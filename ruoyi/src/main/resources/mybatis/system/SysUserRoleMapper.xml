@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.project.system.mapper.SysUserRoleMapper">
+
+	<resultMap type="SysUserRole" id="SysUserRoleResult">
+		<result property="userId"     column="user_id"      />
+		<result property="roleId"     column="role_id"      />
+	</resultMap>
+
+	<delete id="deleteUserRoleByUserId" parameterType="Long">
+		delete from sys_user_role where user_id=#{userId}
+	</delete>
+	
+	<select id="countUserRoleByRoleId" resultType="Integer">
+	    select count(1) from sys_user_role where role_id=#{roleId}  
+	</select>
+	
+	<delete id="deleteUserRole" parameterType="Long">
+ 		delete from sys_user_role where user_id in
+ 		<foreach collection="array" item="userId" open="(" separator="," close=")">
+ 			#{userId}
+        </foreach> 
+ 	</delete>
+	
+	<insert id="batchUserRole">
+		insert into sys_user_role(user_id, role_id) values
+		<foreach item="item" index="index" collection="list" separator=",">
+			(#{item.userId},#{item.roleId})
+		</foreach>
+	</insert>
+	
+	<delete id="deleteUserRoleInfo" parameterType="SysUserRole">
+		delete from sys_user_role where user_id=#{userId} and role_id=#{roleId}
+	</delete>
+	
+	<delete id="deleteUserRoleInfos">
+	    delete from sys_user_role where role_id=#{roleId} and user_id in
+ 	    <foreach collection="userIds" item="userId" open="(" separator="," close=")">
+ 	        #{userId}
+            </foreach> 
+	</delete>
+</mapper> 
