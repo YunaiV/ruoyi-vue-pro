@@ -414,6 +414,7 @@ export default {
         deptId: 100,
         userName: undefined,
         nickName: undefined,
+        password: undefined,
         phonenumber: undefined,
         email: undefined,
         sex: undefined,
