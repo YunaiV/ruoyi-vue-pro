@@ -65,7 +65,7 @@
       <el-table-column label="操作信息" align="center" prop="msg" />
       <el-table-column label="登录日期" align="center" prop="loginTime" width="180">
         <template slot-scope="scope">
-          <span>{{ dateFormat(scope.row.loginTime) }}</span>
+          <span>{{ parseTime(scope.row.loginTime) }}</span>
         </template>
       </el-table-column>
     </el-table>

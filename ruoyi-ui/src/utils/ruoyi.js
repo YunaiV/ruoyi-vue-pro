@@ -4,12 +4,42 @@
  */
 
 // 日期格式化
-export function dateFormat(date, pattern) {
-	var d = new Date(date).Format("yyyy-MM-dd hh:mm:ss");
-	if (pattern) {
-		d = new Date(date).Format(pattern);
-	}
-	return d.toLocaleString();
+export function parseTime(time, pattern) {
+	if (arguments.length === 0) {
+		return null
+	  }
+	  const format = pattern || '{y}-{m}-{d} {h}:{i}:{s}'
+	  let date
+	  if (typeof time === 'object') {
+		date = time
+	  } else {
+		if ((typeof time === 'string') && (/^[0-9]+$/.test(time))) {
+		  time = parseInt(time)
+		}
+		if ((typeof time === 'number') && (time.toString().length === 10)) {
+		  time = time * 1000
+		}
+		date = new Date(time)
+	  }
+	  const formatObj = {
+		y: date.getFullYear(),
+		m: date.getMonth() + 1,
+		d: date.getDate(),
+		h: date.getHours(),
+		i: date.getMinutes(),
+		s: date.getSeconds(),
+		a: date.getDay()
+	  }
+	  const time_str = format.replace(/{(y|m|d|h|i|s|a)+}/g, (result, key) => {
+		let value = formatObj[key]
+		// Note: getDay() returns 0 on Sunday
+		if (key === 'a') { return ['日', '一', '二', '三', '四', '五', '六'][value ] }
+		if (result.length > 0 && value < 10) {
+		  value = '0' + value
+		}
+		return value || 0
+	  })
+	  return time_str
 }
 
 // 表单重置
@@ -56,21 +86,3 @@ export function sprintf(str) {
 	});
 	return flag ? str : '';
 }
-
-Date.prototype.Format = function (fmt) {
-	var o = {
-		"M+": this.getMonth() + 1,                   // 月份
-		"d+": this.getDate(),                        // 日
-		"h+": this.getHours(),                       // 小时
-		"m+": this.getMinutes(),                     // 分
-		"s+": this.getSeconds(),                     // 秒
-		"q+": Math.floor((this.getMonth() + 3) / 3), // 季度
-		"S": this.getMilliseconds()                  // 毫秒
-	};
-	if (/(y+)/.test(fmt))
-		fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
-	for (var k in o)
-		if (new RegExp("(" + k + ")").test(fmt))
-			fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
-	return fmt;
-}  
