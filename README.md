@@ -75,4 +75,4 @@
 
 ## 若依前后端分离交流群
 
-<img border="0" src="https://oscimg.oschina.net/oscnet/e7d76531a534e51b19b0c5ff89e630399a4.jpg" alt="若依前后端分离" title="若依前后端分离"></a>
+QQ群： [![加入QQ群](https://img.shields.io/badge/937441-blue.svg)](https://jq.qq.com/?_wv=1027&k=5bVB1og)  点击按钮入群。
