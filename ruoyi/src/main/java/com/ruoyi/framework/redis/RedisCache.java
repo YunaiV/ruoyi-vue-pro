@@ -197,4 +197,15 @@ public class RedisCache
         Map<String, T> map = redisTemplate.opsForHash().entries(key);
         return map;
     }
+
+    /**
+     * 获得缓存的基本对象列表
+     * 
+     * @param pattern 字符串前缀
+     * @return 对象列表
+     */
+    public Collection<String> keys(String pattern)
+    {
+        return redisTemplate.keys(pattern);
+    }
 }

@@ -9,9 +9,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.utils.IdUtils;
+import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.common.utils.ip.AddressUtils;
+import com.ruoyi.common.utils.ip.IpUtils;
 import com.ruoyi.framework.redis.RedisCache;
 import com.ruoyi.framework.security.LoginUser;
+import eu.bitwalker.useragentutils.UserAgent;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -76,6 +80,7 @@ public class TokenService
     {
         String token = IdUtils.fastUUID();
         loginUser.setToken(token);
+        setUserAgent(loginUser);
         refreshToken(loginUser);
 
         Map<String, Object> claims = new HashMap<>();
@@ -104,8 +109,7 @@ public class TokenService
     /**
      * 刷新令牌有效期
      * 
-     * @param token 令牌
-     * @return 令牌
+     * @param loginUser 登录信息
      */
     public void refreshToken(LoginUser loginUser)
     {
@@ -115,7 +119,22 @@ public class TokenService
         String userKey = getTokenKey(loginUser.getToken());
         redisCache.setCacheObject(userKey, loginUser, expireTime, TimeUnit.MINUTES);
     }
-
+    
+    /**
+     * 设置用户代理信息
+     * 
+     * @param loginUser 登录信息
+     */
+    public void setUserAgent(LoginUser loginUser)
+    {
+        UserAgent userAgent = UserAgent.parseUserAgentString(ServletUtils.getRequest().getHeader("User-Agent"));
+        String ip = IpUtils.getIpAddr(ServletUtils.getRequest());
+        loginUser.setIpaddr(ip);
+        loginUser.setLoginLocation(AddressUtils.getRealAddressByIP(ip));
+        loginUser.setBrowser(userAgent.getBrowser().getName());
+        loginUser.setOs(userAgent.getOperatingSystem().getName());
+    }
+    
     /**
      * 从数据声明生成令牌
      *
