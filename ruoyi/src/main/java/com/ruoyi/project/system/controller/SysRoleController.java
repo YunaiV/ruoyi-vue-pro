@@ -3,6 +3,7 @@ package com.ruoyi.project.system.controller;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.utils.SecurityUtils;
+import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.framework.aspectj.lang.annotation.Log;
 import com.ruoyi.framework.aspectj.lang.enums.BusinessType;
 import com.ruoyi.framework.web.controller.BaseController;
@@ -42,6 +44,16 @@ public class SysRoleController extends BaseController
         return getDataTable(list);
     }
 
+    @Log(title = "角色管理", businessType = BusinessType.EXPORT)
+    @PreAuthorize("@ss.hasPermi('system:role:export')")
+    @GetMapping("/export")
+    public AjaxResult export(SysRole role)
+    {
+        List<SysRole> list = roleService.selectRoleList(role);
+        ExcelUtil<SysRole> util = new ExcelUtil<SysRole>(SysRole.class);
+        return util.exportExcel(list, "角色数据");
+    }
+
     /**
      * 根据角色编号获取详细信息
      */
@@ -58,7 +70,7 @@ public class SysRoleController extends BaseController
     @PreAuthorize("@ss.hasPermi('system:role:add')")
     @Log(title = "角色管理", businessType = BusinessType.INSERT)
     @PostMapping
-    public AjaxResult add(@RequestBody SysRole role)
+    public AjaxResult add(@Validated @RequestBody SysRole role)
     {
         if (UserConstants.NOT_UNIQUE.equals(roleService.checkRoleNameUnique(role)))
         {
@@ -79,7 +91,7 @@ public class SysRoleController extends BaseController
     @PreAuthorize("@ss.hasPermi('system:role:edit')")
     @Log(title = "角色管理", businessType = BusinessType.UPDATE)
     @PutMapping
-    public AjaxResult edit(@RequestBody SysRole role)
+    public AjaxResult edit(@Validated @RequestBody SysRole role)
     {
         roleService.checkRoleAllowed(role);
         if (UserConstants.NOT_UNIQUE.equals(roleService.checkRoleNameUnique(role)))
@@ -120,15 +132,14 @@ public class SysRoleController extends BaseController
     }
 
     /**
-     * 删除岗位
+     * 删除角色
      */
     @PreAuthorize("@ss.hasPermi('system:role:remove')")
     @Log(title = "角色管理", businessType = BusinessType.DELETE)
-    @DeleteMapping("/{roleId}")
-    public AjaxResult remove(@PathVariable Long roleId)
+    @DeleteMapping("/{roleIds}")
+    public AjaxResult remove(@PathVariable Long[] roleIds)
     {
-        roleService.checkRoleAllowed(new SysRole(roleId));
-        return toAjax(roleService.deleteRoleById(roleId));
+        return toAjax(roleService.deleteRoleByIds(roleIds));
     }
 
     /**

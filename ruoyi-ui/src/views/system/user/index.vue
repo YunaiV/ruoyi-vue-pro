@@ -27,8 +27,8 @@
       </el-col>
       <!--用户数据-->
       <el-col :span="20" :xs="24">
-        <el-form :inline="true" label-width="68px">
-          <el-form-item label="用户名称">
+        <el-form :model="queryParams" ref="queryForm" :inline="true" label-width="68px">
+          <el-form-item label="用户名称" prop="userName">
             <el-input
               v-model="queryParams.userName"
               placeholder="请输入用户名称"
@@ -38,7 +38,7 @@
               @keyup.enter.native="handleQuery"
             />
           </el-form-item>
-          <el-form-item label="手机号码">
+          <el-form-item label="手机号码" prop="phonenumber">
             <el-input
               v-model="queryParams.phonenumber"
               placeholder="请输入手机号码"
@@ -48,7 +48,7 @@
               @keyup.enter.native="handleQuery"
             />
           </el-form-item>
-          <el-form-item label="状态">
+          <el-form-item label="状态" prop="status">
             <el-select
               v-model="queryParams.status"
               placeholder="用户状态"
@@ -78,11 +78,53 @@
           </el-form-item>
           <el-form-item>
             <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
-            <el-button type="primary" icon="el-icon-plus" size="mini" @click="handleAdd" v-hasPermi="['system:user:add']">新增</el-button>
+            <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
           </el-form-item>
         </el-form>
 
-        <el-table v-loading="loading" :data="userList">
+        <el-row :gutter="10" class="mb8">
+          <el-col :span="1.5">
+            <el-button
+              type="primary"
+              icon="el-icon-plus"
+              size="mini"
+              @click="handleAdd"
+              v-hasPermi="['system:user:add']"
+            >新增</el-button>
+          </el-col>
+          <el-col :span="1.5">
+            <el-button
+              type="success"
+              icon="el-icon-edit"
+              size="mini"
+              :disabled="single"
+              @click="handleUpdate"
+              v-hasPermi="['system:user:edit']"
+            >修改</el-button>
+          </el-col>
+          <el-col :span="1.5">
+            <el-button
+              type="danger"
+              icon="el-icon-delete"
+              size="mini"
+              :disabled="multiple"
+              @click="handleDelete"
+              v-hasPermi="['system:user:remove']"
+            >删除</el-button>
+          </el-col>
+          <el-col :span="1.5">
+            <el-button
+              type="warning"
+              icon="el-icon-download"
+              size="mini"
+              @click="handleExport"
+              v-hasPermi="['system:user:export']"
+            >导出</el-button>
+          </el-col>
+        </el-row>
+
+        <el-table v-loading="loading" :data="userList" @selection-change="handleSelectionChange">
+          <el-table-column type="selection" width="40" align="center" />
           <el-table-column label="用户编号" align="center" prop="userId" />
           <el-table-column label="用户名称" align="center" prop="userName" />
           <el-table-column label="用户昵称" align="center" prop="nickName" />
@@ -246,7 +288,7 @@
 </template>
 
 <script>
-import { listUser, getUser, delUser, addUser, updateUser, resetUserPwd, changeUserStatus } from "@/api/system/user";
+import { listUser, getUser, delUser, addUser, updateUser, exportUser, resetUserPwd, changeUserStatus } from "@/api/system/user";
 import { treeselect } from "@/api/system/dept";
 import { listPost } from "@/api/system/post";
 import { listRole } from "@/api/system/role";
@@ -259,6 +301,12 @@ export default {
     return {
       // 遮罩层
       loading: true,
+      // 选中数组
+      ids: [],
+      // 非单个禁用
+      single: true,
+      // 非多个禁用
+      multiple: true,
       // 总条数
       total: 0,
       // 用户表格数据
@@ -430,6 +478,18 @@ export default {
       this.queryParams.page = 1;
       this.getList();
     },
+    /** 重置按钮操作 */
+    resetQuery() {
+      this.dateRange = [];
+      this.resetForm("queryForm");
+      this.handleQuery();
+    },
+    // 多选框选中数据
+    handleSelectionChange(selection) {
+      this.ids = selection.map(item => item.userId)
+      this.single = selection.length!=1
+      this.multiple = !selection.length
+    },
     /** 新增按钮操作 */
     handleAdd() {
       this.reset();
@@ -446,7 +506,8 @@ export default {
       this.getTreeselect();
       this.getPosts();
       this.getRoles();
-      getUser(row.userId).then(response => {
+      const userId = row.userId || this.ids
+      getUser(userId).then(response => {
         this.form = response.data;
         this.form.postIds = response.postIds;
         this.form.roleIds = response.roleIds;
@@ -500,15 +561,29 @@ export default {
     },
     /** 删除按钮操作 */
     handleDelete(row) {
-      this.$confirm('是否确认删除名称为"' + row.userName + '"的数据项?', "警告", {
+      const userIds = row.userId || this.ids;
+      this.$confirm('是否确认删除用户编号为"' + userIds + '"的数据项?', "警告", {
           confirmButtonText: "确定",
           cancelButtonText: "取消",
           type: "warning"
         }).then(function() {
-          return delUser(row.userId);
+          return delUser(userIds);
         }).then(() => {
           this.getList();
           this.msgSuccess("删除成功");
+        }).catch(function() {});
+    },
+    /** 导出按钮操作 */
+    handleExport() {
+      const queryParams = this.queryParams;
+      this.$confirm('是否确认导出所有用户数据项?', "警告", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning"
+        }).then(function() {
+          return exportUser(queryParams);
+        }).then(response => {
+          this.download(response.msg);
         }).catch(function() {});
     }
   }

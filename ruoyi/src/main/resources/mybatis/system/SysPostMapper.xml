@@ -111,5 +111,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	<delete id="deletePostById" parameterType="Long">
 		delete from sys_post where post_id = #{postId}
 	</delete>
+	
+	<delete id="deletePostByIds" parameterType="Long">
+ 		delete from sys_post where post_id in
+ 		<foreach collection="array" item="postId" open="(" separator="," close=")">
+ 			#{postId}
+        </foreach> 
+ 	</delete>
 
 </mapper> 

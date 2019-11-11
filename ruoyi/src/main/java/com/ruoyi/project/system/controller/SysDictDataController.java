@@ -3,6 +3,7 @@ package com.ruoyi.project.system.controller;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -10,9 +11,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import com.ruoyi.common.utils.SecurityUtils;
+import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.framework.aspectj.lang.annotation.Log;
 import com.ruoyi.framework.aspectj.lang.enums.BusinessType;
 import com.ruoyi.framework.web.controller.BaseController;
@@ -35,12 +36,21 @@ public class SysDictDataController extends BaseController
 
     @PreAuthorize("@ss.hasPermi('system:dict:list')")
     @GetMapping("/list")
-    @ResponseBody
     public TableDataInfo list(SysDictData dictData)
     {
         startPage();
         List<SysDictData> list = dictDataService.selectDictDataList(dictData);
         return getDataTable(list);
+    }
+
+    @Log(title = "字典数据", businessType = BusinessType.EXPORT)
+    @PreAuthorize("@ss.hasPermi('system:dict:export')")
+    @GetMapping("/export")
+    public AjaxResult export(SysDictData dictData)
+    {
+        List<SysDictData> list = dictDataService.selectDictDataList(dictData);
+        ExcelUtil<SysDictData> util = new ExcelUtil<SysDictData>(SysDictData.class);
+        return util.exportExcel(list, "字典数据");
     }
 
     /**
@@ -69,7 +79,7 @@ public class SysDictDataController extends BaseController
     @PreAuthorize("@ss.hasPermi('system:dict:add')")
     @Log(title = "字典数据", businessType = BusinessType.INSERT)
     @PostMapping
-    public AjaxResult add(@RequestBody SysDictData dict)
+    public AjaxResult add(@Validated @RequestBody SysDictData dict)
     {
         dict.setCreateBy(SecurityUtils.getUsername());
         return toAjax(dictDataService.insertDictData(dict));
@@ -81,7 +91,7 @@ public class SysDictDataController extends BaseController
     @PreAuthorize("@ss.hasPermi('system:dict:edit')")
     @Log(title = "字典数据", businessType = BusinessType.UPDATE)
     @PutMapping
-    public AjaxResult edit(@RequestBody SysDictData dict)
+    public AjaxResult edit(@Validated @RequestBody SysDictData dict)
     {
         dict.setUpdateBy(SecurityUtils.getUsername());
         return toAjax(dictDataService.updateDictData(dict));
@@ -92,9 +102,9 @@ public class SysDictDataController extends BaseController
      */
     @PreAuthorize("@ss.hasPermi('system:dict:remove')")
     @Log(title = "字典类型", businessType = BusinessType.DELETE)
-    @DeleteMapping("/{dictCode}")
-    public AjaxResult remove(@PathVariable Long dictCode)
+    @DeleteMapping("/{dictCodes}")
+    public AjaxResult remove(@PathVariable Long[] dictCodes)
     {
-        return toAjax(dictDataService.deleteDictDataById(dictCode));
+        return toAjax(dictDataService.deleteDictDataByIds(dictCodes));
     }
 }

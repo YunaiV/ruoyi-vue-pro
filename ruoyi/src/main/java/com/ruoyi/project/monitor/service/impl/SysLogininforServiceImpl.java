@@ -3,7 +3,6 @@ package com.ruoyi.project.monitor.service.impl;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.ruoyi.common.core.text.Convert;
 import com.ruoyi.project.monitor.domain.SysLogininfor;
 import com.ruoyi.project.monitor.mapper.SysLogininforMapper;
 import com.ruoyi.project.monitor.service.ISysLogininforService;
@@ -46,13 +45,13 @@ public class SysLogininforServiceImpl implements ISysLogininforService
     /**
      * 批量删除系统登录日志
      * 
-     * @param ids 需要删除的数据
+     * @param infoIds 需要删除的登录日志ID
      * @return
      */
     @Override
-    public int deleteLogininforByIds(String ids)
+    public int deleteLogininforByIds(Long[] infoIds)
     {
-        return logininforMapper.deleteLogininforByIds(Convert.toStrArray(ids));
+        return logininforMapper.deleteLogininforByIds(infoIds);
     }
 
     /**

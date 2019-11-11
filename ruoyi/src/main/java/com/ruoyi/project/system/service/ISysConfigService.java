@@ -53,10 +53,18 @@ public interface ISysConfigService
     /**
      * 删除参数配置信息
      * 
-     * @param configId 需要删除的数据ID
+     * @param configId 参数ID
      * @return 结果
      */
     public int deleteConfigById(Long configId);
+
+    /**
+     * 批量删除参数信息
+     * 
+     * @param configIds 需要删除的参数ID
+     * @return 结果
+     */
+    public int deleteConfigByIds(Long[] configIds);
 
     /**
      * 校验参数键名是否唯一

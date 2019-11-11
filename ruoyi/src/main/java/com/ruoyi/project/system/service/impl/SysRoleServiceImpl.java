@@ -18,6 +18,7 @@ import com.ruoyi.project.system.domain.SysRoleMenu;
 import com.ruoyi.project.system.mapper.SysRoleDeptMapper;
 import com.ruoyi.project.system.mapper.SysRoleMapper;
 import com.ruoyi.project.system.mapper.SysRoleMenuMapper;
+import com.ruoyi.project.system.mapper.SysUserRoleMapper;
 import com.ruoyi.project.system.service.ISysRoleService;
 
 /**
@@ -33,6 +34,9 @@ public class SysRoleServiceImpl implements ISysRoleService
 
     @Autowired
     private SysRoleMenuMapper roleMenuMapper;
+
+    @Autowired
+    private SysUserRoleMapper userRoleMapper;
 
     @Autowired
     private SysRoleDeptMapper roleDeptMapper;
@@ -150,6 +154,18 @@ public class SysRoleServiceImpl implements ISysRoleService
         {
             throw new CustomException("不允许操作超级管理员角色");
         }
+    }
+
+    /**
+     * 通过角色ID查询角色使用数量
+     * 
+     * @param roleId 角色ID
+     * @return 结果
+     */
+    @Override
+    public int countUserRoleByRoleId(Long roleId)
+    {
+        return userRoleMapper.countUserRoleByRoleId(roleId);
     }
 
     /**
@@ -271,5 +287,25 @@ public class SysRoleServiceImpl implements ISysRoleService
     public int deleteRoleById(Long roleId)
     {
         return roleMapper.deleteRoleById(roleId);
+    }
+
+    /**
+     * 批量删除角色信息
+     * 
+     * @param roleIds 需要删除的角色ID
+     * @return 结果
+     */
+    public int deleteRoleByIds(Long[] roleIds)
+    {
+        for (Long roleId : roleIds)
+        {
+            checkRoleAllowed(new SysRole(roleId));
+            SysRole role = selectRoleById(roleId);
+            if (countUserRoleByRoleId(roleId) > 0)
+            {
+                throw new CustomException(String.format("%1$s已分配,不能删除", role.getRoleName()));
+            }
+        }
+        return roleMapper.deleteRoleByIds(roleIds);
     }
 }

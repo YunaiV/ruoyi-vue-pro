@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
-    <el-form :inline="true">
-      <el-form-item label="角色名称">
+    <el-form :model="queryParams" ref="queryForm" :inline="true">
+      <el-form-item label="角色名称" prop="roleName">
         <el-input
           v-model="queryParams.roleName"
           placeholder="请输入角色名称"
@@ -11,7 +11,7 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="权限字符">
+      <el-form-item label="权限字符" prop="roleKey">
         <el-input
           v-model="queryParams.roleKey"
           placeholder="请输入权限字符"
@@ -21,7 +21,7 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="状态">
+      <el-form-item label="状态" prop="status">
         <el-select
           v-model="queryParams.status"
           placeholder="角色状态"
@@ -51,6 +51,12 @@
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
+        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
+      </el-form-item>
+    </el-form>
+
+    <el-row :gutter="10" class="mb8">
+      <el-col :span="1.5">
         <el-button
           type="primary"
           icon="el-icon-plus"
@@ -58,15 +64,45 @@
           @click="handleAdd"
           v-hasPermi="['system:role:add']"
         >新增</el-button>
-      </el-form-item>
-    </el-form>
+      </el-col>
+      <el-col :span="1.5">
+        <el-button
+          type="success"
+          icon="el-icon-edit"
+          size="mini"
+          :disabled="single"
+          @click="handleUpdate"
+          v-hasPermi="['system:role:edit']"
+        >修改</el-button>
+      </el-col>
+      <el-col :span="1.5">
+        <el-button
+          type="danger"
+          icon="el-icon-delete"
+          size="mini"
+          :disabled="multiple"
+          @click="handleDelete"
+          v-hasPermi="['system:role:remove']"
+        >删除</el-button>
+      </el-col>
+      <el-col :span="1.5">
+        <el-button
+          type="warning"
+          icon="el-icon-download"
+          size="mini"
+          @click="handleExport"
+          v-hasPermi="['system:post:export']"
+        >导出</el-button>
+      </el-col>
+    </el-row>
 
-    <el-table v-loading="loading" :data="roleList">
+    <el-table v-loading="loading" :data="roleList" @selection-change="handleSelectionChange">
+      <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="角色编号" prop="roleId" width="120" />
       <el-table-column label="角色名称" prop="roleName" :show-overflow-tooltip="true" width="150" />
-      <el-table-column label="权限字符" prop="roleKey" :show-overflow-tooltip="true" width="180" />
-      <el-table-column label="显示顺序" prop="roleSort" width="120" />
-      <el-table-column label="状态" align="center" width="120">
+      <el-table-column label="权限字符" prop="roleKey" :show-overflow-tooltip="true" width="150" />
+      <el-table-column label="显示顺序" prop="roleSort" width="100" />
+      <el-table-column label="状态" align="center" width="100">
         <template slot-scope="scope">
           <el-switch
             v-model="scope.row.status"
@@ -197,7 +233,7 @@
 </template>
 
 <script>
-import { listRole, getRole, delRole, addRole, updateRole, dataScope, changeRoleStatus } from "@/api/system/role";
+import { listRole, getRole, delRole, addRole, updateRole, exportRole, dataScope, changeRoleStatus } from "@/api/system/role";
 import { treeselect as menuTreeselect, roleMenuTreeselect } from "@/api/system/menu";
 import { treeselect as deptTreeselect, roleDeptTreeselect } from "@/api/system/dept";
 
@@ -206,6 +242,12 @@ export default {
     return {
       // 遮罩层
       loading: true,
+      // 选中数组
+      ids: [],
+      // 非单个禁用
+      single: true,
+      // 非多个禁用
+      multiple: true,
       // 总条数
       total: 0,
       // 角色表格数据
@@ -384,6 +426,18 @@ export default {
       this.queryParams.pageNum = 1;
       this.getList();
     },
+    /** 重置按钮操作 */
+    resetQuery() {
+      this.dateRange = [];
+      this.resetForm("queryForm");
+      this.handleQuery();
+    },
+    // 多选框选中数据
+    handleSelectionChange(selection) {
+      this.ids = selection.map(item => item.roleId)
+      this.single = selection.length!=1
+      this.multiple = !selection.length
+    },
     /** 新增按钮操作 */
     handleAdd() {
       this.reset();
@@ -394,10 +448,11 @@ export default {
     /** 修改按钮操作 */
     handleUpdate(row) {
       this.reset();
+      const roleId = row.roleId || this.ids
       this.$nextTick(() => {
-        this.getRoleMenuTreeselect(row.roleId);
+        this.getRoleMenuTreeselect(roleId);
       });
-      getRole(row.roleId).then(response => {
+      getRole(roleId).then(response => {
         this.form = response.data;
         this.open = true;
         this.title = "修改角色";
@@ -462,15 +517,29 @@ export default {
     },
     /** 删除按钮操作 */
     handleDelete(row) {
-      this.$confirm('是否确认删除名称为"' + row.roleName + '"的数据项?', "警告", {
+      const roleIds = row.roleId || this.ids;
+      this.$confirm('是否确认删除角色编号为"' + roleIds + '"的数据项?', "警告", {
           confirmButtonText: "确定",
           cancelButtonText: "取消",
           type: "warning"
         }).then(function() {
-          return delRole(row.roleId);
+          return delRole(roleIds);
         }).then(() => {
           this.getList();
           this.msgSuccess("删除成功");
+        }).catch(function() {});
+    },
+    /** 导出按钮操作 */
+    handleExport() {
+      const queryParams = this.queryParams;
+      this.$confirm('是否确认导出所有角色数据项?', "警告", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning"
+        }).then(function() {
+          return exportRole(queryParams);
+        }).then(response => {
+          this.download(response.msg);
         }).catch(function() {});
     }
   }

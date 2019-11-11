@@ -42,3 +42,12 @@ export function delPost(postId) {
     method: 'delete'
   })
 }
+
+// 导出岗位
+export function exportPost(query) {
+  return request({
+    url: '/system/post/export',
+    method: 'get',
+    params: query
+  })
+}

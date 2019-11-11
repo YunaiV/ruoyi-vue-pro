@@ -5,7 +5,7 @@
 
 	<groupId>com.ruoyi</groupId>
 	<artifactId>ruoyi</artifactId>
-	<version>1.0</version>
+	<version>1.1</version>
 	<packaging>jar</packaging>
 
 	<name>ruoyi</name>
@@ -32,6 +32,7 @@
 		<bitwalker.version>1.19</bitwalker.version>
 		<jwt.version>0.9.0</jwt.version>
 		<swagger.version>2.9.2</swagger.version>
+		<poi.version>3.17</poi.version>
 		<oshi.version>3.9.1</oshi.version>
 	</properties>
 
@@ -222,6 +223,13 @@
 		<dependency>
 			<groupId>net.java.dev.jna</groupId>
 			<artifactId>jna-platform</artifactId>
+		</dependency>
+		
+		<!-- excel工具 -->
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml</artifactId>
+			<version>${poi.version}</version>
 		</dependency>
 
 	</dependencies>

@@ -64,3 +64,12 @@ export function delRole(roleId) {
     method: 'delete'
   })
 }
+
+// 导出角色
+export function exportRole(query) {
+  return request({
+    url: '/system/role/export',
+    method: 'get',
+    params: query
+  })
+}

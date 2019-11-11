@@ -136,7 +136,7 @@ create table sys_menu (
   path              varchar(200)    default ''                 comment '路由地址',
   component         varchar(255)    default null               comment '组件路径',
   is_frame          int(1)          default 1                  comment '是否为外链（0是 1否）',
-  menu_type         char(1)         default ''                 comment '菜单类型（0目录 1菜单 2按钮）',
+  menu_type         char(1)         default ''                 comment '菜单类型（M目录 C菜单 F按钮）',
   visible           char(1)         default 0                  comment '菜单状态（0显示 1隐藏）',
   perms             varchar(100)    default null               comment '权限标识',
   icon              varchar(100)    default '#'                comment '菜单图标',
@@ -152,10 +152,10 @@ create table sys_menu (
 -- 初始化-菜单信息表数据
 -- ----------------------------
 -- 一级菜单
-insert into sys_menu values('1', '系统管理', '0', '1', 'system',   null,  1, 'M', '0', '', 'system',   'admin', '2018-03-16 11-33-00', 'ry', '2018-03-16 11-33-00', '系统管理目录');
-insert into sys_menu values('2', '系统监控', '0', '2', 'monitor',  null,  1, 'M', '0', '', 'monitor',  'admin', '2018-03-16 11-33-00', 'ry', '2018-03-16 11-33-00', '系统监控目录');
-insert into sys_menu values('3', '系统工具', '0', '3', 'tool',     null,  1, 'M', '0', '', 'tool',     'admin', '2018-03-16 11-33-00', 'ry', '2018-03-16 11-33-00', '系统工具目录');
-INSERT INTO sys_menu VALUES('4', '若依官网', '0', '4', 'http://ruoyi.vip',  NULL ,  0, 'M', '0', '', 'guide',     'admin', '2018-03-16 11-33-00', 'ry', '2018-03-16 11-33-00', '若依官网');
+insert into sys_menu values('1', '系统管理', '0', '1', 'system',           null,   1, 'M', '0', '', 'system',   'admin', '2018-03-16 11-33-00', 'ry', '2018-03-16 11-33-00', '系统管理目录');
+insert into sys_menu values('2', '系统监控', '0', '2', 'monitor',          null,   1, 'M', '0', '', 'monitor',  'admin', '2018-03-16 11-33-00', 'ry', '2018-03-16 11-33-00', '系统监控目录');
+insert into sys_menu values('3', '系统工具', '0', '3', 'tool',             null,   1, 'M', '0', '', 'tool',     'admin', '2018-03-16 11-33-00', 'ry', '2018-03-16 11-33-00', '系统工具目录');
+insert into sys_menu values('4', '若依官网', '0', '4', 'http://ruoyi.vip', null ,  0, 'M', '0', '', 'guide',    'admin', '2018-03-16 11-33-00', 'ry', '2018-03-16 11-33-00', '若依官网地址');
 -- 二级菜单
 insert into sys_menu values('100',  '用户管理', '1',   '1', 'user',       'system/user/index',        1, 'C', '0', 'system:user:list',        'user',          'admin', '2018-03-16 11-33-00', 'ry', '2018-03-16 11-33-00', '用户管理菜单');
 insert into sys_menu values('101',  '角色管理', '1',   '2', 'role',       'system/role/index',        1, 'C', '0', 'system:role:list',        'peoples',       'admin', '2018-03-16 11-33-00', 'ry', '2018-03-16 11-33-00', '角色管理菜单');
@@ -550,27 +550,7 @@ create table sys_logininfor (
 
 
 -- ----------------------------
--- 15、在线用户记录
--- ----------------------------
-drop table if exists sys_user_online;
-create table sys_user_online (
-  sessionId         varchar(50)   default ''                comment '用户会话id',
-  user_name         varchar(50)   default ''                comment '用户账号',
-  dept_name         varchar(50)   default ''                comment '部门名称',
-  ipaddr            varchar(50)   default ''                comment '登录IP地址',
-  login_location    varchar(255)  default ''                comment '登录地点',
-  browser           varchar(50)   default ''                comment '浏览器类型',
-  os                varchar(50)   default ''                comment '操作系统',
-  status            varchar(10)   default ''                comment '在线状态on_line在线off_line离线',
-  start_timestamp   datetime                                comment 'session创建时间',
-  last_access_time  datetime                                comment 'session最后访问时间',
-  expire_time       int(5)        default 0                 comment '超时时间，单位为分钟',
-  primary key (sessionId)
-) engine=innodb comment = '在线用户记录';
-
-
--- ----------------------------
--- 16、定时任务调度表
+-- 15、定时任务调度表
 -- ----------------------------
 drop table if exists sys_job;
 create table sys_job (
@@ -596,7 +576,7 @@ insert into sys_job values(3, '系统默认（多参）', 'DEFAULT', 'ryTask.ryM
 
 
 -- ----------------------------
--- 17、定时任务调度日志表
+-- 16、定时任务调度日志表
 -- ----------------------------
 drop table if exists sys_job_log;
 create table sys_job_log (
@@ -613,7 +593,7 @@ create table sys_job_log (
 
 
 -- ----------------------------
--- 18、通知公告表
+-- 17、通知公告表
 -- ----------------------------
 drop table if exists sys_notice;
 create table sys_notice (
@@ -638,7 +618,7 @@ insert into sys_notice values('2', '维护通知：2018-07-01 若依系统凌晨
 
 
 -- ----------------------------
--- 19、代码生成业务表
+-- 18、代码生成业务表
 -- ----------------------------
 drop table if exists gen_table;
 create table gen_table (
@@ -663,7 +643,7 @@ create table gen_table (
 
 
 -- ----------------------------
--- 20、代码生成业务表字段
+-- 19、代码生成业务表字段
 -- ----------------------------
 drop table if exists gen_table_column;
 create table gen_table_column (

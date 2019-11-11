@@ -360,4 +360,19 @@ public class SysUserServiceImpl implements ISysUserService
         userPostMapper.deleteUserPostByUserId(userId);
         return userMapper.deleteUserById(userId);
     }
+
+    /**
+     * 批量删除用户信息
+     * 
+     * @param userIds 需要删除的用户ID
+     * @return 结果
+     */
+    public int deleteUserByIds(Long[] userIds)
+    {
+        for (Long userId : userIds)
+        {
+            checkUserAllowed(new SysUser(userId));
+        }
+        return userMapper.deleteUserByIds(userIds);
+    }
 }

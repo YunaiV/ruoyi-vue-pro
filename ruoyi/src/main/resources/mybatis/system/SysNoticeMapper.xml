@@ -79,4 +79,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         delete from sys_notice where notice_id = #{noticeId}
     </delete>
     
+    <delete id="deleteNoticeByIds" parameterType="Long">
+        delete from sys_notice where notice_id in 
+        <foreach item="noticeId" collection="array" open="(" separator="," close=")">
+            #{noticeId}
+        </foreach>
+    </delete>
+    
 </mapper>

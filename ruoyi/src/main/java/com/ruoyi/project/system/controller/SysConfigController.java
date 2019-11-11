@@ -3,6 +3,7 @@ package com.ruoyi.project.system.controller;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.utils.SecurityUtils;
+import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.framework.aspectj.lang.annotation.Log;
 import com.ruoyi.framework.aspectj.lang.enums.BusinessType;
 import com.ruoyi.framework.web.controller.BaseController;
@@ -45,6 +47,16 @@ public class SysConfigController extends BaseController
         return getDataTable(list);
     }
 
+    @Log(title = "参数管理", businessType = BusinessType.EXPORT)
+    @PreAuthorize("@ss.hasPermi('system:config:export')")
+    @GetMapping("/export")
+    public AjaxResult export(SysConfig config)
+    {
+        List<SysConfig> list = configService.selectConfigList(config);
+        ExcelUtil<SysConfig> util = new ExcelUtil<SysConfig>(SysConfig.class);
+        return util.exportExcel(list, "参数数据");
+    }
+
     /**
      * 根据参数编号获取详细信息
      */
@@ -71,7 +83,7 @@ public class SysConfigController extends BaseController
     @PreAuthorize("@ss.hasPermi('system:config:add')")
     @Log(title = "参数管理", businessType = BusinessType.INSERT)
     @PostMapping
-    public AjaxResult add(@RequestBody SysConfig config)
+    public AjaxResult add(@Validated @RequestBody SysConfig config)
     {
         if (UserConstants.NOT_UNIQUE.equals(configService.checkConfigKeyUnique(config)))
         {
@@ -87,7 +99,7 @@ public class SysConfigController extends BaseController
     @PreAuthorize("@ss.hasPermi('system:config:edit')")
     @Log(title = "参数管理", businessType = BusinessType.UPDATE)
     @PutMapping
-    public AjaxResult edit(@RequestBody SysConfig config)
+    public AjaxResult edit(@Validated @RequestBody SysConfig config)
     {
         if (UserConstants.NOT_UNIQUE.equals(configService.checkConfigKeyUnique(config)))
         {
@@ -102,9 +114,9 @@ public class SysConfigController extends BaseController
      */
     @PreAuthorize("@ss.hasPermi('system:config:remove')")
     @Log(title = "参数管理", businessType = BusinessType.DELETE)
-    @DeleteMapping("/{configId}")
-    public AjaxResult remove(@PathVariable Long configId)
+    @DeleteMapping("/{configIds}")
+    public AjaxResult remove(@PathVariable Long[] configIds)
     {
-        return toAjax(configService.deleteConfigById(configId));
+        return toAjax(configService.deleteConfigByIds(configIds));
     }
 }

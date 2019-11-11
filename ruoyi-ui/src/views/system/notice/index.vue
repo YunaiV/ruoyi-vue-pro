@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
-    <el-form :inline="true" label-width="68px">
-      <el-form-item label="公告标题">
+    <el-form :model="queryParams" ref="queryForm" :inline="true" label-width="68px">
+      <el-form-item label="公告标题" prop="noticeTitle">
         <el-input
           v-model="queryParams.noticeTitle"
           placeholder="请输入公告标题"
@@ -10,7 +10,7 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="操作人员">
+      <el-form-item label="操作人员" prop="createBy">
         <el-input
           v-model="queryParams.createBy"
           placeholder="请输入操作人员"
@@ -19,7 +19,7 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="类型">
+      <el-form-item label="类型" prop="noticeType">
         <el-select v-model="queryParams.noticeType" placeholder="公告类型" clearable size="small">
           <el-option
             v-for="dict in typeOptions"
@@ -31,11 +31,44 @@
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
-        <el-button type="primary" icon="el-icon-plus" size="mini" @click="handleAdd" v-hasPermi="['system:notice:add']">新增</el-button>
+        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
 
-    <el-table v-loading="loading" :data="noticeList">
+    <el-row :gutter="10" class="mb8">
+      <el-col :span="1.5">
+        <el-button
+          type="primary"
+          icon="el-icon-plus"
+          size="mini"
+          @click="handleAdd"
+          v-hasPermi="['system:notice:add']"
+        >新增</el-button>
+      </el-col>
+      <el-col :span="1.5">
+        <el-button
+          type="success"
+          icon="el-icon-edit"
+          size="mini"
+          :disabled="single"
+          @click="handleUpdate"
+          v-hasPermi="['system:notice:edit']"
+        >修改</el-button>
+      </el-col>
+      <el-col :span="1.5">
+        <el-button
+          type="danger"
+          icon="el-icon-delete"
+          size="mini"
+          :disabled="multiple"
+          @click="handleDelete"
+          v-hasPermi="['system:notice:remove']"
+        >删除</el-button>
+      </el-col>
+    </el-row>
+
+    <el-table v-loading="loading" :data="noticeList" @selection-change="handleSelectionChange">
+      <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="序号" align="center" prop="noticeId" width="100" />
       <el-table-column
         label="公告标题"
@@ -65,10 +98,10 @@
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-          <el-button 
-            size="mini" 
-            type="text" 
-            icon="el-icon-edit" 
+          <el-button
+            size="mini"
+            type="text"
+            icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
             v-hasPermi="['system:notice:edit']"
           >修改</el-button>
@@ -125,7 +158,7 @@
           </el-col>
           <el-col :span="24">
             <el-form-item label="内容">
-               <Editor v-model="form.noticeContent"/>
+              <Editor v-model="form.noticeContent" />
             </el-form-item>
           </el-col>
         </el-row>
@@ -139,7 +172,7 @@
 </template>
 
 <script>
-import { listNotice, getNotice, delNotice, addNotice, updateNotice } from "@/api/system/notice";
+import { listNotice, getNotice, delNotice, addNotice, updateNotice, exportNotice } from "@/api/system/notice";
 import Editor from '@/components/Editor';
 
 export default {
@@ -150,6 +183,12 @@ export default {
     return {
       // 遮罩层
       loading: true,
+      // 选中数组
+      ids: [],
+      // 非单个禁用
+      single: true,
+      // 非多个禁用
+      multiple: true,
       // 总条数
       total: 0,
       // 公告表格数据
@@ -231,6 +270,17 @@ export default {
       this.queryParams.pageNum = 1;
       this.getList();
     },
+    /** 重置按钮操作 */
+    resetQuery() {
+      this.resetForm("queryForm");
+      this.handleQuery();
+    },
+    // 多选框选中数据
+    handleSelectionChange(selection) {
+      this.ids = selection.map(item => item.noticeId)
+      this.single = selection.length!=1
+      this.multiple = !selection.length
+    },
     /** 新增按钮操作 */
     handleAdd() {
       this.reset();
@@ -240,7 +290,8 @@ export default {
     /** 修改按钮操作 */
     handleUpdate(row) {
       this.reset();
-      getNotice(row.noticeId).then(response => {
+      const noticeId = row.noticeId || this.ids
+      getNotice(noticeId).then(response => {
         this.form = response.data;
         this.open = true;
         this.title = "修改公告";
@@ -276,12 +327,13 @@ export default {
     },
     /** 删除按钮操作 */
     handleDelete(row) {
-      this.$confirm('是否确认删除公告标题为"' + row.noticeTitle + '"的数据项?', "警告", {
+      const noticeIds = row.noticeId || this.ids
+      this.$confirm('是否确认删除公告编号为"' + noticeIds + '"的数据项?', "警告", {
           confirmButtonText: "确定",
           cancelButtonText: "取消",
           type: "warning"
         }).then(function() {
-          return delNotice(row.noticeId);
+          return delNotice(noticeIds);
         }).then(() => {
           this.getList();
           this.msgSuccess("删除成功");

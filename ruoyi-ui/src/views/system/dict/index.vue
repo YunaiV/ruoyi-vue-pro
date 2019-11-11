@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
-    <el-form :inline="true" label-width="68px">
-      <el-form-item label="字典名称">
+    <el-form :model="queryParams" ref="queryForm" :inline="true" label-width="68px">
+      <el-form-item label="字典名称" prop="dictName">
         <el-input
           v-model="queryParams.dictName"
           placeholder="请输入字典名称"
@@ -11,7 +11,7 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="字典类型">
+      <el-form-item label="字典类型" prop="dictType">
         <el-input
           v-model="queryParams.dictType"
           placeholder="请输入字典类型"
@@ -21,7 +21,7 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="状态">
+      <el-form-item label="状态" prop="status">
         <el-select
           v-model="queryParams.status"
           placeholder="字典状态"
@@ -39,7 +39,7 @@
       </el-form-item>
       <el-form-item label="创建时间">
         <el-date-picker
-          v-model="queryParams.createTime"
+          v-model="dateRange"
           size="small"
           style="width: 240px"
           value-format="yyyy-MM-dd"
@@ -51,14 +51,56 @@
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
-        <el-button type="primary" icon="el-icon-plus" size="mini" @click="handleAdd" v-hasPermi="['system:dict:add']">新增</el-button>
+        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
 
-    <el-table v-loading="loading" :data="typeList" style="width: 100%;">
-      <el-table-column label="字典主键" align="center" prop="dictId" />
+    <el-row :gutter="10" class="mb8">
+      <el-col :span="1.5">
+        <el-button
+          type="primary"
+          icon="el-icon-plus"
+          size="mini"
+          @click="handleAdd"
+          v-hasPermi="['system:dict:add']"
+        >新增</el-button>
+      </el-col>
+      <el-col :span="1.5">
+        <el-button
+          type="success"
+          icon="el-icon-edit"
+          size="mini"
+          :disabled="single"
+          @click="handleUpdate"
+          v-hasPermi="['system:dict:edit']"
+        >修改</el-button>
+      </el-col>
+      <el-col :span="1.5">
+        <el-button
+          type="danger"
+          icon="el-icon-delete"
+          size="mini"
+          :disabled="multiple"
+          @click="handleDelete"
+          v-hasPermi="['system:dict:remove']"
+        >删除</el-button>
+      </el-col>
+      <el-col :span="1.5">
+        <el-button
+          type="warning"
+          icon="el-icon-download"
+          size="mini"
+          @click="handleExport"
+          v-hasPermi="['system:dict:export']"
+        >导出</el-button>
+      </el-col>
+    </el-row>
+
+    <el-table v-loading="loading" :data="typeList" @selection-change="handleSelectionChange">
+      <el-table-column type="selection" width="55" align="center" />
+      <el-table-column label="字典编号" align="center" prop="dictId" />
       <el-table-column label="字典名称" align="center" prop="dictName" :show-overflow-tooltip="true" />
-      <el-table-column label="字典类型" align="center">
+      <el-table-column label="字典类型" align="center" :show-overflow-tooltip="true">
         <template slot-scope="scope">
           <router-link :to="'/dict/type/data/' + scope.row.dictId" class="link-type">
             <span>{{ scope.row.dictType }}</span>
@@ -74,10 +116,10 @@
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-          <el-button 
-            size="mini" 
-            type="text" 
-            icon="el-icon-edit" 
+          <el-button
+            size="mini"
+            type="text"
+            icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
             v-hasPermi="['system:dict:edit']"
           >修改</el-button>
@@ -131,13 +173,19 @@
 </template>
 
 <script>
-import { listType, getType, delType, addType, updateType } from "@/api/system/dict/type";
+import { listType, getType, delType, addType, updateType, exportType } from "@/api/system/dict/type";
 
 export default {
   data() {
     return {
       // 遮罩层
       loading: true,
+      // 选中数组
+      ids: [],
+      // 非单个禁用
+      single: true,
+      // 非多个禁用
+      multiple: true,
       // 总条数
       total: 0,
       // 字典表格数据
@@ -181,8 +229,7 @@ export default {
     /** 查询字典类型列表 */
     getList() {
       this.loading = true;
-      listType(this.addDateRange(this.queryParams, this.dateRange)).then(
-        response => {
+      listType(this.addDateRange(this.queryParams, this.dateRange)).then(response => {
           this.typeList = response.rows;
           this.total = response.total;
           this.loading = false;
@@ -214,16 +261,29 @@ export default {
       this.queryParams.pageNum = 1;
       this.getList();
     },
+    /** 重置按钮操作 */
+    resetQuery() {
+      this.dateRange = [];
+      this.resetForm("queryForm");
+      this.handleQuery();
+    },
     /** 新增按钮操作 */
     handleAdd() {
       this.reset();
       this.open = true;
       this.title = "添加字典类型";
     },
+    // 多选框选中数据
+    handleSelectionChange(selection) {
+      this.ids = selection.map(item => item.dictId)
+      this.single = selection.length!=1
+      this.multiple = !selection.length
+    },
     /** 修改按钮操作 */
     handleUpdate(row) {
       this.reset();
-      getType(row.dictId).then(response => {
+      const dictId = row.dictId || this.ids
+      getType(dictId).then(response => {
         this.form = response.data;
         this.open = true;
         this.title = "修改字典类型";
@@ -259,15 +319,29 @@ export default {
     },
     /** 删除按钮操作 */
     handleDelete(row) {
-      this.$confirm('是否确认删除名称为"' + row.dictName + '"的数据项?', "警告", {
+      const dictIds = row.dictId || this.ids;
+      this.$confirm('是否确认删除字典编号为"' + dictIds + '"的数据项?', "警告", {
           confirmButtonText: "确定",
           cancelButtonText: "取消",
           type: "warning"
         }).then(function() {
-          return delType(row.dictId);
+          return delType(dictIds);
         }).then(() => {
           this.getList();
           this.msgSuccess("删除成功");
+        }).catch(function() {});
+    },
+    /** 导出按钮操作 */
+    handleExport() {
+      const queryParams = this.queryParams;
+      this.$confirm('是否确认导出所有类型数据项?', "警告", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning"
+        }).then(function() {
+          return exportType(queryParams);
+        }).then(response => {
+          this.download(response.msg);
         }).catch(function() {});
     }
   }

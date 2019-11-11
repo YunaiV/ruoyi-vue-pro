@@ -3,6 +3,7 @@ package com.ruoyi.project.system.controller;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.utils.SecurityUtils;
+import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.framework.aspectj.lang.annotation.Log;
 import com.ruoyi.framework.aspectj.lang.enums.BusinessType;
 import com.ruoyi.framework.web.controller.BaseController;
@@ -44,6 +46,16 @@ public class SysPostController extends BaseController
         List<SysPost> list = postService.selectPostList(post);
         return getDataTable(list);
     }
+    
+    @Log(title = "岗位管理", businessType = BusinessType.EXPORT)
+    @PreAuthorize("@ss.hasPermi('system:config:export')")
+    @GetMapping("/export")
+    public AjaxResult export(SysPost post)
+    {
+        List<SysPost> list = postService.selectPostList(post);
+        ExcelUtil<SysPost> util = new ExcelUtil<SysPost>(SysPost.class);
+        return util.exportExcel(list, "岗位数据");
+    }
 
     /**
      * 根据岗位编号获取详细信息
@@ -61,7 +73,7 @@ public class SysPostController extends BaseController
     @PreAuthorize("@ss.hasPermi('system:post:add')")
     @Log(title = "岗位管理", businessType = BusinessType.INSERT)
     @PostMapping
-    public AjaxResult add(@RequestBody SysPost post)
+    public AjaxResult add(@Validated @RequestBody SysPost post)
     {
         if (UserConstants.NOT_UNIQUE.equals(postService.checkPostNameUnique(post)))
         {
@@ -81,7 +93,7 @@ public class SysPostController extends BaseController
     @PreAuthorize("@ss.hasPermi('system:post:edit')")
     @Log(title = "岗位管理", businessType = BusinessType.UPDATE)
     @PutMapping
-    public AjaxResult edit(@RequestBody SysPost post)
+    public AjaxResult edit(@Validated @RequestBody SysPost post)
     {
         if (UserConstants.NOT_UNIQUE.equals(postService.checkPostNameUnique(post)))
         {
@@ -100,10 +112,10 @@ public class SysPostController extends BaseController
      */
     @PreAuthorize("@ss.hasPermi('system:post:remove')")
     @Log(title = "岗位管理", businessType = BusinessType.DELETE)
-    @DeleteMapping("/{postId}")
-    public AjaxResult remove(@PathVariable Long postId)
+    @DeleteMapping("/{postIds}")
+    public AjaxResult remove(@PathVariable Long[] postIds)
     {
-        return toAjax(postService.deletePostById(postId));
+        return toAjax(postService.deletePostByIds(postIds));
     }
 
     /**

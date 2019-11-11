@@ -42,3 +42,12 @@ export function delType(dictId) {
     method: 'delete'
   })
 }
+
+// 导出字典类型
+export function exportType(query) {
+  return request({
+    url: '/system/dict/type/export',
+    method: 'get',
+    params: query
+  })
+}

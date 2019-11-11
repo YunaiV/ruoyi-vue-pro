@@ -80,6 +80,14 @@ public interface SysUserMapper
     public int deleteUserById(Long userId);
 
     /**
+     * 批量删除用户信息
+     * 
+     * @param userIds 需要删除的用户ID
+     * @return 结果
+     */
+    public int deleteUserByIds(Long[] userIds);
+
+    /**
      * 校验用户名称是否唯一
      * 
      * @param userName 用户名称
