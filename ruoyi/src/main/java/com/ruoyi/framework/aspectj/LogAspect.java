@@ -2,6 +2,8 @@ package com.ruoyi.framework.aspectj;
 
 import java.lang.reflect.Method;
 import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.Signature;
 import org.aspectj.lang.annotation.AfterReturning;
@@ -192,7 +194,7 @@ public class LogAspect
         {
             for (int i = 0; i < paramsArray.length; i++)
             {
-                if (!(paramsArray[i] instanceof MultipartFile))
+                if (!isFilterObject(paramsArray[i]))
                 {
                     Object jsonObj = JSON.toJSON(paramsArray[i]);
                     params += jsonObj.toString() + " ";
@@ -200,5 +202,16 @@ public class LogAspect
             }
         }
         return params.trim();
+    }
+
+    /**
+     * 判断是否需要过滤的对象。
+     * 
+     * @param o 对象信息。
+     * @return 如果是需要过滤的对象，则返回true；否则返回false。
+     */
+    public boolean isFilterObject(final Object o)
+    {
+        return o instanceof MultipartFile || o instanceof HttpServletRequest || o instanceof HttpServletResponse;
     }
 }
