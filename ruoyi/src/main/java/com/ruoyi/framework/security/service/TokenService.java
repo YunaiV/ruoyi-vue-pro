@@ -71,6 +71,18 @@ public class TokenService
     }
 
     /**
+     * 设置用户身份信息
+     */
+    public void setLoginUser(LoginUser loginUser)
+    {
+        if (StringUtils.isNotNull(loginUser) && StringUtils.isNotEmpty(loginUser.getToken()))
+        {
+            String userKey = getTokenKey(loginUser.getToken());
+            redisCache.setCacheObject(userKey, loginUser);
+        }
+    }
+
+    /**
      * 创建令牌
      * 
      * @param loginUser 用户信息

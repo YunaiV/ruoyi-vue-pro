@@ -10,6 +10,11 @@ import io.jsonwebtoken.Claims;
 public class Constants
 {
     /**
+     * UTF-8 字符集
+     */
+    public static final String UTF8 = "UTF-8";
+    
+    /**
      * 通用成功标识
      */
     public static final String SUCCESS = "0";

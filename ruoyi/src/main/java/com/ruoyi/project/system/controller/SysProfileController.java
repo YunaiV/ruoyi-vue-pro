@@ -98,6 +98,8 @@ public class SysProfileController extends BaseController
             {
                 AjaxResult ajax = AjaxResult.success();
                 ajax.put("imgUrl", avatar);
+                loginUser.getUser().setAvatar(avatar);
+                tokenService.setLoginUser(loginUser);
                 return ajax;
             }
         }
