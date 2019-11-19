@@ -41,7 +41,7 @@
       <el-table-column prop="orderNum" label="排序" width="60px"></el-table-column>
       <el-table-column prop="perms" label="权限标识" width="130px" :show-overflow-tooltip="true"></el-table-column>
       <el-table-column prop="component" label="组件路径" width="180px" :show-overflow-tooltip="true"></el-table-column>
-      <el-table-column prop="visible" label="	可见" :formatter="visibleFormat" width="80px"></el-table-column>
+      <el-table-column prop="visible" label="可见" :formatter="visibleFormat" width="80px"></el-table-column>
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
@@ -63,7 +63,6 @@
             v-hasPermi="['system:menu:add']"
           >新增</el-button>
           <el-button
-            v-if="scope.row.parentId != 0"
             size="mini"
             type="text"
             icon="el-icon-delete"
@@ -78,7 +77,7 @@
     <el-dialog :title="title" :visible.sync="open" width="600px">
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-row>
-          <el-col :span="24" v-if="form.parentId !== 0">
+          <el-col :span="24">
             <el-form-item label="上级菜单">
               <treeselect
                 v-model="form.parentId"
@@ -188,7 +187,7 @@ export default {
       // 菜单表格树数据
       menuList: [],
       // 菜单树选项
-      menuOptions: undefined,
+      menuOptions: [],
       // 弹出层标题
       title: "",
       // 是否显示弹出层
@@ -235,7 +234,10 @@ export default {
     /** 查询菜单下拉树结构 */
     getTreeselect() {
       treeselect().then(response => {
-        this.menuOptions = response.data;
+        this.menuOptions = [];
+        const menu = { id: 0, label: '主类目', children: [] };
+        menu.children = response.data;
+        this.menuOptions.push(menu);
       });
     },
     // 菜单显示状态字典翻译
