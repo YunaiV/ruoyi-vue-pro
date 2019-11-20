@@ -40,7 +40,7 @@
     "url": "https://gitee.com/y_project/RuoYi-Vue.git"
   },
   "dependencies": {
-    "@riophae/vue-treeselect": "0.1.0",
+    "@riophae/vue-treeselect": "0.4.0",
     "vue-quill-editor": "3.0.6",
     "vue-cropper": "0.4.9",
     "axios": "0.18.1",
@@ -48,6 +48,7 @@
     "element-ui": "2.11.1",
     "fuse.js": "3.4.4",
     "js-cookie": "2.2.0",
+    "jsencrypt": "3.0.0-rc.1",
     "normalize.css": "7.0.0",
     "nprogress": "0.2.0",
     "path-to-regexp": "2.4.0",
