@@ -83,6 +83,18 @@ public class TokenService
     }
 
     /**
+     * 删除用户身份信息
+     */
+    public void delLoginUser(String token)
+    {
+        if (StringUtils.isNotEmpty(token))
+        {
+            String userKey = getTokenKey(token);
+            redisCache.deleteObject(userKey);
+        }
+    }
+
+    /**
      * 创建令牌
      * 
      * @param loginUser 用户信息
