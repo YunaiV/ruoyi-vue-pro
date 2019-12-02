@@ -262,6 +262,7 @@ public class GenTableServiceImpl implements IGenTableService
                 zip.putNextEntry(new ZipEntry(VelocityUtils.getFileName(template, table)));
                 IOUtils.write(sw.toString(), zip, Constants.UTF8);
                 IOUtils.closeQuietly(sw);
+				zip.flush();
                 zip.closeEntry();
             }
             catch (IOException e)
