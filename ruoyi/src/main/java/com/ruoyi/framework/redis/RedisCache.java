@@ -158,11 +158,7 @@ public class RedisCache
     {
         Set<T> dataSet = new HashSet<T>();
         BoundSetOperations<String, T> operation = redisTemplate.boundSetOps(key);
-        Long size = operation.size();
-        for (int i = 0; i < size; i++)
-        {
-            dataSet.add(operation.pop());
-        }
+        dataSet = operation.members();
         return dataSet;
     }
 
