@@ -117,6 +117,7 @@
 import { list, delLogininfor, cleanLogininfor, exportLogininfor } from "@/api/monitor/logininfor";
 
 export default {
+  name: "Logininfor",
   data() {
     return {
       // 遮罩层

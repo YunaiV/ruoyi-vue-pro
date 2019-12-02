@@ -153,6 +153,7 @@
 import { listPost, getPost, delPost, addPost, updatePost, exportPost } from "@/api/system/post";
 
 export default {
+  name: "Post",
   data() {
     return {
       // 遮罩层

@@ -89,13 +89,3 @@ export default {
   }
 };
 </script>
-
-<style rel="stylesheet/scss" lang="scss">
-.avatar-uploader-icon {
-  font-size: 28px;
-  width: 120px;
-  height: 120px;
-  line-height: 120px;
-  text-align: center;
-}
-</style>

@@ -246,8 +246,9 @@ insert into sys_menu values('1054', '任务导出', '110', '7', '#', '', 1, 'F',
 insert into sys_menu values('1055', '生成查询', '114', '1', '#', '', 1, 'F', '0', 'tool:gen:query',             '#', 'admin', '2018-03-16 11-33-00', 'ry', '2018-03-16 11-33-00', '');
 insert into sys_menu values('1056', '生成修改', '114', '2', '#', '', 1, 'F', '0', 'tool:gen:edit',              '#', 'admin', '2018-03-16 11-33-00', 'ry', '2018-03-16 11-33-00', '');
 insert into sys_menu values('1057', '生成删除', '114', '3', '#', '', 1, 'F', '0', 'tool:gen:remove',            '#', 'admin', '2018-03-16 11-33-00', 'ry', '2018-03-16 11-33-00', '');
-insert into sys_menu values('1058', '预览代码', '114', '4', '#', '', 1, 'F', '0', 'tool:gen:preview',           '#', 'admin', '2018-03-16 11-33-00', 'ry', '2018-03-16 11-33-00', '');
-insert into sys_menu values('1059', '生成代码', '114', '5', '#', '', 1, 'F', '0', 'tool:gen:code',              '#', 'admin', '2018-03-16 11-33-00', 'ry', '2018-03-16 11-33-00', '');
+insert into sys_menu values('1058', '导入代码', '114', '2', '#', '', 1, 'F', '0', 'tool:gen:import',            '#', 'admin', '2018-03-16 11-33-00', 'ry', '2018-03-16 11-33-00', '');
+insert into sys_menu values('1059', '预览代码', '114', '4', '#', '', 1, 'F', '0', 'tool:gen:preview',           '#', 'admin', '2018-03-16 11-33-00', 'ry', '2018-03-16 11-33-00', '');
+insert into sys_menu values('1060', '生成代码', '114', '5', '#', '', 1, 'F', '0', 'tool:gen:code',              '#', 'admin', '2018-03-16 11-33-00', 'ry', '2018-03-16 11-33-00', '');
 
 
 -- ----------------------------
@@ -362,6 +363,7 @@ insert into sys_role_menu values ('2', '1056');
 insert into sys_role_menu values ('2', '1057');
 insert into sys_role_menu values ('2', '1058');
 insert into sys_role_menu values ('2', '1059');
+insert into sys_role_menu values ('2', '1060');
 
 -- ----------------------------
 -- 8、角色和部门关联表  角色1-N部门

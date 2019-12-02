@@ -186,6 +186,7 @@
 import { list, delOperlog, cleanOperlog, exportOperlog } from "@/api/monitor/operlog";
 
 export default {
+  name: "Operlog",
   data() {
     return {
       // 遮罩层

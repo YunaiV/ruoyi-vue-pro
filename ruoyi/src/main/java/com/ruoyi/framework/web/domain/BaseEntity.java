@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -40,9 +39,16 @@ public class BaseEntity implements Serializable
     /** 数据权限 */
     private String dataScope;
 
-    /** 请求参数 */
+    /** 开始时间 */
     @JsonIgnore
-    private String params;
+    private String beginTime;
+
+    /** 结束时间 */
+    @JsonIgnore
+    private String endTime;
+
+    /** 请求参数 */
+    private Map<String, Object> params;
 
     public String getSearchValue()
     {
@@ -114,17 +120,36 @@ public class BaseEntity implements Serializable
         this.dataScope = dataScope;
     }
 
-    @SuppressWarnings("unchecked")
+    public String getBeginTime()
+    {
+        return beginTime;
+    }
+
+    public void setBeginTime(String beginTime)
+    {
+        this.beginTime = beginTime;
+    }
+
+    public String getEndTime()
+    {
+        return endTime;
+    }
+
+    public void setEndTime(String endTime)
+    {
+        this.endTime = endTime;
+    }
+
     public Map<String, Object> getParams()
     {
         if (params == null)
         {
-            return new HashMap<>();
+            params = new HashMap<>();
         }
-        return JSON.parseObject(params, Map.class);
+        return params;
     }
 
-    public void setParams(String params)
+    public void setParams(Map<String, Object> params)
     {
         this.params = params;
     }

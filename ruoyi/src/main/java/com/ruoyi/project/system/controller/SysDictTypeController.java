@@ -106,4 +106,14 @@ public class SysDictTypeController extends BaseController
     {
         return toAjax(dictTypeService.deleteDictTypeByIds(dictIds));
     }
+
+    /**
+     * 获取字典选择框列表
+     */
+    @GetMapping("/optionselect")
+    public AjaxResult optionselect()
+    {
+        List<SysDictType> dictTypes = dictTypeService.selectDictTypeAll();
+        return AjaxResult.success(dictTypes);
+    }
 }

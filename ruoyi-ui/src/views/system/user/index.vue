@@ -290,12 +290,11 @@
 <script>
 import { listUser, getUser, delUser, addUser, updateUser, exportUser, resetUserPwd, changeUserStatus } from "@/api/system/user";
 import { treeselect } from "@/api/system/dept";
-import { listPost } from "@/api/system/post";
-import { listRole } from "@/api/system/role";
 import Treeselect from "@riophae/vue-treeselect";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 
 export default {
+  name: "User",
   components: { Treeselect },
   data() {
     return {
@@ -423,18 +422,6 @@ export default {
       this.queryParams.deptId = data.id;
       this.getList();
     },
-    /** 查询岗位列表 */
-    getPosts() {
-      listPost().then(response => {
-        this.postOptions = response.rows;
-      });
-    },
-    /** 查询角色列表 */
-    getRoles() {
-      listRole().then(response => {
-        this.roleOptions = response.rows;
-      });
-    },
     // 用户状态修改
     handleStatusChange(row) {
       let text = row.status === "0" ? "启用" : "停用";
@@ -494,21 +481,23 @@ export default {
     handleAdd() {
       this.reset();
       this.getTreeselect();
-      this.getPosts();
-      this.getRoles();
-      this.open = true;
-      this.title = "添加用户";
-      this.form.password = this.initPassword;
+      getUser().then(response => {
+        this.postOptions = response.posts;
+        this.roleOptions = response.roles;
+        this.open = true;
+        this.title = "添加用户";
+        this.form.password = this.initPassword;
+      });
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
       this.reset();
       this.getTreeselect();
-      this.getPosts();
-      this.getRoles();
       const userId = row.userId || this.ids
       getUser(userId).then(response => {
         this.form = response.data;
+        this.postOptions = response.posts;
+        this.roleOptions = response.roles;
         this.form.postIds = response.postIds;
         this.form.roleIds = response.roleIds;
         this.open = true;

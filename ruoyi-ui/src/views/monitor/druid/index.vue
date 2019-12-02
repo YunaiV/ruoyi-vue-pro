@@ -5,6 +5,7 @@
 </template>
 <script>
 export default {
+  name: "Druid",
   data() {
     return {
       src: process.env.VUE_APP_BASE_API + "/druid/index.html",

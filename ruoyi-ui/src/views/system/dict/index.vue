@@ -176,6 +176,7 @@
 import { listType, getType, delType, addType, updateType, exportType } from "@/api/system/dict/type";
 
 export default {
+  name: "Dict",
   data() {
     return {
       // 遮罩层

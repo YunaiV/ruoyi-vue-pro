@@ -176,6 +176,7 @@ import { listNotice, getNotice, delNotice, addNotice, updateNotice, exportNotice
 import Editor from '@/components/Editor';
 
 export default {
+  name: "Notice",
   components: {
     Editor
   },

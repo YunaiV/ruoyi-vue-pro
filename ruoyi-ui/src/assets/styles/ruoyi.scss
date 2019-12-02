@@ -53,6 +53,10 @@
 	margin-left: 20px;
 }
 
+.el-dialog {
+	margin-top: 6vh !important;
+}
+
 .el-table .el-table__header-wrapper th {
 	word-break: break-word;
 	background-color: #f8f8f9;
@@ -61,6 +65,16 @@
 	font-size: 13px;
 }
 
+/** 表单布局 **/
+.form-header {
+    font-size:15px;
+	color:#6379bb;
+	border-bottom:1px solid #ddd;
+	margin:8px 10px 25px 10px;
+	padding-bottom:5px
+}
+
+/** 表格布局 **/
 .pagination-container {
 	position: relative;
 	height: 25px;

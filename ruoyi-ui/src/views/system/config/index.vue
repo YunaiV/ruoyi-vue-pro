@@ -168,6 +168,7 @@
 import { listConfig, getConfig, delConfig, addConfig, updateConfig, exportConfig } from "@/api/system/config";
 
 export default {
+  name: "Config",
   data() {
     return {
       // 遮罩层

@@ -68,6 +68,7 @@
 import { list, forceLogout } from "@/api/monitor/online";
 
 export default {
+  name: "Online",
   data() {
     return {
       // 遮罩层

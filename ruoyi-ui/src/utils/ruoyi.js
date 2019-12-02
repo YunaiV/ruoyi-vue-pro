@@ -9,21 +9,21 @@ const baseURL = process.env.VUE_APP_BASE_API
 export function parseTime(time, pattern) {
 	if (arguments.length === 0) {
 		return null
-	  }
-	  const format = pattern || '{y}-{m}-{d} {h}:{i}:{s}'
-	  let date
-	  if (typeof time === 'object') {
+	}
+	const format = pattern || '{y}-{m}-{d} {h}:{i}:{s}'
+	let date
+	if (typeof time === 'object') {
 		date = time
-	  } else {
+	} else {
 		if ((typeof time === 'string') && (/^[0-9]+$/.test(time))) {
-		  time = parseInt(time)
+			time = parseInt(time)
 		}
 		if ((typeof time === 'number') && (time.toString().length === 10)) {
-		  time = time * 1000
+			time = time * 1000
 		}
 		date = new Date(time)
-	  }
-	  const formatObj = {
+	}
+	const formatObj = {
 		y: date.getFullYear(),
 		m: date.getMonth() + 1,
 		d: date.getDate(),
@@ -31,22 +31,22 @@ export function parseTime(time, pattern) {
 		i: date.getMinutes(),
 		s: date.getSeconds(),
 		a: date.getDay()
-	  }
-	  const time_str = format.replace(/{(y|m|d|h|i|s|a)+}/g, (result, key) => {
+	}
+	const time_str = format.replace(/{(y|m|d|h|i|s|a)+}/g, (result, key) => {
 		let value = formatObj[key]
 		// Note: getDay() returns 0 on Sunday
-		if (key === 'a') { return ['日', '一', '二', '三', '四', '五', '六'][value ] }
+		if (key === 'a') { return ['日', '一', '二', '三', '四', '五', '六'][value] }
 		if (result.length > 0 && value < 10) {
-		  value = '0' + value
+			value = '0' + value
 		}
 		return value || 0
-	  })
-	  return time_str
+	})
+	return time_str
 }
 
 // 表单重置
 export function resetForm(refName) {
-	if (this.$refs[refName] !== undefined) {
+	if (this.$refs[refName]) {
 		this.$refs[refName].resetFields();
 	}
 }
@@ -54,11 +54,11 @@ export function resetForm(refName) {
 // 添加日期范围
 export function addDateRange(params, dateRange) {
 	var search = params;
-	if (null != dateRange) {
-		search.params = {
-			beginTime: this.dateRange[0],
-			endTime: this.dateRange[1]
-		};
+	search.beginTime = "";
+	search.endTime = "";
+	if (null != dateRange && '' != dateRange) {
+		search.beginTime = this.dateRange[0];
+		search.endTime = this.dateRange[1];
 	}
 	return search;
 }
@@ -92,4 +92,12 @@ export function sprintf(str) {
 		return arg;
 	});
 	return flag ? str : '';
+}
+
+// 转换字符串，undefined,null等转化为""
+export function praseStrEmpty(str) {
+    if (!str || str == "undefined" || str == "null") {
+        return "";
+    }
+    return str;
 }

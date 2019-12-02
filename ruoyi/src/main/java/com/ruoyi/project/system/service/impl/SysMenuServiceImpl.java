@@ -116,11 +116,10 @@ public class SysMenuServiceImpl implements ISysMenuService
         for (SysMenu menu : menus)
         {
             RouterVo router = new RouterVo();
-            router.setName(menu.getMenuName());
+            router.setName(StringUtils.capitalize(menu.getPath()));
             router.setPath(getRouterPath(menu));
             router.setComponent(StringUtils.isEmpty(menu.getComponent()) ? "Layout" : menu.getComponent());
             router.setMeta(new MetaVo(menu.getMenuName(), menu.getIcon()));
-            router.setName(menu.getMenuName());
             List<SysMenu> cMenus = menu.getChildren();
             if (!cMenus.isEmpty() && cMenus.size() > 0 && "M".equals(menu.getMenuType()))
             {

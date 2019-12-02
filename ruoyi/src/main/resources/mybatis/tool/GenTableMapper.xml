@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.project.tool.gen.mapper.GenTableMapper">
+
+	<resultMap type="GenTable" id="GenTableResult">
+	    <id     property="tableId"        column="table_id"        />
+		<result property="tableName"      column="table_name"      />
+		<result property="tableComment"   column="table_comment"   />
+		<result property="className"      column="class_name"      />
+		<result property="tplCategory"    column="tpl_category"    />
+		<result property="packageName"    column="package_name"    />
+		<result property="moduleName"     column="module_name"     />
+		<result property="businessName"   column="business_name"   />
+		<result property="functionName"   column="function_name"   />
+		<result property="functionAuthor" column="function_author" />
+		<result property="options"        column="options"         />
+		<result property="createBy"       column="create_by"       />
+		<result property="createTime"     column="create_time"     />
+		<result property="updateBy"       column="update_by"       />
+		<result property="updateTime"     column="update_time"     />
+		<result property="remark"         column="remark"          />
+		<collection  property="columns"  javaType="java.util.List"  resultMap="GenTableColumnResult" />
+	</resultMap>
+	
+	<resultMap type="GenTableColumn" id="GenTableColumnResult">
+        <id     property="columnId"       column="column_id"      />
+        <result property="tableId"        column="table_id"       />
+        <result property="columnName"     column="column_name"    />
+        <result property="columnComment"  column="column_comment" />
+        <result property="columnType"     column="column_type"    />
+        <result property="javaType"       column="java_type"      />
+        <result property="javaField"      column="java_field"     />
+        <result property="isPk"           column="is_pk"          />
+        <result property="isIncrement"    column="is_increment"   />
+        <result property="isRequired"     column="is_required"    />
+        <result property="isInsert"       column="is_insert"      />
+        <result property="isEdit"         column="is_edit"        />
+        <result property="isList"         column="is_list"        />
+        <result property="isQuery"        column="is_query"       />
+        <result property="queryType"      column="query_type"     />
+        <result property="htmlType"       column="html_type"      />
+        <result property="dictType"       column="dict_type"      />
+        <result property="sort"           column="sort"           />
+        <result property="createBy"       column="create_by"      />
+        <result property="createTime"     column="create_time"    />
+        <result property="updateBy"       column="update_by"      />
+        <result property="updateTime"     column="update_time"    />
+    </resultMap>
+	
+	<sql id="selectGenTableVo">
+        select table_id, table_name, table_comment, class_name, tpl_category, package_name, module_name, business_name, function_name, function_author, options, create_by, create_time, update_by, update_time, remark from gen_table
+    </sql>
+    
+    <select id="selectGenTableList" parameterType="GenTable" resultMap="GenTableResult">
+		<include refid="selectGenTableVo"/>
+		<where>
+			<if test="tableName != null and tableName != ''">
+				AND lower(table_name) like lower(concat('%', #{tableName}, '%'))
+			</if>
+			<if test="tableComment != null and tableComment != ''">
+				AND lower(table_comment) like lower(concat('%', #{tableComment}, '%'))
+			</if>
+<!-- 			<if test="beginTime != null and beginTime != ''">开始时间检索 -->
+<!-- 				AND date_format(create_time,'%y%m%d') &gt;= date_format(#{beginTime},'%y%m%d') -->
+<!-- 			</if> -->
+<!-- 			<if test="endTime != null and endTime != ''">结束时间检索 -->
+<!-- 				AND date_format(create_time,'%y%m%d') &lt;= date_format(#{endTime},'%y%m%d') -->
+<!-- 			</if> -->
+		</where>
+	</select>
+
+	<select id="selectDbTableList" parameterType="GenTable" resultMap="GenTableResult">
+		select table_name, table_comment, create_time, update_time from information_schema.tables
+		where table_schema = (select database())
+		AND table_name NOT LIKE 'qrtz_%' AND table_name NOT LIKE 'gen_%'
+		AND table_name NOT IN (select table_name from gen_table)
+		<if test="tableName != null and tableName != ''">
+			AND lower(table_name) like lower(concat('%', #{tableName}, '%'))
+		</if>
+		<if test="tableComment != null and tableComment != ''">
+			AND lower(table_comment) like lower(concat('%', #{tableComment}, '%'))
+		</if>
+		<if test="beginTime != null and beginTime != ''"><!-- 开始时间检索 -->
+			AND date_format(create_time,'%y%m%d') &gt;= date_format(#{beginTime},'%y%m%d')
+		</if>
+		<if test="endTime != null and endTime != ''"><!-- 结束时间检索 -->
+			AND date_format(create_time,'%y%m%d') &lt;= date_format(#{endTime},'%y%m%d')
+		</if>
+	</select>
+	
+	<select id="selectDbTableListByNames" resultMap="GenTableResult">
+		select table_name, table_comment, create_time, update_time from information_schema.tables
+		where table_name NOT LIKE 'qrtz_%' and table_name NOT LIKE 'gen_%' and table_schema = (select database())
+		and table_name in
+	    <foreach collection="array" item="name" open="(" separator="," close=")">
+ 			#{name}
+        </foreach> 
+	</select>
+	
+	<select id="selectTableByName" parameterType="String" resultMap="GenTableResult">
+		select table_name, table_comment, create_time, update_time from information_schema.tables
+		where table_comment <![CDATA[ <> ]]> '' and table_schema = (select database())
+		and table_name = #{tableName}
+	</select>
+	
+	<select id="selectGenTableById" parameterType="Long" resultMap="GenTableResult">
+	    SELECT t.table_id, t.table_name, t.table_comment, t.class_name, t.tpl_category, t.package_name, t.module_name, t.business_name, t.function_name, t.function_author, t.options, t.remark,
+			   c.column_id, c.column_name, c.column_comment, c.column_type, c.java_type, c.java_field, c.is_pk, c.is_increment, c.is_required, c.is_insert, c.is_edit, c.is_list, c.is_query, c.query_type, c.html_type, c.dict_type, c.sort
+		FROM gen_table t
+			 LEFT JOIN gen_table_column c ON t.table_id = c.table_id
+		where t.table_id = #{tableId}
+	</select>
+	
+	<select id="selectGenTableByName" parameterType="String" resultMap="GenTableResult">
+	    SELECT t.table_id, t.table_name, t.table_comment, t.class_name, t.tpl_category, t.package_name, t.module_name, t.business_name, t.function_name, t.function_author, t.options, t.remark,
+			   c.column_id, c.column_name, c.column_comment, c.column_type, c.java_type, c.java_field, c.is_pk, c.is_increment, c.is_required, c.is_insert, c.is_edit, c.is_list, c.is_query, c.query_type, c.html_type, c.dict_type, c.sort
+		FROM gen_table t
+			 LEFT JOIN gen_table_column c ON t.table_id = c.table_id
+		where t.table_name = #{tableName}
+	</select>
+	
+	<insert id="insertGenTable" parameterType="GenTable" useGeneratedKeys="true" keyProperty="tableId">
+        insert into gen_table (
+			<if test="tableName != null">table_name,</if>
+			<if test="tableComment != null and tableComment != ''">table_comment,</if>
+			<if test="className != null and className != ''">class_name,</if>
+			<if test="tplCategory != null and tplCategory != ''">tpl_category,</if>
+			<if test="packageName != null and packageName != ''">package_name,</if>
+			<if test="moduleName != null and moduleName != ''">module_name,</if>
+			<if test="businessName != null and businessName != ''">business_name,</if>
+			<if test="functionName != null and functionName != ''">function_name,</if>
+			<if test="functionAuthor != null and functionAuthor != ''">function_author,</if>
+			<if test="remark != null and remark != ''">remark,</if>
+ 			<if test="createBy != null and createBy != ''">create_by,</if>
+			create_time
+         )values(
+			<if test="tableName != null">#{tableName},</if>
+			<if test="tableComment != null and tableComment != ''">#{tableComment},</if>
+			<if test="className != null and className != ''">#{className},</if>
+			<if test="tplCategory != null and tplCategory != ''">#{tplCategory},</if>
+			<if test="packageName != null and packageName != ''">#{packageName},</if>
+			<if test="moduleName != null and moduleName != ''">#{moduleName},</if>
+			<if test="businessName != null and businessName != ''">#{businessName},</if>
+			<if test="functionName != null and functionName != ''">#{functionName},</if>
+			<if test="functionAuthor != null and functionAuthor != ''">#{functionAuthor},</if>
+			<if test="remark != null and remark != ''">#{remark},</if>
+ 			<if test="createBy != null and createBy != ''">#{createBy},</if>
+			sysdate()
+         )
+    </insert>
+    
+    <update id="updateGenTable" parameterType="GenTable">
+        update gen_table
+        <set>
+            <if test="tableName != null">table_name = #{tableName},</if>
+            <if test="tableComment != null and tableComment != ''">table_comment = #{tableComment},</if>
+            <if test="className != null and className != ''">class_name = #{className},</if>
+            <if test="functionAuthor != null and functionAuthor != ''">function_author = #{functionAuthor},</if>
+            <if test="tplCategory != null and tplCategory != ''">tpl_category = #{tplCategory},</if>
+            <if test="packageName != null and packageName != ''">package_name = #{packageName},</if>
+            <if test="moduleName != null and moduleName != ''">module_name = #{moduleName},</if>
+            <if test="businessName != null and businessName != ''">business_name = #{businessName},</if>
+            <if test="functionName != null and functionName != ''">function_name = #{functionName},</if>
+            <if test="options != null and options != ''">options = #{options},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            update_time = sysdate()
+        </set>
+        where table_id = #{tableId}
+    </update>
+    
+    <delete id="deleteGenTableByIds" parameterType="Long">
+        delete from gen_table where table_id in 
+        <foreach collection="array" item="tableId" open="(" separator="," close=")">
+            #{tableId}
+        </foreach>
+    </delete>
+
+</mapper> 

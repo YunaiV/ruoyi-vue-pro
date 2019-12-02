@@ -27,17 +27,6 @@ import Layout from '@/layout'
 // 公共路由
 export const constantRoutes = [
   {
-    path: '/redirect',
-    component: Layout,
-    hidden: true,
-    children: [
-      {
-        path: '/redirect/:path*',
-        component: () => import('@/views/redirect')
-      }
-    ]
-  },
-  {
     path: '/login',
     component: () => import('@/views/login'),
     hidden: true
@@ -74,7 +63,7 @@ export const constantRoutes = [
       {
         path: 'profile',
         component: () => import('@/views/system/user/profile/index'),
-        name: '个人中心',
+        name: 'Profile',
         meta: { title: '个人中心', icon: 'user' }
       }
     ]
@@ -87,8 +76,21 @@ export const constantRoutes = [
       {
         path: 'type/data/:dictId(\\d+)',
         component: () => import('@/views/system/dict/data'),
-        name: '字典数据',
+        name: 'Data',
         meta: { title: '字典数据', icon: '' }
+      }
+    ]
+  },
+  {
+    path: '/gen',
+    component: Layout,
+    hidden: true,
+    children: [
+      {
+        path: 'edit',
+        component: () => import('@/views/tool/gen/editTable'),
+        name: 'GenEdit',
+        meta: { title: '修改生成配置' }
       }
     ]
   }

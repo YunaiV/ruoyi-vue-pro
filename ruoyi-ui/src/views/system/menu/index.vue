@@ -179,6 +179,7 @@ import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 import IconSelect from "@/components/IconSelect";
 
 export default {
+  name: "Menu",
   components: { Treeselect, IconSelect },
   data() {
     return {

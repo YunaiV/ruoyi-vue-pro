@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.utils.SecurityUtils;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.framework.aspectj.lang.annotation.Log;
 import com.ruoyi.framework.aspectj.lang.enums.BusinessType;
@@ -69,12 +70,18 @@ public class SysUserController extends BaseController
      * 根据用户编号获取详细信息
      */
     @PreAuthorize("@ss.hasPermi('system:user:query')")
-    @GetMapping(value = "/{userId}")
-    public AjaxResult getInfo(@PathVariable Long userId)
+    @GetMapping(value = { "/", "/{userId}" })
+    public AjaxResult getInfo(@PathVariable(value = "userId", required = false) Long userId)
     {
-        AjaxResult ajax = AjaxResult.success(userService.selectUserById(userId));
-        ajax.put("postIds", postService.selectPostListByUserId(userId));
-        ajax.put("roleIds", roleService.selectRoleListByUserId(userId));
+        AjaxResult ajax = AjaxResult.success();
+        ajax.put("roles", roleService.selectRoleAll());
+        ajax.put("posts", postService.selectPostAll());
+        if (StringUtils.isNotNull(userId))
+        {
+            ajax.put(AjaxResult.DATA_TAG, userService.selectUserById(userId));
+            ajax.put("postIds", postService.selectPostListByUserId(userId));
+            ajax.put("roleIds", roleService.selectRoleListByUserId(userId));
+        }
         return ajax;
     }
 

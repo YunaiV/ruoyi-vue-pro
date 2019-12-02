@@ -175,6 +175,7 @@
 import { getServer } from "@/api/monitor/server";
 
 export default {
+  name: "Server",
   data() {
     return {
       // 加载层信息

@@ -159,6 +159,7 @@ import { listData, getData, delData, addData, updateData, exportData } from "@/a
 import { listType, getType } from "@/api/system/dict/type";
 
 export default {
+  name: "Data",
   data() {
     return {
       // 遮罩层

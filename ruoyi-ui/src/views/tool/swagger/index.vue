@@ -5,6 +5,7 @@
 </template>
 <script>
 export default {
+  name: "Swagger",
   data() {
     return {
       src: process.env.VUE_APP_BASE_API + "/swagger-ui.html",
