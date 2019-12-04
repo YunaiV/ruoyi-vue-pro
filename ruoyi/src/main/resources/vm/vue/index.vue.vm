@@ -213,7 +213,6 @@
         <el-form-item label="${comment}" prop="${field}">
           <el-input v-model="form.${field}" type="textarea" placeholder="请输入内容" />
         </el-form-item>
-      </el-form>
 #end
 #end
 #end
@@ -286,7 +285,7 @@ export default {
 #set($comment=$column.columnComment)
 #end
 #set($comment=$column.columnComment)
-        studentName: [
+        $column.javaField: [
           { required: true, message: "$comment不能为空", trigger: "blur" }
         ]#if($velocityCount != $columns.size()),#end
 #end
