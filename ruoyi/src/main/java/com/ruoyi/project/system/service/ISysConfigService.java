@@ -24,7 +24,7 @@ public interface ISysConfigService
      * @param configKey 参数键名
      * @return 参数键值
      */
-    public Object selectConfigByKey(String configKey);
+    public String selectConfigByKey(String configKey);
 
     /**
      * 查询参数配置列表

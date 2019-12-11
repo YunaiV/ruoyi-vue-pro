@@ -9,6 +9,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import com.ruoyi.framework.aspectj.lang.annotation.Excel;
 import com.ruoyi.framework.aspectj.lang.annotation.Excel.ColumnType;
+import com.ruoyi.framework.aspectj.lang.annotation.Excel.Type;
 import com.ruoyi.framework.aspectj.lang.annotation.Excels;
 import com.ruoyi.framework.web.domain.BaseEntity;
 
@@ -26,6 +27,7 @@ public class SysUser extends BaseEntity
     private Long userId;
 
     /** 部门ID */
+    @Excel(name = "部门编号", type = Type.IMPORT)
     private Long deptId;
 
     /** 用户账号 */
@@ -65,15 +67,18 @@ public class SysUser extends BaseEntity
     private String delFlag;
 
     /** 最后登陆IP */
-    @Excel(name = "最后登陆IP")
+    @Excel(name = "最后登陆IP", type = Type.EXPORT)
     private String loginIp;
 
     /** 最后登陆时间 */
-    @Excel(name = "最后登陆时间", width = 30, dateFormat = "yyyy-MM-dd HH:mm:ss")
+    @Excel(name = "最后登陆时间", width = 30, dateFormat = "yyyy-MM-dd HH:mm:ss", type = Type.EXPORT)
     private Date loginDate;
 
     /** 部门对象 */
-    @Excels({ @Excel(name = "部门名称", targetAttr = "deptName"), @Excel(name = "部门负责人", targetAttr = "leader") })
+    @Excels({
+        @Excel(name = "部门名称", targetAttr = "deptName", type = Type.EXPORT),
+        @Excel(name = "部门负责人", targetAttr = "leader", type = Type.EXPORT)
+    })
     private SysDept dept;
 
     /** 角色对象 */

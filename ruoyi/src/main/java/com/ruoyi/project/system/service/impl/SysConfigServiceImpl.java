@@ -41,7 +41,7 @@ public class SysConfigServiceImpl implements ISysConfigService
      * @return 参数键值
      */
     @Override
-    public Object selectConfigByKey(String configKey)
+    public String selectConfigByKey(String configKey)
     {
         SysConfig config = new SysConfig();
         config.setConfigKey(configKey);
