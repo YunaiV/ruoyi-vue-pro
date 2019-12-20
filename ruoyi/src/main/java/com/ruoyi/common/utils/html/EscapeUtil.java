@@ -58,7 +58,7 @@ public class EscapeUtil
      */
     public static String clean(String content)
     {
-        return content.replaceAll(RE_HTML_MARK, "");
+        return new HTMLFilter().filter(content);
     }
 
     /**
