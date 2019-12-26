@@ -135,9 +135,9 @@
         <el-table v-loading="loading" :data="userList" @selection-change="handleSelectionChange">
           <el-table-column type="selection" width="40" align="center" />
           <el-table-column label="用户编号" align="center" prop="userId" />
-          <el-table-column label="用户名称" align="center" prop="userName" />
-          <el-table-column label="用户昵称" align="center" prop="nickName" />
-          <el-table-column label="部门" align="center" prop="dept.deptName" />
+          <el-table-column label="用户名称" align="center" prop="userName" :show-overflow-tooltip="true" />
+          <el-table-column label="用户昵称" align="center" prop="nickName" :show-overflow-tooltip="true" />
+          <el-table-column label="部门" align="center" prop="dept.deptName" :show-overflow-tooltip="true" />
           <el-table-column label="手机号码" align="center" prop="phonenumber" width="120" />
           <el-table-column label="状态" align="center">
             <template slot-scope="scope">
@@ -502,7 +502,7 @@ export default {
     reset() {
       this.form = {
         userId: undefined,
-        deptId: 100,
+        deptId: undefined,
         userName: undefined,
         nickName: undefined,
         password: undefined,

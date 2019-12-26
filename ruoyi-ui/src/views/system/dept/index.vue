@@ -228,7 +228,7 @@ export default {
     reset() {
       this.form = {
         deptId: undefined,
-        parentId: 100,
+        parentId: undefined,
         deptName: undefined,
         orderNum: undefined,
         leader: undefined,
