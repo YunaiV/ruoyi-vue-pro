@@ -124,8 +124,6 @@ public class TokenService
         long currentTime = System.currentTimeMillis();
         if (expireTime - currentTime <= MILLIS_MINUTE_TEN)
         {
-            String token = loginUser.getToken();
-            loginUser.setToken(token);
             refreshToken(loginUser);
         }
     }
