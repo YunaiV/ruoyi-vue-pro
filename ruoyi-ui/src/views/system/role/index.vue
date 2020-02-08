@@ -369,15 +369,15 @@ export default {
     /** 根据角色ID查询菜单树结构 */
     getRoleMenuTreeselect(roleId) {
       roleMenuTreeselect(roleId).then(response => {
-        this.getMenuTreeselect();
-        this.$refs.menu.setCheckedKeys(response.data);
+        this.menuOptions = response.menus;
+        this.$refs.menu.setCheckedKeys(response.checkedKeys);
       });
     },
     /** 根据角色ID查询部门树结构 */
     getRoleDeptTreeselect(roleId) {
       roleDeptTreeselect(roleId).then(response => {
-        this.getDeptTreeselect();
-        this.$refs.dept.setCheckedKeys(response.data);
+        this.deptOptions = response.depts;
+        this.$refs.dept.setCheckedKeys(response.checkedKeys);
       });
     },
     // 角色状态修改
@@ -407,8 +407,8 @@ export default {
     },
     // 表单重置
     reset() {
-      if (this.$refs.tree != undefined) {
-        this.$refs.tree.setCheckedKeys([]);
+      if (this.$refs.menu != undefined) {
+        this.$refs.menu.setCheckedKeys([]);
       }
       this.form = {
         roleId: undefined,

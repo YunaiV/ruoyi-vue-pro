@@ -70,7 +70,11 @@ public class SysDeptController extends BaseController
     @GetMapping(value = "/roleDeptTreeselect/{roleId}")
     public AjaxResult roleDeptTreeselect(@PathVariable("roleId") Long roleId)
     {
-        return AjaxResult.success(deptService.selectDeptListByRoleId(roleId));
+        List<SysDept> depts = deptService.selectDeptList(new SysDept());
+        AjaxResult ajax = AjaxResult.success();
+        ajax.put("checkedKeys", deptService.selectDeptListByRoleId(roleId));
+        ajax.put("depts", deptService.buildDeptTreeSelect(depts));
+        return ajax;
     }
 
     /**

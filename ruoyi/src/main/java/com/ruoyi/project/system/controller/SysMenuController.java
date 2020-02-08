@@ -80,7 +80,12 @@ public class SysMenuController extends BaseController
     @GetMapping(value = "/roleMenuTreeselect/{roleId}")
     public AjaxResult roleMenuTreeselect(@PathVariable("roleId") Long roleId)
     {
-        return AjaxResult.success(menuService.selectMenuListByRoleId(roleId));
+        LoginUser loginUser = tokenService.getLoginUser(ServletUtils.getRequest());
+        List<SysMenu> menus = menuService.selectMenuList(loginUser.getUser().getUserId());
+        AjaxResult ajax = AjaxResult.success();
+        ajax.put("checkedKeys", menuService.selectMenuListByRoleId(roleId));
+        ajax.put("menus", menuService.buildMenuTreeSelect(menus));
+        return ajax;
     }
 
     /**
