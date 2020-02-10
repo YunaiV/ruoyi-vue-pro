@@ -91,7 +91,14 @@ public class SysProfileController extends BaseController
         {
             return AjaxResult.error("新密码不能与旧密码相同");
         }
-        return toAjax(userService.resetUserPwd(userName, SecurityUtils.encryptPassword(newPassword)));
+        if (userService.resetUserPwd(userName, SecurityUtils.encryptPassword(newPassword)) > 0)
+        {
+            // 更新缓存用户密码
+            loginUser.getUser().setPassword(SecurityUtils.encryptPassword(newPassword));
+            tokenService.setLoginUser(loginUser);
+            return AjaxResult.success();
+        }
+        return AjaxResult.error("修改密码异常，请联系管理员");
     }
 
     /**
