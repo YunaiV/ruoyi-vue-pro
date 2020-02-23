@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import com.alibaba.fastjson.JSONObject;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.http.HttpUtils;
+import com.ruoyi.framework.config.RuoYiConfig;
 
 /**
  * 获取地址类
@@ -25,17 +26,20 @@ public class AddressUtils
         {
             return "内网IP";
         }
-        String rspStr = HttpUtils.sendPost(IP_URL, "ip=" + ip);
-        if (StringUtils.isEmpty(rspStr))
+        if (RuoYiConfig.isAddressEnabled())
         {
-            log.error("获取地理位置异常 {}", ip);
-            return address;
+            String rspStr = HttpUtils.sendPost(IP_URL, "ip=" + ip);
+            if (StringUtils.isEmpty(rspStr))
+            {
+                log.error("获取地理位置异常 {}", ip);
+                return address;
+            }
+            JSONObject obj = JSONObject.parseObject(rspStr);
+            JSONObject data = obj.getObject("data", JSONObject.class);
+            String region = data.getString("region");
+            String city = data.getString("city");
+            address = region + " " + city;
         }
-        JSONObject obj = JSONObject.parseObject(rspStr);
-        JSONObject data = obj.getObject("data", JSONObject.class);
-        String region = data.getString("region");
-        String city = data.getString("city");
-        address = region + " " + city;
         return address;
     }
 }
