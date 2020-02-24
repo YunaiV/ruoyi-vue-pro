@@ -82,6 +82,7 @@
               <treeselect
                 v-model="form.parentId"
                 :options="menuOptions"
+                :normalizer="normalizer"
                 :show-count="true"
                 placeholder="选择上级菜单"
               />
@@ -173,7 +174,7 @@
 </template>
 
 <script>
-import { listMenu, getMenu, treeselect, delMenu, addMenu, updateMenu } from "@/api/system/menu";
+import { listMenu, getMenu, delMenu, addMenu, updateMenu } from "@/api/system/menu";
 import Treeselect from "@riophae/vue-treeselect";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 import IconSelect from "@/components/IconSelect";
@@ -228,16 +229,27 @@ export default {
     getList() {
       this.loading = true;
       listMenu(this.queryParams).then(response => {
-        this.menuList = response.data;
+        this.menuList = this.handleTree(response.data, "menuId");
         this.loading = false;
       });
     },
+    /** 转换菜单数据结构 */
+    normalizer(node) {
+      if (node.children && !node.children.length) {
+        delete node.children;
+      }
+      return {
+        id: node.menuId,
+        label: node.menuName,
+        children: node.children
+      };
+    },
     /** 查询菜单下拉树结构 */
     getTreeselect() {
-      treeselect().then(response => {
+      listMenu().then(response => {
         this.menuOptions = [];
-        const menu = { id: 0, label: '主类目', children: [] };
-        menu.children = response.data;
+        const menu = { menuId: 0, menuName: '主类目', children: [] };
+        menu.children = this.handleTree(response.data, "menuId");
         this.menuOptions.push(menu);
       });
     },

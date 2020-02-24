@@ -88,7 +88,7 @@
         <el-row>
           <el-col :span="24" v-if="form.parentId !== 0">
             <el-form-item label="上级部门" prop="parentId">
-              <treeselect v-model="form.parentId" :options="deptOptions" placeholder="选择上级部门" />
+              <treeselect v-model="form.parentId" :options="deptOptions" :normalizer="normalizer" placeholder="选择上级部门" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
@@ -138,7 +138,7 @@
 </template>
 
 <script>
-import { listDept, getDept, treeselect, delDept, addDept, updateDept } from "@/api/system/dept";
+import { listDept, getDept, delDept, addDept, updateDept } from "@/api/system/dept";
 import Treeselect from "@riophae/vue-treeselect";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 
@@ -205,14 +205,25 @@ export default {
     getList() {
       this.loading = true;
       listDept(this.queryParams).then(response => {
-        this.deptList = response.data;
+        this.deptList = this.handleTree(response.data, "deptId");
         this.loading = false;
       });
     },
+    /** 转换部门数据结构 */
+    normalizer(node) {
+      if (node.children && !node.children.length) {
+        delete node.children;
+      }
+      return {
+        id: node.deptId,
+        label: node.deptName,
+        children: node.children
+      };
+    },
     /** 查询部门下拉树结构 */
     getTreeselect() {
-      treeselect().then(response => {
-        this.deptOptions = response.data;
+      listDept().then(response => {
+        this.deptOptions = this.handleTree(response.data, "deptId");
       });
     },
     // 字典状态字典翻译

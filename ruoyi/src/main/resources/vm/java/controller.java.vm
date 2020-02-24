@@ -18,7 +18,10 @@ import ${packageName}.service.I${ClassName}Service;
 import com.ruoyi.framework.web.controller.BaseController;
 import com.ruoyi.framework.web.domain.AjaxResult;
 import com.ruoyi.common.utils.poi.ExcelUtil;
+#if($table.crud)
 import com.ruoyi.framework.web.page.TableDataInfo;
+#elseif($table.tree)
+#end
 
 /**
  * ${functionName}Controller
@@ -38,12 +41,20 @@ public class ${ClassName}Controller extends BaseController
      */
     @PreAuthorize("@ss.hasPermi('${permissionPrefix}:list')")
     @GetMapping("/list")
+#if($table.crud)
     public TableDataInfo list(${ClassName} ${className})
     {
         startPage();
         List<${ClassName}> list = ${className}Service.select${ClassName}List(${className});
         return getDataTable(list);
     }
+#elseif($table.tree)
+    public AjaxResult list(${ClassName} ${className})
+    {
+        List<${ClassName}> list = ${className}Service.select${ClassName}List(${className});
+        return AjaxResult.success(list);
+    }
+#end
 
     /**
      * 导出${functionName}列表

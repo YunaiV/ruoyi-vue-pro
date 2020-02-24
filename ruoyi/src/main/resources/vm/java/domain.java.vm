@@ -3,7 +3,11 @@ package ${packageName}.domain;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import com.ruoyi.framework.aspectj.lang.annotation.Excel;
+#if($table.crud)
 import com.ruoyi.framework.web.domain.BaseEntity;
+#elseif($table.tree)
+import com.ruoyi.framework.web.domain.TreeEntity;
+#end
 #foreach ($import in $importList)
 import ${import};
 #end
@@ -14,7 +18,11 @@ import ${import};
  * @author ${author}
  * @date ${datetime}
  */
+#if($table.crud)
 #set($Entity="BaseEntity")
+#elseif($table.tree)
+#set($Entity="TreeEntity")
+#end
 public class ${ClassName} extends ${Entity}
 {
     private static final long serialVersionUID = 1L;
@@ -43,7 +51,7 @@ public class ${ClassName} extends ${Entity}
 #end
 #foreach ($column in $columns)
 #if(!$table.isSuperColumn($column.javaField))
-#if($column.javaField > 2 && $column.javaField.substring(1,2).matches("[A-Z]"))
+#if($column.javaField.length() > 2 && $column.javaField.substring(1,2).matches("[A-Z]"))
 #set($AttrName=$column.javaField)
 #else
 #set($AttrName=$column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
@@ -64,7 +72,7 @@ public class ${ClassName} extends ${Entity}
     public String toString() {
         return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
 #foreach ($column in $columns)
-#if($column.javaField > 2 && $column.javaField.substring(1,2).matches("[A-Z]"))
+#if($column.javaField.length() > 2 && $column.javaField.substring(1,2).matches("[A-Z]"))
 #set($AttrName=$column.javaField)
 #else
 #set($AttrName=$column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})

@@ -6,7 +6,7 @@
           <span slot="label">生成模板</span>
           <el-select v-model="info.tplCategory">
             <el-option label="单表（增删改查）" value="crud" />
-            <el-option label="树表（增删改查）" value="tree" disabled/>
+            <el-option label="树表（增删改查）" value="tree"/>
           </el-select>
         </el-form-item>
       </el-col>
