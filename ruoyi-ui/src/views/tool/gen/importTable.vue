@@ -26,7 +26,7 @@
       </el-form-item>
     </el-form>
     <el-row>
-      <el-table :data="dbTableList" @selection-change="handleSelectionChange" height="260px">
+      <el-table @row-click="clickRow" ref="table" :data="dbTableList" @selection-change="handleSelectionChange" height="260px">
         <el-table-column type="selection" width="55"></el-table-column>
         <el-table-column prop="tableName" label="表名称"></el-table-column>
         <el-table-column prop="tableComment" label="表描述"></el-table-column>
@@ -75,6 +75,9 @@ export default {
     show() {
       this.getList();
       this.visible = true;
+    },
+    clickRow(row) {
+      this.$refs.table.toggleRowSelection(row);
     },
     // 多选框选中数据
     handleSelectionChange(selection) {
