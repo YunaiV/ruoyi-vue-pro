@@ -13,12 +13,11 @@
             min-width="10%"
             :show-overflow-tooltip="true"
           />
-          <el-table-column
-            label="字段描述"
-            prop="columnComment"
-            min-width="10%"
-            :show-overflow-tooltip="true"
-          />
+          <el-table-column label="字段描述" min-width="10%">
+            <template slot-scope="scope">
+              <el-input v-model="scope.row.columnComment"></el-input>
+            </template>
+          </el-table-column>
           <el-table-column
             label="物理类型"
             prop="columnType"
