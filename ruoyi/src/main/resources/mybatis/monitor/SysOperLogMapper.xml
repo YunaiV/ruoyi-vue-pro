@@ -25,7 +25,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
 	<sql id="selectOperLogVo">
         select oper_id, title, business_type, method, request_method, operator_type, oper_name, dept_name, oper_url, oper_ip, oper_location, oper_param, json_result, status, error_msg, oper_time
-        from sys_oper_log order by oper_id desc
+        from sys_oper_log
     </sql>
     
 	<insert id="insertOperlog" parameterType="SysOperLog">
@@ -39,7 +39,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="title != null and title != ''">
 				AND title like concat('%', #{title}, '%')
 			</if>
-			<if test="businessType != null">
+			<if test="businessType != null and businessType != ''">
 				AND business_type = #{businessType}
 			</if>
 			<if test="businessTypes != null and businessTypes.length > 0">
@@ -61,6 +61,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 				and date_format(oper_time,'%y%m%d') &lt;= date_format(#{endTime},'%y%m%d')
 			</if>
 		</where>
+		order by oper_id desc
 	</select>
 	
 	<delete id="deleteOperLogByIds" parameterType="Long">
