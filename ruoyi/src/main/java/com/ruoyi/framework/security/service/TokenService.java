@@ -77,8 +77,7 @@ public class TokenService
     {
         if (StringUtils.isNotNull(loginUser) && StringUtils.isNotEmpty(loginUser.getToken()))
         {
-            String userKey = getTokenKey(loginUser.getToken());
-            redisCache.setCacheObject(userKey, loginUser);
+            refreshToken(loginUser);
         }
     }
 

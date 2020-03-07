@@ -51,16 +51,16 @@ public class SysPermissionService
      */
     public Set<String> getMenuPermission(SysUser user)
     {
-        Set<String> roles = new HashSet<String>();
+        Set<String> perms = new HashSet<String>();
         // 管理员拥有所有权限
         if (user.isAdmin())
         {
-            roles.add("*:*:*");
+            perms.add("*:*:*");
         }
         else
         {
-            roles.addAll(menuService.selectMenuPermsByUserId(user.getUserId()));
+            perms.addAll(menuService.selectMenuPermsByUserId(user.getUserId()));
         }
-        return roles;
+        return perms;
     }
 }
