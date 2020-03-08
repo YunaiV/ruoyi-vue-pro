@@ -33,7 +33,7 @@
               </li>
               <li class="list-group-item">
                 <svg-icon icon-class="date" />创建日期
-                <div class="pull-right">2018-08-23 09:11:56</div>
+                <div class="pull-right">{{ user.createTime }}</div>
               </li>
             </ul>
           </div>
