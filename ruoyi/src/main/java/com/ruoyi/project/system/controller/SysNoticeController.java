@@ -84,9 +84,9 @@ public class SysNoticeController extends BaseController
      */
     @PreAuthorize("@ss.hasPermi('system:notice:remove')")
     @Log(title = "通知公告", businessType = BusinessType.DELETE)
-    @DeleteMapping("/{noticeId}")
-    public AjaxResult remove(@PathVariable Long noticeId)
+    @DeleteMapping("/{noticeIds}")
+    public AjaxResult remove(@PathVariable Long[] noticeIds)
     {
-        return toAjax(noticeService.deleteNoticeById(noticeId));
+        return toAjax(noticeService.deleteNoticeByIds(noticeIds));
     }
 }
