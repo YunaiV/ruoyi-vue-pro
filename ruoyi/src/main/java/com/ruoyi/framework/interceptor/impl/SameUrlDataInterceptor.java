@@ -26,7 +26,7 @@ public class SameUrlDataInterceptor extends RepeatSubmitInterceptor
 
     public final String REPEAT_TIME = "repeatTime";
 
-    public final String SESSION_REPEAT_KEY = "repeatData";
+    public final String CACHE_REPEAT_KEY = "repeatData";
 
     @Autowired
     private RedisCache redisCache;
@@ -62,7 +62,7 @@ public class SameUrlDataInterceptor extends RepeatSubmitInterceptor
         // 请求地址（作为存放session的key值）
         String url = request.getRequestURI();
 
-        Object sessionObj = redisCache.getCacheObject(SESSION_REPEAT_KEY);
+        Object sessionObj = redisCache.getCacheObject(CACHE_REPEAT_KEY);
         if (sessionObj != null)
         {
             Map<String, Object> sessionMap = (Map<String, Object>) sessionObj;
@@ -77,7 +77,7 @@ public class SameUrlDataInterceptor extends RepeatSubmitInterceptor
         }
         Map<String, Object> cacheMap = new HashMap<String, Object>();
         cacheMap.put(url, nowDataMap);
-        redisCache.setCacheObject(SESSION_REPEAT_KEY, cacheMap, intervalTime, TimeUnit.SECONDS);
+        redisCache.setCacheObject(CACHE_REPEAT_KEY, cacheMap, intervalTime, TimeUnit.SECONDS);
         return false;
     }
 
