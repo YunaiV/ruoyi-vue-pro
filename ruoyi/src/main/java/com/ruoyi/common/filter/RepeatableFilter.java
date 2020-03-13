@@ -9,8 +9,6 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
-import com.ruoyi.common.enums.HttpMethod;
-
 /**
  * Repeatable 过滤器
  * 
@@ -28,15 +26,18 @@ public class RepeatableFilter implements Filter
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException
     {
-        HttpServletRequest req = (HttpServletRequest) request;
-        if (HttpMethod.PUT.name().equals(req.getMethod()) || HttpMethod.POST.name().equals(req.getMethod()))
+        ServletRequest requestWrapper = null;
+        if (request instanceof HttpServletRequest)
         {
-            RepeatedlyRequestWrapper repeatedlyRequest = new RepeatedlyRequestWrapper((HttpServletRequest) request);
-            chain.doFilter(repeatedlyRequest, response);
+            requestWrapper = new RepeatedlyRequestWrapper((HttpServletRequest) request, response);
+        }
+        if (null == requestWrapper)
+        {
+            chain.doFilter(request, response);
         }
         else
         {
-            chain.doFilter(request, response);
+            chain.doFilter(requestWrapper, response);
         }
     }
 

@@ -180,7 +180,7 @@ public class GenUtils
      */
     public static String replaceFirst(String replacementm, String[] searchList)
     {
-        String text = StringUtils.EMPTY;
+        String text = replacementm;
         for (String searchString : searchList)
         {
             if (replacementm.startsWith(searchString))
