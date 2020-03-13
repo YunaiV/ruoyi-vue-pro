@@ -1,4 +1,4 @@
-package com.ruoyi.common.xss;
+package com.ruoyi.common.filter;
 
 import java.io.IOException;
 import java.util.ArrayList;
