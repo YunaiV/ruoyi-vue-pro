@@ -166,10 +166,30 @@ public class GenUtils
         if (autoRemovePre && StringUtils.isNotEmpty(tablePrefix))
         {
             String[] searchList = StringUtils.split(tablePrefix, ",");
-            String[] replacementList = emptyList(searchList.length);
-            tableName = StringUtils.replaceEach(tableName, searchList, replacementList);
+            tableName = replaceFirst(tableName, searchList);
         }
         return StringUtils.convertToCamelCase(tableName);
+    }
+
+    /**
+     * 批量替换前缀
+     * 
+     * @param replacementm 替换值
+     * @param searchList 替换列表
+     * @return
+     */
+    public static String replaceFirst(String replacementm, String[] searchList)
+    {
+        String text = StringUtils.EMPTY;
+        for (String searchString : searchList)
+        {
+            if (replacementm.startsWith(searchString))
+            {
+                text = replacementm.replaceFirst(searchString, "");
+                break;
+            }
+        }
+        return text;
     }
 
     /**
@@ -218,21 +238,5 @@ public class GenUtils
         {
             return 0;
         }
-    }
-
-    /**
-     * 获取空数组列表
-     * 
-     * @param length 长度
-     * @return 数组信息
-     */
-    public static String[] emptyList(int length)
-    {
-        String[] values = new String[length];
-        for (int i = 0; i < length; i++)
-        {
-            values[i] = StringUtils.EMPTY;
-        }
-        return values;
     }
 }
