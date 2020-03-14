@@ -210,6 +210,9 @@ export default {
         ],
         orderNum: [
           { required: true, message: "菜单顺序不能为空", trigger: "blur" }
+        ],
+        path: [
+          { required: true, message: "路由地址不能为空", trigger: "blur" }
         ]
       }
     };
