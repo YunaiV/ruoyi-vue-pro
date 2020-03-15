@@ -3,50 +3,54 @@ import { debounce } from '@/utils'
 export default {
   data() {
     return {
-      $_sidebarElm: null
+      $_sidebarElm: null,
+      $_resizeHandler: null
     }
   },
   mounted() {
-    this.$_initResizeEvent()
-    this.$_initSidebarResizeEvent()
-  },
-  beforeDestroy() {
-    this.$_destroyResizeEvent()
-    this.$_destroySidebarResizeEvent()
+    this.initListener()
   },
   activated() {
-    this.$_initResizeEvent()
-    this.$_initSidebarResizeEvent()
+    if (!this.$_resizeHandler) {
+      // avoid duplication init
+      this.initListener()
+    }
+
+    // when keep-alive chart activated, auto resize
+    this.resize()
+  },
+  beforeDestroy() {
+    this.destroyListener()
   },
   deactivated() {
-    this.$_destroyResizeEvent()
-    this.$_destroySidebarResizeEvent()
+    this.destroyListener()
   },
   methods: {
-    $_resizeHandler() {
-      return debounce(() => {
-        if (this.chart) {
-          this.chart.resize()
-        }
-      }, 100)()
-    },
-    $_initResizeEvent() {
-      window.addEventListener('resize', this.$_resizeHandler)
-    },
-    $_destroyResizeEvent() {
-      window.removeEventListener('resize', this.$_resizeHandler)
-    },
+    // use $_ for mixins properties
+    // https://vuejs.org/v2/style-guide/index.html#Private-property-names-essential
     $_sidebarResizeHandler(e) {
       if (e.propertyName === 'width') {
         this.$_resizeHandler()
       }
     },
-    $_initSidebarResizeEvent() {
+    initListener() {
+      this.$_resizeHandler = debounce(() => {
+        this.resize()
+      }, 100)
+      window.addEventListener('resize', this.$_resizeHandler)
+
       this.$_sidebarElm = document.getElementsByClassName('sidebar-container')[0]
       this.$_sidebarElm && this.$_sidebarElm.addEventListener('transitionend', this.$_sidebarResizeHandler)
     },
-    $_destroySidebarResizeEvent() {
+    destroyListener() {
+      window.removeEventListener('resize', this.$_resizeHandler)
+      this.$_resizeHandler = null
+
       this.$_sidebarElm && this.$_sidebarElm.removeEventListener('transitionend', this.$_sidebarResizeHandler)
+    },
+    resize() {
+      const { chart } = this
+      chart && chart.resize()
     }
   }
 }
