@@ -1,6 +1,6 @@
 @echo off
 echo.
-echo [信息] 打包Web工程，生成node_modules包文件。
+echo [信息] 安装Web工程，生成node_modules文件。
 echo.
 
 %~d0
