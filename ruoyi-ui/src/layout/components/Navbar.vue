@@ -36,8 +36,8 @@
           <el-dropdown-item>
             <span @click="setting = true">布局设置</span>
           </el-dropdown-item>
-          <el-dropdown-item divided>
-            <span @click="logout">退出登录</span>
+          <el-dropdown-item divided @click.native="logout">
+            <span>退出登录</span>
           </el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
