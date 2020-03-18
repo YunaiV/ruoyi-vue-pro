@@ -28,7 +28,6 @@ import oshi.util.Util;
  */
 public class Server
 {
-    
     private static final int OSHI_WAIT_SECOND = 1000;
     
     /**

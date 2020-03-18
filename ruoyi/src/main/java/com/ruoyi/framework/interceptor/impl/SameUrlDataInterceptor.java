@@ -59,7 +59,7 @@ public class SameUrlDataInterceptor extends RepeatSubmitInterceptor
         nowDataMap.put(REPEAT_PARAMS, nowParams);
         nowDataMap.put(REPEAT_TIME, System.currentTimeMillis());
 
-        // 请求地址（作为存放session的key值）
+        // 请求地址（作为存放cache的key值）
         String url = request.getRequestURI();
 
         Object sessionObj = redisCache.getCacheObject(CACHE_REPEAT_KEY);

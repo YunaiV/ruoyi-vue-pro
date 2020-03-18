@@ -21,7 +21,6 @@ public class HttpHelper
 
     public static String getBodyString(ServletRequest request)
     {
-
         StringBuilder sb = new StringBuilder();
         BufferedReader reader = null;
         try (InputStream inputStream = request.getInputStream())

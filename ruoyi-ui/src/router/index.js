@@ -93,6 +93,19 @@ export const constantRoutes = [
     ]
   },
   {
+    path: '/job',
+    component: Layout,
+    hidden: true,
+    children: [
+      {
+        path: 'log',
+        component: () => import('@/views/monitor/job/log'),
+        name: 'JobLog',
+        meta: { title: '调度日志' }
+      }
+    ]
+  },
+  {
     path: '/gen',
     component: Layout,
     hidden: true,
