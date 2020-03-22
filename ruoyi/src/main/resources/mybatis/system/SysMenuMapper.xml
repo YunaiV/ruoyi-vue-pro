@@ -96,7 +96,8 @@
 		from sys_menu m
 			 left join sys_role_menu rm on m.menu_id = rm.menu_id
 			 left join sys_user_role ur on rm.role_id = ur.role_id
-		where ur.user_id = #{userId}
+			 left join sys_role r on r.role_id = ur.role_id
+		where m.visible = '0' and r.status = '0' and ur.user_id = #{userId}
 	</select>
 	
 	<select id="selectMenuById" parameterType="Long" resultMap="SysMenuResult">
