@@ -238,8 +238,8 @@
           </el-col>
           <el-col :span="12">
             <el-form-item label="是否并发：">
-              <div v-if="form.status == 0">允许</div>
-              <div v-else-if="form.status == 1">禁止</div>
+              <div v-if="form.concurrent == 0">允许</div>
+              <div v-else-if="form.concurrent == 1">禁止</div>
             </el-form-item>
           </el-col>
           <el-col :span="12">
