@@ -6,7 +6,7 @@
       </el-tab-pane>
       <el-tab-pane label="字段信息" name="cloum">
         <el-table ref="dragTable" :data="cloumns" row-key="columnId" :max-height="tableHeight">
-          <el-table-column label="序号" type="index" min-width="5%" />
+          <el-table-column label="序号" type="index" min-width="5%" class-name="allowDrag" />
           <el-table-column
             label="字段列名"
             prop="columnName"
@@ -203,6 +203,7 @@ export default {
   mounted() {
     const el = this.$refs.dragTable.$el.querySelectorAll(".el-table__body-wrapper > table > tbody")[0];
     const sortable = Sortable.create(el, {
+      handle: ".allowDrag",
       onEnd: evt => {
         const targetRow = this.cloumns.splice(evt.oldIndex, 1)[0];
         this.cloumns.splice(evt.newIndex, 0, targetRow);
