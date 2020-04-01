@@ -11,7 +11,7 @@ export function login(username, password, code, uuid) {
   return request({
     url: '/login',
     method: 'post',
-    params: data
+    data: data
   })
 }
 

@@ -5,9 +5,11 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.utils.ServletUtils;
+import com.ruoyi.framework.security.LoginBody;
 import com.ruoyi.framework.security.LoginUser;
 import com.ruoyi.framework.security.service.SysLoginService;
 import com.ruoyi.framework.security.service.SysPermissionService;
@@ -47,11 +49,12 @@ public class SysLoginController
      * @return 结果
      */
     @PostMapping("/login")
-    public AjaxResult login(String username, String password, String code, String uuid)
+    public AjaxResult login(@RequestBody LoginBody loginBody)
     {
         AjaxResult ajax = AjaxResult.success();
         // 生成令牌
-        String token = loginService.login(username, password, code, uuid);
+        String token = loginService.login(loginBody.getUsername(), loginBody.getPassword(), loginBody.getCode(),
+                loginBody.getUuid());
         ajax.put(Constants.TOKEN, token);
         return ajax;
     }
