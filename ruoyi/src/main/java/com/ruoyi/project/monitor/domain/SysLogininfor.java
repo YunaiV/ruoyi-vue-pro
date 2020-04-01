@@ -1,6 +1,7 @@
 package com.ruoyi.project.monitor.domain;
 
 import java.util.Date;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.ruoyi.framework.aspectj.lang.annotation.Excel;
 import com.ruoyi.framework.aspectj.lang.annotation.Excel.ColumnType;
 import com.ruoyi.framework.web.domain.BaseEntity;
@@ -47,6 +48,7 @@ public class SysLogininfor extends BaseEntity
     private String msg;
 
     /** 访问时间 */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Excel(name = "访问时间", width = 30, dateFormat = "yyyy-MM-dd HH:mm:ss")
     private Date loginTime;
 
