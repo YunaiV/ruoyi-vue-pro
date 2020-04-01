@@ -119,7 +119,6 @@ public class GenController extends BaseController
     @PutMapping
     public AjaxResult editSave(@Validated @RequestBody GenTable genTable)
     {
-        System.out.println(genTable.getParams().size());
         genTableService.validateEdit(genTable);
         genTableService.updateGenTable(genTable);
         return AjaxResult.success();

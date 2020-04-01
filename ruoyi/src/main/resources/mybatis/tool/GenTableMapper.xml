@@ -110,7 +110,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			   c.column_id, c.column_name, c.column_comment, c.column_type, c.java_type, c.java_field, c.is_pk, c.is_increment, c.is_required, c.is_insert, c.is_edit, c.is_list, c.is_query, c.query_type, c.html_type, c.dict_type, c.sort
 		FROM gen_table t
 			 LEFT JOIN gen_table_column c ON t.table_id = c.table_id
-		where t.table_id = #{tableId}
+		where t.table_id = #{tableId} order by c.sort
 	</select>
 	
 	<select id="selectGenTableByName" parameterType="String" resultMap="GenTableResult">
@@ -118,7 +118,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			   c.column_id, c.column_name, c.column_comment, c.column_type, c.java_type, c.java_field, c.is_pk, c.is_increment, c.is_required, c.is_insert, c.is_edit, c.is_list, c.is_query, c.query_type, c.html_type, c.dict_type, c.sort
 		FROM gen_table t
 			 LEFT JOIN gen_table_column c ON t.table_id = c.table_id
-		where t.table_name = #{tableName}
+		where t.table_name = #{tableName} order by c.sort
 	</select>
 	
 	<insert id="insertGenTable" parameterType="GenTable" useGeneratedKeys="true" keyProperty="tableId">

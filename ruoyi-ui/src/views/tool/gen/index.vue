@@ -80,7 +80,7 @@
 
     <el-table v-loading="loading" :data="tableList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55"></el-table-column>
-      <el-table-column label="序号" align="center" prop="tableId" width="50px" />
+      <el-table-column label="序号" align="center" prop="tableId" width="60px" />
       <el-table-column
         label="表名称"
         align="center"
