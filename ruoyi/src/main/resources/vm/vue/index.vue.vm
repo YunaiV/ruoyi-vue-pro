@@ -258,8 +258,7 @@ export default {
 #end
 #if(${column.dictType} != '')
       // $comment字典
-      ${column.javaField}Options: []#if($velocityCount != $columns.size()),#end
-
+      ${column.javaField}Options: [],
 #end
 #end
       // 查询参数
