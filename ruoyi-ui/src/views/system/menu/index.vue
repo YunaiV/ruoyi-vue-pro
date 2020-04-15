@@ -11,9 +11,9 @@
         />
       </el-form-item>
       <el-form-item label="状态">
-        <el-select v-model="queryParams.visible" placeholder="菜单状态" clearable size="small">
+        <el-select v-model="queryParams.status" placeholder="菜单状态" clearable size="small">
           <el-option
-            v-for="dict in visibleOptions"
+            v-for="dict in statusOptions"
             :key="dict.dictValue"
             :label="dict.dictLabel"
             :value="dict.dictValue"
@@ -41,7 +41,7 @@
       <el-table-column prop="orderNum" label="排序" width="60"></el-table-column>
       <el-table-column prop="perms" label="权限标识" :show-overflow-tooltip="true"></el-table-column>
       <el-table-column prop="component" label="组件路径" :show-overflow-tooltip="true"></el-table-column>
-      <el-table-column prop="visible" label="可见" :formatter="visibleFormat" width="80"></el-table-column>
+      <el-table-column prop="status" label="状态" :formatter="statusFormat" width="80"></el-table-column>
       <el-table-column label="创建时间" align="center" prop="createTime">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
@@ -152,11 +152,22 @@
               <el-input v-model="form.perms" placeholder="请权限标识" maxlength="50" />
             </el-form-item>
           </el-col>
-          <el-col :span="24">
-            <el-form-item v-if="form.menuType != 'F'" label="菜单状态">
+          <el-col :span="12">
+            <el-form-item v-if="form.menuType != 'F'" label="显示状态">
               <el-radio-group v-model="form.visible">
                 <el-radio
                   v-for="dict in visibleOptions"
+                  :key="dict.dictValue"
+                  :label="dict.dictValue"
+                >{{dict.dictLabel}}</el-radio>
+              </el-radio-group>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item v-if="form.menuType != 'F'" label="菜单状态">
+              <el-radio-group v-model="form.status">
+                <el-radio
+                  v-for="dict in statusOptions"
                   :key="dict.dictValue"
                   :label="dict.dictValue"
                 >{{dict.dictLabel}}</el-radio>
@@ -194,8 +205,10 @@ export default {
       title: "",
       // 是否显示弹出层
       open: false,
-      // 菜单状态数据字典
+      // 显示状态数据字典
       visibleOptions: [],
+      // 菜单状态数据字典
+      statusOptions: [],
       // 查询参数
       queryParams: {
         menuName: undefined,
@@ -221,6 +234,9 @@ export default {
     this.getList();
     this.getDicts("sys_show_hide").then(response => {
       this.visibleOptions = response.data;
+    });
+    this.getDicts("sys_normal_disable").then(response => {
+      this.statusOptions = response.data;
     });
   },
   methods: {
@@ -256,12 +272,19 @@ export default {
         this.menuOptions.push(menu);
       });
     },
-    // 菜单显示状态字典翻译
+    // 显示状态字典翻译
     visibleFormat(row, column) {
       if (row.menuType == "F") {
         return "";
       }
       return this.selectDictLabel(this.visibleOptions, row.visible);
+    },
+    // 菜单状态字典翻译
+    statusFormat(row, column) {
+      if (row.menuType == "F") {
+        return "";
+      }
+      return this.selectDictLabel(this.statusOptions, row.status);
     },
     // 取消按钮
     cancel() {
@@ -278,7 +301,8 @@ export default {
         menuType: "M",
         orderNum: undefined,
         isFrame: "1",
-        visible: "0"
+        visible: "0",
+        status: "0"
       };
       this.resetForm("form");
     },

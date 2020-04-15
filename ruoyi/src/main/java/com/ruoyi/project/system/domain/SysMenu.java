@@ -44,8 +44,11 @@ public class SysMenu extends BaseEntity
     /** 类型（M目录 C菜单 F按钮） */
     private String menuType;
 
-    /** 菜单状态:0显示,1隐藏 */
+    /** 显示状态（0显示 1隐藏） */
     private String visible;
+    
+    /** 菜单状态（0显示 1隐藏） */
+    private String status;
 
     /** 权限字符串 */
     private String perms;
@@ -162,6 +165,16 @@ public class SysMenu extends BaseEntity
         this.visible = visible;
     }
 
+    public String getStatus()
+    {
+        return status;
+    }
+
+    public void setStatus(String status)
+    {
+        this.status = status;
+    }
+
     @Size(min = 0, max = 100, message = "权限标识长度不能超过100个字符")
     public String getPerms()
     {
@@ -205,6 +218,7 @@ public class SysMenu extends BaseEntity
             .append("isFrame", getIsFrame())
             .append("menuType", getMenuType())
             .append("visible", getVisible())
+            .append("status ", getStatus())
             .append("perms", getPerms())
             .append("icon", getIcon())
             .append("createBy", getCreateBy())

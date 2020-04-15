@@ -139,6 +139,7 @@ public class SysMenuServiceImpl implements ISysMenuService
         for (SysMenu menu : menus)
         {
             RouterVo router = new RouterVo();
+            router.setHidden("1".equals(menu.getVisible()));
             router.setName(StringUtils.capitalize(menu.getPath()));
             router.setPath(getRouterPath(menu));
             router.setComponent(StringUtils.isEmpty(menu.getComponent()) ? "Layout" : menu.getComponent());
