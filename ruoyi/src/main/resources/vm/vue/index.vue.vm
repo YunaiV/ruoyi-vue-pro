@@ -112,7 +112,7 @@
 #elseif($column.list && $column.htmlType == "datetime")
       <el-table-column label="${comment}" align="center" prop="${javaField}" width="180">
         <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.${javaField}) }}</span>
+          <span>{{ parseTime(scope.row.${javaField}, '{y}-{m}-{d}') }}</span>
         </template>
       </el-table-column>
 #elseif($column.list && "" != $column.dictType)

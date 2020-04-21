@@ -1,5 +1,8 @@
 package ${packageName}.domain;
 
+#foreach ($import in $importList)
+import ${import};
+#end
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import com.ruoyi.framework.aspectj.lang.annotation.Excel;
@@ -7,9 +10,6 @@ import com.ruoyi.framework.aspectj.lang.annotation.Excel;
 import com.ruoyi.framework.web.domain.BaseEntity;
 #elseif($table.tree)
 import com.ruoyi.framework.web.domain.TreeEntity;
-#end
-#foreach ($import in $importList)
-import ${import};
 #end
 
 /**
@@ -40,6 +40,7 @@ public class ${ClassName} extends ${Entity}
 #if($parentheseIndex != -1)
     @Excel(name = "${comment}", readConverterExp = "$column.readConverterExp()")
 #elseif($column.javaType == 'Date')
+    @JsonFormat(pattern = "yyyy-MM-dd")
     @Excel(name = "${comment}", width = 30, dateFormat = "yyyy-MM-dd")
 #else
     @Excel(name = "${comment}")
