@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.exception.CustomException;
 import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.common.utils.spring.SpringUtils;
 import com.ruoyi.framework.aspectj.lang.annotation.DataScope;
 import com.ruoyi.project.system.domain.SysRole;
 import com.ruoyi.project.system.domain.SysRoleDept;
@@ -82,7 +83,7 @@ public class SysRoleServiceImpl implements ISysRoleService
      */
     public List<SysRole> selectRoleAll()
     {
-        return roleMapper.selectRoleAll();
+        return SpringUtils.getAopProxy(this).selectRoleList(new SysRole());
     }
 
     /**
