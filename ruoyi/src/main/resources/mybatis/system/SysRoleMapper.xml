@@ -48,6 +48,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		</if>
 		<!-- 数据范围过滤 -->
 		${dataScope}
+		order by r.role_sort
 	</select>
     
 	<select id="selectRolePermissionByUserId" parameterType="Long" resultMap="SysRoleResult">
