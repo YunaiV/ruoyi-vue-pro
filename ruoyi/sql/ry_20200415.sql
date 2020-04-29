@@ -138,7 +138,7 @@ create table sys_menu (
   is_frame          int(1)          default 1                  comment '是否为外链（0是 1否）',
   menu_type         char(1)         default ''                 comment '菜单类型（M目录 C菜单 F按钮）',
   visible           char(1)         default 0                  comment '菜单状态（0显示 1隐藏）',
-  status            char(1)         not null                   comment '菜单状态（0正常 1停用）',
+  status            char(1)         default 0                  comment '菜单状态（0正常 1停用）',
   perms             varchar(100)    default null               comment '权限标识',
   icon              varchar(100)    default '#'                comment '菜单图标',
   create_by         varchar(64)     default ''                 comment '创建者',

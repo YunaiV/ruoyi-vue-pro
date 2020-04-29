@@ -3,6 +3,7 @@ package com.ruoyi.framework.config;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import io.swagger.annotations.ApiOperation;
@@ -32,6 +33,10 @@ public class SwaggerConfig
     @Autowired
     private RuoYiConfig ruoyiConfig;
 
+    /** Swagger开关配置 */
+    @Value("${swagger.enable}")
+    private boolean swaggerEnable;
+
     /**
      * 创建API
      */
@@ -39,6 +44,8 @@ public class SwaggerConfig
     public Docket createRestApi()
     {
         return new Docket(DocumentationType.SWAGGER_2)
+                // 是否启用Swagger
+                .enable(swaggerEnable)
                 .pathMapping("/dev-api")
                 // 用来创建该API的基本信息，展示在文档的页面中（自定义展示的信息）
                 .apiInfo(apiInfo())

@@ -100,6 +100,10 @@ pagehelper:
   supportMethodsArguments: true
   params: count=countSql 
 
+# Swagger配置
+swagger:
+  enable: true
+
 # 防止XSS攻击
 xss: 
   # 过滤开关
