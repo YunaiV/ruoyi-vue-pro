@@ -6,6 +6,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.ruoyi.common.constant.ScheduleConstants;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.job.CronUtils;
@@ -110,6 +111,7 @@ public class SysJob extends BaseEntity implements Serializable
         this.cronExpression = cronExpression;
     }
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     public Date getNextValidTime()
     {
         if (StringUtils.isNotEmpty(cronExpression))
