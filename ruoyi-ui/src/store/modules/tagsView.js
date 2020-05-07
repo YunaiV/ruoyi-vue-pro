@@ -38,6 +38,7 @@ const mutations = {
     })
   },
   DEL_OTHERS_CACHED_VIEWS: (state, view) => {
+    const index = state.cachedViews.indexOf(view.name)
     if (index > -1) {
       state.cachedViews = state.cachedViews.slice(index, index + 1)
     } else {
