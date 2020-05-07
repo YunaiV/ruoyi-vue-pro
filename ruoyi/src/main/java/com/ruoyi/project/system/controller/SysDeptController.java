@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.utils.SecurityUtils;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.framework.aspectj.lang.annotation.Log;
 import com.ruoyi.framework.aspectj.lang.enums.BusinessType;
 import com.ruoyi.framework.web.controller.BaseController;
@@ -108,6 +109,11 @@ public class SysDeptController extends BaseController
         else if (dept.getParentId().equals(dept.getDeptId()))
         {
             return AjaxResult.error("修改部门'" + dept.getDeptName() + "'失败，上级部门不能是自己");
+        }
+        else if (StringUtils.equals(UserConstants.DEPT_DISABLE, dept.getStatus())
+                && deptService.selectNormalChildrenDeptById(dept.getDeptId()) > 0)
+        {
+            return AjaxResult.error("该部门包含未停用的子部门！");
         }
         dept.setUpdateBy(SecurityUtils.getUsername());
         return toAjax(deptService.updateDept(dept));
