@@ -33,9 +33,13 @@ public class SwaggerConfig
     @Autowired
     private RuoYiConfig ruoyiConfig;
 
-    /** Swagger开关配置 */
-    @Value("${swagger.enable}")
-    private boolean swaggerEnable;
+    /** 是否开启swagger */
+    @Value("${swagger.enabled}")
+    private boolean enabled;
+
+    /** 设置请求的统一前缀 */
+    @Value("${swagger.pathMapping}")
+    private String pathMapping;
 
     /**
      * 创建API
@@ -45,8 +49,7 @@ public class SwaggerConfig
     {
         return new Docket(DocumentationType.SWAGGER_2)
                 // 是否启用Swagger
-                .enable(swaggerEnable)
-                .pathMapping("/dev-api")
+                .enable(enabled)
                 // 用来创建该API的基本信息，展示在文档的页面中（自定义展示的信息）
                 .apiInfo(apiInfo())
                 // 设置哪些接口暴露给Swagger展示
@@ -54,13 +57,14 @@ public class SwaggerConfig
                 // 扫描所有有注解的api，用这种方式更灵活
                 .apis(RequestHandlerSelectors.withMethodAnnotation(ApiOperation.class))
                 // 扫描指定包中的swagger注解
-                //.apis(RequestHandlerSelectors.basePackage("com.ruoyi.project.tool.swagger"))
+                // .apis(RequestHandlerSelectors.basePackage("com.ruoyi.project.tool.swagger"))
                 // 扫描所有 .apis(RequestHandlerSelectors.any())
                 .paths(PathSelectors.any())
                 .build()
                 /* 设置安全模式，swagger可以设置访问token */
                 .securitySchemes(securitySchemes())
-                .securityContexts(securityContexts());
+                .securityContexts(securityContexts())
+                .pathMapping(pathMapping);
     }
 
     /**
@@ -72,7 +76,7 @@ public class SwaggerConfig
         apiKeyList.add(new ApiKey("Authorization", "Authorization", "header"));
         return apiKeyList;
     }
-    
+
     /**
      * 安全上下文
      */
@@ -86,7 +90,7 @@ public class SwaggerConfig
                         .build());
         return securityContexts;
     }
-    
+
     /**
      * 默认的安全上引用
      */
