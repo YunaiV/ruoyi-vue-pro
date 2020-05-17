@@ -397,7 +397,7 @@ export default {
           type: "warning"
         }).then(function() {
           return runJob(row.jobId, row.jobGroup);
-        }).then(function() {
+        }).then(() => {
           this.msgSuccess("执行成功");
         }).catch(function() {});
     },

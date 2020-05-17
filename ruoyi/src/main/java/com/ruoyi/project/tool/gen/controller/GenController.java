@@ -124,6 +124,9 @@ public class GenController extends BaseController
         return AjaxResult.success();
     }
 
+    /**
+     * 删除代码生成
+     */
     @PreAuthorize("@ss.hasPermi('tool:gen:remove')")
     @Log(title = "代码生成", businessType = BusinessType.DELETE)
     @DeleteMapping("/{tableIds}")

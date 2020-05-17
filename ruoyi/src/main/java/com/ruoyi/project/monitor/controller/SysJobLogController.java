@@ -76,6 +76,9 @@ public class SysJobLogController extends BaseController
         return toAjax(jobLogService.deleteJobLogByIds(jobLogIds));
     }
 
+    /**
+     * 清空定时任务调度日志
+     */
     @PreAuthorize("@ss.hasPermi('monitor:job:remove')")
     @Log(title = "调度日志", businessType = BusinessType.CLEAN)
     @DeleteMapping("/clean")
