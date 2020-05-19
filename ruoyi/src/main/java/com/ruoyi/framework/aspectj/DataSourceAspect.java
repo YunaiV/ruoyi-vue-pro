@@ -1,6 +1,6 @@
 package com.ruoyi.framework.aspectj;
 
-import java.lang.reflect.Method;
+import java.util.Objects;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -8,6 +8,7 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import com.ruoyi.common.utils.StringUtils;
@@ -60,17 +61,12 @@ public class DataSourceAspect
     public DataSource getDataSource(ProceedingJoinPoint point)
     {
         MethodSignature signature = (MethodSignature) point.getSignature();
-        Class<? extends Object> targetClass = point.getTarget().getClass();
-        DataSource targetDataSource = targetClass.getAnnotation(DataSource.class);
-        if (StringUtils.isNotNull(targetDataSource))
+        DataSource dataSource = AnnotationUtils.findAnnotation(signature.getMethod(), DataSource.class);
+        if (Objects.nonNull(dataSource))
         {
-            return targetDataSource;
-        }
-        else
-        {
-            Method method = signature.getMethod();
-            DataSource dataSource = method.getAnnotation(DataSource.class);
             return dataSource;
         }
+
+        return AnnotationUtils.findAnnotation(signature.getDeclaringType(), DataSource.class);
     }
 }
