@@ -20,6 +20,16 @@ public class Constants
     public static final String GBK = "GBK";
 
     /**
+     * http请求
+     */
+    public static final String HTTP = "http://";
+
+    /**
+     * https请求
+     */
+    public static final String HTTPS = "https://";
+
+    /**
      * 通用成功标识
      */
     public static final String SUCCESS = "0";
