@@ -317,7 +317,7 @@ public class SysMenuServiceImpl implements ISysMenuService
         // 非外链并且是一级目录（类型为菜单）
         else if (isMeunFrame(menu))
         {
-            routerPath = StringUtils.EMPTY;
+            routerPath = "/";
         }
         return routerPath;
     }
