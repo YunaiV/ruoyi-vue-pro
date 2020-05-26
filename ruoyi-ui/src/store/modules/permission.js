@@ -32,6 +32,10 @@ const permission = {
 // 遍历后台传来的路由字符串，转换为组件对象
 function filterAsyncRouter(asyncRouterMap) {
   return asyncRouterMap.filter(route => {
+    if(!route.path){
+      // 防止空路由出现的警告，设置默认path
+      route.path = '/path';
+    }
     if (route.component) {
       // Layout组件特殊处理
       if (route.component === 'Layout') {
