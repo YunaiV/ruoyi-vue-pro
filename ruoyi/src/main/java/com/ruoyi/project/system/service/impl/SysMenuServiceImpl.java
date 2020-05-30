@@ -140,7 +140,7 @@ public class SysMenuServiceImpl implements ISysMenuService
         {
             RouterVo router = new RouterVo();
             router.setHidden("1".equals(menu.getVisible()));
-            router.setName(StringUtils.capitalize(menu.getPath()));
+            router.setName(getRouteName(menu));
             router.setPath(getRouterPath(menu));
             router.setComponent(getComponent(menu));
             router.setMeta(new MetaVo(menu.getMenuName(), menu.getIcon()));
@@ -297,6 +297,23 @@ public class SysMenuServiceImpl implements ISysMenuService
             return UserConstants.NOT_UNIQUE;
         }
         return UserConstants.UNIQUE;
+    }
+
+    /**
+     * 获取路由名称
+     * 
+     * @param menu 菜单信息
+     * @return 路由名称
+     */
+    public String getRouteName(SysMenu menu)
+    {
+        String routerName = StringUtils.capitalize(menu.getPath());
+        // 非外链并且是一级目录（类型为目录）
+        if (isMeunFrame(menu))
+        {
+            routerName = StringUtils.EMPTY;
+        }
+        return routerName;
     }
 
     /**

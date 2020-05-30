@@ -13,8 +13,8 @@
                 mode="vertical"
             >
                 <sidebar-item
-                    v-for="route in permission_routes"
-                    :key="route.path"
+                    v-for="(route, index) in permission_routes"
+                    :key="route.path  + index"
                     :item="route"
                     :base-path="route.path"
                 />
