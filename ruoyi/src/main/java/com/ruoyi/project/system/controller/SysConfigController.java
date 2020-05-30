@@ -118,4 +118,16 @@ public class SysConfigController extends BaseController
     {
         return toAjax(configService.deleteConfigByIds(configIds));
     }
+
+    /**
+     * 清空缓存
+     */
+    @PreAuthorize("@ss.hasPermi('system:config:remove')")
+    @Log(title = "参数管理", businessType = BusinessType.CLEAN)
+    @DeleteMapping("/clearCache")
+    public AjaxResult clearCache()
+    {
+        configService.clearCache();
+        return AjaxResult.success();
+    }
 }

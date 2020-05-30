@@ -51,6 +51,14 @@ export function delConfig(configId) {
   })
 }
 
+// 清理参数缓存
+export function clearCache() {
+  return request({
+    url: '/system/config/clearCache',
+    method: 'delete'
+  })
+}
+
 // 导出参数
 export function exportConfig(query) {
   return request({

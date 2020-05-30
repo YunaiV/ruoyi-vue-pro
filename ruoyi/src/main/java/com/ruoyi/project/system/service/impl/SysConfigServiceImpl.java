@@ -1,10 +1,15 @@
 package com.ruoyi.project.system.service.impl;
 
+import java.util.Collection;
 import java.util.List;
+import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.constant.UserConstants;
+import com.ruoyi.common.core.text.Convert;
 import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.framework.redis.RedisCache;
 import com.ruoyi.project.system.domain.SysConfig;
 import com.ruoyi.project.system.mapper.SysConfigMapper;
 import com.ruoyi.project.system.service.ISysConfigService;
@@ -19,6 +24,22 @@ public class SysConfigServiceImpl implements ISysConfigService
 {
     @Autowired
     private SysConfigMapper configMapper;
+
+    @Autowired
+    private RedisCache redisCache;
+
+    /**
+     * 项目启动时，初始化参数到缓存
+     */
+    @PostConstruct
+    public void init()
+    {
+        List<SysConfig> configsList = configMapper.selectConfigList(new SysConfig());
+        for (SysConfig config : configsList)
+        {
+            redisCache.setCacheObject(getCacheKey(config.getConfigKey()), config.getConfigValue());
+        }
+    }
 
     /**
      * 查询参数配置信息
@@ -43,10 +64,20 @@ public class SysConfigServiceImpl implements ISysConfigService
     @Override
     public String selectConfigByKey(String configKey)
     {
+        String configValue = Convert.toStr(redisCache.getCacheObject(getCacheKey(configKey)));
+        if (StringUtils.isNotEmpty(configValue))
+        {
+            return configValue;
+        }
         SysConfig config = new SysConfig();
         config.setConfigKey(configKey);
         SysConfig retConfig = configMapper.selectConfig(config);
-        return StringUtils.isNotNull(retConfig) ? retConfig.getConfigValue() : "";
+        if (StringUtils.isNotNull(retConfig))
+        {
+            redisCache.setCacheObject(getCacheKey(configKey), retConfig.getConfigValue());
+            return retConfig.getConfigValue();
+        }
+        return StringUtils.EMPTY;
     }
 
     /**
@@ -70,7 +101,12 @@ public class SysConfigServiceImpl implements ISysConfigService
     @Override
     public int insertConfig(SysConfig config)
     {
-        return configMapper.insertConfig(config);
+        int row = configMapper.insertConfig(config);
+        if (row > 0)
+        {
+            redisCache.setCacheObject(getCacheKey(config.getConfigKey()), config.getConfigValue());
+        }
+        return row;
     }
 
     /**
@@ -82,19 +118,12 @@ public class SysConfigServiceImpl implements ISysConfigService
     @Override
     public int updateConfig(SysConfig config)
     {
-        return configMapper.updateConfig(config);
-    }
-
-    /**
-     * 删除参数配置信息
-     * 
-     * @param configId 参数ID
-     * @return 结果
-     */
-    @Override
-    public int deleteConfigById(Long configId)
-    {
-        return configMapper.deleteConfigById(configId);
+        int row = configMapper.updateConfig(config);
+        if (row > 0)
+        {
+            redisCache.setCacheObject(getCacheKey(config.getConfigKey()), config.getConfigValue());
+        }
+        return row;
     }
 
     /**
@@ -106,7 +135,22 @@ public class SysConfigServiceImpl implements ISysConfigService
     @Override
     public int deleteConfigByIds(Long[] configIds)
     {
-        return configMapper.deleteConfigByIds(configIds);
+        int count = configMapper.deleteConfigByIds(configIds);
+        if (count > 0)
+        {
+            Collection<String> keys = redisCache.keys(Constants.SYS_CONFIG_KEY + "*");
+            redisCache.deleteObject(keys);
+        }
+        return count;
+    }
+
+    /**
+     * 清空缓存数据
+     */
+    public void clearCache()
+    {
+        Collection<String> keys = redisCache.keys(Constants.SYS_CONFIG_KEY + "*");
+        redisCache.deleteObject(keys);
     }
 
     /**
@@ -125,5 +169,16 @@ public class SysConfigServiceImpl implements ISysConfigService
             return UserConstants.NOT_UNIQUE;
         }
         return UserConstants.UNIQUE;
+    }
+
+    /**
+     * 设置cache key
+     * 
+     * @param configKey 参数键
+     * @return 缓存键key
+     */
+    private String getCacheKey(String configKey)
+    {
+        return Constants.SYS_CONFIG_KEY + configKey;
     }
 }

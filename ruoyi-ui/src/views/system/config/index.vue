@@ -88,6 +88,15 @@
           v-hasPermi="['system:config:export']"
         >导出</el-button>
       </el-col>
+      <el-col :span="1.5">
+        <el-button
+          type="danger"
+          icon="el-icon-refresh"
+          size="mini"
+          @click="handleClearCache"
+          v-hasPermi="['system:config:remove']"
+        >清理缓存</el-button>
+      </el-col>
     </el-row>
 
     <el-table v-loading="loading" :data="configList" @selection-change="handleSelectionChange">
@@ -165,7 +174,7 @@
 </template>
 
 <script>
-import { listConfig, getConfig, delConfig, addConfig, updateConfig, exportConfig } from "@/api/system/config";
+import { listConfig, getConfig, delConfig, addConfig, updateConfig, exportConfig, clearCache } from "@/api/system/config";
 
 export default {
   name: "Config",
@@ -340,6 +349,17 @@ export default {
         }).then(response => {
           this.download(response.msg);
         }).catch(function() {});
+    },
+    /** 清理缓存按钮操作 */
+    handleClearCache() {
+      const queryParams = this.queryParams;
+      clearCache().then(response => {
+        if (response.code === 200) {
+          this.msgSuccess("清理成功");
+        } else {
+          this.msgError(response.msg);
+        }
+      });
     }
   }
 };
