@@ -21,6 +21,7 @@ import com.ruoyi.framework.web.domain.AjaxResult;
 import com.ruoyi.framework.web.page.TableDataInfo;
 import com.ruoyi.project.system.domain.SysDictData;
 import com.ruoyi.project.system.service.ISysDictDataService;
+import com.ruoyi.project.system.service.ISysDictTypeService;
 
 /**
  * 数据字典信息
@@ -33,6 +34,9 @@ public class SysDictDataController extends BaseController
 {
     @Autowired
     private ISysDictDataService dictDataService;
+
+    @Autowired
+    private ISysDictTypeService dictTypeService;
 
     @PreAuthorize("@ss.hasPermi('system:dict:list')")
     @GetMapping("/list")
@@ -66,10 +70,10 @@ public class SysDictDataController extends BaseController
     /**
      * 根据字典类型查询字典数据信息
      */
-    @GetMapping(value = "/dictType/{dictType}")
+    @GetMapping(value = "/type/{dictType}")
     public AjaxResult dictType(@PathVariable String dictType)
     {
-        return AjaxResult.success(dictDataService.selectDictDataByType(dictType));
+        return AjaxResult.success(dictTypeService.selectDictDataByType(dictType));
     }
 
     /**

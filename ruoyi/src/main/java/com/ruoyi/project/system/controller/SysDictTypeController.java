@@ -108,6 +108,18 @@ public class SysDictTypeController extends BaseController
     }
 
     /**
+     * 清空缓存
+     */
+    @PreAuthorize("@ss.hasPermi('system:dict:remove')")
+    @Log(title = "字典类型", businessType = BusinessType.CLEAN)
+    @DeleteMapping("/clearCache")
+    public AjaxResult clearCache()
+    {
+        dictTypeService.clearCache();
+        return AjaxResult.success();
+    }
+
+    /**
      * 获取字典选择框列表
      */
     @GetMapping("/optionselect")

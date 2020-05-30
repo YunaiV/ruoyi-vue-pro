@@ -352,7 +352,6 @@ export default {
     },
     /** 清理缓存按钮操作 */
     handleClearCache() {
-      const queryParams = this.queryParams;
       clearCache().then(response => {
         if (response.code === 200) {
           this.msgSuccess("清理成功");
