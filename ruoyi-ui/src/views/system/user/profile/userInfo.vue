@@ -64,8 +64,6 @@ export default {
           updateUserProfile(this.user).then(response => {
             if (response.code === 200) {
               this.msgSuccess("修改成功");
-            } else {
-              this.msgError(response.msg);
             }
           });
         }
