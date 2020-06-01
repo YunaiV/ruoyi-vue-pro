@@ -48,7 +48,7 @@ function filterAsyncRouter(asyncRouterMap) {
 }
 
 export const loadView = (view) => { // 路由懒加载
-  return (resolve) =>  require([`@/views/${view}`], resolve)
+  return () => import(`@/views/${view}`)
 }
 
 export default permission

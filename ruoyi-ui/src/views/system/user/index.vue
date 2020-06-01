@@ -572,8 +572,6 @@ export default {
           resetUserPwd(row.userId, value).then(response => {
             if (response.code === 200) {
               this.msgSuccess("修改成功，新密码是：" + value);
-            } else {
-              this.msgError(response.msg);
             }
           });
         }).catch(() => {});
@@ -588,8 +586,6 @@ export default {
                 this.msgSuccess("修改成功");
                 this.open = false;
                 this.getList();
-              } else {
-                this.msgError(response.msg);
               }
             });
           } else {
@@ -598,8 +594,6 @@ export default {
                 this.msgSuccess("新增成功");
                 this.open = false;
                 this.getList();
-              } else {
-                this.msgError(response.msg);
               }
             });
           }
