@@ -40,7 +40,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			AND status = #{status}
 		</if>
 		<!-- 数据范围过滤 -->
-		${dataScope}
+		${params.dataScope}
 		order by d.parent_id, d.order_num
     </select>
     

@@ -78,7 +78,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			AND (u.dept_id = #{deptId} OR u.dept_id IN ( SELECT t.dept_id FROM sys_dept t WHERE FIND_IN_SET (#{deptId},ancestors) ))
 		</if>
 		<!-- 数据范围过滤 -->
-		${dataScope}
+		${params.dataScope}
 	</select>
 	
 	<select id="selectUserByUserName" parameterType="String" resultMap="SysUserResult">

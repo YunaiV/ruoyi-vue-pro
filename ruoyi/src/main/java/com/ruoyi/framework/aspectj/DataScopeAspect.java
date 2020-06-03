@@ -52,6 +52,11 @@ public class DataScopeAspect
      */
     public static final String DATA_SCOPE_SELF = "5";
 
+    /**
+     * 数据权限过滤关键字
+     */
+    public static final String DATA_SCOPE = "dataScope";
+
     // 配置织入点
     @Pointcut("@annotation(com.ruoyi.framework.aspectj.lang.annotation.DataScope)")
     public void dataScopePointCut()
@@ -138,7 +143,7 @@ public class DataScopeAspect
         if (StringUtils.isNotBlank(sqlString.toString()))
         {
             BaseEntity baseEntity = (BaseEntity) joinPoint.getArgs()[0];
-            baseEntity.setDataScope(" AND (" + sqlString.substring(4) + ")");
+            baseEntity.getParams().put(DATA_SCOPE, " AND (" + sqlString.substring(4) + ")");
         }
     }
 
