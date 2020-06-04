@@ -70,7 +70,12 @@ export default {
       this.show = false
     },
     change(val) {
-      this.$router.push(val.path)
+      if(this.ishttp(val.path)) {
+        // http(s):// 路径新窗口打开
+        window.open(val.path, "_blank");
+      } else {
+        this.$router.push(val.path)
+      }
       this.search = ''
       this.options = []
       this.$nextTick(() => {
@@ -104,7 +109,7 @@ export default {
         if (router.hidden) { continue }
 
         const data = {
-          path: path.resolve(basePath, router.path),
+          path: !this.ishttp(router.path) ? path.resolve(basePath, router.path) : router.path,
           title: [...prefixTitle]
         }
 
@@ -134,6 +139,9 @@ export default {
       } else {
         this.options = []
       }
+    },
+    ishttp(url) {
+      return url.indexOf('http://') !== -1 || url.indexOf('https://') !== -1
     }
   }
 }
