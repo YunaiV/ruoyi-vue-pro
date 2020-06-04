@@ -48,7 +48,7 @@ public class SysPostController extends BaseController
     }
     
     @Log(title = "岗位管理", businessType = BusinessType.EXPORT)
-    @PreAuthorize("@ss.hasPermi('system:config:export')")
+    @PreAuthorize("@ss.hasPermi('system:post:export')")
     @GetMapping("/export")
     public AjaxResult export(SysPost post)
     {
