@@ -133,7 +133,7 @@
 
     <!-- 添加或修改定时任务对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="700px" append-to-body>
-      <el-form ref="form" :model="form" :rules="rules" label-width="100px">
+      <el-form ref="form" :model="form" :rules="rules" label-width="120px">
         <el-row>
           <el-col :span="12">
             <el-form-item label="任务名称" prop="jobName">
