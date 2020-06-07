@@ -146,7 +146,7 @@
               v-for="dict in ${field}Options"
               :key="dict.dictValue"
               :label="dict.dictLabel"
-              #if($column.javaType == "Integer"):value="parseInt(dict.dictValue)"#else:value="dict.dictValue"#end
+              #if($column.javaType == "Integer" || $column.javaType == "Long"):value="parseInt(dict.dictValue)"#else:value="dict.dictValue"#end
 
             ></el-option>
           </el-select>
@@ -163,7 +163,7 @@
             <el-radio
               v-for="dict in ${field}Options"
               :key="dict.dictValue"
-              #if($column.javaType == "Integer"):label="parseInt(dict.dictValue)"#else:label="dict.dictValue"#end
+              #if($column.javaType == "Integer" || $column.javaType == "Long"):label="parseInt(dict.dictValue)"#else:label="dict.dictValue"#end
 
             >{{dict.dictLabel}}</el-radio>
           </el-radio-group>
