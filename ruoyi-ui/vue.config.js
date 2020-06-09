@@ -117,7 +117,11 @@ module.exports = {
                 }
               }
             })
-          config.optimization.runtimeChunk('single')
+          config.optimization.runtimeChunk('single'),
+          {
+             from: path.resolve(__dirname, './public/robots.txt'),//防爬虫文件
+             to:'./',//到根目录下
+          }
         }
       )
   }
