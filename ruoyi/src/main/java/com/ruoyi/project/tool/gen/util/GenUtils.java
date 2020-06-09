@@ -58,11 +58,11 @@ public class GenUtils
         {
             column.setHtmlType(GenConstants.HTML_INPUT);
 
-            // 如果是浮点型
+            // 如果是浮点型 统一用BigDecimal
             String[] str = StringUtils.split(StringUtils.substringBetween(column.getColumnType(), "(", ")"), ",");
             if (str != null && str.length == 2 && Integer.parseInt(str[1]) > 0)
             {
-                column.setJavaType(GenConstants.TYPE_DOUBLE);
+                column.setJavaType(GenConstants.TYPE_BIGDECIMAL);
             }
             // 如果是整形
             else if (str != null && str.length == 1 && Integer.parseInt(str[0]) <= 10)
