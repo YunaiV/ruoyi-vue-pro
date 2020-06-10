@@ -40,7 +40,7 @@ public class IpUtils
         {
             ip = request.getRemoteAddr();
         }
-
+        ip = EscapeUtil.clean(ip);//清除Xss特殊字符
         return "0:0:0:0:0:0:0:1".equals(ip) ? "127.0.0.1" : ip;
     }
 
