@@ -118,7 +118,7 @@ public class HttpUtils
         StringBuilder result = new StringBuilder();
         try
         {
-            String urlNameString = url + "?" + param;
+            String urlNameString = url;
             log.info("sendPost - {}", urlNameString);
             URL realUrl = new URL(urlNameString);
             URLConnection conn = realUrl.openConnection();
