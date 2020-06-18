@@ -87,7 +87,7 @@
           icon="el-icon-download"
           size="mini"
           @click="handleExport"
-          v-hasPermi="['monitor:jobLog:export']"
+          v-hasPermi="['monitor:job:export']"
         >导出</el-button>
       </el-col>
     </el-row>
