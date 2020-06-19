@@ -196,9 +196,7 @@ export default {
         jobName: undefined,
         jobGroup: undefined,
         status: undefined
-      },
-      // 表单参数
-      form: {}
+      }
     };
   },
   created() {
