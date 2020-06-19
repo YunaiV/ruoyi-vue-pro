@@ -84,6 +84,7 @@ public class SysNoticeServiceImpl implements ISysNoticeService
      * @param noticeIds 需要删除的公告ID
      * @return 结果
      */
+    @Override
     public int deleteNoticeByIds(Long[] noticeIds)
     {
         return noticeMapper.deleteNoticeByIds(noticeIds);

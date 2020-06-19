@@ -81,6 +81,7 @@ public class SysRoleServiceImpl implements ISysRoleService
      * 
      * @return 角色列表
      */
+    @Override
     public List<SysRole> selectRoleAll()
     {
         return SpringUtils.getAopProxy(this).selectRoleList(new SysRole());
@@ -92,6 +93,7 @@ public class SysRoleServiceImpl implements ISysRoleService
      * @param userId 用户ID
      * @return 选中角色ID列表
      */
+    @Override
     public List<Integer> selectRoleListByUserId(Long userId)
     {
         return roleMapper.selectRoleListByUserId(userId);
@@ -103,6 +105,7 @@ public class SysRoleServiceImpl implements ISysRoleService
      * @param roleId 角色ID
      * @return 角色对象信息
      */
+    @Override
     public SysRole selectRoleById(Long roleId)
     {
         return roleMapper.selectRoleById(roleId);
@@ -149,6 +152,7 @@ public class SysRoleServiceImpl implements ISysRoleService
      * 
      * @param role 角色信息
      */
+    @Override
     public void checkRoleAllowed(SysRole role)
     {
         if (StringUtils.isNotNull(role.getRoleId()) && role.isAdmin())
@@ -207,6 +211,7 @@ public class SysRoleServiceImpl implements ISysRoleService
      * @param role 角色信息
      * @return 结果
      */
+    @Override
     public int updateRoleStatus(SysRole role)
     {
         return roleMapper.updateRole(role);
@@ -296,6 +301,7 @@ public class SysRoleServiceImpl implements ISysRoleService
      * @param roleIds 需要删除的角色ID
      * @return 结果
      */
+    @Override
     public int deleteRoleByIds(Long[] roleIds)
     {
         for (Long roleId : roleIds)

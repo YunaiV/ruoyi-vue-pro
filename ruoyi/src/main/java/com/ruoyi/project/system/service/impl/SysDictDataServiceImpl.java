@@ -62,6 +62,7 @@ public class SysDictDataServiceImpl implements ISysDictDataService
      * @param dictCodes 需要删除的字典数据ID
      * @return 结果
      */
+    @Override
     public int deleteDictDataByIds(Long[] dictCodes)
     {
         int row = dictDataMapper.deleteDictDataByIds(dictCodes);

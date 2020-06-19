@@ -72,6 +72,7 @@ public class SysUserOnlineServiceImpl implements ISysUserOnlineService
      * @param user 用户信息
      * @return 在线用户
      */
+    @Override
     public SysUserOnline loginUserToUserOnline(LoginUser user)
     {
         if (StringUtils.isNull(user) && StringUtils.isNull(user.getUser()))

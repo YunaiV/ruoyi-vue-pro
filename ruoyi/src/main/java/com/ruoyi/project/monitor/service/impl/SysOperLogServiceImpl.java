@@ -47,6 +47,7 @@ public class SysOperLogServiceImpl implements ISysOperLogService
      * @param operIds 需要删除的操作日志ID
      * @return 结果
      */
+    @Override
     public int deleteOperLogByIds(Long[] operIds)
     {
         return operLogMapper.deleteOperLogByIds(operIds);

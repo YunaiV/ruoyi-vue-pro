@@ -121,6 +121,7 @@ public class SysMenuServiceImpl implements ISysMenuService
      * @param roleId 角色ID
      * @return 选中菜单列表
      */
+    @Override
     public List<Integer> selectMenuListByRoleId(Long roleId)
     {
         return menuMapper.selectMenuListByRoleId(roleId);
