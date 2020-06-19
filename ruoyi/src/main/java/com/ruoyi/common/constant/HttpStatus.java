@@ -5,7 +5,7 @@ package com.ruoyi.common.constant;
  * 
  * @author ruoyi
  */
-public interface HttpStatus
+public class HttpStatus
 {
     /**
      * 操作成功
