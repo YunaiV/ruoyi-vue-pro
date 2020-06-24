@@ -211,6 +211,8 @@
               <treeselect v-model="form.deptId" :options="deptOptions" :disable-branch-nodes="true" :show-count="true" placeholder="请选择归属部门" />
             </el-form-item>
           </el-col>
+        </el-row>
+        <el-row>
           <el-col :span="12">
             <el-form-item label="手机号码" prop="phonenumber">
               <el-input v-model="form.phonenumber" placeholder="请输入手机号码" maxlength="11" />
@@ -221,6 +223,8 @@
               <el-input v-model="form.email" placeholder="请输入邮箱" maxlength="50" />
             </el-form-item>
           </el-col>
+        </el-row>
+        <el-row>
           <el-col :span="12">
             <el-form-item v-if="form.userId == undefined" label="用户名称" prop="userName">
               <el-input v-model="form.userName" placeholder="请输入用户名称" />
@@ -231,6 +235,8 @@
               <el-input v-model="form.password" placeholder="请输入用户密码" type="password" />
             </el-form-item>
           </el-col>
+        </el-row>
+        <el-row>
           <el-col :span="12">
             <el-form-item label="用户性别">
               <el-select v-model="form.sex" placeholder="请选择">
@@ -254,7 +260,8 @@
               </el-radio-group>
             </el-form-item>
           </el-col>
-
+        </el-row>
+        <el-row>
           <el-col :span="12">
             <el-form-item label="岗位">
               <el-select v-model="form.postIds" multiple placeholder="请选择">
@@ -281,6 +288,8 @@
               </el-select>
             </el-form-item>
           </el-col>
+        </el-row>
+        <el-row>
           <el-col :span="24">
             <el-form-item label="备注">
               <el-input v-model="form.remark" type="textarea" placeholder="请输入内容"></el-input>
