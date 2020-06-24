@@ -1,7 +1,7 @@
 <template>
   <div>
     <img v-bind:src="options.img" @click="editCropper()" title="点击上传头像" class="img-circle img-lg" />
-    <el-dialog :title="title" :visible.sync="open" width="800px" append-to-body>
+    <el-dialog :title="title" :visible.sync="open" width="800px" append-to-body @opened="modalOpened">
       <el-row>
         <el-col :xs="24" :md="12" :style="{height: '350px'}">
           <vue-cropper
@@ -13,6 +13,7 @@
             :autoCropHeight="options.autoCropHeight"
             :fixedBox="options.fixedBox"
             @realTime="realTime"
+            v-if="visible"
           />
         </el-col>
         <el-col :xs="24" :md="12" :style="{height: '350px'}">
@@ -67,6 +68,8 @@ export default {
     return {
       // 是否显示弹出层
       open: false,
+      // 是否显示cropper
+      visible: false,
       // 弹出层标题
       title: "修改头像",
       options: {
@@ -83,6 +86,10 @@ export default {
     // 编辑头像
     editCropper() {
       this.open = true;
+    },
+    // 打开弹出层结束时的回调
+    modalOpened() {
+      this.visible = true;
     },
     // 覆盖默认的上传行为
     requestUpload() {
@@ -121,9 +128,10 @@ export default {
           if (response.code === 200) {
             this.open = false;
             this.options.img = process.env.VUE_APP_BASE_API + response.imgUrl;
+            store.commit('SET_AVATAR', this.options.img);
             this.msgSuccess("修改成功");
           }
-          this.$refs.cropper.clearCrop();
+          this.visible = false;
         });
       });
     },
