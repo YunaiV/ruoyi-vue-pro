@@ -147,8 +147,8 @@ export default {
       info: {}
     };
   },
-  beforeCreate() {
-    const { tableId } = this.$route.query;
+  created() {
+    const tableId = this.$route.params && this.$route.params.tableId;
     if (tableId) {
       // 获取表详细信息
       getGenTable(tableId).then(res => {

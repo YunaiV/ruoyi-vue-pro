@@ -270,7 +270,7 @@ export default {
     /** 修改按钮操作 */
     handleEditTable(row) {
       const tableId = row.tableId || this.ids[0];
-      this.$router.push({ path: "/gen/edit", query: { tableId: tableId } });
+      this.$router.push("/gen/edit/" + tableId);
     },
     /** 删除按钮操作 */
     handleDelete(row) {
