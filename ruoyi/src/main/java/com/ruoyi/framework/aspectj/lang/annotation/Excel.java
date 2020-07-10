@@ -15,6 +15,11 @@ import java.lang.annotation.Target;
 public @interface Excel
 {
     /**
+     * 导出时在excel中排序
+     */
+    public int sort() default Integer.MAX_VALUE;
+
+    /**
      * 导出到Excel中的名字.
      */
     public String name() default "";
