@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.ruoyi.common.exception.job.TaskException;
+import com.ruoyi.common.utils.SecurityUtils;
+import com.ruoyi.common.utils.job.CronUtils;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.framework.aspectj.lang.annotation.Log;
 import com.ruoyi.framework.aspectj.lang.enums.BusinessType;
@@ -77,6 +79,11 @@ public class SysJobController extends BaseController
     @PostMapping
     public AjaxResult add(@RequestBody SysJob sysJob) throws SchedulerException, TaskException
     {
+        if (!CronUtils.isValid(sysJob.getCronExpression()))
+        {
+            return AjaxResult.error("cron表达式不正确");
+        }
+        sysJob.setCreateBy(SecurityUtils.getUsername());
         return toAjax(jobService.insertJob(sysJob));
     }
 
@@ -88,6 +95,11 @@ public class SysJobController extends BaseController
     @PutMapping
     public AjaxResult edit(@RequestBody SysJob sysJob) throws SchedulerException, TaskException
     {
+        if (!CronUtils.isValid(sysJob.getCronExpression()))
+        {
+            return AjaxResult.error("cron表达式不正确");
+        }
+        sysJob.setUpdateBy(SecurityUtils.getUsername());
         return toAjax(jobService.updateJob(sysJob));
     }
 
