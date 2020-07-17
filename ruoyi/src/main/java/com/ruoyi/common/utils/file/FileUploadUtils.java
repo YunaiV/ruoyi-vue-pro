@@ -9,8 +9,8 @@ import com.ruoyi.common.exception.file.FileNameLengthLimitExceededException;
 import com.ruoyi.common.exception.file.FileSizeLimitExceededException;
 import com.ruoyi.common.exception.file.InvalidExtensionException;
 import com.ruoyi.common.utils.DateUtils;
+import com.ruoyi.common.utils.IdUtils;
 import com.ruoyi.common.utils.StringUtils;
-import com.ruoyi.common.utils.security.Md5Utils;
 import com.ruoyi.framework.config.RuoYiConfig;
 
 /**
@@ -34,8 +34,6 @@ public class FileUploadUtils
      * 默认上传的地址
      */
     private static String defaultBaseDir = RuoYiConfig.getProfile();
-
-    private static int counter = 0;
 
     public static void setDefaultBaseDir(String defaultBaseDir)
     {
@@ -125,7 +123,7 @@ public class FileUploadUtils
     {
         String fileName = file.getOriginalFilename();
         String extension = getExtension(file);
-        fileName = DateUtils.datePath() + "/" + encodingFilename(fileName) + "." + extension;
+        fileName = DateUtils.datePath() + "/" + IdUtils.fastUUID() + "." + extension;
         return fileName;
     }
 
@@ -150,16 +148,6 @@ public class FileUploadUtils
         String currentDir = StringUtils.substring(uploadDir, dirLastIndex);
         String pathFileName = Constants.RESOURCE_PREFIX + "/" + currentDir + "/" + fileName;
         return pathFileName;
-    }
-
-    /**
-     * 编码文件名
-     */
-    private static final String encodingFilename(String fileName)
-    {
-        fileName = fileName.replace("_", " ");
-        fileName = Md5Utils.hash(fileName + System.nanoTime() + counter++);
-        return fileName;
     }
 
     /**

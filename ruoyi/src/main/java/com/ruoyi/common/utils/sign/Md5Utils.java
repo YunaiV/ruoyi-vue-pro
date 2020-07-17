@@ -1,4 +1,4 @@
-package com.ruoyi.common.utils.security;
+package com.ruoyi.common.utils.sign;
 
 import java.security.MessageDigest;
 import org.slf4j.Logger;
