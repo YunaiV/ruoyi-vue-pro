@@ -314,8 +314,10 @@ export default {
     handleAdd(row) {
       this.reset();
       this.getTreeselect();
-      if (row != null) {
+      if (row != null && row.menuId) {
         this.form.parentId = row.menuId;
+      } else {
+        this.form.parentId = 0;
       }
       this.open = true;
       this.title = "添加菜单";
