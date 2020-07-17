@@ -62,12 +62,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="tableComment != null and tableComment != ''">
 				AND lower(table_comment) like lower(concat('%', #{tableComment}, '%'))
 			</if>
-<!-- 			<if test="beginTime != null and beginTime != ''">开始时间检索 -->
-<!-- 				AND date_format(create_time,'%y%m%d') &gt;= date_format(#{beginTime},'%y%m%d') -->
-<!-- 			</if> -->
-<!-- 			<if test="endTime != null and endTime != ''">结束时间检索 -->
-<!-- 				AND date_format(create_time,'%y%m%d') &lt;= date_format(#{endTime},'%y%m%d') -->
-<!-- 			</if> -->
+			<if test="beginTime != null and beginTime != ''"><!-- 开始时间检索 -->
+				AND create_time &gt;= to_date(#{beginTime},'yyyy-MM-dd HH24:mi:ss')
+			</if>
+			<if test="endTime != null and endTime != ''"><!-- 结束时间检索 -->
+				AND create_time &lt;= to_date(#{endTime},'yyyy-MM-dd HH24:mi:ss')
+			</if>
 		</where>
 	</select>
 
