@@ -65,9 +65,6 @@
     "vuex": "3.1.0"
   },
   "devDependencies": {
-    "@babel/core": "7.0.0",
-    "@babel/register": "7.0.0",
-    "@babel/parser": "^7.7.4",
     "@vue/cli-plugin-babel": "3.5.3",
     "@vue/cli-plugin-eslint": "^3.9.1",
     "@vue/cli-plugin-unit-jest": "3.5.3",
