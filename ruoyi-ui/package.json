@@ -44,7 +44,7 @@
     "axios": "0.18.1",
     "clipboard": "2.0.4",
     "echarts": "4.2.1",
-    "element-ui": "2.13.0",
+    "element-ui": "2.13.2",
     "file-saver": "2.0.1",
     "js-beautify": "^1.10.2",
     "fuse.js": "3.4.4",
