@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SysRoleMenuMapper">
+
+	<resultMap type="SysRoleMenu" id="SysRoleMenuResult">
+		<result property="roleId"     column="role_id"      />
+		<result property="menuId"     column="menu_id"      />
+	</resultMap>
+	
+	<select id="checkMenuExistRole" resultType="Integer">
+	    select count(1) from sys_role_menu where menu_id = #{menuId}  
+	</select>
+
+	<delete id="deleteRoleMenuByRoleId" parameterType="Long">
+		delete from sys_role_menu where role_id=#{roleId}
+	</delete>
+	
+	<insert id="batchRoleMenu">
+		insert into sys_role_menu(role_id, menu_id) values
+		<foreach item="item" index="index" collection="list" separator=",">
+			(#{item.roleId},#{item.menuId})
+		</foreach>
+	</insert>
+	
+</mapper> 

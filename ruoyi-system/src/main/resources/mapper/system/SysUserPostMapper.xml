@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SysUserPostMapper">
+
+	<resultMap type="SysUserPost" id="SysUserPostResult">
+		<result property="userId"     column="user_id"      />
+		<result property="postId"     column="post_id"      />
+	</resultMap>
+
+	<delete id="deleteUserPostByUserId" parameterType="Long">
+		delete from sys_user_post where user_id=#{userId}
+	</delete>
+	
+	<select id="countUserPostById" resultType="Integer">
+	    select count(1) from sys_user_post where post_id=#{postId}  
+	</select>
+	
+	<delete id="deleteUserPost" parameterType="Long">
+ 		delete from sys_user_post where user_id in
+ 		<foreach collection="array" item="userId" open="(" separator="," close=")">
+ 			#{userId}
+        </foreach> 
+ 	</delete>
+	
+	<insert id="batchUserPost">
+		insert into sys_user_post(user_id, post_id) values
+		<foreach item="item" index="index" collection="list" separator=",">
+			(#{item.userId},#{item.postId})
+		</foreach>
+	</insert>
+	
+</mapper> 

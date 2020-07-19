@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.quartz.mapper.SysJobLogMapper">
+
+	<resultMap type="SysJobLog" id="SysJobLogResult">
+		<id     property="jobLogId"       column="job_log_id"      />
+		<result property="jobName"        column="job_name"        />
+		<result property="jobGroup"       column="job_group"       />
+		<result property="invokeTarget"   column="invoke_target"   />
+		<result property="jobMessage"     column="job_message"     />
+		<result property="status"         column="status"          />
+		<result property="exceptionInfo"  column="exception_info"  />
+		<result property="createTime"     column="create_time"     />
+	</resultMap>
+	
+	<sql id="selectJobLogVo">
+        select job_log_id, job_name, job_group, invoke_target, job_message, status, exception_info, create_time 
+		from sys_job_log
+    </sql>
+	
+	<select id="selectJobLogList" parameterType="SysJobLog" resultMap="SysJobLogResult">
+		<include refid="selectJobLogVo"/>
+		<where>
+			<if test="jobName != null and jobName != ''">
+				AND job_name like concat('%', #{jobName}, '%')
+			</if>
+			<if test="jobGroup != null and jobGroup != ''">
+				AND job_group = #{jobGroup}
+			</if>
+			<if test="status != null and status != ''">
+				AND status = #{status}
+			</if>
+			<if test="invokeTarget != null and invokeTarget != ''">
+				AND invoke_target like concat('%', #{invokeTarget}, '%')
+			</if>
+			<if test="beginTime != null and beginTime != ''"><!-- 开始时间检索 -->
+				and date_format(create_time,'%y%m%d') &gt;= date_format(#{beginTime},'%y%m%d')
+			</if>
+			<if test="endTime != null and endTime != ''"><!-- 结束时间检索 -->
+				and date_format(create_time,'%y%m%d') &lt;= date_format(#{endTime},'%y%m%d')
+			</if>
+		</where>
+	</select>
+	
+	<select id="selectJobLogAll" resultMap="SysJobLogResult">
+		<include refid="selectJobLogVo"/>
+	</select>
+	
+	<select id="selectJobLogById" parameterType="Long" resultMap="SysJobLogResult">
+		<include refid="selectJobLogVo"/>
+		where job_log_id = #{jobLogId}
+	</select>
+	
+	<delete id="deleteJobLogById" parameterType="Long">
+ 		delete from sys_job_log where job_log_id = #{jobLogId}
+ 	</delete>
+ 	
+ 	<delete id="deleteJobLogByIds" parameterType="Long">
+ 		delete from sys_job_log where job_log_id in
+ 		<foreach collection="array" item="jobLogId" open="(" separator="," close=")">
+ 			#{jobLogId}
+        </foreach> 
+ 	</delete>
+ 	
+ 	<update id="cleanJobLog">
+        truncate table sys_job_log
+    </update>
+ 	
+ 	<insert id="insertJobLog" parameterType="SysJobLog">
+ 		insert into sys_job_log(
+ 			<if test="jobLogId != null and jobLogId != 0">job_log_id,</if>
+ 			<if test="jobName != null and jobName != ''">job_name,</if>
+ 			<if test="jobGroup != null and jobGroup != ''">job_group,</if>
+ 			<if test="invokeTarget != null and invokeTarget != ''">invoke_target,</if>
+ 			<if test="jobMessage != null and jobMessage != ''">job_message,</if>
+ 			<if test="status != null and status != ''">status,</if>
+ 			<if test="exceptionInfo != null and exceptionInfo != ''">exception_info,</if>
+ 			create_time
+ 		)values(
+ 			<if test="jobLogId != null and jobLogId != 0">#{jobLogId},</if>
+ 			<if test="jobName != null and jobName != ''">#{jobName},</if>
+ 			<if test="jobGroup != null and jobGroup != ''">#{jobGroup},</if>
+ 			<if test="invokeTarget != null and invokeTarget != ''">#{invokeTarget},</if>
+ 			<if test="jobMessage != null and jobMessage != ''">#{jobMessage},</if>
+ 			<if test="status != null and status != ''">#{status},</if>
+ 			<if test="exceptionInfo != null and exceptionInfo != ''">#{exceptionInfo},</if>
+ 			sysdate()
+ 		)
+	</insert>
+
+</mapper> 
