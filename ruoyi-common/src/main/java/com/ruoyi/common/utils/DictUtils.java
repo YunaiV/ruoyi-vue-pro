@@ -2,7 +2,6 @@ package com.ruoyi.common.utils;
 
 import java.util.Collection;
 import java.util.List;
-
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.entity.SysDictData;
 import com.ruoyi.common.core.redis.RedisCache;
@@ -41,6 +40,58 @@ public class DictUtils
             return DictDatas;
         }
         return null;
+    }
+
+    /**
+     * 根据字典类型和字典值获取字典标签
+     * 
+     * @param dictType 字典类型
+     * @param dictValue 字典值
+     * @return 字典标签
+     */
+    public static String getDictLabel(String dictType, String dictValue)
+    {
+        if (StringUtils.isNotEmpty(dictType) && StringUtils.isNotEmpty(dictValue))
+        {
+            List<SysDictData> datas = getDictCache(dictType);
+            if (StringUtils.isNotEmpty(datas))
+            {
+                for (SysDictData dict : datas)
+                {
+                    if (dictValue.equals(dict.getDictValue()))
+                    {
+                        return dict.getDictLabel();
+                    }
+                }
+            }
+        }
+        return dictValue;
+    }
+
+    /**
+     * 根据字典类型和字典标签获取字典值
+     * 
+     * @param dictType 字典类型
+     * @param dictLabel 字典标签
+     * @return 字典值
+     */
+    public static String getDictValue(String dictType, String dictLabel)
+    {
+        if (StringUtils.isNotEmpty(dictType) && StringUtils.isNotEmpty(dictLabel))
+        {
+            List<SysDictData> datas = getDictCache(dictType);
+            if (StringUtils.isNotEmpty(datas))
+            {
+                for (SysDictData dict : datas)
+                {
+                    if (dictLabel.equals(dict.getDictLabel()))
+                    {
+                        return dict.getDictValue();
+                    }
+                }
+            }
+        }
+        return dictLabel;
     }
 
     /**
