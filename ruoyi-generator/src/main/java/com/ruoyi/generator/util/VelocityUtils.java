@@ -239,7 +239,7 @@ public class VelocityUtils
      */
     public static String getParentMenuId(JSONObject paramsObj)
     {
-        if (paramsObj.containsKey(GenConstants.PARENT_MENU_ID))
+        if (StringUtils.isNotEmpty(paramsObj) && paramsObj.containsKey(GenConstants.PARENT_MENU_ID))
         {
             return paramsObj.getString(GenConstants.PARENT_MENU_ID);
         }
