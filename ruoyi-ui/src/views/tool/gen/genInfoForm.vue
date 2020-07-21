@@ -58,6 +58,18 @@
           <el-input v-model="info.functionName" />
         </el-form-item>
       </el-col>
+
+      <el-col :span="12">
+        <el-form-item prop="functionName">
+          <span slot="label">
+            上级菜单
+            <el-tooltip content="分配到指定菜单下，例如 系统管理" placement="top">
+              <i class="el-icon-question"></i>
+            </el-tooltip>
+          </span>
+          <treeselect :append-to-body="true" v-model="info.parentMenuId" :options="menus" :normalizer="normalizer" :show-count="true" placeholder="请选择系统菜单"/>
+        </el-form-item>
+      </el-col>
     </el-row>
 
     <el-row v-show="info.tplCategory == 'tree'">
@@ -120,13 +132,21 @@
   </el-form>
 </template>
 <script>
+import Treeselect from "@riophae/vue-treeselect";
+import "@riophae/vue-treeselect/dist/vue-treeselect.css";
+
 export default {
   name: "BasicInfoForm",
+  components: { Treeselect },
   props: {
     info: {
       type: Object,
       default: null
-    }
+    },
+    menus: {
+      type: Array,
+      default: []
+    },
   },
   data() {
     return {
@@ -149,6 +169,19 @@ export default {
       }
     };
   },
-  created() {}
+  created() {},
+  methods: {
+    /** 转换菜单数据结构 */
+    normalizer(node) {
+      if (node.children && !node.children.length) {
+        delete node.children;
+      }
+      return {
+        id: node.menuId,
+        label: node.menuName,
+        children: node.children
+      };
+    }
+  }
 };
 </script>
