@@ -13,7 +13,7 @@ import com.ruoyi.common.utils.ServletUtils;
 
 /**
  * 防止重复提交拦截器
- * 
+ *
  * @author ruoyi
  */
 @Component
@@ -46,8 +46,8 @@ public abstract class RepeatSubmitInterceptor extends HandlerInterceptorAdapter
 
     /**
      * 验证是否重复提交由子类实现具体的防重复提交的规则
-     * 
-     * @param httpServletRequest
+     *
+     * @param request
      * @return
      * @throws Exception
      */

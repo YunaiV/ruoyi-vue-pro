@@ -66,7 +66,7 @@ public abstract class AbstractQuartzJob implements Job
      * 执行后
      *
      * @param context 工作执行上下文对象
-     * @param sysScheduleJob 系统计划任务
+     * @param sysJob 系统计划任务
      */
     protected void after(JobExecutionContext context, SysJob sysJob, Exception e)
     {
