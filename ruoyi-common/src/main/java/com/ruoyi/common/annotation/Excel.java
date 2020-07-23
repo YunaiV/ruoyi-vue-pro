@@ -40,6 +40,11 @@ public @interface Excel
     public String readConverterExp() default "";
 
     /**
+     * 分隔符，读取字符串组内容
+     */
+    public String separator() default ",";
+
+    /**
      * 导出类型（0数字 1字符串）
      */
     public ColumnType cellType() default ColumnType.STRING;
