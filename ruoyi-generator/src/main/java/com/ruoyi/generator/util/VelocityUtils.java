@@ -11,6 +11,11 @@ import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.generator.domain.GenTable;
 import com.ruoyi.generator.domain.GenTableColumn;
 
+/**
+ * 模板处理工具类
+ * 
+ * @author ruoyi
+ */
 public class VelocityUtils
 {
     /** 项目空间路径 */

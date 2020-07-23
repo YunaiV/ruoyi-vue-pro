@@ -201,8 +201,9 @@ public class ExcelUtil<T>
                     // 设置类的私有字段属性可访问.
                     field.setAccessible(true);
                     Integer column = cellMap.get(attr.name());
-                    if(column !=null ) { // 字段在excel 中没有，那么就不需要设置值
-                    	fieldsMap.put(column, field);
+                    if (column != null)
+                    {
+                        fieldsMap.put(column, field);
                     }
                 }
             }
@@ -695,7 +696,7 @@ public class ExcelUtil<T>
         }
         return StringUtils.stripEnd(propertyString.toString(), separator);
     }
-    
+
     /**
      * 解析字典值
      * 
@@ -897,15 +898,7 @@ public class ExcelUtil<T>
                     }
                     else
                     {
-						/* if ((Double) val % 1 > 0)
-						{
-						    val = new DecimalFormat("0.00").format(val);
-						}
-						else
-						{
-						    val = new DecimalFormat("0").format(val);
-						}*/
-                    	val = new BigDecimal(val.toString()); // 导入的数据保证原汁原味，不做处理
+                        val = new BigDecimal(val.toString()); // 浮点格式处理
                     }
                 }
                 else if (cell.getCellTypeEnum() == CellType.STRING)

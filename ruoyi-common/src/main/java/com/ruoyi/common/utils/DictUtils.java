@@ -41,8 +41,8 @@ public class DictUtils
         Object cacheObj = SpringUtils.getBean(RedisCache.class).getCacheObject(getCacheKey(key));
         if (StringUtils.isNotNull(cacheObj))
         {
-            List<SysDictData> DictDatas = StringUtils.cast(cacheObj);
-            return DictDatas;
+            List<SysDictData> dictDatas = StringUtils.cast(cacheObj);
+            return dictDatas;
         }
         return null;
     }
