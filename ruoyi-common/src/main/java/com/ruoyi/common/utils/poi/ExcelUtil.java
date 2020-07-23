@@ -8,7 +8,6 @@ import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -18,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.Cell;
@@ -41,6 +41,7 @@ import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFDataValidation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import com.ruoyi.common.annotation.Excel;
 import com.ruoyi.common.annotation.Excel.ColumnType;
 import com.ruoyi.common.annotation.Excel.Type;
@@ -200,7 +201,9 @@ public class ExcelUtil<T>
                     // 设置类的私有字段属性可访问.
                     field.setAccessible(true);
                     Integer column = cellMap.get(attr.name());
-                    fieldsMap.put(column, field);
+                    if(column !=null ) { // 字段在excel 中没有，那么就不需要设置值
+                    	fieldsMap.put(column, field);
+                    }
                 }
             }
             for (int i = 1; i < rows; i++)
@@ -894,14 +897,15 @@ public class ExcelUtil<T>
                     }
                     else
                     {
-                        if ((Double) val % 1 > 0)
-                        {
-                            val = new DecimalFormat("0.00").format(val);
-                        }
-                        else
-                        {
-                            val = new DecimalFormat("0").format(val);
-                        }
+						/* if ((Double) val % 1 > 0)
+						{
+						    val = new DecimalFormat("0.00").format(val);
+						}
+						else
+						{
+						    val = new DecimalFormat("0").format(val);
+						}*/
+                    	val = new BigDecimal(val.toString()); // 导入的数据保证原汁原味，不做处理
                     }
                 }
                 else if (cell.getCellTypeEnum() == CellType.STRING)
