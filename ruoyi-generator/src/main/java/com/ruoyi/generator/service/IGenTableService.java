@@ -75,20 +75,28 @@ public interface IGenTableService
     public Map<String, String> previewCode(Long tableId);
 
     /**
-     * 生成代码
+     * 生成代码（下载方式）
      * 
      * @param tableName 表名称
      * @return 数据
      */
-    public byte[] generatorCode(String tableName);
+    public byte[] downloadCode(String tableName);
 
     /**
-     * 批量生成代码
+     * 生成代码（自定义路径）
+     * 
+     * @param tableName 表名称
+     * @return 数据
+     */
+    public void generatorCode(String tableName);
+
+    /**
+     * 批量生成代码（下载方式）
      * 
      * @param tableNames 表数组
      * @return 数据
      */
-    public byte[] generatorCode(String[] tableNames);
+    public byte[] downloadCode(String[] tableNames);
 
     /**
      * 修改保存参数校验

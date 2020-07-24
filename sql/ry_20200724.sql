@@ -635,6 +635,8 @@ create table gen_table (
   business_name     varchar(30)                                comment '生成业务名',
   function_name     varchar(50)                                comment '生成功能名',
   function_author   varchar(50)                                comment '生成功能作者',
+  gen_type          char(1)         default '0'                comment '生成代码方式（0zip压缩包 1自定义路径）',
+  gen_path          varchar(200)    default '/'                comment '生成路径（不填默认项目路径）',
   options           varchar(1000)                              comment '其它生成选项',
   create_by         varchar(64)     default ''                 comment '创建者',
   create_time 	    datetime                                   comment '创建时间',

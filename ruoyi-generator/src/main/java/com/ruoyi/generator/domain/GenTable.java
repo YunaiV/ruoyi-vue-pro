@@ -55,6 +55,12 @@ public class GenTable extends BaseEntity
     @NotBlank(message = "作者不能为空")
     private String functionAuthor;
 
+    /** 生成代码方式（0zip压缩包 1自定义路径） */
+    private String genType;
+
+    /** 生成路径（不填默认项目路径） */
+    private String genPath;
+
     /** 主键信息 */
     private GenTableColumn pkColumn;
 
@@ -178,6 +184,26 @@ public class GenTable extends BaseEntity
     public void setFunctionAuthor(String functionAuthor)
     {
         this.functionAuthor = functionAuthor;
+    }
+
+    public String getGenType()
+    {
+        return genType;
+    }
+
+    public void setGenType(String genType)
+    {
+        this.genType = genType;
+    }
+
+    public String getGenPath()
+    {
+        return genPath;
+    }
+
+    public void setGenPath(String genPath)
+    {
+        this.genPath = genPath;
     }
 
     public GenTableColumn getPkColumn()
