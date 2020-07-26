@@ -253,7 +253,7 @@ export default {
       queryParams: {
 #foreach ($column in $columns)
 #if($column.query)
-        $column.javaField: undefined#if($velocityCount != $columns.size()),#end
+        $column.javaField: null#if($velocityCount != $columns.size()),#end
 
 #end
 #end
@@ -349,7 +349,7 @@ export default {
         $column.javaField: []#if($velocityCount != $columns.size()),#end
 
 #else
-        $column.javaField: undefined#if($velocityCount != $columns.size()),#end
+        $column.javaField: null#if($velocityCount != $columns.size()),#end
 
 #end
 #end
@@ -376,7 +376,7 @@ export default {
     handleUpdate(row) {
       this.reset();
 	  this.getTreeselect();
-      if (row != undefined) {
+      if (row != null) {
         this.form.${treeParentCode} = row.${treeCode};
       }
       get${BusinessName}(row.${pkColumn.javaField}).then(response => {
@@ -391,7 +391,7 @@ export default {
       });
     },
     /** 提交按钮 */
-    submitForm: function() {
+    submitForm() {
       this.#[[$]]#refs["form"].validate(valid => {
         if (valid) {
 #foreach ($column in $columns)
@@ -399,7 +399,7 @@ export default {
           this.form.$column.javaField = this.form.${column.javaField}.join(",");
 #end
 #end
-          if (this.form.${pkColumn.javaField} != undefined) {
+          if (this.form.${pkColumn.javaField} != null) {
             update${BusinessName}(this.form).then(response => {
               if (response.code === 200) {
                 this.msgSuccess("修改成功");
