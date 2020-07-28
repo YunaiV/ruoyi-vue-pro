@@ -131,7 +131,7 @@ public final class HTMLFilter
         vAllowedEntities = new String[] { "amp", "gt", "lt", "quot" };
         stripComment = true;
         encodeQuotes = true;
-        alwaysMakeTags = true;
+        alwaysMakeTags = false;
     }
 
     /**
@@ -208,7 +208,7 @@ public final class HTMLFilter
 
         s = processRemoveBlanks(s);
 
-        s = validateEntities(s);
+        // s = validateEntities(s);
 
         return s;
     }
@@ -245,6 +245,7 @@ public final class HTMLFilter
             // try and form html
             //
             s = regexReplace(P_END_ARROW, "", s);
+            // 不追加结束标签
             s = regexReplace(P_BODY_TO_END, "<$1>", s);
             s = regexReplace(P_XML_CONTENT, "$1<$2", s);
 
