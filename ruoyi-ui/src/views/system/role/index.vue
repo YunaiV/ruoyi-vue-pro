@@ -91,7 +91,7 @@
           icon="el-icon-download"
           size="mini"
           @click="handleExport"
-          v-hasPermi="['system:post:export']"
+          v-hasPermi="['system:role:export']"
         >导出</el-button>
       </el-col>
     </el-row>
