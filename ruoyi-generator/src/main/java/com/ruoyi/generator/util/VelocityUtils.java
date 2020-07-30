@@ -233,7 +233,6 @@ public class VelocityUtils
     public static String getPermissionPrefix(String moduleName, String businessName)
     {
         return StringUtils.format("{}:{}", moduleName, businessName);
-
     }
 
     /**

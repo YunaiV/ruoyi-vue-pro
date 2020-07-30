@@ -343,7 +343,7 @@ export default {
       this.form = {
 #foreach ($column in $columns)
 #if($column.htmlType == "radio")
-        $column.javaField: "0"#if($velocityCount != $columns.size()),#end
+        $column.javaField: #if($column.javaType == "Integer" || $column.javaType == "Long")0#else"0"#end#if($velocityCount != $columns.size()),#end
 
 #elseif($column.htmlType == "checkbox")
         $column.javaField: []#if($velocityCount != $columns.size()),#end
