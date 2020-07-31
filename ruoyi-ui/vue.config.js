@@ -30,6 +30,7 @@ module.exports = {
   devServer: {
     host: '0.0.0.0',
     port: port,
+    open: true,
     proxy: {
       // detail: https://cli.vuejs.org/config/#devserver-proxy
       [process.env.VUE_APP_BASE_API]: {
@@ -68,17 +69,6 @@ module.exports = {
       .loader('svg-sprite-loader')
       .options({
         symbolId: 'icon-[name]'
-      })
-      .end()
-
-    // set preserveWhitespace
-    config.module
-      .rule('vue')
-      .use('vue-loader')
-      .loader('vue-loader')
-      .tap(options => {
-        options.compilerOptions.preserveWhitespace = true
-        return options
       })
       .end()
 
