@@ -1,6 +1,6 @@
 <template>
   <div class="app-container">
-    <el-form :model="queryParams" ref="queryForm" :inline="true" label-width="68px">
+    <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
 #foreach($column in $columns)
 #if($column.query)
 #set($dictType=$column.dictType)
@@ -51,23 +51,30 @@
 #end
 #end
       <el-form-item>
+	    <el-button type="cyan" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
+        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
+      </el-form-item>
+    </el-form>
+
+    <el-row :gutter="10" class="mb8">
+      <el-col :span="1.5">
         <el-button
-          class="filter-item"
-          type="primary"
-          icon="el-icon-search"
-          size="mini"
-          @click="handleQuery"
-        >搜索</el-button>
-        <el-button
-          class="filter-item"
           type="primary"
           icon="el-icon-plus"
           size="mini"
           @click="handleAdd"
           v-hasPermi="['${moduleName}:${businessName}:add']"
         >新增</el-button>
-      </el-form-item>
-    </el-form>
+      </el-col>
+      <div class="top-right-btn">
+        <el-tooltip class="item" effect="dark" content="刷新" placement="top">
+          <el-button size="mini" circle icon="el-icon-refresh" @click="handleQuery" />
+        </el-tooltip>
+        <el-tooltip class="item" effect="dark" :content="showSearch ? '隐藏搜索' : '显示搜索'" placement="top">
+          <el-button size="mini" circle icon="el-icon-search" @click="showSearch=!showSearch" />
+        </el-tooltip>
+      </div>
+    </el-row>
 
     <el-table
       v-loading="loading"
@@ -229,6 +236,8 @@ export default {
     return {
       // 遮罩层
       loading: true,
+      // 显示搜索条件
+      showSearch: true,
       // ${functionName}表格数据
       ${businessName}List: [],
       // ${functionName}树选项

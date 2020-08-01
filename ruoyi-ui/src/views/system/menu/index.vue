@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
-    <el-form :inline="true">
-      <el-form-item label="菜单名称">
+    <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch">
+      <el-form-item label="菜单名称" prop="menuName">
         <el-input
           v-model="queryParams.menuName"
           placeholder="请输入菜单名称"
@@ -10,7 +10,7 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="状态">
+      <el-form-item label="状态" prop="status">
         <el-select v-model="queryParams.status" placeholder="菜单状态" clearable size="small">
           <el-option
             v-for="dict in statusOptions"
@@ -21,10 +21,30 @@
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
-        <el-button type="primary" icon="el-icon-plus" size="mini" @click="handleAdd" v-hasPermi="['system:menu:add']">新增</el-button>
+        <el-button type="cyan" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
+        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
+
+    <el-row :gutter="10" class="mb8">
+      <el-col :span="1.5">
+        <el-button
+          type="primary"
+          icon="el-icon-plus"
+          size="mini"
+          @click="handleAdd"
+          v-hasPermi="['system:menu:add']"
+        >新增</el-button>
+      </el-col>
+      <div class="top-right-btn">
+        <el-tooltip class="item" effect="dark" content="刷新" placement="top">
+          <el-button size="mini" circle icon="el-icon-refresh" @click="handleQuery" />
+        </el-tooltip>
+        <el-tooltip class="item" effect="dark" :content="showSearch ? '隐藏搜索' : '显示搜索'" placement="top">
+          <el-button size="mini" circle icon="el-icon-search" @click="showSearch=!showSearch" />
+        </el-tooltip>
+      </div>
+    </el-row>
 
     <el-table
       v-loading="loading"
@@ -197,6 +217,8 @@ export default {
     return {
       // 遮罩层
       loading: true,
+      // 显示搜索条件
+      showSearch: true,
       // 菜单表格树数据
       menuList: [],
       // 菜单树选项
@@ -309,6 +331,11 @@ export default {
     /** 搜索按钮操作 */
     handleQuery() {
       this.getList();
+    },
+    /** 重置按钮操作 */
+    resetQuery() {
+      this.resetForm("queryForm");
+      this.handleQuery();
     },
     /** 新增按钮操作 */
     handleAdd(row) {
