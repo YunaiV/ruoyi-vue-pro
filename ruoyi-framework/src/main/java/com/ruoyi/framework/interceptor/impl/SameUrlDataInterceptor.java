@@ -5,8 +5,10 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import com.alibaba.fastjson.JSONObject;
+import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.redis.RedisCache;
 import com.ruoyi.common.filter.RepeatedlyRequestWrapper;
 import com.ruoyi.common.utils.StringUtils;
@@ -26,7 +28,9 @@ public class SameUrlDataInterceptor extends RepeatSubmitInterceptor
 
     public final String REPEAT_TIME = "repeatTime";
 
-    public final String CACHE_REPEAT_KEY = "repeatData";
+    // 令牌自定义标识
+    @Value("${token.header}")
+    private String header;
 
     @Autowired
     private RedisCache redisCache;
@@ -62,7 +66,10 @@ public class SameUrlDataInterceptor extends RepeatSubmitInterceptor
         // 请求地址（作为存放cache的key值）
         String url = request.getRequestURI();
 
-        Object sessionObj = redisCache.getCacheObject(CACHE_REPEAT_KEY);
+        // 唯一标识（指定key + 消息头）
+        String cache_repeat_key = Constants.REPEAT_SUBMIT_KEY + request.getHeader(header);
+
+        Object sessionObj = redisCache.getCacheObject(cache_repeat_key);
         if (sessionObj != null)
         {
             Map<String, Object> sessionMap = (Map<String, Object>) sessionObj;
@@ -77,7 +84,7 @@ public class SameUrlDataInterceptor extends RepeatSubmitInterceptor
         }
         Map<String, Object> cacheMap = new HashMap<String, Object>();
         cacheMap.put(url, nowDataMap);
-        redisCache.setCacheObject(CACHE_REPEAT_KEY, cacheMap, intervalTime, TimeUnit.SECONDS);
+        redisCache.setCacheObject(cache_repeat_key, cacheMap, intervalTime, TimeUnit.SECONDS);
         return false;
     }
 
