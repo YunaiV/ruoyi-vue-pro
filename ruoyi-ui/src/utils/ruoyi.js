@@ -78,18 +78,17 @@ export function selectDictLabel(datas, value) {
 }
 
 // 回显数据字典（字符串数组）
-export function selectDictLabels(datas, value, separator) {
-	var actions = [];
-	var currentSeparator = undefined === separator ? "," : separator;
-	var temp = value.split(currentSeparator);
-	Object.keys(value.split(currentSeparator)).some((val) => {
-        Object.keys(datas).some((key) => {
-            if (datas[key].dictValue == ('' + temp[val])) {
-				actions.push(datas[key].dictLabel + currentSeparator);
-			}
-		})
-	})
-	return actions.join('').substring(0, actions.join('').length - 1);
+export function selectDictLabels (datas = {}, value = '', separator = ',') {
+  const actions = []
+  const temp = value.split(separator)
+  temp.forEach((_, index) => {
+    Object.keys(datas).forEach(key => {
+      if (datas[key].dictValue === temp[index].toString()) {
+        actions.push(datas[key].dictLabel)
+      }
+    })
+  })
+  return actions.join(separator)
 }
 
 // 通用下载方法
