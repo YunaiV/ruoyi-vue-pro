@@ -142,7 +142,28 @@
 	padding-left: 15px;
 	margin-bottom: 10px;
 }
-  
+
+/* button color */
+.el-button--cyan.is-active,
+.el-button--cyan:active {
+  background: #20B2AA;
+  border-color: #20B2AA;
+  color: #FFFFFF;
+}
+
+.el-button--cyan:focus,
+.el-button--cyan:hover {
+  background: #48D1CC;
+  border-color: #48D1CC;
+  color: #FFFFFF;
+}
+
+.el-button--cyan {
+  background-color: #20B2AA;
+  border-color: #20B2AA;
+  color: #FFFFFF;
+}
+
 /* text color */
 .text-navy {
 	color: #1ab394;
@@ -198,4 +219,8 @@
 	opacity: .8;
 	color: #fff!important;
 	background: #42b983!important;
+}
+
+.top-right-btn {
+	float: right;
 }
