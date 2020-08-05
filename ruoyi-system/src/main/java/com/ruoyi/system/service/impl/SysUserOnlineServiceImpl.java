@@ -75,7 +75,7 @@ public class SysUserOnlineServiceImpl implements ISysUserOnlineService
     @Override
     public SysUserOnline loginUserToUserOnline(LoginUser user)
     {
-        if (StringUtils.isNull(user) && StringUtils.isNull(user.getUser()))
+        if (StringUtils.isNull(user) || StringUtils.isNull(user.getUser()))
         {
             return null;
         }
