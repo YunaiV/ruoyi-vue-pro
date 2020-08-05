@@ -63,29 +63,20 @@ export function addDateRange (params = {}, dateRange) {
 }
 
 // 回显数据字典
-export function selectDictLabel(datas, value) {
-	var actions = [];
-	Object.keys(datas).some((key) => {
-		if (datas[key].dictValue == ('' + value)) {
-			actions.push(datas[key].dictLabel);
-			return true;
-		}
-	})
-	return actions.join('');
+export function selectDictLabel(datas = [], value = '') {
+  if (!value) return '-';
+  const dataArr = datas.filter(item => item.dictValue === value.toString());
+  return dataArr.length ? dataArr[0].dictLabel : 'Error Dict';
 }
 
 // 回显数据字典（字符串数组）
-export function selectDictLabels (datas = {}, value = '', separator = ',') {
-  const actions = []
-  const temp = value.split(separator)
+export function selectDictLabels(datas = [], value = '', separator = ',') {
+  const actions = [];
+  const temp = value.split(separator).filter(item => item);
   temp.forEach((_, index) => {
-    Object.keys(datas).forEach(key => {
-      if (datas[key].dictValue === temp[index].toString()) {
-        actions.push(datas[key].dictLabel)
-      }
-    })
+    actions.push(selectDictLabel(datas, temp[index]));
   })
-  return actions.join(separator)
+  return actions.join(separator);
 }
 
 // 通用下载方法
