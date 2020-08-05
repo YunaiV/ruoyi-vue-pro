@@ -57,7 +57,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	
 	<select id="checkDictTypeUnique" parameterType="String" resultMap="SysDictTypeResult">
 		<include refid="selectDictTypeVo"/>
-		where dict_type = #{dictType}
+		where dict_type = #{dictType} limit 1
 	</select>
 	
 	<delete id="deleteDictTypeById" parameterType="Long">

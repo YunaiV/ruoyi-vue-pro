@@ -61,7 +61,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     
     <select id="checkConfigKeyUnique" parameterType="String" resultMap="SysConfigResult">
         <include refid="selectConfigVo"/>
-        where config_key = #{configKey}
+        where config_key = #{configKey} limit 1
     </select>
     
     <insert id="insertConfig" parameterType="SysConfig">

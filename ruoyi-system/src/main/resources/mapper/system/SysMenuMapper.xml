@@ -118,7 +118,7 @@
 	
 	<select id="checkMenuNameUnique" parameterType="SysMenu" resultMap="SysMenuResult">
 		<include refid="selectMenuVo"/>
-		where menu_name=#{menuName} and parent_id = #{parentId}
+		where menu_name=#{menuName} and parent_id = #{parentId} limit 1
 	</select>
 	
 	<update id="updateMenu" parameterType="SysMenu">

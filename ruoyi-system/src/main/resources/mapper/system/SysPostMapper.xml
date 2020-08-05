@@ -64,12 +64,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	
 	<select id="checkPostNameUnique" parameterType="String" resultMap="SysPostResult">
 		<include refid="selectPostVo"/>
-		 where post_name=#{postName}
+		 where post_name=#{postName} limit 1
 	</select>
 	
 	<select id="checkPostCodeUnique" parameterType="String" resultMap="SysPostResult">
 		<include refid="selectPostVo"/>
-		 where post_code=#{postCode}
+		 where post_code=#{postCode} limit 1
 	</select>
 	
 	<update id="updatePost" parameterType="SysPost">
