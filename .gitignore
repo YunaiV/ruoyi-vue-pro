@@ -37,6 +37,7 @@ nbdist/
 # Others
 *.log
 *.xml.versionsBackup
+*.swp
 
 !*/build/*.java
 !*/build/*.html
