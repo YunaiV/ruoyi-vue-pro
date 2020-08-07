@@ -146,6 +146,7 @@ export default {
 
 <style>
 .editor {
+  white-space: pre-wrap!important;
   line-height: normal !important;
   height: 192px;
 }
