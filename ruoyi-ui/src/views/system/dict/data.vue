@@ -1,6 +1,6 @@
 <template>
   <div class="app-container">
-    <el-form :model="queryParams" ref="queryForm" v-show="showSearch" :inline="true">
+    <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
       <el-form-item label="字典名称" prop="dictType">
         <el-select v-model="queryParams.dictType" size="small">
           <el-option
@@ -75,14 +75,7 @@
           v-hasPermi="['system:dict:export']"
         >导出</el-button>
       </el-col>
-      <div class="top-right-btn">
-        <el-tooltip class="item" effect="dark" content="刷新" placement="top">
-          <el-button size="mini" circle icon="el-icon-refresh" @click="handleQuery" />
-        </el-tooltip>
-        <el-tooltip class="item" effect="dark" :content="showSearch ? '隐藏搜索' : '显示搜索'" placement="top">
-          <el-button size="mini" circle icon="el-icon-search" @click="showSearch=!showSearch" />
-        </el-tooltip>
-      </div>
+      <table-tools-ext :showSearch.sync="showSearch" @queryTable="getList"></table-tools-ext>
     </el-row>
 
     <el-table v-loading="loading" :data="dataList" @selection-change="handleSelectionChange">

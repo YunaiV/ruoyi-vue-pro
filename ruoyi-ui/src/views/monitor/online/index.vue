@@ -1,6 +1,6 @@
 <template>
   <div class="app-container">
-    <el-form :model="queryParams" ref="queryForm" :inline="true">
+    <el-form :model="queryParams" ref="queryForm" :inline="true" label-width="68px">
       <el-form-item label="登录地址" prop="ipaddr">
         <el-input
           v-model="queryParams.ipaddr"
@@ -23,8 +23,8 @@
         <el-button type="cyan" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
       </el-form-item>
-    </el-form>
 
+    </el-form>
     <el-table
       v-loading="loading"
       :data="list.slice((pageNum-1)*pageSize,pageNum*pageSize)"
