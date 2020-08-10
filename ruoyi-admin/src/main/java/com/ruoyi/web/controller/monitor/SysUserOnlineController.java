@@ -82,7 +82,7 @@ public class SysUserOnlineController extends BaseController
      * 强退用户
      */
     @PreAuthorize("@ss.hasPermi('monitor:online:forceLogout')")
-    @Log(title = "在线用户", businessType = BusinessType.DELETE)
+    @Log(title = "在线用户", businessType = BusinessType.FORCE)
     @DeleteMapping("/{tokenId}")
     public AjaxResult forceLogout(@PathVariable String tokenId)
     {
