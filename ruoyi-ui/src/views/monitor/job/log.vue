@@ -90,7 +90,7 @@
           v-hasPermi="['monitor:job:export']"
         >导出</el-button>
       </el-col>
-      <table-tools-ext :showSearch.sync="showSearch" @queryTable="getList"></table-tools-ext>
+      <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
     <el-table v-loading="loading" :data="jobLogList" @selection-change="handleSelectionChange">

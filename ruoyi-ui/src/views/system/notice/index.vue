@@ -65,7 +65,7 @@
           v-hasPermi="['system:notice:remove']"
         >删除</el-button>
       </el-col>
-      <table-tools-ext :showSearch.sync="showSearch" @queryTable="getList"></table-tools-ext>
+      <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
     <el-table v-loading="loading" :data="noticeList" @selection-change="handleSelectionChange">
@@ -164,7 +164,7 @@
           </el-col>
         </el-row>
       </el-form>
-      <div slot="footer" class="dialog-footer" style="padding-top:20px">
+      <div slot="footer" class="dialog-footer" style="padding-top:30px">
         <el-button type="primary" @click="submitForm">确 定</el-button>
         <el-button @click="cancel">取 消</el-button>
       </div>

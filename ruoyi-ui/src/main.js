@@ -21,7 +21,7 @@ import { getConfigKey } from "@/api/system/config";
 import { parseTime, resetForm, addDateRange, selectDictLabel, selectDictLabels, download, handleTree } from "@/utils/ruoyi";
 import Pagination from "@/components/Pagination";
 //自定义表格工具扩展
-import TableToolsExt from "@/components/TableToolsExt"
+import RightToolbar from "@/components/RightToolbar"
 
 // 全局方法挂载
 Vue.prototype.getDicts = getDicts
@@ -48,7 +48,7 @@ Vue.prototype.msgInfo = function (msg) {
 
 // 全局组件挂载
 Vue.component('Pagination', Pagination)
-Vue.component('TableToolsExt', TableToolsExt)
+Vue.component('RightToolbar', RightToolbar)
 
 Vue.use(permission)
 

@@ -84,7 +84,7 @@
           v-hasPermi="['monitor:job:query']"
         >日志</el-button>
       </el-col>
-      <table-tools-ext :showSearch.sync="showSearch" @queryTable="getList"></table-tools-ext>
+      <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
     <el-table v-loading="loading" :data="jobList" @selection-change="handleSelectionChange">
