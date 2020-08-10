@@ -6,6 +6,7 @@ import java.util.concurrent.TimeUnit;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import com.alibaba.fastjson.JSONObject;
 import com.ruoyi.common.constant.Constants;
@@ -51,8 +52,13 @@ public class SameUrlDataInterceptor extends RepeatSubmitInterceptor
     @Override
     public boolean isRepeatSubmit(HttpServletRequest request)
     {
-        RepeatedlyRequestWrapper repeatedlyRequest = (RepeatedlyRequestWrapper) request;
-        String nowParams = HttpHelper.getBodyString(repeatedlyRequest);
+        String nowParams = "";
+        if (request instanceof HttpServletRequest && StringUtils.equalsAnyIgnoreCase(request.getContentType(),
+                MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_JSON_UTF8_VALUE))
+        {
+            RepeatedlyRequestWrapper repeatedlyRequest = (RepeatedlyRequestWrapper) request;
+            nowParams = HttpHelper.getBodyString(repeatedlyRequest);
+        }
 
         // body参数为空，获取Parameter的数据
         if (StringUtils.isEmpty(nowParams))
