@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 通用js方法封装处理
  * Copyright (c) 2019 ruoyi
  */
@@ -128,7 +128,7 @@ export function handleTree(data, id, parentId, children, rootId) {
 	id = id || 'id'
 	parentId = parentId || 'parentId'
 	children = children || 'children'
-	rootId = rootId || 0
+	rootId = rootId || Math.min.apply(Math,data.map(item => { return item[parentId] })) || 0
 	//对源数据深度克隆
 	const cloneData = JSON.parse(JSON.stringify(data))
 	//循环所有项
