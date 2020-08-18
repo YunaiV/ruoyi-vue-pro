@@ -88,7 +88,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter
     protected void configure(HttpSecurity httpSecurity) throws Exception
     {
         httpSecurity
-                // CRSF禁用，因为不使用session
+                // CSRF禁用，因为不使用session
                 .csrf().disable()
                 // 认证失败处理类
                 .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
