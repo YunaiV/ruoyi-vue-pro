@@ -66,7 +66,7 @@
           v-hasPermi="['${moduleName}:${businessName}:add']"
         >新增</el-button>
       </el-col>
-	  <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
+      <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
     <el-table
@@ -140,7 +140,7 @@
           <el-input v-model="form.${field}" placeholder="请输入${comment}" />
         </el-form-item>
 #elseif($column.htmlType == "select" && "" != $dictType)
-        <el-form-item label="${comment}">
+        <el-form-item label="${comment}" prop="${field}">
           <el-select v-model="form.${field}" placeholder="请选择${comment}">
             <el-option
               v-for="dict in ${field}Options"
@@ -152,7 +152,7 @@
           </el-select>
         </el-form-item>
 #elseif($column.htmlType == "select" && $dictType)
-        <el-form-item label="${comment}">
+        <el-form-item label="${comment}" prop="${field}">
           <el-select v-model="form.${field}" placeholder="请选择${comment}">
             <el-option label="请选择字典生成" value="" />
           </el-select>
@@ -272,9 +272,8 @@ export default {
 #else
 #set($comment=$column.columnComment)
 #end
-#set($comment=$column.columnComment)
         $column.javaField: [
-          { required: true, message: "$comment不能为空", trigger: "blur" }
+          { required: true, message: "$comment不能为空", trigger: "#if($column.htmlType == "select")"change"#else"blur"#end" }
         ]#if($velocityCount != $columns.size()),#end
 
 #end
