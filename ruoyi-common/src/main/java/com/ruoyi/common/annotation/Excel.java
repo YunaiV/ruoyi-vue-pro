@@ -4,6 +4,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.math.BigDecimal;
 
 /**
  * 自定义导出Excel数据注解
@@ -30,7 +31,7 @@ public @interface Excel
     public String dateFormat() default "";
 
     /**
-     * 如果是字典类型，请设置字典的type值
+     * 如果是字典类型，请设置字典的type值 (如: sys_user_sex)
      */
     public String dictType() default "";
 
@@ -43,6 +44,16 @@ public @interface Excel
      * 分隔符，读取字符串组内容
      */
     public String separator() default ",";
+
+    /**
+     * BigDecimal 精度 默认:-1(默认不开启BigDecimal格式化)
+     */
+    public int scale() default -1;
+
+    /**
+     * BigDecimal 舍入规则 默认:BigDecimal.ROUND_HALF_EVEN
+     */
+    public int roundingMode() default BigDecimal.ROUND_HALF_EVEN;
 
     /**
      * 导出类型（0数字 1字符串）
