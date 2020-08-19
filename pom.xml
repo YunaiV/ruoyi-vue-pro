@@ -23,7 +23,7 @@
         <swagger.version>2.9.2</swagger.version>
 		<kaptcha.version>2.3.2</kaptcha.version>
         <pagehelper.boot.version>1.2.5</pagehelper.boot.version>
-        <fastjson.version>1.2.70</fastjson.version>
+        <fastjson.version>1.2.73</fastjson.version>
         <oshi.version>3.9.1</oshi.version>
         <commons.io.version>2.5</commons.io.version>
         <commons.fileupload.version>1.3.3</commons.fileupload.version>
