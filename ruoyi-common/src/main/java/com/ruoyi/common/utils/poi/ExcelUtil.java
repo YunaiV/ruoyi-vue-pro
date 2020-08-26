@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -864,9 +863,9 @@ public class ExcelUtil<T>
         if (StringUtils.isNotEmpty(name))
         {
             Class<?> clazz = o.getClass();
-            String methodName = "get" + name.substring(0, 1).toUpperCase() + name.substring(1);
-            Method method = clazz.getMethod(methodName);
-            o = method.invoke(o);
+            Field field = clazz.getDeclaredField(name);
+            field.setAccessible(true);
+            o = field.get(o);
         }
         return o;
     }
