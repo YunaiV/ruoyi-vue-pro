@@ -340,7 +340,7 @@ public class GenTableColumn extends BaseEntity
     public static boolean isUsableColumn(String javaField)
     {
         // isSuperColumn()中的名单用于避免生成多余Domain属性，若某些属性在生成页面时需要用到不能忽略，则放在此处白名单
-        return StringUtils.equalsAnyIgnoreCase(javaField, "parentId", "orderNum");
+        return StringUtils.equalsAnyIgnoreCase(javaField, "parentId", "orderNum", "remark");
     }
 
     public String readConverterExp()
