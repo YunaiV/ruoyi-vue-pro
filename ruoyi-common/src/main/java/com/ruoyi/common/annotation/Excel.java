@@ -101,6 +101,11 @@ public @interface Excel
     public String targetAttr() default "";
 
     /**
+     * 是否自动统计数据,在最后追加一行统计数据总和
+     */
+    public boolean isStatistics() default false;
+
+    /**
      * 字段类型（0：导出导入；1：仅导出；2：仅导入）
      */
     Type type() default Type.ALL;
