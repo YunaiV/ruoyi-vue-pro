@@ -273,7 +273,7 @@ export default {
 #set($comment=$column.columnComment)
 #end
         $column.javaField: [
-          { required: true, message: "$comment不能为空", trigger: "#if($column.htmlType == "select")"change"#else"blur"#end" }
+          { required: true, message: "$comment不能为空", trigger: #if($column.htmlType == "select")"change"#else"blur"#end }
         ]#if($velocityCount != $columns.size()),#end
 
 #end
