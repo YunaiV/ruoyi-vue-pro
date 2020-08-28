@@ -29,7 +29,7 @@ public class GenConstants
     public static final String PARENT_MENU_NAME = "parentMenuName";
 
     /** 数据库字符串类型 */
-    public static final String[] COLUMNTYPE_STR = { "char", "varchar", "narchar", "varchar2", "tinytext", "text",
+    public static final String[] COLUMNTYPE_STR = { "char", "varchar", "nvarchar", "varchar2", "tinytext", "text",
             "mediumtext", "longtext" };
 
     /** 数据库时间类型 */
