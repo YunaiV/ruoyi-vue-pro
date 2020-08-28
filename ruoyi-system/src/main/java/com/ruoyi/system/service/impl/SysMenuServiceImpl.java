@@ -178,14 +178,19 @@ public class SysMenuServiceImpl implements ISysMenuService
     public List<SysMenu> buildMenuTree(List<SysMenu> menus)
     {
         List<SysMenu> returnList = new ArrayList<SysMenu>();
+        List<Long> tempList = new ArrayList<Long>();
+        for (SysMenu dept : menus)
+        {
+            tempList.add(dept.getMenuId());
+        }
         for (Iterator<SysMenu> iterator = menus.iterator(); iterator.hasNext();)
         {
-            SysMenu t = (SysMenu) iterator.next();
-            // 根据传入的某个父节点ID,遍历该父节点的所有子节点
-            if (t.getParentId() == 0)
+            SysMenu menu = (SysMenu) iterator.next();
+            // 如果是顶级节点, 遍历该父节点的所有子节点
+            if (!tempList.contains(menu.getParentId()))
             {
-                recursionFn(menus, t);
-                returnList.add(t);
+                recursionFn(menus, menu);
+                returnList.add(menu);
             }
         }
         if (returnList.isEmpty())
@@ -406,13 +411,7 @@ public class SysMenuServiceImpl implements ISysMenuService
         {
             if (hasChild(list, tChild))
             {
-                // 判断是否有子节点
-                Iterator<SysMenu> it = childList.iterator();
-                while (it.hasNext())
-                {
-                    SysMenu n = (SysMenu) it.next();
-                    recursionFn(list, n);
-                }
+                recursionFn(list, tChild);
             }
         }
     }

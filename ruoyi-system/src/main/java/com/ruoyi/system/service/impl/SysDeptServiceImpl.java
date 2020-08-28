@@ -267,13 +267,7 @@ public class SysDeptServiceImpl implements ISysDeptService
         {
             if (hasChild(list, tChild))
             {
-                // 判断是否有子节点
-                Iterator<SysDept> it = childList.iterator();
-                while (it.hasNext())
-                {
-                    SysDept n = (SysDept) it.next();
-                    recursionFn(list, n);
-                }
+                recursionFn(list, tChild);
             }
         }
     }
