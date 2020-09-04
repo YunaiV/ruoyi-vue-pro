@@ -71,9 +71,9 @@ export default {
     value: {
       handler(val) {
         if (val !== this.currentValue) {
-          this.currentValue = val;
+          this.currentValue = val === null ? "" : val;
           if (this.Quill) {
-            this.Quill.pasteHTML(this.value);
+            this.Quill.pasteHTML(this.currentValue);
           }
         }
       },
