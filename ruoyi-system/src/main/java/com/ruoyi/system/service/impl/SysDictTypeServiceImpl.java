@@ -76,12 +76,12 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService
     public List<SysDictData> selectDictDataByType(String dictType)
     {
         List<SysDictData> dictDatas = DictUtils.getDictCache(dictType);
-        if (StringUtils.isNotNull(dictDatas))
+        if (null!=dictDatas&&!dictDatas.isEmpty())
         {
             return dictDatas;
         }
         dictDatas = dictDataMapper.selectDictDataByType(dictType);
-        if (StringUtils.isNotNull(dictDatas))
+        if (null!=dictDatas&&!dictDatas.isEmpty())
         {
             DictUtils.setDictCache(dictType, dictDatas);
             return dictDatas;
