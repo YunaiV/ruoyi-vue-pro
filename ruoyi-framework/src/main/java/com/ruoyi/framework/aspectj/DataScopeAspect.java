@@ -79,6 +79,9 @@ public class DataScopeAspect
         }
         // 获取当前的用户
         LoginUser loginUser = SpringUtils.getBean(TokenService.class).getLoginUser(ServletUtils.getRequest());
+        if (loginUser == null) {
+            return;
+        }
         SysUser currentUser = loginUser.getUser();
         if (currentUser != null)
         {
