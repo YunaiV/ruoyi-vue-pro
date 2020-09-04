@@ -79,14 +79,11 @@ public class DataScopeAspect
         }
         // 获取当前的用户
         LoginUser loginUser = SpringUtils.getBean(TokenService.class).getLoginUser(ServletUtils.getRequest());
-        if (loginUser == null) {
-            return;
-        }
-        SysUser currentUser = loginUser.getUser();
-        if (currentUser != null)
+        if (StringUtils.isNotNull(loginUser))
         {
+            SysUser currentUser = loginUser.getUser();
             // 如果是超级管理员，则不过滤数据
-            if (!currentUser.isAdmin())
+            if (StringUtils.isNotNull(currentUser) && !currentUser.isAdmin())
             {
                 dataScopeFilter(joinPoint, currentUser, controllerDataScope.deptAlias(),
                         controllerDataScope.userAlias());
