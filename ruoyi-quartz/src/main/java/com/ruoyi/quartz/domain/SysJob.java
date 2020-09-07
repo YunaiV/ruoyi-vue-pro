@@ -88,7 +88,7 @@ public class SysJob extends BaseEntity implements Serializable
     }
 
     @NotBlank(message = "调用目标字符串不能为空")
-    @Size(min = 0, max = 1000, message = "调用目标字符串长度不能超过500个字符")
+    @Size(min = 0, max = 500, message = "调用目标字符串长度不能超过500个字符")
     public String getInvokeTarget()
     {
         return invokeTarget;
