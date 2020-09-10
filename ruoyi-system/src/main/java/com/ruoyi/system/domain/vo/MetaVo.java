@@ -13,7 +13,7 @@ public class MetaVo
     private String title;
 
     /**
-     * 设置该路由的图标，对应路径src/icons/svg
+     * 设置该路由的图标，对应路径src/assets/icons/svg
      */
     private String icon;
 
