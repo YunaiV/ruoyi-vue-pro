@@ -74,6 +74,9 @@ public class GenConstants
     /** 日期控件 */
     public static final String HTML_DATETIME = "datetime";
 
+    /** 富文本控件 */
+    public static final String HTML_EDITOR = "editor";
+
     /** 字符串类型 */
     public static final String TYPE_STRING = "String";
 

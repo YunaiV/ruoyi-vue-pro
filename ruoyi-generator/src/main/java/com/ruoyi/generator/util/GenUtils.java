@@ -111,6 +111,11 @@ public class GenUtils
         {
             column.setHtmlType(GenConstants.HTML_SELECT);
         }
+        // 内容字段设置富文本控件
+        else if (StringUtils.endsWithIgnoreCase(columnName, "content"))
+        {
+            column.setHtmlType(GenConstants.HTML_EDITOR);
+        }
     }
 
     /**
