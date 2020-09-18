@@ -7,6 +7,7 @@ import java.io.StringWriter;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import org.apache.commons.io.IOUtils;
@@ -224,7 +225,6 @@ public class GenTableServiceImpl implements IGenTableService
      * 生成代码（自定义路径）
      * 
      * @param tableName 表名称
-     * @return 数据
      */
     @Override
     public void generatorCode(String tableName)
@@ -259,6 +259,37 @@ public class GenTableServiceImpl implements IGenTableService
                     throw new CustomException("渲染模板失败，表名：" + table.getTableName());
                 }
             }
+        }
+    }
+
+    /**
+     * 同步数据库
+     * 
+     * @param tableName 表名称
+     */
+    @Override
+    @Transactional
+    public void synchDb(String tableName)
+    {
+        GenTable table = genTableMapper.selectGenTableByName(tableName);
+        List<GenTableColumn> tableColumns = table.getColumns();
+        List<String> tableColumnNames = tableColumns.stream().map(GenTableColumn::getColumnName).collect(Collectors.toList());
+
+        List<GenTableColumn> dbTableColumns = genTableColumnMapper.selectDbTableColumnsByName(tableName);
+        List<String> dbTableColumnNames = dbTableColumns.stream().map(GenTableColumn::getColumnName).collect(Collectors.toList());
+
+        dbTableColumns.forEach(column -> {
+            if (!tableColumnNames.contains(column.getColumnName()))
+            {
+                GenUtils.initColumnField(column, table);
+                genTableColumnMapper.insertGenTableColumn(column);
+            }
+        });
+
+        List<GenTableColumn> delColumns = tableColumns.stream().filter(column -> !dbTableColumnNames.contains(column.getColumnName())).collect(Collectors.toList());
+        if (StringUtils.isNotEmpty(delColumns))
+        {
+            genTableColumnMapper.deleteGenTableColumns(delColumns);
         }
     }
 

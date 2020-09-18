@@ -117,4 +117,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         </foreach>
     </delete>
     
+    <delete id="deleteGenTableColumns">
+        delete from gen_table_column where column_id in 
+        <foreach collection="list" item="item" open="(" separator="," close=")">
+            #{item.columnId}
+        </foreach>
+    </delete>
 </mapper>

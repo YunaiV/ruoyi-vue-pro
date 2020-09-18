@@ -17,7 +17,7 @@ public interface GenTableColumnMapper
      * @return 列信息
      */
     public List<GenTableColumn> selectDbTableColumnsByName(String tableName);
-    
+
     /**
      * 查询业务字段列表
      * 
@@ -41,6 +41,14 @@ public interface GenTableColumnMapper
      * @return 结果
      */
     public int updateGenTableColumn(GenTableColumn genTableColumn);
+
+    /**
+     * 删除业务字段
+     * 
+     * @param genTableColumns 列数据
+     * @return 结果
+     */
+    public int deleteGenTableColumns(List<GenTableColumn> genTableColumns);
 
     /**
      * 批量删除业务字段
