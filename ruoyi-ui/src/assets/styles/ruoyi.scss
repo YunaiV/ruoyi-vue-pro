@@ -67,6 +67,11 @@
 			font-size: 13px;
 		}
 	}
+	.el-table__body-wrapper {
+		.el-button [class*="el-icon-"] + span {
+			margin-left: 1px;
+		}
+	}
 }
 
 /** 表单布局 **/
