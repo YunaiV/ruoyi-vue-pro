@@ -37,6 +37,12 @@ public class SysRole extends BaseEntity
     @Excel(name = "数据范围", readConverterExp = "1=所有数据权限,2=自定义数据权限,3=本部门数据权限,4=本部门及以下数据权限")
     private String dataScope;
 
+    /** 菜单树选择项是否关联显示（0：父子互相关联显示 1：父子不互相关联显示） */
+    private boolean menuCheckStrictly;
+
+    /** 部门树选择项是否关联显示（0：父子互相关联显示 1：父子不互相关联显示） */
+    private boolean deptCheckStrictly;
+
     /** 角色状态（0正常 1停用） */
     @Excel(name = "角色状态", readConverterExp = "0=正常,1=停用")
     private String status;
@@ -126,6 +132,26 @@ public class SysRole extends BaseEntity
     public void setDataScope(String dataScope)
     {
         this.dataScope = dataScope;
+    }
+
+    public boolean isMenuCheckStrictly()
+    {
+        return menuCheckStrictly;
+    }
+
+    public void setMenuCheckStrictly(boolean menuCheckStrictly)
+    {
+        this.menuCheckStrictly = menuCheckStrictly;
+    }
+
+    public boolean isDeptCheckStrictly()
+    {
+        return deptCheckStrictly;
+    }
+
+    public void setDeptCheckStrictly(boolean deptCheckStrictly)
+    {
+        this.deptCheckStrictly = deptCheckStrictly;
     }
 
     public String getStatus()

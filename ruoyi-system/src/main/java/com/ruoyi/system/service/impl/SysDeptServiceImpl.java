@@ -10,9 +10,11 @@ import com.ruoyi.common.annotation.DataScope;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.domain.TreeSelect;
 import com.ruoyi.common.core.domain.entity.SysDept;
+import com.ruoyi.common.core.domain.entity.SysRole;
 import com.ruoyi.common.exception.CustomException;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.mapper.SysDeptMapper;
+import com.ruoyi.system.mapper.SysRoleMapper;
 import com.ruoyi.system.service.ISysDeptService;
 
 /**
@@ -25,6 +27,9 @@ public class SysDeptServiceImpl implements ISysDeptService
 {
     @Autowired
     private SysDeptMapper deptMapper;
+
+    @Autowired
+    private SysRoleMapper roleMapper;
 
     /**
      * 查询部门管理数据
@@ -93,7 +98,8 @@ public class SysDeptServiceImpl implements ISysDeptService
     @Override
     public List<Integer> selectDeptListByRoleId(Long roleId)
     {
-        return deptMapper.selectDeptListByRoleId(roleId);
+        SysRole role = roleMapper.selectRoleById(roleId);
+        return deptMapper.selectDeptListByRoleId(roleId, role.isDeptCheckStrictly());
     }
 
     /**

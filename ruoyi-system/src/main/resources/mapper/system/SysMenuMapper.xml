@@ -82,12 +82,14 @@
 		order by m.parent_id, m.order_num
 	</select>
 	
-	<select id="selectMenuListByRoleId" parameterType="Long" resultType="Integer">
-		select m.menu_id, m.parent_id
+	<select id="selectMenuListByRoleId" resultType="Integer">
+		select m.menu_id
 		from sys_menu m
             left join sys_role_menu rm on m.menu_id = rm.menu_id
         where rm.role_id = #{roleId}
-        	and m.menu_id not in (select m.parent_id from sys_menu m inner join sys_role_menu rm on m.menu_id = rm.menu_id and rm.role_id = #{roleId})
+            <if test="menuCheckStrictly">
+              and m.menu_id not in (select m.parent_id from sys_menu m inner join sys_role_menu rm on m.menu_id = rm.menu_id and rm.role_id = #{roleId})
+            </if>
 		order by m.parent_id, m.order_num
 	</select>
 	
