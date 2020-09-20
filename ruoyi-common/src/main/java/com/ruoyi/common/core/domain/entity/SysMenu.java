@@ -41,6 +41,9 @@ public class SysMenu extends BaseEntity
     /** 是否为外链（0是 1否） */
     private String isFrame;
 
+    /** 是否缓存（0缓存 1不缓存） */
+    private String isCache;
+
     /** 类型（M目录 C菜单 F按钮） */
     private String menuType;
 
@@ -144,6 +147,16 @@ public class SysMenu extends BaseEntity
         this.isFrame = isFrame;
     }
 
+    public String getIsCache()
+    {
+        return isCache;
+    }
+
+    public void setIsCache(String isCache)
+    {
+        this.isCache = isCache;
+    }
+
     @NotBlank(message = "菜单类型不能为空")
     public String getMenuType()
     {
@@ -216,6 +229,7 @@ public class SysMenu extends BaseEntity
             .append("path", getPath())
             .append("component", getComponent())
             .append("isFrame", getIsFrame())
+            .append("IsCache", getIsCache())
             .append("menuType", getMenuType())
             .append("visible", getVisible())
             .append("status ", getStatus())

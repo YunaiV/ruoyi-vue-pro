@@ -17,7 +17,7 @@ import Layout from '@/layout'
  * redirect: noRedirect           // 当设置 noRedirect 的时候该路由在面包屑导航中不可被点击
  * name:'router-name'             // 设定路由的名字，一定要填写不然使用<keep-alive>时会出现各种问题
  * meta : {
-    roles: ['admin','editor']    // 设置该路由进入的权限，支持多个权限叠加
+    noCache: true                // 如果设置为true，则不会被 <keep-alive> 缓存(默认 false)
     title: 'title'               // 设置该路由在侧边栏和面包屑中展示的名字
     icon: 'svg-name'             // 设置该路由的图标，对应路径src/assets/icons/svg
     breadcrumb: false            // 如果设置为false，则不会在breadcrumb面包屑中显示

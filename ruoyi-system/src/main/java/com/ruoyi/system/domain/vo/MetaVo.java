@@ -17,6 +17,11 @@ public class MetaVo
      */
     private String icon;
 
+    /**
+     * 设置为true，则不会被 <keep-alive>缓存
+     */
+    private boolean noCache;
+
     public MetaVo()
     {
     }
@@ -25,6 +30,23 @@ public class MetaVo
     {
         this.title = title;
         this.icon = icon;
+    }
+
+    public MetaVo(String title, String icon, boolean noCache)
+    {
+        this.title = title;
+        this.icon = icon;
+        this.noCache = noCache;
+    }
+
+    public boolean isNoCache()
+    {
+        return noCache;
+    }
+
+    public void setNoCache(boolean noCache)
+    {
+        this.noCache = noCache;
     }
 
     public String getTitle()
