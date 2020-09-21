@@ -97,8 +97,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
  			<if test="roleKey != null and roleKey != ''">role_key,</if>
  			<if test="roleSort != null and roleSort != ''">role_sort,</if>
  			<if test="dataScope != null and dataScope != ''">data_scope,</if>
- 			<if test="menuCheckStrictly != null and menuCheckStrictly != ''">menu_check_strictly,</if>
- 			<if test="deptCheckStrictly != null and deptCheckStrictly != ''">dept_check_strictly,</if>
+ 			<if test="menuCheckStrictly != null">menu_check_strictly,</if>
+ 			<if test="deptCheckStrictly != null">dept_check_strictly,</if>
  			<if test="status != null and status != ''">status,</if>
  			<if test="remark != null and remark != ''">remark,</if>
  			<if test="createBy != null and createBy != ''">create_by,</if>

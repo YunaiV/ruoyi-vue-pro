@@ -440,6 +440,7 @@ export default {
         menuIds: [],
         deptIds: [],
         menuCheckStrictly: true,
+		deptCheckStrictly: true,
         remark: undefined
       };
       this.resetForm("form");
