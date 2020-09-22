@@ -22,7 +22,7 @@ public class LoginUser implements UserDetails
     private String token;
 
     /**
-     * 登陆时间
+     * 登录时间
      */
     private Long loginTime;
 

@@ -25,7 +25,7 @@ public class AsyncFactory
     private static final Logger sys_user_logger = LoggerFactory.getLogger("sys-user");
 
     /**
-     * 记录登陆信息
+     * 记录登录信息
      * 
      * @param username 用户名
      * @param status 状态
