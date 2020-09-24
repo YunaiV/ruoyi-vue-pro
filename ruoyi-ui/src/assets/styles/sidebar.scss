@@ -63,6 +63,12 @@
       width: 100% !important;
     }
 
+    .el-menu-item, .el-submenu__title {
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+      white-space: nowrap !important;
+    }
+
     // menu hover
     .submenu-title-noDropdown,
     .el-submenu__title {
