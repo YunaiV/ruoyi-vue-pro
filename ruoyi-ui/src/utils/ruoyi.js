@@ -59,8 +59,8 @@ export function addDateRange(params, dateRange) {
 	search.beginTime = "";
 	search.endTime = "";
 	if (null != dateRange && '' != dateRange) {
-		search.beginTime = this.dateRange[0];
-		search.endTime = this.dateRange[1];
+		search.beginTime = dateRange[0];
+		search.endTime = dateRange[1];
 	}
 	return search;
 }
