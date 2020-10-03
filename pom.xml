@@ -78,11 +78,13 @@
             <dependency>
                 <groupId>net.java.dev.jna</groupId>
                 <artifactId>jna</artifactId>
+                <version>${jna.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>net.java.dev.jna</groupId>
                 <artifactId>jna-platform</artifactId>
+                <version>${jna.version}</version>
             </dependency>
 			
             <!-- swagger2-->
