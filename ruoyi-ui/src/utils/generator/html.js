@@ -107,6 +107,18 @@ const layouts = {
 }
 
 const tags = {
+  'el-button': el => {
+    const {
+      tag, disabled
+    } = attrBuilder(el)
+    const type = el.type ? `type="${el.type}"` : ''
+    const icon = el.icon ? `icon="${el.icon}"` : ''
+    const size = el.size ? `size="${el.size}"` : ''
+    let child = buildElButtonChild(el)
+
+    if (child) child = `\n${child}\n` // 换行
+    return `<${el.tag} ${type} ${icon} ${size} ${disabled}>${child}</${el.tag}>`
+  },
   'el-input': el => {
     const {
       disabled, vModel, clearable, placeholder, width
@@ -270,6 +282,15 @@ function attrBuilder(el) {
     width: el.style && el.style.width ? ':style="{width: \'100%\'}"' : '',
     disabled: el.disabled ? ':disabled=\'true\'' : ''
   }
+}
+
+// el-buttin 子级
+function buildElButtonChild(conf) {
+  const children = []
+  if (conf.default) {
+    children.push(conf.default)
+  }
+  return children.join('\n')
 }
 
 // el-input innerHTML

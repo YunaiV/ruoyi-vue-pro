@@ -406,6 +406,21 @@ export const layoutComponents = [
     layoutTree: true,
     children: [],
     document: 'https://element.eleme.cn/#/zh-CN/component/layout'
+  },
+  {
+    layout: 'colFormItem',
+    label: '按钮',
+    changeTag: true,
+    labelWidth: null,
+    tag: 'el-button',
+    tagIcon: 'button',
+    span: 24,
+    default: '主要按钮',
+    type: 'primary',
+    icon: 'el-icon-search',
+    size: 'medium',
+    disabled: false,
+    document: 'https://element.eleme.cn/#/zh-CN/component/button'
   }
 ]
 

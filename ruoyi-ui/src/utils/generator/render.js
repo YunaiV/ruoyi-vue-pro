@@ -26,6 +26,11 @@ function vModel(self, dataObject, defaultValue) {
 }
 
 const componentChild = {
+  'el-button': {
+    default(h, conf, key) {
+      return conf[key]
+    },
+  },
   'el-input': {
     prepend(h, conf, key) {
       return <template slot="prepend">{conf[key]}</template>
