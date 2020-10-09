@@ -24,7 +24,7 @@
         <swagger.version>2.9.2</swagger.version>
 		<kaptcha.version>2.3.2</kaptcha.version>
         <pagehelper.boot.version>1.2.5</pagehelper.boot.version>
-        <fastjson.version>1.2.73</fastjson.version>
+        <fastjson.version>1.2.74</fastjson.version>
         <oshi.version>5.2.5</oshi.version>
         <jna.version>5.5.0</jna.version>
         <commons.io.version>2.5</commons.io.version>
