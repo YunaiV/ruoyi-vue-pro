@@ -125,12 +125,10 @@ export default {
         let formData = new FormData();
         formData.append("avatarfile", data);
         uploadAvatar(formData).then(response => {
-          if (response.code === 200) {
-            this.open = false;
-            this.options.img = process.env.VUE_APP_BASE_API + response.imgUrl;
-            store.commit('SET_AVATAR', this.options.img);
-            this.msgSuccess("修改成功");
-          }
+          this.open = false;
+          this.options.img = process.env.VUE_APP_BASE_API + response.imgUrl;
+          store.commit('SET_AVATAR', this.options.img);
+          this.msgSuccess("修改成功");
           this.visible = false;
         });
       });

@@ -284,7 +284,7 @@ export default {
         }).then(() => {
           this.getList();
           this.msgSuccess("删除成功");
-        }).catch(function() {});
+        })
     },
     /** 清空按钮操作 */
     handleClean() {
@@ -297,7 +297,7 @@ export default {
         }).then(() => {
           this.getList();
           this.msgSuccess("清空成功");
-        }).catch(function() {});
+        })
     },
     /** 导出按钮操作 */
     handleExport() {
@@ -310,7 +310,7 @@ export default {
           return exportOperlog(queryParams);
         }).then(response => {
           this.download(response.msg);
-        }).catch(function() {});
+        })
     }
   }
 };
