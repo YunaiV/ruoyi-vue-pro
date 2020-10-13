@@ -377,9 +377,9 @@ export default {
     // 所有部门节点数据
     getDeptAllCheckedKeys() {
       // 目前被选中的部门节点
-      let checkedKeys = this.$refs.dept.getHalfCheckedKeys();
+      let checkedKeys = this.$refs.dept.getCheckedKeys();
       // 半选中的部门节点
-      let halfCheckedKeys = this.$refs.dept.getCheckedKeys();
+      let halfCheckedKeys = this.$refs.dept.getHalfCheckedKeys();
       checkedKeys.unshift.apply(checkedKeys, halfCheckedKeys);
       return checkedKeys;
     },
