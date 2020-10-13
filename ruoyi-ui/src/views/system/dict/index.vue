@@ -352,9 +352,7 @@ export default {
     /** 清理缓存按钮操作 */
     handleClearCache() {
       clearCache().then(response => {
-        if (response.code === 200) {
-          this.msgSuccess("清理成功");
-        }
+        this.msgSuccess("清理成功");
       });
     }
   }

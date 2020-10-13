@@ -368,9 +368,9 @@ export default {
     // 所有菜单节点数据
     getMenuAllCheckedKeys() {
       // 目前被选中的菜单节点
-      let checkedKeys = this.$refs.menu.getHalfCheckedKeys();
+      let checkedKeys = this.$refs.menu.getCheckedKeys();
       // 半选中的菜单节点
-      let halfCheckedKeys = this.$refs.menu.getCheckedKeys();
+      let halfCheckedKeys = this.$refs.menu.getHalfCheckedKeys();
       checkedKeys.unshift.apply(checkedKeys, halfCheckedKeys);
       return checkedKeys;
     },
@@ -440,7 +440,7 @@ export default {
         menuIds: [],
         deptIds: [],
         menuCheckStrictly: true,
-		deptCheckStrictly: true,
+        deptCheckStrictly: true,
         remark: undefined
       };
       this.resetForm("form");
