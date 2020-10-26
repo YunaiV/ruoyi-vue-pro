@@ -177,7 +177,7 @@ export default {
           { required: true, message: "部门名称不能为空", trigger: "blur" }
         ],
         orderNum: [
-          { required: true, message: "菜单顺序不能为空", trigger: "blur" }
+          { required: true, message: "显示排序不能为空", trigger: "blur" }
         ],
         email: [
           {
