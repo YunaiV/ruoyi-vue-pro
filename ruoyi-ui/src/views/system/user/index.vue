@@ -422,7 +422,7 @@ export default {
           { required: true, message: "用户昵称不能为空", trigger: "blur" }
         ],
         deptId: [
-          { required: true, message: "归属部门不能为空", trigger: "blur" }
+          { required: true, message: "归属部门不能为空", trigger: "change" }
         ],
         password: [
           { required: true, message: "用户密码不能为空", trigger: "blur" }
