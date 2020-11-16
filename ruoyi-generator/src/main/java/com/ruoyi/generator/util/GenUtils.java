@@ -111,6 +111,11 @@ public class GenUtils
         {
             column.setHtmlType(GenConstants.HTML_SELECT);
         }
+        // 文件字段设置上传控件
+        else if (StringUtils.endsWithIgnoreCase(columnName, "image"))
+        {
+            column.setHtmlType(GenConstants.HTML_UPLOAD_IMAGE);
+        }
         // 内容字段设置富文本控件
         else if (StringUtils.endsWithIgnoreCase(columnName, "content"))
         {

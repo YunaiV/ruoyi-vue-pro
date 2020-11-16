@@ -168,6 +168,10 @@
         <el-form-item label="${comment}" prop="${field}">
           <el-input v-model="form.${field}" placeholder="请输入${comment}" />
         </el-form-item>
+#elseif($column.htmlType == "uploadImage")
+        <el-form-item label="${comment}">
+          <uploadImage v-model="form.${field}"/>
+        </el-form-item>
 #elseif($column.htmlType == "editor")
         <el-form-item label="${comment}">
           <editor v-model="form.${field}" :min-height="192"/>
@@ -253,6 +257,12 @@
 <script>
 import { list${BusinessName}, get${BusinessName}, del${BusinessName}, add${BusinessName}, update${BusinessName}, export${BusinessName} } from "@/api/${moduleName}/${businessName}";
 #foreach($column in $columns)
+#if($column.insert && !$column.superColumn && !$column.pk && $column.htmlType == "uploadImage")
+import UploadImage from '@/components/UploadImage';
+#break
+#end
+#end
+#foreach($column in $columns)
 #if($column.insert && !$column.superColumn && !$column.pk && $column.htmlType == "editor")
 import Editor from '@/components/Editor';
 #break
@@ -261,12 +271,20 @@ import Editor from '@/components/Editor';
 
 export default {
   name: "${BusinessName}",
+  components: {
 #foreach($column in $columns)
-#if($column.insert && !$column.superColumn && !$column.pk && $column.htmlType == "editor")
-  components: { Editor },
+#if($column.insert && !$column.superColumn && !$column.pk && $column.htmlType == "uploadImage")
+    UploadImage,
 #break
 #end
 #end
+#foreach($column in $columns)
+#if($column.insert && !$column.superColumn && !$column.pk && $column.htmlType == "editor")
+    Editor,
+#break
+#end
+#end
+  },
   data() {
     return {
       // 遮罩层
