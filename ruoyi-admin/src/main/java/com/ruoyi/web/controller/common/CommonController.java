@@ -5,6 +5,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -41,17 +42,15 @@ public class CommonController
     {
         try
         {
-            if (!FileUtils.isValidFilename(fileName))
+            if (!FileUtils.checkAllowDownload(fileName))
             {
                 throw new Exception(StringUtils.format("文件名称({})非法，不允许下载。 ", fileName));
             }
             String realFileName = System.currentTimeMillis() + fileName.substring(fileName.indexOf("_") + 1);
             String filePath = RuoYiConfig.getDownloadPath() + fileName;
 
-            response.setCharacterEncoding("utf-8");
-            response.setContentType("multipart/form-data");
-            response.setHeader("Content-Disposition",
-                    "attachment;fileName=" + FileUtils.setFileDownloadHeader(request, realFileName));
+            response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+            FileUtils.setAttachmentResponseHeader(response, realFileName);
             FileUtils.writeBytes(filePath, response.getOutputStream());
             if (delete)
             {
@@ -92,18 +91,28 @@ public class CommonController
      * 本地资源通用下载
      */
     @GetMapping("/common/download/resource")
-    public void resourceDownload(String name, HttpServletRequest request, HttpServletResponse response) throws Exception
+    public void resourceDownload(String resource, HttpServletRequest request, HttpServletResponse response)
+            throws Exception
     {
-        // 本地资源路径
-        String localPath = RuoYiConfig.getProfile();
-        // 数据库资源地址
-        String downloadPath = localPath + StringUtils.substringAfter(name, Constants.RESOURCE_PREFIX);
-        // 下载名称
-        String downloadName = StringUtils.substringAfterLast(downloadPath, "/");
-        response.setCharacterEncoding("utf-8");
-        response.setContentType("multipart/form-data");
-        response.setHeader("Content-Disposition",
-                "attachment;fileName=" + FileUtils.setFileDownloadHeader(request, downloadName));
-        FileUtils.writeBytes(downloadPath, response.getOutputStream());
+        try
+        {
+            if (!FileUtils.checkAllowDownload(resource))
+            {
+                throw new Exception(StringUtils.format("资源文件({})非法，不允许下载。 ", resource));
+            }
+            // 本地资源路径
+            String localPath = RuoYiConfig.getProfile();
+            // 数据库资源地址
+            String downloadPath = localPath + StringUtils.substringAfter(resource, Constants.RESOURCE_PREFIX);
+            // 下载名称
+            String downloadName = StringUtils.substringAfterLast(downloadPath, "/");
+            response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+            FileUtils.setAttachmentResponseHeader(response, downloadName);
+            FileUtils.writeBytes(downloadPath, response.getOutputStream());
+        }
+        catch (Exception e)
+        {
+            log.error("下载文件失败", e);
+        }
     }
 }
