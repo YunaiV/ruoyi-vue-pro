@@ -146,6 +146,20 @@
             <span>更新日志</span>
           </div>
           <el-collapse accordion>
+            <el-collapse-item title="v3.2.1 - 2020-11-18">
+              <ol>
+                <li>阻止任意文件下载漏洞</li>
+                <li>代码生成支持上传控件</li>
+                <li>新增图片上传组件</li>
+                <li>调整默认首页</li>
+                <li>升级druid到最新版本v1.2.2</li>
+                <li>mapperLocations配置支持分隔符</li>
+                <li>权限信息调整</li>
+                <li>调整sql默认时间</li>
+                <li>解决代码生成没有bit类型的问题</li>
+                <li>升级pagehelper到最新版1.3.0</li>
+              </ol>
+            </el-collapse-item>
             <el-collapse-item title="v3.2.0 - 2020-10-10">
               <ol>
                 <li>升级springboot版本到2.1.17 提升安全性</li>
@@ -421,7 +435,7 @@ export default {
   data() {
     return {
       // 版本号
-      version: "3.2.0",
+      version: "3.2.1",
     };
   },
   methods: {
