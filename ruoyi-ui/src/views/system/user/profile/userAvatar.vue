@@ -1,6 +1,6 @@
 <template>
   <div>
-    <img v-bind:src="options.img" @click="editCropper()" title="点击上传头像" class="img-circle img-lg" />
+    <div class="user-info-head" @click="editCropper()"><img v-bind:src="options.img" title="点击上传头像" class="img-circle img-lg" /></div>
     <el-dialog :title="title" :visible.sync="open" width="800px" append-to-body @opened="modalOpened">
       <el-row>
         <el-col :xs="24" :md="12" :style="{height: '350px'}">
@@ -140,3 +140,27 @@ export default {
   }
 };
 </script>
+<style scoped lang="scss">
+.user-info-head {
+  position: relative;
+  display: inline-block;
+}
+
+.user-info-head:hover:after {
+  content: '+';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  color: #eee;
+  background: rgba(0, 0, 0, 0.5);
+  font-size: 24px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  cursor: pointer;
+  line-height: 110px;
+  border-radius: 50%;
+}
+</style>
