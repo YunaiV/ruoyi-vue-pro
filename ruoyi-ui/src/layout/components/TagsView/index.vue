@@ -29,6 +29,7 @@
 <script>
 import ScrollPane from './ScrollPane'
 import path from 'path'
+import Global from "@/layout/components/global.js";
 
 export default {
   components: { ScrollPane },
@@ -144,6 +145,7 @@ export default {
           })
         })
       })
+      Global.$emit("removeCache", "refreshSelectedTag", this.selectedTag);
     },
     closeSelectedTag(view) {
       this.$store.dispatch('tagsView/delView', view).then(({ visitedViews }) => {
@@ -151,12 +153,14 @@ export default {
           this.toLastView(visitedViews, view)
         }
       })
+      Global.$emit("removeCache", "closeSelectedTag", view);
     },
     closeOthersTags() {
       this.$router.push(this.selectedTag)
       this.$store.dispatch('tagsView/delOthersViews', this.selectedTag).then(() => {
         this.moveToCurrentTag()
       })
+      Global.$emit("removeCache", "closeOthersTags", this.selectedTag);
     },
     closeAllTags(view) {
       this.$store.dispatch('tagsView/delAllViews').then(({ visitedViews }) => {
@@ -165,6 +169,7 @@ export default {
         }
         this.toLastView(visitedViews, view)
       })
+      Global.$emit("removeCache", "closeAllTags");
     },
     toLastView(visitedViews, view) {
       const latestView = visitedViews.slice(-1)[0]
