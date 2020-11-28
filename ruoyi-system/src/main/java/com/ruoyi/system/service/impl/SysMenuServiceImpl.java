@@ -364,6 +364,10 @@ public class SysMenuServiceImpl implements ISysMenuService
         {
             component = menu.getComponent();
         }
+        else if (StringUtils.isEmpty(menu.getComponent()) && isParentView(menu))
+        {
+            component = UserConstants.PARENT_VIEW;
+        }
         return component;
     }
 
@@ -377,6 +381,17 @@ public class SysMenuServiceImpl implements ISysMenuService
     {
         return menu.getParentId().intValue() == 0 && UserConstants.TYPE_MENU.equals(menu.getMenuType())
                 && menu.getIsFrame().equals(UserConstants.NO_FRAME);
+    }
+
+    /**
+     * 是否为parent_view组件
+     * 
+     * @param menu 菜单信息
+     * @return 结果
+     */
+    public boolean isParentView(SysMenu menu)
+    {
+        return menu.getParentId().intValue() != 0 && UserConstants.TYPE_DIR.equals(menu.getMenuType());
     }
 
     /**
