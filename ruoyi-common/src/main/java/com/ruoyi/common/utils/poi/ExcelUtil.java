@@ -274,6 +274,10 @@ public class ExcelUtil<T>
                             val = DateUtil.getJavaDate((Double) val);
                         }
                     }
+                    else if (Boolean.TYPE == fieldType || Boolean.class == fieldType)
+                    {
+                        val = Convert.toBool(val, false);
+                    }
                     if (StringUtils.isNotNull(fieldType))
                     {
                         Excel attr = field.getAnnotation(Excel.class);

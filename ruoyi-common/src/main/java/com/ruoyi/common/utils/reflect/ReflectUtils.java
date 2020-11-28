@@ -204,6 +204,10 @@ public class ReflectUtils
                             args[i] = DateUtil.getJavaDate((Double) args[i]);
                         }
                     }
+                    else if (cs[i] == boolean.class || cs[i] == Boolean.class)
+                    {
+                        args[i] = Convert.toBool(args[i]);
+                    }
                 }
             }
             return (E) method.invoke(obj, args);
