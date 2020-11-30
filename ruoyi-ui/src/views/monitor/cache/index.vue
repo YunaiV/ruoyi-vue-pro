@@ -117,14 +117,14 @@ export default {
         this.usedmemory = echarts.init(this.$refs.usedmemory, "macarons");
         this.usedmemory.setOption({
           tooltip: {
-            formatter: "{b} <br/>{a} : {c}K",
+            formatter: "{b} <br/>{a} : " + this.cache.info.used_memory_human,
           },
           series: [
             {
               name: "峰值",
               type: "gauge",
               detail: {
-                formatter: "{value}K",
+                formatter: this.cache.info.used_memory_human,
               },
               data: [
                 {
