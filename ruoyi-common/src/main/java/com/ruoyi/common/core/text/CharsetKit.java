@@ -66,7 +66,7 @@ public class CharsetKit
 
         if (null == destCharset)
         {
-            srcCharset = StandardCharsets.UTF_8;
+            destCharset = StandardCharsets.UTF_8;
         }
 
         if (StringUtils.isEmpty(source) || srcCharset.equals(destCharset))
