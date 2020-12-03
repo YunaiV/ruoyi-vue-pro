@@ -473,6 +473,21 @@ public class ExcelUtil<T>
         style.setFont(totalFont);
         styles.put("total", style);
 
+        style = wb.createCellStyle();
+        style.cloneStyleFrom(styles.get("data"));
+        style.setAlignment(HorizontalAlignment.LEFT);
+        styles.put("data1", style);
+
+        style = wb.createCellStyle();
+        style.cloneStyleFrom(styles.get("data"));
+        style.setAlignment(HorizontalAlignment.CENTER);
+        styles.put("data2", style);
+
+        style = wb.createCellStyle();
+        style.cloneStyleFrom(styles.get("data"));
+        style.setAlignment(HorizontalAlignment.RIGHT);
+        styles.put("data3", style);
+
         return styles;
     }
 
@@ -555,7 +570,8 @@ public class ExcelUtil<T>
             {
                 // 创建cell
                 cell = row.createCell(column);
-                cell.setCellStyle(styles.get("data"));
+                int align = attr.align().value();
+                cell.setCellStyle(styles.get("data" + (align >= 1 && align <= 3 ? align : "")));
 
                 // 用于读取对象中的属性
                 Object value = getTargetValue(vo, field, attr);

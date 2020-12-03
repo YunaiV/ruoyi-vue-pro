@@ -106,6 +106,27 @@ public @interface Excel
     public boolean isStatistics() default false;
 
     /**
+     * 导出字段对齐方式（0：默认；1：靠左；2：居中；3：靠右）
+     */
+    Align align() default Align.AUTO;
+
+    public enum Align
+    {
+        AUTO(0), LEFT(1), CENTER(2), RIGHT(3);
+        private final int value;
+
+        Align(int value)
+        {
+            this.value = value;
+        }
+
+        public int value()
+        {
+            return this.value;
+        }
+    }
+
+    /**
      * 字段类型（0：导出导入；1：仅导出；2：仅导入）
      */
     Type type() default Type.ALL;
