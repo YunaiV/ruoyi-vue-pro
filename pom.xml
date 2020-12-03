@@ -28,7 +28,7 @@
         <jna.version>5.6.0</jna.version>
         <commons.io.version>2.5</commons.io.version>
         <commons.fileupload.version>1.3.3</commons.fileupload.version>
-        <poi.version>3.17</poi.version>
+        <poi.version>4.1.2</poi.version>
         <velocity.version>1.7</velocity.version>
         <jwt.version>0.9.1</jwt.version>
     </properties>
