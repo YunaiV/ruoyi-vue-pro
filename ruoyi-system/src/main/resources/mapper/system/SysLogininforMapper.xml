@@ -33,11 +33,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="userName != null and userName != ''">
 				AND user_name like concat('%', #{userName}, '%')
 			</if>
-			<if test="beginTime != null and beginTime != ''"><!-- 开始时间检索 -->
-				and date_format(login_time,'%y%m%d') &gt;= date_format(#{beginTime},'%y%m%d')
+			<if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+				and date_format(login_time,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
 			</if>
-			<if test="endTime != null and endTime != ''"><!-- 结束时间检索 -->
-				and date_format(login_time,'%y%m%d') &lt;= date_format(#{endTime},'%y%m%d')
+			<if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+				and date_format(login_time,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
 			</if>
 		</where>
 		order by info_id desc
