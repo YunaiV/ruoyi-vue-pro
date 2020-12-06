@@ -27,7 +27,7 @@
         <el-col :lg="2" :md="2">
           <el-upload action="#" :http-request="requestUpload" :show-file-list="false" :before-upload="beforeUpload">
             <el-button size="small">
-              上传
+              选择
               <i class="el-icon-upload el-icon--right"></i>
             </el-button>
           </el-upload>
