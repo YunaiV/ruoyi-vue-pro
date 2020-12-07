@@ -15,6 +15,11 @@ $subMenuActiveText:#f4f4f5; // https://github.com/ElemeFE/element/issues/12951
 
 $menuBg:#304156;
 $menuHover:#263445;
+$sidebarTitle: #ffffff;
+
+$menuLightBg:#ffffff;
+$menuLightHover:#f0f1f5;
+$sidebarLightTitle: #001529;
 
 $subMenuBg:#1f2d3d;
 $subMenuHover:#001528;
@@ -29,7 +34,11 @@ $sideBarWidth: 200px;
   subMenuActiveText: $subMenuActiveText;
   menuBg: $menuBg;
   menuHover: $menuHover;
+  menuLightBg: $menuLightBg;
+  menuLightHover: $menuLightHover;
   subMenuBg: $subMenuBg;
   subMenuHover: $subMenuHover;
   sideBarWidth: $sideBarWidth;
+  sidebarTitle: $sidebarTitle;
+  sidebarLightTitle: $sidebarLightTitle
 }

@@ -1,7 +1,7 @@
 <template>
-  <div :class="classObj" class="app-wrapper">
-    <div v-if="device==='mobile'&&sidebar.opened" class="drawer-bg" @click="handleClickOutside" />
-    <sidebar class="sidebar-container" />
+  <div :class="classObj" class="app-wrapper" :style="{'--current-color': theme}">
+    <div v-if="device==='mobile'&&sidebar.opened" class="drawer-bg" @click="handleClickOutside"/>
+    <sidebar class="sidebar-container" :style="{ backgroundColor: sideTheme === 'theme-dark' ? variables.menuBg : variables.menuLightBg }" />
     <div :class="{hasTagsView:needTagsView}" class="main-container">
       <div :class="{'fixed-header':fixedHeader}">
         <navbar />
@@ -20,6 +20,7 @@ import RightPanel from '@/components/RightPanel'
 import { AppMain, Navbar, Settings, Sidebar, TagsView } from './components'
 import ResizeMixin from './mixin/ResizeHandler'
 import { mapState } from 'vuex'
+import variables from '@/assets/styles/variables.scss'
 
 export default {
   name: 'Layout',
@@ -34,6 +35,8 @@ export default {
   mixins: [ResizeMixin],
   computed: {
     ...mapState({
+      theme: state => state.settings.theme,
+      sideTheme: state => state.settings.sideTheme,
       sidebar: state => state.app.sidebar,
       device: state => state.app.device,
       showSettings: state => state.settings.showSettings,
@@ -47,6 +50,9 @@ export default {
         withoutAnimation: this.sidebar.withoutAnimation,
         mobile: this.device === 'mobile'
       }
+    },
+    variables() {
+      return variables;
     }
   },
   methods: {
