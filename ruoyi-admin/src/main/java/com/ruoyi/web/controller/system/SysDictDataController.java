@@ -1,5 +1,6 @@
 package com.ruoyi.web.controller.system;
 
+import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -19,6 +20,7 @@ import com.ruoyi.common.core.domain.entity.SysDictData;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.SecurityUtils;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.system.service.ISysDictDataService;
 import com.ruoyi.system.service.ISysDictTypeService;
@@ -73,10 +75,12 @@ public class SysDictDataController extends BaseController
     @GetMapping(value = "/type/{dictType}")
     public AjaxResult dictType(@PathVariable String dictType)
     {
-		List<SysDictData> data = dictTypeService.selectDictDataByType(dictType);
-		if (data == null)
-			data = new ArrayList<>();
-		return AjaxResult.success(data);
+        List<SysDictData> data = dictTypeService.selectDictDataByType(dictType);
+        if (StringUtils.isNull(data))
+        {
+            data = new ArrayList<SysDictData>();
+        }
+        return AjaxResult.success(data);
     }
 
     /**
