@@ -123,6 +123,8 @@ export default {
             {
               name: "峰值",
               type: "gauge",
+              min: 0,
+              max: 1000,
               detail: {
                 formatter: this.cache.info.used_memory_human,
               },
