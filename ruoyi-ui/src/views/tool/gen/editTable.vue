@@ -127,6 +127,7 @@
 import { getGenTable, updateGenTable } from "@/api/tool/gen";
 import { optionselect as getDictOptionselect } from "@/api/system/dict/type";
 import { listMenu as getMenuTreeselect } from "@/api/system/menu";
+import Global from "@/layout/components/global.js";
 import basicInfoForm from "./basicInfoForm";
 import genInfoForm from "./genInfoForm";
 import Sortable from 'sortablejs'
@@ -207,6 +208,7 @@ export default {
     },
     /** 关闭按钮 */
     close() {
+      Global.$emit("removeCache", "closeSelectedTag", this.$route);
       this.$store.dispatch("tagsView/delView", this.$route);
       this.$router.push({ path: "/tool/gen", query: { t: Date.now()}})
     }
