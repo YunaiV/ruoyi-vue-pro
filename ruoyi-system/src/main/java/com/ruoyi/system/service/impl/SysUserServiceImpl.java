@@ -363,6 +363,7 @@ public class SysUserServiceImpl implements ISysUserService
      * @return 结果
      */
     @Override
+    @Transactional
     public int deleteUserById(Long userId)
     {
         // 删除用户与角色关联
@@ -379,12 +380,17 @@ public class SysUserServiceImpl implements ISysUserService
      * @return 结果
      */
     @Override
+    @Transactional
     public int deleteUserByIds(Long[] userIds)
     {
         for (Long userId : userIds)
         {
             checkUserAllowed(new SysUser(userId));
         }
+        // 删除用户与角色关联
+        userRoleMapper.deleteUserRole(userIds);
+        // 删除用户与岗位关联
+        userPostMapper.deleteUserPost(userIds);
         return userMapper.deleteUserByIds(userIds);
     }
 

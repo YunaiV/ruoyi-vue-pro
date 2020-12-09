@@ -238,7 +238,7 @@
 	position: relative;
 	float: right;
 }
-/* XY 代码生成预览左右滑动 */
-.el-tabs__content{
-    overflow-x: scroll;
+/* el-tabs提供滚动机制 */
+.el-tabs__content {
+	overflow-x: scroll;
 }
