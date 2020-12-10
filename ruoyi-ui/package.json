@@ -43,7 +43,7 @@
     "@riophae/vue-treeselect": "0.4.0",
     "axios": "0.18.1",
     "clipboard": "2.0.4",
-    "core-js": "3.6.5",
+    "core-js": "3.8.1",
     "echarts": "4.2.1",
     "element-ui": "2.14.1",
     "file-saver": "2.0.1",
