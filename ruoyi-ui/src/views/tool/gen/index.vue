@@ -159,7 +159,7 @@
     <!-- 预览界面 -->
     <el-dialog :title="preview.title" :visible.sync="preview.open" width="80%" top="5vh" append-to-body>
       <el-tabs v-model="preview.activeName">
-        <el-tab-pane
+        <el-tab-pane style="overflow-x: scroll;"
           v-for="(value, key) in preview.data"
           :label="key.substring(key.lastIndexOf('/')+1,key.indexOf('.vm'))"
           :name="key.substring(key.lastIndexOf('/')+1,key.indexOf('.vm'))"
