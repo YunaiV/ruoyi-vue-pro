@@ -18,8 +18,11 @@ import { getDicts } from "@/api/system/dict/data";
 import { getConfigKey } from "@/api/system/config";
 import { parseTime, resetForm, addDateRange, selectDictLabel, selectDictLabels, download, handleTree } from "@/utils/ruoyi";
 import Pagination from "@/components/Pagination";
-//自定义表格工具扩展
+// 自定义表格工具扩展
 import RightToolbar from "@/components/RightToolbar"
+// 代码高亮插件
+import hljs from 'highlight.js'
+import 'highlight.js/styles/github-gist.css'
 
 // 全局方法挂载
 Vue.prototype.getDicts = getDicts
@@ -49,6 +52,7 @@ Vue.component('Pagination', Pagination)
 Vue.component('RightToolbar', RightToolbar)
 
 Vue.use(permission)
+Vue.use(hljs.vuePlugin);
 
 /**
  * If you don't want to use mock-server

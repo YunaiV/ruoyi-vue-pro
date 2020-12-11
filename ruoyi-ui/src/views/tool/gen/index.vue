@@ -165,7 +165,7 @@
           :name="key.substring(key.lastIndexOf('/')+1,key.indexOf('.vm'))"
           :key="key"
         >
-          <pre>{{ value }}</pre>
+          <highlightjs autodetect :code="value" />
         </el-tab-pane>
       </el-tabs>
     </el-dialog>
@@ -177,6 +177,7 @@
 import { listTable, previewTable, delTable, genCode, synchDb } from "@/api/tool/gen";
 import importTable from "./importTable";
 import { downLoadZip } from "@/utils/zipdownload";
+
 export default {
   name: "Gen",
   components: { importTable },

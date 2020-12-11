@@ -44,6 +44,7 @@
     "element-ui": "2.14.1",
     "file-saver": "2.0.4",
     "fuse.js": "6.4.3",
+    "highlight.js": "10.4.1",
     "js-beautify": "1.13.0",
     "js-cookie": "2.2.1",
     "jsencrypt": "3.0.0-rc.1",
