@@ -136,10 +136,15 @@ public class RedisCache
      * @param dataSet 缓存的数据
      * @return 缓存数据的对象
      */
-    public <T> long setCacheSet(final String key, final Set<T> dataSet)
+    public <T> BoundSetOperations<String, T> setCacheSet(final String key, final Set<T> dataSet)
     {
-        Long count = redisTemplate.opsForSet().add(key, dataSet);
-        return count == null ? 0 : count;
+        BoundSetOperations<String, T> setOperation = redisTemplate.boundSetOps(key);
+        Iterator<T> it = dataSet.iterator();
+        while (it.hasNext())
+        {
+            setOperation.add(it.next());
+        }
+        return setOperation;
     }
 
     /**
