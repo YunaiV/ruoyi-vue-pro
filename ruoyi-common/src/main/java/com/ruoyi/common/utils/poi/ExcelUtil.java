@@ -877,7 +877,7 @@ public class ExcelUtil<T>
      */
     private Object getValue(Object o, String name) throws Exception
     {
-        if (StringUtils.isNotEmpty(name))
+        if (StringUtils.isNotNull(o) && StringUtils.isNotEmpty(name))
         {
             Class<?> clazz = o.getClass();
             Field field = clazz.getDeclaredField(name);

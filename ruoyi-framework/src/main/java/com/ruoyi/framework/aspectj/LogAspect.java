@@ -212,6 +212,7 @@ public class LogAspect
      * @param o 对象信息。
      * @return 如果是需要过滤的对象，则返回true；否则返回false。
      */
+    @SuppressWarnings("rawtypes")
     public boolean isFilterObject(final Object o)
     {
         Class<?> clazz = o.getClass();
@@ -230,7 +231,7 @@ public class LogAspect
         else if (Map.class.isAssignableFrom(clazz))
         {
             Map map = (Map) o;
-            for (Iterator iter = map.entrySet().iterator(); iter.hasNext(); )
+            for (Iterator iter = map.entrySet().iterator(); iter.hasNext();)
             {
                 Map.Entry entry = (Map.Entry) iter.next();
                 return entry.getValue() instanceof MultipartFile;
