@@ -92,6 +92,15 @@
         background-color: rgba(0, 0, 0, 0.06) !important;
       }
     }
+
+    & .theme-dark .nest-menu .el-submenu>.el-submenu__title,
+    & .theme-dark .el-submenu .el-menu-item {
+      background-color: $subMenuBg !important;
+
+      &:hover {
+        background-color: $subMenuHover !important;
+      }
+    }
   }
 
   .hideSidebar {
