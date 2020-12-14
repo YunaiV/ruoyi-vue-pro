@@ -3,7 +3,7 @@ ruoyi:
   # 名称
   name: RuoYi
   # 版本
-  version: 3.2.1
+  version: 3.3.0
   # 版权年份
   copyrightYear: 2020
   # 实例演示开关
