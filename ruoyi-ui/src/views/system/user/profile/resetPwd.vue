@@ -18,7 +18,6 @@
 
 <script>
 import { updateUserPwd } from "@/api/system/user";
-import Global from "@/layout/components/global.js";
 
 export default {
   data() {
@@ -65,7 +64,6 @@ export default {
       });
     },
     close() {
-      Global.$emit("removeCache", "closeSelectedTag", this.$route);
       this.$store.dispatch("tagsView/delView", this.$route);
       this.$router.push({ path: "/index" });
     }
