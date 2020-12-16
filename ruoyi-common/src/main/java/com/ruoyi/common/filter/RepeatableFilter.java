@@ -29,8 +29,8 @@ public class RepeatableFilter implements Filter
             throws IOException, ServletException
     {
         ServletRequest requestWrapper = null;
-        if (request instanceof HttpServletRequest && StringUtils.equalsAnyIgnoreCase(request.getContentType(),
-                MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_JSON_UTF8_VALUE))
+        if (request instanceof HttpServletRequest
+                && StringUtils.equalsAnyIgnoreCase(request.getContentType(), MediaType.APPLICATION_JSON_VALUE))
         {
             requestWrapper = new RepeatedlyRequestWrapper((HttpServletRequest) request, response);
         }
