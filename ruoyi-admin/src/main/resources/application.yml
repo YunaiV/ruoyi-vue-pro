@@ -60,6 +60,8 @@ spring:
   redis:
     # 地址
     host: localhost
+    # 设置不同的库，默认值为0，redis默认16个，即0到15
+    database: 0
     # 端口，默认为6379
     port: 6379
     # 密码
