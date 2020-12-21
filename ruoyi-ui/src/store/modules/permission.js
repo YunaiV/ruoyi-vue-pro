@@ -74,7 +74,6 @@ function filterChildren(childrenMap) {
           }
           children.push(c)
         })
-        childrenMap.splice(index, 1)
         return
       }
     }
