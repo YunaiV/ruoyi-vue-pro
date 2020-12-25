@@ -38,14 +38,27 @@
           <el-option label="请选择字典生成" value="" />
         </el-select>
       </el-form-item>
-#elseif($column.htmlType == "datetime")
+#elseif($column.htmlType == "datetime" && $column.queryType != "BETWEEN")
       <el-form-item label="${comment}" prop="${column.javaField}">
-        <el-date-picker clearable size="small" style="width: 200px"
+        <el-date-picker clearable size="small"
           v-model="queryParams.${column.javaField}"
           type="date"
           value-format="yyyy-MM-dd"
           placeholder="选择${comment}">
         </el-date-picker>
+      </el-form-item>
+#elseif($column.htmlType == "datetime" && $column.queryType == "BETWEEN")
+      <el-form-item label="${comment}">
+        <el-date-picker
+          v-model="daterange${AttrName}"
+          size="small"
+          style="width: 240px"
+          value-format="yyyy-MM-dd"
+          type="daterange"
+          range-separator="-"
+          start-placeholder="开始日期"
+          end-placeholder="结束日期"
+        ></el-date-picker>
       </el-form-item>
 #end
 #end
@@ -95,7 +108,7 @@
           v-hasPermi="['${moduleName}:${businessName}:export']"
         >导出</el-button>
       </el-col>
-	  <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
+      <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
     <el-table v-loading="loading" :data="${businessName}List" @selection-change="handleSelectionChange">
@@ -230,7 +243,7 @@
         </el-form-item>
 #elseif($column.htmlType == "datetime")
         <el-form-item label="${comment}" prop="${field}">
-          <el-date-picker clearable size="small" style="width: 200px"
+          <el-date-picker clearable size="small"
             v-model="form.${field}"
             type="date"
             value-format="yyyy-MM-dd"
@@ -315,6 +328,10 @@ export default {
 #if(${column.dictType} != '')
       // $comment字典
       ${column.javaField}Options: [],
+#elseif($column.htmlType == "datetime" && $column.queryType == "BETWEEN")
+#set($AttrName=$column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
+      // $comment时间范围
+      daterange${AttrName}: [],
 #end
 #end
       // 查询参数
@@ -363,6 +380,21 @@ export default {
     /** 查询${functionName}列表 */
     getList() {
       this.loading = true;
+#foreach ($column in $columns)
+#if($column.htmlType == "datetime" && $column.queryType == "BETWEEN")
+      this.queryParams.params = {};
+#break
+#end
+#end
+#foreach ($column in $columns)
+#if($column.htmlType == "datetime" && $column.queryType == "BETWEEN")
+#set($AttrName=$column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
+      if (null != this.daterange${AttrName} && '' != this.daterange${AttrName}) {
+        this.queryParams.params["begin${AttrName}"] = this.daterange${AttrName}[0];
+        this.queryParams.params["end${AttrName}"] = this.daterange${AttrName}[1];
+      }
+#end
+#end
       list${BusinessName}(this.queryParams).then(response => {
         this.${businessName}List = response.rows;
         this.total = response.total;
@@ -413,6 +445,12 @@ export default {
     },
     /** 重置按钮操作 */
     resetQuery() {
+#foreach ($column in $columns)
+#if($column.htmlType == "datetime" && $column.queryType == "BETWEEN")
+#set($AttrName=$column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
+      this.daterange${AttrName} = [];
+#end
+#end
       this.resetForm("queryForm");
       this.handleQuery();
     },
