@@ -131,7 +131,7 @@
 			<if test="parentId != null">parent_id = #{parentId},</if>
 			<if test="orderNum != null and orderNum != ''">order_num = #{orderNum},</if>
 			<if test="path != null and path != ''">path = #{path},</if>
-			<if test="component != null and component != ''">component = #{component},</if>
+			<if test="component != null">component = #{component},</if>
 			<if test="isFrame != null and isFrame != ''">is_frame = #{isFrame},</if>
 			<if test="isCache != null and isCache != ''">is_cache = #{isCache},</if>
 			<if test="menuType != null and menuType != ''">menu_type = #{menuType},</if>
