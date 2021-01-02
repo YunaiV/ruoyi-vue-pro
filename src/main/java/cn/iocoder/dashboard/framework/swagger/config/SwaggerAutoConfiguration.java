@@ -57,9 +57,7 @@ public class SwaggerAutoConfiguration {
                 .paths(PathSelectors.any())
                 .build()
                 .securitySchemes(securitySchemes())
-                .securityContexts(securityContexts())
-//                .pathMapping() TODO 芋艿：稍后解决，统一 api 前缀
-                ;
+                .securityContexts(securityContexts());
     }
 
     /**

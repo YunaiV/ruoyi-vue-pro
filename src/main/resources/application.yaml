@@ -20,6 +20,8 @@ spring:
 
 # 芋道配置项，设置当前项目所有自定义的配置
 yudao:
+  web:
+    api-prefix: /api
   security:
     token-header: Authorization
     token-secret: abcdefghijklmnopqrstuvwxyz

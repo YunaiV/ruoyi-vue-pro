@@ -8,7 +8,7 @@ axios.defaults.headers['Content-Type'] = 'application/json;charset=utf-8'
 // 创建axios实例
 const service = axios.create({
   // axios中请求配置有baseURL选项，表示请求URL公共部分
-  baseURL: process.env.VUE_APP_BASE_API,
+  baseURL: process.env.VUE_APP_BASE_API + '/api/', // 此处的 /api/ 地址，原因是后端的基础路径为 /api/
   // 超时
   timeout: 10000
 })
@@ -76,13 +76,13 @@ service.interceptors.response.use(res => {
       })
       return Promise.reject('error')
     } else {
-      return res.data
+      return res.data.data // 第二层 data 才是后端返回的 CommonResult.data
     }
   },
   error => {
     console.log('err' + error)
     let { message } = error;
-    if (message == "Network Error") {
+    if (message === "Network Error") {
       message = "后端接口连接异常";
     }
     else if (message.includes("timeout")) {
