@@ -1,7 +1,29 @@
 spring:
-  # 数据源配置项
+  # 数据源配置项 TODO 多数据源；TODO 监控配置
   datasource:
     url: jdbc:mysql://127.0.1:3306/ruoyi-vue-pro?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=CTT
     driver-class-name: com.mysql.jdbc.Driver
     username: root
     password: 123456
+  # redis 配置 TODO 需要进行下，对接到 redisson
+  redis:
+    # 地址
+    host: localhost
+    # 端口，默认为6379
+    port: 6379
+    # 数据库索引
+    database: 0
+    # 连接超时时间
+    timeout: 10s
+
+# 芋道配置项，设置当前项目所有自定义的配置
+yudao:
+  security:
+    token-header: Authorization
+    token-secret: abcdefghijklmnopqrstuvwxyz
+    token-expires: 30m
+  swagger:
+    title: 管理后台
+    description: 提供管理员管理的所有功能
+    version: 1.0.0
+    base-package: cn.iocoder.dashboard.modules
