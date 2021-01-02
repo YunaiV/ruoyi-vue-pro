@@ -1,4 +1,6 @@
 spring:
+  application:
+    name: dashboard
   # 数据源配置项 TODO 多数据源；TODO 监控配置
   datasource:
     url: jdbc:mysql://127.0.1:3306/ruoyi-vue-pro?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=CTT
@@ -21,9 +23,14 @@ yudao:
   security:
     token-header: Authorization
     token-secret: abcdefghijklmnopqrstuvwxyz
-    token-expires: 30m
+    token-timeout: 1d
+    session-timeout: 30m
   swagger:
     title: 管理后台
     description: 提供管理员管理的所有功能
     version: 1.0.0
     base-package: cn.iocoder.dashboard.modules
+  captcha:
+    timeout: 5m
+    width: 160
+    height: 60

@@ -1,0 +1,44 @@
+package cn.iocoder.dashboard.modules.system.dal.redis.dao.common;
+
+import cn.iocoder.dashboard.framework.security.core.LoginUser;
+import com.alibaba.fastjson.JSON;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.stereotype.Repository;
+
+import javax.annotation.Resource;
+
+import java.time.Duration;
+
+import static cn.iocoder.dashboard.modules.system.dal.redis.RedisKeyConstants.CAPTCHA_CODE;
+
+/**
+ * 验证码的 Redis DAO
+ *
+ * @author 芋道源码
+ */
+@Repository
+public class SysCaptchaRedisDAO {
+
+    @Resource
+    private StringRedisTemplate stringRedisTemplate;
+
+    public String get(String uuid) {
+        String redisKey = formatKey(uuid);
+        return stringRedisTemplate.opsForValue().get(redisKey);
+    }
+
+    public void set(String uuid, String code, Duration timeout) {
+        String redisKey = formatKey(uuid);
+        stringRedisTemplate.opsForValue().set(redisKey, code, timeout);
+    }
+
+    public void delete(String uuid) {
+        String redisKey = formatKey(uuid);
+        stringRedisTemplate.delete(redisKey);
+    }
+
+    private static String formatKey(String uuid) {
+        return String.format(CAPTCHA_CODE.getKeyTemplate(), uuid);
+    }
+
+}

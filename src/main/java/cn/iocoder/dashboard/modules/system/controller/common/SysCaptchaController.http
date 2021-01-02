@@ -1,0 +1,2 @@
+### 请求 /captcha/get-image 接口 => 成功
+GET {{baseUrl}}/captcha/get-image
