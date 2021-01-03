@@ -13,6 +13,10 @@ Content-Type: application/json
 GET {{baseUrl}}/get-info
 Authorization: Bearer {{token}}
 
+### 请求 /get-routers 接口 => 成功
+GET {{baseUrl}}/get-routers
+Authorization: Bearer {{token}}
+
 ### 请求 /druid/xxx 接口 => 失败 TODO 临时测试
 GET http://127.0.0.1:8080/druid/123
 Authorization: Bearer {{token}}

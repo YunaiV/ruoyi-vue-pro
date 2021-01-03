@@ -2,6 +2,7 @@ package cn.iocoder.dashboard.modules.system.controller.auth;
 
 import cn.iocoder.dashboard.common.pojo.CommonResult;
 import cn.iocoder.dashboard.modules.system.controller.auth.vo.SysAuthGetInfoRespVO;
+import cn.iocoder.dashboard.modules.system.controller.auth.vo.SysAuthGetRouterRespVO;
 import cn.iocoder.dashboard.modules.system.controller.auth.vo.SysAuthLoginReqVO;
 import cn.iocoder.dashboard.modules.system.controller.auth.vo.SysAuthLoginRespVO;
 import cn.iocoder.dashboard.modules.system.service.auth.SysAuthService;
@@ -11,6 +12,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
+
+import java.util.List;
 
 import static cn.iocoder.dashboard.common.pojo.CommonResult.success;
 import static cn.iocoder.dashboard.framework.security.core.util.SecurityUtils.getLoginUserId;
@@ -37,6 +40,13 @@ public class SysAuthController {
     public CommonResult<SysAuthGetInfoRespVO> getInfo() {
         SysAuthGetInfoRespVO respVO = authService.getInfo(getLoginUserId(), getLoginUserRoleIds());
         return success(respVO);
+    }
+
+    @ApiOperation("获得菜单 Vue 路由")
+    @GetMapping("get-routers")
+    public CommonResult<List<SysAuthGetRouterRespVO>> getRouters() {
+        List<SysAuthGetRouterRespVO> respVOList = authService.getRouters(getLoginUserId(), getLoginUserRoleIds());
+        return success(respVOList);
     }
 
 }

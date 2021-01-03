@@ -2,6 +2,7 @@ package cn.iocoder.dashboard.modules.system.convert.auth;
 
 import cn.iocoder.dashboard.framework.security.core.LoginUser;
 import cn.iocoder.dashboard.modules.system.controller.auth.vo.SysAuthGetInfoRespVO;
+import cn.iocoder.dashboard.modules.system.controller.auth.vo.SysAuthGetRouterRespVO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.permission.SysMenuDO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.permission.SysRoleDO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.user.SysUserDO;
@@ -26,5 +27,7 @@ public interface SysAuthConvert {
         respVO.setPermissions(CollectionUtils.convertSet(menuList, SysMenuDO::getPerms));
         return respVO;
     }
+
+    SysAuthGetRouterRespVO convertTreeNode(SysMenuDO menu);
 
 }

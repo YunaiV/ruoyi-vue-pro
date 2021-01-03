@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollectionUtil;
 
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -15,6 +16,10 @@ public class CollectionUtils {
 
     public static <T> Set<T> asSet(T... objs) {
         return new HashSet<>(Arrays.asList(objs));
+    }
+
+    public static <T> List<T> filterList(Collection<T> from, Predicate<T> predicate) {
+        return from.stream().filter(predicate).collect(Collectors.toList());
     }
 
     public static <T, U> List<U> convertList(List<T> from, Function<T, U> func) {
