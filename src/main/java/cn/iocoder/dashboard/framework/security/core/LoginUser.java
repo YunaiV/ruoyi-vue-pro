@@ -3,7 +3,6 @@ package cn.iocoder.dashboard.framework.security.core;
 import cn.iocoder.dashboard.modules.system.enums.user.UserStatus;
 import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Data;
-import org.springframework.data.annotation.Transient;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -24,9 +23,13 @@ public class LoginUser implements UserDetails {
      */
     private Long userId;
     /**
+     * 科室编号
+     */
+    private Long deptId;
+    /**
      * 角色编号数组
      */
-    private Set<Integer> roleIds;
+    private Set<Long> roleIds;
     /**
      * 最后更新时间
      */

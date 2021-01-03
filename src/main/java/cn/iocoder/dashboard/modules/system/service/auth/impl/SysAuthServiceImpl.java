@@ -4,13 +4,19 @@ import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.dashboard.framework.security.config.SecurityProperties;
 import cn.iocoder.dashboard.framework.security.core.LoginUser;
+import cn.iocoder.dashboard.modules.system.controller.auth.vo.SysAuthGetInfoRespVO;
+import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.permission.SysMenuDO;
+import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.permission.SysRoleDO;
 import cn.iocoder.dashboard.modules.system.enums.user.UserStatus;
 import cn.iocoder.dashboard.modules.system.convert.auth.SysAuthConvert;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.user.SysUserDO;
 import cn.iocoder.dashboard.modules.system.dal.redis.dao.auth.SysLoginUserRedisDAO;
 import cn.iocoder.dashboard.modules.system.service.auth.SysAuthService;
 import cn.iocoder.dashboard.modules.system.service.auth.SysTokenService;
+import cn.iocoder.dashboard.modules.system.service.permission.SysPermissionService;
+import cn.iocoder.dashboard.modules.system.service.permission.SysRoleService;
 import cn.iocoder.dashboard.modules.system.service.user.SysUserService;
+import cn.iocoder.dashboard.util.collection.CollectionUtils;
 import cn.iocoder.dashboard.util.date.DateUtils;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
@@ -27,9 +33,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import javax.annotation.Resource;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Set;
+import java.util.*;
 
 import static cn.iocoder.dashboard.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.*;
@@ -53,6 +57,11 @@ public class SysAuthServiceImpl implements SysAuthService {
     @Resource
     private SysUserService userService;
     @Resource
+    private SysRoleService roleService;
+    @Resource
+    private SysPermissionService permissionService;
+
+    @Resource
     private SysLoginUserRedisDAO loginUserRedisDAO;
 
     @Override
@@ -62,7 +71,6 @@ public class SysAuthServiceImpl implements SysAuthService {
         if (user == null) {
             throw new UsernameNotFoundException(username);
         }
-
         // 创建 LoginUser 对象
         return SysAuthConvert.INSTANCE.convert(user);
     }
@@ -74,11 +82,10 @@ public class SysAuthServiceImpl implements SysAuthService {
         if (user == null) {
             throw new UsernameNotFoundException(String.valueOf(userId));
         }
-
         // 创建 LoginUser 对象
         LoginUser loginUser = SysAuthConvert.INSTANCE.convert(user);
         loginUser.setUpdateTime(new Date());
-        loginUser.setRoleIds(this.getUserRoleIds(loginUser.getUserId()));
+        loginUser.setRoleIds(this.getUserRoleIds(loginUser.getUserId(), loginUser.getDeptId()));
         return loginUser;
     }
 
@@ -89,11 +96,10 @@ public class SysAuthServiceImpl implements SysAuthService {
 
         // 使用账号密码，进行登陆。
         LoginUser loginUser = this.login0(username, password);
-
         // 缓存登陆用户到 Redis 中
         String sessionId = IdUtil.fastSimpleUUID();
         loginUser.setUpdateTime(new Date());
-        loginUser.setRoleIds(this.getUserRoleIds(loginUser.getUserId()));
+        loginUser.setRoleIds(this.getUserRoleIds(loginUser.getUserId(), loginUser.getDeptId()));
         loginUserRedisDAO.set(sessionId, loginUser);
 
         // 创建 Token
@@ -143,11 +149,15 @@ public class SysAuthServiceImpl implements SysAuthService {
      * 获得 User 拥有的角色编号数组
      *
      * @param userId 用户编号
+     * @param deptId 科室编号
      * @return 角色编号数组
      */
-    private Set<Integer> getUserRoleIds(Long userId) {
-        // TODO 芋艿：读取角色编号
-        return Collections.emptySet();
+    private Set<Long> getUserRoleIds(Long userId, Long deptId) {
+        // 用户拥有的角色
+        Set<Long> roleIds = new HashSet<>(permissionService.listUserRoleIds(userId));
+        // 部门拥有的角色
+        CollectionUtils.addIfNotNull(roleIds, permissionService.getDeptRoleId(deptId));
+        return roleIds;
     }
 
     @Override
@@ -162,7 +172,6 @@ public class SysAuthServiceImpl implements SysAuthService {
         // 获得 LoginUser
         LoginUser loginUser = loginUserRedisDAO.get(sessionId);
         if (loginUser == null) {
-//            throw exception(AUTH_SESSION_TIMEOUT);
             return null;
         }
         // 刷新 LoginUser 缓存
@@ -176,18 +185,15 @@ public class SysAuthServiceImpl implements SysAuthService {
             claims = tokenService.parseToken(token);
         } catch (JwtException jwtException) {
             log.warn("[verifyToken][token({}) 解析发生异常]", token);
-//            throw exception(TOKEN_PARSE_FAIL);
             return null;
         }
         // token 已经过期
         if (DateUtils.isExpired(claims.getExpiration())) {
-//            throw exception(TOKEN_EXPIRED);
             return null;
         }
         // 判断 sessionId 是否存在
         String sessionId = claims.getSubject();
         if (StrUtil.isBlank(sessionId)) {
-//            throw exception(AUTH_SESSION_ID_NOT_FOUND);
             return null;
         }
         return sessionId;
@@ -207,9 +213,25 @@ public class SysAuthServiceImpl implements SysAuthService {
         }
 
         // 刷新 LoginUser 缓存
+        loginUser.setDeptId(user.getDeptId());
         loginUser.setUpdateTime(new Date());
-        loginUser.setRoleIds(this.getUserRoleIds(loginUser.getUserId()));
+        loginUser.setRoleIds(this.getUserRoleIds(loginUser.getUserId(), loginUser.getDeptId()));
         loginUserRedisDAO.set(sessionId, loginUser);
+    }
+
+    @Override
+    public SysAuthGetInfoRespVO getInfo(Long userId, Set<Long> roleIds) {
+        // 获得用户信息
+        SysUserDO user = userService.getUser(userId);
+        if (user == null) {
+            return null;
+        }
+        // 获得角色列表
+        List<SysRoleDO> roleList = roleService.listRolesFromCache(roleIds);
+        // 获得菜单列表
+        List<SysMenuDO> menuList = permissionService.listRoleMenusFromCache(roleIds);
+        // 拼接结果返回
+        return SysAuthConvert.INSTANCE.convert(user, roleList, menuList);
     }
 
 }

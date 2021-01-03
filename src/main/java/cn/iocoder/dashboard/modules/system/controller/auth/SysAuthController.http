@@ -1,0 +1,18 @@
+### 请求 /login 接口 => 成功
+POST {{baseUrl}}/login
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "admin123",
+  "uuid": "9b2ffbc1-7425-4155-9894-9d5c08541d62",
+  "code": "1024"
+}
+
+### 请求 /get-info 接口 => 成功
+GET {{baseUrl}}/get-info
+Authorization: Bearer {{token}}
+
+### 请求 /druid/xxx 接口 => 失败 TODO 临时测试
+GET http://127.0.0.1:8080/druid/123
+Authorization: Bearer {{token}}

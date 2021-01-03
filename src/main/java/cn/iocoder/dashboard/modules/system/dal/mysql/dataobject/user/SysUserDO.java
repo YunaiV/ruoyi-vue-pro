@@ -1,24 +1,22 @@
 package cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.user;
 
-import java.util.Date;
-import java.util.List;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
-
 import cn.iocoder.dashboard.framework.excel.Excel;
 import cn.iocoder.dashboard.framework.excel.Excels;
 import cn.iocoder.dashboard.framework.mybatis.core.BaseDO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.dept.SysDept;
-import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.permission.SysRole;
+import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.permission.SysRoleDO;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
+import java.util.Date;
+import java.util.List;
 
 /**
  * 用户 DO
@@ -128,7 +126,7 @@ public class SysUserDO extends BaseDO {
      * 角色对象
      */
     @TableField(exist = false)
-    private List<SysRole> roles;
+    private List<SysRoleDO> roles;
 
     /**
      * 角色组
@@ -141,14 +139,5 @@ public class SysUserDO extends BaseDO {
      */
     @TableField(exist = false)
     private Long[] postIds;
-
-    // TODO 芋艿：后续清理掉
-    public boolean isAdmin() {
-        return isAdmin(this.userId);
-    }
-
-    public static boolean isAdmin(Long userId) {
-        return userId != null && 1L == userId;
-    }
 
 }

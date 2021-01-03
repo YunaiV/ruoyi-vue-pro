@@ -7,6 +7,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Set;
 
 /**
  * 安全服务工具类
@@ -14,6 +15,8 @@ import javax.servlet.http.HttpServletRequest;
  * @author ruoyi
  */
 public class SecurityUtils {
+
+    private SecurityUtils() {}
 
     /**
      * 从请求中，获得认证 Token
@@ -39,6 +42,19 @@ public class SecurityUtils {
      */
     public static LoginUser getLoginUser() {
         return (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    }
+
+    /**
+     * 获得当前用户的编号
+     *
+     * @return 用户编号
+     */
+    public static Long getLoginUserId() {
+        return getLoginUser().getUserId();
+    }
+
+    public static Set<Long> getLoginUserRoleIds() {
+        return getLoginUser().getRoleIds();
     }
 
     /**
