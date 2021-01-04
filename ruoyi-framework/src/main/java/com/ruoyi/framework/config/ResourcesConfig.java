@@ -15,18 +15,16 @@ import com.ruoyi.framework.interceptor.RepeatSubmitInterceptor;
 
 /**
  * 通用配置
- * 
+ *
  * @author ruoyi
  */
 @Configuration
-public class ResourcesConfig implements WebMvcConfigurer
-{
+public class ResourcesConfig implements WebMvcConfigurer {
     @Autowired
     private RepeatSubmitInterceptor repeatSubmitInterceptor;
 
     @Override
-    public void addResourceHandlers(ResourceHandlerRegistry registry)
-    {
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
         /** 本地文件上传路径 */
         registry.addResourceHandler(Constants.RESOURCE_PREFIX + "/**").addResourceLocations("file:" + RuoYiConfig.getProfile() + "/");
 
@@ -39,28 +37,8 @@ public class ResourcesConfig implements WebMvcConfigurer
      * 自定义拦截规则
      */
     @Override
-    public void addInterceptors(InterceptorRegistry registry)
-    {
+    public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(repeatSubmitInterceptor).addPathPatterns("/**");
     }
 
-    /**
-     * 跨域配置
-     */
-    @Bean
-    public CorsFilter corsFilter()
-    {
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        CorsConfiguration config = new CorsConfiguration();
-        config.setAllowCredentials(true);
-        // 设置访问源地址
-        config.addAllowedOrigin("*");
-        // 设置访问源请求头
-        config.addAllowedHeader("*");
-        // 设置访问源请求方法
-        config.addAllowedMethod("*");
-        // 对接口配置跨域设置
-        source.registerCorsConfiguration("/**", config);
-        return new CorsFilter(source);
-    }
 }

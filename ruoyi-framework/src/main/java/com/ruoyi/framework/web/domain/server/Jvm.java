@@ -1,16 +1,16 @@
 package com.ruoyi.framework.web.domain.server;
 
 import java.lang.management.ManagementFactory;
+
 import com.ruoyi.common.utils.Arith;
 import com.ruoyi.common.utils.DateUtils;
 
 /**
  * JVM相关信息
- * 
+ *
  * @author ruoyi
  */
-public class Jvm
-{
+public class Jvm {
     /**
      * 当前JVM占用的内存总数(M)
      */
@@ -36,87 +36,72 @@ public class Jvm
      */
     private String home;
 
-    public double getTotal()
-    {
+    public double getTotal() {
         return Arith.div(total, (1024 * 1024), 2);
     }
 
-    public void setTotal(double total)
-    {
+    public void setTotal(double total) {
         this.total = total;
     }
 
-    public double getMax()
-    {
+    public double getMax() {
         return Arith.div(max, (1024 * 1024), 2);
     }
 
-    public void setMax(double max)
-    {
+    public void setMax(double max) {
         this.max = max;
     }
 
-    public double getFree()
-    {
+    public double getFree() {
         return Arith.div(free, (1024 * 1024), 2);
     }
 
-    public void setFree(double free)
-    {
+    public void setFree(double free) {
         this.free = free;
     }
 
-    public double getUsed()
-    {
+    public double getUsed() {
         return Arith.div(total - free, (1024 * 1024), 2);
     }
 
-    public double getUsage()
-    {
+    public double getUsage() {
         return Arith.mul(Arith.div(total - free, total, 4), 100);
     }
 
     /**
      * 获取JDK名称
      */
-    public String getName()
-    {
+    public String getName() {
         return ManagementFactory.getRuntimeMXBean().getVmName();
     }
 
-    public String getVersion()
-    {
+    public String getVersion() {
         return version;
     }
 
-    public void setVersion(String version)
-    {
+    public void setVersion(String version) {
         this.version = version;
     }
 
-    public String getHome()
-    {
+    public String getHome() {
         return home;
     }
 
-    public void setHome(String home)
-    {
+    public void setHome(String home) {
         this.home = home;
     }
 
     /**
      * JDK启动时间
      */
-    public String getStartTime()
-    {
+    public String getStartTime() {
         return DateUtils.parseDateToStr(DateUtils.YYYY_MM_DD_HH_MM_SS, DateUtils.getServerStartDate());
     }
 
     /**
      * JDK运行时间
      */
-    public String getRunTime()
-    {
+    public String getRunTime() {
         return DateUtils.getDatePoor(DateUtils.getNowDate(), DateUtils.getServerStartDate());
     }
 }

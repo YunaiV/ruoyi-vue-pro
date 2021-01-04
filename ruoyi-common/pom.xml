@@ -29,11 +29,6 @@
             <artifactId>spring-web</artifactId>
         </dependency>
 
-        <!-- spring security 安全认证 -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-security</artifactId>
-        </dependency>
 
         <!-- pagehelper 分页插件 -->
         <dependency>
@@ -52,7 +47,7 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
         </dependency>
-  
+
         <!-- JSON工具类 -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>

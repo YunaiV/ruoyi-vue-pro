@@ -1,6 +1,7 @@
 package com.ruoyi.framework.config;
 
 import java.util.TimeZone;
+
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
 import org.springframework.context.annotation.Bean;
@@ -17,14 +18,12 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 @EnableAspectJAutoProxy(exposeProxy = true)
 // 指定要扫描的Mapper类的包的路径
 @MapperScan("com.ruoyi.**.mapper")
-public class ApplicationConfig
-{
+public class ApplicationConfig {
     /**
      * 时区配置
      */
     @Bean
-    public Jackson2ObjectMapperBuilderCustomizer jacksonObjectMapperCustomization()
-    {
+    public Jackson2ObjectMapperBuilderCustomizer jacksonObjectMapperCustomization() {
         return jacksonObjectMapperBuilder -> jacksonObjectMapperBuilder.timeZone(TimeZone.getDefault());
     }
 }
