@@ -2,6 +2,7 @@ package cn.iocoder.dashboard.modules.system.service.auth.impl;
 
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.iocoder.dashboard.common.enums.CommonStatusEnum;
 import cn.iocoder.dashboard.framework.security.config.SecurityProperties;
 import cn.iocoder.dashboard.framework.security.core.LoginUser;
 import cn.iocoder.dashboard.modules.system.controller.auth.vo.SysAuthGetInfoRespVO;
@@ -12,6 +13,7 @@ import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.permission.SysRo
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.user.SysUserDO;
 import cn.iocoder.dashboard.modules.system.dal.redis.dao.auth.SysLoginUserRedisDAO;
 import cn.iocoder.dashboard.modules.system.enums.permission.MenuIdEnum;
+import cn.iocoder.dashboard.modules.system.enums.permission.MenuTypeEnum;
 import cn.iocoder.dashboard.modules.system.enums.user.UserStatus;
 import cn.iocoder.dashboard.modules.system.service.auth.SysAuthService;
 import cn.iocoder.dashboard.modules.system.service.auth.SysTokenService;
@@ -19,6 +21,7 @@ import cn.iocoder.dashboard.modules.system.service.permission.SysPermissionServi
 import cn.iocoder.dashboard.modules.system.service.permission.SysRoleService;
 import cn.iocoder.dashboard.modules.system.service.user.SysUserService;
 import cn.iocoder.dashboard.util.collection.CollectionUtils;
+import cn.iocoder.dashboard.util.collection.SetUtils;
 import cn.iocoder.dashboard.util.date.DateUtils;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
@@ -231,22 +234,24 @@ public class SysAuthServiceImpl implements SysAuthService {
         // 获得角色列表
         List<SysRoleDO> roleList = roleService.listRolesFromCache(roleIds);
         // 获得菜单列表
-        List<SysMenuDO> menuList = permissionService.listRoleMenusFromCache(roleIds);
+        List<SysMenuDO> menuList = permissionService.listRoleMenusFromCache(roleIds,
+                SetUtils.asSet(MenuTypeEnum.DIR.getType(), MenuTypeEnum.MENU.getType(), MenuTypeEnum.BUTTON.getType()),
+                SetUtils.asSet(CommonStatusEnum.ENABLE.getStatus()));
         // 拼接结果返回
         return SysAuthConvert.INSTANCE.convert(user, roleList, menuList);
     }
 
     @Override
     public List<SysAuthGetRouterRespVO> getRouters(Long userId, Set<Long> roleIds) {
-        // TODO 芋艿：去除 F 的类型，去除 禁用 的
-        List<SysMenuDO> menuList = permissionService.listRoleMenusFromCache(roleIds);
+        List<SysMenuDO> menuList = permissionService.listRoleMenusFromCache(roleIds,
+                SetUtils.asSet(MenuTypeEnum.DIR.getType(), MenuTypeEnum.MENU.getType()),
+                SetUtils.asSet(CommonStatusEnum.ENABLE.getStatus()));
         // 转换成 Tree 结构返回
         return buildRouterTree(menuList);
     }
 
     private static List<SysAuthGetRouterRespVO> buildRouterTree(List<SysMenuDO> menuList) {
         // 排序，保证菜单的有序性
-        menuList = new ArrayList<>(menuList); // 使用 ArrayList 套一下，因为 menuList 是不可修改的 List
         menuList.sort(Comparator.comparing(SysMenuDO::getOrderNum));
         // 构建菜单树
         // 使用 LinkedHashMap 的原因，是为了排序 。实际也可以用 Stream API ，就是太丑了。

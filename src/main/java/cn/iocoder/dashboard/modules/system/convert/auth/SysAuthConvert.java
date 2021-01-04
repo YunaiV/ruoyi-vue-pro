@@ -22,10 +22,11 @@ public interface SysAuthConvert {
     LoginUser convert(SysUserDO bean);
 
     default SysAuthGetInfoRespVO convert(SysUserDO user, List<SysRoleDO> roleList, List<SysMenuDO> menuList) {
-        SysAuthGetInfoRespVO respVO = new SysAuthGetInfoRespVO();
-        respVO.setRoles(CollectionUtils.convertSet(roleList, SysRoleDO::getRoleKey));
-        respVO.setPermissions(CollectionUtils.convertSet(menuList, SysMenuDO::getPerms));
-        return respVO;
+        return SysAuthGetInfoRespVO.builder()
+                .user(SysAuthGetInfoRespVO.UserVO.builder().nickname(user.getNickname()).avatar(user.getAvatar()).build())
+                .roles(CollectionUtils.convertSet(roleList, SysRoleDO::getRoleKey))
+                .permissions(CollectionUtils.convertSet(menuList, SysMenuDO::getPerms))
+                .build();
     }
 
     SysAuthGetRouterRespVO convertTreeNode(SysMenuDO menu);

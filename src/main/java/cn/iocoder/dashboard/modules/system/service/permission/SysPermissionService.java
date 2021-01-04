@@ -22,10 +22,15 @@ public interface SysPermissionService {
     /**
      * 获得角色们拥有的菜单列表，从缓存中获取
      *
-     * @param roleIds 角色编号素组
+     * 任一参数为空时，则返回为空
+     *
+     * @param roleIds 角色编号数组
+     * @param menuTypes 菜单类型数组
+     * @param menusStatuses 菜单状态数组
      * @return 菜单列表
      */
-    List<SysMenuDO> listRoleMenusFromCache(Collection<Long> roleIds);
+    List<SysMenuDO> listRoleMenusFromCache(Collection<Long> roleIds, Collection<String> menuTypes,
+                                           Collection<String> menusStatuses);
 
     /**
      * 获得用户拥有的角色编号数组

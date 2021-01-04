@@ -14,8 +14,8 @@ import java.util.stream.Collectors;
  */
 public class CollectionUtils {
 
-    public static <T> Set<T> asSet(T... objs) {
-        return new HashSet<>(Arrays.asList(objs));
+    public static boolean isAnyEmpty(Collection<?>... collections) {
+        return Arrays.stream(collections).anyMatch(CollectionUtil::isEmpty);
     }
 
     public static <T> List<T> filterList(Collection<T> from, Predicate<T> predicate) {

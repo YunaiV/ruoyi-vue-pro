@@ -1,10 +1,9 @@
 package cn.iocoder.dashboard.modules.system.service.permission.impl;
 
-import cn.hutool.core.collection.CollectionUtil;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dao.permission.SysMenuMapper;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.permission.SysMenuDO;
 import cn.iocoder.dashboard.modules.system.service.permission.SysMenuService;
-import com.google.common.collect.ImmutableList;
+import cn.iocoder.dashboard.util.collection.CollectionUtils;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
@@ -13,10 +12,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -64,18 +60,27 @@ public class SysMenuServiceImpl implements SysMenuService {
     }
 
     @Override
-    public List<SysMenuDO> listMenusFromCache() {
-        // Guava ImmutableMap 对应的 value 类型为 ImmutableCollection
-        // 而 ImmutableList 在 copyof 时，如果入参类型为 ImmutableCollection 时，会进行包装，而不会进行复制。
-        return ImmutableList.copyOf(menuCache.values());
+    public List<SysMenuDO> listMenusFromCache(Collection<String> menuTypes, Collection<String> menusStatuses) {
+        // 任一一个参数为空，则返回空
+        if (CollectionUtils.isAnyEmpty(menuTypes, menusStatuses)) {
+            return Collections.emptyList();
+        }
+        // 创建新数组，避免缓存被修改
+        return menuCache.values().stream().filter(menu -> menuTypes.contains(menu.getMenuType())
+                && menusStatuses.contains(menu.getStatus()))
+                .collect(Collectors.toList());
     }
 
     @Override
-    public List<SysMenuDO> listMenusFromCache(Collection<Long> menuIds) {
-        if (CollectionUtil.isEmpty(menuIds)) {
+    public List<SysMenuDO> listMenusFromCache(Collection<Long> menuIds, Collection<String> menuTypes,
+                                              Collection<String> menusStatuses) {
+        // 任一一个参数为空，则返回空
+        if (CollectionUtils.isAnyEmpty(menuIds, menuTypes, menusStatuses)) {
             return Collections.emptyList();
         }
-        return menuCache.values().stream().filter(menuDO -> menuIds.contains(menuDO.getMenuId()))
+        return menuCache.values().stream().filter(menu -> menuIds.contains(menu.getMenuId())
+                && menuTypes.contains(menu.getMenuType())
+                && menusStatuses.contains(menu.getStatus()))
                 .collect(Collectors.toList());
     }
 }

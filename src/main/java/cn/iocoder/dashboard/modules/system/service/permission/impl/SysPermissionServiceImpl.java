@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -77,16 +78,21 @@ public class SysPermissionServiceImpl implements SysPermissionService {
     }
 
     @Override
-    public List<SysMenuDO> listRoleMenusFromCache(Collection<Long> roleIds) {
+    public List<SysMenuDO> listRoleMenusFromCache(Collection<Long> roleIds, Collection<String> menuTypes,
+                                                  Collection<String> menusStatuses) {
+        // 任一一个参数为空时，不返回任何菜单
+        if (CollectionUtils.isAnyEmpty(roleIds, menusStatuses, menusStatuses)) {
+            return Collections.emptyList();
+        }
         // 判断角色是否包含管理员
         List<SysRoleDO> roleList = roleService.listRolesFromCache(roleIds);
         boolean hasAdmin = roleService.hasAnyAdmin(roleList);
         // 获得角色拥有的菜单关联
         if (hasAdmin) { // 管理员，获取到全部
-            return menuService.listMenusFromCache();
+            return menuService.listMenusFromCache(menuTypes, menusStatuses);
         }
         List<Long> menuIds = MapUtils.getList(roleMenuCache, roleIds);
-        return menuService.listMenusFromCache(menuIds);
+        return menuService.listMenusFromCache(menuIds, menuTypes, menusStatuses);
     }
 
     @Override
