@@ -1,6 +1,9 @@
 package cn.iocoder.dashboard.modules.system.controller.auth.vo;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
@@ -10,6 +13,9 @@ import java.util.List;
  * @author ruoyi
  */
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class SysAuthGetRouterRespVO {
 
     /**
@@ -62,6 +68,9 @@ public class SysAuthGetRouterRespVO {
     private List<SysAuthGetRouterRespVO> children;
 
     @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
     public static class MetaVO {
 
         /**

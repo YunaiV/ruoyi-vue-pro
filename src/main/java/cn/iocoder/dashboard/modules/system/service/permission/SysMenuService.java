@@ -11,7 +11,7 @@ import java.util.List;
 public interface SysMenuService {
 
     /**
-     *
+     * 初始化菜单
      */
     void init();
 
@@ -38,5 +38,7 @@ public interface SysMenuService {
      */
     List<SysMenuDO> listMenusFromCache(Collection<Long> menuIds, Collection<String> menuTypes,
                                        Collection<String> menusStatuses);
+
+
 
 }
