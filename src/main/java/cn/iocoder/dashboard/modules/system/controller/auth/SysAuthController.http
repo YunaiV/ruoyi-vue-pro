@@ -9,12 +9,12 @@ Content-Type: application/json
   "code": "1024"
 }
 
-### 请求 /get-info 接口 => 成功
-GET {{baseUrl}}/get-info
+### 请求 /get-permission-info 接口 => 成功
+GET {{baseUrl}}/get-permission-info
 Authorization: Bearer {{token}}
 
-### 请求 /get-routers 接口 => 成功
-GET {{baseUrl}}/get-routers
+### 请求 /list-menus 接口 => 成功
+GET {{baseUrl}}/list-menus
 Authorization: Bearer {{token}}
 
 ### 请求 /druid/xxx 接口 => 失败 TODO 临时测试

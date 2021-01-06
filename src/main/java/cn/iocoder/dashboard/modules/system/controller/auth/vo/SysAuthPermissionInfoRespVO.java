@@ -9,20 +9,20 @@ import lombok.NoArgsConstructor;
 
 import java.util.Set;
 
-@ApiModel("获得用户信息 Resp VO")
+@ApiModel(value = "登陆用户的权限信息 Response VO", description = "额外包括用户信息和角色列表")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class SysAuthGetInfoRespVO {
+public class SysAuthPermissionInfoRespVO {
 
     @ApiModelProperty(value = "用户信息", required = true)
     private UserVO user;
 
-    @ApiModelProperty(value = "角色权限数组", required = true)
+    @ApiModelProperty(value = "角色标识数组", required = true)
     private Set<String> roles;
 
-    @ApiModelProperty(value = "菜单权限数组", required = true)
+    @ApiModelProperty(value = "操作权限数组", required = true)
     private Set<String> permissions;
 
     @ApiModel("用户信息 VO")

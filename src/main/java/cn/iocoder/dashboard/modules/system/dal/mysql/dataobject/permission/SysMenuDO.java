@@ -56,25 +56,10 @@ public class SysMenuDO extends BaseDO {
     private String component;
 
     /**
-     * 是否为外链（0是 1否）
-     */
-    private String isFrame;
-
-    /**
-     * 是否缓存（0缓存 1不缓存）
-     */
-    private String isCache;
-
-    /**
      * 类型（M目录 C菜单 F按钮）
      */
     @NotBlank(message = "菜单类型不能为空")
     private String menuType;
-
-    /**
-     * 显示状态（0显示 1隐藏）
-     */
-    private String visible;
 
     /**
      * 菜单状态（0显示 1隐藏）
@@ -85,7 +70,7 @@ public class SysMenuDO extends BaseDO {
      * 权限字符串
      */
     @Size(max = 100, message = "权限标识长度不能超过100个字符")
-    private String perms;
+    private String permission;
 
     /**
      * 菜单图标

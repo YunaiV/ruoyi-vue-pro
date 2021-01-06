@@ -1,8 +1,8 @@
 package cn.iocoder.dashboard.modules.system.controller.auth;
 
 import cn.iocoder.dashboard.common.pojo.CommonResult;
-import cn.iocoder.dashboard.modules.system.controller.auth.vo.SysAuthGetInfoRespVO;
-import cn.iocoder.dashboard.modules.system.controller.auth.vo.SysAuthGetRouterRespVO;
+import cn.iocoder.dashboard.modules.system.controller.auth.vo.SysAuthMenuRespVO;
+import cn.iocoder.dashboard.modules.system.controller.auth.vo.SysAuthPermissionInfoRespVO;
 import cn.iocoder.dashboard.modules.system.controller.auth.vo.SysAuthLoginReqVO;
 import cn.iocoder.dashboard.modules.system.controller.auth.vo.SysAuthLoginRespVO;
 import cn.iocoder.dashboard.modules.system.service.auth.SysAuthService;
@@ -35,17 +35,17 @@ public class SysAuthController {
         return success(SysAuthLoginRespVO.builder().token(token).build());
     }
 
-    @ApiOperation("获取登陆用户的信息")
-    @GetMapping("/get-info")
-    public CommonResult<SysAuthGetInfoRespVO> getInfo() {
-        SysAuthGetInfoRespVO respVO = authService.getInfo(getLoginUserId(), getLoginUserRoleIds());
+    @ApiOperation("获取登陆用户的权限信息")
+    @GetMapping("/get-permission-info")
+    public CommonResult<SysAuthPermissionInfoRespVO> getPermissionInfo() {
+        SysAuthPermissionInfoRespVO respVO = authService.getPermissionInfo(getLoginUserId(), getLoginUserRoleIds());
         return success(respVO);
     }
 
-    @ApiOperation("获得菜单 Vue 路由")
-    @GetMapping("get-routers")
-    public CommonResult<List<SysAuthGetRouterRespVO>> getRouters() {
-        List<SysAuthGetRouterRespVO> respVOList = authService.getRouters(getLoginUserId(), getLoginUserRoleIds());
+    @ApiOperation("获得登陆用户的菜单列表")
+    @GetMapping("list-menus")
+    public CommonResult<List<SysAuthMenuRespVO>> listMenus() {
+        List<SysAuthMenuRespVO> respVOList = authService.listMenus(getLoginUserId(), getLoginUserRoleIds());
         return success(respVOList);
     }
 

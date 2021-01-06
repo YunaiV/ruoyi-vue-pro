@@ -34,7 +34,7 @@ public class SysMenuServiceImpl implements SysMenuService {
     private volatile Map<Long, SysMenuDO> menuCache;
     /**
      * 权限与菜单缓存
-     * key：权限 {@link SysMenuDO#getPerms()}
+     * key：权限 {@link SysMenuDO#getPermission()}
      * value：SysMenuDO 数组，因为一个权限可能对应多个 SysMenuDO 对象
      *
      * 这里声明 volatile 修饰的原因是，每次刷新时，直接修改指向
@@ -55,7 +55,7 @@ public class SysMenuServiceImpl implements SysMenuService {
         ImmutableMultimap.Builder<String, SysMenuDO> permMenuCacheBuilder = ImmutableMultimap.builder();
         menuList.forEach(menuDO -> {
             menuCacheBuilder.put(menuDO.getMenuId(), menuDO);
-            permMenuCacheBuilder.put(menuDO.getPerms(), menuDO);
+            permMenuCacheBuilder.put(menuDO.getPermission(), menuDO);
         });
         menuCache = menuCacheBuilder.build();
         permMenuCache = permMenuCacheBuilder.build();

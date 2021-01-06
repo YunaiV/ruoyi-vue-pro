@@ -5,8 +5,8 @@ import cn.hutool.core.util.StrUtil;
 import cn.iocoder.dashboard.common.enums.CommonStatusEnum;
 import cn.iocoder.dashboard.framework.security.config.SecurityProperties;
 import cn.iocoder.dashboard.framework.security.core.LoginUser;
-import cn.iocoder.dashboard.modules.system.controller.auth.vo.SysAuthGetInfoRespVO;
-import cn.iocoder.dashboard.modules.system.controller.auth.vo.SysAuthGetRouterRespVO;
+import cn.iocoder.dashboard.modules.system.controller.auth.vo.SysAuthPermissionInfoRespVO;
+import cn.iocoder.dashboard.modules.system.controller.auth.vo.SysAuthMenuRespVO;
 import cn.iocoder.dashboard.modules.system.convert.auth.SysAuthConvert;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.permission.SysMenuDO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.permission.SysRoleDO;
@@ -225,7 +225,7 @@ public class SysAuthServiceImpl implements SysAuthService {
     }
 
     @Override
-    public SysAuthGetInfoRespVO getInfo(Long userId, Set<Long> roleIds) {
+    public SysAuthPermissionInfoRespVO getPermissionInfo(Long userId, Set<Long> roleIds) {
         // 获得用户信息
         SysUserDO user = userService.getUser(userId);
         if (user == null) {
@@ -242,7 +242,7 @@ public class SysAuthServiceImpl implements SysAuthService {
     }
 
     @Override
-    public List<SysAuthGetRouterRespVO> getRouters(Long userId, Set<Long> roleIds) {
+    public List<SysAuthMenuRespVO> listMenus(Long userId, Set<Long> roleIds) {
         List<SysMenuDO> menuList = permissionService.listRoleMenusFromCache(roleIds,
                 SetUtils.asSet(MenuTypeEnum.DIR.getType(), MenuTypeEnum.MENU.getType()),
                 SetUtils.asSet(CommonStatusEnum.ENABLE.getStatus()));
@@ -250,17 +250,17 @@ public class SysAuthServiceImpl implements SysAuthService {
         return buildRouterTree(menuList);
     }
 
-    private static List<SysAuthGetRouterRespVO> buildRouterTree(List<SysMenuDO> menuList) {
+    private static List<SysAuthMenuRespVO> buildRouterTree(List<SysMenuDO> menuList) {
         // 排序，保证菜单的有序性
         menuList.sort(Comparator.comparing(SysMenuDO::getOrderNum));
         // 构建菜单树
         // 使用 LinkedHashMap 的原因，是为了排序 。实际也可以用 Stream API ，就是太丑了。
-        Map<Long, SysAuthGetRouterRespVO> treeNodeMap = new LinkedHashMap<>();
+        Map<Long, SysAuthMenuRespVO> treeNodeMap = new LinkedHashMap<>();
         menuList.forEach(menu -> treeNodeMap.put(menu.getMenuId(), SysAuthConvert.INSTANCE.convertTreeNode(menu)));
         // 处理父子关系
         treeNodeMap.values().stream().filter(node -> !node.getParentId().equals(MenuIdEnum.ROOT.getId())).forEach((childNode) -> {
             // 获得父节点
-            SysAuthGetRouterRespVO parentNode = treeNodeMap.get(childNode.getParentId());
+            SysAuthMenuRespVO parentNode = treeNodeMap.get(childNode.getParentId());
             if (parentNode == null) {
                 log.error("[buildRouterTree][resource({}) 找不到父资源({})]", childNode.getMenuId(), childNode.getParentId());
                 return;
