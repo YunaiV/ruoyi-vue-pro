@@ -59,3 +59,11 @@ export function exportData(query) {
     params: query
   })
 }
+
+// 查询全部字典数据列表
+export function listSimpleDictDatas() {
+  return request({
+    url: '/system/dict-data/list-all-simple',
+    method: 'get',
+  })
+}

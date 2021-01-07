@@ -211,6 +211,8 @@ import Treeselect from "@riophae/vue-treeselect";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 import IconSelect from "@/components/IconSelect";
 
+import { getDictDataLabel, getDictDatas, DICT_TYPE } from '@/utils/dict'
+
 export default {
   name: "Menu",
   components: { Treeselect, IconSelect },
@@ -255,12 +257,6 @@ export default {
   },
   created() {
     this.getList();
-    this.getDicts("sys_show_hide").then(response => {
-      this.visibleOptions = response.data;
-    });
-    this.getDicts("sys_normal_disable").then(response => {
-      this.statusOptions = response.data;
-    });
   },
   methods: {
     // 选择图标
@@ -295,19 +291,9 @@ export default {
         this.menuOptions.push(menu);
       });
     },
-    // 显示状态字典翻译
-    visibleFormat(row, column) {
-      if (row.menuType == "3") {
-        return "";
-      }
-      return this.selectDictLabel(this.visibleOptions, row.visible);
-    },
     // 菜单状态字典翻译
     statusFormat(row, column) {
-      if (row.menuType == "3") {
-        return "";
-      }
-      return this.selectDictLabel(this.statusOptions, row.status);
+      return getDictDataLabel(DICT_TYPE.SYS_COMMON_STATUS, row.status)
     },
     // 取消按钮
     cancel() {

@@ -19,7 +19,7 @@ import javax.validation.constraints.Size;
 @TableName("sys_dict_data")
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class SysDictData extends BaseDO {
+public class SysDictDataDO extends BaseDO {
 
     /**
      * 字典编码
@@ -31,7 +31,7 @@ public class SysDictData extends BaseDO {
      * 字典排序
      */
     @Excel(name = "字典排序", cellType = Excel.ColumnType.NUMERIC)
-    private Long dictSort;
+    private Integer dictSort;
     /**
      * 字典标签
      */
@@ -48,6 +48,8 @@ public class SysDictData extends BaseDO {
     private String dictValue;
     /**
      * 字典类型
+     *
+     * 外键 {@link SysDictDataDO#getDictType()}
      */
     @Excel(name = "字典类型")
     @NotBlank(message = "字典类型不能为空")

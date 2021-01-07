@@ -37,6 +37,7 @@ const user = {
       const uuid = userInfo.uuid
       return new Promise((resolve, reject) => {
         login(username, password, code, uuid).then(res => {
+          res = res.data;
           setToken(res.token)
           commit('SET_TOKEN', res.token)
           resolve()
@@ -53,7 +54,6 @@ const user = {
           res = res.data; // 读取 data 数据
           const user = res.user
           const avatar = user.avatar === "" ? require("@/assets/images/profile.jpg") : process.env.VUE_APP_BASE_API + user.avatar;
-          debugger
           if (res.roles && res.roles.length > 0) { // 验证返回的roles是否是一个非空数组
             commit('SET_ROLES', res.roles)
             commit('SET_PERMISSIONS', res.permissions)
