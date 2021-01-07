@@ -51,8 +51,8 @@
           <svg-icon :icon-class="scope.row.icon" />
         </template>
       </el-table-column>
-      <el-table-column prop="orderNum" label="排序" width="60"></el-table-column>
-      <el-table-column prop="perms" label="权限标识" :show-overflow-tooltip="true"></el-table-column>
+      <el-table-column prop="sort" label="排序" width="60"></el-table-column>
+      <el-table-column prop="permission" label="权限标识" :show-overflow-tooltip="true"></el-table-column>
       <el-table-column prop="component" label="组件路径" :show-overflow-tooltip="true"></el-table-column>
       <el-table-column prop="status" label="状态" :formatter="statusFormat" width="80"></el-table-column>
       <el-table-column label="创建时间" align="center" prop="createTime">
@@ -62,16 +62,16 @@
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-          <el-button size="mini" 
-            type="text" 
-            icon="el-icon-edit" 
+          <el-button size="mini"
+            type="text"
+            icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
             v-hasPermi="['system:menu:edit']"
           >修改</el-button>
-          <el-button 
-            size="mini" 
-            type="text" 
-            icon="el-icon-plus" 
+          <el-button
+            size="mini"
+            type="text"
+            icon="el-icon-plus"
             @click="handleAdd(scope.row)"
             v-hasPermi="['system:menu:add']"
           >新增</el-button>
@@ -104,14 +104,14 @@
           <el-col :span="24">
             <el-form-item label="菜单类型" prop="menuType">
               <el-radio-group v-model="form.menuType">
-                <el-radio label="M">目录</el-radio>
-                <el-radio label="C">菜单</el-radio>
-                <el-radio label="F">按钮</el-radio>
+                <el-radio label="1">目录</el-radio>
+                <el-radio label="2">菜单</el-radio>
+                <el-radio label="3">按钮</el-radio>
               </el-radio-group>
             </el-form-item>
           </el-col>
           <el-col :span="24">
-            <el-form-item v-if="form.menuType != 'F'" label="菜单图标">
+            <el-form-item v-if="form.menuType != '3'" label="菜单图标">
               <el-popover
                 placement="bottom-start"
                 width="460"
@@ -143,7 +143,7 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item v-if="form.menuType != 'F'" label="是否外链">
+            <el-form-item v-if="form.menuType != '3'" label="是否外链">
               <el-radio-group v-model="form.isFrame">
                 <el-radio label="0">是</el-radio>
                 <el-radio label="1">否</el-radio>
@@ -151,22 +151,22 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item v-if="form.menuType != 'F'" label="路由地址" prop="path">
+            <el-form-item v-if="form.menuType != '3'" label="路由地址" prop="path">
               <el-input v-model="form.path" placeholder="请输入路由地址" />
             </el-form-item>
           </el-col>
-          <el-col :span="12" v-if="form.menuType == 'C'">
+          <el-col :span="12" v-if="form.menuType == '2'">
             <el-form-item label="组件路径" prop="component">
               <el-input v-model="form.component" placeholder="请输入组件路径" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item v-if="form.menuType != 'M'" label="权限标识">
+            <el-form-item v-if="form.menuType != '1'" label="权限标识">
               <el-input v-model="form.perms" placeholder="请权限标识" maxlength="50" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item v-if="form.menuType != 'F'" label="显示状态">
+            <el-form-item v-if="form.menuType != '3'" label="显示状态">
               <el-radio-group v-model="form.visible">
                 <el-radio
                   v-for="dict in visibleOptions"
@@ -177,7 +177,7 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item v-if="form.menuType != 'F'" label="菜单状态">
+            <el-form-item v-if="form.menuType != '3'" label="菜单状态">
               <el-radio-group v-model="form.status">
                 <el-radio
                   v-for="dict in statusOptions"
@@ -188,7 +188,7 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item v-if="form.menuType == 'C'" label="是否缓存">
+            <el-form-item v-if="form.menuType == '2'" label="是否缓存">
               <el-radio-group v-model="form.isCache">
                 <el-radio label="0">缓存</el-radio>
                 <el-radio label="1">不缓存</el-radio>
@@ -297,14 +297,14 @@ export default {
     },
     // 显示状态字典翻译
     visibleFormat(row, column) {
-      if (row.menuType == "F") {
+      if (row.menuType == "3") {
         return "";
       }
       return this.selectDictLabel(this.visibleOptions, row.visible);
     },
     // 菜单状态字典翻译
     statusFormat(row, column) {
-      if (row.menuType == "F") {
+      if (row.menuType == "3") {
         return "";
       }
       return this.selectDictLabel(this.statusOptions, row.status);
@@ -321,7 +321,7 @@ export default {
         parentId: 0,
         menuName: undefined,
         icon: undefined,
-        menuType: "M",
+        menuType: "1",
         orderNum: undefined,
         isFrame: "1",
         isCache: "0",

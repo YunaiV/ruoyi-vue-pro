@@ -1,5 +1,8 @@
 package cn.iocoder.dashboard.modules.system.service.permission.impl;
 
+import cn.iocoder.dashboard.modules.system.controller.permission.vo.SysMenuListReqVO;
+import cn.iocoder.dashboard.modules.system.controller.permission.vo.SysMenuRespVO;
+import cn.iocoder.dashboard.modules.system.convert.permission.SysMenuConvert;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dao.permission.SysMenuMapper;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.permission.SysMenuDO;
 import cn.iocoder.dashboard.modules.system.service.permission.SysMenuService;
@@ -63,7 +66,14 @@ public class SysMenuServiceImpl implements SysMenuService {
     }
 
     @Override
-    public List<SysMenuDO> listMenusFromCache(Collection<String> menuTypes, Collection<String> menusStatuses) {
+    public List<SysMenuRespVO> listMenus(SysMenuListReqVO reqVO) {
+        List<SysMenuDO> list = menuMapper.selectList(null);
+        // TODO 排序
+        return SysMenuConvert.INSTANCE.convertList(list);
+    }
+
+    @Override
+    public List<SysMenuDO> listMenusFromCache(Collection<Integer> menuTypes, Collection<Integer> menusStatuses) {
         // 任一一个参数为空，则返回空
         if (CollectionUtils.isAnyEmpty(menuTypes, menusStatuses)) {
             return Collections.emptyList();
@@ -75,8 +85,8 @@ public class SysMenuServiceImpl implements SysMenuService {
     }
 
     @Override
-    public List<SysMenuDO> listMenusFromCache(Collection<Long> menuIds, Collection<String> menuTypes,
-                                              Collection<String> menusStatuses) {
+    public List<SysMenuDO> listMenusFromCache(Collection<Long> menuIds, Collection<Integer> menuTypes,
+                                              Collection<Integer> menusStatuses) {
         // 任一一个参数为空，则返回空
         if (CollectionUtils.isAnyEmpty(menuIds, menuTypes, menusStatuses)) {
             return Collections.emptyList();

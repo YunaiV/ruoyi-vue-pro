@@ -76,7 +76,7 @@ service.interceptors.response.use(res => {
       })
       return Promise.reject('error')
     } else {
-      return res.data.data // 第二层 data 才是后端返回的 CommonResult.data
+      return res.data
     }
   },
   error => {

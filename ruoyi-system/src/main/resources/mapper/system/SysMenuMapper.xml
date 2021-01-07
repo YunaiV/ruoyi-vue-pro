@@ -83,11 +83,6 @@
 		where m.status = '0' and r.status = '0' and ur.user_id = #{userId}
 	</select>
 
-	<select id="selectMenuById" parameterType="Long" resultMap="SysMenuResult">
-		<include refid="selectMenuVo"/>
-		where menu_id = #{menuId}
-	</select>
-
 	<select id="hasChildByMenuId" resultType="Integer">
 	    select count(1) from sys_menu where parent_id = #{menuId}
 	</select>
@@ -96,9 +91,5 @@
 		<include refid="selectMenuVo"/>
 		where menu_name=#{menuName} and parent_id = #{parentId} limit 1
 	</select>
-
-	<delete id="deleteMenuById" parameterType="Long">
-	    delete from sys_menu where menu_id = #{menuId}
-	</delete>
 
 </mapper>

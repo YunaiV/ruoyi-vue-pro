@@ -12,14 +12,14 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum MenuTypeEnum {
 
-    DIR("M"), // 目录
-    MENU("C"), // 菜单
-    BUTTON("F") // 按钮
+    DIR(1), // 目录
+    MENU(2), // 菜单
+    BUTTON(3) // 按钮
     ;
 
     /**
      * 类型
      */
-    private final String type;
+    private final Integer type;
 
 }

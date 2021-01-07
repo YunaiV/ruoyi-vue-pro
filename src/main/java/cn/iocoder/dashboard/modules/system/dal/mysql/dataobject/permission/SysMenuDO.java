@@ -1,16 +1,15 @@
 package cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.permission;
 
+import cn.iocoder.dashboard.common.enums.CommonStatusEnum;
 import cn.iocoder.dashboard.framework.mybatis.core.BaseDO;
+import cn.iocoder.dashboard.modules.system.enums.permission.MenuTypeEnum;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
-
 /**
- * 菜单权限表
+ * 菜单 DO
  *
  * @author ruoyi
  */
@@ -24,57 +23,52 @@ public class SysMenuDO extends BaseDO {
      */
     @TableId
     private Long menuId;
-
     /**
      * 菜单名称
      */
-    @NotBlank(message = "菜单名称不能为空")
-    @Size(max = 50, message = "菜单名称长度不能超过50个字符")
     private String menuName;
-
+    /**
+     * 权限标识
+     *
+     * 一般格式为：${系统}:${模块}:${操作}
+     * 例如说：system:admin:add，即 system 服务的添加管理员。
+     *
+     * 当我们把该 SysMenuDO 赋予给角色后，意味着该角色有该资源：
+     * - 对于后端，配合 @PreAuthorize 注解，配置 API 接口需要该权限，从而对 API 接口进行权限控制。
+     * - 对于前端，配合前端标签，配置按钮是否展示，避免用户没有该权限时，结果可以看到该操作。
+     */
+    private String permission;
+    /**
+     * 菜单类型
+     *
+     * 枚举 {@link MenuTypeEnum}
+     */
+    private Integer menuType;
+    /**
+     * 显示顺序
+     */
+    private String sort;
     /**
      * 父菜单ID
      */
     private Long parentId;
-
-    /**
-     * 显示顺序
-     */
-    @NotBlank(message = "显示顺序不能为空")
-    private String orderNum;
-
     /**
      * 路由地址
      */
-    @Size(max = 200, message = "路由地址不能超过200个字符")
     private String path;
-
-    /**
-     * 组件路径
-     */
-    @Size(max = 200, message = "组件路径不能超过255个字符")
-    private String component;
-
-    /**
-     * 类型（M目录 C菜单 F按钮）
-     */
-    @NotBlank(message = "菜单类型不能为空")
-    private String menuType;
-
-    /**
-     * 菜单状态（0显示 1隐藏）
-     */
-    private String status;
-
-    /**
-     * 权限字符串
-     */
-    @Size(max = 100, message = "权限标识长度不能超过100个字符")
-    private String permission;
-
     /**
      * 菜单图标
      */
     private String icon;
+    /**
+     * 组件路径
+     */
+    private String component;
+    /**
+     * 状态
+     *
+     * 枚举 {@link CommonStatusEnum}
+     */
+    private Integer status;
 
 }

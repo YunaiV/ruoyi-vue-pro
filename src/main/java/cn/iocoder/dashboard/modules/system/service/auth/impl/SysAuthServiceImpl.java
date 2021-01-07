@@ -5,8 +5,8 @@ import cn.hutool.core.util.StrUtil;
 import cn.iocoder.dashboard.common.enums.CommonStatusEnum;
 import cn.iocoder.dashboard.framework.security.config.SecurityProperties;
 import cn.iocoder.dashboard.framework.security.core.LoginUser;
-import cn.iocoder.dashboard.modules.system.controller.auth.vo.SysAuthPermissionInfoRespVO;
 import cn.iocoder.dashboard.modules.system.controller.auth.vo.SysAuthMenuRespVO;
+import cn.iocoder.dashboard.modules.system.controller.auth.vo.SysAuthPermissionInfoRespVO;
 import cn.iocoder.dashboard.modules.system.convert.auth.SysAuthConvert;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.permission.SysMenuDO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.permission.SysRoleDO;
@@ -252,7 +252,7 @@ public class SysAuthServiceImpl implements SysAuthService {
 
     private static List<SysAuthMenuRespVO> buildRouterTree(List<SysMenuDO> menuList) {
         // 排序，保证菜单的有序性
-        menuList.sort(Comparator.comparing(SysMenuDO::getOrderNum));
+        menuList.sort(Comparator.comparing(SysMenuDO::getSort));
         // 构建菜单树
         // 使用 LinkedHashMap 的原因，是为了排序 。实际也可以用 Stream API ，就是太丑了。
         Map<Long, SysAuthMenuRespVO> treeNodeMap = new LinkedHashMap<>();
