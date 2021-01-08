@@ -26,7 +26,7 @@ public interface SysAuthConvert {
     default SysAuthPermissionInfoRespVO convert(SysUserDO user, List<SysRoleDO> roleList, List<SysMenuDO> menuList) {
         return SysAuthPermissionInfoRespVO.builder()
                 .user(SysAuthPermissionInfoRespVO.UserVO.builder().nickname(user.getNickname()).avatar(user.getAvatar()).build())
-                .roles(CollectionUtils.convertSet(roleList, SysRoleDO::getRoleKey))
+                .roles(CollectionUtils.convertSet(roleList, SysRoleDO::getCode))
                 .permissions(CollectionUtils.convertSet(menuList, SysMenuDO::getPermission))
                 .build();
     }

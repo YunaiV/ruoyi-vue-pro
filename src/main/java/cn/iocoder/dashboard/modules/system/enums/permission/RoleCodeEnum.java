@@ -8,7 +8,7 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
-public enum RoleKeyEnum {
+public enum RoleCodeEnum {
 
     ADMIN("admin"), // 超级管理员
     ;

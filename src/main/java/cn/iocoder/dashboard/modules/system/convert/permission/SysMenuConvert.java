@@ -1,8 +1,8 @@
 package cn.iocoder.dashboard.modules.system.convert.permission;
 
-import cn.iocoder.dashboard.modules.system.controller.permission.vo.SysMenuCreateReqVO;
-import cn.iocoder.dashboard.modules.system.controller.permission.vo.SysMenuRespVO;
-import cn.iocoder.dashboard.modules.system.controller.permission.vo.SysMenuUpdateReqVO;
+import cn.iocoder.dashboard.modules.system.controller.permission.vo.menu.SysMenuCreateReqVO;
+import cn.iocoder.dashboard.modules.system.controller.permission.vo.menu.SysMenuRespVO;
+import cn.iocoder.dashboard.modules.system.controller.permission.vo.menu.SysMenuUpdateReqVO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.permission.SysMenuDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;

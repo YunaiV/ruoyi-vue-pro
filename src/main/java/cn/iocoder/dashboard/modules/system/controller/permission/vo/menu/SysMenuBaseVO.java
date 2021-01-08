@@ -1,4 +1,4 @@
-package cn.iocoder.dashboard.modules.system.controller.permission.vo;
+package cn.iocoder.dashboard.modules.system.controller.permission.vo.menu;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;

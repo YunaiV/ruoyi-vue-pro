@@ -1,7 +1,7 @@
 package cn.iocoder.dashboard.modules.system.dal.mysql.dao.permission;
 
 import cn.iocoder.dashboard.framework.mybatis.core.query.QueryWrapperX;
-import cn.iocoder.dashboard.modules.system.controller.permission.vo.SysMenuListReqVO;
+import cn.iocoder.dashboard.modules.system.controller.permission.vo.menu.SysMenuListReqVO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.permission.SysMenuDO;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;

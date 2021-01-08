@@ -1,10 +1,10 @@
 package cn.iocoder.dashboard.modules.system.controller.permission;
 
 import cn.iocoder.dashboard.common.pojo.CommonResult;
-import cn.iocoder.dashboard.modules.system.controller.permission.vo.SysMenuCreateReqVO;
-import cn.iocoder.dashboard.modules.system.controller.permission.vo.SysMenuListReqVO;
-import cn.iocoder.dashboard.modules.system.controller.permission.vo.SysMenuRespVO;
-import cn.iocoder.dashboard.modules.system.controller.permission.vo.SysMenuUpdateReqVO;
+import cn.iocoder.dashboard.modules.system.controller.permission.vo.menu.SysMenuCreateReqVO;
+import cn.iocoder.dashboard.modules.system.controller.permission.vo.menu.SysMenuListReqVO;
+import cn.iocoder.dashboard.modules.system.controller.permission.vo.menu.SysMenuRespVO;
+import cn.iocoder.dashboard.modules.system.controller.permission.vo.menu.SysMenuUpdateReqVO;
 import cn.iocoder.dashboard.modules.system.convert.permission.SysMenuConvert;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.permission.SysMenuDO;
 import cn.iocoder.dashboard.modules.system.service.permission.SysMenuService;
