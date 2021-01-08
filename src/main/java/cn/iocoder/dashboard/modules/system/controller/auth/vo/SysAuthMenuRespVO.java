@@ -1,6 +1,7 @@
 package cn.iocoder.dashboard.modules.system.controller.auth.vo;
 
 import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,32 +16,22 @@ import java.util.List;
 @Builder
 public class SysAuthMenuRespVO {
 
-    /**
-     * 菜单编号
-     */
-    private Long menuId;
-    /**
-     * 父菜单编号
-     */
+    @ApiModelProperty(value = "菜单名称", required = true, example = "芋道")
+    private Long id;
+
+    @ApiModelProperty(value = "父菜单 ID", required = true, example = "1024")
     private Long parentId;
 
-    /**
-     * 菜单名称
-     */
-    private String menuName;
+    @ApiModelProperty(value = "菜单名称", required = true, example = "芋道")
+    private String name;
 
-    /**
-     * 路由地址
-     */
+    @ApiModelProperty(value = "路由地址", example = "post", notes = "仅菜单类型为菜单或者目录时，才需要传")
     private String path;
-    /**
-     * 组件地址
-     */
+
+    @ApiModelProperty(value = "组件路径", example = "system/post/index", notes = "仅菜单类型为菜单时，才需要传")
     private String component;
 
-    /**
-     * 菜单图标
-     */
+    @ApiModelProperty(value = "菜单图标", example = "/menu/list", notes = "仅菜单类型为菜单或者目录时，才需要传")
     private String icon;
 
     /**

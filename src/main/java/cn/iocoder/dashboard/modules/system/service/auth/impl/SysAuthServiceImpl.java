@@ -12,7 +12,6 @@ import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.permission.SysMe
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.permission.SysRoleDO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.user.SysUserDO;
 import cn.iocoder.dashboard.modules.system.dal.redis.dao.auth.SysLoginUserRedisDAO;
-import cn.iocoder.dashboard.modules.system.enums.permission.MenuIdEnum;
 import cn.iocoder.dashboard.modules.system.enums.permission.MenuTypeEnum;
 import cn.iocoder.dashboard.modules.system.enums.user.UserStatus;
 import cn.iocoder.dashboard.modules.system.service.auth.SysAuthService;
@@ -38,7 +37,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import javax.annotation.Resource;
-import java.util.*;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import static cn.iocoder.dashboard.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.*;
@@ -243,36 +245,12 @@ public class SysAuthServiceImpl implements SysAuthService {
 
     @Override
     public List<SysAuthMenuRespVO> listMenus(Long userId, Set<Long> roleIds) {
+        // 获得用户拥有的菜单列表
         List<SysMenuDO> menuList = permissionService.listRoleMenusFromCache(roleIds,
-                SetUtils.asSet(MenuTypeEnum.DIR.getType(), MenuTypeEnum.MENU.getType()),
-                SetUtils.asSet(CommonStatusEnum.ENABLE.getStatus()));
+                SetUtils.asSet(MenuTypeEnum.DIR.getType(), MenuTypeEnum.MENU.getType()), // 只要目录和菜单类型
+                SetUtils.asSet(CommonStatusEnum.ENABLE.getStatus())); // 只要开启的
         // 转换成 Tree 结构返回
-        return buildRouterTree(menuList);
-    }
-
-    private static List<SysAuthMenuRespVO> buildRouterTree(List<SysMenuDO> menuList) {
-        // 排序，保证菜单的有序性
-        menuList.sort(Comparator.comparing(SysMenuDO::getSort));
-        // 构建菜单树
-        // 使用 LinkedHashMap 的原因，是为了排序 。实际也可以用 Stream API ，就是太丑了。
-        Map<Long, SysAuthMenuRespVO> treeNodeMap = new LinkedHashMap<>();
-        menuList.forEach(menu -> treeNodeMap.put(menu.getMenuId(), SysAuthConvert.INSTANCE.convertTreeNode(menu)));
-        // 处理父子关系
-        treeNodeMap.values().stream().filter(node -> !node.getParentId().equals(MenuIdEnum.ROOT.getId())).forEach((childNode) -> {
-            // 获得父节点
-            SysAuthMenuRespVO parentNode = treeNodeMap.get(childNode.getParentId());
-            if (parentNode == null) {
-                log.error("[buildRouterTree][resource({}) 找不到父资源({})]", childNode.getMenuId(), childNode.getParentId());
-                return;
-            }
-            // 将自己添加到父节点中
-            if (parentNode.getChildren() == null) {
-                parentNode.setChildren(new ArrayList<>());
-            }
-            parentNode.getChildren().add(childNode);
-        });
-        // 获得到所有的根节点
-        return CollectionUtils.filterList(treeNodeMap.values(), node -> MenuIdEnum.ROOT.getId().equals(node.getParentId()));
+        return SysAuthConvert.INSTANCE.buildMenuTree(menuList);
     }
 
 }

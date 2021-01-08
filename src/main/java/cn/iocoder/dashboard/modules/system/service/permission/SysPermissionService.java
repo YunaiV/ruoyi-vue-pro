@@ -48,4 +48,11 @@ public interface SysPermissionService {
      */
     Long getDeptRoleId(Long deptId);
 
+    /**
+     * 删除授予给角色的菜单们
+     *
+     * @param menuId 菜单编号
+     */
+    void deleteRolesMenuByMenuId(Long menuId);
+
 }

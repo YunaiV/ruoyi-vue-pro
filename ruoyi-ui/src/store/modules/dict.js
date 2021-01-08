@@ -28,8 +28,8 @@ const actions = {
         }
         // 处理 dictValue 层级
         dictDataMap[dictData.dictType].push({
-          dictValue: dictData.dictValue,
-          dictLabel: dictData.dictLabel
+          value: dictData.value,
+          label: dictData.label
         })
       })
       // 存储到 Store 中

@@ -437,7 +437,7 @@ export default {
         roleKey: undefined,
         roleSort: 0,
         status: "0",
-        menuIds: [],
+        ids: [],
         deptIds: [],
         menuCheckStrictly: true,
         deptCheckStrictly: true,
@@ -535,14 +535,14 @@ export default {
       this.$refs["form"].validate(valid => {
         if (valid) {
           if (this.form.roleId != undefined) {
-            this.form.menuIds = this.getMenuAllCheckedKeys();
+            this.form.ids = this.getMenuAllCheckedKeys();
             updateRole(this.form).then(response => {
               this.msgSuccess("修改成功");
               this.open = false;
               this.getList();
             });
           } else {
-            this.form.menuIds = this.getMenuAllCheckedKeys();
+            this.form.ids = this.getMenuAllCheckedKeys();
             addRole(this.form).then(response => {
               this.msgSuccess("新增成功");
               this.open = false;

@@ -19,7 +19,7 @@ public class SysDictDataServiceImpl implements SysDictDataService {
 
     private static final Comparator<SysDictDataDO> COMPARATOR_TYPE_AND_SORT = Comparator
             .comparing(SysDictDataDO::getDictType)
-            .thenComparingInt(SysDictDataDO::getDictSort);
+            .thenComparingInt(SysDictDataDO::getSort);
 
     @Resource
     private SysDictDataMapper dictDataMapper;

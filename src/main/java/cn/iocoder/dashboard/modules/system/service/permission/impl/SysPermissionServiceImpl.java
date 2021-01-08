@@ -107,4 +107,9 @@ public class SysPermissionServiceImpl implements SysPermissionService {
         return roleDept != null ? roleDept.getRoleId() : null;
     }
 
+    @Override
+    public void deleteRolesMenuByMenuId(Long menuId) {
+        // TODO 实现我
+    }
+
 }

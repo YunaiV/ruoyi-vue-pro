@@ -3,6 +3,7 @@ package cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.permission;
 import cn.iocoder.dashboard.common.enums.CommonStatusEnum;
 import cn.iocoder.dashboard.framework.mybatis.core.BaseDO;
 import cn.iocoder.dashboard.modules.system.enums.permission.MenuTypeEnum;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
@@ -22,11 +23,11 @@ public class SysMenuDO extends BaseDO {
      * 菜单ID
      */
     @TableId
-    private Long menuId;
+    private Long id;
     /**
      * 菜单名称
      */
-    private String menuName;
+    private String name;
     /**
      * 权限标识
      *
@@ -43,7 +44,8 @@ public class SysMenuDO extends BaseDO {
      *
      * 枚举 {@link MenuTypeEnum}
      */
-    private Integer menuType;
+    @TableField("menu_type")
+    private Integer type;
     /**
      * 显示顺序
      */

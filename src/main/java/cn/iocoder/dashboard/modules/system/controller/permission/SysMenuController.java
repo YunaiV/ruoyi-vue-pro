@@ -1,13 +1,17 @@
 package cn.iocoder.dashboard.modules.system.controller.permission;
 
 import cn.iocoder.dashboard.common.pojo.CommonResult;
+import cn.iocoder.dashboard.modules.system.controller.permission.vo.SysMenuCreateReqVO;
 import cn.iocoder.dashboard.modules.system.controller.permission.vo.SysMenuListReqVO;
 import cn.iocoder.dashboard.modules.system.controller.permission.vo.SysMenuRespVO;
+import cn.iocoder.dashboard.modules.system.controller.permission.vo.SysMenuUpdateReqVO;
+import cn.iocoder.dashboard.modules.system.convert.permission.SysMenuConvert;
+import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.permission.SysMenuDO;
 import cn.iocoder.dashboard.modules.system.service.permission.SysMenuService;
 import io.swagger.annotations.Api;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import io.swagger.annotations.ApiOperation;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -22,24 +26,21 @@ public class SysMenuController {
     @Resource
     private SysMenuService menuService;
 
-    /**
-     * 获取菜单列表
-     */
+    @ApiOperation("获取菜单列表")
 //    @PreAuthorize("@ss.hasPermi('system:menu:list')")
     @GetMapping("/list")
     public CommonResult<List<SysMenuRespVO>> list(SysMenuListReqVO reqVO) {
         return success(menuService.listMenus(reqVO));
     }
-//
-//    /**
-//     * 根据菜单编号获取详细信息
-//     */
+
+    @ApiOperation("获取菜单信息")
+    @GetMapping("/get")
 //    @PreAuthorize("@ss.hasPermi('system:menu:query')")
-//    @GetMapping(value = "/{menuId}")
-//    public AjaxResult getInfo(@PathVariable Long menuId) {
-//        return AjaxResult.success(menuService.selectMenuById(menuId));
-//    }
-//
+    public CommonResult<SysMenuRespVO> getMenu(Long id) {
+        SysMenuDO menu = menuService.getMenu(id);
+        return success(SysMenuConvert.INSTANCE.convert(menu));
+    }
+
 //    /**
 //     * 获取菜单下拉树列表
 //     */
@@ -63,57 +64,31 @@ public class SysMenuController {
 //        ajax.put("menus", menuService.buildMenuTreeSelect(menus));
 //        return ajax;
 //    }
-//
-//    /**
-//     * 新增菜单
-//     */
+
+    @ApiOperation("新增菜单")
 //    @PreAuthorize("@ss.hasPermi('system:menu:add')")
 //    @Log(title = "菜单管理", businessType = BusinessType.INSERT)
-//    @PostMapping
-//    public AjaxResult add(@Validated @RequestBody SysMenu menu) {
-//        if (UserConstants.NOT_UNIQUE.equals(menuService.checkMenuNameUnique(menu))) {
-//            return AjaxResult.error("新增菜单'" + menu.getMenuName() + "'失败，菜单名称已存在");
-//        } else if (UserConstants.YES_FRAME.equals(menu.getIsFrame())
-//                && !StringUtils.startsWithAny(menu.getPath(), Constants.HTTP, Constants.HTTPS)) {
-//            return AjaxResult.error("新增菜单'" + menu.getMenuName() + "'失败，地址必须以http(s)://开头");
-//        }
-//        menu.setCreateBy(SecurityUtils.getUsername());
-//        return toAjax(menuService.insertMenu(menu));
-//    }
-//
-//    /**
-//     * 修改菜单
-//     */
+    @PostMapping("/create")
+    public CommonResult<Long> createMenu(@Validated @RequestBody SysMenuCreateReqVO reqVO) {
+        Long menuId = menuService.createMenu(reqVO);
+        return success(menuId);
+    }
+
+    @ApiOperation("修改菜单")
 //    @PreAuthorize("@ss.hasPermi('system:menu:edit')")
 //    @Log(title = "菜单管理", businessType = BusinessType.UPDATE)
-//    @PutMapping
-//    public AjaxResult edit(@Validated @RequestBody SysMenu menu) {
-//        if (UserConstants.NOT_UNIQUE.equals(menuService.checkMenuNameUnique(menu))) {
-//            return AjaxResult.error("修改菜单'" + menu.getMenuName() + "'失败，菜单名称已存在");
-//        } else if (UserConstants.YES_FRAME.equals(menu.getIsFrame())
-//                && !StringUtils.startsWithAny(menu.getPath(), Constants.HTTP, Constants.HTTPS)) {
-//            return AjaxResult.error("修改菜单'" + menu.getMenuName() + "'失败，地址必须以http(s)://开头");
-//        } else if (menu.getMenuId().equals(menu.getParentId())) {
-//            return AjaxResult.error("修改菜单'" + menu.getMenuName() + "'失败，上级菜单不能选择自己");
-//        }
-//        menu.setUpdateBy(SecurityUtils.getUsername());
-//        return toAjax(menuService.updateMenu(menu));
-//    }
-//
-//    /**
-//     * 删除菜单
-//     */
-//    @PreAuthorize("@ss.hasPermi('system:menu:remove')")
+    @PostMapping("/update")
+    public CommonResult<Boolean> updateMenu(@Validated @RequestBody SysMenuUpdateReqVO reqVO) {
+        menuService.updateMenu(reqVO);
+        return success(true);
+    }
+
+    @ApiOperation("删除菜单")
 //    @Log(title = "菜单管理", businessType = BusinessType.DELETE)
 //    @DeleteMapping("/{menuId}")
-//    public AjaxResult remove(@PathVariable("menuId") Long menuId) {
-//        if (menuService.hasChildByMenuId(menuId)) {
-//            return AjaxResult.error("存在子菜单,不允许删除");
-//        }
-//        if (menuService.checkMenuExistRole(menuId)) {
-//            return AjaxResult.error("菜单已分配,不允许删除");
-//        }
-//        return toAjax(menuService.deleteMenuById(menuId));
-//    }
+    public CommonResult<Boolean> deleteMenu(@RequestParam("id") Long id) {
+        menuService.deleteMenu(id);
+        return success(true);
+    }
 
 }

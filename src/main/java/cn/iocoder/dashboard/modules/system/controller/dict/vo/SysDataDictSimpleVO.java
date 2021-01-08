@@ -12,9 +12,9 @@ public class SysDataDictSimpleVO {
     private String dictType;
 
     @ApiModelProperty(value = "字典键值", required = true, example = "1")
-    private String dictValue;
+    private String value;
 
     @ApiModelProperty(value = "字典标签", required = true, example = "男")
-    private String dictLabel;
+    private String label;
 
 }

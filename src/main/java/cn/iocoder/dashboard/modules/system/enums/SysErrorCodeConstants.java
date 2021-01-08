@@ -18,4 +18,12 @@ public interface SysErrorCodeConstants {
     ErrorCode TOKEN_EXPIRED = new ErrorCode(1002001000, "Token 已经过期");
     ErrorCode TOKEN_PARSE_FAIL = new ErrorCode(1002001001, "Token 解析失败");
 
+    // ========== 菜单模块 1002002000 ==========
+    ErrorCode MENU_NAME_DUPLICATE = new ErrorCode(1002002000, "已经存在该名字的菜单");
+    ErrorCode MENU_PARENT_NOT_EXISTS = new ErrorCode(1002002001, "父菜单不存在");
+    ErrorCode MENU_PARENT_ERROR = new ErrorCode(1002002002, "不能设置自己为父菜单");
+    ErrorCode MENU_NOT_EXISTS = new ErrorCode(1002002003, "菜单不存在");
+    ErrorCode MENU_EXISTS_CHILDREN = new ErrorCode(1002002004, "存在子菜单，无法删除");
+    ErrorCode MENU_PARENT_NOT_MENU = new ErrorCode(1002002005, "父菜单的类型必须是菜单");
+
 }

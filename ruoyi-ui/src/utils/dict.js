@@ -6,7 +6,8 @@
 import store from '@/store'
 
 export const DICT_TYPE = {
-  SYS_COMMON_STATUS: 'sys_common_status'
+  SYS_COMMON_STATUS: 'sys_common_status',
+  SYS_MENU_TYPE: 'menu_type'
 }
 
 /**
@@ -28,8 +29,8 @@ export function getDictDataLabel(dictType, value) {
   // 获取 value 对应的展示名
   value = value + '' // 强制转换成字符串，因为 DictData 小类数值，是字符串
   for (const dictData of dictDatas) {
-    if (dictData.dictValue === value) {
-      return dictData.dictLabel
+    if (dictData.value === value) {
+      return dictData.label
     }
   }
   return ''

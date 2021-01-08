@@ -44,7 +44,7 @@ function filterAsyncRouter(asyncRouterMap, isRewrite = false) {
     // 将 ruoyi 后端原有耦合前端的逻辑，迁移到此处
     // 处理 meta 属性
     route.meta = {
-      title: route.menuName,
+      title: route.name,
       icon: route.icon
     }
     // 处理 component 属性

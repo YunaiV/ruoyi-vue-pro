@@ -219,8 +219,8 @@ export default {
         delete node.children;
       }
       return {
-        id: node.menuId,
-        label: node.menuName,
+        id: node.id,
+        label: node.name,
         children: node.children
       };
     }

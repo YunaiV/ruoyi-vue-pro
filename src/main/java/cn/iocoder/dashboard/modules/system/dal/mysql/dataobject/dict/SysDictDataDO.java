@@ -26,30 +26,30 @@ public class SysDictDataDO extends BaseDO {
      */
     @TableId
     @Excel(name = "字典编码", cellType = Excel.ColumnType.NUMERIC)
-    private Long dictCode;
+    private Long id;
     /**
      * 字典排序
      */
     @Excel(name = "字典排序", cellType = Excel.ColumnType.NUMERIC)
-    private Integer dictSort;
+    private Integer sort;
     /**
      * 字典标签
      */
     @Excel(name = "字典标签")
     @NotBlank(message = "字典标签不能为空")
     @Size(max = 100, message = "字典标签长度不能超过100个字符")
-    private String dictLabel;
+    private String label;
     /**
-     * 字典键值
+     * 字典值
      */
     @Excel(name = "字典键值")
     @NotBlank(message = "字典键值不能为空")
     @Size(max = 100, message = "字典键值长度不能超过100个字符")
-    private String dictValue;
+    private String value;
     /**
      * 字典类型
      *
-     * 外键 {@link SysDictDataDO#getDictType()}
+     * 冗余 {@link SysDictDataDO#getDictType()}
      */
     @Excel(name = "字典类型")
     @NotBlank(message = "字典类型不能为空")

@@ -17,15 +17,15 @@ public class SysMenuBaseVO {
     @ApiModelProperty(value = "菜单名称", required = true, example = "芋道")
     @NotBlank(message = "菜单名称不能为空")
     @Size(max = 50, message = "菜单名称长度不能超过50个字符")
-    private String menuName;
+    private String name;
 
     @ApiModelProperty(value = "权限标识", example = "sys:menu:add", notes = "仅菜单类型为按钮时，才需要传递")
     @Size(max = 100)
     private String permission;
 
-    @ApiModelProperty(value = "类型", required = true, example = "1", notes = "参见 MenuTypeEnum 枚举类")
+    @ApiModelProperty(value = "类型", required = true, example = "1", notes = "参见 SysMenuTypeEnum 枚举类")
     @NotBlank(message = "菜单类型不能为空")
-    private Integer menuType;
+    private Integer type;
 
     @ApiModelProperty(value = "显示顺序不能为空", required = true, example = "1024")
     @NotBlank(message = "显示顺序不能为空")
