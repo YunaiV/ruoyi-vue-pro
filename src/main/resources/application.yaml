@@ -38,3 +38,15 @@ yudao:
     timeout: 5m
     width: 160
     height: 60
+
+# MyBatis Plus 的配置项
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true # 虽然默认为 true ，但是还是显示去指定下。
+  global-config:
+    db-config:
+      id-type: auto # 自增 ID
+      logic-delete-value: 1 # 逻辑已删除值(默认为 1)
+      logic-not-delete-value: 0 # 逻辑未删除值(默认为 0)
+  mapper-locations: classpath*:mapper/*.xml
+  type-aliases-package: cn.iocoder.dashboard.modules.*.dal.mysql.dataobject

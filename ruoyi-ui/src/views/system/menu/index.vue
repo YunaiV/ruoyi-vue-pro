@@ -13,10 +13,10 @@
       <el-form-item label="状态" prop="status">
         <el-select v-model="queryParams.status" placeholder="菜单状态" clearable size="small">
           <el-option
-            v-for="dict in statusOptions"
-            :key="dict.dictValue"
-            :label="dict.dictLabel"
-            :value="dict.dictValue"
+            v-for="dict in statusDictDatas"
+            :key="dict.value"
+            :label="dict.label"
+            :value="dict.value"
           />
         </el-select>
       </el-form-item>
@@ -106,8 +106,8 @@
               <el-radio-group v-model="form.type">
                 <el-radio
                     v-for="dict in menuTypeDictDatas"
-                    :key="dict.value"
-                    :label="dict.value"
+                    :key="parseInt(dict.value)"
+                    :label="parseInt(dict.value)"
                 >{{dict.label}}</el-radio>
               </el-radio-group>
             </el-form-item>
@@ -165,7 +165,7 @@
                 <el-radio
                   v-for="dict in statusDictDatas"
                   :key="dict.value"
-                  :label="dict.value"
+                  :label="parseInt(dict.value)"
                 >{{dict.label}}</el-radio>
               </el-radio-group>
             </el-form-item>
@@ -206,8 +206,6 @@ export default {
       title: "",
       // 是否显示弹出层
       open: false,
-      // 菜单状态数据字典
-      statusOptions: [],
       // 查询参数
       queryParams: {
         name: undefined,
@@ -288,9 +286,9 @@ export default {
         parentId: 0,
         name: undefined,
         icon: undefined,
-        type: "1",
+        type: SysMenuTypeEnum.DIR,
         sort: undefined,
-        status: "0"
+        status: SysCommonStatusEnum.ENABLE
       };
       this.resetForm("form");
     },
@@ -329,17 +327,18 @@ export default {
     submitForm: function() {
       this.$refs["form"].validate(valid => {
         if (valid) {
-          // 若权限类型为菜单时，进行 route 的校验，避免后续拼接出来的路由无法跳转
-          if (this.form.type === ResourceTypeEnum.MENU) {
+          // 若权限类型为目录或者菜单时，进行 path 的校验，避免后续拼接出来的路由无法跳转
+          if (this.form.type === SysMenuTypeEnum.DIR
+            || this.form.type === SysMenuTypeEnum.MENU) {
             // 如果是外链，则不进行校验
-            const route = this.resourceForm.route
-            if (route.indexOf('http://') === -1 || route.indexOf('https://') === -1) {
-              // 父权限为根节点，route 必须以 / 开头
-              if (this.resourceForm.pid === 0 && route.charAt(0) !== '/') {
-                this.messageSuccess('前端必须以 / 开头')
+            const path = this.form.path
+            if (path.indexOf('http://') === -1 || path.indexOf('https://') === -1) {
+              // 父权限为根节点，path 必须以 / 开头
+              if (this.form.parentId === 0 && path.charAt(0) !== '/') {
+                this.msgSuccess('前端必须以 / 开头')
                 return
-              } else if (this.resourceForm.pid !== 0 && route.charAt(0) === '/') {
-                this.messageSuccess('前端不能以 / 开头')
+              } else if (this.form.parentId !== 0 && path.charAt(0) === '/') {
+                this.msgSuccess('前端不能以 / 开头')
                 return
               }
             }

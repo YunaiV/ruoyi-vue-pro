@@ -226,31 +226,4 @@ public class SysAuthServiceImpl implements SysAuthService {
         loginUserRedisDAO.set(sessionId, loginUser);
     }
 
-    @Override
-    public SysAuthPermissionInfoRespVO getPermissionInfo(Long userId, Set<Long> roleIds) {
-        // 获得用户信息
-        SysUserDO user = userService.getUser(userId);
-        if (user == null) {
-            return null;
-        }
-        // 获得角色列表
-        List<SysRoleDO> roleList = roleService.listRolesFromCache(roleIds);
-        // 获得菜单列表
-        List<SysMenuDO> menuList = permissionService.listRoleMenusFromCache(roleIds,
-                SetUtils.asSet(MenuTypeEnum.DIR.getType(), MenuTypeEnum.MENU.getType(), MenuTypeEnum.BUTTON.getType()),
-                SetUtils.asSet(CommonStatusEnum.ENABLE.getStatus()));
-        // 拼接结果返回
-        return SysAuthConvert.INSTANCE.convert(user, roleList, menuList);
-    }
-
-    @Override
-    public List<SysAuthMenuRespVO> listMenus(Long userId, Set<Long> roleIds) {
-        // 获得用户拥有的菜单列表
-        List<SysMenuDO> menuList = permissionService.listRoleMenusFromCache(roleIds,
-                SetUtils.asSet(MenuTypeEnum.DIR.getType(), MenuTypeEnum.MENU.getType()), // 只要目录和菜单类型
-                SetUtils.asSet(CommonStatusEnum.ENABLE.getStatus())); // 只要开启的
-        // 转换成 Tree 结构返回
-        return SysAuthConvert.INSTANCE.buildMenuTree(menuList);
-    }
-
 }

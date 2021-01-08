@@ -84,8 +84,8 @@ public class SysMenuController {
     }
 
     @ApiOperation("删除菜单")
+    @PostMapping("/delete")
 //    @Log(title = "菜单管理", businessType = BusinessType.DELETE)
-//    @DeleteMapping("/{menuId}")
     public CommonResult<Boolean> deleteMenu(@RequestParam("id") Long id) {
         menuService.deleteMenu(id);
         return success(true);

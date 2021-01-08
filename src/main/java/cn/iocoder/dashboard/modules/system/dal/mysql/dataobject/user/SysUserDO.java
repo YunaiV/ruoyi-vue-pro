@@ -2,7 +2,7 @@ package cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.user;
 
 import cn.iocoder.dashboard.framework.excel.Excel;
 import cn.iocoder.dashboard.framework.excel.Excels;
-import cn.iocoder.dashboard.framework.mybatis.core.BaseDO;
+import cn.iocoder.dashboard.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.dept.SysDept;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.permission.SysRoleDO;
 import com.baomidou.mybatisplus.annotation.TableField;

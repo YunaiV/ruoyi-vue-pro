@@ -65,7 +65,7 @@ public class SysMenuServiceImpl implements SysMenuService {
     @Override
     @PostConstruct
     public void init() {
-        List<SysMenuDO> menuList = menuMapper.selectList(null);
+        List<SysMenuDO> menuList = menuMapper.selectList();
         ImmutableMap.Builder<Long, SysMenuDO> menuCacheBuilder = ImmutableMap.builder();
         ImmutableMultimap.Builder<String, SysMenuDO> permMenuCacheBuilder = ImmutableMultimap.builder();
         menuList.forEach(menuDO -> {
@@ -79,7 +79,7 @@ public class SysMenuServiceImpl implements SysMenuService {
 
     @Override
     public List<SysMenuRespVO> listMenus(SysMenuListReqVO reqVO) {
-        List<SysMenuDO> list = menuMapper.selectList(null);
+        List<SysMenuDO> list = menuMapper.selectList(reqVO);
         // TODO 排序
         return SysMenuConvert.INSTANCE.convertList(list);
     }
@@ -240,9 +240,10 @@ public class SysMenuServiceImpl implements SysMenuService {
         if (menu == null) {
             throw ServiceExceptionUtil.exception(MENU_PARENT_NOT_EXISTS);
         }
-        // 父菜单必须是目录类型
-        if (!MenuTypeEnum.DIR.getType().equals(menu.getType())) {
-            throw ServiceExceptionUtil.exception(MENU_PARENT_NOT_MENU);
+        // 父菜单必须是目录或者菜单类型
+        if (!MenuTypeEnum.DIR.getType().equals(menu.getType())
+            && !MenuTypeEnum.MENU.getType().equals(menu.getType())) {
+            throw ServiceExceptionUtil.exception(MENU_PARENT_NOT_DIR_OR_MENU);
         }
     }
 

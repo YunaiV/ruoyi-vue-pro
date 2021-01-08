@@ -59,59 +59,11 @@ public interface SysMenuMapper
 
     /**
      * 根据角色ID查询菜单树信息
-     * 
+     *
      * @param roleId 角色ID
      * @param menuCheckStrictly 菜单树选择项是否关联显示
      * @return 选中菜单列表
      */
     public List<Integer> selectMenuListByRoleId(@Param("roleId") Long roleId, @Param("menuCheckStrictly") boolean menuCheckStrictly);
 
-    /**
-     * 根据菜单ID查询信息
-     *
-     * @param menuId 菜单ID
-     * @return 菜单信息
-     */
-    public SysMenu selectMenuById(Long menuId);
-
-    /**
-     * 是否存在菜单子节点
-     *
-     * @param menuId 菜单ID
-     * @return 结果
-     */
-    public int hasChildByMenuId(Long menuId);
-
-    /**
-     * 新增菜单信息
-     *
-     * @param menu 菜单信息
-     * @return 结果
-     */
-    public int insertMenu(SysMenu menu);
-
-    /**
-     * 修改菜单信息
-     *
-     * @param menu 菜单信息
-     * @return 结果
-     */
-    public int updateMenu(SysMenu menu);
-
-    /**
-     * 删除菜单管理信息
-     *
-     * @param menuId 菜单ID
-     * @return 结果
-     */
-    public int deleteMenuById(Long menuId);
-
-    /**
-     * 校验菜单名称是否唯一
-     *
-     * @param menuName 菜单名称
-     * @param parentId 父菜单ID
-     * @return 结果
-     */
-    public SysMenu checkMenuNameUnique(@Param("menuName") String menuName, @Param("parentId") Long parentId);
 }

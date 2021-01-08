@@ -1,4 +1,4 @@
-package cn.iocoder.dashboard.framework.mybatis.core;
+package cn.iocoder.dashboard.framework.mybatis.core.dataobject;
 
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import lombok.Data;

@@ -24,7 +24,7 @@ public class SysMenuBaseVO {
     private String permission;
 
     @ApiModelProperty(value = "类型", required = true, example = "1", notes = "参见 SysMenuTypeEnum 枚举类")
-    @NotBlank(message = "菜单类型不能为空")
+    @NotNull(message = "菜单类型不能为空")
     private Integer type;
 
     @ApiModelProperty(value = "显示顺序不能为空", required = true, example = "1024")
