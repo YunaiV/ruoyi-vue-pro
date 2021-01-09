@@ -32,7 +32,6 @@ import com.ruoyi.system.service.ISysMenuService;
  */
 @Service
 public class SysMenuServiceImpl implements ISysMenuService {
-    public static final String PREMISSION_STRING = "perms[\"{0}\"]";
 
     /**
      * 根据用户查询系统菜单列表
@@ -98,30 +97,5 @@ public class SysMenuServiceImpl implements ISysMenuService {
         }
         return getChildPerms(menus, 0);
     }
-
-    /**
-     * 根据角色ID查询菜单树信息
-     *
-     * @param roleId 角色ID
-     * @return 选中菜单列表
-     */
-    @Override
-    public List<Integer> selectMenuListByRoleId(Long roleId) {
-        SysRole role = roleMapper.selectRoleById(roleId);
-        return menuMapper.selectMenuListByRoleId(roleId, role.isMenuCheckStrictly());
-    }
-
-    /**
-     * 查询菜单使用数量
-     *
-     * @param menuId 菜单ID
-     * @return 结果
-     */
-    @Override
-    public boolean checkMenuExistRole(Long menuId) {
-        int result = roleMenuMapper.checkMenuExistRole(menuId);
-        return result > 0 ? true : false;
-    }
-
 
 }

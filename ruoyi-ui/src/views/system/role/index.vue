@@ -112,14 +112,14 @@
               type="text"
               icon="el-icon-circle-check"
               @click="handleMenu(scope.row)"
-              v-hasPermi="['system:role:edit']"
+              v-hasPermi="['system:permission:assign-role-menu']"
           >菜单权限</el-button>
           <el-button
             size="mini"
             type="text"
             icon="el-icon-circle-check"
             @click="handleDataScope(scope.row)"
-            v-hasPermi="['system:role:edit']"
+            v-hasPermi="['system:permission:assign-role-data-scope']"
           >数据权限</el-button>
           <el-button
             size="mini"
@@ -214,7 +214,6 @@
           <el-input v-model="form.code" :disabled="true" />
         </el-form-item>
         <el-form-item label="菜单权限">
-          <el-checkbox v-model="!form.menuCheckStrictly" @change="handleCheckedTreeConnect($event, 'menu')">父子联动(选中父节点，自动选择子节点)</el-checkbox>
           <el-checkbox v-model="menuExpand" @change="handleCheckedTreeExpand($event, 'menu')">展开/折叠</el-checkbox>
           <el-checkbox v-model="menuNodeAll" @change="handleCheckedTreeNodeAll($event, 'menu')">全选/全不选</el-checkbox>
           <el-tree
@@ -356,15 +355,6 @@ export default {
         this.deptOptions = response.data;
       });
     },
-    // 所有菜单节点数据
-    getMenuAllCheckedKeys() {
-      // 目前被选中的菜单节点
-      let checkedKeys = this.$refs.menu.getCheckedKeys();
-      // 半选中的菜单节点
-      let halfCheckedKeys = this.$refs.menu.getHalfCheckedKeys();
-      checkedKeys.unshift.apply(checkedKeys, halfCheckedKeys);
-      return checkedKeys;
-    },
     // 所有部门节点数据
     getDeptAllCheckedKeys() {
       // 目前被选中的部门节点
@@ -434,7 +424,6 @@ export default {
         sort: 0,
         deptIds: [],
         menuIds: [],
-        menuCheckStrictly: false, // 非严格，菜单弹窗的父子级联动
         deptCheckStrictly: false,
         remark: undefined
       };
@@ -515,12 +504,8 @@ export default {
       });
       // 获得角色拥有的菜单集合
       listRoleMenus(id).then(response => {
-        // 设置为严格，避免设置父节点自动选中子节点，解决半选中问题
-        // this.form.menuCheckStrictly = true
         // 设置选中
-        this.$refs.menu.setCheckedKeys(response.data, false);
-        // 设置为非严格，继续使用半选中
-        // this.form.menuCheckStrictly = false
+        this.$refs.menu.setCheckedKeys(response.data, true, false);
       })
     },
     /** 分配数据权限操作 */
@@ -575,7 +560,7 @@ export default {
       if (this.form.id !== undefined) {
         assignRoleMenu({
           roleId: this.form.id,
-          menuIds: this.getMenuAllCheckedKeys()
+          menuIds: this.$refs.menu.getCheckedKeys(true)
         }).then(response => {
           this.msgSuccess("修改成功");
           this.openMenu = false;

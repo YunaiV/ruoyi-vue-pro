@@ -59,4 +59,6 @@ public class SysPermissionController {
 //        return success(true);
 //    }
 
+//    system:permission:assign-role-data-scope TODO
+
 }
