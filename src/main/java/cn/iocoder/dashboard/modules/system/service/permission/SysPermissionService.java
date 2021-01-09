@@ -44,6 +44,22 @@ public interface SysPermissionService {
     Set<Long> listUserRoleIds(Long userId, @Nullable Collection<Integer> roleStatuses);
 
     /**
+     * 获得角色拥有的菜单编号集合
+     *
+     * @param roleId 角色编号
+     * @return 菜单编号集合
+     */
+    Set<Long> listRoleMenuIds(Long roleId);
+
+    /**
+     * 赋予赋予角色菜单
+     *
+     * @param roleId 角色编号
+     * @param menuIds 菜单编号集合
+     */
+    void assignRoleMenu(Long roleId, Set<Long> menuIds);
+
+    /**
      * 处理角色删除时，删除关联授权角色
      *
      * @param roleId 角色编号

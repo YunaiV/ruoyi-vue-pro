@@ -148,5 +148,5 @@ export function handleTree(data, id, parentId, children, rootId) {
 		//返回第一层
 		return father[parentId] === rootId;
 	});
-	return treeData != '' ? treeData : data;
+	return treeData !== '' ? treeData : data;
 }

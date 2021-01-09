@@ -9,26 +9,18 @@ export function listMenu(query) {
   })
 }
 
+// 查询菜单（精简)列表
+export function listSimpleMenus() {
+  return request({
+    url: '/system/menu/list-all-simple',
+    method: 'get'
+  })
+}
+
 // 查询菜单详细
 export function getMenu(id) {
   return request({
     url: '/system/menu/get?id=' + id,
-    method: 'get'
-  })
-}
-
-// 查询菜单下拉树结构
-export function treeselect() {
-  return request({
-    url: '/system/menu/treeselect',
-    method: 'get'
-  })
-}
-
-// 根据角色ID查询菜单下拉树结构
-export function roleMenuTreeselect(roleId) {
-  return request({
-    url: '/system/menu/roleMenuTreeselect/' + roleId,
     method: 'get'
   })
 }

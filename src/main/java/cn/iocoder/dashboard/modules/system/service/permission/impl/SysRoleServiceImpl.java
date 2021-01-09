@@ -18,6 +18,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.google.common.collect.ImmutableMap;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
@@ -115,6 +116,7 @@ public class SysRoleServiceImpl implements SysRoleService {
     }
 
     @Override
+    @Transactional
     public void deleteRole(Long id) {
         // 校验是否可以更新
         this.checkUpdateRole(id);
@@ -128,7 +130,6 @@ public class SysRoleServiceImpl implements SysRoleService {
     public SysRoleDO getRole(Long id) {
         return roleMapper.selectById(id);
     }
-
 
     @Override
     public PageResult<SysRoleDO> pageRole(SysRolePageReqVO reqVO) {

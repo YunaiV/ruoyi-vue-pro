@@ -2,7 +2,6 @@ package cn.iocoder.dashboard.modules.system.service.permission;
 
 import cn.iocoder.dashboard.modules.system.controller.permission.vo.menu.SysMenuCreateReqVO;
 import cn.iocoder.dashboard.modules.system.controller.permission.vo.menu.SysMenuListReqVO;
-import cn.iocoder.dashboard.modules.system.controller.permission.vo.menu.SysMenuRespVO;
 import cn.iocoder.dashboard.modules.system.controller.permission.vo.menu.SysMenuUpdateReqVO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.permission.SysMenuDO;
 
@@ -22,12 +21,19 @@ public interface SysMenuService {
     void init();
 
     /**
+     * 获得所有菜单列表
+     *
+     * @return 菜单列表
+     */
+    List<SysMenuDO> listMenus();
+
+    /**
      * 筛选菜单列表
      *
      * @param reqVO 筛选条件请求 VO
      * @return 菜单列表
      */
-    List<SysMenuRespVO> listMenus(SysMenuListReqVO reqVO);
+    List<SysMenuDO> listMenus(SysMenuListReqVO reqVO);
 
     /**
      * 获得所有菜单，从缓存中

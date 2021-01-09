@@ -2,6 +2,7 @@ package cn.iocoder.dashboard.modules.system.convert.permission;
 
 import cn.iocoder.dashboard.modules.system.controller.permission.vo.menu.SysMenuCreateReqVO;
 import cn.iocoder.dashboard.modules.system.controller.permission.vo.menu.SysMenuRespVO;
+import cn.iocoder.dashboard.modules.system.controller.permission.vo.menu.SysMenuSimpleRespVO;
 import cn.iocoder.dashboard.modules.system.controller.permission.vo.menu.SysMenuUpdateReqVO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.permission.SysMenuDO;
 import org.mapstruct.Mapper;
@@ -21,5 +22,7 @@ public interface SysMenuConvert {
     SysMenuDO convert(SysMenuUpdateReqVO bean);
 
     SysMenuRespVO convert(SysMenuDO bean);
+
+    List<SysMenuSimpleRespVO> convertList02(List<SysMenuDO> list);
 
 }

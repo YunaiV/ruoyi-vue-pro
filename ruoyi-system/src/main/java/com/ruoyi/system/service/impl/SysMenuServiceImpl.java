@@ -112,18 +112,6 @@ public class SysMenuServiceImpl implements ISysMenuService {
     }
 
     /**
-     * 构建前端所需要下拉树结构
-     *
-     * @param menus 菜单列表
-     * @return 下拉树结构列表
-     */
-    @Override
-    public List<TreeSelect> buildMenuTreeSelect(List<SysMenu> menus) {
-        List<SysMenu> menuTrees = buildMenuTree(menus);
-        return menuTrees.stream().map(TreeSelect::new).collect(Collectors.toList());
-    }
-
-    /**
      * 查询菜单使用数量
      *
      * @param menuId 菜单ID

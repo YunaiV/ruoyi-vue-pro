@@ -1,5 +1,6 @@
 package cn.iocoder.dashboard.modules.system.service.permission.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dao.permission.SysRoleMenuMapper;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dao.permission.SysUserRoleMapper;
@@ -16,6 +17,7 @@ import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
@@ -108,6 +110,36 @@ public class SysPermissionServiceImpl implements SysPermissionService {
             });
         }
         return CollectionUtils.convertSet(userRoleList, SysUserRoleDO::getRoleId);
+    }
+
+    @Override
+    public Set<Long> listRoleMenuIds(Long roleId) {
+        // 如果是管理员的情况下，获取全部菜单编号
+        SysRoleDO role = roleService.getRole(roleId);
+        if (roleService.hasAnyAdmin(Collections.singletonList(role))) {
+            return CollectionUtils.convertSet(menuService.listMenus(), SysMenuDO::getId);
+        }
+        // 如果是非管理员的情况下，获得拥有的菜单编号
+        return CollectionUtils.convertSet(roleMenuMapper.selectListByRoleId(roleId),
+                SysRoleMenuDO::getMenuId);
+    }
+
+    @Override
+    @Transactional
+    public void assignRoleMenu(Long roleId, Set<Long> menuIds) {
+        // 获得角色拥有菜单编号
+        Set<Long> dbMenuIds = CollectionUtils.convertSet(roleMenuMapper.selectListByRoleId(roleId),
+                SysRoleMenuDO::getMenuId);
+        // 计算新增和删除的菜单编号
+        Collection<Long> createMenuIds = CollUtil.subtract(menuIds, dbMenuIds);
+        Collection<Long> deleteMenuIds = CollUtil.subtract(dbMenuIds, menuIds);
+        // 执行新增和删除。对于已经授权的菜单，不用做任何处理
+        if (!CollectionUtil.isEmpty(createMenuIds)) {
+            roleMenuMapper.insertList(roleId, createMenuIds);
+        }
+        if (!CollectionUtil.isEmpty(deleteMenuIds)) {
+            roleMenuMapper.deleteListByRoleIdAndMenuIds(roleId, deleteMenuIds);
+        }
     }
 
     @Override

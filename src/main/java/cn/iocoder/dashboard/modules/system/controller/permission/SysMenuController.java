@@ -1,10 +1,8 @@
 package cn.iocoder.dashboard.modules.system.controller.permission;
 
+import cn.iocoder.dashboard.common.enums.CommonStatusEnum;
 import cn.iocoder.dashboard.common.pojo.CommonResult;
-import cn.iocoder.dashboard.modules.system.controller.permission.vo.menu.SysMenuCreateReqVO;
-import cn.iocoder.dashboard.modules.system.controller.permission.vo.menu.SysMenuListReqVO;
-import cn.iocoder.dashboard.modules.system.controller.permission.vo.menu.SysMenuRespVO;
-import cn.iocoder.dashboard.modules.system.controller.permission.vo.menu.SysMenuUpdateReqVO;
+import cn.iocoder.dashboard.modules.system.controller.permission.vo.menu.*;
 import cn.iocoder.dashboard.modules.system.convert.permission.SysMenuConvert;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.permission.SysMenuDO;
 import cn.iocoder.dashboard.modules.system.service.permission.SysMenuService;
@@ -15,6 +13,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.Comparator;
 import java.util.List;
 
 import static cn.iocoder.dashboard.common.pojo.CommonResult.success;
@@ -30,8 +29,22 @@ public class SysMenuController {
     @ApiOperation("获取菜单列表")
 //    @PreAuthorize("@ss.hasPermi('system:menu:list')")
     @GetMapping("/list")
-    public CommonResult<List<SysMenuRespVO>> list(SysMenuListReqVO reqVO) {
-        return success(menuService.listMenus(reqVO));
+    public CommonResult<List<SysMenuRespVO>> listMenus(SysMenuListReqVO reqVO) {
+        List<SysMenuDO> list = menuService.listMenus(reqVO);
+        list.sort(Comparator.comparing(SysMenuDO::getSort));
+        return success(SysMenuConvert.INSTANCE.convertList(list));
+    }
+
+    @ApiOperation(value = "获取菜单精简信息列表", notes = "只包含被开启的菜单，主要用于前端的下拉选项")
+    @GetMapping("/list-all-simple")
+    public CommonResult<List<SysMenuSimpleRespVO>> listSimpleMenus() {
+        // 获得菜单列表，只要开启状态的
+        SysMenuListReqVO reqVO = new SysMenuListReqVO();
+        reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
+        List<SysMenuDO> list = menuService.listMenus(reqVO);
+        // 排序后，返回个诶前端
+        list.sort(Comparator.comparing(SysMenuDO::getSort));
+        return success(SysMenuConvert.INSTANCE.convertList02(list));
     }
 
     @ApiOperation("获取菜单信息")
@@ -42,17 +55,6 @@ public class SysMenuController {
         return success(SysMenuConvert.INSTANCE.convert(menu));
     }
 
-//    /**
-//     * 获取菜单下拉树列表
-//     */
-//    @GetMapping("/treeselect")
-//    public AjaxResult treeselect(SysMenu menu) {
-//        LoginUser loginUser = tokenService.getLoginUser(ServletUtils.getRequest());
-//        Long userId = loginUser.getUser().getUserId();
-//        List<SysMenu> menus = menuService.selectMenuList(menu, userId);
-//        return AjaxResult.success(menuService.buildMenuTreeSelect(menus));
-//    }
-//
 //    /**
 //     * 加载对应角色菜单列表树
 //     */

@@ -3,7 +3,6 @@ package cn.iocoder.dashboard.modules.system.service.permission.impl;
 import cn.iocoder.dashboard.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.dashboard.modules.system.controller.permission.vo.menu.SysMenuCreateReqVO;
 import cn.iocoder.dashboard.modules.system.controller.permission.vo.menu.SysMenuListReqVO;
-import cn.iocoder.dashboard.modules.system.controller.permission.vo.menu.SysMenuRespVO;
 import cn.iocoder.dashboard.modules.system.controller.permission.vo.menu.SysMenuUpdateReqVO;
 import cn.iocoder.dashboard.modules.system.convert.permission.SysMenuConvert;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dao.permission.SysMenuMapper;
@@ -78,10 +77,13 @@ public class SysMenuServiceImpl implements SysMenuService {
     }
 
     @Override
-    public List<SysMenuRespVO> listMenus(SysMenuListReqVO reqVO) {
-        List<SysMenuDO> list = menuMapper.selectList(reqVO);
-        // TODO 排序
-        return SysMenuConvert.INSTANCE.convertList(list);
+    public List<SysMenuDO> listMenus() {
+        return menuMapper.selectList();
+    }
+
+    @Override
+    public List<SysMenuDO> listMenus(SysMenuListReqVO reqVO) {
+        return menuMapper.selectList(reqVO);
     }
 
     @Override
