@@ -8,7 +8,6 @@ import cn.iocoder.dashboard.framework.security.core.LoginUser;
 import cn.iocoder.dashboard.modules.system.convert.auth.SysAuthConvert;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.user.SysUserDO;
 import cn.iocoder.dashboard.modules.system.dal.redis.dao.auth.SysLoginUserRedisDAO;
-import cn.iocoder.dashboard.modules.system.enums.user.UserStatus;
 import cn.iocoder.dashboard.modules.system.service.auth.SysAuthService;
 import cn.iocoder.dashboard.modules.system.service.auth.SysTokenService;
 import cn.iocoder.dashboard.modules.system.service.permission.SysPermissionService;
@@ -199,7 +198,7 @@ public class SysAuthServiceImpl implements SysAuthService {
 
         // 重新加载 SysUserDO 信息
         SysUserDO user = userService.getUser(loginUser.getUserId());
-        if (user == null || UserStatus.DISABLE.getCode().equals(user.getStatus())) {
+        if (user == null || CommonStatusEnum.DISABLE.getStatus().equals(user.getStatus())) {
             throw exception(TOKEN_EXPIRED); // 校验 token 时，用户被禁用的情况下，也认为 token 过期，方便前端跳转到登陆界面
         }
 

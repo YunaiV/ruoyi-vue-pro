@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.framework.security.core;
 
-import cn.iocoder.dashboard.modules.system.enums.user.UserStatus;
+import cn.iocoder.dashboard.common.enums.CommonStatusEnum;
 import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
@@ -46,7 +46,7 @@ public class LoginUser implements UserDetails {
     /**
      * 状态
      */
-    private String status;
+    private Integer status;
 
     @Override
     @JSONField(serialize = false) // 避免序列化
@@ -63,7 +63,7 @@ public class LoginUser implements UserDetails {
     @Override
     @JSONField(serialize = false) // 避免序列化
     public boolean isEnabled() {
-        return UserStatus.OK.getCode().equals(status);
+        return CommonStatusEnum.ENABLE.getStatus().equals(status);
     }
 
     @Override

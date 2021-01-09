@@ -1,4 +1,4 @@
-package cn.iocoder.dashboard.modules.system.controller.permission.vo.role;
+package cn.iocoder.dashboard.modules.system.controller.user.vo.user;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -6,11 +6,11 @@ import lombok.Data;
 
 import javax.validation.constraints.NotNull;
 
-@ApiModel("角色更新状态 Request VO")
+@ApiModel("用户更新状态 Request VO")
 @Data
-public class SysRoleUpdateStatusReqVO {
+public class SysUserUpdateStatusReqVO {
 
-    @ApiModelProperty(value = "角色编号", required = true, example = "1024")
+    @ApiModelProperty(value = "用户编号", required = true, example = "1024")
     @NotNull(message = "角色编号不能为空")
     private Long id;
 
