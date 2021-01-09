@@ -7,7 +7,8 @@ import store from '@/store'
 
 export const DICT_TYPE = {
   SYS_COMMON_STATUS: 'sys_common_status',
-  SYS_MENU_TYPE: 'sys_menu_type'
+  SYS_MENU_TYPE: 'sys_menu_type',
+  SYS_ROLE_TYPE: 'sys_role_type',
 }
 
 /**

@@ -2,16 +2,12 @@ package cn.iocoder.dashboard.modules.system.controller.permission;
 
 import cn.iocoder.dashboard.common.pojo.CommonResult;
 import cn.iocoder.dashboard.common.pojo.PageResult;
-import cn.iocoder.dashboard.modules.system.controller.permission.vo.role.SysRoleCreateReqVO;
-import cn.iocoder.dashboard.modules.system.controller.permission.vo.role.SysRolePageReqVO;
-import cn.iocoder.dashboard.modules.system.controller.permission.vo.role.SysRoleRespVO;
-import cn.iocoder.dashboard.modules.system.controller.permission.vo.role.SysRoleUpdateReqVO;
+import cn.iocoder.dashboard.modules.system.controller.permission.vo.role.*;
 import cn.iocoder.dashboard.modules.system.convert.permission.SysRoleConvert;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.permission.SysRoleDO;
 import cn.iocoder.dashboard.modules.system.service.permission.SysRoleService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -82,14 +78,10 @@ public class SysRoleController {
 
     @ApiOperation("修改角色状态")
     @PostMapping("/update-status")
-    @ApiImplicitParams(value = {
-            @ApiImplicitParam(name = "id", value = "角色编号", required = true, example = "1024"),
-            @ApiImplicitParam(name = "status", value = "状态", required = true, example = "1")
-    })
 //    @PreAuthorize("@ss.hasPermi('system:role:edit')")
 //    @Log(title = "角色管理", businessType = BusinessType.UPDATE)
-    public CommonResult<Boolean> updateRoleStatus(@RequestParam("id") Long id, @RequestParam("status") Integer status) {
-        roleService.updateRoleStatus(id, status);
+    public CommonResult<Boolean> updateRoleStatus(@Validated @RequestBody SysRoleUpdateStatusReqVO reqVO) {
+        roleService.updateRoleStatus(reqVO.getId(), reqVO.getStatus());
         return success(true);
     }
 

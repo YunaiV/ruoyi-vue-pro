@@ -105,15 +105,8 @@ public class SysRoleServiceImpl implements SysRoleService {
 
     @Override
     public void updateRole(SysRoleUpdateReqVO reqVO) {
-        // 校验更新的角色是否存在
-        SysRoleDO role = roleMapper.selectById(reqVO.getId());
-        if (roleMapper.selectById(reqVO.getId()) == null) {
-            throw ServiceExceptionUtil.exception(ROLE_NOT_EXISTS);
-        }
-        // 内置角色，不允许修改
-        if (RoleTypeEnum.SYSTEM.getType().equals(role.getType())) {
-            throw ServiceExceptionUtil.exception(ROLE_CAN_NOT_UPDATE_SYSTEM_TYPE_ROLE);
-        }
+        // 校验是否可以更新
+        this.checkUpdateRole(reqVO.getId());
         // 校验角色的唯一字段是否重复
         checkDuplicateRole(reqVO.getName(), reqVO.getCode(), reqVO.getId());
         // 更新到数据库
@@ -123,15 +116,8 @@ public class SysRoleServiceImpl implements SysRoleService {
 
     @Override
     public void deleteRole(Long id) {
-        // 校验删除的角色是否存在
-        SysRoleDO roleDO = roleMapper.selectById(id);
-        if (roleMapper.selectById(id) == null) {
-            throw ServiceExceptionUtil.exception(ROLE_NOT_EXISTS);
-        }
-        // 内置角色，不允许删除
-        if (RoleTypeEnum.SYSTEM.getType().equals(roleDO.getType())) {
-            throw ServiceExceptionUtil.exception(ROLE_CAN_NOT_DELETE_SYSTEM_TYPE_ROLE);
-        }
+        // 校验是否可以更新
+        this.checkUpdateRole(id);
         // 标记删除
         roleMapper.deleteById(id);
         // 删除相关数据
@@ -152,11 +138,9 @@ public class SysRoleServiceImpl implements SysRoleService {
 
     @Override
     public void updateRoleStatus(Long id, Integer status) {
-        // 校验修改的角色是否存在
-        SysRoleDO roleDO = roleMapper.selectById(id);
-        if (roleMapper.selectById(id) == null) {
-            throw ServiceExceptionUtil.exception(ROLE_NOT_EXISTS);
-        }
+        // 校验是否可以更新
+        this.checkUpdateRole(id);
+        // 更新状态
         SysRoleDO updateObject = new SysRoleDO();
         updateObject.setId(id);
         updateObject.setStatus(status);
@@ -187,6 +171,22 @@ public class SysRoleServiceImpl implements SysRoleService {
         role = roleMapper.selectByCode(code);
         if (role != null && !role.getId().equals(id)) {
             throw ServiceExceptionUtil.exception(ROLE_CODE_DUPLICATE, name);
+        }
+    }
+
+    /**
+     * 校验角色是否可以被更新
+     *
+     * @param id 角色编号
+     */
+    private void checkUpdateRole(Long id) {
+        SysRoleDO roleDO = roleMapper.selectById(id);
+        if (roleDO == null) {
+            throw ServiceExceptionUtil.exception(ROLE_NOT_EXISTS);
+        }
+        // 内置角色，不允许删除
+        if (RoleTypeEnum.SYSTEM.getType().equals(roleDO.getType())) {
+            throw ServiceExceptionUtil.exception(ROLE_CAN_NOT_DELETE_SYSTEM_TYPE_ROLE);
         }
     }
 

@@ -30,4 +30,7 @@ public class SysRoleBaseVO {
     @ApiModelProperty(value = "角色类型", required = true, example = "1", notes = "见 RoleTypeEnum 枚举")
     private Integer type;
 
+    @ApiModelProperty(value = "备注", example = "我是一个角色")
+    private String remark;
+
 }

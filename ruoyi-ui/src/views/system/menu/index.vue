@@ -14,9 +14,9 @@
         <el-select v-model="queryParams.status" placeholder="菜单状态" clearable size="small">
           <el-option
             v-for="dict in statusDictDatas"
-            :key="dict.value"
+            :key="parseInt(dict.value)"
             :label="dict.label"
-            :value="dict.value"
+            :value="parseInt(dict.value)"
           />
         </el-select>
       </el-form-item>
