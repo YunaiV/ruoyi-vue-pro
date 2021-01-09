@@ -24,7 +24,18 @@ export const SysMenuTypeEnum = {
 /**
  * 角色的类型枚举
  */
-export const RoleTypeEnum = {
+export const SysRoleTypeEnum = {
   SYSTEM: 1, // 内置角色
   CUSTOM: 2 // 自定义角色
+}
+
+/**
+ * 数据权限的泛微枚举
+ */
+export const SysDataScopeEnum = {
+  ALL: 1, // 全部数据权限
+  DEPT_CUSTOM: 2, // 指定部门数据权限
+  DEPT_ONLY: 3, // 部门数据权限
+  DEPT_AND_CHILD: 4, // 部门及以下数据权限
+  DEPT_SELF: 5 // 仅本人数据权限
 }

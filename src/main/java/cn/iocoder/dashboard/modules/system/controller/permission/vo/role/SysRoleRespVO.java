@@ -25,7 +25,7 @@ public class SysRoleRespVO extends SysRoleBaseVO {
     @ApiModelProperty(value = "状态", required = true, example = "1", notes = "参见 SysCommonStatusEnum 枚举类")
     private Integer status;
 
-    @ApiModelProperty(value = "角色类型", required = true, example = "1", notes = "参见 RoleTypeEnum 枚举类")
+    @ApiModelProperty(value = "角色类型", required = true, example = "1", notes = "参见 SysRoleTypeEnum 枚举类")
     private Integer type;
 
     @ApiModelProperty(value = "创建时间", required = true, example = "时间戳格式")

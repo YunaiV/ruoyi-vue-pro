@@ -26,6 +26,7 @@ export function getDept(deptId) {
 }
 
 // 查询部门下拉树结构
+// TODO 准备删除
 export function treeselect() {
   return request({
     url: '/system/dept/treeselect',
@@ -34,9 +35,18 @@ export function treeselect() {
 }
 
 // 根据角色ID查询部门树结构
+// TODO 准备删除
 export function roleDeptTreeselect(roleId) {
   return request({
     url: '/system/dept/roleDeptTreeselect/' + roleId,
+    method: 'get'
+  })
+}
+
+// 获取部门精简信息列表
+export function listSimpleDepts() {
+  return request({
+    url: '/system/dept/list-all-simple',
     method: 'get'
   })
 }

@@ -1,5 +1,6 @@
 package cn.iocoder.dashboard.modules.system.service.dept.impl;
 
+import cn.iocoder.dashboard.modules.system.controller.dept.vo.dept.SysDeptListReqVO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dao.dept.SysDeptMapper;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.dept.SysDeptDO;
 import cn.iocoder.dashboard.modules.system.service.dept.SysDeptService;
@@ -22,6 +23,11 @@ public class SysDeptServiceImpl implements SysDeptService {
     @Override
     public List<SysDeptDO> listDepts() {
         return deptMapper.selectList();
+    }
+
+    @Override
+    public List<SysDeptDO> listDepts(SysDeptListReqVO reqVO) {
+        return deptMapper.selectList(reqVO);
     }
 
 }

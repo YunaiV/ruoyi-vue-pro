@@ -163,7 +163,7 @@
     </el-dialog>
 
     <!-- 分配角色的数据权限对话框 -->
-    <el-dialog :title="title" :visible.sync="openDataScope" width="500px" append-to-body>
+    <el-dialog title="分配数据权限" :visible.sync="openDataScope" width="500px" append-to-body>
       <el-form :model="form" label-width="80px">
         <el-form-item label="角色名称">
           <el-input v-model="form.name" :disabled="true" />
@@ -174,15 +174,15 @@
         <el-form-item label="权限范围">
           <el-select v-model="form.dataScope">
             <el-option
-              v-for="item in dataScopeOptions"
-              :key="item.value"
+              v-for="item in dataScopeDictDatas"
+              :key="parseInt(item.value)"
               :label="item.label"
-              :value="item.value"
+              :value="parseInt(item.value)"
             ></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="数据权限" v-show="form.dataScope == 2">
-          <el-checkbox v-model="form.deptCheckStrictly" @change="handleCheckedTreeConnect($event, 'dept')">父子联动</el-checkbox>
+        <el-form-item label="数据权限" v-show="form.dataScope === SysDataScopeEnum.DEPT_CUSTOM">
+          <el-checkbox v-model="!form.deptCheckStrictly" @change="handleCheckedTreeConnect($event, 'dept')">父子联动(选中父节点，自动选择子节点)</el-checkbox>
           <el-checkbox v-model="deptExpand" @change="handleCheckedTreeExpand($event, 'dept')">展开/折叠</el-checkbox>
           <el-checkbox v-model="deptNodeAll" @change="handleCheckedTreeNodeAll($event, 'dept')">全选/全不选</el-checkbox>
           <el-tree
@@ -237,11 +237,20 @@
 </template>
 
 <script>
-import { listRole, getRole, delRole, addRole, updateRole, exportRole, dataScope, changeRoleStatus } from "@/api/system/role";
-import { listSimpleMenus } from "@/api/system/menu";
-import { listRoleMenus, assignRoleMenu } from "@/api/system/permission";
-import { treeselect as deptTreeselect, roleDeptTreeselect } from "@/api/system/dept";
-import {SysCommonStatusEnum, SysMenuTypeEnum} from "@/utils/constants";
+import {
+  addRole,
+  changeRoleStatus,
+  dataScope,
+  delRole,
+  exportRole,
+  getRole,
+  listRole,
+  updateRole
+} from "@/api/system/role";
+import {listSimpleMenus} from "@/api/system/menu";
+import {assignRoleMenu, listRoleMenus} from "@/api/system/permission";
+import {listSimpleDepts, treeselect as deptTreeselect} from "@/api/system/dept";
+import {SysCommonStatusEnum, SysDataScopeEnum} from "@/utils/constants";
 import {DICT_TYPE, getDictDataLabel, getDictDatas} from "@/utils/dict";
 
 export default {
@@ -264,38 +273,12 @@ export default {
       openDataScope: false,
       // 是否显示弹出层（菜单权限）
       openMenu: false,
-      // TODO 需要简化下
       menuExpand: false,
       menuNodeAll: false,
       deptExpand: true,
       deptNodeAll: false,
       // 日期范围
       dateRange: [],
-      // 状态数据字典
-      statusOptions: [],
-      // 数据范围选项
-      dataScopeOptions: [
-        {
-          value: "1",
-          label: "全部数据权限"
-        },
-        {
-          value: "2",
-          label: "自定数据权限"
-        },
-        {
-          value: "3",
-          label: "本部门数据权限"
-        },
-        {
-          value: "4",
-          label: "本部门及以下数据权限"
-        },
-        {
-          value: "5",
-          label: "仅本人数据权限"
-        }
-      ],
       // 菜单列表
       menuOptions: [],
       // 部门列表
@@ -328,10 +311,12 @@ export default {
       },
 
       // 枚举
-      CommonStatusEnum: SysCommonStatusEnum,
+      SysCommonStatusEnum: SysCommonStatusEnum,
+      SysDataScopeEnum: SysDataScopeEnum,
       // 数据字典
       roleTypeDictDatas: getDictDatas(DICT_TYPE.SYS_ROLE_TYPE),
-      statusDictDatas: getDictDatas(DICT_TYPE.SYS_COMMON_STATUS)
+      statusDictDatas: getDictDatas(DICT_TYPE.SYS_COMMON_STATUS),
+      dataScopeDictDatas: getDictDatas(DICT_TYPE.SYS_DATA_SCOPE)
     };
   },
   created() {
@@ -348,28 +333,6 @@ export default {
           this.loading = false;
         }
       );
-    },
-    /** 查询部门树结构 */
-    getDeptTreeselect() {
-      deptTreeselect().then(response => {
-        this.deptOptions = response.data;
-      });
-    },
-    // 所有部门节点数据
-    getDeptAllCheckedKeys() {
-      // 目前被选中的部门节点
-      let checkedKeys = this.$refs.dept.getCheckedKeys();
-      // 半选中的部门节点
-      let halfCheckedKeys = this.$refs.dept.getHalfCheckedKeys();
-      checkedKeys.unshift.apply(checkedKeys, halfCheckedKeys);
-      return checkedKeys;
-    },
-    /** 根据角色ID查询部门树结构 */
-    getRoleDeptTreeselect(id) {
-      return roleDeptTreeselect(id).then(response => {
-        this.deptOptions = response.depts;
-        return response;
-      });
     },
     // 角色状态修改
     handleStatusChange(row) {
@@ -511,16 +474,22 @@ export default {
     /** 分配数据权限操作 */
     handleDataScope(row) {
       this.reset();
-      const roleDeptTreeselect = this.getRoleDeptTreeselect(row.id);
+      // 处理了 form 的角色 name 和 code 的展示
+      this.form.id = row.id;
+      this.form.name = row.name;
+      this.form.code = row.code;
+      // 打开弹窗
+      this.openDataScope = true;
+      // 获得部门列表
+      listSimpleDepts().then(response => {
+        // 处理 menuOptions 参数
+        this.deptOptions = [];
+        this.deptOptions.push(...this.handleTree(response.data, "id"));
+      });
+      // 获得角色拥有的数据权限
       getRole(row.id).then(response => {
-        this.form = response.data;
-        this.openDataScope = true;
-        this.$nextTick(() => {
-          roleDeptTreeselect.then(res => {
-            this.$refs.dept.setCheckedKeys(res.checkedKeys);
-          });
-        });
-        this.title = "分配数据权限";
+        // TODO 搞一搞
+        // this.$refs.dept.setCheckedKeys(res.checkedKeys);
       });
     },
     /** 提交按钮 */
@@ -546,8 +515,13 @@ export default {
     /** 提交按钮（数据权限） */
     submitDataScope: function() {
       if (this.form.id !== undefined) {
-        this.form.deptIds = this.getDeptAllCheckedKeys();
-        dataScope(this.form).then(response => {
+        // this.form.deptIds = this.getDeptAllCheckedKeys();
+        debugger
+        dataScope({
+          roleId: this.form.id,
+          deptIds: this.form.dataScope !== SysDataScopeEnum.DEPT_CUSTOM ? [] :
+              this.$refs.dept.getCheckedKeys(false)
+        }).then(response => {
           this.msgSuccess("修改成功");
           this.openDataScope = false;
           this.getList();
@@ -556,7 +530,6 @@ export default {
     },
     /** 提交按钮（菜单权限） */
     submitMenu: function() {
-      // TODO 需要改动下
       if (this.form.id !== undefined) {
         assignRoleMenu({
           roleId: this.form.id,
