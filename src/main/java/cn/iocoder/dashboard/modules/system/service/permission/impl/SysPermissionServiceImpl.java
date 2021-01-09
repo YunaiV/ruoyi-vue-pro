@@ -1,9 +1,12 @@
 package cn.iocoder.dashboard.modules.system.service.permission.impl;
 
-import cn.iocoder.dashboard.modules.system.dal.mysql.dao.permission.SysRoleDeptMapper;
+import cn.hutool.core.collection.CollectionUtil;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dao.permission.SysRoleMenuMapper;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dao.permission.SysUserRoleMapper;
-import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.permission.*;
+import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.permission.SysMenuDO;
+import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.permission.SysRoleDO;
+import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.permission.SysRoleMenuDO;
+import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.permission.SysUserRoleDO;
 import cn.iocoder.dashboard.modules.system.service.permission.SysMenuService;
 import cn.iocoder.dashboard.modules.system.service.permission.SysPermissionService;
 import cn.iocoder.dashboard.modules.system.service.permission.SysRoleService;
@@ -19,11 +22,12 @@ import javax.annotation.Resource;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 /**
  * 权限 Service 实现类
  *
- * @author 初始化
+ * @author 芋道源码
  */
 @Service
 @Slf4j
@@ -50,8 +54,6 @@ public class SysPermissionServiceImpl implements SysPermissionService {
     private SysRoleMenuMapper roleMenuMapper;
     @Resource
     private SysUserRoleMapper userRoleMapper;
-    @Resource
-    private SysRoleDeptMapper roleDeptMapper;
 
     @Resource
     private SysRoleService roleService;
@@ -96,19 +98,29 @@ public class SysPermissionServiceImpl implements SysPermissionService {
     }
 
     @Override
-    public List<Long> listUserRoleIds(Long userId) {
+    public Set<Long> listUserRoleIds(Long userId, Collection<Integer> roleStatuses) {
         List<SysUserRoleDO> userRoleList = userRoleMapper.selectListByUserId(userId);
-        return CollectionUtils.convertList(userRoleList, SysUserRoleDO::getRoleId);
+        // 过滤角色状态
+        if (CollectionUtil.isNotEmpty(roleStatuses)) {
+            userRoleList.removeIf(userRoleDO -> {
+                SysRoleDO role = roleService.getRoleFromCache(userRoleDO.getRoleId());
+                return role == null || !roleStatuses.contains(role.getStatus());
+            });
+        }
+        return CollectionUtils.convertSet(userRoleList, SysUserRoleDO::getRoleId);
     }
 
     @Override
-    public Long getDeptRoleId(Long deptId) {
-        SysRoleDeptDO roleDept = roleDeptMapper.selectById(deptId);
-        return roleDept != null ? roleDept.getRoleId() : null;
+    public void processRoleDeleted(Long roleId) {
+        // TODO 实现我
+//        // 标记删除 RoleResource
+//        roleResourceMapper.deleteByRoleId(roleId);
+//        // 标记删除 AdminRole
+//        adminRoleMapper.deleteByRoleId(roleId);
     }
 
     @Override
-    public void deleteRolesMenuByMenuId(Long menuId) {
+    public void processMenuDeleted(Long menuId) {
         // TODO 实现我
     }
 

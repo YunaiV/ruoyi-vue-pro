@@ -1,5 +1,9 @@
 package cn.iocoder.dashboard.modules.system.service.permission;
 
+import cn.iocoder.dashboard.common.pojo.PageResult;
+import cn.iocoder.dashboard.modules.system.controller.permission.vo.role.SysRoleCreateReqVO;
+import cn.iocoder.dashboard.modules.system.controller.permission.vo.role.SysRolePageReqVO;
+import cn.iocoder.dashboard.modules.system.controller.permission.vo.role.SysRoleUpdateReqVO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.permission.SysRoleDO;
 
 import java.util.Collection;
@@ -18,12 +22,20 @@ public interface SysRoleService {
     void init();
 
     /**
+     * 获得角色，从缓存中
+     *
+     * @param id 角色编号
+     * @return 角色
+     */
+    SysRoleDO getRoleFromCache(Long id);
+
+    /**
      * 获得角色数组，从缓存中
      *
-     * @param roleIds 角色编号数组
+     * @param ids 角色编号数组
      * @return 角色数组
      */
-    List<SysRoleDO> listRolesFromCache(Collection<Long> roleIds);
+    List<SysRoleDO> listRolesFromCache(Collection<Long> ids);
 
     /**
      * 判断角色数组中，是否有管理员
@@ -32,5 +44,51 @@ public interface SysRoleService {
      * @return 是否有管理员
      */
     boolean hasAnyAdmin(Collection<SysRoleDO> roleList);
+
+    /**
+     * 创建角色
+     *
+     * @param reqVO 创建角色信息
+     * @return 角色编号
+     */
+    Long createRole(SysRoleCreateReqVO reqVO);
+
+    /**
+     * 更新角色
+     *
+     * @param reqVO 更新角色信息
+     */
+    void updateRole(SysRoleUpdateReqVO reqVO);
+
+    /**
+     * 删除角色
+     *
+     * @param id 角色编号
+     */
+    void deleteRole(Long id);
+
+    /**
+     * 获得角色
+     *
+     * @param id 角色编号
+     * @return 角色
+     */
+    SysRoleDO getRole(Long id);
+
+    /**
+     * 获得角色分页
+     *
+     * @param reqVO 角色分页查询
+     * @return 角色分页结果
+     */
+    PageResult<SysRoleDO> pageRole(SysRolePageReqVO reqVO);
+
+    /**
+     * 更新角色状态
+     *
+     * @param id 角色编号
+     * @param status 状态
+     */
+    void updateRoleStatus(Long id, Integer status);
 
 }

@@ -2,8 +2,10 @@ package cn.iocoder.dashboard.modules.system.service.permission;
 
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.permission.SysMenuDO;
 
+import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 /**
  * 权限 Service 接口
@@ -33,26 +35,26 @@ public interface SysPermissionService {
                                            Collection<Integer> menusStatuses);
 
     /**
-     * 获得用户拥有的角色编号数组
+     * 获得用户拥有的角色编号集合
      *
      * @param userId 用户编号
-     * @return 角色编号数组
+     * @param roleStatuses 角色状态集合. 允许为空，为空时不过滤
+     * @return 角色编号集合
      */
-    List<Long> listUserRoleIds(Long userId);
+    Set<Long> listUserRoleIds(Long userId, @Nullable Collection<Integer> roleStatuses);
 
     /**
-     * 获得部门拥有的角色编号
+     * 处理角色删除时，删除关联授权角色
      *
-     * @param deptId 部门编号
-     * @return 角色编号
+     * @param roleId 角色编号
      */
-    Long getDeptRoleId(Long deptId);
+    void processRoleDeleted(Long roleId);
 
     /**
-     * 删除授予给角色的菜单们
+     * 处理菜单删除时，删除关联授权数据
      *
      * @param menuId 菜单编号
      */
-    void deleteRolesMenuByMenuId(Long menuId);
+    void processMenuDeleted(Long menuId);
 
 }

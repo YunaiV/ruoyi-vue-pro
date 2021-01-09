@@ -160,7 +160,7 @@ public class SysMenuServiceImpl implements SysMenuService {
         // 标记删除
         menuMapper.deleteById(menuId);
         // 删除授予给角色的权限
-        permissionService.deleteRolesMenuByMenuId(menuId);
+        permissionService.processMenuDeleted(menuId);
     }
 
     @Override

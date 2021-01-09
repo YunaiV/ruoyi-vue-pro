@@ -26,4 +26,11 @@ public interface SysErrorCodeConstants {
     ErrorCode MENU_EXISTS_CHILDREN = new ErrorCode(1002002004, "存在子菜单，无法删除");
     ErrorCode MENU_PARENT_NOT_DIR_OR_MENU = new ErrorCode(1002002005, "父菜单的类型必须是目录或者菜单");
 
+    // ========== 角色模块 1002003000 ==========
+    ErrorCode ROLE_NOT_EXISTS = new ErrorCode(1002003000, "角色不存在");
+    ErrorCode ROLE_NAME_DUPLICATE = new ErrorCode(1002003001, "已经存在名为【{}}】的角色");
+    ErrorCode ROLE_CODE_DUPLICATE = new ErrorCode(1002003002, "已经存在编码为【{}}】的角色");
+    ErrorCode ROLE_CAN_NOT_UPDATE_SYSTEM_TYPE_ROLE = new ErrorCode(1002003004, "不能修改类型为系统内置的角色");
+    ErrorCode ROLE_CAN_NOT_DELETE_SYSTEM_TYPE_ROLE = new ErrorCode(1002003005, "不能删除类型为系统内置的角色");
+
 }

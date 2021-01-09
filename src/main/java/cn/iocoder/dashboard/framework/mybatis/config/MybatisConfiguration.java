@@ -1,7 +1,10 @@
 package cn.iocoder.dashboard.framework.mybatis.config;
 
+import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
+import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
 import org.apache.ibatis.annotations.Mapper;
 import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
@@ -12,4 +15,12 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @MapperScan(value = "cn.iocoder.dashboard", annotationClass = Mapper.class)
 public class MybatisConfiguration {
+
+    @Bean
+    public MybatisPlusInterceptor mybatisPlusInterceptor() {
+        MybatisPlusInterceptor mybatisPlusInterceptor = new MybatisPlusInterceptor();
+        mybatisPlusInterceptor.addInnerInterceptor(new PaginationInnerInterceptor()); // 分页插件
+        return mybatisPlusInterceptor;
+    }
+
 }

@@ -9,6 +9,7 @@ import cn.iocoder.dashboard.modules.system.convert.permission.SysMenuConvert;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.permission.SysMenuDO;
 import cn.iocoder.dashboard.modules.system.service.permission.SysMenuService;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -65,7 +66,7 @@ public class SysMenuController {
 //        return ajax;
 //    }
 
-    @ApiOperation("新增菜单")
+    @ApiOperation("创建菜单")
 //    @PreAuthorize("@ss.hasPermi('system:menu:add')")
 //    @Log(title = "菜单管理", businessType = BusinessType.INSERT)
     @PostMapping("/create")
@@ -85,6 +86,7 @@ public class SysMenuController {
 
     @ApiOperation("删除菜单")
     @PostMapping("/delete")
+    @ApiImplicitParam(name = "id", value = "角色编号", required= true, example = "1024")
 //    @Log(title = "菜单管理", businessType = BusinessType.DELETE)
     public CommonResult<Boolean> deleteMenu(@RequestParam("id") Long id) {
         menuService.deleteMenu(id);

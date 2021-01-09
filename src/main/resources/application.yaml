@@ -43,6 +43,7 @@ yudao:
 mybatis-plus:
   configuration:
     map-underscore-to-camel-case: true # 虽然默认为 true ，但是还是显示去指定下。
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl # 打印日志
   global-config:
     db-config:
       id-type: auto # 自增 ID

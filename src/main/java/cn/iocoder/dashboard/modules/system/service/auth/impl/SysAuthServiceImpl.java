@@ -5,22 +5,14 @@ import cn.hutool.core.util.StrUtil;
 import cn.iocoder.dashboard.common.enums.CommonStatusEnum;
 import cn.iocoder.dashboard.framework.security.config.SecurityProperties;
 import cn.iocoder.dashboard.framework.security.core.LoginUser;
-import cn.iocoder.dashboard.modules.system.controller.auth.vo.SysAuthMenuRespVO;
-import cn.iocoder.dashboard.modules.system.controller.auth.vo.SysAuthPermissionInfoRespVO;
 import cn.iocoder.dashboard.modules.system.convert.auth.SysAuthConvert;
-import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.permission.SysMenuDO;
-import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.permission.SysRoleDO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.user.SysUserDO;
 import cn.iocoder.dashboard.modules.system.dal.redis.dao.auth.SysLoginUserRedisDAO;
-import cn.iocoder.dashboard.modules.system.enums.permission.MenuTypeEnum;
 import cn.iocoder.dashboard.modules.system.enums.user.UserStatus;
 import cn.iocoder.dashboard.modules.system.service.auth.SysAuthService;
 import cn.iocoder.dashboard.modules.system.service.auth.SysTokenService;
 import cn.iocoder.dashboard.modules.system.service.permission.SysPermissionService;
-import cn.iocoder.dashboard.modules.system.service.permission.SysRoleService;
 import cn.iocoder.dashboard.modules.system.service.user.SysUserService;
-import cn.iocoder.dashboard.util.collection.CollectionUtils;
-import cn.iocoder.dashboard.util.collection.SetUtils;
 import cn.iocoder.dashboard.util.date.DateUtils;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
@@ -37,9 +29,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import javax.annotation.Resource;
+import java.util.Collections;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import static cn.iocoder.dashboard.common.exception.util.ServiceExceptionUtil.exception;
@@ -63,8 +54,6 @@ public class SysAuthServiceImpl implements SysAuthService {
     private AuthenticationManager authenticationManager;
     @Resource
     private SysUserService userService;
-    @Resource
-    private SysRoleService roleService;
     @Resource
     private SysPermissionService permissionService;
 
@@ -92,7 +81,7 @@ public class SysAuthServiceImpl implements SysAuthService {
         // 创建 LoginUser 对象
         LoginUser loginUser = SysAuthConvert.INSTANCE.convert(user);
         loginUser.setUpdateTime(new Date());
-        loginUser.setRoleIds(this.getUserRoleIds(loginUser.getUserId(), loginUser.getDeptId()));
+        loginUser.setRoleIds(this.getUserRoleIds(loginUser.getUserId()));
         return loginUser;
     }
 
@@ -106,7 +95,7 @@ public class SysAuthServiceImpl implements SysAuthService {
         // 缓存登陆用户到 Redis 中
         String sessionId = IdUtil.fastSimpleUUID();
         loginUser.setUpdateTime(new Date());
-        loginUser.setRoleIds(this.getUserRoleIds(loginUser.getUserId(), loginUser.getDeptId()));
+        loginUser.setRoleIds(this.getUserRoleIds(loginUser.getUserId()));
         loginUserRedisDAO.set(sessionId, loginUser);
 
         // 创建 Token
@@ -156,15 +145,10 @@ public class SysAuthServiceImpl implements SysAuthService {
      * 获得 User 拥有的角色编号数组
      *
      * @param userId 用户编号
-     * @param deptId 科室编号
      * @return 角色编号数组
      */
-    private Set<Long> getUserRoleIds(Long userId, Long deptId) {
-        // 用户拥有的角色
-        Set<Long> roleIds = new HashSet<>(permissionService.listUserRoleIds(userId));
-        // 部门拥有的角色
-        CollectionUtils.addIfNotNull(roleIds, permissionService.getDeptRoleId(deptId));
-        return roleIds;
+    private Set<Long> getUserRoleIds(Long userId) {
+        return permissionService.listUserRoleIds(userId, Collections.singleton(CommonStatusEnum.ENABLE.getStatus()));
     }
 
     @Override
@@ -222,7 +206,7 @@ public class SysAuthServiceImpl implements SysAuthService {
         // 刷新 LoginUser 缓存
         loginUser.setDeptId(user.getDeptId());
         loginUser.setUpdateTime(new Date());
-        loginUser.setRoleIds(this.getUserRoleIds(loginUser.getUserId(), loginUser.getDeptId()));
+        loginUser.setRoleIds(this.getUserRoleIds(loginUser.getUserId()));
         loginUserRedisDAO.set(sessionId, loginUser);
     }
 

@@ -5,17 +5,21 @@ import cn.iocoder.dashboard.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.dashboard.framework.security.core.enums.DataScopeEnum;
 import cn.iocoder.dashboard.modules.system.enums.permission.RoleCodeEnum;
 import cn.iocoder.dashboard.modules.system.enums.permission.RoleTypeEnum;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.extension.handlers.FastjsonTypeHandler;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import java.util.List;
 
 /**
  * 角色 DO
  *
  * @author ruoyi
  */
-@TableName("sys_role")
+@TableName(value = "sys_role", autoResultMap = true)
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class SysRoleDO extends BaseDO {
@@ -40,17 +44,11 @@ public class SysRoleDO extends BaseDO {
      */
     private Integer sort;
     /**
-     * 数据范围
-     *
-     * 枚举类 {@link DataScopeEnum}
-     */
-    private Integer dataScope;
-    /**
      * 角色状态
      *
      * 枚举 {@link CommonStatusEnum}
      */
-    private String status;
+    private Integer status;
     /**
      * 角色类型
      *
@@ -63,13 +61,17 @@ public class SysRoleDO extends BaseDO {
     private String remark;
 
     /**
-     * 菜单树选择项是否关联显示（ 0：父子不互相关联显示 1：父子互相关联显示）
+     * 数据范围
+     *
+     * 枚举 {@link DataScopeEnum}
      */
-    private boolean menuCheckStrictly;
-
+    private Integer dataScope;
     /**
-     * 部门树选择项是否关联显示（0：父子不互相关联显示 1：父子互相关联显示 ）
+     * 数据范围(指定部门数组)
+     *
+     * 适用于 {@link #dataScope} 的值为 {@link DataScopeEnum#DEPT_CUSTOM} 时
      */
-    private boolean deptCheckStrictly;
+    @TableField(typeHandler = FastjsonTypeHandler.class)
+    private List<Long> dataScopeDeptIds;
 
 }

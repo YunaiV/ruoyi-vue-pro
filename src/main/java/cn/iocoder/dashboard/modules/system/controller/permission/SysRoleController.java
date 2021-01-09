@@ -1,23 +1,75 @@
 package cn.iocoder.dashboard.modules.system.controller.permission;
 
+import cn.iocoder.dashboard.common.pojo.CommonResult;
+import cn.iocoder.dashboard.common.pojo.PageResult;
+import cn.iocoder.dashboard.modules.system.controller.permission.vo.role.SysRoleCreateReqVO;
+import cn.iocoder.dashboard.modules.system.controller.permission.vo.role.SysRolePageReqVO;
+import cn.iocoder.dashboard.modules.system.controller.permission.vo.role.SysRoleRespVO;
+import cn.iocoder.dashboard.modules.system.controller.permission.vo.role.SysRoleUpdateReqVO;
+import cn.iocoder.dashboard.modules.system.convert.permission.SysRoleConvert;
+import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.permission.SysRoleDO;
+import cn.iocoder.dashboard.modules.system.service.permission.SysRoleService;
 import io.swagger.annotations.Api;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
+import javax.annotation.Resource;
+
+import static cn.iocoder.dashboard.common.pojo.CommonResult.success;
 
 @Api(tags = "角色 API")
 @RestController
 @RequestMapping("/system/role")
 public class SysRoleController {
 
+    @Resource
+    private SysRoleService roleService;
+
+    @ApiOperation("获得角色分页")
+    @GetMapping("/page")
 //    @PreAuthorize("@ss.hasPermi('system:role:list')")
-//    @GetMapping("/list")
-//    public TableDataInfo list(SysRole role)
-//    {
-//        startPage();
-//        List<SysRole> list = roleService.selectRoleList(role);
-//        return getDataTable(list);
-//    }
-//
+    public CommonResult<PageResult<SysRoleDO>> list(SysRolePageReqVO reqVO) {
+        return success(roleService.pageRole(reqVO));
+    }
+
+    @ApiOperation("创建角色")
+    @PostMapping("/create")
+//    @PreAuthorize("@ss.hasPermi('system:role:add')")
+//    @Log(title = "角色管理", businessType = BusinessType.INSERT)
+    public CommonResult<Long> add(@Validated @RequestBody SysRoleCreateReqVO reqVO) {
+        return success(roleService.createRole(reqVO));
+    }
+
+    @ApiOperation("修改角色")
+//    @PreAuthorize("@ss.hasPermi('system:role:edit')")
+//    @Log(title = "角色管理", businessType = BusinessType.UPDATE)
+    @PostMapping("/update")
+    public CommonResult<Boolean> update(@Validated @RequestBody SysRoleUpdateReqVO reqVO) {
+        roleService.updateRole(reqVO);
+        return success(true);
+    }
+
+    @ApiOperation("删除角色")
+    @PostMapping("/delete")
+    @ApiImplicitParam(name = "id", value = "角色编号", required = true, example = "1024")
+//    @PreAuthorize("@ss.hasPermi('system:role:remove')")
+//    @Log(title = "角色管理", businessType = BusinessType.DELETE)
+    public CommonResult<Boolean> remove(@RequestParam("id") Long id) {
+        roleService.deleteRole(id);
+        return success(true);
+    }
+
+    @ApiOperation("获得角色信息")
+    @GetMapping("/get")
+//    @PreAuthorize("@ss.hasPermi('system:role:query')")
+    public CommonResult<SysRoleRespVO> getRole(@RequestParam("id") Long id) {
+        SysRoleDO role = roleService.getRole(id);
+        return success(SysRoleConvert.INSTANCE.convert(role));
+    }
+
 //    @Log(title = "角色管理", businessType = BusinessType.EXPORT)
 //    @PreAuthorize("@ss.hasPermi('system:role:export')")
 //    @GetMapping("/export")
@@ -27,71 +79,20 @@ public class SysRoleController {
 //        ExcelUtil<SysRole> util = new ExcelUtil<SysRole>(SysRole.class);
 //        return util.exportExcel(list, "角色数据");
 //    }
-//
-//    /**
-//     * 根据角色编号获取详细信息
-//     */
-//    @PreAuthorize("@ss.hasPermi('system:role:query')")
-//    @GetMapping(value = "/{roleId}")
-//    public AjaxResult getInfo(@PathVariable Long roleId)
-//    {
-//        return AjaxResult.success(roleService.selectRoleById(roleId));
-//    }
-//
-//    /**
-//     * 新增角色
-//     */
-//    @PreAuthorize("@ss.hasPermi('system:role:add')")
-//    @Log(title = "角色管理", businessType = BusinessType.INSERT)
-//    @PostMapping
-//    public AjaxResult add(@Validated @RequestBody SysRole role)
-//    {
-//        if (UserConstants.NOT_UNIQUE.equals(roleService.checkRoleNameUnique(role)))
-//        {
-//            return AjaxResult.error("新增角色'" + role.getRoleName() + "'失败，角色名称已存在");
-//        }
-//        else if (UserConstants.NOT_UNIQUE.equals(roleService.checkRoleKeyUnique(role)))
-//        {
-//            return AjaxResult.error("新增角色'" + role.getRoleName() + "'失败，角色权限已存在");
-//        }
-//        role.setCreateBy(SecurityUtils.getUsername());
-//        return toAjax(roleService.insertRole(role));
-//
-//    }
-//
-//    /**
-//     * 修改保存角色
-//     */
+
+    @ApiOperation("修改角色状态")
+    @PostMapping("/update-status")
+    @ApiImplicitParams(value = {
+            @ApiImplicitParam(name = "id", value = "角色编号", required = true, example = "1024"),
+            @ApiImplicitParam(name = "status", value = "状态", required = true, example = "1")
+    })
 //    @PreAuthorize("@ss.hasPermi('system:role:edit')")
 //    @Log(title = "角色管理", businessType = BusinessType.UPDATE)
-//    @PutMapping
-//    public AjaxResult edit(@Validated @RequestBody SysRole role)
-//    {
-//        roleService.checkRoleAllowed(role);
-//        if (UserConstants.NOT_UNIQUE.equals(roleService.checkRoleNameUnique(role)))
-//        {
-//            return AjaxResult.error("修改角色'" + role.getRoleName() + "'失败，角色名称已存在");
-//        }
-//        else if (UserConstants.NOT_UNIQUE.equals(roleService.checkRoleKeyUnique(role)))
-//        {
-//            return AjaxResult.error("修改角色'" + role.getRoleName() + "'失败，角色权限已存在");
-//        }
-//        role.setUpdateBy(SecurityUtils.getUsername());
-//
-//        if (roleService.updateRole(role) > 0)
-//        {
-//            // 更新缓存用户权限
-//            LoginUser loginUser = tokenService.getLoginUser(ServletUtils.getRequest());
-//            if (StringUtils.isNotNull(loginUser.getUser()) && !loginUser.getUser().isAdmin())
-//            {
-//                loginUser.setPermissions(permissionService.getMenuPermission(loginUser.getUser()));
-//                loginUser.setUser(userService.selectUserByUserName(loginUser.getUser().getUserName()));
-//                tokenService.setLoginUser(loginUser);
-//            }
-//            return AjaxResult.success();
-//        }
-//        return AjaxResult.error("修改角色'" + role.getRoleName() + "'失败，请联系管理员");
-//    }
+    public CommonResult<Boolean> updateRoleStatus(@RequestParam("id") Long id, @RequestParam("status") Integer status) {
+        roleService.updateRoleStatus(id, status);
+        return success(true);
+    }
+
 //
 //    /**
 //     * 修改保存数据权限
@@ -104,30 +105,8 @@ public class SysRoleController {
 //        roleService.checkRoleAllowed(role);
 //        return toAjax(roleService.authDataScope(role));
 //    }
-//
-//    /**
-//     * 状态修改
-//     */
-//    @PreAuthorize("@ss.hasPermi('system:role:edit')")
-//    @Log(title = "角色管理", businessType = BusinessType.UPDATE)
-//    @PutMapping("/changeStatus")
-//    public AjaxResult changeStatus(@RequestBody SysRole role)
-//    {
-//        roleService.checkRoleAllowed(role);
-//        role.setUpdateBy(SecurityUtils.getUsername());
-//        return toAjax(roleService.updateRoleStatus(role));
-//    }
-//
-//    /**
-//     * 删除角色
-//     */
-//    @PreAuthorize("@ss.hasPermi('system:role:remove')")
-//    @Log(title = "角色管理", businessType = BusinessType.DELETE)
-//    @DeleteMapping("/{roleIds}")
-//    public AjaxResult remove(@PathVariable Long[] roleIds)
-//    {
-//        return toAjax(roleService.deleteRoleByIds(roleIds));
-//    }
+
+
 //
 //    /**
 //     * 获取角色选择框列表
