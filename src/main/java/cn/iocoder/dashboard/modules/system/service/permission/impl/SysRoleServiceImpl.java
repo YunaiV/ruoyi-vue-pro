@@ -23,10 +23,7 @@ import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.*;
@@ -148,6 +145,18 @@ public class SysRoleServiceImpl implements SysRoleService {
         roleMapper.updateById(updateObject);
     }
 
+    @Override
+    public void updateRoleDataScope(Long id, Integer dataScope, Set<Long> dataScopeDeptIds) {
+        // 校验是否可以更新
+        checkUpdateRole(id);
+        // 更新数据范围
+        SysRoleDO updateObject = new SysRoleDO();
+        updateObject.setId(id);
+        updateObject.setDataScope(dataScope);
+        updateObject.setDataScopeDeptIds(dataScopeDeptIds);
+        roleMapper.updateById(updateObject);
+    }
+
     /**
      * 校验角色的唯一字段是否重复
      *
@@ -187,7 +196,7 @@ public class SysRoleServiceImpl implements SysRoleService {
         }
         // 内置角色，不允许删除
         if (RoleTypeEnum.SYSTEM.getType().equals(roleDO.getType())) {
-            throw ServiceExceptionUtil.exception(ROLE_CAN_NOT_DELETE_SYSTEM_TYPE_ROLE);
+            throw ServiceExceptionUtil.exception(ROLE_CAN_NOT_UPDATE_SYSTEM_TYPE_ROLE);
         }
     }
 

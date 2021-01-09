@@ -52,12 +52,21 @@ public interface SysPermissionService {
     Set<Long> listRoleMenuIds(Long roleId);
 
     /**
-     * 赋予赋予角色菜单
+     * 设置角色菜单
      *
      * @param roleId 角色编号
      * @param menuIds 菜单编号集合
      */
     void assignRoleMenu(Long roleId, Set<Long> menuIds);
+
+    /**
+     * 设置角色的数据权限
+     *
+     * @param roleId 角色编号
+     * @param dataScope 数据范围
+     * @param dataScopeDeptIds 部门编号数组
+     */
+    void assignRoleDataScope(Long roleId, Integer dataScope, Set<Long> dataScopeDeptIds);
 
     /**
      * 处理角色删除时，删除关联授权角色

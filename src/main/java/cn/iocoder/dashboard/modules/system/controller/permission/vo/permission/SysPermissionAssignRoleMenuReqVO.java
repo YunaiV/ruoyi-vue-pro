@@ -12,7 +12,7 @@ import java.util.Set;
 @Data
 public class SysPermissionAssignRoleMenuReqVO {
 
-    @ApiModelProperty(value = "角色名", required = true, example = "1")
+    @ApiModelProperty(value = "角色编号", required = true, example = "1")
     @NotNull(message = "角色编号不能为空")
     private Long roleId;
 

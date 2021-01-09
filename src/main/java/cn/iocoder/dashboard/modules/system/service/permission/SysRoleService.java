@@ -8,6 +8,7 @@ import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.permission.SysRo
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 /**
  * 角色 Service 接口
@@ -90,5 +91,14 @@ public interface SysRoleService {
      * @param status 状态
      */
     void updateRoleStatus(Long id, Integer status);
+
+    /**
+     * 设置角色的数据权限
+     *
+     * @param id 角色编号
+     * @param dataScope 数据范围
+     * @param dataScopeDeptIds 部门编号数组
+     */
+    void updateRoleDataScope(Long id, Integer dataScope, Set<Long> dataScopeDeptIds);
 
 }

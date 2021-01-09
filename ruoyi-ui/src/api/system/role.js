@@ -35,15 +35,6 @@ export function updateRole(data) {
   })
 }
 
-// 角色数据权限
-export function dataScope(data) {
-  return request({
-    url: '/system/role/dataScope',
-    method: 'put',
-    data: data
-  })
-}
-
 // 角色状态修改
 export function changeRoleStatus(id, status) {
   const data = {

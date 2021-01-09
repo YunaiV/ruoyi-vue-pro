@@ -4,22 +4,6 @@
 		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ruoyi.system.mapper.SysMenuMapper">
 
-    <select id="selectMenuList" parameterType="SysMenu" resultMap="SysMenuResult">
-		<include refid="selectMenuVo"/>
-		<where>
-			<if test="menuName != null and menuName != ''">
-				AND menu_name like concat('%', #{menuName}, '%')
-			</if>
-			<if test="visible != null and visible != ''">
-				AND visible = #{visible}
-			</if>
-			<if test="status != null and status != ''">
-				AND status = #{status}
-			</if>
-		</where>
-		order by parent_id, order_num
-	</select>
-
 	<select id="selectMenuTreeAll" resultMap="SysMenuResult">
 		select distinct m.menu_id, m.parent_id, m.menu_name, m.path, m.component, m.visible, m.status, ifnull(m.perms,'') as perms, m.is_frame, m.is_cache, m.menu_type, m.icon, m.order_num, m.create_time
 		from sys_menu m where m.menu_type in ('M', 'C') and m.status = 0
@@ -67,13 +51,6 @@
 		order by m.parent_id, m.order_num
 	</select>
 
-	<select id="selectMenuPerms" resultType="String">
-		select distinct m.perms
-		from sys_menu m
-			 left join sys_role_menu rm on m.menu_id = rm.menu_id
-			 left join sys_user_role ur on rm.role_id = ur.role_id
-	</select>
-
 	<select id="selectMenuPermsByUserId" parameterType="Long" resultType="String">
 		select distinct m.perms
 		from sys_menu m
@@ -81,15 +58,6 @@
 			 left join sys_user_role ur on rm.role_id = ur.role_id
 			 left join sys_role r on r.role_id = ur.role_id
 		where m.status = '0' and r.status = '0' and ur.user_id = #{userId}
-	</select>
-
-	<select id="hasChildByMenuId" resultType="Integer">
-	    select count(1) from sys_menu where parent_id = #{menuId}
-	</select>
-
-	<select id="checkMenuNameUnique" parameterType="SysMenu" resultMap="SysMenuResult">
-		<include refid="selectMenuVo"/>
-		where menu_name=#{menuName} and parent_id = #{parentId} limit 1
 	</select>
 
 </mapper>

@@ -143,6 +143,11 @@ public class SysPermissionServiceImpl implements SysPermissionService {
     }
 
     @Override
+    public void assignRoleDataScope(Long roleId, Integer dataScope, Set<Long> dataScopeDeptIds) {
+        roleService.updateRoleDataScope(roleId, dataScope, dataScopeDeptIds);
+    }
+
+    @Override
     public void processRoleDeleted(Long roleId) {
         // TODO 实现我
 //        // 标记删除 RoleResource

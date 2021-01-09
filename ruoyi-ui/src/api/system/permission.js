@@ -16,3 +16,12 @@ export function assignRoleMenu(data) {
     data: data
   })
 }
+
+// 赋予角色数据权限
+export function assignRoleDataScope(data) {
+  return request({
+    url: '/system/permission/assign-role-data-scope',
+    method: 'post',
+    data: data
+  })
+}

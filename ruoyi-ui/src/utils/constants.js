@@ -30,7 +30,7 @@ export const SysRoleTypeEnum = {
 }
 
 /**
- * 数据权限的泛微枚举
+ * 数据权限的范围枚举
  */
 export const SysDataScopeEnum = {
   ALL: 1, // 全部数据权限

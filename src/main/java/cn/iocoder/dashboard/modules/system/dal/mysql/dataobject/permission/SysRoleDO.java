@@ -12,7 +12,7 @@ import com.baomidou.mybatisplus.extension.handlers.FastjsonTypeHandler;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.util.List;
+import java.util.Set;
 
 /**
  * 角色 DO
@@ -72,6 +72,6 @@ public class SysRoleDO extends BaseDO {
      * 适用于 {@link #dataScope} 的值为 {@link DataScopeEnum#DEPT_CUSTOM} 时
      */
     @TableField(typeHandler = FastjsonTypeHandler.class)
-    private List<Long> dataScopeDeptIds;
+    private Set<Long> dataScopeDeptIds;
 
 }

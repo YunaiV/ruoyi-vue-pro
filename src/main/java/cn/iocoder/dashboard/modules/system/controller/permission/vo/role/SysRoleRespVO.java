@@ -8,6 +8,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
+import java.util.Set;
 
 @ApiModel("角色信息 Response VO")
 @Data
@@ -21,6 +22,9 @@ public class SysRoleRespVO extends SysRoleBaseVO {
 
     @ApiModelProperty(value = "数据范围", required = true, example = "1", notes = "参见 DataScopeEnum 枚举类")
     private Integer dataScope;
+
+    @ApiModelProperty(value = "数据范围(指定部门数组)", example = "1")
+    private Set<Long> dataScopeDeptIds;
 
     @ApiModelProperty(value = "状态", required = true, example = "1", notes = "参见 SysCommonStatusEnum 枚举类")
     private Integer status;

@@ -1,6 +1,7 @@
 package cn.iocoder.dashboard.modules.system.controller.permission;
 
 import cn.iocoder.dashboard.common.pojo.CommonResult;
+import cn.iocoder.dashboard.modules.system.controller.permission.vo.permission.SysPermissionAssignRoleDataScopeReqVO;
 import cn.iocoder.dashboard.modules.system.controller.permission.vo.permission.SysPermissionAssignRoleMenuReqVO;
 import cn.iocoder.dashboard.modules.system.service.permission.SysPermissionService;
 import io.swagger.annotations.Api;
@@ -40,6 +41,15 @@ public class SysPermissionController {
 //    @RequiresPermissions("system:permission:assign-role-resource")
     public CommonResult<Boolean> assignRoleMenu(@Validated @RequestBody SysPermissionAssignRoleMenuReqVO reqVO) {
         permissionService.assignRoleMenu(reqVO.getRoleId(), reqVO.getMenuIds());
+        return success(true);
+    }
+
+    @PostMapping("/assign-role-data-scope")
+    @ApiOperation("赋予角色数据权限")
+//    @RequiresPermissions("system:permission:assign-role-data-scope")
+    public CommonResult<Boolean> assignRoleDataScope(
+            @Validated @RequestBody SysPermissionAssignRoleDataScopeReqVO reqVO) {
+        permissionService.assignRoleDataScope(reqVO.getRoleId(), reqVO.getDataScope(), reqVO.getDataScopeDeptIds());
         return success(true);
     }
 

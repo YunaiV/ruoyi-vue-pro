@@ -14,7 +14,9 @@ public interface SysRoleMapper extends BaseMapper<SysRoleDO> {
     default IPage<SysRoleDO> selectPage(SysRolePageReqVO reqVO) {
         return selectPage(MyBatisUtils.buildPage(reqVO),
                 new QueryWrapperX<SysRoleDO>().likeIfPresent("name", reqVO.getName())
-                    .eqIfPresent("status", reqVO.getStatus()));
+                    .likeIfPresent("code", reqVO.getCode())
+                    .eqIfPresent("status", reqVO.getStatus())
+                    .betweenIfPresent("create_time", reqVO.getBeginTime(), reqVO.getEndTime()));
     }
 
     default SysRoleDO selectByName(String name) {

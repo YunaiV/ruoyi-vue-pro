@@ -248,8 +248,8 @@ import {
   updateRole
 } from "@/api/system/role";
 import {listSimpleMenus} from "@/api/system/menu";
-import {assignRoleMenu, listRoleMenus} from "@/api/system/permission";
-import {listSimpleDepts, treeselect as deptTreeselect} from "@/api/system/dept";
+import {assignRoleMenu, listRoleMenus, assignRoleDataScope} from "@/api/system/permission";
+import {listSimpleDepts} from "@/api/system/dept";
 import {SysCommonStatusEnum, SysDataScopeEnum} from "@/utils/constants";
 import {DICT_TYPE, getDictDataLabel, getDictDatas} from "@/utils/dict";
 
@@ -326,7 +326,10 @@ export default {
     /** 查询角色列表 */
     getList() {
       this.loading = true;
-      listRole(this.addDateRange(this.queryParams, this.dateRange)).then(
+      listRole(this.addDateRange(this.queryParams, [
+        this.dateRange[0] ? this.dateRange[0] + ' 00:00:00' : undefined,
+        this.dateRange[1] ? this.dateRange[1] + ' 23:59:59' : undefined,
+      ])).then(
         response => {
           this.roleList = response.data.list;
           this.total = response.data.total;
@@ -387,6 +390,7 @@ export default {
         sort: 0,
         deptIds: [],
         menuIds: [],
+        dataScope: undefined,
         deptCheckStrictly: false,
         remark: undefined
       };
@@ -485,11 +489,11 @@ export default {
         // 处理 menuOptions 参数
         this.deptOptions = [];
         this.deptOptions.push(...this.handleTree(response.data, "id"));
-      });
-      // 获得角色拥有的数据权限
-      getRole(row.id).then(response => {
-        // TODO 搞一搞
-        // this.$refs.dept.setCheckedKeys(res.checkedKeys);
+        // 获得角色拥有的数据权限
+        getRole(row.id).then(response => {
+          this.form.dataScope = response.data.dataScope;
+          this.$refs.dept.setCheckedKeys(response.data.dataScopeDeptIds, false);
+        });
       });
     },
     /** 提交按钮 */
@@ -515,11 +519,10 @@ export default {
     /** 提交按钮（数据权限） */
     submitDataScope: function() {
       if (this.form.id !== undefined) {
-        // this.form.deptIds = this.getDeptAllCheckedKeys();
-        debugger
-        dataScope({
+        assignRoleDataScope({
           roleId: this.form.id,
-          deptIds: this.form.dataScope !== SysDataScopeEnum.DEPT_CUSTOM ? [] :
+          dataScope: this.form.dataScope,
+          dataScopeDeptIds: this.form.dataScope !== SysDataScopeEnum.DEPT_CUSTOM ? [] :
               this.$refs.dept.getCheckedKeys(false)
         }).then(response => {
           this.msgSuccess("修改成功");
