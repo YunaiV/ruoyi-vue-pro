@@ -1,11 +1,13 @@
 package cn.iocoder.dashboard.modules.system.service.user;
 
+import cn.iocoder.dashboard.common.pojo.PageResult;
+import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserPageReqVO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.user.SysUserDO;
 
 /**
  * 用户 Service 接口
  *
- * @author ruoyi
+ * @author 芋道源码
  */
 public interface SysUserService {
 //    /**
@@ -31,6 +33,14 @@ public interface SysUserService {
      * @return 用户对象信息
      */
     SysUserDO getUser(Long userId);
+
+    /**
+     * 获得用户分页列表
+     *
+     * @param reqVO 分页条件
+     * @return 分页列表
+     */
+    PageResult<SysUserDO> pageUsers(SysUserPageReqVO reqVO);
 
 //
 //    /**

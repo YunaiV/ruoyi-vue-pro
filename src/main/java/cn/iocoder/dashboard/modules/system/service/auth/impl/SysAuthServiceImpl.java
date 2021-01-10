@@ -80,7 +80,7 @@ public class SysAuthServiceImpl implements SysAuthService {
         // 创建 LoginUser 对象
         LoginUser loginUser = SysAuthConvert.INSTANCE.convert(user);
         loginUser.setUpdateTime(new Date());
-        loginUser.setRoleIds(this.getUserRoleIds(loginUser.getUserId()));
+        loginUser.setRoleIds(this.getUserRoleIds(loginUser.getId()));
         return loginUser;
     }
 
@@ -94,7 +94,7 @@ public class SysAuthServiceImpl implements SysAuthService {
         // 缓存登陆用户到 Redis 中
         String sessionId = IdUtil.fastSimpleUUID();
         loginUser.setUpdateTime(new Date());
-        loginUser.setRoleIds(this.getUserRoleIds(loginUser.getUserId()));
+        loginUser.setRoleIds(this.getUserRoleIds(loginUser.getId()));
         loginUserRedisDAO.set(sessionId, loginUser);
 
         // 创建 Token
@@ -197,7 +197,7 @@ public class SysAuthServiceImpl implements SysAuthService {
         }
 
         // 重新加载 SysUserDO 信息
-        SysUserDO user = userService.getUser(loginUser.getUserId());
+        SysUserDO user = userService.getUser(loginUser.getId());
         if (user == null || CommonStatusEnum.DISABLE.getStatus().equals(user.getStatus())) {
             throw exception(TOKEN_EXPIRED); // 校验 token 时，用户被禁用的情况下，也认为 token 过期，方便前端跳转到登陆界面
         }
@@ -205,7 +205,7 @@ public class SysAuthServiceImpl implements SysAuthService {
         // 刷新 LoginUser 缓存
         loginUser.setDeptId(user.getDeptId());
         loginUser.setUpdateTime(new Date());
-        loginUser.setRoleIds(this.getUserRoleIds(loginUser.getUserId()));
+        loginUser.setRoleIds(this.getUserRoleIds(loginUser.getId()));
         loginUserRedisDAO.set(sessionId, loginUser);
     }
 

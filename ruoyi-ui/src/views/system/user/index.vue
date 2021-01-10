@@ -28,9 +28,9 @@
       <!--用户数据-->
       <el-col :span="20" :xs="24">
         <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
-          <el-form-item label="用户名称" prop="userName">
+          <el-form-item label="用户名称" prop="username">
             <el-input
-              v-model="queryParams.userName"
+              v-model="queryParams.username"
               placeholder="请输入用户名称"
               clearable
               size="small"
@@ -38,9 +38,9 @@
               @keyup.enter.native="handleQuery"
             />
           </el-form-item>
-          <el-form-item label="手机号码" prop="phonenumber">
+          <el-form-item label="手机号码" prop="mobile">
             <el-input
-              v-model="queryParams.phonenumber"
+              v-model="queryParams.mobile"
               placeholder="请输入手机号码"
               clearable
               size="small"
@@ -57,10 +57,10 @@
               style="width: 240px"
             >
               <el-option
-                v-for="dict in statusOptions"
-                :key="dict.dictValue"
-                :label="dict.dictLabel"
-                :value="dict.dictValue"
+                  v-for="dict in statusDictDatas"
+                  :key="parseInt(dict.value)"
+                  :label="dict.label"
+                  :value="parseInt(dict.value)"
               />
             </el-select>
           </el-form-item>
@@ -94,26 +94,6 @@
           </el-col>
           <el-col :span="1.5">
             <el-button
-              type="success"
-              icon="el-icon-edit"
-              size="mini"
-              :disabled="single"
-              @click="handleUpdate"
-              v-hasPermi="['system:user:edit']"
-            >修改</el-button>
-          </el-col>
-          <el-col :span="1.5">
-            <el-button
-              type="danger"
-              icon="el-icon-delete"
-              size="mini"
-              :disabled="multiple"
-              @click="handleDelete"
-              v-hasPermi="['system:user:remove']"
-            >删除</el-button>
-          </el-col>
-          <el-col :span="1.5">
-            <el-button
               type="info"
               icon="el-icon-upload2"
               size="mini"
@@ -133,20 +113,19 @@
           <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
         </el-row>
 
-        <el-table v-loading="loading" :data="userList" @selection-change="handleSelectionChange">
-          <el-table-column type="selection" width="50" align="center" />
-          <el-table-column label="用户编号" align="center" prop="userId" />
-          <el-table-column label="用户名称" align="center" prop="userName" :show-overflow-tooltip="true" />
-          <el-table-column label="用户昵称" align="center" prop="nickName" :show-overflow-tooltip="true" />
-          <el-table-column label="部门" align="center" prop="dept.deptName" :show-overflow-tooltip="true" />
-          <el-table-column label="手机号码" align="center" prop="phonenumber" width="120" />
+        <el-table v-loading="loading" :data="userList">
+          <el-table-column label="用户编号" align="center" prop="id" />
+          <el-table-column label="用户名称" align="center" prop="username" :show-overflow-tooltip="true" />
+          <el-table-column label="用户昵称" align="center" prop="nickname" :show-overflow-tooltip="true" />
+          <el-table-column label="部门" align="center" prop="dept.name" :show-overflow-tooltip="true" />
+          <el-table-column label="手机号码" align="center" prop="mobile" width="120" />
           <el-table-column label="状态" align="center">
             <template slot-scope="scope">
               <el-switch
-                v-model="scope.row.status"
-                active-value="0"
-                inactive-value="1"
-                @change="handleStatusChange(scope.row)"
+                  v-model="scope.row.status"
+                  :active-value="0"
+                  :inactive-value="1"
+                  @change="handleStatusChange(scope.row)"
               ></el-switch>
             </template>
           </el-table-column>
@@ -170,7 +149,7 @@
                 v-hasPermi="['system:user:edit']"
               >修改</el-button>
               <el-button
-                v-if="scope.row.userId !== 1"
+                v-if="scope.row.id !== 1"
                 size="mini"
                 type="text"
                 icon="el-icon-delete"
@@ -191,7 +170,7 @@
         <pagination
           v-show="total>0"
           :total="total"
-          :page.sync="queryParams.pageNum"
+          :page.sync="queryParams.pageNo"
           :limit.sync="queryParams.pageSize"
           @pagination="getList"
         />
@@ -203,8 +182,8 @@
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-row>
           <el-col :span="12">
-            <el-form-item label="用户昵称" prop="nickName">
-              <el-input v-model="form.nickName" placeholder="请输入用户昵称" />
+            <el-form-item label="用户昵称" prop="nickname">
+              <el-input v-model="form.nickname" placeholder="请输入用户昵称" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
@@ -215,8 +194,8 @@
         </el-row>
         <el-row>
           <el-col :span="12">
-            <el-form-item label="手机号码" prop="phonenumber">
-              <el-input v-model="form.phonenumber" placeholder="请输入手机号码" maxlength="11" />
+            <el-form-item label="手机号码" prop="mobile">
+              <el-input v-model="form.mobile" placeholder="请输入手机号码" maxlength="11" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
@@ -227,12 +206,12 @@
         </el-row>
         <el-row>
           <el-col :span="12">
-            <el-form-item v-if="form.userId == undefined" label="用户名称" prop="userName">
-              <el-input v-model="form.userName" placeholder="请输入用户名称" />
+            <el-form-item v-if="form.id === undefined" label="用户名称" prop="username">
+              <el-input v-model="form.username" placeholder="请输入用户名称" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item v-if="form.userId == undefined" label="用户密码" prop="password">
+            <el-form-item v-if="form.id === undefined" label="用户密码" prop="password">
               <el-input v-model="form.password" placeholder="请输入用户密码" type="password" />
             </el-form-item>
           </el-col>
@@ -344,6 +323,11 @@ import { treeselect } from "@/api/system/dept";
 import Treeselect from "@riophae/vue-treeselect";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 
+import {listSimpleDepts} from "@/api/system/dept";
+
+import {SysCommonStatusEnum} from "@/utils/constants";
+import {DICT_TYPE, getDictDatas} from "@/utils/dict";
+
 export default {
   name: "User",
   components: { Treeselect },
@@ -351,12 +335,6 @@ export default {
     return {
       // 遮罩层
       loading: true,
-      // 选中数组
-      ids: [],
-      // 非单个禁用
-      single: true,
-      // 非多个禁用
-      multiple: true,
       // 显示搜索条件
       showSearch: true,
       // 总条数
@@ -387,7 +365,7 @@ export default {
       form: {},
       defaultProps: {
         children: "children",
-        label: "label"
+        label: "name"
       },
       // 用户导入参数
       upload: {
@@ -406,19 +384,19 @@ export default {
       },
       // 查询参数
       queryParams: {
-        pageNum: 1,
+        pageNo: 1,
         pageSize: 10,
-        userName: undefined,
-        phonenumber: undefined,
+        username: undefined,
+        mobile: undefined,
         status: undefined,
         deptId: undefined
       },
       // 表单校验
       rules: {
-        userName: [
+        username: [
           { required: true, message: "用户名称不能为空", trigger: "blur" }
         ],
-        nickName: [
+        nickname: [
           { required: true, message: "用户昵称不能为空", trigger: "blur" }
         ],
         password: [
@@ -431,14 +409,19 @@ export default {
             trigger: ["blur", "change"]
           }
         ],
-        phonenumber: [
+        mobile: [
           {
             pattern: /^1[3|4|5|6|7|8|9][0-9]\d{8}$/,
             message: "请输入正确的手机号码",
             trigger: "blur"
           }
         ]
-      }
+      },
+
+      // 枚举
+      SysCommonStatusEnum: SysCommonStatusEnum,
+      // 数据字典
+      statusDictDatas: getDictDatas(DICT_TYPE.SYS_COMMON_STATUS),
     };
   },
   watch: {
@@ -450,12 +433,6 @@ export default {
   created() {
     this.getList();
     this.getTreeselect();
-    this.getDicts("sys_normal_disable").then(response => {
-      this.statusOptions = response.data;
-    });
-    this.getDicts("sys_user_sex").then(response => {
-      this.sexOptions = response.data;
-    });
     this.getConfigKey("sys.user.initPassword").then(response => {
       this.initPassword = response.msg;
     });
@@ -464,23 +441,28 @@ export default {
     /** 查询用户列表 */
     getList() {
       this.loading = true;
-      listUser(this.addDateRange(this.queryParams, this.dateRange)).then(response => {
-          this.userList = response.rows;
-          this.total = response.total;
+      listUser(this.addDateRange(this.queryParams, [
+        this.dateRange[0] ? this.dateRange[0] + ' 00:00:00' : undefined,
+        this.dateRange[1] ? this.dateRange[1] + ' 23:59:59' : undefined,
+      ])).then(response => {
+          this.userList = response.data.list;
+          this.total = response.data.list;
           this.loading = false;
         }
       );
     },
     /** 查询部门下拉树结构 */
     getTreeselect() {
-      treeselect().then(response => {
-        this.deptOptions = response.data;
+      listSimpleDepts().then(response => {
+        // 处理 menuOptions 参数
+        this.deptOptions = [];
+        this.deptOptions.push(...this.handleTree(response.data, "id"));
       });
     },
     // 筛选节点
     filterNode(value, data) {
       if (!value) return true;
-      return data.label.indexOf(value) !== -1;
+      return data.name.indexOf(value) !== -1;
     },
     // 节点单击事件
     handleNodeClick(data) {
@@ -490,12 +472,12 @@ export default {
     // 用户状态修改
     handleStatusChange(row) {
       let text = row.status === "0" ? "启用" : "停用";
-      this.$confirm('确认要"' + text + '""' + row.userName + '"用户吗?', "警告", {
+      this.$confirm('确认要"' + text + '""' + row.username + '"用户吗?', "警告", {
           confirmButtonText: "确定",
           cancelButtonText: "取消",
           type: "warning"
         }).then(function() {
-          return changeUserStatus(row.userId, row.status);
+          return changeUserStatus(row.id, row.status);
         }).then(() => {
           this.msgSuccess(text + "成功");
         }).catch(function() {
@@ -510,12 +492,12 @@ export default {
     // 表单重置
     reset() {
       this.form = {
-        userId: undefined,
+        id: undefined,
         deptId: undefined,
-        userName: undefined,
-        nickName: undefined,
+        username: undefined,
+        nickname: undefined,
         password: undefined,
-        phonenumber: undefined,
+        mobile: undefined,
         email: undefined,
         sex: undefined,
         status: "0",
@@ -536,12 +518,6 @@ export default {
       this.resetForm("queryForm");
       this.handleQuery();
     },
-    // 多选框选中数据
-    handleSelectionChange(selection) {
-      this.ids = selection.map(item => item.userId);
-      this.single = selection.length != 1;
-      this.multiple = !selection.length;
-    },
     /** 新增按钮操作 */
     handleAdd() {
       this.reset();
@@ -558,8 +534,8 @@ export default {
     handleUpdate(row) {
       this.reset();
       this.getTreeselect();
-      const userId = row.userId || this.ids;
-      getUser(userId).then(response => {
+      const id = row.id;
+      getUser(id).then(response => {
         this.form = response.data;
         this.postOptions = response.posts;
         this.roleOptions = response.roles;
@@ -572,11 +548,11 @@ export default {
     },
     /** 重置密码按钮操作 */
     handleResetPwd(row) {
-      this.$prompt('请输入"' + row.userName + '"的新密码', "提示", {
+      this.$prompt('请输入"' + row.username + '"的新密码', "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消"
       }).then(({ value }) => {
-          resetUserPwd(row.userId, value).then(response => {
+          resetUserPwd(row.id, value).then(response => {
             this.msgSuccess("修改成功，新密码是：" + value);
           });
         }).catch(() => {});
@@ -585,7 +561,7 @@ export default {
     submitForm: function() {
       this.$refs["form"].validate(valid => {
         if (valid) {
-          if (this.form.userId != undefined) {
+          if (this.form.id != undefined) {
             updateUser(this.form).then(response => {
               this.msgSuccess("修改成功");
               this.open = false;
@@ -603,13 +579,13 @@ export default {
     },
     /** 删除按钮操作 */
     handleDelete(row) {
-      const userIds = row.userId || this.ids;
-      this.$confirm('是否确认删除用户编号为"' + userIds + '"的数据项?', "警告", {
+      const ids = row.id || this.ids;
+      this.$confirm('是否确认删除用户编号为"' + ids + '"的数据项?', "警告", {
           confirmButtonText: "确定",
           cancelButtonText: "取消",
           type: "warning"
         }).then(function() {
-          return delUser(userIds);
+          return delUser(ids);
         }).then(() => {
           this.getList();
           this.msgSuccess("删除成功");

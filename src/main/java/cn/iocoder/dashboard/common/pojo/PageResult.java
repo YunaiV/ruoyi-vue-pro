@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 @ApiModel("分页结果")
@@ -16,5 +17,18 @@ public final class PageResult<T> implements Serializable {
 
     @ApiModelProperty(value = "总量", required = true)
     private Long total;
+
+    public PageResult() {
+    }
+
+    public PageResult(List<T> list, Long total) {
+        this.list = list;
+        this.total = total;
+    }
+
+    public PageResult(Long total) {
+        this.list = new ArrayList<>();
+        this.total = total;
+    }
 
 }

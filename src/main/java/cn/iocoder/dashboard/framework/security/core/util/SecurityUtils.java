@@ -50,7 +50,7 @@ public class SecurityUtils {
      * @return 用户编号
      */
     public static Long getLoginUserId() {
-        return getLoginUser().getUserId();
+        return getLoginUser().getId();
     }
 
     public static Set<Long> getLoginUserRoleIds() {

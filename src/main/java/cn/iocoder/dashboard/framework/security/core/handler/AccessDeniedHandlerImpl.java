@@ -6,7 +6,6 @@ import cn.iocoder.dashboard.framework.security.core.util.SecurityUtils;
 import cn.iocoder.dashboard.util.servlet.ServletUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.access.ExceptionTranslationFilter;
 import org.springframework.stereotype.Component;
@@ -36,7 +35,7 @@ public class AccessDeniedHandlerImpl implements AccessDeniedHandler {
             throws IOException, ServletException {
         // 打印 warn 的原因是，不定期合并 warn，看看有没恶意破坏
         log.warn("[commence][访问 URL({}) 时，用户({}) 权限不够]", request.getRequestURI(),
-                SecurityUtils.getLoginUser().getUserId(), e);
+                SecurityUtils.getLoginUser().getId(), e);
         // 返回 403
         ServletUtils.writeJSON(response, CommonResult.error(UNAUTHORIZED));
     }

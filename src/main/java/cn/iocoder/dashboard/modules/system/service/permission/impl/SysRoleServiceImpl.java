@@ -37,12 +37,6 @@ import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.*;
 @Slf4j
 public class SysRoleServiceImpl implements SysRoleService {
 
-    @Resource
-    private SysPermissionService permissionService;
-
-    @Resource
-    private SysRoleMapper roleMapper;
-
     /**
      * 角色缓存
      * key：角色编号 {@link SysRoleDO#getId()}
@@ -50,6 +44,12 @@ public class SysRoleServiceImpl implements SysRoleService {
      * 这里声明 volatile 修饰的原因是，每次刷新时，直接修改指向
      */
     private volatile Map<Long, SysRoleDO> roleCache;
+
+    @Resource
+    private SysPermissionService permissionService;
+
+    @Resource
+    private SysRoleMapper roleMapper;
 
     /**
      * 初始化 {@link #roleCache} 缓存

@@ -1,17 +1,25 @@
 package cn.iocoder.dashboard.modules.system.service.user;
 
+import cn.iocoder.dashboard.common.pojo.PageResult;
+import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserPageReqVO;
+import cn.iocoder.dashboard.modules.system.convert.user.SysUserConvert;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dao.user.SysUserMapper;
+import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.dept.SysDeptDO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.user.SysUserDO;
+import cn.iocoder.dashboard.modules.system.service.dept.SysDeptService;
+import cn.iocoder.dashboard.util.collection.CollectionUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.Collections;
+import java.util.List;
 
 
 /**
- * 用户 业务层处理
+ * 用户 Service 实现类
  *
- * @author ruoyi
+ * @author 芋道源码
  */
 @Service
 @Slf4j
@@ -19,6 +27,9 @@ public class SysUserServiceImpl implements SysUserService {
 
     @Resource
     private SysUserMapper userMapper;
+
+    @Resource
+    private SysDeptService deptService;
 
 //    @Autowired
 //    private SysUserMapper userMapper;
@@ -59,6 +70,19 @@ public class SysUserServiceImpl implements SysUserService {
     @Override
     public SysUserDO getUser(Long userId) {
         return userMapper.selectById(userId);
+    }
+
+    @Override
+    public PageResult<SysUserDO> pageUsers(SysUserPageReqVO reqVO) {
+        // 处理部门查询条件
+        List<Long> deptIds = Collections.emptyList();
+        if (reqVO.getDeptId() != null) {
+            deptIds = CollectionUtils.convertList(deptService.listDeptsByParentIdFromCache(reqVO.getDeptId(), true),
+                    SysDeptDO::getId);
+            deptIds.add(reqVO.getDeptId());
+        }
+        // 执行查询
+        return SysUserConvert.INSTANCE.convertPage(userMapper.selectList(reqVO, deptIds));
     }
 
 //    /**
