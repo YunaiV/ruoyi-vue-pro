@@ -1,7 +1,9 @@
 package cn.iocoder.dashboard.modules.system.convert.user;
 
 import cn.iocoder.dashboard.common.pojo.PageResult;
+import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserCreateReqVO;
 import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserPageItemRespVO;
+import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserUpdateReqVO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.dept.SysDeptDO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.user.SysUserDO;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -20,5 +22,9 @@ public interface SysUserConvert {
 
     @Mapping(source = "records", target = "list")
     PageResult<SysUserDO> convertPage(IPage<SysUserDO> page);
+
+    SysUserDO convert(SysUserCreateReqVO bean);
+
+    SysUserDO convert(SysUserUpdateReqVO bean);
 
 }

@@ -1,7 +1,9 @@
 package cn.iocoder.dashboard.modules.system.service.user;
 
 import cn.iocoder.dashboard.common.pojo.PageResult;
+import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserCreateReqVO;
 import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserPageReqVO;
+import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserUpdateReqVO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.user.SysUserDO;
 
 /**
@@ -29,10 +31,10 @@ public interface SysUserService {
     /**
      * 通过用户 ID 查询用户
      *
-     * @param userId 用户ID
+     * @param id 用户ID
      * @return 用户对象信息
      */
-    SysUserDO getUser(Long userId);
+    SysUserDO getUser(Long id);
 
     /**
      * 获得用户分页列表
@@ -41,6 +43,21 @@ public interface SysUserService {
      * @return 分页列表
      */
     PageResult<SysUserDO> pageUsers(SysUserPageReqVO reqVO);
+
+    /**
+     * 创建用户
+     *
+     * @param reqVO 用户信息
+     * @return 用户编号
+     */
+    Long createUser(SysUserCreateReqVO reqVO);
+
+    /**
+     * 修改用户
+     *
+     * @param reqVO 用户信息
+     */
+    void updateUser(SysUserUpdateReqVO reqVO);
 
 //
 //    /**

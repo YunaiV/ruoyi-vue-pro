@@ -9,6 +9,14 @@ export function listPost(query) {
   })
 }
 
+// 获取岗位精简信息列表
+export function listSimplePosts() {
+  return request({
+    url: '/system/post/list-all-simple',
+    method: 'get'
+  })
+}
+
 // 查询岗位详细
 export function getPost(postId) {
   return request({

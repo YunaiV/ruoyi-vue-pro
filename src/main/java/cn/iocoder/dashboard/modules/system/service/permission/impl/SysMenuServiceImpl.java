@@ -170,55 +170,6 @@ public class SysMenuServiceImpl implements SysMenuService {
         return menuMapper.selectById(id);
     }
 
-//    /**
-//     * 获得菜单列表
-//     *
-//     * @param menuIds 菜单编号列表
-//     * @return 菜单列表
-//     */
-//    public List<ResourceBO> listResources(List<Integer> menuIds) {
-//        List<ResourceDO> menuDOs = menuMapper.selectBatchIds(menuIds);
-//        return ResourceConvert.INSTANCE.convertList(menuDOs);
-//    }
-//
-//    /**
-//     * 获得菜单全列表
-//     *
-//     * @return 菜单全列表
-//     */
-//    public List<ResourceBO> listResources() {
-//        List<ResourceDO> menuDOs = menuMapper.selectList(null);
-//        return ResourceConvert.INSTANCE.convertList(menuDOs);
-//    }
-//
-//    /**
-//     * 获得指定类型的菜单列表
-//     *
-//     * @param type 菜单类型，允许空
-//     * @return 菜单列表
-//     */
-//    public List<ResourceBO> listResourcesByType(Integer type) {
-//        List<ResourceDO> menuDOs = menuMapper.selectListByType(type);
-//        return ResourceConvert.INSTANCE.convertList(menuDOs);
-//    }
-//
-//    /**
-//     * 获得角色拥有的菜单列表
-//     *
-//     * @param roleIds 角色编号
-//     * @param type 菜单类型，允许空
-//     * @return 菜单列表
-//     */
-//    public List<ResourceBO> listRoleResourcesByType(Collection<Integer> roleIds, Integer type) {
-//        List<RoleResourceDO> roleResourceDOs = roleResourceMapper.selectListByRoleIds(roleIds);
-//        if (CollectionUtils.isEmpty(roleResourceDOs)) {
-//            return Collections.emptyList();
-//        }
-//        List<ResourceDO> menuDOs = menuMapper.selectListByIdsAndType(
-//                CollectionUtils.convertSet(roleResourceDOs, RoleResourceDO::getResourceId), type);
-//        return ResourceConvert.INSTANCE.convertList(menuDOs);
-//    }
-//
     /**
      * 校验父菜单是否合法
      *
@@ -263,7 +214,7 @@ public class SysMenuServiceImpl implements SysMenuService {
         if (menu == null) {
             return;
         }
-        // 如果 menuId 为空，说明不用比较是否为相同 menuId 的菜单
+        // 如果 id 为空，说明不用比较是否为相同 id 的菜单
         if (id == null) {
             throw ServiceExceptionUtil.exception(MENU_NAME_DUPLICATE);
         }

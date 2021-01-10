@@ -31,7 +31,7 @@ export function addUser(data) {
 export function updateUser(data) {
   return request({
     url: '/system/user/update',
-    method: 'put',
+    method: 'post',
     data: data
   })
 }

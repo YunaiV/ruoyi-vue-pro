@@ -188,7 +188,9 @@
           </el-col>
           <el-col :span="12">
             <el-form-item label="归属部门" prop="deptId">
-              <treeselect v-model="form.deptId" :options="deptOptions" :show-count="true" placeholder="请选择归属部门" />
+              <treeselect v-model="form.deptId" :options="deptOptions" :show-count="true"
+                          placeholder="请选择归属部门" :normalizer="normalizer"
+              />
             </el-form-item>
           </el-col>
         </el-row>
@@ -221,49 +223,22 @@
             <el-form-item label="用户性别">
               <el-select v-model="form.sex" placeholder="请选择">
                 <el-option
-                  v-for="dict in sexOptions"
-                  :key="dict.dictValue"
-                  :label="dict.dictLabel"
-                  :value="dict.dictValue"
+                  v-for="dict in sexDictDatas"
+                  :key="parseInt(dict.value)"
+                  :label="dict.label"
+                  :value="parseInt(dict.value)"
                 ></el-option>
               </el-select>
             </el-form-item>
           </el-col>
-          <el-col :span="12">
-            <el-form-item label="状态">
-              <el-radio-group v-model="form.status">
-                <el-radio
-                  v-for="dict in statusOptions"
-                  :key="dict.dictValue"
-                  :label="dict.dictValue"
-                >{{dict.dictLabel}}</el-radio>
-              </el-radio-group>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row>
           <el-col :span="12">
             <el-form-item label="岗位">
               <el-select v-model="form.postIds" multiple placeholder="请选择">
                 <el-option
-                  v-for="item in postOptions"
-                  :key="item.postId"
-                  :label="item.postName"
-                  :value="item.postId"
-                  :disabled="item.status == 1"
-                ></el-option>
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="角色">
-              <el-select v-model="form.roleIds" multiple placeholder="请选择">
-                <el-option
-                  v-for="item in roleOptions"
-                  :key="item.roleId"
-                  :label="item.roleName"
-                  :value="item.roleId"
-                  :disabled="item.status == 1"
+                    v-for="item in postOptions"
+                    :key="item.id"
+                    :label="item.name"
+                    :value="item.id"
                 ></el-option>
               </el-select>
             </el-form-item>
@@ -313,17 +288,45 @@
         <el-button @click="upload.open = false">取 消</el-button>
       </div>
     </el-dialog>
+
+    <!-- 分配角色 -->
+<!--    <el-dialog title="分配角色" :visible.sync="openMenu" width="500px" append-to-body>-->
+<!--      <el-form :model="form" label-width="80px">-->
+<!--        <el-form-item label="用户名称">-->
+<!--          <el-input v-model="form.username" :disabled="true" />-->
+<!--        </el-form-item>-->
+<!--        <el-form-item label="用户昵称">-->
+<!--          <el-input v-model="form.nickname" :disabled="true" />-->
+<!--        </el-form-item>-->
+<!--        <el-form-item label="角色">-->
+<!--          <el-select v-model="form.roleIds" multiple placeholder="请选择">-->
+<!--            <el-option-->
+<!--                v-for="item in roleOptions"-->
+<!--                :key="item.roleId"-->
+<!--                :label="item.roleName"-->
+<!--                :value="item.roleId"-->
+<!--                :disabled="item.status == 1"-->
+<!--            ></el-option>-->
+<!--          </el-select>-->
+<!--        </el-form-item>-->
+<!--      </el-form>-->
+<!--      <div slot="footer" class="dialog-footer">-->
+<!--        <el-button type="primary" @click="submitMenu">确 定</el-button>-->
+<!--        <el-button @click="cancelMenu">取 消</el-button>-->
+<!--      </div>-->
+<!--    </el-dialog>-->
+
   </div>
 </template>
 
 <script>
 import { listUser, getUser, delUser, addUser, updateUser, exportUser, resetUserPwd, changeUserStatus, importTemplate } from "@/api/system/user";
 import { getToken } from "@/utils/auth";
-import { treeselect } from "@/api/system/dept";
 import Treeselect from "@riophae/vue-treeselect";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 
 import {listSimpleDepts} from "@/api/system/dept";
+import {listSimplePosts} from "@/api/system/post";
 
 import {SysCommonStatusEnum} from "@/utils/constants";
 import {DICT_TYPE, getDictDatas} from "@/utils/dict";
@@ -422,6 +425,7 @@ export default {
       SysCommonStatusEnum: SysCommonStatusEnum,
       // 数据字典
       statusDictDatas: getDictDatas(DICT_TYPE.SYS_COMMON_STATUS),
+      sexDictDatas: getDictDatas(DICT_TYPE.SYS_USER_SEX),
     };
   },
   watch: {
@@ -446,17 +450,22 @@ export default {
         this.dateRange[1] ? this.dateRange[1] + ' 23:59:59' : undefined,
       ])).then(response => {
           this.userList = response.data.list;
-          this.total = response.data.list;
+          this.total = response.data.total;
           this.loading = false;
         }
       );
     },
-    /** 查询部门下拉树结构 */
+    /** 查询部门下拉树结构 + 岗位下拉 */
     getTreeselect() {
       listSimpleDepts().then(response => {
-        // 处理 menuOptions 参数
+        // 处理 deptOptions 参数
         this.deptOptions = [];
         this.deptOptions.push(...this.handleTree(response.data, "id"));
+      });
+      listSimplePosts().then(response => {
+        // 处理 postOptions 参数
+        this.postOptions = [];
+        this.postOptions.push(...response.data);
       });
     },
     // 筛选节点
@@ -521,14 +530,12 @@ export default {
     /** 新增按钮操作 */
     handleAdd() {
       this.reset();
+      // 获得下拉数据
       this.getTreeselect();
-      getUser().then(response => {
-        this.postOptions = response.posts;
-        this.roleOptions = response.roles;
-        this.open = true;
-        this.title = "添加用户";
-        this.form.password = this.initPassword;
-      });
+      // 打开表单，并设置初始化
+      this.open = true;
+      this.title = "添加用户";
+      this.form.password = this.initPassword;
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
@@ -537,10 +544,6 @@ export default {
       const id = row.id;
       getUser(id).then(response => {
         this.form = response.data;
-        this.postOptions = response.posts;
-        this.roleOptions = response.roles;
-        this.form.postIds = response.postIds;
-        this.form.roleIds = response.roleIds;
         this.open = true;
         this.title = "修改用户";
         this.form.password = "";
@@ -561,7 +564,7 @@ export default {
     submitForm: function() {
       this.$refs["form"].validate(valid => {
         if (valid) {
-          if (this.form.id != undefined) {
+          if (this.form.id !== undefined) {
             updateUser(this.form).then(response => {
               this.msgSuccess("修改成功");
               this.open = false;
@@ -630,6 +633,14 @@ export default {
     // 提交上传文件
     submitFileForm() {
       this.$refs.upload.submit();
+    },
+    // 格式化部门的下拉框
+    normalizer(node) {
+      return {
+        id: node.id,
+        label: node.name,
+        children: node.children
+      }
     }
   }
 };

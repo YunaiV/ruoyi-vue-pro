@@ -40,7 +40,7 @@ public class SysPostDO extends BaseDO {
      *
      * 枚举 {@link CommonStatusEnum}
      */
-    private String status;
+    private Integer status;
     /**
      * 备注
      */

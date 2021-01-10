@@ -1,19 +1,32 @@
 package cn.iocoder.dashboard.modules.system.service.user;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.StrUtil;
+import cn.iocoder.dashboard.common.enums.CommonStatusEnum;
+import cn.iocoder.dashboard.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.dashboard.common.pojo.PageResult;
+import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserCreateReqVO;
 import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserPageReqVO;
+import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserUpdateReqVO;
 import cn.iocoder.dashboard.modules.system.convert.user.SysUserConvert;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dao.user.SysUserMapper;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.dept.SysDeptDO;
+import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.dept.SysPostDO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.user.SysUserDO;
 import cn.iocoder.dashboard.modules.system.service.dept.SysDeptService;
+import cn.iocoder.dashboard.modules.system.service.dept.SysPostService;
 import cn.iocoder.dashboard.util.collection.CollectionUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.*;
 
 
 /**
@@ -30,16 +43,12 @@ public class SysUserServiceImpl implements SysUserService {
 
     @Resource
     private SysDeptService deptService;
+    @Resource
+    private SysPostService postService;
 
-//    @Autowired
-//    private SysUserMapper userMapper;
-//
-//    @Autowired
-//    private SysRoleMapper roleMapper;
-//
-//    @Autowired
-//    private SysPostMapper postMapper;
-//
+    @Resource
+    private PasswordEncoder passwordEncoder;
+
 //    @Autowired
 //    private SysUserRoleMapper userRoleMapper;
 //
@@ -68,8 +77,8 @@ public class SysUserServiceImpl implements SysUserService {
     }
 
     @Override
-    public SysUserDO getUser(Long userId) {
-        return userMapper.selectById(userId);
+    public SysUserDO getUser(Long id) {
+        return userMapper.selectById(id);
     }
 
     @Override
@@ -77,240 +86,148 @@ public class SysUserServiceImpl implements SysUserService {
         // 处理部门查询条件
         List<Long> deptIds = Collections.emptyList();
         if (reqVO.getDeptId() != null) {
-            deptIds = CollectionUtils.convertList(deptService.listDeptsByParentIdFromCache(reqVO.getDeptId(), true),
-                    SysDeptDO::getId);
+            deptIds = CollectionUtils.convertList(deptService.listDeptsByParentIdFromCache(
+                    reqVO.getDeptId(), true), SysDeptDO::getId);
             deptIds.add(reqVO.getDeptId());
         }
         // 执行查询
         return SysUserConvert.INSTANCE.convertPage(userMapper.selectList(reqVO, deptIds));
     }
 
-//    /**
-//     * 通过用户ID查询用户
-//     *
-//     * @param userId 用户ID
-//     * @return 用户对象信息
-//     */
-//    @Override
-//    public SysUser selectUserById(Long userId)
-//    {
-//        return userMapper.selectUserById(userId);
-//    }
-//
-//    /**
-//     * 查询用户所属角色组
-//     *
-//     * @param userName 用户名
-//     * @return 结果
-//     */
-//    @Override
-//    public String selectUserRoleGroup(String userName)
-//    {
-//        List<SysRole> list = roleMapper.selectRolesByUserName(userName);
-//        StringBuffer idsStr = new StringBuffer();
-//        for (SysRole role : list)
-//        {
-//            idsStr.append(role.getRoleName()).append(",");
-//        }
-//        if (StringUtils.isNotEmpty(idsStr.toString()))
-//        {
-//            return idsStr.substring(0, idsStr.length() - 1);
-//        }
-//        return idsStr.toString();
-//    }
-//
-//    /**
-//     * 查询用户所属岗位组
-//     *
-//     * @param userName 用户名
-//     * @return 结果
-//     */
-//    @Override
-//    public String selectUserPostGroup(String userName)
-//    {
-//        List<SysPost> list = postMapper.selectPostsByUserName(userName);
-//        StringBuffer idsStr = new StringBuffer();
-//        for (SysPost post : list)
-//        {
-//            idsStr.append(post.getPostName()).append(",");
-//        }
-//        if (StringUtils.isNotEmpty(idsStr.toString()))
-//        {
-//            return idsStr.substring(0, idsStr.length() - 1);
-//        }
-//        return idsStr.toString();
-//    }
-//
-//    /**
-//     * 校验用户名称是否唯一
-//     *
-//     * @param userName 用户名称
-//     * @return 结果
-//     */
-//    @Override
-//    public String checkUserNameUnique(String userName)
-//    {
-//        int count = userMapper.checkUserNameUnique(userName);
-//        if (count > 0)
-//        {
-//            return UserConstants.NOT_UNIQUE;
-//        }
-//        return UserConstants.UNIQUE;
-//    }
-//
-//    /**
-//     * 校验用户名称是否唯一
-//     *
-//     * @param user 用户信息
-//     * @return
-//     */
-//    @Override
-//    public String checkPhoneUnique(SysUser user)
-//    {
-//        Long userId = StringUtils.isNull(user.getUserId()) ? -1L : user.getUserId();
-//        SysUser info = userMapper.checkPhoneUnique(user.getPhonenumber());
-//        if (StringUtils.isNotNull(info) && info.getUserId().longValue() != userId.longValue())
-//        {
-//            return UserConstants.NOT_UNIQUE;
-//        }
-//        return UserConstants.UNIQUE;
-//    }
-//
-//    /**
-//     * 校验email是否唯一
-//     *
-//     * @param user 用户信息
-//     * @return
-//     */
-//    @Override
-//    public String checkEmailUnique(SysUser user)
-//    {
-//        Long userId = StringUtils.isNull(user.getUserId()) ? -1L : user.getUserId();
-//        SysUser info = userMapper.checkEmailUnique(user.getEmail());
-//        if (StringUtils.isNotNull(info) && info.getUserId().longValue() != userId.longValue())
-//        {
-//            return UserConstants.NOT_UNIQUE;
-//        }
-//        return UserConstants.UNIQUE;
-//    }
-//
-//    /**
-//     * 校验用户是否允许操作
-//     *
-//     * @param user 用户信息
-//     */
-//    @Override
-//    public void checkUserAllowed(SysUser user)
-//    {
-//        if (StringUtils.isNotNull(user.getUserId()) && user.isAdmin())
-//        {
-//            throw new CustomException("不允许操作超级管理员用户");
-//        }
-//    }
-//
-//    /**
-//     * 新增保存用户信息
-//     *
-//     * @param user 用户信息
-//     * @return 结果
-//     */
-//    @Override
-//    @Transactional
-//    public int insertUser(SysUser user)
-//    {
-//        // 新增用户信息
-//        int rows = userMapper.insertUser(user);
-//        // 新增用户岗位关联
-//        insertUserPost(user);
-//        // 新增用户与角色管理
-//        insertUserRole(user);
-//        return rows;
-//    }
-//
-//    /**
-//     * 修改保存用户信息
-//     *
-//     * @param user 用户信息
-//     * @return 结果
-//     */
-//    @Override
-//    @Transactional
-//    public int updateUser(SysUser user)
-//    {
-//        Long userId = user.getUserId();
-//        // 删除用户与角色关联
-//        userRoleMapper.deleteUserRoleByUserId(userId);
-//        // 新增用户与角色管理
-//        insertUserRole(user);
-//        // 删除用户与岗位关联
-//        userPostMapper.deleteUserPostByUserId(userId);
-//        // 新增用户与岗位管理
-//        insertUserPost(user);
-//        return userMapper.updateUser(user);
-//    }
-//
-//    /**
-//     * 修改用户状态
-//     *
-//     * @param user 用户信息
-//     * @return 结果
-//     */
-//    @Override
-//    public int updateUserStatus(SysUser user)
-//    {
-//        return userMapper.updateUser(user);
-//    }
-//
-//    /**
-//     * 修改用户基本信息
-//     *
-//     * @param user 用户信息
-//     * @return 结果
-//     */
-//    @Override
-//    public int updateUserProfile(SysUser user)
-//    {
-//        return userMapper.updateUser(user);
-//    }
-//
-//    /**
-//     * 修改用户头像
-//     *
-//     * @param userName 用户名
-//     * @param avatar 头像地址
-//     * @return 结果
-//     */
-//    @Override
-//    public boolean updateUserAvatar(String userName, String avatar)
-//    {
-//        return userMapper.updateUserAvatar(userName, avatar) > 0;
-//    }
-//
-//    /**
-//     * 重置用户密码
-//     *
-//     * @param user 用户信息
-//     * @return 结果
-//     */
-//    @Override
-//    public int resetPwd(SysUser user)
-//    {
-//        return userMapper.updateUser(user);
-//    }
-//
-//    /**
-//     * 重置用户密码
-//     *
-//     * @param userName 用户名
-//     * @param password 密码
-//     * @return 结果
-//     */
-//    @Override
-//    public int resetUserPwd(String userName, String password)
-//    {
-//        return userMapper.resetUserPwd(userName, password);
-//    }
-//
+    @Override
+    public Long createUser(SysUserCreateReqVO reqVO) {
+        // 校验正确性
+        this.checkCreateOrUpdate(null, reqVO.getUsername(), reqVO.getMobile(), reqVO.getEmail(),
+                reqVO.getDeptId(), reqVO.getPostIds());
+        // 插入用户
+        SysUserDO user = SysUserConvert.INSTANCE.convert(reqVO);
+        user.setStatus(CommonStatusEnum.ENABLE.getStatus()); // 默认开启
+        user.setPassword(passwordEncoder.encode(reqVO.getPassword())); // 加密密码
+        userMapper.insert(user);
+        return user.getId();
+    }
+
+    @Override
+    public void updateUser(SysUserUpdateReqVO reqVO) {
+        // 校验正确性
+        this.checkCreateOrUpdate(reqVO.getId(), reqVO.getUsername(), reqVO.getMobile(), reqVO.getEmail(),
+                reqVO.getDeptId(), reqVO.getPostIds());
+        // 更新用户
+        SysUserDO updateObj = SysUserConvert.INSTANCE.convert(reqVO);
+        userMapper.updateById(updateObj);
+    }
+
+    private void checkCreateOrUpdate(Long id, String username, String mobile, String email,
+                                     Long deptId, Set<Long> postIds) {
+        // 校验用户存在
+        this.checkUserExists(id);
+        // 校验用户名唯一
+        this.checkUsernameUnique(id, username);
+        // 校验手机号唯一
+        this.checkMobileUnique(id, mobile);
+        // 校验邮箱唯一
+        this.checkEmailUnique(id, email);
+        // 校验部门处于开启状态
+        this.checkDeptEnable(deptId);
+        // 校验岗位处于开启状态
+        this.checkPostEnable(postIds);
+    }
+
+    private void checkUserExists(Long id) {
+        if (id == null) {
+            return;
+        }
+        SysUserDO user = userMapper.selectById(id);
+        if (user == null) {
+            throw ServiceExceptionUtil.exception(USER_NOT_EXISTS);
+        }
+    }
+
+    private void checkUsernameUnique(Long id, String username) {
+        if (StrUtil.isNotBlank(username)) {
+            return;
+        }
+        SysUserDO user = userMapper.selectByUsername(username);
+        if (user == null) {
+            return;
+        }
+        // 如果 id 为空，说明不用比较是否为相同 id 的用户
+        if (id == null) {
+            throw ServiceExceptionUtil.exception(USER_USERNAME_EXISTS);
+        }
+        if (!user.getId().equals(id)) {
+            throw ServiceExceptionUtil.exception(USER_USERNAME_EXISTS);
+        }
+    }
+
+    private void checkEmailUnique(Long id, String email) {
+        if (StrUtil.isNotBlank(email)) {
+            return;
+        }
+        SysUserDO user = userMapper.selectByEmail(email);
+        if (user == null) {
+            return;
+        }
+        // 如果 id 为空，说明不用比较是否为相同 id 的用户
+        if (id == null) {
+            throw ServiceExceptionUtil.exception(USER_EMAIL_EXISTS);
+        }
+        if (!user.getId().equals(id)) {
+            throw ServiceExceptionUtil.exception(USER_EMAIL_EXISTS);
+        }
+    }
+
+    private void checkMobileUnique(Long id, String email) {
+        if (StrUtil.isNotBlank(email)) {
+            return;
+        }
+        SysUserDO user = userMapper.selectByMobile(email);
+        if (user == null) {
+            return;
+        }
+        // 如果 id 为空，说明不用比较是否为相同 id 的用户
+        if (id == null) {
+            throw ServiceExceptionUtil.exception(USER_MOBILE_EXISTS);
+        }
+        if (!user.getId().equals(id)) {
+            throw ServiceExceptionUtil.exception(USER_MOBILE_EXISTS);
+        }
+    }
+
+    private void checkDeptEnable(Long deptId) {
+        if (deptId == null) { // 允许不选择
+            return;
+        }
+        SysDeptDO dept = deptService.getDept(deptId);
+        if (dept == null) {
+            throw ServiceExceptionUtil.exception(DEPT_NOT_FOUND);
+        }
+        if (!CommonStatusEnum.ENABLE.getStatus().equals(dept.getStatus())) {
+            throw ServiceExceptionUtil.exception(DEPT_NOT_ENABLE);
+        }
+    }
+
+    private void checkPostEnable(Set<Long> postIds) {
+        if (CollUtil.isEmpty(postIds)) { // 允许不选择
+            return;
+        }
+        List<SysPostDO> posts = postService.listPosts(postIds, null);
+        if (CollUtil.isEmpty(posts)) {
+            throw ServiceExceptionUtil.exception(POST_NOT_FOUND);
+        }
+        Map<Long, SysPostDO> postMap = CollectionUtils.convertMap(posts, SysPostDO::getId);
+        postIds.forEach(postId -> {
+            SysPostDO post = postMap.get(postId);
+            if (post == null) {
+                throw ServiceExceptionUtil.exception(POST_NOT_FOUND);
+            }
+            if (!CommonStatusEnum.ENABLE.getStatus().equals(post.getStatus())) {
+                throw ServiceExceptionUtil.exception(POST_NOT_ENABLE, post.getName());
+            }
+        });
+    }
+
+
 //    /**
 //     * 新增用户角色信息
 //     *
@@ -379,28 +296,8 @@ public class SysUserServiceImpl implements SysUserService {
 //        userPostMapper.deleteUserPostByUserId(userId);
 //        return userMapper.deleteUserById(userId);
 //    }
-//
-//    /**
-//     * 批量删除用户信息
-//     *
-//     * @param userIds 需要删除的用户ID
-//     * @return 结果
-//     */
-//    @Override
-//    @Transactional
-//    public int deleteUserByIds(Long[] userIds)
-//    {
-//        for (Long userId : userIds)
-//        {
-//            checkUserAllowed(new SysUser(userId));
-//        }
-//        // 删除用户与角色关联
-//        userRoleMapper.deleteUserRole(userIds);
-//        // 删除用户与岗位关联
-//        userPostMapper.deleteUserPost(userIds);
-//        return userMapper.deleteUserByIds(userIds);
-//    }
-//
+
+
 //    /**
 //     * 导入用户数据
 //     *

@@ -26,13 +26,13 @@ import static cn.iocoder.dashboard.common.pojo.CommonResult.success;
 public class SysDeptController {
 
     @Resource
-    private SysDeptService sysDeptService;
+    private SysDeptService deptService;
 
     @ApiOperation("获取部门列表")
 //    @PreAuthorize("@ss.hasPermi('system:dept:list')")
     @GetMapping("/list")
     public CommonResult<List<SysDeptRespVO>> listDepts(SysDeptListReqVO reqVO) {
-        List<SysDeptDO> list = sysDeptService.listDepts(reqVO);
+        List<SysDeptDO> list = deptService.listDepts(reqVO);
         list.sort(Comparator.comparing(SysDeptDO::getSort));
         return success(SysDeptConvert.INSTANCE.convertList(list));
     }
@@ -43,8 +43,8 @@ public class SysDeptController {
         // 获得部门列表，只要开启状态的
         SysDeptListReqVO reqVO = new SysDeptListReqVO();
         reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
-        List<SysDeptDO> list = sysDeptService.listDepts(reqVO);
-        // 排序后，返回个诶前端
+        List<SysDeptDO> list = deptService.listDepts(reqVO);
+        // 排序后，返回给前端
         list.sort(Comparator.comparing(SysDeptDO::getSort));
         return success(SysDeptConvert.INSTANCE.convertList02(list));
     }

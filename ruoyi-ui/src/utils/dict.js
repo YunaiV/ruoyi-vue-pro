@@ -10,6 +10,7 @@ export const DICT_TYPE = {
   SYS_MENU_TYPE: 'sys_menu_type',
   SYS_ROLE_TYPE: 'sys_role_type',
   SYS_DATA_SCOPE: 'sys_data_scope',
+  SYS_USER_SEX: 'sys_user_sex',
 }
 
 /**

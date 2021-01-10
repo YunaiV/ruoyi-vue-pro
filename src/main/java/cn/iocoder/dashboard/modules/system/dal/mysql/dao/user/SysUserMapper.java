@@ -18,6 +18,14 @@ public interface SysUserMapper extends BaseMapper<SysUserDO> {
         return selectOne(new QueryWrapper<SysUserDO>().eq("username", username));
     }
 
+    default SysUserDO selectByMobile(String mobile) {
+        return selectOne(new QueryWrapper<SysUserDO>().eq("mobile", mobile));
+    }
+
+    default SysUserDO selectByEmail(String email) {
+        return selectOne(new QueryWrapper<SysUserDO>().eq("email", email));
+    }
+
     default IPage<SysUserDO> selectList(SysUserPageReqVO reqVO, List<Long> deptIds) {
         return selectPage(MyBatisUtils.buildPage(reqVO),
                 new QueryWrapperX<SysUserDO>().likeIfPresent("username", reqVO.getUsername())

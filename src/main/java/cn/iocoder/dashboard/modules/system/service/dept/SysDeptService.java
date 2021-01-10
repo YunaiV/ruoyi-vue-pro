@@ -50,4 +50,12 @@ public interface SysDeptService {
      */
     List<SysDeptDO> listDeptsByParentIdFromCache(Long parentId, boolean recursive);
 
+    /**
+     * 获得部门信息
+     *
+     * @param id 部门编号
+     * @return 部门信息
+     */
+    SysDeptDO getDept(Long id);
+
 }

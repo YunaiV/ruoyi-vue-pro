@@ -3,8 +3,7 @@ package cn.iocoder.dashboard.modules.system.controller.user;
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.dashboard.common.pojo.CommonResult;
 import cn.iocoder.dashboard.common.pojo.PageResult;
-import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserPageItemRespVO;
-import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserPageReqVO;
+import cn.iocoder.dashboard.modules.system.controller.user.vo.user.*;
 import cn.iocoder.dashboard.modules.system.convert.user.SysUserConvert;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.dept.SysDeptDO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.user.SysUserDO;
@@ -12,10 +11,10 @@ import cn.iocoder.dashboard.modules.system.service.dept.SysDeptService;
 import cn.iocoder.dashboard.modules.system.service.user.SysUserService;
 import cn.iocoder.dashboard.util.collection.CollectionUtils;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.*;
@@ -59,7 +58,36 @@ public class SysUserController {
         });
         return success(new PageResult<>(userList, pageResult.getTotal()));
     }
-//
+
+    /**
+     * 根据用户编号获取详细信息
+     */
+    @ApiOperation("获得用户详情")
+    @ApiImplicitParam(name = "id", value = "编号", readOnly = true, example = "1024")
+    @GetMapping("/get")
+//    @PreAuthorize("@ss.hasPermi('system:user:query')")
+    public CommonResult<SysUserRespVO> getInfo(@RequestParam("id") Long id) {
+        return success(SysUserConvert.INSTANCE.convert(userService.getUser(id)));
+    }
+
+    @ApiOperation("新增用户")
+    @PostMapping("/create")
+//    @PreAuthorize("@ss.hasPermi('system:user:add')")
+//    @Log(title = "用户管理", businessType = BusinessType.INSERT)
+    public CommonResult<Long> createUser(@Validated @RequestBody SysUserCreateReqVO reqVO) {
+        Long id = userService.createUser(reqVO);
+        return success(id);
+    }
+
+    @ApiOperation("修改用户")
+    @PostMapping("update")
+//    @PreAuthorize("@ss.hasPermi('system:user:edit')")
+//    @Log(title = "用户管理", businessType = BusinessType.UPDATE)
+    public CommonResult<Boolean> updateUser(@Validated @RequestBody SysUserUpdateReqVO reqVO) {
+        userService.updateUser(reqVO);
+        return success(true);
+    }
+
 //    @Log(title = "用户管理", businessType = BusinessType.EXPORT)
 //    @PreAuthorize("@ss.hasPermi('system:user:export')")
 //    @GetMapping("/export")
@@ -90,76 +118,8 @@ public class SysUserController {
 //        return util.importTemplateExcel("用户数据");
 //    }
 //
-//    /**
-//     * 根据用户编号获取详细信息
-//     */
-//    @PreAuthorize("@ss.hasPermi('system:user:query')")
-//    @GetMapping(value = { "/", "/{userId}" })
-//    public AjaxResult getInfo(@PathVariable(value = "userId", required = false) Long userId)
-//    {
-//        AjaxResult ajax = AjaxResult.success();
-//        List<SysRole> roles = roleService.selectRoleAll();
-//        ajax.put("roles", SysUser.isAdmin(userId) ? roles : roles.stream().filter(r -> !r.isAdmin()).collect(Collectors.toList()));
-//        ajax.put("posts", postService.selectPostAll());
-//        if (StringUtils.isNotNull(userId))
-//        {
-//            ajax.put(AjaxResult.DATA_TAG, userService.selectUserById(userId));
-//            ajax.put("postIds", postService.selectPostListByUserId(userId));
-//            ajax.put("roleIds", roleService.selectRoleListByUserId(userId));
-//        }
-//        return ajax;
-//    }
-//
-//    /**
-//     * 新增用户
-//     */
-//    @PreAuthorize("@ss.hasPermi('system:user:add')")
-//    @Log(title = "用户管理", businessType = BusinessType.INSERT)
-//    @PostMapping
-//    public AjaxResult add(@Validated @RequestBody SysUser user)
-//    {
-//        if (UserConstants.NOT_UNIQUE.equals(userService.checkUserNameUnique(user.getUserName())))
-//        {
-//            return AjaxResult.error("新增用户'" + user.getUserName() + "'失败，登录账号已存在");
-//        }
-//        else if (StringUtils.isNotEmpty(user.getPhonenumber())
-//                && UserConstants.NOT_UNIQUE.equals(userService.checkPhoneUnique(user)))
-//        {
-//            return AjaxResult.error("新增用户'" + user.getUserName() + "'失败，手机号码已存在");
-//        }
-//        else if (StringUtils.isNotEmpty(user.getEmail())
-//                && UserConstants.NOT_UNIQUE.equals(userService.checkEmailUnique(user)))
-//        {
-//            return AjaxResult.error("新增用户'" + user.getUserName() + "'失败，邮箱账号已存在");
-//        }
-//        user.setCreateBy(SecurityUtils.getUsername());
-//        user.setPassword(SecurityUtils.encryptPassword(user.getPassword()));
-//        return toAjax(userService.insertUser(user));
-//    }
-//
-//    /**
-//     * 修改用户
-//     */
-//    @PreAuthorize("@ss.hasPermi('system:user:edit')")
-//    @Log(title = "用户管理", businessType = BusinessType.UPDATE)
-//    @PutMapping
-//    public AjaxResult edit(@Validated @RequestBody SysUser user)
-//    {
-//        userService.checkUserAllowed(user);
-//        if (StringUtils.isNotEmpty(user.getPhonenumber())
-//                && UserConstants.NOT_UNIQUE.equals(userService.checkPhoneUnique(user)))
-//        {
-//            return AjaxResult.error("修改用户'" + user.getUserName() + "'失败，手机号码已存在");
-//        }
-//        else if (StringUtils.isNotEmpty(user.getEmail())
-//                && UserConstants.NOT_UNIQUE.equals(userService.checkEmailUnique(user)))
-//        {
-//            return AjaxResult.error("修改用户'" + user.getUserName() + "'失败，邮箱账号已存在");
-//        }
-//        user.setUpdateBy(SecurityUtils.getUsername());
-//        return toAjax(userService.updateUser(user));
-//    }
-//
+
+
 //    /**
 //     * 删除用户
 //     */

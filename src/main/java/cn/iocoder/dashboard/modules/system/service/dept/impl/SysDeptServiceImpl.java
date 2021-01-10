@@ -114,4 +114,9 @@ public class SysDeptServiceImpl implements SysDeptService {
                 recursiveCount - 1, parentDeptMap));
     }
 
+    @Override
+    public SysDeptDO getDept(Long id) {
+        return deptMapper.selectById(id);
+    }
+
 }

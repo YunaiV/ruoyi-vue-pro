@@ -32,4 +32,23 @@ public interface SysErrorCodeConstants {
     ErrorCode ROLE_CODE_DUPLICATE = new ErrorCode(1002003002, "已经存在编码为【{}}】的角色");
     ErrorCode ROLE_CAN_NOT_UPDATE_SYSTEM_TYPE_ROLE = new ErrorCode(1002003004, "不能操作类型为系统内置的角色");
 
+    // ========== 用户模块 1002004000 ==========
+    ErrorCode USER_USERNAME_EXISTS = new ErrorCode(1002004000, "用户账号已经存在");
+    ErrorCode USER_MOBILE_EXISTS = new ErrorCode(1002004001, "手机号已经存在");
+    ErrorCode USER_EMAIL_EXISTS = new ErrorCode(1002004002, "邮箱已经存在");
+    ErrorCode USER_NOT_EXISTS = new ErrorCode(1002004003, "用户不存在");
+
+    // ========== 部门模块 1002005000 ==========
+    ErrorCode DEPT_NAME_DUPLICATE = new ErrorCode(1002004001, "已经存在该名字的部门");
+    ErrorCode DEPT_PARENT_NOT_EXITS = new ErrorCode(1002004002,"父级部门不存在");
+    ErrorCode DEPT_NOT_FOUND = new ErrorCode(1002004003, "当前部门不存在");
+    ErrorCode DEPT_EXITS_CHILDREN = new ErrorCode(1002004004, "存在子部门，无法删除");
+    ErrorCode DEPT_PARENT_ERROR = new ErrorCode(1002004005, "不能设置自己为父资源");
+    ErrorCode DEPT_EXISTS_USER = new ErrorCode(1002004006, "部门中存在员工，无法删除");
+    ErrorCode DEPT_NOT_ENABLE = new ErrorCode(1002004007, "部门不处于开启状态，不允许选择");
+
+    // ========== 岗位模块 1002005000 ==========
+    ErrorCode POST_NOT_FOUND = new ErrorCode(1002005001, "当前岗位不存在");
+    ErrorCode POST_NOT_ENABLE = new ErrorCode(1002005002, "岗位({}) 不处于开启状态，不允许选择");
+
 }

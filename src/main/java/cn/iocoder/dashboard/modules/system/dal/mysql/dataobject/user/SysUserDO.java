@@ -19,7 +19,7 @@ import java.util.Set;
  *
  * @author ruoyi
  */
-@TableName("sys_user")
+@TableName(value = "sys_user", autoResultMap = true)
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class SysUserDO extends BaseDO {
