@@ -161,4 +161,9 @@ public class SysPermissionServiceImpl implements SysPermissionService {
         // TODO 实现我
     }
 
+    @Override
+    public void processUserDeleted(Long userId) {
+        // TODO 实现我
+    }
+
 }

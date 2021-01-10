@@ -15,6 +15,7 @@ import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.dept.SysPostDO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.user.SysUserDO;
 import cn.iocoder.dashboard.modules.system.service.dept.SysDeptService;
 import cn.iocoder.dashboard.modules.system.service.dept.SysPostService;
+import cn.iocoder.dashboard.modules.system.service.permission.SysPermissionService;
 import cn.iocoder.dashboard.util.collection.CollectionUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -45,18 +46,11 @@ public class SysUserServiceImpl implements SysUserService {
     private SysDeptService deptService;
     @Resource
     private SysPostService postService;
+    @Resource
+    private SysPermissionService permissionService;
 
     @Resource
     private PasswordEncoder passwordEncoder;
-
-//    @Autowired
-//    private SysUserRoleMapper userRoleMapper;
-//
-//    @Autowired
-//    private SysUserPostMapper userPostMapper;
-//
-//    @Autowired
-//    private ISysConfigService configService;
 
 //    /**
 //     * 根据条件分页查询用户列表
@@ -115,6 +109,38 @@ public class SysUserServiceImpl implements SysUserService {
         // 更新用户
         SysUserDO updateObj = SysUserConvert.INSTANCE.convert(reqVO);
         userMapper.updateById(updateObj);
+    }
+
+    @Override
+    public void deleteUser(Long id) {
+        // 校验用户存在
+        this.checkUserExists(id);
+        // 删除用户
+        userMapper.deleteById(id);
+    }
+
+    @Override
+    public void updateUserPassword(Long id, String password) {
+        // 校验用户存在
+        this.checkUserExists(id);
+        // 更新密码
+        SysUserDO updateObj = new SysUserDO();
+        updateObj.setId(id);
+        updateObj.setPassword(passwordEncoder.encode(password)); // 加密密码
+        userMapper.updateById(updateObj);
+    }
+
+    @Override
+    public void updateUserStatus(Long id, Integer status) {
+        // 校验用户存在
+        this.checkUserExists(id);
+        // 更新状态
+        SysUserDO updateObj = new SysUserDO();
+        updateObj.setId(id);
+        updateObj.setStatus(status);
+        userMapper.updateById(updateObj);
+        // 删除用户关联数据
+        permissionService.processUserDeleted(id);
     }
 
     private void checkCreateOrUpdate(Long id, String username, String mobile, String email,
@@ -253,50 +279,6 @@ public class SysUserServiceImpl implements SysUserService {
 //            }
 //        }
 //    }
-//
-//    /**
-//     * 新增用户岗位信息
-//     *
-//     * @param user 用户对象
-//     */
-//    public void insertUserPost(SysUser user)
-//    {
-//        Long[] posts = user.getPostIds();
-//        if (StringUtils.isNotNull(posts))
-//        {
-//            // 新增用户与岗位管理
-//            List<SysUserPost> list = new ArrayList<SysUserPost>();
-//            for (Long postId : posts)
-//            {
-//                SysUserPost up = new SysUserPost();
-//                up.setUserId(user.getUserId());
-//                up.setPostId(postId);
-//                list.add(up);
-//            }
-//            if (list.size() > 0)
-//            {
-//                userPostMapper.batchUserPost(list);
-//            }
-//        }
-//    }
-//
-//    /**
-//     * 通过用户ID删除用户
-//     *
-//     * @param userId 用户ID
-//     * @return 结果
-//     */
-//    @Override
-//    @Transactional
-//    public int deleteUserById(Long userId)
-//    {
-//        // 删除用户与角色关联
-//        userRoleMapper.deleteUserRoleByUserId(userId);
-//        // 删除用户与岗位表
-//        userPostMapper.deleteUserPostByUserId(userId);
-//        return userMapper.deleteUserById(userId);
-//    }
-
 
 //    /**
 //     * 导入用户数据

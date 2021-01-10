@@ -54,27 +54,27 @@ export function exportUser(query) {
 }
 
 // 用户密码重置
-export function resetUserPwd(userId, password) {
+export function resetUserPwd(id, password) {
   const data = {
-    userId,
+    id,
     password
   }
   return request({
-    url: '/system/user/resetPwd',
-    method: 'put',
+    url: '/system/user/update-password',
+    method: 'post',
     data: data
   })
 }
 
 // 用户状态修改
-export function changeUserStatus(userId, status) {
+export function changeUserStatus(id, status) {
   const data = {
-    userId,
+    id,
     status
   }
   return request({
-    url: '/system/user/updateStatus',
-    method: 'put',
+    url: '/system/user/update-status',
+    method: 'post',
     data: data
   })
 }

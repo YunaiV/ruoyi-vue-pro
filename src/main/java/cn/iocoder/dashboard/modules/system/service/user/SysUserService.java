@@ -59,6 +59,29 @@ public interface SysUserService {
      */
     void updateUser(SysUserUpdateReqVO reqVO);
 
+    /**
+     * 删除用户
+     *
+     * @param id 用户编号
+     */
+    void deleteUser(Long id);
+
+    /**
+     * 修改密码
+     *
+     * @param id 用户编号
+     * @param password 密码
+     */
+    void updateUserPassword(Long id, String password);
+
+    /**
+     * 修改密码
+     *
+     * @param id 用户编号
+     * @param status 状态
+     */
+    void updateUserStatus(Long id, Integer status);
+
 //
 //    /**
 //     * 根据用户ID查询用户所属角色组

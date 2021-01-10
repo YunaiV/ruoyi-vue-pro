@@ -88,6 +88,34 @@ public class SysUserController {
         return success(true);
     }
 
+    @ApiOperation("删除用户")
+    @ApiImplicitParam(name = "id", value = "编号", readOnly = true, example = "1024")
+    @PostMapping("/delete")
+//    @PreAuthorize("@ss.hasPermi('system:user:remove')")
+//    @Log(title = "用户管理", businessType = BusinessType.DELETE)
+    public CommonResult<Boolean> deleteUser(@RequestParam("id") Long id) {
+        userService.deleteUser(id);
+        return success(true);
+    }
+
+    @ApiOperation("重置用户密码")
+    @PostMapping("/update-password")
+//    @PreAuthorize("@ss.hasPermi('system:user:resetPwd')")
+//    @Log(title = "用户管理", businessType = BusinessType.UPDATE)
+    public CommonResult<Boolean> updateUserPassword(@Validated @RequestBody SysUserUpdatePasswordReqVO reqVO) {
+        userService.updateUserPassword(reqVO.getId(), reqVO.getPassword());
+        return success(true);
+    }
+
+    @ApiOperation("修改用户状态")
+    @PostMapping("/update-status")
+//    @PreAuthorize("@ss.hasPermi('system:user:edit')")
+//    @Log(title = "用户管理", businessType = BusinessType.UPDATE)
+    public CommonResult<Boolean> updateUserStatus(@Validated @RequestBody SysUserUpdateStatusReqVO reqVO) {
+        userService.updateUserStatus(reqVO.getId(), reqVO.getStatus());
+        return success(true);
+    }
+
 //    @Log(title = "用户管理", businessType = BusinessType.EXPORT)
 //    @PreAuthorize("@ss.hasPermi('system:user:export')")
 //    @GetMapping("/export")
@@ -118,44 +146,5 @@ public class SysUserController {
 //        return util.importTemplateExcel("用户数据");
 //    }
 //
-
-
-//    /**
-//     * 删除用户
-//     */
-//    @PreAuthorize("@ss.hasPermi('system:user:remove')")
-//    @Log(title = "用户管理", businessType = BusinessType.DELETE)
-//    @DeleteMapping("/{userIds}")
-//    public AjaxResult remove(@PathVariable Long[] userIds)
-//    {
-//        return toAjax(userService.deleteUserByIds(userIds));
-//    }
-//
-//    /**
-//     * 重置密码
-//     */
-//    @PreAuthorize("@ss.hasPermi('system:user:resetPwd')")
-//    @Log(title = "用户管理", businessType = BusinessType.UPDATE)
-//    @PutMapping("/resetPwd")
-//    public AjaxResult resetPwd(@RequestBody SysUser user)
-//    {
-//        userService.checkUserAllowed(user);
-//        user.setPassword(SecurityUtils.encryptPassword(user.getPassword()));
-//        user.setUpdateBy(SecurityUtils.getUsername());
-//        return toAjax(userService.resetPwd(user));
-//    }
-//
-//    /**
-//     * 状态修改
-//     */
-//    @PreAuthorize("@ss.hasPermi('system:user:edit')")
-//    @Log(title = "用户管理", businessType = BusinessType.UPDATE)
-//    @PutMapping("/changeStatus")
-//    public AjaxResult changeStatus(@RequestBody SysUser user)
-//    {
-//        userService.checkUserAllowed(user);
-//        user.setUpdateBy(SecurityUtils.getUsername());
-//        return toAjax(userService.updateUserStatus(user));
-//    }
 
 }

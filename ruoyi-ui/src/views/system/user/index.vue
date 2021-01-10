@@ -480,7 +480,7 @@ export default {
     },
     // 用户状态修改
     handleStatusChange(row) {
-      let text = row.status === "0" ? "启用" : "停用";
+      let text = row.status === SysCommonStatusEnum.ENABLE ? "启用" : "停用";
       this.$confirm('确认要"' + text + '""' + row.username + '"用户吗?', "警告", {
           confirmButtonText: "确定",
           cancelButtonText: "取消",
@@ -490,7 +490,8 @@ export default {
         }).then(() => {
           this.msgSuccess(text + "成功");
         }).catch(function() {
-          row.status = row.status === "0" ? "1" : "0";
+          row.status = row.status === SysCommonStatusEnum.ENABLE ? SysCommonStatusEnum.DISABLE
+              : SysCommonStatusEnum.ENABLE;
         });
     },
     // 取消按钮
@@ -518,7 +519,7 @@ export default {
     },
     /** 搜索按钮操作 */
     handleQuery() {
-      this.queryParams.page = 1;
+      this.queryParams.pageNo = 1;
       this.getList();
     },
     /** 重置按钮操作 */

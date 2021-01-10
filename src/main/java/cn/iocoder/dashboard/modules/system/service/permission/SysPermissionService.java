@@ -69,7 +69,7 @@ public interface SysPermissionService {
     void assignRoleDataScope(Long roleId, Integer dataScope, Set<Long> dataScopeDeptIds);
 
     /**
-     * 处理角色删除时，删除关联授权角色
+     * 处理角色删除时，删除关联授权数据
      *
      * @param roleId 角色编号
      */
@@ -81,5 +81,12 @@ public interface SysPermissionService {
      * @param menuId 菜单编号
      */
     void processMenuDeleted(Long menuId);
+
+    /**
+     * 处理用户删除是，删除关联授权数据
+     *
+     * @param userId 用户编号
+     */
+    void processUserDeleted(Long userId);
 
 }
