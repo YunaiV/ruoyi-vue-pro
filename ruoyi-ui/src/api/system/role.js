@@ -9,6 +9,14 @@ export function listRole(query) {
   })
 }
 
+// 查询角色（精简)列表
+export function listSimpleRoles() {
+  return request({
+    url: '/system/role/list-all-simple',
+    method: 'get'
+  })
+}
+
 // 查询角色详细
 export function getRole(roleId) {
   return request({

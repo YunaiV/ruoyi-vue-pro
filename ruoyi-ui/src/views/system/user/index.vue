@@ -163,6 +163,13 @@
                 @click="handleResetPwd(scope.row)"
                 v-hasPermi="['system:user:resetPwd']"
               >重置</el-button>
+              <el-button
+                  size="mini"
+                  type="text"
+                  icon="el-icon-circle-check"
+                  @click="handleRole(scope.row)"
+                  v-hasPermi="['system:permission:assign-user-role']"
+              >分配角色</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -290,31 +297,30 @@
     </el-dialog>
 
     <!-- 分配角色 -->
-<!--    <el-dialog title="分配角色" :visible.sync="openMenu" width="500px" append-to-body>-->
-<!--      <el-form :model="form" label-width="80px">-->
-<!--        <el-form-item label="用户名称">-->
-<!--          <el-input v-model="form.username" :disabled="true" />-->
-<!--        </el-form-item>-->
-<!--        <el-form-item label="用户昵称">-->
-<!--          <el-input v-model="form.nickname" :disabled="true" />-->
-<!--        </el-form-item>-->
-<!--        <el-form-item label="角色">-->
-<!--          <el-select v-model="form.roleIds" multiple placeholder="请选择">-->
-<!--            <el-option-->
-<!--                v-for="item in roleOptions"-->
-<!--                :key="item.roleId"-->
-<!--                :label="item.roleName"-->
-<!--                :value="item.roleId"-->
-<!--                :disabled="item.status == 1"-->
-<!--            ></el-option>-->
-<!--          </el-select>-->
-<!--        </el-form-item>-->
-<!--      </el-form>-->
-<!--      <div slot="footer" class="dialog-footer">-->
-<!--        <el-button type="primary" @click="submitMenu">确 定</el-button>-->
-<!--        <el-button @click="cancelMenu">取 消</el-button>-->
-<!--      </div>-->
-<!--    </el-dialog>-->
+    <el-dialog title="分配角色" :visible.sync="openRole" width="500px" append-to-body>
+      <el-form :model="form" label-width="80px">
+        <el-form-item label="用户名称">
+          <el-input v-model="form.username" :disabled="true" />
+        </el-form-item>
+        <el-form-item label="用户昵称">
+          <el-input v-model="form.nickname" :disabled="true" />
+        </el-form-item>
+        <el-form-item label="角色">
+          <el-select v-model="form.roleIds" multiple placeholder="请选择">
+            <el-option
+                v-for="item in roleOptions"
+                :key="parseInt(item.id)"
+                :label="item.name"
+                :value="parseInt(item.id)"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="submitRole">确 定</el-button>
+        <el-button @click="cancelRole">取 消</el-button>
+      </div>
+    </el-dialog>
 
   </div>
 </template>
@@ -330,6 +336,8 @@ import {listSimplePosts} from "@/api/system/post";
 
 import {SysCommonStatusEnum} from "@/utils/constants";
 import {DICT_TYPE, getDictDatas} from "@/utils/dict";
+import {assignUserRole, listUserRoles} from "@/api/system/permission";
+import {listSimpleRoles} from "@/api/system/role";
 
 export default {
   name: "User",
@@ -420,6 +428,8 @@ export default {
           }
         ]
       },
+      // 是否显示弹出层（角色权限）
+      openRole: false,
 
       // 枚举
       SysCommonStatusEnum: SysCommonStatusEnum,
@@ -499,6 +509,11 @@ export default {
       this.open = false;
       this.reset();
     },
+    // 取消按钮（角色权限）
+    cancelMenu() {
+      this.openRole = false;
+      this.reset();
+    },
     // 表单重置
     reset() {
       this.form = {
@@ -561,6 +576,28 @@ export default {
           });
         }).catch(() => {});
     },
+    /** 分配用户角色操作 */
+    handleRole(row) {
+      this.reset();
+      const id = row.id
+      // 处理了 form 的用户 username 和 nickname 的展示
+      this.form.id = id;
+      this.form.username = row.username;
+      this.form.nickname = row.nickname;
+      // 打开弹窗
+      this.openRole = true;
+      // 获得角色列表
+      listSimpleRoles().then(response => {
+        // 处理 roleOptions 参数
+        this.roleOptions = [];
+        this.roleOptions.push(...response.data);
+      });
+      // 获得角色拥有的菜单集合
+      listUserRoles(id).then(response => {
+        // 设置选中
+        this.form.roleIds = response.data;
+      })
+    },
     /** 提交按钮 */
     submitForm: function() {
       this.$refs["form"].validate(valid => {
@@ -580,6 +617,19 @@ export default {
           }
         }
       });
+    },
+    /** 提交按钮（角色权限） */
+    submitRole: function() {
+      if (this.form.id !== undefined) {
+        assignUserRole({
+          userId: this.form.id,
+          roleIds: this.form.roleIds,
+        }).then(response => {
+          this.msgSuccess("分配角色成功");
+          this.openRole = false;
+          this.getList();
+        });
+      }
     },
     /** 删除按钮操作 */
     handleDelete(row) {

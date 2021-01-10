@@ -60,6 +60,22 @@ public interface SysPermissionService {
     void assignRoleMenu(Long roleId, Set<Long> menuIds);
 
     /**
+     * 获得用户拥有的角色编号集合
+     *
+     * @param userId 用户编号
+     * @return 角色编号集合
+     */
+    Set<Long> listUserRoleIs(Long userId);
+
+    /**
+     * 设置用户角色
+     *
+     * @param userId 角色编号
+     * @param roleIds 角色编号集合
+     */
+    void assignUserRole(Long userId, Set<Long> roleIds);
+
+    /**
      * 设置角色的数据权限
      *
      * @param roleId 角色编号

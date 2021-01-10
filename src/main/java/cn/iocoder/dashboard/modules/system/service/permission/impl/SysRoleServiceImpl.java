@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import javax.annotation.Nullable;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.util.*;
@@ -69,6 +70,11 @@ public class SysRoleServiceImpl implements SysRoleService {
     @Override
     public SysRoleDO getRoleFromCache(Long id) {
         return roleCache.get(id);
+    }
+
+    @Override
+    public List<SysRoleDO> listRoles(@Nullable Collection<Integer> statuses) {
+        return roleMapper.selectListByStatus(statuses);
     }
 
     @Override

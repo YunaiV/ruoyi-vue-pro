@@ -3,6 +3,7 @@ package cn.iocoder.dashboard.modules.system.controller.permission;
 import cn.iocoder.dashboard.common.pojo.CommonResult;
 import cn.iocoder.dashboard.modules.system.controller.permission.vo.permission.SysPermissionAssignRoleDataScopeReqVO;
 import cn.iocoder.dashboard.modules.system.controller.permission.vo.permission.SysPermissionAssignRoleMenuReqVO;
+import cn.iocoder.dashboard.modules.system.controller.permission.vo.permission.SysPermissionAssignUserRoleReqVO;
 import cn.iocoder.dashboard.modules.system.service.permission.SysPermissionService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -53,22 +54,20 @@ public class SysPermissionController {
         return success(true);
     }
 
-//    @GetMapping("/list-admin-roles")
-//    @ApiOperation("获得管理员拥有的角色编号列表")
-////    @RequiresPermissions("system:permission:assign-admin-role")
-//    @ApiImplicitParam(name = "adminId", value = "管理员编号", required = true)
-//    public CommonResult<Set<Integer>> listAdminRoles(Integer adminId) {
-//        return success(permissionManager.listAdminRoles(adminId));
-//    }
+    @ApiOperation("获得管理员拥有的角色编号列表")
+    @ApiImplicitParam(name = "userId", value = "用户编号", required = true)
+    @GetMapping("/list-user-roles")
+//    @RequiresPermissions("system:permission:assign-user-role")
+    public CommonResult<Set<Long>> listAdminRoles(@RequestParam("userId") Long userId) {
+        return success(permissionService.listUserRoleIs(userId));
+    }
 
-//    @PostMapping("/assign-admin-role")
-//    @ApiOperation("赋予用户角色")
-////    @RequiresPermissions("system:permission:assign-admin-role")
-//    public CommonResult<Boolean> assignAdminRole(PermissionAssignAdminRoleDTO assignAdminRoleDTO) {
-//        permissionManager.assignAdminRole(assignAdminRoleDTO);
-//        return success(true);
-//    }
-
-//    system:permission:assign-role-data-scope TODO
+    @ApiOperation("赋予用户角色")
+    @PostMapping("/assign-user-role")
+//    @RequiresPermissions("system:permission:assign-user-role")
+    public CommonResult<Boolean> assignUserRole(@Validated @RequestBody SysPermissionAssignUserRoleReqVO reqVO) {
+        permissionService.assignUserRole(reqVO.getUserId(), reqVO.getRoleIds());
+        return success(true);
+    }
 
 }

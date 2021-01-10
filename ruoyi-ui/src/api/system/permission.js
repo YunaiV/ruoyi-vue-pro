@@ -17,6 +17,23 @@ export function assignRoleMenu(data) {
   })
 }
 
+// 查询用户拥有的角色数组
+export function listUserRoles(userId) {
+  return request({
+    url: '/system/permission/list-user-roles?userId=' + userId,
+    method: 'get'
+  })
+}
+
+// 赋予用户角色
+export function assignUserRole(data) {
+  return request({
+    url: '/system/permission/assign-user-role',
+    method: 'post',
+    data: data
+  })
+}
+
 // 赋予角色数据权限
 export function assignRoleDataScope(data) {
   return request({

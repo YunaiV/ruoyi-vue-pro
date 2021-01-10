@@ -143,6 +143,29 @@ public class SysPermissionServiceImpl implements SysPermissionService {
     }
 
     @Override
+    public Set<Long> listUserRoleIs(Long userId) {
+        return CollectionUtils.convertSet(userRoleMapper.selectListByUserId(userId),
+                SysUserRoleDO::getRoleId);
+    }
+
+    @Override
+    public void assignUserRole(Long userId, Set<Long> roleIds) {
+        // 获得角色拥有角色编号
+        Set<Long> dbRoleIds = CollectionUtils.convertSet(userRoleMapper.selectListByUserId(userId),
+                SysUserRoleDO::getRoleId);
+        // 计算新增和删除的角色编号
+        Collection<Long> createRoleIds = CollUtil.subtract(roleIds, dbRoleIds);
+        Collection<Long> deleteMenuIds = CollUtil.subtract(dbRoleIds, roleIds);
+        // 执行新增和删除。对于已经授权的角色，不用做任何处理
+        if (!CollectionUtil.isEmpty(createRoleIds)) {
+            userRoleMapper.insertList(userId, createRoleIds);
+        }
+        if (!CollectionUtil.isEmpty(deleteMenuIds)) {
+            userRoleMapper.deleteListByUserIdAndRoleIdIds(userId, deleteMenuIds);
+        }
+    }
+
+    @Override
     public void assignRoleDataScope(Long roleId, Integer dataScope, Set<Long> dataScopeDeptIds) {
         roleService.updateRoleDataScope(roleId, dataScope, dataScopeDeptIds);
     }

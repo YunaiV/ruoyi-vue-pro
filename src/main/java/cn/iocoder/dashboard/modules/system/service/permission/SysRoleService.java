@@ -6,6 +6,7 @@ import cn.iocoder.dashboard.modules.system.controller.permission.vo.role.SysRole
 import cn.iocoder.dashboard.modules.system.controller.permission.vo.role.SysRoleUpdateReqVO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.permission.SysRoleDO;
 
+import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -29,6 +30,14 @@ public interface SysRoleService {
      * @return 角色
      */
     SysRoleDO getRoleFromCache(Long id);
+
+    /**
+     * 获得角色列表
+     *
+     * @param statuses 筛选的状态。允许空，空时不筛选
+     * @return 角色列表
+     */
+    List<SysRoleDO> listRoles(@Nullable Collection<Integer> statuses);
 
     /**
      * 获得角色数组，从缓存中

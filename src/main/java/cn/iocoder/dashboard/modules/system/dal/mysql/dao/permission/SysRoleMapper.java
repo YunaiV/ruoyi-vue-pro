@@ -8,6 +8,10 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.apache.ibatis.annotations.Mapper;
 
+import javax.annotation.Nullable;
+import java.util.Collection;
+import java.util.List;
+
 @Mapper
 public interface SysRoleMapper extends BaseMapper<SysRoleDO> {
 
@@ -27,5 +31,7 @@ public interface SysRoleMapper extends BaseMapper<SysRoleDO> {
         return selectOne(new QueryWrapperX<SysRoleDO>().eq("code", code));
     }
 
-
+    default List<SysRoleDO> selectListByStatus(@Nullable Collection<Integer> statuses) {
+        return selectList(new QueryWrapperX<SysRoleDO>().in("status", statuses));
+    }
 }

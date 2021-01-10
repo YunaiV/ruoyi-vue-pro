@@ -1,5 +1,6 @@
 package cn.iocoder.dashboard.modules.system.controller.permission;
 
+import cn.iocoder.dashboard.common.enums.CommonStatusEnum;
 import cn.iocoder.dashboard.common.pojo.CommonResult;
 import cn.iocoder.dashboard.common.pojo.PageResult;
 import cn.iocoder.dashboard.modules.system.controller.permission.vo.role.*;
@@ -13,6 +14,9 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 import static cn.iocoder.dashboard.common.pojo.CommonResult.success;
 
@@ -29,6 +33,16 @@ public class SysRoleController {
 //    @PreAuthorize("@ss.hasPermi('system:role:list')")
     public CommonResult<PageResult<SysRoleDO>> list(SysRolePageReqVO reqVO) {
         return success(roleService.pageRole(reqVO));
+    }
+
+    @ApiOperation(value = "获取角色精简信息列表", notes = "只包含被开启的角色，主要用于前端的下拉选项")
+    @GetMapping("/list-all-simple")
+    public CommonResult<List<SysRoleSimpleRespVO>> listSimpleRoles() {
+        // 获得角色列表，只要开启状态的
+        List<SysRoleDO> list = roleService.listRoles(Collections.singleton(CommonStatusEnum.ENABLE.getStatus()));
+        // 排序后，返回个诶前端
+        list.sort(Comparator.comparing(SysRoleDO::getSort));
+        return success(SysRoleConvert.INSTANCE.convertList02(list));
     }
 
     @ApiOperation("创建角色")
@@ -84,30 +98,5 @@ public class SysRoleController {
         roleService.updateRoleStatus(reqVO.getId(), reqVO.getStatus());
         return success(true);
     }
-
-//
-//    /**
-//     * 修改保存数据权限
-//     */
-//    @PreAuthorize("@ss.hasPermi('system:role:edit')")
-//    @Log(title = "角色管理", businessType = BusinessType.UPDATE)
-//    @PutMapping("/dataScope")
-//    public AjaxResult dataScope(@RequestBody SysRole role)
-//    {
-//        roleService.checkRoleAllowed(role);
-//        return toAjax(roleService.authDataScope(role));
-//    }
-
-
-//
-//    /**
-//     * 获取角色选择框列表
-//     */
-//    @PreAuthorize("@ss.hasPermi('system:role:query')")
-//    @GetMapping("/optionselect")
-//    public AjaxResult optionselect()
-//    {
-//        return AjaxResult.success(roleService.selectRoleAll());
-//    }
 
 }
