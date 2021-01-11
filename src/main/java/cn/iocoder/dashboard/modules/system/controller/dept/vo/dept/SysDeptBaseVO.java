@@ -40,4 +40,9 @@ public class SysDeptBaseVO {
     @Size(max = 50, message = "邮箱长度不能超过50个字符")
     private String email;
 
+    @ApiModelProperty(value = "状态", required = true, example = "1", notes = "见 SysCommonStatusEnum 枚举")
+    @NotNull(message = "状态不能为空")
+//    @InEnum(value = SysCommonStatusEnum.class, message = "修改状态必须是 {value}")
+    private Integer status;
+
 }

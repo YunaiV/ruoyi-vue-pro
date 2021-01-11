@@ -21,4 +21,13 @@ public interface SysDeptMapper extends BaseMapper<SysDeptDO> {
                 .eqIfPresent("status", reqVO.getStatus()));
     }
 
+    default SysDeptDO selectByParentIdAndName(Long parentId, String name) {
+        return selectOne(new QueryWrapper<SysDeptDO>().eq("parent_id", parentId)
+                .eq("name", name));
+    }
+
+    default Integer selectCountByParentId(Long parentId) {
+        return selectCount(new QueryWrapper<SysDeptDO>().eq("parent_id", parentId));
+    }
+
 }

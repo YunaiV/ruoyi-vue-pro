@@ -3,12 +3,10 @@ package cn.iocoder.dashboard.modules.system.controller.dept.vo.dept;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 @ApiModel("部门列表 Request VO")
 @Data
-@EqualsAndHashCode(callSuper = true)
-public class SysDeptListReqVO extends SysDeptBaseVO {
+public class SysDeptListReqVO {
 
     @ApiModelProperty(value = "部门名称", example = "芋道", notes = "模糊匹配")
     private String name;

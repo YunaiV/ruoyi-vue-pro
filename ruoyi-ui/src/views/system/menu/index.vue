@@ -163,9 +163,10 @@
             <el-form-item v-if="form.type != '3'" label="菜单状态">
               <el-radio-group v-model="form.status">
                 <el-radio
-                  v-for="dict in statusDictDatas"
-                  :key="dict.value"
-                  :label="parseInt(dict.value)"
+                    v-for="dict in statusDictDatas"
+                    :key="parseInt(dict.value)"
+                    :label="dict.label"
+                    :value="parseInt(dict.value)"
                 >{{dict.label}}</el-radio>
               </el-radio-group>
             </el-form-item>
@@ -223,6 +224,9 @@ export default {
         ],
         path: [
           { required: true, message: "路由地址不能为空", trigger: "blur" }
+        ],
+        status: [
+          { required: true, message: "状态不能为空", trigger: "blur" }
         ]
       },
 

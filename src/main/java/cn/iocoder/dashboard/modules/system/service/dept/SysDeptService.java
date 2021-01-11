@@ -1,6 +1,8 @@
 package cn.iocoder.dashboard.modules.system.service.dept;
 
+import cn.iocoder.dashboard.modules.system.controller.dept.vo.dept.SysDeptCreateReqVO;
 import cn.iocoder.dashboard.modules.system.controller.dept.vo.dept.SysDeptListReqVO;
+import cn.iocoder.dashboard.modules.system.controller.dept.vo.dept.SysDeptUpdateReqVO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.dept.SysDeptDO;
 
 import java.util.Collection;
@@ -57,5 +59,27 @@ public interface SysDeptService {
      * @return 部门信息
      */
     SysDeptDO getDept(Long id);
+
+    /**
+     * 创建部门
+     *
+     * @param reqVO 部门信息
+     * @return 部门编号
+     */
+    Long createDept(SysDeptCreateReqVO reqVO);
+
+    /**
+     * 更新部门
+     *
+     * @param reqVO 部门信息
+     */
+    void updateDept(SysDeptUpdateReqVO reqVO);
+
+    /**
+     * 删除部门
+     *
+     * @param id 部门编号
+     */
+    void deleteDept(Long id);
 
 }

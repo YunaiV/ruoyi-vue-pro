@@ -33,10 +33,6 @@ public class SysDeptDO extends BaseDO {
      */
     private Long parentId;
     /**
-     * 祖级列表
-     */
-    private String ancestors;
-    /**
      * 显示顺序
      */
     private String sort;

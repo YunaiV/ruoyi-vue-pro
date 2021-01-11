@@ -43,9 +43,10 @@ public interface SysErrorCodeConstants {
     ErrorCode DEPT_PARENT_NOT_EXITS = new ErrorCode(1002004002,"父级部门不存在");
     ErrorCode DEPT_NOT_FOUND = new ErrorCode(1002004003, "当前部门不存在");
     ErrorCode DEPT_EXITS_CHILDREN = new ErrorCode(1002004004, "存在子部门，无法删除");
-    ErrorCode DEPT_PARENT_ERROR = new ErrorCode(1002004005, "不能设置自己为父资源");
+    ErrorCode DEPT_PARENT_ERROR = new ErrorCode(1002004005, "不能设置自己为父部门");
     ErrorCode DEPT_EXISTS_USER = new ErrorCode(1002004006, "部门中存在员工，无法删除");
     ErrorCode DEPT_NOT_ENABLE = new ErrorCode(1002004007, "部门不处于开启状态，不允许选择");
+    ErrorCode DEPT_PARENT_IS_CHILD = new ErrorCode(1002004008, "不能设置自己的子部门为父部门");
 
     // ========== 岗位模块 1002005000 ==========
     ErrorCode POST_NOT_FOUND = new ErrorCode(1002005001, "当前岗位不存在");

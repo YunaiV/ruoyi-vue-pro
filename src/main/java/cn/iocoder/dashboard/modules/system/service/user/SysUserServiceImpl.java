@@ -253,33 +253,6 @@ public class SysUserServiceImpl implements SysUserService {
         });
     }
 
-
-//    /**
-//     * 新增用户角色信息
-//     *
-//     * @param user 用户对象
-//     */
-//    public void insertUserRole(SysUser user)
-//    {
-//        Long[] roles = user.getRoleIds();
-//        if (StringUtils.isNotNull(roles))
-//        {
-//            // 新增用户与角色管理
-//            List<SysUserRole> list = new ArrayList<SysUserRole>();
-//            for (Long roleId : roles)
-//            {
-//                SysUserRole ur = new SysUserRole();
-//                ur.setUserId(user.getUserId());
-//                ur.setRoleId(roleId);
-//                list.add(ur);
-//            }
-//            if (list.size() > 0)
-//            {
-//                userRoleMapper.batchUserRole(list);
-//            }
-//        }
-//    }
-
 //    /**
 //     * 导入用户数据
 //     *
@@ -347,4 +320,15 @@ public class SysUserServiceImpl implements SysUserService {
 //        return successMsg.toString();
 //    }
 
+//    /**
+//     * 根据条件分页查询用户列表
+//     *
+//     * @param user 用户信息
+//     * @return 用户信息集合信息
+//     */
+//    @Override
+//    @DataScope(deptAlias = "d", userAlias = "u")
+//    public List<SysUser> selectUserList(SysUser user) {
+//        return userMapper.selectUserList(user);
+//    }
 }

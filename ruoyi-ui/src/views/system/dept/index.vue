@@ -1,9 +1,9 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch">
-      <el-form-item label="部门名称" prop="deptName">
+      <el-form-item label="部门名称" prop="name">
         <el-input
-          v-model="queryParams.deptName"
+          v-model="queryParams.name"
           placeholder="请输入部门名称"
           clearable
           size="small"
@@ -11,12 +11,12 @@
         />
       </el-form-item>
       <el-form-item label="状态" prop="status">
-        <el-select v-model="queryParams.status" placeholder="部门状态" clearable size="small">
+        <el-select v-model="queryParams.status" placeholder="菜单状态" clearable size="small">
           <el-option
-            v-for="dict in statusOptions"
-            :key="dict.dictValue"
-            :label="dict.dictLabel"
-            :value="dict.dictValue"
+              v-for="dict in statusDictDatas"
+              :key="parseInt(dict.value)"
+              :label="dict.label"
+              :value="parseInt(dict.value)"
           />
         </el-select>
       </el-form-item>
@@ -42,12 +42,12 @@
     <el-table
       v-loading="loading"
       :data="deptList"
-      row-key="deptId"
+      row-key="id"
       default-expand-all
       :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
     >
-      <el-table-column prop="deptName" label="部门名称" width="260"></el-table-column>
-      <el-table-column prop="orderNum" label="排序" width="200"></el-table-column>
+      <el-table-column prop="name" label="部门名称" width="260"></el-table-column>
+      <el-table-column prop="sort" label="排序" width="200"></el-table-column>
       <el-table-column prop="status" label="状态" :formatter="statusFormat" width="100"></el-table-column>
       <el-table-column label="创建时间" align="center" prop="createTime" width="200">
         <template slot-scope="scope">
@@ -56,22 +56,22 @@
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-          <el-button 
-            size="mini" 
-            type="text" 
-            icon="el-icon-edit" 
+          <el-button
+            size="mini"
+            type="text"
+            icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
             v-hasPermi="['system:dept:edit']"
           >修改</el-button>
-          <el-button 
-            size="mini" 
-            type="text" 
-            icon="el-icon-plus" 
+          <el-button
+            size="mini"
+            type="text"
+            icon="el-icon-plus"
             @click="handleAdd(scope.row)"
             v-hasPermi="['system:dept:add']"
           >新增</el-button>
           <el-button
-            v-if="scope.row.parentId != 0"
+            v-if="scope.row.parentId !== 0"
             size="mini"
             type="text"
             icon="el-icon-delete"
@@ -92,13 +92,13 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="部门名称" prop="deptName">
-              <el-input v-model="form.deptName" placeholder="请输入部门名称" />
+            <el-form-item label="部门名称" prop="name">
+              <el-input v-model="form.name" placeholder="请输入部门名称" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="显示排序" prop="orderNum">
-              <el-input-number v-model="form.orderNum" controls-position="right" :min="0" />
+            <el-form-item label="显示排序" prop="sort">
+              <el-input-number v-model="form.sort" controls-position="right" :min="0" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
@@ -117,13 +117,13 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="部门状态">
+            <el-form-item label="部门状态" prop="status">
               <el-radio-group v-model="form.status">
                 <el-radio
-                  v-for="dict in statusOptions"
-                  :key="dict.dictValue"
-                  :label="dict.dictValue"
-                >{{dict.dictLabel}}</el-radio>
+                    v-for="dict in statusDictDatas"
+                    :key="parseInt(dict.value)"
+                    :label="parseInt(dict.value)"
+                >{{dict.label}}</el-radio>
               </el-radio-group>
             </el-form-item>
           </el-col>
@@ -138,9 +138,12 @@
 </template>
 
 <script>
-import { listDept, getDept, delDept, addDept, updateDept, listDeptExcludeChild } from "@/api/system/dept";
+import { listDept, getDept, delDept, addDept, updateDept } from "@/api/system/dept";
 import Treeselect from "@riophae/vue-treeselect";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
+
+import {SysCommonStatusEnum, SysMenuTypeEnum} from '@/utils/constants'
+import { getDictDataLabel, getDictDatas, DICT_TYPE } from '@/utils/dict'
 
 export default {
   name: "Dept",
@@ -163,7 +166,7 @@ export default {
       statusOptions: [],
       // 查询参数
       queryParams: {
-        deptName: undefined,
+        name: undefined,
         status: undefined
       },
       // 表单参数
@@ -173,10 +176,10 @@ export default {
         parentId: [
           { required: true, message: "上级部门不能为空", trigger: "blur" }
         ],
-        deptName: [
+        name: [
           { required: true, message: "部门名称不能为空", trigger: "blur" }
         ],
-        orderNum: [
+        sort: [
           { required: true, message: "显示排序不能为空", trigger: "blur" }
         ],
         email: [
@@ -192,22 +195,27 @@ export default {
             message: "请输入正确的手机号码",
             trigger: "blur"
           }
+        ],
+        status: [
+          { required: true, message: "状态不能为空", trigger: "blur" }
         ]
-      }
+      },
+
+      // 枚举
+      CommonStatusEnum: SysCommonStatusEnum,
+      // 数据字典
+      statusDictDatas: getDictDatas(DICT_TYPE.SYS_COMMON_STATUS)
     };
   },
   created() {
     this.getList();
-    this.getDicts("sys_normal_disable").then(response => {
-      this.statusOptions = response.data;
-    });
   },
   methods: {
     /** 查询部门列表 */
     getList() {
       this.loading = true;
       listDept(this.queryParams).then(response => {
-        this.deptList = this.handleTree(response.data, "deptId");
+        this.deptList = this.handleTree(response.data, "id");
         this.loading = false;
       });
     },
@@ -217,14 +225,14 @@ export default {
         delete node.children;
       }
       return {
-        id: node.deptId,
-        label: node.deptName,
+        id: node.id,
+        label: node.name,
         children: node.children
       };
     },
     // 字典状态字典翻译
     statusFormat(row, column) {
-      return this.selectDictLabel(this.statusOptions, row.status);
+      return getDictDataLabel(DICT_TYPE.SYS_COMMON_STATUS, row.status)
     },
     // 取消按钮
     cancel() {
@@ -234,10 +242,10 @@ export default {
     // 表单重置
     reset() {
       this.form = {
-        deptId: undefined,
+        id: undefined,
         parentId: undefined,
-        deptName: undefined,
-        orderNum: undefined,
+        name: undefined,
+        sort: undefined,
         leader: undefined,
         phone: undefined,
         email: undefined,
@@ -257,32 +265,32 @@ export default {
     /** 新增按钮操作 */
     handleAdd(row) {
       this.reset();
-      if (row != undefined) {
-        this.form.parentId = row.deptId;
+      if (row !== undefined) {
+        this.form.parentId = row.id;
       }
       this.open = true;
       this.title = "添加部门";
       listDept().then(response => {
-	        this.deptOptions = this.handleTree(response.data, "deptId");
+	        this.deptOptions = this.handleTree(response.data, "id");
       });
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
       this.reset();
-      getDept(row.deptId).then(response => {
+      getDept(row.id).then(response => {
         this.form = response.data;
         this.open = true;
         this.title = "修改部门";
       });
-      listDeptExcludeChild(row.deptId).then(response => {
-	        this.deptOptions = this.handleTree(response.data, "deptId");
+      listDept(row.id).then(response => {
+	        this.deptOptions = this.handleTree(response.data, "id");
       });
     },
     /** 提交按钮 */
     submitForm: function() {
       this.$refs["form"].validate(valid => {
         if (valid) {
-          if (this.form.deptId != undefined) {
+          if (this.form.id !== undefined) {
             updateDept(this.form).then(response => {
               this.msgSuccess("修改成功");
               this.open = false;
@@ -300,12 +308,12 @@ export default {
     },
     /** 删除按钮操作 */
     handleDelete(row) {
-      this.$confirm('是否确认删除名称为"' + row.deptName + '"的数据项?', "警告", {
+      this.$confirm('是否确认删除名称为"' + row.name + '"的数据项?', "警告", {
           confirmButtonText: "确定",
           cancelButtonText: "取消",
           type: "warning"
         }).then(function() {
-          return delDept(row.deptId);
+          return delDept(row.id);
         }).then(() => {
           this.getList();
           this.msgSuccess("删除成功");

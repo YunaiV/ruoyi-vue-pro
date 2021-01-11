@@ -2,17 +2,15 @@ package cn.iocoder.dashboard.modules.system.controller.dept;
 
 import cn.iocoder.dashboard.common.enums.CommonStatusEnum;
 import cn.iocoder.dashboard.common.pojo.CommonResult;
-import cn.iocoder.dashboard.modules.system.controller.dept.vo.dept.SysDeptListReqVO;
-import cn.iocoder.dashboard.modules.system.controller.dept.vo.dept.SysDeptRespVO;
-import cn.iocoder.dashboard.modules.system.controller.dept.vo.dept.SysDeptSimpleRespVO;
+import cn.iocoder.dashboard.modules.system.controller.dept.vo.dept.*;
 import cn.iocoder.dashboard.modules.system.convert.dept.SysDeptConvert;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.dept.SysDeptDO;
 import cn.iocoder.dashboard.modules.system.service.dept.SysDeptService;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.Comparator;
@@ -49,4 +47,39 @@ public class SysDeptController {
         return success(SysDeptConvert.INSTANCE.convertList02(list));
     }
 
+    @ApiOperation("获得部门信息")
+    @ApiImplicitParam(name = "id", value = "编号", readOnly = true, example = "1024")
+//    @PreAuthorize("@ss.hasPermi('system:dept:query')")
+    @GetMapping("/get")
+    public CommonResult<SysDeptRespVO> getDept(@RequestParam("id") Long id) {
+        return success(SysDeptConvert.INSTANCE.convert(deptService.getDept(id)));
+    }
+
+    @ApiOperation("新增部门")
+    @PostMapping("create")
+//    @PreAuthorize("@ss.hasPermi('system:dept:add')")
+//    @Log(title = "部门管理", businessType = BusinessType.INSERT)
+    public CommonResult<Long> createDept(@Validated @RequestBody SysDeptCreateReqVO reqVO) {
+        Long deptId = deptService.createDept(reqVO);
+        return success(deptId);
+    }
+
+    @ApiOperation("修改部门")
+    @PostMapping("update")
+//    @PreAuthorize("@ss.hasPermi('system:dept:edit')")
+//    @Log(title = "部门管理", businessType = BusinessType.UPDATE)
+    public CommonResult<Boolean> updateDept(@Validated @RequestBody SysDeptUpdateReqVO reqVO) {
+        deptService.updateDept(reqVO);
+        return success(true);
+    }
+
+    @ApiOperation("删除部门")
+    @ApiImplicitParam(name = "id", value = "编号", readOnly = true, example = "1024")
+    @PostMapping("delete")
+//    @PreAuthorize("@ss.hasPermi('system:dept:remove')")
+//    @Log(title = "部门管理", businessType = BusinessType.DELETE)
+    public CommonResult<Boolean> deleteDept(@RequestParam("id") Long id) {
+        deptService.deleteDept(id);
+        return success(true);
+    }
 }

@@ -206,4 +206,16 @@ public class SysRoleServiceImpl implements SysRoleService {
         }
     }
 
+
+//    /**
+//     * 根据条件分页查询角色数据
+//     *
+//     * @param role 角色信息
+//     * @return 角色数据集合信息
+//     */
+//    @Override
+//    @DataScope(deptAlias = "d")
+//    public List<SysRole> selectRoleList(SysRole role) {
+//        return roleMapper.selectRoleList(role);
+//    }
 }
