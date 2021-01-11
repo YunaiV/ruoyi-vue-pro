@@ -1,5 +1,9 @@
 package cn.iocoder.dashboard.modules.system.service.dept;
 
+import cn.iocoder.dashboard.common.pojo.PageResult;
+import cn.iocoder.dashboard.modules.system.controller.dept.vo.post.SysPostCreateReqVO;
+import cn.iocoder.dashboard.modules.system.controller.dept.vo.post.SysPostPageReqVO;
+import cn.iocoder.dashboard.modules.system.controller.dept.vo.post.SysPostUpdateReqVO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.dept.SysPostDO;
 
 import javax.annotation.Nullable;
@@ -21,5 +25,43 @@ public interface SysPostService {
      * @return 部门列表
      */
     List<SysPostDO> listPosts(@Nullable Collection<Long> ids, @Nullable Collection<Integer> statuses);
+
+    /**
+     * 获得岗位分页列表
+     *
+     * @param reqVO 分页条件
+     * @return 部门分页列表
+     */
+    PageResult<SysPostDO> pagePosts(SysPostPageReqVO reqVO);
+
+    /**
+     * 获得岗位信息
+     *
+     * @param id 岗位编号
+     * @return 岗位信息
+     */
+    SysPostDO getPost(Long id);
+
+    /**
+     * 创建岗位
+     *
+     * @param reqVO 岗位信息
+     * @return 岗位编号
+     */
+    Long createPost(SysPostCreateReqVO reqVO);
+
+    /**
+     * 更新岗位
+     *
+     * @param reqVO 岗位信息
+     */
+    void updatePost(SysPostUpdateReqVO reqVO);
+
+    /**
+     * 删除岗位信息
+     *
+     * @param id 岗位编号
+     */
+    void deletePost(Long id);
 
 }

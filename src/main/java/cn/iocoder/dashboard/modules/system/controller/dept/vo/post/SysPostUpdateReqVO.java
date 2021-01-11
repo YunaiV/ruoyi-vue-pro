@@ -14,6 +14,6 @@ public class SysPostUpdateReqVO extends SysPostBaseVO {
 
     @ApiModelProperty(value = "岗位编号", required = true, example = "1024")
     @NotNull(message = "岗位编号不能为空")
-    private Integer id;
+    private Long id;
 
 }

@@ -175,7 +175,7 @@ public class SysDeptServiceImpl implements SysDeptService {
         if (parentId.equals(id)) {
             throw ServiceExceptionUtil.exception(DEPT_PARENT_ERROR);
         }
-        // 父菜单不存在
+        // 父岗位不存在
         SysDeptDO dept = deptMapper.selectById(parentId);
         if (dept == null) {
             throw ServiceExceptionUtil.exception(DEPT_PARENT_NOT_EXITS);
@@ -206,7 +206,7 @@ public class SysDeptServiceImpl implements SysDeptService {
         if (menu == null) {
             return;
         }
-        // 如果 id 为空，说明不用比较是否为相同 id 的菜单
+        // 如果 id 为空，说明不用比较是否为相同 id 的岗位
         if (id == null) {
             throw ServiceExceptionUtil.exception(DEPT_NAME_DUPLICATE);
         }

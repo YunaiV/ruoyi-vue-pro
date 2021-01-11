@@ -142,7 +142,7 @@ import { listDept, getDept, delDept, addDept, updateDept } from "@/api/system/de
 import Treeselect from "@riophae/vue-treeselect";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 
-import {SysCommonStatusEnum, SysMenuTypeEnum} from '@/utils/constants'
+import {SysCommonStatusEnum} from '@/utils/constants'
 import { getDictDataLabel, getDictDatas, DICT_TYPE } from '@/utils/dict'
 
 export default {
@@ -249,7 +249,7 @@ export default {
         leader: undefined,
         phone: undefined,
         email: undefined,
-        status: "0"
+        status: SysCommonStatusEnum.ENABLE,
       };
       this.resetForm("form");
     },

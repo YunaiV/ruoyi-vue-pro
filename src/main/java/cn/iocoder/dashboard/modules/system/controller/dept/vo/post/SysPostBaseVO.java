@@ -27,6 +27,9 @@ public class SysPostBaseVO {
     @NotBlank(message = "显示顺序不能为空")
     private String sort;
 
+    @ApiModelProperty(value = "状态", required = true, example = "1", notes = "参见 SysCommonStatusEnum 枚举类")
+    private Integer status;
+
     @ApiModelProperty(value = "备注", example = "快乐的备注")
     private String remark;
 

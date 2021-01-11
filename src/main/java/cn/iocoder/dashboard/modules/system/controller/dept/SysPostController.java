@@ -2,15 +2,16 @@ package cn.iocoder.dashboard.modules.system.controller.dept;
 
 import cn.iocoder.dashboard.common.enums.CommonStatusEnum;
 import cn.iocoder.dashboard.common.pojo.CommonResult;
-import cn.iocoder.dashboard.modules.system.controller.dept.vo.post.SysPostSimpleRespVO;
+import cn.iocoder.dashboard.common.pojo.PageResult;
+import cn.iocoder.dashboard.modules.system.controller.dept.vo.post.*;
 import cn.iocoder.dashboard.modules.system.convert.dept.SysPostConvert;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.dept.SysPostDO;
 import cn.iocoder.dashboard.modules.system.service.dept.SysPostService;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.Collections;
@@ -37,4 +38,54 @@ public class SysPostController {
         return success(SysPostConvert.INSTANCE.convertList02(list));
     }
 
+    @ApiOperation("获得岗位分页列表")
+    @GetMapping("/page")
+//    @PreAuthorize("@ss.hasPermi('system:post:list')")
+    public CommonResult<PageResult<SysPostRespVO>> pagePosts(@Validated SysPostPageReqVO reqVO) {
+        return success(SysPostConvert.INSTANCE.convertPage(postService.pagePosts(reqVO)));
+    }
+
+    @ApiOperation("新增岗位")
+    @PostMapping("/create")
+//    @PreAuthorize("@ss.hasPermi('system:post:add')")
+//    @Log(title = "岗位管理", businessType = BusinessType.INSERT)
+    public CommonResult<Long> createPost(@Validated @RequestBody SysPostCreateReqVO reqVO) {
+        Long postId = postService.createPost(reqVO);
+        return success(postId);
+    }
+
+    @ApiOperation("修改岗位")
+    @PostMapping("/update")
+//    @PreAuthorize("@ss.hasPermi('system:post:edit')")
+//    @Log(title = "岗位管理", businessType = BusinessType.UPDATE)
+    public CommonResult<Boolean> updatePost(@Validated @RequestBody SysPostUpdateReqVO reqVO) {
+        postService.updatePost(reqVO);
+        return success(true);
+    }
+
+    @ApiOperation("删除岗位")
+    @PostMapping("/delete")
+//    @PreAuthorize("@ss.hasPermi('system:post:remove')")
+//    @Log(title = "岗位管理", businessType = BusinessType.DELETE)
+    public CommonResult<Boolean> deletePost(@RequestParam("id") Long id) {
+        postService.deletePost(id);
+        return success(true);
+    }
+
+    @ApiOperation("获得岗位信息")
+    @ApiImplicitParam(name = "id", value = "岗位编号", readOnly = true, example = "1024")
+//    @PreAuthorize("@ss.hasPermi('system:post:query')")
+    @GetMapping(value = "/get")
+    public CommonResult<SysPostRespVO> getPost(@RequestParam("id") Long id) {
+        return success(SysPostConvert.INSTANCE.convert(postService.getPost(id)));
+    }
+
+//    @Log(title = "岗位管理", businessType = BusinessType.EXPORT)
+//    @PreAuthorize("@ss.hasPermi('system:post:export')")
+//    @GetMapping("/export")
+//    public AjaxResult export(SysPost post) {
+//        List<SysPost> list = postService.selectPostList(post);
+//        ExcelUtil<SysPost> util = new ExcelUtil<SysPost>(SysPost.class);
+//        return util.exportExcel(list, "岗位数据");
+//    }
 }

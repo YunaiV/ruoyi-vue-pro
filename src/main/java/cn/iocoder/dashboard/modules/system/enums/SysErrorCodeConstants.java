@@ -51,5 +51,7 @@ public interface SysErrorCodeConstants {
     // ========== 岗位模块 1002005000 ==========
     ErrorCode POST_NOT_FOUND = new ErrorCode(1002005001, "当前岗位不存在");
     ErrorCode POST_NOT_ENABLE = new ErrorCode(1002005002, "岗位({}) 不处于开启状态，不允许选择");
+    ErrorCode POST_NAME_DUPLICATE = new ErrorCode(1002004001, "已经存在该名字的岗位");
+    ErrorCode POST_CODE_DUPLICATE = new ErrorCode(1002004001, "已经存在该标识的岗位");
 
 }
