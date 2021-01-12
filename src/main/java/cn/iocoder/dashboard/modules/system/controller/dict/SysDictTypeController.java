@@ -2,11 +2,9 @@ package cn.iocoder.dashboard.modules.system.controller.dict;
 
 import cn.iocoder.dashboard.common.pojo.CommonResult;
 import cn.iocoder.dashboard.common.pojo.PageResult;
-import cn.iocoder.dashboard.modules.system.controller.dict.vo.type.SysDictTypeCreateReqVO;
-import cn.iocoder.dashboard.modules.system.controller.dict.vo.type.SysDictTypePageReqVO;
-import cn.iocoder.dashboard.modules.system.controller.dict.vo.type.SysDictTypeRespVO;
-import cn.iocoder.dashboard.modules.system.controller.dict.vo.type.SysDictTypeUpdateReqVO;
+import cn.iocoder.dashboard.modules.system.controller.dict.vo.type.*;
 import cn.iocoder.dashboard.modules.system.convert.dict.SysDictTypeConvert;
+import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.dict.SysDictTypeDO;
 import cn.iocoder.dashboard.modules.system.service.dict.SysDictTypeService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -15,6 +13,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 import static cn.iocoder.dashboard.common.pojo.CommonResult.success;
 
@@ -69,14 +68,13 @@ public class SysDictTypeController {
     }
 
 
-//    /**
-//     * 获取字典选择框列表
-//     */
-//    @GetMapping("/optionselect")
-//    public AjaxResult optionselect() {
-//        List<SysDictType> dictTypes = dictTypeService.selectDictTypeAll();
-//        return AjaxResult.success(dictTypes);
-//    }
+    @GetMapping("/list-all-simple")
+    @ApiOperation(value = "获得全部字典类型列表", notes = "包括开启 + 禁用的字典类型，主要用于前端的下拉选项")
+    // 无需添加权限认证，因为前端全局都需要
+    public CommonResult<List<SysDictTypeSimpleRespVO>> listSimpleDictTypes() {
+        List<SysDictTypeDO> list = dictTypeService.listDictTypes();
+        return success(SysDictTypeConvert.INSTANCE.convertList(list));
+    }
 
     //
 //    @Log(title = "字典类型", businessType = BusinessType.EXPORT)

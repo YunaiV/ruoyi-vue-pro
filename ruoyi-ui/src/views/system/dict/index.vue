@@ -314,12 +314,6 @@ export default {
         }).then(response => {
           this.download(response.msg);
         })
-    },
-    /** 清理缓存按钮操作 */
-    handleClearCache() {
-      clearCache().then(response => {
-        this.msgSuccess("清理成功");
-      });
     }
   }
 };

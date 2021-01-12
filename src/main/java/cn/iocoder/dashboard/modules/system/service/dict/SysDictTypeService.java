@@ -6,6 +6,8 @@ import cn.iocoder.dashboard.modules.system.controller.dict.vo.type.SysDictTypePa
 import cn.iocoder.dashboard.modules.system.controller.dict.vo.type.SysDictTypeUpdateReqVO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.dict.SysDictTypeDO;
 
+import java.util.List;
+
 /**
  * 字典类型 Service 接口
  *
@@ -58,5 +60,12 @@ public interface SysDictTypeService {
      * @param id 字典类型编号
      */
     void deleteDictType(Long id);
+
+    /**
+     * 获得全部字典类型列表
+     *
+     * @return 字典类型列表
+     */
+    List<SysDictTypeDO> listDictTypes();
 
 }

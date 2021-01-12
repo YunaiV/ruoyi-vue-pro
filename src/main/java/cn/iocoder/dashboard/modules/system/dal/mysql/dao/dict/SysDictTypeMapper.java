@@ -4,9 +4,12 @@ import cn.iocoder.dashboard.framework.mybatis.core.query.QueryWrapperX;
 import cn.iocoder.dashboard.framework.mybatis.core.util.MyBatisUtils;
 import cn.iocoder.dashboard.modules.system.controller.dict.vo.type.SysDictTypePageReqVO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.dict.SysDictTypeDO;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.apache.ibatis.annotations.Mapper;
+
+import java.util.List;
 
 @Mapper
 public interface SysDictTypeMapper extends BaseMapper<SysDictTypeDO> {
@@ -25,6 +28,10 @@ public interface SysDictTypeMapper extends BaseMapper<SysDictTypeDO> {
 
     default SysDictTypeDO selectByName(String name) {
         return selectOne(new QueryWrapperX<SysDictTypeDO>().eq("name", name));
+    }
+
+    default List<SysDictTypeDO> selectList() {
+        return selectList(new QueryWrapper<>());
     }
 
 }

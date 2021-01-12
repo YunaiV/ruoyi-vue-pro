@@ -15,6 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 
+import java.util.List;
+
 import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.*;
 
 /**
@@ -72,6 +74,11 @@ public class SysDictTypeServiceImpl implements SysDictTypeService {
         // 执行删除
         self.deleteDictType0(id);
         // TODO 发送 MQ 消息
+    }
+
+    @Override
+    public List<SysDictTypeDO> listDictTypes() {
+        return dictTypeMapper.selectList();
     }
 
     @Transactional

@@ -13,9 +13,12 @@ import lombok.NoArgsConstructor;
 public class SysDictTypeSimpleRespVO {
 
     @ApiModelProperty(value = "字典类型编号", required = true, example = "1024")
-    private Integer id;
+    private Long id;
 
     @ApiModelProperty(value = "字典类型名称", required = true, example = "芋道")
     private String name;
+
+    @ApiModelProperty(value = "字典类型", required = true, example = "sys_common_sex")
+    private String type;
 
 }
