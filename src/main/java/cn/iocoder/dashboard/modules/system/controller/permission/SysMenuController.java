@@ -88,7 +88,7 @@ public class SysMenuController {
 
     @ApiOperation("删除菜单")
     @PostMapping("/delete")
-    @ApiImplicitParam(name = "id", value = "角色编号", required= true, example = "1024")
+    @ApiImplicitParam(name = "id", value = "角色编号", required= true, example = "1024", dataTypeClass = Long.class)
 //    @Log(title = "菜单管理", businessType = BusinessType.DELETE)
     public CommonResult<Boolean> deleteMenu(@RequestParam("id") Long id) {
         menuService.deleteMenu(id);

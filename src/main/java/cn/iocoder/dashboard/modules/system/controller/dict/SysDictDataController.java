@@ -41,7 +41,7 @@ public class SysDictDataController {
     }
 
     @ApiOperation("/查询字典数据详细")
-    @ApiImplicitParam(name = "id", value = "编号", readOnly = true, example = "1024")
+    @ApiImplicitParam(name = "id", value = "编号", readOnly = true, example = "1024", dataTypeClass = Long.class)
     @GetMapping(value = "/get")
 //    @PreAuthorize("@ss.hasPermi('system:dict:query')")
     public CommonResult<SysDictDataRespVO> getDictData(@RequestParam("id") Long id) {
@@ -67,7 +67,7 @@ public class SysDictDataController {
     }
 
     @ApiOperation("删除字典数据")
-    @ApiImplicitParam(name = "id", value = "编号", readOnly = true, example = "1024")
+    @ApiImplicitParam(name = "id", value = "编号", readOnly = true, example = "1024", dataTypeClass = Long.class)
     @PostMapping("/delete")
 //    @PreAuthorize("@ss.hasPermi('system:dict:remove')")
     public CommonResult<Boolean> deleteDictData(Long id) {

@@ -11,6 +11,7 @@ import java.math.BigDecimal;
  *
  * @author ruoyi
  */
+@Deprecated
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
 public @interface Excel {

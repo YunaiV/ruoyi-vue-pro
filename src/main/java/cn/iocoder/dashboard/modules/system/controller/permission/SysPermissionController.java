@@ -30,8 +30,8 @@ public class SysPermissionController {
     private SysPermissionService permissionService;
 
     @ApiOperation("获得角色拥有的菜单编号")
+    @ApiImplicitParam(name = "roleId", value = "角色编号", required = true, dataTypeClass = Long.class)
     @GetMapping("/list-role-resources")
-    @ApiImplicitParam(name = "roleId", value = "角色编号", required = true)
 //    @RequiresPermissions("system:permission:assign-role-menu")
     public CommonResult<Set<Long>> listRoleMenus(Long roleId) {
         return success(permissionService.listRoleMenuIds(roleId));
@@ -55,7 +55,7 @@ public class SysPermissionController {
     }
 
     @ApiOperation("获得管理员拥有的角色编号列表")
-    @ApiImplicitParam(name = "userId", value = "用户编号", required = true)
+    @ApiImplicitParam(name = "userId", value = "用户编号", required = true, dataTypeClass = Long.class)
     @GetMapping("/list-user-roles")
 //    @RequiresPermissions("system:permission:assign-user-role")
     public CommonResult<Set<Long>> listAdminRoles(@RequestParam("userId") Long userId) {

@@ -64,10 +64,10 @@ public class SysRoleController {
 
     @ApiOperation("删除角色")
     @PostMapping("/delete")
-    @ApiImplicitParam(name = "id", value = "角色编号", required = true, example = "1024")
+    @ApiImplicitParam(name = "id", value = "角色编号", required = true, example = "1024", dataTypeClass = Long.class)
 //    @PreAuthorize("@ss.hasPermi('system:role:remove')")
 //    @Log(title = "角色管理", businessType = BusinessType.DELETE)
-    public CommonResult<Boolean> remove(@RequestParam("id") Long id) {
+    public CommonResult<Boolean> deleteRole(@RequestParam("id") Long id) {
         roleService.deleteRole(id);
         return success(true);
     }

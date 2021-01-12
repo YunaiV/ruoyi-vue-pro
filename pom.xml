@@ -11,6 +11,7 @@
     <name>ruoyi</name>
     <url>http://www.ruoyi.vip</url>
     <description>若依管理系统</description>
+    <packaging>jar</packaging>
 
     <properties>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -54,31 +55,18 @@
         <jjwt.version>0.9.1</jjwt.version>
         <fastjson.version>1.2.75</fastjson.version>
         <hutool.version>5.5.6</hutool.version>
+        <easyexcel.verion>2.2.7</easyexcel.verion>
     </properties>
 
     <!-- 依赖声明 -->
     <dependencyManagement>
         <dependencies>
 
-<!--            &lt;!&ndash;阿里数据库连接池 &ndash;&gt;-->
-<!--            <dependency>-->
-<!--                <groupId>com.alibaba</groupId>-->
-<!--                <artifactId>druid-spring-boot-starter</artifactId>-->
-<!--                <version>${druid.version}</version>-->
-<!--            </dependency>-->
-
 <!--            &lt;!&ndash; 解析客户端操作系统、浏览器等 &ndash;&gt;-->
 <!--            <dependency>-->
 <!--                <groupId>eu.bitwalker</groupId>-->
 <!--                <artifactId>UserAgentUtils</artifactId>-->
 <!--                <version>${bitwalker.version}</version>-->
-<!--            </dependency>-->
-
-<!--            &lt;!&ndash; pagehelper 分页插件 &ndash;&gt;-->
-<!--            <dependency>-->
-<!--                <groupId>com.github.pagehelper</groupId>-->
-<!--                <artifactId>pagehelper-spring-boot-starter</artifactId>-->
-<!--                <version>${pagehelper.boot.version}</version>-->
 <!--            </dependency>-->
 
 <!--            &lt;!&ndash; 获取系统信息 &ndash;&gt;-->
@@ -100,30 +88,6 @@
 <!--                <version>${jna.version}</version>-->
 <!--            </dependency>-->
 
-<!--            &lt;!&ndash; swagger2&ndash;&gt;-->
-<!--            <dependency>-->
-<!--                <groupId>io.springfox</groupId>-->
-<!--                <artifactId>springfox-swagger2</artifactId>-->
-<!--                <version>${swagger.version}</version>-->
-<!--                <exclusions>-->
-<!--                    <exclusion>-->
-<!--                        <groupId>io.swagger</groupId>-->
-<!--                        <artifactId>swagger-annotations</artifactId>-->
-<!--                    </exclusion>-->
-<!--                    <exclusion>-->
-<!--                        <groupId>io.swagger</groupId>-->
-<!--                        <artifactId>swagger-models</artifactId>-->
-<!--                    </exclusion>-->
-<!--                </exclusions>-->
-<!--            </dependency>-->
-
-<!--            &lt;!&ndash; swagger2-UI&ndash;&gt;-->
-<!--            <dependency>-->
-<!--                <groupId>io.springfox</groupId>-->
-<!--                <artifactId>springfox-swagger-ui</artifactId>-->
-<!--                <version>${swagger.version}</version>-->
-<!--            </dependency>-->
-
 <!--            &lt;!&ndash;io常用工具类 &ndash;&gt;-->
 <!--            <dependency>-->
 <!--                <groupId>commons-io</groupId>-->
@@ -138,39 +102,11 @@
 <!--                <version>${commons.fileupload.version}</version>-->
 <!--            </dependency>-->
 
-<!--            &lt;!&ndash; excel工具 &ndash;&gt;-->
-<!--            <dependency>-->
-<!--                <groupId>org.apache.poi</groupId>-->
-<!--                <artifactId>poi-ooxml</artifactId>-->
-<!--                <version>${poi.version}</version>-->
-<!--            </dependency>-->
-
 <!--            &lt;!&ndash;velocity代码生成使用模板 &ndash;&gt;-->
 <!--            <dependency>-->
 <!--                <groupId>org.apache.velocity</groupId>-->
 <!--                <artifactId>velocity</artifactId>-->
 <!--                <version>${velocity.version}</version>-->
-<!--            </dependency>-->
-
-<!--            &lt;!&ndash; 阿里JSON解析器 &ndash;&gt;-->
-<!--            <dependency>-->
-<!--                <groupId>com.alibaba</groupId>-->
-<!--                <artifactId>fastjson</artifactId>-->
-<!--                <version>${fastjson.version}</version>-->
-<!--            </dependency>-->
-
-<!--            &lt;!&ndash;Token生成与解析&ndash;&gt;-->
-<!--            <dependency>-->
-<!--                <groupId>io.jsonwebtoken</groupId>-->
-<!--                <artifactId>jjwt</artifactId>-->
-<!--                <version>${jwt.version}</version>-->
-<!--            </dependency>-->
-
-<!--            &lt;!&ndash;验证码 &ndash;&gt;-->
-<!--            <dependency>-->
-<!--                <groupId>com.github.penggle</groupId>-->
-<!--                <artifactId>kaptcha</artifactId>-->
-<!--                <version>${kaptcha.version}</version>-->
 <!--            </dependency>-->
 
             <!-- 统一依赖管理 -->
@@ -183,16 +119,6 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
-
-<!--    <modules>-->
-<!--        <module>ruoyi-admin</module>-->
-<!--        <module>ruoyi-framework</module>-->
-<!--        <module>ruoyi-system</module>-->
-<!--        <module>ruoyi-quartz</module>-->
-<!--        <module>ruoyi-generator</module>-->
-<!--        <module>ruoyi-common</module>-->
-<!--    </modules>-->
-    <packaging>jar</packaging>
 
     <dependencies>
         <!-- Spring 核心 -->
@@ -306,6 +232,13 @@
             <artifactId>hutool-captcha</artifactId>
             <version>${hutool.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>easyexcel</artifactId>
+            <version>${easyexcel.verion}</version>
+        </dependency>
+
     </dependencies>
 
 

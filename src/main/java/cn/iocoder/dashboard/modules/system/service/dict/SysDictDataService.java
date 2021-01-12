@@ -1,6 +1,7 @@
 package cn.iocoder.dashboard.modules.system.service.dict;
 
 import cn.iocoder.dashboard.common.pojo.PageResult;
+import cn.iocoder.dashboard.framework.dict.core.service.DictDataFrameworkService;
 import cn.iocoder.dashboard.modules.system.controller.dict.vo.data.SysDictDataCreateReqVO;
 import cn.iocoder.dashboard.modules.system.controller.dict.vo.data.SysDictDataPageReqVO;
 import cn.iocoder.dashboard.modules.system.controller.dict.vo.data.SysDictDataUpdateReqVO;
@@ -13,8 +14,18 @@ import java.util.List;
  *
  * @author ruoyi
  */
-public interface SysDictDataService {
+public interface SysDictDataService extends DictDataFrameworkService {
 
+    /**
+     * 初始化，主要是初始化缓存
+     */
+    void init();
+
+    /**
+     * 获得字典数据列表
+     *
+     * @return 字典数据全列表
+     */
     List<SysDictDataDO> listDictDatas();
 
     /**

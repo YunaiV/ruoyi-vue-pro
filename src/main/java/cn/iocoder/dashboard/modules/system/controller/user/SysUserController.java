@@ -63,7 +63,7 @@ public class SysUserController {
      * 根据用户编号获取详细信息
      */
     @ApiOperation("获得用户详情")
-    @ApiImplicitParam(name = "id", value = "编号", readOnly = true, example = "1024")
+    @ApiImplicitParam(name = "id", value = "编号", readOnly = true, example = "1024", dataTypeClass = Long.class)
     @GetMapping("/get")
 //    @PreAuthorize("@ss.hasPermi('system:user:query')")
     public CommonResult<SysUserRespVO> getInfo(@RequestParam("id") Long id) {
@@ -89,7 +89,7 @@ public class SysUserController {
     }
 
     @ApiOperation("删除用户")
-    @ApiImplicitParam(name = "id", value = "编号", readOnly = true, example = "1024")
+    @ApiImplicitParam(name = "id", value = "编号", readOnly = true, example = "1024", dataTypeClass = Long.class)
     @PostMapping("/delete")
 //    @PreAuthorize("@ss.hasPermi('system:user:remove')")
 //    @Log(title = "用户管理", businessType = BusinessType.DELETE)

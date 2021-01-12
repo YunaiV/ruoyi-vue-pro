@@ -1,0 +1,23 @@
+package cn.iocoder.dashboard.modules.system.enums.dict;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+/**
+ * 字典类型的类型枚举
+ */
+@Getter
+@AllArgsConstructor
+public enum DictTypeEnum {
+
+    SYS_USER_SEX("sys_user_sex"), // 用户性别
+    SYS_COMMON_STATUS("sys_common_status"), // 系统状态
+    ;
+
+
+    /**
+     * 值
+     */
+    private final String value;
+
+}

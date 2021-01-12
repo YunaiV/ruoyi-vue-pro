@@ -10,6 +10,7 @@ import java.lang.annotation.Target;
  *
  * @author ruoyi
  */
+@Deprecated
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Excels

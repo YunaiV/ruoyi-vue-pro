@@ -11,20 +11,14 @@ import java.util.Date;
  * 用户 Excel 导出响应 VO
  */
 @Data
-public class SysUserExcelRespVO {
+public class SysUserExcelRespBackVO {
 
     @Excel(name = "用户序号", cellType = Excel.ColumnType.NUMERIC, prompt = "用户编号")
     private Long id;
 
-    /**
-     * 用户账号
-     */
     @Excel(name = "登录名称")
     private String username;
 
-    /**
-     * 用户昵称
-     */
     @Excel(name = "用户名称")
     private String nickname;
 

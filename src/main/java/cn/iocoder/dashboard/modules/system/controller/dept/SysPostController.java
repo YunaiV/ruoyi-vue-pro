@@ -73,7 +73,7 @@ public class SysPostController {
     }
 
     @ApiOperation("获得岗位信息")
-    @ApiImplicitParam(name = "id", value = "岗位编号", readOnly = true, example = "1024")
+    @ApiImplicitParam(name = "id", value = "岗位编号", readOnly = true, example = "1024", dataTypeClass = Long.class)
 //    @PreAuthorize("@ss.hasPermi('system:post:query')")
     @GetMapping(value = "/get")
     public CommonResult<SysPostRespVO> getPost(@RequestParam("id") Long id) {
