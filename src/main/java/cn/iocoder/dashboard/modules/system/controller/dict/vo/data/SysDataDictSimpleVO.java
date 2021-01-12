@@ -1,4 +1,4 @@
-package cn.iocoder.dashboard.modules.system.controller.dict.vo;
+package cn.iocoder.dashboard.modules.system.controller.dict.vo.data;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;

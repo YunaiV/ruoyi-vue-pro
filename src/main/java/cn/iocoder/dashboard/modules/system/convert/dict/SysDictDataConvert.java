@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.modules.system.convert.dict;
 
-import cn.iocoder.dashboard.modules.system.controller.dict.vo.SysDataDictSimpleVO;
+import cn.iocoder.dashboard.modules.system.controller.dict.vo.data.SysDataDictSimpleVO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.dict.SysDictDataDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
