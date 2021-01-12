@@ -3,7 +3,7 @@ import request from '@/utils/request'
 // 查询字典类型列表
 export function listType(query) {
   return request({
-    url: '/system/dict/type/list',
+    url: '/system/dict-type/page',
     method: 'get',
     params: query
   })
@@ -12,7 +12,7 @@ export function listType(query) {
 // 查询字典类型详细
 export function getType(dictId) {
   return request({
-    url: '/system/dict/type/' + dictId,
+    url: '/system/dict-type/get?id=' + dictId,
     method: 'get'
   })
 }
@@ -20,7 +20,7 @@ export function getType(dictId) {
 // 新增字典类型
 export function addType(data) {
   return request({
-    url: '/system/dict/type',
+    url: '/system/dict-type/create',
     method: 'post',
     data: data
   })
@@ -29,8 +29,8 @@ export function addType(data) {
 // 修改字典类型
 export function updateType(data) {
   return request({
-    url: '/system/dict/type',
-    method: 'put',
+    url: '/system/dict-type/update',
+    method: 'post',
     data: data
   })
 }
@@ -38,23 +38,15 @@ export function updateType(data) {
 // 删除字典类型
 export function delType(dictId) {
   return request({
-    url: '/system/dict/type/' + dictId,
-    method: 'delete'
-  })
-}
-
-// 清理参数缓存
-export function clearCache() {
-  return request({
-    url: '/system/dict/type/clearCache',
-    method: 'delete'
+    url: '/system/dict-type/delete?id=' + dictId,
+    method: 'post'
   })
 }
 
 // 导出字典类型
 export function exportType(query) {
   return request({
-    url: '/system/dict/type/export',
+    url: '/system/dict-type/export',
     method: 'get',
     params: query
   })
@@ -63,7 +55,7 @@ export function exportType(query) {
 // 获取字典选择框列表
 export function optionselect() {
   return request({
-    url: '/system/dict/type/optionselect',
+    url: '/system/dict-type/optionselect',
     method: 'get'
   })
 }

@@ -6,7 +6,7 @@ import lombok.Data;
 
 @ApiModel("数据字典精简 VO")
 @Data
-public class SysDataDictSimpleVO {
+public class SysDictDataSimpleVO {
 
     @ApiModelProperty(value = "字典类型", required = true, example = "gender")
     private String dictType;

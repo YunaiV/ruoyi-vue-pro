@@ -38,5 +38,9 @@ public class SysDictTypeDO extends BaseDO {
      * 枚举 {@link CommonStatusEnum}
      */
     private Integer status;
+    /**
+     * 备注
+     */
+    private String remark;
 
 }

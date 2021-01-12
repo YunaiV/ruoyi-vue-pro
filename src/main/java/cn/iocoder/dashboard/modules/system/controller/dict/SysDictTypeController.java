@@ -5,7 +5,7 @@ import cn.iocoder.dashboard.common.pojo.PageResult;
 import cn.iocoder.dashboard.modules.system.controller.dict.vo.type.SysDictTypeCreateReqVO;
 import cn.iocoder.dashboard.modules.system.controller.dict.vo.type.SysDictTypePageReqVO;
 import cn.iocoder.dashboard.modules.system.controller.dict.vo.type.SysDictTypeRespVO;
-import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserUpdateReqVO;
+import cn.iocoder.dashboard.modules.system.controller.dict.vo.type.SysDictTypeUpdateReqVO;
 import cn.iocoder.dashboard.modules.system.convert.dict.SysDictTypeConvert;
 import cn.iocoder.dashboard.modules.system.service.dict.SysDictTypeService;
 import io.swagger.annotations.Api;
@@ -26,14 +26,14 @@ public class SysDictTypeController {
     @Resource
     private SysDictTypeService dictTypeService;
 
-    @ApiOperation("/page")
-    @GetMapping("/list")
+    @ApiOperation("/获得字典类型的分页列表")
+    @GetMapping("/page")
 //    @PreAuthorize("@ss.hasPermi('system:dict:list')")
     public CommonResult<PageResult<SysDictTypeRespVO>> pageDictTypes(@Validated SysDictTypePageReqVO reqVO) {
         return success(SysDictTypeConvert.INSTANCE.convertPage(dictTypeService.pageDictTypes(reqVO)));
     }
 
-    @ApiOperation("/查询字典详细")
+    @ApiOperation("/查询字典类型详细")
     @ApiImplicitParam(name = "id", value = "编号", readOnly = true, example = "1024")
     @GetMapping(value = "/get")
 //    @PreAuthorize("@ss.hasPermi('system:dict:query')")
@@ -54,7 +54,7 @@ public class SysDictTypeController {
     @PostMapping("update")
 //    @PreAuthorize("@ss.hasPermi('system:dict:edit')")
 //    @Log(title = "字典类型", businessType = BusinessType.UPDATE)
-    public CommonResult<Boolean> updateDictType(@Validated @RequestBody SysUserUpdateReqVO reqVO) {
+    public CommonResult<Boolean> updateDictType(@Validated @RequestBody SysDictTypeUpdateReqVO reqVO) {
         dictTypeService.updateDictType(reqVO);
         return success(true);
     }
