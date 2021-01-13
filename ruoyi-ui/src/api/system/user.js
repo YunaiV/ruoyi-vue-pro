@@ -49,7 +49,8 @@ export function exportUser(query) {
   return request({
     url: '/system/user/export',
     method: 'get',
-    params: query
+    params: query,
+    responseType: 'blob'
   })
 }
 

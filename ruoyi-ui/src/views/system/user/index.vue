@@ -655,7 +655,15 @@ export default {
         }).then(function() {
           return exportUser(queryParams);
         }).then(response => {
-          this.download(response.msg);
+          // this.download(response.msg);
+          let blob = new Blob([response], {type: 'application/vnd.ms-excel'});
+          window.URL = window.URL || window.webkitURL;
+          let href = URL.createObjectURL(blob);
+          let downA = document.createElement("a");
+          downA.href =  href;//
+          downA.download = '123321.xls';
+          downA.click();
+          window.URL.revokeObjectURL(href);
         })
     },
     /** 导入按钮操作 */

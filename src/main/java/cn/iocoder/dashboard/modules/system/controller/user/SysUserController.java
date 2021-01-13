@@ -10,6 +10,7 @@ import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.user.SysUserDO;
 import cn.iocoder.dashboard.modules.system.service.dept.SysDeptService;
 import cn.iocoder.dashboard.modules.system.service.user.SysUserService;
 import cn.iocoder.dashboard.util.collection.CollectionUtils;
+import com.alibaba.excel.EasyExcel;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
@@ -17,6 +18,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.*;
 
 import static cn.iocoder.dashboard.common.pojo.CommonResult.success;
@@ -114,6 +117,15 @@ public class SysUserController {
     public CommonResult<Boolean> updateUserStatus(@Validated @RequestBody SysUserUpdateStatusReqVO reqVO) {
         userService.updateUserStatus(reqVO.getId(), reqVO.getStatus());
         return success(true);
+    }
+
+    @ApiOperation("导出用户")
+    @GetMapping("/export")
+    public void exportUsers(HttpServletResponse response) throws IOException {
+        String fileName = "测试文件.xls";
+        response.addHeader("Content-Disposition", "attachment;filename=" + fileName);
+        response.setContentType("application/vnd.ms-excel;charset=UTF-8");
+        EasyExcel.write(response.getOutputStream(), SysUserExcelVO.class).sheet().doWrite(new ArrayList<>());
     }
 
 //    @Log(title = "用户管理", businessType = BusinessType.EXPORT)

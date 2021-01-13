@@ -2,10 +2,10 @@ package cn.iocoder.dashboard.modules.system.controller.auth;
 
 import cn.iocoder.dashboard.common.enums.CommonStatusEnum;
 import cn.iocoder.dashboard.common.pojo.CommonResult;
-import cn.iocoder.dashboard.modules.system.controller.auth.vo.SysAuthMenuRespVO;
-import cn.iocoder.dashboard.modules.system.controller.auth.vo.SysAuthPermissionInfoRespVO;
 import cn.iocoder.dashboard.modules.system.controller.auth.vo.SysAuthLoginReqVO;
 import cn.iocoder.dashboard.modules.system.controller.auth.vo.SysAuthLoginRespVO;
+import cn.iocoder.dashboard.modules.system.controller.auth.vo.SysAuthMenuRespVO;
+import cn.iocoder.dashboard.modules.system.controller.auth.vo.SysAuthPermissionInfoRespVO;
 import cn.iocoder.dashboard.modules.system.convert.auth.SysAuthConvert;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.permission.SysMenuDO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.permission.SysRoleDO;
@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
-
 import java.util.List;
 
 import static cn.iocoder.dashboard.common.pojo.CommonResult.success;

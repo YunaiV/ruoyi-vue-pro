@@ -49,7 +49,7 @@
     </el-row>
 
     <el-table v-loading="loading" :data="noticeList">
-      <el-table-column label="序号" align="center" prop="noticeId" width="100" />
+      <el-table-column label="序号" align="center" prop="id" width="100" />
       <el-table-column
         label="公告标题"
         align="center"
@@ -117,11 +117,11 @@
             <el-form-item label="公告类型" prop="type">
               <el-select v-model="form.type" placeholder="请选择">
                 <el-option
-                  v-for="dict in typeOptions"
-                  :key="dict.dictValue"
-                  :label="dict.dictLabel"
-                  :value="dict.dictValue"
-                ></el-option>
+                    v-for="dict in noticeTypeDictDatas"
+                    :key="parseInt(dict.value)"
+                    :label="dict.label"
+                    :value="parseInt(dict.value)"
+                />
               </el-select>
             </el-form-item>
           </el-col>
@@ -131,9 +131,9 @@
                 <el-radio
                     v-for="dict in statusDictDatas"
                     :key="parseInt(dict.value)"
-                    :label="dict.label"
-                    :value="parseInt(dict.value)"
+                    :label="parseInt(dict.value)"
                 >{{dict.label}}</el-radio>
+              </el-radio-group>
             </el-form-item>
           </el-col>
           <el-col :span="24">
@@ -177,10 +177,6 @@ export default {
       title: "",
       // 是否显示弹出层
       open: false,
-      // 类型数据字典
-      statusOptions: [],
-      // 状态数据字典
-      typeOptions: [],
       // 查询参数
       queryParams: {
         pageNo: 1,
@@ -227,7 +223,7 @@ export default {
     },
     // 公告状态字典翻译
     typeFormat(row, column) {
-      return getDictDataLabel(DICT_TYPE.SYS_NOTICE_TYPE, row.status)
+      return getDictDataLabel(DICT_TYPE.SYS_NOTICE_TYPE, row.type)
     },
     // 取消按钮
     cancel() {
@@ -237,7 +233,7 @@ export default {
     // 表单重置
     reset() {
       this.form = {
-        noticeId: undefined,
+        id: undefined,
         title: undefined,
         type: undefined,
         content: undefined,
@@ -264,8 +260,8 @@ export default {
     /** 修改按钮操作 */
     handleUpdate(row) {
       this.reset();
-      const noticeId = row.noticeId || this.ids
-      getNotice(noticeId).then(response => {
+      const id = row.id || this.ids
+      getNotice(id).then(response => {
         this.form = response.data;
         this.open = true;
         this.title = "修改公告";
@@ -275,7 +271,7 @@ export default {
     submitForm: function() {
       this.$refs["form"].validate(valid => {
         if (valid) {
-          if (this.form.noticeId !== undefined) {
+          if (this.form.id !== undefined) {
             updateNotice(this.form).then(response => {
               this.msgSuccess("修改成功");
               this.open = false;
@@ -293,13 +289,13 @@ export default {
     },
     /** 删除按钮操作 */
     handleDelete(row) {
-      const noticeIds = row.noticeId || this.ids
-      this.$confirm('是否确认删除公告编号为"' + noticeIds + '"的数据项?', "警告", {
+      const ids = row.id || this.ids
+      this.$confirm('是否确认删除公告编号为"' + ids + '"的数据项?', "警告", {
           confirmButtonText: "确定",
           cancelButtonText: "取消",
           type: "warning"
         }).then(function() {
-          return delNotice(noticeIds);
+          return delNotice(ids);
         }).then(() => {
           this.getList();
           this.msgSuccess("删除成功");
