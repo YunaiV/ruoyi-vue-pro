@@ -17,7 +17,7 @@ import java.util.Date;
 public class SysDictDataRespVO extends SysDictDataBaseVO {
 
     @ApiModelProperty(value = "字典数据编号", required = true, example = "1024")
-    private Integer id;
+    private Long id;
 
     @ApiModelProperty(value = "创建时间", required = true, example = "时间戳格式")
     private Date createTime;

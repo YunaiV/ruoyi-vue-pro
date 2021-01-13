@@ -17,7 +17,7 @@ import java.util.Date;
 public class SysDictTypeRespVO extends SysDictTypeBaseVO {
 
     @ApiModelProperty(value = "字典类型编号", required = true, example = "1024")
-    private Integer id;
+    private Long id;
 
     @ApiModelProperty(value = "字典类型", required = true, example = "sys_common_sex")
     private String type;

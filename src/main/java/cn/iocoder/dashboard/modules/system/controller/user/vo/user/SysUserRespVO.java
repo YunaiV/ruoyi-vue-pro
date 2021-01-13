@@ -17,7 +17,7 @@ import java.util.Date;
 public class SysUserRespVO extends SysUserBaseVO {
 
     @ApiModelProperty(value = "用户编号", required = true, example = "1")
-    private Integer id;
+    private Long id;
 
     @ApiModelProperty(value = "状态", required = true, example = "1", notes = "参见 SysCommonStatusEnum 枚举类")
     private Integer status;

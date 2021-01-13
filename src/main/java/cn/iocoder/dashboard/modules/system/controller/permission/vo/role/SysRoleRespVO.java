@@ -18,7 +18,7 @@ import java.util.Set;
 public class SysRoleRespVO extends SysRoleBaseVO {
 
     @ApiModelProperty(value = "角色编号", required = true, example = "1")
-    private Integer id;
+    private Long id;
 
     @ApiModelProperty(value = "数据范围", required = true, example = "1", notes = "参见 DataScopeEnum 枚举类")
     private Integer dataScope;

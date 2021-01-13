@@ -13,7 +13,7 @@ import java.util.Date;
 public class SysDeptRespVO extends SysDeptBaseVO {
 
     @ApiModelProperty(value = "部门编号", required = true, example = "1024")
-    private Integer id;
+    private Long id;
 
     @ApiModelProperty(value = "状态", required = true, example = "1", notes = "参见 SysCommonStatusEnum 枚举类")
     private Integer status;

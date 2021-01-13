@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 public class SysPostSimpleRespVO {
 
     @ApiModelProperty(value = "岗位编号", required = true, example = "1024")
-    private Integer id;
+    private Long id;
 
     @ApiModelProperty(value = "岗位名称", required = true, example = "芋道")
     private String name;

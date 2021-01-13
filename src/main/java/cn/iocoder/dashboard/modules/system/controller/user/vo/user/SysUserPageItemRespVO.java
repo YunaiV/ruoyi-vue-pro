@@ -24,7 +24,7 @@ public class SysUserPageItemRespVO extends SysUserRespVO {
     public static class Dept {
 
         @ApiModelProperty(value = "部门编号", required = true, example = "1")
-        private Integer id;
+        private Long id;
 
         @ApiModelProperty(value = "部门名称", required = true, example = "研发部")
         private String name;

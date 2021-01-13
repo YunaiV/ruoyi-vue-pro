@@ -11,6 +11,7 @@ export const DICT_TYPE = {
   SYS_ROLE_TYPE: 'sys_role_type',
   SYS_DATA_SCOPE: 'sys_data_scope',
   SYS_USER_SEX: 'sys_user_sex',
+  SYS_NOTICE_TYPE: 'sys_notice_type',
 }
 
 /**

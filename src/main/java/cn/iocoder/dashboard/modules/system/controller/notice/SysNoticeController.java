@@ -1,64 +1,72 @@
 package cn.iocoder.dashboard.modules.system.controller.notice;
 
+import cn.iocoder.dashboard.common.pojo.CommonResult;
+import cn.iocoder.dashboard.common.pojo.PageResult;
+import cn.iocoder.dashboard.modules.system.controller.notice.vo.SysNoticeCreateReqVO;
+import cn.iocoder.dashboard.modules.system.controller.notice.vo.SysNoticePageReqVO;
+import cn.iocoder.dashboard.modules.system.controller.notice.vo.SysNoticeRespVO;
+import cn.iocoder.dashboard.modules.system.controller.notice.vo.SysNoticeUpdateReqVO;
+import cn.iocoder.dashboard.modules.system.convert.notice.SysNoticeConvert;
+import cn.iocoder.dashboard.modules.system.service.notice.SysNoticeService;
 import io.swagger.annotations.Api;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiOperation;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
+import javax.annotation.Resource;
+
+import static cn.iocoder.dashboard.common.pojo.CommonResult.success;
 
 @Api(tags = "通知公告 API")
 @RestController
 @RequestMapping("/system/notice")
 public class SysNoticeController {
 
-//    /**
-//     * 获取通知公告列表
-//     */
+    @Resource
+    private SysNoticeService noticeService;
+
+    @ApiOperation("获取通知公告列表")
+    @GetMapping("/page")
 //    @PreAuthorize("@ss.hasPermi('system:notice:list')")
-//    @GetMapping("/list")
-//    public TableDataInfo list(SysNotice notice) {
-//        startPage();
-//        List<SysNotice> list = noticeService.selectNoticeList(notice);
-//        return getDataTable(list);
-//    }
-//
-//    /**
-//     * 根据通知公告编号获取详细信息
-//     */
+    public CommonResult<PageResult<SysNoticeRespVO>> pageNotices(@Validated SysNoticePageReqVO reqVO) {
+        return success(SysNoticeConvert.INSTANCE.convertPage(noticeService.pageNotices(reqVO)));
+    }
+
+    @ApiOperation("获得通知公告")
+    @ApiImplicitParam(name = "id", value = "编号", readOnly = true, example = "1024", dataTypeClass = Long.class)
 //    @PreAuthorize("@ss.hasPermi('system:notice:query')")
-//    @GetMapping(value = "/{noticeId}")
-//    public AjaxResult getInfo(@PathVariable Long noticeId) {
-//        return AjaxResult.success(noticeService.selectNoticeById(noticeId));
-//    }
-//
-//    /**
-//     * 新增通知公告
-//     */
+    @GetMapping(value = "/get")
+    public CommonResult<SysNoticeRespVO> getNotice(@RequestParam("id") Long id) {
+        return success(SysNoticeConvert.INSTANCE.convert(noticeService.getNotice(id)));
+    }
+
+    @ApiOperation("新增通知公告")
 //    @PreAuthorize("@ss.hasPermi('system:notice:add')")
 //    @Log(title = "通知公告", businessType = BusinessType.INSERT)
-//    @PostMapping
-//    public AjaxResult add(@Validated @RequestBody SysNotice notice) {
-//        notice.setCreateBy(SecurityUtils.getUsername());
-//        return toAjax(noticeService.insertNotice(notice));
-//    }
-//
-//    /**
-//     * 修改通知公告
-//     */
+    @PostMapping("/create")
+    public CommonResult<Long> createNotice(@Validated @RequestBody SysNoticeCreateReqVO reqVO) {
+        Long noticeId = noticeService.createNotice(reqVO);
+        return success(noticeId);
+    }
+
+    @ApiOperation("修改通知公告")
 //    @PreAuthorize("@ss.hasPermi('system:notice:edit')")
 //    @Log(title = "通知公告", businessType = BusinessType.UPDATE)
-//    @PutMapping
-//    public AjaxResult edit(@Validated @RequestBody SysNotice notice) {
-//        notice.setUpdateBy(SecurityUtils.getUsername());
-//        return toAjax(noticeService.updateNotice(notice));
-//    }
-//
-//    /**
-//     * 删除通知公告
-//     */
+    @PostMapping("/update")
+    public CommonResult<Boolean> updateNotice(@Validated @RequestBody SysNoticeUpdateReqVO reqVO) {
+        noticeService.updateNotice(reqVO);
+        return success(true);
+    }
+
+    @ApiOperation("删除通知公告")
+    @ApiImplicitParam(name = "id", value = "编号", readOnly = true, example = "1024", dataTypeClass = Long.class)
 //    @PreAuthorize("@ss.hasPermi('system:notice:remove')")
 //    @Log(title = "通知公告", businessType = BusinessType.DELETE)
-//    @DeleteMapping("/{noticeIds}")
-//    public AjaxResult remove(@PathVariable Long[] noticeIds) {
-//        return toAjax(noticeService.deleteNoticeByIds(noticeIds));
-//    }
+    @PostMapping("/delete")
+    public CommonResult<Boolean> deleteNotice(@RequestParam("id") Long id) {
+        noticeService.deleteNotice(id);
+        return success(true);
+    }
 
 }
