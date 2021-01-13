@@ -1,12 +1,16 @@
 package cn.iocoder.dashboard.modules.system.service.dept;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.dashboard.modules.system.controller.dept.vo.dept.SysDeptCreateReqVO;
 import cn.iocoder.dashboard.modules.system.controller.dept.vo.dept.SysDeptListReqVO;
 import cn.iocoder.dashboard.modules.system.controller.dept.vo.dept.SysDeptUpdateReqVO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.dept.SysDeptDO;
+import cn.iocoder.dashboard.util.collection.CollectionUtils;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 部门 Service 接口
@@ -34,6 +38,20 @@ public interface SysDeptService {
      * @return 部门列表
      */
     List<SysDeptDO> listDepts(Collection<Long> ids);
+
+    /**
+     * 获得指定编号的部门 Map
+     *
+     * @param ids 部门编号数组
+     * @return 部门 Map
+     */
+    default Map<Long, SysDeptDO> getDeptMap(Collection<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return Collections.emptyMap();
+        }
+        List<SysDeptDO> list = listDepts(ids);
+        return CollectionUtils.convertMap(list, SysDeptDO::getId);
+    }
 
     /**
      * 筛选部门列表

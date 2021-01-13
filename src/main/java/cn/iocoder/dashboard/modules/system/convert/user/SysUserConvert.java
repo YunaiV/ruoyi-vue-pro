@@ -2,6 +2,7 @@ package cn.iocoder.dashboard.modules.system.convert.user;
 
 import cn.iocoder.dashboard.common.pojo.PageResult;
 import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserCreateReqVO;
+import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserExcelVO;
 import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserPageItemRespVO;
 import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserUpdateReqVO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.dept.SysDeptDO;
@@ -26,5 +27,7 @@ public interface SysUserConvert {
     SysUserDO convert(SysUserCreateReqVO bean);
 
     SysUserDO convert(SysUserUpdateReqVO bean);
+
+    SysUserExcelVO convert02(SysUserDO bean);
 
 }

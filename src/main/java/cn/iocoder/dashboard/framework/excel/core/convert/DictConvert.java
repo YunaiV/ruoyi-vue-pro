@@ -54,7 +54,7 @@ public class DictConvert implements Converter<Object> {
             return null;
         }
         // 生成 Excel 小表格
-        return new CellData<>(dictData.getValue());
+        return new CellData<>(dictData.getLabel());
     }
 
     private static DictTypeEnum getType(ExcelContentProperty contentProperty) {

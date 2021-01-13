@@ -15,6 +15,7 @@ import cn.iocoder.dashboard.modules.system.service.dict.SysDictTypeService;
 import com.google.common.collect.ImmutableTable;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -56,6 +57,7 @@ public class SysDictDataServiceImpl implements SysDictDataService {
     private SysDictDataMapper dictDataMapper;
 
     @Override
+    @PostConstruct
     public void init() {
         // 获得字典数据
         List<SysDictDataDO> list = this.listDictDatas();

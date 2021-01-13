@@ -3,6 +3,7 @@ package cn.iocoder.dashboard.modules.system.controller.user;
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.dashboard.common.pojo.CommonResult;
 import cn.iocoder.dashboard.common.pojo.PageResult;
+import cn.iocoder.dashboard.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.dashboard.modules.system.controller.user.vo.user.*;
 import cn.iocoder.dashboard.modules.system.convert.user.SysUserConvert;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.dept.SysDeptDO;
@@ -10,7 +11,7 @@ import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.user.SysUserDO;
 import cn.iocoder.dashboard.modules.system.service.dept.SysDeptService;
 import cn.iocoder.dashboard.modules.system.service.user.SysUserService;
 import cn.iocoder.dashboard.util.collection.CollectionUtils;
-import com.alibaba.excel.EasyExcel;
+import cn.iocoder.dashboard.util.collection.MapUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
@@ -20,7 +21,10 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 import static cn.iocoder.dashboard.common.pojo.CommonResult.success;
 
@@ -37,7 +41,7 @@ public class SysUserController {
     @ApiOperation("获得用户分页列表")
     @GetMapping("/page")
 //    @PreAuthorize("@ss.hasPermi('system:user:list')")
-    public CommonResult<PageResult<SysUserPageItemRespVO>> pageUsers(SysUserPageReqVO reqVO) {
+    public CommonResult<PageResult<SysUserPageItemRespVO>> pageUsers(@Validated SysUserPageReqVO reqVO) {
         // 获得用户分页列表
         PageResult<SysUserDO> pageResult = userService.pageUsers(reqVO);
         if (CollUtil.isEmpty(pageResult.getList())) {
@@ -45,13 +49,8 @@ public class SysUserController {
         }
 
         // 获得拼接需要的数据
-        Map<Long, SysDeptDO> deptMap;
         Collection<Long> deptIds = CollectionUtils.convertList(pageResult.getList(), SysUserDO::getDeptId);
-        if (CollUtil.isNotEmpty(deptIds)) {
-            deptMap = CollectionUtils.convertMap(deptService.listDepts(deptIds), SysDeptDO::getId);
-        } else {
-            deptMap = Collections.emptyMap();
-        }
+        Map<Long, SysDeptDO> deptMap = deptService.getDeptMap(deptIds);
         // 拼接结果返回
         List<SysUserPageItemRespVO> userList = new ArrayList<>(pageResult.getList().size());
         pageResult.getList().forEach(user -> {
@@ -121,11 +120,29 @@ public class SysUserController {
 
     @ApiOperation("导出用户")
     @GetMapping("/export")
-    public void exportUsers(HttpServletResponse response) throws IOException {
-        String fileName = "测试文件.xls";
-        response.addHeader("Content-Disposition", "attachment;filename=" + fileName);
-        response.setContentType("application/vnd.ms-excel;charset=UTF-8");
-        EasyExcel.write(response.getOutputStream(), SysUserExcelVO.class).sheet().doWrite(new ArrayList<>());
+//    @PreAuthorize("@ss.hasPermi('system:user:export')") , @Validated SysUserExportReqVO reqVO
+//    @Log(title = "用户管理", businessType = BusinessType.EXPORT)
+    public void exportUsers(HttpServletResponse response, @Validated SysUserExportReqVO reqVO) throws IOException {
+        // 获得用户列表
+        List<SysUserDO> users = userService.listUsers(reqVO);
+
+        // 获得拼接需要的数据
+        Collection<Long> deptIds = CollectionUtils.convertList(users, SysUserDO::getDeptId);
+        Map<Long, SysDeptDO> deptMap = deptService.getDeptMap(deptIds);
+        // 拼接数据
+        List<SysUserExcelVO> excelUsers = new ArrayList<>(users.size());
+        users.forEach(user -> {
+            SysUserExcelVO excelVO = SysUserConvert.INSTANCE.convert02(user);
+            MapUtils.findAndThen(deptMap, user.getDeptId(), dept -> {
+                excelVO.setDeptName(dept.getName());
+                excelVO.setDeptLeader(dept.getLeader());
+            });
+            excelUsers.add(excelVO);
+        });
+
+        // 输出
+        ExcelUtils.write(response, "用户数据.xls", "用户列表",
+                SysUserExcelVO.class, excelUsers);
     }
 
 //    @Log(title = "用户管理", businessType = BusinessType.EXPORT)

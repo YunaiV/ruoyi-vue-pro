@@ -6,6 +6,7 @@ import cn.iocoder.dashboard.common.enums.CommonStatusEnum;
 import cn.iocoder.dashboard.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.dashboard.common.pojo.PageResult;
 import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserCreateReqVO;
+import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserExportReqVO;
 import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserPageReqVO;
 import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserUpdateReqVO;
 import cn.iocoder.dashboard.modules.system.convert.user.SysUserConvert;
@@ -77,15 +78,29 @@ public class SysUserServiceImpl implements SysUserService {
 
     @Override
     public PageResult<SysUserDO> pageUsers(SysUserPageReqVO reqVO) {
-        // 处理部门查询条件
-        List<Long> deptIds = Collections.emptyList();
-        if (reqVO.getDeptId() != null) {
-            deptIds = CollectionUtils.convertList(deptService.listDeptsByParentIdFromCache(
-                    reqVO.getDeptId(), true), SysDeptDO::getId);
-            deptIds.add(reqVO.getDeptId());
+        return SysUserConvert.INSTANCE.convertPage(userMapper.selectList(reqVO,
+                this.getDeptCondition(reqVO.getDeptId())));
+    }
+
+    @Override
+    public List<SysUserDO> listUsers(SysUserExportReqVO reqVO) {
+        return userMapper.selectList(reqVO, this.getDeptCondition(reqVO.getDeptId()));
+    }
+
+    /**
+     * 获得部门条件：查询指定部门的子部门编号们，包括自身
+     *
+     * @param deptId 部门编号
+     * @return 部门编号集合
+     */
+    private Set<Long> getDeptCondition(Long deptId) {
+        if (deptId == null) {
+            return Collections.emptySet();
         }
-        // 执行查询
-        return SysUserConvert.INSTANCE.convertPage(userMapper.selectList(reqVO, deptIds));
+        Set<Long> deptIds = CollectionUtils.convertSet(deptService.listDeptsByParentIdFromCache(
+                deptId, true), SysDeptDO::getId);
+        deptIds.add(deptId); // 包括自身
+        return deptIds;
     }
 
     @Override

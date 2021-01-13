@@ -510,7 +510,7 @@ export default {
       this.reset();
     },
     // 取消按钮（角色权限）
-    cancelMenu() {
+    cancelRole() {
       this.openRole = false;
       this.reset();
     },
@@ -647,7 +647,10 @@ export default {
     },
     /** 导出按钮操作 */
     handleExport() {
-      const queryParams = this.queryParams;
+      const queryParams = this.addDateRange(this.queryParams, [
+        this.dateRange[0] ? this.dateRange[0] + ' 00:00:00' : undefined,
+        this.dateRange[1] ? this.dateRange[1] + ' 23:59:59' : undefined,
+      ]);
       this.$confirm('是否确认导出所有用户数据项?', "警告", {
           confirmButtonText: "确定",
           cancelButtonText: "取消",
@@ -655,15 +658,7 @@ export default {
         }).then(function() {
           return exportUser(queryParams);
         }).then(response => {
-          // this.download(response.msg);
-          let blob = new Blob([response], {type: 'application/vnd.ms-excel'});
-          window.URL = window.URL || window.webkitURL;
-          let href = URL.createObjectURL(blob);
-          let downA = document.createElement("a");
-          downA.href =  href;//
-          downA.download = '123321.xls';
-          downA.click();
-          window.URL.revokeObjectURL(href);
+          this.downloadExcel(response, '用户数据.xls');
         })
     },
     /** 导入按钮操作 */

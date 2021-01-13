@@ -22,7 +22,7 @@ public class SysUserExcelVO {
     @ExcelProperty("用户名称")
     private String username;
 
-    @ExcelProperty("用户名称")
+    @ExcelProperty("用户昵称")
     private String nickname;
 
     @ExcelProperty("用户邮箱")
