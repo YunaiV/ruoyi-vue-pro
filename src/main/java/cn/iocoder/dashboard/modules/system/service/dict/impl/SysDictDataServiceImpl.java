@@ -4,6 +4,7 @@ import cn.iocoder.dashboard.common.enums.CommonStatusEnum;
 import cn.iocoder.dashboard.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.dashboard.common.pojo.PageResult;
 import cn.iocoder.dashboard.modules.system.controller.dict.vo.data.SysDictDataCreateReqVO;
+import cn.iocoder.dashboard.modules.system.controller.dict.vo.data.SysDictDataExportReqVO;
 import cn.iocoder.dashboard.modules.system.controller.dict.vo.data.SysDictDataPageReqVO;
 import cn.iocoder.dashboard.modules.system.controller.dict.vo.data.SysDictDataUpdateReqVO;
 import cn.iocoder.dashboard.modules.system.convert.dict.SysDictDataConvert;
@@ -82,6 +83,13 @@ public class SysDictDataServiceImpl implements SysDictDataService {
     @Override
     public PageResult<SysDictDataDO> pageDictDatas(SysDictDataPageReqVO reqVO) {
         return SysDictDataConvert.INSTANCE.convertPage02(dictDataMapper.selectList(reqVO));
+    }
+
+    @Override
+    public List<SysDictDataDO> listDictDatas(SysDictDataExportReqVO reqVO) {
+        List<SysDictDataDO> list = dictDataMapper.selectList(reqVO);
+        list.sort(COMPARATOR_TYPE_AND_SORT);
+        return list;
     }
 
     @Override

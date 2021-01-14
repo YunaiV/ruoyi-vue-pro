@@ -2,6 +2,7 @@ package cn.iocoder.dashboard.modules.system.service.permission;
 
 import cn.iocoder.dashboard.common.pojo.PageResult;
 import cn.iocoder.dashboard.modules.system.controller.permission.vo.role.SysRoleCreateReqVO;
+import cn.iocoder.dashboard.modules.system.controller.permission.vo.role.SysRoleExportReqVO;
 import cn.iocoder.dashboard.modules.system.controller.permission.vo.role.SysRolePageReqVO;
 import cn.iocoder.dashboard.modules.system.controller.permission.vo.role.SysRoleUpdateReqVO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.permission.SysRoleDO;
@@ -92,6 +93,14 @@ public interface SysRoleService {
      * @return 角色分页结果
      */
     PageResult<SysRoleDO> pageRole(SysRolePageReqVO reqVO);
+
+    /**
+     * 获得角色列表
+     *
+     * @param reqVO 列表查询
+     * @return 角色列表
+     */
+    List<SysRoleDO> listRoles(SysRoleExportReqVO reqVO);
 
     /**
      * 更新角色状态

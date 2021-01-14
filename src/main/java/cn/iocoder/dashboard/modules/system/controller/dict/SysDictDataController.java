@@ -2,6 +2,7 @@ package cn.iocoder.dashboard.modules.system.controller.dict;
 
 import cn.iocoder.dashboard.common.pojo.CommonResult;
 import cn.iocoder.dashboard.common.pojo.PageResult;
+import cn.iocoder.dashboard.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.dashboard.modules.system.controller.dict.vo.data.*;
 import cn.iocoder.dashboard.modules.system.convert.dict.SysDictDataConvert;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.dict.SysDictDataDO;
@@ -13,6 +14,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.List;
 
 import static cn.iocoder.dashboard.common.pojo.CommonResult.success;
@@ -25,8 +28,8 @@ public class SysDictDataController {
     @Resource
     private SysDictDataService dictDataService;
 
-    @GetMapping("/list-all-simple")
     @ApiOperation(value = "获得全部字典数据列表", notes = "一般用于管理后台缓存字典数据在本地")
+    @GetMapping("/list-all-simple")
     // 无需添加权限认证，因为前端全局都需要
     public CommonResult<List<SysDictDataSimpleVO>> listSimpleDictDatas() {
         List<SysDictDataDO> list = dictDataService.listDictDatas();
@@ -75,14 +78,16 @@ public class SysDictDataController {
         return success(true);
     }
 
-
+    @ApiOperation("导出字典数据")
+    @GetMapping("/export")
 //    @Log(title = "字典类型", businessType = BusinessType.EXPORT)
 //    @PreAuthorize("@ss.hasPermi('system:dict:export')")
-//    @GetMapping("/export")
-//    public AjaxResult export(SysDictType dictType) {
-//        List<SysDictType> list = dictTypeService.selectDictTypeList(dictType);
-//        ExcelUtil<SysDictType> util = new ExcelUtil<SysDictType>(SysDictType.class);
-//        return util.exportExcel(list, "字典类型");
-//    }
+    public void export(HttpServletResponse response, @Validated SysDictDataExportReqVO reqVO) throws IOException {
+        List<SysDictDataDO> list = dictDataService.listDictDatas(reqVO);
+        List<SysDictDataExcelVO> excelDataList = SysDictDataConvert.INSTANCE.convertList02(list);
+        // 输出
+        ExcelUtils.write(response, "字典数据.xls", "数据列表",
+                SysDictDataExcelVO.class, excelDataList);
+    }
 
 }

@@ -2,6 +2,7 @@ package cn.iocoder.dashboard.modules.system.controller.dict;
 
 import cn.iocoder.dashboard.common.pojo.CommonResult;
 import cn.iocoder.dashboard.common.pojo.PageResult;
+import cn.iocoder.dashboard.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.dashboard.modules.system.controller.dict.vo.type.*;
 import cn.iocoder.dashboard.modules.system.convert.dict.SysDictTypeConvert;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.dict.SysDictTypeDO;
@@ -13,6 +14,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.List;
 
 import static cn.iocoder.dashboard.common.pojo.CommonResult.success;
@@ -76,14 +79,16 @@ public class SysDictTypeController {
         return success(SysDictTypeConvert.INSTANCE.convertList(list));
     }
 
-    //
+    @ApiOperation("导出数据类型")
+    @GetMapping("/export")
 //    @Log(title = "字典类型", businessType = BusinessType.EXPORT)
 //    @PreAuthorize("@ss.hasPermi('system:dict:export')")
-//    @GetMapping("/export")
-//    public AjaxResult export(SysDictType dictType) {
-//        List<SysDictType> list = dictTypeService.selectDictTypeList(dictType);
-//        ExcelUtil<SysDictType> util = new ExcelUtil<SysDictType>(SysDictType.class);
-//        return util.exportExcel(list, "字典类型");
-//    }
+    public void export(HttpServletResponse response, @Validated SysDictTypeExportReqVO reqVO) throws IOException {
+        List<SysDictTypeDO> list = dictTypeService.listDictTypes(reqVO);
+        List<SysDictTypeExcelVO> excelTypeList = SysDictTypeConvert.INSTANCE.convertList02(list);
+        // 输出
+        ExcelUtils.write(response, "字典类型.xls", "类型列表",
+                SysDictTypeExcelVO.class, excelTypeList);
+    }
 
 }

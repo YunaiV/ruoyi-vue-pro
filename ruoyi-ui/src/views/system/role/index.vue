@@ -568,7 +568,7 @@ export default {
         }).then(function() {
           return exportRole(queryParams);
         }).then(response => {
-          this.download(response.msg);
+          this.downloadExcel(response, '角色数据.xls');
         })
     }
   }

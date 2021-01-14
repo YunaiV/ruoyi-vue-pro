@@ -1,10 +1,7 @@
 package cn.iocoder.dashboard.modules.system.convert.permission;
 
 import cn.iocoder.dashboard.common.pojo.PageResult;
-import cn.iocoder.dashboard.modules.system.controller.permission.vo.role.SysRoleCreateReqVO;
-import cn.iocoder.dashboard.modules.system.controller.permission.vo.role.SysRoleRespVO;
-import cn.iocoder.dashboard.modules.system.controller.permission.vo.role.SysRoleSimpleRespVO;
-import cn.iocoder.dashboard.modules.system.controller.permission.vo.role.SysRoleUpdateReqVO;
+import cn.iocoder.dashboard.modules.system.controller.permission.vo.role.*;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.permission.SysRoleDO;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.mapstruct.Mapper;
@@ -28,5 +25,7 @@ public interface SysRoleConvert {
     SysRoleDO convert(SysRoleCreateReqVO bean);
 
     List<SysRoleSimpleRespVO> convertList02(List<SysRoleDO> list);
+
+    List<SysRoleExcelVO> convertList03(List<SysRoleDO> list);
 
 }

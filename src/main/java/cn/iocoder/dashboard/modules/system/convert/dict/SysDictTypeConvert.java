@@ -1,10 +1,7 @@
 package cn.iocoder.dashboard.modules.system.convert.dict;
 
 import cn.iocoder.dashboard.common.pojo.PageResult;
-import cn.iocoder.dashboard.modules.system.controller.dict.vo.type.SysDictTypeCreateReqVO;
-import cn.iocoder.dashboard.modules.system.controller.dict.vo.type.SysDictTypeRespVO;
-import cn.iocoder.dashboard.modules.system.controller.dict.vo.type.SysDictTypeSimpleRespVO;
-import cn.iocoder.dashboard.modules.system.controller.dict.vo.type.SysDictTypeUpdateReqVO;
+import cn.iocoder.dashboard.modules.system.controller.dict.vo.type.*;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.dict.SysDictTypeDO;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.mapstruct.Mapper;
@@ -30,5 +27,7 @@ public interface SysDictTypeConvert {
     SysDictTypeDO convert(SysDictTypeUpdateReqVO bean);
 
     List<SysDictTypeSimpleRespVO> convertList(List<SysDictTypeDO> list);
+
+    List<SysDictTypeExcelVO> convertList02(List<SysDictTypeDO> list);
 
 }

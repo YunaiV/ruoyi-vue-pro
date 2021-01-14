@@ -48,7 +48,8 @@ export function exportType(query) {
   return request({
     url: '/system/dict-type/export',
     method: 'get',
-    params: query
+    params: query,
+    responseType: 'blob'
   })
 }
 

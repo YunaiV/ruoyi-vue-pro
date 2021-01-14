@@ -69,6 +69,7 @@ export function exportRole(query) {
   return request({
     url: '/system/role/export',
     method: 'get',
-    params: query
+    params: query,
+    responseType: 'blob'
   })
 }

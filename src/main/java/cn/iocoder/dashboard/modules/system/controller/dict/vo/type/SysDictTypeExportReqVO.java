@@ -1,10 +1,8 @@
 package cn.iocoder.dashboard.modules.system.controller.dict.vo.type;
 
-import cn.iocoder.dashboard.common.pojo.PageParam;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.Size;
@@ -14,8 +12,7 @@ import static cn.iocoder.dashboard.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOU
 
 @ApiModel("字典类型分页列表 Request VO")
 @Data
-@EqualsAndHashCode(callSuper = true)
-public class SysDictTypePageReqVO extends PageParam {
+public class SysDictTypeExportReqVO {
 
     @ApiModelProperty(value = "字典类型名称", example = "芋道", notes = "模糊匹配")
     private String name;

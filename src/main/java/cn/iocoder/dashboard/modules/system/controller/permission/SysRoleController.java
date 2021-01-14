@@ -3,6 +3,7 @@ package cn.iocoder.dashboard.modules.system.controller.permission;
 import cn.iocoder.dashboard.common.enums.CommonStatusEnum;
 import cn.iocoder.dashboard.common.pojo.CommonResult;
 import cn.iocoder.dashboard.common.pojo.PageResult;
+import cn.iocoder.dashboard.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.dashboard.modules.system.controller.permission.vo.role.*;
 import cn.iocoder.dashboard.modules.system.convert.permission.SysRoleConvert;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.permission.SysRoleDO;
@@ -14,6 +15,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -80,16 +83,6 @@ public class SysRoleController {
         return success(SysRoleConvert.INSTANCE.convert(role));
     }
 
-//    @Log(title = "角色管理", businessType = BusinessType.EXPORT)
-//    @PreAuthorize("@ss.hasPermi('system:role:export')")
-//    @GetMapping("/export")
-//    public AjaxResult export(SysRole role)
-//    {
-//        List<SysRole> list = roleService.selectRoleList(role);
-//        ExcelUtil<SysRole> util = new ExcelUtil<SysRole>(SysRole.class);
-//        return util.exportExcel(list, "角色数据");
-//    }
-
     @ApiOperation("修改角色状态")
     @PostMapping("/update-status")
 //    @PreAuthorize("@ss.hasPermi('system:role:edit')")
@@ -97,6 +90,17 @@ public class SysRoleController {
     public CommonResult<Boolean> updateRoleStatus(@Validated @RequestBody SysRoleUpdateStatusReqVO reqVO) {
         roleService.updateRoleStatus(reqVO.getId(), reqVO.getStatus());
         return success(true);
+    }
+
+    @GetMapping("/export")
+//    @Log(title = "角色管理", businessType = BusinessType.EXPORT)
+//    @PreAuthorize("@ss.hasPermi('system:role:export')")
+    public void export(HttpServletResponse response, @Validated SysRoleExportReqVO reqVO) throws IOException {
+        List<SysRoleDO> list = roleService.listRoles(reqVO);
+        List<SysRoleExcelVO> excelDataList = SysRoleConvert.INSTANCE.convertList03(list);
+        // 输出
+        ExcelUtils.write(response, "角色数据.xls", "角色列表",
+                SysRoleExcelVO.class, excelDataList);
     }
 
 }

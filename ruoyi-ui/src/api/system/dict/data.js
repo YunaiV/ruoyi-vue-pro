@@ -54,9 +54,10 @@ export function delData(dictCode) {
 // 导出字典数据
 export function exportData(query) {
   return request({
-    url: '/system/dict/data/export',
+    url: '/system/dict-data/export',
     method: 'get',
-    params: query
+    params: query,
+    responseType: 'blob'
   })
 }
 

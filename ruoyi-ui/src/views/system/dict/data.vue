@@ -314,7 +314,7 @@ export default {
         }).then(function() {
           return exportData(queryParams);
         }).then(response => {
-          this.download(response.msg);
+          this.downloadExcel(response, '字典数据.xls');
         })
     }
   }

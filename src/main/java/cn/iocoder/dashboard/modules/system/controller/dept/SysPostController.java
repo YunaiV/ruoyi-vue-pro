@@ -89,10 +89,10 @@ public class SysPostController {
 //    @PreAuthorize("@ss.hasPermi('system:post:export')")
     public void export(HttpServletResponse response, @Validated SysPostExportReqVO reqVO) throws IOException {
         List<SysPostDO> posts = postService.listPosts(reqVO);
-        List<SysPostExcelVO> excelPosts = SysPostConvert.INSTANCE.convertList03(posts);
+        List<SysPostExcelVO> excelDataList = SysPostConvert.INSTANCE.convertList03(posts);
         // 输出
         ExcelUtils.write(response, "岗位数据.xls", "岗位列表",
-                SysPostExcelVO.class, excelPosts);
+                SysPostExcelVO.class, excelDataList);
     }
 
 }

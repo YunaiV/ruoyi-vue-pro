@@ -3,6 +3,7 @@ package cn.iocoder.dashboard.modules.system.service.dict.impl;
 import cn.iocoder.dashboard.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.dashboard.common.pojo.PageResult;
 import cn.iocoder.dashboard.modules.system.controller.dict.vo.type.SysDictTypeCreateReqVO;
+import cn.iocoder.dashboard.modules.system.controller.dict.vo.type.SysDictTypeExportReqVO;
 import cn.iocoder.dashboard.modules.system.controller.dict.vo.type.SysDictTypePageReqVO;
 import cn.iocoder.dashboard.modules.system.controller.dict.vo.type.SysDictTypeUpdateReqVO;
 import cn.iocoder.dashboard.modules.system.convert.dict.SysDictTypeConvert;
@@ -38,6 +39,11 @@ public class SysDictTypeServiceImpl implements SysDictTypeService {
     @Override
     public PageResult<SysDictTypeDO> pageDictTypes(SysDictTypePageReqVO reqVO) {
         return SysDictTypeConvert.INSTANCE.convertPage02(dictTypeMapper.selectList(reqVO));
+    }
+
+    @Override
+    public List<SysDictTypeDO> listDictTypes(SysDictTypeExportReqVO reqVO) {
+        return dictTypeMapper.selectList(reqVO);
     }
 
     @Override

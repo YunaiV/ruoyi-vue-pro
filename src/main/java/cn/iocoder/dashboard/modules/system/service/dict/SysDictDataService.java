@@ -3,6 +3,7 @@ package cn.iocoder.dashboard.modules.system.service.dict;
 import cn.iocoder.dashboard.common.pojo.PageResult;
 import cn.iocoder.dashboard.framework.dict.core.service.DictDataFrameworkService;
 import cn.iocoder.dashboard.modules.system.controller.dict.vo.data.SysDictDataCreateReqVO;
+import cn.iocoder.dashboard.modules.system.controller.dict.vo.data.SysDictDataExportReqVO;
 import cn.iocoder.dashboard.modules.system.controller.dict.vo.data.SysDictDataPageReqVO;
 import cn.iocoder.dashboard.modules.system.controller.dict.vo.data.SysDictDataUpdateReqVO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.dict.SysDictDataDO;
@@ -35,6 +36,14 @@ public interface SysDictDataService extends DictDataFrameworkService {
      * @return 字典数据分页列表
      */
     PageResult<SysDictDataDO> pageDictDatas(SysDictDataPageReqVO reqVO);
+
+    /**
+     * 获得字典数据列表
+     *
+     * @param reqVO 列表请求
+     * @return 字典数据列表
+     */
+    List<SysDictDataDO> listDictDatas(SysDictDataExportReqVO reqVO);
 
     /**
      * 获得字典数据详情

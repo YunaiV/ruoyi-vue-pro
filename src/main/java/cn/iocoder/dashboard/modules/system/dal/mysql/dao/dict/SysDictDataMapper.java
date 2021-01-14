@@ -2,6 +2,7 @@ package cn.iocoder.dashboard.modules.system.dal.mysql.dao.dict;
 
 import cn.iocoder.dashboard.framework.mybatis.core.query.QueryWrapperX;
 import cn.iocoder.dashboard.framework.mybatis.core.util.MyBatisUtils;
+import cn.iocoder.dashboard.modules.system.controller.dict.vo.data.SysDictDataExportReqVO;
 import cn.iocoder.dashboard.modules.system.controller.dict.vo.data.SysDictDataPageReqVO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.dict.SysDictDataDO;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -36,4 +37,9 @@ public interface SysDictDataMapper extends BaseMapper<SysDictDataDO> {
         return selectList(new QueryWrapper<>());
     }
 
+    default List<SysDictDataDO> selectList(SysDictDataExportReqVO reqVO) {
+        return selectList(new QueryWrapperX<SysDictDataDO>().likeIfPresent("label", reqVO.getLabel())
+                        .likeIfPresent("dict_type", reqVO.getDictType())
+                        .eqIfPresent("status", reqVO.getStatus()));
+    }
 }

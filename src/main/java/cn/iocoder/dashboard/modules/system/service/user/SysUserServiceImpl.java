@@ -335,15 +335,4 @@ public class SysUserServiceImpl implements SysUserService {
 //        return successMsg.toString();
 //    }
 
-//    /**
-//     * 根据条件分页查询用户列表
-//     *
-//     * @param user 用户信息
-//     * @return 用户信息集合信息
-//     */
-//    @Override
-//    @DataScope(deptAlias = "d", userAlias = "u")
-//    public List<SysUser> selectUserList(SysUser user) {
-//        return userMapper.selectUserList(user);
-//    }
 }

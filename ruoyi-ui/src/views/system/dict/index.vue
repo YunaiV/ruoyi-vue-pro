@@ -304,7 +304,10 @@ export default {
     },
     /** 导出按钮操作 */
     handleExport() {
-      const queryParams = this.queryParams;
+      const queryParams = this.addDateRange(this.queryParams, [
+        this.dateRange[0] ? this.dateRange[0] + ' 00:00:00' : undefined,
+        this.dateRange[1] ? this.dateRange[1] + ' 23:59:59' : undefined,
+      ]);
       this.$confirm('是否确认导出所有类型数据项?', "警告", {
           confirmButtonText: "确定",
           cancelButtonText: "取消",
@@ -312,7 +315,7 @@ export default {
         }).then(function() {
           return exportType(queryParams);
         }).then(response => {
-          this.download(response.msg);
+          this.downloadExcel(response, '数据类型.xls');
         })
     }
   }

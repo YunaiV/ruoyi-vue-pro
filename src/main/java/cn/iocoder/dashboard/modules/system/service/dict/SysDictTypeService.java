@@ -2,6 +2,7 @@ package cn.iocoder.dashboard.modules.system.service.dict;
 
 import cn.iocoder.dashboard.common.pojo.PageResult;
 import cn.iocoder.dashboard.modules.system.controller.dict.vo.type.SysDictTypeCreateReqVO;
+import cn.iocoder.dashboard.modules.system.controller.dict.vo.type.SysDictTypeExportReqVO;
 import cn.iocoder.dashboard.modules.system.controller.dict.vo.type.SysDictTypePageReqVO;
 import cn.iocoder.dashboard.modules.system.controller.dict.vo.type.SysDictTypeUpdateReqVO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.dict.SysDictTypeDO;
@@ -22,6 +23,14 @@ public interface SysDictTypeService {
      * @return 字典类型分页列表
      */
     PageResult<SysDictTypeDO> pageDictTypes(SysDictTypePageReqVO reqVO);
+
+    /**
+     * 获得字典类型列表
+     *
+     * @param reqVO 列表请求
+     * @return 字典类型列表
+     */
+    List<SysDictTypeDO> listDictTypes(SysDictTypeExportReqVO reqVO);
 
     /**
      * 获得字典类型详情

@@ -5,6 +5,7 @@ import cn.iocoder.dashboard.common.enums.CommonStatusEnum;
 import cn.iocoder.dashboard.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.dashboard.common.pojo.PageResult;
 import cn.iocoder.dashboard.modules.system.controller.permission.vo.role.SysRoleCreateReqVO;
+import cn.iocoder.dashboard.modules.system.controller.permission.vo.role.SysRoleExportReqVO;
 import cn.iocoder.dashboard.modules.system.controller.permission.vo.role.SysRolePageReqVO;
 import cn.iocoder.dashboard.modules.system.controller.permission.vo.role.SysRoleUpdateReqVO;
 import cn.iocoder.dashboard.modules.system.convert.permission.SysRoleConvert;
@@ -138,6 +139,11 @@ public class SysRoleServiceImpl implements SysRoleService {
     public PageResult<SysRoleDO> pageRole(SysRolePageReqVO reqVO) {
         IPage<SysRoleDO> roleDOPage = roleMapper.selectPage(reqVO);
         return SysRoleConvert.INSTANCE.convertPage(roleDOPage);
+    }
+
+    @Override
+    public List<SysRoleDO> listRoles(SysRoleExportReqVO reqVO) {
+        return roleMapper.listRoles(reqVO);
     }
 
     @Override
