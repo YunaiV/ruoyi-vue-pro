@@ -48,7 +48,7 @@ public class SysDeptController {
     }
 
     @ApiOperation("获得部门信息")
-    @ApiImplicitParam(name = "id", value = "编号", readOnly = true, example = "1024", dataTypeClass = Long.class)
+    @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
 //    @PreAuthorize("@ss.hasPermi('system:dept:query')")
     @GetMapping("/get")
     public CommonResult<SysDeptRespVO> getDept(@RequestParam("id") Long id) {
@@ -74,7 +74,7 @@ public class SysDeptController {
     }
 
     @ApiOperation("删除部门")
-    @ApiImplicitParam(name = "id", value = "编号", readOnly = true, example = "1024", dataTypeClass = Long.class)
+    @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
     @PostMapping("delete")
 //    @PreAuthorize("@ss.hasPermi('system:dept:remove')")
 //    @Log(title = "部门管理", businessType = BusinessType.DELETE)

@@ -34,7 +34,7 @@ public class SysNoticeController {
     }
 
     @ApiOperation("获得通知公告")
-    @ApiImplicitParam(name = "id", value = "编号", readOnly = true, example = "1024", dataTypeClass = Long.class)
+    @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
 //    @PreAuthorize("@ss.hasPermi('system:notice:query')")
     @GetMapping(value = "/get")
     public CommonResult<SysNoticeRespVO> getNotice(@RequestParam("id") Long id) {
@@ -60,7 +60,7 @@ public class SysNoticeController {
     }
 
     @ApiOperation("删除通知公告")
-    @ApiImplicitParam(name = "id", value = "编号", readOnly = true, example = "1024", dataTypeClass = Long.class)
+    @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
 //    @PreAuthorize("@ss.hasPermi('system:notice:remove')")
 //    @Log(title = "通知公告", businessType = BusinessType.DELETE)
     @PostMapping("/delete")
