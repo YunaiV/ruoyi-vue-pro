@@ -286,7 +286,7 @@ export default {
         }).then(function() {
           return exportPost(queryParams);
         }).then(response => {
-          this.download(response.msg);
+        this.downloadExcel(response, '岗位数据.xls');
         })
     }
   }

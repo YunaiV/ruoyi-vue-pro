@@ -2,6 +2,7 @@ package cn.iocoder.dashboard.modules.system.dal.mysql.dao.dept;
 
 import cn.iocoder.dashboard.framework.mybatis.core.query.QueryWrapperX;
 import cn.iocoder.dashboard.framework.mybatis.core.util.MyBatisUtils;
+import cn.iocoder.dashboard.modules.system.controller.dept.vo.post.SysPostExportReqVO;
 import cn.iocoder.dashboard.modules.system.controller.dept.vo.post.SysPostPageReqVO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.dept.SysPostDO;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -24,6 +25,11 @@ public interface SysPostMapper extends BaseMapper<SysPostDO> {
         return selectPage(MyBatisUtils.buildPage(reqVO),
                 new QueryWrapperX<SysPostDO>().likeIfPresent("name", reqVO.getName())
                         .eqIfPresent("status", reqVO.getStatus()));
+    }
+
+    default List<SysPostDO> selectList(SysPostExportReqVO reqVO) {
+        return selectList(new QueryWrapperX<SysPostDO>().likeIfPresent("name", reqVO.getName())
+                .eqIfPresent("status", reqVO.getStatus()));
     }
 
     default SysPostDO selectByName(String name) {

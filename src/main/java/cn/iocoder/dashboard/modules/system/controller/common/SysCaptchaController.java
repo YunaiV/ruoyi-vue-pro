@@ -15,7 +15,7 @@ import static cn.iocoder.dashboard.common.pojo.CommonResult.success;
 
 @Api(tags = "验证码 API")
 @RestController
-@RequestMapping("/captcha")
+@RequestMapping("/system/captcha")
 public class SysCaptchaController {
 
     @Resource

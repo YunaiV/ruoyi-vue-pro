@@ -3,6 +3,7 @@ package cn.iocoder.dashboard.modules.system.controller.dept;
 import cn.iocoder.dashboard.common.enums.CommonStatusEnum;
 import cn.iocoder.dashboard.common.pojo.CommonResult;
 import cn.iocoder.dashboard.common.pojo.PageResult;
+import cn.iocoder.dashboard.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.dashboard.modules.system.controller.dept.vo.post.*;
 import cn.iocoder.dashboard.modules.system.convert.dept.SysPostConvert;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.dept.SysPostDO;
@@ -14,6 +15,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -80,12 +83,16 @@ public class SysPostController {
         return success(SysPostConvert.INSTANCE.convert(postService.getPost(id)));
     }
 
+    @GetMapping("/export")
+    @ApiOperation("岗位管理")
 //    @Log(title = "岗位管理", businessType = BusinessType.EXPORT)
 //    @PreAuthorize("@ss.hasPermi('system:post:export')")
-//    @GetMapping("/export")
-//    public AjaxResult export(SysPost post) {
-//        List<SysPost> list = postService.selectPostList(post);
-//        ExcelUtil<SysPost> util = new ExcelUtil<SysPost>(SysPost.class);
-//        return util.exportExcel(list, "岗位数据");
-//    }
+    public void export(HttpServletResponse response, @Validated SysPostExportReqVO reqVO) throws IOException {
+        List<SysPostDO> posts = postService.listPosts(reqVO);
+        List<SysPostExcelVO> excelPosts = SysPostConvert.INSTANCE.convertList03(posts);
+        // 输出
+        ExcelUtils.write(response, "岗位数据.xls", "岗位列表",
+                SysPostExcelVO.class, excelPosts);
+    }
+
 }

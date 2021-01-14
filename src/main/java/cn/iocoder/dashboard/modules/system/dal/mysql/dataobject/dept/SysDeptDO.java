@@ -8,7 +8,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * 部门表 sys_dept
+ * 部门表
  *
  * @author ruoyi
  */

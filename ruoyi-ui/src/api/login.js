@@ -34,7 +34,7 @@ export function logout() {
 // 获取验证码
 export function getCodeImg() {
   return request({
-    url: '/captcha/get-image',
+    url: '/system/captcha/get-image',
     method: 'get'
   })
 }

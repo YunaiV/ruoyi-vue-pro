@@ -2,6 +2,7 @@ package cn.iocoder.dashboard.modules.system.service.dept;
 
 import cn.iocoder.dashboard.common.pojo.PageResult;
 import cn.iocoder.dashboard.modules.system.controller.dept.vo.post.SysPostCreateReqVO;
+import cn.iocoder.dashboard.modules.system.controller.dept.vo.post.SysPostExportReqVO;
 import cn.iocoder.dashboard.modules.system.controller.dept.vo.post.SysPostPageReqVO;
 import cn.iocoder.dashboard.modules.system.controller.dept.vo.post.SysPostUpdateReqVO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.dept.SysPostDO;
@@ -18,7 +19,7 @@ import java.util.List;
 public interface SysPostService {
 
     /**
-     * 获得所有岗位列表
+     * 获得符合条件的岗位列表
      *
      * @param ids 岗位编号数组。如果为空，不进行筛选
      * @param statuses 状态数组。如果为空，不进行筛选
@@ -33,6 +34,14 @@ public interface SysPostService {
      * @return 部门分页列表
      */
     PageResult<SysPostDO> pagePosts(SysPostPageReqVO reqVO);
+
+    /**
+     * 获得岗位列表
+     *
+     * @param reqVO 查询条件
+     * @return 部门列表
+     */
+    List<SysPostDO> listPosts(SysPostExportReqVO reqVO);
 
     /**
      * 获得岗位信息

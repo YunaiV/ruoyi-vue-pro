@@ -56,6 +56,7 @@ export function exportPost(query) {
   return request({
     url: '/system/post/export',
     method: 'get',
-    params: query
+    params: query,
+    responseType: 'blob'
   })
 }

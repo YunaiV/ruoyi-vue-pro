@@ -69,4 +69,6 @@ public interface SysErrorCodeConstants {
     // ========== 通知公告 1002008000 ==========
     ErrorCode NOTICE_NOT_FOUND = new ErrorCode(1002008001, "当前通知公告不存在");
 
+    // ========== 文件 1002009000 ==========
+    ErrorCode FILE_PATH_EXISTS = new ErrorCode(1002009001, "文件路径已经存在");
 }

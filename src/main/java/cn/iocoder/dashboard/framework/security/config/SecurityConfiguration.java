@@ -1,7 +1,6 @@
 package cn.iocoder.dashboard.framework.security.config;
 
 import cn.iocoder.dashboard.framework.security.core.filter.JwtAuthenticationTokenFilter;
-import cn.iocoder.dashboard.framework.security.core.handler.AuthenticationEntryPointImpl;
 import cn.iocoder.dashboard.framework.security.core.handler.LogoutSuccessHandlerImpl;
 import cn.iocoder.dashboard.framework.web.config.WebProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -19,8 +18,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.authentication.logout.LogoutFilter;
-import org.springframework.web.filter.CorsFilter;
 
 import javax.annotation.Resource;
 
@@ -126,12 +123,13 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 // 登陆的接口，可匿名访问
                 .antMatchers(webProperties.getApiPrefix() + "/login").anonymous()
                 // 通用的接口，可匿名访问
-                .antMatchers( webProperties.getApiPrefix() + "/captcha/**").anonymous()
+                .antMatchers( webProperties.getApiPrefix() + "/system/captcha/**").anonymous()
                 // TODO
                 .antMatchers(HttpMethod.GET, "/*.html", "/**/*.html", "/**/*.css", "/**/*.js").permitAll()
                 .antMatchers("/profile/**").anonymous()
-                .antMatchers("/common/download**").anonymous()
-                .antMatchers("/common/download/resource**").anonymous()
+                // 文件的获取接口，可匿名访问
+                .antMatchers(webProperties.getApiPrefix() + "/system/file/get/**").anonymous()
+                // TODO
                 .antMatchers("/swagger-ui.html").anonymous()
                 .antMatchers("/swagger-resources/**").anonymous()
                 .antMatchers("/webjars/**").anonymous()

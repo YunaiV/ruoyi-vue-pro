@@ -17,6 +17,12 @@ spring:
     database: 0
     # 连接超时时间
     timeout: 10s
+  # Servlet 配置
+  servlet:
+    # 文件上传相关配置项
+    multipart:
+      max-file-size: 16MB # 单个文件大小
+      max-request-size: 32MB # 设置总上传的文件大小
 
 # 芋道配置项，设置当前项目所有自定义的配置
 yudao:
@@ -38,6 +44,8 @@ yudao:
     timeout: 5m
     width: 160
     height: 60
+  file:
+    base-path: http://127.0.0.1:1024/api/file/get/
 
 # MyBatis Plus 的配置项
 mybatis-plus:
