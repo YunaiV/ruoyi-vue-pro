@@ -39,16 +39,6 @@ public class SysOperLogServiceImpl implements ISysOperLogService {
         return operLogMapper.selectOperLogList(operLog);
     }
 
-    /**
-     * 批量删除系统操作日志
-     *
-     * @param operIds 需要删除的操作日志ID
-     * @return 结果
-     */
-    @Override
-    public int deleteOperLogByIds(Long[] operIds) {
-        return operLogMapper.deleteOperLogByIds(operIds);
-    }
 
     /**
      * 查询操作日志详细
@@ -61,11 +51,4 @@ public class SysOperLogServiceImpl implements ISysOperLogService {
         return operLogMapper.selectOperLogById(operId);
     }
 
-    /**
-     * 清空操作日志
-     */
-    @Override
-    public void cleanOperLog() {
-        operLogMapper.cleanOperLog();
-    }
 }

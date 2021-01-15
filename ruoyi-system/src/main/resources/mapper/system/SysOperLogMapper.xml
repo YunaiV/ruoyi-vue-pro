@@ -4,35 +4,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ruoyi.system.mapper.SysOperLogMapper">
 
-	<resultMap type="SysOperLog" id="SysOperLogResult">
-		<id     property="operId"         column="oper_id"        />
-		<result property="title"          column="title"          />
-		<result property="businessType"   column="business_type"  />
-		<result property="method"         column="method"         />
-		<result property="requestMethod"  column="request_method" />
-		<result property="operatorType"   column="operator_type"  />
-		<result property="operName"       column="oper_name"      />
-		<result property="deptName"       column="dept_name"      />
-		<result property="operUrl"        column="oper_url"       />
-		<result property="operIp"         column="oper_ip"        />
-		<result property="operLocation"   column="oper_location"  />
-		<result property="operParam"      column="oper_param"     />
-		<result property="jsonResult"     column="json_result"    />
-		<result property="status"         column="status"         />
-		<result property="errorMsg"       column="error_msg"      />
-		<result property="operTime"       column="oper_time"      />
-	</resultMap>
-
-	<sql id="selectOperLogVo">
-        select oper_id, title, business_type, method, request_method, operator_type, oper_name, dept_name, oper_url, oper_ip, oper_location, oper_param, json_result, status, error_msg, oper_time
-        from sys_oper_log
-    </sql>
-    
-	<insert id="insertOperlog" parameterType="SysOperLog">
-		insert into sys_oper_log(title, business_type, method, request_method, operator_type, oper_name, dept_name, oper_url, oper_ip, oper_location, oper_param, json_result, status, error_msg, oper_time)
-        values (#{title}, #{businessType}, #{method}, #{requestMethod}, #{operatorType}, #{operName}, #{deptName}, #{operUrl}, #{operIp}, #{operLocation}, #{operParam}, #{jsonResult}, #{status}, #{errorMsg}, sysdate())
-	</insert>
-	
 	<select id="selectOperLogList" parameterType="SysOperLog" resultMap="SysOperLogResult">
 		<include refid="selectOperLogVo"/>
 		<where>
@@ -46,7 +17,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			    AND business_type in
 			    <foreach collection="businessTypes" item="businessType" open="(" separator="," close=")">
 		 			#{businessType}
-		        </foreach> 
+		        </foreach>
 			</if>
 			<if test="status != null">
 				AND status = #{status}
@@ -63,21 +34,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		</where>
 		order by oper_id desc
 	</select>
-	
-	<delete id="deleteOperLogByIds" parameterType="Long">
- 		delete from sys_oper_log where oper_id in
- 		<foreach collection="array" item="operId" open="(" separator="," close=")">
- 			#{operId}
-        </foreach> 
- 	</delete>
- 	
- 	<select id="selectOperLogById" parameterType="Long" resultMap="SysOperLogResult">
-		<include refid="selectOperLogVo"/>
-		where oper_id = #{operId}
-	</select>
-	
-	<update id="cleanOperLog">
-        truncate table sys_oper_log
-    </update>
 
-</mapper> 
+
+</mapper>
