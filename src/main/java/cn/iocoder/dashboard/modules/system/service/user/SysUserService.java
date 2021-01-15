@@ -1,10 +1,7 @@
 package cn.iocoder.dashboard.modules.system.service.user;
 
 import cn.iocoder.dashboard.common.pojo.PageResult;
-import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserCreateReqVO;
-import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserExportReqVO;
-import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserPageReqVO;
-import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserUpdateReqVO;
+import cn.iocoder.dashboard.modules.system.controller.user.vo.user.*;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.user.SysUserDO;
 
 import java.util.List;
@@ -86,6 +83,15 @@ public interface SysUserService {
      */
     void updateUserStatus(Long id, Integer status);
 
+    /**
+     * 批量导入用户
+     *
+     * @param importUsers 导入用户列表
+     * @param isUpdateSupport 是否支持更新
+     * @return 导入结果
+     */
+    SysUserImportRespVO importUsers(List<SysUserImportExcelVO> importUsers, boolean isUpdateSupport);
+
 //
 //    /**
 //     * 修改用户基本信息
@@ -121,14 +127,4 @@ public interface SysUserService {
 //     */
 //    public int resetUserPwd(String userName, String password);
 
-//
-//    /**
-//     * 导入用户数据
-//     *
-//     * @param userList 用户数据列表
-//     * @param isUpdateSupport 是否更新支持，如果已存在，则进行更新数据
-//     * @param operName 操作用户
-//     * @return 结果
-//     */
-//    public String importUser(List<SysUser> userList, Boolean isUpdateSupport, String operName);
 }

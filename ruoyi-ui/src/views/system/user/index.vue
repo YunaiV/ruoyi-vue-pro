@@ -391,7 +391,7 @@ export default {
         // 设置上传的请求头部
         headers: { Authorization: "Bearer " + getToken() },
         // 上传的地址
-        url: process.env.VUE_APP_BASE_API + "/system/user/importData"
+        url: process.env.VUE_APP_BASE_API + '/api/' + "/system/user/import"
       },
       // 查询参数
       queryParams: {
@@ -669,7 +669,7 @@ export default {
     /** 下载模板操作 */
     importTemplate() {
       importTemplate().then(response => {
-        this.download(response.msg);
+        this.downloadExcel(response, '用户导入模板.xls');
       });
     },
     // 文件上传中处理
@@ -681,7 +681,21 @@ export default {
       this.upload.open = false;
       this.upload.isUploading = false;
       this.$refs.upload.clearFiles();
-      this.$alert(response.msg, "导入结果", { dangerouslyUseHTMLString: true });
+      // 拼接提示语
+      let data = response.data;
+      let text = '创建成功数量：' + data.createUsernames.length;
+      for (const username of data.createUsernames) {
+        text += '<br />&nbsp;&nbsp;&nbsp;&nbsp;' + username;
+      }
+      text += '<br />更新成功数量：' + data.updateUsernames.length;
+      for (const username of data.updateUsernames) {
+        text += '<br />&nbsp;&nbsp;&nbsp;&nbsp;' + username;
+      }
+      text += '<br />更新失败数量：' + Object.keys(data.failureUsernames).length;
+      for (const username in data.failureUsernames) {
+        text += '<br />&nbsp;&nbsp;&nbsp;&nbsp;' + username + '：' + data.failureUsernames[username];
+      }
+      this.$alert(text, "导入结果", { dangerouslyUseHTMLString: true });
       this.getList();
     },
     // 提交上传文件

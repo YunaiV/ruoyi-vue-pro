@@ -2,6 +2,7 @@ package cn.iocoder.dashboard.framework.excel.core.util;
 
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.write.style.column.LongestMatchColumnWidthStyleStrategy;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -36,6 +37,12 @@ public class ExcelUtils {
         // 设置 header 和 contentType。写在最后的原因是，避免报错时，响应 contentType 已经被修改了
         response.addHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(filename, "UTF-8"));
         response.setContentType("application/vnd.ms-excel;charset=UTF-8");
+    }
+
+    public static <T> List<T> raed(MultipartFile file, Class<T> head) throws IOException {
+       return EasyExcel.read(file.getInputStream(), head, null)
+                .autoCloseStream(false)  // 不要自动关闭，交给 Servlet 自己处理
+                .doReadAllSync();
     }
 
 }

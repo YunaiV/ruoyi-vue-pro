@@ -4,12 +4,18 @@ import cn.iocoder.dashboard.framework.excel.core.annotations.DictFormat;
 import cn.iocoder.dashboard.framework.excel.core.convert.DictConvert;
 import cn.iocoder.dashboard.modules.system.enums.dict.DictTypeEnum;
 import com.alibaba.excel.annotation.ExcelProperty;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * 用户 Excel 导入 VO
  */
 @Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class SysUserImportExcelVO {
 
     @ExcelProperty("登录名称")
@@ -29,7 +35,7 @@ public class SysUserImportExcelVO {
 
     @ExcelProperty(value = "用户性别", converter = DictConvert.class)
     @DictFormat(DictTypeEnum.SYS_USER_SEX)
-    private String sex;
+    private Integer sex;
 
     @ExcelProperty(value = "账号状态", converter = DictConvert.class)
     @DictFormat(DictTypeEnum.SYS_COMMON_STATUS)

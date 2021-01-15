@@ -103,11 +103,11 @@ public class ServiceExceptionUtil {
                 if (i == 0) {
                     return messagePattern;
                 } else {
-                    sbuf.append(messagePattern.substring(i, messagePattern.length()));
+                    sbuf.append(messagePattern.substring(i));
                     return sbuf.toString();
                 }
             } else {
-                sbuf.append(messagePattern.substring(i, j));
+                sbuf.append(messagePattern, i, j);
                 sbuf.append(params[l]);
                 i = j + 2;
             }
@@ -115,7 +115,7 @@ public class ServiceExceptionUtil {
         if (messagePattern.indexOf("{}", i) != -1) {
             LOGGER.error("[doFormat][参数过少：错误码({})|错误内容({})|参数({})", code, messagePattern, params);
         }
-        sbuf.append(messagePattern.substring(i, messagePattern.length()));
+        sbuf.append(messagePattern.substring(i));
         return sbuf.toString();
     }
 

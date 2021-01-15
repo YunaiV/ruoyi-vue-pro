@@ -3,12 +3,10 @@ package cn.iocoder.dashboard.modules.system.service.user;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.dashboard.common.enums.CommonStatusEnum;
+import cn.iocoder.dashboard.common.exception.ServiceException;
 import cn.iocoder.dashboard.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.dashboard.common.pojo.PageResult;
-import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserCreateReqVO;
-import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserExportReqVO;
-import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserPageReqVO;
-import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserUpdateReqVO;
+import cn.iocoder.dashboard.modules.system.controller.user.vo.user.*;
 import cn.iocoder.dashboard.modules.system.convert.user.SysUserConvert;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dao.user.SysUserMapper;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.dept.SysDeptDO;
@@ -21,12 +19,10 @@ import cn.iocoder.dashboard.util.collection.CollectionUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.*;
 
@@ -268,71 +264,42 @@ public class SysUserServiceImpl implements SysUserService {
         });
     }
 
-//    /**
-//     * 导入用户数据
-//     *
-//     * @param userList 用户数据列表
-//     * @param isUpdateSupport 是否更新支持，如果已存在，则进行更新数据
-//     * @param operName 操作用户
-//     * @return 结果
-//     */
-//    @Override
-//    public String importUser(List<SysUser> userList, Boolean isUpdateSupport, String operName)
-//    {
-//        if (StringUtils.isNull(userList) || userList.size() == 0)
-//        {
-//            throw new CustomException("导入用户数据不能为空！");
-//        }
-//        int successNum = 0;
-//        int failureNum = 0;
-//        StringBuilder successMsg = new StringBuilder();
-//        StringBuilder failureMsg = new StringBuilder();
-//        String password = configService.selectConfigByKey("sys.user.initPassword");
-//        for (SysUser user : userList)
-//        {
-//            try
-//            {
-//                // 验证是否存在这个用户
-//                SysUser u = userMapper.selectUserByUserName(user.getUserName());
-//                if (StringUtils.isNull(u))
-//                {
-//                    user.setPassword(SecurityUtils.encryptPassword(password));
-//                    user.setCreateBy(operName);
-//                    this.insertUser(user);
-//                    successNum++;
-//                    successMsg.append("<br/>" + successNum + "、账号 " + user.getUserName() + " 导入成功");
-//                }
-//                else if (isUpdateSupport)
-//                {
-//                    user.setUpdateBy(operName);
-//                    this.updateUser(user);
-//                    successNum++;
-//                    successMsg.append("<br/>" + successNum + "、账号 " + user.getUserName() + " 更新成功");
-//                }
-//                else
-//                {
-//                    failureNum++;
-//                    failureMsg.append("<br/>" + failureNum + "、账号 " + user.getUserName() + " 已存在");
-//                }
-//            }
-//            catch (Exception e)
-//            {
-//                failureNum++;
-//                String msg = "<br/>" + failureNum + "、账号 " + user.getUserName() + " 导入失败：";
-//                failureMsg.append(msg + e.getMessage());
-//                log.error(msg, e);
-//            }
-//        }
-//        if (failureNum > 0)
-//        {
-//            failureMsg.insert(0, "很抱歉，导入失败！共 " + failureNum + " 条数据格式不正确，错误如下：");
-//            throw new CustomException(failureMsg.toString());
-//        }
-//        else
-//        {
-//            successMsg.insert(0, "恭喜您，数据已全部导入成功！共 " + successNum + " 条，数据如下：");
-//        }
-//        return successMsg.toString();
-//    }
+    @Override
+    @Transactional // 添加事务，异常则回滚所有导入
+    public SysUserImportRespVO importUsers(List<SysUserImportExcelVO> importUsers, boolean isUpdateSupport) {
+        if (CollUtil.isEmpty(importUsers)) {
+            throw ServiceExceptionUtil.exception(USER_IMPORT_LIST_IS_EMPTY);
+        }
+        SysUserImportRespVO respVO = SysUserImportRespVO.builder().createUsernames(new ArrayList<>())
+                .updateUsernames(new ArrayList<>()).failureUsernames(new LinkedHashMap<>()).build();
+        importUsers.forEach(importUser -> {
+            // 校验，判断是否有不符合的原因
+            try {
+                checkCreateOrUpdate(null, null, importUser.getMobile(), importUser.getEmail(),
+                        importUser.getDeptId(), null);
+            } catch (ServiceException ex) {
+                respVO.getFailureUsernames().put(importUser.getUsername(), ex.getMessage());
+                return;
+            }
+            // 判断如果不存在，在进行插入
+            SysUserDO existUser = userMapper.selectByUsername(importUser.getUsername());
+            if (existUser == null) {
+                // TODO 芋艿：初始密码
+                userMapper.insert(SysUserConvert.INSTANCE.convert(importUser));
+                respVO.getCreateUsernames().add(importUser.getUsername());
+                return;
+            }
+            // 如果存在，判断是否允许更新
+            if (!isUpdateSupport) {
+                respVO.getFailureUsernames().put(importUser.getUsername(), USER_USERNAME_EXISTS.getMessage());
+                return;
+            }
+            SysUserDO updateUser = SysUserConvert.INSTANCE.convert(importUser);
+            updateUser.setId(existUser.getId());
+            userMapper.updateById(updateUser);
+            respVO.getUpdateUsernames().add(importUser.getUsername());
+        });
+        return respVO;
+    }
 
 }

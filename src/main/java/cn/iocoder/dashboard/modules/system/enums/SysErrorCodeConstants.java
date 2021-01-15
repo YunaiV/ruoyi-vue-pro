@@ -37,6 +37,7 @@ public interface SysErrorCodeConstants {
     ErrorCode USER_MOBILE_EXISTS = new ErrorCode(1002004001, "手机号已经存在");
     ErrorCode USER_EMAIL_EXISTS = new ErrorCode(1002004002, "邮箱已经存在");
     ErrorCode USER_NOT_EXISTS = new ErrorCode(1002004003, "用户不存在");
+    ErrorCode USER_IMPORT_LIST_IS_EMPTY = new ErrorCode(1002004004, "导入用户数据不能为空！");
 
     // ========== 部门模块 1002005000 ==========
     ErrorCode DEPT_NAME_DUPLICATE = new ErrorCode(1002004001, "已经存在该名字的部门");

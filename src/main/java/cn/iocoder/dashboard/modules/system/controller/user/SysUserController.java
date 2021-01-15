@@ -1,6 +1,7 @@
 package cn.iocoder.dashboard.modules.system.controller.user;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.iocoder.dashboard.common.enums.CommonStatusEnum;
 import cn.iocoder.dashboard.common.pojo.CommonResult;
 import cn.iocoder.dashboard.common.pojo.PageResult;
 import cn.iocoder.dashboard.framework.excel.core.util.ExcelUtils;
@@ -8,23 +9,23 @@ import cn.iocoder.dashboard.modules.system.controller.user.vo.user.*;
 import cn.iocoder.dashboard.modules.system.convert.user.SysUserConvert;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.dept.SysDeptDO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.user.SysUserDO;
+import cn.iocoder.dashboard.modules.system.enums.common.SysSexEnum;
 import cn.iocoder.dashboard.modules.system.service.dept.SysDeptService;
 import cn.iocoder.dashboard.modules.system.service.user.SysUserService;
 import cn.iocoder.dashboard.util.collection.CollectionUtils;
 import cn.iocoder.dashboard.util.collection.MapUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static cn.iocoder.dashboard.common.pojo.CommonResult.success;
 
@@ -145,35 +146,35 @@ public class SysUserController {
                 SysUserExcelVO.class, excelUsers);
     }
 
-//    @Log(title = "用户管理", businessType = BusinessType.EXPORT)
-//    @PreAuthorize("@ss.hasPermi('system:user:export')")
-//    @GetMapping("/export")
-//    public AjaxResult export(SysUser user)
-//    {
-//        List<SysUser> list = userService.selectUserList(user);
-//        ExcelUtil<SysUser> util = new ExcelUtil<SysUser>(SysUser.class);
-//        return util.exportExcel(list, "用户数据");
-//    }
-//
+    @ApiOperation("获得导入用户模板")
+    @GetMapping("/get-import-template")
+    public void importTemplate(HttpServletResponse response) throws IOException {
+        // 手动创建导出 demo
+        List<SysUserImportExcelVO> list = Arrays.asList(
+                SysUserImportExcelVO.builder().username("yudao").deptId(1L).email("yudao@iocoder.cn").mobile("15601691300")
+                        .nickname("芋道").status(CommonStatusEnum.ENABLE.getStatus()).sex(SysSexEnum.MALE.getSEX()).build(),
+                SysUserImportExcelVO.builder().username("yuanma").deptId(2L).email("yuanma@iocoder.cn").mobile("15601701300")
+                        .nickname("源码").status(CommonStatusEnum.DISABLE.getStatus()).sex(SysSexEnum.FEMALE.getSEX()).build()
+        );
+
+        // 输出
+        ExcelUtils.write(response, "用户导入模板.xls", "用户列表",
+                SysUserImportExcelVO.class, list);
+
+    }
+
+    @ApiOperation("导入用户")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "path", value = "Excel 文件", required = true, dataTypeClass = MultipartFile.class),
+            @ApiImplicitParam(name = "update-support", value = "是否支持更新，默认为 false", example = "true", dataTypeClass = Long.class)
+    })
+    @PostMapping("/import")
 //    @Log(title = "用户管理", businessType = BusinessType.IMPORT)
 //    @PreAuthorize("@ss.hasPermi('system:user:import')")
-//    @PostMapping("/importData")
-//    public AjaxResult importData(MultipartFile file, boolean updateSupport) throws Exception
-//    {
-//        ExcelUtil<SysUser> util = new ExcelUtil<SysUser>(SysUser.class);
-//        List<SysUser> userList = util.importExcel(file.getInputStream());
-//        LoginUser loginUser = tokenService.getLoginUser(ServletUtils.getRequest());
-//        String operName = loginUser.getUsername();
-//        String message = userService.importUser(userList, updateSupport, operName);
-//        return AjaxResult.success(message);
-//    }
-//
-//    @GetMapping("/importTemplate")
-//    public AjaxResult importTemplate()
-//    {
-//        ExcelUtil<SysUser> util = new ExcelUtil<SysUser>(SysUser.class);
-//        return util.importTemplateExcel("用户数据");
-//    }
-//
+    public CommonResult<SysUserImportRespVO> importExcel(@RequestParam("file") MultipartFile file,
+                                                         @RequestParam(value = "updateSupport", required = false, defaultValue = "false") Boolean updateSupport) throws Exception {
+        List<SysUserImportExcelVO> list = ExcelUtils.raed(file, SysUserImportExcelVO.class);
+        return success(userService.importUsers(list, updateSupport));
+    }
 
 }
