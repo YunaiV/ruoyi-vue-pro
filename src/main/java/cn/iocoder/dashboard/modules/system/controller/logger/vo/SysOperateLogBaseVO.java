@@ -6,7 +6,6 @@ import lombok.Data;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
-import java.util.Map;
 
 /**
  * 操作日志 Base VO，提供给添加、修改、详细的子 VO 使用
@@ -56,7 +55,7 @@ public class SysOperateLogBaseVO {
     private String javaMethod;
 
     @ApiModelProperty(value = "Java 方法的参数")
-    private Map<String, Object> javaMethodArgs;
+    private String javaMethodArgs;
 
     @ApiModelProperty(value = "开始时间", required = true)
     @NotNull(message = "开始时间不能为空")

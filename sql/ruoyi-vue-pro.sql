@@ -11,7 +11,7 @@
  Target Server Version : 50718
  File Encoding         : 65001
 
- Date: 14/01/2021 21:27:23
+ Date: 17/01/2021 01:21:15
 */
 
 SET NAMES utf8mb4;
@@ -262,28 +262,36 @@ CREATE TABLE `sys_notice` (
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COMMENT='通知公告表';
 
 -- ----------------------------
--- Table structure for sys_oper_log
+-- Table structure for sys_operate_log
 -- ----------------------------
-DROP TABLE IF EXISTS `sys_oper_log`;
-CREATE TABLE `sys_oper_log` (
-  `oper_id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '日志主键',
-  `title` varchar(50) DEFAULT '' COMMENT '模块标题',
-  `business_type` int(2) DEFAULT '0' COMMENT '业务类型（0其它 1新增 2修改 3删除）',
-  `method` varchar(100) DEFAULT '' COMMENT '方法名称',
-  `request_method` varchar(10) DEFAULT '' COMMENT '请求方式',
-  `operator_type` int(1) DEFAULT '0' COMMENT '操作类别（0其它 1后台用户 2手机端用户）',
-  `oper_name` varchar(50) DEFAULT '' COMMENT '操作人员',
-  `dept_name` varchar(50) DEFAULT '' COMMENT '部门名称',
-  `oper_url` varchar(255) DEFAULT '' COMMENT '请求URL',
-  `oper_ip` varchar(50) DEFAULT '' COMMENT '主机地址',
-  `oper_location` varchar(255) DEFAULT '' COMMENT '操作地点',
-  `oper_param` varchar(2000) DEFAULT '' COMMENT '请求参数',
-  `json_result` varchar(2000) DEFAULT '' COMMENT '返回参数',
-  `status` int(1) DEFAULT '0' COMMENT '操作状态（0正常 1异常）',
-  `error_msg` varchar(2000) DEFAULT '' COMMENT '错误消息',
-  `oper_time` datetime DEFAULT NULL COMMENT '操作时间',
-  PRIMARY KEY (`oper_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='操作日志记录';
+DROP TABLE IF EXISTS `sys_operate_log`;
+CREATE TABLE `sys_operate_log` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '日志主键',
+  `trace_id` varchar(64) NOT NULL DEFAULT '' COMMENT '链路追踪编号',
+  `user_id` bigint(20) NOT NULL COMMENT '用户编号',
+  `module` varchar(50) NOT NULL COMMENT '模块标题',
+  `name` varchar(50) NOT NULL COMMENT '操作名',
+  `operate_type` bigint(4) NOT NULL DEFAULT '0' COMMENT '操作分类',
+  `content` varchar(2000) NOT NULL DEFAULT '' COMMENT '操作内容',
+  `exts` varchar(512) NOT NULL DEFAULT '' COMMENT '拓展字段',
+  `request_method` varchar(16) DEFAULT '' COMMENT '请求方法名',
+  `request_url` varchar(255) DEFAULT '' COMMENT '请求地址',
+  `user_ip` varchar(50) DEFAULT NULL COMMENT '用户 IP',
+  `user_agent` varchar(50) DEFAULT NULL COMMENT '浏览器 UA',
+  `java_method` varchar(512) NOT NULL DEFAULT '' COMMENT 'Java 方法名',
+  `java_method_args` varchar(8000) DEFAULT '' COMMENT 'Java 方法的参数',
+  `start_time` datetime NOT NULL COMMENT '操作时间',
+  `duration` int(11) NOT NULL COMMENT '执行时长',
+  `result_code` int(11) NOT NULL DEFAULT '0' COMMENT '结果码',
+  `result_msg` varchar(512) DEFAULT '' COMMENT '结果提示',
+  `result_data` varchar(4000) DEFAULT '' COMMENT '结果数据',
+  `create_by` varchar(64) DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_by` varchar(64) DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COMMENT='操作日志记录';
 
 -- ----------------------------
 -- Table structure for sys_post
@@ -367,7 +375,7 @@ CREATE TABLE `sys_user` (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=101 DEFAULT CHARSET=utf8mb4 COMMENT='用户信息表';
+) ENGINE=InnoDB AUTO_INCREMENT=104 DEFAULT CHARSET=utf8mb4 COMMENT='用户信息表';
 
 -- ----------------------------
 -- Table structure for sys_user_role

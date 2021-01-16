@@ -25,6 +25,16 @@ import java.util.Map;
 public class SysOperateLogDO extends BaseDO {
 
     /**
+     * {@link #javaMethodArgs} 的最大长度
+     */
+    public static final Integer JAVA_METHOD_ARGS_MAX_LENGTH = 8000;
+
+    /**
+     * {@link #resultData} 的最大长度
+     */
+    public static final Integer RESULT_MAX_LENGTH = 4000;
+
+    /**
      * 日志主键
      */
     @TableId
@@ -54,6 +64,7 @@ public class SysOperateLogDO extends BaseDO {
      *
      * 枚举 {@link SysOperateLogTypeEnum}
      */
+    @TableField("operate_type")
     private Integer type;
     /**
      * 操作内容，记录整个操作的明细
@@ -94,9 +105,12 @@ public class SysOperateLogDO extends BaseDO {
     private String javaMethod;
     /**
      * Java 方法的参数
+     *
+     * 实际格式为 Map<String, Object>
+     *     不使用 @TableField(typeHandler = FastjsonTypeHandler.class) 注解的原因是，数据库存储有长度限制，会进行裁剪，会导致 JSON 反序列化失败
+     *     其中，key 为参数名，value 为参数值
      */
-    @TableField(typeHandler = FastjsonTypeHandler.class)
-    private Map<String, Object> javaMethodArgs;
+    private String javaMethodArgs;
     /**
      * 开始时间
      */

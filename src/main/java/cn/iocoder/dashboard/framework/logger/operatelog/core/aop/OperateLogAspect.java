@@ -272,7 +272,7 @@ public class OperateLogAspect {
         return ((MethodSignature) joinPoint.getSignature()).getMethod().getDeclaringClass().getAnnotation(annotationClass);
     }
 
-    private static Map<String, Object> obtainMethodArgs(ProceedingJoinPoint joinPoint) {
+    private static String obtainMethodArgs(ProceedingJoinPoint joinPoint) {
         // TODO 提升：参数脱敏和忽略
         MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
         String[] argNames = methodSignature.getParameterNames();
@@ -285,7 +285,7 @@ public class OperateLogAspect {
             // 被忽略时，标记为 ignore 字符串，避免和 null 混在一起
             args.put(argName, !isIgnoreArgs(argValue) ? argValue : "[ignore]");
         }
-        return args;
+        return JSON.toJSONString(argValues);
     }
 
     private static String obtainResultData(Object result) {
