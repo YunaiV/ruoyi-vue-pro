@@ -165,8 +165,8 @@ public class SysUserController {
 
     @ApiOperation("导入用户")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "path", value = "Excel 文件", required = true, dataTypeClass = MultipartFile.class),
-            @ApiImplicitParam(name = "update-support", value = "是否支持更新，默认为 false", example = "true", dataTypeClass = Long.class)
+            @ApiImplicitParam(name = "file", value = "Excel 文件", required = true, dataTypeClass = MultipartFile.class),
+            @ApiImplicitParam(name = "updateSupport", value = "是否支持更新，默认为 false", example = "true", dataTypeClass = Boolean.class)
     })
     @PostMapping("/import")
 //    @Log(title = "用户管理", businessType = BusinessType.IMPORT)
