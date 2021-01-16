@@ -36,7 +36,7 @@ public class SysOperateLogDO extends BaseDO {
      */
     private String traceId;
     /**
-     * 操作人
+     * 用户编号
      *
      * {@link SysUserDO#getId()}
      */
@@ -69,7 +69,7 @@ public class SysOperateLogDO extends BaseDO {
      * TODO 预留字段
      */
     @TableField(typeHandler = FastjsonTypeHandler.class)
-    private Map<String, Object> ext;
+    private Map<String, Object> exts;
 
     /**
      * 请求方法名
@@ -79,11 +79,6 @@ public class SysOperateLogDO extends BaseDO {
      * 请求地址
      */
     private String requestUrl;
-    /**
-     * 请求参数
-     */
-    @TableField(typeHandler = FastjsonTypeHandler.class)
-    private Map<String, Object> requestParams;
     /**
      * 用户 IP
      */
@@ -97,6 +92,11 @@ public class SysOperateLogDO extends BaseDO {
      * Java 方法名
      */
     private String javaMethod;
+    /**
+     * Java 方法的参数
+     */
+    @TableField(typeHandler = FastjsonTypeHandler.class)
+    private Map<String, Object> javaMethodArgs;
     /**
      * 开始时间
      */
@@ -119,8 +119,9 @@ public class SysOperateLogDO extends BaseDO {
     private String resultMsg;
     /**
      * 结果数据
+     *
+     * 如果是对象，则使用 JSON 格式化
      */
-    @TableField(typeHandler = FastjsonTypeHandler.class)
-    private Map<String, Object> resultData;
+    private String resultData;
 
 }

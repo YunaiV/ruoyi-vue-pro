@@ -49,6 +49,8 @@
         <druid.version>1.2.4</druid.version>
         <mybatis-plus.version>3.4.1</mybatis-plus.version>
         <redisson.version>3.13.6</redisson.version>
+        <!-- 监控相关 -->
+        <skywalking.version>8.3.0</skywalking.version>
         <!-- 工具类相关 -->
         <lombok.version>1.16.14</lombok.version>
         <mapstruct.version>1.4.1.Final</mapstruct.version>
@@ -88,20 +90,6 @@
 <!--                <version>${jna.version}</version>-->
 <!--            </dependency>-->
 
-<!--            &lt;!&ndash;io常用工具类 &ndash;&gt;-->
-<!--            <dependency>-->
-<!--                <groupId>commons-io</groupId>-->
-<!--                <artifactId>commons-io</artifactId>-->
-<!--                <version>${commons.io.version}</version>-->
-<!--            </dependency>-->
-
-<!--            &lt;!&ndash;文件上传工具类 &ndash;&gt;-->
-<!--            <dependency>-->
-<!--                <groupId>commons-fileupload</groupId>-->
-<!--                <artifactId>commons-fileupload</artifactId>-->
-<!--                <version>${commons.fileupload.version}</version>-->
-<!--            </dependency>-->
-
 <!--            &lt;!&ndash;velocity代码生成使用模板 &ndash;&gt;-->
 <!--            <dependency>-->
 <!--                <groupId>org.apache.velocity</groupId>-->
@@ -127,6 +115,11 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-configuration-processor</artifactId>
             <optional>true</optional>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aop</artifactId>
         </dependency>
 
         <!-- Web 相关 -->
@@ -172,6 +165,13 @@
             <groupId>org.redisson</groupId>
             <artifactId>redisson-spring-boot-starter</artifactId>
             <version>${redisson.version}</version>
+        </dependency>
+
+        <!-- 监控相关 -->
+        <dependency>
+            <groupId>org.apache.skywalking</groupId>
+            <artifactId>apm-toolkit-trace</artifactId>
+            <version>${skywalking.version}</version>
         </dependency>
 
         <!-- 工具类相关 -->

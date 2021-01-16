@@ -2,6 +2,7 @@ package cn.iocoder.dashboard.modules.system.controller.auth;
 
 import cn.iocoder.dashboard.common.enums.CommonStatusEnum;
 import cn.iocoder.dashboard.common.pojo.CommonResult;
+import cn.iocoder.dashboard.framework.logger.operatelog.core.annotations.OperateLog;
 import cn.iocoder.dashboard.modules.system.controller.auth.vo.SysAuthLoginReqVO;
 import cn.iocoder.dashboard.modules.system.controller.auth.vo.SysAuthLoginRespVO;
 import cn.iocoder.dashboard.modules.system.controller.auth.vo.SysAuthMenuRespVO;
@@ -28,7 +29,7 @@ import static cn.iocoder.dashboard.common.pojo.CommonResult.success;
 import static cn.iocoder.dashboard.framework.security.core.util.SecurityUtils.getLoginUserId;
 import static cn.iocoder.dashboard.framework.security.core.util.SecurityUtils.getLoginUserRoleIds;
 
-@Api(tags = "认证 API")
+@Api("认证 API")
 @RestController
 @RequestMapping("/")
 public class SysAuthController {
@@ -44,6 +45,7 @@ public class SysAuthController {
 
     @ApiOperation("使用账号密码登录")
     @PostMapping("/login")
+    @OperateLog(enable = false) // 避免 Post 请求被记录操作日志
     public CommonResult<SysAuthLoginRespVO> login(@RequestBody @Valid SysAuthLoginReqVO reqVO) {
         String token = authService.login(reqVO.getUsername(), reqVO.getPassword(), reqVO.getUuid(), reqVO.getCode());
         // 返回结果
@@ -52,6 +54,7 @@ public class SysAuthController {
 
     @ApiOperation("获取登陆用户的权限信息")
     @GetMapping("/get-permission-info")
+    @OperateLog
     public CommonResult<SysAuthPermissionInfoRespVO> getPermissionInfo() {
         // 获得用户信息
         SysUserDO user = userService.getUser(getLoginUserId());

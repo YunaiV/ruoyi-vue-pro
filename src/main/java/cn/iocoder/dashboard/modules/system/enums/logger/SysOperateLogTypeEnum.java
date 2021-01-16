@@ -1,5 +1,6 @@
 package cn.iocoder.dashboard.modules.system.enums.logger;
 
+import cn.iocoder.dashboard.framework.logger.operatelog.core.annotations.OperateLog;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -13,25 +14,32 @@ import lombok.Getter;
 public enum SysOperateLogTypeEnum {
 
     /**
+     * 查询
+     *
+     * 绝大多数情况下，不会记录查询动作，因为过于大量显得没有意义。
+     * 在有需要的时候，通过声明 {@link OperateLog} 注解来记录
+     */
+    GET(1),
+    /**
      * 新增
      */
-    CREATE(1),
+    CREATE(2),
     /**
      * 修改
      */
-    UPDATE(2),
+    UPDATE(3),
     /**
      * 删除
      */
-    DELETE(3),
+    DELETE(4),
     /**
      * 导出
      */
-    EXPORT(4),
+    EXPORT(5),
     /**
      * 导入
      */
-    IMPORT(5),
+    IMPORT(6),
     /**
      * 其它
      *
