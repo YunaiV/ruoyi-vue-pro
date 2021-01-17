@@ -10,7 +10,7 @@ import cn.iocoder.dashboard.framework.logger.operatelog.core.enums.OperateTypeEn
 import cn.iocoder.dashboard.framework.logger.operatelog.core.service.OperateLogFrameworkService;
 import cn.iocoder.dashboard.framework.security.core.util.SecurityUtils;
 import cn.iocoder.dashboard.framework.tracer.core.util.TracerUtils;
-import cn.iocoder.dashboard.modules.system.controller.logger.vo.SysOperateLogCreateReqVO;
+import cn.iocoder.dashboard.modules.system.controller.logger.vo.operatelog.SysOperateLogCreateReqVO;
 import cn.iocoder.dashboard.util.servlet.ServletUtils;
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Maps;

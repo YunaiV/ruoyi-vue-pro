@@ -1,9 +1,9 @@
 package cn.iocoder.dashboard.modules.system.convert.logger;
 
 import cn.iocoder.dashboard.common.pojo.PageResult;
-import cn.iocoder.dashboard.modules.system.controller.logger.vo.SysOperateLogCreateReqVO;
-import cn.iocoder.dashboard.modules.system.controller.logger.vo.SysOperateLogExcelVO;
-import cn.iocoder.dashboard.modules.system.controller.logger.vo.SysOperateLogRespVO;
+import cn.iocoder.dashboard.modules.system.controller.logger.vo.operatelog.SysOperateLogCreateReqVO;
+import cn.iocoder.dashboard.modules.system.controller.logger.vo.operatelog.SysOperateLogExcelVO;
+import cn.iocoder.dashboard.modules.system.controller.logger.vo.operatelog.SysOperateLogRespVO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.logger.SysOperateLogDO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.user.SysUserDO;
 import cn.iocoder.dashboard.util.collection.MapUtils;

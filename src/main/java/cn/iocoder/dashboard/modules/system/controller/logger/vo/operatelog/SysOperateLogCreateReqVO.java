@@ -1,4 +1,4 @@
-package cn.iocoder.dashboard.modules.system.controller.logger.vo;
+package cn.iocoder.dashboard.modules.system.controller.logger.vo.operatelog;
 
 import io.swagger.annotations.ApiModel;
 import lombok.Data;

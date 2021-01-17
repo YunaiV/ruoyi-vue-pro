@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.framework.logger.operatelog.core.service;
 
-import cn.iocoder.dashboard.modules.system.controller.logger.vo.SysOperateLogCreateReqVO;
+import cn.iocoder.dashboard.modules.system.controller.logger.vo.operatelog.SysOperateLogCreateReqVO;
 
 public interface OperateLogFrameworkService {
 

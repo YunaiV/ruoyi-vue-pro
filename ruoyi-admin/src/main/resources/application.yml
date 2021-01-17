@@ -42,13 +42,6 @@ spring:
     basename: i18n/messages
   profiles:
     active: druid
-  # 文件上传
-  servlet:
-     multipart:
-       # 单个文件大小
-       max-file-size:  10MB
-       # 设置总上传的文件大小
-       max-request-size:  20MB
   # 服务模块
   devtools:
     restart:
@@ -76,13 +69,6 @@ spring:
         max-active: 8
         # #连接池最大阻塞等待时间（使用负值表示没有限制）
         max-wait: -1ms
-
-# Swagger配置
-swagger:
-  # 是否开启swagger
-  enabled: true
-  # 请求前缀
-  pathMapping: /dev-api
 
 # 防止XSS攻击
 xss:

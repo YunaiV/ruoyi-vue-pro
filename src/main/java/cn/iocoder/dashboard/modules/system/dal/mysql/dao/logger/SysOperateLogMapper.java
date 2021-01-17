@@ -4,8 +4,8 @@ import cn.iocoder.dashboard.common.exception.enums.GlobalErrorCodeConstants;
 import cn.iocoder.dashboard.common.pojo.PageResult;
 import cn.iocoder.dashboard.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.dashboard.framework.mybatis.core.query.QueryWrapperX;
-import cn.iocoder.dashboard.modules.system.controller.logger.vo.SysOperateLogExportReqVO;
-import cn.iocoder.dashboard.modules.system.controller.logger.vo.SysOperateLogPageReqVO;
+import cn.iocoder.dashboard.modules.system.controller.logger.vo.operatelog.SysOperateLogExportReqVO;
+import cn.iocoder.dashboard.modules.system.controller.logger.vo.operatelog.SysOperateLogPageReqVO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.logger.SysOperateLogDO;
 import org.apache.ibatis.annotations.Mapper;
 
