@@ -42,20 +42,31 @@ import static cn.iocoder.dashboard.common.exception.enums.GlobalErrorCodeConstan
 import static cn.iocoder.dashboard.common.exception.enums.GlobalErrorCodeConstants.SUCCESS;
 
 /**
- * 拦截使用 @ApiOperation 注解，如果满足条件，则生成操作日志。
+ * 拦截使用 @OperateLog 注解，如果满足条件，则生成操作日志。
  * 满足如下任一条件，则会进行记录：
  * 1. 使用 @ApiOperation + 非 @GetMapping
  * 2. 使用 @OperateLog 注解
  *
  * 但是，如果声明 @OperateLog 注解时，将 enable 属性设置为 false 时，强制不记录。
  *
- * 为什么考虑使用 @ApiOperation 记录呢？避免有小伙伴忘记添加 @OperateLog 注解
- *
  * @author 芋道源码
  */
 @Aspect
 @Slf4j
 public class OperateLogAspect {
+
+    /**
+     * 用于记录操作内容的上下文
+     *
+     * @see SysOperateLogCreateReqVO#getContent()
+     */
+    private static final ThreadLocal<String> CONTENT = new ThreadLocal<>();
+    /**
+     * 用于记录拓展字段的上下文
+     *
+     * @see SysOperateLogCreateReqVO#getExts()
+     */
+    private static final ThreadLocal<Map<String, Object>> EXTS = new ThreadLocal<>();
 
     @Resource
     private OperateLogFrameworkService operateLogFrameworkService;
@@ -84,7 +95,25 @@ public class OperateLogAspect {
         } catch (Throwable exception) {
             this.log(joinPoint, operateLog, apiOperation, startTime, null, exception);
             throw exception;
+        } finally {
+            clearThreadLocal();
         }
+    }
+
+    public static void setContent(String content) {
+        CONTENT.set(content);
+    }
+
+    public static void addExt(String key, Object value) {
+        if (EXTS.get() == null) {
+            EXTS.set(new HashMap<>());
+        }
+        EXTS.get().put(key, value);
+    }
+
+    private static void clearThreadLocal() {
+        CONTENT.remove();
+        EXTS.remove();
     }
 
     private void log(ProceedingJoinPoint joinPoint, OperateLog operateLog, ApiOperation apiOperation,
@@ -154,6 +183,9 @@ public class OperateLogAspect {
             SysOperateLogTypeEnum operateLogType = convertOperateLogType(requestMethod);
             operateLogVO.setType(operateLogType != null ? operateLogType.getType() : null);
         }
+        // content 和 exts 属性
+        operateLogVO.setContent(CONTENT.get());
+        operateLogVO.setExts(EXTS.get());
     }
 
     private static void fillRequestFields(SysOperateLogCreateReqVO operateLogVO) {
@@ -197,6 +229,11 @@ public class OperateLogAspect {
             operateLogVO.setResultCode(INTERNAL_SERVER_ERROR.getCode());
             operateLogVO.setResultMsg(ExceptionUtil.getRootCauseMessage(exception));
         }
+    }
+
+    private static void fillContentFields(SysOperateLogCreateReqVO operateLogVO) {
+        operateLogVO.setContent(CONTENT.get());
+        operateLogVO.setExts(EXTS.get());
     }
 
     private static boolean isLogEnable(ProceedingJoinPoint joinPoint, OperateLog operateLog) {
