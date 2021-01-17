@@ -15,26 +15,22 @@ import javax.validation.constraints.Size;
 @Data
 public class SysLoginLogBaseVO {
 
+    @ApiModelProperty(value = "日志类型", required = true, example = "1", notes = "参见 SysLoginLogTypeEnum 枚举类")
+    @NotNull(message = "日志类型不能为空")
+    private Integer logType;
+
     @ApiModelProperty(value = "链路追踪编号", required = true, example = "89aca178-a370-411c-ae02-3f0d672be4ab")
     @NotEmpty(message = "链路追踪编号不能为空")
     private String traceId;
-
-    @ApiModelProperty(value = "用户编号", required = true, example = "1024")
-    @NotNull(message = "用户编号不能为空")
-    private Long userId;
 
     @ApiModelProperty(value = "用户账号", required = true, example = "yudao")
     @NotBlank(message = "用户账号不能为空")
     @Size(max = 30, message = "用户账号长度不能超过30个字符")
     private String username;
 
-
     @ApiModelProperty(value = "登陆结果", required = true, example = "1", notes = "参见 SysLoginResultEnum 枚举类")
     @NotNull(message = "登陆结果不能为空")
     private Integer result;
-
-    @ApiModelProperty(value = "操作明细", example = "修改编号为 1 的用户信息，将性别从男改成女，将姓名从芋道改成源码。")
-    private String content;
 
     @ApiModelProperty(value = "用户 IP", required = true, example = "127.0.0.1")
     @NotEmpty(message = "用户 IP 不能为空")

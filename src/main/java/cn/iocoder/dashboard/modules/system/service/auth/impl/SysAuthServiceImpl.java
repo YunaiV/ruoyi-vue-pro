@@ -3,16 +3,24 @@ package cn.iocoder.dashboard.modules.system.service.auth.impl;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.dashboard.common.enums.CommonStatusEnum;
+import cn.iocoder.dashboard.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.dashboard.framework.security.config.SecurityProperties;
 import cn.iocoder.dashboard.framework.security.core.LoginUser;
+import cn.iocoder.dashboard.framework.tracer.core.util.TracerUtils;
+import cn.iocoder.dashboard.modules.system.controller.logger.vo.loginlog.SysLoginLogCreateReqVO;
 import cn.iocoder.dashboard.modules.system.convert.auth.SysAuthConvert;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.user.SysUserDO;
 import cn.iocoder.dashboard.modules.system.dal.redis.dao.auth.SysLoginUserRedisDAO;
+import cn.iocoder.dashboard.modules.system.enums.logger.SysLoginLogTypeEnum;
+import cn.iocoder.dashboard.modules.system.enums.logger.SysLoginResultEnum;
 import cn.iocoder.dashboard.modules.system.service.auth.SysAuthService;
 import cn.iocoder.dashboard.modules.system.service.auth.SysTokenService;
+import cn.iocoder.dashboard.modules.system.service.common.SysCaptchaService;
+import cn.iocoder.dashboard.modules.system.service.logger.SysLoginLogService;
 import cn.iocoder.dashboard.modules.system.service.permission.SysPermissionService;
 import cn.iocoder.dashboard.modules.system.service.user.SysUserService;
 import cn.iocoder.dashboard.util.date.DateUtils;
+import cn.iocoder.dashboard.util.servlet.ServletUtils;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import lombok.extern.slf4j.Slf4j;
@@ -55,6 +63,10 @@ public class SysAuthServiceImpl implements SysAuthService {
     private SysUserService userService;
     @Resource
     private SysPermissionService permissionService;
+    @Resource
+    private SysCaptchaService captchaService;
+    @Resource
+    private SysLoginLogService loginLogService;
 
     @Resource
     private SysLoginUserRedisDAO loginUserRedisDAO;
@@ -87,7 +99,7 @@ public class SysAuthServiceImpl implements SysAuthService {
     @Override
     public String login(String username, String password, String captchaUUID, String captchaCode) {
         // 判断验证码是否正确
-        this.verifyCaptcha(captchaUUID, captchaCode);
+        this.verifyCaptcha(username, captchaUUID, captchaCode);
 
         // 使用账号密码，进行登陆。
         LoginUser loginUser = this.login0(username, password);
@@ -102,18 +114,20 @@ public class SysAuthServiceImpl implements SysAuthService {
         return tokenService.createToken(sessionId);
     }
 
-    private void verifyCaptcha(String captchaUUID, String captchaCode) {
-        //        String verifyKey = Constants.CAPTCHA_CODE_KEY + captchaUUID;
-//        String captcha = redisCache.getCacheObject(verifyKey);
-//        redisCache.deleteObject(verifyKey);
-//        if (captcha == null) {
-//            AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_FAIL, MessageUtils.message("user.jcaptcha.expire")));
-//            throw new CaptchaExpireException();
-//        }
-//        if (!code.equalsIgnoreCase(captcha)) {
-//            AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_FAIL, MessageUtils.message("user.jcaptcha.error")));
-//            throw new CaptchaException();
-//        }
+    private void verifyCaptcha(String username, String captchaUUID, String captchaCode) {
+        String code = captchaService.getCaptchaCode(captchaUUID);
+        // 验证码不存在
+        if (code == null) {
+            this.createLoginLog(username, SysLoginResultEnum.CAPTCHA_NOT_FOUND);
+            throw ServiceExceptionUtil.exception(AUTH_LOGIN_CAPTCHA_NOT_FOUND);
+        }
+        // 验证码不正确
+        if (!code.equals(captchaCode)) {
+            this.createLoginLog(username, SysLoginResultEnum.CAPTCHA_CODE_ERROR);
+            throw ServiceExceptionUtil.exception(AUTH_LOGIN_CAPTCHA_CODE_ERROR);
+        }
+        // 正确，所以要删除下验证码
+        captchaService.deleteCaptchaCode(captchaUUID);
     }
 
     private LoginUser login0(String username, String password) {
@@ -124,20 +138,31 @@ public class SysAuthServiceImpl implements SysAuthService {
             // 在其内部，会调用到 loadUserByUsername 方法，获取 User 信息
             authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
         } catch (BadCredentialsException badCredentialsException) {
-            // TODO 日志优化
-//            AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_FAIL, MessageUtils.message("user.password.not.match")));
+            this.createLoginLog(username, SysLoginResultEnum.BAD_CREDENTIALS);
             throw exception(AUTH_LOGIN_BAD_CREDENTIALS);
         } catch (DisabledException disabledException) {
-            // TODO 日志优化
+            this.createLoginLog(username, SysLoginResultEnum.USER_DISABLED);
             throw exception(AUTH_LOGIN_USER_DISABLED);
         } catch (AuthenticationException authenticationException) {
-            // TODO 日志优化
+            log.error("[login0][username({}) 发生未知异常]", username, authenticationException);
+            this.createLoginLog(username, SysLoginResultEnum.UNKNOWN_ERROR);
             throw exception(AUTH_LOGIN_FAIL_UNKNOWN);
         }
-        // TODO 需要优化
-//        AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_SUCCESS, MessageUtils.message("user.login.success")));
+        // 登陆成功
         Assert.notNull(authentication.getPrincipal(), "Principal 不会为空");
+        this.createLoginLog(username, SysLoginResultEnum.SUCCESS);
         return (LoginUser) authentication.getPrincipal();
+    }
+
+    private void createLoginLog(String username, SysLoginResultEnum loginResult) {
+        SysLoginLogCreateReqVO reqVO = new SysLoginLogCreateReqVO();
+        reqVO.setLogType(SysLoginLogTypeEnum.LOGIN.getType());
+        reqVO.setTraceId(TracerUtils.getTraceId());
+        reqVO.setUsername(username);
+        reqVO.setUserAgent(ServletUtils.getUserAgent());
+        reqVO.setUserIp(ServletUtils.getClientIP());
+        reqVO.setResult(loginResult.getResult());
+        loginLogService.createLoginLog(reqVO);
     }
 
     /**

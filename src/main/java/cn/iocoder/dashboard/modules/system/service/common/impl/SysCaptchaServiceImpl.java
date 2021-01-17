@@ -35,4 +35,14 @@ public class SysCaptchaServiceImpl implements SysCaptchaService {
         return SysCaptchaConvert.INSTANCE.convert(uuid, captcha);
     }
 
+    @Override
+    public String getCaptchaCode(String uuid) {
+        return captchaRedisDAO.get(uuid);
+    }
+
+    @Override
+    public void deleteCaptchaCode(String uuid) {
+        captchaRedisDAO.delete(uuid);
+    }
+
 }

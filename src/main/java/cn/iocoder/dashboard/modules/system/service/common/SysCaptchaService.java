@@ -7,6 +7,26 @@ import cn.iocoder.dashboard.modules.system.controller.common.vo.SysCaptchaImageR
  */
 public interface SysCaptchaService {
 
+    /**
+     * 获得验证码图片
+     *
+     * @return 验证码图片
+     */
     SysCaptchaImageRespVO getCaptchaImage();
+
+    /**
+     * 获得 uuid 对应的验证码
+     *
+     * @param uuid 验证码编号
+     * @return 验证码
+     */
+    String getCaptchaCode(String uuid);
+
+    /**
+     * 删除 uuid 对应的验证码
+     *
+     * @param uuid 验证码编号
+     */
+    void deleteCaptchaCode(String uuid);
 
 }

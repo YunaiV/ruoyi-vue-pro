@@ -1,6 +1,5 @@
 package cn.iocoder.dashboard.modules.system.controller.logger.vo.loginlog;
 
-import cn.iocoder.dashboard.modules.system.controller.logger.vo.operatelog.SysOperateLogCreateReqVO;
 import io.swagger.annotations.ApiModel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -11,5 +10,5 @@ import lombok.ToString;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class SysLoginLogCreateReqVO extends SysOperateLogCreateReqVO {
+public class SysLoginLogCreateReqVO extends SysLoginLogBaseVO {
 }

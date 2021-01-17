@@ -24,9 +24,6 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.context.request.RequestAttributes;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
@@ -196,11 +193,10 @@ public class OperateLogAspect {
 
     private static void fillRequestFields(SysOperateLogCreateReqVO operateLogVO) {
         // 获得 Request 对象
-        RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
-        if (!(requestAttributes instanceof ServletRequestAttributes)) {
+        HttpServletRequest request = ServletUtils.getRequest();
+        if (request == null) {
             return;
         }
-        HttpServletRequest request = ((ServletRequestAttributes) requestAttributes).getRequest();
         // 补全请求信息
         operateLogVO.setRequestMethod(request.getMethod());
         operateLogVO.setRequestUrl(request.getRequestURI());

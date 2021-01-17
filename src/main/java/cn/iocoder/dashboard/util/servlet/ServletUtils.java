@@ -4,6 +4,9 @@ import cn.hutool.core.io.IoUtil;
 import cn.hutool.extra.servlet.ServletUtil;
 import com.alibaba.fastjson.JSON;
 import org.springframework.http.MediaType;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -52,6 +55,35 @@ public class ServletUtils {
     public static String getUserAgent(HttpServletRequest request) {
         String ua = request.getHeader("User-Agent");
         return ua != null ? ua : "";
+    }
+
+    /**
+     * 获得请求
+     *
+     * @return HttpServletRequest
+     */
+    public static HttpServletRequest getRequest() {
+        RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
+        if (!(requestAttributes instanceof ServletRequestAttributes)) {
+            return null;
+        }
+        return ((ServletRequestAttributes) requestAttributes).getRequest();
+    }
+
+    public static String getUserAgent() {
+        HttpServletRequest request = getRequest();
+        if (request == null) {
+            return null;
+        }
+        return getUserAgent(request);
+    }
+
+    public static String getClientIP() {
+        HttpServletRequest request = getRequest();
+        if (request == null) {
+            return null;
+        }
+        return ServletUtil.getClientIP(request);
     }
 
 }
