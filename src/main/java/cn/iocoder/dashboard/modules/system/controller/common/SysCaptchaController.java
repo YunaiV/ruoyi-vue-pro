@@ -23,7 +23,7 @@ public class SysCaptchaController {
 
     @ApiOperation("生成图片验证码")
     @GetMapping("/get-image")
-    private CommonResult<SysCaptchaImageRespVO> getCaptchaImage() {
+    public CommonResult<SysCaptchaImageRespVO> getCaptchaImage() {
         return success(captchaService.getCaptchaImage());
     }
 

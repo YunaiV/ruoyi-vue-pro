@@ -23,6 +23,7 @@ import RightToolbar from "@/components/RightToolbar"
 // 代码高亮插件
 import hljs from 'highlight.js'
 import 'highlight.js/styles/github-gist.css'
+import {DICT_TYPE, getDictDataLabel, getDictDatas} from "@/utils/dict";
 
 // 全局方法挂载
 Vue.prototype.getDicts = getDicts
@@ -32,6 +33,9 @@ Vue.prototype.resetForm = resetForm
 Vue.prototype.addDateRange = addDateRange
 Vue.prototype.selectDictLabel = selectDictLabel
 Vue.prototype.selectDictLabels = selectDictLabels
+Vue.prototype.getDictDatas = getDictDatas
+Vue.prototype.getDictDataLabel = getDictDataLabel
+Vue.prototype.DICT_TYPE = DICT_TYPE
 Vue.prototype.download = download
 Vue.prototype.downloadExcel = downloadExcel
 Vue.prototype.handleTree = handleTree

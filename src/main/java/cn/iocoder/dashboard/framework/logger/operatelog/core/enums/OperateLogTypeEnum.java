@@ -1,4 +1,4 @@
-package cn.iocoder.dashboard.modules.system.enums.logger;
+package cn.iocoder.dashboard.framework.logger.operatelog.core.enums;
 
 import cn.iocoder.dashboard.framework.logger.operatelog.core.annotations.OperateLog;
 import lombok.AllArgsConstructor;
@@ -11,7 +11,7 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
-public enum SysOperateLogTypeEnum {
+public enum OperateLogTypeEnum {
 
     /**
      * 查询

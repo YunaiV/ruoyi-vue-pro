@@ -23,28 +23,12 @@ import com.ruoyi.system.service.ISysOperLogService;
  *
  * @author ruoyi
  */
-@RestController
-@RequestMapping("/monitor/operlog")
+
 public class SysOperlogController extends BaseController {
 
     @Autowired
     private ISysOperLogService operLogService;
 
-    @PreAuthorize("@ss.hasPermi('monitor:operlog:list')")
-    @GetMapping("/list")
-    public TableDataInfo list(SysOperLog operLog) {
-        startPage();
-        List<SysOperLog> list = operLogService.selectOperLogList(operLog);
-        return getDataTable(list);
-    }
 
-    @Log(title = "操作日志", businessType = BusinessType.EXPORT)
-    @PreAuthorize("@ss.hasPermi('monitor:operlog:export')")
-    @GetMapping("/export")
-    public AjaxResult export(SysOperLog operLog) {
-        List<SysOperLog> list = operLogService.selectOperLogList(operLog);
-        ExcelUtil<SysOperLog> util = new ExcelUtil<SysOperLog>(SysOperLog.class);
-        return util.exportExcel(list, "操作日志");
-    }
 
 }

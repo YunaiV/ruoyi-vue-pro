@@ -83,6 +83,16 @@ public class SysUserServiceImpl implements SysUserService {
         return userMapper.selectList(reqVO, this.getDeptCondition(reqVO.getDeptId()));
     }
 
+    @Override
+    public List<SysUserDO> listUsers(Collection<Long> ids) {
+        return userMapper.selectBatchIds(ids);
+    }
+
+    @Override
+    public List<SysUserDO> listUsersByNickname(String nickname) {
+        return userMapper.selectListByNickname(nickname);
+    }
+
     /**
      * 获得部门条件：查询指定部门的子部门编号们，包括自身
      *

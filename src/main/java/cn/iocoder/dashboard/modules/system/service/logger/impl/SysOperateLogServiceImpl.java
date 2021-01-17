@@ -1,18 +1,27 @@
 package cn.iocoder.dashboard.modules.system.service.logger.impl;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.StrUtil;
+import cn.iocoder.dashboard.common.pojo.PageResult;
 import cn.iocoder.dashboard.modules.system.controller.logger.vo.SysOperateLogCreateReqVO;
+import cn.iocoder.dashboard.modules.system.controller.logger.vo.SysOperateLogPageReqVO;
 import cn.iocoder.dashboard.modules.system.convert.logger.SysOperateLogConvert;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dao.logger.SysOperateLogMapper;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.logger.SysOperateLogDO;
+import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.user.SysUserDO;
 import cn.iocoder.dashboard.modules.system.service.logger.SysOperateLogService;
+import cn.iocoder.dashboard.modules.system.service.user.SysUserService;
 import cn.iocoder.dashboard.util.string.StrUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.Collection;
 
-import static cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.logger.SysOperateLogDO.*;
+import static cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.logger.SysOperateLogDO.JAVA_METHOD_ARGS_MAX_LENGTH;
+import static cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.logger.SysOperateLogDO.RESULT_MAX_LENGTH;
+import static cn.iocoder.dashboard.util.collection.CollectionUtils.convertSet;
 
 @Service
 @Slf4j
@@ -20,6 +29,9 @@ public class SysOperateLogServiceImpl implements SysOperateLogService {
 
     @Resource
     private SysOperateLogMapper operateLogMapper;
+
+    @Resource
+    private SysUserService userService;
 
     @Override
     @Async
@@ -33,6 +45,20 @@ public class SysOperateLogServiceImpl implements SysOperateLogService {
             // 仅仅打印日志，不对外抛出。原因是，还是要保留现场数据。
             log.error("[createOperateLogAsync][记录操作日志异常，日志为 ({})]", reqVO, throwable);
         }
+    }
+
+    @Override
+    public PageResult<SysOperateLogDO> pageOperateLog(SysOperateLogPageReqVO reqVO) {
+        // 处理基于用户昵称的查询
+        Collection<Long> userIds = null;
+        if (StrUtil.isNotEmpty(reqVO.getUserNickname())) {
+            userIds = convertSet(userService.listUsersByNickname(reqVO.getUserNickname()), SysUserDO::getId);
+            if (CollUtil.isEmpty(userIds)) {
+                return PageResult.empty();
+            }
+        }
+        // 查询分页
+        return operateLogMapper.selectPage(reqVO, userIds);
     }
 
 }

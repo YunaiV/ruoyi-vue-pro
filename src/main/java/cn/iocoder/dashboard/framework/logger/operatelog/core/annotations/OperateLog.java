@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.framework.logger.operatelog.core.annotations;
 
-import cn.iocoder.dashboard.modules.system.enums.logger.SysOperateLogTypeEnum;
+import cn.iocoder.dashboard.framework.logger.operatelog.core.enums.OperateLogTypeEnum;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
@@ -32,7 +32,7 @@ public @interface OperateLog {
      *
      * 实际并不是数组，因为枚举不能设置 null 作为默认值
      */
-    SysOperateLogTypeEnum[] type() default {};
+    OperateLogTypeEnum[] type() default {};
 
     // ========== 开关字段 ==========
 

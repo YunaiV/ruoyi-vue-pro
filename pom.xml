@@ -22,7 +22,7 @@
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <maven-compiler-plugin.version>3.8.0</maven-compiler-plugin.version>
         <!-- 统一依赖管理 -->
-        <spring.boot.version>2.4.1</spring.boot.version>
+        <spring.boot.version>2.4.2</spring.boot.version>
 
 <!--        <ruoyi.version>3.3.0</ruoyi.version>-->
 <!--        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>-->

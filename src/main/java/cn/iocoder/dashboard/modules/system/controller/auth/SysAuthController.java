@@ -54,7 +54,6 @@ public class SysAuthController {
 
     @ApiOperation("获取登陆用户的权限信息")
     @GetMapping("/get-permission-info")
-    @OperateLog
     public CommonResult<SysAuthPermissionInfoRespVO> getPermissionInfo() {
         // 获得用户信息
         SysUserDO user = userService.getUser(getLoginUserId());

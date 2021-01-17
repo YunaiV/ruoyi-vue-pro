@@ -1,10 +1,15 @@
 package cn.iocoder.dashboard.modules.system.service.user;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.dashboard.common.pojo.PageResult;
 import cn.iocoder.dashboard.modules.system.controller.user.vo.user.*;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.user.SysUserDO;
+import cn.iocoder.dashboard.util.collection.CollectionUtils;
 
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 用户 Service 接口
@@ -44,6 +49,35 @@ public interface SysUserService {
      * @return 用户列表
      */
     List<SysUserDO> listUsers(SysUserExportReqVO reqVO);
+
+    /**
+     * 获得用户列表
+     *
+     * @param ids 用户编号数组
+     * @return 用户列表
+     */
+    List<SysUserDO> listUsers(Collection<Long> ids);
+
+    /**
+     * 获得用户 Map
+     *
+     * @param ids 用户编号数组
+     * @return 用户 Map
+     */
+    default Map<Long, SysUserDO> getUserMap(Collection<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return new HashMap<>();
+        }
+        return CollectionUtils.convertMap(listUsers(ids), SysUserDO::getId);
+    }
+
+    /**
+     * 获得用户列表，基于昵称模糊匹配
+     *
+     * @param nickname 昵称
+     * @return 用户列表
+     */
+    List<SysUserDO> listUsersByNickname(String nickname);
 
     /**
      * 创建用户

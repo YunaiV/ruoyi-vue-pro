@@ -6,6 +6,7 @@ import lombok.Data;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
+import java.util.Map;
 
 /**
  * 操作日志 Base VO，提供给添加、修改、详细的子 VO 使用
@@ -30,9 +31,15 @@ public class SysOperateLogBaseVO {
     @NotEmpty(message = "操作名")
     private String name;
 
-    @ApiModelProperty(value = "操作分类", required = true, example = "操作分类", notes = "参见 SysOperateLogTypeEnum 枚举类")
+    @ApiModelProperty(value = "操作分类", required = true, example = "1", notes = "参见 SysOperateLogTypeEnum 枚举类")
     @NotNull(message = "操作分类不能为空")
     private Integer type;
+
+    @ApiModelProperty(value = "操作明细", example = "修改编号为 1 的用户信息，将性别从男改成女，将姓名从芋道改成源码。")
+    private String content;
+
+    @ApiModelProperty(value = "拓展字段", example = "{'orderId': 1}")
+    private Map<String, Object> exts;
 
     @ApiModelProperty(value = "请求方法名", required = true, example = "GET")
     @NotEmpty(message = "请求方法名不能为空")

@@ -3,7 +3,7 @@ package cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.logger;
 import cn.iocoder.dashboard.common.pojo.CommonResult;
 import cn.iocoder.dashboard.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.user.SysUserDO;
-import cn.iocoder.dashboard.modules.system.enums.logger.SysOperateLogTypeEnum;
+import cn.iocoder.dashboard.framework.logger.operatelog.core.enums.OperateLogTypeEnum;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -62,22 +62,18 @@ public class SysOperateLogDO extends BaseDO {
     /**
      * 操作分类
      *
-     * 枚举 {@link SysOperateLogTypeEnum}
+     * 枚举 {@link OperateLogTypeEnum}
      */
     @TableField("operate_type")
     private Integer type;
     /**
      * 操作内容，记录整个操作的明细
      * 例如说，修改编号为 1 的用户信息，将性别从男改成女，将姓名从芋道改成源码。
-     *
-     * TODO 预留字段
      */
     private String content;
     /**
      * 拓展字段，有些复杂的业务，需要记录一些字段
      * 例如说，记录订单编号，则可以添加 key 为 "orderId"，value 为订单编号
-     *
-     * TODO 预留字段
      */
     @TableField(typeHandler = FastjsonTypeHandler.class)
     private Map<String, Object> exts;

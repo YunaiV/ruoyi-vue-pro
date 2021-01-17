@@ -6,11 +6,11 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.servlet.ServletUtil;
 import cn.iocoder.dashboard.common.pojo.CommonResult;
 import cn.iocoder.dashboard.framework.logger.operatelog.core.annotations.OperateLog;
+import cn.iocoder.dashboard.framework.logger.operatelog.core.enums.OperateLogTypeEnum;
 import cn.iocoder.dashboard.framework.logger.operatelog.core.service.OperateLogFrameworkService;
 import cn.iocoder.dashboard.framework.security.core.util.SecurityUtils;
 import cn.iocoder.dashboard.framework.tracer.core.util.TracerUtils;
 import cn.iocoder.dashboard.modules.system.controller.logger.vo.SysOperateLogCreateReqVO;
-import cn.iocoder.dashboard.modules.system.enums.logger.SysOperateLogTypeEnum;
 import cn.iocoder.dashboard.util.servlet.ServletUtils;
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Maps;
@@ -180,7 +180,7 @@ public class OperateLogAspect {
         }
         if (operateLogVO.getType() == null) {
             RequestMethod requestMethod = obtainFirstMatchRequestMethod(obtainRequestMethod(joinPoint));
-            SysOperateLogTypeEnum operateLogType = convertOperateLogType(requestMethod);
+            OperateLogTypeEnum operateLogType = convertOperateLogType(requestMethod);
             operateLogVO.setType(operateLogType != null ? operateLogType.getType() : null);
         }
         // content 和 exts 属性
@@ -275,21 +275,21 @@ public class OperateLogAspect {
         return requestMethods[0];
     }
 
-    private static SysOperateLogTypeEnum convertOperateLogType(RequestMethod requestMethod) {
+    private static OperateLogTypeEnum convertOperateLogType(RequestMethod requestMethod) {
         if (requestMethod == null) {
             return null;
         }
         switch (requestMethod) {
             case GET:
-                return SysOperateLogTypeEnum.GET;
+                return OperateLogTypeEnum.GET;
             case POST:
-                return SysOperateLogTypeEnum.CREATE;
+                return OperateLogTypeEnum.CREATE;
             case PUT:
-                return SysOperateLogTypeEnum.UPDATE;
+                return OperateLogTypeEnum.UPDATE;
             case DELETE:
-                return SysOperateLogTypeEnum.DELETE;
+                return OperateLogTypeEnum.DELETE;
             default:
-                return SysOperateLogTypeEnum.OTHER;
+                return OperateLogTypeEnum.OTHER;
         }
     }
 

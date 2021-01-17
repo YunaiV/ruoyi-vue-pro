@@ -45,5 +45,9 @@ public interface SysUserMapper extends BaseMapper<SysUserDO> {
                 .inIfPresent("dept_id", deptIds));
     }
 
+    default List<SysUserDO> selectListByNickname(String nickname) {
+        return selectList(new QueryWrapperX<SysUserDO>().like("nickname", nickname));
+    }
+
 }
 
