@@ -2,9 +2,12 @@ package cn.iocoder.dashboard.modules.system.controller.logger;
 
 import cn.iocoder.dashboard.common.pojo.CommonResult;
 import cn.iocoder.dashboard.common.pojo.PageResult;
+import cn.iocoder.dashboard.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.dashboard.framework.logger.operatelog.core.annotations.OperateLog;
-import cn.iocoder.dashboard.framework.logger.operatelog.core.enums.OperateLogTypeEnum;
+import cn.iocoder.dashboard.framework.logger.operatelog.core.enums.OperateTypeEnum;
 import cn.iocoder.dashboard.framework.logger.operatelog.core.util.OperateLogUtils;
+import cn.iocoder.dashboard.modules.system.controller.logger.vo.SysOperateLogExcelVO;
+import cn.iocoder.dashboard.modules.system.controller.logger.vo.SysOperateLogExportReqVO;
 import cn.iocoder.dashboard.modules.system.controller.logger.vo.SysOperateLogPageReqVO;
 import cn.iocoder.dashboard.modules.system.controller.logger.vo.SysOperateLogRespVO;
 import cn.iocoder.dashboard.modules.system.convert.logger.SysOperateLogConvert;
@@ -22,12 +25,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
 import static cn.iocoder.dashboard.common.pojo.CommonResult.success;
+import static cn.iocoder.dashboard.framework.logger.operatelog.core.enums.OperateTypeEnum.EXPORT;
 
 @Api(tags = "操作日志 API")
 @RestController
@@ -41,7 +47,7 @@ public class SysOperateLogController {
     private SysUserService userService;
 
     @ApiOperation("示例")
-    @OperateLog(type = OperateLogTypeEnum.OTHER)
+    @OperateLog(type = OperateTypeEnum.OTHER)
     @GetMapping("/demo")
     public CommonResult<Boolean> demo() {
         // 这里可以调用业务逻辑
@@ -74,13 +80,22 @@ public class SysOperateLogController {
         return success(new PageResult<>(list, pageResult.getTotal()));
     }
 
-//    @Log(title = "操作日志", businessType = BusinessType.EXPORT)
+    @ApiOperation("导出操作日志")
+    @GetMapping("/export")
+    @OperateLog(type = EXPORT)
 //    @PreAuthorize("@ss.hasPermi('system:operate-log:export')")
-//    @GetMapping("/export")
-//    public AjaxResult export(SysOperLog operLog) {
-//        List<SysOperLog> list = operLogService.selectOperLogList(operLog);
-//        ExcelUtil<SysOperLog> util = new ExcelUtil<SysOperLog>(SysOperLog.class);
-//        return util.exportExcel(list, "操作日志");
-//    }
+    public void exportOperateLog(HttpServletResponse response, @Validated SysOperateLogExportReqVO reqVO)
+            throws IOException {
+        List<SysOperateLogDO> list = operateLogService.listOperateLogs(reqVO);
+
+        // 获得拼接需要的数据
+        Collection<Long> userIds = CollectionUtils.convertList(list, SysOperateLogDO::getUserId);
+        Map<Long, SysUserDO> userMap = userService.getUserMap(userIds);
+        // 拼接数据
+        List<SysOperateLogExcelVO> excelDataList = SysOperateLogConvert.INSTANCE.convertList(list, userMap);
+        // 输出
+        ExcelUtils.write(response, "操作日志.xls", "数据列表",
+                SysOperateLogExcelVO.class, excelDataList);
+    }
 
 }

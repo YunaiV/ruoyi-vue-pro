@@ -2,10 +2,19 @@ package cn.iocoder.dashboard.modules.system.convert.logger;
 
 import cn.iocoder.dashboard.common.pojo.PageResult;
 import cn.iocoder.dashboard.modules.system.controller.logger.vo.SysOperateLogCreateReqVO;
+import cn.iocoder.dashboard.modules.system.controller.logger.vo.SysOperateLogExcelVO;
 import cn.iocoder.dashboard.modules.system.controller.logger.vo.SysOperateLogRespVO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.logger.SysOperateLogDO;
+import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.user.SysUserDO;
+import cn.iocoder.dashboard.util.collection.MapUtils;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
+
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import static cn.iocoder.dashboard.common.exception.enums.GlobalErrorCodeConstants.SUCCESS;
 
 @Mapper
 public interface SysOperateLogConvert {
@@ -17,5 +26,16 @@ public interface SysOperateLogConvert {
     PageResult<SysOperateLogRespVO> convertPage(PageResult<SysOperateLogDO> page);
 
     SysOperateLogRespVO convert(SysOperateLogDO bean);
+
+    default List<SysOperateLogExcelVO> convertList(List<SysOperateLogDO> list, Map<Long, SysUserDO> userMap) {
+        return list.stream().map(operateLog -> {
+            SysOperateLogExcelVO excelVO = convert02(operateLog);
+            MapUtils.findAndThen(userMap, operateLog.getId(), user -> excelVO.setUserNickname(user.getNickname()));
+            excelVO.setSuccessStr(SUCCESS.getCode().equals(operateLog.getResultCode()) ? "成功" : "失败");
+            return excelVO;
+        }).collect(Collectors.toList());
+    }
+
+    SysOperateLogExcelVO convert02(SysOperateLogDO bean);
 
 }

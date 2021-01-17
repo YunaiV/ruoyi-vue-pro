@@ -14,6 +14,7 @@ export function exportOperateLog(query) {
   return request({
     url: '/system/operate-log/export',
     method: 'get',
-    params: query
+    params: query,
+    responseType: 'blob'
   })
 }

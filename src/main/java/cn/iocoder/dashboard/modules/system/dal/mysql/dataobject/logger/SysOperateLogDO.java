@@ -3,7 +3,7 @@ package cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.logger;
 import cn.iocoder.dashboard.common.pojo.CommonResult;
 import cn.iocoder.dashboard.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.user.SysUserDO;
-import cn.iocoder.dashboard.framework.logger.operatelog.core.enums.OperateLogTypeEnum;
+import cn.iocoder.dashboard.framework.logger.operatelog.core.enums.OperateTypeEnum;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -19,7 +19,7 @@ import java.util.Map;
  *
  * @author 芋道源码
  */
-@TableName("sys_operate_log")
+@TableName(value = "sys_operate_log", autoResultMap = true)
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class SysOperateLogDO extends BaseDO {
@@ -62,7 +62,7 @@ public class SysOperateLogDO extends BaseDO {
     /**
      * 操作分类
      *
-     * 枚举 {@link OperateLogTypeEnum}
+     * 枚举 {@link OperateTypeEnum}
      */
     @TableField("operate_type")
     private Integer type;

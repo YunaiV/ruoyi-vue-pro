@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.dashboard.common.pojo.PageResult;
 import cn.iocoder.dashboard.modules.system.controller.logger.vo.SysOperateLogCreateReqVO;
+import cn.iocoder.dashboard.modules.system.controller.logger.vo.SysOperateLogExportReqVO;
 import cn.iocoder.dashboard.modules.system.controller.logger.vo.SysOperateLogPageReqVO;
 import cn.iocoder.dashboard.modules.system.convert.logger.SysOperateLogConvert;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dao.logger.SysOperateLogMapper;
@@ -18,6 +19,8 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 import static cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.logger.SysOperateLogDO.JAVA_METHOD_ARGS_MAX_LENGTH;
 import static cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.logger.SysOperateLogDO.RESULT_MAX_LENGTH;
@@ -59,6 +62,20 @@ public class SysOperateLogServiceImpl implements SysOperateLogService {
         }
         // 查询分页
         return operateLogMapper.selectPage(reqVO, userIds);
+    }
+
+    @Override
+    public List<SysOperateLogDO> listOperateLogs(SysOperateLogExportReqVO reqVO) {
+        // 处理基于用户昵称的查询
+        Collection<Long> userIds = null;
+        if (StrUtil.isNotEmpty(reqVO.getUserNickname())) {
+            userIds = convertSet(userService.listUsersByNickname(reqVO.getUserNickname()), SysUserDO::getId);
+            if (CollUtil.isEmpty(userIds)) {
+                return Collections.emptyList();
+            }
+        }
+        // 查询列表
+        return operateLogMapper.selectList(reqVO, userIds);
     }
 
 }

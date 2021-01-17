@@ -6,7 +6,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.servlet.ServletUtil;
 import cn.iocoder.dashboard.common.pojo.CommonResult;
 import cn.iocoder.dashboard.framework.logger.operatelog.core.annotations.OperateLog;
-import cn.iocoder.dashboard.framework.logger.operatelog.core.enums.OperateLogTypeEnum;
+import cn.iocoder.dashboard.framework.logger.operatelog.core.enums.OperateTypeEnum;
 import cn.iocoder.dashboard.framework.logger.operatelog.core.service.OperateLogFrameworkService;
 import cn.iocoder.dashboard.framework.security.core.util.SecurityUtils;
 import cn.iocoder.dashboard.framework.tracer.core.util.TracerUtils;
@@ -163,8 +163,14 @@ public class OperateLogAspect {
         if (StrUtil.isEmpty(operateLogVO.getModule())) {
             Api api = getClassAnnotation(joinPoint, Api.class);
             if (api != null) {
-                operateLogVO.setModule(Optional.of(api.value())
-                        .orElse(ArrayUtil.isEmpty(api.tags()) ? api.tags()[0] : null));
+                // 优先读取 @API 的 name 属性
+                if (StrUtil.isNotEmpty(api.value())) {
+                    operateLogVO.setModule(api.value());
+                }
+                // 没有的话，读取 @API 的 tags 属性
+                if (StrUtil.isEmpty(operateLogVO.getModule()) && ArrayUtil.isNotEmpty(api.tags())) {
+                    operateLogVO.setModule(api.tags()[0]);
+                }
             }
         }
         // name 属性
@@ -180,7 +186,7 @@ public class OperateLogAspect {
         }
         if (operateLogVO.getType() == null) {
             RequestMethod requestMethod = obtainFirstMatchRequestMethod(obtainRequestMethod(joinPoint));
-            OperateLogTypeEnum operateLogType = convertOperateLogType(requestMethod);
+            OperateTypeEnum operateLogType = convertOperateLogType(requestMethod);
             operateLogVO.setType(operateLogType != null ? operateLogType.getType() : null);
         }
         // content 和 exts 属性
@@ -275,21 +281,21 @@ public class OperateLogAspect {
         return requestMethods[0];
     }
 
-    private static OperateLogTypeEnum convertOperateLogType(RequestMethod requestMethod) {
+    private static OperateTypeEnum convertOperateLogType(RequestMethod requestMethod) {
         if (requestMethod == null) {
             return null;
         }
         switch (requestMethod) {
             case GET:
-                return OperateLogTypeEnum.GET;
+                return OperateTypeEnum.GET;
             case POST:
-                return OperateLogTypeEnum.CREATE;
+                return OperateTypeEnum.CREATE;
             case PUT:
-                return OperateLogTypeEnum.UPDATE;
+                return OperateTypeEnum.UPDATE;
             case DELETE:
-                return OperateLogTypeEnum.DELETE;
+                return OperateTypeEnum.DELETE;
             default:
-                return OperateLogTypeEnum.OTHER;
+                return OperateTypeEnum.OTHER;
         }
     }
 
@@ -322,7 +328,7 @@ public class OperateLogAspect {
             // 被忽略时，标记为 ignore 字符串，避免和 null 混在一起
             args.put(argName, !isIgnoreArgs(argValue) ? argValue : "[ignore]");
         }
-        return JSON.toJSONString(argValues);
+        return JSON.toJSONString(args);
     }
 
     private static String obtainResultData(Object result) {

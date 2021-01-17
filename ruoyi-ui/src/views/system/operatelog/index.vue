@@ -138,36 +138,41 @@
     <el-dialog title="操作日志详细" :visible.sync="open" width="700px" append-to-body>
       <el-form ref="form" :model="form" label-width="100px" size="mini">
         <el-row>
-          <el-col :span="12">
-            <el-form-item label="操作模块：">{{ form.title }} / {{ typeFormat(form) }}</el-form-item>
-            <el-form-item
-              label="登录信息："
-            >{{ form.operName }} / {{ form.operIp }} / {{ form.operLocation }}</el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="请求地址：">{{ form.operUrl }}</el-form-item>
-            <el-form-item label="请求方式：">{{ form.requestMethod }}</el-form-item>
+          <el-col :span="24">
+            <el-form-item label="日志主键：">{{ form.id }}</el-form-item>
           </el-col>
           <el-col :span="24">
-            <el-form-item label="操作方法：">{{ form.method }}</el-form-item>
+            <el-form-item label="链路追踪：">{{ form.traceId }}</el-form-item>
           </el-col>
           <el-col :span="24">
-            <el-form-item label="请求参数：">{{ form.operParam }}</el-form-item>
+            <el-form-item label="用户信息：">{{ form.userId }} | {{ form.userNickname }} | {{ form.userIp }} | {{ form.userAgent}} </el-form-item>
           </el-col>
           <el-col :span="24">
-            <el-form-item label="返回参数：">{{ form.jsonResult }}</el-form-item>
+            <el-form-item label="操作信息：">
+              {{ form.module }} | {{ form.name }} | {{ getDictDataLabel(DICT_TYPE.SYS_OPERATE_TYPE, form.type) }}
+              <br /> {{ form.content }}
+              <br /> {{ form.exts }}
+            </el-form-item>
           </el-col>
-          <el-col :span="12">
-            <el-form-item label="操作状态：">
-              <div v-if="form.status === 0">正常</div>
-              <div v-else-if="form.status === 1">失败</div>
+          <el-col :span="24">
+            <el-form-item label="请求信息：">{{ form.requestMethod }} | {{ form.requestUrl }} </el-form-item>
+          </el-col>
+          <el-col :span="24">
+            <el-form-item label="方法名：">{{ form.javaMethod }}</el-form-item>
+          </el-col>
+          <el-col :span="24">
+            <el-form-item label="方法参数：">{{ form.javaMethodArgs }}</el-form-item>
+          </el-col>
+          <el-col :span="24">
+            <el-form-item label="开始时间：">
+              {{ parseTime(form.startTime) }} | {{ form.duration }} ms
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="操作时间：">{{ parseTime(form.operTime) }}</el-form-item>
-          </el-col>
-          <el-col :span="24">
-            <el-form-item label="异常信息：" v-if="form.status === 1">{{ form.errorMsg }}</el-form-item>
+            <el-form-item label="操作结果：">
+              <div v-if="form.resultCode === 0">正常 | {{ form.resultData}} </div>
+              <div v-else-if="form.resultCode > 0">失败 | {{ form.resultCode }} || {{ form.resultMsg}}</div>
+            </el-form-item>
           </el-col>
         </el-row>
       </el-form>
@@ -258,7 +263,10 @@ export default {
     },
     /** 导出按钮操作 */
     handleExport() {
-      const queryParams = this.queryParams;
+      const queryParams = this.addDateRange(this.queryParams, [
+        this.dateRange[0] ? this.dateRange[0] + ' 00:00:00' : undefined,
+        this.dateRange[1] ? this.dateRange[1] + ' 23:59:59' : undefined,
+      ])
       this.$confirm('是否确认导出所有操作日志数据项?', "警告", {
           confirmButtonText: "确定",
           cancelButtonText: "取消",
@@ -266,7 +274,7 @@ export default {
         }).then(function() {
           return exportOperateLog(queryParams);
         }).then(response => {
-          this.download(response.msg);
+          this.downloadExcel(response, '操作日志.xls');
         })
     }
   }

@@ -12,6 +12,7 @@ public enum DictTypeEnum {
 
     SYS_USER_SEX("sys_user_sex"), // 用户性别
     SYS_COMMON_STATUS("sys_common_status"), // 系统状态
+    SYS_OPERATE_TYPE("sys_operate_type"), // 操作类型
     ;
 
 

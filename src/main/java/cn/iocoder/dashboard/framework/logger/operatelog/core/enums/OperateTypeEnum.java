@@ -11,7 +11,7 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
-public enum OperateLogTypeEnum {
+public enum OperateTypeEnum {
 
     /**
      * 查询
