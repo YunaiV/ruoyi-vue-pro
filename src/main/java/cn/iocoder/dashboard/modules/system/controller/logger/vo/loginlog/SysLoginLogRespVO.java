@@ -8,7 +8,7 @@ import lombok.ToString;
 
 import java.util.Date;
 
-@ApiModel("操作日志 Response VO")
+@ApiModel("登陆日志 Response VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
