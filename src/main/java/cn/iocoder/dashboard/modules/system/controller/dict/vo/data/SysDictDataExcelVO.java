@@ -5,7 +5,7 @@ import cn.iocoder.dashboard.framework.excel.core.convert.DictConvert;
 import com.alibaba.excel.annotation.ExcelProperty;
 import lombok.Data;
 
-import static cn.iocoder.dashboard.modules.system.enums.dict.DictTypeEnum.SYS_COMMON_STATUS;
+import static cn.iocoder.dashboard.modules.system.enums.dict.SysDictTypeEnum.SYS_COMMON_STATUS;
 
 /**
  * 字典数据 Excel 导出响应 VO

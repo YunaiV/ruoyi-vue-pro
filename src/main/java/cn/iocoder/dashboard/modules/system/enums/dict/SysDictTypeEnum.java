@@ -8,7 +8,7 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
-public enum DictTypeEnum {
+public enum SysDictTypeEnum {
 
     SYS_USER_SEX("sys_user_sex"), // 用户性别
     SYS_COMMON_STATUS("sys_common_status"), // 系统状态

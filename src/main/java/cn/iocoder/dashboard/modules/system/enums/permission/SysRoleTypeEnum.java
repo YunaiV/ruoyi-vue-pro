@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum RoleTypeEnum {
+public enum SysRoleTypeEnum {
 
     /**
      * 内置角色

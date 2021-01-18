@@ -2,8 +2,11 @@ package cn.iocoder.dashboard.modules.system.service.logger;
 
 import cn.iocoder.dashboard.common.pojo.PageResult;
 import cn.iocoder.dashboard.modules.system.controller.logger.vo.loginlog.SysLoginLogCreateReqVO;
+import cn.iocoder.dashboard.modules.system.controller.logger.vo.loginlog.SysLoginLogExportReqVO;
 import cn.iocoder.dashboard.modules.system.controller.logger.vo.loginlog.SysLoginLogPageReqVO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.logger.SysLoginLogDO;
+
+import java.util.List;
 
 /**
  * 登陆日志 Service 接口
@@ -24,5 +27,13 @@ public interface SysLoginLogService {
      * @return 登陆日志分页
      */
     PageResult<SysLoginLogDO> getLoginLogPage(SysLoginLogPageReqVO reqVO);
+
+    /**
+     * 获得登陆日志列表
+     *
+     * @param reqVO 列表条件
+     * @return 登陆日志列表
+     */
+    List<SysLoginLogDO> getLoginLogList(SysLoginLogExportReqVO reqVO);
 
 }

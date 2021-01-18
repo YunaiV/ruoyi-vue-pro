@@ -5,7 +5,7 @@ import cn.hutool.core.convert.Convert;
 import cn.iocoder.dashboard.framework.dict.core.util.DictUtils;
 import cn.iocoder.dashboard.framework.excel.core.annotations.DictFormat;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.dict.SysDictDataDO;
-import cn.iocoder.dashboard.modules.system.enums.dict.DictTypeEnum;
+import cn.iocoder.dashboard.modules.system.enums.dict.SysDictTypeEnum;
 import com.alibaba.excel.converters.Converter;
 import com.alibaba.excel.enums.CellDataTypeEnum;
 import com.alibaba.excel.metadata.CellData;
@@ -30,7 +30,7 @@ public class DictConvert implements Converter<Object> {
     public Object convertToJavaData(CellData cellData, ExcelContentProperty contentProperty,
                                     GlobalConfiguration globalConfiguration) {
         // 使用字典解析
-        DictTypeEnum type = getType(contentProperty);
+        SysDictTypeEnum type = getType(contentProperty);
         String label = cellData.getStringValue();
         SysDictDataDO dictData = DictUtils.parseDictDataFromCache(type.getValue(), label);
         if (dictData == null) {
@@ -46,7 +46,7 @@ public class DictConvert implements Converter<Object> {
     public CellData<String> convertToExcelData(Object object, ExcelContentProperty contentProperty,
                                        GlobalConfiguration globalConfiguration) {
         // 使用字典格式化
-        DictTypeEnum type = getType(contentProperty);
+        SysDictTypeEnum type = getType(contentProperty);
         String value = String.valueOf(object);
         SysDictDataDO dictData = DictUtils.getDictDataFromCache(type.getValue(), value);
         if (dictData == null) {
@@ -57,7 +57,7 @@ public class DictConvert implements Converter<Object> {
         return new CellData<>(dictData.getLabel());
     }
 
-    private static DictTypeEnum getType(ExcelContentProperty contentProperty) {
+    private static SysDictTypeEnum getType(ExcelContentProperty contentProperty) {
         return contentProperty.getField().getAnnotation(DictFormat.class).value();
     }
 

@@ -4,7 +4,7 @@ import cn.iocoder.dashboard.common.enums.CommonStatusEnum;
 import cn.iocoder.dashboard.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.dashboard.framework.security.core.enums.DataScopeEnum;
 import cn.iocoder.dashboard.modules.system.enums.permission.RoleCodeEnum;
-import cn.iocoder.dashboard.modules.system.enums.permission.RoleTypeEnum;
+import cn.iocoder.dashboard.modules.system.enums.permission.SysRoleTypeEnum;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -52,7 +52,7 @@ public class SysRoleDO extends BaseDO {
     /**
      * 角色类型
      *
-     * 枚举 {@link RoleTypeEnum}
+     * 枚举 {@link SysRoleTypeEnum}
      */
     private Integer type;
     /**

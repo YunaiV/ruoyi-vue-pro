@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.dashboard.common.pojo.PageResult;
 import cn.iocoder.dashboard.modules.system.controller.logger.vo.loginlog.SysLoginLogCreateReqVO;
+import cn.iocoder.dashboard.modules.system.controller.logger.vo.loginlog.SysLoginLogExportReqVO;
 import cn.iocoder.dashboard.modules.system.controller.logger.vo.loginlog.SysLoginLogPageReqVO;
 import cn.iocoder.dashboard.modules.system.convert.logger.SysLoginLogConvert;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dao.logger.SysLoginLogMapper;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.Collection;
+import java.util.List;
 
 import static cn.iocoder.dashboard.util.collection.CollectionUtils.convertSet;
 
@@ -39,6 +41,11 @@ public class SysLoginLogServiceImpl implements SysLoginLogService {
     @Override
     public PageResult<SysLoginLogDO> getLoginLogPage(SysLoginLogPageReqVO reqVO) {
         return loginLogMapper.selectPage(reqVO);
+    }
+
+    @Override
+    public List<SysLoginLogDO> getLoginLogList(SysLoginLogExportReqVO reqVO) {
+        return loginLogMapper.selectList(reqVO);
     }
 
 }

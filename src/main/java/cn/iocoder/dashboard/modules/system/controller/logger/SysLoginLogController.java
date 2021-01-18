@@ -2,6 +2,9 @@ package cn.iocoder.dashboard.modules.system.controller.logger;
 
 import cn.iocoder.dashboard.common.pojo.CommonResult;
 import cn.iocoder.dashboard.common.pojo.PageResult;
+import cn.iocoder.dashboard.framework.excel.core.util.ExcelUtils;
+import cn.iocoder.dashboard.modules.system.controller.logger.vo.loginlog.SysLoginLogExcelVO;
+import cn.iocoder.dashboard.modules.system.controller.logger.vo.loginlog.SysLoginLogExportReqVO;
 import cn.iocoder.dashboard.modules.system.controller.logger.vo.loginlog.SysLoginLogPageReqVO;
 import cn.iocoder.dashboard.modules.system.controller.logger.vo.loginlog.SysLoginLogRespVO;
 import cn.iocoder.dashboard.modules.system.convert.logger.SysLoginLogConvert;
@@ -15,6 +18,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.List;
 
 @Api(tags = "登陆日志 API")
 @RestController
@@ -32,13 +38,17 @@ public class SysLoginLogController {
         return CommonResult.success(SysLoginLogConvert.INSTANCE.convertPage(page));
     }
 
-//    @GetMapping("/export")
-////    @Log(title = "登录日志", businessType = BusinessType.EXPORT)
-////    @PreAuthorize("@ss.hasPermi('monitor:logininfor:export')")
-//    public void exportLoginLog(SysLogininfor logininfor) {
-//        List<SysLogininfor> list = logininforService.selectLogininforList(logininfor);
-//        ExcelUtil<SysLogininfor> util = new ExcelUtil<SysLogininfor>(SysLogininfor.class);
-//        return util.exportExcel(list, "登录日志");
-//    }
+    @ApiOperation("导出登陆日志 Excel")
+    @GetMapping("/export")
+//    @Log(title = "登录日志", businessType = BusinessType.EXPORT)
+//    @PreAuthorize("@ss.hasPermi('monitor:logininfor:export')")
+    public void exportLoginLog(HttpServletResponse response, @Validated SysLoginLogExportReqVO reqVO) throws IOException {
+        List<SysLoginLogDO> list = loginLogService.getLoginLogList(reqVO);
+        // 拼接数据
+        List<SysLoginLogExcelVO> excelDataList = SysLoginLogConvert.INSTANCE.convertList(list);
+        // 输出
+        ExcelUtils.write(response, "登陆日志.xls", "数据列表",
+                SysLoginLogExcelVO.class, excelDataList);
+    }
 
 }

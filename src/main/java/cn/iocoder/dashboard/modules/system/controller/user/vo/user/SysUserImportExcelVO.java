@@ -2,7 +2,7 @@ package cn.iocoder.dashboard.modules.system.controller.user.vo.user;
 
 import cn.iocoder.dashboard.framework.excel.core.annotations.DictFormat;
 import cn.iocoder.dashboard.framework.excel.core.convert.DictConvert;
-import cn.iocoder.dashboard.modules.system.enums.dict.DictTypeEnum;
+import cn.iocoder.dashboard.modules.system.enums.dict.SysDictTypeEnum;
 import com.alibaba.excel.annotation.ExcelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -34,11 +34,11 @@ public class SysUserImportExcelVO {
     private String mobile;
 
     @ExcelProperty(value = "用户性别", converter = DictConvert.class)
-    @DictFormat(DictTypeEnum.SYS_USER_SEX)
+    @DictFormat(SysDictTypeEnum.SYS_USER_SEX)
     private Integer sex;
 
     @ExcelProperty(value = "账号状态", converter = DictConvert.class)
-    @DictFormat(DictTypeEnum.SYS_COMMON_STATUS)
+    @DictFormat(SysDictTypeEnum.SYS_COMMON_STATUS)
     private Integer status;
 
 }

@@ -12,7 +12,7 @@ import cn.iocoder.dashboard.modules.system.convert.permission.SysRoleConvert;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dao.permission.SysRoleMapper;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.permission.SysRoleDO;
 import cn.iocoder.dashboard.modules.system.enums.permission.RoleCodeEnum;
-import cn.iocoder.dashboard.modules.system.enums.permission.RoleTypeEnum;
+import cn.iocoder.dashboard.modules.system.enums.permission.SysRoleTypeEnum;
 import cn.iocoder.dashboard.modules.system.service.permission.SysPermissionService;
 import cn.iocoder.dashboard.modules.system.service.permission.SysRoleService;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -101,7 +101,7 @@ public class SysRoleServiceImpl implements SysRoleService {
         checkDuplicateRole(reqVO.getName(), reqVO.getCode(), null);
         // 插入到数据库
         SysRoleDO role = SysRoleConvert.INSTANCE.convert(reqVO);
-        role.setType(RoleTypeEnum.CUSTOM.getType());
+        role.setType(SysRoleTypeEnum.CUSTOM.getType());
         role.setStatus(CommonStatusEnum.ENABLE.getStatus());
         roleMapper.insert(role);
         // 返回
@@ -207,7 +207,7 @@ public class SysRoleServiceImpl implements SysRoleService {
             throw ServiceExceptionUtil.exception(ROLE_NOT_EXISTS);
         }
         // 内置角色，不允许删除
-        if (RoleTypeEnum.SYSTEM.getType().equals(roleDO.getType())) {
+        if (SysRoleTypeEnum.SYSTEM.getType().equals(roleDO.getType())) {
             throw ServiceExceptionUtil.exception(ROLE_CAN_NOT_UPDATE_SYSTEM_TYPE_ROLE);
         }
     }

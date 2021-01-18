@@ -7,8 +7,8 @@ import lombok.Data;
 
 import java.util.Date;
 
-import static cn.iocoder.dashboard.modules.system.enums.dict.DictTypeEnum.SYS_COMMON_STATUS;
-import static cn.iocoder.dashboard.modules.system.enums.dict.DictTypeEnum.SYS_USER_SEX;
+import static cn.iocoder.dashboard.modules.system.enums.dict.SysDictTypeEnum.SYS_COMMON_STATUS;
+import static cn.iocoder.dashboard.modules.system.enums.dict.SysDictTypeEnum.SYS_USER_SEX;
 
 /**
  * 用户 Excel 导出 VO

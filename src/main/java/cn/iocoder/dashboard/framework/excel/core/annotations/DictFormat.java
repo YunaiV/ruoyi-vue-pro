@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.framework.excel.core.annotations;
 
-import cn.iocoder.dashboard.modules.system.enums.dict.DictTypeEnum;
+import cn.iocoder.dashboard.modules.system.enums.dict.SysDictTypeEnum;
 
 import java.lang.annotation.*;
 
@@ -14,6 +14,6 @@ import java.lang.annotation.*;
 @Inherited
 public @interface DictFormat {
 
-    DictTypeEnum value();
+    SysDictTypeEnum value();
 
 }

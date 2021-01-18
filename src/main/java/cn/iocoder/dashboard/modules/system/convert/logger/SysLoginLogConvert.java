@@ -2,10 +2,13 @@ package cn.iocoder.dashboard.modules.system.convert.logger;
 
 import cn.iocoder.dashboard.common.pojo.PageResult;
 import cn.iocoder.dashboard.modules.system.controller.logger.vo.loginlog.SysLoginLogCreateReqVO;
+import cn.iocoder.dashboard.modules.system.controller.logger.vo.loginlog.SysLoginLogExcelVO;
 import cn.iocoder.dashboard.modules.system.controller.logger.vo.loginlog.SysLoginLogRespVO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.logger.SysLoginLogDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
+
+import java.util.List;
 
 @Mapper
 public interface SysLoginLogConvert {
@@ -15,5 +18,7 @@ public interface SysLoginLogConvert {
     SysLoginLogDO convert(SysLoginLogCreateReqVO bean);
 
     PageResult<SysLoginLogRespVO> convertPage(PageResult<SysLoginLogDO> page);
+
+    List<SysLoginLogExcelVO> convertList(List<SysLoginLogDO> list);
 
 }
