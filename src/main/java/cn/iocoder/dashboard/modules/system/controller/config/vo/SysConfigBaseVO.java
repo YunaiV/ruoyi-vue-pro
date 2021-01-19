@@ -5,6 +5,7 @@ import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 /**
@@ -29,11 +30,8 @@ public class SysConfigBaseVO {
     @Size(max = 500, message = "参数键值长度不能超过500个字符")
     private String value;
 
-    @ApiModelProperty(value = "参数类型", required = true, example = "1", notes = "参见 SysConfigTypeEnum 枚举")
-    private String type;
-
     @ApiModelProperty(value = "是否敏感", required = true, example = "true")
-    @NotBlank(message = "是否敏感不能为空")
+    @NotNull(message = "是否敏感不能为空")
     private Boolean sensitive;
 
     @ApiModelProperty(value = "备注", example = "备注一下很帅气！")

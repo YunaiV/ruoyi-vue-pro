@@ -74,4 +74,10 @@ public interface SysErrorCodeConstants {
 
     // ========== 文件 1002009000 ==========
     ErrorCode FILE_PATH_EXISTS = new ErrorCode(1002009001, "文件路径已经存在");
+
+    // ========== 参数配置 1002010000 ==========
+    ErrorCode CONFIG_NOT_FOUND = new ErrorCode(1002010001, "参数配置不存在");
+    ErrorCode CONFIG_NAME_DUPLICATE = new ErrorCode(1002010002, "参数配置 key 重复");
+    ErrorCode CONFIG_CAN_NOT_DELETE_SYSTEM_TYPE = new ErrorCode(1002010003, "不能删除类型为系统内置的参数配置");
+    ErrorCode CONFIG_GET_VALUE_ERROR_IF_SENSITIVE = new ErrorCode(1002010004, "不允许获取敏感配置到前端");
 }

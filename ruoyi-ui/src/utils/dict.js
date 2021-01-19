@@ -13,7 +13,8 @@ export const DICT_TYPE = {
   SYS_USER_SEX: 'sys_user_sex',
   SYS_NOTICE_TYPE: 'sys_notice_type',
   SYS_OPERATE_TYPE: 'sys_operate_type',
-  SYS_LOGIN_RESULT: 'sys_login_result'
+  SYS_LOGIN_RESULT: 'sys_login_result',
+  SYS_CONFIG_TYPE: 'sys_config_type',
 }
 
 /**

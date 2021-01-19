@@ -1,0 +1,36 @@
+package cn.iocoder.dashboard.modules.system.controller.config.vo;
+
+import cn.iocoder.dashboard.common.pojo.PageParam;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.util.Date;
+
+import static cn.iocoder.dashboard.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
+
+@ApiModel("参数配置分页 Request VO")
+@Data
+@EqualsAndHashCode(callSuper = true)
+public class SysConfigPageReqVO extends PageParam {
+
+    @ApiModelProperty(value = "参数名称", example = "模糊匹配")
+    private String name;
+
+    @ApiModelProperty(value = "参数键名", example = "yunai.db.username", notes = "模糊匹配")
+    private String key;
+
+    @ApiModelProperty(value = "参数类型", example = "1", notes = "参见 SysConfigTypeEnum 枚举")
+    private Integer type;
+
+    @ApiModelProperty(value = "开始时间", example = "2020-10-24")
+    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
+    private Date beginTime;
+
+    @ApiModelProperty(value = "结束时间", example = "2020-10-24")
+    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
+    private Date endTime;
+
+}

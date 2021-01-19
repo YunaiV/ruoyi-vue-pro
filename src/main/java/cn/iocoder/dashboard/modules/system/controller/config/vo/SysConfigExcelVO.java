@@ -1,5 +1,8 @@
 package cn.iocoder.dashboard.modules.system.controller.config.vo;
 
+import cn.iocoder.dashboard.framework.excel.core.annotations.DictFormat;
+import cn.iocoder.dashboard.framework.excel.core.convert.DictConvert;
+import cn.iocoder.dashboard.modules.system.enums.dict.SysDictTypeEnum;
 import com.alibaba.excel.annotation.ExcelProperty;
 import lombok.Data;
 
@@ -26,10 +29,12 @@ public class SysConfigExcelVO {
     @ExcelProperty("参数键值")
     private String value;
 
-    @ExcelProperty("参数类型")
-    private String type;
+    @ExcelProperty(value = "参数类型", converter = DictConvert.class)
+    @DictFormat(SysDictTypeEnum.SYS_CONFIG_TYPE)
+    private Integer type;
 
-    @ExcelProperty("是否敏感")
+    @ExcelProperty(value = "是否敏感", converter = DictConvert.class)
+    @DictFormat(SysDictTypeEnum.SYS_BOOLEAN_STRING)
     private Boolean sensitive;
 
     @ExcelProperty("备注")

@@ -14,6 +14,8 @@ public enum SysDictTypeEnum {
     SYS_COMMON_STATUS("sys_common_status"), // 系统状态
     SYS_OPERATE_TYPE("sys_operate_type"), // 操作类型
     SYS_LOGIN_RESULT("sys_login_result"), // 登陆结果
+    SYS_CONFIG_TYPE("sys_config_type"), // 参数配置类型
+    SYS_BOOLEAN_STRING("sys_boolean_string"), // Boolean 是否类型
     ;
 
 
