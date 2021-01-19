@@ -11,6 +11,7 @@ import cn.iocoder.dashboard.modules.system.service.config.SysConfigService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,20 +28,18 @@ import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.CO
 @RequestMapping("/system/config")
 public class SysConfigController {
 
-//    private SpringValueRegistry
-//
-//    @Value("demo.test")
-//    private String demo;
-//
-//    @GetMapping("/demo")
-//    public String demo() {
-//        return demo;
-//    }
-//
-//    @PostMapping("/demo")
-//    public void setDemo() {
-//
-//    }
+    @Value("${demo.test:false}")
+    private String demo;
+
+    @GetMapping("/demo")
+    public String demo() {
+        return demo;
+    }
+
+    @PostMapping("/demo")
+    public void setDemo() {
+
+    }
 
     @Resource
     private SysConfigService configService;

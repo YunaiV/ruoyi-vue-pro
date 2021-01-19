@@ -1,5 +1,8 @@
 package cn.iocoder.dashboard.framework.apollox.spring.property;
 
+import cn.iocoder.dashboard.framework.apollox.spring.config.ConfigPropertySource;
+import cn.iocoder.dashboard.framework.apollox.spring.config.ConfigPropertySourceFactory;
+import cn.iocoder.dashboard.framework.apollox.spring.util.SpringInjector;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -9,6 +12,7 @@ import org.springframework.core.PriorityOrdered;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.Environment;
 
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -28,14 +32,29 @@ public class PropertySourcesProcessor implements BeanFactoryPostProcessor, Envir
      */
     private static final AtomicBoolean INITIALIZED = new AtomicBoolean(false);
 
+    private final ConfigPropertySourceFactory configPropertySourceFactory = SpringInjector.getInstance(ConfigPropertySourceFactory.class);
     /**
      * Spring ConfigurableEnvironment 对象
      */
     private ConfigurableEnvironment environment;
 
+
     @Override
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+        if (INITIALIZED.compareAndSet(false, true)) {
+            // 初始化 AutoUpdateConfigChangeListener 对象，实现属性的自动更新
+            initializeAutoUpdatePropertiesFeature(beanFactory);
+        }
+    }
 
+    private void initializeAutoUpdatePropertiesFeature(ConfigurableListableBeanFactory beanFactory) {
+        // 创建 AutoUpdateConfigChangeListener 对象
+        AutoUpdateConfigChangeListener autoUpdateConfigChangeListener = new AutoUpdateConfigChangeListener(environment, beanFactory);
+        // 循环，向 ConfigPropertySource 注册配置变更器
+        List<ConfigPropertySource> configPropertySources = configPropertySourceFactory.getAllConfigPropertySources();
+        for (ConfigPropertySource configPropertySource : configPropertySources) {
+            configPropertySource.addChangeListener(autoUpdateConfigChangeListener);
+        }
     }
 
     @Override

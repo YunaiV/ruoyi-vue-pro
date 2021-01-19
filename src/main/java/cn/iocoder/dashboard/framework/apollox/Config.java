@@ -25,4 +25,11 @@ public interface Config {
      */
     Set<String> getPropertyNames();
 
+    /**
+     * Add change listener to this config instance.
+     *
+     * @param listener the config change listener
+     */
+    void addChangeListener(ConfigChangeListener listener);
+
 }

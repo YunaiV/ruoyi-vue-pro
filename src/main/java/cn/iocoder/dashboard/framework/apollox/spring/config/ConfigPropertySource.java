@@ -1,6 +1,7 @@
 package cn.iocoder.dashboard.framework.apollox.spring.config;
 
 import cn.iocoder.dashboard.framework.apollox.Config;
+import cn.iocoder.dashboard.framework.apollox.ConfigChangeListener;
 import org.springframework.core.env.EnumerablePropertySource;
 
 import java.util.Set;
@@ -16,7 +17,7 @@ public class ConfigPropertySource extends EnumerablePropertySource<Config> {
 
     private static final String[] EMPTY_ARRAY = new String[0];
 
-    public ConfigPropertySource(String name, Config source) { // 此处的 Apollo Config 作为 `source`
+    ConfigPropertySource(String name, Config source) { // 此处的 Apollo Config 作为 `source`
         super(name, source);
     }
 
@@ -34,6 +35,15 @@ public class ConfigPropertySource extends EnumerablePropertySource<Config> {
     @Override
     public Object getProperty(String name) {
         return this.source.getProperty(name, null);
+    }
+
+    /**
+     * 添加 ConfigChangeListener 到 Config 中
+     *
+     * @param listener 监听器
+     */
+    public void addChangeListener(ConfigChangeListener listener) {
+        this.source.addChangeListener(listener);
     }
 
 }

@@ -1,5 +1,6 @@
 package cn.iocoder.dashboard.framework.apollox.spring.config;
 
+import cn.iocoder.dashboard.framework.apollox.spring.annotation.ApolloAnnotationProcessor;
 import cn.iocoder.dashboard.framework.apollox.spring.annotation.SpringValueProcessor;
 import cn.iocoder.dashboard.framework.apollox.spring.property.PropertySourcesProcessor;
 import cn.iocoder.dashboard.framework.apollox.spring.property.SpringValueDefinitionProcessor;
@@ -20,8 +21,12 @@ public class ConfigPropertySourcesProcessor extends PropertySourcesProcessor imp
     public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
         // 注册 PropertySourcesPlaceholderConfigurer 到 BeanDefinitionRegistry 中，替换 PlaceHolder 为对应的属性值，参考文章 https://leokongwq.github.io/2016/12/28/spring-PropertyPlaceholderConfigurer.html
         BeanRegistrationUtil.registerBeanDefinitionIfNotExists(registry, PropertySourcesPlaceholderConfigurer.class.getName(), PropertySourcesPlaceholderConfigurer.class);
+        // 注册 ApolloAnnotationProcessor 到 BeanDefinitionRegistry 中，因为 XML 配置的 Bean 对象，也可能存在 @ApolloConfig 和 @ApolloConfigChangeListener 注解。
+        BeanRegistrationUtil.registerBeanDefinitionIfNotExists(registry, ApolloAnnotationProcessor.class.getName(), ApolloAnnotationProcessor.class);
         // 注册 SpringValueProcessor 到 BeanDefinitionRegistry 中，用于 PlaceHolder 自动更新机制
         BeanRegistrationUtil.registerBeanDefinitionIfNotExists(registry, SpringValueProcessor.class.getName(), SpringValueProcessor.class);
+        // 注册 ApolloJsonValueProcessor 到 BeanDefinitionRegistry 中，因为 XML 配置的 Bean 对象，也可能存在 @ApolloJsonValue 注解。
+//        BeanRegistrationUtil.registerBeanDefinitionIfNotExists(registry, ApolloJsonValueProcessor.class.getName(), ApolloJsonValueProcessor.class); TODO 芋艿：暂时不需要迁移
 
         // 处理 XML 配置的 Spring PlaceHolder
         processSpringValueDefinition(registry);

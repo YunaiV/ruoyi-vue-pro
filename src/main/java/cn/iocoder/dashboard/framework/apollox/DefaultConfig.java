@@ -1,8 +1,9 @@
 package cn.iocoder.dashboard.framework.apollox;
 
+import java.util.Collections;
 import java.util.Set;
 
-public class DBConfig implements Config {
+public class DefaultConfig implements Config {
 
     @Override
     public String getProperty(String key, String defaultValue) {
@@ -11,7 +12,12 @@ public class DBConfig implements Config {
 
     @Override
     public Set<String> getPropertyNames() {
-        return null;
+        return Collections.emptySet(); // TODO 等下实现
+    }
+
+    @Override
+    public void addChangeListener(ConfigChangeListener listener) {
+
     }
 
 }
