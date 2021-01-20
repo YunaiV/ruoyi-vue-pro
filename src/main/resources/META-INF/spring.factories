@@ -1,4 +1,0 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-    cn.iocoder.dashboard.framework.apollox.spring.boot.ApolloAutoConfiguration
-org.springframework.context.ApplicationContextInitializer=\
-    cn.iocoder.dashboard.framework.apollox.spring.boot.ApolloApplicationContextInitializer

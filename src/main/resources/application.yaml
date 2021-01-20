@@ -50,10 +50,9 @@ yudao:
 # Apollo 配置中心
 apollo:
   bootstrap:
-    enabled: true
+    enabled: true # 设置 Apollo 在启动阶段生效
     eagerLoad:
-      enabled: true
-  autoUpdateInjectedSpringProperties: true
+      enabled: true # 设置 Apollo 在日志初始化前生效，可以实现日志的动态级别配置
 
 # MyBatis Plus 的配置项
 mybatis-plus:
