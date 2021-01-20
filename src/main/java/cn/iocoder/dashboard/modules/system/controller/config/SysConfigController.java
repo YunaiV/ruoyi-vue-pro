@@ -28,7 +28,7 @@ import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.CO
 @RequestMapping("/system/config")
 public class SysConfigController {
 
-    @Value("${demo.test:false}")
+    @Value("${demo.test}")
     private String demo;
 
     @GetMapping("/demo")

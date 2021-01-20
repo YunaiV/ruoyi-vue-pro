@@ -167,6 +167,13 @@
             <version>${redisson.version}</version>
         </dependency>
 
+        <!-- -->
+        <dependency>
+            <groupId>com.ctrip.framework.apollo</groupId>
+            <artifactId>apollo-client</artifactId>
+            <version>1.7.0</version>
+        </dependency>
+
         <!-- 监控相关 -->
         <dependency>
             <groupId>org.apache.skywalking</groupId>

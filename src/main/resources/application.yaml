@@ -47,6 +47,14 @@ yudao:
   file:
     base-path: http://127.0.0.1:1024/api/file/get/
 
+# Apollo 配置中心
+apollo:
+  bootstrap:
+    enabled: true
+    eagerLoad:
+      enabled: true
+  autoUpdateInjectedSpringProperties: true
+
 # MyBatis Plus 的配置项
 mybatis-plus:
   configuration:

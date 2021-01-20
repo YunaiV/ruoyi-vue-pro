@@ -6,8 +6,8 @@ import cn.iocoder.dashboard.modules.system.controller.dept.vo.post.SysPostExport
 import cn.iocoder.dashboard.modules.system.controller.dept.vo.post.SysPostPageReqVO;
 import cn.iocoder.dashboard.modules.system.controller.dept.vo.post.SysPostUpdateReqVO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.dept.SysPostDO;
+import org.springframework.lang.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.List;
 
