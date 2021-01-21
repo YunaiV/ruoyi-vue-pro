@@ -1,11 +1,11 @@
-package cn.iocoder.dashboard.modules.system.enums.config;
+package cn.iocoder.dashboard.modules.infra.enums.config;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum SysConfigTypeEnum {
+public enum InfConfigTypeEnum {
 
     /**
      * 系统配置

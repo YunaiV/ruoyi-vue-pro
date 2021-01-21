@@ -1,13 +1,13 @@
-package cn.iocoder.dashboard.modules.system.controller.config;
+package cn.iocoder.dashboard.modules.infra.controller.config;
 
 import cn.iocoder.dashboard.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.dashboard.common.pojo.CommonResult;
 import cn.iocoder.dashboard.common.pojo.PageResult;
 import cn.iocoder.dashboard.framework.excel.core.util.ExcelUtils;
-import cn.iocoder.dashboard.modules.system.controller.config.vo.*;
-import cn.iocoder.dashboard.modules.system.convert.config.SysConfigConvert;
-import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.config.SysConfigDO;
-import cn.iocoder.dashboard.modules.system.service.config.SysConfigService;
+import cn.iocoder.dashboard.modules.infra.controller.config.vo.*;
+import cn.iocoder.dashboard.modules.infra.convert.config.InfConfigConvert;
+import cn.iocoder.dashboard.modules.infra.dal.mysql.dataobject.config.InfConfigDO;
+import cn.iocoder.dashboard.modules.infra.service.config.InfConfigService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
@@ -21,12 +21,12 @@ import java.io.IOException;
 import java.util.List;
 
 import static cn.iocoder.dashboard.common.pojo.CommonResult.success;
-import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.CONFIG_GET_VALUE_ERROR_IF_SENSITIVE;
+import static cn.iocoder.dashboard.modules.infra.enums.InfErrorCodeConstants.CONFIG_GET_VALUE_ERROR_IF_SENSITIVE;
 
 @Api(tags = "参数配置")
 @RestController
-@RequestMapping("/system/config")
-public class SysConfigController {
+@RequestMapping("/infra/config")
+public class InfConfigController {
 
     @Value("${demo.test}")
     private String demo;
@@ -42,42 +42,42 @@ public class SysConfigController {
     }
 
     @Resource
-    private SysConfigService configService;
+    private InfConfigService configService;
 
     @ApiOperation("获取参数配置分页")
     @GetMapping("/page")
-//    @PreAuthorize("@ss.hasPermi('system:config:list')")
-    public CommonResult<PageResult<SysConfigRespVO>> getConfigPage(@Validated SysConfigPageReqVO reqVO) {
-        PageResult<SysConfigDO> page = configService.getConfigPage(reqVO);
-        return success(SysConfigConvert.INSTANCE.convertPage(page));
+//    @PreAuthorize("@ss.hasPermi('infra:config:list')")
+    public CommonResult<PageResult<InfConfigRespVO>> getConfigPage(@Validated InfConfigPageReqVO reqVO) {
+        PageResult<InfConfigDO> page = configService.getConfigPage(reqVO);
+        return success(InfConfigConvert.INSTANCE.convertPage(page));
     }
 
     @ApiOperation("导出参数配置")
     @GetMapping("/export")
 //    @Log(title = "参数管理", businessType = BusinessType.EXPORT)
-//    @PreAuthorize("@ss.hasPermi('system:config:export')")
-    public void exportSysConfig(HttpServletResponse response, @Validated SysConfigExportReqVO reqVO) throws IOException {
-        List<SysConfigDO> list = configService.getConfigList(reqVO);
+//    @PreAuthorize("@ss.hasPermi('infra:config:export')")
+    public void exportSysConfig(HttpServletResponse response, @Validated InfConfigExportReqVO reqVO) throws IOException {
+        List<InfConfigDO> list = configService.getConfigList(reqVO);
         // 拼接数据
-        List<SysConfigExcelVO> excelDataList = SysConfigConvert.INSTANCE.convertList(list);
+        List<InfConfigExcelVO> excelDataList = InfConfigConvert.INSTANCE.convertList(list);
         // 输出
         ExcelUtils.write(response, "参数配置.xls", "配置列表",
-                SysConfigExcelVO.class, excelDataList);
+                InfConfigExcelVO.class, excelDataList);
     }
 
     @ApiOperation("获得参数配置")
     @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
     @GetMapping(value = "/get")
-//    @PreAuthorize("@ss.hasPermi('system:config:query')")
-    public CommonResult<SysConfigRespVO> getConfig(@RequestParam("id") Long id) {
-        return success(SysConfigConvert.INSTANCE.convert(configService.getConfig(id)));
+//    @PreAuthorize("@ss.hasPermi('infra:config:query')")
+    public CommonResult<InfConfigRespVO> getConfig(@RequestParam("id") Long id) {
+        return success(InfConfigConvert.INSTANCE.convert(configService.getConfig(id)));
     }
 
     @ApiOperation(value = "根据参数键名查询参数值", notes = "敏感配置，不允许返回给前端")
     @ApiImplicitParam(name = "key", value = "参数键", required = true, example = "yunai.biz.username", dataTypeClass = String.class)
     @GetMapping(value = "/get-value-by-key")
     public CommonResult<String> getConfigKey(@RequestParam("key") String key) {
-        SysConfigDO config = configService.getConfigByKey(key);
+        InfConfigDO config = configService.getConfigByKey(key);
         if (config == null) {
             return null;
         }
@@ -89,18 +89,18 @@ public class SysConfigController {
 
     @ApiOperation("新增参数配置")
     @PostMapping("/create")
-//    @PreAuthorize("@ss.hasPermi('system:config:add')")
+//    @PreAuthorize("@ss.hasPermi('infra:config:add')")
 //    @Log(title = "参数管理", businessType = BusinessType.INSERT)
 //    @RepeatSubmit
-    public CommonResult<Long> createConfig(@Validated @RequestBody SysConfigCreateReqVO reqVO) {
+    public CommonResult<Long> createConfig(@Validated @RequestBody InfConfigCreateReqVO reqVO) {
         return success(configService.createConfig(reqVO));
     }
 
     @ApiOperation("修改参数配置")
     @PutMapping("/update")
-//    @PreAuthorize("@ss.hasPermi('system:config:edit')")
+//    @PreAuthorize("@ss.hasPermi('infra:config:edit')")
 //    @Log(title = "参数管理", businessType = BusinessType.UPDATE)
-    public CommonResult<Boolean> edit(@Validated @RequestBody SysConfigUpdateReqVO reqVO) {
+    public CommonResult<Boolean> edit(@Validated @RequestBody InfConfigUpdateReqVO reqVO) {
         configService.updateConfig(reqVO);
         return success(true);
     }
@@ -108,7 +108,7 @@ public class SysConfigController {
     @ApiOperation("删除参数配置")
     @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
     @DeleteMapping("/delete")
-//    @PreAuthorize("@ss.hasPermi('system:config:remove')")
+//    @PreAuthorize("@ss.hasPermi('infra:config:remove')")
 //    @Log(title = "参数管理", businessType = BusinessType.DELETE)
     public CommonResult<Boolean> deleteConfig(@RequestParam("id") Long id) {
         configService.deleteConfig(id);

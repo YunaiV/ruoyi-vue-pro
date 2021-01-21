@@ -1,7 +1,7 @@
-package cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.config;
+package cn.iocoder.dashboard.modules.infra.dal.mysql.dataobject.config;
 
 import cn.iocoder.dashboard.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.dashboard.modules.system.enums.config.SysConfigTypeEnum;
+import cn.iocoder.dashboard.modules.infra.enums.config.InfConfigTypeEnum;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
@@ -13,11 +13,11 @@ import lombok.ToString;
  *
  * @author ruoyi
  */
-@TableName("sys_config")
+@TableName("inf_config")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class SysConfigDO extends BaseDO {
+public class InfConfigDO extends BaseDO {
 
     /**
      * 参数主键
@@ -44,7 +44,7 @@ public class SysConfigDO extends BaseDO {
     /**
      * 参数类型
      *
-     * 枚举 {@link SysConfigTypeEnum}
+     * 枚举 {@link InfConfigTypeEnum}
      */
     @TableField("`type`")
     private Integer type;

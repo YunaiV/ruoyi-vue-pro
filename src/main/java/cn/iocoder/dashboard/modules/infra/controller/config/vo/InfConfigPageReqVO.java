@@ -1,4 +1,4 @@
-package cn.iocoder.dashboard.modules.system.controller.config.vo;
+package cn.iocoder.dashboard.modules.infra.controller.config.vo;
 
 import cn.iocoder.dashboard.common.pojo.PageParam;
 import io.swagger.annotations.ApiModel;
@@ -14,7 +14,7 @@ import static cn.iocoder.dashboard.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOU
 @ApiModel("参数配置分页 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class SysConfigPageReqVO extends PageParam {
+public class InfConfigPageReqVO extends PageParam {
 
     @ApiModelProperty(value = "参数名称", example = "模糊匹配")
     private String name;

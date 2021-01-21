@@ -1,4 +1,4 @@
-package cn.iocoder.dashboard.modules.system.controller.config.vo;
+package cn.iocoder.dashboard.modules.infra.controller.config.vo;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -13,7 +13,7 @@ import javax.validation.constraints.Size;
  * 如果子 VO 存在差异的字段，请不要添加到这里，影响 Swagger 文档生成
  */
 @Data
-public class SysConfigBaseVO {
+public class InfConfigBaseVO {
 
     @ApiModelProperty(value = "参数分组", required = true, example = "biz")
     @NotEmpty(message = "参数分组不能为空")

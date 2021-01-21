@@ -8,6 +8,11 @@ import com.ctrip.framework.apollo.internals.ConfigRepository;
 import com.ctrip.framework.apollo.internals.DefaultConfig;
 import com.ctrip.framework.apollo.spi.ConfigFactory;
 
+/**
+ * 基于 DB 的 ConfigFactory 实现类
+ *
+ * @author 芋道源码
+ */
 public class DBConfigFactory implements ConfigFactory {
 
     @Override
@@ -21,7 +26,7 @@ public class DBConfigFactory implements ConfigFactory {
     }
 
     private ConfigRepository createDBConfigRepository(String namespace) {
-        return new DBConfigRepository(namespace); // TODO 芋艿：看看怎么优化
+        return new DBConfigRepository(namespace);
     }
 
 }

@@ -53,6 +53,10 @@ apollo:
     enabled: true # 设置 Apollo 在启动阶段生效
     eagerLoad:
       enabled: true # 设置 Apollo 在日志初始化前生效，可以实现日志的动态级别配置
+  jdbc: # 自定义的 JDBC 配置项，用于数据库的地址
+    url: ${spring.datasource.url}
+    username: ${spring.datasource.username}
+    password: ${spring.datasource.password}
 
 # MyBatis Plus 的配置项
 mybatis-plus:

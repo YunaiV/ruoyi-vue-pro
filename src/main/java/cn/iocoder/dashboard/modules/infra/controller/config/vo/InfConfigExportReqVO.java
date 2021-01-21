@@ -1,4 +1,4 @@
-package cn.iocoder.dashboard.modules.system.controller.config.vo;
+package cn.iocoder.dashboard.modules.infra.controller.config.vo;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -11,7 +11,7 @@ import static cn.iocoder.dashboard.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOU
 
 @ApiModel("参数配置导出 Request VO")
 @Data
-public class SysConfigExportReqVO {
+public class InfConfigExportReqVO {
 
     @ApiModelProperty(value = "参数名称", example = "模糊匹配")
     private String name;

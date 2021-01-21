@@ -24,7 +24,6 @@
         <!-- 统一依赖管理 -->
         <spring.boot.version>2.4.2</spring.boot.version>
 
-<!--        <ruoyi.version>3.3.0</ruoyi.version>-->
 <!--        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>-->
 <!--        <maven-jar-plugin.version>3.1.1</maven-jar-plugin.version>-->
 <!--        <druid.version>1.2.2</druid.version>-->
@@ -48,7 +47,7 @@
         <mysql-connector-java.version>5.1.46</mysql-connector-java.version>
         <druid.version>1.2.4</druid.version>
         <mybatis-plus.version>3.4.1</mybatis-plus.version>
-        <redisson.version>3.13.6</redisson.version>
+        <redisson.version>3.14.1</redisson.version>
         <!-- 监控相关 -->
         <skywalking.version>8.3.0</skywalking.version>
         <!-- 工具类相关 -->
@@ -142,6 +141,12 @@
             <groupId>com.github.xiaoymin</groupId>
             <artifactId>knife4j-spring-boot-starter</artifactId>
             <version>${knife4j.version}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>mapstruct</artifactId>
+                    <groupId>org.mapstruct</groupId> <!-- 避免冲突 -->
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- DB 相关 -->

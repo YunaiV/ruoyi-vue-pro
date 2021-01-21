@@ -1,16 +1,16 @@
-package cn.iocoder.dashboard.modules.system.service.config.impl;
+package cn.iocoder.dashboard.modules.infra.service.config.impl;
 
 import cn.iocoder.dashboard.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.dashboard.common.pojo.PageResult;
-import cn.iocoder.dashboard.modules.system.controller.config.vo.SysConfigCreateReqVO;
-import cn.iocoder.dashboard.modules.system.controller.config.vo.SysConfigExportReqVO;
-import cn.iocoder.dashboard.modules.system.controller.config.vo.SysConfigPageReqVO;
-import cn.iocoder.dashboard.modules.system.controller.config.vo.SysConfigUpdateReqVO;
-import cn.iocoder.dashboard.modules.system.convert.config.SysConfigConvert;
-import cn.iocoder.dashboard.modules.system.dal.mysql.dao.config.SysConfigMapper;
-import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.config.SysConfigDO;
-import cn.iocoder.dashboard.modules.system.enums.config.SysConfigTypeEnum;
-import cn.iocoder.dashboard.modules.system.service.config.SysConfigService;
+import cn.iocoder.dashboard.modules.infra.controller.config.vo.InfConfigCreateReqVO;
+import cn.iocoder.dashboard.modules.infra.controller.config.vo.InfConfigExportReqVO;
+import cn.iocoder.dashboard.modules.infra.controller.config.vo.InfConfigPageReqVO;
+import cn.iocoder.dashboard.modules.infra.controller.config.vo.InfConfigUpdateReqVO;
+import cn.iocoder.dashboard.modules.infra.convert.config.InfConfigConvert;
+import cn.iocoder.dashboard.modules.infra.dal.mysql.dao.config.InfConfigMapper;
+import cn.iocoder.dashboard.modules.infra.dal.mysql.dataobject.config.InfConfigDO;
+import cn.iocoder.dashboard.modules.infra.enums.config.InfConfigTypeEnum;
+import cn.iocoder.dashboard.modules.infra.service.config.InfConfigService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -18,64 +18,64 @@ import javax.annotation.Resource;
 
 import java.util.List;
 
-import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.*;
+import static cn.iocoder.dashboard.modules.infra.enums.InfErrorCodeConstants.*;
 
 /**
  * 参数配置 Service 实现类
  */
 @Service
 @Slf4j
-public class SysConfigServiceImpl implements SysConfigService {
+public class InfConfigServiceImpl implements InfConfigService {
 
     @Resource
-    private SysConfigMapper configMapper;
+    private InfConfigMapper configMapper;
 
     @Override
-    public PageResult<SysConfigDO> getConfigPage(SysConfigPageReqVO reqVO) {
+    public PageResult<InfConfigDO> getConfigPage(InfConfigPageReqVO reqVO) {
         return configMapper.selectPage(reqVO);
     }
 
     @Override
-    public List<SysConfigDO> getConfigList(SysConfigExportReqVO reqVO) {
+    public List<InfConfigDO> getConfigList(InfConfigExportReqVO reqVO) {
         return configMapper.selectList(reqVO);
     }
 
     @Override
-    public SysConfigDO getConfig(Long id) {
+    public InfConfigDO getConfig(Long id) {
         return configMapper.selectById(id);
     }
 
     @Override
-    public SysConfigDO getConfigByKey(String key) {
+    public InfConfigDO getConfigByKey(String key) {
         return configMapper.selectByKey(key);
     }
 
     @Override
-    public Long createConfig(SysConfigCreateReqVO reqVO) {
+    public Long createConfig(InfConfigCreateReqVO reqVO) {
         // 校验正确性
         checkCreateOrUpdate(null, reqVO.getKey());
         // 插入参数配置
-        SysConfigDO config = SysConfigConvert.INSTANCE.convert(reqVO);
-        config.setType(SysConfigTypeEnum.CUSTOM.getType());
+        InfConfigDO config = InfConfigConvert.INSTANCE.convert(reqVO);
+        config.setType(InfConfigTypeEnum.CUSTOM.getType());
         configMapper.insert(config);
         return config.getId();
     }
 
     @Override
-    public void updateConfig(SysConfigUpdateReqVO reqVO) {
+    public void updateConfig(InfConfigUpdateReqVO reqVO) {
         // 校验正确性
         checkCreateOrUpdate(reqVO.getId(), null); // 不允许更新 key
         // 更新参数配置
-        SysConfigDO updateObj = SysConfigConvert.INSTANCE.convert(reqVO);
+        InfConfigDO updateObj = InfConfigConvert.INSTANCE.convert(reqVO);
         configMapper.updateById(updateObj);
     }
 
     @Override
     public void deleteConfig(Long id) {
         // 校验配置存在
-        SysConfigDO config = checkConfigExists(id);
+        InfConfigDO config = checkConfigExists(id);
         // 内置配置，不允许删除
-        if (SysConfigTypeEnum.SYSTEM.getType().equals(config.getType())) {
+        if (InfConfigTypeEnum.SYSTEM.getType().equals(config.getType())) {
             throw ServiceExceptionUtil.exception(CONFIG_CAN_NOT_DELETE_SYSTEM_TYPE);
         }
         // 删除
@@ -89,11 +89,11 @@ public class SysConfigServiceImpl implements SysConfigService {
         checkConfigKeyUnique(id, key);
     }
 
-    private SysConfigDO checkConfigExists(Long id) {
+    private InfConfigDO checkConfigExists(Long id) {
         if (id == null) {
             return null;
         }
-        SysConfigDO config = configMapper.selectById(id);
+        InfConfigDO config = configMapper.selectById(id);
         if (config == null) {
             throw ServiceExceptionUtil.exception(CONFIG_NOT_FOUND);
         }
@@ -101,7 +101,7 @@ public class SysConfigServiceImpl implements SysConfigService {
     }
 
     private void checkConfigKeyUnique(Long id, String key) {
-        SysConfigDO config = configMapper.selectByKey(key);
+        InfConfigDO config = configMapper.selectByKey(key);
         if (config == null) {
             return;
         }

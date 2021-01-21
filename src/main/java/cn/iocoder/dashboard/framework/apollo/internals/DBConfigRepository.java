@@ -1,8 +1,9 @@
 package cn.iocoder.dashboard.framework.apollo.internals;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.iocoder.dashboard.framework.apollo.core.ConfigConsts;
 import cn.iocoder.dashboard.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.config.SysConfigDO;
+import cn.iocoder.dashboard.modules.infra.dal.mysql.dataobject.config.InfConfigDO;
 import com.ctrip.framework.apollo.Apollo;
 import com.ctrip.framework.apollo.build.ApolloInjector;
 import com.ctrip.framework.apollo.core.utils.ApolloThreadFactory;
@@ -59,12 +60,9 @@ public class DBConfigRepository extends AbstractConfigRepository {
         this.m_namespace = namespace;
         this.propertiesFactory = ApolloInjector.getInstance(PropertiesFactory.class);
         this.m_configUtil = ApolloInjector.getInstance(ConfigUtil.class);
-        // TODO 优化到配置
-        String url = "jdbc:mysql://127.0.1:33061/ruoyi-vue-pro?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=CTT";
-        String username = "root";
-        String password = "123456";
-//        DataSource dataSource = DataSourceBuilder.create().url(url).username(username).password(password).build();
-        DataSource dataSource = new DriverManagerDataSource(url, username, password);
+        // 初始化 DB
+        DataSource dataSource = new DriverManagerDataSource(System.getProperty(ConfigConsts.APOLLO_JDBC_URL),
+                System.getProperty(ConfigConsts.APOLLO_JDBC_USERNAME), System.getProperty(ConfigConsts.APOLLO_JDBC_PASSWORD));
         this.jdbcTemplate = new JdbcTemplate(dataSource);
 
         // 初始化加载
@@ -76,7 +74,7 @@ public class DBConfigRepository extends AbstractConfigRepository {
     @Override
     protected void sync() {
         // 第一步，尝试获取配置
-        List<SysConfigDO> configs = this.loadConfigIfUpdate(this.maxUpdateTime);
+        List<InfConfigDO> configs = this.loadConfigIfUpdate(this.maxUpdateTime);
         if (CollUtil.isEmpty(configs)) { // 如果没有更新，则返回
             return;
         }
@@ -111,7 +109,7 @@ public class DBConfigRepository extends AbstractConfigRepository {
         return ConfigSourceType.REMOTE;
     }
 
-    private Properties buildProperties(List<SysConfigDO> configs) {
+    private Properties buildProperties(List<InfConfigDO> configs) {
         Properties properties = propertiesFactory.getPropertiesInstance();
         configs.stream().filter(config -> 0 == config.getDeleted()) // 过滤掉被删除的配置
                 .forEach(config -> properties.put(config.getKey(), config.getValue()));
@@ -145,7 +143,7 @@ public class DBConfigRepository extends AbstractConfigRepository {
      * @param maxUpdateTime 当前配置的最大更新时间
      * @return 配置列表
      */
-    private List<SysConfigDO> loadConfigIfUpdate(Date maxUpdateTime) {
+    private List<InfConfigDO> loadConfigIfUpdate(Date maxUpdateTime) {
         // 第一步，判断是否要更新。
         boolean isUpdate = maxUpdateTime == null; // 如果更新时间为空，说明 DB 一定有新数据
         if (!isUpdate) {
@@ -159,12 +157,12 @@ public class DBConfigRepository extends AbstractConfigRepository {
     }
 
     private boolean existsNewConfig(Date maxUpdateTime) {
-         return jdbcTemplate.query("SELECT id FROM sys_config WHERE update_time > ? LIMIT 1",
+         return jdbcTemplate.query("SELECT id FROM inf_config WHERE update_time > ? LIMIT 1",
                  ResultSet::next, maxUpdateTime);
     }
 
-    private List<SysConfigDO> getSysConfigList() {
-        return jdbcTemplate.query("SELECT `key`, `value`, update_time, deleted FROM sys_config", new BeanPropertyRowMapper<>(SysConfigDO.class));
+    private List<InfConfigDO> getSysConfigList() {
+        return jdbcTemplate.query("SELECT `key`, `value`, update_time, deleted FROM inf_config", new BeanPropertyRowMapper<>(InfConfigDO.class));
     }
 
 }

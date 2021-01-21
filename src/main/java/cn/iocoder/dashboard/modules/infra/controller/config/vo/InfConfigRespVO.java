@@ -1,4 +1,4 @@
-package cn.iocoder.dashboard.modules.system.controller.config.vo;
+package cn.iocoder.dashboard.modules.infra.controller.config.vo;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -12,7 +12,7 @@ import java.util.Date;
 @ApiModel("参数配置信息 Response VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class SysConfigRespVO extends SysConfigBaseVO {
+public class InfConfigRespVO extends InfConfigBaseVO {
 
     @ApiModelProperty(value = "参数配置序号", required = true, example = "1024")
     private Long id;

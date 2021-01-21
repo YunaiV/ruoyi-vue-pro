@@ -1,4 +1,4 @@
-package cn.iocoder.dashboard.modules.system.controller.config.vo;
+package cn.iocoder.dashboard.modules.infra.controller.config.vo;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -11,7 +11,7 @@ import javax.validation.constraints.Size;
 @ApiModel("参数配置创建 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class SysConfigCreateReqVO extends SysConfigBaseVO {
+public class InfConfigCreateReqVO extends InfConfigBaseVO {
 
     @ApiModelProperty(value = "参数键名", required = true, example = "yunai.db.username")
     @NotBlank(message = "参数键名长度不能为空")

@@ -1,4 +1,4 @@
-package cn.iocoder.dashboard.modules.system.controller.config.vo;
+package cn.iocoder.dashboard.modules.infra.controller.config.vo;
 
 import cn.iocoder.dashboard.framework.excel.core.annotations.DictFormat;
 import cn.iocoder.dashboard.framework.excel.core.convert.DictConvert;
@@ -12,7 +12,7 @@ import java.util.Date;
  * 参数配置 Excel 导出响应 VO
  */
 @Data
-public class SysConfigExcelVO {
+public class InfConfigExcelVO {
 
     @ExcelProperty("参数配置序号")
     private Long id;
