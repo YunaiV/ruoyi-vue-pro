@@ -3,6 +3,7 @@ package cn.iocoder.dashboard.framework.apollo.internals;
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.dashboard.framework.apollo.core.ConfigConsts;
 import cn.iocoder.dashboard.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.dashboard.modules.infra.dal.mysql.dao.config.InfConfigDAOImpl;
 import cn.iocoder.dashboard.modules.infra.dal.mysql.dataobject.config.InfConfigDO;
 import com.ctrip.framework.apollo.Apollo;
 import com.ctrip.framework.apollo.build.ApolloInjector;
@@ -14,12 +15,7 @@ import com.ctrip.framework.apollo.tracer.Tracer;
 import com.ctrip.framework.apollo.util.ConfigUtil;
 import com.ctrip.framework.apollo.util.factory.PropertiesFactory;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
-import javax.sql.DataSource;
-import java.sql.ResultSet;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
@@ -51,9 +47,9 @@ public class DBConfigRepository extends AbstractConfigRepository {
     private volatile Date maxUpdateTime;
 
     /**
-     * Spring JDBC 操作模板
+     * 配置读取 DAO
      */
-    private final JdbcTemplate jdbcTemplate;
+    private final ConfigFrameworkDAO configFrameworkDAO;
 
     public DBConfigRepository(String namespace) {
         // 初始化变量
@@ -61,9 +57,8 @@ public class DBConfigRepository extends AbstractConfigRepository {
         this.propertiesFactory = ApolloInjector.getInstance(PropertiesFactory.class);
         this.m_configUtil = ApolloInjector.getInstance(ConfigUtil.class);
         // 初始化 DB
-        DataSource dataSource = new DriverManagerDataSource(System.getProperty(ConfigConsts.APOLLO_JDBC_URL),
+        this.configFrameworkDAO = new InfConfigDAOImpl(System.getProperty(ConfigConsts.APOLLO_JDBC_URL),
                 System.getProperty(ConfigConsts.APOLLO_JDBC_USERNAME), System.getProperty(ConfigConsts.APOLLO_JDBC_PASSWORD));
-        this.jdbcTemplate = new JdbcTemplate(dataSource);
 
         // 初始化加载
         this.trySync();
@@ -84,6 +79,7 @@ public class DBConfigRepository extends AbstractConfigRepository {
         Properties newProperties = this.buildProperties(configs);
         this.m_configCache = newProperties;
         // 第三步，获取最大的配置时间
+        assert configs.size() > 0; // 断言，避免告警
         this.maxUpdateTime = configs.stream().max(Comparator.comparing(BaseDO::getUpdateTime)).get().getUpdateTime();
         // 第四部，触发配置刷新！重要！！！！
         super.fireRepositoryChange(m_namespace, newProperties);
@@ -145,24 +141,16 @@ public class DBConfigRepository extends AbstractConfigRepository {
      */
     private List<InfConfigDO> loadConfigIfUpdate(Date maxUpdateTime) {
         // 第一步，判断是否要更新。
-        boolean isUpdate = maxUpdateTime == null; // 如果更新时间为空，说明 DB 一定有新数据
-        if (!isUpdate) {
-            isUpdate = this.existsNewConfig(maxUpdateTime); // 判断数据库中是否有更新的配置
-        }
-        if (!isUpdate) {
-            return null;
+        if (maxUpdateTime == null) { // 如果更新时间为空，说明 DB 一定有新数据
+            log.info("[loadConfigIfUpdate][首次加载全量配置]");
+        } else { // 判断数据库中是否有更新的配置
+            if (!configFrameworkDAO.selectExistsByUpdateTimeAfter(maxUpdateTime)) {
+                return null;
+            }
+            log.info("[loadConfigIfUpdate][增量加载全量配置]");
         }
         // 第二步，如果有更新，则从数据库加载所有配置
-        return this.getSysConfigList();
-    }
-
-    private boolean existsNewConfig(Date maxUpdateTime) {
-         return jdbcTemplate.query("SELECT id FROM inf_config WHERE update_time > ? LIMIT 1",
-                 ResultSet::next, maxUpdateTime);
-    }
-
-    private List<InfConfigDO> getSysConfigList() {
-        return jdbcTemplate.query("SELECT `key`, `value`, update_time, deleted FROM inf_config", new BeanPropertyRowMapper<>(InfConfigDO.class));
+        return configFrameworkDAO.getSysConfigList();
     }
 
 }
