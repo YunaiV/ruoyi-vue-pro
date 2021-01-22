@@ -1,5 +1,7 @@
 package cn.iocoder.dashboard.util.json;
 
+import com.alibaba.fastjson.JSON;
+
 /**
  * JSON 工具类
  *
@@ -7,15 +9,16 @@ package cn.iocoder.dashboard.util.json;
  */
 public class JSONUtils {
 
-//    public static Map<String, Object> toJSONMap(Object javaObject) {
-//        return (Map<String, Object>) JSON.toJSON(javaObject);
-//    }
-//
-//    public static void main(String[] args) {
-//        SysDictTypeCreateReqVO createReqVO = new SysDictTypeCreateReqVO();
-//        createReqVO.setType("1");
-//        createReqVO.setRemark("2");
-//        System.out.println(toJSONMap(createReqVO));
-//    }
+    public static String toJSONString(Object object) {
+        return JSON.toJSONString(object);
+    }
+
+    public static <T> T parseObject(String text, Class<T> clazz) {
+        return JSON.parseObject(text, clazz);
+    }
+
+    public static <T> T parseObject(byte[] bytes, Class<T> clazz) {
+        return JSON.parseObject(bytes, clazz);
+    }
 
 }
