@@ -32,7 +32,7 @@ public class InfConfigDAOImpl implements ConfigFrameworkDAO {
     }
 
     @Override
-    public List<InfConfigDO> getSysConfigList() {
+    public List<InfConfigDO> selectList() {
         return jdbcTemplate.query("SELECT `key`, `value`, update_time, deleted FROM inf_config", new BeanPropertyRowMapper<>(InfConfigDO.class));
     }
 

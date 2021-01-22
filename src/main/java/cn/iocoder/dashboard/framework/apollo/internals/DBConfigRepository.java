@@ -73,7 +73,6 @@ public class DBConfigRepository extends AbstractConfigRepository {
         if (CollUtil.isEmpty(configs)) { // 如果没有更新，则返回
             return;
         }
-        log.info("[sync][同步到新配置，配置数量为:{}]", configs.size());
 
         // 第二步，构建新的 Properties
         Properties newProperties = this.buildProperties(configs);
@@ -83,6 +82,7 @@ public class DBConfigRepository extends AbstractConfigRepository {
         this.maxUpdateTime = configs.stream().max(Comparator.comparing(BaseDO::getUpdateTime)).get().getUpdateTime();
         // 第四部，触发配置刷新！重要！！！！
         super.fireRepositoryChange(m_namespace, newProperties);
+        log.info("[sync][缓存配置，数量为:{}]", configs.size());
     }
 
     @Override
@@ -150,7 +150,7 @@ public class DBConfigRepository extends AbstractConfigRepository {
             log.info("[loadConfigIfUpdate][增量加载全量配置]");
         }
         // 第二步，如果有更新，则从数据库加载所有配置
-        return configFrameworkDAO.getSysConfigList();
+        return configFrameworkDAO.selectList();
     }
 
 }

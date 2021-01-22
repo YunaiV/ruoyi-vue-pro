@@ -23,6 +23,6 @@ public interface ConfigFrameworkDAO {
      *
      * @return 配置列表
      */
-    List<InfConfigDO> getSysConfigList();
+    List<InfConfigDO> selectList();
 
 }

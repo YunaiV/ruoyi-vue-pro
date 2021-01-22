@@ -1,6 +1,8 @@
 package cn.iocoder.dashboard.modules.system.service.permission.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.dashboard.common.exception.util.ServiceExceptionUtil;
+import cn.iocoder.dashboard.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.dashboard.modules.system.controller.permission.vo.menu.SysMenuCreateReqVO;
 import cn.iocoder.dashboard.modules.system.controller.permission.vo.menu.SysMenuListReqVO;
 import cn.iocoder.dashboard.modules.system.controller.permission.vo.menu.SysMenuUpdateReqVO;
@@ -16,14 +18,12 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.*;
@@ -36,6 +36,12 @@ import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.*;
 @Service
 @Slf4j
 public class SysMenuServiceImpl implements SysMenuService {
+
+    /**
+     * 定时执行 {@link #schedulePeriodicRefresh()} 的周期
+     * 因为已经通过 Redis Pub/Sub 机制，所以频率不需要高
+     */
+    private static final long SCHEDULER_PERIOD = 5 * 60 * 1000L;
 
     /**
      * 菜单缓存
@@ -52,6 +58,10 @@ public class SysMenuServiceImpl implements SysMenuService {
      * 这里声明 volatile 修饰的原因是，每次刷新时，直接修改指向
      */
     private volatile Multimap<String, SysMenuDO> permMenuCache;
+    /**
+     * 缓存菜单的最大更新时间，用于后续的增量轮询，判断是否有更新
+     */
+    private volatile Date maxUpdateTime;
 
     @Resource
     private SysMenuMapper menuMapper;
@@ -63,8 +73,14 @@ public class SysMenuServiceImpl implements SysMenuService {
      */
     @Override
     @PostConstruct
-    public void init() {
-        List<SysMenuDO> menuList = menuMapper.selectList();
+    public synchronized void init() {
+        // 获取
+        List<SysMenuDO> menuList = this.loadMenuIfUpdate(maxUpdateTime);
+        if (CollUtil.isEmpty(menuList)) {
+            return;
+        }
+
+        // 构建缓存
         ImmutableMap.Builder<Long, SysMenuDO> menuCacheBuilder = ImmutableMap.builder();
         ImmutableMultimap.Builder<String, SysMenuDO> permMenuCacheBuilder = ImmutableMultimap.builder();
         menuList.forEach(menuDO -> {
@@ -73,7 +89,35 @@ public class SysMenuServiceImpl implements SysMenuService {
         });
         menuCache = menuCacheBuilder.build();
         permMenuCache = permMenuCacheBuilder.build();
-        log.info("[init][初始化菜单数量为 {}]", menuList.size());
+        assert menuList.size() > 0; // 断言，避免告警
+        maxUpdateTime = menuList.stream().max(Comparator.comparing(BaseDO::getUpdateTime)).get().getUpdateTime();
+        log.info("[init][缓存菜单，数量为:{}]", menuList.size());
+    }
+
+    @Scheduled(fixedDelay = SCHEDULER_PERIOD, initialDelay = SCHEDULER_PERIOD)
+    public void schedulePeriodicRefresh() {
+        init();
+    }
+
+    /**
+     * 如果菜单发生变化，从数据库中获取最新的全量菜单。
+     * 如果未发生变化，则返回空
+     *
+     * @param maxUpdateTime 当前菜单的最大更新时间
+     * @return 菜单列表
+     */
+    private List<SysMenuDO> loadMenuIfUpdate(Date maxUpdateTime) {
+        // 第一步，判断是否要更新。
+        if (maxUpdateTime == null) { // 如果更新时间为空，说明 DB 一定有新数据
+            log.info("[loadMenuIfUpdate][首次加载全量菜单]");
+        } else { // 判断数据库中是否有更新的菜单
+            if (!menuMapper.selectExistsByUpdateTimeAfter(maxUpdateTime)) {
+                return null;
+            }
+            log.info("[loadMenuIfUpdate][增量加载全量菜单]");
+        }
+        // 第二步，如果有更新，则从数据库加载所有菜单
+        return menuMapper.selectList();
     }
 
     @Override
