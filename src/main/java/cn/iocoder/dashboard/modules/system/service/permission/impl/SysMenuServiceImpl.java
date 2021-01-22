@@ -11,6 +11,7 @@ import cn.iocoder.dashboard.modules.system.dal.mysql.dao.permission.SysMenuMappe
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.permission.SysMenuDO;
 import cn.iocoder.dashboard.modules.system.enums.permission.MenuIdEnum;
 import cn.iocoder.dashboard.modules.system.enums.permission.MenuTypeEnum;
+import cn.iocoder.dashboard.modules.system.mq.producer.permission.SysMenuProducer;
 import cn.iocoder.dashboard.modules.system.service.permission.SysMenuService;
 import cn.iocoder.dashboard.modules.system.service.permission.SysPermissionService;
 import cn.iocoder.dashboard.util.collection.CollectionUtils;
@@ -67,6 +68,9 @@ public class SysMenuServiceImpl implements SysMenuService {
     private SysMenuMapper menuMapper;
     @Resource
     private SysPermissionService permissionService;
+
+    @Resource
+    private SysMenuProducer menuProducer;
 
     /**
      * 初始化 {@link #menuCache} 和 {@link #permMenuCache} 缓存
@@ -183,6 +187,8 @@ public class SysMenuServiceImpl implements SysMenuService {
         SysMenuDO updateObject = SysMenuConvert.INSTANCE.convert(reqVO);
         initMenuProperty(updateObject);
         menuMapper.updateById(updateObject);
+        // 发送刷新消息
+        menuProducer.sendMenuRefreshMessage();
     }
 
     /**

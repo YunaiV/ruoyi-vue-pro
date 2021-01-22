@@ -19,8 +19,6 @@ public class RedisKeyDefine {
         HASH,
         SET,
         ZSET,
-        STREAM,
-        PUBSUB;
 
     }
 
