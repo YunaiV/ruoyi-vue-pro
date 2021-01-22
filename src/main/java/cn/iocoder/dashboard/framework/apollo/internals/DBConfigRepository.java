@@ -34,7 +34,7 @@ public class DBConfigRepository extends AbstractConfigRepository {
     }
 
     private final ConfigUtil m_configUtil;
-    private PropertiesFactory propertiesFactory;
+    private final PropertiesFactory propertiesFactory;
     private final String m_namespace;
 
     /**
