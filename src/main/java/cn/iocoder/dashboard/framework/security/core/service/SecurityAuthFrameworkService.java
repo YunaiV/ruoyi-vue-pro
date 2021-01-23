@@ -4,16 +4,11 @@ import cn.iocoder.dashboard.framework.security.core.LoginUser;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 /**
- * Security 框架 Service 接口，定义 security 组件需要的功能
+ * Security 框架 Auth Service 接口，定义 security 组件需要的功能
+ *
+ * @author 芋道源码
  */
-public interface SecurityFrameworkService extends UserDetailsService {
-
-    /**
-     * 基于 token 退出登录
-     *
-     * @param token token
-     */
-    void logout(String token);
+public interface SecurityAuthFrameworkService extends UserDetailsService {
 
     /**
      * 校验 token 的有效性，并获取用户信息
@@ -31,5 +26,12 @@ public interface SecurityFrameworkService extends UserDetailsService {
      * @return 登录用户
      */
     LoginUser mockLogin(Long userId);
+
+    /**
+     * 基于 token 退出登录
+     *
+     * @param token token
+     */
+    void logout(String token);
 
 }

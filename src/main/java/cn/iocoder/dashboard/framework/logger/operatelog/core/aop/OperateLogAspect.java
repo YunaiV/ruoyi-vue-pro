@@ -233,11 +233,6 @@ public class OperateLogAspect {
         }
     }
 
-    private static void fillContentFields(SysOperateLogCreateReqVO operateLogVO) {
-        operateLogVO.setContent(CONTENT.get());
-        operateLogVO.setExts(EXTS.get());
-    }
-
     private static boolean isLogEnable(ProceedingJoinPoint joinPoint, OperateLog operateLog) {
         // 有 @OperateLog 注解的情况下
         if (operateLog != null) {

@@ -2,7 +2,7 @@ package cn.iocoder.dashboard.framework.security.core.handler;
 
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.dashboard.framework.security.config.SecurityProperties;
-import cn.iocoder.dashboard.framework.security.core.service.SecurityFrameworkService;
+import cn.iocoder.dashboard.framework.security.core.service.SecurityAuthFrameworkService;
 import cn.iocoder.dashboard.framework.security.core.util.SecurityUtils;
 import cn.iocoder.dashboard.util.servlet.ServletUtils;
 import org.springframework.security.core.Authentication;
@@ -26,7 +26,7 @@ public class LogoutSuccessHandlerImpl implements LogoutSuccessHandler {
     private SecurityProperties securityProperties;
 
     @Resource
-    private SecurityFrameworkService securityFrameworkService;
+    private SecurityAuthFrameworkService securityFrameworkService;
 
     @Override
     public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {

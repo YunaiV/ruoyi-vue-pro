@@ -217,6 +217,8 @@ public class SysRoleServiceImpl implements SysRoleService {
         updateObject.setId(id);
         updateObject.setStatus(status);
         roleMapper.updateById(updateObject);
+        // 发送刷新消息
+        roleProducer.sendRoleRefreshMessage();
     }
 
     @Override
@@ -229,6 +231,8 @@ public class SysRoleServiceImpl implements SysRoleService {
         updateObject.setDataScope(dataScope);
         updateObject.setDataScopeDeptIds(dataScopeDeptIds);
         roleMapper.updateById(updateObject);
+        // 发送刷新消息
+        roleProducer.sendRoleRefreshMessage();
     }
 
     /**

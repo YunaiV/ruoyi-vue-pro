@@ -1,5 +1,6 @@
 package cn.iocoder.dashboard.modules.system.service.permission;
 
+import cn.iocoder.dashboard.framework.security.core.service.SecurityPermissionFrameworkService;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.permission.SysMenuDO;
 import org.springframework.lang.Nullable;
 
@@ -14,12 +15,12 @@ import java.util.Set;
  *
  * @author 芋道源码
  */
-public interface SysPermissionService {
+public interface SysPermissionService extends SecurityPermissionFrameworkService {
 
     /**
      * 初始化
      */
-    void init();
+    void initLocalCache();
 
     /**
      * 获得角色们拥有的菜单列表，从缓存中获取

@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.modules.system.service.auth;
 
-import cn.iocoder.dashboard.framework.security.core.service.SecurityFrameworkService;
+import cn.iocoder.dashboard.framework.security.core.service.SecurityAuthFrameworkService;
 
 /**
  * 认证 Service 接口
@@ -9,7 +9,7 @@ import cn.iocoder.dashboard.framework.security.core.service.SecurityFrameworkSer
  *
  * @author 芋道源码
  */
-public interface SysAuthService extends SecurityFrameworkService {
+public interface SysAuthService extends SecurityAuthFrameworkService {
 
     String login(String username, String password, String captchaUUID, String captchaCode);
 

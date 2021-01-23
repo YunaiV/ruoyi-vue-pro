@@ -57,6 +57,16 @@ public interface SysRoleService {
     boolean hasAnyAdmin(Collection<SysRoleDO> roleList);
 
     /**
+     * 判断角色编号数组中，是否有管理员
+     *
+     * @param ids 角色编号数组
+     * @return 是否有管理员
+     */
+    default boolean hasAnyAdmin(Set<Long> ids) {
+        return hasAnyAdmin(listRolesFromCache(ids));
+    }
+
+    /**
      * 创建角色
      *
      * @param reqVO 创建角色信息

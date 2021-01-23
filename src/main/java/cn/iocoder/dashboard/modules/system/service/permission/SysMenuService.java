@@ -59,6 +59,14 @@ public interface SysMenuService {
     List<SysMenuDO> listMenusFromCache(Collection<Long> menuIds, Collection<Integer> menuTypes,
                                        Collection<Integer> menusStatuses);
 
+    /**
+     * 获得权限对应的菜单数组
+     *
+     * @param permission 权限标识
+     * @return 数组
+     */
+    List<SysMenuDO> getMenuListByPermissionFromCache(String permission);
+
     /*
      * 创建菜单
      *

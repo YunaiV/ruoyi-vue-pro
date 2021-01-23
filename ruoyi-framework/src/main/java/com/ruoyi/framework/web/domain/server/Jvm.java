@@ -40,16 +40,8 @@ public class Jvm {
         return Arith.div(total, (1024 * 1024), 2);
     }
 
-    public void setTotal(double total) {
-        this.total = total;
-    }
-
     public double getMax() {
         return Arith.div(max, (1024 * 1024), 2);
-    }
-
-    public void setMax(double max) {
-        this.max = max;
     }
 
     public double getFree() {
@@ -73,22 +65,6 @@ public class Jvm {
      */
     public String getName() {
         return ManagementFactory.getRuntimeMXBean().getVmName();
-    }
-
-    public String getVersion() {
-        return version;
-    }
-
-    public void setVersion(String version) {
-        this.version = version;
-    }
-
-    public String getHome() {
-        return home;
-    }
-
-    public void setHome(String home) {
-        this.home = home;
     }
 
     /**

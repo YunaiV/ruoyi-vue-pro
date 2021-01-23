@@ -61,7 +61,7 @@ public class SysMenuServiceImpl implements SysMenuService {
      *
      * 这里声明 volatile 修饰的原因是，每次刷新时，直接修改指向
      */
-    private volatile Multimap<String, SysMenuDO> permMenuCache;
+    private volatile Multimap<String, SysMenuDO> permissionMenuCache;
     /**
      * 缓存菜单的最大更新时间，用于后续的增量轮询，判断是否有更新
      */
@@ -76,7 +76,7 @@ public class SysMenuServiceImpl implements SysMenuService {
     private SysMenuProducer menuProducer;
 
     /**
-     * 初始化 {@link #menuCache} 和 {@link #permMenuCache} 缓存
+     * 初始化 {@link #menuCache} 和 {@link #permissionMenuCache} 缓存
      */
     @Override
     @PostConstruct
@@ -95,7 +95,7 @@ public class SysMenuServiceImpl implements SysMenuService {
             permMenuCacheBuilder.put(menuDO.getPermission(), menuDO);
         });
         menuCache = menuCacheBuilder.build();
-        permMenuCache = permMenuCacheBuilder.build();
+        permissionMenuCache = permMenuCacheBuilder.build();
         assert menuList.size() > 0; // 断言，避免告警
         maxUpdateTime = menuList.stream().max(Comparator.comparing(BaseDO::getUpdateTime)).get().getUpdateTime();
         log.info("[initLocalCache][缓存菜单，数量为:{}]", menuList.size());
@@ -160,6 +160,11 @@ public class SysMenuServiceImpl implements SysMenuService {
                 && menuTypes.contains(menu.getType())
                 && menusStatuses.contains(menu.getStatus()))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<SysMenuDO> getMenuListByPermissionFromCache(String permission) {
+        return new ArrayList<>(permissionMenuCache.get(permission));
     }
 
     @Override

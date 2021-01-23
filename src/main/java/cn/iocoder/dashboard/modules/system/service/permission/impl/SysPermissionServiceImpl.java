@@ -2,12 +2,16 @@ package cn.iocoder.dashboard.modules.system.service.permission.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.ArrayUtil;
+import cn.iocoder.dashboard.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.dashboard.framework.security.core.util.SecurityUtils;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dao.permission.SysRoleMenuMapper;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dao.permission.SysUserRoleMapper;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.permission.SysMenuDO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.permission.SysRoleDO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.permission.SysRoleMenuDO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.permission.SysUserRoleDO;
+import cn.iocoder.dashboard.modules.system.mq.producer.permission.SysPermissionProducer;
 import cn.iocoder.dashboard.modules.system.service.permission.SysMenuService;
 import cn.iocoder.dashboard.modules.system.service.permission.SysPermissionService;
 import cn.iocoder.dashboard.modules.system.service.permission.SysRoleService;
@@ -18,22 +22,27 @@ import com.google.common.collect.Multimap;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * 权限 Service 实现类
  *
  * @author 芋道源码
  */
-@Service
+@Service("ss") // 使用 Spring Security 的缩写，方便食用
 @Slf4j
 public class SysPermissionServiceImpl implements SysPermissionService {
+
+    /**
+     * 定时执行 {@link #schedulePeriodicRefresh()} 的周期
+     * 因为已经通过 Redis Pub/Sub 机制，所以频率不需要高
+     */
+    private static final long SCHEDULER_PERIOD = 5 * 60 * 1000L;
 
     /**
      * 角色编号与菜单编号的缓存映射
@@ -51,6 +60,10 @@ public class SysPermissionServiceImpl implements SysPermissionService {
      * 这里声明 volatile 修饰的原因是，每次刷新时，直接修改指向
      */
     private volatile Multimap<Long, Long> menuRoleCache;
+    /**
+     * 缓存菜单的最大更新时间，用于后续的增量轮询，判断是否有更新
+     */
+    private volatile Date maxUpdateTime;
 
     @Resource
     private SysRoleMenuMapper roleMenuMapper;
@@ -62,14 +75,22 @@ public class SysPermissionServiceImpl implements SysPermissionService {
     @Resource
     private SysMenuService menuService;
 
+    @Resource
+    private SysPermissionProducer permissionProducer;
+
     /**
      * 初始化 {@link #roleMenuCache} 和 {@link #menuRoleCache} 缓存
      */
     @Override
     @PostConstruct
-    public void init() {
+    public void initLocalCache() {
+        // 获取角色与菜单的关联列表，如果有更新
+        List<SysRoleMenuDO> roleMenuList = this.loadRoleMenuIfUpdate(maxUpdateTime);
+        if (CollUtil.isEmpty(roleMenuList)) {
+            return;
+        }
+
         // 初始化 roleMenuCache 和 menuRoleCache 缓存
-        List<SysRoleMenuDO> roleMenuList = roleMenuMapper.selectList(null);
         ImmutableMultimap.Builder<Long, Long> roleMenuCacheBuilder = ImmutableMultimap.builder();
         ImmutableMultimap.Builder<Long, Long> menuRoleCacheBuilder = ImmutableMultimap.builder();
         roleMenuList.forEach(roleMenuDO -> {
@@ -78,7 +99,30 @@ public class SysPermissionServiceImpl implements SysPermissionService {
         });
         roleMenuCache = roleMenuCacheBuilder.build();
         menuRoleCache = menuRoleCacheBuilder.build();
+        assert roleMenuList.size() > 0; // 断言，避免告警
+        maxUpdateTime = roleMenuList.stream().max(Comparator.comparing(BaseDO::getUpdateTime)).get().getUpdateTime();
         log.info("[initLocalCache][初始化角色与菜单的关联数量为 {}]", roleMenuList.size());
+    }
+
+    /**
+     * 如果角色与菜单的关联发生变化，从数据库中获取最新的全量角色与菜单的关联。
+     * 如果未发生变化，则返回空
+     *
+     * @param maxUpdateTime 当前角色与菜单的关联的最大更新时间
+     * @return 角色与菜单的关联列表
+     */
+    private List<SysRoleMenuDO> loadRoleMenuIfUpdate(Date maxUpdateTime) {
+        // 第一步，判断是否要更新。
+        if (maxUpdateTime == null) { // 如果更新时间为空，说明 DB 一定有新数据
+            log.info("[loadRoleMenuIfUpdate][首次加载全量角色与菜单的关联]");
+        } else { // 判断数据库中是否有更新的角色与菜单的关联
+            if (!roleMenuMapper.selectExistsByUpdateTimeAfter(maxUpdateTime)) {
+                return null;
+            }
+            log.info("[loadRoleMenuIfUpdate][增量加载全量角色与菜单的关联]");
+        }
+        // 第二步，如果有更新，则从数据库加载所有角色与菜单的关联
+        return roleMenuMapper.selectList();
     }
 
     @Override
@@ -140,6 +184,15 @@ public class SysPermissionServiceImpl implements SysPermissionService {
         if (!CollectionUtil.isEmpty(deleteMenuIds)) {
             roleMenuMapper.deleteListByRoleIdAndMenuIds(roleId, deleteMenuIds);
         }
+        // 发送刷新消息. 注意，需要事务提交后，在进行发送刷新消息。不然 db 还未提交，结果缓存先刷新了
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+
+            @Override
+            public void afterCommit() {
+                permissionProducer.sendRoleMenuRefreshMessage();
+            }
+
+        });
     }
 
     @Override
@@ -187,6 +240,41 @@ public class SysPermissionServiceImpl implements SysPermissionService {
     @Override
     public void processUserDeleted(Long userId) {
         // TODO 实现我
+    }
+
+    @Override
+    public boolean hasPermission(String permission) {
+        return hasAnyPermissions(permission);
+    }
+
+    @Override
+    public boolean hasAnyPermissions(String... permissions) {
+        // 如果为空，说明已经有权限
+        if (ArrayUtil.isEmpty(permissions)) {
+            return true;
+        }
+
+        // 获得当前登陆的角色。如果为空，说明没有权限
+        Set<Long> roleIds = SecurityUtils.getLoginUserRoleIds();
+        if (CollUtil.isEmpty(roleIds)) {
+            return false;
+        }
+        // 判断是否是超管。如果是，当然符合条件
+        if (roleService.hasAnyAdmin(roleIds)) {
+            return true;
+        }
+
+        // 遍历权限，判断是否有一个满足
+        return Arrays.stream(permissions).anyMatch(permission -> {
+            List<SysMenuDO> menuList = menuService.getMenuListByPermissionFromCache(permission);
+            // 采用严格模式，如果权限找不到对应的 Menu 的话，认为
+            if (CollUtil.isEmpty(menuList)) {
+                return false;
+            }
+            // 获得是否拥有该权限，任一一个
+            return menuList.stream().anyMatch(menu -> CollUtil.containsAny(roleIds,
+                    menuRoleCache.get(menu.getId())));
+        });
     }
 
 }

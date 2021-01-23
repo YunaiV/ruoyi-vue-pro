@@ -38,20 +38,8 @@ public class Cpu {
      */
     private double free;
 
-    public int getCpuNum() {
-        return cpuNum;
-    }
-
-    public void setCpuNum(int cpuNum) {
-        this.cpuNum = cpuNum;
-    }
-
     public double getTotal() {
         return Arith.round(Arith.mul(total, 100), 2);
-    }
-
-    public void setTotal(double total) {
-        this.total = total;
     }
 
     public double getSys() {

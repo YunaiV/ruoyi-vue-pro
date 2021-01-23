@@ -1,16 +1,17 @@
 package cn.iocoder.dashboard.modules.system.dal.mysql.dao.permission;
 
+import cn.iocoder.dashboard.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.permission.SysRoleMenuDO;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Mapper
-public interface SysRoleMenuMapper extends BaseMapper<SysRoleMenuDO> {
+public interface SysRoleMenuMapper extends BaseMapperX<SysRoleMenuDO> {
 
     default List<SysRoleMenuDO> selectListByRoleId(Long roleId) {
         return selectList(new QueryWrapper<SysRoleMenuDO>().eq("role_id", roleId));
@@ -30,6 +31,11 @@ public interface SysRoleMenuMapper extends BaseMapper<SysRoleMenuDO> {
     default void deleteListByRoleIdAndMenuIds(Long roleId, Collection<Long> menuIds) {
         delete(new QueryWrapper<SysRoleMenuDO>().eq("role_id", roleId)
                 .in("menu_id", menuIds));
+    }
+
+    default boolean selectExistsByUpdateTimeAfter(Date maxUpdateTime) {
+        return selectOne(new QueryWrapper<SysRoleMenuDO>().select("id")
+                .gt("update_time", maxUpdateTime).last("LIMIT 1")) != null;
     }
 
 }

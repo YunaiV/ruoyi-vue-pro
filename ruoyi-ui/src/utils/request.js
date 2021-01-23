@@ -61,7 +61,9 @@ service.interceptors.response.use(res => {
         }
       ).then(() => {
         store.dispatch('LogOut').then(() => {
-          location.href = '/index';
+          if (location.pathname !== '/login') { // 避免重复跳转
+            location.href = '/index';
+          }
         })
       })
     } else if (code === 500) {

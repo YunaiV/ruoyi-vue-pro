@@ -392,6 +392,7 @@ export default {
         menuIds: [],
         dataScope: undefined,
         deptCheckStrictly: false,
+        menuCheckStrictly: true,
         remark: undefined
       };
       this.resetForm("form");
@@ -471,8 +472,12 @@ export default {
       });
       // 获得角色拥有的菜单集合
       listRoleMenus(id).then(response => {
+        // 设置为严格，避免设置父节点自动选中子节点，解决半选中问题
+        this.form.menuCheckStrictly = true
         // 设置选中
-        this.$refs.menu.setCheckedKeys(response.data, true, false);
+        this.$refs.menu.setCheckedKeys(response.data);
+        // 设置为非严格，继续使用半选中
+        this.form.menuCheckStrictly = false
       })
     },
     /** 分配数据权限操作 */
@@ -523,7 +528,7 @@ export default {
           roleId: this.form.id,
           dataScope: this.form.dataScope,
           dataScopeDeptIds: this.form.dataScope !== SysDataScopeEnum.DEPT_CUSTOM ? [] :
-              this.$refs.dept.getCheckedKeys(false)
+              this.$refs.dept.getCheckedKeys()
         }).then(response => {
           this.msgSuccess("修改成功");
           this.openDataScope = false;
@@ -536,7 +541,7 @@ export default {
       if (this.form.id !== undefined) {
         assignRoleMenu({
           roleId: this.form.id,
-          menuIds: this.$refs.menu.getCheckedKeys(true)
+          menuIds: [...this.$refs.menu.getCheckedKeys(), ...this.$refs.menu.getHalfCheckedKeys()]
         }).then(response => {
           this.msgSuccess("修改成功");
           this.openMenu = false;

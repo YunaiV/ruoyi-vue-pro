@@ -18,6 +18,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -41,7 +42,7 @@ public class SysUserController {
 
     @ApiOperation("获得用户分页列表")
     @GetMapping("/page")
-//    @PreAuthorize("@ss.hasPermi('system:user:list')")
+    @PreAuthorize("@ss.hasPermission('system:user:list')")
     public CommonResult<PageResult<SysUserPageItemRespVO>> pageUsers(@Validated SysUserPageReqVO reqVO) {
         // 获得用户分页列表
         PageResult<SysUserDO> pageResult = userService.pageUsers(reqVO);
