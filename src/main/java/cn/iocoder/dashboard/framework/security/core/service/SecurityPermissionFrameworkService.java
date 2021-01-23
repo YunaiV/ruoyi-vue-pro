@@ -1,5 +1,7 @@
 package cn.iocoder.dashboard.framework.security.core.service;
 
+import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.permission.SysRoleDO;
+
 /**
  * Security 框架 Permission Service 接口，定义 security 组件需要的功能
  *
@@ -22,5 +24,23 @@ public interface SecurityPermissionFrameworkService {
      * @return 是否
      */
     boolean hasAnyPermissions(String... permissions);
+
+    /**
+     * 判断是否有角色
+     *
+     * 注意，角色使用的是 {@link SysRoleDO#getCode()} 标识
+     *
+     * @param role 角色
+     * @return 是否
+     */
+    boolean hasRole(String role);
+
+    /**
+     * 判断是否有角色，任一一个即可
+     *
+     * @param roles 角色数组
+     * @return 是否
+     */
+    boolean hasAnyRoles(String... roles);
 
 }

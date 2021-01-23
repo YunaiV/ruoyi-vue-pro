@@ -19,7 +19,9 @@ import cn.iocoder.dashboard.util.collection.CollectionUtils;
 import cn.iocoder.dashboard.util.collection.MapUtils;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
@@ -102,6 +104,11 @@ public class SysPermissionServiceImpl implements SysPermissionService {
         assert roleMenuList.size() > 0; // 断言，避免告警
         maxUpdateTime = roleMenuList.stream().max(Comparator.comparing(BaseDO::getUpdateTime)).get().getUpdateTime();
         log.info("[initLocalCache][初始化角色与菜单的关联数量为 {}]", roleMenuList.size());
+    }
+
+    @Scheduled(fixedDelay = SCHEDULER_PERIOD, initialDelay = SCHEDULER_PERIOD)
+    public void schedulePeriodicRefresh() {
+        initLocalCache();
     }
 
     /**
@@ -275,6 +282,32 @@ public class SysPermissionServiceImpl implements SysPermissionService {
             return menuList.stream().anyMatch(menu -> CollUtil.containsAny(roleIds,
                     menuRoleCache.get(menu.getId())));
         });
+    }
+
+    @Override
+    public boolean hasRole(String role) {
+        return hasAnyRoles(role);
+    }
+
+    @Override
+    public boolean hasAnyRoles(String... roles) {
+        // 如果为空，说明已经有权限
+        if (ArrayUtil.isEmpty(roles)) {
+            return true;
+        }
+
+        // 获得当前登陆的角色。如果为空，说明没有权限
+        Set<Long> roleIds = SecurityUtils.getLoginUserRoleIds();
+        if (CollUtil.isEmpty(roleIds)) {
+            return false;
+        }
+        // 判断是否是超管。如果是，当然符合条件
+        if (roleService.hasAnyAdmin(roleIds)) {
+            return true;
+        }
+        Set<String> userRoles = CollectionUtils.convertSet(roleService.listRolesFromCache(roleIds),
+                SysRoleDO::getCode);
+        return CollUtil.containsAny(userRoles, Sets.newHashSet(roles));
     }
 
 }

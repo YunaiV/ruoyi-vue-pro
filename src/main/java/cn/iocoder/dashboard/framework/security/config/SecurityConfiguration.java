@@ -3,6 +3,7 @@ package cn.iocoder.dashboard.framework.security.config;
 import cn.iocoder.dashboard.framework.security.core.filter.JwtAuthenticationTokenFilter;
 import cn.iocoder.dashboard.framework.security.core.handler.LogoutSuccessHandlerImpl;
 import cn.iocoder.dashboard.framework.web.config.WebProperties;
+import de.codecentric.boot.admin.server.config.AdminServerProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
@@ -60,6 +61,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Resource
     private WebProperties webProperties;
+    @Resource
+    private AdminServerProperties adminServerProperties;
 
     /**
      * 由于 Spring Security 创建 AuthenticationManager 对象时，没声明 @Bean 注解，导致无法被注入
@@ -134,6 +137,13 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers("/swagger-resources/**").anonymous()
                 .antMatchers("/webjars/**").anonymous()
                 .antMatchers("/*/api-docs").anonymous()
+                // Spring Boot Admin Server 的安全配置
+                .antMatchers(adminServerProperties.getContextPath()).anonymous()
+                .antMatchers(adminServerProperties.getContextPath() + "/**").anonymous()
+                // Spring Boot Actuator 的安全配置
+                .antMatchers("/actuator").anonymous()
+                .antMatchers("/actuator/**").anonymous()
+                // TODO
                 .antMatchers("/druid/**").hasAnyAuthority("druid") // TODO 芋艿，未来需要在拓展下
                 // 除上面外的所有请求全部需要鉴权认证
                 .anyRequest().authenticated()

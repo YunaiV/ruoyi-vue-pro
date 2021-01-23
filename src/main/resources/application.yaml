@@ -23,6 +23,14 @@ spring:
     multipart:
       max-file-size: 16MB # 单个文件大小
       max-request-size: 32MB # 设置总上传的文件大小
+  # Spring Boot Admin 配置项
+  boot:
+    admin:
+      # Spring Boot Admin Client 客户端的相关配置
+      client:
+        url: http://127.0.0.1:8080/${spring.boot.admin.context-path} # 设置 Spring Boot Admin Server 地址
+      # Spring Boot Admin Server 服务端的相关配置
+      context-path: /admin # 配置 Spring
 
 # 芋道配置项，设置当前项目所有自定义的配置
 yudao:
@@ -70,3 +78,10 @@ mybatis-plus:
       logic-not-delete-value: 0 # 逻辑未删除值(默认为 0)
   mapper-locations: classpath*:mapper/*.xml
   type-aliases-package: cn.iocoder.dashboard.modules.*.dal.mysql.dataobject
+
+# Actuator 监控端点的配置项
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*' # 需要开放的端点。默认值只打开 health 和 info 两个端点。通过设置 * ，可以开放所有端点。
