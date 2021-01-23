@@ -138,7 +138,7 @@ public class SysDictDataServiceImpl implements SysDictDataService {
 
     @Override
     public PageResult<SysDictDataDO> pageDictDatas(SysDictDataPageReqVO reqVO) {
-        return SysDictDataConvert.INSTANCE.convertPage02(dictDataMapper.selectList(reqVO));
+        return dictDataMapper.selectPage(reqVO);
     }
 
     @Override

@@ -3,9 +3,7 @@ package cn.iocoder.dashboard.modules.system.convert.dict;
 import cn.iocoder.dashboard.common.pojo.PageResult;
 import cn.iocoder.dashboard.modules.system.controller.dict.vo.type.*;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.dict.SysDictTypeDO;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
@@ -18,9 +16,6 @@ public interface SysDictTypeConvert {
     PageResult<SysDictTypeRespVO> convertPage(PageResult<SysDictTypeDO> bean);
 
     SysDictTypeRespVO convert(SysDictTypeDO bean);
-
-    @Mapping(source = "records", target = "list")
-    PageResult<SysDictTypeDO> convertPage02(IPage<SysDictTypeDO> page);
 
     SysDictTypeDO convert(SysDictTypeCreateReqVO bean);
 

@@ -74,8 +74,7 @@ public class SysUserServiceImpl implements SysUserService {
 
     @Override
     public PageResult<SysUserDO> pageUsers(SysUserPageReqVO reqVO) {
-        return SysUserConvert.INSTANCE.convertPage(userMapper.selectList(reqVO,
-                this.getDeptCondition(reqVO.getDeptId())));
+        return userMapper.selectPage(reqVO, this.getDeptCondition(reqVO.getDeptId()));
     }
 
     @Override

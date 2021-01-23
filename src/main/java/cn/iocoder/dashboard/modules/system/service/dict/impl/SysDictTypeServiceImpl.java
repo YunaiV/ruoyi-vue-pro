@@ -12,10 +12,8 @@ import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.dict.SysDictType
 import cn.iocoder.dashboard.modules.system.service.dict.SysDictDataService;
 import cn.iocoder.dashboard.modules.system.service.dict.SysDictTypeService;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-
 import java.util.List;
 
 import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.*;
@@ -29,8 +27,6 @@ import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.*;
 public class SysDictTypeServiceImpl implements SysDictTypeService {
 
     @Resource
-    private SysDictTypeServiceImpl self;
-    @Resource
     private SysDictDataService dictDataService;
 
     @Resource
@@ -38,7 +34,7 @@ public class SysDictTypeServiceImpl implements SysDictTypeService {
 
     @Override
     public PageResult<SysDictTypeDO> pageDictTypes(SysDictTypePageReqVO reqVO) {
-        return SysDictTypeConvert.INSTANCE.convertPage02(dictTypeMapper.selectList(reqVO));
+        return dictTypeMapper.selectPage(reqVO);
     }
 
     @Override
@@ -77,18 +73,6 @@ public class SysDictTypeServiceImpl implements SysDictTypeService {
 
     @Override
     public void deleteDictType(Long id) {
-        // 执行删除
-        self.deleteDictType0(id);
-        // TODO 发送 MQ 消息
-    }
-
-    @Override
-    public List<SysDictTypeDO> listDictTypes() {
-        return dictTypeMapper.selectList();
-    }
-
-    @Transactional
-    public void deleteDictType0(Long id) {
         // 校验是否存在
         SysDictTypeDO dictType = this.checkDictTypeExists(id);
         // 校验是否有字典数据
@@ -97,6 +81,11 @@ public class SysDictTypeServiceImpl implements SysDictTypeService {
         }
         // 删除字典类型
         dictTypeMapper.deleteById(id);
+    }
+
+    @Override
+    public List<SysDictTypeDO> listDictTypes() {
+        return dictTypeMapper.selectList();
     }
 
     private void checkCreateOrUpdate(Long id, String name, String type) {

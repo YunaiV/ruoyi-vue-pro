@@ -3,9 +3,7 @@ package cn.iocoder.dashboard.modules.system.convert.dict;
 import cn.iocoder.dashboard.common.pojo.PageResult;
 import cn.iocoder.dashboard.modules.system.controller.dict.vo.data.*;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.dict.SysDictDataDO;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
@@ -24,9 +22,6 @@ public interface SysDictDataConvert {
     SysDictDataDO convert(SysDictDataUpdateReqVO bean);
 
     SysDictDataDO convert(SysDictDataCreateReqVO bean);
-
-    @Mapping(source = "records", target = "list")
-    PageResult<SysDictDataDO> convertPage02(IPage<SysDictDataDO> page);
 
     List<SysDictDataExcelVO> convertList02(List<SysDictDataDO> bean);
 

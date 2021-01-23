@@ -28,7 +28,7 @@ public class SysNoticeServiceImpl implements SysNoticeService {
 
     @Override
     public PageResult<SysNoticeDO> pageNotices(SysNoticePageReqVO reqVO) {
-        return SysNoticeConvert.INSTANCE.convertPage02(noticeMapper.selectList(reqVO));
+        return noticeMapper.selectPage(reqVO);
     }
 
     @Override

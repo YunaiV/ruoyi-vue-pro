@@ -18,7 +18,6 @@ import cn.iocoder.dashboard.modules.system.enums.permission.SysRoleTypeEnum;
 import cn.iocoder.dashboard.modules.system.mq.producer.permission.SysRoleProducer;
 import cn.iocoder.dashboard.modules.system.service.permission.SysPermissionService;
 import cn.iocoder.dashboard.modules.system.service.permission.SysRoleService;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.google.common.collect.ImmutableMap;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.Nullable;
@@ -201,8 +200,7 @@ public class SysRoleServiceImpl implements SysRoleService {
 
     @Override
     public PageResult<SysRoleDO> pageRole(SysRolePageReqVO reqVO) {
-        IPage<SysRoleDO> roleDOPage = roleMapper.selectPage(reqVO);
-        return SysRoleConvert.INSTANCE.convertPage(roleDOPage);
+        return roleMapper.selectPage(reqVO);
     }
 
     @Override

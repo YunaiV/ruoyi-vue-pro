@@ -36,7 +36,7 @@ public class SysPostServiceImpl implements SysPostService {
 
     @Override
     public PageResult<SysPostDO> pagePosts(SysPostPageReqVO reqVO) {
-        return SysPostConvert.INSTANCE.convertPage02(postMapper.selectList(reqVO));
+        return postMapper.selectPage(reqVO);
     }
 
     @Override
