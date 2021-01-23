@@ -88,7 +88,7 @@ public class SysDeptServiceImpl implements SysDeptService {
         parentDeptCache = parentBuilder.build();
         assert deptList.size() > 0; // 断言，避免告警
         maxUpdateTime = deptList.stream().max(Comparator.comparing(BaseDO::getUpdateTime)).get().getUpdateTime();
-        log.info("[init][初始化 Dept 数量为 {}]", deptList.size());
+        log.info("[initLocalCache][初始化 Dept 数量为 {}]", deptList.size());
     }
 
     @Scheduled(fixedDelay = SCHEDULER_PERIOD, initialDelay = SCHEDULER_PERIOD)
@@ -201,7 +201,6 @@ public class SysDeptServiceImpl implements SysDeptService {
         // 删除部门
         deptMapper.deleteById(id);
         // TODO 需要处理下与角色的数据权限关联，等做数据权限一起处理下
-
         // 发送刷新消息
         deptProducer.sendDeptRefreshMessage();
     }

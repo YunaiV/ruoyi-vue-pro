@@ -98,7 +98,7 @@ public class SysMenuServiceImpl implements SysMenuService {
         permMenuCache = permMenuCacheBuilder.build();
         assert menuList.size() > 0; // 断言，避免告警
         maxUpdateTime = menuList.stream().max(Comparator.comparing(BaseDO::getUpdateTime)).get().getUpdateTime();
-        log.info("[init][缓存菜单，数量为:{}]", menuList.size());
+        log.info("[initLocalCache][缓存菜单，数量为:{}]", menuList.size());
     }
 
     @Scheduled(fixedDelay = SCHEDULER_PERIOD, initialDelay = SCHEDULER_PERIOD)

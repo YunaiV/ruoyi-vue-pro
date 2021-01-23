@@ -100,7 +100,7 @@ public class SysDictDataServiceImpl implements SysDictDataService {
         valueDictDataCache = valueDictDataBuilder.build();
         assert dataList.size() > 0; // 断言，避免告警
         maxUpdateTime = dataList.stream().max(Comparator.comparing(BaseDO::getUpdateTime)).get().getUpdateTime();
-        log.info("[init][缓存字典数据，数量为:{}]", dataList.size());
+        log.info("[initLocalCache][缓存字典数据，数量为:{}]", dataList.size());
     }
 
     @Scheduled(fixedDelay = SCHEDULER_PERIOD, initialDelay = SCHEDULER_PERIOD)

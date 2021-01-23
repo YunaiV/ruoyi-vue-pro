@@ -78,7 +78,7 @@ public class SysPermissionServiceImpl implements SysPermissionService {
         });
         roleMenuCache = roleMenuCacheBuilder.build();
         menuRoleCache = menuRoleCacheBuilder.build();
-        log.info("[init][初始化角色与菜单的关联数量为 {}]", roleMenuList.size());
+        log.info("[initLocalCache][初始化角色与菜单的关联数量为 {}]", roleMenuList.size());
     }
 
     @Override

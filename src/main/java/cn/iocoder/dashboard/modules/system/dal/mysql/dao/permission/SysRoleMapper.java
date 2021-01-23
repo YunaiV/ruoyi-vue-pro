@@ -1,20 +1,22 @@
 package cn.iocoder.dashboard.modules.system.dal.mysql.dao.permission;
 
+import cn.iocoder.dashboard.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.dashboard.framework.mybatis.core.query.QueryWrapperX;
 import cn.iocoder.dashboard.framework.mybatis.core.util.MyBatisUtils;
 import cn.iocoder.dashboard.modules.system.controller.permission.vo.role.SysRoleExportReqVO;
 import cn.iocoder.dashboard.modules.system.controller.permission.vo.role.SysRolePageReqVO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.permission.SysRoleDO;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.lang.Nullable;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 @Mapper
-public interface SysRoleMapper extends BaseMapper<SysRoleDO> {
+public interface SysRoleMapper extends BaseMapperX<SysRoleDO> {
 
     default IPage<SysRoleDO> selectPage(SysRolePageReqVO reqVO) {
         return selectPage(MyBatisUtils.buildPage(reqVO),
@@ -41,6 +43,11 @@ public interface SysRoleMapper extends BaseMapper<SysRoleDO> {
 
     default List<SysRoleDO> selectListByStatus(@Nullable Collection<Integer> statuses) {
         return selectList(new QueryWrapperX<SysRoleDO>().in("status", statuses));
+    }
+
+    default boolean selectExistsByUpdateTimeAfter(Date maxUpdateTime) {
+        return selectOne(new QueryWrapper<SysRoleDO>().select("id")
+                .gt("update_time", maxUpdateTime).last("LIMIT 1")) != null;
     }
 
 }

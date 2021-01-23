@@ -20,9 +20,9 @@ import java.util.Set;
 public interface SysRoleService {
 
     /**
-     * 初始化
+     * 初始化角色的本地缓存
      */
-    void init();
+    void initLocalCache();
 
     /**
      * 获得角色，从缓存中
