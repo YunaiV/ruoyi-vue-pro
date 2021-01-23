@@ -24,4 +24,14 @@ public class WebProperties {
     @NotNull(message = "API 前缀不能为空")
     private String apiPrefix;
 
+    /**
+     * Controller 所在包
+     *
+     * 主要目的是，给该 Controller 设置指定的 {@link #apiPrefix}
+     *
+     * 因为我们有多个 modules 包里会包含 Controller，所以只需要写到 cn.iocoder.dashboard 这样的层级
+     */
+    @NotNull(message = "Controller 所在包不能为空")
+    private String controllerPackage;
+
 }

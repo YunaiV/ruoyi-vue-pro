@@ -36,6 +36,7 @@ spring:
 yudao:
   web:
     api-prefix: /api
+    controller-package: cn.iocoder.dashboard
   security:
     token-header: Authorization
     token-secret: abcdefghijklmnopqrstuvwxyz
