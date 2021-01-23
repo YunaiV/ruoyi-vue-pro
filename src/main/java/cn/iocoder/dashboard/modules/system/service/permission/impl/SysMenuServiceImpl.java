@@ -77,8 +77,8 @@ public class SysMenuServiceImpl implements SysMenuService {
      */
     @Override
     @PostConstruct
-    public synchronized void init() {
-        // 获取
+    public synchronized void initLocalCache() {
+        // 获取菜单列表，如果有更新
         List<SysMenuDO> menuList = this.loadMenuIfUpdate(maxUpdateTime);
         if (CollUtil.isEmpty(menuList)) {
             return;
@@ -100,7 +100,7 @@ public class SysMenuServiceImpl implements SysMenuService {
 
     @Scheduled(fixedDelay = SCHEDULER_PERIOD, initialDelay = SCHEDULER_PERIOD)
     public void schedulePeriodicRefresh() {
-        init();
+        initLocalCache();
     }
 
     /**

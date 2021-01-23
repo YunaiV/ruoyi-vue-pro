@@ -16,9 +16,9 @@ import java.util.List;
 public interface SysMenuService {
 
     /**
-     * 初始化菜单
+     * 初始化菜单的本地缓存
      */
-    void init();
+    void initLocalCache();
 
     /**
      * 获得所有菜单列表

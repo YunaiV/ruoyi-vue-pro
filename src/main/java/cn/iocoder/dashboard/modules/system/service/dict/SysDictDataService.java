@@ -18,9 +18,9 @@ import java.util.List;
 public interface SysDictDataService extends DictDataFrameworkService {
 
     /**
-     * 初始化，主要是初始化缓存
+     * 初始化字典数据的本地缓存
      */
-    void init();
+    void initLocalCache();
 
     /**
      * 获得字典数据列表

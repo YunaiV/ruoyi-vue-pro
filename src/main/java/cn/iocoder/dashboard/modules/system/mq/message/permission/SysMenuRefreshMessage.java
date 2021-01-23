@@ -1,13 +1,17 @@
 package cn.iocoder.dashboard.modules.system.mq.message.permission;
 
+import cn.iocoder.dashboard.framework.redis.core.pubsub.ChannelMessage;
 import lombok.Data;
 
 /**
  * 菜单数据刷新 Message
  */
 @Data
-public class SysMenuRefreshMessage {
+public class SysMenuRefreshMessage implements ChannelMessage {
 
-    public static final String TOPIC = "system.menu.refresh";
+    @Override
+    public String getChannel() {
+        return "system.menu.refresh";
+    }
 
 }

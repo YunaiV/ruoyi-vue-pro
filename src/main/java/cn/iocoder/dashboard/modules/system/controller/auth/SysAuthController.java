@@ -63,7 +63,8 @@ public class SysAuthController {
         // 获得角色列表
         List<SysRoleDO> roleList = roleService.listRolesFromCache(getLoginUserRoleIds());
         // 获得菜单列表
-        List<SysMenuDO> menuList = permissionService.listRoleMenusFromCache(getLoginUserRoleIds(),
+        List<SysMenuDO> menuList = permissionService.listRoleMenusFromCache(
+                getLoginUserRoleIds(), // 注意，基于登陆的角色，因为后续的权限判断也是基于它
                 SetUtils.asSet(MenuTypeEnum.DIR.getType(), MenuTypeEnum.MENU.getType(), MenuTypeEnum.BUTTON.getType()),
                 SetUtils.asSet(CommonStatusEnum.ENABLE.getStatus()));
         // 拼接结果返回
@@ -74,7 +75,8 @@ public class SysAuthController {
     @GetMapping("list-menus")
     public CommonResult<List<SysAuthMenuRespVO>> listMenus() {
         // 获得用户拥有的菜单列表
-        List<SysMenuDO> menuList = permissionService.listRoleMenusFromCache(getLoginUserRoleIds(),
+        List<SysMenuDO> menuList = permissionService.listRoleMenusFromCache(
+                getLoginUserRoleIds(), // 注意，基于登陆的角色，因为后续的权限判断也是基于它
                 SetUtils.asSet(MenuTypeEnum.DIR.getType(), MenuTypeEnum.MENU.getType()), // 只要目录和菜单类型
                 SetUtils.asSet(CommonStatusEnum.ENABLE.getStatus())); // 只要开启的
         // 转换成 Tree 结构返回

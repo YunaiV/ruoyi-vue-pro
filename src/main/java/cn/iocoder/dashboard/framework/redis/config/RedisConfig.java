@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.framework.redis.config;
 
-import cn.iocoder.dashboard.framework.redis.core.listener.AbstractMessageListener;
+import cn.iocoder.dashboard.framework.redis.core.pubsub.AbstractChannelMessageListener;
 import com.alibaba.fastjson.support.spring.GenericFastJsonRedisSerializer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -35,7 +35,7 @@ public class RedisConfig {
 
     @Bean
     public RedisMessageListenerContainer redisMessageListenerContainer(RedisConnectionFactory factory,
-                                                                       List<AbstractMessageListener<?>> listeners) {
+                                                                       List<AbstractChannelMessageListener<?>> listeners) {
         // 创建 RedisMessageListenerContainer 对象
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
         // 设置 RedisConnection 工厂。

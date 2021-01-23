@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.Date;
 import java.util.List;
 
 import static com.baomidou.mybatisplus.core.metadata.OrderItem.asc;
@@ -42,4 +43,10 @@ public interface SysDictDataMapper extends BaseMapper<SysDictDataDO> {
                         .likeIfPresent("dict_type", reqVO.getDictType())
                         .eqIfPresent("status", reqVO.getStatus()));
     }
+
+    default boolean selectExistsByUpdateTimeAfter(Date maxUpdateTime) {
+        return selectOne(new QueryWrapper<SysDictDataDO>().select("id")
+                .gt("update_time", maxUpdateTime).last("LIMIT 1")) != null;
+    }
+
 }

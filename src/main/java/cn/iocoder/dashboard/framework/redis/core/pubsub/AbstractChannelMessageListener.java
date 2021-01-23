@@ -1,7 +1,8 @@
-package cn.iocoder.dashboard.framework.redis.core.listener;
+package cn.iocoder.dashboard.framework.redis.core.pubsub;
 
 import cn.hutool.core.util.ArrayUtil;
 import cn.iocoder.dashboard.util.json.JSONUtils;
+import lombok.SneakyThrows;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
 import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
@@ -15,15 +16,21 @@ import java.lang.reflect.Type;
  *
  * @author 芋道源码
  */
-public abstract class AbstractMessageListener<T> implements MessageListener {
+public abstract class AbstractChannelMessageListener<T extends ChannelMessage> implements MessageListener {
 
     /**
      * 消息类型
      */
     private final Class<T> messageType;
+    /**
+     * Redis Channel
+     */
+    private final String channel;
 
-    protected AbstractMessageListener() {
+    @SneakyThrows
+    protected AbstractChannelMessageListener() {
         this.messageType = getMessageClass();
+        this.channel = messageType.newInstance().getChannel();
     }
 
     /**
@@ -31,7 +38,9 @@ public abstract class AbstractMessageListener<T> implements MessageListener {
      *
      * @return channel
      */
-    public abstract String getChannel();
+    public final String getChannel() {
+        return channel;
+    }
 
     @Override
     public final void onMessage(Message message, byte[] bytes) {
@@ -56,7 +65,7 @@ public abstract class AbstractMessageListener<T> implements MessageListener {
         Class<?> targetClass = getClass();
         while (targetClass.getSuperclass() != null) {
             // 如果不是 AbstractMessageListener 父类，继续向上查找
-            if (targetClass.getSuperclass() != AbstractMessageListener.class) {
+            if (targetClass.getSuperclass() != AbstractChannelMessageListener.class) {
                 targetClass = targetClass.getSuperclass();
                 continue;
             }
