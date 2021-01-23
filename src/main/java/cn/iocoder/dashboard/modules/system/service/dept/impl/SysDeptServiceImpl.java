@@ -174,8 +174,8 @@ public class SysDeptServiceImpl implements SysDeptService {
         // 插入部门
         SysDeptDO dept = SysDeptConvert.INSTANCE.convert(reqVO);
         deptMapper.insert(dept);
-        // 发送消息
-        deptProducer.sendMenuRefreshMessage();
+        // 发送刷新消息
+        deptProducer.sendDeptRefreshMessage();
         return dept.getId();
     }
 
@@ -186,8 +186,8 @@ public class SysDeptServiceImpl implements SysDeptService {
         // 更新部门
         SysDeptDO updateObj = SysDeptConvert.INSTANCE.convert(reqVO);
         deptMapper.updateById(updateObj);
-        // 发送消息
-        deptProducer.sendMenuRefreshMessage();
+        // 发送刷新消息
+        deptProducer.sendDeptRefreshMessage();
     }
 
     @Override
@@ -200,8 +200,10 @@ public class SysDeptServiceImpl implements SysDeptService {
         }
         // 删除部门
         deptMapper.deleteById(id);
-        // 发送消息
-        deptProducer.sendMenuRefreshMessage();
+        // TODO 需要处理下与角色的数据权限关联，等做数据权限一起处理下
+
+        // 发送刷新消息
+        deptProducer.sendDeptRefreshMessage();
     }
 
     private void checkCreateOrUpdate(Long id, Long parentId, String name) {

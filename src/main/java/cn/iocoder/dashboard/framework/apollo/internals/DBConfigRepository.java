@@ -28,6 +28,8 @@ public class DBConfigRepository extends AbstractConfigRepository {
 
     private final static ScheduledExecutorService m_executorService;
 
+    private static DBConfigRepository INSTANCE;
+
     static {
         m_executorService = Executors.newScheduledThreadPool(1,
                 ApolloThreadFactory.create(DBConfigRepository.class.getSimpleName(), true));
@@ -64,6 +66,19 @@ public class DBConfigRepository extends AbstractConfigRepository {
         this.trySync();
         // 初始化定时任务
         this.schedulePeriodicRefresh();
+
+        // 设置单例
+        INSTANCE = this;
+    }
+
+    /**
+     * 通知同步，
+     */
+    public static void noticeSync() {
+        // 提交到线程池中，避免和 schedulePeriodicRefresh 并发问题
+        m_executorService.submit(() -> {
+            INSTANCE.trySync();
+        });
     }
 
     @Override
@@ -127,7 +142,6 @@ public class DBConfigRepository extends AbstractConfigRepository {
             Tracer.logEvent("Apollo.Client.Version", Apollo.VERSION);
         }, m_configUtil.getRefreshInterval(), m_configUtil.getRefreshInterval(),
                 m_configUtil.getRefreshIntervalTimeUnit());
-//                TimeUnit.SECONDS);
     }
 
     // ========== 数据库相关操作 ==========

@@ -219,7 +219,7 @@ public class SysMenuServiceImpl implements SysMenuService {
         menuMapper.deleteById(menuId);
         // 删除授予给角色的权限
         permissionService.processMenuDeleted(menuId);
-        // 发送刷新消息. 注意，需要事务提交后，在进行发送消息。不然 db 还未提交，结果缓存先刷新了
+        // 发送刷新消息. 注意，需要事务提交后，在进行发送刷新消息。不然 db 还未提交，结果缓存先刷新了
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
 
             @Override

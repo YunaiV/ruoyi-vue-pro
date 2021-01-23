@@ -10,6 +10,7 @@ import cn.iocoder.dashboard.modules.infra.convert.config.InfConfigConvert;
 import cn.iocoder.dashboard.modules.infra.dal.mysql.dao.config.InfConfigMapper;
 import cn.iocoder.dashboard.modules.infra.dal.mysql.dataobject.config.InfConfigDO;
 import cn.iocoder.dashboard.modules.infra.enums.config.InfConfigTypeEnum;
+import cn.iocoder.dashboard.modules.infra.mq.producer.config.InfConfigProducer;
 import cn.iocoder.dashboard.modules.infra.service.config.InfConfigService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -29,6 +30,9 @@ public class InfConfigServiceImpl implements InfConfigService {
 
     @Resource
     private InfConfigMapper configMapper;
+
+    @Resource
+    private InfConfigProducer configProducer;
 
     @Override
     public PageResult<InfConfigDO> getConfigPage(InfConfigPageReqVO reqVO) {
@@ -58,6 +62,8 @@ public class InfConfigServiceImpl implements InfConfigService {
         InfConfigDO config = InfConfigConvert.INSTANCE.convert(reqVO);
         config.setType(InfConfigTypeEnum.CUSTOM.getType());
         configMapper.insert(config);
+        // 发送刷新消息
+        configProducer.sendConfigRefreshMessage();
         return config.getId();
     }
 
@@ -68,6 +74,8 @@ public class InfConfigServiceImpl implements InfConfigService {
         // 更新参数配置
         InfConfigDO updateObj = InfConfigConvert.INSTANCE.convert(reqVO);
         configMapper.updateById(updateObj);
+        // 发送刷新消息
+        configProducer.sendConfigRefreshMessage();
     }
 
     @Override
@@ -80,6 +88,8 @@ public class InfConfigServiceImpl implements InfConfigService {
         }
         // 删除
         configMapper.deleteById(id);
+        // 发送刷新消息
+        configProducer.sendConfigRefreshMessage();
     }
 
     private void checkCreateOrUpdate(Long id, String key) {
@@ -113,4 +123,5 @@ public class InfConfigServiceImpl implements InfConfigService {
             throw ServiceExceptionUtil.exception(CONFIG_NAME_DUPLICATE);
         }
     }
+
 }

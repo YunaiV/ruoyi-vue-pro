@@ -19,7 +19,7 @@ public class SysDeptProducer {
     /**
      * 发送 {@link SysDeptRefreshMessage} 消息
      */
-    public void sendMenuRefreshMessage() {
+    public void sendDeptRefreshMessage() {
         SysDeptRefreshMessage message = new SysDeptRefreshMessage();
         RedisMessageUtils.sendChannelMessage(stringRedisTemplate, message);
     }

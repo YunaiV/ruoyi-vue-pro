@@ -160,8 +160,8 @@ public class SysDictDataServiceImpl implements SysDictDataService {
         // 插入字典类型
         SysDictDataDO dictData = SysDictDataConvert.INSTANCE.convert(reqVO);
         dictDataMapper.insert(dictData);
-        // 发送消息
-        dictDataProducer.sendMenuRefreshMessage();
+        // 发送刷新消息
+        dictDataProducer.sendDictDataRefreshMessage();
         return dictData.getId();
     }
 
@@ -172,8 +172,8 @@ public class SysDictDataServiceImpl implements SysDictDataService {
         // 更新字典类型
         SysDictDataDO updateObj = SysDictDataConvert.INSTANCE.convert(reqVO);
         dictDataMapper.updateById(updateObj);
-        // 发送消息
-        dictDataProducer.sendMenuRefreshMessage();
+        // 发送刷新消息
+        dictDataProducer.sendDictDataRefreshMessage();
     }
 
     @Override
@@ -182,8 +182,8 @@ public class SysDictDataServiceImpl implements SysDictDataService {
         this.checkDictDataExists(id);
         // 删除字典数据
         dictDataMapper.deleteById(id);
-        // 发送消息
-        dictDataProducer.sendMenuRefreshMessage();
+        // 发送刷新消息
+        dictDataProducer.sendDictDataRefreshMessage();
     }
 
     @Override
