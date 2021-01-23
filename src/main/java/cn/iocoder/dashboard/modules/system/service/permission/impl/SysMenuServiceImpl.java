@@ -21,6 +21,9 @@ import com.google.common.collect.Multimap;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
@@ -169,6 +172,8 @@ public class SysMenuServiceImpl implements SysMenuService {
         SysMenuDO menu = SysMenuConvert.INSTANCE.convert(reqVO);
         initMenuProperty(menu);
         menuMapper.insert(menu);
+        // 发送刷新消息
+        menuProducer.sendMenuRefreshMessage();
         // 返回
         return menu.getId();
     }
@@ -196,6 +201,7 @@ public class SysMenuServiceImpl implements SysMenuService {
      *
      * @param menuId 菜单编号
      */
+    @Transactional
     public void deleteMenu(Long menuId) {
         // 校验更新的菜单是否存在
         if (menuMapper.selectById(menuId) == null) {
@@ -213,6 +219,15 @@ public class SysMenuServiceImpl implements SysMenuService {
         menuMapper.deleteById(menuId);
         // 删除授予给角色的权限
         permissionService.processMenuDeleted(menuId);
+        // 发送刷新消息. 注意，需要事务提交后，在进行发送消息。不然 db 还未提交，结果缓存先刷新了
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+
+            @Override
+            public void afterCommit() {
+                menuProducer.sendMenuRefreshMessage();
+            }
+
+        });
     }
 
     @Override

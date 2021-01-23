@@ -20,16 +20,9 @@ import java.util.Map;
 public interface SysDeptService {
 
     /**
-     * 初始化
+     * 初始化部门的本地缓存
      */
-    void init();
-
-    /**
-     * 获得所有部门列表
-     *
-     * @return 部门列表
-     */
-    List<SysDeptDO> listDepts();
+    void initLocalCache();
 
     /**
      * 获得指定编号的部门列表

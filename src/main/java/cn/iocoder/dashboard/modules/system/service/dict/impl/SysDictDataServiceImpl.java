@@ -82,7 +82,7 @@ public class SysDictDataServiceImpl implements SysDictDataService {
 
     @Override
     @PostConstruct
-    public void initLocalCache() {
+    public synchronized void initLocalCache() {
         // 获取字典数据列表，如果有更新
         List<SysDictDataDO> dataList = this.loadDictDataIfUpdate(maxUpdateTime);
         if (CollUtil.isEmpty(dataList)) {

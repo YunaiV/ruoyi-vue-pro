@@ -3,6 +3,7 @@ package cn.iocoder.dashboard.modules.system.service.dept.impl;
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.dashboard.common.enums.CommonStatusEnum;
 import cn.iocoder.dashboard.common.exception.util.ServiceExceptionUtil;
+import cn.iocoder.dashboard.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.dashboard.modules.system.controller.dept.vo.dept.SysDeptCreateReqVO;
 import cn.iocoder.dashboard.modules.system.controller.dept.vo.dept.SysDeptListReqVO;
 import cn.iocoder.dashboard.modules.system.controller.dept.vo.dept.SysDeptUpdateReqVO;
@@ -10,19 +11,18 @@ import cn.iocoder.dashboard.modules.system.convert.dept.SysDeptConvert;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dao.dept.SysDeptMapper;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.dept.SysDeptDO;
 import cn.iocoder.dashboard.modules.system.enums.dept.DeptIdEnum;
+import cn.iocoder.dashboard.modules.system.mq.producer.dept.SysDeptProducer;
 import cn.iocoder.dashboard.modules.system.service.dept.SysDeptService;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.*;
 
@@ -34,6 +34,12 @@ import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.*;
 @Service
 @Slf4j
 public class SysDeptServiceImpl implements SysDeptService {
+
+    /**
+     * 定时执行 {@link #schedulePeriodicRefresh()} 的周期
+     * 因为已经通过 Redis Pub/Sub 机制，所以频率不需要高
+     */
+    private static final long SCHEDULER_PERIOD = 5 * 60 * 1000L;
 
     /**
      * 部门缓存
@@ -50,30 +56,64 @@ public class SysDeptServiceImpl implements SysDeptService {
      * 这里声明 volatile 修饰的原因是，每次刷新时，直接修改指向
      */
     private volatile Multimap<Long, SysDeptDO> parentDeptCache;
+    /**
+     * 缓存部门的最大更新时间，用于后续的增量轮询，判断是否有更新
+     */
+    private volatile Date maxUpdateTime;
 
     @Resource
     private SysDeptMapper deptMapper;
 
+    @Resource
+    private SysDeptProducer deptProducer;
+
     @Override
     @PostConstruct
-    public void init() {
-        // 从数据库中读取
-        List<SysDeptDO> sysDeptDOList = deptMapper.selectList();
+    public synchronized void initLocalCache() {
+        // 获取部门列表，如果有更新
+        List<SysDeptDO> deptList = this.loadDeptIfUpdate(maxUpdateTime);
+        if (CollUtil.isEmpty(deptList)) {
+            return;
+        }
+
         // 构建缓存
         ImmutableMap.Builder<Long, SysDeptDO> builder = ImmutableMap.builder();
         ImmutableMultimap.Builder<Long, SysDeptDO> parentBuilder = ImmutableMultimap.builder();
-        sysDeptDOList.forEach(sysRoleDO -> {
+        deptList.forEach(sysRoleDO -> {
             builder.put(sysRoleDO.getId(), sysRoleDO);
             parentBuilder.put(sysRoleDO.getParentId(), sysRoleDO);
         });
         // 设置缓存
         deptCache = builder.build();
         parentDeptCache = parentBuilder.build();
-        log.info("[init][初始化 Dept 数量为 {}]", sysDeptDOList.size());
+        assert deptList.size() > 0; // 断言，避免告警
+        maxUpdateTime = deptList.stream().max(Comparator.comparing(BaseDO::getUpdateTime)).get().getUpdateTime();
+        log.info("[init][初始化 Dept 数量为 {}]", deptList.size());
     }
 
-    @Override
-    public List<SysDeptDO> listDepts() {
+    @Scheduled(fixedDelay = SCHEDULER_PERIOD, initialDelay = SCHEDULER_PERIOD)
+    public void schedulePeriodicRefresh() {
+        initLocalCache();
+    }
+
+    /**
+     * 如果部门发生变化，从数据库中获取最新的全量部门。
+     * 如果未发生变化，则返回空
+     *
+     * @param maxUpdateTime 当前部门的最大更新时间
+     * @return 部门列表
+     */
+    private List<SysDeptDO> loadDeptIfUpdate(Date maxUpdateTime) {
+        // 第一步，判断是否要更新。
+        if (maxUpdateTime == null) { // 如果更新时间为空，说明 DB 一定有新数据
+            log.info("[loadMenuIfUpdate][首次加载全量部门]");
+        } else { // 判断数据库中是否有更新的部门
+            if (!deptMapper.selectExistsByUpdateTimeAfter(maxUpdateTime)) {
+                return null;
+            }
+            log.info("[loadMenuIfUpdate][增量加载全量部门]");
+        }
+        // 第二步，如果有更新，则从数据库加载所有部门
         return deptMapper.selectList();
     }
 
@@ -134,6 +174,8 @@ public class SysDeptServiceImpl implements SysDeptService {
         // 插入部门
         SysDeptDO dept = SysDeptConvert.INSTANCE.convert(reqVO);
         deptMapper.insert(dept);
+        // 发送消息
+        deptProducer.sendMenuRefreshMessage();
         return dept.getId();
     }
 
@@ -144,6 +186,8 @@ public class SysDeptServiceImpl implements SysDeptService {
         // 更新部门
         SysDeptDO updateObj = SysDeptConvert.INSTANCE.convert(reqVO);
         deptMapper.updateById(updateObj);
+        // 发送消息
+        deptProducer.sendMenuRefreshMessage();
     }
 
     @Override
@@ -156,6 +200,8 @@ public class SysDeptServiceImpl implements SysDeptService {
         }
         // 删除部门
         deptMapper.deleteById(id);
+        // 发送消息
+        deptProducer.sendMenuRefreshMessage();
     }
 
     private void checkCreateOrUpdate(Long id, Long parentId, String name) {

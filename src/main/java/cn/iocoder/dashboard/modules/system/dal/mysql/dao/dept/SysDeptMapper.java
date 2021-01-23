@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.Date;
 import java.util.List;
 
 @Mapper
@@ -28,6 +29,11 @@ public interface SysDeptMapper extends BaseMapper<SysDeptDO> {
 
     default Integer selectCountByParentId(Long parentId) {
         return selectCount(new QueryWrapper<SysDeptDO>().eq("parent_id", parentId));
+    }
+
+    default boolean selectExistsByUpdateTimeAfter(Date maxUpdateTime) {
+        return selectOne(new QueryWrapper<SysDeptDO>().select("id")
+                .gt("update_time", maxUpdateTime).last("LIMIT 1")) != null;
     }
 
 }
