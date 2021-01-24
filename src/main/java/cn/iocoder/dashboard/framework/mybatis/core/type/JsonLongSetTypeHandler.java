@@ -1,12 +1,10 @@
 package cn.iocoder.dashboard.framework.mybatis.core.type;
 
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.user.SysUserDO;
+import cn.iocoder.dashboard.util.json.JsonUtils;
 import com.baomidou.mybatisplus.extension.handlers.AbstractJsonTypeHandler;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.io.IOException;
 import java.util.Set;
 
 /**
@@ -17,29 +15,18 @@ import java.util.Set;
  *
  * @author 芋道源码
  */
-public class JacksonLongSetTypeHandler extends AbstractJsonTypeHandler<Object> {
-
-    // TODO 芋艿，需要将 Spring 的设置下进来
-    private static final ObjectMapper objectMapper = new ObjectMapper();
+public class JsonLongSetTypeHandler extends AbstractJsonTypeHandler<Object> {
 
     private static final TypeReference<Set<Long>> typeReference = new TypeReference<Set<Long>>(){};
 
     @Override
     protected Object parse(String json) {
-        try {
-            return objectMapper.readValue(json, typeReference);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        return JsonUtils.parseObject(json, typeReference);
     }
 
     @Override
     protected String toJson(Object obj) {
-        try {
-            return objectMapper.writeValueAsString(obj);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+        return JsonUtils.toJsonString(obj);
     }
 
 }

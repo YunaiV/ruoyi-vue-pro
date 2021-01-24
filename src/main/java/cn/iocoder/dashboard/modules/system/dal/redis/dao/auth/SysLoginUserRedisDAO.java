@@ -1,7 +1,7 @@
 package cn.iocoder.dashboard.modules.system.dal.redis.dao.auth;
 
 import cn.iocoder.dashboard.framework.security.core.LoginUser;
-import cn.iocoder.dashboard.util.json.JSONUtils;
+import cn.iocoder.dashboard.util.json.JsonUtils;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -22,12 +22,12 @@ public class SysLoginUserRedisDAO {
 
     public LoginUser get(String sessionId) {
         String redisKey = formatKey(sessionId);
-        return JSONUtils.parseObject(stringRedisTemplate.opsForValue().get(redisKey), LoginUser.class);
+        return JsonUtils.parseObject(stringRedisTemplate.opsForValue().get(redisKey), LoginUser.class);
     }
 
     public void set(String sessionId, LoginUser loginUser) {
         String redisKey = formatKey(sessionId);
-        stringRedisTemplate.opsForValue().set(redisKey, JSONUtils.toJSONString(loginUser), LOGIN_USER.getTimeout());
+        stringRedisTemplate.opsForValue().set(redisKey, JsonUtils.toJsonString(loginUser), LOGIN_USER.getTimeout());
     }
 
     public void delete(String accessToken) {

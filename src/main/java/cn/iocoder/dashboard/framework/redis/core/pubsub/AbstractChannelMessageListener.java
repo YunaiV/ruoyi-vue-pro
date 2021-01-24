@@ -1,7 +1,7 @@
 package cn.iocoder.dashboard.framework.redis.core.pubsub;
 
 import cn.hutool.core.util.ArrayUtil;
-import cn.iocoder.dashboard.util.json.JSONUtils;
+import cn.iocoder.dashboard.util.json.JsonUtils;
 import lombok.SneakyThrows;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
@@ -44,7 +44,7 @@ public abstract class AbstractChannelMessageListener<T extends ChannelMessage> i
 
     @Override
     public final void onMessage(Message message, byte[] bytes) {
-        T messageObj = JSONUtils.parseObject(message.getBody(), messageType);
+        T messageObj = JsonUtils.parseObject(message.getBody(), messageType);
         this.onMessage(messageObj);
     }
 

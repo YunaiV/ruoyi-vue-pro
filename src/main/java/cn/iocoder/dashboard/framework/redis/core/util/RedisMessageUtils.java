@@ -1,7 +1,7 @@
 package cn.iocoder.dashboard.framework.redis.core.util;
 
 import cn.iocoder.dashboard.framework.redis.core.pubsub.ChannelMessage;
-import cn.iocoder.dashboard.util.json.JSONUtils;
+import cn.iocoder.dashboard.util.json.JsonUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 
 /**
@@ -18,7 +18,7 @@ public class RedisMessageUtils {
      * @param message 消息
      */
     public static <T extends ChannelMessage>  void sendChannelMessage(RedisTemplate<?, ?> redisTemplate, T message) {
-        redisTemplate.convertAndSend(message.getChannel(), JSONUtils.toJSONString(message));
+        redisTemplate.convertAndSend(message.getChannel(), JsonUtils.toJsonString(message));
     }
 
 }

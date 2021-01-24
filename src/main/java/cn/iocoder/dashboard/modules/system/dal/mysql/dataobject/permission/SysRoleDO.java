@@ -2,7 +2,7 @@ package cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.permission;
 
 import cn.iocoder.dashboard.common.enums.CommonStatusEnum;
 import cn.iocoder.dashboard.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.dashboard.framework.mybatis.core.type.JacksonLongSetTypeHandler;
+import cn.iocoder.dashboard.framework.mybatis.core.type.JsonLongSetTypeHandler;
 import cn.iocoder.dashboard.framework.security.core.enums.DataScopeEnum;
 import cn.iocoder.dashboard.modules.system.enums.permission.RoleCodeEnum;
 import cn.iocoder.dashboard.modules.system.enums.permission.SysRoleTypeEnum;
@@ -71,7 +71,7 @@ public class SysRoleDO extends BaseDO {
      *
      * 适用于 {@link #dataScope} 的值为 {@link DataScopeEnum#DEPT_CUSTOM} 时
      */
-    @TableField(typeHandler = JacksonLongSetTypeHandler.class)
+    @TableField(typeHandler = JsonLongSetTypeHandler.class)
     private Set<Long> dataScopeDeptIds;
 
 }
