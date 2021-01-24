@@ -1,13 +1,13 @@
 package cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.logger;
 
 import cn.iocoder.dashboard.common.pojo.CommonResult;
+import cn.iocoder.dashboard.framework.logger.operatelog.core.enums.OperateTypeEnum;
 import cn.iocoder.dashboard.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.user.SysUserDO;
-import cn.iocoder.dashboard.framework.logger.operatelog.core.enums.OperateTypeEnum;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.extension.handlers.FastjsonTypeHandler;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -75,7 +75,7 @@ public class SysOperateLogDO extends BaseDO {
      * 拓展字段，有些复杂的业务，需要记录一些字段
      * 例如说，记录订单编号，则可以添加 key 为 "orderId"，value 为订单编号
      */
-    @TableField(typeHandler = FastjsonTypeHandler.class)
+    @TableField(typeHandler = JacksonTypeHandler.class)
     private Map<String, Object> exts;
 
     /**

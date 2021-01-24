@@ -31,6 +31,11 @@ spring:
         url: http://127.0.0.1:8080/${spring.boot.admin.context-path} # 设置 Spring Boot Admin Server 地址
       # Spring Boot Admin Server 服务端的相关配置
       context-path: /admin # 配置 Spring
+  # Jackson 配置项
+  jackson:
+    serialization:
+      write-dates-as-timestamps: true # 设置时间的格式，使用时间戳
+      write-date-timestamps-as-nanoseconds: false # 设置不使用 nanoseconds 的格式。例如说 1611460870.401，而是直接 1611460870401
 
 # 芋道配置项，设置当前项目所有自定义的配置
 yudao:

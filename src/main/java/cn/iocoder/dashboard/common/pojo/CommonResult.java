@@ -4,7 +4,6 @@ import cn.iocoder.dashboard.common.exception.ErrorCode;
 import cn.iocoder.dashboard.common.exception.GlobalException;
 import cn.iocoder.dashboard.common.exception.ServiceException;
 import cn.iocoder.dashboard.common.exception.enums.GlobalErrorCodeConstants;
-import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.springframework.util.Assert;
@@ -69,13 +68,11 @@ public final class CommonResult<T> implements Serializable {
         return result;
     }
 
-    @JSONField(serialize = false) // 避免 fastjson 序列化
     @JsonIgnore // 避免 jackson 序列化
     public boolean isSuccess() {
         return GlobalErrorCodeConstants.SUCCESS.getCode().equals(code);
     }
 
-    @JSONField(serialize = false) // 避免 fastjson 序列化
     @JsonIgnore // 避免 jackson 序列化
     public boolean isError() {
         return !isSuccess();

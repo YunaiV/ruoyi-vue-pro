@@ -1,7 +1,6 @@
 package cn.iocoder.dashboard.framework.redis.config;
 
 import cn.iocoder.dashboard.framework.redis.core.pubsub.AbstractChannelMessageListener;
-import com.alibaba.fastjson.support.spring.GenericFastJsonRedisSerializer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,7 +28,7 @@ public class RedisConfig {
         // 使用 String 序列化方式，序列化 KEY 。
         template.setKeySerializer(RedisSerializer.string());
         // 使用 JSON 序列化方式（库是 FastJSON ），序列化 VALUE 。
-        template.setValueSerializer(new GenericFastJsonRedisSerializer());
+        template.setValueSerializer(RedisSerializer.json());
         return template;
     }
 

@@ -11,8 +11,8 @@ import cn.iocoder.dashboard.framework.logger.operatelog.core.service.OperateLogF
 import cn.iocoder.dashboard.framework.security.core.util.SecurityUtils;
 import cn.iocoder.dashboard.framework.tracer.core.util.TracerUtils;
 import cn.iocoder.dashboard.modules.system.controller.logger.vo.operatelog.SysOperateLogCreateReqVO;
+import cn.iocoder.dashboard.util.json.JSONUtils;
 import cn.iocoder.dashboard.util.servlet.ServletUtils;
-import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Maps;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -319,7 +319,7 @@ public class OperateLogAspect {
             // 被忽略时，标记为 ignore 字符串，避免和 null 混在一起
             args.put(argName, !isIgnoreArgs(argValue) ? argValue : "[ignore]");
         }
-        return JSON.toJSONString(args);
+        return JSONUtils.toJSONString(args);
     }
 
     private static String obtainResultData(Object result) {
@@ -327,7 +327,7 @@ public class OperateLogAspect {
         if (result instanceof CommonResult) {
             result = ((CommonResult<?>) result).getData();
         }
-        return JSON.toJSONString(result);
+        return JSONUtils.toJSONString(result);
     }
 
     private static boolean isIgnoreArgs(Object object) {

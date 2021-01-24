@@ -31,7 +31,6 @@
 <!--        <swagger.version>2.9.2</swagger.version>-->
 <!--		<kaptcha.version>2.3.2</kaptcha.version>-->
 <!--        <pagehelper.boot.version>1.3.0</pagehelper.boot.version>-->
-<!--        <fastjson.version>1.2.74</fastjson.version>-->
 <!--        <oshi.version>5.3.6</oshi.version>-->
 <!--        <jna.version>5.6.0</jna.version>-->
 <!--        <commons.io.version>2.5</commons.io.version>-->
@@ -55,7 +54,6 @@
         <lombok.version>1.16.14</lombok.version>
         <mapstruct.version>1.4.1.Final</mapstruct.version>
         <jjwt.version>0.9.1</jjwt.version>
-        <fastjson.version>1.2.75</fastjson.version>
         <hutool.version>5.5.6</hutool.version>
         <easyexcel.verion>2.2.7</easyexcel.verion>
     </properties>
@@ -63,32 +61,6 @@
     <!-- 依赖声明 -->
     <dependencyManagement>
         <dependencies>
-
-<!--            &lt;!&ndash; 解析客户端操作系统、浏览器等 &ndash;&gt;-->
-<!--            <dependency>-->
-<!--                <groupId>eu.bitwalker</groupId>-->
-<!--                <artifactId>UserAgentUtils</artifactId>-->
-<!--                <version>${bitwalker.version}</version>-->
-<!--            </dependency>-->
-
-<!--            &lt;!&ndash; 获取系统信息 &ndash;&gt;-->
-<!--            <dependency>-->
-<!--                <groupId>com.github.oshi</groupId>-->
-<!--                <artifactId>oshi-core</artifactId>-->
-<!--                <version>${oshi.version}</version>-->
-<!--            </dependency>-->
-
-<!--            <dependency>-->
-<!--                <groupId>net.java.dev.jna</groupId>-->
-<!--                <artifactId>jna</artifactId>-->
-<!--                <version>${jna.version}</version>-->
-<!--            </dependency>-->
-
-<!--            <dependency>-->
-<!--                <groupId>net.java.dev.jna</groupId>-->
-<!--                <artifactId>jna-platform</artifactId>-->
-<!--                <version>${jna.version}</version>-->
-<!--            </dependency>-->
 
 <!--            &lt;!&ndash;velocity代码生成使用模板 &ndash;&gt;-->
 <!--            <dependency>-->
@@ -212,22 +184,9 @@
         </dependency>
 
         <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>fastjson</artifactId>
-            <version>${fastjson.version}</version>
-        </dependency>
-
-        <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>${lombok.version}</version>
-        </dependency>
-
-        <dependency>
-            <!-- 解析客户端操作系统、浏览器等 TODO 芋艿：后面看看 hutool 有没替代 -->
-            <groupId>eu.bitwalker</groupId>
-            <artifactId>UserAgentUtils</artifactId>
-            <version>1.21</version>
         </dependency>
 
         <dependency>

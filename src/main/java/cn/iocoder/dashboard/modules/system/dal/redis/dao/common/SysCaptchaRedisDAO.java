@@ -1,12 +1,9 @@
 package cn.iocoder.dashboard.modules.system.dal.redis.dao.common;
 
-import cn.iocoder.dashboard.framework.security.core.LoginUser;
-import com.alibaba.fastjson.JSON;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
-
 import java.time.Duration;
 
 import static cn.iocoder.dashboard.modules.system.dal.redis.RedisKeyConstants.CAPTCHA_CODE;

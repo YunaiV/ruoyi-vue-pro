@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.framework.redis.core.pubsub;
 
-import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * Redis Channel Message 接口
@@ -12,7 +12,7 @@ public interface ChannelMessage {
      *
      * @return Channel
      */
-    @JSONField(serialize = false) // 必须序列化
+    @JsonIgnore // 必须序列化
     String getChannel();
 
 }
