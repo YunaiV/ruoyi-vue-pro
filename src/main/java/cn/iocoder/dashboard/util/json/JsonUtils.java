@@ -1,5 +1,7 @@
 package cn.iocoder.dashboard.util.json;
 
+import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.StrUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -36,6 +38,9 @@ public class JsonUtils {
     }
 
     public static <T> T parseObject(String text, Class<T> clazz) {
+        if (StrUtil.isEmpty(text)) {
+            return null;
+        }
         try {
             return objectMapper.readValue(text, clazz);
         } catch (IOException e) {
@@ -44,6 +49,9 @@ public class JsonUtils {
     }
 
     public static <T> T parseObject(byte[] bytes, Class<T> clazz) {
+        if (ArrayUtil.isEmpty(bytes)) {
+            return null;
+        }
         try {
             return objectMapper.readValue(bytes, clazz);
         } catch (IOException e) {
