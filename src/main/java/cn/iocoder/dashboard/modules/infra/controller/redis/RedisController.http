@@ -1,3 +1,7 @@
-### 请求 /get-permission-info 接口 => 成功
+### 请求 /infra/redis/get-monitor-info 接口 => 成功
 GET {{baseUrl}}/infra/redis/get-monitor-info
+Authorization: Bearer {{token}}
+
+### 请求 /infra/redis/get-key-list 接口 => 成功
+GET {{baseUrl}}/infra/redis/get-key-list
 Authorization: Bearer {{token}}

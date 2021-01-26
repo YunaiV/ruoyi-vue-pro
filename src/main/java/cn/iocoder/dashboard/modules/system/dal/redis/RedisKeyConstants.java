@@ -6,7 +6,6 @@ import cn.iocoder.dashboard.framework.security.core.LoginUser;
 import java.time.Duration;
 
 import static cn.iocoder.dashboard.framework.redis.core.RedisKeyDefine.KeyTypeEnum.STRING;
-import static cn.iocoder.dashboard.framework.redis.core.RedisKeyDefine.TIMEOUT_DYNAMIC;
 
 /**
  * Redis Key 枚举类
@@ -20,13 +19,15 @@ public interface RedisKeyConstants {
      *
      * key 的 format 的参数是 sessionId
      */
-    RedisKeyDefine LOGIN_USER = new RedisKeyDefine("login_user:%s", STRING, LoginUser.class, Duration.ofMinutes(30));
+    RedisKeyDefine LOGIN_USER = new RedisKeyDefine("login_user:%s", STRING, LoginUser.class,
+            Duration.ofMinutes(30));
 
     /**
      * 验证码的缓存
      *
      * key 的 format 的参数是 uuid
      */
-    RedisKeyDefine CAPTCHA_CODE = new RedisKeyDefine("captcha_code:%s", STRING, String.class, TIMEOUT_DYNAMIC);
+    RedisKeyDefine CAPTCHA_CODE = new RedisKeyDefine("captcha_code:%s", STRING, String.class,
+            RedisKeyDefine.TimeoutTypeEnum.DYNAMIC);
 
 }
