@@ -1,28 +1,27 @@
 spring:
   application:
     name: dashboard
+
   # 数据源配置项 TODO 多数据源；TODO 监控配置
   datasource:
     url: jdbc:mysql://127.0.1:33061/ruoyi-vue-pro?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=CTT
     driver-class-name: com.mysql.jdbc.Driver
     username: root
     password: 123456
-  # redis 配置 TODO 需要进行下，对接到 redisson
+
+  # Redis 配置。Redisson 默认的配置足够使用，一般不需要进行调优
   redis:
-    # 地址
-    host: localhost
-    # 端口，默认为6379
-    port: 6379
-    # 数据库索引
-    database: 0
-    # 连接超时时间
-    timeout: 10s
+    host: 127.0.0.1 # 地址
+    port: 6379 # 端口
+    database: 0 # 数据库索引
+
   # Servlet 配置
   servlet:
     # 文件上传相关配置项
     multipart:
       max-file-size: 16MB # 单个文件大小
       max-request-size: 32MB # 设置总上传的文件大小
+
   # Spring Boot Admin 配置项
   boot:
     admin:
@@ -31,6 +30,7 @@ spring:
         url: http://127.0.0.1:8080/${spring.boot.admin.context-path} # 设置 Spring Boot Admin Server 地址
       # Spring Boot Admin Server 服务端的相关配置
       context-path: /admin # 配置 Spring
+
   # Jackson 配置项
   jackson:
     serialization:
