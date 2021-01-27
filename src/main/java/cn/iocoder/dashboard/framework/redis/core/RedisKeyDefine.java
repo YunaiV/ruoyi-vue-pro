@@ -1,8 +1,6 @@
 package cn.iocoder.dashboard.framework.redis.core;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.Getter;
 
 import java.time.Duration;
 
@@ -26,20 +24,15 @@ public class RedisKeyDefine {
 
     }
 
-    @Getter
-    @AllArgsConstructor
-    public enum TimeoutTypeEnum {
+    /**
+     * 过期时间 - 永不过期
+     */
+    public static final Duration TIMEOUT_FOREVER = null;
 
-        FOREVER(1), // 永不超时
-        DYNAMIC(2), // 动态超时
-        FIXED(3); // 固定超时
-
-        /**
-         * 类型
-         */
-        private final Integer type;
-
-    }
+    /**
+     * 过期时间 - 动态，通过参数传入
+     */
+    public static final Duration TIMEOUT_DYNAMIC = null;
 
     /**
      * Key 模板
@@ -56,11 +49,9 @@ public class RedisKeyDefine {
      */
     private final Class<?> valueType;
     /**
-     * 超时类型
-     */
-    private final TimeoutTypeEnum timeoutType;
-    /**
      * 过期时间
+     *
+     * 为空时，表示永不过期 {@link #TIMEOUT_FOREVER}
      */
     private final Duration timeout;
 
@@ -68,20 +59,7 @@ public class RedisKeyDefine {
         this.keyTemplate = keyTemplate;
         this.keyType = keyType;
         this.valueType = valueType;
-        this.timeoutType = TimeoutTypeEnum.FIXED;
         this.timeout = timeout;
-        // 添加注册表
-        RedisKeyRegistry.add(this);
-    }
-
-    public RedisKeyDefine(String keyTemplate, KeyTypeEnum keyType, Class<?> valueType, TimeoutTypeEnum timeoutType) {
-        this.keyTemplate = keyTemplate;
-        this.keyType = keyType;
-        this.valueType = valueType;
-        this.timeoutType = timeoutType;
-        this.timeout = Duration.ZERO;
-        // 添加注册表
-        RedisKeyRegistry.add(this);
     }
 
 }
