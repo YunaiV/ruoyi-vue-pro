@@ -1,5 +1,6 @@
 package cn.iocoder.dashboard.framework.redis.core;
 
+import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
@@ -14,15 +15,23 @@ import java.time.Duration;
 @Data
 public class RedisKeyDefine {
 
+    @Getter
+    @AllArgsConstructor
     public enum KeyTypeEnum {
 
-        STRING,
-        LIST,
-        HASH,
-        SET,
-        ZSET,
-        STREAM,
-        PUBSUB
+        STRING("String"),
+        LIST("List"),
+        HASH("Hash"),
+        SET("Set"),
+        ZSET("Sorted Set"),
+        STREAM("Stream"),
+        PUBSUB("Pub/Sub");
+
+        /**
+         * 类型
+         */
+        @JsonValue
+        private final String type;
 
     }
 
@@ -37,6 +46,7 @@ public class RedisKeyDefine {
         /**
          * 类型
          */
+        @JsonValue
         private final Integer type;
 
     }
@@ -63,25 +73,29 @@ public class RedisKeyDefine {
      * 过期时间
      */
     private final Duration timeout;
+    /**
+     * 备注
+     */
+    private final String memo;
 
-    public RedisKeyDefine(String keyTemplate, KeyTypeEnum keyType, Class<?> valueType, Duration timeout) {
+    private RedisKeyDefine(String memo, String keyTemplate, KeyTypeEnum keyType, Class<?> valueType,
+                           TimeoutTypeEnum timeoutType, Duration timeout) {
+        this.memo = memo;
         this.keyTemplate = keyTemplate;
         this.keyType = keyType;
         this.valueType = valueType;
-        this.timeoutType = TimeoutTypeEnum.FIXED;
         this.timeout = timeout;
+        this.timeoutType = timeoutType;
         // 添加注册表
         RedisKeyRegistry.add(this);
     }
 
-    public RedisKeyDefine(String keyTemplate, KeyTypeEnum keyType, Class<?> valueType, TimeoutTypeEnum timeoutType) {
-        this.keyTemplate = keyTemplate;
-        this.keyType = keyType;
-        this.valueType = valueType;
-        this.timeoutType = timeoutType;
-        this.timeout = Duration.ZERO;
-        // 添加注册表
-        RedisKeyRegistry.add(this);
+    public RedisKeyDefine(String memo, String keyTemplate, KeyTypeEnum keyType, Class<?> valueType, Duration timeout) {
+        this(memo, keyTemplate, keyType, valueType, TimeoutTypeEnum.FIXED, timeout);
+    }
+
+    public RedisKeyDefine(String memo, String keyTemplate, KeyTypeEnum keyType, Class<?> valueType, TimeoutTypeEnum timeoutType) {
+        this(memo, keyTemplate, keyType, valueType, timeoutType, Duration.ZERO);
     }
 
 }

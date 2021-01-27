@@ -34,8 +34,10 @@ spring:
   # Jackson 配置项
   jackson:
     serialization:
-      write-dates-as-timestamps: true # 设置时间的格式，使用时间戳
+      write-dates-as-timestamps: true # 设置 Date 的格式，使用时间戳
       write-date-timestamps-as-nanoseconds: false # 设置不使用 nanoseconds 的格式。例如说 1611460870.401，而是直接 1611460870401
+      write-durations-as-timestamps: true # 设置 Duration 的格式，使用时间戳
+      fail-on-empty-beans: false # 允许序列化无属性的 Bean
 
 # 芋道配置项，设置当前项目所有自定义的配置
 yudao:

@@ -11,7 +11,7 @@
  Target Server Version : 50718
  File Encoding         : 65001
 
- Date: 22/01/2021 01:31:59
+ Date: 28/01/2021 01:32:22
 */
 
 SET NAMES utf8mb4;
@@ -86,6 +86,74 @@ BEGIN;
 COMMIT;
 
 -- ----------------------------
+-- Table structure for gen_table_column_copy1
+-- ----------------------------
+DROP TABLE IF EXISTS `gen_table_column_copy1`;
+CREATE TABLE `gen_table_column_copy1` (
+  `column_id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '编号',
+  `table_id` varchar(64) DEFAULT NULL COMMENT '归属表编号',
+  `column_name` varchar(200) DEFAULT NULL COMMENT '列名称',
+  `column_comment` varchar(500) DEFAULT NULL COMMENT '列描述',
+  `column_type` varchar(100) DEFAULT NULL COMMENT '列类型',
+  `java_type` varchar(500) DEFAULT NULL COMMENT 'JAVA类型',
+  `java_field` varchar(200) DEFAULT NULL COMMENT 'JAVA字段名',
+  `is_pk` char(1) DEFAULT NULL COMMENT '是否主键（1是）',
+  `is_increment` char(1) DEFAULT NULL COMMENT '是否自增（1是）',
+  `is_required` char(1) DEFAULT NULL COMMENT '是否必填（1是）',
+  `is_insert` char(1) DEFAULT NULL COMMENT '是否为插入字段（1是）',
+  `is_edit` char(1) DEFAULT NULL COMMENT '是否编辑字段（1是）',
+  `is_list` char(1) DEFAULT NULL COMMENT '是否列表字段（1是）',
+  `is_query` char(1) DEFAULT NULL COMMENT '是否查询字段（1是）',
+  `query_type` varchar(200) DEFAULT 'EQ' COMMENT '查询方式（等于、不等于、大于、小于、范围）',
+  `html_type` varchar(200) DEFAULT NULL COMMENT '显示类型（文本框、文本域、下拉框、复选框、单选框、日期控件）',
+  `dict_type` varchar(200) DEFAULT '' COMMENT '字典类型',
+  `sort` int(11) DEFAULT NULL COMMENT '排序',
+  `create_by` varchar(64) DEFAULT '' COMMENT '创建者',
+  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
+  `update_by` varchar(64) DEFAULT '' COMMENT '更新者',
+  `update_time` datetime DEFAULT NULL COMMENT '更新时间',
+  PRIMARY KEY (`column_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='代码生成业务表字段';
+
+-- ----------------------------
+-- Records of gen_table_column_copy1
+-- ----------------------------
+BEGIN;
+COMMIT;
+
+-- ----------------------------
+-- Table structure for gen_table_copy1
+-- ----------------------------
+DROP TABLE IF EXISTS `gen_table_copy1`;
+CREATE TABLE `gen_table_copy1` (
+  `table_id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '编号',
+  `table_name` varchar(200) DEFAULT '' COMMENT '表名称',
+  `table_comment` varchar(500) DEFAULT '' COMMENT '表描述',
+  `class_name` varchar(100) DEFAULT '' COMMENT '实体类名称',
+  `tpl_category` varchar(200) DEFAULT 'crud' COMMENT '使用的模板（crud单表操作 tree树表操作）',
+  `package_name` varchar(100) DEFAULT NULL COMMENT '生成包路径',
+  `module_name` varchar(30) DEFAULT NULL COMMENT '生成模块名',
+  `business_name` varchar(30) DEFAULT NULL COMMENT '生成业务名',
+  `function_name` varchar(50) DEFAULT NULL COMMENT '生成功能名',
+  `function_author` varchar(50) DEFAULT NULL COMMENT '生成功能作者',
+  `gen_type` char(1) DEFAULT '0' COMMENT '生成代码方式（0zip压缩包 1自定义路径）',
+  `gen_path` varchar(200) DEFAULT '/' COMMENT '生成路径（不填默认项目路径）',
+  `options` varchar(1000) DEFAULT NULL COMMENT '其它生成选项',
+  `create_by` varchar(64) DEFAULT '' COMMENT '创建者',
+  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
+  `update_by` varchar(64) DEFAULT '' COMMENT '更新者',
+  `update_time` datetime DEFAULT NULL COMMENT '更新时间',
+  `remark` varchar(500) DEFAULT NULL COMMENT '备注',
+  PRIMARY KEY (`table_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='代码生成业务表';
+
+-- ----------------------------
+-- Records of gen_table_copy1
+-- ----------------------------
+BEGIN;
+COMMIT;
+
+-- ----------------------------
 -- Table structure for inf_config
 -- ----------------------------
 DROP TABLE IF EXISTS `inf_config`;
@@ -111,9 +179,40 @@ CREATE TABLE `inf_config` (
 -- ----------------------------
 BEGIN;
 INSERT INTO `inf_config` VALUES (1, 'ui', 1, '主框架页-默认皮肤样式名称', 'sys.index.skinName', 'skin-blue', b'0', '蓝色 skin-blue、绿色 skin-green、紫色 skin-purple、红色 skin-red、黄色 skin-yellow', 'admin', '2021-01-05 17:03:48', '', '2021-01-05 17:03:48', b'0');
-INSERT INTO `inf_config` VALUES (2, 'biz', 1, '用户管理-账号初始密码', 'sys.user.initPassword', '123456', b'1', '初始化密码 123456', 'admin', '2021-01-05 17:03:48', '', '2021-01-19 03:05:02', b'0');
+INSERT INTO `inf_config` VALUES (2, 'biz', 1, '用户管理-账号初始密码', 'sys.user.initPassword', '123456', b'0', '初始化密码 123456', 'admin', '2021-01-05 17:03:48', '', '2021-01-21 02:13:02', b'0');
 INSERT INTO `inf_config` VALUES (3, 'ui', 1, '主框架页-侧边栏主题', 'sys.index.sideTheme', 'theme-dark', b'0', '深色主题theme-dark，浅色主题theme-light', 'admin', '2021-01-05 17:03:48', '', '2021-01-19 03:05:21', b'0');
 INSERT INTO `inf_config` VALUES (4, '1', 2, 'xxx', 'demo.test', '10', b'0', '5', '', '2021-01-19 03:10:26', '', '2021-01-20 09:25:55', b'0');
+COMMIT;
+
+-- ----------------------------
+-- Table structure for inf_config_copy1
+-- ----------------------------
+DROP TABLE IF EXISTS `inf_config_copy1`;
+CREATE TABLE `inf_config_copy1` (
+  `id` int(5) NOT NULL AUTO_INCREMENT COMMENT '参数主键',
+  `group` varchar(50) NOT NULL COMMENT '参数分组',
+  `type` tinyint(4) NOT NULL COMMENT '参数类型',
+  `name` varchar(100) NOT NULL DEFAULT '' COMMENT '参数名称',
+  `key` varchar(100) NOT NULL DEFAULT '' COMMENT '参数键名',
+  `value` varchar(500) NOT NULL DEFAULT '' COMMENT '参数键值',
+  `sensitive` bit(1) NOT NULL COMMENT '是否敏感',
+  `remark` varchar(500) DEFAULT NULL COMMENT '备注',
+  `create_by` varchar(64) DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_by` varchar(64) DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COMMENT='参数配置表';
+
+-- ----------------------------
+-- Records of inf_config_copy1
+-- ----------------------------
+BEGIN;
+INSERT INTO `inf_config_copy1` VALUES (1, 'ui', 1, '主框架页-默认皮肤样式名称', 'sys.index.skinName', 'skin-blue', b'0', '蓝色 skin-blue、绿色 skin-green、紫色 skin-purple、红色 skin-red、黄色 skin-yellow', 'admin', '2021-01-05 17:03:48', '', '2021-01-05 17:03:48', b'0');
+INSERT INTO `inf_config_copy1` VALUES (2, 'biz', 1, '用户管理-账号初始密码', 'sys.user.initPassword', '123456', b'0', '初始化密码 123456', 'admin', '2021-01-05 17:03:48', '', '2021-01-21 02:13:02', b'0');
+INSERT INTO `inf_config_copy1` VALUES (3, 'ui', 1, '主框架页-侧边栏主题', 'sys.index.sideTheme', 'theme-dark', b'0', '深色主题theme-dark，浅色主题theme-light', 'admin', '2021-01-05 17:03:48', '', '2021-01-19 03:05:21', b'0');
+INSERT INTO `inf_config_copy1` VALUES (4, '1', 2, 'xxx', 'demo.test', '10', b'0', '5', '', '2021-01-19 03:10:26', '', '2021-01-20 09:25:55', b'0');
 COMMIT;
 
 -- ----------------------------
@@ -154,6 +253,43 @@ INSERT INTO `sys_dept` VALUES (109, '财务部门', 102, 2, '若依', '158888888
 COMMIT;
 
 -- ----------------------------
+-- Table structure for sys_dept_copy1
+-- ----------------------------
+DROP TABLE IF EXISTS `sys_dept_copy1`;
+CREATE TABLE `sys_dept_copy1` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '部门id',
+  `name` varchar(30) NOT NULL DEFAULT '' COMMENT '部门名称',
+  `parent_id` bigint(20) NOT NULL DEFAULT '0' COMMENT '父部门id',
+  `sort` int(4) NOT NULL DEFAULT '0' COMMENT '显示顺序',
+  `leader` varchar(20) DEFAULT NULL COMMENT '负责人',
+  `phone` varchar(11) DEFAULT NULL COMMENT '联系电话',
+  `email` varchar(50) DEFAULT NULL COMMENT '邮箱',
+  `status` tinyint(4) NOT NULL COMMENT '部门状态（0正常 1停用）',
+  `create_by` varchar(64) DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_by` varchar(64) DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=110 DEFAULT CHARSET=utf8mb4 COMMENT='部门表';
+
+-- ----------------------------
+-- Records of sys_dept_copy1
+-- ----------------------------
+BEGIN;
+INSERT INTO `sys_dept_copy1` VALUES (100, '芋道源码', 0, 0, '若依', '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '', '2021-01-06 19:45:52', b'0');
+INSERT INTO `sys_dept_copy1` VALUES (101, '深圳总公司', 100, 1, '若依', '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '', '2021-01-05 17:03:47', b'0');
+INSERT INTO `sys_dept_copy1` VALUES (102, '长沙分公司', 100, 2, '若依', '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '', '2021-01-05 17:03:47', b'0');
+INSERT INTO `sys_dept_copy1` VALUES (103, '研发部门', 101, 1, '若依', '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '', '2021-01-05 17:03:47', b'0');
+INSERT INTO `sys_dept_copy1` VALUES (104, '市场部门', 101, 2, '若依', '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '', '2021-01-05 17:03:47', b'0');
+INSERT INTO `sys_dept_copy1` VALUES (105, '测试部门', 101, 3, '若依', '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '', '2021-01-05 17:03:47', b'0');
+INSERT INTO `sys_dept_copy1` VALUES (106, '财务部门', 101, 4, '若依', '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '', '2021-01-05 17:03:47', b'0');
+INSERT INTO `sys_dept_copy1` VALUES (107, '运维部门', 101, 5, '若依', '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '', '2021-01-05 17:03:47', b'0');
+INSERT INTO `sys_dept_copy1` VALUES (108, '市场部门', 102, 1, '若依', '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '', '2021-01-05 17:03:47', b'0');
+INSERT INTO `sys_dept_copy1` VALUES (109, '财务部门', 102, 2, '若依', '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '', '2021-01-05 17:03:47', b'0');
+COMMIT;
+
+-- ----------------------------
 -- Table structure for sys_dict_data
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_dict_data`;
@@ -171,7 +307,7 @@ CREATE TABLE `sys_dict_data` (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=47 DEFAULT CHARSET=utf8mb4 COMMENT='字典数据表';
+) ENGINE=InnoDB AUTO_INCREMENT=50 DEFAULT CHARSET=utf8mb4 COMMENT='字典数据表';
 
 -- ----------------------------
 -- Records of sys_dict_data
@@ -214,6 +350,75 @@ INSERT INTO `sys_dict_data` VALUES (43, 31, '验证码不正确', '31', 'sys_log
 INSERT INTO `sys_dict_data` VALUES (44, 100, '未知异常', '100', 'sys_login_result', 0, '登陆结果 - 未知异常', '', '2021-01-18 06:17:54', '', '2021-01-18 06:19:57', b'0');
 INSERT INTO `sys_dict_data` VALUES (45, 1, '是', 'true', 'sys_boolean_string', 0, 'Boolean 是否类型 - 是', '', '2021-01-19 03:20:55', '', '2021-01-19 03:21:08', b'0');
 INSERT INTO `sys_dict_data` VALUES (46, 1, '否', 'false', 'sys_boolean_string', 0, 'Boolean 是否类型 - 否', '', '2021-01-19 03:20:55', '', '2021-01-19 03:21:39', b'0');
+INSERT INTO `sys_dict_data` VALUES (47, 1, '永不超时', '1', 'inf_redis_timeout_type', 0, 'Redis 未设置超时的情况', '', '2021-01-26 00:53:17', '', '2021-01-26 00:53:17', b'0');
+INSERT INTO `sys_dict_data` VALUES (48, 1, '动态超时', '2', 'inf_redis_timeout_type', 0, '程序里动态传入超时时间，无法固定', '', '2021-01-26 00:55:00', '', '2021-01-26 00:55:00', b'0');
+INSERT INTO `sys_dict_data` VALUES (49, 3, '固定超时', '3', 'inf_redis_timeout_type', 0, 'Redis 设置了过期时间', '', '2021-01-26 00:55:26', '', '2021-01-26 00:55:26', b'0');
+COMMIT;
+
+-- ----------------------------
+-- Table structure for sys_dict_data_copy1
+-- ----------------------------
+DROP TABLE IF EXISTS `sys_dict_data_copy1`;
+CREATE TABLE `sys_dict_data_copy1` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '字典编码',
+  `sort` int(4) NOT NULL DEFAULT '0' COMMENT '字典排序',
+  `label` varchar(100) NOT NULL DEFAULT '' COMMENT '字典标签',
+  `value` varchar(100) NOT NULL DEFAULT '' COMMENT '字典键值',
+  `dict_type` varchar(100) NOT NULL DEFAULT '' COMMENT '字典类型',
+  `status` tinyint(4) NOT NULL DEFAULT '0' COMMENT '状态（0正常 1停用）',
+  `remark` varchar(500) DEFAULT NULL COMMENT '备注',
+  `create_by` varchar(64) DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_by` varchar(64) DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=50 DEFAULT CHARSET=utf8mb4 COMMENT='字典数据表';
+
+-- ----------------------------
+-- Records of sys_dict_data_copy1
+-- ----------------------------
+BEGIN;
+INSERT INTO `sys_dict_data_copy1` VALUES (1, 1, '男', '1', 'sys_user_sex', 0, '性别男', 'admin', '2021-01-05 17:03:48', '', '2021-01-06 05:48:53', b'0');
+INSERT INTO `sys_dict_data_copy1` VALUES (2, 2, '女', '2', 'sys_user_sex', 0, '性别女', 'admin', '2021-01-05 17:03:48', '', '2021-01-06 05:48:55', b'0');
+INSERT INTO `sys_dict_data_copy1` VALUES (8, 1, '正常', '0', 'sys_job_status', 0, '正常状态', 'admin', '2021-01-05 17:03:48', '', '2021-01-06 00:02:28', b'0');
+INSERT INTO `sys_dict_data_copy1` VALUES (9, 2, '暂停', '1', 'sys_job_status', 0, '停用状态', 'admin', '2021-01-05 17:03:48', '', '2021-01-06 00:02:28', b'0');
+INSERT INTO `sys_dict_data_copy1` VALUES (10, 1, '默认', 'DEFAULT', 'sys_job_group', 0, '默认分组', 'admin', '2021-01-05 17:03:48', '', '2021-01-06 00:02:28', b'0');
+INSERT INTO `sys_dict_data_copy1` VALUES (11, 2, '系统', 'SYSTEM', 'sys_job_group', 0, '系统分组', 'admin', '2021-01-05 17:03:48', '', '2021-01-06 00:02:28', b'0');
+INSERT INTO `sys_dict_data_copy1` VALUES (12, 1, '系统内置', '1', 'sys_config_type', 0, '参数类型 - 系统内置', 'admin', '2021-01-05 17:03:48', '', '2021-01-18 07:41:59', b'0');
+INSERT INTO `sys_dict_data_copy1` VALUES (13, 2, '自定义', '2', 'sys_config_type', 0, '参数类型 - 自定义', 'admin', '2021-01-05 17:03:48', '', '2021-01-18 07:41:51', b'0');
+INSERT INTO `sys_dict_data_copy1` VALUES (14, 1, '通知', '1', 'sys_notice_type', 0, '通知', 'admin', '2021-01-05 17:03:48', '', '2021-01-06 00:02:28', b'0');
+INSERT INTO `sys_dict_data_copy1` VALUES (15, 2, '公告', '2', 'sys_notice_type', 0, '公告', 'admin', '2021-01-05 17:03:48', '', '2021-01-06 00:02:28', b'0');
+INSERT INTO `sys_dict_data_copy1` VALUES (16, 0, '其它', '0', 'sys_operate_type', 0, '其它操作', 'admin', '2021-01-05 17:03:48', '', '2021-01-16 13:51:12', b'0');
+INSERT INTO `sys_dict_data_copy1` VALUES (17, 1, '查询', '1', 'sys_operate_type', 0, '查询操作', 'admin', '2021-01-05 17:03:48', '', '2021-01-16 13:51:10', b'0');
+INSERT INTO `sys_dict_data_copy1` VALUES (18, 2, '新增', '2', 'sys_operate_type', 0, '新增操作', 'admin', '2021-01-05 17:03:48', '', '2021-01-16 13:51:17', b'0');
+INSERT INTO `sys_dict_data_copy1` VALUES (19, 3, '修改', '3', 'sys_operate_type', 0, '修改操作', 'admin', '2021-01-05 17:03:48', '', '2021-01-16 13:51:20', b'0');
+INSERT INTO `sys_dict_data_copy1` VALUES (20, 4, '删除', '4', 'sys_operate_type', 0, '删除操作', 'admin', '2021-01-05 17:03:48', '', '2021-01-16 13:51:24', b'0');
+INSERT INTO `sys_dict_data_copy1` VALUES (22, 5, '导出', '5', 'sys_operate_type', 0, '导出操作', 'admin', '2021-01-05 17:03:48', '', '2021-01-16 13:49:20', b'0');
+INSERT INTO `sys_dict_data_copy1` VALUES (23, 6, '导入', '6', 'sys_operate_type', 0, '导入操作', 'admin', '2021-01-05 17:03:48', '', '2021-01-16 13:49:24', b'0');
+INSERT INTO `sys_dict_data_copy1` VALUES (27, 1, '开启', '0', 'sys_common_status', 0, '开启状态', 'admin', '2021-01-05 17:03:48', '', '2021-01-06 02:57:12', b'0');
+INSERT INTO `sys_dict_data_copy1` VALUES (28, 2, '关闭', '1', 'sys_common_status', 0, '关闭状态', 'admin', '2021-01-05 17:03:48', '', '2021-01-06 05:48:32', b'0');
+INSERT INTO `sys_dict_data_copy1` VALUES (29, 1, '目录', '1', 'sys_menu_type', 0, '目录', 'admin', '2021-01-05 17:03:48', '', '2021-01-06 13:33:30', b'0');
+INSERT INTO `sys_dict_data_copy1` VALUES (30, 2, '菜单', '2', 'sys_menu_type', 0, '菜单', 'admin', '2021-01-05 17:03:48', '', '2021-01-06 13:33:35', b'0');
+INSERT INTO `sys_dict_data_copy1` VALUES (31, 3, '按钮', '3', 'sys_menu_type', 0, '按钮', 'admin', '2021-01-05 17:03:48', '', '2021-01-06 13:33:38', b'0');
+INSERT INTO `sys_dict_data_copy1` VALUES (32, 1, '内置', '1', 'sys_role_type', 0, '内置角色', 'admin', '2021-01-05 17:03:48', '', '2021-01-06 13:34:22', b'0');
+INSERT INTO `sys_dict_data_copy1` VALUES (33, 2, '自定义', '2', 'sys_role_type', 0, '自定义角色', 'admin', '2021-01-05 17:03:48', '', '2021-01-06 13:34:26', b'0');
+INSERT INTO `sys_dict_data_copy1` VALUES (34, 1, '全部数据权限', '1', 'sys_data_scope', 0, '全部数据权限', 'admin', '2021-01-05 17:03:48', '', '2021-01-06 19:38:02', b'0');
+INSERT INTO `sys_dict_data_copy1` VALUES (35, 2, '指定部门数据权限', '2', 'sys_data_scope', 0, '指定部门数据权限', 'admin', '2021-01-05 17:03:48', '', '2021-01-06 19:38:20', b'0');
+INSERT INTO `sys_dict_data_copy1` VALUES (36, 3, '本部门数据权限', '3', 'sys_data_scope', 0, '本部门数据权限', 'admin', '2021-01-05 17:03:48', '', '2021-01-06 19:38:29', b'0');
+INSERT INTO `sys_dict_data_copy1` VALUES (37, 4, '本部门及以下数据权限', '4', 'sys_data_scope', 0, '本部门及以下数据权限', 'admin', '2021-01-05 17:03:48', '', '2021-01-06 19:38:32', b'0');
+INSERT INTO `sys_dict_data_copy1` VALUES (38, 5, '仅本人数据权限', '5', 'sys_data_scope', 0, '仅本人数据权限', 'admin', '2021-01-05 17:03:48', '', '2021-01-06 19:38:38', b'0');
+INSERT INTO `sys_dict_data_copy1` VALUES (39, 0, '成功', '0', 'sys_login_result', 0, '登陆结果 - 成功', '', '2021-01-18 06:17:36', '', '2021-01-18 06:17:36', b'0');
+INSERT INTO `sys_dict_data_copy1` VALUES (40, 10, '账号或密码不正确', '10', 'sys_login_result', 0, '登陆结果 - 账号或密码不正确', '', '2021-01-18 06:17:54', '', '2021-01-18 06:17:54', b'0');
+INSERT INTO `sys_dict_data_copy1` VALUES (41, 20, '用户被禁用', '20', 'sys_login_result', 0, '登陆结果 - 用户被禁用', '', '2021-01-18 06:17:54', '', '2021-01-18 06:19:02', b'0');
+INSERT INTO `sys_dict_data_copy1` VALUES (42, 30, '验证码不存在', '30', 'sys_login_result', 0, '登陆结果 - 验证码不存在', '', '2021-01-18 06:17:54', '', '2021-01-18 06:19:24', b'0');
+INSERT INTO `sys_dict_data_copy1` VALUES (43, 31, '验证码不正确', '31', 'sys_login_result', 0, '登陆结果 - 验证码不正确', '', '2021-01-18 06:17:54', '', '2021-01-18 06:19:33', b'0');
+INSERT INTO `sys_dict_data_copy1` VALUES (44, 100, '未知异常', '100', 'sys_login_result', 0, '登陆结果 - 未知异常', '', '2021-01-18 06:17:54', '', '2021-01-18 06:19:57', b'0');
+INSERT INTO `sys_dict_data_copy1` VALUES (45, 1, '是', 'true', 'sys_boolean_string', 0, 'Boolean 是否类型 - 是', '', '2021-01-19 03:20:55', '', '2021-01-19 03:21:08', b'0');
+INSERT INTO `sys_dict_data_copy1` VALUES (46, 1, '否', 'false', 'sys_boolean_string', 0, 'Boolean 是否类型 - 否', '', '2021-01-19 03:20:55', '', '2021-01-19 03:21:39', b'0');
+INSERT INTO `sys_dict_data_copy1` VALUES (47, 1, '永不超时', '1', 'inf_redis_timeout_type', 0, 'Redis 未设置超时的情况', '', '2021-01-26 00:53:17', '', '2021-01-26 00:53:17', b'0');
+INSERT INTO `sys_dict_data_copy1` VALUES (48, 1, '动态超时', '2', 'inf_redis_timeout_type', 0, '程序里动态传入超时时间，无法固定', '', '2021-01-26 00:55:00', '', '2021-01-26 00:55:00', b'0');
+INSERT INTO `sys_dict_data_copy1` VALUES (49, 3, '固定超时', '3', 'inf_redis_timeout_type', 0, 'Redis 设置了过期时间', '', '2021-01-26 00:55:26', '', '2021-01-26 00:55:26', b'0');
 COMMIT;
 
 -- ----------------------------
@@ -233,7 +438,7 @@ CREATE TABLE `sys_dict_type` (
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE KEY `dict_type` (`dict_type`)
-) ENGINE=InnoDB AUTO_INCREMENT=105 DEFAULT CHARSET=utf8mb4 COMMENT='字典类型表';
+) ENGINE=InnoDB AUTO_INCREMENT=106 DEFAULT CHARSET=utf8mb4 COMMENT='字典类型表';
 
 -- ----------------------------
 -- Records of sys_dict_type
@@ -250,6 +455,44 @@ INSERT INTO `sys_dict_type` VALUES (9, '操作类型', 'sys_oper_type', 0, NULL,
 INSERT INTO `sys_dict_type` VALUES (10, '系统状态', 'sys_common_status', 0, NULL, 'admin', '2021-01-05 17:03:48', '', '2021-01-05 17:03:48', b'0');
 INSERT INTO `sys_dict_type` VALUES (11, 'Boolean 是否类型', 'sys_boolean_string', 0, 'boolean 转是否', '', '2021-01-19 03:20:08', '', '2021-01-19 03:20:08', b'0');
 INSERT INTO `sys_dict_type` VALUES (104, '登陆结果', 'sys_login_result', 0, '登陆结果', '', '2021-01-18 06:17:11', '', '2021-01-18 06:17:11', b'0');
+INSERT INTO `sys_dict_type` VALUES (105, 'Redis 超时类型', 'inf_redis_timeout_type', 0, 'RedisKeyDefine.TimeoutTypeEnum', '', '2021-01-26 00:52:50', '', '2021-01-26 00:52:50', b'0');
+COMMIT;
+
+-- ----------------------------
+-- Table structure for sys_dict_type_copy1
+-- ----------------------------
+DROP TABLE IF EXISTS `sys_dict_type_copy1`;
+CREATE TABLE `sys_dict_type_copy1` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '字典主键',
+  `name` varchar(100) NOT NULL DEFAULT '' COMMENT '字典名称',
+  `dict_type` varchar(100) NOT NULL DEFAULT '' COMMENT '字典类型',
+  `status` tinyint(4) NOT NULL DEFAULT '0' COMMENT '状态（0正常 1停用）',
+  `remark` varchar(500) DEFAULT NULL COMMENT '备注',
+  `create_by` varchar(64) DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_by` varchar(64) DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE KEY `dict_type` (`dict_type`)
+) ENGINE=InnoDB AUTO_INCREMENT=106 DEFAULT CHARSET=utf8mb4 COMMENT='字典类型表';
+
+-- ----------------------------
+-- Records of sys_dict_type_copy1
+-- ----------------------------
+BEGIN;
+INSERT INTO `sys_dict_type_copy1` VALUES (1, '用户性别', 'sys_user_sex', 0, NULL, 'admin', '2021-01-05 17:03:48', '', '2021-01-05 17:03:48', b'0');
+INSERT INTO `sys_dict_type_copy1` VALUES (3, '系统开关', 'sys_normal_disable', 0, NULL, 'admin', '2021-01-05 17:03:48', '', '2021-01-07 19:47:48', b'1');
+INSERT INTO `sys_dict_type_copy1` VALUES (4, '任务状态', 'sys_job_status', 0, NULL, 'admin', '2021-01-05 17:03:48', '', '2021-01-05 17:03:48', b'0');
+INSERT INTO `sys_dict_type_copy1` VALUES (5, '任务分组', 'sys_job_group', 0, NULL, 'admin', '2021-01-05 17:03:48', '', '2021-01-05 17:03:48', b'0');
+INSERT INTO `sys_dict_type_copy1` VALUES (6, '参数类型', 'sys_config_type', 0, NULL, 'admin', '2021-01-05 17:03:48', '', '2021-01-18 07:41:04', b'0');
+INSERT INTO `sys_dict_type_copy1` VALUES (7, '通知类型', 'sys_notice_type', 0, NULL, 'admin', '2021-01-05 17:03:48', '', '2021-01-05 17:03:48', b'0');
+INSERT INTO `sys_dict_type_copy1` VALUES (8, '通知状态', 'sys_notice_status', 0, NULL, 'admin', '2021-01-05 17:03:48', '', '2021-01-05 17:03:48', b'0');
+INSERT INTO `sys_dict_type_copy1` VALUES (9, '操作类型', 'sys_oper_type', 0, NULL, 'admin', '2021-01-05 17:03:48', '', '2021-01-05 17:03:48', b'0');
+INSERT INTO `sys_dict_type_copy1` VALUES (10, '系统状态', 'sys_common_status', 0, NULL, 'admin', '2021-01-05 17:03:48', '', '2021-01-05 17:03:48', b'0');
+INSERT INTO `sys_dict_type_copy1` VALUES (11, 'Boolean 是否类型', 'sys_boolean_string', 0, 'boolean 转是否', '', '2021-01-19 03:20:08', '', '2021-01-19 03:20:08', b'0');
+INSERT INTO `sys_dict_type_copy1` VALUES (104, '登陆结果', 'sys_login_result', 0, '登陆结果', '', '2021-01-18 06:17:11', '', '2021-01-18 06:17:11', b'0');
+INSERT INTO `sys_dict_type_copy1` VALUES (105, 'Redis 超时类型', 'inf_redis_timeout_type', 0, 'RedisKeyDefine.TimeoutTypeEnum', '', '2021-01-26 00:52:50', '', '2021-01-26 00:52:50', b'0');
 COMMIT;
 
 -- ----------------------------
@@ -344,7 +587,7 @@ CREATE TABLE `sys_login_log` (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COMMENT='系统访问记录';
+) ENGINE=InnoDB AUTO_INCREMENT=33 DEFAULT CHARSET=utf8mb4 COMMENT='系统访问记录';
 
 -- ----------------------------
 -- Records of sys_login_log
@@ -362,6 +605,26 @@ INSERT INTO `sys_login_log` VALUES (9, 1, '6e7e7bf7-e1fe-401e-bc1a-1aa5057a5bb4'
 INSERT INTO `sys_login_log` VALUES (10, 1, '2af83bf4-1c84-462c-ae5c-d0b4565fe9e4', 'admin', 0, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36', '', '2021-01-20 11:17:27', '', '2021-01-20 11:17:27', b'0');
 INSERT INTO `sys_login_log` VALUES (11, 1, '23a4f5c4-1edc-4fbe-8254-f52ce8d247c8', 'admin', 0, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36', '', '2021-01-20 13:37:23', '', '2021-01-20 13:37:23', b'0');
 INSERT INTO `sys_login_log` VALUES (12, 1, 'a0260b40-e81f-4eac-9fd7-350883f9ed72', 'admin', 0, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36', '', '2021-01-20 14:10:55', '', '2021-01-20 14:10:55', b'0');
+INSERT INTO `sys_login_log` VALUES (13, 1, 'c6ed4c50-933d-498f-8b5d-d68a93b88a2f', 'admin', 0, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36', '', '2021-01-20 17:10:19', '', '2021-01-20 17:10:19', b'0');
+INSERT INTO `sys_login_log` VALUES (14, 1, '17622ede-63e3-4b67-aea0-b525248f709d', 'admin', 0, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36', '', '2021-01-20 21:41:37', '', '2021-01-20 21:41:37', b'0');
+INSERT INTO `sys_login_log` VALUES (15, 1, 'dbe5faa4-c0e0-420d-b7ab-2eb943fbe1a4', 'admin', 0, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36', '', '2021-01-20 23:36:39', '', '2021-01-20 23:36:39', b'0');
+INSERT INTO `sys_login_log` VALUES (16, 1, '0801b6de-9406-4acf-8dbf-b797448e0006', 'admin', 0, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36', '', '2021-01-21 00:37:03', '', '2021-01-21 00:37:03', b'0');
+INSERT INTO `sys_login_log` VALUES (17, 1, 'c52b9ef0-9054-4733-845a-b5b094dee5e3', 'admin', 0, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36', '', '2021-01-21 01:18:25', '', '2021-01-21 01:18:25', b'0');
+INSERT INTO `sys_login_log` VALUES (18, 1, 'bfda0442-06f9-45f6-91f3-7285aeee1063', 'admin', 0, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36', '', '2021-01-21 02:10:57', '', '2021-01-21 02:10:57', b'0');
+INSERT INTO `sys_login_log` VALUES (19, 1, '6caf92e4-2b84-4185-b661-c944ce5eb05d', 'test', 0, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36', '', '2021-01-21 02:25:38', '', '2021-01-21 02:25:38', b'0');
+INSERT INTO `sys_login_log` VALUES (20, 1, 'd9659885-0bfd-4662-8656-afcdeb1983ff', 'admin', 0, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36', '', '2021-01-21 03:02:57', '', '2021-01-21 03:02:57', b'0');
+INSERT INTO `sys_login_log` VALUES (21, 1, '02dd6057-c59f-4c1e-a234-969449f99bcc', 'admin', 0, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36', '', '2021-01-21 04:56:22', '', '2021-01-21 04:56:22', b'0');
+INSERT INTO `sys_login_log` VALUES (22, 1, '69c26040-e9f4-45fa-98f9-a2391625f48f', 'admin', 0, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36', '', '2021-01-21 06:17:16', '', '2021-01-21 06:17:16', b'0');
+INSERT INTO `sys_login_log` VALUES (23, 1, '13814413-8a87-4fbf-9474-3225b033ff44', 'admin', 30, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-01-21 08:30:51', '', '2021-01-21 08:30:51', b'0');
+INSERT INTO `sys_login_log` VALUES (24, 1, '6d84218d-90e9-40fa-acad-e9173813a26f', 'admin', 0, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-01-21 08:30:51', '', '2021-01-21 08:30:51', b'0');
+INSERT INTO `sys_login_log` VALUES (25, 1, '85c2a039-0e6a-47bb-bdd8-72acac8b28e2', 'admin', 31, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-01-21 08:30:59', '', '2021-01-21 08:30:59', b'0');
+INSERT INTO `sys_login_log` VALUES (26, 1, 'f44852b5-091b-4a4c-b9f7-99d4f9850cb5', 'admin', 31, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-01-21 08:31:05', '', '2021-01-21 08:31:05', b'0');
+INSERT INTO `sys_login_log` VALUES (27, 1, '9830c3ea-9530-45af-b284-c6f8a5c6228d', 'admin', 0, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-01-21 08:31:22', '', '2021-01-21 08:31:22', b'0');
+INSERT INTO `sys_login_log` VALUES (28, 1, '98eae309-5661-4de5-b6fa-60ab609b4549', 'admin', 31, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-01-21 09:57:09', '', '2021-01-21 09:57:09', b'0');
+INSERT INTO `sys_login_log` VALUES (29, 1, 'ad9e244f-4c88-4762-b280-2d46d16081ac', 'admin', 31, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-01-21 09:57:15', '', '2021-01-21 09:57:15', b'0');
+INSERT INTO `sys_login_log` VALUES (30, 1, '5032fac5-c6dc-41e4-882b-2dbea01ef1f6', 'admin', 0, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-01-21 09:57:18', '', '2021-01-21 09:57:18', b'0');
+INSERT INTO `sys_login_log` VALUES (31, 1, '802ca4eb-ac96-4c6b-91de-0e445dc46e78', 'admin', 0, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-01-25 21:29:41', '', '2021-01-25 21:29:41', b'0');
+INSERT INTO `sys_login_log` VALUES (32, 1, '3aeafd34-af33-4329-8b47-8972ecc72635', 'admin', 0, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-01-25 23:59:57', '', '2021-01-25 23:59:57', b'0');
 COMMIT;
 
 -- ----------------------------
@@ -385,7 +648,7 @@ CREATE TABLE `sys_menu` (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=1066 DEFAULT CHARSET=utf8mb4 COMMENT='菜单权限表';
+) ENGINE=InnoDB AUTO_INCREMENT=1068 DEFAULT CHARSET=utf8mb4 COMMENT='菜单权限表';
 
 -- ----------------------------
 -- Records of sys_menu
@@ -394,7 +657,7 @@ BEGIN;
 INSERT INTO `sys_menu` VALUES (1, '系统管理', '', 1, 1, 0, '/system', 'system', NULL, 0, 'admin', '2021-01-05 17:03:48', '', '2021-01-05 22:34:28', b'0');
 INSERT INTO `sys_menu` VALUES (2, '基础设施', '', 1, 2, 0, '/infra', 'monitor', NULL, 0, 'admin', '2021-01-05 17:03:48', '', '2021-01-20 14:18:35', b'0');
 INSERT INTO `sys_menu` VALUES (3, '系统工具', '', 1, 3, 0, '/tool', 'tool', NULL, 0, 'admin', '2021-01-05 17:03:48', '', '2021-01-05 22:34:28', b'0');
-INSERT INTO `sys_menu` VALUES (4, '若依官网', '', 1, 4, 0, 'http://ruoyi.vip', 'guide', NULL, 0, 'admin', '2021-01-05 17:03:48', '', '2021-01-05 22:34:28', b'0');
+INSERT INTO `sys_menu` VALUES (4, '若依官网', '', 1, 4, 0, 'http://ruoyi.vip', 'guide', NULL, 0, 'admin', '2021-01-05 17:03:48', '', '2021-01-20 21:54:28', b'1');
 INSERT INTO `sys_menu` VALUES (100, '用户管理', 'system:user:list', 2, 1, 1, 'user', 'user', 'system/user/index', 0, 'admin', '2021-01-05 17:03:48', '', '2021-01-05 22:36:45', b'0');
 INSERT INTO `sys_menu` VALUES (101, '角色管理', 'system:role:list', 2, 2, 1, 'role', 'peoples', 'system/role/index', 0, 'admin', '2021-01-05 17:03:48', '', '2021-01-05 22:36:45', b'0');
 INSERT INTO `sys_menu` VALUES (102, '菜单管理', 'system:menu:list', 2, 3, 1, 'menu', 'tree-table', 'system/menu/index', 0, 'admin', '2021-01-05 17:03:48', '', '2021-01-05 22:36:45', b'0');
@@ -407,8 +670,8 @@ INSERT INTO `sys_menu` VALUES (108, '日志管理', '', 1, 9, 1, 'log', 'log', '
 INSERT INTO `sys_menu` VALUES (109, '在线用户', 'monitor:online:list', 2, 1, 2, 'online', 'online', 'monitor/online/index', 0, 'admin', '2021-01-05 17:03:48', '', '2021-01-05 22:36:45', b'0');
 INSERT INTO `sys_menu` VALUES (110, '定时任务', 'monitor:job:list', 2, 2, 2, 'job', 'job', 'monitor/job/index', 0, 'admin', '2021-01-05 17:03:48', '', '2021-01-05 22:36:45', b'0');
 INSERT INTO `sys_menu` VALUES (111, '数据监控', 'monitor:druid:list', 2, 3, 2, 'druid', 'druid', 'monitor/druid/index', 0, 'admin', '2021-01-05 17:03:48', '', '2021-01-05 22:36:45', b'0');
-INSERT INTO `sys_menu` VALUES (112, '服务监控', 'monitor:server:list', 2, 4, 2, 'server', 'server', 'monitor/server/index', 0, 'admin', '2021-01-05 17:03:48', '', '2021-01-05 22:36:45', b'0');
-INSERT INTO `sys_menu` VALUES (113, '缓存监控', 'monitor:cache:list', 2, 5, 2, 'cache', 'redis', 'monitor/cache/index', 0, 'admin', '2021-01-05 17:03:48', '', '2021-01-05 22:36:45', b'0');
+INSERT INTO `sys_menu` VALUES (112, '服务监控', 'monitor:server:list', 2, 4, 2, 'http://127.0.0.1:8080/admin', 'server', '', 0, 'admin', '2021-01-05 17:03:48', '', '2021-01-21 04:58:59', b'0');
+INSERT INTO `sys_menu` VALUES (113, 'Redis 监控', '', 2, 5, 2, 'redis', 'redis', 'infra/redis/index', 0, 'admin', '2021-01-05 17:03:48', '', '2021-01-26 00:56:30', b'0');
 INSERT INTO `sys_menu` VALUES (114, '表单构建', 'tool:build:list', 2, 1, 3, 'build', 'build', 'tool/build/index', 0, 'admin', '2021-01-05 17:03:48', '', '2021-01-05 22:36:45', b'0');
 INSERT INTO `sys_menu` VALUES (115, '代码生成', 'tool:gen:list', 2, 2, 3, 'gen', 'code', 'tool/gen/index', 0, 'admin', '2021-01-05 17:03:48', '', '2021-01-05 22:36:45', b'0');
 INSERT INTO `sys_menu` VALUES (116, '系统接口', 'tool:swagger:list', 2, 3, 3, 'swagger', 'swagger', 'tool/swagger/index', 0, 'admin', '2021-01-05 17:03:48', '', '2021-01-05 22:36:45', b'0');
@@ -469,12 +732,14 @@ INSERT INTO `sys_menu` VALUES (1054, '任务导出', 'monitor:job:export', 3, 7,
 INSERT INTO `sys_menu` VALUES (1055, '生成查询', 'tool:gen:query', 3, 1, 115, '#', '#', '', 0, 'admin', '2021-01-05 17:03:48', '', '2021-01-05 22:36:55', b'0');
 INSERT INTO `sys_menu` VALUES (1056, '生成修改', 'tool:gen:edit', 3, 2, 115, '#', '#', '', 0, 'admin', '2021-01-05 17:03:48', '', '2021-01-05 22:36:55', b'0');
 INSERT INTO `sys_menu` VALUES (1057, '生成删除', 'tool:gen:remove', 3, 3, 115, '#', '#', '', 0, 'admin', '2021-01-05 17:03:48', '', '2021-01-05 22:36:55', b'0');
-INSERT INTO `sys_menu` VALUES (1058, '导入代码', 'tool:gen:import', 3, 2, 115, '#', '#', '', 0, 'admin', '2021-01-05 17:03:48', '', '2021-01-05 22:36:55', b'0');
+INSERT INTO `sys_menu` VALUES (1058, '导入代码', 'tool:gen:import', 3, 2, 115, '', '#', '', 0, 'admin', '2021-01-05 17:03:48', '', '2021-01-20 16:55:13', b'0');
 INSERT INTO `sys_menu` VALUES (1059, '预览代码', 'tool:gen:preview', 3, 4, 115, '#', '#', '', 0, 'admin', '2021-01-05 17:03:48', '', '2021-01-05 22:36:55', b'0');
-INSERT INTO `sys_menu` VALUES (1060, '生成代码', 'tool:gen:code', 3, 5, 115, '#', '#', '', 0, 'admin', '2021-01-05 17:03:48', '', '2021-01-05 22:36:55', b'0');
+INSERT INTO `sys_menu` VALUES (1060, '生成代码', 'tool:gen:code', 3, 5, 115, '', '#', '', 0, 'admin', '2021-01-05 17:03:48', '', '2021-01-20 16:54:18', b'0');
 INSERT INTO `sys_menu` VALUES (1063, '设置角色菜单权限', 'system:permission:assign-role-menu', 3, 6, 101, '', '', '', 0, '', '2021-01-06 17:53:44', '', '2021-01-06 17:55:23', b'0');
 INSERT INTO `sys_menu` VALUES (1064, '设置角色数据权限', 'system:permission:assign-role-data-scope', 3, 7, 101, '', '', '', 0, '', '2021-01-06 17:56:31', '', '2021-01-06 17:56:31', b'0');
 INSERT INTO `sys_menu` VALUES (1065, '设置用户角色', 'system:permission:assign-user-role', 3, 8, 101, '', '', '', 0, '', '2021-01-07 10:23:28', '', '2021-01-07 10:23:28', b'0');
+INSERT INTO `sys_menu` VALUES (1066, '获得 Redis 监控信息', 'infra:redis:get-monitor-info', 3, 1, 113, '', '', '', 0, '', '2021-01-26 01:02:31', '', '2021-01-26 01:02:31', b'0');
+INSERT INTO `sys_menu` VALUES (1067, '获得 Redis Key 列表', 'infra:redis:get-key-list', 3, 2, 113, '', '', '', 0, '', '2021-01-26 01:02:52', '', '2021-01-26 01:02:52', b'0');
 COMMIT;
 
 -- ----------------------------
@@ -534,7 +799,7 @@ CREATE TABLE `sys_operate_log` (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=32 DEFAULT CHARSET=utf8mb4 COMMENT='操作日志记录';
+) ENGINE=InnoDB AUTO_INCREMENT=85 DEFAULT CHARSET=utf8mb4 COMMENT='操作日志记录';
 
 -- ----------------------------
 -- Records of sys_operate_log
@@ -568,6 +833,59 @@ INSERT INTO `sys_operate_log` VALUES (28, '866a915b-e60e-4ed6-a60c-ffee9d0d9fa4'
 INSERT INTO `sys_operate_log` VALUES (29, '6b812f9a-6b56-4965-9592-33e6bcfb789a', 1, '菜单 API', '修改菜单', 2, '', '', 'POST', '/api/system/menu/update', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36', 'CommonResult cn.iocoder.dashboard.modules.system.controller.permission.SysMenuController.updateMenu(SysMenuUpdateReqVO)', '{\"reqVO\":{\"component\":\"\",\"icon\":\"\",\"id\":1032,\"name\":\"配置新增\",\"parentId\":106,\"path\":\"\",\"permission\":\"infra:config:add\",\"sort\":\"2\",\"type\":3}}', '2021-01-22 01:28:32', 14, 0, '', 'true', '', '2021-01-20 14:34:05', '', '2021-01-20 14:34:05', b'0');
 INSERT INTO `sys_operate_log` VALUES (30, '3d6b8177-66b9-480f-bbba-90733b15219d', 1, '菜单 API', '修改菜单', 2, '', '', 'POST', '/api/system/menu/update', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36', 'CommonResult cn.iocoder.dashboard.modules.system.controller.permission.SysMenuController.updateMenu(SysMenuUpdateReqVO)', '{\"reqVO\":{\"component\":\"\",\"icon\":\"#\",\"id\":1034,\"name\":\"配置删除\",\"parentId\":106,\"path\":\"#\",\"permission\":\"infra:config:remove\",\"sort\":\"4\",\"type\":3}}', '2021-01-22 01:28:39', 14, 0, '', 'true', '', '2021-01-20 14:34:13', '', '2021-01-20 14:34:13', b'0');
 INSERT INTO `sys_operate_log` VALUES (31, 'b937aa5e-b18a-4dd3-a931-70302fe8c0be', 1, '菜单 API', '修改菜单', 2, '', '', 'POST', '/api/system/menu/update', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36', 'CommonResult cn.iocoder.dashboard.modules.system.controller.permission.SysMenuController.updateMenu(SysMenuUpdateReqVO)', '{\"reqVO\":{\"component\":\"\",\"icon\":\"#\",\"id\":1035,\"name\":\"配置导出\",\"parentId\":106,\"path\":\"#\",\"permission\":\"infra:config:export\",\"sort\":\"5\",\"type\":3}}', '2021-01-22 01:28:46', 13, 0, '', 'true', '', '2021-01-20 14:34:19', '', '2021-01-20 14:34:19', b'0');
+INSERT INTO `sys_operate_log` VALUES (32, '308cd0ba-ee57-439f-b1cd-d168ce97672c', 1, '菜单 API', '修改菜单', 2, '', '', 'POST', '/api/system/menu/update', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36', 'CommonResult cn.iocoder.dashboard.modules.system.controller.permission.SysMenuController.updateMenu(SysMenuUpdateReqVO)', '{\"reqVO\":{\"component\":\"tool/build/index\",\"icon\":\"build\",\"id\":114,\"name\":\"表单构建\",\"parentId\":3,\"path\":\"build\",\"permission\":\"tool:build:list\",\"sort\":\"1\",\"type\":2}}', '2021-01-22 20:50:59', 32, 0, '', 'true', '', '2021-01-20 17:10:54', '', '2021-01-20 17:10:54', b'0');
+INSERT INTO `sys_operate_log` VALUES (33, '90bc8b4b-a2dc-484c-b6bc-dab700f600e4', 1, '菜单 API', '修改菜单', 2, '', '', 'POST', '/api/system/menu/update', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36', 'CommonResult cn.iocoder.dashboard.modules.system.controller.permission.SysMenuController.updateMenu(SysMenuUpdateReqVO)', '{\"reqVO\":{\"component\":\"tool/swagger/index\",\"icon\":\"swagger\",\"id\":116,\"name\":\"系统接口\",\"parentId\":3,\"path\":\"swagger\",\"permission\":\"tool:swagger:list\",\"sort\":\"3\",\"type\":2}}', '2021-01-22 20:51:15', 5588, 0, '', 'true', '', '2021-01-20 17:11:16', '', '2021-01-20 17:11:16', b'0');
+INSERT INTO `sys_operate_log` VALUES (34, '787f584d-5675-422c-b1b9-a0fcf63e9369', 1, '菜单 API', '修改菜单', 2, '', '', 'POST', '/api/system/menu/update', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36', 'CommonResult cn.iocoder.dashboard.modules.system.controller.permission.SysMenuController.updateMenu(SysMenuUpdateReqVO)', '{\"reqVO\":{\"component\":\"tool/build/index\",\"icon\":\"build\",\"id\":114,\"name\":\"表单构建\",\"parentId\":3,\"path\":\"build\",\"permission\":\"tool:build:list\",\"sort\":\"1\",\"type\":2}}', '2021-01-22 21:03:48', 2512, 0, '', 'true', '', '2021-01-20 17:23:46', '', '2021-01-20 17:23:46', b'0');
+INSERT INTO `sys_operate_log` VALUES (35, '8593c50c-4d50-48e6-a3b1-917b83ec6972', 1, '菜单 API', '修改菜单', 2, '', '', 'POST', '/api/system/menu/update', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36', 'CommonResult cn.iocoder.dashboard.modules.system.controller.permission.SysMenuController.updateMenu(SysMenuUpdateReqVO)', '{\"reqVO\":{\"component\":\"tool/build/index\",\"icon\":\"build\",\"id\":114,\"name\":\"表单构建\",\"parentId\":3,\"path\":\"build\",\"permission\":\"tool:build:list\",\"sort\":\"1\",\"type\":2}}', '2021-01-22 21:14:35', 187876, 0, '', 'true', '', '2021-01-20 17:37:39', '', '2021-01-20 17:37:39', b'0');
+INSERT INTO `sys_operate_log` VALUES (36, 'a5b07322-a990-47ef-a227-9af6e4bc8315', 1, '菜单 API', '修改菜单', 2, '', '', 'POST', '/api/system/menu/update', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36', 'CommonResult cn.iocoder.dashboard.modules.system.controller.permission.SysMenuController.updateMenu(SysMenuUpdateReqVO)', '{\"reqVO\":{\"component\":\"tool/build/index\",\"icon\":\"build\",\"id\":114,\"name\":\"表单构建\",\"parentId\":3,\"path\":\"build\",\"permission\":\"tool:build:list\",\"sort\":\"1\",\"type\":2}}', '2021-01-22 21:19:42', 74, 0, '', 'true', '', '2021-01-20 17:39:39', '', '2021-01-20 17:39:39', b'0');
+INSERT INTO `sys_operate_log` VALUES (37, '02c9934e-cfba-4455-9d55-7a0600ef02ff', 1, '菜单 API', '修改菜单', 2, '', '', 'POST', '/api/system/menu/update', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36', 'CommonResult cn.iocoder.dashboard.modules.system.controller.permission.SysMenuController.updateMenu(SysMenuUpdateReqVO)', '{\"reqVO\":{\"component\":\"tool/build/index\",\"icon\":\"build\",\"id\":114,\"name\":\"表单构建\",\"parentId\":3,\"path\":\"build\",\"permission\":\"tool:build:list\",\"sort\":\"1\",\"type\":2}}', '2021-01-22 21:19:56', 21, 0, '', 'true', '', '2021-01-20 17:40:57', '', '2021-01-20 17:40:57', b'0');
+INSERT INTO `sys_operate_log` VALUES (38, 'c4b27f76-dd8d-4da8-a10c-46f11fe1d31f', 1, '菜单 API', '修改菜单', 2, '', '', 'POST', '/api/system/menu/update', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36', 'CommonResult cn.iocoder.dashboard.modules.system.controller.permission.SysMenuController.updateMenu(SysMenuUpdateReqVO)', '{\"reqVO\":{\"component\":\"tool/build/index\",\"icon\":\"build\",\"id\":114,\"name\":\"表单构建\",\"parentId\":3,\"path\":\"build\",\"permission\":\"tool:build:list\",\"sort\":\"1\",\"type\":2}}', '2021-01-22 21:21:06', 17, 0, '', 'true', '', '2021-01-20 17:41:16', '', '2021-01-20 17:41:16', b'0');
+INSERT INTO `sys_operate_log` VALUES (39, '0313045c-4782-4748-9085-910cf58a797e', 1, '菜单 API', '修改菜单', 2, '', '', 'POST', '/api/system/menu/update', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36', 'CommonResult cn.iocoder.dashboard.modules.system.controller.permission.SysMenuController.updateMenu(SysMenuUpdateReqVO)', '{\"reqVO\":{\"component\":\"tool/build/index\",\"icon\":\"build\",\"id\":114,\"name\":\"表单构建\",\"parentId\":3,\"path\":\"build\",\"permission\":\"tool:build:list\",\"sort\":\"1\",\"type\":2}}', '2021-01-22 21:21:21', 13, 0, '', 'true', '', '2021-01-20 17:42:23', '', '2021-01-20 17:42:23', b'0');
+INSERT INTO `sys_operate_log` VALUES (40, '29baeaf1-4442-47c5-bd6d-8f8ed7b196df', 1, '菜单 API', '修改菜单', 2, '', '', 'POST', '/api/system/menu/update', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36', 'CommonResult cn.iocoder.dashboard.modules.system.controller.permission.SysMenuController.updateMenu(SysMenuUpdateReqVO)', '{\"reqVO\":{\"component\":\"tool/build/index\",\"icon\":\"build\",\"id\":114,\"name\":\"表单构建\",\"parentId\":3,\"path\":\"build\",\"permission\":\"tool:build:list\",\"sort\":\"1\",\"type\":2}}', '2021-01-22 21:42:04', 4138, 0, '', 'true', '', '2021-01-20 18:02:07', '', '2021-01-20 18:02:07', b'0');
+INSERT INTO `sys_operate_log` VALUES (41, 'b3c84534-96aa-4e1b-9a25-5187fa9457c8', 1, '菜单 API', '修改菜单', 2, '', '', 'POST', '/api/system/menu/update', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36', 'CommonResult cn.iocoder.dashboard.modules.system.controller.permission.SysMenuController.updateMenu(SysMenuUpdateReqVO)', '{\"reqVO\":{\"component\":\"tool/build/index\",\"icon\":\"build\",\"id\":114,\"name\":\"表单构建\",\"parentId\":3,\"path\":\"build\",\"permission\":\"tool:build:list\",\"sort\":\"1\",\"type\":2}}', '2021-01-22 21:44:09', 49, 0, '', 'true', '', '2021-01-20 18:04:08', '', '2021-01-20 18:04:08', b'0');
+INSERT INTO `sys_operate_log` VALUES (42, '91b5c5a5-9f27-482e-8d01-60cdb17e38fd', 1, '菜单 API', '修改菜单', 2, '', '', 'POST', '/api/system/menu/update', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36', 'CommonResult cn.iocoder.dashboard.modules.system.controller.permission.SysMenuController.updateMenu(SysMenuUpdateReqVO)', '{\"reqVO\":{\"component\":\"tool/build/index\",\"icon\":\"build\",\"id\":114,\"name\":\"表单构建\",\"parentId\":3,\"path\":\"build\",\"permission\":\"tool:build:list\",\"sort\":\"1\",\"type\":2}}', '2021-01-22 21:47:16', 60, 0, '', 'true', '', '2021-01-20 18:07:14', '', '2021-01-20 18:07:14', b'0');
+INSERT INTO `sys_operate_log` VALUES (43, '7d4c2903-4d40-44fb-9f09-3201a016a90d', 1, '字典数据 API', '修改字典数据', 2, '', '', 'POST', '/api/system/dict-data/update', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36', 'CommonResult cn.iocoder.dashboard.modules.system.controller.dict.SysDictDataController.updateDictData(SysDictDataUpdateReqVO)', '{\"reqVO\":{\"dictType\":\"sys_user_sex\",\"id\":1,\"label\":\"男\",\"remark\":\"性别男\",\"sort\":\"1\",\"status\":0,\"value\":\"1\"}}', '2021-01-23 10:50:51', 27, 0, '', 'true', '', '2021-01-20 21:41:59', '', '2021-01-20 21:41:59', b'0');
+INSERT INTO `sys_operate_log` VALUES (44, 'de4ddd97-85e1-4cb2-9167-84256e9c743e', 1, '字典数据 API', '修改字典数据', 2, '', '', 'POST', '/api/system/dict-data/update', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36', 'CommonResult cn.iocoder.dashboard.modules.system.controller.dict.SysDictDataController.updateDictData(SysDictDataUpdateReqVO)', '{\"reqVO\":{\"dictType\":\"sys_user_sex\",\"id\":1,\"label\":\"男\",\"remark\":\"性别男\",\"sort\":\"1\",\"status\":0,\"value\":\"1\"}}', '2021-01-23 10:53:52', 60816, 0, '', 'true', '', '2021-01-20 21:46:01', '', '2021-01-20 21:46:01', b'0');
+INSERT INTO `sys_operate_log` VALUES (45, 'bd8c93f1-0a83-4e73-8c57-efb651aad67d', 1, '菜单 API', '删除菜单', 2, '', '', 'POST', '/api/system/menu/delete', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36', 'CommonResult cn.iocoder.dashboard.modules.system.controller.permission.SysMenuController.deleteMenu(Long)', '{\"id\":4}', '2021-01-23 11:03:18', 4581, 0, '', 'true', '', '2021-01-20 21:54:32', '', '2021-01-20 21:54:32', b'0');
+INSERT INTO `sys_operate_log` VALUES (46, '5e30d224-c026-4a05-82a3-0069601f4326', 1, '部门 API', '修改部门', 2, '', '', 'POST', '/api/system/dept/update', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36', 'CommonResult cn.iocoder.dashboard.modules.system.controller.dept.SysDeptController.updateDept(SysDeptUpdateReqVO)', '{\"reqVO\":{\"email\":\"ry@qq.com\",\"id\":108,\"leader\":\"若依\",\"name\":\"市场部门\",\"parentId\":102,\"phone\":\"15888888888\",\"sort\":\"1\",\"status\":0}}', '2021-01-23 11:26:21', 34, 0, '', 'true', '', '2021-01-20 22:17:32', '', '2021-01-20 22:17:32', b'0');
+INSERT INTO `sys_operate_log` VALUES (47, '766b8aa6-9414-478a-8179-ee990be2aa73', 1, '部门 API', '修改部门', 2, '', '', 'POST', '/api/system/dept/update', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36', 'CommonResult cn.iocoder.dashboard.modules.system.controller.dept.SysDeptController.updateDept(SysDeptUpdateReqVO)', '{\"reqVO\":{\"email\":\"ry@qq.com\",\"id\":109,\"leader\":\"若依\",\"name\":\"财务部门\",\"parentId\":102,\"phone\":\"15888888888\",\"sort\":\"2\",\"status\":0}}', '2021-01-23 11:28:30', 5086, 0, '', 'true', '', '2021-01-20 22:19:46', '', '2021-01-20 22:19:46', b'0');
+INSERT INTO `sys_operate_log` VALUES (48, '3cd76e05-b37b-4d89-bc7d-6252052878d3', 1, '参数配置', '修改参数配置', 3, '', '', 'PUT', '/api/infra/config/update', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36', 'CommonResult cn.iocoder.dashboard.modules.infra.controller.config.InfConfigController.edit(InfConfigUpdateReqVO)', '{\"reqVO\":{\"group\":\"ui\",\"id\":1,\"name\":\"主框架页-默认皮肤样式名称\",\"remark\":\"蓝色 skin-blue、绿色 skin-green、紫色 skin-purple、红色 skin-red、黄色 skin-yellow\",\"sensitive\":false,\"value\":\"skin-blue\"}}', '2021-01-23 13:23:23', 31, 0, '', 'true', '', '2021-01-20 23:37:02', '', '2021-01-20 23:37:02', b'0');
+INSERT INTO `sys_operate_log` VALUES (49, 'b89748ba-6f98-4abf-b26a-af9e0425f234', 1, '角色 API', '修改角色', 2, '', '', 'POST', '/api/system/role/update', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36', 'CommonResult cn.iocoder.dashboard.modules.system.controller.permission.SysRoleController.update(SysRoleUpdateReqVO)', '{\"reqVO\":{\"code\":\"test\",\"id\":101,\"name\":\"测试账号\",\"remark\":\"132\",\"sort\":\"0\",\"type\":2}}', '2021-01-23 18:16:08', 5314, 0, '', 'true', '', '2021-01-21 00:37:30', '', '2021-01-21 00:37:30', b'0');
+INSERT INTO `sys_operate_log` VALUES (50, '369f88d5-b425-4918-b994-2a893165c704', 1, '角色 API', '修改角色', 2, '', '', 'POST', '/api/system/role/update', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36', 'CommonResult cn.iocoder.dashboard.modules.system.controller.permission.SysRoleController.update(SysRoleUpdateReqVO)', '{\"reqVO\":{\"code\":\"test\",\"id\":101,\"name\":\"测试账号\",\"remark\":\"132\",\"sort\":\"0\",\"type\":2}}', '2021-01-23 18:16:51', 3946, 0, '', 'true', '', '2021-01-21 00:38:11', '', '2021-01-21 00:38:11', b'0');
+INSERT INTO `sys_operate_log` VALUES (51, 'ffa6bc01-3f1c-44c7-a632-087fa66c754e', 1, '用户 API', '新增用户', 2, '', '', 'POST', '/api/system/user/create', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36', 'CommonResult cn.iocoder.dashboard.modules.system.controller.user.SysUserController.createUser(SysUserCreateReqVO)', '{\"reqVO\":{\"nickname\":\"测试号\",\"password\":\"buzhidao\",\"postIds\":[],\"username\":\"test\"}}', '2021-01-23 20:32:14', 135, 0, '', '104', '', '2021-01-21 02:13:53', '', '2021-01-21 02:13:53', b'0');
+INSERT INTO `sys_operate_log` VALUES (52, '4b3982fc-b52c-4f72-aaf6-9a0a3cb1ad3e', 1, '用户 API', '修改用户', 2, '', '', 'POST', '/api/system/user/update', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36', 'CommonResult cn.iocoder.dashboard.modules.system.controller.user.SysUserController.updateUser(SysUserUpdateReqVO)', '{\"reqVO\":{\"avatar\":\"\",\"deptId\":100,\"email\":\"\",\"id\":104,\"mobile\":\"15601691200\",\"nickname\":\"测试号\",\"postIds\":[],\"sex\":1,\"username\":\"test\"}}', '2021-01-23 20:32:34', 25, 0, '', 'true', '', '2021-01-21 02:14:13', '', '2021-01-21 02:14:13', b'0');
+INSERT INTO `sys_operate_log` VALUES (53, 'c2390db2-3239-4c20-94d2-e92025101128', 1, '权限 API', '赋予用户角色', 2, '', '', 'POST', '/api/system/permission/assign-user-role', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36', 'CommonResult cn.iocoder.dashboard.modules.system.controller.permission.SysPermissionController.assignUserRole(SysPermissionAssignUserRoleReqVO)', '{\"reqVO\":{\"roleIds\":[101],\"userId\":104}}', '2021-01-23 20:32:53', 15, 0, '', 'true', '', '2021-01-21 02:14:32', '', '2021-01-21 02:14:32', b'0');
+INSERT INTO `sys_operate_log` VALUES (54, 'dde4892a-a721-46c3-8fc4-3101d5b0a191', 1, '权限 API', '赋予角色菜单', 2, '', '', 'POST', '/api/system/permission/assign-role-menu', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36', 'CommonResult cn.iocoder.dashboard.modules.system.controller.permission.SysPermissionController.assignRoleMenu(SysPermissionAssignRoleMenuReqVO)', '{\"reqVO\":{\"menuIds\":[1001],\"roleId\":101}}', '2021-01-23 20:33:22', 27, 0, '', 'true', '', '2021-01-21 02:15:01', '', '2021-01-21 02:15:01', b'0');
+INSERT INTO `sys_operate_log` VALUES (55, '36a58418-375f-4e7a-b0a9-8161358537ab', 1, '权限 API', '赋予角色数据权限', 2, '', '', 'POST', '/api/system/permission/assign-role-data-scope', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36', 'CommonResult cn.iocoder.dashboard.modules.system.controller.permission.SysPermissionController.assignRoleDataScope(SysPermissionAssignRoleDataScopeReqVO)', '{\"reqVO\":{\"dataScope\":2,\"dataScopeDeptIds\":[104],\"roleId\":101}}', '2021-01-23 20:33:47', 13, 0, '', 'true', '', '2021-01-21 02:15:26', '', '2021-01-21 02:15:26', b'0');
+INSERT INTO `sys_operate_log` VALUES (56, 'f3b54afc-4427-4eeb-979c-c274d5566019', 1, '权限 API', '赋予角色菜单', 2, '', '', 'POST', '/api/system/permission/assign-role-menu', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36', 'CommonResult cn.iocoder.dashboard.modules.system.controller.permission.SysPermissionController.assignRoleMenu(SysPermissionAssignRoleMenuReqVO)', '{\"reqVO\":{\"menuIds\":[1001],\"roleId\":101}}', '2021-01-23 20:55:28', 35, 0, '', 'true', '', '2021-01-21 02:37:09', '', '2021-01-21 02:37:09', b'0');
+INSERT INTO `sys_operate_log` VALUES (57, '96543ff3-30e6-4ceb-8ca1-fe39ba235bf6', 1, '权限 API', '赋予角色菜单', 2, '', '', 'POST', '/api/system/permission/assign-role-menu', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36', 'CommonResult cn.iocoder.dashboard.modules.system.controller.permission.SysPermissionController.assignRoleMenu(SysPermissionAssignRoleMenuReqVO)', '{\"reqVO\":{\"menuIds\":[1001],\"roleId\":101}}', '2021-01-23 20:57:48', 20, 0, '', 'true', '', '2021-01-21 02:39:29', '', '2021-01-21 02:39:29', b'0');
+INSERT INTO `sys_operate_log` VALUES (58, '9a31bdda-cb5f-4b87-b30d-c5139e75f24b', 1, '权限 API', '赋予角色菜单', 2, '', '', 'POST', '/api/system/permission/assign-role-menu', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36', 'CommonResult cn.iocoder.dashboard.modules.system.controller.permission.SysPermissionController.assignRoleMenu(SysPermissionAssignRoleMenuReqVO)', '{\"reqVO\":{\"menuIds\":[1,100,1001],\"roleId\":101}}', '2021-01-23 20:58:05', 19, 0, '', 'true', '', '2021-01-21 02:39:45', '', '2021-01-21 02:39:45', b'0');
+INSERT INTO `sys_operate_log` VALUES (59, 'f5c66c24-7aca-468d-8507-641599166c78', 1, '权限 API', '赋予角色菜单', 2, '', '', 'POST', '/api/system/permission/assign-role-menu', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36', 'CommonResult cn.iocoder.dashboard.modules.system.controller.permission.SysPermissionController.assignRoleMenu(SysPermissionAssignRoleMenuReqVO)', '{\"reqVO\":{\"menuIds\":[1,100,1001],\"roleId\":101}}', '2021-01-23 21:40:13', 8370, 0, '', 'true', '', '2021-01-21 03:03:21', '', '2021-01-21 03:03:21', b'0');
+INSERT INTO `sys_operate_log` VALUES (60, 'b259a76d-5771-47ed-8a4a-74728ff32b96', 1, '权限 API', '赋予角色菜单', 2, '', '', 'POST', '/api/system/permission/assign-role-menu', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36', 'CommonResult cn.iocoder.dashboard.modules.system.controller.permission.SysPermissionController.assignRoleMenu(SysPermissionAssignRoleMenuReqVO)', '{\"reqVO\":{\"menuIds\":[1,100,1001],\"roleId\":101}}', '2021-01-23 21:40:42', 10361, 0, '', 'true', '', '2021-01-21 03:03:51', '', '2021-01-21 03:03:51', b'0');
+INSERT INTO `sys_operate_log` VALUES (61, '3ff17962-16e0-412b-8b91-aaf356b13caf', 1, '权限 API', '赋予角色菜单', 2, '', '', 'POST', '/api/system/permission/assign-role-menu', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36', 'CommonResult cn.iocoder.dashboard.modules.system.controller.permission.SysPermissionController.assignRoleMenu(SysPermissionAssignRoleMenuReqVO)', '{\"reqVO\":{\"menuIds\":[1,100,1001],\"roleId\":101}}', '2021-01-23 21:41:25', 2828, 0, '', 'true', '', '2021-01-21 03:04:27', '', '2021-01-21 03:04:27', b'0');
+INSERT INTO `sys_operate_log` VALUES (62, '70de67ba-c36a-43b3-9575-682f6e80d4b2', 1, '权限 API', '赋予角色菜单', 2, '', '', 'POST', '/api/system/permission/assign-role-menu', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36', 'CommonResult cn.iocoder.dashboard.modules.system.controller.permission.SysPermissionController.assignRoleMenu(SysPermissionAssignRoleMenuReqVO)', '{\"reqVO\":{\"menuIds\":[1024,1025,1,1026,1027,1028,1029,1030,1036,1037,1038,1039,1040,1042,1043,1045,100,1063,1064,1065,1007,1008,1009,1010,1011,1012,1013,1014,1015,1016,1017,1018,1019,1020,1021,1022,1023],\"roleId\":101}}', '2021-01-23 21:41:51', 1686, 0, '', 'true', '', '2021-01-21 03:04:52', '', '2021-01-21 03:04:52', b'0');
+INSERT INTO `sys_operate_log` VALUES (63, 'e86ac5b7-bb6f-486a-9f98-3525bd31c62a', 1, '权限 API', '赋予角色菜单', 2, '', '', 'POST', '/api/system/permission/assign-role-menu', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36', 'CommonResult cn.iocoder.dashboard.modules.system.controller.permission.SysPermissionController.assignRoleMenu(SysPermissionAssignRoleMenuReqVO)', '{\"reqVO\":{\"menuIds\":[1,100,1001,1002],\"roleId\":101}}', '2021-01-23 21:44:44', 2928, 0, '', 'true', '', '2021-01-21 03:07:46', '', '2021-01-21 03:07:46', b'0');
+INSERT INTO `sys_operate_log` VALUES (64, '68ee41a8-d7f4-4fbf-9234-11713cf4ea1e', 1, '权限 API', '赋予角色菜单', 2, '', '', 'POST', '/api/system/permission/assign-role-menu', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36', 'CommonResult cn.iocoder.dashboard.modules.system.controller.permission.SysPermissionController.assignRoleMenu(SysPermissionAssignRoleMenuReqVO)', '{\"reqVO\":{\"menuIds\":[1,100,1001],\"roleId\":101}}', '2021-01-23 21:47:08', 11, 0, '', 'true', '', '2021-01-21 03:10:08', '', '2021-01-21 03:10:08', b'0');
+INSERT INTO `sys_operate_log` VALUES (65, 'e5ae7cb4-0a91-4cf6-810a-9215ccf5cf74', 1, '权限 API', '赋予角色菜单', 2, '', '', 'POST', '/api/system/permission/assign-role-menu', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36', 'CommonResult cn.iocoder.dashboard.modules.system.controller.permission.SysPermissionController.assignRoleMenu(SysPermissionAssignRoleMenuReqVO)', '{\"reqVO\":{\"menuIds\":[1,100,1001,1002],\"roleId\":101}}', '2021-01-23 21:48:17', 9, 0, '', 'true', '', '2021-01-21 03:11:17', '', '2021-01-21 03:11:17', b'0');
+INSERT INTO `sys_operate_log` VALUES (66, '246c0e9d-8232-4944-9d5e-b245b0baea2d', 1, '权限 API', '赋予角色菜单', 2, '', '', 'POST', '/api/system/permission/assign-role-menu', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36', 'CommonResult cn.iocoder.dashboard.modules.system.controller.permission.SysPermissionController.assignRoleMenu(SysPermissionAssignRoleMenuReqVO)', '{\"reqVO\":{\"menuIds\":[],\"roleId\":101}}', '2021-01-23 21:50:11', 11, 0, '', 'true', '', '2021-01-21 03:13:11', '', '2021-01-21 03:13:11', b'0');
+INSERT INTO `sys_operate_log` VALUES (67, 'aaa9076d-92de-4a7b-bedc-89922c9c30d0', 1, '权限 API', '赋予角色菜单', 2, '', '', 'POST', '/api/system/permission/assign-role-menu', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36', 'CommonResult cn.iocoder.dashboard.modules.system.controller.permission.SysPermissionController.assignRoleMenu(SysPermissionAssignRoleMenuReqVO)', '{\"reqVO\":{\"menuIds\":[1,100,1001],\"roleId\":101}}', '2021-01-23 21:50:21', 13, 0, '', 'true', '', '2021-01-21 03:13:21', '', '2021-01-21 03:13:21', b'0');
+INSERT INTO `sys_operate_log` VALUES (68, '3fb4e653-ba5b-4953-85a1-30ccd0884963', 1, '权限 API', '赋予角色菜单', 2, '', '', 'POST', '/api/system/permission/assign-role-menu', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36', 'CommonResult cn.iocoder.dashboard.modules.system.controller.permission.SysPermissionController.assignRoleMenu(SysPermissionAssignRoleMenuReqVO)', '{\"reqVO\":{\"menuIds\":[1008,1009,1,1010,1011,1012,101,1063,1064,1065],\"roleId\":101}}', '2021-01-23 21:50:40', 28, 0, '', 'true', '', '2021-01-21 03:13:40', '', '2021-01-21 03:13:40', b'0');
+INSERT INTO `sys_operate_log` VALUES (69, 'c85d8da3-2dd8-4922-9511-c60a71fc13e0', 1, '权限 API', '赋予角色菜单', 2, '', '', 'POST', '/api/system/permission/assign-role-menu', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36', 'CommonResult cn.iocoder.dashboard.modules.system.controller.permission.SysPermissionController.assignRoleMenu(SysPermissionAssignRoleMenuReqVO)', '{\"reqVO\":{\"menuIds\":[1008,1009,1,1010,1011,1012,101,1063,1064,1065],\"roleId\":101}}', '2021-01-23 22:00:02', 40, 0, '', 'true', '', '2021-01-21 03:23:02', '', '2021-01-21 03:23:02', b'0');
+INSERT INTO `sys_operate_log` VALUES (70, 'fdb42076-927f-4274-bf0c-2e5b5c6ba51c', 1, '权限 API', '赋予角色菜单', 2, '', '', 'POST', '/api/system/permission/assign-role-menu', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36', 'CommonResult cn.iocoder.dashboard.modules.system.controller.permission.SysPermissionController.assignRoleMenu(SysPermissionAssignRoleMenuReqVO)', '{\"reqVO\":{\"menuIds\":[1,100,1001,1002,1003,1004,1005,1006,1007],\"roleId\":101}}', '2021-01-23 22:00:14', 41, 0, '', 'true', '', '2021-01-21 03:23:14', '', '2021-01-21 03:23:14', b'0');
+INSERT INTO `sys_operate_log` VALUES (71, '60387620-e304-4180-87ab-ad5131a50dbf', 1, '权限 API', '赋予角色菜单', 2, '', '', 'POST', '/api/system/permission/assign-role-menu', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36', 'CommonResult cn.iocoder.dashboard.modules.system.controller.permission.SysPermissionController.assignRoleMenu(SysPermissionAssignRoleMenuReqVO)', '{\"reqVO\":{\"menuIds\":[1008,1009,1,1010,1011,1012,101,1063,1064,1065],\"roleId\":101}}', '2021-01-23 22:00:27', 44, 0, '', 'true', '', '2021-01-21 03:23:27', '', '2021-01-21 03:23:27', b'0');
+INSERT INTO `sys_operate_log` VALUES (72, 'c78c1b32-66ee-456a-bf42-02a863181338', 1, '菜单 API', '修改菜单', 2, '', '', 'POST', '/api/system/menu/update', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36', 'CommonResult cn.iocoder.dashboard.modules.system.controller.permission.SysMenuController.updateMenu(SysMenuUpdateReqVO)', '{\"reqVO\":{\"component\":\"http://127.0.0.1:8080/admin\",\"icon\":\"server\",\"id\":112,\"name\":\"服务监控\",\"parentId\":2,\"path\":\"server\",\"permission\":\"monitor:server:list\",\"sort\":\"4\",\"type\":2}}', '2021-01-23 23:34:51', 36, 0, '', 'true', '', '2021-01-21 04:57:58', '', '2021-01-21 04:57:58', b'0');
+INSERT INTO `sys_operate_log` VALUES (73, 'bdf5b5c3-6b10-4f6d-9131-bca51df74855', 1, '菜单 API', '修改菜单', 2, '', '', 'POST', '/api/system/menu/update', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36', 'CommonResult cn.iocoder.dashboard.modules.system.controller.permission.SysMenuController.updateMenu(SysMenuUpdateReqVO)', '{\"reqVO\":{\"component\":\"\",\"icon\":\"server\",\"id\":112,\"name\":\"服务监控\",\"parentId\":2,\"path\":\"http://127.0.0.1:8080/admin\",\"permission\":\"monitor:server:list\",\"sort\":\"4\",\"type\":2}}', '2021-01-23 23:35:52', 14, 0, '', 'true', '', '2021-01-21 04:58:59', '', '2021-01-21 04:58:59', b'0');
+INSERT INTO `sys_operate_log` VALUES (74, '8502967e-48a6-4b1b-978e-a6fab0d4dc48', 1, '菜单 API', '修改菜单', 2, '', '', 'POST', '/api/system/menu/update', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', 'CommonResult cn.iocoder.dashboard.modules.system.controller.permission.SysMenuController.updateMenu(SysMenuUpdateReqVO)', '{\"reqVO\":{\"icon\":\"tool\",\"id\":3,\"name\":\"系统工具\",\"parentId\":0,\"path\":\"/tool\",\"permission\":\"\",\"sort\":\"3\",\"type\":1}}', '2021-01-24 10:30:53', 32, 0, '', 'true', '', '2021-01-21 08:56:19', '', '2021-01-21 08:56:19', b'0');
+INSERT INTO `sys_operate_log` VALUES (75, 'b1e1ac23-ff33-4d8b-ae7e-dcf58edf01eb', 1, '用户 API', '修改用户', 2, '', '', 'POST', '/api/system/user/update', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', 'CommonResult cn.iocoder.dashboard.modules.system.controller.user.SysUserController.updateUser(SysUserUpdateReqVO)', '{\"reqVO\":{\"username\":\"test\",\"nickname\":\"测试号\",\"remark\":null,\"deptId\":100,\"postIds\":[],\"email\":\"\",\"mobile\":\"15601691200\",\"sex\":1,\"avatar\":\"\",\"id\":104}}', '2021-01-24 12:14:07', 34, 0, '', 'true', '', '2021-01-21 10:39:40', '', '2021-01-21 10:39:40', b'0');
+INSERT INTO `sys_operate_log` VALUES (76, '815f8631-e297-4a6c-b31a-8f6e54c6e7a2', 1, '菜单 API', '修改菜单', 2, '', '', 'POST', '/api/system/menu/update', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', 'CommonResult cn.iocoder.dashboard.modules.system.controller.permission.SysMenuController.updateMenu(SysMenuUpdateReqVO)', '{\"reqVO\":{\"name\":\"Redis 监控\",\"permission\":\"\",\"type\":2,\"sort\":\"5\",\"parentId\":2,\"path\":\"cache\",\"icon\":\"redis\",\"component\":\"monitor/cache/index\",\"id\":113}}', '2021-01-28 01:18:11', 52, 500, 'InvalidDefinitionException: No serializer found for class cn.iocoder.dashboard.modules.system.mq.message.permission.SysMenuRefreshMessage and no properties discovered to create BeanSerializer (to avoid exception, disable SerializationFeature.FAIL_ON_EMPTY_BEANS)', 'null', '', '2021-01-26 00:51:20', '', '2021-01-26 00:51:20', b'0');
+INSERT INTO `sys_operate_log` VALUES (77, 'd6f87cd1-824e-4f65-8ba3-51212fe6e4ff', 1, '字典类型 API', '新增字典类型', 2, '', '', 'POST', '/api/system/dict-type/create', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', 'CommonResult cn.iocoder.dashboard.modules.system.controller.dict.SysDictTypeController.createDictType(SysDictTypeCreateReqVO)', '{\"reqVO\":{\"name\":\"Redis 超时类型\",\"status\":0,\"remark\":\"RedisKeyDefine.TimeoutTypeEnum\",\"type\":\"inf_redis_timeout_type\"}}', '2021-01-28 01:19:41', 19, 0, '', '105', '', '2021-01-26 00:52:50', '', '2021-01-26 00:52:50', b'0');
+INSERT INTO `sys_operate_log` VALUES (78, '7ed80010-a788-49c6-b41a-567930a63225', 1, '字典数据 API', '新增字典数据', 2, '', '', 'POST', '/api/system/dict-data/create', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', 'CommonResult cn.iocoder.dashboard.modules.system.controller.dict.SysDictDataController.createDictData(SysDictDataCreateReqVO)', '{\"reqVO\":{\"sort\":\"1\",\"label\":\"永不超时\",\"value\":\"1\",\"dictType\":\"inf_redis_timeout_type\",\"status\":0,\"remark\":\"Redis 未设置超时的情况\"}}', '2021-01-28 01:20:08', 18, 500, 'InvalidDefinitionException: No serializer found for class cn.iocoder.dashboard.modules.system.mq.message.dict.SysDictDataRefreshMessage and no properties discovered to create BeanSerializer (to avoid exception, disable SerializationFeature.FAIL_ON_EMPTY_BEANS)', 'null', '', '2021-01-26 00:53:17', '', '2021-01-26 00:53:17', b'0');
+INSERT INTO `sys_operate_log` VALUES (79, '6e92720f-7757-4cb7-99e2-f6d3b83b7bbb', 1, '字典数据 API', '新增字典数据', 2, '', '', 'POST', '/api/system/dict-data/create', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', 'CommonResult cn.iocoder.dashboard.modules.system.controller.dict.SysDictDataController.createDictData(SysDictDataCreateReqVO)', '{\"reqVO\":{\"sort\":\"1\",\"label\":\"永不超时\",\"value\":\"1\",\"dictType\":\"inf_redis_timeout_type\",\"status\":0,\"remark\":\"Redis 未设置超时的情况\"}}', '2021-01-28 01:21:26', 33, 500, 'ServiceException: 已经存在该值的字典数据', 'null', '', '2021-01-26 00:54:35', '', '2021-01-26 00:54:35', b'0');
+INSERT INTO `sys_operate_log` VALUES (80, 'd204de50-32b5-4cf0-b163-768fb57ef38b', 1, '字典数据 API', '新增字典数据', 2, '', '', 'POST', '/api/system/dict-data/create', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', 'CommonResult cn.iocoder.dashboard.modules.system.controller.dict.SysDictDataController.createDictData(SysDictDataCreateReqVO)', '{\"reqVO\":{\"sort\":\"1\",\"label\":\"动态超时\",\"value\":\"2\",\"dictType\":\"inf_redis_timeout_type\",\"status\":0,\"remark\":\"程序里动态传入超时时间，无法固定\"}}', '2021-01-28 01:21:51', 24, 0, '', '48', '', '2021-01-26 00:55:00', '', '2021-01-26 00:55:00', b'0');
+INSERT INTO `sys_operate_log` VALUES (81, '78c517c7-191d-46d8-bdc3-5dbeb06be26d', 1, '字典数据 API', '新增字典数据', 2, '', '', 'POST', '/api/system/dict-data/create', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', 'CommonResult cn.iocoder.dashboard.modules.system.controller.dict.SysDictDataController.createDictData(SysDictDataCreateReqVO)', '{\"reqVO\":{\"sort\":\"3\",\"label\":\"固定超时\",\"value\":\"3\",\"dictType\":\"inf_redis_timeout_type\",\"status\":0,\"remark\":\"Redis 设置了过期时间\"}}', '2021-01-28 01:22:17', 21, 0, '', '49', '', '2021-01-26 00:55:26', '', '2021-01-26 00:55:26', b'0');
+INSERT INTO `sys_operate_log` VALUES (82, 'b8c971f3-fd22-4ed3-b5f9-ffc9a8d34859', 1, '菜单 API', '修改菜单', 2, '', '', 'POST', '/api/system/menu/update', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', 'CommonResult cn.iocoder.dashboard.modules.system.controller.permission.SysMenuController.updateMenu(SysMenuUpdateReqVO)', '{\"reqVO\":{\"name\":\"Redis 监控\",\"permission\":\"\",\"type\":2,\"sort\":\"5\",\"parentId\":2,\"path\":\"redis\",\"icon\":\"redis\",\"component\":\"infra/redis/index\",\"id\":113}}', '2021-01-28 01:23:21', 29, 0, '', 'true', '', '2021-01-26 00:56:30', '', '2021-01-26 00:56:30', b'0');
+INSERT INTO `sys_operate_log` VALUES (83, 'e0922d52-0007-4105-a487-692d00d091c3', 1, '菜单 API', '创建菜单', 2, '', '', 'POST', '/api/system/menu/create', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', 'CommonResult cn.iocoder.dashboard.modules.system.controller.permission.SysMenuController.createMenu(SysMenuCreateReqVO)', '{\"reqVO\":{\"name\":\"获得 Redis 监控信息\",\"permission\":\"infra:redis:get-monitor-info\",\"type\":3,\"sort\":\"1\",\"parentId\":113,\"path\":null,\"icon\":null,\"component\":null}}', '2021-01-28 01:29:22', 14, 0, '', '1066', '', '2021-01-26 01:02:31', '', '2021-01-26 01:02:31', b'0');
+INSERT INTO `sys_operate_log` VALUES (84, 'f44a431b-395e-45d9-9e6c-3fbdf7617155', 1, '菜单 API', '创建菜单', 2, '', '', 'POST', '/api/system/menu/create', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', 'CommonResult cn.iocoder.dashboard.modules.system.controller.permission.SysMenuController.createMenu(SysMenuCreateReqVO)', '{\"reqVO\":{\"name\":\"获得 Redis Key 列表\",\"permission\":\"infra:redis:get-key-list\",\"type\":3,\"sort\":\"2\",\"parentId\":113,\"path\":null,\"icon\":null,\"component\":null}}', '2021-01-28 01:29:42', 11, 0, '', '1067', '', '2021-01-26 01:02:52', '', '2021-01-26 01:02:52', b'0');
 COMMIT;
 
 -- ----------------------------
@@ -628,7 +946,7 @@ CREATE TABLE `sys_role` (
 BEGIN;
 INSERT INTO `sys_role` VALUES (1, '超级管理员', 'admin', 1, 1, '', 0, 1, '超级管理员', 'admin', '2021-01-05 17:03:48', '', '2021-01-06 12:40:20', b'0');
 INSERT INTO `sys_role` VALUES (2, '普通角色', 'common', 2, 2, '', 0, 1, '普通角色', 'admin', '2021-01-05 17:03:48', '', '2021-01-06 11:46:58', b'0');
-INSERT INTO `sys_role` VALUES (101, '测试账号', 'test', 0, 2, '[103]', 0, 2, '132', '', '2021-01-06 13:49:35', '', '2021-01-06 20:36:02', b'0');
+INSERT INTO `sys_role` VALUES (101, '测试账号', 'test', 0, 2, '[104]', 0, 2, '132', '', '2021-01-06 13:49:35', '', '2021-01-21 02:15:26', b'0');
 COMMIT;
 
 -- ----------------------------
@@ -645,7 +963,7 @@ CREATE TABLE `sys_role_menu` (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=169 DEFAULT CHARSET=utf8mb4 COMMENT='角色和菜单关联表';
+) ENGINE=InnoDB AUTO_INCREMENT=239 DEFAULT CHARSET=utf8mb4 COMMENT='角色和菜单关联表';
 
 -- ----------------------------
 -- Records of sys_role_menu
@@ -735,88 +1053,76 @@ INSERT INTO `sys_role_menu` VALUES (81, 2, 1057, '', '2021-01-06 17:28:04', '', 
 INSERT INTO `sys_role_menu` VALUES (82, 2, 1058, '', '2021-01-06 17:28:04', '', '2021-01-06 17:28:04', b'0');
 INSERT INTO `sys_role_menu` VALUES (83, 2, 1059, '', '2021-01-06 17:28:04', '', '2021-01-06 17:28:04', b'0');
 INSERT INTO `sys_role_menu` VALUES (84, 2, 1060, '', '2021-01-06 17:28:04', '', '2021-01-06 17:28:04', b'0');
-INSERT INTO `sys_role_menu` VALUES (85, 101, 114, '', '2021-01-06 17:30:23', '', '2021-01-06 18:00:16', b'1');
-INSERT INTO `sys_role_menu` VALUES (88, 101, 3, '', '2021-01-06 17:44:56', '', '2021-01-06 17:47:52', b'1');
-INSERT INTO `sys_role_menu` VALUES (89, 101, 1056, '', '2021-01-06 17:47:52', '', '2021-01-06 17:47:59', b'1');
-INSERT INTO `sys_role_menu` VALUES (90, 101, 1057, '', '2021-01-06 17:47:52', '', '2021-01-06 17:47:59', b'1');
-INSERT INTO `sys_role_menu` VALUES (91, 101, 1058, '', '2021-01-06 17:47:52', '', '2021-01-06 17:47:59', b'1');
-INSERT INTO `sys_role_menu` VALUES (92, 101, 1059, '', '2021-01-06 17:47:52', '', '2021-01-06 17:47:59', b'1');
-INSERT INTO `sys_role_menu` VALUES (93, 101, 1060, '', '2021-01-06 17:47:52', '', '2021-01-06 17:47:59', b'1');
-INSERT INTO `sys_role_menu` VALUES (94, 101, 116, '', '2021-01-06 17:47:52', '', '2021-01-06 17:49:37', b'1');
-INSERT INTO `sys_role_menu` VALUES (95, 101, 1055, '', '2021-01-06 17:47:52', '', '2021-01-06 17:47:59', b'1');
-INSERT INTO `sys_role_menu` VALUES (96, 101, 1055, '', '2021-01-06 17:48:04', '', '2021-01-06 17:49:37', b'1');
-INSERT INTO `sys_role_menu` VALUES (97, 101, 1056, '', '2021-01-06 17:48:13', '', '2021-01-06 17:49:37', b'1');
-INSERT INTO `sys_role_menu` VALUES (98, 101, 1057, '', '2021-01-06 17:48:13', '', '2021-01-06 17:49:37', b'1');
-INSERT INTO `sys_role_menu` VALUES (99, 101, 1058, '', '2021-01-06 17:48:13', '', '2021-01-06 17:49:37', b'1');
-INSERT INTO `sys_role_menu` VALUES (100, 101, 1059, '', '2021-01-06 17:49:29', '', '2021-01-06 17:49:37', b'1');
-INSERT INTO `sys_role_menu` VALUES (101, 101, 1060, '', '2021-01-06 17:49:29', '', '2021-01-06 17:49:37', b'1');
-INSERT INTO `sys_role_menu` VALUES (102, 101, 1024, '', '2021-01-06 18:00:10', '', '2021-01-06 18:00:16', b'1');
-INSERT INTO `sys_role_menu` VALUES (103, 101, 1025, '', '2021-01-06 18:00:10', '', '2021-01-06 18:00:16', b'1');
-INSERT INTO `sys_role_menu` VALUES (104, 101, 1026, '', '2021-01-06 18:00:10', '', '2021-01-06 18:00:16', b'1');
-INSERT INTO `sys_role_menu` VALUES (105, 101, 1027, '', '2021-01-06 18:00:10', '', '2021-01-06 18:00:16', b'1');
-INSERT INTO `sys_role_menu` VALUES (106, 101, 1028, '', '2021-01-06 18:00:10', '', '2021-01-06 18:00:16', b'1');
-INSERT INTO `sys_role_menu` VALUES (107, 101, 4, '', '2021-01-06 18:00:10', '', '2021-01-06 18:00:16', b'1');
-INSERT INTO `sys_role_menu` VALUES (108, 101, 1029, '', '2021-01-06 18:00:10', '', '2021-01-06 18:00:16', b'1');
-INSERT INTO `sys_role_menu` VALUES (109, 101, 1030, '', '2021-01-06 18:00:10', '', '2021-01-06 18:00:16', b'1');
-INSERT INTO `sys_role_menu` VALUES (110, 101, 1031, '', '2021-01-06 18:00:10', '', '2021-01-06 18:00:16', b'1');
-INSERT INTO `sys_role_menu` VALUES (111, 101, 1032, '', '2021-01-06 18:00:10', '', '2021-01-06 18:00:16', b'1');
-INSERT INTO `sys_role_menu` VALUES (112, 101, 1033, '', '2021-01-06 18:00:10', '', '2021-01-06 18:00:16', b'1');
-INSERT INTO `sys_role_menu` VALUES (113, 101, 1034, '', '2021-01-06 18:00:10', '', '2021-01-06 18:00:16', b'1');
-INSERT INTO `sys_role_menu` VALUES (114, 101, 1035, '', '2021-01-06 18:00:10', '', '2021-01-06 18:00:16', b'1');
-INSERT INTO `sys_role_menu` VALUES (115, 101, 1036, '', '2021-01-06 18:00:10', '', '2021-01-06 18:00:16', b'1');
-INSERT INTO `sys_role_menu` VALUES (116, 101, 1037, '', '2021-01-06 18:00:10', '', '2021-01-06 18:00:16', b'1');
-INSERT INTO `sys_role_menu` VALUES (117, 101, 1038, '', '2021-01-06 18:00:10', '', '2021-01-06 18:00:16', b'1');
-INSERT INTO `sys_role_menu` VALUES (118, 101, 1039, '', '2021-01-06 18:00:10', '', '2021-01-06 18:00:16', b'1');
-INSERT INTO `sys_role_menu` VALUES (119, 101, 1040, '', '2021-01-06 18:00:10', '', '2021-01-06 18:00:16', b'1');
-INSERT INTO `sys_role_menu` VALUES (120, 101, 1041, '', '2021-01-06 18:00:11', '', '2021-01-06 18:00:16', b'1');
-INSERT INTO `sys_role_menu` VALUES (121, 101, 1042, '', '2021-01-06 18:00:11', '', '2021-01-06 18:00:16', b'1');
-INSERT INTO `sys_role_menu` VALUES (122, 101, 1043, '', '2021-01-06 18:00:11', '', '2021-01-06 18:00:16', b'1');
-INSERT INTO `sys_role_menu` VALUES (123, 101, 1044, '', '2021-01-06 18:00:11', '', '2021-01-06 18:00:16', b'1');
-INSERT INTO `sys_role_menu` VALUES (124, 101, 1045, '', '2021-01-06 18:00:11', '', '2021-01-06 18:00:16', b'1');
-INSERT INTO `sys_role_menu` VALUES (125, 101, 1046, '', '2021-01-06 18:00:11', '', '2021-01-06 18:00:16', b'1');
-INSERT INTO `sys_role_menu` VALUES (126, 101, 1047, '', '2021-01-06 18:00:11', '', '2021-01-06 18:00:16', b'1');
-INSERT INTO `sys_role_menu` VALUES (127, 101, 1048, '', '2021-01-06 18:00:11', '', '2021-01-06 18:00:16', b'1');
-INSERT INTO `sys_role_menu` VALUES (128, 101, 1049, '', '2021-01-06 18:00:11', '', '2021-01-06 18:00:16', b'1');
-INSERT INTO `sys_role_menu` VALUES (129, 101, 1050, '', '2021-01-06 18:00:11', '', '2021-01-06 18:00:16', b'1');
-INSERT INTO `sys_role_menu` VALUES (130, 101, 1051, '', '2021-01-06 18:00:11', '', '2021-01-06 18:00:16', b'1');
-INSERT INTO `sys_role_menu` VALUES (131, 101, 1052, '', '2021-01-06 18:00:11', '', '2021-01-06 18:00:16', b'1');
-INSERT INTO `sys_role_menu` VALUES (132, 101, 1053, '', '2021-01-06 18:00:11', '', '2021-01-06 18:00:16', b'1');
-INSERT INTO `sys_role_menu` VALUES (133, 101, 1054, '', '2021-01-06 18:00:11', '', '2021-01-06 18:00:16', b'1');
-INSERT INTO `sys_role_menu` VALUES (134, 101, 1055, '', '2021-01-06 18:00:11', '', '2021-01-06 18:00:16', b'1');
-INSERT INTO `sys_role_menu` VALUES (135, 101, 1056, '', '2021-01-06 18:00:11', '', '2021-01-06 18:00:16', b'1');
-INSERT INTO `sys_role_menu` VALUES (136, 101, 1057, '', '2021-01-06 18:00:11', '', '2021-01-06 18:00:16', b'1');
-INSERT INTO `sys_role_menu` VALUES (137, 101, 1058, '', '2021-01-06 18:00:11', '', '2021-01-06 18:00:16', b'1');
-INSERT INTO `sys_role_menu` VALUES (138, 101, 1059, '', '2021-01-06 18:00:11', '', '2021-01-06 18:00:16', b'1');
-INSERT INTO `sys_role_menu` VALUES (139, 101, 1060, '', '2021-01-06 18:00:11', '', '2021-01-06 18:00:16', b'1');
-INSERT INTO `sys_role_menu` VALUES (140, 101, 1063, '', '2021-01-06 18:00:11', '', '2021-01-06 18:00:16', b'1');
-INSERT INTO `sys_role_menu` VALUES (141, 101, 1064, '', '2021-01-06 18:00:11', '', '2021-01-06 18:00:16', b'1');
-INSERT INTO `sys_role_menu` VALUES (142, 101, 1001, '', '2021-01-06 18:00:11', '', '2021-01-06 18:00:16', b'1');
-INSERT INTO `sys_role_menu` VALUES (143, 101, 1002, '', '2021-01-06 18:00:11', '', '2021-01-06 18:00:16', b'1');
-INSERT INTO `sys_role_menu` VALUES (144, 101, 1003, '', '2021-01-06 18:00:11', '', '2021-01-06 18:00:16', b'1');
-INSERT INTO `sys_role_menu` VALUES (145, 101, 1004, '', '2021-01-06 18:00:11', '', '2021-01-06 18:00:16', b'1');
-INSERT INTO `sys_role_menu` VALUES (146, 101, 1005, '', '2021-01-06 18:00:11', '', '2021-01-06 18:00:16', b'1');
-INSERT INTO `sys_role_menu` VALUES (147, 101, 1006, '', '2021-01-06 18:00:11', '', '2021-01-06 18:00:16', b'1');
-INSERT INTO `sys_role_menu` VALUES (148, 101, 1007, '', '2021-01-06 18:00:11', '', '2021-01-06 18:00:16', b'1');
-INSERT INTO `sys_role_menu` VALUES (149, 101, 111, '', '2021-01-06 18:00:11', '', '2021-01-06 18:00:16', b'1');
-INSERT INTO `sys_role_menu` VALUES (150, 101, 1008, '', '2021-01-06 18:00:11', '', '2021-01-06 18:00:16', b'1');
-INSERT INTO `sys_role_menu` VALUES (151, 101, 112, '', '2021-01-06 18:00:11', '', '2021-01-06 18:00:16', b'1');
-INSERT INTO `sys_role_menu` VALUES (152, 101, 1009, '', '2021-01-06 18:00:11', '', '2021-01-06 18:00:16', b'1');
-INSERT INTO `sys_role_menu` VALUES (153, 101, 113, '', '2021-01-06 18:00:11', '', '2021-01-06 18:00:16', b'1');
-INSERT INTO `sys_role_menu` VALUES (154, 101, 1010, '', '2021-01-06 18:00:11', '', '2021-01-06 18:00:16', b'1');
-INSERT INTO `sys_role_menu` VALUES (155, 101, 1011, '', '2021-01-06 18:00:11', '', '2021-01-06 18:00:16', b'1');
-INSERT INTO `sys_role_menu` VALUES (156, 101, 1012, '', '2021-01-06 18:00:11', '', '2021-01-06 18:00:16', b'1');
-INSERT INTO `sys_role_menu` VALUES (157, 101, 116, '', '2021-01-06 18:00:11', '', '2021-01-06 18:00:16', b'1');
-INSERT INTO `sys_role_menu` VALUES (158, 101, 1013, '', '2021-01-06 18:00:11', '', '2021-01-06 18:00:16', b'1');
-INSERT INTO `sys_role_menu` VALUES (159, 101, 1014, '', '2021-01-06 18:00:11', '', '2021-01-06 18:00:16', b'1');
-INSERT INTO `sys_role_menu` VALUES (160, 101, 1015, '', '2021-01-06 18:00:11', '', '2021-01-06 18:00:16', b'1');
-INSERT INTO `sys_role_menu` VALUES (161, 101, 1016, '', '2021-01-06 18:00:11', '', '2021-01-06 18:00:16', b'1');
-INSERT INTO `sys_role_menu` VALUES (162, 101, 1017, '', '2021-01-06 18:00:11', '', '2021-01-06 18:00:16', b'1');
-INSERT INTO `sys_role_menu` VALUES (163, 101, 1018, '', '2021-01-06 18:00:11', '', '2021-01-06 18:00:16', b'1');
-INSERT INTO `sys_role_menu` VALUES (164, 101, 1019, '', '2021-01-06 18:00:11', '', '2021-01-06 18:00:16', b'1');
-INSERT INTO `sys_role_menu` VALUES (165, 101, 1020, '', '2021-01-06 18:00:11', '', '2021-01-06 18:00:16', b'1');
-INSERT INTO `sys_role_menu` VALUES (166, 101, 1021, '', '2021-01-06 18:00:11', '', '2021-01-06 18:00:16', b'1');
-INSERT INTO `sys_role_menu` VALUES (167, 101, 1022, '', '2021-01-06 18:00:11', '', '2021-01-06 18:00:16', b'1');
-INSERT INTO `sys_role_menu` VALUES (168, 101, 1023, '', '2021-01-06 18:00:11', '', '2021-01-06 18:00:16', b'1');
+INSERT INTO `sys_role_menu` VALUES (169, 101, 1001, '', '2021-01-21 02:15:01', '', '2021-01-21 03:04:50', b'1');
+INSERT INTO `sys_role_menu` VALUES (170, 101, 1, '', '2021-01-21 02:39:45', '', '2021-01-21 03:13:11', b'1');
+INSERT INTO `sys_role_menu` VALUES (171, 101, 100, '', '2021-01-21 02:39:45', '', '2021-01-21 03:13:11', b'1');
+INSERT INTO `sys_role_menu` VALUES (172, 101, 1024, '', '2021-01-21 03:04:50', '', '2021-01-21 03:07:43', b'1');
+INSERT INTO `sys_role_menu` VALUES (173, 101, 1025, '', '2021-01-21 03:04:50', '', '2021-01-21 03:07:43', b'1');
+INSERT INTO `sys_role_menu` VALUES (174, 101, 1026, '', '2021-01-21 03:04:50', '', '2021-01-21 03:07:43', b'1');
+INSERT INTO `sys_role_menu` VALUES (175, 101, 1027, '', '2021-01-21 03:04:50', '', '2021-01-21 03:07:43', b'1');
+INSERT INTO `sys_role_menu` VALUES (176, 101, 1028, '', '2021-01-21 03:04:50', '', '2021-01-21 03:07:43', b'1');
+INSERT INTO `sys_role_menu` VALUES (177, 101, 1029, '', '2021-01-21 03:04:50', '', '2021-01-21 03:07:43', b'1');
+INSERT INTO `sys_role_menu` VALUES (178, 101, 1030, '', '2021-01-21 03:04:50', '', '2021-01-21 03:07:43', b'1');
+INSERT INTO `sys_role_menu` VALUES (179, 101, 1036, '', '2021-01-21 03:04:50', '', '2021-01-21 03:07:43', b'1');
+INSERT INTO `sys_role_menu` VALUES (180, 101, 1037, '', '2021-01-21 03:04:50', '', '2021-01-21 03:07:43', b'1');
+INSERT INTO `sys_role_menu` VALUES (181, 101, 1038, '', '2021-01-21 03:04:50', '', '2021-01-21 03:07:43', b'1');
+INSERT INTO `sys_role_menu` VALUES (182, 101, 1039, '', '2021-01-21 03:04:50', '', '2021-01-21 03:07:43', b'1');
+INSERT INTO `sys_role_menu` VALUES (183, 101, 1040, '', '2021-01-21 03:04:50', '', '2021-01-21 03:07:43', b'1');
+INSERT INTO `sys_role_menu` VALUES (184, 101, 1042, '', '2021-01-21 03:04:50', '', '2021-01-21 03:07:43', b'1');
+INSERT INTO `sys_role_menu` VALUES (185, 101, 1043, '', '2021-01-21 03:04:50', '', '2021-01-21 03:07:43', b'1');
+INSERT INTO `sys_role_menu` VALUES (186, 101, 1045, '', '2021-01-21 03:04:50', '', '2021-01-21 03:07:43', b'1');
+INSERT INTO `sys_role_menu` VALUES (187, 101, 1063, '', '2021-01-21 03:04:50', '', '2021-01-21 03:07:43', b'1');
+INSERT INTO `sys_role_menu` VALUES (188, 101, 1064, '', '2021-01-21 03:04:50', '', '2021-01-21 03:07:43', b'1');
+INSERT INTO `sys_role_menu` VALUES (189, 101, 1065, '', '2021-01-21 03:04:50', '', '2021-01-21 03:07:43', b'1');
+INSERT INTO `sys_role_menu` VALUES (190, 101, 1007, '', '2021-01-21 03:04:50', '', '2021-01-21 03:07:43', b'1');
+INSERT INTO `sys_role_menu` VALUES (191, 101, 1008, '', '2021-01-21 03:04:50', '', '2021-01-21 03:07:43', b'1');
+INSERT INTO `sys_role_menu` VALUES (192, 101, 1009, '', '2021-01-21 03:04:50', '', '2021-01-21 03:07:43', b'1');
+INSERT INTO `sys_role_menu` VALUES (193, 101, 1010, '', '2021-01-21 03:04:50', '', '2021-01-21 03:07:43', b'1');
+INSERT INTO `sys_role_menu` VALUES (194, 101, 1011, '', '2021-01-21 03:04:50', '', '2021-01-21 03:07:43', b'1');
+INSERT INTO `sys_role_menu` VALUES (195, 101, 1012, '', '2021-01-21 03:04:50', '', '2021-01-21 03:07:43', b'1');
+INSERT INTO `sys_role_menu` VALUES (196, 101, 1013, '', '2021-01-21 03:04:50', '', '2021-01-21 03:07:43', b'1');
+INSERT INTO `sys_role_menu` VALUES (197, 101, 1014, '', '2021-01-21 03:04:50', '', '2021-01-21 03:07:43', b'1');
+INSERT INTO `sys_role_menu` VALUES (198, 101, 1015, '', '2021-01-21 03:04:50', '', '2021-01-21 03:07:43', b'1');
+INSERT INTO `sys_role_menu` VALUES (199, 101, 1016, '', '2021-01-21 03:04:50', '', '2021-01-21 03:07:43', b'1');
+INSERT INTO `sys_role_menu` VALUES (200, 101, 1017, '', '2021-01-21 03:04:50', '', '2021-01-21 03:07:43', b'1');
+INSERT INTO `sys_role_menu` VALUES (201, 101, 1018, '', '2021-01-21 03:04:50', '', '2021-01-21 03:07:43', b'1');
+INSERT INTO `sys_role_menu` VALUES (202, 101, 1019, '', '2021-01-21 03:04:50', '', '2021-01-21 03:07:43', b'1');
+INSERT INTO `sys_role_menu` VALUES (203, 101, 1020, '', '2021-01-21 03:04:50', '', '2021-01-21 03:07:43', b'1');
+INSERT INTO `sys_role_menu` VALUES (204, 101, 1021, '', '2021-01-21 03:04:50', '', '2021-01-21 03:07:43', b'1');
+INSERT INTO `sys_role_menu` VALUES (205, 101, 1022, '', '2021-01-21 03:04:50', '', '2021-01-21 03:07:43', b'1');
+INSERT INTO `sys_role_menu` VALUES (206, 101, 1023, '', '2021-01-21 03:04:50', '', '2021-01-21 03:07:43', b'1');
+INSERT INTO `sys_role_menu` VALUES (207, 101, 1001, '', '2021-01-21 03:07:43', '', '2021-01-21 03:13:11', b'1');
+INSERT INTO `sys_role_menu` VALUES (208, 101, 1002, '', '2021-01-21 03:07:43', '', '2021-01-21 03:10:08', b'1');
+INSERT INTO `sys_role_menu` VALUES (209, 101, 1002, '', '2021-01-21 03:11:17', '', '2021-01-21 03:13:11', b'1');
+INSERT INTO `sys_role_menu` VALUES (210, 101, 1, '', '2021-01-21 03:13:21', '', '2021-01-21 03:13:21', b'0');
+INSERT INTO `sys_role_menu` VALUES (211, 101, 1001, '', '2021-01-21 03:13:21', '', '2021-01-21 03:13:40', b'1');
+INSERT INTO `sys_role_menu` VALUES (212, 101, 100, '', '2021-01-21 03:13:21', '', '2021-01-21 03:13:40', b'1');
+INSERT INTO `sys_role_menu` VALUES (213, 101, 1008, '', '2021-01-21 03:13:40', '', '2021-01-21 03:23:14', b'1');
+INSERT INTO `sys_role_menu` VALUES (214, 101, 1009, '', '2021-01-21 03:13:40', '', '2021-01-21 03:23:14', b'1');
+INSERT INTO `sys_role_menu` VALUES (215, 101, 1010, '', '2021-01-21 03:13:40', '', '2021-01-21 03:23:14', b'1');
+INSERT INTO `sys_role_menu` VALUES (216, 101, 1011, '', '2021-01-21 03:13:40', '', '2021-01-21 03:23:14', b'1');
+INSERT INTO `sys_role_menu` VALUES (217, 101, 1012, '', '2021-01-21 03:13:40', '', '2021-01-21 03:23:14', b'1');
+INSERT INTO `sys_role_menu` VALUES (218, 101, 101, '', '2021-01-21 03:13:40', '', '2021-01-21 03:23:14', b'1');
+INSERT INTO `sys_role_menu` VALUES (219, 101, 1063, '', '2021-01-21 03:13:40', '', '2021-01-21 03:23:14', b'1');
+INSERT INTO `sys_role_menu` VALUES (220, 101, 1064, '', '2021-01-21 03:13:40', '', '2021-01-21 03:23:14', b'1');
+INSERT INTO `sys_role_menu` VALUES (221, 101, 1065, '', '2021-01-21 03:13:40', '', '2021-01-21 03:23:14', b'1');
+INSERT INTO `sys_role_menu` VALUES (222, 101, 100, '', '2021-01-21 03:23:14', '', '2021-01-21 03:23:27', b'1');
+INSERT INTO `sys_role_menu` VALUES (223, 101, 1001, '', '2021-01-21 03:23:14', '', '2021-01-21 03:23:27', b'1');
+INSERT INTO `sys_role_menu` VALUES (224, 101, 1002, '', '2021-01-21 03:23:14', '', '2021-01-21 03:23:27', b'1');
+INSERT INTO `sys_role_menu` VALUES (225, 101, 1003, '', '2021-01-21 03:23:14', '', '2021-01-21 03:23:27', b'1');
+INSERT INTO `sys_role_menu` VALUES (226, 101, 1004, '', '2021-01-21 03:23:14', '', '2021-01-21 03:23:27', b'1');
+INSERT INTO `sys_role_menu` VALUES (227, 101, 1005, '', '2021-01-21 03:23:14', '', '2021-01-21 03:23:27', b'1');
+INSERT INTO `sys_role_menu` VALUES (228, 101, 1006, '', '2021-01-21 03:23:14', '', '2021-01-21 03:23:27', b'1');
+INSERT INTO `sys_role_menu` VALUES (229, 101, 1007, '', '2021-01-21 03:23:14', '', '2021-01-21 03:23:27', b'1');
+INSERT INTO `sys_role_menu` VALUES (230, 101, 1008, '', '2021-01-21 03:23:27', '', '2021-01-21 03:23:27', b'0');
+INSERT INTO `sys_role_menu` VALUES (231, 101, 1009, '', '2021-01-21 03:23:27', '', '2021-01-21 03:23:27', b'0');
+INSERT INTO `sys_role_menu` VALUES (232, 101, 1010, '', '2021-01-21 03:23:27', '', '2021-01-21 03:23:27', b'0');
+INSERT INTO `sys_role_menu` VALUES (233, 101, 1011, '', '2021-01-21 03:23:27', '', '2021-01-21 03:23:27', b'0');
+INSERT INTO `sys_role_menu` VALUES (234, 101, 1012, '', '2021-01-21 03:23:27', '', '2021-01-21 03:23:27', b'0');
+INSERT INTO `sys_role_menu` VALUES (235, 101, 101, '', '2021-01-21 03:23:27', '', '2021-01-21 03:23:27', b'0');
+INSERT INTO `sys_role_menu` VALUES (236, 101, 1063, '', '2021-01-21 03:23:27', '', '2021-01-21 03:23:27', b'0');
+INSERT INTO `sys_role_menu` VALUES (237, 101, 1064, '', '2021-01-21 03:23:27', '', '2021-01-21 03:23:27', b'0');
+INSERT INTO `sys_role_menu` VALUES (238, 101, 1065, '', '2021-01-21 03:23:27', '', '2021-01-21 03:23:27', b'0');
 COMMIT;
 
 -- ----------------------------
@@ -844,7 +1150,7 @@ CREATE TABLE `sys_user` (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=104 DEFAULT CHARSET=utf8mb4 COMMENT='用户信息表';
+) ENGINE=InnoDB AUTO_INCREMENT=105 DEFAULT CHARSET=utf8mb4 COMMENT='用户信息表';
 
 -- ----------------------------
 -- Records of sys_user
@@ -854,6 +1160,7 @@ INSERT INTO `sys_user` VALUES (1, 'admin', '$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH
 INSERT INTO `sys_user` VALUES (2, 'ry', '$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', '若依', '测试员', 105, '[2]', 'ry@qq.com', '15666666666', 1, '', 0, '127.0.0.1', '2021-01-05 17:03:47', 'admin', '2021-01-05 17:03:47', '', '2021-01-05 17:03:47', b'0');
 INSERT INTO `sys_user` VALUES (100, 'yudao', '$2a$10$11U48RhyJ5pSBYWSn12AD./ld671.ycSzJHbyrtpeoMeYiw31eo8a', '芋道', '不要吓我', 100, '[1]', 'yudao@iocoder.cn', '15601691300', 1, '', 1, '', NULL, '', '2021-01-07 09:07:17', '', '2021-01-13 23:53:12', b'0');
 INSERT INTO `sys_user` VALUES (103, 'yuanma', '', '源码', NULL, 100, NULL, 'yuanma@iocoder.cn', '15601701300', 0, '', 0, '', NULL, '', '2021-01-13 23:50:35', '', '2021-01-13 23:50:35', b'0');
+INSERT INTO `sys_user` VALUES (104, 'test', '$2a$10$wTJ.1LVmhxcujss2NR2SMeBo8AaFsjkoDfDafHYsdHmitAiwmnvce', '测试号', NULL, 100, '[]', '', '15601691200', 1, '', 0, '', NULL, '', '2021-01-21 02:13:53', '', '2021-01-21 02:14:13', b'0');
 COMMIT;
 
 -- ----------------------------
@@ -870,7 +1177,7 @@ CREATE TABLE `sys_user_role` (
   `update_time` datetime DEFAULT NULL COMMENT '更新时间',
   `deleted` bit(1) DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COMMENT='用户和角色关联表';
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COMMENT='用户和角色关联表';
 
 -- ----------------------------
 -- Records of sys_user_role
@@ -882,6 +1189,7 @@ INSERT INTO `sys_user_role` VALUES (3, 100, 1, '', NULL, '', NULL, b'1');
 INSERT INTO `sys_user_role` VALUES (4, 100, 101, '', NULL, '', NULL, b'0');
 INSERT INTO `sys_user_role` VALUES (5, 100, 1, '', NULL, '', NULL, b'0');
 INSERT INTO `sys_user_role` VALUES (6, 100, 2, '', NULL, '', NULL, b'0');
+INSERT INTO `sys_user_role` VALUES (7, 104, 101, '', NULL, '', NULL, b'0');
 COMMIT;
 
 SET FOREIGN_KEY_CHECKS = 1;

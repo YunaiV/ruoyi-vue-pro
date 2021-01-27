@@ -14,20 +14,12 @@ import static cn.iocoder.dashboard.framework.redis.core.RedisKeyDefine.KeyTypeEn
  */
 public interface RedisKeyConstants {
 
-    /**
-     * {@link LoginUser} 的缓存
-     *
-     * key 的 format 的参数是 sessionId
-     */
-    RedisKeyDefine LOGIN_USER = new RedisKeyDefine("login_user:%s", STRING, LoginUser.class,
-            Duration.ofMinutes(30));
+    RedisKeyDefine LOGIN_USER = new RedisKeyDefine("登陆用户的缓存",
+            "login_user:%s", // 参数为 sessionId
+            STRING, LoginUser.class, Duration.ofMinutes(30));
 
-    /**
-     * 验证码的缓存
-     *
-     * key 的 format 的参数是 uuid
-     */
-    RedisKeyDefine CAPTCHA_CODE = new RedisKeyDefine("captcha_code:%s", STRING, String.class,
-            RedisKeyDefine.TimeoutTypeEnum.DYNAMIC);
+    RedisKeyDefine CAPTCHA_CODE = new RedisKeyDefine("验证码的缓存",
+            "captcha_code:%s", // 参数为 uuid
+            STRING, String.class, RedisKeyDefine.TimeoutTypeEnum.DYNAMIC);
 
 }
