@@ -1,4 +1,4 @@
-package cn.iocoder.dashboard.modules.system.controller.auth.vo;
+package cn.iocoder.dashboard.modules.system.controller.auth.vo.auth;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
