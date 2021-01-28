@@ -77,9 +77,11 @@ public interface SysErrorCodeConstants {
 
 
     // ========== 消息 1003001000 ==========
-    ErrorCode SMS_CHANNEL_NOT_FOUND = new ErrorCode(1003001001, "没有短信渠道信息, 请初始化sms_channel表数据。");
-    ErrorCode SMS_TEMPLATE_NOT_FOUND = new ErrorCode(1003001002, "没有短信模板信息, 请初始化sms_template表数据。");
-    ErrorCode SMS_SENDER_NOT_FOUND = new ErrorCode(1003001003, "没有找到对应的短信发送对象，请检查sms_channel表和sms_template表数据");
-    ErrorCode INVALID_CHANNEL_CODE = new ErrorCode(1003001004, "非法的短信渠道code，请检查sms_channel表的code值是否与SmsChannelEnum中的code值一致。");
+    ErrorCode SMS_CHANNEL_NOT_INIT = new ErrorCode(1003001001,
+            "短信渠道没有初始化, 请调用SmsClientWrapper#initSmsClient()或SmsClientWrapper#addSmsClient");
+    ErrorCode SMS_CHANNEL_NOT_FOUND = new ErrorCode(1003001002, "没有短信渠道信息, 请初始化sms_channel表数据。");
+    ErrorCode SMS_TEMPLATE_NOT_FOUND = new ErrorCode(1003001003, "没有短信模板信息, 请初始化sms_template表数据。");
+    ErrorCode SMS_SENDER_NOT_FOUND = new ErrorCode(1003001004, "没有找到对应的短信发送对象，请检查sms_channel表和sms_template表数据");
+    ErrorCode INVALID_CHANNEL_CODE = new ErrorCode(1003001005, "非法的短信渠道code，请检查sms_channel表的code值是否与SmsChannelEnum中的code值一致。");
 
 }
