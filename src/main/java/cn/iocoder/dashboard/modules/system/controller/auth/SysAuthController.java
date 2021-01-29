@@ -28,6 +28,8 @@ import java.util.List;
 import static cn.iocoder.dashboard.common.pojo.CommonResult.success;
 import static cn.iocoder.dashboard.framework.security.core.util.SecurityUtils.getLoginUserId;
 import static cn.iocoder.dashboard.framework.security.core.util.SecurityUtils.getLoginUserRoleIds;
+import static cn.iocoder.dashboard.util.servlet.ServletUtils.getClientIP;
+import static cn.iocoder.dashboard.util.servlet.ServletUtils.getUserAgent;
 
 @Api("认证 API")
 @RestController
@@ -47,7 +49,7 @@ public class SysAuthController {
     @PostMapping("/login")
     @OperateLog(enable = false) // 避免 Post 请求被记录操作日志
     public CommonResult<SysAuthLoginRespVO> login(@RequestBody @Valid SysAuthLoginReqVO reqVO) {
-        String token = authService.login(reqVO.getUsername(), reqVO.getPassword(), reqVO.getUuid(), reqVO.getCode());
+        String token = authService.login(reqVO, getClientIP(), getUserAgent());
         // 返回结果
         return success(SysAuthLoginRespVO.builder().token(token).build());
     }

@@ -41,6 +41,7 @@ spring:
 
 # 芋道配置项，设置当前项目所有自定义的配置
 yudao:
+  version: 1.0.0
   web:
     api-prefix: /api
     controller-package: cn.iocoder.dashboard

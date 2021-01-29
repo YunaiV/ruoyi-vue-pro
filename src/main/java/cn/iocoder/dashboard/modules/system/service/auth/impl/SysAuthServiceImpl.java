@@ -1,28 +1,22 @@
 package cn.iocoder.dashboard.modules.system.service.auth.impl;
 
-import cn.hutool.core.util.IdUtil;
-import cn.hutool.core.util.StrUtil;
 import cn.iocoder.dashboard.common.enums.CommonStatusEnum;
 import cn.iocoder.dashboard.common.exception.util.ServiceExceptionUtil;
-import cn.iocoder.dashboard.framework.security.config.SecurityProperties;
 import cn.iocoder.dashboard.framework.security.core.LoginUser;
 import cn.iocoder.dashboard.framework.tracer.core.util.TracerUtils;
+import cn.iocoder.dashboard.modules.system.controller.auth.vo.auth.SysAuthLoginReqVO;
 import cn.iocoder.dashboard.modules.system.controller.logger.vo.loginlog.SysLoginLogCreateReqVO;
 import cn.iocoder.dashboard.modules.system.convert.auth.SysAuthConvert;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.user.SysUserDO;
-import cn.iocoder.dashboard.modules.system.dal.redis.dao.auth.SysLoginUserRedisDAO;
 import cn.iocoder.dashboard.modules.system.enums.logger.SysLoginLogTypeEnum;
 import cn.iocoder.dashboard.modules.system.enums.logger.SysLoginResultEnum;
 import cn.iocoder.dashboard.modules.system.service.auth.SysAuthService;
-import cn.iocoder.dashboard.modules.system.service.auth.SysTokenService;
+import cn.iocoder.dashboard.modules.system.service.auth.SysUserSessionService;
 import cn.iocoder.dashboard.modules.system.service.common.SysCaptchaService;
 import cn.iocoder.dashboard.modules.system.service.logger.SysLoginLogService;
 import cn.iocoder.dashboard.modules.system.service.permission.SysPermissionService;
 import cn.iocoder.dashboard.modules.system.service.user.SysUserService;
-import cn.iocoder.dashboard.util.date.DateUtils;
 import cn.iocoder.dashboard.util.servlet.ServletUtils;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -37,7 +31,6 @@ import org.springframework.util.Assert;
 
 import javax.annotation.Resource;
 import java.util.Collections;
-import java.util.Date;
 import java.util.Set;
 
 import static cn.iocoder.dashboard.common.exception.util.ServiceExceptionUtil.exception;
@@ -53,11 +46,6 @@ import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.*;
 public class SysAuthServiceImpl implements SysAuthService {
 
     @Resource
-    private SecurityProperties securityProperties;
-
-    @Resource
-    private SysTokenService tokenService;
-    @Resource
     private AuthenticationManager authenticationManager;
     @Resource
     private SysUserService userService;
@@ -67,9 +55,8 @@ public class SysAuthServiceImpl implements SysAuthService {
     private SysCaptchaService captchaService;
     @Resource
     private SysLoginLogService loginLogService;
-
     @Resource
-    private SysLoginUserRedisDAO loginUserRedisDAO;
+    private SysUserSessionService userSessionService;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -91,27 +78,21 @@ public class SysAuthServiceImpl implements SysAuthService {
         }
         // 创建 LoginUser 对象
         LoginUser loginUser = SysAuthConvert.INSTANCE.convert(user);
-        loginUser.setUpdateTime(new Date());
-        loginUser.setRoleIds(this.getUserRoleIds(loginUser.getId()));
+        loginUser.setRoleIds(this.getUserRoleIds(loginUser.getId())); // 获取用户角色列表
         return loginUser;
     }
 
     @Override
-    public String login(String username, String password, String captchaUUID, String captchaCode) {
+    public String login(SysAuthLoginReqVO reqVO, String userIp, String userAgent) {
         // 判断验证码是否正确
-        this.verifyCaptcha(username, captchaUUID, captchaCode);
+        this.verifyCaptcha(reqVO.getUsername(), reqVO.getUuid(), reqVO.getCode());
 
         // 使用账号密码，进行登陆。
-        LoginUser loginUser = this.login0(username, password);
-        // 缓存登陆用户到 Redis 中
-        String sessionId = IdUtil.fastSimpleUUID();
-        loginUser.setUpdateTime(new Date());
-        loginUser.setRoleIds(this.getUserRoleIds(loginUser.getId()));
-        loginUserRedisDAO.set(sessionId, loginUser);
+        LoginUser loginUser = this.login0(reqVO.getUsername(), reqVO.getPassword());
+        loginUser.setRoleIds(this.getUserRoleIds(loginUser.getId())); // 获取用户角色列表
 
-        // 创建 Token
-        // 我们在返回给前端的 JWT 中，使用 sessionId 作为 subject 主体，标识当前 User 用户
-        return tokenService.createToken(sessionId);
+        // 缓存登陆用户到 Redis 中，返回 sessionId 编号
+        return userSessionService.createUserSession(loginUser, userIp, userAgent);
     }
 
     private void verifyCaptcha(String username, String captchaUUID, String captchaCode) {
@@ -182,42 +163,20 @@ public class SysAuthServiceImpl implements SysAuthService {
 
     @Override
     public LoginUser verifyTokenAndRefresh(String token) {
-        // 验证 token 的有效性
-        String sessionId = this.verifyToken(token);
         // 获得 LoginUser
-        LoginUser loginUser = loginUserRedisDAO.get(sessionId);
+        LoginUser loginUser = userSessionService.getLoginUser(token);
         if (loginUser == null) {
             return null;
         }
         // 刷新 LoginUser 缓存
-        this.refreshLoginUserCache(sessionId, loginUser);
+        this.refreshLoginUserCache(token, loginUser);
         return loginUser;
     }
 
-    private String verifyToken(String token) {
-        Claims claims;
-        try {
-            claims = tokenService.parseToken(token);
-        } catch (JwtException jwtException) {
-            log.warn("[verifyToken][token({}) 解析发生异常]", token);
-            return null;
-        }
-        // token 已经过期
-        if (DateUtils.isExpired(claims.getExpiration())) {
-            return null;
-        }
-        // 判断 sessionId 是否存在
-        String sessionId = claims.getSubject();
-        if (StrUtil.isBlank(sessionId)) {
-            return null;
-        }
-        return sessionId;
-    }
-
-    private void refreshLoginUserCache(String sessionId, LoginUser loginUser) {
+    private void refreshLoginUserCache(String token, LoginUser loginUser) {
         // 每 1/3 的 Session 超时时间，刷新 LoginUser 缓存
         if (System.currentTimeMillis() - loginUser.getUpdateTime().getTime() <
-                securityProperties.getSessionTimeout().toMillis() / 3) {
+                userSessionService.getSessionTimeoutMillis() / 3) {
             return;
         }
 
@@ -229,9 +188,8 @@ public class SysAuthServiceImpl implements SysAuthService {
 
         // 刷新 LoginUser 缓存
         loginUser.setDeptId(user.getDeptId());
-        loginUser.setUpdateTime(new Date());
         loginUser.setRoleIds(this.getUserRoleIds(loginUser.getId()));
-        loginUserRedisDAO.set(sessionId, loginUser);
+        userSessionService.refreshUserSession(token, loginUser);
     }
 
 }

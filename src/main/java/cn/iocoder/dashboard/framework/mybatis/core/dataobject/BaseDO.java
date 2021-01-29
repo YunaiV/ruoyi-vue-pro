@@ -34,7 +34,4 @@ public class BaseDO implements Serializable {
     @TableLogic
     private Integer deleted;
 
-//    /** 备注 */ TODO 思考下，怎么解决
-//    private String remark;
-
 }

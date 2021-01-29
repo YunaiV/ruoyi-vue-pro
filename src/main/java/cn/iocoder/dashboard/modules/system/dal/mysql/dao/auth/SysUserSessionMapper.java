@@ -2,6 +2,8 @@ package cn.iocoder.dashboard.modules.system.dal.mysql.dao.auth;
 
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.auth.SysUserSessionDO;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Mapper;
 
-public interface SysUserOnlineMapper extends BaseMapper<SysUserSessionDO> {
+@Mapper
+public interface SysUserSessionMapper extends BaseMapper<SysUserSessionDO> {
 }
