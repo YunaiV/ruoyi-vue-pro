@@ -80,6 +80,14 @@ public interface SysUserService {
     List<SysUserDO> listUsersByNickname(String nickname);
 
     /**
+     * 获得用户列表，基于用户账号模糊匹配
+     *
+     * @param username 用户账号
+     * @return 用户列表
+     */
+    List<SysUserDO> listUsersByUsername(String username);
+
+    /**
      * 创建用户
      *
      * @param reqVO 用户信息

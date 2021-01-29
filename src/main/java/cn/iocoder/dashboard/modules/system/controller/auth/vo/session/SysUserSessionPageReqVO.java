@@ -14,7 +14,6 @@ import javax.validation.constraints.NotEmpty;
 public class SysUserSessionPageReqVO extends PageParam {
 
     @ApiModelProperty(value = "用户 IP", example = "127.0.0.1", notes = "模糊匹配")
-    @NotEmpty(message = "用户 IP 不能为空")
     private String userIp;
 
     @ApiModelProperty(value = "用户账号", example = "yudao", notes = "模糊匹配")

@@ -3,6 +3,7 @@ package cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.auth;
 import cn.iocoder.dashboard.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.dashboard.framework.security.core.LoginUser;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.user.SysUserDO;
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Builder;
@@ -27,7 +28,7 @@ public class SysUserSessionDO extends BaseDO {
     /**
      * 会话编号, 即 sessionId
      */
-    @TableId
+    @TableId(type = IdType.INPUT)
     private String id;
     /**
      * 用户编号

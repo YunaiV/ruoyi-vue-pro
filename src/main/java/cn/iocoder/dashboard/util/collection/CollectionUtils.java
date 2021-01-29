@@ -26,35 +26,35 @@ public class CollectionUtils {
         return from.stream().filter(predicate).collect(Collectors.toList());
     }
 
-    public static <T, U> List<U> convertList(List<T> from, Function<T, U> func) {
+    public static <T, U> List<U> convertList(Collection<T> from, Function<T, U> func) {
         if (CollUtil.isEmpty(from)) {
             return new ArrayList<>();
         }
         return from.stream().map(func).collect(Collectors.toList());
     }
 
-    public static <T, U> Set<U> convertSet(List<T> from, Function<T, U> func) {
+    public static <T, U> Set<U> convertSet(Collection<T> from, Function<T, U> func) {
         if (CollUtil.isEmpty(from)) {
             return new HashSet<>();
         }
         return from.stream().map(func).collect(Collectors.toSet());
     }
 
-    public static <T, K> Map<K, T> convertMap(List<T> from, Function<T, K> keyFunc) {
+    public static <T, K> Map<K, T> convertMap(Collection<T> from, Function<T, K> keyFunc) {
         if (CollUtil.isEmpty(from)) {
             return new HashMap<>();
         }
         return from.stream().collect(Collectors.toMap(keyFunc, item -> item));
     }
 
-    public static <T, K, V> Map<K, V> convertMap(List<T> from, Function<T, K> keyFunc, Function<T, V> valueFunc) {
+    public static <T, K, V> Map<K, V> convertMap(Collection<T> from, Function<T, K> keyFunc, Function<T, V> valueFunc) {
         if (CollUtil.isEmpty(from)) {
             return new HashMap<>();
         }
         return from.stream().collect(Collectors.toMap(keyFunc, valueFunc));
     }
 
-    public static <T, K> Map<K, List<T>> convertMultiMap(List<T> from, Function<T, K> keyFunc) {
+    public static <T, K> Map<K, List<T>> convertMultiMap(Collection<T> from, Function<T, K> keyFunc) {
         if (CollUtil.isEmpty(from)) {
             return new HashMap<>();
         }
@@ -62,7 +62,7 @@ public class CollectionUtils {
                 Collectors.mapping(t -> t, Collectors.toList())));
     }
 
-    public static <T, K, V> Map<K, List<V>> convertMultiMap(List<T> from, Function<T, K> keyFunc, Function<T, V> valueFunc) {
+    public static <T, K, V> Map<K, List<V>> convertMultiMap(Collection<T> from, Function<T, K> keyFunc, Function<T, V> valueFunc) {
         if (CollUtil.isEmpty(from)) {
             return new HashMap<>();
         }
@@ -71,7 +71,7 @@ public class CollectionUtils {
     }
 
     // 暂时没想好名字，先以 2 结尾噶
-    public static <T, K, V> Map<K, Set<V>> convertMultiMap2(List<T> from, Function<T, K> keyFunc, Function<T, V> valueFunc) {
+    public static <T, K, V> Map<K, Set<V>> convertMultiMap2(Collection<T> from, Function<T, K> keyFunc, Function<T, V> valueFunc) {
         if (CollUtil.isEmpty(from)) {
             return new HashMap<>();
         }

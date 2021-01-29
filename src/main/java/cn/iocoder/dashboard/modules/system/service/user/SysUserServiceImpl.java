@@ -92,6 +92,11 @@ public class SysUserServiceImpl implements SysUserService {
         return userMapper.selectListByNickname(nickname);
     }
 
+    @Override
+    public List<SysUserDO> listUsersByUsername(String username) {
+        return userMapper.selectListByUsername(username);
+    }
+
     /**
      * 获得部门条件：查询指定部门的子部门编号们，包括自身
      *

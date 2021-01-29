@@ -48,5 +48,9 @@ public interface SysUserMapper extends BaseMapperX<SysUserDO> {
         return selectList(new QueryWrapperX<SysUserDO>().like("nickname", nickname));
     }
 
+    default List<SysUserDO> selectListByUsername(String username) {
+        return selectList(new QueryWrapperX<SysUserDO>().like("username", username));
+    }
+
 }
 

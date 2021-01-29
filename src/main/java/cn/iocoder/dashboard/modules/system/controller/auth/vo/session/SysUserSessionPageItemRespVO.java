@@ -8,6 +8,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import java.util.Date;
+
 @ApiModel(value = "用户在线 Session Response VO", description = "相比用户基本信息来说，会多部门、用户账号等信息")
 @Data
 @NoArgsConstructor
@@ -25,7 +27,7 @@ public class SysUserSessionPageItemRespVO extends PageParam {
     private String userAgent;
 
     @ApiModelProperty(value = "登陆时间", required = true)
-    private String createTime;
+    private Date createTime;
 
     @ApiModelProperty(value = "用户账号", required = true, example = "yudao")
     private String username;

@@ -4,8 +4,14 @@ import cn.iocoder.dashboard.common.pojo.CommonResult;
 import cn.iocoder.dashboard.common.pojo.PageResult;
 import cn.iocoder.dashboard.modules.system.controller.auth.vo.session.SysUserSessionPageItemRespVO;
 import cn.iocoder.dashboard.modules.system.controller.auth.vo.session.SysUserSessionPageReqVO;
+import cn.iocoder.dashboard.modules.system.convert.auth.SysUserSessionConvert;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.auth.SysUserSessionDO;
+import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.dept.SysDeptDO;
+import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.user.SysUserDO;
 import cn.iocoder.dashboard.modules.system.service.auth.SysUserSessionService;
+import cn.iocoder.dashboard.modules.system.service.dept.SysDeptService;
+import cn.iocoder.dashboard.modules.system.service.user.SysUserService;
+import cn.iocoder.dashboard.util.collection.MapUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
@@ -14,26 +20,50 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import static cn.iocoder.dashboard.common.pojo.CommonResult.success;
+import static cn.iocoder.dashboard.util.collection.CollectionUtils.convertList;
 
 @Api("用户 Session API")
 @RestController
-@RequestMapping("/user-session")
+@RequestMapping("/system/user-session")
 public class SysUserSessionController {
 
     @Resource
     private SysUserSessionService userSessionService;
+    @Resource
+    private SysUserService userService;
+    @Resource
+    private SysDeptService deptService;
 
     @ApiOperation("获得 Session 分页列表")
     @PreAuthorize("@ss.hasPermission('system:user-session:page')")
     @GetMapping("/page")
     public CommonResult<PageResult<SysUserSessionPageItemRespVO>> getUserSessionPage(@Validated SysUserSessionPageReqVO reqVO) {
         // 获得 Session 分页
-        PageResult<SysUserSessionDO> sessionPage = userSessionService.getUserSessionPage(reqVO);
+        PageResult<SysUserSessionDO> pageResult = userSessionService.getUserSessionPage(reqVO);
 
-        //
-        return null;
+        // 获得拼接需要的数据
+        Map<Long, SysUserDO> userMap = userService.getUserMap(
+                convertList(pageResult.getList(), SysUserSessionDO::getUserId));
+        Map<Long, SysDeptDO> deptMap = deptService.getDeptMap(
+                convertList(userMap.values(), SysUserDO::getDeptId));
+        // 拼接结果返回
+        List<SysUserSessionPageItemRespVO> sessionList = new ArrayList<>(pageResult.getList().size());
+        pageResult.getList().forEach(session -> {
+            SysUserSessionPageItemRespVO respVO = SysUserSessionConvert.INSTANCE.convert(session);
+            sessionList.add(respVO);
+            // 设置用户账号
+            MapUtils.findAndThen(userMap, session.getUserId(), user -> {
+                respVO.setUsername(user.getUsername());
+                // 设置用户部门
+                MapUtils.findAndThen(deptMap, user.getDeptId(), dept -> respVO.setDeptName(dept.getName()));
+            });
+        });
+        return success(new PageResult<>(sessionList, pageResult.getTotal()));
     }
 
     @ApiOperation("删除 Session")

@@ -30,8 +30,8 @@ public class SysLoginUserRedisDAO {
         stringRedisTemplate.opsForValue().set(redisKey, JsonUtils.toJsonString(loginUser), LOGIN_USER.getTimeout());
     }
 
-    public void delete(String accessToken) {
-        String redisKey = formatKey(accessToken);
+    public void delete(String sessionId) {
+        String redisKey = formatKey(sessionId);
         stringRedisTemplate.delete(redisKey);
     }
 
