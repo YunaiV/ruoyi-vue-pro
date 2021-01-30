@@ -23,25 +23,9 @@ public class GenTable extends BaseEntity {
     private String packageName;
 
     /**
-     * 生成代码方式（0zip压缩包 1自定义路径）
-     */
-    private String genType;
-
-    /**
-     * 生成路径（不填默认项目路径）
-     */
-    private String genPath;
-
-    /**
      * 主键信息
      */
     private GenTableColumn pkColumn;
-
-    /**
-     * 表列信息
-     */
-    @Valid
-    private List<GenTableColumn> columns;
 
     /**
      * 其它生成选项

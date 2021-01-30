@@ -81,46 +81,6 @@ public class GenConstants {
     public static final String[] TREE_ENTITY = {"parentName", "parentId", "orderNum", "ancestors", "children"};
 
     /**
-     * 文本框
-     */
-    public static final String HTML_INPUT = "input";
-
-    /**
-     * 文本域
-     */
-    public static final String HTML_TEXTAREA = "textarea";
-
-    /**
-     * 下拉框
-     */
-    public static final String HTML_SELECT = "select";
-
-    /**
-     * 单选框
-     */
-    public static final String HTML_RADIO = "radio";
-
-    /**
-     * 复选框
-     */
-    public static final String HTML_CHECKBOX = "checkbox";
-
-    /**
-     * 日期控件
-     */
-    public static final String HTML_DATETIME = "datetime";
-
-    /**
-     * 上传控件
-     */
-    public static final String HTML_UPLOAD_IMAGE = "uploadImage";
-
-    /**
-     * 富文本控件
-     */
-    public static final String HTML_EDITOR = "editor";
-
-    /**
      * 字符串类型
      */
     public static final String TYPE_STRING = "String";
@@ -150,13 +110,4 @@ public class GenConstants {
      */
     public static final String TYPE_DATE = "Date";
 
-    /**
-     * 模糊查询
-     */
-    public static final String QUERY_LIKE = "LIKE";
-
-    /**
-     * 需要
-     */
-    public static final String REQUIRE = "1";
 }

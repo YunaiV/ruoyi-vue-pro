@@ -1,7 +1,7 @@
 package cn.iocoder.dashboard.modules.tool.dal.mysql.dataobject.codegen;
 
 import cn.iocoder.dashboard.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.dashboard.modules.tool.enums.codegen.ToolCodeGenTemplateTypeEnum;
+import cn.iocoder.dashboard.modules.tool.enums.codegen.ToolCodegenTemplateTypeEnum;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Builder;
 import lombok.Data;
@@ -18,12 +18,13 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 public class ToolCodegenTableDO extends BaseDO {
 
-    // ========== 表相关字段 ==========
-
     /**
      * ID 编号
      */
     private Long id;
+
+    // ========== 表相关字段 ==========
+
     /**
      * 表名称
      */
@@ -78,7 +79,7 @@ public class ToolCodegenTableDO extends BaseDO {
     /**
      * 模板类型
      *
-     * 枚举 {@link ToolCodeGenTemplateTypeEnum}
+     * 枚举 {@link ToolCodegenTemplateTypeEnum}
      */
     private Integer templateType;
 

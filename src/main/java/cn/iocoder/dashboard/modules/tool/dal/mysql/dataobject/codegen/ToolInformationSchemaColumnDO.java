@@ -28,6 +28,10 @@ public class ToolInformationSchemaColumnDO {
      */
     private String columnType;
     /**
+     * 字段描述
+     */
+    private String columnComment;
+    /**
      * 是否允许为空
      */
     @TableField("case when is_nullable = 'yes' then '1' else '0' end")
@@ -37,6 +41,11 @@ public class ToolInformationSchemaColumnDO {
      */
     @TableField("case when column_key = 'PRI' then '1' else '0' end")
     private Boolean primaryKey;
+    /**
+     * 是否自增
+     */
+    @TableField("case when extra = 'auto_increment' then '1' else '0' end")
+    private Boolean autoIncrement;
     /**
      * 排序字段
      */

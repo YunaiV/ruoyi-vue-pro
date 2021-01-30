@@ -10,7 +10,7 @@ import lombok.Getter;
  */
 @AllArgsConstructor
 @Getter
-public enum ToolCodeGenTemplateTypeEnum {
+public enum ToolCodegenTemplateTypeEnum {
 
     CRUD(1), // 基础 CRUD
     TREE(2), // 树形 CRUD
