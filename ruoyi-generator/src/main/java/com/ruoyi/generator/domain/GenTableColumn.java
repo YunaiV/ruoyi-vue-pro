@@ -6,7 +6,7 @@ import com.ruoyi.common.utils.StringUtils;
 
 /**
  * 代码生成业务字段表 gen_table_column
- * 
+ *
  * @author ruoyi
  */
 public class GenTableColumn extends BaseEntity
@@ -67,86 +67,6 @@ public class GenTableColumn extends BaseEntity
 
     /** 排序 */
     private Integer sort;
-
-    public void setColumnId(Long columnId)
-    {
-        this.columnId = columnId;
-    }
-
-    public Long getColumnId()
-    {
-        return columnId;
-    }
-
-    public void setTableId(Long tableId)
-    {
-        this.tableId = tableId;
-    }
-
-    public Long getTableId()
-    {
-        return tableId;
-    }
-
-    public void setColumnName(String columnName)
-    {
-        this.columnName = columnName;
-    }
-
-    public String getColumnName()
-    {
-        return columnName;
-    }
-
-    public void setColumnComment(String columnComment)
-    {
-        this.columnComment = columnComment;
-    }
-
-    public String getColumnComment()
-    {
-        return columnComment;
-    }
-
-    public void setColumnType(String columnType)
-    {
-        this.columnType = columnType;
-    }
-
-    public String getColumnType()
-    {
-        return columnType;
-    }
-
-    public void setJavaType(String javaType)
-    {
-        this.javaType = javaType;
-    }
-
-    public String getJavaType()
-    {
-        return javaType;
-    }
-
-    public void setJavaField(String javaField)
-    {
-        this.javaField = javaField;
-    }
-
-    public String getJavaField()
-    {
-        return javaField;
-    }
-
-    public void setIsPk(String isPk)
-    {
-        this.isPk = isPk;
-    }
-
-    public String getIsPk()
-    {
-        return isPk;
-    }
 
     public boolean isPk()
     {
@@ -276,46 +196,6 @@ public class GenTableColumn extends BaseEntity
     public boolean isQuery(String isQuery)
     {
         return isQuery != null && StringUtils.equals("1", isQuery);
-    }
-
-    public void setQueryType(String queryType)
-    {
-        this.queryType = queryType;
-    }
-
-    public String getQueryType()
-    {
-        return queryType;
-    }
-
-    public String getHtmlType()
-    {
-        return htmlType;
-    }
-
-    public void setHtmlType(String htmlType)
-    {
-        this.htmlType = htmlType;
-    }
-
-    public void setDictType(String dictType)
-    {
-        this.dictType = dictType;
-    }
-
-    public String getDictType()
-    {
-        return dictType;
-    }
-
-    public void setSort(Integer sort)
-    {
-        this.sort = sort;
-    }
-
-    public Integer getSort()
-    {
-        return sort;
     }
 
     public boolean isSuperColumn()

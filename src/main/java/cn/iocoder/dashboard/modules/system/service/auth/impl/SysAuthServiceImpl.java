@@ -137,7 +137,7 @@ public class SysAuthServiceImpl implements SysAuthService {
 
     private void createLoginLog(String username, SysLoginResultEnum loginResult) {
         SysLoginLogCreateReqVO reqVO = new SysLoginLogCreateReqVO();
-        reqVO.setLogType(SysLoginLogTypeEnum.LOGIN.getType());
+        reqVO.setLogType(SysLoginLogTypeEnum.LOGIN_USERNAME.getType());
         reqVO.setTraceId(TracerUtils.getTraceId());
         reqVO.setUsername(username);
         reqVO.setUserAgent(ServletUtils.getUserAgent());
