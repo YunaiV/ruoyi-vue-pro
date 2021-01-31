@@ -14,4 +14,8 @@ public interface ToolInformationSchemaTableMapper extends BaseMapperX<ToolInform
         return selectList(new QueryWrapper<ToolInformationSchemaTableDO>().eq("table_schema", tableSchema));
     }
 
+    default ToolInformationSchemaTableDO selectByTableName(String tableName) {
+        return selectOne(new QueryWrapper<ToolInformationSchemaTableDO>().eq("table_name", tableName));
+    }
+
 }
