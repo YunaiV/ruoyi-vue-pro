@@ -1,0 +1,30 @@
+import com.baomidou.mybatisplus.annotation.*;
+import lombok.*;
+import java.util.*;
+
+/**
+* ${table.description}
+*/
+@TableName("${table.tableName}")
+@Data
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class ${table.tableName}DO extends BaseDO {
+
+#foreach ($column in $columns)
+    /**
+    * ${column.columnComment}
+    */
+#if(${column.primaryKey} && ${column.javaType} != 'String')
+    @TableId
+#end
+#if(${column.primaryKey} && ${column.javaType} == 'String')
+    @TableId(type = IdType.INPUT)
+#end
+    private ${column.javaType} ${column.javaField};
+#end
+
+}

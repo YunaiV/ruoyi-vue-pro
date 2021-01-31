@@ -5,8 +5,7 @@ import cn.iocoder.dashboard.framework.mybatis.core.dataobject.BaseDO;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 
 /**
  * 字典类型表
@@ -16,6 +15,10 @@ import lombok.EqualsAndHashCode;
 @TableName("sys_dict_type")
 @Data
 @EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class SysDictTypeDO extends BaseDO {
 
     /**

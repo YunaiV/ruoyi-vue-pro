@@ -5,16 +5,9 @@ import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.dashboard.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.dashboard.modules.tool.convert.codegen.CodegenConvert;
-import cn.iocoder.dashboard.modules.tool.dal.mysql.dao.coegen.ToolCodegenColumnMapper;
-import cn.iocoder.dashboard.modules.tool.dal.mysql.dao.coegen.ToolCodegenTableMapper;
-import cn.iocoder.dashboard.modules.tool.dal.mysql.dao.coegen.ToolInformationSchemaColumnMapper;
-import cn.iocoder.dashboard.modules.tool.dal.mysql.dao.coegen.ToolInformationSchemaTableMapper;
-import cn.iocoder.dashboard.modules.tool.dal.mysql.dataobject.codegen.ToolCodegenColumnDO;
-import cn.iocoder.dashboard.modules.tool.dal.mysql.dataobject.codegen.ToolCodegenTableDO;
-import cn.iocoder.dashboard.modules.tool.dal.mysql.dataobject.codegen.ToolInformationSchemaColumnDO;
-import cn.iocoder.dashboard.modules.tool.dal.mysql.dataobject.codegen.ToolInformationSchemaTableDO;
-import cn.iocoder.dashboard.modules.tool.enums.codegen.ToolCodegenColumnHtmlTypeEnum;
-import cn.iocoder.dashboard.modules.tool.enums.codegen.ToolCodegenColumnListConditionEnum;
+import cn.iocoder.dashboard.modules.tool.dal.mysql.dao.coegen.*;
+import cn.iocoder.dashboard.modules.tool.dal.mysql.dataobject.codegen.*;
+import cn.iocoder.dashboard.modules.tool.enums.codegen.*;
 import cn.iocoder.dashboard.modules.tool.service.codegen.ToolCodegenService;
 import com.google.common.collect.Sets;
 import org.springframework.stereotype.Service;
@@ -60,8 +53,7 @@ public class ToolCodegenServiceImpl implements ToolCodegenService {
     /**
      * 新增操作，不需要传递的字段
      */
-    private static final Set<String> CREATE_OPERATION_EXCLUDE_COLUMN = Sets.newHashSet(
-            "id");
+    private static final Set<String> CREATE_OPERATION_EXCLUDE_COLUMN = Sets.newHashSet("id");
     /**
      * 修改操作，不需要传递的字段
      */
@@ -69,11 +61,11 @@ public class ToolCodegenServiceImpl implements ToolCodegenService {
     /**
      * 列表操作的条件，不需要传递的字段
      */
-    private static final Set<String> LIST_OPERATION_CONDITION_COLUMN = Sets.newHashSet();
+    private static final Set<String> LIST_OPERATION_EXCLUDE_COLUMN = Sets.newHashSet("id");
     /**
      * 列表操作的结果，不需要返回的字段
      */
-    private static final Set<String> LIST_OPERATION_RESULT_COLUMN = Sets.newHashSet();
+    private static final Set<String> LIST_OPERATION_RESULT_EXCLUDE_COLUMN = Sets.newHashSet();
 
     /**
      * Java 类型与 MySQL 类型的映射关系
@@ -90,13 +82,15 @@ public class ToolCodegenServiceImpl implements ToolCodegenService {
             .build();
 
     static {
+        // 处理 OPERATION 相关的字段
         Arrays.stream(BaseDO.class.getDeclaredFields()).forEach(field -> {
             CREATE_OPERATION_EXCLUDE_COLUMN.add(field.getName());
             UPDATE_OPERATION_EXCLUDE_COLUMN.add(field.getName());
-            LIST_OPERATION_CONDITION_COLUMN.add(field.getName());
-            LIST_OPERATION_RESULT_COLUMN.add(field.getName());
+            LIST_OPERATION_EXCLUDE_COLUMN.add(field.getName());
+            LIST_OPERATION_RESULT_EXCLUDE_COLUMN.add(field.getName());
         });
-        LIST_OPERATION_RESULT_COLUMN.remove("create_time"); // 创建时间，还是需要返回的
+        LIST_OPERATION_EXCLUDE_COLUMN.remove("create_time"); // 创建时间，还是可能需要传递的
+        LIST_OPERATION_RESULT_EXCLUDE_COLUMN.remove("create_time"); // 创建时间，还是需要返回的
     }
 
     @Resource
@@ -134,7 +128,7 @@ public class ToolCodegenServiceImpl implements ToolCodegenService {
         columns.forEach(column -> {
             initColumnDefault(column);
             column.setTableId(table.getId());
-            codegenColumnMapper.insert(column);
+            codegenColumnMapper.insert(column); // TODO 批量插入
         });
         return table.getId();
     }
@@ -150,10 +144,11 @@ public class ToolCodegenServiceImpl implements ToolCodegenService {
         table.setBusinessName(StrUtil.subAfter(table.getTableName(),
                 '_', false)); // 第一个 _ 前缀的后面，作为 module 名字
         table.setBusinessName(StrUtil.toCamelCase(table.getBusinessName())); // 可能存在多个 _ 的情况，转换成驼峰
-        table.setClassName(StrUtil.toCamelCase(table.getClassName())); // 驼峰
-        table.setClassComment(StrUtil.subBefore(table.getClassComment(), // 去除结尾的表，作为类描述
+        table.setClassName(StrUtil.upperFirst(StrUtil.toCamelCase(table.getTableName()))); // 驼峰 + 首字母大写
+        table.setClassComment(StrUtil.subBefore(table.getTableComment(), // 去除结尾的表，作为类描述
                 '表', true));
         table.setAuthor("芋艿"); // TODO 稍后改成创建人
+        table.setTemplateType(ToolCodegenTemplateTypeEnum.CRUD.getType());
     }
 
     /**
@@ -175,7 +170,7 @@ public class ToolCodegenServiceImpl implements ToolCodegenService {
         column.setJavaField(StrUtil.toCamelCase(column.getColumnName()));
         // 处理 dictType 字段，暂无
         // 处理 javaType 字段
-        String dbType = StrUtil.subBefore(column.getColumnName(), ')', false);
+        String dbType = StrUtil.subBefore(column.getColumnType(), '(', false);
         javaTypeMappings.entrySet().stream()
                 .filter(entry -> entry.getValue().contains(dbType))
                 .findFirst().ifPresent(entry -> column.setJavaType(entry.getKey()));
@@ -187,26 +182,29 @@ public class ToolCodegenServiceImpl implements ToolCodegenService {
 
     private void processColumnOperation(ToolCodegenColumnDO column) {
         // 处理 createOperation 字段
-        column.setCreateOperation(!CREATE_OPERATION_EXCLUDE_COLUMN.contains(column.getColumnName())
-            && !column.getPrimaryKey()); // 非主键
+        column.setCreateOperation(!CREATE_OPERATION_EXCLUDE_COLUMN.contains(column.getJavaField())
+            && !column.getPrimaryKey()); // 对于主键，创建时无需传递
         // 处理 updateOperation 字段
-        column.setUpdateOperation(!UPDATE_OPERATION_EXCLUDE_COLUMN.contains(column.getColumnName()));
-        // 处理 listOperationResult 字段
-        column.setListOperationResult(!LIST_OPERATION_RESULT_COLUMN.contains(column.getColumnName()));
-        // 处理 listOperationCondition 字段。默认设置为需要过滤的条件，手动进行取消
-        if (!LIST_OPERATION_CONDITION_COLUMN.contains(column.getColumnName())
-            && !column.getPrimaryKey()) { // 非主键
+        column.setUpdateOperation(!UPDATE_OPERATION_EXCLUDE_COLUMN.contains(column.getJavaField())
+            || column.getPrimaryKey()); // 对于主键，更新时需要传递
+        // 处理 listOperation 字段
+        column.setListOperation(!LIST_OPERATION_EXCLUDE_COLUMN.contains(column.getJavaField())
+                && !column.getPrimaryKey()); // 对于主键，列表过滤不需要传递
+        // 处理 listOperationCondition 字段
+        columnListOperationConditionMappings.entrySet().stream()
+                .filter(entry -> StrUtil.endWithIgnoreCase(column.getJavaField(), entry.getKey()))
+                .findFirst().ifPresent(entry -> column.setListOperationCondition(entry.getValue().getCondition()));
+        if (column.getListOperationCondition() == null) {
             column.setListOperationCondition(ToolCodegenColumnListConditionEnum.EQ.getCondition());
         }
-        columnListOperationConditionMappings.entrySet().stream()
-                .filter(entry -> StrUtil.endWithIgnoreCase(column.getColumnName(), entry.getKey()))
-                .findFirst().ifPresent(entry -> column.setListOperationCondition(entry.getValue().getCondition()));
+        // 处理 listOperationResult 字段
+        column.setListOperationResult(!LIST_OPERATION_RESULT_EXCLUDE_COLUMN.contains(column.getJavaField()));
     }
 
     private void processColumnUI(ToolCodegenColumnDO column) {
         // 基于后缀进行匹配
         columnHtmlTypeMappings.entrySet().stream()
-                .filter(entry -> StrUtil.endWithIgnoreCase(column.getColumnName(), entry.getKey()))
+                .filter(entry -> StrUtil.endWithIgnoreCase(column.getJavaField(), entry.getKey()))
                 .findFirst().ifPresent(entry -> column.setHtmlType(entry.getValue().getType()));
         // 如果是 Boolean 类型时，设置为 radio 类型.
         // 其它类型，因为字段名可以相对保障，所以不进行处理。例如说 date 对应 datetime 类型.

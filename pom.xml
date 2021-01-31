@@ -54,6 +54,7 @@
         <mapstruct.version>1.4.1.Final</mapstruct.version>
         <hutool.version>5.5.6</hutool.version>
         <easyexcel.verion>2.2.7</easyexcel.verion>
+        <velocity.version>2.2</velocity.version>
     </properties>
 
     <!-- 依赖声明 -->
@@ -219,6 +220,12 @@
             <groupId>com.alibaba</groupId>
             <artifactId>easyexcel</artifactId>
             <version>${easyexcel.verion}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.velocity</groupId>
+            <artifactId>velocity-engine-core</artifactId>
+            <version>${velocity.version}</version>
         </dependency>
 
     </dependencies>

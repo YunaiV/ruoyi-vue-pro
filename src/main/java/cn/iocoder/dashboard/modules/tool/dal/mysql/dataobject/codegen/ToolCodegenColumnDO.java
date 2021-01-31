@@ -95,16 +95,19 @@ public class ToolCodegenColumnDO extends BaseDO {
      */
     private Boolean updateOperation;
     /**
-     * 是否为 List 查询操作的返回字段
+     * 是否为 List 查询操作的字段
      */
-    private Boolean listOperationResult;
+    private Boolean listOperation;
     /**
      * List 查询操作的条件类型
-     * 如果为空，则说明不是查询字段
      *
      * 枚举 {@link ToolCodegenColumnListConditionEnum}
      */
     private String listOperationCondition;
+    /**
+     * 是否为 List 查询操作的返回字段
+     */
+    private Boolean listOperationResult;
 
     // ========== UI 相关字段 ==========
 
