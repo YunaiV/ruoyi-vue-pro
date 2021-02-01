@@ -83,5 +83,6 @@ public interface SysErrorCodeConstants {
     ErrorCode SMS_TEMPLATE_NOT_FOUND = new ErrorCode(1003001003, "没有短信模板信息, 请初始化sms_template表数据。");
     ErrorCode SMS_SENDER_NOT_FOUND = new ErrorCode(1003001004, "没有找到对应的短信发送对象，请检查sms_channel表和sms_template表数据");
     ErrorCode INVALID_CHANNEL_CODE = new ErrorCode(1003001005, "非法的短信渠道code，请检查sms_channel表的code值是否与SmsChannelEnum中的code值一致。");
+    ErrorCode PARAM_VALUE_IS_NULL = new ErrorCode(1003001006, "参数【{}】不能为空");
 
 }

@@ -3,7 +3,9 @@ package cn.iocoder.dashboard.modules.system.service.sms.impl;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.dashboard.common.enums.SmsChannelEnum;
 import cn.iocoder.dashboard.common.pojo.PageResult;
-import cn.iocoder.dashboard.modules.system.controller.sms.vo.SmsChannelAllVO;
+import cn.iocoder.dashboard.framework.sms.client.AbstractSmsClient;
+import cn.iocoder.dashboard.framework.sms.core.SmsClientFactory;
+import cn.iocoder.dashboard.modules.system.controller.sms.vo.SmsChannelPropertyVO;
 import cn.iocoder.dashboard.modules.system.controller.sms.vo.req.SmsChannelCreateReqVO;
 import cn.iocoder.dashboard.modules.system.controller.sms.vo.req.SmsChannelPageReqVO;
 import cn.iocoder.dashboard.modules.system.controller.sms.vo.resp.SmsChannelEnumRespVO;
@@ -14,12 +16,16 @@ import cn.iocoder.dashboard.modules.system.dal.mysql.dao.sms.SmsTemplateMapper;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.sms.SmsChannelDO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.sms.SmsTemplateDO;
 import cn.iocoder.dashboard.modules.system.service.sms.SmsChannelService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 短信渠道Service实现类
@@ -29,6 +35,30 @@ import java.util.List;
  */
 @Service
 public class SmsChannelServiceImpl implements SmsChannelService {
+
+    private final Map<String, Long> templateCode2ChannelIdMap = new ConcurrentHashMap<>(32);
+
+    @Autowired
+    private SmsClientFactory smsClientFactory;
+
+    /**
+     * 初始化短信客户端
+     */
+    @PostConstruct
+    @Override
+    public void initSmsClient() {
+        List<SmsChannelPropertyVO> smsChannelPropertyVOList = listChannelAllEnabledInfo();
+        if (ObjectUtil.isEmpty(smsChannelPropertyVOList)) {
+            return;
+        }
+        smsChannelPropertyVOList.forEach(smsChannelPropertyVO -> {
+            Long clientId = smsClientFactory.createClient(smsChannelPropertyVO);
+            smsChannelPropertyVO.getTemplateList().forEach(smsTemplateVO -> {
+                templateCode2ChannelIdMap.put(smsTemplateVO.getCode(), clientId);
+            });
+        });
+    }
+
 
     @Resource
     private SmsChannelMapper mapper;
@@ -54,12 +84,17 @@ public class SmsChannelServiceImpl implements SmsChannelService {
     }
 
     @Override
-    public List<SmsChannelAllVO> listChannelAllEnabledInfo() {
+    public AbstractSmsClient<?> getClient(String templateCode) {
+        return smsClientFactory.getClient(templateCode2ChannelIdMap.get(templateCode));
+    }
+
+    @Override
+    public List<SmsChannelPropertyVO> listChannelAllEnabledInfo() {
         List<SmsChannelDO> channelDOList = mapper.selectEnabledList();
         if (ObjectUtil.isNull(channelDOList)) {
             return null;
         }
-        List<SmsChannelAllVO> channelAllVOList = SmsChannelConvert.INSTANCE.convert(channelDOList);
+        List<SmsChannelPropertyVO> channelAllVOList = SmsChannelConvert.INSTANCE.convert(channelDOList);
 
         channelAllVOList.forEach(smsChannelDO -> {
 
@@ -70,11 +105,5 @@ public class SmsChannelServiceImpl implements SmsChannelService {
             smsChannelDO.setTemplateList(SmsTemplateConvert.INSTANCE.convert(templateDOList));
         });
         return channelAllVOList;
-    }
-
-    @Override
-    public boolean flushChannel() {
-
-        return true;
     }
 }

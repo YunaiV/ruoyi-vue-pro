@@ -17,6 +17,7 @@ public class SmsTemplateVO {
      * 业务编码(来自数据字典, 用户自定义业务场景 一个场景可以有多个模板)
      */
     private String bizCode;
+
     /**
      * 编码
      */
@@ -26,5 +27,12 @@ public class SmsTemplateVO {
      * 实际渠道模板唯一标识
      */
     private String apiTemplateId;
+
+    /**
+     * 内容
+     */
+    private String content;
+
+
 
 }

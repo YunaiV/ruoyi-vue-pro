@@ -3,6 +3,7 @@ package cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.sms;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -15,8 +16,9 @@ import java.util.Date;
  */
 @Data
 @EqualsAndHashCode
+@Accessors(chain = true)
 @TableName(value = "sms_log", autoResultMap = true)
-public class SmsLog implements Serializable {
+public class SmsLogDO implements Serializable {
 
     /**
      * 自增编号
@@ -29,19 +31,19 @@ public class SmsLog implements Serializable {
     private String channelCode;
 
     /**
-     * 实际渠道短信唯一标识
+     * 短信渠道id
      */
-    private String apiSmsId;
+    private Long channelId;
 
     /**
      * 模板id
      */
-    private Long templateId;
+    private String templateCode;
 
     /**
-     * 手机号
+     * 手机号(数组json字符串)
      */
-    private String phone;
+    private String phones;
 
     /**
      * 内容
@@ -54,7 +56,7 @@ public class SmsLog implements Serializable {
     private String remark;
 
     /**
-     * 发送状态（0发送中 1成功 2失败）
+     * 发送状态（1异步推送中 2发送中 3失败 4成功）
      */
     private Integer sendStatus;
 

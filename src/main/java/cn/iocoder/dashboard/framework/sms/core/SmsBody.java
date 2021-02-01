@@ -1,9 +1,10 @@
-package cn.iocoder.dashboard.framework.sms;
+package cn.iocoder.dashboard.framework.sms.core;
 
 import cn.iocoder.dashboard.util.json.JsonUtils;
 import lombok.Data;
 
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * 消息内容实体类
@@ -12,9 +13,14 @@ import java.util.Map;
 public class SmsBody {
 
     /**
+     * 消息日志id
+     */
+    private Long smsLogId;
+
+    /**
      * 模板编码
      */
-    private String code;
+    private String templateCode;
 
     /**
      * 参数列表

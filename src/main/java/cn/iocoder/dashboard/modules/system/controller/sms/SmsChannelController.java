@@ -44,11 +44,5 @@ public class SmsChannelController {
         return success(service.createChannel(reqVO));
     }
 
-    @ApiOperation("刷新消息渠道信息")
-    @PutMapping("/flush")
-    public CommonResult<Boolean> flushChannel() {
-        return success(service.flushChannel());
-    }
-
 
 }

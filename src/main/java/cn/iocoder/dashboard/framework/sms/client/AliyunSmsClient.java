@@ -1,9 +1,8 @@
-package cn.iocoder.dashboard.modules.system.sms.client;
+package cn.iocoder.dashboard.framework.sms.client;
 
-import cn.iocoder.dashboard.framework.sms.SmsBody;
-import cn.iocoder.dashboard.framework.sms.SmsClient;
-import cn.iocoder.dashboard.framework.sms.SmsResult;
-import cn.iocoder.dashboard.modules.system.controller.sms.vo.SmsChannelAllVO;
+import cn.iocoder.dashboard.framework.sms.core.SmsBody;
+import cn.iocoder.dashboard.framework.sms.core.SmsResult;
+import cn.iocoder.dashboard.modules.system.controller.sms.vo.SmsChannelPropertyVO;
 import com.aliyuncs.DefaultAcsClient;
 import com.aliyuncs.IAcsClient;
 import com.aliyuncs.dysmsapi.model.v20170525.SendSmsRequest;
@@ -23,7 +22,7 @@ import java.util.Collection;
  * @date 2021/1/25 14:17
  */
 @Slf4j
-public class AliSmsClient implements SmsClient<SendSmsResponse> {
+public class AliyunSmsClient extends AbstractSmsClient<SendSmsResponse> {
 
     private static final String OK = "OK";
 
@@ -33,8 +32,6 @@ public class AliSmsClient implements SmsClient<SendSmsResponse> {
 
     private static final String ENDPOINT = "cn-hangzhou";
 
-    private final SmsChannelAllVO channelVO;
-
     private final IAcsClient acsClient;
 
     /**
@@ -42,9 +39,8 @@ public class AliSmsClient implements SmsClient<SendSmsResponse> {
      *
      * @param channelVO 阿里云短信配置
      */
-    public AliSmsClient(SmsChannelAllVO channelVO) {
-
-        this.channelVO = channelVO;
+    public AliyunSmsClient(SmsChannelPropertyVO channelVO) {
+        super(channelVO);
 
         String accessKeyId = channelVO.getApiKey();
         String accessKeySecret = channelVO.getApiSecret();
@@ -57,13 +53,13 @@ public class AliSmsClient implements SmsClient<SendSmsResponse> {
 
 
     @Override
-    public SmsResult<SendSmsResponse> send(SmsBody msgBody, Collection<String> targets) {
+    public SmsResult<SendSmsResponse> send(SmsBody smsBody, Collection<String> targets) {
         SendSmsRequest request = new SendSmsRequest();
         request.setSysMethod(MethodType.POST);
         request.setPhoneNumbers(StringUtils.join(targets, ","));
         request.setSignName(channelVO.getApiSignatureId());
-        request.setTemplateCode(channelVO.getTemplateByTemplateCode(msgBody.getCode()).getApiTemplateId());
-        request.setTemplateParam(msgBody.getParamsStr());
+        request.setTemplateCode(channelVO.getTemplateByTemplateCode(smsBody.getTemplateCode()).getApiTemplateId());
+        request.setTemplateParam(smsBody.getParamsStr());
 
         try {
             SendSmsResponse sendSmsResponse = acsClient.getAcsResponse(request);
@@ -78,14 +74,15 @@ public class AliSmsClient implements SmsClient<SendSmsResponse> {
             return resultBody;
         } catch (Exception e) {
             log.debug(e.getMessage(), e);
+            return failResult("发送异常: " + e.getMessage());
         }
-
-        return failResult();
     }
 
-    @Override
-    public SmsResult<SendSmsResponse> sendAsync(SmsBody msgBody, Collection<String> targets) {
-        return null;
+    SmsResult<SendSmsResponse> failResult(String message) {
+        SmsResult<SendSmsResponse> resultBody = new SmsResult<>();
+        resultBody.setSuccess(false);
+        resultBody.setMessage(message);
+        return resultBody;
     }
 
 }

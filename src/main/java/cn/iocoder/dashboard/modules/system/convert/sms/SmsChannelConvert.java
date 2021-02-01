@@ -2,7 +2,7 @@ package cn.iocoder.dashboard.modules.system.convert.sms;
 
 import cn.iocoder.dashboard.common.enums.SmsChannelEnum;
 import cn.iocoder.dashboard.common.pojo.PageResult;
-import cn.iocoder.dashboard.modules.system.controller.sms.vo.SmsChannelAllVO;
+import cn.iocoder.dashboard.modules.system.controller.sms.vo.SmsChannelPropertyVO;
 import cn.iocoder.dashboard.modules.system.controller.sms.vo.req.SmsChannelCreateReqVO;
 import cn.iocoder.dashboard.modules.system.controller.sms.vo.resp.SmsChannelEnumRespVO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.sms.SmsChannelDO;
@@ -28,7 +28,7 @@ public interface SmsChannelConvert {
 
     List<SmsChannelEnumRespVO> convertEnum(List<SmsChannelEnum> bean);
 
-    List<SmsChannelAllVO> convert(List<SmsChannelDO> bean);
+    List<SmsChannelPropertyVO> convert(List<SmsChannelDO> bean);
 
 
 }

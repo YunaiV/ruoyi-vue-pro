@@ -1,4 +1,4 @@
-package cn.iocoder.dashboard.framework.sms;
+package cn.iocoder.dashboard.framework.sms.core;
 
 import lombok.Data;
 
