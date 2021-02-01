@@ -3,6 +3,7 @@ package cn.iocoder.dashboard.modules.tool.service.codegen.impl;
 import cn.hutool.extra.template.TemplateConfig;
 import cn.hutool.extra.template.TemplateEngine;
 import cn.hutool.extra.template.TemplateUtil;
+import cn.iocoder.dashboard.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.dashboard.modules.tool.dal.mysql.dataobject.codegen.ToolCodegenColumnDO;
 import cn.iocoder.dashboard.modules.tool.dal.mysql.dataobject.codegen.ToolCodegenTableDO;
 import org.springframework.stereotype.Component;
@@ -37,6 +38,10 @@ public class ToolCodegenEngine {
         Map<String, Object> bindingMap = new HashMap<>();
         bindingMap.put("table", table);
         bindingMap.put("columns", columns);
+        bindingMap.put("basePackage", "cn.iocoder.dashboard.modules"); // TODO 基础包
+        // DO 类，独有字段
+        bindingMap.put("baseDOFields", ToolCodegenBuilder.BASE_DO_FIELDS);
+        bindingMap.put("baseDOClassName", BaseDO.class.getName());
         String result = templateEngine.getTemplate("codegen/dal/do.vm").render(bindingMap);
         System.out.println(result);
     }

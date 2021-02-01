@@ -1,9 +1,14 @@
+package ${basePackage}.${table.moduleName}.dal.mysql.dataobject.${table.businessName};
+
 import com.baomidou.mybatisplus.annotation.*;
+import ${baseDOClassName};
 import lombok.*;
 import java.util.*;
 
 /**
-* ${table.description}
+* ${table.classComment} DO
+*
+* @author ${table.author}
 */
 @TableName("${table.tableName}")
 @Data
@@ -12,19 +17,24 @@ import java.util.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ${table.tableName}DO extends BaseDO {
+public class ${table.className}DO extends BaseDO {
 
 #foreach ($column in $columns)
+#if (!${baseDOFields.contains(${column.javaField})})##排除 BaseDO 的字段
     /**
     * ${column.columnComment}
     */
-#if(${column.primaryKey} && ${column.javaType} != 'String')
+#if ($column.dictType != "")##处理枚举值
+    // TODO 枚举 ${column.dictType}
+#end
+#if (${column.primaryKey} && ${column.javaType} != 'String')##处理主键 + 非 String 的情况
     @TableId
 #end
-#if(${column.primaryKey} && ${column.javaType} == 'String')
+#if (${column.primaryKey} && ${column.javaType} == 'String')##处理主键 + String 的情况
     @TableId(type = IdType.INPUT)
 #end
     private ${column.javaType} ${column.javaField};
+#end
 #end
 
 }

@@ -51,6 +51,10 @@ public class ToolCodegenBuilder {
                     .build();
 
     /**
+     * {@link BaseDO} 的字段
+     */
+    public static final Set<String> BASE_DO_FIELDS = new HashSet<>();
+    /**
      * 新增操作，不需要传递的字段
      */
     private static final Set<String> CREATE_OPERATION_EXCLUDE_COLUMN = Sets.newHashSet("id");
@@ -82,14 +86,13 @@ public class ToolCodegenBuilder {
             .build();
 
     static {
+        Arrays.stream(BaseDO.class.getDeclaredFields()).forEach(field -> BASE_DO_FIELDS.add(field.getName()));
         // 处理 OPERATION 相关的字段
-        Arrays.stream(BaseDO.class.getDeclaredFields()).forEach(field -> {
-            CREATE_OPERATION_EXCLUDE_COLUMN.add(field.getName());
-            UPDATE_OPERATION_EXCLUDE_COLUMN.add(field.getName());
-            LIST_OPERATION_EXCLUDE_COLUMN.add(field.getName());
-            LIST_OPERATION_RESULT_EXCLUDE_COLUMN.add(field.getName());
-        });
+        CREATE_OPERATION_EXCLUDE_COLUMN.addAll(BASE_DO_FIELDS);
+        UPDATE_OPERATION_EXCLUDE_COLUMN.addAll(BASE_DO_FIELDS);
+        LIST_OPERATION_EXCLUDE_COLUMN.addAll(BASE_DO_FIELDS);
         LIST_OPERATION_EXCLUDE_COLUMN.remove("create_time"); // 创建时间，还是可能需要传递的
+        LIST_OPERATION_RESULT_EXCLUDE_COLUMN.addAll(BASE_DO_FIELDS);
         LIST_OPERATION_RESULT_EXCLUDE_COLUMN.remove("create_time"); // 创建时间，还是需要返回的
     }
 
