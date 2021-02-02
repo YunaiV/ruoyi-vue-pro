@@ -11,147 +11,11 @@
  Target Server Version : 50718
  File Encoding         : 65001
 
- Date: 28/01/2021 01:32:22
+ Date: 02/02/2021 22:52:40
 */
 
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
-
--- ----------------------------
--- Table structure for gen_table
--- ----------------------------
-DROP TABLE IF EXISTS `gen_table`;
-CREATE TABLE `gen_table` (
-  `table_id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '编号',
-  `table_name` varchar(200) DEFAULT '' COMMENT '表名称',
-  `table_comment` varchar(500) DEFAULT '' COMMENT '表描述',
-  `class_name` varchar(100) DEFAULT '' COMMENT '实体类名称',
-  `tpl_category` varchar(200) DEFAULT 'crud' COMMENT '使用的模板（crud单表操作 tree树表操作）',
-  `package_name` varchar(100) DEFAULT NULL COMMENT '生成包路径',
-  `module_name` varchar(30) DEFAULT NULL COMMENT '生成模块名',
-  `business_name` varchar(30) DEFAULT NULL COMMENT '生成业务名',
-  `function_name` varchar(50) DEFAULT NULL COMMENT '生成功能名',
-  `function_author` varchar(50) DEFAULT NULL COMMENT '生成功能作者',
-  `gen_type` char(1) DEFAULT '0' COMMENT '生成代码方式（0zip压缩包 1自定义路径）',
-  `gen_path` varchar(200) DEFAULT '/' COMMENT '生成路径（不填默认项目路径）',
-  `options` varchar(1000) DEFAULT NULL COMMENT '其它生成选项',
-  `create_by` varchar(64) DEFAULT '' COMMENT '创建者',
-  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
-  `update_by` varchar(64) DEFAULT '' COMMENT '更新者',
-  `update_time` datetime DEFAULT NULL COMMENT '更新时间',
-  `remark` varchar(500) DEFAULT NULL COMMENT '备注',
-  PRIMARY KEY (`table_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='代码生成业务表';
-
--- ----------------------------
--- Records of gen_table
--- ----------------------------
-BEGIN;
-COMMIT;
-
--- ----------------------------
--- Table structure for gen_table_column
--- ----------------------------
-DROP TABLE IF EXISTS `gen_table_column`;
-CREATE TABLE `gen_table_column` (
-  `column_id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '编号',
-  `table_id` varchar(64) DEFAULT NULL COMMENT '归属表编号',
-  `column_name` varchar(200) DEFAULT NULL COMMENT '列名称',
-  `column_comment` varchar(500) DEFAULT NULL COMMENT '列描述',
-  `column_type` varchar(100) DEFAULT NULL COMMENT '列类型',
-  `java_type` varchar(500) DEFAULT NULL COMMENT 'JAVA类型',
-  `java_field` varchar(200) DEFAULT NULL COMMENT 'JAVA字段名',
-  `is_pk` char(1) DEFAULT NULL COMMENT '是否主键（1是）',
-  `is_increment` char(1) DEFAULT NULL COMMENT '是否自增（1是）',
-  `is_required` char(1) DEFAULT NULL COMMENT '是否必填（1是）',
-  `is_insert` char(1) DEFAULT NULL COMMENT '是否为插入字段（1是）',
-  `is_edit` char(1) DEFAULT NULL COMMENT '是否编辑字段（1是）',
-  `is_list` char(1) DEFAULT NULL COMMENT '是否列表字段（1是）',
-  `is_query` char(1) DEFAULT NULL COMMENT '是否查询字段（1是）',
-  `query_type` varchar(200) DEFAULT 'EQ' COMMENT '查询方式（等于、不等于、大于、小于、范围）',
-  `html_type` varchar(200) DEFAULT NULL COMMENT '显示类型（文本框、文本域、下拉框、复选框、单选框、日期控件）',
-  `dict_type` varchar(200) DEFAULT '' COMMENT '字典类型',
-  `sort` int(11) DEFAULT NULL COMMENT '排序',
-  `create_by` varchar(64) DEFAULT '' COMMENT '创建者',
-  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
-  `update_by` varchar(64) DEFAULT '' COMMENT '更新者',
-  `update_time` datetime DEFAULT NULL COMMENT '更新时间',
-  PRIMARY KEY (`column_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='代码生成业务表字段';
-
--- ----------------------------
--- Records of gen_table_column
--- ----------------------------
-BEGIN;
-COMMIT;
-
--- ----------------------------
--- Table structure for gen_table_column_copy1
--- ----------------------------
-DROP TABLE IF EXISTS `gen_table_column_copy1`;
-CREATE TABLE `gen_table_column_copy1` (
-  `column_id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '编号',
-  `table_id` varchar(64) DEFAULT NULL COMMENT '归属表编号',
-  `column_name` varchar(200) DEFAULT NULL COMMENT '列名称',
-  `column_comment` varchar(500) DEFAULT NULL COMMENT '列描述',
-  `column_type` varchar(100) DEFAULT NULL COMMENT '列类型',
-  `java_type` varchar(500) DEFAULT NULL COMMENT 'JAVA类型',
-  `java_field` varchar(200) DEFAULT NULL COMMENT 'JAVA字段名',
-  `is_pk` char(1) DEFAULT NULL COMMENT '是否主键（1是）',
-  `is_increment` char(1) DEFAULT NULL COMMENT '是否自增（1是）',
-  `is_required` char(1) DEFAULT NULL COMMENT '是否必填（1是）',
-  `is_insert` char(1) DEFAULT NULL COMMENT '是否为插入字段（1是）',
-  `is_edit` char(1) DEFAULT NULL COMMENT '是否编辑字段（1是）',
-  `is_list` char(1) DEFAULT NULL COMMENT '是否列表字段（1是）',
-  `is_query` char(1) DEFAULT NULL COMMENT '是否查询字段（1是）',
-  `query_type` varchar(200) DEFAULT 'EQ' COMMENT '查询方式（等于、不等于、大于、小于、范围）',
-  `html_type` varchar(200) DEFAULT NULL COMMENT '显示类型（文本框、文本域、下拉框、复选框、单选框、日期控件）',
-  `dict_type` varchar(200) DEFAULT '' COMMENT '字典类型',
-  `sort` int(11) DEFAULT NULL COMMENT '排序',
-  `create_by` varchar(64) DEFAULT '' COMMENT '创建者',
-  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
-  `update_by` varchar(64) DEFAULT '' COMMENT '更新者',
-  `update_time` datetime DEFAULT NULL COMMENT '更新时间',
-  PRIMARY KEY (`column_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='代码生成业务表字段';
-
--- ----------------------------
--- Records of gen_table_column_copy1
--- ----------------------------
-BEGIN;
-COMMIT;
-
--- ----------------------------
--- Table structure for gen_table_copy1
--- ----------------------------
-DROP TABLE IF EXISTS `gen_table_copy1`;
-CREATE TABLE `gen_table_copy1` (
-  `table_id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '编号',
-  `table_name` varchar(200) DEFAULT '' COMMENT '表名称',
-  `table_comment` varchar(500) DEFAULT '' COMMENT '表描述',
-  `class_name` varchar(100) DEFAULT '' COMMENT '实体类名称',
-  `tpl_category` varchar(200) DEFAULT 'crud' COMMENT '使用的模板（crud单表操作 tree树表操作）',
-  `package_name` varchar(100) DEFAULT NULL COMMENT '生成包路径',
-  `module_name` varchar(30) DEFAULT NULL COMMENT '生成模块名',
-  `business_name` varchar(30) DEFAULT NULL COMMENT '生成业务名',
-  `function_name` varchar(50) DEFAULT NULL COMMENT '生成功能名',
-  `function_author` varchar(50) DEFAULT NULL COMMENT '生成功能作者',
-  `gen_type` char(1) DEFAULT '0' COMMENT '生成代码方式（0zip压缩包 1自定义路径）',
-  `gen_path` varchar(200) DEFAULT '/' COMMENT '生成路径（不填默认项目路径）',
-  `options` varchar(1000) DEFAULT NULL COMMENT '其它生成选项',
-  `create_by` varchar(64) DEFAULT '' COMMENT '创建者',
-  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
-  `update_by` varchar(64) DEFAULT '' COMMENT '更新者',
-  `update_time` datetime DEFAULT NULL COMMENT '更新时间',
-  `remark` varchar(500) DEFAULT NULL COMMENT '备注',
-  PRIMARY KEY (`table_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='代码生成业务表';
-
--- ----------------------------
--- Records of gen_table_copy1
--- ----------------------------
-BEGIN;
-COMMIT;
 
 -- ----------------------------
 -- Table structure for inf_config
@@ -182,37 +46,6 @@ INSERT INTO `inf_config` VALUES (1, 'ui', 1, '主框架页-默认皮肤样式名
 INSERT INTO `inf_config` VALUES (2, 'biz', 1, '用户管理-账号初始密码', 'sys.user.initPassword', '123456', b'0', '初始化密码 123456', 'admin', '2021-01-05 17:03:48', '', '2021-01-21 02:13:02', b'0');
 INSERT INTO `inf_config` VALUES (3, 'ui', 1, '主框架页-侧边栏主题', 'sys.index.sideTheme', 'theme-dark', b'0', '深色主题theme-dark，浅色主题theme-light', 'admin', '2021-01-05 17:03:48', '', '2021-01-19 03:05:21', b'0');
 INSERT INTO `inf_config` VALUES (4, '1', 2, 'xxx', 'demo.test', '10', b'0', '5', '', '2021-01-19 03:10:26', '', '2021-01-20 09:25:55', b'0');
-COMMIT;
-
--- ----------------------------
--- Table structure for inf_config_copy1
--- ----------------------------
-DROP TABLE IF EXISTS `inf_config_copy1`;
-CREATE TABLE `inf_config_copy1` (
-  `id` int(5) NOT NULL AUTO_INCREMENT COMMENT '参数主键',
-  `group` varchar(50) NOT NULL COMMENT '参数分组',
-  `type` tinyint(4) NOT NULL COMMENT '参数类型',
-  `name` varchar(100) NOT NULL DEFAULT '' COMMENT '参数名称',
-  `key` varchar(100) NOT NULL DEFAULT '' COMMENT '参数键名',
-  `value` varchar(500) NOT NULL DEFAULT '' COMMENT '参数键值',
-  `sensitive` bit(1) NOT NULL COMMENT '是否敏感',
-  `remark` varchar(500) DEFAULT NULL COMMENT '备注',
-  `create_by` varchar(64) DEFAULT '' COMMENT '创建者',
-  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_by` varchar(64) DEFAULT '' COMMENT '更新者',
-  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
-  PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COMMENT='参数配置表';
-
--- ----------------------------
--- Records of inf_config_copy1
--- ----------------------------
-BEGIN;
-INSERT INTO `inf_config_copy1` VALUES (1, 'ui', 1, '主框架页-默认皮肤样式名称', 'sys.index.skinName', 'skin-blue', b'0', '蓝色 skin-blue、绿色 skin-green、紫色 skin-purple、红色 skin-red、黄色 skin-yellow', 'admin', '2021-01-05 17:03:48', '', '2021-01-05 17:03:48', b'0');
-INSERT INTO `inf_config_copy1` VALUES (2, 'biz', 1, '用户管理-账号初始密码', 'sys.user.initPassword', '123456', b'0', '初始化密码 123456', 'admin', '2021-01-05 17:03:48', '', '2021-01-21 02:13:02', b'0');
-INSERT INTO `inf_config_copy1` VALUES (3, 'ui', 1, '主框架页-侧边栏主题', 'sys.index.sideTheme', 'theme-dark', b'0', '深色主题theme-dark，浅色主题theme-light', 'admin', '2021-01-05 17:03:48', '', '2021-01-19 03:05:21', b'0');
-INSERT INTO `inf_config_copy1` VALUES (4, '1', 2, 'xxx', 'demo.test', '10', b'0', '5', '', '2021-01-19 03:10:26', '', '2021-01-20 09:25:55', b'0');
 COMMIT;
 
 -- ----------------------------
@@ -250,43 +83,6 @@ INSERT INTO `sys_dept` VALUES (106, '财务部门', 101, 4, '若依', '158888888
 INSERT INTO `sys_dept` VALUES (107, '运维部门', 101, 5, '若依', '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '', '2021-01-05 17:03:47', b'0');
 INSERT INTO `sys_dept` VALUES (108, '市场部门', 102, 1, '若依', '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '', '2021-01-05 17:03:47', b'0');
 INSERT INTO `sys_dept` VALUES (109, '财务部门', 102, 2, '若依', '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '', '2021-01-05 17:03:47', b'0');
-COMMIT;
-
--- ----------------------------
--- Table structure for sys_dept_copy1
--- ----------------------------
-DROP TABLE IF EXISTS `sys_dept_copy1`;
-CREATE TABLE `sys_dept_copy1` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '部门id',
-  `name` varchar(30) NOT NULL DEFAULT '' COMMENT '部门名称',
-  `parent_id` bigint(20) NOT NULL DEFAULT '0' COMMENT '父部门id',
-  `sort` int(4) NOT NULL DEFAULT '0' COMMENT '显示顺序',
-  `leader` varchar(20) DEFAULT NULL COMMENT '负责人',
-  `phone` varchar(11) DEFAULT NULL COMMENT '联系电话',
-  `email` varchar(50) DEFAULT NULL COMMENT '邮箱',
-  `status` tinyint(4) NOT NULL COMMENT '部门状态（0正常 1停用）',
-  `create_by` varchar(64) DEFAULT '' COMMENT '创建者',
-  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_by` varchar(64) DEFAULT '' COMMENT '更新者',
-  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
-  PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=110 DEFAULT CHARSET=utf8mb4 COMMENT='部门表';
-
--- ----------------------------
--- Records of sys_dept_copy1
--- ----------------------------
-BEGIN;
-INSERT INTO `sys_dept_copy1` VALUES (100, '芋道源码', 0, 0, '若依', '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '', '2021-01-06 19:45:52', b'0');
-INSERT INTO `sys_dept_copy1` VALUES (101, '深圳总公司', 100, 1, '若依', '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '', '2021-01-05 17:03:47', b'0');
-INSERT INTO `sys_dept_copy1` VALUES (102, '长沙分公司', 100, 2, '若依', '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '', '2021-01-05 17:03:47', b'0');
-INSERT INTO `sys_dept_copy1` VALUES (103, '研发部门', 101, 1, '若依', '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '', '2021-01-05 17:03:47', b'0');
-INSERT INTO `sys_dept_copy1` VALUES (104, '市场部门', 101, 2, '若依', '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '', '2021-01-05 17:03:47', b'0');
-INSERT INTO `sys_dept_copy1` VALUES (105, '测试部门', 101, 3, '若依', '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '', '2021-01-05 17:03:47', b'0');
-INSERT INTO `sys_dept_copy1` VALUES (106, '财务部门', 101, 4, '若依', '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '', '2021-01-05 17:03:47', b'0');
-INSERT INTO `sys_dept_copy1` VALUES (107, '运维部门', 101, 5, '若依', '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '', '2021-01-05 17:03:47', b'0');
-INSERT INTO `sys_dept_copy1` VALUES (108, '市场部门', 102, 1, '若依', '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '', '2021-01-05 17:03:47', b'0');
-INSERT INTO `sys_dept_copy1` VALUES (109, '财务部门', 102, 2, '若依', '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '', '2021-01-05 17:03:47', b'0');
 COMMIT;
 
 -- ----------------------------
@@ -356,72 +152,6 @@ INSERT INTO `sys_dict_data` VALUES (49, 3, '固定超时', '3', 'inf_redis_timeo
 COMMIT;
 
 -- ----------------------------
--- Table structure for sys_dict_data_copy1
--- ----------------------------
-DROP TABLE IF EXISTS `sys_dict_data_copy1`;
-CREATE TABLE `sys_dict_data_copy1` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '字典编码',
-  `sort` int(4) NOT NULL DEFAULT '0' COMMENT '字典排序',
-  `label` varchar(100) NOT NULL DEFAULT '' COMMENT '字典标签',
-  `value` varchar(100) NOT NULL DEFAULT '' COMMENT '字典键值',
-  `dict_type` varchar(100) NOT NULL DEFAULT '' COMMENT '字典类型',
-  `status` tinyint(4) NOT NULL DEFAULT '0' COMMENT '状态（0正常 1停用）',
-  `remark` varchar(500) DEFAULT NULL COMMENT '备注',
-  `create_by` varchar(64) DEFAULT '' COMMENT '创建者',
-  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_by` varchar(64) DEFAULT '' COMMENT '更新者',
-  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
-  PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=50 DEFAULT CHARSET=utf8mb4 COMMENT='字典数据表';
-
--- ----------------------------
--- Records of sys_dict_data_copy1
--- ----------------------------
-BEGIN;
-INSERT INTO `sys_dict_data_copy1` VALUES (1, 1, '男', '1', 'sys_user_sex', 0, '性别男', 'admin', '2021-01-05 17:03:48', '', '2021-01-06 05:48:53', b'0');
-INSERT INTO `sys_dict_data_copy1` VALUES (2, 2, '女', '2', 'sys_user_sex', 0, '性别女', 'admin', '2021-01-05 17:03:48', '', '2021-01-06 05:48:55', b'0');
-INSERT INTO `sys_dict_data_copy1` VALUES (8, 1, '正常', '0', 'sys_job_status', 0, '正常状态', 'admin', '2021-01-05 17:03:48', '', '2021-01-06 00:02:28', b'0');
-INSERT INTO `sys_dict_data_copy1` VALUES (9, 2, '暂停', '1', 'sys_job_status', 0, '停用状态', 'admin', '2021-01-05 17:03:48', '', '2021-01-06 00:02:28', b'0');
-INSERT INTO `sys_dict_data_copy1` VALUES (10, 1, '默认', 'DEFAULT', 'sys_job_group', 0, '默认分组', 'admin', '2021-01-05 17:03:48', '', '2021-01-06 00:02:28', b'0');
-INSERT INTO `sys_dict_data_copy1` VALUES (11, 2, '系统', 'SYSTEM', 'sys_job_group', 0, '系统分组', 'admin', '2021-01-05 17:03:48', '', '2021-01-06 00:02:28', b'0');
-INSERT INTO `sys_dict_data_copy1` VALUES (12, 1, '系统内置', '1', 'sys_config_type', 0, '参数类型 - 系统内置', 'admin', '2021-01-05 17:03:48', '', '2021-01-18 07:41:59', b'0');
-INSERT INTO `sys_dict_data_copy1` VALUES (13, 2, '自定义', '2', 'sys_config_type', 0, '参数类型 - 自定义', 'admin', '2021-01-05 17:03:48', '', '2021-01-18 07:41:51', b'0');
-INSERT INTO `sys_dict_data_copy1` VALUES (14, 1, '通知', '1', 'sys_notice_type', 0, '通知', 'admin', '2021-01-05 17:03:48', '', '2021-01-06 00:02:28', b'0');
-INSERT INTO `sys_dict_data_copy1` VALUES (15, 2, '公告', '2', 'sys_notice_type', 0, '公告', 'admin', '2021-01-05 17:03:48', '', '2021-01-06 00:02:28', b'0');
-INSERT INTO `sys_dict_data_copy1` VALUES (16, 0, '其它', '0', 'sys_operate_type', 0, '其它操作', 'admin', '2021-01-05 17:03:48', '', '2021-01-16 13:51:12', b'0');
-INSERT INTO `sys_dict_data_copy1` VALUES (17, 1, '查询', '1', 'sys_operate_type', 0, '查询操作', 'admin', '2021-01-05 17:03:48', '', '2021-01-16 13:51:10', b'0');
-INSERT INTO `sys_dict_data_copy1` VALUES (18, 2, '新增', '2', 'sys_operate_type', 0, '新增操作', 'admin', '2021-01-05 17:03:48', '', '2021-01-16 13:51:17', b'0');
-INSERT INTO `sys_dict_data_copy1` VALUES (19, 3, '修改', '3', 'sys_operate_type', 0, '修改操作', 'admin', '2021-01-05 17:03:48', '', '2021-01-16 13:51:20', b'0');
-INSERT INTO `sys_dict_data_copy1` VALUES (20, 4, '删除', '4', 'sys_operate_type', 0, '删除操作', 'admin', '2021-01-05 17:03:48', '', '2021-01-16 13:51:24', b'0');
-INSERT INTO `sys_dict_data_copy1` VALUES (22, 5, '导出', '5', 'sys_operate_type', 0, '导出操作', 'admin', '2021-01-05 17:03:48', '', '2021-01-16 13:49:20', b'0');
-INSERT INTO `sys_dict_data_copy1` VALUES (23, 6, '导入', '6', 'sys_operate_type', 0, '导入操作', 'admin', '2021-01-05 17:03:48', '', '2021-01-16 13:49:24', b'0');
-INSERT INTO `sys_dict_data_copy1` VALUES (27, 1, '开启', '0', 'sys_common_status', 0, '开启状态', 'admin', '2021-01-05 17:03:48', '', '2021-01-06 02:57:12', b'0');
-INSERT INTO `sys_dict_data_copy1` VALUES (28, 2, '关闭', '1', 'sys_common_status', 0, '关闭状态', 'admin', '2021-01-05 17:03:48', '', '2021-01-06 05:48:32', b'0');
-INSERT INTO `sys_dict_data_copy1` VALUES (29, 1, '目录', '1', 'sys_menu_type', 0, '目录', 'admin', '2021-01-05 17:03:48', '', '2021-01-06 13:33:30', b'0');
-INSERT INTO `sys_dict_data_copy1` VALUES (30, 2, '菜单', '2', 'sys_menu_type', 0, '菜单', 'admin', '2021-01-05 17:03:48', '', '2021-01-06 13:33:35', b'0');
-INSERT INTO `sys_dict_data_copy1` VALUES (31, 3, '按钮', '3', 'sys_menu_type', 0, '按钮', 'admin', '2021-01-05 17:03:48', '', '2021-01-06 13:33:38', b'0');
-INSERT INTO `sys_dict_data_copy1` VALUES (32, 1, '内置', '1', 'sys_role_type', 0, '内置角色', 'admin', '2021-01-05 17:03:48', '', '2021-01-06 13:34:22', b'0');
-INSERT INTO `sys_dict_data_copy1` VALUES (33, 2, '自定义', '2', 'sys_role_type', 0, '自定义角色', 'admin', '2021-01-05 17:03:48', '', '2021-01-06 13:34:26', b'0');
-INSERT INTO `sys_dict_data_copy1` VALUES (34, 1, '全部数据权限', '1', 'sys_data_scope', 0, '全部数据权限', 'admin', '2021-01-05 17:03:48', '', '2021-01-06 19:38:02', b'0');
-INSERT INTO `sys_dict_data_copy1` VALUES (35, 2, '指定部门数据权限', '2', 'sys_data_scope', 0, '指定部门数据权限', 'admin', '2021-01-05 17:03:48', '', '2021-01-06 19:38:20', b'0');
-INSERT INTO `sys_dict_data_copy1` VALUES (36, 3, '本部门数据权限', '3', 'sys_data_scope', 0, '本部门数据权限', 'admin', '2021-01-05 17:03:48', '', '2021-01-06 19:38:29', b'0');
-INSERT INTO `sys_dict_data_copy1` VALUES (37, 4, '本部门及以下数据权限', '4', 'sys_data_scope', 0, '本部门及以下数据权限', 'admin', '2021-01-05 17:03:48', '', '2021-01-06 19:38:32', b'0');
-INSERT INTO `sys_dict_data_copy1` VALUES (38, 5, '仅本人数据权限', '5', 'sys_data_scope', 0, '仅本人数据权限', 'admin', '2021-01-05 17:03:48', '', '2021-01-06 19:38:38', b'0');
-INSERT INTO `sys_dict_data_copy1` VALUES (39, 0, '成功', '0', 'sys_login_result', 0, '登陆结果 - 成功', '', '2021-01-18 06:17:36', '', '2021-01-18 06:17:36', b'0');
-INSERT INTO `sys_dict_data_copy1` VALUES (40, 10, '账号或密码不正确', '10', 'sys_login_result', 0, '登陆结果 - 账号或密码不正确', '', '2021-01-18 06:17:54', '', '2021-01-18 06:17:54', b'0');
-INSERT INTO `sys_dict_data_copy1` VALUES (41, 20, '用户被禁用', '20', 'sys_login_result', 0, '登陆结果 - 用户被禁用', '', '2021-01-18 06:17:54', '', '2021-01-18 06:19:02', b'0');
-INSERT INTO `sys_dict_data_copy1` VALUES (42, 30, '验证码不存在', '30', 'sys_login_result', 0, '登陆结果 - 验证码不存在', '', '2021-01-18 06:17:54', '', '2021-01-18 06:19:24', b'0');
-INSERT INTO `sys_dict_data_copy1` VALUES (43, 31, '验证码不正确', '31', 'sys_login_result', 0, '登陆结果 - 验证码不正确', '', '2021-01-18 06:17:54', '', '2021-01-18 06:19:33', b'0');
-INSERT INTO `sys_dict_data_copy1` VALUES (44, 100, '未知异常', '100', 'sys_login_result', 0, '登陆结果 - 未知异常', '', '2021-01-18 06:17:54', '', '2021-01-18 06:19:57', b'0');
-INSERT INTO `sys_dict_data_copy1` VALUES (45, 1, '是', 'true', 'sys_boolean_string', 0, 'Boolean 是否类型 - 是', '', '2021-01-19 03:20:55', '', '2021-01-19 03:21:08', b'0');
-INSERT INTO `sys_dict_data_copy1` VALUES (46, 1, '否', 'false', 'sys_boolean_string', 0, 'Boolean 是否类型 - 否', '', '2021-01-19 03:20:55', '', '2021-01-19 03:21:39', b'0');
-INSERT INTO `sys_dict_data_copy1` VALUES (47, 1, '永不超时', '1', 'inf_redis_timeout_type', 0, 'Redis 未设置超时的情况', '', '2021-01-26 00:53:17', '', '2021-01-26 00:53:17', b'0');
-INSERT INTO `sys_dict_data_copy1` VALUES (48, 1, '动态超时', '2', 'inf_redis_timeout_type', 0, '程序里动态传入超时时间，无法固定', '', '2021-01-26 00:55:00', '', '2021-01-26 00:55:00', b'0');
-INSERT INTO `sys_dict_data_copy1` VALUES (49, 3, '固定超时', '3', 'inf_redis_timeout_type', 0, 'Redis 设置了过期时间', '', '2021-01-26 00:55:26', '', '2021-01-26 00:55:26', b'0');
-COMMIT;
-
--- ----------------------------
 -- Table structure for sys_dict_type
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_dict_type`;
@@ -456,43 +186,6 @@ INSERT INTO `sys_dict_type` VALUES (10, '系统状态', 'sys_common_status', 0, 
 INSERT INTO `sys_dict_type` VALUES (11, 'Boolean 是否类型', 'sys_boolean_string', 0, 'boolean 转是否', '', '2021-01-19 03:20:08', '', '2021-01-19 03:20:08', b'0');
 INSERT INTO `sys_dict_type` VALUES (104, '登陆结果', 'sys_login_result', 0, '登陆结果', '', '2021-01-18 06:17:11', '', '2021-01-18 06:17:11', b'0');
 INSERT INTO `sys_dict_type` VALUES (105, 'Redis 超时类型', 'inf_redis_timeout_type', 0, 'RedisKeyDefine.TimeoutTypeEnum', '', '2021-01-26 00:52:50', '', '2021-01-26 00:52:50', b'0');
-COMMIT;
-
--- ----------------------------
--- Table structure for sys_dict_type_copy1
--- ----------------------------
-DROP TABLE IF EXISTS `sys_dict_type_copy1`;
-CREATE TABLE `sys_dict_type_copy1` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '字典主键',
-  `name` varchar(100) NOT NULL DEFAULT '' COMMENT '字典名称',
-  `dict_type` varchar(100) NOT NULL DEFAULT '' COMMENT '字典类型',
-  `status` tinyint(4) NOT NULL DEFAULT '0' COMMENT '状态（0正常 1停用）',
-  `remark` varchar(500) DEFAULT NULL COMMENT '备注',
-  `create_by` varchar(64) DEFAULT '' COMMENT '创建者',
-  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_by` varchar(64) DEFAULT '' COMMENT '更新者',
-  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
-  PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE KEY `dict_type` (`dict_type`)
-) ENGINE=InnoDB AUTO_INCREMENT=106 DEFAULT CHARSET=utf8mb4 COMMENT='字典类型表';
-
--- ----------------------------
--- Records of sys_dict_type_copy1
--- ----------------------------
-BEGIN;
-INSERT INTO `sys_dict_type_copy1` VALUES (1, '用户性别', 'sys_user_sex', 0, NULL, 'admin', '2021-01-05 17:03:48', '', '2021-01-05 17:03:48', b'0');
-INSERT INTO `sys_dict_type_copy1` VALUES (3, '系统开关', 'sys_normal_disable', 0, NULL, 'admin', '2021-01-05 17:03:48', '', '2021-01-07 19:47:48', b'1');
-INSERT INTO `sys_dict_type_copy1` VALUES (4, '任务状态', 'sys_job_status', 0, NULL, 'admin', '2021-01-05 17:03:48', '', '2021-01-05 17:03:48', b'0');
-INSERT INTO `sys_dict_type_copy1` VALUES (5, '任务分组', 'sys_job_group', 0, NULL, 'admin', '2021-01-05 17:03:48', '', '2021-01-05 17:03:48', b'0');
-INSERT INTO `sys_dict_type_copy1` VALUES (6, '参数类型', 'sys_config_type', 0, NULL, 'admin', '2021-01-05 17:03:48', '', '2021-01-18 07:41:04', b'0');
-INSERT INTO `sys_dict_type_copy1` VALUES (7, '通知类型', 'sys_notice_type', 0, NULL, 'admin', '2021-01-05 17:03:48', '', '2021-01-05 17:03:48', b'0');
-INSERT INTO `sys_dict_type_copy1` VALUES (8, '通知状态', 'sys_notice_status', 0, NULL, 'admin', '2021-01-05 17:03:48', '', '2021-01-05 17:03:48', b'0');
-INSERT INTO `sys_dict_type_copy1` VALUES (9, '操作类型', 'sys_oper_type', 0, NULL, 'admin', '2021-01-05 17:03:48', '', '2021-01-05 17:03:48', b'0');
-INSERT INTO `sys_dict_type_copy1` VALUES (10, '系统状态', 'sys_common_status', 0, NULL, 'admin', '2021-01-05 17:03:48', '', '2021-01-05 17:03:48', b'0');
-INSERT INTO `sys_dict_type_copy1` VALUES (11, 'Boolean 是否类型', 'sys_boolean_string', 0, 'boolean 转是否', '', '2021-01-19 03:20:08', '', '2021-01-19 03:20:08', b'0');
-INSERT INTO `sys_dict_type_copy1` VALUES (104, '登陆结果', 'sys_login_result', 0, '登陆结果', '', '2021-01-18 06:17:11', '', '2021-01-18 06:17:11', b'0');
-INSERT INTO `sys_dict_type_copy1` VALUES (105, 'Redis 超时类型', 'inf_redis_timeout_type', 0, 'RedisKeyDefine.TimeoutTypeEnum', '', '2021-01-26 00:52:50', '', '2021-01-26 00:52:50', b'0');
 COMMIT;
 
 -- ----------------------------
@@ -587,7 +280,7 @@ CREATE TABLE `sys_login_log` (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=33 DEFAULT CHARSET=utf8mb4 COMMENT='系统访问记录';
+) ENGINE=InnoDB AUTO_INCREMENT=41 DEFAULT CHARSET=utf8mb4 COMMENT='系统访问记录';
 
 -- ----------------------------
 -- Records of sys_login_log
@@ -625,6 +318,14 @@ INSERT INTO `sys_login_log` VALUES (29, 1, 'ad9e244f-4c88-4762-b280-2d46d16081ac
 INSERT INTO `sys_login_log` VALUES (30, 1, '5032fac5-c6dc-41e4-882b-2dbea01ef1f6', 'admin', 0, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-01-21 09:57:18', '', '2021-01-21 09:57:18', b'0');
 INSERT INTO `sys_login_log` VALUES (31, 1, '802ca4eb-ac96-4c6b-91de-0e445dc46e78', 'admin', 0, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-01-25 21:29:41', '', '2021-01-25 21:29:41', b'0');
 INSERT INTO `sys_login_log` VALUES (32, 1, '3aeafd34-af33-4329-8b47-8972ecc72635', 'admin', 0, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-01-25 23:59:57', '', '2021-01-25 23:59:57', b'0');
+INSERT INTO `sys_login_log` VALUES (33, 1, '2829acdd-ac0e-40e4-847c-5ef160bded8f', 'admin', 0, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-01-26 05:17:41', '', '2021-01-26 05:17:41', b'0');
+INSERT INTO `sys_login_log` VALUES (34, 1, 'ed9e0038-854a-48d1-8d1a-0ca2faa51635', 'admin', 0, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-01-26 07:55:34', '', '2021-01-26 07:55:34', b'0');
+INSERT INTO `sys_login_log` VALUES (35, 1, 'abb350a3-5cac-49a6-9cce-37e9a675840c', 'admin', 0, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-01-26 08:26:02', '', '2021-01-26 08:26:02', b'0');
+INSERT INTO `sys_login_log` VALUES (36, 1, '82ba6974-5279-4e7b-8151-569a01b4d666', 'admin', 0, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-01-26 08:26:25', '', '2021-01-26 08:26:25', b'0');
+INSERT INTO `sys_login_log` VALUES (37, 1, '71c36cd2-23de-4788-af29-d1eaa658fb95', 'admin', 31, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-01-26 08:27:29', '', '2021-01-26 08:27:29', b'0');
+INSERT INTO `sys_login_log` VALUES (38, 1, '8d595ab5-da9c-473b-94c5-8a6efe3bc50e', 'admin', 0, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-01-26 08:27:33', '', '2021-01-26 08:27:33', b'0');
+INSERT INTO `sys_login_log` VALUES (39, 1, 'b56f5bf7-01c5-43e5-bfc6-b43052518b20', 'admin', 0, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-01-26 08:29:27', '', '2021-01-26 08:29:27', b'0');
+INSERT INTO `sys_login_log` VALUES (40, 1, '0d22b1ad-9254-490e-a4cc-43c928f293dd', 'admin', 0, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-01-26 08:30:01', '', '2021-01-26 08:30:01', b'0');
 COMMIT;
 
 -- ----------------------------
@@ -667,7 +368,7 @@ INSERT INTO `sys_menu` VALUES (105, '字典管理', 'system:dict:list', 2, 6, 1,
 INSERT INTO `sys_menu` VALUES (106, '配置管理', 'infra:config:list', 2, 7, 2, 'config', 'edit', 'infra/config/index', 0, 'admin', '2021-01-05 17:03:48', '', '2021-01-20 14:35:39', b'0');
 INSERT INTO `sys_menu` VALUES (107, '通知公告', 'system:notice:list', 2, 8, 1, 'notice', 'message', 'system/notice/index', 0, 'admin', '2021-01-05 17:03:48', '', '2021-01-05 22:36:45', b'0');
 INSERT INTO `sys_menu` VALUES (108, '日志管理', '', 1, 9, 1, 'log', 'log', '', 0, 'admin', '2021-01-05 17:03:48', '', '2021-01-05 22:34:28', b'0');
-INSERT INTO `sys_menu` VALUES (109, '在线用户', 'monitor:online:list', 2, 1, 2, 'online', 'online', 'monitor/online/index', 0, 'admin', '2021-01-05 17:03:48', '', '2021-01-05 22:36:45', b'0');
+INSERT INTO `sys_menu` VALUES (109, '在线用户', 'system:user-session:list', 2, 10, 1, 'user-session', 'online', 'system/session/index', 0, 'admin', '2021-01-05 17:03:48', '', '2021-01-26 08:21:20', b'0');
 INSERT INTO `sys_menu` VALUES (110, '定时任务', 'monitor:job:list', 2, 2, 2, 'job', 'job', 'monitor/job/index', 0, 'admin', '2021-01-05 17:03:48', '', '2021-01-05 22:36:45', b'0');
 INSERT INTO `sys_menu` VALUES (111, '数据监控', 'monitor:druid:list', 2, 3, 2, 'druid', 'druid', 'monitor/druid/index', 0, 'admin', '2021-01-05 17:03:48', '', '2021-01-05 22:36:45', b'0');
 INSERT INTO `sys_menu` VALUES (112, '服务监控', 'monitor:server:list', 2, 4, 2, 'http://127.0.0.1:8080/admin', 'server', '', 0, 'admin', '2021-01-05 17:03:48', '', '2021-01-21 04:58:59', b'0');
@@ -720,9 +421,9 @@ INSERT INTO `sys_menu` VALUES (1040, '操作查询', 'system:operate-log:query',
 INSERT INTO `sys_menu` VALUES (1042, '日志导出', 'system:operate-log:export', 3, 2, 500, '', '', '', 0, 'admin', '2021-01-05 17:03:48', '', '2021-01-16 18:28:23', b'0');
 INSERT INTO `sys_menu` VALUES (1043, '登录查询', 'system:login-log:query', 3, 1, 501, '#', '#', '', 0, 'admin', '2021-01-05 17:03:48', '', '2021-01-18 05:29:26', b'0');
 INSERT INTO `sys_menu` VALUES (1045, '日志导出', 'system:login-log:export', 3, 3, 501, '#', '#', '', 0, 'admin', '2021-01-05 17:03:48', '', '2021-01-18 05:29:30', b'0');
-INSERT INTO `sys_menu` VALUES (1046, '在线查询', 'monitor:online:query', 3, 1, 109, '#', '#', '', 0, 'admin', '2021-01-05 17:03:48', '', '2021-01-05 22:36:55', b'0');
-INSERT INTO `sys_menu` VALUES (1047, '批量强退', 'monitor:online:batchLogout', 3, 2, 109, '#', '#', '', 0, 'admin', '2021-01-05 17:03:48', '', '2021-01-05 22:36:55', b'0');
-INSERT INTO `sys_menu` VALUES (1048, '单条强退', 'monitor:online:forceLogout', 3, 3, 109, '#', '#', '', 0, 'admin', '2021-01-05 17:03:48', '', '2021-01-05 22:36:55', b'0');
+INSERT INTO `sys_menu` VALUES (1046, '在线查询', 'system:user-session:list', 3, 1, 109, '', '', '', 0, 'admin', '2021-01-05 17:03:48', '', '2021-01-26 08:22:37', b'0');
+INSERT INTO `sys_menu` VALUES (1047, '批量强退', 'monitor:online:batchLogout', 3, 2, 109, '#', '#', '', 0, 'admin', '2021-01-05 17:03:48', '', '2021-01-26 08:21:46', b'1');
+INSERT INTO `sys_menu` VALUES (1048, '单条强退', 'system:user-session:delete', 3, 3, 109, '', '', '', 0, 'admin', '2021-01-05 17:03:48', '', '2021-01-26 08:22:54', b'0');
 INSERT INTO `sys_menu` VALUES (1049, '任务查询', 'monitor:job:query', 3, 1, 110, '#', '#', '', 0, 'admin', '2021-01-05 17:03:48', '', '2021-01-05 22:36:55', b'0');
 INSERT INTO `sys_menu` VALUES (1050, '任务新增', 'monitor:job:add', 3, 2, 110, '#', '#', '', 0, 'admin', '2021-01-05 17:03:48', '', '2021-01-05 22:36:55', b'0');
 INSERT INTO `sys_menu` VALUES (1051, '任务修改', 'monitor:job:edit', 3, 3, 110, '#', '#', '', 0, 'admin', '2021-01-05 17:03:48', '', '2021-01-05 22:36:55', b'0');
@@ -799,7 +500,7 @@ CREATE TABLE `sys_operate_log` (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=85 DEFAULT CHARSET=utf8mb4 COMMENT='操作日志记录';
+) ENGINE=InnoDB AUTO_INCREMENT=91 DEFAULT CHARSET=utf8mb4 COMMENT='操作日志记录';
 
 -- ----------------------------
 -- Records of sys_operate_log
@@ -886,6 +587,12 @@ INSERT INTO `sys_operate_log` VALUES (81, '78c517c7-191d-46d8-bdc3-5dbeb06be26d'
 INSERT INTO `sys_operate_log` VALUES (82, 'b8c971f3-fd22-4ed3-b5f9-ffc9a8d34859', 1, '菜单 API', '修改菜单', 2, '', '', 'POST', '/api/system/menu/update', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', 'CommonResult cn.iocoder.dashboard.modules.system.controller.permission.SysMenuController.updateMenu(SysMenuUpdateReqVO)', '{\"reqVO\":{\"name\":\"Redis 监控\",\"permission\":\"\",\"type\":2,\"sort\":\"5\",\"parentId\":2,\"path\":\"redis\",\"icon\":\"redis\",\"component\":\"infra/redis/index\",\"id\":113}}', '2021-01-28 01:23:21', 29, 0, '', 'true', '', '2021-01-26 00:56:30', '', '2021-01-26 00:56:30', b'0');
 INSERT INTO `sys_operate_log` VALUES (83, 'e0922d52-0007-4105-a487-692d00d091c3', 1, '菜单 API', '创建菜单', 2, '', '', 'POST', '/api/system/menu/create', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', 'CommonResult cn.iocoder.dashboard.modules.system.controller.permission.SysMenuController.createMenu(SysMenuCreateReqVO)', '{\"reqVO\":{\"name\":\"获得 Redis 监控信息\",\"permission\":\"infra:redis:get-monitor-info\",\"type\":3,\"sort\":\"1\",\"parentId\":113,\"path\":null,\"icon\":null,\"component\":null}}', '2021-01-28 01:29:22', 14, 0, '', '1066', '', '2021-01-26 01:02:31', '', '2021-01-26 01:02:31', b'0');
 INSERT INTO `sys_operate_log` VALUES (84, 'f44a431b-395e-45d9-9e6c-3fbdf7617155', 1, '菜单 API', '创建菜单', 2, '', '', 'POST', '/api/system/menu/create', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', 'CommonResult cn.iocoder.dashboard.modules.system.controller.permission.SysMenuController.createMenu(SysMenuCreateReqVO)', '{\"reqVO\":{\"name\":\"获得 Redis Key 列表\",\"permission\":\"infra:redis:get-key-list\",\"type\":3,\"sort\":\"2\",\"parentId\":113,\"path\":null,\"icon\":null,\"component\":null}}', '2021-01-28 01:29:42', 11, 0, '', '1067', '', '2021-01-26 01:02:52', '', '2021-01-26 01:02:52', b'0');
+INSERT INTO `sys_operate_log` VALUES (85, 'a46dce1a-6ced-4aa5-90f6-8ea979d038a5', 1, '菜单 API', '修改菜单', 2, '', '', 'POST', '/api/system/menu/update', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', 'CommonResult cn.iocoder.dashboard.modules.system.controller.permission.SysMenuController.updateMenu(SysMenuUpdateReqVO)', '{\"reqVO\":{\"name\":\"在线用户\",\"permission\":\"system:user-session:list\",\"type\":2,\"sort\":\"1\",\"parentId\":2,\"path\":\"user-session\",\"icon\":\"online\",\"component\":\"system/session/index\",\"id\":109}}', '2021-01-30 01:08:01', 49, 0, '', 'true', '', '2021-01-26 08:20:55', '', '2021-01-26 08:20:55', b'0');
+INSERT INTO `sys_operate_log` VALUES (86, 'f2092546-cbd3-485e-b54b-95a1448b9985', 1, '菜单 API', '修改菜单', 2, '', '', 'POST', '/api/system/menu/update', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', 'CommonResult cn.iocoder.dashboard.modules.system.controller.permission.SysMenuController.updateMenu(SysMenuUpdateReqVO)', '{\"reqVO\":{\"name\":\"在线用户\",\"permission\":\"system:user-session:list\",\"type\":2,\"sort\":\"10\",\"parentId\":1,\"path\":\"user-session\",\"icon\":\"online\",\"component\":\"system/session/index\",\"id\":109}}', '2021-01-30 01:08:26', 16, 0, '', 'true', '', '2021-01-26 08:21:20', '', '2021-01-26 08:21:20', b'0');
+INSERT INTO `sys_operate_log` VALUES (87, 'c2b446cc-c49e-477f-93de-bf2f900d6483', 1, '菜单 API', '删除菜单', 2, '', '', 'POST', '/api/system/menu/delete', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', 'CommonResult cn.iocoder.dashboard.modules.system.controller.permission.SysMenuController.deleteMenu(Long)', '{\"id\":1047}', '2021-01-30 01:08:51', 48, 0, '', 'true', '', '2021-01-26 08:21:46', '', '2021-01-26 08:21:46', b'0');
+INSERT INTO `sys_operate_log` VALUES (88, '1597d596-7be2-4af1-b50a-bc169974a4fb', 1, '菜单 API', '修改菜单', 2, '', '', 'POST', '/api/system/menu/update', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', 'CommonResult cn.iocoder.dashboard.modules.system.controller.permission.SysMenuController.updateMenu(SysMenuUpdateReqVO)', '{\"reqVO\":{\"name\":\"在线查询\",\"permission\":\"system:user-session:list\",\"type\":3,\"sort\":\"1\",\"parentId\":109,\"path\":\"#\",\"icon\":\"#\",\"component\":\"\",\"id\":1046}}', '2021-01-30 01:09:43', 16, 0, '', 'true', '', '2021-01-26 08:22:37', '', '2021-01-26 08:22:37', b'0');
+INSERT INTO `sys_operate_log` VALUES (89, 'd8afad81-a738-4b8f-a7f0-bbf4515540e9', 1, '菜单 API', '修改菜单', 2, '', '', 'POST', '/api/system/menu/update', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', 'CommonResult cn.iocoder.dashboard.modules.system.controller.permission.SysMenuController.updateMenu(SysMenuUpdateReqVO)', '{\"reqVO\":{\"name\":\"单条强退\",\"permission\":\"system:user-session:delete\",\"type\":3,\"sort\":\"3\",\"parentId\":109,\"path\":\"#\",\"icon\":\"#\",\"component\":\"\",\"id\":1048}}', '2021-01-30 01:10:00', 19, 0, '', 'true', '', '2021-01-26 08:22:54', '', '2021-01-26 08:22:54', b'0');
+INSERT INTO `sys_operate_log` VALUES (90, '28d257d8-d578-4bbe-b671-09d3ce94bda6', 1, '用户 Session API', '删除 Session', 4, '', '', 'DELETE', '/api/system/user-session/delete', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', 'CommonResult cn.iocoder.dashboard.modules.system.controller.auth.SysUserSessionController.delete(String)', '{\"id\":\"73cc914671034f3190f09f520d1b39e9\"}', '2021-01-30 01:16:55', 11, 0, '', 'true', '', '2021-01-26 08:29:50', '', '2021-01-26 08:29:50', b'0');
 COMMIT;
 
 -- ----------------------------
@@ -1190,6 +897,112 @@ INSERT INTO `sys_user_role` VALUES (4, 100, 101, '', NULL, '', NULL, b'0');
 INSERT INTO `sys_user_role` VALUES (5, 100, 1, '', NULL, '', NULL, b'0');
 INSERT INTO `sys_user_role` VALUES (6, 100, 2, '', NULL, '', NULL, b'0');
 INSERT INTO `sys_user_role` VALUES (7, 104, 101, '', NULL, '', NULL, b'0');
+COMMIT;
+
+-- ----------------------------
+-- Table structure for sys_user_session
+-- ----------------------------
+DROP TABLE IF EXISTS `sys_user_session`;
+CREATE TABLE `sys_user_session` (
+  `id` varchar(32) NOT NULL COMMENT '会话编号',
+  `user_id` bigint(20) NOT NULL COMMENT '用户编号',
+  `user_ip` varchar(50) NOT NULL COMMENT '用户 IP',
+  `user_agent` varchar(200) NOT NULL COMMENT '浏览器 UA',
+  `create_by` varchar(64) DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_by` varchar(64) DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户在线 Session';
+
+-- ----------------------------
+-- Records of sys_user_session
+-- ----------------------------
+BEGIN;
+INSERT INTO `sys_user_session` VALUES ('73cc914671034f3190f09f520d1b39e9', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-01-26 08:29:27', '', '2021-01-26 08:29:50', b'1');
+INSERT INTO `sys_user_session` VALUES ('9cc71dc2d7a24b978db1bfe0e4bae349', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-01-26 08:30:01', '', '2021-01-26 08:30:01', b'0');
+COMMIT;
+
+-- ----------------------------
+-- Table structure for tool_codegen_table
+-- ----------------------------
+DROP TABLE IF EXISTS `tool_codegen_table`;
+CREATE TABLE `tool_codegen_table` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '编号',
+  `table_name` varchar(200) NOT NULL DEFAULT '' COMMENT '表名称',
+  `table_comment` varchar(500) NOT NULL DEFAULT '' COMMENT '表描述',
+  `remark` varchar(500) DEFAULT NULL COMMENT '备注',
+  `module_name` varchar(30) NOT NULL COMMENT '生成模块名',
+  `business_name` varchar(30) NOT NULL COMMENT '生成业务名',
+  `class_name` varchar(100) NOT NULL DEFAULT '' COMMENT '实体类名称',
+  `class_comment` varchar(50) NOT NULL COMMENT '生成功能名',
+  `author` varchar(50) NOT NULL COMMENT '生成作者',
+  `template_type` tinyint(4) NOT NULL COMMENT '使用的模板（crud单表操作 tree树表操作）',
+  `create_by` varchar(64) DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_by` varchar(64) DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  `package_name` varchar(100) DEFAULT NULL COMMENT '生成包路径',
+  `sub_table_name` varchar(64) DEFAULT NULL COMMENT '关联子表的表名',
+  `sub_table_fk_name` varchar(64) DEFAULT NULL COMMENT '子表关联的外键名',
+  `options` varchar(1000) DEFAULT NULL COMMENT '其它生成选项',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COMMENT='代码生成表定义';
+
+-- ----------------------------
+-- Records of tool_codegen_table
+-- ----------------------------
+BEGIN;
+INSERT INTO `tool_codegen_table` VALUES (8, 'sys_dict_type', '字典类型表', NULL, 'system', 'test', 'SysDictType', '字典类型', '芋艿', 1, '', '2021-01-31 00:24:41', '', '2021-01-31 05:47:01', b'0', NULL, NULL, NULL, NULL);
+COMMIT;
+
+-- ----------------------------
+-- Table structure for tool_codegen_table_column
+-- ----------------------------
+DROP TABLE IF EXISTS `tool_codegen_table_column`;
+CREATE TABLE `tool_codegen_table_column` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '编号',
+  `table_id` bigint(20) NOT NULL COMMENT '归属表编号',
+  `column_name` varchar(200) NOT NULL COMMENT '列名称',
+  `column_type` varchar(100) NOT NULL COMMENT '列类型',
+  `column_comment` varchar(500) NOT NULL COMMENT '列描述',
+  `nullable` bit(1) NOT NULL COMMENT '是否必填（1是）',
+  `primary_key` bit(1) NOT NULL COMMENT '是否主键（1是）',
+  `auto_Increment` char(1) NOT NULL COMMENT '是否自增（1是）',
+  `ordinal_position` int(11) NOT NULL COMMENT '排序',
+  `java_type` varchar(32) NOT NULL COMMENT 'JAVA类型',
+  `java_field` varchar(64) NOT NULL COMMENT 'JAVA字段名',
+  `dict_type` varchar(200) DEFAULT '' COMMENT '字典类型',
+  `create_operation` bit(1) NOT NULL COMMENT '是否为 Create 创建操作的字段',
+  `update_operation` bit(1) NOT NULL COMMENT '是否为 Update 更新操作的字段',
+  `list_operation` bit(1) NOT NULL COMMENT '是否为 List 查询操作的字段',
+  `list_operation_condition` varchar(32) NOT NULL DEFAULT 'EQ' COMMENT 'List 查询操作的条件类型',
+  `list_operation_result` bit(1) NOT NULL COMMENT '是否为 List 查询操作的返回字段',
+  `html_type` varchar(32) NOT NULL COMMENT '显示类型（文本框、文本域、下拉框、复选框、单选框、日期控件）',
+  `create_by` varchar(64) DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_by` varchar(64) DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=41 DEFAULT CHARSET=utf8mb4 COMMENT='代码生成表字段定义';
+
+-- ----------------------------
+-- Records of tool_codegen_table_column
+-- ----------------------------
+BEGIN;
+INSERT INTO `tool_codegen_table_column` VALUES (31, 8, 'id', 'bigint(20)', '字典主键', b'0', b'1', '1', 1, 'Long', 'id', '', b'0', b'1', b'0', '=', b'1', 'input', '', '2021-01-31 00:24:42', '', '2021-01-31 00:24:42', b'0');
+INSERT INTO `tool_codegen_table_column` VALUES (32, 8, 'name', 'varchar(100)', '字典名称', b'0', b'0', '0', 2, 'String', 'name', '', b'1', b'1', b'1', 'LIKE', b'1', 'input', '', '2021-01-31 00:24:42', '', '2021-01-31 00:24:42', b'0');
+INSERT INTO `tool_codegen_table_column` VALUES (33, 8, 'dict_type', 'varchar(100)', '字典类型', b'0', b'0', '0', 3, 'String', 'dictType', '', b'1', b'1', b'1', '=', b'1', 'select', '', '2021-01-31 00:24:42', '', '2021-01-31 00:24:42', b'0');
+INSERT INTO `tool_codegen_table_column` VALUES (34, 8, 'status', 'tinyint(4)', '状态', b'0', b'0', '0', 4, 'Integer', 'status', 'sys_common_status', b'1', b'1', b'1', '=', b'1', 'radio', '', '2021-01-31 00:24:42', '', '2021-01-31 04:38:58', b'0');
+INSERT INTO `tool_codegen_table_column` VALUES (35, 8, 'remark', 'varchar(500)', '备注', b'1', b'0', '0', 5, 'String', 'remark', '', b'1', b'1', b'1', '=', b'1', 'input', '', '2021-01-31 00:24:42', '', '2021-01-31 00:24:42', b'0');
+INSERT INTO `tool_codegen_table_column` VALUES (36, 8, 'create_by', 'varchar(64)', '创建者', b'1', b'0', '0', 6, 'String', 'createBy', '', b'0', b'0', b'0', '=', b'0', 'input', '', '2021-01-31 00:24:42', '', '2021-01-31 00:24:42', b'0');
+INSERT INTO `tool_codegen_table_column` VALUES (37, 8, 'create_time', 'datetime', '创建时间', b'0', b'0', '0', 7, 'Date', 'createTime', '', b'0', b'0', b'0', 'BETWEEN', b'0', 'input', '', '2021-01-31 00:24:42', '', '2021-01-31 00:24:42', b'0');
+INSERT INTO `tool_codegen_table_column` VALUES (38, 8, 'update_by', 'varchar(64)', '更新者', b'1', b'0', '0', 8, 'String', 'updateBy', '', b'0', b'0', b'0', '=', b'0', 'input', '', '2021-01-31 00:24:42', '', '2021-01-31 00:24:42', b'0');
+INSERT INTO `tool_codegen_table_column` VALUES (39, 8, 'update_time', 'datetime', '更新时间', b'0', b'0', '0', 9, 'Date', 'updateTime', '', b'0', b'0', b'0', 'BETWEEN', b'0', 'input', '', '2021-01-31 00:24:42', '', '2021-01-31 00:24:42', b'0');
+INSERT INTO `tool_codegen_table_column` VALUES (40, 8, 'deleted', 'bit(1)', '是否删除', b'0', b'0', '0', 10, 'Boolean', 'deleted', '', b'0', b'0', b'0', '=', b'0', 'radio', '', '2021-01-31 00:24:42', '', '2021-01-31 00:24:42', b'0');
 COMMIT;
 
 SET FOREIGN_KEY_CHECKS = 1;

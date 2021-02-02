@@ -1,0 +1,42 @@
+package ${basePackage}.${table.moduleName}.dal.mysql.dao.${table.businessName};
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+
+import ${pageResultClassName};
+import ${QueryWrapperClassName};
+import ${BaseMapperClassName};
+import ${basePackage}.${table.moduleName}.dal.mysql.dataobject.${table.businessName}DO;
+import org.apache.ibatis.annotations.Mapper;
+
+@Mapper
+public interface ${table.className}Mapper extends BaseMapperX<${table.className}DO> {
+
+    default PageResult<${table.className}DO> selectPage(${table.className}PageReqVO reqVO) {
+        return selectPage(reqVO, new QueryWrapperX<${table.className}DO>()
+#foreach ($column in $columns)
+#if (${column.listOperation})
+#set ($JavaField = $column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})##首字母大写
+#if (${column.listOperationCondition} == "=")##情况一，= 的时候
+            .eqIfPresent("${column.column_name}", reqVO.get${JavaField}())
+#end
+#if (${column.listOperationCondition} == "!=")##情况二，!= 的时候
+            .neIfPresent("${column.column_name}", reqVO.get${JavaField}())
+#end
+#if (${column.listOperationCondition} == ">")##情况三，> 的时候
+        .gtIfPresent("${column.column_name}", reqVO.get${JavaField}())
+#end
+#if (${column.listOperationCondition} == ">=")##情况四，>= 的时候
+        .geIfPresent("${column.column_name}", reqVO.get${JavaField}())
+#end
+#if (${column.listOperationCondition} == "<")##情况五，< 的时候
+        .gtIfPresent("${column.column_name}", reqVO.get${JavaField}())
+#end
+#if (${column.listOperationCondition} == "<=")##情况六，<= 的时候
+        .geIfPresent("${column.column_name}", reqVO.get${JavaField}())
+#end
+#end
+#end
+        );
+    }
+
+}

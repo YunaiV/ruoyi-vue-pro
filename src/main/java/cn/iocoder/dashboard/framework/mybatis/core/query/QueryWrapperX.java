@@ -44,9 +44,23 @@ public class QueryWrapperX<T> extends QueryWrapper<T> {
         return this;
     }
 
+    public QueryWrapperX<T> neIfPresent(String column, Object val) {
+        if (val != null) {
+            return (QueryWrapperX<T>) super.ne(column, val);
+        }
+        return this;
+    }
+
     public QueryWrapperX<T> gtIfPresent(String column, Object val) {
         if (val != null) {
             return (QueryWrapperX<T>) super.gt(column, val);
+        }
+        return this;
+    }
+
+    public QueryWrapperX<T> geIfPresent(String column, Object val) {
+        if (val != null) {
+            return (QueryWrapperX<T>) super.ge(column, val);
         }
         return this;
     }

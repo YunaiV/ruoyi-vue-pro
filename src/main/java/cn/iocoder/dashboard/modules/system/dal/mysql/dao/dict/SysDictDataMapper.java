@@ -31,10 +31,6 @@ public interface SysDictDataMapper extends BaseMapperX<SysDictDataDO> {
                 .orderByAsc("dict_type", "sort"));
     }
 
-    default List<SysDictDataDO> selectList() {
-        return selectList(new QueryWrapper<>());
-    }
-
     default List<SysDictDataDO> selectList(SysDictDataExportReqVO reqVO) {
         return selectList(new QueryWrapperX<SysDictDataDO>().likeIfPresent("label", reqVO.getLabel())
                         .likeIfPresent("dict_type", reqVO.getDictType())
