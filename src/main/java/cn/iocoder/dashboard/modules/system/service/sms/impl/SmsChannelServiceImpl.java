@@ -5,7 +5,8 @@ import cn.iocoder.dashboard.common.enums.SmsChannelEnum;
 import cn.iocoder.dashboard.common.pojo.PageResult;
 import cn.iocoder.dashboard.framework.sms.client.AbstractSmsClient;
 import cn.iocoder.dashboard.framework.sms.core.SmsClientFactory;
-import cn.iocoder.dashboard.modules.system.controller.sms.vo.SmsChannelPropertyVO;
+import cn.iocoder.dashboard.framework.sms.core.property.SmsChannelProperty;
+import cn.iocoder.dashboard.modules.system.controller.sms.vo.SmsChannelAllVO;
 import cn.iocoder.dashboard.modules.system.controller.sms.vo.req.SmsChannelCreateReqVO;
 import cn.iocoder.dashboard.modules.system.controller.sms.vo.req.SmsChannelPageReqVO;
 import cn.iocoder.dashboard.modules.system.controller.sms.vo.resp.SmsChannelEnumRespVO;
@@ -47,13 +48,14 @@ public class SmsChannelServiceImpl implements SmsChannelService {
     @PostConstruct
     @Override
     public void initSmsClient() {
-        List<SmsChannelPropertyVO> smsChannelPropertyVOList = listChannelAllEnabledInfo();
-        if (ObjectUtil.isEmpty(smsChannelPropertyVOList)) {
+        List<SmsChannelAllVO> smsChannelAllVOList = listChannelAllEnabledInfo();
+        if (ObjectUtil.isEmpty(smsChannelAllVOList)) {
             return;
         }
-        smsChannelPropertyVOList.forEach(smsChannelPropertyVO -> {
-            Long clientId = smsClientFactory.createClient(smsChannelPropertyVO);
-            smsChannelPropertyVO.getTemplateList().forEach(smsTemplateVO -> {
+        List<SmsChannelProperty> channelPropertyList = SmsChannelConvert.INSTANCE.convertProperty(smsChannelAllVOList);
+        channelPropertyList.forEach(smsChannelProperty -> {
+            Long clientId = smsClientFactory.createClient(smsChannelProperty);
+            smsChannelProperty.getTemplateList().forEach(smsTemplateVO -> {
                 templateCode2ChannelIdMap.put(smsTemplateVO.getCode(), clientId);
             });
         });
@@ -89,12 +91,12 @@ public class SmsChannelServiceImpl implements SmsChannelService {
     }
 
     @Override
-    public List<SmsChannelPropertyVO> listChannelAllEnabledInfo() {
+    public List<SmsChannelAllVO> listChannelAllEnabledInfo() {
         List<SmsChannelDO> channelDOList = mapper.selectEnabledList();
         if (ObjectUtil.isNull(channelDOList)) {
             return null;
         }
-        List<SmsChannelPropertyVO> channelAllVOList = SmsChannelConvert.INSTANCE.convert(channelDOList);
+        List<SmsChannelAllVO> channelAllVOList = SmsChannelConvert.INSTANCE.convert(channelDOList);
 
         channelAllVOList.forEach(smsChannelDO -> {
 

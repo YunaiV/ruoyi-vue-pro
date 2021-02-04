@@ -3,7 +3,7 @@ package cn.iocoder.dashboard.modules.system.service.sms.impl;
 import cn.iocoder.dashboard.framework.sms.client.AbstractSmsClient;
 import cn.iocoder.dashboard.framework.sms.core.SmsBody;
 import cn.iocoder.dashboard.framework.sms.core.SmsResult;
-import cn.iocoder.dashboard.modules.system.controller.sms.vo.SmsChannelPropertyVO;
+import cn.iocoder.dashboard.modules.system.controller.sms.vo.SmsChannelAllVO;
 import cn.iocoder.dashboard.modules.system.controller.sms.vo.SmsTemplateVO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dao.sms.SmsLogMapper;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.sms.SmsLogDO;
@@ -37,7 +37,7 @@ public class SmsLogServiceImpl implements SmsLogService {
             smsLogMapper.updateById(smsLog);
             return smsBody.getSmsLogId();
         } else {
-            SmsChannelPropertyVO property = client.getProperty();
+            SmsChannelAllVO property = client.getProperty();
             SmsTemplateVO smsTemplate = property.getTemplateByTemplateCode(smsBody.getTemplateCode());
 
             smsLog.setChannelCode(property.getCode())

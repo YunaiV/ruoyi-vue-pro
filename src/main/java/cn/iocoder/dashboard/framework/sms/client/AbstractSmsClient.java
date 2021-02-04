@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.framework.sms.client;
 
-import cn.iocoder.dashboard.modules.system.controller.sms.vo.SmsChannelPropertyVO;
+import cn.iocoder.dashboard.framework.sms.core.property.SmsChannelProperty;
 
 /**
  * 抽象短息客户端
@@ -13,19 +13,19 @@ public abstract class AbstractSmsClient<R> implements SmsClient<R> {
     /**
      * 短信渠道参数
      */
-    protected final SmsChannelPropertyVO channelVO;
+    protected final SmsChannelProperty channelVO;
 
     /**
      * 构造阿里云短信发送处理
      *
-     * @param channelVO 阿里云短信配置
+     * @param property 阿里云短信配置
      */
-    public AbstractSmsClient(SmsChannelPropertyVO channelVO) {
-        this.channelVO = channelVO;
+    public AbstractSmsClient(SmsChannelProperty property) {
+        this.channelVO = property;
     }
 
 
-    public SmsChannelPropertyVO getProperty() {
+    public SmsChannelProperty getProperty() {
         return channelVO;
     }
 

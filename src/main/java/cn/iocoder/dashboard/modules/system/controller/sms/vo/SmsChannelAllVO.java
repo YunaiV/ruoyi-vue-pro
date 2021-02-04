@@ -14,7 +14,7 @@ import java.util.List;
  */
 @Data
 @EqualsAndHashCode
-public class SmsChannelPropertyVO implements Serializable {
+public class SmsChannelAllVO implements Serializable {
 
     /**
      * id

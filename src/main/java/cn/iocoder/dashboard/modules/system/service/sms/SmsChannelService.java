@@ -2,7 +2,7 @@ package cn.iocoder.dashboard.modules.system.service.sms;
 
 import cn.iocoder.dashboard.common.pojo.PageResult;
 import cn.iocoder.dashboard.framework.sms.client.AbstractSmsClient;
-import cn.iocoder.dashboard.modules.system.controller.sms.vo.SmsChannelPropertyVO;
+import cn.iocoder.dashboard.modules.system.controller.sms.vo.SmsChannelAllVO;
 import cn.iocoder.dashboard.modules.system.controller.sms.vo.req.SmsChannelCreateReqVO;
 import cn.iocoder.dashboard.modules.system.controller.sms.vo.req.SmsChannelPageReqVO;
 import cn.iocoder.dashboard.modules.system.controller.sms.vo.resp.SmsChannelEnumRespVO;
@@ -59,5 +59,5 @@ public interface SmsChannelService {
      *
      * @return 渠道(包含名下模块)信息集合
      */
-    List<SmsChannelPropertyVO> listChannelAllEnabledInfo();
+    List<SmsChannelAllVO> listChannelAllEnabledInfo();
 }

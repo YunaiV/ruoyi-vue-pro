@@ -7,7 +7,7 @@ import cn.iocoder.dashboard.common.exception.ServiceException;
 import cn.iocoder.dashboard.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.dashboard.framework.sms.client.AbstractSmsClient;
 import cn.iocoder.dashboard.framework.sms.client.AliyunSmsClient;
-import cn.iocoder.dashboard.modules.system.controller.sms.vo.SmsChannelPropertyVO;
+import cn.iocoder.dashboard.framework.sms.core.property.SmsChannelProperty;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
@@ -32,7 +32,7 @@ public class SmsClientFactory {
      * @param propertyVO 参数对象
      * @return 客户端id(默认channelId)
      */
-    public Long createClient(SmsChannelPropertyVO propertyVO) {
+    public Long createClient(SmsChannelProperty propertyVO) {
         if (StrUtil.isBlank(propertyVO.getCode())) {
             throw ServiceExceptionUtil.exception(PARAM_VALUE_IS_NULL, "短信渠道编码");
         }
@@ -45,7 +45,7 @@ public class SmsClientFactory {
         return propertyVO.getId();
     }
 
-    private AbstractSmsClient<?> createClient(SmsChannelEnum channelEnum, SmsChannelPropertyVO channelVO) {
+    private AbstractSmsClient<?> createClient(SmsChannelEnum channelEnum, SmsChannelProperty channelVO) {
         if (channelEnum == null) {
             throw new ServiceException(INVALID_CHANNEL_CODE);
         }

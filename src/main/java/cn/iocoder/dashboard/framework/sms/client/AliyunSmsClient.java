@@ -2,7 +2,7 @@ package cn.iocoder.dashboard.framework.sms.client;
 
 import cn.iocoder.dashboard.framework.sms.core.SmsBody;
 import cn.iocoder.dashboard.framework.sms.core.SmsResult;
-import cn.iocoder.dashboard.modules.system.controller.sms.vo.SmsChannelPropertyVO;
+import cn.iocoder.dashboard.framework.sms.core.property.SmsChannelProperty;
 import com.aliyuncs.DefaultAcsClient;
 import com.aliyuncs.IAcsClient;
 import com.aliyuncs.dysmsapi.model.v20170525.SendSmsRequest;
@@ -39,7 +39,7 @@ public class AliyunSmsClient extends AbstractSmsClient<SendSmsResponse> {
      *
      * @param channelVO 阿里云短信配置
      */
-    public AliyunSmsClient(SmsChannelPropertyVO channelVO) {
+    public AliyunSmsClient(SmsChannelProperty channelVO) {
         super(channelVO);
 
         String accessKeyId = channelVO.getApiKey();
