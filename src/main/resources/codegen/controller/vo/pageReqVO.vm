@@ -1,0 +1,43 @@
+package ${basePackage}.${table.moduleName}.controller.${table.businessName}.vo;
+
+import lombok.*;
+import java.util.*;
+import javax.validation.constraints.*;
+import io.swagger.annotations.*;
+import ${pageParamClassName};
+
+@ApiModel("${table.classComment}分页 Request VO")
+@Data
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class ${table.className}PageReqVO extends PageParam {
+
+#foreach ($column in $columns)
+#set ($JavaField = $column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})##首字母大写
+#if (${column.listOperation})##查询操作
+#if (${column.listOperationCondition} == "BETWEEN")## Between 的时候
+    @ApiModelProperty(value = "开始${column.columnComment}"#if ("$!column.example" != ""), example = "${column.example}"#end)
+#if (${column.javaType} == "Date")## 时间类型
+    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
+#end
+    private ${column.javaType} begin${JavaField};
+
+    @ApiModelProperty(value = "结束${column.columnComment}"#if ("$!column.example" != ""), example = "${column.example}"#end)
+#if (${column.javaType} == "Date")## 时间类型
+    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
+#end
+    private ${column.javaType} end${JavaField};
+#else
+#if (${column.javaType} == "Date")## 时间类型
+    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
+#end
+    @ApiModelProperty(value = "${column.columnComment}"#if ("$!column.example" != ""), example = "${column.example}"#end)
+    private ${column.javaType} ${column.javaField};
+#end
+
+#end
+#end
+}

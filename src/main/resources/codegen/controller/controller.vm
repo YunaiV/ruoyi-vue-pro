@@ -1,0 +1,63 @@
+import org.springframework.web.bind.annotation.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import io.swagger.annotations.*;
+import javax.validation.constraints.*;
+import javax.validation.*;
+import java.util.*;
+
+import org.springframework.validation.annotation.Validated;
+
+/**
+ * ${class.description} Controller
+ */
+@RestController
+@RequestMapping("/${class.classNameLowerUnderscore}")
+@Api(tags = "${class.description}")
+@Validated
+public class ${class.className}Controller {
+
+    @Autowired
+    private ${class.className}Service ${class.classNameVar}Service;
+
+    @PostMapping("/create")
+    @ApiOperation("创建${class.description}")
+    public CommonResult<Integer> create${class.className}(@Valid ${class.className}CreateReqVO createVO) {
+        return success(${class.classNameVar}Service.create${class.className}(createVO));
+    }
+
+    @PostMapping("/update")
+    @ApiOperation("更新${class.description}")
+    public CommonResult<Boolean> update${class.className}(@Valid ${class.className}UpdateReqVO updateVO) {
+        ${class.classNameVar}Service.update${class.className}(updateVO);
+        return success(true);
+    }
+
+    @PostMapping("/delete")
+    @ApiOperation("删除${class.description}")
+    @ApiImplicitParam(name = "${class.classNameVar}Id", value = "${class.description}编号", required = true)
+    public CommonResult<Boolean> delete${class.className}(@RequestParam("${class.classNameVar}Id") Integer ${class.classNameVar}Id) {
+        ${class.classNameVar}Service.delete${class.className}(${class.classNameVar}Id);
+        return success(true);
+    }
+
+    @GetMapping("/get")
+    @ApiOperation("获得${class.description}")
+    @ApiImplicitParam(name = "${class.classNameVar}Id", value = "${class.description}编号", required = true)
+    public CommonResult<${class.className}RespVO> get${class.className}(@RequestParam("${class.classNameVar}Id") Integer ${class.classNameVar}Id) {
+        return success(${class.classNameVar}Service.get${class.className}(${class.classNameVar}Id));
+    }
+
+    @GetMapping("/list")
+    @ApiOperation("获得${class.description}列表")
+    @ApiImplicitParam(name = "${class.classNameVar}Ids", value = "${class.description}编号列表", required = true)
+    public CommonResult<List<${class.className}RespVO>> list${class.className}s(@RequestParam("${class.classNameVar}Ids") List<Integer> ${class.classNameVar}Ids) {
+        return success(${class.classNameVar}Service.list${class.className}s(${class.classNameVar}Ids));
+    }
+
+    @GetMapping("/page")
+    @ApiOperation("获得${class.description}分页")
+    public CommonResult<PageResult<${class.className}RespVO>> page${class.className}(${class.className}PageReqVO pageVO) {
+        return success(${class.classNameVar}Service.page${class.className}(pageVO));
+    }
+
+}

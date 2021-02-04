@@ -1,9 +1,9 @@
 package ${basePackage}.${table.moduleName}.dal.mysql.dataobject.${table.businessName};
 
-import com.baomidou.mybatisplus.annotation.*;
-import ${baseDOClassName};
 import lombok.*;
 import java.util.*;
+import com.baomidou.mybatisplus.annotation.*;
+import ${baseDOClassName};
 
 /**
 * ${table.classComment} DO
@@ -24,7 +24,7 @@ public class ${table.className}DO extends BaseDO {
     /**
     * ${column.columnComment}
     */
-#if ($column.dictType != "")##处理枚举值
+#if ("$!column.dictType" != "")##处理枚举值
     // TODO 枚举 ${column.dictType}
 #end
 #if (${column.primaryKey} && ${column.javaType} != 'String')##处理主键 + 非 String 的情况

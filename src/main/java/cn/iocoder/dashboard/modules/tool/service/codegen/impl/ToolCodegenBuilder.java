@@ -48,6 +48,8 @@ public class ToolCodegenBuilder {
                     .put("image", ToolCodegenColumnHtmlTypeEnum.UPLOAD_IMAGE)
                     .put("file", ToolCodegenColumnHtmlTypeEnum.UPLOAD_FILE)
                     .put("content", ToolCodegenColumnHtmlTypeEnum.EDITOR)
+                    .put("time", ToolCodegenColumnHtmlTypeEnum.DATETIME)
+                    .put("date", ToolCodegenColumnHtmlTypeEnum.DATETIME)
                     .build();
 
     /**

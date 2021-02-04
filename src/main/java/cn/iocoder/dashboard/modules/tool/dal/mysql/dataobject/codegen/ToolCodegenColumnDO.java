@@ -83,6 +83,10 @@ public class ToolCodegenColumnDO extends BaseDO {
      * 关联 {@link SysDictTypeDO#getType()}
      */
     private String dictType;
+    /**
+     * 数据示例，主要用于生成 Swagger 注解的 example 字段
+     */
+    private String example;
 
     // ========== CRUD 相关字段 ==========
 
