@@ -10,13 +10,15 @@ import cn.iocoder.dashboard.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.dashboard.framework.mybatis.core.query.QueryWrapperX;
 import cn.iocoder.dashboard.modules.tool.dal.mysql.dataobject.codegen.ToolCodegenColumnDO;
 import cn.iocoder.dashboard.modules.tool.dal.mysql.dataobject.codegen.ToolCodegenTableDO;
+import cn.iocoder.dashboard.util.collection.CollectionUtils;
 import cn.iocoder.dashboard.util.date.DateUtils;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static cn.hutool.core.text.CharSequenceUtil.*;
 
 /**
  * 代码生成的引擎，用于具体生成代码
@@ -49,7 +51,7 @@ public class ToolCodegenEngine {
 
     private void initGlobalBindingMap() {
         // 全局配置
-        globalBindingMap.put("basePackage", "cn.iocoder.dashboard.modules"); // TODO 基础包
+        globalBindingMap.put("basePackage", "cn.iocoder.dashboard.modules"); // TODO 基础包, 抽成参数
         // 全局 Java Bean
         globalBindingMap.put("PageResultClassName", PageResult.class.getName());
         globalBindingMap.put("DateUtilsClassName", DateUtils.class.getName());
@@ -64,16 +66,21 @@ public class ToolCodegenEngine {
 
     public void execute(ToolCodegenTableDO table, List<ToolCodegenColumnDO> columns) {
         // 创建 bindingMap
-        Map<String, Object> bindingMap = new HashMap<>();
+        Map<String, Object> bindingMap = new HashMap<>(globalBindingMap);
         bindingMap.put("table", table);
         bindingMap.put("columns", columns);
-        bindingMap.put("hasDateColumn", columns.stream().anyMatch(codegenColumnDO ->
-                codegenColumnDO.getJavaType().equals(Date.class.getSimpleName())));
-        bindingMap.putAll(globalBindingMap);
+        bindingMap.put("primaryColumn", CollectionUtils.findFirst(columns, ToolCodegenColumnDO::getPrimaryKey));
+        bindingMap.put("simpleClassName", upperFirst(toCamelCase(subAfter( // 去掉第一个驼峰，例如说 SysUser 去掉后是 User
+                toUnderlineCase(table.getClassName()), '_', false))));
         // 执行生成
 //        String result = templateEngine.getTemplate("codegen/dal/do.vm").render(bindingMap);
 //        String result = templateEngine.getTemplate("codegen/dal/mapper.vm").render(bindingMap);
-        String result = templateEngine.getTemplate("codegen/controller/vo/pageReqVO.vm").render(bindingMap);
+//        String result = templateEngine.getTemplate("codegen/controller/vo/pageReqVO.vm").render(bindingMap);
+//        String result = templateEngine.getTemplate("codegen/controller/vo/baseVO.vm").render(bindingMap);
+//        String result = templateEngine.getTemplate("codegen/controller/vo/createReqVO.vm").render(bindingMap);
+//        String result = templateEngine.getTemplate("codegen/controller/vo/updateReqVO.vm").render(bindingMap);
+//        String result = templateEngine.getTemplate("codegen/controller/vo/respVO.vm").render(bindingMap);
+        String result = templateEngine.getTemplate("codegen/service/service.vm").render(bindingMap);
         System.out.println(result);
     }
 

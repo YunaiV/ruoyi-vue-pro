@@ -86,6 +86,13 @@ public class CollectionUtils {
         return !CollectionUtil.isEmpty(from) ? from.get(0) : null;
     }
 
+    public static <T> T findFirst(List<T> from, Predicate<T> predicate) {
+        if (CollUtil.isEmpty(from)) {
+            return null;
+        }
+        return from.stream().filter(predicate).findFirst().orElse(null);
+    }
+
     public static <T> void addIfNotNull(Collection<T> coll, T item) {
         if (item == null) {
             return;
