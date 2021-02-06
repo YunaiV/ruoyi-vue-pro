@@ -17,7 +17,7 @@ public interface ${table.className}Service {
      * 创建${table.classComment}
      *
      * @param createReqVO 创建信息
-     * @return ${class.description}
+     * @return 编号
      */
     ${primaryColumn.javaType} create${simpleClassName}(@Valid ${table.className}CreateReqVO createReqVO);
 
@@ -39,7 +39,7 @@ public interface ${table.className}Service {
      * 获得${table.classComment}
      *
      * @param id 编号
-     * @return ${class.description}
+     * @return ${table.classComment}
      */
     ${table.className}DO get${simpleClassName}(${primaryColumn.javaType} id);
 
@@ -47,7 +47,7 @@ public interface ${table.className}Service {
      * 获得${table.classComment}列表
      *
      * @param ids 编号
-     * @return ${class.classComment}列表
+     * @return ${table.classComment}列表
      */
     List<${table.className}DO> get${simpleClassName}List(Collection<${primaryColumn.javaType}> ids);
 
@@ -55,7 +55,7 @@ public interface ${table.className}Service {
      * 获得${table.classComment}分页
      *
      * @param pageReqVO 分页查询
-     * @return ${class.classComment}分页
+     * @return ${table.classComment}分页
      */
 	PageResult<${table.className}DO> get${simpleClassName}Page(${table.className}PageReqVO pageReqVO);
 

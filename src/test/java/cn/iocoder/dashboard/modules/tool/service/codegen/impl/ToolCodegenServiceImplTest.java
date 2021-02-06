@@ -16,7 +16,7 @@ class ToolCodegenServiceImplTest {
 
     @Test
     public void tetCreateCodegenTable() {
-        toolCodegenService.createCodegenTable("sys_dict_type");
+        toolCodegenService.createCodegenTable("sys_test_demo");
     }
 
 }

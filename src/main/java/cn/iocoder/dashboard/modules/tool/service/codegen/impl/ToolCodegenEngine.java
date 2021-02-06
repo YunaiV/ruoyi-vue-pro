@@ -14,6 +14,7 @@ import cn.iocoder.dashboard.util.collection.CollectionUtils;
 import cn.iocoder.dashboard.util.date.DateUtils;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +31,9 @@ import static cn.hutool.core.text.CharSequenceUtil.*;
  */
 @Component
 public class ToolCodegenEngine {
+
+    @Resource
+    private ToolCodegenBuilder codegenBuilder;
 
     /**
      * 模板引擎，由 hutool 实现
@@ -69,9 +73,15 @@ public class ToolCodegenEngine {
         Map<String, Object> bindingMap = new HashMap<>(globalBindingMap);
         bindingMap.put("table", table);
         bindingMap.put("columns", columns);
-        bindingMap.put("primaryColumn", CollectionUtils.findFirst(columns, ToolCodegenColumnDO::getPrimaryKey));
-        bindingMap.put("simpleClassName", upperFirst(toCamelCase(subAfter( // 去掉第一个驼峰，例如说 SysUser 去掉后是 User
-                toUnderlineCase(table.getClassName()), '_', false))));
+        bindingMap.put("primaryColumn", CollectionUtils.findFirst(columns, ToolCodegenColumnDO::getPrimaryKey)); // 主键字段
+        String simpleModuleName = codegenBuilder.getSimpleModuleName(table.getModuleName());
+        bindingMap.put("simpleModuleName", simpleModuleName); // 将 system 转成 sys
+        // className 相关
+        String simpleClassName = subAfter(table.getClassName(), upperFirst(simpleModuleName)
+                , false); // 将 TestDictType 转换成 DictType. 因为在 create 等方法后，不需要带上 Test 前缀
+        bindingMap.put("simpleClassName", simpleClassName);
+        bindingMap.put("simpleClassName_underlineCase", toUnderlineCase(simpleClassName)); // 将 DictType 转换成 dict_type
+        bindingMap.put("classNameVar", lowerFirst(simpleClassName)); // 将 DictType 转换成 dictType，用于变量
         // 执行生成
 //        String result = templateEngine.getTemplate("codegen/dal/do.vm").render(bindingMap);
 //        String result = templateEngine.getTemplate("codegen/dal/mapper.vm").render(bindingMap);
@@ -80,7 +90,10 @@ public class ToolCodegenEngine {
 //        String result = templateEngine.getTemplate("codegen/controller/vo/createReqVO.vm").render(bindingMap);
 //        String result = templateEngine.getTemplate("codegen/controller/vo/updateReqVO.vm").render(bindingMap);
 //        String result = templateEngine.getTemplate("codegen/controller/vo/respVO.vm").render(bindingMap);
+//        String result = templateEngine.getTemplate("codegen/convert/convert.vm").render(bindingMap);
+//        String result = templateEngine.getTemplate("codegen/enums/errorcode.vm").render(bindingMap);
         String result = templateEngine.getTemplate("codegen/service/service.vm").render(bindingMap);
+//        String result = templateEngine.getTemplate("codegen/service/serviceImpl.vm").render(bindingMap);
         System.out.println(result);
     }
 

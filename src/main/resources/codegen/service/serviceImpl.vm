@@ -1,0 +1,30 @@
+package ${basePackage}.${table.moduleName}.service.${table.businessName}.impl;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import javax.annotation.Resource;
+import org.springframework.validation.annotation.Validated;
+
+import java.util.*;
+import ${basePackage}.${table.moduleName}.controller.${table.businessName}.vo.*;
+import ${basePackage}.${table.moduleName}.dal.mysql.dataobject.${table.businessName}.${table.className}DO;
+import ${PageResultClassName};
+
+import static ${basePackage}.${table.moduleName}.enums.${simpleModuleName.substring(0,1).toUpperCase()}${simpleModuleName.substring(1)}ErrorCodeConstants.*;
+
+/**
+* ${table.classComment} Service 实现类
+*
+* @author ${table.author}
+*/
+@Validated
+public class ${table.className}ServiceImpl implements {table.className}Service {
+
+    @Resource
+    private ${table.className}Mapper ${classNameVar}Mapper;
+
+    @Override
+    public ${primaryColumn.javaType} create${simpleClassName}(@Valid ${table.className}CreateReqVO createReqVO) {
+    }
+
+}

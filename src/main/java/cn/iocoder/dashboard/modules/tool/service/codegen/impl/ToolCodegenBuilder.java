@@ -17,6 +17,8 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.util.*;
 
+import static cn.hutool.core.text.CharSequenceUtil.*;
+
 /**
  * 代码生成器的 Builder，负责：
  * 1. 将数据库的表 {@link ToolInformationSchemaTableDO} 定义，构建成 {@link ToolCodegenTableDO}
@@ -24,6 +26,18 @@ import java.util.*;
  */
 @Component
 public class ToolCodegenBuilder {
+
+    /**
+     * Module 名字的映射 TODO 后续梳理到配置类
+     *
+     * key：模块的完整名
+     * value：模块的缩写名
+     */
+    private static final Map<String, String> moduleNames = MapUtil.<String, String>builder()
+            .put("system", "sys")
+            .put("infra", "inf")
+            .put("tool", "tool")
+            .build();
 
     /**
      * 字段名与 {@link ToolCodegenColumnListConditionEnum} 的默认映射
@@ -93,9 +107,9 @@ public class ToolCodegenBuilder {
         CREATE_OPERATION_EXCLUDE_COLUMN.addAll(BASE_DO_FIELDS);
         UPDATE_OPERATION_EXCLUDE_COLUMN.addAll(BASE_DO_FIELDS);
         LIST_OPERATION_EXCLUDE_COLUMN.addAll(BASE_DO_FIELDS);
-        LIST_OPERATION_EXCLUDE_COLUMN.remove("create_time"); // 创建时间，还是可能需要传递的
+        LIST_OPERATION_EXCLUDE_COLUMN.remove("createTime"); // 创建时间，还是可能需要传递的
         LIST_OPERATION_RESULT_EXCLUDE_COLUMN.addAll(BASE_DO_FIELDS);
-        LIST_OPERATION_RESULT_EXCLUDE_COLUMN.remove("create_time"); // 创建时间，还是需要返回的
+        LIST_OPERATION_RESULT_EXCLUDE_COLUMN.remove("createTime"); // 创建时间，还是需要返回的
     }
 
     public ToolCodegenTableDO buildTable(ToolInformationSchemaTableDO schemaTable) {
@@ -110,13 +124,12 @@ public class ToolCodegenBuilder {
      * @param table 表定义
      */
     private void initTableDefault(ToolCodegenTableDO table) {
-        table.setModuleName(StrUtil.subBefore(table.getTableName(),
-                '_', false)); // 第一个 _ 前缀的前面，作为 module 名字
-        table.setBusinessName(StrUtil.subAfter(table.getTableName(),
-                '_', false)); // 第一个 _ 前缀的后面，作为 module 名字
-        table.setBusinessName(StrUtil.toCamelCase(table.getBusinessName())); // 可能存在多个 _ 的情况，转换成驼峰
-        table.setClassName(StrUtil.upperFirst(StrUtil.toCamelCase(table.getTableName()))); // 驼峰 + 首字母大写
-        table.setClassComment(StrUtil.subBefore(table.getTableComment(), // 去除结尾的表，作为类描述
+        table.setModuleName(getFullModuleName(StrUtil.subBefore(table.getTableName(),
+                '_', false))); // 第一个 _ 前缀的前面，作为 module 名字
+        table.setBusinessName(toCamelCase(subAfter(table.getTableName(),
+                '_', false))); // 第一步，第一个 _ 前缀的后面，作为 module 名字; 第二步，可能存在多个 _ 的情况，转换成驼峰
+        table.setClassName(upperFirst(toCamelCase(table.getTableName()))); // 驼峰 + 首字母大写
+        table.setClassComment(subBefore(table.getTableComment(), // 去除结尾的表，作为类描述
                 '表', true));
         table.setAuthor("芋艿"); // TODO 稍后改成创建人
         table.setTemplateType(ToolCodegenTemplateTypeEnum.CRUD.getType());
@@ -144,7 +157,7 @@ public class ToolCodegenBuilder {
 
     private void processColumnJava(ToolCodegenColumnDO column) {
         // 处理 javaField 字段
-        column.setJavaField(StrUtil.toCamelCase(column.getColumnName()));
+        column.setJavaField(toCamelCase(column.getColumnName()));
         // 处理 dictType 字段，暂无
         // 处理 javaType 字段
         String dbType = StrUtil.subBefore(column.getColumnType(), '(', false);
@@ -192,6 +205,29 @@ public class ToolCodegenBuilder {
         if (column.getHtmlType() == null) {
             column.setHtmlType(ToolCodegenColumnHtmlTypeEnum.INPUT.getType());
         }
+    }
+
+    /**
+     * 获得模块的缩略名
+     *
+     * @param fullModuleName 模块的完整名
+     * @return 缩略名
+     */
+    public String getSimpleModuleName(String fullModuleName) {
+        return moduleNames.getOrDefault(fullModuleName, fullModuleName);
+    }
+
+    /**
+     * 获得模块的完整名
+     *
+     * @param shortModuleName 模块的缩略名
+     * @return 完整名
+     */
+    public String getFullModuleName(String shortModuleName) {
+        return moduleNames.entrySet().stream()
+                .filter(entry -> entry.getValue().equals(shortModuleName)) // 匹配
+                .findFirst().map(Map.Entry::getKey) // 返回 key
+                .orElse(shortModuleName); // 兜底返回 shortModuleName
     }
 
 }

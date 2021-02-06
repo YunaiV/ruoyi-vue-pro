@@ -1,0 +1,22 @@
+package ${basePackage}.${table.moduleName}.convert.${table.businessName};
+
+import org.mapstruct.Mapper;
+import org.mapstruct.factory.Mappers;
+import ${basePackage}.${table.moduleName}.controller.${table.businessName}.vo.*;
+import ${basePackage}.${table.moduleName}.dal.mysql.dataobject.${table.businessName}.${table.className}DO;
+
+/**
+* ${table.classComment} Convert
+*
+* @author ${table.author}
+*/
+@Mapper
+public interface ${table.className}Convert {
+
+    ${table.className}Convert INSTANCE = Mappers.getMapper(${table.className}Convert.class);
+
+    ${table.className}DO convert(${table.className}CreateReqVO bean);
+
+    ${table.className}DO convert(${table.className}UpdateReqVO bean);
+
+}

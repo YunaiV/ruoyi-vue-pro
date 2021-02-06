@@ -23,11 +23,6 @@ public class GenTable extends BaseEntity {
     private String packageName;
 
     /**
-     * 主键信息
-     */
-    private GenTableColumn pkColumn;
-
-    /**
      * 其它生成选项
      */
     private String options;
@@ -57,31 +52,4 @@ public class GenTable extends BaseEntity {
      */
     private String parentMenuName;
 
-    public boolean isTree() {
-        return isTree(this.tplCategory);
-    }
-
-    public static boolean isTree(String tplCategory) {
-        return tplCategory != null && StringUtils.equals(GenConstants.TPL_TREE, tplCategory);
-    }
-
-    public boolean isCrud() {
-        return isCrud(this.tplCategory);
-    }
-
-    public static boolean isCrud(String tplCategory) {
-        return tplCategory != null && StringUtils.equals(GenConstants.TPL_CRUD, tplCategory);
-    }
-
-    public boolean isSuperColumn(String javaField) {
-        return isSuperColumn(this.tplCategory, javaField);
-    }
-
-    public static boolean isSuperColumn(String tplCategory, String javaField) {
-        if (isTree(tplCategory)) {
-            return StringUtils.equalsAnyIgnoreCase(javaField,
-                    ArrayUtils.addAll(GenConstants.TREE_ENTITY, GenConstants.BASE_ENTITY));
-        }
-        return StringUtils.equalsAnyIgnoreCase(javaField, GenConstants.BASE_ENTITY);
-    }
 }

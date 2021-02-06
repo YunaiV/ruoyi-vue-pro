@@ -24,7 +24,7 @@ public class ToolCodegenEngineTest {
 
     @Test
     public void testExecute() {
-        ToolCodegenTableDO table = codegenTableMapper.selectById(8);
+        ToolCodegenTableDO table = codegenTableMapper.selectById(10);
         List<ToolCodegenColumnDO> columns = codegenColumnMapper.selectByTableId(table.getId());
         codegenEngine.execute(table, columns);
     }

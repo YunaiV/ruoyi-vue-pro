@@ -5,6 +5,7 @@ import ${QueryWrapperClassName};
 import ${BaseMapperClassName};
 import ${basePackage}.${table.moduleName}.dal.mysql.dataobject.${table.businessName}.${table.className}DO;
 import org.apache.ibatis.annotations.Mapper;
+import ${basePackage}.${table.moduleName}.controller.${table.businessName}.vo.${table.className}PageReqVO;
 
 /**
 * ${table.classComment} Mapper
@@ -26,19 +27,19 @@ public interface ${table.className}Mapper extends BaseMapperX<${table.className}
             .neIfPresent("${column.columnName}", reqVO.get${JavaField}())
 #end
 #if (${column.listOperationCondition} == ">")##情况三，> 的时候
-        .gtIfPresent("${column.columnName}", reqVO.get${JavaField}())
+            .gtIfPresent("${column.columnName}", reqVO.get${JavaField}())
 #end
 #if (${column.listOperationCondition} == ">=")##情况四，>= 的时候
-        .geIfPresent("${column.columnName}", reqVO.get${JavaField}())
+            .geIfPresent("${column.columnName}", reqVO.get${JavaField}())
 #end
 #if (${column.listOperationCondition} == "<")##情况五，< 的时候
-        .gtIfPresent("${column.columnName}", reqVO.get${JavaField}())
+            .gtIfPresent("${column.columnName}", reqVO.get${JavaField}())
 #end
 #if (${column.listOperationCondition} == "LIKE")##情况七，Like 的时候
-        .likeIfPresent("${column.columnName}", reqVO.get${JavaField}())
+            .likeIfPresent("${column.columnName}", reqVO.get${JavaField}())
 #end
 #if (${column.listOperationCondition} == "BETWEEN")##情况八，Between 的时候
-        .betweenIfPresent("${column.columnName}", reqVO.getBegin${JavaField}(), reqVO.getEnd${JavaField}())
+            .betweenIfPresent("${column.columnName}", reqVO.getBegin${JavaField}(), reqVO.getEnd${JavaField}())
 #end
 #end
 #end

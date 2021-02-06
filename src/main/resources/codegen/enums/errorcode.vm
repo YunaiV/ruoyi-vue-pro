@@ -1,0 +1,2 @@
+// ========== ${table.classCommet} TODO 补充编号 ==========
+ErrorCode ${simpleClassName_underlineCase.toUpperCase()}_NOT_FOUND = new ErrorCode(TODO 补充编号, "${table.classComment}不存在}");
