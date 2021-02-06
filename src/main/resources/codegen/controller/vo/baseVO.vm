@@ -14,14 +14,7 @@ public class ${table.className}BaseVO {
 
 #foreach ($column in $columns)
 #if (${column.createOperation} && ${column.updateOperation} && ${column.listOperationResult})##通用操作
-    @ApiModelProperty(value = "${column.columnComment}"#if (!${column.nullable}), required = true#end#if ("$!column.example" != ""), example = "${column.example}"#end)
-#if (!${column.nullable})#if (${field.fieldType} == 'String')## 判断 @NotEmpty 和 @NotNull 注解
-    @NotEmpty(message = "${column.columnComment}不能为空")
-#else
-    @NotNull(message = "${column.columnComment}不能为空")
-#end
-#end
-    private ${column.javaType} ${column.javaField};
+    #parse("codegen/controller/vo/_column.vm")
 
 #end
 #end

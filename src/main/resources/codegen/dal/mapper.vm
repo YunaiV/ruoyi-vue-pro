@@ -6,6 +6,11 @@ import ${BaseMapperClassName};
 import ${basePackage}.${table.moduleName}.dal.mysql.dataobject.${table.businessName}.${table.className}DO;
 import org.apache.ibatis.annotations.Mapper;
 
+/**
+* ${table.classComment} Mapper
+*
+* @author ${table.author}
+*/
 @Mapper
 public interface ${table.className}Mapper extends BaseMapperX<${table.className}DO> {
 

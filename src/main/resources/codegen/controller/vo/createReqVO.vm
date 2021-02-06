@@ -4,6 +4,16 @@ import lombok.*;
 import java.util.*;
 import io.swagger.annotations.*;
 import javax.validation.constraints.*;
+## 处理 Date 字段的引入
+#foreach ($column in $columns)
+#if (${column.createOperation} && (!${column.updateOperation} || !${column.listOperationResult})
+    && ${column.javaType} == "Date")## 时间类型
+import org.springframework.format.annotation.DateTimeFormat;
+
+import static ${DateUtilsClassName}.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
+#break
+#end
+#end
 
 @ApiModel("${table.classComment}创建 Request VO")
 @Data
@@ -13,14 +23,7 @@ public class ${table.className}CreateReqVO extends ${table.className}BaseVO {
 
 #foreach ($column in $columns)
 #if (${column.createOperation} && (!${column.updateOperation} || !${column.listOperationResult}))##不是通用字段
-    @ApiModelProperty(value = "${column.columnComment}"#if (!${column.nullable}), required = true#end#if ("$!column.example" != ""), example = "${column.example}"#end)
-#if (!${column.nullable})#if (${field.fieldType} == 'String')## 判断 @NotEmpty 和 @NotNull 注解
-    @NotEmpty(message = "${column.columnComment}不能为空")
-#else
-    @NotNull(message = "${column.columnComment}不能为空")
-#end
-#end
-    private ${column.javaType} ${column.javaField};
+    #parse("codegen/controller/vo/_column.vm")
 
 #end
 #end
