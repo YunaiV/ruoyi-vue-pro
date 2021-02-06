@@ -3,7 +3,7 @@ package ${basePackage}.${table.moduleName}.dal.mysql.dataobject.${table.business
 import lombok.*;
 import java.util.*;
 import com.baomidou.mybatisplus.annotation.*;
-import ${baseDOClassName};
+import ${BaseDOClassName};
 
 /**
 * ${table.classComment} DO

@@ -3,6 +3,7 @@ package cn.iocoder.dashboard.modules.tool.service.codegen.impl;
 import cn.hutool.extra.template.TemplateConfig;
 import cn.hutool.extra.template.TemplateEngine;
 import cn.hutool.extra.template.TemplateUtil;
+import cn.iocoder.dashboard.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.dashboard.common.pojo.PageParam;
 import cn.iocoder.dashboard.common.pojo.PageResult;
 import cn.iocoder.dashboard.framework.mybatis.core.dataobject.BaseDO;
@@ -59,11 +60,12 @@ public class ToolCodegenEngine {
         // 全局 Java Bean
         globalBindingMap.put("PageResultClassName", PageResult.class.getName());
         globalBindingMap.put("DateUtilsClassName", DateUtils.class.getName());
+        globalBindingMap.put("ServiceExceptionUtilClassName", ServiceExceptionUtil.class.getName());
         // VO 类，独有字段
         globalBindingMap.put("PageParamClassName", PageParam.class.getName());
         // DO 类，独有字段
         globalBindingMap.put("baseDOFields", ToolCodegenBuilder.BASE_DO_FIELDS);
-        globalBindingMap.put("baseDOClassName", BaseDO.class.getName());
+        globalBindingMap.put("BaseDOClassName", BaseDO.class.getName());
         globalBindingMap.put("QueryWrapperClassName", QueryWrapperX.class.getName());
         globalBindingMap.put("BaseMapperClassName", BaseMapperX.class.getName());
     }
@@ -92,8 +94,8 @@ public class ToolCodegenEngine {
 //        String result = templateEngine.getTemplate("codegen/controller/vo/respVO.vm").render(bindingMap);
 //        String result = templateEngine.getTemplate("codegen/convert/convert.vm").render(bindingMap);
 //        String result = templateEngine.getTemplate("codegen/enums/errorcode.vm").render(bindingMap);
-        String result = templateEngine.getTemplate("codegen/service/service.vm").render(bindingMap);
-//        String result = templateEngine.getTemplate("codegen/service/serviceImpl.vm").render(bindingMap);
+//        String result = templateEngine.getTemplate("codegen/service/service.vm").render(bindingMap);
+        String result = templateEngine.getTemplate("codegen/service/serviceImpl.vm").render(bindingMap);
         System.out.println(result);
     }
 
