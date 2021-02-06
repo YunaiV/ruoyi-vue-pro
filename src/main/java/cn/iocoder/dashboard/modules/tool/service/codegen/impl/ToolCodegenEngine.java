@@ -10,8 +10,10 @@ import cn.iocoder.dashboard.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.dashboard.framework.mybatis.core.query.QueryWrapperX;
 import cn.iocoder.dashboard.modules.tool.dal.mysql.dataobject.codegen.ToolCodegenColumnDO;
 import cn.iocoder.dashboard.modules.tool.dal.mysql.dataobject.codegen.ToolCodegenTableDO;
+import cn.iocoder.dashboard.util.date.DateUtils;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,9 +51,10 @@ public class ToolCodegenEngine {
         // 全局配置
         globalBindingMap.put("basePackage", "cn.iocoder.dashboard.modules"); // TODO 基础包
         // 全局 Java Bean
-        globalBindingMap.put("pageResultClassName", PageResult.class.getName());
+        globalBindingMap.put("PageResultClassName", PageResult.class.getName());
+        globalBindingMap.put("DateUtilsClassName", DateUtils.class.getName());
         // VO 类，独有字段
-        globalBindingMap.put("pageParamClassName", PageParam.class.getName());
+        globalBindingMap.put("PageParamClassName", PageParam.class.getName());
         // DO 类，独有字段
         globalBindingMap.put("baseDOFields", ToolCodegenBuilder.BASE_DO_FIELDS);
         globalBindingMap.put("baseDOClassName", BaseDO.class.getName());
@@ -64,6 +67,8 @@ public class ToolCodegenEngine {
         Map<String, Object> bindingMap = new HashMap<>();
         bindingMap.put("table", table);
         bindingMap.put("columns", columns);
+        bindingMap.put("hasDateColumn", columns.stream().anyMatch(codegenColumnDO ->
+                codegenColumnDO.getJavaType().equals(Date.class.getSimpleName())));
         bindingMap.putAll(globalBindingMap);
         // 执行生成
 //        String result = templateEngine.getTemplate("codegen/dal/do.vm").render(bindingMap);

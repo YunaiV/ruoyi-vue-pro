@@ -2,9 +2,13 @@ package ${basePackage}.${table.moduleName}.controller.${table.businessName}.vo;
 
 import lombok.*;
 import java.util.*;
-import javax.validation.constraints.*;
 import io.swagger.annotations.*;
-import ${pageParamClassName};
+import ${PageParamClassName};
+#if (${hasDateColumn})
+import org.springframework.format.annotation.DateTimeFormat;
+
+import static ${DateUtilsClassName}.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
+#end
 
 @ApiModel("${table.classComment}分页 Request VO")
 @Data
@@ -18,7 +22,7 @@ public class ${table.className}PageReqVO extends PageParam {
 #foreach ($column in $columns)
 #set ($JavaField = $column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})##首字母大写
 #if (${column.listOperation})##查询操作
-#if (${column.listOperationCondition} == "BETWEEN")## Between 的时候
+#if (${column.listOperationCondition} == "BETWEEN")## 情况一，Between 的时候
     @ApiModelProperty(value = "开始${column.columnComment}"#if ("$!column.example" != ""), example = "${column.example}"#end)
 #if (${column.javaType} == "Date")## 时间类型
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
@@ -30,7 +34,7 @@ public class ${table.className}PageReqVO extends PageParam {
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
 #end
     private ${column.javaType} end${JavaField};
-#else
+#else##情况二，非 Between 的时间
 #if (${column.javaType} == "Date")## 时间类型
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
 #end

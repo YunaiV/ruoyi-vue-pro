@@ -1,6 +1,6 @@
 package ${basePackage}.${table.moduleName}.dal.mysql.dao.${table.businessName};
 
-import ${pageResultClassName};
+import ${PageResultClassName};
 import ${QueryWrapperClassName};
 import ${BaseMapperClassName};
 import ${basePackage}.${table.moduleName}.dal.mysql.dataobject.${table.businessName}.${table.className}DO;
