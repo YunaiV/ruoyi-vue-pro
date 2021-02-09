@@ -90,7 +90,8 @@
                 <el-option label="单选框" value="radio" />
                 <el-option label="复选框" value="checkbox" />
                 <el-option label="日期控件" value="datetime" />
-                <el-option label="上传控件" value="uploadImage" />
+                <el-option label="图片上传" value="imageUpload" />
+                <el-option label="文件上传" value="fileUpload" />
                 <el-option label="富文本控件" value="editor" />
               </el-select>
             </template>
@@ -112,7 +113,7 @@
         </el-table>
       </el-tab-pane>
       <el-tab-pane label="生成信息" name="genInfo">
-        <gen-info-form ref="genInfo" :info="info" :menus="menus"/>
+        <gen-info-form ref="genInfo" :info="info" :tables="tables" :menus="menus"/>
       </el-tab-pane>
     </el-tabs>
     <el-form label-width="100px">
@@ -143,6 +144,8 @@ export default {
       activeName: "cloum",
       // 表格的高度
       tableHeight: document.documentElement.scrollHeight - 245 + "px",
+      // 表信息
+      tables: [],
       // 表列信息
       cloumns: [],
       // 字典信息
@@ -160,6 +163,7 @@ export default {
       getGenTable(tableId).then(res => {
         this.cloumns = res.data.rows;
         this.info = res.data.info;
+        this.tables = res.data.tables;
       });
       /** 查询字典下拉列表 */
       getDictOptionselect().then(response => {
@@ -167,7 +171,7 @@ export default {
       });
       /** 查询菜单下拉列表 */
       getMenuTreeselect().then(response => {
-        this.menus = this.handleTree(response.data, "id");
+        this.menus = this.handleTree(response.data, "menuId");
       });
     }
   },

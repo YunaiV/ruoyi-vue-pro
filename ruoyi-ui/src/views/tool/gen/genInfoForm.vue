@@ -4,9 +4,10 @@
       <el-col :span="12">
         <el-form-item prop="tplCategory">
           <span slot="label">生成模板</span>
-          <el-select v-model="info.tplCategory">
+          <el-select v-model="info.tplCategory" @change="tplSelectChange">
             <el-option label="单表（增删改查）" value="crud" />
             <el-option label="树表（增删改查）" value="tree" />
+            <el-option label="主子表（增删改查）" value="sub" />
           </el-select>
         </el-form-item>
       </el-col>
@@ -126,8 +127,8 @@
           </span>
           <el-select v-model="info.treeCode" placeholder="请选择">
             <el-option
-              v-for="column in info.columns"
-              :key="column.columnName"
+              v-for="(column, index) in info.columns"
+              :key="index"
               :label="column.columnName + '：' + column.columnComment"
               :value="column.columnName"
             ></el-option>
@@ -144,8 +145,8 @@
           </span>
           <el-select v-model="info.treeParentCode" placeholder="请选择">
             <el-option
-              v-for="column in info.columns"
-              :key="column.columnName"
+              v-for="(column, index) in info.columns"
+              :key="index"
               :label="column.columnName + '：' + column.columnComment"
               :value="column.columnName"
             ></el-option>
@@ -162,8 +163,47 @@
           </span>
           <el-select v-model="info.treeName" placeholder="请选择">
             <el-option
-              v-for="column in info.columns"
-              :key="column.columnName"
+              v-for="(column, index) in info.columns"
+              :key="index"
+              :label="column.columnName + '：' + column.columnComment"
+              :value="column.columnName"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+      </el-col>
+    </el-row>
+    <el-row v-show="info.tplCategory == 'sub'">
+      <h4 class="form-header">关联信息</h4>
+      <el-col :span="12">
+        <el-form-item>
+          <span slot="label">
+            关联子表的表名
+            <el-tooltip content="关联子表的表名， 如：sys_user" placement="top">
+              <i class="el-icon-question"></i>
+            </el-tooltip>
+          </span>
+          <el-select v-model="info.subTableName" placeholder="请选择" @change="subSelectChange">
+            <el-option
+              v-for="(table, index) in tables"
+              :key="index"
+              :label="table.tableName + '：' + table.tableComment"
+              :value="table.tableName"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+      </el-col>
+      <el-col :span="12">
+        <el-form-item>
+          <span slot="label">
+            子表关联的外键名
+            <el-tooltip content="子表关联的外键名， 如：user_id" placement="top">
+              <i class="el-icon-question"></i>
+            </el-tooltip>
+          </span>
+          <el-select v-model="info.subTableFkName" placeholder="请选择">
+            <el-option
+              v-for="(column, index) in subColumns"
+              :key="index"
               :label="column.columnName + '：' + column.columnComment"
               :value="column.columnName"
             ></el-option>
@@ -185,6 +225,10 @@ export default {
       type: Object,
       default: null
     },
+    tables: {
+      type: Array,
+      default: null
+    },
     menus: {
       type: Array,
       default: []
@@ -192,6 +236,7 @@ export default {
   },
   data() {
     return {
+      subColumns: [],
       rules: {
         tplCategory: [
           { required: true, message: "请选择生成模板", trigger: "blur" }
@@ -212,6 +257,11 @@ export default {
     };
   },
   created() {},
+  watch: {
+    'info.subTableName': function(val) {
+      this.setSubTableColumns(val);
+    }
+  },
   methods: {
     /** 转换菜单数据结构 */
     normalizer(node) {
@@ -219,10 +269,31 @@ export default {
         delete node.children;
       }
       return {
-        id: node.id,
-        label: node.name,
+        id: node.menuId,
+        label: node.menuName,
         children: node.children
       };
+    },
+    /** 选择子表名触发 */
+    subSelectChange(value) {
+      this.info.subTableFkName = '';
+    },
+    /** 选择生成模板触发 */
+    tplSelectChange(value) {
+      if(value !== 'sub') {
+        this.info.subTableName = '';
+        this.info.subTableFkName = '';
+      }
+    },
+    /** 设置关联外键 */
+    setSubTableColumns(value) {
+      for (var item in this.tables) {
+        const name = this.tables[item].tableName;
+        if (value === name) {
+          this.subColumns = this.tables[item].columns;
+          break;
+        }
+      }
     }
   }
 };
