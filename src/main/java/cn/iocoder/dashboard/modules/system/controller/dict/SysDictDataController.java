@@ -5,7 +5,7 @@ import cn.iocoder.dashboard.common.pojo.PageResult;
 import cn.iocoder.dashboard.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.dashboard.modules.system.controller.dict.vo.data.*;
 import cn.iocoder.dashboard.modules.system.convert.dict.SysDictDataConvert;
-import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.dict.SysDictDataDO;
+import cn.iocoder.dashboard.modules.system.dal.dataobject.dict.SysDictDataDO;
 import cn.iocoder.dashboard.modules.system.service.dict.SysDictDataService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;

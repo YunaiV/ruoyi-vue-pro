@@ -7,7 +7,7 @@ import cn.iocoder.dashboard.modules.system.controller.test.vo.SysTestDemoPageReq
 import cn.iocoder.dashboard.modules.system.controller.test.vo.SysTestDemoRespVO;
 import cn.iocoder.dashboard.modules.system.controller.test.vo.SysTestDemoUpdateReqVO;
 import cn.iocoder.dashboard.modules.system.convert.test.SysTestDemoConvert;
-import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.test.SysTestDemoDO;
+import cn.iocoder.dashboard.modules.system.dal.dataobject.test.SysTestDemoDO;
 import cn.iocoder.dashboard.modules.system.service.test.SysTestDemoService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;

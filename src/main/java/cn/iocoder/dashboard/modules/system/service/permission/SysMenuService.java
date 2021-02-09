@@ -3,7 +3,7 @@ package cn.iocoder.dashboard.modules.system.service.permission;
 import cn.iocoder.dashboard.modules.system.controller.permission.vo.menu.SysMenuCreateReqVO;
 import cn.iocoder.dashboard.modules.system.controller.permission.vo.menu.SysMenuListReqVO;
 import cn.iocoder.dashboard.modules.system.controller.permission.vo.menu.SysMenuUpdateReqVO;
-import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.permission.SysMenuDO;
+import cn.iocoder.dashboard.modules.system.dal.dataobject.permission.SysMenuDO;
 
 import java.util.Collection;
 import java.util.List;

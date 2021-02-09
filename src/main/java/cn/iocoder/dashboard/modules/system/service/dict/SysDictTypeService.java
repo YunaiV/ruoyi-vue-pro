@@ -5,7 +5,7 @@ import cn.iocoder.dashboard.modules.system.controller.dict.vo.type.SysDictTypeCr
 import cn.iocoder.dashboard.modules.system.controller.dict.vo.type.SysDictTypeExportReqVO;
 import cn.iocoder.dashboard.modules.system.controller.dict.vo.type.SysDictTypePageReqVO;
 import cn.iocoder.dashboard.modules.system.controller.dict.vo.type.SysDictTypeUpdateReqVO;
-import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.dict.SysDictTypeDO;
+import cn.iocoder.dashboard.modules.system.dal.dataobject.dict.SysDictTypeDO;
 
 import java.util.List;
 

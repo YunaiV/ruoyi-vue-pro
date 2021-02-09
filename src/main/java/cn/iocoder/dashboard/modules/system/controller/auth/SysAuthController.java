@@ -8,9 +8,9 @@ import cn.iocoder.dashboard.modules.system.controller.auth.vo.auth.SysAuthLoginR
 import cn.iocoder.dashboard.modules.system.controller.auth.vo.auth.SysAuthMenuRespVO;
 import cn.iocoder.dashboard.modules.system.controller.auth.vo.auth.SysAuthPermissionInfoRespVO;
 import cn.iocoder.dashboard.modules.system.convert.auth.SysAuthConvert;
-import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.permission.SysMenuDO;
-import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.permission.SysRoleDO;
-import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.user.SysUserDO;
+import cn.iocoder.dashboard.modules.system.dal.dataobject.permission.SysMenuDO;
+import cn.iocoder.dashboard.modules.system.dal.dataobject.permission.SysRoleDO;
+import cn.iocoder.dashboard.modules.system.dal.dataobject.user.SysUserDO;
 import cn.iocoder.dashboard.modules.system.enums.permission.MenuTypeEnum;
 import cn.iocoder.dashboard.modules.system.service.auth.SysAuthService;
 import cn.iocoder.dashboard.modules.system.service.permission.SysPermissionService;

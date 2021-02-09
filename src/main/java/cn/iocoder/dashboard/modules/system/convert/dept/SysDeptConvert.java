@@ -4,7 +4,7 @@ import cn.iocoder.dashboard.modules.system.controller.dept.vo.dept.SysDeptCreate
 import cn.iocoder.dashboard.modules.system.controller.dept.vo.dept.SysDeptRespVO;
 import cn.iocoder.dashboard.modules.system.controller.dept.vo.dept.SysDeptSimpleRespVO;
 import cn.iocoder.dashboard.modules.system.controller.dept.vo.dept.SysDeptUpdateReqVO;
-import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.dept.SysDeptDO;
+import cn.iocoder.dashboard.modules.system.dal.dataobject.dept.SysDeptDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 

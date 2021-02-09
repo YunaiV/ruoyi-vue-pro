@@ -1,7 +1,7 @@
 package cn.iocoder.dashboard.modules.system.service.permission;
 
 import cn.iocoder.dashboard.framework.security.core.service.SecurityPermissionFrameworkService;
-import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.permission.SysMenuDO;
+import cn.iocoder.dashboard.modules.system.dal.dataobject.permission.SysMenuDO;
 import org.springframework.lang.Nullable;
 
 import java.util.Collection;

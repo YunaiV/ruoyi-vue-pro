@@ -6,8 +6,8 @@ import cn.iocoder.dashboard.modules.system.controller.test.vo.SysTestDemoCreateR
 import cn.iocoder.dashboard.modules.system.controller.test.vo.SysTestDemoPageReqVO;
 import cn.iocoder.dashboard.modules.system.controller.test.vo.SysTestDemoUpdateReqVO;
 import cn.iocoder.dashboard.modules.system.convert.test.SysTestDemoConvert;
-import cn.iocoder.dashboard.modules.system.dal.mysql.dao.test.SysTestDemoMapper;
-import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.test.SysTestDemoDO;
+import cn.iocoder.dashboard.modules.system.dal.mysql.test.SysTestDemoMapper;
+import cn.iocoder.dashboard.modules.system.dal.dataobject.test.SysTestDemoDO;
 import cn.iocoder.dashboard.modules.system.service.test.SysTestDemoService;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;

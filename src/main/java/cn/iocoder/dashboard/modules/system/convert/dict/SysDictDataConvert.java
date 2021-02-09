@@ -2,7 +2,7 @@ package cn.iocoder.dashboard.modules.system.convert.dict;
 
 import cn.iocoder.dashboard.common.pojo.PageResult;
 import cn.iocoder.dashboard.modules.system.controller.dict.vo.data.*;
-import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.dict.SysDictDataDO;
+import cn.iocoder.dashboard.modules.system.dal.dataobject.dict.SysDictDataDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 

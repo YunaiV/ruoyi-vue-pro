@@ -8,8 +8,8 @@ import cn.iocoder.dashboard.modules.system.controller.dept.vo.dept.SysDeptCreate
 import cn.iocoder.dashboard.modules.system.controller.dept.vo.dept.SysDeptListReqVO;
 import cn.iocoder.dashboard.modules.system.controller.dept.vo.dept.SysDeptUpdateReqVO;
 import cn.iocoder.dashboard.modules.system.convert.dept.SysDeptConvert;
-import cn.iocoder.dashboard.modules.system.dal.mysql.dao.dept.SysDeptMapper;
-import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.dept.SysDeptDO;
+import cn.iocoder.dashboard.modules.system.dal.mysql.dept.SysDeptMapper;
+import cn.iocoder.dashboard.modules.system.dal.dataobject.dept.SysDeptDO;
 import cn.iocoder.dashboard.modules.system.enums.dept.DeptIdEnum;
 import cn.iocoder.dashboard.modules.system.mq.producer.dept.SysDeptProducer;
 import cn.iocoder.dashboard.modules.system.service.dept.SysDeptService;

@@ -3,7 +3,7 @@ package cn.iocoder.dashboard.modules.system.service.user;
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.dashboard.common.pojo.PageResult;
 import cn.iocoder.dashboard.modules.system.controller.user.vo.user.*;
-import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.user.SysUserDO;
+import cn.iocoder.dashboard.modules.system.dal.dataobject.user.SysUserDO;
 import cn.iocoder.dashboard.util.collection.CollectionUtils;
 
 import java.util.Collection;

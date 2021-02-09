@@ -6,7 +6,7 @@ import cn.iocoder.dashboard.common.pojo.PageResult;
 import cn.iocoder.dashboard.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.dashboard.modules.infra.controller.config.vo.*;
 import cn.iocoder.dashboard.modules.infra.convert.config.InfConfigConvert;
-import cn.iocoder.dashboard.modules.infra.dal.mysql.dataobject.config.InfConfigDO;
+import cn.iocoder.dashboard.modules.infra.dal.dataobject.config.InfConfigDO;
 import cn.iocoder.dashboard.modules.infra.service.config.InfConfigService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;

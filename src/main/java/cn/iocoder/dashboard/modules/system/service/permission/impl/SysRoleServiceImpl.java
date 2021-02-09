@@ -11,8 +11,8 @@ import cn.iocoder.dashboard.modules.system.controller.permission.vo.role.SysRole
 import cn.iocoder.dashboard.modules.system.controller.permission.vo.role.SysRolePageReqVO;
 import cn.iocoder.dashboard.modules.system.controller.permission.vo.role.SysRoleUpdateReqVO;
 import cn.iocoder.dashboard.modules.system.convert.permission.SysRoleConvert;
-import cn.iocoder.dashboard.modules.system.dal.mysql.dao.permission.SysRoleMapper;
-import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.permission.SysRoleDO;
+import cn.iocoder.dashboard.modules.system.dal.mysql.permission.SysRoleMapper;
+import cn.iocoder.dashboard.modules.system.dal.dataobject.permission.SysRoleDO;
 import cn.iocoder.dashboard.modules.system.enums.permission.RoleCodeEnum;
 import cn.iocoder.dashboard.modules.system.enums.permission.SysRoleTypeEnum;
 import cn.iocoder.dashboard.modules.system.mq.producer.permission.SysRoleProducer;

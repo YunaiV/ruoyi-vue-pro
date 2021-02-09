@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.framework.apollo.internals;
 
-import cn.iocoder.dashboard.modules.infra.dal.mysql.dataobject.config.InfConfigDO;
+import cn.iocoder.dashboard.modules.infra.dal.dataobject.config.InfConfigDO;
 
 import java.util.Date;
 import java.util.List;

@@ -4,7 +4,7 @@ import cn.iocoder.dashboard.common.enums.CommonStatusEnum;
 import cn.iocoder.dashboard.common.pojo.CommonResult;
 import cn.iocoder.dashboard.modules.system.controller.dept.vo.dept.*;
 import cn.iocoder.dashboard.modules.system.convert.dept.SysDeptConvert;
-import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.dept.SysDeptDO;
+import cn.iocoder.dashboard.modules.system.dal.dataobject.dept.SysDeptDO;
 import cn.iocoder.dashboard.modules.system.service.dept.SysDeptService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;

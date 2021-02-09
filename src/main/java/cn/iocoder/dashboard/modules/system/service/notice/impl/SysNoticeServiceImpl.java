@@ -6,8 +6,8 @@ import cn.iocoder.dashboard.modules.system.controller.notice.vo.SysNoticeCreateR
 import cn.iocoder.dashboard.modules.system.controller.notice.vo.SysNoticePageReqVO;
 import cn.iocoder.dashboard.modules.system.controller.notice.vo.SysNoticeUpdateReqVO;
 import cn.iocoder.dashboard.modules.system.convert.notice.SysNoticeConvert;
-import cn.iocoder.dashboard.modules.system.dal.mysql.dao.notice.SysNoticeMapper;
-import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.notice.SysNoticeDO;
+import cn.iocoder.dashboard.modules.system.dal.mysql.notice.SysNoticeMapper;
+import cn.iocoder.dashboard.modules.system.dal.dataobject.notice.SysNoticeDO;
 import cn.iocoder.dashboard.modules.system.service.notice.SysNoticeService;
 import org.springframework.stereotype.Service;
 

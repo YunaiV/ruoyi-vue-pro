@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.framework.security.core.service;
 
-import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.permission.SysRoleDO;
+import cn.iocoder.dashboard.modules.system.dal.dataobject.permission.SysRoleDO;
 
 /**
  * Security 框架 Permission Service 接口，定义 security 组件需要的功能

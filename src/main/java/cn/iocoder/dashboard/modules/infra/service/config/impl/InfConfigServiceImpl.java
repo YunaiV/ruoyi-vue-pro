@@ -7,8 +7,8 @@ import cn.iocoder.dashboard.modules.infra.controller.config.vo.InfConfigExportRe
 import cn.iocoder.dashboard.modules.infra.controller.config.vo.InfConfigPageReqVO;
 import cn.iocoder.dashboard.modules.infra.controller.config.vo.InfConfigUpdateReqVO;
 import cn.iocoder.dashboard.modules.infra.convert.config.InfConfigConvert;
-import cn.iocoder.dashboard.modules.infra.dal.mysql.dao.config.InfConfigMapper;
-import cn.iocoder.dashboard.modules.infra.dal.mysql.dataobject.config.InfConfigDO;
+import cn.iocoder.dashboard.modules.infra.dal.mysql.config.InfConfigMapper;
+import cn.iocoder.dashboard.modules.infra.dal.dataobject.config.InfConfigDO;
 import cn.iocoder.dashboard.modules.infra.enums.config.InfConfigTypeEnum;
 import cn.iocoder.dashboard.modules.infra.mq.producer.config.InfConfigProducer;
 import cn.iocoder.dashboard.modules.infra.service.config.InfConfigService;

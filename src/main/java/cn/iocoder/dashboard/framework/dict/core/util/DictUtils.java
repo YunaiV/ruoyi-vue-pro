@@ -1,7 +1,7 @@
 package cn.iocoder.dashboard.framework.dict.core.util;
 
 import cn.iocoder.dashboard.framework.dict.core.service.DictDataFrameworkService;
-import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.dict.SysDictDataDO;
+import cn.iocoder.dashboard.modules.system.dal.dataobject.dict.SysDictDataDO;
 import lombok.extern.slf4j.Slf4j;
 
 /**

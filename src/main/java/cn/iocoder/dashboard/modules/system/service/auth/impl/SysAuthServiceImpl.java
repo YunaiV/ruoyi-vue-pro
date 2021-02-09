@@ -7,7 +7,7 @@ import cn.iocoder.dashboard.framework.tracer.core.util.TracerUtils;
 import cn.iocoder.dashboard.modules.system.controller.auth.vo.auth.SysAuthLoginReqVO;
 import cn.iocoder.dashboard.modules.system.controller.logger.vo.loginlog.SysLoginLogCreateReqVO;
 import cn.iocoder.dashboard.modules.system.convert.auth.SysAuthConvert;
-import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.user.SysUserDO;
+import cn.iocoder.dashboard.modules.system.dal.dataobject.user.SysUserDO;
 import cn.iocoder.dashboard.modules.system.enums.logger.SysLoginLogTypeEnum;
 import cn.iocoder.dashboard.modules.system.enums.logger.SysLoginResultEnum;
 import cn.iocoder.dashboard.modules.system.service.auth.SysAuthService;

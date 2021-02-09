@@ -7,8 +7,8 @@ import cn.iocoder.dashboard.modules.system.controller.dict.vo.type.SysDictTypeEx
 import cn.iocoder.dashboard.modules.system.controller.dict.vo.type.SysDictTypePageReqVO;
 import cn.iocoder.dashboard.modules.system.controller.dict.vo.type.SysDictTypeUpdateReqVO;
 import cn.iocoder.dashboard.modules.system.convert.dict.SysDictTypeConvert;
-import cn.iocoder.dashboard.modules.system.dal.mysql.dao.dict.SysDictTypeMapper;
-import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.dict.SysDictTypeDO;
+import cn.iocoder.dashboard.modules.system.dal.mysql.dict.SysDictTypeMapper;
+import cn.iocoder.dashboard.modules.system.dal.dataobject.dict.SysDictTypeDO;
 import cn.iocoder.dashboard.modules.system.service.dict.SysDictDataService;
 import cn.iocoder.dashboard.modules.system.service.dict.SysDictTypeService;
 import org.springframework.stereotype.Service;

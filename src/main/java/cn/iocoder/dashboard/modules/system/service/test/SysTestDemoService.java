@@ -4,7 +4,7 @@ import cn.iocoder.dashboard.common.pojo.PageResult;
 import cn.iocoder.dashboard.modules.system.controller.test.vo.SysTestDemoCreateReqVO;
 import cn.iocoder.dashboard.modules.system.controller.test.vo.SysTestDemoPageReqVO;
 import cn.iocoder.dashboard.modules.system.controller.test.vo.SysTestDemoUpdateReqVO;
-import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.test.SysTestDemoDO;
+import cn.iocoder.dashboard.modules.system.dal.dataobject.test.SysTestDemoDO;
 
 import javax.validation.Valid;
 import java.util.Collection;

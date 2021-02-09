@@ -3,7 +3,7 @@ package cn.iocoder.dashboard.modules.system.service.auth;
 import cn.iocoder.dashboard.common.pojo.PageResult;
 import cn.iocoder.dashboard.framework.security.core.LoginUser;
 import cn.iocoder.dashboard.modules.system.controller.auth.vo.session.SysUserSessionPageReqVO;
-import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.auth.SysUserSessionDO;
+import cn.iocoder.dashboard.modules.system.dal.dataobject.auth.SysUserSessionDO;
 
 /**
  * 在线用户 Session Service 接口

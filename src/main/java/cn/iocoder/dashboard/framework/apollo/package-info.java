@@ -1,7 +1,7 @@
 /**
  * 配置中心客户端，基于 Apollo Client 进行简化
  *
- * 差别在于，我们使用 {@link cn.iocoder.dashboard.modules.infra.dal.mysql.dataobject.config.InfConfigDO} 表作为配置源。
+ * 差别在于，我们使用 {@link cn.iocoder.dashboard.modules.infra.dal.dataobject.config.InfConfigDO} 表作为配置源。
  * 当然，功能肯定也会相对少些，满足最小化诉求。
  *
  * 1. 项目初始化时，可以使用 SysConfigDO 表的配置

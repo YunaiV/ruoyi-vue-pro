@@ -6,8 +6,8 @@ import cn.iocoder.dashboard.modules.tool.controller.codegen.vo.ToolCodegenDetail
 import cn.iocoder.dashboard.modules.tool.controller.codegen.vo.ToolCodegenTablePageReqVO;
 import cn.iocoder.dashboard.modules.tool.controller.codegen.vo.ToolCodegenTableRespVO;
 import cn.iocoder.dashboard.modules.tool.convert.codegen.ToolCodegenConvert;
-import cn.iocoder.dashboard.modules.tool.dal.mysql.dataobject.codegen.ToolCodegenColumnDO;
-import cn.iocoder.dashboard.modules.tool.dal.mysql.dataobject.codegen.ToolCodegenTableDO;
+import cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen.ToolCodegenColumnDO;
+import cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen.ToolCodegenTableDO;
 import cn.iocoder.dashboard.modules.tool.service.codegen.ToolCodegenService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

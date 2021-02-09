@@ -1,8 +1,8 @@
 package cn.iocoder.dashboard.modules.system.convert.user;
 
 import cn.iocoder.dashboard.modules.system.controller.user.vo.user.*;
-import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.dept.SysDeptDO;
-import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.user.SysUserDO;
+import cn.iocoder.dashboard.modules.system.dal.dataobject.dept.SysDeptDO;
+import cn.iocoder.dashboard.modules.system.dal.dataobject.user.SysUserDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 

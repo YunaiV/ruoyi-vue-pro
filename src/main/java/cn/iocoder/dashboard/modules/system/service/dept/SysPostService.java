@@ -5,7 +5,7 @@ import cn.iocoder.dashboard.modules.system.controller.dept.vo.post.SysPostCreate
 import cn.iocoder.dashboard.modules.system.controller.dept.vo.post.SysPostExportReqVO;
 import cn.iocoder.dashboard.modules.system.controller.dept.vo.post.SysPostPageReqVO;
 import cn.iocoder.dashboard.modules.system.controller.dept.vo.post.SysPostUpdateReqVO;
-import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.dept.SysPostDO;
+import cn.iocoder.dashboard.modules.system.dal.dataobject.dept.SysPostDO;
 import org.springframework.lang.Nullable;
 
 import java.util.Collection;

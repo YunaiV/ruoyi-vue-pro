@@ -1,7 +1,7 @@
 package cn.iocoder.dashboard.modules.system.convert.permission;
 
 import cn.iocoder.dashboard.modules.system.controller.permission.vo.role.*;
-import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.permission.SysRoleDO;
+import cn.iocoder.dashboard.modules.system.dal.dataobject.permission.SysRoleDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 

@@ -4,7 +4,7 @@ package cn.iocoder.dashboard.framework.excel.core.convert;
 import cn.hutool.core.convert.Convert;
 import cn.iocoder.dashboard.framework.dict.core.util.DictUtils;
 import cn.iocoder.dashboard.framework.excel.core.annotations.DictFormat;
-import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.dict.SysDictDataDO;
+import cn.iocoder.dashboard.modules.system.dal.dataobject.dict.SysDictDataDO;
 import cn.iocoder.dashboard.modules.system.enums.dict.SysDictTypeEnum;
 import com.alibaba.excel.converters.Converter;
 import com.alibaba.excel.enums.CellDataTypeEnum;

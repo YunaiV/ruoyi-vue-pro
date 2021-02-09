@@ -2,7 +2,7 @@ package cn.iocoder.dashboard.modules.system.controller.common;
 
 import cn.hutool.core.io.IoUtil;
 import cn.iocoder.dashboard.common.pojo.CommonResult;
-import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.common.SysFileDO;
+import cn.iocoder.dashboard.modules.system.dal.dataobject.common.SysFileDO;
 import cn.iocoder.dashboard.modules.system.service.common.SysFileService;
 import cn.iocoder.dashboard.util.servlet.ServletUtils;
 import io.swagger.annotations.Api;

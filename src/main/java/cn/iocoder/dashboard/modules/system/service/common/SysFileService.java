@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.modules.system.service.common;
 
-import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.common.SysFileDO;
+import cn.iocoder.dashboard.modules.system.dal.dataobject.common.SysFileDO;
 
 /**
  * 文件 Service 接口
