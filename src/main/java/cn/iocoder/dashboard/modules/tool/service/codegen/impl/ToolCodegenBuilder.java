@@ -3,7 +3,7 @@ package cn.iocoder.dashboard.modules.tool.service.codegen.impl;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.dashboard.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.dashboard.modules.tool.convert.codegen.CodegenConvert;
+import cn.iocoder.dashboard.modules.tool.convert.codegen.ToolCodegenConvert;
 import cn.iocoder.dashboard.modules.tool.dal.mysql.dataobject.codegen.ToolCodegenColumnDO;
 import cn.iocoder.dashboard.modules.tool.dal.mysql.dataobject.codegen.ToolCodegenTableDO;
 import cn.iocoder.dashboard.modules.tool.dal.mysql.dataobject.codegen.ToolInformationSchemaColumnDO;
@@ -113,7 +113,7 @@ public class ToolCodegenBuilder {
     }
 
     public ToolCodegenTableDO buildTable(ToolInformationSchemaTableDO schemaTable) {
-        ToolCodegenTableDO table = CodegenConvert.INSTANCE.convert(schemaTable);
+        ToolCodegenTableDO table = ToolCodegenConvert.INSTANCE.convert(schemaTable);
         initTableDefault(table);
         return table;
     }
@@ -136,7 +136,7 @@ public class ToolCodegenBuilder {
     }
 
     public List<ToolCodegenColumnDO> buildColumns(List<ToolInformationSchemaColumnDO> schemaColumns) {
-        List<ToolCodegenColumnDO> columns = CodegenConvert.INSTANCE.convertList(schemaColumns);
+        List<ToolCodegenColumnDO> columns = ToolCodegenConvert.INSTANCE.convertList(schemaColumns);
         columns.forEach(this::initColumnDefault);
         return columns;
     }

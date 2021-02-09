@@ -64,7 +64,6 @@
           plain
           icon="el-icon-edit"
           size="mini"
-          :disabled="single"
           @click="handleEditTable"
           v-hasPermi="['tool:gen:edit']"
         >修改</el-button>
@@ -75,7 +74,6 @@
           plain
           icon="el-icon-delete"
           size="mini"
-          :disabled="multiple"
           @click="handleDelete"
           v-hasPermi="['tool:gen:remove']"
         >删除</el-button>
@@ -83,13 +81,7 @@
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
-    <el-table v-loading="loading" :data="tableList" @selection-change="handleSelectionChange">
-      <el-table-column type="selection" align="center" width="55"></el-table-column>
-      <el-table-column label="序号" type="index" width="50" align="center">
-        <template slot-scope="scope">
-          <span>{{(queryParams.pageNum - 1) * queryParams.pageSize + scope.$index + 1}}</span>
-        </template>
-      </el-table-column>
+    <el-table v-loading="loading" :data="tableList">
       <el-table-column
         label="表名称"
         align="center"
@@ -111,8 +103,16 @@
         :show-overflow-tooltip="true"
         width="120"
       />
-      <el-table-column label="创建时间" align="center" prop="createTime" width="160" />
-      <el-table-column label="更新时间" align="center" prop="updateTime" width="160" />
+      <el-table-column label="创建时间" align="center" prop="createTime" width="160">
+        <template slot-scope="scope">
+          <span>{{ parseTime(scope.row.createTime) }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="创建时间" align="center" prop="createTime" width="160">
+        <template slot-scope="scope">
+          <span>{{ parseTime(scope.row.updateTime) }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
@@ -156,7 +156,7 @@
     <pagination
       v-show="total>0"
       :total="total"
-      :page.sync="queryParams.pageNum"
+      :page.sync="queryParams.pageNo"
       :limit.sync="queryParams.pageSize"
       @pagination="getList"
     />
@@ -178,12 +178,15 @@
 </template>
 
 <script>
-import { listTable, previewTable, delTable, genCode, synchDb } from "@/api/tool/gen";
+import { previewTable, delTable, genCode, synchDb } from "@/api/tool/gen";
+import { getCodeGenTablePage } from "@/api/tool/codegen";
+
 import importTable from "./importTable";
 import { downLoadZip } from "@/utils/zipdownload";
 // 代码高亮插件
 import hljs from "highlight.js/lib/highlight";
 import "highlight.js/styles/github-gist.css";
+import {list} from "@/api/system/loginlog";
 hljs.registerLanguage("java", require("highlight.js/lib/languages/java"));
 hljs.registerLanguage("xml", require("highlight.js/lib/languages/xml"));
 hljs.registerLanguage("html", require("highlight.js/lib/languages/xml"));
@@ -200,14 +203,8 @@ export default {
       loading: true,
       // 唯一标识符
       uniqueId: "",
-      // 选中数组
-      ids: [],
       // 选中表数组
       tableNames: [],
-      // 非单个禁用
-      single: true,
-      // 非多个禁用
-      multiple: true,
       // 显示搜索条件
       showSearch: true,
       // 总条数
@@ -218,7 +215,7 @@ export default {
       dateRange: "",
       // 查询参数
       queryParams: {
-        pageNum: 1,
+        pageNo: 1,
         pageSize: 10,
         tableName: undefined,
         tableComment: undefined
@@ -237,7 +234,7 @@ export default {
   },
   activated() {
     const time = this.$route.query.t;
-    if (time != null && time != this.uniqueId) {
+    if (time != null && time !== this.uniqueId) {
       this.uniqueId = time;
       this.resetQuery();
     }
@@ -246,22 +243,25 @@ export default {
     /** 查询表集合 */
     getList() {
       this.loading = true;
-      listTable(this.addDateRange(this.queryParams, this.dateRange)).then(response => {
-          this.tableList = response.rows;
-          this.total = response.total;
-          this.loading = false;
-        }
+      getCodeGenTablePage(this.addDateRange(this.queryParams, [
+        this.dateRange[0] ? this.dateRange[0] + ' 00:00:00' : undefined,
+        this.dateRange[1] ? this.dateRange[1] + ' 23:59:59' : undefined,
+      ], 'CreateTime')).then(response => {
+            this.tableList = response.data.list;
+            this.total = response.data.total;
+            this.loading = false;
+          }
       );
     },
     /** 搜索按钮操作 */
     handleQuery() {
-      this.queryParams.pageNum = 1;
+      this.queryParams.pageNo = 1;
       this.getList();
     },
     /** 生成代码操作 */
     handleGenTable(row) {
       const tableNames = row.tableName || this.tableNames;
-      if (tableNames == "") {
+      if (tableNames === "") {
         this.msgError("请选择要生成的数据");
         return;
       }
@@ -310,16 +310,9 @@ export default {
       const result = hljs.highlight(language, code || "", true);
       return result.value || '&nbsp;';
     },
-    // 多选框选中数据
-    handleSelectionChange(selection) {
-      this.ids = selection.map(item => item.tableId);
-      this.tableNames = selection.map(item => item.tableName);
-      this.single = selection.length != 1;
-      this.multiple = !selection.length;
-    },
     /** 修改按钮操作 */
     handleEditTable(row) {
-      const tableId = row.tableId || this.ids[0];
+      const tableId = row.id;
       this.$router.push("/gen/edit/" + tableId);
     },
     /** 删除按钮操作 */

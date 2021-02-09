@@ -2,11 +2,10 @@
   <el-card>
     <el-tabs v-model="activeName">
       <el-tab-pane label="基本信息" name="basic">
-        <basic-info-form ref="basicInfo" :info="info" />
+        <basic-info-form ref="basicInfo" :info="table" />
       </el-tab-pane>
       <el-tab-pane label="字段信息" name="cloum">
-        <el-table ref="dragTable" :data="cloumns" row-key="columnId" :max-height="tableHeight">
-          <el-table-column label="序号" type="index" min-width="5%" class-name="allowDrag" />
+        <el-table ref="dragTable" :data="columns" row-key="columnId" :max-height="tableHeight">
           <el-table-column
             label="字段列名"
             prop="columnName"
@@ -41,44 +40,43 @@
               <el-input v-model="scope.row.javaField"></el-input>
             </template>
           </el-table-column>
-
-          <el-table-column label="插入" min-width="5%">
+          <el-table-column label="插入" min-width="4%">
             <template slot-scope="scope">
-              <el-checkbox true-label="1" v-model="scope.row.isInsert"></el-checkbox>
+              <el-checkbox true-label="true" false-label="false" v-model="scope.row.createOperation"></el-checkbox>
             </template>
           </el-table-column>
-          <el-table-column label="编辑" min-width="5%">
+          <el-table-column label="编辑" min-width="4%">
             <template slot-scope="scope">
-              <el-checkbox true-label="1" v-model="scope.row.isEdit"></el-checkbox>
+              <el-checkbox true-label="true" false-label="false" v-model="scope.row.updateOperation"></el-checkbox>
             </template>
           </el-table-column>
-          <el-table-column label="列表" min-width="5%">
+          <el-table-column label="列表" min-width="4%">
             <template slot-scope="scope">
-              <el-checkbox true-label="1" v-model="scope.row.isList"></el-checkbox>
+              <el-checkbox true-label="true" false-label="false" v-model="scope.row.listOperationResult"></el-checkbox>
             </template>
           </el-table-column>
-          <el-table-column label="查询" min-width="5%">
+          <el-table-column label="查询" min-width="4%">
             <template slot-scope="scope">
-              <el-checkbox true-label="1" v-model="scope.row.isQuery"></el-checkbox>
+              <el-checkbox true-label="true" false-label="false" v-model="scope.row.listOperation"></el-checkbox>
             </template>
           </el-table-column>
           <el-table-column label="查询方式" min-width="10%">
             <template slot-scope="scope">
-              <el-select v-model="scope.row.queryType">
-                <el-option label="=" value="EQ" />
-                <el-option label="!=" value="NE" />
-                <el-option label=">" value="GT" />
-                <el-option label=">=" value="GTE" />
-                <el-option label="<" value="LT" />
-                <el-option label="<=" value="LTE" />
+              <el-select v-model="scope.row.listOperationCondition">
+                <el-option label="=" value="=" />
+                <el-option label="!=" value="!=" />
+                <el-option label=">" value=">" />
+                <el-option label=">=" value=">=" />
+                <el-option label="<" value="<>" />
+                <el-option label="<=" value="<=" />
                 <el-option label="LIKE" value="LIKE" />
                 <el-option label="BETWEEN" value="BETWEEN" />
               </el-select>
             </template>
           </el-table-column>
-          <el-table-column label="必填" min-width="5%">
+          <el-table-column label="允许空" min-width="5%">
             <template slot-scope="scope">
-              <el-checkbox true-label="1" v-model="scope.row.isRequired"></el-checkbox>
+              <el-checkbox true-label="true" false-label="false" v-model="scope.row.nullable"></el-checkbox>
             </template>
           </el-table-column>
           <el-table-column label="显示类型" min-width="12%">
@@ -110,10 +108,15 @@
               </el-select>
             </template>
           </el-table-column>
+          <el-table-column label="示例" min-width="10%">
+            <template slot-scope="scope">
+              <el-input v-model="scope.row.example"></el-input>
+            </template>
+          </el-table-column>
         </el-table>
       </el-tab-pane>
       <el-tab-pane label="生成信息" name="genInfo">
-        <gen-info-form ref="genInfo" :info="info" :tables="tables" :menus="menus"/>
+        <gen-info-form ref="genInfo" :info="table" :tables="tables" :menus="menus"/>
       </el-tab-pane>
     </el-tabs>
     <el-form label-width="100px">
@@ -125,7 +128,8 @@
   </el-card>
 </template>
 <script>
-import { getGenTable, updateGenTable } from "@/api/tool/gen";
+import { updateGenTable } from "@/api/tool/gen";
+import { getCodeGenDetail } from "@/api/tool/codegen";
 import { optionselect as getDictOptionselect } from "@/api/system/dict/type";
 import { listMenu as getMenuTreeselect } from "@/api/system/menu";
 import basicInfoForm from "./basicInfoForm";
@@ -147,23 +151,22 @@ export default {
       // 表信息
       tables: [],
       // 表列信息
-      cloumns: [],
+      columns: [],
       // 字典信息
       dictOptions: [],
       // 菜单信息
       menus: [],
       // 表详细信息
-      info: {}
+      table: {}
     };
   },
   created() {
     const tableId = this.$route.params && this.$route.params.tableId;
     if (tableId) {
       // 获取表详细信息
-      getGenTable(tableId).then(res => {
-        this.cloumns = res.data.rows;
-        this.info = res.data.info;
-        this.tables = res.data.tables;
+      getCodeGenDetail(tableId).then(res => {
+        this.table = res.data.table;
+        this.columns = res.data.columns;
       });
       /** 查询字典下拉列表 */
       getDictOptionselect().then(response => {
@@ -184,7 +187,7 @@ export default {
         const validateResult = res.every(item => !!item);
         if (validateResult) {
           const genTable = Object.assign({}, basicForm.model, genForm.model);
-          genTable.columns = this.cloumns;
+          genTable.columns = this.columns;
           genTable.params = {
             treeCode: genTable.treeCode,
             treeName: genTable.treeName,
@@ -220,10 +223,10 @@ export default {
     const sortable = Sortable.create(el, {
       handle: ".allowDrag",
       onEnd: evt => {
-        const targetRow = this.cloumns.splice(evt.oldIndex, 1)[0];
-        this.cloumns.splice(evt.newIndex, 0, targetRow);
-        for (let index in this.cloumns) {
-          this.cloumns[index].sort = parseInt(index) + 1;
+        const targetRow = this.columns.splice(evt.oldIndex, 1)[0];
+        this.columns.splice(evt.newIndex, 0, targetRow);
+        for (let index in this.columns) {
+          this.columns[index].sort = parseInt(index) + 1;
         }
       }
     });

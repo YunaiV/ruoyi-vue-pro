@@ -18,8 +18,8 @@
         </el-form-item>
       </el-col>
       <el-col :span="12">
-        <el-form-item label="作者" prop="functionAuthor">
-          <el-input placeholder="请输入" v-model="info.functionAuthor" />
+        <el-form-item label="作者" prop="author">
+          <el-input placeholder="请输入" v-model="info.author" />
         </el-form-item>
       </el-col>
       <el-col :span="24">
@@ -51,7 +51,7 @@ export default {
         className: [
           { required: true, message: "请输入实体类名称", trigger: "blur" }
         ],
-        functionAuthor: [
+        author: [
           { required: true, message: "请输入作者", trigger: "blur" }
         ]
       }

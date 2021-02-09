@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
@@ -14,6 +15,7 @@ import static cn.iocoder.dashboard.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOU
 @ApiModel("参数配置分页 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
 public class InfConfigPageReqVO extends PageParam {
 
     @ApiModelProperty(value = "参数名称", example = "模糊匹配")

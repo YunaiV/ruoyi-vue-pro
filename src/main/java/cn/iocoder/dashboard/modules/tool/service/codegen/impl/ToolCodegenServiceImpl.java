@@ -1,6 +1,8 @@
 package cn.iocoder.dashboard.modules.tool.service.codegen.impl;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.iocoder.dashboard.common.pojo.PageResult;
+import cn.iocoder.dashboard.modules.tool.controller.codegen.vo.ToolCodegenTablePageReqVO;
 import cn.iocoder.dashboard.modules.tool.dal.mysql.dao.coegen.ToolCodegenColumnMapper;
 import cn.iocoder.dashboard.modules.tool.dal.mysql.dao.coegen.ToolCodegenTableMapper;
 import cn.iocoder.dashboard.modules.tool.dal.mysql.dao.coegen.ToolInformationSchemaColumnMapper;
@@ -65,6 +67,21 @@ public class ToolCodegenServiceImpl implements ToolCodegenService {
             codegenColumnMapper.insert(column); // TODO 批量插入
         });
         return table.getId();
+    }
+
+    @Override
+    public PageResult<ToolCodegenTableDO> getCodeGenTablePage(ToolCodegenTablePageReqVO pageReqVO) {
+        return codegenTableMapper.selectPage(pageReqVO);
+    }
+
+    @Override
+    public ToolCodegenTableDO getCodeGenTablePage(Long id) {
+        return codegenTableMapper.selectById(id);
+    }
+
+    @Override
+    public List<ToolCodegenColumnDO> getCodegenColumnListByTableId(Long tableId) {
+        return codegenColumnMapper.selectListByTableId(tableId);
     }
 
 }

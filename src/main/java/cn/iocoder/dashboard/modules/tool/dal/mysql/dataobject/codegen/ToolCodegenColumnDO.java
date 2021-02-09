@@ -15,7 +15,7 @@ import lombok.EqualsAndHashCode;
  *
  * @author 芋道源码
  */
-@TableName(value = "tool_codegen_table_column", autoResultMap = true)
+@TableName(value = "tool_codegen_column", autoResultMap = true)
 @Data
 @Builder
 @EqualsAndHashCode(callSuper = true)
@@ -60,7 +60,7 @@ public class ToolCodegenColumnDO extends BaseDO {
      */
     private Boolean autoIncrement;
     /**
-     * 排序字段
+     * 排序
      */
     private Integer ordinalPosition;
 
@@ -121,6 +121,5 @@ public class ToolCodegenColumnDO extends BaseDO {
      * 枚举 {@link ToolCodegenColumnHtmlTypeEnum}
      */
     private String htmlType;
-
 
 }

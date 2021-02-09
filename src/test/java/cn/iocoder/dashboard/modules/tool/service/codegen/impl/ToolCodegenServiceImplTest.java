@@ -16,7 +16,9 @@ class ToolCodegenServiceImplTest {
 
     @Test
     public void tetCreateCodegenTable() {
-        toolCodegenService.createCodegenTable("sys_test_demo");
+//        toolCodegenService.createCodegenTable("sys_test_demo");
+//        toolCodegenService.createCodegenTable("tool_codegen_table");
+        toolCodegenService.createCodegenTable("tool_codegen_column");
     }
 
 }

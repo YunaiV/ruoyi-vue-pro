@@ -10,7 +10,7 @@ import java.util.List;
 @Mapper
 public interface ToolCodegenColumnMapper extends BaseMapperX<ToolCodegenColumnDO> {
 
-    default List<ToolCodegenColumnDO> selectByTableId(Long tableId) {
+    default List<ToolCodegenColumnDO> selectListByTableId(Long tableId) {
         return selectList(new QueryWrapper<ToolCodegenColumnDO>()
                 .eq("table_id", tableId)
                 .orderByAsc("ordinal_position"));

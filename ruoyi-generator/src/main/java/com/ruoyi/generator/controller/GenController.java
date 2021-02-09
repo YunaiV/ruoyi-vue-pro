@@ -37,36 +37,6 @@ import com.ruoyi.generator.service.IGenTableService;
 @RestController
 @RequestMapping("/tool/gen")
 public class GenController extends BaseController {
-    @Autowired
-    private IGenTableService genTableService;
-
-    @Autowired
-    private IGenTableColumnService genTableColumnService;
-
-    /**
-     * 查询代码生成列表
-     */
-    @PreAuthorize("@ss.hasPermi('tool:gen:list')")
-    @GetMapping("/list")
-    public TableDataInfo genList(GenTable genTable) {
-        startPage();
-        List<GenTable> list = genTableService.selectGenTableList(genTable);
-        return getDataTable(list);
-    }
-
-    /**
-     * 修改代码生成业务
-     */
-    @PreAuthorize("@ss.hasPermi('tool:gen:query')")
-    @GetMapping(value = "/{talbleId}")
-    public AjaxResult getInfo(@PathVariable Long talbleId) {
-        GenTable table = genTableService.selectGenTableById(talbleId);
-        List<GenTableColumn> list = genTableColumnService.selectGenTableColumnListByTableId(talbleId);
-        Map<String, Object> map = new HashMap<String, Object>();
-        map.put("info", table);
-        map.put("rows", list);
-        return AjaxResult.success(map);
-    }
 
     /**
      * 查询数据库列表

@@ -95,12 +95,12 @@ public class ToolCodegenEngine {
 //        String result = templateEngine.getTemplate("codegen/controller/vo/baseVO.vm").render(bindingMap);
 //        String result = templateEngine.getTemplate("codegen/controller/vo/createReqVO.vm").render(bindingMap);
 //        String result = templateEngine.getTemplate("codegen/controller/vo/updateReqVO.vm").render(bindingMap);
-//        String result = templateEngine.getTemplate("codegen/controller/vo/respVO.vm").render(bindingMap);
+        String result = templateEngine.getTemplate("codegen/controller/vo/respVO.vm").render(bindingMap);
 //        String result = templateEngine.getTemplate("codegen/convert/convert.vm").render(bindingMap);
 //        String result = templateEngine.getTemplate("codegen/enums/errorcode.vm").render(bindingMap);
 //        String result = templateEngine.getTemplate("codegen/service/service.vm").render(bindingMap);
 //        String result = templateEngine.getTemplate("codegen/service/serviceImpl.vm").render(bindingMap);
-        String result = templateEngine.getTemplate("codegen/controller/controller.vm").render(bindingMap);
+//        String result = templateEngine.getTemplate("codegen/controller/controller.vm").render(bindingMap);
         System.out.println(result);
     }
 
