@@ -4,6 +4,7 @@ import cn.hutool.extra.template.TemplateConfig;
 import cn.hutool.extra.template.TemplateEngine;
 import cn.hutool.extra.template.TemplateUtil;
 import cn.iocoder.dashboard.common.exception.util.ServiceExceptionUtil;
+import cn.iocoder.dashboard.common.pojo.CommonResult;
 import cn.iocoder.dashboard.common.pojo.PageParam;
 import cn.iocoder.dashboard.common.pojo.PageResult;
 import cn.iocoder.dashboard.framework.mybatis.core.dataobject.BaseDO;
@@ -58,6 +59,7 @@ public class ToolCodegenEngine {
         // 全局配置
         globalBindingMap.put("basePackage", "cn.iocoder.dashboard.modules"); // TODO 基础包, 抽成参数
         // 全局 Java Bean
+        globalBindingMap.put("CommonResultClassName", CommonResult.class.getName());
         globalBindingMap.put("PageResultClassName", PageResult.class.getName());
         globalBindingMap.put("DateUtilsClassName", DateUtils.class.getName());
         globalBindingMap.put("ServiceExceptionUtilClassName", ServiceExceptionUtil.class.getName());
@@ -76,6 +78,7 @@ public class ToolCodegenEngine {
         bindingMap.put("table", table);
         bindingMap.put("columns", columns);
         bindingMap.put("primaryColumn", CollectionUtils.findFirst(columns, ToolCodegenColumnDO::getPrimaryKey)); // 主键字段
+        // moduleName 相关
         String simpleModuleName = codegenBuilder.getSimpleModuleName(table.getModuleName());
         bindingMap.put("simpleModuleName", simpleModuleName); // 将 system 转成 sys
         // className 相关
@@ -84,6 +87,7 @@ public class ToolCodegenEngine {
         bindingMap.put("simpleClassName", simpleClassName);
         bindingMap.put("simpleClassName_underlineCase", toUnderlineCase(simpleClassName)); // 将 DictType 转换成 dict_type
         bindingMap.put("classNameVar", lowerFirst(simpleClassName)); // 将 DictType 转换成 dictType，用于变量
+        bindingMap.put("simpleClassName_strikeCase", toSymbolCase(simpleClassName, '-')); // 将 DictType 转换成 dict-type
         // 执行生成
 //        String result = templateEngine.getTemplate("codegen/dal/do.vm").render(bindingMap);
 //        String result = templateEngine.getTemplate("codegen/dal/mapper.vm").render(bindingMap);
@@ -95,7 +99,8 @@ public class ToolCodegenEngine {
 //        String result = templateEngine.getTemplate("codegen/convert/convert.vm").render(bindingMap);
 //        String result = templateEngine.getTemplate("codegen/enums/errorcode.vm").render(bindingMap);
 //        String result = templateEngine.getTemplate("codegen/service/service.vm").render(bindingMap);
-        String result = templateEngine.getTemplate("codegen/service/serviceImpl.vm").render(bindingMap);
+//        String result = templateEngine.getTemplate("codegen/service/serviceImpl.vm").render(bindingMap);
+        String result = templateEngine.getTemplate("codegen/controller/controller.vm").render(bindingMap);
         System.out.println(result);
     }
 
