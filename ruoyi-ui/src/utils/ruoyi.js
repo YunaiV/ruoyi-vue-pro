@@ -116,6 +116,21 @@ export function downloadExcel(data, fileName) {
   window.URL.revokeObjectURL(href);
 }
 
+// 下载 Zip 方法
+export function downloadZip(data, fileName) {
+  // 创建 blob
+  let blob = new Blob([data], {type: 'application/zip'});
+  // 创建 href 超链接，点击进行下载
+  window.URL = window.URL || window.webkitURL;
+  let href = URL.createObjectURL(blob);
+  let downA = document.createElement("a");
+  downA.href =  href;
+  downA.download = fileName;
+  downA.click();
+  // 销毁超连接
+  window.URL.revokeObjectURL(href);
+}
+
 // 字符串格式化(%s )
 export function sprintf(str) {
 	var args = arguments, flag = true, i = 1;

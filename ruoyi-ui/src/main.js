@@ -16,7 +16,17 @@ import './assets/icons' // icon
 import './permission' // permission control
 import { getDicts } from "@/api/system/dict/data";
 import { getConfigKey } from "@/api/infra/config";
-import { parseTime, resetForm, addDateRange, selectDictLabel, selectDictLabels, download, handleTree, downloadExcel } from "@/utils/ruoyi";
+import {
+  parseTime,
+  resetForm,
+  addDateRange,
+  selectDictLabel,
+  selectDictLabels,
+  download,
+  handleTree,
+  downloadExcel,
+  downloadZip
+} from "@/utils/ruoyi";
 import Pagination from "@/components/Pagination";
 // 自定义表格工具扩展
 import RightToolbar from "@/components/RightToolbar"
@@ -38,6 +48,7 @@ Vue.prototype.getDictDataLabel = getDictDataLabel
 Vue.prototype.DICT_TYPE = DICT_TYPE
 Vue.prototype.download = download
 Vue.prototype.downloadExcel = downloadExcel
+Vue.prototype.downloadZip = downloadZip
 Vue.prototype.handleTree = handleTree
 
 Vue.prototype.msgSuccess = function (msg) {

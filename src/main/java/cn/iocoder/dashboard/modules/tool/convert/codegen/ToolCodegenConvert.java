@@ -1,9 +1,10 @@
 package cn.iocoder.dashboard.modules.tool.convert.codegen;
 
 import cn.iocoder.dashboard.common.pojo.PageResult;
+import cn.iocoder.dashboard.modules.tool.controller.codegen.vo.ToolCodegenDetailRespVO;
+import cn.iocoder.dashboard.modules.tool.controller.codegen.vo.ToolCodegenPreviewRespVO;
 import cn.iocoder.dashboard.modules.tool.controller.codegen.vo.ToolCodegenUpdateReqVO;
 import cn.iocoder.dashboard.modules.tool.controller.codegen.vo.column.ToolCodegenColumnRespVO;
-import cn.iocoder.dashboard.modules.tool.controller.codegen.vo.ToolCodegenDetailRespVO;
 import cn.iocoder.dashboard.modules.tool.controller.codegen.vo.table.ToolCodegenTableRespVO;
 import cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen.ToolCodegenColumnDO;
 import cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen.ToolCodegenTableDO;
@@ -13,6 +14,8 @@ import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Mapper
 public interface ToolCodegenConvert {
@@ -50,6 +53,15 @@ public interface ToolCodegenConvert {
         respVO.setTable(convert(table));
         respVO.setColumns(convertList02(columns));
         return respVO;
+    }
+
+    default List<ToolCodegenPreviewRespVO> convert(Map<String, String> codes) {
+        return codes.entrySet().stream().map(entry -> {
+            ToolCodegenPreviewRespVO respVO = new ToolCodegenPreviewRespVO();
+            respVO.setFilePath(entry.getKey());
+            respVO.setCode(entry.getValue());
+            return respVO;
+        }).collect(Collectors.toList());
     }
 
 }

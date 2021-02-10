@@ -72,7 +72,7 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
         return ${classNameVar}Mapper.selectBatchIds(ids);
     }
 
-	@Override
+    @Override
     public PageResult<${table.className}DO> get${simpleClassName}Page(${table.className}PageReqVO pageReqVO) {
 		return ${classNameVar}Mapper.selectPage(pageReqVO);
     }

@@ -7,6 +7,7 @@ import cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen.ToolCodegenColum
 import cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen.ToolCodegenTableDO;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 代码生成 Service 接口
@@ -53,5 +54,13 @@ public interface ToolCodegenService {
      * @return 字段定义数组
      */
     List<ToolCodegenColumnDO> getCodegenColumnListByTableId(Long tableId);
+
+    /**
+     * 执行指定表的代码生成
+     *
+     * @param tableId 表编号
+     * @return 生成结果。key 为文件路径，value 为对应的代码内容
+     */
+    Map<String, String> generationCodes(Long tableId);
 
 }

@@ -21,6 +21,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -42,7 +43,7 @@ public class ToolCodegenEngine {
      * key：模板在 resources 的地址
      * value：生成的路径
      */
-    private static final Map<String, String> TEMPLATES = MapUtil.<String, String>builder()
+    private static final Map<String, String> TEMPLATES = MapUtil.<String, String>builder(new LinkedHashMap<>()) // 有序
             // Java
             .put("codegen/java/controller/controller.vm", "java/${basePackage}/${table.moduleName}/controller/${table.businessName}/${table.className}Controller.java")
             .put("codegen/java/controller/vo/baseVO.vm", "java/${basePackage}/${table.moduleName}/controller/${table.businessName}/vo/${table.className}BaseVO.java")
@@ -53,7 +54,7 @@ public class ToolCodegenEngine {
             .put("codegen/java/convert/convert.vm", "java/${basePackage}/${table.moduleName}/convert/${table.businessName}/${table.className}Convert.java")
             .put("codegen/java/dal/do.vm", "java/${basePackage}/${table.moduleName}/dal/dataobject/${table.businessName}/${table.className}DO.java")
             .put("codegen/java/dal/mapper.vm", "java/${basePackage}/${table.moduleName}/dal/mysql/${table.businessName}/${table.className}Mapper.java")
-            .put("codegen/java/enums/errorcode.vm", "java/${basePackage}.${table.moduleName}.enums.${simpleModuleName_upperFirst}ErrorCodeConstants.java")
+            .put("codegen/java/enums/errorcode.vm", "java/${basePackage}/${table.moduleName}/enums/${simpleModuleName_upperFirst}ErrorCodeConstants.java")
             .put("codegen/java/service/service.vm", "java/${basePackage}/${table.moduleName}/service/${table.businessName}/${table.className}Service.java")
             .put("codegen/java/service/serviceImpl.vm", "java/${basePackage}/${table.moduleName}/service/${table.businessName}/impl/${table.className}ServiceImpl.java")
             // Vue
@@ -117,7 +118,7 @@ public class ToolCodegenEngine {
         bindingMap.put("simpleClassName_strikeCase", toSymbolCase(simpleClassName, '-')); // 将 DictType 转换成 dict-type
 
         // 执行生成
-        final Map<String, String> result = Maps.newHashMapWithExpectedSize(TEMPLATES.size());
+        final Map<String, String> result = Maps.newLinkedHashMapWithExpectedSize(TEMPLATES.size()); // 有序
         TEMPLATES.forEach((vmPath, filePath) -> {
             filePath = formatFilePath(filePath, bindingMap);
             String content = templateEngine.getTemplate(vmPath).render(bindingMap);

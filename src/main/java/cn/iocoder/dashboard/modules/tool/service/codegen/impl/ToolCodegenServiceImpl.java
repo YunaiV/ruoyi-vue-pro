@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 代码生成 Service 实现类
@@ -100,6 +101,22 @@ public class ToolCodegenServiceImpl implements ToolCodegenService {
     @Override
     public List<ToolCodegenColumnDO> getCodegenColumnListByTableId(Long tableId) {
         return codegenColumnMapper.selectListByTableId(tableId);
+    }
+
+    @Override
+    public Map<String, String> generationCodes(Long tableId) {
+        // 校验是否已经存在
+        ToolCodegenTableDO table = codegenTableMapper.selectById(tableId);
+        if (codegenTableMapper.selectById(tableId) == null) {
+            throw new RuntimeException(""); // TODO
+        }
+        List<ToolCodegenColumnDO> columns = codegenColumnMapper.selectListByTableId(tableId);
+        if (CollUtil.isEmpty(columns)) {
+            throw new RuntimeException(""); // TODO
+        }
+
+        // 执行生成
+        return codegenEngine.execute(table, columns);
     }
 
 }

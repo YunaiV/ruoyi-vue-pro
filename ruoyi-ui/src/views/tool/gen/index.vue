@@ -39,70 +39,18 @@
 
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
-        <el-button
-          type="primary"
-          plain
-          icon="el-icon-download"
-          size="mini"
-          @click="handleGenTable"
-          v-hasPermi="['tool:gen:code']"
-        >生成</el-button>
+        <el-button type="primary" plain icon="el-icon-download" size="mini" @click="handleGenTable" v-hasPermi="['tool:gen:code']">生成</el-button>
       </el-col>
       <el-col :span="1.5">
-        <el-button
-          type="info"
-          plain
-          icon="el-icon-upload"
-          size="mini"
-          @click="openImportTable"
-          v-hasPermi="['tool:gen:import']"
-        >导入</el-button>
-      </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="success"
-          plain
-          icon="el-icon-edit"
-          size="mini"
-          @click="handleEditTable"
-          v-hasPermi="['tool:gen:edit']"
-        >修改</el-button>
-      </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="danger"
-          plain
-          icon="el-icon-delete"
-          size="mini"
-          @click="handleDelete"
-          v-hasPermi="['tool:gen:remove']"
-        >删除</el-button>
+        <el-button type="info" plain icon="el-icon-upload" size="mini" @click="openImportTable" v-hasPermi="['tool:gen:import']">导入</el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
     <el-table v-loading="loading" :data="tableList">
-      <el-table-column
-        label="表名称"
-        align="center"
-        prop="tableName"
-        :show-overflow-tooltip="true"
-        width="120"
-      />
-      <el-table-column
-        label="表描述"
-        align="center"
-        prop="tableComment"
-        :show-overflow-tooltip="true"
-        width="120"
-      />
-      <el-table-column
-        label="实体"
-        align="center"
-        prop="className"
-        :show-overflow-tooltip="true"
-        width="120"
-      />
+      <el-table-column label="表名称" align="center" prop="tableName" :show-overflow-tooltip="true" width="200"/>
+      <el-table-column label="表描述" align="center" prop="tableComment" :show-overflow-tooltip="true" width="120"/>
+      <el-table-column label="实体" align="center" prop="className" :show-overflow-tooltip="true" width="200"/>
       <el-table-column label="创建时间" align="center" prop="createTime" width="160">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
@@ -115,61 +63,20 @@
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-          <el-button
-            type="text"
-            size="small"
-            icon="el-icon-view"
-            @click="handlePreview(scope.row)"
-            v-hasPermi="['tool:gen:preview']"
-          >预览</el-button>
-          <el-button
-            type="text"
-            size="small"
-            icon="el-icon-edit"
-            @click="handleEditTable(scope.row)"
-            v-hasPermi="['tool:gen:edit']"
-          >编辑</el-button>
-          <el-button
-            type="text"
-            size="small"
-            icon="el-icon-delete"
-            @click="handleDelete(scope.row)"
-            v-hasPermi="['tool:gen:remove']"
-          >删除</el-button>
-          <el-button
-            type="text"
-            size="small"
-            icon="el-icon-refresh"
-            @click="handleSynchDb(scope.row)"
-            v-hasPermi="['tool:gen:edit']"
-          >同步</el-button>
-          <el-button
-            type="text"
-            size="small"
-            icon="el-icon-download"
-            @click="handleGenTable(scope.row)"
-            v-hasPermi="['tool:gen:code']"
-          >生成代码</el-button>
+          <el-button type="text" size="small" icon="el-icon-view" @click="handlePreview(scope.row)" v-hasPermi="['tool:gen:preview']">预览</el-button>
+          <el-button type="text" size="small" icon="el-icon-edit" @click="handleEditTable(scope.row)" v-hasPermi="['tool:gen:edit']">编辑</el-button>
+          <el-button type="text" size="small" icon="el-icon-delete" @click="handleDelete(scope.row)" v-hasPermi="['tool:gen:remove']">删除</el-button>
+          <el-button type="text" size="small" icon="el-icon-refresh" @click="handleSynchDb(scope.row)" v-hasPermi="['tool:gen:edit']">同步</el-button>
+          <el-button type="text" size="small" icon="el-icon-download" @click="handleGenTable(scope.row)" v-hasPermi="['tool:gen:code']">生成代码</el-button>
         </template>
       </el-table-column>
     </el-table>
-    <pagination
-      v-show="total>0"
-      :total="total"
-      :page.sync="queryParams.pageNo"
-      :limit.sync="queryParams.pageSize"
-      @pagination="getList"
-    />
+    <pagination v-show="total>0" :total="total" :page.sync="queryParams.pageNo" :limit.sync="queryParams.pageSize" @pagination="getList"/>
     <!-- 预览界面 -->
     <el-dialog :title="preview.title" :visible.sync="preview.open" width="80%" top="5vh" append-to-body>
-      <el-tabs v-model="preview.activeName">
-        <el-tab-pane
-          v-for="(value, key) in preview.data"
-          :label="key.substring(key.lastIndexOf('/')+1,key.indexOf('.vm'))"
-          :name="key.substring(key.lastIndexOf('/')+1,key.indexOf('.vm'))"
-          :key="key"
-        >
-        <pre><code class="hljs" v-html="highlightedCode(value, key)"></code></pre>
+      <el-tabs tab-position="left" v-model="preview.activeName">
+        <el-tab-pane v-for="item in preview.data" :label="item.filePath.substring(item.filePath.lastIndexOf('/') + 1)" :name="item.filePath" :key="item.filePath">
+          <pre><code class="hljs" v-html="highlightedCode(item)"></code></pre>
         </el-tab-pane>
       </el-tabs>
     </el-dialog>
@@ -179,7 +86,7 @@
 
 <script>
 import { previewTable, delTable, genCode, synchDb } from "@/api/tool/gen";
-import { getCodeGenTablePage } from "@/api/tool/codegen";
+import { getCodeGenTablePage, previewCodegen, } from "@/api/tool/codegen";
 
 import importTable from "./importTable";
 import { downLoadZip } from "@/utils/zipdownload";
@@ -260,18 +167,20 @@ export default {
     },
     /** 生成代码操作 */
     handleGenTable(row) {
-      const tableNames = row.tableName || this.tableNames;
-      if (tableNames === "") {
-        this.msgError("请选择要生成的数据");
-        return;
-      }
-      if(row.genType === "1") {
-        genCode(row.tableName).then(response => {
-          this.msgSuccess("成功生成到自定义路径：" + row.genPath);
-        });
-      } else {
-        downLoadZip("/tool/gen/batchGenCode?tables=" + tableNames, "ruoyi");
-      }
+      // const tableNames = row.tableName || this.tableNames;
+      // if (tableNames === "") {
+      //   this.msgError("请选择要生成的数据");
+      //   return;
+      // }
+      // if(row.genType === "1") {
+      //   genCode(row.tableName).then(response => {
+      //     this.msgSuccess("成功生成到自定义路径：" + row.genPath);
+      //   });
+      // } else {
+      //   downLoadZip("/tool/gen/batchGenCode?tables=" + tableNames, "ruoyi");
+      // }
+
+
     },
     /** 同步数据库操作 */
     handleSynchDb(row) {
@@ -298,16 +207,18 @@ export default {
     },
     /** 预览按钮 */
     handlePreview(row) {
-      previewTable(row.tableId).then(response => {
+      previewCodegen(row.id).then(response => {
         this.preview.data = response.data;
+        this.preview.activeName = response.data[0].filePath;
         this.preview.open = true;
       });
     },
     /** 高亮显示 */
-    highlightedCode(code, key) {
-      const vmName = key.substring(key.lastIndexOf("/") + 1, key.indexOf(".vm"));
-      var language = vmName.substring(vmName.indexOf(".") + 1, vmName.length);
-      const result = hljs.highlight(language, code || "", true);
+    highlightedCode(item) {
+      // const vmName = key.substring(key.lastIndexOf("/") + 1, key.indexOf(".vm"));
+      // var language = vmName.substring(vmName.indexOf(".") + 1, vmName.length);
+      var language = item.filePath.substring(item.filePath.lastIndexOf(".") + 1);
+      const result = hljs.highlight(language, item.code || "", true);
       return result.value || '&nbsp;';
     },
     /** 修改按钮操作 */

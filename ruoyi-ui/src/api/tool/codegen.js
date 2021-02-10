@@ -25,3 +25,20 @@ export function updateCodegen(data) {
     data: data
   })
 }
+
+// 预览生成代码
+export function previewCodegen(tableId) {
+  return request({
+    url: '/tool/codegen/preview?tableId=' + tableId,
+    method: 'get'
+  })
+}
+
+// 下载生成代码
+export function downloadCodegen(tableId) {
+  return request({
+    url: '/tool/codegen/download?tableId=' + tableId,
+    method: 'get',
+    responseType: 'blob'
+  })
+}

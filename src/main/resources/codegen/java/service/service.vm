@@ -57,6 +57,6 @@ public interface ${table.className}Service {
      * @param pageReqVO 分页查询
      * @return ${table.classComment}分页
      */
-	PageResult<${table.className}DO> get${simpleClassName}Page(${table.className}PageReqVO pageReqVO);
+    PageResult<${table.className}DO> get${simpleClassName}Page(${table.className}PageReqVO pageReqVO);
 
 }
