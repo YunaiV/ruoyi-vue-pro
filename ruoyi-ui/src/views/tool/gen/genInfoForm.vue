@@ -4,31 +4,34 @@
       <el-col :span="12">
         <el-form-item prop="tplCategory">
           <span slot="label">生成模板</span>
-          <el-select v-model="info.tplCategory" @change="tplSelectChange">
-            <el-option label="单表（增删改查）" value="crud" />
-            <el-option label="树表（增删改查）" value="tree" />
-            <el-option label="主子表（增删改查）" value="sub" />
+          <el-select v-model="info.templateType" @change="tplSelectChange">
+            <el-option
+                v-for="dict in this.getDictDatas(DICT_TYPE.TOOL_CODEGEN_TEMPLATE_TYPE)"
+                :key="parseInt(dict.value)"
+                :label="dict.label"
+                :value="parseInt(dict.value)"
+            />
           </el-select>
         </el-form-item>
       </el-col>
 
-      <el-col :span="12">
-        <el-form-item prop="packageName">
-          <span slot="label">
-            生成包路径
-            <el-tooltip content="生成在哪个java包下，例如 com.ruoyi.system" placement="top">
-              <i class="el-icon-question"></i>
-            </el-tooltip>
-          </span>
-          <el-input v-model="info.packageName" />
-        </el-form-item>
-      </el-col>
+<!--      <el-col :span="12">-->
+<!--        <el-form-item prop="packageName">-->
+<!--          <span slot="label">-->
+<!--            生成包路径-->
+<!--            <el-tooltip content="生成在哪个java包下，例如 com.ruoyi.system" placement="top">-->
+<!--              <i class="el-icon-question"></i>-->
+<!--            </el-tooltip>-->
+<!--          </span>-->
+<!--          <el-input v-model="info.packageName" />-->
+<!--        </el-form-item>-->
+<!--      </el-col>-->
 
       <el-col :span="12">
         <el-form-item prop="moduleName">
           <span slot="label">
-            生成模块名
-            <el-tooltip content="可理解为子系统名，例如 system" placement="top">
+            模块名
+            <el-tooltip content="模块名，即一级目录，例如 system、infra、tool 等等" placement="top">
               <i class="el-icon-question"></i>
             </el-tooltip>
           </span>
@@ -39,8 +42,8 @@
       <el-col :span="12">
         <el-form-item prop="businessName">
           <span slot="label">
-            生成业务名
-            <el-tooltip content="可理解为功能英文名，例如 user" placement="top">
+            业务名
+            <el-tooltip content="业务名，即二级目录，例如 user、permission、dict 等等" placement="top">
               <i class="el-icon-question"></i>
             </el-tooltip>
           </span>
@@ -49,14 +52,26 @@
       </el-col>
 
       <el-col :span="12">
-        <el-form-item prop="functionName">
+        <el-form-item prop="className">
           <span slot="label">
-            生成功能名
+            类名称
+            <el-tooltip content="类名称（首字母大写），例如SysUser、SysMenu、SysDictData 等等" placement="top">
+              <i class="el-icon-question"></i>
+            </el-tooltip>
+          </span>
+          <el-input v-model="info.className" />
+        </el-form-item>
+      </el-col>
+
+      <el-col :span="12">
+        <el-form-item prop="classComment">
+          <span slot="label">
+            类描述
             <el-tooltip content="用作类描述，例如 用户" placement="top">
               <i class="el-icon-question"></i>
             </el-tooltip>
           </span>
-          <el-input v-model="info.functionName" />
+          <el-input v-model="info.classComment" />
         </el-form-item>
       </el-col>
 
@@ -76,19 +91,6 @@
             :show-count="true"
             placeholder="请选择系统菜单"
           />
-        </el-form-item>
-      </el-col>
-
-      <el-col :span="12">
-        <el-form-item prop="genType">
-          <span slot="label">
-            生成代码方式
-            <el-tooltip content="默认为zip压缩包下载，也可以自定义生成路径" placement="top">
-              <i class="el-icon-question"></i>
-            </el-tooltip>
-          </span>
-          <el-radio v-model="info.genType" label="0">zip压缩包</el-radio>
-          <el-radio v-model="info.genType" label="1">自定义路径</el-radio>
         </el-form-item>
       </el-col>
 
@@ -238,20 +240,23 @@ export default {
     return {
       subColumns: [],
       rules: {
-        tplCategory: [
+        templateType: [
           { required: true, message: "请选择生成模板", trigger: "blur" }
         ],
-        packageName: [
-          { required: true, message: "请输入生成包路径", trigger: "blur" }
-        ],
+        // packageName: [
+        //   { required: true, message: "请输入生成包路径", trigger: "blur" }
+        // ],
         moduleName: [
           { required: true, message: "请输入生成模块名", trigger: "blur" }
         ],
         businessName: [
           { required: true, message: "请输入生成业务名", trigger: "blur" }
         ],
-        functionName: [
-          { required: true, message: "请输入生成功能名", trigger: "blur" }
+        className: [
+          { required: true, message: "请输入生成类名称", trigger: "blur" }
+        ],
+        classComment: [
+          { required: true, message: "请输入生成类描述", trigger: "blur" }
         ],
       }
     };

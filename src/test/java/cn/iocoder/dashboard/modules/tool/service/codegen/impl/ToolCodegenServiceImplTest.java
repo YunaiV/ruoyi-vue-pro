@@ -6,8 +6,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.annotation.Resource;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 @SpringBootTest(classes = TestApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class ToolCodegenServiceImplTest {
 
@@ -18,7 +16,7 @@ class ToolCodegenServiceImplTest {
     public void tetCreateCodegenTable() {
 //        toolCodegenService.createCodegenTable("sys_test_demo");
 //        toolCodegenService.createCodegenTable("tool_codegen_table");
-        toolCodegenService.createCodegenTable("tool_codegen_column");
+        toolCodegenService.createCodegen("tool_codegen_column");
     }
 
 }

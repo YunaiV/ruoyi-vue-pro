@@ -39,8 +39,8 @@ spring:
       write-durations-as-timestamps: true # 设置 Duration 的格式，使用时间戳
       fail-on-empty-beans: false # 允许序列化无属性的 Bean
 
-  main:
-    lazy-initialization: true # TODO 芋艿：本地开发环境，可以配置下 lazy 延迟加载
+#  main:
+#    lazy-initialization: true # TODO 芋艿：本地开发环境，可以配置下 lazy 延迟加载
 
 # 芋道配置项，设置当前项目所有自定义的配置
 yudao:

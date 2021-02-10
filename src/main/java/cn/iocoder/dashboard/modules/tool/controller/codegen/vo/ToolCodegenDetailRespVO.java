@@ -1,5 +1,7 @@
 package cn.iocoder.dashboard.modules.tool.controller.codegen.vo;
 
+import cn.iocoder.dashboard.modules.tool.controller.codegen.vo.column.ToolCodegenColumnRespVO;
+import cn.iocoder.dashboard.modules.tool.controller.codegen.vo.table.ToolCodegenTableRespVO;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;

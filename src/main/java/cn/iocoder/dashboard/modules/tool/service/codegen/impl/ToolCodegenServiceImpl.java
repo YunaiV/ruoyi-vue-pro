@@ -2,7 +2,9 @@ package cn.iocoder.dashboard.modules.tool.service.codegen.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.dashboard.common.pojo.PageResult;
-import cn.iocoder.dashboard.modules.tool.controller.codegen.vo.ToolCodegenTablePageReqVO;
+import cn.iocoder.dashboard.modules.tool.controller.codegen.vo.ToolCodegenUpdateReqVO;
+import cn.iocoder.dashboard.modules.tool.controller.codegen.vo.table.ToolCodegenTablePageReqVO;
+import cn.iocoder.dashboard.modules.tool.convert.codegen.ToolCodegenConvert;
 import cn.iocoder.dashboard.modules.tool.dal.mysql.coegen.ToolCodegenColumnMapper;
 import cn.iocoder.dashboard.modules.tool.dal.mysql.coegen.ToolCodegenTableMapper;
 import cn.iocoder.dashboard.modules.tool.dal.mysql.coegen.ToolInformationSchemaColumnMapper;
@@ -42,7 +44,7 @@ public class ToolCodegenServiceImpl implements ToolCodegenService {
 
     @Override
     @Transactional
-    public Long createCodegenTable(String tableName) {
+    public Long createCodegen(String tableName) {
         // 从数据库中，获得数据库表结构
         ToolInformationSchemaTableDO schemaTable = informationSchemaTableMapper.selectByTableName(tableName);
         if (schemaTable == null) {
@@ -67,6 +69,22 @@ public class ToolCodegenServiceImpl implements ToolCodegenService {
             codegenColumnMapper.insert(column); // TODO 批量插入
         });
         return table.getId();
+    }
+
+    @Override
+    @Transactional
+    public void updateCodegen(ToolCodegenUpdateReqVO updateReqVO) {
+        // 校验是否已经存在
+        if (codegenTableMapper.selectById(updateReqVO.getTable().getId()) == null) {
+            throw new RuntimeException(""); // TODO
+        }
+
+        // 更新 table 表定义
+        ToolCodegenTableDO updateTableObj = ToolCodegenConvert.INSTANCE.convert(updateReqVO.getTable());
+        codegenTableMapper.updateById(updateTableObj);
+        // 更新 column 字段定义
+        List<ToolCodegenColumnDO> updateColumnObjs = ToolCodegenConvert.INSTANCE.convertList03(updateReqVO.getColumns());
+        updateColumnObjs.forEach(updateColumnObj -> codegenColumnMapper.updateById(updateColumnObj));
     }
 
     @Override

@@ -1,7 +1,8 @@
 package cn.iocoder.dashboard.modules.tool.service.codegen;
 
 import cn.iocoder.dashboard.common.pojo.PageResult;
-import cn.iocoder.dashboard.modules.tool.controller.codegen.vo.ToolCodegenTablePageReqVO;
+import cn.iocoder.dashboard.modules.tool.controller.codegen.vo.ToolCodegenUpdateReqVO;
+import cn.iocoder.dashboard.modules.tool.controller.codegen.vo.table.ToolCodegenTablePageReqVO;
 import cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen.ToolCodegenColumnDO;
 import cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen.ToolCodegenTableDO;
 
@@ -20,7 +21,14 @@ public interface ToolCodegenService {
      * @param tableName 表名称
      * @return 表定义的编号
      */
-    Long createCodegenTable(String tableName);
+    Long createCodegen(String tableName);
+
+    /**
+     * 更新数据库的表和字段定义
+     *
+     * @param updateReqVO 更新信息
+     */
+    void updateCodegen(ToolCodegenUpdateReqVO updateReqVO);
 
     /**
      * 获得表定义分页

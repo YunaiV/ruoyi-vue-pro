@@ -1,4 +1,4 @@
-package cn.iocoder.dashboard.modules.system.dal.redis.dao.common;
+package cn.iocoder.dashboard.modules.system.dal.redis.common;
 
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Repository;

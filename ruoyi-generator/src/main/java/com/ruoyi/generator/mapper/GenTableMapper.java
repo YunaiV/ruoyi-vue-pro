@@ -50,27 +50,4 @@ public interface GenTableMapper {
      */
     public GenTable selectGenTableByName(String tableName);
 
-    /**
-     * 新增业务
-     *
-     * @param genTable 业务信息
-     * @return 结果
-     */
-    public int insertGenTable(GenTable genTable);
-
-    /**
-     * 修改业务
-     *
-     * @param genTable 业务信息
-     * @return 结果
-     */
-    public int updateGenTable(GenTable genTable);
-
-    /**
-     * 批量删除业务
-     *
-     * @param ids 需要删除的数据ID
-     * @return 结果
-     */
-    public int deleteGenTableByIds(Long[] ids);
 }

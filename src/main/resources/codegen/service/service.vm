@@ -3,7 +3,7 @@ package ${basePackage}.${table.moduleName}.service.${table.businessName};
 import java.util.*;
 import javax.validation.*;
 import ${basePackage}.${table.moduleName}.controller.${table.businessName}.vo.*;
-import ${basePackage}.${table.moduleName}.dal.mysql.dataobject.${table.businessName}.${table.className}DO;
+import ${basePackage}.${table.moduleName}.dal.dataobject.${table.businessName}.${table.className}DO;
 import ${PageResultClassName};
 
 /**

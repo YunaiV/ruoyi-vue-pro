@@ -15,7 +15,7 @@ import ${CommonResultClassName};
 import static ${CommonResultClassName}.success;
 
 import ${basePackage}.${table.moduleName}.controller.${table.businessName}.vo.*;
-import ${basePackage}.${table.moduleName}.dal.mysql.dataobject.${table.businessName}.${table.className}DO;
+import ${basePackage}.${table.moduleName}.dal.dataobject.${table.businessName}.${table.className}DO;
 import ${basePackage}.${table.moduleName}.convert.${table.businessName}.${table.className}Convert;
 import ${basePackage}.${table.moduleName}.service.${table.businessName}.${table.className}Service;
 

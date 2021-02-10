@@ -39,3 +39,12 @@ export const SysDataScopeEnum = {
   DEPT_AND_CHILD: 4, // 部门及以下数据权限
   DEPT_SELF: 5 // 仅本人数据权限
 }
+
+/**
+ * 代码生成模板类型
+ */
+export const ToolCodegenTemplateTypeEnum = {
+  CRUD: 1, // 基础 CRUD
+  TREE: 2, // 树形 CRUD
+  SUB: 3, // 主子表 CRUD
+}

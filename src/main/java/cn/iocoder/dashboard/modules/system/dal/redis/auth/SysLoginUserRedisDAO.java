@@ -1,4 +1,4 @@
-package cn.iocoder.dashboard.modules.system.dal.redis.dao.auth;
+package cn.iocoder.dashboard.modules.system.dal.redis.auth;
 
 import cn.iocoder.dashboard.framework.security.core.LoginUser;
 import cn.iocoder.dashboard.util.json.JsonUtils;

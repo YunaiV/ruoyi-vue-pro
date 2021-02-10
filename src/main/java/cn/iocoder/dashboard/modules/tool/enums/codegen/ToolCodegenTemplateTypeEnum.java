@@ -12,10 +12,10 @@ import lombok.Getter;
 @Getter
 public enum ToolCodegenTemplateTypeEnum {
 
-    CRUD(1), // 基础 CRUD
-    TREE(2), // 树形 CRUD
+    CRUD(1), // 单表（增删改查）
+    TREE(2), // 树表（增删改查）
     // TODO 主子表，暂时不考虑支持。原因是较为灵活，形态较多，很难评估。
-    SUB(3) // 主子表 CRUD
+    SUB(3) // 主子表（增删改查）
     ;
 
     /**

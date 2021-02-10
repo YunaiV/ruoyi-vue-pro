@@ -10,7 +10,7 @@ import cn.iocoder.dashboard.modules.system.controller.auth.vo.session.SysUserSes
 import cn.iocoder.dashboard.modules.system.dal.mysql.auth.SysUserSessionMapper;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.auth.SysUserSessionDO;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.user.SysUserDO;
-import cn.iocoder.dashboard.modules.system.dal.redis.dao.auth.SysLoginUserRedisDAO;
+import cn.iocoder.dashboard.modules.system.dal.redis.auth.SysLoginUserRedisDAO;
 import cn.iocoder.dashboard.modules.system.service.auth.SysUserSessionService;
 import cn.iocoder.dashboard.modules.system.service.user.SysUserService;
 import org.springframework.stereotype.Service;

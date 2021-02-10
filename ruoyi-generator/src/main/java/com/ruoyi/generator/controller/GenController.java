@@ -77,18 +77,6 @@ public class GenController extends BaseController {
     }
 
     /**
-     * 修改保存代码生成业务
-     */
-    @PreAuthorize("@ss.hasPermi('tool:gen:edit')")
-    @Log(title = "代码生成", businessType = BusinessType.UPDATE)
-    @PutMapping
-    public AjaxResult editSave(@Validated @RequestBody GenTable genTable) {
-        genTableService.validateEdit(genTable);
-        genTableService.updateGenTable(genTable);
-        return AjaxResult.success();
-    }
-
-    /**
      * 删除代码生成
      */
     @PreAuthorize("@ss.hasPermi('tool:gen:remove')")

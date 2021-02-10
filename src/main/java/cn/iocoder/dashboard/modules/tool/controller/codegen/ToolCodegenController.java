@@ -3,8 +3,9 @@ package cn.iocoder.dashboard.modules.tool.controller.codegen;
 import cn.iocoder.dashboard.common.pojo.CommonResult;
 import cn.iocoder.dashboard.common.pojo.PageResult;
 import cn.iocoder.dashboard.modules.tool.controller.codegen.vo.ToolCodegenDetailRespVO;
-import cn.iocoder.dashboard.modules.tool.controller.codegen.vo.ToolCodegenTablePageReqVO;
-import cn.iocoder.dashboard.modules.tool.controller.codegen.vo.ToolCodegenTableRespVO;
+import cn.iocoder.dashboard.modules.tool.controller.codegen.vo.ToolCodegenUpdateReqVO;
+import cn.iocoder.dashboard.modules.tool.controller.codegen.vo.table.ToolCodegenTablePageReqVO;
+import cn.iocoder.dashboard.modules.tool.controller.codegen.vo.table.ToolCodegenTableRespVO;
 import cn.iocoder.dashboard.modules.tool.convert.codegen.ToolCodegenConvert;
 import cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen.ToolCodegenColumnDO;
 import cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen.ToolCodegenTableDO;
@@ -30,7 +31,7 @@ public class ToolCodegenController {
     private ToolCodegenService codegenService;
 
     @ApiOperation("获得表定义分页")
-    @GetMapping("/page")
+    @GetMapping("/table/page")
     // TODO 权限 @PreAuthorize("@ss.hasPermi('tool:gen:list')")
     public CommonResult<PageResult<ToolCodegenTableRespVO>> getCodeGenTablePage(@Valid ToolCodegenTablePageReqVO pageReqVO) {
         PageResult<ToolCodegenTableDO> pageResult = codegenService.getCodeGenTablePage(pageReqVO);
@@ -50,8 +51,19 @@ public class ToolCodegenController {
     @ApiOperation("基于数据库的表结构，创建代码生成器的表定义")
     @PostMapping("/create")
     // TODO 权限
-    public CommonResult<Long> createCodeGenTable(@RequestParam("tableName") String tableName) {
-        return success(codegenService.createCodegenTable(tableName));
+    public CommonResult<Long> createCodeGen(@RequestParam("tableName") String tableName) {
+        return success(codegenService.createCodegen(tableName));
+    }
+
+    /**
+     * 修改保存代码生成业务
+     */
+    @ApiOperation("更新数据库的表和字段定义")
+    @PutMapping("/update")
+//    @PreAuthorize("@ss.hasPermi('tool:gen:edit')") TODO 权限
+    public CommonResult<Boolean> updateCodegen(@Valid @RequestBody ToolCodegenUpdateReqVO updateReqVO) {
+        codegenService.updateCodegen(updateReqVO);
+        return success(true);
     }
 
 }

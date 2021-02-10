@@ -9,23 +9,6 @@ export function listDbTable(query) {
   })
 }
 
-// 查询表详细信息
-export function getGenTable(tableId) {
-  return request({
-    url: '/tool/gen/' + tableId,
-    method: 'get'
-  })
-}
-
-// 修改代码生成信息
-export function updateGenTable(data) {
-  return request({
-    url: '/tool/gen',
-    method: 'put',
-    data: data
-  })
-}
-
 // 导入表
 export function importTable(data) {
   return request({

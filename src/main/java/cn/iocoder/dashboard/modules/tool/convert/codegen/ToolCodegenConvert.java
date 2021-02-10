@@ -1,9 +1,10 @@
 package cn.iocoder.dashboard.modules.tool.convert.codegen;
 
 import cn.iocoder.dashboard.common.pojo.PageResult;
-import cn.iocoder.dashboard.modules.tool.controller.codegen.vo.ToolCodegenColumnRespVO;
+import cn.iocoder.dashboard.modules.tool.controller.codegen.vo.ToolCodegenUpdateReqVO;
+import cn.iocoder.dashboard.modules.tool.controller.codegen.vo.column.ToolCodegenColumnRespVO;
 import cn.iocoder.dashboard.modules.tool.controller.codegen.vo.ToolCodegenDetailRespVO;
-import cn.iocoder.dashboard.modules.tool.controller.codegen.vo.ToolCodegenTableRespVO;
+import cn.iocoder.dashboard.modules.tool.controller.codegen.vo.table.ToolCodegenTableRespVO;
 import cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen.ToolCodegenColumnDO;
 import cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen.ToolCodegenTableDO;
 import cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen.ToolInformationSchemaColumnDO;
@@ -37,6 +38,10 @@ public interface ToolCodegenConvert {
     // ========== ToolCodegenTableDO 相关 ==========
 
     List<ToolCodegenColumnRespVO> convertList02(List<ToolCodegenColumnDO> list);
+
+    ToolCodegenTableDO convert(ToolCodegenUpdateReqVO.Table bean);
+
+    List<ToolCodegenColumnDO> convertList03(List<ToolCodegenUpdateReqVO.Column> columns);
 
     // ========== 其它 ==========
 

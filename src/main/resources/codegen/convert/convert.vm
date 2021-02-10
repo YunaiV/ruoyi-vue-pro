@@ -7,7 +7,7 @@ import ${PageResultClassName};
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 import ${basePackage}.${table.moduleName}.controller.${table.businessName}.vo.*;
-import ${basePackage}.${table.moduleName}.dal.mysql.dataobject.${table.businessName}.${table.className}DO;
+import ${basePackage}.${table.moduleName}.dal.dataobject.${table.businessName}.${table.className}DO;
 
 /**
 * ${table.classComment} Convert

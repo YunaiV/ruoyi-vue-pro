@@ -1,9 +1,9 @@
-package ${basePackage}.${table.moduleName}.dal.mysql.dao.${table.businessName};
+package ${basePackage}.${table.moduleName}.dal.mysql.${table.businessName};
 
 import ${PageResultClassName};
 import ${QueryWrapperClassName};
 import ${BaseMapperClassName};
-import ${basePackage}.${table.moduleName}.dal.mysql.dataobject.${table.businessName}.${table.className}DO;
+import ${basePackage}.${table.moduleName}.dal.dataobject.${table.businessName}.${table.className}DO;
 import org.apache.ibatis.annotations.Mapper;
 import ${basePackage}.${table.moduleName}.controller.${table.businessName}.vo.${table.className}PageReqVO;
 

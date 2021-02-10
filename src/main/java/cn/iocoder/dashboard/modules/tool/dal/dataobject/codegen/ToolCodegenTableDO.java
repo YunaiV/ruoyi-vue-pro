@@ -43,7 +43,7 @@ public class ToolCodegenTableDO extends BaseDO {
     /**
      * 模块名，即一级目录
      *
-     * 例如说，infra、system、tool 等等
+     * 例如说，system、infra、tool 等等
      */
     private String moduleName;
     /**

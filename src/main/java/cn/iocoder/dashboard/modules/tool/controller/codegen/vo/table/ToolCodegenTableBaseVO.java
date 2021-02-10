@@ -1,4 +1,4 @@
-package cn.iocoder.dashboard.modules.tool.controller.codegen.vo;
+package cn.iocoder.dashboard.modules.tool.controller.codegen.vo.table;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;

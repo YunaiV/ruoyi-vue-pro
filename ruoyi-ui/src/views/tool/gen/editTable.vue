@@ -98,13 +98,11 @@
             <template slot-scope="scope">
               <el-select v-model="scope.row.dictType" clearable filterable placeholder="请选择">
                 <el-option
-                  v-for="dict in dictOptions"
-                  :key="dict.dictType"
-                  :label="dict.dictName"
-                  :value="dict.dictType">
-                  <span style="float: left">{{ dict.dictName }}</span>
-                  <span style="float: right; color: #8492a6; font-size: 13px">{{ dict.dictType }}</span>
-              </el-option>
+                    v-for="dict in dictOptions"
+                    :key="dict.id"
+                    :label="dict.name"
+                    :value="dict.type"
+                />
               </el-select>
             </template>
           </el-table-column>
@@ -128,9 +126,8 @@
   </el-card>
 </template>
 <script>
-import { updateGenTable } from "@/api/tool/gen";
-import { getCodeGenDetail } from "@/api/tool/codegen";
-import { optionselect as getDictOptionselect } from "@/api/system/dict/type";
+import { getCodeGenDetail, updateCodegen } from "@/api/tool/codegen";
+import { listAllSimple as listAllSimpleDictType } from "@/api/system/dict/type";
 import { listMenu as getMenuTreeselect } from "@/api/system/menu";
 import basicInfoForm from "./basicInfoForm";
 import genInfoForm from "./genInfoForm";
@@ -169,7 +166,7 @@ export default {
         this.columns = res.data.columns;
       });
       /** 查询字典下拉列表 */
-      getDictOptionselect().then(response => {
+      listAllSimpleDictType().then(response => {
         this.dictOptions = response.data;
       });
       /** 查询菜单下拉列表 */
@@ -186,7 +183,8 @@ export default {
       Promise.all([basicForm, genForm].map(this.getFormPromise)).then(res => {
         const validateResult = res.every(item => !!item);
         if (validateResult) {
-          const genTable = Object.assign({}, basicForm.model, genForm.model);
+          const genTable = {};
+          genTable.table = Object.assign({}, basicForm.model, genForm.model);
           genTable.columns = this.columns;
           genTable.params = {
             treeCode: genTable.treeCode,
@@ -194,11 +192,9 @@ export default {
             treeParentCode: genTable.treeParentCode,
             parentMenuId: genTable.parentMenuId
           };
-          updateGenTable(genTable).then(res => {
-            this.msgSuccess(res.msg);
-            if (res.code === 200) {
-              this.close();
-            }
+          updateCodegen(genTable).then(res => {
+            this.msgSuccess("修改成功！");
+            this.close();
           });
         } else {
           this.msgError("表单校验未通过，请重新检查提交内容");
