@@ -14,7 +14,7 @@ public class ${table.className}BaseVO {
 
 #foreach ($column in $columns)
 #if (${column.createOperation} && ${column.updateOperation} && ${column.listOperationResult})##通用操作
-    #parse("codegen/controller/vo/_column.vm")
+    #parse("codegen/java/controller/vo/_column.vm")
 
 #end
 #end

@@ -16,7 +16,7 @@ import ${basePackage}.${table.moduleName}.service.${table.businessName}.${table.
 
 import ${ServiceExceptionUtilClassName};
 
-import static ${basePackage}.${table.moduleName}.enums.${simpleModuleName.substring(0,1).toUpperCase()}${simpleModuleName.substring(1)}ErrorCodeConstants.*;
+import static ${basePackage}.${table.moduleName}.enums.${simpleModuleName_upperFirst}ErrorCodeConstants.*;
 
 /**
 * ${table.classComment} Service 实现类

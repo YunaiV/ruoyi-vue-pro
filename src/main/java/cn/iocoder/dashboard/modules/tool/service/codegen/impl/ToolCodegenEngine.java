@@ -1,5 +1,7 @@
 package cn.iocoder.dashboard.modules.tool.service.codegen.impl;
 
+import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.template.TemplateConfig;
 import cn.hutool.extra.template.TemplateEngine;
 import cn.hutool.extra.template.TemplateUtil;
@@ -14,6 +16,7 @@ import cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen.ToolCodegenColum
 import cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen.ToolCodegenTableDO;
 import cn.iocoder.dashboard.util.collection.CollectionUtils;
 import cn.iocoder.dashboard.util.date.DateUtils;
+import com.google.common.collect.Maps;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -33,6 +36,29 @@ import static cn.hutool.core.text.CharSequenceUtil.*;
  */
 @Component
 public class ToolCodegenEngine {
+
+    /**
+     * 模板配置
+     * key：模板在 resources 的地址
+     * value：生成的路径
+     */
+    private static final Map<String, String> TEMPLATES = MapUtil.<String, String>builder()
+            // Java
+            .put("codegen/java/controller/controller.vm", "java/${basePackage}/${table.moduleName}/controller/${table.businessName}/${table.className}Controller.java")
+            .put("codegen/java/controller/vo/baseVO.vm", "java/${basePackage}/${table.moduleName}/controller/${table.businessName}/vo/${table.className}BaseVO.java")
+            .put("codegen/java/controller/vo/createReqVO.vm", "java/${basePackage}/${table.moduleName}/controller/${table.businessName}/vo/${table.className}CreateReqVO.java")
+            .put("codegen/java/controller/vo/pageReqVO.vm", "java/${basePackage}/${table.moduleName}/controller/${table.businessName}/vo/${table.className}PageReqVO.java")
+            .put("codegen/java/controller/vo/respVO.vm", "java/${basePackage}/${table.moduleName}/controller/${table.businessName}/vo/${table.className}RespVO.java")
+            .put("codegen/java/controller/vo/updateReqVO.vm", "java/${basePackage}/${table.moduleName}/controller/${table.businessName}/vo/${table.className}UpdateReqVO.java")
+            .put("codegen/java/convert/convert.vm", "java/${basePackage}/${table.moduleName}/convert/${table.businessName}/${table.className}Convert.java")
+            .put("codegen/java/dal/do.vm", "java/${basePackage}/${table.moduleName}/dal/dataobject/${table.businessName}/${table.className}DO.java")
+            .put("codegen/java/dal/mapper.vm", "java/${basePackage}/${table.moduleName}/dal/mysql/${table.businessName}/${table.className}Mapper.java")
+            .put("codegen/java/enums/errorcode.vm", "java/${basePackage}.${table.moduleName}.enums.${simpleModuleName_upperFirst}ErrorCodeConstants.java")
+            .put("codegen/java/service/service.vm", "java/${basePackage}/${table.moduleName}/service/${table.businessName}/${table.className}Service.java")
+            .put("codegen/java/service/serviceImpl.vm", "java/${basePackage}/${table.moduleName}/service/${table.businessName}/impl/${table.className}ServiceImpl.java")
+            // Vue
+            // SQL
+            .build();
 
     @Resource
     private ToolCodegenBuilder codegenBuilder;
@@ -72,7 +98,7 @@ public class ToolCodegenEngine {
         globalBindingMap.put("BaseMapperClassName", BaseMapperX.class.getName());
     }
 
-    public void execute(ToolCodegenTableDO table, List<ToolCodegenColumnDO> columns) {
+    public Map<String, String> execute(ToolCodegenTableDO table, List<ToolCodegenColumnDO> columns) {
         // 创建 bindingMap
         Map<String, Object> bindingMap = new HashMap<>(globalBindingMap);
         bindingMap.put("table", table);
@@ -81,6 +107,7 @@ public class ToolCodegenEngine {
         // moduleName 相关
         String simpleModuleName = codegenBuilder.getSimpleModuleName(table.getModuleName());
         bindingMap.put("simpleModuleName", simpleModuleName); // 将 system 转成 sys
+        bindingMap.put("simpleModuleName_upperFirst", upperFirst(simpleModuleName)); // 将 sys 转成 Sys
         // className 相关
         String simpleClassName = subAfter(table.getClassName(), upperFirst(simpleModuleName)
                 , false); // 将 TestDictType 转换成 DictType. 因为在 create 等方法后，不需要带上 Test 前缀
@@ -88,20 +115,25 @@ public class ToolCodegenEngine {
         bindingMap.put("simpleClassName_underlineCase", toUnderlineCase(simpleClassName)); // 将 DictType 转换成 dict_type
         bindingMap.put("classNameVar", lowerFirst(simpleClassName)); // 将 DictType 转换成 dictType，用于变量
         bindingMap.put("simpleClassName_strikeCase", toSymbolCase(simpleClassName, '-')); // 将 DictType 转换成 dict-type
+
         // 执行生成
-//        String result = templateEngine.getTemplate("codegen/dal/do.vm").render(bindingMap);
-//        String result = templateEngine.getTemplate("codegen/dal/mapper.vm").render(bindingMap);
-//        String result = templateEngine.getTemplate("codegen/controller/vo/pageReqVO.vm").render(bindingMap);
-//        String result = templateEngine.getTemplate("codegen/controller/vo/baseVO.vm").render(bindingMap);
-//        String result = templateEngine.getTemplate("codegen/controller/vo/createReqVO.vm").render(bindingMap);
-//        String result = templateEngine.getTemplate("codegen/controller/vo/updateReqVO.vm").render(bindingMap);
-        String result = templateEngine.getTemplate("codegen/controller/vo/respVO.vm").render(bindingMap);
-//        String result = templateEngine.getTemplate("codegen/convert/convert.vm").render(bindingMap);
-//        String result = templateEngine.getTemplate("codegen/enums/errorcode.vm").render(bindingMap);
-//        String result = templateEngine.getTemplate("codegen/service/service.vm").render(bindingMap);
-//        String result = templateEngine.getTemplate("codegen/service/serviceImpl.vm").render(bindingMap);
-//        String result = templateEngine.getTemplate("codegen/controller/controller.vm").render(bindingMap);
-        System.out.println(result);
+        final Map<String, String> result = Maps.newHashMapWithExpectedSize(TEMPLATES.size());
+        TEMPLATES.forEach((vmPath, filePath) -> {
+            filePath = formatFilePath(filePath, bindingMap);
+            String content = templateEngine.getTemplate(vmPath).render(bindingMap);
+            result.put(filePath, content);
+        });
+        return result;
+    }
+
+    private String formatFilePath(String filePath, Map<String, Object> bindingMap) {
+        filePath = StrUtil.replace(filePath, "${basePackage}", ((String) bindingMap.get("basePackage")).replaceAll("\\.", "/"));
+        ToolCodegenTableDO table = (ToolCodegenTableDO) bindingMap.get("table");
+        filePath = StrUtil.replace(filePath, "${simpleModuleName_upperFirst}", (String) bindingMap.get("simpleModuleName_upperFirst"));
+        filePath = StrUtil.replace(filePath, "${table.moduleName}", table.getModuleName());
+        filePath = StrUtil.replace(filePath, "${table.businessName}", table.getBusinessName());
+        filePath = StrUtil.replace(filePath, "${table.className}", table.getClassName());
+        return filePath;
     }
 
 }
