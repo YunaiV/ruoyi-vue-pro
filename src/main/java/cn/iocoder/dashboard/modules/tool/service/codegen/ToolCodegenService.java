@@ -21,9 +21,17 @@ public interface ToolCodegenService {
      * 基于数据库的表结构，创建代码生成器的表定义
      *
      * @param tableName 表名称
-     * @return 表定义的编号
+     * @return 创建的表定义的编号
      */
     Long createCodegen(String tableName);
+
+    /**
+     * 基于 {@link #createCodegen(String)} 的批量创建
+     *
+     * @param tableNames 表名称数组
+     * @return 创建的表定义的编号数组
+     */
+    List<Long> createCodeGenList(List<String> tableNames);
 
     /**
      * 更新数据库的表和字段定义
@@ -33,12 +41,26 @@ public interface ToolCodegenService {
     void updateCodegen(ToolCodegenUpdateReqVO updateReqVO);
 
     /**
+     * 基于数据库的表结构，同步数据库的表和字段定义
+     *
+     * @param tableId 表编号
+     */
+    void syncCodegen(Long tableId);
+
+    /**
+     * 删除数据库的表和字段定义
+     *
+     * @param tableId 数据编号
+     */
+    void deleteCodegen(Long tableId);
+
+    /**
      * 获得表定义分页
      *
      * @param pageReqVO 分页条件
      * @return 表定义分页
      */
-    PageResult<ToolCodegenTableDO> getCodeGenTablePage(ToolCodegenTablePageReqVO pageReqVO);
+    PageResult<ToolCodegenTableDO> getCodegenTablePage(ToolCodegenTablePageReqVO pageReqVO);
 
     /**
      * 获得表定义
@@ -46,7 +68,14 @@ public interface ToolCodegenService {
      * @param id 表编号
      * @return 表定义
      */
-    ToolCodegenTableDO getCodeGenTablePage(Long id);
+    ToolCodegenTableDO getCodegenTablePage(Long id);
+
+    /**
+     * 获得全部表定义
+     *
+     * @return 表定义数组
+     */
+    List<ToolCodegenTableDO> getCodeGenTableList();
 
     /**
      * 获得指定表的字段定义数组

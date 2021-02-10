@@ -39,9 +39,6 @@
 
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
-        <el-button type="primary" plain icon="el-icon-download" size="mini" @click="handleGenTable" v-hasPermi="['tool:gen:code']">生成</el-button>
-      </el-col>
-      <el-col :span="1.5">
         <el-button type="info" plain icon="el-icon-upload" size="mini" @click="openImportTable" v-hasPermi="['tool:gen:import']">导入</el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
@@ -85,15 +82,12 @@
 </template>
 
 <script>
-import { delTable, synchDb } from "@/api/tool/gen";
-import { getCodeGenTablePage, previewCodegen, downloadCodegen } from "@/api/tool/codegen";
+import { getCodegenTablePage, previewCodegen, downloadCodegen, deleteCodegen, syncCodegen } from "@/api/tool/codegen";
 
 import importTable from "./importTable";
 // 代码高亮插件
 import hljs from "highlight.js/lib/highlight";
 import "highlight.js/styles/github-gist.css";
-import {list} from "@/api/system/loginlog";
-import {exportOperateLog} from "@/api/system/operatelog";
 hljs.registerLanguage("java", require("highlight.js/lib/languages/java"));
 hljs.registerLanguage("xml", require("highlight.js/lib/languages/xml"));
 hljs.registerLanguage("html", require("highlight.js/lib/languages/xml"));
@@ -150,7 +144,7 @@ export default {
     /** 查询表集合 */
     getList() {
       this.loading = true;
-      getCodeGenTablePage(this.addDateRange(this.queryParams, [
+      getCodegenTablePage(this.addDateRange(this.queryParams, [
         this.dateRange[0] ? this.dateRange[0] + ' 00:00:00' : undefined,
         this.dateRange[1] ? this.dateRange[1] + ' 23:59:59' : undefined,
       ], 'CreateTime')).then(response => {
@@ -179,7 +173,7 @@ export default {
         cancelButtonText: "取消",
         type: "warning"
       }).then(function() {
-          return synchDb(tableName);
+          return syncCodegen(row.id);
       }).then(() => {
           this.msgSuccess("同步成功");
       })
@@ -217,13 +211,13 @@ export default {
     },
     /** 删除按钮操作 */
     handleDelete(row) {
-      const tableIds = row.tableId || this.ids;
-      this.$confirm('是否确认删除表编号为"' + tableIds + '"的数据项?', "警告", {
+      const tableIds = row.id;
+      this.$confirm('是否确认删除表名称为"' + row.tableName + '"的数据项?', "警告", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning"
       }).then(function() {
-          return delTable(tableIds);
+          return deleteCodegen(tableIds);
       }).then(() => {
           this.getList();
           this.msgSuccess("删除成功");

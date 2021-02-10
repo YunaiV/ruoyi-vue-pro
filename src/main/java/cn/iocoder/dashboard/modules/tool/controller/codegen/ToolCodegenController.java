@@ -15,6 +15,7 @@ import cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen.ToolCodegenColum
 import cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen.ToolCodegenTableDO;
 import cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen.ToolSchemaTableDO;
 import cn.iocoder.dashboard.modules.tool.service.codegen.ToolCodegenService;
+import cn.iocoder.dashboard.util.collection.CollectionUtils;
 import cn.iocoder.dashboard.util.servlet.ServletUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -31,6 +32,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static cn.iocoder.dashboard.common.pojo.CommonResult.success;
 
@@ -47,7 +49,7 @@ public class ToolCodegenController {
     @GetMapping("/db/table/list")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "tableName", required = true, example = "yudao", dataTypeClass = String.class),
-            @ApiImplicitParam(name = "tableComment", required = true, example = "芋道", dataTypeClass = Long.class)
+            @ApiImplicitParam(name = "tableComment", required = true, example = "芋道", dataTypeClass = String.class)
     })
 //    @PreAuthorize("@ss.hasPermi('tool:gen:list')") TODO 权限
     public CommonResult<List<ToolSchemaTableRespVO>> getSchemaTableList(
@@ -56,33 +58,35 @@ public class ToolCodegenController {
         // 获得数据库自带的表定义列表
         List<ToolSchemaTableDO> schemaTables = codegenService.getSchemaTableList(tableName, tableComment);
         // 移除在 Codegen 中，已经存在的
-
-        return null;
+        Set<String> existsTables = CollectionUtils.convertSet(codegenService.getCodeGenTableList(), ToolCodegenTableDO::getTableName);
+        schemaTables.removeIf(table -> existsTables.contains(table.getTableName()));
+        return success(ToolCodegenConvert.INSTANCE.convertList04(schemaTables));
     }
 
     @ApiOperation("获得表定义分页")
     @GetMapping("/table/page")
     // TODO 权限 @PreAuthorize("@ss.hasPermi('tool:gen:list')")
     public CommonResult<PageResult<ToolCodegenTableRespVO>> getCodeGenTablePage(@Valid ToolCodegenTablePageReqVO pageReqVO) {
-        PageResult<ToolCodegenTableDO> pageResult = codegenService.getCodeGenTablePage(pageReqVO);
+        PageResult<ToolCodegenTableDO> pageResult = codegenService.getCodegenTablePage(pageReqVO);
         return success(ToolCodegenConvert.INSTANCE.convertPage(pageResult));
     }
 
     @ApiOperation("获得表和字段的明细")
     @GetMapping("/detail")
+    @ApiImplicitParam(name = "tableId", required = true, example = "表编号", dataTypeClass = Long.class)
 //   todo @PreAuthorize("@ss.hasPermi('tool:gen:query')")
-    public CommonResult<ToolCodegenDetailRespVO> getCodeGenDetail(@RequestParam("tableId") Long tableId) {
-        ToolCodegenTableDO table = codegenService.getCodeGenTablePage(tableId);
+    public CommonResult<ToolCodegenDetailRespVO> getCodegenDetail(@RequestParam("tableId") Long tableId) {
+        ToolCodegenTableDO table = codegenService.getCodegenTablePage(tableId);
         List<ToolCodegenColumnDO> columns = codegenService.getCodegenColumnListByTableId(tableId);
         // 拼装返回
         return success(ToolCodegenConvert.INSTANCE.convert(table, columns));
     }
 
-    @ApiOperation("基于数据库的表结构，创建代码生成器的表定义")
-    @PostMapping("/create")
+    @ApiOperation("基于数据库的表结构，创建代码生成器的表和字段定义")
+    @PostMapping("/create-list")
     // TODO 权限
-    public CommonResult<Long> createCodeGen(@RequestParam("tableName") String tableName) {
-        return success(codegenService.createCodegen(tableName));
+    public CommonResult<List<Long>> createCodegenList(@RequestParam("tableNames") List<String> tableNames) {
+        return success(codegenService.createCodeGenList(tableNames));
     }
 
     @ApiOperation("更新数据库的表和字段定义")
@@ -90,6 +94,24 @@ public class ToolCodegenController {
 //    @PreAuthorize("@ss.hasPermi('tool:gen:edit')") TODO 权限
     public CommonResult<Boolean> updateCodegen(@Valid @RequestBody ToolCodegenUpdateReqVO updateReqVO) {
         codegenService.updateCodegen(updateReqVO);
+        return success(true);
+    }
+
+    @ApiOperation("基于数据库的表结构，同步数据库的表和字段定义")
+    @PutMapping("/sync")
+    @ApiImplicitParam(name = "tableId", required = true, example = "表编号", dataTypeClass = Long.class)
+//    @PreAuthorize("@ss.hasPermi('tool:gen:edit')") TODO 权限
+    public CommonResult<Boolean> syncCodegen(@RequestParam("tableId") Long tableId) {
+        codegenService.syncCodegen(tableId);
+        return success(true);
+    }
+
+    @ApiOperation("删除数据库的表和字段定义")
+    @DeleteMapping("/delete")
+    @ApiImplicitParam(name = "tableId", required = true, example = "表编号", dataTypeClass = Long.class)
+//    @PreAuthorize("@ss.hasPermi('tool:gen:remove')") TODO 权限
+    public CommonResult<Boolean> deleteCodegen(@RequestParam("tableId") Long tableId) {
+        codegenService.deleteCodegen(tableId);
         return success(true);
     }
 
@@ -118,5 +140,19 @@ public class ToolCodegenController {
         // 输出
         ServletUtils.writeAttachment(response, "codegen.zip", outputStream.toByteArray());
     }
+
+//    /**
+//     * 查询数据表字段列表
+//     */
+//    @PreAuthorize("@ss.hasPermi('tool:gen:list')")
+//    @GetMapping(value = "/column/{talbleId}")
+//    public TableDataInfo columnList(Long tableId) {
+//        TableDataInfo dataInfo = new TableDataInfo();
+//        List<GenTableColumn> list = genTableColumnService.selectGenTableColumnListByTableId(tableId);
+//        dataInfo.setRows(list);
+//        dataInfo.setTotal(list.size());
+//        return dataInfo;
+//    }
+//
 
 }

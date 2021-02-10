@@ -126,7 +126,7 @@
   </el-card>
 </template>
 <script>
-import { getCodeGenDetail, updateCodegen } from "@/api/tool/codegen";
+import { getCodegenDetail, updateCodegen } from "@/api/tool/codegen";
 import { listAllSimple as listAllSimpleDictType } from "@/api/system/dict/type";
 import { listMenu as getMenuTreeselect } from "@/api/system/menu";
 import basicInfoForm from "./basicInfoForm";
@@ -161,7 +161,7 @@ export default {
     const tableId = this.$route.params && this.$route.params.tableId;
     if (tableId) {
       // 获取表详细信息
-      getCodeGenDetail(tableId).then(res => {
+      getCodegenDetail(tableId).then(res => {
         this.table = res.data.table;
         this.columns = res.data.columns;
       });

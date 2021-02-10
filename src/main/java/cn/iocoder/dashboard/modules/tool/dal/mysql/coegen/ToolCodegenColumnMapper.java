@@ -11,9 +11,12 @@ import java.util.List;
 public interface ToolCodegenColumnMapper extends BaseMapperX<ToolCodegenColumnDO> {
 
     default List<ToolCodegenColumnDO> selectListByTableId(Long tableId) {
-        return selectList(new QueryWrapper<ToolCodegenColumnDO>()
-                .eq("table_id", tableId)
+        return selectList(new QueryWrapper<ToolCodegenColumnDO>().eq("table_id", tableId)
                 .orderByAsc("ordinal_position"));
+    }
+
+    default void deleteListByTableId(Long tableId) {
+        delete(new QueryWrapper<ToolCodegenColumnDO>().eq("table_id", tableId));
     }
 
 }

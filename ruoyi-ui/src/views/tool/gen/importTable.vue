@@ -28,18 +28,15 @@
     <el-row>
       <el-table @row-click="clickRow" ref="table" :data="dbTableList" @selection-change="handleSelectionChange" height="260px">
         <el-table-column type="selection" width="55"></el-table-column>
+        <el-table-column prop="tableSchema" label="数据库" :show-overflow-tooltip="true"></el-table-column>
         <el-table-column prop="tableName" label="表名称" :show-overflow-tooltip="true"></el-table-column>
         <el-table-column prop="tableComment" label="表描述" :show-overflow-tooltip="true"></el-table-column>
-        <el-table-column prop="createTime" label="创建时间"></el-table-column>
-        <el-table-column prop="updateTime" label="更新时间"></el-table-column>
+        <el-table-column prop="createTime" label="创建时间">
+          <template slot-scope="scope">
+            <span>{{ parseTime(scope.row.createTime) }}</span>
+          </template>
+        </el-table-column>
       </el-table>
-      <pagination
-        v-show="total>0"
-        :total="total"
-        :page.sync="queryParams.pageNum"
-        :limit.sync="queryParams.pageSize"
-        @pagination="getList"
-      />
     </el-row>
     <div slot="footer" class="dialog-footer">
       <el-button type="primary" @click="handleImportTable">确 定</el-button>
@@ -49,7 +46,7 @@
 </template>
 
 <script>
-import { listDbTable, importTable } from "@/api/tool/gen";
+import { getSchemaTableList, createCodegenList } from "@/api/tool/codegen";
 export default {
   data() {
     return {
@@ -63,8 +60,6 @@ export default {
       dbTableList: [],
       // 查询参数
       queryParams: {
-        pageNum: 1,
-        pageSize: 10,
         tableName: undefined,
         tableComment: undefined
       }
@@ -85,16 +80,12 @@ export default {
     },
     // 查询表数据
     getList() {
-      listDbTable(this.queryParams).then(res => {
-        if (res.code === 200) {
-          this.dbTableList = res.rows;
-          this.total = res.total;
-        }
+      getSchemaTableList(this.queryParams).then(res => {
+        this.dbTableList = res.data;
       });
     },
     /** 搜索按钮操作 */
     handleQuery() {
-      this.queryParams.pageNum = 1;
       this.getList();
     },
     /** 重置按钮操作 */
@@ -104,12 +95,10 @@ export default {
     },
     /** 导入按钮操作 */
     handleImportTable() {
-      importTable({ tables: this.tables.join(",") }).then(res => {
-        this.msgSuccess(res.msg);
-        if (res.code === 200) {
-          this.visible = false;
-          this.$emit("ok");
-        }
+      createCodegenList(this.tables.join(",")).then(res => {
+        this.msgSuccess("导入成功");
+        this.visible = false;
+        this.$emit("ok");
       });
     }
   }

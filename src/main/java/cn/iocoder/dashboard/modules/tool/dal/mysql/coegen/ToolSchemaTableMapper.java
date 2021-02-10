@@ -14,8 +14,8 @@ public interface ToolSchemaTableMapper extends BaseMapperX<ToolSchemaTableDO> {
 
     default List<ToolSchemaTableDO> selectList(Collection<String> tableSchemas, String tableName, String tableComment) {
         return selectList(new QueryWrapperX<ToolSchemaTableDO>().in("table_schema", tableSchemas)
-                .eqIfPresent("table_name", tableName)
-                .eqIfPresent("table_comment", tableComment));
+                .likeIfPresent("table_name", tableName)
+                .likeIfPresent("table_comment", tableComment));
     }
 
     default List<ToolSchemaTableDO> selectListByTableSchema(String tableSchema) {

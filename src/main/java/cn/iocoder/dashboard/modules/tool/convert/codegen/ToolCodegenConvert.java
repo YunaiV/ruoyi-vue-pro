@@ -6,6 +6,7 @@ import cn.iocoder.dashboard.modules.tool.controller.codegen.vo.ToolCodegenPrevie
 import cn.iocoder.dashboard.modules.tool.controller.codegen.vo.ToolCodegenUpdateReqVO;
 import cn.iocoder.dashboard.modules.tool.controller.codegen.vo.column.ToolCodegenColumnRespVO;
 import cn.iocoder.dashboard.modules.tool.controller.codegen.vo.table.ToolCodegenTableRespVO;
+import cn.iocoder.dashboard.modules.tool.controller.codegen.vo.table.ToolSchemaTableRespVO;
 import cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen.ToolCodegenColumnDO;
 import cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen.ToolCodegenTableDO;
 import cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen.ToolSchemaColumnDO;
@@ -45,6 +46,8 @@ public interface ToolCodegenConvert {
     ToolCodegenTableDO convert(ToolCodegenUpdateReqVO.Table bean);
 
     List<ToolCodegenColumnDO> convertList03(List<ToolCodegenUpdateReqVO.Column> columns);
+
+    List<ToolSchemaTableRespVO> convertList04(List<ToolSchemaTableDO> list);
 
     // ========== 其它 ==========
 
