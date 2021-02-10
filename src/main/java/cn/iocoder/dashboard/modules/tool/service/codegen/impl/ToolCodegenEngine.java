@@ -9,6 +9,7 @@ import cn.iocoder.dashboard.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.dashboard.common.pojo.CommonResult;
 import cn.iocoder.dashboard.common.pojo.PageParam;
 import cn.iocoder.dashboard.common.pojo.PageResult;
+import cn.iocoder.dashboard.framework.codegen.config.CodegenProperties;
 import cn.iocoder.dashboard.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.dashboard.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.dashboard.framework.mybatis.core.query.QueryWrapperX;
@@ -19,6 +20,7 @@ import cn.iocoder.dashboard.util.date.DateUtils;
 import com.google.common.collect.Maps;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -45,24 +47,39 @@ public class ToolCodegenEngine {
      */
     private static final Map<String, String> TEMPLATES = MapUtil.<String, String>builder(new LinkedHashMap<>()) // 有序
             // Java
-            .put("codegen/java/controller/controller.vm", "java/${basePackage}/${table.moduleName}/controller/${table.businessName}/${table.className}Controller.java")
-            .put("codegen/java/controller/vo/baseVO.vm", "java/${basePackage}/${table.moduleName}/controller/${table.businessName}/vo/${table.className}BaseVO.java")
-            .put("codegen/java/controller/vo/createReqVO.vm", "java/${basePackage}/${table.moduleName}/controller/${table.businessName}/vo/${table.className}CreateReqVO.java")
-            .put("codegen/java/controller/vo/pageReqVO.vm", "java/${basePackage}/${table.moduleName}/controller/${table.businessName}/vo/${table.className}PageReqVO.java")
-            .put("codegen/java/controller/vo/respVO.vm", "java/${basePackage}/${table.moduleName}/controller/${table.businessName}/vo/${table.className}RespVO.java")
-            .put("codegen/java/controller/vo/updateReqVO.vm", "java/${basePackage}/${table.moduleName}/controller/${table.businessName}/vo/${table.className}UpdateReqVO.java")
-            .put("codegen/java/convert/convert.vm", "java/${basePackage}/${table.moduleName}/convert/${table.businessName}/${table.className}Convert.java")
-            .put("codegen/java/dal/do.vm", "java/${basePackage}/${table.moduleName}/dal/dataobject/${table.businessName}/${table.className}DO.java")
-            .put("codegen/java/dal/mapper.vm", "java/${basePackage}/${table.moduleName}/dal/mysql/${table.businessName}/${table.className}Mapper.java")
-            .put("codegen/java/enums/errorcode.vm", "java/${basePackage}/${table.moduleName}/enums/${simpleModuleName_upperFirst}ErrorCodeConstants.java")
-            .put("codegen/java/service/service.vm", "java/${basePackage}/${table.moduleName}/service/${table.businessName}/${table.className}Service.java")
-            .put("codegen/java/service/serviceImpl.vm", "java/${basePackage}/${table.moduleName}/service/${table.businessName}/impl/${table.className}ServiceImpl.java")
+            .put(javaTemplatePath("controller/controller"),
+                    javaFilePath("controller/${table.businessName}/${table.className}Controller"))
+            .put(javaTemplatePath("controller/vo/baseVO"),
+                    javaFilePath("controller/${table.businessName}/vo/${table.className}BaseVO"))
+            .put(javaTemplatePath("controller/vo/createReqVO"),
+                    javaFilePath("controller/${table.businessName}/vo/${table.className}CreateReqVO"))
+            .put(javaTemplatePath("controller/vo/pageReqVO"),
+                    javaFilePath("controller/${table.businessName}/vo/${table.className}PageReqVO"))
+            .put(javaTemplatePath("controller/vo/respVO"),
+                    javaFilePath("controller/${table.businessName}/vo/${table.className}RespVO"))
+            .put(javaTemplatePath("controller/vo/updateReqVO"),
+                    javaFilePath("controller/${table.businessName}/vo/${table.className}UpdateReqVO"))
+            .put(javaTemplatePath("convert/convert"),
+                    javaFilePath("convert/${table.businessName}/${table.className}Convert"))
+            .put(javaTemplatePath("dal/do"),
+                    javaFilePath("dal/dataobject/${table.businessName}/${table.className}DO"))
+            .put(javaTemplatePath("dal/mapper"),
+                    javaFilePath("dal/mysql/${table.businessName}/${table.className}Mapper"))
+            .put(javaTemplatePath("enums/errorcode"),
+                    javaFilePath("enums/${simpleModuleName_upperFirst}ErrorCodeConstants"))
+            .put(javaTemplatePath("service/service"),
+                    javaFilePath("service/${table.businessName}/${table.className}Service"))
+            .put(javaTemplatePath("service/serviceImpl"),
+                    javaFilePath("service/${table.businessName}/impl/${table.className}ServiceImpl"))
             // Vue
             // SQL
             .build();
 
     @Resource
     private ToolCodegenBuilder codegenBuilder;
+
+    @Resource
+    private CodegenProperties codegenProperties;
 
     /**
      * 模板引擎，由 hutool 实现
@@ -78,13 +95,12 @@ public class ToolCodegenEngine {
         TemplateConfig config = new TemplateConfig();
         config.setResourceMode(TemplateConfig.ResourceMode.CLASSPATH);
         this.templateEngine = TemplateUtil.createEngine(config);
-        // 初始化基础 bindingMap
-        initGlobalBindingMap();
     }
 
+    @PostConstruct
     private void initGlobalBindingMap() {
         // 全局配置
-        globalBindingMap.put("basePackage", "cn.iocoder.dashboard.modules"); // TODO 基础包, 抽成参数
+        globalBindingMap.put("basePackage", codegenProperties.getBasePackage());
         // 全局 Java Bean
         globalBindingMap.put("CommonResultClassName", CommonResult.class.getName());
         globalBindingMap.put("PageResultClassName", PageResult.class.getName());
@@ -135,6 +151,14 @@ public class ToolCodegenEngine {
         filePath = StrUtil.replace(filePath, "${table.businessName}", table.getBusinessName());
         filePath = StrUtil.replace(filePath, "${table.className}", table.getClassName());
         return filePath;
+    }
+
+    private static String javaTemplatePath(String path) {
+        return "codegen/java/" + path + ".vm";
+    }
+
+    private static String javaFilePath(String path) {
+        return "java/${basePackage}/${table.moduleName}/" + path + ".java";
     }
 
 }

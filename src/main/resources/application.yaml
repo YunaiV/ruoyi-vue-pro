@@ -44,10 +44,12 @@ spring:
 
 # 芋道配置项，设置当前项目所有自定义的配置
 yudao:
-  version: 1.0.0
+  info:
+    version: 1.0.0
+    base-package: cn.iocoder.dashboard
   web:
     api-prefix: /api
-    controller-package: cn.iocoder.dashboard
+    controller-package: ${yudao.info.base-package}
   security:
     token-header: Authorization
     token-secret: abcdefghijklmnopqrstuvwxyz
@@ -66,6 +68,9 @@ yudao:
     height: 60
   file:
     base-path: http://127.0.0.1:1024/api/file/get/
+  codegen:
+    base-package: ${yudao.info.base-package}.modules
+    db-schemas: ruoyi-vue-pro
 
 # Apollo 配置中心
 apollo:
@@ -89,7 +94,7 @@ mybatis-plus:
       logic-delete-value: 1 # 逻辑已删除值(默认为 1)
       logic-not-delete-value: 0 # 逻辑未删除值(默认为 0)
   mapper-locations: classpath*:mapper/*.xml
-  type-aliases-package: cn.iocoder.dashboard.modules.*.dal.mysql.dataobject
+  type-aliases-package: ${yudao.info.base-package}.modules.*.dal.dataobject
 
 # Actuator 监控端点的配置项
 management:

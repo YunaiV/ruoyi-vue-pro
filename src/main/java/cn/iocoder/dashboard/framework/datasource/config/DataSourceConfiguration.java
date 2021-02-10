@@ -1,4 +1,4 @@
-package cn.iocoder.dashboard.framework.datasource;
+package cn.iocoder.dashboard.framework.datasource.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.annotation.EnableTransactionManagement;

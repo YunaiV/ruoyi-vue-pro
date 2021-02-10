@@ -8,8 +8,8 @@ import cn.iocoder.dashboard.modules.tool.controller.codegen.vo.column.ToolCodege
 import cn.iocoder.dashboard.modules.tool.controller.codegen.vo.table.ToolCodegenTableRespVO;
 import cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen.ToolCodegenColumnDO;
 import cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen.ToolCodegenTableDO;
-import cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen.ToolInformationSchemaColumnDO;
-import cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen.ToolInformationSchemaTableDO;
+import cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen.ToolSchemaColumnDO;
+import cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen.ToolSchemaTableDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
@@ -24,11 +24,11 @@ public interface ToolCodegenConvert {
 
     // ========== ToolInformationSchemaTableDO 和 ToolInformationSchemaColumnDO 相关 ==========
 
-    ToolCodegenTableDO convert(ToolInformationSchemaTableDO bean);
+    ToolCodegenTableDO convert(ToolSchemaTableDO bean);
 
-    List<ToolCodegenColumnDO> convertList(List<ToolInformationSchemaColumnDO> list);
+    List<ToolCodegenColumnDO> convertList(List<ToolSchemaColumnDO> list);
 
-    ToolCodegenTableRespVO convert(ToolInformationSchemaColumnDO bean);
+    ToolCodegenTableRespVO convert(ToolSchemaColumnDO bean);
 
     // ========== ToolCodegenTableDO 相关 ==========
 

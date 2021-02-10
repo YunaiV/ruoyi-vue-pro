@@ -1,7 +1,7 @@
 package cn.iocoder.dashboard.modules.tool.dal.mysql.coegen;
 
 import cn.iocoder.dashboard.TestApplication;
-import cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen.ToolInformationSchemaColumnDO;
+import cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen.ToolSchemaColumnDO;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -15,11 +15,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class ToolInformationSchemaColumnMapperTest {
 
     @Resource
-    private ToolInformationSchemaColumnMapper toolInformationSchemaColumnMapper;
+    private ToolSchemaColumnMapper toolInformationSchemaColumnMapper;
 
     @Test
     public void testSelectListByTableName() {
-        List<ToolInformationSchemaColumnDO> columns = toolInformationSchemaColumnMapper
+        List<ToolSchemaColumnDO> columns = toolInformationSchemaColumnMapper
                 .selectListByTableName("inf_config");
         assertTrue(columns.size() > 0);
     }

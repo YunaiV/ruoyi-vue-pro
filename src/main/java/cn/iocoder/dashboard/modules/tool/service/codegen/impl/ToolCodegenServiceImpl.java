@@ -2,17 +2,18 @@ package cn.iocoder.dashboard.modules.tool.service.codegen.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.dashboard.common.pojo.PageResult;
+import cn.iocoder.dashboard.framework.codegen.config.CodegenProperties;
 import cn.iocoder.dashboard.modules.tool.controller.codegen.vo.ToolCodegenUpdateReqVO;
 import cn.iocoder.dashboard.modules.tool.controller.codegen.vo.table.ToolCodegenTablePageReqVO;
 import cn.iocoder.dashboard.modules.tool.convert.codegen.ToolCodegenConvert;
-import cn.iocoder.dashboard.modules.tool.dal.mysql.coegen.ToolCodegenColumnMapper;
-import cn.iocoder.dashboard.modules.tool.dal.mysql.coegen.ToolCodegenTableMapper;
-import cn.iocoder.dashboard.modules.tool.dal.mysql.coegen.ToolInformationSchemaColumnMapper;
-import cn.iocoder.dashboard.modules.tool.dal.mysql.coegen.ToolInformationSchemaTableMapper;
 import cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen.ToolCodegenColumnDO;
 import cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen.ToolCodegenTableDO;
-import cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen.ToolInformationSchemaColumnDO;
-import cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen.ToolInformationSchemaTableDO;
+import cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen.ToolSchemaColumnDO;
+import cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen.ToolSchemaTableDO;
+import cn.iocoder.dashboard.modules.tool.dal.mysql.coegen.ToolCodegenColumnMapper;
+import cn.iocoder.dashboard.modules.tool.dal.mysql.coegen.ToolCodegenTableMapper;
+import cn.iocoder.dashboard.modules.tool.dal.mysql.coegen.ToolSchemaColumnMapper;
+import cn.iocoder.dashboard.modules.tool.dal.mysql.coegen.ToolSchemaTableMapper;
 import cn.iocoder.dashboard.modules.tool.service.codegen.ToolCodegenService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,9 +31,9 @@ import java.util.Map;
 public class ToolCodegenServiceImpl implements ToolCodegenService {
 
     @Resource
-    private ToolInformationSchemaTableMapper informationSchemaTableMapper;
+    private ToolSchemaTableMapper schemaTableMapper;
     @Resource
-    private ToolInformationSchemaColumnMapper informationSchemaColumnMapper;
+    private ToolSchemaColumnMapper schemaColumnMapper;
     @Resource
     private ToolCodegenTableMapper codegenTableMapper;
     @Resource
@@ -43,15 +44,18 @@ public class ToolCodegenServiceImpl implements ToolCodegenService {
     @Resource
     private ToolCodegenEngine codegenEngine;
 
+    @Resource
+    private CodegenProperties codegenProperties;
+
     @Override
     @Transactional
     public Long createCodegen(String tableName) {
         // 从数据库中，获得数据库表结构
-        ToolInformationSchemaTableDO schemaTable = informationSchemaTableMapper.selectByTableName(tableName);
+        ToolSchemaTableDO schemaTable = schemaTableMapper.selectByTableName(tableName);
         if (schemaTable == null) {
             throw new RuntimeException(""); // TODO
         }
-        List<ToolInformationSchemaColumnDO> schemaColumns = informationSchemaColumnMapper.selectListByTableName(tableName);
+        List<ToolSchemaColumnDO> schemaColumns = schemaColumnMapper.selectListByTableName(tableName);
         if (CollUtil.isEmpty(schemaColumns)) {
             throw new RuntimeException(""); // TODO
         }
@@ -117,6 +121,11 @@ public class ToolCodegenServiceImpl implements ToolCodegenService {
 
         // 执行生成
         return codegenEngine.execute(table, columns);
+    }
+
+    @Override
+    public List<ToolSchemaTableDO> getSchemaTableList(String tableName, String tableComment) {
+        return schemaTableMapper.selectList(codegenProperties.getDbSchemas(), tableName, tableComment);
     }
 
 }

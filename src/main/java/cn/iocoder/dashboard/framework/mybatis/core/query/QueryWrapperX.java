@@ -104,4 +104,10 @@ public class QueryWrapperX<T> extends QueryWrapper<T> {
         return this;
     }
 
+    @Override
+    public QueryWrapperX<T> in(String column, Collection<?> coll) {
+        super.in(column, coll);
+        return this;
+    }
+
 }

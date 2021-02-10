@@ -14,7 +14,7 @@ import java.util.Date;
 @TableName(value = "information_schema.tables", autoResultMap = true)
 @Data
 @Builder
-public class ToolInformationSchemaTableDO {
+public class ToolSchemaTableDO {
 
     /**
      * 数据库

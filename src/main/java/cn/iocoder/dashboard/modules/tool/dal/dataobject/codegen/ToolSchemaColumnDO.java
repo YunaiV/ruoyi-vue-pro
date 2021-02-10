@@ -13,7 +13,7 @@ import lombok.Data;
 @TableName(value = "information_schema.columns", autoResultMap = true)
 @Data
 @Builder
-public class ToolInformationSchemaColumnDO {
+public class ToolSchemaColumnDO {
 
     /**
      * 表名称

@@ -6,8 +6,8 @@ import cn.iocoder.dashboard.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.dashboard.modules.tool.convert.codegen.ToolCodegenConvert;
 import cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen.ToolCodegenColumnDO;
 import cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen.ToolCodegenTableDO;
-import cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen.ToolInformationSchemaColumnDO;
-import cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen.ToolInformationSchemaTableDO;
+import cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen.ToolSchemaColumnDO;
+import cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen.ToolSchemaTableDO;
 import cn.iocoder.dashboard.modules.tool.enums.codegen.ToolCodegenColumnHtmlTypeEnum;
 import cn.iocoder.dashboard.modules.tool.enums.codegen.ToolCodegenColumnListConditionEnum;
 import cn.iocoder.dashboard.modules.tool.enums.codegen.ToolCodegenTemplateTypeEnum;
@@ -21,8 +21,8 @@ import static cn.hutool.core.text.CharSequenceUtil.*;
 
 /**
  * 代码生成器的 Builder，负责：
- * 1. 将数据库的表 {@link ToolInformationSchemaTableDO} 定义，构建成 {@link ToolCodegenTableDO}
- * 2. 将数据库的列 {@link ToolInformationSchemaColumnDO} 构定义，建成 {@link ToolCodegenColumnDO}
+ * 1. 将数据库的表 {@link ToolSchemaTableDO} 定义，构建成 {@link ToolCodegenTableDO}
+ * 2. 将数据库的列 {@link ToolSchemaColumnDO} 构定义，建成 {@link ToolCodegenColumnDO}
  */
 @Component
 public class ToolCodegenBuilder {
@@ -112,7 +112,7 @@ public class ToolCodegenBuilder {
         LIST_OPERATION_RESULT_EXCLUDE_COLUMN.remove("createTime"); // 创建时间，还是需要返回的
     }
 
-    public ToolCodegenTableDO buildTable(ToolInformationSchemaTableDO schemaTable) {
+    public ToolCodegenTableDO buildTable(ToolSchemaTableDO schemaTable) {
         ToolCodegenTableDO table = ToolCodegenConvert.INSTANCE.convert(schemaTable);
         initTableDefault(table);
         return table;
@@ -135,7 +135,7 @@ public class ToolCodegenBuilder {
         table.setTemplateType(ToolCodegenTemplateTypeEnum.CRUD.getType());
     }
 
-    public List<ToolCodegenColumnDO> buildColumns(List<ToolInformationSchemaColumnDO> schemaColumns) {
+    public List<ToolCodegenColumnDO> buildColumns(List<ToolSchemaColumnDO> schemaColumns) {
         List<ToolCodegenColumnDO> columns = ToolCodegenConvert.INSTANCE.convertList(schemaColumns);
         columns.forEach(this::initColumnDefault);
         return columns;

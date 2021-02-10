@@ -5,6 +5,7 @@ import cn.iocoder.dashboard.modules.tool.controller.codegen.vo.ToolCodegenUpdate
 import cn.iocoder.dashboard.modules.tool.controller.codegen.vo.table.ToolCodegenTablePageReqVO;
 import cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen.ToolCodegenColumnDO;
 import cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen.ToolCodegenTableDO;
+import cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen.ToolSchemaTableDO;
 
 import java.util.List;
 import java.util.Map;
@@ -62,5 +63,14 @@ public interface ToolCodegenService {
      * @return 生成结果。key 为文件路径，value 为对应的代码内容
      */
     Map<String, String> generationCodes(Long tableId);
+
+    /**
+     * 获得数据库自带的表定义列表
+     *
+     * @param tableName 表名称
+     * @param tableComment 表描述
+     * @return 表定义列表
+     */
+    List<ToolSchemaTableDO> getSchemaTableList(String tableName, String tableComment);
 
 }

@@ -1,7 +1,7 @@
 package cn.iocoder.dashboard.modules.tool.dal.mysql.coegen;
 
 import cn.iocoder.dashboard.TestApplication;
-import cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen.ToolInformationSchemaTableDO;
+import cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen.ToolSchemaTableDO;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -14,11 +14,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class ToolInformationSchemaTableMapperTest {
 
     @Resource
-    private ToolInformationSchemaTableMapper toolInformationSchemaTableMapper;
+    private ToolSchemaTableMapper toolInformationSchemaTableMapper;
 
     @Test
     public void tstSelectListByTableSchema() {
-        List<ToolInformationSchemaTableDO> tables = toolInformationSchemaTableMapper
+        List<ToolSchemaTableDO> tables = toolInformationSchemaTableMapper
                 .selectListByTableSchema("ruoyi-vue-pro");
         assertTrue(tables.size() > 0);
     }

@@ -9,13 +9,16 @@ import cn.iocoder.dashboard.modules.tool.controller.codegen.vo.ToolCodegenPrevie
 import cn.iocoder.dashboard.modules.tool.controller.codegen.vo.ToolCodegenUpdateReqVO;
 import cn.iocoder.dashboard.modules.tool.controller.codegen.vo.table.ToolCodegenTablePageReqVO;
 import cn.iocoder.dashboard.modules.tool.controller.codegen.vo.table.ToolCodegenTableRespVO;
+import cn.iocoder.dashboard.modules.tool.controller.codegen.vo.table.ToolSchemaTableRespVO;
 import cn.iocoder.dashboard.modules.tool.convert.codegen.ToolCodegenConvert;
 import cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen.ToolCodegenColumnDO;
 import cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen.ToolCodegenTableDO;
+import cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen.ToolSchemaTableDO;
 import cn.iocoder.dashboard.modules.tool.service.codegen.ToolCodegenService;
 import cn.iocoder.dashboard.util.servlet.ServletUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -39,6 +42,23 @@ public class ToolCodegenController {
 
     @Resource
     private ToolCodegenService codegenService;
+
+    @ApiOperation(value = "获得数据库自带的表定义列表", notes = "会过滤掉已经导入 Codegen 的表")
+    @GetMapping("/db/table/list")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "tableName", required = true, example = "yudao", dataTypeClass = String.class),
+            @ApiImplicitParam(name = "tableComment", required = true, example = "芋道", dataTypeClass = Long.class)
+    })
+//    @PreAuthorize("@ss.hasPermi('tool:gen:list')") TODO 权限
+    public CommonResult<List<ToolSchemaTableRespVO>> getSchemaTableList(
+            @RequestParam(value = "tableName", required = false) String tableName,
+            @RequestParam(value = "tableComment", required = false) String tableComment) {
+        // 获得数据库自带的表定义列表
+        List<ToolSchemaTableDO> schemaTables = codegenService.getSchemaTableList(tableName, tableComment);
+        // 移除在 Codegen 中，已经存在的
+
+        return null;
+    }
 
     @ApiOperation("获得表定义分页")
     @GetMapping("/table/page")
