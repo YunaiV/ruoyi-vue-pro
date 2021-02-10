@@ -85,15 +85,15 @@
 </template>
 
 <script>
-import { previewTable, delTable, genCode, synchDb } from "@/api/tool/gen";
-import { getCodeGenTablePage, previewCodegen, } from "@/api/tool/codegen";
+import { delTable, synchDb } from "@/api/tool/gen";
+import { getCodeGenTablePage, previewCodegen, downloadCodegen } from "@/api/tool/codegen";
 
 import importTable from "./importTable";
-import { downLoadZip } from "@/utils/zipdownload";
 // 代码高亮插件
 import hljs from "highlight.js/lib/highlight";
 import "highlight.js/styles/github-gist.css";
 import {list} from "@/api/system/loginlog";
+import {exportOperateLog} from "@/api/system/operatelog";
 hljs.registerLanguage("java", require("highlight.js/lib/languages/java"));
 hljs.registerLanguage("xml", require("highlight.js/lib/languages/xml"));
 hljs.registerLanguage("html", require("highlight.js/lib/languages/xml"));
@@ -167,20 +167,9 @@ export default {
     },
     /** 生成代码操作 */
     handleGenTable(row) {
-      // const tableNames = row.tableName || this.tableNames;
-      // if (tableNames === "") {
-      //   this.msgError("请选择要生成的数据");
-      //   return;
-      // }
-      // if(row.genType === "1") {
-      //   genCode(row.tableName).then(response => {
-      //     this.msgSuccess("成功生成到自定义路径：" + row.genPath);
-      //   });
-      // } else {
-      //   downLoadZip("/tool/gen/batchGenCode?tables=" + tableNames, "ruoyi");
-      // }
-
-
+      downloadCodegen(row.id).then(response => {
+        this.downloadZip(response, 'codegen-' + row.tableName + '.zip');
+      })
     },
     /** 同步数据库操作 */
     handleSynchDb(row) {

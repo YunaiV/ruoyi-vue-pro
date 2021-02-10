@@ -30,7 +30,7 @@ export function updateCodegen(data) {
 export function previewCodegen(tableId) {
   return request({
     url: '/tool/codegen/preview?tableId=' + tableId,
-    method: 'get'
+    method: 'get',
   })
 }
 

@@ -103,23 +103,17 @@ export function download(fileName) {
 
 // 下载 Excel 方法
 export function downloadExcel(data, fileName) {
-  // 创建 blob
-  let blob = new Blob([data], {type: 'application/vnd.ms-excel'});
-  // 创建 href 超链接，点击进行下载
-  window.URL = window.URL || window.webkitURL;
-  let href = URL.createObjectURL(blob);
-  let downA = document.createElement("a");
-  downA.href =  href;
-  downA.download = fileName;
-  downA.click();
-  // 销毁超连接
-  window.URL.revokeObjectURL(href);
+  download0(data, fileName, 'application/vnd.ms-excel');
 }
 
 // 下载 Zip 方法
 export function downloadZip(data, fileName) {
+  download0(data, fileName, 'application/zip');
+}
+
+function download0(data, fileName, mineType) {
   // 创建 blob
-  let blob = new Blob([data], {type: 'application/zip'});
+  let blob = new Blob([data], {type: mineType});
   // 创建 href 超链接，点击进行下载
   window.URL = window.URL || window.webkitURL;
   let href = URL.createObjectURL(blob);
