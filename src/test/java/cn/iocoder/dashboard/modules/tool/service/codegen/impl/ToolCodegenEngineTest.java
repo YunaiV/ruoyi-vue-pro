@@ -1,10 +1,10 @@
 package cn.iocoder.dashboard.modules.tool.service.codegen.impl;
 
 import cn.iocoder.dashboard.TestApplication;
-import cn.iocoder.dashboard.modules.tool.dal.mysql.coegen.ToolCodegenColumnMapper;
-import cn.iocoder.dashboard.modules.tool.dal.mysql.coegen.ToolCodegenTableMapper;
 import cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen.ToolCodegenColumnDO;
 import cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen.ToolCodegenTableDO;
+import cn.iocoder.dashboard.modules.tool.dal.mysql.coegen.ToolCodegenColumnMapper;
+import cn.iocoder.dashboard.modules.tool.dal.mysql.coegen.ToolCodegenTableMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -25,10 +25,11 @@ public class ToolCodegenEngineTest {
 
     @Test
     public void testExecute() {
-        ToolCodegenTableDO table = codegenTableMapper.selectById(10);
+        ToolCodegenTableDO table = codegenTableMapper.selectById(20);
         List<ToolCodegenColumnDO> columns = codegenColumnMapper.selectListByTableId(table.getId());
         Map<String, String> result = codegenEngine.execute(table, columns);
-        System.out.println(result.get("vue/views/system/test/index.vue"));
+        result.forEach((s, s2) -> System.out.println(s2));
+//        System.out.println(result.get("vue/views/system/test/index.vue"));
     }
 
 }

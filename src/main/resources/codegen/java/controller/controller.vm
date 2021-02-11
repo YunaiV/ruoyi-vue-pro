@@ -73,4 +73,6 @@ public class ${table.className}Controller {
         return success(${table.className}Convert.INSTANCE.convertPage(pageResult));
     }
 
+
+
 }

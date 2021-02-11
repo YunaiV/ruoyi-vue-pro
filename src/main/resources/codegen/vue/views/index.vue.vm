@@ -9,8 +9,6 @@
     #set ($javaField = $column.javaField)
     #set ($AttrName=$column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
     #set ($comment=$column.columnComment)
-    #set ($parentheseIndex=$column.columnComment.indexOf("（"))
-    #if ($parentheseIndex >= 0) #set($comment=$column.columnComment.substring(0, $parentheseIndex)) #end
 #if ($column.htmlType == "input")
       <el-form-item label="${comment}" prop="${javaField}">
         <el-input v-model="queryParams.${javaField}" placeholder="请输入${comment}" clearable size="small" @keyup.enter.native="handleQuery"/>
@@ -67,8 +65,6 @@
     #set ($javaField = $column.javaField)
     #set ($AttrName=$column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
     #set ($comment=$column.columnComment)
-    #set ($parentheseIndex=$column.columnComment.indexOf("（"))
-    #if ($parentheseIndex >= 0) #set($comment=$column.columnComment.substring(0, $parentheseIndex)) #end
 #if ($column.javaType == "Date")## 时间类型
       <el-table-column label="${comment}" align="center" prop="${javaField}" width="180">
         <template slot-scope="scope">
@@ -108,8 +104,6 @@
     #set ($javaField = $column.javaField)
     #set ($AttrName = $column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
     #set ($comment = $column.columnComment)
-    #set ($parentheseIndex = $column.columnComment.indexOf("（"))
-    #if ($parentheseIndex >= 0) #set($comment = $column.columnComment.substring(0, $parentheseIndex)) #end
 #if ($column.htmlType == "input")
   #if (!$column.primaryKey)## 忽略主键，不用在表单里
         <el-form-item label="${comment}" prop="${javaField}">

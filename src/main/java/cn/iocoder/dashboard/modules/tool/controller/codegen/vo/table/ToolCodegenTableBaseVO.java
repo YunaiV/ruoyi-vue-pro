@@ -31,6 +31,10 @@ public class ToolCodegenTableBaseVO {
     @NotNull(message = "业务名不能为空")
     private String businessName;
 
+    @ApiModelProperty(value = "业务包", required = true, example = "codegen")
+    @NotNull(message = "业务包不能为空")
+    private String businessPackage;
+
     @ApiModelProperty(value = "类名称", required = true, example = "ToolCodegenTable")
     @NotNull(message = "类名称不能为空")
     private String className;

@@ -22,17 +22,15 @@ public class ${table.className}DO extends BaseDO {
 #foreach ($column in $columns)
 #if (!${baseDOFields.contains(${column.javaField})})##排除 BaseDO 的字段
     /**
-    * ${column.columnComment}
-    */
-#if ("$!column.dictType" != "")##处理枚举值
-    // TODO 枚举 ${column.dictType}
-#end
-#if (${column.primaryKey} && ${column.javaType} != 'String')##处理主键 + 非 String 的情况
-    @TableId
-#end
-#if (${column.primaryKey} && ${column.javaType} == 'String')##处理主键 + String 的情况
-    @TableId(type = IdType.INPUT)
-#end
+     * ${column.columnComment}
+    #if ("$!column.dictType" != "")##处理枚举值
+     *
+     * 枚举 {@link TODO ${column.dictType} 对应的类}
+    #end
+     */
+    #if (${column.primaryKey})##处理主键
+    @TableId#if (${column.javaType} == 'String')type = IdType.INPUT)#end
+    #end
     private ${column.javaType} ${column.javaField};
 #end
 #end

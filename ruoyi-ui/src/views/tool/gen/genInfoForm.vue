@@ -52,6 +52,18 @@
       </el-col>
 
       <el-col :span="12">
+        <el-form-item prop="businessPackage">
+          <span slot="label">
+            业务包
+            <el-tooltip content="业务包，自定义二级目录。例如说，我们希望将 dictType 和 dictData 归类成 dict 业务" placement="top">
+              <i class="el-icon-question"></i>
+            </el-tooltip>
+          </span>
+          <el-input v-model="info.businessPackage" />
+        </el-form-item>
+      </el-col>
+
+      <el-col :span="12">
         <el-form-item prop="className">
           <span slot="label">
             类名称
@@ -251,6 +263,9 @@ export default {
         ],
         businessName: [
           { required: true, message: "请输入生成业务名", trigger: "blur" }
+        ],
+        businessPackage: [
+          { required: true, message: "请输入生成业务包", trigger: "blur" }
         ],
         className: [
           { required: true, message: "请输入生成类名称", trigger: "blur" }

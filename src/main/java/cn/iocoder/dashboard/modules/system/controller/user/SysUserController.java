@@ -124,7 +124,8 @@ public class SysUserController {
     @GetMapping("/export")
 //    @PreAuthorize("@ss.hasPermi('system:user:export')") , @Validated SysUserExportReqVO reqVO
 //    @Log(title = "用户管理", businessType = BusinessType.EXPORT)
-    public void exportUsers(HttpServletResponse response, @Validated SysUserExportReqVO reqVO) throws IOException {
+    public void exportUsers(@Validated SysUserExportReqVO reqVO,
+                            HttpServletResponse response) throws IOException {
         // 获得用户列表
         List<SysUserDO> users = userService.listUsers(reqVO);
 
@@ -143,8 +144,7 @@ public class SysUserController {
         });
 
         // 输出
-        ExcelUtils.write(response, "用户数据.xls", "用户列表",
-                SysUserExcelVO.class, excelUsers);
+        ExcelUtils.write(response, "用户数据.xls", "用户列表", SysUserExcelVO.class, excelUsers);
     }
 
     @ApiOperation("获得导入用户模板")

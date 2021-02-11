@@ -25,7 +25,6 @@ public class SysNoticeDO extends BaseDO {
     /**
      * 公告标题
      */
-
     private String title;
     /**
      * 公告类型
