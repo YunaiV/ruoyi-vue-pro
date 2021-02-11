@@ -81,6 +81,8 @@ public class ToolCodegenEngine {
             // Vue
             .put(vueTemplatePath("views/index.vue"),
                     vueFilePath("views/${table.moduleName}/${table.businessName}/index.vue"))
+            .put(vueTemplatePath("api/api.js"),
+                    vueFilePath("api/${table.moduleName}/${classNameVar}.js"))
             // SQL
             .build();
 
@@ -163,6 +165,7 @@ public class ToolCodegenEngine {
         filePath = StrUtil.replace(filePath, "${table.moduleName}", table.getModuleName());
         filePath = StrUtil.replace(filePath, "${table.businessName}", table.getBusinessName());
         filePath = StrUtil.replace(filePath, "${table.className}", table.getClassName());
+        filePath = StrUtil.replace(filePath, "${classNameVar}", (String) bindingMap.get("classNameVar"));
         return filePath;
     }
 

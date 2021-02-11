@@ -1,53 +1,56 @@
 import request from '@/utils/request'
+#set ($baseURL = "/${table.moduleName}/${simpleClassName_strikeCase}")
 
-// 查询${functionName}列表
-export function list${BusinessName}(query) {
+// 创建${table.classComment}
+export function create${simpleClassName}(data) {
   return request({
-    url: '/${moduleName}/${businessName}/list',
-    method: 'get',
-    params: query
-  })
-}
-
-// 查询${functionName}详细
-export function get${BusinessName}(${pkColumn.javaField}) {
-  return request({
-    url: '/${moduleName}/${businessName}/' + ${pkColumn.javaField},
-    method: 'get'
-  })
-}
-
-// 新增${functionName}
-export function add${BusinessName}(data) {
-  return request({
-    url: '/${moduleName}/${businessName}',
+    url: '${baseURL}/create',
     method: 'post',
     data: data
   })
 }
 
-// 修改${functionName}
-export function update${BusinessName}(data) {
+// 更新${table.classComment}
+export function update${simpleClassName}(data) {
   return request({
-    url: '/${moduleName}/${businessName}',
+    url: '${baseURL}/update',
     method: 'put',
     data: data
   })
 }
 
-// 删除${functionName}
-export function del${BusinessName}(${pkColumn.javaField}) {
+
+// 删除${table.classComment}
+export function delete${simpleClassName}(id) {
   return request({
-    url: '/${moduleName}/${businessName}/' + ${pkColumn.javaField},
+    url: '${baseURL}/delelte?id=' + id,
     method: 'delete'
   })
 }
 
-// 导出${functionName}
-export function export${BusinessName}(query) {
+// 获得${table.classComment}
+export function get${simpleClassName}(id) {
   return request({
-    url: '/${moduleName}/${businessName}/export',
+    url: '${baseURL}/get?id=' + id,
+    method: 'get'
+  })
+}
+
+// 获得${table.classComment}分页
+export function get${simpleClassName}Page(query) {
+  return request({
+    url: '${baseURL}/page',
     method: 'get',
     params: query
+  })
+}
+
+// 导出${table.classComment} Excel
+export function export${simpleClassName}Excel(query) {
+  return request({
+    url: '${baseURL}/export-excel',
+    method: 'get',
+    params: query,
+    reponseBody: 'blob'
   })
 }

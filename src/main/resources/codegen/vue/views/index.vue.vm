@@ -111,14 +111,17 @@
         </el-form-item>
   #end
 #elseif($column.htmlType == "imageUpload")## 图片上传
+        #set ($hasImageUploadColumn = true)
         <el-form-item label="${comment}">
           <imageUpload v-model="form.${javaField}"/>
         </el-form-item>
 #elseif($column.htmlType == "fileUpload")## 文件上传
+        #set ($hasFileUploadColumn = true)
         <el-form-item label="${comment}">
           <fileUpload v-model="form.${javaField}"/>
         </el-form-item>
 #elseif($column.htmlType == "editor")## 文本编辑器
+        #set ($hasEditorColumn = true)
         <el-form-item label="${comment}">
           <editor v-model="form.${javaField}" :min-height="192"/>
         </el-form-item>
@@ -176,46 +179,28 @@
 </template>
 
 <script>
-import { list${BusinessName}, get${BusinessName}, del${BusinessName}, add${BusinessName}, update${BusinessName}, export${BusinessName} } from "@/api/${moduleName}/${businessName}";
-#foreach($column in $columns)
-#if($column.insert && !$column.superColumn && !$column.pk && $column.htmlType == "imageUpload")
+import { create${simpleClassName}, update${simpleClassName}, delete${simpleClassName}, get${simpleClassName}, get${simpleClassName}Page, export${simpleClassName}Excel } from "@/api/${table.moduleName}/${classNameVar}";
+#if ($hasImageUploadColumn)
 import ImageUpload from '@/components/ImageUpload';
-#break
 #end
-#end
-#foreach($column in $columns)
-#if($column.insert && !$column.superColumn && !$column.pk && $column.htmlType == "fileUpload")
+#if ($hasFileUploadColumn)
 import FileUpload from '@/components/FileUpload';
-#break
 #end
-#end
-#foreach($column in $columns)
-#if($column.insert && !$column.superColumn && !$column.pk && $column.htmlType == "editor")
+#if ($hasEditorColumn)
 import Editor from '@/components/Editor';
-#break
-#end
 #end
 
 export default {
-  name: "${BusinessName}",
+  name: "${simpleClassName}",
   components: {
-#foreach($column in $columns)
-#if($column.insert && !$column.superColumn && !$column.pk && $column.htmlType == "imageUpload")
+#if ($hasImageUploadColumn)
     ImageUpload,
-#break
 #end
-#end
-#foreach($column in $columns)
-#if($column.insert && !$column.superColumn && !$column.pk && $column.htmlType == "fileUpload")
+#if ($hasFileUploadColumn)
     FileUpload,
-#break
 #end
-#end
-#foreach($column in $columns)
-#if($column.insert && !$column.superColumn && !$column.pk && $column.htmlType == "editor")
+#if ($hasEditorColumn)
     Editor,
-#break
-#end
 #end
   },
   data() {
@@ -232,63 +217,37 @@ export default {
       title: "",
       // 是否显示弹出层
       open: false,
-#foreach ($column in $columns)
-#set($parentheseIndex=$column.columnComment.indexOf("（"))
-#if($parentheseIndex != -1)
-#set($comment=$column.columnComment.substring(0, $parentheseIndex))
-#else
-#set($comment=$column.columnComment)
-#end
-#if(${column.dictType} != '')
-      // $comment字典
-      ${column.javaField}Options: [],
-#elseif($column.htmlType == "datetime" && $column.queryType == "BETWEEN")
-#set($AttrName=$column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
-      // $comment时间范围
+      #foreach ($column in $columns)## 时间范围
+      #if ($column.htmlType == "datetime" && $column.listOperationCondition == "BETWEEN")
+      #set ($AttrName = $column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
       dateRange${AttrName}: [],
-#end
-#end
+      #end
+      #end
       // 查询参数
       queryParams: {
         pageNo: 1,
         pageSize: 10,
-#foreach ($column in $columns)
-#if($column.query)
-        $column.javaField: null#if($velocityCount != $columns.size()),#end
-
-#end
-#end
+        #foreach ($column in $columns)
+        #if ($column.listOperation && $column.listOperationCondition != 'BETWEEN')
+        $column.javaField: null,
+        #end
+        #end
       },
       // 表单参数
       form: {},
       // 表单校验
       rules: {
-#foreach ($column in $columns)
-#if($column.required)
-#set($parentheseIndex=$column.columnComment.indexOf("（"))
-#if($parentheseIndex != -1)
-#set($comment=$column.columnComment.substring(0, $parentheseIndex))
-#else
-#set($comment=$column.columnComment)
-#end
-        $column.javaField: [
-          { required: true, message: "$comment不能为空", trigger: #if($column.htmlType == "select")"change"#else"blur"#end }
-        ]#if($velocityCount != $columns.size()),#end
-
-#end
-#end
+      #foreach ($column in $columns)
+      #if (($column.createOperation || $column.updateOperation) && !$column.nullable && !${column.primaryKey})## 创建或者更新操作 && 要求非空 && 非主键
+        #set($comment=$column.columnComment)
+        $column.javaField: [{ required: true, message: "${comment}不能为空", trigger: #if($column.htmlType == "select")"change"#else"blur"#end }],
+      #end
+      #end
       }
     };
   },
   created() {
     this.getList();
-#foreach ($column in $columns)
-#if(${column.dictType} != '')
-    this.getDicts("${column.dictType}").then(response => {
-      this.${column.javaField}Options = response.data;
-    });
-#end
-#end
   },
   methods: {
     /** 查询${functionName}列表 */
@@ -379,6 +338,8 @@ export default {
     submitForm() {
       this.#[[$]]#refs["form"].validate(valid => {
         if (valid) {
+          return;
+        }
 #foreach ($column in $columns)
 #if($column.htmlType == "checkbox")
           this.form.$column.javaField = this.form.${column.javaField}.join(",");
@@ -402,7 +363,7 @@ export default {
     },
     /** 删除按钮操作 */
     handleDelete(row) {
-      const ${pkColumn.javaField}s = row.${pkColumn.javaField} || this.ids;
+      const ${pkColumn.javaField}s = row.${pkColumn.javaField};
       this.$confirm('是否确认删除${functionName}编号为"' + ${pkColumn.javaField}s + '"的数据项?', "警告", {
           confirmButtonText: "确定",
           cancelButtonText: "取消",
