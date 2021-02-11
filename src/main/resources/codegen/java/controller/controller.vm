@@ -8,11 +8,15 @@ import io.swagger.annotations.*;
 
 import javax.validation.constraints.*;
 import javax.validation.*;
+import javax.servlet.http.*;
 import java.util.*;
+import java.io.IOException;
 
 import ${PageResultClassName};
 import ${CommonResultClassName};
 import static ${CommonResultClassName}.success;
+
+import ${ExcelUtilsClassName};
 
 import ${basePackage}.${table.moduleName}.controller.${table.businessName}.vo.*;
 import ${basePackage}.${table.moduleName}.dal.dataobject.${table.businessName}.${table.className}DO;
@@ -73,6 +77,14 @@ public class ${table.className}Controller {
         return success(${table.className}Convert.INSTANCE.convertPage(pageResult));
     }
 
-
+    @GetMapping("/export-excel")
+    @ApiOperation("导出${table.classComment} Excel")
+    public void export${simpleClassName}Excel(@Valid ${table.className}ExportReqVO exportReqVO,
+              HttpServletResponse response) throws IOException {
+        List<${table.className}DO> list = ${classNameVar}Service.get${simpleClassName}List(exportReqVO);
+        // 导出 Excel
+        List<${table.className}ExcelVO> datas = ${table.className}Convert.INSTANCE.convertList02(list);
+        ExcelUtils.write(response, "${table.classComment}.xls", "数据", ${table.className}ExcelVO.class, datas);
+    }
 
 }

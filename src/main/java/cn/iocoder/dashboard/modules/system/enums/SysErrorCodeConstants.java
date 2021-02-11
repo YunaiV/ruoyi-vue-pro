@@ -75,7 +75,4 @@ public interface SysErrorCodeConstants {
     // ========== 文件 1002009000 ==========
     ErrorCode FILE_PATH_EXISTS = new ErrorCode(1002009001, "文件路径已经存在");
 
-    // ========== 字典类型（测试） 1002010000 ==========
-    ErrorCode TEST_DEMO_NOT_EXISTS = new ErrorCode(1002010000, "字典类型不存在}");
-
 }

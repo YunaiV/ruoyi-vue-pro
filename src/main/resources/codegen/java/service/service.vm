@@ -7,10 +7,10 @@ import ${basePackage}.${table.moduleName}.dal.dataobject.${table.businessName}.$
 import ${PageResultClassName};
 
 /**
-* ${table.classComment} Service 接口
-*
-* @author ${table.author}
-*/
+ * ${table.classComment} Service 接口
+ *
+ * @author ${table.author}
+ */
 public interface ${table.className}Service {
 
     /**
@@ -58,5 +58,13 @@ public interface ${table.className}Service {
      * @return ${table.classComment}分页
      */
     PageResult<${table.className}DO> get${simpleClassName}Page(${table.className}PageReqVO pageReqVO);
+
+    /**
+     * 获得${table.classComment}列表, 用于 Excel 导出
+     *
+     * @param exportReqVO 查询条件
+     * @return ${table.classComment}分页
+     */
+    List<${table.className}DO> get${simpleClassName}List(${table.className}ExportReqVO exportReqVO);
 
 }

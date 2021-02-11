@@ -19,10 +19,10 @@ import ${ServiceExceptionUtilClassName};
 import static ${basePackage}.${table.moduleName}.enums.${simpleModuleName_upperFirst}ErrorCodeConstants.*;
 
 /**
-* ${table.classComment} Service 实现类
-*
-* @author ${table.author}
-*/
+ * ${table.classComment} Service 实现类
+ *
+ * @author ${table.author}
+ */
 @Service
 @Validated
 public class ${table.className}ServiceImpl implements ${table.className}Service {
@@ -75,6 +75,11 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
     @Override
     public PageResult<${table.className}DO> get${simpleClassName}Page(${table.className}PageReqVO pageReqVO) {
 		return ${classNameVar}Mapper.selectPage(pageReqVO);
+    }
+
+    @Override
+    public List<${table.className}DO> get${simpleClassName}List(${table.className}ExportReqVO exportReqVO) {
+		return ${classNameVar}Mapper.selectList(exportReqVO);
     }
 
 }

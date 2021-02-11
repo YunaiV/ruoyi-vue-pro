@@ -10,10 +10,10 @@ import ${basePackage}.${table.moduleName}.controller.${table.businessName}.vo.*;
 import ${basePackage}.${table.moduleName}.dal.dataobject.${table.businessName}.${table.className}DO;
 
 /**
-* ${table.classComment} Convert
-*
-* @author ${table.author}
-*/
+ * ${table.classComment} Convert
+ *
+ * @author ${table.author}
+ */
 @Mapper
 public interface ${table.className}Convert {
 
@@ -28,5 +28,7 @@ public interface ${table.className}Convert {
     List<${table.className}RespVO> convertList(List<${table.className}DO> list);
 
     PageResult<${table.className}RespVO> convertPage(PageResult<${table.className}DO> page);
+
+    List<${table.className}ExcelVO> convertList02(List<${table.className}DO> list);
 
 }

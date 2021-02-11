@@ -1,0 +1,35 @@
+package ${basePackage}.${table.moduleName}.controller.${table.businessName}.vo;
+
+import lombok.*;
+import java.util.*;
+import io.swagger.annotations.*;
+
+import com.alibaba.excel.annotation.ExcelProperty;
+#foreach ($column in $columns)
+#if ("$!column.dictType" != "")## 有设置数据字典
+import ${DictFormatClassName};
+
+import static ${SysDictTypeEnumClassName}.*;
+#break
+#end
+#end
+
+/**
+ * ${table.classComment} Excel VO
+ *
+ * @author ${table.author}
+ */
+@Data
+public class ${table.className}ExcelVO {
+
+#foreach ($column in $columns)
+    #if (${column.listOperationResult})##返回字段
+    @ExcelProperty("${column.columnComment}")
+    #if ("$!column.dictType" != "")##处理枚举值
+    @DictFormat(${column.dictType.toUpperCase()})
+    #end
+    private ${column.javaType} ${column.javaField};
+
+    #end
+#end
+}

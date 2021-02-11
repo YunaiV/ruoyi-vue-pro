@@ -10,9 +10,12 @@ import cn.iocoder.dashboard.common.pojo.CommonResult;
 import cn.iocoder.dashboard.common.pojo.PageParam;
 import cn.iocoder.dashboard.common.pojo.PageResult;
 import cn.iocoder.dashboard.framework.codegen.config.CodegenProperties;
+import cn.iocoder.dashboard.framework.excel.core.annotations.DictFormat;
+import cn.iocoder.dashboard.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.dashboard.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.dashboard.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.dashboard.framework.mybatis.core.query.QueryWrapperX;
+import cn.iocoder.dashboard.modules.system.enums.dict.SysDictTypeEnum;
 import cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen.ToolCodegenColumnDO;
 import cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen.ToolCodegenTableDO;
 import cn.iocoder.dashboard.util.collection.CollectionUtils;
@@ -59,6 +62,10 @@ public class ToolCodegenEngine {
                     javaFilePath("controller/${table.businessName}/vo/${table.className}RespVO"))
             .put(javaTemplatePath("controller/vo/updateReqVO"),
                     javaFilePath("controller/${table.businessName}/vo/${table.className}UpdateReqVO"))
+            .put(javaTemplatePath("controller/vo/exportReqVO"),
+                    javaFilePath("controller/${table.businessName}/vo/${table.className}ExportReqVO"))
+            .put(javaTemplatePath("controller/vo/excelVO"),
+                    javaFilePath("controller/${table.businessName}/vo/${table.className}ExcelVO"))
             .put(javaTemplatePath("convert/convert"),
                     javaFilePath("convert/${table.businessName}/${table.className}Convert"))
             .put(javaTemplatePath("dal/do"),
@@ -106,15 +113,19 @@ public class ToolCodegenEngine {
         // 全局 Java Bean
         globalBindingMap.put("CommonResultClassName", CommonResult.class.getName());
         globalBindingMap.put("PageResultClassName", PageResult.class.getName());
-        globalBindingMap.put("DateUtilsClassName", DateUtils.class.getName());
-        globalBindingMap.put("ServiceExceptionUtilClassName", ServiceExceptionUtil.class.getName());
         // VO 类，独有字段
         globalBindingMap.put("PageParamClassName", PageParam.class.getName());
+        globalBindingMap.put("DictFormatClassName", DictFormat.class.getName());
+        globalBindingMap.put("SysDictTypeEnumClassName", SysDictTypeEnum.class.getName());
         // DO 类，独有字段
         globalBindingMap.put("baseDOFields", ToolCodegenBuilder.BASE_DO_FIELDS);
         globalBindingMap.put("BaseDOClassName", BaseDO.class.getName());
         globalBindingMap.put("QueryWrapperClassName", QueryWrapperX.class.getName());
         globalBindingMap.put("BaseMapperClassName", BaseMapperX.class.getName());
+        // Util 了诶
+        globalBindingMap.put("ServiceExceptionUtilClassName", ServiceExceptionUtil.class.getName());
+        globalBindingMap.put("DateUtilsClassName", DateUtils.class.getName());
+        globalBindingMap.put("ExcelUtilsClassName", ExcelUtils.class.getName());
     }
 
     public Map<String, String> execute(ToolCodegenTableDO table, List<ToolCodegenColumnDO> columns) {
