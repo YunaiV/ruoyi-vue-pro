@@ -10,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
 
 @SpringBootTest(classes = TestApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class ToolCodegenEngineTest {
@@ -24,9 +25,10 @@ public class ToolCodegenEngineTest {
 
     @Test
     public void testExecute() {
-        ToolCodegenTableDO table = codegenTableMapper.selectById(14);
+        ToolCodegenTableDO table = codegenTableMapper.selectById(10);
         List<ToolCodegenColumnDO> columns = codegenColumnMapper.selectListByTableId(table.getId());
-        codegenEngine.execute(table, columns);
+        Map<String, String> result = codegenEngine.execute(table, columns);
+        System.out.println(result.get("vue/views/system/test/index.vue"));
     }
 
 }

@@ -72,6 +72,8 @@ public class ToolCodegenEngine {
             .put(javaTemplatePath("service/serviceImpl"),
                     javaFilePath("service/${table.businessName}/impl/${table.className}ServiceImpl"))
             // Vue
+            .put(vueTemplatePath("views/index.vue"),
+                    vueFilePath("views/${table.moduleName}/${table.businessName}/index.vue"))
             // SQL
             .build();
 
@@ -159,6 +161,14 @@ public class ToolCodegenEngine {
 
     private static String javaFilePath(String path) {
         return "java/${basePackage}/${table.moduleName}/" + path + ".java";
+    }
+
+    private static String vueTemplatePath(String path) {
+        return "codegen/vue/" + path + ".vm";
+    }
+
+    private static String vueFilePath(String path) {
+        return "vue/" + path;
     }
 
 }
