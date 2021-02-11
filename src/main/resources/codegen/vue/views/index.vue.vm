@@ -1,35 +1,37 @@
 <template>
   <div class="app-container">
-## ========== 搜索区 ==========
+
+    <!-- 搜索工作栏 -->
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
 #foreach($column in $columns)
 #if ($column.listOperation)
     #set ($dictType=$column.dictType)
+    #set ($javaField = $column.javaField)
     #set ($AttrName=$column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
     #set ($comment=$column.columnComment)
     #set ($parentheseIndex=$column.columnComment.indexOf("（"))
     #if ($parentheseIndex >= 0) #set($comment=$column.columnComment.substring(0, $parentheseIndex)) #end
 #if ($column.htmlType == "input")
-      <el-form-item label="${comment}" prop="${column.javaField}">
-        <el-input v-model="queryParams.${column.javaField}" placeholder="请输入${comment}" clearable size="small" @keyup.enter.native="handleQuery"/>
+      <el-form-item label="${comment}" prop="${javaField}">
+        <el-input v-model="queryParams.${javaField}" placeholder="请输入${comment}" clearable size="small" @keyup.enter.native="handleQuery"/>
       </el-form-item>
 #elseif ($column.htmlType == "select" || $column.htmlType == "radio")
-      <el-form-item label="${comment}" prop="${column.javaField}">
-        <el-select v-model="queryParams.${column.javaField}" placeholder="请选择${comment}" clearable size="small">
-    #if ("" != $dictType) ## 设置了 dictType 数据字典的情况
+      <el-form-item label="${comment}" prop="${javaField}">
+        <el-select v-model="queryParams.${javaField}" placeholder="请选择${comment}" clearable size="small">
+    #if ("" != $dictType)## 设置了 dictType 数据字典的情况
           <el-option v-for="dict in this.getDictDatas(DICT_TYPE.$dictType.toUpperCase())"
                        :key="parseInt(dict.dictValue)" :label="dict.dictLabel" :value="parseInt(dict.dictValue)"/>
-    #else ## 未设置 dictType 数据字典的情况
+    #else## 未设置 dictType 数据字典的情况
           <el-option label="请选择字典生成" value="" />
     #end
         </el-select>
       </el-form-item>
 #elseif($column.htmlType == "datetime")
-    #if ($column.queryType != "BETWEEN") ## 非范围
-      <el-form-item label="${comment}" prop="${column.javaField}">
-        <el-date-picker clearable size="small" v-model="queryParams.${column.javaField}" type="date" value-format="yyyy-MM-dd" placeholder="选择${comment}" />
+    #if ($column.queryType != "BETWEEN")## 非范围
+      <el-form-item label="${comment}" prop="${javaField}">
+        <el-date-picker clearable size="small" v-model="queryParams.${javaField}" type="date" value-format="yyyy-MM-dd" placeholder="选择${comment}" />
       </el-form-item>
-    #else ## 范围
+    #else## 范围
       <el-form-item label="${comment}">
         <el-date-picker v-model="dateRange${AttrName}" size="small" style="width: 240px" value-format="yyyy-MM-dd"
                         type="daterange" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" />
@@ -44,7 +46,7 @@
       </el-form-item>
     </el-form>
 
-## ========== 操作区 ==========
+    <!-- 操作工具栏 -->
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
         <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="handleAdd"
@@ -57,92 +59,80 @@
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
-## ========== 列表区 ==========
-    <el-table v-loading="loading" :data="${businessName}List" @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="55" align="center" />
+    <!-- 列表 -->
+    <el-table v-loading="loading" :data="${businessName}List">
 #foreach($column in $columns)
+#if ($column.listOperationResult)
     #set ($dictType=$column.dictType)
+    #set ($javaField = $column.javaField)
     #set ($AttrName=$column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
     #set ($comment=$column.columnComment)
     #set ($parentheseIndex=$column.columnComment.indexOf("（"))
     #if ($parentheseIndex >= 0) #set($comment=$column.columnComment.substring(0, $parentheseIndex)) #end
-#if ($column.pk) ## 主键
-      <el-table-column label="${comment}" align="center" prop="${javaField}" />
-#elseif($column.list && $column.htmlType == "datetime")
+#if ($column.javaType == "Date")## 时间类型
       <el-table-column label="${comment}" align="center" prop="${javaField}" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.${javaField}, '{y}-{m}-{d}') }}</span>
         </template>
       </el-table-column>
-#elseif($column.list && "" != $column.dictType)
-      <el-table-column label="${comment}" align="center" prop="${javaField}" :formatter="${javaField}Format" />
-#elseif($column.list && "" != $javaField)
+#elseif("" != $column.dictType)## 数据字典
+      <el-table-column label="${comment}" align="center" prop="${javaField}">
+        <template slot-scope="scope">
+          <span>{{ getDictDataLabel(DICT_TYPE.$dictType.toUpperCase(), scope.row.javaField) }}</span>
+        </template>
+      </el-table-column>>
+#else
       <el-table-column label="${comment}" align="center" prop="${javaField}" />
+#end
 #end
 #end
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-          <el-button
-            size="mini"
-            type="text"
-            icon="el-icon-edit"
-            @click="handleUpdate(scope.row)"
-            v-hasPermi="['${moduleName}:${businessName}:edit']"
-          >修改</el-button>
-          <el-button
-            size="mini"
-            type="text"
-            icon="el-icon-delete"
-            @click="handleDelete(scope.row)"
-            v-hasPermi="['${moduleName}:${businessName}:remove']"
-          >删除</el-button>
+          <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
+                     v-hasPermi="['${moduleName}:${businessName}:edit']">修改</el-button>
+          <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)"
+                     v-hasPermi="['${moduleName}:${businessName}:remove']">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
+    <!-- 分页组件 -->
+    <pagination v-show="total > 0" :total="total" :page.sync="queryParams.pageNo" :limit.sync="queryParams.pageSize"
+                @pagination="getList"/>
 
-    <pagination
-      v-show="total>0"
-      :total="total"
-      :page.sync="queryParams.pageNum"
-      :limit.sync="queryParams.pageSize"
-      @pagination="getList"
-    />
-
-    <!-- 添加或修改${functionName}对话框 -->
+    <!-- 对话框(添加 / 修改) -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
 #foreach($column in $columns)
-#set($field=$column.javaField)
-#if($column.insert && !$column.pk)
-#if(($column.usableColumn) || (!$column.superColumn))
-#set($parentheseIndex=$column.columnComment.indexOf("（"))
-#if($parentheseIndex != -1)
-#set($comment=$column.columnComment.substring(0, $parentheseIndex))
-#else
-#set($comment=$column.columnComment)
-#end
-#set($dictType=$column.dictType)
-#if($column.htmlType == "input")
-        <el-form-item label="${comment}" prop="${field}">
-          <el-input v-model="form.${field}" placeholder="请输入${comment}" />
+#if ($column.createOperation || $column.updateOperation)
+    #set ($dictType = $column.dictType)
+    #set ($javaField = $column.javaField)
+    #set ($AttrName = $column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
+    #set ($comment = $column.columnComment)
+    #set ($parentheseIndex = $column.columnComment.indexOf("（"))
+    #if ($parentheseIndex >= 0) #set($comment = $column.columnComment.substring(0, $parentheseIndex)) #end
+#if ($column.htmlType == "input")
+  #if (!$column.primaryKey)## 忽略主键，不用在表单里
+        <el-form-item label="${comment}" prop="${javaField}">
+          <el-input v-model="form.${javaField}" placeholder="请输入${comment}" />
         </el-form-item>
+  #end
 #elseif($column.htmlType == "imageUpload")
         <el-form-item label="${comment}">
-          <imageUpload v-model="form.${field}"/>
+          <imageUpload v-model="form.${javaField}"/>
         </el-form-item>
 #elseif($column.htmlType == "fileUpload")
         <el-form-item label="${comment}">
-          <fileUpload v-model="form.${field}"/>
+          <fileUpload v-model="form.${javaField}"/>
         </el-form-item>
 #elseif($column.htmlType == "editor")
         <el-form-item label="${comment}">
-          <editor v-model="form.${field}" :min-height="192"/>
+          <editor v-model="form.${javaField}" :min-height="192"/>
         </el-form-item>
 #elseif($column.htmlType == "select" && "" != $dictType)
-        <el-form-item label="${comment}" prop="${field}">
-          <el-select v-model="form.${field}" placeholder="请选择${comment}">
+        <el-form-item label="${comment}" prop="${javaField}">
+          <el-select v-model="form.${javaField}" placeholder="请选择${comment}">
             <el-option
-              v-for="dict in ${field}Options"
+              v-for="dict in ${javaField}Options"
               :key="dict.dictValue"
               :label="dict.dictLabel"
               #if($column.javaType == "Integer" || $column.javaType == "Long"):value="parseInt(dict.dictValue)"#else:value="dict.dictValue"#end
@@ -151,16 +141,16 @@
           </el-select>
         </el-form-item>
 #elseif($column.htmlType == "select" && $dictType)
-        <el-form-item label="${comment}" prop="${field}">
-          <el-select v-model="form.${field}" placeholder="请选择${comment}">
+        <el-form-item label="${comment}" prop="${javaField}">
+          <el-select v-model="form.${javaField}" placeholder="请选择${comment}">
             <el-option label="请选择字典生成" value="" />
           </el-select>
         </el-form-item>
 #elseif($column.htmlType == "checkbox" && "" != $dictType)
         <el-form-item label="${comment}">
-          <el-checkbox-group v-model="form.${field}">
+          <el-checkbox-group v-model="form.${javaField}">
             <el-checkbox
-              v-for="dict in ${field}Options"
+              v-for="dict in ${javaField}Options"
               :key="dict.dictValue"
               :label="dict.dictValue">
               {{dict.dictLabel}}
@@ -169,15 +159,15 @@
         </el-form-item>
 #elseif($column.htmlType == "checkbox" && $dictType)
         <el-form-item label="${comment}">
-          <el-checkbox-group v-model="form.${field}">
+          <el-checkbox-group v-model="form.${javaField}">
             <el-checkbox>请选择字典生成</el-checkbox>
           </el-checkbox-group>
         </el-form-item>
 #elseif($column.htmlType == "radio" && "" != $dictType)
         <el-form-item label="${comment}">
-          <el-radio-group v-model="form.${field}">
+          <el-radio-group v-model="form.${javaField}">
             <el-radio
-              v-for="dict in ${field}Options"
+              v-for="dict in ${javaField}Options"
               :key="dict.dictValue"
               #if($column.javaType == "Integer" || $column.javaType == "Long"):label="parseInt(dict.dictValue)"#else:label="dict.dictValue"#end
 
@@ -186,24 +176,23 @@
         </el-form-item>
 #elseif($column.htmlType == "radio" && $dictType)
         <el-form-item label="${comment}">
-          <el-radio-group v-model="form.${field}">
+          <el-radio-group v-model="form.${javaField}">
             <el-radio label="1">请选择字典生成</el-radio>
           </el-radio-group>
         </el-form-item>
 #elseif($column.htmlType == "datetime")
-        <el-form-item label="${comment}" prop="${field}">
+        <el-form-item label="${comment}" prop="${javaField}">
           <el-date-picker clearable size="small"
-            v-model="form.${field}"
+            v-model="form.${javaField}"
             type="date"
             value-format="yyyy-MM-dd"
             placeholder="选择${comment}">
           </el-date-picker>
         </el-form-item>
 #elseif($column.htmlType == "textarea")
-        <el-form-item label="${comment}" prop="${field}">
-          <el-input v-model="form.${field}" type="textarea" placeholder="请输入内容" />
+        <el-form-item label="${comment}" prop="${javaField}">
+          <el-input v-model="form.${javaField}" type="textarea" placeholder="请输入内容" />
         </el-form-item>
-#end
 #end
 #end
 #end
@@ -263,26 +252,12 @@ export default {
     return {
       // 遮罩层
       loading: true,
-      // 选中数组
-      ids: [],
-#if($table.sub)
-      // 子表选中数据
-      checked${subClassName}: [],
-#end
-      // 非单个禁用
-      single: true,
-      // 非多个禁用
-      multiple: true,
       // 显示搜索条件
       showSearch: true,
       // 总条数
       total: 0,
       // ${functionName}表格数据
-      ${businessName}List: [],
-#if($table.sub)
-      // ${subTable.functionName}表格数据
-      ${subclassName}List: [],
-#end
+      list: [],
       // 弹出层标题
       title: "",
       // 是否显示弹出层
@@ -305,7 +280,7 @@ export default {
 #end
       // 查询参数
       queryParams: {
-        pageNum: 1,
+        pageNo: 1,
         pageSize: 10,
 #foreach ($column in $columns)
 #if($column.query)
@@ -365,7 +340,7 @@ export default {
 #end
 #end
       list${BusinessName}(this.queryParams).then(response => {
-        this.${businessName}List = response.rows;
+        this.list = response.rows;
         this.total = response.total;
         this.loading = false;
       });
@@ -391,14 +366,11 @@ export default {
 #end
 #end
       };
-#if($table.sub)
-      this.${subclassName}List = [];
-#end
       this.resetForm("form");
     },
     /** 搜索按钮操作 */
     handleQuery() {
-      this.queryParams.pageNum = 1;
+      this.queryParams.pageNo = 1;
       this.getList();
     },
     /** 重置按钮操作 */
@@ -411,12 +383,6 @@ export default {
 #end
       this.resetForm("queryForm");
       this.handleQuery();
-    },
-    // 多选框选中数据
-    handleSelectionChange(selection) {
-      this.ids = selection.map(item => item.${pkColumn.javaField})
-      this.single = selection.length!==1
-      this.multiple = !selection.length
     },
     /** 新增按钮操作 */
     handleAdd() {
@@ -435,9 +401,6 @@ export default {
         this.form.$column.javaField = this.form.${column.javaField}.split(",");
 #end
 #end
-#if($table.sub)
-        this.${subclassName}List = response.data.${subclassName}List;
-#end
         this.open = true;
         this.title = "修改${functionName}";
       });
@@ -450,9 +413,6 @@ export default {
 #if($column.htmlType == "checkbox")
           this.form.$column.javaField = this.form.${column.javaField}.join(",");
 #end
-#end
-#if($table.sub)
-          this.form.${subclassName}List = this.${subclassName}List;
 #end
           if (this.form.${pkColumn.javaField} != null) {
             update${BusinessName}(this.form).then(response => {
@@ -484,40 +444,6 @@ export default {
           this.msgSuccess("删除成功");
         })
     },
-#if($table.sub)
-	/** ${subTable.functionName}序号 */
-    row${subClassName}Index({ row, rowIndex }) {
-      row.index = rowIndex + 1;
-    },
-    /** ${subTable.functionName}添加按钮操作 */
-    handleAdd${subClassName}() {
-      let obj = {};
-#foreach($column in $subTable.columns)
-#if($column.pk || $column.javaField == ${subTableFkclassName})
-#elseif($column.list && "" != $javaField)
-      obj.$column.javaField = "";
-#end
-#end
-      this.${subclassName}List.push(obj);
-    },
-    /** ${subTable.functionName}删除按钮操作 */
-    handleDelete${subClassName}() {
-      if (this.checked${subClassName}.length == 0) {
-        this.$alert("请先选择要删除的${subTable.functionName}数据", "提示", { confirmButtonText: "确定", });
-      } else {
-        this.${subclassName}List.splice(this.checked${subClassName}[0].index - 1, 1);
-      }
-    },
-    /** 单选框选中数据 */
-    handle${subClassName}SelectionChange(selection) {
-      if (selection.length > 1) {
-        this.$refs.${subclassName}.clearSelection();
-        this.$refs.${subclassName}.toggleRowSelection(selection.pop());
-      } else {
-        this.checked${subClassName} = selection;
-      }
-    },
-#end
     /** 导出按钮操作 */
     handleExport() {
       const queryParams = this.queryParams;
