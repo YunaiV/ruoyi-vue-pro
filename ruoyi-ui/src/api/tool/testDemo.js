@@ -22,7 +22,7 @@ export function updateTestDemo(data) {
 // 删除字典类型
 export function deleteTestDemo(id) {
   return request({
-    url: '/tool/test-demo/delelte?id=' + id,
+    url: '/tool/test-demo/delete?id=' + id,
     method: 'delete'
   })
 }
@@ -50,6 +50,6 @@ export function exportTestDemoExcel(query) {
     url: '/tool/test-demo/export-excel',
     method: 'get',
     params: query,
-    reponseBody: 'blob'
+    responseType: 'blob'
   })
 }

@@ -39,15 +39,15 @@ public class ${table.className}Controller {
 
     @PostMapping("/create")
     @ApiOperation("创建${table.classComment}")
-    @PreAuthorize("@ss.hasPermi('${permissionPrefix}:create')")
-    public CommonResult<${primaryColumn.javaType}> create${simpleClassName}(@Valid ${table.className}CreateReqVO createReqVO) {
+    @PreAuthorize("@ss.hasPermission('${permissionPrefix}:create')")
+    public CommonResult<${primaryColumn.javaType}> create${simpleClassName}(@Valid @RequestBody ${table.className}CreateReqVO createReqVO) {
         return success(${classNameVar}Service.create${simpleClassName}(createReqVO));
     }
 
     @PutMapping("/update")
     @ApiOperation("更新${table.classComment}")
-    @PreAuthorize("@ss.hasPermi('${permissionPrefix}:update')")
-    public CommonResult<Boolean> update${simpleClassName}(@Valid ${table.className}UpdateReqVO updateReqVO) {
+    @PreAuthorize("@ss.hasPermission('${permissionPrefix}:update')")
+    public CommonResult<Boolean> update${simpleClassName}(@Valid @RequestBody ${table.className}UpdateReqVO updateReqVO) {
         ${classNameVar}Service.update${simpleClassName}(updateReqVO);
         return success(true);
     }
@@ -55,7 +55,7 @@ public class ${table.className}Controller {
 	@DeleteMapping("/delete")
     @ApiOperation("删除${table.classComment}")
     @ApiImplicitParam(name = "id", value = "编号", required = true)
-	@PreAuthorize("@ss.hasPermi('${permissionPrefix}:delete')")
+	@PreAuthorize("@ss.hasPermission('${permissionPrefix}:delete')")
     public CommonResult<Boolean> delete${simpleClassName}(@RequestParam("id") ${primaryColumn.javaType} id) {
         ${classNameVar}Service.delete${simpleClassName}(id);
         return success(true);
@@ -64,7 +64,7 @@ public class ${table.className}Controller {
     @GetMapping("/get")
     @ApiOperation("获得${table.classComment}")
     @ApiImplicitParam(name = "id", value = "编号", required = true, dataTypeClass = ${primaryColumn.javaType}.class)
-    @PreAuthorize("@ss.hasPermi('${permissionPrefix}:query')")
+    @PreAuthorize("@ss.hasPermission('${permissionPrefix}:query')")
     public CommonResult<${table.className}RespVO> get${simpleClassName}(@RequestParam("id") ${primaryColumn.javaType} id) {
         ${table.className}DO ${classNameVar} = ${classNameVar}Service.get${simpleClassName}(id);
         return success(${table.className}Convert.INSTANCE.convert(${classNameVar}));
@@ -73,7 +73,7 @@ public class ${table.className}Controller {
     @GetMapping("/list")
     @ApiOperation("获得${table.classComment}列表")
     @ApiImplicitParam(name = "ids", value = "编号列表", required = true, dataTypeClass = List.class)
-    @PreAuthorize("@ss.hasPermi('${permissionPrefix}:query')")
+    @PreAuthorize("@ss.hasPermission('${permissionPrefix}:query')")
     public CommonResult<List<${table.className}RespVO>> get${simpleClassName}List(@RequestParam("ids") Collection<${primaryColumn.javaType}> ids) {
         List<${table.className}DO> list = ${classNameVar}Service.get${simpleClassName}List(ids);
         return success(${table.className}Convert.INSTANCE.convertList(list));
@@ -81,7 +81,7 @@ public class ${table.className}Controller {
 
     @GetMapping("/page")
     @ApiOperation("获得${table.classComment}分页")
-    @PreAuthorize("@ss.hasPermi('${permissionPrefix}:query')")
+    @PreAuthorize("@ss.hasPermission('${permissionPrefix}:query')")
     public CommonResult<PageResult<${table.className}RespVO>> get${simpleClassName}Page(@Valid ${table.className}PageReqVO pageVO) {
         PageResult<${table.className}DO> pageResult = ${classNameVar}Service.get${simpleClassName}Page(pageVO);
         return success(${table.className}Convert.INSTANCE.convertPage(pageResult));
@@ -89,7 +89,7 @@ public class ${table.className}Controller {
 
     @GetMapping("/export-excel")
     @ApiOperation("导出${table.classComment} Excel")
-    @PreAuthorize("@ss.hasPermi('${permissionPrefix}:export')")
+    @PreAuthorize("@ss.hasPermission('${permissionPrefix}:export')")
     @OperateLog(type = EXPORT)
     public void export${simpleClassName}Excel(@Valid ${table.className}ExportReqVO exportReqVO,
               HttpServletResponse response) throws IOException {

@@ -93,7 +93,7 @@ export function addBeginAndEndTime(params, dateRange, propName) {
     params['begin' + propName] = dateRange[0] + ' 00:00:00';
   }
   if (dateRange[1]) {
-    params['end' + propName] = dateRange[0] + ' 23:59:59';
+    params['end' + propName] = dateRange[1] + ' 23:59:59';
   }
   return params;
 }

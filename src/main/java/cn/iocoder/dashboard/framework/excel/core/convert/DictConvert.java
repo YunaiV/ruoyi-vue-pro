@@ -44,14 +44,19 @@ public class DictConvert implements Converter<Object> {
 
     @Override
     public CellData<String> convertToExcelData(Object object, ExcelContentProperty contentProperty,
-                                       GlobalConfiguration globalConfiguration) {
+                                               GlobalConfiguration globalConfiguration) {
+        // 空时，返回空
+        if (object == null) {
+            return new CellData<>("");
+        }
+
         // 使用字典格式化
         SysDictTypeEnum type = getType(contentProperty);
         String value = String.valueOf(object);
         SysDictDataDO dictData = DictUtils.getDictDataFromCache(type.getValue(), value);
         if (dictData == null) {
             log.error("[convertToExcelData][type({}) 转换不了 label({})]", type, value);
-            return null;
+            return new CellData<>("");
         }
         // 生成 Excel 小表格
         return new CellData<>(dictData.getLabel());

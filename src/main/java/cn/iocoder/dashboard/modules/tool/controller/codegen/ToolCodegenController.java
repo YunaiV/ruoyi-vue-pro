@@ -51,7 +51,6 @@ public class ToolCodegenController {
             @ApiImplicitParam(name = "tableName", required = true, example = "yudao", dataTypeClass = String.class),
             @ApiImplicitParam(name = "tableComment", required = true, example = "芋道", dataTypeClass = String.class)
     })
-//    @PreAuthorize("@ss.hasPermi('tool:gen:list')") TODO 权限
     public CommonResult<List<ToolSchemaTableRespVO>> getSchemaTableList(
             @RequestParam(value = "tableName", required = false) String tableName,
             @RequestParam(value = "tableComment", required = false) String tableComment) {

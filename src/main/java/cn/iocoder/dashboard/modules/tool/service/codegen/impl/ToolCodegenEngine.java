@@ -11,6 +11,7 @@ import cn.iocoder.dashboard.common.pojo.PageParam;
 import cn.iocoder.dashboard.common.pojo.PageResult;
 import cn.iocoder.dashboard.framework.codegen.config.CodegenProperties;
 import cn.iocoder.dashboard.framework.excel.core.annotations.DictFormat;
+import cn.iocoder.dashboard.framework.excel.core.convert.DictConvert;
 import cn.iocoder.dashboard.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.dashboard.framework.logger.operatelog.core.annotations.OperateLog;
 import cn.iocoder.dashboard.framework.logger.operatelog.core.enums.OperateTypeEnum;
@@ -27,11 +28,9 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+import static cn.hutool.core.map.MapUtil.getStr;
 import static cn.hutool.core.text.CharSequenceUtil.*;
 
 /**
@@ -82,7 +81,7 @@ public class ToolCodegenEngine {
                     javaFilePath("service/${table.businessName}/impl/${table.className}ServiceImpl"))
             // Vue
             .put(vueTemplatePath("views/index.vue"),
-                    vueFilePath("views/${table.moduleName}/${table.businessName}/index.vue"))
+                    vueFilePath("views/${table.moduleName}/${classNameVar}/index.vue"))
             .put(vueTemplatePath("api/api.js"),
                     vueFilePath("api/${table.moduleName}/${classNameVar}.js"))
             // SQL
@@ -131,6 +130,7 @@ public class ToolCodegenEngine {
         globalBindingMap.put("ServiceExceptionUtilClassName", ServiceExceptionUtil.class.getName());
         globalBindingMap.put("DateUtilsClassName", DateUtils.class.getName());
         globalBindingMap.put("ExcelUtilsClassName", ExcelUtils.class.getName());
+        globalBindingMap.put("DictConvertClassName", DictConvert.class.getName());
         globalBindingMap.put("OperateLogClassName", OperateLog.class.getName());
         globalBindingMap.put("OperateTypeEnumClassName", OperateTypeEnum.class.getName());
     }
@@ -167,13 +167,18 @@ public class ToolCodegenEngine {
     }
 
     private String formatFilePath(String filePath, Map<String, Object> bindingMap) {
-        filePath = StrUtil.replace(filePath, "${basePackage}", ((String) bindingMap.get("basePackage")).replaceAll("\\.", "/"));
+        filePath = StrUtil.replace(filePath, "${basePackage}",
+                getStr(bindingMap, "basePackage").replaceAll("\\.", "/"));
+        filePath = StrUtil.replace(filePath, "${simpleModuleName_upperFirst}",
+                getStr(bindingMap, "simpleModuleName_upperFirst"));
+        filePath = StrUtil.replace(filePath, "${classNameVar}",
+                getStr(bindingMap, "classNameVar"));
+
+        // table 包含的字段
         ToolCodegenTableDO table = (ToolCodegenTableDO) bindingMap.get("table");
-        filePath = StrUtil.replace(filePath, "${simpleModuleName_upperFirst}", (String) bindingMap.get("simpleModuleName_upperFirst"));
         filePath = StrUtil.replace(filePath, "${table.moduleName}", table.getModuleName());
         filePath = StrUtil.replace(filePath, "${table.businessName}", table.getBusinessName());
         filePath = StrUtil.replace(filePath, "${table.className}", table.getClassName());
-        filePath = StrUtil.replace(filePath, "${classNameVar}", (String) bindingMap.get("classNameVar"));
         return filePath;
     }
 

@@ -31,10 +31,6 @@ public class ToolCodegenTableBaseVO {
     @NotNull(message = "业务名不能为空")
     private String businessName;
 
-    @ApiModelProperty(value = "业务包", required = true, example = "codegen")
-    @NotNull(message = "业务包不能为空")
-    private String businessPackage;
-
     @ApiModelProperty(value = "类名称", required = true, example = "ToolCodegenTable")
     @NotNull(message = "类名称不能为空")
     private String className;
@@ -50,5 +46,8 @@ public class ToolCodegenTableBaseVO {
     @ApiModelProperty(value = "模板类型", required = true, example = "1", notes = "参见 ToolCodegenTemplateTypeEnum 枚举")
     @NotNull(message = "模板类型不能为空")
     private Integer templateType;
+
+    @ApiModelProperty(value = "父菜单编号", example = "1024")
+    private Long parentMenuId;
 
 }

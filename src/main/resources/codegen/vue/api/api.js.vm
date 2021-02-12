@@ -23,7 +23,7 @@ export function update${simpleClassName}(data) {
 // 删除${table.classComment}
 export function delete${simpleClassName}(id) {
   return request({
-    url: '${baseURL}/delelte?id=' + id,
+    url: '${baseURL}/delete?id=' + id,
     method: 'delete'
   })
 }
@@ -51,6 +51,6 @@ export function export${simpleClassName}Excel(query) {
     url: '${baseURL}/export-excel',
     method: 'get',
     params: query,
-    reponseBody: 'blob'
+    responseType: 'blob'
   })
 }

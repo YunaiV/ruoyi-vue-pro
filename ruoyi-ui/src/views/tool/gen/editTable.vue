@@ -129,6 +129,7 @@
 import { getCodegenDetail, updateCodegen } from "@/api/tool/codegen";
 import { listAllSimple as listAllSimpleDictType } from "@/api/system/dict/type";
 import { listMenu as getMenuTreeselect } from "@/api/system/menu";
+import { listSimpleMenus } from "@/api/system/menu";
 import basicInfoForm from "./basicInfoForm";
 import genInfoForm from "./genInfoForm";
 import Sortable from 'sortablejs'
@@ -170,8 +171,9 @@ export default {
         this.dictOptions = response.data;
       });
       /** 查询菜单下拉列表 */
-      getMenuTreeselect().then(response => {
-        this.menus = this.handleTree(response.data, "menuId");
+      listSimpleMenus().then(response => {
+        this.menus = [];
+        this.menus.push(...this.handleTree(response.data, "id"));
       });
     }
   },

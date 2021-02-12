@@ -54,14 +54,6 @@ public class ToolCodegenTableDO extends BaseDO {
      */
     private String businessName;
     /**
-     * 业务包，自定义二级目录
-     *
-     * 例如说，我们希望将 dictType 和 dictData 归类成 dict 业务
-     *
-     * 如果不需要的情况下，businessName 和 businessPackage 是等价的
-     */
-    private String businessPackage;
-    /**
      * 类名称（首字母大写）
      *
      * 例如说，SysUser、SysMenu、SysDictData 等等

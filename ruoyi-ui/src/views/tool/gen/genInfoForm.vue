@@ -51,17 +51,17 @@
         </el-form-item>
       </el-col>
 
-      <el-col :span="12">
-        <el-form-item prop="businessPackage">
-          <span slot="label">
-            业务包
-            <el-tooltip content="业务包，自定义二级目录。例如说，我们希望将 dictType 和 dictData 归类成 dict 业务" placement="top">
-              <i class="el-icon-question"></i>
-            </el-tooltip>
-          </span>
-          <el-input v-model="info.businessPackage" />
-        </el-form-item>
-      </el-col>
+<!--      <el-col :span="12">-->
+<!--        <el-form-item prop="businessPackage">-->
+<!--          <span slot="label">-->
+<!--            业务包-->
+<!--            <el-tooltip content="业务包，自定义二级目录。例如说，我们希望将 dictType 和 dictData 归类成 dict 业务" placement="top">-->
+<!--              <i class="el-icon-question"></i>-->
+<!--            </el-tooltip>-->
+<!--          </span>-->
+<!--          <el-input v-model="info.businessPackage" />-->
+<!--        </el-form-item>-->
+<!--      </el-col>-->
 
       <el-col :span="12">
         <el-form-item prop="className">
@@ -95,14 +95,8 @@
               <i class="el-icon-question"></i>
             </el-tooltip>
           </span>
-          <treeselect
-            :append-to-body="true"
-            v-model="info.parentMenuId"
-            :options="menus"
-            :normalizer="normalizer"
-            :show-count="true"
-            placeholder="请选择系统菜单"
-          />
+          <treeselect :append-to-body="true" v-model="info.parentMenuId" :options="menus"
+            :normalizer="normalizer" :show-count="true" placeholder="请选择系统菜单" />
         </el-form-item>
       </el-col>
 
@@ -289,8 +283,8 @@ export default {
         delete node.children;
       }
       return {
-        id: node.menuId,
-        label: node.menuName,
+        id: node.id,
+        label: node.name,
         children: node.children
       };
     },

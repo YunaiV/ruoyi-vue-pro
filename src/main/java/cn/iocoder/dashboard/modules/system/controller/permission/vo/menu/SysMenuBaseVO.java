@@ -42,11 +42,12 @@ public class SysMenuBaseVO {
     @ApiModelProperty(value = "菜单图标", example = "/menu/list", notes = "仅菜单类型为菜单或者目录时，才需要传")
     private String icon;
 
-    /**
-     * 组件路径
-     */
     @ApiModelProperty(value = "组件路径", example = "system/post/index", notes = "仅菜单类型为菜单时，才需要传")
     @Size(max = 200, message = "组件路径不能超过255个字符")
     private String component;
+
+    @ApiModelProperty(value = "状态", required = true, example = "1", notes = "见 SysCommonStatusEnum 枚举")
+    @NotNull(message = "状态不能为空")
+    private Integer status;
 
 }

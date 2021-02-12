@@ -18,14 +18,14 @@
         <el-select v-model="queryParams.${javaField}" placeholder="请选择${comment}" clearable size="small">
     #if ("" != $dictType)## 设置了 dictType 数据字典的情况
           <el-option v-for="dict in this.getDictDatas(DICT_TYPE.$dictType.toUpperCase())"
-                       :key="dict.dictValue" :label="dict.dictLabel" :value="dict.dictValue"/>
+                       :key="dict.value" :label="dict.label" :value="dict.value"/>
     #else## 未设置 dictType 数据字典的情况
           <el-option label="请选择字典生成" value="" />
     #end
         </el-select>
       </el-form-item>
 #elseif($column.htmlType == "datetime")
-    #if ($column.queryType != "BETWEEN")## 非范围
+    #if ($column.listOperationCondition != "BETWEEN")## 非范围
       <el-form-item label="${comment}" prop="${javaField}">
         <el-date-picker clearable size="small" v-model="queryParams.${javaField}" type="date" value-format="yyyy-MM-dd" placeholder="选择${comment}" />
       </el-form-item>
@@ -74,7 +74,7 @@
 #elseif("" != $column.dictType)## 数据字典
       <el-table-column label="${comment}" align="center" prop="${javaField}">
         <template slot-scope="scope">
-          <span>{{ getDictDataLabel(DICT_TYPE.$dictType.toUpperCase(), scope.row.javaField) }}</span>
+          <span>{{ getDictDataLabel(DICT_TYPE.$dictType.toUpperCase(), scope.row.${column.javaField}) }}</span>
         </template>
       </el-table-column>>
 #else
@@ -253,11 +253,12 @@ export default {
     /** 查询列表 */
     getList() {
       this.loading = true;
+      // 处理查询参数
       let params = {...this.queryParams};
       #foreach ($column in $columns)
       #if ($column.htmlType == "datetime" && $column.listOperationCondition == "BETWEEN")
       #set ($AttrName = $column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
-      this.addBeginAndEndTime(params, this.dateRange${AttrName}, ${column.javaField});
+      this.addBeginAndEndTime(params, this.dateRange${AttrName}, '${column.javaField}');
       #end
       #end
       // 执行查询
@@ -279,7 +280,7 @@ export default {
         #if($column.htmlType == "checkbox")
         $column.javaField: [],
         #else
-        $column.javaField: null,
+        $column.javaField: undefined,
         #end
         #end
       };
@@ -325,7 +326,7 @@ export default {
     /** 提交按钮 */
     submitForm() {
       this.#[[$]]#refs["form"].validate(valid => {
-        if (valid) {
+        if (!valid) {
           return;
         }
         #foreach ($column in $columns)
@@ -366,19 +367,23 @@ export default {
     },
     /** 导出按钮操作 */
     handleExport() {
+      // 处理查询参数
+      let params = {...this.queryParams};
+      params.pageNo = undefined;
+      params.pageSize = undefined;
+      #foreach ($column in $columns)
+      #if ($column.htmlType == "datetime" && $column.listOperationCondition == "BETWEEN")
+      #set ($AttrName = $column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
+      this.addBeginAndEndTime(params, this.dateRange${AttrName}, '${column.javaField}');
+      #end
+      #end
+      // 执行导出
       this.$confirm('是否确认导出所有${table.classComment}数据项?', "警告", {
           confirmButtonText: "确定",
           cancelButtonText: "取消",
           type: "warning"
         }).then(function() {
-          let params = {...this.queryParams};
-          #foreach ($column in $columns)
-          #if ($column.htmlType == "datetime" && $column.listOperationCondition == "BETWEEN")
-          #set ($AttrName = $column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
-          this.addBeginAndEndTime(params, this.dateRange${AttrName}, ${column.javaField});
-          #end
-          #end
-          return export${simpleClassName}(params);
+          return export${simpleClassName}Excel(params);
         }).then(response => {
           this.downloadExcel(response, '${table.classComment}.xls');
         })

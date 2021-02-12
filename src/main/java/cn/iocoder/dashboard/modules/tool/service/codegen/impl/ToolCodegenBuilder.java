@@ -128,7 +128,6 @@ public class ToolCodegenBuilder {
                 '_', false))); // 第一个 _ 前缀的前面，作为 module 名字
         table.setBusinessName(toCamelCase(subAfter(table.getTableName(),
                 '_', false))); // 第一步，第一个 _ 前缀的后面，作为 module 名字; 第二步，可能存在多个 _ 的情况，转换成驼峰
-        table.setBusinessPackage(table.getBusinessPackage());
         table.setClassName(upperFirst(toCamelCase(table.getTableName()))); // 驼峰 + 首字母大写
         table.setClassComment(subBefore(table.getTableComment(), // 去除结尾的表，作为类描述
                 '表', true));
