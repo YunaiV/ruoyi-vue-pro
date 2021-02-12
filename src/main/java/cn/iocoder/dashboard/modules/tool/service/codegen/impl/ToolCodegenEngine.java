@@ -12,6 +12,8 @@ import cn.iocoder.dashboard.common.pojo.PageResult;
 import cn.iocoder.dashboard.framework.codegen.config.CodegenProperties;
 import cn.iocoder.dashboard.framework.excel.core.annotations.DictFormat;
 import cn.iocoder.dashboard.framework.excel.core.util.ExcelUtils;
+import cn.iocoder.dashboard.framework.logger.operatelog.core.annotations.OperateLog;
+import cn.iocoder.dashboard.framework.logger.operatelog.core.enums.OperateTypeEnum;
 import cn.iocoder.dashboard.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.dashboard.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.dashboard.framework.mybatis.core.query.QueryWrapperX;
@@ -84,6 +86,7 @@ public class ToolCodegenEngine {
             .put(vueTemplatePath("api/api.js"),
                     vueFilePath("api/${table.moduleName}/${classNameVar}.js"))
             // SQL
+            .put("codegen/sql/sql.vm", "sql/sql.sql")
             .build();
 
     @Resource
@@ -124,10 +127,12 @@ public class ToolCodegenEngine {
         globalBindingMap.put("BaseDOClassName", BaseDO.class.getName());
         globalBindingMap.put("QueryWrapperClassName", QueryWrapperX.class.getName());
         globalBindingMap.put("BaseMapperClassName", BaseMapperX.class.getName());
-        // Util 了诶
+        // Util 工具类
         globalBindingMap.put("ServiceExceptionUtilClassName", ServiceExceptionUtil.class.getName());
         globalBindingMap.put("DateUtilsClassName", DateUtils.class.getName());
         globalBindingMap.put("ExcelUtilsClassName", ExcelUtils.class.getName());
+        globalBindingMap.put("OperateLogClassName", OperateLog.class.getName());
+        globalBindingMap.put("OperateTypeEnumClassName", OperateTypeEnum.class.getName());
     }
 
     public Map<String, String> execute(ToolCodegenTableDO table, List<ToolCodegenColumnDO> columns) {
@@ -146,7 +151,10 @@ public class ToolCodegenEngine {
         bindingMap.put("simpleClassName", simpleClassName);
         bindingMap.put("simpleClassName_underlineCase", toUnderlineCase(simpleClassName)); // 将 DictType 转换成 dict_type
         bindingMap.put("classNameVar", lowerFirst(simpleClassName)); // 将 DictType 转换成 dictType，用于变量
-        bindingMap.put("simpleClassName_strikeCase", toSymbolCase(simpleClassName, '-')); // 将 DictType 转换成 dict-type
+        String simpleClassNameStrikeCase = toSymbolCase(simpleClassName, '-'); // 将 DictType 转换成 dict-type
+        bindingMap.put("simpleClassName_strikeCase", simpleClassNameStrikeCase);
+        // permission 前缀
+        bindingMap.put("permissionPrefix", table.getModuleName() + ":" + simpleClassNameStrikeCase);
 
         // 执行生成
         final Map<String, String> result = Maps.newLinkedHashMapWithExpectedSize(TEMPLATES.size()); // 有序

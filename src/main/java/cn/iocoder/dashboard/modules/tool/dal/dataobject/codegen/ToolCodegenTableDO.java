@@ -1,6 +1,7 @@
 package cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen;
 
 import cn.iocoder.dashboard.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.dashboard.modules.system.dal.dataobject.permission.SysMenuDO;
 import cn.iocoder.dashboard.modules.tool.enums.codegen.ToolCodegenTemplateTypeEnum;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Builder;
@@ -85,5 +86,12 @@ public class ToolCodegenTableDO extends BaseDO {
     private Integer templateType;
 
     // ========== 菜单相关字段 ==========
+
+    /**
+     * 父菜单编号
+     *
+     * 关联 {@link SysMenuDO#getId()}
+     */
+    private Long parentMenuId;
 
 }

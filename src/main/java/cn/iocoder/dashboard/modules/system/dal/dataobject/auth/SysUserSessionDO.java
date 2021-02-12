@@ -33,7 +33,7 @@ public class SysUserSessionDO extends BaseDO {
     /**
      * 用户编号
      *
-     * 外键 {@link SysUserDO#getId()}
+     * 关联 {@link SysUserDO#getId()}
      */
     private Long userId;
     /**

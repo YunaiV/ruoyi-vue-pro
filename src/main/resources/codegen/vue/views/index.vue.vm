@@ -48,11 +48,11 @@
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
         <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="handleAdd"
-                   v-hasPermi="['${moduleName}:${businessName}:add']">新增</el-button>
+                   v-hasPermi="['${permissionPrefix}:create']">新增</el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button type="warning" plain icon="el-icon-download" size="mini" @click="handleExport"
-                   v-hasPermi="['${moduleName}:${businessName}:export']">导出</el-button>
+                   v-hasPermi="['${permissionPrefix}:export']">导出</el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
@@ -85,9 +85,9 @@
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
-                     v-hasPermi="['${moduleName}:${businessName}:edit']">修改</el-button>
+                     v-hasPermi="['${permissionPrefix}:update']">修改</el-button>
           <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)"
-                     v-hasPermi="['${moduleName}:${businessName}:remove']">删除</el-button>
+                     v-hasPermi="['${permissionPrefix}:delete']">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -211,7 +211,7 @@ export default {
       showSearch: true,
       // 总条数
       total: 0,
-      // ${table.tableComment}表格数据
+      // ${table.classComment}列表
       list: [],
       // 弹出层标题
       title: "",
@@ -305,7 +305,7 @@ export default {
     handleAdd() {
       this.reset();
       this.open = true;
-      this.title = "添加${table.tableComment}";
+      this.title = "添加${table.classComment}";
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
@@ -319,7 +319,7 @@ export default {
         #end
         #end
         this.open = true;
-        this.title = "修改${table.tableComment}";
+        this.title = "修改${table.classComment}";
       });
     },
     /** 提交按钮 */
@@ -353,7 +353,7 @@ export default {
     /** 删除按钮操作 */
     handleDelete(row) {
       const ${primaryColumn.javaField} = row.${primaryColumn.javaField};
-      this.$confirm('是否确认删除${table.tableComment}编号为"' + ${primaryColumn.javaField} + '"的数据项?', "警告", {
+      this.$confirm('是否确认删除${table.classComment}编号为"' + ${primaryColumn.javaField} + '"的数据项?', "警告", {
           confirmButtonText: "确定",
           cancelButtonText: "取消",
           type: "warning"
@@ -366,7 +366,7 @@ export default {
     },
     /** 导出按钮操作 */
     handleExport() {
-      this.$confirm('是否确认导出所有${table.tableComment}数据项?', "警告", {
+      this.$confirm('是否确认导出所有${table.classComment}数据项?', "警告", {
           confirmButtonText: "确定",
           cancelButtonText: "取消",
           type: "warning"

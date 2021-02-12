@@ -1,0 +1,26 @@
+-- 菜单 SQL
+INSERT INTO `sys_menu`(
+    `name`, `permission`, `menu_type`, `sort`, `parent_id`,
+    `path`, `icon`, `component`, `status`
+)
+VALUES (
+    '${table.tableComment}管理', '${permissionPrefix}:query', 2, 0, ${table.parentMenuId},
+    '${simpleClassName_strikeCase}', '', '${table.moduleName}/${table.businessName}/index', 1
+);
+
+-- 按钮父菜单ID
+SELECT @parentId := LAST_INSERT_ID();
+
+-- 按钮 SQL
+#set ($functionNames = ['创建', '更新', '删除', '导出'])
+#set ($functionOps = ['create', 'update', 'delete', 'export'])
+#foreach ($functionName in $functionNames)
+INSERT INTO `sys_menu`(
+    `name`, `permission`, `menu_type`, `sort`, `parent_id`,
+    `path`, `icon`, `component`, `status`
+)
+VALUES (
+    '${table.tableComment}${functionName}', '${permissionPrefix}:${functionOps[$velocityCount]}', 3, 0, @parentId,
+    '', '', '', 1
+);
+#end

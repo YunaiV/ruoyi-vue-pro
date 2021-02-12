@@ -29,7 +29,7 @@ public class SysDeptDO extends BaseDO {
     /**
      * 父部门ID
      *
-     * 外键 {@link #id}
+     * 关联 {@link #id}
      */
     private Long parentId;
     /**

@@ -29,7 +29,7 @@ public class ToolCodegenColumnDO extends BaseDO {
     /**
      * 表编号
      *
-     * 外键 {@link ToolCodegenTableDO#getId()}
+     * 关联 {@link ToolCodegenTableDO#getId()}
      */
     private Long tableId;
 
