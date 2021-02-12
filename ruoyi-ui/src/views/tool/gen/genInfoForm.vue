@@ -294,6 +294,11 @@ export default {
     },
     /** 选择生成模板触发 */
     tplSelectChange(value) {
+      if (value !== 1) {
+        // TODO 芋艿：暂时不考虑支持树形结构
+        this.msgError('暂时不考虑支持【树形】和【主子表】的代码生成。原因是：导致 vm 模板过于复杂，不利于胖友二次开发');
+        return false;
+      }
       if(value !== 'sub') {
         this.info.subTableName = '';
         this.info.subTableFkName = '';
