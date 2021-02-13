@@ -151,6 +151,12 @@
             <version>1.7.0</version>
         </dependency>
 
+        <!-- Job 定时任务相关 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-quartz</artifactId>
+        </dependency>
+
         <!-- 监控相关 -->
         <dependency>
             <groupId>org.apache.skywalking</groupId>
