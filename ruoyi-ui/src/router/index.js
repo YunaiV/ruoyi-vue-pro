@@ -107,13 +107,13 @@ export const constantRoutes = [
     ]
   },
   {
-    path: '/gen',
+    path: '/codegen',
     component: Layout,
     hidden: true,
     children: [
       {
         path: 'edit/:tableId(\\d+)',
-        component: (resolve) => require(['@/views/tool/gen/editTable'], resolve),
+        component: (resolve) => require(['@/views/tool/codegen/editTable'], resolve),
         name: 'GenEdit',
         meta: { title: '修改生成配置' }
       }

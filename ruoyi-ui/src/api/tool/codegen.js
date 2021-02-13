@@ -27,10 +27,22 @@ export function updateCodegen(data) {
 }
 
 // 基于数据库的表结构，同步数据库的表和字段定义
-export function syncCodegen(tableId) {
+export function syncCodegenFromDB(tableId) {
   return request({
-    url: '/tool/codegen/sync?tableId=' + tableId,
+    url: '/tool/codegen/sync-from-db?tableId=' + tableId,
     method: 'put'
+  })
+}
+
+// 基于 SQL 建表语句，同步数据库的表和字段定义
+export function syncCodegenFromSQL(tableId, sql) {
+  return request({
+    url: '/tool/codegen/sync-from-sql?tableId=' + tableId,
+    method: 'put',
+    headers:{
+      'Content-type': 'application/x-www-form-urlencoded'
+    },
+    data: 'tableId=' + tableId + "&sql=" + sql,
   })
 }
 
@@ -61,14 +73,26 @@ export function getSchemaTableList(query) {
 }
 
 // 基于数据库的表结构，创建代码生成器的表定义
-export function createCodegenList(tableNames) {
+export function createCodegenListFromDB(tableNames) {
   return request({
-    url: '/tool/codegen/create-list',
+    url: '/tool/codegen/create-list-from-db',
     method: 'post',
     headers:{
       'Content-type': 'application/x-www-form-urlencoded'
     },
     data: 'tableNames=' + tableNames
+  })
+}
+
+// 基于 SQL 建表语句，创建代码生成器的表定义
+export function createCodegenListFromSQL(data) {
+  return request({
+    url: '/tool/codegen/create-list-from-sql',
+    method: 'post',
+    headers:{
+      'Content-type': 'application/x-www-form-urlencoded'
+    },
+    data: 'sql=' + data.sql,
   })
 }
 

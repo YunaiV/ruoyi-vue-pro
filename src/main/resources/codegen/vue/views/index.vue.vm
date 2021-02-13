@@ -268,12 +268,12 @@ export default {
         this.loading = false;
       });
     },
-    // 取消按钮
+    /** 取消按钮 */
     cancel() {
       this.open = false;
       this.reset();
     },
-    // 表单重置
+    /** 表单重置 */
     reset() {
       this.form = {
         #foreach ($column in $columns)

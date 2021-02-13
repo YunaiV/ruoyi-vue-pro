@@ -56,9 +56,6 @@ public class ToolCodegenServiceImpl implements ToolCodegenService {
     @Resource
     private CodegenProperties codegenProperties;
 
-    @Resource
-    private ToolCodegenServiceImpl self;
-
     private Long createCodegen0(ToolCodegenImportTypeEnum importType,
                                 ToolSchemaTableDO schemaTable, List<ToolSchemaColumnDO> schemaColumns) {
         // 校验导入的表和字段非空
@@ -99,7 +96,7 @@ public class ToolCodegenServiceImpl implements ToolCodegenService {
             throw exception(CODEGEN_PARSE_SQL_ERROR);
         }
         // 导入
-        return self.createCodegen0(ToolCodegenImportTypeEnum.SQL, schemaTable, schemaColumns);
+        return this.createCodegen0(ToolCodegenImportTypeEnum.SQL, schemaTable, schemaColumns);
     }
 
     @Override
@@ -108,7 +105,7 @@ public class ToolCodegenServiceImpl implements ToolCodegenService {
         ToolSchemaTableDO schemaTable = schemaTableMapper.selectByTableName(tableName);
         List<ToolSchemaColumnDO> schemaColumns = schemaColumnMapper.selectListByTableName(tableName);
         // 导入
-        return self.createCodegen0(ToolCodegenImportTypeEnum.DB, schemaTable, schemaColumns);
+        return this.createCodegen0(ToolCodegenImportTypeEnum.DB, schemaTable, schemaColumns);
     }
 
     @Override
@@ -147,7 +144,7 @@ public class ToolCodegenServiceImpl implements ToolCodegenService {
         List<ToolSchemaColumnDO> schemaColumns = schemaColumnMapper.selectListByTableName(table.getTableName());
 
         // 执行同步
-        self.syncCodegen0(tableId, schemaColumns);
+        this.syncCodegen0(tableId, schemaColumns);
     }
 
     @Override
@@ -167,7 +164,7 @@ public class ToolCodegenServiceImpl implements ToolCodegenService {
         }
 
         // 执行同步
-        self.syncCodegen0(tableId, schemaColumns);
+        this.syncCodegen0(tableId, schemaColumns);
     }
 
     private void syncCodegen0(Long tableId, List<ToolSchemaColumnDO> schemaColumns) {
