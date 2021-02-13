@@ -17,35 +17,25 @@ public class SchedulerManager {
         this.scheduler = scheduler;
     }
 
-    public void addJob(Long jobId, String jobHandlerName, String jobHandlerParam,
-                       String triggerName, String cronExpression)
+    public void addJob(Long jobId, String jobHandlerName, String jobHandlerParam, String cronExpression)
             throws SchedulerException {
         // 创建 JobDetail 对象
         JobDetail jobDetail = JobBuilder.newJob(JobHandlerInvoker.class)
                 .usingJobData(JobDataKeyEnum.JOB_ID.name(), jobId)
+                .usingJobData(JobDataKeyEnum.JOB_HANDLER_NAME.name(), jobHandlerName)
                 .withIdentity(jobHandlerName).build();
         // 创建 Trigger 对象
-        Trigger trigger = TriggerBuilder.newTrigger()
-                .withIdentity(triggerName)
-                .usingJobData(JobDataKeyEnum.JOB_HANDLER_NAME.name(), jobHandlerName)
-                .usingJobData(JobDataKeyEnum.JOB_HANDLER_PARAM.name(), jobHandlerParam)
-                .withSchedule(CronScheduleBuilder.cronSchedule(cronExpression))
-                .build();
+        Trigger trigger = this.buildTrigger(jobHandlerName, jobHandlerParam, cronExpression);
         // 新增调度
         scheduler.scheduleJob(jobDetail, trigger);
     }
 
-    public void updateJob(String jobHandlerName, String jobHandlerParam,
-                          String triggerName, String cronExpression) throws SchedulerException {
-        // 创建 Trigger 对象
-        Trigger trigger = TriggerBuilder.newTrigger()
-                .withIdentity(triggerName)
-                .usingJobData(JobDataKeyEnum.JOB_HANDLER_NAME.name(), jobHandlerName)
-                .usingJobData(JobDataKeyEnum.JOB_HANDLER_PARAM.name(), jobHandlerParam)
-                .withSchedule(CronScheduleBuilder.cronSchedule(cronExpression))
-                .build();
+    public void updateJob(String jobHandlerName, String jobHandlerParam, String cronExpression)
+            throws SchedulerException {
+        // 创建新 Trigger 对象
+        Trigger newTrigger = this.buildTrigger(jobHandlerName, jobHandlerParam, cronExpression);
         // 修改调度
-        scheduler.rescheduleJob(new TriggerKey(triggerName), trigger);
+        scheduler.rescheduleJob(new TriggerKey(jobHandlerName), newTrigger);
     }
 
     public void deleteJob(String jobHandlerName) throws SchedulerException {
@@ -56,10 +46,9 @@ public class SchedulerManager {
         scheduler.pauseJob(new JobKey(jobHandlerName));
     }
 
-    public void resumeJob(String jobHandlerName,
-                          String triggerName) throws SchedulerException {
+    public void resumeJob(String jobHandlerName) throws SchedulerException {
         scheduler.resumeJob(new JobKey(jobHandlerName));
-        scheduler.resumeTrigger(new TriggerKey(triggerName));
+        scheduler.resumeTrigger(new TriggerKey(jobHandlerName));
     }
 
     public void triggerJob(Long jobId, String jobHandlerName, String jobHandlerParam)
@@ -70,6 +59,14 @@ public class SchedulerManager {
         data.put(JobDataKeyEnum.JOB_HANDLER_PARAM.name(), jobHandlerParam);
         // 触发任务
         scheduler.triggerJob(new JobKey(jobHandlerName), data);
+    }
+
+    private Trigger buildTrigger(String jobHandlerName, String jobHandlerParam, String cronExpression) {
+        return TriggerBuilder.newTrigger()
+                .withIdentity(jobHandlerName)
+                .usingJobData(JobDataKeyEnum.JOB_HANDLER_PARAM.name(), jobHandlerParam)
+                .withSchedule(CronScheduleBuilder.cronSchedule(cronExpression))
+                .build();
     }
 
 }

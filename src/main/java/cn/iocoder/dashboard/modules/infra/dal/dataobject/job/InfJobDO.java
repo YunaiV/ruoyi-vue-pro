@@ -2,7 +2,6 @@ package cn.iocoder.dashboard.modules.infra.dal.dataobject.job;
 
 import cn.iocoder.dashboard.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.dashboard.modules.infra.enums.job.InfJobStatusEnum;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
@@ -31,11 +30,6 @@ public class InfJobDO extends BaseDO {
      * 任务名称
      */
     private String name;
-    /**
-     * 任务分组
-     */
-    @TableField("`group`")
-    private String group;
     /**
      * 任务状态
      *

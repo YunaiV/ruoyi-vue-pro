@@ -36,14 +36,8 @@ public class JobHandlerInvoker extends QuartzJobBean {
         }
     }
 
-    @SuppressWarnings("SwitchStatementWithTooFewBranches")
     private static String getJobData(JobExecutionContext executionContext, JobDataKeyEnum key) {
-        switch (key) {
-            case JOB_ID:
-                return executionContext.getJobDetail().getJobDataMap().getString(key.name());
-            default:
-                return executionContext.getTrigger().getJobDataMap().getString(key.name());
-        }
+        return executionContext.getMergedJobDataMap().getString(key.name());
     }
 
 }
