@@ -4,17 +4,16 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
- * 代码生成模板类型
+ * 代码生成的导入类型
  *
  * @author 芋道源码
  */
 @AllArgsConstructor
 @Getter
-public enum ToolCodegenTemplateTypeEnum {
+public enum ToolCodegenImportTypeEnum {
 
-    CRUD(1), // 单表（增删改查）
-    TREE(2), // 树表（增删改查）
-    ;
+    DB(1), // 从 information_schema 的 table 和 columns 表导入
+    SQL(2); // 基于建表 SQL 语句导入
 
     /**
      * 类型

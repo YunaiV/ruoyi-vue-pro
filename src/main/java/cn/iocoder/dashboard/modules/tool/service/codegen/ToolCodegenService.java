@@ -18,6 +18,14 @@ import java.util.Map;
 public interface ToolCodegenService {
 
     /**
+     * 基于 SQL 建表语句，创建代码生成器的表定义
+     *
+     * @param sql SQL 建表语句
+     * @return 创建的表定义的编号
+     */
+    Long createCodegenListFromSQL(String sql);
+
+    /**
      * 基于数据库的表结构，创建代码生成器的表定义
      *
      * @param tableName 表名称
@@ -31,7 +39,7 @@ public interface ToolCodegenService {
      * @param tableNames 表名称数组
      * @return 创建的表定义的编号数组
      */
-    List<Long> createCodeGenList(List<String> tableNames);
+    List<Long> createCodegenListFromDB(List<String> tableNames);
 
     /**
      * 更新数据库的表和字段定义
@@ -45,7 +53,15 @@ public interface ToolCodegenService {
      *
      * @param tableId 表编号
      */
-    void syncCodegen(Long tableId);
+    void syncCodegenFromDB(Long tableId);
+
+    /**
+     * 基于 SQL 建表语句，同步数据库的表和字段定义
+     *
+     * @param tableId 表编号
+     * @param sql SQL 建表语句
+     */
+    void syncCodegenFromSQL(Long tableId, String sql);
 
     /**
      * 删除数据库的表和字段定义

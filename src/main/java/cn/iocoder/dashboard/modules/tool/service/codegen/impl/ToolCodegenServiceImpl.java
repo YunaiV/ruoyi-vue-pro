@@ -14,8 +14,10 @@ import cn.iocoder.dashboard.modules.tool.dal.mysql.coegen.ToolCodegenColumnMappe
 import cn.iocoder.dashboard.modules.tool.dal.mysql.coegen.ToolCodegenTableMapper;
 import cn.iocoder.dashboard.modules.tool.dal.mysql.coegen.ToolSchemaColumnMapper;
 import cn.iocoder.dashboard.modules.tool.dal.mysql.coegen.ToolSchemaTableMapper;
+import cn.iocoder.dashboard.modules.tool.enums.codegen.ToolCodegenImportTypeEnum;
 import cn.iocoder.dashboard.modules.tool.service.codegen.ToolCodegenService;
 import cn.iocoder.dashboard.util.collection.CollectionUtils;
+import org.apache.commons.collections4.KeyValue;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +27,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static cn.iocoder.dashboard.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.dashboard.modules.tool.enums.ToolErrorCodeConstants.*;
 
 /**
  * 代码生成 Service 实现类
@@ -51,25 +56,26 @@ public class ToolCodegenServiceImpl implements ToolCodegenService {
     @Resource
     private CodegenProperties codegenProperties;
 
-    @Override
-    @Transactional
-    public Long createCodegen(String tableName) {
-        // 从数据库中，获得数据库表结构
-        ToolSchemaTableDO schemaTable = schemaTableMapper.selectByTableName(tableName);
+    @Resource
+    private ToolCodegenServiceImpl self;
+
+    private Long createCodegen0(ToolCodegenImportTypeEnum importType,
+                                ToolSchemaTableDO schemaTable, List<ToolSchemaColumnDO> schemaColumns) {
+        // 校验导入的表和字段非空
         if (schemaTable == null) {
-            throw new RuntimeException(""); // TODO
+            throw exception(CODEGEN_IMPORT_TABLE_NULL);
         }
-        List<ToolSchemaColumnDO> schemaColumns = schemaColumnMapper.selectListByTableName(tableName);
         if (CollUtil.isEmpty(schemaColumns)) {
-            throw new RuntimeException(""); // TODO
+            throw exception(CODEGEN_IMPORT_COLUMNS_NULL);
         }
         // 校验是否已经存在
-        if (codegenTableMapper.selectByTableName(tableName) != null) {
-            throw new RuntimeException(""); // TODO
+        if (codegenTableMapper.selectByTableName(schemaTable.getTableName()) != null) {
+            throw exception(CODEGEN_TABLE_EXISTS);
         }
 
         // 构建 ToolCodegenTableDO 对象，插入到 DB 中
         ToolCodegenTableDO table = codegenBuilder.buildTable(schemaTable);
+        table.setImportType(importType.getType());
         codegenTableMapper.insert(table);
         // 构建 ToolCodegenColumnDO 数组，插入到 DB 中
         List<ToolCodegenColumnDO> columns = codegenBuilder.buildColumns(schemaColumns);
@@ -81,8 +87,33 @@ public class ToolCodegenServiceImpl implements ToolCodegenService {
     }
 
     @Override
+    public Long createCodegenListFromSQL(String sql) {
+        // 从 SQL 中，获得数据库表结构
+        ToolSchemaTableDO schemaTable;
+        List<ToolSchemaColumnDO> schemaColumns;
+        try {
+            KeyValue<ToolSchemaTableDO, List<ToolSchemaColumnDO>> result = ToolCodegenSQLParser.parse(sql);
+            schemaTable = result.getKey();
+            schemaColumns = result.getValue();
+        } catch (Exception ex) {
+            throw exception(CODEGEN_PARSE_SQL_ERROR);
+        }
+        // 导入
+        return self.createCodegen0(ToolCodegenImportTypeEnum.SQL, schemaTable, schemaColumns);
+    }
+
+    @Override
+    public Long createCodegen(String tableName) {
+        // 从数据库中，获得数据库表结构
+        ToolSchemaTableDO schemaTable = schemaTableMapper.selectByTableName(tableName);
+        List<ToolSchemaColumnDO> schemaColumns = schemaColumnMapper.selectListByTableName(tableName);
+        // 导入
+        return self.createCodegen0(ToolCodegenImportTypeEnum.DB, schemaTable, schemaColumns);
+    }
+
+    @Override
     @Transactional
-    public List<Long> createCodeGenList(List<String> tableNames) {
+    public List<Long> createCodegenListFromDB(List<String> tableNames) {
         List<Long> ids = new ArrayList<>(tableNames.size());
         // 遍历添加。虽然效率会低一点，但是没必要做成完全批量，因为不会这么大量
         tableNames.forEach(tableName -> ids.add(createCodegen(tableName)));
@@ -94,7 +125,7 @@ public class ToolCodegenServiceImpl implements ToolCodegenService {
     public void updateCodegen(ToolCodegenUpdateReqVO updateReqVO) {
         // 校验是否已经存在
         if (codegenTableMapper.selectById(updateReqVO.getTable().getId()) == null) {
-            throw new RuntimeException(""); // TODO
+            throw exception(CODEGEN_TABLE_NOT_EXISTS);
         }
 
         // 更新 table 表定义
@@ -106,16 +137,43 @@ public class ToolCodegenServiceImpl implements ToolCodegenService {
     }
 
     @Override
-    public void syncCodegen(Long tableId) {
+    public void syncCodegenFromDB(Long tableId) {
         // 校验是否已经存在
         ToolCodegenTableDO table = codegenTableMapper.selectById(tableId);
         if (table == null) {
-            throw new RuntimeException(""); // TODO
+            throw exception(CODEGEN_TABLE_NOT_EXISTS);
         }
         // 从数据库中，获得数据库表结构
         List<ToolSchemaColumnDO> schemaColumns = schemaColumnMapper.selectListByTableName(table.getTableName());
+
+        // 执行同步
+        self.syncCodegen0(tableId, schemaColumns);
+    }
+
+    @Override
+    public void syncCodegenFromSQL(Long tableId, String sql) {
+        // 校验是否已经存在
+        ToolCodegenTableDO table = codegenTableMapper.selectById(tableId);
+        if (table == null) {
+            throw exception(CODEGEN_TABLE_NOT_EXISTS);
+        }
+        // 从 SQL 中，获得数据库表结构
+        List<ToolSchemaColumnDO> schemaColumns;
+        try {
+            KeyValue<ToolSchemaTableDO, List<ToolSchemaColumnDO>> result = ToolCodegenSQLParser.parse(sql);
+            schemaColumns = result.getValue();
+        } catch (Exception ex) {
+            throw exception(CODEGEN_PARSE_SQL_ERROR);
+        }
+
+        // 执行同步
+        self.syncCodegen0(tableId, schemaColumns);
+    }
+
+    private void syncCodegen0(Long tableId, List<ToolSchemaColumnDO> schemaColumns) {
+        // 校验导入的字段不为空
         if (CollUtil.isEmpty(schemaColumns)) {
-            throw new RuntimeException(""); // TODO
+            throw exception(CODEGEN_SYNC_COLUMNS_NULL);
         }
         Set<String> schemaColumnNames = CollectionUtils.convertSet(schemaColumns, ToolSchemaColumnDO::getColumnName);
 
@@ -128,13 +186,13 @@ public class ToolCodegenServiceImpl implements ToolCodegenService {
         Set<Long> deleteColumnIds = codegenColumns.stream().filter(column -> !schemaColumnNames.contains(column.getColumnName()))
                 .map(ToolCodegenColumnDO::getId).collect(Collectors.toSet());
         if (CollUtil.isEmpty(schemaColumns) && CollUtil.isEmpty(deleteColumnIds)) {
-            throw new RuntimeException(""); // TODO
+            throw exception(CODEGEN_SYNC_NONE_CHANGE);
         }
 
         // 插入新增的字段
         List<ToolCodegenColumnDO> columns = codegenBuilder.buildColumns(schemaColumns);
         columns.forEach(column -> {
-            column.setTableId(table.getId());
+            column.setTableId(tableId);
             codegenColumnMapper.insert(column); // TODO 批量插入
         });
         // 删除不存在的字段
@@ -146,7 +204,7 @@ public class ToolCodegenServiceImpl implements ToolCodegenService {
     public void deleteCodegen(Long tableId) {
         // 校验是否已经存在
         if (codegenTableMapper.selectById(tableId) == null) {
-            throw new RuntimeException(""); // TODO
+            throw exception(CODEGEN_TABLE_NOT_EXISTS);
         }
 
         // 删除 table 表定义
@@ -180,11 +238,11 @@ public class ToolCodegenServiceImpl implements ToolCodegenService {
         // 校验是否已经存在
         ToolCodegenTableDO table = codegenTableMapper.selectById(tableId);
         if (codegenTableMapper.selectById(tableId) == null) {
-            throw new RuntimeException(""); // TODO
+            throw exception(CODEGEN_TABLE_NOT_EXISTS);
         }
         List<ToolCodegenColumnDO> columns = codegenColumnMapper.selectListByTableId(tableId);
         if (CollUtil.isEmpty(columns)) {
-            throw new RuntimeException(""); // TODO
+            throw exception(CODEGEN_COLUMN_NOT_EXISTS);
         }
 
         // 执行生成

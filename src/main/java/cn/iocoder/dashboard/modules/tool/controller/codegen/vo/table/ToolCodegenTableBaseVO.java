@@ -12,6 +12,10 @@ import javax.validation.constraints.NotNull;
 @Data
 public class ToolCodegenTableBaseVO {
 
+    @ApiModelProperty(value = "导入类型", required = true, example = "1", notes = "参见 ToolCodegenImportTypeEnum 枚举")
+    @NotNull(message = "导入类型不能为空")
+    private Integer importType;
+
     @ApiModelProperty(value = "表名称", required = true, example = "yudao")
     @NotNull(message = "表名称不能为空")
     private String tableName;

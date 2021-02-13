@@ -24,6 +24,13 @@ public class ToolCodegenTableDO extends BaseDO {
      */
     private Long id;
 
+    /**
+     * 导入类型
+     *
+     * 枚举 {@link ToolCodegenTemplateTypeEnum}
+     */
+    private Integer importType;
+
     // ========== 表相关字段 ==========
 
     /**

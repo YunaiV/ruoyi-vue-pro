@@ -21,6 +21,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -45,12 +46,13 @@ public class ToolCodegenController {
     @Resource
     private ToolCodegenService codegenService;
 
-    @ApiOperation(value = "获得数据库自带的表定义列表", notes = "会过滤掉已经导入 Codegen 的表")
     @GetMapping("/db/table/list")
+    @ApiOperation(value = "获得数据库自带的表定义列表", notes = "会过滤掉已经导入 Codegen 的表")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "tableName", required = true, example = "yudao", dataTypeClass = String.class),
             @ApiImplicitParam(name = "tableComment", required = true, example = "芋道", dataTypeClass = String.class)
     })
+    @PreAuthorize("@ss.hasPermission('tool:codegen:query')")
     public CommonResult<List<ToolSchemaTableRespVO>> getSchemaTableList(
             @RequestParam(value = "tableName", required = false) String tableName,
             @RequestParam(value = "tableComment", required = false) String tableComment) {
@@ -62,18 +64,18 @@ public class ToolCodegenController {
         return success(ToolCodegenConvert.INSTANCE.convertList04(schemaTables));
     }
 
-    @ApiOperation("获得表定义分页")
     @GetMapping("/table/page")
-    // TODO 权限 @PreAuthorize("@ss.hasPermi('tool:gen:list')")
+    @ApiOperation("获得表定义分页")
+    @PreAuthorize("@ss.hasPermission('tool:codegen:query')")
     public CommonResult<PageResult<ToolCodegenTableRespVO>> getCodeGenTablePage(@Valid ToolCodegenTablePageReqVO pageReqVO) {
         PageResult<ToolCodegenTableDO> pageResult = codegenService.getCodegenTablePage(pageReqVO);
         return success(ToolCodegenConvert.INSTANCE.convertPage(pageResult));
     }
 
-    @ApiOperation("获得表和字段的明细")
     @GetMapping("/detail")
+    @ApiOperation("获得表和字段的明细")
     @ApiImplicitParam(name = "tableId", required = true, example = "表编号", dataTypeClass = Long.class)
-//   todo @PreAuthorize("@ss.hasPermi('tool:gen:query')")
+    @PreAuthorize("@ss.hasPermission('tool:codegen:query')")
     public CommonResult<ToolCodegenDetailRespVO> getCodegenDetail(@RequestParam("tableId") Long tableId) {
         ToolCodegenTableDO table = codegenService.getCodegenTablePage(tableId);
         List<ToolCodegenColumnDO> columns = codegenService.getCodegenColumnListByTableId(tableId);
@@ -82,33 +84,55 @@ public class ToolCodegenController {
     }
 
     @ApiOperation("基于数据库的表结构，创建代码生成器的表和字段定义")
-    @PostMapping("/create-list")
-    // TODO 权限
-    public CommonResult<List<Long>> createCodegenList(@RequestParam("tableNames") List<String> tableNames) {
-        return success(codegenService.createCodeGenList(tableNames));
+    @ApiImplicitParam(name = "tableNames", required = true, example = "sys_user", dataTypeClass = List.class)
+    @PostMapping("/create-list-from-db")
+    @PreAuthorize("@ss.hasPermission('tool:codegen:create')")
+    public CommonResult<List<Long>> createCodegenListFromDB(@RequestParam("tableNames") List<String> tableNames) {
+        return success(codegenService.createCodegenListFromDB(tableNames));
+    }
+
+    @ApiOperation("基于 SQL 建表语句，创建代码生成器的表和字段定义")
+    @ApiImplicitParam(name = "SQL 建表语句", required = true, example = "sql", dataTypeClass = String.class)
+    @PostMapping("/create-list-from-sql")
+    @PreAuthorize("@ss.hasPermission('tool:codegen:create')")
+    public CommonResult<Long> createCodegenListFromSQL(@RequestParam("sql") String sql) {
+        return success(codegenService.createCodegenListFromSQL(sql));
     }
 
     @ApiOperation("更新数据库的表和字段定义")
     @PutMapping("/update")
-//    @PreAuthorize("@ss.hasPermi('tool:gen:edit')") TODO 权限
+    @PreAuthorize("@ss.hasPermission('tool:codegen:update')")
     public CommonResult<Boolean> updateCodegen(@Valid @RequestBody ToolCodegenUpdateReqVO updateReqVO) {
         codegenService.updateCodegen(updateReqVO);
         return success(true);
     }
 
     @ApiOperation("基于数据库的表结构，同步数据库的表和字段定义")
-    @PutMapping("/sync")
+    @PutMapping("/sync-from-db")
     @ApiImplicitParam(name = "tableId", required = true, example = "表编号", dataTypeClass = Long.class)
-//    @PreAuthorize("@ss.hasPermi('tool:gen:edit')") TODO 权限
-    public CommonResult<Boolean> syncCodegen(@RequestParam("tableId") Long tableId) {
-        codegenService.syncCodegen(tableId);
+    @PreAuthorize("@ss.hasPermission('tool:codegen:update')")
+    public CommonResult<Boolean> syncCodegenFromDB(@RequestParam("tableId") Long tableId) {
+        codegenService.syncCodegenFromDB(tableId);
+        return success(true);
+    }
+
+    @ApiOperation("基于 SQL 建表语句，同步数据库的表和字段定义")
+    @PutMapping("/sync-from-sql")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "tableId", required = true, example = "表编号", dataTypeClass = Long.class),
+            @ApiImplicitParam(name = "SQL 建表语句", required = true, example = "sql", dataTypeClass = String.class)
+    })
+    @PreAuthorize("@ss.hasPermission('tool:codegen:update')")
+    public CommonResult<Boolean> syncCodegenFromSQL(@RequestParam("tableId") Long tableId,
+                                                    @RequestParam("sql") String sql) {
+        codegenService.syncCodegenFromSQL(tableId, sql);
         return success(true);
     }
 
     @ApiOperation("删除数据库的表和字段定义")
     @DeleteMapping("/delete")
     @ApiImplicitParam(name = "tableId", required = true, example = "表编号", dataTypeClass = Long.class)
-//    @PreAuthorize("@ss.hasPermi('tool:gen:remove')") TODO 权限
+    @PreAuthorize("@ss.hasPermission('tool:codegen:delete')")
     public CommonResult<Boolean> deleteCodegen(@RequestParam("tableId") Long tableId) {
         codegenService.deleteCodegen(tableId);
         return success(true);
@@ -117,7 +141,7 @@ public class ToolCodegenController {
     @ApiOperation("预览生成代码")
     @GetMapping("/preview")
     @ApiImplicitParam(name = "tableId", required = true, example = "表编号", dataTypeClass = Long.class)
-//    @PreAuthorize("@ss.hasPermi('tool:gen:preview')") TODO 权限
+    @PreAuthorize("@ss.hasPermission('tool:codegen:preview')")
     public CommonResult<List<ToolCodegenPreviewRespVO>> previewCodegen(@RequestParam("tableId") Long tableId) {
         Map<String, String> codes = codegenService.generationCodes(tableId);
         return success(ToolCodegenConvert.INSTANCE.convert(codes));
@@ -126,7 +150,7 @@ public class ToolCodegenController {
     @ApiOperation("下载生成代码")
     @GetMapping("/download")
     @ApiImplicitParam(name = "tableId", required = true, example = "表编号", dataTypeClass = Long.class)
-    // @PreAuthorize("@ss.hasPermi('tool:gen:code')") todo 权限
+    @PreAuthorize("@ss.hasPermission('tool:codegen:download')")
     public void downloadCodegen(@RequestParam("tableId") Long tableId,
                                 HttpServletResponse response) throws IOException {
         // 生成代码
