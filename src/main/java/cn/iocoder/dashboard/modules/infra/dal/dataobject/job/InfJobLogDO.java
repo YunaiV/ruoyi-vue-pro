@@ -18,7 +18,7 @@ import java.util.Date;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class InfJobLog extends BaseDO {
+public class InfJobLogDO extends BaseDO {
 
     /**
      * 日志编号
@@ -27,31 +27,31 @@ public class InfJobLog extends BaseDO {
     /**
      * 任务编号
      *
-     * 关联 {@link InfJob#getId()}
+     * 关联 {@link InfJobDO#getId()}
      */
     private Long jobId;
     /**
      * 任务名称
      *
-     * 冗余字段 {@link InfJob#getName()}
+     * 冗余字段 {@link InfJobDO#getName()}
      */
     private String jobName;
     /**
      * 任务分组
      *
-     * 冗余字段 {@link InfJob#getGroup()}
+     * 冗余字段 {@link InfJobDO#getGroup()}
      */
     private String jobGroup;
     /**
      * 处理器的名字
      *
-     * 冗余字段 {@link InfJob#getHandlerName()}
+     * 冗余字段 {@link InfJobDO#getHandlerName()}
      */
     private String handlerName;
     /**
      * 处理器的参数
      *
-     * 冗余字段 {@link InfJob#getHandlerParam()}
+     * 冗余字段 {@link InfJobDO#getHandlerParam()}
      */
     private String handlerParam;
 
@@ -82,7 +82,7 @@ public class InfJobLog extends BaseDO {
     /**
      * 结果数据
      *
-     * 如果是对象，则使用 JSON 格式化
+     * 目前使用的 {@link CommonResult#getData()} 数据
      */
     private String resultData;
 

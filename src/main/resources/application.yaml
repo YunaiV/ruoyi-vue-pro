@@ -42,6 +42,35 @@ spring:
 #  main:
 #    lazy-initialization: true # TODO 芋艿：本地开发环境，可以配置下 lazy 延迟加载
 
+  # Quartz 配置项，对应 QuartzProperties 配置类
+  quartz:
+    scheduler-name: clusteredScheduler # Scheduler 名字。默认为 schedulerName
+    job-store-type: jdbc # Job 存储器类型。默认为 memory 表示内存，可选 jdbc 使用数据库。
+    auto-startup: true # Quartz 是否自动启动
+    startup-delay: 0 # 延迟 N 秒启动
+    wait-for-jobs-to-complete-on-shutdown: true # 应用关闭时，是否等待定时任务执行完成。默认为 false ，建议设置为 true
+    overwrite-existing-jobs: false # 是否覆盖已有 Job 的配置
+    properties: # 添加 Quartz Scheduler 附加属性，更多可以看 http://www.quartz-scheduler.org/documentation/2.4.0-SNAPSHOT/configuration.html 文档
+      org:
+        quartz:
+          # JobStore 相关配置
+          jobStore:
+            # 数据源名称
+#            dataSource: quartzDataSource # 使用的数据源 TODO 使用默认数据源
+            class: org.quartz.impl.jdbcjobstore.JobStoreTX # JobStore 实现类
+            driverDelegateClass: org.quartz.impl.jdbcjobstore.StdJDBCDelegate
+            tablePrefix: QRTZ_ # Quartz 表前缀
+            isClustered: true # 是集群模式
+            clusterCheckinInterval: 1000
+            useProperties: false
+          # 线程池相关配置
+          threadPool:
+            threadCount: 25 # 线程池大小。默认为 10 。
+            threadPriority: 5 # 线程优先级
+            class: org.quartz.simpl.SimpleThreadPool # 线程池类型
+    jdbc: # 使用 JDBC 的 JobStore 的时候，JDBC 的配置
+      initialize-schema: never # 是否自动使用 SQL 初始化 Quartz 表结构。这里设置成 never ，我们手动创建表结构。
+
 # 芋道配置项，设置当前项目所有自定义的配置
 yudao:
   info:

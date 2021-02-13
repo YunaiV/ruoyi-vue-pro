@@ -12,7 +12,7 @@ import lombok.ToString;
 import java.util.Date;
 
 /**
- * 定时任务表
+ * 定时任务 DO
  *
  * @author 芋道源码
  */
@@ -20,7 +20,7 @@ import java.util.Date;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class InfJob extends BaseDO {
+public class InfJobDO extends BaseDO {
 
     /**
      * 任务编号
