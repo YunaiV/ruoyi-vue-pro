@@ -15,6 +15,10 @@ import java.util.stream.Collectors;
  */
 public class CollectionUtils {
 
+    public static boolean containsAny(Object source, Object... targets) {
+        return Arrays.asList(targets).contains(source);
+    }
+
     public static boolean isAnyEmpty(Collection<?>... collections) {
         return Arrays.stream(collections).anyMatch(CollectionUtil::isEmpty);
     }

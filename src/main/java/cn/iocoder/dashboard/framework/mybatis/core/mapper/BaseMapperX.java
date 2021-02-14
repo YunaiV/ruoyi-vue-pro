@@ -28,4 +28,8 @@ public interface BaseMapperX<T> extends BaseMapper<T> {
         return selectList(new QueryWrapper<>());
     }
 
+    default T selectOne(String field, Object value) {
+        return selectOne(new QueryWrapper<T>().eq(field, value));
+    }
+
 }

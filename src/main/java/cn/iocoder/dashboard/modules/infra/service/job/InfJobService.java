@@ -6,6 +6,7 @@ import cn.iocoder.dashboard.modules.infra.controller.job.vo.job.InfJobExportReqV
 import cn.iocoder.dashboard.modules.infra.controller.job.vo.job.InfJobPageReqVO;
 import cn.iocoder.dashboard.modules.infra.controller.job.vo.job.InfJobUpdateReqVO;
 import cn.iocoder.dashboard.modules.infra.dal.dataobject.job.InfJobDO;
+import org.quartz.SchedulerException;
 
 import javax.validation.Valid;
 import java.util.Collection;
@@ -24,21 +25,36 @@ public interface InfJobService {
      * @param createReqVO 创建信息
      * @return 编号
      */
-    Long createJob(@Valid InfJobCreateReqVO createReqVO);
+    Long createJob(@Valid InfJobCreateReqVO createReqVO) throws SchedulerException;
 
     /**
      * 更新定时任务
      *
      * @param updateReqVO 更新信息
      */
-    void updateJob(@Valid InfJobUpdateReqVO updateReqVO);
+    void updateJob(@Valid InfJobUpdateReqVO updateReqVO) throws SchedulerException;
+
+    /**
+     * 更新定时任务的状态
+     *
+     * @param id 任务编号
+     * @param status 状态
+     */
+    void updateJobStatus(Long id, Integer status) throws SchedulerException;
+
+    /**
+     * 触发定时任务
+     *
+     * @param id 任务编号
+     */
+    void triggerJob(Long id) throws SchedulerException;
 
     /**
      * 删除定时任务
      *
      * @param id 编号
      */
-    void deleteJob(Long id);
+    void deleteJob(Long id) throws SchedulerException;
 
     /**
      * 获得定时任务

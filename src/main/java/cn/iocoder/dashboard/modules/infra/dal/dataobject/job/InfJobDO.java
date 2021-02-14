@@ -2,13 +2,9 @@ package cn.iocoder.dashboard.modules.infra.dal.dataobject.job;
 
 import cn.iocoder.dashboard.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.dashboard.modules.infra.enums.job.InfJobStatusEnum;
-import com.baomidou.mybatisplus.annotation.FieldStrategy;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.*;
 
 import java.util.Date;
 
@@ -21,6 +17,9 @@ import java.util.Date;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class InfJobDO extends BaseDO {
 
     /**
@@ -45,7 +44,6 @@ public class InfJobDO extends BaseDO {
     /**
      * 处理器的参数
      */
-    @TableField(updateStrategy = FieldStrategy.IGNORED)
     private String handlerParam;
 
     // ========== 时间相关字段 ==========

@@ -48,3 +48,13 @@ export const ToolCodegenTemplateTypeEnum = {
   TREE: 2, // 树形 CRUD
   SUB: 3, // 主子表 CRUD
 }
+
+/**
+ * 任务状态的枚举
+ */
+export const InfJobStatusEnum = {
+  INIT: 0, // 初始化中
+  NORMAL: 1, // 开启运行
+  EXCEPTION: 2, // 异常运行
+  STOP: 3, // 暂停运行
+}
