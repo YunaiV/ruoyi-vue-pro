@@ -31,18 +31,6 @@ public class InfJobLogDO extends BaseDO {
      */
     private Long jobId;
     /**
-     * 任务名称
-     *
-     * 冗余字段 {@link InfJobDO#getName()}
-     */
-    private String jobName;
-    /**
-     * 任务分组
-     *
-     * 冗余字段 {@link InfJobDO#getGroup()}
-     */
-    private String jobGroup;
-    /**
      * 处理器的名字
      *
      * 冗余字段 {@link InfJobDO#getHandlerName()}
@@ -74,16 +62,11 @@ public class InfJobLogDO extends BaseDO {
      */
     private Integer resultCode;
     /**
-     * 结果提示
+     * 结果
      *
-     * 目前使用的 {@link CommonResult#getMsg()} 属性
+     * 成功时，使用 {@link CommonResult#getData()} 数据
+     * 失败时，使用 {@link CommonResult#getMsg()} 属性
      */
-    private String resultMsg;
-    /**
-     * 结果数据
-     *
-     * 目前使用的 {@link CommonResult#getData()} 数据
-     */
-    private String resultData;
+    private String result;
 
 }
