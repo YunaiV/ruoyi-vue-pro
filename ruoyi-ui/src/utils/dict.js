@@ -17,6 +17,7 @@ export const DICT_TYPE = {
   SYS_CONFIG_TYPE: 'sys_config_type',
 
   INF_REDIS_TIMEOUT_TYPE: 'inf_redis_timeout_type',
+  INF_JOB_STATUS: 'inf_job_status',
 
   TOOL_CODEGEN_TEMPLATE_TYPE: 'tool_codegen_template_type',
 }

@@ -89,7 +89,7 @@ public class InfJobController {
     @PreAuthorize("@ss.hasPermission('infra:job:export')")
     @OperateLog(type = EXPORT)
     public void exportJobExcel(@Valid InfJobExportReqVO exportReqVO,
-              HttpServletResponse response) throws IOException {
+                               HttpServletResponse response) throws IOException {
         List<InfJobDO> list = jobService.getJobList(exportReqVO);
         // 导出 Excel
         List<InfJobExcelVO> datas = InfJobConvert.INSTANCE.convertList02(list);

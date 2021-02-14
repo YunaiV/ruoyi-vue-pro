@@ -5,6 +5,11 @@ import cn.iocoder.dashboard.framework.quartz.core.handler.JobHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+/**
+ * 用户 Session 超时 Job
+ *
+ * @author 芋道源码
+ */
 @Component
 @Slf4j
 public class SysUserSessionTimeoutJob implements JobHandler {

@@ -218,9 +218,11 @@ export default {
       // 是否显示弹出层
       open: false,
       #foreach ($column in $columns)## 时间范围
+      #if ($column.listOperation)
       #if ($column.htmlType == "datetime" && $column.listOperationCondition == "BETWEEN")
       #set ($AttrName = $column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
       dateRange${AttrName}: [],
+      #end
       #end
       #end
       // 查询参数
@@ -256,9 +258,11 @@ export default {
       // 处理查询参数
       let params = {...this.queryParams};
       #foreach ($column in $columns)
+      #if ($column.listOperation)
       #if ($column.htmlType == "datetime" && $column.listOperationCondition == "BETWEEN")
       #set ($AttrName = $column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
       this.addBeginAndEndTime(params, this.dateRange${AttrName}, '${column.javaField}');
+      #end
       #end
       #end
       // 执行查询
@@ -277,10 +281,12 @@ export default {
     reset() {
       this.form = {
         #foreach ($column in $columns)
-        #if($column.htmlType == "checkbox")
+        #if ($column.createOperation || $column.updateOperation)
+        #if ($column.htmlType == "checkbox")
         $column.javaField: [],
         #else
         $column.javaField: undefined,
+        #end
         #end
         #end
       };
@@ -294,9 +300,11 @@ export default {
     /** 重置按钮操作 */
     resetQuery() {
       #foreach ($column in $columns)
+      #if ($column.listOperation)
       #if ($column.htmlType == "datetime" && $column.listOperationCondition == "BETWEEN")
       #set ($AttrName = $column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
       this.dateRange${AttrName} = [];
+      #end
       #end
       #end
       this.resetForm("queryForm");
@@ -372,9 +380,11 @@ export default {
       params.pageNo = undefined;
       params.pageSize = undefined;
       #foreach ($column in $columns)
+      #if ($column.listOperation)
       #if ($column.htmlType == "datetime" && $column.listOperationCondition == "BETWEEN")
       #set ($AttrName = $column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
       this.addBeginAndEndTime(params, this.dateRange${AttrName}, '${column.javaField}');
+      #end
       #end
       #end
       // 执行导出

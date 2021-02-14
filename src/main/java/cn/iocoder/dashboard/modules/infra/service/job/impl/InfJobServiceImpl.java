@@ -35,6 +35,9 @@ public class InfJobServiceImpl implements InfJobService {
     public Long createJob(InfJobCreateReqVO createReqVO) {
         // 插入
         InfJobDO job = InfJobConvert.INSTANCE.convert(createReqVO);
+        if (job.getMonitorTimeout() == null) {
+            job.setMonitorTimeout(0);
+        }
         jobMapper.insert(job);
         // 返回
         return job.getId();
@@ -46,6 +49,9 @@ public class InfJobServiceImpl implements InfJobService {
         this.validateJobExists(updateReqVO.getId());
         // 更新
         InfJobDO updateObj = InfJobConvert.INSTANCE.convert(updateReqVO);
+        if (updateObj.getMonitorTimeout() == null) {
+            updateObj.setMonitorTimeout(0);
+        }
         jobMapper.updateById(updateObj);
     }
 
