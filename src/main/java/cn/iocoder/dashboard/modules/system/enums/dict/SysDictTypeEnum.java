@@ -18,6 +18,7 @@ public enum SysDictTypeEnum {
     SYS_BOOLEAN_STRING("sys_boolean_string"), // Boolean 是否类型
 
     INF_REDIS_TIMEOUT_TYPE("inf_redis_timeout_type"),  // Redis 超时类型
+    INF_JOB_STATUS("inf_job_status") // 任务状态的枚举
     ;
 
 

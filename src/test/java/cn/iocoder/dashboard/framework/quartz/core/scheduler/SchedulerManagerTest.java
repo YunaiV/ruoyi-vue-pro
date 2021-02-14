@@ -30,6 +30,12 @@ class SchedulerManagerTest {
     }
 
     @Test
+    public void testDeleteJob() throws SchedulerException {
+        String jobHandlerName = StrUtil.lowerFirst(SysUserSessionTimeoutJob.class.getSimpleName());
+        schedulerManager.deleteJob(jobHandlerName);
+    }
+
+    @Test
     public void testPauseJob() throws SchedulerException {
         String jobHandlerName = StrUtil.lowerFirst(SysUserSessionTimeoutJob.class.getSimpleName());
         schedulerManager.pauseJob(jobHandlerName);

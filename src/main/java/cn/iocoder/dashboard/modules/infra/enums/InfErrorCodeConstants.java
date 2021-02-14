@@ -15,4 +15,7 @@ public interface InfErrorCodeConstants {
     ErrorCode CONFIG_CAN_NOT_DELETE_SYSTEM_TYPE = new ErrorCode(1001000003, "不能删除类型为系统内置的参数配置");
     ErrorCode CONFIG_GET_VALUE_ERROR_IF_SENSITIVE = new ErrorCode(1001000004, "不允许获取敏感配置到前端");
 
+    // ========== 定时任务 1001001000 ==========
+    ErrorCode JOB_NOT_EXISTS = new ErrorCode(1001001000, "定时任务不存在");
+
 }

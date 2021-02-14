@@ -2,6 +2,8 @@ package cn.iocoder.dashboard.modules.infra.dal.dataobject.job;
 
 import cn.iocoder.dashboard.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.dashboard.modules.infra.enums.job.InfJobStatusEnum;
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
@@ -43,6 +45,7 @@ public class InfJobDO extends BaseDO {
     /**
      * 处理器的参数
      */
+    @TableField(updateStrategy = FieldStrategy.IGNORED)
     private String handlerParam;
 
     // ========== 时间相关字段 ==========
@@ -76,12 +79,11 @@ public class InfJobDO extends BaseDO {
 
     // ========== 监控相关字段 ==========
     /**
-     * 监控开关
-     */
-    private Boolean monitorSwitch;
-    /**
      * 监控超时时间，单位：毫秒
+     *
+     * 注意，这里的超时的目的，不是进行任务的取消，而是告警任务的执行时间过长
      */
+    @TableField(updateStrategy = FieldStrategy.IGNORED)
     private Integer monitorTimeout;
 
     // TODO misfirePolicy
