@@ -11,7 +11,7 @@
  Target Server Version : 50718
  File Encoding         : 65001
 
- Date: 14/02/2021 22:48:01
+ Date: 17/02/2021 20:59:32
 */
 
 SET NAMES utf8mb4;
@@ -78,6 +78,79 @@ CREATE TABLE `inf_job` (
 BEGIN;
 INSERT INTO `inf_job` VALUES (2, '用户 Session 超时 Job', 3, 'sysUserSessionTimeoutJob', 'aoteman', '0/5 * * * * ? *', NULL, NULL, NULL, NULL, 10, '', '2021-02-07 10:15:09', '', '2021-02-07 12:57:44', b'1');
 INSERT INTO `inf_job` VALUES (3, '用户 Session 超时 Job', 1, 'sysUserSessionTimeoutJob', NULL, '0/5 * * * * ? *', NULL, NULL, NULL, NULL, 0, '', '2021-02-07 13:07:32', '', '2021-02-07 13:07:32', b'0');
+COMMIT;
+
+-- ----------------------------
+-- Table structure for inf_job_log
+-- ----------------------------
+DROP TABLE IF EXISTS `inf_job_log`;
+CREATE TABLE `inf_job_log` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '日志编号',
+  `job_id` bigint(20) NOT NULL COMMENT '任务编号',
+  `handler_name` varchar(64) NOT NULL COMMENT '处理器的名字',
+  `handler_param` varchar(255) DEFAULT NULL COMMENT '处理器的参数',
+  `begin_time` datetime NOT NULL COMMENT '开始执行时间',
+  `end_time` datetime DEFAULT NULL COMMENT '结束执行时间',
+  `duration` int(11) DEFAULT NULL COMMENT '执行时长',
+  `status` tinyint(4) NOT NULL COMMENT '任务状态',
+  `result` varchar(4000) DEFAULT '' COMMENT '结果数据',
+  `create_by` varchar(64) DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_by` varchar(64) DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=49 DEFAULT CHARSET=utf8mb4 COMMENT='定时任务表';
+
+-- ----------------------------
+-- Records of inf_job_log
+-- ----------------------------
+BEGIN;
+INSERT INTO `inf_job_log` VALUES (4, 3, 'sysUserSessionTimeoutJob', NULL, '2021-02-17 20:55:08', '2021-02-17 20:55:10', 1758, 2, 'IllegalArgumentException: JobHandler 不会为空', '', '2021-02-08 00:38:00', '', '2021-02-08 00:38:02', b'0');
+INSERT INTO `inf_job_log` VALUES (5, 3, 'sysUserSessionTimeoutJob', NULL, '2021-02-17 20:55:10', '2021-02-17 20:55:11', 556, 2, 'IllegalArgumentException: JobHandler 不会为空', '', '2021-02-08 00:38:02', '', '2021-02-08 00:38:03', b'0');
+INSERT INTO `inf_job_log` VALUES (6, 3, 'sysUserSessionTimeoutJob', NULL, '2021-02-17 20:55:11', '2021-02-17 20:55:11', 554, 2, 'IllegalArgumentException: JobHandler 不会为空', '', '2021-02-08 00:38:03', '', '2021-02-08 00:38:03', b'0');
+INSERT INTO `inf_job_log` VALUES (7, 3, 'sysUserSessionTimeoutJob', NULL, '2021-02-17 20:55:11', '2021-02-17 20:55:12', 179, 2, 'IllegalArgumentException: JobHandler 不会为空', '', '2021-02-08 00:38:03', '', '2021-02-08 00:38:04', b'0');
+INSERT INTO `inf_job_log` VALUES (8, 3, 'sysUserSessionTimeoutJob', NULL, '2021-02-17 20:55:12', '2021-02-17 20:55:12', 185, 2, 'IllegalArgumentException: JobHandler 不会为空', '', '2021-02-08 00:38:04', '', '2021-02-08 00:38:04', b'0');
+INSERT INTO `inf_job_log` VALUES (9, 3, 'sysUserSessionTimeoutJob', NULL, '2021-02-17 20:55:12', '2021-02-17 20:55:12', 279, 2, 'IllegalArgumentException: JobHandler 不会为空', '', '2021-02-08 00:38:04', '', '2021-02-08 00:38:04', b'0');
+INSERT INTO `inf_job_log` VALUES (10, 3, 'sysUserSessionTimeoutJob', NULL, '2021-02-17 20:55:15', '2021-02-17 20:55:37', 21590, 2, 'IllegalArgumentException: JobHandler 不会为空', '', '2021-02-08 00:38:07', '', '2021-02-08 00:38:40', b'0');
+INSERT INTO `inf_job_log` VALUES (11, 3, 'sysUserSessionTimeoutJob', NULL, '2021-02-17 20:55:47', '2021-02-17 20:55:52', 4053, 2, 'IllegalArgumentException: JobHandler 不会为空', '', '2021-02-08 00:38:40', '', '2021-02-08 00:38:44', b'0');
+INSERT INTO `inf_job_log` VALUES (12, 3, 'sysUserSessionTimeoutJob', NULL, '2021-02-17 20:55:52', '2021-02-17 20:55:52', 10, 2, 'IllegalArgumentException: JobHandler 不会为空', '', '2021-02-08 00:38:44', '', '2021-02-08 00:38:44', b'0');
+INSERT INTO `inf_job_log` VALUES (13, 3, 'sysUserSessionTimeoutJob', NULL, '2021-02-17 20:55:52', '2021-02-17 20:55:52', 3, 2, 'IllegalArgumentException: JobHandler 不会为空', '', '2021-02-08 00:38:44', '', '2021-02-08 00:38:44', b'0');
+INSERT INTO `inf_job_log` VALUES (14, 3, 'sysUserSessionTimeoutJob', NULL, '2021-02-17 20:55:52', '2021-02-17 20:55:52', 3, 2, 'IllegalArgumentException: JobHandler 不会为空', '', '2021-02-08 00:38:44', '', '2021-02-08 00:38:44', b'0');
+INSERT INTO `inf_job_log` VALUES (15, 3, 'sysUserSessionTimeoutJob', NULL, '2021-02-17 20:55:52', '2021-02-17 20:55:52', 3, 2, 'IllegalArgumentException: JobHandler 不会为空', '', '2021-02-08 00:38:44', '', '2021-02-08 00:38:44', b'0');
+INSERT INTO `inf_job_log` VALUES (16, 3, 'sysUserSessionTimeoutJob', NULL, '2021-02-17 20:55:52', '2021-02-17 20:55:52', 3, 2, 'IllegalArgumentException: JobHandler 不会为空', '', '2021-02-08 00:38:44', '', '2021-02-08 00:38:44', b'0');
+INSERT INTO `inf_job_log` VALUES (17, 3, 'sysUserSessionTimeoutJob', NULL, '2021-02-17 20:55:52', '2021-02-17 20:55:52', 3, 2, 'IllegalArgumentException: JobHandler 不会为空', '', '2021-02-08 00:38:44', '', '2021-02-08 00:38:44', b'0');
+INSERT INTO `inf_job_log` VALUES (18, 3, 'sysUserSessionTimeoutJob', NULL, '2021-02-17 20:55:55', '2021-02-17 20:55:55', 3, 2, 'IllegalArgumentException: JobHandler 不会为空', '', '2021-02-08 00:38:47', '', '2021-02-08 00:38:47', b'0');
+INSERT INTO `inf_job_log` VALUES (19, 3, 'sysUserSessionTimeoutJob', NULL, '2021-02-17 20:56:00', '2021-02-17 20:56:00', 4, 2, 'IllegalArgumentException: JobHandler 不会为空', '', '2021-02-08 00:38:52', '', '2021-02-08 00:38:52', b'0');
+INSERT INTO `inf_job_log` VALUES (20, 3, 'sysUserSessionTimeoutJob', NULL, '2021-02-17 20:56:05', '2021-02-17 20:56:05', 3, 2, 'IllegalArgumentException: JobHandler 不会为空', '', '2021-02-08 00:38:57', '', '2021-02-08 00:38:57', b'0');
+INSERT INTO `inf_job_log` VALUES (21, 3, 'sysUserSessionTimeoutJob', NULL, '2021-02-17 20:56:27', '2021-02-17 20:56:42', 14963, 2, 'IllegalArgumentException: JobHandler 不会为空', '', '2021-02-08 00:39:19', '', '2021-02-08 00:39:34', b'0');
+INSERT INTO `inf_job_log` VALUES (22, 3, 'sysUserSessionTimeoutJob', NULL, '2021-02-17 20:56:42', '2021-02-17 20:56:42', 7, 2, 'IllegalArgumentException: JobHandler 不会为空', '', '2021-02-08 00:39:34', '', '2021-02-08 00:39:34', b'0');
+INSERT INTO `inf_job_log` VALUES (23, 3, 'sysUserSessionTimeoutJob', NULL, '2021-02-17 20:56:42', '2021-02-17 20:56:42', 3, 2, 'IllegalArgumentException: JobHandler 不会为空', '', '2021-02-08 00:39:34', '', '2021-02-08 00:39:34', b'0');
+INSERT INTO `inf_job_log` VALUES (24, 3, 'sysUserSessionTimeoutJob', NULL, '2021-02-17 20:56:42', '2021-02-17 20:56:42', 2, 2, 'IllegalArgumentException: JobHandler 不会为空', '', '2021-02-08 00:39:34', '', '2021-02-08 00:39:34', b'0');
+INSERT INTO `inf_job_log` VALUES (25, 3, 'sysUserSessionTimeoutJob', NULL, '2021-02-17 20:56:42', '2021-02-17 20:56:42', 4, 2, 'IllegalArgumentException: JobHandler 不会为空', '', '2021-02-08 00:39:34', '', '2021-02-08 00:39:34', b'0');
+INSERT INTO `inf_job_log` VALUES (26, 3, 'sysUserSessionTimeoutJob', NULL, '2021-02-17 20:56:42', '2021-02-17 20:56:42', 4, 2, 'IllegalArgumentException: JobHandler 不会为空', '', '2021-02-08 00:39:35', '', '2021-02-08 00:39:35', b'0');
+INSERT INTO `inf_job_log` VALUES (27, 3, 'sysUserSessionTimeoutJob', NULL, '2021-02-17 20:57:12', '2021-02-17 20:57:12', 28, 2, '', '', '2021-02-08 00:40:04', '', '2021-02-08 00:40:04', b'0');
+INSERT INTO `inf_job_log` VALUES (28, 3, 'sysUserSessionTimeoutJob', NULL, '2021-02-17 20:57:12', '2021-02-17 20:57:12', 6, 2, '', '', '2021-02-08 00:40:05', '', '2021-02-08 00:40:05', b'0');
+INSERT INTO `inf_job_log` VALUES (29, 3, 'sysUserSessionTimeoutJob', NULL, '2021-02-17 20:57:12', '2021-02-17 20:57:12', 4, 2, '', '', '2021-02-08 00:40:05', '', '2021-02-08 00:40:05', b'0');
+INSERT INTO `inf_job_log` VALUES (30, 3, 'sysUserSessionTimeoutJob', NULL, '2021-02-17 20:57:12', '2021-02-17 20:57:12', 5, 2, '', '', '2021-02-08 00:40:05', '', '2021-02-08 00:40:05', b'0');
+INSERT INTO `inf_job_log` VALUES (31, 3, 'sysUserSessionTimeoutJob', NULL, '2021-02-17 20:57:12', '2021-02-17 20:57:12', 3, 2, '', '', '2021-02-08 00:40:05', '', '2021-02-08 00:40:05', b'0');
+INSERT INTO `inf_job_log` VALUES (32, 3, 'sysUserSessionTimeoutJob', NULL, '2021-02-17 20:57:12', '2021-02-17 20:57:12', 6, 2, '', '', '2021-02-08 00:40:05', '', '2021-02-08 00:40:05', b'0');
+INSERT INTO `inf_job_log` VALUES (33, 3, 'sysUserSessionTimeoutJob', NULL, '2021-02-17 20:57:13', '2021-02-17 20:57:13', 4, 2, '', '', '2021-02-08 00:40:05', '', '2021-02-08 00:40:05', b'0');
+INSERT INTO `inf_job_log` VALUES (34, 3, 'sysUserSessionTimeoutJob', NULL, '2021-02-17 20:57:15', '2021-02-17 20:57:15', 4, 2, '', '', '2021-02-08 00:40:07', '', '2021-02-08 00:40:07', b'0');
+INSERT INTO `inf_job_log` VALUES (35, 3, 'sysUserSessionTimeoutJob', NULL, '2021-02-17 20:57:20', '2021-02-17 20:57:20', 4, 2, '', '', '2021-02-08 00:40:12', '', '2021-02-08 00:40:12', b'0');
+INSERT INTO `inf_job_log` VALUES (36, 3, 'sysUserSessionTimeoutJob', NULL, '2021-02-17 20:57:25', '2021-02-17 20:57:25', 4, 2, '', '', '2021-02-08 00:40:17', '', '2021-02-08 00:40:17', b'0');
+INSERT INTO `inf_job_log` VALUES (37, 3, 'sysUserSessionTimeoutJob', NULL, '2021-02-17 20:57:30', '2021-02-17 20:57:30', 5, 2, '', '', '2021-02-08 00:40:22', '', '2021-02-08 00:40:22', b'0');
+INSERT INTO `inf_job_log` VALUES (38, 3, 'sysUserSessionTimeoutJob', NULL, '2021-02-17 20:57:35', '2021-02-17 20:57:35', 4, 2, '', '', '2021-02-08 00:40:27', '', '2021-02-08 00:40:27', b'0');
+INSERT INTO `inf_job_log` VALUES (39, 3, 'sysUserSessionTimeoutJob', NULL, '2021-02-17 20:57:40', '2021-02-17 20:57:40', 4, 2, '', '', '2021-02-08 00:40:32', '', '2021-02-08 00:40:32', b'0');
+INSERT INTO `inf_job_log` VALUES (40, 3, 'sysUserSessionTimeoutJob', NULL, '2021-02-17 20:57:45', '2021-02-17 20:57:45', 3, 2, '', '', '2021-02-08 00:40:37', '', '2021-02-08 00:40:37', b'0');
+INSERT INTO `inf_job_log` VALUES (41, 3, 'sysUserSessionTimeoutJob', NULL, '2021-02-17 20:57:50', '2021-02-17 20:57:50', 3, 2, '', '', '2021-02-08 00:40:42', '', '2021-02-08 00:40:42', b'0');
+INSERT INTO `inf_job_log` VALUES (42, 3, 'sysUserSessionTimeoutJob', NULL, '2021-02-17 20:57:55', '2021-02-17 20:57:55', 4, 2, '', '', '2021-02-08 00:40:47', '', '2021-02-08 00:40:47', b'0');
+INSERT INTO `inf_job_log` VALUES (43, 3, 'sysUserSessionTimeoutJob', NULL, '2021-02-17 20:58:00', '2021-02-17 20:58:00', 4, 2, '', '', '2021-02-08 00:40:52', '', '2021-02-08 00:40:52', b'0');
+INSERT INTO `inf_job_log` VALUES (44, 3, 'sysUserSessionTimeoutJob', NULL, '2021-02-17 20:58:05', '2021-02-17 20:58:05', 3, 2, '', '', '2021-02-08 00:40:57', '', '2021-02-08 00:40:57', b'0');
+INSERT INTO `inf_job_log` VALUES (45, 3, 'sysUserSessionTimeoutJob', NULL, '2021-02-17 20:58:10', '2021-02-17 20:58:10', 4, 2, '', '', '2021-02-08 00:41:02', '', '2021-02-08 00:41:02', b'0');
+INSERT INTO `inf_job_log` VALUES (46, 3, 'sysUserSessionTimeoutJob', NULL, '2021-02-17 20:58:15', '2021-02-17 20:58:15', 6, 2, '', '', '2021-02-08 00:41:07', '', '2021-02-08 00:41:13', b'0');
+INSERT INTO `inf_job_log` VALUES (47, 3, 'sysUserSessionTimeoutJob', NULL, '2021-02-17 20:58:21', '2021-02-17 20:58:21', 3, 2, '', '', '2021-02-08 00:41:13', '', '2021-02-08 00:41:17', b'0');
+INSERT INTO `inf_job_log` VALUES (48, 3, 'sysUserSessionTimeoutJob', NULL, '2021-02-17 20:58:25', '2021-02-17 20:58:25', 6, 2, '', '', '2021-02-08 00:41:17', '', '2021-02-08 00:41:17', b'0');
 COMMIT;
 
 -- ----------------------------
@@ -586,7 +659,7 @@ CREATE TABLE `sys_operate_log` (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=261 DEFAULT CHARSET=utf8mb4 COMMENT='操作日志记录';
+) ENGINE=InnoDB AUTO_INCREMENT=262 DEFAULT CHARSET=utf8mb4 COMMENT='操作日志记录';
 
 -- ----------------------------
 -- Records of sys_operate_log
@@ -687,6 +760,7 @@ INSERT INTO `sys_operate_log` VALUES (257, 'a3b43efc-c3a3-4228-8f48-f978c2c7ff6c
 INSERT INTO `sys_operate_log` VALUES (258, '2be3590d-9ab4-4cc1-a8af-4b2a7c557958', 1, '定时任务', '导出定时任务 Excel', 5, '', '', 'GET', '/api/infra/job/export-excel', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', 'void cn.iocoder.dashboard.modules.infra.controller.job.InfJobController.exportJobExcel(InfJobExportReqVO,HttpServletResponse)', '{\"exportReqVO\":{\"name\":null,\"status\":null,\"handlerName\":null},\"response\":\"[ignore]\"}', '2021-02-14 22:46:07', 1008, 0, '', 'null', '', '2021-02-07 13:10:00', '', '2021-02-07 13:10:00', b'0');
 INSERT INTO `sys_operate_log` VALUES (259, '5dc1134b-41e0-4080-9e4e-9d955674d8d5', 1, '定时任务', '导出定时任务 Excel', 5, '', '', 'GET', '/api/infra/job/export-excel', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', 'void cn.iocoder.dashboard.modules.infra.controller.job.InfJobController.exportJobExcel(InfJobExportReqVO,HttpServletResponse)', '{\"exportReqVO\":{\"name\":null,\"status\":null,\"handlerName\":null},\"response\":\"[ignore]\"}', '2021-02-14 22:46:13', 37, 0, '', 'null', '', '2021-02-07 13:10:06', '', '2021-02-07 13:10:06', b'0');
 INSERT INTO `sys_operate_log` VALUES (260, '2df8e5e2-613e-4aab-b95f-ffd692c2e563', 1, '定时任务', '导出定时任务 Excel', 5, '', '', 'GET', '/api/infra/job/export-excel', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', 'void cn.iocoder.dashboard.modules.infra.controller.job.InfJobController.exportJobExcel(InfJobExportReqVO,HttpServletResponse)', '{\"exportReqVO\":{\"name\":null,\"status\":null,\"handlerName\":null},\"response\":\"[ignore]\"}', '2021-02-14 22:47:28', 27, 0, '', 'null', '', '2021-02-07 13:11:20', '', '2021-02-07 13:11:20', b'0');
+INSERT INTO `sys_operate_log` VALUES (261, 'b8d90eff-b3ba-473f-ad88-d42c64a7a3d8', 1, '定时任务', '更新定时任务', 3, '', '', 'PUT', '/api/infra/job/update', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', 'CommonResult cn.iocoder.dashboard.modules.infra.controller.job.InfJobController.updateJob(InfJobUpdateReqVO)', '{\"updateReqVO\":{\"name\":\"用户 Session 超时 Job\",\"handlerParam\":null,\"cronExpression\":\"0/5 * * * * ? * 11111\",\"monitorTimeout\":0,\"id\":3}}', '2021-02-14 22:57:48', 15, 500, 'ServiceException: CRON 表达式不正确', 'null', '', '2021-02-07 13:21:41', '', '2021-02-07 13:21:41', b'0');
 COMMIT;
 
 -- ----------------------------
@@ -1016,7 +1090,7 @@ CREATE TABLE `sys_user_session` (
 BEGIN;
 INSERT INTO `sys_user_session` VALUES ('019f009268e24cc1957c46763eef1fd4', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-02-07 08:36:48', '', '2021-02-14 20:04:33', b'0');
 INSERT INTO `sys_user_session` VALUES ('04d51ff81ad54d05ab2f29e66b2a02f2', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-02-05 17:46:10', '', '2021-02-11 00:58:19', b'0');
-INSERT INTO `sys_user_session` VALUES ('0df60899301d4080bd4164f24bccf18b', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-02-07 13:05:42', '', '2021-02-07 13:05:42', b'0');
+INSERT INTO `sys_user_session` VALUES ('0df60899301d4080bd4164f24bccf18b', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-02-07 13:05:42', '', '2021-02-14 22:57:44', b'0');
 INSERT INTO `sys_user_session` VALUES ('1127b5eb9b0c4f9fa382d4d98a8a4a38', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-02-05 06:49:00', '', '2021-02-10 11:10:31', b'0');
 INSERT INTO `sys_user_session` VALUES ('20109910c52e4b02bbc0531212bff8cb', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-02-06 02:39:48', '', '2021-02-06 02:39:48', b'0');
 INSERT INTO `sys_user_session` VALUES ('2024509755b3444690c2a1dddaebd812', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-02-05 06:22:30', '', '2021-02-05 06:22:30', b'0');

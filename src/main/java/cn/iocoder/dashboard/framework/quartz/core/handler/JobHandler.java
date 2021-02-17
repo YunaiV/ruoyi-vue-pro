@@ -1,7 +1,5 @@
 package cn.iocoder.dashboard.framework.quartz.core.handler;
 
-import cn.iocoder.dashboard.common.pojo.CommonResult;
-
 /**
  * 任务处理器
  *
@@ -16,6 +14,6 @@ public interface JobHandler {
      * @return 结果
      * @throws Exception 异常
      */
-    CommonResult<String> execute(String param) throws Exception;
+    String execute(String param) throws Exception;
 
 }

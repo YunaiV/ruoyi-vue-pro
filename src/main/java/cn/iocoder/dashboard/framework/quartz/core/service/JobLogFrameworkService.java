@@ -1,5 +1,7 @@
 package cn.iocoder.dashboard.framework.quartz.core.service;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 /**
@@ -13,31 +15,40 @@ public interface JobLogFrameworkService {
      * 创建 Job 日志
      *
      * @param jobId 任务编号
+     * @param beginTime 开始时间
      * @param jobHandlerName Job 处理器的名字
      * @param jobHandlerParam Job 处理器的参数
      * @return Job 日志的编号
      */
-    Long createJobLog(Long jobId, String jobHandlerName, String jobHandlerParam);
+    Long createJobLog(@NotNull(message = "任务编号不能为空") Long jobId,
+                      @NotNull(message = "开始时间") Date beginTime,
+                      @NotEmpty(message = "Job 处理器的名字不能为空") String jobHandlerName,
+                      String jobHandlerParam);
 
     /**
      * 更新 Job 日志成功
      *
-     * @param id 日志编号
+     * @param logId 日志编号
      * @param endTime 结束时间。因为是异步，避免记录时间不准去
      * @param duration 运行时长，单位：毫秒
-     * @param data 成功数据
+     * @param result 成功数据
      */
-    void updateJobLogSuccessAsync(Long id, Date endTime, Long duration, String data);
+    void updateJobLogSuccessAsync(@NotNull(message = "日志编号不能为空") Long logId,
+                                  @NotNull(message = "结束时间不能为空") Date endTime,
+                                  @NotNull(message = "运行时长不能为空") Integer duration,
+                                  String result);
 
     /**
      * 更新 Job 日志失败
      *
-     * @param id 日志编号
+     * @param logId 日志编号
      * @param endTime 结束时间。因为是异步，避免记录时间不准去
      * @param duration 运行时长，单位：毫秒
-     * @param code 错误码
-     * @param msg 异常提示
+     * @param result 异常提示
      */
-    void updateJobLogErrorAsync(Long id, Date endTime, Long duration, Integer code, String msg);
+    void updateJobLogErrorAsync(@NotNull(message = "日志编号不能为空") Long logId,
+                                @NotNull(message = "结束时间不能为空") Date endTime,
+                                @NotNull(message = "运行时长不能为空") Integer duration,
+                                String result);
 
 }

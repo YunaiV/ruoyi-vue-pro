@@ -18,7 +18,7 @@ public class DateUtils {
         return System.currentTimeMillis() > time.getTime();
     }
 
-    public static Long diff(Date endTime, Date startTime) {
+    public static long diff(Date endTime, Date startTime) {
         return endTime.getTime() - startTime.getTime();
     }
 
