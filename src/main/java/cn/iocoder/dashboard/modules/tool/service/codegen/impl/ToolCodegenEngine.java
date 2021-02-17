@@ -4,7 +4,7 @@ import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.template.TemplateConfig;
 import cn.hutool.extra.template.TemplateEngine;
-import cn.hutool.extra.template.TemplateUtil;
+import cn.hutool.extra.template.engine.velocity.VelocityEngine;
 import cn.iocoder.dashboard.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.dashboard.common.pojo.CommonResult;
 import cn.iocoder.dashboard.common.pojo.PageParam;
@@ -28,7 +28,10 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 import static cn.hutool.core.map.MapUtil.getStr;
 import static cn.hutool.core.text.CharSequenceUtil.*;
@@ -107,7 +110,7 @@ public class ToolCodegenEngine {
         // 初始化 TemplateEngine 属性
         TemplateConfig config = new TemplateConfig();
         config.setResourceMode(TemplateConfig.ResourceMode.CLASSPATH);
-        this.templateEngine = TemplateUtil.createEngine(config);
+        this.templateEngine = new VelocityEngine(config);
     }
 
     @PostConstruct

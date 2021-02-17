@@ -55,6 +55,7 @@
         <hutool.version>5.5.6</hutool.version>
         <easyexcel.verion>2.2.7</easyexcel.verion>
         <velocity.version>2.2</velocity.version>
+        <screw.version>1.0.5</screw.version>
     </properties>
 
     <!-- 依赖声明 -->
@@ -232,6 +233,12 @@
             <groupId>org.apache.velocity</groupId>
             <artifactId>velocity-engine-core</artifactId>
             <version>${velocity.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.smallbun.screw</groupId>
+            <artifactId>screw-core</artifactId>
+            <version>${screw.version}</version>
         </dependency>
 
     </dependencies>
