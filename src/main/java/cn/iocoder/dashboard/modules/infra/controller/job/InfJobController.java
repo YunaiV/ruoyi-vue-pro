@@ -10,7 +10,9 @@ import cn.iocoder.dashboard.modules.infra.dal.dataobject.job.InfJobDO;
 import cn.iocoder.dashboard.modules.infra.service.job.InfJobService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import org.quartz.SchedulerException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -37,30 +39,55 @@ public class InfJobController {
     @PostMapping("/create")
     @ApiOperation("创建定时任务")
     @PreAuthorize("@ss.hasPermission('infra:job:create')")
-    public CommonResult<Long> createJob(@Valid @RequestBody InfJobCreateReqVO createReqVO) {
+    public CommonResult<Long> createJob(@Valid @RequestBody InfJobCreateReqVO createReqVO)
+            throws SchedulerException {
         return success(jobService.createJob(createReqVO));
     }
 
     @PutMapping("/update")
     @ApiOperation("更新定时任务")
     @PreAuthorize("@ss.hasPermission('infra:job:update')")
-    public CommonResult<Boolean> updateJob(@Valid @RequestBody InfJobUpdateReqVO updateReqVO) {
+    public CommonResult<Boolean> updateJob(@Valid @RequestBody InfJobUpdateReqVO updateReqVO)
+            throws SchedulerException {
         jobService.updateJob(updateReqVO);
+        return success(true);
+    }
+
+    @PutMapping("/update-status")
+    @ApiOperation("更新定时任务的状态")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class),
+            @ApiImplicitParam(name = "status", value = "状态", required = true, example = "1", dataTypeClass = Integer.class),
+    })
+    @PreAuthorize("@ss.hasPermission('infra:job:update')")
+    public CommonResult<Boolean> updateJobStatus(@RequestParam(value = "id") Long id, @RequestParam("status") Integer status)
+            throws SchedulerException {
+        jobService.updateJobStatus(id, status);
         return success(true);
     }
 
 	@DeleteMapping("/delete")
     @ApiOperation("删除定时任务")
-    @ApiImplicitParam(name = "id", value = "编号", required = true)
+    @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
 	@PreAuthorize("@ss.hasPermission('infra:job:delete')")
-    public CommonResult<Boolean> deleteJob(@RequestParam("id") Long id) {
+    public CommonResult<Boolean> deleteJob(@RequestParam("id") Long id)
+            throws SchedulerException {
         jobService.deleteJob(id);
+        return success(true);
+    }
+
+    @PutMapping("/trigger")
+    @ApiOperation("触发定时任务")
+    @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
+    @PreAuthorize("@ss.hasPermission('infra:job:trigger')")
+    public CommonResult<Boolean> triggerJob(@RequestParam("id") Long id) throws SchedulerException {
+        jobService.triggerJob(id);
         return success(true);
     }
 
     @GetMapping("/get")
     @ApiOperation("获得定时任务")
-    @ApiImplicitParam(name = "id", value = "编号", required = true, dataTypeClass = Long.class)
+    @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
     @PreAuthorize("@ss.hasPermission('infra:job:query')")
     public CommonResult<InfJobRespVO> getJob(@RequestParam("id") Long id) {
         InfJobDO job = jobService.getJob(id);

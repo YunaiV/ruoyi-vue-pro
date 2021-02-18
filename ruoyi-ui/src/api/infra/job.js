@@ -46,35 +46,30 @@ export function delJob(jobId) {
 // 导出定时任务调度
 export function exportJob(query) {
   return request({
-    url: '/infra/job/export',
+    url: '/infra/job/export-excel',
     method: 'get',
-    params: query
+    params: query,
+    responseType: 'blob'
   })
 }
 
 // 任务状态修改
-export function changeJobStatus(jobId, status) {
-  const data = {
-    jobId,
-    status
-  }
+export function updateJobStatus(jobId, status) {
   return request({
-    url: '/monitor/job/changeStatus',
+    url: '/infra/job/update-status',
     method: 'put',
-    data: data
+    headers:{
+      'Content-type': 'application/x-www-form-urlencoded'
+    },
+    data: 'id=' + jobId + "&status=" + status,
   })
 }
 
 
 // 定时任务立即执行一次
-export function runJob(jobId, jobGroup) {
-  const data = {
-    jobId,
-    jobGroup
-  }
+export function runJob(jobId) {
   return request({
-    url: '/monitor/job/run',
-    method: 'put',
-    data: data
+    url: '/infra/job/trigger?id=' + jobId,
+    method: 'put'
   })
 }

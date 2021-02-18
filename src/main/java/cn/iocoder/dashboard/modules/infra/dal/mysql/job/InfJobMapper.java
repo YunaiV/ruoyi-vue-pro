@@ -18,6 +18,10 @@ import java.util.List;
 @Mapper
 public interface InfJobMapper extends BaseMapperX<InfJobDO> {
 
+    default InfJobDO selectByHandlerName(String handlerName) {
+        return selectOne("handler_name", handlerName);
+    }
+
     default PageResult<InfJobDO> selectPage(InfJobPageReqVO reqVO) {
         return selectPage(reqVO, new QueryWrapperX<InfJobDO>()
                 .likeIfPresent("name", reqVO.getName())

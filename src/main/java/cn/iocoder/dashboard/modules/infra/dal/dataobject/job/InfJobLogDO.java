@@ -1,11 +1,10 @@
 package cn.iocoder.dashboard.modules.infra.dal.dataobject.job;
 
-import cn.iocoder.dashboard.common.pojo.CommonResult;
 import cn.iocoder.dashboard.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.dashboard.framework.quartz.core.handler.JobHandler;
+import cn.iocoder.dashboard.modules.infra.enums.job.InfJobLogStatusEnum;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.*;
 
 import java.util.Date;
 
@@ -18,6 +17,9 @@ import java.util.Date;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class InfJobLogDO extends BaseDO {
 
     /**
@@ -30,18 +32,6 @@ public class InfJobLogDO extends BaseDO {
      * 关联 {@link InfJobDO#getId()}
      */
     private Long jobId;
-    /**
-     * 任务名称
-     *
-     * 冗余字段 {@link InfJobDO#getName()}
-     */
-    private String jobName;
-    /**
-     * 任务分组
-     *
-     * 冗余字段 {@link InfJobDO#getGroup()}
-     */
-    private String jobGroup;
     /**
      * 处理器的名字
      *
@@ -58,7 +48,7 @@ public class InfJobLogDO extends BaseDO {
     /**
      * 开始执行时间
      */
-    private Date startTime;
+    private Date beginTime;
     /**
      * 结束执行时间
      */
@@ -68,22 +58,17 @@ public class InfJobLogDO extends BaseDO {
      */
     private Integer duration;
     /**
-     * 结果码
+     * 状态
      *
-     * 目前使用的 {@link CommonResult#getCode()} 属性
+     * 枚举 {@link InfJobLogStatusEnum}
      */
-    private Integer resultCode;
-    /**
-     * 结果提示
-     *
-     * 目前使用的 {@link CommonResult#getMsg()} 属性
-     */
-    private String resultMsg;
+    private Integer status;
     /**
      * 结果数据
      *
-     * 目前使用的 {@link CommonResult#getData()} 数据
+     * 成功时，使用 {@link JobHandler#execute(String)} 的结果
+     * 失败时，使用 {@link JobHandler#execute(String)} 的异常堆栈
      */
-    private String resultData;
+    private String result;
 
 }
