@@ -55,7 +55,8 @@ public class InfJobServiceImpl implements InfJobService {
         jobMapper.insert(job);
 
         // 添加 Job 到 Quartz 中
-        schedulerManager.addJob(job.getId(), job.getHandlerName(), job.getHandlerParam(), job.getCronExpression());
+        schedulerManager.addJob(job.getId(), job.getHandlerName(), job.getHandlerParam(), job.getCronExpression(),
+                createReqVO.getRetryCount(), createReqVO.getRetryInterval());
         // 更新
         InfJobDO updateObj = InfJobDO.builder().id(job.getId()).status(InfJobStatusEnum.NORMAL.getStatus()).build();
         jobMapper.updateById(updateObj);
@@ -80,7 +81,8 @@ public class InfJobServiceImpl implements InfJobService {
         jobMapper.updateById(updateObj);
 
         // 更新 Job 到 Quartz 中
-        schedulerManager.updateJob(job.getHandlerName(), updateReqVO.getHandlerParam(), updateReqVO.getCronExpression());
+        schedulerManager.updateJob(job.getHandlerName(), updateReqVO.getHandlerParam(), updateReqVO.getCronExpression(),
+                updateReqVO.getRetryCount(), updateReqVO.getRetryInterval());
     }
 
     @Override
@@ -138,7 +140,7 @@ public class InfJobServiceImpl implements InfJobService {
     }
 
     private void validateCronExpression(String cronExpression) {
-        if (CronUtils.isValid(cronExpression)) {
+        if (!CronUtils.isValid(cronExpression)) {
             throw exception(JOB_CRON_EXPRESSION_VALID);
         }
     }

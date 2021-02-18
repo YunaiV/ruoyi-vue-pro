@@ -30,7 +30,7 @@
       </el-col>
       <el-col :span="1.5">
         <el-button type="info" icon="el-icon-s-operation" size="mini" @click="handleJobLog"
-                   v-hasPermi="['monitor:job:query']">日志</el-button>
+                   v-hasPermi="['infra:job:query']">日志</el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
@@ -53,9 +53,9 @@
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
                      v-hasPermi="['infra:job:update']">修改</el-button>
           <el-button size="mini" type="text" icon="el-icon-check" @click="handleChangeStatus(scope.row, true)"
-                     v-hasPermi="['infra:job:update']">开启</el-button>
+                     v-if="scope.row.status === InfJobStatusEnum.STOP" v-hasPermi="['infra:job:update']">开启</el-button>
           <el-button size="mini" type="text" icon="el-icon-close" @click="handleChangeStatus(scope.row, false)"
-                     v-hasPermi="['infra:job:update']">暂停</el-button>
+                     v-if="scope.row.status === InfJobStatusEnum.NORMAL" v-hasPermi="['infra:job:update']">暂停</el-button>
           <el-button size="mini" type="text" icon="el-icon-caret-right" @click="handleRun(scope.row)"
                      v-hasPermi="['infra:job:trigger']">执行一次</el-button>
           <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)"
@@ -82,6 +82,12 @@
         <el-form-item label="CRON 表达式" prop="cronExpression">
           <el-input v-model="form.cronExpression" placeholder="请输入CRON 表达式" />
         </el-form-item>
+        <el-form-item label="重试次数" prop="retryCount">
+          <el-input v-model="form.retryCount" placeholder="请输入重试次数。设置为 0 时，不进行重试" />
+        </el-form-item>
+        <el-form-item label="重试间隔" prop="retryInterval">
+          <el-input v-model="form.retryInterval" placeholder="请输入重试间隔，单位：毫秒。设置为 0 时，无需间隔" />
+        </el-form-item>
         <el-form-item label="监控超时时间" prop="monitorTimeout">
           <el-input v-model="form.monitorTimeout" placeholder="请输入监控超时时间，单位：毫秒" />
         </el-form-item>
@@ -107,6 +113,8 @@
             <el-form-item label="最后一次执行的开始时间：">{{ parseTime(form.executeEndTime) }}</el-form-item>
             <el-form-item label="上一次触发时间：">{{ parseTime(form.firePrevTime) }}</el-form-item>
             <el-form-item label="下一次触发时间：">{{ parseTime(form.fireNextTime) }}</el-form-item>
+            <el-form-item label="重试次数：">{{ form.retryCount }}</el-form-item>
+            <el-form-item label="重试间隔：">{{ form.retryInterval + " 毫秒" }}</el-form-item>
             <el-form-item label="监控超时时间：">{{ form.monitorTimeout > 0 ? form.monitorTimeout + " 毫秒" : "未开启" }}</el-form-item>
           </el-col>
         </el-row>
@@ -158,7 +166,12 @@ export default {
         name: [{ required: true, message: "任务名称不能为空", trigger: "blur" }],
         handlerName: [{ required: true, message: "处理器的名字不能为空", trigger: "blur" }],
         cronExpression: [{ required: true, message: "CRON 表达式不能为空", trigger: "blur" }],
-      }
+        retryCount: [{ required: true, message: "重试次数不能为空", trigger: "blur" }],
+        retryInterval: [{ required: true, message: "重试间隔不能为空", trigger: "blur" }],
+      },
+
+      // 枚举
+      InfJobStatusEnum: InfJobStatusEnum
     };
   },
   created() {
@@ -187,6 +200,8 @@ export default {
         handlerName: undefined,
         handlerParam: undefined,
         cronExpression: undefined,
+        retryCount: undefined,
+        retryInterval: undefined,
         monitorTimeout: undefined,
       };
       this.resetForm("form");

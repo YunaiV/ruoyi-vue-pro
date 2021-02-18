@@ -1,7 +1,7 @@
 package cn.iocoder.dashboard.framework.quartz.core.handler;
 
 import cn.hutool.core.lang.Assert;
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.thread.ThreadUtil;
 import cn.iocoder.dashboard.framework.quartz.core.enums.JobDataKeyEnum;
 import cn.iocoder.dashboard.framework.quartz.core.service.JobLogFrameworkService;
 import lombok.extern.slf4j.Slf4j;
@@ -38,8 +38,11 @@ public class JobHandlerInvoker extends QuartzJobBean {
     protected void executeInternal(JobExecutionContext executionContext) throws JobExecutionException {
         // 第一步，获得 Job 数据
         Long jobId = executionContext.getMergedJobDataMap().getLong(JobDataKeyEnum.JOB_ID.name());
-        String jobHandlerName = getJobHandlerName(executionContext);
+        String jobHandlerName = executionContext.getMergedJobDataMap().getString(JobDataKeyEnum.JOB_HANDLER_NAME.name());
         String jobHandlerParam = executionContext.getMergedJobDataMap().getString(JobDataKeyEnum.JOB_HANDLER_PARAM.name());
+        int refireCount  = executionContext.getRefireCount();
+        int retryCount = (Integer) executionContext.getMergedJobDataMap().getOrDefault(JobDataKeyEnum.JOB_RETRY_COUNT.name(), 0);
+        int retryInterval = (Integer) executionContext.getMergedJobDataMap().getOrDefault(JobDataKeyEnum.JOB_RETRY_INTERVAL.name(), 0);
 
         // 第二步，执行任务
         Long jobLogId = null;
@@ -48,7 +51,7 @@ public class JobHandlerInvoker extends QuartzJobBean {
         Throwable exception = null;
         try {
             // 记录 Job 日志（初始）
-            jobLogId = jobLogFrameworkService.createJobLog(jobId, startTime, jobHandlerName, jobHandlerParam);
+            jobLogId = jobLogFrameworkService.createJobLog(jobId, startTime, jobHandlerName, jobHandlerParam, refireCount + 1);
             // 执行任务
             data = this.executeInternal(jobHandlerName, jobHandlerParam);
         } catch (Throwable ex) {
@@ -58,21 +61,8 @@ public class JobHandlerInvoker extends QuartzJobBean {
         // 第三步，记录执行日志
         this.updateJobLogResultAsync(jobLogId, startTime, data, exception, executionContext);
 
-        // 最终还是抛出异常，用于停止任务
-        if (exception != null) {
-            throw new JobExecutionException(exception);
-        }
-    }
-
-    private static String getJobHandlerName(JobExecutionContext executionContext) {
-        String jobHandlerName = executionContext.getMergedJobDataMap().getString(JobDataKeyEnum.JOB_HANDLER_NAME.name());
-        if (StrUtil.isEmpty(jobHandlerName)) {
-            log.error("[executeInternal][Job({}) 获取不到正确的 jobHandlerName({})]",
-                    executionContext.getJobDetail().getKey(), jobHandlerName);
-            throw new IllegalStateException(StrUtil.format("Job({}) 获取不到正确的 jobHandlerName({})",
-                    executionContext.getJobDetail().getKey(), jobHandlerName));
-        }
-        return jobHandlerName;
+        // 第四步，处理有异常的情况
+        handleException(exception, refireCount, retryCount, retryInterval);
     }
 
     private String executeInternal(String jobHandlerName, String jobHandlerParam) throws Exception {
@@ -86,18 +76,38 @@ public class JobHandlerInvoker extends QuartzJobBean {
     private void updateJobLogResultAsync(Long jobLogId, Date startTime, String data, Throwable exception,
                                          JobExecutionContext executionContext) {
         Date endTime = new Date();
-        try {
-            if (data != null) { // 成功
-                jobLogFrameworkService.updateJobLogSuccessAsync(jobLogId, endTime, (int) diff(endTime, startTime), data);
-            } else { // 失败
-                jobLogFrameworkService.updateJobLogErrorAsync(jobLogId, endTime, (int) diff(endTime, startTime),
-                        getRootCauseMessage(exception));
-            }
-        } catch (Exception ex) {
-            log.error("[executeInternal][Job({}) logId({}) 记录执行日志失败({})]",
-                    executionContext.getJobDetail().getKey(), jobLogId,
-                    data != null ? data : getRootCauseMessage(exception));
+        // 处理是否成功
+        boolean success = exception == null;
+        if (!success) {
+            data = getRootCauseMessage(exception);
         }
+        // 更新日志
+        try {
+            jobLogFrameworkService.updateJobLogResultAsync(jobLogId, endTime, (int) diff(endTime, startTime), success, data);
+        } catch (Exception ex) {
+            log.error("[executeInternal][Job({}) logId({}) 记录执行日志失败({}/{})]",
+                    executionContext.getJobDetail().getKey(), jobLogId, success, data);
+        }
+    }
+
+    private void handleException(Throwable exception,
+                                 int refireCount, int retryCount, int retryInterval) throws JobExecutionException {
+        // 如果有异常，则进行重试
+        if (exception == null) {
+            return;
+        }
+        // 情况一：如果到达重试上限，则直接抛出异常即可
+        if (refireCount >= retryCount) {
+            throw new JobExecutionException(exception);
+        }
+
+        // 情况二：如果未到达重试上限，则 sleep 一定间隔时间，然后重试
+        // 这里使用 sleep 来实现，主要还是希望实现比较简单。因为，同一时间，不会存在大量失败的 Job。
+        if (retryInterval > 0) {
+            ThreadUtil.sleep(retryInterval);
+        }
+        // 第二个参数，refireImmediately = true，表示立即重试
+        throw new JobExecutionException(exception, true);
     }
 
 }

@@ -30,9 +30,12 @@ public class SchedulerManager {
      * @param jobHandlerName 任务处理器的名字
      * @param jobHandlerParam 任务处理器的参数
      * @param cronExpression CRON 表达式
+     * @param retryCount 重试次数
+     * @param retryInterval 重试间隔
      * @throws SchedulerException 添加异常
      */
-    public void addJob(Long jobId, String jobHandlerName, String jobHandlerParam, String cronExpression)
+    public void addJob(Long jobId, String jobHandlerName, String jobHandlerParam, String cronExpression,
+                       Integer retryCount, Integer retryInterval)
             throws SchedulerException {
         // 创建 JobDetail 对象
         JobDetail jobDetail = JobBuilder.newJob(JobHandlerInvoker.class)
@@ -40,7 +43,7 @@ public class SchedulerManager {
                 .usingJobData(JobDataKeyEnum.JOB_HANDLER_NAME.name(), jobHandlerName)
                 .withIdentity(jobHandlerName).build();
         // 创建 Trigger 对象
-        Trigger trigger = this.buildTrigger(jobHandlerName, jobHandlerParam, cronExpression);
+        Trigger trigger = this.buildTrigger(jobHandlerName, jobHandlerParam, cronExpression, retryCount, retryInterval);
         // 新增调度
         scheduler.scheduleJob(jobDetail, trigger);
     }
@@ -51,12 +54,15 @@ public class SchedulerManager {
      * @param jobHandlerName 任务处理器的名字
      * @param jobHandlerParam 任务处理器的参数
      * @param cronExpression CRON 表达式
+     * @param retryCount 重试次数
+     * @param retryInterval 重试间隔
      * @throws SchedulerException 更新异常
      */
-    public void updateJob(String jobHandlerName, String jobHandlerParam, String cronExpression)
+    public void updateJob(String jobHandlerName, String jobHandlerParam, String cronExpression,
+                          Integer retryCount, Integer retryInterval)
             throws SchedulerException {
         // 创建新 Trigger 对象
-        Trigger newTrigger = this.buildTrigger(jobHandlerName, jobHandlerParam, cronExpression);
+        Trigger newTrigger = this.buildTrigger(jobHandlerName, jobHandlerParam, cronExpression, retryCount, retryInterval);
         // 修改调度
         scheduler.rescheduleJob(new TriggerKey(jobHandlerName), newTrigger);
     }
@@ -102,7 +108,7 @@ public class SchedulerManager {
      */
     public void triggerJob(Long jobId, String jobHandlerName, String jobHandlerParam)
             throws SchedulerException {
-        JobDataMap data = new JobDataMap();
+        JobDataMap data = new JobDataMap(); // 无需重试，所以不设置 retryCount 和 retryInterval
         data.put(JobDataKeyEnum.JOB_ID.name(), jobId);
         data.put(JobDataKeyEnum.JOB_HANDLER_NAME.name(), jobHandlerName);
         data.put(JobDataKeyEnum.JOB_HANDLER_PARAM.name(), jobHandlerParam);
@@ -110,11 +116,14 @@ public class SchedulerManager {
         scheduler.triggerJob(new JobKey(jobHandlerName), data);
     }
 
-    private Trigger buildTrigger(String jobHandlerName, String jobHandlerParam, String cronExpression) {
+    private Trigger buildTrigger(String jobHandlerName, String jobHandlerParam, String cronExpression,
+                                 Integer retryCount, Integer retryInterval) {
         return TriggerBuilder.newTrigger()
                 .withIdentity(jobHandlerName)
-                .usingJobData(JobDataKeyEnum.JOB_HANDLER_PARAM.name(), jobHandlerParam)
                 .withSchedule(CronScheduleBuilder.cronSchedule(cronExpression))
+                .usingJobData(JobDataKeyEnum.JOB_HANDLER_PARAM.name(), jobHandlerParam)
+                .usingJobData(JobDataKeyEnum.JOB_RETRY_COUNT.name(), retryCount)
+                .usingJobData(JobDataKeyEnum.JOB_RETRY_INTERVAL.name(), retryInterval)
                 .build();
     }
 

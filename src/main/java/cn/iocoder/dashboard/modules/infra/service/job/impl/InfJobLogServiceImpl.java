@@ -26,8 +26,8 @@ public class InfJobLogServiceImpl implements InfJobLogService {
     private InfJobLogMapper jobLogMapper;
 
     @Override
-    public Long createJobLog(Long jobId, Date beginTime, String jobHandlerName, String jobHandlerParam) {
-        InfJobLogDO log = InfJobLogDO.builder().jobId(jobId).handlerName(jobHandlerName).handlerParam(jobHandlerParam)
+    public Long createJobLog(Long jobId, Date beginTime, String jobHandlerName, String jobHandlerParam, Integer executeIndex) {
+        InfJobLogDO log = InfJobLogDO.builder().jobId(jobId).handlerName(jobHandlerName).handlerParam(jobHandlerParam).executeIndex(executeIndex)
                 .beginTime(beginTime).status(InfJobLogStatusEnum.RUNNING.getStatus()).build();
         jobLogMapper.insert(log);
         return log.getId();
@@ -35,24 +35,14 @@ public class InfJobLogServiceImpl implements InfJobLogService {
 
     @Override
     @Async
-    public void updateJobLogSuccessAsync(Long logId, Date endTime, Integer duration, String result) {
-        updateJobLogResult(logId, endTime, duration, result, InfJobLogStatusEnum.SUCCESS);
-    }
-
-    @Override
-    @Async
-    public void updateJobLogErrorAsync(Long logId, Date endTime, Integer duration, String result) {
-        updateJobLogResult(logId, endTime, duration, result, InfJobLogStatusEnum.FAILURE);
-    }
-
-    private void updateJobLogResult(Long logId, Date endTime, Integer duration, String result, InfJobLogStatusEnum status) {
+    public void updateJobLogResultAsync(Long logId, Date endTime, Integer duration, boolean success, String result) {
         try {
             InfJobLogDO updateObj = InfJobLogDO.builder().id(logId).endTime(endTime).duration(duration)
-                    .status(status.getStatus()).result(result).build();
+                    .status(success ? InfJobLogStatusEnum.SUCCESS.getStatus() : InfJobLogStatusEnum.FAILURE.getStatus()).result(result).build();
             jobLogMapper.updateById(updateObj);
         } catch (Exception ex) {
-            log.error("[updateJobLogResult][logId({}) endTime({}) duration({}) result({}) status({})]",
-                    logId, endTime, duration, result, status);
+            log.error("[updateJobLogResultAsync][logId({}) endTime({}) duration({}) success({}) result({})]",
+                    logId, endTime, duration, success, result);
         }
     }
 

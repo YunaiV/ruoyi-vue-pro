@@ -20,13 +20,13 @@ class SchedulerManagerTest {
     @Test
     public void testAddJob() throws SchedulerException {
         String jobHandlerName = StrUtil.lowerFirst(SysUserSessionTimeoutJob.class.getSimpleName());
-        schedulerManager.addJob(1L, jobHandlerName, "test", "0/10 * * * * ? *");
+        schedulerManager.addJob(1L, jobHandlerName, "test", "0/10 * * * * ? *", 0, 0);
     }
 
     @Test
     public void testUpdateJob() throws SchedulerException {
         String jobHandlerName = StrUtil.lowerFirst(SysUserSessionTimeoutJob.class.getSimpleName());
-        schedulerManager.updateJob(jobHandlerName, "hahaha", "0/20 * * * * ? *");
+        schedulerManager.updateJob(jobHandlerName, "hahaha", "0/20 * * * * ? *", 0, 0);
     }
 
     @Test

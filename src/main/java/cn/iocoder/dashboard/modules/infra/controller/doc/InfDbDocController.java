@@ -1,4 +1,4 @@
-package cn.iocoder.dashboard.modules.infra.controller.dbdoc;
+package cn.iocoder.dashboard.modules.infra.controller.doc;
 
 import cn.hutool.extra.servlet.ServletUtil;
 import cn.smallbun.screw.core.Configuration;

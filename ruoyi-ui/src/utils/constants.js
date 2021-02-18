@@ -54,7 +54,6 @@ export const ToolCodegenTemplateTypeEnum = {
  */
 export const InfJobStatusEnum = {
   INIT: 0, // 初始化中
-  NORMAL: 1, // 开启运行
-  EXCEPTION: 2, // 异常运行
-  STOP: 3, // 暂停运行
+  NORMAL: 1, // 运行中
+  STOP: 2, // 暂停运行
 }

@@ -27,7 +27,10 @@ import ${basePackage}.${table.moduleName}.controller.${table.businessName}.vo.*;
                 .geIfPresent("${column.columnName}", reqVO.get${JavaField}())
 #end
 #if (${column.listOperationCondition} == "<")##情况五，< 的时候
-                .gtIfPresent("${column.columnName}", reqVO.get${JavaField}())
+                .ltIfPresent("${column.columnName}", reqVO.get${JavaField}())
+#end
+#if (${column.listOperationCondition} == "<=")##情况五，<= 的时候
+                .leIfPresent("${column.columnName}", reqVO.get${JavaField}())
 #end
 #if (${column.listOperationCondition} == "LIKE")##情况七，Like 的时候
                 .likeIfPresent("${column.columnName}", reqVO.get${JavaField}())

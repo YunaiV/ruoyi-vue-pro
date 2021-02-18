@@ -134,6 +134,7 @@ public class ToolCodegenServiceImpl implements ToolCodegenService {
     }
 
     @Override
+    @Transactional
     public void syncCodegenFromDB(Long tableId) {
         // 校验是否已经存在
         ToolCodegenTableDO table = codegenTableMapper.selectById(tableId);
@@ -148,6 +149,7 @@ public class ToolCodegenServiceImpl implements ToolCodegenService {
     }
 
     @Override
+    @Transactional
     public void syncCodegenFromSQL(Long tableId, String sql) {
         // 校验是否已经存在
         ToolCodegenTableDO table = codegenTableMapper.selectById(tableId);
@@ -193,7 +195,9 @@ public class ToolCodegenServiceImpl implements ToolCodegenService {
             codegenColumnMapper.insert(column); // TODO 批量插入
         });
         // 删除不存在的字段
-        codegenColumnMapper.deleteBatchIds(deleteColumnIds);
+        if (CollUtil.isNotEmpty(deleteColumnIds)) {
+            codegenColumnMapper.deleteBatchIds(deleteColumnIds);
+        }
     }
 
     @Override

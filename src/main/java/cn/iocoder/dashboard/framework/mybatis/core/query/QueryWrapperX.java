@@ -65,6 +65,20 @@ public class QueryWrapperX<T> extends QueryWrapper<T> {
         return this;
     }
 
+    public QueryWrapperX<T> ltIfPresent(String column, Object val) {
+        if (val != null) {
+            return (QueryWrapperX<T>) super.lt(column, val);
+        }
+        return this;
+    }
+
+    public QueryWrapperX<T> leIfPresent(String column, Object val) {
+        if (val != null) {
+            return (QueryWrapperX<T>) super.le(column, val);
+        }
+        return this;
+    }
+
     public QueryWrapperX<T> betweenIfPresent(String column, Object val1, Object val2) {
         if (val1 != null && val2 != null) {
             return (QueryWrapperX<T>) super.between(column, val1, val2);

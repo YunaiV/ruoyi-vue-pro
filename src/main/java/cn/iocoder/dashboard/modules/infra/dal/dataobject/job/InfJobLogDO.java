@@ -44,6 +44,12 @@ public class InfJobLogDO extends BaseDO {
      * 冗余字段 {@link InfJobDO#getHandlerParam()}
      */
     private String handlerParam;
+    /**
+     * 第几次执行
+     *
+     * 用于区分是不是重试执行。如果是重试执行，则 index 大于 1
+     */
+    private Integer executeIndex;
 
     /**
      * 开始执行时间

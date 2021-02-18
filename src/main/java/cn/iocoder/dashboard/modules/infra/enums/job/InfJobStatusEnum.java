@@ -23,17 +23,13 @@ public enum InfJobStatusEnum {
      */
     INIT(0, Collections.emptySet()),
     /**
-     * 开启运行
+     * 开启
      */
     NORMAL(1, Sets.newHashSet(STATE_WAITING, STATE_ACQUIRED, STATE_BLOCKED)),
     /**
-     * 异常运行
+     * 暂停
      */
-    EXCEPTION(2, Sets.newHashSet(STATE_COMPLETE)),
-    /**
-     * 暂停运行
-     */
-    STOP(3, Sets.newHashSet(STATE_PAUSED, STATE_PAUSED_BLOCKED));
+    STOP(2, Sets.newHashSet(STATE_PAUSED, STATE_PAUSED_BLOCKED));
 
     /**
      * 状态

@@ -75,6 +75,18 @@ public class InfJobDO extends BaseDO {
      */
     private Date fireNextTime;
 
+    // ========== 重试相关字段 ==========
+    /**
+     * 重试次数
+     * 如果不重试，则设置为 0
+     */
+    private Integer retryCount;
+    /**
+     * 重试间隔，单位：毫秒
+     * 如果没有间隔，则设置为 0
+     */
+    private Integer retryInterval;
+
     // ========== 监控相关字段 ==========
     /**
      * 监控超时时间，单位：毫秒
