@@ -195,13 +195,13 @@ public class SysDictDataServiceImpl implements SysDictDataService {
         // 校验自己存在
         checkDictDataExists(id);
         // 校验字典数据的值的唯一性
-        checkDictDataValueUnique(id, label);
+        checkDictDataValueUnique(id, dictType, label);
         // 校验字典类型有效
         checkDictTypeValid(dictType);
     }
 
-    private void checkDictDataValueUnique(Long id, String label) {
-        SysDictDataDO dictData = dictDataMapper.selectByLabel(label);
+    private void checkDictDataValueUnique(Long id, String dictType, String label) {
+        SysDictDataDO dictData = dictDataMapper.selectByDictTypeAndLabel(dictType, label);
         if (dictData == null) {
             return;
         }

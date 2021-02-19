@@ -23,14 +23,14 @@ public class InfJobBaseVO {
     @NotNull(message = "CRON 表达式不能为空")
     private String cronExpression;
 
-    @ApiModelProperty(value = "重试次数", required = true)
+    @ApiModelProperty(value = "重试次数", required = true, example = "3")
     @NotNull(message = "重试次数不能为空")
     private Integer retryCount;
 
-    @ApiModelProperty(value = "重试间隔", required = true)
+    @ApiModelProperty(value = "重试间隔", required = true, example = "1000")
     @NotNull(message = "重试间隔不能为空")
     private Integer retryInterval;
-    
+
     @ApiModelProperty(value = "监控超时时间", example = "1000")
     private Integer monitorTimeout;
 

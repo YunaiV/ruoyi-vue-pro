@@ -6,8 +6,6 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
-import java.util.Date;
-
 /**
  * 定时任务 DO
  *
@@ -45,35 +43,10 @@ public class InfJobDO extends BaseDO {
      * 处理器的参数
      */
     private String handlerParam;
-
-    // ========== 时间相关字段 ==========
-
     /**
      * CRON 表达式
      */
     private String cronExpression;
-    /**
-     * 最后一次执行的开始时间
-     *
-     * 该字段在任务执行结束后，进行记录
-     */
-    private Date executeBeginTime;
-    /**
-     * 最后一次执行的结束时间
-     *
-     * 该字段在任务执行结束后，进行记录
-     */
-    private Date executeEndTime;
-    /**
-     * 上一次触发时间，来自 Quartz SCHE_TRIGGERS 表
-     */
-    private Date firePrevTime;
-    /**
-     * 下一次触发时间，来自 Quartz SCHE_TRIGGERS 表
-     *
-     * 在触发器状态从 `ACQUIRED` 变成 `BLOCKED` 时，就会更新 PREV_FIRE_TIME、NEXT_FIRE_TIME，然后定时任务才正式开始执行
-     */
-    private Date fireNextTime;
 
     // ========== 重试相关字段 ==========
     /**
@@ -95,9 +68,5 @@ public class InfJobDO extends BaseDO {
      * 注意，这里的超时的目的，不是进行任务的取消，而是告警任务的执行时间过长
      */
     private Integer monitorTimeout;
-
-    // TODO misfirePolicy
-    // TODO concurrent
-    // TODO 失败重试
 
 }

@@ -73,3 +73,11 @@ export function runJob(jobId) {
     method: 'put'
   })
 }
+
+// 获得定时任务的下 n 次执行时间
+export function getJobNextTimes(jobId) {
+  return request({
+    url: '/infra/job/get_next_times?id=' + jobId,
+    method: 'get'
+  })
+}

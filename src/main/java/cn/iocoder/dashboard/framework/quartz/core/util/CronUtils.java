@@ -2,6 +2,11 @@ package cn.iocoder.dashboard.framework.quartz.core.util;
 
 import org.quartz.CronExpression;
 
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 /**
  * Quartz Cron 表达式的工具类
  *
@@ -17,6 +22,33 @@ public class CronUtils {
      */
     public static boolean isValid(String cronExpression) {
         return CronExpression.isValidExpression(cronExpression);
+    }
+
+    /**
+     * 基于 CRON 表达式，获得下 n 个满足执行的时间
+     *
+     * @param cronExpression CRON 表达式
+     * @param n 数量
+     * @return 满足条件的执行时间
+     */
+    public static List<Date> getNextTimes(String cronExpression, int n) {
+        // 获得 CronExpression 对象
+        CronExpression cron;
+        try {
+            cron = new CronExpression(cronExpression);
+        } catch (ParseException e) {
+            throw new IllegalArgumentException(e.getMessage());
+        }
+        // 从当前开始计算，n 个满足条件的
+        Date now = new Date();
+        List<Date> nextTimes = new ArrayList<>(n);
+        for (int i = 0; i < n; i++) {
+            Date nextTime = cron.getNextValidTimeAfter(now);
+            nextTimes.add(nextTime);
+            // 切换现在，为下一个触发时间；
+            now = nextTime;
+        }
+        return nextTimes;
     }
 
 }

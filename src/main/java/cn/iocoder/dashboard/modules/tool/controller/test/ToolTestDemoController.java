@@ -51,7 +51,7 @@ public class ToolTestDemoController {
 
     @DeleteMapping("/delete")
     @ApiOperation("删除测试示例")
-    @ApiImplicitParam(name = "id", value = "编号", required = true)
+    @ApiImplicitParam(name = "id", value = "编号", required = true, dataTypeClass = Long.class)
     @PreAuthorize("@ss.hasPermission('tool:test-demo:delete')")
     public CommonResult<Boolean> deleteTestDemo(@RequestParam("id") Long id) {
         testDemoService.deleteTestDemo(id);

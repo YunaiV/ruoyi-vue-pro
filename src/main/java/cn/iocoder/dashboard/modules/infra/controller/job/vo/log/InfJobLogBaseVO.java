@@ -16,18 +16,18 @@ import static cn.iocoder.dashboard.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOU
 @Data
 public class InfJobLogBaseVO {
 
-    @ApiModelProperty(value = "任务编号", required = true)
+    @ApiModelProperty(value = "任务编号", required = true, example = "1024")
     @NotNull(message = "任务编号不能为空")
     private Long jobId;
 
-    @ApiModelProperty(value = "处理器的名字", required = true)
+    @ApiModelProperty(value = "处理器的名字", required = true, example = "sysUserSessionTimeoutJob")
     @NotNull(message = "处理器的名字不能为空")
     private String handlerName;
 
-    @ApiModelProperty(value = "处理器的参数")
+    @ApiModelProperty(value = "处理器的参数", example = "yudao")
     private String handlerParam;
 
-    @ApiModelProperty(value = "第几次执行", required = true)
+    @ApiModelProperty(value = "第几次执行", required = true, example = "1")
     @NotNull(message = "第几次执行不能为空")
     private Integer executeIndex;
 
@@ -40,14 +40,14 @@ public class InfJobLogBaseVO {
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private Date endTime;
 
-    @ApiModelProperty(value = "执行时长")
+    @ApiModelProperty(value = "执行时长", example = "123")
     private Integer duration;
 
-    @ApiModelProperty(value = "任务状态", required = true)
+    @ApiModelProperty(value = "任务状态", required = true, example = "1", notes = "参见 InfJobLogStatusEnum 枚举")
     @NotNull(message = "任务状态不能为空")
     private Integer status;
 
-    @ApiModelProperty(value = "结果数据")
+    @ApiModelProperty(value = "结果数据", example = "执行成功")
     private String result;
 
 }

@@ -14,7 +14,7 @@ import java.util.Date;
 @ToString(callSuper = true)
 public class InfJobLogRespVO extends InfJobLogBaseVO {
 
-    @ApiModelProperty(value = "日志编号", required = true)
+    @ApiModelProperty(value = "日志编号", required = true, example = "1024")
     private Long id;
 
     @ApiModelProperty(value = "创建时间", required = true)

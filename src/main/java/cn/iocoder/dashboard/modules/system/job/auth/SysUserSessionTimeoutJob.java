@@ -15,9 +15,6 @@ public class SysUserSessionTimeoutJob implements JobHandler {
 
     @Override
     public String execute(String param) throws Exception {
-        if (true) {
-            throw new RuntimeException("测试异常");
-        }
 //        System.out.println("执行了一次任务");
         log.info("[execute][执行任务：{}]", param);
         return null;

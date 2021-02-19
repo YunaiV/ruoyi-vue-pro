@@ -1,5 +1,8 @@
 package cn.iocoder.dashboard.modules.infra.controller.job.vo.log;
 
+import cn.iocoder.dashboard.framework.excel.core.annotations.DictFormat;
+import cn.iocoder.dashboard.framework.excel.core.convert.DictConvert;
+import cn.iocoder.dashboard.modules.system.enums.dict.SysDictTypeEnum;
 import com.alibaba.excel.annotation.ExcelProperty;
 import lombok.Data;
 
@@ -37,7 +40,8 @@ public class InfJobLogExcelVO {
     @ExcelProperty("执行时长")
     private Integer duration;
 
-    @ExcelProperty("任务状态")
+    @ExcelProperty(value = "任务状态", converter = DictConvert.class)
+    @DictFormat(SysDictTypeEnum.INF_JOB_STATUS)
     private Integer status;
 
     @ExcelProperty("结果数据")

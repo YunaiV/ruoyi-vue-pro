@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 import static cn.iocoder.dashboard.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
@@ -13,7 +14,10 @@ import static cn.iocoder.dashboard.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOU
 @Data
 public class InfJobLogExportReqVO {
 
-    @ApiModelProperty(value = "处理器的名字")
+    @ApiModelProperty(value = "任务编号", example = "10")
+    private Long jobId;
+
+    @ApiModelProperty(value = "处理器的名字", notes = "模糊匹配")
     private String handlerName;
 
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
@@ -24,7 +28,7 @@ public class InfJobLogExportReqVO {
     @ApiModelProperty(value = "结束执行时间")
     private Date endTime;
 
-    @ApiModelProperty(value = "任务状态")
+    @ApiModelProperty(value = "任务状态", notes = "参见 InfJobLogStatusEnum 枚举")
     private Integer status;
 
 }

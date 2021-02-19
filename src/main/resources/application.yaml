@@ -50,11 +50,16 @@ spring:
     properties: # 添加 Quartz Scheduler 附加属性，更多可以看 http://www.quartz-scheduler.org/documentation/2.4.0-SNAPSHOT/configuration.html 文档
       org:
         quartz:
+          # Scheduler 相关配置
+          scheduler:
+            instanceName: schedulerName
+            instanceId: AUTO # 自动生成 instance ID
           # JobStore 相关配置
           jobStore:
             class: org.quartz.impl.jdbcjobstore.JobStoreTX # JobStore 实现类
             isClustered: true # 是集群模式
-            clusterCheckinInterval: 1000
+            clusterCheckinInterval: 15000 # 集群检查频率，单位：毫秒。默认为 15000，即 15 秒
+            misfireThreshold: 60000 # misfire 阀值，单位：毫秒。
           # 线程池相关配置
           threadPool:
             threadCount: 25 # 线程池大小。默认为 10 。

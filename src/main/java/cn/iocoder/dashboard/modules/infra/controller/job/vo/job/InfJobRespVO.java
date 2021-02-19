@@ -25,18 +25,6 @@ public class InfJobRespVO extends InfJobBaseVO {
     @NotNull(message = "处理器的名字不能为空")
     private String handlerName;
 
-    @ApiModelProperty(value = "最后一次执行的开始时间")
-    private Date executeBeginTime;
-
-    @ApiModelProperty(value = "最后一次执行的结束时间")
-    private Date executeEndTime;
-
-    @ApiModelProperty(value = "上一次触发时间")
-    private Date firePrevTime;
-
-    @ApiModelProperty(value = "下一次触发时间")
-    private Date fireNextTime;
-
     @ApiModelProperty(value = "创建时间", required = true)
     private Date createTime;
 

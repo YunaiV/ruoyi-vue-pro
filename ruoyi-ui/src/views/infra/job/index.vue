@@ -30,7 +30,7 @@
       </el-col>
       <el-col :span="1.5">
         <el-button type="info" icon="el-icon-s-operation" size="mini" @click="handleJobLog"
-                   v-hasPermi="['infra:job:query']">日志</el-button>
+                   v-hasPermi="['infra:job:query']">执行日志</el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
@@ -50,6 +50,8 @@
         <template slot-scope="scope">
           <el-button size="mini" type="text" icon="el-icon-view" @click="handleView(scope.row)"
                      v-hasPermi="['infra:job:query']">详细</el-button>
+          <el-button size="mini" icon="el-icon-s-operation" @click="handleJobLog(scope.row)"
+                     v-hasPermi="['infra:job:query']">执行日志</el-button>
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
                      v-hasPermi="['infra:job:update']">修改</el-button>
           <el-button size="mini" type="text" icon="el-icon-check" @click="handleChangeStatus(scope.row, true)"
@@ -109,13 +111,10 @@
             <el-form-item label="处理器的名字：">{{ form.handlerName }}</el-form-item>
             <el-form-item label="处理器的参数：">{{ form.handlerParam }}</el-form-item>
             <el-form-item label="cron表达式：">{{ form.cronExpression }}</el-form-item>
-            <el-form-item label="最后一次执行的开始时间：">{{ parseTime(form.executeBeginTime) }}</el-form-item>
-            <el-form-item label="最后一次执行的开始时间：">{{ parseTime(form.executeEndTime) }}</el-form-item>
-            <el-form-item label="上一次触发时间：">{{ parseTime(form.firePrevTime) }}</el-form-item>
-            <el-form-item label="下一次触发时间：">{{ parseTime(form.fireNextTime) }}</el-form-item>
             <el-form-item label="重试次数：">{{ form.retryCount }}</el-form-item>
             <el-form-item label="重试间隔：">{{ form.retryInterval + " 毫秒" }}</el-form-item>
             <el-form-item label="监控超时时间：">{{ form.monitorTimeout > 0 ? form.monitorTimeout + " 毫秒" : "未开启" }}</el-form-item>
+            <el-form-item label="后续执行时间：">{{ Array.from(nextTimes, x => parseTime(x)).join('; ')}}</el-form-item>
           </el-col>
         </el-row>
       </el-form>
@@ -128,7 +127,7 @@
 </template>
 
 <script>
-import { listJob, getJob, delJob, addJob, updateJob, exportJob, runJob, updateJobStatus } from "@/api/infra/job";
+import { listJob, getJob, delJob, addJob, updateJob, exportJob, runJob, updateJobStatus, getJobNextTimes } from "@/api/infra/job";
 import { InfJobStatusEnum } from "@/utils/constants";
 
 export default {
@@ -169,6 +168,7 @@ export default {
         retryCount: [{ required: true, message: "重试次数不能为空", trigger: "blur" }],
         retryInterval: [{ required: true, message: "重试间隔不能为空", trigger: "blur" }],
       },
+      nextTimes: [], // 后续执行时间
 
       // 枚举
       InfJobStatusEnum: InfJobStatusEnum
@@ -204,6 +204,7 @@ export default {
         retryInterval: undefined,
         monitorTimeout: undefined,
       };
+      this.nextTimes = [];
       this.resetForm("form");
     },
     /** 搜索按钮操作 */
@@ -234,10 +235,23 @@ export default {
         this.form = response.data;
         this.openView = true;
       });
+      // 获取下一次执行时间
+      getJobNextTimes(row.id).then(response => {
+        this.nextTimes = response.data;
+      });
     },
     /** 任务日志列表查询 */
-    handleJobLog() {
-      this.$router.push("/job/log");
+    handleJobLog(row) {
+      if (row.id) {
+        this.$router.push({
+          path:"/job/log",
+          query:{
+            jobId: row.id
+          }
+        });
+      } else {
+        this.$router.push("/job/log");
+      }
     },
     /** 新增按钮操作 */
     handleAdd() {

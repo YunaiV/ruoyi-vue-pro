@@ -4,6 +4,7 @@ import cn.iocoder.dashboard.common.pojo.CommonResult;
 import cn.iocoder.dashboard.common.pojo.PageResult;
 import cn.iocoder.dashboard.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.dashboard.framework.logger.operatelog.core.annotations.OperateLog;
+import cn.iocoder.dashboard.framework.quartz.core.util.CronUtils;
 import cn.iocoder.dashboard.modules.infra.controller.job.vo.job.*;
 import cn.iocoder.dashboard.modules.infra.convert.job.InfJobConvert;
 import cn.iocoder.dashboard.modules.infra.dal.dataobject.job.InfJobDO;
@@ -22,6 +23,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import static cn.iocoder.dashboard.common.pojo.CommonResult.success;
@@ -121,6 +124,22 @@ public class InfJobController {
         // 导出 Excel
         List<InfJobExcelVO> datas = InfJobConvert.INSTANCE.convertList02(list);
         ExcelUtils.write(response, "定时任务.xls", "数据", InfJobExcelVO.class, datas);
+    }
+
+    @GetMapping("/get_next_times")
+    @ApiOperation("获得定时任务的下 n 次执行时间")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class),
+            @ApiImplicitParam(name = "count", value = "数量", example = "5", dataTypeClass = Long.class)
+    })
+    @PreAuthorize("@ss.hasPermission('infra:job:query')")
+    public CommonResult<List<Date>> getJobNextTimes(@RequestParam("id") Long id,
+                                                    @RequestParam(value = "count", required = false, defaultValue = "5") Integer count) {
+        InfJobDO job = jobService.getJob(id);
+        if (job == null) {
+            return success(Collections.emptyList());
+        }
+        return success(CronUtils.getNextTimes(job.getCronExpression(), count));
     }
 
 }

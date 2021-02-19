@@ -15,8 +15,9 @@ import java.util.List;
 @Mapper
 public interface SysDictDataMapper extends BaseMapperX<SysDictDataDO> {
 
-    default SysDictDataDO selectByLabel(String label) {
-        return selectOne(new QueryWrapper<SysDictDataDO>().eq("label", label));
+    default SysDictDataDO selectByDictTypeAndLabel(String dictType, String label) {
+        return selectOne(new QueryWrapper<SysDictDataDO>().eq("dict_type", dictType)
+                .eq("label", label));
     }
 
     default int selectCountByDictType(String dictType) {
