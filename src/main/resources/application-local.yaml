@@ -1,0 +1,112 @@
+server:
+  port: 48080
+
+--- #################### 数据库相关配置 ####################
+
+spring:
+  # 数据源配置项 TODO 多数据源；TODO 监控配置
+  datasource:
+    name: ruoyi-vue-pro
+    url: jdbc:mysql://127.0.1:33061/${spring.datasource.name}?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=CTT
+    driver-class-name: com.mysql.jdbc.Driver
+    username: root
+    password: 123456
+
+  # Redis 配置。Redisson 默认的配置足够使用，一般不需要进行调优
+  redis:
+    host: 127.0.0.1 # 地址
+    port: 6379 # 端口
+    database: 0 # 数据库索引
+
+--- #################### 定时任务相关配置 ####################
+
+# Quartz 配置项，对应 QuartzProperties 配置类
+spring:
+  quartz:
+    scheduler-name: schedulerName # Scheduler 名字。默认为 schedulerName
+    job-store-type: jdbc # Job 存储器类型。默认为 memory 表示内存，可选 jdbc 使用数据库。
+    wait-for-jobs-to-complete-on-shutdown: true # 应用关闭时，是否等待定时任务执行完成。默认为 false ，建议设置为 true
+    properties: # 添加 Quartz Scheduler 附加属性，更多可以看 http://www.quartz-scheduler.org/documentation/2.4.0-SNAPSHOT/configuration.html 文档
+      org:
+        quartz:
+          # Scheduler 相关配置
+          scheduler:
+            instanceName: schedulerName
+            instanceId: AUTO # 自动生成 instance ID
+          # JobStore 相关配置
+          jobStore:
+            class: org.quartz.impl.jdbcjobstore.JobStoreTX # JobStore 实现类
+            isClustered: true # 是集群模式
+            clusterCheckinInterval: 15000 # 集群检查频率，单位：毫秒。默认为 15000，即 15 秒
+            misfireThreshold: 60000 # misfire 阀值，单位：毫秒。
+          # 线程池相关配置
+          threadPool:
+            threadCount: 25 # 线程池大小。默认为 10 。
+            threadPriority: 5 # 线程优先级
+            class: org.quartz.simpl.SimpleThreadPool # 线程池类型
+    jdbc: # 使用 JDBC 的 JobStore 的时候，JDBC 的配置
+      initialize-schema: NEVER # 是否自动使用 SQL 初始化 Quartz 表结构。这里设置成 never ，我们手动创建表结构。
+
+--- #################### 配置中心相关配置 ####################
+
+# Apollo 配置中心
+apollo:
+  bootstrap:
+    enabled: true # 设置 Apollo 在启动阶段生效
+    eagerLoad:
+      enabled: true # 设置 Apollo 在日志初始化前生效，可以实现日志的动态级别配置
+  jdbc: # 自定义的 JDBC 配置项，用于数据库的地址
+    url: ${spring.datasource.url}
+    username: ${spring.datasource.username}
+    password: ${spring.datasource.password}
+
+--- #################### 监控相关配置 ####################
+
+# Actuator 监控端点的配置项
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*' # 需要开放的端点。默认值只打开 health 和 info 两个端点。通过设置 * ，可以开放所有端点。
+
+# Spring Boot Admin 配置项
+spring:
+  boot:
+    admin:
+      # Spring Boot Admin Client 客户端的相关配置
+      client:
+        url: http://127.0.0.1:8080/${spring.boot.admin.context-path} # 设置 Spring Boot Admin Server 地址
+      # Spring Boot Admin Server 服务端的相关配置
+      context-path: /admin # 配置 Spring
+
+--- #################### 芋道相关配置 ####################
+
+# 芋道配置项，设置当前项目所有自定义的配置
+yudao:
+  info:
+    version: 1.0.0
+    base-package: cn.iocoder.dashboard
+  web:
+    api-prefix: /api
+    controller-package: ${yudao.info.base-package}
+  security:
+    token-header: Authorization
+    token-secret: abcdefghijklmnopqrstuvwxyz
+    token-timeout: 1d
+    session-timeout: 30m
+    mock-enable: true
+    mock-secret: test
+  swagger:
+    title: 管理后台
+    description: 提供管理员管理的所有功能
+    version: ${yudao.info.base-package}
+    base-package: ${yudao.info.base-package}.modules
+  captcha:
+    timeout: 5m
+    width: 160
+    height: 60
+  file:
+    base-path: http://127.0.0.1:${server.port}/${yudao.web.api-prefix}/file/get/
+  codegen:
+    base-package: ${yudao.info.base-package}.modules
+    db-schemas: ${spring.datasource.name}
