@@ -123,32 +123,31 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 // 一堆自定义的 Spring Security 处理器
                 .exceptionHandling().authenticationEntryPoint(unauthorizedHandler)
                     .accessDeniedHandler(accessDeniedHandler).and()
-                // TODO 过滤请求
+                // 设置每个请求的权限
                 .authorizeRequests()
-                // 登陆的接口，可匿名访问
-                .antMatchers(webProperties.getApiPrefix() + "/login").anonymous()
-                // 通用的接口，可匿名访问
-                .antMatchers( webProperties.getApiPrefix() + "/system/captcha/**").anonymous()
-                // TODO
-                .antMatchers(HttpMethod.GET, "/*.html", "/**/*.html", "/**/*.css", "/**/*.js").permitAll()
-                .antMatchers("/profile/**").anonymous()
-                // 文件的获取接口，可匿名访问
-                .antMatchers(webProperties.getApiPrefix() + "/system/file/get/**").anonymous()
-                // TODO
-                .antMatchers("/swagger-ui.html").anonymous()
-                .antMatchers("/swagger-resources/**").anonymous()
-                .antMatchers("/webjars/**").anonymous()
-                .antMatchers("/*/api-docs").anonymous()
-                // Spring Boot Admin Server 的安全配置
-                .antMatchers(adminServerProperties.getContextPath()).anonymous()
-                .antMatchers(adminServerProperties.getContextPath() + "/**").anonymous()
-                // Spring Boot Actuator 的安全配置
-                .antMatchers("/actuator").anonymous()
-                .antMatchers("/actuator/**").anonymous()
-                // TODO
-                .antMatchers("/druid/**").hasAnyAuthority("druid") // TODO 芋艿，未来需要在拓展下
-                // 除上面外的所有请求全部需要鉴权认证
-                .anyRequest().authenticated()
+                    // 登陆的接口，可匿名访问
+                    .antMatchers(webProperties.getApiPrefix() + "/login").anonymous()
+                    // 通用的接口，可匿名访问
+                    .antMatchers( webProperties.getApiPrefix() + "/system/captcha/**").anonymous()
+                    // 静态资源，可匿名访问
+                    .antMatchers(HttpMethod.GET, "/*.html", "/**/*.html", "/**/*.css", "/**/*.js").permitAll()
+                    // 文件的获取接口，可匿名访问
+                    .antMatchers(webProperties.getApiPrefix() + "/system/file/get/**").anonymous()
+                    // Swagger 接口文档
+                    .antMatchers("/swagger-ui.html").anonymous()
+                    .antMatchers("/swagger-resources/**").anonymous()
+                    .antMatchers("/webjars/**").anonymous()
+                    .antMatchers("/*/api-docs").anonymous()
+                    // Spring Boot Admin Server 的安全配置
+                    .antMatchers(adminServerProperties.getContextPath()).anonymous()
+                    .antMatchers(adminServerProperties.getContextPath() + "/**").anonymous()
+                    // Spring Boot Actuator 的安全配置
+                    .antMatchers("/actuator").anonymous()
+                    .antMatchers("/actuator/**").anonymous()
+                    // Druid 监控
+                    .antMatchers("/druid/**").anonymous()
+                    // 除上面外的所有请求全部需要鉴权认证
+                    .anyRequest().authenticated()
                 .and()
                 .headers().frameOptions().disable();
         httpSecurity.logout().logoutUrl("/logout").logoutSuccessHandler(logoutSuccessHandler);

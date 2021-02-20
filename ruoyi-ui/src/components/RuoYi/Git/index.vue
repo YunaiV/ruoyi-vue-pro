@@ -9,7 +9,7 @@ export default {
   name: 'YudaoGit',
   data() {
     return {
-      url: 'https://github.com/YunaiV/ruoyi-vue-proe'
+      url: 'https://github.com/YunaiV/ruoyi-vue-pro'
     }
   },
   methods: {
