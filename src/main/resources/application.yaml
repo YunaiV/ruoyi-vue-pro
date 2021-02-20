@@ -3,7 +3,7 @@ spring:
     name: dashboard
 
   profiles:
-    active: dev
+    active: local
 
   # Servlet 配置
   servlet:
