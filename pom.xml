@@ -8,9 +8,9 @@
     <artifactId>dashboard</artifactId>
     <version>1.0.0</version>
 
-    <name>ruoyi</name>
-    <url>http://www.ruoyi.vip</url>
-    <description>若依管理系统</description>
+    <name>dashboard</name>
+    <url>http://www.iocoder.cn</url>
+    <description>芋道管理系统</description>
     <packaging>jar</packaging>
 
     <properties>
@@ -23,24 +23,8 @@
         <maven-compiler-plugin.version>3.8.0</maven-compiler-plugin.version>
         <!-- 统一依赖管理 -->
         <spring.boot.version>2.4.2</spring.boot.version>
-
-<!--        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>-->
-<!--        <maven-jar-plugin.version>3.1.1</maven-jar-plugin.version>-->
-<!--        <druid.version>1.2.2</druid.version>-->
-<!--        <bitwalker.version>1.21</bitwalker.version>-->
-<!--        <swagger.version>2.9.2</swagger.version>-->
-<!--		<kaptcha.version>2.3.2</kaptcha.version>-->
-<!--        <pagehelper.boot.version>1.3.0</pagehelper.boot.version>-->
-<!--        <oshi.version>5.3.6</oshi.version>-->
-<!--        <jna.version>5.6.0</jna.version>-->
-<!--        <commons.io.version>2.5</commons.io.version>-->
-<!--        <commons.fileupload.version>1.3.3</commons.fileupload.version>-->
-<!--        <poi.version>4.1.2</poi.version>-->
-<!--        <velocity.version>1.7</velocity.version>-->
-
         <!-- Web 相关 -->
         <knife4j.version>3.0.2</knife4j.version>
-
         <!-- DB 相关 -->
         <mysql-connector-java.version>5.1.46</mysql-connector-java.version>
         <druid.version>1.2.4</druid.version>
@@ -61,14 +45,6 @@
     <!-- 依赖声明 -->
     <dependencyManagement>
         <dependencies>
-
-<!--            &lt;!&ndash;velocity代码生成使用模板 &ndash;&gt;-->
-<!--            <dependency>-->
-<!--                <groupId>org.apache.velocity</groupId>-->
-<!--                <artifactId>velocity</artifactId>-->
-<!--                <version>${velocity.version}</version>-->
-<!--            </dependency>-->
-
             <!-- 统一依赖管理 -->
             <dependency>
                 <groupId>org.springframework.boot</groupId>
@@ -191,12 +167,6 @@
         </dependency>
 
         <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>${lombok.version}</version>
-        </dependency>
-
-        <dependency>
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct</artifactId> <!-- use mapstruct-jdk8 for Java 8 or higher -->
             <version>${mapstruct.version}</version>
@@ -245,6 +215,9 @@
 
 
     <build>
+        <!-- 设置构建的 jar 包名 -->
+        <finalName>${project.artifactId}</finalName>
+
         <pluginManagement>
             <plugins>
                 <!-- 提供给 mapstruct 使用 -->
