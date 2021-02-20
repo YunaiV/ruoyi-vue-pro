@@ -223,6 +223,13 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>${spring.boot.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal> <!-- 将原来的 jar 打入其中 -->
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
 
             <!-- 提供给 mapstruct 使用 -->
