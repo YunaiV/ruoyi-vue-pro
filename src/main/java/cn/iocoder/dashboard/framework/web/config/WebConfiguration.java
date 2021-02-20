@@ -1,5 +1,6 @@
 package cn.iocoder.dashboard.framework.web.config;
 
+import cn.iocoder.dashboard.framework.web.core.filter.RequestBodyCacheFilter;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -48,6 +49,15 @@ public class WebConfiguration implements WebMvcConfigurer {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config); // 对接口配置跨域设置
         return new CorsFilter(source);
+    }
+
+    /**
+     * 创建 RequestBodyCacheFilter Bean，可重复读取请求内容
+     */
+    @Bean
+    @Order(Integer.MIN_VALUE)
+    public RequestBodyCacheFilter requestBodyCacheFilter() {
+        return new RequestBodyCacheFilter();
     }
 
 }

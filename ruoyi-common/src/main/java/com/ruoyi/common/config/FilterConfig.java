@@ -44,15 +44,4 @@ public class FilterConfig {
         return registration;
     }
 
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    @Bean
-    public FilterRegistrationBean someFilterRegistration() {
-        FilterRegistrationBean registration = new FilterRegistrationBean();
-        registration.setFilter(new RepeatableFilter());
-        registration.addUrlPatterns("/*");
-        registration.setName("repeatableFilter");
-        registration.setOrder(FilterRegistrationBean.LOWEST_PRECEDENCE);
-        return registration;
-    }
-
 }
