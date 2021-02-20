@@ -5,10 +5,9 @@ import cn.iocoder.dashboard.modules.system.controller.logger.vo.loginlog.SysLogi
 import cn.iocoder.dashboard.modules.system.controller.logger.vo.loginlog.SysLoginLogExportReqVO;
 import cn.iocoder.dashboard.modules.system.controller.logger.vo.loginlog.SysLoginLogPageReqVO;
 import cn.iocoder.dashboard.modules.system.convert.logger.SysLoginLogConvert;
-import cn.iocoder.dashboard.modules.system.dal.mysql.logger.SysLoginLogMapper;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.logger.SysLoginLogDO;
+import cn.iocoder.dashboard.modules.system.dal.mysql.logger.SysLoginLogMapper;
 import cn.iocoder.dashboard.modules.system.service.logger.SysLoginLogService;
-import cn.iocoder.dashboard.modules.system.service.user.SysUserService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -22,9 +21,6 @@ public class SysLoginLogServiceImpl implements SysLoginLogService {
 
     @Resource
     private SysLoginLogMapper loginLogMapper;
-
-    @Resource
-    private SysUserService userService;
 
     @Override
     public void createLoginLog(SysLoginLogCreateReqVO reqVO) {

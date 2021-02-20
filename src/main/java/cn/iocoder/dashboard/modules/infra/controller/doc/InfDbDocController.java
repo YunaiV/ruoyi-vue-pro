@@ -44,28 +44,31 @@ public class InfDbDocController {
 
     @GetMapping("/export-html")
     public synchronized void exportHtml(HttpServletResponse response) throws FileNotFoundException {
-        // 创建 screw 的配置
-        Configuration config = Configuration.builder()
-                .version(DOC_VERSION)  // 版本
-                .description(DOC_DESCRIPTION) // 描述
-                .dataSource(buildDataSource()) // 数据源
-                .engineConfig(buildEngineConfig()) // 引擎配置
-                .produceConfig(buildProcessConfig()) // 处理配置
-                .build();
+        try (HikariDataSource dataSource = buildDataSource()) {
+            // 创建 screw 的配置
+            Configuration config = Configuration.builder()
+                    .version(DOC_VERSION)  // 版本
+                    .description(DOC_DESCRIPTION) // 描述
+                    .dataSource(dataSource) // 数据源
+                    .engineConfig(buildEngineConfig()) // 引擎配置
+                    .produceConfig(buildProcessConfig()) // 处理配置
+                    .build();
 
-        // 执行 screw，生成数据库文档
-        new DocumentationExecute(config).execute();
+            // 执行 screw，生成数据库文档
+            new DocumentationExecute(config).execute();
 
-        // 读取，返回
-        ServletUtil.write(response,
-                new FileInputStream(FILE_OUTPUT_DIR + File.separator + DOC_FILE_NAME + FILE_OUTPUT_TYPE.getFileSuffix()),
-                MediaType.TEXT_HTML_VALUE);
+            // 读取，返回
+            ServletUtil.write(response,
+                    new FileInputStream(FILE_OUTPUT_DIR + File.separator + DOC_FILE_NAME + FILE_OUTPUT_TYPE.getFileSuffix()),
+                    MediaType.TEXT_HTML_VALUE);
+        }
     }
 
     /**
      * 创建数据源
      */
-    private DataSource buildDataSource() {
+    // TODO 芋艿：screw 暂时不支持 druid，尴尬
+    private HikariDataSource buildDataSource() {
         // 创建 HikariConfig 配置类
         HikariConfig hikariConfig = new HikariConfig();
 //        hikariConfig.setDriverClassName("com.mysql.cj.jdbc.Driver");
