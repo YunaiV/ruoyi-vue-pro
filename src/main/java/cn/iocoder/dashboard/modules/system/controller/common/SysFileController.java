@@ -20,7 +20,7 @@ import java.io.IOException;
 
 import static cn.iocoder.dashboard.common.pojo.CommonResult.success;
 
-@Api(tags = "文件 API")
+@Api(tags = "文件存储")
 @RestController
 @RequestMapping("/system/file")
 @Slf4j

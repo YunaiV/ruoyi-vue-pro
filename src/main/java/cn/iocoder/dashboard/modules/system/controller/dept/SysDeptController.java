@@ -18,7 +18,7 @@ import java.util.List;
 
 import static cn.iocoder.dashboard.common.pojo.CommonResult.success;
 
-@Api(tags = "部门 API")
+@Api(tags = "部门")
 @RestController
 @RequestMapping("/system/dept")
 public class SysDeptController {

@@ -22,7 +22,7 @@ import java.util.Properties;
 
 import static cn.iocoder.dashboard.common.pojo.CommonResult.success;
 
-@Api("Redis 监控 API")
+@Api(tags = "Redis 监控")
 @RestController
 @RequestMapping("/infra/redis")
 public class RedisController {

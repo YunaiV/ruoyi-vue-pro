@@ -31,7 +31,7 @@ import static cn.iocoder.dashboard.framework.security.core.util.SecurityUtils.ge
 import static cn.iocoder.dashboard.util.servlet.ServletUtils.getClientIP;
 import static cn.iocoder.dashboard.util.servlet.ServletUtils.getUserAgent;
 
-@Api("认证 API")
+@Api(tags = "认证")
 @RestController
 @RequestMapping("/")
 public class SysAuthController {

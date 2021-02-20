@@ -75,7 +75,7 @@ spring:
     admin:
       # Spring Boot Admin Client 客户端的相关配置
       client:
-        url: http://127.0.0.1:8080/${spring.boot.admin.context-path} # 设置 Spring Boot Admin Server 地址
+        url: http://127.0.0.1:${server.port}/${spring.boot.admin.context-path} # 设置 Spring Boot Admin Server 地址
       # Spring Boot Admin Server 服务端的相关配置
       context-path: /admin # 配置 Spring
 

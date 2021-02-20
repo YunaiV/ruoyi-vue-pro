@@ -55,7 +55,7 @@
             size="mini"
             icon="el-icon-cloudy"
             plain
-            @click="goTarget('https://gitee.com/y_project/RuoYi-Vue')"
+            @click="goTarget('https://gitee.com/zhijiantianya/ruoyi-vue-pro')"
             >访问码云</el-button
           >
           <el-button

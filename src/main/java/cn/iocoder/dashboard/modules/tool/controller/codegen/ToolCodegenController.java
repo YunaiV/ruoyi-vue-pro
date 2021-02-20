@@ -37,7 +37,7 @@ import java.util.Set;
 
 import static cn.iocoder.dashboard.common.pojo.CommonResult.success;
 
-@Api(tags = "代码生成器 API")
+@Api(tags = "代码生成器")
 @RestController
 @RequestMapping("/tool/codegen")
 @Validated
@@ -49,8 +49,8 @@ public class ToolCodegenController {
     @GetMapping("/db/table/list")
     @ApiOperation(value = "获得数据库自带的表定义列表", notes = "会过滤掉已经导入 Codegen 的表")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "tableName", required = true, example = "yudao", dataTypeClass = String.class),
-            @ApiImplicitParam(name = "tableComment", required = true, example = "芋道", dataTypeClass = String.class)
+            @ApiImplicitParam(name = "tableName", value = "表名，模糊匹配", required = true, example = "yudao", dataTypeClass = String.class),
+            @ApiImplicitParam(name = "tableComment", value = "描述，模糊匹配", required = true, example = "芋道", dataTypeClass = String.class)
     })
     @PreAuthorize("@ss.hasPermission('tool:codegen:query')")
     public CommonResult<List<ToolSchemaTableRespVO>> getSchemaTableList(
@@ -74,7 +74,7 @@ public class ToolCodegenController {
 
     @GetMapping("/detail")
     @ApiOperation("获得表和字段的明细")
-    @ApiImplicitParam(name = "tableId", required = true, example = "表编号", dataTypeClass = Long.class)
+    @ApiImplicitParam(name = "tableId", value = "表编号", required = true, example = "1024", dataTypeClass = Long.class)
     @PreAuthorize("@ss.hasPermission('tool:codegen:query')")
     public CommonResult<ToolCodegenDetailRespVO> getCodegenDetail(@RequestParam("tableId") Long tableId) {
         ToolCodegenTableDO table = codegenService.getCodegenTablePage(tableId);
@@ -84,7 +84,7 @@ public class ToolCodegenController {
     }
 
     @ApiOperation("基于数据库的表结构，创建代码生成器的表和字段定义")
-    @ApiImplicitParam(name = "tableNames", required = true, example = "sys_user", dataTypeClass = List.class)
+    @ApiImplicitParam(name = "tableNames", value = "表名数组", required = true, example = "sys_user", dataTypeClass = List.class)
     @PostMapping("/create-list-from-db")
     @PreAuthorize("@ss.hasPermission('tool:codegen:create')")
     public CommonResult<List<Long>> createCodegenListFromDB(@RequestParam("tableNames") List<String> tableNames) {
@@ -92,7 +92,7 @@ public class ToolCodegenController {
     }
 
     @ApiOperation("基于 SQL 建表语句，创建代码生成器的表和字段定义")
-    @ApiImplicitParam(name = "SQL 建表语句", required = true, example = "sql", dataTypeClass = String.class)
+    @ApiImplicitParam(name = "sql", value = "SQL 建表语句", required = true, example = "sql", dataTypeClass = String.class)
     @PostMapping("/create-list-from-sql")
     @PreAuthorize("@ss.hasPermission('tool:codegen:create')")
     public CommonResult<Long> createCodegenListFromSQL(@RequestParam("sql") String sql) {
@@ -109,7 +109,7 @@ public class ToolCodegenController {
 
     @ApiOperation("基于数据库的表结构，同步数据库的表和字段定义")
     @PutMapping("/sync-from-db")
-    @ApiImplicitParam(name = "tableId", required = true, example = "表编号", dataTypeClass = Long.class)
+    @ApiImplicitParam(name = "tableId", value = "表编号", required = true, example = "1024", dataTypeClass = Long.class)
     @PreAuthorize("@ss.hasPermission('tool:codegen:update')")
     public CommonResult<Boolean> syncCodegenFromDB(@RequestParam("tableId") Long tableId) {
         codegenService.syncCodegenFromDB(tableId);
@@ -119,8 +119,8 @@ public class ToolCodegenController {
     @ApiOperation("基于 SQL 建表语句，同步数据库的表和字段定义")
     @PutMapping("/sync-from-sql")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "tableId", required = true, example = "表编号", dataTypeClass = Long.class),
-            @ApiImplicitParam(name = "SQL 建表语句", required = true, example = "sql", dataTypeClass = String.class)
+            @ApiImplicitParam(name = "tableId", value = "表编号", required = true, example = "1024", dataTypeClass = Long.class),
+            @ApiImplicitParam(name = "sql", value = "SQL 建表语句", required = true, example = "sql", dataTypeClass = String.class)
     })
     @PreAuthorize("@ss.hasPermission('tool:codegen:update')")
     public CommonResult<Boolean> syncCodegenFromSQL(@RequestParam("tableId") Long tableId,
@@ -131,7 +131,7 @@ public class ToolCodegenController {
 
     @ApiOperation("删除数据库的表和字段定义")
     @DeleteMapping("/delete")
-    @ApiImplicitParam(name = "tableId", required = true, example = "表编号", dataTypeClass = Long.class)
+    @ApiImplicitParam(name = "tableId", value = "表编号", required = true, example = "1024", dataTypeClass = Long.class)
     @PreAuthorize("@ss.hasPermission('tool:codegen:delete')")
     public CommonResult<Boolean> deleteCodegen(@RequestParam("tableId") Long tableId) {
         codegenService.deleteCodegen(tableId);
@@ -140,7 +140,7 @@ public class ToolCodegenController {
 
     @ApiOperation("预览生成代码")
     @GetMapping("/preview")
-    @ApiImplicitParam(name = "tableId", required = true, example = "表编号", dataTypeClass = Long.class)
+    @ApiImplicitParam(name = "tableId", value = "表编号", required = true, example = "1024", dataTypeClass = Long.class)
     @PreAuthorize("@ss.hasPermission('tool:codegen:preview')")
     public CommonResult<List<ToolCodegenPreviewRespVO>> previewCodegen(@RequestParam("tableId") Long tableId) {
         Map<String, String> codes = codegenService.generationCodes(tableId);
@@ -149,7 +149,7 @@ public class ToolCodegenController {
 
     @ApiOperation("下载生成代码")
     @GetMapping("/download")
-    @ApiImplicitParam(name = "tableId", required = true, example = "表编号", dataTypeClass = Long.class)
+    @ApiImplicitParam(name = "tableId", value = "表编号", required = true, example = "1024", dataTypeClass = Long.class)
     @PreAuthorize("@ss.hasPermission('tool:codegen:download')")
     public void downloadCodegen(@RequestParam("tableId") Long tableId,
                                 HttpServletResponse response) throws IOException {
@@ -163,19 +163,5 @@ public class ToolCodegenController {
         // 输出
         ServletUtils.writeAttachment(response, "codegen.zip", outputStream.toByteArray());
     }
-
-//    /**
-//     * 查询数据表字段列表
-//     */
-//    @PreAuthorize("@ss.hasPermi('tool:gen:list')")
-//    @GetMapping(value = "/column/{talbleId}")
-//    public TableDataInfo columnList(Long tableId) {
-//        TableDataInfo dataInfo = new TableDataInfo();
-//        List<GenTableColumn> list = genTableColumnService.selectGenTableColumnListByTableId(tableId);
-//        dataInfo.setRows(list);
-//        dataInfo.setTotal(list.size());
-//        return dataInfo;
-//    }
-//
 
 }

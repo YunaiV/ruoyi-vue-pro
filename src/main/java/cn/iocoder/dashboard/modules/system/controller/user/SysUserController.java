@@ -30,7 +30,7 @@ import java.util.*;
 
 import static cn.iocoder.dashboard.common.pojo.CommonResult.success;
 
-@Api(tags = "用户 API")
+@Api(tags = "用户")
 @RestController
 @RequestMapping("/system/user")
 public class SysUserController {

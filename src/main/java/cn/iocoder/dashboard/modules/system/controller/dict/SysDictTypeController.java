@@ -20,7 +20,7 @@ import java.util.List;
 
 import static cn.iocoder.dashboard.common.pojo.CommonResult.success;
 
-@Api(tags = "字典类型 API")
+@Api(tags = "字典类型")
 @RestController
 @RequestMapping("/system/dict-type")
 public class SysDictTypeController {

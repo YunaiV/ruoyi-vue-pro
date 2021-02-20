@@ -35,7 +35,7 @@ import java.util.Map;
 import static cn.iocoder.dashboard.common.pojo.CommonResult.success;
 import static cn.iocoder.dashboard.framework.logger.operatelog.core.enums.OperateTypeEnum.EXPORT;
 
-@Api(tags = "操作日志 API")
+@Api(tags = "操作日志")
 @RestController
 @RequestMapping("/system/operate-log")
 public class SysOperateLogController {

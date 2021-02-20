@@ -43,8 +43,7 @@
 
 - admin/admin123  
 
-演示地址：http://vue.ruoyi.vip  
-文档地址：http://doc.ruoyi.vip
+演示地址：<http://dashboard.yudao.iocoder.cn>
 
 ## 演示图
 

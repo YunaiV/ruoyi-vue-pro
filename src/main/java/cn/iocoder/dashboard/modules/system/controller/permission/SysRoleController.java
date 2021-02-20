@@ -23,7 +23,7 @@ import java.util.List;
 
 import static cn.iocoder.dashboard.common.pojo.CommonResult.success;
 
-@Api(tags = "角色 API")
+@Api(tags = "角色")
 @RestController
 @RequestMapping("/system/role")
 public class SysRoleController {

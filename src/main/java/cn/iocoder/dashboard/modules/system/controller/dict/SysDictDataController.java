@@ -20,7 +20,7 @@ import java.util.List;
 
 import static cn.iocoder.dashboard.common.pojo.CommonResult.success;
 
-@Api(tags = "字典数据 API")
+@Api(tags = "字典数据")
 @RestController
 @RequestMapping("/system/dict-data")
 public class SysDictDataController {

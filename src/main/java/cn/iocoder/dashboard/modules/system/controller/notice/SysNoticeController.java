@@ -18,7 +18,7 @@ import javax.annotation.Resource;
 
 import static cn.iocoder.dashboard.common.pojo.CommonResult.success;
 
-@Api(tags = "通知公告 API")
+@Api(tags = "通知公告")
 @RestController
 @RequestMapping("/system/notice")
 public class SysNoticeController {

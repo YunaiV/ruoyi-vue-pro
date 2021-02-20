@@ -23,7 +23,7 @@ import java.util.List;
 
 import static cn.iocoder.dashboard.common.pojo.CommonResult.success;
 
-@Api(tags = "岗位 API")
+@Api(tags = "岗位")
 @RestController
 @RequestMapping("/system/post")
 public class SysPostController {

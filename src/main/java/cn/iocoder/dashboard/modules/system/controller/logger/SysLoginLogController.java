@@ -22,7 +22,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
-@Api(tags = "登陆日志 API")
+@Api(tags = "登陆日志")
 @RestController
 @RequestMapping("/system/login-log")
 public class SysLoginLogController {

@@ -27,7 +27,7 @@ import java.util.Map;
 import static cn.iocoder.dashboard.common.pojo.CommonResult.success;
 import static cn.iocoder.dashboard.util.collection.CollectionUtils.convertList;
 
-@Api("用户 Session API")
+@Api(tags = "用户 Session")
 @RestController
 @RequestMapping("/system/user-session")
 public class SysUserSessionController {

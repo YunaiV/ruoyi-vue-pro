@@ -18,7 +18,7 @@ import java.util.List;
 
 import static cn.iocoder.dashboard.common.pojo.CommonResult.success;
 
-@Api(tags = "菜单 API")
+@Api(tags = "菜单")
 @RestController
 @RequestMapping("/system/menu")
 public class SysMenuController {
