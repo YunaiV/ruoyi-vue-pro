@@ -11,6 +11,27 @@ spring:
     driver-class-name: com.mysql.jdbc.Driver
     username: root
     password: 3WLiVUBEwTbvAfsh
+    druid:
+      web-stat-filter:
+        enabled: true
+      stat-view-servlet:
+        enabled: true
+        # 设置白名单，不填则允许所有访问
+        allow:
+        url-pattern: /druid/*
+        # 控制台管理用户名和密码
+        login-username:
+        login-password:
+      filter:
+        stat:
+          enabled: true
+          # 慢 SQL 记录
+          log-slow-sql: true
+          slow-sql-millis: 100
+          merge-sql: true
+        wall:
+          config:
+            multi-statement-allow: true
 
   # Redis 配置。Redisson 默认的配置足够使用，一般不需要进行调优
   redis:
