@@ -37,13 +37,15 @@
 6. 在线构建器：拖动表单元素生成相应的HTML代码。
 7. 连接池监视：监视当前系统数据库连接池状态，可进行分析SQL找出系统性能瓶颈。
 
-
-
 ## 在线体验
 
-- admin/admin123  
-
 演示地址：<http://dashboard.yudao.iocoder.cn>
+* 账号密码：admin/admin123  
+
+文档地址：<http://www.iocoder.cn/categories/Yudao/>
+* [《如何搭建环境》](http://www.iocoder.cn/categories/Yudao/?yudao)
+
+> 未来会补充文档和视频，方便胖友冲冲冲！
 
 ## 演示图
 
