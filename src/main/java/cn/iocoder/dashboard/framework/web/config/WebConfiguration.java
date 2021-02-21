@@ -1,10 +1,12 @@
 package cn.iocoder.dashboard.framework.web.config;
 
 import cn.iocoder.dashboard.framework.web.core.filter.RequestBodyCacheFilter;
+import cn.iocoder.dashboard.framework.web.core.filter.XssFilter;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.util.PathMatcher;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -18,7 +20,7 @@ import javax.annotation.Resource;
  * Web 配置类
  */
 @Configuration
-@EnableConfigurationProperties(WebProperties.class)
+@EnableConfigurationProperties({WebProperties.class, XssProperties.class})
 public class WebConfiguration implements WebMvcConfigurer {
 
     @Resource
@@ -58,6 +60,15 @@ public class WebConfiguration implements WebMvcConfigurer {
     @Order(Integer.MIN_VALUE)
     public RequestBodyCacheFilter requestBodyCacheFilter() {
         return new RequestBodyCacheFilter();
+    }
+
+    /**
+     * 创建 XssFilter Bean，解决 Xss 安全问题
+     */
+    @Bean
+    @Order(Integer.MIN_VALUE + 1000) // 需要保证在 RequestBodyCacheFilter 后面
+    public XssFilter xssFilter(XssProperties properties, PathMatcher pathMatcher) {
+        return new XssFilter(properties, pathMatcher);
     }
 
 }
