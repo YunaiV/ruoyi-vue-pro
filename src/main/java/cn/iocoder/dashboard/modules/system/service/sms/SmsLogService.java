@@ -22,6 +22,8 @@ public interface SmsLogService {
      * @param isAsync      是否异步发送
      * @return 生成的日志id
      */
+    // TODO FROM 芋艿 to ZZF: async 是针对发送的方式，对于日志不一定需要关心。这样，短信日志，实际就发送前插入，发送后更新结果
+    // TODO FROM 芋艿 to ZZF：短信日志，群发的情况，应该是每个手机一条哈。虽然是群发，但是可能部分成功，部分失败；对应到短信平台，实际也是多条。
     Long beforeSendLog(SmsBody smsBody, List<String> targetPhones, AbstractSmsClient<?> client, Boolean isAsync);
 
     /**

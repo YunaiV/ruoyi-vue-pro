@@ -60,7 +60,7 @@ public class AliyunSmsClient extends AbstractSmsClient<SendSmsResponse> {
         request.setSignName(channelVO.getApiSignatureId());
         request.setTemplateCode(channelVO.getTemplateByTemplateCode(smsBody.getTemplateCode()).getApiTemplateId());
         request.setTemplateParam(smsBody.getParamsStr());
-
+        // TODO FROM 芋艿 TO zzf：try catch 咱是不是可以交给 abstract 来做。这样，异常处理，重试，限流等等，都可以酱紫
         try {
             SendSmsResponse sendSmsResponse = acsClient.getAcsResponse(request);
 

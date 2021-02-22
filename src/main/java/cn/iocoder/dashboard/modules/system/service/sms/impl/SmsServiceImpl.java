@@ -42,6 +42,7 @@ public class SmsServiceImpl implements SmsService {
         return result;
     }
 
+    // TODO FROM 芋艿 to ZZF：可能要讨论下，对于短信发送来说，貌似只提供异步发送即可。对于业务来说，一定不能依赖短信的发送结果。
     @Override
     public void sendAsync(SmsBody smsBody, List<String> targetPhones) {
         AbstractSmsClient<?> client = channelService.getClient(smsBody.getTemplateCode());

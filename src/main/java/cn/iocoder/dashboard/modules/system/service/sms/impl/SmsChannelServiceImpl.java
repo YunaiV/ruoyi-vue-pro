@@ -61,7 +61,7 @@ public class SmsChannelServiceImpl implements SmsChannelService {
         });
     }
 
-
+    // TODO FROM 芋艿 to ZZF：channelMapper 嘿，保持命名统一。
     @Resource
     private SmsChannelMapper mapper;
 

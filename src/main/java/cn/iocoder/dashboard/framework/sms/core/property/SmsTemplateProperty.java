@@ -4,7 +4,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * 渠道模板VO类
+ * 渠道模板VO类 TODO FROM 芋艿 TO zzf：模板是不是不要提供到 client 里面，而是交给 factory 统一维护就好。不然，模板修改时候，刷新 client 会比较麻烦。
  *
  * @author zzf
  * @date 2021/1/25 17:03

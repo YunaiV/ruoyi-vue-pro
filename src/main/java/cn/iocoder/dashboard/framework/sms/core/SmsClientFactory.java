@@ -33,6 +33,7 @@ public class SmsClientFactory {
      * @return 客户端id(默认channelId)
      */
     public Long createClient(SmsChannelProperty propertyVO) {
+        // TODO FROM 芋艿 TO zzf：参数的校验，可以考虑统一使用 validation。
         if (StrUtil.isBlank(propertyVO.getCode())) {
             throw ServiceExceptionUtil.exception(PARAM_VALUE_IS_NULL, "短信渠道编码");
         }

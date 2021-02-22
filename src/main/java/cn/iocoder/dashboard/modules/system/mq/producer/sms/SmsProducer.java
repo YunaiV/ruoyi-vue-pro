@@ -25,6 +25,7 @@ public class SmsProducer {
         SmsSendMessage message = new SmsSendMessage();
         message.setSmsBody(smsBody);
         message.setTargetPhones(targetPhoneList);
+        // TODO FROM 芋艿 TO ZZF：这块等未来改哈。这个方法目前是广播消费，会导致每个节点都发送一次。等后续封装出 redis stream 消息
         RedisMessageUtils.sendChannelMessage(stringRedisTemplate, message);
     }
 

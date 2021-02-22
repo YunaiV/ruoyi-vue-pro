@@ -18,6 +18,9 @@ import java.util.List;
  */
 public interface SmsChannelService {
 
+    // TODO FROM 芋艿 to ZZF：SmsChannelService=》SysSmsChannelService，增加 Sys 前缀，算在系统模块里
+    // TODO FROM 芋艿 to ZZF：方法名，保持不去掉 Sms 前缀。虽然长点，嘿嘿
+
     /**
      * 初始化短信渠道
      */
