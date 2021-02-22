@@ -1,8 +1,9 @@
-package cn.iocoder.dashboard.framework.idempotent.core.keyresolver;
+package cn.iocoder.dashboard.framework.idempotent.core.keyresolver.impl;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
 import cn.iocoder.dashboard.framework.idempotent.core.annotation.Idempotent;
+import cn.iocoder.dashboard.framework.idempotent.core.keyresolver.IdempotentKeyResolver;
 import org.aspectj.lang.JoinPoint;
 
 /**

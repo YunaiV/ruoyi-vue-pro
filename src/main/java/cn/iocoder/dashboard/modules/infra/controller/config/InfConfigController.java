@@ -5,6 +5,7 @@ import cn.iocoder.dashboard.common.pojo.CommonResult;
 import cn.iocoder.dashboard.common.pojo.PageResult;
 import cn.iocoder.dashboard.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.dashboard.framework.idempotent.core.annotation.Idempotent;
+import cn.iocoder.dashboard.framework.idempotent.core.keyresolver.impl.ExpressionIdempotentKeyResolver;
 import cn.iocoder.dashboard.modules.infra.controller.config.vo.*;
 import cn.iocoder.dashboard.modules.infra.convert.config.InfConfigConvert;
 import cn.iocoder.dashboard.modules.infra.dal.dataobject.config.InfConfigDO;
@@ -92,7 +93,7 @@ public class InfConfigController {
     @PostMapping("/create")
 //    @PreAuthorize("@ss.hasPermi('infra:config:add')")
 //    @Log(title = "参数管理", businessType = BusinessType.INSERT)
-    @Idempotent(timeout = 10)
+    @Idempotent(timeout = 60, keyResolver = ExpressionIdempotentKeyResolver.class, keyArg = "#reqVO.key")
     public CommonResult<Long> createConfig(@Validated @RequestBody InfConfigCreateReqVO reqVO) {
         return success(configService.createConfig(reqVO));
     }

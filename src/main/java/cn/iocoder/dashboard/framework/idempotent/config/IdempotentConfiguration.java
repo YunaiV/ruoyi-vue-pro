@@ -1,8 +1,8 @@
 package cn.iocoder.dashboard.framework.idempotent.config;
 
 import cn.iocoder.dashboard.framework.idempotent.core.aop.IdempotentAspect;
-import cn.iocoder.dashboard.framework.idempotent.core.keyresolver.DefaultIdempotentKeyResolver;
-import cn.iocoder.dashboard.framework.idempotent.core.keyresolver.ExpressionIdempotentKeyResolver;
+import cn.iocoder.dashboard.framework.idempotent.core.keyresolver.impl.DefaultIdempotentKeyResolver;
+import cn.iocoder.dashboard.framework.idempotent.core.keyresolver.impl.ExpressionIdempotentKeyResolver;
 import cn.iocoder.dashboard.framework.idempotent.core.keyresolver.IdempotentKeyResolver;
 import cn.iocoder.dashboard.framework.idempotent.core.redis.IdempotentRedisDAO;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;

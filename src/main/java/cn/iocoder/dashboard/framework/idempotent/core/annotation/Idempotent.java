@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.framework.idempotent.core.annotation;
 
-import cn.iocoder.dashboard.framework.idempotent.core.keyresolver.DefaultIdempotentKeyResolver;
+import cn.iocoder.dashboard.framework.idempotent.core.keyresolver.impl.DefaultIdempotentKeyResolver;
 import cn.iocoder.dashboard.framework.idempotent.core.keyresolver.IdempotentKeyResolver;
 
 import java.lang.annotation.ElementType;
