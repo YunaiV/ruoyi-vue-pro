@@ -182,7 +182,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="数据权限" v-show="form.dataScope === SysDataScopeEnum.DEPT_CUSTOM">
-          <el-checkbox v-model="!form.deptCheckStrictly" @change="handleCheckedTreeConnect($event, 'dept')">父子联动(选中父节点，自动选择子节点)</el-checkbox>
+          <el-checkbox :checked="!form.deptCheckStrictly" @change="handleCheckedTreeConnect($event, 'dept')">父子联动(选中父节点，自动选择子节点)</el-checkbox>
           <el-checkbox v-model="deptExpand" @change="handleCheckedTreeExpand($event, 'dept')">展开/折叠</el-checkbox>
           <el-checkbox v-model="deptNodeAll" @change="handleCheckedTreeNodeAll($event, 'dept')">全选/全不选</el-checkbox>
           <el-tree
@@ -282,7 +282,8 @@ export default {
       // 菜单列表
       menuOptions: [],
       // 部门列表
-      deptOptions: [],
+      deptOptions: [], // 部门属性结构
+      depts: [], // 部门列表
       // 查询参数
       queryParams: {
         pageNo: 1,
@@ -427,7 +428,8 @@ export default {
       if (type === 'menu') {
         this.$refs.menu.setCheckedNodes(value ? this.menuOptions: []);
       } else if (type === 'dept') {
-        this.$refs.dept.setCheckedNodes(value ? this.deptOptions: []);
+        // this.$refs.dept.setCheckedNodes(value ? this.deptOptions: []);
+        this.$refs.dept.setCheckedNodes(value ? this.depts: []);
       }
     },
     // 树权限（父子联动）
@@ -435,7 +437,7 @@ export default {
       if (type === 'menu') {
         this.form.menuCheckStrictly = value;
       } else if (type === 'dept') {
-        this.form.deptCheckStrictly = value;
+        this.form.deptCheckStrictly = !value;
       }
     },
     /** 新增按钮操作 */
@@ -491,9 +493,11 @@ export default {
       this.openDataScope = true;
       // 获得部门列表
       listSimpleDepts().then(response => {
-        // 处理 menuOptions 参数
+        // 处理 deptOptions 参数
         this.deptOptions = [];
         this.deptOptions.push(...this.handleTree(response.data, "id"));
+        this.depts = response.data;
+        // this.deptIds = response.data.map(x => x.id);
         // 获得角色拥有的数据权限
         getRole(row.id).then(response => {
           this.form.dataScope = response.data.dataScope;
