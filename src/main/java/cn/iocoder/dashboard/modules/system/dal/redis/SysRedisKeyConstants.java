@@ -12,7 +12,7 @@ import static cn.iocoder.dashboard.framework.redis.core.RedisKeyDefine.KeyTypeEn
  *
  * @author 芋道源码
  */
-public interface RedisKeyConstants {
+public interface SysRedisKeyConstants {
 
     RedisKeyDefine LOGIN_USER = new RedisKeyDefine("登陆用户的缓存",
             "login_user:%s", // 参数为 sessionId

@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
 
-import static cn.iocoder.dashboard.modules.system.dal.redis.RedisKeyConstants.LOGIN_USER;
+import static cn.iocoder.dashboard.modules.system.dal.redis.SysRedisKeyConstants.LOGIN_USER;
 
 /**
  * {@link LoginUser} 的 RedisDAO

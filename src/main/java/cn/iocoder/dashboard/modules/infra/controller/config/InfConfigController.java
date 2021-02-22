@@ -4,6 +4,7 @@ import cn.iocoder.dashboard.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.dashboard.common.pojo.CommonResult;
 import cn.iocoder.dashboard.common.pojo.PageResult;
 import cn.iocoder.dashboard.framework.excel.core.util.ExcelUtils;
+import cn.iocoder.dashboard.framework.idempotent.core.annotation.Idempotent;
 import cn.iocoder.dashboard.modules.infra.controller.config.vo.*;
 import cn.iocoder.dashboard.modules.infra.convert.config.InfConfigConvert;
 import cn.iocoder.dashboard.modules.infra.dal.dataobject.config.InfConfigDO;
@@ -91,7 +92,7 @@ public class InfConfigController {
     @PostMapping("/create")
 //    @PreAuthorize("@ss.hasPermi('infra:config:add')")
 //    @Log(title = "参数管理", businessType = BusinessType.INSERT)
-//    @RepeatSubmit
+    @Idempotent(timeout = 10)
     public CommonResult<Long> createConfig(@Validated @RequestBody InfConfigCreateReqVO reqVO) {
         return success(configService.createConfig(reqVO));
     }
@@ -100,7 +101,8 @@ public class InfConfigController {
     @PutMapping("/update")
 //    @PreAuthorize("@ss.hasPermi('infra:config:edit')")
 //    @Log(title = "参数管理", businessType = BusinessType.UPDATE)
-    public CommonResult<Boolean> edit(@Validated @RequestBody InfConfigUpdateReqVO reqVO) {
+    @Idempotent(timeout = 60)
+    public CommonResult<Boolean> updateConfig(@Validated @RequestBody InfConfigUpdateReqVO reqVO) {
         configService.updateConfig(reqVO);
         return success(true);
     }
