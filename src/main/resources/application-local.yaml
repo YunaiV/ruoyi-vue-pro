@@ -7,7 +7,7 @@ spring:
   # 数据源配置项 TODO 多数据源；TODO 监控配置
   datasource:
     name: ruoyi-vue-pro
-    url: jdbc:mysql://127.0.1:33061/${spring.datasource.name}?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=CTT
+    url: jdbc:mysql://127.0.0.1:3306/${spring.datasource.name}?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=CTT
     driver-class-name: com.mysql.jdbc.Driver
     username: root
     password: 123456
@@ -98,6 +98,8 @@ spring:
       # Spring Boot Admin Client 客户端的相关配置
       client:
         url: http://127.0.0.1:${server.port}/${spring.boot.admin.context-path} # 设置 Spring Boot Admin Server 地址
+        instance:
+          prefer-ip: true
       # Spring Boot Admin Server 服务端的相关配置
       context-path: /admin # 配置 Spring
 
