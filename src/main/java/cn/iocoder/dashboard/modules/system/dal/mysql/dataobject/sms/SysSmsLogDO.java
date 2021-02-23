@@ -18,7 +18,7 @@ import java.util.Date;
 @EqualsAndHashCode
 @Accessors(chain = true)
 @TableName(value = "sms_log", autoResultMap = true)
-public class SmsLogDO implements Serializable {
+public class SysSmsLogDO implements Serializable {
 
     /**
      * 自增编号

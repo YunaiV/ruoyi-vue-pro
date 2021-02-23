@@ -14,7 +14,7 @@ import java.util.List;
  * @author zzf
  * @date 2021/1/25 9:24
  */
-public interface SmsService {
+public interface SysSmsService {
 
     /**
      * 发送消息
@@ -23,7 +23,7 @@ public interface SmsService {
      * @param targetPhones 发送对象手机号列表
      * @return 是否发送成功
      */
-    SmsResult<?> send(SmsBody smsBody, List<String> targetPhones);
+    SmsResult send(SmsBody smsBody, List<String> targetPhones);
 
     /**
      * 发送消息
@@ -32,7 +32,7 @@ public interface SmsService {
      * @param targetPhone 发送对象手机号
      * @return 是否发送成功
      */
-    default SmsResult<?> send(SmsBody smsBody, String targetPhone) {
+    default SmsResult send(SmsBody smsBody, String targetPhone) {
         if (StringUtils.isBlank(targetPhone)) {
             return failResult("targetPhone must not null.");
         }
@@ -47,7 +47,7 @@ public interface SmsService {
      * @param targetPhones 发送对象手机号数组
      * @return 是否发送成功
      */
-    default SmsResult<?> send(SmsBody smsBody, String... targetPhones) {
+    default SmsResult send(SmsBody smsBody, String... targetPhones) {
         if (targetPhones == null) {
             return failResult("targetPhones must not null.");
         }
@@ -91,8 +91,8 @@ public interface SmsService {
     }
 
 
-    default SmsResult<?> failResult(String message) {
-        SmsResult<?> resultBody = new SmsResult<>();
+    default SmsResult failResult(String message) {
+        SmsResult resultBody = new SmsResult();
         resultBody.setSuccess(false);
         resultBody.setMessage(message);
         return resultBody;

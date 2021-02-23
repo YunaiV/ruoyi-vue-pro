@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.modules.system.service.sms.impl;
 
-import cn.iocoder.dashboard.modules.system.service.sms.SmsTemplateService;
+import cn.iocoder.dashboard.modules.system.service.sms.SysSmsTemplateService;
 import org.springframework.stereotype.Service;
 
 /**
@@ -10,5 +10,5 @@ import org.springframework.stereotype.Service;
  * @date 2021/1/25 9:25
  */
 @Service
-public class SmsTemplateServiceImpl implements SmsTemplateService {
+public class SysSmsTemplateServiceImpl implements SysSmsTemplateService {
 }

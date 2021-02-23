@@ -4,7 +4,7 @@ import cn.iocoder.dashboard.framework.redis.core.pubsub.AbstractChannelMessageLi
 import cn.iocoder.dashboard.framework.sms.core.SmsResult;
 import cn.iocoder.dashboard.modules.system.mq.message.dept.SysDeptRefreshMessage;
 import cn.iocoder.dashboard.modules.system.mq.message.sms.SmsSendMessage;
-import cn.iocoder.dashboard.modules.system.service.sms.SmsService;
+import cn.iocoder.dashboard.modules.system.service.sms.SysSmsService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -20,12 +20,12 @@ import javax.annotation.Resource;
 public class SmsSendConsumer extends AbstractChannelMessageListener<SmsSendMessage> {
 
     @Resource
-    private SmsService smsService;
+    private SysSmsService sysSmsService;
 
     @Override
     public void onMessage(SmsSendMessage message) {
         log.info("[onMessage][收到 发送短信 消息]");
-        SmsResult<?> send = smsService.send(message.getSmsBody(), message.getTargetPhones());
+        SmsResult send = sysSmsService.send(message.getSmsBody(), message.getTargetPhones());
     }
 
 }

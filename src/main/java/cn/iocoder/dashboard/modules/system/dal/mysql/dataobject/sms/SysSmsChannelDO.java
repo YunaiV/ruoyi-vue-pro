@@ -15,7 +15,7 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @TableName(value = "sms_channel", autoResultMap = true)
-public class SmsChannelDO extends BaseDO {
+public class SysSmsChannelDO extends BaseDO {
 
     /**
      * 自增编号

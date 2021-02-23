@@ -2,8 +2,8 @@ package cn.iocoder.dashboard.modules.system.convert.sms;
 
 import cn.iocoder.dashboard.common.pojo.PageResult;
 import cn.iocoder.dashboard.modules.system.controller.sms.vo.SmsTemplateVO;
-import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.sms.SmsChannelDO;
-import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.sms.SmsTemplateDO;
+import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.sms.SysSmsChannelDO;
+import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.sms.SysSmsTemplateDO;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -17,10 +17,10 @@ public interface SmsTemplateConvert {
     SmsTemplateConvert INSTANCE = Mappers.getMapper(SmsTemplateConvert.class);
 
     @Mapping(source = "records", target = "list")
-    PageResult<SmsChannelDO> convertPage(IPage<SmsChannelDO> page);
+    PageResult<SysSmsChannelDO> convertPage(IPage<SysSmsChannelDO> page);
 
-    List<SmsTemplateVO> convert(List<SmsTemplateDO> bean);
+    List<SmsTemplateVO> convert(List<SysSmsTemplateDO> bean);
 
-    SmsTemplateVO convert(SmsTemplateDO bean);
+    SmsTemplateVO convert(SysSmsTemplateDO bean);
 
 }

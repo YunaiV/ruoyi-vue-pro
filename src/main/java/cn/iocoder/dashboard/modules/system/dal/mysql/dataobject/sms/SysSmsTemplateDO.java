@@ -16,7 +16,7 @@ import java.util.Date;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @TableName(value = "sms_template", autoResultMap = true)
-public class SmsTemplateDO extends BaseDO {
+public class SysSmsTemplateDO extends BaseDO {
 
     /**
      * 自增编号

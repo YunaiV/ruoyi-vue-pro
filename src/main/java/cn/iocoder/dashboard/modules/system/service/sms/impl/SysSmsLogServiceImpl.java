@@ -3,14 +3,12 @@ package cn.iocoder.dashboard.modules.system.service.sms.impl;
 import cn.iocoder.dashboard.framework.sms.client.AbstractSmsClient;
 import cn.iocoder.dashboard.framework.sms.core.SmsBody;
 import cn.iocoder.dashboard.framework.sms.core.SmsResult;
-import cn.iocoder.dashboard.modules.system.controller.sms.vo.SmsChannelAllVO;
-import cn.iocoder.dashboard.modules.system.controller.sms.vo.SmsTemplateVO;
-import cn.iocoder.dashboard.modules.system.dal.mysql.dao.sms.SmsLogMapper;
-import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.sms.SmsLogDO;
+import cn.iocoder.dashboard.framework.sms.core.property.SmsChannelProperty;
+import cn.iocoder.dashboard.modules.system.dal.mysql.dao.sms.SysSmsLogMapper;
+import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.sms.SysSmsLogDO;
 import cn.iocoder.dashboard.modules.system.enums.sms.SmsSendStatusEnum;
-import cn.iocoder.dashboard.modules.system.service.sms.SmsLogService;
+import cn.iocoder.dashboard.modules.system.service.sms.SysSmsLogService;
 import cn.iocoder.dashboard.util.json.JsonUtils;
-import cn.iocoder.dashboard.util.string.StrUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -23,42 +21,41 @@ import java.util.List;
  * @date 2021/1/25 9:25
  */
 @Service
-public class SmsLogServiceImpl implements SmsLogService {
+public class SysSmsLogServiceImpl implements SysSmsLogService {
 
     @Resource
-    private SmsLogMapper smsLogMapper;
+    private SysSmsLogMapper logMapper;
 
     @Override
-    public Long beforeSendLog(SmsBody smsBody, List<String> targetPhones, AbstractSmsClient<?> client, Boolean isAsync) {
-        SmsLogDO smsLog = new SmsLogDO();
+    public Long beforeSendLog(SmsBody smsBody, List<String> targetPhones, AbstractSmsClient client, Boolean isAsync) {
+        SysSmsLogDO smsLog = new SysSmsLogDO();
         if (smsBody.getSmsLogId() != null) {
             smsLog.setId(smsBody.getSmsLogId());
             smsLog.setSendStatus(SmsSendStatusEnum.SENDING.getStatus());
-            smsLogMapper.updateById(smsLog);
+            logMapper.updateById(smsLog);
             return smsBody.getSmsLogId();
         } else {
-            SmsChannelAllVO property = client.getProperty();
-            SmsTemplateVO smsTemplate = property.getTemplateByTemplateCode(smsBody.getTemplateCode());
+            SmsChannelProperty property = client.getProperty();
 
             smsLog.setChannelCode(property.getCode())
                     .setChannelId(property.getId())
-                    .setTemplateCode(smsTemplate.getCode())
+                    .setTemplateCode(smsBody.getTemplateCode())
                     .setPhones(JsonUtils.toJsonString(targetPhones))
-                    .setContent(StrUtils.replace(smsTemplate.getContent(), smsBody.getParams()));
+                    .setContent(smsBody.getParams().toString());
 
             if (isAsync) {
                 smsLog.setSendStatus(SmsSendStatusEnum.ASYNC.getStatus());
             } else {
                 smsLog.setSendStatus(SmsSendStatusEnum.SENDING.getStatus());
             }
-            smsLogMapper.insert(smsLog);
+            logMapper.insert(smsLog);
             return smsLog.getId();
         }
     }
 
     @Override
-    public void afterSendLog(Long logId, SmsResult<?> result) {
-        SmsLogDO smsLog = new SmsLogDO();
+    public void afterSendLog(Long logId, SmsResult result) {
+        SysSmsLogDO smsLog = new SysSmsLogDO();
         smsLog.setId(logId);
         if (result.getSuccess()) {
             smsLog.setSendStatus(SmsSendStatusEnum.SUCCESS.getStatus());
@@ -66,7 +63,7 @@ public class SmsLogServiceImpl implements SmsLogService {
             smsLog.setSendStatus(SmsSendStatusEnum.FAIL.getStatus());
             smsLog.setRemark(result.getMessage() + JsonUtils.toJsonString(result.getResult()));
         }
-        smsLogMapper.updateById(smsLog);
+        logMapper.updateById(smsLog);
     }
 
 }

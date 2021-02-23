@@ -1,10 +1,14 @@
 package cn.iocoder.dashboard.framework.sms.client;
 
+import cn.hutool.core.date.DateUtil;
 import cn.iocoder.dashboard.framework.sms.core.SmsBody;
 import cn.iocoder.dashboard.framework.sms.core.SmsResult;
+import cn.iocoder.dashboard.framework.sms.core.SmsResultDetail;
 import cn.iocoder.dashboard.framework.sms.core.property.SmsChannelProperty;
 import com.aliyuncs.DefaultAcsClient;
 import com.aliyuncs.IAcsClient;
+import com.aliyuncs.dysmsapi.model.v20170525.QuerySendDetailsRequest;
+import com.aliyuncs.dysmsapi.model.v20170525.QuerySendDetailsResponse;
 import com.aliyuncs.dysmsapi.model.v20170525.SendSmsRequest;
 import com.aliyuncs.dysmsapi.model.v20170525.SendSmsResponse;
 import com.aliyuncs.http.MethodType;
@@ -13,7 +17,9 @@ import com.aliyuncs.profile.IClientProfile;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * 阿里短信实现类
@@ -22,7 +28,7 @@ import java.util.Collection;
  * @date 2021/1/25 14:17
  */
 @Slf4j
-public class AliyunSmsClient extends AbstractSmsClient<SendSmsResponse> {
+public class AliyunSmsClient extends AbstractSmsClient {
 
     private static final String OK = "OK";
 
@@ -53,35 +59,36 @@ public class AliyunSmsClient extends AbstractSmsClient<SendSmsResponse> {
 
 
     @Override
-    public SmsResult<SendSmsResponse> send(SmsBody smsBody, Collection<String> targets) {
+    public SmsResult doSend(String templateApiId, SmsBody smsBody, Collection<String> targets) throws Exception {
         SendSmsRequest request = new SendSmsRequest();
         request.setSysMethod(MethodType.POST);
         request.setPhoneNumbers(StringUtils.join(targets, ","));
         request.setSignName(channelVO.getApiSignatureId());
-        request.setTemplateCode(channelVO.getTemplateByTemplateCode(smsBody.getTemplateCode()).getApiTemplateId());
+        request.setTemplateCode(templateApiId);
         request.setTemplateParam(smsBody.getParamsStr());
-        // TODO FROM 芋艿 TO zzf：try catch 咱是不是可以交给 abstract 来做。这样，异常处理，重试，限流等等，都可以酱紫
-        try {
-            SendSmsResponse sendSmsResponse = acsClient.getAcsResponse(request);
+        // TODO FROM 芋艿 TO zzf：try catch 咱是不是可以交给 abstract 来做。这样，异常处理，重试，限流等等，都可以酱紫  DONE
+        SendSmsResponse sendSmsResponse = acsClient.getAcsResponse(request);
 
-            boolean result = OK.equals(sendSmsResponse.getCode());
-            if (!result) {
-                log.debug("send fail[code={}, message={}]", sendSmsResponse.getCode(), sendSmsResponse.getMessage());
-            }
-            SmsResult<SendSmsResponse> resultBody = new SmsResult<>();
-            resultBody.setSuccess(result);
-            resultBody.setResult(sendSmsResponse);
-            return resultBody;
-        } catch (Exception e) {
-            log.debug(e.getMessage(), e);
-            return failResult("发送异常: " + e.getMessage());
+        boolean result = OK.equals(sendSmsResponse.getCode());
+        if (!result) {
+            log.debug("send fail[code={}, message={}]", sendSmsResponse.getCode(), sendSmsResponse.getMessage());
         }
-    }
+        SmsResult resultBody = new SmsResult();
+        resultBody.setSuccess(result);
+        QuerySendDetailsRequest querySendDetailsRequest = new QuerySendDetailsRequest();
+        querySendDetailsRequest.setBizId(sendSmsResponse.getBizId());
 
-    SmsResult<SendSmsResponse> failResult(String message) {
-        SmsResult<SendSmsResponse> resultBody = new SmsResult<>();
-        resultBody.setSuccess(false);
-        resultBody.setMessage(message);
+        QuerySendDetailsResponse acsResponse = acsClient.getAcsResponse(querySendDetailsRequest);
+        List<SmsResultDetail> resultDetailList = new ArrayList<>(Integer.parseInt(acsResponse.getTotalCount()));
+        acsResponse.getSmsSendDetailDTOs().forEach(s -> {
+            SmsResultDetail resultDetail = new SmsResultDetail();
+            resultDetail.setCreateTime(DateUtil.parseDateTime(s.getSendDate()));
+            resultDetail.setMessage(s.getContent());
+            resultDetail.setPhone(s.getPhoneNum());
+            resultDetail.setStatus(Math.toIntExact(s.getSendStatus()));
+            resultDetailList.add(resultDetail);
+        });
+        resultBody.setResult(resultDetailList);
         return resultBody;
     }
 

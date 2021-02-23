@@ -11,15 +11,16 @@ import java.util.Collection;
  * @author zzf
  * @date 2021/1/25 14:14
  */
-public interface SmsClient<R> {
+public interface SmsClient {
 
     /**
      * 发送消息
      *
-     * @param smsBody 消息内容
-     * @param targets 发送对象列表
-     * @return 是否发送成功
+     * @param templateApiId 短信模板唯一标识
+     * @param smsBody       消息内容
+     * @param targets       发送对象列表
+     * @return 短信发送结果
      */
-    SmsResult<R> send(SmsBody smsBody, Collection<String> targets);
+    SmsResult send(String templateApiId, SmsBody smsBody, Collection<String> targets);
 
 }

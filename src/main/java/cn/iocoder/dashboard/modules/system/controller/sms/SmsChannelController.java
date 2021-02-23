@@ -5,8 +5,8 @@ import cn.iocoder.dashboard.common.pojo.PageResult;
 import cn.iocoder.dashboard.modules.system.controller.sms.vo.req.SmsChannelCreateReqVO;
 import cn.iocoder.dashboard.modules.system.controller.sms.vo.req.SmsChannelPageReqVO;
 import cn.iocoder.dashboard.modules.system.controller.sms.vo.resp.SmsChannelEnumRespVO;
-import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.sms.SmsChannelDO;
-import cn.iocoder.dashboard.modules.system.service.sms.SmsChannelService;
+import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.sms.SysSmsChannelDO;
+import cn.iocoder.dashboard.modules.system.service.sms.SysSmsChannelService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.validation.annotation.Validated;
@@ -23,25 +23,25 @@ import static cn.iocoder.dashboard.common.pojo.CommonResult.success;
 public class SmsChannelController {
 
     @Resource
-    private SmsChannelService service;
+    private SysSmsChannelService service;
 
     @ApiOperation("获取渠道/签名分页")
     @GetMapping("/page")
-    public CommonResult<PageResult<SmsChannelDO>> getPermissionInfo(@Validated SmsChannelPageReqVO reqVO) {
-        return success(service.pageChannels(reqVO));
+    public CommonResult<PageResult<SysSmsChannelDO>> getPermissionInfo(@Validated SmsChannelPageReqVO reqVO) {
+        return success(service.pageSmsChannels(reqVO));
     }
 
     @ApiOperation("获取渠道枚举")
     @GetMapping("/list/channel-enum")
     public CommonResult<List<SmsChannelEnumRespVO>> getChannelEnums() {
-        return success(service.getChannelEnums());
+        return success(service.getSmsChannelEnums());
     }
 
 
     @ApiOperation("添加消息渠道")
     @PostMapping("/create")
     public CommonResult<Long> add(@Validated @RequestBody SmsChannelCreateReqVO reqVO) {
-        return success(service.createChannel(reqVO));
+        return success(service.createSmsChannel(reqVO));
     }
 
 

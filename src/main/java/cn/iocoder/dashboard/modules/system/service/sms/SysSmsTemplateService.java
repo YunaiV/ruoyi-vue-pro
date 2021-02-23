@@ -6,5 +6,5 @@ package cn.iocoder.dashboard.modules.system.service.sms;
  * @author zzf
  * @date 2021/1/25 9:24
  */
-public interface SmsTemplateService {
+public interface SysSmsTemplateService {
 }

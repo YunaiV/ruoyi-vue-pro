@@ -1,15 +1,14 @@
 package cn.iocoder.dashboard.framework.sms.core;
 
-import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.StrUtil;
-import cn.iocoder.dashboard.common.enums.SmsChannelEnum;
 import cn.iocoder.dashboard.common.exception.ServiceException;
-import cn.iocoder.dashboard.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.dashboard.framework.sms.client.AbstractSmsClient;
 import cn.iocoder.dashboard.framework.sms.client.AliyunSmsClient;
+import cn.iocoder.dashboard.framework.sms.core.enums.SmsChannelEnum;
 import cn.iocoder.dashboard.framework.sms.core.property.SmsChannelProperty;
+import cn.iocoder.dashboard.framework.sms.core.property.SmsTemplateProperty;
 import org.springframework.stereotype.Component;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -24,7 +23,17 @@ import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.*;
 @Component
 public class SmsClientFactory {
 
-    private final Map<Long, AbstractSmsClient<?>> smsSenderMap = new ConcurrentHashMap<>(8);
+    /**
+     * channelId: client map
+     * 保存 渠道id: 对应短信客户端 的map
+     */
+    private final Map<Long, AbstractSmsClient> smsSenderMap = new ConcurrentHashMap<>(8);
+
+    /**
+     * templateCode: TemplateProperty map
+     * 保存 模板编码：模板信息 的map
+     */
+    private final Map<String, SmsTemplateProperty> templatePropertyMap = new ConcurrentHashMap<>(16);
 
     /**
      * 创建短信客户端
@@ -33,20 +42,13 @@ public class SmsClientFactory {
      * @return 客户端id(默认channelId)
      */
     public Long createClient(SmsChannelProperty propertyVO) {
-        // TODO FROM 芋艿 TO zzf：参数的校验，可以考虑统一使用 validation。
-        if (StrUtil.isBlank(propertyVO.getCode())) {
-            throw ServiceExceptionUtil.exception(PARAM_VALUE_IS_NULL, "短信渠道编码");
-        }
-        if (ObjectUtil.isNull(propertyVO.getId())) {
-            throw ServiceExceptionUtil.exception(PARAM_VALUE_IS_NULL, "短信渠道ID");
-        }
-
-        AbstractSmsClient<?> sender = createClient(SmsChannelEnum.getByCode(propertyVO.getCode()), propertyVO);
+        // TODO FROM 芋艿 TO zzf：参数的校验，可以考虑统一使用 validation。   DONE
+        AbstractSmsClient sender = createClient(SmsChannelEnum.getByCode(propertyVO.getCode()), propertyVO);
         smsSenderMap.put(propertyVO.getId(), sender);
         return propertyVO.getId();
     }
 
-    private AbstractSmsClient<?> createClient(SmsChannelEnum channelEnum, SmsChannelProperty channelVO) {
+    private AbstractSmsClient createClient(SmsChannelEnum channelEnum, SmsChannelProperty channelVO) {
         if (channelEnum == null) {
             throw new ServiceException(INVALID_CHANNEL_CODE);
         }
@@ -66,7 +68,38 @@ public class SmsClientFactory {
      * @param channelId 渠道id
      * @return 短信id
      */
-    public AbstractSmsClient<?> getClient(Long channelId) {
+    public AbstractSmsClient getClient(Long channelId) {
         return smsSenderMap.get(channelId);
+    }
+
+
+    /**
+     * 添加或修改短信模板信息缓存
+     */
+    public void addOrUpdateTemplateCache(Collection<SmsTemplateProperty> templateProperties) {
+        templateProperties.forEach(s -> templatePropertyMap.put(s.getCode(), s));
+    }
+
+
+    /**
+     * 添加或修改短信模板信息缓存
+     */
+    public void addOrUpdateTemplateCache(SmsTemplateProperty templateProperty) {
+        templatePropertyMap.put(templateProperty.getCode(), templateProperty);
+    }
+
+
+    /**
+     * 根据短信模板编码获取模板唯一标识
+     *
+     * @param templateCode 短信模板编码
+     * @return 短信id
+     */
+    public String getTemplateApiIdByCode(String templateCode) {
+        SmsTemplateProperty smsTemplateProperty = templatePropertyMap.get(templateCode);
+        if (smsTemplateProperty == null) {
+            throw new ServiceException(SMS_TEMPLATE_NOT_FOUND);
+        }
+        return smsTemplateProperty.getApiTemplateId();
     }
 }
