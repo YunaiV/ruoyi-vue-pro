@@ -81,6 +81,13 @@ apollo:
     username: ${spring.datasource.username}
     password: ${spring.datasource.password}
 
+--- #################### 服务保障相关配置 ####################
+
+# Lock4j 配置项
+lock4j:
+  acquire-timeout: 3000 # 获取分布式锁超时时间，默认为 3000 毫秒
+  expire: 30000 # 分布式锁的超时时间，默认为 30 毫秒
+
 --- #################### 监控相关配置 ####################
 
 # Actuator 监控端点的配置项

@@ -38,6 +38,8 @@
 1. Redis 监控：监控 Redis 数据库的使用情况，使用的 Redis Key 管理
 1. Java 监控：基于 Spring Boot Admin 实现 Java 应用的监控
 1. 链路追踪：基于 SkyWalking 实现性能监控，特别是链路的追踪
+1. 分布式锁：基于 Redis 实现分布式锁，满足并发场景
+1. 幂等组件：基于 Redis 实现幂等组件，解决重复请求问题
 
 ### 研发工具
 
@@ -45,7 +47,6 @@
 1. 代码生成：前后端代码的生成（Java、Vue、SQL），支持 CRUD 下载
 1. 系统接口：基于 Swagger 自动生成相关的 RESTful API 接口文档
 1. 数据库文档：基于 Screw 自动生成数据库文档
-1. 幂等组件：基于 Redis 实现幂等组件，解决重复请求问题
 
 ## 在线体验
 

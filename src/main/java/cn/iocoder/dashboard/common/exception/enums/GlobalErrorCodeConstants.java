@@ -29,7 +29,8 @@ public interface GlobalErrorCodeConstants {
     ErrorCode INTERNAL_SERVER_ERROR = new ErrorCode(500, "系统异常");
 
     // ========== 自定义错误段 ==========
-    ErrorCode REPEATED_REQUESTS = new ErrorCode(900, "重复请求");
+    ErrorCode REPEATED_REQUESTS = new ErrorCode(900, "重复请求，请稍后重试"); // 重复请求
+    ErrorCode CONCURRENCY_REQUESTS = new ErrorCode(901, "请求失败，请稍后重试"); // 并发请求，不允许
 
     ErrorCode UNKNOWN = new ErrorCode(999, "未知错误");
 

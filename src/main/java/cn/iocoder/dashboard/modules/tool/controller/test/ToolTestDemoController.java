@@ -1,5 +1,6 @@
 package cn.iocoder.dashboard.modules.tool.controller.test;
 
+import cn.hutool.core.thread.ThreadUtil;
 import cn.iocoder.dashboard.common.pojo.CommonResult;
 import cn.iocoder.dashboard.common.pojo.PageResult;
 import cn.iocoder.dashboard.framework.excel.core.util.ExcelUtils;
@@ -8,6 +9,7 @@ import cn.iocoder.dashboard.modules.tool.controller.test.vo.*;
 import cn.iocoder.dashboard.modules.tool.convert.test.ToolTestDemoConvert;
 import cn.iocoder.dashboard.modules.tool.dal.dataobject.test.ToolTestDemoDO;
 import cn.iocoder.dashboard.modules.tool.service.test.ToolTestDemoService;
+import com.baomidou.lock.annotation.Lock4j;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
@@ -21,6 +23,7 @@ import javax.validation.Valid;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static cn.iocoder.dashboard.common.pojo.CommonResult.success;
 import static cn.iocoder.dashboard.framework.logger.operatelog.core.enums.OperateTypeEnum.EXPORT;
@@ -62,7 +65,11 @@ public class ToolTestDemoController {
     @ApiOperation("获得测试示例")
     @ApiImplicitParam(name = "id", value = "编号", required = true, dataTypeClass = Long.class)
     @PreAuthorize("@ss.hasPermission('tool:test-demo:query')")
+    @Lock4j // 分布式锁
     public CommonResult<ToolTestDemoRespVO> getTestDemo(@RequestParam("id") Long id) {
+        if (true) { // 测试分布式锁
+            ThreadUtil.sleep(5, TimeUnit.SECONDS);
+        }
         ToolTestDemoDO testDemo = testDemoService.getTestDemo(id);
         return success(ToolTestDemoConvert.INSTANCE.convert(testDemo));
     }

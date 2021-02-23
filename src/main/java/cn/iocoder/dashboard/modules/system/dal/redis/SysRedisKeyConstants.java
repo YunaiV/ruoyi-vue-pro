@@ -8,7 +8,7 @@ import java.time.Duration;
 import static cn.iocoder.dashboard.framework.redis.core.RedisKeyDefine.KeyTypeEnum.STRING;
 
 /**
- * Redis Key 枚举类
+ * System Redis Key 枚举类
  *
  * @author 芋道源码
  */
