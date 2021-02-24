@@ -7,7 +7,7 @@ import javax.validation.constraints.NotEmpty;
 
 /**
  * 渠道模板VO类
- * TODO FROM 芋艿 TO zzf：模板是不是不要提供到 client 里面，而是交给 factory 统一维护就好。不然，模板修改时候，刷新 client 会比较麻烦。
+ * TODO FROM 芋艿 TO zzf：模板是不是不要提供到 client 里面，而是交给 factory 统一维护就好。不然，模板修改时候，刷新 client 会比较麻烦。 DONE
  *
  *
  * @author zzf

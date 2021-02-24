@@ -59,6 +59,14 @@ public class SysSmsLogServiceImpl implements SysSmsLogService {
         smsLog.setId(logId);
         if (result.getSuccess()) {
             smsLog.setSendStatus(SmsSendStatusEnum.SUCCESS.getStatus());
+            SysSmsLogDO smsLogDO = logMapper.selectById(logId);
+            result.getResult().forEach(s -> {
+                smsLogDO.setPhones(s.getPhone());
+                smsLogDO.setSendStatus(s.getStatus());
+                smsLogDO.setRemark(s.getMessage());
+                smsLogDO.setCreateTime(s.getCreateTime());
+                logMapper.insert(smsLogDO);
+            });
         } else {
             smsLog.setSendStatus(SmsSendStatusEnum.FAIL.getStatus());
             smsLog.setRemark(result.getMessage() + JsonUtils.toJsonString(result.getResult()));

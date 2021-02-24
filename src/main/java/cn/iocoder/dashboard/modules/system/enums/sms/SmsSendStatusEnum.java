@@ -22,8 +22,11 @@ public enum SmsSendStatusEnum {
     //失败
     FAIL(3),
 
+    //等待回执
+    WAITING(4),
+
     //成功
-    SUCCESS(4);
+    SUCCESS(5);
 
     private final int status;
 

@@ -5,6 +5,7 @@ import cn.iocoder.dashboard.framework.sms.core.SmsBody;
 import cn.iocoder.dashboard.framework.sms.core.SmsResult;
 import cn.iocoder.dashboard.framework.sms.core.SmsResultDetail;
 import cn.iocoder.dashboard.framework.sms.core.property.SmsChannelProperty;
+import cn.iocoder.dashboard.modules.system.enums.sms.SmsSendStatusEnum;
 import com.aliyuncs.DefaultAcsClient;
 import com.aliyuncs.IAcsClient;
 import com.aliyuncs.dysmsapi.model.v20170525.QuerySendDetailsRequest;
@@ -85,11 +86,21 @@ public class AliyunSmsClient extends AbstractSmsClient {
             resultDetail.setCreateTime(DateUtil.parseDateTime(s.getSendDate()));
             resultDetail.setMessage(s.getContent());
             resultDetail.setPhone(s.getPhoneNum());
-            resultDetail.setStatus(Math.toIntExact(s.getSendStatus()));
+            resultDetail.setStatus(statusConvert(s.getSendStatus()));
             resultDetailList.add(resultDetail);
         });
         resultBody.setResult(resultDetailList);
         return resultBody;
+    }
+
+    private int statusConvert(Long aliSendStatus) {
+        if (aliSendStatus == 1L) {
+            return SmsSendStatusEnum.SUCCESS.getStatus();
+        }
+        if (aliSendStatus == 2L) {
+            return SmsSendStatusEnum.FAIL.getStatus();
+        }
+        return SmsSendStatusEnum.WAITING.getStatus();
     }
 
 }

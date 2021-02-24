@@ -12,7 +12,7 @@ import java.util.List;
 public class SmsResult implements Serializable {
 
     /**
-     * 是否成功
+     * 是否成功(发送短信的请求是否成功)
      */
     // TODO FROM 芋艿 to zzf：未来要加一个 code，将不同平台的短信失败的情况，做一次统一的收敛。  DONE
     private Boolean success;

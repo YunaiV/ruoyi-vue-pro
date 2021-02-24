@@ -12,7 +12,7 @@ import java.util.Date;
 public class SmsResultDetail implements Serializable {
 
     /**
-     * 状态   1成功 2失败 3等待回执
+     * 短信发送状态 {@link cn.iocoder.dashboard.modules.system.enums.sms.SmsSendStatusEnum}
      */
     private Integer status;
 
