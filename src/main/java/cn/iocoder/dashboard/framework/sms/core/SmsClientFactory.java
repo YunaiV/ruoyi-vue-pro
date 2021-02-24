@@ -42,7 +42,6 @@ public class SmsClientFactory {
      * @return 客户端id(默认channelId)
      */
     public Long createClient(SmsChannelProperty propertyVO) {
-        // TODO FROM 芋艿 TO zzf：参数的校验，可以考虑统一使用 validation。   DONE
         AbstractSmsClient sender = createClient(SmsChannelEnum.getByCode(propertyVO.getCode()), propertyVO);
         smsSenderMap.put(propertyVO.getId(), sender);
         return propertyVO.getId();
@@ -77,7 +76,7 @@ public class SmsClientFactory {
      * 添加或修改短信模板信息缓存
      */
     public void addOrUpdateTemplateCache(Collection<SmsTemplateProperty> templateProperties) {
-        templateProperties.forEach(s -> templatePropertyMap.put(s.getCode(), s));
+        templateProperties.forEach(s -> addOrUpdateTemplateCache(templateProperties));
     }
 
 
@@ -102,4 +101,5 @@ public class SmsClientFactory {
         }
         return smsTemplateProperty.getApiTemplateId();
     }
+
 }

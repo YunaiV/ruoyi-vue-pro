@@ -42,6 +42,7 @@ public class SysSmsChannelServiceImpl implements SysSmsChannelService {
     @Autowired
     private SmsClientFactory clientFactory;
 
+    // TODO FROM 芋艿 to zzf：方法要放在成员变量下面；
     /**
      * 初始化短信客户端
      */
@@ -65,7 +66,6 @@ public class SysSmsChannelServiceImpl implements SysSmsChannelService {
         });
     }
 
-    // TODO FROM 芋艿 to ZZF：channelMapper 嘿，保持命名统一。 DONE
     @Resource
     private SysSmsChannelMapper channelMapper;
 

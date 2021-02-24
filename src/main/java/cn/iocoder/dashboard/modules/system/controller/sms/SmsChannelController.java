@@ -37,12 +37,10 @@ public class SmsChannelController {
         return success(service.getSmsChannelEnums());
     }
 
-
     @ApiOperation("添加消息渠道")
     @PostMapping("/create")
     public CommonResult<Long> add(@Validated @RequestBody SmsChannelCreateReqVO reqVO) {
         return success(service.createSmsChannel(reqVO));
     }
-
 
 }

@@ -22,7 +22,7 @@ public abstract class AbstractSmsClient implements SmsClient {
     protected final SmsChannelProperty channelVO;
 
     /**
-     * 构造阿里云短信发送处理
+     * 构造阿里云短信发送处理 TODO FROM 芋艿 to zzf：貌似注释不对
      *
      * @param property 阿里云短信配置
      */
@@ -30,13 +30,12 @@ public abstract class AbstractSmsClient implements SmsClient {
         this.channelVO = property;
     }
 
-
     public SmsChannelProperty getProperty() {
         return channelVO;
     }
 
     @Override
-    public SmsResult send(String templateApiId, SmsBody smsBody, Collection<String> targets) {
+    public final SmsResult send(String templateApiId, SmsBody smsBody, Collection<String> targets) {
         SmsResult result;
         try {
             beforeSend(templateApiId, smsBody, targets);
@@ -50,13 +49,13 @@ public abstract class AbstractSmsClient implements SmsClient {
         return result;
     }
 
-
     /**
      * 发送消息
      *
      * @param templateApiId 短信模板唯一标识
      * @param smsBody       消息内容
      * @param targets       发送对象列表
+     * @throws Exception    调用发送失败，抛出异常
      * @return 短信发送结果
      */
     public abstract SmsResult doSend(String templateApiId, SmsBody smsBody, Collection<String> targets) throws Exception;
@@ -67,7 +66,7 @@ public abstract class AbstractSmsClient implements SmsClient {
     protected void afterSend(String templateApiId, SmsBody smsBody, Collection<String> targets, SmsResult result) throws Exception {
     }
 
-
+    // TODO FROM 芋艿 to zzf：可以考虑抽到 SmsResult 里
     SmsResult failResult(String message) {
         SmsResult resultBody = new SmsResult();
         resultBody.setSuccess(false);

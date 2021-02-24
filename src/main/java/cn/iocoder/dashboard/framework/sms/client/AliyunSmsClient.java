@@ -58,16 +58,14 @@ public class AliyunSmsClient extends AbstractSmsClient {
         acsClient = new DefaultAcsClient(profile);
     }
 
-
     @Override
     public SmsResult doSend(String templateApiId, SmsBody smsBody, Collection<String> targets) throws Exception {
         SendSmsRequest request = new SendSmsRequest();
         request.setSysMethod(MethodType.POST);
-        request.setPhoneNumbers(StringUtils.join(targets, ","));
+        request.setPhoneNumbers(StringUtils.join(targets, ",")); // TODO FROM 芋艿 to zzf：统一使用 Hutool 工具类嘿。
         request.setSignName(channelVO.getApiSignatureId());
         request.setTemplateCode(templateApiId);
         request.setTemplateParam(smsBody.getParamsStr());
-        // TODO FROM 芋艿 TO zzf：try catch 咱是不是可以交给 abstract 来做。这样，异常处理，重试，限流等等，都可以酱紫  DONE
         SendSmsResponse sendSmsResponse = acsClient.getAcsResponse(request);
 
         boolean result = OK.equals(sendSmsResponse.getCode());
@@ -78,7 +76,7 @@ public class AliyunSmsClient extends AbstractSmsClient {
         resultBody.setSuccess(result);
         QuerySendDetailsRequest querySendDetailsRequest = new QuerySendDetailsRequest();
         querySendDetailsRequest.setBizId(sendSmsResponse.getBizId());
-
+        // TODO FROM 芋艿 to zzf：发送完之后，基于短信平台回调，去更新回执状态。短信发送是否成功，和最终用户收到，是两个维度。这块有困惑，可以微信，我给个截图哈。
         QuerySendDetailsResponse acsResponse = acsClient.getAcsResponse(querySendDetailsRequest);
         List<SmsResultDetail> resultDetailList = new ArrayList<>(Integer.parseInt(acsResponse.getTotalCount()));
         acsResponse.getSmsSendDetailDTOs().forEach(s -> {
