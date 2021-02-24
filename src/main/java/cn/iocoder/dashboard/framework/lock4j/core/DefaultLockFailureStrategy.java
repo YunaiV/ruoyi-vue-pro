@@ -14,7 +14,7 @@ public class DefaultLockFailureStrategy implements LockFailureStrategy {
     @Override
     public void onLockFailure(String key, long acquireTimeout, int acquireCount) {
         log.debug("[onLockFailure][线程:{} 获取锁失败，key:{} 获取超时时长:{} ms]", Thread.currentThread().getName(), key, acquireTimeout);
-        throw new ServiceException(GlobalErrorCodeConstants.CONCURRENCY_REQUESTS);
+        throw new ServiceException(GlobalErrorCodeConstants.LOCKED);
     }
 
 }

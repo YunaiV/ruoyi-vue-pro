@@ -34,6 +34,7 @@
         <apollo.version>1.7.0</apollo.version>
         <!-- 服务保障相关 -->
         <lock4j.version>2.2.0</lock4j.version>
+        <resilience4j.version>1.7.0</resilience4j.version>
         <!-- 监控相关 -->
         <skywalking.version>8.3.0</skywalking.version>
         <spring-boot-admin.version>2.3.1</spring-boot-admin.version>
@@ -143,6 +144,12 @@
             <groupId>com.baomidou</groupId>
             <artifactId>lock4j-redisson-spring-boot-starter</artifactId>
             <version>${lock4j.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.github.resilience4j</groupId>
+            <artifactId>resilience4j-spring-boot2</artifactId>
+            <version>${resilience4j.version}</version>
         </dependency>
 
         <!-- 监控相关 -->

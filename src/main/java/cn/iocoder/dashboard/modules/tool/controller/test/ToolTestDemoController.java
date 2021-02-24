@@ -10,6 +10,7 @@ import cn.iocoder.dashboard.modules.tool.convert.test.ToolTestDemoConvert;
 import cn.iocoder.dashboard.modules.tool.dal.dataobject.test.ToolTestDemoDO;
 import cn.iocoder.dashboard.modules.tool.service.test.ToolTestDemoService;
 import com.baomidou.lock.annotation.Lock4j;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
@@ -78,6 +79,7 @@ public class ToolTestDemoController {
     @ApiOperation("获得测试示例列表")
     @ApiImplicitParam(name = "ids", value = "编号列表", required = true, dataTypeClass = List.class)
     @PreAuthorize("@ss.hasPermission('tool:test-demo:query')")
+    @RateLimiter(name = "backendA")
     public CommonResult<List<ToolTestDemoRespVO>> getTestDemoList(@RequestParam("ids") Collection<Long> ids) {
         List<ToolTestDemoDO> list = testDemoService.getTestDemoList(ids);
         return success(ToolTestDemoConvert.INSTANCE.convertList(list));

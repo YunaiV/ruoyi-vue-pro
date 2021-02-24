@@ -40,6 +40,7 @@
 1. 链路追踪：基于 SkyWalking 实现性能监控，特别是链路的追踪
 1. 分布式锁：基于 Redis 实现分布式锁，满足并发场景
 1. 幂等组件：基于 Redis 实现幂等组件，解决重复请求问题
+1. 服务保障：基于 Resilience4j 实现服务的稳定性，包括限流、熔断等功能
 
 ### 研发工具
 
@@ -57,6 +58,37 @@
 * [《如何搭建环境》](http://www.iocoder.cn/categories/Yudao/?yudao)
 
 > 未来会补充文档和视频，方便胖友冲冲冲！
+
+## 技术栈
+
+**后端**
+
+| 框架 | 说明 |  版本 | 学习指南 |
+| --- | --- | --- | --- |
+| [Spring Boot](https://spring.io/projects/spring-boot) | 应用开发框架 | 2.4.2 | [文档](https://github.com/YunaiV/SpringBoot-Labs) |
+| [MySQL](https://www.mysql.com/cn/) | 数据库服务器 | 5.7 |  |
+| [Druid](https://github.com/alibaba/druid) | JDBC 连接池、监控组件 | 1.2.4 | [文档](http://www.iocoder.cn/Spring-Boot/datasource-pool/?yudao) |
+| [MyBatis-Plus](https://mp.baomidou.com/) | MyBatis 增强工具包 | 3.4.1 | [文档](http://www.iocoder.cn/Spring-Boot/MyBatis/?yudao) |
+| [Redis](https://redis.io/) | key-value 数据库 | 5.0 |  |
+| [Redisson](https://github.com/redisson/redisson) | Redis 客户端 | 3.1.46 | [文档](http://www.iocoder.cn/Spring-Boot/Redis/?yudao) |
+| [Spring MVC](https://github.com/spring-projects/spring-framework/tree/master/spring-webmvc) | MVC 框架  | 5.4.2 | [文档](http://www.iocoder.cn/SpringMVC/MVC/?yudao) |
+| [Spring Security](https://github.com/spring-projects/spring-security) | Spring 安全框架 | 5.4.2 | [文档](http://www.iocoder.cn/Spring-Boot/Spring-Security/?yudao) |
+| [Hibernate Validator](https://github.com/hibernate/hibernate-validator) | 参数校验组件 | 6.1.7 | [文档](http://www.iocoder.cn/Spring-Boot/Validation/?yudao) |
+| [Quartz](https://github.com/quartz-scheduler) | 任务调度组件 | 2.3.2 | [文档](http://www.iocoder.cn/Spring-Boot/Job/?yudao) |
+| [Knife4j](https://gitee.com/xiaoym/knife4j) | Swagger 增强 UI 实现 | 3.0.2 | [文档](http://www.iocoder.cn/Spring-Boot/Swagger/?yudao) |
+| [Resilience4j](https://github.com/quartz-scheduler) | 服务保障组件 | 1.7.0 | [文档](http://www.iocoder.cn/Spring-Boot/Resilience4j/?yudao) |
+| [SkyWalking](https://skywalking.apache.org/) | 分布式应用追踪系统 | 8.6.0 | [文档](http://www.iocoder.cn/Spring-Boot/SkyWalking/?yudao) |
+| [Spring Boot Admin](https://github.com/skywalking) | Spring Boot 监控平台 | 8.6.0 | [文档](http://www.iocoder.cn/Spring-Boot/Admin/?yudao) |
+| [Jackson](https://github.com/FasterXML/jackson) | JSON 工具库 | 2.11.4 |  |
+| [MapStruct](https://mapstruct.org/) | Java Bean 转换 | 1.4.1 | [文档](http://www.iocoder.cn/Spring-Boot/MapStruct/?yudao) |
+| [Lombok](https://projectlombok.org/) | 消除冗长的 Java 代码| 1.16.14 | [文档](http://www.iocoder.cn/Spring-Boot/Lombok/?yudao) |
+
+**前端**
+
+| 框架 | 说明 |  版本 |
+| --- | --- | --- |
+| [Vue](https://cn.vuejs.org/index.html) | JavaScript 框架 | 2.6.12 |
+| [Vue Element Admin](https://ant.design/docs/react/introduce-cn) | 后台前端解决方案 | - |
 
 ## 演示图
 
