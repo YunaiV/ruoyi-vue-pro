@@ -1,7 +1,6 @@
 package cn.iocoder.dashboard.framework.web.core.filter;
 
-import cn.hutool.core.util.StrUtil;
-import org.springframework.http.MediaType;
+import cn.iocoder.dashboard.util.servlet.ServletUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 
@@ -29,7 +28,7 @@ public class RequestBodyCacheFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         // 只处理 json 请求内容
-        return !StrUtil.startWithIgnoreCase(request.getContentType(), MediaType.APPLICATION_JSON_VALUE);
+        return !ServletUtils.isJsonRequest(request);
     }
 
 }

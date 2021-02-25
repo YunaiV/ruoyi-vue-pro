@@ -37,6 +37,5 @@ public class LogoutSuccessHandlerImpl implements LogoutSuccessHandler {
         }
         // 返回成功
         ServletUtils.writeJSON(response, null);
-//        ServletUtils.renderString(response, JSON.toJSONString(AjaxResult.error(HttpStatus.OK.value(), "退出成功")));
     }
 }

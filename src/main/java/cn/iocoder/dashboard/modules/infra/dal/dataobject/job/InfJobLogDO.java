@@ -9,7 +9,7 @@ import lombok.*;
 import java.util.Date;
 
 /**
- * 定时任务的执行日志 sys_job_log
+ * 定时任务的执行日志
  *
  * @author 芋道源码
  */

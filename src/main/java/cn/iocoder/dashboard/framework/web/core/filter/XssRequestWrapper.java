@@ -6,6 +6,7 @@ import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HTMLFilter;
+import cn.iocoder.dashboard.util.servlet.ServletUtils;
 import org.springframework.http.MediaType;
 
 import javax.servlet.ReadListener;
@@ -56,7 +57,7 @@ public class XssRequestWrapper extends HttpServletRequestWrapper {
     @Override
     public ServletInputStream getInputStream() throws IOException {
         // 如果非 json 请求，不进行 Xss 处理
-        if (!StrUtil.startWithIgnoreCase(super.getContentType(), MediaType.APPLICATION_JSON_VALUE)) {
+        if (!ServletUtils.isJsonRequest(this)) {
             return super.getInputStream();
         }
 
