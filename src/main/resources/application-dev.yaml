@@ -120,6 +120,11 @@ spring:
       # Spring Boot Admin Server 服务端的相关配置
       context-path: /admin # 配置 Spring
 
+# 日志文件配置
+logging:
+  file:
+    path: ${user.home}/logs/ # 日志文件的路径
+
 --- #################### 芋道相关配置 ####################
 
 # 芋道配置项，设置当前项目所有自定义的配置

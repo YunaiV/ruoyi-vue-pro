@@ -2,8 +2,8 @@ package cn.iocoder.dashboard.modules.system.service.common.impl;
 
 import cn.iocoder.dashboard.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.dashboard.framework.file.config.FileProperties;
-import cn.iocoder.dashboard.modules.system.dal.mysql.common.SysFileMapper;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.common.SysFileDO;
+import cn.iocoder.dashboard.modules.system.dal.mysql.common.SysFileMapper;
 import cn.iocoder.dashboard.modules.system.service.common.SysFileService;
 import org.springframework.stereotype.Service;
 
