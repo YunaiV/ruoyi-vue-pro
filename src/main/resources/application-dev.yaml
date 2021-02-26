@@ -157,7 +157,7 @@ yudao:
     base-package: ${yudao.info.base-package}.modules
     db-schemas: ${spring.datasource.name}
   xss:
-    enable: true
+    enable: false
     exclude-urls: # 如下两个 url，仅仅是为了演示，去掉配置也没关系
       - ${spring.boot.admin.context-path}/** # 不处理 Spring Boot Admin 的请求
       - ${management.endpoints.web.base-path}/** # 不处理 Actuator 的请求

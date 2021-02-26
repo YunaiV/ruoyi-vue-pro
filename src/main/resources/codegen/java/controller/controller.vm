@@ -52,7 +52,7 @@ public class ${table.className}Controller {
         return success(true);
     }
 
-	@DeleteMapping("/delete")
+    @DeleteMapping("/delete")
     @ApiOperation("删除${table.classComment}")
     @ApiImplicitParam(name = "id", value = "编号", required = true)
 	@PreAuthorize("@ss.hasPermission('${permissionPrefix}:delete')")

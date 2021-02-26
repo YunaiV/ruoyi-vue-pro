@@ -61,7 +61,7 @@ public class ApiAccessLogCreateDTO {
      * 开始请求时间
      */
     @NotNull(message = "开始请求时间不能为空")
-    private Date startTime;
+    private Date beginTime;
     /**
      * 结束请求时间
      */

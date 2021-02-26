@@ -78,7 +78,7 @@ public class SysApiAccessLogDO extends BaseDO {
     /**
      * 开始请求时间
      */
-    private Date startTime;
+    private Date beginTime;
     /**
      * 结束请求时间
      */

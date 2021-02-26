@@ -74,12 +74,12 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
 
     @Override
     public PageResult<${table.className}DO> get${simpleClassName}Page(${table.className}PageReqVO pageReqVO) {
-		return ${classNameVar}Mapper.selectPage(pageReqVO);
+        return ${classNameVar}Mapper.selectPage(pageReqVO);
     }
 
     @Override
     public List<${table.className}DO> get${simpleClassName}List(${table.className}ExportReqVO exportReqVO) {
-		return ${classNameVar}Mapper.selectList(exportReqVO);
+        return ${classNameVar}Mapper.selectList(exportReqVO);
     }
 
 }
