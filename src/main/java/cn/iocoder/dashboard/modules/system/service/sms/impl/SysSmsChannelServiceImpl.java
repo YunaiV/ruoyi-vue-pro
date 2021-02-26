@@ -6,7 +6,9 @@ import cn.iocoder.dashboard.framework.sms.client.AbstractSmsClient;
 import cn.iocoder.dashboard.framework.sms.core.SmsClientFactory;
 import cn.iocoder.dashboard.framework.sms.core.enums.SmsChannelEnum;
 import cn.iocoder.dashboard.framework.sms.core.property.SmsChannelProperty;
+import cn.iocoder.dashboard.framework.sms.core.property.SmsTemplateProperty;
 import cn.iocoder.dashboard.modules.system.controller.sms.vo.SmsChannelAllVO;
+import cn.iocoder.dashboard.modules.system.controller.sms.vo.SmsTemplateVO;
 import cn.iocoder.dashboard.modules.system.controller.sms.vo.req.SmsChannelCreateReqVO;
 import cn.iocoder.dashboard.modules.system.controller.sms.vo.req.SmsChannelPageReqVO;
 import cn.iocoder.dashboard.modules.system.controller.sms.vo.resp.SmsChannelEnumRespVO;
@@ -39,38 +41,35 @@ public class SysSmsChannelServiceImpl implements SysSmsChannelService {
 
     private final Map<String, Long> templateCode2ChannelIdMap = new ConcurrentHashMap<>(32);
 
-    @Autowired
+    @Resource
     private SmsClientFactory clientFactory;
-
-    // TODO FROM 芋艿 to zzf：方法要放在成员变量下面；
-    /**
-     * 初始化短信客户端
-     */
-    @PostConstruct
-    @Override
-    public void initSmsClient() {
-        // 查询有效渠道信息
-        List<SysSmsChannelDO> channelDOList = channelMapper.selectEnabledList();
-        List<SmsChannelProperty> propertyList = SmsChannelConvert.INSTANCE.convertProperties(channelDOList);
-
-        // 遍历渠道生成client并获取模板缓存
-        propertyList.forEach(channelProperty -> {
-            Long clientId = clientFactory.createClient(channelProperty);
-            List<SysSmsTemplateDO> templateDOList = templateMapper.selectListByChannelId(channelProperty.getId());
-            if (ObjectUtil.isNotEmpty(templateDOList)) {
-                templateDOList.forEach(template -> {
-                    templateCode2ChannelIdMap.put(template.getCode(), clientId);
-                });
-                SmsTemplateConvert.INSTANCE.convert(templateDOList);
-            }
-        });
-    }
 
     @Resource
     private SysSmsChannelMapper channelMapper;
 
     @Resource
     private SysSmsTemplateMapper templateMapper;
+
+
+    @PostConstruct
+    @Override
+    public void initSmsClientAndCacheSmsTemplate() {
+        // 查询有效渠道信息
+        List<SysSmsChannelDO> channelDOList = channelMapper.selectEnabledList();
+        List<SmsChannelProperty> propertyList = SmsChannelConvert.INSTANCE.convertProperties(channelDOList);
+
+        // 遍历渠道生成client、获取模板并缓存
+        propertyList.forEach(channelProperty -> {
+            List<SysSmsTemplateDO> templateDOList = templateMapper.selectListByChannelId(channelProperty.getId());
+            if (ObjectUtil.isNotEmpty(templateDOList)) {
+                Long clientId = clientFactory.createClient(channelProperty);
+                templateDOList.forEach(template -> templateCode2ChannelIdMap.put(template.getCode(), clientId));
+
+                List<SmsTemplateProperty> templatePropertyList = SmsTemplateConvert.INSTANCE.convertProperty(templateDOList);
+                clientFactory.addOrUpdateTemplateCache(templatePropertyList);
+            }
+        });
+    }
 
     @Override
     public PageResult<SysSmsChannelDO> pageSmsChannels(SmsChannelPageReqVO reqVO) {
@@ -106,9 +105,7 @@ public class SysSmsChannelServiceImpl implements SysSmsChannelService {
             return null;
         }
         List<SmsChannelAllVO> channelAllVOList = SmsChannelConvert.INSTANCE.convert(channelDOList);
-
         channelAllVOList.forEach(smsChannelDO -> {
-
             List<SysSmsTemplateDO> templateDOList = templateMapper.selectListByChannelId(smsChannelDO.getId());
             if (ObjectUtil.isNull(templateDOList)) {
                 templateDOList = new ArrayList<>();

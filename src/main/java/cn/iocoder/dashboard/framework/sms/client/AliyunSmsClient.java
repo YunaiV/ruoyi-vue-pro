@@ -1,6 +1,8 @@
 package cn.iocoder.dashboard.framework.sms.client;
 
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.dashboard.framework.sms.core.SmsBody;
 import cn.iocoder.dashboard.framework.sms.core.SmsResult;
 import cn.iocoder.dashboard.framework.sms.core.SmsResultDetail;
@@ -62,7 +64,7 @@ public class AliyunSmsClient extends AbstractSmsClient {
     public SmsResult doSend(String templateApiId, SmsBody smsBody, Collection<String> targets) throws Exception {
         SendSmsRequest request = new SendSmsRequest();
         request.setSysMethod(MethodType.POST);
-        request.setPhoneNumbers(StringUtils.join(targets, ",")); // TODO FROM 芋艿 to zzf：统一使用 Hutool 工具类嘿。
+        request.setPhoneNumbers(ArrayUtil.join(targets, ","));
         request.setSignName(channelVO.getApiSignatureId());
         request.setTemplateCode(templateApiId);
         request.setTemplateParam(smsBody.getParamsStr());

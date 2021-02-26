@@ -31,4 +31,11 @@ public class SmsResult implements Serializable {
      */
     private List<SmsResultDetail> result;
 
+
+    public static SmsResult failResult(String message) {
+        SmsResult resultBody = new SmsResult();
+        resultBody.setSuccess(false);
+        resultBody.setMessage(message);
+        return resultBody;
+    }
 }

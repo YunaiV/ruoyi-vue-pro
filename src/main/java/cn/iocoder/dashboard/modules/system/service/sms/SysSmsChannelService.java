@@ -19,9 +19,9 @@ import java.util.List;
 public interface SysSmsChannelService {
 
     /**
-     * 初始化短信渠道
+     * 初始化短信渠道并缓存短信模板信息
      */
-    void initSmsClient();
+    void initSmsClientAndCacheSmsTemplate();
 
     /**
      * 分页查询短信渠道信息

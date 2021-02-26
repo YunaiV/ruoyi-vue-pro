@@ -76,7 +76,7 @@ public class SmsClientFactory {
      * 添加或修改短信模板信息缓存
      */
     public void addOrUpdateTemplateCache(Collection<SmsTemplateProperty> templateProperties) {
-        templateProperties.forEach(s -> addOrUpdateTemplateCache(templateProperties));
+        templateProperties.forEach(this::addOrUpdateTemplateCache);
     }
 
 

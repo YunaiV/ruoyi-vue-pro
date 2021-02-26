@@ -24,7 +24,7 @@ public class SmsSendConsumer extends AbstractChannelMessageListener<SmsSendMessa
 
     @Override
     public void onMessage(SmsSendMessage message) {
-        log.info("[onMessage][收到 发送短信 消息]"); // TODO FROM 芋艿 to zzf：log 如果要打，这里要内容打上。其他 Consumer 没打的原因，是没内容。。。
+        log.info("[onMessage][收到 发送短信 消息], content: " +  message.toString());
         SmsResult send = sysSmsService.send(message.getSmsBody(), message.getTargetPhones());
     }
 
