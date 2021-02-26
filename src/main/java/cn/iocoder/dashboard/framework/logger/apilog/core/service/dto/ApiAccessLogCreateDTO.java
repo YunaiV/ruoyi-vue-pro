@@ -1,5 +1,7 @@
 package cn.iocoder.dashboard.framework.logger.apilog.core.service.dto;
 
+import lombok.Data;
+
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 
@@ -8,6 +10,7 @@ import java.util.Date;
  *
  * @author 芋道源码
  */
+@Data
 public class ApiAccessLogCreateDTO {
 
     /**
@@ -17,7 +20,7 @@ public class ApiAccessLogCreateDTO {
     /**
      * 用户编号
      */
-    private Integer userId;
+    private Long userId;
     /**
      * 用户类型
      */

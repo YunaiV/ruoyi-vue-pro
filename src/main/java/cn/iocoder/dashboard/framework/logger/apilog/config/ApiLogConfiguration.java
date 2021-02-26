@@ -1,6 +1,7 @@
 package cn.iocoder.dashboard.framework.logger.apilog.config;
 
 import cn.iocoder.dashboard.framework.logger.apilog.core.filter.ApiAccessLogFilter;
+import cn.iocoder.dashboard.framework.logger.apilog.core.service.ApiAccessLogFrameworkService;
 import cn.iocoder.dashboard.framework.web.config.WebProperties;
 import cn.iocoder.dashboard.framework.web.core.enums.FilterOrderEnum;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -16,8 +17,9 @@ public class ApiLogConfiguration {
      * 创建 ApiAccessLogFilter Bean，记录 API 请求日志
      */
     @Bean
-    public FilterRegistrationBean<ApiAccessLogFilter> apiAccessLogFilter(WebProperties webProperties) {
-        ApiAccessLogFilter filter = new ApiAccessLogFilter(webProperties);
+    public FilterRegistrationBean<ApiAccessLogFilter> apiAccessLogFilter(WebProperties webProperties,
+                                                                         ApiAccessLogFrameworkService apiAccessLogFrameworkService) {
+        ApiAccessLogFilter filter = new ApiAccessLogFilter(webProperties, apiAccessLogFrameworkService);
         return createFilterBean(filter, FilterOrderEnum.API_ACCESS_LOG_FILTER);
     }
 

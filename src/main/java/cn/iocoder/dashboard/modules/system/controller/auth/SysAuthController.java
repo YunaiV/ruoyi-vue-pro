@@ -26,8 +26,8 @@ import javax.validation.Valid;
 import java.util.List;
 
 import static cn.iocoder.dashboard.common.pojo.CommonResult.success;
-import static cn.iocoder.dashboard.framework.security.core.util.SecurityUtils.getLoginUserId;
-import static cn.iocoder.dashboard.framework.security.core.util.SecurityUtils.getLoginUserRoleIds;
+import static cn.iocoder.dashboard.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
+import static cn.iocoder.dashboard.framework.security.core.util.SecurityFrameworkUtils.getLoginUserRoleIds;
 import static cn.iocoder.dashboard.util.servlet.ServletUtils.getClientIP;
 import static cn.iocoder.dashboard.util.servlet.ServletUtils.getUserAgent;
 

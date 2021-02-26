@@ -3,7 +3,7 @@ package cn.iocoder.dashboard.framework.security.core.handler;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.dashboard.framework.security.config.SecurityProperties;
 import cn.iocoder.dashboard.framework.security.core.service.SecurityAuthFrameworkService;
-import cn.iocoder.dashboard.framework.security.core.util.SecurityUtils;
+import cn.iocoder.dashboard.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.dashboard.util.servlet.ServletUtils;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
@@ -31,7 +31,7 @@ public class LogoutSuccessHandlerImpl implements LogoutSuccessHandler {
     @Override
     public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
         // 执行退出
-        String token = SecurityUtils.obtainAuthorization(request, securityProperties.getTokenHeader());
+        String token = SecurityFrameworkUtils.obtainAuthorization(request, securityProperties.getTokenHeader());
         if (StrUtil.isNotBlank(token)) {
             securityFrameworkService.logout(token);
         }

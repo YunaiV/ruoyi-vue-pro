@@ -1,6 +1,7 @@
 package cn.iocoder.dashboard.framework.security.core.util;
 
 import cn.iocoder.dashboard.framework.security.core.LoginUser;
+import cn.iocoder.dashboard.framework.web.core.util.WebFrameworkUtils;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -12,11 +13,11 @@ import java.util.Set;
 /**
  * 安全服务工具类
  *
- * @author ruoyi
+ * @author 芋道源码
  */
-public class SecurityUtils {
+public class SecurityFrameworkUtils {
 
-    private SecurityUtils() {}
+    private SecurityFrameworkUtils() {}
 
     /**
      * 从请求中，获得认证 Token
@@ -45,7 +46,7 @@ public class SecurityUtils {
     }
 
     /**
-     * 获得当前用户的编号
+     * 获得当前用户的编号，从上下文中
      *
      * @return 用户编号
      */
@@ -53,6 +54,11 @@ public class SecurityUtils {
         return getLoginUser().getId();
     }
 
+    /**
+     * 获得当前用户的角色编号数组
+     *
+     * @return 角色编号数组
+     */
     public static Set<Long> getLoginUserRoleIds() {
         return getLoginUser().getRoleIds();
     }
@@ -70,6 +76,9 @@ public class SecurityUtils {
         authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
         // 设置到上下文
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+        // 额外设置到 request 中，用于 ApiAccessLogFilter 可以获取到用户编号；
+        // 原因是，Spring Security 的 Filter 在 ApiAccessLogFilter 后面，在它记录访问日志时，线上上下文已经没有用户编号等信息
+        WebFrameworkUtils.setLoginUserId(request, loginUser.getId());
     }
 
 }

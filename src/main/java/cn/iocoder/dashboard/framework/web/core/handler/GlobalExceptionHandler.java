@@ -3,7 +3,7 @@ package cn.iocoder.dashboard.framework.web.core.handler;
 import cn.iocoder.dashboard.common.exception.GlobalException;
 import cn.iocoder.dashboard.common.exception.ServiceException;
 import cn.iocoder.dashboard.common.pojo.CommonResult;
-import cn.iocoder.dashboard.framework.security.core.util.SecurityUtils;
+import cn.iocoder.dashboard.framework.security.core.util.SecurityFrameworkUtils;
 import io.github.resilience4j.ratelimiter.RequestNotPermitted;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.AccessDeniedException;
@@ -26,6 +26,8 @@ import static cn.iocoder.dashboard.common.exception.enums.GlobalErrorCodeConstan
 
 /**
  * 全局异常处理器，将 Exception 翻译成 CommonResult + 对应的异常编号
+ *
+ * @author 芋道源码
  */
 @RestControllerAdvice
 @Slf4j
@@ -183,7 +185,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(value = AccessDeniedException.class)
     public CommonResult<?> accessDeniedExceptionHandler(HttpServletRequest req, AccessDeniedException ex) {
-        log.warn("[accessDeniedExceptionHandler][userId({}) 无法访问 url({})]", SecurityUtils.getLoginUserId(),
+        log.warn("[accessDeniedExceptionHandler][userId({}) 无法访问 url({})]", SecurityFrameworkUtils.getLoginUserId(),
                 req.getRequestURL(), ex);
         return CommonResult.error(FORBIDDEN);
     }
@@ -275,7 +277,7 @@ public class GlobalExceptionHandler {
 //        // 设置其它字段
 //        exceptionLog.setTraceId(MallUtils.getTraceId())
 //                .setApplicationName(applicationName)
-//                .setUri(request.getRequestURI()) // TODO 提升：如果想要优化，可以使用 Swagger 的 @ApiOperation 注解。
+//                .setUri(request.getRequestURI())
 //                .setQueryString(HttpUtil.buildQueryString(request))
 //                .setMethod(request.getMethod())
 //                .setUserAgent(HttpUtil.getUserAgent(request))

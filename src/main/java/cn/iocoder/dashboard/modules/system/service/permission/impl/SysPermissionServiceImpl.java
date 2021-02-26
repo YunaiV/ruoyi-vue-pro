@@ -4,7 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.iocoder.dashboard.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.dashboard.framework.security.core.util.SecurityUtils;
+import cn.iocoder.dashboard.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.dashboard.modules.system.dal.mysql.permission.SysRoleMenuMapper;
 import cn.iocoder.dashboard.modules.system.dal.mysql.permission.SysUserRoleMapper;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.permission.SysMenuDO;
@@ -262,7 +262,7 @@ public class SysPermissionServiceImpl implements SysPermissionService {
         }
 
         // 获得当前登陆的角色。如果为空，说明没有权限
-        Set<Long> roleIds = SecurityUtils.getLoginUserRoleIds();
+        Set<Long> roleIds = SecurityFrameworkUtils.getLoginUserRoleIds();
         if (CollUtil.isEmpty(roleIds)) {
             return false;
         }
@@ -297,7 +297,7 @@ public class SysPermissionServiceImpl implements SysPermissionService {
         }
 
         // 获得当前登陆的角色。如果为空，说明没有权限
-        Set<Long> roleIds = SecurityUtils.getLoginUserRoleIds();
+        Set<Long> roleIds = SecurityFrameworkUtils.getLoginUserRoleIds();
         if (CollUtil.isEmpty(roleIds)) {
             return false;
         }

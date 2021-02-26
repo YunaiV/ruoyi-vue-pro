@@ -1,7 +1,7 @@
 package cn.iocoder.dashboard.framework.web.config;
 
 import cn.iocoder.dashboard.framework.web.core.enums.FilterOrderEnum;
-import cn.iocoder.dashboard.framework.web.core.filter.RequestBodyCacheFilter;
+import cn.iocoder.dashboard.framework.web.core.filter.CacheRequestBodyFilter;
 import cn.iocoder.dashboard.framework.web.core.filter.XssFilter;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -55,8 +55,8 @@ public class WebConfiguration implements WebMvcConfigurer {
      * 创建 RequestBodyCacheFilter Bean，可重复读取请求内容
      */
     @Bean
-    public FilterRegistrationBean<RequestBodyCacheFilter> requestBodyCacheFilter() {
-        return createFilterBean(new RequestBodyCacheFilter(), FilterOrderEnum.REQUEST_BODY_CACHE_FILTER);
+    public FilterRegistrationBean<CacheRequestBodyFilter> requestBodyCacheFilter() {
+        return createFilterBean(new CacheRequestBodyFilter(), FilterOrderEnum.REQUEST_BODY_CACHE_FILTER);
     }
 
     /**

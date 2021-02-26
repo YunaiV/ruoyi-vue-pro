@@ -8,7 +8,7 @@ import cn.iocoder.dashboard.common.pojo.CommonResult;
 import cn.iocoder.dashboard.framework.logger.operatelog.core.annotations.OperateLog;
 import cn.iocoder.dashboard.framework.logger.operatelog.core.enums.OperateTypeEnum;
 import cn.iocoder.dashboard.framework.logger.operatelog.core.service.OperateLogFrameworkService;
-import cn.iocoder.dashboard.framework.security.core.util.SecurityUtils;
+import cn.iocoder.dashboard.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.dashboard.framework.tracer.core.util.TracerUtils;
 import cn.iocoder.dashboard.modules.system.controller.logger.vo.operatelog.SysOperateLogCreateReqVO;
 import cn.iocoder.dashboard.util.json.JsonUtils;
@@ -148,7 +148,7 @@ public class OperateLogAspect {
     }
 
     private static void fillUserFields(SysOperateLogCreateReqVO operateLogVO) {
-        operateLogVO.setUserId(SecurityUtils.getLoginUserId());
+        operateLogVO.setUserId(SecurityFrameworkUtils.getLoginUserId());
     }
 
     private static void fillModuleFields(SysOperateLogCreateReqVO operateLogVO,
