@@ -1,11 +1,11 @@
-package cn.iocoder.dashboard.modules.system.dal.mysql.logger;
+package cn.iocoder.dashboard.modules.infra.dal.mysql.logger;
 
 import cn.iocoder.dashboard.common.pojo.PageResult;
 import cn.iocoder.dashboard.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.dashboard.framework.mybatis.core.query.QueryWrapperX;
-import cn.iocoder.dashboard.modules.system.controller.logger.vo.apiaccesslog.SysApiAccessLogExportReqVO;
-import cn.iocoder.dashboard.modules.system.controller.logger.vo.apiaccesslog.SysApiAccessLogPageReqVO;
-import cn.iocoder.dashboard.modules.system.dal.dataobject.logger.SysApiAccessLogDO;
+import cn.iocoder.dashboard.modules.infra.controller.logger.vo.apiaccesslog.InfApiAccessLogExportReqVO;
+import cn.iocoder.dashboard.modules.infra.controller.logger.vo.apiaccesslog.InfApiAccessLogPageReqVO;
+import cn.iocoder.dashboard.modules.infra.dal.dataobject.logger.InfApiAccessLogDO;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -16,10 +16,10 @@ import java.util.List;
  * @author 芋道源码
  */
 @Mapper
-public interface SysApiAccessLogMapper extends BaseMapperX<SysApiAccessLogDO> {
+public interface InfApiAccessLogMapper extends BaseMapperX<InfApiAccessLogDO> {
 
-    default PageResult<SysApiAccessLogDO> selectPage(SysApiAccessLogPageReqVO reqVO) {
-        return selectPage(reqVO, new QueryWrapperX<SysApiAccessLogDO>()
+    default PageResult<InfApiAccessLogDO> selectPage(InfApiAccessLogPageReqVO reqVO) {
+        return selectPage(reqVO, new QueryWrapperX<InfApiAccessLogDO>()
                 .eqIfPresent("user_id", reqVO.getUserId())
                 .eqIfPresent("user_type", reqVO.getUserType())
                 .eqIfPresent("application_name", reqVO.getApplicationName())
@@ -27,11 +27,12 @@ public interface SysApiAccessLogMapper extends BaseMapperX<SysApiAccessLogDO> {
                 .betweenIfPresent("begin_time", reqVO.getBeginBeginTime(), reqVO.getEndBeginTime())
                 .geIfPresent("duration", reqVO.getDuration())
                 .eqIfPresent("result_code", reqVO.getResultCode())
+                .orderByDesc("id")
         );
     }
 
-    default List<SysApiAccessLogDO> selectList(SysApiAccessLogExportReqVO reqVO) {
-        return selectList(new QueryWrapperX<SysApiAccessLogDO>()
+    default List<InfApiAccessLogDO> selectList(InfApiAccessLogExportReqVO reqVO) {
+        return selectList(new QueryWrapperX<InfApiAccessLogDO>()
                 .eqIfPresent("user_id", reqVO.getUserId())
                 .eqIfPresent("user_type", reqVO.getUserType())
                 .eqIfPresent("application_name", reqVO.getApplicationName())
@@ -39,6 +40,7 @@ public interface SysApiAccessLogMapper extends BaseMapperX<SysApiAccessLogDO> {
                 .betweenIfPresent("begin_time", reqVO.getBeginBeginTime(), reqVO.getEndBeginTime())
                 .geIfPresent("duration", reqVO.getDuration())
                 .eqIfPresent("result_code", reqVO.getResultCode())
+                .orderByDesc("id")
         );
     }
 

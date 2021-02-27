@@ -1,4 +1,4 @@
-package cn.iocoder.dashboard.modules.system.controller.logger.vo.apiaccesslog;
+package cn.iocoder.dashboard.modules.infra.controller.logger.vo.apiaccesslog;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -9,9 +9,9 @@ import java.util.Date;
 
 import static cn.iocoder.dashboard.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
-@ApiModel(value = "API 访问日志 Excel 导出 Request VO", description = "参数和 SysApiAccessLogPageReqVO 是一致的")
+@ApiModel(value = "API 访问日志 Excel 导出 Request VO", description = "参数和 InfApiAccessLogPageReqVO 是一致的")
 @Data
-public class SysApiAccessLogExportReqVO {
+public class InfApiAccessLogExportReqVO {
 
     @ApiModelProperty(value = "用户编号", example = "666")
     private Long userId;

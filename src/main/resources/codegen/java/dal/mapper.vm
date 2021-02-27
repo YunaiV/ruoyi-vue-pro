@@ -52,12 +52,13 @@ public interface ${table.className}Mapper extends BaseMapperX<${table.className}
     default PageResult<${table.className}DO> selectPage(${table.className}PageReqVO reqVO) {
         return selectPage(reqVO, new QueryWrapperX<${table.className}DO>()
 			#listCondition()
+			.orderByDesc("id")# 大多数情况下，id 倒序
         );
     }
 
     default List<${table.className}DO> selectList(${table.className}ExportReqVO reqVO) {
         return selectList(new QueryWrapperX<${table.className}DO>()
-			#listCondition()
+			#listCondition()# 大多数情况下，id 倒序
         );
     }
 

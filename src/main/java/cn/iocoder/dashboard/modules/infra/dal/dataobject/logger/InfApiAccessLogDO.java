@@ -1,4 +1,4 @@
-package cn.iocoder.dashboard.modules.system.dal.dataobject.logger;
+package cn.iocoder.dashboard.modules.infra.dal.dataobject.logger;
 
 import cn.iocoder.dashboard.common.enums.UserTypeEnum;
 import cn.iocoder.dashboard.common.pojo.CommonResult;
@@ -14,14 +14,14 @@ import java.util.Date;
  *
  * @author 芋道源码
  */
-@TableName("sys_api_access_log")
+@TableName("inf_api_access_log")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SysApiAccessLogDO extends BaseDO {
+public class InfApiAccessLogDO extends BaseDO {
 
     /**
      * 编号

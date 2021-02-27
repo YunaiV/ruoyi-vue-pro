@@ -1,4 +1,4 @@
-package cn.iocoder.dashboard.modules.system.controller.logger.vo.apiaccesslog;
+package cn.iocoder.dashboard.modules.infra.controller.logger.vo.apiaccesslog;
 
 import cn.iocoder.dashboard.framework.excel.core.annotations.DictFormat;
 import cn.iocoder.dashboard.framework.excel.core.convert.DictConvert;
@@ -15,7 +15,7 @@ import static cn.iocoder.dashboard.modules.system.enums.dict.SysDictTypeEnum.USE
  * @author 芋道源码
  */
 @Data
-public class SysApiAccessLogExcelVO {
+public class InfApiAccessLogExcelVO {
 
     @ExcelProperty("日志主键")
     private Long id;

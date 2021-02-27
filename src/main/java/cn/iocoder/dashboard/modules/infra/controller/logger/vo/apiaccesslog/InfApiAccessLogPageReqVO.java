@@ -1,4 +1,4 @@
-package cn.iocoder.dashboard.modules.system.controller.logger.vo.apiaccesslog;
+package cn.iocoder.dashboard.modules.infra.controller.logger.vo.apiaccesslog;
 
 import cn.iocoder.dashboard.common.pojo.PageParam;
 import io.swagger.annotations.ApiModel;
@@ -16,7 +16,7 @@ import static cn.iocoder.dashboard.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOU
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class SysApiAccessLogPageReqVO extends PageParam {
+public class InfApiAccessLogPageReqVO extends PageParam {
 
     @ApiModelProperty(value = "用户编号", example = "666")
     private Long userId;

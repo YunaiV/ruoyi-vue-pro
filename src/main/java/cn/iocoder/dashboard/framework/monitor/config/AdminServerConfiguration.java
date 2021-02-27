@@ -1,4 +1,4 @@
-package cn.iocoder.dashboard.framework.monitor;
+package cn.iocoder.dashboard.framework.monitor.config;
 
 import de.codecentric.boot.admin.server.config.EnableAdminServer;
 import org.springframework.context.annotation.Configuration;

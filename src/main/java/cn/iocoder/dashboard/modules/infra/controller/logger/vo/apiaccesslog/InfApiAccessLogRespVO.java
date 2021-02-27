@@ -1,4 +1,4 @@
-package cn.iocoder.dashboard.modules.system.controller.logger.vo.apiaccesslog;
+package cn.iocoder.dashboard.modules.infra.controller.logger.vo.apiaccesslog;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -12,7 +12,7 @@ import java.util.Date;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class SysApiAccessLogRespVO extends SysApiAccessLogBaseVO {
+public class InfApiAccessLogRespVO extends InfApiAccessLogBaseVO {
 
     @ApiModelProperty(value = "日志主键", required = true, example = "1024")
     private Long id;

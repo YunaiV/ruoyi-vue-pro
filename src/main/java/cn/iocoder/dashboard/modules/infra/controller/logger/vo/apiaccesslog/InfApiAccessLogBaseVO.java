@@ -1,4 +1,4 @@
-package cn.iocoder.dashboard.modules.system.controller.logger.vo.apiaccesslog;
+package cn.iocoder.dashboard.modules.infra.controller.logger.vo.apiaccesslog;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -14,7 +14,7 @@ import static cn.iocoder.dashboard.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOU
 * 如果子 VO 存在差异的字段，请不要添加到这里，影响 Swagger 文档生成
 */
 @Data
-public class SysApiAccessLogBaseVO {
+public class InfApiAccessLogBaseVO {
 
     @ApiModelProperty(value = "链路追踪编号", required = true, example = "66600cb6-7852-11eb-9439-0242ac130002")
     @NotNull(message = "链路追踪编号不能为空")
