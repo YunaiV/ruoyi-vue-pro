@@ -10,7 +10,7 @@ import lombok.Getter;
  */
 @AllArgsConstructor
 @Getter
-public enum ApiErrorLogProcessStatusEnum {
+public enum InfApiErrorLogProcessStatusEnum {
 
     INIT(0, "未处理"),
     DONE(1, "已处理"),

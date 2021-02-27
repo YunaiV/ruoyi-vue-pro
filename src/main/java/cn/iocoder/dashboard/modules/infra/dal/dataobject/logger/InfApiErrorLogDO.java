@@ -2,7 +2,7 @@ package cn.iocoder.dashboard.modules.infra.dal.dataobject.logger;
 
 import cn.iocoder.dashboard.common.enums.UserTypeEnum;
 import cn.iocoder.dashboard.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.dashboard.modules.infra.enums.logger.ApiErrorLogProcessStatusEnum;
+import cn.iocoder.dashboard.modules.infra.enums.logger.InfApiErrorLogProcessStatusEnum;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.user.SysUserDO;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
@@ -136,7 +136,7 @@ public class InfApiErrorLogDO extends BaseDO {
     /**
      * 处理状态
      *
-     * 枚举 {@link ApiErrorLogProcessStatusEnum}
+     * 枚举 {@link InfApiErrorLogProcessStatusEnum}
      */
     private Integer processStatus;
     /**

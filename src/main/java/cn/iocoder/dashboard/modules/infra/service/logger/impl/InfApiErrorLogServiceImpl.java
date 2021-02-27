@@ -7,13 +7,14 @@ import cn.iocoder.dashboard.modules.infra.controller.logger.vo.apierrorlog.InfAp
 import cn.iocoder.dashboard.modules.infra.convert.logger.InfApiErrorLogConvert;
 import cn.iocoder.dashboard.modules.infra.dal.dataobject.logger.InfApiErrorLogDO;
 import cn.iocoder.dashboard.modules.infra.dal.mysql.logger.InfApiErrorLogMapper;
-import cn.iocoder.dashboard.modules.infra.enums.logger.ApiErrorLogProcessStatusEnum;
+import cn.iocoder.dashboard.modules.infra.enums.logger.InfApiErrorLogProcessStatusEnum;
 import cn.iocoder.dashboard.modules.infra.service.logger.InfApiErrorLogService;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.List;
 
 import static cn.iocoder.dashboard.common.exception.util.ServiceExceptionUtil.exception;
@@ -36,7 +37,7 @@ public class InfApiErrorLogServiceImpl implements InfApiErrorLogService {
     @Async
     public void createApiErrorLogAsync(ApiErrorLogCreateDTO createDTO) {
         InfApiErrorLogDO apiErrorLog = InfApiErrorLogConvert.INSTANCE.convert(createDTO);
-        apiErrorLog.setProcessStatus(ApiErrorLogProcessStatusEnum.INIT.getStatus());
+        apiErrorLog.setProcessStatus(InfApiErrorLogProcessStatusEnum.INIT.getStatus());
         apiErrorLogMapper.insert(apiErrorLog);
     }
 
@@ -56,12 +57,12 @@ public class InfApiErrorLogServiceImpl implements InfApiErrorLogService {
         if (errorLog == null) {
             throw exception(API_ERROR_LOG_NOT_FOUND);
         }
-        if (!ApiErrorLogProcessStatusEnum.INIT.getStatus().equals(errorLog.getProcessStatus())) {
+        if (!InfApiErrorLogProcessStatusEnum.INIT.getStatus().equals(errorLog.getProcessStatus())) {
             throw exception(API_ERROR_LOG_PROCESSED);
         }
         // 标记处理
         apiErrorLogMapper.updateById(InfApiErrorLogDO.builder().id(id).processStatus(processStatus)
-                .processUserId(processStatus).build());
+                .processUserId(processStatus).processTime(new Date()).build());
     }
 
 }

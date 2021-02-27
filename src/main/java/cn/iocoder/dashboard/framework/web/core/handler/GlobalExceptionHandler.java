@@ -48,7 +48,7 @@ import static cn.iocoder.dashboard.common.exception.enums.GlobalErrorCodeConstan
 @Slf4j
 public class GlobalExceptionHandler {
 
-    @Value("spring.application.name")
+    @Value("${spring.application.name}")
     private String applicationName;
 
     @Resource

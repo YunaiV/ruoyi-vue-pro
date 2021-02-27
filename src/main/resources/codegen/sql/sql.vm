@@ -5,7 +5,7 @@ INSERT INTO `sys_menu`(
 )
 VALUES (
     '${table.classComment}管理', '${permissionPrefix}:query', 2, 0, ${table.parentMenuId},
-    '${simpleClassName_strikeCase}', '', '${table.moduleName}/${classNameVar}/index', 1
+    '${simpleClassName_strikeCase}', '', '${table.moduleName}/${classNameVar}/index', 0
 );
 
 -- 按钮父菜单ID
@@ -22,6 +22,6 @@ INSERT INTO `sys_menu`(
 )
 VALUES (
     '${table.tableComment}${functionName}', '${permissionPrefix}:${functionOps.get($index)}', 3, $foreach.count, @parentId,
-    '', '', '', 1
+    '', '', '', 0
 );
 #end

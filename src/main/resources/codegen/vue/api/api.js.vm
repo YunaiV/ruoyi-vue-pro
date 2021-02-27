@@ -19,7 +19,6 @@ export function update${simpleClassName}(data) {
   })
 }
 
-
 // 删除${table.classComment}
 export function delete${simpleClassName}(id) {
   return request({

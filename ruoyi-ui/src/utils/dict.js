@@ -21,6 +21,7 @@ export const DICT_TYPE = {
   INF_REDIS_TIMEOUT_TYPE: 'inf_redis_timeout_type',
   INF_JOB_STATUS: 'inf_job_status',
   INF_JOB_LOG_STATUS: 'inf_job_log_status',
+  INF_API_ERROR_LOG_PROCESS_STATUS: 'inf_api_error_log_process_status',
 
   TOOL_CODEGEN_TEMPLATE_TYPE: 'tool_codegen_template_type',
 }
