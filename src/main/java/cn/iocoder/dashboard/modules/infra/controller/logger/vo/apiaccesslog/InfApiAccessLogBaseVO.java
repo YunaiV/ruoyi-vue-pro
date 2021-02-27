@@ -40,7 +40,7 @@ public class InfApiAccessLogBaseVO {
     @NotNull(message = "请求地址不能为空")
     private String requestUrl;
 
-    @ApiModelProperty(value = "Java 方法的参数")
+    @ApiModelProperty(value = "请求参数")
     private String requestParams;
 
     @ApiModelProperty(value = "用户 IP", required = true, example = "127.0.0.1")

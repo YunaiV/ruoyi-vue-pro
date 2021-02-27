@@ -39,15 +39,6 @@ public class InfApiAccessLogController {
     @Resource
     private InfApiAccessLogService apiAccessLogService;
 
-    @GetMapping("/get")
-    @ApiOperation("获得API 访问日志")
-    @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
-    @PreAuthorize("@ss.hasPermission('infra:api-access-log:query')")
-    public CommonResult<InfApiAccessLogRespVO> getApiAccessLog(@RequestParam("id") Long id) {
-        InfApiAccessLogDO apiAccessLog = apiAccessLogService.getApiAccessLog(id);
-        return success(InfApiAccessLogConvert.INSTANCE.convert(apiAccessLog));
-    }
-
     @GetMapping("/page")
     @ApiOperation("获得API 访问日志分页")
     @PreAuthorize("@ss.hasPermission('infra:api-access-log:query')")

@@ -18,7 +18,7 @@
       <el-form-item label="请求地址" prop="requestUrl">
         <el-input v-model="queryParams.requestUrl" placeholder="请输入请求地址" clearable size="small" @keyup.enter.native="handleQuery"/>
       </el-form-item>
-      <el-form-item label="开始请求时间">
+      <el-form-item label="请求时间">
         <el-date-picker v-model="dateRangeBeginTime" size="small" style="width: 240px" value-format="yyyy-MM-dd"
                         type="daterange" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" />
       </el-form-item>
@@ -45,8 +45,7 @@
 
     <!-- 列表 -->
     <el-table v-loading="loading" :data="list">
-      <el-table-column label="日志主键" align="center" prop="id" />
-      <el-table-column label="链路追踪编号" align="center" prop="traceId" />
+      <el-table-column label="日志编号" align="center" prop="id" />
       <el-table-column label="用户编号" align="center" prop="userId" />
       <el-table-column label="用户类型" align="center" prop="userType">
         <template slot-scope="scope">
@@ -55,31 +54,26 @@
       </el-table-column>>
       <el-table-column label="应用名" align="center" prop="applicationName" />
       <el-table-column label="请求方法名" align="center" prop="requestMethod" />
-      <el-table-column label="请求地址" align="center" prop="requestUrl" />
-      <el-table-column label="Java 方法的参数" align="center" prop="requestParams" />
-      <el-table-column label="用户 IP" align="center" prop="userIp" />
-      <el-table-column label="浏览器 UA" align="center" prop="userAgent" />
-      <el-table-column label="开始请求时间" align="center" prop="beginTime" width="180">
+      <el-table-column label="请求地址" align="center" prop="requestUrl" width="250" />
+      <el-table-column label="请求时间" align="center" prop="beginTime" width="180">
         <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.beginTime, '{y}-{m}-{d}') }}</span>
+          <span>{{ parseTime(scope.row.beginTime) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="结束请求时间" align="center" prop="endTime" width="180">
+      <el-table-column label="执行时长" align="center" prop="startTime">
         <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.endTime, '{y}-{m}-{d}') }}</span>
+          <span>{{ scope.row.duration }}  ms</span>
         </template>
       </el-table-column>
-      <el-table-column label="执行时长" align="center" prop="duration" />
-      <el-table-column label="结果码" align="center" prop="resultCode" />
-      <el-table-column label="结果提示" align="center" prop="resultMsg" />
-      <el-table-column label="创建时间" align="center" prop="createTime" width="180">
+      <el-table-column label="操作结果" align="center" prop="status">
         <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.createTime, '{y}-{m}-{d}') }}</span>
+          <span>{{ scope.row.resultCode === 0 ? '成功' : '失败(' + scope.row.resultMsg + ')' }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-
+          <el-button size="mini" type="text" icon="el-icon-view" @click="handleView(scope.row,scope.index)"
+                     v-hasPermi="['infra:api-access-log:query']">详细</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -87,11 +81,39 @@
     <pagination v-show="total > 0" :total="total" :page.sync="queryParams.pageNo" :limit.sync="queryParams.pageSize"
                 @pagination="getList"/>
 
+    <!-- 操作日志详细 -->
+    <el-dialog title="操作日志详细" :visible.sync="open" width="700px" append-to-body>
+      <el-form ref="form" :model="form" label-width="100px" size="mini">
+        <el-row>
+          <el-col :span="24">
+            <el-form-item label="日志主键：">{{ form.id }}</el-form-item>
+            <el-form-item label="链路追踪：">{{ form.traceId }}</el-form-item>
+            <el-form-item label="链路追踪：">{{ form.applicationName }}</el-form-item>
+            <el-form-item label="用户信息：">
+              {{ form.userId }} | {{ getDictDataLabel(DICT_TYPE.USER_TYPE, form.userType) }} | {{ form.userIp }} | {{ form.userAgent}}
+            </el-form-item>
+            <el-form-item label="请求信息：">{{ form.requestMethod }} | {{ form.requestUrl }} </el-form-item>
+            <el-form-item label="请求参数：">{{ form.requestParams }}</el-form-item>
+            <el-form-item label="开始时间：">
+              {{ parseTime(form.beginTime) }} ~ {{ parseTime(form.endTime) }} | {{ form.duration }} ms
+            </el-form-item>
+            <el-form-item label="操作结果：">
+              <div v-if="form.resultCode === 0">正常</div>
+              <div v-else-if="form.resultCode > 0">失败 | {{ form.resultCode }} || {{ form.resultMsg}}</div>
+            </el-form-item>
+          </el-col>
+        </el-row>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="open = false">关 闭</el-button>
+      </div>
+    </el-dialog>
+
   </div>
 </template>
 
 <script>
-import { getApiAccessLog, getApiAccessLogPage, exportApiAccessLogExcel } from "@/api/infra/apiAccessLog";
+import { getApiAccessLogPage, exportApiAccessLogExcel } from "@/api/infra/apiAccessLog";
 
 export default {
   name: "ApiAccessLog",
@@ -180,6 +202,11 @@ export default {
       this.dateRangeBeginTime = [];
       this.resetForm("queryForm");
       this.handleQuery();
+    },
+    /** 详细按钮操作 */
+    handleView(row) {
+      this.open = true;
+      this.form = row;
     },
     /** 导出按钮操作 */
     handleExport() {

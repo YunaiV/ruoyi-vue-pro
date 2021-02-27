@@ -39,7 +39,7 @@ public class InfApiAccessLogExcelVO {
     @ExcelProperty("请求地址")
     private String requestUrl;
 
-    @ExcelProperty("Java 方法的参数")
+    @ExcelProperty("请求参数")
     private String requestParams;
 
     @ExcelProperty("用户 IP")

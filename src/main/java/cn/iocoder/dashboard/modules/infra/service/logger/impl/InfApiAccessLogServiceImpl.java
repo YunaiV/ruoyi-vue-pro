@@ -37,11 +37,6 @@ public class InfApiAccessLogServiceImpl implements InfApiAccessLogService {
     }
 
     @Override
-    public InfApiAccessLogDO getApiAccessLog(Long id) {
-        return apiAccessLogMapper.selectById(id);
-    }
-
-    @Override
     public PageResult<InfApiAccessLogDO> getApiAccessLogPage(InfApiAccessLogPageReqVO pageReqVO) {
         return apiAccessLogMapper.selectPage(pageReqVO);
     }

@@ -115,13 +115,8 @@
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-          <el-button
-            size="mini"
-            type="text"
-            icon="el-icon-view"
-            @click="handleView(scope.row,scope.index)"
-            v-hasPermi="['system:operate-log:query']"
-          >详细</el-button>
+          <el-button size="mini" type="text" icon="el-icon-view" @click="handleView(scope.row,scope.index)"
+                     v-hasPermi="['system:operate-log:query']">详细</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -135,7 +130,7 @@
     />
 
     <!-- 操作日志详细 -->
-    <el-dialog title="操作日志详细" :visible.sync="open" width="700px" append-to-body>
+    <el-dialog title="访问日志详细" :visible.sync="open" width="700px" append-to-body>
       <el-form ref="form" :model="form" label-width="100px" size="mini">
         <el-row>
           <el-col :span="24">
