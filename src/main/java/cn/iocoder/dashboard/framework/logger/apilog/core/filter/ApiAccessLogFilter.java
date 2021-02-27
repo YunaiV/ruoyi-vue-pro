@@ -68,20 +68,20 @@ public class ApiAccessLogFilter extends OncePerRequestFilter {
 
     private void createApiAccessLog(HttpServletRequest request, Date beginTime,
                                     Map<String, String> queryString, String requestBody, Exception ex) {
+        ApiAccessLogCreateDTO accessLog = new ApiAccessLogCreateDTO();
         try {
-            ApiAccessLogCreateDTO accessLog = this.buildApiAccessLogDTO(request, beginTime, queryString, requestBody, ex);
+            this.buildApiAccessLogDTO(accessLog, request, beginTime, queryString, requestBody, ex);
             apiAccessLogFrameworkService.createApiAccessLogAsync(accessLog);
-        } catch (Exception e) {
-            log.error("[createApiAccessLog][url({}) 发生异常]", request.getRequestURI(), e);
+        } catch (Throwable th) {
+            log.error("[createApiAccessLog][url({}) log({}) 发生异常]", request.getRequestURI(), JsonUtils.toJsonString(accessLog), th);
         }
     }
 
-    private ApiAccessLogCreateDTO buildApiAccessLogDTO(HttpServletRequest request, Date beginTime,
-                                                       Map<String, String> queryString, String requestBody, Exception ex) {
-        ApiAccessLogCreateDTO accessLog = new ApiAccessLogCreateDTO();
+    private void buildApiAccessLogDTO(ApiAccessLogCreateDTO accessLog, HttpServletRequest request, Date beginTime,
+                                      Map<String, String> queryString, String requestBody, Exception ex) {
         // 处理用户信息
         accessLog.setUserId(WebFrameworkUtils.getLoginUserId(request));
-        accessLog.setUserType(WebFrameworkUtils.getUsrType(request));
+        accessLog.setUserType(WebFrameworkUtils.getUesrType(request));
         // 设置访问结果
         CommonResult<?> result = WebFrameworkUtils.getCommonResult(request);
         if (result != null) {
@@ -107,7 +107,6 @@ public class ApiAccessLogFilter extends OncePerRequestFilter {
         accessLog.setBeginTime(beginTime);
         accessLog.setEndTime(new Date());
         accessLog.setDuration((int) DateUtils.diff(accessLog.getEndTime(), accessLog.getBeginTime()));
-        return accessLog;
     }
 
 }

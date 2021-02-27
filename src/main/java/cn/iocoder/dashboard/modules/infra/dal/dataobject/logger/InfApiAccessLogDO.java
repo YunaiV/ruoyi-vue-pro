@@ -51,6 +51,8 @@ public class InfApiAccessLogDO extends BaseDO {
      */
     private String applicationName;
 
+    // ========== 请求相关字段 ==========
+
     /**
      * 请求方法名
      */
@@ -74,6 +76,8 @@ public class InfApiAccessLogDO extends BaseDO {
      * 浏览器 UA
      */
     private String userAgent;
+
+    // ========== 执行相关字段 ==========
 
     /**
      * 开始请求时间

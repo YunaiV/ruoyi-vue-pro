@@ -30,7 +30,7 @@ public class InfApiAccessLogServiceImpl implements InfApiAccessLogService {
 
     @Override
     @Async
-    public void createApiAccessLogAsync(@Valid ApiAccessLogCreateDTO createDTO) {
+    public void createApiAccessLogAsync(ApiAccessLogCreateDTO createDTO) {
         // 插入
         InfApiAccessLogDO apiAccessLog = InfApiAccessLogConvert.INSTANCE.convert(createDTO);
         apiAccessLogMapper.insert(apiAccessLog);
