@@ -1,6 +1,5 @@
 package cn.iocoder.dashboard.modules.tool.service.codegen.impl;
 
-import cn.iocoder.dashboard.TestApplication;
 import cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen.ToolCodegenColumnDO;
 import cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen.ToolCodegenTableDO;
 import cn.iocoder.dashboard.modules.tool.dal.mysql.coegen.ToolCodegenColumnMapper;
@@ -12,7 +11,7 @@ import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
 
-@SpringBootTest(classes = TestApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest
 public class ToolCodegenEngineTest {
 
     @Resource

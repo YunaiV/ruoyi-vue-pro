@@ -1,12 +1,11 @@
 package cn.iocoder.dashboard.modules.tool.service.codegen.impl;
 
-import cn.iocoder.dashboard.TestApplication;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.annotation.Resource;
 
-@SpringBootTest(classes = TestApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest
 class ToolCodegenServiceImplTest {
 
     @Resource

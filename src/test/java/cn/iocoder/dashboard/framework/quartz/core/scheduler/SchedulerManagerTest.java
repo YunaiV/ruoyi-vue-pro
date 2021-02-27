@@ -1,7 +1,6 @@
 package cn.iocoder.dashboard.framework.quartz.core.scheduler;
 
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.dashboard.TestApplication;
 import cn.iocoder.dashboard.modules.system.job.auth.SysUserSessionTimeoutJob;
 import org.junit.jupiter.api.Test;
 import org.quartz.SchedulerException;
@@ -9,9 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.annotation.Resource;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-@SpringBootTest(classes = TestApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest
 class SchedulerManagerTest {
 
     @Resource

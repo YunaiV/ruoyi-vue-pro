@@ -1,6 +1,5 @@
 package cn.iocoder.dashboard.modules.tool.dal.mysql.coegen;
 
-import cn.iocoder.dashboard.TestApplication;
 import cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen.ToolSchemaTableDO;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -10,7 +9,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@SpringBootTest(classes = TestApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest
 class ToolInformationSchemaTableMapperTest {
 
     @Resource

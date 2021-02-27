@@ -4,6 +4,7 @@ import cn.iocoder.dashboard.framework.security.core.filter.JwtAuthenticationToke
 import cn.iocoder.dashboard.framework.security.core.handler.LogoutSuccessHandlerImpl;
 import cn.iocoder.dashboard.framework.web.config.WebProperties;
 import de.codecentric.boot.admin.server.config.AdminServerProperties;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
@@ -68,8 +69,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
      * 由于 Spring Security 创建 AuthenticationManager 对象时，没声明 @Bean 注解，导致无法被注入
      * 通过覆写父类的该方法，添加 @Bean 注解，解决该问题
      */
-    @Bean
     @Override
+    @Bean
+    @ConditionalOnMissingBean(AuthenticationManager.class)
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
     }
