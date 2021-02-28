@@ -117,10 +117,10 @@ public class InfConfigServiceImpl implements InfConfigService {
         }
         // 如果 id 为空，说明不用比较是否为相同 id 的参数配置
         if (id == null) {
-            throw ServiceExceptionUtil.exception(CONFIG_NAME_DUPLICATE);
+            throw ServiceExceptionUtil.exception(CONFIG_KEY_DUPLICATE);
         }
         if (!config.getId().equals(id)) {
-            throw ServiceExceptionUtil.exception(CONFIG_NAME_DUPLICATE);
+            throw ServiceExceptionUtil.exception(CONFIG_KEY_DUPLICATE);
         }
     }
 
