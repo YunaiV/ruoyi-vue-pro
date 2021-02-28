@@ -10,10 +10,10 @@ import cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen.ToolCodegenColum
 import cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen.ToolCodegenTableDO;
 import cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen.ToolSchemaColumnDO;
 import cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen.ToolSchemaTableDO;
-import cn.iocoder.dashboard.modules.tool.dal.mysql.coegen.ToolCodegenColumnMapper;
-import cn.iocoder.dashboard.modules.tool.dal.mysql.coegen.ToolCodegenTableMapper;
-import cn.iocoder.dashboard.modules.tool.dal.mysql.coegen.ToolSchemaColumnMapper;
-import cn.iocoder.dashboard.modules.tool.dal.mysql.coegen.ToolSchemaTableMapper;
+import cn.iocoder.dashboard.modules.tool.dal.mysql.codegen.ToolCodegenColumnMapper;
+import cn.iocoder.dashboard.modules.tool.dal.mysql.codegen.ToolCodegenTableMapper;
+import cn.iocoder.dashboard.modules.tool.dal.mysql.codegen.ToolSchemaColumnMapper;
+import cn.iocoder.dashboard.modules.tool.dal.mysql.codegen.ToolSchemaTableMapper;
 import cn.iocoder.dashboard.modules.tool.enums.codegen.ToolCodegenImportTypeEnum;
 import cn.iocoder.dashboard.modules.tool.service.codegen.ToolCodegenService;
 import cn.iocoder.dashboard.util.collection.CollectionUtils;

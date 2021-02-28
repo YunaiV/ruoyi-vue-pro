@@ -1,6 +1,7 @@
 spring:
   main:
-    lazy-initialization: true
+    lazy-initialization: true # 开启懒加载，加快速度
+    banner-mode: off # 单元测试，禁用 Banner
 
   # 去除的自动配置项
   autoconfigure:
@@ -9,6 +10,11 @@ spring:
       - org.springframework.boot.autoconfigure.security.reactive.ReactiveSecurityAutoConfiguration # 单元测试，禁用 SpringSecurity
       - org.springframework.boot.autoconfigure.quartz.QuartzAutoConfiguration # 单元测试，禁用 Quartz
       - com.baomidou.lock.spring.boot.autoconfigure.LockAutoConfiguration # 单元测试，禁用 Lock4j 分布式锁
+
+# Swagger 接口文档的自动配置（单元测试，禁用 Swagger)
+springfox:
+  documentation:
+    auto-startup: false
 
 --- #################### 数据库相关配置 ####################
 
@@ -25,7 +31,7 @@ spring:
   # Redis 配置。Redisson 默认的配置足够使用，一般不需要进行调优
   redis:
     host: 127.0.0.1 # 地址
-    port: 6379 # 端口
+    port: 36379 # 端口（单元测试，使用 363979 端口）
     database: 0 # 数据库索引
 
 --- #################### 定时任务相关配置 ####################
@@ -70,10 +76,7 @@ spring:
       # Spring Boot Admin Server 服务端的相关配置
       context-path: /admin # 配置 Spring
 
-# 日志文件配置
-logging:
-  file:
-    path: ${user.home}/logs/ # 日志文件的路径
+# 日志文件配置（不需要配置）
 
 --- #################### 芋道相关配置 ####################
 

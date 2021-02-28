@@ -1,4 +1,4 @@
-package cn.iocoder.dashboard.modules.tool.dal.mysql.coegen;
+package cn.iocoder.dashboard.modules.tool.dal.mysql.codegen;
 
 import cn.iocoder.dashboard.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.dashboard.framework.mybatis.core.query.QueryWrapperX;

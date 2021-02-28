@@ -2,8 +2,8 @@ package cn.iocoder.dashboard.modules.tool.service.codegen.impl;
 
 import cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen.ToolCodegenColumnDO;
 import cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen.ToolCodegenTableDO;
-import cn.iocoder.dashboard.modules.tool.dal.mysql.coegen.ToolCodegenColumnMapper;
-import cn.iocoder.dashboard.modules.tool.dal.mysql.coegen.ToolCodegenTableMapper;
+import cn.iocoder.dashboard.modules.tool.dal.mysql.codegen.ToolCodegenColumnMapper;
+import cn.iocoder.dashboard.modules.tool.dal.mysql.codegen.ToolCodegenTableMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 

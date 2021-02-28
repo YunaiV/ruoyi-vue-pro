@@ -1,5 +1,6 @@
 package cn.iocoder.dashboard.modules.infra.service.config;
 
+import cn.iocoder.dashboard.BaseSpringBootUnitTest;
 import cn.iocoder.dashboard.common.exception.ServiceException;
 import cn.iocoder.dashboard.modules.infra.controller.config.vo.InfConfigCreateReqVO;
 import cn.iocoder.dashboard.modules.infra.dal.dataobject.config.InfConfigDO;
@@ -9,9 +10,7 @@ import cn.iocoder.dashboard.modules.infra.mq.producer.config.InfConfigProducer;
 import cn.iocoder.dashboard.modules.infra.service.config.impl.InfConfigServiceImpl;
 import cn.iocoder.dashboard.util.AssertUtils;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 
 import javax.annotation.Resource;
@@ -21,10 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-@SpringBootTest
-@ActiveProfiles("unit-test")
-@Sql(scripts = "/sql/clean.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
-public class InfConfigServiceImplTest {
+public class InfConfigServiceImplTest extends BaseSpringBootUnitTest {
 
     @Resource
     private InfConfigServiceImpl configService;

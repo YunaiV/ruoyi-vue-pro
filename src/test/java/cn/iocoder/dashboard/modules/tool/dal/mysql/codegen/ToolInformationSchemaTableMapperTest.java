@@ -1,4 +1,4 @@
-package cn.iocoder.dashboard.modules.tool.dal.mysql.coegen;
+package cn.iocoder.dashboard.modules.tool.dal.mysql.codegen;
 
 import cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen.ToolSchemaTableDO;
 import org.junit.jupiter.api.Test;

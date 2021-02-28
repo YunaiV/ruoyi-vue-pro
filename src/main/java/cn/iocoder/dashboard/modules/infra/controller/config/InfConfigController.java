@@ -13,7 +13,6 @@ import cn.iocoder.dashboard.modules.infra.service.config.InfConfigService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,19 +28,6 @@ import static cn.iocoder.dashboard.modules.infra.enums.InfErrorCodeConstants.CON
 @RestController
 @RequestMapping("/infra/config")
 public class InfConfigController {
-
-    @Value("${demo.test}")
-    private String demo;
-
-    @GetMapping("/demo")
-    public String demo() {
-        return demo;
-    }
-
-    @PostMapping("/demo")
-    public void setDemo() {
-
-    }
 
     @Resource
     private InfConfigService configService;
