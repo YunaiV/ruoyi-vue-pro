@@ -1,7 +1,7 @@
 package cn.iocoder.dashboard.config;
 
-import io.reactivex.rxjava3.core.Scheduler;
 import org.mockito.Mockito;
+import org.quartz.impl.StdScheduler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
@@ -11,8 +11,8 @@ import org.springframework.context.annotation.Lazy;
 public class QuartzTestConfiguration {
 
     @Bean
-    public Scheduler scheduler() {
-        return Mockito.mock(Scheduler.class);
+    public StdScheduler scheduler() {
+        return Mockito.mock(StdScheduler.class);
     }
 
 }

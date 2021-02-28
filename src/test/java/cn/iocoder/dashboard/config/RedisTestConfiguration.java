@@ -18,12 +18,24 @@ import java.io.IOException;
 @AutoConfigureBefore({RedisAutoConfiguration.class, RedissonAutoConfiguration.class}) // 在 Redis 自动配置前，进行初始化
 public class RedisTestConfiguration {
 
+//    /**
+//     * 创建模拟的 Redis Server 服务器
+//     */
+//    @Bean(initMethod = "start", destroyMethod = "stop")
+//    public RedisServer redisServer(RedisProperties properties) throws IOException {
+//        return new RedisServer(properties.getPort());
+//    }
+
     /**
      * 创建模拟的 Redis Server 服务器
      */
-    @Bean(initMethod = "start", destroyMethod = "stop")
+    @Bean(destroyMethod = "stop")
     public RedisServer redisServer(RedisProperties properties) throws IOException {
-        return new RedisServer(properties.getPort());
+        RedisServer redisServer = new RedisServer(properties.getPort());
+        try {
+            redisServer.start();
+        } catch (Exception ignore) {}
+        return redisServer;
     }
 
 }
