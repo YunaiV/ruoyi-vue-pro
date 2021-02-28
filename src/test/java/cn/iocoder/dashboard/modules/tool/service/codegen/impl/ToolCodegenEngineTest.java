@@ -1,5 +1,6 @@
 package cn.iocoder.dashboard.modules.tool.service.codegen.impl;
 
+import cn.iocoder.dashboard.BaseSpringBootUnitTest;
 import cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen.ToolCodegenColumnDO;
 import cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen.ToolCodegenTableDO;
 import cn.iocoder.dashboard.modules.tool.dal.mysql.codegen.ToolCodegenColumnMapper;
@@ -11,8 +12,7 @@ import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
 
-@SpringBootTest
-public class ToolCodegenEngineTest {
+public class ToolCodegenEngineTest extends BaseSpringBootUnitTest {
 
     @Resource
     private ToolCodegenTableMapper codegenTableMapper;

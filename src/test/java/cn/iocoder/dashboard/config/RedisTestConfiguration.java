@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Lazy;
 
 import java.io.IOException;
 
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @Lazy(false) // 禁用懒加载，因为需要保证 Redis Server 必须先启动
 @EnableConfigurationProperties(RedisProperties.class)
 @AutoConfigureBefore({RedisAutoConfiguration.class, RedissonAutoConfiguration.class}) // 在 Redis 自动配置前，进行初始化
@@ -32,6 +32,7 @@ public class RedisTestConfiguration {
     @Bean(destroyMethod = "stop")
     public RedisServer redisServer(RedisProperties properties) throws IOException {
         RedisServer redisServer = new RedisServer(properties.getPort());
+        // TODO 芋艿：一次执行多个单元测试时，貌似创建多个 spring 容器，导致不进行 stop。这样，就导致端口被占用，无法启动。。。
         try {
             redisServer.start();
         } catch (Exception ignore) {}
