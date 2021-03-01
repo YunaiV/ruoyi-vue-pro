@@ -7,8 +7,7 @@ import cn.iocoder.dashboard.modules.system.enums.common.SysSexEnum;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.Date;
@@ -22,6 +21,9 @@ import java.util.Set;
 @TableName(value = "sys_user", autoResultMap = true)
 @Data
 @EqualsAndHashCode(callSuper = true)
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class SysUserDO extends BaseDO {
 
     /**

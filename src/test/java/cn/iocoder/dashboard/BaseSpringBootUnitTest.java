@@ -9,7 +9,7 @@ import org.springframework.test.context.jdbc.Sql;
 
 import javax.annotation.Resource;
 
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
 @ActiveProfiles("unit-test") // 设置使用 application-unit-test 配置文件
 @Sql(scripts = "/sql/clean.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD) // 每个单元测试结束后，清理 DB
 public class BaseSpringBootUnitTest {
