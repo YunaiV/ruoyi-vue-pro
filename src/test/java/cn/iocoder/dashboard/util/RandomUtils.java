@@ -1,9 +1,14 @@
 package cn.iocoder.dashboard.util;
 
-import cn.hutool.core.util.*;
+import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.RandomUtil;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.user.SysUserDO;
+import uk.co.jemos.podam.api.PodamFactory;
+import uk.co.jemos.podam.api.PodamFactoryImpl;
 
-import java.lang.reflect.Field;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.function.Consumer;
 
 /**
  * 随机工具类
@@ -13,6 +18,10 @@ import java.lang.reflect.Field;
 public class RandomUtils {
 
     private static final int RANDOM_STRING_LENGTH = 10;
+
+    private static final int RANDOM_DATE_MAX = 30;
+
+    private static final PodamFactory PODAM_FACTORY = new PodamFactoryImpl();
 
     public static String randomString() {
         return RandomUtil.randomString(RANDOM_STRING_LENGTH);
@@ -26,41 +35,27 @@ public class RandomUtils {
         return RandomUtil.randomInt(0, Integer.MAX_VALUE);
     }
 
+    public static Date randomDate() {
+        return RandomUtil.randomDay(0, RANDOM_DATE_MAX);
+    }
+
     public static Short randomShort() {
         return (short) RandomUtil.randomInt(0, Short.MAX_VALUE);
     }
 
-    public static SysUserDO randomUserDO() {
-        SysUserDO user = randomObject(SysUserDO.class);
-        return user;
+    @SafeVarargs
+    public static SysUserDO randomUserDO(Consumer<SysUserDO>... consumers) {
+        return randomPojo(SysUserDO.class, consumers);
     }
 
-    private static <T> T randomObject(Class<T> clazz) {
-        // 创建对象
-        T object = ReflectUtil.newInstance(clazz);
-        // 遍历属性，设置随机值
-        for (Field field : ReflectUtil.getFields(clazz)) {
-            // 数字类型
-            if (field.getType() == Long.class) {
-                ReflectUtil.setFieldValue(object, field, randomLong());
-                continue;
-            }
-            if (field.getType() == Integer.class) {
-                ReflectUtil.setFieldValue(object, field, randomInteger());
-                continue;
-            }
-            if (field.getType() == Short.class) {
-                ReflectUtil.setFieldValue(object, field, randomShort());
-                continue;
-            }
-            // 字符串类型
-            if (field.getType() == String.class) {
-                ReflectUtil.setFieldValue(object, field, randomString());
-                continue;
-            }
-//            System.out.println();
+    @SafeVarargs
+    private static <T> T randomPojo(Class<T> clazz, Consumer<T>... consumers) {
+        T pojo = PODAM_FACTORY.manufacturePojo(clazz);
+        // 非空时，回调逻辑。通过它，可以实现 Pojo 的进一步处理
+        if (ArrayUtil.isNotEmpty(consumers)) {
+            Arrays.stream(consumers).forEach(consumer -> consumer.accept(pojo));
         }
-        return object;
+        return pojo;
     }
 
 }

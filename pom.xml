@@ -190,6 +190,13 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>uk.co.jemos.podam</groupId> <!-- 单元测试，随机生成 POJO 类 -->
+            <artifactId>podam</artifactId>
+            <version>7.2.6.RELEASE</version>
+            <scope>test</scope>
+        </dependency>
+
         <!-- 工具类相关 -->
         <dependency>
             <groupId>org.projectlombok</groupId>

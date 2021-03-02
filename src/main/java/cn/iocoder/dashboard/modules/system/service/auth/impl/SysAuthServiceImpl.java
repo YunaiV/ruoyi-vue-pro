@@ -85,7 +85,7 @@ public class SysAuthServiceImpl implements SysAuthService {
     @Override
     public String login(SysAuthLoginReqVO reqVO, String userIp, String userAgent) {
         // 判断验证码是否正确
-//        this.verifyCaptcha(reqVO.getUsername(), reqVO.getUuid(), reqVO.getCode());
+        this.verifyCaptcha(reqVO.getUsername(), reqVO.getUuid(), reqVO.getCode());
 
         // 使用账号密码，进行登陆。
         LoginUser loginUser = this.login0(reqVO.getUsername(), reqVO.getPassword());
@@ -99,11 +99,13 @@ public class SysAuthServiceImpl implements SysAuthService {
         String code = captchaService.getCaptchaCode(captchaUUID);
         // 验证码不存在
         if (code == null) {
+            // 创建登陆失败日志（验证码不存在）
             this.createLoginLog(username, SysLoginResultEnum.CAPTCHA_NOT_FOUND);
             throw ServiceExceptionUtil.exception(AUTH_LOGIN_CAPTCHA_NOT_FOUND);
         }
         // 验证码不正确
         if (!code.equals(captchaCode)) {
+            // 创建登陆失败日志（验证码不正确)
             this.createLoginLog(username, SysLoginResultEnum.CAPTCHA_CODE_ERROR);
             throw ServiceExceptionUtil.exception(AUTH_LOGIN_CAPTCHA_CODE_ERROR);
         }

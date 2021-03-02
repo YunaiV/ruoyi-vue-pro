@@ -32,6 +32,6 @@ public class BaseDO implements Serializable {
      * 是否删除
      */
     @TableLogic
-    private Integer deleted;
+    private Boolean deleted;
 
 }

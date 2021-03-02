@@ -1,5 +1,6 @@
 package cn.iocoder.dashboard.util;
 
+import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.iocoder.dashboard.common.exception.ErrorCode;
 import cn.iocoder.dashboard.common.exception.ServiceException;
@@ -22,10 +23,15 @@ public class AssertUtils {
      *
      * @param expected 期望对象
      * @param actual 实际对象
+     * @param ignoreFields 忽略的属性数组
      */
-    public static void assertEquals(Object expected, Object actual) {
+    public static void assertEquals(Object expected, Object actual, String... ignoreFields) {
         Field[] expectedFields = ReflectUtil.getFields(expected.getClass());
         Arrays.stream(expectedFields).forEach(expectedField -> {
+            // 如果是忽略的属性，则不进行比对
+            if (ArrayUtil.contains(ignoreFields, expectedField.getName())) {
+                return;
+            }
             // 忽略不存在的属性
             Field actualField = ReflectUtil.getField(actual.getClass(), expectedField.getName());
             if (actualField == null) {
