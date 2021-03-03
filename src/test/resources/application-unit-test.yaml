@@ -10,6 +10,8 @@ spring:
       - org.springframework.boot.autoconfigure.security.reactive.ReactiveSecurityAutoConfiguration # 单元测试，禁用 SpringSecurity
       - org.springframework.boot.autoconfigure.quartz.QuartzAutoConfiguration # 单元测试，禁用 Quartz
       - com.baomidou.lock.spring.boot.autoconfigure.LockAutoConfiguration # 单元测试，禁用 Lock4j 分布式锁
+      - org.springframework.boot.autoconfigure.task.TaskSchedulingAutoConfiguration # 单元测试，禁用 Scheduler 定时任务
+      - org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration # 项目没有使用 Spring Data，所以禁用配置类，加速启动
 
 # Swagger 接口文档的自动配置（单元测试，禁用 Swagger)
 springfox:

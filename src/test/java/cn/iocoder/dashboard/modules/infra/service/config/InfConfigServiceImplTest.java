@@ -11,11 +11,13 @@ import cn.iocoder.dashboard.modules.infra.service.config.impl.InfConfigServiceIm
 import cn.iocoder.dashboard.util.AssertUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.jdbc.Sql;
 
 import javax.annotation.Resource;
 
+import static cn.hutool.core.util.RandomUtil.randomEle;
 import static cn.iocoder.dashboard.modules.infra.enums.InfErrorCodeConstants.CONFIG_KEY_DUPLICATE;
+import static cn.iocoder.dashboard.util.RandomUtils.randomInfConfigCreateReqVO;
+import static cn.iocoder.dashboard.util.RandomUtils.randomInfConfigDO;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -34,13 +36,7 @@ public class InfConfigServiceImplTest extends BaseSpringBootUnitTest {
     @Test
     public void testCreateConfig_success() {
         // 入参
-        InfConfigCreateReqVO reqVO = new InfConfigCreateReqVO();
-        reqVO.setGroup("test_group");
-        reqVO.setName("test_name");
-        reqVO.setValue("test_value");
-        reqVO.setSensitive(true);
-        reqVO.setRemark("test_remark");
-        reqVO.setKey("test_key");
+        InfConfigCreateReqVO reqVO = randomInfConfigCreateReqVO();
         // mock
 
         // 调用
@@ -56,17 +52,14 @@ public class InfConfigServiceImplTest extends BaseSpringBootUnitTest {
     }
 
     @Test
-    @Sql(statements = "INSERT INTO `inf_config`(`group`, `type`, `name`, `key`, `value`, `sensitive`)  VALUES ('test_group', 1, 'test_name', 'test_key', 'test_value', 1);")
     public void testCreateConfig_keyDuplicate() {
         // 入参
-        InfConfigCreateReqVO reqVO = new InfConfigCreateReqVO();
-        reqVO.setGroup("test_group");
-        reqVO.setName("test_name");
-        reqVO.setValue("test_value");
-        reqVO.setSensitive(true);
-        reqVO.setRemark("test_remark");
-        reqVO.setKey("test_key");
-        // mock
+        InfConfigCreateReqVO reqVO = randomInfConfigCreateReqVO();
+        // mock 数据
+        configMapper.insert(randomInfConfigDO(o -> {
+            o.setKey(reqVO.getKey()); // @Sql：插入一条重复的 key
+            o.setType(randomEle(InfConfigTypeEnum.values()).getType());
+        }));
 
         // 调用
         ServiceException serviceException = assertThrows(ServiceException.class, () -> configService.createConfig(reqVO));

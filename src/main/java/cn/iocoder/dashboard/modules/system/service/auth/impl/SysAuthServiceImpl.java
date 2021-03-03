@@ -30,11 +30,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import javax.annotation.Resource;
-import java.util.Collections;
 import java.util.Set;
 
 import static cn.iocoder.dashboard.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.*;
+import static java.util.Collections.singleton;
 
 /**
  * Auth Service 实现类
@@ -155,7 +155,7 @@ public class SysAuthServiceImpl implements SysAuthService {
      * @return 角色编号数组
      */
     private Set<Long> getUserRoleIds(Long userId) {
-        return permissionService.listUserRoleIds(userId, Collections.singleton(CommonStatusEnum.ENABLE.getStatus()));
+        return permissionService.getUserRoleIds(userId, singleton(CommonStatusEnum.ENABLE.getStatus()));
     }
 
     @Override

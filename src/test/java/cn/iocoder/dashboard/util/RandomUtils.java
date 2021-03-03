@@ -2,13 +2,18 @@ package cn.iocoder.dashboard.util;
 
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.RandomUtil;
+import cn.iocoder.dashboard.modules.infra.controller.config.vo.InfConfigCreateReqVO;
+import cn.iocoder.dashboard.modules.infra.dal.dataobject.config.InfConfigDO;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.user.SysUserDO;
 import uk.co.jemos.podam.api.PodamFactory;
 import uk.co.jemos.podam.api.PodamFactoryImpl;
 
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Set;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * 随机工具类
@@ -21,7 +26,23 @@ public class RandomUtils {
 
     private static final int RANDOM_DATE_MAX = 30;
 
+    private static final int RANDOM_COLLECTION_LENGTH = 5;
+
     private static final PodamFactory PODAM_FACTORY = new PodamFactoryImpl();
+
+    static {
+        // 字符串
+        PODAM_FACTORY.getStrategy().addOrReplaceTypeManufacturer(String.class,
+                (dataProviderStrategy, attributeMetadata, map) -> randomString());
+        // Boolean
+        PODAM_FACTORY.getStrategy().addOrReplaceTypeManufacturer(Boolean.class, (dataProviderStrategy, attributeMetadata, map) -> {
+            // 如果是 deleted 的字段，返回非删除
+            if (attributeMetadata.getAttributeName().equals("deleted")) {
+                return false;
+            }
+            return RandomUtil.randomBoolean();
+        });
+    }
 
     public static String randomString() {
         return RandomUtil.randomString(RANDOM_STRING_LENGTH);
@@ -43,9 +64,24 @@ public class RandomUtils {
         return (short) RandomUtil.randomInt(0, Short.MAX_VALUE);
     }
 
+    public static <T> Set<T> randomSet(Class<T> clazz) {
+        return Stream.iterate(0, i -> i).limit(RandomUtil.randomInt(0, RANDOM_DATE_MAX))
+                .map(i -> randomPojo(clazz)).collect(Collectors.toSet());
+    }
+
     @SafeVarargs
     public static SysUserDO randomUserDO(Consumer<SysUserDO>... consumers) {
         return randomPojo(SysUserDO.class, consumers);
+    }
+
+    @SafeVarargs
+    public static InfConfigCreateReqVO randomInfConfigCreateReqVO(Consumer<InfConfigCreateReqVO>... consumers) {
+        return randomPojo(InfConfigCreateReqVO.class, consumers);
+    }
+
+    @SafeVarargs
+    public static InfConfigDO randomInfConfigDO(Consumer<InfConfigDO>... consumers) {
+        return randomPojo(InfConfigDO.class, consumers);
     }
 
     @SafeVarargs

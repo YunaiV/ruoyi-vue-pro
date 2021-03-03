@@ -42,7 +42,7 @@ public interface SysPermissionService extends SecurityPermissionFrameworkService
      * @param roleStatuses 角色状态集合. 允许为空，为空时不过滤
      * @return 角色编号集合
      */
-    Set<Long> listUserRoleIds(Long userId, @Nullable Collection<Integer> roleStatuses);
+    Set<Long> getUserRoleIds(Long userId, @Nullable Collection<Integer> roleStatuses);
 
     /**
      * 获得角色拥有的菜单编号集合

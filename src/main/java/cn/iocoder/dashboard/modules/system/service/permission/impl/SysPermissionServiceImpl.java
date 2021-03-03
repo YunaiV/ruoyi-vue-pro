@@ -151,7 +151,7 @@ public class SysPermissionServiceImpl implements SysPermissionService {
     }
 
     @Override
-    public Set<Long> listUserRoleIds(Long userId, Collection<Integer> roleStatuses) {
+    public Set<Long> getUserRoleIds(Long userId, Collection<Integer> roleStatuses) {
         List<SysUserRoleDO> userRoleList = userRoleMapper.selectListByUserId(userId);
         // 过滤角色状态
         if (CollectionUtil.isNotEmpty(roleStatuses)) {

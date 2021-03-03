@@ -17,7 +17,7 @@ public class InfConfigBaseVO {
 
     @ApiModelProperty(value = "参数分组", required = true, example = "biz")
     @NotEmpty(message = "参数分组不能为空")
-    @Size(max = 100, message = "参数名称不能超过50个字符")
+    @Size(max = 50, message = "参数名称不能超过50个字符")
     private String group;
 
     @ApiModelProperty(value = "参数名称", required = true, example = "数据库名")
