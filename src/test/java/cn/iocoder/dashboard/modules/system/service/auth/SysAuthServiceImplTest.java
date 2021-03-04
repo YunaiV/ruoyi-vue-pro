@@ -42,7 +42,7 @@ public class SysAuthServiceImplTest extends BaseSpringBootUnitTest {
         // 调用
         LoginUser loginUser = (LoginUser) authService.loadUserByUsername(username);
         // 校验
-        AssertUtils.assertEquals(user, loginUser, "updateTime");
+        AssertUtils.assertPojoEquals(user, loginUser, "updateTime");
         assertNull(loginUser.getRoleIds()); // 此时不会加载角色，所以是空的
     }
 
@@ -73,7 +73,7 @@ public class SysAuthServiceImplTest extends BaseSpringBootUnitTest {
         // 调用
         LoginUser loginUser = authService.mockLogin(userId);
         // 断言
-        AssertUtils.assertEquals(user, loginUser, "updateTime");
+        AssertUtils.assertPojoEquals(user, loginUser, "updateTime");
         assertEquals(roleIds, loginUser.getRoleIds());
     }
 

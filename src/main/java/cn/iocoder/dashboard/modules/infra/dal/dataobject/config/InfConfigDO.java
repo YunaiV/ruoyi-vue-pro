@@ -3,6 +3,7 @@ package cn.iocoder.dashboard.modules.infra.dal.dataobject.config;
 import cn.iocoder.dashboard.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.dashboard.modules.infra.enums.config.InfConfigTypeEnum;
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -22,6 +23,7 @@ public class InfConfigDO extends BaseDO {
     /**
      * 参数主键
      */
+    @TableId
     private Long id;
     /**
      * 参数分组

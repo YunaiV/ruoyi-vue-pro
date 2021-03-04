@@ -77,12 +77,22 @@
     <pagination v-show="total>0" :total="total" :page.sync="queryParams.pageNo" :limit.sync="queryParams.pageSize" @pagination="getList"/>
 
     <!-- 预览界面 -->
-    <el-dialog :title="preview.title" :visible.sync="preview.open" width="80%" top="5vh" append-to-body>
-      <el-tabs tab-position="left" v-model="preview.activeName">
-        <el-tab-pane v-for="item in preview.data" :label="item.filePath.substring(item.filePath.lastIndexOf('/') + 1)" :name="item.filePath" :key="item.filePath">
-          <pre><code class="hljs" v-html="highlightedCode(item)"></code></pre>
-        </el-tab-pane>
-      </el-tabs>
+    <el-dialog :title="preview.title" :visible.sync="preview.open" width="90%" top="5vh" append-to-body>
+
+      <el-row>
+        <el-col :span="7">
+          <el-tree :data="preview.fileTree" :expand-on-click-node="false" default-expand-all
+                   @node-click="handleNodeClick"/>
+        </el-col>
+        <el-col :span="17">
+          <el-tabs v-model="preview.activeName">
+            <el-tab-pane v-for="item in preview.data" :label="item.filePath.substring(item.filePath.lastIndexOf('/') + 1)"
+                         :name="item.filePath" :key="item.filePath">
+              <pre><code class="hljs" v-html="highlightedCode(item)"></code></pre>
+            </el-tab-pane>
+          </el-tabs>
+        </el-col>
+      </el-row>
     </el-dialog>
 
     <!-- 基于 DB 导入 -->
@@ -154,8 +164,9 @@ export default {
       preview: {
         open: false,
         title: "代码预览",
+        fileTree: [],
         data: {},
-        activeName: "domain.java"
+        activeName: "",
       },
       // 基于 SQL 导入
       importSQL: {
@@ -243,6 +254,11 @@ export default {
     handlePreview(row) {
       previewCodegen(row.id).then(response => {
         this.preview.data = response.data;
+        let files = this.handleFiles(response.data);
+        console.log(files)
+        this.preview.fileTree = this.handleTree(files, "id", "parentId", "children",
+            "/"); // "/" 为根节点
+        console.log(this.preview.fileTree)
         this.preview.activeName = response.data[0].filePath;
         this.preview.open = true;
       });
@@ -254,6 +270,36 @@ export default {
       var language = item.filePath.substring(item.filePath.lastIndexOf(".") + 1);
       const result = hljs.highlight(language, item.code || "", true);
       return result.value || '&nbsp;';
+    },
+    /** 生成 files 目录 **/
+    handleFiles(datas) {
+      let exists = {}; // key：file 的 id；value：true
+      let files = [];
+      // 遍历每个元素
+      for (const data of datas) {
+        let paths = data.filePath.split('/');
+        let fullPath = ''; // 从头开始的路径，用于生成 id
+        for (let i = 0; i < paths.length; i++) {
+          // 已经添加大奥 files 中，则跳过
+          let oldFullPath = fullPath;
+          fullPath = fullPath.length === 0 ? paths[i] : fullPath + '/' + paths[i];
+          if (exists[fullPath]) {
+            continue;
+          }
+          // 添加到 files 中
+          exists[fullPath] = true;
+          files.push({
+            id: fullPath,
+            label: paths[i],
+            parentId: oldFullPath || '/'  // "/" 为根节点
+          });
+        }
+      }
+      return files;
+    },
+    /** 节点单击事件 **/
+    handleNodeClick(data) {
+      this.preview.activeName = data.id;
     },
     /** 修改按钮操作 */
     handleEditTable(row) {
