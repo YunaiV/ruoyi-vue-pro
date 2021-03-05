@@ -2,7 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+    <modelVersion>4.0.0</modelVersion>
 
     <groupId>cn.iocoder</groupId>
     <artifactId>dashboard</artifactId>
@@ -37,6 +37,7 @@
         <resilience4j.version>1.7.0</resilience4j.version>
         <!-- 监控相关 -->
         <skywalking.version>8.3.0</skywalking.version>
+        <logback.encoder.version>6.1</logback.encoder.version>
         <spring-boot-admin.version>2.3.1</spring-boot-admin.version>
         <!-- 工具类相关 -->
         <lombok.version>1.16.14</lombok.version>
@@ -157,6 +158,18 @@
             <groupId>org.apache.skywalking</groupId>
             <artifactId>apm-toolkit-trace</artifactId>
             <version>${skywalking.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.skywalking</groupId>
+            <artifactId>apm-toolkit-logback-1.x</artifactId>
+            <version>${skywalking.version}</version>
+        </dependency>
+        <!-- sky-walking日志相关 -->
+        <dependency>
+            <groupId>net.logstash.logback</groupId>
+            <artifactId>logstash-logback-encoder</artifactId>
+            <version>${logback.encoder.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
