@@ -1,0 +1,55 @@
+<configuration>　　　
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">　　　　　
+        <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+            <layout class="cn.iocoder.dashboard.framework.tracer.skywalking.TraceIdPatternLogbackLayout">
+                <pattern>%d{ISO8601} | %tid | %thread | %-5level | %msg%n</pattern>
+            </layout>
+        </encoder>
+    </appender>
+    <appender name="FILE"  class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>./logs/ruoyi-vue-pro-%d{yyyy-MM-dd_HH}.log</FileNamePattern>
+            <MaxHistory>3</MaxHistory>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+            <layout class="org.apache.skywalking.apm.toolkit.log.logback.v1.x.TraceIdPatternLogbackLayout">
+                <pattern>%d{ISO8601} | %tid | %thread | %-5level | %msg%n</pattern>
+            </layout>
+        </encoder>
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <MaxFileSize>10MB</MaxFileSize>
+        </triggeringPolicy>
+    </appender>
+    <appender name="ASYNC" class="ch.qos.logback.classic.AsyncAppender">
+        <discardingThreshold>0</discardingThreshold>
+        <queueSize>10</queueSize>
+        <appender-ref ref="FILE"/>
+    </appender>
+
+    <springProfile name="dev">
+        <logger name="cn.iocoder.dashboard" level="INFO" additivity="false">
+            <appender-ref ref="STDOUT"/>
+            <appender-ref ref="ASYNC"/>
+        </logger>
+    </springProfile>
+    <springProfile name="local">
+        <logger name="cn.iocoder.dashboard" level="INFO" additivity="false">
+            <appender-ref ref="STDOUT"/>
+        </logger>
+    </springProfile>
+    <springProfile name="default">
+        <logger name="cn.iocoder.dashboard" level="INFO" additivity="false">
+            <appender-ref ref="STDOUT"/>
+            <appender-ref ref="ASYNC"/>
+        </logger>
+    </springProfile>
+
+    <root level="DEBUG">　　　　　　
+        <appender-ref ref="STDOUT"/>　　　
+        <appender-ref ref="ASYNC"/>　
+    </root>
+
+    <logger name="cn.iocoder.dashboard" level="INFO">
+        <appender-ref ref="STDOUT"/>
+    </logger>
+</configuration>

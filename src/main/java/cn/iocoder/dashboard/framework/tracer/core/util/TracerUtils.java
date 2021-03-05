@@ -30,7 +30,9 @@ public class TracerUtils {
             }
         } catch (Throwable ignore) {}
         // TODO 芋艿 多次调用会问题
-        return UUID.randomUUID().toString();
+
+        // TODO 麻薯 定义一个给外部扩展的接口,默认在未接入Skywalking时,输出UUID
+        return "UUID:" + UUID.randomUUID().toString();
     }
 
 }
