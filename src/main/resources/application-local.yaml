@@ -7,7 +7,7 @@ spring:
   # 数据源配置项 TODO 多数据源；TODO 监控配置
   datasource:
     name: ruoyi-vue-pro
-    url: jdbc:mysql://127.0.0.1:3306/${spring.datasource.name}?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=CTT
+    url: jdbc:mysql://127.0.0.1:3306/${spring.datasource.name}?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=CTT&allowPublicKeyRetrieval=true
     driver-class-name: com.mysql.jdbc.Driver
     username: root
     password: 123456
