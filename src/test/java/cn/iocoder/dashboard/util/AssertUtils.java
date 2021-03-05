@@ -52,7 +52,7 @@ public class AssertUtils {
      * @param errorCode 错误码对象
      * @param serviceException 业务异常
      */
-    public static void assertPojoEquals(ErrorCode errorCode, ServiceException serviceException) {
+    public static void assertExceptionEquals(ErrorCode errorCode, ServiceException serviceException) {
         Assertions.assertEquals(errorCode.getCode(), serviceException.getCode(), "错误码不匹配");
         Assertions.assertEquals(errorCode.getMessage(), serviceException.getMessage(), "错误提示不匹配");
     }

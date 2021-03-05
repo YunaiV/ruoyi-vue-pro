@@ -105,7 +105,7 @@ public class InfConfigServiceImpl implements InfConfigService {
         }
         InfConfigDO config = configMapper.selectById(id);
         if (config == null) {
-            throw ServiceExceptionUtil.exception(CONFIG_NOT_FOUND);
+            throw ServiceExceptionUtil.exception(CONFIG_NOT_EXISTS);
         }
         return config;
     }
