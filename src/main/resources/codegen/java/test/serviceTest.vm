@@ -12,17 +12,53 @@ import ${basePackage}.modules.${table.moduleName}.service.${table.businessName}.
 import ${basePackage}.modules.${table.moduleName}.controller.${table.businessName}.vo.*;
 import ${basePackage}.modules.${table.moduleName}.dal.dataobject.${table.businessName}.${table.className}DO;
 import ${basePackage}.modules.${table.moduleName}.dal.mysql.${table.businessName}.${table.className}Mapper;
+import ${basePackage}.util.object.ObjectUtils;
+import ${PageResultClassName};
 
 import javax.annotation.Resource;
+import java.util.*;
 
 import static cn.hutool.core.util.RandomUtil.*;
 import static ${basePackage}.modules.${table.moduleName}.enums.${simpleModuleName_upperFirst}ErrorCodeConstants.*;
-import static cn.iocoder.dashboard.util.AssertUtils.*;
-import static cn.iocoder.dashboard.util.RandomUtils.*;
-import static cn.iocoder.dashboard.util.date.DateUtils.*;
+import static ${basePackage}.util.AssertUtils.*;
+import static ${basePackage}.util.RandomUtils.*;
+import static ${basePackage}.util.date.DateUtils.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+## 字段模板
+#macro(getPageCondition $VO)
+       // mock 数据
+       ${table.className}DO db${simpleClassName} = randomPojo(${table.className}DO.class, o -> {); // 等会查询到
+       #foreach ($column in $columns)
+       #if (${column.listOperation})
+       #set ($JavaField = $column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})##首字母大写
+           o.set$JavaField(null);
+       #end
+       #end
+       });
+       ${classNameVar}Mapper.insert(db${simpleClassName});
+       #foreach ($column in $columns)
+       #if (${column.listOperation})
+       #set ($JavaField = $column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})##首字母大写
+       // 测试 ${column.javaField} 不匹配
+       ${classNameVar}Mapper.insert(ObjectUtils.clone(db${simpleClassName}, o -> o.set$JavaField(null)));
+       #end
+       #end
+       // 准备参数
+       ${table.className}${VO} reqVO = new ${table.className}${VO}();
+       #foreach ($column in $columns)
+       #if (${column.listOperation})
+       #set ($JavaField = $column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})##首字母大写
+       #if (${column.listOperationCondition} == "BETWEEN")## BETWEEN 的情况
+       reqVO.setBegin${JavaField}(null);
+       reqVO.setEnd${JavaField}(null);
+       #else
+       reqVO.set$JavaField(null);
+       #end
+       #end
+       #end
+#end
 /**
 * {@link ${table.className}ServiceImpl} 的单元测试类
 *
@@ -97,15 +133,29 @@ public class ${table.className}ServiceTest extends BaseSpringBootUnitTest {
 
         // 调用, 并断言异常
         assertServiceException(() -> ${classNameVar}Service.delete${simpleClassName}(id), ${simpleClassName_underlineCase.toUpperCase()}_NOT_EXISTS);
-   }
+    }
 
-    @Test
+    @Test // TODO 请修改 null 为需要的值
     public void testGet${simpleClassName}Page() {
-        // mock 数据
-        ${table.className}DO db${simpleClassName} = randomPojo(${table.className}DO.class, o -> {); // 等会查询到
+       #getPageCondition("PageReqVO")
 
-        });
-        ${classNameVar}Mapper.insert(db${simpleClassName});
+       // 调用
+       PageResult<${table.className}DO> pageResult = configService.getConfigPage(reqVO);
+       // 断言
+       assertEquals(1, pageResult.getTotal());
+       assertEquals(1, pageResult.getList().size());
+       assertPojoEquals(db${simpleClassName}, pageResult.getList().get(0));
+    }
+
+    @Test // TODO 请修改 null 为需要的值
+    public void testGet${simpleClassName}List() {
+       #getPageCondition("ExportReqVO")
+
+       // 调用
+       PageResult<${table.className}DO> list = configService.getConfigPage(reqVO);
+       // 断言
+       assertEquals(1, list.size());
+       assertPojoEquals(db${simpleClassName}, list.get(0));
     }
 
 }
