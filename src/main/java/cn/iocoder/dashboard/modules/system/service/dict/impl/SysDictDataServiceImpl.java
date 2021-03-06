@@ -227,7 +227,7 @@ public class SysDictDataServiceImpl implements SysDictDataService {
     private void checkDictTypeValid(String type) {
         SysDictTypeDO dictType = dictTypeService.getDictType(type);
         if (dictType == null) {
-            throw ServiceExceptionUtil.exception(DICT_TYPE_NOT_FOUND);
+            throw ServiceExceptionUtil.exception(DICT_TYPE_NOT_EXISTS);
         }
         if (!CommonStatusEnum.ENABLE.getStatus().equals(dictType.getStatus())) {
             throw ServiceExceptionUtil.exception(DICT_TYPE_NOT_ENABLE);

@@ -1,6 +1,5 @@
 package cn.iocoder.dashboard.modules.infra.service.config;
 
-import cn.hutool.core.util.ArrayUtil;
 import cn.iocoder.dashboard.BaseSpringBootUnitTest;
 import cn.iocoder.dashboard.common.pojo.PageResult;
 import cn.iocoder.dashboard.modules.infra.controller.config.vo.InfConfigCreateReqVO;
@@ -12,6 +11,7 @@ import cn.iocoder.dashboard.modules.infra.dal.mysql.config.InfConfigMapper;
 import cn.iocoder.dashboard.modules.infra.enums.config.InfConfigTypeEnum;
 import cn.iocoder.dashboard.modules.infra.mq.producer.config.InfConfigProducer;
 import cn.iocoder.dashboard.modules.infra.service.config.impl.InfConfigServiceImpl;
+import cn.iocoder.dashboard.util.collection.ArrayUtils;
 import cn.iocoder.dashboard.util.object.ObjectUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -20,13 +20,16 @@ import javax.annotation.Resource;
 import java.util.List;
 import java.util.function.Consumer;
 
-import static cn.hutool.core.util.RandomUtil.*;
+import static cn.hutool.core.util.RandomUtil.randomEle;
 import static cn.iocoder.dashboard.modules.infra.enums.InfErrorCodeConstants.*;
-import static cn.iocoder.dashboard.util.AssertUtils.*;
-import static cn.iocoder.dashboard.util.RandomUtils.*;
-import static cn.iocoder.dashboard.util.date.DateUtils.*;
+import static cn.iocoder.dashboard.util.AssertUtils.assertPojoEquals;
+import static cn.iocoder.dashboard.util.AssertUtils.assertServiceException;
+import static cn.iocoder.dashboard.util.RandomUtils.randomLongId;
+import static cn.iocoder.dashboard.util.RandomUtils.randomPojo;
+import static cn.iocoder.dashboard.util.date.DateUtils.buildTime;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 /**
  * {@link InfConfigServiceImpl} 的单元测试类
@@ -227,12 +230,11 @@ public class InfConfigServiceTest extends BaseSpringBootUnitTest {
     // ========== 随机对象 ==========
 
     @SafeVarargs
-    @SuppressWarnings("unchecked")
     private static InfConfigDO randomInfConfigDO(Consumer<InfConfigDO>... consumers) {
         Consumer<InfConfigDO> consumer = (o) -> {
             o.setType(randomEle(InfConfigTypeEnum.values()).getType()); // 保证 key 的范围
         };
-        return randomPojo(InfConfigDO.class, ArrayUtil.append(new Consumer[]{consumer}, consumers));
+        return randomPojo(InfConfigDO.class, ArrayUtils.append(consumer, consumers));
     }
 
 }

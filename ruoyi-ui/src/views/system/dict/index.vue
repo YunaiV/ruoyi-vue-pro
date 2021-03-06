@@ -39,7 +39,7 @@
       </el-form-item>
       <el-form-item label="创建时间">
         <el-date-picker
-          v-model="dateRange"
+          v-model="dateRangeCreateTime"
           size="small"
           style="width: 240px"
           value-format="yyyy-MM-dd"
@@ -177,7 +177,7 @@ export default {
       // 状态数据字典
       statusOptions: [],
       // 日期范围
-      dateRange: [],
+      dateRangeCreateTime: [],
       // 查询参数
       queryParams: {
         pageNo: 1,
@@ -211,15 +211,15 @@ export default {
     /** 查询字典类型列表 */
     getList() {
       this.loading = true;
-      listType(this.addDateRange(this.queryParams, [
-        this.dateRange[0] ? this.dateRange[0] + ' 00:00:00' : undefined,
-        this.dateRange[1] ? this.dateRange[1] + ' 23:59:59' : undefined,
-      ])).then(response => {
-          this.typeList = response.data.list;
-          this.total = response.data.total;
-          this.loading = false;
-        }
-      );
+      // 处理查询参数
+      let params = {...this.queryParams};
+      this.addBeginAndEndTime(params, this.dateRangeCreateTime, 'createTime');
+      // 执行查询
+      listType(params).then(response => {
+        this.typeList = response.data.list;
+        this.total = response.data.total;
+        this.loading = false;
+      });
     },
     // 字典状态字典翻译
     statusFormat(row, column) {
@@ -248,7 +248,7 @@ export default {
     },
     /** 重置按钮操作 */
     resetQuery() {
-      this.dateRange = [];
+      this.dateRangeCreateTime = [];
       this.resetForm("queryForm");
       this.handleQuery();
     },
@@ -304,19 +304,21 @@ export default {
     },
     /** 导出按钮操作 */
     handleExport() {
-      const queryParams = this.addDateRange(this.queryParams, [
-        this.dateRange[0] ? this.dateRange[0] + ' 00:00:00' : undefined,
-        this.dateRange[1] ? this.dateRange[1] + ' 23:59:59' : undefined,
-      ]);
-      this.$confirm('是否确认导出所有类型数据项?', "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(function() {
-          return exportType(queryParams);
-        }).then(response => {
-          this.downloadExcel(response, '数据类型.xls');
-        })
+      // 处理查询参数
+      let params = {...this.queryParams};
+      params.pageNo = undefined;
+      params.pageSize = undefined;
+      this.addBeginAndEndTime(params, this.dateRangeCreateTime, 'createTime');
+      // 执行导出
+      this.$confirm('是否确认导出所有字典类型数据项?', "警告", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      }).then(function() {
+        return exportType(params);
+      }).then(response => {
+        this.downloadExcel(response, '字典类型.xls');
+      })
     }
   }
 };
