@@ -1,4 +1,4 @@
-package cn.iocoder.dashboard.util.bean;
+package cn.iocoder.dashboard.util.sping;
 
 import org.springframework.beans.BeansException;
 
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 
 
 @Component
-public class SpringUtil implements ApplicationContextAware {
+public class SpringBeanUtil implements ApplicationContextAware {
 
     /**
      * Spring context
