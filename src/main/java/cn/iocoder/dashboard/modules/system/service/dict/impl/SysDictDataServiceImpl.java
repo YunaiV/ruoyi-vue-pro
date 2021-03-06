@@ -130,19 +130,19 @@ public class SysDictDataServiceImpl implements SysDictDataService {
     }
 
     @Override
-    public List<SysDictDataDO> listDictDatas() {
+    public List<SysDictDataDO> getDictDataList() {
         List<SysDictDataDO> list = dictDataMapper.selectList();
         list.sort(COMPARATOR_TYPE_AND_SORT);
         return list;
     }
 
     @Override
-    public PageResult<SysDictDataDO> pageDictDatas(SysDictDataPageReqVO reqVO) {
+    public PageResult<SysDictDataDO> getDictDataPage(SysDictDataPageReqVO reqVO) {
         return dictDataMapper.selectPage(reqVO);
     }
 
     @Override
-    public List<SysDictDataDO> listDictDatas(SysDictDataExportReqVO reqVO) {
+    public List<SysDictDataDO> getDictDataList(SysDictDataExportReqVO reqVO) {
         List<SysDictDataDO> list = dictDataMapper.selectList(reqVO);
         list.sort(COMPARATOR_TYPE_AND_SORT);
         return list;
@@ -194,10 +194,10 @@ public class SysDictDataServiceImpl implements SysDictDataService {
     private void checkCreateOrUpdate(Long id, String label, String dictType) {
         // 校验自己存在
         checkDictDataExists(id);
-        // 校验字典数据的值的唯一性
-        checkDictDataValueUnique(id, dictType, label);
         // 校验字典类型有效
         checkDictTypeValid(dictType);
+        // 校验字典数据的值的唯一性
+        checkDictDataValueUnique(id, dictType, label);
     }
 
     private void checkDictDataValueUnique(Long id, String dictType, String label) {
@@ -220,7 +220,7 @@ public class SysDictDataServiceImpl implements SysDictDataService {
         }
         SysDictDataDO dictData = dictDataMapper.selectById(id);
         if (dictData == null) {
-            throw ServiceExceptionUtil.exception(DICT_DATA_NOT_FOUND);
+            throw ServiceExceptionUtil.exception(DICT_DATA_NOT_EXISTS);
         }
     }
 

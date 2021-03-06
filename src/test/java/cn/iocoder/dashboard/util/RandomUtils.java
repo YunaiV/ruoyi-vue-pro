@@ -2,6 +2,7 @@ package cn.iocoder.dashboard.util;
 
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.RandomUtil;
+import cn.iocoder.dashboard.common.enums.CommonStatusEnum;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.user.SysUserDO;
 import uk.co.jemos.podam.api.PodamFactory;
 import uk.co.jemos.podam.api.PodamFactoryImpl;
@@ -65,6 +66,10 @@ public class RandomUtils {
     public static <T> Set<T> randomSet(Class<T> clazz) {
         return Stream.iterate(0, i -> i).limit(RandomUtil.randomInt(0, RANDOM_DATE_MAX))
                 .map(i -> randomPojo(clazz)).collect(Collectors.toSet());
+    }
+
+    public static Integer randomCommonStatus() {
+        return RandomUtil.randomEle(CommonStatusEnum.values()).getStatus();
     }
 
     @SafeVarargs

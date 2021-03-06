@@ -65,7 +65,7 @@ public interface SysErrorCodeConstants {
     ErrorCode DICT_TYPE_HAS_CHILDREN = new ErrorCode(1002006004, "无法删除，该字典类型还有字典数据");
 
     // ========== 字典数据 1002007000 ==========
-    ErrorCode DICT_DATA_NOT_FOUND = new ErrorCode(1002007001, "当前字典数据不存在");
+    ErrorCode DICT_DATA_NOT_EXISTS = new ErrorCode(1002007001, "当前字典数据不存在");
     ErrorCode DICT_DATA_NOT_ENABLE = new ErrorCode(1002007002, "字典数据不处于开启状态，不允许选择");
     ErrorCode DICT_DATA_VALUE_DUPLICATE = new ErrorCode(1002007003, "已经存在该值的字典数据");
 
