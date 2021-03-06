@@ -33,7 +33,7 @@ import static org.mockito.Mockito.when;
 /**
 * {@link SysDictTypeServiceImpl} 的单元测试类
 *
-* @author 芋艿
+* @author 芋道源码
 */
 public class SysDictTypeServiceTest extends BaseSpringBootUnitTest {
 
