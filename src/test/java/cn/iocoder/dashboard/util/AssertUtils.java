@@ -4,10 +4,14 @@ import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.iocoder.dashboard.common.exception.ErrorCode;
 import cn.iocoder.dashboard.common.exception.ServiceException;
+import cn.iocoder.dashboard.common.exception.util.ServiceExceptionUtil;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.function.Executable;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * 单元测试，assert 断言工具类
@@ -47,14 +51,19 @@ public class AssertUtils {
     }
 
     /**
-     * 比对抛出的 ServiceException 是否匹配
+     * 执行方法，校验抛出的 Service 是否符合条件
      *
+     * @param executable 业务异常
      * @param errorCode 错误码对象
-     * @param serviceException 业务异常
+     * @param messageParams 消息参数
      */
-    public static void assertExceptionEquals(ErrorCode errorCode, ServiceException serviceException) {
+    public static void assertServiceException(Executable executable, ErrorCode errorCode, Object... messageParams) {
+        // 调用方法
+        ServiceException serviceException = assertThrows(ServiceException.class, executable);
+        // 校验错误码
         Assertions.assertEquals(errorCode.getCode(), serviceException.getCode(), "错误码不匹配");
-        Assertions.assertEquals(errorCode.getMessage(), serviceException.getMessage(), "错误提示不匹配");
+        String message = ServiceExceptionUtil.doFormat(errorCode.getCode(), errorCode.getMessage(), messageParams);
+        Assertions.assertEquals(message, serviceException.getMessage(), "错误提示不匹配");
     }
 
 }

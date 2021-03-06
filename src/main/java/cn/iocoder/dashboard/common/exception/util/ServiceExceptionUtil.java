@@ -2,6 +2,7 @@ package cn.iocoder.dashboard.common.exception.util;
 
 import cn.iocoder.dashboard.common.exception.ErrorCode;
 import cn.iocoder.dashboard.common.exception.ServiceException;
+import com.google.common.annotations.VisibleForTesting;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -91,7 +92,8 @@ public class ServiceExceptionUtil {
      * @param params         参数
      * @return 格式化后的提示
      */
-    private static String doFormat(int code, String messagePattern, Object... params) {
+    @VisibleForTesting
+    public static String doFormat(int code, String messagePattern, Object... params) {
         StringBuilder sbuf = new StringBuilder(messagePattern.length() + 50);
         int i = 0;
         int j;
