@@ -33,7 +33,7 @@ public class SysDictTypeDO extends BaseDO {
     /**
      * 字典类型
      */
-    @TableField("dict_type")
+    @TableField("`type`")
     private String type;
     /**
      * 状态

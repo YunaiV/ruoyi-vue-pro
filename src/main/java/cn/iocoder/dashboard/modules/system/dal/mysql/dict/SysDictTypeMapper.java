@@ -16,20 +16,21 @@ public interface SysDictTypeMapper extends BaseMapperX<SysDictTypeDO> {
     default PageResult<SysDictTypeDO> selectPage(SysDictTypePageReqVO reqVO) {
         return selectPage(reqVO, new QueryWrapperX<SysDictTypeDO>()
                 .likeIfPresent("name", reqVO.getName())
-                .likeIfPresent("dict_type", reqVO.getType())
+                .likeIfPresent("`type`", reqVO.getType())
                 .eqIfPresent("status", reqVO.getStatus())
-                .betweenIfPresent("create_time", reqVO.getBeginTime(), reqVO.getEndTime()));
+                .betweenIfPresent("create_time", reqVO.getBeginCreateTime(), reqVO.getEndCreateTime()));
     }
 
     default List<SysDictTypeDO> selectList(SysDictTypeExportReqVO reqVO) {
-        return selectList(new QueryWrapperX<SysDictTypeDO>().likeIfPresent("name", reqVO.getName())
-                        .likeIfPresent("dict_type", reqVO.getType())
-                        .eqIfPresent("status", reqVO.getStatus())
-                        .betweenIfPresent("create_time", reqVO.getBeginTime(), reqVO.getEndTime()));
+        return selectList(new QueryWrapperX<SysDictTypeDO>()
+                .likeIfPresent("name", reqVO.getName())
+                .likeIfPresent("`type`", reqVO.getType())
+                .eqIfPresent("status", reqVO.getStatus())
+                .betweenIfPresent("create_time", reqVO.getBeginCreateTime(), reqVO.getEndCreateTime()));
     }
 
     default SysDictTypeDO selectByType(String type) {
-        return selectOne(new QueryWrapperX<SysDictTypeDO>().eq("dict_type", type));
+        return selectOne(new QueryWrapperX<SysDictTypeDO>().eq("`type`", type));
     }
 
     default SysDictTypeDO selectByName(String name) {
