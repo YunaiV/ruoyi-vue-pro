@@ -7,3 +7,6 @@ DELETE FROM "sys_dict_data";
 DELETE FROM "sys_role";
 DELETE FROM "sys_role_menu";
 DELETE FROM "sys_menu";
+DELETE FROM "sys_login_log";
+DELETE FROM "sys_operate_log";
+DELETE FROM "sys_user";
