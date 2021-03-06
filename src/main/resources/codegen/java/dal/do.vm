@@ -1,4 +1,4 @@
-package ${basePackage}.${table.moduleName}.dal.dataobject.${table.businessName};
+package ${basePackage}.modules.${table.moduleName}.dal.dataobject.${table.businessName};
 
 import lombok.*;
 import java.util.*;

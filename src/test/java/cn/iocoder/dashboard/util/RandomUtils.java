@@ -46,7 +46,7 @@ public class RandomUtils {
         return RandomUtil.randomString(RANDOM_STRING_LENGTH);
     }
 
-    public static Long randomLong() {
+    public static Long randomLongId() {
         return RandomUtil.randomLong(0, Long.MAX_VALUE);
     }
 

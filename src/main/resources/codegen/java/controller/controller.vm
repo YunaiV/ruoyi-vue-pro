@@ -1,4 +1,4 @@
-package ${basePackage}.${table.moduleName}.controller.${table.businessName};
+package ${basePackage}.modules.${table.moduleName}.controller.${table.businessName};
 
 import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
@@ -22,10 +22,10 @@ import ${ExcelUtilsClassName};
 import ${OperateLogClassName};
 import static ${OperateTypeEnumClassName}.*;
 
-import ${basePackage}.${table.moduleName}.controller.${table.businessName}.vo.*;
-import ${basePackage}.${table.moduleName}.dal.dataobject.${table.businessName}.${table.className}DO;
-import ${basePackage}.${table.moduleName}.convert.${table.businessName}.${table.className}Convert;
-import ${basePackage}.${table.moduleName}.service.${table.businessName}.${table.className}Service;
+import ${basePackage}.modules.${table.moduleName}.controller.${table.businessName}.vo.*;
+import ${basePackage}.modules.${table.moduleName}.dal.dataobject.${table.businessName}.${table.className}DO;
+import ${basePackage}.modules.${table.moduleName}.convert.${table.businessName}.${table.className}Convert;
+import ${basePackage}.modules.${table.moduleName}.service.${table.businessName}.${table.className}Service;
 
 @Api(tags = "${table.classComment}")
 @RestController
