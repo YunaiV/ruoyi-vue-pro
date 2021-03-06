@@ -53,9 +53,7 @@ public class ToolCodegenEngine {
      * value：生成的路径
      */
     private static final Map<String, String> TEMPLATES = MapUtil.<String, String>builder(new LinkedHashMap<>()) // 有序
-            // Java
-            .put(javaTemplatePath("controller/controller"),
-                    javaFilePath("controller/${table.businessName}/${table.className}Controller"))
+            // Java Main
             .put(javaTemplatePath("controller/vo/baseVO"),
                     javaFilePath("controller/${table.businessName}/vo/${table.className}BaseVO"))
             .put(javaTemplatePath("controller/vo/createReqVO"),
@@ -70,6 +68,8 @@ public class ToolCodegenEngine {
                     javaFilePath("controller/${table.businessName}/vo/${table.className}ExportReqVO"))
             .put(javaTemplatePath("controller/vo/excelVO"),
                     javaFilePath("controller/${table.businessName}/vo/${table.className}ExcelVO"))
+            .put(javaTemplatePath("controller/controller"),
+                    javaFilePath("controller/${table.businessName}/${table.className}Controller"))
             .put(javaTemplatePath("convert/convert"),
                     javaFilePath("convert/${table.businessName}/${table.className}Convert"))
             .put(javaTemplatePath("dal/do"),
@@ -78,10 +78,13 @@ public class ToolCodegenEngine {
                     javaFilePath("dal/mysql/${table.businessName}/${table.className}Mapper"))
             .put(javaTemplatePath("enums/errorcode"),
                     javaFilePath("enums/${simpleModuleName_upperFirst}ErrorCodeConstants"))
-            .put(javaTemplatePath("service/service"),
-                    javaFilePath("service/${table.businessName}/${table.className}Service"))
             .put(javaTemplatePath("service/serviceImpl"),
                     javaFilePath("service/${table.businessName}/impl/${table.className}ServiceImpl"))
+            .put(javaTemplatePath("service/service"),
+                    javaFilePath("service/${table.businessName}/${table.className}Service"))
+            // Java Test
+            .put(javaTemplatePath("test/serviceTest"),
+                    javaFilePath("service/${table.businessName}/${table.className}ServiceTest"))
             // Vue
             .put(vueTemplatePath("views/index.vue"),
                     vueFilePath("views/${table.moduleName}/${classNameVar}/index.vue"))

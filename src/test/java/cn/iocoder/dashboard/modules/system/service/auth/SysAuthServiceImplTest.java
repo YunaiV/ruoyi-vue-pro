@@ -61,7 +61,7 @@ public class SysAuthServiceImplTest extends BaseSpringBootUnitTest {
     @Test
     public void testMockLogin_success() {
         // 准备参数
-        Long userId = randomLong();
+        Long userId = randomLongId();
         // mock 方法 01
         SysUserDO user = randomUserDO(o -> o.setId(userId));
         when(userService.getUser(eq(userId))).thenReturn(user);
@@ -80,7 +80,7 @@ public class SysAuthServiceImplTest extends BaseSpringBootUnitTest {
     @Test
     public void testMockLogin_userNotFound() {
         // 准备参数
-        Long userId = randomLong();
+        Long userId = randomLongId();
         // mock 方法
 
         // 调用, 并断言异常
