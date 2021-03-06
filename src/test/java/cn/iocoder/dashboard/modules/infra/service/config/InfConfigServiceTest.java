@@ -20,24 +20,26 @@ import javax.annotation.Resource;
 import java.util.List;
 import java.util.function.Consumer;
 
-import static cn.hutool.core.util.RandomUtil.randomEle;
+import static cn.hutool.core.util.RandomUtil.*;
 import static cn.iocoder.dashboard.modules.infra.enums.InfErrorCodeConstants.*;
-import static cn.iocoder.dashboard.util.AssertUtils.assertPojoEquals;
-import static cn.iocoder.dashboard.util.AssertUtils.assertServiceException;
-import static cn.iocoder.dashboard.util.RandomUtils.randomPojo;
-import static cn.iocoder.dashboard.util.date.DateUtils.buildTime;
+import static cn.iocoder.dashboard.util.AssertUtils.*;
+import static cn.iocoder.dashboard.util.RandomUtils.*;
+import static cn.iocoder.dashboard.util.date.DateUtils.*;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
-public class InfConfigServiceImplTest extends BaseSpringBootUnitTest {
+/**
+ * {@link InfConfigServiceImpl} 的单元测试类
+ *
+ * @author 芋道源码
+ */
+public class InfConfigServiceTest extends BaseSpringBootUnitTest {
 
     @Resource
     private InfConfigServiceImpl configService;
 
     @Resource
     private InfConfigMapper configMapper;
-
     @MockBean
     private InfConfigProducer configProducer;
 
@@ -211,6 +213,15 @@ public class InfConfigServiceImplTest extends BaseSpringBootUnitTest {
 
         // 调用, 并断言异常
         assertServiceException(() -> configService.deleteConfig(id), CONFIG_CAN_NOT_DELETE_SYSTEM_TYPE);
+    }
+
+    @Test
+    public void testDeleteConfig_notExists() {
+        // 准备参数
+        Long id = randomLongId();
+
+        // 调用, 并断言异常
+        assertServiceException(() -> configService.deleteConfig(id), CONFIG_NOT_EXISTS);
     }
 
     // ========== 随机对象 ==========

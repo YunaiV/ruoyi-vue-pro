@@ -154,7 +154,7 @@ yudao:
   file:
     base-path: http://127.0.0.1:${server.port}/${yudao.web.api-prefix}/file/get/
   codegen:
-    base-package: ${yudao.info.base-package}.modules
+    base-package: ${yudao.info.base-package}
     db-schemas: ${spring.datasource.name}
   xss:
     enable: false
