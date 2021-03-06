@@ -24,7 +24,7 @@
         <!-- 统一依赖管理 -->
         <spring.boot.version>2.4.2</spring.boot.version>
         <!-- Web 相关 -->
-        <knife4j.version>3.0.2</knife4j.version>
+        <knife4j.version>2.0.8</knife4j.version>
         <!-- DB 相关 -->
         <mysql-connector-java.version>5.1.46</mysql-connector-java.version>
         <druid.version>1.2.4</druid.version>
