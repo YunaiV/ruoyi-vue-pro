@@ -11,7 +11,7 @@
  Target Server Version : 50718
  File Encoding         : 65001
 
- Date: 07/03/2021 00:43:34
+ Date: 08/03/2021 00:50:29
 */
 
 SET NAMES utf8mb4;
@@ -43,7 +43,7 @@ CREATE TABLE `inf_api_access_log` (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=1822 DEFAULT CHARSET=utf8mb4 COMMENT='API 访问日志表';
+) ENGINE=InnoDB AUTO_INCREMENT=1850 DEFAULT CHARSET=utf8mb4 COMMENT='API 访问日志表';
 
 -- ----------------------------
 -- Records of inf_api_access_log
@@ -175,7 +175,7 @@ CREATE TABLE `inf_job_log` (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=4458 DEFAULT CHARSET=utf8mb4 COMMENT='定时任务日志表';
+) ENGINE=InnoDB AUTO_INCREMENT=4477 DEFAULT CHARSET=utf8mb4 COMMENT='定时任务日志表';
 
 -- ----------------------------
 -- Records of inf_job_log
@@ -579,7 +579,7 @@ CREATE TABLE `sys_operate_log` (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COMMENT='操作日志记录';
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COMMENT='操作日志记录';
 
 -- ----------------------------
 -- Records of sys_operate_log
@@ -955,7 +955,7 @@ INSERT INTO `sys_user_session` VALUES ('7b008d71139f48a4903aeaab0bbbef2e', 1, '1
 INSERT INTO `sys_user_session` VALUES ('7cbd0fdfb9304f298abb9ee2f58f7230', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-02-08 20:02:24', '', '2021-02-08 20:02:24', b'0');
 INSERT INTO `sys_user_session` VALUES ('830a1687977b44969025177ad3b6d051', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-02-10 01:56:00', '', '2021-02-10 01:56:00', b'0');
 INSERT INTO `sys_user_session` VALUES ('8331dbbca7be4348a3d2d02bf559b65e', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-02-05 13:29:04', '', '2021-02-10 19:06:26', b'0');
-INSERT INTO `sys_user_session` VALUES ('897714de63634dba9ac235247f9860c2', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-03-06 06:27:27', '', '2021-03-06 06:27:27', b'0');
+INSERT INTO `sys_user_session` VALUES ('897714de63634dba9ac235247f9860c2', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-03-06 06:27:27', '', '2021-03-07 00:50:21', b'0');
 INSERT INTO `sys_user_session` VALUES ('8d7668c1276344ecbffaf7e4420595d7', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-02-08 09:56:09', '', '2021-02-19 19:17:42', b'0');
 INSERT INTO `sys_user_session` VALUES ('9a3a5b8dee1841b69d70454ce23a53a3', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-02-26 00:09:49', '', '2021-02-27 01:27:20', b'0');
 INSERT INTO `sys_user_session` VALUES ('9cc71dc2d7a24b978db1bfe0e4bae349', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-01-26 08:30:01', '', '2021-01-26 08:30:01', b'0');
@@ -1006,7 +1006,7 @@ CREATE TABLE `tool_codegen_column` (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=369 DEFAULT CHARSET=utf8mb4 COMMENT='代码生成表字段定义';
+) ENGINE=InnoDB AUTO_INCREMENT=381 DEFAULT CHARSET=utf8mb4 COMMENT='代码生成表字段定义';
 
 -- ----------------------------
 -- Records of tool_codegen_column
@@ -1148,6 +1148,18 @@ INSERT INTO `tool_codegen_column` VALUES (365, 29, 'create_time', 'datetime', '�
 INSERT INTO `tool_codegen_column` VALUES (366, 29, 'update_by', 'varchar(64)', '更新者', b'1', b'0', '0', 8, 'String', 'updateBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-03-06 03:52:57', '', '2021-03-06 03:52:57', b'0');
 INSERT INTO `tool_codegen_column` VALUES (367, 29, 'update_time', 'datetime', '更新时间', b'0', b'0', '0', 9, 'Date', 'updateTime', '', NULL, b'0', b'0', b'0', 'BETWEEN', b'0', 'datetime', '', '2021-03-06 03:52:57', '', '2021-03-06 03:52:57', b'0');
 INSERT INTO `tool_codegen_column` VALUES (368, 29, 'deleted', 'bit(1)', '是否删除', b'0', b'0', '0', 10, 'Boolean', 'deleted', '', NULL, b'0', b'0', b'0', '=', b'0', 'radio', '', '2021-03-06 03:52:57', '', '2021-03-06 03:52:57', b'0');
+INSERT INTO `tool_codegen_column` VALUES (369, 30, 'id', 'bigint(20)', '字典编码', b'0', b'1', '1', 1, 'Long', 'id', '', NULL, b'0', b'1', b'0', '=', b'1', 'input', '', '2021-03-06 06:48:28', '', '2021-03-06 06:48:28', b'0');
+INSERT INTO `tool_codegen_column` VALUES (370, 30, 'sort', 'int(4)', '字典排序', b'0', b'0', '0', 2, 'Integer', 'sort', '', NULL, b'1', b'1', b'0', '=', b'1', 'input', '', '2021-03-06 06:48:28', '', '2021-03-06 06:50:38', b'0');
+INSERT INTO `tool_codegen_column` VALUES (371, 30, 'label', 'varchar(100)', '字典标签', b'0', b'0', '0', 3, 'String', 'label', '', NULL, b'1', b'1', b'1', 'LIKE', b'1', 'input', '', '2021-03-06 06:48:28', '', '2021-03-06 06:50:38', b'0');
+INSERT INTO `tool_codegen_column` VALUES (372, 30, 'value', 'varchar(100)', '字典键值', b'0', b'0', '0', 4, 'String', 'value', '', NULL, b'1', b'1', b'0', '=', b'1', 'input', '', '2021-03-06 06:48:28', '', '2021-03-06 06:50:38', b'0');
+INSERT INTO `tool_codegen_column` VALUES (373, 30, 'dict_type', 'varchar(100)', '字典类型', b'0', b'0', '0', 5, 'String', 'dictType', '', NULL, b'1', b'1', b'1', 'LIKE', b'1', 'select', '', '2021-03-06 06:48:28', '', '2021-03-06 06:50:38', b'0');
+INSERT INTO `tool_codegen_column` VALUES (374, 30, 'status', 'tinyint(4)', '状态（0正常 1停用）', b'0', b'0', '0', 6, 'Integer', 'status', '', NULL, b'1', b'1', b'1', 'LIKE', b'1', 'radio', '', '2021-03-06 06:48:28', '', '2021-03-06 06:50:38', b'0');
+INSERT INTO `tool_codegen_column` VALUES (375, 30, 'remark', 'varchar(500)', '备注', b'1', b'0', '0', 7, 'String', 'remark', '', NULL, b'1', b'1', b'0', '=', b'1', 'input', '', '2021-03-06 06:48:28', '', '2021-03-06 06:50:38', b'0');
+INSERT INTO `tool_codegen_column` VALUES (376, 30, 'create_by', 'varchar(64)', '创建者', b'1', b'0', '0', 8, 'String', 'createBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-03-06 06:48:28', '', '2021-03-06 06:48:28', b'0');
+INSERT INTO `tool_codegen_column` VALUES (377, 30, 'create_time', 'datetime', '创建时间', b'0', b'0', '0', 9, 'Date', 'createTime', '', NULL, b'0', b'0', b'1', 'BETWEEN', b'1', 'datetime', '', '2021-03-06 06:48:28', '', '2021-03-06 06:48:28', b'0');
+INSERT INTO `tool_codegen_column` VALUES (378, 30, 'update_by', 'varchar(64)', '更新者', b'1', b'0', '0', 10, 'String', 'updateBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-03-06 06:48:28', '', '2021-03-06 06:48:28', b'0');
+INSERT INTO `tool_codegen_column` VALUES (379, 30, 'update_time', 'datetime', '更新时间', b'0', b'0', '0', 11, 'Date', 'updateTime', '', NULL, b'0', b'0', b'0', 'BETWEEN', b'0', 'datetime', '', '2021-03-06 06:48:28', '', '2021-03-06 06:48:28', b'0');
+INSERT INTO `tool_codegen_column` VALUES (380, 30, 'deleted', 'bit(1)', '是否删除', b'0', b'0', '0', 12, 'Boolean', 'deleted', '', NULL, b'0', b'0', b'0', '=', b'0', 'radio', '', '2021-03-06 06:48:28', '', '2021-03-06 06:48:28', b'0');
 COMMIT;
 
 -- ----------------------------
@@ -1173,7 +1185,7 @@ CREATE TABLE `tool_codegen_table` (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=30 DEFAULT CHARSET=utf8mb4 COMMENT='代码生成表定义';
+) ENGINE=InnoDB AUTO_INCREMENT=31 DEFAULT CHARSET=utf8mb4 COMMENT='代码生成表定义';
 
 -- ----------------------------
 -- Records of tool_codegen_table
@@ -1189,6 +1201,7 @@ INSERT INTO `tool_codegen_table` VALUES (26, 1, 'inf_api_access_log', 'API 访�
 INSERT INTO `tool_codegen_table` VALUES (27, 1, 'inf_api_error_log', 'API 错误日志', NULL, 'infra', 'apiErrorLog', 'InfApiErrorLog', 'API 错误日志', '芋道源码', 1, 1083, '', '2021-02-26 06:54:49', '', '2021-02-26 07:53:03', b'0');
 INSERT INTO `tool_codegen_table` VALUES (28, 1, 'sys_dict_type', '字典类型表', NULL, 'system', 'dictType', 'SysDictType', '字典类型', '芋艿', 1, NULL, '', '2021-03-06 03:45:55', '', '2021-03-06 03:51:02', b'1');
 INSERT INTO `tool_codegen_table` VALUES (29, 1, 'sys_dict_type', '字典类型表', NULL, 'system', 'dict', 'SysDictType', '字典类型', '芋艿', 1, NULL, '', '2021-03-06 03:52:57', '', '2021-03-06 04:03:52', b'0');
+INSERT INTO `tool_codegen_table` VALUES (30, 1, 'sys_dict_data', '字典数据表', NULL, 'system', 'type', 'SysDictData', '字典数据', '芋道源码', 1, NULL, '', '2021-03-06 06:48:28', '', '2021-03-06 06:50:47', b'0');
 COMMIT;
 
 -- ----------------------------

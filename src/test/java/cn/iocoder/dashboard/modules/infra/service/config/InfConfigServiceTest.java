@@ -24,8 +24,7 @@ import static cn.hutool.core.util.RandomUtil.randomEle;
 import static cn.iocoder.dashboard.modules.infra.enums.InfErrorCodeConstants.*;
 import static cn.iocoder.dashboard.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.dashboard.util.AssertUtils.assertServiceException;
-import static cn.iocoder.dashboard.util.RandomUtils.randomLongId;
-import static cn.iocoder.dashboard.util.RandomUtils.randomPojo;
+import static cn.iocoder.dashboard.util.RandomUtils.*;
 import static cn.iocoder.dashboard.util.date.DateUtils.buildTime;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.times;
@@ -146,19 +145,6 @@ public class InfConfigServiceTest extends BaseSpringBootUnitTest {
     }
 
     @Test
-    public void testCreateConfig_keyDuplicate() {
-        // 准备参数
-        InfConfigCreateReqVO reqVO = randomPojo(InfConfigCreateReqVO.class);
-        // mock 数据
-        configMapper.insert(randomInfConfigDO(o -> { // @Sql
-            o.setKey(reqVO.getKey()); // 模拟 key 重复
-        }));
-
-        // 调用, 并断言异常
-        assertServiceException(() -> configService.createConfig(reqVO), CONFIG_KEY_DUPLICATE);
-    }
-
-    @Test
     public void testUpdateConfig_success() {
         // mock 数据
         InfConfigDO dbConfig = randomInfConfigDO();
@@ -175,15 +161,6 @@ public class InfConfigServiceTest extends BaseSpringBootUnitTest {
         assertPojoEquals(reqVO, config);
         // 校验调用
         verify(configProducer, times(1)).sendConfigRefreshMessage();
-    }
-
-    @Test
-    public void testUpdateConfig_notExists() {
-        // 准备参数
-        InfConfigUpdateReqVO reqVO = randomPojo(InfConfigUpdateReqVO.class);
-
-        // 调用, 并断言异常
-        assertServiceException(() -> configService.updateConfig(reqVO), CONFIG_NOT_EXISTS);
     }
 
     @Test
@@ -219,12 +196,49 @@ public class InfConfigServiceTest extends BaseSpringBootUnitTest {
     }
 
     @Test
-    public void testDeleteConfig_notExists() {
+    public void testCheckConfigExists_success() {
+        // mock 数据
+        InfConfigDO dbConfigDO = randomInfConfigDO();
+        configMapper.insert(dbConfigDO);// @Sql: 先插入出一条存在的数据
+
+        // 调用成功
+        configService.checkConfigExists(dbConfigDO.getId());
+    }
+
+    @Test
+    public void testCheckConfigExist_notExists() {
+        assertServiceException(() -> configService.checkConfigExists(randomLongId()), CONFIG_NOT_EXISTS);
+    }
+
+    @Test
+    public void testCheckConfigKeyUnique_success() {
+        // 调用，成功
+        configService.checkConfigKeyUnique(randomLongId(), randomString());
+    }
+
+    @Test
+    public void testCheckConfigKeyUnique_keyDuplicateForCreate() {
+        // 准备参数
+        String key = randomString();
+        // mock 数据
+        configMapper.insert(randomInfConfigDO(o -> o.setKey(key)));
+
+        // 调用，校验异常
+        assertServiceException(() -> configService.checkConfigKeyUnique(null, key),
+                CONFIG_KEY_DUPLICATE);
+    }
+
+    @Test
+    public void testCheckConfigKeyUnique_keyDuplicateForUpdate() {
         // 准备参数
         Long id = randomLongId();
+        String key = randomString();
+        // mock 数据
+        configMapper.insert(randomInfConfigDO(o -> o.setKey(key)));
 
-        // 调用, 并断言异常
-        assertServiceException(() -> configService.deleteConfig(id), CONFIG_NOT_EXISTS);
+        // 调用，校验异常
+        assertServiceException(() -> configService.checkConfigKeyUnique(id, key),
+                CONFIG_KEY_DUPLICATE);
     }
 
     // ========== 随机对象 ==========

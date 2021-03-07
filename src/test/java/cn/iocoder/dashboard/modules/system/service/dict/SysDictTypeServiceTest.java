@@ -234,7 +234,6 @@ public class SysDictTypeServiceTest extends BaseSpringBootUnitTest {
                 DICT_TYPE_TYPE_DUPLICATE);
     }
 
-
     @Test
     public void testCheckDictTypNameUnique_success() {
         // 调用，成功
@@ -242,7 +241,7 @@ public class SysDictTypeServiceTest extends BaseSpringBootUnitTest {
     }
 
     @Test
-    public void testCheckDictTypeNameUnique_valueDuplicateForCreate() {
+    public void testCheckDictTypeNameUnique_nameDuplicateForCreate() {
         // 准备参数
         String name = randomString();
         // mock 数据
@@ -254,7 +253,7 @@ public class SysDictTypeServiceTest extends BaseSpringBootUnitTest {
     }
 
     @Test
-    public void testCheckDictTypeNameUnique_valueDuplicateForUpdate() {
+    public void testCheckDictTypeNameUnique_nameDuplicateForUpdate() {
         // 准备参数
         Long id = randomLongId();
         String name = randomString();
