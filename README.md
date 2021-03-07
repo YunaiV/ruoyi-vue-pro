@@ -86,7 +86,7 @@
 | [MapStruct](https://mapstruct.org/) | Java Bean 转换 | 1.4.1 | [文档](http://www.iocoder.cn/Spring-Boot/MapStruct/?yudao) |
 | [Lombok](https://projectlombok.org/) | 消除冗长的 Java 代码 | 1.16.14 | [文档](http://www.iocoder.cn/Spring-Boot/Lombok/?yudao) |
 | [JUnit](https://junit.org/junit5/) | Java 单元测试框架 | 5.7.0 | - |
-| [Mockito](https://junit.org/junit5/) | Java Mock 框架 | 3.6.28 | - |
+| [Mockito](https://github.com/mockito/mockito) | Java Mock 框架 | 3.6.28 | - |
 
 **前端**
 
