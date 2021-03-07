@@ -105,9 +105,11 @@ public class SysUserSessionServiceImpl implements SysUserSessionService {
 
     @Override
     public long clearSessionTimeout() {
+        // 获取db里已经超时的用户列表
         Long timeoutCount = 0L;
-        List<SysUserSessionDO> sessionDOS = userSessionMapper.selectSessionTimeout();
-        for (SysUserSessionDO sessionDO : sessionDOS) {
+        List<SysUserSessionDO> sessionTimeoutDOS = userSessionMapper.selectSessionTimeout();
+        for (SysUserSessionDO sessionDO : sessionTimeoutDOS) {
+            // 确认已经超时,移出在线用户列表
             if (loginUserRedisDAO.get(sessionDO.getId()) == null) {
                 timeoutCount += userSessionMapper.deleteById(sessionDO.getId());
             }

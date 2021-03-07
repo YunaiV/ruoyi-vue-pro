@@ -21,9 +21,9 @@ public class SysUserSessionTimeoutJob implements JobHandler {
 
     @Override
     public String execute(String param) throws Exception {
-        log.info("[execute][执行任务：{}]", "清除过期用户信息");
+        log.info("[execute][执行任务：{}]", "移除超时的在线用户");
         long timeoutCount = sysUserSessionService.clearSessionTimeout();
-        log.info("[execute][执行任务：{}]", "清楚过期用户信息完成" + timeoutCount);
+        log.info("[execute][执行任务：{}]", "移除超时的在线用户完成" + timeoutCount);
         return null;
     }
 
