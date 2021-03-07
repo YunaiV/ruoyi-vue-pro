@@ -10,6 +10,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.util.Date;
+
 /**
  * 在线用户表
  *
@@ -44,5 +46,9 @@ public class SysUserSessionDO extends BaseDO {
      * 浏览器 UA
      */
     private String userAgent;
+    /**
+     * 会话超时时间
+     */
+    private Date sessionTimeout;
 
 }

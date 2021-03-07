@@ -60,4 +60,12 @@ public interface SysUserSessionService {
      */
     PageResult<SysUserSessionDO> getUserSessionPage(SysUserSessionPageReqVO reqVO);
 
+    /**
+     * 移除超时的在线用户
+     * @param
+     * @return {@link Long}
+     * @author Lyon
+     * @date 2021/3/7
+     **/
+    long clearSessionTimeout();
 }

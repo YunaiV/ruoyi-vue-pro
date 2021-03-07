@@ -8,6 +8,8 @@ import cn.iocoder.dashboard.modules.system.dal.dataobject.auth.SysUserSessionDO;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.Collection;
+import java.util.Date;
+import java.util.List;
 
 @Mapper
 public interface SysUserSessionMapper extends BaseMapperX<SysUserSessionDO> {
@@ -18,4 +20,7 @@ public interface SysUserSessionMapper extends BaseMapperX<SysUserSessionDO> {
                 .likeIfPresent("user_ip", reqVO.getUserIp()));
     }
 
+    default List<SysUserSessionDO> selectSessionTimeout() {
+        return selectList(new QueryWrapperX<SysUserSessionDO>().lt("session_timeout",new Date()));
+    }
 }

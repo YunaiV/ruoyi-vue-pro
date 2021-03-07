@@ -7,18 +7,21 @@ import cn.iocoder.dashboard.common.pojo.PageResult;
 import cn.iocoder.dashboard.framework.security.config.SecurityProperties;
 import cn.iocoder.dashboard.framework.security.core.LoginUser;
 import cn.iocoder.dashboard.modules.system.controller.auth.vo.session.SysUserSessionPageReqVO;
-import cn.iocoder.dashboard.modules.system.dal.mysql.auth.SysUserSessionMapper;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.auth.SysUserSessionDO;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.user.SysUserDO;
+import cn.iocoder.dashboard.modules.system.dal.mysql.auth.SysUserSessionMapper;
 import cn.iocoder.dashboard.modules.system.dal.redis.auth.SysLoginUserRedisDAO;
 import cn.iocoder.dashboard.modules.system.service.auth.SysUserSessionService;
 import cn.iocoder.dashboard.modules.system.service.user.SysUserService;
+import cn.iocoder.dashboard.util.date.DateUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
+import static cn.iocoder.dashboard.modules.system.dal.redis.SysRedisKeyConstants.LOGIN_USER;
 import static cn.iocoder.dashboard.util.collection.CollectionUtils.convertSet;
 
 /**
@@ -49,7 +52,9 @@ public class SysUserSessionServiceImpl implements SysUserSessionService {
         loginUserRedisDAO.set(sessionId, loginUser);
         // 写入 DB 中
         SysUserSessionDO userSession = SysUserSessionDO.builder().id(sessionId)
-                .userId(loginUser.getId()).userIp(userIp).userAgent(userAgent).build();
+                .userId(loginUser.getId()).userIp(userIp).userAgent(userAgent)
+                .sessionTimeout(DateUtils.addTime(LOGIN_USER.getTimeout()))
+                .build();
         userSessionMapper.insert(userSession);
         // 返回 Session 编号
         return sessionId;
@@ -63,6 +68,7 @@ public class SysUserSessionServiceImpl implements SysUserSessionService {
         // 更新 DB 中
         SysUserSessionDO updateObj = SysUserSessionDO.builder().id(sessionId).build();
         updateObj.setUpdateTime(new Date());
+        updateObj.setSessionTimeout(DateUtils.addTime(LOGIN_USER.getTimeout()));
         userSessionMapper.updateById(updateObj);
     }
 
@@ -95,6 +101,18 @@ public class SysUserSessionServiceImpl implements SysUserSessionService {
             }
         }
         return userSessionMapper.selectPage(reqVO, userIds);
+    }
+
+    @Override
+    public long clearSessionTimeout() {
+        Long timeoutCount = 0L;
+        List<SysUserSessionDO> sessionDOS = userSessionMapper.selectSessionTimeout();
+        for (SysUserSessionDO sessionDO : sessionDOS) {
+            if (loginUserRedisDAO.get(sessionDO.getId()) == null) {
+                timeoutCount += userSessionMapper.deleteById(sessionDO.getId());
+            }
+        }
+        return timeoutCount;
     }
 
     /**
