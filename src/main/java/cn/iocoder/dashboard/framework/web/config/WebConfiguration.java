@@ -27,9 +27,10 @@ public class WebConfiguration implements WebMvcConfigurer {
 
     @Override
     public void configurePathMatch(PathMatchConfigurer configurer) {
+        // 设置 API 前缀，仅仅匹配 controller 包下的
         configurer.addPathPrefix(webProperties.getApiPrefix(), clazz ->
                 clazz.isAnnotationPresent(RestController.class)
-                && clazz.getPackage().getName().startsWith(webProperties.getControllerPackage()));
+                && clazz.getPackage().getName().startsWith(webProperties.getControllerPackage())); // 仅仅匹配 controller 包
     }
 
     // ========== Filter 相关 ==========

@@ -58,14 +58,14 @@ public interface SysErrorCodeConstants {
     ErrorCode POST_CODE_DUPLICATE = new ErrorCode(1002005001, "已经存在该标识的岗位");
 
     // ========== 字典类型 1002006000 ==========
-    ErrorCode DICT_TYPE_NOT_FOUND = new ErrorCode(1002006001, "当前字典类型不存在");
+    ErrorCode DICT_TYPE_NOT_EXISTS = new ErrorCode(1002006001, "当前字典类型不存在");
     ErrorCode DICT_TYPE_NOT_ENABLE = new ErrorCode(1002006002, "字典类型不处于开启状态，不允许选择");
     ErrorCode DICT_TYPE_NAME_DUPLICATE = new ErrorCode(1002006003, "已经存在该名字的字典类型");
     ErrorCode DICT_TYPE_TYPE_DUPLICATE = new ErrorCode(1002006004, "已经存在该类型的字典类型");
     ErrorCode DICT_TYPE_HAS_CHILDREN = new ErrorCode(1002006004, "无法删除，该字典类型还有字典数据");
 
     // ========== 字典数据 1002007000 ==========
-    ErrorCode DICT_DATA_NOT_FOUND = new ErrorCode(1002007001, "当前字典数据不存在");
+    ErrorCode DICT_DATA_NOT_EXISTS = new ErrorCode(1002007001, "当前字典数据不存在");
     ErrorCode DICT_DATA_NOT_ENABLE = new ErrorCode(1002007002, "字典数据不处于开启状态，不允许选择");
     ErrorCode DICT_DATA_VALUE_DUPLICATE = new ErrorCode(1002007003, "已经存在该值的字典数据");
 

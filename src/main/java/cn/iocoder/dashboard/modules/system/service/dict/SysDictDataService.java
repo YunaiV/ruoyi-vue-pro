@@ -27,7 +27,7 @@ public interface SysDictDataService extends DictDataFrameworkService {
      *
      * @return 字典数据全列表
      */
-    List<SysDictDataDO> listDictDatas();
+    List<SysDictDataDO> getDictDataList();
 
     /**
      * 获得字典数据分页列表
@@ -35,7 +35,7 @@ public interface SysDictDataService extends DictDataFrameworkService {
      * @param reqVO 分页请求
      * @return 字典数据分页列表
      */
-    PageResult<SysDictDataDO> pageDictDatas(SysDictDataPageReqVO reqVO);
+    PageResult<SysDictDataDO> getDictDataPage(SysDictDataPageReqVO reqVO);
 
     /**
      * 获得字典数据列表
@@ -43,7 +43,7 @@ public interface SysDictDataService extends DictDataFrameworkService {
      * @param reqVO 列表请求
      * @return 字典数据列表
      */
-    List<SysDictDataDO> listDictDatas(SysDictDataExportReqVO reqVO);
+    List<SysDictDataDO> getDictDataList(SysDictDataExportReqVO reqVO);
 
     /**
      * 获得字典数据详情

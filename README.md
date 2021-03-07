@@ -43,11 +43,12 @@
 1. 幂等组件：基于 Redis 实现幂等组件，解决重复请求问题
 1. 服务保障：基于 Resilience4j 实现服务的稳定性，包括限流、熔断等功能
 1. 日志服务：轻量级日志中心，查看远程服务器的日志
+1. 单元测试：基于 JUnit + Mockito 实现单元测试，保证功能的正确性、代码的质量等
 
 ### 研发工具
 
 1. 表单构建：拖动表单元素生成相应的 HTML 代码
-1. 代码生成：前后端代码的生成（Java、Vue、SQL），支持 CRUD 下载
+1. 代码生成：前后端代码的生成（Java、Vue、SQL、单元测试），支持 CRUD 下载
 1. 系统接口：基于 Swagger 自动生成相关的 RESTful API 接口文档
 1. 数据库文档：基于 Screw 自动生成数据库文档
 
@@ -83,7 +84,9 @@
 | [Spring Boot Admin](https://github.com/skywalking) | Spring Boot 监控平台 | 8.6.0 | [文档](http://www.iocoder.cn/Spring-Boot/Admin/?yudao) |
 | [Jackson](https://github.com/FasterXML/jackson) | JSON 工具库 | 2.11.4 |  |
 | [MapStruct](https://mapstruct.org/) | Java Bean 转换 | 1.4.1 | [文档](http://www.iocoder.cn/Spring-Boot/MapStruct/?yudao) |
-| [Lombok](https://projectlombok.org/) | 消除冗长的 Java 代码| 1.16.14 | [文档](http://www.iocoder.cn/Spring-Boot/Lombok/?yudao) |
+| [Lombok](https://projectlombok.org/) | 消除冗长的 Java 代码 | 1.16.14 | [文档](http://www.iocoder.cn/Spring-Boot/Lombok/?yudao) |
+| [JUnit](https://junit.org/junit5/) | Java 单元测试框架 | 5.7.0 | - |
+| [Mockito](https://github.com/mockito/mockito) | Java Mock 框架 | 3.6.28 | - |
 
 **前端**
 
@@ -125,7 +128,7 @@
     </tr>
     <tr>
         <td><img src="https://oscimg.oschina.net/oscnet/b6115bc8c31de52951982e509930b20684a.jpg"/></td>
-        <td><img src="https://oscimg.oschina.net/oscnet/up-6d73c2140ce694e3de4c05035fdc1868d4c.png"/></td>
+        <td> - </td>
     </tr>
 </table>
 
