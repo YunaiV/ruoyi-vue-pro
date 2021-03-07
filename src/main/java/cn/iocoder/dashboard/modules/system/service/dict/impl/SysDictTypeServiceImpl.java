@@ -99,8 +99,8 @@ public class SysDictTypeServiceImpl implements SysDictTypeService {
     }
 
     @VisibleForTesting
-    public void checkDictTypeNameUnique(Long id, String type) {
-        SysDictTypeDO dictType = dictTypeMapper.selectByName(type);
+    public void checkDictTypeNameUnique(Long id, String name) {
+        SysDictTypeDO dictType = dictTypeMapper.selectByName(name);
         if (dictType == null) {
             return;
         }

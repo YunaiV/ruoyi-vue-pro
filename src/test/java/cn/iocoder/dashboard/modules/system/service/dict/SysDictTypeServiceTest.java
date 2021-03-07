@@ -23,8 +23,8 @@ import static cn.hutool.core.util.RandomUtil.randomEle;
 import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.*;
 import static cn.iocoder.dashboard.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.dashboard.util.AssertUtils.assertServiceException;
-import static cn.iocoder.dashboard.util.RandomUtils.randomLongId;
-import static cn.iocoder.dashboard.util.RandomUtils.randomPojo;
+import static cn.iocoder.dashboard.util.RandomUtils.*;
+import static cn.iocoder.dashboard.util.RandomUtils.randomString;
 import static cn.iocoder.dashboard.util.date.DateUtils.buildTime;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.eq;
@@ -143,32 +143,6 @@ public class SysDictTypeServiceTest extends BaseSpringBootUnitTest {
     }
 
     @Test
-    public void testCreateDictType_nameDuplicate() {
-        // mock 数据
-        SysDictTypeDO dbDictType = randomDictTypeDO();
-        dictTypeMapper.insert(dbDictType);// @Sql: 先插入出一条存在的数据
-        // 准备参数
-        SysDictTypeCreateReqVO reqVO = randomPojo(SysDictTypeCreateReqVO.class,
-                o -> o.setName(dbDictType.getName())); // 模拟 name 重复
-
-        // 调用, 并断言异常
-        assertServiceException(() -> dictTypeService.createDictType(reqVO), DICT_TYPE_NAME_DUPLICATE);
-    }
-
-    @Test
-    public void testCreateDictType_typeDuplicate() {
-        // mock 数据
-        SysDictTypeDO dbDictType = randomDictTypeDO();
-        dictTypeMapper.insert(dbDictType);// @Sql: 先插入出一条存在的数据
-        // 准备参数
-        SysDictTypeCreateReqVO reqVO = randomPojo(SysDictTypeCreateReqVO.class,
-                o -> o.setType(dbDictType.getType())); // 模拟 type 重复
-
-        // 调用, 并断言异常
-        assertServiceException(() -> dictTypeService.createDictType(reqVO), DICT_TYPE_TYPE_DUPLICATE);
-    }
-
-    @Test
     public void testUpdateDictType_success() {
         // mock 数据
         SysDictTypeDO dbDictType = randomDictTypeDO();
@@ -187,33 +161,6 @@ public class SysDictTypeServiceTest extends BaseSpringBootUnitTest {
     }
 
     @Test
-    public void testUpdateDictType_notExists() {
-        // 准备参数
-        SysDictTypeUpdateReqVO reqVO = randomPojo(SysDictTypeUpdateReqVO.class);
-
-        // 调用, 并断言异常
-        assertServiceException(() -> dictTypeService.updateDictType(reqVO), DICT_TYPE_NOT_EXISTS);
-    }
-
-    @Test
-    public void testUpdateDictType_nameDuplicate() {
-        // mock 数据，稍后更新它
-        SysDictTypeDO dbDictType = randomDictTypeDO();
-        dictTypeMapper.insert(dbDictType);
-        // mock 数据，ks稍后模拟重复它的名字
-        SysDictTypeDO nameDictType = randomDictTypeDO();
-        dictTypeMapper.insert(nameDictType);
-        // 准备参数
-        SysDictTypeUpdateReqVO reqVO = randomPojo(SysDictTypeUpdateReqVO.class, o -> {
-            o.setId(dbDictType.getId()); // 设置更新的 ID
-            o.setName(nameDictType.getName()); // 模拟 name 重复
-        });
-
-        // 调用, 并断言异常
-        assertServiceException(() -> dictTypeService.updateDictType(reqVO), DICT_TYPE_NAME_DUPLICATE);
-    }
-
-    @Test
     public void testDeleteDictType_success() {
         // mock 数据
         SysDictTypeDO dbDictType = randomDictTypeDO();
@@ -228,15 +175,6 @@ public class SysDictTypeServiceTest extends BaseSpringBootUnitTest {
     }
 
     @Test
-    public void testDeleteDictType_notExists() {
-        // 准备参数
-        Long id = randomLongId();
-
-        // 调用, 并断言异常
-        assertServiceException(() -> dictTypeService.deleteDictType(id), DICT_TYPE_NOT_EXISTS);
-    }
-
-    @Test
     public void testDeleteDictType_hasChildren() {
         // mock 数据
         SysDictTypeDO dbDictType = randomDictTypeDO();
@@ -248,6 +186,84 @@ public class SysDictTypeServiceTest extends BaseSpringBootUnitTest {
 
         // 调用, 并断言异常
         assertServiceException(() -> dictTypeService.deleteDictType(id), DICT_TYPE_HAS_CHILDREN);
+    }
+
+    @Test
+    public void testCheckDictDataExists_success() {
+        // mock 数据
+        SysDictTypeDO dbDictType = randomDictTypeDO();
+        dictTypeMapper.insert(dbDictType);// @Sql: 先插入出一条存在的数据
+
+        // 调用成功
+        dictTypeService.checkDictTypeExists(dbDictType.getId());
+    }
+
+    @Test
+    public void testCheckDictDataExists_notExists() {
+        assertServiceException(() -> dictTypeService.checkDictTypeExists(randomLongId()), DICT_TYPE_NOT_EXISTS);
+    }
+
+    @Test
+    public void testCheckDictTypeUnique_success() {
+        // 调用，成功
+        dictTypeService.checkDictTypeUnique(randomLongId(), randomString());
+    }
+
+    @Test
+    public void testCheckDictTypeUnique_valueDuplicateForCreate() {
+        // 准备参数
+        String type = randomString();
+        // mock 数据
+        dictTypeMapper.insert(randomDictTypeDO(o -> o.setType(type)));
+
+        // 调用，校验异常
+        assertServiceException(() -> dictTypeService.checkDictTypeUnique(null, type),
+                DICT_TYPE_TYPE_DUPLICATE);
+    }
+
+    @Test
+    public void testCheckDictTypeUnique_valueDuplicateForUpdate() {
+        // 准备参数
+        Long id = randomLongId();
+        String type = randomString();
+        // mock 数据
+        dictTypeMapper.insert(randomDictTypeDO(o -> o.setType(type)));
+
+        // 调用，校验异常
+        assertServiceException(() -> dictTypeService.checkDictTypeUnique(id, type),
+                DICT_TYPE_TYPE_DUPLICATE);
+    }
+
+
+    @Test
+    public void testCheckDictTypNameUnique_success() {
+        // 调用，成功
+        dictTypeService.checkDictTypeNameUnique(randomLongId(), randomString());
+    }
+
+    @Test
+    public void testCheckDictTypeNameUnique_valueDuplicateForCreate() {
+        // 准备参数
+        String name = randomString();
+        // mock 数据
+        dictTypeMapper.insert(randomDictTypeDO(o -> o.setName(name)));
+
+        // 调用，校验异常
+        assertServiceException(() -> dictTypeService.checkDictTypeNameUnique(null, name),
+                DICT_TYPE_NAME_DUPLICATE);
+    }
+
+    @Test
+    public void testCheckDictTypeNameUnique_valueDuplicateForUpdate() {
+        // 准备参数
+        Long id = randomLongId();
+        String name = randomString();
+        // mock 数据
+        dictTypeMapper.insert(randomDictTypeDO(o -> o.setName(name)));
+
+        // 调用，校验异常
+        assertServiceException(() -> dictTypeService.checkDictTypeNameUnique(id, name),
+                DICT_TYPE_NAME_DUPLICATE);
     }
 
     // ========== 随机对象 ==========

@@ -205,6 +205,11 @@ public class SysDictDataServiceTest extends BaseSpringBootUnitTest {
     }
 
     @Test
+    public void testCheckDictDataExists_notExists() {
+        assertServiceException(() -> dictDataService.checkDictDataExists(randomLongId()), DICT_DATA_NOT_EXISTS);
+    }
+
+    @Test
     public void testCheckDictTypeValid_success() {
         // mock 方法，数据类型被禁用
         String type = randomString();
