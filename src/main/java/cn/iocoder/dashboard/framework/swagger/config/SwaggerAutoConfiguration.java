@@ -19,7 +19,7 @@ import springfox.documentation.service.SecurityScheme;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spi.service.contexts.SecurityContext;
 import springfox.documentation.spring.web.plugins.Docket;
-import springfox.documentation.swagger2.annotations.EnableSwagger2WebMvc;
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import java.util.Collections;
 import java.util.List;
@@ -32,7 +32,7 @@ import static springfox.documentation.builders.RequestHandlerSelectors.basePacka
  * @author 芋道源码
  */
 @Configuration
-@EnableSwagger2WebMvc
+@EnableSwagger2
 @EnableKnife4j
 @ConditionalOnClass({Docket.class, ApiInfoBuilder.class})
 @ConditionalOnProperty(prefix = "yudao.swagger", value = "enable", matchIfMissing = true)
