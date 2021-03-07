@@ -49,6 +49,37 @@ public class SysDictDataServiceTest extends BaseSpringBootUnitTest {
     @MockBean
     private SysDictDataProducer dictDataProducer;
 
+    /**
+     * 测试加载到新的字典数据的情况
+     */
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testInitLocalCache() {
+        // mock 数据
+        SysDictDataDO dictData01 = randomDictDataDO();
+        dictDataMapper.insert(dictData01);
+        SysDictDataDO dictData02 = randomDictDataDO();
+        dictDataMapper.insert(dictData02);
+
+        // 调用
+        dictDataService.initLocalCache();
+        // 断言 labelDictDataCache 缓存
+        ImmutableTable<String, String, SysDictDataDO> labelDictDataCache =
+                (ImmutableTable<String, String, SysDictDataDO>) getFieldValue(dictDataService, "labelDictDataCache");
+        assertEquals(2, labelDictDataCache.size());
+        assertPojoEquals(dictData01, labelDictDataCache.get(dictData01.getDictType(), dictData01.getLabel()));
+        assertPojoEquals(dictData02, labelDictDataCache.get(dictData02.getDictType(), dictData02.getLabel()));
+        // 断言 valueDictDataCache 缓存
+        ImmutableTable<String, String, SysDictDataDO> valueDictDataCache =
+                (ImmutableTable<String, String, SysDictDataDO>) getFieldValue(dictDataService, "valueDictDataCache");
+        assertEquals(2, valueDictDataCache.size());
+        assertPojoEquals(dictData01, valueDictDataCache.get(dictData01.getDictType(), dictData01.getValue()));
+        assertPojoEquals(dictData02, valueDictDataCache.get(dictData02.getDictType(), dictData02.getValue()));
+        // 断言 maxUpdateTime 缓存
+        Date maxUpdateTime = (Date) getFieldValue(dictDataService, "maxUpdateTime");
+        assertEquals(ObjectUtils.max(dictData01.getUpdateTime(), dictData02.getUpdateTime()), maxUpdateTime);
+    }
+
     @Test
     public void testGetDictDataPage() {
         // mock 数据
@@ -126,46 +157,6 @@ public class SysDictDataServiceTest extends BaseSpringBootUnitTest {
     }
 
     @Test
-    public void testCreateDictData_dictTypeNotExists() {
-        // 准备参数
-        SysDictDataCreateReqVO reqVO = randomPojo(SysDictDataCreateReqVO.class,
-                o -> o.setStatus(randomCommonStatus()));
-
-        // 调用, 并断言异常
-        assertServiceException(() -> dictDataService.createDictData(reqVO), DICT_TYPE_NOT_EXISTS);
-    }
-
-    @Test
-    public void testCreateDictData_dictTypeNotEnable() {
-        // 准备参数
-        SysDictDataCreateReqVO reqVO = randomPojo(SysDictDataCreateReqVO.class,
-                o -> o.setStatus(randomCommonStatus()));
-        // mock 方法，数据类型被禁用
-        when(dictTypeService.getDictType(eq(reqVO.getDictType()))).thenReturn(
-                randomPojo(SysDictTypeDO.class, o -> o.setStatus(CommonStatusEnum.DISABLE.getStatus())));
-
-        // 调用, 并断言异常
-        assertServiceException(() -> dictDataService.createDictData(reqVO), DICT_TYPE_NOT_ENABLE);
-    }
-
-    @Test
-    public void testCreateDictData_dictDataValueDuplicate() {
-        // 准备参数
-        SysDictDataCreateReqVO reqVO = randomPojo(SysDictDataCreateReqVO.class,
-                o -> o.setStatus(randomCommonStatus()));
-        // mock 方法，字典类型
-        when(dictTypeService.getDictType(eq(reqVO.getDictType()))).thenReturn(randomDictTypeDO(reqVO.getDictType()));
-        // mock dictData 重复 value 重复
-        dictDataMapper.insert(randomDictDataDO(o -> {
-            o.setDictType(reqVO.getDictType());
-            o.setValue(reqVO.getValue()); // 使用 reqVO 的 value，实现重复
-        }));
-
-        // 调用, 并断言异常
-        assertServiceException(() -> dictDataService.createDictData(reqVO), DICT_DATA_VALUE_DUPLICATE);
-    }
-
-    @Test
     public void testUpdateDictData_success() {
         // mock 数据
         SysDictDataDO dbDictData = randomDictDataDO();
@@ -188,101 +179,6 @@ public class SysDictDataServiceTest extends BaseSpringBootUnitTest {
     }
 
     @Test
-    public void testUpdateDictData_notExists() {
-        // 准备参数
-        SysDictDataUpdateReqVO reqVO = randomPojo(SysDictDataUpdateReqVO.class);
-
-        // 调用, 并断言异常
-        assertServiceException(() -> dictDataService.updateDictData(reqVO), DICT_DATA_NOT_EXISTS);
-    }
-
-    /**
-     * 测试加载到新的字典数据的情况
-     */
-    @Test
-    @SuppressWarnings("unchecked")
-    public void testInitLocalCache() {
-        // mock 数据
-        SysDictDataDO dictData01 = randomDictDataDO();
-        dictDataMapper.insert(dictData01);
-        SysDictDataDO dictData02 = randomDictDataDO();
-        dictDataMapper.insert(dictData02);
-
-        // 调用
-        dictDataService.initLocalCache();
-        // 断言 labelDictDataCache 缓存
-        ImmutableTable<String, String, SysDictDataDO> labelDictDataCache =
-                (ImmutableTable<String, String, SysDictDataDO>) getFieldValue(dictDataService, "labelDictDataCache");
-        assertEquals(2, labelDictDataCache.size());
-        assertPojoEquals(dictData01, labelDictDataCache.get(dictData01.getDictType(), dictData01.getLabel()));
-        assertPojoEquals(dictData02, labelDictDataCache.get(dictData02.getDictType(), dictData02.getLabel()));
-        // 断言 valueDictDataCache 缓存
-        ImmutableTable<String, String, SysDictDataDO> valueDictDataCache =
-                (ImmutableTable<String, String, SysDictDataDO>) getFieldValue(dictDataService, "valueDictDataCache");
-        assertEquals(2, valueDictDataCache.size());
-        assertPojoEquals(dictData01, valueDictDataCache.get(dictData01.getDictType(), dictData01.getValue()));
-        assertPojoEquals(dictData02, valueDictDataCache.get(dictData02.getDictType(), dictData02.getValue()));
-        // 断言 maxUpdateTime 缓存
-        Date maxUpdateTime = (Date) getFieldValue(dictDataService, "maxUpdateTime");
-        assertEquals(ObjectUtils.max(dictData01.getUpdateTime(), dictData02.getUpdateTime()), maxUpdateTime);
-    }
-
-    @Test
-    public void testUpdateDictData_dictTypeNotExists() {
-        // mock 数据
-        SysDictDataDO dbDictData = randomDictDataDO();
-        dictDataMapper.insert(dbDictData);// @Sql: 先插入出一条存在的数据
-        // 准备参数
-        SysDictDataUpdateReqVO reqVO = randomPojo(SysDictDataUpdateReqVO.class, o -> {
-            o.setId(dbDictData.getId()); // 设置更新的 ID
-            o.setStatus(randomCommonStatus());
-        });
-
-        // 调用, 并断言异常
-        assertServiceException(() -> dictDataService.updateDictData(reqVO), DICT_TYPE_NOT_EXISTS);
-    }
-
-    @Test
-    public void testUpdateDictData_dictTypeNotEnable() {
-        // mock 数据
-        SysDictDataDO dbDictData = randomDictDataDO();
-        dictDataMapper.insert(dbDictData);// @Sql: 先插入出一条存在的数据
-        // 准备参数
-        SysDictDataUpdateReqVO reqVO = randomPojo(SysDictDataUpdateReqVO.class, o -> {
-            o.setId(dbDictData.getId()); // 设置更新的 ID
-            o.setStatus(randomCommonStatus());
-        });
-        // mock 方法，数据类型被禁用
-        when(dictTypeService.getDictType(eq(reqVO.getDictType()))).thenReturn(
-                randomPojo(SysDictTypeDO.class, o -> o.setStatus(CommonStatusEnum.DISABLE.getStatus())));
-
-        // 调用, 并断言异常
-        assertServiceException(() -> dictDataService.updateDictData(reqVO), DICT_TYPE_NOT_ENABLE);
-    }
-
-    @Test
-    public void testUpdateDictData_dictDataValueDuplicate() {
-        // mock 数据
-        SysDictDataDO dbDictData = randomDictDataDO();
-        dictDataMapper.insert(dbDictData);// @Sql: 先插入出一条存在的数据
-        // 准备参数
-        SysDictDataUpdateReqVO reqVO = randomPojo(SysDictDataUpdateReqVO.class, o -> {
-            o.setId(dbDictData.getId()); // 设置更新的 ID
-            o.setStatus(randomCommonStatus());
-        });
-        // mock 方法，字典类型
-        when(dictTypeService.getDictType(eq(reqVO.getDictType()))).thenReturn(randomDictTypeDO(reqVO.getDictType()));
-        // mock dictData 重复 value 重复
-        dictDataMapper.insert(randomDictDataDO(o -> {
-            o.setDictType(reqVO.getDictType());
-            o.setValue(reqVO.getValue()); // 使用 reqVO 的 value，实现重复
-        }));
-
-        // 调用, 并断言异常
-        assertServiceException(() -> dictDataService.updateDictData(reqVO), DICT_DATA_VALUE_DUPLICATE);
-    }
-
-    @Test
     public void testDeleteDictData_success() {
         // mock 数据
         SysDictDataDO dbDictData = randomDictDataDO();
@@ -299,12 +195,78 @@ public class SysDictDataServiceTest extends BaseSpringBootUnitTest {
     }
 
     @Test
-    public void testDeleteDictData_notExists() {
-        // 准备参数
-        Long id = randomLongId();
+    public void testCheckDictDataExists_success() {
+        // mock 数据
+        SysDictDataDO dbDictData = randomDictDataDO();
+        dictDataMapper.insert(dbDictData);// @Sql: 先插入出一条存在的数据
+
+        // 调用成功
+        dictDataService.checkDictDataExists(dbDictData.getId());
+    }
+
+    @Test
+    public void testCheckDictTypeValid_success() {
+        // mock 方法，数据类型被禁用
+        String type = randomString();
+        when(dictTypeService.getDictType(eq(type))).thenReturn(randomDictTypeDO(type));
+
+        // 调用, 成功
+        dictDataService.checkDictTypeValid(type);
+    }
+
+    @Test
+    public void testCheckDictTypeValid_notExists() {
+        assertServiceException(() -> dictDataService.checkDictTypeValid(randomString()), DICT_TYPE_NOT_EXISTS);
+    }
+
+    @Test
+    public void testCheckDictTypeValid_notEnable() {
+        // mock 方法，数据类型被禁用
+        String dictType = randomString();
+        when(dictTypeService.getDictType(eq(dictType))).thenReturn(
+                randomPojo(SysDictTypeDO.class, o -> o.setStatus(CommonStatusEnum.DISABLE.getStatus())));
 
         // 调用, 并断言异常
-        assertServiceException(() -> dictDataService.deleteDictData(id), DICT_DATA_NOT_EXISTS);
+        assertServiceException(() -> dictDataService.checkDictTypeValid(dictType), DICT_TYPE_NOT_ENABLE);
+    }
+
+    @Test
+    public void testCheckDictDataValueUnique_success() {
+        // 调用，成功
+        dictDataService.checkDictDataValueUnique(randomLongId(), randomString(), randomString());
+    }
+
+    @Test
+    public void testCheckDictDataValueUnique_valueDuplicateForCreate() {
+        // 准备参数
+        String dictType = randomString();
+        String value = randomString();
+        // mock 数据
+        dictDataMapper.insert(randomDictDataDO(o -> {
+            o.setDictType(dictType);
+            o.setValue(value);
+        }));
+
+        // 调用，校验异常
+        assertServiceException(() -> dictDataService.checkDictDataValueUnique(null, dictType, value),
+                DICT_DATA_VALUE_DUPLICATE);
+    }
+
+    @Test
+    public void testCheckDictDataValueUnique_valueDuplicateForUpdate() {
+        // 准备参数
+        Long id = randomLongId();
+        String dictType = randomString();
+        String value = randomString();
+        // mock 数据
+        dictDataMapper.insert(randomDictDataDO(o -> {
+            o.setDictType(dictType);
+            o.setValue(value);
+        }));
+
+        // 调用，校验异常
+        assertServiceException(() -> dictDataService.checkDictDataValueUnique(id, dictType, value),
+                DICT_DATA_VALUE_DUPLICATE);
     }
 
     // ========== 随机对象 ==========

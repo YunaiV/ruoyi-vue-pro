@@ -10,6 +10,7 @@ import cn.iocoder.dashboard.modules.system.dal.dataobject.dict.SysDictTypeDO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dict.SysDictTypeMapper;
 import cn.iocoder.dashboard.modules.system.service.dict.SysDictDataService;
 import cn.iocoder.dashboard.modules.system.service.dict.SysDictTypeService;
+import com.google.common.annotations.VisibleForTesting;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -97,7 +98,8 @@ public class SysDictTypeServiceImpl implements SysDictTypeService {
         checkDictTypeUnique(id, type);
     }
 
-    private void checkDictTypeNameUnique(Long id, String type) {
+    @VisibleForTesting
+    public void checkDictTypeNameUnique(Long id, String type) {
         SysDictTypeDO dictType = dictTypeMapper.selectByName(type);
         if (dictType == null) {
             return;
@@ -111,7 +113,8 @@ public class SysDictTypeServiceImpl implements SysDictTypeService {
         }
     }
 
-    private void checkDictTypeUnique(Long id, String type) {
+    @VisibleForTesting
+    public void checkDictTypeUnique(Long id, String type) {
         SysDictTypeDO dictType = dictTypeMapper.selectByType(type);
         if (dictType == null) {
             return;
@@ -125,7 +128,8 @@ public class SysDictTypeServiceImpl implements SysDictTypeService {
         }
     }
 
-    private SysDictTypeDO checkDictTypeExists(Long id) {
+    @VisibleForTesting
+    public SysDictTypeDO checkDictTypeExists(Long id) {
         if (id == null) {
             return null;
         }

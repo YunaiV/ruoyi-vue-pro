@@ -15,6 +15,7 @@ import cn.iocoder.dashboard.modules.system.dal.mysql.dict.SysDictDataMapper;
 import cn.iocoder.dashboard.modules.system.mq.producer.dict.SysDictDataProducer;
 import cn.iocoder.dashboard.modules.system.service.dict.SysDictDataService;
 import cn.iocoder.dashboard.modules.system.service.dict.SysDictTypeService;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableTable;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -200,8 +201,9 @@ public class SysDictDataServiceImpl implements SysDictDataService {
         checkDictDataValueUnique(id, dictType, value);
     }
 
-    private void checkDictDataValueUnique(Long id, String dictType, String label) {
-        SysDictDataDO dictData = dictDataMapper.selectByDictTypeAndLabel(dictType, label);
+    @VisibleForTesting
+    public void checkDictDataValueUnique(Long id, String dictType, String value) {
+        SysDictDataDO dictData = dictDataMapper.selectByDictTypeAndValue(dictType, value);
         if (dictData == null) {
             return;
         }
@@ -214,7 +216,8 @@ public class SysDictDataServiceImpl implements SysDictDataService {
         }
     }
 
-    private void checkDictDataExists(Long id) {
+    @VisibleForTesting
+    public void checkDictDataExists(Long id) {
         if (id == null) {
             return;
         }
@@ -224,7 +227,8 @@ public class SysDictDataServiceImpl implements SysDictDataService {
         }
     }
 
-    private void checkDictTypeValid(String type) {
+    @VisibleForTesting
+    public void checkDictTypeValid(String type) {
         SysDictTypeDO dictType = dictTypeService.getDictType(type);
         if (dictType == null) {
             throw exception(DICT_TYPE_NOT_EXISTS);
