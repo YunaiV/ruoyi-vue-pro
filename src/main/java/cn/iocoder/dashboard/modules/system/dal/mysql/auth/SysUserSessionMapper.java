@@ -20,7 +20,7 @@ public interface SysUserSessionMapper extends BaseMapperX<SysUserSessionDO> {
                 .likeIfPresent("user_ip", reqVO.getUserIp()));
     }
 
-    default List<SysUserSessionDO> selectSessionTimeout() {
+    default List<SysUserSessionDO> selectListBySessionTimoutLt() {
         return selectList(new QueryWrapperX<SysUserSessionDO>().lt("session_timeout",new Date()));
     }
 }

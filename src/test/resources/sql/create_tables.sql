@@ -114,3 +114,17 @@ CREATE TABLE "sys_dict_type" (
     "deleted" bit NOT NULL DEFAULT FALSE,
     PRIMARY KEY ("id")
 ) COMMENT '字典类型表';
+
+CREATE TABLE `sys_user_session` (
+    `id` varchar(32) NOT NULL,
+    `user_id` bigint DEFAULT NULL,
+    `user_ip` varchar(50) DEFAULT NULL,
+    `user_agent` varchar(512) DEFAULT NULL,
+    `session_timeout` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "create_by" varchar(64) DEFAULT '',
+    "create_time" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `update_by` varchar(64) DEFAULT '' ,
+    "update_time" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "deleted" bit NOT NULL DEFAULT FALSE,
+    PRIMARY KEY (`id`)
+) COMMENT '用户在线 Session';

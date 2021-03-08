@@ -13,16 +13,18 @@ import cn.iocoder.dashboard.modules.system.dal.mysql.auth.SysUserSessionMapper;
 import cn.iocoder.dashboard.modules.system.dal.redis.auth.SysLoginUserRedisDAO;
 import cn.iocoder.dashboard.modules.system.service.auth.SysUserSessionService;
 import cn.iocoder.dashboard.modules.system.service.user.SysUserService;
-import cn.iocoder.dashboard.util.date.DateUtils;
+import com.google.common.collect.Lists;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.time.Duration;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
-import static cn.iocoder.dashboard.modules.system.dal.redis.SysRedisKeyConstants.LOGIN_USER;
 import static cn.iocoder.dashboard.util.collection.CollectionUtils.convertSet;
+import static cn.iocoder.dashboard.util.date.DateUtils.addTime;
 
 /**
  * 在线用户 Session Service 实现类
@@ -53,7 +55,7 @@ public class SysUserSessionServiceImpl implements SysUserSessionService {
         // 写入 DB 中
         SysUserSessionDO userSession = SysUserSessionDO.builder().id(sessionId)
                 .userId(loginUser.getId()).userIp(userIp).userAgent(userAgent)
-                .sessionTimeout(DateUtils.addTime(LOGIN_USER.getTimeout()))
+                .sessionTimeout(addTime(Duration.ofMillis(getSessionTimeoutMillis())))
                 .build();
         userSessionMapper.insert(userSession);
         // 返回 Session 编号
@@ -68,7 +70,7 @@ public class SysUserSessionServiceImpl implements SysUserSessionService {
         // 更新 DB 中
         SysUserSessionDO updateObj = SysUserSessionDO.builder().id(sessionId).build();
         updateObj.setUpdateTime(new Date());
-        updateObj.setSessionTimeout(DateUtils.addTime(LOGIN_USER.getTimeout()));
+        updateObj.setSessionTimeout(addTime(Duration.ofMillis(getSessionTimeoutMillis())));
         userSessionMapper.updateById(updateObj);
     }
 
@@ -106,15 +108,17 @@ public class SysUserSessionServiceImpl implements SysUserSessionService {
     @Override
     public long clearSessionTimeout() {
         // 获取db里已经超时的用户列表
-        Long timeoutCount = 0L;
-        List<SysUserSessionDO> sessionTimeoutDOS = userSessionMapper.selectSessionTimeout();
-        for (SysUserSessionDO sessionDO : sessionTimeoutDOS) {
-            // 确认已经超时,移出在线用户列表
-            if (loginUserRedisDAO.get(sessionDO.getId()) == null) {
-                timeoutCount += userSessionMapper.deleteById(sessionDO.getId());
-            }
+        List<SysUserSessionDO> sessionTimeoutDOS = userSessionMapper.selectListBySessionTimoutLt();
+        List<String> timeoutIdList = sessionTimeoutDOS
+                .stream()
+                .filter(sessionDO -> loginUserRedisDAO.get(sessionDO.getId()) == null)
+                .map(SysUserSessionDO::getId)
+                .collect(Collectors.toList());
+        // 确认已经超时,按批次移出在线用户列表
+        if (CollUtil.isNotEmpty(timeoutIdList)) {
+            Lists.partition(timeoutIdList, 100).forEach(userSessionMapper::deleteBatchIds);
         }
-        return timeoutCount;
+        return timeoutIdList.size();
     }
 
     /**

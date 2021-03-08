@@ -16,7 +16,7 @@ public interface SysRedisKeyConstants {
 
     RedisKeyDefine LOGIN_USER = new RedisKeyDefine("登陆用户的缓存",
             "login_user:%s", // 参数为 sessionId
-            STRING, LoginUser.class, Duration.ofMinutes(30));
+            STRING, LoginUser.class, RedisKeyDefine.TimeoutTypeEnum.DYNAMIC);
 
     RedisKeyDefine CAPTCHA_CODE = new RedisKeyDefine("验证码的缓存",
             "captcha_code:%s", // 参数为 uuid

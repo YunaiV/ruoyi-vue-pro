@@ -62,8 +62,8 @@ public interface SysUserSessionService {
 
     /**
      * 移除超时的在线用户
-     * @param
-     * @return {@link Long}
+     *
+     * @return {@link Long } 移出的超时用户数量
      * @author Lyon
      * @date 2021/3/7
      **/
