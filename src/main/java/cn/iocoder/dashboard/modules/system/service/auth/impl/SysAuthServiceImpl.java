@@ -162,7 +162,9 @@ public class SysAuthServiceImpl implements SysAuthService {
     public void logout(String token) {
         // 查询用户信息
         LoginUser loginUser = userSessionService.getLoginUser(token);
-        if(loginUser == null) return;
+        if(loginUser == null) {
+            return;
+        }
         // 删除session
         userSessionService.deleteUserSession(token);
         this.createLogoutLog(loginUser.getUsername(), SysLoginResultEnum.SUCCESS);
