@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.modules.system.service.dict;
 
-import cn.iocoder.dashboard.BaseSpringBootUnitTest;
+import cn.iocoder.dashboard.BaseDbUnitTest;
 import cn.iocoder.dashboard.common.enums.CommonStatusEnum;
 import cn.iocoder.dashboard.common.pojo.PageResult;
 import cn.iocoder.dashboard.modules.system.controller.dict.vo.type.SysDictTypeCreateReqVO;
@@ -14,6 +14,7 @@ import cn.iocoder.dashboard.util.collection.ArrayUtils;
 import cn.iocoder.dashboard.util.object.ObjectUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -24,7 +25,6 @@ import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.*;
 import static cn.iocoder.dashboard.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.dashboard.util.AssertUtils.assertServiceException;
 import static cn.iocoder.dashboard.util.RandomUtils.*;
-import static cn.iocoder.dashboard.util.RandomUtils.randomString;
 import static cn.iocoder.dashboard.util.date.DateUtils.buildTime;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.eq;
@@ -35,7 +35,8 @@ import static org.mockito.Mockito.when;
 *
 * @author 芋道源码
 */
-public class SysDictTypeServiceTest extends BaseSpringBootUnitTest {
+@Import(SysDictTypeServiceImpl.class)
+public class SysDictTypeServiceTest extends BaseDbUnitTest {
 
     @Resource
     private SysDictTypeServiceImpl dictTypeService;

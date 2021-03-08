@@ -1,15 +1,19 @@
 package cn.iocoder.dashboard.modules.system.service.auth;
 
-import cn.iocoder.dashboard.BaseSpringBootUnitTest;
+import cn.iocoder.dashboard.BaseDbUnitTest;
 import cn.iocoder.dashboard.common.enums.CommonStatusEnum;
 import cn.iocoder.dashboard.framework.security.core.LoginUser;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.user.SysUserDO;
 import cn.iocoder.dashboard.modules.system.service.auth.impl.SysAuthServiceImpl;
+import cn.iocoder.dashboard.modules.system.service.common.SysCaptchaService;
+import cn.iocoder.dashboard.modules.system.service.logger.SysLoginLogService;
 import cn.iocoder.dashboard.modules.system.service.permission.SysPermissionService;
 import cn.iocoder.dashboard.modules.system.service.user.SysUserService;
 import cn.iocoder.dashboard.util.AssertUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import javax.annotation.Resource;
@@ -21,7 +25,13 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
-public class SysAuthServiceImplTest extends BaseSpringBootUnitTest {
+/**
+ * {@link SysAuthServiceImpl} 的单元测试
+ *
+ * @author 芋道源码
+ */
+@Import(SysAuthServiceImpl.class)
+public class SysAuthServiceImplTest extends BaseDbUnitTest {
 
     @Resource
     private SysAuthServiceImpl authService;
@@ -30,6 +40,14 @@ public class SysAuthServiceImplTest extends BaseSpringBootUnitTest {
     private SysUserService userService;
     @MockBean
     private SysPermissionService permissionService;
+    @MockBean
+    private AuthenticationManager authenticationManager;
+    @MockBean
+    private SysCaptchaService captchaService;
+    @MockBean
+    private SysLoginLogService loginLogService;
+    @MockBean
+    private SysUserSessionService userSessionService;
 
     @Test
     public void testLoadUserByUsername_success() {

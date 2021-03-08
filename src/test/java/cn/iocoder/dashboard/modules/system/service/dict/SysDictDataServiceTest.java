@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.modules.system.service.dict;
 
-import cn.iocoder.dashboard.BaseSpringBootUnitTest;
+import cn.iocoder.dashboard.BaseDbUnitTest;
 import cn.iocoder.dashboard.common.enums.CommonStatusEnum;
 import cn.iocoder.dashboard.common.pojo.PageResult;
 import cn.iocoder.dashboard.modules.system.controller.dict.vo.data.SysDictDataCreateReqVO;
@@ -17,6 +17,7 @@ import cn.iocoder.dashboard.util.object.ObjectUtils;
 import com.google.common.collect.ImmutableTable;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
 import java.util.Date;
@@ -37,7 +38,8 @@ import static org.mockito.Mockito.*;
 *
 * @author 芋道源码
 */
-public class SysDictDataServiceTest extends BaseSpringBootUnitTest {
+@Import(SysDictDataServiceImpl.class)
+public class SysDictDataServiceTest extends BaseDbUnitTest {
 
     @Resource
     private SysDictDataServiceImpl dictDataService;
