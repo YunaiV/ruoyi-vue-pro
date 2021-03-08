@@ -32,7 +32,7 @@ public class SysDictDataController {
     @GetMapping("/list-all-simple")
     // 无需添加权限认证，因为前端全局都需要
     public CommonResult<List<SysDictDataSimpleVO>> listSimpleDictDatas() {
-        List<SysDictDataDO> list = dictDataService.listDictDatas();
+        List<SysDictDataDO> list = dictDataService.getDictDataList();
         return success(SysDictDataConvert.INSTANCE.convertList(list));
     }
 
@@ -40,7 +40,7 @@ public class SysDictDataController {
     @GetMapping("/page")
 //    @PreAuthorize("@ss.hasPermi('system:dict:list')")
     public CommonResult<PageResult<SysDictDataRespVO>> pageDictTypes(@Validated SysDictDataPageReqVO reqVO) {
-        return success(SysDictDataConvert.INSTANCE.convertPage(dictDataService.pageDictDatas(reqVO)));
+        return success(SysDictDataConvert.INSTANCE.convertPage(dictDataService.getDictDataPage(reqVO)));
     }
 
     @ApiOperation("/查询字典数据详细")
@@ -83,7 +83,7 @@ public class SysDictDataController {
 //    @Log(title = "字典类型", businessType = BusinessType.EXPORT)
 //    @PreAuthorize("@ss.hasPermi('system:dict:export')")
     public void export(HttpServletResponse response, @Validated SysDictDataExportReqVO reqVO) throws IOException {
-        List<SysDictDataDO> list = dictDataService.listDictDatas(reqVO);
+        List<SysDictDataDO> list = dictDataService.getDictDataList(reqVO);
         List<SysDictDataExcelVO> excelDataList = SysDictDataConvert.INSTANCE.convertList02(list);
         // 输出
         ExcelUtils.write(response, "字典数据.xls", "数据列表",

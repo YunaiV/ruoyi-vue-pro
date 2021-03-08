@@ -12,6 +12,7 @@ import cn.iocoder.dashboard.modules.infra.dal.dataobject.config.InfConfigDO;
 import cn.iocoder.dashboard.modules.infra.enums.config.InfConfigTypeEnum;
 import cn.iocoder.dashboard.modules.infra.mq.producer.config.InfConfigProducer;
 import cn.iocoder.dashboard.modules.infra.service.config.InfConfigService;
+import com.google.common.annotations.VisibleForTesting;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -99,18 +100,20 @@ public class InfConfigServiceImpl implements InfConfigService {
         checkConfigKeyUnique(id, key);
     }
 
-    private InfConfigDO checkConfigExists(Long id) {
+    @VisibleForTesting
+    public InfConfigDO checkConfigExists(Long id) {
         if (id == null) {
             return null;
         }
         InfConfigDO config = configMapper.selectById(id);
         if (config == null) {
-            throw ServiceExceptionUtil.exception(CONFIG_NOT_FOUND);
+            throw ServiceExceptionUtil.exception(CONFIG_NOT_EXISTS);
         }
         return config;
     }
 
-    private void checkConfigKeyUnique(Long id, String key) {
+    @VisibleForTesting
+    public void checkConfigKeyUnique(Long id, String key) {
         InfConfigDO config = configMapper.selectByKey(key);
         if (config == null) {
             return;

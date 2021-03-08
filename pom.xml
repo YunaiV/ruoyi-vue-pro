@@ -2,7 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+    <modelVersion>4.0.0</modelVersion>
 
     <groupId>cn.iocoder</groupId>
     <artifactId>dashboard</artifactId>
@@ -25,6 +25,7 @@
         <spring.boot.version>2.4.2</spring.boot.version>
         <!-- Web 相关 -->
         <knife4j.version>3.0.2</knife4j.version>
+        <swagger-annotations.version>1.5.22</swagger-annotations.version>
         <!-- DB 相关 -->
         <mysql-connector-java.version>5.1.46</mysql-connector-java.version>
         <druid.version>1.2.4</druid.version>
@@ -100,7 +101,20 @@
                     <artifactId>mapstruct</artifactId>
                     <groupId>org.mapstruct</groupId> <!-- 避免冲突 -->
                 </exclusion>
+                <exclusion>
+                    <artifactId>guava</artifactId>
+                    <groupId>com.google.guava</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>swagger-annotations</artifactId>
+                    <groupId>io.swagger</groupId>
+                </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>io.swagger</groupId>
+            <artifactId>swagger-annotations</artifactId>
+            <version>${swagger-annotations.version}</version>
         </dependency>
 
         <!-- DB 相关 -->
@@ -144,6 +158,12 @@
             <groupId>com.baomidou</groupId>
             <artifactId>lock4j-redisson-spring-boot-starter</artifactId>
             <version>${lock4j.version}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>redisson-spring-boot-starter</artifactId>
+                    <groupId>org.redisson</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
@@ -175,6 +195,12 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>asm</artifactId>
+                    <groupId>org.ow2.asm</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>

@@ -24,12 +24,16 @@ public interface BaseMapperX<T> extends BaseMapper<T> {
         return new PageResult<>(mpPage.getRecords(), mpPage.getTotal());
     }
 
-    default List<T> selectList() {
-        return selectList(new QueryWrapper<>());
-    }
-
     default T selectOne(String field, Object value) {
         return selectOne(new QueryWrapper<T>().eq(field, value));
+    }
+
+    default Integer selectCount(String field, Object value) {
+        return selectCount(new QueryWrapper<T>().eq(field, value));
+    }
+
+    default List<T> selectList() {
+        return selectList(new QueryWrapper<>());
     }
 
 }
