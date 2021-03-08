@@ -23,7 +23,7 @@ public class SysPostExcelVO {
     private String name;
 
     @ExcelProperty("岗位排序")
-    private String sort;
+    private Integer sort;
 
     @ExcelProperty(value = "状态", converter = DictConvert.class)
     @DictFormat(SYS_COMMON_STATUS)
