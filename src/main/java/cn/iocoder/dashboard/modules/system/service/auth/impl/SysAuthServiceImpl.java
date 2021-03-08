@@ -160,7 +160,25 @@ public class SysAuthServiceImpl implements SysAuthService {
 
     @Override
     public void logout(String token) {
-//        AsyncManager.me().execute(AsyncFactory.recordLogininfor(userName, Constants.LOGOUT, "退出成功")); TODO 需要搞一搞
+        // 查询用户信息
+        LoginUser loginUser = userSessionService.getLoginUser(token);
+        if(loginUser == null) {
+            return;
+        }
+        // 删除session
+        userSessionService.deleteUserSession(token);
+        this.createLogoutLog(loginUser.getUsername(), SysLoginResultEnum.SUCCESS);
+    }
+
+    private void createLogoutLog(String username, SysLoginResultEnum loginResult) {
+        SysLoginLogCreateReqVO reqVO = new SysLoginLogCreateReqVO();
+        reqVO.setLogType(SysLoginLogTypeEnum.LOGOUT_SELF.getType());
+        reqVO.setTraceId(TracerUtils.getTraceId());
+        reqVO.setUsername(username);
+        reqVO.setUserAgent(ServletUtils.getUserAgent());
+        reqVO.setUserIp(ServletUtils.getClientIP());
+        reqVO.setResult(loginResult.getResult());
+        loginLogService.createLoginLog(reqVO);
     }
 
     @Override
