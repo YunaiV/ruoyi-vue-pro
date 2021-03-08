@@ -162,22 +162,23 @@ public class SysAuthServiceImpl implements SysAuthService {
     public void logout(String token) {
         // 查询用户信息
         LoginUser loginUser = userSessionService.getLoginUser(token);
-        if(loginUser == null) {
+        if (loginUser == null) {
             return;
         }
-        // 删除session
+        // 删除 session
         userSessionService.deleteUserSession(token);
-        this.createLogoutLog(loginUser.getUsername(), SysLoginResultEnum.SUCCESS);
+        // 记录登出日子和
+        this.createLogoutLog(loginUser.getUsername());
     }
 
-    private void createLogoutLog(String username, SysLoginResultEnum loginResult) {
+    private void createLogoutLog(String username) {
         SysLoginLogCreateReqVO reqVO = new SysLoginLogCreateReqVO();
         reqVO.setLogType(SysLoginLogTypeEnum.LOGOUT_SELF.getType());
         reqVO.setTraceId(TracerUtils.getTraceId());
         reqVO.setUsername(username);
         reqVO.setUserAgent(ServletUtils.getUserAgent());
         reqVO.setUserIp(ServletUtils.getClientIP());
-        reqVO.setResult(loginResult.getResult());
+        reqVO.setResult(SysLoginResultEnum.SUCCESS.getResult());
         loginLogService.createLoginLog(reqVO);
     }
 
