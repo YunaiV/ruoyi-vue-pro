@@ -1,4 +1,4 @@
-package cn.iocoder.dashboard.framework.mybatis.config;
+package cn.iocoder.dashboard.framework.mybatis.core.handle;
 
 import cn.iocoder.dashboard.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.dashboard.framework.security.core.LoginUser;
@@ -18,7 +18,7 @@ import java.util.Objects;
  * @author hexiaowu
  */
 @Component
-public class DefaultParamHandler implements MetaObjectHandler {
+public class DefaultDBFieldHandler implements MetaObjectHandler {
 
     @Override
     public void insertFill(MetaObject metaObject) {
