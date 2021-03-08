@@ -54,4 +54,15 @@ public class SmsChannelProperty implements Serializable {
     @NotEmpty(message = "签名值不能为空")
     private String signature;
 
+    /**
+     * 是否拥有回调函数（0否 1是）
+     */
+    @NotNull(message = "是否拥有回调函数不能为空")
+    private Integer hadCallback;
+
+    /**
+     * 短信发送回调url
+     */
+    private String callbackUrl;
+
 }

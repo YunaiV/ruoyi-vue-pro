@@ -2,8 +2,10 @@ package cn.iocoder.dashboard.framework.sms.client;
 
 import cn.iocoder.dashboard.framework.sms.core.SmsBody;
 import cn.iocoder.dashboard.framework.sms.core.SmsResult;
+import cn.iocoder.dashboard.framework.sms.core.SmsResultDetail;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * 短信父接口
@@ -22,5 +24,8 @@ public interface SmsClient {
      * @return 短信发送结果
      */
     SmsResult send(String templateApiId, SmsBody smsBody, Collection<String> targets);
+
+
+    //List<SmsResultDetail> getSmsSendResult(String jsonObjectParam);
 
 }

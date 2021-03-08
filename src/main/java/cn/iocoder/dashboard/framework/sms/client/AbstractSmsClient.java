@@ -58,7 +58,7 @@ public abstract class AbstractSmsClient implements SmsClient {
      * @return 短信发送结果
      * @throws Exception 调用发送失败，抛出异常
      */
-    public abstract SmsResult doSend(String templateApiId, SmsBody smsBody, Collection<String> targets) throws Exception;
+    protected abstract SmsResult doSend(String templateApiId, SmsBody smsBody, Collection<String> targets) throws Exception;
 
     protected void beforeSend(String templateApiId, SmsBody smsBody, Collection<String> targets) throws Exception {
     }

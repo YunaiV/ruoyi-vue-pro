@@ -20,7 +20,7 @@ public class JsonUtils {
 
     /**
      * 初始化 objectMapper 属性
-     *
+     * <p>
      * 通过这样的方式，使用 Spring 创建的 ObjectMapper Bean
      *
      * @param objectMapper ObjectMapper 对象
@@ -60,6 +60,14 @@ public class JsonUtils {
     }
 
     public static Object parseObject(String text, TypeReference<Set<Long>> typeReference) {
+        try {
+            return objectMapper.readValue(text, typeReference);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static <T> T parseByType(String text, TypeReference<T> typeReference) {
         try {
             return objectMapper.readValue(text, typeReference);
         } catch (IOException e) {

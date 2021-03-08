@@ -2,7 +2,6 @@ package cn.iocoder.dashboard.framework.sms.client;
 
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ArrayUtil;
-import cn.hutool.core.util.StrUtil;
 import cn.iocoder.dashboard.framework.sms.core.SmsBody;
 import cn.iocoder.dashboard.framework.sms.core.SmsResult;
 import cn.iocoder.dashboard.framework.sms.core.SmsResultDetail;
@@ -14,11 +13,11 @@ import com.aliyuncs.dysmsapi.model.v20170525.QuerySendDetailsRequest;
 import com.aliyuncs.dysmsapi.model.v20170525.QuerySendDetailsResponse;
 import com.aliyuncs.dysmsapi.model.v20170525.SendSmsRequest;
 import com.aliyuncs.dysmsapi.model.v20170525.SendSmsResponse;
+import com.aliyuncs.exceptions.ClientException;
 import com.aliyuncs.http.MethodType;
 import com.aliyuncs.profile.DefaultProfile;
 import com.aliyuncs.profile.IClientProfile;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -31,7 +30,7 @@ import java.util.List;
  * @date 2021/1/25 14:17
  */
 @Slf4j
-public class AliyunSmsClient extends AbstractSmsClient {
+public class AliyunSmsClient extends AbstractSmsClient implements NeedQuerySendResultSmsClient {
 
     private static final String OK = "OK";
 
@@ -70,35 +69,43 @@ public class AliyunSmsClient extends AbstractSmsClient {
         request.setTemplateParam(smsBody.getParamsStr());
         SendSmsResponse sendSmsResponse = acsClient.getAcsResponse(request);
 
-        boolean result = OK.equals(sendSmsResponse.getCode());
-        if (!result) {
+        boolean success = OK.equals(sendSmsResponse.getCode());
+        if (!success) {
             log.debug("send fail[code={}, message={}]", sendSmsResponse.getCode(), sendSmsResponse.getMessage());
         }
-        SmsResult resultBody = new SmsResult();
-        resultBody.setSuccess(result);
+        return new SmsResult()
+                .setSuccess(success)
+                .setMessage(sendSmsResponse.getMessage())
+                .setCode(sendSmsResponse.getCode())
+                .setApiId(sendSmsResponse.getBizId())
+                .setSendResultParam(sendSmsResponse.getBizId());
+    }
+
+
+    @Override
+    public List<SmsResultDetail> getSmsSendResult(String param) throws ClientException {
         QuerySendDetailsRequest querySendDetailsRequest = new QuerySendDetailsRequest();
-        querySendDetailsRequest.setBizId(sendSmsResponse.getBizId());
-        // TODO FROM 芋艿 to zzf：发送完之后，基于短信平台回调，去更新回执状态。短信发送是否成功，和最终用户收到，是两个维度。这块有困惑，可以微信，我给个截图哈。
+        querySendDetailsRequest.setBizId(param);
+        // TODO FROM 芋艿 to zzf：发送完之后，基于短信平台回调，去更新回执状态。短信发送是否成功，和最终用户收到，是两个维度。这块有困惑，可以微信，我给个截图哈。 DONE
         QuerySendDetailsResponse acsResponse = acsClient.getAcsResponse(querySendDetailsRequest);
         List<SmsResultDetail> resultDetailList = new ArrayList<>(Integer.parseInt(acsResponse.getTotalCount()));
         acsResponse.getSmsSendDetailDTOs().forEach(s -> {
             SmsResultDetail resultDetail = new SmsResultDetail();
-            resultDetail.setCreateTime(DateUtil.parseDateTime(s.getSendDate()));
+            resultDetail.setSendTime(DateUtil.parseDateTime(s.getSendDate()));
             resultDetail.setMessage(s.getContent());
             resultDetail.setPhone(s.getPhoneNum());
-            resultDetail.setStatus(statusConvert(s.getSendStatus()));
+            resultDetail.setSendStatus(statusConvert(s.getSendStatus()));
             resultDetailList.add(resultDetail);
         });
-        resultBody.setResult(resultDetailList);
-        return resultBody;
+        return resultDetailList;
     }
 
     private int statusConvert(Long aliSendStatus) {
         if (aliSendStatus == 1L) {
-            return SmsSendStatusEnum.SUCCESS.getStatus();
+            return SmsSendStatusEnum.SEND_SUCCESS.getStatus();
         }
         if (aliSendStatus == 2L) {
-            return SmsSendStatusEnum.FAIL.getStatus();
+            return SmsSendStatusEnum.SEND_FAIL.getStatus();
         }
         return SmsSendStatusEnum.WAITING.getStatus();
     }

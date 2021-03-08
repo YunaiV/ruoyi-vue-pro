@@ -14,7 +14,7 @@ public class SmsResultDetail implements Serializable {
     /**
      * 短信发送状态 {@link cn.iocoder.dashboard.modules.system.enums.sms.SmsSendStatusEnum}
      */
-    private Integer status;
+    private Integer sendStatus;
 
     /**
      * 接收手机号
@@ -29,5 +29,5 @@ public class SmsResultDetail implements Serializable {
     /**
      * 时间
      */
-    private Date createTime;
+    private Date sendTime;
 }

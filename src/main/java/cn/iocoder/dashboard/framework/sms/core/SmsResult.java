@@ -1,20 +1,26 @@
 package cn.iocoder.dashboard.framework.sms.core;
 
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 import java.io.Serializable;
-import java.util.List;
 
 /**
  * 消息内容实体类
  */
 @Data
+@Accessors(chain = true)
 public class SmsResult implements Serializable {
 
     /**
      * 是否成功(发送短信的请求是否成功)
      */
     private Boolean success;
+
+    /**
+     * 第三方唯一标识
+     */
+    private String apiId;
 
     /**
      * 状态码
@@ -27,10 +33,9 @@ public class SmsResult implements Serializable {
     private String message;
 
     /**
-     * 返回值
+     * 用于查询发送结果的参数
      */
-    private List<SmsResultDetail> result;
-
+    private String sendResultParam;
 
     public static SmsResult failResult(String message) {
         SmsResult resultBody = new SmsResult();

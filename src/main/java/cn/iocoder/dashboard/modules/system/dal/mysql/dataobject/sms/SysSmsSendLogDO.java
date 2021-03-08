@@ -1,5 +1,6 @@
 package cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.sms;
 
+import cn.iocoder.dashboard.modules.system.enums.sms.SmsSendStatusEnum;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -17,8 +18,8 @@ import java.util.Date;
 @Data
 @EqualsAndHashCode
 @Accessors(chain = true)
-@TableName(value = "sms_log", autoResultMap = true)
-public class SysSmsLogDO implements Serializable {
+@TableName(value = "sms_send_log", autoResultMap = true)
+public class SysSmsSendLogDO implements Serializable {
 
     /**
      * 自增编号
@@ -41,14 +42,9 @@ public class SysSmsLogDO implements Serializable {
     private String templateCode;
 
     /**
-     * 手机号(数组json字符串)
+     * 手机号
      */
-    private String phones;
-
-    /**
-     * 内容
-     */
-    private String content;
+    private String phone;
 
     /**
      * 备注
@@ -56,18 +52,15 @@ public class SysSmsLogDO implements Serializable {
     private String remark;
 
     /**
-     * 发送状态（1异步推送中 2发送中 3失败 4成功）
+     * 发送状态
+     *
+     * @see SmsSendStatusEnum
      */
     private Integer sendStatus;
 
     /**
-     * 创建者
+     * 发送时间
      */
-    private String createBy;
-
-    /**
-     * 创建时间
-     */
-    private Date createTime;
+    private Date sendTime;
 
 }

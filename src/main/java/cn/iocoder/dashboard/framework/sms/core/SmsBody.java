@@ -4,7 +4,6 @@ import cn.iocoder.dashboard.util.json.JsonUtils;
 import lombok.Data;
 
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * 消息内容实体类
@@ -21,6 +20,11 @@ public class SmsBody {
      * 模板编码
      */
     private String templateCode;
+
+    /**
+     * 模板编码
+     */
+    private String templateContent;
 
     /**
      * 参数列表
