@@ -21,13 +21,13 @@ public class BaseDO implements Serializable {
      */
     private Date updateTime;
     /**
-     * 创建者 TODO 芋艿：迁移成编号
+     * 创建者
      */
-    private String createBy;
+    private String creator;
     /**
-     * 更新者 TODO 芋艿：迁移成编号
+     * 更新者
      */
-    private String updateBy;
+    private String updater;
     /**
      * 是否删除
      */
