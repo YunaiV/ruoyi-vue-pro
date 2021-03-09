@@ -6,21 +6,24 @@ import cn.hutool.core.util.StrUtil;
 import cn.iocoder.dashboard.common.pojo.PageResult;
 import cn.iocoder.dashboard.framework.security.config.SecurityProperties;
 import cn.iocoder.dashboard.framework.security.core.LoginUser;
+import cn.iocoder.dashboard.framework.tracer.core.util.TracerUtils;
 import cn.iocoder.dashboard.modules.system.controller.auth.vo.session.SysUserSessionPageReqVO;
+import cn.iocoder.dashboard.modules.system.controller.logger.vo.loginlog.SysLoginLogCreateReqVO;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.auth.SysUserSessionDO;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.user.SysUserDO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.auth.SysUserSessionMapper;
 import cn.iocoder.dashboard.modules.system.dal.redis.auth.SysLoginUserRedisDAO;
+import cn.iocoder.dashboard.modules.system.enums.logger.SysLoginLogTypeEnum;
+import cn.iocoder.dashboard.modules.system.enums.logger.SysLoginResultEnum;
 import cn.iocoder.dashboard.modules.system.service.auth.SysUserSessionService;
+import cn.iocoder.dashboard.modules.system.service.logger.SysLoginLogService;
 import cn.iocoder.dashboard.modules.system.service.user.SysUserService;
 import com.google.common.collect.Lists;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.time.Duration;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static cn.iocoder.dashboard.util.collection.CollectionUtils.convertSet;
@@ -36,14 +39,14 @@ public class SysUserSessionServiceImpl implements SysUserSessionService {
 
     @Resource
     private SecurityProperties securityProperties;
-
     @Resource
     private SysLoginUserRedisDAO loginUserRedisDAO;
     @Resource
     private SysUserSessionMapper userSessionMapper;
-
     @Resource
     private SysUserService userService;
+    @Resource
+    private SysLoginLogService loginLogService;
 
     @Override
     public String createUserSession(LoginUser loginUser, String userIp, String userAgent) {
@@ -54,7 +57,7 @@ public class SysUserSessionServiceImpl implements SysUserSessionService {
         loginUserRedisDAO.set(sessionId, loginUser);
         // 写入 DB 中
         SysUserSessionDO userSession = SysUserSessionDO.builder().id(sessionId)
-                .userId(loginUser.getId()).userIp(userIp).userAgent(userAgent)
+                .userId(loginUser.getId()).userIp(userIp).userAgent(userAgent).username(loginUser.getUsername())
                 .sessionTimeout(addTime(Duration.ofMillis(getSessionTimeoutMillis())))
                 .build();
         userSessionMapper.insert(userSession);
@@ -69,6 +72,7 @@ public class SysUserSessionServiceImpl implements SysUserSessionService {
         loginUserRedisDAO.set(sessionId, loginUser);
         // 更新 DB 中
         SysUserSessionDO updateObj = SysUserSessionDO.builder().id(sessionId).build();
+        updateObj.setUsername(loginUser.getUsername());
         updateObj.setUpdateTime(new Date());
         updateObj.setSessionTimeout(addTime(Duration.ofMillis(getSessionTimeoutMillis())));
         userSessionMapper.updateById(updateObj);
@@ -109,16 +113,30 @@ public class SysUserSessionServiceImpl implements SysUserSessionService {
     public long clearSessionTimeout() {
         // 获取db里已经超时的用户列表
         List<SysUserSessionDO> sessionTimeoutDOS = userSessionMapper.selectListBySessionTimoutLt();
-        List<String> timeoutIdList = sessionTimeoutDOS
+        Map<String, SysUserSessionDO> timeoutSessionDOMap = sessionTimeoutDOS
                 .stream()
                 .filter(sessionDO -> loginUserRedisDAO.get(sessionDO.getId()) == null)
-                .map(SysUserSessionDO::getId)
-                .collect(Collectors.toList());
+                .collect(Collectors.toMap(SysUserSessionDO::getId, o -> o));
         // 确认已经超时,按批次移出在线用户列表
-        if (CollUtil.isNotEmpty(timeoutIdList)) {
-            Lists.partition(timeoutIdList, 100).forEach(userSessionMapper::deleteBatchIds);
+        if (CollUtil.isNotEmpty(timeoutSessionDOMap)) {
+            Lists.partition(new ArrayList<>(timeoutSessionDOMap.keySet()), 100).forEach(userSessionMapper::deleteBatchIds);
+            //记录用户超时退出日志
+            createTimeoutLogoutLog(timeoutSessionDOMap.values());
         }
-        return timeoutIdList.size();
+        return timeoutSessionDOMap.size();
+    }
+
+    private void createTimeoutLogoutLog(Collection<SysUserSessionDO> timeoutSessionDOS) {
+        for (SysUserSessionDO timeoutSessionDO : timeoutSessionDOS) {
+            SysLoginLogCreateReqVO reqVO = new SysLoginLogCreateReqVO();
+            reqVO.setLogType(SysLoginLogTypeEnum.LOGOUT_TIMEOUT.getType());
+            reqVO.setTraceId(TracerUtils.getTraceId());
+            reqVO.setUsername(timeoutSessionDO.getUsername());
+            reqVO.setUserAgent(timeoutSessionDO.getUserAgent());
+            reqVO.setUserIp(timeoutSessionDO.getUserIp());
+            reqVO.setResult(SysLoginResultEnum.SUCCESS.getResult());
+            loginLogService.createLoginLog(reqVO);
+        }
     }
 
     /**

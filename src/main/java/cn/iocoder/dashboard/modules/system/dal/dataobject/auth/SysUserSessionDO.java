@@ -38,6 +38,14 @@ public class SysUserSessionDO extends BaseDO {
      * 关联 {@link SysUserDO#getId()}
      */
     private Long userId;
+
+    /**
+     * 用户账号
+     *
+     * 冗余，因为账号可以变更
+     */
+    private String username;
+
     /**
      * 用户 IP
      */

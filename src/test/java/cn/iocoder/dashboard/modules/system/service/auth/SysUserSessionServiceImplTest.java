@@ -1,12 +1,20 @@
 package cn.iocoder.dashboard.modules.system.service.auth;
 
 import cn.hutool.core.date.DateUtil;
-import cn.iocoder.dashboard.BaseSpringBootUnitTest;
+import cn.iocoder.dashboard.BaseDbAndRedisUnitTest;
 import cn.iocoder.dashboard.framework.mybatis.core.query.QueryWrapperX;
+import cn.iocoder.dashboard.framework.security.config.SecurityProperties;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.auth.SysUserSessionDO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.auth.SysUserSessionMapper;
+import cn.iocoder.dashboard.modules.system.dal.redis.auth.SysLoginUserRedisDAO;
+import cn.iocoder.dashboard.modules.system.service.auth.impl.SysUserSessionServiceImpl;
+import cn.iocoder.dashboard.modules.system.service.dept.impl.SysDeptServiceImpl;
+import cn.iocoder.dashboard.modules.system.service.logger.impl.SysLoginLogServiceImpl;
+import cn.iocoder.dashboard.modules.system.service.user.SysUserServiceImpl;
 import cn.iocoder.dashboard.util.RandomUtils;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
 import java.util.Date;
@@ -23,12 +31,25 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @version 1.0
  * @since <pre>3月 8, 2021</pre>
  */
-public class SysUserSessionServiceImplTest extends BaseSpringBootUnitTest {
+@Import({
+        SysUserSessionServiceImpl.class
+})
+public class SysUserSessionServiceImplTest extends BaseDbAndRedisUnitTest {
 
     @Resource
-    SysUserSessionService sysUserSessionService;
+    SysUserSessionServiceImpl sysUserSessionService;
     @Resource
     SysUserSessionMapper sysUserSessionMapper;
+    @MockBean
+    SecurityProperties securityProperties;
+    @MockBean
+    SysDeptServiceImpl sysDeptService;
+    @MockBean
+    SysUserServiceImpl sysUserService;
+    @MockBean
+    SysLoginLogServiceImpl sysLoginLogService;
+    @MockBean
+    SysLoginUserRedisDAO sysLoginUserRedisDAO;
 
     @Test
     public void testClearSessionTimeout_success() throws Exception {
