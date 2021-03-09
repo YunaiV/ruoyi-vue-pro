@@ -26,7 +26,7 @@ public class SysDeptBaseVO {
 
     @ApiModelProperty(value = "显示顺序不能为空", required = true, example = "1024")
     @NotBlank(message = "显示顺序不能为空")
-    private String sort;
+    private Integer sort;
 
     @ApiModelProperty(value = "负责人", example = "芋道")
     private String leader;

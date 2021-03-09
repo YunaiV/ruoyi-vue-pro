@@ -25,7 +25,7 @@ public class SysPostBaseVO {
 
     @ApiModelProperty(value = "显示顺序不能为空", required = true, example = "1024")
     @NotBlank(message = "显示顺序不能为空")
-    private String sort;
+    private Integer sort;
 
     @ApiModelProperty(value = "状态", required = true, example = "1", notes = "参见 SysCommonStatusEnum 枚举类")
     private Integer status;
