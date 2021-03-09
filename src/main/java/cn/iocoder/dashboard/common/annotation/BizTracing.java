@@ -12,6 +12,7 @@ import java.lang.annotation.*;
  * @author 麻薯
  */
 public @interface BizTracing {
+
     String BIZ_ID = "bizId";
     String BIZ_TYPE = "bizType";
 

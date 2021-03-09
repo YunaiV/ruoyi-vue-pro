@@ -22,11 +22,12 @@ package cn.iocoder.dashboard.framework.tracer.skywalking;
 import ch.qos.logback.classic.PatternLayout;
 
 /**
- * Based on the logback-compoenent convert register mechanism,
+ * Based on the logback-component convert register mechanism,
  * register {@link LocalLogbackPatternConverter} as a new convert, match to "tid".
  * You can use "%tid" in logback config file, "Pattern" section.
  * If sky-walking agent is not active mode, it will use UUID as tid.
  * <p>
+ * logback 的转换组件,为tid 添加占位符的转换器
  * Created by mashu on 2021/3/6.
  */
 public class TraceIdPatternLogbackLayout extends PatternLayout {
