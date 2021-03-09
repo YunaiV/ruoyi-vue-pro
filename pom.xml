@@ -164,13 +164,6 @@
             <artifactId>apm-toolkit-logback-1.x</artifactId>
             <version>${skywalking.version}</version>
         </dependency>
-        <!-- sky-walking日志相关 -->
-        <dependency>
-            <groupId>net.logstash.logback</groupId>
-            <artifactId>logstash-logback-encoder</artifactId>
-            <version>${logback.encoder.version}</version>
-            <scope>provided</scope>
-        </dependency>
 
         <dependency>
             <groupId>de.codecentric</groupId>
