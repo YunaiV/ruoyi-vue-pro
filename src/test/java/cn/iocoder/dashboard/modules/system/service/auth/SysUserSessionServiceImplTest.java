@@ -11,6 +11,7 @@ import cn.iocoder.dashboard.modules.system.service.auth.impl.SysUserSessionServi
 import cn.iocoder.dashboard.modules.system.service.dept.impl.SysDeptServiceImpl;
 import cn.iocoder.dashboard.modules.system.service.logger.impl.SysLoginLogServiceImpl;
 import cn.iocoder.dashboard.modules.system.service.user.SysUserServiceImpl;
+import cn.iocoder.dashboard.util.AssertUtils;
 import cn.iocoder.dashboard.util.RandomUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -31,9 +32,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @version 1.0
  * @since <pre>3月 8, 2021</pre>
  */
-@Import({
-        SysUserSessionServiceImpl.class
-})
+@Import(
+        SysUserSessionServiceImpl.class)
 public class SysUserSessionServiceImplTest extends BaseDbAndRedisUnitTest {
 
     @Resource
@@ -62,14 +62,17 @@ public class SysUserSessionServiceImplTest extends BaseDbAndRedisUnitTest {
                 .limit(expectedTimeoutCount)
                 .map(i -> RandomUtils.randomPojo(SysUserSessionDO.class, o -> o.setSessionTimeout(DateUtil.offsetSecond(new Date(), -1))))
                 .collect(Collectors.toList());
-        prepareData.add(RandomUtils.randomPojo(SysUserSessionDO.class, o -> o.setSessionTimeout(DateUtil.offsetMinute(new Date(), 30))));
+        SysUserSessionDO sessionDO = RandomUtils.randomPojo(SysUserSessionDO.class, o -> o.setSessionTimeout(DateUtil.offsetMinute(new Date(), 30)));
+        prepareData.add(sessionDO);
         prepareData.forEach(sysUserSessionMapper::insert);
 
         //清空超时数据
         long actualTimeoutCount = sysUserSessionService.clearSessionTimeout();
+        //校验
         assertEquals(expectedTimeoutCount, actualTimeoutCount);
-        Integer actualTotal = sysUserSessionMapper.selectCount(new QueryWrapperX<>());
-        assertEquals(expectedTotal, actualTotal);
+        List<SysUserSessionDO> userSessionDOS = sysUserSessionMapper.selectList();
+        assertEquals(expectedTotal, userSessionDOS.size());
+        AssertUtils.assertPojoEquals(sessionDO, userSessionDOS.get(0), "updateTime");
     }
 
 } 
