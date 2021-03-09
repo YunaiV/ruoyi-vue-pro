@@ -28,7 +28,7 @@ public class SysMenuBaseVO {
     private Integer type;
 
     @ApiModelProperty(value = "显示顺序不能为空", required = true, example = "1024")
-    @NotBlank(message = "显示顺序不能为空")
+    @NotNull(message = "显示顺序不能为空")
     private Integer sort;
 
     @ApiModelProperty(value = "父菜单 ID", required = true, example = "1024")
