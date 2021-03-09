@@ -152,7 +152,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                     .anyRequest().authenticated()
                 .and()
                 .headers().frameOptions().disable();
-        httpSecurity.logout().logoutUrl("/logout").logoutSuccessHandler(logoutSuccessHandler);
+        httpSecurity.logout().logoutUrl(webProperties.getApiPrefix() + "/logout").logoutSuccessHandler(logoutSuccessHandler);
         // 添加 JWT Filter
         httpSecurity.addFilterBefore(authenticationTokenFilter, UsernamePasswordAuthenticationFilter.class);
     }

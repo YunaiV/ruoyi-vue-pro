@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.modules.infra.service.config;
 
-import cn.iocoder.dashboard.BaseSpringBootUnitTest;
+import cn.iocoder.dashboard.BaseDbUnitTest;
 import cn.iocoder.dashboard.common.pojo.PageResult;
 import cn.iocoder.dashboard.modules.infra.controller.config.vo.InfConfigCreateReqVO;
 import cn.iocoder.dashboard.modules.infra.controller.config.vo.InfConfigExportReqVO;
@@ -15,6 +15,7 @@ import cn.iocoder.dashboard.util.collection.ArrayUtils;
 import cn.iocoder.dashboard.util.object.ObjectUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -35,7 +36,8 @@ import static org.mockito.Mockito.verify;
  *
  * @author 芋道源码
  */
-public class InfConfigServiceTest extends BaseSpringBootUnitTest {
+@Import(InfConfigServiceImpl.class)
+public class InfConfigServiceTest extends BaseDbUnitTest {
 
     @Resource
     private InfConfigServiceImpl configService;

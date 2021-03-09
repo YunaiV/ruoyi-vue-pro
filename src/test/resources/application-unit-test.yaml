@@ -3,21 +3,6 @@ spring:
     lazy-initialization: true # 开启懒加载，加快速度
     banner-mode: off # 单元测试，禁用 Banner
 
-  # 去除的自动配置项
-  autoconfigure:
-    exclude:
-      - org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration # 单元测试，禁用 SpringSecurity
-      - org.springframework.boot.autoconfigure.security.reactive.ReactiveSecurityAutoConfiguration # 单元测试，禁用 SpringSecurity
-      - org.springframework.boot.autoconfigure.quartz.QuartzAutoConfiguration # 单元测试，禁用 Quartz
-      - com.baomidou.lock.spring.boot.autoconfigure.LockAutoConfiguration # 单元测试，禁用 Lock4j 分布式锁
-      - org.springframework.boot.autoconfigure.task.TaskSchedulingAutoConfiguration # 单元测试，禁用 Scheduler 定时任务
-      - org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration # 项目没有使用 Spring Data，所以禁用配置类，加速启动
-
-# Swagger 接口文档的自动配置（单元测试，禁用 Swagger)
-springfox:
-  documentation:
-    auto-startup: false
-
 --- #################### 数据库相关配置 ####################
 
 spring:
@@ -29,6 +14,9 @@ spring:
     username: sa
     password:
     schema: classpath:sql/create_tables.sql # MySQL 转 H2 的语句，使用 https://www.jooq.org/translate/ 工具
+    druid:
+      async-init: true # 单元测试，异步初始化 Druid 连接池，提升启动速度
+      initial-size: 1 # 单元测试，配置为 1，提升启动速度
 
   # Redis 配置。Redisson 默认的配置足够使用，一般不需要进行调优
   redis:
@@ -36,16 +24,12 @@ spring:
     port: 16379 # 端口（单元测试，使用 16379 端口）
     database: 0 # 数据库索引
 
+mybatis:
+  lazy-initialization: true # 单元测试，设置 MyBatis Mapper 延迟加载，加速每个单元测试
+
 --- #################### 定时任务相关配置 ####################
 
-# Quartz 配置项，对应 QuartzProperties 配置类（单元测试，禁用 Quartz）
-
 --- #################### 配置中心相关配置 ####################
-
-# Apollo 配置中心
-apollo:
-  bootstrap:
-    enabled: false # 单元测试，禁用配置中心
 
 --- #################### 服务保障相关配置 ####################
 
@@ -62,23 +46,6 @@ resilience4j:
         register-health-indicator: true # 是否注册到健康监测
 
 --- #################### 监控相关配置 ####################
-
-# Actuator 监控端点的配置项
-management:
-  endpoints:
-    enabled-by-default: false
-
-# Spring Boot Admin 配置项
-spring:
-  boot:
-    admin:
-      # Spring Boot Admin Client 客户端的相关配置
-      client:
-        enabled: false
-      # Spring Boot Admin Server 服务端的相关配置
-      context-path: /admin # 配置 Spring
-
-# 日志文件配置（不需要配置）
 
 --- #################### 芋道相关配置 ####################
 
