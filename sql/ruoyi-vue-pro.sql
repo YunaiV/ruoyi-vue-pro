@@ -11,7 +11,7 @@
  Target Server Version : 50718
  File Encoding         : 65001
 
- Date: 08/03/2021 00:50:29
+ Date: 09/03/2021 20:39:41
 */
 
 SET NAMES utf8mb4;
@@ -37,13 +37,13 @@ CREATE TABLE `inf_api_access_log` (
   `duration` int(11) NOT NULL COMMENT '执行时长',
   `result_code` int(11) NOT NULL DEFAULT '0' COMMENT '结果码',
   `result_msg` varchar(512) DEFAULT '' COMMENT '结果提示',
-  `create_by` varchar(64) DEFAULT '' COMMENT '创建者',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_by` varchar(64) DEFAULT '' COMMENT '更新者',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=1850 DEFAULT CHARSET=utf8mb4 COMMENT='API 访问日志表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='API 访问日志表';
 
 -- ----------------------------
 -- Records of inf_api_access_log
@@ -78,13 +78,13 @@ CREATE TABLE `inf_api_error_log` (
   `process_status` tinyint(4) NOT NULL COMMENT '处理状态',
   `process_time` datetime DEFAULT NULL COMMENT '处理时间',
   `process_user_id` int(11) DEFAULT '0' COMMENT '处理用户编号',
-  `create_by` varchar(64) DEFAULT '' COMMENT '创建者',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_by` varchar(64) DEFAULT '' COMMENT '更新者',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COMMENT='系统异常日志';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='系统异常日志';
 
 -- ----------------------------
 -- Records of inf_api_error_log
@@ -105,9 +105,9 @@ CREATE TABLE `inf_config` (
   `value` varchar(500) NOT NULL DEFAULT '' COMMENT '参数键值',
   `sensitive` bit(1) NOT NULL COMMENT '是否敏感',
   `remark` varchar(500) DEFAULT NULL COMMENT '备注',
-  `create_by` varchar(64) DEFAULT '' COMMENT '创建者',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_by` varchar(64) DEFAULT '' COMMENT '更新者',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
@@ -138,9 +138,9 @@ CREATE TABLE `inf_job` (
   `retry_count` int(11) NOT NULL DEFAULT '0' COMMENT '重试次数',
   `retry_interval` int(11) NOT NULL DEFAULT '0' COMMENT '重试间隔',
   `monitor_timeout` int(11) NOT NULL DEFAULT '0' COMMENT '监控超时时间',
-  `create_by` varchar(64) DEFAULT '' COMMENT '创建者',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_by` varchar(64) DEFAULT '' COMMENT '更新者',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
@@ -169,13 +169,13 @@ CREATE TABLE `inf_job_log` (
   `duration` int(11) DEFAULT NULL COMMENT '执行时长',
   `status` tinyint(4) NOT NULL COMMENT '任务状态',
   `result` varchar(4000) DEFAULT '' COMMENT '结果数据',
-  `create_by` varchar(64) DEFAULT '' COMMENT '创建者',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_by` varchar(64) DEFAULT '' COMMENT '更新者',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=4477 DEFAULT CHARSET=utf8mb4 COMMENT='定时任务日志表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='定时任务日志表';
 
 -- ----------------------------
 -- Records of inf_job_log
@@ -196,9 +196,9 @@ CREATE TABLE `sys_dept` (
   `phone` varchar(11) DEFAULT NULL COMMENT '联系电话',
   `email` varchar(50) DEFAULT NULL COMMENT '邮箱',
   `status` tinyint(4) NOT NULL COMMENT '部门状态（0正常 1停用）',
-  `create_by` varchar(64) DEFAULT '' COMMENT '创建者',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_by` varchar(64) DEFAULT '' COMMENT '更新者',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
@@ -232,9 +232,9 @@ CREATE TABLE `sys_dict_data` (
   `dict_type` varchar(100) NOT NULL DEFAULT '' COMMENT '字典类型',
   `status` tinyint(4) NOT NULL DEFAULT '0' COMMENT '状态（0正常 1停用）',
   `remark` varchar(500) DEFAULT NULL COMMENT '备注',
-  `create_by` varchar(64) DEFAULT '' COMMENT '创建者',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_by` varchar(64) DEFAULT '' COMMENT '更新者',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
@@ -310,9 +310,9 @@ CREATE TABLE `sys_dict_type` (
   `type` varchar(100) NOT NULL DEFAULT '' COMMENT '字典类型',
   `status` tinyint(4) NOT NULL DEFAULT '0' COMMENT '状态（0正常 1停用）',
   `remark` varchar(500) DEFAULT NULL COMMENT '备注',
-  `create_by` varchar(64) DEFAULT '' COMMENT '创建者',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_by` varchar(64) DEFAULT '' COMMENT '更新者',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE,
@@ -349,9 +349,9 @@ DROP TABLE IF EXISTS `sys_file`;
 CREATE TABLE `sys_file` (
   `id` varchar(188) NOT NULL COMMENT '文件路径',
   `content` blob NOT NULL COMMENT '文件内容',
-  `create_by` varchar(64) DEFAULT '' COMMENT '创建者',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_by` varchar(64) DEFAULT '' COMMENT '更新者',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
@@ -376,13 +376,13 @@ CREATE TABLE `sys_login_log` (
   `result` tinyint(4) NOT NULL COMMENT '登陆结果',
   `user_ip` varchar(50) NOT NULL COMMENT '用户 IP',
   `user_agent` varchar(512) NOT NULL COMMENT '浏览器 UA',
-  `create_by` varchar(64) DEFAULT '' COMMENT '创建者',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_by` varchar(64) DEFAULT '' COMMENT '更新者',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=127 DEFAULT CHARSET=utf8mb4 COMMENT='系统访问记录';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='系统访问记录';
 
 -- ----------------------------
 -- Records of sys_login_log
@@ -405,9 +405,9 @@ CREATE TABLE `sys_menu` (
   `icon` varchar(100) DEFAULT '#' COMMENT '菜单图标',
   `component` varchar(255) DEFAULT NULL COMMENT '组件路径',
   `status` tinyint(4) NOT NULL DEFAULT '0' COMMENT '菜单状态（0正常 1停用）',
-  `create_by` varchar(64) DEFAULT '' COMMENT '创建者',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_by` varchar(64) DEFAULT '' COMMENT '更新者',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
@@ -532,9 +532,9 @@ CREATE TABLE `sys_notice` (
   `content` text NOT NULL COMMENT '公告内容',
   `notice_type` tinyint(4) NOT NULL COMMENT '公告类型（1通知 2公告）',
   `status` tinyint(4) NOT NULL DEFAULT '0' COMMENT '公告状态（0正常 1关闭）',
-  `create_by` varchar(64) DEFAULT '' COMMENT '创建者',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_by` varchar(64) DEFAULT '' COMMENT '更新者',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
@@ -573,13 +573,13 @@ CREATE TABLE `sys_operate_log` (
   `result_code` int(11) NOT NULL DEFAULT '0' COMMENT '结果码',
   `result_msg` varchar(512) DEFAULT '' COMMENT '结果提示',
   `result_data` varchar(4000) DEFAULT '' COMMENT '结果数据',
-  `create_by` varchar(64) DEFAULT '' COMMENT '创建者',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_by` varchar(64) DEFAULT '' COMMENT '更新者',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COMMENT='操作日志记录';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='操作日志记录';
 
 -- ----------------------------
 -- Records of sys_operate_log
@@ -598,9 +598,9 @@ CREATE TABLE `sys_post` (
   `sort` int(4) NOT NULL COMMENT '显示顺序',
   `status` tinyint(4) NOT NULL COMMENT '状态（0正常 1停用）',
   `remark` varchar(500) DEFAULT NULL COMMENT '备注',
-  `create_by` varchar(64) DEFAULT '' COMMENT '创建者',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_by` varchar(64) DEFAULT '' COMMENT '更新者',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
@@ -631,9 +631,9 @@ CREATE TABLE `sys_role` (
   `status` tinyint(4) NOT NULL COMMENT '角色状态（0正常 1停用）',
   `type` tinyint(4) NOT NULL COMMENT '角色类型',
   `remark` varchar(500) DEFAULT NULL COMMENT '备注',
-  `create_by` varchar(64) DEFAULT '' COMMENT '创建者',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_by` varchar(64) DEFAULT '' COMMENT '更新者',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
@@ -656,9 +656,9 @@ CREATE TABLE `sys_role_menu` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '自增编号',
   `role_id` bigint(20) NOT NULL COMMENT '角色ID',
   `menu_id` bigint(20) NOT NULL COMMENT '菜单ID',
-  `create_by` varchar(64) DEFAULT '' COMMENT '创建者',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_by` varchar(64) DEFAULT '' COMMENT '更新者',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
@@ -843,9 +843,9 @@ CREATE TABLE `sys_user` (
   `status` tinyint(4) NOT NULL DEFAULT '0' COMMENT '帐号状态（0正常 1停用）',
   `login_ip` varchar(50) DEFAULT '' COMMENT '最后登录IP',
   `login_date` datetime DEFAULT NULL COMMENT '最后登录时间',
-  `create_by` varchar(64) DEFAULT '' COMMENT '创建者',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_by` varchar(64) DEFAULT '' COMMENT '更新者',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
@@ -870,9 +870,9 @@ CREATE TABLE `sys_user_role` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '自增编号',
   `user_id` bigint(20) NOT NULL COMMENT '用户ID',
   `role_id` bigint(20) NOT NULL COMMENT '角色ID',
-  `create_by` varchar(64) DEFAULT '' COMMENT '创建者',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
   `create_time` datetime DEFAULT NULL COMMENT '创建时间',
-  `update_by` varchar(64) DEFAULT '' COMMENT '更新者',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
   `update_time` datetime DEFAULT NULL COMMENT '更新时间',
   `deleted` bit(1) DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
@@ -898,11 +898,13 @@ DROP TABLE IF EXISTS `sys_user_session`;
 CREATE TABLE `sys_user_session` (
   `id` varchar(32) NOT NULL COMMENT '会话编号',
   `user_id` bigint(20) NOT NULL COMMENT '用户编号',
+  `session_timeout` datetime NOT NULL COMMENT '会话超时时间',
+  `username` varchar(30) NOT NULL COMMENT '用户账号',
   `user_ip` varchar(50) NOT NULL COMMENT '用户 IP',
   `user_agent` varchar(512) NOT NULL COMMENT '浏览器 UA',
-  `create_by` varchar(64) DEFAULT '' COMMENT '创建者',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_by` varchar(64) DEFAULT '' COMMENT '更新者',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
@@ -912,68 +914,6 @@ CREATE TABLE `sys_user_session` (
 -- Records of sys_user_session
 -- ----------------------------
 BEGIN;
-INSERT INTO `sys_user_session` VALUES ('015797486c564c01b128cb2662bfa1f9', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-02-08 03:20:22', '', '2021-02-08 03:20:22', b'0');
-INSERT INTO `sys_user_session` VALUES ('019f009268e24cc1957c46763eef1fd4', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-02-07 08:36:48', '', '2021-02-14 20:04:33', b'0');
-INSERT INTO `sys_user_session` VALUES ('037f130370a744a4b1db19aef205b8ae', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-02-08 20:38:37', '', '2021-02-08 20:38:37', b'0');
-INSERT INTO `sys_user_session` VALUES ('04d51ff81ad54d05ab2f29e66b2a02f2', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-02-05 17:46:10', '', '2021-02-11 00:58:19', b'0');
-INSERT INTO `sys_user_session` VALUES ('055057e3356b4c249d56a6627ca057a7', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-03-04 16:54:24', '', '2021-03-05 01:25:51', b'0');
-INSERT INTO `sys_user_session` VALUES ('064ba2d647704f57bdf36a1803a724d7', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-02-26 02:17:35', '', '2021-02-27 12:04:09', b'0');
-INSERT INTO `sys_user_session` VALUES ('0df60899301d4080bd4164f24bccf18b', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-02-07 13:05:42', '', '2021-02-14 22:57:44', b'0');
-INSERT INTO `sys_user_session` VALUES ('1127b5eb9b0c4f9fa382d4d98a8a4a38', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-02-05 06:49:00', '', '2021-02-10 11:10:31', b'0');
-INSERT INTO `sys_user_session` VALUES ('11aa2d7861d445349790804fa8676754', 1, '127.0.0.1', 'Mozilla/5.0 (Linux; Android 10; PCT-AL10 Build/HUAWEIPCT-AL10; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/77.0.3865.120 MQQBrowser/6.2 TBS/045513 Mobile Safari/537.36 MMWEBID/2883 MicroMessenger/8.0.1.1841(0x28000159) Process/tools WeChat/arm64 Weixin NetType/4G Language/zh_CN ABI/arm64', '', '2021-02-09 00:06:03', '', '2021-02-09 00:06:03', b'0');
-INSERT INTO `sys_user_session` VALUES ('135db2c6d88a4f41aaf4df46f3a3e0ea', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-03-06 01:44:25', '', '2021-03-06 01:44:25', b'0');
-INSERT INTO `sys_user_session` VALUES ('1bcac32d34b94422893f10718f643320', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-02-09 12:14:10', '', '2021-02-09 12:14:10', b'0');
-INSERT INTO `sys_user_session` VALUES ('20109910c52e4b02bbc0531212bff8cb', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-02-06 02:39:48', '', '2021-02-06 02:39:48', b'0');
-INSERT INTO `sys_user_session` VALUES ('2024509755b3444690c2a1dddaebd812', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-02-05 06:22:30', '', '2021-02-05 06:22:30', b'0');
-INSERT INTO `sys_user_session` VALUES ('260facb728964db7a3df8461b4eebe86', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-02-08 23:10:08', '', '2021-02-08 23:10:08', b'0');
-INSERT INTO `sys_user_session` VALUES ('27858c1f13c64a2a8889063932419885', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-02-08 18:27:13', '', '2021-02-20 16:11:21', b'0');
-INSERT INTO `sys_user_session` VALUES ('27d6db8abb3b4ed88d446ad489b9db23', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-02-07 06:38:34', '', '2021-02-14 10:57:34', b'0');
-INSERT INTO `sys_user_session` VALUES ('27dbe0b1051b41eb9efe6558af7cd681', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-03-06 00:51:14', '', '2021-03-06 19:10:23', b'0');
-INSERT INTO `sys_user_session` VALUES ('285af833677642448bbd19c40a279825', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-02-08 04:17:09', '', '2021-02-18 20:23:05', b'0');
-INSERT INTO `sys_user_session` VALUES ('31e5ff8584794ca58460ecf68a177c3f', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-02-06 11:48:57', '', '2021-02-12 20:56:44', b'0');
-INSERT INTO `sys_user_session` VALUES ('39cdef31685d4e93931a053d88ff0279', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-02-05 08:09:33', '', '2021-02-05 08:09:33', b'0');
-INSERT INTO `sys_user_session` VALUES ('3e111c66356d47da8ffc2755bfa3db52', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-02-09 14:00:25', '', '2021-02-09 14:00:25', b'0');
-INSERT INTO `sys_user_session` VALUES ('3f308ac8ff26481e829261dd14babbbb', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-02-08 01:33:07', '', '2021-02-17 22:01:24', b'0');
-INSERT INTO `sys_user_session` VALUES ('452d44e0616c4dca93485ce67ac946df', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-03-06 03:41:56', '', '2021-03-06 21:59:07', b'0');
-INSERT INTO `sys_user_session` VALUES ('50274d6c400f42f7bd5391a12858e262', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-02-26 11:45:04', '', '2021-02-26 11:45:04', b'0');
-INSERT INTO `sys_user_session` VALUES ('5636ae58b9644ea1b4ed934b025b76ea', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-02-05 04:24:59', '', '2021-02-09 18:40:06', b'0');
-INSERT INTO `sys_user_session` VALUES ('5891c4873bf746989a132929449d5f2b', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-03-06 01:55:18', '', '2021-03-06 20:55:38', b'0');
-INSERT INTO `sys_user_session` VALUES ('597956fbc5b34363981530b24e1b5327', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-02-06 13:47:15', '', '2021-02-12 20:36:16', b'0');
-INSERT INTO `sys_user_session` VALUES ('599102a1e8414ab59eddaf5492f98dad', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-02-26 06:40:37', '', '2021-02-27 21:25:52', b'0');
-INSERT INTO `sys_user_session` VALUES ('5a9b736ccaa8452394c57ac82bd0815e', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-02-05 10:57:52', '', '2021-02-10 16:52:48', b'0');
-INSERT INTO `sys_user_session` VALUES ('5aaeaa5c89434c6bbfa6c5af55097093', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-02-26 01:28:32', '', '2021-02-27 10:34:25', b'0');
-INSERT INTO `sys_user_session` VALUES ('5b6787e6cbfa4c7faba0dc825fc02816', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-02-08 17:25:20', '', '2021-02-20 14:49:27', b'0');
-INSERT INTO `sys_user_session` VALUES ('604ac07123a445ee8a81e58db1d6d695', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-02-05 16:33:53', '', '2021-02-05 16:33:53', b'0');
-INSERT INTO `sys_user_session` VALUES ('648563ff4a7f454dac0385cca0581fb3', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-02-08 09:34:50', '', '2021-02-19 09:55:44', b'0');
-INSERT INTO `sys_user_session` VALUES ('64fd3d0a54754b8fa13b62d2f261b1e2', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-02-05 01:36:09', '', '2021-02-09 16:05:22', b'0');
-INSERT INTO `sys_user_session` VALUES ('661be9d3983e4e2eb8b346c1329015f5', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-02-06 19:46:45', '', '2021-02-13 12:02:29', b'0');
-INSERT INTO `sys_user_session` VALUES ('6acbf1f210ff4c6594acb3505f0c3738', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-02-07 12:16:36', '', '2021-02-14 22:37:22', b'0');
-INSERT INTO `sys_user_session` VALUES ('6e7e89c4948f45658eb74878457ac611', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-02-09 21:29:20', '', '2021-02-23 01:54:44', b'0');
-INSERT INTO `sys_user_session` VALUES ('73c66b705ed94e18bc53df61abc2d102', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-02-06 15:00:55', '', '2021-02-06 15:00:55', b'0');
-INSERT INTO `sys_user_session` VALUES ('73cc914671034f3190f09f520d1b39e9', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-01-26 08:29:27', '', '2021-01-26 08:29:50', b'1');
-INSERT INTO `sys_user_session` VALUES ('7b008d71139f48a4903aeaab0bbbef2e', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-03-06 04:38:15', '', '2021-03-06 04:38:15', b'0');
-INSERT INTO `sys_user_session` VALUES ('7cbd0fdfb9304f298abb9ee2f58f7230', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-02-08 20:02:24', '', '2021-02-08 20:02:24', b'0');
-INSERT INTO `sys_user_session` VALUES ('830a1687977b44969025177ad3b6d051', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-02-10 01:56:00', '', '2021-02-10 01:56:00', b'0');
-INSERT INTO `sys_user_session` VALUES ('8331dbbca7be4348a3d2d02bf559b65e', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-02-05 13:29:04', '', '2021-02-10 19:06:26', b'0');
-INSERT INTO `sys_user_session` VALUES ('897714de63634dba9ac235247f9860c2', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-03-06 06:27:27', '', '2021-03-07 00:50:21', b'0');
-INSERT INTO `sys_user_session` VALUES ('8d7668c1276344ecbffaf7e4420595d7', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-02-08 09:56:09', '', '2021-02-19 19:17:42', b'0');
-INSERT INTO `sys_user_session` VALUES ('9a3a5b8dee1841b69d70454ce23a53a3', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-02-26 00:09:49', '', '2021-02-27 01:27:20', b'0');
-INSERT INTO `sys_user_session` VALUES ('9cc71dc2d7a24b978db1bfe0e4bae349', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-01-26 08:30:01', '', '2021-01-26 08:30:01', b'0');
-INSERT INTO `sys_user_session` VALUES ('9e47f4bfee5e444194530de88900e259', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-02-09 20:25:02', '', '2021-02-23 01:54:51', b'0');
-INSERT INTO `sys_user_session` VALUES ('a07756b7a4b24117b0bd14ec2c68b516', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-02-26 07:47:21', '', '2021-02-27 23:12:38', b'0');
-INSERT INTO `sys_user_session` VALUES ('a1d01dbed7ff4b6392c3f27c18ce8778', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-02-07 07:36:14', '', '2021-02-14 12:13:56', b'0');
-INSERT INTO `sys_user_session` VALUES ('a63c2208dd824440999bee9abc22ea7a', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-02-25 20:45:24', '', '2021-02-25 20:45:24', b'0');
-INSERT INTO `sys_user_session` VALUES ('a7c495d00e2e4543ba943b4edb8c8176', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-02-26 03:44:46', '', '2021-02-27 12:50:23', b'0');
-INSERT INTO `sys_user_session` VALUES ('a93edff183c447719ecb627d40ca22a6', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-02-05 20:28:51', '', '2021-02-05 20:28:51', b'0');
-INSERT INTO `sys_user_session` VALUES ('aa22b7a5754b440e957ec47b832c9fd6', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-02-06 21:22:31', '', '2021-02-06 21:22:31', b'0');
-INSERT INTO `sys_user_session` VALUES ('b3881aa0b09b4bcdaf9e5ce5f2bbf15a', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-02-09 20:18:33', '', '2021-02-09 20:18:33', b'0');
-INSERT INTO `sys_user_session` VALUES ('bafb6445d05a4ee1bd9cdcf2ee83aea9', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-02-09 13:57:15', '', '2021-02-09 13:57:15', b'0');
-INSERT INTO `sys_user_session` VALUES ('c1ede4001ac945f8844b3c7abdc86119', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-02-08 03:05:18', '', '2021-02-08 03:05:18', b'0');
-INSERT INTO `sys_user_session` VALUES ('c527dcd973454664a75bbf5dbeae834a', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-02-09 17:06:03', '', '2021-02-22 20:33:03', b'0');
-INSERT INTO `sys_user_session` VALUES ('df87c2afa8de4559a091292434df9fd8', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-02-09 20:05:45', '', '2021-02-23 00:25:16', b'0');
-INSERT INTO `sys_user_session` VALUES ('e3ad1ef8b9aa4b329855b29c7b372e8f', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-02-05 06:21:44', '', '2021-02-05 06:21:44', b'0');
-INSERT INTO `sys_user_session` VALUES ('ea0d48776db84da4ac0f4c2adf62c366', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-02-08 07:02:03', '', '2021-02-08 07:02:03', b'0');
-INSERT INTO `sys_user_session` VALUES ('f881f7dc67d04cd29574657fdde32a62', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', '', '2021-02-05 08:53:20', '', '2021-02-05 08:53:20', b'0');
 COMMIT;
 
 -- ----------------------------
@@ -1000,9 +940,9 @@ CREATE TABLE `tool_codegen_column` (
   `list_operation_condition` varchar(32) NOT NULL DEFAULT '=' COMMENT 'List 查询操作的条件类型',
   `list_operation_result` bit(1) NOT NULL COMMENT '是否为 List 查询操作的返回字段',
   `html_type` varchar(32) NOT NULL COMMENT '显示类型',
-  `create_by` varchar(64) DEFAULT '' COMMENT '创建者',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_by` varchar(64) DEFAULT '' COMMENT '更新者',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
@@ -1018,9 +958,9 @@ INSERT INTO `tool_codegen_column` VALUES (234, 20, 'status', 'tinyint(4)', '状�
 INSERT INTO `tool_codegen_column` VALUES (235, 20, 'type', 'tinyint(4)', '类型', b'0', b'0', '0', 4, 'Integer', 'type', 'sys_operate_type', '2', b'1', b'1', b'1', '=', b'1', 'select', '', '2021-02-06 01:33:25', '', '2021-02-06 03:26:05', b'0');
 INSERT INTO `tool_codegen_column` VALUES (236, 20, 'category', 'tinyint(4)', '分类', b'0', b'0', '0', 5, 'Integer', 'category', 'inf_redis_timeout_type', '3', b'1', b'1', b'1', '=', b'1', 'radio', '', '2021-02-06 01:33:25', '', '2021-02-06 13:17:53', b'0');
 INSERT INTO `tool_codegen_column` VALUES (237, 20, 'remark', 'varchar(500)', '备注', b'1', b'0', '0', 6, 'String', 'remark', '', '我是备注', b'1', b'1', b'1', '=', b'1', 'input', '', '2021-02-06 01:33:25', '', '2021-02-06 03:26:08', b'0');
-INSERT INTO `tool_codegen_column` VALUES (238, 20, 'create_by', 'varchar(64)', '创建者', b'1', b'0', '0', 7, 'String', 'createBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-02-06 01:33:25', '', '2021-02-06 03:26:09', b'0');
+INSERT INTO `tool_codegen_column` VALUES (238, 20, 'creator', 'varchar(64)', '创建者', b'1', b'0', '0', 7, 'String', 'createBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-02-06 01:33:25', '', '2021-02-06 03:26:09', b'0');
 INSERT INTO `tool_codegen_column` VALUES (239, 20, 'create_time', 'datetime', '创建时间', b'0', b'0', '0', 8, 'Date', 'createTime', '', NULL, b'0', b'0', b'1', 'BETWEEN', b'1', 'datetime', '', '2021-02-06 01:33:25', '', '2021-02-06 07:50:41', b'0');
-INSERT INTO `tool_codegen_column` VALUES (240, 20, 'update_by', 'varchar(64)', '更新者', b'1', b'0', '0', 9, 'String', 'updateBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-02-06 01:33:25', '', '2021-02-06 03:26:13', b'0');
+INSERT INTO `tool_codegen_column` VALUES (240, 20, 'updater', 'varchar(64)', '更新者', b'1', b'0', '0', 9, 'String', 'updateBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-02-06 01:33:25', '', '2021-02-06 03:26:13', b'0');
 INSERT INTO `tool_codegen_column` VALUES (241, 20, 'update_time', 'datetime', '更新时间', b'0', b'0', '0', 10, 'Date', 'updateTime', '', NULL, b'0', b'0', b'0', '=', b'0', 'datetime', '', '2021-02-06 01:33:25', '', '2021-02-06 08:02:20', b'0');
 INSERT INTO `tool_codegen_column` VALUES (242, 20, 'deleted', 'bit(1)', '是否删除', b'0', b'0', '0', 11, 'Boolean', 'deleted', '', NULL, b'0', b'0', b'1', '=', b'0', 'radio', '', '2021-02-06 01:33:25', '', '2021-02-06 07:52:14', b'0');
 INSERT INTO `tool_codegen_column` VALUES (243, 21, 'id', 'int(5)', '参数主键', b'0', b'1', '1', 1, 'Integer', 'id', '', NULL, b'0', b'1', b'0', '=', b'1', 'input', '', '2021-02-06 19:51:35', '', '2021-02-06 19:51:35', b'0');
@@ -1031,9 +971,9 @@ INSERT INTO `tool_codegen_column` VALUES (247, 21, 'key', 'varchar(100)', '参�
 INSERT INTO `tool_codegen_column` VALUES (248, 21, 'value', 'varchar(500)', '参数键值', b'0', b'0', '0', 6, 'String', 'value', '', NULL, b'1', b'1', b'0', '=', b'1', 'input', '', '2021-02-06 19:51:35', '', '2021-03-06 02:20:02', b'0');
 INSERT INTO `tool_codegen_column` VALUES (249, 21, 'sensitive', 'bit(1)', '是否敏感', b'0', b'0', '0', 7, 'Boolean', 'sensitive', '', NULL, b'1', b'1', b'0', '=', b'1', 'radio', '', '2021-02-06 19:51:35', '', '2021-03-06 02:20:02', b'0');
 INSERT INTO `tool_codegen_column` VALUES (250, 21, 'remark', 'varchar(500)', '备注', b'1', b'0', '0', 8, 'String', 'remark', '', NULL, b'1', b'1', b'0', '=', b'1', 'input', '', '2021-02-06 19:51:35', '', '2021-03-06 02:20:02', b'0');
-INSERT INTO `tool_codegen_column` VALUES (251, 21, 'create_by', 'varchar(64)', '创建者', b'1', b'0', '0', 9, 'String', 'createBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-02-06 19:51:35', '', '2021-02-06 19:51:35', b'0');
+INSERT INTO `tool_codegen_column` VALUES (251, 21, 'creator', 'varchar(64)', '创建者', b'1', b'0', '0', 9, 'String', 'createBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-02-06 19:51:35', '', '2021-02-06 19:51:35', b'0');
 INSERT INTO `tool_codegen_column` VALUES (252, 21, 'create_time', 'datetime', '创建时间', b'0', b'0', '0', 10, 'Date', 'createTime', '', NULL, b'0', b'0', b'1', 'BETWEEN', b'1', 'datetime', '', '2021-02-06 19:51:35', '', '2021-02-06 19:51:35', b'0');
-INSERT INTO `tool_codegen_column` VALUES (253, 21, 'update_by', 'varchar(64)', '更新者', b'1', b'0', '0', 11, 'String', 'updateBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-02-06 19:51:35', '', '2021-02-06 19:51:35', b'0');
+INSERT INTO `tool_codegen_column` VALUES (253, 21, 'updater', 'varchar(64)', '更新者', b'1', b'0', '0', 11, 'String', 'updateBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-02-06 19:51:35', '', '2021-02-06 19:51:35', b'0');
 INSERT INTO `tool_codegen_column` VALUES (254, 21, 'update_time', 'datetime', '更新时间', b'0', b'0', '0', 12, 'Date', 'updateTime', '', NULL, b'0', b'0', b'0', 'BETWEEN', b'0', 'datetime', '', '2021-02-06 19:51:35', '', '2021-02-06 19:51:35', b'0');
 INSERT INTO `tool_codegen_column` VALUES (255, 21, 'deleted', 'bit(1)', '是否删除', b'0', b'0', '0', 13, 'Boolean', 'deleted', '', NULL, b'0', b'0', b'0', '=', b'0', 'radio', '', '2021-02-06 19:51:35', '', '2021-02-06 19:51:35', b'0');
 INSERT INTO `tool_codegen_column` VALUES (256, 23, 'job_id', 'bigint(20)', '任务ID', b'0', b'1', '1', 1, 'Long', 'jobId', '', NULL, b'0', b'1', b'0', '=', b'1', 'input', '', '2021-02-06 20:29:26', '', '2021-02-07 06:38:51', b'1');
@@ -1044,9 +984,9 @@ INSERT INTO `tool_codegen_column` VALUES (260, 23, 'cron_expression', 'varchar(2
 INSERT INTO `tool_codegen_column` VALUES (261, 23, 'misfire_policy', 'varchar(20)', '计划执行错误策略（1立即执行 2执行一次 3放弃执行）', b'1', b'0', '0', 6, 'String', 'misfirePolicy', '', NULL, b'1', b'1', b'1', '=', b'1', 'input', '', '2021-02-06 20:29:26', '', '2021-02-06 20:47:14', b'1');
 INSERT INTO `tool_codegen_column` VALUES (262, 23, 'concurrent', 'char(1)', '是否并发执行（0允许 1禁止）', b'1', b'0', '0', 7, 'String', 'concurrent', '', NULL, b'1', b'1', b'1', '=', b'1', 'input', '', '2021-02-06 20:29:26', '', '2021-02-06 20:47:14', b'1');
 INSERT INTO `tool_codegen_column` VALUES (263, 23, 'status', 'char(1)', '状态（0正常 1暂停）', b'1', b'0', '0', 8, 'String', 'status', '', NULL, b'1', b'1', b'1', '=', b'1', 'radio', '', '2021-02-06 20:29:26', '', '2021-02-06 20:46:49', b'1');
-INSERT INTO `tool_codegen_column` VALUES (264, 23, 'create_by', 'varchar(64)', '创建者', b'1', b'0', '0', 9, 'String', 'createBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-02-06 20:29:26', '', '2021-02-06 20:46:49', b'1');
+INSERT INTO `tool_codegen_column` VALUES (264, 23, 'creator', 'varchar(64)', '创建者', b'1', b'0', '0', 9, 'String', 'createBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-02-06 20:29:26', '', '2021-02-06 20:46:49', b'1');
 INSERT INTO `tool_codegen_column` VALUES (265, 23, 'create_time', 'datetime', '创建时间', b'0', b'0', '0', 10, 'Date', 'createTime', '', NULL, b'0', b'0', b'1', 'BETWEEN', b'1', 'datetime', '', '2021-02-06 20:29:26', '', '2021-02-06 20:46:49', b'1');
-INSERT INTO `tool_codegen_column` VALUES (266, 23, 'update_by', 'varchar(64)', '更新者', b'1', b'0', '0', 11, 'String', 'updateBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-02-06 20:29:26', '', '2021-02-06 20:46:49', b'1');
+INSERT INTO `tool_codegen_column` VALUES (266, 23, 'updater', 'varchar(64)', '更新者', b'1', b'0', '0', 11, 'String', 'updateBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-02-06 20:29:26', '', '2021-02-06 20:46:49', b'1');
 INSERT INTO `tool_codegen_column` VALUES (267, 23, 'update_time', 'datetime', '更新时间', b'1', b'0', '0', 12, 'Date', 'updateTime', '', NULL, b'0', b'0', b'0', 'BETWEEN', b'0', 'datetime', '', '2021-02-06 20:29:26', '', '2021-02-06 20:47:14', b'1');
 INSERT INTO `tool_codegen_column` VALUES (268, 23, 'remark', 'varchar(500)', '备注信息', b'1', b'0', '0', 13, 'String', 'remark', '', NULL, b'1', b'1', b'1', '=', b'1', 'input', '', '2021-02-06 20:29:26', '', '2021-02-06 20:47:14', b'1');
 INSERT INTO `tool_codegen_column` VALUES (269, 24, 'id', 'bigint(20)', '任务编号', b'0', b'1', '1', 1, 'Long', 'id', '', '1024', b'0', b'1', b'0', '=', b'1', 'input', '', '2021-02-07 06:39:34', '', '2021-02-07 06:44:19', b'0');
@@ -1060,9 +1000,9 @@ INSERT INTO `tool_codegen_column` VALUES (276, 24, 'execute_end_time', 'datetime
 INSERT INTO `tool_codegen_column` VALUES (277, 24, 'fire_prev_time', 'datetime', '上一次触发时间', b'1', b'0', '0', 9, 'Date', 'firePrevTime', '', NULL, b'0', b'0', b'0', 'BETWEEN', b'1', 'datetime', '', '2021-02-07 06:39:34', '', '2021-02-07 07:53:27', b'0');
 INSERT INTO `tool_codegen_column` VALUES (278, 24, 'fire_next_time', 'datetime', '下一次触发时间', b'1', b'0', '0', 10, 'Date', 'fireNextTime', '', NULL, b'0', b'0', b'0', 'BETWEEN', b'1', 'datetime', '', '2021-02-07 06:39:34', '', '2021-02-07 07:53:27', b'0');
 INSERT INTO `tool_codegen_column` VALUES (279, 24, 'monitor_timeout', 'int(11)', '监控超时时间', b'1', b'0', '0', 11, 'Integer', 'monitorTimeout', '', '1000', b'1', b'1', b'0', '=', b'1', 'input', '', '2021-02-07 06:39:34', '', '2021-02-07 06:44:19', b'0');
-INSERT INTO `tool_codegen_column` VALUES (280, 24, 'create_by', 'varchar(64)', '创建者', b'1', b'0', '0', 12, 'String', 'createBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-02-07 06:39:34', '', '2021-02-07 06:39:34', b'0');
+INSERT INTO `tool_codegen_column` VALUES (280, 24, 'creator', 'varchar(64)', '创建者', b'1', b'0', '0', 12, 'String', 'createBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-02-07 06:39:34', '', '2021-02-07 06:39:34', b'0');
 INSERT INTO `tool_codegen_column` VALUES (281, 24, 'create_time', 'datetime', '创建时间', b'0', b'0', '0', 13, 'Date', 'createTime', '', NULL, b'0', b'0', b'0', 'BETWEEN', b'1', 'datetime', '', '2021-02-07 06:39:34', '', '2021-02-07 06:44:19', b'0');
-INSERT INTO `tool_codegen_column` VALUES (282, 24, 'update_by', 'varchar(64)', '更新者', b'1', b'0', '0', 14, 'String', 'updateBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-02-07 06:39:34', '', '2021-02-07 06:39:34', b'0');
+INSERT INTO `tool_codegen_column` VALUES (282, 24, 'updater', 'varchar(64)', '更新者', b'1', b'0', '0', 14, 'String', 'updateBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-02-07 06:39:34', '', '2021-02-07 06:39:34', b'0');
 INSERT INTO `tool_codegen_column` VALUES (283, 24, 'update_time', 'datetime', '更新时间', b'0', b'0', '0', 15, 'Date', 'updateTime', '', NULL, b'0', b'0', b'0', 'BETWEEN', b'0', 'datetime', '', '2021-02-07 06:39:34', '', '2021-02-07 06:39:34', b'0');
 INSERT INTO `tool_codegen_column` VALUES (284, 24, 'deleted', 'bit(1)', '是否删除', b'0', b'0', '0', 16, 'Boolean', 'deleted', '', NULL, b'0', b'0', b'0', '=', b'0', 'radio', '', '2021-02-07 06:39:34', '', '2021-02-07 06:39:34', b'0');
 INSERT INTO `tool_codegen_column` VALUES (285, 24, 'retry_count', 'int(11)', '重试次数', b'0', b'0', '0', 11, 'Integer', 'retryCount', '', NULL, b'1', b'1', b'1', '=', b'1', 'input', '', '2021-02-08 04:17:27', '', '2021-02-08 04:17:27', b'0');
@@ -1077,9 +1017,9 @@ INSERT INTO `tool_codegen_column` VALUES (293, 25, 'end_time', 'datetime', '结�
 INSERT INTO `tool_codegen_column` VALUES (294, 25, 'duration', 'int(11)', '执行时长', b'1', b'0', '0', 8, 'Integer', 'duration', '', NULL, b'1', b'1', b'0', '=', b'1', 'input', '', '2021-02-08 04:58:41', '', '2021-02-08 05:06:07', b'0');
 INSERT INTO `tool_codegen_column` VALUES (295, 25, 'status', 'tinyint(4)', '任务状态', b'0', b'0', '0', 9, 'Integer', 'status', 'inf_job_log_status', NULL, b'1', b'1', b'1', '=', b'1', 'radio', '', '2021-02-08 04:58:41', '', '2021-02-08 10:21:07', b'0');
 INSERT INTO `tool_codegen_column` VALUES (296, 25, 'result', 'varchar(4000)', '结果数据', b'1', b'0', '0', 10, 'String', 'result', '', NULL, b'1', b'1', b'0', '=', b'1', 'input', '', '2021-02-08 04:58:41', '', '2021-02-08 05:06:07', b'0');
-INSERT INTO `tool_codegen_column` VALUES (297, 25, 'create_by', 'varchar(64)', '创建者', b'1', b'0', '0', 11, 'String', 'createBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-02-08 04:58:41', '', '2021-02-08 04:58:41', b'0');
+INSERT INTO `tool_codegen_column` VALUES (297, 25, 'creator', 'varchar(64)', '创建者', b'1', b'0', '0', 11, 'String', 'createBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-02-08 04:58:41', '', '2021-02-08 04:58:41', b'0');
 INSERT INTO `tool_codegen_column` VALUES (298, 25, 'create_time', 'datetime', '创建时间', b'0', b'0', '0', 12, 'Date', 'createTime', '', NULL, b'0', b'0', b'0', 'BETWEEN', b'1', 'datetime', '', '2021-02-08 04:58:41', '', '2021-02-08 05:06:07', b'0');
-INSERT INTO `tool_codegen_column` VALUES (299, 25, 'update_by', 'varchar(64)', '更新者', b'1', b'0', '0', 13, 'String', 'updateBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-02-08 04:58:41', '', '2021-02-08 04:58:41', b'0');
+INSERT INTO `tool_codegen_column` VALUES (299, 25, 'updater', 'varchar(64)', '更新者', b'1', b'0', '0', 13, 'String', 'updateBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-02-08 04:58:41', '', '2021-02-08 04:58:41', b'0');
 INSERT INTO `tool_codegen_column` VALUES (300, 25, 'update_time', 'datetime', '更新时间', b'0', b'0', '0', 14, 'Date', 'updateTime', '', NULL, b'0', b'0', b'0', 'BETWEEN', b'0', 'datetime', '', '2021-02-08 04:58:41', '', '2021-02-08 04:58:41', b'0');
 INSERT INTO `tool_codegen_column` VALUES (301, 25, 'deleted', 'bit(1)', '是否删除', b'0', b'0', '0', 15, 'Boolean', 'deleted', '', NULL, b'0', b'0', b'0', '=', b'0', 'radio', '', '2021-02-08 04:58:41', '', '2021-02-08 04:58:41', b'0');
 INSERT INTO `tool_codegen_column` VALUES (302, 26, 'id', 'bigint(20)', '日志主键', b'0', b'1', '1', 1, 'Long', 'id', '', '1024', b'0', b'1', b'0', '=', b'1', 'input', '', '2021-02-26 00:13:35', '', '2021-02-26 00:18:03', b'0');
@@ -1097,9 +1037,9 @@ INSERT INTO `tool_codegen_column` VALUES (314, 26, 'end_time', 'datetime', '结�
 INSERT INTO `tool_codegen_column` VALUES (315, 26, 'duration', 'int(11)', '执行时长', b'0', b'0', '0', 14, 'Integer', 'duration', '', '100', b'1', b'1', b'1', '>=', b'1', 'input', '', '2021-02-26 00:13:35', '', '2021-02-26 00:29:12', b'0');
 INSERT INTO `tool_codegen_column` VALUES (316, 26, 'result_code', 'int(11)', '结果码', b'0', b'0', '0', 15, 'Integer', 'resultCode', '', '0', b'1', b'1', b'1', '=', b'1', 'input', '', '2021-02-26 00:13:35', '', '2021-02-26 00:29:12', b'0');
 INSERT INTO `tool_codegen_column` VALUES (317, 26, 'result_msg', 'varchar(512)', '结果提示', b'1', b'0', '0', 16, 'String', 'resultMsg', '', '芋道源码，牛逼！', b'1', b'1', b'0', '=', b'1', 'input', '', '2021-02-26 00:13:35', '', '2021-02-26 00:30:58', b'0');
-INSERT INTO `tool_codegen_column` VALUES (318, 26, 'create_by', 'varchar(64)', '创建者', b'1', b'0', '0', 17, 'String', 'createBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-02-26 00:13:35', '', '2021-02-26 00:13:35', b'0');
+INSERT INTO `tool_codegen_column` VALUES (318, 26, 'creator', 'varchar(64)', '创建者', b'1', b'0', '0', 17, 'String', 'createBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-02-26 00:13:35', '', '2021-02-26 00:13:35', b'0');
 INSERT INTO `tool_codegen_column` VALUES (319, 26, 'create_time', 'datetime', '创建时间', b'0', b'0', '0', 18, 'Date', 'createTime', '', NULL, b'0', b'0', b'0', 'BETWEEN', b'1', 'datetime', '', '2021-02-26 00:13:35', '', '2021-02-26 00:33:02', b'0');
-INSERT INTO `tool_codegen_column` VALUES (320, 26, 'update_by', 'varchar(64)', '更新者', b'1', b'0', '0', 19, 'String', 'updateBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-02-26 00:13:35', '', '2021-02-26 00:13:35', b'0');
+INSERT INTO `tool_codegen_column` VALUES (320, 26, 'updater', 'varchar(64)', '更新者', b'1', b'0', '0', 19, 'String', 'updateBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-02-26 00:13:35', '', '2021-02-26 00:13:35', b'0');
 INSERT INTO `tool_codegen_column` VALUES (321, 26, 'update_time', 'datetime', '更新时间', b'0', b'0', '0', 20, 'Date', 'updateTime', '', NULL, b'0', b'0', b'0', 'BETWEEN', b'0', 'datetime', '', '2021-02-26 00:13:35', '', '2021-02-26 00:13:35', b'0');
 INSERT INTO `tool_codegen_column` VALUES (322, 26, 'deleted', 'bit(1)', '是否删除', b'0', b'0', '0', 21, 'Boolean', 'deleted', '', NULL, b'0', b'0', b'0', '=', b'0', 'radio', '', '2021-02-26 00:13:35', '', '2021-02-26 00:13:35', b'0');
 INSERT INTO `tool_codegen_column` VALUES (323, 27, 'id', 'int(11)', '编号', b'0', b'1', '1', 1, 'Integer', 'id', '', '1024', b'0', b'1', b'0', '=', b'1', 'input', '', '2021-02-26 06:54:49', '', '2021-02-26 06:58:23', b'0');
@@ -1122,7 +1062,7 @@ INSERT INTO `tool_codegen_column` VALUES (339, 27, 'exception_file_name', 'varch
 INSERT INTO `tool_codegen_column` VALUES (340, 27, 'exception_method_name', 'varchar(512)', '异常发生的方法名', b'0', b'0', '0', 18, 'String', 'exceptionMethodName', '', NULL, b'1', b'1', b'0', 'LIKE', b'1', 'input', '', '2021-02-26 06:54:49', '', '2021-02-26 07:10:19', b'0');
 INSERT INTO `tool_codegen_column` VALUES (341, 27, 'exception_line_number', 'int(11)', '异常发生的方法所在行', b'0', b'0', '0', 19, 'Integer', 'exceptionLineNumber', '', NULL, b'1', b'1', b'0', '=', b'1', 'input', '', '2021-02-26 06:54:49', '', '2021-02-26 07:10:19', b'0');
 INSERT INTO `tool_codegen_column` VALUES (342, 27, 'create_time', 'datetime', '创建时间', b'0', b'0', '0', 20, 'Date', 'createTime', '', NULL, b'0', b'0', b'0', 'BETWEEN', b'1', 'datetime', '', '2021-02-26 06:54:49', '', '2021-02-26 06:56:14', b'0');
-INSERT INTO `tool_codegen_column` VALUES (343, 27, 'update_by', 'varchar(64)', '更新者', b'0', b'0', '0', 21, 'String', 'updateBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-02-26 06:54:49', '', '2021-02-26 06:56:14', b'0');
+INSERT INTO `tool_codegen_column` VALUES (343, 27, 'updater', 'varchar(64)', '更新者', b'0', b'0', '0', 21, 'String', 'updateBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-02-26 06:54:49', '', '2021-02-26 06:56:14', b'0');
 INSERT INTO `tool_codegen_column` VALUES (344, 27, 'update_time', 'datetime', '更新时间', b'0', b'0', '0', 22, 'Date', 'updateTime', '', NULL, b'0', b'0', b'0', 'BETWEEN', b'0', 'datetime', '', '2021-02-26 06:54:49', '', '2021-02-26 06:54:49', b'0');
 INSERT INTO `tool_codegen_column` VALUES (345, 27, 'deleted', 'bit(1)', '是否删除', b'0', b'0', '0', 23, 'Boolean', 'deleted', '', NULL, b'0', b'0', b'0', '=', b'0', 'radio', '', '2021-02-26 06:54:49', '', '2021-02-26 06:54:49', b'0');
 INSERT INTO `tool_codegen_column` VALUES (346, 27, 'process_status', 'tinyint(4)', '处理状态', b'0', b'0', '0', 20, 'Integer', 'processStatus', 'inf_api_error_log_process_status', '0', b'1', b'1', b'1', '=', b'1', 'radio', '', '2021-02-26 07:01:49', '', '2021-02-26 07:11:29', b'0');
@@ -1133,9 +1073,9 @@ INSERT INTO `tool_codegen_column` VALUES (350, 28, 'name', 'varchar(100)', '字�
 INSERT INTO `tool_codegen_column` VALUES (351, 28, 'dict_type', 'varchar(100)', '字典类型', b'0', b'0', '0', 3, 'String', 'dictType', '', NULL, b'1', b'1', b'1', '=', b'1', 'select', '', '2021-03-06 03:45:55', '', '2021-03-06 03:51:02', b'1');
 INSERT INTO `tool_codegen_column` VALUES (352, 28, 'status', 'tinyint(4)', '状态（0正常 1停用）', b'0', b'0', '0', 4, 'Integer', 'status', '', NULL, b'1', b'1', b'1', '=', b'1', 'radio', '', '2021-03-06 03:45:55', '', '2021-03-06 03:51:02', b'1');
 INSERT INTO `tool_codegen_column` VALUES (353, 28, 'remark', 'varchar(500)', '备注', b'1', b'0', '0', 5, 'String', 'remark', '', NULL, b'1', b'1', b'1', '=', b'1', 'input', '', '2021-03-06 03:45:55', '', '2021-03-06 03:51:02', b'1');
-INSERT INTO `tool_codegen_column` VALUES (354, 28, 'create_by', 'varchar(64)', '创建者', b'1', b'0', '0', 6, 'String', 'createBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-03-06 03:45:55', '', '2021-03-06 03:51:02', b'1');
+INSERT INTO `tool_codegen_column` VALUES (354, 28, 'creator', 'varchar(64)', '创建者', b'1', b'0', '0', 6, 'String', 'createBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-03-06 03:45:55', '', '2021-03-06 03:51:02', b'1');
 INSERT INTO `tool_codegen_column` VALUES (355, 28, 'create_time', 'datetime', '创建时间', b'0', b'0', '0', 7, 'Date', 'createTime', '', NULL, b'0', b'0', b'1', 'BETWEEN', b'1', 'datetime', '', '2021-03-06 03:45:55', '', '2021-03-06 03:51:02', b'1');
-INSERT INTO `tool_codegen_column` VALUES (356, 28, 'update_by', 'varchar(64)', '更新者', b'1', b'0', '0', 8, 'String', 'updateBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-03-06 03:45:55', '', '2021-03-06 03:51:02', b'1');
+INSERT INTO `tool_codegen_column` VALUES (356, 28, 'updater', 'varchar(64)', '更新者', b'1', b'0', '0', 8, 'String', 'updateBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-03-06 03:45:55', '', '2021-03-06 03:51:02', b'1');
 INSERT INTO `tool_codegen_column` VALUES (357, 28, 'update_time', 'datetime', '更新时间', b'0', b'0', '0', 9, 'Date', 'updateTime', '', NULL, b'0', b'0', b'0', 'BETWEEN', b'0', 'datetime', '', '2021-03-06 03:45:55', '', '2021-03-06 03:51:02', b'1');
 INSERT INTO `tool_codegen_column` VALUES (358, 28, 'deleted', 'bit(1)', '是否删除', b'0', b'0', '0', 10, 'Boolean', 'deleted', '', NULL, b'0', b'0', b'0', '=', b'0', 'radio', '', '2021-03-06 03:45:55', '', '2021-03-06 03:51:02', b'1');
 INSERT INTO `tool_codegen_column` VALUES (359, 29, 'id', 'bigint(20)', '字典主键', b'0', b'1', '1', 1, 'Long', 'id', '', NULL, b'0', b'1', b'0', '=', b'1', 'input', '', '2021-03-06 03:52:57', '', '2021-03-06 03:52:57', b'0');
@@ -1143,9 +1083,9 @@ INSERT INTO `tool_codegen_column` VALUES (360, 29, 'name', 'varchar(100)', '字�
 INSERT INTO `tool_codegen_column` VALUES (361, 29, 'type', 'varchar(100)', '字典类型', b'0', b'0', '0', 3, 'String', 'type', '', NULL, b'1', b'1', b'1', 'LIKE', b'1', 'select', '', '2021-03-06 03:52:57', '', '2021-03-06 03:54:48', b'0');
 INSERT INTO `tool_codegen_column` VALUES (362, 29, 'status', 'tinyint(4)', '状态（0正常 1停用）', b'0', b'0', '0', 4, 'Integer', 'status', '', NULL, b'1', b'1', b'1', '=', b'1', 'radio', '', '2021-03-06 03:52:57', '', '2021-03-06 03:52:57', b'0');
 INSERT INTO `tool_codegen_column` VALUES (363, 29, 'remark', 'varchar(500)', '备注', b'1', b'0', '0', 5, 'String', 'remark', '', NULL, b'1', b'1', b'0', '=', b'1', 'input', '', '2021-03-06 03:52:57', '', '2021-03-06 03:54:48', b'0');
-INSERT INTO `tool_codegen_column` VALUES (364, 29, 'create_by', 'varchar(64)', '创建者', b'1', b'0', '0', 6, 'String', 'createBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-03-06 03:52:57', '', '2021-03-06 03:52:57', b'0');
+INSERT INTO `tool_codegen_column` VALUES (364, 29, 'creator', 'varchar(64)', '创建者', b'1', b'0', '0', 6, 'String', 'createBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-03-06 03:52:57', '', '2021-03-06 03:52:57', b'0');
 INSERT INTO `tool_codegen_column` VALUES (365, 29, 'create_time', 'datetime', '创建时间', b'0', b'0', '0', 7, 'Date', 'createTime', '', NULL, b'0', b'0', b'1', 'BETWEEN', b'1', 'datetime', '', '2021-03-06 03:52:57', '', '2021-03-06 03:52:57', b'0');
-INSERT INTO `tool_codegen_column` VALUES (366, 29, 'update_by', 'varchar(64)', '更新者', b'1', b'0', '0', 8, 'String', 'updateBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-03-06 03:52:57', '', '2021-03-06 03:52:57', b'0');
+INSERT INTO `tool_codegen_column` VALUES (366, 29, 'updater', 'varchar(64)', '更新者', b'1', b'0', '0', 8, 'String', 'updateBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-03-06 03:52:57', '', '2021-03-06 03:52:57', b'0');
 INSERT INTO `tool_codegen_column` VALUES (367, 29, 'update_time', 'datetime', '更新时间', b'0', b'0', '0', 9, 'Date', 'updateTime', '', NULL, b'0', b'0', b'0', 'BETWEEN', b'0', 'datetime', '', '2021-03-06 03:52:57', '', '2021-03-06 03:52:57', b'0');
 INSERT INTO `tool_codegen_column` VALUES (368, 29, 'deleted', 'bit(1)', '是否删除', b'0', b'0', '0', 10, 'Boolean', 'deleted', '', NULL, b'0', b'0', b'0', '=', b'0', 'radio', '', '2021-03-06 03:52:57', '', '2021-03-06 03:52:57', b'0');
 INSERT INTO `tool_codegen_column` VALUES (369, 30, 'id', 'bigint(20)', '字典编码', b'0', b'1', '1', 1, 'Long', 'id', '', NULL, b'0', b'1', b'0', '=', b'1', 'input', '', '2021-03-06 06:48:28', '', '2021-03-06 06:48:28', b'0');
@@ -1155,9 +1095,9 @@ INSERT INTO `tool_codegen_column` VALUES (372, 30, 'value', 'varchar(100)', '字
 INSERT INTO `tool_codegen_column` VALUES (373, 30, 'dict_type', 'varchar(100)', '字典类型', b'0', b'0', '0', 5, 'String', 'dictType', '', NULL, b'1', b'1', b'1', 'LIKE', b'1', 'select', '', '2021-03-06 06:48:28', '', '2021-03-06 06:50:38', b'0');
 INSERT INTO `tool_codegen_column` VALUES (374, 30, 'status', 'tinyint(4)', '状态（0正常 1停用）', b'0', b'0', '0', 6, 'Integer', 'status', '', NULL, b'1', b'1', b'1', 'LIKE', b'1', 'radio', '', '2021-03-06 06:48:28', '', '2021-03-06 06:50:38', b'0');
 INSERT INTO `tool_codegen_column` VALUES (375, 30, 'remark', 'varchar(500)', '备注', b'1', b'0', '0', 7, 'String', 'remark', '', NULL, b'1', b'1', b'0', '=', b'1', 'input', '', '2021-03-06 06:48:28', '', '2021-03-06 06:50:38', b'0');
-INSERT INTO `tool_codegen_column` VALUES (376, 30, 'create_by', 'varchar(64)', '创建者', b'1', b'0', '0', 8, 'String', 'createBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-03-06 06:48:28', '', '2021-03-06 06:48:28', b'0');
+INSERT INTO `tool_codegen_column` VALUES (376, 30, 'creator', 'varchar(64)', '创建者', b'1', b'0', '0', 8, 'String', 'createBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-03-06 06:48:28', '', '2021-03-06 06:48:28', b'0');
 INSERT INTO `tool_codegen_column` VALUES (377, 30, 'create_time', 'datetime', '创建时间', b'0', b'0', '0', 9, 'Date', 'createTime', '', NULL, b'0', b'0', b'1', 'BETWEEN', b'1', 'datetime', '', '2021-03-06 06:48:28', '', '2021-03-06 06:48:28', b'0');
-INSERT INTO `tool_codegen_column` VALUES (378, 30, 'update_by', 'varchar(64)', '更新者', b'1', b'0', '0', 10, 'String', 'updateBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-03-06 06:48:28', '', '2021-03-06 06:48:28', b'0');
+INSERT INTO `tool_codegen_column` VALUES (378, 30, 'updater', 'varchar(64)', '更新者', b'1', b'0', '0', 10, 'String', 'updateBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-03-06 06:48:28', '', '2021-03-06 06:48:28', b'0');
 INSERT INTO `tool_codegen_column` VALUES (379, 30, 'update_time', 'datetime', '更新时间', b'0', b'0', '0', 11, 'Date', 'updateTime', '', NULL, b'0', b'0', b'0', 'BETWEEN', b'0', 'datetime', '', '2021-03-06 06:48:28', '', '2021-03-06 06:48:28', b'0');
 INSERT INTO `tool_codegen_column` VALUES (380, 30, 'deleted', 'bit(1)', '是否删除', b'0', b'0', '0', 12, 'Boolean', 'deleted', '', NULL, b'0', b'0', b'0', '=', b'0', 'radio', '', '2021-03-06 06:48:28', '', '2021-03-06 06:48:28', b'0');
 COMMIT;
@@ -1179,9 +1119,9 @@ CREATE TABLE `tool_codegen_table` (
   `author` varchar(50) NOT NULL COMMENT '作者',
   `template_type` tinyint(4) NOT NULL DEFAULT '1' COMMENT '模板类型',
   `parent_menu_id` bigint(20) DEFAULT NULL COMMENT '父菜单编号',
-  `create_by` varchar(64) DEFAULT '' COMMENT '创建者',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_by` varchar(64) DEFAULT '' COMMENT '更新者',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
@@ -1215,9 +1155,9 @@ CREATE TABLE `tool_test_demo` (
   `type` tinyint(4) NOT NULL COMMENT '类型',
   `category` tinyint(4) NOT NULL COMMENT '分类',
   `remark` varchar(500) DEFAULT NULL COMMENT '备注',
-  `create_by` varchar(64) DEFAULT '' COMMENT '创建者',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_by` varchar(64) DEFAULT '' COMMENT '更新者',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE

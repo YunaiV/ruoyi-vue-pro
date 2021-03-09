@@ -1,11 +1,10 @@
-package cn.iocoder.dashboard.framework.mybatis.core.handle;
+package cn.iocoder.dashboard.framework.mybatis.core.handler;
 
 import cn.iocoder.dashboard.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.dashboard.framework.security.core.LoginUser;
 import cn.iocoder.dashboard.framework.security.core.util.SecurityFrameworkUtils;
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import org.apache.ibatis.reflection.MetaObject;
-import org.springframework.stereotype.Component;
 
 import java.util.Date;
 import java.util.Objects;
@@ -17,7 +16,6 @@ import java.util.Objects;
  *
  * @author hexiaowu
  */
-@Component
 public class DefaultDBFieldHandler implements MetaObjectHandler {
 
     @Override

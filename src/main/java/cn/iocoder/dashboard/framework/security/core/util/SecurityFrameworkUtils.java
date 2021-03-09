@@ -56,7 +56,7 @@ public class SecurityFrameworkUtils {
         if (authentication == null) {
             return null;
         }
-        return (LoginUser) authentication.getPrincipal();
+        return authentication.getPrincipal() instanceof LoginUser ? (LoginUser) authentication.getPrincipal() : null;
     }
 
     /**
