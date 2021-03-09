@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.framework.mybatis.config;
 
-import cn.iocoder.dashboard.framework.mybatis.core.handle.DefaultDBFieldHandler;
+import cn.iocoder.dashboard.framework.mybatis.core.handler.DefaultDBFieldHandler;
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;

@@ -10,18 +10,21 @@ import javax.annotation.Resource;
 /**
  * 用户 Session 超时 Job
  *
- * @author 芋道源码
+ * @author 願
  */
 @Component
 @Slf4j
 public class SysUserSessionTimeoutJob implements JobHandler {
 
     @Resource
-    SysUserSessionService sysUserSessionService;
+    private SysUserSessionService sysUserSessionService;
 
     @Override
     public String execute(String param) throws Exception {
-        return String.valueOf(sysUserSessionService.clearSessionTimeout());
+        // 执行过期
+        Long timeoutCount = sysUserSessionService.clearSessionTimeout();
+        // 返回结果，记录每次的超时数量
+        return String.format("移除在线会话数量为 %s 个", timeoutCount);
     }
 
 }
