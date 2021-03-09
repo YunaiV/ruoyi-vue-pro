@@ -75,7 +75,7 @@ public class InfJobLogController {
         List<InfJobLogDO> list = jobLogService.getJobLogList(exportReqVO);
         // 导出 Excel
         List<InfJobLogExcelVO> datas = InfJobLogConvert.INSTANCE.convertList02(list);
-        ExcelUtils.write(response, "定时任务.xls", "数据", InfJobLogExcelVO.class, datas);
+        ExcelUtils.write(response, "任务日志.xls", "数据", InfJobLogExcelVO.class, datas);
     }
 
 }
