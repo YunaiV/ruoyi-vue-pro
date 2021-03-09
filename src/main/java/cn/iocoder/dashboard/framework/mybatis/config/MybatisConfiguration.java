@@ -1,5 +1,7 @@
 package cn.iocoder.dashboard.framework.mybatis.config;
 
+import cn.iocoder.dashboard.framework.mybatis.core.handle.DefaultDBFieldHandler;
+import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
 import org.apache.ibatis.annotations.Mapper;
@@ -22,6 +24,11 @@ public class MybatisConfiguration {
         MybatisPlusInterceptor mybatisPlusInterceptor = new MybatisPlusInterceptor();
         mybatisPlusInterceptor.addInnerInterceptor(new PaginationInnerInterceptor()); // 分页插件
         return mybatisPlusInterceptor;
+    }
+
+    @Bean
+    public MetaObjectHandler defaultMetaObjectHandler(){
+        return new DefaultDBFieldHandler(); // 自动填充参数类
     }
 
 }
