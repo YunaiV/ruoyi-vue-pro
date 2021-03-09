@@ -57,7 +57,7 @@ public class DefaultDBFieldHandler implements MetaObjectHandler {
         }
         // 当前登录用户不为空，更新人为空，则当前登录用户为更新人
         if (Objects.nonNull(loginUser) && Objects.isNull(modifier)) {
-            setFieldValByName("updater", loginUser.getId(), metaObject);
+            setFieldValByName("updater", loginUser.getId().toString(), metaObject);
         }
     }
 }

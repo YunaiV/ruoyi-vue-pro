@@ -15,7 +15,7 @@ import javax.validation.constraints.Size;
 public class SysDictDataBaseVO {
 
     @ApiModelProperty(value = "显示顺序不能为空", required = true, example = "1024")
-    @NotBlank(message = "显示顺序不能为空")
+    @NotNull(message = "显示顺序不能为空")
     private Integer sort;
 
     @ApiModelProperty(value = "字典标签", required = true, example = "芋道")
