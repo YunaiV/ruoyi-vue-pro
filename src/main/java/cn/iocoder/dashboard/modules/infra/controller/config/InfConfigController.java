@@ -3,7 +3,6 @@ package cn.iocoder.dashboard.modules.infra.controller.config;
 import cn.iocoder.dashboard.common.pojo.CommonResult;
 import cn.iocoder.dashboard.common.pojo.PageResult;
 import cn.iocoder.dashboard.framework.excel.core.util.ExcelUtils;
-import cn.iocoder.dashboard.framework.idempotent.core.annotation.Idempotent;
 import cn.iocoder.dashboard.framework.logger.operatelog.core.annotations.OperateLog;
 import cn.iocoder.dashboard.modules.infra.controller.config.vo.*;
 import cn.iocoder.dashboard.modules.infra.convert.config.InfConfigConvert;
@@ -19,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-
 import java.io.IOException;
 import java.util.List;
 
@@ -44,18 +42,17 @@ public class InfConfigController {
         return success(configService.createConfig(reqVO));
     }
 
-    @ApiOperation("修改参数配置")
     @PutMapping("/update")
+    @ApiOperation("修改参数配置")
     @PreAuthorize("@ss.hasPermission('infra:config:update')")
-    @Idempotent(timeout = 60)
     public CommonResult<Boolean> updateConfig(@Valid @RequestBody InfConfigUpdateReqVO reqVO) {
         configService.updateConfig(reqVO);
         return success(true);
     }
 
+    @DeleteMapping("/delete")
     @ApiOperation("删除参数配置")
     @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
-    @DeleteMapping("/delete")
     @PreAuthorize("@ss.hasPermission('infra:config:delete')")
     public CommonResult<Boolean> deleteConfig(@RequestParam("id") Long id) {
         configService.deleteConfig(id);
@@ -70,9 +67,9 @@ public class InfConfigController {
         return success(InfConfigConvert.INSTANCE.convert(configService.getConfig(id)));
     }
 
+    @GetMapping(value = "/get-value-by-key")
     @ApiOperation(value = "根据参数键名查询参数值", notes = "敏感配置，不允许返回给前端")
     @ApiImplicitParam(name = "key", value = "参数键", required = true, example = "yunai.biz.username", dataTypeClass = String.class)
-    @GetMapping(value = "/get-value-by-key")
     public CommonResult<String> getConfigKey(@RequestParam("key") String key) {
         InfConfigDO config = configService.getConfigByKey(key);
         if (config == null) {
