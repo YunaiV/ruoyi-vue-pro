@@ -37,7 +37,7 @@ CREATE TABLE `inf_api_access_log` (
   `duration` int(11) NOT NULL COMMENT '执行时长',
   `result_code` int(11) NOT NULL DEFAULT '0' COMMENT '结果码',
   `result_msg` varchar(512) DEFAULT '' COMMENT '结果提示',
-  `crerator` varchar(64) DEFAULT '' COMMENT '创建者',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `updater` varchar(64) DEFAULT '' COMMENT '更新者',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
@@ -843,9 +843,9 @@ CREATE TABLE `sys_user` (
   `status` tinyint(4) NOT NULL DEFAULT '0' COMMENT '帐号状态（0正常 1停用）',
   `login_ip` varchar(50) DEFAULT '' COMMENT '最后登录IP',
   `login_date` datetime DEFAULT NULL COMMENT '最后登录时间',
-  `create_by` varchar(64) DEFAULT '' COMMENT '创建者',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_by` varchar(64) DEFAULT '' COMMENT '更新者',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
@@ -958,9 +958,9 @@ INSERT INTO `tool_codegen_column` VALUES (234, 20, 'status', 'tinyint(4)', '状�
 INSERT INTO `tool_codegen_column` VALUES (235, 20, 'type', 'tinyint(4)', '类型', b'0', b'0', '0', 4, 'Integer', 'type', 'sys_operate_type', '2', b'1', b'1', b'1', '=', b'1', 'select', '', '2021-02-06 01:33:25', '', '2021-02-06 03:26:05', b'0');
 INSERT INTO `tool_codegen_column` VALUES (236, 20, 'category', 'tinyint(4)', '分类', b'0', b'0', '0', 5, 'Integer', 'category', 'inf_redis_timeout_type', '3', b'1', b'1', b'1', '=', b'1', 'radio', '', '2021-02-06 01:33:25', '', '2021-02-06 13:17:53', b'0');
 INSERT INTO `tool_codegen_column` VALUES (237, 20, 'remark', 'varchar(500)', '备注', b'1', b'0', '0', 6, 'String', 'remark', '', '我是备注', b'1', b'1', b'1', '=', b'1', 'input', '', '2021-02-06 01:33:25', '', '2021-02-06 03:26:08', b'0');
-INSERT INTO `tool_codegen_column` VALUES (238, 20, 'create_by', 'varchar(64)', '创建者', b'1', b'0', '0', 7, 'String', 'createBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-02-06 01:33:25', '', '2021-02-06 03:26:09', b'0');
+INSERT INTO `tool_codegen_column` VALUES (238, 20, 'creator', 'varchar(64)', '创建者', b'1', b'0', '0', 7, 'String', 'createBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-02-06 01:33:25', '', '2021-02-06 03:26:09', b'0');
 INSERT INTO `tool_codegen_column` VALUES (239, 20, 'create_time', 'datetime', '创建时间', b'0', b'0', '0', 8, 'Date', 'createTime', '', NULL, b'0', b'0', b'1', 'BETWEEN', b'1', 'datetime', '', '2021-02-06 01:33:25', '', '2021-02-06 07:50:41', b'0');
-INSERT INTO `tool_codegen_column` VALUES (240, 20, 'update_by', 'varchar(64)', '更新者', b'1', b'0', '0', 9, 'String', 'updateBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-02-06 01:33:25', '', '2021-02-06 03:26:13', b'0');
+INSERT INTO `tool_codegen_column` VALUES (240, 20, 'updater', 'varchar(64)', '更新者', b'1', b'0', '0', 9, 'String', 'updateBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-02-06 01:33:25', '', '2021-02-06 03:26:13', b'0');
 INSERT INTO `tool_codegen_column` VALUES (241, 20, 'update_time', 'datetime', '更新时间', b'0', b'0', '0', 10, 'Date', 'updateTime', '', NULL, b'0', b'0', b'0', '=', b'0', 'datetime', '', '2021-02-06 01:33:25', '', '2021-02-06 08:02:20', b'0');
 INSERT INTO `tool_codegen_column` VALUES (242, 20, 'deleted', 'bit(1)', '是否删除', b'0', b'0', '0', 11, 'Boolean', 'deleted', '', NULL, b'0', b'0', b'1', '=', b'0', 'radio', '', '2021-02-06 01:33:25', '', '2021-02-06 07:52:14', b'0');
 INSERT INTO `tool_codegen_column` VALUES (243, 21, 'id', 'int(5)', '参数主键', b'0', b'1', '1', 1, 'Integer', 'id', '', NULL, b'0', b'1', b'0', '=', b'1', 'input', '', '2021-02-06 19:51:35', '', '2021-02-06 19:51:35', b'0');
@@ -971,9 +971,9 @@ INSERT INTO `tool_codegen_column` VALUES (247, 21, 'key', 'varchar(100)', '参�
 INSERT INTO `tool_codegen_column` VALUES (248, 21, 'value', 'varchar(500)', '参数键值', b'0', b'0', '0', 6, 'String', 'value', '', NULL, b'1', b'1', b'0', '=', b'1', 'input', '', '2021-02-06 19:51:35', '', '2021-03-06 02:20:02', b'0');
 INSERT INTO `tool_codegen_column` VALUES (249, 21, 'sensitive', 'bit(1)', '是否敏感', b'0', b'0', '0', 7, 'Boolean', 'sensitive', '', NULL, b'1', b'1', b'0', '=', b'1', 'radio', '', '2021-02-06 19:51:35', '', '2021-03-06 02:20:02', b'0');
 INSERT INTO `tool_codegen_column` VALUES (250, 21, 'remark', 'varchar(500)', '备注', b'1', b'0', '0', 8, 'String', 'remark', '', NULL, b'1', b'1', b'0', '=', b'1', 'input', '', '2021-02-06 19:51:35', '', '2021-03-06 02:20:02', b'0');
-INSERT INTO `tool_codegen_column` VALUES (251, 21, 'create_by', 'varchar(64)', '创建者', b'1', b'0', '0', 9, 'String', 'createBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-02-06 19:51:35', '', '2021-02-06 19:51:35', b'0');
+INSERT INTO `tool_codegen_column` VALUES (251, 21, 'creator', 'varchar(64)', '创建者', b'1', b'0', '0', 9, 'String', 'createBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-02-06 19:51:35', '', '2021-02-06 19:51:35', b'0');
 INSERT INTO `tool_codegen_column` VALUES (252, 21, 'create_time', 'datetime', '创建时间', b'0', b'0', '0', 10, 'Date', 'createTime', '', NULL, b'0', b'0', b'1', 'BETWEEN', b'1', 'datetime', '', '2021-02-06 19:51:35', '', '2021-02-06 19:51:35', b'0');
-INSERT INTO `tool_codegen_column` VALUES (253, 21, 'update_by', 'varchar(64)', '更新者', b'1', b'0', '0', 11, 'String', 'updateBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-02-06 19:51:35', '', '2021-02-06 19:51:35', b'0');
+INSERT INTO `tool_codegen_column` VALUES (253, 21, 'updater', 'varchar(64)', '更新者', b'1', b'0', '0', 11, 'String', 'updateBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-02-06 19:51:35', '', '2021-02-06 19:51:35', b'0');
 INSERT INTO `tool_codegen_column` VALUES (254, 21, 'update_time', 'datetime', '更新时间', b'0', b'0', '0', 12, 'Date', 'updateTime', '', NULL, b'0', b'0', b'0', 'BETWEEN', b'0', 'datetime', '', '2021-02-06 19:51:35', '', '2021-02-06 19:51:35', b'0');
 INSERT INTO `tool_codegen_column` VALUES (255, 21, 'deleted', 'bit(1)', '是否删除', b'0', b'0', '0', 13, 'Boolean', 'deleted', '', NULL, b'0', b'0', b'0', '=', b'0', 'radio', '', '2021-02-06 19:51:35', '', '2021-02-06 19:51:35', b'0');
 INSERT INTO `tool_codegen_column` VALUES (256, 23, 'job_id', 'bigint(20)', '任务ID', b'0', b'1', '1', 1, 'Long', 'jobId', '', NULL, b'0', b'1', b'0', '=', b'1', 'input', '', '2021-02-06 20:29:26', '', '2021-02-07 06:38:51', b'1');
@@ -984,9 +984,9 @@ INSERT INTO `tool_codegen_column` VALUES (260, 23, 'cron_expression', 'varchar(2
 INSERT INTO `tool_codegen_column` VALUES (261, 23, 'misfire_policy', 'varchar(20)', '计划执行错误策略（1立即执行 2执行一次 3放弃执行）', b'1', b'0', '0', 6, 'String', 'misfirePolicy', '', NULL, b'1', b'1', b'1', '=', b'1', 'input', '', '2021-02-06 20:29:26', '', '2021-02-06 20:47:14', b'1');
 INSERT INTO `tool_codegen_column` VALUES (262, 23, 'concurrent', 'char(1)', '是否并发执行（0允许 1禁止）', b'1', b'0', '0', 7, 'String', 'concurrent', '', NULL, b'1', b'1', b'1', '=', b'1', 'input', '', '2021-02-06 20:29:26', '', '2021-02-06 20:47:14', b'1');
 INSERT INTO `tool_codegen_column` VALUES (263, 23, 'status', 'char(1)', '状态（0正常 1暂停）', b'1', b'0', '0', 8, 'String', 'status', '', NULL, b'1', b'1', b'1', '=', b'1', 'radio', '', '2021-02-06 20:29:26', '', '2021-02-06 20:46:49', b'1');
-INSERT INTO `tool_codegen_column` VALUES (264, 23, 'create_by', 'varchar(64)', '创建者', b'1', b'0', '0', 9, 'String', 'createBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-02-06 20:29:26', '', '2021-02-06 20:46:49', b'1');
+INSERT INTO `tool_codegen_column` VALUES (264, 23, 'creator', 'varchar(64)', '创建者', b'1', b'0', '0', 9, 'String', 'createBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-02-06 20:29:26', '', '2021-02-06 20:46:49', b'1');
 INSERT INTO `tool_codegen_column` VALUES (265, 23, 'create_time', 'datetime', '创建时间', b'0', b'0', '0', 10, 'Date', 'createTime', '', NULL, b'0', b'0', b'1', 'BETWEEN', b'1', 'datetime', '', '2021-02-06 20:29:26', '', '2021-02-06 20:46:49', b'1');
-INSERT INTO `tool_codegen_column` VALUES (266, 23, 'update_by', 'varchar(64)', '更新者', b'1', b'0', '0', 11, 'String', 'updateBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-02-06 20:29:26', '', '2021-02-06 20:46:49', b'1');
+INSERT INTO `tool_codegen_column` VALUES (266, 23, 'updater', 'varchar(64)', '更新者', b'1', b'0', '0', 11, 'String', 'updateBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-02-06 20:29:26', '', '2021-02-06 20:46:49', b'1');
 INSERT INTO `tool_codegen_column` VALUES (267, 23, 'update_time', 'datetime', '更新时间', b'1', b'0', '0', 12, 'Date', 'updateTime', '', NULL, b'0', b'0', b'0', 'BETWEEN', b'0', 'datetime', '', '2021-02-06 20:29:26', '', '2021-02-06 20:47:14', b'1');
 INSERT INTO `tool_codegen_column` VALUES (268, 23, 'remark', 'varchar(500)', '备注信息', b'1', b'0', '0', 13, 'String', 'remark', '', NULL, b'1', b'1', b'1', '=', b'1', 'input', '', '2021-02-06 20:29:26', '', '2021-02-06 20:47:14', b'1');
 INSERT INTO `tool_codegen_column` VALUES (269, 24, 'id', 'bigint(20)', '任务编号', b'0', b'1', '1', 1, 'Long', 'id', '', '1024', b'0', b'1', b'0', '=', b'1', 'input', '', '2021-02-07 06:39:34', '', '2021-02-07 06:44:19', b'0');
@@ -1000,9 +1000,9 @@ INSERT INTO `tool_codegen_column` VALUES (276, 24, 'execute_end_time', 'datetime
 INSERT INTO `tool_codegen_column` VALUES (277, 24, 'fire_prev_time', 'datetime', '上一次触发时间', b'1', b'0', '0', 9, 'Date', 'firePrevTime', '', NULL, b'0', b'0', b'0', 'BETWEEN', b'1', 'datetime', '', '2021-02-07 06:39:34', '', '2021-02-07 07:53:27', b'0');
 INSERT INTO `tool_codegen_column` VALUES (278, 24, 'fire_next_time', 'datetime', '下一次触发时间', b'1', b'0', '0', 10, 'Date', 'fireNextTime', '', NULL, b'0', b'0', b'0', 'BETWEEN', b'1', 'datetime', '', '2021-02-07 06:39:34', '', '2021-02-07 07:53:27', b'0');
 INSERT INTO `tool_codegen_column` VALUES (279, 24, 'monitor_timeout', 'int(11)', '监控超时时间', b'1', b'0', '0', 11, 'Integer', 'monitorTimeout', '', '1000', b'1', b'1', b'0', '=', b'1', 'input', '', '2021-02-07 06:39:34', '', '2021-02-07 06:44:19', b'0');
-INSERT INTO `tool_codegen_column` VALUES (280, 24, 'create_by', 'varchar(64)', '创建者', b'1', b'0', '0', 12, 'String', 'createBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-02-07 06:39:34', '', '2021-02-07 06:39:34', b'0');
+INSERT INTO `tool_codegen_column` VALUES (280, 24, 'creator', 'varchar(64)', '创建者', b'1', b'0', '0', 12, 'String', 'createBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-02-07 06:39:34', '', '2021-02-07 06:39:34', b'0');
 INSERT INTO `tool_codegen_column` VALUES (281, 24, 'create_time', 'datetime', '创建时间', b'0', b'0', '0', 13, 'Date', 'createTime', '', NULL, b'0', b'0', b'0', 'BETWEEN', b'1', 'datetime', '', '2021-02-07 06:39:34', '', '2021-02-07 06:44:19', b'0');
-INSERT INTO `tool_codegen_column` VALUES (282, 24, 'update_by', 'varchar(64)', '更新者', b'1', b'0', '0', 14, 'String', 'updateBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-02-07 06:39:34', '', '2021-02-07 06:39:34', b'0');
+INSERT INTO `tool_codegen_column` VALUES (282, 24, 'updater', 'varchar(64)', '更新者', b'1', b'0', '0', 14, 'String', 'updateBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-02-07 06:39:34', '', '2021-02-07 06:39:34', b'0');
 INSERT INTO `tool_codegen_column` VALUES (283, 24, 'update_time', 'datetime', '更新时间', b'0', b'0', '0', 15, 'Date', 'updateTime', '', NULL, b'0', b'0', b'0', 'BETWEEN', b'0', 'datetime', '', '2021-02-07 06:39:34', '', '2021-02-07 06:39:34', b'0');
 INSERT INTO `tool_codegen_column` VALUES (284, 24, 'deleted', 'bit(1)', '是否删除', b'0', b'0', '0', 16, 'Boolean', 'deleted', '', NULL, b'0', b'0', b'0', '=', b'0', 'radio', '', '2021-02-07 06:39:34', '', '2021-02-07 06:39:34', b'0');
 INSERT INTO `tool_codegen_column` VALUES (285, 24, 'retry_count', 'int(11)', '重试次数', b'0', b'0', '0', 11, 'Integer', 'retryCount', '', NULL, b'1', b'1', b'1', '=', b'1', 'input', '', '2021-02-08 04:17:27', '', '2021-02-08 04:17:27', b'0');
@@ -1017,9 +1017,9 @@ INSERT INTO `tool_codegen_column` VALUES (293, 25, 'end_time', 'datetime', '结�
 INSERT INTO `tool_codegen_column` VALUES (294, 25, 'duration', 'int(11)', '执行时长', b'1', b'0', '0', 8, 'Integer', 'duration', '', NULL, b'1', b'1', b'0', '=', b'1', 'input', '', '2021-02-08 04:58:41', '', '2021-02-08 05:06:07', b'0');
 INSERT INTO `tool_codegen_column` VALUES (295, 25, 'status', 'tinyint(4)', '任务状态', b'0', b'0', '0', 9, 'Integer', 'status', 'inf_job_log_status', NULL, b'1', b'1', b'1', '=', b'1', 'radio', '', '2021-02-08 04:58:41', '', '2021-02-08 10:21:07', b'0');
 INSERT INTO `tool_codegen_column` VALUES (296, 25, 'result', 'varchar(4000)', '结果数据', b'1', b'0', '0', 10, 'String', 'result', '', NULL, b'1', b'1', b'0', '=', b'1', 'input', '', '2021-02-08 04:58:41', '', '2021-02-08 05:06:07', b'0');
-INSERT INTO `tool_codegen_column` VALUES (297, 25, 'create_by', 'varchar(64)', '创建者', b'1', b'0', '0', 11, 'String', 'createBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-02-08 04:58:41', '', '2021-02-08 04:58:41', b'0');
+INSERT INTO `tool_codegen_column` VALUES (297, 25, 'creator', 'varchar(64)', '创建者', b'1', b'0', '0', 11, 'String', 'createBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-02-08 04:58:41', '', '2021-02-08 04:58:41', b'0');
 INSERT INTO `tool_codegen_column` VALUES (298, 25, 'create_time', 'datetime', '创建时间', b'0', b'0', '0', 12, 'Date', 'createTime', '', NULL, b'0', b'0', b'0', 'BETWEEN', b'1', 'datetime', '', '2021-02-08 04:58:41', '', '2021-02-08 05:06:07', b'0');
-INSERT INTO `tool_codegen_column` VALUES (299, 25, 'update_by', 'varchar(64)', '更新者', b'1', b'0', '0', 13, 'String', 'updateBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-02-08 04:58:41', '', '2021-02-08 04:58:41', b'0');
+INSERT INTO `tool_codegen_column` VALUES (299, 25, 'updater', 'varchar(64)', '更新者', b'1', b'0', '0', 13, 'String', 'updateBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-02-08 04:58:41', '', '2021-02-08 04:58:41', b'0');
 INSERT INTO `tool_codegen_column` VALUES (300, 25, 'update_time', 'datetime', '更新时间', b'0', b'0', '0', 14, 'Date', 'updateTime', '', NULL, b'0', b'0', b'0', 'BETWEEN', b'0', 'datetime', '', '2021-02-08 04:58:41', '', '2021-02-08 04:58:41', b'0');
 INSERT INTO `tool_codegen_column` VALUES (301, 25, 'deleted', 'bit(1)', '是否删除', b'0', b'0', '0', 15, 'Boolean', 'deleted', '', NULL, b'0', b'0', b'0', '=', b'0', 'radio', '', '2021-02-08 04:58:41', '', '2021-02-08 04:58:41', b'0');
 INSERT INTO `tool_codegen_column` VALUES (302, 26, 'id', 'bigint(20)', '日志主键', b'0', b'1', '1', 1, 'Long', 'id', '', '1024', b'0', b'1', b'0', '=', b'1', 'input', '', '2021-02-26 00:13:35', '', '2021-02-26 00:18:03', b'0');
@@ -1037,9 +1037,9 @@ INSERT INTO `tool_codegen_column` VALUES (314, 26, 'end_time', 'datetime', '结�
 INSERT INTO `tool_codegen_column` VALUES (315, 26, 'duration', 'int(11)', '执行时长', b'0', b'0', '0', 14, 'Integer', 'duration', '', '100', b'1', b'1', b'1', '>=', b'1', 'input', '', '2021-02-26 00:13:35', '', '2021-02-26 00:29:12', b'0');
 INSERT INTO `tool_codegen_column` VALUES (316, 26, 'result_code', 'int(11)', '结果码', b'0', b'0', '0', 15, 'Integer', 'resultCode', '', '0', b'1', b'1', b'1', '=', b'1', 'input', '', '2021-02-26 00:13:35', '', '2021-02-26 00:29:12', b'0');
 INSERT INTO `tool_codegen_column` VALUES (317, 26, 'result_msg', 'varchar(512)', '结果提示', b'1', b'0', '0', 16, 'String', 'resultMsg', '', '芋道源码，牛逼！', b'1', b'1', b'0', '=', b'1', 'input', '', '2021-02-26 00:13:35', '', '2021-02-26 00:30:58', b'0');
-INSERT INTO `tool_codegen_column` VALUES (318, 26, 'create_by', 'varchar(64)', '创建者', b'1', b'0', '0', 17, 'String', 'createBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-02-26 00:13:35', '', '2021-02-26 00:13:35', b'0');
+INSERT INTO `tool_codegen_column` VALUES (318, 26, 'creator', 'varchar(64)', '创建者', b'1', b'0', '0', 17, 'String', 'createBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-02-26 00:13:35', '', '2021-02-26 00:13:35', b'0');
 INSERT INTO `tool_codegen_column` VALUES (319, 26, 'create_time', 'datetime', '创建时间', b'0', b'0', '0', 18, 'Date', 'createTime', '', NULL, b'0', b'0', b'0', 'BETWEEN', b'1', 'datetime', '', '2021-02-26 00:13:35', '', '2021-02-26 00:33:02', b'0');
-INSERT INTO `tool_codegen_column` VALUES (320, 26, 'update_by', 'varchar(64)', '更新者', b'1', b'0', '0', 19, 'String', 'updateBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-02-26 00:13:35', '', '2021-02-26 00:13:35', b'0');
+INSERT INTO `tool_codegen_column` VALUES (320, 26, 'updater', 'varchar(64)', '更新者', b'1', b'0', '0', 19, 'String', 'updateBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-02-26 00:13:35', '', '2021-02-26 00:13:35', b'0');
 INSERT INTO `tool_codegen_column` VALUES (321, 26, 'update_time', 'datetime', '更新时间', b'0', b'0', '0', 20, 'Date', 'updateTime', '', NULL, b'0', b'0', b'0', 'BETWEEN', b'0', 'datetime', '', '2021-02-26 00:13:35', '', '2021-02-26 00:13:35', b'0');
 INSERT INTO `tool_codegen_column` VALUES (322, 26, 'deleted', 'bit(1)', '是否删除', b'0', b'0', '0', 21, 'Boolean', 'deleted', '', NULL, b'0', b'0', b'0', '=', b'0', 'radio', '', '2021-02-26 00:13:35', '', '2021-02-26 00:13:35', b'0');
 INSERT INTO `tool_codegen_column` VALUES (323, 27, 'id', 'int(11)', '编号', b'0', b'1', '1', 1, 'Integer', 'id', '', '1024', b'0', b'1', b'0', '=', b'1', 'input', '', '2021-02-26 06:54:49', '', '2021-02-26 06:58:23', b'0');
@@ -1062,7 +1062,7 @@ INSERT INTO `tool_codegen_column` VALUES (339, 27, 'exception_file_name', 'varch
 INSERT INTO `tool_codegen_column` VALUES (340, 27, 'exception_method_name', 'varchar(512)', '异常发生的方法名', b'0', b'0', '0', 18, 'String', 'exceptionMethodName', '', NULL, b'1', b'1', b'0', 'LIKE', b'1', 'input', '', '2021-02-26 06:54:49', '', '2021-02-26 07:10:19', b'0');
 INSERT INTO `tool_codegen_column` VALUES (341, 27, 'exception_line_number', 'int(11)', '异常发生的方法所在行', b'0', b'0', '0', 19, 'Integer', 'exceptionLineNumber', '', NULL, b'1', b'1', b'0', '=', b'1', 'input', '', '2021-02-26 06:54:49', '', '2021-02-26 07:10:19', b'0');
 INSERT INTO `tool_codegen_column` VALUES (342, 27, 'create_time', 'datetime', '创建时间', b'0', b'0', '0', 20, 'Date', 'createTime', '', NULL, b'0', b'0', b'0', 'BETWEEN', b'1', 'datetime', '', '2021-02-26 06:54:49', '', '2021-02-26 06:56:14', b'0');
-INSERT INTO `tool_codegen_column` VALUES (343, 27, 'update_by', 'varchar(64)', '更新者', b'0', b'0', '0', 21, 'String', 'updateBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-02-26 06:54:49', '', '2021-02-26 06:56:14', b'0');
+INSERT INTO `tool_codegen_column` VALUES (343, 27, 'updater', 'varchar(64)', '更新者', b'0', b'0', '0', 21, 'String', 'updateBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-02-26 06:54:49', '', '2021-02-26 06:56:14', b'0');
 INSERT INTO `tool_codegen_column` VALUES (344, 27, 'update_time', 'datetime', '更新时间', b'0', b'0', '0', 22, 'Date', 'updateTime', '', NULL, b'0', b'0', b'0', 'BETWEEN', b'0', 'datetime', '', '2021-02-26 06:54:49', '', '2021-02-26 06:54:49', b'0');
 INSERT INTO `tool_codegen_column` VALUES (345, 27, 'deleted', 'bit(1)', '是否删除', b'0', b'0', '0', 23, 'Boolean', 'deleted', '', NULL, b'0', b'0', b'0', '=', b'0', 'radio', '', '2021-02-26 06:54:49', '', '2021-02-26 06:54:49', b'0');
 INSERT INTO `tool_codegen_column` VALUES (346, 27, 'process_status', 'tinyint(4)', '处理状态', b'0', b'0', '0', 20, 'Integer', 'processStatus', 'inf_api_error_log_process_status', '0', b'1', b'1', b'1', '=', b'1', 'radio', '', '2021-02-26 07:01:49', '', '2021-02-26 07:11:29', b'0');
@@ -1073,9 +1073,9 @@ INSERT INTO `tool_codegen_column` VALUES (350, 28, 'name', 'varchar(100)', '字�
 INSERT INTO `tool_codegen_column` VALUES (351, 28, 'dict_type', 'varchar(100)', '字典类型', b'0', b'0', '0', 3, 'String', 'dictType', '', NULL, b'1', b'1', b'1', '=', b'1', 'select', '', '2021-03-06 03:45:55', '', '2021-03-06 03:51:02', b'1');
 INSERT INTO `tool_codegen_column` VALUES (352, 28, 'status', 'tinyint(4)', '状态（0正常 1停用）', b'0', b'0', '0', 4, 'Integer', 'status', '', NULL, b'1', b'1', b'1', '=', b'1', 'radio', '', '2021-03-06 03:45:55', '', '2021-03-06 03:51:02', b'1');
 INSERT INTO `tool_codegen_column` VALUES (353, 28, 'remark', 'varchar(500)', '备注', b'1', b'0', '0', 5, 'String', 'remark', '', NULL, b'1', b'1', b'1', '=', b'1', 'input', '', '2021-03-06 03:45:55', '', '2021-03-06 03:51:02', b'1');
-INSERT INTO `tool_codegen_column` VALUES (354, 28, 'create_by', 'varchar(64)', '创建者', b'1', b'0', '0', 6, 'String', 'createBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-03-06 03:45:55', '', '2021-03-06 03:51:02', b'1');
+INSERT INTO `tool_codegen_column` VALUES (354, 28, 'creator', 'varchar(64)', '创建者', b'1', b'0', '0', 6, 'String', 'createBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-03-06 03:45:55', '', '2021-03-06 03:51:02', b'1');
 INSERT INTO `tool_codegen_column` VALUES (355, 28, 'create_time', 'datetime', '创建时间', b'0', b'0', '0', 7, 'Date', 'createTime', '', NULL, b'0', b'0', b'1', 'BETWEEN', b'1', 'datetime', '', '2021-03-06 03:45:55', '', '2021-03-06 03:51:02', b'1');
-INSERT INTO `tool_codegen_column` VALUES (356, 28, 'update_by', 'varchar(64)', '更新者', b'1', b'0', '0', 8, 'String', 'updateBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-03-06 03:45:55', '', '2021-03-06 03:51:02', b'1');
+INSERT INTO `tool_codegen_column` VALUES (356, 28, 'updater', 'varchar(64)', '更新者', b'1', b'0', '0', 8, 'String', 'updateBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-03-06 03:45:55', '', '2021-03-06 03:51:02', b'1');
 INSERT INTO `tool_codegen_column` VALUES (357, 28, 'update_time', 'datetime', '更新时间', b'0', b'0', '0', 9, 'Date', 'updateTime', '', NULL, b'0', b'0', b'0', 'BETWEEN', b'0', 'datetime', '', '2021-03-06 03:45:55', '', '2021-03-06 03:51:02', b'1');
 INSERT INTO `tool_codegen_column` VALUES (358, 28, 'deleted', 'bit(1)', '是否删除', b'0', b'0', '0', 10, 'Boolean', 'deleted', '', NULL, b'0', b'0', b'0', '=', b'0', 'radio', '', '2021-03-06 03:45:55', '', '2021-03-06 03:51:02', b'1');
 INSERT INTO `tool_codegen_column` VALUES (359, 29, 'id', 'bigint(20)', '字典主键', b'0', b'1', '1', 1, 'Long', 'id', '', NULL, b'0', b'1', b'0', '=', b'1', 'input', '', '2021-03-06 03:52:57', '', '2021-03-06 03:52:57', b'0');
@@ -1083,9 +1083,9 @@ INSERT INTO `tool_codegen_column` VALUES (360, 29, 'name', 'varchar(100)', '字�
 INSERT INTO `tool_codegen_column` VALUES (361, 29, 'type', 'varchar(100)', '字典类型', b'0', b'0', '0', 3, 'String', 'type', '', NULL, b'1', b'1', b'1', 'LIKE', b'1', 'select', '', '2021-03-06 03:52:57', '', '2021-03-06 03:54:48', b'0');
 INSERT INTO `tool_codegen_column` VALUES (362, 29, 'status', 'tinyint(4)', '状态（0正常 1停用）', b'0', b'0', '0', 4, 'Integer', 'status', '', NULL, b'1', b'1', b'1', '=', b'1', 'radio', '', '2021-03-06 03:52:57', '', '2021-03-06 03:52:57', b'0');
 INSERT INTO `tool_codegen_column` VALUES (363, 29, 'remark', 'varchar(500)', '备注', b'1', b'0', '0', 5, 'String', 'remark', '', NULL, b'1', b'1', b'0', '=', b'1', 'input', '', '2021-03-06 03:52:57', '', '2021-03-06 03:54:48', b'0');
-INSERT INTO `tool_codegen_column` VALUES (364, 29, 'create_by', 'varchar(64)', '创建者', b'1', b'0', '0', 6, 'String', 'createBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-03-06 03:52:57', '', '2021-03-06 03:52:57', b'0');
+INSERT INTO `tool_codegen_column` VALUES (364, 29, 'creator', 'varchar(64)', '创建者', b'1', b'0', '0', 6, 'String', 'createBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-03-06 03:52:57', '', '2021-03-06 03:52:57', b'0');
 INSERT INTO `tool_codegen_column` VALUES (365, 29, 'create_time', 'datetime', '创建时间', b'0', b'0', '0', 7, 'Date', 'createTime', '', NULL, b'0', b'0', b'1', 'BETWEEN', b'1', 'datetime', '', '2021-03-06 03:52:57', '', '2021-03-06 03:52:57', b'0');
-INSERT INTO `tool_codegen_column` VALUES (366, 29, 'update_by', 'varchar(64)', '更新者', b'1', b'0', '0', 8, 'String', 'updateBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-03-06 03:52:57', '', '2021-03-06 03:52:57', b'0');
+INSERT INTO `tool_codegen_column` VALUES (366, 29, 'updater', 'varchar(64)', '更新者', b'1', b'0', '0', 8, 'String', 'updateBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-03-06 03:52:57', '', '2021-03-06 03:52:57', b'0');
 INSERT INTO `tool_codegen_column` VALUES (367, 29, 'update_time', 'datetime', '更新时间', b'0', b'0', '0', 9, 'Date', 'updateTime', '', NULL, b'0', b'0', b'0', 'BETWEEN', b'0', 'datetime', '', '2021-03-06 03:52:57', '', '2021-03-06 03:52:57', b'0');
 INSERT INTO `tool_codegen_column` VALUES (368, 29, 'deleted', 'bit(1)', '是否删除', b'0', b'0', '0', 10, 'Boolean', 'deleted', '', NULL, b'0', b'0', b'0', '=', b'0', 'radio', '', '2021-03-06 03:52:57', '', '2021-03-06 03:52:57', b'0');
 INSERT INTO `tool_codegen_column` VALUES (369, 30, 'id', 'bigint(20)', '字典编码', b'0', b'1', '1', 1, 'Long', 'id', '', NULL, b'0', b'1', b'0', '=', b'1', 'input', '', '2021-03-06 06:48:28', '', '2021-03-06 06:48:28', b'0');
@@ -1095,9 +1095,9 @@ INSERT INTO `tool_codegen_column` VALUES (372, 30, 'value', 'varchar(100)', '字
 INSERT INTO `tool_codegen_column` VALUES (373, 30, 'dict_type', 'varchar(100)', '字典类型', b'0', b'0', '0', 5, 'String', 'dictType', '', NULL, b'1', b'1', b'1', 'LIKE', b'1', 'select', '', '2021-03-06 06:48:28', '', '2021-03-06 06:50:38', b'0');
 INSERT INTO `tool_codegen_column` VALUES (374, 30, 'status', 'tinyint(4)', '状态（0正常 1停用）', b'0', b'0', '0', 6, 'Integer', 'status', '', NULL, b'1', b'1', b'1', 'LIKE', b'1', 'radio', '', '2021-03-06 06:48:28', '', '2021-03-06 06:50:38', b'0');
 INSERT INTO `tool_codegen_column` VALUES (375, 30, 'remark', 'varchar(500)', '备注', b'1', b'0', '0', 7, 'String', 'remark', '', NULL, b'1', b'1', b'0', '=', b'1', 'input', '', '2021-03-06 06:48:28', '', '2021-03-06 06:50:38', b'0');
-INSERT INTO `tool_codegen_column` VALUES (376, 30, 'create_by', 'varchar(64)', '创建者', b'1', b'0', '0', 8, 'String', 'createBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-03-06 06:48:28', '', '2021-03-06 06:48:28', b'0');
+INSERT INTO `tool_codegen_column` VALUES (376, 30, 'creator', 'varchar(64)', '创建者', b'1', b'0', '0', 8, 'String', 'createBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-03-06 06:48:28', '', '2021-03-06 06:48:28', b'0');
 INSERT INTO `tool_codegen_column` VALUES (377, 30, 'create_time', 'datetime', '创建时间', b'0', b'0', '0', 9, 'Date', 'createTime', '', NULL, b'0', b'0', b'1', 'BETWEEN', b'1', 'datetime', '', '2021-03-06 06:48:28', '', '2021-03-06 06:48:28', b'0');
-INSERT INTO `tool_codegen_column` VALUES (378, 30, 'update_by', 'varchar(64)', '更新者', b'1', b'0', '0', 10, 'String', 'updateBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-03-06 06:48:28', '', '2021-03-06 06:48:28', b'0');
+INSERT INTO `tool_codegen_column` VALUES (378, 30, 'updater', 'varchar(64)', '更新者', b'1', b'0', '0', 10, 'String', 'updateBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-03-06 06:48:28', '', '2021-03-06 06:48:28', b'0');
 INSERT INTO `tool_codegen_column` VALUES (379, 30, 'update_time', 'datetime', '更新时间', b'0', b'0', '0', 11, 'Date', 'updateTime', '', NULL, b'0', b'0', b'0', 'BETWEEN', b'0', 'datetime', '', '2021-03-06 06:48:28', '', '2021-03-06 06:48:28', b'0');
 INSERT INTO `tool_codegen_column` VALUES (380, 30, 'deleted', 'bit(1)', '是否删除', b'0', b'0', '0', 12, 'Boolean', 'deleted', '', NULL, b'0', b'0', b'0', '=', b'0', 'radio', '', '2021-03-06 06:48:28', '', '2021-03-06 06:48:28', b'0');
 COMMIT;
@@ -1155,9 +1155,9 @@ CREATE TABLE `tool_test_demo` (
   `type` tinyint(4) NOT NULL COMMENT '类型',
   `category` tinyint(4) NOT NULL COMMENT '分类',
   `remark` varchar(500) DEFAULT NULL COMMENT '备注',
-  `create_by` varchar(64) DEFAULT '' COMMENT '创建者',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_by` varchar(64) DEFAULT '' COMMENT '更新者',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
