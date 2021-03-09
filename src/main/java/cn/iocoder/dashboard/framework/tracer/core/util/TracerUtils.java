@@ -1,8 +1,8 @@
 package cn.iocoder.dashboard.framework.tracer.core.util;
 
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.dashboard.framework.tracer.core.ITrace;
-import cn.iocoder.dashboard.util.sping.SpringBeanUtil;
 import org.apache.skywalking.apm.toolkit.trace.TraceContext;
 
 import java.util.UUID;
@@ -61,7 +61,7 @@ public class TracerUtils {
      * @return ITrace
      */
     private static ITrace getTracer() {
-        return SpringBeanUtil.getBean(ITrace.class);
+        return SpringUtil.getBean(ITrace.class);
     }
 
     /**
