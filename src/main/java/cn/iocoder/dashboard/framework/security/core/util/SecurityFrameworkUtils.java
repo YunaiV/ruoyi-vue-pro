@@ -20,14 +20,13 @@ import java.util.Set;
  */
 public class SecurityFrameworkUtils {
 
-    private SecurityFrameworkUtils() {
-    }
+    private SecurityFrameworkUtils() {}
 
     /**
      * 从请求中，获得认证 Token
      *
      * @param request 请求
-     * @param header  认证 Token 对应的 Header 名字
+     * @param header 认证 Token 对应的 Header 名字
      * @return 认证 Token
      */
     public static String obtainAuthorization(HttpServletRequest request, String header) {
@@ -86,12 +85,12 @@ public class SecurityFrameworkUtils {
      * 设置当前用户
      *
      * @param loginUser 登陆用户
-     * @param request   请求
+     * @param request 请求
      */
     public static void setLoginUser(LoginUser loginUser, HttpServletRequest request) {
         // 创建 UsernamePasswordAuthenticationToken 对象
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-            loginUser, null, null);
+                loginUser, null, null);
         authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
         // 设置到上下文
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
