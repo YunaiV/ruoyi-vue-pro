@@ -7,20 +7,22 @@ import cn.iocoder.dashboard.modules.system.controller.logger.vo.operatelog.SysOp
 import cn.iocoder.dashboard.modules.system.controller.logger.vo.operatelog.SysOperateLogExportReqVO;
 import cn.iocoder.dashboard.modules.system.controller.logger.vo.operatelog.SysOperateLogPageReqVO;
 import cn.iocoder.dashboard.modules.system.convert.logger.SysOperateLogConvert;
-import cn.iocoder.dashboard.modules.system.dal.mysql.logger.SysOperateLogMapper;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.logger.SysOperateLogDO;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.user.SysUserDO;
+import cn.iocoder.dashboard.modules.system.dal.mysql.logger.SysOperateLogMapper;
 import cn.iocoder.dashboard.modules.system.service.logger.SysOperateLogService;
 import cn.iocoder.dashboard.modules.system.service.user.SysUserService;
 import cn.iocoder.dashboard.util.string.StrUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.Future;
 
 import static cn.iocoder.dashboard.modules.system.dal.dataobject.logger.SysOperateLogDO.JAVA_METHOD_ARGS_MAX_LENGTH;
 import static cn.iocoder.dashboard.modules.system.dal.dataobject.logger.SysOperateLogDO.RESULT_MAX_LENGTH;
@@ -38,16 +40,18 @@ public class SysOperateLogServiceImpl implements SysOperateLogService {
 
     @Override
     @Async
-    public void createOperateLogAsync(SysOperateLogCreateReqVO reqVO) {
+    public Future<Boolean> createOperateLogAsync(SysOperateLogCreateReqVO reqVO) {
+        boolean success = false;
         try {
             SysOperateLogDO logDO = SysOperateLogConvert.INSTANCE.convert(reqVO);
             logDO.setJavaMethodArgs(StrUtils.maxLength(logDO.getJavaMethodArgs(), JAVA_METHOD_ARGS_MAX_LENGTH));
             logDO.setResultData(StrUtils.maxLength(logDO.getResultData(), RESULT_MAX_LENGTH));
-            operateLogMapper.insert(logDO);
+            success = operateLogMapper.insert(logDO) == 1;
         } catch (Throwable throwable) {
             // 仅仅打印日志，不对外抛出。原因是，还是要保留现场数据。
             log.error("[createOperateLogAsync][记录操作日志异常，日志为 ({})]", reqVO, throwable);
         }
+        return new AsyncResult<>(success);
     }
 
     @Override

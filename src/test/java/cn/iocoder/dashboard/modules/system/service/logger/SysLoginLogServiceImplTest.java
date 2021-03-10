@@ -3,14 +3,13 @@ package cn.iocoder.dashboard.modules.system.service.logger;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.ReflectUtil;
-import cn.iocoder.dashboard.BaseSpringBootUnitTest;
+import cn.iocoder.dashboard.BaseDbUnitTest;
 import cn.iocoder.dashboard.common.pojo.PageResult;
 import cn.iocoder.dashboard.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.dashboard.framework.tracer.core.util.TracerUtils;
 import cn.iocoder.dashboard.modules.system.controller.logger.vo.loginlog.SysLoginLogCreateReqVO;
 import cn.iocoder.dashboard.modules.system.controller.logger.vo.loginlog.SysLoginLogExportReqVO;
 import cn.iocoder.dashboard.modules.system.controller.logger.vo.loginlog.SysLoginLogPageReqVO;
-import cn.iocoder.dashboard.modules.system.convert.logger.SysLoginLogConvert;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.logger.SysLoginLogDO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.logger.SysLoginLogMapper;
 import cn.iocoder.dashboard.modules.system.enums.logger.SysLoginLogTypeEnum;
@@ -19,6 +18,7 @@ import cn.iocoder.dashboard.modules.system.service.logger.impl.SysLoginLogServic
 import cn.iocoder.dashboard.util.RandomUtils;
 import cn.iocoder.dashboard.util.object.ObjectUtils;
 import org.junit.jupiter.api.Test;
+import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
 import java.lang.reflect.Field;
@@ -30,7 +30,8 @@ import static cn.iocoder.dashboard.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.dashboard.util.date.DateUtils.buildTime;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class SysLoginLogServiceImplTest extends BaseSpringBootUnitTest {
+@Import(SysLoginLogServiceImpl.class)
+public class SysLoginLogServiceImplTest extends BaseDbUnitTest {
 
     @Resource
     private SysLoginLogServiceImpl sysLoginLogService;
@@ -40,7 +41,6 @@ public class SysLoginLogServiceImplTest extends BaseSpringBootUnitTest {
 
     @Test
     public void testCreateLoginLog() {
-
         String traceId = TracerUtils.getTraceId();
         SysLoginLogCreateReqVO reqVO = RandomUtils.randomPojo(SysLoginLogCreateReqVO.class, vo -> {
             // 指定随机的范围,避免超出范围入库失败
@@ -50,19 +50,12 @@ public class SysLoginLogServiceImplTest extends BaseSpringBootUnitTest {
             vo.setTraceId(traceId);
         });
 
-
         // 执行service方法
         sysLoginLogService.createLoginLog(reqVO);
 
-        // 查询插入的数据
-        SysLoginLogDO sysLoginLogDO = loginLogMapper.selectOne("trace_id", traceId);
-
         // 断言，忽略基本字段
-        assertPojoEquals(
-                SysLoginLogConvert.INSTANCE.convert(reqVO),
-                sysLoginLogDO,
-                getBaseDOFields()
-        );
+        SysLoginLogDO sysLoginLogDO = loginLogMapper.selectOne(null);
+        assertPojoEquals(reqVO, sysLoginLogDO);
     }
 
 
@@ -155,17 +148,4 @@ public class SysLoginLogServiceImplTest extends BaseSpringBootUnitTest {
         assertEquals(1, loginLogList.size());
         assertPojoEquals(loginLogDO, loginLogList.get(0));
     }
-
-
-    private static String[] getBaseDOFields() {
-        Field[] fields = ReflectUtil.getFields(BaseDO.class);
-
-        List<String> collect = Arrays.stream(fields)
-                .map(Field::getName)
-                .collect(Collectors.toList());
-        collect.add("id");
-
-        return ArrayUtil.toArray(collect, String.class);
-    }
-
 }

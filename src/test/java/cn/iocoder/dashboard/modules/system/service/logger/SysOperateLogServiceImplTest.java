@@ -1,9 +1,10 @@
 package cn.iocoder.dashboard.modules.system.service.logger;
 
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.ReflectUtil;
-import cn.iocoder.dashboard.BaseSpringBootUnitTest;
+import cn.iocoder.dashboard.BaseDbUnitTest;
 import cn.iocoder.dashboard.common.enums.CommonStatusEnum;
 import cn.iocoder.dashboard.common.exception.enums.GlobalErrorCodeConstants;
 import cn.iocoder.dashboard.common.pojo.PageResult;
@@ -13,15 +14,18 @@ import cn.iocoder.dashboard.framework.tracer.core.util.TracerUtils;
 import cn.iocoder.dashboard.modules.system.controller.logger.vo.operatelog.SysOperateLogCreateReqVO;
 import cn.iocoder.dashboard.modules.system.controller.logger.vo.operatelog.SysOperateLogExportReqVO;
 import cn.iocoder.dashboard.modules.system.controller.logger.vo.operatelog.SysOperateLogPageReqVO;
-import cn.iocoder.dashboard.modules.system.convert.logger.SysOperateLogConvert;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.logger.SysOperateLogDO;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.user.SysUserDO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.logger.SysOperateLogMapper;
 import cn.iocoder.dashboard.modules.system.dal.mysql.user.SysUserMapper;
 import cn.iocoder.dashboard.modules.system.enums.common.SysSexEnum;
+import cn.iocoder.dashboard.modules.system.service.logger.impl.SysOperateLogServiceImpl;
+import cn.iocoder.dashboard.modules.system.service.user.SysUserService;
 import cn.iocoder.dashboard.util.RandomUtils;
 import cn.iocoder.dashboard.util.object.ObjectUtils;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
 import java.lang.reflect.Field;
@@ -29,6 +33,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 import static cn.iocoder.dashboard.util.AssertUtils.assertPojoEquals;
@@ -36,7 +42,8 @@ import static cn.iocoder.dashboard.util.date.DateUtils.buildTime;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class SysOperateLogServiceImplTest extends BaseSpringBootUnitTest {
+@Import({SysOperateLogServiceImpl.class})
+public class SysOperateLogServiceImplTest extends BaseDbUnitTest {
 
     @Resource
     private SysOperateLogService sysOperateLogServiceImpl;
@@ -47,24 +54,26 @@ public class SysOperateLogServiceImplTest extends BaseSpringBootUnitTest {
     @Resource
     private SysUserMapper sysUserMapper;
 
+    @MockBean
+    private SysUserService sysUserService;
+
     @Test
-    public void testCreateOperateLogAsync() throws InterruptedException {
+    public void testCreateOperateLogAsync() throws InterruptedException, ExecutionException {
 
         String traceId = TracerUtils.getTraceId();
         SysOperateLogCreateReqVO reqVO = RandomUtils.randomPojo(SysOperateLogCreateReqVO.class, vo -> {
             vo.setTraceId(traceId);
             vo.setUserId(RandomUtil.randomLong(1, Long.MAX_VALUE));
 
-            Map<String, Object> map = new HashMap<>();
-            map.put("orderId", 1);
+            Map<String, Object> map = MapUtil.builder("orderId", (Object) 1).build();
             vo.setExts(map);
         });
 
         // 执行service方法
-        sysOperateLogServiceImpl.createOperateLogAsync(reqVO);
+        Future<Boolean> future = sysOperateLogServiceImpl.createOperateLogAsync(reqVO);
 
         // 等异步执行完
-        Thread.sleep(2000);
+        future.get();
 
         // 查询插入的数据
         SysOperateLogDO sysOperateLogDO = sysOperateLogMapper.selectOne("trace_id", traceId);
@@ -72,11 +81,7 @@ public class SysOperateLogServiceImplTest extends BaseSpringBootUnitTest {
         // 断言
         assertNotNull(sysOperateLogDO);
         // 断言，忽略基本字段
-        assertPojoEquals(
-                SysOperateLogConvert.INSTANCE.convert(reqVO),
-                sysOperateLogDO,
-                getBaseDOFields()
-        );
+        assertPojoEquals(reqVO, sysOperateLogDO);
     }
 
 
@@ -165,8 +170,8 @@ public class SysOperateLogServiceImplTest extends BaseSpringBootUnitTest {
             entity.setStartTime(buildTime(2021, 3, 6));
             entity.setResultCode(GlobalErrorCodeConstants.SUCCESS.getCode());
 
-            Map<String, Object> map = new HashMap<>();
-            map.put("orderId", 1);
+
+            Map<String, Object> map = MapUtil.builder("orderId", (Object) 1).build();
             entity.setExts(map);
         });
 
@@ -200,17 +205,4 @@ public class SysOperateLogServiceImplTest extends BaseSpringBootUnitTest {
         assertEquals(1, list.size());
         assertPojoEquals(sysOperateLogDO, list.get(0));
     }
-
-
-    private static String[] getBaseDOFields() {
-        Field[] fields = ReflectUtil.getFields(BaseDO.class);
-
-        List<String> collect = Arrays.stream(fields)
-                .map(Field::getName)
-                .collect(Collectors.toList());
-        collect.add("id");
-
-        return ArrayUtil.toArray(collect, String.class);
-    }
-
 }
