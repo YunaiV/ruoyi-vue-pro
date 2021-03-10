@@ -8,12 +8,10 @@ import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Lazy;
 
 import java.io.IOException;
 
 @Configuration(proxyBeanMethods = false)
-@Lazy(false) // 禁用懒加载，因为需要保证 Redis Server 必须先启动
 @EnableConfigurationProperties(RedisProperties.class)
 @AutoConfigureBefore({RedisAutoConfiguration.class, RedissonAutoConfiguration.class}) // 在 Redis 自动配置前，进行初始化
 public class RedisTestConfiguration {

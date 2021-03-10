@@ -2,6 +2,8 @@ package cn.iocoder.dashboard.util.collection;
 
 import cn.hutool.core.util.ArrayUtil;
 
+import java.util.function.Consumer;
+
 /**
  * Array 工具类
  *
@@ -18,11 +20,11 @@ public class ArrayUtils {
      * @return 结果数组
      */
     @SafeVarargs
-    public static <T> T[] append(T object, T... newElements) {
+    public static <T> Consumer<T>[] append(Consumer<T> object, Consumer<T>... newElements) {
         if (object == null) {
             return newElements;
         }
-        T[] result = ArrayUtil.newArray(object.getClass(), 1 + newElements.length);
+        Consumer<T>[] result = ArrayUtil.newArray(Consumer.class, 1 + newElements.length);
         result[0] = object;
         System.arraycopy(newElements, 0, result, 1, newElements.length);
         return result;

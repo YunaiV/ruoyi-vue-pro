@@ -34,7 +34,7 @@ public class SysPostDO extends BaseDO {
     /**
      * 岗位排序
      */
-    private String sort;
+    private Integer sort;
     /**
      * 状态
      *

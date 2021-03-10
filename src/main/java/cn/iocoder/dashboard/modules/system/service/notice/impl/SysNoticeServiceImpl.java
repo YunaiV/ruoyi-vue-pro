@@ -9,6 +9,7 @@ import cn.iocoder.dashboard.modules.system.convert.notice.SysNoticeConvert;
 import cn.iocoder.dashboard.modules.system.dal.mysql.notice.SysNoticeMapper;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.notice.SysNoticeDO;
 import cn.iocoder.dashboard.modules.system.service.notice.SysNoticeService;
+import com.google.common.annotations.VisibleForTesting;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -60,7 +61,8 @@ public class SysNoticeServiceImpl implements SysNoticeService {
         noticeMapper.deleteById(id);
     }
 
-    private void checkNoticeExists(Long id) {
+    @VisibleForTesting
+    public void checkNoticeExists(Long id) {
         if (id == null) {
             return;
         }

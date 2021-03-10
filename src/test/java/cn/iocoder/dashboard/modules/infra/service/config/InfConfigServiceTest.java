@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.modules.infra.service.config;
 
-import cn.iocoder.dashboard.BaseSpringBootUnitTest;
+import cn.iocoder.dashboard.BaseDbUnitTest;
 import cn.iocoder.dashboard.common.pojo.PageResult;
 import cn.iocoder.dashboard.modules.infra.controller.config.vo.InfConfigCreateReqVO;
 import cn.iocoder.dashboard.modules.infra.controller.config.vo.InfConfigExportReqVO;
@@ -15,6 +15,7 @@ import cn.iocoder.dashboard.util.collection.ArrayUtils;
 import cn.iocoder.dashboard.util.object.ObjectUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -24,8 +25,7 @@ import static cn.hutool.core.util.RandomUtil.randomEle;
 import static cn.iocoder.dashboard.modules.infra.enums.InfErrorCodeConstants.*;
 import static cn.iocoder.dashboard.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.dashboard.util.AssertUtils.assertServiceException;
-import static cn.iocoder.dashboard.util.RandomUtils.randomLongId;
-import static cn.iocoder.dashboard.util.RandomUtils.randomPojo;
+import static cn.iocoder.dashboard.util.RandomUtils.*;
 import static cn.iocoder.dashboard.util.date.DateUtils.buildTime;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.times;
@@ -36,7 +36,8 @@ import static org.mockito.Mockito.verify;
  *
  * @author 芋道源码
  */
-public class InfConfigServiceTest extends BaseSpringBootUnitTest {
+@Import(InfConfigServiceImpl.class)
+public class InfConfigServiceTest extends BaseDbUnitTest {
 
     @Resource
     private InfConfigServiceImpl configService;
@@ -45,6 +46,120 @@ public class InfConfigServiceTest extends BaseSpringBootUnitTest {
     private InfConfigMapper configMapper;
     @MockBean
     private InfConfigProducer configProducer;
+
+    @Test
+    public void testCreateConfig_success() {
+        // 准备参数
+        InfConfigCreateReqVO reqVO = randomPojo(InfConfigCreateReqVO.class);
+
+        // 调用
+        Long configId = configService.createConfig(reqVO);
+        // 断言
+        assertNotNull(configId);
+        // 校验记录的属性是否正确
+        InfConfigDO config = configMapper.selectById(configId);
+        assertPojoEquals(reqVO, config);
+        assertEquals(InfConfigTypeEnum.CUSTOM.getType(), config.getType());
+        // 校验调用
+        verify(configProducer, times(1)).sendConfigRefreshMessage();
+    }
+
+    @Test
+    public void testUpdateConfig_success() {
+        // mock 数据
+        InfConfigDO dbConfig = randomInfConfigDO();
+        configMapper.insert(dbConfig);// @Sql: 先插入出一条存在的数据
+        // 准备参数
+        InfConfigUpdateReqVO reqVO = randomPojo(InfConfigUpdateReqVO.class, o -> {
+            o.setId(dbConfig.getId()); // 设置更新的 ID
+        });
+
+        // 调用
+        configService.updateConfig(reqVO);
+        // 校验是否更新正确
+        InfConfigDO config = configMapper.selectById(reqVO.getId()); // 获取最新的
+        assertPojoEquals(reqVO, config);
+        // 校验调用
+        verify(configProducer, times(1)).sendConfigRefreshMessage();
+    }
+
+    @Test
+    public void testDeleteConfig_success() {
+        // mock 数据
+        InfConfigDO dbConfig = randomInfConfigDO(o -> {
+            o.setType(InfConfigTypeEnum.CUSTOM.getType()); // 只能删除 CUSTOM 类型
+        });
+        configMapper.insert(dbConfig);// @Sql: 先插入出一条存在的数据
+        // 准备参数
+        Long id = dbConfig.getId();
+
+        // 调用
+        configService.deleteConfig(id);
+        // 校验数据不存在了
+        assertNull(configMapper.selectById(id));
+        // 校验调用
+        verify(configProducer, times(1)).sendConfigRefreshMessage();
+    }
+
+    @Test
+    public void testDeleteConfig_canNotDeleteSystemType() {
+        // mock 数据
+        InfConfigDO dbConfig = randomInfConfigDO(o -> {
+            o.setType(InfConfigTypeEnum.SYSTEM.getType()); // SYSTEM 不允许删除
+        });
+        configMapper.insert(dbConfig);// @Sql: 先插入出一条存在的数据
+        // 准备参数
+        Long id = dbConfig.getId();
+
+        // 调用, 并断言异常
+        assertServiceException(() -> configService.deleteConfig(id), CONFIG_CAN_NOT_DELETE_SYSTEM_TYPE);
+    }
+
+    @Test
+    public void testCheckConfigExists_success() {
+        // mock 数据
+        InfConfigDO dbConfigDO = randomInfConfigDO();
+        configMapper.insert(dbConfigDO);// @Sql: 先插入出一条存在的数据
+
+        // 调用成功
+        configService.checkConfigExists(dbConfigDO.getId());
+    }
+
+    @Test
+    public void testCheckConfigExist_notExists() {
+        assertServiceException(() -> configService.checkConfigExists(randomLongId()), CONFIG_NOT_EXISTS);
+    }
+
+    @Test
+    public void testCheckConfigKeyUnique_success() {
+        // 调用，成功
+        configService.checkConfigKeyUnique(randomLongId(), randomString());
+    }
+
+    @Test
+    public void testCheckConfigKeyUnique_keyDuplicateForCreate() {
+        // 准备参数
+        String key = randomString();
+        // mock 数据
+        configMapper.insert(randomInfConfigDO(o -> o.setKey(key)));
+
+        // 调用，校验异常
+        assertServiceException(() -> configService.checkConfigKeyUnique(null, key),
+                CONFIG_KEY_DUPLICATE);
+    }
+
+    @Test
+    public void testCheckConfigKeyUnique_keyDuplicateForUpdate() {
+        // 准备参数
+        Long id = randomLongId();
+        String key = randomString();
+        // mock 数据
+        configMapper.insert(randomInfConfigDO(o -> o.setKey(key)));
+
+        // 调用，校验异常
+        assertServiceException(() -> configService.checkConfigKeyUnique(id, key),
+                CONFIG_KEY_DUPLICATE);
+    }
 
     @Test
     public void testGetConfigPage() {
@@ -126,105 +241,6 @@ public class InfConfigServiceTest extends BaseSpringBootUnitTest {
         // 断言
         assertNotNull(config);
         assertPojoEquals(dbConfig, config);
-    }
-
-    @Test
-    public void testCreateConfig_success() {
-        // 准备参数
-        InfConfigCreateReqVO reqVO = randomPojo(InfConfigCreateReqVO.class);
-
-        // 调用
-        Long configId = configService.createConfig(reqVO);
-        // 断言
-        assertNotNull(configId);
-        // 校验记录的属性是否正确
-        InfConfigDO config = configMapper.selectById(configId);
-        assertPojoEquals(reqVO, config);
-        assertEquals(InfConfigTypeEnum.CUSTOM.getType(), config.getType());
-        // 校验调用
-        verify(configProducer, times(1)).sendConfigRefreshMessage();
-    }
-
-    @Test
-    public void testCreateConfig_keyDuplicate() {
-        // 准备参数
-        InfConfigCreateReqVO reqVO = randomPojo(InfConfigCreateReqVO.class);
-        // mock 数据
-        configMapper.insert(randomInfConfigDO(o -> { // @Sql
-            o.setKey(reqVO.getKey()); // 模拟 key 重复
-        }));
-
-        // 调用, 并断言异常
-        assertServiceException(() -> configService.createConfig(reqVO), CONFIG_KEY_DUPLICATE);
-    }
-
-    @Test
-    public void testUpdateConfig_success() {
-        // mock 数据
-        InfConfigDO dbConfig = randomInfConfigDO();
-        configMapper.insert(dbConfig);// @Sql: 先插入出一条存在的数据
-        // 准备参数
-        InfConfigUpdateReqVO reqVO = randomPojo(InfConfigUpdateReqVO.class, o -> {
-            o.setId(dbConfig.getId()); // 设置更新的 ID
-        });
-
-        // 调用
-        configService.updateConfig(reqVO);
-        // 校验是否更新正确
-        InfConfigDO config = configMapper.selectById(reqVO.getId()); // 获取最新的
-        assertPojoEquals(reqVO, config);
-        // 校验调用
-        verify(configProducer, times(1)).sendConfigRefreshMessage();
-    }
-
-    @Test
-    public void testUpdateConfig_notExists() {
-        // 准备参数
-        InfConfigUpdateReqVO reqVO = randomPojo(InfConfigUpdateReqVO.class);
-
-        // 调用, 并断言异常
-        assertServiceException(() -> configService.updateConfig(reqVO), CONFIG_NOT_EXISTS);
-    }
-
-    @Test
-    public void testDeleteConfig_success() {
-        // mock 数据
-        InfConfigDO dbConfig = randomInfConfigDO(o -> {
-            o.setType(InfConfigTypeEnum.CUSTOM.getType()); // 只能删除 CUSTOM 类型
-        });
-        configMapper.insert(dbConfig);// @Sql: 先插入出一条存在的数据
-        // 准备参数
-        Long id = dbConfig.getId();
-
-        // 调用
-        configService.deleteConfig(id);
-        // 校验数据不存在了
-        assertNull(configMapper.selectById(id));
-        // 校验调用
-        verify(configProducer, times(1)).sendConfigRefreshMessage();
-    }
-
-    @Test
-    public void testDeleteConfig_canNotDeleteSystemType() {
-        // mock 数据
-        InfConfigDO dbConfig = randomInfConfigDO(o -> {
-            o.setType(InfConfigTypeEnum.SYSTEM.getType()); // SYSTEM 不允许删除
-        });
-        configMapper.insert(dbConfig);// @Sql: 先插入出一条存在的数据
-        // 准备参数
-        Long id = dbConfig.getId();
-
-        // 调用, 并断言异常
-        assertServiceException(() -> configService.deleteConfig(id), CONFIG_CAN_NOT_DELETE_SYSTEM_TYPE);
-    }
-
-    @Test
-    public void testDeleteConfig_notExists() {
-        // 准备参数
-        Long id = randomLongId();
-
-        // 调用, 并断言异常
-        assertServiceException(() -> configService.deleteConfig(id), CONFIG_NOT_EXISTS);
     }
 
     // ========== 随机对象 ==========

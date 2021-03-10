@@ -49,7 +49,7 @@ public class SysMenuDO extends BaseDO {
     /**
      * 显示顺序
      */
-    private String sort;
+    private Integer sort;
     /**
      * 父菜单ID
      */

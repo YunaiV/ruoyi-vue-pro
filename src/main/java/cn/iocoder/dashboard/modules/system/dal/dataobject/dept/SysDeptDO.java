@@ -35,7 +35,7 @@ public class SysDeptDO extends BaseDO {
     /**
      * 显示顺序
      */
-    private String sort;
+    private Integer sort;
     /**
      * 负责人
      */
