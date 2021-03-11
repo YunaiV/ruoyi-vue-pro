@@ -40,6 +40,7 @@ public interface SysErrorCodeConstants {
     ErrorCode USER_EMAIL_EXISTS = new ErrorCode(1002004002, "邮箱已经存在");
     ErrorCode USER_NOT_EXISTS = new ErrorCode(1002004003, "用户不存在");
     ErrorCode USER_IMPORT_LIST_IS_EMPTY = new ErrorCode(1002004004, "导入用户数据不能为空！");
+    ErrorCode USER_PASSWORD_FAILED = new ErrorCode(1002004005, "用户密码校验失败");
 
     // ========== 部门模块 1002005000 ==========
     ErrorCode DEPT_NAME_DUPLICATE = new ErrorCode(1002004001, "已经存在该名字的部门");
@@ -74,5 +75,6 @@ public interface SysErrorCodeConstants {
 
     // ========== 文件 1002009000 ==========
     ErrorCode FILE_PATH_EXISTS = new ErrorCode(1002009001, "文件路径已经存在");
+    ErrorCode FILE_UPLOAD_FAILED = new ErrorCode(1002009002, "文件上传失败");
 
 }

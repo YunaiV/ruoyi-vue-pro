@@ -152,7 +152,7 @@ yudao:
     width: 160
     height: 60
   file:
-    base-path: http://127.0.0.1:${server.port}/${yudao.web.api-prefix}/file/get/
+    base-path: http://127.0.0.1:${server.port}${yudao.web.api-prefix}/system/file/get/
   codegen:
     base-package: ${yudao.info.base-package}
     db-schemas: ${spring.datasource.name}
