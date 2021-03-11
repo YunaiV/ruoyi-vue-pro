@@ -1,6 +1,7 @@
 package cn.iocoder.dashboard.modules.infra.controller.doc;
 
-import cn.hutool.extra.servlet.ServletUtil;
+import cn.hutool.core.lang.UUID;
+import cn.iocoder.dashboard.util.servlet.ServletUtils;
 import cn.smallbun.screw.core.Configuration;
 import cn.smallbun.screw.core.engine.EngineConfig;
 import cn.smallbun.screw.core.engine.EngineFileType;
@@ -11,17 +12,15 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import io.swagger.annotations.Api;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
-import org.springframework.http.MediaType;
+import org.springframework.util.StreamUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
-import javax.sql.DataSource;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.*;
 import java.util.Collections;
 
 @Api(tags = "数据库文档")
@@ -34,34 +33,80 @@ public class InfDbDocController {
 
     private static final String FILE_OUTPUT_DIR = System.getProperty("java.io.tmpdir") + File.separator
             + "db-doc";
-    private static final EngineFileType FILE_OUTPUT_TYPE = EngineFileType.HTML; // 可以设置 Word 或者 Markdown 格式
     private static final String DOC_FILE_NAME = "数据库文档";
     private static final String DOC_VERSION = "1.0.0";
     private static final String DOC_DESCRIPTION = "文档描述";
 
-    @Resource
-    private DataSource dataSource;
 
     @GetMapping("/export-html")
-    public synchronized void exportHtml(HttpServletResponse response) throws FileNotFoundException {
+    public void exportHtml(@RequestParam(defaultValue = "true") Boolean deleteFile,
+                                        HttpServletResponse response) throws IOException {
+        EngineFileType fileOutputType=EngineFileType.HTML;
+        doExportFile(fileOutputType,deleteFile,response);
+    }
+
+
+
+    @GetMapping("/export-word")
+    public void exportWord(@RequestParam(defaultValue = "true") Boolean deleteFile,
+                                        HttpServletResponse response) throws IOException {
+        EngineFileType fileOutputType=EngineFileType.WORD;
+        doExportFile(fileOutputType,deleteFile,response);
+    }
+
+
+    @GetMapping("/export-markdown")
+    public void exportMarkdown(@RequestParam(defaultValue = "true") Boolean deleteFile,
+            HttpServletResponse response) throws IOException {
+        EngineFileType fileOutputType=EngineFileType.MD;
+        doExportFile(fileOutputType,deleteFile,response);
+    }
+
+    private void doExportFile(EngineFileType fileOutputType, Boolean deleteFile,
+                              HttpServletResponse response) throws IOException {
+        String docFileName=DOC_FILE_NAME+"_"+ UUID.fastUUID().toString(true);
+        String filePath= doExportFile(fileOutputType,docFileName);
+        String downloadFileName=DOC_FILE_NAME+fileOutputType.getFileSuffix(); //下载后的文件名
+        // 读取，返回
+        try (InputStream is=new FileInputStream(filePath)){//处理后关闭文件流才能删除
+            ServletUtils.writeAttachment(response,downloadFileName, StreamUtils.copyToByteArray(is));
+        }
+        handleDeleteFile(deleteFile,filePath);
+    }
+
+
+    /**
+     * 输出文件，返回文件路径
+     * @param fileOutputType
+     * @param fileName
+     * @return
+     */
+    private String doExportFile(EngineFileType fileOutputType, String fileName){
         try (HikariDataSource dataSource = buildDataSource()) {
             // 创建 screw 的配置
             Configuration config = Configuration.builder()
                     .version(DOC_VERSION)  // 版本
                     .description(DOC_DESCRIPTION) // 描述
                     .dataSource(dataSource) // 数据源
-                    .engineConfig(buildEngineConfig()) // 引擎配置
+                    .engineConfig(buildEngineConfig(fileOutputType,fileName)) // 引擎配置
                     .produceConfig(buildProcessConfig()) // 处理配置
                     .build();
 
             // 执行 screw，生成数据库文档
             new DocumentationExecute(config).execute();
 
-            // 读取，返回
-            ServletUtil.write(response,
-                    new FileInputStream(FILE_OUTPUT_DIR + File.separator + DOC_FILE_NAME + FILE_OUTPUT_TYPE.getFileSuffix()),
-                    MediaType.TEXT_HTML_VALUE);
+
+            String filePath=FILE_OUTPUT_DIR + File.separator + fileName + fileOutputType.getFileSuffix();
+            return filePath;
         }
+    }
+
+    private void handleDeleteFile(Boolean deleteFile,String filePath){
+        if(!deleteFile){
+            return;
+        }
+        File file=new File(filePath);
+        file.delete();
     }
 
     /**
@@ -83,13 +128,13 @@ public class InfDbDocController {
     /**
      * 创建 screw 的引擎配置
      */
-    private static EngineConfig buildEngineConfig() {
+    private static EngineConfig buildEngineConfig(EngineFileType fileOutputType,String docFileName) {
         return EngineConfig.builder()
                 .fileOutputDir(FILE_OUTPUT_DIR) // 生成文件路径
                 .openOutputDir(false) // 打开目录
-                .fileType(FILE_OUTPUT_TYPE) // 文件类型
+                .fileType(fileOutputType) // 文件类型
                 .produceType(EngineTemplateType.freemarker) // 文件类型
-                .fileName(DOC_FILE_NAME) // 自定义文件名称
+                .fileName(docFileName) // 自定义文件名称
                 .build();
     }
 
