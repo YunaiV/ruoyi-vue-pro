@@ -13,7 +13,7 @@ import cn.iocoder.dashboard.modules.system.convert.dict.SysDictDataConvert;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dao.dict.SysDictDataMapper;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.dict.SysDictDataDO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.dict.SysDictTypeDO;
-import cn.iocoder.dashboard.modules.system.mq.producer.dict.SysDictDataProducer;
+import cn.iocoder.dashboard.modules.system.redis.mq.producer.dict.SysDictDataProducer;
 import cn.iocoder.dashboard.modules.system.service.dict.SysDictDataService;
 import cn.iocoder.dashboard.modules.system.service.dict.SysDictTypeService;
 import com.google.common.collect.ImmutableTable;

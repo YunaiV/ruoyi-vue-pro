@@ -11,7 +11,7 @@ import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.permission.SysMe
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.permission.SysRoleDO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.permission.SysRoleMenuDO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.permission.SysUserRoleDO;
-import cn.iocoder.dashboard.modules.system.mq.producer.permission.SysPermissionProducer;
+import cn.iocoder.dashboard.modules.system.redis.mq.producer.permission.SysPermissionProducer;
 import cn.iocoder.dashboard.modules.system.service.permission.SysMenuService;
 import cn.iocoder.dashboard.modules.system.service.permission.SysPermissionService;
 import cn.iocoder.dashboard.modules.system.service.permission.SysRoleService;

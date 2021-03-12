@@ -12,7 +12,6 @@ CREATE TABLE `sms_channel`
     `code`             varchar(50)  NOT NULL COMMENT '编码(来自枚举类 阿里、华为、七牛等)',
     `api_key`          varchar(100) NOT NULL COMMENT '账号id',
     `api_secret`       varchar(100) NOT NULL COMMENT '账号秘钥',
-    `had_callback`     bit(1)       NOT NULL DEFAULT b'0' COMMENT '是否拥有回调函数',
     `callback_url`     varchar(100) NOT NULL default '' COMMENT '回调请求路径',
     `api_signature_id` varchar(100) NOT NULL COMMENT '实际渠道签名唯一标识',
     `name`             varchar(50)  NOT NULL COMMENT '名称',
@@ -61,7 +60,7 @@ CREATE TABLE `sms_template`
 ) ENGINE = InnoDB
   AUTO_INCREMENT = 1
   DEFAULT CHARSET = utf8mb4 COMMENT ='短信模板';
-
+/*
 -- ----------------------------
 -- Table structure for sms_query_log
 -- ----------------------------
@@ -73,7 +72,7 @@ CREATE TABLE `sms_query_log`
     `channel_code`      varchar(50)   NOT NULL COMMENT '短信渠道编码(来自枚举类)',
     `channel_id`        bigint(20)    NOT NULL COMMENT '短信渠道id',
     `template_code`     varchar(50)   NOT NULL COMMENT '渠道编码',
-    `phones`            varchar(2000) NOT NULL COMMENT '手机号(数组json字符串)',
+    `phone`             char(11)      NOT NULL COMMENT '手机号',
     `content`           varchar(1000) NOT NULL DEFAULT '' COMMENT '内容',
     `send_result_param` varchar(200)  NOT NULL DEFAULT '' COMMENT '查询短信发送结果的参数',
     `send_status`       tinyint(1)    NOT NULL DEFAULT 2 COMMENT '发送状态（0本地异步中 1发送请求失败 2发送请求成功）',
@@ -84,24 +83,26 @@ CREATE TABLE `sms_query_log`
     PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB
   AUTO_INCREMENT = 1
-  DEFAULT CHARSET = utf8mb4 COMMENT ='短信请求日志';
+  DEFAULT CHARSET = utf8mb4 COMMENT ='短信请求日志';*/
 
 -- ----------------------------
 -- Table structure for sms_log
 -- ----------------------------
-DROP TABLE IF EXISTS `sms_send_log`;
-CREATE TABLE `sms_send_log`
+DROP TABLE IF EXISTS `sms_query_log`;
+CREATE TABLE `sms_query_log`
 (
     `id`            bigint(20)    NOT NULL AUTO_INCREMENT COMMENT '自增编号',
+    `api_id`        varchar(100)  NOT NULL COMMENT '第三方唯一标识',
     `channel_code`  varchar(50)   NOT NULL COMMENT '短信渠道编码(来自枚举类)',
     `channel_id`    bigint(20)    NOT NULL COMMENT '短信渠道id',
     `template_code` varchar(50)   NOT NULL COMMENT '渠道编码',
-    `query_log_id`  bigint(20)    NOT NULL COMMENT '请求日志id',
     `phone`         char(11)      NOT NULL COMMENT '手机号',
     `content`       varchar(1000) NOT NULL DEFAULT '' COMMENT '内容',
+    `send_status`   tinyint(1)    NOT NULL DEFAULT 0 COMMENT '发送状态 详情见:SmsSendStatusEnum',
     `remark`        varchar(200)           DEFAULT NULL COMMENT '备注',
-    `success`       tinyint(1)    NOT NULL DEFAULT b'0' COMMENT '是否删除',
-    `send_time`     datetime               DEFAULT NULL COMMENT '创建时间',
+    `create_by`     varchar(64)   NOT NULL DEFAULT '' COMMENT '创建者',
+    `create_time`   datetime               DEFAULT NULL COMMENT '创建时间',
+    `send_time`     datetime               DEFAULT NULL COMMENT '发送时间',
     PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB
   AUTO_INCREMENT = 1

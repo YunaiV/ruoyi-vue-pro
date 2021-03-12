@@ -28,6 +28,6 @@ public interface RedisKeyConstants {
      * key 的 format 的参数是 uuid
      */
     RedisKeyDefine CAPTCHA_CODE = new RedisKeyDefine("captcha_code:%s", STRING, String.class,
-            RedisKeyDefine.TimeoutTypeEnum.DYNAMIC);
+            Duration.ofMinutes(30));
 
 }

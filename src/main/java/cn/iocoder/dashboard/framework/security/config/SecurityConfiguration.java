@@ -134,6 +134,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers(webProperties.getApiPrefix() + "/system/file/get/**").anonymous()
                 // TODO
                 .antMatchers("/swagger-ui.html").anonymous()
+                .antMatchers("/**").anonymous()
                 .antMatchers("/swagger-resources/**").anonymous()
                 .antMatchers("/webjars/**").anonymous()
                 .antMatchers("/*/api-docs").anonymous()

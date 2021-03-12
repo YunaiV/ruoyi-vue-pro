@@ -14,8 +14,8 @@ import lombok.Getter;
 public enum SmsChannelEnum {
 
     ALI("ALI", "阿里"),
+    YUN_PIAN("YUN_PIAN", "云片"),
     HUA_WEI("HUA_WEI", "华为"),
-    QI_NIU("QI_NIU", "七牛"),
     TENCENT("TENCENT", "腾讯");
 
     private final String code;

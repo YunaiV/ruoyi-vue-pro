@@ -4,8 +4,7 @@ import cn.iocoder.dashboard.framework.sms.core.SmsBody;
 import cn.iocoder.dashboard.framework.sms.core.SmsResult;
 import cn.iocoder.dashboard.framework.sms.core.SmsResultDetail;
 
-import java.util.Collection;
-import java.util.List;
+import javax.servlet.ServletRequest;
 
 /**
  * 短信父接口
@@ -23,9 +22,15 @@ public interface SmsClient {
      * @param targets       发送对象列表
      * @return 短信发送结果
      */
-    SmsResult send(String templateApiId, SmsBody smsBody, Collection<String> targets);
+    SmsResult send(String templateApiId, SmsBody smsBody, String targets);
 
 
-    //List<SmsResultDetail> getSmsSendResult(String jsonObjectParam);
+    /**
+     * 短信发送回调请求处理
+     *
+     * @param request 请求
+     * @return 短信发送结果
+     */
+    SmsResultDetail smsSendCallbackHandle(ServletRequest request) throws Exception;
 
 }

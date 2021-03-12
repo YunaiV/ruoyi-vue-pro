@@ -32,11 +32,6 @@ public class SmsResult implements Serializable {
      */
     private String message;
 
-    /**
-     * 用于查询发送结果的参数
-     */
-    private String sendResultParam;
-
     public static SmsResult failResult(String message) {
         SmsResult resultBody = new SmsResult();
         resultBody.setSuccess(false);

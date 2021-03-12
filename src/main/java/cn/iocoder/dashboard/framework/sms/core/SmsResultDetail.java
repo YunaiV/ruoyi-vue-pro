@@ -12,6 +12,11 @@ import java.util.Date;
 public class SmsResultDetail implements Serializable {
 
     /**
+     * 唯一标识
+     */
+    private String apiId;
+
+    /**
      * 短信发送状态 {@link cn.iocoder.dashboard.modules.system.enums.sms.SmsSendStatusEnum}
      */
     private Integer sendStatus;
@@ -30,4 +35,9 @@ public class SmsResultDetail implements Serializable {
      * 时间
      */
     private Date sendTime;
+
+    /**
+     * 接口返回值
+     */
+    private Object callbackResponseBody;
 }

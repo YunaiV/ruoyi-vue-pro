@@ -28,11 +28,6 @@ public class SysSmsChannelDO extends BaseDO {
     private String code;
 
     /**
-     * 是否拥有回答（0否 1是）
-     */
-    private Integer had_callback;
-
-    /**
      * 短信发送回调url
      */
     private String callback_url;

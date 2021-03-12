@@ -5,8 +5,6 @@ import cn.iocoder.dashboard.framework.sms.core.SmsResult;
 import cn.iocoder.dashboard.framework.sms.core.property.SmsChannelProperty;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.Collection;
-
 /**
  * 抽象短息客户端
  *
@@ -35,12 +33,12 @@ public abstract class AbstractSmsClient implements SmsClient {
     }
 
     @Override
-    public final SmsResult send(String templateApiId, SmsBody smsBody, Collection<String> targets) {
+    public final SmsResult send(String templateApiId, SmsBody smsBody, String target) {
         SmsResult result;
         try {
-            beforeSend(templateApiId, smsBody, targets);
-            result = doSend(templateApiId, smsBody, targets);
-            afterSend(templateApiId, smsBody, targets, result);
+            beforeSend(templateApiId, smsBody, target);
+            result = doSend(templateApiId, smsBody, target);
+            afterSend(templateApiId, smsBody, target, result);
         } catch (Exception e) {
             // exception handle
             log.debug(e.getMessage(), e);
@@ -54,16 +52,16 @@ public abstract class AbstractSmsClient implements SmsClient {
      *
      * @param templateApiId 短信模板唯一标识
      * @param smsBody       消息内容
-     * @param targets       发送对象列表
+     * @param targetPhone   发送对象手机号
      * @return 短信发送结果
      * @throws Exception 调用发送失败，抛出异常
      */
-    protected abstract SmsResult doSend(String templateApiId, SmsBody smsBody, Collection<String> targets) throws Exception;
+    protected abstract SmsResult doSend(String templateApiId, SmsBody smsBody, String targetPhone) throws Exception;
 
-    protected void beforeSend(String templateApiId, SmsBody smsBody, Collection<String> targets) throws Exception {
+    protected void beforeSend(String templateApiId, SmsBody smsBody, String targetPhone) throws Exception {
     }
 
-    protected void afterSend(String templateApiId, SmsBody smsBody, Collection<String> targets, SmsResult result) throws Exception {
+    protected void afterSend(String templateApiId, SmsBody smsBody, String targetPhone, SmsResult result) throws Exception {
     }
 
 }

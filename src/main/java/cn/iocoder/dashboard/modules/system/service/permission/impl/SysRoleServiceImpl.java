@@ -15,7 +15,7 @@ import cn.iocoder.dashboard.modules.system.dal.mysql.dao.permission.SysRoleMappe
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.permission.SysRoleDO;
 import cn.iocoder.dashboard.modules.system.enums.permission.RoleCodeEnum;
 import cn.iocoder.dashboard.modules.system.enums.permission.SysRoleTypeEnum;
-import cn.iocoder.dashboard.modules.system.mq.producer.permission.SysRoleProducer;
+import cn.iocoder.dashboard.modules.system.redis.mq.producer.permission.SysRoleProducer;
 import cn.iocoder.dashboard.modules.system.service.permission.SysPermissionService;
 import cn.iocoder.dashboard.modules.system.service.permission.SysRoleService;
 import com.google.common.collect.ImmutableMap;

@@ -2,7 +2,6 @@ package cn.iocoder.dashboard.modules.system.service.sms.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.iocoder.dashboard.framework.sms.client.AbstractSmsClient;
-import cn.iocoder.dashboard.framework.sms.client.NeedQuerySendResultSmsClient;
 import cn.iocoder.dashboard.framework.sms.core.SmsResultDetail;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dao.sms.SysSmsQueryLogMapper;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dao.sms.SysSmsSendLogMapper;
@@ -62,7 +61,7 @@ public class SysSmsSendLogServiceImpl implements SysSmsSendLogService {
             updateQueryLog.setId(queryLog.getId());
 
             // 只处理实现了获取发送结果方法的短信客户端，理论上这里都是满足条件的，以防万一加个判断。
-            if (smsClient instanceof NeedQuerySendResultSmsClient) {
+            /*if (smsClient instanceof NeedQuerySendResultSmsClient) {
                 //初始化点字段值
                 queryLog2SendLong(insertSendLog, queryLog);
 
@@ -89,7 +88,7 @@ public class SysSmsSendLogServiceImpl implements SysSmsSendLogService {
                 //理论上这里都是满足条件的，以防万一加个判断。
                 updateQueryLog.setSendStatus(SmsSendStatusEnum.QUERY_SEND_FAIL.getStatus());
                 smsQueryLogMapper.updateById(updateQueryLog);
-            }
+            }*/
             updateQueryLog.setSendStatus(SmsSendStatusEnum.SEND_SUCCESS.getStatus());
             updateQueryLog.setRemark(String.format("日志(id = %s)对应的客户端没有继承NeedQuerySendResultSmsClient, 不能获取短信结果。", queryLog.getId()));
             smsQueryLogMapper.updateById(updateQueryLog);

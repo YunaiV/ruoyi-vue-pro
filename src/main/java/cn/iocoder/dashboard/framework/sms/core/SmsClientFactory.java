@@ -2,12 +2,15 @@ package cn.iocoder.dashboard.framework.sms.core;
 
 import cn.iocoder.dashboard.common.exception.ServiceException;
 import cn.iocoder.dashboard.framework.sms.client.AbstractSmsClient;
-import cn.iocoder.dashboard.framework.sms.client.AliyunSmsClient;
+import cn.iocoder.dashboard.framework.sms.client.impl.ali.AliyunSmsClient;
+import cn.iocoder.dashboard.framework.sms.client.impl.yunpian.YunpianSmsClient;
 import cn.iocoder.dashboard.framework.sms.core.enums.SmsChannelEnum;
 import cn.iocoder.dashboard.framework.sms.core.property.SmsChannelProperty;
 import cn.iocoder.dashboard.framework.sms.core.property.SmsTemplateProperty;
+import cn.iocoder.dashboard.util.json.JsonUtils;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.ServletRequest;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -54,6 +57,8 @@ public class SmsClientFactory {
         switch (channelEnum) {
             case ALI:
                 return new AliyunSmsClient(channelVO);
+            case YUN_PIAN:
+                return new YunpianSmsClient(channelVO);
             // TODO fill more channel
             default:
                 break;
@@ -101,5 +106,29 @@ public class SmsClientFactory {
         }
         return smsTemplateProperty.getApiTemplateId();
     }
+
+
+    /**
+     * 从短信发送回调函数请求中获取用于唯一确定一条send_lod的apiId
+     *
+     * @param callbackRequest 短信发送回调函数请求
+     * @return 第三方平台短信唯一标识
+     */
+    public SmsResultDetail getSmsResultDetailFromCallbackQuery(ServletRequest callbackRequest) {
+
+        for (Long channelId : smsSenderMap.keySet()) {
+            AbstractSmsClient smsClient = smsSenderMap.get(channelId);
+            try {
+                SmsResultDetail smsSendResult = smsClient.smsSendCallbackHandle(callbackRequest);
+                if (smsSendResult != null) {
+                    return smsSendResult;
+                }
+            } catch (Exception ignored) {
+            }
+        }
+        throw new IllegalArgumentException("getSmsResultDetailFromCallbackQuery fail! don't match SmsClient by RequestParam: "
+                + JsonUtils.toJsonString(callbackRequest.getParameterMap()));
+    }
+
 
 }

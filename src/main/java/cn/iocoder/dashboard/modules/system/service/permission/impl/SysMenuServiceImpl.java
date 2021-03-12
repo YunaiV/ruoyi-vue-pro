@@ -11,7 +11,7 @@ import cn.iocoder.dashboard.modules.system.dal.mysql.dao.permission.SysMenuMappe
 import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.permission.SysMenuDO;
 import cn.iocoder.dashboard.modules.system.enums.permission.MenuIdEnum;
 import cn.iocoder.dashboard.modules.system.enums.permission.MenuTypeEnum;
-import cn.iocoder.dashboard.modules.system.mq.producer.permission.SysMenuProducer;
+import cn.iocoder.dashboard.modules.system.redis.mq.producer.permission.SysMenuProducer;
 import cn.iocoder.dashboard.modules.system.service.permission.SysMenuService;
 import cn.iocoder.dashboard.modules.system.service.permission.SysPermissionService;
 import cn.iocoder.dashboard.util.collection.CollectionUtils;

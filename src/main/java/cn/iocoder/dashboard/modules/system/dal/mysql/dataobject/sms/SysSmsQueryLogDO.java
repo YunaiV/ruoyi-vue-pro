@@ -1,15 +1,12 @@
 package cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.sms;
 
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.List;
 
 /**
  * 短信日志
@@ -29,6 +26,11 @@ public class SysSmsQueryLogDO implements Serializable {
     private Long id;
 
     /**
+     * 第三方唯一标识
+     */
+    private String apiId;
+
+    /**
      * 短信渠道编码(来自枚举类)
      */
     private String channelCode;
@@ -46,8 +48,7 @@ public class SysSmsQueryLogDO implements Serializable {
     /**
      * 手机号
      */
-    @TableField(typeHandler = JacksonTypeHandler.class)
-    private List<String> phones;
+    private String phone;
 
     /**
      * 内容
@@ -67,16 +68,6 @@ public class SysSmsQueryLogDO implements Serializable {
     private Integer gotResult;
 
     /**
-     * 是否拥有回调函数（0否 1是）
-     */
-    private Integer hadCallback;
-
-    /**
-     * 结果(对象json字符串)
-     */
-    private String sendResultParam;
-
-    /**
      * 备注
      */
     private String remark;
@@ -90,5 +81,10 @@ public class SysSmsQueryLogDO implements Serializable {
      * 创建时间
      */
     private Date createTime;
+
+    /**
+     * 发送时间
+     */
+    private Date sendTime;
 
 }
