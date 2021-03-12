@@ -33,9 +33,7 @@ public interface SysRoleMenuMapper extends BaseMapperX<SysRoleMenuDO> {
                 .in("menu_id", menuIds));
     }
 
-    default boolean selectExistsByUpdateTimeAfter(Date maxUpdateTime) {
-        return selectOne(new QueryWrapper<SysRoleMenuDO>().select("id")
-                .gt("update_time", maxUpdateTime).last("LIMIT 1")) != null;
-    }
+    @Select("select id from sys_role_menu where update_time > #{maxUpdateTime} limit 1")
+    List<Long> selectExistsByUpdateTimeAfter(Date maxUpdateTime); 
 
 }
