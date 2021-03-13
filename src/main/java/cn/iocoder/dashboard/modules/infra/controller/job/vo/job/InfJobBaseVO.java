@@ -34,4 +34,7 @@ public class InfJobBaseVO {
     @ApiModelProperty(value = "监控超时时间", example = "1000")
     private Integer monitorTimeout;
 
+    public void setCronExpression(String cronExpression) {
+        this.cronExpression = cronExpression;
+    }
 }

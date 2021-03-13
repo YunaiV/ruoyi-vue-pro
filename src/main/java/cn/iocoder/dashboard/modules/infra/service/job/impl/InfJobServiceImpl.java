@@ -13,6 +13,7 @@ import cn.iocoder.dashboard.modules.infra.dal.mysql.job.InfJobMapper;
 import cn.iocoder.dashboard.modules.infra.enums.job.InfJobStatusEnum;
 import cn.iocoder.dashboard.modules.infra.service.job.InfJobService;
 import org.quartz.SchedulerException;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -37,6 +38,7 @@ public class InfJobServiceImpl implements InfJobService {
     @Resource
     private InfJobMapper jobMapper;
 
+    @MockBean
     @Resource
     private SchedulerManager schedulerManager;
 
