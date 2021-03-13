@@ -1,9 +1,9 @@
 package cn.iocoder.dashboard.modules.tool.service.codegen.impl;
 
-import cn.iocoder.dashboard.BaseSpringBootUnitTest;
+import cn.iocoder.dashboard.BaseDbUnitTest;
 import org.junit.jupiter.api.Test;
 
-public class ToolCodegenSQLParserTest extends BaseSpringBootUnitTest {
+public class ToolCodegenSQLParserTest extends BaseDbUnitTest {
 
     @Test
     public void testParse() {

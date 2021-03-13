@@ -15,9 +15,9 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 
 /**
- * 依赖内存 DB 的单元测试
+ * 依赖内存 DB + Redis 的单元测试
  *
- * 注意，Service 层同样适用。对于 Service 层的单元测试，我们针对自己模块的 Mapper 走的是 H2 内存数据库，针对别的模块的 Service 走的是 Mock 方法
+ * 相比 {@link BaseDbUnitTest} 来说，额外增加了内存 Redis
  *
  * @author 芋道源码
  */
