@@ -48,9 +48,7 @@ public class InfDbDocController {
 
     @GetMapping("/export-html")
     @ApiOperation("导出html格式的数据文档")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "deleteFile", value = "是否删除在服务器本地生成的数据库文档", example = "true", dataTypeClass = Boolean.class),
-    })
+    @ApiImplicitParam(name = "deleteFile", value = "是否删除在服务器本地生成的数据库文档", example = "true", dataTypeClass = Boolean.class)
     public void exportHtml(@RequestParam(defaultValue = "true") Boolean deleteFile,
                            HttpServletResponse response) throws IOException {
         doExportFile(EngineFileType.HTML, deleteFile, response);
@@ -58,9 +56,7 @@ public class InfDbDocController {
 
     @GetMapping("/export-word")
     @ApiOperation("导出word格式的数据文档")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "deleteFile", value = "是否删除在服务器本地生成的数据库文档", example = "true", dataTypeClass = Boolean.class),
-    })
+    @ApiImplicitParam(name = "deleteFile", value = "是否删除在服务器本地生成的数据库文档", example = "true", dataTypeClass = Boolean.class)
     public void exportWord(@RequestParam(defaultValue = "true") Boolean deleteFile,
                            HttpServletResponse response) throws IOException {
         doExportFile(EngineFileType.WORD, deleteFile, response);
@@ -68,9 +64,7 @@ public class InfDbDocController {
 
     @GetMapping("/export-markdown")
     @ApiOperation("导出markdown格式的数据文档")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "deleteFile", value = "是否删除在服务器本地生成的数据库文档", example = "true", dataTypeClass = Boolean.class),
-    })
+    @ApiImplicitParam(name = "deleteFile", value = "是否删除在服务器本地生成的数据库文档", example = "true", dataTypeClass = Boolean.class)
     public void exportMarkdown(@RequestParam(defaultValue = "true") Boolean deleteFile,
                                HttpServletResponse response) throws IOException {
         doExportFile(EngineFileType.MD, deleteFile, response);
@@ -81,12 +75,13 @@ public class InfDbDocController {
         String docFileName = DOC_FILE_NAME + "_" + IdUtil.fastSimpleUUID();
         String filePath = doExportFile(fileOutputType, docFileName);
         String downloadFileName = DOC_FILE_NAME + fileOutputType.getFileSuffix(); //下载后的文件名
-        // 读取，返回
-        //IoUtil.readBytes 直接读取FileInputStream 不会关闭流，有bug,所以用BufferedInputStream包装一下, 关闭流后才能删除文件
-        byte[] content = IoUtil.readBytes(new BufferedInputStream(new FileInputStream(filePath)));
-        //这里不用hutool工具类，它的中文文件名编码有问题,导致在浏览器下载时有问题
-        ServletUtils.writeAttachment(response, downloadFileName, content);
-        handleDeleteFile(deleteFile, filePath);
+        try {
+            // 读取，返回
+            //这里不用hutool工具类，它的中文文件名编码有问题,导致在浏览器下载时有问题
+            ServletUtils.writeAttachment(response, downloadFileName, FileUtil.readBytes(filePath));
+        }finally {
+            handleDeleteFile(deleteFile, filePath);
+        }
     }
 
     /**
