@@ -2,7 +2,6 @@ package cn.iocoder.dashboard.modules.system.service.auth;
 
 import cn.hutool.core.date.DateUtil;
 import cn.iocoder.dashboard.BaseDbAndRedisUnitTest;
-import cn.iocoder.dashboard.framework.mybatis.core.query.QueryWrapperX;
 import cn.iocoder.dashboard.framework.security.config.SecurityProperties;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.auth.SysUserSessionDO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.auth.SysUserSessionMapper;
@@ -32,24 +31,24 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @version 1.0
  * @since <pre>3月 8, 2021</pre>
  */
-@Import(
-        SysUserSessionServiceImpl.class)
+@Import(SysUserSessionServiceImpl.class)
 public class SysUserSessionServiceImplTest extends BaseDbAndRedisUnitTest {
 
     @Resource
-    SysUserSessionServiceImpl sysUserSessionService;
+    private SysUserSessionServiceImpl sysUserSessionService;
     @Resource
-    SysUserSessionMapper sysUserSessionMapper;
+    private SysUserSessionMapper sysUserSessionMapper;
+
     @MockBean
-    SecurityProperties securityProperties;
+    private SecurityProperties securityProperties;
     @MockBean
-    SysDeptServiceImpl sysDeptService;
+    private SysDeptServiceImpl sysDeptService;
     @MockBean
-    SysUserServiceImpl sysUserService;
+    private SysUserServiceImpl sysUserService;
     @MockBean
-    SysLoginLogServiceImpl sysLoginLogService;
+    private SysLoginLogServiceImpl sysLoginLogService;
     @MockBean
-    SysLoginUserRedisDAO sysLoginUserRedisDAO;
+    private SysLoginUserRedisDAO sysLoginUserRedisDAO;
 
     @Test
     public void testClearSessionTimeout_success() throws Exception {
@@ -75,4 +74,4 @@ public class SysUserSessionServiceImplTest extends BaseDbAndRedisUnitTest {
         AssertUtils.assertPojoEquals(sessionDO, userSessionDOS.get(0), "updateTime");
     }
 
-} 
+}

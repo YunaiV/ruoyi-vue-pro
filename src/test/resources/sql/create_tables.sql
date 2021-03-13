@@ -17,6 +17,18 @@ CREATE TABLE IF NOT EXISTS "inf_config" (
     PRIMARY KEY ("id")
 ) COMMENT '参数配置表';
 
+CREATE TABLE IF NOT EXISTS "inf_file" (
+    "id" varchar(188) NOT NULL,
+    "type" varchar(63) DEFAULT NULL,
+    "content" blob NOT NULL,
+    "creator" varchar(64) DEFAULT '',
+    "create_time" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updater" varchar(64) DEFAULT '',
+    "update_time" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "deleted" bit NOT NULL DEFAULT FALSE,
+    PRIMARY KEY ("id")
+) COMMENT '文件表';
+
 -- sys 开头的 DB
 
 CREATE TABLE IF NOT EXISTS "sys_dept" (

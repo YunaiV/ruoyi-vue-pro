@@ -134,7 +134,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                     // 静态资源，可匿名访问
                     .antMatchers(HttpMethod.GET, "/*.html", "/**/*.html", "/**/*.css", "/**/*.js").permitAll()
                     // 文件的获取接口，可匿名访问
-                    .antMatchers(webProperties.getApiPrefix() + "/system/file/get/**").anonymous()
+                    .antMatchers(webProperties.getApiPrefix() + "/infra/file/get/**").anonymous()
                     // Swagger 接口文档
                     .antMatchers("/swagger-ui.html").anonymous()
                     .antMatchers("/swagger-resources/**").anonymous()
