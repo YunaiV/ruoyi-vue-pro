@@ -78,7 +78,6 @@ public class SysUserProfileController {
                     return success(true);
                 }
             } catch (IOException e) {
-                log.error("文件上传失败", e);
                 throw new RuntimeException(e);
             }
         }
