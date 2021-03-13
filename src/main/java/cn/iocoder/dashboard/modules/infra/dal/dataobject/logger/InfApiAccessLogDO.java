@@ -37,7 +37,7 @@ public class InfApiAccessLogDO extends BaseDO {
     /**
      * 用户编号
      */
-    private Integer userId;
+    private Long userId;
     /**
      * 用户类型
      *

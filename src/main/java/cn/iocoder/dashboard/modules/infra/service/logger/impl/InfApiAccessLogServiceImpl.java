@@ -9,12 +9,13 @@ import cn.iocoder.dashboard.modules.infra.dal.dataobject.logger.InfApiAccessLogD
 import cn.iocoder.dashboard.modules.infra.dal.mysql.logger.InfApiAccessLogMapper;
 import cn.iocoder.dashboard.modules.infra.service.logger.InfApiAccessLogService;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
-import javax.validation.Valid;
 import java.util.List;
+import java.util.concurrent.Future;
 
 /**
  * API 访问日志 Service 实现类
@@ -30,10 +31,11 @@ public class InfApiAccessLogServiceImpl implements InfApiAccessLogService {
 
     @Override
     @Async
-    public void createApiAccessLogAsync(ApiAccessLogCreateDTO createDTO) {
+    public Future<Boolean> createApiAccessLogAsync(ApiAccessLogCreateDTO createDTO) {
         // 插入
         InfApiAccessLogDO apiAccessLog = InfApiAccessLogConvert.INSTANCE.convert(createDTO);
-        apiAccessLogMapper.insert(apiAccessLog);
+        int insert = apiAccessLogMapper.insert(apiAccessLog);
+        return new AsyncResult<>(insert == 1);
     }
 
     @Override
