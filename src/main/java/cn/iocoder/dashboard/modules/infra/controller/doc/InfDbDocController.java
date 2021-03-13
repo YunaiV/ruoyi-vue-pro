@@ -1,6 +1,10 @@
 package cn.iocoder.dashboard.modules.infra.controller.doc;
 
+import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.lang.UUID;
+import cn.hutool.core.util.IdUtil;
+import cn.hutool.extra.servlet.ServletUtil;
 import cn.iocoder.dashboard.util.servlet.ServletUtils;
 import cn.smallbun.screw.core.Configuration;
 import cn.smallbun.screw.core.engine.EngineConfig;
@@ -11,7 +15,11 @@ import cn.smallbun.screw.core.process.ProcessConfig;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
+import org.springframework.http.MediaType;
 import org.springframework.util.StreamUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -39,74 +47,78 @@ public class InfDbDocController {
 
 
     @GetMapping("/export-html")
+    @ApiOperation("导出html格式的数据文档")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "deleteFile", value = "是否删除在服务器本地生成的数据库文档", example = "true", dataTypeClass = Boolean.class),
+    })
     public void exportHtml(@RequestParam(defaultValue = "true") Boolean deleteFile,
-                                        HttpServletResponse response) throws IOException {
-        EngineFileType fileOutputType=EngineFileType.HTML;
-        doExportFile(fileOutputType,deleteFile,response);
+                           HttpServletResponse response) throws IOException {
+        doExportFile(EngineFileType.HTML, deleteFile, response);
     }
-
-
 
     @GetMapping("/export-word")
+    @ApiOperation("导出word格式的数据文档")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "deleteFile", value = "是否删除在服务器本地生成的数据库文档", example = "true", dataTypeClass = Boolean.class),
+    })
     public void exportWord(@RequestParam(defaultValue = "true") Boolean deleteFile,
-                                        HttpServletResponse response) throws IOException {
-        EngineFileType fileOutputType=EngineFileType.WORD;
-        doExportFile(fileOutputType,deleteFile,response);
+                           HttpServletResponse response) throws IOException {
+        doExportFile(EngineFileType.WORD, deleteFile, response);
     }
 
-
     @GetMapping("/export-markdown")
+    @ApiOperation("导出markdown格式的数据文档")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "deleteFile", value = "是否删除在服务器本地生成的数据库文档", example = "true", dataTypeClass = Boolean.class),
+    })
     public void exportMarkdown(@RequestParam(defaultValue = "true") Boolean deleteFile,
-            HttpServletResponse response) throws IOException {
-        EngineFileType fileOutputType=EngineFileType.MD;
-        doExportFile(fileOutputType,deleteFile,response);
+                               HttpServletResponse response) throws IOException {
+        doExportFile(EngineFileType.MD, deleteFile, response);
     }
 
     private void doExportFile(EngineFileType fileOutputType, Boolean deleteFile,
                               HttpServletResponse response) throws IOException {
-        String docFileName=DOC_FILE_NAME+"_"+ UUID.fastUUID().toString(true);
-        String filePath= doExportFile(fileOutputType,docFileName);
-        String downloadFileName=DOC_FILE_NAME+fileOutputType.getFileSuffix(); //下载后的文件名
+        String docFileName = DOC_FILE_NAME + "_" + IdUtil.fastSimpleUUID();
+        String filePath = doExportFile(fileOutputType, docFileName);
+        String downloadFileName = DOC_FILE_NAME + fileOutputType.getFileSuffix(); //下载后的文件名
         // 读取，返回
-        try (InputStream is=new FileInputStream(filePath)){//处理后关闭文件流才能删除
-            ServletUtils.writeAttachment(response,downloadFileName, StreamUtils.copyToByteArray(is));
-        }
-        handleDeleteFile(deleteFile,filePath);
+        //IoUtil.readBytes 直接读取FileInputStream 不会关闭流，有bug,所以用BufferedInputStream包装一下, 关闭流后才能删除文件
+        byte[] content = IoUtil.readBytes(new BufferedInputStream(new FileInputStream(filePath)));
+        //这里不用hutool工具类，它的中文文件名编码有问题,导致在浏览器下载时有问题
+        ServletUtils.writeAttachment(response, downloadFileName, content);
+        handleDeleteFile(deleteFile, filePath);
     }
-
 
     /**
      * 输出文件，返回文件路径
-     * @param fileOutputType
-     * @param fileName
-     * @return
+     *
+     * @param fileOutputType 文件类型
+     * @param fileName       文件名, 无需 ".docx" 等文件后缀
+     * @return 生成的文件所在路径
      */
-    private String doExportFile(EngineFileType fileOutputType, String fileName){
+    private String doExportFile(EngineFileType fileOutputType, String fileName) {
         try (HikariDataSource dataSource = buildDataSource()) {
             // 创建 screw 的配置
             Configuration config = Configuration.builder()
                     .version(DOC_VERSION)  // 版本
                     .description(DOC_DESCRIPTION) // 描述
                     .dataSource(dataSource) // 数据源
-                    .engineConfig(buildEngineConfig(fileOutputType,fileName)) // 引擎配置
+                    .engineConfig(buildEngineConfig(fileOutputType, fileName)) // 引擎配置
                     .produceConfig(buildProcessConfig()) // 处理配置
                     .build();
 
             // 执行 screw，生成数据库文档
             new DocumentationExecute(config).execute();
 
-
-            String filePath=FILE_OUTPUT_DIR + File.separator + fileName + fileOutputType.getFileSuffix();
-            return filePath;
+            return FILE_OUTPUT_DIR + File.separator + fileName + fileOutputType.getFileSuffix();
         }
     }
 
-    private void handleDeleteFile(Boolean deleteFile,String filePath){
-        if(!deleteFile){
+    private void handleDeleteFile(Boolean deleteFile, String filePath) {
+        if (!deleteFile) {
             return;
         }
-        File file=new File(filePath);
-        file.delete();
+        FileUtil.del(filePath);
     }
 
     /**
@@ -128,7 +140,7 @@ public class InfDbDocController {
     /**
      * 创建 screw 的引擎配置
      */
-    private static EngineConfig buildEngineConfig(EngineFileType fileOutputType,String docFileName) {
+    private static EngineConfig buildEngineConfig(EngineFileType fileOutputType, String docFileName) {
         return EngineConfig.builder()
                 .fileOutputDir(FILE_OUTPUT_DIR) // 生成文件路径
                 .openOutputDir(false) // 打开目录
