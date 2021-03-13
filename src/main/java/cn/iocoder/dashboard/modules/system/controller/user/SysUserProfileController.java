@@ -1,6 +1,5 @@
 package cn.iocoder.dashboard.modules.system.controller.user;
 
-import cn.iocoder.dashboard.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.dashboard.common.pojo.CommonResult;
 import cn.iocoder.dashboard.framework.security.core.LoginUser;
 import cn.iocoder.dashboard.framework.security.core.util.SecurityFrameworkUtils;
@@ -31,7 +30,6 @@ import java.io.IOException;
 import java.util.List;
 
 import static cn.iocoder.dashboard.common.pojo.CommonResult.success;
-import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.FILE_UPLOAD_FAILED;
 
 /**
  * @author niudehua
@@ -49,11 +47,6 @@ public class SysUserProfileController {
     @Resource
     private SysRoleService roleService;
 
-    /**
-     * 个人信息
-     *
-     * @return 个人信息详情
-     */
     @GetMapping("/get")
     @ApiOperation("获得登录用户信息")
     public CommonResult<SysUserProfileRespVO> profile() {
@@ -67,13 +60,6 @@ public class SysUserProfileController {
         return success(userProfileRespVO);
     }
 
-    /**
-     * 修改个人信息
-     *
-     * @param reqVO   个人信息更新 reqVO
-     * @param request HttpServletRequest
-     * @return 修改结果
-     */
     @PostMapping("/update")
     @ApiOperation("修改用户个人信息")
     public CommonResult<Boolean> updateProfile(@RequestBody SysUserProfileUpdateReqVO reqVO, HttpServletRequest request) {
@@ -82,12 +68,6 @@ public class SysUserProfileController {
         return success(true);
     }
 
-    /**
-     * 上传用户个人头像
-     *
-     * @param file 头像文件
-     * @return 上传结果
-     */
     @PostMapping("/upload-avatar")
     @ApiOperation("上传用户个人头像")
     public CommonResult<Boolean> uploadAvatar(@RequestParam("avatarFile") MultipartFile file) {
@@ -99,7 +79,7 @@ public class SysUserProfileController {
                 }
             } catch (IOException e) {
                 log.error("文件上传失败", e);
-                throw ServiceExceptionUtil.exception(FILE_UPLOAD_FAILED);
+                throw new RuntimeException(e);
             }
         }
         return success(false);
