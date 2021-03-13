@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.autoconfigure.MybatisPlusAutoConfiguration;
 import org.redisson.spring.starter.RedissonAutoConfiguration;
 import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
@@ -30,6 +31,7 @@ public class BaseDbAndRedisUnitTest {
             // DB 配置类
             DataSourceConfiguration.class, // 自己的 DB 配置类
             DataSourceAutoConfiguration.class, // Spring DB 自动配置类
+            DataSourceTransactionManagerAutoConfiguration.class, // Spring 事务自动配置类
             DruidDataSourceAutoConfigure.class, // Druid 自动配置类
             // MyBatis 配置类
             MybatisConfiguration.class, // 自己的 MyBatis 配置类
