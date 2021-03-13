@@ -206,7 +206,7 @@ public class SysMenuServiceImpl implements SysMenuService {
      *
      * @param menuId 菜单编号
      */
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void deleteMenu(Long menuId) {
         // 校验更新的菜单是否存在
         if (menuMapper.selectById(menuId) == null) {
