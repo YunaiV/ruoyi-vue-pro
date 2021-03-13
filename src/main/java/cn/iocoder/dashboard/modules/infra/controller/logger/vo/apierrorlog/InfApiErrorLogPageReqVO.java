@@ -19,7 +19,7 @@ import static cn.iocoder.dashboard.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOU
 public class InfApiErrorLogPageReqVO extends PageParam {
 
     @ApiModelProperty(value = "用户编号", example = "666")
-    private Integer userId;
+    private Long userId;
 
     @ApiModelProperty(value = "用户类型", example = "1")
     private Integer userType;
