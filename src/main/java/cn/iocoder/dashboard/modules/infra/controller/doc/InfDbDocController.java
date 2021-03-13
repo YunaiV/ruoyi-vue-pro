@@ -1,10 +1,7 @@
 package cn.iocoder.dashboard.modules.infra.controller.doc;
 
 import cn.hutool.core.io.FileUtil;
-import cn.hutool.core.io.IoUtil;
-import cn.hutool.core.lang.UUID;
 import cn.hutool.core.util.IdUtil;
-import cn.hutool.extra.servlet.ServletUtil;
 import cn.iocoder.dashboard.util.servlet.ServletUtils;
 import cn.smallbun.screw.core.Configuration;
 import cn.smallbun.screw.core.engine.EngineConfig;
@@ -16,11 +13,8 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
-import org.springframework.http.MediaType;
-import org.springframework.util.StreamUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -28,7 +22,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.Collections;
 
 @Api(tags = "数据库文档")
@@ -45,9 +40,8 @@ public class InfDbDocController {
     private static final String DOC_VERSION = "1.0.0";
     private static final String DOC_DESCRIPTION = "文档描述";
 
-
     @GetMapping("/export-html")
-    @ApiOperation("导出html格式的数据文档")
+    @ApiOperation("导出 html 格式的数据文档")
     @ApiImplicitParam(name = "deleteFile", value = "是否删除在服务器本地生成的数据库文档", example = "true", dataTypeClass = Boolean.class)
     public void exportHtml(@RequestParam(defaultValue = "true") Boolean deleteFile,
                            HttpServletResponse response) throws IOException {
@@ -55,7 +49,7 @@ public class InfDbDocController {
     }
 
     @GetMapping("/export-word")
-    @ApiOperation("导出word格式的数据文档")
+    @ApiOperation("导出 word 格式的数据文档")
     @ApiImplicitParam(name = "deleteFile", value = "是否删除在服务器本地生成的数据库文档", example = "true", dataTypeClass = Boolean.class)
     public void exportWord(@RequestParam(defaultValue = "true") Boolean deleteFile,
                            HttpServletResponse response) throws IOException {
@@ -63,7 +57,7 @@ public class InfDbDocController {
     }
 
     @GetMapping("/export-markdown")
-    @ApiOperation("导出markdown格式的数据文档")
+    @ApiOperation("导出 markdown 格式的数据文档")
     @ApiImplicitParam(name = "deleteFile", value = "是否删除在服务器本地生成的数据库文档", example = "true", dataTypeClass = Boolean.class)
     public void exportMarkdown(@RequestParam(defaultValue = "true") Boolean deleteFile,
                                HttpServletResponse response) throws IOException {
@@ -77,9 +71,8 @@ public class InfDbDocController {
         String downloadFileName = DOC_FILE_NAME + fileOutputType.getFileSuffix(); //下载后的文件名
         try {
             // 读取，返回
-            //这里不用hutool工具类，它的中文文件名编码有问题,导致在浏览器下载时有问题
             ServletUtils.writeAttachment(response, downloadFileName, FileUtil.readBytes(filePath));
-        }finally {
+        } finally {
             handleDeleteFile(deleteFile, filePath);
         }
     }
@@ -123,7 +116,6 @@ public class InfDbDocController {
     private HikariDataSource buildDataSource() {
         // 创建 HikariConfig 配置类
         HikariConfig hikariConfig = new HikariConfig();
-//        hikariConfig.setDriverClassName("com.mysql.cj.jdbc.Driver");
         hikariConfig.setJdbcUrl(dataSourceProperties.getUrl());
         hikariConfig.setUsername(dataSourceProperties.getUsername());
         hikariConfig.setPassword(dataSourceProperties.getPassword());
