@@ -1,5 +1,6 @@
 -- inf 开头的 DB
 DELETE FROM "inf_config";
+DELETE FROM "inf_file";
 
 -- sys 开头的 DB
 DELETE FROM "sys_dept";
