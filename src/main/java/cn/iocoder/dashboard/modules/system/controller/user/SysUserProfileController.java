@@ -88,7 +88,7 @@ public class SysUserProfileController {
      * @param file 头像文件
      * @return 上传结果
      */
-    @PostMapping("/uploadAvatar")
+    @PostMapping("/upload-avatar")
     @ApiOperation("上传用户个人头像")
     public CommonResult<Boolean> uploadAvatar(@RequestParam("avatarFile") MultipartFile file) {
         if (!file.isEmpty()) {

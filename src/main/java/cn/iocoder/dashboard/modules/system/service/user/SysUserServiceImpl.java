@@ -2,7 +2,7 @@ package cn.iocoder.dashboard.modules.system.service.user;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.IoUtil;
-import cn.hutool.core.lang.UUID;
+import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.dashboard.common.enums.CommonStatusEnum;
 import cn.iocoder.dashboard.common.exception.ServiceException;
@@ -67,19 +67,6 @@ public class SysUserServiceImpl implements SysUserService {
 
     @Resource
     private InfFileService fileService;
-
-//    /**
-//     * 根据条件分页查询用户列表
-//     *
-//     * @param user 用户信息
-//     * @return 用户信息集合信息
-//     */
-//    @Override
-//    @DataScope(deptAlias = "d", userAlias = "u")
-//    public List<SysUser> selectUserList(SysUser user)
-//    {
-//        return userMapper.selectUserList(user);
-//    }
 
     @Override
     public SysUserDO getUserByUserName(String username) {
@@ -322,7 +309,7 @@ public class SysUserServiceImpl implements SysUserService {
      * @param id          用户 id
      * @param oldPassword 旧密码
      * @param newPassword 新密码
-     * @return
+     * @return 校验结果
      */
     private boolean checkOldPassword(Long id, String oldPassword, String newPassword) {
         if (id == null || StrUtil.isBlank(oldPassword) || StrUtil.isBlank(newPassword)) {
@@ -340,7 +327,7 @@ public class SysUserServiceImpl implements SysUserService {
     }
 
     @Override
-    @Transactional // 添加事务，异常则回滚所有导入
+    @Transactional(rollbackFor = Exception.class) // 添加事务，异常则回滚所有导入
     public SysUserImportRespVO importUsers(List<SysUserImportExcelVO> importUsers, boolean isUpdateSupport) {
         if (CollUtil.isEmpty(importUsers)) {
             throw ServiceExceptionUtil.exception(USER_IMPORT_LIST_IS_EMPTY);
@@ -381,8 +368,7 @@ public class SysUserServiceImpl implements SysUserService {
     public int updateAvatar(Long id, InputStream avatarFile) {
         this.checkUserExists(id);
         // 存储文件
-        String avatar;
-        avatar = fileService.createFile(UUID.fastUUID().toString(), IoUtil.readBytes(avatarFile));
+        String avatar = fileService.createFile(IdUtil.fastUUID(), IoUtil.readBytes(avatarFile));
         // 更新路径
         SysUserDO sysUserDO = new SysUserDO();
         sysUserDO.setId(id);
