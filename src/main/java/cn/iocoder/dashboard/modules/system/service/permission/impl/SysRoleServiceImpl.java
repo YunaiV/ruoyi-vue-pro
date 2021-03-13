@@ -174,7 +174,7 @@ public class SysRoleServiceImpl implements SysRoleService {
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void deleteRole(Long id) {
         // 校验是否可以更新
         this.checkUpdateRole(id);

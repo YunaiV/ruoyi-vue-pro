@@ -17,11 +17,6 @@ import java.util.Set;
 @EqualsAndHashCode(callSuper = true)
 public class SysUserProfileRespVO extends SysUserRespVO {
 
-    @ApiModelProperty(value = "旧密码", required = true, example = "123456")
-    private String oldPassword;
-
-    @ApiModelProperty(value = "新密码", required = true, example = "123456")
-    private String newPassword;
     /**
      * 所属角色
      */

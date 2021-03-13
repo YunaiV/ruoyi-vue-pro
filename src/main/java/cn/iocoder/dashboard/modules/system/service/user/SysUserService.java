@@ -11,8 +11,8 @@ import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserProfil
 import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserUpdateReqVO;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.user.SysUserDO;
 import cn.iocoder.dashboard.util.collection.CollectionUtils;
-import org.springframework.web.multipart.MultipartFile;
 
+import java.io.InputStream;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -115,7 +115,7 @@ public interface SysUserService {
      * @param reqVO 用户个人信息
      * @return 修改结果
      */
-    int updateUserProfile(SysUserProfileUpdateReqVO reqVO);
+    void updateUserProfile(SysUserProfileUpdateReqVO reqVO);
 
     /**
      * 删除用户
@@ -154,9 +154,8 @@ public interface SysUserService {
      *
      * @param id         用户 id
      * @param avatarFile 头像文件
-     * @return 更新结果
      */
-    int updateAvatar(Long id, MultipartFile avatarFile);
+    void updateAvatar(Long id, InputStream avatarFile);
 
 //
 //    /**

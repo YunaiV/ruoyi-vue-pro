@@ -76,5 +76,6 @@ public interface SysErrorCodeConstants {
     // ========== 文件 1002009000 ==========
     ErrorCode FILE_PATH_EXISTS = new ErrorCode(1002009001, "文件路径已经存在");
     ErrorCode FILE_UPLOAD_FAILED = new ErrorCode(1002009002, "文件上传失败");
+    ErrorCode FILE_IS_EMPTY= new ErrorCode(1002009003, "文件为空");
 
 }
