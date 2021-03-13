@@ -145,7 +145,7 @@ yudao:
   swagger:
     title: 管理后台
     description: 提供管理员管理的所有功能
-    version: ${yudao.info.base-package}
+    version: ${yudao.info.version}
     base-package: ${yudao.info.base-package}.modules
   captcha:
     timeout: 5m

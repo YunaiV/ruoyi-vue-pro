@@ -2,11 +2,13 @@ package cn.iocoder.dashboard.modules.system.service.user;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.IoUtil;
+import cn.hutool.core.lang.UUID;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.dashboard.common.enums.CommonStatusEnum;
 import cn.iocoder.dashboard.common.exception.ServiceException;
 import cn.iocoder.dashboard.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.dashboard.common.pojo.PageResult;
+import cn.iocoder.dashboard.modules.infra.service.file.InfFileService;
 import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserCreateReqVO;
 import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserExportReqVO;
 import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserImportExcelVO;
@@ -19,7 +21,6 @@ import cn.iocoder.dashboard.modules.system.dal.dataobject.dept.SysDeptDO;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.dept.SysPostDO;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.user.SysUserDO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.user.SysUserMapper;
-import cn.iocoder.dashboard.modules.system.service.common.SysFileService;
 import cn.iocoder.dashboard.modules.system.service.dept.SysDeptService;
 import cn.iocoder.dashboard.modules.system.service.dept.SysPostService;
 import cn.iocoder.dashboard.modules.system.service.permission.SysPermissionService;
@@ -28,10 +29,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
-import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -66,7 +66,7 @@ public class SysUserServiceImpl implements SysUserService {
     private PasswordEncoder passwordEncoder;
 
     @Resource
-    private SysFileService fileService;
+    private InfFileService fileService;
 
 //    /**
 //     * 根据条件分页查询用户列表
@@ -156,20 +156,22 @@ public class SysUserServiceImpl implements SysUserService {
     }
 
     @Override
-    public int updateUserProfile(SysUserProfileUpdateReqVO reqVO) {
+    public void updateUserProfile(SysUserProfileUpdateReqVO reqVO) {
         // 校验正确性
-        this.checkCreateOrUpdate(reqVO.getId(), reqVO.getUsername(), reqVO.getMobile(), reqVO.getEmail(),
-            reqVO.getDeptId(), reqVO.getPostIds());
-
-        SysUserDO updateObj = SysUserConvert.INSTANCE.convert(reqVO);
-        // 校验旧密码
-        if (checkOldPassword(reqVO.getId(), reqVO.getOldPassword(), reqVO.getNewPassword())) {
-            return userMapper.updateById(updateObj);
+        this.checkUserExists(reqVO.getId());
+        this.checkEmailUnique(reqVO.getId(), reqVO.getEmail());
+        this.checkMobileUnique(reqVO.getId(), reqVO.getMobile());
+        // 校验填写密码
+        String encode = null;
+        if (this.checkOldPassword(reqVO.getId(), reqVO.getOldPassword(), reqVO.getNewPassword())) {
+            // 更新密码
+            encode = passwordEncoder.encode(reqVO.getNewPassword());
         }
-
-        String encode = passwordEncoder.encode(reqVO.getNewPassword());
-        updateObj.setPassword(encode);
-        return userMapper.updateById(updateObj);
+        SysUserDO updateObj = SysUserConvert.INSTANCE.convert(reqVO);
+        if (StrUtil.isNotBlank(encode)) {
+            updateObj.setPassword(encode);
+        }
+        userMapper.updateById(updateObj);
     }
 
     @Override
@@ -314,9 +316,17 @@ public class SysUserServiceImpl implements SysUserService {
         });
     }
 
+    /**
+     * 校验旧密码、新密码
+     *
+     * @param id          用户 id
+     * @param oldPassword 旧密码
+     * @param newPassword 新密码
+     * @return
+     */
     private boolean checkOldPassword(Long id, String oldPassword, String newPassword) {
         if (id == null || StrUtil.isBlank(oldPassword) || StrUtil.isBlank(newPassword)) {
-            return true;
+            return false;
         }
         SysUserDO user = userMapper.selectById(id);
         if (user == null) {
@@ -326,7 +336,7 @@ public class SysUserServiceImpl implements SysUserService {
         if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
             throw ServiceExceptionUtil.exception(USER_PASSWORD_FAILED);
         }
-        return false;
+        return true;
     }
 
     @Override
@@ -368,15 +378,11 @@ public class SysUserServiceImpl implements SysUserService {
     }
 
     @Override
-    public int updateAvatar(Long id, MultipartFile avatarFile) {
+    public int updateAvatar(Long id, InputStream avatarFile) {
         this.checkUserExists(id);
         // 存储文件
-        String avatar = null;
-        try {
-            avatar = fileService.createFile(avatarFile.getOriginalFilename(), IoUtil.readBytes(avatarFile.getInputStream()));
-        } catch (IOException e) {
-            throw ServiceExceptionUtil.exception(FILE_UPLOAD_FAILED);
-        }
+        String avatar;
+        avatar = fileService.createFile(UUID.fastUUID().toString(), IoUtil.readBytes(avatarFile));
         // 更新路径
         SysUserDO sysUserDO = new SysUserDO();
         sysUserDO.setId(id);
