@@ -24,7 +24,7 @@ public interface SmsClient {
      */
     SmsResult send(String templateApiId, SmsBody smsBody, String targets);
 
-
+    // TODO FROM 芋艿 to ZZF：是不是可以改成意图更明确的解析返回结果，例如说 parseXXXX
     /**
      * 短信发送回调请求处理
      *

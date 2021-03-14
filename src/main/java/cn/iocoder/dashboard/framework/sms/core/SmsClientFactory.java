@@ -115,7 +115,6 @@ public class SmsClientFactory {
      * @return 第三方平台短信唯一标识
      */
     public SmsResultDetail getSmsResultDetailFromCallbackQuery(ServletRequest callbackRequest) {
-
         for (Long channelId : smsSenderMap.keySet()) {
             AbstractSmsClient smsClient = smsSenderMap.get(channelId);
             try {
