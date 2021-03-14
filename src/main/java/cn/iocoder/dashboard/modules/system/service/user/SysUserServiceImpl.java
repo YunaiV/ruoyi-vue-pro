@@ -113,7 +113,7 @@ public class SysUserServiceImpl implements SysUserService {
         if (deptId == null) {
             return Collections.emptySet();
         }
-        Set<Long> deptIds = CollectionUtils.convertSet(deptService.listDeptsByParentIdFromCache(
+        Set<Long> deptIds = CollectionUtils.convertSet(deptService.getDeptsByParentIdFromCache(
             deptId, true), SysDeptDO::getId);
         deptIds.add(deptId); // 包括自身
         return deptIds;
@@ -287,7 +287,7 @@ public class SysUserServiceImpl implements SysUserService {
         if (CollUtil.isEmpty(postIds)) { // 允许不选择
             return;
         }
-        List<SysPostDO> posts = postService.listPosts(postIds, null);
+        List<SysPostDO> posts = postService.getPosts(postIds, null);
         if (CollUtil.isEmpty(posts)) {
             throw ServiceExceptionUtil.exception(POST_NOT_FOUND);
         }

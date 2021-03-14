@@ -19,6 +19,7 @@ import com.google.common.collect.Multimap;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
@@ -32,6 +33,7 @@ import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.*;
  * @author 芋道源码
  */
 @Service
+@Validated
 @Slf4j
 public class SysDeptServiceImpl implements SysDeptService {
 
@@ -47,6 +49,7 @@ public class SysDeptServiceImpl implements SysDeptService {
      *
      * 这里声明 volatile 修饰的原因是，每次刷新时，直接修改指向
      */
+    @SuppressWarnings("FieldCanBeLocal")
     private volatile Map<Long, SysDeptDO> deptCache;
     /**
      * 父部门缓存
@@ -118,17 +121,55 @@ public class SysDeptServiceImpl implements SysDeptService {
     }
 
     @Override
-    public List<SysDeptDO> listDepts(Collection<Long> ids) {
+    public Long createDept(SysDeptCreateReqVO reqVO) {
+        // 校验正确性
+        checkCreateOrUpdate(null, reqVO.getParentId(), reqVO.getName());
+        // 插入部门
+        SysDeptDO dept = SysDeptConvert.INSTANCE.convert(reqVO);
+        deptMapper.insert(dept);
+        // 发送刷新消息
+        deptProducer.sendDeptRefreshMessage();
+        return dept.getId();
+    }
+
+    @Override
+    public void updateDept(SysDeptUpdateReqVO reqVO) {
+        // 校验正确性
+        checkCreateOrUpdate(reqVO.getId(), reqVO.getParentId(), reqVO.getName());
+        // 更新部门
+        SysDeptDO updateObj = SysDeptConvert.INSTANCE.convert(reqVO);
+        deptMapper.updateById(updateObj);
+        // 发送刷新消息
+        deptProducer.sendDeptRefreshMessage();
+    }
+
+    @Override
+    public void deleteDept(Long id) {
+        // 校验是否存在
+        checkDeptExists(id);
+        // 校验是否有子部门
+        if (deptMapper.selectCountByParentId(id) > 0) {
+            throw ServiceExceptionUtil.exception(DEPT_EXITS_CHILDREN);
+        }
+        // 删除部门
+        deptMapper.deleteById(id);
+        // TODO 需要处理下与角色的数据权限关联，等做数据权限一起处理下
+        // 发送刷新消息
+        deptProducer.sendDeptRefreshMessage();
+    }
+
+    @Override
+    public List<SysDeptDO> getSimpleDepts(Collection<Long> ids) {
         return deptMapper.selectBatchIds(ids);
     }
 
     @Override
-    public List<SysDeptDO> listDepts(SysDeptListReqVO reqVO) {
+    public List<SysDeptDO> getSimpleDepts(SysDeptListReqVO reqVO) {
         return deptMapper.selectList(reqVO);
     }
 
     @Override
-    public List<SysDeptDO> listDeptsByParentIdFromCache(Long parentId, boolean recursive) {
+    public List<SysDeptDO> getDeptsByParentIdFromCache(Long parentId, boolean recursive) {
         List<SysDeptDO> result = new ArrayList<>();
         // 递归，简单粗暴
         this.listDeptsByParentIdFromCache(result, parentId,
@@ -167,44 +208,6 @@ public class SysDeptServiceImpl implements SysDeptService {
         return deptMapper.selectById(id);
     }
 
-    @Override
-    public Long createDept(SysDeptCreateReqVO reqVO) {
-        // 校验正确性
-        checkCreateOrUpdate(null, reqVO.getParentId(), reqVO.getName());
-        // 插入部门
-        SysDeptDO dept = SysDeptConvert.INSTANCE.convert(reqVO);
-        deptMapper.insert(dept);
-        // 发送刷新消息
-        deptProducer.sendDeptRefreshMessage();
-        return dept.getId();
-    }
-
-    @Override
-    public void updateDept(SysDeptUpdateReqVO reqVO) {
-        // 校验正确性
-        checkCreateOrUpdate(reqVO.getId(), reqVO.getParentId(), reqVO.getName());
-        // 更新部门
-        SysDeptDO updateObj = SysDeptConvert.INSTANCE.convert(reqVO);
-        deptMapper.updateById(updateObj);
-        // 发送刷新消息
-        deptProducer.sendDeptRefreshMessage();
-    }
-
-    @Override
-    public void deleteDept(Long id) {
-        // 校验是否存在
-        checkDeptExists(id);
-        // 校验是否有子部门
-        if (deptMapper.selectCountByParentId(id) > 0) {
-            throw ServiceExceptionUtil.exception(DEPT_EXITS_CHILDREN);
-        }
-        // 删除部门
-        deptMapper.deleteById(id);
-        // TODO 需要处理下与角色的数据权限关联，等做数据权限一起处理下
-        // 发送刷新消息
-        deptProducer.sendDeptRefreshMessage();
-    }
-
     private void checkCreateOrUpdate(Long id, Long parentId, String name) {
         // 校验自己存在
         checkDeptExists(id);
@@ -232,7 +235,7 @@ public class SysDeptServiceImpl implements SysDeptService {
             throw ServiceExceptionUtil.exception(DEPT_NOT_ENABLE);
         }
         // 父部门不能是原来的子部门
-        List<SysDeptDO> children = this.listDeptsByParentIdFromCache(id, true);
+        List<SysDeptDO> children = this.getDeptsByParentIdFromCache(id, true);
         if (children.stream().anyMatch(dept1 -> dept1.getId().equals(parentId))) {
             throw ServiceExceptionUtil.exception(DEPT_PARENT_IS_CHILD);
         }
@@ -262,12 +265,6 @@ public class SysDeptServiceImpl implements SysDeptService {
         }
     }
 
-//    /**
-//     * 查询部门管理数据
-//     *
-//     * @param dept 部门信息
-//     * @return 部门信息集合
-//     */
 //    @Override
 //    @DataScope(deptAlias = "d")
 //    public List<SysDept> selectDeptList(SysDept dept)
