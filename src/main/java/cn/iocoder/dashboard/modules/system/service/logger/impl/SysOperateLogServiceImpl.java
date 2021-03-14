@@ -59,7 +59,7 @@ public class SysOperateLogServiceImpl implements SysOperateLogService {
         // 处理基于用户昵称的查询
         Collection<Long> userIds = null;
         if (StrUtil.isNotEmpty(reqVO.getUserNickname())) {
-            userIds = convertSet(userService.listUsersByNickname(reqVO.getUserNickname()), SysUserDO::getId);
+            userIds = convertSet(userService.getUsersByNickname(reqVO.getUserNickname()), SysUserDO::getId);
             if (CollUtil.isEmpty(userIds)) {
                 return PageResult.empty();
             }
@@ -73,7 +73,7 @@ public class SysOperateLogServiceImpl implements SysOperateLogService {
         // 处理基于用户昵称的查询
         Collection<Long> userIds = null;
         if (StrUtil.isNotEmpty(reqVO.getUserNickname())) {
-            userIds = convertSet(userService.listUsersByNickname(reqVO.getUserNickname()), SysUserDO::getId);
+            userIds = convertSet(userService.getUsersByNickname(reqVO.getUserNickname()), SysUserDO::getId);
             if (CollUtil.isEmpty(userIds)) {
                 return Collections.emptyList();
             }

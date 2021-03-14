@@ -16,12 +16,7 @@ import cn.iocoder.dashboard.util.collection.CollectionUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
@@ -55,26 +50,27 @@ public class SysUserProfileController {
         Long userId = SecurityFrameworkUtils.getLoginUserId();
         SysUserDO user = userService.getUser(userId);
         SysUserProfileRespVO userProfileRespVO = SysUserConvert.INSTANCE.convert03(user);
-        List<SysRoleDO> userRoles = roleService.listRolesFromCache(permissionService.listUserRoleIs(userId));
+        List<SysRoleDO> userRoles = roleService.getRolesFromCache(permissionService.listUserRoleIs(userId));
         userProfileRespVO.setRoles(CollectionUtils.convertSet(userRoles, SysUserConvert.INSTANCE::convert));
         return success(userProfileRespVO);
     }
 
-    @PostMapping("/update")
+    @PutMapping("/update")
     @ApiOperation("修改用户个人信息")
-    public CommonResult<Boolean> updateProfile(@RequestBody SysUserProfileUpdateReqVO reqVO, HttpServletRequest request) {
+    public CommonResult<Boolean> updateUserProfile(@RequestBody SysUserProfileUpdateReqVO reqVO, HttpServletRequest request) {
         userService.updateUserProfile(reqVO);
         SecurityFrameworkUtils.setLoginUser(SysAuthConvert.INSTANCE.convert(reqVO), request);
         return success(true);
     }
 
-    @PostMapping("/upload-avatar")
+    @PutMapping("/upload-avatar")
     @ApiOperation("上传用户个人头像")
-    public CommonResult<Boolean> uploadAvatar(@RequestParam("avatarFile") MultipartFile file) throws IOException {
+    public CommonResult<Boolean> updateUserAvatar(@RequestParam("avatarFile") MultipartFile file) throws IOException {
         if (file.isEmpty()) {
             throw ServiceExceptionUtil.exception(FILE_IS_EMPTY);
         }
-        userService.updateAvatar(SecurityFrameworkUtils.getLoginUserId(), file.getInputStream());
+        userService.updateUserAvatar(SecurityFrameworkUtils.getLoginUserId(), file.getInputStream());
         return success(true);
     }
+
 }

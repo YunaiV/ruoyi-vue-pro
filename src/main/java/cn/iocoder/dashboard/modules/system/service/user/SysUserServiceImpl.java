@@ -61,69 +61,16 @@ public class SysUserServiceImpl implements SysUserService {
     private SysPostService postService;
     @Resource
     private SysPermissionService permissionService;
-
     @Resource
     private PasswordEncoder passwordEncoder;
-
     @Resource
     private InfFileService fileService;
-
-    @Override
-    public SysUserDO getUserByUserName(String username) {
-        return userMapper.selectByUsername(username);
-    }
-
-    @Override
-    public SysUserDO getUser(Long id) {
-        return userMapper.selectById(id);
-    }
-
-    @Override
-    public PageResult<SysUserDO> pageUsers(SysUserPageReqVO reqVO) {
-        return userMapper.selectPage(reqVO, this.getDeptCondition(reqVO.getDeptId()));
-    }
-
-    @Override
-    public List<SysUserDO> listUsers(SysUserExportReqVO reqVO) {
-        return userMapper.selectList(reqVO, this.getDeptCondition(reqVO.getDeptId()));
-    }
-
-    @Override
-    public List<SysUserDO> listUsers(Collection<Long> ids) {
-        return userMapper.selectBatchIds(ids);
-    }
-
-    @Override
-    public List<SysUserDO> listUsersByNickname(String nickname) {
-        return userMapper.selectListByNickname(nickname);
-    }
-
-    @Override
-    public List<SysUserDO> listUsersByUsername(String username) {
-        return userMapper.selectListByUsername(username);
-    }
-
-    /**
-     * 获得部门条件：查询指定部门的子部门编号们，包括自身
-     *
-     * @param deptId 部门编号
-     * @return 部门编号集合
-     */
-    private Set<Long> getDeptCondition(Long deptId) {
-        if (deptId == null) {
-            return Collections.emptySet();
-        }
-        Set<Long> deptIds = CollectionUtils.convertSet(deptService.getDeptsByParentIdFromCache(
-            deptId, true), SysDeptDO::getId);
-        deptIds.add(deptId); // 包括自身
-        return deptIds;
-    }
 
     @Override
     public Long createUser(SysUserCreateReqVO reqVO) {
         // 校验正确性
         this.checkCreateOrUpdate(null, reqVO.getUsername(), reqVO.getMobile(), reqVO.getEmail(),
-            reqVO.getDeptId(), reqVO.getPostIds());
+                reqVO.getDeptId(), reqVO.getPostIds());
         // 插入用户
         SysUserDO user = SysUserConvert.INSTANCE.convert(reqVO);
         user.setStatus(CommonStatusEnum.ENABLE.getStatus()); // 默认开启
@@ -136,7 +83,7 @@ public class SysUserServiceImpl implements SysUserService {
     public void updateUser(SysUserUpdateReqVO reqVO) {
         // 校验正确性
         this.checkCreateOrUpdate(reqVO.getId(), reqVO.getUsername(), reqVO.getMobile(), reqVO.getEmail(),
-            reqVO.getDeptId(), reqVO.getPostIds());
+                reqVO.getDeptId(), reqVO.getPostIds());
         // 更新用户
         SysUserDO updateObj = SysUserConvert.INSTANCE.convert(reqVO);
         userMapper.updateById(updateObj);
@@ -162,11 +109,15 @@ public class SysUserServiceImpl implements SysUserService {
     }
 
     @Override
-    public void deleteUser(Long id) {
-        // 校验用户存在
+    public void updateUserAvatar(Long id, InputStream avatarFile) {
         this.checkUserExists(id);
-        // 删除用户
-        userMapper.deleteById(id);
+        // 存储文件
+        String avatar = fileService.createFile(IdUtil.fastUUID(), IoUtil.readBytes(avatarFile));
+        // 更新路径
+        SysUserDO sysUserDO = new SysUserDO();
+        sysUserDO.setId(id);
+        sysUserDO.setAvatar(avatar);
+        userMapper.updateById(sysUserDO);
     }
 
     @Override
@@ -191,6 +142,65 @@ public class SysUserServiceImpl implements SysUserService {
         userMapper.updateById(updateObj);
         // 删除用户关联数据
         permissionService.processUserDeleted(id);
+    }
+
+    @Override
+    public void deleteUser(Long id) {
+        // 校验用户存在
+        this.checkUserExists(id);
+        // 删除用户
+        userMapper.deleteById(id);
+    }
+
+    @Override
+    public SysUserDO getUserByUsername(String username) {
+        return userMapper.selectByUsername(username);
+    }
+
+    @Override
+    public SysUserDO getUser(Long id) {
+        return userMapper.selectById(id);
+    }
+
+    @Override
+    public PageResult<SysUserDO> getUserPage(SysUserPageReqVO reqVO) {
+        return userMapper.selectPage(reqVO, this.getDeptCondition(reqVO.getDeptId()));
+    }
+
+    @Override
+    public List<SysUserDO> getUsers(SysUserExportReqVO reqVO) {
+        return userMapper.selectList(reqVO, this.getDeptCondition(reqVO.getDeptId()));
+    }
+
+    @Override
+    public List<SysUserDO> getUsers(Collection<Long> ids) {
+        return userMapper.selectBatchIds(ids);
+    }
+
+    @Override
+    public List<SysUserDO> getUsersByNickname(String nickname) {
+        return userMapper.selectListByNickname(nickname);
+    }
+
+    @Override
+    public List<SysUserDO> getUsersByUsername(String username) {
+        return userMapper.selectListByUsername(username);
+    }
+
+    /**
+     * 获得部门条件：查询指定部门的子部门编号们，包括自身
+     *
+     * @param deptId 部门编号
+     * @return 部门编号集合
+     */
+    private Set<Long> getDeptCondition(Long deptId) {
+        if (deptId == null) {
+            return Collections.emptySet();
+        }
+        Set<Long> deptIds = CollectionUtils.convertSet(deptService.getDeptsByParentIdFromCache(
+            deptId, true), SysDeptDO::getId);
+        deptIds.add(deptId); // 包括自身
+        return deptIds;
     }
 
     private void checkCreateOrUpdate(Long id, String username, String mobile, String email,
@@ -362,18 +372,6 @@ public class SysUserServiceImpl implements SysUserService {
             respVO.getUpdateUsernames().add(importUser.getUsername());
         });
         return respVO;
-    }
-
-    @Override
-    public void updateAvatar(Long id, InputStream avatarFile) {
-        this.checkUserExists(id);
-        // 存储文件
-        String avatar = fileService.createFile(IdUtil.fastUUID(), IoUtil.readBytes(avatarFile));
-        // 更新路径
-        SysUserDO sysUserDO = new SysUserDO();
-        sysUserDO.setId(id);
-        sysUserDO.setAvatar(avatar);
-        userMapper.updateById(sysUserDO);
     }
 
 }

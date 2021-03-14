@@ -65,7 +65,7 @@ public class SysAuthController {
             return null;
         }
         // 获得角色列表
-        List<SysRoleDO> roleList = roleService.listRolesFromCache(getLoginUserRoleIds());
+        List<SysRoleDO> roleList = roleService.getRolesFromCache(getLoginUserRoleIds());
         // 获得菜单列表
         List<SysMenuDO> menuList = permissionService.getRoleMenusFromCache(
                 getLoginUserRoleIds(), // 注意，基于登陆的角色，因为后续的权限判断也是基于它

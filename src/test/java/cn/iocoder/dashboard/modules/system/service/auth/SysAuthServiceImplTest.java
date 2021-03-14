@@ -55,7 +55,7 @@ public class SysAuthServiceImplTest extends BaseDbUnitTest {
         String username = randomString();
         // mock 方法
         SysUserDO user = randomUserDO(o -> o.setUsername(username));
-        when(userService.getUserByUserName(eq(username))).thenReturn(user);
+        when(userService.getUserByUsername(eq(username))).thenReturn(user);
 
         // 调用
         LoginUser loginUser = (LoginUser) authService.loadUserByUsername(username);

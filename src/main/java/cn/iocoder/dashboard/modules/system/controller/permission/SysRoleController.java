@@ -4,6 +4,7 @@ import cn.iocoder.dashboard.common.enums.CommonStatusEnum;
 import cn.iocoder.dashboard.common.pojo.CommonResult;
 import cn.iocoder.dashboard.common.pojo.PageResult;
 import cn.iocoder.dashboard.framework.excel.core.util.ExcelUtils;
+import cn.iocoder.dashboard.framework.logger.operatelog.core.annotations.OperateLog;
 import cn.iocoder.dashboard.modules.system.controller.permission.vo.role.*;
 import cn.iocoder.dashboard.modules.system.convert.permission.SysRoleConvert;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.permission.SysRoleDO;
@@ -11,96 +12,95 @@ import cn.iocoder.dashboard.modules.system.service.permission.SysRoleService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
 import static cn.iocoder.dashboard.common.pojo.CommonResult.success;
+import static cn.iocoder.dashboard.framework.logger.operatelog.core.enums.OperateTypeEnum.EXPORT;
 
 @Api(tags = "角色")
 @RestController
 @RequestMapping("/system/role")
+@Validated
 public class SysRoleController {
 
     @Resource
     private SysRoleService roleService;
 
-    @ApiOperation("获得角色分页")
-    @GetMapping("/page")
-//    @PreAuthorize("@ss.hasPermi('system:role:list')")
-    public CommonResult<PageResult<SysRoleDO>> list(SysRolePageReqVO reqVO) {
-        return success(roleService.pageRole(reqVO));
-    }
-
-    @ApiOperation(value = "获取角色精简信息列表", notes = "只包含被开启的角色，主要用于前端的下拉选项")
-    @GetMapping("/list-all-simple")
-    public CommonResult<List<SysRoleSimpleRespVO>> listSimpleRoles() {
-        // 获得角色列表，只要开启状态的
-        List<SysRoleDO> list = roleService.listRoles(Collections.singleton(CommonStatusEnum.ENABLE.getStatus()));
-        // 排序后，返回个诶前端
-        list.sort(Comparator.comparing(SysRoleDO::getSort));
-        return success(SysRoleConvert.INSTANCE.convertList02(list));
-    }
-
-    @ApiOperation("创建角色")
     @PostMapping("/create")
-//    @PreAuthorize("@ss.hasPermi('system:role:add')")
-//    @Log(title = "角色管理", businessType = BusinessType.INSERT)
-    public CommonResult<Long> add(@Validated @RequestBody SysRoleCreateReqVO reqVO) {
+    @ApiOperation("创建角色")
+    @PreAuthorize("@ss.hasPermission('system:role:create')")
+    public CommonResult<Long> createRole(@Valid @RequestBody SysRoleCreateReqVO reqVO) {
         return success(roleService.createRole(reqVO));
     }
 
+    @PutMapping("/update")
     @ApiOperation("修改角色")
-//    @PreAuthorize("@ss.hasPermi('system:role:edit')")
-//    @Log(title = "角色管理", businessType = BusinessType.UPDATE)
-    @PostMapping("/update")
-    public CommonResult<Boolean> update(@Validated @RequestBody SysRoleUpdateReqVO reqVO) {
+    @PreAuthorize("@ss.hasPermission('system:role:update')")
+    public CommonResult<Boolean> updateRole(@Valid @RequestBody SysRoleUpdateReqVO reqVO) {
         roleService.updateRole(reqVO);
         return success(true);
     }
 
+    @PutMapping("/update-status")
+    @ApiOperation("修改角色状态")
+    @PreAuthorize("@ss.hasPermission('system:role:update')")
+    public CommonResult<Boolean> updateRoleStatus(@Valid @RequestBody SysRoleUpdateStatusReqVO reqVO) {
+        roleService.updateRoleStatus(reqVO.getId(), reqVO.getStatus());
+        return success(true);
+    }
+
+    @DeleteMapping("/delete")
     @ApiOperation("删除角色")
-    @PostMapping("/delete")
     @ApiImplicitParam(name = "id", value = "角色编号", required = true, example = "1024", dataTypeClass = Long.class)
-//    @PreAuthorize("@ss.hasPermi('system:role:remove')")
-//    @Log(title = "角色管理", businessType = BusinessType.DELETE)
+    @PreAuthorize("@ss.hasPermission('system:role:delete')")
     public CommonResult<Boolean> deleteRole(@RequestParam("id") Long id) {
         roleService.deleteRole(id);
         return success(true);
     }
 
-    @ApiOperation("获得角色信息")
     @GetMapping("/get")
-//    @PreAuthorize("@ss.hasPermi('system:role:query')")
+    @ApiOperation("获得角色信息")
+    @PreAuthorize("@ss.hasPermission('system:role:query')")
     public CommonResult<SysRoleRespVO> getRole(@RequestParam("id") Long id) {
         SysRoleDO role = roleService.getRole(id);
         return success(SysRoleConvert.INSTANCE.convert(role));
     }
 
-    @ApiOperation("修改角色状态")
-    @PostMapping("/update-status")
-//    @PreAuthorize("@ss.hasPermi('system:role:edit')")
-//    @Log(title = "角色管理", businessType = BusinessType.UPDATE)
-    public CommonResult<Boolean> updateRoleStatus(@Validated @RequestBody SysRoleUpdateStatusReqVO reqVO) {
-        roleService.updateRoleStatus(reqVO.getId(), reqVO.getStatus());
-        return success(true);
+    @GetMapping("/page")
+    @ApiOperation("获得角色分页")
+    @PreAuthorize("@ss.hasPermission('system:role:query')")
+    public CommonResult<PageResult<SysRoleDO>> getRolePage(SysRolePageReqVO reqVO) {
+        return success(roleService.getRolePage(reqVO));
+    }
+
+    @GetMapping("/list-all-simple")
+    @ApiOperation(value = "获取角色精简信息列表", notes = "只包含被开启的角色，主要用于前端的下拉选项")
+    public CommonResult<List<SysRoleSimpleRespVO>> getSimpleRoles() {
+        // 获得角色列表，只要开启状态的
+        List<SysRoleDO> list = roleService.getRoles(Collections.singleton(CommonStatusEnum.ENABLE.getStatus()));
+        // 排序后，返回个诶前端
+        list.sort(Comparator.comparing(SysRoleDO::getSort));
+        return success(SysRoleConvert.INSTANCE.convertList02(list));
     }
 
     @GetMapping("/export")
-//    @Log(title = "角色管理", businessType = BusinessType.EXPORT)
-//    @PreAuthorize("@ss.hasPermi('system:role:export')")
+    @OperateLog(type = EXPORT)
+    @PreAuthorize("@ss.hasPermission('system:role:export')")
     public void export(HttpServletResponse response, @Validated SysRoleExportReqVO reqVO) throws IOException {
-        List<SysRoleDO> list = roleService.listRoles(reqVO);
-        List<SysRoleExcelVO> excelDataList = SysRoleConvert.INSTANCE.convertList03(list);
+        List<SysRoleDO> list = roleService.getRoles(reqVO);
+        List<SysRoleExcelVO> data = SysRoleConvert.INSTANCE.convertList03(list);
         // 输出
-        ExcelUtils.write(response, "角色数据.xls", "角色列表",
-                SysRoleExcelVO.class, excelDataList);
+        ExcelUtils.write(response, "角色数据.xls", "角色列表", SysRoleExcelVO.class, data);
     }
 
 }
