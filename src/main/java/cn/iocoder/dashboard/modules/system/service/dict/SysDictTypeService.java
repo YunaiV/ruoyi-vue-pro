@@ -17,6 +17,28 @@ import java.util.List;
 public interface SysDictTypeService {
 
     /**
+     * 创建字典类型
+     *
+     * @param reqVO 字典类型信息
+     * @return 字典类型编号
+     */
+    Long createDictType(SysDictTypeCreateReqVO reqVO);
+
+    /**
+     * 更新字典类型
+     *
+     * @param reqVO 字典类型信息
+     */
+    void updateDictType(SysDictTypeUpdateReqVO reqVO);
+
+    /**
+     * 删除字典类型
+     *
+     * @param id 字典类型编号
+     */
+    void deleteDictType(Long id);
+
+    /**
      * 获得字典类型分页列表
      *
      * @param reqVO 分页请求
@@ -47,28 +69,6 @@ public interface SysDictTypeService {
      * @return 字典类型详情
      */
     SysDictTypeDO getDictType(String type);
-
-    /**
-     * 创建字典类型
-     *
-     * @param reqVO 字典类型信息
-     * @return 字典类型编号
-     */
-    Long createDictType(SysDictTypeCreateReqVO reqVO);
-
-    /**
-     * 更新字典类型
-     *
-     * @param reqVO 字典类型信息
-     */
-    void updateDictType(SysDictTypeUpdateReqVO reqVO);
-
-    /**
-     * 删除字典类型
-     *
-     * @param id 字典类型编号
-     */
-    void deleteDictType(Long id);
 
     /**
      * 获得全部字典类型列表

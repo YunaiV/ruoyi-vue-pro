@@ -133,7 +133,7 @@ public class SysDictDataServiceTest extends BaseDbUnitTest {
         reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
 
         // 调用
-        List<SysDictDataDO> list = dictDataService.getDictDataList(reqVO);
+        List<SysDictDataDO> list = dictDataService.getDictDatas(reqVO);
         // 断言
         assertEquals(1, list.size());
         assertPojoEquals(dbDictData, list.get(0));
