@@ -133,8 +133,8 @@ public class SysPermissionServiceImpl implements SysPermissionService {
     }
 
     @Override
-    public List<SysMenuDO> listRoleMenusFromCache(Collection<Long> roleIds, Collection<Integer> menuTypes,
-                                                  Collection<Integer> menusStatuses) {
+    public List<SysMenuDO> getRoleMenusFromCache(Collection<Long> roleIds, Collection<Integer> menuTypes,
+                                                 Collection<Integer> menusStatuses) {
         // 任一一个参数为空时，不返回任何菜单
         if (CollectionUtils.isAnyEmpty(roleIds, menusStatuses, menusStatuses)) {
             return Collections.emptyList();

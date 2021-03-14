@@ -19,39 +19,6 @@ import java.util.List;
 public interface SysPostService {
 
     /**
-     * 获得符合条件的岗位列表
-     *
-     * @param ids 岗位编号数组。如果为空，不进行筛选
-     * @param statuses 状态数组。如果为空，不进行筛选
-     * @return 部门列表
-     */
-    List<SysPostDO> listPosts(@Nullable Collection<Long> ids, @Nullable Collection<Integer> statuses);
-
-    /**
-     * 获得岗位分页列表
-     *
-     * @param reqVO 分页条件
-     * @return 部门分页列表
-     */
-    PageResult<SysPostDO> pagePosts(SysPostPageReqVO reqVO);
-
-    /**
-     * 获得岗位列表
-     *
-     * @param reqVO 查询条件
-     * @return 部门列表
-     */
-    List<SysPostDO> listPosts(SysPostExportReqVO reqVO);
-
-    /**
-     * 获得岗位信息
-     *
-     * @param id 岗位编号
-     * @return 岗位信息
-     */
-    SysPostDO getPost(Long id);
-
-    /**
      * 创建岗位
      *
      * @param reqVO 岗位信息
@@ -72,5 +39,38 @@ public interface SysPostService {
      * @param id 岗位编号
      */
     void deletePost(Long id);
+
+    /**
+     * 获得符合条件的岗位列表
+     *
+     * @param ids 岗位编号数组。如果为空，不进行筛选
+     * @param statuses 状态数组。如果为空，不进行筛选
+     * @return 部门列表
+     */
+    List<SysPostDO> getPosts(@Nullable Collection<Long> ids, @Nullable Collection<Integer> statuses);
+
+    /**
+     * 获得岗位分页列表
+     *
+     * @param reqVO 分页条件
+     * @return 部门分页列表
+     */
+    PageResult<SysPostDO> getPostPage(SysPostPageReqVO reqVO);
+
+    /**
+     * 获得岗位列表
+     *
+     * @param reqVO 查询条件
+     * @return 部门列表
+     */
+    List<SysPostDO> getPosts(SysPostExportReqVO reqVO);
+
+    /**
+     * 获得岗位信息
+     *
+     * @param id 岗位编号
+     * @return 岗位信息
+     */
+    SysPostDO getPost(Long id);
 
 }
