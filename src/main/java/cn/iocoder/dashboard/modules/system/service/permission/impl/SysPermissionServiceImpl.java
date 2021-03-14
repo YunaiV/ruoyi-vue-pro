@@ -231,22 +231,41 @@ public class SysPermissionServiceImpl implements SysPermissionService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void processRoleDeleted(Long roleId) {
-        // TODO 实现我
-//        // 标记删除 RoleResource
-//        roleResourceMapper.deleteByRoleId(roleId);
-//        // 标记删除 AdminRole
-//        adminRoleMapper.deleteByRoleId(roleId);
+        // 标记删除 UserRole
+        userRoleMapper.deleteListByRoleId(roleId);
+        // 标记删除 RoleMenu
+        roleMenuMapper.deleteListByRoleId(roleId);
+        // 发送刷新消息. 注意，需要事务提交后，在进行发送刷新消息。不然 db 还未提交，结果缓存先刷新了
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+
+            @Override
+            public void afterCommit() {
+                permissionProducer.sendRoleMenuRefreshMessage();
+            }
+
+        });
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void processMenuDeleted(Long menuId) {
-        // TODO 实现我
+        roleMenuMapper.deleteListByMenuId(menuId);
+        // 发送刷新消息. 注意，需要事务提交后，在进行发送刷新消息。不然 db 还未提交，结果缓存先刷新了
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+
+            @Override
+            public void afterCommit() {
+                permissionProducer.sendRoleMenuRefreshMessage();
+            }
+
+        });
     }
 
     @Override
     public void processUserDeleted(Long userId) {
-        // TODO 实现我
+        userRoleMapper.deleteListByUserId(userId);
     }
 
     @Override

@@ -153,7 +153,6 @@ public class SysDeptServiceImpl implements SysDeptService {
         }
         // 删除部门
         deptMapper.deleteById(id);
-        // TODO 需要处理下与角色的数据权限关联，等做数据权限一起处理下
         // 发送刷新消息
         deptProducer.sendDeptRefreshMessage();
     }

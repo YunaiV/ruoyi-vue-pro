@@ -33,6 +33,14 @@ public interface SysRoleMenuMapper extends BaseMapperX<SysRoleMenuDO> {
                 .in("menu_id", menuIds));
     }
 
+    default void deleteListByMenuId(Long menuId) {
+        delete(new QueryWrapper<SysRoleMenuDO>().eq("menu_id", menuId));
+    }
+
+    default void deleteListByRoleId(Long roleId) {
+        delete(new QueryWrapper<SysRoleMenuDO>().eq("role_id", roleId));
+    }
+
     default boolean selectExistsByUpdateTimeAfter(Date maxUpdateTime) {
         return selectOne(new QueryWrapper<SysRoleMenuDO>().select("id")
                 .gt("update_time", maxUpdateTime).last("LIMIT 1")) != null;
