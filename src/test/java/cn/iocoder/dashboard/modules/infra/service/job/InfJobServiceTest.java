@@ -1,25 +1,43 @@
 package cn.iocoder.dashboard.modules.infra.service.job;
 
+import static cn.hutool.core.util.RandomUtil.randomEle;
+import static cn.iocoder.dashboard.modules.infra.enums.InfErrorCodeConstants.JOB_CHANGE_STATUS_EQUALS;
+import static cn.iocoder.dashboard.modules.infra.enums.InfErrorCodeConstants.JOB_CHANGE_STATUS_INVALID;
+import static cn.iocoder.dashboard.modules.infra.enums.InfErrorCodeConstants.JOB_CRON_EXPRESSION_VALID;
+import static cn.iocoder.dashboard.modules.infra.enums.InfErrorCodeConstants.JOB_HANDLER_EXISTS;
+import static cn.iocoder.dashboard.modules.infra.enums.InfErrorCodeConstants.JOB_NOT_EXISTS;
+import static cn.iocoder.dashboard.modules.infra.enums.InfErrorCodeConstants.JOB_UPDATE_ONLY_NORMAL_STATUS;
 import static cn.iocoder.dashboard.util.AssertUtils.assertPojoEquals;
+import static cn.iocoder.dashboard.util.AssertUtils.assertServiceException;
 import static cn.iocoder.dashboard.util.RandomUtils.randomPojo;
+import static cn.iocoder.dashboard.util.RandomUtils.randomString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.junit.jupiter.api.Assertions.assertNull;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.annotation.Resource;
 
 import org.junit.jupiter.api.Test;
 import org.quartz.SchedulerException;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+
 import cn.iocoder.dashboard.BaseDbUnitTest;
+import cn.iocoder.dashboard.common.pojo.PageResult;
 import cn.iocoder.dashboard.framework.quartz.core.scheduler.SchedulerManager;
 import cn.iocoder.dashboard.modules.infra.controller.job.vo.job.InfJobCreateReqVO;
+import cn.iocoder.dashboard.modules.infra.controller.job.vo.job.InfJobExportReqVO;
+import cn.iocoder.dashboard.modules.infra.controller.job.vo.job.InfJobPageReqVO;
+import cn.iocoder.dashboard.modules.infra.controller.job.vo.job.InfJobUpdateReqVO;
 import cn.iocoder.dashboard.modules.infra.convert.job.InfJobConvert;
 import cn.iocoder.dashboard.modules.infra.dal.dataobject.job.InfJobDO;
 import cn.iocoder.dashboard.modules.infra.dal.mysql.job.InfJobMapper;
 import cn.iocoder.dashboard.modules.infra.enums.job.InfJobStatusEnum;
 import cn.iocoder.dashboard.modules.infra.service.job.impl.InfJobServiceImpl;
+import cn.iocoder.dashboard.util.object.ObjectUtils;
 
 /**
  * {@link InfJobServiceImpl} 的单元测试
@@ -28,45 +46,236 @@ import cn.iocoder.dashboard.modules.infra.service.job.impl.InfJobServiceImpl;
  */
 @Import(InfJobServiceImpl.class)
 public class InfJobServiceTest extends BaseDbUnitTest {
-    @Resource
-    private InfJobServiceImpl jobService;
 
     @Resource
-    private InfJobMapper jobMapper;
+    private InfJobServiceImpl jobService;
     @Resource
+    private InfJobMapper jobMapper;
+    @MockBean
     private SchedulerManager schedulerManager;
 
     @Test
-    public void testCreateJob_success() throws SchedulerException {
-        // 准备参数
+    public void testCreateJob_cronExpressionValid() {
+        // 准备参数。Cron 表达式为 String 类型，默认随机字符串。
         InfJobCreateReqVO reqVO = randomPojo(InfJobCreateReqVO.class);
-        reqVO.setCronExpression("0 0/1 * * * ? *");
+        // 调用，并断言异常
+        assertServiceException(() -> jobService.createJob(reqVO), JOB_CRON_EXPRESSION_VALID);
+    }
 
+    @Test
+    public void testCreateJob_jobHandlerExists() throws SchedulerException {
+        // 准备参数 指定 Cron 表达式
+        InfJobCreateReqVO reqVO = randomPojo(InfJobCreateReqVO.class, o -> o.setCronExpression("0 0/1 * * * ? *"));
+        // 调用
+        jobService.createJob(reqVO);
+        // 调用，并断言异常
+        assertServiceException(() -> jobService.createJob(reqVO), JOB_HANDLER_EXISTS);
+    }
+
+    @Test
+    public void testCreateJob_success() throws SchedulerException {
+        // 准备参数 指定 Cron 表达式
+        InfJobCreateReqVO reqVO = randomPojo(InfJobCreateReqVO.class, o -> o.setCronExpression("0 0/1 * * * ? *"));
         // 调用
         Long jobId = jobService.createJob(reqVO);
-
         // 断言
         assertNotNull(jobId);
-
         // 校验记录的属性是否正确
         InfJobDO job = jobMapper.selectById(jobId);
         assertPojoEquals(reqVO, job);
         assertEquals(InfJobStatusEnum.NORMAL.getStatus(), job.getStatus());
+    }
 
-        // 校验调用
-        verify(jobMapper, times(1)).selectByHandlerName(reqVO.getHandlerName());
+    @Test
+    public void testUpdateJob_jobNotExists(){
+        // 准备参数
+        InfJobUpdateReqVO reqVO = randomPojo(InfJobUpdateReqVO.class, o -> o.setCronExpression("0 0/1 * * * ? *"));
+        // 调用，并断言异常
+        assertServiceException(() -> jobService.updateJob(reqVO), JOB_NOT_EXISTS);
+    }
 
-        InfJobDO insertJob = InfJobConvert.INSTANCE.convert(reqVO);
-        insertJob.setStatus(InfJobStatusEnum.INIT.getStatus());
-        fillJobMonitorTimeoutEmpty(insertJob);
-        verify(jobMapper, times(1)).insert(insertJob);
+    @Test
+    public void testUpdateJob_onlyNormalStatus(){
+        // mock 数据
+        InfJobCreateReqVO createReqVO = randomPojo(InfJobCreateReqVO.class, o -> o.setCronExpression("0 0/1 * * * ? *"));
+        InfJobDO job = InfJobConvert.INSTANCE.convert(createReqVO);
+        job.setStatus(InfJobStatusEnum.INIT.getStatus());
+        fillJobMonitorTimeoutEmpty(job);
+        jobMapper.insert(job);
+        // 准备参数
+        InfJobUpdateReqVO updateReqVO = randomPojo(InfJobUpdateReqVO.class, o -> {
+            o.setId(job.getId());
+            o.setName(createReqVO.getName());
+            o.setCronExpression(createReqVO.getCronExpression());
+        });
+        // 调用，并断言异常
+        assertServiceException(() -> jobService.updateJob(updateReqVO), JOB_UPDATE_ONLY_NORMAL_STATUS);
+    }
 
-        verify(schedulerManager, times(1)).addJob(job.getId(), job.getHandlerName(), job.getHandlerParam(), job.getCronExpression(),
-                job.getRetryCount(), job.getRetryInterval());
+    @Test
+    public void testUpdateJob_success() throws SchedulerException {
+        // mock 数据
+        InfJobCreateReqVO createReqVO = randomPojo(InfJobCreateReqVO.class, o -> o.setCronExpression("0 0/1 * * * ? *"));
+        InfJobDO job = InfJobConvert.INSTANCE.convert(createReqVO);
+        job.setStatus(InfJobStatusEnum.NORMAL.getStatus());
+        fillJobMonitorTimeoutEmpty(job);
+        jobMapper.insert(job);
+        schedulerManager.addJob(job.getId(), job.getHandlerName(), job.getHandlerParam(), job.getCronExpression(),
+                createReqVO.getRetryCount(), createReqVO.getRetryInterval());
+        // 准备参数
+        InfJobUpdateReqVO updateReqVO = randomPojo(InfJobUpdateReqVO.class, o -> {
+            o.setId(job.getId());
+            o.setName(createReqVO.getName());
+            o.setCronExpression(createReqVO.getCronExpression());
+        });
+        // 调用
+        jobService.updateJob(updateReqVO);
+        // 校验记录的属性是否正确
+        InfJobDO updateJob = jobMapper.selectById(updateReqVO.getId());
+        assertPojoEquals(updateReqVO, updateJob);
+    }
 
-        InfJobDO updateObj = InfJobDO.builder().id(insertJob.getId()).status(InfJobStatusEnum.NORMAL.getStatus()).build();
-        verify(jobMapper, times(1)).updateById(updateObj);
+    @Test
+    public void testUpdateJobStatus_changeStatusInvalid() {
+        // 调用，并断言异常
+        assertServiceException(() -> jobService.updateJobStatus(1l, InfJobStatusEnum.INIT.getStatus()), JOB_CHANGE_STATUS_INVALID);
+    }
 
+    @Test
+    public void testUpdateJobStatus_changeStatusEquals() {
+        // mock 数据
+        InfJobCreateReqVO createReqVO = randomPojo(InfJobCreateReqVO.class, o -> o.setCronExpression("0 0/1 * * * ? *"));
+        InfJobDO job = InfJobConvert.INSTANCE.convert(createReqVO);
+        job.setStatus(InfJobStatusEnum.NORMAL.getStatus());
+        fillJobMonitorTimeoutEmpty(job);
+        jobMapper.insert(job);
+        // 调用，并断言异常
+        assertServiceException(() -> jobService.updateJobStatus(job.getId(), job.getStatus()), JOB_CHANGE_STATUS_EQUALS);
+    }
+
+    @Test
+    public void testUpdateJobStatus_success() throws SchedulerException {
+        // mock 数据
+        InfJobCreateReqVO createReqVO = randomPojo(InfJobCreateReqVO.class, o -> o.setCronExpression("0 0/1 * * * ? *"));
+        InfJobDO job = InfJobConvert.INSTANCE.convert(createReqVO);
+        job.setStatus(InfJobStatusEnum.NORMAL.getStatus());
+        fillJobMonitorTimeoutEmpty(job);
+        jobMapper.insert(job);
+        schedulerManager.addJob(job.getId(), job.getHandlerName(), job.getHandlerParam(), job.getCronExpression(),
+                createReqVO.getRetryCount(), createReqVO.getRetryInterval());
+        // 调用
+        jobService.updateJobStatus(job.getId(), InfJobStatusEnum.STOP.getStatus());
+        // 校验记录的属性是否正确
+        InfJobDO updateJob = jobMapper.selectById(job.getId());
+        assertEquals(InfJobStatusEnum.STOP.getStatus(), updateJob.getStatus());
+    }
+
+    /**
+     *  页面"执行一次"按钮功能集成测试发现问题：
+     *  inf_job 表初始化任务 sysUserSessionTimeoutJob 点击报错，是因为 Job 并没有添加到 Quartz 中；
+     *  没有走 createJob 中 scheduler.scheduleJob() 这一步，报错任务找不到。
+     *  // FINISHED Quartz 相关表新增初始化任务 sysUserSessionTimeoutJob sql
+     */
+    @Test
+    public void testTriggerJob_success() throws SchedulerException {
+        /**
+         * TODO 不知道是否要将 Quartz 相关 SQL 引入来做单元测试
+         * 1、schedulerManager.addJob sysUserSessionTimeoutJob
+         * 2、schedulerManager.triggerJob
+         * 3、check inf_job_log
+         */
+    }
+
+    @Test
+    public void testDeleteJob_success() throws SchedulerException {
+        // mock 数据
+        InfJobCreateReqVO createReqVO = randomPojo(InfJobCreateReqVO.class, o -> o.setCronExpression("0 0/1 * * * ? *"));
+        InfJobDO job = InfJobConvert.INSTANCE.convert(createReqVO);
+        job.setStatus(InfJobStatusEnum.NORMAL.getStatus());
+        fillJobMonitorTimeoutEmpty(job);
+        jobMapper.insert(job);
+        schedulerManager.addJob(job.getId(), job.getHandlerName(), job.getHandlerParam(), job.getCronExpression(),
+                createReqVO.getRetryCount(), createReqVO.getRetryInterval());
+        // 调用 UPDATE inf_job SET deleted=1 WHERE id=? AND deleted=0
+        jobService.deleteJob(job.getId());
+        // 校验数据不存在了  WHERE id=? AND deleted=0 查询为空正常
+        assertNull(jobMapper.selectById(job.getId()));
+    }
+
+    @Test
+    public void testGetJobListByIds_success() {
+        // mock 数据
+        InfJobDO dbJob = randomPojo(InfJobDO.class, o -> {
+            o.setStatus(randomEle(InfJobStatusEnum.values()).getStatus()); // 保证 status 的范围
+        });
+        InfJobDO cloneJob = ObjectUtils.clone(dbJob, o -> o.setHandlerName(randomString()));
+        jobMapper.insert(dbJob);
+        // 测试 handlerName 不匹配
+        jobMapper.insert(cloneJob);
+        // 准备参数
+        ArrayList ids = new ArrayList<>();
+        ids.add(dbJob.getId());
+        ids.add(cloneJob.getId());
+        // 调用
+        List<InfJobDO> list = jobService.getJobList(ids);
+        // 断言
+        assertEquals(2, list.size());
+        assertPojoEquals(dbJob, list.get(0));
+    }
+
+    @Test
+    public void testGetJobPage_success() {
+        // mock 数据
+        InfJobDO dbJob = randomPojo(InfJobDO.class, o -> {
+            o.setName("定时任务测试");
+            o.setHandlerName("handlerName 单元测试");
+            o.setStatus(InfJobStatusEnum.INIT.getStatus());
+        });
+        jobMapper.insert(dbJob);
+        // 测试 name 不匹配
+        jobMapper.insert(ObjectUtils.clone(dbJob, o -> o.setName("土豆")));
+        // 测试 status 不匹配
+        jobMapper.insert(ObjectUtils.clone(dbJob, o -> o.setStatus(InfJobStatusEnum.NORMAL.getStatus())));
+        // 测试 handlerName 不匹配
+        jobMapper.insert(ObjectUtils.clone(dbJob, o -> o.setHandlerName(randomString())));
+        // 准备参数
+        InfJobPageReqVO reqVo = new InfJobPageReqVO();
+        reqVo.setName("定时");
+        reqVo.setStatus(InfJobStatusEnum.INIT.getStatus());
+        reqVo.setHandlerName("单元");
+        // 调用
+        PageResult<InfJobDO> pageResult = jobService.getJobPage(reqVo);
+        // 断言
+        assertEquals(1, pageResult.getTotal());
+        assertEquals(1, pageResult.getList().size());
+        assertPojoEquals(dbJob, pageResult.getList().get(0));
+    }
+
+    @Test
+    public void testGetJobListForExport_success() {
+        // mock 数据
+        InfJobDO dbJob = randomPojo(InfJobDO.class, o -> {
+            o.setName("定时任务测试");
+            o.setHandlerName("handlerName 单元测试");
+            o.setStatus(InfJobStatusEnum.INIT.getStatus());
+        });
+        jobMapper.insert(dbJob);
+        // 测试 name 不匹配
+        jobMapper.insert(ObjectUtils.clone(dbJob, o -> o.setName("土豆")));
+        // 测试 status 不匹配
+        jobMapper.insert(ObjectUtils.clone(dbJob, o -> o.setStatus(InfJobStatusEnum.NORMAL.getStatus())));
+        // 测试 handlerName 不匹配
+        jobMapper.insert(ObjectUtils.clone(dbJob, o -> o.setHandlerName(randomString())));
+        // 准备参数
+        InfJobExportReqVO reqVo = new InfJobExportReqVO();
+        reqVo.setName("定时");
+        reqVo.setStatus(InfJobStatusEnum.INIT.getStatus());
+        reqVo.setHandlerName("单元");
+        // 调用
+        List<InfJobDO> list = jobService.getJobList(reqVo);
+        // 断言
+        assertEquals(1, list.size());
+        assertPojoEquals(dbJob, list.get(0));
     }
 
     private static void fillJobMonitorTimeoutEmpty(InfJobDO job) {
