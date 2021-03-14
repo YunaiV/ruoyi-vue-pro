@@ -1,12 +1,11 @@
 package cn.iocoder.dashboard.modules.tool.service.codegen.impl;
 
-import cn.iocoder.dashboard.BaseSpringBootUnitTest;
+import cn.iocoder.dashboard.BaseDbUnitTest;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.annotation.Resource;
 
-class ToolCodegenServiceImplTest extends BaseSpringBootUnitTest {
+class ToolCodegenServiceImplTest extends BaseDbUnitTest {
 
     @Resource
     private ToolCodegenServiceImpl toolCodegenService;

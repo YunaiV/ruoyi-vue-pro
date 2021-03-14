@@ -1,18 +1,17 @@
 package cn.iocoder.dashboard.modules.tool.service.codegen.impl;
 
-import cn.iocoder.dashboard.BaseSpringBootUnitTest;
+import cn.iocoder.dashboard.BaseDbUnitTest;
 import cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen.ToolCodegenColumnDO;
 import cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen.ToolCodegenTableDO;
 import cn.iocoder.dashboard.modules.tool.dal.mysql.codegen.ToolCodegenColumnMapper;
 import cn.iocoder.dashboard.modules.tool.dal.mysql.codegen.ToolCodegenTableMapper;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
 
-public class ToolCodegenEngineTest extends BaseSpringBootUnitTest {
+public class ToolCodegenEngineTest extends BaseDbUnitTest {
 
     @Resource
     private ToolCodegenTableMapper codegenTableMapper;

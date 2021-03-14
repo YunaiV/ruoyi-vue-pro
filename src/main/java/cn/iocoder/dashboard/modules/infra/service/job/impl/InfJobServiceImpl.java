@@ -43,7 +43,7 @@ public class InfJobServiceImpl implements InfJobService {
     private SchedulerManager schedulerManager;
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public Long createJob(InfJobCreateReqVO createReqVO) throws SchedulerException {
         validateCronExpression(createReqVO.getCronExpression());
         // 校验唯一性
@@ -68,7 +68,7 @@ public class InfJobServiceImpl implements InfJobService {
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void updateJob(InfJobUpdateReqVO updateReqVO) throws SchedulerException {
         validateCronExpression(updateReqVO.getCronExpression());
         // 校验存在
@@ -88,7 +88,7 @@ public class InfJobServiceImpl implements InfJobService {
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void updateJobStatus(Long id, Integer status) throws SchedulerException {
         // 校验 status
         if (!containsAny(status, InfJobStatusEnum.NORMAL.getStatus(), InfJobStatusEnum.STOP.getStatus())) {
@@ -122,7 +122,7 @@ public class InfJobServiceImpl implements InfJobService {
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void deleteJob(Long id) throws SchedulerException {
         // 校验存在
         InfJobDO job = this.validateJobExists(id);

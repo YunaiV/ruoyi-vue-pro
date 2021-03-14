@@ -40,8 +40,8 @@ public class SysUserController {
     @Resource
     private SysDeptService deptService;
 
-    @ApiOperation("获得用户分页列表")
     @GetMapping("/page")
+    @ApiOperation("获得用户分页列表")
     @PreAuthorize("@ss.hasPermission('system:user:list')")
     public CommonResult<PageResult<SysUserPageItemRespVO>> pageUsers(@Validated SysUserPageReqVO reqVO) {
         // 获得用户分页列表
@@ -66,9 +66,9 @@ public class SysUserController {
     /**
      * 根据用户编号获取详细信息
      */
+    @GetMapping("/get")
     @ApiOperation("获得用户详情")
     @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
-    @GetMapping("/get")
 //    @PreAuthorize("@ss.hasPermi('system:user:query')")
     public CommonResult<SysUserRespVO> getInfo(@RequestParam("id") Long id) {
         return success(SysUserConvert.INSTANCE.convert(userService.getUser(id)));

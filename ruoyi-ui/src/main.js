@@ -25,7 +25,10 @@ import {
   download,
   handleTree,
   downloadExcel,
-  downloadZip
+  downloadWord,
+  downloadZip,
+  downloadHtml,
+  downloadMarkdown,
 } from "@/utils/ruoyi";
 import Pagination from "@/components/Pagination";
 // 自定义表格工具扩展
@@ -48,6 +51,9 @@ Vue.prototype.getDictDataLabel = getDictDataLabel
 Vue.prototype.DICT_TYPE = DICT_TYPE
 Vue.prototype.download = download
 Vue.prototype.downloadExcel = downloadExcel
+Vue.prototype.downloadWord = downloadWord
+Vue.prototype.downloadHtml = downloadHtml
+Vue.prototype.downloadMarkdown = downloadMarkdown
 Vue.prototype.downloadZip = downloadZip
 Vue.prototype.handleTree = handleTree
 
