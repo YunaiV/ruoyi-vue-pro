@@ -5,7 +5,7 @@ import cn.iocoder.dashboard.modules.infra.controller.config.vo.InfConfigCreateRe
 import cn.iocoder.dashboard.modules.infra.controller.config.vo.InfConfigExcelVO;
 import cn.iocoder.dashboard.modules.infra.controller.config.vo.InfConfigRespVO;
 import cn.iocoder.dashboard.modules.infra.controller.config.vo.InfConfigUpdateReqVO;
-import cn.iocoder.dashboard.modules.infra.dal.mysql.dataobject.config.InfConfigDO;
+import cn.iocoder.dashboard.modules.infra.dal.dataobject.config.InfConfigDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 

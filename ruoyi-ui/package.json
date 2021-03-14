@@ -1,8 +1,8 @@
 {
   "name": "ruoyi",
   "version": "3.3.0",
-  "description": "若依管理系统",
-  "author": "若依",
+  "description": "芋道管理系统",
+  "author": "芋道",
   "license": "MIT",
   "scripts": {
     "dev": "vue-cli-service serve",
@@ -33,7 +33,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://gitee.com/y_project/RuoYi-Vue.git"
+    "url": "https://github.com/YunaiV/ruoyi-vue-pro"
   },
   "dependencies": {
     "@riophae/vue-treeselect": "0.4.0",
@@ -41,10 +41,10 @@
     "clipboard": "2.0.6",
     "core-js": "3.8.1",
     "echarts": "4.9.0",
-    "element-ui": "2.14.1",
+    "element-ui": "2.15.0",
     "file-saver": "2.0.4",
     "fuse.js": "6.4.3",
-    "highlight.js": "10.4.1",
+    "highlight.js": "9.18.5",
     "js-beautify": "1.13.0",
     "js-cookie": "2.2.1",
     "jsencrypt": "3.0.0-rc.1",

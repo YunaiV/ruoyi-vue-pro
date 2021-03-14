@@ -1,0 +1,82 @@
+spring:
+  main:
+    lazy-initialization: true # 开启懒加载，加快速度
+    banner-mode: off # 单元测试，禁用 Banner
+
+--- #################### 数据库相关配置 ####################
+
+spring:
+  # 数据源配置项
+  datasource:
+    name: ruoyi-vue-pro
+    url: jdbc:h2:mem:testdb;MODE=MYSQL;DATABASE_TO_UPPER=false; # MODE 使用 MySQL 模式；DATABASE_TO_UPPER 配置表和字段使用小写
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+    schema: classpath:sql/create_tables.sql # MySQL 转 H2 的语句，使用 https://www.jooq.org/translate/ 工具
+    druid:
+      async-init: true # 单元测试，异步初始化 Druid 连接池，提升启动速度
+      initial-size: 1 # 单元测试，配置为 1，提升启动速度
+
+  # Redis 配置。Redisson 默认的配置足够使用，一般不需要进行调优
+  redis:
+    host: 127.0.0.1 # 地址
+    port: 16379 # 端口（单元测试，使用 16379 端口）
+    database: 0 # 数据库索引
+
+mybatis:
+  lazy-initialization: true # 单元测试，设置 MyBatis Mapper 延迟加载，加速每个单元测试
+
+--- #################### 定时任务相关配置 ####################
+
+--- #################### 配置中心相关配置 ####################
+
+--- #################### 服务保障相关配置 ####################
+
+# Lock4j 配置项（单元测试，禁用 Lock4j）
+
+# Resilience4j 配置项
+resilience4j:
+  ratelimiter:
+    instances:
+      backendA:
+        limit-for-period: 1 # 每个周期内，允许的请求数。默认为 50
+        limit-refresh-period: 60s # 每个周期的时长，单位：微秒。默认为 500
+        timeout-duration: 1s # 被限流时，阻塞等待的时长，单位：微秒。默认为 5s
+        register-health-indicator: true # 是否注册到健康监测
+
+--- #################### 监控相关配置 ####################
+
+--- #################### 芋道相关配置 ####################
+
+# 芋道配置项，设置当前项目所有自定义的配置
+yudao:
+  info:
+    version: 1.0.0
+    base-package: cn.iocoder.dashboard
+  web:
+    api-prefix: /api
+    controller-package: ${yudao.info.base-package}
+  security:
+    token-header: Authorization
+    token-secret: abcdefghijklmnopqrstuvwxyz
+    token-timeout: 1d
+    session-timeout: 30m
+    mock-enable: true
+    mock-secret: test
+  swagger:
+    enable: false # 单元测试，禁用 Swagger
+  captcha:
+    timeout: 5m
+    width: 160
+    height: 60
+  file:
+    base-path: http://127.0.0.1:${server.port}/${yudao.web.api-prefix}/file/get/
+  codegen:
+    base-package: ${yudao.info.base-package}.modules
+    db-schemas: ${spring.datasource.name}
+  xss:
+    enable: false
+    exclude-urls: # 如下两个 url，仅仅是为了演示，去掉配置也没关系
+      - ${spring.boot.admin.context-path}/** # 不处理 Spring Boot Admin 的请求
+      - ${management.endpoints.web.base-path}/** # 不处理 Actuator 的请求

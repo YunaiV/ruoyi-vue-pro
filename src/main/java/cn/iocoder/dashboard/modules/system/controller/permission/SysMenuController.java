@@ -4,7 +4,7 @@ import cn.iocoder.dashboard.common.enums.CommonStatusEnum;
 import cn.iocoder.dashboard.common.pojo.CommonResult;
 import cn.iocoder.dashboard.modules.system.controller.permission.vo.menu.*;
 import cn.iocoder.dashboard.modules.system.convert.permission.SysMenuConvert;
-import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.permission.SysMenuDO;
+import cn.iocoder.dashboard.modules.system.dal.dataobject.permission.SysMenuDO;
 import cn.iocoder.dashboard.modules.system.service.permission.SysMenuService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -18,7 +18,7 @@ import java.util.List;
 
 import static cn.iocoder.dashboard.common.pojo.CommonResult.success;
 
-@Api(tags = "菜单 API")
+@Api(tags = "菜单")
 @RestController
 @RequestMapping("/system/menu")
 public class SysMenuController {

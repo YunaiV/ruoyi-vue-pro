@@ -28,8 +28,8 @@ public class SysMenuBaseVO {
     private Integer type;
 
     @ApiModelProperty(value = "显示顺序不能为空", required = true, example = "1024")
-    @NotBlank(message = "显示顺序不能为空")
-    private String sort;
+    @NotNull(message = "显示顺序不能为空")
+    private Integer sort;
 
     @ApiModelProperty(value = "父菜单 ID", required = true, example = "1024")
     @NotNull(message = "父菜单 ID 不能为空")
@@ -42,11 +42,12 @@ public class SysMenuBaseVO {
     @ApiModelProperty(value = "菜单图标", example = "/menu/list", notes = "仅菜单类型为菜单或者目录时，才需要传")
     private String icon;
 
-    /**
-     * 组件路径
-     */
     @ApiModelProperty(value = "组件路径", example = "system/post/index", notes = "仅菜单类型为菜单时，才需要传")
     @Size(max = 200, message = "组件路径不能超过255个字符")
     private String component;
+
+    @ApiModelProperty(value = "状态", required = true, example = "1", notes = "见 SysCommonStatusEnum 枚举")
+    @NotNull(message = "状态不能为空")
+    private Integer status;
 
 }

@@ -4,6 +4,14 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.iocoder.dashboard.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.dashboard.framework.security.core.util.SecurityFrameworkUtils;
+import cn.iocoder.dashboard.modules.system.dal.mysql.permission.SysRoleMenuMapper;
+import cn.iocoder.dashboard.modules.system.dal.mysql.permission.SysUserRoleMapper;
+import cn.iocoder.dashboard.modules.system.dal.dataobject.permission.SysMenuDO;
+import cn.iocoder.dashboard.modules.system.dal.dataobject.permission.SysRoleDO;
+import cn.iocoder.dashboard.modules.system.dal.dataobject.permission.SysRoleMenuDO;
+import cn.iocoder.dashboard.modules.system.dal.dataobject.permission.SysUserRoleDO;
+import cn.iocoder.dashboard.modules.system.mq.producer.permission.SysPermissionProducer;
 import cn.iocoder.dashboard.framework.security.core.util.SecurityUtils;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dao.permission.SysRoleMenuMapper;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dao.permission.SysUserRoleMapper;
@@ -151,7 +159,7 @@ public class SysPermissionServiceImpl implements SysPermissionService {
     }
 
     @Override
-    public Set<Long> listUserRoleIds(Long userId, Collection<Integer> roleStatuses) {
+    public Set<Long> getUserRoleIds(Long userId, Collection<Integer> roleStatuses) {
         List<SysUserRoleDO> userRoleList = userRoleMapper.selectListByUserId(userId);
         // 过滤角色状态
         if (CollectionUtil.isNotEmpty(roleStatuses)) {
@@ -176,7 +184,7 @@ public class SysPermissionServiceImpl implements SysPermissionService {
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void assignRoleMenu(Long roleId, Set<Long> menuIds) {
         // 获得角色拥有菜单编号
         Set<Long> dbMenuIds = CollectionUtils.convertSet(roleMenuMapper.selectListByRoleId(roleId),
@@ -262,7 +270,7 @@ public class SysPermissionServiceImpl implements SysPermissionService {
         }
 
         // 获得当前登陆的角色。如果为空，说明没有权限
-        Set<Long> roleIds = SecurityUtils.getLoginUserRoleIds();
+        Set<Long> roleIds = SecurityFrameworkUtils.getLoginUserRoleIds();
         if (CollUtil.isEmpty(roleIds)) {
             return false;
         }
@@ -297,7 +305,7 @@ public class SysPermissionServiceImpl implements SysPermissionService {
         }
 
         // 获得当前登陆的角色。如果为空，说明没有权限
-        Set<Long> roleIds = SecurityUtils.getLoginUserRoleIds();
+        Set<Long> roleIds = SecurityFrameworkUtils.getLoginUserRoleIds();
         if (CollUtil.isEmpty(roleIds)) {
             return false;
         }

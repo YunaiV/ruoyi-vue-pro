@@ -4,6 +4,7 @@ import cn.iocoder.dashboard.framework.security.core.filter.JwtAuthenticationToke
 import cn.iocoder.dashboard.framework.security.core.handler.LogoutSuccessHandlerImpl;
 import cn.iocoder.dashboard.framework.web.config.WebProperties;
 import de.codecentric.boot.admin.server.config.AdminServerProperties;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
@@ -68,8 +69,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
      * 由于 Spring Security 创建 AuthenticationManager 对象时，没声明 @Bean 注解，导致无法被注入
      * 通过覆写父类的该方法，添加 @Bean 注解，解决该问题
      */
-    @Bean
     @Override
+    @Bean
+    @ConditionalOnMissingBean(AuthenticationManager.class)
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
     }
@@ -114,6 +116,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
+                // 开启跨域
+                .cors().and()
                 // CSRF 禁用，因为不使用 Session
                 .csrf().disable()
                 // 基于 token 机制，所以不需要 Session
@@ -121,36 +125,34 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 // 一堆自定义的 Spring Security 处理器
                 .exceptionHandling().authenticationEntryPoint(unauthorizedHandler)
                     .accessDeniedHandler(accessDeniedHandler).and()
-                // TODO 过滤请求
+                // 设置每个请求的权限
                 .authorizeRequests()
-                // 登陆的接口，可匿名访问
-                .antMatchers(webProperties.getApiPrefix() + "/login").anonymous()
-                // 通用的接口，可匿名访问
-                .antMatchers( webProperties.getApiPrefix() + "/system/captcha/**").anonymous()
-                // TODO
-                .antMatchers(HttpMethod.GET, "/*.html", "/**/*.html", "/**/*.css", "/**/*.js").permitAll()
-                .antMatchers("/profile/**").anonymous()
-                // 文件的获取接口，可匿名访问
-                .antMatchers(webProperties.getApiPrefix() + "/system/file/get/**").anonymous()
-                // TODO
-                .antMatchers("/swagger-ui.html").anonymous()
-                .antMatchers("/**").anonymous()
-                .antMatchers("/swagger-resources/**").anonymous()
-                .antMatchers("/webjars/**").anonymous()
-                .antMatchers("/*/api-docs").anonymous()
-                // Spring Boot Admin Server 的安全配置
-                .antMatchers(adminServerProperties.getContextPath()).anonymous()
-                .antMatchers(adminServerProperties.getContextPath() + "/**").anonymous()
-                // Spring Boot Actuator 的安全配置
-                .antMatchers("/actuator").anonymous()
-                .antMatchers("/actuator/**").anonymous()
-                // TODO
-                .antMatchers("/druid/**").hasAnyAuthority("druid") // TODO 芋艿，未来需要在拓展下
-                // 除上面外的所有请求全部需要鉴权认证
-                .anyRequest().authenticated()
+                    // 登陆的接口，可匿名访问
+                    .antMatchers(webProperties.getApiPrefix() + "/login").anonymous()
+                    // 通用的接口，可匿名访问
+                    .antMatchers( webProperties.getApiPrefix() + "/system/captcha/**").anonymous()
+                    // 静态资源，可匿名访问
+                    .antMatchers(HttpMethod.GET, "/*.html", "/**/*.html", "/**/*.css", "/**/*.js").permitAll()
+                    // 文件的获取接口，可匿名访问
+                    .antMatchers(webProperties.getApiPrefix() + "/infra/file/get/**").anonymous()
+                    // Swagger 接口文档
+                    .antMatchers("/swagger-ui.html").anonymous()
+                    .antMatchers("/swagger-resources/**").anonymous()
+                    .antMatchers("/webjars/**").anonymous()
+                    .antMatchers("/*/api-docs").anonymous()
+                    // Spring Boot Admin Server 的安全配置
+                    .antMatchers(adminServerProperties.getContextPath()).anonymous()
+                    .antMatchers(adminServerProperties.getContextPath() + "/**").anonymous()
+                    // Spring Boot Actuator 的安全配置
+                    .antMatchers("/actuator").anonymous()
+                    .antMatchers("/actuator/**").anonymous()
+                    // Druid 监控
+                    .antMatchers("/druid/**").anonymous()
+                    // 除上面外的所有请求全部需要鉴权认证
+                    .anyRequest().authenticated()
                 .and()
                 .headers().frameOptions().disable();
-        httpSecurity.logout().logoutUrl("/logout").logoutSuccessHandler(logoutSuccessHandler);
+        httpSecurity.logout().logoutUrl(webProperties.getApiPrefix() + "/logout").logoutSuccessHandler(logoutSuccessHandler);
         // 添加 JWT Filter
         httpSecurity.addFilterBefore(authenticationTokenFilter, UsernamePasswordAuthenticationFilter.class);
     }

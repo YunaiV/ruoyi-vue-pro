@@ -4,7 +4,7 @@ import cn.iocoder.dashboard.common.pojo.PageResult;
 import cn.iocoder.dashboard.modules.system.controller.logger.vo.loginlog.SysLoginLogCreateReqVO;
 import cn.iocoder.dashboard.modules.system.controller.logger.vo.loginlog.SysLoginLogExcelVO;
 import cn.iocoder.dashboard.modules.system.controller.logger.vo.loginlog.SysLoginLogRespVO;
-import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.logger.SysLoginLogDO;
+import cn.iocoder.dashboard.modules.system.dal.dataobject.logger.SysLoginLogDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 

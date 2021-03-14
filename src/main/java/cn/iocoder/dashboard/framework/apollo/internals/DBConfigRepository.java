@@ -3,8 +3,8 @@ package cn.iocoder.dashboard.framework.apollo.internals;
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.dashboard.framework.apollo.core.ConfigConsts;
 import cn.iocoder.dashboard.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.dashboard.modules.infra.dal.mysql.dao.config.InfConfigDAOImpl;
-import cn.iocoder.dashboard.modules.infra.dal.mysql.dataobject.config.InfConfigDO;
+import cn.iocoder.dashboard.modules.infra.dal.mysql.config.InfConfigDAOImpl;
+import cn.iocoder.dashboard.modules.infra.dal.dataobject.config.InfConfigDO;
 import com.ctrip.framework.apollo.Apollo;
 import com.ctrip.framework.apollo.build.ApolloInjector;
 import com.ctrip.framework.apollo.core.utils.ApolloThreadFactory;
@@ -122,7 +122,7 @@ public class DBConfigRepository extends AbstractConfigRepository {
 
     private Properties buildProperties(List<InfConfigDO> configs) {
         Properties properties = propertiesFactory.getPropertiesInstance();
-        configs.stream().filter(config -> 0 == config.getDeleted()) // 过滤掉被删除的配置
+        configs.stream().filter(BaseDO::getDeleted) // 过滤掉被删除的配置
                 .forEach(config -> properties.put(config.getKey(), config.getValue()));
         return properties;
     }

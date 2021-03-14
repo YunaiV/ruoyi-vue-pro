@@ -16,13 +16,26 @@ import './assets/icons' // icon
 import './permission' // permission control
 import { getDicts } from "@/api/system/dict/data";
 import { getConfigKey } from "@/api/infra/config";
-import { parseTime, resetForm, addDateRange, selectDictLabel, selectDictLabels, download, handleTree, downloadExcel } from "@/utils/ruoyi";
+import {
+  parseTime,
+  resetForm,
+  addDateRange,
+  addBeginAndEndTime,
+  selectDictLabel,
+  download,
+  handleTree,
+  downloadExcel,
+  downloadWord,
+  downloadZip,
+  downloadHtml,
+  downloadMarkdown,
+} from "@/utils/ruoyi";
 import Pagination from "@/components/Pagination";
 // 自定义表格工具扩展
 import RightToolbar from "@/components/RightToolbar"
 // 代码高亮插件
-import hljs from 'highlight.js'
-import 'highlight.js/styles/github-gist.css'
+// import hljs from 'highlight.js'
+// import 'highlight.js/styles/github-gist.css'
 import {DICT_TYPE, getDictDataLabel, getDictDatas} from "@/utils/dict";
 
 // 全局方法挂载
@@ -31,13 +44,17 @@ Vue.prototype.getConfigKey = getConfigKey
 Vue.prototype.parseTime = parseTime
 Vue.prototype.resetForm = resetForm
 Vue.prototype.addDateRange = addDateRange
+Vue.prototype.addBeginAndEndTime = addBeginAndEndTime
 Vue.prototype.selectDictLabel = selectDictLabel
-Vue.prototype.selectDictLabels = selectDictLabels
 Vue.prototype.getDictDatas = getDictDatas
 Vue.prototype.getDictDataLabel = getDictDataLabel
 Vue.prototype.DICT_TYPE = DICT_TYPE
 Vue.prototype.download = download
 Vue.prototype.downloadExcel = downloadExcel
+Vue.prototype.downloadWord = downloadWord
+Vue.prototype.downloadHtml = downloadHtml
+Vue.prototype.downloadMarkdown = downloadMarkdown
+Vue.prototype.downloadZip = downloadZip
 Vue.prototype.handleTree = handleTree
 
 Vue.prototype.msgSuccess = function (msg) {
@@ -57,7 +74,7 @@ Vue.component('Pagination', Pagination)
 Vue.component('RightToolbar', RightToolbar)
 
 Vue.use(permission)
-Vue.use(hljs.vuePlugin);
+// Vue.use(hljs.vuePlugin);
 
 /**
  * If you don't want to use mock-server

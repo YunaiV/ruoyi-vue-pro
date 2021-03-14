@@ -7,8 +7,8 @@ import cn.iocoder.dashboard.modules.system.controller.dept.vo.post.SysPostExport
 import cn.iocoder.dashboard.modules.system.controller.dept.vo.post.SysPostPageReqVO;
 import cn.iocoder.dashboard.modules.system.controller.dept.vo.post.SysPostUpdateReqVO;
 import cn.iocoder.dashboard.modules.system.convert.dept.SysPostConvert;
-import cn.iocoder.dashboard.modules.system.dal.mysql.dao.dept.SysPostMapper;
-import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.dept.SysPostDO;
+import cn.iocoder.dashboard.modules.system.dal.mysql.dept.SysPostMapper;
+import cn.iocoder.dashboard.modules.system.dal.dataobject.dept.SysPostDO;
 import cn.iocoder.dashboard.modules.system.service.dept.SysPostService;
 import org.springframework.stereotype.Service;
 

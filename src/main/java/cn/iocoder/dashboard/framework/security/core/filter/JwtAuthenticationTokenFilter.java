@@ -1,17 +1,13 @@
 package cn.iocoder.dashboard.framework.security.core.filter;
 
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.extra.servlet.ServletUtil;
 import cn.iocoder.dashboard.common.pojo.CommonResult;
 import cn.iocoder.dashboard.framework.security.config.SecurityProperties;
 import cn.iocoder.dashboard.framework.security.core.LoginUser;
-import cn.iocoder.dashboard.framework.security.core.util.SecurityUtils;
+import cn.iocoder.dashboard.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.dashboard.framework.web.core.handler.GlobalExceptionHandler;
 import cn.iocoder.dashboard.modules.system.service.auth.SysAuthService;
 import cn.iocoder.dashboard.util.servlet.ServletUtils;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -42,7 +38,7 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
     @SuppressWarnings("NullableProblems")
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
-        String token = SecurityUtils.obtainAuthorization(request, securityProperties.getTokenHeader());
+        String token = SecurityFrameworkUtils.obtainAuthorization(request, securityProperties.getTokenHeader());
         if (StrUtil.isNotEmpty(token)) {
             try {
                 // 验证 token 有效性
@@ -53,7 +49,7 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
                 }
                 // 设置当前用户
                 if (loginUser != null) {
-                    SecurityUtils.setLoginUser(loginUser, request);
+                    SecurityFrameworkUtils.setLoginUser(loginUser, request);
                 }
             } catch (Throwable ex) {
                 CommonResult<?> result = globalExceptionHandler.allExceptionHandler(request, ex);

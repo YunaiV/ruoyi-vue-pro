@@ -5,7 +5,7 @@ import cn.iocoder.dashboard.common.pojo.PageResult;
 import cn.iocoder.dashboard.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.dashboard.modules.system.controller.dict.vo.type.*;
 import cn.iocoder.dashboard.modules.system.convert.dict.SysDictTypeConvert;
-import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.dict.SysDictTypeDO;
+import cn.iocoder.dashboard.modules.system.dal.dataobject.dict.SysDictTypeDO;
 import cn.iocoder.dashboard.modules.system.service.dict.SysDictTypeService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -20,7 +20,7 @@ import java.util.List;
 
 import static cn.iocoder.dashboard.common.pojo.CommonResult.success;
 
-@Api(tags = "字典类型 API")
+@Api(tags = "字典类型")
 @RestController
 @RequestMapping("/system/dict-type")
 public class SysDictTypeController {
@@ -32,7 +32,7 @@ public class SysDictTypeController {
     @GetMapping("/page")
 //    @PreAuthorize("@ss.hasPermi('system:dict:list')")
     public CommonResult<PageResult<SysDictTypeRespVO>> pageDictTypes(@Validated SysDictTypePageReqVO reqVO) {
-        return success(SysDictTypeConvert.INSTANCE.convertPage(dictTypeService.pageDictTypes(reqVO)));
+        return success(SysDictTypeConvert.INSTANCE.convertPage(dictTypeService.getDictTypePage(reqVO)));
     }
 
     @ApiOperation("/查询字典类型详细")
@@ -75,7 +75,7 @@ public class SysDictTypeController {
     @ApiOperation(value = "获得全部字典类型列表", notes = "包括开启 + 禁用的字典类型，主要用于前端的下拉选项")
     // 无需添加权限认证，因为前端全局都需要
     public CommonResult<List<SysDictTypeSimpleRespVO>> listSimpleDictTypes() {
-        List<SysDictTypeDO> list = dictTypeService.listDictTypes();
+        List<SysDictTypeDO> list = dictTypeService.getDictTypeList();
         return success(SysDictTypeConvert.INSTANCE.convertList(list));
     }
 
@@ -84,7 +84,7 @@ public class SysDictTypeController {
 //    @Log(title = "字典类型", businessType = BusinessType.EXPORT)
 //    @PreAuthorize("@ss.hasPermi('system:dict:export')")
     public void export(HttpServletResponse response, @Validated SysDictTypeExportReqVO reqVO) throws IOException {
-        List<SysDictTypeDO> list = dictTypeService.listDictTypes(reqVO);
+        List<SysDictTypeDO> list = dictTypeService.getDictTypeList(reqVO);
         List<SysDictTypeExcelVO> excelTypeList = SysDictTypeConvert.INSTANCE.convertList02(list);
         // 输出
         ExcelUtils.write(response, "字典类型.xls", "类型列表",

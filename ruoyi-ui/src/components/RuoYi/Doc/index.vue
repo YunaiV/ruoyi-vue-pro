@@ -6,10 +6,10 @@
 
 <script>
 export default {
-  name: 'RuoYiDoc',
+  name: 'YudaoDoc',
   data() {
     return {
-      url: 'http://doc.ruoyi.vip/ruoyi-vue'
+      url: 'http://www.iocoder.cn/Yudao/build-debugger-environment/?yudao'
     }
   },
   methods: {

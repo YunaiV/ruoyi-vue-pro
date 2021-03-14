@@ -5,7 +5,7 @@ import cn.iocoder.dashboard.common.pojo.PageResult;
 import cn.iocoder.dashboard.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.dashboard.modules.system.controller.dict.vo.data.*;
 import cn.iocoder.dashboard.modules.system.convert.dict.SysDictDataConvert;
-import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.dict.SysDictDataDO;
+import cn.iocoder.dashboard.modules.system.dal.dataobject.dict.SysDictDataDO;
 import cn.iocoder.dashboard.modules.system.service.dict.SysDictDataService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -20,7 +20,7 @@ import java.util.List;
 
 import static cn.iocoder.dashboard.common.pojo.CommonResult.success;
 
-@Api(tags = "字典数据 API")
+@Api(tags = "字典数据")
 @RestController
 @RequestMapping("/system/dict-data")
 public class SysDictDataController {
@@ -32,7 +32,7 @@ public class SysDictDataController {
     @GetMapping("/list-all-simple")
     // 无需添加权限认证，因为前端全局都需要
     public CommonResult<List<SysDictDataSimpleVO>> listSimpleDictDatas() {
-        List<SysDictDataDO> list = dictDataService.listDictDatas();
+        List<SysDictDataDO> list = dictDataService.getDictDataList();
         return success(SysDictDataConvert.INSTANCE.convertList(list));
     }
 
@@ -40,7 +40,7 @@ public class SysDictDataController {
     @GetMapping("/page")
 //    @PreAuthorize("@ss.hasPermi('system:dict:list')")
     public CommonResult<PageResult<SysDictDataRespVO>> pageDictTypes(@Validated SysDictDataPageReqVO reqVO) {
-        return success(SysDictDataConvert.INSTANCE.convertPage(dictDataService.pageDictDatas(reqVO)));
+        return success(SysDictDataConvert.INSTANCE.convertPage(dictDataService.getDictDataPage(reqVO)));
     }
 
     @ApiOperation("/查询字典数据详细")
@@ -83,7 +83,7 @@ public class SysDictDataController {
 //    @Log(title = "字典类型", businessType = BusinessType.EXPORT)
 //    @PreAuthorize("@ss.hasPermi('system:dict:export')")
     public void export(HttpServletResponse response, @Validated SysDictDataExportReqVO reqVO) throws IOException {
-        List<SysDictDataDO> list = dictDataService.listDictDatas(reqVO);
+        List<SysDictDataDO> list = dictDataService.getDictDataList(reqVO);
         List<SysDictDataExcelVO> excelDataList = SysDictDataConvert.INSTANCE.convertList02(list);
         // 输出
         ExcelUtils.write(response, "字典数据.xls", "数据列表",

@@ -4,7 +4,7 @@ import cn.iocoder.dashboard.common.pojo.PageResult;
 import cn.iocoder.dashboard.modules.system.controller.notice.vo.SysNoticeCreateReqVO;
 import cn.iocoder.dashboard.modules.system.controller.notice.vo.SysNoticePageReqVO;
 import cn.iocoder.dashboard.modules.system.controller.notice.vo.SysNoticeUpdateReqVO;
-import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.notice.SysNoticeDO;
+import cn.iocoder.dashboard.modules.system.dal.dataobject.notice.SysNoticeDO;
 
 /**
  * 通知公告 Service 接口

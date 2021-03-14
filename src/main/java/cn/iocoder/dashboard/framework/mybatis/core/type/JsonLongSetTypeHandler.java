@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.framework.mybatis.core.type;
 
-import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.user.SysUserDO;
+import cn.iocoder.dashboard.modules.system.dal.dataobject.user.SysUserDO;
 import cn.iocoder.dashboard.util.json.JsonUtils;
 import com.baomidou.mybatisplus.extension.handlers.AbstractJsonTypeHandler;
 import com.fasterxml.jackson.core.type.TypeReference;

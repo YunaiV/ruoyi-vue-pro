@@ -1,11 +1,24 @@
 package cn.iocoder.dashboard.framework.web.core.handler;
 
+import cn.hutool.core.exceptions.ExceptionUtil;
+import cn.hutool.core.map.MapUtil;
+import cn.hutool.extra.servlet.ServletUtil;
 import cn.iocoder.dashboard.common.exception.GlobalException;
 import cn.iocoder.dashboard.common.exception.ServiceException;
 import cn.iocoder.dashboard.common.pojo.CommonResult;
-import cn.iocoder.dashboard.framework.security.core.util.SecurityUtils;
+import cn.iocoder.dashboard.framework.logger.apilog.core.service.ApiErrorLogFrameworkService;
+import cn.iocoder.dashboard.framework.logger.apilog.core.service.dto.ApiErrorLogCreateDTO;
+import cn.iocoder.dashboard.framework.security.core.util.SecurityFrameworkUtils;
+import cn.iocoder.dashboard.framework.tracer.core.util.TracerUtils;
+import cn.iocoder.dashboard.framework.web.core.util.WebFrameworkUtils;
+import cn.iocoder.dashboard.util.json.JsonUtils;
+import cn.iocoder.dashboard.util.servlet.ServletUtils;
+import io.github.resilience4j.ratelimiter.RequestNotPermitted;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.util.Assert;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -16,19 +29,30 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.ValidationException;
+import java.util.Date;
+import java.util.Map;
 
 import static cn.iocoder.dashboard.common.exception.enums.GlobalErrorCodeConstants.*;
 
 /**
  * 全局异常处理器，将 Exception 翻译成 CommonResult + 对应的异常编号
+ *
+ * @author 芋道源码
  */
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
+
+    @Value("${spring.application.name}")
+    private String applicationName;
+
+    @Resource
+    private ApiErrorLogFrameworkService apiErrorLogFrameworkService;
 
     /**
      * 处理所有异常，主要是提供给 Filter 使用
@@ -62,6 +86,9 @@ public class GlobalExceptionHandler {
         }
         if (ex instanceof HttpRequestMethodNotSupportedException) {
             return httpRequestMethodNotSupportedExceptionHandler((HttpRequestMethodNotSupportedException) ex);
+        }
+        if (ex instanceof RequestNotPermitted) {
+            return requestNotPermittedExceptionHandler(request, (RequestNotPermitted) ex);
         }
         if (ex instanceof ServiceException) {
             return serviceExceptionHandler((ServiceException) ex);
@@ -164,13 +191,22 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * 处理 Resilience4j 限流抛出的异常
+     */
+    @ExceptionHandler(value = RequestNotPermitted.class)
+    public CommonResult<?> requestNotPermittedExceptionHandler(HttpServletRequest req, RequestNotPermitted ex) {
+        log.warn("[requestNotPermittedExceptionHandler][url({}) 访问过于频繁]", req.getRequestURL(), ex);
+        return CommonResult.error(TOO_MANY_REQUESTS);
+    }
+
+    /**
      * 处理 Spring Security 权限不足的异常
      *
      * 来源是，使用 @PreAuthorize 注解，AOP 进行权限拦截
      */
     @ExceptionHandler(value = AccessDeniedException.class)
     public CommonResult<?> accessDeniedExceptionHandler(HttpServletRequest req, AccessDeniedException ex) {
-        log.warn("[accessDeniedExceptionHandler][userId({}) 无法访问 url({})]", SecurityUtils.getLoginUserId(),
+        log.warn("[accessDeniedExceptionHandler][userId({}) 无法访问 url({})]", SecurityFrameworkUtils.getLoginUserId(),
                 req.getRequestURL(), ex);
         return CommonResult.error(FORBIDDEN);
     }
@@ -217,57 +253,47 @@ public class GlobalExceptionHandler {
         return CommonResult.error(INTERNAL_SERVER_ERROR.getCode(), INTERNAL_SERVER_ERROR.getMessage());
     }
 
-    // TODO 芋艿：增加异常日志
-    public void createExceptionLog(HttpServletRequest req, Throwable e) {
-//        // 插入异常日志
-//        SystemExceptionLogCreateDTO exceptionLog = new SystemExceptionLogCreateDTO();
-//        try {
-//            // 增加异常计数 metrics TODO 暂时去掉
-////            EXCEPTION_COUNTER.increment();
-//            // 初始化 exceptionLog
-//            initExceptionLog(exceptionLog, req, e);
-//            // 执行插入 exceptionLog
-//            createExceptionLog(exceptionLog);
-//        } catch (Throwable th) {
-//            log.error("[createExceptionLog][插入访问日志({}) 发生异常({})", JSON.toJSONString(exceptionLog), ExceptionUtils.getRootCauseMessage(th));
-//        }
+    private void createExceptionLog(HttpServletRequest req, Throwable e) {
+        // 插入错误日志
+        ApiErrorLogCreateDTO errorLog = new ApiErrorLogCreateDTO();
+        try {
+            // 初始化 errorLog
+            initExceptionLog(errorLog, req, e);
+            // 执行插入 errorLog
+            apiErrorLogFrameworkService.createApiErrorLogAsync(errorLog);
+        } catch (Throwable th) {
+            log.error("[createExceptionLog][url({}) log({}) 发生异常]", req.getRequestURI(),  JsonUtils.toJsonString(errorLog), th);
+        }
     }
 
-//    // TODO 优化点：后续可以增加事件
-//    @Async
-//    public void createExceptionLog(SystemExceptionLogCreateDTO exceptionLog) {
-//        try {
-//            systemExceptionLogRpc.createSystemExceptionLog(exceptionLog);
-//        } catch (Throwable th) {
-//            log.error("[addAccessLog][插入异常日志({}) 发生异常({})", JSON.toJSONString(exceptionLog), ExceptionUtils.getRootCauseMessage(th));
-//        }
-//    }
-//
-//    private void initExceptionLog(SystemExceptionLogCreateDTO exceptionLog, HttpServletRequest request, Throwable e) {
-//        // 设置账号编号
-//        exceptionLog.setUserId(CommonWebUtil.getUserId(request));
-//        exceptionLog.setUserType(CommonWebUtil.getUserType(request));
-//        // 设置异常字段
-//        exceptionLog.setExceptionName(e.getClass().getName());
-//        exceptionLog.setExceptionMessage(ExceptionUtil.getMessage(e));
-//        exceptionLog.setExceptionRootCauseMessage(ExceptionUtil.getRootCauseMessage(e));
-//        exceptionLog.setExceptionStackTrace(ExceptionUtil.getStackTrace(e));
-//        StackTraceElement[] stackTraceElements = e.getStackTrace();
-//        Assert.notEmpty(stackTraceElements, "异常 stackTraceElements 不能为空");
-//        StackTraceElement stackTraceElement = stackTraceElements[0];
-//        exceptionLog.setExceptionClassName(stackTraceElement.getClassName());
-//        exceptionLog.setExceptionFileName(stackTraceElement.getFileName());
-//        exceptionLog.setExceptionMethodName(stackTraceElement.getMethodName());
-//        exceptionLog.setExceptionLineNumber(stackTraceElement.getLineNumber());
-//        // 设置其它字段
-//        exceptionLog.setTraceId(MallUtils.getTraceId())
-//                .setApplicationName(applicationName)
-//                .setUri(request.getRequestURI()) // TODO 提升：如果想要优化，可以使用 Swagger 的 @ApiOperation 注解。
-//                .setQueryString(HttpUtil.buildQueryString(request))
-//                .setMethod(request.getMethod())
-//                .setUserAgent(HttpUtil.getUserAgent(request))
-//                .setIp(HttpUtil.getIp(request))
-//                .setExceptionTime(new Date());
-//    }
+    private void initExceptionLog(ApiErrorLogCreateDTO errorLog, HttpServletRequest request, Throwable e) {
+        // 处理用户信息
+        errorLog.setUserId(WebFrameworkUtils.getLoginUserId(request));
+        errorLog.setUserType(WebFrameworkUtils.getUesrType(request));
+        // 设置异常字段
+        errorLog.setExceptionName(e.getClass().getName());
+        errorLog.setExceptionMessage(ExceptionUtil.getMessage(e));
+        errorLog.setExceptionRootCauseMessage(ExceptionUtil.getRootCauseMessage(e));
+        errorLog.setExceptionStackTrace(ExceptionUtils.getStackTrace(e));
+        StackTraceElement[] stackTraceElements = e.getStackTrace();
+        Assert.notEmpty(stackTraceElements, "异常 stackTraceElements 不能为空");
+        StackTraceElement stackTraceElement = stackTraceElements[0];
+        errorLog.setExceptionClassName(stackTraceElement.getClassName());
+        errorLog.setExceptionFileName(stackTraceElement.getFileName());
+        errorLog.setExceptionMethodName(stackTraceElement.getMethodName());
+        errorLog.setExceptionLineNumber(stackTraceElement.getLineNumber());
+        // 设置其它字段
+        errorLog.setTraceId(TracerUtils.getTraceId());
+        errorLog.setApplicationName(applicationName);
+        errorLog.setRequestUrl(request.getRequestURI());
+        Map<String, Object> requestParams = MapUtil.<String, Object>builder()
+                .put("query", ServletUtil.getParamMap(request))
+                .put("body", ServletUtil.getBody(request)).build();
+        errorLog.setRequestParams(JsonUtils.toJsonString(requestParams));
+        errorLog.setRequestMethod(request.getMethod());
+        errorLog.setUserAgent(ServletUtils.getUserAgent(request));
+        errorLog.setUserIp(ServletUtil.getClientIP(request));
+        errorLog.setExceptionTime(new Date());
+    }
 
 }

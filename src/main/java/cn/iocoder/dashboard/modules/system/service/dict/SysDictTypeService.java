@@ -5,7 +5,7 @@ import cn.iocoder.dashboard.modules.system.controller.dict.vo.type.SysDictTypeCr
 import cn.iocoder.dashboard.modules.system.controller.dict.vo.type.SysDictTypeExportReqVO;
 import cn.iocoder.dashboard.modules.system.controller.dict.vo.type.SysDictTypePageReqVO;
 import cn.iocoder.dashboard.modules.system.controller.dict.vo.type.SysDictTypeUpdateReqVO;
-import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.dict.SysDictTypeDO;
+import cn.iocoder.dashboard.modules.system.dal.dataobject.dict.SysDictTypeDO;
 
 import java.util.List;
 
@@ -22,7 +22,7 @@ public interface SysDictTypeService {
      * @param reqVO 分页请求
      * @return 字典类型分页列表
      */
-    PageResult<SysDictTypeDO> pageDictTypes(SysDictTypePageReqVO reqVO);
+    PageResult<SysDictTypeDO> getDictTypePage(SysDictTypePageReqVO reqVO);
 
     /**
      * 获得字典类型列表
@@ -30,7 +30,7 @@ public interface SysDictTypeService {
      * @param reqVO 列表请求
      * @return 字典类型列表
      */
-    List<SysDictTypeDO> listDictTypes(SysDictTypeExportReqVO reqVO);
+    List<SysDictTypeDO> getDictTypeList(SysDictTypeExportReqVO reqVO);
 
     /**
      * 获得字典类型详情
@@ -75,6 +75,6 @@ public interface SysDictTypeService {
      *
      * @return 字典类型列表
      */
-    List<SysDictTypeDO> listDictTypes();
+    List<SysDictTypeDO> getDictTypeList();
 
 }

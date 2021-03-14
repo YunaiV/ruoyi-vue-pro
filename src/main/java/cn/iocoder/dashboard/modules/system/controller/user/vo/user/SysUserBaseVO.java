@@ -17,7 +17,7 @@ public class SysUserBaseVO {
 
     @ApiModelProperty(value = "用户账号", required = true, example = "yudao")
     @NotBlank(message = "用户账号不能为空")
-    @Size(max = 30, message = "用户账号长度不能超过30个字符")
+    @Size(min = 4, max = 30, message = "用户账号长度为 4-30 个字符")
     private String username;
 
     @ApiModelProperty(value = "用户昵称", required = true, example = "芋艿")

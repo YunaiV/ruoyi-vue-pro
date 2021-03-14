@@ -13,7 +13,7 @@ import javax.annotation.Resource;
 
 import static cn.iocoder.dashboard.common.pojo.CommonResult.success;
 
-@Api(tags = "验证码 API")
+@Api(tags = "验证码")
 @RestController
 @RequestMapping("/system/captcha")
 public class SysCaptchaController {
@@ -21,8 +21,8 @@ public class SysCaptchaController {
     @Resource
     private SysCaptchaService captchaService;
 
-    @ApiOperation("生成图片验证码")
     @GetMapping("/get-image")
+    @ApiOperation("生成图片验证码")
     public CommonResult<SysCaptchaImageRespVO> getCaptchaImage() {
         return success(captchaService.getCaptchaImage());
     }

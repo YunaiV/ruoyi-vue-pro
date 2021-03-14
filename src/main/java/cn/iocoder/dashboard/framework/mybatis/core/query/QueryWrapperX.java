@@ -44,9 +44,37 @@ public class QueryWrapperX<T> extends QueryWrapper<T> {
         return this;
     }
 
+    public QueryWrapperX<T> neIfPresent(String column, Object val) {
+        if (val != null) {
+            return (QueryWrapperX<T>) super.ne(column, val);
+        }
+        return this;
+    }
+
     public QueryWrapperX<T> gtIfPresent(String column, Object val) {
         if (val != null) {
             return (QueryWrapperX<T>) super.gt(column, val);
+        }
+        return this;
+    }
+
+    public QueryWrapperX<T> geIfPresent(String column, Object val) {
+        if (val != null) {
+            return (QueryWrapperX<T>) super.ge(column, val);
+        }
+        return this;
+    }
+
+    public QueryWrapperX<T> ltIfPresent(String column, Object val) {
+        if (val != null) {
+            return (QueryWrapperX<T>) super.lt(column, val);
+        }
+        return this;
+    }
+
+    public QueryWrapperX<T> leIfPresent(String column, Object val) {
+        if (val != null) {
+            return (QueryWrapperX<T>) super.le(column, val);
         }
         return this;
     }
@@ -87,6 +115,12 @@ public class QueryWrapperX<T> extends QueryWrapper<T> {
     @Override
     public QueryWrapperX<T> last(String lastSql) {
         super.last(lastSql);
+        return this;
+    }
+
+    @Override
+    public QueryWrapperX<T> in(String column, Collection<?> coll) {
+        super.in(column, coll);
         return this;
     }
 

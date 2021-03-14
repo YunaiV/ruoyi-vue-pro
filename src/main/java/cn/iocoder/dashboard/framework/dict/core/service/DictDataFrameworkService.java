@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.framework.dict.core.service;
 
-import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.dict.SysDictDataDO;
+import cn.iocoder.dashboard.modules.system.dal.dataobject.dict.SysDictDataDO;
 
 import java.util.List;
 

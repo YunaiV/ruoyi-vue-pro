@@ -1,6 +1,7 @@
 package cn.iocoder.dashboard.util.servlet;
 
 import cn.hutool.core.io.IoUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.servlet.ServletUtil;
 import cn.iocoder.dashboard.util.json.JsonUtils;
 import org.springframework.http.MediaType;
@@ -8,6 +9,7 @@ import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -84,6 +86,10 @@ public class ServletUtils {
             return null;
         }
         return ServletUtil.getClientIP(request);
+    }
+
+    public static boolean isJsonRequest(ServletRequest request) {
+        return StrUtil.startWithIgnoreCase(request.getContentType(), MediaType.APPLICATION_JSON_VALUE);
     }
 
 }

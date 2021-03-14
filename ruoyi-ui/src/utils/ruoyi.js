@@ -69,6 +69,35 @@ export function addDateRange(params, dateRange, propName) {
 	return search;
 }
 
+/**
+ * 添加开始和结束时间到 params 参数中
+ *
+ * @param params 参数
+ * @param dateRange 时间范围。
+ *                大小为 2 的数组，每个时间为 yyyy-MM-dd 格式
+ * @param propName 加入的参数名，可以为空
+ */
+export function addBeginAndEndTime(params, dateRange, propName) {
+  // 必须传入参数
+  if (!dateRange) {
+    return params;
+  }
+  // 如果未传递 propName 属性，默认为 time
+  if (!propName) {
+    propName = 'Time';
+  } else {
+    propName = propName.charAt(0).toUpperCase() + propName.slice(1);
+  }
+  // 设置参数
+  if (dateRange[0]) {
+    params['begin' + propName] = dateRange[0] + ' 00:00:00';
+  }
+  if (dateRange[1]) {
+    params['end' + propName] = dateRange[1] + ' 23:59:59';
+  }
+  return params;
+}
+
 // 回显数据字典
 export function selectDictLabel(datas, value) {
 	var actions = [];
@@ -81,21 +110,6 @@ export function selectDictLabel(datas, value) {
 	return actions.join('');
 }
 
-// 回显数据字典（字符串数组）
-export function selectDictLabels(datas, value, separator) {
-	var actions = [];
-	var currentSeparator = undefined === separator ? "," : separator;
-	var temp = value.split(currentSeparator);
-	Object.keys(value.split(currentSeparator)).some((val) => {
-		Object.keys(datas).some((key) => {
-			if (datas[key].dictValue == ('' + temp[val])) {
-				actions.push(datas[key].dictLabel + currentSeparator);
-			}
-		})
-	})
-	return actions.join('').substring(0, actions.join('').length - 1);
-}
-
 // 通用下载方法
 export function download(fileName) {
 	window.location.href = baseURL + "/common/download?fileName=" + encodeURI(fileName) + "&delete=" + true;
@@ -103,8 +117,32 @@ export function download(fileName) {
 
 // 下载 Excel 方法
 export function downloadExcel(data, fileName) {
+  download0(data, fileName, 'application/vnd.ms-excel');
+}
+
+// 下载 Word 方法
+export function downloadWord(data, fileName) {
+  download0(data, fileName, 'application/msword');
+}
+
+// 下载 Zip 方法
+export function downloadZip(data, fileName) {
+  download0(data, fileName, 'application/zip');
+}
+
+// 下载 Html 方法
+export function downloadHtml(data, fileName) {
+  download0(data, fileName, 'text/html');
+}
+
+// 下载 Markdown 方法
+export function downloadMarkdown(data, fileName) {
+  download0(data, fileName, 'text/markdown');
+}
+
+function download0(data, fileName, mineType) {
   // 创建 blob
-  let blob = new Blob([data], {type: 'application/vnd.ms-excel'});
+  let blob = new Blob([data], {type: mineType});
   // 创建 href 超链接，点击进行下载
   window.URL = window.URL || window.webkitURL;
   let href = URL.createObjectURL(blob);

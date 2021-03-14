@@ -8,7 +8,7 @@ import cn.iocoder.dashboard.modules.system.controller.logger.vo.loginlog.SysLogi
 import cn.iocoder.dashboard.modules.system.controller.logger.vo.loginlog.SysLoginLogPageReqVO;
 import cn.iocoder.dashboard.modules.system.controller.logger.vo.loginlog.SysLoginLogRespVO;
 import cn.iocoder.dashboard.modules.system.convert.logger.SysLoginLogConvert;
-import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.logger.SysLoginLogDO;
+import cn.iocoder.dashboard.modules.system.dal.dataobject.logger.SysLoginLogDO;
 import cn.iocoder.dashboard.modules.system.service.logger.SysLoginLogService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -22,7 +22,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
-@Api(tags = "登陆日志 API")
+@Api(tags = "登陆日志")
 @RestController
 @RequestMapping("/system/login-log")
 public class SysLoginLogController {

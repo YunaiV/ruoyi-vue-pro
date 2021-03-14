@@ -1,0 +1,55 @@
+import request from '@/utils/request'
+#set ($baseURL = "/${table.moduleName}/${simpleClassName_strikeCase}")
+
+// 创建${table.classComment}
+export function create${simpleClassName}(data) {
+  return request({
+    url: '${baseURL}/create',
+    method: 'post',
+    data: data
+  })
+}
+
+// 更新${table.classComment}
+export function update${simpleClassName}(data) {
+  return request({
+    url: '${baseURL}/update',
+    method: 'put',
+    data: data
+  })
+}
+
+// 删除${table.classComment}
+export function delete${simpleClassName}(id) {
+  return request({
+    url: '${baseURL}/delete?id=' + id,
+    method: 'delete'
+  })
+}
+
+// 获得${table.classComment}
+export function get${simpleClassName}(id) {
+  return request({
+    url: '${baseURL}/get?id=' + id,
+    method: 'get'
+  })
+}
+
+// 获得${table.classComment}分页
+export function get${simpleClassName}Page(query) {
+  return request({
+    url: '${baseURL}/page',
+    method: 'get',
+    params: query
+  })
+}
+
+// 导出${table.classComment} Excel
+export function export${simpleClassName}Excel(query) {
+  return request({
+    url: '${baseURL}/export-excel',
+    method: 'get',
+    params: query,
+    responseType: 'blob'
+  })
+}

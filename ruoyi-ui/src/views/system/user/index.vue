@@ -122,10 +122,10 @@
           <el-table-column label="状态" align="center">
             <template slot-scope="scope">
               <el-switch
-                  v-model="scope.row.status"
-                  :active-value="0"
-                  :inactive-value="1"
-                  @change="handleStatusChange(scope.row)"
+                v-model="scope.row.status"
+                :active-value="0"
+                :inactive-value="1"
+                @change="handleStatusChange(scope.row)"
               ></el-switch>
             </template>
           </el-table-column>
@@ -142,34 +142,41 @@
           >
             <template slot-scope="scope">
               <el-button
-                size="mini"
+                size="large"
                 type="text"
                 icon="el-icon-edit"
                 @click="handleUpdate(scope.row)"
-                v-hasPermi="['system:user:edit']"
+                v-hasPermi="['system:role:edit']"
               >修改</el-button>
-              <el-button
-                v-if="scope.row.id !== 1"
-                size="mini"
-                type="text"
-                icon="el-icon-delete"
-                @click="handleDelete(scope.row)"
-                v-hasPermi="['system:user:remove']"
-              >删除</el-button>
-              <el-button
-                size="mini"
-                type="text"
-                icon="el-icon-key"
-                @click="handleResetPwd(scope.row)"
-                v-hasPermi="['system:user:resetPwd']"
-              >重置</el-button>
-              <el-button
-                  size="mini"
-                  type="text"
-                  icon="el-icon-circle-check"
-                  @click="handleRole(scope.row)"
-                  v-hasPermi="['system:permission:assign-user-role']"
-              >分配角色</el-button>
+              <el-dropdown  @command="(command) => handleCommand(command, scope.$index, scope.row)">
+                    <span class="el-dropdown-link">
+                      更多操作<i class="el-icon-arrow-down el-icon--right"></i>
+                    </span>
+                <el-dropdown-menu slot="dropdown">
+                  <el-dropdown-item
+                    command="handleDelete"
+                    v-if="scope.row.id !== 1"
+                    size="mini"
+                    type="text"
+                    icon="el-icon-delete"
+                    v-hasPermi="['system:user:remove']"
+                  >删除</el-dropdown-item>
+                  <el-dropdown-item
+                    command="handleResetPwd"
+                    size="mini"
+                    type="text"
+                    icon="el-icon-key"
+                    v-hasPermi="['system:user:resetPwd']"
+                  >重置</el-dropdown-item>
+                  <el-dropdown-item
+                    command="handleRole"
+                    size="mini"
+                    type="text"
+                    icon="el-icon-circle-check"
+                    v-hasPermi="['system:permission:assign-user-role']"
+                  >分配角色</el-dropdown-item>
+                </el-dropdown-menu>
+              </el-dropdown>
             </template>
           </el-table-column>
         </el-table>
@@ -452,6 +459,25 @@ export default {
     });
   },
   methods: {
+    // 更多操作
+    handleCommand(command, index, row) {
+      switch (command) {
+        case 'handleUpdate':
+          this.handleUpdate(row);//修改客户信息
+          break;
+        case 'handleDelete':
+          this.handleDelete(row);//红号变更
+          break;
+        case 'handleResetPwd':
+          this.handleResetPwd(row);
+          break;
+        case 'handleRole':
+          this.handleRole(row);
+          break;
+        default:
+          break;
+      }
+    },
     /** 查询用户列表 */
     getList() {
       this.loading = true;
@@ -713,3 +739,13 @@ export default {
   }
 };
 </script>
+<style>
+  .el-dropdown-link {
+    cursor: pointer;
+    color: #1890ff;
+    margin-left: 5px;
+  }
+  .el-icon-arrow-down {
+    font-size: 14px;
+  }
+</style>

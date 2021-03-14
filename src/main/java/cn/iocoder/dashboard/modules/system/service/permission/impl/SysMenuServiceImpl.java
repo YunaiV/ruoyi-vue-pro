@@ -7,8 +7,8 @@ import cn.iocoder.dashboard.modules.system.controller.permission.vo.menu.SysMenu
 import cn.iocoder.dashboard.modules.system.controller.permission.vo.menu.SysMenuListReqVO;
 import cn.iocoder.dashboard.modules.system.controller.permission.vo.menu.SysMenuUpdateReqVO;
 import cn.iocoder.dashboard.modules.system.convert.permission.SysMenuConvert;
-import cn.iocoder.dashboard.modules.system.dal.mysql.dao.permission.SysMenuMapper;
-import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.permission.SysMenuDO;
+import cn.iocoder.dashboard.modules.system.dal.mysql.permission.SysMenuMapper;
+import cn.iocoder.dashboard.modules.system.dal.dataobject.permission.SysMenuDO;
 import cn.iocoder.dashboard.modules.system.enums.permission.MenuIdEnum;
 import cn.iocoder.dashboard.modules.system.enums.permission.MenuTypeEnum;
 import cn.iocoder.dashboard.modules.system.redis.mq.producer.permission.SysMenuProducer;
@@ -206,7 +206,7 @@ public class SysMenuServiceImpl implements SysMenuService {
      *
      * @param menuId 菜单编号
      */
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void deleteMenu(Long menuId) {
         // 校验更新的菜单是否存在
         if (menuMapper.selectById(menuId) == null) {

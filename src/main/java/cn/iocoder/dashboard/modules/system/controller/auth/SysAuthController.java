@@ -3,14 +3,14 @@ package cn.iocoder.dashboard.modules.system.controller.auth;
 import cn.iocoder.dashboard.common.enums.CommonStatusEnum;
 import cn.iocoder.dashboard.common.pojo.CommonResult;
 import cn.iocoder.dashboard.framework.logger.operatelog.core.annotations.OperateLog;
-import cn.iocoder.dashboard.modules.system.controller.auth.vo.SysAuthLoginReqVO;
-import cn.iocoder.dashboard.modules.system.controller.auth.vo.SysAuthLoginRespVO;
-import cn.iocoder.dashboard.modules.system.controller.auth.vo.SysAuthMenuRespVO;
-import cn.iocoder.dashboard.modules.system.controller.auth.vo.SysAuthPermissionInfoRespVO;
+import cn.iocoder.dashboard.modules.system.controller.auth.vo.auth.SysAuthLoginReqVO;
+import cn.iocoder.dashboard.modules.system.controller.auth.vo.auth.SysAuthLoginRespVO;
+import cn.iocoder.dashboard.modules.system.controller.auth.vo.auth.SysAuthMenuRespVO;
+import cn.iocoder.dashboard.modules.system.controller.auth.vo.auth.SysAuthPermissionInfoRespVO;
 import cn.iocoder.dashboard.modules.system.convert.auth.SysAuthConvert;
-import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.permission.SysMenuDO;
-import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.permission.SysRoleDO;
-import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.user.SysUserDO;
+import cn.iocoder.dashboard.modules.system.dal.dataobject.permission.SysMenuDO;
+import cn.iocoder.dashboard.modules.system.dal.dataobject.permission.SysRoleDO;
+import cn.iocoder.dashboard.modules.system.dal.dataobject.user.SysUserDO;
 import cn.iocoder.dashboard.modules.system.enums.permission.MenuTypeEnum;
 import cn.iocoder.dashboard.modules.system.service.auth.SysAuthService;
 import cn.iocoder.dashboard.modules.system.service.permission.SysPermissionService;
@@ -26,10 +26,12 @@ import javax.validation.Valid;
 import java.util.List;
 
 import static cn.iocoder.dashboard.common.pojo.CommonResult.success;
-import static cn.iocoder.dashboard.framework.security.core.util.SecurityUtils.getLoginUserId;
-import static cn.iocoder.dashboard.framework.security.core.util.SecurityUtils.getLoginUserRoleIds;
+import static cn.iocoder.dashboard.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
+import static cn.iocoder.dashboard.framework.security.core.util.SecurityFrameworkUtils.getLoginUserRoleIds;
+import static cn.iocoder.dashboard.util.servlet.ServletUtils.getClientIP;
+import static cn.iocoder.dashboard.util.servlet.ServletUtils.getUserAgent;
 
-@Api("认证 API")
+@Api(tags = "认证")
 @RestController
 @RequestMapping("/")
 public class SysAuthController {
@@ -47,7 +49,7 @@ public class SysAuthController {
     @PostMapping("/login")
     @OperateLog(enable = false) // 避免 Post 请求被记录操作日志
     public CommonResult<SysAuthLoginRespVO> login(@RequestBody @Valid SysAuthLoginReqVO reqVO) {
-        String token = authService.login(reqVO.getUsername(), reqVO.getPassword(), reqVO.getUuid(), reqVO.getCode());
+        String token = authService.login(reqVO, getClientIP(), getUserAgent());
         // 返回结果
         return success(SysAuthLoginRespVO.builder().token(token).build());
     }

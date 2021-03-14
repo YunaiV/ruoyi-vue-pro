@@ -160,14 +160,10 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item v-if="form.type != '3'" label="菜单状态">
+            <el-form-item label="菜单状态">
               <el-radio-group v-model="form.status">
-                <el-radio
-                    v-for="dict in statusDictDatas"
-                    :key="parseInt(dict.value)"
-                    :label="dict.label"
-                    :value="parseInt(dict.value)"
-                >{{dict.label}}</el-radio>
+                <el-radio v-for="dict in this.getDictDatas(DICT_TYPE.SYS_COMMON_STATUS)"
+                          :key="dict.value" :label="parseInt(dict.value)">{{dict.label}}</el-radio>
               </el-radio-group>
             </el-form-item>
           </el-col>

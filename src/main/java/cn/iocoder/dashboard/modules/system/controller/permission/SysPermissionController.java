@@ -21,7 +21,7 @@ import static cn.iocoder.dashboard.common.pojo.CommonResult.success;
  *
  * @author 芋道源码
  */
-@Api(tags = "权限 API")
+@Api(tags = "权限")
 @RestController
 @RequestMapping("/system/permission")
 public class SysPermissionController {

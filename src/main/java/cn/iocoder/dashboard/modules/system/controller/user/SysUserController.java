@@ -7,8 +7,8 @@ import cn.iocoder.dashboard.common.pojo.PageResult;
 import cn.iocoder.dashboard.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.dashboard.modules.system.controller.user.vo.user.*;
 import cn.iocoder.dashboard.modules.system.convert.user.SysUserConvert;
-import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.dept.SysDeptDO;
-import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.user.SysUserDO;
+import cn.iocoder.dashboard.modules.system.dal.dataobject.dept.SysDeptDO;
+import cn.iocoder.dashboard.modules.system.dal.dataobject.user.SysUserDO;
 import cn.iocoder.dashboard.modules.system.enums.common.SysSexEnum;
 import cn.iocoder.dashboard.modules.system.service.dept.SysDeptService;
 import cn.iocoder.dashboard.modules.system.service.user.SysUserService;
@@ -30,7 +30,7 @@ import java.util.*;
 
 import static cn.iocoder.dashboard.common.pojo.CommonResult.success;
 
-@Api(tags = "用户 API")
+@Api(tags = "用户")
 @RestController
 @RequestMapping("/system/user")
 public class SysUserController {
@@ -40,8 +40,8 @@ public class SysUserController {
     @Resource
     private SysDeptService deptService;
 
-    @ApiOperation("获得用户分页列表")
     @GetMapping("/page")
+    @ApiOperation("获得用户分页列表")
     @PreAuthorize("@ss.hasPermission('system:user:list')")
     public CommonResult<PageResult<SysUserPageItemRespVO>> pageUsers(@Validated SysUserPageReqVO reqVO) {
         // 获得用户分页列表
@@ -66,9 +66,9 @@ public class SysUserController {
     /**
      * 根据用户编号获取详细信息
      */
+    @GetMapping("/get")
     @ApiOperation("获得用户详情")
     @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
-    @GetMapping("/get")
 //    @PreAuthorize("@ss.hasPermi('system:user:query')")
     public CommonResult<SysUserRespVO> getInfo(@RequestParam("id") Long id) {
         return success(SysUserConvert.INSTANCE.convert(userService.getUser(id)));
@@ -124,7 +124,8 @@ public class SysUserController {
     @GetMapping("/export")
 //    @PreAuthorize("@ss.hasPermi('system:user:export')") , @Validated SysUserExportReqVO reqVO
 //    @Log(title = "用户管理", businessType = BusinessType.EXPORT)
-    public void exportUsers(HttpServletResponse response, @Validated SysUserExportReqVO reqVO) throws IOException {
+    public void exportUsers(@Validated SysUserExportReqVO reqVO,
+                            HttpServletResponse response) throws IOException {
         // 获得用户列表
         List<SysUserDO> users = userService.listUsers(reqVO);
 
@@ -143,8 +144,7 @@ public class SysUserController {
         });
 
         // 输出
-        ExcelUtils.write(response, "用户数据.xls", "用户列表",
-                SysUserExcelVO.class, excelUsers);
+        ExcelUtils.write(response, "用户数据.xls", "用户列表", SysUserExcelVO.class, excelUsers);
     }
 
     @ApiOperation("获得导入用户模板")

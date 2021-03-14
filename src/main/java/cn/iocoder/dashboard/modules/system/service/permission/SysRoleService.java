@@ -5,7 +5,7 @@ import cn.iocoder.dashboard.modules.system.controller.permission.vo.role.SysRole
 import cn.iocoder.dashboard.modules.system.controller.permission.vo.role.SysRoleExportReqVO;
 import cn.iocoder.dashboard.modules.system.controller.permission.vo.role.SysRolePageReqVO;
 import cn.iocoder.dashboard.modules.system.controller.permission.vo.role.SysRoleUpdateReqVO;
-import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.permission.SysRoleDO;
+import cn.iocoder.dashboard.modules.system.dal.dataobject.permission.SysRoleDO;
 import org.springframework.lang.Nullable;
 
 import java.util.Collection;

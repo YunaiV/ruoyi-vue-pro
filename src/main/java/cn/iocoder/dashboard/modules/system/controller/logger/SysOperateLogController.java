@@ -11,8 +11,8 @@ import cn.iocoder.dashboard.modules.system.controller.logger.vo.operatelog.SysOp
 import cn.iocoder.dashboard.modules.system.controller.logger.vo.operatelog.SysOperateLogPageReqVO;
 import cn.iocoder.dashboard.modules.system.controller.logger.vo.operatelog.SysOperateLogRespVO;
 import cn.iocoder.dashboard.modules.system.convert.logger.SysOperateLogConvert;
-import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.logger.SysOperateLogDO;
-import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.user.SysUserDO;
+import cn.iocoder.dashboard.modules.system.dal.dataobject.logger.SysOperateLogDO;
+import cn.iocoder.dashboard.modules.system.dal.dataobject.user.SysUserDO;
 import cn.iocoder.dashboard.modules.system.service.logger.SysOperateLogService;
 import cn.iocoder.dashboard.modules.system.service.user.SysUserService;
 import cn.iocoder.dashboard.util.collection.CollectionUtils;
@@ -35,7 +35,7 @@ import java.util.Map;
 import static cn.iocoder.dashboard.common.pojo.CommonResult.success;
 import static cn.iocoder.dashboard.framework.logger.operatelog.core.enums.OperateTypeEnum.EXPORT;
 
-@Api(tags = "操作日志 API")
+@Api(tags = "操作日志")
 @RestController
 @RequestMapping("/system/operate-log")
 public class SysOperateLogController {

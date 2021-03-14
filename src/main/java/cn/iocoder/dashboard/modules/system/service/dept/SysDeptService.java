@@ -4,7 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.dashboard.modules.system.controller.dept.vo.dept.SysDeptCreateReqVO;
 import cn.iocoder.dashboard.modules.system.controller.dept.vo.dept.SysDeptListReqVO;
 import cn.iocoder.dashboard.modules.system.controller.dept.vo.dept.SysDeptUpdateReqVO;
-import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.dept.SysDeptDO;
+import cn.iocoder.dashboard.modules.system.dal.dataobject.dept.SysDeptDO;
 import cn.iocoder.dashboard.util.collection.CollectionUtils;
 
 import java.util.Collection;

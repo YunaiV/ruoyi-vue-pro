@@ -6,6 +6,8 @@
 import store from '@/store'
 
 export const DICT_TYPE = {
+  USER_TYPE: 'user_type',
+
   SYS_COMMON_STATUS: 'sys_common_status',
   SYS_MENU_TYPE: 'sys_menu_type',
   SYS_ROLE_TYPE: 'sys_role_type',
@@ -15,6 +17,13 @@ export const DICT_TYPE = {
   SYS_OPERATE_TYPE: 'sys_operate_type',
   SYS_LOGIN_RESULT: 'sys_login_result',
   SYS_CONFIG_TYPE: 'sys_config_type',
+
+  INF_REDIS_TIMEOUT_TYPE: 'inf_redis_timeout_type',
+  INF_JOB_STATUS: 'inf_job_status',
+  INF_JOB_LOG_STATUS: 'inf_job_log_status',
+  INF_API_ERROR_LOG_PROCESS_STATUS: 'inf_api_error_log_process_status',
+
+  TOOL_CODEGEN_TEMPLATE_TYPE: 'tool_codegen_template_type',
 }
 
 /**

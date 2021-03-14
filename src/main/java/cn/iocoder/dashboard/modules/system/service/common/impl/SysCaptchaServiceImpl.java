@@ -6,7 +6,7 @@ import cn.hutool.core.util.IdUtil;
 import cn.iocoder.dashboard.framework.captcha.config.CaptchaProperties;
 import cn.iocoder.dashboard.modules.system.controller.common.vo.SysCaptchaImageRespVO;
 import cn.iocoder.dashboard.modules.system.convert.common.SysCaptchaConvert;
-import cn.iocoder.dashboard.modules.system.dal.redis.dao.common.SysCaptchaRedisDAO;
+import cn.iocoder.dashboard.modules.system.dal.redis.common.SysCaptchaRedisDAO;
 import cn.iocoder.dashboard.modules.system.service.common.SysCaptchaService;
 import org.springframework.stereotype.Service;
 

@@ -10,8 +10,12 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum SysLoginLogTypeEnum {
 
-    LOGIN(1),
-    LOGOUT(2);
+    LOGIN_USERNAME(100), // 使用账号登录
+
+    LOGOUT_SELF(200),  // 自己主动登出
+    LOGOUT_TIMEOUT(201), // 超时登出
+    LOGOUT_DELETE(202), // 强制退出
+    ;
 
     /**
      * 日志类型

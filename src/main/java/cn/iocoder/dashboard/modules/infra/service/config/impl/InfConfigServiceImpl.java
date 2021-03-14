@@ -7,13 +7,15 @@ import cn.iocoder.dashboard.modules.infra.controller.config.vo.InfConfigExportRe
 import cn.iocoder.dashboard.modules.infra.controller.config.vo.InfConfigPageReqVO;
 import cn.iocoder.dashboard.modules.infra.controller.config.vo.InfConfigUpdateReqVO;
 import cn.iocoder.dashboard.modules.infra.convert.config.InfConfigConvert;
-import cn.iocoder.dashboard.modules.infra.dal.mysql.dao.config.InfConfigMapper;
-import cn.iocoder.dashboard.modules.infra.dal.mysql.dataobject.config.InfConfigDO;
+import cn.iocoder.dashboard.modules.infra.dal.mysql.config.InfConfigMapper;
+import cn.iocoder.dashboard.modules.infra.dal.dataobject.config.InfConfigDO;
 import cn.iocoder.dashboard.modules.infra.enums.config.InfConfigTypeEnum;
 import cn.iocoder.dashboard.modules.infra.mq.producer.config.InfConfigProducer;
 import cn.iocoder.dashboard.modules.infra.service.config.InfConfigService;
+import com.google.common.annotations.VisibleForTesting;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 
@@ -26,6 +28,7 @@ import static cn.iocoder.dashboard.modules.infra.enums.InfErrorCodeConstants.*;
  */
 @Service
 @Slf4j
+@Validated
 public class InfConfigServiceImpl implements InfConfigService {
 
     @Resource
@@ -33,26 +36,6 @@ public class InfConfigServiceImpl implements InfConfigService {
 
     @Resource
     private InfConfigProducer configProducer;
-
-    @Override
-    public PageResult<InfConfigDO> getConfigPage(InfConfigPageReqVO reqVO) {
-        return configMapper.selectPage(reqVO);
-    }
-
-    @Override
-    public List<InfConfigDO> getConfigList(InfConfigExportReqVO reqVO) {
-        return configMapper.selectList(reqVO);
-    }
-
-    @Override
-    public InfConfigDO getConfig(Long id) {
-        return configMapper.selectById(id);
-    }
-
-    @Override
-    public InfConfigDO getConfigByKey(String key) {
-        return configMapper.selectByKey(key);
-    }
 
     @Override
     public Long createConfig(InfConfigCreateReqVO reqVO) {
@@ -92,6 +75,26 @@ public class InfConfigServiceImpl implements InfConfigService {
         configProducer.sendConfigRefreshMessage();
     }
 
+    @Override
+    public InfConfigDO getConfig(Long id) {
+        return configMapper.selectById(id);
+    }
+
+    @Override
+    public InfConfigDO getConfigByKey(String key) {
+        return configMapper.selectByKey(key);
+    }
+
+    @Override
+    public PageResult<InfConfigDO> getConfigPage(InfConfigPageReqVO reqVO) {
+        return configMapper.selectPage(reqVO);
+    }
+
+    @Override
+    public List<InfConfigDO> getConfigList(InfConfigExportReqVO reqVO) {
+        return configMapper.selectList(reqVO);
+    }
+
     private void checkCreateOrUpdate(Long id, String key) {
         // 校验自己存在
         checkConfigExists(id);
@@ -99,28 +102,30 @@ public class InfConfigServiceImpl implements InfConfigService {
         checkConfigKeyUnique(id, key);
     }
 
-    private InfConfigDO checkConfigExists(Long id) {
+    @VisibleForTesting
+    public InfConfigDO checkConfigExists(Long id) {
         if (id == null) {
             return null;
         }
         InfConfigDO config = configMapper.selectById(id);
         if (config == null) {
-            throw ServiceExceptionUtil.exception(CONFIG_NOT_FOUND);
+            throw ServiceExceptionUtil.exception(CONFIG_NOT_EXISTS);
         }
         return config;
     }
 
-    private void checkConfigKeyUnique(Long id, String key) {
+    @VisibleForTesting
+    public void checkConfigKeyUnique(Long id, String key) {
         InfConfigDO config = configMapper.selectByKey(key);
         if (config == null) {
             return;
         }
         // 如果 id 为空，说明不用比较是否为相同 id 的参数配置
         if (id == null) {
-            throw ServiceExceptionUtil.exception(CONFIG_NAME_DUPLICATE);
+            throw ServiceExceptionUtil.exception(CONFIG_KEY_DUPLICATE);
         }
         if (!config.getId().equals(id)) {
-            throw ServiceExceptionUtil.exception(CONFIG_NAME_DUPLICATE);
+            throw ServiceExceptionUtil.exception(CONFIG_KEY_DUPLICATE);
         }
     }
 

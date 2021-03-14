@@ -6,7 +6,7 @@ import cn.iocoder.dashboard.common.pojo.PageResult;
 import cn.iocoder.dashboard.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.dashboard.modules.system.controller.dept.vo.post.*;
 import cn.iocoder.dashboard.modules.system.convert.dept.SysPostConvert;
-import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.dept.SysPostDO;
+import cn.iocoder.dashboard.modules.system.dal.dataobject.dept.SysPostDO;
 import cn.iocoder.dashboard.modules.system.service.dept.SysPostService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -23,7 +23,7 @@ import java.util.List;
 
 import static cn.iocoder.dashboard.common.pojo.CommonResult.success;
 
-@Api(tags = "岗位 API")
+@Api(tags = "岗位")
 @RestController
 @RequestMapping("/system/post")
 public class SysPostController {

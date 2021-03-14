@@ -1,0 +1,34 @@
+package ${basePackage}.modules.${table.moduleName}.convert.${table.businessName};
+
+import java.util.*;
+
+import ${PageResultClassName};
+
+import org.mapstruct.Mapper;
+import org.mapstruct.factory.Mappers;
+import ${basePackage}.modules.${table.moduleName}.controller.${table.businessName}.vo.*;
+import ${basePackage}.modules.${table.moduleName}.dal.dataobject.${table.businessName}.${table.className}DO;
+
+/**
+ * ${table.classComment} Convert
+ *
+ * @author ${table.author}
+ */
+@Mapper
+public interface ${table.className}Convert {
+
+    ${table.className}Convert INSTANCE = Mappers.getMapper(${table.className}Convert.class);
+
+    ${table.className}DO convert(${table.className}CreateReqVO bean);
+
+    ${table.className}DO convert(${table.className}UpdateReqVO bean);
+
+    ${table.className}RespVO convert(${table.className}DO bean);
+
+    List<${table.className}RespVO> convertList(List<${table.className}DO> list);
+
+    PageResult<${table.className}RespVO> convertPage(PageResult<${table.className}DO> page);
+
+    List<${table.className}ExcelVO> convertList02(List<${table.className}DO> list);
+
+}

@@ -2,10 +2,17 @@ package cn.iocoder.dashboard.modules.system.service.user;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.dashboard.common.pojo.PageResult;
-import cn.iocoder.dashboard.modules.system.controller.user.vo.user.*;
-import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.user.SysUserDO;
+import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserCreateReqVO;
+import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserExportReqVO;
+import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserImportExcelVO;
+import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserImportRespVO;
+import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserPageReqVO;
+import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserProfileUpdateReqVO;
+import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserUpdateReqVO;
+import cn.iocoder.dashboard.modules.system.dal.dataobject.user.SysUserDO;
 import cn.iocoder.dashboard.util.collection.CollectionUtils;
 
+import java.io.InputStream;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -80,6 +87,14 @@ public interface SysUserService {
     List<SysUserDO> listUsersByNickname(String nickname);
 
     /**
+     * 获得用户列表，基于用户账号模糊匹配
+     *
+     * @param username 用户账号
+     * @return 用户列表
+     */
+    List<SysUserDO> listUsersByUsername(String username);
+
+    /**
      * 创建用户
      *
      * @param reqVO 用户信息
@@ -95,6 +110,14 @@ public interface SysUserService {
     void updateUser(SysUserUpdateReqVO reqVO);
 
     /**
+     * 修改用户个人信息
+     *
+     * @param reqVO 用户个人信息
+     * @return 修改结果
+     */
+    void updateUserProfile(SysUserProfileUpdateReqVO reqVO);
+
+    /**
      * 删除用户
      *
      * @param id 用户编号
@@ -104,7 +127,7 @@ public interface SysUserService {
     /**
      * 修改密码
      *
-     * @param id 用户编号
+     * @param id       用户编号
      * @param password 密码
      */
     void updateUserPassword(Long id, String password);
@@ -112,7 +135,7 @@ public interface SysUserService {
     /**
      * 修改密码
      *
-     * @param id 用户编号
+     * @param id     用户编号
      * @param status 状态
      */
     void updateUserStatus(Long id, Integer status);
@@ -120,11 +143,19 @@ public interface SysUserService {
     /**
      * 批量导入用户
      *
-     * @param importUsers 导入用户列表
+     * @param importUsers     导入用户列表
      * @param isUpdateSupport 是否支持更新
      * @return 导入结果
      */
     SysUserImportRespVO importUsers(List<SysUserImportExcelVO> importUsers, boolean isUpdateSupport);
+
+    /**
+     * 更新用户头像
+     *
+     * @param id         用户 id
+     * @param avatarFile 头像文件
+     */
+    void updateAvatar(Long id, InputStream avatarFile);
 
 //
 //    /**

@@ -6,7 +6,7 @@ import cn.iocoder.dashboard.common.pojo.PageResult;
 import cn.iocoder.dashboard.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.dashboard.modules.system.controller.permission.vo.role.*;
 import cn.iocoder.dashboard.modules.system.convert.permission.SysRoleConvert;
-import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.permission.SysRoleDO;
+import cn.iocoder.dashboard.modules.system.dal.dataobject.permission.SysRoleDO;
 import cn.iocoder.dashboard.modules.system.service.permission.SysRoleService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -23,7 +23,7 @@ import java.util.List;
 
 import static cn.iocoder.dashboard.common.pojo.CommonResult.success;
 
-@Api(tags = "角色 API")
+@Api(tags = "角色")
 @RestController
 @RequestMapping("/system/role")
 public class SysRoleController {
