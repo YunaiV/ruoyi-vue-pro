@@ -1,33 +1,24 @@
 package cn.iocoder.dashboard.modules.system.controller.errorcode.dto;
 
 import cn.iocoder.dashboard.common.pojo.PageParam;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.experimental.Accessors;
 
 /**
  * 错误码分页 DTO
  */
+@ApiModel("错误码分页 DTO")
 @Data
 @EqualsAndHashCode(callSuper = true)
-@Accessors(chain = true)
 public class ErrorCodePageDTO extends PageParam {
 
-    /**
-     * 错误码编码
-     */
+    @ApiModelProperty(value = "错误码编码", required = true)
     private Integer code;
-    /**
-     * 错误码错误提示
-     *
-     * 模糊匹配
-     */
+    @ApiModelProperty(value = "错误码错误提示", required = true)
     private String message;
-    /**
-     * 错误码分组
-     *
-     * 模糊匹配
-     */
+    @ApiModelProperty(value = "错误码分组", required = true)
     private String group;
 
 }

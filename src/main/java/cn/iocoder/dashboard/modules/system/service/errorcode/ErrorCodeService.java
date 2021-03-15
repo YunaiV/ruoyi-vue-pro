@@ -3,6 +3,7 @@ package cn.iocoder.dashboard.modules.system.service.errorcode;
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.dashboard.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.dashboard.common.pojo.PageResult;
+import cn.iocoder.dashboard.modules.system.controller.errorcode.dto.ErrorCodePageDTO;
 import cn.iocoder.dashboard.modules.system.convert.errorcode.ErrorCodeConvert;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.errorcode.ErrorCodeDO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.errorcode.ErrorCodeMapper;
