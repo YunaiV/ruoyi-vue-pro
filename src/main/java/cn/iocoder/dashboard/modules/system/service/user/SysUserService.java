@@ -2,7 +2,14 @@ package cn.iocoder.dashboard.modules.system.service.user;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.dashboard.common.pojo.PageResult;
-import cn.iocoder.dashboard.modules.system.controller.user.vo.user.*;
+import cn.iocoder.dashboard.modules.system.controller.user.vo.profile.SysUserProfileUpdatePasswordReqVo;
+import cn.iocoder.dashboard.modules.system.controller.user.vo.profile.SysUserProfileUpdateReqVO;
+import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserCreateReqVO;
+import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserExportReqVO;
+import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserImportExcelVO;
+import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserImportRespVO;
+import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserPageReqVO;
+import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserUpdateReqVO;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.user.SysUserDO;
 import cn.iocoder.dashboard.util.collection.CollectionUtils;
 
@@ -40,6 +47,14 @@ public interface SysUserService {
      * @param reqVO 用户个人信息
      */
     void updateUserProfile(SysUserProfileUpdateReqVO reqVO);
+
+    /**
+     * 修改用户个人密码
+     *
+     * @param reqVO 更新用户个人密码
+     */
+    void updateUserPassword(SysUserProfileUpdatePasswordReqVo reqVO);
+
 
     /**
      * 更新用户头像

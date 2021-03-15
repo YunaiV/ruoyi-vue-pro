@@ -3,8 +3,9 @@ package cn.iocoder.dashboard.modules.system.controller.user;
 import cn.iocoder.dashboard.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.dashboard.common.pojo.CommonResult;
 import cn.iocoder.dashboard.framework.security.core.util.SecurityFrameworkUtils;
-import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserProfileRespVO;
-import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserProfileUpdateReqVO;
+import cn.iocoder.dashboard.modules.system.controller.user.vo.profile.SysUserProfileRespVO;
+import cn.iocoder.dashboard.modules.system.controller.user.vo.profile.SysUserProfileUpdatePasswordReqVo;
+import cn.iocoder.dashboard.modules.system.controller.user.vo.profile.SysUserProfileUpdateReqVO;
 import cn.iocoder.dashboard.modules.system.convert.auth.SysAuthConvert;
 import cn.iocoder.dashboard.modules.system.convert.user.SysUserConvert;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.permission.SysRoleDO;
@@ -16,11 +17,17 @@ import cn.iocoder.dashboard.util.collection.CollectionUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import java.io.IOException;
 import java.util.List;
 
@@ -57,8 +64,16 @@ public class SysUserProfileController {
 
     @PutMapping("/update")
     @ApiOperation("修改用户个人信息")
-    public CommonResult<Boolean> updateUserProfile(@RequestBody SysUserProfileUpdateReqVO reqVO, HttpServletRequest request) {
+    public CommonResult<Boolean> updateUserProfile(@Valid @RequestBody SysUserProfileUpdateReqVO reqVO, HttpServletRequest request) {
         userService.updateUserProfile(reqVO);
+        SecurityFrameworkUtils.setLoginUser(SysAuthConvert.INSTANCE.convert(reqVO), request);
+        return success(true);
+    }
+
+    @PutMapping("/update-password")
+    @ApiOperation("修改用户个人密码")
+    public CommonResult<Boolean> updateUserProfilePassword(@Valid @RequestBody SysUserProfileUpdatePasswordReqVo reqVO, HttpServletRequest request) {
+        userService.updateUserPassword(reqVO);
         SecurityFrameworkUtils.setLoginUser(SysAuthConvert.INSTANCE.convert(reqVO), request);
         return success(true);
     }

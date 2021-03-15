@@ -5,6 +5,7 @@ import lombok.Data;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.util.Set;
 
@@ -39,7 +40,7 @@ public class SysUserBaseVO {
     private String email;
 
     @ApiModelProperty(value = "手机号码", example = "15601691300")
-    @Size(max = 11, message = "手机号码长度不能超过11个字符")
+    @Pattern(regexp = "^1(3|4|5|7|8)\\d{9}$",message = "手机号码格式错误")
     private String mobile;
 
     @ApiModelProperty(value = "用户性别", example = "1", notes = "参见 SysSexEnum 枚举类")
@@ -47,6 +48,5 @@ public class SysUserBaseVO {
 
     @ApiModelProperty(value = "用户头像", example = "http://www.iocoder.cn/xxx.png")
     private String avatar;
-
 
 }
