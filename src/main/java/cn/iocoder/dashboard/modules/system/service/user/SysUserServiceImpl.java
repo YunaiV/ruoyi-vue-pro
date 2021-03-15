@@ -9,12 +9,13 @@ import cn.iocoder.dashboard.common.exception.ServiceException;
 import cn.iocoder.dashboard.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.dashboard.common.pojo.PageResult;
 import cn.iocoder.dashboard.modules.infra.service.file.InfFileService;
+import cn.iocoder.dashboard.modules.system.controller.user.vo.profile.SysUserProfileUpdatePasswordReqVo;
+import cn.iocoder.dashboard.modules.system.controller.user.vo.profile.SysUserProfileUpdateReqVO;
 import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserCreateReqVO;
 import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserExportReqVO;
 import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserImportExcelVO;
 import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserImportRespVO;
 import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserPageReqVO;
-import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserProfileUpdateReqVO;
 import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserUpdateReqVO;
 import cn.iocoder.dashboard.modules.system.convert.user.SysUserConvert;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.dept.SysDeptDO;
@@ -70,7 +71,7 @@ public class SysUserServiceImpl implements SysUserService {
     public Long createUser(SysUserCreateReqVO reqVO) {
         // 校验正确性
         this.checkCreateOrUpdate(null, reqVO.getUsername(), reqVO.getMobile(), reqVO.getEmail(),
-                reqVO.getDeptId(), reqVO.getPostIds());
+            reqVO.getDeptId(), reqVO.getPostIds());
         // 插入用户
         SysUserDO user = SysUserConvert.INSTANCE.convert(reqVO);
         user.setStatus(CommonStatusEnum.ENABLE.getStatus()); // 默认开启
@@ -83,7 +84,7 @@ public class SysUserServiceImpl implements SysUserService {
     public void updateUser(SysUserUpdateReqVO reqVO) {
         // 校验正确性
         this.checkCreateOrUpdate(reqVO.getId(), reqVO.getUsername(), reqVO.getMobile(), reqVO.getEmail(),
-                reqVO.getDeptId(), reqVO.getPostIds());
+            reqVO.getDeptId(), reqVO.getPostIds());
         // 更新用户
         SysUserDO updateObj = SysUserConvert.INSTANCE.convert(reqVO);
         userMapper.updateById(updateObj);
@@ -95,16 +96,17 @@ public class SysUserServiceImpl implements SysUserService {
         this.checkUserExists(reqVO.getId());
         this.checkEmailUnique(reqVO.getId(), reqVO.getEmail());
         this.checkMobileUnique(reqVO.getId(), reqVO.getMobile());
-        // 校验填写密码
-        String encode = null;
-        if (this.checkOldPassword(reqVO.getId(), reqVO.getOldPassword(), reqVO.getNewPassword())) {
-            // 更新密码
-            encode = passwordEncoder.encode(reqVO.getNewPassword());
-        }
-        SysUserDO updateObj = SysUserConvert.INSTANCE.convert(reqVO);
-        if (StrUtil.isNotBlank(encode)) {
-            updateObj.setPassword(encode);
-        }
+        userMapper.updateById(SysUserConvert.INSTANCE.convert(reqVO));
+    }
+
+    @Override
+    public void updateUserPassword(SysUserProfileUpdatePasswordReqVo reqVO) {
+        // 校验旧密码密码
+        this.checkOldPassword(reqVO.getId(), reqVO.getOldPassword());
+        SysUserDO updateObj = new SysUserDO();
+        updateObj.setId(reqVO.getId());
+        // 加密密码
+        updateObj.setPassword(passwordEncoder.encode(reqVO.getNewPassword()));
         userMapper.updateById(updateObj);
     }
 
@@ -314,26 +316,19 @@ public class SysUserServiceImpl implements SysUserService {
     }
 
     /**
-     * 校验旧密码、新密码
+     * 校验旧密码
      *
      * @param id          用户 id
      * @param oldPassword 旧密码
-     * @param newPassword 新密码
-     * @return 校验结果
      */
-    private boolean checkOldPassword(Long id, String oldPassword, String newPassword) {
-        if (id == null || StrUtil.isBlank(oldPassword) || StrUtil.isBlank(newPassword)) {
-            return false;
-        }
+    private void checkOldPassword(Long id, String oldPassword) {
         SysUserDO user = userMapper.selectById(id);
         if (user == null) {
             throw ServiceExceptionUtil.exception(USER_NOT_EXISTS);
         }
-
         if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
             throw ServiceExceptionUtil.exception(USER_PASSWORD_FAILED);
         }
-        return true;
     }
 
     @Override

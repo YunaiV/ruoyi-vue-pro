@@ -1,11 +1,12 @@
 package cn.iocoder.dashboard.modules.system.convert.user;
 
+import cn.iocoder.dashboard.modules.system.controller.user.vo.profile.SysUserProfileRespVO;
+import cn.iocoder.dashboard.modules.system.controller.user.vo.profile.SysUserProfileUpdatePasswordReqVo;
+import cn.iocoder.dashboard.modules.system.controller.user.vo.profile.SysUserProfileUpdateReqVO;
 import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserCreateReqVO;
 import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserExcelVO;
 import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserImportExcelVO;
 import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserPageItemRespVO;
-import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserProfileRespVO;
-import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserProfileUpdateReqVO;
 import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserUpdateReqVO;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.dept.SysDeptDO;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.permission.SysRoleDO;
@@ -36,6 +37,7 @@ public interface SysUserConvert {
 
     SysUserDO convert(SysUserProfileUpdateReqVO bean);
 
+    SysUserDO convert(SysUserProfileUpdatePasswordReqVo bean);
 
 
 }
