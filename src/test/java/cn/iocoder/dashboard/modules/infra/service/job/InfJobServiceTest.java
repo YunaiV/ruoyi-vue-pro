@@ -14,6 +14,9 @@ import static cn.iocoder.dashboard.util.RandomUtils.randomString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -84,6 +87,9 @@ public class InfJobServiceTest extends BaseDbUnitTest {
         InfJobDO job = jobMapper.selectById(jobId);
         assertPojoEquals(reqVO, job);
         assertEquals(InfJobStatusEnum.NORMAL.getStatus(), job.getStatus());
+        // 校验调用
+        verify(schedulerManager, times(1)).addJob(eq(job.getId()), eq(job.getHandlerName()), eq(job.getHandlerParam()), eq(job.getCronExpression()),
+                eq(reqVO.getRetryCount()), eq(reqVO.getRetryInterval()));
     }
 
     @Test
@@ -120,8 +126,6 @@ public class InfJobServiceTest extends BaseDbUnitTest {
         job.setStatus(InfJobStatusEnum.NORMAL.getStatus());
         fillJobMonitorTimeoutEmpty(job);
         jobMapper.insert(job);
-        schedulerManager.addJob(job.getId(), job.getHandlerName(), job.getHandlerParam(), job.getCronExpression(),
-                createReqVO.getRetryCount(), createReqVO.getRetryInterval());
         // 准备参数
         InfJobUpdateReqVO updateReqVO = randomPojo(InfJobUpdateReqVO.class, o -> {
             o.setId(job.getId());
@@ -133,6 +137,9 @@ public class InfJobServiceTest extends BaseDbUnitTest {
         // 校验记录的属性是否正确
         InfJobDO updateJob = jobMapper.selectById(updateReqVO.getId());
         assertPojoEquals(updateReqVO, updateJob);
+        // 校验调用
+        verify(schedulerManager, times(1)).updateJob(eq(job.getHandlerName()), eq(updateReqVO.getHandlerParam()), eq(updateReqVO.getCronExpression()),
+                eq(updateReqVO.getRetryCount()), eq(updateReqVO.getRetryInterval()));
     }
 
     @Test
@@ -154,36 +161,51 @@ public class InfJobServiceTest extends BaseDbUnitTest {
     }
 
     @Test
-    public void testUpdateJobStatus_success() throws SchedulerException {
+    public void testUpdateJobStatus_NormalToStop_success() throws SchedulerException {
         // mock 数据
         InfJobCreateReqVO createReqVO = randomPojo(InfJobCreateReqVO.class, o -> o.setCronExpression("0 0/1 * * * ? *"));
         InfJobDO job = InfJobConvert.INSTANCE.convert(createReqVO);
         job.setStatus(InfJobStatusEnum.NORMAL.getStatus());
         fillJobMonitorTimeoutEmpty(job);
         jobMapper.insert(job);
-        schedulerManager.addJob(job.getId(), job.getHandlerName(), job.getHandlerParam(), job.getCronExpression(),
-                createReqVO.getRetryCount(), createReqVO.getRetryInterval());
         // 调用
         jobService.updateJobStatus(job.getId(), InfJobStatusEnum.STOP.getStatus());
         // 校验记录的属性是否正确
         InfJobDO updateJob = jobMapper.selectById(job.getId());
         assertEquals(InfJobStatusEnum.STOP.getStatus(), updateJob.getStatus());
+        // 校验调用
+        verify(schedulerManager, times(1)).pauseJob(eq(job.getHandlerName()));
     }
 
-    /**
-     *  页面"执行一次"按钮功能集成测试发现问题：
-     *  inf_job 表初始化任务 sysUserSessionTimeoutJob 点击报错，是因为 Job 并没有添加到 Quartz 中；
-     *  没有走 createJob 中 scheduler.scheduleJob() 这一步，报错任务找不到。
-     *  // FINISHED Quartz 相关表新增初始化任务 sysUserSessionTimeoutJob sql
-     */
+    @Test
+    public void testUpdateJobStatus_StopToNormal_success() throws SchedulerException {
+        // mock 数据
+        InfJobCreateReqVO createReqVO = randomPojo(InfJobCreateReqVO.class, o -> o.setCronExpression("0 0/1 * * * ? *"));
+        InfJobDO job = InfJobConvert.INSTANCE.convert(createReqVO);
+        job.setStatus(InfJobStatusEnum.STOP.getStatus());
+        fillJobMonitorTimeoutEmpty(job);
+        jobMapper.insert(job);
+        // 调用
+        jobService.updateJobStatus(job.getId(), InfJobStatusEnum.NORMAL.getStatus());
+        // 校验记录的属性是否正确
+        InfJobDO updateJob = jobMapper.selectById(job.getId());
+        assertEquals(InfJobStatusEnum.NORMAL.getStatus(), updateJob.getStatus());
+        // 校验调用
+        verify(schedulerManager, times(1)).resumeJob(eq(job.getHandlerName()));
+    }
+
     @Test
     public void testTriggerJob_success() throws SchedulerException {
-        /**
-         * TODO 不知道是否要将 Quartz 相关 SQL 引入来做单元测试
-         * 1、schedulerManager.addJob sysUserSessionTimeoutJob
-         * 2、schedulerManager.triggerJob
-         * 3、check inf_job_log
-         */
+        // mock 数据
+        InfJobCreateReqVO createReqVO = randomPojo(InfJobCreateReqVO.class, o -> o.setCronExpression("0 0/1 * * * ? *"));
+        InfJobDO job = InfJobConvert.INSTANCE.convert(createReqVO);
+        job.setStatus(InfJobStatusEnum.NORMAL.getStatus());
+        fillJobMonitorTimeoutEmpty(job);
+        jobMapper.insert(job);
+        // 调用
+        jobService.triggerJob(job.getId());
+        // 校验调用
+        verify(schedulerManager, times(1)).triggerJob(eq(job.getId()), eq(job.getHandlerName()), eq(job.getHandlerParam()));
     }
 
     @Test
@@ -194,12 +216,12 @@ public class InfJobServiceTest extends BaseDbUnitTest {
         job.setStatus(InfJobStatusEnum.NORMAL.getStatus());
         fillJobMonitorTimeoutEmpty(job);
         jobMapper.insert(job);
-        schedulerManager.addJob(job.getId(), job.getHandlerName(), job.getHandlerParam(), job.getCronExpression(),
-                createReqVO.getRetryCount(), createReqVO.getRetryInterval());
         // 调用 UPDATE inf_job SET deleted=1 WHERE id=? AND deleted=0
         jobService.deleteJob(job.getId());
         // 校验数据不存在了  WHERE id=? AND deleted=0 查询为空正常
         assertNull(jobMapper.selectById(job.getId()));
+        // 校验调用
+        verify(schedulerManager, times(1)).deleteJob(eq(job.getHandlerName()));
     }
 
     @Test
