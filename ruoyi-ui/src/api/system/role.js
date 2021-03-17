@@ -38,7 +38,7 @@ export function addRole(data) {
 export function updateRole(data) {
   return request({
     url: '/system/role/update',
-    method: 'post',
+    method: 'put',
     data: data
   })
 }
@@ -51,7 +51,7 @@ export function changeRoleStatus(id, status) {
   }
   return request({
     url: '/system/role/update-status',
-    method: 'post',
+    method: 'put',
     data: data
   })
 }
@@ -60,7 +60,7 @@ export function changeRoleStatus(id, status) {
 export function delRole(roleId) {
   return request({
     url: '/system/role/delete?id=' + roleId,
-    method: 'post'
+    method: 'delete'
   })
 }
 

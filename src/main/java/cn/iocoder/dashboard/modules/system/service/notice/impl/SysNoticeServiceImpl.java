@@ -28,16 +28,6 @@ public class SysNoticeServiceImpl implements SysNoticeService {
     private SysNoticeMapper noticeMapper;
 
     @Override
-    public PageResult<SysNoticeDO> pageNotices(SysNoticePageReqVO reqVO) {
-        return noticeMapper.selectPage(reqVO);
-    }
-
-    @Override
-    public SysNoticeDO getNotice(Long id) {
-        return noticeMapper.selectById(id);
-    }
-
-    @Override
     public Long createNotice(SysNoticeCreateReqVO reqVO) {
         SysNoticeDO notice = SysNoticeConvert.INSTANCE.convert(reqVO);
         noticeMapper.insert(notice);
@@ -59,6 +49,16 @@ public class SysNoticeServiceImpl implements SysNoticeService {
         this.checkNoticeExists(id);
         // 删除通知公告
         noticeMapper.deleteById(id);
+    }
+
+    @Override
+    public PageResult<SysNoticeDO> pageNotices(SysNoticePageReqVO reqVO) {
+        return noticeMapper.selectPage(reqVO);
+    }
+
+    @Override
+    public SysNoticeDO getNotice(Long id) {
+        return noticeMapper.selectById(id);
     }
 
     @VisibleForTesting

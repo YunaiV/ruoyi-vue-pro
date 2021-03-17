@@ -128,46 +128,6 @@ public class SysMenuServiceImpl implements SysMenuService {
     }
 
     @Override
-    public List<SysMenuDO> listMenus() {
-        return menuMapper.selectList();
-    }
-
-    @Override
-    public List<SysMenuDO> listMenus(SysMenuListReqVO reqVO) {
-        return menuMapper.selectList(reqVO);
-    }
-
-    @Override
-    public List<SysMenuDO> listMenusFromCache(Collection<Integer> menuTypes, Collection<Integer> menusStatuses) {
-        // 任一一个参数为空，则返回空
-        if (CollectionUtils.isAnyEmpty(menuTypes, menusStatuses)) {
-            return Collections.emptyList();
-        }
-        // 创建新数组，避免缓存被修改
-        return menuCache.values().stream().filter(menu -> menuTypes.contains(menu.getType())
-                && menusStatuses.contains(menu.getStatus()))
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public List<SysMenuDO> listMenusFromCache(Collection<Long> menuIds, Collection<Integer> menuTypes,
-                                              Collection<Integer> menusStatuses) {
-        // 任一一个参数为空，则返回空
-        if (CollectionUtils.isAnyEmpty(menuIds, menuTypes, menusStatuses)) {
-            return Collections.emptyList();
-        }
-        return menuCache.values().stream().filter(menu -> menuIds.contains(menu.getId())
-                && menuTypes.contains(menu.getType())
-                && menusStatuses.contains(menu.getStatus()))
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public List<SysMenuDO> getMenuListByPermissionFromCache(String permission) {
-        return new ArrayList<>(permissionMenuCache.get(permission));
-    }
-
-    @Override
     public Long createMenu(SysMenuCreateReqVO reqVO) {
         // 校验父菜单存在
         checkParentResource(reqVO.getParentId(), null);
@@ -206,7 +166,7 @@ public class SysMenuServiceImpl implements SysMenuService {
      *
      * @param menuId 菜单编号
      */
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void deleteMenu(Long menuId) {
         // 校验更新的菜单是否存在
         if (menuMapper.selectById(menuId) == null) {
@@ -233,6 +193,46 @@ public class SysMenuServiceImpl implements SysMenuService {
             }
 
         });
+    }
+
+    @Override
+    public List<SysMenuDO> getMenus() {
+        return menuMapper.selectList();
+    }
+
+    @Override
+    public List<SysMenuDO> getMenus(SysMenuListReqVO reqVO) {
+        return menuMapper.selectList(reqVO);
+    }
+
+    @Override
+    public List<SysMenuDO> listMenusFromCache(Collection<Integer> menuTypes, Collection<Integer> menusStatuses) {
+        // 任一一个参数为空，则返回空
+        if (CollectionUtils.isAnyEmpty(menuTypes, menusStatuses)) {
+            return Collections.emptyList();
+        }
+        // 创建新数组，避免缓存被修改
+        return menuCache.values().stream().filter(menu -> menuTypes.contains(menu.getType())
+                && menusStatuses.contains(menu.getStatus()))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<SysMenuDO> listMenusFromCache(Collection<Long> menuIds, Collection<Integer> menuTypes,
+                                              Collection<Integer> menusStatuses) {
+        // 任一一个参数为空，则返回空
+        if (CollectionUtils.isAnyEmpty(menuIds, menuTypes, menusStatuses)) {
+            return Collections.emptyList();
+        }
+        return menuCache.values().stream().filter(menu -> menuIds.contains(menu.getId())
+                && menuTypes.contains(menu.getType())
+                && menusStatuses.contains(menu.getStatus()))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<SysMenuDO> getMenuListByPermissionFromCache(String permission) {
+        return new ArrayList<>(permissionMenuCache.get(permission));
     }
 
     @Override

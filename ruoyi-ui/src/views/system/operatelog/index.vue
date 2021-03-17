@@ -2,72 +2,28 @@
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
       <el-form-item label="系统模块" prop="title">
-        <el-input
-          v-model="queryParams.title"
-          placeholder="请输入系统模块"
-          clearable
-          style="width: 240px;"
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
+        <el-input v-model="queryParams.title" placeholder="请输入系统模块" clearable style="width: 240px;" size="small"
+                  @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item label="操作人员" prop="operName">
-        <el-input
-          v-model="queryParams.operName"
-          placeholder="请输入操作人员"
-          clearable
-          style="width: 240px;"
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
+        <el-input v-model="queryParams.operName" placeholder="请输入操作人员" clearable style="width: 240px;" size="small"
+                  @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item label="类型" prop="type">
-        <el-select
-          v-model="queryParams.type"
-          placeholder="操作类型"
-          clearable
-          size="small"
-          style="width: 240px"
-        >
-          <el-option
-            v-for="dict in this.getDictDatas(DICT_TYPE.SYS_OPERATE_TYPE)"
-            :key="parseInt(dict.value)"
-            :label="dict.label"
-            :value="parseInt(dict.value)"
-          />
+        <el-select v-model="queryParams.type" placeholder="操作类型" clearable size="small" style="width: 240px">
+          <el-option v-for="dict in this.getDictDatas(DICT_TYPE.SYS_OPERATE_TYPE)" :key="parseInt(dict.value)"
+                     :label="dict.label" :value="parseInt(dict.value)"/>
         </el-select>
       </el-form-item>
       <el-form-item label="状态" prop="status">
-        <el-select
-          v-model="queryParams.success"
-          placeholder="操作状态"
-          clearable
-          size="small"
-          style="width: 240px"
-        >
-          <el-option
-              :key="true"
-              label="成功"
-              :value="true"
-          />
-          <el-option
-              :key="false"
-              label="失败"
-              :value="false"
-          />
+        <el-select v-model="queryParams.success" placeholder="操作状态" clearable size="small" style="width: 240px">
+          <el-option :key="true" label="成功" :value="true"/>
+          <el-option :key="false" label="失败" :value="false"/>
         </el-select>
       </el-form-item>
       <el-form-item label="操作时间">
-        <el-date-picker
-          v-model="dateRange"
-          size="small"
-          style="width: 240px"
-          value-format="yyyy-MM-dd"
-          type="daterange"
-          range-separator="-"
-          start-placeholder="开始日期"
-          end-placeholder="结束日期"
-        ></el-date-picker>
+        <el-date-picker v-model="dateRange" size="small" style="width: 240px" value-format="yyyy-MM-dd"
+          type="daterange" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期"></el-date-picker>
       </el-form-item>
       <el-form-item>
         <el-button type="cyan" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
@@ -77,13 +33,8 @@
 
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
-        <el-button
-          type="warning"
-          icon="el-icon-download"
-          size="mini"
-          @click="handleExport"
-          v-hasPermi="['system:config:export']"
-        >导出</el-button>
+        <el-button type="warning" icon="el-icon-download" size="mini" @click="handleExport"
+                   v-hasPermi="['system:operate-log:export']">导出</el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>

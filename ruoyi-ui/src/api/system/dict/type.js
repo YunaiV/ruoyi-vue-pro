@@ -30,7 +30,7 @@ export function addType(data) {
 export function updateType(data) {
   return request({
     url: '/system/dict-type/update',
-    method: 'post',
+    method: 'put',
     data: data
   })
 }
@@ -39,7 +39,7 @@ export function updateType(data) {
 export function delType(dictId) {
   return request({
     url: '/system/dict-type/delete?id=' + dictId,
-    method: 'post'
+    method: 'delete'
   })
 }
 

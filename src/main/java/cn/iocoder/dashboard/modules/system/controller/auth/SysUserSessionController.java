@@ -39,9 +39,9 @@ public class SysUserSessionController {
     @Resource
     private SysDeptService deptService;
 
+    @GetMapping("/page")
     @ApiOperation("获得 Session 分页列表")
     @PreAuthorize("@ss.hasPermission('system:user-session:page')")
-    @GetMapping("/page")
     public CommonResult<PageResult<SysUserSessionPageItemRespVO>> getUserSessionPage(@Validated SysUserSessionPageReqVO reqVO) {
         // 获得 Session 分页
         PageResult<SysUserSessionDO> pageResult = userSessionService.getUserSessionPage(reqVO);
@@ -66,12 +66,12 @@ public class SysUserSessionController {
         return success(new PageResult<>(sessionList, pageResult.getTotal()));
     }
 
-    @ApiOperation("删除 Session")
-    @PreAuthorize("@ss.hasPermission('system:user-session:delete')")
     @DeleteMapping("/delete")
+    @ApiOperation("删除 Session")
     @ApiImplicitParam(name = "id", value = "Session 编号", required = true, dataTypeClass = String.class,
             example = "fe50b9f6-d177-44b1-8da9-72ea34f63db7")
-    public CommonResult<Boolean> delete(@RequestParam("id") String id) {
+    @PreAuthorize("@ss.hasPermission('system:user-session:delete')")
+    public CommonResult<Boolean> deleteUserSession(@RequestParam("id") String id) {
         userSessionService.deleteUserSession(id);
         return success(true);
     }

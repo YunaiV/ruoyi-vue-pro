@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.modules.tool.dal.mysql.codegen;
 
-import cn.iocoder.dashboard.BaseSpringBootUnitTest;
+import cn.iocoder.dashboard.BaseDbUnitTest;
 import cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen.ToolSchemaTableDO;
 import org.junit.jupiter.api.Test;
 
@@ -9,7 +9,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class ToolInformationSchemaTableMapperTest extends BaseSpringBootUnitTest {
+class ToolInformationSchemaTableMapperTest extends BaseDbUnitTest {
 
     @Resource
     private ToolSchemaTableMapper toolInformationSchemaTableMapper;

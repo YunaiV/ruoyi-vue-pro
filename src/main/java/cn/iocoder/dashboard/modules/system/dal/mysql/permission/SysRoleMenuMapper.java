@@ -33,6 +33,14 @@ public interface SysRoleMenuMapper extends BaseMapperX<SysRoleMenuDO> {
         delete(new QueryWrapper<SysRoleMenuDO>().eq("role_id", roleId)
                 .in("menu_id", menuIds));
     }
+    
+    default void deleteListByMenuId(Long menuId) {
+        delete(new QueryWrapper<SysRoleMenuDO>().eq("menu_id", menuId));
+    }
+
+    default void deleteListByRoleId(Long roleId) {
+        delete(new QueryWrapper<SysRoleMenuDO>().eq("role_id", roleId));
+    }
 
     @Select("SELECT id FROM sys_role_menu WHERE update_time > #{maxUpdateTime} LIMIT 1")
     Long selectExistsByUpdateTimeAfter(Date maxUpdateTime);

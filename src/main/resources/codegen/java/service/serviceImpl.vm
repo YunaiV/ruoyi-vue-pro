@@ -16,6 +16,7 @@ import ${basePackage}.modules.${table.moduleName}.service.${table.businessName}.
 
 import ${ServiceExceptionUtilClassName};
 
+import static cn.iocoder.dashboard.common.exception.util.ServiceExceptionUtil.exception;
 import static ${basePackage}.modules.${table.moduleName}.enums.${simpleModuleName_upperFirst}ErrorCodeConstants.*;
 
 /**
@@ -58,7 +59,7 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
 
     private void validate${simpleClassName}Exists(${primaryColumn.javaType} id) {
         if (${classNameVar}Mapper.selectById(id) == null) {
-            throw ServiceExceptionUtil.exception(${simpleClassName_underlineCase.toUpperCase()}_NOT_EXISTS);
+            throw exception(${simpleClassName_underlineCase.toUpperCase()}_NOT_EXISTS);
         }
     }
 

@@ -32,8 +32,8 @@ public interface SysPermissionService extends SecurityPermissionFrameworkService
      * @param menusStatuses 菜单状态数组
      * @return 菜单列表
      */
-    List<SysMenuDO> listRoleMenusFromCache(Collection<Long> roleIds, Collection<Integer> menuTypes,
-                                           Collection<Integer> menusStatuses);
+    List<SysMenuDO> getRoleMenusFromCache(Collection<Long> roleIds, Collection<Integer> menuTypes,
+                                          Collection<Integer> menusStatuses);
 
     /**
      * 获得用户拥有的角色编号集合

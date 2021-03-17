@@ -269,7 +269,7 @@ public class GlobalExceptionHandler {
     private void initExceptionLog(ApiErrorLogCreateDTO errorLog, HttpServletRequest request, Throwable e) {
         // 处理用户信息
         errorLog.setUserId(WebFrameworkUtils.getLoginUserId(request));
-        errorLog.setUserType(WebFrameworkUtils.getUesrType(request));
+        errorLog.setUserType(WebFrameworkUtils.getUserType(request));
         // 设置异常字段
         errorLog.setExceptionName(e.getClass().getName());
         errorLog.setExceptionMessage(ExceptionUtil.getMessage(e));

@@ -109,7 +109,7 @@ public class ToolCodegenServiceImpl implements ToolCodegenService {
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public List<Long> createCodegenListFromDB(List<String> tableNames) {
         List<Long> ids = new ArrayList<>(tableNames.size());
         // 遍历添加。虽然效率会低一点，但是没必要做成完全批量，因为不会这么大量
@@ -118,7 +118,7 @@ public class ToolCodegenServiceImpl implements ToolCodegenService {
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void updateCodegen(ToolCodegenUpdateReqVO updateReqVO) {
         // 校验是否已经存在
         if (codegenTableMapper.selectById(updateReqVO.getTable().getId()) == null) {
@@ -134,7 +134,7 @@ public class ToolCodegenServiceImpl implements ToolCodegenService {
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void syncCodegenFromDB(Long tableId) {
         // 校验是否已经存在
         ToolCodegenTableDO table = codegenTableMapper.selectById(tableId);
@@ -149,7 +149,7 @@ public class ToolCodegenServiceImpl implements ToolCodegenService {
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void syncCodegenFromSQL(Long tableId, String sql) {
         // 校验是否已经存在
         ToolCodegenTableDO table = codegenTableMapper.selectById(tableId);
@@ -201,7 +201,7 @@ public class ToolCodegenServiceImpl implements ToolCodegenService {
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void deleteCodegen(Long tableId) {
         // 校验是否已经存在
         if (codegenTableMapper.selectById(tableId) == null) {

@@ -68,7 +68,7 @@
 #if ($column.javaType == "Date")## 时间类型
       <el-table-column label="${comment}" align="center" prop="${javaField}" width="180">
         <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.${javaField}, '{y}-{m}-{d}') }}</span>
+          <span>{{ parseTime(scope.row.${javaField}) }}</span>
         </template>
       </el-table-column>
 #elseif("" != $column.dictType)## 数据字典

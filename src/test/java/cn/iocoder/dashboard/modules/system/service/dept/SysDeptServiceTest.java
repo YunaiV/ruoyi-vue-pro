@@ -92,7 +92,7 @@ class SysDeptServiceTest extends BaseDbUnitTest {
         reqVO.setName("开");
         reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
         // 调用
-        List<SysDeptDO> sysDeptDOS = deptService.listDepts(reqVO);
+        List<SysDeptDO> sysDeptDOS = deptService.getSimpleDepts(reqVO);
         // 断言
         assertEquals(1, sysDeptDOS.size());
         assertPojoEquals(dept, sysDeptDOS.get(0));
