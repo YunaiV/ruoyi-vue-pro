@@ -86,6 +86,7 @@ public class SysPermissionServiceImpl implements SysPermissionService {
     @Override
     @PostConstruct
     public void initLocalCache() {
+        Date now = new Date();
         // 获取角色与菜单的关联列表，如果有更新
         List<SysRoleMenuDO> roleMenuList = this.loadRoleMenuIfUpdate(maxUpdateTime);
         if (CollUtil.isEmpty(roleMenuList)) {
@@ -102,7 +103,7 @@ public class SysPermissionServiceImpl implements SysPermissionService {
         roleMenuCache = roleMenuCacheBuilder.build();
         menuRoleCache = menuRoleCacheBuilder.build();
         assert roleMenuList.size() > 0; // 断言，避免告警
-        maxUpdateTime = roleMenuList.stream().max(Comparator.comparing(BaseDO::getUpdateTime)).get().getUpdateTime();
+        maxUpdateTime = now;
         log.info("[initLocalCache][初始化角色与菜单的关联数量为 {}]", roleMenuList.size());
     }
 
@@ -123,7 +124,7 @@ public class SysPermissionServiceImpl implements SysPermissionService {
         if (maxUpdateTime == null) { // 如果更新时间为空，说明 DB 一定有新数据
             log.info("[loadRoleMenuIfUpdate][首次加载全量角色与菜单的关联]");
         } else { // 判断数据库中是否有更新的角色与菜单的关联
-            if (roleMenuMapper.selectExistsByUpdateTimeAfter(maxUpdateTime).size() == 0) {
+            if (Objects.isNull(roleMenuMapper.selectExistsByUpdateTimeAfter(maxUpdateTime))) {
                 return null;
             }
             log.info("[loadRoleMenuIfUpdate][增量加载全量角色与菜单的关联]");

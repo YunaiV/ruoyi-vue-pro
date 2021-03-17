@@ -4,6 +4,7 @@ import cn.iocoder.dashboard.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.permission.SysRoleMenuDO;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Select;
 
 import java.util.Collection;
 import java.util.Date;
@@ -33,7 +34,7 @@ public interface SysRoleMenuMapper extends BaseMapperX<SysRoleMenuDO> {
                 .in("menu_id", menuIds));
     }
 
-    @Select("select id from sys_role_menu where update_time > #{maxUpdateTime} limit 1")
-    List<Long> selectExistsByUpdateTimeAfter(Date maxUpdateTime); 
+    @Select("SELECT id FROM sys_role_menu WHERE update_time > #{maxUpdateTime} LIMIT 1")
+    Long selectExistsByUpdateTimeAfter(Date maxUpdateTime);
 
 }
