@@ -13,7 +13,13 @@ import java.lang.annotation.*;
  */
 public @interface BizTracing {
 
+    /**
+     * 交易流水tag名
+     */
     String BIZ_ID_TAG = "bizId";
+    /**
+     * 交易类型tag名
+     */
     String BIZ_TYPE_TAG = "bizType";
 
     String bizId();

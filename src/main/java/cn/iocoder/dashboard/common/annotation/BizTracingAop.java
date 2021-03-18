@@ -21,8 +21,8 @@ public class BizTracingAop {
 
     @Around(value = "@annotation(bizTracing)")
     public void tagBizInfo(ProceedingJoinPoint joinPoint, BizTracing bizTracing) {
-        String bizId = SpElUtil.analysisSpEl(bizTracing.bizId(), joinPoint);
-        String bizType = SpElUtil.analysisSpEl(bizTracing.bizType(), joinPoint);
+        String bizId = (String) SpElUtil.analysisSpEl(bizTracing.bizId(), joinPoint);
+        String bizType = (String) SpElUtil.analysisSpEl(bizTracing.bizType(), joinPoint);
         if (StrUtil.isBlankIfStr(bizId)) {
             log.error("empty biz: bizId[{}], bizType[{}].", bizId, bizType);
             return;
