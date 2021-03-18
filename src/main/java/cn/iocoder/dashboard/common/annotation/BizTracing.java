@@ -13,11 +13,11 @@ import java.lang.annotation.*;
  */
 public @interface BizTracing {
 
-    String BIZ_ID = "bizId";
-    String BIZ_TYPE = "bizType";
+    String BIZ_ID_TAG = "bizId";
+    String BIZ_TYPE_TAG = "bizType";
 
-    String bizId() default "NULL_ID";
+    String bizId();
 
-    String bizType() default "NULL_TYPE";
+    String bizType();
 
 }
