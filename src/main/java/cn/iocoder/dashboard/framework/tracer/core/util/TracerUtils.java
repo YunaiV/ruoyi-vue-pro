@@ -3,6 +3,7 @@ package cn.iocoder.dashboard.framework.tracer.core.util;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.dashboard.framework.tracer.core.ITrace;
+import io.netty.util.concurrent.FastThreadLocal;
 import org.apache.skywalking.apm.toolkit.trace.TraceContext;
 
 import java.util.Map;
@@ -19,7 +20,7 @@ public class TracerUtils {
     /**
      * 维护请求线程对应的TraceId
      */
-    private final static Map<Thread, String> threadTraceIdMap = new ConcurrentHashMap<>();
+    private static FastThreadLocal<String> traceIdMap = new FastThreadLocal<>();
 
     /**
      * 保存链路流水号
@@ -27,7 +28,7 @@ public class TracerUtils {
      * @param traceId 链路流水号
      */
     public static void saveThreadTraceId(String traceId) {
-        threadTraceIdMap.put(Thread.currentThread(), traceId);
+        traceIdMap.set(traceId);
     }
 
     /**
@@ -36,14 +37,14 @@ public class TracerUtils {
      * @return 链路流水号
      */
     public static String getThreadTraceId() {
-        return threadTraceIdMap.get(Thread.currentThread());
+        return traceIdMap.get();
     }
 
     /**
      * 根据线程删除链路流水
      */
     public static void deleteThreadTraceId() {
-        threadTraceIdMap.remove(Thread.currentThread());
+        traceIdMap.remove();
     }
 
     /**
@@ -75,7 +76,7 @@ public class TracerUtils {
         } catch (Throwable ignore) {
         }
         // 尝试从map中获取
-        traceId = threadTraceIdMap.get(Thread.currentThread());
+        traceId = traceIdMap.get();
         if (StrUtil.isNotBlank(traceId)) {
             return traceId;
         }
