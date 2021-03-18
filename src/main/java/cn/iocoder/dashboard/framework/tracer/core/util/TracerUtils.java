@@ -6,9 +6,7 @@ import cn.iocoder.dashboard.framework.tracer.core.ITrace;
 import io.netty.util.concurrent.FastThreadLocal;
 import org.apache.skywalking.apm.toolkit.trace.TraceContext;
 
-import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 链路追踪工具类
