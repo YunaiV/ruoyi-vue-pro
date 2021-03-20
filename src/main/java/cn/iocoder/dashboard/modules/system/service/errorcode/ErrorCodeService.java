@@ -2,8 +2,9 @@ package cn.iocoder.dashboard.modules.system.service.errorcode;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.dashboard.common.exception.util.ServiceExceptionUtil;
+import cn.iocoder.dashboard.common.pojo.CommonResult;
 import cn.iocoder.dashboard.common.pojo.PageResult;
-import cn.iocoder.dashboard.modules.system.controller.errorcode.dto.ErrorCodePageDTO;
+import cn.iocoder.dashboard.modules.system.controller.errorcode.vo.ErrorCodeVO;
 import cn.iocoder.dashboard.modules.system.convert.errorcode.ErrorCodeConvert;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.errorcode.ErrorCodeDO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.errorcode.ErrorCodeMapper;
@@ -24,6 +25,7 @@ import java.util.Map;
 
 import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.ERROR_CODE_DUPLICATE;
 import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.ERROR_CODE_NOT_EXISTS;
+import static cn.iocoder.dashboard.common.pojo.CommonResult.success;
 
 /**
  * 错误码 Service
@@ -106,6 +108,12 @@ public class ErrorCodeService {
         });
     }
 
+    public CommonResult<Boolean> autoGenerateErrorCodes1(@Valid List<ErrorCodeAutoGenerateBO> autoGenerateBOs) {
+        autoGenerateErrorCodes(autoGenerateBOs);
+        return success(Boolean.TRUE);
+    }
+
+
     /**
      * 删除错误码
      *
@@ -178,6 +186,12 @@ public class ErrorCodeService {
     public List<ErrorCodeBO> listErrorCodes(String group, Date minUpdateTime) {
         List<ErrorCodeDO> errorCodeDOs = errorCodeMapper.selectListByGroup(group, minUpdateTime);
         return ErrorCodeConvert.INSTANCE.convertList(errorCodeDOs);
+    }
+
+    public CommonResult<List<ErrorCodeVO>> listErrorCodes1(String group, Date minUpdateTime) {
+        List<ErrorCodeDO> errorCodeDOs = errorCodeMapper.selectListByGroup(group, minUpdateTime);
+        final List<ErrorCodeBO> errorCodeBOS = ErrorCodeConvert.INSTANCE.convertList(errorCodeDOs);
+        return success(ErrorCodeConvert.INSTANCE.convertList02(errorCodeBOS));
     }
 
 }

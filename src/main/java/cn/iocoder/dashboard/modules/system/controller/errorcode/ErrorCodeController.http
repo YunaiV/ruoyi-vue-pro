@@ -1,0 +1,58 @@
+### 请求 /login 接口 => 成功
+POST http://localhost:48080/api/login
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "admin123",
+  "uuid": "9b2ffbc1-7425-4155-9894-9d5c08541d62",
+  "code": "1024"
+}
+
+> {%
+ client.global.set("token", response.body.data.token)
+ %}
+
+
+### list-group
+GET http://localhost:48080/api/system/error-code/list-group
+Authorization: Bearer {{token}}
+Content-Type: application/x-www-form-urlencoded
+
+group=test&minUpdateTime=2021-03-14 14:37:47
+
+
+
+###
+GET http://localhost:48080/api/system/error-code/query
+Authorization: Bearer {{token}}
+Content-Type: application/x-www-form-urlencoded
+
+errorCodeId=350
+
+###
+POST http://localhost:48080/api/system/error-code/generate
+Authorization: Bearer {{token}}
+
+[
+{
+    "code": 202,
+      "message": "成功1",
+      "group": "test1"
+}
+]
+
+###
+POST http://localhost:48080/api/system/error-code/create
+Authorization: Bearer {{token}}
+Content-Type:application/json
+
+{
+  "code": 200,
+  "message": "成功",
+  "group": "test",
+  "type": 1
+}
+
+
+
