@@ -1,15 +1,21 @@
 package cn.iocoder.dashboard.framework.redis.config;
 
+import cn.hutool.core.net.NetUtil;
 import cn.iocoder.dashboard.framework.redis.core.pubsub.AbstractChannelMessageListener;
+import cn.iocoder.dashboard.framework.redis.core.stream.AbstractStreamMessageListener;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.stream.*;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.serializer.RedisSerializer;
+import org.springframework.data.redis.stream.StreamMessageListenerContainer;
+import org.springframework.util.ErrorHandler;
 
+import java.time.Duration;
 import java.util.List;
 
 /**
@@ -45,6 +51,54 @@ public class RedisConfig {
             log.info("[redisMessageListenerContainer][注册 Channel({}) 对应的监听器({})]",
                     listener.getChannel(), listener.getClass().getName());
         });
+        return container;
+    }
+
+    @Bean(initMethod = "start", destroyMethod = "stop")
+    public StreamMessageListenerContainer<String, ObjectRecord<String, String>> redisStreamMessageListenerContainer(
+            RedisConnectionFactory factory, List<AbstractStreamMessageListener<?>> listeners) {
+        // 创建配置对象
+        StreamMessageListenerContainer.StreamMessageListenerContainerOptions<String, ObjectRecord<String, String>>
+                streamMessageListenerContainerOptions = StreamMessageListenerContainer.StreamMessageListenerContainerOptions
+                    .builder()
+                    // 一次性最多拉取多少条消息
+                    .batchSize(10)
+                    // 执行消息轮询的执行器
+                    // .executor(this.threadPoolTaskExecutor)
+                    // 消息消费异常的handler
+                    .errorHandler(new ErrorHandler() {
+                        @Override
+                        public void handleError(Throwable t) {
+                            // throw new RuntimeException(t);
+                            t.printStackTrace();
+                        }
+                    })
+                    // 超时时间，设置为0，表示不超时（超时后会抛出异常）
+                    .pollTimeout(Duration.ZERO)
+                    // 序列化器
+                    .serializer(RedisSerializer.string())
+                    .targetType(String.class)
+                    .build();
+
+        // 根据配置对象创建监听容器对象
+        StreamMessageListenerContainer<String, ObjectRecord<String, String>> container = StreamMessageListenerContainer
+                .create(factory, streamMessageListenerContainerOptions);
+
+        RedisTemplate<String, Object> redisTemplate = redisTemplate(factory);
+
+        // 使用监听容器对象开始监听消费（使用的是手动确认方式）
+        String consumerName = NetUtil.getLocalHostName(); // TODO 需要优化下，晚点参考下 rocketmq consumer 的
+        for (AbstractStreamMessageListener<?> listener : listeners) {
+            try {
+                redisTemplate.opsForStream().createGroup(listener.getStreamKey(), listener.getGroup());
+            } catch (Exception ignore) {
+//                ignore.printStackTrace();
+            }
+
+            container.receive(Consumer.from(listener.getGroup(), consumerName),
+                    StreamOffset.create(listener.getStreamKey(), ReadOffset.lastConsumed()), listener);
+        }
+
         return container;
     }
 
