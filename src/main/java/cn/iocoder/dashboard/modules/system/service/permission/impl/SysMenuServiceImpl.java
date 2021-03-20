@@ -168,10 +168,6 @@ public class SysMenuServiceImpl implements SysMenuService {
      */
     @Transactional(rollbackFor = Exception.class)
     public void deleteMenu(Long menuId) {
-        // 校验更新的菜单是否存在
-        if (menuMapper.selectById(menuId) == null) {
-            throw ServiceExceptionUtil.exception(MENU_NOT_EXISTS);
-        }
         // 校验是否还有子菜单
         if (menuMapper.selectCountByParentId(menuId) > 0) {
             throw ServiceExceptionUtil.exception(MENU_EXISTS_CHILDREN);

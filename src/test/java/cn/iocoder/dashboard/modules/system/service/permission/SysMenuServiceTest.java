@@ -1,32 +1,37 @@
 package cn.iocoder.dashboard.modules.system.service.permission;
 
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.lang.Assert;
 import cn.iocoder.dashboard.BaseDbUnitTest;
 import cn.iocoder.dashboard.modules.system.controller.permission.vo.menu.SysMenuCreateReqVO;
+import cn.iocoder.dashboard.modules.system.controller.permission.vo.menu.SysMenuListReqVO;
+import cn.iocoder.dashboard.modules.system.controller.permission.vo.menu.SysMenuUpdateReqVO;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.permission.SysMenuDO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.permission.SysMenuMapper;
 import cn.iocoder.dashboard.modules.system.enums.permission.MenuTypeEnum;
 import cn.iocoder.dashboard.modules.system.mq.producer.permission.SysMenuProducer;
-import cn.iocoder.dashboard.modules.system.mq.producer.permission.SysPermissionProducer;
 import cn.iocoder.dashboard.modules.system.service.permission.impl.SysMenuServiceImpl;
+import cn.iocoder.dashboard.util.AopTargetUtils;
 import cn.iocoder.dashboard.util.AssertUtils;
 import cn.iocoder.dashboard.util.RandomUtils;
+import cn.iocoder.dashboard.util.object.ObjectUtils;
+import com.google.common.collect.Multimap;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
 
-import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.MENU_PARENT_NOT_DIR_OR_MENU;
-import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.MENU_PARENT_NOT_EXISTS;
-import static cn.iocoder.dashboard.util.RandomUtils.randomLongId;
+import java.util.*;
+
+import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.*;
 import static cn.iocoder.dashboard.util.RandomUtils.randomPojo;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
 
 @Import(SysMenuServiceImpl.class)
 public class SysMenuServiceTest extends BaseDbUnitTest {
-
 
     @Resource
     private SysMenuServiceImpl sysMenuService;
@@ -40,16 +45,47 @@ public class SysMenuServiceTest extends BaseDbUnitTest {
     @Resource
     private SysMenuMapper menuMapper;
 
+    @Test
+    public void testInitLocalCache_success() throws Exception {
+        SysMenuDO menuDO1 = createMenuDO(MenuTypeEnum.MENU, "xxxx", 0L);
+        menuMapper.insert(menuDO1);
+        SysMenuDO menuDO2 = createMenuDO(MenuTypeEnum.MENU, "xxxx", 0L);
+        menuMapper.insert(menuDO2);
+
+        //调用
+        sysMenuService.initLocalCache();
+
+        // 获取代理对象
+        SysMenuServiceImpl target = (SysMenuServiceImpl) AopTargetUtils.getTarget(sysMenuService);
+
+        Map<Long, SysMenuDO> menuCache = (Map<Long, SysMenuDO>) BeanUtil.getFieldValue(target, "menuCache");
+        Assert.isTrue(menuCache.size()==2);
+        AssertUtils.assertPojoEquals(menuDO1,menuCache.get(menuDO1.getId()));
+        AssertUtils.assertPojoEquals(menuDO2,menuCache.get(menuDO2.getId()));
+
+        Multimap<String, SysMenuDO> permissionMenuCache = (Multimap<String, SysMenuDO>) BeanUtil.getFieldValue(target, "permissionMenuCache");
+        Assert.isTrue(permissionMenuCache.size()==2);
+        AssertUtils.assertPojoEquals(menuDO1,permissionMenuCache.get(menuDO1.getPermission()));
+        AssertUtils.assertPojoEquals(menuDO2,permissionMenuCache.get(menuDO2.getPermission()));
+
+        Date maxUpdateTime = (Date) BeanUtil.getFieldValue(target, "maxUpdateTime");
+        assertEquals(ObjectUtils.max(menuDO1.getUpdateTime(), menuDO2.getUpdateTime()), maxUpdateTime);
+    }
 
     @Test
     public void testCreateMenu_success() {
         //构造父目录
-        SysMenuDO menuDO = createParentMenuDO(MenuTypeEnum.MENU);
+        SysMenuDO menuDO = createMenuDO(MenuTypeEnum.MENU, "parent", 0L);
         menuMapper.insert(menuDO);
         Long parentId = menuDO.getId();
 
         //调用
-        SysMenuCreateReqVO vo = createReqVO(parentId);
+        SysMenuCreateReqVO vo = randomPojo(SysMenuCreateReqVO.class, o -> {
+            o.setParentId(parentId);
+            o.setName("testSonName");
+            o.setType(MenuTypeEnum.MENU.getType());
+            o.setStatus(RandomUtils.randomCommonStatus());
+        });
         Long menuId = sysMenuService.createMenu(vo);
 
         //断言
@@ -66,44 +102,343 @@ public class SysMenuServiceTest extends BaseDbUnitTest {
         Long parentId = RandomUtils.randomLongId();
 
         // 调用
-        SysMenuCreateReqVO vo = createReqVO(parentId);
-
-        // 调用, 并断言异常
-        AssertUtils.assertServiceException(() -> sysMenuService.createMenu(vo), MENU_PARENT_NOT_EXISTS);
-    }
-
-    @Test
-    public void testCreateMenu_checkParentIsDirOrMenu() {
-        //构造父目录
-        SysMenuDO menuDO = createParentMenuDO(MenuTypeEnum.BUTTON);
-        menuMapper.insert(menuDO);
-        Long parentId = menuDO.getId();
-
-        // 调用
-        SysMenuCreateReqVO vo = createReqVO(parentId);
-
-        // 调用, 并断言异常
-        AssertUtils.assertServiceException(() -> sysMenuService.createMenu(vo), MENU_PARENT_NOT_DIR_OR_MENU);
-    }
-
-
-    private SysMenuCreateReqVO createReqVO(Long parentId) {
         SysMenuCreateReqVO vo = randomPojo(SysMenuCreateReqVO.class, o -> {
             o.setParentId(parentId);
             o.setName("testSonName");
             o.setType(MenuTypeEnum.MENU.getType());
             o.setStatus(RandomUtils.randomCommonStatus());
         });
-        return vo;
+
+        // 调用, 并断言异常
+        AssertUtils.assertServiceException(() -> sysMenuService.createMenu(vo), MENU_PARENT_NOT_EXISTS);
     }
 
-    private SysMenuDO createParentMenuDO(MenuTypeEnum typeEnum) {
-        SysMenuDO menuDO = randomPojo(SysMenuDO.class, o -> {
-            o.setName("testParentName");
-            o.setType(typeEnum.getType());
+    @Test
+    public void testCreateMenu_checkParentTypeError() {
+        //构造父目录
+        SysMenuDO menuDO = createMenuDO(MenuTypeEnum.BUTTON, "parent", 0L);
+        menuMapper.insert(menuDO);
+        Long parentId = menuDO.getId();
+
+        // 调用
+        SysMenuCreateReqVO vo = randomPojo(SysMenuCreateReqVO.class, o -> {
+            o.setParentId(parentId);
+            o.setName("testSonName");
+            o.setType(MenuTypeEnum.MENU.getType());
             o.setStatus(RandomUtils.randomCommonStatus());
         });
-        return menuDO;
+
+        // 调用, 并断言异常
+        AssertUtils.assertServiceException(() -> sysMenuService.createMenu(vo), MENU_PARENT_NOT_DIR_OR_MENU);
     }
+
+    @Test
+    public void testUpdateMenu_success() {
+        //构造父子目录
+        SysMenuDO sonMenuDO = initParentAndSonMenuDO();
+        Long sonId = sonMenuDO.getId();
+        Long parentId = sonMenuDO.getParentId();
+
+        //调用
+        SysMenuUpdateReqVO vo = RandomUtils.randomPojo(SysMenuUpdateReqVO.class, o -> {
+            o.setId(sonId);
+            o.setParentId(parentId);
+            o.setType(MenuTypeEnum.MENU.getType());
+            o.setStatus(RandomUtils.randomCommonStatus());
+            o.setName("pppppp"); //修改名字
+        });
+        sysMenuService.updateMenu(vo);
+
+        //断言
+        // 校验记录的属性是否正确
+        SysMenuDO ret = menuMapper.selectById(sonId);
+        AssertUtils.assertPojoEquals(vo, ret);
+        // 校验调用
+        verify(sysMenuProducer).sendMenuRefreshMessage();
+    }
+
+    @Test
+    public void testUpdateMenu_sonIdNotExist() {
+        Long sonId = 99999L;
+        Long parentId = 10000L;
+
+        //调用
+        SysMenuUpdateReqVO vo = RandomUtils.randomPojo(SysMenuUpdateReqVO.class, o -> {
+            o.setId(sonId);
+            o.setParentId(parentId);
+            o.setType(MenuTypeEnum.MENU.getType());
+            o.setStatus(RandomUtils.randomCommonStatus());
+        });
+        //断言
+        AssertUtils.assertServiceException(() -> sysMenuService.updateMenu(vo), MENU_NOT_EXISTS);
+    }
+
+    @Test
+    public void testUpdateMenu_canNotSetSelfToBeParent() {
+        //构造父子目录
+        SysMenuDO sonMenuDO = initParentAndSonMenuDO();
+        Long sonId = sonMenuDO.getId();
+
+        long updateParentId = sonId;
+
+        //调用
+        SysMenuUpdateReqVO vo = RandomUtils.randomPojo(SysMenuUpdateReqVO.class, o -> {
+            o.setId(sonId);
+            o.setParentId(updateParentId);
+            o.setType(MenuTypeEnum.MENU.getType());
+            o.setStatus(RandomUtils.randomCommonStatus());
+        });
+        //断言
+        AssertUtils.assertServiceException(() -> sysMenuService.updateMenu(vo), MENU_PARENT_ERROR);
+    }
+
+    @Test
+    public void testUpdateMenu_parentNotExist() {
+        //构造父子目录
+        SysMenuDO sonMenuDO = initParentAndSonMenuDO();
+        Long sonId = sonMenuDO.getId();
+
+        long updateParentId = -999999;
+
+        //调用
+        SysMenuUpdateReqVO vo = RandomUtils.randomPojo(SysMenuUpdateReqVO.class, o -> {
+            o.setId(sonId);
+            o.setParentId(updateParentId);
+            o.setType(MenuTypeEnum.MENU.getType());
+            o.setStatus(RandomUtils.randomCommonStatus());
+        });
+        //断言
+        AssertUtils.assertServiceException(() -> sysMenuService.updateMenu(vo), MENU_PARENT_NOT_EXISTS);
+    }
+
+    @Test
+    public void testUpdateMenu_parentTypeError() {
+        SysMenuDO sonMenuDO = createMenuDO(MenuTypeEnum.MENU, "son", 999L);
+        menuMapper.insert(sonMenuDO);
+        Long sonId = sonMenuDO.getId();
+
+        //button类型
+        SysMenuDO menuDO = createMenuDO(MenuTypeEnum.BUTTON, "parent", 0L);
+        menuMapper.insert(menuDO);
+        Long parentId = menuDO.getId();
+
+        //调用
+        SysMenuUpdateReqVO vo = RandomUtils.randomPojo(SysMenuUpdateReqVO.class, o -> {
+            o.setId(sonId);
+            o.setParentId(parentId);
+            o.setType(MenuTypeEnum.MENU.getType());
+            o.setStatus(RandomUtils.randomCommonStatus());
+        });
+        //断言
+        AssertUtils.assertServiceException(() -> sysMenuService.updateMenu(vo), MENU_PARENT_NOT_DIR_OR_MENU);
+    }
+
+    @Test
+    public void testUpdateMenu_sonMenuNameDuplicate() {
+        SysMenuDO parent = createMenuDO(MenuTypeEnum.MENU, "parent", 999L);
+        menuMapper.insert(parent);
+        Long parentId = parent.getId();
+
+
+        SysMenuDO sonMenuDO = createMenuDO(MenuTypeEnum.MENU, "son", parentId);
+        menuMapper.insert(sonMenuDO);
+
+        SysMenuDO sonMenuDO2 = createMenuDO(MenuTypeEnum.MENU, "son2", parentId);
+        menuMapper.insert(sonMenuDO2);
+
+        Long sonId = sonMenuDO.getId();
+        String updateName = sonMenuDO2.getName();
+
+        //调用
+        SysMenuUpdateReqVO vo = RandomUtils.randomPojo(SysMenuUpdateReqVO.class, o -> {
+            o.setId(sonId);
+            o.setParentId(parentId);
+            o.setType(MenuTypeEnum.MENU.getType());
+            o.setStatus(RandomUtils.randomCommonStatus());
+            o.setName(updateName);
+        });
+        //断言
+        AssertUtils.assertServiceException(() -> sysMenuService.updateMenu(vo), MENU_NAME_DUPLICATE);
+    }
+
+    @Test
+    public void testDeleteMenu_success() {
+        SysMenuDO sonMenuDO = initParentAndSonMenuDO();
+
+        Long sonId = sonMenuDO.getId();
+        //调用
+        sysMenuService.deleteMenu(sonId);
+
+        //断言
+        SysMenuDO menuDO = menuMapper.selectById(sonId);
+        Assert.isNull(menuDO);
+        verify(sysPermissionService).processMenuDeleted(sonId);
+        verify(sysMenuProducer).sendMenuRefreshMessage();
+    }
+
+    @Test
+    public void testDeleteMenu_menuNotExist() {
+        Long sonId = 99999L;
+
+        AssertUtils.assertServiceException(() -> sysMenuService.deleteMenu(sonId), MENU_NOT_EXISTS);
+    }
+
+    @Test
+    public void testDeleteMenu_existChildren() {
+        SysMenuDO sonMenu = initParentAndSonMenuDO();
+        Long parentId = sonMenu.getParentId();
+
+        AssertUtils.assertServiceException(() -> sysMenuService.deleteMenu(parentId), MENU_EXISTS_CHILDREN);
+    }
+
+    @Test
+    public void testGetMenus_success() {
+        Map<Long, SysMenuDO> idMenuMap = new HashMap<>();
+        SysMenuDO menuDO = createMenuDO(MenuTypeEnum.MENU, "parent", 0L);
+        menuMapper.insert(menuDO);
+        idMenuMap.put(menuDO.getId(), menuDO);
+
+        SysMenuDO sonMenu = createMenuDO(MenuTypeEnum.MENU, "son", menuDO.getId());
+        menuMapper.insert(sonMenu);
+        idMenuMap.put(sonMenu.getId(), sonMenu);
+
+        //调用
+        List<SysMenuDO> menuDOS = sysMenuService.getMenus();
+
+        //断言
+        Assert.isTrue(menuDOS.size() == idMenuMap.size());
+        for (SysMenuDO menu : menuDOS) {
+            AssertUtils.assertPojoEquals(idMenuMap.get(menu.getId()), menu);
+        }
+    }
+
+
+    @Test
+    public void testGetMenusReqVo_success() {
+        Map<Long, SysMenuDO> idMenuMap = new HashMap<>();
+        SysMenuDO menu = createMenuDO(MenuTypeEnum.MENU, "name2", 0L, 1);
+        menuMapper.insert(menu);
+        idMenuMap.put(menu.getId(), menu);
+
+        menu = createMenuDO(MenuTypeEnum.MENU, "11name111", 0L, 1);
+        menuMapper.insert(menu);
+        idMenuMap.put(menu.getId(), menu);
+
+        menu = createMenuDO(MenuTypeEnum.MENU, "name", 0L, 1);
+        menuMapper.insert(menu);
+        idMenuMap.put(menu.getId(), menu);
+
+
+        menu = createMenuDO(MenuTypeEnum.MENU, "xxxxxx", 0L, 1);
+        menuMapper.insert(menu);
+        menu = createMenuDO(MenuTypeEnum.MENU, "name", 0L, 2);
+        menuMapper.insert(menu);
+
+
+        //调用
+        SysMenuListReqVO reqVO = new SysMenuListReqVO();
+        reqVO.setStatus(1);
+        reqVO.setName("name");
+        List<SysMenuDO> menuDOS = sysMenuService.getMenus(reqVO);
+
+        //断言
+        Assert.isTrue(menuDOS.size() == idMenuMap.size());
+        for (SysMenuDO m : menuDOS) {
+            AssertUtils.assertPojoEquals(idMenuMap.get(m.getId()), m);
+        }
+    }
+
+    @Test
+    public void testListMenusFromCache_success() throws Exception {
+        Map<Long, SysMenuDO> mockCacheMap = new HashMap<>();
+        //获取代理对象
+        SysMenuServiceImpl target = (SysMenuServiceImpl) AopTargetUtils.getTarget(sysMenuService);
+        BeanUtil.setFieldValue(target, "menuCache", mockCacheMap);
+
+        Map<Long, SysMenuDO> idMenuMap = new HashMap<>();
+        SysMenuDO menuDO = createMenuDO(1L, MenuTypeEnum.MENU, "name", 0L, 1);
+        mockCacheMap.put(menuDO.getId(), menuDO);
+        idMenuMap.put(menuDO.getId(), menuDO);
+
+        menuDO = createMenuDO(2L, MenuTypeEnum.MENU, "name", 0L, 1);
+        mockCacheMap.put(menuDO.getId(), menuDO);
+        idMenuMap.put(menuDO.getId(), menuDO);
+
+
+        menuDO = createMenuDO(3L, MenuTypeEnum.BUTTON, "name", 0L, 1);
+        mockCacheMap.put(menuDO.getId(), menuDO);
+        menuDO = createMenuDO(4L, MenuTypeEnum.MENU, "name", 0L, 2);
+        mockCacheMap.put(menuDO.getId(), menuDO);
+
+        List<SysMenuDO> menuDOS = sysMenuService.listMenusFromCache(Arrays.asList(MenuTypeEnum.MENU.getType()), Arrays.asList(1));
+        Assert.isTrue(menuDOS.size() == idMenuMap.size());
+        for (SysMenuDO m : menuDOS) {
+            AssertUtils.assertPojoEquals(idMenuMap.get(m.getId()), m);
+        }
+    }
+
+
+    @Test
+    public void testListMenusFromCache2_success() throws Exception {
+        Map<Long, SysMenuDO> mockCacheMap = new HashMap<>();
+        //获取代理对象
+        SysMenuServiceImpl target = (SysMenuServiceImpl) AopTargetUtils.getTarget(sysMenuService);
+        BeanUtil.setFieldValue(target, "menuCache", mockCacheMap);
+
+        Map<Long, SysMenuDO> idMenuMap = new HashMap<>();
+        SysMenuDO menuDO = createMenuDO(1L, MenuTypeEnum.MENU, "name", 0L, 1);
+        mockCacheMap.put(menuDO.getId(), menuDO);
+        idMenuMap.put(menuDO.getId(), menuDO);
+
+        menuDO = createMenuDO(2L, MenuTypeEnum.MENU, "name", 0L, 1);
+        mockCacheMap.put(menuDO.getId(), menuDO);
+        menuDO = createMenuDO(3L, MenuTypeEnum.BUTTON, "name", 0L, 1);
+        mockCacheMap.put(menuDO.getId(), menuDO);
+        menuDO = createMenuDO(4L, MenuTypeEnum.MENU, "name", 0L, 2);
+        mockCacheMap.put(menuDO.getId(), menuDO);
+
+        List<SysMenuDO> menuDOS = sysMenuService.listMenusFromCache(Arrays.asList(1L),
+                Arrays.asList(MenuTypeEnum.MENU.getType()), Arrays.asList(1));
+        Assert.isTrue(menuDOS.size() == idMenuMap.size());
+        for (SysMenuDO m : menuDOS) {
+            AssertUtils.assertPojoEquals(idMenuMap.get(m.getId()), m);
+        }
+    }
+
+    /**
+     * 构造父子目录，返回子目录
+     *
+     * @return
+     */
+    private SysMenuDO initParentAndSonMenuDO() {
+        //构造父子目录
+        SysMenuDO menuDO = createMenuDO(MenuTypeEnum.MENU, "parent", 0L);
+        menuMapper.insert(menuDO);
+        Long parentId = menuDO.getId();
+
+        SysMenuDO sonMenuDO = createMenuDO(MenuTypeEnum.MENU, "testSonName", parentId);
+        menuMapper.insert(sonMenuDO);
+        return sonMenuDO;
+    }
+
+    private SysMenuDO createMenuDO(MenuTypeEnum typeEnum, String menuName, Long parentId) {
+        return createMenuDO(typeEnum, menuName, parentId, RandomUtils.randomCommonStatus());
+    }
+
+    private SysMenuDO createMenuDO(MenuTypeEnum typeEnum, String menuName, Long parentId, Integer status) {
+        return createMenuDO(null, typeEnum, menuName, parentId, status);
+    }
+
+    private SysMenuDO createMenuDO(Long id, MenuTypeEnum typeEnum, String menuName, Long parentId, Integer status) {
+        SysMenuDO sonMenuDO = RandomUtils.randomPojo(SysMenuDO.class, o -> {
+            o.setId(id);
+            o.setParentId(parentId);
+            o.setType(typeEnum.getType());
+            o.setStatus(status);
+            o.setName(menuName);
+        });
+        return sonMenuDO;
+    }
+
 
 }
