@@ -46,6 +46,9 @@ public abstract class AbstractStreamMessageListener<T extends StreamMessage>
     @Override
     public void onMessage(ObjectRecord<String, String> message) {
         System.out.println(message);
+        if (true) {
+//            throw new IllegalStateException("测试下");
+        }
     }
 
     /**

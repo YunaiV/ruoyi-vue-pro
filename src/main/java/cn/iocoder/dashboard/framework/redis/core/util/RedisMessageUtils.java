@@ -31,7 +31,7 @@ public class RedisMessageUtils {
      * @param message 消息
      * @return 消息记录的编号对象
      */
-    public static <T extends StreamMessage> RecordId sendStreamMessage(RedisTemplate<String, String> redisTemplate, T message) {
+    public static <T extends StreamMessage> RecordId sendStreamMessage(RedisTemplate<String, ?> redisTemplate, T message) {
         return redisTemplate.opsForStream().add(StreamRecords.newRecord()
                 .ofObject(JsonUtils.toJsonString(message)) // 设置内容
                 .withStreamKey(message.getStreamKey())); // 设置 stream key

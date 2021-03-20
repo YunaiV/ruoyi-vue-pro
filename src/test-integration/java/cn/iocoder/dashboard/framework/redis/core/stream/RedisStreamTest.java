@@ -9,6 +9,7 @@ import cn.iocoder.dashboard.modules.system.mq.message.mail.SysMailSendMessage;
 import cn.iocoder.dashboard.modules.system.mq.message.sms.SysSmsSendMessage;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
 import javax.annotation.Resource;
@@ -31,13 +32,18 @@ public class RedisStreamTest  {
         @Resource
         private StringRedisTemplate stringRedisTemplate;
 
+        @Resource
+        private RedisTemplate<String, Object> redisTemplate;
+
         @Test
         public void testProducer01() {
-            // 创建消息
-            SysSmsSendMessage message = new SysSmsSendMessage();
-            message.setMobile("15601691300").setTemplateCode("test");
-            // 发送消息
-            RedisMessageUtils.sendStreamMessage(stringRedisTemplate, message);
+            for (int i = 0; i < 100; i++) {
+                // 创建消息
+                SysSmsSendMessage message = new SysSmsSendMessage();
+                message.setMobile("15601691300").setTemplateCode("test:" + i);
+                // 发送消息
+                RedisMessageUtils.sendStreamMessage(stringRedisTemplate, message);
+            }
         }
 
         @Test
