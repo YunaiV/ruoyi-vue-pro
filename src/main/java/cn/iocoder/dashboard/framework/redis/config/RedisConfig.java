@@ -83,12 +83,15 @@ public class RedisConfig {
                 redisTemplate.getRequiredConnectionFactory(), containerOptions);
 
         // 第二步，注册监听器，消费对应的 Stream 主题
-        String consumerName = buildConsumerName();
+//        String consumerName = buildConsumerName();
+        String consumerName = "110";
         listeners.forEach(listener -> {
             // 创建 listener 对应的消费者分组
             try {
                 redisTemplate.opsForStream().createGroup(listener.getStreamKey(), listener.getGroup());
             } catch (Exception ignore) {}
+            // 设置 listener 对应的 redisTemplate
+            listener.setRedisTemplate(redisTemplate);
             // 创建 Consumer 对象
             Consumer consumer = Consumer.from(listener.getGroup(), consumerName);
             // 设置 Consumer 消费进度，以最小消费进度为准

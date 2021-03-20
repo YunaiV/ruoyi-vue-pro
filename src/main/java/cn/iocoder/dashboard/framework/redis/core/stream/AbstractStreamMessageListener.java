@@ -1,12 +1,14 @@
 package cn.iocoder.dashboard.framework.redis.core.stream;
 
-import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.TypeUtil;
+import cn.iocoder.dashboard.util.json.JsonUtils;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.connection.stream.ObjectRecord;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.stream.StreamListener;
-import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
 
 import java.lang.reflect.Type;
 
@@ -33,9 +35,14 @@ public abstract class AbstractStreamMessageListener<T extends StreamMessage>
     /**
      * Redis 消费者分组，默认使用 spring.application.name 名字
      */
-    @Value("spring.application.name")
+    @Value("${spring.application.name}")
     @Getter
     private String group;
+    /**
+     *
+     */
+    @Setter
+    private RedisTemplate<String, ?> redisTemplate;
 
     @SneakyThrows
     protected AbstractStreamMessageListener() {
@@ -45,10 +52,16 @@ public abstract class AbstractStreamMessageListener<T extends StreamMessage>
 
     @Override
     public void onMessage(ObjectRecord<String, String> message) {
-        System.out.println(message);
-        if (true) {
-//            throw new IllegalStateException("测试下");
-        }
+        // 消费消息
+        T messageObj = JsonUtils.parseObject(message.getValue(), messageType);
+        this.onMessage(messageObj);
+        // ack 消息消费完成
+        redisTemplate.opsForStream().acknowledge(group, message);
+        // TODO 芋艿：需要额外考虑以下几个点：
+        // 1. 处理异常的情况
+        // 2. 发送日志；以及事务的结合
+        // 3. 消费日志；以及通用的幂等性
+        // 4. 消费失败的重试，https://zhuanlan.zhihu.com/p/60501638
     }
 
     /**
@@ -64,23 +77,12 @@ public abstract class AbstractStreamMessageListener<T extends StreamMessage>
      * @return 消息类型
      */
     @SuppressWarnings("unchecked")
-    // TODO 芋艿：稍后重构
     private Class<T> getMessageClass() {
-        Class<?> targetClass = getClass();
-        while (targetClass.getSuperclass() != null) {
-            // 如果不是 AbstractMessageListener 父类，继续向上查找
-            if (targetClass.getSuperclass() != AbstractStreamMessageListener.class) {
-                targetClass = targetClass.getSuperclass();
-                continue;
-            }
-            // 如果是 AbstractMessageListener 父类，则解析泛型
-            Type[] types = ((ParameterizedTypeImpl) targetClass.getGenericSuperclass()).getActualTypeArguments();
-            if (ArrayUtil.isEmpty(types)) {
-                throw new IllegalStateException(String.format("类型(%s) 需要设置消息类型", getClass().getName()));
-            }
-            return (Class<T>) types[0];
+        Type type = TypeUtil.getTypeArgument(getClass(), 0);
+        if (type == null) {
+            throw new IllegalStateException(String.format("类型(%s) 需要设置消息类型", getClass().getName()));
         }
-        throw new IllegalStateException(String.format("类型(%s) 找不到 AbstractStreamMessageListener 父类", getClass().getName()));
+        return (Class<T>) type;
     }
 
 }
