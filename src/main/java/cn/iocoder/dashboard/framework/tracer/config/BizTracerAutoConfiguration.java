@@ -8,6 +8,11 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * BizTracer Bean 配置类
+ *
+ * @author mashu
+ */
 @Configuration
 @ConditionalOnClass({BizTracingAop.class})
 @EnableConfigurationProperties(BizTracerProperties.class)
