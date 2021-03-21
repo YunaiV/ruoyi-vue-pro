@@ -1,6 +1,7 @@
-package cn.iocoder.dashboard.modules.tool.service.codegen.impl;
+package cn.iocoder.dashboard.modules.tool.service.codegen;
 
 import cn.iocoder.dashboard.BaseDbUnitTest;
+import cn.iocoder.dashboard.modules.tool.service.codegen.impl.ToolCodegenServiceImpl;
 import org.junit.jupiter.api.Test;
 
 import javax.annotation.Resource;

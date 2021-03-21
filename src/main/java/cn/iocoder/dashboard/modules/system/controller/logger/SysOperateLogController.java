@@ -50,7 +50,7 @@ public class SysOperateLogController {
     @ApiOperation("查看操作日志分页列表")
     @PreAuthorize("@ss.hasPermission('system:operate-log:query')")
     public CommonResult<PageResult<SysOperateLogRespVO>> pageOperateLog(@Valid SysOperateLogPageReqVO reqVO) {
-        PageResult<SysOperateLogDO> pageResult = operateLogService.pageOperateLog(reqVO);
+        PageResult<SysOperateLogDO> pageResult = operateLogService.getOperateLogPage(reqVO);
 
         // 获得拼接需要的数据
         Collection<Long> userIds = CollectionUtils.convertList(pageResult.getList(), SysOperateLogDO::getUserId);
@@ -71,7 +71,7 @@ public class SysOperateLogController {
     @PreAuthorize("@ss.hasPermission('system:operate-log:export')")
     @OperateLog(type = EXPORT)
     public void exportOperateLog(HttpServletResponse response, @Valid SysOperateLogExportReqVO reqVO) throws IOException {
-        List<SysOperateLogDO> list = operateLogService.listOperateLogs(reqVO);
+        List<SysOperateLogDO> list = operateLogService.getOperateLogs(reqVO);
 
         // 获得拼接需要的数据
         Collection<Long> userIds = CollectionUtils.convertList(list, SysOperateLogDO::getUserId);

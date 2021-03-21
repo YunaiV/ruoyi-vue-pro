@@ -68,7 +68,7 @@ public class InfApiErrorLogServiceImplTest extends BaseDbUnitTest {
         // 构造测试数据
         long userId = 2233L;
         int userType = UserTypeEnum.ADMIN.getValue();
-        String applicationName = "ruoyi-test";
+        String applicationName = "yudao-test";
         String requestUrl = "foo";
         Date beginTime = buildTime(2021, 3, 13);
         int progressStatus = InfApiErrorLogProcessStatusEnum.INIT.getStatus();
@@ -121,7 +121,7 @@ public class InfApiErrorLogServiceImplTest extends BaseDbUnitTest {
         // 构造测试数据
         long userId = 2233L;
         int userType = UserTypeEnum.ADMIN.getValue();
-        String applicationName = "ruoyi-test";
+        String applicationName = "yudao-test";
         String requestUrl = "foo";
         Date beginTime = buildTime(2021, 3, 13);
         int progressStatus = InfApiErrorLogProcessStatusEnum.INIT.getStatus();

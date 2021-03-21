@@ -1,10 +1,11 @@
-package cn.iocoder.dashboard.modules.tool.service.codegen.impl;
+package cn.iocoder.dashboard.modules.tool.service.codegen;
 
 import cn.iocoder.dashboard.BaseDbUnitTest;
 import cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen.ToolCodegenColumnDO;
 import cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen.ToolCodegenTableDO;
 import cn.iocoder.dashboard.modules.tool.dal.mysql.codegen.ToolCodegenColumnMapper;
 import cn.iocoder.dashboard.modules.tool.dal.mysql.codegen.ToolCodegenTableMapper;
+import cn.iocoder.dashboard.modules.tool.service.codegen.impl.ToolCodegenEngine;
 import org.junit.jupiter.api.Test;
 
 import javax.annotation.Resource;

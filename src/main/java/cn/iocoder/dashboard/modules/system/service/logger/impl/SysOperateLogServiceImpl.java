@@ -55,7 +55,7 @@ public class SysOperateLogServiceImpl implements SysOperateLogService {
     }
 
     @Override
-    public PageResult<SysOperateLogDO> pageOperateLog(SysOperateLogPageReqVO reqVO) {
+    public PageResult<SysOperateLogDO> getOperateLogPage(SysOperateLogPageReqVO reqVO) {
         // 处理基于用户昵称的查询
         Collection<Long> userIds = null;
         if (StrUtil.isNotEmpty(reqVO.getUserNickname())) {
@@ -69,7 +69,7 @@ public class SysOperateLogServiceImpl implements SysOperateLogService {
     }
 
     @Override
-    public List<SysOperateLogDO> listOperateLogs(SysOperateLogExportReqVO reqVO) {
+    public List<SysOperateLogDO> getOperateLogs(SysOperateLogExportReqVO reqVO) {
         // 处理基于用户昵称的查询
         Collection<Long> userIds = null;
         if (StrUtil.isNotEmpty(reqVO.getUserNickname())) {

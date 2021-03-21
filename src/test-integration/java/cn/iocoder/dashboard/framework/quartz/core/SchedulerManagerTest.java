@@ -1,7 +1,8 @@
-package cn.iocoder.dashboard.framework.quartz.core.scheduler;
+package cn.iocoder.dashboard.framework.quartz.core;
 
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.dashboard.BaseDbUnitTest;
+import cn.iocoder.dashboard.framework.quartz.core.scheduler.SchedulerManager;
 import cn.iocoder.dashboard.modules.system.job.auth.SysUserSessionTimeoutJob;
 import org.junit.jupiter.api.Test;
 import org.quartz.SchedulerException;

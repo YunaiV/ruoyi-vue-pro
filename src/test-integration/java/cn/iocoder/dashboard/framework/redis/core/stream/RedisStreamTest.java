@@ -7,6 +7,7 @@ import cn.iocoder.dashboard.modules.system.mq.consumer.mail.SysMailSendConsumer;
 import cn.iocoder.dashboard.modules.system.mq.consumer.sms.SysSmsSendConsumer;
 import cn.iocoder.dashboard.modules.system.mq.message.mail.SysMailSendMessage;
 import cn.iocoder.dashboard.modules.system.mq.message.sms.SysSmsSendMessage;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -18,6 +19,7 @@ import java.util.concurrent.TimeUnit;
 public class RedisStreamTest  {
 
     @Import({SysSmsSendConsumer.class, SysMailSendConsumer.class})
+    @Disabled
     public static class ConsumerTest extends BaseRedisIntegrationTest {
 
         @Test
@@ -27,6 +29,7 @@ public class RedisStreamTest  {
 
     }
 
+    @Disabled
     public static class ProducerTest extends BaseRedisIntegrationTest {
 
         @Resource
