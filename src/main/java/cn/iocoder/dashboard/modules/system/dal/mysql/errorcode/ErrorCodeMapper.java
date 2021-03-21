@@ -1,8 +1,8 @@
 package cn.iocoder.dashboard.modules.system.dal.mysql.errorcode;
 
 import cn.iocoder.dashboard.framework.mybatis.core.query.QueryWrapperX;
+import cn.iocoder.dashboard.modules.system.controller.errorcode.dto.ErrorCodePageDTO;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.errorcode.ErrorCodeDO;
-import cn.iocoder.dashboard.modules.system.service.errorcode.bo.ErrorCodePageBO;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -15,10 +15,10 @@ import java.util.List;
 
 @Mapper
 public interface ErrorCodeMapper extends BaseMapper<ErrorCodeDO> {
-    default IPage<ErrorCodeDO> selectPage(ErrorCodePageBO pageBO) {
-        return selectPage(new Page<>(pageBO.getPageNo(), pageBO.getPageSize()),
-                new QueryWrapperX<ErrorCodeDO>().likeIfPresent("`group`", pageBO.getGroup())
-                        .eqIfPresent("code", pageBO.getCode()).likeIfPresent("message", pageBO.getMessage()));
+    default IPage<ErrorCodeDO> selectPage(ErrorCodePageDTO pageDTO) {
+        return selectPage(new Page<>(pageDTO.getPageNo(), pageDTO.getPageSize()),
+                new QueryWrapperX<ErrorCodeDO>().likeIfPresent("`group`", pageDTO.getGroup())
+                        .eqIfPresent("code", pageDTO.getCode()).likeIfPresent("message", pageDTO.getMessage()));
     }
 
     default List<ErrorCodeDO> selectListByCodes(Collection<Integer> codes) {

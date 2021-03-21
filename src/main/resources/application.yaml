@@ -33,6 +33,7 @@ mybatis-plus:
   mapper-locations: classpath*:mapper/*.xml
   type-aliases-package: ${yudao.info.base-package}.modules.*.dal.dataobject
 
-ruoyi:
+yudao:
   error-code:
     group: test1
+    constantsClass: cn.iocoder.dashboard.common.exception.enums.GlobalErrorCodeConstants
