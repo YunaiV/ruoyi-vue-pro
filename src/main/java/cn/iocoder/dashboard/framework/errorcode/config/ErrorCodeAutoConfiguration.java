@@ -1,6 +1,7 @@
 package cn.iocoder.dashboard.framework.errorcode.config;
 
-import cn.iocoder.dashboard.framework.errorcode.core.ErrorCodeRemoteLoader;
+import cn.iocoder.dashboard.modules.system.service.errorcode.ErrorCodeRemoteLoaderImpl;
+import cn.iocoder.dashboard.modules.system.service.errorcode.ErrorCodeAutoGeneratorImpl;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,14 +13,14 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 public class ErrorCodeAutoConfiguration {
 
     @Bean
-    public cn.iocoder.dashboard.framework.errorcode.core.ErrorCodeAutoGenerator errorCodeAutoGenerator(ErrorCodeProperties errorCodeProperties) {
-        return new cn.iocoder.dashboard.framework.errorcode.core.ErrorCodeAutoGenerator(errorCodeProperties.getGroup())
+    public ErrorCodeAutoGeneratorImpl errorCodeAutoGenerator(ErrorCodeProperties errorCodeProperties) {
+        return new ErrorCodeAutoGeneratorImpl(errorCodeProperties.getGroup())
                 .setErrorCodeConstantsClass(errorCodeProperties.getConstantsClass());
     }
 
     @Bean
-    public ErrorCodeRemoteLoader errorCodeRemoteLoader(ErrorCodeProperties errorCodeProperties) {
-        return new ErrorCodeRemoteLoader(errorCodeProperties.getGroup());
+    public ErrorCodeRemoteLoaderImpl errorCodeRemoteLoader(ErrorCodeProperties errorCodeProperties) {
+        return new ErrorCodeRemoteLoaderImpl(errorCodeProperties.getGroup());
     }
 
 }
