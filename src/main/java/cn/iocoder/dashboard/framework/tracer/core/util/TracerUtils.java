@@ -18,7 +18,7 @@ public class TracerUtils {
     /**
      * 维护请求线程对应的TraceId
      */
-    private static FastThreadLocal<String> traceIdMap = new FastThreadLocal<>();
+    private final static FastThreadLocal<String> traceIdMap = new FastThreadLocal<>();
 
     /**
      * 保存链路流水号
