@@ -2,7 +2,7 @@ package cn.iocoder.dashboard.modules.system.service.user;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.dashboard.common.pojo.PageResult;
-import cn.iocoder.dashboard.modules.system.controller.user.vo.profile.SysUserProfileUpdatePasswordReqVo;
+import cn.iocoder.dashboard.modules.system.controller.user.vo.profile.SysUserProfileUpdatePasswordReqVO;
 import cn.iocoder.dashboard.modules.system.controller.user.vo.profile.SysUserProfileUpdateReqVO;
 import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserCreateReqVO;
 import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserExportReqVO;
@@ -44,17 +44,18 @@ public interface SysUserService {
     /**
      * 修改用户个人信息
      *
+     * @param id 用户编号
      * @param reqVO 用户个人信息
      */
-    void updateUserProfile(SysUserProfileUpdateReqVO reqVO);
+    void updateUserProfile(Long id, SysUserProfileUpdateReqVO reqVO);
 
     /**
      * 修改用户个人密码
      *
+     * @param id 用户编号
      * @param reqVO 更新用户个人密码
      */
-    void updateUserPassword(SysUserProfileUpdatePasswordReqVo reqVO);
-
+    void updateUserPassword(Long id, SysUserProfileUpdatePasswordReqVO reqVO);
 
     /**
      * 更新用户头像

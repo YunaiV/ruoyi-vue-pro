@@ -3,7 +3,7 @@
     <el-form-item label="用户昵称" prop="nickName">
       <el-input v-model="user.nickname" />
     </el-form-item>
-    <el-form-item label="手机号码" prop="phonenumber">
+    <el-form-item label="手机号码" prop="mobile">
       <el-input v-model="user.mobile" maxlength="11" />
     </el-form-item>
     <el-form-item label="邮箱" prop="email">

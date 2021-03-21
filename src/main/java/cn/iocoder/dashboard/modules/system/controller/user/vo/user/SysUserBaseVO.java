@@ -36,7 +36,7 @@ public class SysUserBaseVO {
 
     @ApiModelProperty(value = "用户邮箱", example = "yudao@iocoder.cn")
     @Email(message = "邮箱格式不正确")
-    @Size(max = 50, message = "邮箱长度不能超过50个字符")
+    @Size(max = 50, message = "邮箱长度不能超过 50 个字符")
     private String email;
 
     @ApiModelProperty(value = "手机号码", example = "15601691300")

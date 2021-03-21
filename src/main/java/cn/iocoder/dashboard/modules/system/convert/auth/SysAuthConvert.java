@@ -3,7 +3,7 @@ package cn.iocoder.dashboard.modules.system.convert.auth;
 import cn.iocoder.dashboard.framework.security.core.LoginUser;
 import cn.iocoder.dashboard.modules.system.controller.auth.vo.auth.SysAuthMenuRespVO;
 import cn.iocoder.dashboard.modules.system.controller.auth.vo.auth.SysAuthPermissionInfoRespVO;
-import cn.iocoder.dashboard.modules.system.controller.user.vo.profile.SysUserProfileUpdatePasswordReqVo;
+import cn.iocoder.dashboard.modules.system.controller.user.vo.profile.SysUserProfileUpdatePasswordReqVO;
 import cn.iocoder.dashboard.modules.system.controller.user.vo.profile.SysUserProfileUpdateReqVO;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.permission.SysMenuDO;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.permission.SysRoleDO;
@@ -42,7 +42,7 @@ public interface SysAuthConvert {
 
     LoginUser convert(SysUserProfileUpdateReqVO reqVO);
 
-    LoginUser convert(SysUserProfileUpdatePasswordReqVo reqVO);
+    LoginUser convert(SysUserProfileUpdatePasswordReqVO reqVO);
 
     /**
      * 将菜单列表，构建成菜单树

@@ -83,8 +83,8 @@ public class RedisConfig {
                 redisTemplate.getRequiredConnectionFactory(), containerOptions);
 
         // 第二步，注册监听器，消费对应的 Stream 主题
-//        String consumerName = buildConsumerName();
-        String consumerName = "110";
+        String consumerName = buildConsumerName();
+//        String consumerName = "110";
         listeners.forEach(listener -> {
             // 创建 listener 对应的消费者分组
             try {
@@ -106,6 +106,12 @@ public class RedisConfig {
         return container;
     }
 
+    /**
+     * 构建消费者名字，使用本地 IP + 进程编号的方式。
+     * 参考自 RocketMQ clientId 的实现
+     *
+     * @return 消费者名字
+     */
     private static String buildConsumerName() {
         return String.format("%s@%d", SystemUtil.getHostInfo().getAddress(), SystemUtil.getCurrentPID());
     }

@@ -9,7 +9,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
-import java.util.Set;
+import java.util.List;
 
 
 @Data
@@ -18,6 +18,7 @@ import java.util.Set;
 @AllArgsConstructor
 @ApiModel("用户个人中心信息 Response VO")
 public class SysUserProfileRespVO extends SysUserBaseVO {
+
     @ApiModelProperty(value = "用户编号", required = true, example = "1")
     private Long id;
 
@@ -36,8 +37,17 @@ public class SysUserProfileRespVO extends SysUserBaseVO {
     /**
      * 所属角色
      */
-    @ApiModelProperty(value = "所属角色", required = true, example = "123456")
-    private Set<Role> roles;
+    private List<Role> roles;
+
+    /**
+     * 所在部门
+     */
+    private Dept dept;
+
+    /**
+     * 所属岗位数组
+     */
+    private List<Post> posts;
 
     @ApiModel("角色")
     @Data
@@ -50,4 +60,29 @@ public class SysUserProfileRespVO extends SysUserBaseVO {
         private String name;
 
     }
+
+    @ApiModel("部门")
+    @Data
+    public static class Dept {
+
+        @ApiModelProperty(value = "部门编号", required = true, example = "1")
+        private Long id;
+
+        @ApiModelProperty(value = "部门名称", required = true, example = "研发部")
+        private String name;
+
+    }
+
+    @ApiModel("岗位")
+    @Data
+    public static class Post {
+
+        @ApiModelProperty(value = "岗位编号", required = true, example = "1")
+        private Long id;
+
+        @ApiModelProperty(value = "岗位名称", required = true, example = "开发")
+        private String name;
+
+    }
+
 }

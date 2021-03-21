@@ -9,7 +9,7 @@ import cn.iocoder.dashboard.common.exception.ServiceException;
 import cn.iocoder.dashboard.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.dashboard.common.pojo.PageResult;
 import cn.iocoder.dashboard.modules.infra.service.file.InfFileService;
-import cn.iocoder.dashboard.modules.system.controller.user.vo.profile.SysUserProfileUpdatePasswordReqVo;
+import cn.iocoder.dashboard.modules.system.controller.user.vo.profile.SysUserProfileUpdatePasswordReqVO;
 import cn.iocoder.dashboard.modules.system.controller.user.vo.profile.SysUserProfileUpdateReqVO;
 import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserCreateReqVO;
 import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserExportReqVO;
@@ -91,22 +91,22 @@ public class SysUserServiceImpl implements SysUserService {
     }
 
     @Override
-    public void updateUserProfile(SysUserProfileUpdateReqVO reqVO) {
+    public void updateUserProfile(Long id, SysUserProfileUpdateReqVO reqVO) {
         // 校验正确性
-        this.checkUserExists(reqVO.getId());
-        this.checkEmailUnique(reqVO.getId(), reqVO.getEmail());
-        this.checkMobileUnique(reqVO.getId(), reqVO.getMobile());
-        userMapper.updateById(SysUserConvert.INSTANCE.convert(reqVO));
+        this.checkUserExists(id);
+        this.checkEmailUnique(id, reqVO.getEmail());
+        this.checkMobileUnique(id, reqVO.getMobile());
+        // 执行更新
+        userMapper.updateById(SysUserConvert.INSTANCE.convert(reqVO).setId(id));
     }
 
     @Override
-    public void updateUserPassword(SysUserProfileUpdatePasswordReqVo reqVO) {
+    public void updateUserPassword(Long id, SysUserProfileUpdatePasswordReqVO reqVO) {
         // 校验旧密码密码
-        this.checkOldPassword(reqVO.getId(), reqVO.getOldPassword());
-        SysUserDO updateObj = new SysUserDO();
-        updateObj.setId(reqVO.getId());
-        // 加密密码
-        updateObj.setPassword(passwordEncoder.encode(reqVO.getNewPassword()));
+        this.checkOldPassword(id, reqVO.getOldPassword());
+        // 执行更新
+        SysUserDO updateObj = new SysUserDO().setId(id);
+        updateObj.setPassword(passwordEncoder.encode(reqVO.getNewPassword())); // 加密密码
         userMapper.updateById(updateObj);
     }
 

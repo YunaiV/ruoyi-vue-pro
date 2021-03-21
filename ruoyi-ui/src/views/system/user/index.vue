@@ -107,8 +107,7 @@
           <el-col :span="12">
             <el-form-item label="归属部门" prop="deptId">
               <treeselect v-model="form.deptId" :options="deptOptions" :show-count="true"
-                          placeholder="请选择归属部门" :normalizer="normalizer"
-              />
+                          placeholder="请选择归属部门" :normalizer="normalizer"/>
             </el-form-item>
           </el-col>
         </el-row>
@@ -140,12 +139,7 @@
           <el-col :span="12">
             <el-form-item label="用户性别">
               <el-select v-model="form.sex" placeholder="请选择">
-                <el-option
-                  v-for="dict in sexDictDatas"
-                  :key="parseInt(dict.value)"
-                  :label="dict.label"
-                  :value="parseInt(dict.value)"
-                ></el-option>
+                <el-option v-for="dict in sexDictDatas" :key="parseInt(dict.value)" :label="dict.label" :value="parseInt(dict.value)"/>
               </el-select>
             </el-form-item>
           </el-col>

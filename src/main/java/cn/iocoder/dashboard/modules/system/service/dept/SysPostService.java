@@ -1,5 +1,6 @@
 package cn.iocoder.dashboard.modules.system.service.dept;
 
+import cn.iocoder.dashboard.common.enums.CommonStatusEnum;
 import cn.iocoder.dashboard.common.pojo.PageResult;
 import cn.iocoder.dashboard.modules.system.controller.dept.vo.post.SysPostCreateReqVO;
 import cn.iocoder.dashboard.modules.system.controller.dept.vo.post.SysPostExportReqVO;
@@ -10,6 +11,8 @@ import org.springframework.lang.Nullable;
 
 import java.util.Collection;
 import java.util.List;
+
+import static cn.iocoder.dashboard.util.collection.SetUtils.asSet;
 
 /**
  * 岗位 Service 接口
@@ -39,6 +42,16 @@ public interface SysPostService {
      * @param id 岗位编号
      */
     void deletePost(Long id);
+
+    /**
+     * 获得岗位列表
+     *
+     * @param ids 岗位编号数组。如果为空，不进行筛选
+     * @return 部门列表
+     */
+    default List<SysPostDO> getPosts(@Nullable Collection<Long> ids) {
+        return getPosts(ids, asSet(CommonStatusEnum.ENABLE.getStatus(), CommonStatusEnum.DISABLE.getStatus()));
+    }
 
     /**
      * 获得符合条件的岗位列表
