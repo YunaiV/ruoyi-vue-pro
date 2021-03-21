@@ -16,7 +16,6 @@ import org.springframework.context.annotation.Configuration;
  */
 @Aspect
 @Slf4j
-@Configuration
 public class BizTracingAop {
 
     @Around(value = "@annotation(bizTracing)")
