@@ -15,6 +15,7 @@ import cn.iocoder.dashboard.modules.system.mq.producer.permission.SysMenuProduce
 import cn.iocoder.dashboard.modules.system.service.permission.SysMenuService;
 import cn.iocoder.dashboard.modules.system.service.permission.SysPermissionService;
 import cn.iocoder.dashboard.util.collection.CollectionUtils;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
@@ -246,7 +247,8 @@ public class SysMenuServiceImpl implements SysMenuService {
      * @param parentId 父菜单编号
      * @param childId 当前菜单编号
      */
-    private void checkParentResource(Long parentId, Long childId) {
+    @VisibleForTesting
+    public void checkParentResource(Long parentId, Long childId) {
         if (parentId == null || MenuIdEnum.ROOT.getId().equals(parentId)) {
             return;
         }
@@ -275,7 +277,8 @@ public class SysMenuServiceImpl implements SysMenuService {
      * @param parentId 父菜单编号
      * @param id 菜单编号
      */
-    private void checkResource(Long parentId, String name, Long id) {
+    @VisibleForTesting
+    public void checkResource(Long parentId, String name, Long id) {
         SysMenuDO menu = menuMapper.selectByParentIdAndName(parentId, name);
         if (menu == null) {
             return;

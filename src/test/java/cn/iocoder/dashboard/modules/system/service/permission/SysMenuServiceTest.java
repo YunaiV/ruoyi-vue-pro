@@ -26,7 +26,9 @@ import javax.annotation.Resource;
 import java.util.*;
 
 import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.*;
-import static cn.iocoder.dashboard.util.RandomUtils.randomPojo;
+import static cn.iocoder.dashboard.util.AssertUtils.assertPojoEquals;
+import static cn.iocoder.dashboard.util.AssertUtils.assertServiceException;
+import static cn.iocoder.dashboard.util.RandomUtils.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
 
@@ -59,14 +61,14 @@ public class SysMenuServiceTest extends BaseDbUnitTest {
         SysMenuServiceImpl target = (SysMenuServiceImpl) AopTargetUtils.getTarget(sysMenuService);
 
         Map<Long, SysMenuDO> menuCache = (Map<Long, SysMenuDO>) BeanUtil.getFieldValue(target, "menuCache");
-        Assert.isTrue(menuCache.size()==2);
-        AssertUtils.assertPojoEquals(menuDO1,menuCache.get(menuDO1.getId()));
-        AssertUtils.assertPojoEquals(menuDO2,menuCache.get(menuDO2.getId()));
+        Assert.isTrue(menuCache.size() == 2);
+        assertPojoEquals(menuDO1, menuCache.get(menuDO1.getId()));
+        assertPojoEquals(menuDO2, menuCache.get(menuDO2.getId()));
 
         Multimap<String, SysMenuDO> permissionMenuCache = (Multimap<String, SysMenuDO>) BeanUtil.getFieldValue(target, "permissionMenuCache");
-        Assert.isTrue(permissionMenuCache.size()==2);
-        AssertUtils.assertPojoEquals(menuDO1,permissionMenuCache.get(menuDO1.getPermission()));
-        AssertUtils.assertPojoEquals(menuDO2,permissionMenuCache.get(menuDO2.getPermission()));
+        Assert.isTrue(permissionMenuCache.size() == 2);
+        assertPojoEquals(menuDO1, permissionMenuCache.get(menuDO1.getPermission()));
+        assertPojoEquals(menuDO2, permissionMenuCache.get(menuDO2.getPermission()));
 
         Date maxUpdateTime = (Date) BeanUtil.getFieldValue(target, "maxUpdateTime");
         assertEquals(ObjectUtils.max(menuDO1.getUpdateTime(), menuDO2.getUpdateTime()), maxUpdateTime);
@@ -92,44 +94,9 @@ public class SysMenuServiceTest extends BaseDbUnitTest {
         Assertions.assertNotNull(menuId);
         // 校验记录的属性是否正确
         SysMenuDO ret = menuMapper.selectById(menuId);
-        AssertUtils.assertPojoEquals(vo, ret);
+        assertPojoEquals(vo, ret);
         // 校验调用
         verify(sysMenuProducer).sendMenuRefreshMessage();
-    }
-
-    @Test
-    public void testCreateMenu_checkParentExist() {
-        Long parentId = RandomUtils.randomLongId();
-
-        // 调用
-        SysMenuCreateReqVO vo = randomPojo(SysMenuCreateReqVO.class, o -> {
-            o.setParentId(parentId);
-            o.setName("testSonName");
-            o.setType(MenuTypeEnum.MENU.getType());
-            o.setStatus(RandomUtils.randomCommonStatus());
-        });
-
-        // 调用, 并断言异常
-        AssertUtils.assertServiceException(() -> sysMenuService.createMenu(vo), MENU_PARENT_NOT_EXISTS);
-    }
-
-    @Test
-    public void testCreateMenu_checkParentTypeError() {
-        //构造父目录
-        SysMenuDO menuDO = createMenuDO(MenuTypeEnum.BUTTON, "parent", 0L);
-        menuMapper.insert(menuDO);
-        Long parentId = menuDO.getId();
-
-        // 调用
-        SysMenuCreateReqVO vo = randomPojo(SysMenuCreateReqVO.class, o -> {
-            o.setParentId(parentId);
-            o.setName("testSonName");
-            o.setType(MenuTypeEnum.MENU.getType());
-            o.setStatus(RandomUtils.randomCommonStatus());
-        });
-
-        // 调用, 并断言异常
-        AssertUtils.assertServiceException(() -> sysMenuService.createMenu(vo), MENU_PARENT_NOT_DIR_OR_MENU);
     }
 
     @Test
@@ -152,7 +119,7 @@ public class SysMenuServiceTest extends BaseDbUnitTest {
         //断言
         // 校验记录的属性是否正确
         SysMenuDO ret = menuMapper.selectById(sonId);
-        AssertUtils.assertPojoEquals(vo, ret);
+        assertPojoEquals(vo, ret);
         // 校验调用
         verify(sysMenuProducer).sendMenuRefreshMessage();
     }
@@ -170,102 +137,14 @@ public class SysMenuServiceTest extends BaseDbUnitTest {
             o.setStatus(RandomUtils.randomCommonStatus());
         });
         //断言
-        AssertUtils.assertServiceException(() -> sysMenuService.updateMenu(vo), MENU_NOT_EXISTS);
-    }
-
-    @Test
-    public void testUpdateMenu_canNotSetSelfToBeParent() {
-        //构造父子目录
-        SysMenuDO sonMenuDO = initParentAndSonMenuDO();
-        Long sonId = sonMenuDO.getId();
-
-        long updateParentId = sonId;
-
-        //调用
-        SysMenuUpdateReqVO vo = RandomUtils.randomPojo(SysMenuUpdateReqVO.class, o -> {
-            o.setId(sonId);
-            o.setParentId(updateParentId);
-            o.setType(MenuTypeEnum.MENU.getType());
-            o.setStatus(RandomUtils.randomCommonStatus());
-        });
-        //断言
-        AssertUtils.assertServiceException(() -> sysMenuService.updateMenu(vo), MENU_PARENT_ERROR);
-    }
-
-    @Test
-    public void testUpdateMenu_parentNotExist() {
-        //构造父子目录
-        SysMenuDO sonMenuDO = initParentAndSonMenuDO();
-        Long sonId = sonMenuDO.getId();
-
-        long updateParentId = -999999;
-
-        //调用
-        SysMenuUpdateReqVO vo = RandomUtils.randomPojo(SysMenuUpdateReqVO.class, o -> {
-            o.setId(sonId);
-            o.setParentId(updateParentId);
-            o.setType(MenuTypeEnum.MENU.getType());
-            o.setStatus(RandomUtils.randomCommonStatus());
-        });
-        //断言
-        AssertUtils.assertServiceException(() -> sysMenuService.updateMenu(vo), MENU_PARENT_NOT_EXISTS);
-    }
-
-    @Test
-    public void testUpdateMenu_parentTypeError() {
-        SysMenuDO sonMenuDO = createMenuDO(MenuTypeEnum.MENU, "son", 999L);
-        menuMapper.insert(sonMenuDO);
-        Long sonId = sonMenuDO.getId();
-
-        //button类型
-        SysMenuDO menuDO = createMenuDO(MenuTypeEnum.BUTTON, "parent", 0L);
-        menuMapper.insert(menuDO);
-        Long parentId = menuDO.getId();
-
-        //调用
-        SysMenuUpdateReqVO vo = RandomUtils.randomPojo(SysMenuUpdateReqVO.class, o -> {
-            o.setId(sonId);
-            o.setParentId(parentId);
-            o.setType(MenuTypeEnum.MENU.getType());
-            o.setStatus(RandomUtils.randomCommonStatus());
-        });
-        //断言
-        AssertUtils.assertServiceException(() -> sysMenuService.updateMenu(vo), MENU_PARENT_NOT_DIR_OR_MENU);
-    }
-
-    @Test
-    public void testUpdateMenu_sonMenuNameDuplicate() {
-        SysMenuDO parent = createMenuDO(MenuTypeEnum.MENU, "parent", 999L);
-        menuMapper.insert(parent);
-        Long parentId = parent.getId();
-
-
-        SysMenuDO sonMenuDO = createMenuDO(MenuTypeEnum.MENU, "son", parentId);
-        menuMapper.insert(sonMenuDO);
-
-        SysMenuDO sonMenuDO2 = createMenuDO(MenuTypeEnum.MENU, "son2", parentId);
-        menuMapper.insert(sonMenuDO2);
-
-        Long sonId = sonMenuDO.getId();
-        String updateName = sonMenuDO2.getName();
-
-        //调用
-        SysMenuUpdateReqVO vo = RandomUtils.randomPojo(SysMenuUpdateReqVO.class, o -> {
-            o.setId(sonId);
-            o.setParentId(parentId);
-            o.setType(MenuTypeEnum.MENU.getType());
-            o.setStatus(RandomUtils.randomCommonStatus());
-            o.setName(updateName);
-        });
-        //断言
-        AssertUtils.assertServiceException(() -> sysMenuService.updateMenu(vo), MENU_NAME_DUPLICATE);
+        assertServiceException(() -> sysMenuService.updateMenu(vo), MENU_NOT_EXISTS);
     }
 
     @Test
     public void testDeleteMenu_success() {
         SysMenuDO sonMenuDO = initParentAndSonMenuDO();
-
         Long sonId = sonMenuDO.getId();
+
         //调用
         sysMenuService.deleteMenu(sonId);
 
@@ -280,7 +159,7 @@ public class SysMenuServiceTest extends BaseDbUnitTest {
     public void testDeleteMenu_menuNotExist() {
         Long sonId = 99999L;
 
-        AssertUtils.assertServiceException(() -> sysMenuService.deleteMenu(sonId), MENU_NOT_EXISTS);
+        assertServiceException(() -> sysMenuService.deleteMenu(sonId), MENU_NOT_EXISTS);
     }
 
     @Test
@@ -288,7 +167,7 @@ public class SysMenuServiceTest extends BaseDbUnitTest {
         SysMenuDO sonMenu = initParentAndSonMenuDO();
         Long parentId = sonMenu.getParentId();
 
-        AssertUtils.assertServiceException(() -> sysMenuService.deleteMenu(parentId), MENU_EXISTS_CHILDREN);
+        assertServiceException(() -> sysMenuService.deleteMenu(parentId), MENU_EXISTS_CHILDREN);
     }
 
     @Test
@@ -307,15 +186,14 @@ public class SysMenuServiceTest extends BaseDbUnitTest {
 
         //断言
         Assert.isTrue(menuDOS.size() == idMenuMap.size());
-        for (SysMenuDO menu : menuDOS) {
-            AssertUtils.assertPojoEquals(idMenuMap.get(menu.getId()), menu);
-        }
+        menuDOS.stream().forEach(m -> assertPojoEquals(idMenuMap.get(m.getId()), m));
     }
 
 
     @Test
     public void testGetMenusReqVo_success() {
         Map<Long, SysMenuDO> idMenuMap = new HashMap<>();
+        //用于验证可以模糊搜索名称包含"name"，状态为1的menu
         SysMenuDO menu = createMenuDO(MenuTypeEnum.MENU, "name2", 0L, 1);
         menuMapper.insert(menu);
         idMenuMap.put(menu.getId(), menu);
@@ -328,12 +206,11 @@ public class SysMenuServiceTest extends BaseDbUnitTest {
         menuMapper.insert(menu);
         idMenuMap.put(menu.getId(), menu);
 
-
+        //以下是不符合搜索条件的的menu
         menu = createMenuDO(MenuTypeEnum.MENU, "xxxxxx", 0L, 1);
         menuMapper.insert(menu);
         menu = createMenuDO(MenuTypeEnum.MENU, "name", 0L, 2);
         menuMapper.insert(menu);
-
 
         //调用
         SysMenuListReqVO reqVO = new SysMenuListReqVO();
@@ -343,9 +220,7 @@ public class SysMenuServiceTest extends BaseDbUnitTest {
 
         //断言
         Assert.isTrue(menuDOS.size() == idMenuMap.size());
-        for (SysMenuDO m : menuDOS) {
-            AssertUtils.assertPojoEquals(idMenuMap.get(m.getId()), m);
-        }
+        menuDOS.stream().forEach(m -> assertPojoEquals(idMenuMap.get(m.getId()), m));
     }
 
     @Test
@@ -356,6 +231,7 @@ public class SysMenuServiceTest extends BaseDbUnitTest {
         BeanUtil.setFieldValue(target, "menuCache", mockCacheMap);
 
         Map<Long, SysMenuDO> idMenuMap = new HashMap<>();
+        //用于验证搜索类型为MENU,状态为1的menu
         SysMenuDO menuDO = createMenuDO(1L, MenuTypeEnum.MENU, "name", 0L, 1);
         mockCacheMap.put(menuDO.getId(), menuDO);
         idMenuMap.put(menuDO.getId(), menuDO);
@@ -364,7 +240,7 @@ public class SysMenuServiceTest extends BaseDbUnitTest {
         mockCacheMap.put(menuDO.getId(), menuDO);
         idMenuMap.put(menuDO.getId(), menuDO);
 
-
+        //以下是不符合搜索条件的menu
         menuDO = createMenuDO(3L, MenuTypeEnum.BUTTON, "name", 0L, 1);
         mockCacheMap.put(menuDO.getId(), menuDO);
         menuDO = createMenuDO(4L, MenuTypeEnum.MENU, "name", 0L, 2);
@@ -372,9 +248,7 @@ public class SysMenuServiceTest extends BaseDbUnitTest {
 
         List<SysMenuDO> menuDOS = sysMenuService.listMenusFromCache(Arrays.asList(MenuTypeEnum.MENU.getType()), Arrays.asList(1));
         Assert.isTrue(menuDOS.size() == idMenuMap.size());
-        for (SysMenuDO m : menuDOS) {
-            AssertUtils.assertPojoEquals(idMenuMap.get(m.getId()), m);
-        }
+        menuDOS.stream().forEach(m -> assertPojoEquals(idMenuMap.get(m.getId()), m));
     }
 
 
@@ -386,10 +260,12 @@ public class SysMenuServiceTest extends BaseDbUnitTest {
         BeanUtil.setFieldValue(target, "menuCache", mockCacheMap);
 
         Map<Long, SysMenuDO> idMenuMap = new HashMap<>();
+        //验证搜索id为1, 类型为MENU, 状态为1 的menu
         SysMenuDO menuDO = createMenuDO(1L, MenuTypeEnum.MENU, "name", 0L, 1);
         mockCacheMap.put(menuDO.getId(), menuDO);
         idMenuMap.put(menuDO.getId(), menuDO);
 
+        //以下是不符合搜索条件的menu
         menuDO = createMenuDO(2L, MenuTypeEnum.MENU, "name", 0L, 1);
         mockCacheMap.put(menuDO.getId(), menuDO);
         menuDO = createMenuDO(3L, MenuTypeEnum.BUTTON, "name", 0L, 1);
@@ -400,9 +276,57 @@ public class SysMenuServiceTest extends BaseDbUnitTest {
         List<SysMenuDO> menuDOS = sysMenuService.listMenusFromCache(Arrays.asList(1L),
                 Arrays.asList(MenuTypeEnum.MENU.getType()), Arrays.asList(1));
         Assert.isTrue(menuDOS.size() == idMenuMap.size());
-        for (SysMenuDO m : menuDOS) {
-            AssertUtils.assertPojoEquals(idMenuMap.get(m.getId()), m);
-        }
+        menuDOS.stream().forEach(menu -> assertPojoEquals(idMenuMap.get(menu.getId()), menu));
+    }
+
+    @Test
+    public void testCheckParentResource_success() {
+        SysMenuDO menuDO = createMenuDO(MenuTypeEnum.MENU, "parent", 0L);
+        menuMapper.insert(menuDO);
+        Long parentId = menuDO.getId();
+
+        sysMenuService.checkParentResource(parentId, null);
+    }
+
+    @Test
+    public void testCheckParentResource_canNotSetSelfToBeParent() {
+        assertServiceException(() -> sysMenuService.checkParentResource(1L, 1L), MENU_PARENT_ERROR);
+    }
+
+    @Test
+    public void testCheckParentResource_parentNotExist() {
+        assertServiceException(() -> sysMenuService.checkParentResource(randomLongId(), null), MENU_PARENT_NOT_EXISTS);
+    }
+
+    @Test
+    public void testCheckParentResource_parentTypeError() {
+        SysMenuDO menuDO = createMenuDO(MenuTypeEnum.BUTTON, "parent", 0L);
+        menuMapper.insert(menuDO);
+        Long parentId = menuDO.getId();
+
+        assertServiceException(() -> sysMenuService.checkParentResource(parentId, null), MENU_PARENT_NOT_DIR_OR_MENU);
+    }
+
+    @Test
+    public void testCheckResource_success(){
+        SysMenuDO sonMenu=initParentAndSonMenuDO();
+        Long parentId=sonMenu.getParentId();
+
+        Long otherSonMenuId=randomLongId();
+        String otherSonMenuName=randomString();
+
+        sysMenuService.checkResource(parentId,otherSonMenuName,otherSonMenuId);
+    }
+
+    @Test
+    public void testCheckResource_sonMenuNameDuplicate(){
+        SysMenuDO sonMenu=initParentAndSonMenuDO();
+        Long parentId=sonMenu.getParentId();
+
+        Long otherSonMenuId=randomLongId();
+        String otherSonMenuName=sonMenu.getName(); //相同名称
+
+        assertServiceException(()->sysMenuService.checkResource(parentId,otherSonMenuName,otherSonMenuId), MENU_NAME_DUPLICATE);
     }
 
     /**
