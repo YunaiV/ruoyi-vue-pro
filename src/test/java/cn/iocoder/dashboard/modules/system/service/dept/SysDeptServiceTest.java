@@ -72,7 +72,6 @@ class SysDeptServiceTest extends BaseDbUnitTest {
         // 断言 maxUpdateTime 缓存
         Date maxUpdateTime = (Date) getFieldValue(deptService, "maxUpdateTime");
         assertEquals(ObjectUtils.max(deptDO1.getUpdateTime(), deptDO2.getUpdateTime()), maxUpdateTime);
-
     }
 
     @Test
