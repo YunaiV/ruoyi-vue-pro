@@ -1,4 +1,4 @@
-package cn.iocoder.dashboard.common.annotation;
+package cn.iocoder.dashboard.framework.tracer.annotation;
 
 import java.lang.annotation.*;
 
