@@ -119,33 +119,6 @@ public class SysRoleServiceImpl implements SysRoleService {
     }
 
     @Override
-    public SysRoleDO getRoleFromCache(Long id) {
-        return roleCache.get(id);
-    }
-
-    @Override
-    public List<SysRoleDO> listRoles(@Nullable Collection<Integer> statuses) {
-        return roleMapper.selectListByStatus(statuses);
-    }
-
-    @Override
-    public List<SysRoleDO> listRolesFromCache(Collection<Long> ids) {
-        if (CollectionUtil.isEmpty(ids)) {
-            return Collections.emptyList();
-        }
-        return roleCache.values().stream().filter(roleDO -> ids.contains(roleDO.getId()))
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public boolean hasAnyAdmin(Collection<SysRoleDO> roleList) {
-        if (CollectionUtil.isEmpty(roleList)) {
-            return false;
-        }
-        return roleList.stream().anyMatch(roleDO -> RoleCodeEnum.ADMIN.getKey().equals(roleDO.getCode()));
-    }
-
-    @Override
     public Long createRole(SysRoleCreateReqVO reqVO) {
         // 校验角色
         checkDuplicateRole(reqVO.getName(), reqVO.getCode(), null);
@@ -174,41 +147,6 @@ public class SysRoleServiceImpl implements SysRoleService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void deleteRole(Long id) {
-        // 校验是否可以更新
-        this.checkUpdateRole(id);
-        // 标记删除
-        roleMapper.deleteById(id);
-        // 删除相关数据
-        permissionService.processRoleDeleted(id);
-        // 发送刷新消息. 注意，需要事务提交后，在进行发送刷新消息。不然 db 还未提交，结果缓存先刷新了
-        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
-
-            @Override
-            public void afterCommit() {
-                roleProducer.sendRoleRefreshMessage();
-            }
-
-        });
-    }
-
-    @Override
-    public SysRoleDO getRole(Long id) {
-        return roleMapper.selectById(id);
-    }
-
-    @Override
-    public PageResult<SysRoleDO> pageRole(SysRolePageReqVO reqVO) {
-        return roleMapper.selectPage(reqVO);
-    }
-
-    @Override
-    public List<SysRoleDO> listRoles(SysRoleExportReqVO reqVO) {
-        return roleMapper.listRoles(reqVO);
-    }
-
-    @Override
     public void updateRoleStatus(Long id, Integer status) {
         // 校验是否可以更新
         this.checkUpdateRole(id);
@@ -233,6 +171,68 @@ public class SysRoleServiceImpl implements SysRoleService {
         roleMapper.updateById(updateObject);
         // 发送刷新消息
         roleProducer.sendRoleRefreshMessage();
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteRole(Long id) {
+        // 校验是否可以更新
+        this.checkUpdateRole(id);
+        // 标记删除
+        roleMapper.deleteById(id);
+        // 删除相关数据
+        permissionService.processRoleDeleted(id);
+        // 发送刷新消息. 注意，需要事务提交后，在进行发送刷新消息。不然 db 还未提交，结果缓存先刷新了
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+
+            @Override
+            public void afterCommit() {
+                roleProducer.sendRoleRefreshMessage();
+            }
+
+        });
+    }
+
+    @Override
+    public SysRoleDO getRoleFromCache(Long id) {
+        return roleCache.get(id);
+    }
+
+    @Override
+    public List<SysRoleDO> getRoles(@Nullable Collection<Integer> statuses) {
+        return roleMapper.selectListByStatus(statuses);
+    }
+
+    @Override
+    public List<SysRoleDO> getRolesFromCache(Collection<Long> ids) {
+        if (CollectionUtil.isEmpty(ids)) {
+            return Collections.emptyList();
+        }
+        return roleCache.values().stream().filter(roleDO -> ids.contains(roleDO.getId()))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public boolean hasAnyAdmin(Collection<SysRoleDO> roleList) {
+        if (CollectionUtil.isEmpty(roleList)) {
+            return false;
+        }
+        return roleList.stream().anyMatch(roleDO -> RoleCodeEnum.ADMIN.getKey().equals(roleDO.getCode()));
+    }
+
+    @Override
+    public SysRoleDO getRole(Long id) {
+        return roleMapper.selectById(id);
+    }
+
+    @Override
+    public PageResult<SysRoleDO> getRolePage(SysRolePageReqVO reqVO) {
+        return roleMapper.selectPage(reqVO);
+    }
+
+    @Override
+    public List<SysRoleDO> getRoles(SysRoleExportReqVO reqVO) {
+        return roleMapper.listRoles(reqVO);
     }
 
     /**
@@ -278,16 +278,10 @@ public class SysRoleServiceImpl implements SysRoleService {
         }
     }
 
-
-//    /**
-//     * 根据条件分页查询角色数据
-//     *
-//     * @param role 角色信息
-//     * @return 角色数据集合信息
-//     */
 //    @Override
 //    @DataScope(deptAlias = "d")
 //    public List<SysRole> selectRoleList(SysRole role) {
 //        return roleMapper.selectRoleList(role);
 //    }
+
 }

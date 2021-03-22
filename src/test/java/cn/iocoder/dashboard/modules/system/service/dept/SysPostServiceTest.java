@@ -59,7 +59,7 @@ class SysPostServiceTest extends BaseDbUnitTest {
         reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
 
         // 调用
-        PageResult<SysPostDO> pageResult = postService.pagePosts(reqVO);
+        PageResult<SysPostDO> pageResult = postService.getPostPage(reqVO);
 
         // 断言
         assertEquals(1, pageResult.getTotal());
@@ -85,7 +85,7 @@ class SysPostServiceTest extends BaseDbUnitTest {
         reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
 
         // 调用
-        List<SysPostDO> list = postService.listPosts(reqVO);
+        List<SysPostDO> list = postService.getPosts(reqVO);
         // 断言
         assertEquals(1, list.size());
         assertPojoEquals(postDO, list.get(0));

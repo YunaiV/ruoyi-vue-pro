@@ -131,7 +131,7 @@ public class SysDictDataServiceImpl implements SysDictDataService {
     }
 
     @Override
-    public List<SysDictDataDO> getDictDataList() {
+    public List<SysDictDataDO> getDictDatas() {
         List<SysDictDataDO> list = dictDataMapper.selectList();
         list.sort(COMPARATOR_TYPE_AND_SORT);
         return list;
@@ -143,7 +143,7 @@ public class SysDictDataServiceImpl implements SysDictDataService {
     }
 
     @Override
-    public List<SysDictDataDO> getDictDataList(SysDictDataExportReqVO reqVO) {
+    public List<SysDictDataDO> getDictDatas(SysDictDataExportReqVO reqVO) {
         List<SysDictDataDO> list = dictDataMapper.selectList(reqVO);
         list.sort(COMPARATOR_TYPE_AND_SORT);
         return list;

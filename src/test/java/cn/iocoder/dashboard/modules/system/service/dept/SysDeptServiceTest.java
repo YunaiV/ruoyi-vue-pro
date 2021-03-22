@@ -72,7 +72,6 @@ class SysDeptServiceTest extends BaseDbUnitTest {
         // 断言 maxUpdateTime 缓存
         Date maxUpdateTime = (Date) getFieldValue(deptService, "maxUpdateTime");
         assertEquals(ObjectUtils.max(deptDO1.getUpdateTime(), deptDO2.getUpdateTime()), maxUpdateTime);
-
     }
 
     @Test
@@ -92,7 +91,7 @@ class SysDeptServiceTest extends BaseDbUnitTest {
         reqVO.setName("开");
         reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
         // 调用
-        List<SysDeptDO> sysDeptDOS = deptService.listDepts(reqVO);
+        List<SysDeptDO> sysDeptDOS = deptService.getSimpleDepts(reqVO);
         // 断言
         assertEquals(1, sysDeptDOS.size());
         assertPojoEquals(dept, sysDeptDOS.get(0));

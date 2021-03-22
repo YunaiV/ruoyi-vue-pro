@@ -1,17 +1,17 @@
 package cn.iocoder.dashboard.modules.system.convert.user;
 
-import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserCreateReqVO;
-import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserExcelVO;
-import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserImportExcelVO;
-import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserPageItemRespVO;
-import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserProfileRespVO;
-import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserProfileUpdateReqVO;
-import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserUpdateReqVO;
+import cn.iocoder.dashboard.modules.system.controller.user.vo.profile.SysUserProfileRespVO;
+import cn.iocoder.dashboard.modules.system.controller.user.vo.profile.SysUserProfileUpdatePasswordReqVO;
+import cn.iocoder.dashboard.modules.system.controller.user.vo.profile.SysUserProfileUpdateReqVO;
+import cn.iocoder.dashboard.modules.system.controller.user.vo.user.*;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.dept.SysDeptDO;
+import cn.iocoder.dashboard.modules.system.dal.dataobject.dept.SysPostDO;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.permission.SysRoleDO;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.user.SysUserDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
+
+import java.util.List;
 
 @Mapper
 public interface SysUserConvert {
@@ -32,10 +32,14 @@ public interface SysUserConvert {
 
     SysUserProfileRespVO convert03(SysUserDO bean);
 
-    SysUserProfileRespVO.Role convert(SysRoleDO bean);
+    List<SysUserProfileRespVO.Role> convertList(List<SysRoleDO> list);
+
+    SysUserProfileRespVO.Dept convert02(SysDeptDO bean);
 
     SysUserDO convert(SysUserProfileUpdateReqVO bean);
 
+    SysUserDO convert(SysUserProfileUpdatePasswordReqVO bean);
 
+    List<SysUserProfileRespVO.Post> convertList02(List<SysPostDO> list);
 
 }

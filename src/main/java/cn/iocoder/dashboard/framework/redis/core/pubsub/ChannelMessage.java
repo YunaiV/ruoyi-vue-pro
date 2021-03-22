@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * Redis Channel Message 接口
+ *
+ * @author 芋道源码
  */
 public interface ChannelMessage {
 
@@ -12,7 +14,7 @@ public interface ChannelMessage {
      *
      * @return Channel
      */
-    @JsonIgnore // 必须序列化
+    @JsonIgnore // 避免序列化
     String getChannel();
 
 }

@@ -55,11 +55,11 @@ public class SysOperateLogServiceImpl implements SysOperateLogService {
     }
 
     @Override
-    public PageResult<SysOperateLogDO> pageOperateLog(SysOperateLogPageReqVO reqVO) {
+    public PageResult<SysOperateLogDO> getOperateLogPage(SysOperateLogPageReqVO reqVO) {
         // 处理基于用户昵称的查询
         Collection<Long> userIds = null;
         if (StrUtil.isNotEmpty(reqVO.getUserNickname())) {
-            userIds = convertSet(userService.listUsersByNickname(reqVO.getUserNickname()), SysUserDO::getId);
+            userIds = convertSet(userService.getUsersByNickname(reqVO.getUserNickname()), SysUserDO::getId);
             if (CollUtil.isEmpty(userIds)) {
                 return PageResult.empty();
             }
@@ -69,11 +69,11 @@ public class SysOperateLogServiceImpl implements SysOperateLogService {
     }
 
     @Override
-    public List<SysOperateLogDO> listOperateLogs(SysOperateLogExportReqVO reqVO) {
+    public List<SysOperateLogDO> getOperateLogs(SysOperateLogExportReqVO reqVO) {
         // 处理基于用户昵称的查询
         Collection<Long> userIds = null;
         if (StrUtil.isNotEmpty(reqVO.getUserNickname())) {
-            userIds = convertSet(userService.listUsersByNickname(reqVO.getUserNickname()), SysUserDO::getId);
+            userIds = convertSet(userService.getUsersByNickname(reqVO.getUserNickname()), SysUserDO::getId);
             if (CollUtil.isEmpty(userIds)) {
                 return Collections.emptyList();
             }

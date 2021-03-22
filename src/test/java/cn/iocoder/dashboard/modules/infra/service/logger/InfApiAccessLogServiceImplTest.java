@@ -38,7 +38,6 @@ public class InfApiAccessLogServiceImplTest extends BaseDbUnitTest {
     @Resource
     private InfApiAccessLogMapper infApiAccessLogMapper;
 
-
     @Test
     public void testCreateApiAccessLogAsync() throws Exception {
         ApiAccessLogCreateDTO createDTO = RandomUtils.randomPojo(
@@ -59,13 +58,12 @@ public class InfApiAccessLogServiceImplTest extends BaseDbUnitTest {
         assertPojoEquals(createDTO, infApiAccessLogDO);
     }
 
-
     @Test
     public void testGetApiAccessLogPage() {
         // 构造测试数据
         long userId = 2233L;
         int userType = UserTypeEnum.ADMIN.getValue();
-        String applicationName = "ruoyi-test";
+        String applicationName = "yudao-test";
         String requestUrl = "foo";
         Date beginTime = buildTime(2021, 3, 13);
         int duration = 1000;
@@ -123,7 +121,7 @@ public class InfApiAccessLogServiceImplTest extends BaseDbUnitTest {
         // 构造测试数据
         long userId = 2233L;
         int userType = UserTypeEnum.ADMIN.getValue();
-        String applicationName = "ruoyi-test";
+        String applicationName = "yudao-test";
         String requestUrl = "foo";
         Date beginTime = buildTime(2021, 3, 13);
         int duration = 1000;
@@ -174,4 +172,5 @@ public class InfApiAccessLogServiceImplTest extends BaseDbUnitTest {
         assertEquals(1, list.size());
         assertPojoEquals(infApiAccessLogDO, list.get(0));
     }
+
 }

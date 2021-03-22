@@ -1,15 +1,11 @@
 package cn.iocoder.dashboard.modules.system.service.logger;
 
 import cn.hutool.core.map.MapUtil;
-import cn.hutool.core.util.ArrayUtil;
-import cn.hutool.core.util.RandomUtil;
-import cn.hutool.core.util.ReflectUtil;
 import cn.iocoder.dashboard.BaseDbUnitTest;
 import cn.iocoder.dashboard.common.enums.CommonStatusEnum;
 import cn.iocoder.dashboard.common.exception.enums.GlobalErrorCodeConstants;
 import cn.iocoder.dashboard.common.pojo.PageResult;
 import cn.iocoder.dashboard.framework.logger.operatelog.core.enums.OperateTypeEnum;
-import cn.iocoder.dashboard.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.dashboard.framework.tracer.core.util.TracerUtils;
 import cn.iocoder.dashboard.modules.system.controller.logger.vo.operatelog.SysOperateLogCreateReqVO;
 import cn.iocoder.dashboard.modules.system.controller.logger.vo.operatelog.SysOperateLogExportReqVO;
@@ -17,7 +13,6 @@ import cn.iocoder.dashboard.modules.system.controller.logger.vo.operatelog.SysOp
 import cn.iocoder.dashboard.modules.system.dal.dataobject.logger.SysOperateLogDO;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.user.SysUserDO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.logger.SysOperateLogMapper;
-import cn.iocoder.dashboard.modules.system.dal.mysql.user.SysUserMapper;
 import cn.iocoder.dashboard.modules.system.enums.common.SysSexEnum;
 import cn.iocoder.dashboard.modules.system.service.logger.impl.SysOperateLogServiceImpl;
 import cn.iocoder.dashboard.modules.system.service.user.SysUserService;
@@ -28,105 +23,78 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
-import java.lang.reflect.Field;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-import java.util.stream.Collectors;
 
 import static cn.iocoder.dashboard.util.AssertUtils.assertPojoEquals;
+import static cn.iocoder.dashboard.util.RandomUtils.randomLongId;
 import static cn.iocoder.dashboard.util.date.DateUtils.buildTime;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.when;
 
 @Import({SysOperateLogServiceImpl.class})
 public class SysOperateLogServiceImplTest extends BaseDbUnitTest {
 
     @Resource
-    private SysOperateLogService sysOperateLogServiceImpl;
+    private SysOperateLogService operateLogServiceImpl;
 
     @Resource
-    private SysOperateLogMapper sysOperateLogMapper;
-
-    @Resource
-    private SysUserMapper sysUserMapper;
+    private SysOperateLogMapper operateLogMapper;
 
     @MockBean
-    private SysUserService sysUserService;
+    private SysUserService userService;
 
     @Test
     public void testCreateOperateLogAsync() throws InterruptedException, ExecutionException {
-
         String traceId = TracerUtils.getTraceId();
-        SysOperateLogCreateReqVO reqVO = RandomUtils.randomPojo(SysOperateLogCreateReqVO.class, vo -> {
-            vo.setTraceId(traceId);
-            vo.setUserId(RandomUtil.randomLong(1, Long.MAX_VALUE));
-
-            Map<String, Object> map = MapUtil.builder("orderId", (Object) 1).build();
-            vo.setExts(map);
+        SysOperateLogCreateReqVO reqVO = RandomUtils.randomPojo(SysOperateLogCreateReqVO.class, o -> {
+            o.setTraceId(traceId);
+            o.setUserId(randomLongId());
+            o.setExts(MapUtil.<String, Object>builder("orderId", randomLongId()).build());
         });
 
         // 执行service方法
-        Future<Boolean> future = sysOperateLogServiceImpl.createOperateLogAsync(reqVO);
-
-        // 等异步执行完
+        Future<Boolean> future = operateLogServiceImpl.createOperateLogAsync(reqVO);
         future.get();
-
-        // 查询插入的数据
-        SysOperateLogDO sysOperateLogDO = sysOperateLogMapper.selectOne("trace_id", traceId);
-
-        // 断言
-        assertNotNull(sysOperateLogDO);
-        // 断言，忽略基本字段
+        // 断言插入是否正确
+        SysOperateLogDO sysOperateLogDO = operateLogMapper.selectOne("trace_id", traceId);
         assertPojoEquals(reqVO, sysOperateLogDO);
     }
 
-
     @Test
-    public void testPageOperateLog() {
-
+    public void testGetOperateLogPage() {
         // 构造测试数据
-
         // 先构造用户
-        SysUserDO user = RandomUtils.randomPojo(SysUserDO.class, sysUserDO -> {
-            sysUserDO.setNickname("wangkai");
-            sysUserDO.setSex(SysSexEnum.MALE.getSEX());
-            sysUserDO.setStatus(CommonStatusEnum.ENABLE.getStatus());
+        SysUserDO user = RandomUtils.randomPojo(SysUserDO.class, o -> {
+            o.setNickname("wangkai");
+            o.setSex(SysSexEnum.MALE.getSEX());
+            o.setStatus(CommonStatusEnum.ENABLE.getStatus());
         });
-        sysUserMapper.insert(user);
+        when(userService.getUsersByNickname("wangkai")).thenReturn(Collections.singletonList(user));
         Long userId = user.getId();
-
-
         // 构造操作日志
-        SysOperateLogDO sysOperateLogDO = RandomUtils.randomPojo(SysOperateLogDO.class, entity -> {
-            entity.setTraceId(TracerUtils.getTraceId());
-            entity.setUserId(userId);
-            entity.setModule("order");
-            entity.setType(OperateTypeEnum.CREATE.getType());
-            entity.setStartTime(buildTime(2021, 3, 6));
-            entity.setResultCode(GlobalErrorCodeConstants.SUCCESS.getCode());
-
-            Map<String, Object> map = new HashMap<>();
-            map.put("orderId", 1);
-            entity.setExts(map);
+        SysOperateLogDO sysOperateLogDO = RandomUtils.randomPojo(SysOperateLogDO.class, o -> {
+            o.setUserId(userId);
+            o.setModule("order");
+            o.setType(OperateTypeEnum.CREATE.getType());
+            o.setStartTime(buildTime(2021, 3, 6));
+            o.setResultCode(GlobalErrorCodeConstants.SUCCESS.getCode());
+            o.setExts(MapUtil.<String, Object>builder("orderId", randomLongId()).build());
         });
-
-        sysOperateLogMapper.insert(sysOperateLogDO);
+        operateLogMapper.insert(sysOperateLogDO);
 
         // 下面几个是不匹配的数据
-        // 随机userId
-        sysOperateLogMapper.insert(ObjectUtils.clone(sysOperateLogDO, logDO -> logDO.setUserId(userId + 1)));
-        // module不同
-        sysOperateLogMapper.insert(ObjectUtils.clone(sysOperateLogDO, logDO -> logDO.setModule("user")));
-        // type不同
-        sysOperateLogMapper.insert(ObjectUtils.clone(sysOperateLogDO, logDO -> logDO.setType(OperateTypeEnum.IMPORT.getType())));
-        // createTime不同
-        sysOperateLogMapper.insert(ObjectUtils.clone(sysOperateLogDO, logDO -> logDO.setStartTime(buildTime(2021, 2, 6))));
-        // resultCode不同
-        sysOperateLogMapper.insert(ObjectUtils.clone(sysOperateLogDO, logDO -> logDO.setResultCode(GlobalErrorCodeConstants.BAD_REQUEST.getCode())));
+        // 随机 userId
+        operateLogMapper.insert(ObjectUtils.clone(sysOperateLogDO, logDO -> logDO.setUserId(userId + 1)));
+        // module 不同
+        operateLogMapper.insert(ObjectUtils.clone(sysOperateLogDO, logDO -> logDO.setModule("user")));
+        // type 不同
+        operateLogMapper.insert(ObjectUtils.clone(sysOperateLogDO, logDO -> logDO.setType(OperateTypeEnum.IMPORT.getType())));
+        // createTime 不同
+        operateLogMapper.insert(ObjectUtils.clone(sysOperateLogDO, logDO -> logDO.setStartTime(buildTime(2021, 2, 6))));
+        // resultCode 不同
+        operateLogMapper.insert(ObjectUtils.clone(sysOperateLogDO, logDO -> logDO.setResultCode(GlobalErrorCodeConstants.BAD_REQUEST.getCode())));
 
         // 构造调用参数
         SysOperateLogPageReqVO reqVO = new SysOperateLogPageReqVO();
@@ -138,8 +106,7 @@ public class SysOperateLogServiceImplTest extends BaseDbUnitTest {
         reqVO.setSuccess(true);
 
         // 调用service方法
-        PageResult<SysOperateLogDO> pageResult = sysOperateLogServiceImpl.pageOperateLog(reqVO);
-
+        PageResult<SysOperateLogDO> pageResult = operateLogServiceImpl.getOperateLogPage(reqVO);
         // 断言，只查到了一条符合条件的
         assertEquals(1, pageResult.getTotal());
         assertEquals(1, pageResult.getList().size());
@@ -147,47 +114,38 @@ public class SysOperateLogServiceImplTest extends BaseDbUnitTest {
     }
 
     @Test
-    public void testListOperateLogs() {
-
+    public void testGetOperateLogs() {
         // 构造测试数据
-
         // 先构造用户
-        SysUserDO user = RandomUtils.randomPojo(SysUserDO.class, sysUserDO -> {
-            sysUserDO.setNickname("wangkai");
-            sysUserDO.setSex(SysSexEnum.MALE.getSEX());
-            sysUserDO.setStatus(CommonStatusEnum.ENABLE.getStatus());
+        SysUserDO user = RandomUtils.randomPojo(SysUserDO.class, o -> {
+            o.setNickname("wangkai");
+            o.setSex(SysSexEnum.MALE.getSEX());
+            o.setStatus(CommonStatusEnum.ENABLE.getStatus());
         });
-        sysUserMapper.insert(user);
+        when(userService.getUsersByNickname("wangkai")).thenReturn(Collections.singletonList(user));
         Long userId = user.getId();
-
-
         // 构造操作日志
-        SysOperateLogDO sysOperateLogDO = RandomUtils.randomPojo(SysOperateLogDO.class, entity -> {
-            entity.setTraceId(TracerUtils.getTraceId());
-            entity.setUserId(userId);
-            entity.setModule("order");
-            entity.setType(OperateTypeEnum.CREATE.getType());
-            entity.setStartTime(buildTime(2021, 3, 6));
-            entity.setResultCode(GlobalErrorCodeConstants.SUCCESS.getCode());
-
-
-            Map<String, Object> map = MapUtil.builder("orderId", (Object) 1).build();
-            entity.setExts(map);
+        SysOperateLogDO sysOperateLogDO = RandomUtils.randomPojo(SysOperateLogDO.class, o -> {
+            o.setUserId(userId);
+            o.setModule("order");
+            o.setType(OperateTypeEnum.CREATE.getType());
+            o.setStartTime(buildTime(2021, 3, 6));
+            o.setResultCode(GlobalErrorCodeConstants.SUCCESS.getCode());
+            o.setExts(MapUtil.<String, Object>builder("orderId", randomLongId()).build());
         });
-
-        sysOperateLogMapper.insert(sysOperateLogDO);
+        operateLogMapper.insert(sysOperateLogDO);
 
         // 下面几个是不匹配的数据
-        // 随机userId
-        sysOperateLogMapper.insert(ObjectUtils.clone(sysOperateLogDO, logDO -> logDO.setUserId(userId + 1)));
-        // module不同
-        sysOperateLogMapper.insert(ObjectUtils.clone(sysOperateLogDO, logDO -> logDO.setModule("user")));
-        // type不同
-        sysOperateLogMapper.insert(ObjectUtils.clone(sysOperateLogDO, logDO -> logDO.setType(OperateTypeEnum.IMPORT.getType())));
-        // createTime不同
-        sysOperateLogMapper.insert(ObjectUtils.clone(sysOperateLogDO, logDO -> logDO.setStartTime(buildTime(2021, 2, 6))));
-        // resultCode不同
-        sysOperateLogMapper.insert(ObjectUtils.clone(sysOperateLogDO, logDO -> logDO.setResultCode(GlobalErrorCodeConstants.BAD_REQUEST.getCode())));
+        // 随机 userId
+        operateLogMapper.insert(ObjectUtils.clone(sysOperateLogDO, logDO -> logDO.setUserId(userId + 1)));
+        // module 不同
+        operateLogMapper.insert(ObjectUtils.clone(sysOperateLogDO, logDO -> logDO.setModule("user")));
+        // type 不同
+        operateLogMapper.insert(ObjectUtils.clone(sysOperateLogDO, logDO -> logDO.setType(OperateTypeEnum.IMPORT.getType())));
+        // createTime 不同
+        operateLogMapper.insert(ObjectUtils.clone(sysOperateLogDO, logDO -> logDO.setStartTime(buildTime(2021, 2, 6))));
+        // resultCode 不同
+        operateLogMapper.insert(ObjectUtils.clone(sysOperateLogDO, logDO -> logDO.setResultCode(GlobalErrorCodeConstants.BAD_REQUEST.getCode())));
 
         // 构造调用参数
         SysOperateLogExportReqVO reqVO = new SysOperateLogExportReqVO();
@@ -198,11 +156,11 @@ public class SysOperateLogServiceImplTest extends BaseDbUnitTest {
         reqVO.setEndTime(buildTime(2021, 3, 7));
         reqVO.setSuccess(true);
 
-        // 调用service方法
-        List<SysOperateLogDO> list = sysOperateLogServiceImpl.listOperateLogs(reqVO);
-
+        // 调用 service 方法
+        List<SysOperateLogDO> list = operateLogServiceImpl.getOperateLogs(reqVO);
         // 断言，只查到了一条符合条件的
         assertEquals(1, list.size());
         assertPojoEquals(sysOperateLogDO, list.get(0));
     }
+
 }

@@ -31,7 +31,7 @@ public class WebFrameworkUtils {
         return (Long) request.getAttribute(REQUEST_ATTRIBUTE_LOGIN_USER_ID);
     }
 
-    public static Integer getUesrType(HttpServletRequest request) {
+    public static Integer getUserType(HttpServletRequest request) {
         return UserTypeEnum.ADMIN.getValue(); // TODO 芋艿：等后续优化
     }
 

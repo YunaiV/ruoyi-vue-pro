@@ -3,6 +3,7 @@ package cn.iocoder.dashboard.modules.system.controller.dict;
 import cn.iocoder.dashboard.common.pojo.CommonResult;
 import cn.iocoder.dashboard.common.pojo.PageResult;
 import cn.iocoder.dashboard.framework.excel.core.util.ExcelUtils;
+import cn.iocoder.dashboard.framework.logger.operatelog.core.annotations.OperateLog;
 import cn.iocoder.dashboard.modules.system.controller.dict.vo.type.*;
 import cn.iocoder.dashboard.modules.system.convert.dict.SysDictTypeConvert;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.dict.SysDictTypeDO;
@@ -10,66 +11,67 @@ import cn.iocoder.dashboard.modules.system.service.dict.SysDictTypeService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 import java.io.IOException;
 import java.util.List;
 
 import static cn.iocoder.dashboard.common.pojo.CommonResult.success;
+import static cn.iocoder.dashboard.framework.logger.operatelog.core.enums.OperateTypeEnum.EXPORT;
 
 @Api(tags = "字典类型")
 @RestController
 @RequestMapping("/system/dict-type")
+@Validated
 public class SysDictTypeController {
 
     @Resource
     private SysDictTypeService dictTypeService;
 
+    @PostMapping("/create")
+    @ApiOperation("创建字典类型")
+    @PreAuthorize("@ss.hasPermission('system:dict:create')")
+    public CommonResult<Long> createDictType(@Valid @RequestBody SysDictTypeCreateReqVO reqVO) {
+        Long dictTypeId = dictTypeService.createDictType(reqVO);
+        return success(dictTypeId);
+    }
+
+    @PostMapping("update")
+    @ApiOperation("修改字典类型")
+    @PreAuthorize("@ss.hasPermission('system:dict:update')")
+    public CommonResult<Boolean> updateDictType(@Valid @RequestBody SysDictTypeUpdateReqVO reqVO) {
+        dictTypeService.updateDictType(reqVO);
+        return success(true);
+    }
+
+    @DeleteMapping("/delete")
+    @ApiOperation("删除字典类型")
+    @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
+    @PreAuthorize("@ss.hasPermission('system:dict:delete')")
+    public CommonResult<Boolean> deleteDictType(Long id) {
+        dictTypeService.deleteDictType(id);
+        return success(true);
+    }
+
     @ApiOperation("/获得字典类型的分页列表")
     @GetMapping("/page")
-//    @PreAuthorize("@ss.hasPermi('system:dict:list')")
-    public CommonResult<PageResult<SysDictTypeRespVO>> pageDictTypes(@Validated SysDictTypePageReqVO reqVO) {
+    @PreAuthorize("@ss.hasPermission('system:dict:quey')")
+    public CommonResult<PageResult<SysDictTypeRespVO>> pageDictTypes(@Valid SysDictTypePageReqVO reqVO) {
         return success(SysDictTypeConvert.INSTANCE.convertPage(dictTypeService.getDictTypePage(reqVO)));
     }
 
     @ApiOperation("/查询字典类型详细")
     @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
     @GetMapping(value = "/get")
-//    @PreAuthorize("@ss.hasPermi('system:dict:query')")
+    @PreAuthorize("@ss.hasPermission('system:dict:quey')")
     public CommonResult<SysDictTypeRespVO> getDictType(@RequestParam("id") Long id) {
         return success(SysDictTypeConvert.INSTANCE.convert(dictTypeService.getDictType(id)));
     }
-
-    @ApiOperation("新增字典类型")
-    @PostMapping("/create")
-//    @PreAuthorize("@ss.hasPermi('system:dict:add')")
-//    @Log(title = "字典类型", businessType = BusinessType.INSERT)
-    public CommonResult<Long> createDictType(@Validated @RequestBody SysDictTypeCreateReqVO reqVO) {
-        Long dictTypeId = dictTypeService.createDictType(reqVO);
-        return success(dictTypeId);
-    }
-
-    @ApiOperation("修改字典类型")
-    @PostMapping("update")
-//    @PreAuthorize("@ss.hasPermi('system:dict:edit')")
-//    @Log(title = "字典类型", businessType = BusinessType.UPDATE)
-    public CommonResult<Boolean> updateDictType(@Validated @RequestBody SysDictTypeUpdateReqVO reqVO) {
-        dictTypeService.updateDictType(reqVO);
-        return success(true);
-    }
-
-    @ApiOperation("删除字典类型")
-    @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
-    @PostMapping("/delete")
-//    @PreAuthorize("@ss.hasPermi('system:dict:remove')")
-    public CommonResult<Boolean> deleteDictType(Long id) {
-        dictTypeService.deleteDictType(id);
-        return success(true);
-    }
-
 
     @GetMapping("/list-all-simple")
     @ApiOperation(value = "获得全部字典类型列表", notes = "包括开启 + 禁用的字典类型，主要用于前端的下拉选项")
@@ -81,14 +83,13 @@ public class SysDictTypeController {
 
     @ApiOperation("导出数据类型")
     @GetMapping("/export")
-//    @Log(title = "字典类型", businessType = BusinessType.EXPORT)
-//    @PreAuthorize("@ss.hasPermi('system:dict:export')")
-    public void export(HttpServletResponse response, @Validated SysDictTypeExportReqVO reqVO) throws IOException {
+    @PreAuthorize("@ss.hasPermission('system:dict:quey')")
+    @OperateLog(type = EXPORT)
+    public void export(HttpServletResponse response, @Valid SysDictTypeExportReqVO reqVO) throws IOException {
         List<SysDictTypeDO> list = dictTypeService.getDictTypeList(reqVO);
-        List<SysDictTypeExcelVO> excelTypeList = SysDictTypeConvert.INSTANCE.convertList02(list);
+        List<SysDictTypeExcelVO> data = SysDictTypeConvert.INSTANCE.convertList02(list);
         // 输出
-        ExcelUtils.write(response, "字典类型.xls", "类型列表",
-                SysDictTypeExcelVO.class, excelTypeList);
+        ExcelUtils.write(response, "字典类型.xls", "类型列表", SysDictTypeExcelVO.class, data);
     }
 
 }
