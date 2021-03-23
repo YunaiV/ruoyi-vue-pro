@@ -30,8 +30,8 @@ public interface SysErrorCodeConstants {
 
     // ========== 角色模块 1002003000 ==========
     ErrorCode ROLE_NOT_EXISTS = new ErrorCode(1002003000, "角色不存在");
-    ErrorCode ROLE_NAME_DUPLICATE = new ErrorCode(1002003001, "已经存在名为【{}}】的角色");
-    ErrorCode ROLE_CODE_DUPLICATE = new ErrorCode(1002003002, "已经存在编码为【{}}】的角色");
+    ErrorCode ROLE_NAME_DUPLICATE = new ErrorCode(1002003001, "已经存在名为【{}】的角色");
+    ErrorCode ROLE_CODE_DUPLICATE = new ErrorCode(1002003002, "已经存在编码为【{}】的角色");
     ErrorCode ROLE_CAN_NOT_UPDATE_SYSTEM_TYPE_ROLE = new ErrorCode(1002003004, "不能操作类型为系统内置的角色");
 
     // ========== 用户模块 1002004000 ==========

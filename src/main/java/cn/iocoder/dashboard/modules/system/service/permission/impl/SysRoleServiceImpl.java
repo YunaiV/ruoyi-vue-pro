@@ -18,6 +18,7 @@ import cn.iocoder.dashboard.modules.system.enums.permission.SysRoleTypeEnum;
 import cn.iocoder.dashboard.modules.system.mq.producer.permission.SysRoleProducer;
 import cn.iocoder.dashboard.modules.system.service.permission.SysPermissionService;
 import cn.iocoder.dashboard.modules.system.service.permission.SysRoleService;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.Nullable;
@@ -245,7 +246,8 @@ public class SysRoleServiceImpl implements SysRoleService {
      * @param code 角色额编码
      * @param id 角色编号
      */
-    private void checkDuplicateRole(String name, String code, Long id) {
+    @VisibleForTesting
+    public void checkDuplicateRole(String name, String code, Long id) {
         // 1. 该 name 名字被其它角色所使用
         SysRoleDO role = roleMapper.selectByName(name);
         if (role != null && !role.getId().equals(id)) {
@@ -258,7 +260,7 @@ public class SysRoleServiceImpl implements SysRoleService {
         // 该 code 编码被其它角色所使用
         role = roleMapper.selectByCode(code);
         if (role != null && !role.getId().equals(id)) {
-            throw ServiceExceptionUtil.exception(ROLE_CODE_DUPLICATE, name);
+            throw ServiceExceptionUtil.exception(ROLE_CODE_DUPLICATE, code);
         }
     }
 
@@ -267,7 +269,8 @@ public class SysRoleServiceImpl implements SysRoleService {
      *
      * @param id 角色编号
      */
-    private void checkUpdateRole(Long id) {
+    @VisibleForTesting
+    public void checkUpdateRole(Long id) {
         SysRoleDO roleDO = roleMapper.selectById(id);
         if (roleDO == null) {
             throw ServiceExceptionUtil.exception(ROLE_NOT_EXISTS);
