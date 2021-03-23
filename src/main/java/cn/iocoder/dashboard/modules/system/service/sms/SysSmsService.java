@@ -1,13 +1,8 @@
 package cn.iocoder.dashboard.modules.system.service.sms;
 
-import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.core.util.ArrayUtil;
-import cn.iocoder.dashboard.framework.sms.core.SmsBody;
-import cn.iocoder.dashboard.framework.sms.core.enums.SmsChannelEnum;
-
 import javax.servlet.ServletRequest;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 短信Service接口
@@ -18,39 +13,11 @@ import java.util.List;
  */
 public interface SysSmsService {
 
-    /**
-     * 发送消息
-     *
-     * @param smsBody      消息内容
-     * @param targetPhones 发送对象手机号列表
-     */
-    default void send(SmsBody smsBody, List<String> targetPhones) {
-        if (CollectionUtil.isEmpty(targetPhones)) {
-            return;
-        }
-        targetPhones.forEach(s -> this.send(smsBody, s));
-    }
+    void sendSingleSms(String mobile, Long userId, Integer userType,
+                       String templateCode, Map<String, Object> templateParams);
 
-    /**
-     * 发送消息
-     *
-     * @param smsBody     消息内容
-     * @param targetPhone 发送对象手机号
-     */
-    void send(SmsBody smsBody, String targetPhone);
-
-    /**
-     * 发送消息
-     *
-     * @param smsBody      消息内容
-     * @param targetPhones 发送对象手机号数组
-     */
-    default void send(SmsBody smsBody, String... targetPhones) {
-        if (ArrayUtil.isEmpty(targetPhones)) {
-            return;
-        }
-        send(smsBody, Arrays.asList(targetPhones));
-    }
+    void sendBatchSms(List<String> mobiles, List<Long> userIds, Integer userType,
+                      String templateCode, Map<String, Object> templateParams);
 
     /**
      * 处理短信发送回调函数

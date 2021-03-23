@@ -1,6 +1,6 @@
-package cn.iocoder.dashboard.modules.system.dal.mysql.dao.sms;
+package cn.iocoder.dashboard.modules.system.dal.mysql.sms;
 
-import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.sms.SysSmsSendLogDO;
+import cn.iocoder.dashboard.modules.system.dal.dataobject.sms.SysSmsSendLogDO;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 

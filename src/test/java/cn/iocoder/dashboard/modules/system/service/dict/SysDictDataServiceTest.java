@@ -10,7 +10,7 @@ import cn.iocoder.dashboard.modules.system.controller.dict.vo.data.SysDictDataUp
 import cn.iocoder.dashboard.modules.system.dal.dataobject.dict.SysDictDataDO;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.dict.SysDictTypeDO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dict.SysDictDataMapper;
-import cn.iocoder.dashboard.modules.system.redis.mq.producer.dict.SysDictDataProducer;
+import cn.iocoder.dashboard.modules.system.mq.producer.dict.SysDictDataProducer;
 import cn.iocoder.dashboard.modules.system.service.dict.impl.SysDictDataServiceImpl;
 import cn.iocoder.dashboard.util.collection.ArrayUtils;
 import cn.iocoder.dashboard.util.object.ObjectUtils;

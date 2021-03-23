@@ -2,11 +2,10 @@ package cn.iocoder.dashboard.modules.system.service.sms.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.iocoder.dashboard.framework.sms.client.AbstractSmsClient;
-import cn.iocoder.dashboard.framework.sms.core.SmsResultDetail;
-import cn.iocoder.dashboard.modules.system.dal.mysql.dao.sms.SysSmsQueryLogMapper;
-import cn.iocoder.dashboard.modules.system.dal.mysql.dao.sms.SysSmsSendLogMapper;
-import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.sms.SysSmsQueryLogDO;
-import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.sms.SysSmsSendLogDO;
+import cn.iocoder.dashboard.modules.system.dal.dataobject.sms.SysSmsQueryLogDO;
+import cn.iocoder.dashboard.modules.system.dal.dataobject.sms.SysSmsSendLogDO;
+import cn.iocoder.dashboard.modules.system.dal.mysql.sms.SysSmsQueryLogMapper;
+import cn.iocoder.dashboard.modules.system.dal.mysql.sms.SysSmsSendLogMapper;
 import cn.iocoder.dashboard.modules.system.enums.sms.SmsSendStatusEnum;
 import cn.iocoder.dashboard.modules.system.service.sms.SysSmsChannelService;
 import cn.iocoder.dashboard.modules.system.service.sms.SysSmsSendLogService;

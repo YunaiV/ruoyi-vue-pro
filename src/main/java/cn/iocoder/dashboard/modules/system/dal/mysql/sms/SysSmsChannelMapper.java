@@ -1,10 +1,10 @@
-package cn.iocoder.dashboard.modules.system.dal.mysql.dao.sms;
+package cn.iocoder.dashboard.modules.system.dal.mysql.sms;
 
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.dashboard.common.enums.CommonStatusEnum;
 import cn.iocoder.dashboard.framework.mybatis.core.util.MyBatisUtils;
 import cn.iocoder.dashboard.modules.system.controller.sms.vo.req.SmsChannelPageReqVO;
-import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.sms.SysSmsChannelDO;
+import cn.iocoder.dashboard.modules.system.dal.dataobject.sms.SysSmsChannelDO;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;

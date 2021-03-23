@@ -102,7 +102,7 @@ public class SmsClientFactory {
     public String getTemplateApiIdByCode(String templateCode) {
         SmsTemplateProperty smsTemplateProperty = templatePropertyMap.get(templateCode);
         if (smsTemplateProperty == null) {
-            throw new ServiceException(SMS_TEMPLATE_NOT_FOUND);
+            throw new ServiceException(SMS_TEMPLATE_NOT_EXISTS);
         }
         return smsTemplateProperty.getApiTemplateId();
     }

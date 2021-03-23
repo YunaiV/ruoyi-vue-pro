@@ -5,7 +5,7 @@ import cn.iocoder.dashboard.common.pojo.PageResult;
 import cn.iocoder.dashboard.modules.system.controller.sms.vo.req.SmsChannelCreateReqVO;
 import cn.iocoder.dashboard.modules.system.controller.sms.vo.req.SmsChannelPageReqVO;
 import cn.iocoder.dashboard.modules.system.controller.sms.vo.resp.SmsChannelEnumRespVO;
-import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.sms.SysSmsChannelDO;
+import cn.iocoder.dashboard.modules.system.dal.dataobject.sms.SysSmsChannelDO;
 import cn.iocoder.dashboard.modules.system.service.sms.SysSmsChannelService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

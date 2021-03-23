@@ -11,7 +11,7 @@ import cn.iocoder.dashboard.modules.system.convert.dept.SysDeptConvert;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dept.SysDeptMapper;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.dept.SysDeptDO;
 import cn.iocoder.dashboard.modules.system.enums.dept.DeptIdEnum;
-import cn.iocoder.dashboard.modules.system.redis.mq.producer.dept.SysDeptProducer;
+import cn.iocoder.dashboard.modules.system.mq.producer.dept.SysDeptProducer;
 import cn.iocoder.dashboard.modules.system.service.dept.SysDeptService;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMultimap;

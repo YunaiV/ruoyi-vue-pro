@@ -1,7 +1,7 @@
-package cn.iocoder.dashboard.modules.system.dal.mysql.dao.sms;
+package cn.iocoder.dashboard.modules.system.dal.mysql.sms;
 
 import cn.iocoder.dashboard.common.enums.DefaultBitFieldEnum;
-import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.sms.SysSmsQueryLogDO;
+import cn.iocoder.dashboard.modules.system.dal.dataobject.sms.SysSmsQueryLogDO;
 import cn.iocoder.dashboard.modules.system.enums.sms.SmsSendStatusEnum;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;

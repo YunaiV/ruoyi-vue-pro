@@ -2,14 +2,12 @@ package cn.iocoder.dashboard.modules.system.service.sms;
 
 import cn.iocoder.dashboard.common.pojo.PageResult;
 import cn.iocoder.dashboard.framework.sms.client.AbstractSmsClient;
-import cn.iocoder.dashboard.framework.sms.core.SmsResultDetail;
 import cn.iocoder.dashboard.modules.system.controller.sms.vo.SmsChannelAllVO;
 import cn.iocoder.dashboard.modules.system.controller.sms.vo.req.SmsChannelCreateReqVO;
 import cn.iocoder.dashboard.modules.system.controller.sms.vo.req.SmsChannelPageReqVO;
 import cn.iocoder.dashboard.modules.system.controller.sms.vo.resp.SmsChannelEnumRespVO;
-import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.sms.SysSmsChannelDO;
+import cn.iocoder.dashboard.modules.system.dal.dataobject.sms.SysSmsChannelDO;
 
-import javax.servlet.ServletRequest;
 import java.util.List;
 
 /**

@@ -1,19 +1,14 @@
 package cn.iocoder.dashboard.modules.system.controller.sms;
 
-import cn.iocoder.dashboard.framework.sms.core.SmsBody;
-import cn.iocoder.dashboard.modules.system.redis.stream.sms.SmsSendStreamProducer;
 import cn.iocoder.dashboard.modules.system.service.sms.SysSmsService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import javax.servlet.ServletRequest;
-import java.util.Arrays;
-import java.util.Map;
 
 /**
  * 短信默认回调接口

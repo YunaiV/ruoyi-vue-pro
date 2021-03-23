@@ -1,15 +1,18 @@
-package cn.iocoder.dashboard.modules.system.dal.mysql.dao.sms;
-
+package cn.iocoder.dashboard.modules.system.dal.mysql.sms;
 import cn.iocoder.dashboard.common.enums.CommonStatusEnum;
-import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.sms.SysSmsTemplateDO;
+import cn.iocoder.dashboard.framework.mybatis.core.mapper.BaseMapperX;
+import cn.iocoder.dashboard.modules.system.dal.dataobject.sms.SysSmsTemplateDO;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
 
 @Mapper
-public interface SysSmsTemplateMapper extends BaseMapper<SysSmsTemplateDO> {
+public interface SysSmsTemplateMapper extends BaseMapperX<SysSmsTemplateDO> {
+
+    default SysSmsTemplateDO selectOneByCode(String code) {
+        return selectOne("code", code);
+    }
 
     /**
      * 根据短信渠道id查询短信模板集合

@@ -6,7 +6,7 @@ import cn.iocoder.dashboard.framework.sms.core.SmsResult;
 import cn.iocoder.dashboard.framework.sms.core.SmsResultDetail;
 import cn.iocoder.dashboard.framework.sms.core.property.SmsChannelProperty;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dao.sms.SysSmsQueryLogMapper;
-import cn.iocoder.dashboard.modules.system.dal.mysql.dataobject.sms.SysSmsQueryLogDO;
+import cn.iocoder.dashboard.modules.system.dal.dataobject.sms.SysSmsQueryLogDO;
 import cn.iocoder.dashboard.modules.system.enums.sms.SmsSendStatusEnum;
 import cn.iocoder.dashboard.modules.system.service.sms.SysSmsQueryLogService;
 import org.springframework.stereotype.Service;
