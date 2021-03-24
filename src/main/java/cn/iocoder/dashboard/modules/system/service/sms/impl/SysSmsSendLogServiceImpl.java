@@ -6,7 +6,7 @@ import cn.iocoder.dashboard.modules.system.dal.dataobject.sms.SysSmsQueryLogDO;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.sms.SysSmsSendLogDO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.sms.SysSmsQueryLogMapper;
 import cn.iocoder.dashboard.modules.system.dal.mysql.sms.SysSmsSendLogMapper;
-import cn.iocoder.dashboard.modules.system.enums.sms.SmsSendStatusEnum;
+import cn.iocoder.dashboard.modules.system.enums.sms.SysSmsSendStatusEnum;
 import cn.iocoder.dashboard.modules.system.service.sms.SysSmsChannelService;
 import cn.iocoder.dashboard.modules.system.service.sms.SysSmsSendLogService;
 import lombok.extern.slf4j.Slf4j;
@@ -88,7 +88,7 @@ public class SysSmsSendLogServiceImpl implements SysSmsSendLogService {
                 updateQueryLog.setSendStatus(SmsSendStatusEnum.QUERY_SEND_FAIL.getStatus());
                 smsQueryLogMapper.updateById(updateQueryLog);
             }*/
-            updateQueryLog.setSendStatus(SmsSendStatusEnum.SEND_SUCCESS.getStatus());
+            updateQueryLog.setSendStatus(SysSmsSendStatusEnum.SEND_SUCCESS.getStatus());
             updateQueryLog.setRemark(String.format("日志(id = %s)对应的客户端没有继承NeedQuerySendResultSmsClient, 不能获取短信结果。", queryLog.getId()));
             smsQueryLogMapper.updateById(updateQueryLog);
         });

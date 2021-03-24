@@ -2,7 +2,7 @@ package cn.iocoder.dashboard.modules.system.dal.mysql.sms;
 
 import cn.iocoder.dashboard.common.enums.DefaultBitFieldEnum;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.sms.SysSmsQueryLogDO;
-import cn.iocoder.dashboard.modules.system.enums.sms.SmsSendStatusEnum;
+import cn.iocoder.dashboard.modules.system.enums.sms.SysSmsSendStatusEnum;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
@@ -17,7 +17,7 @@ public interface SysSmsQueryLogMapper extends BaseMapper<SysSmsQueryLogDO> {
      */
     default List<SysSmsQueryLogDO> selectNoResultQueryLogList() {
         return this.selectList(new LambdaQueryWrapper<SysSmsQueryLogDO>()
-                .eq(SysSmsQueryLogDO::getSendStatus, SmsSendStatusEnum.QUERY_SUCCESS)
+                .eq(SysSmsQueryLogDO::getSendStatus, SysSmsSendStatusEnum.QUERY_SUCCESS)
                 .eq(SysSmsQueryLogDO::getGotResult, DefaultBitFieldEnum.NO)
         );
     }

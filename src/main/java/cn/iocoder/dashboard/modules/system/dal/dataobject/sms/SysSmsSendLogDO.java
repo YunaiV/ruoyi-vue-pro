@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.modules.system.dal.dataobject.sms;
 
-import cn.iocoder.dashboard.modules.system.enums.sms.SmsSendStatusEnum;
+import cn.iocoder.dashboard.modules.system.enums.sms.SysSmsSendStatusEnum;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -54,7 +54,7 @@ public class SysSmsSendLogDO implements Serializable {
     /**
      * 发送状态
      *
-     * @see SmsSendStatusEnum
+     * @see SysSmsSendStatusEnum
      */
     private Integer sendStatus;
 

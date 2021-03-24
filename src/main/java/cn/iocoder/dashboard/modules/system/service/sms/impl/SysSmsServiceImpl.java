@@ -1,5 +1,7 @@
 package cn.iocoder.dashboard.modules.system.service.sms.impl;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.dashboard.common.enums.UserTypeEnum;
 import cn.iocoder.dashboard.framework.sms.client.AbstractSmsClient;
@@ -21,6 +23,8 @@ import javax.servlet.ServletRequest;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 import static cn.iocoder.dashboard.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.*;
@@ -55,23 +59,39 @@ public class SysSmsServiceImpl implements SysSmsService {
     @Override
     public void sendSingleSms(String mobile, Long userId, Integer userType,
                               String templateCode, Map<String, Object> templateParams) {
-        // 校验短信模板是否存在
-        SysSmsTemplateDO template = this.checkSmsTemplateExists(templateCode);
+        // 校验短信模板是否合法
+        SysSmsTemplateDO template = this.checkSmsTemplateValid(templateCode, templateParams);
         // 校验手机号码是否存在
         mobile = this.checkMobile(mobile, userId, userType);
+        //
     }
 
     @Override
     public void sendBatchSms(List<String> mobiles, List<Long> userIds, Integer userType,
                              String templateCode, Map<String, Object> templateParams) {
         // 校验短信模板是否存在
-        SysSmsTemplateDO template = this.checkSmsTemplateExists(templateCode);
+        SysSmsTemplateDO template = this.checkSmsTemplateValid(templateCode, templateParams);
     }
 
-    private SysSmsTemplateDO checkSmsTemplateExists(String templateCode) {
+    private SysSmsTemplateDO checkSmsTemplateValid(String templateCode, Map<String, Object> templateParams) {
+        // 短信模板不存在
         SysSmsTemplateDO template = smsTemplateService.getSmsTemplateByCode(templateCode);
         if (template == null) {
             throw exception(SMS_TEMPLATE_NOT_EXISTS);
+        }
+        // 参数不够
+        if (CollUtil.isNotEmpty(template.getParams())) {
+            template.getParams().forEach(param -> {
+                if (!templateParams.containsKey(param)) {
+                    throw exception(SMS_SEND_MOBILE_TEMPLATE_PARAM_MISS);
+                }
+            });
+        }
+        // 移除多余参数
+        if (CollUtil.isEmpty(template.getParams())) {
+            templateParams.clear();
+        } else {
+            templateParams.entrySet().removeIf(entry -> !template.getParams().contains(entry.getKey()));
         }
         return template;
     }

@@ -84,6 +84,7 @@ public interface SysErrorCodeConstants {
 
     // ========== 短信发送 1002011000 ==========
     ErrorCode SMS_SEND_MOBILE_NOT_EXISTS = new ErrorCode(1002011000, "手机号不存在");
+    ErrorCode SMS_SEND_MOBILE_TEMPLATE_PARAM_MISS = new ErrorCode(1002011001, "模板参数({})缺失");
 
     ErrorCode SMS_CHANNEL_NOT_INIT = new ErrorCode(1003001001,
             "短信渠道没有初始化, 请调用SmsClientWrapper#initSmsClient()或SmsClientWrapper#addSmsClient");

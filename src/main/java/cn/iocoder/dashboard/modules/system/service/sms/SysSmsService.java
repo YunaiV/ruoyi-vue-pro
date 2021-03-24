@@ -19,6 +19,8 @@ public interface SysSmsService {
     void sendBatchSms(List<String> mobiles, List<Long> userIds, Integer userType,
                       String templateCode, Map<String, Object> templateParams);
 
+    void doSendSms();
+
     /**
      * 处理短信发送回调函数
      *

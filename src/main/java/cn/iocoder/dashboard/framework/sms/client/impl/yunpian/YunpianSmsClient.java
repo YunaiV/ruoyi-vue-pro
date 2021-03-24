@@ -9,7 +9,7 @@ import cn.iocoder.dashboard.framework.sms.core.SmsConstants;
 import cn.iocoder.dashboard.framework.sms.core.SmsResult;
 import cn.iocoder.dashboard.framework.sms.core.SmsResultDetail;
 import cn.iocoder.dashboard.framework.sms.core.property.SmsChannelProperty;
-import cn.iocoder.dashboard.modules.system.enums.sms.SmsSendStatusEnum;
+import cn.iocoder.dashboard.modules.system.enums.sms.SysSmsSendStatusEnum;
 import cn.iocoder.dashboard.util.json.JsonUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.yunpian.sdk.YunpianClient;
@@ -155,8 +155,8 @@ public class YunpianSmsClient extends AbstractSmsClient {
         private static int getSendStatus(Map<String, String> map) {
             String reportStatus = map.get(REPORT_STATUS);
             return SmsConstants.SUCCESS.equals(reportStatus)
-                    ? SmsSendStatusEnum.SEND_SUCCESS.getStatus()
-                    : SmsSendStatusEnum.SEND_FAIL.getStatus();
+                    ? SysSmsSendStatusEnum.SEND_SUCCESS.getStatus()
+                    : SysSmsSendStatusEnum.SEND_FAIL.getStatus();
         }
 
         public static SmsResultDetail getSmsResultDetailByParam(Map<String, String> map) {

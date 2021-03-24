@@ -7,7 +7,7 @@ import cn.iocoder.dashboard.framework.sms.core.SmsBody;
 import cn.iocoder.dashboard.framework.sms.core.SmsResult;
 import cn.iocoder.dashboard.framework.sms.core.SmsResultDetail;
 import cn.iocoder.dashboard.framework.sms.core.property.SmsChannelProperty;
-import cn.iocoder.dashboard.modules.system.enums.sms.SmsSendStatusEnum;
+import cn.iocoder.dashboard.modules.system.enums.sms.SysSmsSendStatusEnum;
 import cn.iocoder.dashboard.util.json.JsonUtils;
 import com.aliyuncs.DefaultAcsClient;
 import com.aliyuncs.IAcsClient;
@@ -131,8 +131,8 @@ public class AliyunSmsClient extends AbstractSmsClient {
 
         public Integer getSendStatus() {
             return ((Boolean) sendResultParamMap.get(CallbackField.SUCCESS))
-                    ? SmsSendStatusEnum.SEND_SUCCESS.getStatus()
-                    : SmsSendStatusEnum.SEND_FAIL.getStatus();
+                    ? SysSmsSendStatusEnum.SEND_SUCCESS.getStatus()
+                    : SysSmsSendStatusEnum.SEND_FAIL.getStatus();
         }
 
         public String getBizId() {

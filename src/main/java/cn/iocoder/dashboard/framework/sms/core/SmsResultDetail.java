@@ -1,5 +1,6 @@
 package cn.iocoder.dashboard.framework.sms.core;
 
+import cn.iocoder.dashboard.modules.system.enums.sms.SysSmsSendStatusEnum;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -17,7 +18,7 @@ public class SmsResultDetail implements Serializable {
     private String apiId;
 
     /**
-     * 短信发送状态 {@link cn.iocoder.dashboard.modules.system.enums.sms.SmsSendStatusEnum}
+     * 短信发送状态 {@link SysSmsSendStatusEnum}
      */
     private Integer sendStatus;
 
