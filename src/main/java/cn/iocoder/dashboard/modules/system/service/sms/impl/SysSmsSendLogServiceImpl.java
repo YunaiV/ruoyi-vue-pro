@@ -2,8 +2,9 @@ package cn.iocoder.dashboard.modules.system.service.sms.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.iocoder.dashboard.framework.sms.client.AbstractSmsClient;
-import cn.iocoder.dashboard.modules.system.dal.dataobject.sms.SysSmsQueryLogDO;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.sms.SysSmsSendLogDO;
+import cn.iocoder.dashboard.modules.system.dal.dataobject.sms.SysSmsSendLogDOX;
+import cn.iocoder.dashboard.modules.system.dal.dataobject.sms.SysSmsTemplateDO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.sms.SysSmsQueryLogMapper;
 import cn.iocoder.dashboard.modules.system.dal.mysql.sms.SysSmsSendLogMapper;
 import cn.iocoder.dashboard.modules.system.enums.sms.SysSmsSendStatusEnum;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 短信发送日志服务实现类
@@ -42,17 +44,35 @@ public class SysSmsSendLogServiceImpl implements SysSmsSendLogService {
 
 
     @Override
+    public Long createSmsSendLog(String mobile, Long userId, Integer userType,
+                                 SysSmsTemplateDO template, String templateContent, Map<String, Object> templateParams) {
+        SysSmsSendLogDO.SysSmsSendLogDOBuilder logBuilder = SysSmsSendLogDO.builder();
+        // 设置手机相关字段
+        logBuilder.mobile(mobile).userId(userId).userType(userType);
+        // 设置模板相关字段
+        logBuilder.templateId(template.getId()).templateCode(template.getCode()).templateType(template.getType());
+        logBuilder.templateContent(templateContent).templateParams(templateParams).apiTemplateId(template.getApiTemplateId());
+        // 设置渠道相关字段
+        logBuilder.channelId(template.getChannelId()).channelCode(template.getChannelCode());
+
+        // 插入数据库
+        SysSmsSendLogDO logDO = logBuilder.build();
+        smsSendLogMapper.insert(logDO);
+        return logDO.getId();
+    }
+
+    @Override
     public void getAndSaveSmsSendLog() {
 
-        List<SysSmsQueryLogDO> noResultQueryLogList = smsQueryLogMapper.selectNoResultQueryLogList();
+        List<SysSmsSendLogDO> noResultQueryLogList = smsQueryLogMapper.selectNoResultQueryLogList();
 
         if (CollectionUtil.isEmpty(noResultQueryLogList)) {
             return;
         }
         //用于添加的发送日志对象
-        SysSmsSendLogDO insertSendLog = new SysSmsSendLogDO();
+        SysSmsSendLogDOX insertSendLog = new SysSmsSendLogDOX();
         //用于修改状态的请求日志对象
-        SysSmsQueryLogDO updateQueryLog = new SysSmsQueryLogDO();
+        SysSmsSendLogDO updateQueryLog = new SysSmsSendLogDO();
 
         noResultQueryLogList.forEach(queryLog -> {
             AbstractSmsClient smsClient = smsChannelService.getSmsClient(queryLog.getTemplateCode());
@@ -94,7 +114,7 @@ public class SysSmsSendLogServiceImpl implements SysSmsSendLogService {
         });
     }
 
-    private void queryLog2SendLong(SysSmsSendLogDO insertSendLog, SysSmsQueryLogDO queryLog) {
+    private void queryLog2SendLong(SysSmsSendLogDOX insertSendLog, SysSmsSendLogDO queryLog) {
         insertSendLog.setChannelCode(queryLog.getChannelCode());
         insertSendLog.setChannelId(queryLog.getChannelId());
         insertSendLog.setTemplateCode(queryLog.getTemplateCode());

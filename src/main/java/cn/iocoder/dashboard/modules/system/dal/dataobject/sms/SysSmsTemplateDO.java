@@ -51,6 +51,8 @@ public class SysSmsTemplateDO extends BaseDO {
     private String name;
     /**
      * 内容
+     *
+     * 内容的参数，使用 {} 包括，例如说 {name}
      */
     private String content;
     /**
@@ -62,6 +64,10 @@ public class SysSmsTemplateDO extends BaseDO {
      * 备注
      */
     private String remark;
+    /**
+     * 短信 API 的模板编号
+     */
+    private String apiTemplateId;
 
     // ========= 渠道相关字段 =========
 
@@ -77,9 +83,5 @@ public class SysSmsTemplateDO extends BaseDO {
      * 冗余 {@link SysSmsChannelDO#getCode()}
      */
     private String channelCode;
-    /**
-     * 短信 API 的模板编号
-     */
-    private String apiTemplateId;
 
 }

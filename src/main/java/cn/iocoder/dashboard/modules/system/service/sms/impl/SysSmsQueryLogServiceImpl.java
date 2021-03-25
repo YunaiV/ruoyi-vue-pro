@@ -6,7 +6,7 @@ import cn.iocoder.dashboard.framework.sms.core.SmsResult;
 import cn.iocoder.dashboard.framework.sms.core.SmsResultDetail;
 import cn.iocoder.dashboard.framework.sms.core.property.SmsChannelProperty;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dao.sms.SysSmsQueryLogMapper;
-import cn.iocoder.dashboard.modules.system.dal.dataobject.sms.SysSmsQueryLogDO;
+import cn.iocoder.dashboard.modules.system.dal.dataobject.sms.SysSmsSendLogDO;
 import cn.iocoder.dashboard.modules.system.enums.sms.SysSmsSendStatusEnum;
 import cn.iocoder.dashboard.modules.system.service.sms.SysSmsQueryLogService;
 import org.springframework.stereotype.Service;
@@ -27,7 +27,7 @@ public class SysSmsQueryLogServiceImpl implements SysSmsQueryLogService {
 
     @Override
     public void beforeSendLog(SmsBody smsBody, String targetPhone, AbstractSmsClient client) {
-        SysSmsQueryLogDO smsLog = new SysSmsQueryLogDO();
+        SysSmsSendLogDO smsLog = new SysSmsSendLogDO();
         SmsChannelProperty property = client.getProperty();
 
         smsLog.setChannelCode(property.getCode())
@@ -43,7 +43,7 @@ public class SysSmsQueryLogServiceImpl implements SysSmsQueryLogService {
 
     @Override
     public void afterSendLog(Long logId, SmsResult result) {
-        SysSmsQueryLogDO smsLog = new SysSmsQueryLogDO();
+        SysSmsSendLogDO smsLog = new SysSmsSendLogDO();
         smsLog.setId(logId);
         smsLog.setApiId(result.getApiId());
         smsLog.setSendStatus(SysSmsSendStatusEnum.QUERY_FAIL.getStatus());
@@ -53,7 +53,7 @@ public class SysSmsQueryLogServiceImpl implements SysSmsQueryLogService {
 
     @Override
     public void updateSendLogByResultDetail(SmsResultDetail smsResultDetail) {
-        SysSmsQueryLogDO queryLogDO = new SysSmsQueryLogDO();
+        SysSmsSendLogDO queryLogDO = new SysSmsSendLogDO();
         queryLogDO.setSendStatus(smsResultDetail.getSendStatus());
         queryLogDO.setSendTime(smsResultDetail.getSendTime());
         queryLogDO.setRemark(smsResultDetail.getMessage());

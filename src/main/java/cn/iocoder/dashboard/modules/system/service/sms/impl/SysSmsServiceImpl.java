@@ -11,10 +11,7 @@ import cn.iocoder.dashboard.framework.sms.core.SmsResultDetail;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.sms.SysSmsTemplateDO;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.user.SysUserDO;
 import cn.iocoder.dashboard.modules.system.mq.producer.sms.SmsSendStreamProducer;
-import cn.iocoder.dashboard.modules.system.service.sms.SysSmsChannelService;
-import cn.iocoder.dashboard.modules.system.service.sms.SysSmsQueryLogService;
-import cn.iocoder.dashboard.modules.system.service.sms.SysSmsService;
-import cn.iocoder.dashboard.modules.system.service.sms.SysSmsTemplateService;
+import cn.iocoder.dashboard.modules.system.service.sms.*;
 import cn.iocoder.dashboard.modules.system.service.user.SysUserService;
 import org.springframework.stereotype.Service;
 
@@ -41,6 +38,9 @@ public class SysSmsServiceImpl implements SysSmsService {
     @Resource
     private SysSmsTemplateService smsTemplateService;
     @Resource
+    private SysSmsSendLogService smsSendLogService;
+
+    @Resource
     private SysUserService userService;
 
     @Resource
@@ -63,7 +63,13 @@ public class SysSmsServiceImpl implements SysSmsService {
         SysSmsTemplateDO template = this.checkSmsTemplateValid(templateCode, templateParams);
         // 校验手机号码是否存在
         mobile = this.checkMobile(mobile, userId, userType);
-        //
+
+        // 创建发送日志
+        String content = smsTemplateService.formatSmsTemplateContent(template.getContent(), templateParams);
+        Long sendLogId = smsSendLogService.createSmsSendLog(mobile, userId, userType, template, content, templateParams);
+
+        // 发送 MQ 消息
+
     }
 
     @Override
@@ -71,6 +77,11 @@ public class SysSmsServiceImpl implements SysSmsService {
                              String templateCode, Map<String, Object> templateParams) {
         // 校验短信模板是否存在
         SysSmsTemplateDO template = this.checkSmsTemplateValid(templateCode, templateParams);
+    }
+
+    @Override
+    public void doSendSms() {
+
     }
 
     private SysSmsTemplateDO checkSmsTemplateValid(String templateCode, Map<String, Object> templateParams) {
