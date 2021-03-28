@@ -1,16 +1,16 @@
 package cn.iocoder.dashboard.modules.system.service.sms.impl;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.iocoder.dashboard.common.enums.CommonStatusEnum;
 import cn.iocoder.dashboard.common.enums.UserTypeEnum;
-import cn.iocoder.dashboard.framework.sms.client.AbstractSmsClient;
-import cn.iocoder.dashboard.framework.sms.core.SmsBody;
 import cn.iocoder.dashboard.framework.sms.core.SmsClientFactory;
 import cn.iocoder.dashboard.framework.sms.core.SmsResultDetail;
+import cn.iocoder.dashboard.framework.sms.core.enums.SmsSendFailureTypeEnum;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.sms.SysSmsTemplateDO;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.user.SysUserDO;
-import cn.iocoder.dashboard.modules.system.mq.producer.sms.SmsSendStreamProducer;
+import cn.iocoder.dashboard.modules.system.mq.message.sms.SysSmsSendMessage;
+import cn.iocoder.dashboard.modules.system.mq.producer.sms.SysSmsProducer;
 import cn.iocoder.dashboard.modules.system.service.sms.*;
 import cn.iocoder.dashboard.modules.system.service.user.SysUserService;
 import org.springframework.stereotype.Service;
@@ -20,8 +20,6 @@ import javax.servlet.ServletRequest;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
 
 import static cn.iocoder.dashboard.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.*;
@@ -51,7 +49,7 @@ public class SysSmsServiceImpl implements SysSmsService {
     private SysSmsQueryLogService logService;
 
     @Resource
-    private SmsSendStreamProducer smsProducer;
+    private SysSmsProducer smsProducer;
 
     @Resource
     private SmsClientFactory smsClientFactory;
@@ -68,8 +66,13 @@ public class SysSmsServiceImpl implements SysSmsService {
         String content = smsTemplateService.formatSmsTemplateContent(template.getContent(), templateParams);
         Long sendLogId = smsSendLogService.createSmsSendLog(mobile, userId, userType, template, content, templateParams);
 
-        // 发送 MQ 消息
-
+        // 如果模板被禁用，则直接标记发送失败。也就说，不发短信，嘿嘿。
+        if (CommonStatusEnum.DISABLE.getStatus().equals(template.getStatus())) {
+            smsSendLogService.updateSmsSendLogFailure(sendLogId, SmsSendFailureTypeEnum.SMS_TEMPLATE_DISABLE.getType());
+            return;
+        }
+        // 如果模板未禁用，发送 MQ 消息。目的是，异步化调用短信平台
+        smsProducer.sendSmsSendMessage(sendLogId, mobile, template.getChannelId(), template.getApiTemplateId(), templateParams);
     }
 
     @Override
@@ -77,11 +80,6 @@ public class SysSmsServiceImpl implements SysSmsService {
                              String templateCode, Map<String, Object> templateParams) {
         // 校验短信模板是否存在
         SysSmsTemplateDO template = this.checkSmsTemplateValid(templateCode, templateParams);
-    }
-
-    @Override
-    public void doSendSms() {
-
     }
 
     private SysSmsTemplateDO checkSmsTemplateValid(String templateCode, Map<String, Object> templateParams) {
@@ -132,10 +130,8 @@ public class SysSmsServiceImpl implements SysSmsService {
     }
 
     @Override
-    public void send(SmsBody smsBody, String targetPhone) {
-        AbstractSmsClient client = channelService.getSmsClient(smsBody.getTemplateCode());
-        logService.beforeSendLog(smsBody, targetPhone, client);
-        smsProducer.sendSmsSendMessage(smsBody, targetPhone);
+    public void doSendSms(SysSmsSendMessage message) {
+
     }
 
     @Override

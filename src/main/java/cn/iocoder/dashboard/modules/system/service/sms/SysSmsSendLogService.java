@@ -15,6 +15,14 @@ public interface SysSmsSendLogService {
     Long createSmsSendLog(String mobile, Long userId, Integer userType,
                           SysSmsTemplateDO template, String templateContent, Map<String, Object> templateParams);
 
+    /**
+     * 更新发送日志为失败
+     *
+     * @param id 发送日志编号
+     * @param sendFailureType 失败类型
+     */
+    void updateSmsSendLogFailure(Long id, Integer sendFailureType);
+
     void getAndSaveSmsSendLog();
 
 }

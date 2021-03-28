@@ -17,7 +17,7 @@ import java.util.Map;
  */
 @Slf4j
 @Component
-public class SmsSendStreamProducer {
+public class SysSmsProducer {
 
     @Resource
     private StringRedisTemplate stringRedisTemplate;
@@ -25,17 +25,17 @@ public class SmsSendStreamProducer {
     /**
      * 发送短信 Message
      *
+     * @param sendLogId 发送日志编号
      * @param mobile 手机号
-     * @param templateCode 短信模板编号
+     * @param channelId 渠道编号
+     * @param apiTemplateId 短信模板编号
      * @param templateParams 短信模板参数
-     * @param userId 用户编号
-     * @param userType 用户类型
+     * @param sendLogId 发送日志编号
      */
-    public void sendSmsSendMessage(String mobile, String templateCode, Map<String, Object> templateParams,
-                                   Integer userId, Integer userType) {
-        SysSmsSendMessage message = new SysSmsSendMessage();
-        message.setMobile(mobile).setTemplateCode(templateCode).setTemplateParams(templateParams);
-        message.setUserId(userId).setUserType(userType);
+    public void sendSmsSendMessage(Long sendLogId, String mobile,
+                                   Long channelId, String apiTemplateId, Map<String, Object> templateParams) {
+        SysSmsSendMessage message = new SysSmsSendMessage().setSendLogId(sendLogId).setMobile(mobile);
+        message.setChannelId(channelId).setApiTemplateId(apiTemplateId).setTemplateParams(templateParams);
         RedisMessageUtils.sendStreamMessage(stringRedisTemplate, message);
     }
 

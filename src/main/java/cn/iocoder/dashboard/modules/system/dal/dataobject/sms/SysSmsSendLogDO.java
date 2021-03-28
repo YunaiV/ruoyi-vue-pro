@@ -2,7 +2,7 @@ package cn.iocoder.dashboard.modules.system.dal.dataobject.sms;
 
 import cn.iocoder.dashboard.common.enums.UserTypeEnum;
 import cn.iocoder.dashboard.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.dashboard.modules.system.enums.sms.SysSmsSendFailureTypeEnum;
+import cn.iocoder.dashboard.framework.sms.core.enums.SmsSendFailureTypeEnum;
 import cn.iocoder.dashboard.modules.system.enums.sms.SysSmsSendStatusEnum;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
@@ -108,7 +108,7 @@ public class SysSmsSendLogDO extends BaseDO {
     /**
      * 发送失败的类型
      *
-     * 枚举 {@link SysSmsSendFailureTypeEnum}
+     * 枚举 {@link SmsSendFailureTypeEnum}
      */
     private Integer sendFailureType;
     /**

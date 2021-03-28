@@ -1,5 +1,7 @@
 package cn.iocoder.dashboard.modules.system.service.sms;
 
+import cn.iocoder.dashboard.modules.system.mq.message.sms.SysSmsSendMessage;
+
 import javax.servlet.ServletRequest;
 import java.util.List;
 import java.util.Map;
@@ -19,7 +21,7 @@ public interface SysSmsService {
     void sendBatchSms(List<String> mobiles, List<Long> userIds, Integer userType,
                       String templateCode, Map<String, Object> templateParams);
 
-    void doSendSms();
+    void doSendSms(SysSmsSendMessage message);
 
     /**
      * 处理短信发送回调函数

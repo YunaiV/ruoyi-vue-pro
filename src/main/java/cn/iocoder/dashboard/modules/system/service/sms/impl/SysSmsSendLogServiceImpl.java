@@ -42,7 +42,6 @@ public class SysSmsSendLogServiceImpl implements SysSmsSendLogService {
      */
     private static final long SCHEDULER_PERIOD = 5 * 60 * 1000L;
 
-
     @Override
     public Long createSmsSendLog(String mobile, Long userId, Integer userType,
                                  SysSmsTemplateDO template, String templateContent, Map<String, Object> templateParams) {
@@ -59,6 +58,11 @@ public class SysSmsSendLogServiceImpl implements SysSmsSendLogService {
         SysSmsSendLogDO logDO = logBuilder.build();
         smsSendLogMapper.insert(logDO);
         return logDO.getId();
+    }
+
+    @Override
+    public void updateSmsSendLogFailure(Long id, Integer sendFailureType) {
+        smsSendLogMapper.updateById(new SysSmsSendLogDO().setId(id).setSendFailureType(sendFailureType));
     }
 
     @Override

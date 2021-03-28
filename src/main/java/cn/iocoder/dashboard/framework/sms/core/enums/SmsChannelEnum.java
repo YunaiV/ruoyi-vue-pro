@@ -1,5 +1,6 @@
 package cn.iocoder.dashboard.framework.sms.core.enums;
 
+import cn.hutool.core.util.ArrayUtil;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -13,22 +14,22 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum SmsChannelEnum {
 
-    ALI("ALI", "阿里"),
     YUN_PIAN("YUN_PIAN", "云片"),
-    HUA_WEI("HUA_WEI", "华为"),
-    TENCENT("TENCENT", "腾讯");
+    ALIYUN("ALIYUN", "阿里云"),
+    TENCENT("TENCENT", "腾讯云"),
+    HUA_WEI("HUA_WEI", "华为云"),;
 
+    /**
+     * 编码
+     */
     private final String code;
-
+    /**
+     * 名字
+     */
     private final String name;
 
     public static SmsChannelEnum getByCode(String code) {
-        for (SmsChannelEnum value : SmsChannelEnum.values()) {
-            if (value.getCode().equals(code)) {
-                return value;
-            }
-        }
-        return null;
+        return ArrayUtil.firstMatch(o -> o.getCode().equals(code), values());
     }
 
 }

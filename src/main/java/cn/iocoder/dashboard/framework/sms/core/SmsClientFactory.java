@@ -55,7 +55,7 @@ public class SmsClientFactory {
             throw new ServiceException(INVALID_CHANNEL_CODE);
         }
         switch (channelEnum) {
-            case ALI:
+            case ALIYUN:
                 return new AliyunSmsClient(channelVO);
             case YUN_PIAN:
                 return new YunpianSmsClient(channelVO);
