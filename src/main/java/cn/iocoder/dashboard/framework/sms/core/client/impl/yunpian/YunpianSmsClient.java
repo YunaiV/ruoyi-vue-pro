@@ -1,19 +1,20 @@
-package cn.iocoder.dashboard.framework.sms.client.impl.yunpian;
+package cn.iocoder.dashboard.framework.sms.core.client.impl.yunpian;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.CharsetUtil;
-import cn.iocoder.dashboard.framework.sms.client.AbstractSmsClient;
-import cn.iocoder.dashboard.framework.sms.core.SmsBody;
+import cn.hutool.core.util.URLUtil;
 import cn.iocoder.dashboard.framework.sms.core.SmsConstants;
 import cn.iocoder.dashboard.framework.sms.core.SmsResult;
 import cn.iocoder.dashboard.framework.sms.core.SmsResultDetail;
-import cn.iocoder.dashboard.framework.sms.core.property.SmsChannelProperty;
+import cn.iocoder.dashboard.framework.sms.core.client.impl.AbstractSmsClient;
+import cn.iocoder.dashboard.framework.sms.core.enums.SmsSendFailureTypeEnum;
+import cn.iocoder.dashboard.framework.sms.core.property.SmsChannelProperties;
 import cn.iocoder.dashboard.modules.system.enums.sms.SysSmsSendStatusEnum;
 import cn.iocoder.dashboard.util.json.JsonUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.yunpian.sdk.YunpianClient;
-import com.yunpian.sdk.constant.Code;
 import com.yunpian.sdk.constant.YunpianConstant;
 import com.yunpian.sdk.model.Result;
 import com.yunpian.sdk.model.SmsSingleSend;
@@ -25,9 +26,10 @@ import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.StringJoiner;
 
 /**
- * 云片短信实现类
+ * 云片短信客户端的实现类
  *
  * @author zzf
  * @date 9:48 2021/3/5
@@ -35,70 +37,58 @@ import java.util.Map;
 @Slf4j
 public class YunpianSmsClient extends AbstractSmsClient {
 
-    private final YunpianClient client;
+    /**
+     * 云信短信客户端
+     */
+    private volatile YunpianClient client;
 
     private final TypeReference<List<Map<String, String>>> callbackType = new TypeReference<List<Map<String, String>>>() {
     };
 
-    /**
-     * 构造云片短信发送处理
-     *
-     * @param channelVO 阿里云短信配置
-     */
-    public YunpianSmsClient(SmsChannelProperty channelVO) {
-        super(channelVO);
-        client = new YunpianClient(channelVO.getApiKey());
+    public YunpianSmsClient(SmsChannelProperties properties) {
+        super(properties);
     }
 
     @Override
-    public SmsResult doSend(String templateApiId, SmsBody smsBody, String targetPhone) {
-        Map<String, String> paramMap = new HashMap<>();
-        paramMap.put(YunpianConstant.APIKEY, getProperty().getApiKey());
-        paramMap.put(YunpianConstant.MOBILE, String.join(SmsConstants.COMMA, targetPhone));
-        paramMap.put(YunpianConstant.TEXT, formatContent(smsBody));
-        paramMap.put(Helper.CALLBACK, getProperty().getCallbackUrl());
+    public void doInit() {
+        client = new YunpianClient(properties.getApiKey());
+    }
 
-        Result<SmsSingleSend> sendResult = client.sms().single_send(paramMap);
-        boolean success = sendResult.getCode().equals(Code.OK);
+    @Override
+    protected SmsResult doSend(Long sendLogId, String mobile, String apiTemplateId, Map<String, Object> templateParams) throws Throwable {
+        // 构建参数
+        Map<String, String> request = new HashMap<>();
+        request.put(YunpianConstant.APIKEY, properties.getApiKey());
+        request.put(YunpianConstant.MOBILE, mobile);
+        request.put(YunpianConstant.TPL_ID, apiTemplateId);
+        request.put(YunpianConstant.TPL_VALUE, formatTplValue(templateParams));
+        request.put(YunpianConstant.UID, String.valueOf(sendLogId));
+        request.put(Helper.CALLBACK, properties.getCallbackUrl());
 
-        if (!success) {
-            log.debug("send fail[code={}, message={}]", sendResult.getCode(), sendResult.getDetail());
+        // 执行发送
+        Result<SmsSingleSend> sendResult = client.sms().tpl_single_send(request);
+        if (sendResult.getThrowable() != null) {
+            throw sendResult.getThrowable();
         }
-        return new SmsResult()
-                .setSuccess(success)
-                .setMessage(sendResult.getDetail())
-                .setCode(sendResult.getCode().toString())
-                .setApiId(sendResult.getData().getSid().toString());
+        // 解析结果
+        SmsSingleSend data = sendResult.getData();
+        return SmsResult.success(parseSendFailureType(sendResult), // 将 API 短信平台，解析成统一的错误码
+                String.valueOf(data.getCode()), data.getMsg(), null, String.valueOf(data.getSid()));
     }
 
-
-    /**
-     * 格式化短信内容，将参数注入到模板中
-     *
-     * @param smsBody 短信信息
-     * @return 格式化后的短信内容
-     */
-    private String formatContent(SmsBody smsBody) {
-        StringBuilder result = new StringBuilder(smsBody.getTemplateContent());
-        smsBody.getParams().forEach((key, val) -> {
-            String param = parseParamToPlaceholder(key);
-            result.replace(result.indexOf(param), result.indexOf(param + param.length()), val);
-        });
-        return result.toString();
+    private static String formatTplValue(Map<String, Object> templateParams) {
+        if (CollUtil.isEmpty(templateParams)) {
+            return "";
+        }
+        // 参考 https://www.yunpian.com/official/document/sms/zh_cn/introduction_demos_encode_sample 格式化
+        StringJoiner joiner = new StringJoiner("&");
+        templateParams.forEach((key, value) -> joiner.add(String.format("#%s#=%s", key, URLUtil.encode(String.valueOf(value)))));
+        return joiner.toString();
     }
 
-    /**
-     * 将指定参数改成对应的占位字符
-     * <p>
-     * 云片的是 #param# 的形式作为占位符
-     *
-     * @param key 参数名
-     * @return 对应的占位字符
-     */
-    private String parseParamToPlaceholder(String key) {
-        return SmsConstants.JING_HAO + key + SmsConstants.JING_HAO;
+    private static SmsSendFailureTypeEnum parseSendFailureType(Result<SmsSingleSend> sendResult) {
+        return SmsSendFailureTypeEnum.SMS_UNKNOWN;
     }
-
 
     /**
      * 云片的比较复杂，又是加密又是套娃的
@@ -108,7 +98,6 @@ public class YunpianSmsClient extends AbstractSmsClient {
         Map<String, String> map = getRequestParams(request);
         return Helper.getSmsResultDetailByParam(map);
     }
-
 
     /**
      * 从 request 中获取请求中传入的短信发送结果信息
@@ -155,8 +144,8 @@ public class YunpianSmsClient extends AbstractSmsClient {
         private static int getSendStatus(Map<String, String> map) {
             String reportStatus = map.get(REPORT_STATUS);
             return SmsConstants.SUCCESS.equals(reportStatus)
-                    ? SysSmsSendStatusEnum.SEND_SUCCESS.getStatus()
-                    : SysSmsSendStatusEnum.SEND_FAIL.getStatus();
+                    ? SysSmsSendStatusEnum.SUCCESS.getStatus()
+                    : SysSmsSendStatusEnum.FAILURE.getStatus();
         }
 
         public static SmsResultDetail getSmsResultDetailByParam(Map<String, String> map) {

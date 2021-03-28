@@ -1,19 +1,15 @@
-package cn.iocoder.dashboard.framework.sms.client.impl.ali;
+package cn.iocoder.dashboard.framework.sms.core.client.impl.aliyun;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateUtil;
-import cn.iocoder.dashboard.framework.sms.client.AbstractSmsClient;
-import cn.iocoder.dashboard.framework.sms.core.SmsBody;
 import cn.iocoder.dashboard.framework.sms.core.SmsResult;
 import cn.iocoder.dashboard.framework.sms.core.SmsResultDetail;
-import cn.iocoder.dashboard.framework.sms.core.property.SmsChannelProperty;
+import cn.iocoder.dashboard.framework.sms.core.client.impl.AbstractSmsClient;
+import cn.iocoder.dashboard.framework.sms.core.property.SmsChannelProperties;
 import cn.iocoder.dashboard.modules.system.enums.sms.SysSmsSendStatusEnum;
 import cn.iocoder.dashboard.util.json.JsonUtils;
 import com.aliyuncs.DefaultAcsClient;
 import com.aliyuncs.IAcsClient;
-import com.aliyuncs.dysmsapi.model.v20170525.SendSmsRequest;
-import com.aliyuncs.dysmsapi.model.v20170525.SendSmsResponse;
-import com.aliyuncs.http.MethodType;
 import com.aliyuncs.profile.DefaultProfile;
 import com.aliyuncs.profile.IClientProfile;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -28,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 阿里短信实现类
+ * 阿里短信客户端的实现类
  *
  * @author zzf
  * @date 2021/1/25 14:17
@@ -36,53 +32,53 @@ import java.util.Map;
 @Slf4j
 public class AliyunSmsClient extends AbstractSmsClient {
 
-    private static final String OK = "OK";
-
     private static final String PRODUCT = "Dystopi";
-
     private static final String DOMAIN = "dysmsapi.aliyuncs.com";
-
     private static final String ENDPOINT = "cn-hangzhou";
 
-    private final IAcsClient acsClient;
+    private static final String OK = "OK";
 
     /**
-     * 构造阿里云短信发送处理
-     *
-     * @param channelVO 阿里云短信配置
+     * 阿里云客户端
      */
-    public AliyunSmsClient(SmsChannelProperty channelVO) {
-        super(channelVO);
+    private volatile IAcsClient acsClient;
 
-        String accessKeyId = channelVO.getApiKey();
-        String accessKeySecret = channelVO.getApiSecret();
+    public AliyunSmsClient(SmsChannelProperties properties) {
+        super(properties);
+    }
 
-        IClientProfile profile = DefaultProfile.getProfile(ENDPOINT, accessKeyId, accessKeySecret);
+    @Override
+    protected void doInit() {
+        IClientProfile profile = DefaultProfile.getProfile(ENDPOINT, properties.getApiKey(), properties.getApiSecret());
         DefaultProfile.addEndpoint(ENDPOINT, PRODUCT, DOMAIN);
-
         acsClient = new DefaultAcsClient(profile);
     }
 
     @Override
-    public SmsResult doSend(String templateApiId, SmsBody smsBody, String targetPhone) throws Exception {
-        SendSmsRequest request = new SendSmsRequest();
-        request.setSysMethod(MethodType.POST);
-        request.setPhoneNumbers(targetPhone);
-        request.setSignName(channelVO.getApiSignatureId());
-        request.setTemplateCode(templateApiId);
-        request.setTemplateParam(smsBody.getParamsStr());
-        SendSmsResponse sendSmsResponse = acsClient.getAcsResponse(request);
-
-        boolean success = OK.equals(sendSmsResponse.getCode());
-        if (!success) {
-            log.debug("send fail[code={}, message={}]", sendSmsResponse.getCode(), sendSmsResponse.getMessage());
-        }
-        return new SmsResult()
-                .setSuccess(success)
-                .setMessage(sendSmsResponse.getMessage())
-                .setCode(sendSmsResponse.getCode())
-                .setApiId(sendSmsResponse.getBizId());
+    protected SmsResult doSend(Long sendLogId, String mobile, String apiTemplateId, Map<String, Object> templateParams) throws Exception {
+        return null;
     }
+
+//    @Override
+//    public SmsResult doSend(String templateApiId, SmsBody smsBody, String targetPhone) throws Exception {
+//        SendSmsRequest request = new SendSmsRequest();
+//        request.setSysMethod(MethodType.POST);
+//        request.setPhoneNumbers(targetPhone);
+//        request.setSignName(properties.getSignature());
+//        request.setTemplateCode(templateApiId);
+//        request.setTemplateParam(smsBody.getParamsStr());
+//        SendSmsResponse sendSmsResponse = acsClient.getAcsResponse(request);
+//
+//        boolean success = OK.equals(sendSmsResponse.getCode());
+//        if (!success) {
+//            log.debug("send fail[code={}, message={}]", sendSmsResponse.getCode(), sendSmsResponse.getMessage());
+//        }
+//        return new SmsResult()
+//                .setSuccess(success)
+//                .setMessage(sendSmsResponse.getMessage())
+//                .setCode(sendSmsResponse.getCode())
+//                .setApiId(sendSmsResponse.getBizId());
+//    }
 
     /**
      * [{
@@ -131,8 +127,8 @@ public class AliyunSmsClient extends AbstractSmsClient {
 
         public Integer getSendStatus() {
             return ((Boolean) sendResultParamMap.get(CallbackField.SUCCESS))
-                    ? SysSmsSendStatusEnum.SEND_SUCCESS.getStatus()
-                    : SysSmsSendStatusEnum.SEND_FAIL.getStatus();
+                    ? SysSmsSendStatusEnum.SUCCESS.getStatus()
+                    : SysSmsSendStatusEnum.FAILURE.getStatus();
         }
 
         public String getBizId() {

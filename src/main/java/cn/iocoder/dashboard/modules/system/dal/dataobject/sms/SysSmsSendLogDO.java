@@ -106,15 +106,22 @@ public class SysSmsSendLogDO extends BaseDO {
      */
     private Integer sendStatus;
     /**
+     * 时间发送时间
+     */
+    private Date sendTime;
+    /**
      * 发送失败的类型
      *
-     * 枚举 {@link SmsSendFailureTypeEnum}
+     * 枚举 {@link SmsSendFailureTypeEnum#getType()}
      */
     private Integer sendFailureType;
     /**
-     * 发送成功时间
+     * 发送失败的提示
+     *
+     * 一般情况下，使用 {@link SmsSendFailureTypeEnum#getMsg()}
+     * 异常情况下，通过格式化 Exception 的提示存储
      */
-    private Date sendTime;
+    private String sendFailureMsg;
     /**
      * 短信 API 发送失败的类型
      *

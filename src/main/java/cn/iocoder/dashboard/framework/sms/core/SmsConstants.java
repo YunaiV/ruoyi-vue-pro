@@ -15,4 +15,5 @@ public interface SmsConstants {
     String COMMA = ",";
 
     String SUCCESS = "SUCCESS";
+
 }

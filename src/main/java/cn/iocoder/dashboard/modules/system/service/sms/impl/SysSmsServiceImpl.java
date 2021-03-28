@@ -4,15 +4,19 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.dashboard.common.enums.CommonStatusEnum;
 import cn.iocoder.dashboard.common.enums.UserTypeEnum;
-import cn.iocoder.dashboard.framework.sms.core.SmsClientFactory;
-import cn.iocoder.dashboard.framework.sms.core.SmsResultDetail;
+import cn.iocoder.dashboard.framework.sms.core.SmsResult;
+import cn.iocoder.dashboard.framework.sms.core.client.SmsClient;
+import cn.iocoder.dashboard.framework.sms.core.client.SmsClientFactory;
 import cn.iocoder.dashboard.framework.sms.core.enums.SmsSendFailureTypeEnum;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.sms.SysSmsTemplateDO;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.user.SysUserDO;
 import cn.iocoder.dashboard.modules.system.mq.message.sms.SysSmsSendMessage;
 import cn.iocoder.dashboard.modules.system.mq.producer.sms.SysSmsProducer;
-import cn.iocoder.dashboard.modules.system.service.sms.*;
+import cn.iocoder.dashboard.modules.system.service.sms.SysSmsSendLogService;
+import cn.iocoder.dashboard.modules.system.service.sms.SysSmsService;
+import cn.iocoder.dashboard.modules.system.service.sms.SysSmsTemplateService;
 import cn.iocoder.dashboard.modules.system.service.user.SysUserService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -31,28 +35,20 @@ import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.*;
  * @date 2021/1/25 9:25
  */
 @Service
+@Slf4j
 public class SysSmsServiceImpl implements SysSmsService {
 
     @Resource
     private SysSmsTemplateService smsTemplateService;
     @Resource
     private SysSmsSendLogService smsSendLogService;
+    @Resource
+    private SysSmsProducer smsProducer;
+    @Resource
+    private SmsClientFactory smsClientFactory;
 
     @Resource
     private SysUserService userService;
-
-    @Resource
-    private SysSmsChannelService channelService;
-
-
-    @Resource
-    private SysSmsQueryLogService logService;
-
-    @Resource
-    private SysSmsProducer smsProducer;
-
-    @Resource
-    private SmsClientFactory smsClientFactory;
 
     @Override
     public void sendSingleSms(String mobile, Long userId, Integer userType,
@@ -68,7 +64,7 @@ public class SysSmsServiceImpl implements SysSmsService {
 
         // 如果模板被禁用，则直接标记发送失败。也就说，不发短信，嘿嘿。
         if (CommonStatusEnum.DISABLE.getStatus().equals(template.getStatus())) {
-            smsSendLogService.updateSmsSendLogFailure(sendLogId, SmsSendFailureTypeEnum.SMS_TEMPLATE_DISABLE.getType());
+            smsSendLogService.updateSmsSendLogFailure(sendLogId, SmsSendFailureTypeEnum.SMS_TEMPLATE_DISABLE);
             return;
         }
         // 如果模板未禁用，发送 MQ 消息。目的是，异步化调用短信平台
@@ -126,19 +122,31 @@ public class SysSmsServiceImpl implements SysSmsService {
             SysUserDO user = userService.getUser(userId);
             return user != null ? user.getMobile() : null;
         }
+        // TODO 芋艿：支持 C 端用户
         return null;
     }
 
     @Override
     public void doSendSms(SysSmsSendMessage message) {
+        // 获得渠道对应的 SmsClient 客户端
+        SmsClient smsClient = smsClientFactory.getSmsClient(message.getChannelId());
+        if (smsClient == null) {
+            log.error("[doSendSms][短信 message({}) 找不到对应的客户端]", message);
+            smsSendLogService.updateSmsSendLogFailure(message.getSendLogId(), SmsSendFailureTypeEnum.SMS_CHANNEL_CLIENT_NOT_EXISTS);
+            return;
+        }
 
+        // 发送短信
+        SmsResult sendResult = smsClient.send(message.getSendLogId(), message.getMobile(),
+                message.getApiTemplateId(), message.getTemplateParams());
     }
 
     @Override
     public Object smsSendCallbackHandle(ServletRequest request) {
-        SmsResultDetail smsResultDetail = smsClientFactory.getSmsResultDetailFromCallbackQuery(request);
-        logService.updateSendLogByResultDetail(smsResultDetail);
-        return smsResultDetail.getCallbackResponseBody();
+//        SmsResultDetail smsResultDetail = smsClientFactory.getSmsResultDetailFromCallbackQuery(request);
+//        logService.updateSendLogByResultDetail(smsResultDetail);
+//        return smsResultDetail.getCallbackResponseBody();
+        return null;
     }
 
 }

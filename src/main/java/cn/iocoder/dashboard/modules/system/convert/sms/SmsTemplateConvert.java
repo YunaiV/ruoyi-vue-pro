@@ -1,7 +1,6 @@
 package cn.iocoder.dashboard.modules.system.convert.sms;
 
 import cn.iocoder.dashboard.common.pojo.PageResult;
-import cn.iocoder.dashboard.framework.sms.core.property.SmsTemplateProperty;
 import cn.iocoder.dashboard.modules.system.controller.sms.vo.SmsTemplateVO;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.sms.SysSmsChannelDO;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.sms.SysSmsTemplateDO;
@@ -23,7 +22,5 @@ public interface SmsTemplateConvert {
     List<SmsTemplateVO> convert(List<SysSmsTemplateDO> bean);
 
     SmsTemplateVO convert(SysSmsTemplateDO bean);
-
-    List<SmsTemplateProperty> convertProperty(List<SysSmsTemplateDO> bean);
 
 }

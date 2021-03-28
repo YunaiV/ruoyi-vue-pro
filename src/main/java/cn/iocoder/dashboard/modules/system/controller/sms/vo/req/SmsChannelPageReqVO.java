@@ -15,9 +15,6 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper = true)
 public class SmsChannelPageReqVO extends PageParam {
 
-    @ApiModelProperty(value = "渠道名", example = "阿里", notes = "模糊匹配")
-    private String name;
-
     @ApiModelProperty(value = "签名值", example = "源码", notes = "模糊匹配")
     private String signature;
 

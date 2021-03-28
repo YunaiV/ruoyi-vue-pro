@@ -1,32 +1,24 @@
 package cn.iocoder.dashboard.modules.system.service.sms.impl;
 
-import cn.hutool.core.util.ObjectUtil;
+import cn.iocoder.dashboard.common.enums.CommonStatusEnum;
 import cn.iocoder.dashboard.common.pojo.PageResult;
-import cn.iocoder.dashboard.framework.sms.client.AbstractSmsClient;
-import cn.iocoder.dashboard.framework.sms.core.SmsClientFactory;
+import cn.iocoder.dashboard.framework.sms.core.client.SmsClientFactory;
 import cn.iocoder.dashboard.framework.sms.core.enums.SmsChannelEnum;
-import cn.iocoder.dashboard.framework.sms.core.property.SmsChannelProperty;
-import cn.iocoder.dashboard.framework.sms.core.property.SmsTemplateProperty;
-import cn.iocoder.dashboard.modules.system.controller.sms.vo.SmsChannelAllVO;
+import cn.iocoder.dashboard.framework.sms.core.property.SmsChannelProperties;
 import cn.iocoder.dashboard.modules.system.controller.sms.vo.req.SmsChannelCreateReqVO;
 import cn.iocoder.dashboard.modules.system.controller.sms.vo.req.SmsChannelPageReqVO;
 import cn.iocoder.dashboard.modules.system.controller.sms.vo.resp.SmsChannelEnumRespVO;
 import cn.iocoder.dashboard.modules.system.convert.sms.SmsChannelConvert;
-import cn.iocoder.dashboard.modules.system.convert.sms.SmsTemplateConvert;
-import cn.iocoder.dashboard.modules.system.dal.mysql.dao.sms.SysSmsChannelMapper;
-import cn.iocoder.dashboard.modules.system.dal.mysql.dao.sms.SysSmsTemplateMapper;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.sms.SysSmsChannelDO;
-import cn.iocoder.dashboard.modules.system.dal.dataobject.sms.SysSmsTemplateDO;
+import cn.iocoder.dashboard.modules.system.dal.mysql.sms.SysSmsChannelMapper;
+import cn.iocoder.dashboard.modules.system.dal.mysql.sms.SysSmsTemplateMapper;
 import cn.iocoder.dashboard.modules.system.service.sms.SysSmsChannelService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 短信渠道Service实现类
@@ -37,10 +29,8 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 public class SysSmsChannelServiceImpl implements SysSmsChannelService {
 
-    private final Map<String, Long> templateCode2ChannelIdMap = new ConcurrentHashMap<>(32);
-
     @Resource
-    private SmsClientFactory clientFactory;
+    private SmsClientFactory smsClientFactory;
 
     @Resource
     private SysSmsChannelMapper channelMapper;
@@ -48,30 +38,19 @@ public class SysSmsChannelServiceImpl implements SysSmsChannelService {
     @Resource
     private SysSmsTemplateMapper templateMapper;
 
-
-    @PostConstruct
     @Override
+    @PostConstruct
     public void initSmsClientAndCacheSmsTemplate() {
         // 查询有效渠道信息
-        List<SysSmsChannelDO> channelDOList = channelMapper.selectEnabledList();
-        List<SmsChannelProperty> propertyList = SmsChannelConvert.INSTANCE.convertProperties(channelDOList);
-
-        // 遍历渠道生成client、获取模板并缓存
-        propertyList.forEach(channelProperty -> {
-            List<SysSmsTemplateDO> templateDOList = templateMapper.selectListByChannelId(channelProperty.getId());
-            if (ObjectUtil.isNotEmpty(templateDOList)) {
-                Long clientId = clientFactory.createClient(channelProperty);
-                templateDOList.forEach(template -> templateCode2ChannelIdMap.put(template.getCode(), clientId));
-
-                List<SmsTemplateProperty> templatePropertyList = SmsTemplateConvert.INSTANCE.convertProperty(templateDOList);
-                clientFactory.addOrUpdateTemplateCache(templatePropertyList);
-            }
-        });
+        List<SysSmsChannelDO> channelDOList = channelMapper.selectListByStatus(CommonStatusEnum.ENABLE.getStatus());
+        // 创建渠道 Client
+        List<SmsChannelProperties> propertiesList = SmsChannelConvert.INSTANCE.convertList(channelDOList);
+        propertiesList.forEach(properties -> smsClientFactory.createOrUpdateSmsClient(properties));
     }
 
     @Override
     public PageResult<SysSmsChannelDO> pageSmsChannels(SmsChannelPageReqVO reqVO) {
-        return SmsChannelConvert.INSTANCE.convertPage(channelMapper.selectChannelPage(reqVO));
+        return channelMapper.selectChannelPage(reqVO);
     }
 
     @Override
@@ -86,30 +65,20 @@ public class SysSmsChannelServiceImpl implements SysSmsChannelService {
         return SmsChannelConvert.INSTANCE.convertEnum(Arrays.asList(SmsChannelEnum.values()));
     }
 
-    @Override
-    public AbstractSmsClient getSmsClient(String templateCode) {
-        return clientFactory.getClient(templateCode2ChannelIdMap.get(templateCode));
-    }
-
-    @Override
-    public String getSmsTemplateApiIdByCode(String templateCode) {
-        return clientFactory.getTemplateApiIdByCode(templateCode);
-    }
-
-    @Override
-    public List<SmsChannelAllVO> listSmsChannelAllEnabledInfo() {
-        List<SysSmsChannelDO> channelDOList = channelMapper.selectEnabledList();
-        if (ObjectUtil.isNull(channelDOList)) {
-            return null;
-        }
-        List<SmsChannelAllVO> channelAllVOList = SmsChannelConvert.INSTANCE.convert(channelDOList);
-        channelAllVOList.forEach(smsChannelDO -> {
-            List<SysSmsTemplateDO> templateDOList = templateMapper.selectListByChannelId(smsChannelDO.getId());
-            if (ObjectUtil.isNull(templateDOList)) {
-                templateDOList = new ArrayList<>();
-            }
-            smsChannelDO.setTemplateList(SmsTemplateConvert.INSTANCE.convert(templateDOList));
-        });
-        return channelAllVOList;
-    }
+//    @Override
+//    public List<SmsChannelAllVO> listSmsChannelAllEnabledInfo() {
+//        List<SysSmsChannelDO> channelDOList = channelMapper.selectListByStatus();
+//        if (ObjectUtil.isNull(channelDOList)) {
+//            return null;
+//        }
+//        List<SmsChannelAllVO> channelAllVOList = SmsChannelConvert.INSTANCE.convert(channelDOList);
+//        channelAllVOList.forEach(smsChannelDO -> {
+//            List<SysSmsTemplateDO> templateDOList = templateMapper.selectListByChannelId(smsChannelDO.getId());
+//            if (ObjectUtil.isNull(templateDOList)) {
+//                templateDOList = new ArrayList<>();
+//            }
+//            smsChannelDO.setTemplateList(SmsTemplateConvert.INSTANCE.convert(templateDOList));
+//        });
+//        return channelAllVOList;
+//    }
 }
