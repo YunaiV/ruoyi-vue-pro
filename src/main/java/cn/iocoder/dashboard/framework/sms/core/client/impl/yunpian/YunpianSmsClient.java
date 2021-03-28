@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.CharsetUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.URLUtil;
 import cn.iocoder.dashboard.framework.sms.core.SmsConstants;
 import cn.iocoder.dashboard.framework.sms.core.SmsResult;
@@ -28,6 +29,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
 
+import static com.yunpian.sdk.constant.Code.*;
+
 /**
  * 云片短信客户端的实现类
  *
@@ -51,7 +54,15 @@ public class YunpianSmsClient extends AbstractSmsClient {
 
     @Override
     public void doInit() {
-        client = new YunpianClient(properties.getApiKey());
+        YunpianClient oldClient = client;
+        // 初始化新的客户端
+        YunpianClient newClient = new YunpianClient(properties.getApiKey());
+        newClient.init();
+        this.client = newClient;
+        // 销毁老的客户端
+        if (oldClient != null) {
+            oldClient.close();
+        }
     }
 
     @Override
@@ -71,9 +82,8 @@ public class YunpianSmsClient extends AbstractSmsClient {
             throw sendResult.getThrowable();
         }
         // 解析结果
-        SmsSingleSend data = sendResult.getData();
         return SmsResult.success(parseSendFailureType(sendResult), // 将 API 短信平台，解析成统一的错误码
-                String.valueOf(data.getCode()), data.getMsg(), null, String.valueOf(data.getSid()));
+                String.valueOf(sendResult.getCode()), formatResultMsg(sendResult), null, getApiSerialNo(sendResult));
     }
 
     private static String formatTplValue(Map<String, Object> templateParams) {
@@ -86,8 +96,29 @@ public class YunpianSmsClient extends AbstractSmsClient {
         return joiner.toString();
     }
 
+    private static String formatResultMsg(Result<SmsSingleSend> sendResult) {
+        if (StrUtil.isEmpty(sendResult.getDetail())) {
+            return sendResult.getMsg();
+        }
+        return sendResult.getMsg() + " => " + sendResult.getDetail();
+    }
+
     private static SmsSendFailureTypeEnum parseSendFailureType(Result<SmsSingleSend> sendResult) {
+        Integer code = sendResult.getCode();
+        switch (code) {
+            case ARGUMENT_MISSING: return SmsSendFailureTypeEnum.SMS_API_PARAM_ERROR;
+            case BAD_ARGUMENT_FORMAT: return SmsSendFailureTypeEnum.SMS_TEMPLATE_PARAM_ERROR;
+            case TPL_NOT_FOUND: return SmsSendFailureTypeEnum.SMS_TEMPLATE_NOT_EXISTS;
+            case TPL_NOT_VALID: return SmsSendFailureTypeEnum.SMS_TMPLATE_INVALID;
+        }
         return SmsSendFailureTypeEnum.SMS_UNKNOWN;
+    }
+
+    private static String getApiSerialNo(Result<SmsSingleSend> sendResult) {
+        if (sendResult.getData() == null) {
+            return null;
+        }
+        return String.valueOf(sendResult.getData().getSid());
     }
 
     /**

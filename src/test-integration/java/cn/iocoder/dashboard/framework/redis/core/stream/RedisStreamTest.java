@@ -4,7 +4,7 @@ import cn.hutool.core.thread.ThreadUtil;
 import cn.iocoder.dashboard.BaseRedisIntegrationTest;
 import cn.iocoder.dashboard.framework.redis.core.util.RedisMessageUtils;
 import cn.iocoder.dashboard.modules.system.mq.consumer.mail.SysMailSendConsumer;
-import cn.iocoder.dashboard.modules.system.mq.consumer.sms.SysSmsSendConsumer;
+import cn.iocoder.dashboard.modules.system.mq.consumer.sms.SmsSendConsumer;
 import cn.iocoder.dashboard.modules.system.mq.message.mail.SysMailSendMessage;
 import cn.iocoder.dashboard.modules.system.mq.message.sms.SysSmsSendMessage;
 import org.junit.jupiter.api.Disabled;
@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit;
 
 public class RedisStreamTest  {
 
-    @Import({SysSmsSendConsumer.class, SysMailSendConsumer.class})
+    @Import({SmsSendConsumer.class, SysMailSendConsumer.class})
     @Disabled
     public static class ConsumerTest extends BaseRedisIntegrationTest {
 
@@ -43,7 +43,7 @@ public class RedisStreamTest  {
             for (int i = 0; i < 100; i++) {
                 // 创建消息
                 SysSmsSendMessage message = new SysSmsSendMessage();
-                message.setMobile("15601691300").setTemplateCode("test:" + i);
+                message.setMobile("15601691300").setApiTemplateId("test:" + i);
                 // 发送消息
                 RedisMessageUtils.sendStreamMessage(stringRedisTemplate, message);
             }
