@@ -60,8 +60,12 @@ public class SmsResult implements Serializable {
 
     public static SmsResult success(SmsSendFailureTypeEnum sendFailureType,
                                     String apiSendCode, String apiSendMsg, String apiRequestId, String apiSerialNo) {
-        return new SmsResult().setSuccess(true).setSendFailureType(sendFailureType.getType()).setSendFailureMsg(sendFailureType.getMsg())
-                .setApiSendCode(apiSendCode).setApiSendMsg(apiSendMsg).setApiRequestId(apiRequestId).setApiSerialNo(apiSerialNo);
+        SmsResult result = new SmsResult().setSuccess(true).setApiSendCode(apiSendCode).setApiSendMsg(apiSendMsg)
+                .setApiRequestId(apiRequestId).setApiSerialNo(apiSerialNo);
+        if (sendFailureType != null) {
+            result.setSendFailureType(sendFailureType.getType()).setSendFailureMsg(sendFailureType.getMsg());
+        }
+        return result;
     }
 
     public static SmsResult error(Throwable ex) {

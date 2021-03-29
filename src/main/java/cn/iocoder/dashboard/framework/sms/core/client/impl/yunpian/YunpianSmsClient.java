@@ -106,10 +106,11 @@ public class YunpianSmsClient extends AbstractSmsClient {
     private static SmsSendFailureTypeEnum parseSendFailureType(Result<SmsSingleSend> sendResult) {
         Integer code = sendResult.getCode();
         switch (code) {
+            case OK: return null;
             case ARGUMENT_MISSING: return SmsSendFailureTypeEnum.SMS_API_PARAM_ERROR;
             case BAD_ARGUMENT_FORMAT: return SmsSendFailureTypeEnum.SMS_TEMPLATE_PARAM_ERROR;
             case TPL_NOT_FOUND: return SmsSendFailureTypeEnum.SMS_TEMPLATE_NOT_EXISTS;
-            case TPL_NOT_VALID: return SmsSendFailureTypeEnum.SMS_TMPLATE_INVALID;
+            case TPL_NOT_VALID: return SmsSendFailureTypeEnum.SMS_TEMPLATE_INVALID;
         }
         return SmsSendFailureTypeEnum.SMS_UNKNOWN;
     }

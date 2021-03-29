@@ -2,14 +2,20 @@ package cn.iocoder.dashboard.framework.sms.core.client.impl.aliyun;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.dashboard.framework.sms.core.SmsResult;
 import cn.iocoder.dashboard.framework.sms.core.SmsResultDetail;
 import cn.iocoder.dashboard.framework.sms.core.client.impl.AbstractSmsClient;
+import cn.iocoder.dashboard.framework.sms.core.enums.SmsSendFailureTypeEnum;
 import cn.iocoder.dashboard.framework.sms.core.property.SmsChannelProperties;
 import cn.iocoder.dashboard.modules.system.enums.sms.SysSmsSendStatusEnum;
 import cn.iocoder.dashboard.util.json.JsonUtils;
 import com.aliyuncs.DefaultAcsClient;
 import com.aliyuncs.IAcsClient;
+import com.aliyuncs.dysmsapi.model.v20170525.SendSmsRequest;
+import com.aliyuncs.dysmsapi.model.v20170525.SendSmsResponse;
+import com.aliyuncs.exceptions.ClientException;
+import com.aliyuncs.http.MethodType;
 import com.aliyuncs.profile.DefaultProfile;
 import com.aliyuncs.profile.IClientProfile;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -36,8 +42,6 @@ public class AliyunSmsClient extends AbstractSmsClient {
     private static final String DOMAIN = "dysmsapi.aliyuncs.com";
     private static final String ENDPOINT = "cn-hangzhou";
 
-    private static final String OK = "OK";
-
     /**
      * 阿里云客户端
      */
@@ -56,29 +60,44 @@ public class AliyunSmsClient extends AbstractSmsClient {
 
     @Override
     protected SmsResult doSend(Long sendLogId, String mobile, String apiTemplateId, Map<String, Object> templateParams) throws Exception {
-        return null;
+        // 构建参数
+        SendSmsRequest request = new SendSmsRequest();
+        request.setSysMethod(MethodType.POST);
+        request.setPhoneNumbers(mobile);
+        request.setSignName(properties.getSignature());
+        request.setTemplateCode(apiTemplateId);
+        request.setTemplateParam(JsonUtils.toJsonString(templateParams));
+        request.setOutId(String.valueOf(sendLogId));
+
+        try {
+            // 执行发送
+            SendSmsResponse sendResult = acsClient.getAcsResponse(request);
+            // 解析结果
+            return SmsResult.success(parseSendFailureType(sendResult.getCode()), // 将 API 短信平台，解析成统一的错误码
+                    sendResult.getCode(), sendResult.getMessage(), sendResult.getRequestId(), sendResult.getBizId());
+        } catch (ClientException ex) {
+            return SmsResult.success(parseSendFailureType(ex.getErrCode()), // 将 API 短信平台，解析成统一的错误码
+                    ex.getErrCode(), formatResultMsg(ex), ex.getRequestId(), null);
+        }
     }
 
-//    @Override
-//    public SmsResult doSend(String templateApiId, SmsBody smsBody, String targetPhone) throws Exception {
-//        SendSmsRequest request = new SendSmsRequest();
-//        request.setSysMethod(MethodType.POST);
-//        request.setPhoneNumbers(targetPhone);
-//        request.setSignName(properties.getSignature());
-//        request.setTemplateCode(templateApiId);
-//        request.setTemplateParam(smsBody.getParamsStr());
-//        SendSmsResponse sendSmsResponse = acsClient.getAcsResponse(request);
-//
-//        boolean success = OK.equals(sendSmsResponse.getCode());
-//        if (!success) {
-//            log.debug("send fail[code={}, message={}]", sendSmsResponse.getCode(), sendSmsResponse.getMessage());
-//        }
-//        return new SmsResult()
-//                .setSuccess(success)
-//                .setMessage(sendSmsResponse.getMessage())
-//                .setCode(sendSmsResponse.getCode())
-//                .setApiId(sendSmsResponse.getBizId());
-//    }
+    private static SmsSendFailureTypeEnum parseSendFailureType(String code) {
+        switch (code) {
+            case "OK": return null;
+            case "MissingAccessKeyId": return SmsSendFailureTypeEnum.SMS_CHANNEL_API_KEY_MISSING;
+            case "isp.RAM_PERMISSION_DENY": return SmsSendFailureTypeEnum.SMS_CHANNEL_PERMISSION_DENY;
+            case "isv.INVALID_PARAMETERS": return SmsSendFailureTypeEnum.SMS_API_PARAM_ERROR;
+            case "isv.BUSINESS_LIMIT_CONTROL": return SmsSendFailureTypeEnum.SMS_SEND_LIMIT_CONTROL;
+        }
+        return SmsSendFailureTypeEnum.SMS_UNKNOWN;
+    }
+
+    private static String formatResultMsg(ClientException ex) {
+        if (StrUtil.isEmpty(ex.getErrorDescription())) {
+            return ex.getMessage();
+        }
+        return ex.getErrMsg() + " => " + ex.getErrorDescription();
+    }
 
     /**
      * [{
