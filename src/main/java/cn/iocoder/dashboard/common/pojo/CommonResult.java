@@ -1,7 +1,6 @@
 package cn.iocoder.dashboard.common.pojo;
 
 import cn.iocoder.dashboard.common.exception.ErrorCode;
-import cn.iocoder.dashboard.common.exception.GlobalException;
 import cn.iocoder.dashboard.common.exception.ServiceException;
 import cn.iocoder.dashboard.common.exception.enums.GlobalErrorCodeConstants;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -16,7 +15,7 @@ import java.io.Serializable;
  * @param <T> 数据泛型
  */
 @Data
-public final class CommonResult<T> implements Serializable {
+public class CommonResult<T> implements Serializable {
 
     /**
      * 错误码
@@ -81,15 +80,11 @@ public final class CommonResult<T> implements Serializable {
     // ========= 和 Exception 异常体系集成 =========
 
     /**
-     * 判断是否有异常。如果有，则抛出 {@link GlobalException} 或 {@link ServiceException} 异常
+     * 判断是否有异常。如果有，则抛出 {@link ServiceException} 异常
      */
-    public void checkError() throws GlobalException, ServiceException {
+    public void checkError() throws ServiceException {
         if (isSuccess()) {
             return;
-        }
-        // 全局异常
-        if (GlobalErrorCodeConstants.isMatch(code)) {
-            throw new GlobalException(code, msg);
         }
         // 业务异常
         throw new ServiceException(code, msg);
@@ -97,10 +92,6 @@ public final class CommonResult<T> implements Serializable {
 
     public static <T> CommonResult<T> error(ServiceException serviceException) {
         return error(serviceException.getCode(), serviceException.getMessage());
-    }
-
-    public static <T> CommonResult<T> error(GlobalException globalException) {
-        return error(globalException.getCode(), globalException.getMessage());
     }
 
 }

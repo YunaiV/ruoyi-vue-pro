@@ -4,7 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.dashboard.common.enums.CommonStatusEnum;
 import cn.iocoder.dashboard.common.enums.UserTypeEnum;
-import cn.iocoder.dashboard.framework.sms.core.SmsResult;
+import cn.iocoder.dashboard.framework.sms.core.client.SmsCommonResult;
 import cn.iocoder.dashboard.framework.sms.core.client.SmsClient;
 import cn.iocoder.dashboard.framework.sms.core.client.SmsClientFactory;
 import cn.iocoder.dashboard.framework.sms.core.enums.SmsSendFailureTypeEnum;
@@ -137,7 +137,7 @@ public class SysSmsServiceImpl implements SysSmsService {
         }
 
         // 发送短信
-        SmsResult sendResult = smsClient.send(message.getSendLogId(), message.getMobile(),
+        SmsCommonResult sendResult = smsClient.send(message.getSendLogId(), message.getMobile(),
                 message.getApiTemplateId(), message.getTemplateParams());
     }
 

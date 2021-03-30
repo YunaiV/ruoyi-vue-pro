@@ -3,7 +3,7 @@ package cn.iocoder.dashboard.framework.sms.core.client.impl.aliyun;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.dashboard.framework.sms.core.SmsResult;
+import cn.iocoder.dashboard.framework.sms.core.client.SmsCommonResult;
 import cn.iocoder.dashboard.framework.sms.core.SmsResultDetail;
 import cn.iocoder.dashboard.framework.sms.core.client.impl.AbstractSmsClient;
 import cn.iocoder.dashboard.framework.sms.core.enums.SmsSendFailureTypeEnum;
@@ -59,7 +59,7 @@ public class AliyunSmsClient extends AbstractSmsClient {
     }
 
     @Override
-    protected SmsResult doSend(Long sendLogId, String mobile, String apiTemplateId, Map<String, Object> templateParams) throws Exception {
+    protected SmsCommonResult doSend(Long sendLogId, String mobile, String apiTemplateId, Map<String, Object> templateParams) throws Exception {
         // 构建参数
         SendSmsRequest request = new SendSmsRequest();
         request.setSysMethod(MethodType.POST);
@@ -73,10 +73,10 @@ public class AliyunSmsClient extends AbstractSmsClient {
             // 执行发送
             SendSmsResponse sendResult = acsClient.getAcsResponse(request);
             // 解析结果
-            return SmsResult.success(parseSendFailureType(sendResult.getCode()), // 将 API 短信平台，解析成统一的错误码
+            return SmsCommonResult.success(parseSendFailureType(sendResult.getCode()), // 将 API 短信平台，解析成统一的错误码
                     sendResult.getCode(), sendResult.getMessage(), sendResult.getRequestId(), sendResult.getBizId());
         } catch (ClientException ex) {
-            return SmsResult.success(parseSendFailureType(ex.getErrCode()), // 将 API 短信平台，解析成统一的错误码
+            return SmsCommonResult.success(parseSendFailureType(ex.getErrCode()), // 将 API 短信平台，解析成统一的错误码
                     ex.getErrCode(), formatResultMsg(ex), ex.getRequestId(), null);
         }
     }

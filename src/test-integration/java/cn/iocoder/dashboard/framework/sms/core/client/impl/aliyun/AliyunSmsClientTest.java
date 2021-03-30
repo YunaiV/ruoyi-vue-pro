@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.framework.sms.core.client.impl.aliyun;
 
-import cn.iocoder.dashboard.framework.sms.core.SmsResult;
+import cn.iocoder.dashboard.framework.sms.core.client.SmsCommonResult;
 import cn.iocoder.dashboard.framework.sms.core.enums.SmsChannelEnum;
 import cn.iocoder.dashboard.framework.sms.core.property.SmsChannelProperties;
 import org.junit.jupiter.api.Test;
@@ -30,7 +30,7 @@ public class AliyunSmsClientTest {
         templateParams.put("code", "1024");
 //        templateParams.put("operation", "嘿嘿");
 //        SmsResult result = smsClient.send(1L, "15601691399", "4372216", templateParams);
-        SmsResult result = smsClient.send(1L, "15601691399", "SMS_207945135", templateParams);
+        SmsCommonResult result = smsClient.send(1L, "15601691399", "SMS_207945135", templateParams);
         System.out.println(result);
     }
 

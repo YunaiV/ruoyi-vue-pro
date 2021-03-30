@@ -1,7 +1,7 @@
 package cn.iocoder.dashboard.framework.sms.core.client;
 
-import cn.iocoder.dashboard.framework.sms.core.SmsResult;
 import cn.iocoder.dashboard.framework.sms.core.SmsResultDetail;
+import cn.iocoder.dashboard.framework.sms.core.client.dto.SmsSendRespDTO;
 
 import javax.servlet.ServletRequest;
 import java.util.Map;
@@ -30,7 +30,7 @@ public interface SmsClient {
      * @param templateParams 短信模板参数
      * @return 短信发送结果
      */
-    SmsResult send(Long sendLogId, String mobile, String apiTemplateId, Map<String, Object> templateParams);
+    SmsCommonResult<SmsSendRespDTO> send(Long sendLogId, String mobile, String apiTemplateId, Map<String, Object> templateParams);
 
     // TODO FROM 芋艿 to ZZF：是不是可以改成意图更明确的解析返回结果，例如说 parseXXXX
     /**

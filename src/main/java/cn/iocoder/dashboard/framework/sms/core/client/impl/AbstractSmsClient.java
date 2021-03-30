@@ -1,7 +1,8 @@
 package cn.iocoder.dashboard.framework.sms.core.client.impl;
 
-import cn.iocoder.dashboard.framework.sms.core.SmsResult;
+import cn.iocoder.dashboard.framework.sms.core.client.SmsCommonResult;
 import cn.iocoder.dashboard.framework.sms.core.client.SmsClient;
+import cn.iocoder.dashboard.framework.sms.core.client.dto.SmsSendRespDTO;
 import cn.iocoder.dashboard.framework.sms.core.property.SmsChannelProperties;
 import lombok.extern.slf4j.Slf4j;
 
@@ -60,8 +61,10 @@ public abstract class AbstractSmsClient implements SmsClient {
     }
 
     @Override
-    public final SmsResult send(Long sendLogId, String mobile, String apiTemplateId, Map<String, Object> templateParams) {
-        SmsResult result;
+    public final SmsCommonResult<SmsSendRespDTO> send(Long sendLogId, String mobile,
+                                                      String apiTemplateId, Map<String, Object> templateParams) {
+        // 执行短信发送
+        SmsCommonResult<SmsSendRespDTO> result;
         try {
             result = doSend(sendLogId, mobile, apiTemplateId, templateParams);
         } catch (Throwable ex) {
@@ -69,7 +72,7 @@ public abstract class AbstractSmsClient implements SmsClient {
             log.error("[send][发送短信异常，sendLogId({}) mobile({}) apiTemplateId({}) templateParams({})]",
                     sendLogId, mobile, apiTemplateId, templateParams, ex);
             // 封装返回
-            return SmsResult.error(ex);
+            return SmsCommonResult.error(ex);
         }
         return result;
     }
@@ -83,7 +86,7 @@ public abstract class AbstractSmsClient implements SmsClient {
      * @param templateParams 短信模板参数
      * @return 短信发送结果
      */
-    protected abstract SmsResult doSend(Long sendLogId, String mobile, String apiTemplateId, Map<String, Object> templateParams)
-            throws Throwable;
+    protected abstract SmsCommonResult<SmsSendRespDTO> doSend(Long sendLogId, String mobile,
+                                                              String apiTemplateId, Map<String, Object> templateParams) throws Throwable;
 
 }

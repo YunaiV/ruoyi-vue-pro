@@ -8,9 +8,6 @@ package cn.iocoder.dashboard.framework.sms.core;
  */
 public interface SmsConstants {
 
-    String OK = "OK";
-
-    String JING_HAO = "#";
 
     String COMMA = ",";
 

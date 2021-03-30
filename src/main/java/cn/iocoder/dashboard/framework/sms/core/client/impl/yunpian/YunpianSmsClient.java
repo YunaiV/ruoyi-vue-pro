@@ -7,7 +7,7 @@ import cn.hutool.core.util.CharsetUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.URLUtil;
 import cn.iocoder.dashboard.framework.sms.core.SmsConstants;
-import cn.iocoder.dashboard.framework.sms.core.SmsResult;
+import cn.iocoder.dashboard.framework.sms.core.client.SmsCommonResult;
 import cn.iocoder.dashboard.framework.sms.core.SmsResultDetail;
 import cn.iocoder.dashboard.framework.sms.core.client.impl.AbstractSmsClient;
 import cn.iocoder.dashboard.framework.sms.core.enums.SmsSendFailureTypeEnum;
@@ -66,7 +66,7 @@ public class YunpianSmsClient extends AbstractSmsClient {
     }
 
     @Override
-    protected SmsResult doSend(Long sendLogId, String mobile, String apiTemplateId, Map<String, Object> templateParams) throws Throwable {
+    protected SmsCommonResult doSend(Long sendLogId, String mobile, String apiTemplateId, Map<String, Object> templateParams) throws Throwable {
         // 构建参数
         Map<String, String> request = new HashMap<>();
         request.put(YunpianConstant.APIKEY, properties.getApiKey());
@@ -82,7 +82,7 @@ public class YunpianSmsClient extends AbstractSmsClient {
             throw sendResult.getThrowable();
         }
         // 解析结果
-        return SmsResult.success(parseSendFailureType(sendResult), // 将 API 短信平台，解析成统一的错误码
+        return SmsCommonResult.success(parseSendFailureType(sendResult), // 将 API 短信平台，解析成统一的错误码
                 String.valueOf(sendResult.getCode()), formatResultMsg(sendResult), null, getApiSerialNo(sendResult));
     }
 

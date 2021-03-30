@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.framework.sms.core.client.impl.yunpian;
 
-import cn.iocoder.dashboard.framework.sms.core.SmsResult;
+import cn.iocoder.dashboard.framework.sms.core.client.SmsCommonResult;
 import cn.iocoder.dashboard.framework.sms.core.enums.SmsChannelEnum;
 import cn.iocoder.dashboard.framework.sms.core.property.SmsChannelProperties;
 import org.junit.jupiter.api.Test;
@@ -29,7 +29,7 @@ public class YunpianSmsClientIntegrationTest {
         templateParams.put("code", "1024");
         templateParams.put("operation", "嘿嘿");
 //        SmsResult result = smsClient.send(1L, "15601691399", "4372216", templateParams);
-        SmsResult result = smsClient.send(1L, "15601691399", "4383920", templateParams);
+        SmsCommonResult result = smsClient.send(1L, "15601691399", "4383920", templateParams);
         System.out.println(result);
     }
 
