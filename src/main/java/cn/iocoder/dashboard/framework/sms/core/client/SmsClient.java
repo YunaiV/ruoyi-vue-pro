@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.framework.sms.core.client;
 
-import cn.iocoder.dashboard.framework.sms.core.SmsResultDetail;
+import cn.iocoder.dashboard.framework.sms.core.client.dto.SmsResultDetail;
 import cn.iocoder.dashboard.framework.sms.core.client.dto.SmsSendRespDTO;
 
 import javax.servlet.ServletRequest;

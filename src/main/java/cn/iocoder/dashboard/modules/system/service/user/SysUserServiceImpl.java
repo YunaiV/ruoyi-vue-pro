@@ -358,7 +358,7 @@ public class SysUserServiceImpl implements SysUserService {
             }
             // 如果存在，判断是否允许更新
             if (!isUpdateSupport) {
-                respVO.getFailureUsernames().put(importUser.getUsername(), USER_USERNAME_EXISTS.getMessage());
+                respVO.getFailureUsernames().put(importUser.getUsername(), USER_USERNAME_EXISTS.getMsg());
                 return;
             }
             SysUserDO updateUser = SysUserConvert.INSTANCE.convert(importUser);

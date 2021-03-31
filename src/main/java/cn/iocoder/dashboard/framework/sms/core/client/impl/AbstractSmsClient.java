@@ -1,5 +1,6 @@
 package cn.iocoder.dashboard.framework.sms.core.client.impl;
 
+import cn.iocoder.dashboard.framework.sms.core.client.SmsCodeMapping;
 import cn.iocoder.dashboard.framework.sms.core.client.SmsCommonResult;
 import cn.iocoder.dashboard.framework.sms.core.client.SmsClient;
 import cn.iocoder.dashboard.framework.sms.core.client.dto.SmsSendRespDTO;
@@ -21,14 +22,19 @@ public abstract class AbstractSmsClient implements SmsClient {
      * 短信渠道配置
      */
     protected volatile SmsChannelProperties properties;
+    /**
+     * 错误码枚举类
+     */
+    protected final SmsCodeMapping codeMapping;
 
     /**
      * 短信客户端有参构造函数
      *
      * @param properties 短信配置
      */
-    public AbstractSmsClient(SmsChannelProperties properties) {
+    public AbstractSmsClient(SmsChannelProperties properties, SmsCodeMapping codeMapping) {
         this.properties = properties;
+        this.codeMapping = codeMapping;
     }
 
     /**

@@ -4,9 +4,9 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.dashboard.framework.sms.core.client.SmsCommonResult;
-import cn.iocoder.dashboard.framework.sms.core.SmsResultDetail;
+import cn.iocoder.dashboard.framework.sms.core.client.dto.SmsResultDetail;
+import cn.iocoder.dashboard.framework.sms.core.client.dto.SmsSendRespDTO;
 import cn.iocoder.dashboard.framework.sms.core.client.impl.AbstractSmsClient;
-import cn.iocoder.dashboard.framework.sms.core.enums.SmsSendFailureTypeEnum;
 import cn.iocoder.dashboard.framework.sms.core.property.SmsChannelProperties;
 import cn.iocoder.dashboard.modules.system.enums.sms.SysSmsSendStatusEnum;
 import cn.iocoder.dashboard.util.json.JsonUtils;
@@ -48,7 +48,7 @@ public class AliyunSmsClient extends AbstractSmsClient {
     private volatile IAcsClient acsClient;
 
     public AliyunSmsClient(SmsChannelProperties properties) {
-        super(properties);
+        super(properties, new AliyunSmsCodeMapping());
     }
 
     @Override
@@ -59,7 +59,8 @@ public class AliyunSmsClient extends AbstractSmsClient {
     }
 
     @Override
-    protected SmsCommonResult doSend(Long sendLogId, String mobile, String apiTemplateId, Map<String, Object> templateParams) throws Exception {
+    protected SmsCommonResult<SmsSendRespDTO> doSend(Long sendLogId, String mobile,
+                                                     String apiTemplateId, Map<String, Object> templateParams) throws Throwable {
         // 构建参数
         SendSmsRequest request = new SendSmsRequest();
         request.setSysMethod(MethodType.POST);
@@ -73,23 +74,14 @@ public class AliyunSmsClient extends AbstractSmsClient {
             // 执行发送
             SendSmsResponse sendResult = acsClient.getAcsResponse(request);
             // 解析结果
-            return SmsCommonResult.success(parseSendFailureType(sendResult.getCode()), // 将 API 短信平台，解析成统一的错误码
-                    sendResult.getCode(), sendResult.getMessage(), sendResult.getRequestId(), sendResult.getBizId());
+            SmsSendRespDTO data = null;
+            if (sendResult.getBizId() != null) {
+                data = new SmsSendRespDTO().setSerialNo(sendResult.getBizId());
+            }
+            return SmsCommonResult.build(sendResult.getCode(), sendResult.getMessage(), sendResult.getRequestId(), data, codeMapping);
         } catch (ClientException ex) {
-            return SmsCommonResult.success(parseSendFailureType(ex.getErrCode()), // 将 API 短信平台，解析成统一的错误码
-                    ex.getErrCode(), formatResultMsg(ex), ex.getRequestId(), null);
+            return SmsCommonResult.build(ex.getErrCode(), formatResultMsg(ex), ex.getRequestId(), null, codeMapping);
         }
-    }
-
-    private static SmsSendFailureTypeEnum parseSendFailureType(String code) {
-        switch (code) {
-            case "OK": return null;
-            case "MissingAccessKeyId": return SmsSendFailureTypeEnum.SMS_CHANNEL_API_KEY_MISSING;
-            case "isp.RAM_PERMISSION_DENY": return SmsSendFailureTypeEnum.SMS_CHANNEL_PERMISSION_DENY;
-            case "isv.INVALID_PARAMETERS": return SmsSendFailureTypeEnum.SMS_API_PARAM_ERROR;
-            case "isv.BUSINESS_LIMIT_CONTROL": return SmsSendFailureTypeEnum.SMS_SEND_LIMIT_CONTROL;
-        }
-        return SmsSendFailureTypeEnum.SMS_UNKNOWN;
     }
 
     private static String formatResultMsg(ClientException ex) {

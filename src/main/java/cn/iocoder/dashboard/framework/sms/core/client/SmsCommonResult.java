@@ -1,8 +1,10 @@
 package cn.iocoder.dashboard.framework.sms.core.client;
 
 import cn.hutool.core.exceptions.ExceptionUtil;
+import cn.hutool.core.lang.Assert;
+import cn.iocoder.dashboard.common.exception.ErrorCode;
 import cn.iocoder.dashboard.common.pojo.CommonResult;
-import cn.iocoder.dashboard.framework.sms.core.enums.SmsSendFailureTypeEnum;
+import cn.iocoder.dashboard.framework.sms.core.enums.SmsFrameworkErrorCodeConstants;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -40,20 +42,27 @@ public class SmsCommonResult<T> extends CommonResult<T> {
     private SmsCommonResult() {
     }
 
-    public static SmsCommonResult success(SmsSendFailureTypeEnum sendFailureType,
-                                          String apiSendCode, String apiSendMsg, String apiRequestId, String apiSerialNo) {
-        SmsCommonResult result = new SmsCommonResult().setSuccess(true).setApiSendCode(apiSendCode).setApiSendMsg(apiSendMsg)
-                .setApiRequestId(apiRequestId).setApiSerialNo(apiSerialNo);
-        if (sendFailureType != null) {
-            result.setSendFailureType(sendFailureType.getType()).setSendFailureMsg(sendFailureType.getMsg());
+    public static <T> SmsCommonResult<T> build(String apiCode, String apiMsg, String apiRequestId,
+                                               T data, SmsCodeMapping codeMapping) {
+        Assert.notNull(codeMapping, "参数 codeMapping 不能为空");
+        SmsCommonResult<T> result = new SmsCommonResult<T>().setApiCode(apiCode).setApiMsg(apiMsg).setApiRequestId(apiRequestId);
+        result.setData(data);
+        // 翻译错误码
+        if (codeMapping != null) {
+            ErrorCode errorCode = codeMapping.apply(apiCode);
+            if (errorCode == null) {
+                errorCode = SmsFrameworkErrorCodeConstants.SMS_UNKNOWN;
+            }
+            result.setCode(errorCode.getCode()).setMsg(errorCode.getMsg());
         }
         return result;
     }
 
-    public static SmsCommonResult error(Throwable ex) {
-        return new SmsCommonResult().setSuccess(false)
-                .setSendFailureType(SmsSendFailureTypeEnum.SMS_SEND_EXCEPTION.getType())
-                .setSendFailureMsg(ExceptionUtil.getRootCauseMessage(ex));
+    public static <T> SmsCommonResult<T> error(Throwable ex) {
+        SmsCommonResult<T> result = new SmsCommonResult<>();
+        result.setCode(SmsFrameworkErrorCodeConstants.EXCEPTION.getCode());
+        result.setMsg(ExceptionUtil.getRootCauseMessage(ex));
+        return result;
     }
 
 }

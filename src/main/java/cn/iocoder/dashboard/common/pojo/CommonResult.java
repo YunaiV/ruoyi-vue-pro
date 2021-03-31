@@ -30,7 +30,7 @@ public class CommonResult<T> implements Serializable {
     /**
      * 错误提示，用户可阅读
      *
-     * @see ErrorCode#getMessage() ()
+     * @see ErrorCode#getMsg() ()
      */
     private String msg;
 
@@ -56,7 +56,7 @@ public class CommonResult<T> implements Serializable {
     }
 
     public static <T> CommonResult<T> error(ErrorCode errorCode) {
-        return error(errorCode.getCode(), errorCode.getMessage());
+        return error(errorCode.getCode(), errorCode.getMsg());
     }
 
     public static <T> CommonResult<T> success(T data) {

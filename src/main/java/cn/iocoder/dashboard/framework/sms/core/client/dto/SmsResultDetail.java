@@ -1,4 +1,4 @@
-package cn.iocoder.dashboard.framework.sms.core;
+package cn.iocoder.dashboard.framework.sms.core.client.dto;
 
 import cn.iocoder.dashboard.modules.system.enums.sms.SysSmsSendStatusEnum;
 import lombok.Data;

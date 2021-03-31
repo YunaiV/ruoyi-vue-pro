@@ -1,6 +1,5 @@
 package cn.iocoder.dashboard.modules.system.service.sms;
 
-import cn.iocoder.dashboard.framework.sms.core.enums.SmsSendFailureTypeEnum;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.sms.SysSmsTemplateDO;
 
 import java.util.Map;

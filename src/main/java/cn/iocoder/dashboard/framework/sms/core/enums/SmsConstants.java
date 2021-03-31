@@ -1,4 +1,4 @@
-package cn.iocoder.dashboard.framework.sms.core;
+package cn.iocoder.dashboard.framework.sms.core.enums;
 
 /**
  * 短信相关常量类

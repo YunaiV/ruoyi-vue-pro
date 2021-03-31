@@ -6,11 +6,11 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.CharsetUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.URLUtil;
-import cn.iocoder.dashboard.framework.sms.core.SmsConstants;
 import cn.iocoder.dashboard.framework.sms.core.client.SmsCommonResult;
-import cn.iocoder.dashboard.framework.sms.core.SmsResultDetail;
+import cn.iocoder.dashboard.framework.sms.core.client.dto.SmsResultDetail;
+import cn.iocoder.dashboard.framework.sms.core.client.dto.SmsSendRespDTO;
 import cn.iocoder.dashboard.framework.sms.core.client.impl.AbstractSmsClient;
-import cn.iocoder.dashboard.framework.sms.core.enums.SmsSendFailureTypeEnum;
+import cn.iocoder.dashboard.framework.sms.core.enums.SmsConstants;
 import cn.iocoder.dashboard.framework.sms.core.property.SmsChannelProperties;
 import cn.iocoder.dashboard.modules.system.enums.sms.SysSmsSendStatusEnum;
 import cn.iocoder.dashboard.util.json.JsonUtils;
@@ -28,8 +28,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
-
-import static com.yunpian.sdk.constant.Code.*;
 
 /**
  * 云片短信客户端的实现类
@@ -49,7 +47,7 @@ public class YunpianSmsClient extends AbstractSmsClient {
     };
 
     public YunpianSmsClient(SmsChannelProperties properties) {
-        super(properties);
+        super(properties, new YunpianSmsCodeMapping());
     }
 
     @Override
@@ -66,7 +64,8 @@ public class YunpianSmsClient extends AbstractSmsClient {
     }
 
     @Override
-    protected SmsCommonResult doSend(Long sendLogId, String mobile, String apiTemplateId, Map<String, Object> templateParams) throws Throwable {
+    protected SmsCommonResult<SmsSendRespDTO> doSend(Long sendLogId, String mobile,
+                                                     String apiTemplateId, Map<String, Object> templateParams) throws Throwable {
         // 构建参数
         Map<String, String> request = new HashMap<>();
         request.put(YunpianConstant.APIKEY, properties.getApiKey());
@@ -82,8 +81,12 @@ public class YunpianSmsClient extends AbstractSmsClient {
             throw sendResult.getThrowable();
         }
         // 解析结果
-        return SmsCommonResult.success(parseSendFailureType(sendResult), // 将 API 短信平台，解析成统一的错误码
-                String.valueOf(sendResult.getCode()), formatResultMsg(sendResult), null, getApiSerialNo(sendResult));
+        SmsSendRespDTO data = null;
+        if (sendResult.getData() != null) {
+            data = new SmsSendRespDTO().setSerialNo(String.valueOf(sendResult.getData().getSid()));
+        }
+        return SmsCommonResult.build(String.valueOf(sendResult.getCode()), formatResultMsg(sendResult), null,
+                data, codeMapping);
     }
 
     private static String formatTplValue(Map<String, Object> templateParams) {
@@ -101,25 +104,6 @@ public class YunpianSmsClient extends AbstractSmsClient {
             return sendResult.getMsg();
         }
         return sendResult.getMsg() + " => " + sendResult.getDetail();
-    }
-
-    private static SmsSendFailureTypeEnum parseSendFailureType(Result<SmsSingleSend> sendResult) {
-        Integer code = sendResult.getCode();
-        switch (code) {
-            case OK: return null;
-            case ARGUMENT_MISSING: return SmsSendFailureTypeEnum.SMS_API_PARAM_ERROR;
-            case BAD_ARGUMENT_FORMAT: return SmsSendFailureTypeEnum.SMS_TEMPLATE_PARAM_ERROR;
-            case TPL_NOT_FOUND: return SmsSendFailureTypeEnum.SMS_TEMPLATE_NOT_EXISTS;
-            case TPL_NOT_VALID: return SmsSendFailureTypeEnum.SMS_TEMPLATE_INVALID;
-        }
-        return SmsSendFailureTypeEnum.SMS_UNKNOWN;
-    }
-
-    private static String getApiSerialNo(Result<SmsSingleSend> sendResult) {
-        if (sendResult.getData() == null) {
-            return null;
-        }
-        return String.valueOf(sendResult.getData().getSid());
     }
 
     /**

@@ -62,7 +62,7 @@ public class AssertUtils {
         ServiceException serviceException = assertThrows(ServiceException.class, executable);
         // 校验错误码
         Assertions.assertEquals(errorCode.getCode(), serviceException.getCode(), "错误码不匹配");
-        String message = ServiceExceptionUtil.doFormat(errorCode.getCode(), errorCode.getMessage(), messageParams);
+        String message = ServiceExceptionUtil.doFormat(errorCode.getCode(), errorCode.getMsg(), messageParams);
         Assertions.assertEquals(message, serviceException.getMessage(), "错误提示不匹配");
     }
 
