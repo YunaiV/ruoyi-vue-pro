@@ -7,6 +7,7 @@ import cn.iocoder.dashboard.common.enums.UserTypeEnum;
 import cn.iocoder.dashboard.framework.sms.core.client.SmsClient;
 import cn.iocoder.dashboard.framework.sms.core.client.SmsClientFactory;
 import cn.iocoder.dashboard.framework.sms.core.client.SmsCommonResult;
+import cn.iocoder.dashboard.framework.sms.core.client.dto.SmsReceiveRespDTO;
 import cn.iocoder.dashboard.framework.sms.core.client.dto.SmsSendRespDTO;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.sms.SysSmsTemplateDO;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.user.SysUserDO;
@@ -21,7 +22,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import javax.annotation.Resource;
-import javax.servlet.ServletRequest;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -139,7 +139,7 @@ public class SysSmsServiceImpl implements SysSmsService {
         SmsClient smsClient = smsClientFactory.getSmsClient(message.getChannelId());
         Assert.notNull(smsClient, String.format("短信客户端(%d) 不存在", message.getChannelId()));
         // 发送短信
-        SmsCommonResult<SmsSendRespDTO> sendResult = smsClient.send(message.getLogId(), message.getMobile(),
+        SmsCommonResult<SmsSendRespDTO> sendResult = smsClient.sendSms(message.getLogId(), message.getMobile(),
                 message.getApiTemplateId(), message.getTemplateParams());
         smsLogService.updateSmsSendResult(message.getLogId(), sendResult.getCode(), sendResult.getMsg(),
                 sendResult.getApiCode(), sendResult.getApiMsg(), sendResult.getApiRequestId(),
@@ -147,11 +147,12 @@ public class SysSmsServiceImpl implements SysSmsService {
     }
 
     @Override
-    public Object smsSendCallbackHandle(ServletRequest request) {
-//        SmsResultDetail smsResultDetail = smsClientFactory.getSmsResultDetailFromCallbackQuery(request);
-//        logService.updateSendLogByResultDetail(smsResultDetail);
-//        return smsResultDetail.getCallbackResponseBody();
-        return null;
+    public void receiveSmsStatus(String channelCode, String text) throws Throwable {
+        // 获得渠道对应的 SmsClient 客户端
+        SmsClient smsClient = smsClientFactory.getSmsClient(channelCode);
+        Assert.notNull(smsClient, String.format("短信客户端(%s) 不存在", channelCode));
+        // 解析内容
+        SmsCommonResult<SmsReceiveRespDTO> receiveResult = smsClient.parseSmsReceiveStatus(text);
     }
 
 }

@@ -7,10 +7,12 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * 消息内容实体类
+ * 消息接收 Response DTO
+ *
+ * @author 芋道源码
  */
 @Data
-public class SmsResultDetail implements Serializable {
+public class SmsReceiveRespDTO implements Serializable {
 
     /**
      * 唯一标识

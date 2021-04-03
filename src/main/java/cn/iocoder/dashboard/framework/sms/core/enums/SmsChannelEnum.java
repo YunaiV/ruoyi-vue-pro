@@ -16,8 +16,9 @@ public enum SmsChannelEnum {
 
     YUN_PIAN("YUN_PIAN", "云片"),
     ALIYUN("ALIYUN", "阿里云"),
-    TENCENT("TENCENT", "腾讯云"),
-    HUA_WEI("HUA_WEI", "华为云"),;
+//    TENCENT("TENCENT", "腾讯云"),
+//    HUA_WEI("HUA_WEI", "华为云"),
+    ;
 
     /**
      * 编码

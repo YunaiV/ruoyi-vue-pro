@@ -32,7 +32,7 @@ public class AliyunSmsClientTest {
         templateParams.add(new KeyValue<>("code", "1024"));
 //        templateParams.put("operation", "嘿嘿");
 //        SmsResult result = smsClient.send(1L, "15601691399", "4372216", templateParams);
-        SmsCommonResult<SmsSendRespDTO> result = smsClient.send(1L, "15601691399", "SMS_207945135", templateParams);
+        SmsCommonResult<SmsSendRespDTO> result = smsClient.sendSms(1L, "15601691399", "SMS_207945135", templateParams);
         System.out.println(result);
     }
 

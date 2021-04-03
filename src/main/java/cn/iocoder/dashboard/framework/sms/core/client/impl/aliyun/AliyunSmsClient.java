@@ -5,7 +5,7 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.dashboard.common.core.KeyValue;
 import cn.iocoder.dashboard.framework.sms.core.client.SmsCommonResult;
-import cn.iocoder.dashboard.framework.sms.core.client.dto.SmsResultDetail;
+import cn.iocoder.dashboard.framework.sms.core.client.dto.SmsReceiveRespDTO;
 import cn.iocoder.dashboard.framework.sms.core.client.dto.SmsSendRespDTO;
 import cn.iocoder.dashboard.framework.sms.core.client.impl.AbstractSmsClient;
 import cn.iocoder.dashboard.framework.sms.core.property.SmsChannelProperties;
@@ -61,8 +61,8 @@ public class AliyunSmsClient extends AbstractSmsClient {
     }
 
     @Override
-    protected SmsCommonResult<SmsSendRespDTO> doSend(Long sendLogId, String mobile,
-                                                     String apiTemplateId, List<KeyValue<String, Object>> templateParams) {
+    protected SmsCommonResult<SmsSendRespDTO> doSendSms(Long sendLogId, String mobile,
+                                                        String apiTemplateId, List<KeyValue<String, Object>> templateParams) {
         // 构建参数
         SendSmsRequest request = new SendSmsRequest();
         request.setSysMethod(MethodType.POST);
@@ -110,16 +110,20 @@ public class AliyunSmsClient extends AbstractSmsClient {
      * @return
      * @throws Exception
      */
-    @Override
-    public SmsResultDetail smsSendCallbackHandle(ServletRequest request) throws Exception {
+    public SmsReceiveRespDTO smsSendCallbackHandle(ServletRequest request) throws Exception {
         BufferedReader reader = new BufferedReader(new InputStreamReader(request.getInputStream()));
         String paramStr = reader.readLine();
-        List<Map<String, Object>> params = JsonUtils.parseByType(paramStr, new TypeReference<List<Map<String, Object>>>() {
+        List<Map<String, Object>> params = JsonUtils.parseObject(paramStr, new TypeReference<List<Map<String, Object>>>() {
         });
         if (CollectionUtil.isNotEmpty(params)) {
             Map<String, Object> sendResultParamMap = params.get(0);
             return CallbackHelper.of(sendResultParamMap).toResultDetail();
         }
+        return null;
+    }
+
+    @Override
+    protected SmsCommonResult<SmsReceiveRespDTO> doParseSmsReceiveStatus(String text) throws Throwable {
         return null;
     }
 
@@ -168,8 +172,8 @@ public class AliyunSmsClient extends AbstractSmsClient {
             return sendResultParamMap.get(CallbackField.OUT_ID).toString();
         }
 
-        public SmsResultDetail toResultDetail() {
-            SmsResultDetail resultDetail = new SmsResultDetail();
+        public SmsReceiveRespDTO toResultDetail() {
+            SmsReceiveRespDTO resultDetail = new SmsReceiveRespDTO();
             resultDetail.setSendStatus(getSendStatus());
             resultDetail.setApiId(getBizId());
             resultDetail.setSendTime(getSendTime());

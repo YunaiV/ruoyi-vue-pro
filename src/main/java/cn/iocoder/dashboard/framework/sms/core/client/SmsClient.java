@@ -1,10 +1,9 @@
 package cn.iocoder.dashboard.framework.sms.core.client;
 
 import cn.iocoder.dashboard.common.core.KeyValue;
-import cn.iocoder.dashboard.framework.sms.core.client.dto.SmsResultDetail;
+import cn.iocoder.dashboard.framework.sms.core.client.dto.SmsReceiveRespDTO;
 import cn.iocoder.dashboard.framework.sms.core.client.dto.SmsSendRespDTO;
 
-import javax.servlet.ServletRequest;
 import java.util.List;
 
 /**
@@ -31,15 +30,15 @@ public interface SmsClient {
      * @param templateParams 短信模板参数
      * @return 短信发送结果
      */
-    SmsCommonResult<SmsSendRespDTO> send(Long logId, String mobile, String apiTemplateId, List<KeyValue<String, Object>> templateParams);
+    SmsCommonResult<SmsSendRespDTO> sendSms(Long logId, String mobile, String apiTemplateId, List<KeyValue<String, Object>> templateParams);
 
-    // TODO FROM 芋艿 to ZZF：是不是可以改成意图更明确的解析返回结果，例如说 parseXXXX
     /**
-     * 短信发送回调请求处理
+     * 解析接收短信的接收结果
      *
-     * @param request 请求
-     * @return 短信发送结果
+     * @param text 结果
+     * @return 结果内容
+     * @throws Throwable 当解析 text 发生异常时，则会抛出异常
      */
-    SmsResultDetail smsSendCallbackHandle(ServletRequest request) throws Exception;
+    SmsCommonResult<SmsReceiveRespDTO> parseSmsReceiveStatus(String text) throws Throwable;
 
 }

@@ -2,7 +2,6 @@ package cn.iocoder.dashboard.modules.system.service.sms;
 
 import cn.iocoder.dashboard.modules.system.mq.message.sms.SysSmsSendMessage;
 
-import javax.servlet.ServletRequest;
 import java.util.List;
 import java.util.Map;
 
@@ -24,11 +23,12 @@ public interface SysSmsService {
     void doSendSms(SysSmsSendMessage message);
 
     /**
-     * 处理短信发送回调函数
+     * 接收短信的接收结果
      *
-     * @param request        请求
-     * @return 响应数据
+     * @param channelCode 渠道编码
+     * @param text 结果内容
+     * @throws Throwable 处理失败时，抛出异常
      */
-    Object smsSendCallbackHandle(ServletRequest request);
+    void receiveSmsStatus(String channelCode, String text) throws Throwable;
 
 }

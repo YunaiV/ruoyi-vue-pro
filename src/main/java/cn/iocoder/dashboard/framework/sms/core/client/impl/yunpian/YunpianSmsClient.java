@@ -2,33 +2,31 @@ package cn.iocoder.dashboard.framework.sms.core.client.impl.yunpian;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.CharsetUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.URLUtil;
 import cn.iocoder.dashboard.common.core.KeyValue;
 import cn.iocoder.dashboard.framework.sms.core.client.SmsCommonResult;
-import cn.iocoder.dashboard.framework.sms.core.client.dto.SmsResultDetail;
+import cn.iocoder.dashboard.framework.sms.core.client.dto.SmsReceiveRespDTO;
 import cn.iocoder.dashboard.framework.sms.core.client.dto.SmsSendRespDTO;
 import cn.iocoder.dashboard.framework.sms.core.client.impl.AbstractSmsClient;
-import cn.iocoder.dashboard.framework.sms.core.enums.SmsConstants;
 import cn.iocoder.dashboard.framework.sms.core.property.SmsChannelProperties;
-import cn.iocoder.dashboard.modules.system.enums.sms.SysSmsSendStatusEnum;
+import cn.iocoder.dashboard.util.date.DateUtils;
 import cn.iocoder.dashboard.util.json.JsonUtils;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.yunpian.sdk.YunpianClient;
 import com.yunpian.sdk.constant.YunpianConstant;
 import com.yunpian.sdk.model.Result;
 import com.yunpian.sdk.model.SmsSingleSend;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.servlet.ServletRequest;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.StringJoiner;
+import java.util.*;
 
 /**
  * 云片短信客户端的实现类
@@ -65,8 +63,8 @@ public class YunpianSmsClient extends AbstractSmsClient {
     }
 
     @Override
-    protected SmsCommonResult<SmsSendRespDTO> doSend(Long sendLogId, String mobile,
-                                                     String apiTemplateId, List<KeyValue<String, Object>> templateParams) throws Throwable {
+    protected SmsCommonResult<SmsSendRespDTO> doSendSms(Long sendLogId, String mobile,
+                                                        String apiTemplateId, List<KeyValue<String, Object>> templateParams) throws Throwable {
         // 构建参数
         Map<String, String> request = new HashMap<>();
         request.put(YunpianConstant.APIKEY, properties.getApiKey());
@@ -74,7 +72,7 @@ public class YunpianSmsClient extends AbstractSmsClient {
         request.put(YunpianConstant.TPL_ID, apiTemplateId);
         request.put(YunpianConstant.TPL_VALUE, formatTplValue(templateParams));
         request.put(YunpianConstant.UID, String.valueOf(sendLogId));
-        request.put(Helper.CALLBACK, properties.getCallbackUrl());
+        request.put(YunpianConstant.CALLBACK_URL, properties.getCallbackUrl());
 
         // 执行发送
         Result<SmsSingleSend> sendResult = client.sms().tpl_single_send(request);
@@ -108,15 +106,6 @@ public class YunpianSmsClient extends AbstractSmsClient {
     }
 
     /**
-     * 云片的比较复杂，又是加密又是套娃的
-     */
-    @Override
-    public SmsResultDetail smsSendCallbackHandle(ServletRequest request) throws UnsupportedEncodingException {
-        Map<String, String> map = getRequestParams(request);
-        return Helper.getSmsResultDetailByParam(map);
-    }
-
-    /**
      * 从 request 中获取请求中传入的短信发送结果信息
      *
      * @param request 回调请求
@@ -127,7 +116,7 @@ public class YunpianSmsClient extends AbstractSmsClient {
         Map<String, String[]> parameterMap = request.getParameterMap();
         String[] smsStatuses = parameterMap.get(YunpianConstant.SMS_STATUS);
         String encode = URLEncoder.encode(smsStatuses[0], CharsetUtil.UTF_8);
-        List<Map<String, String>> paramList = JsonUtils.parseByType(encode, callbackType);
+        List<Map<String, String>> paramList = JsonUtils.parseObject(encode, callbackType);
         if (CollectionUtil.isNotEmpty(paramList)) {
             return paramList.get(0);
         }
@@ -135,46 +124,63 @@ public class YunpianSmsClient extends AbstractSmsClient {
                 + JsonUtils.toJsonString(request.getParameterMap()));
     }
 
-    /**
-     * 云片的回调函数的一些辅助方法
-     */
-    private static class Helper {
-
-        //短信唯一标识
-        private final static String API_ID = "sid";
-
-        //回调地址·
-        private final static String CALLBACK = "callback";
-
-        //手机号
-        private final static String MOBILE = "mobile";
-
-        //错误信息
-        private final static String ERROR_MSG = "error_msg";
-
-        //用户接收时间 字符串 标准格式
-        private final static String USER_RECEIVE_TIME = "user_receive_time";
-
-        //发送状态
-        private final static String REPORT_STATUS = "report_status";
-
-        private static int getSendStatus(Map<String, String> map) {
-            String reportStatus = map.get(REPORT_STATUS);
-            return SmsConstants.SUCCESS.equals(reportStatus)
-                    ? SysSmsSendStatusEnum.SUCCESS.getStatus()
-                    : SysSmsSendStatusEnum.FAILURE.getStatus();
-        }
-
-        public static SmsResultDetail getSmsResultDetailByParam(Map<String, String> map) {
-            SmsResultDetail detail = new SmsResultDetail();
-            detail.setPhone(map.get(MOBILE));
-            detail.setMessage(map.get(ERROR_MSG));
-            detail.setSendTime(DateUtil.parseTime(map.get(USER_RECEIVE_TIME)));
-            detail.setSendStatus(getSendStatus(map));
-            detail.setApiId(API_ID);
-
-            detail.setCallbackResponseBody(SmsConstants.SUCCESS);
-            return detail;
-        }
+    @Override
+    protected SmsCommonResult<SmsReceiveRespDTO> doParseSmsReceiveStatus(String text) throws Throwable {
+        return null;
     }
+
+    /**
+     * 短信接收状态
+     *
+     * 参见 https://www.yunpian.com/official/document/sms/zh_cn/domestic_push_report 文档
+     *
+     * @author 芋道源码
+     */
+    @Data
+    public static class SmsReceiveStatus {
+
+        /**
+         * 运营商反馈代码的中文解释
+         *
+         * 默认不推送此字段，如需推送，请联系客服
+         */
+        @JsonProperty("error_detail")
+        private String errorDetail;
+        /**
+         * 短信编号
+         */
+        private Long sid;
+        /**
+         * 用户自定义 id
+         *
+         * 这里我们传递的是 SysSmsLogDO 的日志编号
+         */
+        private Long uid;
+        /**
+         * 用户接收时间
+         */
+        @JsonProperty("user_receive_time")
+        @JsonFormat(pattern = DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
+        private Date userReceiveTime;
+        /**
+         * 运营商返回的代码，如："DB:0103"
+         *
+         * 由于不同运营商信息不同，此字段仅供参考；
+         */
+        @JsonProperty("error_msg")
+        private String errorMsg;
+        /**
+         * 接收手机号
+         */
+        private String mobile;
+        /**
+         * 接收状态
+         *
+         * 目前仅有 SUCCESS / FAIL，所以使用 Boolean 接收
+         */
+        @JsonProperty("report_status")
+        private String reportStatus;
+
+    }
+
 }
