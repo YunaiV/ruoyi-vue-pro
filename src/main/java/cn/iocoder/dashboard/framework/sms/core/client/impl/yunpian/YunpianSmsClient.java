@@ -6,6 +6,7 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.CharsetUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.URLUtil;
+import cn.iocoder.dashboard.common.core.KeyValue;
 import cn.iocoder.dashboard.framework.sms.core.client.SmsCommonResult;
 import cn.iocoder.dashboard.framework.sms.core.client.dto.SmsResultDetail;
 import cn.iocoder.dashboard.framework.sms.core.client.dto.SmsSendRespDTO;
@@ -65,7 +66,7 @@ public class YunpianSmsClient extends AbstractSmsClient {
 
     @Override
     protected SmsCommonResult<SmsSendRespDTO> doSend(Long sendLogId, String mobile,
-                                                     String apiTemplateId, Map<String, Object> templateParams) throws Throwable {
+                                                     String apiTemplateId, List<KeyValue<String, Object>> templateParams) throws Throwable {
         // 构建参数
         Map<String, String> request = new HashMap<>();
         request.put(YunpianConstant.APIKEY, properties.getApiKey());
@@ -89,13 +90,13 @@ public class YunpianSmsClient extends AbstractSmsClient {
                 data, codeMapping);
     }
 
-    private static String formatTplValue(Map<String, Object> templateParams) {
+    private static String formatTplValue(List<KeyValue<String, Object>> templateParams) {
         if (CollUtil.isEmpty(templateParams)) {
             return "";
         }
         // 参考 https://www.yunpian.com/official/document/sms/zh_cn/introduction_demos_encode_sample 格式化
         StringJoiner joiner = new StringJoiner("&");
-        templateParams.forEach((key, value) -> joiner.add(String.format("#%s#=%s", key, URLUtil.encode(String.valueOf(value)))));
+        templateParams.forEach(param -> joiner.add(String.format("#%s#=%s", param.getKey(), URLUtil.encode(String.valueOf(param.getValue())))));
         return joiner.toString();
     }
 

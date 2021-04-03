@@ -1,10 +1,8 @@
 package cn.iocoder.dashboard.modules.system.convert.sms;
 
-import cn.iocoder.dashboard.framework.sms.core.enums.SmsChannelEnum;
 import cn.iocoder.dashboard.framework.sms.core.property.SmsChannelProperties;
 import cn.iocoder.dashboard.modules.system.controller.sms.vo.SmsChannelAllVO;
 import cn.iocoder.dashboard.modules.system.controller.sms.vo.req.SmsChannelCreateReqVO;
-import cn.iocoder.dashboard.modules.system.controller.sms.vo.resp.SmsChannelEnumRespVO;
 import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserUpdateReqVO;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.sms.SysSmsChannelDO;
 import org.mapstruct.Mapper;
@@ -20,8 +18,6 @@ public interface SmsChannelConvert {
     SysSmsChannelDO convert(SmsChannelCreateReqVO bean);
 
     SysSmsChannelDO convert(SysUserUpdateReqVO bean);
-
-    List<SmsChannelEnumRespVO> convertEnum(List<SmsChannelEnum> bean);
 
     List<SmsChannelAllVO> convert(List<SysSmsChannelDO> bean);
 

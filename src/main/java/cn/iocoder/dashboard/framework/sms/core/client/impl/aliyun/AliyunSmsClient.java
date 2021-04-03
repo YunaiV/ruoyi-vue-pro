@@ -3,12 +3,14 @@ package cn.iocoder.dashboard.framework.sms.core.client.impl.aliyun;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.iocoder.dashboard.common.core.KeyValue;
 import cn.iocoder.dashboard.framework.sms.core.client.SmsCommonResult;
 import cn.iocoder.dashboard.framework.sms.core.client.dto.SmsResultDetail;
 import cn.iocoder.dashboard.framework.sms.core.client.dto.SmsSendRespDTO;
 import cn.iocoder.dashboard.framework.sms.core.client.impl.AbstractSmsClient;
 import cn.iocoder.dashboard.framework.sms.core.property.SmsChannelProperties;
 import cn.iocoder.dashboard.modules.system.enums.sms.SysSmsSendStatusEnum;
+import cn.iocoder.dashboard.util.collection.MapUtils;
 import cn.iocoder.dashboard.util.json.JsonUtils;
 import com.aliyuncs.DefaultAcsClient;
 import com.aliyuncs.IAcsClient;
@@ -60,14 +62,14 @@ public class AliyunSmsClient extends AbstractSmsClient {
 
     @Override
     protected SmsCommonResult<SmsSendRespDTO> doSend(Long sendLogId, String mobile,
-                                                     String apiTemplateId, Map<String, Object> templateParams) throws Throwable {
+                                                     String apiTemplateId, List<KeyValue<String, Object>> templateParams) {
         // 构建参数
         SendSmsRequest request = new SendSmsRequest();
         request.setSysMethod(MethodType.POST);
         request.setPhoneNumbers(mobile);
         request.setSignName(properties.getSignature());
         request.setTemplateCode(apiTemplateId);
-        request.setTemplateParam(JsonUtils.toJsonString(templateParams));
+        request.setTemplateParam(JsonUtils.toJsonString(MapUtils.convertMap(templateParams)));
         request.setOutId(String.valueOf(sendLogId));
 
         try {

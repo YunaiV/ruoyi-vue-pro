@@ -8,18 +8,20 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import java.util.List;
 
 /**
- * 短信模板
+ * 短信模板 DO
  *
  * @author zzf
  * @since 2021-01-25
  */
+@TableName(value = "sys_sms_template", autoResultMap = true)
 @Data
 @EqualsAndHashCode(callSuper = true)
-@TableName(value = "sms_template", autoResultMap = true)
+@ToString(callSuper = true)
 public class SysSmsTemplateDO extends BaseDO {
 
     /**
@@ -46,11 +48,11 @@ public class SysSmsTemplateDO extends BaseDO {
      */
     private String code;
     /**
-     * 名称
+     * 模板名称
      */
     private String name;
     /**
-     * 内容
+     * 模板内容
      *
      * 内容的参数，使用 {} 包括，例如说 {name}
      */

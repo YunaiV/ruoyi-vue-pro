@@ -3,10 +3,7 @@ package cn.iocoder.dashboard.modules.system.service.sms;
 import cn.iocoder.dashboard.common.pojo.PageResult;
 import cn.iocoder.dashboard.modules.system.controller.sms.vo.req.SmsChannelCreateReqVO;
 import cn.iocoder.dashboard.modules.system.controller.sms.vo.req.SmsChannelPageReqVO;
-import cn.iocoder.dashboard.modules.system.controller.sms.vo.resp.SmsChannelEnumRespVO;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.sms.SysSmsChannelDO;
-
-import java.util.List;
 
 /**
  * 短信渠道Service接口
@@ -17,9 +14,9 @@ import java.util.List;
 public interface SysSmsChannelService {
 
     /**
-     * 初始化短信渠道并缓存短信模板信息
+     * 初始化短信客户端
      */
-    void initSmsClientAndCacheSmsTemplate();
+    void initSmsClients();
 
     /**
      * 分页查询短信渠道信息
@@ -36,12 +33,5 @@ public interface SysSmsChannelService {
      * @return 渠道id
      */
     Long createSmsChannel(SmsChannelCreateReqVO reqVO);
-
-    /**
-     * 获取短信渠道枚举/渠道编码
-     *
-     * @return 短信渠道枚举/渠道编码
-     */
-    List<SmsChannelEnumRespVO> getSmsChannelEnums();
 
 }

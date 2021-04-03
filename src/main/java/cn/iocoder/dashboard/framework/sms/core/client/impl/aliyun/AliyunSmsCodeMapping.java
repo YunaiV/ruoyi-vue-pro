@@ -1,6 +1,7 @@
 package cn.iocoder.dashboard.framework.sms.core.client.impl.aliyun;
 
 import cn.iocoder.dashboard.common.exception.ErrorCode;
+import cn.iocoder.dashboard.common.exception.enums.GlobalErrorCodeConstants;
 import cn.iocoder.dashboard.framework.sms.core.client.SmsCodeMapping;
 
 import static cn.iocoder.dashboard.framework.sms.core.enums.SmsFrameworkErrorCodeConstants.*;
@@ -15,7 +16,7 @@ public class AliyunSmsCodeMapping implements SmsCodeMapping {
     @Override
     public ErrorCode apply(String apiCode) {
         switch (apiCode) {
-            case "OK": return null;
+            case "OK": return GlobalErrorCodeConstants.SUCCESS;
             case "MissingAccessKeyId": return SMS_CHANNEL_API_KEY_MISSING;
             case "isp.RAM_PERMISSION_DENY": return SMS_CHANNEL_PERMISSION_DENY;
             case "isv.INVALID_PARAMETERS": return SMS_API_PARAM_ERROR;

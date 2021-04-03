@@ -2,28 +2,30 @@ package cn.iocoder.dashboard.modules.system.dal.dataobject.sms;
 
 import cn.iocoder.dashboard.common.enums.UserTypeEnum;
 import cn.iocoder.dashboard.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.dashboard.framework.sms.core.enums.SmsSendFailureTypeEnum;
+import cn.iocoder.dashboard.framework.sms.core.enums.SmsFrameworkErrorCodeConstants;
 import cn.iocoder.dashboard.modules.system.enums.sms.SysSmsSendStatusEnum;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.*;
 
 import java.util.Date;
 import java.util.Map;
 
 /**
- * 短信发送日志
+ * 短信日志 DO
  *
  * @author zzf
  * @since 2021-01-25
  */
-@TableName(value = "sms_send_log", autoResultMap = true)
+@TableName(value = "sys_sms_log", autoResultMap = true)
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class SysSmsSendLogDO extends BaseDO {
+public class SysSmsLogDO extends BaseDO {
 
     /**
      * 自增编号
@@ -48,7 +50,7 @@ public class SysSmsSendLogDO extends BaseDO {
     // ========= 模板相关字段 =========
 
     /**
-     * 短信模板编号
+     * 模板编号
      *
      * 关联 {@link SysSmsTemplateDO#getId()}
      */
@@ -70,8 +72,9 @@ public class SysSmsSendLogDO extends BaseDO {
      */
     private String templateContent;
     /**
-     * 基于 {@link SysSmsTemplateDO#getParams()} 输入后的内容
+     * 基于 {@link SysSmsTemplateDO#getParams()} 输入后的参数
      */
+    @TableField(typeHandler = JacksonTypeHandler.class)
     private Map<String, Object> templateParams;
     /**
      * 短信 API 的模板编号
@@ -106,32 +109,32 @@ public class SysSmsSendLogDO extends BaseDO {
      */
     private Integer sendStatus;
     /**
-     * 时间发送时间
+     * 发送时间
      */
     private Date sendTime;
     /**
-     * 发送失败的类型
+     * 发送结果的编码
      *
-     * 枚举 {@link SmsSendFailureTypeEnum#getType()}
+     * 枚举 {@link SmsFrameworkErrorCodeConstants}
      */
-    private Integer sendFailureType;
+    private Integer sendCode;
     /**
-     * 发送失败的提示
+     * 发送结果的提示
      *
-     * 一般情况下，使用 {@link SmsSendFailureTypeEnum#getMsg()}
+     * 一般情况下，使用 {@link SmsFrameworkErrorCodeConstants}
      * 异常情况下，通过格式化 Exception 的提示存储
      */
-    private String sendFailureMsg;
+    private String sendMsg;
     /**
-     * 短信 API 发送失败的类型
+     * 短信 API 发送结果的编码
      *
      * 由于第三方的错误码可能是字符串，所以使用 String 类型
      */
-    private String apiSendFailureType;
+    private String apiSendCode;
     /**
      * 短信 API 发送失败的提示
      */
-    private String apiSendFailureMsg;
+    private String apiSendMsg;
     /**
      * 短信 API 发送返回的唯一请求 ID
      *
@@ -147,9 +150,9 @@ public class SysSmsSendLogDO extends BaseDO {
 
     // ========= 接收相关字段 =========
 
-    /**
-     * 是否获取过结果[0否 1是]
-     */
-    private Integer gotResult;
+//    /**
+//     * 是否获取过结果[0否 1是]
+//     */
+//    private Integer gotResult;
 
 }

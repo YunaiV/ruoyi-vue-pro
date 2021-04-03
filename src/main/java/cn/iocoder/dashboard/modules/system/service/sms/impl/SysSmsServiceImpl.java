@@ -1,29 +1,32 @@
 package cn.iocoder.dashboard.modules.system.service.sms.impl;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.iocoder.dashboard.common.core.KeyValue;
 import cn.iocoder.dashboard.common.enums.CommonStatusEnum;
 import cn.iocoder.dashboard.common.enums.UserTypeEnum;
-import cn.iocoder.dashboard.framework.sms.core.client.SmsCommonResult;
 import cn.iocoder.dashboard.framework.sms.core.client.SmsClient;
 import cn.iocoder.dashboard.framework.sms.core.client.SmsClientFactory;
-import cn.iocoder.dashboard.framework.sms.core.enums.SmsSendFailureTypeEnum;
+import cn.iocoder.dashboard.framework.sms.core.client.SmsCommonResult;
+import cn.iocoder.dashboard.framework.sms.core.client.dto.SmsSendRespDTO;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.sms.SysSmsTemplateDO;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.user.SysUserDO;
 import cn.iocoder.dashboard.modules.system.mq.message.sms.SysSmsSendMessage;
 import cn.iocoder.dashboard.modules.system.mq.producer.sms.SysSmsProducer;
-import cn.iocoder.dashboard.modules.system.service.sms.SysSmsSendLogService;
+import cn.iocoder.dashboard.modules.system.service.sms.SysSmsChannelService;
+import cn.iocoder.dashboard.modules.system.service.sms.SysSmsLogService;
 import cn.iocoder.dashboard.modules.system.service.sms.SysSmsService;
 import cn.iocoder.dashboard.modules.system.service.sms.SysSmsTemplateService;
 import cn.iocoder.dashboard.modules.system.service.user.SysUserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 
 import javax.annotation.Resource;
 import javax.servlet.ServletRequest;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static cn.iocoder.dashboard.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.*;
@@ -39,9 +42,11 @@ import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.*;
 public class SysSmsServiceImpl implements SysSmsService {
 
     @Resource
+    private SysSmsChannelService smsChannelService;
+    @Resource
     private SysSmsTemplateService smsTemplateService;
     @Resource
-    private SysSmsSendLogService smsSendLogService;
+    private SysSmsLogService smsLogService;
     @Resource
     private SysSmsProducer smsProducer;
     @Resource
@@ -54,51 +59,56 @@ public class SysSmsServiceImpl implements SysSmsService {
     public void sendSingleSms(String mobile, Long userId, Integer userType,
                               String templateCode, Map<String, Object> templateParams) {
         // 校验短信模板是否合法
-        SysSmsTemplateDO template = this.checkSmsTemplateValid(templateCode, templateParams);
+        SysSmsTemplateDO template = this.checkSmsTemplateValid(templateCode);
         // 校验手机号码是否存在
         mobile = this.checkMobile(mobile, userId, userType);
 
         // 创建发送日志
+        Boolean isSend = CommonStatusEnum.ENABLE.getStatus().equals(template.getStatus()); // 如果模板被禁用，则不发送短信，只记录日志
         String content = smsTemplateService.formatSmsTemplateContent(template.getContent(), templateParams);
-        Long sendLogId = smsSendLogService.createSmsSendLog(mobile, userId, userType, template, content, templateParams);
+        Long sendLogId = smsLogService.createSmsLog(mobile, userId, userType, isSend, template, content, templateParams);
 
-        // 如果模板被禁用，则直接标记发送失败。也就说，不发短信，嘿嘿。
-        if (CommonStatusEnum.DISABLE.getStatus().equals(template.getStatus())) {
-            smsSendLogService.updateSmsSendLogFailure(sendLogId, SmsSendFailureTypeEnum.SMS_TEMPLATE_DISABLE);
+        // 发送 MQ 消息，异步执行发送短信
+        if (!isSend) {
             return;
         }
-        // 如果模板未禁用，发送 MQ 消息。目的是，异步化调用短信平台
-        smsProducer.sendSmsSendMessage(sendLogId, mobile, template.getChannelId(), template.getApiTemplateId(), templateParams);
+        List<KeyValue<String, Object>> newTemplateParams = this.buildTemplateParams(template, templateParams);
+        smsProducer.sendSmsSendMessage(sendLogId, mobile, template.getChannelId(), template.getApiTemplateId(), newTemplateParams);
     }
 
     @Override
     public void sendBatchSms(List<String> mobiles, List<Long> userIds, Integer userType,
                              String templateCode, Map<String, Object> templateParams) {
         // 校验短信模板是否存在
-        SysSmsTemplateDO template = this.checkSmsTemplateValid(templateCode, templateParams);
+        SysSmsTemplateDO template = this.checkSmsTemplateValid(templateCode);
     }
 
-    private SysSmsTemplateDO checkSmsTemplateValid(String templateCode, Map<String, Object> templateParams) {
+    private SysSmsTemplateDO checkSmsTemplateValid(String templateCode) {
         // 短信模板不存在
         SysSmsTemplateDO template = smsTemplateService.getSmsTemplateByCode(templateCode);
         if (template == null) {
             throw exception(SMS_TEMPLATE_NOT_EXISTS);
         }
-        // 参数不够
-        if (CollUtil.isNotEmpty(template.getParams())) {
-            template.getParams().forEach(param -> {
-                if (!templateParams.containsKey(param)) {
-                    throw exception(SMS_SEND_MOBILE_TEMPLATE_PARAM_MISS);
-                }
-            });
-        }
-        // 移除多余参数
-        if (CollUtil.isEmpty(template.getParams())) {
-            templateParams.clear();
-        } else {
-            templateParams.entrySet().removeIf(entry -> !template.getParams().contains(entry.getKey()));
-        }
         return template;
+    }
+
+    /**
+     * 将参数模板，处理成有序的 KeyValue 数组
+     *
+     * 原因是，部分短信平台并不是使用 key 作为参数，而是数组下标，例如说腾讯云 https://cloud.tencent.com/document/product/382/39023
+     *
+     * @param template 短信模板
+     * @param templateParams 原始参数
+     * @return 处理后的参数
+     */
+    private List<KeyValue<String, Object>> buildTemplateParams(SysSmsTemplateDO template, Map<String, Object> templateParams) {
+        return template.getParams().stream().map(key -> {
+            Object value = templateParams.get(key);
+            if (value == null) {
+                throw exception(SMS_SEND_MOBILE_TEMPLATE_PARAM_MISS, key);
+            }
+            return new KeyValue<>(key, value);
+        }).collect(Collectors.toList());
     }
 
     private String checkMobile(String mobile, Long userId, Integer userType) {
@@ -130,15 +140,12 @@ public class SysSmsServiceImpl implements SysSmsService {
     public void doSendSms(SysSmsSendMessage message) {
         // 获得渠道对应的 SmsClient 客户端
         SmsClient smsClient = smsClientFactory.getSmsClient(message.getChannelId());
-        if (smsClient == null) {
-            log.error("[doSendSms][短信 message({}) 找不到对应的客户端]", message);
-            smsSendLogService.updateSmsSendLogFailure(message.getSendLogId(), SmsSendFailureTypeEnum.SMS_CHANNEL_CLIENT_NOT_EXISTS);
-            return;
-        }
-
+        Assert.notNull(smsClient, String.format("短信客户端(%d) 不存在", message.getChannelId()));
         // 发送短信
-        SmsCommonResult sendResult = smsClient.send(message.getSendLogId(), message.getMobile(),
+        SmsCommonResult<SmsSendRespDTO> sendResult = smsClient.send(message.getLogId(), message.getMobile(),
                 message.getApiTemplateId(), message.getTemplateParams());
+        smsLogService.updateSmsSendResult(message.getLogId(), sendResult.getCode(), sendResult.getMsg(),
+                sendResult.getApiCode(), sendResult.getApiMsg(), sendResult.getApiRequestId(), sendResult.getData().getSerialNo());
     }
 
     @Override

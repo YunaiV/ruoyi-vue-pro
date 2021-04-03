@@ -12,7 +12,6 @@ import cn.iocoder.dashboard.common.exception.ErrorCode;
 public interface SmsFrameworkErrorCodeConstants {
 
     // ========== 渠道相关 2001000100 ==========
-    ErrorCode SMS_CHANNEL_CLIENT_NOT_EXISTS = new ErrorCode(2001000100, "短信渠道的客户端不存在");
     ErrorCode SMS_CHANNEL_API_KEY_MISSING = new ErrorCode(2001000101, "API Key 不存在");
     ErrorCode SMS_CHANNEL_PERMISSION_DENY = new ErrorCode(2001000102, "没有发送短信的权限");
 

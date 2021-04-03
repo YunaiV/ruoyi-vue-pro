@@ -8,6 +8,7 @@ import lombok.Data;
 import org.springframework.util.Assert;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
  * 通用返回
@@ -67,9 +68,13 @@ public class CommonResult<T> implements Serializable {
         return result;
     }
 
+    public static boolean isSuccess(Integer code) {
+        return Objects.equals(code, GlobalErrorCodeConstants.SUCCESS.getCode());
+    }
+
     @JsonIgnore // 避免 jackson 序列化
     public boolean isSuccess() {
-        return GlobalErrorCodeConstants.SUCCESS.getCode().equals(code);
+        return isSuccess(GlobalErrorCodeConstants.SUCCESS.getCode());
     }
 
     @JsonIgnore // 避免 jackson 序列化

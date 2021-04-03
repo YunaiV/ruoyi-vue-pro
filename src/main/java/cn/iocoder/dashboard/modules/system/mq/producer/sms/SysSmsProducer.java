@@ -1,5 +1,6 @@
 package cn.iocoder.dashboard.modules.system.mq.producer.sms;
 
+import cn.iocoder.dashboard.common.core.KeyValue;
 import cn.iocoder.dashboard.framework.redis.core.util.RedisMessageUtils;
 import cn.iocoder.dashboard.modules.system.mq.message.sms.SysSmsSendMessage;
 import lombok.extern.slf4j.Slf4j;
@@ -7,7 +8,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.Map;
+import java.util.List;
 
 /**
  * 短信发送流消息监听器
@@ -25,16 +26,15 @@ public class SysSmsProducer {
     /**
      * 发送短信 Message
      *
-     * @param sendLogId 发送日志编号
+     * @param logId 短信日志编号
      * @param mobile 手机号
      * @param channelId 渠道编号
      * @param apiTemplateId 短信模板编号
      * @param templateParams 短信模板参数
-     * @param sendLogId 发送日志编号
      */
-    public void sendSmsSendMessage(Long sendLogId, String mobile,
-                                   Long channelId, String apiTemplateId, Map<String, Object> templateParams) {
-        SysSmsSendMessage message = new SysSmsSendMessage().setSendLogId(sendLogId).setMobile(mobile);
+    public void sendSmsSendMessage(Long logId, String mobile,
+                                   Long channelId, String apiTemplateId, List<KeyValue<String, Object>> templateParams) {
+        SysSmsSendMessage message = new SysSmsSendMessage().setLogId(logId).setMobile(mobile);
         message.setChannelId(channelId).setApiTemplateId(apiTemplateId).setTemplateParams(templateParams);
         RedisMessageUtils.sendStreamMessage(stringRedisTemplate, message);
     }

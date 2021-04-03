@@ -1,13 +1,14 @@
 package cn.iocoder.dashboard.framework.sms.core.client.impl;
 
+import cn.iocoder.dashboard.common.core.KeyValue;
+import cn.iocoder.dashboard.framework.sms.core.client.SmsClient;
 import cn.iocoder.dashboard.framework.sms.core.client.SmsCodeMapping;
 import cn.iocoder.dashboard.framework.sms.core.client.SmsCommonResult;
-import cn.iocoder.dashboard.framework.sms.core.client.SmsClient;
 import cn.iocoder.dashboard.framework.sms.core.client.dto.SmsSendRespDTO;
 import cn.iocoder.dashboard.framework.sms.core.property.SmsChannelProperties;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.Map;
+import java.util.List;
 
 /**
  * 短信客户端抽象类
@@ -67,16 +68,16 @@ public abstract class AbstractSmsClient implements SmsClient {
     }
 
     @Override
-    public final SmsCommonResult<SmsSendRespDTO> send(Long sendLogId, String mobile,
-                                                      String apiTemplateId, Map<String, Object> templateParams) {
+    public final SmsCommonResult<SmsSendRespDTO> send(Long logId, String mobile,
+                                                      String apiTemplateId, List<KeyValue<String, Object>> templateParams) {
         // 执行短信发送
         SmsCommonResult<SmsSendRespDTO> result;
         try {
-            result = doSend(sendLogId, mobile, apiTemplateId, templateParams);
+            result = doSend(logId, mobile, apiTemplateId, templateParams);
         } catch (Throwable ex) {
             // 打印异常日志
             log.error("[send][发送短信异常，sendLogId({}) mobile({}) apiTemplateId({}) templateParams({})]",
-                    sendLogId, mobile, apiTemplateId, templateParams, ex);
+                    logId, mobile, apiTemplateId, templateParams, ex);
             // 封装返回
             return SmsCommonResult.error(ex);
         }
@@ -93,6 +94,7 @@ public abstract class AbstractSmsClient implements SmsClient {
      * @return 短信发送结果
      */
     protected abstract SmsCommonResult<SmsSendRespDTO> doSend(Long sendLogId, String mobile,
-                                                              String apiTemplateId, Map<String, Object> templateParams) throws Throwable;
+                                                              String apiTemplateId, List<KeyValue<String, Object>> templateParams)
+            throws Throwable;
 
 }

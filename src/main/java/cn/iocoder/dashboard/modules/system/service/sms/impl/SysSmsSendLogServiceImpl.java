@@ -1,10 +1,11 @@
 package cn.iocoder.dashboard.modules.system.service.sms.impl;
 
-import cn.iocoder.dashboard.modules.system.dal.dataobject.sms.SysSmsSendLogDO;
+import cn.iocoder.dashboard.common.pojo.CommonResult;
+import cn.iocoder.dashboard.modules.system.dal.dataobject.sms.SysSmsLogDO;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.sms.SysSmsTemplateDO;
-import cn.iocoder.dashboard.modules.system.dal.mysql.sms.SysSmsSendLogMapper;
+import cn.iocoder.dashboard.modules.system.dal.mysql.sms.SysSmsLogMapper;
 import cn.iocoder.dashboard.modules.system.enums.sms.SysSmsSendStatusEnum;
-import cn.iocoder.dashboard.modules.system.service.sms.SysSmsSendLogService;
+import cn.iocoder.dashboard.modules.system.service.sms.SysSmsLogService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -21,15 +22,18 @@ import java.util.Objects;
  */
 @Slf4j
 @Service
-public class SysSmsSendLogServiceImpl implements SysSmsSendLogService {
+public class SysSmsSendLogServiceImpl implements SysSmsLogService {
 
     @Resource
-    private SysSmsSendLogMapper smsSendLogMapper;
+    private SysSmsLogMapper smsLogMapper;
 
     @Override
-    public Long createSmsSendLog(String mobile, Long userId, Integer userType,
-                                 SysSmsTemplateDO template, String templateContent, Map<String, Object> templateParams) {
-        SysSmsSendLogDO.SysSmsSendLogDOBuilder logBuilder = SysSmsSendLogDO.builder();
+    public Long createSmsLog(String mobile, Long userId, Integer userType, Boolean isSend,
+                             SysSmsTemplateDO template, String templateContent, Map<String, Object> templateParams) {
+        SysSmsLogDO.SysSmsLogDOBuilder logBuilder = SysSmsLogDO.builder();
+        // 根据是否要发送，设置状态
+        logBuilder.sendStatus(Objects.equals(isSend, true) ? SysSmsSendStatusEnum.INIT.getStatus()
+                : SysSmsSendStatusEnum.IGNORE.getStatus());
         // 设置手机相关字段
         logBuilder.mobile(mobile).userId(userId).userType(userType);
         // 设置模板相关字段
@@ -39,18 +43,18 @@ public class SysSmsSendLogServiceImpl implements SysSmsSendLogService {
         logBuilder.channelId(template.getChannelId()).channelCode(template.getChannelCode());
 
         // 插入数据库
-        SysSmsSendLogDO logDO = logBuilder.build();
-        smsSendLogMapper.insert(logDO);
+        SysSmsLogDO logDO = logBuilder.build();
+        smsLogMapper.insert(logDO);
         return logDO.getId();
     }
 
     @Override
-    public void updateSmsSendLogResult(Long id, Boolean success, Integer sendFailureType, String sendFailureMsg,
-                                       String apiSendFailureType, String apiSendFailureMsg, String apiRequestId, String apiSerialNo) {
-        SysSmsSendStatusEnum sendStatus = Objects.equals(success, true) ? SysSmsSendStatusEnum.SUCCESS : SysSmsSendStatusEnum.FAILURE;
-        smsSendLogMapper.updateById(new SysSmsSendLogDO().setId(id).setSendStatus(sendStatus.getStatus()).setSendTime(new Date())
-                .setSendFailureType(sendFailureType).setSendFailureMsg(sendFailureMsg)
-                .setApiSendFailureType(apiSendFailureType).setApiSendFailureMsg(apiSendFailureMsg).setApiRequestId(apiRequestId).setApiSerialNo(apiSerialNo));
+    public void updateSmsSendResult(Long id, Integer sendCode, String sendMsg,
+                                    String apiSendCode, String apiSendMsg, String apiRequestId, String apiSerialNo) {
+        SysSmsSendStatusEnum sendStatus = CommonResult.isSuccess(sendCode) ? SysSmsSendStatusEnum.SUCCESS : SysSmsSendStatusEnum.FAILURE;
+        smsLogMapper.updateById(SysSmsLogDO.builder().id(id).sendStatus(sendStatus.getStatus()).sendTime(new Date())
+                .sendCode(sendCode).sendMsg(sendMsg).apiSendCode(apiSendCode).apiSendMsg(apiSendMsg)
+                .apiRequestId(apiRequestId).apiSerialNo(apiSerialNo).build());
     }
 
 }

@@ -1,10 +1,11 @@
 package cn.iocoder.dashboard.modules.system.mq.message.sms;
 
+import cn.iocoder.dashboard.common.core.KeyValue;
 import cn.iocoder.dashboard.framework.redis.core.stream.StreamMessage;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
-import java.util.Map;
+import java.util.List;
 
 /**
  * 短信发送消息
@@ -15,10 +16,10 @@ import java.util.Map;
 public class SysSmsSendMessage implements StreamMessage {
 
     /**
-     * 发送日志编号
+     * 短信日志编号
      */
-    @NotNull(message = "发送日志编号不能为空")
-    private Long sendLogId;
+    @NotNull(message = "短信日志编号不能为空")
+    private Long logId;
     /**
      * 手机号
      */
@@ -37,7 +38,7 @@ public class SysSmsSendMessage implements StreamMessage {
     /**
      * 短信模板参数
      */
-    private Map<String, Object> templateParams;
+    private List<KeyValue<String, Object>> templateParams;
 
     @Override
     public String getStreamKey() {

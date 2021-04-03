@@ -2,6 +2,8 @@ package cn.iocoder.dashboard.util.collection;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
+import cn.iocoder.dashboard.common.core.KeyValue;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 
 import java.util.ArrayList;
@@ -53,6 +55,12 @@ public class MapUtils {
             return;
         }
         consumer.accept(value);
+    }
+
+    public static <K, V> Map<K, V> convertMap(List<KeyValue<K, V>> keyValues) {
+        Map<K, V> map = Maps.newLinkedHashMapWithExpectedSize(keyValues.size());
+        keyValues.forEach(keyValue -> map.put(keyValue.getKey(), keyValue.getValue()));
+        return map;
     }
 
 }

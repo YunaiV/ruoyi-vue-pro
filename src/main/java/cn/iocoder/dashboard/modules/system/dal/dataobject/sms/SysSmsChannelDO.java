@@ -6,16 +6,18 @@ import cn.iocoder.dashboard.framework.sms.core.enums.SmsChannelEnum;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 /**
- * 短信渠道
+ * 短信渠道 DO
  *
  * @author zzf
  * @since 2021-01-25
  */
-@TableName(value = "sms_channel", autoResultMap = true)
+@TableName(value = "sys_sms_channel", autoResultMap = true)
 @Data
 @EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
 public class SysSmsChannelDO extends BaseDO {
 
     /**
