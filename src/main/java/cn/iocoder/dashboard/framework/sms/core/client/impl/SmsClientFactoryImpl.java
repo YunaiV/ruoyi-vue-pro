@@ -38,6 +38,7 @@ public class SmsClientFactoryImpl implements SmsClientFactory {
         AbstractSmsClient client = clients.get(properties.getId());
         if (client == null) {
             client = this.createSmsClient(properties);
+            client.init();
             clients.put(client.getId(), client);
         } else {
             client.refresh(properties);

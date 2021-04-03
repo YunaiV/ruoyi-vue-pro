@@ -5,7 +5,7 @@ import cn.iocoder.dashboard.modules.system.dal.dataobject.sms.SysSmsTemplateDO;
 import java.util.Map;
 
 /**
- * 短信日志服务接口
+ * 短信日志 Service 实现类
  *
  * @author zzf
  * @date 13:48 2021/3/2

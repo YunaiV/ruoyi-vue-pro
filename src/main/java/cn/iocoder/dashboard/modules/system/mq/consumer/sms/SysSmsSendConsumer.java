@@ -16,7 +16,7 @@ import javax.annotation.Resource;
  */
 @Component
 @Slf4j
-public class SmsSendConsumer extends AbstractStreamMessageListener<SysSmsSendMessage> {
+public class SysSmsSendConsumer extends AbstractStreamMessageListener<SysSmsSendMessage> {
 
     @Resource
     private SysSmsService smsService;

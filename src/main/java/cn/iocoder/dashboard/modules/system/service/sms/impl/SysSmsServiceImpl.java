@@ -12,7 +12,6 @@ import cn.iocoder.dashboard.modules.system.dal.dataobject.sms.SysSmsTemplateDO;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.user.SysUserDO;
 import cn.iocoder.dashboard.modules.system.mq.message.sms.SysSmsSendMessage;
 import cn.iocoder.dashboard.modules.system.mq.producer.sms.SysSmsProducer;
-import cn.iocoder.dashboard.modules.system.service.sms.SysSmsChannelService;
 import cn.iocoder.dashboard.modules.system.service.sms.SysSmsLogService;
 import cn.iocoder.dashboard.modules.system.service.sms.SysSmsService;
 import cn.iocoder.dashboard.modules.system.service.sms.SysSmsTemplateService;
@@ -41,8 +40,6 @@ import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.*;
 @Slf4j
 public class SysSmsServiceImpl implements SysSmsService {
 
-    @Resource
-    private SysSmsChannelService smsChannelService;
     @Resource
     private SysSmsTemplateService smsTemplateService;
     @Resource
@@ -145,7 +142,8 @@ public class SysSmsServiceImpl implements SysSmsService {
         SmsCommonResult<SmsSendRespDTO> sendResult = smsClient.send(message.getLogId(), message.getMobile(),
                 message.getApiTemplateId(), message.getTemplateParams());
         smsLogService.updateSmsSendResult(message.getLogId(), sendResult.getCode(), sendResult.getMsg(),
-                sendResult.getApiCode(), sendResult.getApiMsg(), sendResult.getApiRequestId(), sendResult.getData().getSerialNo());
+                sendResult.getApiCode(), sendResult.getApiMsg(), sendResult.getApiRequestId(),
+                sendResult.getData() != null ? sendResult.getData().getSerialNo() : null);
     }
 
     @Override
