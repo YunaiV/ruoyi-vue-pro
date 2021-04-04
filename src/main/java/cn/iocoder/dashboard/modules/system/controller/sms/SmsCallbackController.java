@@ -1,6 +1,8 @@
 package cn.iocoder.dashboard.modules.system.controller.sms;
 
 import cn.hutool.core.util.URLUtil;
+import cn.hutool.extra.servlet.ServletUtil;
+import cn.iocoder.dashboard.common.pojo.CommonResult;
 import cn.iocoder.dashboard.framework.logger.operatelog.core.annotations.OperateLog;
 import cn.iocoder.dashboard.framework.sms.core.enums.SmsChannelEnum;
 import cn.iocoder.dashboard.modules.system.service.sms.SysSmsService;
@@ -13,6 +15,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+
+import static cn.iocoder.dashboard.common.pojo.CommonResult.success;
 
 @Api(tags = "短信回调")
 @RestController
@@ -30,6 +35,15 @@ public class SmsCallbackController {
         String text = URLUtil.decode(smsStatus); // decode 解码参数，因为它被 encode
         smsService.receiveSmsStatus(SmsChannelEnum.YUN_PIAN.getCode(), text);
         return "SUCCESS"; // 约定返回 SUCCESS 为成功
+    }
+
+    @PostMapping("/sms/aliyun")
+    @ApiOperation(value = "阿里云短信的回调", notes = "参见 https://help.aliyun.com/document_detail/120998.html 文档")
+    @OperateLog(enable = false)
+    public CommonResult<Boolean> receiveAliyunSmsStatus(HttpServletRequest request) throws Throwable {
+        String text = ServletUtil.getBody(request);
+        smsService.receiveSmsStatus(SmsChannelEnum.ALIYUN.getCode(), text);
+        return success(true);
     }
 
 }

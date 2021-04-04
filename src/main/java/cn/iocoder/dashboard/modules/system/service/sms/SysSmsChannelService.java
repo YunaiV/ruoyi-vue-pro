@@ -1,9 +1,14 @@
 package cn.iocoder.dashboard.modules.system.service.sms;
 
 import cn.iocoder.dashboard.common.pojo.PageResult;
-import cn.iocoder.dashboard.modules.system.controller.sms.vo.req.SmsChannelCreateReqVO;
-import cn.iocoder.dashboard.modules.system.controller.sms.vo.req.SmsChannelPageReqVO;
+import cn.iocoder.dashboard.modules.system.controller.sms.vo.channel.SysSmsChannelCreateReqVO;
+import cn.iocoder.dashboard.modules.system.controller.sms.vo.channel.SysSmsChannelPageReqVO;
+import cn.iocoder.dashboard.modules.system.controller.sms.vo.channel.SysSmsChannelUpdateReqVO;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.sms.SysSmsChannelDO;
+
+import javax.validation.Valid;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * 短信渠道Service接口
@@ -19,19 +24,49 @@ public interface SysSmsChannelService {
     void initSmsClients();
 
     /**
-     * 分页查询短信渠道信息
+     * 创建短信渠道
      *
-     * @param reqVO 参数对象
-     * @return 短信渠道分页对象
+     * @param createReqVO 创建信息
+     * @return 编号
      */
-    PageResult<SysSmsChannelDO> pageSmsChannels(SmsChannelPageReqVO reqVO);
+    Long createSmsChannel(@Valid SysSmsChannelCreateReqVO createReqVO);
 
     /**
-     * 创建新的渠道信息
+     * 更新短信渠道
      *
-     * @param reqVO 参数对象
-     * @return 渠道id
+     * @param updateReqVO 更新信息
      */
-    Long createSmsChannel(SmsChannelCreateReqVO reqVO);
+    void updateSmsChannel(@Valid SysSmsChannelUpdateReqVO updateReqVO);
+
+    /**
+     * 删除短信渠道
+     *
+     * @param id 编号
+     */
+    void deleteSmsChannel(Long id);
+
+    /**
+     * 获得短信渠道
+     *
+     * @param id 编号
+     * @return 短信渠道
+     */
+    SysSmsChannelDO getSmsChannel(Long id);
+
+    /**
+     * 获得短信渠道列表
+     *
+     * @param ids 编号
+     * @return 短信渠道列表
+     */
+    List<SysSmsChannelDO> getSmsChannelList(Collection<Long> ids);
+
+    /**
+     * 获得短信渠道分页
+     *
+     * @param pageReqVO 分页查询
+     * @return 短信渠道分页
+     */
+    PageResult<SysSmsChannelDO> getSmsChannelPage(SysSmsChannelPageReqVO pageReqVO);
 
 }

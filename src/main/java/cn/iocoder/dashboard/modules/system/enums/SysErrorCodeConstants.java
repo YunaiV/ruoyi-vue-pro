@@ -78,19 +78,15 @@ public interface SysErrorCodeConstants {
     ErrorCode FILE_UPLOAD_FAILED = new ErrorCode(1002009002, "文件上传失败");
     ErrorCode FILE_IS_EMPTY= new ErrorCode(1002009003, "文件为空");
 
+    // ========== 短信渠道 1002011000 ==========
+    ErrorCode SMS_CHANNEL_NOT_EXISTS = new ErrorCode(1002011000, "短信渠道不存在");
 
-    // ========== 短信模板 1002010000 ==========
-    ErrorCode SMS_TEMPLATE_NOT_EXISTS = new ErrorCode(1002010000, "短信模板不存在");
+    // ========== 短信模板 1002011000 ==========
+    ErrorCode SMS_TEMPLATE_NOT_EXISTS = new ErrorCode(1002011000, "短信模板不存在");
 
-    // ========== 短信发送 1002011000 ==========
-    ErrorCode SMS_SEND_MOBILE_NOT_EXISTS = new ErrorCode(1002011000, "手机号不存在");
-    ErrorCode SMS_SEND_MOBILE_TEMPLATE_PARAM_MISS = new ErrorCode(1002011001, "模板参数({})缺失");
+    // ========== 短信发送 1002012000 ==========
+    ErrorCode SMS_SEND_MOBILE_NOT_EXISTS = new ErrorCode(1002012000, "手机号不存在");
+    ErrorCode SMS_SEND_MOBILE_TEMPLATE_PARAM_MISS = new ErrorCode(1002012001, "模板参数({})缺失");
 
-    ErrorCode SMS_CHANNEL_NOT_INIT = new ErrorCode(1003001001,
-            "短信渠道没有初始化, 请调用SmsClientWrapper#initSmsClient()或SmsClientWrapper#addSmsClient");
-    ErrorCode SMS_CHANNEL_NOT_FOUND = new ErrorCode(1003001002, "没有短信渠道信息, 请初始化sms_channel表数据。");
-    ErrorCode SMS_SENDER_NOT_FOUND = new ErrorCode(1003001004, "没有找到对应的短信发送对象，请检查sms_channel表和sms_template表数据");
-    ErrorCode INVALID_CHANNEL_CODE = new ErrorCode(1003001005, "非法的短信渠道code，请检查sms_channel表的code值是否与SmsChannelEnum中的code值一致。");
-    ErrorCode PARAM_VALUE_IS_NULL = new ErrorCode(1003001006, "参数【{}】不能为空");
 
 }
