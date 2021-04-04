@@ -2,6 +2,7 @@ package cn.iocoder.dashboard.modules.system.service.sms;
 
 import cn.iocoder.dashboard.modules.system.dal.dataobject.sms.SysSmsTemplateDO;
 
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -28,7 +29,7 @@ public interface SysSmsLogService {
                       SysSmsTemplateDO template, String templateContent, Map<String, Object> templateParams);
 
     /**
-     * 更新发送日志的结果
+     * 更新日志的发送结果
      *
      * @param id 日志编号
      * @param sendCode 发送结果的编码
@@ -40,5 +41,16 @@ public interface SysSmsLogService {
      */
     void updateSmsSendResult(Long id, Integer sendCode, String sendMsg,
                              String apiSendCode, String apiSendMsg, String apiRequestId, String apiSerialNo);
+
+    /**
+     * 更新日志的接收结果
+     *
+     * @param id 日志编号
+     * @param success 是否接收成功
+     * @param receiveTime 用户接收时间
+     * @param apiReceiveCode API 接收结果的编码
+     * @param apiReceiveMsg API 接收结果的说明
+     */
+    void updateSmsReceiveResult(Long id, Boolean success, Date receiveTime, String apiReceiveCode, String apiReceiveMsg);
 
 }

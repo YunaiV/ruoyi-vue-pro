@@ -3,6 +3,7 @@ package cn.iocoder.dashboard.modules.system.dal.dataobject.sms;
 import cn.iocoder.dashboard.common.enums.UserTypeEnum;
 import cn.iocoder.dashboard.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.dashboard.framework.sms.core.enums.SmsFrameworkErrorCodeConstants;
+import cn.iocoder.dashboard.modules.system.enums.sms.SysSmsReceiveStatusEnum;
 import cn.iocoder.dashboard.modules.system.enums.sms.SysSmsSendStatusEnum;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -150,9 +151,23 @@ public class SysSmsLogDO extends BaseDO {
 
     // ========= 接收相关字段 =========
 
-//    /**
-//     * 是否获取过结果[0否 1是]
-//     */
-//    private Integer gotResult;
+    /**
+     * 接收状态
+     *
+     * 枚举 {@link SysSmsReceiveStatusEnum}
+     */
+    private Integer receiveStatus;
+    /**
+     * 接收时间
+     */
+    private Date receiveTime;
+    /**
+     * 短信 API 接收结果的编码
+     */
+    private String apiReceiveCode;
+    /**
+     * 短信 API 接收结果的提示
+     */
+    private String apiReceiveMsg;
 
 }

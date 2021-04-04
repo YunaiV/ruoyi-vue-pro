@@ -1,5 +1,6 @@
 package cn.iocoder.dashboard.modules.system.service.sms.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.dashboard.common.core.KeyValue;
 import cn.iocoder.dashboard.common.enums.CommonStatusEnum;
@@ -153,6 +154,14 @@ public class SysSmsServiceImpl implements SysSmsService {
         Assert.notNull(smsClient, String.format("短信客户端(%s) 不存在", channelCode));
         // 解析内容
         List<SmsReceiveRespDTO> receiveResults = smsClient.parseSmsReceiveStatus(text);
+        if (CollUtil.isEmpty(receiveResults)) {
+            return;
+        }
+        // 更新短信日志的接收结果. 因为量一般不打，所以先使用 for 循环更新
+        receiveResults.forEach(result -> {
+            smsLogService.updateSmsReceiveResult(result.getLogId(), result.getSuccess(), result.getReceiveTime(),
+                    result.getErrorCode(), result.getErrorCode());
+        });
     }
 
 }

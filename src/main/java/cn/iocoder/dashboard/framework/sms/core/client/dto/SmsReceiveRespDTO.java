@@ -17,11 +17,11 @@ public class SmsReceiveRespDTO {
      */
     private Boolean success;
     /**
-     * API 接收结果编码
+     * API 接收结果的编码
      */
     private String errorCode;
     /**
-     * API 接收结果说明
+     * API 接收结果的说明
      */
     private String errorMsg;
 

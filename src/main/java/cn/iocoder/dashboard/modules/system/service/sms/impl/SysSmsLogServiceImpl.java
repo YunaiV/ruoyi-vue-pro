@@ -4,6 +4,7 @@ import cn.iocoder.dashboard.common.pojo.CommonResult;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.sms.SysSmsLogDO;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.sms.SysSmsTemplateDO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.sms.SysSmsLogMapper;
+import cn.iocoder.dashboard.modules.system.enums.sms.SysSmsReceiveStatusEnum;
 import cn.iocoder.dashboard.modules.system.enums.sms.SysSmsSendStatusEnum;
 import cn.iocoder.dashboard.modules.system.service.sms.SysSmsLogService;
 import lombok.extern.slf4j.Slf4j;
@@ -41,6 +42,8 @@ public class SysSmsLogServiceImpl implements SysSmsLogService {
         logBuilder.templateContent(templateContent).templateParams(templateParams).apiTemplateId(template.getApiTemplateId());
         // 设置渠道相关字段
         logBuilder.channelId(template.getChannelId()).channelCode(template.getChannelCode());
+        // 设置接收相关字段
+        logBuilder.receiveStatus(SysSmsReceiveStatusEnum.INIT.getStatus());
 
         // 插入数据库
         SysSmsLogDO logDO = logBuilder.build();
@@ -51,10 +54,19 @@ public class SysSmsLogServiceImpl implements SysSmsLogService {
     @Override
     public void updateSmsSendResult(Long id, Integer sendCode, String sendMsg,
                                     String apiSendCode, String apiSendMsg, String apiRequestId, String apiSerialNo) {
-        SysSmsSendStatusEnum sendStatus = CommonResult.isSuccess(sendCode) ? SysSmsSendStatusEnum.SUCCESS : SysSmsSendStatusEnum.FAILURE;
+        SysSmsSendStatusEnum sendStatus = CommonResult.isSuccess(sendCode) ? SysSmsSendStatusEnum.SUCCESS
+                : SysSmsSendStatusEnum.FAILURE;
         smsLogMapper.updateById(SysSmsLogDO.builder().id(id).sendStatus(sendStatus.getStatus()).sendTime(new Date())
                 .sendCode(sendCode).sendMsg(sendMsg).apiSendCode(apiSendCode).apiSendMsg(apiSendMsg)
                 .apiRequestId(apiRequestId).apiSerialNo(apiSerialNo).build());
+    }
+
+    @Override
+    public void updateSmsReceiveResult(Long id, Boolean success, Date receiveTime, String apiReceiveCode, String apiReceiveMsg) {
+        SysSmsReceiveStatusEnum receiveStatus = Objects.equals(success, true) ? SysSmsReceiveStatusEnum.SUCCESS
+                : SysSmsReceiveStatusEnum.FAILURE;
+        smsLogMapper.updateById(SysSmsLogDO.builder().id(id).receiveStatus(receiveStatus.getStatus()).receiveTime(receiveTime)
+                .apiReceiveCode(apiReceiveCode).apiReceiveMsg(apiReceiveMsg).build());
     }
 
 }
