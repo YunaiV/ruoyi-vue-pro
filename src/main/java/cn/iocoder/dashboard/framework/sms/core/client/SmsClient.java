@@ -39,6 +39,6 @@ public interface SmsClient {
      * @return 结果内容
      * @throws Throwable 当解析 text 发生异常时，则会抛出异常
      */
-    SmsCommonResult<SmsReceiveRespDTO> parseSmsReceiveStatus(String text) throws Throwable;
+    List<SmsReceiveRespDTO> parseSmsReceiveStatus(String text) throws Throwable;
 
 }

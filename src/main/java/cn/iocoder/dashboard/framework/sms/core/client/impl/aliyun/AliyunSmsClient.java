@@ -1,7 +1,5 @@
 package cn.iocoder.dashboard.framework.sms.core.client.impl.aliyun;
 
-import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.dashboard.common.core.KeyValue;
 import cn.iocoder.dashboard.framework.sms.core.client.SmsCommonResult;
@@ -9,7 +7,6 @@ import cn.iocoder.dashboard.framework.sms.core.client.dto.SmsReceiveRespDTO;
 import cn.iocoder.dashboard.framework.sms.core.client.dto.SmsSendRespDTO;
 import cn.iocoder.dashboard.framework.sms.core.client.impl.AbstractSmsClient;
 import cn.iocoder.dashboard.framework.sms.core.property.SmsChannelProperties;
-import cn.iocoder.dashboard.modules.system.enums.sms.SysSmsSendStatusEnum;
 import cn.iocoder.dashboard.util.collection.MapUtils;
 import cn.iocoder.dashboard.util.json.JsonUtils;
 import com.aliyuncs.DefaultAcsClient;
@@ -20,16 +17,17 @@ import com.aliyuncs.exceptions.ClientException;
 import com.aliyuncs.http.MethodType;
 import com.aliyuncs.profile.DefaultProfile;
 import com.aliyuncs.profile.IClientProfile;
-import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.servlet.ServletRequest;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.stream.Collectors;
+
+import static cn.iocoder.dashboard.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
+import static cn.iocoder.dashboard.util.date.DateUtils.TIME_ZONE_DEFAULT;
 
 /**
  * 阿里短信客户端的实现类
@@ -40,8 +38,9 @@ import java.util.Map;
 @Slf4j
 public class AliyunSmsClient extends AbstractSmsClient {
 
-    private static final String PRODUCT = "Dystopi";
-    private static final String DOMAIN = "dysmsapi.aliyuncs.com";
+    /**
+     * REGION, 使用杭州
+     */
     private static final String ENDPOINT = "cn-hangzhou";
 
     /**
@@ -56,7 +55,6 @@ public class AliyunSmsClient extends AbstractSmsClient {
     @Override
     protected void doInit() {
         IClientProfile profile = DefaultProfile.getProfile(ENDPOINT, properties.getApiKey(), properties.getApiSecret());
-        DefaultProfile.addEndpoint(ENDPOINT, PRODUCT, DOMAIN);
         acsClient = new DefaultAcsClient(profile);
     }
 
@@ -93,133 +91,80 @@ public class AliyunSmsClient extends AbstractSmsClient {
         return ex.getErrMsg() + " => " + ex.getErrorDescription();
     }
 
-    /**
-     * [{
-     * "send_time" : "2017-08-30 00:00:00",
-     * "report_time" : "2017-08-30 00:00:00",
-     * "success" : true,
-     * "err_msg" : "用户接收成功",
-     * "err_code" : "DELIVERED",
-     * "phone_number" : "18612345678",
-     * "sms_size" : "1",
-     * "biz_id" : "932702304080415357^0",
-     * "out_id" : "1184585343"
-     * }]
-     *
-     * @param request 请求
-     * @return
-     * @throws Exception
-     */
-    public SmsReceiveRespDTO smsSendCallbackHandle(ServletRequest request) throws Exception {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(request.getInputStream()));
-        String paramStr = reader.readLine();
-        List<Map<String, Object>> params = JsonUtils.parseObject(paramStr, new TypeReference<List<Map<String, Object>>>() {
-        });
-        if (CollectionUtil.isNotEmpty(params)) {
-            Map<String, Object> sendResultParamMap = params.get(0);
-            return CallbackHelper.of(sendResultParamMap).toResultDetail();
-        }
-        return null;
-    }
-
     @Override
-    protected SmsCommonResult<SmsReceiveRespDTO> doParseSmsReceiveStatus(String text) throws Throwable {
-        return null;
+    protected List<SmsReceiveRespDTO> doParseSmsReceiveStatus(String text) throws Throwable {
+        List<SmsReceiveStatus> statuses = JsonUtils.parseArray(text, SmsReceiveStatus.class);
+        return statuses.stream().map(status -> {
+            SmsReceiveRespDTO resp = new SmsReceiveRespDTO();
+            resp.setSuccess(status.getSuccess());
+            resp.setErrorCode(status.getErrCode()).setErrorMsg(status.getErrMsg());
+            resp.setMobile(status.getPhoneNumber()).setReceiveTime(status.getReportTime());
+            resp.setSerialNo(status.getBizId()).setLogId(Long.valueOf(status.getOutId()));
+            return resp;
+        }).collect(Collectors.toList());
     }
 
     /**
-     * 短信发送回调辅助类
+     * 短信接收状态
+     *
+     * 参见 https://help.aliyun.com/document_detail/101867.html 文档
+     *
+     * @author 芋道源码
      */
-    private static class CallbackHelper {
-
-        private final Map<String, Object> sendResultParamMap;
-
-        private CallbackHelper(Map<String, Object> sendResultParamMap) {
-            this.sendResultParamMap = sendResultParamMap;
-        }
-
-        public static CallbackHelper of(Map<String, Object> sendResultParamMap) {
-            return new CallbackHelper(sendResultParamMap);
-        }
-
-        public Integer getSendStatus() {
-            return ((Boolean) sendResultParamMap.get(CallbackField.SUCCESS))
-                    ? SysSmsSendStatusEnum.SUCCESS.getStatus()
-                    : SysSmsSendStatusEnum.FAILURE.getStatus();
-        }
-
-        public String getBizId() {
-            return sendResultParamMap.get(CallbackField.BIZ_ID).toString();
-        }
-
-        public String getErrMsg() {
-            return sendResultParamMap.get(CallbackField.ERR_MSG).toString();
-        }
-
-        public String getErrCode() {
-            return sendResultParamMap.get(CallbackField.ERR_CODE).toString();
-        }
-
-        public Date getSendTime() {
-            return DateUtil.parseTime(sendResultParamMap.get(CallbackField.SEND_TIME).toString());
-        }
-
-        public String getPhoneNumber() {
-            return sendResultParamMap.get(CallbackField.PHONE_NUMBER).toString();
-        }
-
-        public String getOutId() {
-            return sendResultParamMap.get(CallbackField.OUT_ID).toString();
-        }
-
-        public SmsReceiveRespDTO toResultDetail() {
-            SmsReceiveRespDTO resultDetail = new SmsReceiveRespDTO();
-            resultDetail.setSendStatus(getSendStatus());
-            resultDetail.setApiId(getBizId());
-            resultDetail.setSendTime(getSendTime());
-            resultDetail.setPhone(getPhoneNumber());
-            resultDetail.setMessage(getErrMsg());
-
-            resultDetail.setCallbackResponseBody(generateSuccessResponseBody());
-            return resultDetail;
-        }
+    @Data
+    public static class SmsReceiveStatus {
 
         /**
-         * 生成回调成功的返回对象
+         * 手机号
          */
-        private Map<String, Object> generateSuccessResponseBody() {
-            Map<String, Object> result = new HashMap<>();
-            result.put("code", 0);
-            result.put("msg", "成功");
-            return result;
-        }
+        @JsonProperty("phone_number")
+        private String phoneNumber;
+        /**
+         * 发送时间
+         */
+        @JsonProperty("send_time")
+        @JsonFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND, timezone = TIME_ZONE_DEFAULT)
+        private Date sendTime;
+        /**
+         * 状态报告时间
+         */
+        @JsonProperty("report_time")
+        @JsonFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND, timezone = TIME_ZONE_DEFAULT)
+        private Date reportTime;
+        /**
+         * 是否接收成功
+         */
+        private Boolean success;
+        /**
+         * 状态报告说明
+         */
+        @JsonProperty("err_msg")
+        private String errMsg;
+        /**
+         * 状态报告编码
+         */
+        @JsonProperty("err_code")
+        private String errCode;
+        /**
+         * 发送序列号
+         */
+        @JsonProperty("biz_id")
+        private String bizId;
+        /**
+         * 用户序列号
+         *
+         * 这里我们传递的是 SysSmsLogDO 的日志编号
+         */
+        @JsonProperty("out_id")
+        private String outId;
+        /**
+         * 短信长度，例如说 1、2、3
+         *
+         * 140 字节算一条短信，短信长度超过 140 字节时会拆分成多条短信发送
+         */
+        @JsonProperty("sms_size")
+        private Integer smsSize;
 
-    }
-
-    /**
-     * 回调接口字段定义
-     */
-    private interface CallbackField {
-        //是否成功 boolean
-        String SUCCESS = "success";
-
-        //发送时间
-        String SEND_TIME = "send_time";
-
-        //错误信息
-        String ERR_MSG = "err_msg";
-
-        //错误编码
-        String ERR_CODE = "err_code";
-
-        //手机号
-        String PHONE_NUMBER = "phone_number";
-
-        //用户序列号 out_id
-        String OUT_ID = "out_id";
-
-        //biz_id 即 apiId 唯一标识
-        String BIZ_ID = "biz_id";
     }
 
 }

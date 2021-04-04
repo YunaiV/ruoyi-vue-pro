@@ -152,7 +152,7 @@ public class SysSmsServiceImpl implements SysSmsService {
         SmsClient smsClient = smsClientFactory.getSmsClient(channelCode);
         Assert.notNull(smsClient, String.format("短信客户端(%s) 不存在", channelCode));
         // 解析内容
-        SmsCommonResult<SmsReceiveRespDTO> receiveResult = smsClient.parseSmsReceiveStatus(text);
+        List<SmsReceiveRespDTO> receiveResults = smsClient.parseSmsReceiveStatus(text);
     }
 
 }

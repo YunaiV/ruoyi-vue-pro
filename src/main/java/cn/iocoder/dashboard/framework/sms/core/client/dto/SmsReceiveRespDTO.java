@@ -1,9 +1,7 @@
 package cn.iocoder.dashboard.framework.sms.core.client.dto;
 
-import cn.iocoder.dashboard.modules.system.enums.sms.SysSmsSendStatusEnum;
 import lombok.Data;
 
-import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -12,35 +10,39 @@ import java.util.Date;
  * @author 芋道源码
  */
 @Data
-public class SmsReceiveRespDTO implements Serializable {
+public class SmsReceiveRespDTO {
 
     /**
-     * 唯一标识
+     * 是否接收成功
      */
-    private String apiId;
+    private Boolean success;
+    /**
+     * API 接收结果编码
+     */
+    private String errorCode;
+    /**
+     * API 接收结果说明
+     */
+    private String errorMsg;
 
     /**
-     * 短信发送状态 {@link SysSmsSendStatusEnum}
+     * 手机号
      */
-    private Integer sendStatus;
+    private String mobile;
+    /**
+     * 用户接收时间
+     */
+    private Date receiveTime;
 
     /**
-     * 接收手机号
+     * 短信 API 发送返回的序号
      */
-    private String phone;
-
+    private String serialNo;
     /**
-     * 提示
+     * 短信日志编号
+     *
+     * 对应 SysSmsLogDO 的编号
      */
-    private String message;
+    private Long logId;
 
-    /**
-     * 时间
-     */
-    private Date sendTime;
-
-    /**
-     * 接口返回值
-     */
-    private Object callbackResponseBody;
 }

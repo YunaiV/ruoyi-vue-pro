@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * {@link AliyunSmsClient} 的集成测试
  */
-public class AliyunSmsClientTest {
+public class AliyunSmsClientIntegrationTest {
 
     @Test
     public void testSend() {

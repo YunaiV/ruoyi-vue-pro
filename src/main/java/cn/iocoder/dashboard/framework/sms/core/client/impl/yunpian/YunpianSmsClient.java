@@ -1,8 +1,6 @@
 package cn.iocoder.dashboard.framework.sms.core.client.impl.yunpian;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.core.util.CharsetUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.URLUtil;
 import cn.iocoder.dashboard.common.core.KeyValue;
@@ -11,11 +9,9 @@ import cn.iocoder.dashboard.framework.sms.core.client.dto.SmsReceiveRespDTO;
 import cn.iocoder.dashboard.framework.sms.core.client.dto.SmsSendRespDTO;
 import cn.iocoder.dashboard.framework.sms.core.client.impl.AbstractSmsClient;
 import cn.iocoder.dashboard.framework.sms.core.property.SmsChannelProperties;
-import cn.iocoder.dashboard.util.date.DateUtils;
 import cn.iocoder.dashboard.util.json.JsonUtils;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.yunpian.sdk.YunpianClient;
 import com.yunpian.sdk.constant.YunpianConstant;
 import com.yunpian.sdk.model.Result;
@@ -23,10 +19,11 @@ import com.yunpian.sdk.model.SmsSingleSend;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.servlet.ServletRequest;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.*;
+import java.util.stream.Collectors;
+
+import static cn.iocoder.dashboard.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
+import static cn.iocoder.dashboard.util.date.DateUtils.TIME_ZONE_DEFAULT;
 
 /**
  * 云片短信客户端的实现类
@@ -41,9 +38,6 @@ public class YunpianSmsClient extends AbstractSmsClient {
      * 云信短信客户端
      */
     private volatile YunpianClient client;
-
-    private final TypeReference<List<Map<String, String>>> callbackType = new TypeReference<List<Map<String, String>>>() {
-    };
 
     public YunpianSmsClient(SmsChannelProperties properties) {
         super(properties, new YunpianSmsCodeMapping());
@@ -105,28 +99,17 @@ public class YunpianSmsClient extends AbstractSmsClient {
         return sendResult.getMsg() + " => " + sendResult.getDetail();
     }
 
-    /**
-     * 从 request 中获取请求中传入的短信发送结果信息
-     *
-     * @param request 回调请求
-     * @return 短信发送结果信息
-     * @throws UnsupportedEncodingException 解码异常
-     */
-    private Map<String, String> getRequestParams(ServletRequest request) throws UnsupportedEncodingException {
-        Map<String, String[]> parameterMap = request.getParameterMap();
-        String[] smsStatuses = parameterMap.get(YunpianConstant.SMS_STATUS);
-        String encode = URLEncoder.encode(smsStatuses[0], CharsetUtil.UTF_8);
-        List<Map<String, String>> paramList = JsonUtils.parseObject(encode, callbackType);
-        if (CollectionUtil.isNotEmpty(paramList)) {
-            return paramList.get(0);
-        }
-        throw new IllegalArgumentException("YunpianSmsClient getRequestParams fail! can't format RequestParam: "
-                + JsonUtils.toJsonString(request.getParameterMap()));
-    }
-
     @Override
-    protected SmsCommonResult<SmsReceiveRespDTO> doParseSmsReceiveStatus(String text) throws Throwable {
-        return null;
+    protected List<SmsReceiveRespDTO> doParseSmsReceiveStatus(String text) throws Throwable {
+        List<SmsReceiveStatus> statuses = JsonUtils.parseArray(text, SmsReceiveStatus.class);
+        return statuses.stream().map(status -> {
+            SmsReceiveRespDTO resp = new SmsReceiveRespDTO();
+            resp.setSuccess(Objects.equals(status.getReportStatus(), "SUCCESS"));
+            resp.setErrorCode(status.getErrorMsg()).setErrorMsg(status.getErrorDetail());
+            resp.setMobile(status.getMobile()).setReceiveTime(status.getUserReceiveTime());
+            resp.setSerialNo(String.valueOf(status.getSid())).setLogId(status.getUid());
+            return resp;
+        }).collect(Collectors.toList());
     }
 
     /**
@@ -139,6 +122,24 @@ public class YunpianSmsClient extends AbstractSmsClient {
     @Data
     public static class SmsReceiveStatus {
 
+        /**
+         * 接收状态
+         *
+         * 目前仅有 SUCCESS / FAIL，所以使用 Boolean 接收
+         */
+        @JsonProperty("report_status")
+        private String reportStatus;
+        /**
+         * 接收手机号
+         */
+        private String mobile;
+        /**
+         * 运营商返回的代码，如："DB:0103"
+         *
+         * 由于不同运营商信息不同，此字段仅供参考；
+         */
+        @JsonProperty("error_msg")
+        private String errorMsg;
         /**
          * 运营商反馈代码的中文解释
          *
@@ -160,26 +161,8 @@ public class YunpianSmsClient extends AbstractSmsClient {
          * 用户接收时间
          */
         @JsonProperty("user_receive_time")
-        @JsonFormat(pattern = DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
+        @JsonFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND, timezone = TIME_ZONE_DEFAULT)
         private Date userReceiveTime;
-        /**
-         * 运营商返回的代码，如："DB:0103"
-         *
-         * 由于不同运营商信息不同，此字段仅供参考；
-         */
-        @JsonProperty("error_msg")
-        private String errorMsg;
-        /**
-         * 接收手机号
-         */
-        private String mobile;
-        /**
-         * 接收状态
-         *
-         * 目前仅有 SUCCESS / FAIL，所以使用 Boolean 接收
-         */
-        @JsonProperty("report_status")
-        private String reportStatus;
 
     }
 

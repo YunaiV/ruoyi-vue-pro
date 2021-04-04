@@ -2,7 +2,6 @@ package cn.iocoder.dashboard.util.json;
 
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.dashboard.framework.sms.core.client.impl.yunpian.YunpianSmsClient;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -78,12 +77,6 @@ public class JsonUtils {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    public static void main(String[] args) {
-        String text = "[{\"sid\":9527,\"uid\":null,\"user_receive_time\":\"2014-03-17 22:55:21\",\"error_msg\":\"\",\"mobile\":\"15205201314\",\"report_status\":\"SUCCESS\"},{\"sid\":9528,\"uid\":null,\"user_receive_time\":\"2014-03-17 22:55:23\",\"error_msg\":\"\",\"mobile\":\"15212341234\",\"report_status\":\"SUCCESS\"}]";
-        List<YunpianSmsClient.SmsReceiveStatus> result = parseArray(text, YunpianSmsClient.SmsReceiveStatus.class);
-        System.out.println(result);
     }
 
 }

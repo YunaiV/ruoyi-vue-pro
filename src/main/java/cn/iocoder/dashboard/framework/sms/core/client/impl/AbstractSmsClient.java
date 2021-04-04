@@ -90,7 +90,7 @@ public abstract class AbstractSmsClient implements SmsClient {
             throws Throwable;
 
     @Override
-    public SmsCommonResult<SmsReceiveRespDTO> parseSmsReceiveStatus(String text) throws Throwable {
+    public List<SmsReceiveRespDTO> parseSmsReceiveStatus(String text) throws Throwable {
         try {
             return doParseSmsReceiveStatus(text);
         } catch (Throwable ex) {
@@ -99,6 +99,6 @@ public abstract class AbstractSmsClient implements SmsClient {
         }
     }
 
-    protected abstract SmsCommonResult<SmsReceiveRespDTO> doParseSmsReceiveStatus(String text) throws Throwable;
+    protected abstract List<SmsReceiveRespDTO> doParseSmsReceiveStatus(String text) throws Throwable;
 
 }

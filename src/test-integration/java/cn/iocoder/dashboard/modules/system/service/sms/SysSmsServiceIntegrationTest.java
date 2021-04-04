@@ -34,7 +34,7 @@ public class SysSmsServiceIntegrationTest extends BaseDbAndRedisIntegrationTest 
     private SysUserService userService;
 
     @Test
-    public void testSendSingleSms_云片发送成功() {
+    public void testSendSingleSms_yunpianSuccess() {
         // 参数准备
         String mobile = "15601691399";
         Long userId = 1L;
@@ -50,7 +50,7 @@ public class SysSmsServiceIntegrationTest extends BaseDbAndRedisIntegrationTest 
     }
 
     @Test
-    public void testSendSingleSms_阿里云发送成功() {
+    public void testSendSingleSms_aliyunSuccess() {
         // 参数准备
         String mobile = "15601691399";
         Long userId = 1L;
