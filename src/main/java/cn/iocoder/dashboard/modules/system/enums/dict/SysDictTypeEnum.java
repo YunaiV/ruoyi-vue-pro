@@ -19,6 +19,7 @@ public enum SysDictTypeEnum {
     SYS_CONFIG_TYPE("sys_config_type"), // 参数配置类型
     SYS_BOOLEAN_STRING("sys_boolean_string"), // Boolean 是否类型
     SYS_SMS_CHANNEL_CODE("sys_sms_channel_code"), // 短信渠道编码
+    SYS_SMS_TEMPLATE_TYPE("sys_sms_template_type"), // 短信模板类型
 
     INF_REDIS_TIMEOUT_TYPE("inf_redis_timeout_type"),  // Redis 超时类型
     INF_JOB_STATUS("inf_job_status"), // 定时任务状态的枚举
