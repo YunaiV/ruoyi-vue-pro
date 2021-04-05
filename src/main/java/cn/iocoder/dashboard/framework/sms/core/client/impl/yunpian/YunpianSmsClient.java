@@ -1,6 +1,7 @@
 package cn.iocoder.dashboard.framework.sms.core.client.impl.yunpian;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.URLUtil;
 import cn.iocoder.dashboard.common.core.KeyValue;
@@ -41,6 +42,7 @@ public class YunpianSmsClient extends AbstractSmsClient {
 
     public YunpianSmsClient(SmsChannelProperties properties) {
         super(properties, new YunpianSmsCodeMapping());
+        Assert.notEmpty(properties.getApiKey(), "apiKey 不能为空");
     }
 
     @Override

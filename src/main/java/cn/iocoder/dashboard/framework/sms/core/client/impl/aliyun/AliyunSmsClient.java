@@ -1,5 +1,6 @@
 package cn.iocoder.dashboard.framework.sms.core.client.impl.aliyun;
 
+import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.dashboard.common.core.KeyValue;
 import cn.iocoder.dashboard.framework.sms.core.client.SmsCommonResult;
@@ -50,6 +51,8 @@ public class AliyunSmsClient extends AbstractSmsClient {
 
     public AliyunSmsClient(SmsChannelProperties properties) {
         super(properties, new AliyunSmsCodeMapping());
+        Assert.notEmpty(properties.getApiKey(), "apiKey 不能为空");
+        Assert.notEmpty(properties.getApiSecret(), "apiSecret 不能为空");
     }
 
     @Override

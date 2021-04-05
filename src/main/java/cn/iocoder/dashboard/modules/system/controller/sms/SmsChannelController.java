@@ -22,7 +22,7 @@ import static cn.iocoder.dashboard.common.pojo.CommonResult.success;
 
 @Api(tags = "短信渠道")
 @RestController
-@RequestMapping("/sms/channel")
+@RequestMapping("system/sms-channel")
 public class SmsChannelController {
 
     @Resource

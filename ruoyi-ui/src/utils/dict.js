@@ -17,6 +17,7 @@ export const DICT_TYPE = {
   SYS_OPERATE_TYPE: 'sys_operate_type',
   SYS_LOGIN_RESULT: 'sys_login_result',
   SYS_CONFIG_TYPE: 'sys_config_type',
+  SYS_SMS_CHANNEL_CODE: 'sys_sms_channel_code',
 
   INF_REDIS_TIMEOUT_TYPE: 'inf_redis_timeout_type',
   INF_JOB_STATUS: 'inf_job_status',

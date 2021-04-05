@@ -2,6 +2,7 @@ package cn.iocoder.dashboard.modules.system.controller.sms.vo.channel;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.hibernate.validator.constraints.URL;
 
 import javax.validation.constraints.NotNull;
 
@@ -16,8 +17,8 @@ public class SysSmsChannelBaseVO {
     @NotNull(message = "短信签名不能为空")
     private String signature;
 
-    @ApiModelProperty(value = "任务状态", required = true, example = "1")
-    @NotNull(message = "任务状态不能为空")
+    @ApiModelProperty(value = "启用状态", required = true, example = "1")
+    @NotNull(message = "启用状态不能为空")
     private Integer status;
 
     @ApiModelProperty(value = "备注", example = "好吃！")
@@ -31,6 +32,8 @@ public class SysSmsChannelBaseVO {
     private String apiSecret;
 
     @ApiModelProperty(value = "短信发送回调 URL", example = "http://www.iocoder.cn")
+    @URL(message = "回调 URL 格式不正确")
     private String callbackUrl;
+
 
 }
