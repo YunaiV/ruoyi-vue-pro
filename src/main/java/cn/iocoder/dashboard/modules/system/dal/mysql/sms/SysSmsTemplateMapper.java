@@ -13,7 +13,7 @@ import java.util.List;
 @Mapper
 public interface SysSmsTemplateMapper extends BaseMapperX<SysSmsTemplateDO> {
 
-    default SysSmsTemplateDO selectOneByCode(String code) {
+    default SysSmsTemplateDO selectByCode(String code) {
         return selectOne("code", code);
     }
 
