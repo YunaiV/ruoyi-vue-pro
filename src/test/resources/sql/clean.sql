@@ -20,3 +20,4 @@ DELETE FROM "sys_login_log";
 DELETE FROM "sys_operate_log";
 DELETE FROM "sys_user";
 DELETE FROM "sys_sms_channel";
+DELETE FROM "sys_sms_template";

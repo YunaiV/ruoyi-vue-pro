@@ -82,8 +82,15 @@ public class SysSmsTemplateServiceImpl implements SysSmsTemplateService {
     public void updateSmsTemplate(SysSmsTemplateUpdateReqVO updateReqVO) {
         // 校验存在
         this.validateSmsTemplateExists(updateReqVO.getId());
+        // 校验短信渠道
+        SysSmsChannelDO channelDO = checkSmsChannel(updateReqVO.getChannelId());
+        // 校验短信编码是否重复
+        checkSmsTemplateCodeDuplicate(updateReqVO.getId(), updateReqVO.getCode());
+
         // 更新
         SysSmsTemplateDO updateObj = SysSmsTemplateConvert.INSTANCE.convert(updateReqVO);
+        updateObj.setParams(parseTemplateContentParams(updateObj.getContent()));
+        updateObj.setChannelCode(channelDO.getCode());
         smsTemplateMapper.updateById(updateObj);
     }
 
@@ -121,7 +128,8 @@ public class SysSmsTemplateServiceImpl implements SysSmsTemplateService {
         return smsTemplateMapper.selectList(exportReqVO);
     }
 
-    private SysSmsChannelDO checkSmsChannel(Long channelId) {
+    @VisibleForTesting
+    public SysSmsChannelDO checkSmsChannel(Long channelId) {
         SysSmsChannelDO channelDO = smsChannelService.getSmsChannel(channelId);
         if (channelDO == null) {
             throw exception(SMS_CHANNEL_NOT_EXISTS);
@@ -132,7 +140,8 @@ public class SysSmsTemplateServiceImpl implements SysSmsTemplateService {
         return channelDO;
     }
 
-    private void checkSmsTemplateCodeDuplicate(Long id, String code) {
+    @VisibleForTesting
+    public void checkSmsTemplateCodeDuplicate(Long id, String code) {
         SysSmsTemplateDO template = smsTemplateMapper.selectByCode(code);
         if (template == null) {
             return;

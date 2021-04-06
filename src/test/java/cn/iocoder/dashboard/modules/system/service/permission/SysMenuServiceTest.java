@@ -12,7 +12,6 @@ import cn.iocoder.dashboard.modules.system.enums.permission.MenuTypeEnum;
 import cn.iocoder.dashboard.modules.system.mq.producer.permission.SysMenuProducer;
 import cn.iocoder.dashboard.modules.system.service.permission.impl.SysMenuServiceImpl;
 import cn.iocoder.dashboard.util.AopTargetUtils;
-import cn.iocoder.dashboard.util.AssertUtils;
 import cn.iocoder.dashboard.util.RandomUtils;
 import cn.iocoder.dashboard.util.object.ObjectUtils;
 import com.google.common.collect.Multimap;
@@ -22,7 +21,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
-
 import java.util.*;
 
 import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.*;
@@ -273,10 +271,10 @@ public class SysMenuServiceTest extends BaseDbUnitTest {
         menuDO = createMenuDO(4L, MenuTypeEnum.MENU, "name", 0L, 2);
         mockCacheMap.put(menuDO.getId(), menuDO);
 
-        List<SysMenuDO> menuDOS = sysMenuService.listMenusFromCache(Arrays.asList(1L),
-                Arrays.asList(MenuTypeEnum.MENU.getType()), Arrays.asList(1));
+        List<SysMenuDO> menuDOS = sysMenuService.listMenusFromCache(Collections.singletonList(1L),
+                Collections.singletonList(MenuTypeEnum.MENU.getType()), Collections.singletonList(1));
         Assert.isTrue(menuDOS.size() == idMenuMap.size());
-        menuDOS.stream().forEach(menu -> assertPojoEquals(idMenuMap.get(menu.getId()), menu));
+        menuDOS.forEach(menu -> assertPojoEquals(idMenuMap.get(menu.getId()), menu));
     }
 
     @Test
@@ -354,14 +352,13 @@ public class SysMenuServiceTest extends BaseDbUnitTest {
     }
 
     private SysMenuDO createMenuDO(Long id, MenuTypeEnum typeEnum, String menuName, Long parentId, Integer status) {
-        SysMenuDO sonMenuDO = RandomUtils.randomPojo(SysMenuDO.class, o -> {
+        return RandomUtils.randomPojo(SysMenuDO.class, o -> {
             o.setId(id);
             o.setParentId(parentId);
             o.setType(typeEnum.getType());
             o.setStatus(status);
             o.setName(menuName);
         });
-        return sonMenuDO;
     }
 
 

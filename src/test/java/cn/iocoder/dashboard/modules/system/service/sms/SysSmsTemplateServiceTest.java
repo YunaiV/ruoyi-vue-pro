@@ -3,10 +3,7 @@ package cn.iocoder.dashboard.modules.system.service.sms;
 import cn.iocoder.dashboard.BaseDbUnitTest;
 import cn.iocoder.dashboard.common.enums.CommonStatusEnum;
 import cn.iocoder.dashboard.common.pojo.PageResult;
-import cn.iocoder.dashboard.modules.system.controller.sms.vo.template.SysSmsTemplateCreateReqVO;
-import cn.iocoder.dashboard.modules.system.controller.sms.vo.template.SysSmsTemplateExportReqVO;
-import cn.iocoder.dashboard.modules.system.controller.sms.vo.template.SysSmsTemplatePageReqVO;
-import cn.iocoder.dashboard.modules.system.controller.sms.vo.template.SysSmsTemplateUpdateReqVO;
+import cn.iocoder.dashboard.modules.system.controller.sms.vo.template.*;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.sms.SysSmsChannelDO;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.sms.SysSmsTemplateDO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.sms.SysSmsTemplateMapper;
@@ -24,11 +21,11 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import static cn.hutool.core.util.RandomUtil.randomEle;
-import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.SMS_TEMPLATE_NOT_EXISTS;
+import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.*;
 import static cn.iocoder.dashboard.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.dashboard.util.AssertUtils.assertServiceException;
-import static cn.iocoder.dashboard.util.RandomUtils.randomLongId;
-import static cn.iocoder.dashboard.util.RandomUtils.randomPojo;
+import static cn.iocoder.dashboard.util.RandomUtils.*;
+import static cn.iocoder.dashboard.util.date.DateUtils.buildTime;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
@@ -91,18 +88,29 @@ public class SysSmsTemplateServiceTest extends BaseDbUnitTest {
     @Test
     public void testUpdateSmsTemplate_success() {
         // mock 数据
-        SysSmsTemplateDO dbSmsTemplate = randomPojo(SysSmsTemplateDO.class);
+        SysSmsTemplateDO dbSmsTemplate = randomSmsTemplateDO();
         smsTemplateMapper.insert(dbSmsTemplate);// @Sql: 先插入出一条存在的数据
         // 准备参数
         SysSmsTemplateUpdateReqVO reqVO = randomPojo(SysSmsTemplateUpdateReqVO.class, o -> {
             o.setId(dbSmsTemplate.getId()); // 设置更新的 ID
+            o.setContent("正在进行登录操作{operation}，您的验证码是{code}");
+            o.setStatus(randomEle(CommonStatusEnum.values()).getStatus()); // 保证 status 的范围
+            o.setType(randomEle(SysSmsTemplateTypeEnum.values()).getType()); // 保证 type 的泛微
         });
+        // mock 方法
+        SysSmsChannelDO channelDO = randomPojo(SysSmsChannelDO.class, o -> {
+            o.setId(reqVO.getChannelId());
+            o.setStatus(CommonStatusEnum.ENABLE.getStatus()); // 保证 status 开启，创建必须处于这个状态
+        });
+        when(smsChannelService.getSmsChannel(eq(channelDO.getId()))).thenReturn(channelDO);
 
         // 调用
         smsTemplateService.updateSmsTemplate(reqVO);
         // 校验是否更新正确
         SysSmsTemplateDO smsTemplate = smsTemplateMapper.selectById(reqVO.getId()); // 获取最新的
         assertPojoEquals(reqVO, smsTemplate);
+        assertEquals(Lists.newArrayList("operation", "code"), smsTemplate.getParams());
+        assertEquals(channelDO.getCode(), smsTemplate.getChannelCode());
     }
 
     @Test
@@ -137,43 +145,43 @@ public class SysSmsTemplateServiceTest extends BaseDbUnitTest {
         assertServiceException(() -> smsTemplateService.deleteSmsTemplate(id), SMS_TEMPLATE_NOT_EXISTS);
     }
 
-    @Test // TODO 请修改 null 为需要的值
+    @Test
     public void testGetSmsTemplatePage() {
        // mock 数据
        SysSmsTemplateDO dbSmsTemplate = randomPojo(SysSmsTemplateDO.class, o -> { // 等会查询到
-           o.setType(null);
-           o.setStatus(null);
-           o.setCode(null);
-           o.setContent(null);
-           o.setApiTemplateId(null);
-           o.setChannelId(null);
-           o.setCreateTime(null);
+           o.setType(SysSmsTemplateTypeEnum.PROMOTION.getType());
+           o.setStatus(CommonStatusEnum.ENABLE.getStatus());
+           o.setCode("yudaoyuanma");
+           o.setContent("芋道源码");
+           o.setApiTemplateId("yunai");
+           o.setChannelId(1L);
+           o.setCreateTime(buildTime(2021, 11, 11));
        });
        smsTemplateMapper.insert(dbSmsTemplate);
        // 测试 type 不匹配
-       smsTemplateMapper.insert(ObjectUtils.clone(dbSmsTemplate, o -> o.setType(null)));
+       smsTemplateMapper.insert(ObjectUtils.clone(dbSmsTemplate, o -> o.setType(SysSmsTemplateTypeEnum.VERIFICATION_CODE.getType())));
        // 测试 status 不匹配
-       smsTemplateMapper.insert(ObjectUtils.clone(dbSmsTemplate, o -> o.setStatus(null)));
+       smsTemplateMapper.insert(ObjectUtils.clone(dbSmsTemplate, o -> o.setStatus(CommonStatusEnum.DISABLE.getStatus())));
        // 测试 code 不匹配
-       smsTemplateMapper.insert(ObjectUtils.clone(dbSmsTemplate, o -> o.setCode(null)));
+       smsTemplateMapper.insert(ObjectUtils.clone(dbSmsTemplate, o -> o.setCode("yuanma")));
        // 测试 content 不匹配
-       smsTemplateMapper.insert(ObjectUtils.clone(dbSmsTemplate, o -> o.setContent(null)));
+       smsTemplateMapper.insert(ObjectUtils.clone(dbSmsTemplate, o -> o.setContent("源码")));
        // 测试 apiTemplateId 不匹配
-       smsTemplateMapper.insert(ObjectUtils.clone(dbSmsTemplate, o -> o.setApiTemplateId(null)));
+       smsTemplateMapper.insert(ObjectUtils.clone(dbSmsTemplate, o -> o.setApiTemplateId("nai")));
        // 测试 channelId 不匹配
-       smsTemplateMapper.insert(ObjectUtils.clone(dbSmsTemplate, o -> o.setChannelId(null)));
+       smsTemplateMapper.insert(ObjectUtils.clone(dbSmsTemplate, o -> o.setChannelId(2L)));
        // 测试 createTime 不匹配
-       smsTemplateMapper.insert(ObjectUtils.clone(dbSmsTemplate, o -> o.setCreateTime(null)));
+       smsTemplateMapper.insert(ObjectUtils.clone(dbSmsTemplate, o -> o.setCreateTime(buildTime(2021, 12, 12))));
        // 准备参数
        SysSmsTemplatePageReqVO reqVO = new SysSmsTemplatePageReqVO();
-       reqVO.setType(null);
-       reqVO.setStatus(null);
-       reqVO.setCode(null);
-       reqVO.setContent(null);
-       reqVO.setApiTemplateId(null);
-       reqVO.setChannelId(null);
-       reqVO.setBeginCreateTime(null);
-       reqVO.setEndCreateTime(null);
+       reqVO.setType(SysSmsTemplateTypeEnum.PROMOTION.getType());
+       reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
+       reqVO.setCode("yudao");
+       reqVO.setContent("芋道");
+       reqVO.setApiTemplateId("yu");
+       reqVO.setChannelId(1L);
+       reqVO.setBeginCreateTime(buildTime(2021, 11, 1));
+       reqVO.setEndCreateTime(buildTime(2021, 12, 1));
 
        // 调用
        PageResult<SysSmsTemplateDO> pageResult = smsTemplateService.getSmsTemplatePage(reqVO);
@@ -183,43 +191,43 @@ public class SysSmsTemplateServiceTest extends BaseDbUnitTest {
        assertPojoEquals(dbSmsTemplate, pageResult.getList().get(0));
     }
 
-    @Test // TODO 请修改 null 为需要的值
+    @Test
     public void testGetSmsTemplateList() {
-       // mock 数据
-       SysSmsTemplateDO dbSmsTemplate = randomPojo(SysSmsTemplateDO.class, o -> { // 等会查询到
-           o.setType(null);
-           o.setStatus(null);
-           o.setCode(null);
-           o.setContent(null);
-           o.setApiTemplateId(null);
-           o.setChannelId(null);
-           o.setCreateTime(null);
-       });
-       smsTemplateMapper.insert(dbSmsTemplate);
-       // 测试 type 不匹配
-       smsTemplateMapper.insert(ObjectUtils.clone(dbSmsTemplate, o -> o.setType(null)));
-       // 测试 status 不匹配
-       smsTemplateMapper.insert(ObjectUtils.clone(dbSmsTemplate, o -> o.setStatus(null)));
-       // 测试 code 不匹配
-       smsTemplateMapper.insert(ObjectUtils.clone(dbSmsTemplate, o -> o.setCode(null)));
-       // 测试 content 不匹配
-       smsTemplateMapper.insert(ObjectUtils.clone(dbSmsTemplate, o -> o.setContent(null)));
-       // 测试 apiTemplateId 不匹配
-       smsTemplateMapper.insert(ObjectUtils.clone(dbSmsTemplate, o -> o.setApiTemplateId(null)));
-       // 测试 channelId 不匹配
-       smsTemplateMapper.insert(ObjectUtils.clone(dbSmsTemplate, o -> o.setChannelId(null)));
-       // 测试 createTime 不匹配
-       smsTemplateMapper.insert(ObjectUtils.clone(dbSmsTemplate, o -> o.setCreateTime(null)));
-       // 准备参数
-       SysSmsTemplateExportReqVO reqVO = new SysSmsTemplateExportReqVO();
-       reqVO.setType(null);
-       reqVO.setStatus(null);
-       reqVO.setCode(null);
-       reqVO.setContent(null);
-       reqVO.setApiTemplateId(null);
-       reqVO.setChannelId(null);
-       reqVO.setBeginCreateTime(null);
-       reqVO.setEndCreateTime(null);
+        // mock 数据
+        SysSmsTemplateDO dbSmsTemplate = randomPojo(SysSmsTemplateDO.class, o -> { // 等会查询到
+            o.setType(SysSmsTemplateTypeEnum.PROMOTION.getType());
+            o.setStatus(CommonStatusEnum.ENABLE.getStatus());
+            o.setCode("yudaoyuanma");
+            o.setContent("芋道源码");
+            o.setApiTemplateId("yunai");
+            o.setChannelId(1L);
+            o.setCreateTime(buildTime(2021, 11, 11));
+        });
+        smsTemplateMapper.insert(dbSmsTemplate);
+        // 测试 type 不匹配
+        smsTemplateMapper.insert(ObjectUtils.clone(dbSmsTemplate, o -> o.setType(SysSmsTemplateTypeEnum.VERIFICATION_CODE.getType())));
+        // 测试 status 不匹配
+        smsTemplateMapper.insert(ObjectUtils.clone(dbSmsTemplate, o -> o.setStatus(CommonStatusEnum.DISABLE.getStatus())));
+        // 测试 code 不匹配
+        smsTemplateMapper.insert(ObjectUtils.clone(dbSmsTemplate, o -> o.setCode("yuanma")));
+        // 测试 content 不匹配
+        smsTemplateMapper.insert(ObjectUtils.clone(dbSmsTemplate, o -> o.setContent("源码")));
+        // 测试 apiTemplateId 不匹配
+        smsTemplateMapper.insert(ObjectUtils.clone(dbSmsTemplate, o -> o.setApiTemplateId("nai")));
+        // 测试 channelId 不匹配
+        smsTemplateMapper.insert(ObjectUtils.clone(dbSmsTemplate, o -> o.setChannelId(2L)));
+        // 测试 createTime 不匹配
+        smsTemplateMapper.insert(ObjectUtils.clone(dbSmsTemplate, o -> o.setCreateTime(buildTime(2021, 12, 12))));
+        // 准备参数
+        SysSmsTemplateExportReqVO reqVO = new SysSmsTemplateExportReqVO();
+        reqVO.setType(SysSmsTemplateTypeEnum.PROMOTION.getType());
+        reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
+        reqVO.setCode("yudao");
+        reqVO.setContent("芋道");
+        reqVO.setApiTemplateId("yu");
+        reqVO.setChannelId(1L);
+        reqVO.setBeginCreateTime(buildTime(2021, 11, 1));
+        reqVO.setEndCreateTime(buildTime(2021, 12, 1));
 
        // 调用
        List<SysSmsTemplateDO> list = smsTemplateService.getSmsTemplateList(reqVO);
@@ -227,6 +235,82 @@ public class SysSmsTemplateServiceTest extends BaseDbUnitTest {
        assertEquals(1, list.size());
        assertPojoEquals(dbSmsTemplate, list.get(0));
     }
+
+    @Test
+    public void testCheckSmsChannel_success() {
+        // 准备参数
+        Long channelId = randomLongId();
+        // mock 方法
+        SysSmsChannelDO channelDO = randomPojo(SysSmsChannelDO.class, o -> {
+            o.setId(channelId);
+            o.setStatus(CommonStatusEnum.ENABLE.getStatus()); // 保证 status 开启，创建必须处于这个状态
+        });
+        when(smsChannelService.getSmsChannel(eq(channelId))).thenReturn(channelDO);
+
+        // 调用
+        SysSmsChannelDO returnChannelDO = smsTemplateService.checkSmsChannel(channelId);
+        // 断言
+        assertPojoEquals(returnChannelDO, channelDO);
+    }
+
+    @Test
+    public void testCheckSmsChannel_notExists() {
+        // 准备参数
+        Long channelId = randomLongId();
+
+        // 调用，校验异常
+        assertServiceException(() -> smsTemplateService.checkSmsChannel(channelId),
+                SMS_CHANNEL_NOT_EXISTS);
+    }
+
+    @Test
+    public void testCheckSmsChannel_disable() {
+        // 准备参数
+        Long channelId = randomLongId();
+        // mock 方法
+        SysSmsChannelDO channelDO = randomPojo(SysSmsChannelDO.class, o -> {
+            o.setId(channelId);
+            o.setStatus(CommonStatusEnum.DISABLE.getStatus()); // 保证 status 禁用，触发失败
+        });
+        when(smsChannelService.getSmsChannel(eq(channelId))).thenReturn(channelDO);
+
+        // 调用，校验异常
+        assertServiceException(() -> smsTemplateService.checkSmsChannel(channelId),
+                SMS_CHANNEL_DISABLE);
+    }
+
+    @Test
+    public void testCheckDictDataValueUnique_success() {
+        // 调用，成功
+        smsTemplateService.checkSmsTemplateCodeDuplicate(randomLongId(), randomString());
+    }
+
+    @Test
+    public void testCheckDictDataValueUnique_valueDuplicateForCreate() {
+        // 准备参数
+        String code = randomString();
+        // mock 数据
+        smsTemplateMapper.insert(randomSmsTemplateDO(o -> o.setCode(code)));
+
+        // 调用，校验异常
+        assertServiceException(() -> smsTemplateService.checkSmsTemplateCodeDuplicate(null, code),
+                SMS_TEMPLATE_CODE_DUPLICATE);
+    }
+
+    @Test
+    public void testCheckDictDataValueUnique_valueDuplicateForUpdate() {
+        // 准备参数
+        Long id = randomLongId();
+        String code = randomString();
+        // mock 数据
+        smsTemplateMapper.insert(randomSmsTemplateDO(o -> o.setCode(code)));
+
+        // 调用，校验异常
+        assertServiceException(() -> smsTemplateService.checkSmsTemplateCodeDuplicate(id, code),
+                SMS_TEMPLATE_CODE_DUPLICATE);
+    }
+
+    // ========== 随机对象 ==========
 
     @SafeVarargs
     private static SysSmsTemplateDO randomSmsTemplateDO(Consumer<SysSmsTemplateDO>... consumers) {
