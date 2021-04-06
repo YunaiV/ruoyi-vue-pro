@@ -12,8 +12,8 @@ import javax.validation.constraints.NotNull;
 @Data
 public class SysSmsTemplateBaseVO {
 
-    @ApiModelProperty(value = "短信签名", required = true, example = "1", notes = "参见 SysSmsTemplateTypeEnum 枚举类")
-    @NotNull(message = "短信签名不能为空")
+    @ApiModelProperty(value = "短信类型", required = true, example = "1", notes = "参见 SysSmsTemplateTypeEnum 枚举类")
+    @NotNull(message = "短信类型不能为空")
     private Integer type;
 
     @ApiModelProperty(value = "开启状态", required = true, example = "1", notes = "参见 CommonStatusEnum 枚举类")
