@@ -101,9 +101,11 @@ public class ToolCodegenServiceImpl implements ToolCodegenService {
 
     @Override
     public Long createCodegen(String tableName) {
+        //获取当前schema
+        String tableSchema = codegenProperties.getDbSchemas().iterator().next();
         // 从数据库中，获得数据库表结构
-        ToolSchemaTableDO schemaTable = schemaTableMapper.selectByTableName(tableName);
-        List<ToolSchemaColumnDO> schemaColumns = schemaColumnMapper.selectListByTableName(tableName);
+        ToolSchemaTableDO schemaTable = schemaTableMapper.selectByTableName1(tableSchema,tableName);
+        List<ToolSchemaColumnDO> schemaColumns = schemaColumnMapper.selectListByTableName(tableSchema,tableName);
         // 导入
         return this.createCodegen0(ToolCodegenImportTypeEnum.DB, schemaTable, schemaColumns);
     }
@@ -141,8 +143,9 @@ public class ToolCodegenServiceImpl implements ToolCodegenService {
         if (table == null) {
             throw exception(CODEGEN_TABLE_NOT_EXISTS);
         }
+        String tableSchema = codegenProperties.getDbSchemas().iterator().next();
         // 从数据库中，获得数据库表结构
-        List<ToolSchemaColumnDO> schemaColumns = schemaColumnMapper.selectListByTableName(table.getTableName());
+        List<ToolSchemaColumnDO> schemaColumns = schemaColumnMapper.selectListByTableName(tableSchema,table.getTableName());
 
         // 执行同步
         this.syncCodegen0(tableId, schemaColumns);

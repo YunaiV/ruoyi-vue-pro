@@ -22,8 +22,9 @@ public interface ToolSchemaTableMapper extends BaseMapperX<ToolSchemaTableDO> {
         return selectList(new QueryWrapper<ToolSchemaTableDO>().eq("table_schema", tableSchema));
     }
 
-    default ToolSchemaTableDO selectByTableName(String tableName) {
-        return selectOne(new QueryWrapper<ToolSchemaTableDO>().eq("table_name", tableName));
+    default ToolSchemaTableDO selectByTableName1(String tableSchema,String tableName) {
+        return selectOne(new QueryWrapper<ToolSchemaTableDO>().eq("table_schema",tableSchema)
+                        .eq("table_name", tableName));
     }
 
 }
