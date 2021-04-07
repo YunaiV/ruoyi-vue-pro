@@ -232,7 +232,7 @@ public class SysUserServiceImpl implements SysUserService {
     }
 
     private void checkUsernameUnique(Long id, String username) {
-        if (StrUtil.isNotBlank(username)) {
+        if (StrUtil.isBlank(username)) {
             return;
         }
         SysUserDO user = userMapper.selectByUsername(username);
@@ -249,7 +249,7 @@ public class SysUserServiceImpl implements SysUserService {
     }
 
     private void checkEmailUnique(Long id, String email) {
-        if (StrUtil.isNotBlank(email)) {
+        if (StrUtil.isBlank(email)) {
             return;
         }
         SysUserDO user = userMapper.selectByEmail(email);
@@ -265,11 +265,11 @@ public class SysUserServiceImpl implements SysUserService {
         }
     }
 
-    private void checkMobileUnique(Long id, String email) {
-        if (StrUtil.isNotBlank(email)) {
+    private void checkMobileUnique(Long id, String mobile) {
+        if (StrUtil.isBlank(mobile)) {
             return;
         }
-        SysUserDO user = userMapper.selectByMobile(email);
+        SysUserDO user = userMapper.selectByMobile(mobile);
         if (user == null) {
             return;
         }
