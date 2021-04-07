@@ -3,8 +3,10 @@ package cn.iocoder.dashboard.framework.sms.core.client.impl.yunpian;
 import cn.iocoder.dashboard.common.core.KeyValue;
 import cn.iocoder.dashboard.framework.sms.core.client.SmsCommonResult;
 import cn.iocoder.dashboard.framework.sms.core.client.dto.SmsSendRespDTO;
+import cn.iocoder.dashboard.framework.sms.core.client.dto.SmsTemplateRespDTO;
 import cn.iocoder.dashboard.framework.sms.core.enums.SmsChannelEnum;
 import cn.iocoder.dashboard.framework.sms.core.property.SmsChannelProperties;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -15,8 +17,10 @@ import java.util.List;
  */
 public class YunpianSmsClientIntegrationTest {
 
-    @Test
-    public void testSend() {
+    private static YunpianSmsClient smsClient;
+
+    @BeforeAll
+    public static void init() {
         // 创建配置类
         SmsChannelProperties properties = new SmsChannelProperties();
         properties.setId(1L);
@@ -24,14 +28,24 @@ public class YunpianSmsClientIntegrationTest {
         properties.setCode(SmsChannelEnum.YUN_PIAN.getCode());
         properties.setApiKey("1555a14277cb8a608cf45a9e6a80d510");
         // 创建客户端
-        YunpianSmsClient smsClient = new YunpianSmsClient(properties);
+        smsClient = new YunpianSmsClient(properties);
         smsClient.init();
-        // 发送短信
+    }
+
+    @Test
+    public void testSendSms() {
         List<KeyValue<String, Object>> templateParams = new ArrayList<>();
         templateParams.add(new KeyValue<>("code", "1024"));
         templateParams.add(new KeyValue<>("operation", "嘿嘿"));
 //        SmsResult result = smsClient.send(1L, "15601691399", "4372216", templateParams);
         SmsCommonResult<SmsSendRespDTO> result = smsClient.sendSms(1L, "15601691399", "4383920", templateParams);
+        System.out.println(result);
+    }
+
+    @Test
+    public void testGetSmsTemplate() {
+        String apiTemplateId = "4383920";
+        SmsCommonResult<SmsTemplateRespDTO> result = smsClient.getSmsTemplate(apiTemplateId);
         System.out.println(result);
     }
 

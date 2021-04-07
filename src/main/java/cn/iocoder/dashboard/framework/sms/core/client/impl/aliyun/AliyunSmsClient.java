@@ -124,7 +124,7 @@ public class AliyunSmsClient extends AbstractSmsClient {
         }
     }
 
-    private <T extends AcsResponse, R> SmsCommonResult<R> invoke(AcsRequest<T> request, Function<T, R> consumer) {
+    private <T extends AcsResponse, R> SmsCommonResult<R> invoke(AcsRequest<T> request, Function<T, R> responseConsumer) {
         try {
             // 执行发送. 由于阿里云 sms 短信没有统一的 Response，但是有统一的 code、message、requestId 属性，所以只好反射
             T sendResult = acsClient.getAcsResponse(request);
@@ -134,7 +134,7 @@ public class AliyunSmsClient extends AbstractSmsClient {
             // 解析结果
             R data = null;
             if (Objects.equals(code, "OK")) { // 请求成功的情况下
-                data = consumer.apply(sendResult);
+                data = responseConsumer.apply(sendResult);
             }
             // 拼接结果
             return SmsCommonResult.build(code, message, requestId, data, codeMapping);

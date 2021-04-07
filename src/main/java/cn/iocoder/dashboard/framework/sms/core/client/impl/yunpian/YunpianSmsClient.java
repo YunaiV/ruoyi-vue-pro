@@ -10,6 +10,7 @@ import cn.iocoder.dashboard.framework.sms.core.client.dto.SmsReceiveRespDTO;
 import cn.iocoder.dashboard.framework.sms.core.client.dto.SmsSendRespDTO;
 import cn.iocoder.dashboard.framework.sms.core.client.dto.SmsTemplateRespDTO;
 import cn.iocoder.dashboard.framework.sms.core.client.impl.AbstractSmsClient;
+import cn.iocoder.dashboard.framework.sms.core.enums.SmsTemplateAuditStatusEnum;
 import cn.iocoder.dashboard.framework.sms.core.property.SmsChannelProperties;
 import cn.iocoder.dashboard.util.json.JsonUtils;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -17,11 +18,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.yunpian.sdk.YunpianClient;
 import com.yunpian.sdk.constant.YunpianConstant;
 import com.yunpian.sdk.model.Result;
-import com.yunpian.sdk.model.SmsSingleSend;
+import com.yunpian.sdk.model.Template;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.*;
+import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static cn.iocoder.dashboard.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
@@ -62,27 +65,15 @@ public class YunpianSmsClient extends AbstractSmsClient {
     @Override
     protected SmsCommonResult<SmsSendRespDTO> doSendSms(Long sendLogId, String mobile,
                                                         String apiTemplateId, List<KeyValue<String, Object>> templateParams) throws Throwable {
-        // 构建参数
-        Map<String, String> request = new HashMap<>();
-        request.put(YunpianConstant.APIKEY, properties.getApiKey());
-        request.put(YunpianConstant.MOBILE, mobile);
-        request.put(YunpianConstant.TPL_ID, apiTemplateId);
-        request.put(YunpianConstant.TPL_VALUE, formatTplValue(templateParams));
-        request.put(YunpianConstant.UID, String.valueOf(sendLogId));
-        request.put(YunpianConstant.CALLBACK_URL, properties.getCallbackUrl());
-
-        // 执行发送
-        Result<SmsSingleSend> sendResult = client.sms().tpl_single_send(request);
-        if (sendResult.getThrowable() != null) {
-            throw sendResult.getThrowable();
-        }
-        // 解析结果
-        SmsSendRespDTO data = null;
-        if (sendResult.getData() != null) {
-            data = new SmsSendRespDTO().setSerialNo(String.valueOf(sendResult.getData().getSid()));
-        }
-        return SmsCommonResult.build(String.valueOf(sendResult.getCode()), formatResultMsg(sendResult), null,
-                data, codeMapping);
+        return invoke(() -> {
+            Map<String, String> request = new HashMap<>();
+            request.put(YunpianConstant.MOBILE, mobile);
+            request.put(YunpianConstant.TPL_ID, apiTemplateId);
+            request.put(YunpianConstant.TPL_VALUE, formatTplValue(templateParams));
+            request.put(YunpianConstant.UID, String.valueOf(sendLogId));
+            request.put(YunpianConstant.CALLBACK_URL, properties.getCallbackUrl());
+            return client.sms().tpl_single_send(request);
+        }, response -> new SmsSendRespDTO().setSerialNo(String.valueOf(response.getSid())));
     }
 
     private static String formatTplValue(List<KeyValue<String, Object>> templateParams) {
@@ -93,13 +84,6 @@ public class YunpianSmsClient extends AbstractSmsClient {
         StringJoiner joiner = new StringJoiner("&");
         templateParams.forEach(param -> joiner.add(String.format("#%s#=%s", param.getKey(), URLUtil.encode(String.valueOf(param.getValue())))));
         return joiner.toString();
-    }
-
-    private static String formatResultMsg(Result<SmsSingleSend> sendResult) {
-        if (StrUtil.isEmpty(sendResult.getDetail())) {
-            return sendResult.getMsg();
-        }
-        return sendResult.getMsg() + " => " + sendResult.getDetail();
     }
 
     @Override
@@ -117,7 +101,47 @@ public class YunpianSmsClient extends AbstractSmsClient {
 
     @Override
     protected SmsCommonResult<SmsTemplateRespDTO> doGetSmsTemplate(String apiTemplateId) throws Throwable {
-        return null;
+        return invoke(() -> {
+            Map<String, String> request = new HashMap<>();
+            request.put(YunpianConstant.APIKEY, properties.getApiKey());
+            request.put(YunpianConstant.TPL_ID, apiTemplateId);
+            return client.tpl().get(request);
+        }, response -> {
+            Template template = response.get(0);
+            return new SmsTemplateRespDTO().setId(String.valueOf(template.getTpl_id())).setContent(template.getTpl_content())
+                   .setAuditStatus(convertSmsTemplateAuditStatus(template.getCheck_status())).setAuditReason(template.getReason());
+        });
+    }
+
+    private Integer convertSmsTemplateAuditStatus(String checkStatus) {
+        switch (checkStatus) {
+            case "CHECKING": return SmsTemplateAuditStatusEnum.CHECKING.getStatus();
+            case "SUCCESS": return SmsTemplateAuditStatusEnum.SUCCESS.getStatus();
+            case "FAIL": return SmsTemplateAuditStatusEnum.FAIL.getStatus();
+            default: throw new IllegalArgumentException(String.format("未知审核状态(%s)", checkStatus));
+        }
+    }
+
+    private <T, R> SmsCommonResult<R> invoke(Supplier<Result<T>> requestConsumer, Function<T, R> responseConsumer) throws Throwable {
+        // 执行请求
+        Result<T> result = requestConsumer.get();
+        if (result.getThrowable() != null) {
+            throw result.getThrowable();
+        }
+        // 解析结果
+        R data = null;
+        if (result.getData() != null) {
+            data = responseConsumer.apply(result.getData());
+        }
+        // 拼接结果
+        return SmsCommonResult.build(String.valueOf(result.getCode()), formatResultMsg(result), null, data, codeMapping);
+    }
+
+    private static String formatResultMsg(Result<?> sendResult) {
+        if (StrUtil.isEmpty(sendResult.getDetail())) {
+            return sendResult.getMsg();
+        }
+        return sendResult.getMsg() + " => " + sendResult.getDetail();
     }
 
     /**
