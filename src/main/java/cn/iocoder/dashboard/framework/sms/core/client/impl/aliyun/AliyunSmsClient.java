@@ -1,21 +1,25 @@
 package cn.iocoder.dashboard.framework.sms.core.client.impl.aliyun;
 
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.dashboard.common.core.KeyValue;
 import cn.iocoder.dashboard.framework.sms.core.client.SmsCommonResult;
 import cn.iocoder.dashboard.framework.sms.core.client.dto.SmsReceiveRespDTO;
 import cn.iocoder.dashboard.framework.sms.core.client.dto.SmsSendRespDTO;
+import cn.iocoder.dashboard.framework.sms.core.client.dto.SmsTemplateRespDTO;
 import cn.iocoder.dashboard.framework.sms.core.client.impl.AbstractSmsClient;
+import cn.iocoder.dashboard.framework.sms.core.enums.SmsTemplateAuditStatusEnum;
 import cn.iocoder.dashboard.framework.sms.core.property.SmsChannelProperties;
 import cn.iocoder.dashboard.util.collection.MapUtils;
 import cn.iocoder.dashboard.util.json.JsonUtils;
+import com.aliyuncs.AcsRequest;
+import com.aliyuncs.AcsResponse;
 import com.aliyuncs.DefaultAcsClient;
 import com.aliyuncs.IAcsClient;
+import com.aliyuncs.dysmsapi.model.v20170525.QuerySmsTemplateRequest;
 import com.aliyuncs.dysmsapi.model.v20170525.SendSmsRequest;
-import com.aliyuncs.dysmsapi.model.v20170525.SendSmsResponse;
 import com.aliyuncs.exceptions.ClientException;
-import com.aliyuncs.http.MethodType;
 import com.aliyuncs.profile.DefaultProfile;
 import com.aliyuncs.profile.IClientProfile;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -25,6 +29,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static cn.iocoder.dashboard.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
@@ -66,25 +72,13 @@ public class AliyunSmsClient extends AbstractSmsClient {
                                                         String apiTemplateId, List<KeyValue<String, Object>> templateParams) {
         // 构建参数
         SendSmsRequest request = new SendSmsRequest();
-        request.setSysMethod(MethodType.POST);
         request.setPhoneNumbers(mobile);
         request.setSignName(properties.getSignature());
         request.setTemplateCode(apiTemplateId);
         request.setTemplateParam(JsonUtils.toJsonString(MapUtils.convertMap(templateParams)));
         request.setOutId(String.valueOf(sendLogId));
-
-        try {
-            // 执行发送
-            SendSmsResponse sendResult = acsClient.getAcsResponse(request);
-            // 解析结果
-            SmsSendRespDTO data = null;
-            if (sendResult.getBizId() != null) {
-                data = new SmsSendRespDTO().setSerialNo(sendResult.getBizId());
-            }
-            return SmsCommonResult.build(sendResult.getCode(), sendResult.getMessage(), sendResult.getRequestId(), data, codeMapping);
-        } catch (ClientException ex) {
-            return SmsCommonResult.build(ex.getErrCode(), formatResultMsg(ex), ex.getRequestId(), null, codeMapping);
-        }
+        // 执行请求
+        return invoke(request, response -> new SmsSendRespDTO().setSerialNo(response.getBizId()));
     }
 
     private static String formatResultMsg(ClientException ex) {
@@ -105,6 +99,48 @@ public class AliyunSmsClient extends AbstractSmsClient {
             resp.setSerialNo(status.getBizId()).setLogId(Long.valueOf(status.getOutId()));
             return resp;
         }).collect(Collectors.toList());
+    }
+
+    @Override
+    protected SmsCommonResult<SmsTemplateRespDTO> doGetSmsTemplate(String apiTemplateId) {
+        // 构建参数
+        QuerySmsTemplateRequest request = new QuerySmsTemplateRequest();
+        request.setTemplateCode(apiTemplateId);
+        // 执行请求
+        return invoke(request, response -> {
+            SmsTemplateRespDTO data = new SmsTemplateRespDTO();
+            data.setId(response.getTemplateCode()).setContent(response.getTemplateContent());
+            data.setAuditStatus(convertSmsTemplateAuditStatus(response.getTemplateStatus())).setAuditReason(response.getReason());
+            return data;
+        });
+    }
+
+    private Integer convertSmsTemplateAuditStatus(Integer templateStatus) {
+        switch (templateStatus) {
+            case 0: return SmsTemplateAuditStatusEnum.CHECKING.getStatus();
+            case 1: return SmsTemplateAuditStatusEnum.SUCCESS.getStatus();
+            case 2: return SmsTemplateAuditStatusEnum.FAIL.getStatus();
+            default: throw new IllegalArgumentException(String.format("未知审核状态(%d)", templateStatus));
+        }
+    }
+
+    private <T extends AcsResponse, R> SmsCommonResult<R> invoke(AcsRequest<T> request, Function<T, R> consumer) {
+        try {
+            // 执行发送. 由于阿里云 sms 短信没有统一的 Response，但是有统一的 code、message、requestId 属性，所以只好反射
+            T sendResult = acsClient.getAcsResponse(request);
+            String code = (String) ReflectUtil.getFieldValue(sendResult, "code");
+            String message = (String) ReflectUtil.getFieldValue(sendResult, "message");
+            String requestId = (String) ReflectUtil.getFieldValue(sendResult, "requestId");
+            // 解析结果
+            R data = null;
+            if (Objects.equals(code, "OK")) { // 请求成功的情况下
+                data = consumer.apply(sendResult);
+            }
+            // 拼接结果
+            return SmsCommonResult.build(code, message, requestId, data, codeMapping);
+        } catch (ClientException ex) {
+            return SmsCommonResult.build(ex.getErrCode(), formatResultMsg(ex), ex.getRequestId(), null, codeMapping);
+        }
     }
 
     /**

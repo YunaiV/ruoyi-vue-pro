@@ -21,6 +21,7 @@ public class AliyunSmsCodeMapping implements SmsCodeMapping {
             case "isp.RAM_PERMISSION_DENY": return SMS_CHANNEL_PERMISSION_DENY;
             case "isv.INVALID_PARAMETERS": return SMS_API_PARAM_ERROR;
             case "isv.BUSINESS_LIMIT_CONTROL": return SMS_SEND_LIMIT_CONTROL;
+            case "isv.SMS_TEMPLATE_ILLEGAL": return SMS_TEMPLATE_NOT_EXISTS;
         }
         return SMS_UNKNOWN;
     }

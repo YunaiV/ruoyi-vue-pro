@@ -3,6 +3,7 @@ package cn.iocoder.dashboard.framework.sms.core.client;
 import cn.iocoder.dashboard.common.core.KeyValue;
 import cn.iocoder.dashboard.framework.sms.core.client.dto.SmsReceiveRespDTO;
 import cn.iocoder.dashboard.framework.sms.core.client.dto.SmsSendRespDTO;
+import cn.iocoder.dashboard.framework.sms.core.client.dto.SmsTemplateRespDTO;
 
 import java.util.List;
 
@@ -40,5 +41,13 @@ public interface SmsClient {
      * @throws Throwable 当解析 text 发生异常时，则会抛出异常
      */
     List<SmsReceiveRespDTO> parseSmsReceiveStatus(String text) throws Throwable;
+
+    /**
+     * 查询指定的短信模板
+     *
+     * @param apiTemplateId 短信 API 的模板编号
+     * @return 短信模板
+     */
+    SmsCommonResult<SmsTemplateRespDTO> getSmsTemplate(String apiTemplateId);
 
 }

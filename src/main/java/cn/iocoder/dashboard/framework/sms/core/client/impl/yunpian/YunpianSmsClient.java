@@ -8,6 +8,7 @@ import cn.iocoder.dashboard.common.core.KeyValue;
 import cn.iocoder.dashboard.framework.sms.core.client.SmsCommonResult;
 import cn.iocoder.dashboard.framework.sms.core.client.dto.SmsReceiveRespDTO;
 import cn.iocoder.dashboard.framework.sms.core.client.dto.SmsSendRespDTO;
+import cn.iocoder.dashboard.framework.sms.core.client.dto.SmsTemplateRespDTO;
 import cn.iocoder.dashboard.framework.sms.core.client.impl.AbstractSmsClient;
 import cn.iocoder.dashboard.framework.sms.core.property.SmsChannelProperties;
 import cn.iocoder.dashboard.util.json.JsonUtils;
@@ -112,6 +113,11 @@ public class YunpianSmsClient extends AbstractSmsClient {
             resp.setSerialNo(String.valueOf(status.getSid())).setLogId(status.getUid());
             return resp;
         }).collect(Collectors.toList());
+    }
+
+    @Override
+    protected SmsCommonResult<SmsTemplateRespDTO> doGetSmsTemplate(String apiTemplateId) throws Throwable {
+        return null;
     }
 
     /**

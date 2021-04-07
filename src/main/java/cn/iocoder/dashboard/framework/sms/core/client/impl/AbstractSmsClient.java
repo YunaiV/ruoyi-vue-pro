@@ -6,6 +6,7 @@ import cn.iocoder.dashboard.framework.sms.core.client.SmsCodeMapping;
 import cn.iocoder.dashboard.framework.sms.core.client.SmsCommonResult;
 import cn.iocoder.dashboard.framework.sms.core.client.dto.SmsReceiveRespDTO;
 import cn.iocoder.dashboard.framework.sms.core.client.dto.SmsSendRespDTO;
+import cn.iocoder.dashboard.framework.sms.core.client.dto.SmsTemplateRespDTO;
 import cn.iocoder.dashboard.framework.sms.core.property.SmsChannelProperties;
 import lombok.extern.slf4j.Slf4j;
 
@@ -77,7 +78,7 @@ public abstract class AbstractSmsClient implements SmsClient {
             result = doSendSms(logId, mobile, apiTemplateId, templateParams);
         } catch (Throwable ex) {
             // 打印异常日志
-            log.error("[send][发送短信异常，sendLogId({}) mobile({}) apiTemplateId({}) templateParams({})]",
+            log.error("[sendSms][发送短信异常，sendLogId({}) mobile({}) apiTemplateId({}) templateParams({})]",
                     logId, mobile, apiTemplateId, templateParams, ex);
             // 封装返回
             return SmsCommonResult.error(ex);
@@ -100,5 +101,22 @@ public abstract class AbstractSmsClient implements SmsClient {
     }
 
     protected abstract List<SmsReceiveRespDTO> doParseSmsReceiveStatus(String text) throws Throwable;
+
+    @Override
+    public SmsCommonResult<SmsTemplateRespDTO> getSmsTemplate(String apiTemplateId) {
+        // 执行短信发送
+        SmsCommonResult<SmsTemplateRespDTO> result;
+        try {
+            result = doGetSmsTemplate(apiTemplateId);
+        } catch (Throwable ex) {
+            // 打印异常日志
+            log.error("[getSmsTemplate][获得短信模板({}) 发生异常]", apiTemplateId, ex);
+            // 封装返回
+            return SmsCommonResult.error(ex);
+        }
+        return result;
+    }
+
+    protected abstract SmsCommonResult<SmsTemplateRespDTO> doGetSmsTemplate(String apiTemplateId) throws Throwable;
 
 }
