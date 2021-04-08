@@ -7,6 +7,7 @@ import cn.iocoder.dashboard.modules.system.dal.dataobject.user.SysUserDO;
 import uk.co.jemos.podam.api.PodamFactory;
 import uk.co.jemos.podam.api.PodamFactoryImpl;
 
+import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Set;
@@ -80,6 +81,16 @@ public class RandomUtils {
     @SafeVarargs
     public static <T> T randomPojo(Class<T> clazz, Consumer<T>... consumers) {
         T pojo = PODAM_FACTORY.manufacturePojo(clazz);
+        // 非空时，回调逻辑。通过它，可以实现 Pojo 的进一步处理
+        if (ArrayUtil.isNotEmpty(consumers)) {
+            Arrays.stream(consumers).forEach(consumer -> consumer.accept(pojo));
+        }
+        return pojo;
+    }
+
+    @SafeVarargs
+    public static <T> T randomPojo(Class<T> clazz, Type type, Consumer<T>... consumers) {
+        T pojo = PODAM_FACTORY.manufacturePojo(clazz, type);
         // 非空时，回调逻辑。通过它，可以实现 Pojo 的进一步处理
         if (ArrayUtil.isNotEmpty(consumers)) {
             Arrays.stream(consumers).forEach(consumer -> consumer.accept(pojo));

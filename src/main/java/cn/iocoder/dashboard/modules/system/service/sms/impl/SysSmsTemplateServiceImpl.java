@@ -4,6 +4,10 @@ import cn.hutool.core.util.ReUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.dashboard.common.enums.CommonStatusEnum;
 import cn.iocoder.dashboard.common.pojo.PageResult;
+import cn.iocoder.dashboard.framework.sms.core.client.SmsClient;
+import cn.iocoder.dashboard.framework.sms.core.client.SmsClientFactory;
+import cn.iocoder.dashboard.framework.sms.core.client.SmsCommonResult;
+import cn.iocoder.dashboard.framework.sms.core.client.dto.SmsTemplateRespDTO;
 import cn.iocoder.dashboard.modules.system.controller.sms.vo.template.SysSmsTemplateCreateReqVO;
 import cn.iocoder.dashboard.modules.system.controller.sms.vo.template.SysSmsTemplateExportReqVO;
 import cn.iocoder.dashboard.modules.system.controller.sms.vo.template.SysSmsTemplatePageReqVO;
@@ -16,6 +20,8 @@ import cn.iocoder.dashboard.modules.system.service.sms.SysSmsChannelService;
 import cn.iocoder.dashboard.modules.system.service.sms.SysSmsTemplateService;
 import com.google.common.annotations.VisibleForTesting;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
+import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import java.util.Collection;
@@ -34,6 +40,7 @@ import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.*;
  * @date 2021/1/25 9:25
  */
 @Service
+@Validated
 public class SysSmsTemplateServiceImpl implements SysSmsTemplateService {
 
     /**
@@ -46,6 +53,9 @@ public class SysSmsTemplateServiceImpl implements SysSmsTemplateService {
 
     @Resource
     private SysSmsChannelService smsChannelService;
+
+    @Resource
+    private SmsClientFactory smsClientFactory;
 
     @Override
     public SysSmsTemplateDO getSmsTemplateByCode(String code) {
@@ -68,6 +78,8 @@ public class SysSmsTemplateServiceImpl implements SysSmsTemplateService {
         SysSmsChannelDO channelDO = checkSmsChannel(createReqVO.getChannelId());
         // 校验短信编码是否重复
         checkSmsTemplateCodeDuplicate(null, createReqVO.getCode());
+        // 校验短信模板
+        checkApiTemplate(createReqVO.getChannelId(), createReqVO.getApiTemplateId());
 
         // 插入
         SysSmsTemplateDO template = SysSmsTemplateConvert.INSTANCE.convert(createReqVO);
@@ -86,6 +98,8 @@ public class SysSmsTemplateServiceImpl implements SysSmsTemplateService {
         SysSmsChannelDO channelDO = checkSmsChannel(updateReqVO.getChannelId());
         // 校验短信编码是否重复
         checkSmsTemplateCodeDuplicate(updateReqVO.getId(), updateReqVO.getCode());
+        // 校验短信模板
+        checkApiTemplate(updateReqVO.getChannelId(), updateReqVO.getApiTemplateId());
 
         // 更新
         SysSmsTemplateDO updateObj = SysSmsTemplateConvert.INSTANCE.convert(updateReqVO);
@@ -153,6 +167,22 @@ public class SysSmsTemplateServiceImpl implements SysSmsTemplateService {
         if (!template.getId().equals(id)) {
             throw exception(SMS_TEMPLATE_CODE_DUPLICATE);
         }
+    }
+
+    /**
+     * 校验 API 短信平台的模板是否有效
+     *
+     * @param channelId 渠道编号
+     * @param apiTemplateId API 模板编号
+     */
+    @VisibleForTesting
+    public void checkApiTemplate(Long channelId, String apiTemplateId) {
+        // 获得短信模板
+        SmsClient smsClient = smsClientFactory.getSmsClient(channelId);
+        Assert.notNull(smsClient, String.format("短信客户端(%d) 不存在", channelId));
+        SmsCommonResult<SmsTemplateRespDTO> templateResult = smsClient.getSmsTemplate(apiTemplateId);
+        // 校验短信模板是否正确
+        templateResult.checkError();
     }
 
 }

@@ -77,8 +77,7 @@ public class SysSmsServiceImpl implements SysSmsService {
     @Override
     public void sendBatchSms(List<String> mobiles, List<Long> userIds, Integer userType,
                              String templateCode, Map<String, Object> templateParams) {
-        // 校验短信模板是否存在
-        SysSmsTemplateDO template = this.checkSmsTemplateValid(templateCode);
+        throw new IllegalArgumentException("暂时不支持该操作，感兴趣可以实现该功能哟！");
     }
 
     private SysSmsTemplateDO checkSmsTemplateValid(String templateCode) {

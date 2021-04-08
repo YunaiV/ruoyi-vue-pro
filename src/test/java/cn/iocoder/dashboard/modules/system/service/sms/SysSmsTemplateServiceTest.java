@@ -2,8 +2,16 @@ package cn.iocoder.dashboard.modules.system.service.sms;
 
 import cn.iocoder.dashboard.BaseDbUnitTest;
 import cn.iocoder.dashboard.common.enums.CommonStatusEnum;
+import cn.iocoder.dashboard.common.exception.enums.GlobalErrorCodeConstants;
 import cn.iocoder.dashboard.common.pojo.PageResult;
-import cn.iocoder.dashboard.modules.system.controller.sms.vo.template.*;
+import cn.iocoder.dashboard.framework.sms.core.client.SmsClient;
+import cn.iocoder.dashboard.framework.sms.core.client.SmsClientFactory;
+import cn.iocoder.dashboard.framework.sms.core.client.SmsCommonResult;
+import cn.iocoder.dashboard.framework.sms.core.client.dto.SmsTemplateRespDTO;
+import cn.iocoder.dashboard.modules.system.controller.sms.vo.template.SysSmsTemplateCreateReqVO;
+import cn.iocoder.dashboard.modules.system.controller.sms.vo.template.SysSmsTemplateExportReqVO;
+import cn.iocoder.dashboard.modules.system.controller.sms.vo.template.SysSmsTemplatePageReqVO;
+import cn.iocoder.dashboard.modules.system.controller.sms.vo.template.SysSmsTemplateUpdateReqVO;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.sms.SysSmsChannelDO;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.sms.SysSmsTemplateDO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.sms.SysSmsTemplateMapper;
@@ -47,6 +55,11 @@ public class SysSmsTemplateServiceTest extends BaseDbUnitTest {
     @MockBean
     private SysSmsChannelService smsChannelService;
 
+    @MockBean
+    private SmsClientFactory smsClientFactory;
+    @MockBean
+    private SmsClient smsClient;
+
     @Test
     public void testParseTemplateContentParams() {
         // 准备参数
@@ -60,6 +73,7 @@ public class SysSmsTemplateServiceTest extends BaseDbUnitTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void testCreateSmsTemplate_success() {
         // 准备参数
         SysSmsTemplateCreateReqVO reqVO = randomPojo(SysSmsTemplateCreateReqVO.class, o -> {
@@ -67,12 +81,16 @@ public class SysSmsTemplateServiceTest extends BaseDbUnitTest {
             o.setStatus(randomEle(CommonStatusEnum.values()).getStatus()); // 保证 status 的范围
             o.setType(randomEle(SysSmsTemplateTypeEnum.values()).getType()); // 保证 type 的泛微
         });
-        // mock 方法
+        // mock Channel 的方法
         SysSmsChannelDO channelDO = randomPojo(SysSmsChannelDO.class, o -> {
             o.setId(reqVO.getChannelId());
             o.setStatus(CommonStatusEnum.ENABLE.getStatus()); // 保证 status 开启，创建必须处于这个状态
         });
         when(smsChannelService.getSmsChannel(eq(channelDO.getId()))).thenReturn(channelDO);
+        // mock 获得 API 短信模板成功
+        when(smsClientFactory.getSmsClient(eq(reqVO.getChannelId()))).thenReturn(smsClient);
+        when(smsClient.getSmsTemplate(eq(reqVO.getApiTemplateId()))).thenReturn(randomPojo(SmsCommonResult.class, SmsTemplateRespDTO.class,
+                o -> o.setCode(GlobalErrorCodeConstants.SUCCESS.getCode())));
 
         // 调用
         Long smsTemplateId = smsTemplateService.createSmsTemplate(reqVO);
@@ -86,6 +104,7 @@ public class SysSmsTemplateServiceTest extends BaseDbUnitTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void testUpdateSmsTemplate_success() {
         // mock 数据
         SysSmsTemplateDO dbSmsTemplate = randomSmsTemplateDO();
@@ -103,6 +122,10 @@ public class SysSmsTemplateServiceTest extends BaseDbUnitTest {
             o.setStatus(CommonStatusEnum.ENABLE.getStatus()); // 保证 status 开启，创建必须处于这个状态
         });
         when(smsChannelService.getSmsChannel(eq(channelDO.getId()))).thenReturn(channelDO);
+        // mock 获得 API 短信模板成功
+        when(smsClientFactory.getSmsClient(eq(reqVO.getChannelId()))).thenReturn(smsClient);
+        when(smsClient.getSmsTemplate(eq(reqVO.getApiTemplateId()))).thenReturn(randomPojo(SmsCommonResult.class, SmsTemplateRespDTO.class,
+                o -> o.setCode(GlobalErrorCodeConstants.SUCCESS.getCode())));
 
         // 调用
         smsTemplateService.updateSmsTemplate(reqVO);
