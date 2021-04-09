@@ -25,6 +25,9 @@
         <queueSize>10</queueSize>
         <appender-ref ref="FILE"/>
     </appender>
+    <!-- skywalking grpc 日志收集 8.4.0版本开始支持 -->
+    <appender name="GRPC" class="org.apache.skywalking.apm.toolkit.log.logback.v1.x.log.GRPCLogClientAppender">
+    </appender>
 
     <springProfile name="dev">
         <logger name="cn.iocoder.dashboard" level="INFO" additivity="false">
@@ -35,6 +38,7 @@
     <springProfile name="local">
         <logger name="cn.iocoder.dashboard" level="INFO" additivity="false">
             <appender-ref ref="STDOUT"/>
+            <appender-ref ref="GRPC"/>
         </logger>
     </springProfile>
     <springProfile name="default">
