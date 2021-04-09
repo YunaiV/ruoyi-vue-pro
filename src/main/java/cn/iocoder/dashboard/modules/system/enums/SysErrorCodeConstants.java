@@ -31,7 +31,7 @@ public interface SysErrorCodeConstants {
     // ========== 角色模块 1002003000 ==========
     ErrorCode ROLE_NOT_EXISTS = new ErrorCode(1002003000, "角色不存在");
     ErrorCode ROLE_NAME_DUPLICATE = new ErrorCode(1002003001, "已经存在名为【{}}】的角色");
-    ErrorCode ROLE_CODE_DUPLICATE = new ErrorCode(1002003002, "已经存在编码为【{}}】的角色");
+    ErrorCode ROLE_CODE_DUPLICATE = new ErrorCode(1002003002, "已经存在编码为【{}】的角色");
     ErrorCode ROLE_CAN_NOT_UPDATE_SYSTEM_TYPE_ROLE = new ErrorCode(1002003004, "不能操作类型为系统内置的角色");
 
     // ========== 用户模块 1002004000 ==========
@@ -84,7 +84,7 @@ public interface SysErrorCodeConstants {
 
     // ========== 短信模板 1002011000 ==========
     ErrorCode SMS_TEMPLATE_NOT_EXISTS = new ErrorCode(1002011000, "短信模板不存在");
-    ErrorCode SMS_TEMPLATE_CODE_DUPLICATE = new ErrorCode(1002011001, "已经存在编码为【{}}】的短信模板");
+    ErrorCode SMS_TEMPLATE_CODE_DUPLICATE = new ErrorCode(1002011001, "已经存在编码为【{}】的短信模板");
 
     // ========== 短信发送 1002012000 ==========
     ErrorCode SMS_SEND_MOBILE_NOT_EXISTS = new ErrorCode(1002012000, "手机号不存在");

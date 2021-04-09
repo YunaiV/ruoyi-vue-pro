@@ -4,7 +4,7 @@
     <!-- 搜索工作栏 -->
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="150px">
       <el-form-item label="短信类型" prop="type">
-        <el-select v-model="queryParams.type" placeholder="请选择短信签名" clearable size="small">
+        <el-select v-model="queryParams.type" placeholder="请选择短信类型" clearable size="small">
           <el-option v-for="dict in this.getDictDatas(DICT_TYPE.SYS_SMS_TEMPLATE_TYPE)"
                      :key="dict.value" :label="dict.label" :value="dict.value"/>
         </el-select>
@@ -23,7 +23,9 @@
       </el-form-item>
       <el-form-item label="短信渠道编号" prop="channelId">
         <el-select v-model="queryParams.channelId" placeholder="请选择短信渠道编号" clearable size="small">
-          <el-option label="请选择字典生成" value="" />
+          <el-option v-for="channel in channelOptions"
+                     :key="channel.id" :value="channel.id"
+                     :label="channel.signature + '【' + getDictDataLabel(DICT_TYPE.SYS_SMS_CHANNEL_CODE, channel.code) + '】'" />
         </el-select>
       </el-form-item>
       <el-form-item label="创建时间">
@@ -66,9 +68,10 @@
       </el-table-column>>
       <el-table-column label="备注" align="center" prop="remark" />
       <el-table-column label="短信 API 的模板编号" align="center" prop="apiTemplateId" width="180" />
-      <el-table-column label="短信签名" align="center">
+      <el-table-column label="短信渠道" align="center">
         <template slot-scope="scope">
-          <span>{{ getDictDataLabel(DICT_TYPE.SYS_SMS_CHANNEL_CODE, scope.row.channelCode) }}</span>
+          <div>{{ formatChannelSignature(scope.row.channelId) }}</div>
+          <div>【{{ getDictDataLabel(DICT_TYPE.SYS_SMS_CHANNEL_CODE, scope.row.channelCode) }}】</div>
         </template>
       </el-table-column>
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
@@ -76,8 +79,10 @@
           <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="150">
         <template slot-scope="scope">
+          <el-button size="mini" type="text" icon="el-icon-share" @click="handleUpdate(scope.row)"
+                     v-hasPermi="['system:sms-template:update']">测试</el-button>
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
                      v-hasPermi="['system:sms-template:update']">修改</el-button>
           <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)"
@@ -91,38 +96,40 @@
 
     <!-- 对话框(添加 / 修改) -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
-      <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="短信签名" prop="type">
-          <el-select v-model="form.type" placeholder="请选择短信签名">
+      <el-form ref="form" :model="form" :rules="rules" label-width="140px">
+        <el-form-item label="短信渠道编号" prop="channelId">
+          <el-select v-model="form.channelId" placeholder="请选择短信渠道编号">
+            <el-option v-for="channel in channelOptions"
+                       :key="channel.id" :value="channel.id"
+                       :label="channel.signature + '【' + getDictDataLabel(DICT_TYPE.SYS_SMS_CHANNEL_CODE, channel.code) + '】'" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="短信类型" prop="type">
+          <el-select v-model="form.type" placeholder="请选择短信类型">
             <el-option v-for="dict in this.getDictDatas(DICT_TYPE.SYS_SMS_TEMPLATE_TYPE)"
                        :key="dict.value" :label="dict.label" :value="parseInt(dict.value)" />
           </el-select>
         </el-form-item>
-        <el-form-item label="开启状态">
+        <el-form-item label="模板编号" prop="code">
+          <el-input v-model="form.code" placeholder="请输入模板编号" />
+        </el-form-item>
+        <el-form-item label="模板名称" prop="name">
+          <el-input v-model="form.name" placeholder="请输入模板名称" />
+        </el-form-item>
+        <el-form-item label="模板内容" prop="content">
+          <el-input type="textarea" v-model="form.content" placeholder="请输入模板内容" />
+        </el-form-item>
+        <el-form-item label="开启状态" prop="status">
           <el-radio-group v-model="form.status">
             <el-radio v-for="dict in this.getDictDatas(DICT_TYPE.SYS_COMMON_STATUS)"
                       :key="dict.value" :label="parseInt(dict.value)">{{dict.label}}</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="模板编码" prop="code">
-          <el-input v-model="form.code" placeholder="请输入模板编码" />
-        </el-form-item>
-        <el-form-item label="模板名称" prop="name">
-          <el-input v-model="form.name" placeholder="请输入模板名称" />
-        </el-form-item>
-        <el-form-item label="模板内容">
-          <el-input type="textarea" v-model="form.content" placeholder="请输入模板内容" />
+        <el-form-item label="短信 API 模板编号" prop="apiTemplateId">
+          <el-input v-model="form.apiTemplateId" placeholder="请输入短信 API 的模板编号" />
         </el-form-item>
         <el-form-item label="备注" prop="remark">
           <el-input v-model="form.remark" placeholder="请输入备注" />
-        </el-form-item>
-        <el-form-item label="短信 API 的模板编号" prop="apiTemplateId">
-          <el-input v-model="form.apiTemplateId" placeholder="请输入短信 API 的模板编号" />
-        </el-form-item>
-        <el-form-item label="短信渠道编号" prop="channelId">
-          <el-select v-model="form.channelId" placeholder="请选择短信渠道编号">
-            <el-option label="请选择字典生成" value="" />
-          </el-select>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -135,13 +142,10 @@
 
 <script>
 import { createSmsTemplate, updateSmsTemplate, deleteSmsTemplate, getSmsTemplate, getSmsTemplatePage, exportSmsTemplateExcel } from "@/api/system/sms/smsTemplate";
-import Editor from '@/components/Editor';
+import {  getSimpleSmsChannels } from "@/api/system/sms/smsChannel";
 
 export default {
   name: "SmsTemplate",
-  components: {
-    Editor,
-  },
   data() {
     return {
       // 遮罩层
@@ -172,18 +176,24 @@ export default {
       form: {},
       // 表单校验
       rules: {
-        type: [{ required: true, message: "短信签名不能为空", trigger: "change" }],
+        type: [{ required: true, message: "短信类型不能为空", trigger: "change" }],
         status: [{ required: true, message: "开启状态不能为空", trigger: "blur" }],
         code: [{ required: true, message: "模板编码不能为空", trigger: "blur" }],
         name: [{ required: true, message: "模板名称不能为空", trigger: "blur" }],
         content: [{ required: true, message: "模板内容不能为空", trigger: "blur" }],
         apiTemplateId: [{ required: true, message: "短信 API 的模板编号不能为空", trigger: "blur" }],
         channelId: [{ required: true, message: "短信渠道编号不能为空", trigger: "change" }],
-      }
+      },
+      // 短信渠道
+      channelOptions: [],
     };
   },
   created() {
     this.getList();
+    // 获得短信渠道
+    getSimpleSmsChannels().then(response => {
+      this.channelOptions = response.data;
+    })
   },
   methods: {
     /** 查询列表 */
@@ -300,6 +310,15 @@ export default {
       }).then(response => {
         this.downloadExcel(response, '短信模板.xls');
       })
+    },
+    /** 格式化短信渠道 */
+    formatChannelSignature(channelId) {
+      for (const channel of this.channelOptions) {
+        if (channel.id === channelId) {
+          return channel.signature;
+        }
+      }
+      return '找不到签名：' + channelId;
     }
   }
 };

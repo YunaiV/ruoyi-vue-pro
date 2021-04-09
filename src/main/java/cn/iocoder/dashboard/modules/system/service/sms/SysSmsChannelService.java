@@ -62,6 +62,13 @@ public interface SysSmsChannelService {
     List<SysSmsChannelDO> getSmsChannelList(Collection<Long> ids);
 
     /**
+     * 获得所有短信渠道列表
+     *
+     * @return 短信渠道列表
+     */
+    List<SysSmsChannelDO> getSmsChannelList();
+
+    /**
      * 获得短信渠道分页
      *
      * @param pageReqVO 分页查询

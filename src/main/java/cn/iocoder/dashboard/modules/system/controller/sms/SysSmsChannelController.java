@@ -2,10 +2,7 @@ package cn.iocoder.dashboard.modules.system.controller.sms;
 
 import cn.iocoder.dashboard.common.pojo.CommonResult;
 import cn.iocoder.dashboard.common.pojo.PageResult;
-import cn.iocoder.dashboard.modules.system.controller.sms.vo.channel.SysSmsChannelCreateReqVO;
-import cn.iocoder.dashboard.modules.system.controller.sms.vo.channel.SysSmsChannelPageReqVO;
-import cn.iocoder.dashboard.modules.system.controller.sms.vo.channel.SysSmsChannelRespVO;
-import cn.iocoder.dashboard.modules.system.controller.sms.vo.channel.SysSmsChannelUpdateReqVO;
+import cn.iocoder.dashboard.modules.system.controller.sms.vo.channel.*;
 import cn.iocoder.dashboard.modules.system.convert.sms.SysSmsChannelConvert;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.sms.SysSmsChannelDO;
 import cn.iocoder.dashboard.modules.system.service.sms.SysSmsChannelService;
@@ -17,6 +14,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
+import java.util.Comparator;
+import java.util.List;
 
 import static cn.iocoder.dashboard.common.pojo.CommonResult.success;
 
@@ -67,6 +66,15 @@ public class SysSmsChannelController {
     public CommonResult<PageResult<SysSmsChannelRespVO>> getSmsChannelPage(@Valid SysSmsChannelPageReqVO pageVO) {
         PageResult<SysSmsChannelDO> pageResult = smsChannelService.getSmsChannelPage(pageVO);
         return success(SysSmsChannelConvert.INSTANCE.convertPage(pageResult));
+    }
+
+    @GetMapping("/list-all-simple")
+    @ApiOperation(value = "获得短信渠道精简列表", notes = "包含被禁用的短信渠道")
+    public CommonResult<List<SysSmsChannelSimpleRespVO>> getSimpleSmsChannels() {
+        List<SysSmsChannelDO> list = smsChannelService.getSmsChannelList();
+        // 排序后，返回给前端
+        list.sort(Comparator.comparing(SysSmsChannelDO::getId));
+        return success(SysSmsChannelConvert.INSTANCE.convertList03(list));
     }
 
 }

@@ -91,6 +91,11 @@ public class SysSmsChannelServiceImpl implements SysSmsChannelService {
     }
 
     @Override
+    public List<SysSmsChannelDO> getSmsChannelList() {
+        return smsChannelMapper.selectList();
+    }
+
+    @Override
     public PageResult<SysSmsChannelDO> getSmsChannelPage(SysSmsChannelPageReqVO pageReqVO) {
         return smsChannelMapper.selectPage(pageReqVO);
     }

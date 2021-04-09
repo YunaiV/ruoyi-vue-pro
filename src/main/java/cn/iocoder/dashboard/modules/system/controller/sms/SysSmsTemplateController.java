@@ -84,4 +84,11 @@ public class SysSmsTemplateController {
         ExcelUtils.write(response, "短信模板.xls", "数据", SysSmsTemplateExcelVO.class, datas);
     }
 
+    @PostMapping("/send-sms")
+    @ApiOperation("导出短信模板 Excel")
+    @PreAuthorize("@ss.hasPermission('system:sms-template:send-sms')")
+    public CommonResult<Boolean> sendSms(@Valid @RequestBody SysSmsTemplateSendReqVO sendReqVO) {
+        return success(true);
+    }
+
 }

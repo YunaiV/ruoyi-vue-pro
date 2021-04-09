@@ -42,3 +42,11 @@ export function getSmsChannelPage(query) {
     params: query
   })
 }
+
+// 获得短信渠道精简列表
+export function getSimpleSmsChannels() {
+  return request({
+    url: '/system/sms-channel/list-all-simple',
+    method: 'get',
+  })
+}

@@ -137,7 +137,7 @@
           </el-select>
         </el-form-item>
 #elseif($column.htmlType == "checkbox")## 多选框
-        <el-form-item label="${comment}">
+        <el-form-item label="${comment}" prop="${javaField}">
           <el-checkbox-group v-model="form.${javaField}">
     #if ("" != $dictType)## 有数据字典
             <el-checkbox v-for="dict in this.getDictDatas(DICT_TYPE.$dictType.toUpperCase())"
@@ -148,7 +148,7 @@
           </el-checkbox-group>
         </el-form-item>
 #elseif($column.htmlType == "radio")## 单选框
-        <el-form-item label="${comment}">
+        <el-form-item label="${comment}" prop="${javaField}">
           <el-radio-group v-model="form.${javaField}">
     #if ("" != $dictType)## 有数据字典
             <el-radio v-for="dict in this.getDictDatas(DICT_TYPE.$dictType.toUpperCase())"

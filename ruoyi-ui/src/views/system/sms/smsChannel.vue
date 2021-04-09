@@ -108,7 +108,8 @@
 </template>
 
 <script>
-import { createSmsChannel, updateSmsChannel, deleteSmsChannel, getSmsChannel, getSmsChannelPage } from "@/api/system/sms/smsChannel";
+import { createSmsChannel, updateSmsChannel, deleteSmsChannel, getSmsChannel, getSmsChannelPage,
+  getSimpleSmsChannels } from "@/api/system/sms/smsChannel";
 
 export default {
   name: "SmsChannel",
@@ -144,7 +145,7 @@ export default {
         code: [{ required: true, message: "渠道编码不能为空", trigger: "blur" }],
         status: [{ required: true, message: "启用状态不能为空", trigger: "blur" }],
         apiKey: [{ required: true, message: "短信 API 的账号不能为空", trigger: "blur" }],
-      }
+      },
     };
   },
   created() {

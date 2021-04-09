@@ -74,7 +74,7 @@ public class CommonResult<T> implements Serializable {
 
     @JsonIgnore // 避免 jackson 序列化
     public boolean isSuccess() {
-        return isSuccess(GlobalErrorCodeConstants.SUCCESS.getCode());
+        return isSuccess(code);
     }
 
     @JsonIgnore // 避免 jackson 序列化

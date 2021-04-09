@@ -162,10 +162,10 @@ public class SysSmsTemplateServiceImpl implements SysSmsTemplateService {
         }
         // 如果 id 为空，说明不用比较是否为相同 id 的字典类型
         if (id == null) {
-            throw exception(SMS_TEMPLATE_CODE_DUPLICATE);
+            throw exception(SMS_TEMPLATE_CODE_DUPLICATE, code);
         }
         if (!template.getId().equals(id)) {
-            throw exception(SMS_TEMPLATE_CODE_DUPLICATE);
+            throw exception(SMS_TEMPLATE_CODE_DUPLICATE, code);
         }
     }
 
