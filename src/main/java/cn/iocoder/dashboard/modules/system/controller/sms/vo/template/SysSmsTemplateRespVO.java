@@ -7,6 +7,7 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 import java.util.Date;
+import java.util.List;
 
 @ApiModel("短信模板 Response VO")
 @Data
@@ -19,6 +20,9 @@ public class SysSmsTemplateRespVO extends SysSmsTemplateBaseVO {
 
     @ApiModelProperty(value = "短信渠道编码", required = true, example = "ALIYUN")
     private String channelCode;
+
+    @ApiModelProperty(value = "参数数组", example = "name,code")
+    private List<String> params;
 
     @ApiModelProperty(value = "创建时间", required = true)
     private Date createTime;

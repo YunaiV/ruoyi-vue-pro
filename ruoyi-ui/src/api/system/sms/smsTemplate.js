@@ -43,6 +43,15 @@ export function getSmsTemplatePage(query) {
   })
 }
 
+// 创建短信模板
+export function sendSms(data) {
+  return request({
+    url: '/system/sms-template/send-sms',
+    method: 'post',
+    data: data
+  })
+}
+
 // 导出短信模板 Excel
 export function exportSmsTemplateExcel(query) {
   return request({
@@ -52,3 +61,4 @@ export function exportSmsTemplateExcel(query) {
     responseType: 'blob'
   })
 }
+

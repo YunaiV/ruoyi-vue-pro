@@ -14,7 +14,7 @@ import java.util.Map;
  */
 public interface SysSmsService {
 
-    void sendSingleSms(String mobile, Long userId, Integer userType,
+    Long sendSingleSms(String mobile, Long userId, Integer userType,
                        String templateCode, Map<String, Object> templateParams);
 
     void sendBatchSms(List<String> mobiles, List<Long> userIds, Integer userType,

@@ -7,6 +7,7 @@ import cn.iocoder.dashboard.framework.logger.operatelog.core.annotations.Operate
 import cn.iocoder.dashboard.modules.system.controller.sms.vo.template.*;
 import cn.iocoder.dashboard.modules.system.convert.sms.SysSmsTemplateConvert;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.sms.SysSmsTemplateDO;
+import cn.iocoder.dashboard.modules.system.service.sms.SysSmsService;
 import cn.iocoder.dashboard.modules.system.service.sms.SysSmsTemplateService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -30,6 +31,8 @@ public class SysSmsTemplateController {
 
     @Resource
     private SysSmsTemplateService smsTemplateService;
+    @Resource
+    private SysSmsService smsService;
 
     @PostMapping("/create")
     @ApiOperation("创建短信模板")
@@ -85,10 +88,11 @@ public class SysSmsTemplateController {
     }
 
     @PostMapping("/send-sms")
-    @ApiOperation("导出短信模板 Excel")
+    @ApiOperation("发送短信")
     @PreAuthorize("@ss.hasPermission('system:sms-template:send-sms')")
-    public CommonResult<Boolean> sendSms(@Valid @RequestBody SysSmsTemplateSendReqVO sendReqVO) {
-        return success(true);
+    public CommonResult<Long> sendSms(@Valid @RequestBody SysSmsTemplateSendReqVO sendReqVO) {
+        return success(smsService.sendSingleSms(sendReqVO.getMobile(), null, null,
+                sendReqVO.getTemplateCode(), sendReqVO.getTemplateParams()));
     }
 
 }

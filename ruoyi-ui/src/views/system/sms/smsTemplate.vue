@@ -81,8 +81,8 @@
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="150">
         <template slot-scope="scope">
-          <el-button size="mini" type="text" icon="el-icon-share" @click="handleUpdate(scope.row)"
-                     v-hasPermi="['system:sms-template:update']">测试</el-button>
+          <el-button size="mini" type="text" icon="el-icon-share" @click="handleSendSms(scope.row)"
+                     v-hasPermi="['system:sms-template:send-sms']">测试</el-button>
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
                      v-hasPermi="['system:sms-template:update']">修改</el-button>
           <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)"
@@ -137,11 +137,32 @@
         <el-button @click="cancel">取 消</el-button>
       </div>
     </el-dialog>
+
+    <!-- 对话框(发送短信) -->
+    <el-dialog title="测试发送短信" :visible.sync="sendSmsOpen" width="500px" append-to-body>
+      <el-form ref="sendSmsForm" :model="sendSmsForm" :rules="sendSmsRules" label-width="140px">
+        <el-form-item label="模板内容" prop="content">
+          <el-input v-model="sendSmsForm.content" type="textarea" placeholder="请输入模板内容" readonly />
+        </el-form-item>
+        <el-form-item label="手机号" prop="mobile">
+          <el-input v-model="sendSmsForm.mobile" placeholder="请输入手机号" />
+        </el-form-item>
+        <el-form-item v-for="param in sendSmsForm.params" :label="'参数 {' + param + '}'" :prop="'templateParams.' + param">
+          <el-input v-model="sendSmsForm.templateParams[param]" :placeholder="'请输入 ' + param + ' 参数'" />
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="submitSendSmsForm">确 定</el-button>
+        <el-button @click="cancelSendSms">取 消</el-button>
+      </div>
+    </el-dialog>
+
   </div>
 </template>
 
 <script>
-import { createSmsTemplate, updateSmsTemplate, deleteSmsTemplate, getSmsTemplate, getSmsTemplatePage, exportSmsTemplateExcel } from "@/api/system/sms/smsTemplate";
+import { createSmsTemplate, updateSmsTemplate, deleteSmsTemplate, getSmsTemplate, getSmsTemplatePage,
+  exportSmsTemplateExcel, sendSms } from "@/api/system/sms/smsTemplate";
 import {  getSimpleSmsChannels } from "@/api/system/sms/smsChannel";
 
 export default {
@@ -186,6 +207,16 @@ export default {
       },
       // 短信渠道
       channelOptions: [],
+      // 发送短信
+      sendSmsOpen: false,
+      sendSmsForm: {
+        params: [], // 模板的参数列表
+      },
+      sendSmsRules: {
+        mobile: [{ required: true, message: "手机不能为空", trigger: "blur" }],
+        templateCode: [{ required: true, message: "手机不能为空", trigger: "blur" }],
+        templateParams: { }
+      }
     };
   },
   created() {
@@ -310,6 +341,55 @@ export default {
       }).then(response => {
         this.downloadExcel(response, '短信模板.xls');
       })
+    },
+    /** 发送短息按钮 */
+    handleSendSms(row) {
+      this.resetSendSms(row);
+      // 设置参数
+      this.sendSmsForm.content = row.content;
+      this.sendSmsForm.params = row.params;
+      this.sendSmsForm.templateCode = row.code;
+      this.sendSmsForm.templateParams = row.params.reduce(function(obj, item) {
+        obj[item] = undefined;
+        return obj;
+      }, {});
+      // 根据 row 重置 rules
+      this.sendSmsRules.templateParams = row.params.reduce(function(obj, item) {
+        obj[item] = { required: true, message: '参数 ' + item + " 不能为空", trigger: "change" };
+        return obj;
+      }, {});
+      // 设置打开
+      this.sendSmsOpen = true;
+    },
+    /** 重置发送短信的表单 */
+    resetSendSms() {
+      // 根据 row 重置表单
+      this.sendSmsForm = {
+        content: undefined,
+        params: undefined,
+        mobile: undefined,
+        templateCode: undefined,
+        templateParams: {}
+      };
+      this.resetForm("sendSmsForm");
+    },
+    /** 取消发送短信 */
+    cancelSendSms() {
+      this.sendSmsOpen = false;
+      this.resetSendSms();
+    },
+    /** 提交按钮 */
+    submitSendSmsForm() {
+      this.$refs["sendSmsForm"].validate(valid => {
+        if (!valid) {
+          return;
+        }
+        // 添加的提交
+        sendSms(this.sendSmsForm).then(response => {
+          this.msgSuccess("提交发送成功！发送结果，见发送日志编号：" + response.data);
+          this.sendSmsOpen = false;
+        });
+      });
     },
     /** 格式化短信渠道 */
     formatChannelSignature(channelId) {

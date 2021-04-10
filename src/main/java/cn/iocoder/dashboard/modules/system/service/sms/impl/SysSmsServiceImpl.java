@@ -54,7 +54,7 @@ public class SysSmsServiceImpl implements SysSmsService {
     private SysUserService userService;
 
     @Override
-    public void sendSingleSms(String mobile, Long userId, Integer userType,
+    public Long sendSingleSms(String mobile, Long userId, Integer userType,
                               String templateCode, Map<String, Object> templateParams) {
         // 校验短信模板是否合法
         SysSmsTemplateDO template = this.checkSmsTemplateValid(templateCode);
@@ -67,11 +67,11 @@ public class SysSmsServiceImpl implements SysSmsService {
         Long sendLogId = smsLogService.createSmsLog(mobile, userId, userType, isSend, template, content, templateParams);
 
         // 发送 MQ 消息，异步执行发送短信
-        if (!isSend) {
-            return;
+        if (isSend) {
+            List<KeyValue<String, Object>> newTemplateParams = this.buildTemplateParams(template, templateParams);
+            smsProducer.sendSmsSendMessage(sendLogId, mobile, template.getChannelId(), template.getApiTemplateId(), newTemplateParams);
         }
-        List<KeyValue<String, Object>> newTemplateParams = this.buildTemplateParams(template, templateParams);
-        smsProducer.sendSmsSendMessage(sendLogId, mobile, template.getChannelId(), template.getApiTemplateId(), newTemplateParams);
+        return sendLogId;
     }
 
     @Override
