@@ -21,7 +21,6 @@ import cn.iocoder.dashboard.modules.system.service.sms.SysSmsTemplateService;
 import com.google.common.annotations.VisibleForTesting;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
-import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import java.util.Collection;
@@ -40,7 +39,6 @@ import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.*;
  * @date 2021/1/25 9:25
  */
 @Service
-@Validated
 public class SysSmsTemplateServiceImpl implements SysSmsTemplateService {
 
     /**
@@ -140,6 +138,11 @@ public class SysSmsTemplateServiceImpl implements SysSmsTemplateService {
     @Override
     public List<SysSmsTemplateDO> getSmsTemplateList(SysSmsTemplateExportReqVO exportReqVO) {
         return smsTemplateMapper.selectList(exportReqVO);
+    }
+
+    @Override
+    public Integer countByChannelId(Long channelId) {
+        return smsTemplateMapper.selectCountByChannelId(channelId);
     }
 
     @VisibleForTesting

@@ -20,12 +20,15 @@ import javax.annotation.Resource;
 import java.util.function.Consumer;
 
 import static cn.hutool.core.util.RandomUtil.randomEle;
+import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.SMS_CHANNEL_HAS_CHILDREN;
 import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.SMS_CHANNEL_NOT_EXISTS;
 import static cn.iocoder.dashboard.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.dashboard.util.AssertUtils.assertServiceException;
 import static cn.iocoder.dashboard.util.RandomUtils.*;
 import static cn.iocoder.dashboard.util.date.DateUtils.buildTime;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
 
 /**
 * {@link SysSmsChannelServiceImpl} 的单元测试类
@@ -43,6 +46,9 @@ public class SysSmsChannelServiceTest extends BaseDbUnitTest {
 
     @Resource
     private SysSmsChannelMapper smsChannelMapper;
+
+    @MockBean
+    private SysSmsTemplateService smsTemplateService;
 
     @Test
     public void testCreateSmsChannel_success() {
@@ -67,6 +73,7 @@ public class SysSmsChannelServiceTest extends BaseDbUnitTest {
         SysSmsChannelUpdateReqVO reqVO = randomPojo(SysSmsChannelUpdateReqVO.class, o -> {
             o.setId(dbSmsChannel.getId()); // 设置更新的 ID
             o.setStatus(randomCommonStatus());
+            o.setCallbackUrl(randomString());
         });
 
         // 调用
@@ -106,6 +113,20 @@ public class SysSmsChannelServiceTest extends BaseDbUnitTest {
 
         // 调用, 并断言异常
         assertServiceException(() -> smsChannelService.deleteSmsChannel(id), SMS_CHANNEL_NOT_EXISTS);
+    }
+
+    @Test
+    public void testDeleteSmsChannel_hasChildren() {
+        // mock 数据
+        SysSmsChannelDO dbSmsChannel = randomSmsChannelDO();
+        smsChannelMapper.insert(dbSmsChannel);// @Sql: 先插入出一条存在的数据
+        // 准备参数
+        Long id = dbSmsChannel.getId();
+        // mock 方法
+        when(smsTemplateService.countByChannelId(eq(id))).thenReturn(10);
+
+        // 调用, 并断言异常
+        assertServiceException(() -> smsChannelService.deleteSmsChannel(id), SMS_CHANNEL_HAS_CHILDREN);
     }
 
     @Test

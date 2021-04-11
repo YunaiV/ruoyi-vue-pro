@@ -91,4 +91,12 @@ public interface SysSmsTemplateService {
      */
     List<SysSmsTemplateDO> getSmsTemplateList(SysSmsTemplateExportReqVO exportReqVO);
 
+    /**
+     * 获得指定短信渠道下的短信模板数量
+     *
+     * @param channelId 短信渠道编号
+     * @return 数量
+     */
+    Integer countByChannelId(Long channelId);
+
 }

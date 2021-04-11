@@ -41,4 +41,8 @@ public interface SysSmsTemplateMapper extends BaseMapperX<SysSmsTemplateDO> {
                 .orderByDesc("id"));
     }
 
+    default Integer selectCountByChannelId(Long channelId) {
+        return selectCount("channel_id", channelId);
+    }
+
 }

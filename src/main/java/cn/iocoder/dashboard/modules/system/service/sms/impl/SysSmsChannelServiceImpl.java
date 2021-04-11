@@ -11,6 +11,7 @@ import cn.iocoder.dashboard.modules.system.convert.sms.SysSmsChannelConvert;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.sms.SysSmsChannelDO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.sms.SysSmsChannelMapper;
 import cn.iocoder.dashboard.modules.system.service.sms.SysSmsChannelService;
+import cn.iocoder.dashboard.modules.system.service.sms.SysSmsTemplateService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -19,6 +20,7 @@ import java.util.Collection;
 import java.util.List;
 
 import static cn.iocoder.dashboard.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.SMS_CHANNEL_HAS_CHILDREN;
 import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.SMS_CHANNEL_NOT_EXISTS;
 
 /**
@@ -35,6 +37,9 @@ public class SysSmsChannelServiceImpl implements SysSmsChannelService {
 
     @Resource
     private SysSmsChannelMapper smsChannelMapper;
+
+    @Resource
+    private SysSmsTemplateService smsTemplateService;
 
     @Override
     @PostConstruct
@@ -70,6 +75,10 @@ public class SysSmsChannelServiceImpl implements SysSmsChannelService {
     public void deleteSmsChannel(Long id) {
         // 校验存在
         this.validateSmsChannelExists(id);
+        // 校验是否有字典数据
+        if (smsTemplateService.countByChannelId(id) > 0) {
+            throw exception(SMS_CHANNEL_HAS_CHILDREN);
+        }
         // 更新
         smsChannelMapper.deleteById(id);
     }

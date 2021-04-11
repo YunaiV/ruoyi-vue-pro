@@ -35,5 +35,4 @@ public class SysSmsChannelBaseVO {
     @URL(message = "回调 URL 格式不正确")
     private String callbackUrl;
 
-
 }
