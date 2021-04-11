@@ -138,6 +138,8 @@ public class SysSmsChannelServiceTest extends BaseDbUnitTest {
        assertPojoEquals(dbSmsChannel, pageResult.getList().get(0));
     }
 
+    // ========== 随机对象 ==========
+
     @SafeVarargs
     private static SysSmsChannelDO randomSmsChannelDO(Consumer<SysSmsChannelDO>... consumers) {
         Consumer<SysSmsChannelDO> consumer = (o) -> {

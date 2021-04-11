@@ -63,7 +63,7 @@ public interface ${table.className}Service {
      * 获得${table.classComment}列表, 用于 Excel 导出
      *
      * @param exportReqVO 查询条件
-     * @return ${table.classComment}分页
+     * @return ${table.classComment}列表
      */
     List<${table.className}DO> get${simpleClassName}List(${table.className}ExportReqVO exportReqVO);
 

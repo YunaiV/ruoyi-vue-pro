@@ -1,8 +1,13 @@
 package cn.iocoder.dashboard.modules.system.service.sms;
 
+import cn.iocoder.dashboard.common.pojo.PageResult;
+import cn.iocoder.dashboard.modules.system.controller.sms.vo.log.SysSmsLogExportReqVO;
+import cn.iocoder.dashboard.modules.system.controller.sms.vo.log.SysSmsLogPageReqVO;
+import cn.iocoder.dashboard.modules.system.dal.dataobject.sms.SysSmsLogDO;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.sms.SysSmsTemplateDO;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -52,5 +57,21 @@ public interface SysSmsLogService {
      * @param apiReceiveMsg API 接收结果的说明
      */
     void updateSmsReceiveResult(Long id, Boolean success, Date receiveTime, String apiReceiveCode, String apiReceiveMsg);
+
+    /**
+     * 获得短信日志分页
+     *
+     * @param pageReqVO 分页查询
+     * @return 短信日志分页
+     */
+    PageResult<SysSmsLogDO> getSmsLogPage(SysSmsLogPageReqVO pageReqVO);
+
+    /**
+     * 获得短信日志列表, 用于 Excel 导出
+     *
+     * @param exportReqVO 查询条件
+     * @return 短信日志列表
+     */
+    List<SysSmsLogDO> getSmsLogList(SysSmsLogExportReqVO exportReqVO);
 
 }

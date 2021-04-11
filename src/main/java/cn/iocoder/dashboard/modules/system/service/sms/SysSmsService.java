@@ -14,6 +14,34 @@ import java.util.Map;
  */
 public interface SysSmsService {
 
+    /**
+     * 发送单条短信给用户（管理员）
+     *
+     * 在 mobile 为空时，使用 userId 加载对应管理员的手机号
+     *
+     * @param mobile 手机号
+     * @param userId 用户编号
+     * @param templateCode 短信模板编号
+     * @param templateParams 短信模板参数
+     * @return 发送日志编号
+     */
+    Long sendSingleSmsToAdmin(String mobile, Long userId,
+                              String templateCode, Map<String, Object> templateParams);
+
+    /**
+     * 发送单条短信给用户（会员）
+     *
+     * 在 mobile 为空时，使用 userId 加载对应会员的手机号
+     *
+     * @param mobile 手机号
+     * @param userId 用户编号
+     * @param templateCode 短信模板编号
+     * @param templateParams 短信模板参数
+     * @return 发送日志编号
+     */
+    Long sendSingleSmsToMember(String mobile, Long userId,
+                              String templateCode, Map<String, Object> templateParams);
+
     Long sendSingleSms(String mobile, Long userId, Integer userType,
                        String templateCode, Map<String, Object> templateParams);
 

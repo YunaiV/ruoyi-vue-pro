@@ -23,9 +23,9 @@ import java.util.Map;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 public class SysSmsLogDO extends BaseDO {
 
     /**

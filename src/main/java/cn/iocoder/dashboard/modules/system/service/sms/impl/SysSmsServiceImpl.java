@@ -25,7 +25,6 @@ import org.springframework.util.Assert;
 import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static cn.iocoder.dashboard.common.exception.util.ServiceExceptionUtil.exception;
@@ -54,12 +53,30 @@ public class SysSmsServiceImpl implements SysSmsService {
     private SysUserService userService;
 
     @Override
+    public Long sendSingleSmsToAdmin(String mobile, Long userId, String templateCode, Map<String, Object> templateParams) {
+        // 如果 mobile 为空，则加载用户编号对应的手机号
+        if (StrUtil.isEmpty(mobile)) {
+            SysUserDO user = userService.getUser(userId);
+            if (user != null) {
+                mobile = user.getMobile();
+            }
+        }
+        // 执行发送
+        return this.sendSingleSms(mobile, userId, UserTypeEnum.ADMIN.getValue(), templateCode, templateParams);
+    }
+
+    @Override
+    public Long sendSingleSmsToMember(String mobile, Long userId, String templateCode, Map<String, Object> templateParams) {
+        throw new UnsupportedOperationException("暂时不支持该操作，感兴趣可以实现该功能哟！");
+    }
+
+    @Override
     public Long sendSingleSms(String mobile, Long userId, Integer userType,
                               String templateCode, Map<String, Object> templateParams) {
         // 校验短信模板是否合法
         SysSmsTemplateDO template = this.checkSmsTemplateValid(templateCode);
         // 校验手机号码是否存在
-        mobile = this.checkMobile(mobile, userId, userType);
+        mobile = this.checkMobile(mobile);
 
         // 创建发送日志
         Boolean isSend = CommonStatusEnum.ENABLE.getStatus().equals(template.getStatus()); // 如果模板被禁用，则不发送短信，只记录日志
@@ -77,7 +94,7 @@ public class SysSmsServiceImpl implements SysSmsService {
     @Override
     public void sendBatchSms(List<String> mobiles, List<Long> userIds, Integer userType,
                              String templateCode, Map<String, Object> templateParams) {
-        throw new IllegalArgumentException("暂时不支持该操作，感兴趣可以实现该功能哟！");
+        throw new UnsupportedOperationException("暂时不支持该操作，感兴趣可以实现该功能哟！");
     }
 
     private SysSmsTemplateDO checkSmsTemplateValid(String templateCode) {
@@ -108,29 +125,11 @@ public class SysSmsServiceImpl implements SysSmsService {
         }).collect(Collectors.toList());
     }
 
-    private String checkMobile(String mobile, Long userId, Integer userType) {
-        mobile = getMobile(mobile, userId, userType);
+    private String checkMobile(String mobile) {
         if (StrUtil.isEmpty(mobile)) {
             throw exception(SMS_SEND_MOBILE_NOT_EXISTS);
         }
         return mobile;
-    }
-
-    private String getMobile(String mobile, Long userId, Integer userType) {
-        // 如果已经有手机号，则直接返回
-        if (StrUtil.isNotEmpty(mobile)) {
-            return mobile;
-        }
-        // 没有手机号，则基于 userId 检索
-        if (userId == null || userType == null) {
-            return null;
-        }
-        if (Objects.equals(userType, UserTypeEnum.ADMIN.getValue())) {
-            SysUserDO user = userService.getUser(userId);
-            return user != null ? user.getMobile() : null;
-        }
-        // TODO 芋艿：支持 C 端用户
-        return null;
     }
 
     @Override

@@ -79,7 +79,7 @@ public class SysSmsTemplateServiceTest extends BaseDbUnitTest {
         SysSmsTemplateCreateReqVO reqVO = randomPojo(SysSmsTemplateCreateReqVO.class, o -> {
             o.setContent("正在进行登录操作{operation}，您的验证码是{code}");
             o.setStatus(randomEle(CommonStatusEnum.values()).getStatus()); // 保证 status 的范围
-            o.setType(randomEle(SysSmsTemplateTypeEnum.values()).getType()); // 保证 type 的泛微
+            o.setType(randomEle(SysSmsTemplateTypeEnum.values()).getType()); // 保证 type 的 范围
         });
         // mock Channel 的方法
         SysSmsChannelDO channelDO = randomPojo(SysSmsChannelDO.class, o -> {
@@ -114,7 +114,7 @@ public class SysSmsTemplateServiceTest extends BaseDbUnitTest {
             o.setId(dbSmsTemplate.getId()); // 设置更新的 ID
             o.setContent("正在进行登录操作{operation}，您的验证码是{code}");
             o.setStatus(randomEle(CommonStatusEnum.values()).getStatus()); // 保证 status 的范围
-            o.setType(randomEle(SysSmsTemplateTypeEnum.values()).getType()); // 保证 type 的泛微
+            o.setType(randomEle(SysSmsTemplateTypeEnum.values()).getType()); // 保证 type 的 范围
         });
         // mock 方法
         SysSmsChannelDO channelDO = randomPojo(SysSmsChannelDO.class, o -> {
@@ -339,7 +339,7 @@ public class SysSmsTemplateServiceTest extends BaseDbUnitTest {
     private static SysSmsTemplateDO randomSmsTemplateDO(Consumer<SysSmsTemplateDO>... consumers) {
         Consumer<SysSmsTemplateDO> consumer = (o) -> {
             o.setStatus(randomEle(CommonStatusEnum.values()).getStatus()); // 保证 status 的范围
-            o.setType(randomEle(SysSmsTemplateTypeEnum.values()).getType()); // 保证 type 的泛微
+            o.setType(randomEle(SysSmsTemplateTypeEnum.values()).getType()); // 保证 type 的 范围
         };
         return randomPojo(SysSmsTemplateDO.class, ArrayUtils.append(consumer, consumers));
     }

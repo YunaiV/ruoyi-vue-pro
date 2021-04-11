@@ -1,6 +1,9 @@
 package cn.iocoder.dashboard.modules.system.service.sms.impl;
 
 import cn.iocoder.dashboard.common.pojo.CommonResult;
+import cn.iocoder.dashboard.common.pojo.PageResult;
+import cn.iocoder.dashboard.modules.system.controller.sms.vo.log.SysSmsLogExportReqVO;
+import cn.iocoder.dashboard.modules.system.controller.sms.vo.log.SysSmsLogPageReqVO;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.sms.SysSmsLogDO;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.sms.SysSmsTemplateDO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.sms.SysSmsLogMapper;
@@ -12,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -67,6 +71,16 @@ public class SysSmsLogServiceImpl implements SysSmsLogService {
                 : SysSmsReceiveStatusEnum.FAILURE;
         smsLogMapper.updateById(SysSmsLogDO.builder().id(id).receiveStatus(receiveStatus.getStatus()).receiveTime(receiveTime)
                 .apiReceiveCode(apiReceiveCode).apiReceiveMsg(apiReceiveMsg).build());
+    }
+
+    @Override
+    public PageResult<SysSmsLogDO> getSmsLogPage(SysSmsLogPageReqVO pageReqVO) {
+        return smsLogMapper.selectPage(pageReqVO);
+    }
+
+    @Override
+    public List<SysSmsLogDO> getSmsLogList(SysSmsLogExportReqVO exportReqVO) {
+        return smsLogMapper.selectList(exportReqVO);
     }
 
 }
