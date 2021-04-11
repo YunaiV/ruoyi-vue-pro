@@ -21,8 +21,8 @@
       <el-form-item label="短信 API 的模板编号" prop="apiTemplateId">
         <el-input v-model="queryParams.apiTemplateId" placeholder="请输入短信 API 的模板编号" clearable size="small" @keyup.enter.native="handleQuery"/>
       </el-form-item>
-      <el-form-item label="短信渠道编号" prop="channelId">
-        <el-select v-model="queryParams.channelId" placeholder="请选择短信渠道编号" clearable size="small">
+      <el-form-item label="短信渠道" prop="channelId">
+        <el-select v-model="queryParams.channelId" placeholder="请选择短信渠道" clearable size="small">
           <el-option v-for="channel in channelOptions"
                      :key="channel.id" :value="channel.id"
                      :label="channel.signature + '【' + getDictDataLabel(DICT_TYPE.SYS_SMS_CHANNEL_CODE, channel.code) + '】'" />
@@ -60,12 +60,12 @@
         <template slot-scope="scope">
           <span>{{ getDictDataLabel(DICT_TYPE.SYS_SMS_TEMPLATE_TYPE, scope.row.type) }}</span>
         </template>
-      </el-table-column>>
+      </el-table-column>
       <el-table-column label="开启状态" align="center" prop="status">
         <template slot-scope="scope">
           <span>{{ getDictDataLabel(DICT_TYPE.SYS_COMMON_STATUS, scope.row.status) }}</span>
         </template>
-      </el-table-column>>
+      </el-table-column>
       <el-table-column label="备注" align="center" prop="remark" />
       <el-table-column label="短信 API 的模板编号" align="center" prop="apiTemplateId" width="180" />
       <el-table-column label="短信渠道" align="center">

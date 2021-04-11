@@ -2,15 +2,19 @@
   <div class="app-container">
 
     <!-- 搜索工作栏 -->
-    <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="短信渠道编号" prop="channelId">
-        <el-input v-model="queryParams.channelId" placeholder="请输入短信渠道编号" clearable size="small" @keyup.enter.native="handleQuery"/>
+    <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="100px">
+      <el-form-item label="手机号" prop="mobile">
+        <el-input v-model="queryParams.mobile" placeholder="请输入手机号" clearable size="small" @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="短信渠道" prop="channelId">
+        <el-select v-model="queryParams.channelId" placeholder="请选择短信渠道" clearable size="small">
+          <el-option v-for="channel in channelOptions"
+                     :key="channel.id" :value="channel.id"
+                     :label="channel.signature + '【' + getDictDataLabel(DICT_TYPE.SYS_SMS_CHANNEL_CODE, channel.code) + '】'" />
+        </el-select>
       </el-form-item>
       <el-form-item label="模板编号" prop="templateId">
         <el-input v-model="queryParams.templateId" placeholder="请输入模板编号" clearable size="small" @keyup.enter.native="handleQuery"/>
-      </el-form-item>
-      <el-form-item label="手机号" prop="mobile">
-        <el-input v-model="queryParams.mobile" placeholder="请输入手机号" clearable size="small" @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item label="发送状态" prop="sendStatus">
         <el-select v-model="queryParams.sendStatus" placeholder="请选择发送状态" clearable size="small">
@@ -52,46 +56,51 @@
     <!-- 列表 -->
     <el-table v-loading="loading" :data="list">
       <el-table-column label="编号" align="center" prop="id" />
-      <el-table-column label="短信渠道编号" align="center" prop="channelId" />
-      <el-table-column label="短信渠道编码" align="center" prop="channelCode" />
-      <el-table-column label="模板编号" align="center" prop="templateId" />
-      <el-table-column label="模板编码" align="center" prop="templateCode" />
-      <el-table-column label="短信类型" align="center" prop="templateType" />
-      <el-table-column label="短信内容" align="center" prop="templateContent" />
-      <el-table-column label="短信参数" align="center" prop="templateParams" />
-      <el-table-column label="短信 API 的模板编号" align="center" prop="apiTemplateId" />
-      <el-table-column label="手机号" align="center" prop="mobile" />
-      <el-table-column label="用户编号" align="center" prop="userId" />
-      <el-table-column label="用户类型" align="center" prop="userType" />
-      <el-table-column label="发送状态" align="center" prop="sendStatus" />
-      <el-table-column label="发送时间" align="center" prop="sendTime" width="180">
-        <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.sendTime) }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="发送结果的编码" align="center" prop="sendCode" />
-      <el-table-column label="发送结果的提示" align="center" prop="sendMsg" />
-      <el-table-column label="短信 API 发送结果的编码" align="center" prop="apiSendCode" />
-      <el-table-column label="短信 API 发送失败的提示" align="center" prop="apiSendMsg" />
-      <el-table-column label="短信 API 发送返回的唯一请求 ID" align="center" prop="apiRequestId" />
-      <el-table-column label="短信 API 发送返回的序号" align="center" prop="apiSerialNo" />
-      <el-table-column label="接收状态" align="center" prop="receiveStatus" />
-      <el-table-column label="接收时间" align="center" prop="receiveTime" width="180">
-        <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.receiveTime) }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="API 接收结果的编码" align="center" prop="apiReceiveCode" />
-      <el-table-column label="API 接收结果的说明" align="center" prop="apiReceiveMsg" />
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
       </el-table-column>
+      <el-table-column label="手机号" align="center" prop="mobile" width="120">
+        <template slot-scope="scope">
+          <div>{{ scope.row.mobile }}</div>
+          <div v-if="scope.row.userType && scope.row.userId">
+            {{ getDictDataLabel(DICT_TYPE.USER_TYPE, scope.row.userType) + '(' + scope.row.userId + ')' }}
+          </div>
+        </template>
+      </el-table-column>
+      <el-table-column label="短信内容" align="center" prop="templateContent" width="300" />
+      <el-table-column label="发送状态" align="center">
+        <template slot-scope="scope">
+          <span>{{ getDictDataLabel(DICT_TYPE.SYS_SMS_SEND_STATUS, scope.row.sendStatus) }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="接收状态" align="center">
+        <template slot-scope="scope">
+          <span>{{ getDictDataLabel(DICT_TYPE.SYS_SMS_RECEIVE_STATUS, scope.row.receiveStatus) }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="接收时间" align="center" prop="receiveTime" width="180">
+        <template slot-scope="scope">
+          <span>{{ parseTime(scope.row.receiveTime) }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="短信渠道" align="center">
+        <template slot-scope="scope">
+          <div>{{ formatChannelSignature(scope.row.channelId) }}</div>
+          <div>【{{ getDictDataLabel(DICT_TYPE.SYS_SMS_CHANNEL_CODE, scope.row.channelCode) }}】</div>
+        </template>
+      </el-table-column>
+      <el-table-column label="模板编号" align="center" prop="templateId" />
+      <el-table-column label="短信类型" align="center" prop="templateType">
+        <template slot-scope="scope">
+          <span>{{ getDictDataLabel(DICT_TYPE.SYS_SMS_TEMPLATE_TYPE, scope.row.templateType) }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-          <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
-                     v-hasPermi="['system:sms-log:update']">修改</el-button>
+          <el-button size="mini" type="text" icon="el-icon-view" @click="handleView(scope.row,scope.index)"
+                     v-hasPermi="['system:sms-log:query']">详细</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -99,13 +108,59 @@
     <pagination v-show="total > 0" :total="total" :page.sync="queryParams.pageNo" :limit.sync="queryParams.pageSize"
                 @pagination="getList"/>
 
-    <!-- 对话框(添加 / 修改) -->
+    <!-- 短信日志详细 -->
+    <el-dialog title="短信日志详细" :visible.sync="open" width="700px" append-to-body>
+      <el-form ref="form" :model="form" label-width="100px" size="mini">
+        <el-row>
+          <el-col :span="24">
+            <el-form-item label="日志主键：">{{ form.id }}</el-form-item>
+          </el-col>
+          <el-col :span="24">
+            <el-form-item label="链路追踪：">{{ form.traceId }}</el-form-item>
+          </el-col>
+          <el-col :span="24">
+            <el-form-item label="用户信息：">{{ form.userId }} | {{ form.userNickname }} | {{ form.userIp }} | {{ form.userAgent}} </el-form-item>
+          </el-col>
+          <el-col :span="24">
+            <el-form-item label="操作信息：">
+              {{ form.module }} | {{ form.name }} | {{ getDictDataLabel(DICT_TYPE.SYS_OPERATE_TYPE, form.type) }}
+              <br /> {{ form.content }}
+              <br /> {{ form.exts }}
+            </el-form-item>
+          </el-col>
+          <el-col :span="24">
+            <el-form-item label="请求信息：">{{ form.requestMethod }} | {{ form.requestUrl }} </el-form-item>
+          </el-col>
+          <el-col :span="24">
+            <el-form-item label="方法名：">{{ form.javaMethod }}</el-form-item>
+          </el-col>
+          <el-col :span="24">
+            <el-form-item label="方法参数：">{{ form.javaMethodArgs }}</el-form-item>
+          </el-col>
+          <el-col :span="24">
+            <el-form-item label="开始时间：">
+              {{ parseTime(form.startTime) }} | {{ form.duration }} ms
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="操作结果：">
+              <div v-if="form.resultCode === 0">正常 | {{ form.resultData}} </div>
+              <div v-else-if="form.resultCode > 0">失败 | {{ form.resultCode }} || {{ form.resultMsg}}</div>
+            </el-form-item>
+          </el-col>
+        </el-row>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="open = false">关 闭</el-button>
+      </div>
+    </el-dialog>
 
   </div>
 </template>
 
 <script>
 import { getSmsLogPage, exportSmsLogExcel } from "@/api/system/sms/smsLog";
+import {  getSimpleSmsChannels } from "@/api/system/sms/smsChannel";
 
 export default {
   name: "SmsLog",
@@ -127,6 +182,8 @@ export default {
       open: false,
       dateRangeSendTime: [],
       dateRangeReceiveTime: [],
+      // 表单参数
+      form: {},
       // 查询参数
       queryParams: {
         pageNo: 1,
@@ -137,10 +194,16 @@ export default {
         sendStatus: null,
         receiveStatus: null,
       },
+      // 短信渠道
+      channelOptions: [],
     };
   },
   created() {
     this.getList();
+    // 获得短信渠道
+    getSimpleSmsChannels().then(response => {
+      this.channelOptions = response.data;
+    })
   },
   methods: {
     /** 查询列表 */
@@ -192,6 +255,20 @@ export default {
       }).then(response => {
         this.downloadExcel(response, '短信日志.xls');
       })
+    },
+    /** 详细按钮操作 */
+    handleView(row) {
+      this.open = true;
+      this.form = row;
+    },
+    /** 格式化短信渠道 */
+    formatChannelSignature(channelId) {
+      for (const channel of this.channelOptions) {
+        if (channel.id === channelId) {
+          return channel.signature;
+        }
+      }
+      return '找不到签名：' + channelId;
     }
   }
 };

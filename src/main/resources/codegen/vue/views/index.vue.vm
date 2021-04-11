@@ -76,7 +76,7 @@
         <template slot-scope="scope">
           <span>{{ getDictDataLabel(DICT_TYPE.$dictType.toUpperCase(), scope.row.${column.javaField}) }}</span>
         </template>
-      </el-table-column>>
+      </el-table-column>
 #else
       <el-table-column label="${comment}" align="center" prop="${javaField}" />
 #end
