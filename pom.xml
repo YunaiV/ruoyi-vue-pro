@@ -46,6 +46,7 @@
         <easyexcel.verion>2.2.7</easyexcel.verion>
         <velocity.version>2.2</velocity.version>
         <screw.version>1.0.5</screw.version>
+        <dynamic-datasource.version>3.3.2</dynamic-datasource.version>
     </properties>
 
     <!-- 依赖声明 -->
@@ -270,6 +271,14 @@
             <artifactId>screw-core</artifactId> <!-- 实现数据库文档 -->
             <version>${screw.version}</version>
         </dependency>
+
+        <!-- 多数据源 -->
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>dynamic-datasource-spring-boot-starter</artifactId>
+            <version>${dynamic-datasource.version}</version>
+        </dependency>
+
 
     </dependencies>
 

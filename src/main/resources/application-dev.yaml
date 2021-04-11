@@ -4,13 +4,11 @@ server:
 --- #################### 数据库相关配置 ####################
 
 spring:
-  # 数据源配置项 TODO 多数据源；TODO 监控配置
+  # 数据源配置项 TODO 监控配置
+  # 排除默认的自动配置，使用dynamic-datasource-spring-boot-starter配置多数据源，整合druid
+  autoconfigure:
+    exclude: com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceAutoConfigure
   datasource:
-    name: ruoyi-vue-pro
-    url: jdbc:mysql://400-infra.server.iocoder.cn:3306/${spring.datasource.name}?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=CTT
-    driver-class-name: com.mysql.jdbc.Driver
-    username: root
-    password: 3WLiVUBEwTbvAfsh
     druid:
       web-stat-filter:
         enabled: true
@@ -32,6 +30,34 @@ spring:
         wall:
           config:
             multi-statement-allow: true
+    dynamic:
+      # druid全局配置 https://dynamic-datasource.com/en/guide/integration/Druid.html#configurate-parameters
+#      druid: #The following are the supported global parameters
+#        initial-size:
+#        max-active:
+#        min-idle:
+#        max-wait:
+      primary: master
+      datasource:
+        master:
+          name: ruoyi-vue-pro
+          url: jdbc:mysql://400-infra.server.iocoder.cn:3306/${spring.datasource.dynamic.datasource.master.name}?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=CTT
+          driver-class-name: com.mysql.jdbc.Driver
+          username: root
+          password: 3WLiVUBEwTbvAfsh
+          # druid 局部配置
+#          druid: # The following are independent parameters that can be reset for each db
+#            validation-query: select 1 FROM DUAL #such as oracle need this
+#        slave:
+#          name: ruoyi-vue-pro-slave
+#          url: jdbc:mysql://127.0.0.1:3306/${spring.datasource.dynamic.datasource.slave.name}?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=CTT
+#          driver-class-name: com.mysql.jdbc.Driver
+#          username: root
+#          password: 123456
+
+
+
+
 
   # Redis 配置。Redisson 默认的配置足够使用，一般不需要进行调优
   redis:
