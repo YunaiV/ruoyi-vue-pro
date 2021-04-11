@@ -18,7 +18,8 @@
       </el-form-item>
       <el-form-item label="发送状态" prop="sendStatus">
         <el-select v-model="queryParams.sendStatus" placeholder="请选择发送状态" clearable size="small">
-          <el-option label="请选择字典生成" value="" />
+          <el-option v-for="dict in this.getDictDatas(DICT_TYPE.SYS_SMS_SEND_STATUS)"
+                     :key="dict.value" :label="dict.label" :value="dict.value"/>
         </el-select>
       </el-form-item>
       <el-form-item label="发送时间">
@@ -27,7 +28,8 @@
       </el-form-item>
       <el-form-item label="接收状态" prop="receiveStatus">
         <el-select v-model="queryParams.receiveStatus" placeholder="请选择接收状态" clearable size="small">
-          <el-option label="请选择字典生成" value="" />
+          <el-option v-for="dict in this.getDictDatas(DICT_TYPE.SYS_SMS_RECEIVE_STATUS)"
+                     :key="dict.value" :label="dict.label" :value="dict.value"/>
         </el-select>
       </el-form-item>
       <el-form-item label="接收时间">
@@ -70,22 +72,19 @@
         </template>
       </el-table-column>
       <el-table-column label="短信内容" align="center" prop="templateContent" width="300" />
-      <el-table-column label="发送状态" align="center">
+      <el-table-column label="发送状态" align="center" width="180">
         <template slot-scope="scope">
-          <span>{{ getDictDataLabel(DICT_TYPE.SYS_SMS_SEND_STATUS, scope.row.sendStatus) }}</span>
+          <div>{{ getDictDataLabel(DICT_TYPE.SYS_SMS_SEND_STATUS, scope.row.sendStatus) }}</div>
+          <div>{{ parseTime(scope.row.sendTime) }}</div>
         </template>
       </el-table-column>
-      <el-table-column label="接收状态" align="center">
+      <el-table-column label="接收状态" align="center" width="180">
         <template slot-scope="scope">
-          <span>{{ getDictDataLabel(DICT_TYPE.SYS_SMS_RECEIVE_STATUS, scope.row.receiveStatus) }}</span>
+          <div>{{ getDictDataLabel(DICT_TYPE.SYS_SMS_RECEIVE_STATUS, scope.row.receiveStatus) }}</div>
+          <div>{{ parseTime(scope.row.receiveTime) }}</div>
         </template>
       </el-table-column>
-      <el-table-column label="接收时间" align="center" prop="receiveTime" width="180">
-        <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.receiveTime) }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="短信渠道" align="center">
+      <el-table-column label="短信渠道" align="center" width="100">
         <template slot-scope="scope">
           <div>{{ formatChannelSignature(scope.row.channelId) }}</div>
           <div>【{{ getDictDataLabel(DICT_TYPE.SYS_SMS_CHANNEL_CODE, scope.row.channelCode) }}】</div>
@@ -110,42 +109,65 @@
 
     <!-- 短信日志详细 -->
     <el-dialog title="短信日志详细" :visible.sync="open" width="700px" append-to-body>
-      <el-form ref="form" :model="form" label-width="100px" size="mini">
+      <el-form ref="form" :model="form" label-width="140px" size="mini">
         <el-row>
           <el-col :span="24">
             <el-form-item label="日志主键：">{{ form.id }}</el-form-item>
           </el-col>
           <el-col :span="24">
-            <el-form-item label="链路追踪：">{{ form.traceId }}</el-form-item>
-          </el-col>
-          <el-col :span="24">
-            <el-form-item label="用户信息：">{{ form.userId }} | {{ form.userNickname }} | {{ form.userIp }} | {{ form.userAgent}} </el-form-item>
-          </el-col>
-          <el-col :span="24">
-            <el-form-item label="操作信息：">
-              {{ form.module }} | {{ form.name }} | {{ getDictDataLabel(DICT_TYPE.SYS_OPERATE_TYPE, form.type) }}
-              <br /> {{ form.content }}
-              <br /> {{ form.exts }}
+            <el-form-item label="短信渠道：">
+              {{ formatChannelSignature(form.channelId) }}【{{ getDictDataLabel(DICT_TYPE.SYS_SMS_CHANNEL_CODE, form.channelCode) }}】
             </el-form-item>
           </el-col>
           <el-col :span="24">
-            <el-form-item label="请求信息：">{{ form.requestMethod }} | {{ form.requestUrl }} </el-form-item>
-          </el-col>
-          <el-col :span="24">
-            <el-form-item label="方法名：">{{ form.javaMethod }}</el-form-item>
-          </el-col>
-          <el-col :span="24">
-            <el-form-item label="方法参数：">{{ form.javaMethodArgs }}</el-form-item>
-          </el-col>
-          <el-col :span="24">
-            <el-form-item label="开始时间：">
-              {{ parseTime(form.startTime) }} | {{ form.duration }} ms
+            <el-form-item label="短信模板：">
+              {{ form.templateId }} | {{ form.templateCode}} | {{ getDictDataLabel(DICT_TYPE.SYS_SMS_TEMPLATE_TYPE, form.templateType) }}
             </el-form-item>
           </el-col>
-          <el-col :span="12">
-            <el-form-item label="操作结果：">
-              <div v-if="form.resultCode === 0">正常 | {{ form.resultData}} </div>
-              <div v-else-if="form.resultCode > 0">失败 | {{ form.resultCode }} || {{ form.resultMsg}}</div>
+          <el-col :span="24">
+            <el-form-item label="API 的模板编号：">{{ form.apiTemplateId }}</el-form-item>
+          </el-col>
+          <el-col :span="24">
+            <el-form-item label="用户信息：">{{ form.mobile }}
+              <span v-if="form.userType && form.userId"> | {{ getDictDataLabel(DICT_TYPE.USER_TYPE, form.userType) }} | {{ form.userId }}</span>
+            </el-form-item>
+          </el-col>
+          <el-col :span="24">
+            <el-form-item label="短信内容：">{{ form.templateContent }}</el-form-item>
+          </el-col>
+          <el-col :span="24">
+            <el-form-item label="短信参数：">{{ form.templateParams }}</el-form-item>
+          </el-col>
+          <el-col :span="24">
+            <el-form-item label="创建时间：">{{ parseTime(form.createTime) }}</el-form-item>
+          </el-col>
+          <el-col :span="24">
+            <el-form-item label="发送状态：">{{ getDictDataLabel(DICT_TYPE.SYS_SMS_SEND_STATUS, form.sendStatus) }}</el-form-item>
+          </el-col>
+          <el-col :span="24">
+            <el-form-item label="发送时间：">{{ parseTime(form.sendTime) }}</el-form-item>
+          </el-col>
+          <el-col :span="24">
+            <el-form-item label="发送结果：">{{ form.sendCode }} | {{ form.sendMsg }}
+            </el-form-item>
+          </el-col>
+          <el-col :span="24">
+            <el-form-item label="API 发送结果：">{{ form.apiSendCode }} | {{ form.apiSendMsg }}</el-form-item>
+          </el-col>
+          <el-col :span="24">
+            <el-form-item label="API 短信编号：">{{ form.apiSerialNo }}</el-form-item>
+          </el-col>
+          <el-col :span="24">
+            <el-form-item label="API 请求编号：">{{ form.apiRequestId }}</el-form-item>
+          </el-col>
+          <el-col :span="24">
+            <el-form-item label="接收状态：">{{ getDictDataLabel(DICT_TYPE.SYS_SMS_RECEIVE_STATUS, form.receiveStatus) }}</el-form-item>
+          </el-col>
+          <el-col :span="24">
+            <el-form-item label="接收时间：">{{ parseTime(form.receiveTime) }}</el-form-item>
+          </el-col>
+          <el-col :span="24">
+            <el-form-item label="API 接收结果：">{{ form.apiReceiveCode }} | {{ form.apiReceiveMsg }}
             </el-form-item>
           </el-col>
         </el-row>

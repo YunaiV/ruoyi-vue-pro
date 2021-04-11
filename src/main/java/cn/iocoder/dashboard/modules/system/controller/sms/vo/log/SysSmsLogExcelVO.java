@@ -1,10 +1,15 @@
 package cn.iocoder.dashboard.modules.system.controller.sms.vo.log;
 
+import cn.iocoder.dashboard.framework.excel.core.annotations.DictFormat;
+import cn.iocoder.dashboard.framework.excel.core.convert.DictConvert;
+import cn.iocoder.dashboard.framework.excel.core.convert.JsonConvert;
 import com.alibaba.excel.annotation.ExcelProperty;
 import lombok.Data;
 
 import java.util.Date;
 import java.util.Map;
+
+import static cn.iocoder.dashboard.modules.system.enums.dict.SysDictTypeEnum.*;
 
 /**
  * 短信日志 Excel VO
@@ -21,7 +26,6 @@ public class SysSmsLogExcelVO {
     private Long channelId;
 
     @ExcelProperty("短信渠道编码")
-    // TODO 导出枚举
     private String channelCode;
 
     @ExcelProperty("模板编号")
@@ -30,13 +34,14 @@ public class SysSmsLogExcelVO {
     @ExcelProperty("模板编码")
     private String templateCode;
 
-    @ExcelProperty("短信类型")
+    @ExcelProperty(value = "短信类型", converter = DictConvert.class)
+    @DictFormat(SYS_SMS_TEMPLATE_TYPE)
     private Integer templateType;
 
     @ExcelProperty("短信内容")
     private String templateContent;
 
-    @ExcelProperty("短信参数")
+    @ExcelProperty(value = "短信参数", converter = JsonConvert.class)
     private Map<String, Object> templateParams;
 
     @ExcelProperty("短信 API 的模板编号")
@@ -48,12 +53,12 @@ public class SysSmsLogExcelVO {
     @ExcelProperty("用户编号")
     private Long userId;
 
-    @ExcelProperty("用户类型")
-    // TODO 导出枚举
+    @ExcelProperty(value = "用户类型", converter = DictConvert.class)
+    @DictFormat(USER_TYPE)
     private Integer userType;
 
-    @ExcelProperty("发送状态")
-    // TODO 导出枚举
+    @ExcelProperty(value = "发送状态", converter = DictConvert.class)
+    @DictFormat(SYS_SMS_SEND_STATUS)
     private Integer sendStatus;
 
     @ExcelProperty("发送时间")
@@ -77,8 +82,8 @@ public class SysSmsLogExcelVO {
     @ExcelProperty("短信 API 发送返回的序号")
     private String apiSerialNo;
 
-    @ExcelProperty("接收状态")
-    // TODO 导出枚举
+    @ExcelProperty(value = "接收状态", converter = DictConvert.class)
+    @DictFormat(SYS_SMS_RECEIVE_STATUS)
     private Integer receiveStatus;
 
     @ExcelProperty("接收时间")
