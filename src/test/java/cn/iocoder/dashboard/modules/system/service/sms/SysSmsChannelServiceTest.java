@@ -1,5 +1,6 @@
 package cn.iocoder.dashboard.modules.system.service.sms;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.iocoder.dashboard.BaseDbUnitTest;
 import cn.iocoder.dashboard.common.enums.CommonStatusEnum;
 import cn.iocoder.dashboard.common.pojo.PageResult;
@@ -9,6 +10,7 @@ import cn.iocoder.dashboard.modules.system.controller.sms.vo.channel.SysSmsChann
 import cn.iocoder.dashboard.modules.system.controller.sms.vo.channel.SysSmsChannelUpdateReqVO;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.sms.SysSmsChannelDO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.sms.SysSmsChannelMapper;
+import cn.iocoder.dashboard.modules.system.mq.producer.sms.SysSmsProducer;
 import cn.iocoder.dashboard.modules.system.service.sms.impl.SysSmsChannelServiceImpl;
 import cn.iocoder.dashboard.util.collection.ArrayUtils;
 import cn.iocoder.dashboard.util.object.ObjectUtils;
@@ -17,18 +19,19 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.function.Consumer;
 
 import static cn.hutool.core.util.RandomUtil.randomEle;
 import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.SMS_CHANNEL_HAS_CHILDREN;
 import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.SMS_CHANNEL_NOT_EXISTS;
-import static cn.iocoder.dashboard.util.AssertUtils.assertPojoEquals;
-import static cn.iocoder.dashboard.util.AssertUtils.assertServiceException;
+import static cn.iocoder.dashboard.util.AssertUtils.*;
 import static cn.iocoder.dashboard.util.RandomUtils.*;
 import static cn.iocoder.dashboard.util.date.DateUtils.buildTime;
+import static cn.iocoder.dashboard.util.object.ObjectUtils.max;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
 * {@link SysSmsChannelServiceImpl} 的单元测试类
@@ -41,14 +44,35 @@ public class SysSmsChannelServiceTest extends BaseDbUnitTest {
     @Resource
     private SysSmsChannelServiceImpl smsChannelService;
 
-    @MockBean
-    private SmsClientFactory smsClientFactory;
-
     @Resource
     private SysSmsChannelMapper smsChannelMapper;
 
     @MockBean
+    private SmsClientFactory smsClientFactory;
+    @MockBean
     private SysSmsTemplateService smsTemplateService;
+    @MockBean
+    private SysSmsProducer smsProducer;
+
+    @Test
+    public void testInitLocalCache_success() {
+        // mock 数据s
+        SysSmsChannelDO smsChannelDO01 = randomSmsChannelDO();
+        smsChannelMapper.insert(smsChannelDO01);
+        SysSmsChannelDO smsChannelDO02 = randomSmsChannelDO();
+        smsChannelMapper.insert(smsChannelDO02);
+
+        // 调用
+        smsChannelService.initSmsClients();
+        // 校验 maxUpdateTime 属性
+        Date maxUpdateTime = (Date) BeanUtil.getFieldValue(smsChannelService, "maxUpdateTime");
+        assertEquals(max(smsChannelDO01.getUpdateTime(), smsChannelDO02.getUpdateTime()), maxUpdateTime);
+        // 校验调用
+        verify(smsClientFactory, times(1)).createOrUpdateSmsClient(
+                argThat(properties -> isPojoEquals(smsChannelDO01, properties)));
+        verify(smsClientFactory, times(1)).createOrUpdateSmsClient(
+                argThat(properties -> isPojoEquals(smsChannelDO02, properties)));
+    }
 
     @Test
     public void testCreateSmsChannel_success() {
@@ -62,6 +86,8 @@ public class SysSmsChannelServiceTest extends BaseDbUnitTest {
         // 校验记录的属性是否正确
         SysSmsChannelDO smsChannel = smsChannelMapper.selectById(smsChannelId);
         assertPojoEquals(reqVO, smsChannel);
+        // 校验调用
+        verify(smsProducer, times(1)).sendSmsChannelRefreshMessage();
     }
 
     @Test
@@ -81,6 +107,8 @@ public class SysSmsChannelServiceTest extends BaseDbUnitTest {
         // 校验是否更新正确
         SysSmsChannelDO smsChannel = smsChannelMapper.selectById(reqVO.getId()); // 获取最新的
         assertPojoEquals(reqVO, smsChannel);
+        // 校验调用
+        verify(smsProducer, times(1)).sendSmsChannelRefreshMessage();
     }
 
     @Test
@@ -104,6 +132,8 @@ public class SysSmsChannelServiceTest extends BaseDbUnitTest {
         smsChannelService.deleteSmsChannel(id);
        // 校验数据不存在了
        assertNull(smsChannelMapper.selectById(id));
+        // 校验调用
+        verify(smsProducer, times(1)).sendSmsChannelRefreshMessage();
     }
 
     @Test

@@ -109,6 +109,7 @@ public class SysSmsLogServiceTest extends BaseDbUnitTest {
         assertEquals(apiSerialNo, dbSmsLog.getApiSerialNo());
     }
 
+    @Test
     public void testUpdateSmsReceiveResult() {
         // mock 数据
         SysSmsLogDO dbSmsLog = randomSmsLogDO(
@@ -128,7 +129,7 @@ public class SysSmsLogServiceTest extends BaseDbUnitTest {
         assertEquals(success ? SysSmsReceiveStatusEnum.SUCCESS.getStatus()
                 : SysSmsReceiveStatusEnum.FAILURE.getStatus(), dbSmsLog.getReceiveStatus());
         assertEquals(receiveTime, dbSmsLog.getReceiveTime());
-        assertEquals(apiReceiveCode, dbSmsLog.getApiSendCode());
+        assertEquals(apiReceiveCode, dbSmsLog.getApiReceiveCode());
         assertEquals(apiReceiveMsg, dbSmsLog.getApiReceiveMsg());
     }
 
@@ -233,6 +234,7 @@ public class SysSmsLogServiceTest extends BaseDbUnitTest {
             o.setTemplateParams(randomTemplateParams());
             o.setTemplateType(randomEle(SysSmsTemplateTypeEnum.values()).getType()); // 保证 templateType 的范围
             o.setUserType(randomEle(UserTypeEnum.values()).getValue()); // 保证 userType 的范围
+            o.setSendStatus(randomEle(SysSmsSendStatusEnum.values()).getStatus()); // 保证 sendStatus 的范围
             o.setReceiveStatus(randomEle(SysSmsReceiveStatusEnum.values()).getStatus()); // 保证 receiveStatus 的范围
         };
         return randomPojo(SysSmsLogDO.class, ArrayUtils.append(consumer, consumers));

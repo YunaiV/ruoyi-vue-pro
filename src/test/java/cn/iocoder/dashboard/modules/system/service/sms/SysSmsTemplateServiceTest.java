@@ -16,6 +16,7 @@ import cn.iocoder.dashboard.modules.system.dal.dataobject.sms.SysSmsChannelDO;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.sms.SysSmsTemplateDO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.sms.SysSmsTemplateMapper;
 import cn.iocoder.dashboard.modules.system.enums.sms.SysSmsTemplateTypeEnum;
+import cn.iocoder.dashboard.modules.system.mq.producer.sms.SysSmsProducer;
 import cn.iocoder.dashboard.modules.system.service.sms.impl.SysSmsTemplateServiceImpl;
 import cn.iocoder.dashboard.util.collection.ArrayUtils;
 import cn.iocoder.dashboard.util.object.ObjectUtils;
@@ -25,18 +26,22 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
+import static cn.hutool.core.bean.BeanUtil.getFieldValue;
 import static cn.hutool.core.util.RandomUtil.randomEle;
 import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.*;
 import static cn.iocoder.dashboard.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.dashboard.util.AssertUtils.assertServiceException;
 import static cn.iocoder.dashboard.util.RandomUtils.*;
 import static cn.iocoder.dashboard.util.date.DateUtils.buildTime;
+import static cn.iocoder.dashboard.util.object.ObjectUtils.max;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
 * {@link SysSmsTemplateServiceImpl} 的单元测试类
@@ -54,11 +59,33 @@ public class SysSmsTemplateServiceTest extends BaseDbUnitTest {
 
     @MockBean
     private SysSmsChannelService smsChannelService;
-
     @MockBean
     private SmsClientFactory smsClientFactory;
     @MockBean
     private SmsClient smsClient;
+    @MockBean
+    private SysSmsProducer smsProducer;
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void testInitLocalCache() {
+        // mock 数据
+        SysSmsTemplateDO smsTemplate01 = randomSmsTemplateDO();
+        smsTemplateMapper.insert(smsTemplate01);
+        SysSmsTemplateDO smsTemplate02 = randomSmsTemplateDO();
+        smsTemplateMapper.insert(smsTemplate02);
+
+        // 调用
+        smsTemplateService.initLocalCache();
+        // 断言 deptCache 缓存
+        Map<String, SysSmsTemplateDO> smsTemplateCache = (Map<String, SysSmsTemplateDO>) getFieldValue(smsTemplateService, "smsTemplateCache");
+        assertEquals(2, smsTemplateCache.size());
+        assertPojoEquals(smsTemplate01, smsTemplateCache.get(smsTemplate01.getCode()));
+        assertPojoEquals(smsTemplate02, smsTemplateCache.get(smsTemplate02.getCode()));
+        // 断言 maxUpdateTime 缓存
+        Date maxUpdateTime = (Date) getFieldValue(smsTemplateService, "maxUpdateTime");
+        assertEquals(max(smsTemplate01.getUpdateTime(), smsTemplate02.getUpdateTime()), maxUpdateTime);
+    }
 
     @Test
     public void testParseTemplateContentParams() {
@@ -101,6 +128,8 @@ public class SysSmsTemplateServiceTest extends BaseDbUnitTest {
         assertPojoEquals(reqVO, smsTemplate);
         assertEquals(Lists.newArrayList("operation", "code"), smsTemplate.getParams());
         assertEquals(channelDO.getCode(), smsTemplate.getChannelCode());
+        // 校验调用
+        verify(smsProducer, times(1)).sendSmsTemplateRefreshMessage();
     }
 
     @Test
@@ -134,6 +163,8 @@ public class SysSmsTemplateServiceTest extends BaseDbUnitTest {
         assertPojoEquals(reqVO, smsTemplate);
         assertEquals(Lists.newArrayList("operation", "code"), smsTemplate.getParams());
         assertEquals(channelDO.getCode(), smsTemplate.getChannelCode());
+        // 校验调用
+        verify(smsProducer, times(1)).sendSmsTemplateRefreshMessage();
     }
 
     @Test
@@ -157,6 +188,8 @@ public class SysSmsTemplateServiceTest extends BaseDbUnitTest {
         smsTemplateService.deleteSmsTemplate(id);
        // 校验数据不存在了
        assertNull(smsTemplateMapper.selectById(id));
+        // 校验调用
+        verify(smsProducer, times(1)).sendSmsTemplateRefreshMessage();
     }
 
     @Test
@@ -309,7 +342,7 @@ public class SysSmsTemplateServiceTest extends BaseDbUnitTest {
     }
 
     @Test
-    public void testCheckDictDataValueUnique_valueDuplicateForCreate() {
+    public void testCheckSmsTemplateCodeDuplicate_valueDuplicateForCreate() {
         // 准备参数
         String code = randomString();
         // mock 数据
@@ -317,7 +350,7 @@ public class SysSmsTemplateServiceTest extends BaseDbUnitTest {
 
         // 调用，校验异常
         assertServiceException(() -> smsTemplateService.checkSmsTemplateCodeDuplicate(null, code),
-                SMS_TEMPLATE_CODE_DUPLICATE);
+                SMS_TEMPLATE_CODE_DUPLICATE, code);
     }
 
     @Test
@@ -330,7 +363,7 @@ public class SysSmsTemplateServiceTest extends BaseDbUnitTest {
 
         // 调用，校验异常
         assertServiceException(() -> smsTemplateService.checkSmsTemplateCodeDuplicate(id, code),
-                SMS_TEMPLATE_CODE_DUPLICATE);
+                SMS_TEMPLATE_CODE_DUPLICATE, code);
     }
 
     // ========== 随机对象 ==========
