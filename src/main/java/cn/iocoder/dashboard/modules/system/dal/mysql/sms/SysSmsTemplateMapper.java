@@ -7,7 +7,9 @@ import cn.iocoder.dashboard.modules.system.controller.sms.vo.template.SysSmsTemp
 import cn.iocoder.dashboard.modules.system.controller.sms.vo.template.SysSmsTemplatePageReqVO;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.sms.SysSmsTemplateDO;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Select;
 
+import java.util.Date;
 import java.util.List;
 
 @Mapper
@@ -44,5 +46,8 @@ public interface SysSmsTemplateMapper extends BaseMapperX<SysSmsTemplateDO> {
     default Integer selectCountByChannelId(Long channelId) {
         return selectCount("channel_id", channelId);
     }
+
+    @Select("SELECT id FROM sys_sms_template WHERE update_time > #{maxUpdateTime} LIMIT 1")
+    Long selectExistsByUpdateTimeAfter(Date maxUpdateTime);
 
 }

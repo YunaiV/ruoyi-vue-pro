@@ -21,12 +21,25 @@ import java.util.Map;
 public interface SysSmsTemplateService {
 
     /**
+     * 初始化短信模板的本地缓存
+     */
+    void initLocalCache();
+
+    /**
      * 获得短信模板
      *
      * @param code 模板编码
      * @return 短信模板
      */
     SysSmsTemplateDO getSmsTemplateByCode(String code);
+
+    /**
+     * 获得短信模板，从缓存中
+     *
+     * @param code 模板编码
+     * @return 短信模板
+     */
+    SysSmsTemplateDO getSmsTemplateByCodeFromCache(String code);
 
     /**
      * 格式化短信内容

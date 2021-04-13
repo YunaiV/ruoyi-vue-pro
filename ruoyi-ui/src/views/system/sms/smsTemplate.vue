@@ -68,7 +68,7 @@
       </el-table-column>
       <el-table-column label="备注" align="center" prop="remark" />
       <el-table-column label="短信 API 的模板编号" align="center" prop="apiTemplateId" width="180" />
-      <el-table-column label="短信渠道" align="center">
+      <el-table-column label="短信渠道" align="center" width="120">
         <template slot-scope="scope">
           <div>{{ formatChannelSignature(scope.row.channelId) }}</div>
           <div>【{{ getDictDataLabel(DICT_TYPE.SYS_SMS_CHANNEL_CODE, scope.row.channelCode) }}】</div>

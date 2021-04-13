@@ -98,8 +98,9 @@ public class SysSmsServiceImpl implements SysSmsService {
     }
 
     private SysSmsTemplateDO checkSmsTemplateValid(String templateCode) {
+        // 获得短信模板。考虑到效率，从缓存中获取
+        SysSmsTemplateDO template = smsTemplateService.getSmsTemplateByCodeFromCache(templateCode);
         // 短信模板不存在
-        SysSmsTemplateDO template = smsTemplateService.getSmsTemplateByCode(templateCode);
         if (template == null) {
             throw exception(SMS_TEMPLATE_NOT_EXISTS);
         }

@@ -50,7 +50,7 @@ public abstract class AbstractSmsClient implements SmsClient {
 
     public final void refresh(SmsChannelProperties properties) {
         // 判断是否更新
-        if (!properties.equals(this.properties)) {
+        if (properties.equals(this.properties)) {
             return;
         }
         log.info("[refresh][配置({})发生变化，重新初始化]", properties);

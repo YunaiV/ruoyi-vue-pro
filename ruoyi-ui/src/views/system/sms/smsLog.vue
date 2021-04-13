@@ -84,7 +84,7 @@
           <div>{{ parseTime(scope.row.receiveTime) }}</div>
         </template>
       </el-table-column>
-      <el-table-column label="短信渠道" align="center" width="100">
+      <el-table-column label="短信渠道" align="center" width="120">
         <template slot-scope="scope">
           <div>{{ formatChannelSignature(scope.row.channelId) }}</div>
           <div>【{{ getDictDataLabel(DICT_TYPE.SYS_SMS_CHANNEL_CODE, scope.row.channelCode) }}】</div>

@@ -58,7 +58,7 @@ public class SysRoleServiceImpl implements SysRoleService {
      */
     private volatile Map<Long, SysRoleDO> roleCache;
     /**
-     * 缓存菜单的最大更新时间，用于后续的增量轮询，判断是否有更新
+     * 缓存角色的最大更新时间，用于后续的增量轮询，判断是否有更新
      */
     private volatile Date maxUpdateTime;
 
@@ -77,7 +77,7 @@ public class SysRoleServiceImpl implements SysRoleService {
     @Override
     @PostConstruct
     public void initLocalCache() {
-        // 获取菜单列表，如果有更新
+        // 获取角色列表，如果有更新
         List<SysRoleDO> roleList = this.loadRoleIfUpdate(maxUpdateTime);
         if (CollUtil.isEmpty(roleList)) {
             return;
@@ -98,23 +98,23 @@ public class SysRoleServiceImpl implements SysRoleService {
     }
 
     /**
-     * 如果菜单发生变化，从数据库中获取最新的全量菜单。
+     * 如果角色发生变化，从数据库中获取最新的全量角色。
      * 如果未发生变化，则返回空
      *
-     * @param maxUpdateTime 当前菜单的最大更新时间
-     * @return 菜单列表
+     * @param maxUpdateTime 当前角色的最大更新时间
+     * @return 角色列表
      */
     private List<SysRoleDO> loadRoleIfUpdate(Date maxUpdateTime) {
         // 第一步，判断是否要更新。
         if (maxUpdateTime == null) { // 如果更新时间为空，说明 DB 一定有新数据
-            log.info("[loadRoleIfUpdate][首次加载全量菜单]");
-        } else { // 判断数据库中是否有更新的菜单
+            log.info("[loadRoleIfUpdate][首次加载全量角色]");
+        } else { // 判断数据库中是否有更新的角色
             if (!roleMapper.selectExistsByUpdateTimeAfter(maxUpdateTime)) {
                 return null;
             }
-            log.info("[loadRoleIfUpdate][增量加载全量菜单]");
+            log.info("[loadRoleIfUpdate][增量加载全量角色]");
         }
-        // 第二步，如果有更新，则从数据库加载所有菜单
+        // 第二步，如果有更新，则从数据库加载所有角色
         return roleMapper.selectList();
     }
 
