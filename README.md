@@ -102,9 +102,9 @@
 | [Hibernate Validator](https://github.com/hibernate/hibernate-validator) | 参数校验组件 | 6.1.7 | [文档](http://www.iocoder.cn/Spring-Boot/Validation/?yudao) |
 | [Quartz](https://github.com/quartz-scheduler) | 任务调度组件 | 2.3.2 | [文档](http://www.iocoder.cn/Spring-Boot/Job/?yudao) |
 | [Knife4j](https://gitee.com/xiaoym/knife4j) | Swagger 增强 UI 实现 | 3.0.2 | [文档](http://www.iocoder.cn/Spring-Boot/Swagger/?yudao) |
-| [Resilience4j](https://github.com/quartz-scheduler) | 服务保障组件 | 1.7.0 | [文档](http://www.iocoder.cn/Spring-Boot/Resilience4j/?yudao) |
+| [Resilience4j](https://github.com/resilience4j/resilience4j) | 服务保障组件 | 1.7.0 | [文档](http://www.iocoder.cn/Spring-Boot/Resilience4j/?yudao) |
 | [SkyWalking](https://skywalking.apache.org/) | 分布式应用追踪系统 | 8.6.0 | [文档](http://www.iocoder.cn/Spring-Boot/SkyWalking/?yudao) |
-| [Spring Boot Admin](https://github.com/skywalking) | Spring Boot 监控平台 | 8.6.0 | [文档](http://www.iocoder.cn/Spring-Boot/Admin/?yudao) |
+| [Spring Boot Admin](https://github.com/codecentric/spring-boot-admin) | Spring Boot 监控平台 | 8.6.0 | [文档](http://www.iocoder.cn/Spring-Boot/Admin/?yudao) |
 | [Jackson](https://github.com/FasterXML/jackson) | JSON 工具库 | 2.11.4 |  |
 | [MapStruct](https://mapstruct.org/) | Java Bean 转换 | 1.4.1 | [文档](http://www.iocoder.cn/Spring-Boot/MapStruct/?yudao) |
 | [Lombok](https://projectlombok.org/) | 消除冗长的 Java 代码 | 1.16.14 | [文档](http://www.iocoder.cn/Spring-Boot/Lombok/?yudao) |
