@@ -18,6 +18,7 @@ import cn.iocoder.dashboard.modules.system.service.sms.SysSmsLogService;
 import cn.iocoder.dashboard.modules.system.service.sms.SysSmsService;
 import cn.iocoder.dashboard.modules.system.service.sms.SysSmsTemplateService;
 import cn.iocoder.dashboard.modules.system.service.user.SysUserService;
+import com.google.common.annotations.VisibleForTesting;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -77,6 +78,8 @@ public class SysSmsServiceImpl implements SysSmsService {
         SysSmsTemplateDO template = this.checkSmsTemplateValid(templateCode);
         // 校验手机号码是否存在
         mobile = this.checkMobile(mobile);
+        // 构建有序的模板参数。为什么放在这个位置，是提前保证模板参数的正确性，而不是到了插入发送日志
+        List<KeyValue<String, Object>> newTemplateParams = this.buildTemplateParams(template, templateParams);
 
         // 创建发送日志
         Boolean isSend = CommonStatusEnum.ENABLE.getStatus().equals(template.getStatus()); // 如果模板被禁用，则不发送短信，只记录日志
@@ -85,7 +88,6 @@ public class SysSmsServiceImpl implements SysSmsService {
 
         // 发送 MQ 消息，异步执行发送短信
         if (isSend) {
-            List<KeyValue<String, Object>> newTemplateParams = this.buildTemplateParams(template, templateParams);
             smsProducer.sendSmsSendMessage(sendLogId, mobile, template.getChannelId(), template.getApiTemplateId(), newTemplateParams);
         }
         return sendLogId;
@@ -97,7 +99,8 @@ public class SysSmsServiceImpl implements SysSmsService {
         throw new UnsupportedOperationException("暂时不支持该操作，感兴趣可以实现该功能哟！");
     }
 
-    private SysSmsTemplateDO checkSmsTemplateValid(String templateCode) {
+    @VisibleForTesting
+    public SysSmsTemplateDO checkSmsTemplateValid(String templateCode) {
         // 获得短信模板。考虑到效率，从缓存中获取
         SysSmsTemplateDO template = smsTemplateService.getSmsTemplateByCodeFromCache(templateCode);
         // 短信模板不存在
@@ -116,7 +119,8 @@ public class SysSmsServiceImpl implements SysSmsService {
      * @param templateParams 原始参数
      * @return 处理后的参数
      */
-    private List<KeyValue<String, Object>> buildTemplateParams(SysSmsTemplateDO template, Map<String, Object> templateParams) {
+    @VisibleForTesting
+    public List<KeyValue<String, Object>> buildTemplateParams(SysSmsTemplateDO template, Map<String, Object> templateParams) {
         return template.getParams().stream().map(key -> {
             Object value = templateParams.get(key);
             if (value == null) {
@@ -126,7 +130,8 @@ public class SysSmsServiceImpl implements SysSmsService {
         }).collect(Collectors.toList());
     }
 
-    private String checkMobile(String mobile) {
+    @VisibleForTesting
+    public String checkMobile(String mobile) {
         if (StrUtil.isEmpty(mobile)) {
             throw exception(SMS_SEND_MOBILE_NOT_EXISTS);
         }
