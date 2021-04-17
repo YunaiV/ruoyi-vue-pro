@@ -24,6 +24,7 @@ import com.aliyuncs.profile.DefaultProfile;
 import com.aliyuncs.profile.IClientProfile;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.annotations.VisibleForTesting;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
@@ -53,7 +54,7 @@ public class AliyunSmsClient extends AbstractSmsClient {
     /**
      * 阿里云客户端
      */
-    private volatile IAcsClient acsClient;
+    private volatile IAcsClient client;
 
     public AliyunSmsClient(SmsChannelProperties properties) {
         super(properties, new AliyunSmsCodeMapping());
@@ -64,7 +65,7 @@ public class AliyunSmsClient extends AbstractSmsClient {
     @Override
     protected void doInit() {
         IClientProfile profile = DefaultProfile.getProfile(ENDPOINT, properties.getApiKey(), properties.getApiSecret());
-        acsClient = new DefaultAcsClient(profile);
+        client = new DefaultAcsClient(profile);
     }
 
     @Override
@@ -79,13 +80,6 @@ public class AliyunSmsClient extends AbstractSmsClient {
         request.setOutId(String.valueOf(sendLogId));
         // 执行请求
         return invoke(request, response -> new SmsSendRespDTO().setSerialNo(response.getBizId()));
-    }
-
-    private static String formatResultMsg(ClientException ex) {
-        if (StrUtil.isEmpty(ex.getErrorDescription())) {
-            return ex.getMessage();
-        }
-        return ex.getErrMsg() + " => " + ex.getErrorDescription();
     }
 
     @Override
@@ -115,7 +109,8 @@ public class AliyunSmsClient extends AbstractSmsClient {
         });
     }
 
-    private Integer convertSmsTemplateAuditStatus(Integer templateStatus) {
+    @VisibleForTesting
+    Integer convertSmsTemplateAuditStatus(Integer templateStatus) {
         switch (templateStatus) {
             case 0: return SmsTemplateAuditStatusEnum.CHECKING.getStatus();
             case 1: return SmsTemplateAuditStatusEnum.SUCCESS.getStatus();
@@ -124,10 +119,11 @@ public class AliyunSmsClient extends AbstractSmsClient {
         }
     }
 
-    private <T extends AcsResponse, R> SmsCommonResult<R> invoke(AcsRequest<T> request, Function<T, R> responseConsumer) {
+    @VisibleForTesting
+    <T extends AcsResponse, R> SmsCommonResult<R> invoke(AcsRequest<T> request, Function<T, R> responseConsumer) {
         try {
             // 执行发送. 由于阿里云 sms 短信没有统一的 Response，但是有统一的 code、message、requestId 属性，所以只好反射
-            T sendResult = acsClient.getAcsResponse(request);
+            T sendResult = client.getAcsResponse(request);
             String code = (String) ReflectUtil.getFieldValue(sendResult, "code");
             String message = (String) ReflectUtil.getFieldValue(sendResult, "message");
             String requestId = (String) ReflectUtil.getFieldValue(sendResult, "requestId");
@@ -141,6 +137,13 @@ public class AliyunSmsClient extends AbstractSmsClient {
         } catch (ClientException ex) {
             return SmsCommonResult.build(ex.getErrCode(), formatResultMsg(ex), ex.getRequestId(), null, codeMapping);
         }
+    }
+
+    private static String formatResultMsg(ClientException ex) {
+        if (StrUtil.isEmpty(ex.getErrorDescription())) {
+            return ex.getErrMsg();
+        }
+        return ex.getErrMsg() + " => " + ex.getErrorDescription();
     }
 
     /**

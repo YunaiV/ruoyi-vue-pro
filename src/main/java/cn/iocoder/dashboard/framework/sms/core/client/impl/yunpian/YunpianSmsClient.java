@@ -15,6 +15,7 @@ import cn.iocoder.dashboard.framework.sms.core.property.SmsChannelProperties;
 import cn.iocoder.dashboard.util.json.JsonUtils;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.annotations.VisibleForTesting;
 import com.yunpian.sdk.YunpianClient;
 import com.yunpian.sdk.constant.YunpianConstant;
 import com.yunpian.sdk.model.Result;
@@ -113,7 +114,8 @@ public class YunpianSmsClient extends AbstractSmsClient {
         });
     }
 
-    private Integer convertSmsTemplateAuditStatus(String checkStatus) {
+    @VisibleForTesting
+    Integer convertSmsTemplateAuditStatus(String checkStatus) {
         switch (checkStatus) {
             case "CHECKING": return SmsTemplateAuditStatusEnum.CHECKING.getStatus();
             case "SUCCESS": return SmsTemplateAuditStatusEnum.SUCCESS.getStatus();
@@ -122,7 +124,8 @@ public class YunpianSmsClient extends AbstractSmsClient {
         }
     }
 
-    private <T, R> SmsCommonResult<R> invoke(Supplier<Result<T>> requestConsumer, Function<T, R> responseConsumer) throws Throwable {
+    @VisibleForTesting
+    <T, R> SmsCommonResult<R> invoke(Supplier<Result<T>> requestConsumer, Function<T, R> responseConsumer) throws Throwable {
         // 执行请求
         Result<T> result = requestConsumer.get();
         if (result.getThrowable() != null) {
