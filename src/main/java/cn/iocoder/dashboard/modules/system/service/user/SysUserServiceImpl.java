@@ -1,17 +1,27 @@
 package cn.iocoder.dashboard.modules.system.service.user;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.io.IoUtil;
+import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.dashboard.common.enums.CommonStatusEnum;
 import cn.iocoder.dashboard.common.exception.ServiceException;
 import cn.iocoder.dashboard.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.dashboard.common.pojo.PageResult;
-import cn.iocoder.dashboard.modules.system.controller.user.vo.user.*;
+import cn.iocoder.dashboard.modules.infra.service.file.InfFileService;
+import cn.iocoder.dashboard.modules.system.controller.user.vo.profile.SysUserProfileUpdatePasswordReqVO;
+import cn.iocoder.dashboard.modules.system.controller.user.vo.profile.SysUserProfileUpdateReqVO;
+import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserCreateReqVO;
+import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserExportReqVO;
+import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserImportExcelVO;
+import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserImportRespVO;
+import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserPageReqVO;
+import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserUpdateReqVO;
 import cn.iocoder.dashboard.modules.system.convert.user.SysUserConvert;
-import cn.iocoder.dashboard.modules.system.dal.mysql.user.SysUserMapper;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.dept.SysDeptDO;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.dept.SysPostDO;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.user.SysUserDO;
+import cn.iocoder.dashboard.modules.system.dal.mysql.user.SysUserMapper;
 import cn.iocoder.dashboard.modules.system.service.dept.SysDeptService;
 import cn.iocoder.dashboard.modules.system.service.dept.SysPostService;
 import cn.iocoder.dashboard.modules.system.service.permission.SysPermissionService;
@@ -22,7 +32,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.*;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.*;
 
@@ -45,79 +62,16 @@ public class SysUserServiceImpl implements SysUserService {
     private SysPostService postService;
     @Resource
     private SysPermissionService permissionService;
-
     @Resource
     private PasswordEncoder passwordEncoder;
-
-//    /**
-//     * 根据条件分页查询用户列表
-//     *
-//     * @param user 用户信息
-//     * @return 用户信息集合信息
-//     */
-//    @Override
-//    @DataScope(deptAlias = "d", userAlias = "u")
-//    public List<SysUser> selectUserList(SysUser user)
-//    {
-//        return userMapper.selectUserList(user);
-//    }
-
-    @Override
-    public SysUserDO getUserByUserName(String username) {
-        return userMapper.selectByUsername(username);
-    }
-
-    @Override
-    public SysUserDO getUser(Long id) {
-        return userMapper.selectById(id);
-    }
-
-    @Override
-    public PageResult<SysUserDO> pageUsers(SysUserPageReqVO reqVO) {
-        return userMapper.selectPage(reqVO, this.getDeptCondition(reqVO.getDeptId()));
-    }
-
-    @Override
-    public List<SysUserDO> listUsers(SysUserExportReqVO reqVO) {
-        return userMapper.selectList(reqVO, this.getDeptCondition(reqVO.getDeptId()));
-    }
-
-    @Override
-    public List<SysUserDO> listUsers(Collection<Long> ids) {
-        return userMapper.selectBatchIds(ids);
-    }
-
-    @Override
-    public List<SysUserDO> listUsersByNickname(String nickname) {
-        return userMapper.selectListByNickname(nickname);
-    }
-
-    @Override
-    public List<SysUserDO> listUsersByUsername(String username) {
-        return userMapper.selectListByUsername(username);
-    }
-
-    /**
-     * 获得部门条件：查询指定部门的子部门编号们，包括自身
-     *
-     * @param deptId 部门编号
-     * @return 部门编号集合
-     */
-    private Set<Long> getDeptCondition(Long deptId) {
-        if (deptId == null) {
-            return Collections.emptySet();
-        }
-        Set<Long> deptIds = CollectionUtils.convertSet(deptService.listDeptsByParentIdFromCache(
-                deptId, true), SysDeptDO::getId);
-        deptIds.add(deptId); // 包括自身
-        return deptIds;
-    }
+    @Resource
+    private InfFileService fileService;
 
     @Override
     public Long createUser(SysUserCreateReqVO reqVO) {
         // 校验正确性
         this.checkCreateOrUpdate(null, reqVO.getUsername(), reqVO.getMobile(), reqVO.getEmail(),
-                reqVO.getDeptId(), reqVO.getPostIds());
+            reqVO.getDeptId(), reqVO.getPostIds());
         // 插入用户
         SysUserDO user = SysUserConvert.INSTANCE.convert(reqVO);
         user.setStatus(CommonStatusEnum.ENABLE.getStatus()); // 默认开启
@@ -130,18 +84,42 @@ public class SysUserServiceImpl implements SysUserService {
     public void updateUser(SysUserUpdateReqVO reqVO) {
         // 校验正确性
         this.checkCreateOrUpdate(reqVO.getId(), reqVO.getUsername(), reqVO.getMobile(), reqVO.getEmail(),
-                reqVO.getDeptId(), reqVO.getPostIds());
+            reqVO.getDeptId(), reqVO.getPostIds());
         // 更新用户
         SysUserDO updateObj = SysUserConvert.INSTANCE.convert(reqVO);
         userMapper.updateById(updateObj);
     }
 
     @Override
-    public void deleteUser(Long id) {
-        // 校验用户存在
+    public void updateUserProfile(Long id, SysUserProfileUpdateReqVO reqVO) {
+        // 校验正确性
         this.checkUserExists(id);
-        // 删除用户
-        userMapper.deleteById(id);
+        this.checkEmailUnique(id, reqVO.getEmail());
+        this.checkMobileUnique(id, reqVO.getMobile());
+        // 执行更新
+        userMapper.updateById(SysUserConvert.INSTANCE.convert(reqVO).setId(id));
+    }
+
+    @Override
+    public void updateUserPassword(Long id, SysUserProfileUpdatePasswordReqVO reqVO) {
+        // 校验旧密码密码
+        this.checkOldPassword(id, reqVO.getOldPassword());
+        // 执行更新
+        SysUserDO updateObj = new SysUserDO().setId(id);
+        updateObj.setPassword(passwordEncoder.encode(reqVO.getNewPassword())); // 加密密码
+        userMapper.updateById(updateObj);
+    }
+
+    @Override
+    public void updateUserAvatar(Long id, InputStream avatarFile) {
+        this.checkUserExists(id);
+        // 存储文件
+        String avatar = fileService.createFile(IdUtil.fastUUID(), IoUtil.readBytes(avatarFile));
+        // 更新路径
+        SysUserDO sysUserDO = new SysUserDO();
+        sysUserDO.setId(id);
+        sysUserDO.setAvatar(avatar);
+        userMapper.updateById(sysUserDO);
     }
 
     @Override
@@ -166,6 +144,65 @@ public class SysUserServiceImpl implements SysUserService {
         userMapper.updateById(updateObj);
         // 删除用户关联数据
         permissionService.processUserDeleted(id);
+    }
+
+    @Override
+    public void deleteUser(Long id) {
+        // 校验用户存在
+        this.checkUserExists(id);
+        // 删除用户
+        userMapper.deleteById(id);
+    }
+
+    @Override
+    public SysUserDO getUserByUsername(String username) {
+        return userMapper.selectByUsername(username);
+    }
+
+    @Override
+    public SysUserDO getUser(Long id) {
+        return userMapper.selectById(id);
+    }
+
+    @Override
+    public PageResult<SysUserDO> getUserPage(SysUserPageReqVO reqVO) {
+        return userMapper.selectPage(reqVO, this.getDeptCondition(reqVO.getDeptId()));
+    }
+
+    @Override
+    public List<SysUserDO> getUsers(SysUserExportReqVO reqVO) {
+        return userMapper.selectList(reqVO, this.getDeptCondition(reqVO.getDeptId()));
+    }
+
+    @Override
+    public List<SysUserDO> getUsers(Collection<Long> ids) {
+        return userMapper.selectBatchIds(ids);
+    }
+
+    @Override
+    public List<SysUserDO> getUsersByNickname(String nickname) {
+        return userMapper.selectListByNickname(nickname);
+    }
+
+    @Override
+    public List<SysUserDO> getUsersByUsername(String username) {
+        return userMapper.selectListByUsername(username);
+    }
+
+    /**
+     * 获得部门条件：查询指定部门的子部门编号们，包括自身
+     *
+     * @param deptId 部门编号
+     * @return 部门编号集合
+     */
+    private Set<Long> getDeptCondition(Long deptId) {
+        if (deptId == null) {
+            return Collections.emptySet();
+        }
+        Set<Long> deptIds = CollectionUtils.convertSet(deptService.getDeptsByParentIdFromCache(
+            deptId, true), SysDeptDO::getId);
+        deptIds.add(deptId); // 包括自身
+        return deptIds;
     }
 
     private void checkCreateOrUpdate(Long id, String username, String mobile, String email,
@@ -195,7 +232,7 @@ public class SysUserServiceImpl implements SysUserService {
     }
 
     private void checkUsernameUnique(Long id, String username) {
-        if (StrUtil.isNotBlank(username)) {
+        if (StrUtil.isBlank(username)) {
             return;
         }
         SysUserDO user = userMapper.selectByUsername(username);
@@ -212,7 +249,7 @@ public class SysUserServiceImpl implements SysUserService {
     }
 
     private void checkEmailUnique(Long id, String email) {
-        if (StrUtil.isNotBlank(email)) {
+        if (StrUtil.isBlank(email)) {
             return;
         }
         SysUserDO user = userMapper.selectByEmail(email);
@@ -228,11 +265,11 @@ public class SysUserServiceImpl implements SysUserService {
         }
     }
 
-    private void checkMobileUnique(Long id, String email) {
-        if (StrUtil.isNotBlank(email)) {
+    private void checkMobileUnique(Long id, String mobile) {
+        if (StrUtil.isBlank(mobile)) {
             return;
         }
-        SysUserDO user = userMapper.selectByMobile(email);
+        SysUserDO user = userMapper.selectByMobile(mobile);
         if (user == null) {
             return;
         }
@@ -262,7 +299,7 @@ public class SysUserServiceImpl implements SysUserService {
         if (CollUtil.isEmpty(postIds)) { // 允许不选择
             return;
         }
-        List<SysPostDO> posts = postService.listPosts(postIds, null);
+        List<SysPostDO> posts = postService.getPosts(postIds, null);
         if (CollUtil.isEmpty(posts)) {
             throw ServiceExceptionUtil.exception(POST_NOT_FOUND);
         }
@@ -278,19 +315,35 @@ public class SysUserServiceImpl implements SysUserService {
         });
     }
 
+    /**
+     * 校验旧密码
+     *
+     * @param id          用户 id
+     * @param oldPassword 旧密码
+     */
+    private void checkOldPassword(Long id, String oldPassword) {
+        SysUserDO user = userMapper.selectById(id);
+        if (user == null) {
+            throw ServiceExceptionUtil.exception(USER_NOT_EXISTS);
+        }
+        if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
+            throw ServiceExceptionUtil.exception(USER_PASSWORD_FAILED);
+        }
+    }
+
     @Override
-    @Transactional // 添加事务，异常则回滚所有导入
+    @Transactional(rollbackFor = Exception.class) // 添加事务，异常则回滚所有导入
     public SysUserImportRespVO importUsers(List<SysUserImportExcelVO> importUsers, boolean isUpdateSupport) {
         if (CollUtil.isEmpty(importUsers)) {
             throw ServiceExceptionUtil.exception(USER_IMPORT_LIST_IS_EMPTY);
         }
         SysUserImportRespVO respVO = SysUserImportRespVO.builder().createUsernames(new ArrayList<>())
-                .updateUsernames(new ArrayList<>()).failureUsernames(new LinkedHashMap<>()).build();
+            .updateUsernames(new ArrayList<>()).failureUsernames(new LinkedHashMap<>()).build();
         importUsers.forEach(importUser -> {
             // 校验，判断是否有不符合的原因
             try {
                 checkCreateOrUpdate(null, null, importUser.getMobile(), importUser.getEmail(),
-                        importUser.getDeptId(), null);
+                    importUser.getDeptId(), null);
             } catch (ServiceException ex) {
                 respVO.getFailureUsernames().put(importUser.getUsername(), ex.getMessage());
                 return;
@@ -305,7 +358,7 @@ public class SysUserServiceImpl implements SysUserService {
             }
             // 如果存在，判断是否允许更新
             if (!isUpdateSupport) {
-                respVO.getFailureUsernames().put(importUser.getUsername(), USER_USERNAME_EXISTS.getMessage());
+                respVO.getFailureUsernames().put(importUser.getUsername(), USER_USERNAME_EXISTS.getMsg());
                 return;
             }
             SysUserDO updateUser = SysUserConvert.INSTANCE.convert(importUser);

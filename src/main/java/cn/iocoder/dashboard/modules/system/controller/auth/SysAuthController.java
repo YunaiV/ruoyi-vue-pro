@@ -19,6 +19,7 @@ import cn.iocoder.dashboard.modules.system.service.user.SysUserService;
 import cn.iocoder.dashboard.util.collection.SetUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -34,6 +35,7 @@ import static cn.iocoder.dashboard.util.servlet.ServletUtils.getUserAgent;
 @Api(tags = "认证")
 @RestController
 @RequestMapping("/")
+@Validated
 public class SysAuthController {
 
     @Resource
@@ -45,8 +47,8 @@ public class SysAuthController {
     @Resource
     private SysPermissionService permissionService;
 
-    @ApiOperation("使用账号密码登录")
     @PostMapping("/login")
+    @ApiOperation("使用账号密码登录")
     @OperateLog(enable = false) // 避免 Post 请求被记录操作日志
     public CommonResult<SysAuthLoginRespVO> login(@RequestBody @Valid SysAuthLoginReqVO reqVO) {
         String token = authService.login(reqVO, getClientIP(), getUserAgent());
@@ -54,8 +56,8 @@ public class SysAuthController {
         return success(SysAuthLoginRespVO.builder().token(token).build());
     }
 
-    @ApiOperation("获取登陆用户的权限信息")
     @GetMapping("/get-permission-info")
+    @ApiOperation("获取登陆用户的权限信息")
     public CommonResult<SysAuthPermissionInfoRespVO> getPermissionInfo() {
         // 获得用户信息
         SysUserDO user = userService.getUser(getLoginUserId());
@@ -63,9 +65,9 @@ public class SysAuthController {
             return null;
         }
         // 获得角色列表
-        List<SysRoleDO> roleList = roleService.listRolesFromCache(getLoginUserRoleIds());
+        List<SysRoleDO> roleList = roleService.getRolesFromCache(getLoginUserRoleIds());
         // 获得菜单列表
-        List<SysMenuDO> menuList = permissionService.listRoleMenusFromCache(
+        List<SysMenuDO> menuList = permissionService.getRoleMenusFromCache(
                 getLoginUserRoleIds(), // 注意，基于登陆的角色，因为后续的权限判断也是基于它
                 SetUtils.asSet(MenuTypeEnum.DIR.getType(), MenuTypeEnum.MENU.getType(), MenuTypeEnum.BUTTON.getType()),
                 SetUtils.asSet(CommonStatusEnum.ENABLE.getStatus()));
@@ -73,11 +75,11 @@ public class SysAuthController {
         return success(SysAuthConvert.INSTANCE.convert(user, roleList, menuList));
     }
 
-    @ApiOperation("获得登陆用户的菜单列表")
     @GetMapping("list-menus")
-    public CommonResult<List<SysAuthMenuRespVO>> listMenus() {
+    @ApiOperation("获得登陆用户的菜单列表")
+    public CommonResult<List<SysAuthMenuRespVO>> getMenus() {
         // 获得用户拥有的菜单列表
-        List<SysMenuDO> menuList = permissionService.listRoleMenusFromCache(
+        List<SysMenuDO> menuList = permissionService.getRoleMenusFromCache(
                 getLoginUserRoleIds(), // 注意，基于登陆的角色，因为后续的权限判断也是基于它
                 SetUtils.asSet(MenuTypeEnum.DIR.getType(), MenuTypeEnum.MENU.getType()), // 只要目录和菜单类型
                 SetUtils.asSet(CommonStatusEnum.ENABLE.getStatus())); // 只要开启的

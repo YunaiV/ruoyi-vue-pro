@@ -81,7 +81,7 @@ public class ApiAccessLogFilter extends OncePerRequestFilter {
                                       Map<String, String> queryString, String requestBody, Exception ex) {
         // 处理用户信息
         accessLog.setUserId(WebFrameworkUtils.getLoginUserId(request));
-        accessLog.setUserType(WebFrameworkUtils.getUesrType(request));
+        accessLog.setUserType(WebFrameworkUtils.getUserType(request));
         // 设置访问结果
         CommonResult<?> result = WebFrameworkUtils.getCommonResult(request);
         if (result != null) {

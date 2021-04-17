@@ -13,11 +13,11 @@
             <ul class="list-group list-group-striped">
               <li class="list-group-item">
                 <svg-icon icon-class="user" />用户名称
-                <div class="pull-right">{{ user.userName }}</div>
+                <div class="pull-right">{{ user.username }}</div>
               </li>
               <li class="list-group-item">
                 <svg-icon icon-class="phone" />手机号码
-                <div class="pull-right">{{ user.phonenumber }}</div>
+                <div class="pull-right">{{ user.mobile }}</div>
               </li>
               <li class="list-group-item">
                 <svg-icon icon-class="email" />用户邮箱
@@ -25,15 +25,19 @@
               </li>
               <li class="list-group-item">
                 <svg-icon icon-class="tree" />所属部门
-                <div class="pull-right" v-if="user.dept">{{ user.dept.deptName }} / {{ postGroup }}</div>
+                <div class="pull-right" v-if="user.dept">{{ user.dept.name }}</div>
+              </li>
+              <li class="list-group-item">
+                <svg-icon icon-class="tree" />所属岗位
+                <div class="pull-right" v-if="user.posts">{{ user.posts.map(post => post.name).join(',') }}</div>
               </li>
               <li class="list-group-item">
                 <svg-icon icon-class="peoples" />所属角色
-                <div class="pull-right">{{ roleGroup }}</div>
+                <div class="pull-right">{{ user.roles.map(post => post.name).join(',') }}</div>
               </li>
               <li class="list-group-item">
                 <svg-icon icon-class="date" />创建日期
-                <div class="pull-right">{{ user.createTime }}</div>
+                <div class="pull-right">{{ parseTime(user.createTime) }}</div>
               </li>
             </ul>
           </div>
@@ -82,8 +86,6 @@ export default {
     getUser() {
       getUserProfile().then(response => {
         this.user = response.data;
-        this.roleGroup = response.roleGroup;
-        this.postGroup = response.postGroup;
       });
     }
   }

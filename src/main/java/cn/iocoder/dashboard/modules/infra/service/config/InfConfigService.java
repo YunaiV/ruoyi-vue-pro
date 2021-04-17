@@ -7,28 +7,37 @@ import cn.iocoder.dashboard.modules.infra.controller.config.vo.InfConfigPageReqV
 import cn.iocoder.dashboard.modules.infra.controller.config.vo.InfConfigUpdateReqVO;
 import cn.iocoder.dashboard.modules.infra.dal.dataobject.config.InfConfigDO;
 
+import javax.validation.Valid;
 import java.util.List;
 
 /**
  * 参数配置 Service 接口
+ *
+ * @author 芋道源码
  */
 public interface InfConfigService {
 
     /**
-     * 获得参数配置分页列表
+     * 创建参数配置
      *
-     * @param reqVO 分页条件
-     * @return 分页列表
+     * @param reqVO 创建信息
+     * @return 配置编号
      */
-    PageResult<InfConfigDO> getConfigPage(InfConfigPageReqVO reqVO);
+    Long createConfig(@Valid InfConfigCreateReqVO reqVO);
 
     /**
-     * 获得参数配置列表
+     * 更新参数配置
      *
-     * @param reqVO 列表
-     * @return 列表
+     * @param reqVO 更新信息
      */
-    List<InfConfigDO> getConfigList(InfConfigExportReqVO reqVO);
+    void updateConfig(@Valid InfConfigUpdateReqVO reqVO);
+
+    /**
+     * 删除参数配置
+     *
+     * @param id 配置编号
+     */
+    void deleteConfig(Long id);
 
     /**
      * 获得参数配置
@@ -47,25 +56,20 @@ public interface InfConfigService {
     InfConfigDO getConfigByKey(String key);
 
     /**
-     * 创建参数配置
+     * 获得参数配置分页列表
      *
-     * @param reqVO 创建信息
-     * @return 配置编号
+     * @param reqVO 分页条件
+     * @return 分页列表
      */
-    Long createConfig(InfConfigCreateReqVO reqVO);
+    PageResult<InfConfigDO> getConfigPage(@Valid InfConfigPageReqVO reqVO);
 
     /**
-     * 更新参数配置
+     * 获得参数配置列表
      *
-     * @param reqVO 更新信息
+     * @param reqVO 列表
+     * @return 列表
      */
-    void updateConfig(InfConfigUpdateReqVO reqVO);
+    List<InfConfigDO> getConfigList(@Valid InfConfigExportReqVO reqVO);
 
-    /**
-     * 删除参数配置
-     *
-     * @param id 配置编号
-     */
-    void deleteConfig(Long id);
 
 }

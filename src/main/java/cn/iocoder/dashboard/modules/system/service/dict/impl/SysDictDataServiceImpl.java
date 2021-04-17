@@ -2,7 +2,6 @@ package cn.iocoder.dashboard.modules.system.service.dict.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.dashboard.common.enums.CommonStatusEnum;
-import cn.iocoder.dashboard.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.dashboard.common.pojo.PageResult;
 import cn.iocoder.dashboard.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.dashboard.modules.system.controller.dict.vo.data.SysDictDataCreateReqVO;
@@ -10,12 +9,13 @@ import cn.iocoder.dashboard.modules.system.controller.dict.vo.data.SysDictDataEx
 import cn.iocoder.dashboard.modules.system.controller.dict.vo.data.SysDictDataPageReqVO;
 import cn.iocoder.dashboard.modules.system.controller.dict.vo.data.SysDictDataUpdateReqVO;
 import cn.iocoder.dashboard.modules.system.convert.dict.SysDictDataConvert;
-import cn.iocoder.dashboard.modules.system.dal.mysql.dict.SysDictDataMapper;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.dict.SysDictDataDO;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.dict.SysDictTypeDO;
+import cn.iocoder.dashboard.modules.system.dal.mysql.dict.SysDictDataMapper;
 import cn.iocoder.dashboard.modules.system.mq.producer.dict.SysDictDataProducer;
 import cn.iocoder.dashboard.modules.system.service.dict.SysDictDataService;
 import cn.iocoder.dashboard.modules.system.service.dict.SysDictTypeService;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableTable;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -28,6 +28,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
+import static cn.iocoder.dashboard.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.*;
 
 /**
@@ -130,19 +131,19 @@ public class SysDictDataServiceImpl implements SysDictDataService {
     }
 
     @Override
-    public List<SysDictDataDO> listDictDatas() {
+    public List<SysDictDataDO> getDictDatas() {
         List<SysDictDataDO> list = dictDataMapper.selectList();
         list.sort(COMPARATOR_TYPE_AND_SORT);
         return list;
     }
 
     @Override
-    public PageResult<SysDictDataDO> pageDictDatas(SysDictDataPageReqVO reqVO) {
+    public PageResult<SysDictDataDO> getDictDataPage(SysDictDataPageReqVO reqVO) {
         return dictDataMapper.selectPage(reqVO);
     }
 
     @Override
-    public List<SysDictDataDO> listDictDatas(SysDictDataExportReqVO reqVO) {
+    public List<SysDictDataDO> getDictDatas(SysDictDataExportReqVO reqVO) {
         List<SysDictDataDO> list = dictDataMapper.selectList(reqVO);
         list.sort(COMPARATOR_TYPE_AND_SORT);
         return list;
@@ -156,7 +157,7 @@ public class SysDictDataServiceImpl implements SysDictDataService {
     @Override
     public Long createDictData(SysDictDataCreateReqVO reqVO) {
         // 校验正确性
-        this.checkCreateOrUpdate(null, reqVO.getLabel(), reqVO.getDictType());
+        this.checkCreateOrUpdate(null, reqVO.getValue(), reqVO.getDictType());
         // 插入字典类型
         SysDictDataDO dictData = SysDictDataConvert.INSTANCE.convert(reqVO);
         dictDataMapper.insert(dictData);
@@ -168,7 +169,7 @@ public class SysDictDataServiceImpl implements SysDictDataService {
     @Override
     public void updateDictData(SysDictDataUpdateReqVO reqVO) {
         // 校验正确性
-        this.checkCreateOrUpdate(reqVO.getId(), reqVO.getLabel(), reqVO.getDictType());
+        this.checkCreateOrUpdate(reqVO.getId(), reqVO.getValue(), reqVO.getDictType());
         // 更新字典类型
         SysDictDataDO updateObj = SysDictDataConvert.INSTANCE.convert(reqVO);
         dictDataMapper.updateById(updateObj);
@@ -191,46 +192,49 @@ public class SysDictDataServiceImpl implements SysDictDataService {
         return dictDataMapper.selectCountByDictType(dictType);
     }
 
-    private void checkCreateOrUpdate(Long id, String label, String dictType) {
+    private void checkCreateOrUpdate(Long id, String value, String dictType) {
         // 校验自己存在
         checkDictDataExists(id);
-        // 校验字典数据的值的唯一性
-        checkDictDataValueUnique(id, dictType, label);
         // 校验字典类型有效
         checkDictTypeValid(dictType);
+        // 校验字典数据的值的唯一性
+        checkDictDataValueUnique(id, dictType, value);
     }
 
-    private void checkDictDataValueUnique(Long id, String dictType, String label) {
-        SysDictDataDO dictData = dictDataMapper.selectByDictTypeAndLabel(dictType, label);
+    @VisibleForTesting
+    public void checkDictDataValueUnique(Long id, String dictType, String value) {
+        SysDictDataDO dictData = dictDataMapper.selectByDictTypeAndValue(dictType, value);
         if (dictData == null) {
             return;
         }
         // 如果 id 为空，说明不用比较是否为相同 id 的字典数据
         if (id == null) {
-            throw ServiceExceptionUtil.exception(DICT_DATA_VALUE_DUPLICATE);
+            throw exception(DICT_DATA_VALUE_DUPLICATE);
         }
         if (!dictData.getId().equals(id)) {
-            throw ServiceExceptionUtil.exception(DICT_DATA_VALUE_DUPLICATE);
+            throw exception(DICT_DATA_VALUE_DUPLICATE);
         }
     }
 
-    private void checkDictDataExists(Long id) {
+    @VisibleForTesting
+    public void checkDictDataExists(Long id) {
         if (id == null) {
             return;
         }
         SysDictDataDO dictData = dictDataMapper.selectById(id);
         if (dictData == null) {
-            throw ServiceExceptionUtil.exception(DICT_DATA_NOT_FOUND);
+            throw exception(DICT_DATA_NOT_EXISTS);
         }
     }
 
-    private void checkDictTypeValid(String type) {
+    @VisibleForTesting
+    public void checkDictTypeValid(String type) {
         SysDictTypeDO dictType = dictTypeService.getDictType(type);
         if (dictType == null) {
-            throw ServiceExceptionUtil.exception(DICT_TYPE_NOT_FOUND);
+            throw exception(DICT_TYPE_NOT_EXISTS);
         }
         if (!CommonStatusEnum.ENABLE.getStatus().equals(dictType.getStatus())) {
-            throw ServiceExceptionUtil.exception(DICT_TYPE_NOT_ENABLE);
+            throw exception(DICT_TYPE_NOT_ENABLE);
         }
     }
 

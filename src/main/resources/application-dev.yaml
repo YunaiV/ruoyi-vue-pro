@@ -145,19 +145,20 @@ yudao:
   swagger:
     title: 管理后台
     description: 提供管理员管理的所有功能
-    version: ${yudao.info.base-package}
+    version: ${yudao.info.version}
     base-package: ${yudao.info.base-package}.modules
   captcha:
     timeout: 5m
     width: 160
     height: 60
   file:
-    base-path: http://127.0.0.1:${server.port}/${yudao.web.api-prefix}/file/get/
+    base-path: http://127.0.0.1:${server.port}${yudao.web.api-prefix}/system/file/get/
   codegen:
-    base-package: ${yudao.info.base-package}.modules
+    base-package: ${yudao.info.base-package}
     db-schemas: ${spring.datasource.name}
   xss:
     enable: false
     exclude-urls: # 如下两个 url，仅仅是为了演示，去掉配置也没关系
       - ${spring.boot.admin.context-path}/** # 不处理 Spring Boot Admin 的请求
       - ${management.endpoints.web.base-path}/** # 不处理 Actuator 的请求
+  demo: true # 开启演示模式

@@ -11,6 +11,7 @@ import cn.iocoder.dashboard.modules.system.dal.mysql.dept.SysPostMapper;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.dept.SysPostDO;
 import cn.iocoder.dashboard.modules.system.service.dept.SysPostService;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import java.util.Collection;
@@ -24,30 +25,11 @@ import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.*;
  * @author 芋道源码
  */
 @Service
+@Validated
 public class SysPostServiceImpl implements SysPostService {
 
     @Resource
     private SysPostMapper postMapper;
-
-    @Override
-    public List<SysPostDO> listPosts(Collection<Long> ids, Collection<Integer> statuses) {
-        return postMapper.selectList(ids, statuses);
-    }
-
-    @Override
-    public PageResult<SysPostDO> pagePosts(SysPostPageReqVO reqVO) {
-        return postMapper.selectPage(reqVO);
-    }
-
-    @Override
-    public List<SysPostDO> listPosts(SysPostExportReqVO reqVO) {
-        return postMapper.selectList(reqVO);
-    }
-
-    @Override
-    public SysPostDO getPost(Long id) {
-        return postMapper.selectById(id);
-    }
 
     @Override
     public Long createPost(SysPostCreateReqVO reqVO) {
@@ -66,6 +48,34 @@ public class SysPostServiceImpl implements SysPostService {
         // 更新岗位
         SysPostDO updateObj = SysPostConvert.INSTANCE.convert(reqVO);
         postMapper.updateById(updateObj);
+    }
+
+    @Override
+    public void deletePost(Long id) {
+        // 校验是否存在
+        this.checkPostExists(id);
+        // 删除部门
+        postMapper.deleteById(id);
+    }
+
+    @Override
+    public List<SysPostDO> getPosts(Collection<Long> ids, Collection<Integer> statuses) {
+        return postMapper.selectList(ids, statuses);
+    }
+
+    @Override
+    public PageResult<SysPostDO> getPostPage(SysPostPageReqVO reqVO) {
+        return postMapper.selectPage(reqVO);
+    }
+
+    @Override
+    public List<SysPostDO> getPosts(SysPostExportReqVO reqVO) {
+        return postMapper.selectList(reqVO);
+    }
+
+    @Override
+    public SysPostDO getPost(Long id) {
+        return postMapper.selectById(id);
     }
 
     private void checkCreateOrUpdate(Long id, String name, String code) {
@@ -103,14 +113,6 @@ public class SysPostServiceImpl implements SysPostService {
         if (!post.getId().equals(id)) {
             throw ServiceExceptionUtil.exception(POST_CODE_DUPLICATE);
         }
-    }
-
-    @Override
-    public void deletePost(Long id) {
-        // 校验是否存在
-        this.checkPostExists(id);
-        // 删除部门
-        postMapper.deleteById(id);
     }
 
     private void checkPostExists(Long id) {

@@ -128,13 +128,13 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 // 设置每个请求的权限
                 .authorizeRequests()
                     // 登陆的接口，可匿名访问
-                    .antMatchers(webProperties.getApiPrefix() + "/login").anonymous()
+                    .antMatchers(api("/login")).anonymous()
                     // 通用的接口，可匿名访问
-                    .antMatchers( webProperties.getApiPrefix() + "/system/captcha/**").anonymous()
+                    .antMatchers(api("/system/captcha/**")).anonymous()
                     // 静态资源，可匿名访问
                     .antMatchers(HttpMethod.GET, "/*.html", "/**/*.html", "/**/*.css", "/**/*.js").permitAll()
                     // 文件的获取接口，可匿名访问
-                    .antMatchers(webProperties.getApiPrefix() + "/system/file/get/**").anonymous()
+                    .antMatchers(api("/infra/file/get/**")).anonymous()
                     // Swagger 接口文档
                     .antMatchers("/swagger-ui.html").anonymous()
                     .antMatchers("/swagger-resources/**").anonymous()
@@ -148,13 +148,19 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                     .antMatchers("/actuator/**").anonymous()
                     // Druid 监控
                     .antMatchers("/druid/**").anonymous()
+                    // 短信回调 API
+                    .antMatchers(api("/system/sms/callback/**")).anonymous()
                     // 除上面外的所有请求全部需要鉴权认证
                     .anyRequest().authenticated()
                 .and()
                 .headers().frameOptions().disable();
-        httpSecurity.logout().logoutUrl("/logout").logoutSuccessHandler(logoutSuccessHandler);
+        httpSecurity.logout().logoutUrl(api("/logout")).logoutSuccessHandler(logoutSuccessHandler);
         // 添加 JWT Filter
         httpSecurity.addFilterBefore(authenticationTokenFilter, UsernamePasswordAuthenticationFilter.class);
+    }
+
+    private String api(String url) {
+        return webProperties.getApiPrefix() + url;
     }
 
 }

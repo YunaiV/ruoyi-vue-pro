@@ -2,13 +2,16 @@ package cn.iocoder.dashboard.framework.logger.operatelog.core.service;
 
 import cn.iocoder.dashboard.modules.system.controller.logger.vo.operatelog.SysOperateLogCreateReqVO;
 
+import java.util.concurrent.Future;
+
 public interface OperateLogFrameworkService {
 
     /**
-     * 要不记录操作日志
+     * 异步记录操作日志
      *
      * @param reqVO 操作日志请求
+     * @return true: 记录成功,false: 记录失败
      */
-    void createOperateLogAsync(SysOperateLogCreateReqVO reqVO);
+    Future<Boolean> createOperateLogAsync(SysOperateLogCreateReqVO reqVO);
 
 }

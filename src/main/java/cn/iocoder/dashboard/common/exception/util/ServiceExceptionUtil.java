@@ -2,6 +2,7 @@ package cn.iocoder.dashboard.common.exception.util;
 
 import cn.iocoder.dashboard.common.exception.ErrorCode;
 import cn.iocoder.dashboard.common.exception.ServiceException;
+import com.google.common.annotations.VisibleForTesting;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,12 +47,12 @@ public class ServiceExceptionUtil {
     // ========== 和 ServiceException 的集成 ==========
 
     public static ServiceException exception(ErrorCode errorCode) {
-        String messagePattern = MESSAGES.getOrDefault(errorCode.getCode(), errorCode.getMessage());
+        String messagePattern = MESSAGES.getOrDefault(errorCode.getCode(), errorCode.getMsg());
         return exception0(errorCode.getCode(), messagePattern);
     }
 
     public static ServiceException exception(ErrorCode errorCode, Object... params) {
-        String messagePattern = MESSAGES.getOrDefault(errorCode.getCode(), errorCode.getMessage());
+        String messagePattern = MESSAGES.getOrDefault(errorCode.getCode(), errorCode.getMsg());
         return exception0(errorCode.getCode(), messagePattern, params);
     }
 
@@ -91,7 +92,8 @@ public class ServiceExceptionUtil {
      * @param params         参数
      * @return 格式化后的提示
      */
-    private static String doFormat(int code, String messagePattern, Object... params) {
+    @VisibleForTesting
+    public static String doFormat(int code, String messagePattern, Object... params) {
         StringBuilder sbuf = new StringBuilder(messagePattern.length() + 50);
         int i = 0;
         int j;

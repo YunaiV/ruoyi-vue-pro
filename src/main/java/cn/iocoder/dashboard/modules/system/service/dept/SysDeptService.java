@@ -25,53 +25,6 @@ public interface SysDeptService {
     void initLocalCache();
 
     /**
-     * 获得指定编号的部门列表
-     *
-     * @param ids 部门编号数组
-     * @return 部门列表
-     */
-    List<SysDeptDO> listDepts(Collection<Long> ids);
-
-    /**
-     * 获得指定编号的部门 Map
-     *
-     * @param ids 部门编号数组
-     * @return 部门 Map
-     */
-    default Map<Long, SysDeptDO> getDeptMap(Collection<Long> ids) {
-        if (CollUtil.isEmpty(ids)) {
-            return Collections.emptyMap();
-        }
-        List<SysDeptDO> list = listDepts(ids);
-        return CollectionUtils.convertMap(list, SysDeptDO::getId);
-    }
-
-    /**
-     * 筛选部门列表
-     *
-     * @param reqVO 筛选条件请求 VO
-     * @return 部门列表
-     */
-    List<SysDeptDO> listDepts(SysDeptListReqVO reqVO);
-
-    /**
-     * 获得所有子部门，从缓存中
-     *
-     * @param parentId 部门编号
-     * @param recursive 是否递归获取所有
-     * @return 子部门列表
-     */
-    List<SysDeptDO> listDeptsByParentIdFromCache(Long parentId, boolean recursive);
-
-    /**
-     * 获得部门信息
-     *
-     * @param id 部门编号
-     * @return 部门信息
-     */
-    SysDeptDO getDept(Long id);
-
-    /**
      * 创建部门
      *
      * @param reqVO 部门信息
@@ -92,5 +45,52 @@ public interface SysDeptService {
      * @param id 部门编号
      */
     void deleteDept(Long id);
+
+    /**
+     * 获得指定编号的部门列表
+     *
+     * @param ids 部门编号数组
+     * @return 部门列表
+     */
+    List<SysDeptDO> getSimpleDepts(Collection<Long> ids);
+
+    /**
+     * 获得指定编号的部门 Map
+     *
+     * @param ids 部门编号数组
+     * @return 部门 Map
+     */
+    default Map<Long, SysDeptDO> getDeptMap(Collection<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return Collections.emptyMap();
+        }
+        List<SysDeptDO> list = getSimpleDepts(ids);
+        return CollectionUtils.convertMap(list, SysDeptDO::getId);
+    }
+
+    /**
+     * 筛选部门列表
+     *
+     * @param reqVO 筛选条件请求 VO
+     * @return 部门列表
+     */
+    List<SysDeptDO> getSimpleDepts(SysDeptListReqVO reqVO);
+
+    /**
+     * 获得部门信息
+     *
+     * @param id 部门编号
+     * @return 部门信息
+     */
+    SysDeptDO getDept(Long id);
+
+    /**
+     * 获得所有子部门，从缓存中
+     *
+     * @param parentId 部门编号
+     * @param recursive 是否递归获取所有
+     * @return 子部门列表
+     */
+    List<SysDeptDO> getDeptsByParentIdFromCache(Long parentId, boolean recursive);
 
 }

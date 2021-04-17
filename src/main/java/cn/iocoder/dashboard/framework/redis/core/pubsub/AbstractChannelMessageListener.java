@@ -1,11 +1,10 @@
 package cn.iocoder.dashboard.framework.redis.core.pubsub;
 
-import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.TypeUtil;
 import cn.iocoder.dashboard.util.json.JsonUtils;
 import lombok.SneakyThrows;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
-import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
 
 import java.lang.reflect.Type;
 
@@ -62,21 +61,11 @@ public abstract class AbstractChannelMessageListener<T extends ChannelMessage> i
      */
     @SuppressWarnings("unchecked")
     private Class<T> getMessageClass() {
-        Class<?> targetClass = getClass();
-        while (targetClass.getSuperclass() != null) {
-            // 如果不是 AbstractMessageListener 父类，继续向上查找
-            if (targetClass.getSuperclass() != AbstractChannelMessageListener.class) {
-                targetClass = targetClass.getSuperclass();
-                continue;
-            }
-            // 如果是 AbstractMessageListener 父类，则解析泛型
-            Type[] types = ((ParameterizedTypeImpl) targetClass.getGenericSuperclass()).getActualTypeArguments();
-            if (ArrayUtil.isEmpty(types)) {
-                throw new IllegalStateException(String.format("类型(%s) 需要设置消息类型", getClass().getName()));
-            }
-            return (Class<T>) types[0];
+        Type type = TypeUtil.getTypeArgument(getClass(), 0);
+        if (type == null) {
+            throw new IllegalStateException(String.format("类型(%s) 需要设置消息类型", getClass().getName()));
         }
-        throw new IllegalStateException(String.format("类型(%s) 找不到 AbstractMessageListener 父类", getClass().getName()));
+        return (Class<T>) type;
     }
 
 }

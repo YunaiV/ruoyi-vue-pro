@@ -30,7 +30,7 @@ public class InfApiErrorLogDO extends BaseDO {
     /**
      * 用户编号
      */
-    private Integer userId;
+    private Long userId;
     /**
      * 链路追踪编号
      *
@@ -148,6 +148,6 @@ public class InfApiErrorLogDO extends BaseDO {
      *
      * 关联 {@link SysUserDO#getId()}
      */
-    private Integer processUserId;
+    private Long processUserId;
 
 }

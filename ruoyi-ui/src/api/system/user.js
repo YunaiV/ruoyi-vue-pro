@@ -31,7 +31,7 @@ export function addUser(data) {
 export function updateUser(data) {
   return request({
     url: '/system/user/update',
-    method: 'post',
+    method: 'put',
     data: data
   })
 }
@@ -62,7 +62,7 @@ export function resetUserPwd(id, password) {
   }
   return request({
     url: '/system/user/update-password',
-    method: 'post',
+    method: 'put',
     data: data
   })
 }
@@ -75,7 +75,7 @@ export function changeUserStatus(id, status) {
   }
   return request({
     url: '/system/user/update-status',
-    method: 'post',
+    method: 'put',
     data: data
   })
 }
@@ -83,7 +83,7 @@ export function changeUserStatus(id, status) {
 // 查询用户个人信息
 export function getUserProfile() {
   return request({
-    url: '/system/user/profile',
+    url: '/system/user/profile/get',
     method: 'get'
   })
 }
@@ -91,7 +91,7 @@ export function getUserProfile() {
 // 修改用户个人信息
 export function updateUserProfile(data) {
   return request({
-    url: '/system/user/profile',
+    url: '/system/user/profile/update',
     method: 'put',
     data: data
   })
@@ -104,9 +104,9 @@ export function updateUserPwd(oldPassword, newPassword) {
     newPassword
   }
   return request({
-    url: '/system/user/profile/updatePwd',
+    url: '/system/user/profile/update-password',
     method: 'put',
-    params: data
+    data: data
   })
 }
 
@@ -114,7 +114,7 @@ export function updateUserPwd(oldPassword, newPassword) {
 export function uploadAvatar(data) {
   return request({
     url: '/system/user/profile/avatar',
-    method: 'post',
+    method: 'put',
     data: data
   })
 }
