@@ -2,7 +2,9 @@ package cn.iocoder.dashboard.framework.web.config;
 
 import cn.iocoder.dashboard.framework.web.core.enums.FilterOrderEnum;
 import cn.iocoder.dashboard.framework.web.core.filter.CacheRequestBodyFilter;
+import cn.iocoder.dashboard.framework.web.core.filter.DemoFilter;
 import cn.iocoder.dashboard.framework.web.core.filter.XssFilter;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -66,6 +68,15 @@ public class WebConfiguration implements WebMvcConfigurer {
     @Bean
     public FilterRegistrationBean<XssFilter> xssFilter(XssProperties properties, PathMatcher pathMatcher) {
         return createFilterBean(new XssFilter(properties, pathMatcher), FilterOrderEnum.XSS_FILTER);
+    }
+
+    /**
+     * 创建 DemoFilter Bean，演示模式
+     */
+    @Bean
+    @ConditionalOnProperty(value = "yudao.demo", havingValue = "true")
+    public FilterRegistrationBean<DemoFilter> demoFilter() {
+        return createFilterBean(new DemoFilter(), FilterOrderEnum.DEMO_FILTER);
     }
 
     private static <T extends Filter> FilterRegistrationBean<T> createFilterBean(T filter, Integer order) {
