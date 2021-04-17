@@ -18,6 +18,7 @@ import cn.iocoder.dashboard.modules.system.enums.permission.SysRoleTypeEnum;
 import cn.iocoder.dashboard.modules.system.mq.producer.permission.SysRoleProducer;
 import cn.iocoder.dashboard.modules.system.service.permission.SysPermissionService;
 import cn.iocoder.dashboard.modules.system.service.permission.SysRoleService;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.Nullable;
@@ -58,7 +59,7 @@ public class SysRoleServiceImpl implements SysRoleService {
      */
     private volatile Map<Long, SysRoleDO> roleCache;
     /**
-     * 缓存菜单的最大更新时间，用于后续的增量轮询，判断是否有更新
+     * 缓存角色的最大更新时间，用于后续的增量轮询，判断是否有更新
      */
     private volatile Date maxUpdateTime;
 
@@ -77,7 +78,7 @@ public class SysRoleServiceImpl implements SysRoleService {
     @Override
     @PostConstruct
     public void initLocalCache() {
-        // 获取菜单列表，如果有更新
+        // 获取角色列表，如果有更新
         List<SysRoleDO> roleList = this.loadRoleIfUpdate(maxUpdateTime);
         if (CollUtil.isEmpty(roleList)) {
             return;
@@ -98,23 +99,23 @@ public class SysRoleServiceImpl implements SysRoleService {
     }
 
     /**
-     * 如果菜单发生变化，从数据库中获取最新的全量菜单。
+     * 如果角色发生变化，从数据库中获取最新的全量角色。
      * 如果未发生变化，则返回空
      *
-     * @param maxUpdateTime 当前菜单的最大更新时间
-     * @return 菜单列表
+     * @param maxUpdateTime 当前角色的最大更新时间
+     * @return 角色列表
      */
     private List<SysRoleDO> loadRoleIfUpdate(Date maxUpdateTime) {
         // 第一步，判断是否要更新。
         if (maxUpdateTime == null) { // 如果更新时间为空，说明 DB 一定有新数据
-            log.info("[loadRoleIfUpdate][首次加载全量菜单]");
-        } else { // 判断数据库中是否有更新的菜单
+            log.info("[loadRoleIfUpdate][首次加载全量角色]");
+        } else { // 判断数据库中是否有更新的角色
             if (!roleMapper.selectExistsByUpdateTimeAfter(maxUpdateTime)) {
                 return null;
             }
-            log.info("[loadRoleIfUpdate][增量加载全量菜单]");
+            log.info("[loadRoleIfUpdate][增量加载全量角色]");
         }
-        // 第二步，如果有更新，则从数据库加载所有菜单
+        // 第二步，如果有更新，则从数据库加载所有角色
         return roleMapper.selectList();
     }
 
@@ -245,7 +246,8 @@ public class SysRoleServiceImpl implements SysRoleService {
      * @param code 角色额编码
      * @param id 角色编号
      */
-    private void checkDuplicateRole(String name, String code, Long id) {
+    @VisibleForTesting
+    public void checkDuplicateRole(String name, String code, Long id) {
         // 1. 该 name 名字被其它角色所使用
         SysRoleDO role = roleMapper.selectByName(name);
         if (role != null && !role.getId().equals(id)) {
@@ -258,7 +260,7 @@ public class SysRoleServiceImpl implements SysRoleService {
         // 该 code 编码被其它角色所使用
         role = roleMapper.selectByCode(code);
         if (role != null && !role.getId().equals(id)) {
-            throw ServiceExceptionUtil.exception(ROLE_CODE_DUPLICATE, name);
+            throw ServiceExceptionUtil.exception(ROLE_CODE_DUPLICATE, code);
         }
     }
 
@@ -267,7 +269,8 @@ public class SysRoleServiceImpl implements SysRoleService {
      *
      * @param id 角色编号
      */
-    private void checkUpdateRole(Long id) {
+    @VisibleForTesting
+    public void checkUpdateRole(Long id) {
         SysRoleDO roleDO = roleMapper.selectById(id);
         if (roleDO == null) {
             throw ServiceExceptionUtil.exception(ROLE_NOT_EXISTS);

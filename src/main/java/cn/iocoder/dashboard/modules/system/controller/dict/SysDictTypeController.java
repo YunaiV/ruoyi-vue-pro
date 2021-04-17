@@ -41,7 +41,7 @@ public class SysDictTypeController {
         return success(dictTypeId);
     }
 
-    @PostMapping("update")
+    @PutMapping("/update")
     @ApiOperation("修改字典类型")
     @PreAuthorize("@ss.hasPermission('system:dict:update')")
     public CommonResult<Boolean> updateDictType(@Valid @RequestBody SysDictTypeUpdateReqVO reqVO) {

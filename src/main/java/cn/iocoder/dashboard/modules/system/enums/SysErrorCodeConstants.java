@@ -30,8 +30,8 @@ public interface SysErrorCodeConstants {
 
     // ========== 角色模块 1002003000 ==========
     ErrorCode ROLE_NOT_EXISTS = new ErrorCode(1002003000, "角色不存在");
-    ErrorCode ROLE_NAME_DUPLICATE = new ErrorCode(1002003001, "已经存在名为【{}}】的角色");
-    ErrorCode ROLE_CODE_DUPLICATE = new ErrorCode(1002003002, "已经存在编码为【{}}】的角色");
+    ErrorCode ROLE_NAME_DUPLICATE = new ErrorCode(1002003001, "已经存在名为【{}】的角色");
+    ErrorCode ROLE_CODE_DUPLICATE = new ErrorCode(1002003002, "已经存在编码为【{}】的角色");
     ErrorCode ROLE_CAN_NOT_UPDATE_SYSTEM_TYPE_ROLE = new ErrorCode(1002003004, "不能操作类型为系统内置的角色");
 
     // ========== 用户模块 1002004000 ==========
@@ -77,5 +77,19 @@ public interface SysErrorCodeConstants {
     ErrorCode FILE_PATH_EXISTS = new ErrorCode(1002009001, "文件路径已经存在");
     ErrorCode FILE_UPLOAD_FAILED = new ErrorCode(1002009002, "文件上传失败");
     ErrorCode FILE_IS_EMPTY= new ErrorCode(1002009003, "文件为空");
+
+    // ========== 短信渠道 1002011000 ==========
+    ErrorCode SMS_CHANNEL_NOT_EXISTS = new ErrorCode(1002011000, "短信渠道不存在");
+    ErrorCode SMS_CHANNEL_DISABLE = new ErrorCode(1002011001, "短信渠道不处于开启状态，不允许选择");
+    ErrorCode SMS_CHANNEL_HAS_CHILDREN = new ErrorCode(1002011002, "无法删除，该短信渠道还有短信模板");
+
+    // ========== 短信模板 1002011000 ==========
+    ErrorCode SMS_TEMPLATE_NOT_EXISTS = new ErrorCode(1002011000, "短信模板不存在");
+    ErrorCode SMS_TEMPLATE_CODE_DUPLICATE = new ErrorCode(1002011001, "已经存在编码为【{}】的短信模板");
+
+    // ========== 短信发送 1002012000 ==========
+    ErrorCode SMS_SEND_MOBILE_NOT_EXISTS = new ErrorCode(1002012000, "手机号不存在");
+    ErrorCode SMS_SEND_MOBILE_TEMPLATE_PARAM_MISS = new ErrorCode(1002012001, "模板参数({})缺失");
+
 
 }
