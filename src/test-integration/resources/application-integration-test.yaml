@@ -9,19 +9,15 @@ spring:
   # 数据源配置项
   datasource:
     name: ruoyi-vue-pro
-    url: jdbc:h2:mem:testdb;MODE=MYSQL;DATABASE_TO_UPPER=false; # MODE 使用 MySQL 模式；DATABASE_TO_UPPER 配置表和字段使用小写
-    driver-class-name: org.h2.Driver
-    username: sa
-    password:
-    schema: classpath:sql/create_tables.sql # MySQL 转 H2 的语句，使用 https://www.jooq.org/translate/ 工具
-    druid:
-      async-init: true # 单元测试，异步初始化 Druid 连接池，提升启动速度
-      initial-size: 1 # 单元测试，配置为 1，提升启动速度
+    url: jdbc:mysql://127.0.0.1:3306/${spring.datasource.name}?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=CTT
+    driver-class-name: com.mysql.jdbc.Driver
+    username: root
+    password: 123456
 
   # Redis 配置。Redisson 默认的配置足够使用，一般不需要进行调优
   redis:
     host: 127.0.0.1 # 地址
-    port: 6379 # 端口（单元测试，使用 16379 端口）
+    port: 6379 # 端口
     database: 0 # 数据库索引
 
 mybatis:

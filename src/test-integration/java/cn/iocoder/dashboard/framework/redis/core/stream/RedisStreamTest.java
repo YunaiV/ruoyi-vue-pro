@@ -43,7 +43,7 @@ public class RedisStreamTest  {
             for (int i = 0; i < 100; i++) {
                 // 创建消息
                 SysSmsSendMessage message = new SysSmsSendMessage();
-                message.setMobile("15601691300").setTemplateCode("test:" + i);
+                message.setMobile("15601691300").setApiTemplateId("test:" + i);
                 // 发送消息
                 RedisMessageUtils.sendStreamMessage(stringRedisTemplate, message);
             }

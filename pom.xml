@@ -46,6 +46,7 @@
         <easyexcel.verion>2.2.7</easyexcel.verion>
         <velocity.version>2.2</velocity.version>
         <screw.version>1.0.5</screw.version>
+        <!-- 三方云服务相关 -->
     </properties>
 
     <!-- 依赖声明 -->
@@ -270,6 +271,27 @@
             <artifactId>screw-core</artifactId> <!-- 实现数据库文档 -->
             <version>${screw.version}</version>
         </dependency>
+
+        <!-- 三方云服务相关 -->
+
+        <!-- SMS SDK begin -->
+        <dependency>
+            <groupId>com.yunpian.sdk</groupId>
+            <artifactId>yunpian-java-sdk</artifactId>
+            <version>1.2.7</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.aliyun</groupId>
+            <artifactId>aliyun-java-sdk-core</artifactId>
+            <version>4.5.18</version>
+        </dependency>
+        <dependency>
+            <groupId>com.aliyun</groupId>
+            <artifactId>aliyun-java-sdk-dysmsapi</artifactId>
+            <version>2.1.0</version>
+        </dependency>
+        <!-- SMS SDK end -->
 
     </dependencies>
 

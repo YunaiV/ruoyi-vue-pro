@@ -3,7 +3,6 @@ package cn.iocoder.dashboard.framework.web.core.handler;
 import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.extra.servlet.ServletUtil;
-import cn.iocoder.dashboard.common.exception.GlobalException;
 import cn.iocoder.dashboard.common.exception.ServiceException;
 import cn.iocoder.dashboard.common.pojo.CommonResult;
 import cn.iocoder.dashboard.framework.logger.apilog.core.service.ApiErrorLogFrameworkService;
@@ -95,9 +94,6 @@ public class GlobalExceptionHandler {
         }
         if (ex instanceof AccessDeniedException) {
             return accessDeniedExceptionHandler(request, (AccessDeniedException) ex);
-        }
-        if (ex instanceof GlobalException) {
-            return globalExceptionHandler(request, (GlobalException) ex);
         }
         return defaultExceptionHandler(request, ex);
     }
@@ -223,25 +219,6 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * 处理全局异常 ServiceException
-     *
-     * 例如说，Dubbo 请求超时，调用的 Dubbo 服务系统异常
-     */
-    @ExceptionHandler(value = GlobalException.class)
-    public CommonResult<?> globalExceptionHandler(HttpServletRequest req, GlobalException ex) {
-        // 系统异常时，才打印异常日志
-        if (INTERNAL_SERVER_ERROR.getCode().equals(ex.getCode())) {
-            // 插入异常日志
-            this.createExceptionLog(req, ex);
-        // 普通全局异常，打印 info 日志即可
-        } else {
-            log.info("[globalExceptionHandler]", ex);
-        }
-        // 返回 ERROR CommonResult
-        return CommonResult.error(ex);
-    }
-
-    /**
      * 处理系统异常，兜底处理所有的一切
      */
     @ExceptionHandler(value = Exception.class)
@@ -250,7 +227,7 @@ public class GlobalExceptionHandler {
         // 插入异常日志
         this.createExceptionLog(req, ex);
         // 返回 ERROR CommonResult
-        return CommonResult.error(INTERNAL_SERVER_ERROR.getCode(), INTERNAL_SERVER_ERROR.getMessage());
+        return CommonResult.error(INTERNAL_SERVER_ERROR.getCode(), INTERNAL_SERVER_ERROR.getMsg());
     }
 
     private void createExceptionLog(HttpServletRequest req, Throwable e) {

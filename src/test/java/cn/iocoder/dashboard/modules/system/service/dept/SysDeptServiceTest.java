@@ -270,4 +270,5 @@ class SysDeptServiceTest extends BaseDbUnitTest {
         };
         return randomPojo(SysDeptDO.class, ArrayUtils.append(consumer, consumers));
     }
+
 }
