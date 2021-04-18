@@ -1,15 +1,11 @@
 package cn.iocoder.dashboard.modules.system.controller.errorcode.dto;
 
-import cn.iocoder.dashboard.framework.validator.InEnum;
-import cn.iocoder.dashboard.modules.system.enums.errorcode.ErrorCodeTypeEnum;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import lombok.experimental.Accessors;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.io.Serializable;
 
 @ApiModel("错误码更新 DTO")
 @Data

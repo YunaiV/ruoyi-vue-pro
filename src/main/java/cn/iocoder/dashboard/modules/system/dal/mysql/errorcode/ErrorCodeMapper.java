@@ -15,6 +15,7 @@ import java.util.List;
 
 @Mapper
 public interface ErrorCodeMapper extends BaseMapper<ErrorCodeDO> {
+
     default IPage<ErrorCodeDO> selectPage(ErrorCodePageDTO pageDTO) {
         return selectPage(new Page<>(pageDTO.getPageNo(), pageDTO.getPageSize()),
                 new QueryWrapperX<ErrorCodeDO>().likeIfPresent("`group`", pageDTO.getGroup())
@@ -29,8 +30,9 @@ public interface ErrorCodeMapper extends BaseMapper<ErrorCodeDO> {
         return selectOne(new QueryWrapper<ErrorCodeDO>().eq("code", code));
     }
 
-    default List<ErrorCodeDO> selectListByGroup(String group, Date minUpdateTime) {
-        return selectList(new QueryWrapperX<ErrorCodeDO>().eq("`group`", group)
+    default List<ErrorCodeDO> selectListByApplicationNameAndUpdateTimeGt(String applicationName, Date minUpdateTime) {
+        return selectList(new QueryWrapperX<ErrorCodeDO>().eq("application_name", applicationName)
                 .gtIfPresent("update_time", minUpdateTime));
     }
+
 }

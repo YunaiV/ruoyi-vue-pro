@@ -1,22 +1,34 @@
 package cn.iocoder.dashboard.modules.system.dal.dataobject.errorcode;
 
-import cn.iocoder.dashboard.modules.system.enums.errorcode.ErrorCodeTypeEnum;
-import com.baomidou.mybatisplus.annotation.TableField;
+import cn.iocoder.dashboard.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.dashboard.modules.system.enums.errorcode.SysErrorCodeTypeEnum;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.experimental.Accessors;
+import lombok.ToString;
 
+@TableName(value = "sys_error_code")
 @Data
-@TableName(value = "system_error_code")
-@EqualsAndHashCode()
-@Accessors(chain = true)
-public class ErrorCodeDO {
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
+public class ErrorCodeDO extends BaseDO {
 
     /**
      * 错误码编号
      */
+    @TableId
     private Integer id;
+    /**
+     * 错误码类型
+     *
+     * 枚举 {@link SysErrorCodeTypeEnum}
+     */
+    private Integer type;
+    /**
+     * 应用名
+     */
+    private String applicationName;
     /**
      * 错误码编码
      */
@@ -26,20 +38,8 @@ public class ErrorCodeDO {
      */
     private String message;
     /**
-     * 错误码类型
-     *
-     * 外键 {@link ErrorCodeTypeEnum}
-     */
-    private Integer type;
-    /**
-     * 错误码分组
-     *
-     * 一般情况下，可以采用应用名
-     */
-    @TableField("`group`") // 避免和数据库关键字冲突
-    private String group;
-    /**
      * 错误码备注
      */
     private String memo;
+
 }
