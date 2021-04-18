@@ -4,6 +4,8 @@ import cn.iocoder.dashboard.framework.datasource.config.DataSourceConfiguration;
 import cn.iocoder.dashboard.framework.mybatis.config.MybatisConfiguration;
 import cn.iocoder.dashboard.framework.redis.config.RedisConfig;
 import com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceAutoConfigure;
+import com.baomidou.dynamic.datasource.spring.boot.autoconfigure.DynamicDataSourceAutoConfiguration;
+import com.baomidou.dynamic.datasource.spring.boot.autoconfigure.druid.DruidDynamicDataSourceConfiguration;
 import com.baomidou.mybatisplus.autoconfigure.MybatisPlusAutoConfiguration;
 import org.redisson.spring.starter.RedissonAutoConfiguration;
 import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
@@ -26,6 +28,9 @@ public class BaseDbAndRedisIntegrationTest {
             // MyBatis 配置类
             MybatisConfiguration.class, // 自己的 MyBatis 配置类
             MybatisPlusAutoConfiguration.class, // MyBatis 的自动配置类
+            // Dynamic Datasource 配置后类
+            DynamicDataSourceAutoConfiguration.class, //
+            DruidDynamicDataSourceConfiguration.class, //
             // Redis 配置类
             RedisAutoConfiguration.class, // Spring Redis 自动配置类
             RedisConfig.class, // 自己的 Redis 配置类

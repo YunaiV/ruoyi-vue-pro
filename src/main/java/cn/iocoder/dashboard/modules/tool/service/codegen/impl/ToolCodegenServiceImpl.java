@@ -101,10 +101,10 @@ public class ToolCodegenServiceImpl implements ToolCodegenService {
 
     @Override
     public Long createCodegen(String tableName) {
-        //获取当前schema
+        // 获取当前schema
         String tableSchema = codegenProperties.getDbSchemas().iterator().next();
         // 从数据库中，获得数据库表结构
-        ToolSchemaTableDO schemaTable = schemaTableMapper.selectByTableName1(tableSchema, tableName);
+        ToolSchemaTableDO schemaTable = schemaTableMapper.selectByTableSchemaAndTableName(tableSchema, tableName);
         List<ToolSchemaColumnDO> schemaColumns = schemaColumnMapper.selectListByTableName(tableSchema, tableName);
         // 导入
         return this.createCodegen0(ToolCodegenImportTypeEnum.DB, schemaTable, schemaColumns);
