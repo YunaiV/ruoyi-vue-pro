@@ -46,7 +46,12 @@
         <easyexcel.verion>2.2.7</easyexcel.verion>
         <velocity.version>2.2</velocity.version>
         <screw.version>1.0.5</screw.version>
+        <podam.version>7.2.6.RELEASE</podam.version>
+        <jedis-mock.version>0.1.16</jedis-mock.version>
         <!-- 三方云服务相关 -->
+        <aliyun-java-sdk-core.version>4.5.18</aliyun-java-sdk-core.version>
+        <aliyun-java-sdk-dysmsapi.version>2.1.0</aliyun-java-sdk-dysmsapi.version>
+        <yunpian-java-sdk.version>1.2.7</yunpian-java-sdk.version>
     </properties>
 
     <!-- 依赖声明 -->
@@ -213,14 +218,14 @@
         <dependency>
             <groupId>com.github.fppt</groupId> <!-- 单元测试，我们采用内嵌的 Redis 数据库 -->
             <artifactId>jedis-mock</artifactId>
-            <version>0.1.16</version>
+            <version>${jedis-mock.version}</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>uk.co.jemos.podam</groupId> <!-- 单元测试，随机生成 POJO 类 -->
             <artifactId>podam</artifactId>
-            <version>7.2.6.RELEASE</version>
+            <version>${podam.version}</version>
             <scope>test</scope>
         </dependency>
 
@@ -278,18 +283,18 @@
         <dependency>
             <groupId>com.yunpian.sdk</groupId>
             <artifactId>yunpian-java-sdk</artifactId>
-            <version>1.2.7</version>
+            <version>${yunpian-java-sdk.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.aliyun</groupId>
             <artifactId>aliyun-java-sdk-core</artifactId>
-            <version>4.5.18</version>
+            <version>${aliyun-java-sdk-core.version}</version>
         </dependency>
         <dependency>
             <groupId>com.aliyun</groupId>
             <artifactId>aliyun-java-sdk-dysmsapi</artifactId>
-            <version>2.1.0</version>
+            <version>${aliyun-java-sdk-dysmsapi.version}</version>
         </dependency>
         <!-- SMS SDK end -->
 

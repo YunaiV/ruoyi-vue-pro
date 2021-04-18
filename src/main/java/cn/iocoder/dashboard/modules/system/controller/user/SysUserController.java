@@ -149,9 +149,9 @@ public class SysUserController {
         // 手动创建导出 demo
         List<SysUserImportExcelVO> list = Arrays.asList(
                 SysUserImportExcelVO.builder().username("yudao").deptId(1L).email("yudao@iocoder.cn").mobile("15601691300")
-                        .nickname("芋道").status(CommonStatusEnum.ENABLE.getStatus()).sex(SysSexEnum.MALE.getSEX()).build(),
+                        .nickname("芋道").status(CommonStatusEnum.ENABLE.getStatus()).sex(SysSexEnum.MALE.getSex()).build(),
                 SysUserImportExcelVO.builder().username("yuanma").deptId(2L).email("yuanma@iocoder.cn").mobile("15601701300")
-                        .nickname("源码").status(CommonStatusEnum.DISABLE.getStatus()).sex(SysSexEnum.FEMALE.getSEX()).build()
+                        .nickname("源码").status(CommonStatusEnum.DISABLE.getStatus()).sex(SysSexEnum.FEMALE.getSex()).build()
         );
 
         // 输出

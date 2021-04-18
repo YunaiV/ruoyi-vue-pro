@@ -68,7 +68,7 @@ public class SysOperateLogServiceImplTest extends BaseDbUnitTest {
         // 先构造用户
         SysUserDO user = RandomUtils.randomPojo(SysUserDO.class, o -> {
             o.setNickname("wangkai");
-            o.setSex(SysSexEnum.MALE.getSEX());
+            o.setSex(SysSexEnum.MALE.getSex());
             o.setStatus(CommonStatusEnum.ENABLE.getStatus());
         });
         when(userService.getUsersByNickname("wangkai")).thenReturn(Collections.singletonList(user));
@@ -119,7 +119,7 @@ public class SysOperateLogServiceImplTest extends BaseDbUnitTest {
         // 先构造用户
         SysUserDO user = RandomUtils.randomPojo(SysUserDO.class, o -> {
             o.setNickname("wangkai");
-            o.setSex(SysSexEnum.MALE.getSEX());
+            o.setSex(SysSexEnum.MALE.getSex());
             o.setStatus(CommonStatusEnum.ENABLE.getStatus());
         });
         when(userService.getUsersByNickname("wangkai")).thenReturn(Collections.singletonList(user));

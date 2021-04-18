@@ -2,10 +2,10 @@ package cn.iocoder.dashboard.modules.system.controller.user.vo.user;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.util.Set;
 
@@ -40,7 +40,7 @@ public class SysUserBaseVO {
     private String email;
 
     @ApiModelProperty(value = "手机号码", example = "15601691300")
-    @Pattern(regexp = "^1(3|4|5|7|8)\\d{9}$",message = "手机号码格式错误")
+    @Length(min = 11, max = 11, message = "手机号长度必须 11 位")
     private String mobile;
 
     @ApiModelProperty(value = "用户性别", example = "1", notes = "参见 SysSexEnum 枚举类")
