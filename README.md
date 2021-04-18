@@ -95,7 +95,7 @@
 | [MySQL](https://www.mysql.com/cn/) | 数据库服务器 | 5.7 |  |
 | [Druid](https://github.com/alibaba/druid) | JDBC 连接池、监控组件 | 1.2.4 | [文档](http://www.iocoder.cn/Spring-Boot/datasource-pool/?yudao) |
 | [MyBatis Plus](https://mp.baomidou.com/) | MyBatis 增强工具包 | 3.4.1 | [文档](http://www.iocoder.cn/Spring-Boot/MyBatis/?yudao) |
-| [Dynamic Datasource](https://dynamic-datasource.com/) | 动态数据源 | 3.3.2 | [文档](hhttp://www.iocoder.cn/Spring-Boot/datasource-pool/?yudao) |
+| [Dynamic Datasource](https://dynamic-datasource.com/) | 动态数据源 | 3.3.2 | [文档](http://www.iocoder.cn/Spring-Boot/datasource-pool/?yudao) |
 | [Redis](https://redis.io/) | key-value 数据库 | 5.0 |  |
 | [Redisson](https://github.com/redisson/redisson) | Redis 客户端 | 3.1.46 | [文档](http://www.iocoder.cn/Spring-Boot/Redis/?yudao) |
 | [Spring MVC](https://github.com/spring-projects/spring-framework/tree/master/spring-webmvc) | MVC 框架  | 5.4.2 | [文档](http://www.iocoder.cn/SpringMVC/MVC/?yudao) |
