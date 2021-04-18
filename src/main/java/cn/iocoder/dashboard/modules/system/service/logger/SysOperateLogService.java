@@ -19,7 +19,7 @@ public interface SysOperateLogService extends OperateLogFrameworkService {
      * @param reqVO 分页条件
      * @return 操作日志分页列表
      */
-    PageResult<SysOperateLogDO> pageOperateLog(SysOperateLogPageReqVO reqVO);
+    PageResult<SysOperateLogDO> getOperateLogPage(SysOperateLogPageReqVO reqVO);
 
     /**
      * 获得操作日志列表
@@ -27,6 +27,6 @@ public interface SysOperateLogService extends OperateLogFrameworkService {
      * @param reqVO 列表条件
      * @return 日志列表
      */
-    List<SysOperateLogDO> listOperateLogs(SysOperateLogExportReqVO reqVO);
+    List<SysOperateLogDO> getOperateLogs(SysOperateLogExportReqVO reqVO);
 
 }

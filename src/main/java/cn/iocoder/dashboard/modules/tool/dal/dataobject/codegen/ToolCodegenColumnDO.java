@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.experimental.Accessors;
 
 /**
  * 代码生成 column 字段定义
@@ -17,7 +18,7 @@ import lombok.EqualsAndHashCode;
  */
 @TableName(value = "tool_codegen_column", autoResultMap = true)
 @Data
-@Builder
+@Accessors(chain = true)
 @EqualsAndHashCode(callSuper = true)
 public class ToolCodegenColumnDO extends BaseDO {
 

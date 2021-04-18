@@ -8,3 +8,19 @@ export function exportHtml() {
     responseType: 'blob'
   })
 }
+
+export function exportWord() {
+  return request({
+    url: '/infra/db-doc/export-word',
+    method: 'get',
+    responseType: 'blob'
+  })
+}
+
+export function exportMarkdown() {
+  return request({
+    url: '/infra/db-doc/export-markdown',
+    method: 'get',
+    responseType: 'blob'
+  })
+}

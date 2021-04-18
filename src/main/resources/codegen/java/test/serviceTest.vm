@@ -1,13 +1,11 @@
 package ${basePackage}.modules.${table.moduleName}.service.${table.businessName};
 
-import ${basePackage}.BaseSpringBootUnitTest;
-
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import javax.annotation.Resource;
 
-import cn.iocoder.dashboard.BaseSpringBootUnitTest;
+import ${basePackage}.BaseDbUnitTest;
 import ${basePackage}.modules.${table.moduleName}.service.${table.businessName}.impl.${table.className}ServiceImpl;
 import ${basePackage}.modules.${table.moduleName}.controller.${table.businessName}.vo.*;
 import ${basePackage}.modules.${table.moduleName}.dal.dataobject.${table.businessName}.${table.className}DO;
@@ -16,6 +14,7 @@ import ${basePackage}.util.object.ObjectUtils;
 import ${PageResultClassName};
 
 import javax.annotation.Resource;
+import org.springframework.context.annotation.Import;
 import java.util.*;
 
 import static cn.hutool.core.util.RandomUtil.*;
@@ -64,7 +63,8 @@ import static org.mockito.Mockito.*;
 *
 * @author ${table.author}
 */
-public class ${table.className}ServiceTest extends BaseSpringBootUnitTest {
+@Import(${table.className}ServiceImpl.class)
+public class ${table.className}ServiceTest extends BaseDbUnitTest {
 
     @Resource
     private ${table.className}ServiceImpl ${classNameVar}Service;
@@ -78,7 +78,7 @@ public class ${table.className}ServiceTest extends BaseSpringBootUnitTest {
         ${table.className}CreateReqVO reqVO = randomPojo(${table.className}CreateReqVO.class);
 
         // 调用
-        Long ${classNameVar}Id = ${classNameVar}Service.create${simpleClassName}(reqVO);
+        ${primaryColumn.javaType} ${classNameVar}Id = ${classNameVar}Service.create${simpleClassName}(reqVO);
         // 断言
         assertNotNull(${classNameVar}Id);
         // 校验记录的属性是否正确
@@ -118,7 +118,7 @@ public class ${table.className}ServiceTest extends BaseSpringBootUnitTest {
         ${table.className}DO db${simpleClassName} = randomPojo(${table.className}DO.class);
         ${classNameVar}Mapper.insert(db${simpleClassName});// @Sql: 先插入出一条存在的数据
         // 准备参数
-        Long id = db${simpleClassName}.getId();
+        ${primaryColumn.javaType} id = db${simpleClassName}.getId();
 
         // 调用
         ${classNameVar}Service.delete${simpleClassName}(id);
@@ -129,7 +129,7 @@ public class ${table.className}ServiceTest extends BaseSpringBootUnitTest {
     @Test
     public void testDelete${simpleClassName}_notExists() {
         // 准备参数
-        Long id = randomLongId();
+        ${primaryColumn.javaType} id = random${primaryColumn.javaType}Id();
 
         // 调用, 并断言异常
         assertServiceException(() -> ${classNameVar}Service.delete${simpleClassName}(id), ${simpleClassName_underlineCase.toUpperCase()}_NOT_EXISTS);

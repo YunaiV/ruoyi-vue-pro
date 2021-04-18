@@ -101,7 +101,7 @@ public class SysUserSessionServiceImpl implements SysUserSessionService {
         // 处理基于用户昵称的查询
         Collection<Long> userIds = null;
         if (StrUtil.isNotEmpty(reqVO.getUsername())) {
-            userIds = convertSet(userService.listUsersByUsername(reqVO.getUsername()), SysUserDO::getId);
+            userIds = convertSet(userService.getUsersByUsername(reqVO.getUsername()), SysUserDO::getId);
             if (CollUtil.isEmpty(userIds)) {
                 return PageResult.empty();
             }

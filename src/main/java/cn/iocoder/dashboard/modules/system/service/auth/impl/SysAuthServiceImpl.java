@@ -61,7 +61,7 @@ public class SysAuthServiceImpl implements SysAuthService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         // 获取 username 对应的 SysUserDO
-        SysUserDO user = userService.getUserByUserName(username);
+        SysUserDO user = userService.getUserByUsername(username);
         if (user == null) {
             throw new UsernameNotFoundException(username);
         }

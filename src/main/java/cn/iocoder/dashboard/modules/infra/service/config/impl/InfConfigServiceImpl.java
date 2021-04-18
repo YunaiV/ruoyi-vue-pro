@@ -15,6 +15,7 @@ import cn.iocoder.dashboard.modules.infra.service.config.InfConfigService;
 import com.google.common.annotations.VisibleForTesting;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 
@@ -27,6 +28,7 @@ import static cn.iocoder.dashboard.modules.infra.enums.InfErrorCodeConstants.*;
  */
 @Service
 @Slf4j
+@Validated
 public class InfConfigServiceImpl implements InfConfigService {
 
     @Resource
@@ -34,26 +36,6 @@ public class InfConfigServiceImpl implements InfConfigService {
 
     @Resource
     private InfConfigProducer configProducer;
-
-    @Override
-    public PageResult<InfConfigDO> getConfigPage(InfConfigPageReqVO reqVO) {
-        return configMapper.selectPage(reqVO);
-    }
-
-    @Override
-    public List<InfConfigDO> getConfigList(InfConfigExportReqVO reqVO) {
-        return configMapper.selectList(reqVO);
-    }
-
-    @Override
-    public InfConfigDO getConfig(Long id) {
-        return configMapper.selectById(id);
-    }
-
-    @Override
-    public InfConfigDO getConfigByKey(String key) {
-        return configMapper.selectByKey(key);
-    }
 
     @Override
     public Long createConfig(InfConfigCreateReqVO reqVO) {
@@ -91,6 +73,26 @@ public class InfConfigServiceImpl implements InfConfigService {
         configMapper.deleteById(id);
         // 发送刷新消息
         configProducer.sendConfigRefreshMessage();
+    }
+
+    @Override
+    public InfConfigDO getConfig(Long id) {
+        return configMapper.selectById(id);
+    }
+
+    @Override
+    public InfConfigDO getConfigByKey(String key) {
+        return configMapper.selectByKey(key);
+    }
+
+    @Override
+    public PageResult<InfConfigDO> getConfigPage(InfConfigPageReqVO reqVO) {
+        return configMapper.selectPage(reqVO);
+    }
+
+    @Override
+    public List<InfConfigDO> getConfigList(InfConfigExportReqVO reqVO) {
+        return configMapper.selectList(reqVO);
     }
 
     private void checkCreateOrUpdate(Long id, String key) {

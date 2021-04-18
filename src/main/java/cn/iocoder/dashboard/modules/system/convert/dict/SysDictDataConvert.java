@@ -13,7 +13,7 @@ public interface SysDictDataConvert {
 
     SysDictDataConvert INSTANCE = Mappers.getMapper(SysDictDataConvert.class);
 
-    List<SysDictDataSimpleVO> convertList(List<SysDictDataDO> list);
+    List<SysDictDataSimpleRespVO> convertList(List<SysDictDataDO> list);
 
     SysDictDataRespVO convert(SysDictDataDO bean);
 

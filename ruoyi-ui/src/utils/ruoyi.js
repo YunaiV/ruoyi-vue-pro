@@ -120,9 +120,24 @@ export function downloadExcel(data, fileName) {
   download0(data, fileName, 'application/vnd.ms-excel');
 }
 
+// 下载 Word 方法
+export function downloadWord(data, fileName) {
+  download0(data, fileName, 'application/msword');
+}
+
 // 下载 Zip 方法
 export function downloadZip(data, fileName) {
   download0(data, fileName, 'application/zip');
+}
+
+// 下载 Html 方法
+export function downloadHtml(data, fileName) {
+  download0(data, fileName, 'text/html');
+}
+
+// 下载 Markdown 方法
+export function downloadMarkdown(data, fileName) {
+  download0(data, fileName, 'text/markdown');
 }
 
 function download0(data, fileName, mineType) {

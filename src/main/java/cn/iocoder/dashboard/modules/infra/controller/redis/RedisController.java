@@ -30,9 +30,9 @@ public class RedisController {
     @Resource
     private StringRedisTemplate stringRedisTemplate;
 
+    @GetMapping("/get-monitor-info")
     @ApiOperation("获得 Redis 监控信息")
     @PreAuthorize("@ss.hasPermission('infra:redis:get-monitor-info')")
-    @GetMapping("/get-monitor-info")
     public CommonResult<InfRedisMonitorRespVO> getRedisMonitorInfo() {
         // 获得 Redis 统计信息
         Properties info = stringRedisTemplate.execute((RedisCallback<Properties>) RedisServerCommands::info);
@@ -44,9 +44,9 @@ public class RedisController {
         return success(RedisConvert.INSTANCE.build(info, dbSize, commandStats));
     }
 
+    @GetMapping("/get-key-list")
     @ApiOperation("获得 Redis Key 列表")
     @PreAuthorize("@ss.hasPermission('infra:redis:get-key-list')")
-    @GetMapping("/get-key-list")
     public CommonResult<List<InfRedisKeyRespVO>> getKeyList() {
         List<RedisKeyDefine> keyDefines = RedisKeyRegistry.list();
         return success(RedisConvert.INSTANCE.convertList(keyDefines));

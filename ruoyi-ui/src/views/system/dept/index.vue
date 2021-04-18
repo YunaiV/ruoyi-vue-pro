@@ -2,22 +2,11 @@
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch">
       <el-form-item label="部门名称" prop="name">
-        <el-input
-          v-model="queryParams.name"
-          placeholder="请输入部门名称"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
+        <el-input v-model="queryParams.name" placeholder="请输入部门名称" clearable size="small" @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item label="状态" prop="status">
         <el-select v-model="queryParams.status" placeholder="菜单状态" clearable size="small">
-          <el-option
-              v-for="dict in statusDictDatas"
-              :key="parseInt(dict.value)"
-              :label="dict.label"
-              :value="parseInt(dict.value)"
-          />
+          <el-option v-for="dict in statusDictDatas" :key="parseInt(dict.value)" :label="dict.label" :value="parseInt(dict.value)"/>
         </el-select>
       </el-form-item>
       <el-form-item>
@@ -28,24 +17,13 @@
 
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
-        <el-button
-          type="primary"
-          icon="el-icon-plus"
-          size="mini"
-          @click="handleAdd"
-          v-hasPermi="['system:dept:add']"
-        >新增</el-button>
+        <el-button type="primary" icon="el-icon-plus" size="mini" @click="handleAdd" v-hasPermi="['system:dept:create']">新增</el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
-    <el-table
-      v-loading="loading"
-      :data="deptList"
-      row-key="id"
-      default-expand-all
-      :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
-    >
+    <el-table v-loading="loading" :data="deptList" row-key="id" default-expand-all
+              :tree-props="{children: 'children', hasChildren: 'hasChildren'}">
       <el-table-column prop="name" label="部门名称" width="260"></el-table-column>
       <el-table-column prop="sort" label="排序" width="200"></el-table-column>
       <el-table-column prop="status" label="状态" :formatter="statusFormat" width="100"></el-table-column>
@@ -56,28 +34,12 @@
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-          <el-button
-            size="mini"
-            type="text"
-            icon="el-icon-edit"
-            @click="handleUpdate(scope.row)"
-            v-hasPermi="['system:dept:edit']"
-          >修改</el-button>
-          <el-button
-            size="mini"
-            type="text"
-            icon="el-icon-plus"
-            @click="handleAdd(scope.row)"
-            v-hasPermi="['system:dept:add']"
-          >新增</el-button>
-          <el-button
-            v-if="scope.row.parentId !== 0"
-            size="mini"
-            type="text"
-            icon="el-icon-delete"
-            @click="handleDelete(scope.row)"
-            v-hasPermi="['system:dept:remove']"
-          >删除</el-button>
+          <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
+                     v-hasPermi="['system:dept:update']">修改</el-button>
+          <el-button size="mini" type="text" icon="el-icon-plus" @click="handleAdd(scope.row)"
+                     v-hasPermi="['system:dept:create']">新增</el-button>
+          <el-button v-if="scope.row.parentId !== 0" size="mini" type="text" icon="el-icon-delete"
+                     @click="handleDelete(scope.row)" v-hasPermi="['system:dept:delete']">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -119,11 +81,8 @@
           <el-col :span="12">
             <el-form-item label="部门状态" prop="status">
               <el-radio-group v-model="form.status">
-                <el-radio
-                    v-for="dict in statusDictDatas"
-                    :key="parseInt(dict.value)"
-                    :label="parseInt(dict.value)"
-                >{{dict.label}}</el-radio>
+                <el-radio v-for="dict in statusDictDatas" :key="parseInt(dict.value)" :label="parseInt(dict.value)">
+                  {{dict.label}}</el-radio>
               </el-radio-group>
             </el-form-item>
           </el-col>

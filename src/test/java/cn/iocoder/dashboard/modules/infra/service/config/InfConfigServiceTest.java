@@ -48,88 +48,6 @@ public class InfConfigServiceTest extends BaseDbUnitTest {
     private InfConfigProducer configProducer;
 
     @Test
-    public void testGetConfigPage() {
-        // mock 数据
-        InfConfigDO dbConfig = randomInfConfigDO(o -> { // 等会查询到
-            o.setName("芋艿");
-            o.setKey("yunai");
-            o.setType(InfConfigTypeEnum.SYSTEM.getType());
-            o.setCreateTime(buildTime(2021, 2, 1));
-        });
-        configMapper.insert(dbConfig);
-        // 测试 name 不匹配
-        configMapper.insert(ObjectUtils.clone(dbConfig, o -> o.setName("土豆")));
-        // 测试 key 不匹配
-        configMapper.insert(ObjectUtils.clone(dbConfig, o -> o.setKey("tudou")));
-        // 测试 type 不匹配
-        configMapper.insert(ObjectUtils.clone(dbConfig, o -> o.setType(InfConfigTypeEnum.CUSTOM.getType())));
-        // 测试 createTime 不匹配
-        configMapper.insert(ObjectUtils.clone(dbConfig, o -> o.setCreateTime(buildTime(2021, 1, 1))));
-        // 准备参数
-        InfConfigPageReqVO reqVO = new InfConfigPageReqVO();
-        reqVO.setName("艿");
-        reqVO.setKey("nai");
-        reqVO.setType(InfConfigTypeEnum.SYSTEM.getType());
-        reqVO.setBeginTime(buildTime(2021, 1, 15));
-        reqVO.setEndTime(buildTime(2021, 2, 15));
-
-        // 调用
-        PageResult<InfConfigDO> pageResult = configService.getConfigPage(reqVO);
-        // 断言
-        assertEquals(1, pageResult.getTotal());
-        assertEquals(1, pageResult.getList().size());
-        assertPojoEquals(dbConfig, pageResult.getList().get(0));
-    }
-
-    @Test
-    public void testGetConfigList() {
-        // mock 数据
-        InfConfigDO dbConfig = randomInfConfigDO(o -> { // 等会查询到
-            o.setName("芋艿");
-            o.setKey("yunai");
-            o.setType(InfConfigTypeEnum.SYSTEM.getType());
-            o.setCreateTime(buildTime(2021, 2, 1));
-        });
-        configMapper.insert(dbConfig);
-        // 测试 name 不匹配
-        configMapper.insert(ObjectUtils.clone(dbConfig, o -> o.setName("土豆")));
-        // 测试 key 不匹配
-        configMapper.insert(ObjectUtils.clone(dbConfig, o -> o.setKey("tudou")));
-        // 测试 type 不匹配
-        configMapper.insert(ObjectUtils.clone(dbConfig, o -> o.setType(InfConfigTypeEnum.CUSTOM.getType())));
-        // 测试 createTime 不匹配
-        configMapper.insert(ObjectUtils.clone(dbConfig, o -> o.setCreateTime(buildTime(2021, 1, 1))));
-        // 准备参数
-        InfConfigExportReqVO reqVO = new InfConfigExportReqVO();
-        reqVO.setName("艿");
-        reqVO.setKey("nai");
-        reqVO.setType(InfConfigTypeEnum.SYSTEM.getType());
-        reqVO.setBeginTime(buildTime(2021, 1, 15));
-        reqVO.setEndTime(buildTime(2021, 2, 15));
-
-        // 调用
-        List<InfConfigDO> list = configService.getConfigList(reqVO);
-        // 断言
-        assertEquals(1, list.size());
-        assertPojoEquals(dbConfig, list.get(0));
-    }
-
-    @Test
-    public void testGetConfigByKey() {
-        // mock 数据
-        InfConfigDO dbConfig = randomInfConfigDO();
-        configMapper.insert(dbConfig);// @Sql: 先插入出一条存在的数据
-        // 准备参数
-        String key = dbConfig.getKey();
-
-        // 调用
-        InfConfigDO config = configService.getConfigByKey(key);
-        // 断言
-        assertNotNull(config);
-        assertPojoEquals(dbConfig, config);
-    }
-
-    @Test
     public void testCreateConfig_success() {
         // 准备参数
         InfConfigCreateReqVO reqVO = randomPojo(InfConfigCreateReqVO.class);
@@ -241,6 +159,88 @@ public class InfConfigServiceTest extends BaseDbUnitTest {
         // 调用，校验异常
         assertServiceException(() -> configService.checkConfigKeyUnique(id, key),
                 CONFIG_KEY_DUPLICATE);
+    }
+
+    @Test
+    public void testGetConfigPage() {
+        // mock 数据
+        InfConfigDO dbConfig = randomInfConfigDO(o -> { // 等会查询到
+            o.setName("芋艿");
+            o.setKey("yunai");
+            o.setType(InfConfigTypeEnum.SYSTEM.getType());
+            o.setCreateTime(buildTime(2021, 2, 1));
+        });
+        configMapper.insert(dbConfig);
+        // 测试 name 不匹配
+        configMapper.insert(ObjectUtils.clone(dbConfig, o -> o.setName("土豆")));
+        // 测试 key 不匹配
+        configMapper.insert(ObjectUtils.clone(dbConfig, o -> o.setKey("tudou")));
+        // 测试 type 不匹配
+        configMapper.insert(ObjectUtils.clone(dbConfig, o -> o.setType(InfConfigTypeEnum.CUSTOM.getType())));
+        // 测试 createTime 不匹配
+        configMapper.insert(ObjectUtils.clone(dbConfig, o -> o.setCreateTime(buildTime(2021, 1, 1))));
+        // 准备参数
+        InfConfigPageReqVO reqVO = new InfConfigPageReqVO();
+        reqVO.setName("艿");
+        reqVO.setKey("nai");
+        reqVO.setType(InfConfigTypeEnum.SYSTEM.getType());
+        reqVO.setBeginTime(buildTime(2021, 1, 15));
+        reqVO.setEndTime(buildTime(2021, 2, 15));
+
+        // 调用
+        PageResult<InfConfigDO> pageResult = configService.getConfigPage(reqVO);
+        // 断言
+        assertEquals(1, pageResult.getTotal());
+        assertEquals(1, pageResult.getList().size());
+        assertPojoEquals(dbConfig, pageResult.getList().get(0));
+    }
+
+    @Test
+    public void testGetConfigList() {
+        // mock 数据
+        InfConfigDO dbConfig = randomInfConfigDO(o -> { // 等会查询到
+            o.setName("芋艿");
+            o.setKey("yunai");
+            o.setType(InfConfigTypeEnum.SYSTEM.getType());
+            o.setCreateTime(buildTime(2021, 2, 1));
+        });
+        configMapper.insert(dbConfig);
+        // 测试 name 不匹配
+        configMapper.insert(ObjectUtils.clone(dbConfig, o -> o.setName("土豆")));
+        // 测试 key 不匹配
+        configMapper.insert(ObjectUtils.clone(dbConfig, o -> o.setKey("tudou")));
+        // 测试 type 不匹配
+        configMapper.insert(ObjectUtils.clone(dbConfig, o -> o.setType(InfConfigTypeEnum.CUSTOM.getType())));
+        // 测试 createTime 不匹配
+        configMapper.insert(ObjectUtils.clone(dbConfig, o -> o.setCreateTime(buildTime(2021, 1, 1))));
+        // 准备参数
+        InfConfigExportReqVO reqVO = new InfConfigExportReqVO();
+        reqVO.setName("艿");
+        reqVO.setKey("nai");
+        reqVO.setType(InfConfigTypeEnum.SYSTEM.getType());
+        reqVO.setBeginTime(buildTime(2021, 1, 15));
+        reqVO.setEndTime(buildTime(2021, 2, 15));
+
+        // 调用
+        List<InfConfigDO> list = configService.getConfigList(reqVO);
+        // 断言
+        assertEquals(1, list.size());
+        assertPojoEquals(dbConfig, list.get(0));
+    }
+
+    @Test
+    public void testGetConfigByKey() {
+        // mock 数据
+        InfConfigDO dbConfig = randomInfConfigDO();
+        configMapper.insert(dbConfig);// @Sql: 先插入出一条存在的数据
+        // 准备参数
+        String key = dbConfig.getKey();
+
+        // 调用
+        InfConfigDO config = configService.getConfigByKey(key);
+        // 断言
+        assertNotNull(config);
+        assertPojoEquals(dbConfig, config);
     }
 
     // ========== 随机对象 ==========

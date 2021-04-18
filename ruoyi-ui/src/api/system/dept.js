@@ -46,7 +46,7 @@ export function addDept(data) {
 export function updateDept(data) {
   return request({
     url: '/system/dept/update',
-    method: 'post',
+    method: 'put',
     data: data
   })
 }
@@ -55,6 +55,6 @@ export function updateDept(data) {
 export function delDept(id) {
   return request({
     url: '/system/dept/delete?id=' + id,
-    method: 'post'
+    method: 'delete'
   })
 }

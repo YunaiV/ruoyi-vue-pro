@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.experimental.Accessors;
 
 /**
  * 代码生成 table 表定义
@@ -15,7 +16,7 @@ import lombok.EqualsAndHashCode;
  */
 @TableName(value = "tool_codegen_table", autoResultMap = true)
 @Data
-@Builder
+@Accessors(chain = true)
 @EqualsAndHashCode(callSuper = true)
 public class ToolCodegenTableDO extends BaseDO {
 
