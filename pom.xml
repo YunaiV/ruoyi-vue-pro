@@ -30,6 +30,7 @@
         <mysql-connector-java.version>5.1.46</mysql-connector-java.version>
         <druid.version>1.2.4</druid.version>
         <mybatis-plus.version>3.4.2</mybatis-plus.version>
+        <dynamic-datasource.version>3.3.2</dynamic-datasource.version>
         <redisson.version>3.15.1</redisson.version>
         <!-- Config 配置中心相关 -->
         <apollo.version>1.7.0</apollo.version>
@@ -138,6 +139,11 @@
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-boot-starter</artifactId>
             <version>${mybatis-plus.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>dynamic-datasource-spring-boot-starter</artifactId> <!-- 多数据源 -->
+            <version>${dynamic-datasource.version}</version>
         </dependency>
 
         <dependency>

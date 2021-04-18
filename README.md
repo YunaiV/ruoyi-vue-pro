@@ -35,12 +35,12 @@
 |  | 部门管理 | 配置系统组织机构（公司、部门、小组），树结构展现支持数据权限 |
 |  | 岗位管理 | 配置系统用户所属担任职务 |
 |  | 字典管理 | 对系统中经常使用的一些较为固定的数据进行维护 |
-|  | 通知公告 | 系统通知公告信息发布维护 |
+| 🚀 | 短信管理 | 短信渠道、短息模板、短信日志，对接阿里云、云片等主流短信平台 |
 | 🚀 | 操作日志 | 系统正常操作日志记录和查询，集成 Swagger 生成日志内容 |
 |  | 登录日志 | 系统登录日志记录查询包含登录异常 |
+|  | 通知公告 | 系统通知公告信息发布维护 |
 
 计划新增功能：
-* 短信
 * 邮件
 * 钉钉、飞书等通知
 
@@ -87,14 +87,15 @@
 
 ## 技术栈
 
-**后端**
+### 后端
 
 | 框架 | 说明 |  版本 | 学习指南 |
 | --- | --- | --- | --- |
 | [Spring Boot](https://spring.io/projects/spring-boot) | 应用开发框架 | 2.4.2 | [文档](https://github.com/YunaiV/SpringBoot-Labs) |
 | [MySQL](https://www.mysql.com/cn/) | 数据库服务器 | 5.7 |  |
 | [Druid](https://github.com/alibaba/druid) | JDBC 连接池、监控组件 | 1.2.4 | [文档](http://www.iocoder.cn/Spring-Boot/datasource-pool/?yudao) |
-| [MyBatis-Plus](https://mp.baomidou.com/) | MyBatis 增强工具包 | 3.4.1 | [文档](http://www.iocoder.cn/Spring-Boot/MyBatis/?yudao) |
+| [MyBatis Plus](https://mp.baomidou.com/) | MyBatis 增强工具包 | 3.4.1 | [文档](http://www.iocoder.cn/Spring-Boot/MyBatis/?yudao) |
+| [Dynamic Datasource](https://dynamic-datasource.com/) | 动态数据源 | 3.3.2 | [文档](hhttp://www.iocoder.cn/Spring-Boot/datasource-pool/?yudao) |
 | [Redis](https://redis.io/) | key-value 数据库 | 5.0 |  |
 | [Redisson](https://github.com/redisson/redisson) | Redis 客户端 | 3.1.46 | [文档](http://www.iocoder.cn/Spring-Boot/Redis/?yudao) |
 | [Spring MVC](https://github.com/spring-projects/spring-framework/tree/master/spring-webmvc) | MVC 框架  | 5.4.2 | [文档](http://www.iocoder.cn/SpringMVC/MVC/?yudao) |
@@ -111,7 +112,7 @@
 | [JUnit](https://junit.org/junit5/) | Java 单元测试框架 | 5.7.0 | - |
 | [Mockito](https://github.com/mockito/mockito) | Java Mock 框架 | 3.6.28 | - |
 
-**前端**
+### 前端
 
 | 框架 | 说明 |  版本 |
 | --- | --- | --- |

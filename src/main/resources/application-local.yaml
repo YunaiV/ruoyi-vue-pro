@@ -4,34 +4,56 @@ server:
 --- #################### 数据库相关配置 ####################
 
 spring:
-  # 数据源配置项 TODO 多数据源；TODO 监控配置
+  # 数据源配置项
+  autoconfigure:
+    exclude:
+      - com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceAutoConfigure # 排除 Druid 的自动配置，使用 dynamic-datasource-spring-boot-starter 配置多数据源
   datasource:
-    name: ruoyi-vue-pro
-    url: jdbc:mysql://127.0.0.1:3306/${spring.datasource.name}?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=CTT
-    driver-class-name: com.mysql.jdbc.Driver
-    username: root
-    password: 123456
-    druid:
+    druid: # Druid 【监控】相关的全局配置
       web-stat-filter:
         enabled: true
       stat-view-servlet:
         enabled: true
-        # 设置白名单，不填则允许所有访问
-        allow:
+        allow: # 设置白名单，不填则允许所有访问
         url-pattern: /druid/*
-        # 控制台管理用户名和密码
-        login-username:
+        login-username: # 控制台管理用户名和密码
         login-password:
       filter:
         stat:
           enabled: true
-          # 慢 SQL 记录
-          log-slow-sql: true
+          log-slow-sql: true # 慢 SQL 记录
           slow-sql-millis: 100
           merge-sql: true
         wall:
           config:
             multi-statement-allow: true
+    dynamic: # 多数据源配置
+      druid: # Druid 【连接池】相关的全局配置
+        initial-size: 5 # 初始连接数
+        min-idle: 10 # 最小连接池数量
+        max-active: 20 # 最大连接池数量
+        max-wait: 600000 # 配置获取连接等待超时的时间，单位：毫秒
+        time-between-eviction-runs-millis: 60000 # 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位：毫秒
+        min-evictable-idle-time-millis: 300000 # 配置一个连接在池中最小生存的时间，单位：毫秒
+        max-evictable-idle-time-millis: 900000 # 配置一个连接在池中最大生存的时间，单位：毫秒
+        validation-query: SELECT 1 FROM DUAL # 配置检测连接是否有效
+        test-while-idle: true
+        test-on-borrow: false
+        test-on-return: false
+      primary: master
+      datasource:
+        master:
+          name: ruoyi-vue-pro
+          url: jdbc:mysql://127.0.0.1:3306/${spring.datasource.dynamic.datasource.master.name}?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=CTT
+          driver-class-name: com.mysql.jdbc.Driver
+          username: root
+          password: 123456
+        slave: # 模拟从库，可根据自己需要修改
+          name: ruoyi-vue-pro
+          url: jdbc:mysql://127.0.0.1:3306/${spring.datasource.dynamic.datasource.slave.name}?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=CTT
+          driver-class-name: com.mysql.jdbc.Driver
+          username: root
+          password: 123456
 
   # Redis 配置。Redisson 默认的配置足够使用，一般不需要进行调优
   redis:
@@ -77,9 +99,9 @@ apollo:
     eagerLoad:
       enabled: true # 设置 Apollo 在日志初始化前生效，可以实现日志的动态级别配置
   jdbc: # 自定义的 JDBC 配置项，用于数据库的地址
-    url: ${spring.datasource.url}
-    username: ${spring.datasource.username}
-    password: ${spring.datasource.password}
+    url: ${spring.datasource.dynamic.datasource.master.url}
+    username: ${spring.datasource.dynamic.datasource.master.username}
+    password: ${spring.datasource.dynamic.datasource.master.password}
 
 --- #################### 服务保障相关配置 ####################
 
@@ -155,7 +177,7 @@ yudao:
     base-path: http://127.0.0.1:${server.port}${yudao.web.api-prefix}/system/file/get/
   codegen:
     base-package: ${yudao.info.base-package}
-    db-schemas: ${spring.datasource.name}
+    db-schemas: ${spring.datasource.dynamic.datasource.master.name}
   xss:
     enable: false
     exclude-urls: # 如下两个 url，仅仅是为了演示，去掉配置也没关系
