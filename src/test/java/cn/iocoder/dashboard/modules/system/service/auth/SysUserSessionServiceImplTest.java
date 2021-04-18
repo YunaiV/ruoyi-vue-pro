@@ -1,7 +1,6 @@
 package cn.iocoder.dashboard.modules.system.service.auth;
 
 import static cn.hutool.core.util.RandomUtil.randomEle;
-import static cn.iocoder.dashboard.modules.system.dal.redis.SysRedisKeyConstants.LOGIN_USER;
 import static cn.iocoder.dashboard.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.dashboard.util.RandomUtils.randomDate;
 import static cn.iocoder.dashboard.util.RandomUtils.randomLongId;
@@ -25,7 +24,6 @@ import javax.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.redis.core.StringRedisTemplate;
 
 import cn.hutool.core.date.DateUtil;
 import cn.iocoder.dashboard.BaseDbAndRedisUnitTest;
@@ -33,10 +31,6 @@ import cn.iocoder.dashboard.common.enums.CommonStatusEnum;
 import cn.iocoder.dashboard.common.pojo.PageResult;
 import cn.iocoder.dashboard.framework.security.config.SecurityProperties;
 import cn.iocoder.dashboard.framework.security.core.LoginUser;
-import cn.iocoder.dashboard.modules.infra.controller.job.vo.job.InfJobPageReqVO;
-import cn.iocoder.dashboard.modules.infra.dal.dataobject.job.InfJobDO;
-import cn.iocoder.dashboard.modules.infra.enums.config.InfConfigTypeEnum;
-import cn.iocoder.dashboard.modules.infra.enums.job.InfJobStatusEnum;
 import cn.iocoder.dashboard.modules.system.controller.auth.vo.session.SysUserSessionPageReqVO;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.auth.SysUserSessionDO;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.user.SysUserDO;
@@ -50,7 +44,6 @@ import cn.iocoder.dashboard.modules.system.service.logger.impl.SysLoginLogServic
 import cn.iocoder.dashboard.modules.system.service.user.SysUserServiceImpl;
 import cn.iocoder.dashboard.util.AssertUtils;
 import cn.iocoder.dashboard.util.RandomUtils;
-import cn.iocoder.dashboard.util.json.JsonUtils;
 import cn.iocoder.dashboard.util.object.ObjectUtils;
 
 /**
@@ -167,12 +160,12 @@ public class SysUserSessionServiceImplTest extends BaseDbAndRedisUnitTest {
         String userIp = randomString();
         SysUserDO dbUser1 = randomPojo(SysUserDO.class, o -> {
             o.setUsername("testUsername1");
-            o.setSex(randomEle(SysSexEnum.values()).getSEX());
+            o.setSex(randomEle(SysSexEnum.values()).getSex());
             o.setStatus(CommonStatusEnum.ENABLE.getStatus());
         });
         SysUserDO dbUser2 = randomPojo(SysUserDO.class, o -> {
             o.setUsername("testUsername2");
-            o.setSex(randomEle(SysSexEnum.values()).getSEX());
+            o.setSex(randomEle(SysSexEnum.values()).getSex());
             o.setStatus(CommonStatusEnum.ENABLE.getStatus());
         });
         SysUserSessionDO dbSession = randomPojo(SysUserSessionDO.class, o -> {

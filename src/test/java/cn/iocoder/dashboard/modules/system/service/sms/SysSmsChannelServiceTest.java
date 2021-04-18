@@ -56,7 +56,7 @@ public class SysSmsChannelServiceTest extends BaseDbUnitTest {
 
     @Test
     public void testInitLocalCache_success() {
-        // mock 数据s
+        // mock 数据
         SysSmsChannelDO smsChannelDO01 = randomSmsChannelDO();
         smsChannelMapper.insert(smsChannelDO01);
         SysSmsChannelDO smsChannelDO02 = randomSmsChannelDO();

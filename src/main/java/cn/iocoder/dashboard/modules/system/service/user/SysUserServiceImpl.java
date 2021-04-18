@@ -6,17 +6,11 @@ import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.dashboard.common.enums.CommonStatusEnum;
 import cn.iocoder.dashboard.common.exception.ServiceException;
-import cn.iocoder.dashboard.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.dashboard.common.pojo.PageResult;
 import cn.iocoder.dashboard.modules.infra.service.file.InfFileService;
 import cn.iocoder.dashboard.modules.system.controller.user.vo.profile.SysUserProfileUpdatePasswordReqVO;
 import cn.iocoder.dashboard.modules.system.controller.user.vo.profile.SysUserProfileUpdateReqVO;
-import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserCreateReqVO;
-import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserExportReqVO;
-import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserImportExcelVO;
-import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserImportRespVO;
-import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserPageReqVO;
-import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserUpdateReqVO;
+import cn.iocoder.dashboard.modules.system.controller.user.vo.user.*;
 import cn.iocoder.dashboard.modules.system.convert.user.SysUserConvert;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.dept.SysDeptDO;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.dept.SysPostDO;
@@ -26,21 +20,18 @@ import cn.iocoder.dashboard.modules.system.service.dept.SysDeptService;
 import cn.iocoder.dashboard.modules.system.service.dept.SysPostService;
 import cn.iocoder.dashboard.modules.system.service.permission.SysPermissionService;
 import cn.iocoder.dashboard.util.collection.CollectionUtils;
+import com.google.common.annotations.VisibleForTesting;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
+import static cn.iocoder.dashboard.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.*;
 
 
@@ -52,6 +43,9 @@ import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.*;
 @Service
 @Slf4j
 public class SysUserServiceImpl implements SysUserService {
+
+    @Value("${sys.user.init-password:yudaoyuanma}")
+    private String userInitPassword;
 
     @Resource
     private SysUserMapper userMapper;
@@ -142,8 +136,6 @@ public class SysUserServiceImpl implements SysUserService {
         updateObj.setId(id);
         updateObj.setStatus(status);
         userMapper.updateById(updateObj);
-        // 删除用户关联数据
-        permissionService.processUserDeleted(id);
     }
 
     @Override
@@ -152,6 +144,8 @@ public class SysUserServiceImpl implements SysUserService {
         this.checkUserExists(id);
         // 删除用户
         userMapper.deleteById(id);
+        // 删除用户关联数据
+        permissionService.processUserDeleted(id);
     }
 
     @Override
@@ -221,17 +215,19 @@ public class SysUserServiceImpl implements SysUserService {
         this.checkPostEnable(postIds);
     }
 
-    private void checkUserExists(Long id) {
+    @VisibleForTesting
+    void checkUserExists(Long id) {
         if (id == null) {
             return;
         }
         SysUserDO user = userMapper.selectById(id);
         if (user == null) {
-            throw ServiceExceptionUtil.exception(USER_NOT_EXISTS);
+            throw exception(USER_NOT_EXISTS);
         }
     }
 
-    private void checkUsernameUnique(Long id, String username) {
+    @VisibleForTesting
+    void checkUsernameUnique(Long id, String username) {
         if (StrUtil.isBlank(username)) {
             return;
         }
@@ -241,14 +237,15 @@ public class SysUserServiceImpl implements SysUserService {
         }
         // 如果 id 为空，说明不用比较是否为相同 id 的用户
         if (id == null) {
-            throw ServiceExceptionUtil.exception(USER_USERNAME_EXISTS);
+            throw exception(USER_USERNAME_EXISTS);
         }
         if (!user.getId().equals(id)) {
-            throw ServiceExceptionUtil.exception(USER_USERNAME_EXISTS);
+            throw exception(USER_USERNAME_EXISTS);
         }
     }
 
-    private void checkEmailUnique(Long id, String email) {
+    @VisibleForTesting
+    void checkEmailUnique(Long id, String email) {
         if (StrUtil.isBlank(email)) {
             return;
         }
@@ -258,14 +255,15 @@ public class SysUserServiceImpl implements SysUserService {
         }
         // 如果 id 为空，说明不用比较是否为相同 id 的用户
         if (id == null) {
-            throw ServiceExceptionUtil.exception(USER_EMAIL_EXISTS);
+            throw exception(USER_EMAIL_EXISTS);
         }
         if (!user.getId().equals(id)) {
-            throw ServiceExceptionUtil.exception(USER_EMAIL_EXISTS);
+            throw exception(USER_EMAIL_EXISTS);
         }
     }
 
-    private void checkMobileUnique(Long id, String mobile) {
+    @VisibleForTesting
+    void checkMobileUnique(Long id, String mobile) {
         if (StrUtil.isBlank(mobile)) {
             return;
         }
@@ -275,42 +273,44 @@ public class SysUserServiceImpl implements SysUserService {
         }
         // 如果 id 为空，说明不用比较是否为相同 id 的用户
         if (id == null) {
-            throw ServiceExceptionUtil.exception(USER_MOBILE_EXISTS);
+            throw exception(USER_MOBILE_EXISTS);
         }
         if (!user.getId().equals(id)) {
-            throw ServiceExceptionUtil.exception(USER_MOBILE_EXISTS);
+            throw exception(USER_MOBILE_EXISTS);
         }
     }
 
-    private void checkDeptEnable(Long deptId) {
+    @VisibleForTesting
+    void checkDeptEnable(Long deptId) {
         if (deptId == null) { // 允许不选择
             return;
         }
         SysDeptDO dept = deptService.getDept(deptId);
         if (dept == null) {
-            throw ServiceExceptionUtil.exception(DEPT_NOT_FOUND);
+            throw exception(DEPT_NOT_FOUND);
         }
         if (!CommonStatusEnum.ENABLE.getStatus().equals(dept.getStatus())) {
-            throw ServiceExceptionUtil.exception(DEPT_NOT_ENABLE);
+            throw exception(DEPT_NOT_ENABLE);
         }
     }
 
-    private void checkPostEnable(Set<Long> postIds) {
+    @VisibleForTesting
+    void checkPostEnable(Set<Long> postIds) {
         if (CollUtil.isEmpty(postIds)) { // 允许不选择
             return;
         }
         List<SysPostDO> posts = postService.getPosts(postIds, null);
         if (CollUtil.isEmpty(posts)) {
-            throw ServiceExceptionUtil.exception(POST_NOT_FOUND);
+            throw exception(POST_NOT_FOUND);
         }
         Map<Long, SysPostDO> postMap = CollectionUtils.convertMap(posts, SysPostDO::getId);
         postIds.forEach(postId -> {
             SysPostDO post = postMap.get(postId);
             if (post == null) {
-                throw ServiceExceptionUtil.exception(POST_NOT_FOUND);
+                throw exception(POST_NOT_FOUND);
             }
             if (!CommonStatusEnum.ENABLE.getStatus().equals(post.getStatus())) {
-                throw ServiceExceptionUtil.exception(POST_NOT_ENABLE, post.getName());
+                throw exception(POST_NOT_ENABLE, post.getName());
             }
         });
     }
@@ -321,13 +321,14 @@ public class SysUserServiceImpl implements SysUserService {
      * @param id          用户 id
      * @param oldPassword 旧密码
      */
-    private void checkOldPassword(Long id, String oldPassword) {
+    @VisibleForTesting
+    void checkOldPassword(Long id, String oldPassword) {
         SysUserDO user = userMapper.selectById(id);
         if (user == null) {
-            throw ServiceExceptionUtil.exception(USER_NOT_EXISTS);
+            throw exception(USER_NOT_EXISTS);
         }
         if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
-            throw ServiceExceptionUtil.exception(USER_PASSWORD_FAILED);
+            throw exception(USER_PASSWORD_FAILED);
         }
     }
 
@@ -335,7 +336,7 @@ public class SysUserServiceImpl implements SysUserService {
     @Transactional(rollbackFor = Exception.class) // 添加事务，异常则回滚所有导入
     public SysUserImportRespVO importUsers(List<SysUserImportExcelVO> importUsers, boolean isUpdateSupport) {
         if (CollUtil.isEmpty(importUsers)) {
-            throw ServiceExceptionUtil.exception(USER_IMPORT_LIST_IS_EMPTY);
+            throw exception(USER_IMPORT_LIST_IS_EMPTY);
         }
         SysUserImportRespVO respVO = SysUserImportRespVO.builder().createUsernames(new ArrayList<>())
             .updateUsernames(new ArrayList<>()).failureUsernames(new LinkedHashMap<>()).build();
@@ -351,8 +352,8 @@ public class SysUserServiceImpl implements SysUserService {
             // 判断如果不存在，在进行插入
             SysUserDO existUser = userMapper.selectByUsername(importUser.getUsername());
             if (existUser == null) {
-                // TODO 芋艿：初始密码
-                userMapper.insert(SysUserConvert.INSTANCE.convert(importUser));
+                userMapper.insert(SysUserConvert.INSTANCE.convert(importUser)
+                    .setPassword(passwordEncoder.encode(userInitPassword))); // 设置默认密码
                 respVO.getCreateUsernames().add(importUser.getUsername());
                 return;
             }
