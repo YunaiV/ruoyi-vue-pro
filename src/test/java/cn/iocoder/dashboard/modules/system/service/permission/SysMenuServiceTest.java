@@ -3,6 +3,7 @@ package cn.iocoder.dashboard.modules.system.service.permission;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
 import cn.iocoder.dashboard.BaseDbUnitTest;
+import cn.iocoder.dashboard.common.enums.CommonStatusEnum;
 import cn.iocoder.dashboard.modules.system.controller.permission.vo.menu.SysMenuCreateReqVO;
 import cn.iocoder.dashboard.modules.system.controller.permission.vo.menu.SysMenuListReqVO;
 import cn.iocoder.dashboard.modules.system.controller.permission.vo.menu.SysMenuUpdateReqVO;
@@ -12,7 +13,6 @@ import cn.iocoder.dashboard.modules.system.enums.permission.MenuTypeEnum;
 import cn.iocoder.dashboard.modules.system.mq.producer.permission.SysMenuProducer;
 import cn.iocoder.dashboard.modules.system.service.permission.impl.SysMenuServiceImpl;
 import cn.iocoder.dashboard.util.AopTargetUtils;
-import cn.iocoder.dashboard.util.AssertUtils;
 import cn.iocoder.dashboard.util.RandomUtils;
 import cn.iocoder.dashboard.util.object.ObjectUtils;
 import com.google.common.collect.Multimap;
@@ -22,7 +22,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
-
 import java.util.*;
 
 import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.*;
@@ -54,18 +53,20 @@ public class SysMenuServiceTest extends BaseDbUnitTest {
         SysMenuDO menuDO2 = createMenuDO(MenuTypeEnum.MENU, "xxxx", 0L);
         menuMapper.insert(menuDO2);
 
-        //调用
+        // 调用
         sysMenuService.initLocalCache();
 
         // 获取代理对象
         SysMenuServiceImpl target = (SysMenuServiceImpl) AopTargetUtils.getTarget(sysMenuService);
 
-        Map<Long, SysMenuDO> menuCache = (Map<Long, SysMenuDO>) BeanUtil.getFieldValue(target, "menuCache");
+        Map<Long, SysMenuDO> menuCache =
+                (Map<Long, SysMenuDO>) BeanUtil.getFieldValue(target, "menuCache");
         Assert.isTrue(menuCache.size() == 2);
         assertPojoEquals(menuDO1, menuCache.get(menuDO1.getId()));
         assertPojoEquals(menuDO2, menuCache.get(menuDO2.getId()));
 
-        Multimap<String, SysMenuDO> permissionMenuCache = (Multimap<String, SysMenuDO>) BeanUtil.getFieldValue(target, "permissionMenuCache");
+        Multimap<String, SysMenuDO> permissionMenuCache =
+                (Multimap<String, SysMenuDO>) BeanUtil.getFieldValue(target, "permissionMenuCache");
         Assert.isTrue(permissionMenuCache.size() == 2);
         assertPojoEquals(menuDO1, permissionMenuCache.get(menuDO1.getPermission()));
         assertPojoEquals(menuDO2, permissionMenuCache.get(menuDO2.getPermission()));
@@ -186,9 +187,8 @@ public class SysMenuServiceTest extends BaseDbUnitTest {
 
         //断言
         Assert.isTrue(menuDOS.size() == idMenuMap.size());
-        menuDOS.stream().forEach(m -> assertPojoEquals(idMenuMap.get(m.getId()), m));
+        menuDOS.forEach(m -> assertPojoEquals(idMenuMap.get(m.getId()), m));
     }
-
 
     @Test
     public void testGetMenusReqVo_success() {
@@ -220,7 +220,7 @@ public class SysMenuServiceTest extends BaseDbUnitTest {
 
         //断言
         Assert.isTrue(menuDOS.size() == idMenuMap.size());
-        menuDOS.stream().forEach(m -> assertPojoEquals(idMenuMap.get(m.getId()), m));
+        menuDOS.forEach(m -> assertPojoEquals(idMenuMap.get(m.getId()), m));
     }
 
     @Test
@@ -246,11 +246,11 @@ public class SysMenuServiceTest extends BaseDbUnitTest {
         menuDO = createMenuDO(4L, MenuTypeEnum.MENU, "name", 0L, 2);
         mockCacheMap.put(menuDO.getId(), menuDO);
 
-        List<SysMenuDO> menuDOS = sysMenuService.listMenusFromCache(Arrays.asList(MenuTypeEnum.MENU.getType()), Arrays.asList(1));
+        List<SysMenuDO> menuDOS = sysMenuService.listMenusFromCache(Collections.singletonList(MenuTypeEnum.MENU.getType()),
+                Collections.singletonList(CommonStatusEnum.DISABLE.getStatus()));
         Assert.isTrue(menuDOS.size() == idMenuMap.size());
-        menuDOS.stream().forEach(m -> assertPojoEquals(idMenuMap.get(m.getId()), m));
+        menuDOS.forEach(m -> assertPojoEquals(idMenuMap.get(m.getId()), m));
     }
-
 
     @Test
     public void testListMenusFromCache2_success() throws Exception {
@@ -273,10 +273,10 @@ public class SysMenuServiceTest extends BaseDbUnitTest {
         menuDO = createMenuDO(4L, MenuTypeEnum.MENU, "name", 0L, 2);
         mockCacheMap.put(menuDO.getId(), menuDO);
 
-        List<SysMenuDO> menuDOS = sysMenuService.listMenusFromCache(Arrays.asList(1L),
-                Arrays.asList(MenuTypeEnum.MENU.getType()), Arrays.asList(1));
+        List<SysMenuDO> menuDOS = sysMenuService.listMenusFromCache(Collections.singletonList(1L),
+                Collections.singletonList(MenuTypeEnum.MENU.getType()), Collections.singletonList(1));
         Assert.isTrue(menuDOS.size() == idMenuMap.size());
-        menuDOS.stream().forEach(menu -> assertPojoEquals(idMenuMap.get(menu.getId()), menu));
+        menuDOS.forEach(menu -> assertPojoEquals(idMenuMap.get(menu.getId()), menu));
     }
 
     @Test
@@ -308,14 +308,14 @@ public class SysMenuServiceTest extends BaseDbUnitTest {
     }
 
     @Test
-    public void testCheckResource_success(){
-        SysMenuDO sonMenu=initParentAndSonMenuDO();
-        Long parentId=sonMenu.getParentId();
+    public void testCheckResource_success() {
+        SysMenuDO sonMenu = initParentAndSonMenuDO();
+        Long parentId = sonMenu.getParentId();
 
-        Long otherSonMenuId=randomLongId();
-        String otherSonMenuName=randomString();
+        Long otherSonMenuId = randomLongId();
+        String otherSonMenuName = randomString();
 
-        sysMenuService.checkResource(parentId,otherSonMenuName,otherSonMenuId);
+        sysMenuService.checkResource(parentId, otherSonMenuName, otherSonMenuId);
     }
 
     @Test
@@ -326,7 +326,7 @@ public class SysMenuServiceTest extends BaseDbUnitTest {
         Long otherSonMenuId=randomLongId();
         String otherSonMenuName=sonMenu.getName(); //相同名称
 
-        assertServiceException(()->sysMenuService.checkResource(parentId,otherSonMenuName,otherSonMenuId), MENU_NAME_DUPLICATE);
+        assertServiceException(() -> sysMenuService.checkResource(parentId, otherSonMenuName, otherSonMenuId), MENU_NAME_DUPLICATE);
     }
 
     /**
@@ -354,15 +354,13 @@ public class SysMenuServiceTest extends BaseDbUnitTest {
     }
 
     private SysMenuDO createMenuDO(Long id, MenuTypeEnum typeEnum, String menuName, Long parentId, Integer status) {
-        SysMenuDO sonMenuDO = RandomUtils.randomPojo(SysMenuDO.class, o -> {
+        return RandomUtils.randomPojo(SysMenuDO.class, o -> {
             o.setId(id);
             o.setParentId(parentId);
             o.setType(typeEnum.getType());
             o.setStatus(status);
             o.setName(menuName);
         });
-        return sonMenuDO;
     }
-
 
 }

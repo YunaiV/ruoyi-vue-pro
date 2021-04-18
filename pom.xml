@@ -30,6 +30,7 @@
         <mysql-connector-java.version>5.1.46</mysql-connector-java.version>
         <druid.version>1.2.4</druid.version>
         <mybatis-plus.version>3.4.2</mybatis-plus.version>
+        <dynamic-datasource.version>3.3.2</dynamic-datasource.version>
         <redisson.version>3.15.1</redisson.version>
         <!-- Config 配置中心相关 -->
         <apollo.version>1.7.0</apollo.version>
@@ -46,7 +47,12 @@
         <easyexcel.verion>2.2.7</easyexcel.verion>
         <velocity.version>2.2</velocity.version>
         <screw.version>1.0.5</screw.version>
-        <dynamic-datasource.version>3.3.2</dynamic-datasource.version>
+        <podam.version>7.2.6.RELEASE</podam.version>
+        <jedis-mock.version>0.1.16</jedis-mock.version>
+        <!-- 三方云服务相关 -->
+        <aliyun-java-sdk-core.version>4.5.18</aliyun-java-sdk-core.version>
+        <aliyun-java-sdk-dysmsapi.version>2.1.0</aliyun-java-sdk-dysmsapi.version>
+        <yunpian-java-sdk.version>1.2.7</yunpian-java-sdk.version>
     </properties>
 
     <!-- 依赖声明 -->
@@ -134,6 +140,11 @@
             <artifactId>mybatis-plus-boot-starter</artifactId>
             <version>${mybatis-plus.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>dynamic-datasource-spring-boot-starter</artifactId> <!-- 多数据源 -->
+            <version>${dynamic-datasource.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>org.redisson</groupId>
@@ -213,14 +224,14 @@
         <dependency>
             <groupId>com.github.fppt</groupId> <!-- 单元测试，我们采用内嵌的 Redis 数据库 -->
             <artifactId>jedis-mock</artifactId>
-            <version>0.1.16</version>
+            <version>${jedis-mock.version}</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>uk.co.jemos.podam</groupId> <!-- 单元测试，随机生成 POJO 类 -->
             <artifactId>podam</artifactId>
-            <version>7.2.6.RELEASE</version>
+            <version>${podam.version}</version>
             <scope>test</scope>
         </dependency>
 
@@ -272,13 +283,26 @@
             <version>${screw.version}</version>
         </dependency>
 
-        <!-- 多数据源 -->
+        <!-- 三方云服务相关 -->
+
+        <!-- SMS SDK begin -->
         <dependency>
-            <groupId>com.baomidou</groupId>
-            <artifactId>dynamic-datasource-spring-boot-starter</artifactId>
-            <version>${dynamic-datasource.version}</version>
+            <groupId>com.yunpian.sdk</groupId>
+            <artifactId>yunpian-java-sdk</artifactId>
+            <version>${yunpian-java-sdk.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.aliyun</groupId>
+            <artifactId>aliyun-java-sdk-core</artifactId>
+            <version>${aliyun-java-sdk-core.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.aliyun</groupId>
+            <artifactId>aliyun-java-sdk-dysmsapi</artifactId>
+            <version>${aliyun-java-sdk-dysmsapi.version}</version>
+        </dependency>
+        <!-- SMS SDK end -->
 
     </dependencies>
 

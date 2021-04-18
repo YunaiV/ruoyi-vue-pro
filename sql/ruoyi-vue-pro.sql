@@ -1,7 +1,7 @@
 /*
  Navicat Premium Data Transfer
 
- Source Server         : 127.0.0.1
+ Source Server         : local-mysql001
  Source Server Type    : MySQL
  Source Server Version : 50718
  Source Host           : localhost:3306
@@ -11,7 +11,7 @@
  Target Server Version : 50718
  File Encoding         : 65001
 
- Date: 21/03/2021 18:53:24
+ Date: 18/04/2021 00:36:06
 */
 
 SET NAMES utf8mb4;
@@ -43,7 +43,7 @@ CREATE TABLE `inf_api_access_log` (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=1318 DEFAULT CHARSET=utf8mb4 COMMENT='API 访问日志表';
+) ENGINE=InnoDB AUTO_INCREMENT=3750 DEFAULT CHARSET=utf8mb4 COMMENT='API 访问日志表';
 
 -- ----------------------------
 -- Records of inf_api_access_log
@@ -84,7 +84,7 @@ CREATE TABLE `inf_api_error_log` (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COMMENT='系统异常日志';
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COMMENT='系统异常日志';
 
 -- ----------------------------
 -- Records of inf_api_error_log
@@ -201,7 +201,7 @@ CREATE TABLE `inf_job_log` (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=627 DEFAULT CHARSET=utf8mb4 COMMENT='定时任务日志表';
+) ENGINE=InnoDB AUTO_INCREMENT=2322 DEFAULT CHARSET=utf8mb4 COMMENT='定时任务日志表';
 
 -- ----------------------------
 -- Records of inf_job_log
@@ -264,7 +264,7 @@ CREATE TABLE `sys_dict_data` (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=65 DEFAULT CHARSET=utf8mb4 COMMENT='字典数据表';
+) ENGINE=InnoDB AUTO_INCREMENT=78 DEFAULT CHARSET=utf8mb4 COMMENT='字典数据表';
 
 -- ----------------------------
 -- Records of sys_dict_data
@@ -324,6 +324,19 @@ INSERT INTO `sys_dict_data` VALUES (61, 2, '管理员', '2', 'user_type', 0, NUL
 INSERT INTO `sys_dict_data` VALUES (62, 0, '未处理', '0', 'inf_api_error_log_process_status', 0, NULL, '', '2021-02-26 07:07:19', '', '2021-02-26 08:11:23', b'0');
 INSERT INTO `sys_dict_data` VALUES (63, 1, '已处理', '1', 'inf_api_error_log_process_status', 0, NULL, '', '2021-02-26 07:07:26', '', '2021-02-26 08:11:29', b'0');
 INSERT INTO `sys_dict_data` VALUES (64, 2, '已忽略', '2', 'inf_api_error_log_process_status', 0, NULL, '', '2021-02-26 07:07:34', '', '2021-02-26 08:11:34', b'0');
+INSERT INTO `sys_dict_data` VALUES (65, 1, '云片', 'YUN_PIAN', 'sys_sms_channel_code', 0, NULL, '1', '2021-04-05 01:05:14', '1', '2021-04-13 00:20:13', b'0');
+INSERT INTO `sys_dict_data` VALUES (66, 2, '阿里云', 'ALIYUN', 'sys_sms_channel_code', 0, NULL, '1', '2021-04-05 01:05:26', '1', '2021-04-13 00:20:16', b'0');
+INSERT INTO `sys_dict_data` VALUES (67, 1, '验证码', '1', 'sys_sms_template_type', 0, NULL, '1', '2021-04-05 21:50:57', '1', '2021-04-05 21:50:57', b'0');
+INSERT INTO `sys_dict_data` VALUES (68, 2, '通知', '2', 'sys_sms_template_type', 0, NULL, '1', '2021-04-05 21:51:08', '1', '2021-04-05 21:51:08', b'0');
+INSERT INTO `sys_dict_data` VALUES (69, 0, '营销', '3', 'sys_sms_template_type', 0, NULL, '1', '2021-04-05 21:51:15', '1', '2021-04-05 21:51:15', b'0');
+INSERT INTO `sys_dict_data` VALUES (70, 0, '初始化', '0', 'sys_sms_send_status', 0, NULL, '1', '2021-04-11 20:18:33', '1', '2021-04-11 09:30:18', b'0');
+INSERT INTO `sys_dict_data` VALUES (71, 1, '发送成功', '10', 'sys_sms_send_status', 0, NULL, '1', '2021-04-11 20:18:43', '1', '2021-04-11 09:30:20', b'0');
+INSERT INTO `sys_dict_data` VALUES (72, 2, '发送失败', '20', 'sys_sms_send_status', 0, NULL, '1', '2021-04-11 20:18:49', '1', '2021-04-11 09:30:22', b'0');
+INSERT INTO `sys_dict_data` VALUES (73, 3, '不发送', '30', 'sys_sms_send_status', 0, NULL, '1', '2021-04-11 20:19:44', '1', '2021-04-11 09:30:23', b'0');
+INSERT INTO `sys_dict_data` VALUES (74, 0, '等待结果', '0', 'sys_sms_receive_status', 0, NULL, '1', '2021-04-11 20:27:43', '1', '2021-04-17 23:05:19', b'0');
+INSERT INTO `sys_dict_data` VALUES (75, 1, '接收成功', '10', 'sys_sms_receive_status', 0, NULL, '1', '2021-04-11 20:29:25', '1', '2021-04-11 20:29:35', b'0');
+INSERT INTO `sys_dict_data` VALUES (76, 2, '接收失败', '20', 'sys_sms_receive_status', 0, NULL, '1', '2021-04-11 20:29:31', '1', '2021-04-11 20:29:39', b'0');
+INSERT INTO `sys_dict_data` VALUES (77, 0, '调试(钉钉)', 'DEBUG_DING_TALK', 'sys_sms_channel_code', 0, NULL, '1', '2021-04-13 00:20:37', '1', '2021-04-13 00:20:37', b'0');
 COMMIT;
 
 -- ----------------------------
@@ -343,7 +356,7 @@ CREATE TABLE `sys_dict_type` (
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE KEY `dict_type` (`type`)
-) ENGINE=InnoDB AUTO_INCREMENT=111 DEFAULT CHARSET=utf8mb4 COMMENT='字典类型表';
+) ENGINE=InnoDB AUTO_INCREMENT=115 DEFAULT CHARSET=utf8mb4 COMMENT='字典类型表';
 
 -- ----------------------------
 -- Records of sys_dict_type
@@ -366,6 +379,10 @@ INSERT INTO `sys_dict_type` VALUES (107, '定时任务状态', 'inf_job_status',
 INSERT INTO `sys_dict_type` VALUES (108, '定时任务日志状态', 'inf_job_log_status', 0, NULL, '', '2021-02-08 10:03:51', '', '2021-02-08 10:03:51', b'0');
 INSERT INTO `sys_dict_type` VALUES (109, '用户类型', 'user_type', 0, NULL, '', '2021-02-26 00:15:51', '', '2021-02-26 00:15:51', b'0');
 INSERT INTO `sys_dict_type` VALUES (110, 'API 异常数据的处理状态', 'inf_api_error_log_process_status', 0, NULL, '', '2021-02-26 07:07:01', '', '2021-02-26 07:07:01', b'0');
+INSERT INTO `sys_dict_type` VALUES (111, '短信渠道编码', 'sys_sms_channel_code', 0, NULL, '1', '2021-04-05 01:04:50', '1', '2021-04-05 01:04:50', b'0');
+INSERT INTO `sys_dict_type` VALUES (112, '短信模板的类型', 'sys_sms_template_type', 0, NULL, '1', '2021-04-05 21:50:43', '1', '2021-04-05 21:50:43', b'0');
+INSERT INTO `sys_dict_type` VALUES (113, '短信发送状态', 'sys_sms_send_status', 0, NULL, '1', '2021-04-11 20:18:03', '1', '2021-04-11 09:30:02', b'0');
+INSERT INTO `sys_dict_type` VALUES (114, '短信接收状态', 'sys_sms_receive_status', 0, NULL, '1', '2021-04-11 20:27:14', '1', '2021-04-11 20:27:14', b'0');
 COMMIT;
 
 -- ----------------------------
@@ -386,7 +403,7 @@ CREATE TABLE `sys_login_log` (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COMMENT='系统访问记录';
+) ENGINE=InnoDB AUTO_INCREMENT=84 DEFAULT CHARSET=utf8mb4 COMMENT='系统访问记录';
 
 -- ----------------------------
 -- Records of sys_login_log
@@ -415,7 +432,7 @@ CREATE TABLE `sys_menu` (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=1093 DEFAULT CHARSET=utf8mb4 COMMENT='菜单权限表';
+) ENGINE=InnoDB AUTO_INCREMENT=1110 DEFAULT CHARSET=utf8mb4 COMMENT='菜单权限表';
 
 -- ----------------------------
 -- Records of sys_menu
@@ -530,6 +547,22 @@ INSERT INTO `sys_menu` VALUES (1089, '日志查询', 'infra:api-error-log:query'
 INSERT INTO `sys_menu` VALUES (1090, '文件管理', '', 2, 0, 2, 'file', 'upload', 'infra/file/index', 0, '', '2021-03-12 20:16:20', '1', '2021-03-13 11:07:05', b'0');
 INSERT INTO `sys_menu` VALUES (1091, '文件查询', 'infra:file:query', 3, 1, 1090, '', '', '', 0, '', '2021-03-12 20:16:20', '', '2021-03-12 20:16:20', b'0');
 INSERT INTO `sys_menu` VALUES (1092, '文件删除', 'infra:file:delete', 3, 4, 1090, '', '', '', 0, '', '2021-03-12 20:16:20', '', '2021-03-12 20:16:20', b'0');
+INSERT INTO `sys_menu` VALUES (1093, '短信管理', '', 1, 11, 1, 'sms', 'validCode', NULL, 0, '1', '2021-04-05 01:10:16', '1', '2021-04-05 01:11:38', b'0');
+INSERT INTO `sys_menu` VALUES (1094, '短信渠道', '', 2, 0, 1093, 'sms-channel', 'phone', 'system/sms/smsChannel', 0, '', '2021-04-01 11:07:15', '1', '2021-04-09 23:44:07', b'0');
+INSERT INTO `sys_menu` VALUES (1095, '短信渠道查询', 'system:sms-channel:query', 3, 1, 1094, '', '', '', 0, '', '2021-04-01 11:07:15', '', '2021-04-01 11:07:15', b'0');
+INSERT INTO `sys_menu` VALUES (1096, '短信渠道创建', 'system:sms-channel:create', 3, 2, 1094, '', '', '', 0, '', '2021-04-01 11:07:15', '', '2021-04-01 11:07:15', b'0');
+INSERT INTO `sys_menu` VALUES (1097, '短信渠道更新', 'system:sms-channel:update', 3, 3, 1094, '', '', '', 0, '', '2021-04-01 11:07:15', '', '2021-04-01 11:07:15', b'0');
+INSERT INTO `sys_menu` VALUES (1098, '短信渠道删除', 'system:sms-channel:delete', 3, 4, 1094, '', '', '', 0, '', '2021-04-01 11:07:15', '', '2021-04-01 11:07:15', b'0');
+INSERT INTO `sys_menu` VALUES (1100, '短信模板', '', 2, 1, 1093, 'sms-template', 'phone', 'system/sms/smsTemplate', 0, '', '2021-04-01 17:35:17', '1', '2021-04-11 19:34:21', b'0');
+INSERT INTO `sys_menu` VALUES (1101, '短信模板查询', 'system:sms-template:query', 3, 1, 1100, '', '', '', 0, '', '2021-04-01 17:35:17', '', '2021-04-01 17:35:17', b'0');
+INSERT INTO `sys_menu` VALUES (1102, '短信模板创建', 'system:sms-template:create', 3, 2, 1100, '', '', '', 0, '', '2021-04-01 17:35:17', '', '2021-04-01 17:35:17', b'0');
+INSERT INTO `sys_menu` VALUES (1103, '短信模板更新', 'system:sms-template:update', 3, 3, 1100, '', '', '', 0, '', '2021-04-01 17:35:17', '', '2021-04-01 17:35:17', b'0');
+INSERT INTO `sys_menu` VALUES (1104, '短信模板删除', 'system:sms-template:delete', 3, 4, 1100, '', '', '', 0, '', '2021-04-01 17:35:17', '', '2021-04-01 17:35:17', b'0');
+INSERT INTO `sys_menu` VALUES (1105, '短信模板导出', 'system:sms-template:export', 3, 5, 1100, '', '', '', 0, '', '2021-04-01 17:35:17', '', '2021-04-01 17:35:17', b'0');
+INSERT INTO `sys_menu` VALUES (1106, '发送测试短信', 'system:sms-template:send-sms', 3, 6, 1100, '', '', '', 0, '1', '2021-04-11 00:26:40', '1', '2021-04-11 00:26:40', b'0');
+INSERT INTO `sys_menu` VALUES (1107, '短信日志', '', 2, 2, 1093, 'sms-log', 'phone', 'system/sms/smsLog', 0, '', '2021-04-11 08:37:05', '1', '2021-04-11 19:34:25', b'0');
+INSERT INTO `sys_menu` VALUES (1108, '短信日志查询', 'system:sms-log:query', 3, 1, 1107, '', '', '', 0, '', '2021-04-11 08:37:05', '', '2021-04-11 08:37:05', b'0');
+INSERT INTO `sys_menu` VALUES (1109, '短信日志导出', 'system:sms-log:export', 3, 5, 1107, '', '', '', 0, '', '2021-04-11 08:37:05', '', '2021-04-11 08:37:05', b'0');
 COMMIT;
 
 -- ----------------------------
@@ -589,7 +622,7 @@ CREATE TABLE `sys_operate_log` (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=65 DEFAULT CHARSET=utf8mb4 COMMENT='操作日志记录';
+) ENGINE=InnoDB AUTO_INCREMENT=177 DEFAULT CHARSET=utf8mb4 COMMENT='操作日志记录';
 
 -- ----------------------------
 -- Records of sys_operate_log
@@ -835,6 +868,116 @@ INSERT INTO `sys_role_menu` VALUES (238, 101, 1065, '', '2021-01-21 03:23:27', '
 COMMIT;
 
 -- ----------------------------
+-- Table structure for sys_sms_channel
+-- ----------------------------
+DROP TABLE IF EXISTS `sys_sms_channel`;
+CREATE TABLE `sys_sms_channel` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '编号',
+  `signature` varchar(10) NOT NULL COMMENT '短信签名',
+  `code` varchar(63) NOT NULL COMMENT '渠道编码',
+  `status` tinyint(4) NOT NULL COMMENT '开启状态',
+  `remark` varchar(255) DEFAULT NULL COMMENT '备注',
+  `api_key` varchar(128) NOT NULL COMMENT '短信 API 的账号',
+  `api_secret` varchar(128) DEFAULT NULL COMMENT '短信 API 的秘钥',
+  `callback_url` varchar(255) DEFAULT NULL COMMENT '短信发送回调 URL',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COMMENT='短信渠道';
+
+-- ----------------------------
+-- Records of sys_sms_channel
+-- ----------------------------
+BEGIN;
+INSERT INTO `sys_sms_channel` VALUES (1, '芋道', 'YUN_PIAN', 0, '呵呵呵哒', '1555a14277cb8a608cf45a9e6a80d510', NULL, 'http://java.nat300.top/api/system/sms/callback/sms/yunpian', '', '2021-03-31 06:12:20', '1', '2021-04-13 01:03:19', b'0');
+INSERT INTO `sys_sms_channel` VALUES (2, 'Ballcat', 'ALIYUN', 0, '啦啦啦', 'LTAI5tCnKso2uG3kJ5gRav88', 'fGJ5SNXL7P1NHNRmJ7DJaMJGPyE55C', NULL, '', '2021-03-31 11:53:10', '1', '2021-04-14 00:08:37', b'0');
+INSERT INTO `sys_sms_channel` VALUES (3, '测试', 'YUN_PIAN', 0, '哈哈哈', '23132', NULL, 'http://www.baidu.com', '1', '2021-04-05 21:10:34', '1', '2021-04-11 16:21:58', b'1');
+INSERT INTO `sys_sms_channel` VALUES (4, '测试渠道', 'DEBUG_DING_TALK', 0, '123', '696b5d8ead48071237e4aa5861ff08dbadb2b4ded1c688a7b7c9afc615579859', 'SEC5c4e5ff888bc8a9923ae47f59e7ccd30af1f14d93c55b4e2c9cb094e35aeed67', NULL, '1', '2021-04-13 00:23:14', '1', '2021-04-14 00:07:10', b'0');
+COMMIT;
+
+-- ----------------------------
+-- Table structure for sys_sms_log
+-- ----------------------------
+DROP TABLE IF EXISTS `sys_sms_log`;
+CREATE TABLE `sys_sms_log` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '编号',
+  `channel_id` bigint(20) NOT NULL COMMENT '短信渠道编号',
+  `channel_code` varchar(63) NOT NULL COMMENT '短信渠道编码',
+  `template_id` bigint(20) NOT NULL COMMENT '模板编号',
+  `template_code` varchar(63) NOT NULL COMMENT '模板编码',
+  `template_type` tinyint(4) NOT NULL COMMENT '短信类型',
+  `template_content` varchar(255) NOT NULL COMMENT '短信内容',
+  `template_params` varchar(255) NOT NULL COMMENT '短信参数',
+  `api_template_id` varchar(63) NOT NULL COMMENT '短信 API 的模板编号',
+  `mobile` varchar(11) NOT NULL COMMENT '手机号',
+  `user_id` bigint(20) DEFAULT NULL COMMENT '用户编号',
+  `user_type` tinyint(4) DEFAULT NULL COMMENT '用户类型',
+  `send_status` tinyint(4) NOT NULL DEFAULT '0' COMMENT '发送状态',
+  `send_time` datetime DEFAULT NULL COMMENT '发送时间',
+  `send_code` int(11) DEFAULT NULL COMMENT '发送结果的编码',
+  `send_msg` varchar(255) DEFAULT NULL COMMENT '发送结果的提示',
+  `api_send_code` varchar(63) DEFAULT NULL COMMENT '短信 API 发送结果的编码',
+  `api_send_msg` varchar(255) DEFAULT NULL COMMENT '短信 API 发送失败的提示',
+  `api_request_id` varchar(255) DEFAULT NULL COMMENT '短信 API 发送返回的唯一请求 ID',
+  `api_serial_no` varchar(255) DEFAULT NULL COMMENT '短信 API 发送返回的序号',
+  `receive_status` tinyint(4) NOT NULL DEFAULT '0' COMMENT '接收状态',
+  `receive_time` datetime DEFAULT NULL COMMENT '接收时间',
+  `api_receive_code` varchar(63) DEFAULT NULL COMMENT 'API 接收结果的编码',
+  `api_receive_msg` varchar(255) DEFAULT NULL COMMENT 'API 接收结果的说明',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=35 DEFAULT CHARSET=utf8mb4 COMMENT='短信日志';
+
+-- ----------------------------
+-- Records of sys_sms_log
+-- ----------------------------
+BEGIN;
+COMMIT;
+
+-- ----------------------------
+-- Table structure for sys_sms_template
+-- ----------------------------
+DROP TABLE IF EXISTS `sys_sms_template`;
+CREATE TABLE `sys_sms_template` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '编号',
+  `type` tinyint(4) NOT NULL COMMENT '短信签名',
+  `status` tinyint(4) NOT NULL COMMENT '开启状态',
+  `code` varchar(63) NOT NULL COMMENT '模板编码',
+  `name` varchar(63) NOT NULL COMMENT '模板名称',
+  `content` varchar(255) NOT NULL COMMENT '模板内容',
+  `params` varchar(255) NOT NULL COMMENT '参数数组',
+  `remark` varchar(255) DEFAULT NULL COMMENT '备注',
+  `api_template_id` varchar(63) NOT NULL COMMENT '短信 API 的模板编号',
+  `channel_id` bigint(20) NOT NULL COMMENT '短信渠道编号',
+  `channel_code` varchar(63) NOT NULL COMMENT '短信渠道编码',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COMMENT='短信模板';
+
+-- ----------------------------
+-- Records of sys_sms_template
+-- ----------------------------
+BEGIN;
+INSERT INTO `sys_sms_template` VALUES (2, 1, 0, 'test_01', '测试验证码短信', '正在进行登录操作{operation}，您的验证码是{code}', '[\"operation\",\"code\"]', NULL, '4383920', 1, 'YUN_PIAN', '', '2021-03-31 10:49:38', '1', '2021-04-10 01:22:00', b'0');
+INSERT INTO `sys_sms_template` VALUES (3, 1, 0, 'test_02', '公告通知', '您的验证码{code}，该验证码5分钟内有效，请勿泄漏于他人！', '[\"code\"]', NULL, 'SMS_207945135', 2, 'ALIYUN', '', '2021-03-31 11:56:30', '1', '2021-04-10 01:22:02', b'0');
+INSERT INTO `sys_sms_template` VALUES (4, 3, 0, 'test-ooxx', '测试模板', 'biubiubiu', '[]', '1111', '110', 1, 'YUN_PIAN', '1', '2021-04-09 23:58:42', '1', '2021-04-02 07:47:12', b'1');
+INSERT INTO `sys_sms_template` VALUES (5, 3, 0, 'test-ooxx', '测试模板', 'biubiubiu', '[]', '1111', '110', 1, 'YUN_PIAN', '1', '2021-04-09 23:58:42', '1', '2021-04-02 08:32:22', b'1');
+INSERT INTO `sys_sms_template` VALUES (6, 3, 0, 'test-01', '测试模板', '哈哈哈 {name}', '[\"name\"]', 'f哈哈哈', '4383920', 1, 'YUN_PIAN', '1', '2021-04-10 01:07:21', '1', '2021-04-10 01:22:05', b'0');
+INSERT INTO `sys_sms_template` VALUES (7, 3, 0, 'test-04', '测试下', '老鸡{name}，牛逼{code}', '[\"name\",\"code\"]', NULL, 'suibian', 4, 'DEBUG_DING_TALK', '1', '2021-04-13 00:29:53', '1', '2021-04-14 00:30:38', b'0');
+COMMIT;
+
+-- ----------------------------
 -- Table structure for sys_user
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_user`;
@@ -865,8 +1008,8 @@ CREATE TABLE `sys_user` (
 -- Records of sys_user
 -- ----------------------------
 BEGIN;
-INSERT INTO `sys_user` VALUES (1, 'admin', '$2a$10$0acJOIk2D25/oC87nyclE..0lzeu9DtQ/n3geP4fkun/zIVRhHJIO', '芋道', '管理员', 103, '[1]', 'aoteman@126.com', '15612345678', 1, 'http://127.0.0.1:8080/api/system/file/get/add5ec1891a7d97d2cc1d60847e16294.jpg', 0, '127.0.0.1', '2021-01-05 17:03:47', 'admin', '2021-01-05 17:03:47', '1', '2021-03-21 18:16:16', b'0');
-INSERT INTO `sys_user` VALUES (2, 'ry', '$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', '若依', '测试员', 105, '[2]', 'ry@qq.com', '15666666666', 1, '', 0, '127.0.0.1', '2021-01-05 17:03:47', 'admin', '2021-01-05 17:03:47', '', '2021-01-05 17:03:47', b'0');
+INSERT INTO `sys_user` VALUES (1, 'admin', '$2a$10$0acJOIk2D25/oC87nyclE..0lzeu9DtQ/n3geP4fkun/zIVRhHJIO', '芋道源码', '管理员', 103, '[1]', 'aoteman@126.com', '15612345678', 1, 'http://api-dashboard.yudao.iocoder.cn/api/infra/file/get/5e8609290e915c4fa8b08e67.jpg', 0, '127.0.0.1', '2021-01-05 17:03:47', 'admin', '2021-01-05 17:03:47', '1', '2021-04-05 02:16:10', b'0');
+INSERT INTO `sys_user` VALUES (2, 'ry', '$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', '若依', '测试员', 105, '[2]', 'ry@qq.com', '15666666666', 1, '', 0, '127.0.0.1', '2021-01-05 17:03:47', 'admin', '2021-01-05 17:03:47', '', '2021-04-01 04:50:36', b'1');
 INSERT INTO `sys_user` VALUES (100, 'yudao', '$2a$10$11U48RhyJ5pSBYWSn12AD./ld671.ycSzJHbyrtpeoMeYiw31eo8a', '芋道', '不要吓我', 100, '[1]', 'yudao@iocoder.cn', '15601691300', 1, '', 1, '', NULL, '', '2021-01-07 09:07:17', '1', '2021-03-14 22:35:17', b'0');
 INSERT INTO `sys_user` VALUES (103, 'yuanma', '', '源码', NULL, 100, NULL, 'yuanma@iocoder.cn', '15601701300', 0, '', 0, '', NULL, '', '2021-01-13 23:50:35', '', '2021-01-13 23:50:35', b'0');
 INSERT INTO `sys_user` VALUES (104, 'test', '$2a$10$.TOFpaIiI3PzEwkGrNq0Eu6Cc3rOqJMxTb1DqeSEM8StxaGPBRKoi', '测试号', NULL, 100, '[]', '', '15601691200', 1, '', 0, '', NULL, '', '2021-01-21 02:13:53', '1', '2021-03-14 22:36:38', b'0');
@@ -924,13 +1067,40 @@ CREATE TABLE `sys_user_session` (
 -- Records of sys_user_session
 -- ----------------------------
 BEGIN;
+INSERT INTO `sys_user_session` VALUES ('04c6624c7bf14b1ba1a01cb976a9d876', 1, '2021-04-05 21:40:12', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-05 20:21:09', NULL, '2021-04-01 12:25:35', b'1');
+INSERT INTO `sys_user_session` VALUES ('0e235ce5ae7342a09b372a00bd7d1b41', 1, '2021-04-05 01:43:22', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-05 00:51:03', NULL, '2021-04-01 04:18:06', b'1');
+INSERT INTO `sys_user_session` VALUES ('0e6943f8ca9b4215a014843eb489ccc7', 1, '2021-04-05 22:53:22', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-05 21:43:59', NULL, '2021-04-01 17:25:41', b'1');
+INSERT INTO `sys_user_session` VALUES ('12166cd28b4f448ea468d13c471dfc6e', 1, '2021-04-09 19:48:58', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-09 19:18:58', NULL, '2021-04-02 04:33:15', b'1');
+INSERT INTO `sys_user_session` VALUES ('134d908ae33146bd9b5291471c04f604', 1, '2021-04-10 00:29:28', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-09 23:10:26', NULL, '2021-04-02 08:08:17', b'1');
+INSERT INTO `sys_user_session` VALUES ('1407ce21e47947b9b8d93bff1b55c7d6', 1, '2021-04-07 01:09:11', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-07 00:07:43', NULL, '2021-04-01 18:10:44', b'1');
+INSERT INTO `sys_user_session` VALUES ('1477c38290ff4cee8887ebfe593faa02', 1, '2021-04-17 23:34:57', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-17 23:04:57', NULL, '2021-04-12 21:36:29', b'1');
+INSERT INTO `sys_user_session` VALUES ('3c75ea73e13b4857a18eb57ca2eea80f', 1, '2021-04-11 20:06:52', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-11 19:36:52', NULL, '2021-04-11 09:10:53', b'1');
+INSERT INTO `sys_user_session` VALUES ('40d532d8900c43b791266429a7911751', 1, '2021-04-05 22:11:34', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-05 21:41:34', NULL, '2021-04-01 12:28:20', b'1');
+INSERT INTO `sys_user_session` VALUES ('43676e85d0e04980b2a67181f8d9933b', 1, '2021-04-11 10:41:09', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-11 09:56:31', NULL, '2021-04-02 17:32:07', b'1');
 INSERT INTO `sys_user_session` VALUES ('505b4e7d8b0d4b40aa23bf540da81234', 1, '2021-03-14 01:25:13', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', NULL, '2021-03-14 00:31:43', NULL, '2021-03-13 07:35:26', b'1');
+INSERT INTO `sys_user_session` VALUES ('56a92b99f7b642ccbb7508042a25cb0c', 1, '2021-04-11 21:16:33', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-11 20:14:54', NULL, '2021-04-11 10:08:20', b'1');
 INSERT INTO `sys_user_session` VALUES ('5a7248bf87d14e7e9f0578b05969986c', 1, '2021-03-13 10:42:50', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', NULL, '2021-03-13 09:37:36', NULL, '2021-03-12 19:53:07', b'1');
+INSERT INTO `sys_user_session` VALUES ('5c30d80eb72048daa1a24d3d4f01317b', 1, '2021-04-12 00:31:10', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-11 23:08:14', NULL, '2021-04-11 15:47:45', b'1');
+INSERT INTO `sys_user_session` VALUES ('5dca80a5c61541479a4dbb6e004c2e28', 1, '2021-04-14 00:57:25', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-13 23:38:30', NULL, '2021-04-12 17:33:48', b'1');
+INSERT INTO `sys_user_session` VALUES ('7324a76b029a49ee95bf54ceb4164ba9', 1, '2021-04-13 01:29:14', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-13 00:18:40', NULL, '2021-04-11 23:15:00', b'1');
+INSERT INTO `sys_user_session` VALUES ('749619894bc441bb9773902515f81e6a', 1, '2021-04-11 00:39:51', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-11 00:09:51', NULL, '2021-04-02 16:50:56', b'1');
+INSERT INTO `sys_user_session` VALUES ('7768ae62ad974fd989f5159649a4be82', 1, '2021-04-11 00:53:39', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-10 23:23:27', NULL, '2021-04-02 17:04:58', b'1');
+INSERT INTO `sys_user_session` VALUES ('79efcb8f64aa42af9f4b327fb383532f', 1, '2021-04-11 22:44:07', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-11 21:34:53', NULL, '2021-04-11 14:10:45', b'1');
+INSERT INTO `sys_user_session` VALUES ('87d5b95fdad9447189a95abf8a5152df', 1, '2021-04-17 23:01:18', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-17 22:31:18', NULL, '2021-04-12 21:03:27', b'1');
+INSERT INTO `sys_user_session` VALUES ('8b3eac5e4a104a4191c8070e03d553ea', 1, '2021-04-05 02:45:12', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-05 02:15:12', NULL, '2021-04-01 11:05:25', b'1');
 INSERT INTO `sys_user_session` VALUES ('9ae27346d8b7491aad1385f51e8aa196', 1, '2021-03-13 14:02:12', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', NULL, '2021-03-13 10:43:06', NULL, '2021-03-13 06:40:35', b'1');
+INSERT INTO `sys_user_session` VALUES ('a2fb443b31c049008975ff8ee5499db1', 1, '2021-04-11 09:42:09', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-11 09:12:09', NULL, '2021-04-02 17:16:00', b'1');
+INSERT INTO `sys_user_session` VALUES ('a71a74adf9d141e2849d2a411d558205', 1, '2021-04-17 18:24:44', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-17 17:54:44', NULL, '2021-04-12 17:54:50', b'1');
 INSERT INTO `sys_user_session` VALUES ('ae9ee7452ee54e4b983d658188c15c4d', 1, '2021-03-14 21:32:57', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', NULL, '2021-03-14 20:25:00', NULL, '2021-03-13 15:19:10', b'1');
-INSERT INTO `sys_user_session` VALUES ('d0adf48f82914212b947e5ab04d9fb65', 1, '2021-03-21 19:16:28', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-03-21 18:13:37', NULL, '2021-03-21 18:46:28', b'0');
+INSERT INTO `sys_user_session` VALUES ('b727853eccea4c8589e006ffea985146', 1, '2021-04-12 01:36:00', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-12 01:06:00', NULL, '2021-04-11 19:40:07', b'1');
+INSERT INTO `sys_user_session` VALUES ('c095616db95044c5bed66a3f84519b8b', 1, '2021-04-11 19:59:33', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-11 19:29:33', NULL, '2021-04-11 09:04:19', b'1');
+INSERT INTO `sys_user_session` VALUES ('d0adf48f82914212b947e5ab04d9fb65', 1, '2021-03-21 19:16:28', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-03-21 18:13:37', NULL, '2021-03-15 05:53:20', b'1');
+INSERT INTO `sys_user_session` VALUES ('dfbce0af867547f4bb01ac6f2e583337', 1, '2021-04-11 17:06:15', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-11 16:36:15', NULL, '2021-04-11 08:24:03', b'1');
+INSERT INTO `sys_user_session` VALUES ('e5ecf10e40a5463b8f9b5b453cb1649b', 1, '2021-04-11 17:06:22', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-11 16:36:22', NULL, '2021-04-11 08:24:03', b'1');
+INSERT INTO `sys_user_session` VALUES ('e80c2400724042a2ab73732166cde8fc', 1, '2021-03-21 21:17:12', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-03-21 20:47:12', NULL, '2021-03-15 08:18:56', b'1');
 INSERT INTO `sys_user_session` VALUES ('e8872f5192584440a548641b83c877ef', 1, '2021-03-21 18:36:01', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-03-21 17:51:48', NULL, '2021-03-15 03:54:20', b'1');
 INSERT INTO `sys_user_session` VALUES ('f1ab99b09b5a475795579ff99d60ac78', 1, '2021-03-14 23:04:31', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', NULL, '2021-03-14 21:12:44', NULL, '2021-03-15 03:32:38', b'1');
+INSERT INTO `sys_user_session` VALUES ('f2a4182f62ea4559b9946a523928fac4', 1, '2021-04-10 01:45:57', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-10 00:55:38', NULL, '2021-04-02 14:52:48', b'1');
 INSERT INTO `sys_user_session` VALUES ('f853b50d064340a581e9a49bba9411fc', 1, '2021-03-10 01:55:41', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', NULL, '2021-03-10 01:11:53', NULL, '2021-03-12 18:37:05', b'1');
 COMMIT;
 
@@ -964,7 +1134,7 @@ CREATE TABLE `tool_codegen_column` (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=389 DEFAULT CHARSET=utf8mb4 COMMENT='代码生成表字段定义';
+) ENGINE=InnoDB AUTO_INCREMENT=447 DEFAULT CHARSET=utf8mb4 COMMENT='代码生成表字段定义';
 
 -- ----------------------------
 -- Records of tool_codegen_column
@@ -1126,6 +1296,64 @@ INSERT INTO `tool_codegen_column` VALUES (385, 33, 'create_time', 'datetime', '�
 INSERT INTO `tool_codegen_column` VALUES (386, 33, 'updater', 'varchar(64)', '更新者', b'1', b'0', '0', 6, 'String', 'updater', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '1', '2021-03-13 09:43:20', '1', '2021-03-13 11:27:12', b'0');
 INSERT INTO `tool_codegen_column` VALUES (387, 33, 'update_time', 'datetime', '更新时间', b'0', b'0', '0', 7, 'Date', 'updateTime', '', NULL, b'0', b'0', b'0', 'BETWEEN', b'0', 'datetime', '1', '2021-03-13 09:43:20', '1', '2021-03-13 11:27:12', b'0');
 INSERT INTO `tool_codegen_column` VALUES (388, 33, 'deleted', 'bit(1)', '是否删除', b'0', b'0', '0', 8, 'Boolean', 'deleted', '', NULL, b'0', b'0', b'0', '=', b'0', 'radio', '1', '2021-03-13 09:43:20', '1', '2021-03-13 11:27:12', b'0');
+INSERT INTO `tool_codegen_column` VALUES (389, 34, 'id', 'bigint(20)', '编号', b'0', b'1', '1', 1, 'Long', 'id', '', '1024', b'0', b'1', b'0', '=', b'1', 'input', '1', '2021-04-05 00:51:34', '1', '2021-04-05 20:52:09', b'0');
+INSERT INTO `tool_codegen_column` VALUES (390, 34, 'signature', 'varchar(8)', '短信签名', b'0', b'0', '0', 2, 'String', 'signature', '', '芋道源码', b'1', b'1', b'1', '=', b'1', 'input', '1', '2021-04-05 00:51:34', '1', '2021-04-05 20:52:09', b'0');
+INSERT INTO `tool_codegen_column` VALUES (391, 34, 'code', 'varchar(63)', '渠道编码', b'0', b'0', '0', 3, 'String', 'code', 'sys_sms_channel_code', 'YUN_PIAN', b'1', b'0', b'0', '=', b'1', 'select', '1', '2021-04-05 00:51:34', '1', '2021-04-05 20:52:09', b'0');
+INSERT INTO `tool_codegen_column` VALUES (392, 34, 'status', 'tinyint(4)', '启用状态', b'0', b'0', '0', 4, 'Integer', 'status', 'sys_common_status', '1', b'1', b'1', b'1', '=', b'1', 'radio', '1', '2021-04-05 00:51:34', '1', '2021-04-05 20:52:09', b'0');
+INSERT INTO `tool_codegen_column` VALUES (393, 34, 'remark', 'varchar(255)', '备注', b'1', b'0', '0', 5, 'String', 'remark', '', '好吃！', b'1', b'1', b'0', '=', b'1', 'input', '1', '2021-04-05 00:51:34', '1', '2021-04-05 20:52:09', b'0');
+INSERT INTO `tool_codegen_column` VALUES (394, 34, 'api_key', 'varchar(63)', '短信 API 的账号', b'0', b'0', '0', 6, 'String', 'apiKey', '', 'yudao', b'1', b'1', b'0', '=', b'1', 'input', '1', '2021-04-05 00:51:34', '1', '2021-04-05 20:52:09', b'0');
+INSERT INTO `tool_codegen_column` VALUES (395, 34, 'api_secret', 'varchar(63)', '短信 API 的秘钥', b'1', b'0', '0', 7, 'String', 'apiSecret', '', 'yuanma', b'1', b'1', b'0', '=', b'1', 'input', '1', '2021-04-05 00:51:34', '1', '2021-04-05 20:52:09', b'0');
+INSERT INTO `tool_codegen_column` VALUES (396, 34, 'callback_url', 'varchar(255)', '短信发送回调 URL', b'1', b'0', '0', 8, 'String', 'callbackUrl', '', 'http://www.iocoder.cn', b'1', b'1', b'0', '=', b'1', 'input', '1', '2021-04-05 00:51:34', '1', '2021-04-05 20:52:09', b'0');
+INSERT INTO `tool_codegen_column` VALUES (397, 34, 'creator', 'varchar(64)', '创建者', b'1', b'0', '0', 9, 'String', 'creator', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '1', '2021-04-05 00:51:34', '1', '2021-04-05 20:52:09', b'0');
+INSERT INTO `tool_codegen_column` VALUES (398, 34, 'create_time', 'datetime', '创建时间', b'0', b'0', '0', 10, 'Date', 'createTime', '', NULL, b'0', b'0', b'1', 'BETWEEN', b'1', 'datetime', '1', '2021-04-05 00:51:34', '1', '2021-04-05 20:52:09', b'0');
+INSERT INTO `tool_codegen_column` VALUES (399, 34, 'updater', 'varchar(64)', '更新者', b'1', b'0', '0', 11, 'String', 'updater', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '1', '2021-04-05 00:51:34', '1', '2021-04-05 20:52:09', b'0');
+INSERT INTO `tool_codegen_column` VALUES (400, 34, 'update_time', 'datetime', '更新时间', b'0', b'0', '0', 12, 'Date', 'updateTime', '', NULL, b'0', b'0', b'0', 'BETWEEN', b'0', 'datetime', '1', '2021-04-05 00:51:34', '1', '2021-04-05 20:52:09', b'0');
+INSERT INTO `tool_codegen_column` VALUES (401, 34, 'deleted', 'bit(1)', '是否删除', b'0', b'0', '0', 13, 'Boolean', 'deleted', '', NULL, b'0', b'0', b'0', '=', b'0', 'radio', '1', '2021-04-05 00:51:34', '1', '2021-04-05 20:52:09', b'0');
+INSERT INTO `tool_codegen_column` VALUES (402, 35, 'id', 'bigint(20)', '编号', b'0', b'1', '1', 1, 'Long', 'id', '', '1024', b'0', b'1', b'0', '=', b'1', 'input', '1', '2021-04-05 21:42:22', '1', '2021-04-05 22:23:38', b'0');
+INSERT INTO `tool_codegen_column` VALUES (403, 35, 'type', 'tinyint(4)', '短信签名', b'0', b'0', '0', 2, 'Integer', 'type', 'sys_sms_template_type', '1', b'1', b'1', b'1', '=', b'1', 'select', '1', '2021-04-05 21:42:22', '1', '2021-04-05 22:23:38', b'0');
+INSERT INTO `tool_codegen_column` VALUES (404, 35, 'status', 'tinyint(4)', '开启状态', b'0', b'0', '0', 3, 'Integer', 'status', 'sys_common_status', '1', b'1', b'1', b'1', '=', b'1', 'radio', '1', '2021-04-05 21:42:22', '1', '2021-04-05 22:23:38', b'0');
+INSERT INTO `tool_codegen_column` VALUES (405, 35, 'code', 'varchar(63)', '模板编码', b'0', b'0', '0', 4, 'String', 'code', '', 'test_01', b'1', b'1', b'1', 'LIKE', b'1', 'input', '1', '2021-04-05 21:42:22', '1', '2021-04-05 22:23:38', b'0');
+INSERT INTO `tool_codegen_column` VALUES (406, 35, 'name', 'varchar(63)', '模板名称', b'0', b'0', '0', 5, 'String', 'name', '', 'yudao', b'1', b'1', b'0', 'LIKE', b'1', 'input', '1', '2021-04-05 21:42:22', '1', '2021-04-05 22:23:38', b'0');
+INSERT INTO `tool_codegen_column` VALUES (407, 35, 'content', 'varchar(255)', '模板内容', b'0', b'0', '0', 6, 'String', 'content', '', '你好，{name}。你长的太{like}啦！', b'1', b'1', b'1', 'LIKE', b'1', 'editor', '1', '2021-04-05 21:42:22', '1', '2021-04-05 22:23:38', b'0');
+INSERT INTO `tool_codegen_column` VALUES (408, 35, 'params', 'varchar(255)', '参数数组', b'0', b'0', '0', 7, 'String', 'params', '', 'name,code', b'0', b'0', b'0', '=', b'0', 'input', '1', '2021-04-05 21:42:22', '1', '2021-04-05 22:23:38', b'0');
+INSERT INTO `tool_codegen_column` VALUES (409, 35, 'remark', 'varchar(255)', '备注', b'1', b'0', '0', 8, 'String', 'remark', '', '哈哈哈', b'1', b'1', b'0', '=', b'1', 'input', '1', '2021-04-05 21:42:22', '1', '2021-04-05 22:23:38', b'0');
+INSERT INTO `tool_codegen_column` VALUES (410, 35, 'api_template_id', 'varchar(63)', '短信 API 的模板编号', b'0', b'0', '0', 9, 'String', 'apiTemplateId', '', '4383920', b'1', b'1', b'1', 'LIKE', b'1', 'input', '1', '2021-04-05 21:42:22', '1', '2021-04-05 22:23:38', b'0');
+INSERT INTO `tool_codegen_column` VALUES (411, 35, 'channel_id', 'bigint(20)', '短信渠道编号', b'0', b'0', '0', 10, 'Long', 'channelId', '', '10', b'1', b'1', b'1', '=', b'1', 'select', '1', '2021-04-05 21:42:22', '1', '2021-04-05 22:23:38', b'0');
+INSERT INTO `tool_codegen_column` VALUES (412, 35, 'channel_code', 'varchar(63)', '短信渠道编码', b'0', b'0', '0', 11, 'String', 'channelCode', 'sys_sms_channel_code', 'ALIYUN', b'0', b'0', b'0', '=', b'1', 'input', '1', '2021-04-05 21:42:22', '1', '2021-04-05 22:23:38', b'0');
+INSERT INTO `tool_codegen_column` VALUES (413, 35, 'creator', 'varchar(64)', '创建者', b'1', b'0', '0', 12, 'String', 'creator', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '1', '2021-04-05 21:42:22', '1', '2021-04-05 22:23:38', b'0');
+INSERT INTO `tool_codegen_column` VALUES (414, 35, 'create_time', 'datetime', '创建时间', b'0', b'0', '0', 13, 'Date', 'createTime', '', NULL, b'0', b'0', b'1', 'BETWEEN', b'1', 'datetime', '1', '2021-04-05 21:42:22', '1', '2021-04-05 22:23:38', b'0');
+INSERT INTO `tool_codegen_column` VALUES (415, 35, 'updater', 'varchar(64)', '更新者', b'1', b'0', '0', 14, 'String', 'updater', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '1', '2021-04-05 21:42:22', '1', '2021-04-05 22:23:38', b'0');
+INSERT INTO `tool_codegen_column` VALUES (416, 35, 'update_time', 'datetime', '更新时间', b'0', b'0', '0', 15, 'Date', 'updateTime', '', NULL, b'0', b'0', b'0', 'BETWEEN', b'0', 'datetime', '1', '2021-04-05 21:42:22', '1', '2021-04-05 22:23:38', b'0');
+INSERT INTO `tool_codegen_column` VALUES (417, 35, 'deleted', 'bit(1)', '是否删除', b'0', b'0', '0', 16, 'Boolean', 'deleted', '', NULL, b'0', b'0', b'0', '=', b'0', 'radio', '1', '2021-04-05 21:42:22', '1', '2021-04-05 22:23:38', b'0');
+INSERT INTO `tool_codegen_column` VALUES (418, 36, 'id', 'bigint(20)', '编号', b'0', b'1', '1', 1, 'Long', 'id', '', '1024', b'0', b'0', b'0', '=', b'1', 'input', '1', '2021-04-11 09:13:48', '1', '2021-04-11 20:33:54', b'0');
+INSERT INTO `tool_codegen_column` VALUES (419, 36, 'channel_id', 'bigint(20)', '短信渠道编号', b'0', b'0', '0', 2, 'Long', 'channelId', '', '10', b'0', b'0', b'1', '=', b'1', 'input', '1', '2021-04-11 09:13:48', '1', '2021-04-11 20:33:54', b'0');
+INSERT INTO `tool_codegen_column` VALUES (420, 36, 'channel_code', 'varchar(63)', '短信渠道编码', b'0', b'0', '0', 3, 'String', 'channelCode', '', 'ALIYUN', b'0', b'0', b'0', '=', b'1', 'input', '1', '2021-04-11 09:13:48', '1', '2021-04-11 20:33:54', b'0');
+INSERT INTO `tool_codegen_column` VALUES (421, 36, 'template_id', 'bigint(20)', '模板编号', b'0', b'0', '0', 4, 'Long', 'templateId', '', '20', b'0', b'0', b'1', '=', b'1', 'input', '1', '2021-04-11 09:13:48', '1', '2021-04-11 20:33:54', b'0');
+INSERT INTO `tool_codegen_column` VALUES (422, 36, 'template_code', 'varchar(63)', '模板编码', b'0', b'0', '0', 5, 'String', 'templateCode', '', 'test-01', b'0', b'0', b'0', '=', b'1', 'input', '1', '2021-04-11 09:13:48', '1', '2021-04-11 20:33:54', b'0');
+INSERT INTO `tool_codegen_column` VALUES (423, 36, 'template_type', 'tinyint(4)', '短信类型', b'0', b'0', '0', 6, 'Integer', 'templateType', 'sys_sms_template_type', '1', b'0', b'0', b'0', '=', b'1', 'select', '1', '2021-04-11 09:13:48', '1', '2021-04-11 20:33:54', b'0');
+INSERT INTO `tool_codegen_column` VALUES (424, 36, 'template_content', 'varchar(255)', '短信内容', b'0', b'0', '0', 7, 'String', 'templateContent', '', '你好，你的验证码是 1024', b'0', b'0', b'0', '=', b'1', 'editor', '1', '2021-04-11 09:13:48', '1', '2021-04-11 20:33:54', b'0');
+INSERT INTO `tool_codegen_column` VALUES (425, 36, 'template_params', 'varchar(255)', '短信参数', b'0', b'0', '0', 8, 'String', 'templateParams', '', 'name,code', b'0', b'0', b'0', '=', b'1', 'input', '1', '2021-04-11 09:13:48', '1', '2021-04-11 20:33:54', b'0');
+INSERT INTO `tool_codegen_column` VALUES (426, 36, 'api_template_id', 'varchar(63)', '短信 API 的模板编号', b'0', b'0', '0', 9, 'String', 'apiTemplateId', '', 'SMS_207945135', b'0', b'0', b'0', '=', b'1', 'input', '1', '2021-04-11 09:13:48', '1', '2021-04-11 20:33:54', b'0');
+INSERT INTO `tool_codegen_column` VALUES (427, 36, 'mobile', 'varchar(11)', '手机号', b'0', b'0', '0', 10, 'String', 'mobile', '', '15601691300', b'0', b'0', b'1', 'LIKE', b'1', 'input', '1', '2021-04-11 09:13:48', '1', '2021-04-11 20:33:54', b'0');
+INSERT INTO `tool_codegen_column` VALUES (428, 36, 'user_id', 'bigint(20)', '用户编号', b'1', b'0', '0', 11, 'Long', 'userId', '', '10', b'0', b'0', b'0', '=', b'1', 'input', '1', '2021-04-11 09:13:48', '1', '2021-04-11 20:33:54', b'0');
+INSERT INTO `tool_codegen_column` VALUES (429, 36, 'user_type', 'tinyint(4)', '用户类型', b'1', b'0', '0', 12, 'Integer', 'userType', 'user_type', '1', b'0', b'0', b'0', '=', b'1', 'select', '1', '2021-04-11 09:13:48', '1', '2021-04-11 20:33:54', b'0');
+INSERT INTO `tool_codegen_column` VALUES (430, 36, 'send_status', 'tinyint(4)', '发送状态', b'0', b'0', '0', 13, 'Integer', 'sendStatus', 'sys_sms_send_status', '1', b'0', b'0', b'1', '=', b'1', 'radio', '1', '2021-04-11 09:13:48', '1', '2021-04-11 20:33:54', b'0');
+INSERT INTO `tool_codegen_column` VALUES (431, 36, 'send_time', 'datetime', '发送时间', b'1', b'0', '0', 14, 'Date', 'sendTime', '', NULL, b'0', b'0', b'1', 'BETWEEN', b'1', 'datetime', '1', '2021-04-11 09:13:48', '1', '2021-04-11 20:33:54', b'0');
+INSERT INTO `tool_codegen_column` VALUES (432, 36, 'send_code', 'int(11)', '发送结果的编码', b'1', b'0', '0', 15, 'Integer', 'sendCode', '', '0', b'0', b'0', b'0', '=', b'1', 'input', '1', '2021-04-11 09:13:48', '1', '2021-04-11 20:33:54', b'0');
+INSERT INTO `tool_codegen_column` VALUES (433, 36, 'send_msg', 'varchar(255)', '发送结果的提示', b'1', b'0', '0', 16, 'String', 'sendMsg', '', '成功', b'0', b'0', b'0', '=', b'1', 'input', '1', '2021-04-11 09:13:48', '1', '2021-04-11 20:33:54', b'0');
+INSERT INTO `tool_codegen_column` VALUES (434, 36, 'api_send_code', 'varchar(63)', '短信 API 发送结果的编码', b'1', b'0', '0', 17, 'String', 'apiSendCode', '', 'SUCCESS', b'0', b'0', b'0', '=', b'1', 'input', '1', '2021-04-11 09:13:48', '1', '2021-04-11 20:33:54', b'0');
+INSERT INTO `tool_codegen_column` VALUES (435, 36, 'api_send_msg', 'varchar(255)', '短信 API 发送失败的提示', b'1', b'0', '0', 18, 'String', 'apiSendMsg', '', '成功', b'0', b'0', b'0', '=', b'1', 'input', '1', '2021-04-11 09:13:48', '1', '2021-04-11 20:33:54', b'0');
+INSERT INTO `tool_codegen_column` VALUES (436, 36, 'api_request_id', 'varchar(255)', '短信 API 发送返回的唯一请求 ID', b'1', b'0', '0', 19, 'String', 'apiRequestId', '', '3837C6D3-B96F-428C-BBB2-86135D4B5B99', b'0', b'0', b'0', '=', b'1', 'input', '1', '2021-04-11 09:13:48', '1', '2021-04-11 20:33:54', b'0');
+INSERT INTO `tool_codegen_column` VALUES (437, 36, 'api_serial_no', 'varchar(255)', '短信 API 发送返回的序号', b'1', b'0', '0', 20, 'String', 'apiSerialNo', '', '62923244790', b'0', b'0', b'0', '=', b'1', 'input', '1', '2021-04-11 09:13:48', '1', '2021-04-11 20:33:54', b'0');
+INSERT INTO `tool_codegen_column` VALUES (438, 36, 'receive_status', 'tinyint(4)', '接收状态', b'0', b'0', '0', 21, 'Integer', 'receiveStatus', 'sys_sms_receive_status', '0', b'0', b'0', b'1', '=', b'1', 'radio', '1', '2021-04-11 09:13:48', '1', '2021-04-11 20:33:54', b'0');
+INSERT INTO `tool_codegen_column` VALUES (439, 36, 'receive_time', 'datetime', '接收时间', b'1', b'0', '0', 22, 'Date', 'receiveTime', '', NULL, b'0', b'0', b'1', 'BETWEEN', b'1', 'datetime', '1', '2021-04-11 09:13:48', '1', '2021-04-11 20:33:54', b'0');
+INSERT INTO `tool_codegen_column` VALUES (440, 36, 'api_receive_code', 'varchar(63)', 'API 接收结果的编码', b'1', b'0', '0', 23, 'String', 'apiReceiveCode', '', 'DELIVRD', b'0', b'0', b'0', '=', b'1', 'input', '1', '2021-04-11 09:13:48', '1', '2021-04-11 20:33:54', b'0');
+INSERT INTO `tool_codegen_column` VALUES (441, 36, 'api_receive_msg', 'varchar(255)', 'API 接收结果的说明', b'1', b'0', '0', 24, 'String', 'apiReceiveMsg', '', 'DELIVRD', b'0', b'0', b'0', '=', b'1', 'input', '1', '2021-04-11 09:13:48', '1', '2021-04-11 20:33:54', b'0');
+INSERT INTO `tool_codegen_column` VALUES (442, 36, 'creator', 'varchar(64)', '创建者', b'1', b'0', '0', 25, 'String', 'creator', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '1', '2021-04-11 09:13:48', '1', '2021-04-11 20:33:54', b'0');
+INSERT INTO `tool_codegen_column` VALUES (443, 36, 'create_time', 'datetime', '创建时间', b'0', b'0', '0', 26, 'Date', 'createTime', '', NULL, b'0', b'0', b'0', 'BETWEEN', b'1', 'datetime', '1', '2021-04-11 09:13:48', '1', '2021-04-11 20:33:54', b'0');
+INSERT INTO `tool_codegen_column` VALUES (444, 36, 'updater', 'varchar(64)', '更新者', b'1', b'0', '0', 27, 'String', 'updater', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '1', '2021-04-11 09:13:48', '1', '2021-04-11 20:33:54', b'0');
+INSERT INTO `tool_codegen_column` VALUES (445, 36, 'update_time', 'datetime', '更新时间', b'0', b'0', '0', 28, 'Date', 'updateTime', '', NULL, b'0', b'0', b'0', 'BETWEEN', b'0', 'datetime', '1', '2021-04-11 09:13:48', '1', '2021-04-11 20:33:54', b'0');
+INSERT INTO `tool_codegen_column` VALUES (446, 36, 'deleted', 'bit(1)', '是否删除', b'0', b'0', '0', 29, 'Boolean', 'deleted', '', NULL, b'0', b'0', b'0', '=', b'0', 'radio', '1', '2021-04-11 09:13:48', '1', '2021-04-11 20:33:54', b'0');
 COMMIT;
 
 -- ----------------------------
@@ -1151,7 +1379,7 @@ CREATE TABLE `tool_codegen_table` (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=34 DEFAULT CHARSET=utf8mb4 COMMENT='代码生成表定义';
+) ENGINE=InnoDB AUTO_INCREMENT=37 DEFAULT CHARSET=utf8mb4 COMMENT='代码生成表定义';
 
 -- ----------------------------
 -- Records of tool_codegen_table
@@ -1169,6 +1397,9 @@ INSERT INTO `tool_codegen_table` VALUES (28, 1, 'sys_dict_type', '字典类型�
 INSERT INTO `tool_codegen_table` VALUES (29, 1, 'sys_dict_type', '字典类型表', NULL, 'system', 'dict', 'SysDictType', '字典类型', '芋艿', 1, NULL, '', '2021-03-06 03:52:57', '', '2021-03-06 04:03:52', b'0');
 INSERT INTO `tool_codegen_table` VALUES (30, 1, 'sys_dict_data', '字典数据表', NULL, 'system', 'type', 'SysDictData', '字典数据', '芋道源码', 1, NULL, '', '2021-03-06 06:48:28', '', '2021-03-06 06:50:47', b'0');
 INSERT INTO `tool_codegen_table` VALUES (33, 1, 'inf_file', '文件表', NULL, 'infra', 'file', 'InfFile', '文件', '芋艿', 1, 2, '1', '2021-03-13 09:43:20', '1', '2021-03-13 11:27:12', b'0');
+INSERT INTO `tool_codegen_table` VALUES (34, 1, 'sys_sms_channel', '短信渠道', NULL, 'system', 'sms', 'SysSmsChannel', '短信渠道', '芋道源码', 1, 1093, '1', '2021-04-03 13:39:06', '1', '2021-04-05 20:52:09', b'0');
+INSERT INTO `tool_codegen_table` VALUES (35, 1, 'sys_sms_template', '短信模板', NULL, 'system', 'sms', 'SysSmsTemplate', '短信模板', '芋道源码', 1, 1093, '1', '2021-04-03 13:58:55', '1', '2021-04-05 22:23:38', b'0');
+INSERT INTO `tool_codegen_table` VALUES (36, 1, 'sys_sms_log', '短信日志', NULL, 'system', 'sms', 'SysSmsLog', '短信日志', '芋道源码', 1, 1093, '1', '2021-04-11 01:12:57', '1', '2021-04-11 20:33:54', b'0');
 COMMIT;
 
 -- ----------------------------

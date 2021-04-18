@@ -17,7 +17,7 @@ public class ToolInformationSchemaColumnMapperTest extends BaseDbUnitTest {
     @Test
     public void testSelectListByTableName() {
         List<ToolSchemaColumnDO> columns = toolInformationSchemaColumnMapper
-                .selectListByTableName("inf_config");
+                .selectListByTableName("", "inf_config");
         assertTrue(columns.size() > 0);
     }
 

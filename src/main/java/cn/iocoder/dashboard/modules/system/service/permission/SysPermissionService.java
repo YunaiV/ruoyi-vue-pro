@@ -18,7 +18,7 @@ import java.util.Set;
 public interface SysPermissionService extends SecurityPermissionFrameworkService {
 
     /**
-     * 初始化
+     * 初始化权限的本地缓存
      */
     void initLocalCache();
 

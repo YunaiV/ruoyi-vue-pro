@@ -48,8 +48,8 @@ public class RedisConfig {
      * 创建 Redis Pub/Sub 广播消费的容器
      */
     @Bean
-    public RedisMessageListenerContainer redisMessageListenerContainer(RedisConnectionFactory factory,
-                                                                       List<AbstractChannelMessageListener<?>> listeners) {
+    public RedisMessageListenerContainer redisMessageListenerContainer(
+            RedisConnectionFactory factory, List<AbstractChannelMessageListener<?>> listeners) {
         // 创建 RedisMessageListenerContainer 对象
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
         // 设置 RedisConnection 工厂。
@@ -69,8 +69,8 @@ public class RedisConfig {
      * Redis Stream 的 xreadgroup 命令：https://www.geek-book.com/src/docs/redis/redis/redis.io/commands/xreadgroup.html
      */
     @Bean(initMethod = "start", destroyMethod = "stop")
-    public StreamMessageListenerContainer<String, ObjectRecord<String, String>> redisStreamMessageListenerContainer(RedisTemplate<String, Object> redisTemplate,
-                                                                                                                    List<AbstractStreamMessageListener<?>> listeners) {
+    public StreamMessageListenerContainer<String, ObjectRecord<String, String>> redisStreamMessageListenerContainer(
+            RedisTemplate<String, Object> redisTemplate, List<AbstractStreamMessageListener<?>> listeners) {
         // 第一步，创建 StreamMessageListenerContainer 容器
         // 创建 options 配置
         StreamMessageListenerContainer.StreamMessageListenerContainerOptions<String, ObjectRecord<String, String>> containerOptions =
