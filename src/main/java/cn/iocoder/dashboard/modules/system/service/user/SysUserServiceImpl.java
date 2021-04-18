@@ -20,7 +20,9 @@ import cn.iocoder.dashboard.modules.system.service.dept.SysDeptService;
 import cn.iocoder.dashboard.modules.system.service.dept.SysPostService;
 import cn.iocoder.dashboard.modules.system.service.permission.SysPermissionService;
 import cn.iocoder.dashboard.util.collection.CollectionUtils;
+import com.google.common.annotations.VisibleForTesting;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,6 +43,9 @@ import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.*;
 @Service
 @Slf4j
 public class SysUserServiceImpl implements SysUserService {
+
+    @Value("${sys.user.init-password:yudaoyuanma}")
+    private String userInitPassword;
 
     @Resource
     private SysUserMapper userMapper;
@@ -210,7 +215,8 @@ public class SysUserServiceImpl implements SysUserService {
         this.checkPostEnable(postIds);
     }
 
-    private void checkUserExists(Long id) {
+    @VisibleForTesting
+    void checkUserExists(Long id) {
         if (id == null) {
             return;
         }
@@ -220,7 +226,8 @@ public class SysUserServiceImpl implements SysUserService {
         }
     }
 
-    private void checkUsernameUnique(Long id, String username) {
+    @VisibleForTesting
+    void checkUsernameUnique(Long id, String username) {
         if (StrUtil.isBlank(username)) {
             return;
         }
@@ -237,7 +244,8 @@ public class SysUserServiceImpl implements SysUserService {
         }
     }
 
-    private void checkEmailUnique(Long id, String email) {
+    @VisibleForTesting
+    void checkEmailUnique(Long id, String email) {
         if (StrUtil.isBlank(email)) {
             return;
         }
@@ -254,7 +262,8 @@ public class SysUserServiceImpl implements SysUserService {
         }
     }
 
-    private void checkMobileUnique(Long id, String mobile) {
+    @VisibleForTesting
+    void checkMobileUnique(Long id, String mobile) {
         if (StrUtil.isBlank(mobile)) {
             return;
         }
@@ -271,7 +280,8 @@ public class SysUserServiceImpl implements SysUserService {
         }
     }
 
-    private void checkDeptEnable(Long deptId) {
+    @VisibleForTesting
+    void checkDeptEnable(Long deptId) {
         if (deptId == null) { // 允许不选择
             return;
         }
@@ -284,7 +294,8 @@ public class SysUserServiceImpl implements SysUserService {
         }
     }
 
-    private void checkPostEnable(Set<Long> postIds) {
+    @VisibleForTesting
+    void checkPostEnable(Set<Long> postIds) {
         if (CollUtil.isEmpty(postIds)) { // 允许不选择
             return;
         }
@@ -310,7 +321,8 @@ public class SysUserServiceImpl implements SysUserService {
      * @param id          用户 id
      * @param oldPassword 旧密码
      */
-    private void checkOldPassword(Long id, String oldPassword) {
+    @VisibleForTesting
+    void checkOldPassword(Long id, String oldPassword) {
         SysUserDO user = userMapper.selectById(id);
         if (user == null) {
             throw exception(USER_NOT_EXISTS);
@@ -340,8 +352,8 @@ public class SysUserServiceImpl implements SysUserService {
             // 判断如果不存在，在进行插入
             SysUserDO existUser = userMapper.selectByUsername(importUser.getUsername());
             if (existUser == null) {
-                // TODO 芋艿：初始密码
-                userMapper.insert(SysUserConvert.INSTANCE.convert(importUser));
+                userMapper.insert(SysUserConvert.INSTANCE.convert(importUser)
+                    .setPassword(passwordEncoder.encode(userInitPassword))); // 设置默认密码
                 respVO.getCreateUsernames().add(importUser.getUsername());
                 return;
             }

@@ -1,15 +1,14 @@
 package cn.iocoder.dashboard.modules.system.service.user;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.iocoder.dashboard.BaseDbUnitTest;
 import cn.iocoder.dashboard.common.enums.CommonStatusEnum;
+import cn.iocoder.dashboard.common.pojo.PageResult;
 import cn.iocoder.dashboard.modules.infra.service.file.InfFileService;
 import cn.iocoder.dashboard.modules.system.controller.user.vo.profile.SysUserProfileUpdatePasswordReqVO;
 import cn.iocoder.dashboard.modules.system.controller.user.vo.profile.SysUserProfileUpdateReqVO;
-import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserCreateReqVO;
-import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserImportExcelVO;
-import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserImportRespVO;
-import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserUpdateReqVO;
+import cn.iocoder.dashboard.modules.system.controller.user.vo.user.*;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.dept.SysDeptDO;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.dept.SysPostDO;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.user.SysUserDO;
@@ -20,6 +19,7 @@ import cn.iocoder.dashboard.modules.system.service.dept.SysPostService;
 import cn.iocoder.dashboard.modules.system.service.permission.SysPermissionService;
 import cn.iocoder.dashboard.util.collection.ArrayUtils;
 import cn.iocoder.dashboard.util.collection.CollectionUtils;
+import cn.iocoder.dashboard.util.object.ObjectUtils;
 import org.junit.jupiter.api.Test;
 import org.mockito.stubbing.Answer;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -28,14 +28,18 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.annotation.Resource;
 import java.io.ByteArrayInputStream;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 
 import static cn.hutool.core.util.RandomUtil.randomBytes;
 import static cn.hutool.core.util.RandomUtil.randomEle;
+import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.*;
 import static cn.iocoder.dashboard.util.AssertUtils.assertPojoEquals;
+import static cn.iocoder.dashboard.util.AssertUtils.assertServiceException;
 import static cn.iocoder.dashboard.util.RandomUtils.*;
+import static cn.iocoder.dashboard.util.date.DateUtils.buildTime;
+import static org.assertj.core.util.Lists.newArrayList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.*;
@@ -228,7 +232,7 @@ public class SysUserServiceImplTest extends BaseDbUnitTest {
     }
 
     @Test
-    public void testDeleteUser(){
+    public void testDeleteUser_success(){
         // mock 数据
         SysUserDO dbUser = randomSysUserDO();
         userMapper.insert(dbUser);
@@ -243,45 +247,333 @@ public class SysUserServiceImplTest extends BaseDbUnitTest {
         verify(permissionService, times(1)).processUserDeleted(eq(userId));
     }
 
+    @Test
+    public void testGetUserPage() {
+        // mock 数据
+        SysUserDO dbUser = initGetUserPageData();
+        // 准备参数
+        SysUserPageReqVO reqVO = new SysUserPageReqVO();
+        reqVO.setUsername("yudao");
+        reqVO.setMobile("1560");
+        reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
+        reqVO.setBeginTime(buildTime(2020, 12, 1));
+        reqVO.setEndTime(buildTime(2020, 12, 24));
+        reqVO.setDeptId(1L); // 其中，1L 是 2L 的父部门
+        // mock 方法
+        List<SysDeptDO> deptList = newArrayList(randomPojo(SysDeptDO.class, o -> o.setId(2L)));
+        when(deptService.getDeptsByParentIdFromCache(eq(reqVO.getDeptId()), eq(true))).thenReturn(deptList);
 
+        // 调用
+        PageResult<SysUserDO> pageResult = userService.getUserPage(reqVO);
+        // 断言
+        assertEquals(1, pageResult.getTotal());
+        assertEquals(1, pageResult.getList().size());
+        assertPojoEquals(dbUser, pageResult.getList().get(0));
+    }
 
     @Test
-    public void test_importUsers(){
-        SysDeptDO dept = randomPojo(SysDeptDO.class, o -> { // 等会查询到
-            o.setName("开发部");
-            o.setSort(1);
+    public void testGetUsers() {
+        // mock 数据
+        SysUserDO dbUser = initGetUserPageData();
+        // 准备参数
+        SysUserExportReqVO reqVO = new SysUserExportReqVO();
+        reqVO.setUsername("yudao");
+        reqVO.setMobile("1560");
+        reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
+        reqVO.setBeginTime(buildTime(2020, 12, 1));
+        reqVO.setEndTime(buildTime(2020, 12, 24));
+        reqVO.setDeptId(1L); // 其中，1L 是 2L 的父部门
+        // mock 方法
+        List<SysDeptDO> deptList = newArrayList(randomPojo(SysDeptDO.class, o -> o.setId(2L)));
+        when(deptService.getDeptsByParentIdFromCache(eq(reqVO.getDeptId()), eq(true))).thenReturn(deptList);
+
+        // 调用
+        List<SysUserDO> list = userService.getUsers(reqVO);
+        // 断言
+        assertEquals(1, list.size());
+        assertPojoEquals(dbUser, list.get(0));
+    }
+
+    /**
+     * 初始化 getUserPage 方法的测试数据
+     */
+    private SysUserDO initGetUserPageData() {
+        // mock 数据
+        SysUserDO dbUser = randomSysUserDO(o -> { // 等会查询到
+            o.setUsername("yudaoyuanma");
+            o.setMobile("15601691300");
+            o.setStatus(CommonStatusEnum.ENABLE.getStatus());
+            o.setCreateTime(buildTime(2020, 12, 12));
+            o.setDeptId(2L);
+        });
+        userMapper.insert(dbUser);
+        // 测试 username 不匹配
+        userMapper.insert(ObjectUtils.clone(dbUser, o -> o.setUsername("yuanma")));
+        // 测试 mobile 不匹配
+        userMapper.insert(ObjectUtils.clone(dbUser, o -> o.setMobile("18818260888")));
+        // 测试 status 不匹配
+        userMapper.insert(ObjectUtils.clone(dbUser, o -> o.setStatus(CommonStatusEnum.DISABLE.getStatus())));
+        // 测试 createTime 不匹配
+        userMapper.insert(ObjectUtils.clone(dbUser, o -> o.setCreateTime(buildTime(2020, 11, 11))));
+        // 测试 dept 不匹配
+        userMapper.insert(ObjectUtils.clone(dbUser, o -> o.setDeptId(0L)));
+        return dbUser;
+    }
+
+    /**
+     * 情况一，校验不通过，导致插入失败
+     */
+    @Test
+    public void testImportUsers_01() {
+        // 准备参数
+        SysUserImportExcelVO importUser = randomPojo(SysUserImportExcelVO.class);
+        // mock 方法
+
+        // 调用
+        SysUserImportRespVO respVO = userService.importUsers(newArrayList(importUser), true);
+        // 断言
+        assertEquals(0, respVO.getCreateUsernames().size());
+        assertEquals(0, respVO.getUpdateUsernames().size());
+        assertEquals(1, respVO.getFailureUsernames().size());
+        assertEquals(DEPT_NOT_FOUND.getMsg(), respVO.getFailureUsernames().get(importUser.getUsername()));
+    }
+
+    /**
+     * 情况二，不存在，进行插入
+     */
+    @Test
+    public void testImportUsers_02() {
+        // 准备参数
+        SysUserImportExcelVO importUser = randomPojo(SysUserImportExcelVO.class, o -> {
+            o.setStatus(randomEle(CommonStatusEnum.values()).getStatus()); // 保证 status 的范围
+            o.setSex(randomEle(SysSexEnum.values()).getSex()); // 保证 sex 的范围
+        });
+        // mock deptService 的方法
+        SysDeptDO dept = randomPojo(SysDeptDO.class, o -> {
+            o.setId(importUser.getDeptId());
             o.setStatus(CommonStatusEnum.ENABLE.getStatus());
         });
-//        int depId = deptMapper.insert(dept);
-        int depId = 0;
+        when(deptService.getDept(eq(dept.getId()))).thenReturn(dept);
+        // mock passwordEncoder 的方法
+        when(passwordEncoder.encode(eq("yudaoyuanma"))).thenReturn("java");
+
+        // 调用
+        SysUserImportRespVO respVO = userService.importUsers(newArrayList(importUser), true);
+        // 断言
+        assertEquals(1, respVO.getCreateUsernames().size());
+        SysUserDO user = userMapper.selectByUsername(respVO.getCreateUsernames().get(0));
+        assertPojoEquals(importUser, user);
+        assertEquals("java", user.getPassword());
+        assertEquals(0, respVO.getUpdateUsernames().size());
+        assertEquals(0, respVO.getFailureUsernames().size());
+    }
+
+    /**
+     * 情况三，存在，但是不强制更新
+     */
+    @Test
+    public void testImportUsers_03() {
+        // mock 数据
+        SysUserDO dbUser = randomSysUserDO();
+        userMapper.insert(dbUser);
         // 准备参数
-        List<SysUserImportExcelVO> list = new ArrayList<>();
-        list.add(randomPojo(SysUserImportExcelVO.class, o->{
-            o.setDeptId(dept.getId());
-            o.setSex(1);
-            o.setStatus(1);
-        }));
-        list.add(randomPojo(SysUserImportExcelVO.class, o->{
-            o.setDeptId(dept.getId());
-            o.setSex(1);
-            o.setStatus(1);
-        }));
-        list.add(randomPojo(SysUserImportExcelVO.class, o->{
-            o.setDeptId(dept.getId());
-            o.setSex(1);
-            o.setStatus(1);
-        }));
-        // 批量插入
-        SysUserImportRespVO respVO = userService.importUsers(list,false);
-        System.out.println(respVO.getCreateUsernames().size());
-        // 校验结果
-        assertEquals(respVO.getCreateUsernames().size(),3);
-        // 批量更新
-        list.get(0).setSex(0);
-        SysUserImportRespVO respVOUpdate = userService.importUsers(list,true);
-        System.out.println(respVOUpdate.getUpdateUsernames().size());
-        // 校验结果
-        assertEquals(respVOUpdate.getUpdateUsernames().size(),3);
+        SysUserImportExcelVO importUser = randomPojo(SysUserImportExcelVO.class, o -> {
+            o.setStatus(randomEle(CommonStatusEnum.values()).getStatus()); // 保证 status 的范围
+            o.setSex(randomEle(SysSexEnum.values()).getSex()); // 保证 sex 的范围
+            o.setUsername(dbUser.getUsername());
+        });
+        // mock deptService 的方法
+        SysDeptDO dept = randomPojo(SysDeptDO.class, o -> {
+            o.setId(importUser.getDeptId());
+            o.setStatus(CommonStatusEnum.ENABLE.getStatus());
+        });
+        when(deptService.getDept(eq(dept.getId()))).thenReturn(dept);
+
+        // 调用
+        SysUserImportRespVO respVO = userService.importUsers(newArrayList(importUser), false);
+        // 断言
+        assertEquals(0, respVO.getCreateUsernames().size());
+        assertEquals(0, respVO.getUpdateUsernames().size());
+        assertEquals(1, respVO.getFailureUsernames().size());
+        assertEquals(USER_USERNAME_EXISTS.getMsg(), respVO.getFailureUsernames().get(importUser.getUsername()));
+    }
+
+    /**
+     * 情况四，存在，强制更新
+     */
+    @Test
+    public void testImportUsers_04() {
+        // mock 数据
+        SysUserDO dbUser = randomSysUserDO();
+        userMapper.insert(dbUser);
+        // 准备参数
+        SysUserImportExcelVO importUser = randomPojo(SysUserImportExcelVO.class, o -> {
+            o.setStatus(randomEle(CommonStatusEnum.values()).getStatus()); // 保证 status 的范围
+            o.setSex(randomEle(SysSexEnum.values()).getSex()); // 保证 sex 的范围
+            o.setUsername(dbUser.getUsername());
+        });
+        // mock deptService 的方法
+        SysDeptDO dept = randomPojo(SysDeptDO.class, o -> {
+            o.setId(importUser.getDeptId());
+            o.setStatus(CommonStatusEnum.ENABLE.getStatus());
+        });
+        when(deptService.getDept(eq(dept.getId()))).thenReturn(dept);
+
+        // 调用
+        SysUserImportRespVO respVO = userService.importUsers(newArrayList(importUser), true);
+        // 断言
+        assertEquals(0, respVO.getCreateUsernames().size());
+        assertEquals(1, respVO.getUpdateUsernames().size());
+        SysUserDO user = userMapper.selectByUsername(respVO.getUpdateUsernames().get(0));
+        assertPojoEquals(importUser, user);
+        assertEquals(0, respVO.getFailureUsernames().size());
+    }
+
+    @Test
+    public void testCheckUserExists_notExists() {
+        assertServiceException(() -> userService.checkUserExists(randomLongId()), USER_NOT_EXISTS);
+    }
+
+    @Test
+    public void testCheckUsernameUnique_usernameExistsForCreate() {
+        // 准备参数
+        String username = randomString();
+        // mock 数据
+        userMapper.insert(randomSysUserDO(o -> o.setUsername(username)));
+
+        // 调用，校验异常
+        assertServiceException(() -> userService.checkUsernameUnique(null, username),
+                USER_USERNAME_EXISTS);
+    }
+
+    @Test
+    public void testCheckUsernameUnique_usernameExistsForUpdate() {
+        // 准备参数
+        Long id = randomLongId();
+        String username = randomString();
+        // mock 数据
+        userMapper.insert(randomSysUserDO(o -> o.setUsername(username)));
+
+        // 调用，校验异常
+        assertServiceException(() -> userService.checkUsernameUnique(id, username),
+                USER_USERNAME_EXISTS);
+    }
+
+    @Test
+    public void testCheckEmailUnique_emailExistsForCreate() {
+        // 准备参数
+        String email = randomString();
+        // mock 数据
+        userMapper.insert(randomSysUserDO(o -> o.setEmail(email)));
+
+        // 调用，校验异常
+        assertServiceException(() -> userService.checkEmailUnique(null, email),
+                USER_EMAIL_EXISTS);
+    }
+
+    @Test
+    public void testCheckEmailUnique_emailExistsForUpdate() {
+        // 准备参数
+        Long id = randomLongId();
+        String email = randomString();
+        // mock 数据
+        userMapper.insert(randomSysUserDO(o -> o.setEmail(email)));
+
+        // 调用，校验异常
+        assertServiceException(() -> userService.checkEmailUnique(id, email),
+                USER_EMAIL_EXISTS);
+    }
+
+    @Test
+    public void testCheckMobileUnique_mobileExistsForCreate() {
+        // 准备参数
+        String mobile = randomString();
+        // mock 数据
+        userMapper.insert(randomSysUserDO(o -> o.setMobile(mobile)));
+
+        // 调用，校验异常
+        assertServiceException(() -> userService.checkMobileUnique(null, mobile),
+                USER_MOBILE_EXISTS);
+    }
+
+    @Test
+    public void testCheckMobileUnique_mobileExistsForUpdate() {
+        // 准备参数
+        Long id = randomLongId();
+        String mobile = randomString();
+        // mock 数据
+        userMapper.insert(randomSysUserDO(o -> o.setMobile(mobile)));
+
+        // 调用，校验异常
+        assertServiceException(() -> userService.checkMobileUnique(id, mobile),
+                USER_MOBILE_EXISTS);
+    }
+
+    @Test
+    public void testCheckDeptEnable_notFound() {
+        assertServiceException(() -> userService.checkDeptEnable(randomLongId()),
+                DEPT_NOT_FOUND);
+    }
+
+    @Test
+    public void testCheckDeptEnable_notEnable() {
+        // 准备参数
+        Long deptId = randomLongId();
+        // mock deptService 的方法
+        SysDeptDO dept = randomPojo(SysDeptDO.class, o -> {
+            o.setId(deptId);
+            o.setStatus(CommonStatusEnum.DISABLE.getStatus());
+        });
+        when(deptService.getDept(eq(dept.getId()))).thenReturn(dept);
+
+        // 调用，校验异常
+        assertServiceException(() -> userService.checkDeptEnable(deptId),
+                DEPT_NOT_ENABLE);
+    }
+
+    @Test
+    public void testCheckPostEnable_notFound() {
+        assertServiceException(() -> userService.checkPostEnable(randomSet(Long.class)),
+                POST_NOT_FOUND);
+    }
+
+    @Test
+    public void testCheckPostEnable_notEnable() {
+        // 准备参数
+        Set<Long> postIds = randomSet(Long.class);
+        // mock postService 的方法
+        List<SysPostDO> posts = CollectionUtils.convertList(postIds, postId ->
+                randomPojo(SysPostDO.class, o -> {
+                    o.setId(postId);
+                    o.setStatus(CommonStatusEnum.DISABLE.getStatus());
+                }));
+        when(postService.getPosts(eq(postIds), isNull())).thenReturn(posts);
+
+        // 调用，校验异常
+        assertServiceException(() -> userService.checkPostEnable(postIds),
+                POST_NOT_ENABLE, CollUtil.getFirst(posts).getName());
+    }
+
+    @Test
+    public void testCheckOldPassword_notExists() {
+        assertServiceException(() -> userService.checkOldPassword(randomLongId(), randomString()),
+                USER_NOT_EXISTS);
+    }
+
+    @Test
+    public void testCheckOldPassword_passwordFailed() {
+        // mock 数据
+        SysUserDO user = randomSysUserDO();
+        userMapper.insert(user);
+        // 准备参数
+        Long id = user.getId();
+        String oldPassword = user.getPassword();
+
+        // 调用，校验异常
+        assertServiceException(() -> userService.checkOldPassword(id, oldPassword),
+                USER_PASSWORD_FAILED);
+        // 校验调用
+        verify(passwordEncoder, times(1)).matches(eq(oldPassword), eq(user.getPassword()));
     }
 
     // ========== 随机对象 ==========
