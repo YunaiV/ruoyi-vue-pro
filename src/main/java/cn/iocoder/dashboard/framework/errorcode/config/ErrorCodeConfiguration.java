@@ -17,13 +17,13 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @Configuration
 @EnableConfigurationProperties(ErrorCodeProperties.class)
 @EnableScheduling // 开启调度任务的功能，因为 ErrorCodeRemoteLoader 通过定时刷新错误码
-public class ErrorCodeAutoConfiguration {
+public class ErrorCodeConfiguration {
 
     @Bean
     public ErrorCodeAutoGenerator errorCodeAutoGenerator(@Value("${spring.application.name}") String applicationName,
                                                          ErrorCodeProperties errorCodeProperties,
                                                          ErrorCodeFrameworkService errorCodeFrameworkService) {
-        return new ErrorCodeAutoGeneratorImpl(applicationName, errorCodeProperties.getConstantsClass(),
+        return new ErrorCodeAutoGeneratorImpl(applicationName, errorCodeProperties.getConstantsClassList(),
                 errorCodeFrameworkService);
     }
 

@@ -1,4 +1,4 @@
-package cn.iocoder.dashboard.modules.system.dal.dataobject.errorcode;
+package cn.iocoder.dashboard.modules.infra.dal.dataobject.errorcode;
 
 import cn.iocoder.dashboard.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.dashboard.modules.system.enums.errorcode.SysErrorCodeTypeEnum;
@@ -8,17 +8,22 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-@TableName(value = "sys_error_code")
+/**
+ * 错误码表
+ *
+ * @author 芋道源码
+ */
+@TableName(value = "inf_error_code")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class ErrorCodeDO extends BaseDO {
+public class InfErrorCodeDO extends BaseDO {
 
     /**
-     * 错误码编号
+     * 错误码编号，自增
      */
     @TableId
-    private Integer id;
+    private Long id;
     /**
      * 错误码类型
      *
