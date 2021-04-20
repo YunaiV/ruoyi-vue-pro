@@ -1,12 +1,12 @@
 package cn.iocoder.dashboard.modules.infra.dal.mysql.errorcode;
 
+import cn.iocoder.dashboard.common.pojo.PageResult;
+import cn.iocoder.dashboard.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.dashboard.framework.mybatis.core.query.QueryWrapperX;
-import cn.iocoder.dashboard.modules.system.controller.errorcode.dto.ErrorCodePageDTO;
+import cn.iocoder.dashboard.modules.infra.controller.errorcode.vo.InfErrorCodeExportReqVO;
+import cn.iocoder.dashboard.modules.infra.controller.errorcode.vo.InfErrorCodePageReqVO;
 import cn.iocoder.dashboard.modules.infra.dal.dataobject.errorcode.InfErrorCodeDO;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.Collection;
@@ -14,12 +14,26 @@ import java.util.Date;
 import java.util.List;
 
 @Mapper
-public interface InfErrorCodeMapper extends BaseMapper<InfErrorCodeDO> {
+public interface InfErrorCodeMapper extends BaseMapperX<InfErrorCodeDO> {
 
-    default IPage<InfErrorCodeDO> selectPage(ErrorCodePageDTO pageDTO) {
-        return selectPage(new Page<>(pageDTO.getPageNo(), pageDTO.getPageSize()),
-                new QueryWrapperX<InfErrorCodeDO>().likeIfPresent("`group`", pageDTO.getGroup())
-                        .eqIfPresent("code", pageDTO.getCode()).likeIfPresent("message", pageDTO.getMessage()));
+    default PageResult<InfErrorCodeDO> selectPage(InfErrorCodePageReqVO reqVO) {
+        return selectPage(reqVO, new QueryWrapperX<InfErrorCodeDO>()
+                .eqIfPresent("type", reqVO.getType())
+                .likeIfPresent("application_name", reqVO.getApplicationName())
+                .eqIfPresent("code", reqVO.getCode())
+                .likeIfPresent("message", reqVO.getMessage())
+                .betweenIfPresent("create_time", reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
+                .orderByAsc("application_name", "code"));
+    }
+
+    default List<InfErrorCodeDO> selectList(InfErrorCodeExportReqVO reqVO) {
+        return selectList(new QueryWrapperX<InfErrorCodeDO>()
+                .eqIfPresent("type", reqVO.getType())
+                .likeIfPresent("application_name", reqVO.getApplicationName())
+                .eqIfPresent("code", reqVO.getCode())
+                .likeIfPresent("message", reqVO.getMessage())
+                .betweenIfPresent("create_time", reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
+                .orderByAsc("application_name", "code"));
     }
 
     default List<InfErrorCodeDO> selectListByCodes(Collection<Integer> codes) {

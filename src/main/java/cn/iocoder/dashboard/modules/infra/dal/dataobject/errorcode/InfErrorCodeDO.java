@@ -1,7 +1,7 @@
 package cn.iocoder.dashboard.modules.infra.dal.dataobject.errorcode;
 
 import cn.iocoder.dashboard.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.dashboard.modules.system.enums.errorcode.SysErrorCodeTypeEnum;
+import cn.iocoder.dashboard.modules.infra.enums.errorcode.InfErrorCodeTypeEnum;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
@@ -27,7 +27,7 @@ public class InfErrorCodeDO extends BaseDO {
     /**
      * 错误码类型
      *
-     * 枚举 {@link SysErrorCodeTypeEnum}
+     * 枚举 {@link InfErrorCodeTypeEnum}
      */
     private Integer type;
     /**

@@ -27,7 +27,7 @@ public enum SysDictTypeEnum {
     INF_JOB_STATUS("inf_job_status"), // 定时任务状态的枚举
     INF_JOB_LOG_STATUS("inf_job_log_status"), // 定时任务日志状态的枚举
     INF_API_ERROR_LOG_PROCESS_STATUS("inf_api_error_log_process_status"), // API 错误日志的处理状态的枚举
-
+    INF_ERROR_CODE_TYPE("inf_error_code_type"), // 错误码的类型枚举
     ;
 
 

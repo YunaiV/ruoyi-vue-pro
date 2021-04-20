@@ -5,6 +5,7 @@ DELETE FROM "inf_job";
 DELETE FROM "inf_job_log";
 DELETE FROM "inf_api_access_log";
 DELETE FROM "inf_api_error_log";
+DELETE FROM "inf_error_code";
 
 -- sys 开头的 DB
 DELETE FROM "sys_dept";

@@ -1,4 +1,4 @@
-package cn.iocoder.dashboard.modules.system.enums.errorcode;
+package cn.iocoder.dashboard.modules.infra.enums.errorcode;
 
 import cn.iocoder.dashboard.common.core.IntArrayValuable;
 import lombok.AllArgsConstructor;
@@ -13,7 +13,7 @@ import java.util.Arrays;
  */
 @AllArgsConstructor
 @Getter
-public enum SysErrorCodeTypeEnum implements IntArrayValuable {
+public enum InfErrorCodeTypeEnum implements IntArrayValuable {
 
     /**
      * 自动生成
@@ -24,7 +24,7 @@ public enum SysErrorCodeTypeEnum implements IntArrayValuable {
      */
     MANUAL_OPERATION(2);
 
-    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(SysErrorCodeTypeEnum::getType).toArray();
+    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(InfErrorCodeTypeEnum::getType).toArray();
 
     /**
      * 类型

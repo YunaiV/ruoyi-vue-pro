@@ -30,4 +30,9 @@ public interface InfErrorCodeConstants {
     // ========== 文件 1001003000 ==========
     ErrorCode FILE_NOT_EXISTS = new ErrorCode(1001003000, "文件不存在");
 
+    // ========== 错误码模块 1001004000 ==========
+    ErrorCode ERROR_CODE_NOT_EXISTS = new ErrorCode(1001004000, "错误码不存在");
+    ErrorCode ERROR_CODE_DUPLICATE = new ErrorCode(1001004001, "已经存在编码为【{}}】的错误码");
+    ErrorCode ERROR_CAN_NOT_UPDATE_SYSTEM_TYPE_ERROR = new ErrorCode(1001004002, "不能修改类型为系统内置的错误码");
+
 }
