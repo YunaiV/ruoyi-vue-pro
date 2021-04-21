@@ -1,4 +1,4 @@
-package cn.iocoder.dashboard.modules.infra.controller.errorcode.vo;
+package cn.iocoder.dashboard.modules.system.controller.errorcode.vo;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -12,7 +12,7 @@ import java.util.Date;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class InfErrorCodeRespVO extends InfErrorCodeBaseVO {
+public class SysErrorCodeRespVO extends SysErrorCodeBaseVO {
 
     @ApiModelProperty(value = "错误码编号", required = true, example = "1024")
     private Long id;

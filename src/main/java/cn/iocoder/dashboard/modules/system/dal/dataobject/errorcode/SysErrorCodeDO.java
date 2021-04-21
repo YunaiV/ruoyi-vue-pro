@@ -1,7 +1,7 @@
-package cn.iocoder.dashboard.modules.infra.dal.dataobject.errorcode;
+package cn.iocoder.dashboard.modules.system.dal.dataobject.errorcode;
 
 import cn.iocoder.dashboard.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.dashboard.modules.infra.enums.errorcode.InfErrorCodeTypeEnum;
+import cn.iocoder.dashboard.modules.system.enums.errorcode.SysErrorCodeTypeEnum;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
@@ -13,11 +13,11 @@ import lombok.ToString;
  *
  * @author 芋道源码
  */
-@TableName(value = "inf_error_code")
+@TableName(value = "sys_error_code")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class InfErrorCodeDO extends BaseDO {
+public class SysErrorCodeDO extends BaseDO {
 
     /**
      * 错误码编号，自增
@@ -27,7 +27,7 @@ public class InfErrorCodeDO extends BaseDO {
     /**
      * 错误码类型
      *
-     * 枚举 {@link InfErrorCodeTypeEnum}
+     * 枚举 {@link SysErrorCodeTypeEnum}
      */
     private Integer type;
     /**

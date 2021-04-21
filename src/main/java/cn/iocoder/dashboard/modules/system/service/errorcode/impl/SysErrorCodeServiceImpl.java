@@ -1,18 +1,18 @@
-package cn.iocoder.dashboard.modules.infra.service.errorcode.impl;
+package cn.iocoder.dashboard.modules.system.service.errorcode.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.dashboard.common.pojo.PageResult;
 import cn.iocoder.dashboard.framework.errorcode.core.dto.ErrorCodeAutoGenerateReqDTO;
 import cn.iocoder.dashboard.framework.errorcode.core.dto.ErrorCodeRespDTO;
-import cn.iocoder.dashboard.modules.infra.controller.errorcode.vo.InfErrorCodeCreateReqVO;
-import cn.iocoder.dashboard.modules.infra.controller.errorcode.vo.InfErrorCodeExportReqVO;
-import cn.iocoder.dashboard.modules.infra.controller.errorcode.vo.InfErrorCodePageReqVO;
-import cn.iocoder.dashboard.modules.infra.controller.errorcode.vo.InfErrorCodeUpdateReqVO;
-import cn.iocoder.dashboard.modules.infra.convert.errorcode.InfErrorCodeConvert;
-import cn.iocoder.dashboard.modules.infra.dal.dataobject.errorcode.InfErrorCodeDO;
-import cn.iocoder.dashboard.modules.infra.dal.mysql.errorcode.InfErrorCodeMapper;
-import cn.iocoder.dashboard.modules.infra.enums.errorcode.InfErrorCodeTypeEnum;
-import cn.iocoder.dashboard.modules.infra.service.errorcode.InfErrorCodeService;
+import cn.iocoder.dashboard.modules.system.convert.errorcode.SysErrorCodeConvert;
+import cn.iocoder.dashboard.modules.system.controller.errorcode.vo.SysErrorCodeCreateReqVO;
+import cn.iocoder.dashboard.modules.system.controller.errorcode.vo.SysErrorCodeExportReqVO;
+import cn.iocoder.dashboard.modules.system.controller.errorcode.vo.SysErrorCodePageReqVO;
+import cn.iocoder.dashboard.modules.system.controller.errorcode.vo.SysErrorCodeUpdateReqVO;
+import cn.iocoder.dashboard.modules.system.dal.dataobject.errorcode.SysErrorCodeDO;
+import cn.iocoder.dashboard.modules.system.dal.mysql.errorcode.SysErrorCodeMapper;
+import cn.iocoder.dashboard.modules.system.enums.errorcode.SysErrorCodeTypeEnum;
+import cn.iocoder.dashboard.modules.system.service.errorcode.SysErrorCodeService;
 import com.google.common.annotations.VisibleForTesting;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -25,45 +25,46 @@ import java.util.List;
 import java.util.Map;
 
 import static cn.iocoder.dashboard.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.dashboard.modules.infra.enums.InfErrorCodeConstants.ERROR_CODE_DUPLICATE;
-import static cn.iocoder.dashboard.modules.infra.enums.InfErrorCodeConstants.ERROR_CODE_NOT_EXISTS;
+import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.*;
 import static cn.iocoder.dashboard.util.collection.CollectionUtils.convertMap;
 import static cn.iocoder.dashboard.util.collection.CollectionUtils.convertSet;
 
 /**
  * 错误码 Service 实现类
+ *
+ * @author dlyan
  */
 @Service
 @Validated
 @Slf4j
-public class InfErrorCodeServiceImpl implements InfErrorCodeService {
+public class SysErrorCodeServiceImpl implements SysErrorCodeService {
 
     @Resource
-    private InfErrorCodeMapper errorCodeMapper;
+    private SysErrorCodeMapper errorCodeMapper;
 
     @Override
-    public Long createErrorCode(InfErrorCodeCreateReqVO createReqVO) {
+    public Long createErrorCode(SysErrorCodeCreateReqVO createReqVO) {
         // 校验 code 重复
         validateCodeDuplicate(createReqVO.getCode(), null);
 
         // 插入
-        InfErrorCodeDO errorCode = InfErrorCodeConvert.INSTANCE.convert(createReqVO)
-                .setType(InfErrorCodeTypeEnum.MANUAL_OPERATION.getType());
+        SysErrorCodeDO errorCode = SysErrorCodeConvert.INSTANCE.convert(createReqVO)
+                .setType(SysErrorCodeTypeEnum.MANUAL_OPERATION.getType());
         errorCodeMapper.insert(errorCode);
         // 返回
         return errorCode.getId();
     }
 
     @Override
-    public void updateErrorCode(InfErrorCodeUpdateReqVO updateReqVO) {
+    public void updateErrorCode(SysErrorCodeUpdateReqVO updateReqVO) {
         // 校验存在
         this.validateErrorCodeExists(updateReqVO.getId());
         // 校验 code 重复
         validateCodeDuplicate(updateReqVO.getCode(), updateReqVO.getId());
 
         // 更新
-        InfErrorCodeDO updateObj = InfErrorCodeConvert.INSTANCE.convert(updateReqVO)
-                .setType(InfErrorCodeTypeEnum.MANUAL_OPERATION.getType());
+        SysErrorCodeDO updateObj = SysErrorCodeConvert.INSTANCE.convert(updateReqVO)
+                .setType(SysErrorCodeTypeEnum.MANUAL_OPERATION.getType());
         errorCodeMapper.updateById(updateObj);
     }
 
@@ -85,7 +86,7 @@ public class InfErrorCodeServiceImpl implements InfErrorCodeService {
      */
     @VisibleForTesting
     public void validateCodeDuplicate(Integer code, Long id) {
-        InfErrorCodeDO errorCodeDO = errorCodeMapper.selectByCode(code);
+        SysErrorCodeDO errorCodeDO = errorCodeMapper.selectByCode(code);
         if (errorCodeDO == null) {
             return;
         }
@@ -106,17 +107,17 @@ public class InfErrorCodeServiceImpl implements InfErrorCodeService {
     }
 
     @Override
-    public InfErrorCodeDO getErrorCode(Long id) {
+    public SysErrorCodeDO getErrorCode(Long id) {
         return errorCodeMapper.selectById(id);
     }
 
     @Override
-    public PageResult<InfErrorCodeDO> getErrorCodePage(InfErrorCodePageReqVO pageReqVO) {
+    public PageResult<SysErrorCodeDO> getErrorCodePage(SysErrorCodePageReqVO pageReqVO) {
         return errorCodeMapper.selectPage(pageReqVO);
     }
 
     @Override
-    public List<InfErrorCodeDO> getErrorCodeList(InfErrorCodeExportReqVO exportReqVO) {
+    public List<SysErrorCodeDO> getErrorCodeList(SysErrorCodeExportReqVO exportReqVO) {
         return errorCodeMapper.selectList(exportReqVO);
     }
 
@@ -127,23 +128,23 @@ public class InfErrorCodeServiceImpl implements InfErrorCodeService {
             return;
         }
         // 获得错误码
-        List<InfErrorCodeDO> errorCodeDOs = errorCodeMapper.selectListByCodes(
+        List<SysErrorCodeDO> errorCodeDOs = errorCodeMapper.selectListByCodes(
                 convertSet(autoGenerateDTOs, ErrorCodeAutoGenerateReqDTO::getCode));
-        Map<Integer, InfErrorCodeDO> errorCodeDOMap = convertMap(errorCodeDOs, InfErrorCodeDO::getCode);
+        Map<Integer, SysErrorCodeDO> errorCodeDOMap = convertMap(errorCodeDOs, SysErrorCodeDO::getCode);
 
         // 遍历 autoGenerateBOs 数组，逐个插入或更新。考虑到每次量级不大，就不走批量了
         autoGenerateDTOs.forEach(autoGenerateDTO -> {
-            InfErrorCodeDO errorCodeDO = errorCodeDOMap.get(autoGenerateDTO.getCode());
+            SysErrorCodeDO errorCodeDO = errorCodeDOMap.get(autoGenerateDTO.getCode());
             // 不存在，则进行新增
             if (errorCodeDO == null) {
-                errorCodeDO = InfErrorCodeConvert.INSTANCE.convert(autoGenerateDTO)
-                        .setType(InfErrorCodeTypeEnum.AUTO_GENERATION.getType());
+                errorCodeDO = SysErrorCodeConvert.INSTANCE.convert(autoGenerateDTO)
+                        .setType(SysErrorCodeTypeEnum.AUTO_GENERATION.getType());
                 errorCodeMapper.insert(errorCodeDO);
                 return;
             }
             // 存在，则进行更新。更新有三个前置条件：
             // 条件 1. 只更新自动生成的错误码，即 Type 为 ErrorCodeTypeEnum.AUTO_GENERATION
-            if (!InfErrorCodeTypeEnum.AUTO_GENERATION.getType().equals(errorCodeDO.getType())) {
+            if (!SysErrorCodeTypeEnum.AUTO_GENERATION.getType().equals(errorCodeDO.getType())) {
                 return;
             }
             // 条件 2. 分组 group 必须匹配，避免存在错误码冲突的情况
@@ -158,15 +159,15 @@ public class InfErrorCodeServiceImpl implements InfErrorCodeService {
                 return;
             }
             // 最终匹配，进行更新
-            errorCodeMapper.updateById(new InfErrorCodeDO().setId(errorCodeDO.getId()).setMessage(autoGenerateDTO.getMessage()));
+            errorCodeMapper.updateById(new SysErrorCodeDO().setId(errorCodeDO.getId()).setMessage(autoGenerateDTO.getMessage()));
         });
     }
 
     @Override
     public List<ErrorCodeRespDTO> getErrorCodeList(String applicationName, Date minUpdateTime) {
-        List<InfErrorCodeDO> errorCodeDOs = errorCodeMapper.selectListByApplicationNameAndUpdateTimeGt(
+        List<SysErrorCodeDO> errorCodeDOs = errorCodeMapper.selectListByApplicationNameAndUpdateTimeGt(
                 applicationName, minUpdateTime);
-        return InfErrorCodeConvert.INSTANCE.convertList03(errorCodeDOs);
+        return SysErrorCodeConvert.INSTANCE.convertList03(errorCodeDOs);
     }
 
 }

@@ -1,4 +1,4 @@
-package cn.iocoder.dashboard.modules.infra.controller.errorcode.vo;
+package cn.iocoder.dashboard.modules.system.controller.errorcode.vo;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -12,7 +12,7 @@ import javax.validation.constraints.NotNull;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class InfErrorCodeUpdateReqVO extends InfErrorCodeBaseVO {
+public class SysErrorCodeUpdateReqVO extends SysErrorCodeBaseVO {
 
     @ApiModelProperty(value = "错误码编号", required = true, example = "1024")
     @NotNull(message = "错误码编号不能为空")

@@ -1,24 +1,19 @@
-package cn.iocoder.dashboard.modules.infra.controller.errorcode.vo;
+package cn.iocoder.dashboard.modules.system.controller.errorcode.vo;
 
-import cn.iocoder.dashboard.common.pojo.PageParam;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 
 import static cn.iocoder.dashboard.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
-@ApiModel("错误码分页 Request VO")
+@ApiModel(value = "错误码 Excel 导出 Request VO", description = "参数和 InfErrorCodePageReqVO 是一致的")
 @Data
-@EqualsAndHashCode(callSuper = true)
-@ToString(callSuper = true)
-public class InfErrorCodePageReqVO extends PageParam {
+public class SysErrorCodeExportReqVO {
 
-    @ApiModelProperty(value = "错误码类型", example = "1", notes = "参见 SysErrorCodeTypeEnum 枚举类")
+    @ApiModelProperty(value = "错误码类型", example = "1")
     private Integer type;
 
     @ApiModelProperty(value = "应用名", example = "dashboard")

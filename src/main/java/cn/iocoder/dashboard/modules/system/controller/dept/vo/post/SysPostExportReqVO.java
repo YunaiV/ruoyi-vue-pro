@@ -8,6 +8,9 @@ import lombok.Data;
 @Data
 public class SysPostExportReqVO {
 
+    @ApiModelProperty(value = "岗位编码", example = "yudao", notes = "模糊匹配")
+    private String code;
+
     @ApiModelProperty(value = "岗位名称", example = "芋道", notes = "模糊匹配")
     private String name;
 

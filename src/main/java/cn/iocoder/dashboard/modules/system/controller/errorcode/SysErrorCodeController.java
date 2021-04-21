@@ -1,13 +1,13 @@
-package cn.iocoder.dashboard.modules.infra.controller.errorcode;
+package cn.iocoder.dashboard.modules.system.controller.errorcode;
 
 import cn.iocoder.dashboard.common.pojo.CommonResult;
 import cn.iocoder.dashboard.common.pojo.PageResult;
 import cn.iocoder.dashboard.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.dashboard.framework.logger.operatelog.core.annotations.OperateLog;
-import cn.iocoder.dashboard.modules.infra.controller.errorcode.vo.*;
-import cn.iocoder.dashboard.modules.infra.convert.errorcode.InfErrorCodeConvert;
-import cn.iocoder.dashboard.modules.infra.dal.dataobject.errorcode.InfErrorCodeDO;
-import cn.iocoder.dashboard.modules.infra.service.errorcode.InfErrorCodeService;
+import cn.iocoder.dashboard.modules.system.convert.errorcode.SysErrorCodeConvert;
+import cn.iocoder.dashboard.modules.system.controller.errorcode.vo.*;
+import cn.iocoder.dashboard.modules.system.dal.dataobject.errorcode.SysErrorCodeDO;
+import cn.iocoder.dashboard.modules.system.service.errorcode.SysErrorCodeService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
@@ -26,24 +26,24 @@ import static cn.iocoder.dashboard.framework.logger.operatelog.core.enums.Operat
 
 @Api(tags = "错误码")
 @RestController
-@RequestMapping("/infra/error-code")
+@RequestMapping("/system/error-code")
 @Validated
-public class InfErrorCodeController {
+public class SysErrorCodeController {
 
     @Resource
-    private InfErrorCodeService errorCodeService;
+    private SysErrorCodeService errorCodeService;
 
     @PostMapping("/create")
     @ApiOperation("创建错误码")
-    @PreAuthorize("@ss.hasPermission('infra:error-code:create')")
-    public CommonResult<Long> createErrorCode(@Valid @RequestBody InfErrorCodeCreateReqVO createReqVO) {
+    @PreAuthorize("@ss.hasPermission('system:error-code:create')")
+    public CommonResult<Long> createErrorCode(@Valid @RequestBody SysErrorCodeCreateReqVO createReqVO) {
         return success(errorCodeService.createErrorCode(createReqVO));
     }
 
     @PutMapping("/update")
     @ApiOperation("更新错误码")
-    @PreAuthorize("@ss.hasPermission('infra:error-code:update')")
-    public CommonResult<Boolean> updateErrorCode(@Valid @RequestBody InfErrorCodeUpdateReqVO updateReqVO) {
+    @PreAuthorize("@ss.hasPermission('system:error-code:update')")
+    public CommonResult<Boolean> updateErrorCode(@Valid @RequestBody SysErrorCodeUpdateReqVO updateReqVO) {
         errorCodeService.updateErrorCode(updateReqVO);
         return success(true);
     }
@@ -51,7 +51,7 @@ public class InfErrorCodeController {
     @DeleteMapping("/delete")
     @ApiOperation("删除错误码")
     @ApiImplicitParam(name = "id", value = "编号", required = true)
-    @PreAuthorize("@ss.hasPermission('infra:error-code:delete')")
+    @PreAuthorize("@ss.hasPermission('system:error-code:delete')")
     public CommonResult<Boolean> deleteErrorCode(@RequestParam("id") Long id) {
         errorCodeService.deleteErrorCode(id);
         return success(true);
@@ -60,30 +60,30 @@ public class InfErrorCodeController {
     @GetMapping("/get")
     @ApiOperation("获得错误码")
     @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
-    @PreAuthorize("@ss.hasPermission('infra:error-code:query')")
-    public CommonResult<InfErrorCodeRespVO> getErrorCode(@RequestParam("id") Long id) {
-        InfErrorCodeDO errorCode = errorCodeService.getErrorCode(id);
-        return success(InfErrorCodeConvert.INSTANCE.convert(errorCode));
+    @PreAuthorize("@ss.hasPermission('system:error-code:query')")
+    public CommonResult<SysErrorCodeRespVO> getErrorCode(@RequestParam("id") Long id) {
+        SysErrorCodeDO errorCode = errorCodeService.getErrorCode(id);
+        return success(SysErrorCodeConvert.INSTANCE.convert(errorCode));
     }
 
     @GetMapping("/page")
     @ApiOperation("获得错误码分页")
-    @PreAuthorize("@ss.hasPermission('infra:error-code:query')")
-    public CommonResult<PageResult<InfErrorCodeRespVO>> getErrorCodePage(@Valid InfErrorCodePageReqVO pageVO) {
-        PageResult<InfErrorCodeDO> pageResult = errorCodeService.getErrorCodePage(pageVO);
-        return success(InfErrorCodeConvert.INSTANCE.convertPage(pageResult));
+    @PreAuthorize("@ss.hasPermission('system:error-code:query')")
+    public CommonResult<PageResult<SysErrorCodeRespVO>> getErrorCodePage(@Valid SysErrorCodePageReqVO pageVO) {
+        PageResult<SysErrorCodeDO> pageResult = errorCodeService.getErrorCodePage(pageVO);
+        return success(SysErrorCodeConvert.INSTANCE.convertPage(pageResult));
     }
 
     @GetMapping("/export-excel")
     @ApiOperation("导出错误码 Excel")
-    @PreAuthorize("@ss.hasPermission('infra:error-code:export')")
+    @PreAuthorize("@ss.hasPermission('system:error-code:export')")
     @OperateLog(type = EXPORT)
-    public void exportErrorCodeExcel(@Valid InfErrorCodeExportReqVO exportReqVO,
+    public void exportErrorCodeExcel(@Valid SysErrorCodeExportReqVO exportReqVO,
               HttpServletResponse response) throws IOException {
-        List<InfErrorCodeDO> list = errorCodeService.getErrorCodeList(exportReqVO);
+        List<SysErrorCodeDO> list = errorCodeService.getErrorCodeList(exportReqVO);
         // 导出 Excel
-        List<InfErrorCodeExcelVO> datas = InfErrorCodeConvert.INSTANCE.convertList02(list);
-        ExcelUtils.write(response, "错误码.xls", "数据", InfErrorCodeExcelVO.class, datas);
+        List<SysErrorCodeExcelVO> datas = SysErrorCodeConvert.INSTANCE.convertList02(list);
+        ExcelUtils.write(response, "错误码.xls", "数据", SysErrorCodeExcelVO.class, datas);
     }
 
 }

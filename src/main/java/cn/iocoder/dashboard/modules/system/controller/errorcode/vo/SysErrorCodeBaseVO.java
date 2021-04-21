@@ -1,4 +1,4 @@
-package cn.iocoder.dashboard.modules.infra.controller.errorcode.vo;
+package cn.iocoder.dashboard.modules.system.controller.errorcode.vo;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -10,7 +10,7 @@ import javax.validation.constraints.NotNull;
 * 如果子 VO 存在差异的字段，请不要添加到这里，影响 Swagger 文档生成
 */
 @Data
-public class InfErrorCodeBaseVO {
+public class SysErrorCodeBaseVO {
 
     @ApiModelProperty(value = "应用名", required = true, example = "dashboard")
     @NotNull(message = "应用名不能为空")

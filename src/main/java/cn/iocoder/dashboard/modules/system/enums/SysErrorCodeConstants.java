@@ -91,4 +91,8 @@ public interface SysErrorCodeConstants {
     ErrorCode SMS_SEND_MOBILE_NOT_EXISTS = new ErrorCode(1002012000, "手机号不存在");
     ErrorCode SMS_SEND_MOBILE_TEMPLATE_PARAM_MISS = new ErrorCode(1002012001, "模板参数({})缺失");
 
+    // ========== 错误码模块 1002013000 ==========
+    ErrorCode ERROR_CODE_NOT_EXISTS = new ErrorCode(1002013000, "错误码不存在");
+    ErrorCode ERROR_CODE_DUPLICATE = new ErrorCode(1002013001, "已经存在编码为【{}】的错误码");
+
 }

@@ -1,4 +1,4 @@
-package cn.iocoder.dashboard.modules.infra.controller.errorcode.vo;
+package cn.iocoder.dashboard.modules.system.controller.errorcode.vo;
 
 import io.swagger.annotations.ApiModel;
 import lombok.Data;
@@ -9,6 +9,6 @@ import lombok.ToString;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class InfErrorCodeCreateReqVO extends InfErrorCodeBaseVO {
+public class SysErrorCodeCreateReqVO extends SysErrorCodeBaseVO {
 
 }
