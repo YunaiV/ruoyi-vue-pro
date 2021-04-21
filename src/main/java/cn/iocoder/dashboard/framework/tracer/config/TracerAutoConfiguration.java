@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.framework.tracer.config;
 
-import cn.iocoder.dashboard.framework.tracer.annotation.BizTracingAop;
+import cn.iocoder.dashboard.framework.tracer.core.annotation.BizTracingAop;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * BizTracer Bean 配置类
+ * Tracer 配置类
  *
  * @author mashu
  */
@@ -17,8 +17,7 @@ import org.springframework.context.annotation.Configuration;
 @ConditionalOnClass({BizTracingAop.class})
 @EnableConfigurationProperties(BizTracerProperties.class)
 @ConditionalOnProperty(prefix = "yudao.tracer", value = "enable", matchIfMissing = true)
-public class BizTracerAutoConfiguration {
-
+public class TracerAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
@@ -27,7 +26,8 @@ public class BizTracerAutoConfiguration {
     }
 
     @Bean
-    public BizTracingAop enableBizTracingAop() {
+    @ConditionalOnMissingBean
+    public BizTracingAop bizTracingAop() {
         return new BizTracingAop();
     }
 

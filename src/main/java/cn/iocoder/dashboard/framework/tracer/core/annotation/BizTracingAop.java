@@ -1,4 +1,4 @@
-package cn.iocoder.dashboard.framework.tracer.annotation;
+package cn.iocoder.dashboard.framework.tracer.core.annotation;
 
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.dashboard.util.sping.SpElUtil;
@@ -7,7 +7,6 @@ import org.apache.skywalking.apm.toolkit.trace.ActiveSpan;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.springframework.context.annotation.Configuration;
 
 /**
  * 业务链路AOP切面
@@ -20,14 +19,14 @@ public class BizTracingAop {
 
     @Around(value = "@annotation(bizTracing)")
     public void tagBizInfo(ProceedingJoinPoint joinPoint, BizTracing bizTracing) {
-        String bizId = (String) SpElUtil.analysisSpEl(bizTracing.bizId(), joinPoint);
-        String bizType = (String) SpElUtil.analysisSpEl(bizTracing.bizType(), joinPoint);
+        String bizId = (String) SpElUtil.analysisSpEl(bizTracing.id(), joinPoint);
+        String bizType = (String) SpElUtil.analysisSpEl(bizTracing.type(), joinPoint);
         if (StrUtil.isBlankIfStr(bizId)) {
             log.error("empty biz: bizId[{}], bizType[{}].", bizId, bizType);
             return;
         }
         log.info("accept biz: bizId[{}], bizType[{}].", bizId, bizType);
-        ActiveSpan.tag(BizTracing.BIZ_ID_TAG, bizId);
-        ActiveSpan.tag(BizTracing.BIZ_TYPE_TAG, bizType);
+        ActiveSpan.tag(BizTracing.ID_TAG, bizId);
+        ActiveSpan.tag(BizTracing.TYPE_TAG, bizType);
     }
 }
