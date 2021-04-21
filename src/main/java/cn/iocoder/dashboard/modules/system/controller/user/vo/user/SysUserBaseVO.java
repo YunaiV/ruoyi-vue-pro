@@ -2,6 +2,7 @@ package cn.iocoder.dashboard.modules.system.controller.user.vo.user;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -35,11 +36,11 @@ public class SysUserBaseVO {
 
     @ApiModelProperty(value = "用户邮箱", example = "yudao@iocoder.cn")
     @Email(message = "邮箱格式不正确")
-    @Size(max = 50, message = "邮箱长度不能超过50个字符")
+    @Size(max = 50, message = "邮箱长度不能超过 50 个字符")
     private String email;
 
     @ApiModelProperty(value = "手机号码", example = "15601691300")
-    @Size(max = 11, message = "手机号码长度不能超过11个字符")
+    @Length(min = 11, max = 11, message = "手机号长度必须 11 位")
     private String mobile;
 
     @ApiModelProperty(value = "用户性别", example = "1", notes = "参见 SysSexEnum 枚举类")
@@ -47,6 +48,5 @@ public class SysUserBaseVO {
 
     @ApiModelProperty(value = "用户头像", example = "http://www.iocoder.cn/xxx.png")
     private String avatar;
-
 
 }

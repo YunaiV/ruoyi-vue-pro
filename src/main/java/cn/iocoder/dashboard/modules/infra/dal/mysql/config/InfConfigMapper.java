@@ -14,20 +14,21 @@ import java.util.List;
 @Mapper
 public interface InfConfigMapper extends BaseMapperX<InfConfigDO> {
 
-    default PageResult<InfConfigDO> selectPage(InfConfigPageReqVO reqVO) {
-        return selectPage(reqVO,
-                new QueryWrapperX<InfConfigDO>().likeIfPresent("name", reqVO.getName())
-                        .likeIfPresent("`key`", reqVO.getKey())
-                        .eqIfPresent("`type`", reqVO.getType())
-                        .betweenIfPresent("create_time", reqVO.getBeginTime(), reqVO.getEndTime()));
-    }
-
     default InfConfigDO selectByKey(String key) {
         return selectOne(new QueryWrapper<InfConfigDO>().eq("`key`", key));
     }
 
+    default PageResult<InfConfigDO> selectPage(InfConfigPageReqVO reqVO) {
+        return selectPage(reqVO, new QueryWrapperX<InfConfigDO>()
+                .likeIfPresent("name", reqVO.getName())
+                .likeIfPresent("`key`", reqVO.getKey())
+                .eqIfPresent("`type`", reqVO.getType())
+                .betweenIfPresent("create_time", reqVO.getBeginTime(), reqVO.getEndTime()));
+    }
+
     default List<InfConfigDO> selectList(InfConfigExportReqVO reqVO) {
-        return selectList(new QueryWrapperX<InfConfigDO>().likeIfPresent("name", reqVO.getName())
+        return selectList(new QueryWrapperX<InfConfigDO>()
+                .likeIfPresent("name", reqVO.getName())
                 .likeIfPresent("`key`", reqVO.getKey())
                 .eqIfPresent("`type`", reqVO.getType())
                 .betweenIfPresent("create_time", reqVO.getBeginTime(), reqVO.getEndTime()));

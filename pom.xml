@@ -22,14 +22,16 @@
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <maven-compiler-plugin.version>3.8.0</maven-compiler-plugin.version>
         <!-- 统一依赖管理 -->
-        <spring.boot.version>2.4.2</spring.boot.version>
+        <spring.boot.version>2.4.4</spring.boot.version>
         <!-- Web 相关 -->
         <knife4j.version>3.0.2</knife4j.version>
+        <swagger-annotations.version>1.5.22</swagger-annotations.version>
         <!-- DB 相关 -->
         <mysql-connector-java.version>5.1.46</mysql-connector-java.version>
         <druid.version>1.2.4</druid.version>
-        <mybatis-plus.version>3.4.1</mybatis-plus.version>
-        <redisson.version>3.14.1</redisson.version>
+        <mybatis-plus.version>3.4.2</mybatis-plus.version>
+        <dynamic-datasource.version>3.3.2</dynamic-datasource.version>
+        <redisson.version>3.15.1</redisson.version>
         <!-- Config 配置中心相关 -->
         <apollo.version>1.7.0</apollo.version>
         <!-- 服务保障相关 -->
@@ -42,10 +44,16 @@
         <!-- 工具类相关 -->
         <lombok.version>1.16.14</lombok.version>
         <mapstruct.version>1.4.1.Final</mapstruct.version>
-        <hutool.version>5.5.6</hutool.version>
+        <hutool.version>5.6.1</hutool.version>
         <easyexcel.verion>2.2.7</easyexcel.verion>
         <velocity.version>2.2</velocity.version>
         <screw.version>1.0.5</screw.version>
+        <podam.version>7.2.6.RELEASE</podam.version>
+        <jedis-mock.version>0.1.16</jedis-mock.version>
+        <!-- 三方云服务相关 -->
+        <aliyun-java-sdk-core.version>4.5.18</aliyun-java-sdk-core.version>
+        <aliyun-java-sdk-dysmsapi.version>2.1.0</aliyun-java-sdk-dysmsapi.version>
+        <yunpian-java-sdk.version>1.2.7</yunpian-java-sdk.version>
     </properties>
 
     <!-- 依赖声明 -->
@@ -101,7 +109,20 @@
                     <artifactId>mapstruct</artifactId>
                     <groupId>org.mapstruct</groupId> <!-- 避免冲突 -->
                 </exclusion>
+                <exclusion>
+                    <artifactId>guava</artifactId>
+                    <groupId>com.google.guava</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>swagger-annotations</artifactId>
+                    <groupId>io.swagger</groupId>
+                </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>io.swagger</groupId>
+            <artifactId>swagger-annotations</artifactId>
+            <version>${swagger-annotations.version}</version>
         </dependency>
 
         <!-- DB 相关 -->
@@ -119,6 +140,11 @@
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-boot-starter</artifactId>
             <version>${mybatis-plus.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>dynamic-datasource-spring-boot-starter</artifactId> <!-- 多数据源 -->
+            <version>${dynamic-datasource.version}</version>
         </dependency>
 
         <dependency>
@@ -145,6 +171,12 @@
             <groupId>com.baomidou</groupId>
             <artifactId>lock4j-redisson-spring-boot-starter</artifactId>
             <version>${lock4j.version}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>redisson-spring-boot-starter</artifactId>
+                    <groupId>org.redisson</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
@@ -181,6 +213,12 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>asm</artifactId>
+                    <groupId>org.ow2.asm</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
@@ -192,14 +230,14 @@
         <dependency>
             <groupId>com.github.fppt</groupId> <!-- 单元测试，我们采用内嵌的 Redis 数据库 -->
             <artifactId>jedis-mock</artifactId>
-            <version>0.1.16</version>
+            <version>${jedis-mock.version}</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>uk.co.jemos.podam</groupId> <!-- 单元测试，随机生成 POJO 类 -->
             <artifactId>podam</artifactId>
-            <version>7.2.6.RELEASE</version>
+            <version>${podam.version}</version>
             <scope>test</scope>
         </dependency>
 
@@ -217,33 +255,19 @@
         </dependency>
         <dependency>
             <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct-processor</artifactId>
+            <version>${mapstruct.version}</version>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct-jdk8</artifactId>
             <version>${mapstruct.version}</version>
         </dependency>
 
         <dependency>
             <groupId>cn.hutool</groupId>
-            <artifactId>hutool-core</artifactId>
-            <version>${hutool.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>cn.hutool</groupId>
-            <artifactId>hutool-extra</artifactId>
-            <version>${hutool.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>cn.hutool</groupId>
-            <artifactId>hutool-captcha</artifactId>
-            <version>${hutool.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>cn.hutool</groupId>
-            <artifactId>hutool-http</artifactId>
-            <version>${hutool.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>cn.hutool</groupId>
-            <artifactId>hutool-crypto</artifactId>
+            <artifactId>hutool-all</artifactId>
             <version>${hutool.version}</version>
         </dependency>
 
@@ -264,6 +288,27 @@
             <artifactId>screw-core</artifactId> <!-- 实现数据库文档 -->
             <version>${screw.version}</version>
         </dependency>
+
+        <!-- 三方云服务相关 -->
+
+        <!-- SMS SDK begin -->
+        <dependency>
+            <groupId>com.yunpian.sdk</groupId>
+            <artifactId>yunpian-java-sdk</artifactId>
+            <version>${yunpian-java-sdk.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.aliyun</groupId>
+            <artifactId>aliyun-java-sdk-core</artifactId>
+            <version>${aliyun-java-sdk-core.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.aliyun</groupId>
+            <artifactId>aliyun-java-sdk-dysmsapi</artifactId>
+            <version>${aliyun-java-sdk-dysmsapi.version}</version>
+        </dependency>
+        <!-- SMS SDK end -->
 
     </dependencies>
 

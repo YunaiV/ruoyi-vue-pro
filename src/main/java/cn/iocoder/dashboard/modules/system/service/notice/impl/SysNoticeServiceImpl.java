@@ -9,6 +9,7 @@ import cn.iocoder.dashboard.modules.system.convert.notice.SysNoticeConvert;
 import cn.iocoder.dashboard.modules.system.dal.mysql.notice.SysNoticeMapper;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.notice.SysNoticeDO;
 import cn.iocoder.dashboard.modules.system.service.notice.SysNoticeService;
+import com.google.common.annotations.VisibleForTesting;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -25,16 +26,6 @@ public class SysNoticeServiceImpl implements SysNoticeService {
 
     @Resource
     private SysNoticeMapper noticeMapper;
-
-    @Override
-    public PageResult<SysNoticeDO> pageNotices(SysNoticePageReqVO reqVO) {
-        return noticeMapper.selectPage(reqVO);
-    }
-
-    @Override
-    public SysNoticeDO getNotice(Long id) {
-        return noticeMapper.selectById(id);
-    }
 
     @Override
     public Long createNotice(SysNoticeCreateReqVO reqVO) {
@@ -60,7 +51,18 @@ public class SysNoticeServiceImpl implements SysNoticeService {
         noticeMapper.deleteById(id);
     }
 
-    private void checkNoticeExists(Long id) {
+    @Override
+    public PageResult<SysNoticeDO> pageNotices(SysNoticePageReqVO reqVO) {
+        return noticeMapper.selectPage(reqVO);
+    }
+
+    @Override
+    public SysNoticeDO getNotice(Long id) {
+        return noticeMapper.selectById(id);
+    }
+
+    @VisibleForTesting
+    public void checkNoticeExists(Long id) {
         if (id == null) {
             return;
         }

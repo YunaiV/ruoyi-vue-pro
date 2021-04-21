@@ -1,6 +1,7 @@
 package cn.iocoder.dashboard.framework.security.core.handler;
 
 import cn.hutool.core.util.StrUtil;
+import cn.iocoder.dashboard.common.pojo.CommonResult;
 import cn.iocoder.dashboard.framework.security.config.SecurityProperties;
 import cn.iocoder.dashboard.framework.security.core.service.SecurityAuthFrameworkService;
 import cn.iocoder.dashboard.framework.security.core.util.SecurityFrameworkUtils;
@@ -36,6 +37,6 @@ public class LogoutSuccessHandlerImpl implements LogoutSuccessHandler {
             securityFrameworkService.logout(token);
         }
         // 返回成功
-        ServletUtils.writeJSON(response, null);
+        ServletUtils.writeJSON(response, CommonResult.success(null));
     }
 }

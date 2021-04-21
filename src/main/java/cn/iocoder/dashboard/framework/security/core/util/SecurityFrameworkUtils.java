@@ -2,7 +2,10 @@ package cn.iocoder.dashboard.framework.security.core.util;
 
 import cn.iocoder.dashboard.framework.security.core.LoginUser;
 import cn.iocoder.dashboard.framework.web.core.util.WebFrameworkUtils;
+import org.springframework.lang.Nullable;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.util.StringUtils;
@@ -40,9 +43,20 @@ public class SecurityFrameworkUtils {
 
     /**
      * 获取当前用户
+     *
+     * @return 当前用户
      */
+    @Nullable
     public static LoginUser getLoginUser() {
-        return (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        SecurityContext context = SecurityContextHolder.getContext();
+        if (context == null) {
+            return null;
+        }
+        Authentication authentication = context.getAuthentication();
+        if (authentication == null) {
+            return null;
+        }
+        return authentication.getPrincipal() instanceof LoginUser ? (LoginUser) authentication.getPrincipal() : null;
     }
 
     /**
@@ -50,8 +64,10 @@ public class SecurityFrameworkUtils {
      *
      * @return 用户编号
      */
+    @Nullable
     public static Long getLoginUserId() {
-        return getLoginUser().getId();
+        LoginUser loginUser = getLoginUser();
+        return loginUser != null ? loginUser.getId() : null;
     }
 
     /**
@@ -59,8 +75,10 @@ public class SecurityFrameworkUtils {
      *
      * @return 角色编号数组
      */
+    @Nullable
     public static Set<Long> getLoginUserRoleIds() {
-        return getLoginUser().getRoleIds();
+        LoginUser loginUser = getLoginUser();
+        return loginUser != null ? loginUser.getRoleIds() : null;
     }
 
     /**

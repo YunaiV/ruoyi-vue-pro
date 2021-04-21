@@ -38,7 +38,7 @@ export function addData(data) {
 export function updateData(data) {
   return request({
     url: '/system/dict-data/update',
-    method: 'post',
+    method: 'put',
     data: data
   })
 }
@@ -47,7 +47,7 @@ export function updateData(data) {
 export function delData(dictCode) {
   return request({
     url: '/system/dict-data/delete?id=' + dictCode,
-    method: 'post'
+    method: 'delete'
   })
 }
 

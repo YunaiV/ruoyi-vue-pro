@@ -15,13 +15,13 @@ import java.util.List;
 @Mapper
 public interface SysDictDataMapper extends BaseMapperX<SysDictDataDO> {
 
-    default SysDictDataDO selectByDictTypeAndLabel(String dictType, String label) {
+    default SysDictDataDO selectByDictTypeAndValue(String dictType, String value) {
         return selectOne(new QueryWrapper<SysDictDataDO>().eq("dict_type", dictType)
-                .eq("label", label));
+                .eq("value", value));
     }
 
     default int selectCountByDictType(String dictType) {
-        return selectCount(new QueryWrapper<SysDictDataDO>().eq("dict_type", dictType));
+        return selectCount("dict_type", dictType);
     }
 
     default PageResult<SysDictDataDO> selectPage(SysDictDataPageReqVO reqVO) {

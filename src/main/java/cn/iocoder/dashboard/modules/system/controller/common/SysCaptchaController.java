@@ -21,8 +21,8 @@ public class SysCaptchaController {
     @Resource
     private SysCaptchaService captchaService;
 
-    @ApiOperation("生成图片验证码")
     @GetMapping("/get-image")
+    @ApiOperation("生成图片验证码")
     public CommonResult<SysCaptchaImageRespVO> getCaptchaImage() {
         return success(captchaService.getCaptchaImage());
     }

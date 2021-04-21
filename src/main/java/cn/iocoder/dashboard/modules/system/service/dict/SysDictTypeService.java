@@ -17,38 +17,6 @@ import java.util.List;
 public interface SysDictTypeService {
 
     /**
-     * 获得字典类型分页列表
-     *
-     * @param reqVO 分页请求
-     * @return 字典类型分页列表
-     */
-    PageResult<SysDictTypeDO> pageDictTypes(SysDictTypePageReqVO reqVO);
-
-    /**
-     * 获得字典类型列表
-     *
-     * @param reqVO 列表请求
-     * @return 字典类型列表
-     */
-    List<SysDictTypeDO> listDictTypes(SysDictTypeExportReqVO reqVO);
-
-    /**
-     * 获得字典类型详情
-     *
-     * @param id 字典类型编号
-     * @return 字典类型
-     */
-    SysDictTypeDO getDictType(Long id);
-
-    /**
-     * 获得字典类型详情
-     *
-     * @param type 字典类型
-     * @return 字典类型详情
-     */
-    SysDictTypeDO getDictType(String type);
-
-    /**
      * 创建字典类型
      *
      * @param reqVO 字典类型信息
@@ -71,10 +39,42 @@ public interface SysDictTypeService {
     void deleteDictType(Long id);
 
     /**
+     * 获得字典类型分页列表
+     *
+     * @param reqVO 分页请求
+     * @return 字典类型分页列表
+     */
+    PageResult<SysDictTypeDO> getDictTypePage(SysDictTypePageReqVO reqVO);
+
+    /**
+     * 获得字典类型列表
+     *
+     * @param reqVO 列表请求
+     * @return 字典类型列表
+     */
+    List<SysDictTypeDO> getDictTypeList(SysDictTypeExportReqVO reqVO);
+
+    /**
+     * 获得字典类型详情
+     *
+     * @param id 字典类型编号
+     * @return 字典类型
+     */
+    SysDictTypeDO getDictType(Long id);
+
+    /**
+     * 获得字典类型详情
+     *
+     * @param type 字典类型
+     * @return 字典类型详情
+     */
+    SysDictTypeDO getDictType(String type);
+
+    /**
      * 获得全部字典类型列表
      *
      * @return 字典类型列表
      */
-    List<SysDictTypeDO> listDictTypes();
+    List<SysDictTypeDO> getDictTypeList();
 
 }

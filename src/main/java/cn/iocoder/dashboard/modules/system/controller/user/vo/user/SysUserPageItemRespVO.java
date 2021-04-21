@@ -1,6 +1,5 @@
 package cn.iocoder.dashboard.modules.system.controller.user.vo.user;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -18,7 +17,6 @@ public class SysUserPageItemRespVO extends SysUserRespVO {
     /**
      * 所在部门
      */
-    @JsonIgnore
     private Dept dept;
 
     @ApiModel("部门")

@@ -38,7 +38,7 @@ export function addPost(data) {
 export function updatePost(data) {
   return request({
     url: '/system/post/update',
-    method: 'post',
+    method: 'put',
     data: data
   })
 }
@@ -47,7 +47,7 @@ export function updatePost(data) {
 export function delPost(postId) {
   return request({
     url: '/system/post/delete?id=' + postId,
-    method: 'post'
+    method: 'delete'
   })
 }
 

@@ -18,6 +18,7 @@ import cn.iocoder.dashboard.modules.system.enums.permission.SysRoleTypeEnum;
 import cn.iocoder.dashboard.modules.system.mq.producer.permission.SysRoleProducer;
 import cn.iocoder.dashboard.modules.system.service.permission.SysPermissionService;
 import cn.iocoder.dashboard.modules.system.service.permission.SysRoleService;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.Nullable;
@@ -58,7 +59,7 @@ public class SysRoleServiceImpl implements SysRoleService {
      */
     private volatile Map<Long, SysRoleDO> roleCache;
     /**
-     * 缓存菜单的最大更新时间，用于后续的增量轮询，判断是否有更新
+     * 缓存角色的最大更新时间，用于后续的增量轮询，判断是否有更新
      */
     private volatile Date maxUpdateTime;
 
@@ -77,7 +78,7 @@ public class SysRoleServiceImpl implements SysRoleService {
     @Override
     @PostConstruct
     public void initLocalCache() {
-        // 获取菜单列表，如果有更新
+        // 获取角色列表，如果有更新
         List<SysRoleDO> roleList = this.loadRoleIfUpdate(maxUpdateTime);
         if (CollUtil.isEmpty(roleList)) {
             return;
@@ -98,51 +99,24 @@ public class SysRoleServiceImpl implements SysRoleService {
     }
 
     /**
-     * 如果菜单发生变化，从数据库中获取最新的全量菜单。
+     * 如果角色发生变化，从数据库中获取最新的全量角色。
      * 如果未发生变化，则返回空
      *
-     * @param maxUpdateTime 当前菜单的最大更新时间
-     * @return 菜单列表
+     * @param maxUpdateTime 当前角色的最大更新时间
+     * @return 角色列表
      */
     private List<SysRoleDO> loadRoleIfUpdate(Date maxUpdateTime) {
         // 第一步，判断是否要更新。
         if (maxUpdateTime == null) { // 如果更新时间为空，说明 DB 一定有新数据
-            log.info("[loadRoleIfUpdate][首次加载全量菜单]");
-        } else { // 判断数据库中是否有更新的菜单
+            log.info("[loadRoleIfUpdate][首次加载全量角色]");
+        } else { // 判断数据库中是否有更新的角色
             if (!roleMapper.selectExistsByUpdateTimeAfter(maxUpdateTime)) {
                 return null;
             }
-            log.info("[loadRoleIfUpdate][增量加载全量菜单]");
+            log.info("[loadRoleIfUpdate][增量加载全量角色]");
         }
-        // 第二步，如果有更新，则从数据库加载所有菜单
+        // 第二步，如果有更新，则从数据库加载所有角色
         return roleMapper.selectList();
-    }
-
-    @Override
-    public SysRoleDO getRoleFromCache(Long id) {
-        return roleCache.get(id);
-    }
-
-    @Override
-    public List<SysRoleDO> listRoles(@Nullable Collection<Integer> statuses) {
-        return roleMapper.selectListByStatus(statuses);
-    }
-
-    @Override
-    public List<SysRoleDO> listRolesFromCache(Collection<Long> ids) {
-        if (CollectionUtil.isEmpty(ids)) {
-            return Collections.emptyList();
-        }
-        return roleCache.values().stream().filter(roleDO -> ids.contains(roleDO.getId()))
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public boolean hasAnyAdmin(Collection<SysRoleDO> roleList) {
-        if (CollectionUtil.isEmpty(roleList)) {
-            return false;
-        }
-        return roleList.stream().anyMatch(roleDO -> RoleCodeEnum.ADMIN.getKey().equals(roleDO.getCode()));
     }
 
     @Override
@@ -174,41 +148,6 @@ public class SysRoleServiceImpl implements SysRoleService {
     }
 
     @Override
-    @Transactional
-    public void deleteRole(Long id) {
-        // 校验是否可以更新
-        this.checkUpdateRole(id);
-        // 标记删除
-        roleMapper.deleteById(id);
-        // 删除相关数据
-        permissionService.processRoleDeleted(id);
-        // 发送刷新消息. 注意，需要事务提交后，在进行发送刷新消息。不然 db 还未提交，结果缓存先刷新了
-        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
-
-            @Override
-            public void afterCommit() {
-                roleProducer.sendRoleRefreshMessage();
-            }
-
-        });
-    }
-
-    @Override
-    public SysRoleDO getRole(Long id) {
-        return roleMapper.selectById(id);
-    }
-
-    @Override
-    public PageResult<SysRoleDO> pageRole(SysRolePageReqVO reqVO) {
-        return roleMapper.selectPage(reqVO);
-    }
-
-    @Override
-    public List<SysRoleDO> listRoles(SysRoleExportReqVO reqVO) {
-        return roleMapper.listRoles(reqVO);
-    }
-
-    @Override
     public void updateRoleStatus(Long id, Integer status) {
         // 校验是否可以更新
         this.checkUpdateRole(id);
@@ -235,6 +174,68 @@ public class SysRoleServiceImpl implements SysRoleService {
         roleProducer.sendRoleRefreshMessage();
     }
 
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteRole(Long id) {
+        // 校验是否可以更新
+        this.checkUpdateRole(id);
+        // 标记删除
+        roleMapper.deleteById(id);
+        // 删除相关数据
+        permissionService.processRoleDeleted(id);
+        // 发送刷新消息. 注意，需要事务提交后，在进行发送刷新消息。不然 db 还未提交，结果缓存先刷新了
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+
+            @Override
+            public void afterCommit() {
+                roleProducer.sendRoleRefreshMessage();
+            }
+
+        });
+    }
+
+    @Override
+    public SysRoleDO getRoleFromCache(Long id) {
+        return roleCache.get(id);
+    }
+
+    @Override
+    public List<SysRoleDO> getRoles(@Nullable Collection<Integer> statuses) {
+        return roleMapper.selectListByStatus(statuses);
+    }
+
+    @Override
+    public List<SysRoleDO> getRolesFromCache(Collection<Long> ids) {
+        if (CollectionUtil.isEmpty(ids)) {
+            return Collections.emptyList();
+        }
+        return roleCache.values().stream().filter(roleDO -> ids.contains(roleDO.getId()))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public boolean hasAnyAdmin(Collection<SysRoleDO> roleList) {
+        if (CollectionUtil.isEmpty(roleList)) {
+            return false;
+        }
+        return roleList.stream().anyMatch(roleDO -> RoleCodeEnum.ADMIN.getKey().equals(roleDO.getCode()));
+    }
+
+    @Override
+    public SysRoleDO getRole(Long id) {
+        return roleMapper.selectById(id);
+    }
+
+    @Override
+    public PageResult<SysRoleDO> getRolePage(SysRolePageReqVO reqVO) {
+        return roleMapper.selectPage(reqVO);
+    }
+
+    @Override
+    public List<SysRoleDO> getRoles(SysRoleExportReqVO reqVO) {
+        return roleMapper.listRoles(reqVO);
+    }
+
     /**
      * 校验角色的唯一字段是否重复
      *
@@ -245,7 +246,8 @@ public class SysRoleServiceImpl implements SysRoleService {
      * @param code 角色额编码
      * @param id 角色编号
      */
-    private void checkDuplicateRole(String name, String code, Long id) {
+    @VisibleForTesting
+    public void checkDuplicateRole(String name, String code, Long id) {
         // 1. 该 name 名字被其它角色所使用
         SysRoleDO role = roleMapper.selectByName(name);
         if (role != null && !role.getId().equals(id)) {
@@ -258,7 +260,7 @@ public class SysRoleServiceImpl implements SysRoleService {
         // 该 code 编码被其它角色所使用
         role = roleMapper.selectByCode(code);
         if (role != null && !role.getId().equals(id)) {
-            throw ServiceExceptionUtil.exception(ROLE_CODE_DUPLICATE, name);
+            throw ServiceExceptionUtil.exception(ROLE_CODE_DUPLICATE, code);
         }
     }
 
@@ -267,7 +269,8 @@ public class SysRoleServiceImpl implements SysRoleService {
      *
      * @param id 角色编号
      */
-    private void checkUpdateRole(Long id) {
+    @VisibleForTesting
+    public void checkUpdateRole(Long id) {
         SysRoleDO roleDO = roleMapper.selectById(id);
         if (roleDO == null) {
             throw ServiceExceptionUtil.exception(ROLE_NOT_EXISTS);
@@ -278,16 +281,10 @@ public class SysRoleServiceImpl implements SysRoleService {
         }
     }
 
-
-//    /**
-//     * 根据条件分页查询角色数据
-//     *
-//     * @param role 角色信息
-//     * @return 角色数据集合信息
-//     */
 //    @Override
 //    @DataScope(deptAlias = "d")
 //    public List<SysRole> selectRoleList(SysRole role) {
 //        return roleMapper.selectRoleList(role);
 //    }
+
 }

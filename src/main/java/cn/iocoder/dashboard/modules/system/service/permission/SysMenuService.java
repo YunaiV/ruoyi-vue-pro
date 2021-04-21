@@ -21,11 +21,33 @@ public interface SysMenuService {
     void initLocalCache();
 
     /**
+     * 创建菜单
+     *
+     * @param reqVO 菜单信息
+     * @return 创建出来的菜单编号
+     */
+    Long createMenu(SysMenuCreateReqVO reqVO);
+
+    /**
+     * 更新菜单
+     *
+     * @param reqVO 菜单信息
+     */
+    void updateMenu(SysMenuUpdateReqVO reqVO);
+
+    /**
+     * 删除菜单
+     *
+     * @param id 菜单编号
+     */
+    void deleteMenu(Long id);
+
+    /**
      * 获得所有菜单列表
      *
      * @return 菜单列表
      */
-    List<SysMenuDO> listMenus();
+    List<SysMenuDO> getMenus();
 
     /**
      * 筛选菜单列表
@@ -33,7 +55,7 @@ public interface SysMenuService {
      * @param reqVO 筛选条件请求 VO
      * @return 菜单列表
      */
-    List<SysMenuDO> listMenus(SysMenuListReqVO reqVO);
+    List<SysMenuDO> getMenus(SysMenuListReqVO reqVO);
 
     /**
      * 获得所有菜单，从缓存中
@@ -66,28 +88,6 @@ public interface SysMenuService {
      * @return 数组
      */
     List<SysMenuDO> getMenuListByPermissionFromCache(String permission);
-
-    /*
-     * 创建菜单
-     *
-     * @param reqVO 菜单信息
-     * @return 创建出来的菜单编号
-     */
-    Long createMenu(SysMenuCreateReqVO reqVO);
-
-    /**
-     * 更新菜单
-     *
-     * @param reqVO 菜单信息
-     */
-    void updateMenu(SysMenuUpdateReqVO reqVO);
-
-    /**
-     * 删除菜单
-     *
-     * @param id 菜单编号
-     */
-    void deleteMenu(Long id);
 
     /**
      * 获得菜单

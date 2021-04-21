@@ -9,6 +9,8 @@ import javax.annotation.Resource;
 
 /**
  * Role 角色相关消息的 Producer
+ *
+ * @author 芋道源码
  */
 @Component
 public class SysRoleProducer {
