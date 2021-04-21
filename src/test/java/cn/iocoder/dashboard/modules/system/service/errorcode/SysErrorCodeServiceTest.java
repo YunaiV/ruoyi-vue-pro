@@ -2,18 +2,22 @@ package cn.iocoder.dashboard.modules.system.service.errorcode;
 
 import cn.iocoder.dashboard.BaseDbUnitTest;
 import cn.iocoder.dashboard.common.pojo.PageResult;
+import cn.iocoder.dashboard.framework.errorcode.core.dto.ErrorCodeAutoGenerateReqDTO;
+import cn.iocoder.dashboard.modules.infra.enums.config.InfConfigTypeEnum;
 import cn.iocoder.dashboard.modules.system.controller.errorcode.vo.SysErrorCodeCreateReqVO;
 import cn.iocoder.dashboard.modules.system.controller.errorcode.vo.SysErrorCodeExportReqVO;
 import cn.iocoder.dashboard.modules.system.controller.errorcode.vo.SysErrorCodePageReqVO;
 import cn.iocoder.dashboard.modules.system.controller.errorcode.vo.SysErrorCodeUpdateReqVO;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.errorcode.SysErrorCodeDO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.errorcode.SysErrorCodeMapper;
-import cn.iocoder.dashboard.modules.infra.enums.config.InfConfigTypeEnum;
 import cn.iocoder.dashboard.modules.system.enums.errorcode.SysErrorCodeTypeEnum;
 import cn.iocoder.dashboard.modules.system.service.errorcode.impl.SysErrorCodeServiceImpl;
 import cn.iocoder.dashboard.util.collection.ArrayUtils;
 import cn.iocoder.dashboard.util.object.ObjectUtils;
+import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.slf4j.Logger;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
@@ -21,7 +25,8 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import static cn.hutool.core.util.RandomUtil.randomEle;
-import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.*;
+import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.ERROR_CODE_DUPLICATE;
+import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.ERROR_CODE_NOT_EXISTS;
 import static cn.iocoder.dashboard.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.dashboard.util.AssertUtils.assertServiceException;
 import static cn.iocoder.dashboard.util.RandomUtils.*;
@@ -41,6 +46,9 @@ public class SysErrorCodeServiceTest extends BaseDbUnitTest {
 
     @Resource
     private SysErrorCodeMapper errorCodeMapper;
+
+    @Mock
+    private Logger log;
 
     @Test
     public void testCreateErrorCode_success() {
@@ -184,6 +192,104 @@ public class SysErrorCodeServiceTest extends BaseDbUnitTest {
     public void testValidateErrorCodeExists_notExists() {
         assertServiceException(() -> errorCodeService.validateErrorCodeExists(null),
                 ERROR_CODE_NOT_EXISTS);
+    }
+
+    /**
+     * 情况 1，错误码不存在的情况
+     */
+    @Test
+    public void testAutoGenerateErrorCodes_01() {
+        // 准备参数
+        ErrorCodeAutoGenerateReqDTO generateReqDTO = randomPojo(ErrorCodeAutoGenerateReqDTO.class);
+        // mock 方法
+
+        // 调用
+        errorCodeService.autoGenerateErrorCodes(Lists.newArrayList(generateReqDTO));
+        // 断言
+        SysErrorCodeDO errorCode = errorCodeMapper.selectOne(null);
+        assertPojoEquals(generateReqDTO, errorCode);
+        assertEquals(SysErrorCodeTypeEnum.AUTO_GENERATION.getType(), errorCode.getType());
+    }
+
+    /**
+     * 情况 2.1，错误码存在，但是是 SysErrorCodeTypeEnum.MANUAL_OPERATION 类型
+     */
+    @Test
+    public void testAutoGenerateErrorCodes_021() {
+        // mock 数据
+        SysErrorCodeDO dbErrorCode = randomInfErrorCodeDO(o -> o.setType(SysErrorCodeTypeEnum.MANUAL_OPERATION.getType()));
+        errorCodeMapper.insert(dbErrorCode);
+        // 准备参数
+        ErrorCodeAutoGenerateReqDTO generateReqDTO = randomPojo(ErrorCodeAutoGenerateReqDTO.class,
+                o -> o.setCode(dbErrorCode.getCode()));
+        // mock 方法
+
+        // 调用
+        errorCodeService.autoGenerateErrorCodes(Lists.newArrayList(generateReqDTO));
+        // 断言，相等，说明不会更新
+        SysErrorCodeDO errorCode = errorCodeMapper.selectById(dbErrorCode.getId());
+        assertPojoEquals(dbErrorCode, errorCode);
+    }
+
+    /**
+     * 情况 2.2，错误码存在，但是是 applicationName 不匹配
+     */
+    @Test
+    public void testAutoGenerateErrorCodes_022() {
+        // mock 数据
+        SysErrorCodeDO dbErrorCode = randomInfErrorCodeDO(o -> o.setType(SysErrorCodeTypeEnum.AUTO_GENERATION.getType()));
+        errorCodeMapper.insert(dbErrorCode);
+        // 准备参数
+        ErrorCodeAutoGenerateReqDTO generateReqDTO = randomPojo(ErrorCodeAutoGenerateReqDTO.class,
+                o -> o.setCode(dbErrorCode.getCode()).setApplicationName(randomString()));
+        // mock 方法
+
+        // 调用
+        errorCodeService.autoGenerateErrorCodes(Lists.newArrayList(generateReqDTO));
+        // 断言，相等，说明不会更新
+        SysErrorCodeDO errorCode = errorCodeMapper.selectById(dbErrorCode.getId());
+        assertPojoEquals(dbErrorCode, errorCode);
+    }
+
+    /**
+     * 情况 2.3，错误码存在，但是是 message 相同
+     */
+    @Test
+    public void testAutoGenerateErrorCodes_023() {
+        // mock 数据
+        SysErrorCodeDO dbErrorCode = randomInfErrorCodeDO(o -> o.setType(SysErrorCodeTypeEnum.AUTO_GENERATION.getType()));
+        errorCodeMapper.insert(dbErrorCode);
+        // 准备参数
+        ErrorCodeAutoGenerateReqDTO generateReqDTO = randomPojo(ErrorCodeAutoGenerateReqDTO.class,
+                o -> o.setCode(dbErrorCode.getCode()).setApplicationName(dbErrorCode.getApplicationName())
+                    .setMessage(dbErrorCode.getMessage()));
+        // mock 方法
+
+        // 调用
+        errorCodeService.autoGenerateErrorCodes(Lists.newArrayList(generateReqDTO));
+        // 断言，相等，说明不会更新
+        SysErrorCodeDO errorCode = errorCodeMapper.selectById(dbErrorCode.getId());
+        assertPojoEquals(dbErrorCode, errorCode);
+    }
+
+    /**
+     * 情况 2.3，错误码存在，但是是 message 不同，则进行更新
+     */
+    @Test
+    public void testAutoGenerateErrorCodes_024() {
+        // mock 数据
+        SysErrorCodeDO dbErrorCode = randomInfErrorCodeDO(o -> o.setType(SysErrorCodeTypeEnum.AUTO_GENERATION.getType()));
+        errorCodeMapper.insert(dbErrorCode);
+        // 准备参数
+        ErrorCodeAutoGenerateReqDTO generateReqDTO = randomPojo(ErrorCodeAutoGenerateReqDTO.class,
+                o -> o.setCode(dbErrorCode.getCode()).setApplicationName(dbErrorCode.getApplicationName()));
+        // mock 方法
+
+        // 调用
+        errorCodeService.autoGenerateErrorCodes(Lists.newArrayList(generateReqDTO));
+        // 断言，匹配
+        SysErrorCodeDO errorCode = errorCodeMapper.selectById(dbErrorCode.getId());
+        assertPojoEquals(generateReqDTO, errorCode);
     }
 
     // ========== 随机对象 ==========

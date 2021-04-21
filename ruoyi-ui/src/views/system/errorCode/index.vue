@@ -43,8 +43,8 @@
 
     <!-- 列表 -->
     <el-table v-loading="loading" :data="list">
-      <el-table-column label="错误码编号" align="center" prop="id" />
-      <el-table-column label="错误码类型" align="center" prop="type" width="80">
+      <el-table-column label="编号" align="center" prop="id" />
+      <el-table-column label="类型" align="center" prop="type" width="80">
         <template slot-scope="scope">
           <span>{{ getDictDataLabel(DICT_TYPE.SYS_ERROR_CODE_TYPE, scope.row.type) }}</span>
         </template>
