@@ -21,6 +21,7 @@ export const DICT_TYPE = {
   SYS_SMS_TEMPLATE_TYPE: 'sys_sms_template_type',
   SYS_SMS_SEND_STATUS: 'sys_sms_send_status',
   SYS_SMS_RECEIVE_STATUS: 'sys_sms_receive_status',
+  SYS_ERROR_CODE_TYPE: 'sys_error_code_type',
 
   INF_REDIS_TIMEOUT_TYPE: 'inf_redis_timeout_type',
   INF_JOB_STATUS: 'inf_job_status',

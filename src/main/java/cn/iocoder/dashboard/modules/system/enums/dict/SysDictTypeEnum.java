@@ -22,12 +22,12 @@ public enum SysDictTypeEnum {
     SYS_SMS_TEMPLATE_TYPE("sys_sms_template_type"), // 短信模板类型
     SYS_SMS_SEND_STATUS("sys_sms_send_status"), // 短信发送状态
     SYS_SMS_RECEIVE_STATUS("sys_sms_receive_status"), // 短信接收状态
+    SYS_ERROR_CODE_TYPE("inf_error_code_type"), // 错误码的类型枚举
 
     INF_REDIS_TIMEOUT_TYPE("inf_redis_timeout_type"),  // Redis 超时类型
     INF_JOB_STATUS("inf_job_status"), // 定时任务状态的枚举
     INF_JOB_LOG_STATUS("inf_job_log_status"), // 定时任务日志状态的枚举
     INF_API_ERROR_LOG_PROCESS_STATUS("inf_api_error_log_process_status"), // API 错误日志的处理状态的枚举
-
     ;
 
 

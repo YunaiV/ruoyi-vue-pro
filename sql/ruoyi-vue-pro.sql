@@ -11,7 +11,7 @@
  Target Server Version : 50718
  File Encoding         : 65001
 
- Date: 18/04/2021 00:36:06
+ Date: 22/04/2021 00:48:26
 */
 
 SET NAMES utf8mb4;
@@ -43,7 +43,7 @@ CREATE TABLE `inf_api_access_log` (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=3750 DEFAULT CHARSET=utf8mb4 COMMENT='API 访问日志表';
+) ENGINE=InnoDB AUTO_INCREMENT=4229 DEFAULT CHARSET=utf8mb4 COMMENT='API 访问日志表';
 
 -- ----------------------------
 -- Records of inf_api_access_log
@@ -84,7 +84,7 @@ CREATE TABLE `inf_api_error_log` (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COMMENT='系统异常日志';
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COMMENT='系统异常日志';
 
 -- ----------------------------
 -- Records of inf_api_error_log
@@ -118,7 +118,7 @@ CREATE TABLE `inf_config` (
 -- ----------------------------
 BEGIN;
 INSERT INTO `inf_config` VALUES (1, 'ui', 1, '主框架页-默认皮肤样式名称', 'sys.index.skinName', 'skin-blue', b'0', '蓝色 skin-blue、绿色 skin-green、紫色 skin-purple、红色 skin-red、黄色 skin-yellow', 'admin', '2021-01-05 17:03:48', '', '2021-01-05 17:03:48', b'0');
-INSERT INTO `inf_config` VALUES (2, 'biz', 1, '用户管理-账号初始密码', 'sys.user.initPassword', '123456', b'0', '初始化密码 123456', 'admin', '2021-01-05 17:03:48', '', '2021-01-21 02:13:02', b'0');
+INSERT INTO `inf_config` VALUES (2, 'biz', 1, '用户管理-账号初始密码', 'sys.user.init-password', '123456', b'0', '初始化密码 123456', 'admin', '2021-01-05 17:03:48', '', '2021-04-13 03:48:02', b'0');
 INSERT INTO `inf_config` VALUES (3, 'ui', 1, '主框架页-侧边栏主题', 'sys.index.sideTheme', 'theme-dark', b'0', '深色主题theme-dark，浅色主题theme-light', 'admin', '2021-01-05 17:03:48', '', '2021-01-19 03:05:21', b'0');
 INSERT INTO `inf_config` VALUES (4, '1', 2, 'xxx', 'demo.test', '10', b'0', '5', '', '2021-01-19 03:10:26', '', '2021-01-20 09:25:55', b'0');
 INSERT INTO `inf_config` VALUES (5, 'xxx', 2, 'xxx', 'xxx', 'xxx', b'1', 'xxx', '', '2021-02-09 20:06:47', '', '2021-02-09 20:06:47', b'0');
@@ -201,7 +201,7 @@ CREATE TABLE `inf_job_log` (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=2322 DEFAULT CHARSET=utf8mb4 COMMENT='定时任务日志表';
+) ENGINE=InnoDB AUTO_INCREMENT=2527 DEFAULT CHARSET=utf8mb4 COMMENT='定时任务日志表';
 
 -- ----------------------------
 -- Records of inf_job_log
@@ -264,7 +264,7 @@ CREATE TABLE `sys_dict_data` (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=78 DEFAULT CHARSET=utf8mb4 COMMENT='字典数据表';
+) ENGINE=InnoDB AUTO_INCREMENT=80 DEFAULT CHARSET=utf8mb4 COMMENT='字典数据表';
 
 -- ----------------------------
 -- Records of sys_dict_data
@@ -337,6 +337,8 @@ INSERT INTO `sys_dict_data` VALUES (74, 0, '等待结果', '0', 'sys_sms_receive
 INSERT INTO `sys_dict_data` VALUES (75, 1, '接收成功', '10', 'sys_sms_receive_status', 0, NULL, '1', '2021-04-11 20:29:25', '1', '2021-04-11 20:29:35', b'0');
 INSERT INTO `sys_dict_data` VALUES (76, 2, '接收失败', '20', 'sys_sms_receive_status', 0, NULL, '1', '2021-04-11 20:29:31', '1', '2021-04-11 20:29:39', b'0');
 INSERT INTO `sys_dict_data` VALUES (77, 0, '调试(钉钉)', 'DEBUG_DING_TALK', 'sys_sms_channel_code', 0, NULL, '1', '2021-04-13 00:20:37', '1', '2021-04-13 00:20:37', b'0');
+INSERT INTO `sys_dict_data` VALUES (78, 1, '自动生成', '1', 'sys_error_code_type', 0, NULL, '1', '2021-04-21 00:06:48', '1', '2021-04-13 22:06:44', b'0');
+INSERT INTO `sys_dict_data` VALUES (79, 2, '手动编辑', '2', 'sys_error_code_type', 0, NULL, '1', '2021-04-21 00:07:14', '1', '2021-04-13 22:06:49', b'0');
 COMMIT;
 
 -- ----------------------------
@@ -356,7 +358,7 @@ CREATE TABLE `sys_dict_type` (
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE KEY `dict_type` (`type`)
-) ENGINE=InnoDB AUTO_INCREMENT=115 DEFAULT CHARSET=utf8mb4 COMMENT='字典类型表';
+) ENGINE=InnoDB AUTO_INCREMENT=116 DEFAULT CHARSET=utf8mb4 COMMENT='字典类型表';
 
 -- ----------------------------
 -- Records of sys_dict_type
@@ -383,6 +385,109 @@ INSERT INTO `sys_dict_type` VALUES (111, '短信渠道编码', 'sys_sms_channel_
 INSERT INTO `sys_dict_type` VALUES (112, '短信模板的类型', 'sys_sms_template_type', 0, NULL, '1', '2021-04-05 21:50:43', '1', '2021-04-05 21:50:43', b'0');
 INSERT INTO `sys_dict_type` VALUES (113, '短信发送状态', 'sys_sms_send_status', 0, NULL, '1', '2021-04-11 20:18:03', '1', '2021-04-11 09:30:02', b'0');
 INSERT INTO `sys_dict_type` VALUES (114, '短信接收状态', 'sys_sms_receive_status', 0, NULL, '1', '2021-04-11 20:27:14', '1', '2021-04-11 20:27:14', b'0');
+INSERT INTO `sys_dict_type` VALUES (115, '错误码的类型', 'sys_error_code_type', 0, NULL, '1', '2021-04-21 00:06:30', '1', '2021-04-13 22:07:12', b'0');
+COMMIT;
+
+-- ----------------------------
+-- Table structure for sys_error_code
+-- ----------------------------
+DROP TABLE IF EXISTS `sys_error_code`;
+CREATE TABLE `sys_error_code` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '错误码编号',
+  `type` tinyint(4) NOT NULL DEFAULT '0' COMMENT '错误码类型',
+  `application_name` varchar(50) NOT NULL COMMENT '应用名',
+  `code` int(11) NOT NULL DEFAULT '0' COMMENT '错误码编码',
+  `message` varchar(512) NOT NULL DEFAULT '' COMMENT '错误码错误提示',
+  `memo` varchar(512) DEFAULT '' COMMENT '备注',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=4016 DEFAULT CHARSET=utf8mb4 COMMENT='错误码表';
+
+-- ----------------------------
+-- Records of sys_error_code
+-- ----------------------------
+BEGIN;
+INSERT INTO `sys_error_code` VALUES (3939, 2, 'dashboard', 1001000001, '参数配置不存在', 'ceshi', NULL, '2021-04-20 23:52:56', '1', '2021-04-21 23:44:15', b'0');
+INSERT INTO `sys_error_code` VALUES (3940, 1, 'dashboard', 1001000002, '参数配置 key 重复', '', NULL, '2021-04-20 23:52:56', NULL, '2021-04-20 23:52:56', b'0');
+INSERT INTO `sys_error_code` VALUES (3941, 1, 'dashboard', 1001000003, '不能删除类型为系统内置的参数配置', '', NULL, '2021-04-20 23:52:56', NULL, '2021-04-20 23:52:56', b'0');
+INSERT INTO `sys_error_code` VALUES (3942, 1, 'dashboard', 1001000004, '不允许获取敏感配置到前端', '', NULL, '2021-04-20 23:52:56', NULL, '2021-04-20 23:52:56', b'0');
+INSERT INTO `sys_error_code` VALUES (3943, 1, 'dashboard', 1001001000, '定时任务不存在', '', NULL, '2021-04-20 23:52:56', NULL, '2021-04-20 23:52:56', b'0');
+INSERT INTO `sys_error_code` VALUES (3944, 1, 'dashboard', 1001001001, '定时任务的处理器已经存在', '', NULL, '2021-04-20 23:52:56', NULL, '2021-04-20 23:52:56', b'0');
+INSERT INTO `sys_error_code` VALUES (3945, 1, 'dashboard', 1001001002, '只允许修改为开启或者关闭状态', '', NULL, '2021-04-20 23:52:56', NULL, '2021-04-20 23:52:56', b'0');
+INSERT INTO `sys_error_code` VALUES (3946, 1, 'dashboard', 1001001003, '定时任务已经处于该状态，无需修改', '', NULL, '2021-04-20 23:52:56', NULL, '2021-04-20 23:52:56', b'0');
+INSERT INTO `sys_error_code` VALUES (3947, 1, 'dashboard', 1001001004, '只有开启状态的任务，才可以修改', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
+INSERT INTO `sys_error_code` VALUES (3948, 1, 'dashboard', 1001001005, 'CRON 表达式不正确', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
+INSERT INTO `sys_error_code` VALUES (3949, 2, 'dashboard', 1001002000, 'API 错误日志不存在', '', NULL, '2021-04-20 23:52:57', '1', '2021-04-13 21:55:55', b'1');
+INSERT INTO `sys_error_code` VALUES (3950, 1, 'dashboard', 1001002001, 'API 错误日志已处理', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
+INSERT INTO `sys_error_code` VALUES (3951, 1, 'dashboard', 1001003000, '文件不存在', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
+INSERT INTO `sys_error_code` VALUES (3952, 1, 'dashboard', 1002000000, '登录失败，账号密码不正确', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
+INSERT INTO `sys_error_code` VALUES (3953, 1, 'dashboard', 1002000001, '登录失败，账号被禁用', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
+INSERT INTO `sys_error_code` VALUES (3954, 1, 'dashboard', 1002000002, '登录失败', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
+INSERT INTO `sys_error_code` VALUES (3955, 1, 'dashboard', 1002000003, '验证码不存在', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
+INSERT INTO `sys_error_code` VALUES (3956, 1, 'dashboard', 1002000004, '验证码不正确', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
+INSERT INTO `sys_error_code` VALUES (3957, 1, 'dashboard', 1002001000, 'Token 已经过期', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
+INSERT INTO `sys_error_code` VALUES (3958, 1, 'dashboard', 1002001001, 'Token 解析失败', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
+INSERT INTO `sys_error_code` VALUES (3959, 1, 'dashboard', 1002002000, '已经存在该名字的菜单', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
+INSERT INTO `sys_error_code` VALUES (3960, 1, 'dashboard', 1002002001, '父菜单不存在', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
+INSERT INTO `sys_error_code` VALUES (3961, 1, 'dashboard', 1002002002, '不能设置自己为父菜单', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
+INSERT INTO `sys_error_code` VALUES (3962, 1, 'dashboard', 1002002003, '菜单不存在', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
+INSERT INTO `sys_error_code` VALUES (3963, 1, 'dashboard', 1002002004, '存在子菜单，无法删除', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
+INSERT INTO `sys_error_code` VALUES (3964, 1, 'dashboard', 1002002005, '父菜单的类型必须是目录或者菜单', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
+INSERT INTO `sys_error_code` VALUES (3965, 1, 'dashboard', 1002003000, '角色不存在', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
+INSERT INTO `sys_error_code` VALUES (3966, 1, 'dashboard', 1002003001, '已经存在名为【{}】的角色', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
+INSERT INTO `sys_error_code` VALUES (3967, 1, 'dashboard', 1002003002, '已经存在编码为【{}】的角色', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
+INSERT INTO `sys_error_code` VALUES (3968, 1, 'dashboard', 1002003004, '不能操作类型为系统内置的角色', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
+INSERT INTO `sys_error_code` VALUES (3969, 1, 'dashboard', 1002004000, '用户账号已经存在', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
+INSERT INTO `sys_error_code` VALUES (3970, 1, 'dashboard', 1002004001, '已经存在该名字的部门', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-22 00:04:06', b'0');
+INSERT INTO `sys_error_code` VALUES (3971, 1, 'dashboard', 1002004002, '父级部门不存在', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-22 00:04:06', b'0');
+INSERT INTO `sys_error_code` VALUES (3972, 1, 'dashboard', 1002004003, '用户不存在', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-22 00:04:06', b'0');
+INSERT INTO `sys_error_code` VALUES (3973, 1, 'dashboard', 1002004004, '存在子部门，无法删除', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-22 00:04:06', b'0');
+INSERT INTO `sys_error_code` VALUES (3974, 1, 'dashboard', 1002004005, '不能设置自己为父部门', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-22 00:04:06', b'0');
+INSERT INTO `sys_error_code` VALUES (3975, 1, 'dashboard', 1002004001, '已经存在该名字的部门', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
+INSERT INTO `sys_error_code` VALUES (3976, 1, 'dashboard', 1002004002, '父级部门不存在', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
+INSERT INTO `sys_error_code` VALUES (3977, 1, 'dashboard', 1002004003, '当前部门不存在', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
+INSERT INTO `sys_error_code` VALUES (3978, 1, 'dashboard', 1002004004, '存在子部门，无法删除', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
+INSERT INTO `sys_error_code` VALUES (3979, 1, 'dashboard', 1002004005, '不能设置自己为父部门', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
+INSERT INTO `sys_error_code` VALUES (3980, 1, 'dashboard', 1002004006, '部门中存在员工，无法删除', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
+INSERT INTO `sys_error_code` VALUES (3981, 1, 'dashboard', 1002004007, '部门不处于开启状态，不允许选择', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
+INSERT INTO `sys_error_code` VALUES (3982, 1, 'dashboard', 1002004008, '不能设置自己的子部门为父部门', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
+INSERT INTO `sys_error_code` VALUES (3983, 1, 'dashboard', 1002005001, '已经存在该标识的岗位', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-22 00:04:06', b'0');
+INSERT INTO `sys_error_code` VALUES (3984, 1, 'dashboard', 1002005002, '岗位({}) 不处于开启状态，不允许选择', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
+INSERT INTO `sys_error_code` VALUES (3985, 1, 'dashboard', 1002005001, '已经存在该名字的岗位', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
+INSERT INTO `sys_error_code` VALUES (3986, 1, 'dashboard', 1002005001, '已经存在该标识的岗位', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
+INSERT INTO `sys_error_code` VALUES (3987, 1, 'dashboard', 1002006001, '当前字典类型不存在', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
+INSERT INTO `sys_error_code` VALUES (3988, 1, 'dashboard', 1002006002, '字典类型不处于开启状态，不允许选择', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
+INSERT INTO `sys_error_code` VALUES (3989, 1, 'dashboard', 1002006003, '已经存在该名字的字典类型', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
+INSERT INTO `sys_error_code` VALUES (3990, 1, 'dashboard', 1002006004, '无法删除，该字典类型还有字典数据', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-22 00:04:06', b'0');
+INSERT INTO `sys_error_code` VALUES (3991, 1, 'dashboard', 1002006004, '无法删除，该字典类型还有字典数据', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
+INSERT INTO `sys_error_code` VALUES (3992, 1, 'dashboard', 1002007001, '当前字典数据不存在', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
+INSERT INTO `sys_error_code` VALUES (3993, 1, 'dashboard', 1002007002, '字典数据不处于开启状态，不允许选择', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
+INSERT INTO `sys_error_code` VALUES (3994, 1, 'dashboard', 1002007003, '已经存在该值的字典数据', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
+INSERT INTO `sys_error_code` VALUES (3995, 1, 'dashboard', 1002008001, '当前通知公告不存在', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
+INSERT INTO `sys_error_code` VALUES (3996, 1, 'dashboard', 1002009001, '文件路径已经存在', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-21 00:03:20', b'0');
+INSERT INTO `sys_error_code` VALUES (3997, 1, 'dashboard', 1002009002, '文件上传失败', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
+INSERT INTO `sys_error_code` VALUES (3998, 1, 'dashboard', 1002009003, '文件为空', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
+INSERT INTO `sys_error_code` VALUES (3999, 1, 'dashboard', 1002011000, '短信模板不存在', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-22 00:04:06', b'0');
+INSERT INTO `sys_error_code` VALUES (4000, 1, 'dashboard', 1002011001, '已经存在编码为【{}】的短信模板', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-22 00:04:06', b'0');
+INSERT INTO `sys_error_code` VALUES (4001, 2, 'dashboard', 1002011002, '无法删除，该短信渠道还有短信模板', '', NULL, '2021-04-20 23:52:57', '1', '2021-04-22 00:06:52', b'0');
+INSERT INTO `sys_error_code` VALUES (4002, 1, 'dashboard', 1002011000, '短信模板不存在', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
+INSERT INTO `sys_error_code` VALUES (4003, 1, 'dashboard', 1002011001, '已经存在编码为【{}】的短信模板', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
+INSERT INTO `sys_error_code` VALUES (4004, 1, 'dashboard', 1002012000, '手机号不存在', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
+INSERT INTO `sys_error_code` VALUES (4005, 1, 'dashboard', 1002012001, '模板参数({})缺失', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
+INSERT INTO `sys_error_code` VALUES (4006, 1, 'dashboard', 1002009000, '错误码不存在', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
+INSERT INTO `sys_error_code` VALUES (4007, 1, 'dashboard', 1002009001, '已经存在编码为【{}}】的错误码', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
+INSERT INTO `sys_error_code` VALUES (4008, 1, 'dashboard', 1002004003, '不能修改类型为系统内置的错误码', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
+INSERT INTO `sys_error_code` VALUES (4009, 1, 'dashboard', 1001004000, '错误码不存在', '', NULL, '2021-04-21 00:38:01', NULL, '2021-04-21 00:38:01', b'0');
+INSERT INTO `sys_error_code` VALUES (4010, 1, 'dashboard', 1001004001, '已经存在编码为【{}】的错误码', '', NULL, '2021-04-21 00:38:01', NULL, '2021-04-21 23:48:44', b'0');
+INSERT INTO `sys_error_code` VALUES (4011, 1, 'dashboard', 1001004002, '不能修改类型为系统内置的错误码', '', NULL, '2021-04-21 00:38:01', NULL, '2021-04-21 00:38:01', b'0');
+INSERT INTO `sys_error_code` VALUES (4012, 2, 'dashboard', 1201002000, '啦啦啦啦', 'biubiub', '1', '2021-04-21 23:46:02', '1', '2021-04-21 23:46:02', b'0');
+INSERT INTO `sys_error_code` VALUES (4013, 1, 'dashboard', 1001002000, 'API 错误日志不存在', '', NULL, '2021-04-21 23:48:44', NULL, '2021-04-21 23:48:44', b'0');
+INSERT INTO `sys_error_code` VALUES (4014, 1, 'dashboard', 1002013000, '错误码不存在', '', NULL, '2021-04-22 00:04:06', NULL, '2021-04-22 00:04:06', b'0');
+INSERT INTO `sys_error_code` VALUES (4015, 1, 'dashboard', 1002013001, '已经存在编码为【{}】的错误码', '', NULL, '2021-04-22 00:04:06', NULL, '2021-04-22 00:04:06', b'0');
 COMMIT;
 
 -- ----------------------------
@@ -403,7 +508,7 @@ CREATE TABLE `sys_login_log` (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=84 DEFAULT CHARSET=utf8mb4 COMMENT='系统访问记录';
+) ENGINE=InnoDB AUTO_INCREMENT=98 DEFAULT CHARSET=utf8mb4 COMMENT='系统访问记录';
 
 -- ----------------------------
 -- Records of sys_login_log
@@ -432,7 +537,7 @@ CREATE TABLE `sys_menu` (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=1110 DEFAULT CHARSET=utf8mb4 COMMENT='菜单权限表';
+) ENGINE=InnoDB AUTO_INCREMENT=1116 DEFAULT CHARSET=utf8mb4 COMMENT='菜单权限表';
 
 -- ----------------------------
 -- Records of sys_menu
@@ -563,6 +668,12 @@ INSERT INTO `sys_menu` VALUES (1106, '发送测试短信', 'system:sms-template:
 INSERT INTO `sys_menu` VALUES (1107, '短信日志', '', 2, 2, 1093, 'sms-log', 'phone', 'system/sms/smsLog', 0, '', '2021-04-11 08:37:05', '1', '2021-04-11 19:34:25', b'0');
 INSERT INTO `sys_menu` VALUES (1108, '短信日志查询', 'system:sms-log:query', 3, 1, 1107, '', '', '', 0, '', '2021-04-11 08:37:05', '', '2021-04-11 08:37:05', b'0');
 INSERT INTO `sys_menu` VALUES (1109, '短信日志导出', 'system:sms-log:export', 3, 5, 1107, '', '', '', 0, '', '2021-04-11 08:37:05', '', '2021-04-11 08:37:05', b'0');
+INSERT INTO `sys_menu` VALUES (1110, '错误码管理', '', 2, 12, 1, 'error-code', 'code', 'system/errorCode/index', 0, '', '2021-04-13 21:46:42', '1', '2021-04-22 00:04:35', b'0');
+INSERT INTO `sys_menu` VALUES (1111, '错误码查询', 'system:error-code:query', 3, 1, 1110, '', '', '', 0, '', '2021-04-13 21:46:42', '', '2021-04-13 22:09:37', b'0');
+INSERT INTO `sys_menu` VALUES (1112, '错误码创建', 'system:error-code:create', 3, 2, 1110, '', '', '', 0, '', '2021-04-13 21:46:42', '', '2021-04-13 22:09:43', b'0');
+INSERT INTO `sys_menu` VALUES (1113, '错误码更新', 'system:error-code:update', 3, 3, 1110, '', '', '', 0, '', '2021-04-13 21:46:42', '', '2021-04-13 22:09:47', b'0');
+INSERT INTO `sys_menu` VALUES (1114, '错误码删除', 'system:error-code:delete', 3, 4, 1110, '', '', '', 0, '', '2021-04-13 21:46:42', '', '2021-04-13 22:09:51', b'0');
+INSERT INTO `sys_menu` VALUES (1115, '错误码导出', 'system:error-code:export', 3, 5, 1110, '', '', '', 0, '', '2021-04-13 21:46:42', '', '2021-04-13 22:09:55', b'0');
 COMMIT;
 
 -- ----------------------------
@@ -622,7 +733,7 @@ CREATE TABLE `sys_operate_log` (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=177 DEFAULT CHARSET=utf8mb4 COMMENT='操作日志记录';
+) ENGINE=InnoDB AUTO_INCREMENT=193 DEFAULT CHARSET=utf8mb4 COMMENT='操作日志记录';
 
 -- ----------------------------
 -- Records of sys_operate_log
@@ -933,7 +1044,7 @@ CREATE TABLE `sys_sms_log` (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=35 DEFAULT CHARSET=utf8mb4 COMMENT='短信日志';
+) ENGINE=InnoDB AUTO_INCREMENT=36 DEFAULT CHARSET=utf8mb4 COMMENT='短信日志';
 
 -- ----------------------------
 -- Records of sys_sms_log
@@ -1074,6 +1185,7 @@ INSERT INTO `sys_user_session` VALUES ('12166cd28b4f448ea468d13c471dfc6e', 1, '2
 INSERT INTO `sys_user_session` VALUES ('134d908ae33146bd9b5291471c04f604', 1, '2021-04-10 00:29:28', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-09 23:10:26', NULL, '2021-04-02 08:08:17', b'1');
 INSERT INTO `sys_user_session` VALUES ('1407ce21e47947b9b8d93bff1b55c7d6', 1, '2021-04-07 01:09:11', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-07 00:07:43', NULL, '2021-04-01 18:10:44', b'1');
 INSERT INTO `sys_user_session` VALUES ('1477c38290ff4cee8887ebfe593faa02', 1, '2021-04-17 23:34:57', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-17 23:04:57', NULL, '2021-04-12 21:36:29', b'1');
+INSERT INTO `sys_user_session` VALUES ('347ec49c06d74d138a95266cbb5535a0', 1, '2021-04-21 00:45:41', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-21 00:03:50', NULL, '2021-04-13 18:38:39', b'1');
 INSERT INTO `sys_user_session` VALUES ('3c75ea73e13b4857a18eb57ca2eea80f', 1, '2021-04-11 20:06:52', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-11 19:36:52', NULL, '2021-04-11 09:10:53', b'1');
 INSERT INTO `sys_user_session` VALUES ('40d532d8900c43b791266429a7911751', 1, '2021-04-05 22:11:34', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-05 21:41:34', NULL, '2021-04-01 12:28:20', b'1');
 INSERT INTO `sys_user_session` VALUES ('43676e85d0e04980b2a67181f8d9933b', 1, '2021-04-11 10:41:09', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-11 09:56:31', NULL, '2021-04-02 17:32:07', b'1');
@@ -1084,16 +1196,22 @@ INSERT INTO `sys_user_session` VALUES ('5c30d80eb72048daa1a24d3d4f01317b', 1, '2
 INSERT INTO `sys_user_session` VALUES ('5dca80a5c61541479a4dbb6e004c2e28', 1, '2021-04-14 00:57:25', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-13 23:38:30', NULL, '2021-04-12 17:33:48', b'1');
 INSERT INTO `sys_user_session` VALUES ('7324a76b029a49ee95bf54ceb4164ba9', 1, '2021-04-13 01:29:14', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-13 00:18:40', NULL, '2021-04-11 23:15:00', b'1');
 INSERT INTO `sys_user_session` VALUES ('749619894bc441bb9773902515f81e6a', 1, '2021-04-11 00:39:51', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-11 00:09:51', NULL, '2021-04-02 16:50:56', b'1');
+INSERT INTO `sys_user_session` VALUES ('750dca41b315488b8c17e1c0f8b6a519', 1, '2021-04-21 01:24:28', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-21 00:54:28', NULL, '2021-04-13 21:42:10', b'1');
 INSERT INTO `sys_user_session` VALUES ('7768ae62ad974fd989f5159649a4be82', 1, '2021-04-11 00:53:39', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-10 23:23:27', NULL, '2021-04-02 17:04:58', b'1');
 INSERT INTO `sys_user_session` VALUES ('79efcb8f64aa42af9f4b327fb383532f', 1, '2021-04-11 22:44:07', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-11 21:34:53', NULL, '2021-04-11 14:10:45', b'1');
+INSERT INTO `sys_user_session` VALUES ('83b227ad356f4343b01d321ad26807ce', 1, '2021-04-22 00:49:12', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-21 23:33:02', NULL, '2021-04-22 00:19:12', b'0');
 INSERT INTO `sys_user_session` VALUES ('87d5b95fdad9447189a95abf8a5152df', 1, '2021-04-17 23:01:18', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-17 22:31:18', NULL, '2021-04-12 21:03:27', b'1');
 INSERT INTO `sys_user_session` VALUES ('8b3eac5e4a104a4191c8070e03d553ea', 1, '2021-04-05 02:45:12', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-05 02:15:12', NULL, '2021-04-01 11:05:25', b'1');
 INSERT INTO `sys_user_session` VALUES ('9ae27346d8b7491aad1385f51e8aa196', 1, '2021-03-13 14:02:12', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', NULL, '2021-03-13 10:43:06', NULL, '2021-03-13 06:40:35', b'1');
 INSERT INTO `sys_user_session` VALUES ('a2fb443b31c049008975ff8ee5499db1', 1, '2021-04-11 09:42:09', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-11 09:12:09', NULL, '2021-04-02 17:16:00', b'1');
 INSERT INTO `sys_user_session` VALUES ('a71a74adf9d141e2849d2a411d558205', 1, '2021-04-17 18:24:44', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-17 17:54:44', NULL, '2021-04-12 17:54:50', b'1');
+INSERT INTO `sys_user_session` VALUES ('ab2099c12f5c4b0288c60abe8cfff307', 1, '2021-04-18 01:41:46', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-18 01:01:35', NULL, '2021-04-13 05:14:54', b'1');
 INSERT INTO `sys_user_session` VALUES ('ae9ee7452ee54e4b983d658188c15c4d', 1, '2021-03-14 21:32:57', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', NULL, '2021-03-14 20:25:00', NULL, '2021-03-13 15:19:10', b'1');
 INSERT INTO `sys_user_session` VALUES ('b727853eccea4c8589e006ffea985146', 1, '2021-04-12 01:36:00', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-12 01:06:00', NULL, '2021-04-11 19:40:07', b'1');
+INSERT INTO `sys_user_session` VALUES ('b9ee6fde7bf74ed49cad99abf86c94d6', 1, '2021-04-18 20:21:02', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-18 19:18:52', NULL, '2021-04-13 06:36:39', b'1');
+INSERT INTO `sys_user_session` VALUES ('bb4ad4579bd1436c859b94228967582f', 1, '2021-04-18 20:52:38', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-18 20:22:38', NULL, '2021-04-13 07:14:58', b'1');
 INSERT INTO `sys_user_session` VALUES ('c095616db95044c5bed66a3f84519b8b', 1, '2021-04-11 19:59:33', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-11 19:29:33', NULL, '2021-04-11 09:04:19', b'1');
+INSERT INTO `sys_user_session` VALUES ('c8805f37eb76432c89d6d54feb14756f', 1, '2021-04-18 21:54:56', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-18 21:00:38', NULL, '2021-04-13 17:45:30', b'1');
 INSERT INTO `sys_user_session` VALUES ('d0adf48f82914212b947e5ab04d9fb65', 1, '2021-03-21 19:16:28', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-03-21 18:13:37', NULL, '2021-03-15 05:53:20', b'1');
 INSERT INTO `sys_user_session` VALUES ('dfbce0af867547f4bb01ac6f2e583337', 1, '2021-04-11 17:06:15', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-11 16:36:15', NULL, '2021-04-11 08:24:03', b'1');
 INSERT INTO `sys_user_session` VALUES ('e5ecf10e40a5463b8f9b5b453cb1649b', 1, '2021-04-11 17:06:22', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-11 16:36:22', NULL, '2021-04-11 08:24:03', b'1');
@@ -1134,7 +1252,7 @@ CREATE TABLE `tool_codegen_column` (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=447 DEFAULT CHARSET=utf8mb4 COMMENT='代码生成表字段定义';
+) ENGINE=InnoDB AUTO_INCREMENT=458 DEFAULT CHARSET=utf8mb4 COMMENT='代码生成表字段定义';
 
 -- ----------------------------
 -- Records of tool_codegen_column
@@ -1354,6 +1472,17 @@ INSERT INTO `tool_codegen_column` VALUES (443, 36, 'create_time', 'datetime', '�
 INSERT INTO `tool_codegen_column` VALUES (444, 36, 'updater', 'varchar(64)', '更新者', b'1', b'0', '0', 27, 'String', 'updater', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '1', '2021-04-11 09:13:48', '1', '2021-04-11 20:33:54', b'0');
 INSERT INTO `tool_codegen_column` VALUES (445, 36, 'update_time', 'datetime', '更新时间', b'0', b'0', '0', 28, 'Date', 'updateTime', '', NULL, b'0', b'0', b'0', 'BETWEEN', b'0', 'datetime', '1', '2021-04-11 09:13:48', '1', '2021-04-11 20:33:54', b'0');
 INSERT INTO `tool_codegen_column` VALUES (446, 36, 'deleted', 'bit(1)', '是否删除', b'0', b'0', '0', 29, 'Boolean', 'deleted', '', NULL, b'0', b'0', b'0', '=', b'0', 'radio', '1', '2021-04-11 09:13:48', '1', '2021-04-11 20:33:54', b'0');
+INSERT INTO `tool_codegen_column` VALUES (447, 37, 'id', 'bigint(20)', '错误码编号', b'0', b'1', '1', 1, 'Long', 'id', '', '1024', b'0', b'1', b'0', '=', b'1', 'input', '1', '2021-04-21 00:04:13', '1', '2021-04-21 00:55:37', b'0');
+INSERT INTO `tool_codegen_column` VALUES (448, 37, 'type', 'tinyint(4)', '错误码类型', b'0', b'0', '0', 2, 'Integer', 'type', 'inf_error_code_type', '1', b'0', b'0', b'1', '=', b'1', 'select', '1', '2021-04-21 00:04:13', '1', '2021-04-21 00:55:37', b'0');
+INSERT INTO `tool_codegen_column` VALUES (449, 37, 'application_name', 'varchar(50)', '应用名', b'0', b'0', '0', 3, 'String', 'applicationName', '', 'dashboard', b'1', b'1', b'1', 'LIKE', b'1', 'input', '1', '2021-04-21 00:04:13', '1', '2021-04-21 00:55:37', b'0');
+INSERT INTO `tool_codegen_column` VALUES (450, 37, 'code', 'int(11)', '错误码编码', b'0', b'0', '0', 4, 'Integer', 'code', '', '1234', b'1', b'1', b'1', '=', b'1', 'input', '1', '2021-04-21 00:04:13', '1', '2021-04-21 00:55:37', b'0');
+INSERT INTO `tool_codegen_column` VALUES (451, 37, 'message', 'varchar(512)', '错误码错误提示', b'0', b'0', '0', 5, 'String', 'message', '', '帅气', b'1', b'1', b'1', 'LIKE', b'1', 'input', '1', '2021-04-21 00:04:13', '1', '2021-04-21 00:55:37', b'0');
+INSERT INTO `tool_codegen_column` VALUES (452, 37, 'memo', 'varchar(512)', '备注', b'1', b'0', '0', 6, 'String', 'memo', '', '哈哈哈', b'1', b'1', b'0', '=', b'1', 'input', '1', '2021-04-21 00:04:13', '1', '2021-04-21 00:55:37', b'0');
+INSERT INTO `tool_codegen_column` VALUES (453, 37, 'creator', 'varchar(64)', '创建者', b'1', b'0', '0', 7, 'String', 'creator', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '1', '2021-04-21 00:04:13', '1', '2021-04-21 00:55:37', b'0');
+INSERT INTO `tool_codegen_column` VALUES (454, 37, 'create_time', 'datetime', '创建时间', b'0', b'0', '0', 8, 'Date', 'createTime', '', NULL, b'0', b'0', b'1', 'BETWEEN', b'1', 'datetime', '1', '2021-04-21 00:04:13', '1', '2021-04-21 00:55:37', b'0');
+INSERT INTO `tool_codegen_column` VALUES (455, 37, 'updater', 'varchar(64)', '更新者', b'1', b'0', '0', 9, 'String', 'updater', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '1', '2021-04-21 00:04:13', '1', '2021-04-21 00:55:37', b'0');
+INSERT INTO `tool_codegen_column` VALUES (456, 37, 'update_time', 'datetime', '更新时间', b'0', b'0', '0', 10, 'Date', 'updateTime', '', NULL, b'0', b'0', b'0', 'BETWEEN', b'0', 'datetime', '1', '2021-04-21 00:04:13', '1', '2021-04-21 00:55:37', b'0');
+INSERT INTO `tool_codegen_column` VALUES (457, 37, 'deleted', 'bit(1)', '是否删除', b'0', b'0', '0', 11, 'Boolean', 'deleted', '', NULL, b'0', b'0', b'0', '=', b'0', 'radio', '1', '2021-04-21 00:04:13', '1', '2021-04-21 00:55:37', b'0');
 COMMIT;
 
 -- ----------------------------
@@ -1379,7 +1508,7 @@ CREATE TABLE `tool_codegen_table` (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=37 DEFAULT CHARSET=utf8mb4 COMMENT='代码生成表定义';
+) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=utf8mb4 COMMENT='代码生成表定义';
 
 -- ----------------------------
 -- Records of tool_codegen_table
@@ -1400,6 +1529,7 @@ INSERT INTO `tool_codegen_table` VALUES (33, 1, 'inf_file', '文件表', NULL, '
 INSERT INTO `tool_codegen_table` VALUES (34, 1, 'sys_sms_channel', '短信渠道', NULL, 'system', 'sms', 'SysSmsChannel', '短信渠道', '芋道源码', 1, 1093, '1', '2021-04-03 13:39:06', '1', '2021-04-05 20:52:09', b'0');
 INSERT INTO `tool_codegen_table` VALUES (35, 1, 'sys_sms_template', '短信模板', NULL, 'system', 'sms', 'SysSmsTemplate', '短信模板', '芋道源码', 1, 1093, '1', '2021-04-03 13:58:55', '1', '2021-04-05 22:23:38', b'0');
 INSERT INTO `tool_codegen_table` VALUES (36, 1, 'sys_sms_log', '短信日志', NULL, 'system', 'sms', 'SysSmsLog', '短信日志', '芋道源码', 1, 1093, '1', '2021-04-11 01:12:57', '1', '2021-04-11 20:33:54', b'0');
+INSERT INTO `tool_codegen_table` VALUES (37, 1, 'inf_error_code', '错误码表', NULL, 'infra', 'errorcode', 'InfErrorCode', '错误码', '芋道源码', 1, 2, '1', '2021-04-20 15:27:45', '1', '2021-04-21 00:55:37', b'0');
 COMMIT;
 
 -- ----------------------------

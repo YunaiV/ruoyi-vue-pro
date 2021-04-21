@@ -12,6 +12,7 @@ spring:
       max-file-size: 16MB # 单个文件大小
       max-request-size: 32MB # 设置总上传的文件大小
 
+  # Jackson 配置项
   jackson:
     serialization:
       write-dates-as-timestamps: true # 设置 Date 的格式，使用时间戳
@@ -34,3 +35,8 @@ mybatis-plus:
 
 --- #################### 芋道相关配置 ####################
 
+yudao:
+  error-code: # 错误码相关配置项
+    constants-class-list:
+      - cn.iocoder.dashboard.modules.infra.enums.InfErrorCodeConstants
+      - cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants

@@ -22,12 +22,15 @@ public interface SysPostMapper extends BaseMapperX<SysPostDO> {
 
     default PageResult<SysPostDO> selectPage(SysPostPageReqVO reqVO) {
         return selectPage(reqVO, new QueryWrapperX<SysPostDO>()
+                .likeIfPresent("code", reqVO.getCode())
                 .likeIfPresent("name", reqVO.getName())
                 .eqIfPresent("status", reqVO.getStatus()));
     }
 
     default List<SysPostDO> selectList(SysPostExportReqVO reqVO) {
-        return selectList(new QueryWrapperX<SysPostDO>().likeIfPresent("name", reqVO.getName())
+        return selectList(new QueryWrapperX<SysPostDO>()
+                .likeIfPresent("code", reqVO.getCode())
+                .likeIfPresent("name", reqVO.getName())
                 .eqIfPresent("status", reqVO.getStatus()));
     }
 
