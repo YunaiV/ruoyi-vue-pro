@@ -9,6 +9,7 @@ public interface FilterOrderEnum {
 
     int CORS_FILTER = Integer.MIN_VALUE;
 
+    int TRACE_FILTER = CORS_FILTER + 1;
 
     int REQUEST_BODY_CACHE_FILTER = Integer.MIN_VALUE + 500;
 

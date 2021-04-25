@@ -10,5 +10,5 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  */
 @ConfigurationProperties("yudao.tracer")
 @Data
-public class BizTracerProperties {
+public class TracerProperties {
 }

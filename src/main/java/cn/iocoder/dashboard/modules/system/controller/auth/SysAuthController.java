@@ -3,6 +3,7 @@ package cn.iocoder.dashboard.modules.system.controller.auth;
 import cn.iocoder.dashboard.common.enums.CommonStatusEnum;
 import cn.iocoder.dashboard.common.pojo.CommonResult;
 import cn.iocoder.dashboard.framework.logger.operatelog.core.annotations.OperateLog;
+import cn.iocoder.dashboard.framework.tracer.core.annotation.BizTrace;
 import cn.iocoder.dashboard.modules.system.controller.auth.vo.auth.SysAuthLoginReqVO;
 import cn.iocoder.dashboard.modules.system.controller.auth.vo.auth.SysAuthLoginRespVO;
 import cn.iocoder.dashboard.modules.system.controller.auth.vo.auth.SysAuthMenuRespVO;
@@ -58,6 +59,7 @@ public class SysAuthController {
 
     @GetMapping("/get-permission-info")
     @ApiOperation("获取登陆用户的权限信息")
+    @BizTrace(id = "1", type = "'user'")
     public CommonResult<SysAuthPermissionInfoRespVO> getPermissionInfo() {
         // 获得用户信息
         SysUserDO user = userService.getUser(getLoginUserId());

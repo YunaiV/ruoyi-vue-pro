@@ -2,8 +2,6 @@ package cn.iocoder.dashboard.framework.tracer.core.util;
 
 import org.apache.skywalking.apm.toolkit.trace.TraceContext;
 
-import java.util.UUID;
-
 /**
  * 链路追踪工具类
  *
@@ -18,10 +16,8 @@ public class TracerUtils {
     }
 
     /**
-     * 获得链路追踪编号
-     * <p>
-     * 直接返回skywalking 的TraceId 如果不存在的话为空字符串""
-     * <p>
+     * 获得链路追踪编号，直接返回 SkyWalking 的 TraceId。
+     * 如果不存在的话为空字符串！！！
      *
      * @return 链路追踪编号
      */

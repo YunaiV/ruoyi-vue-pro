@@ -1,11 +1,13 @@
-<configuration>　　　
+<configuration>　　
+    　
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">　　　　　
         <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
-            <layout class="cn.iocoder.dashboard.framework.tracer.skywalking.TraceIdPatternLogbackLayout">
+            <layout class="org.apache.skywalking.apm.toolkit.log.logback.v1.x.TraceIdPatternLogbackLayout">
                 <pattern>%d{ISO8601} | %tid | %thread | %-5level | %msg%n</pattern>
             </layout>
         </encoder>
     </appender>
+
     <appender name="FILE"  class="ch.qos.logback.core.rolling.RollingFileAppender">
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <FileNamePattern>./logs/ruoyi-vue-pro-%d{yyyy-MM-dd_HH}.log</FileNamePattern>
@@ -20,13 +22,20 @@
             <MaxFileSize>10MB</MaxFileSize>
         </triggeringPolicy>
     </appender>
+
     <appender name="ASYNC" class="ch.qos.logback.classic.AsyncAppender">
         <discardingThreshold>0</discardingThreshold>
         <queueSize>10</queueSize>
         <appender-ref ref="FILE"/>
     </appender>
+
     <!-- skywalking grpc 日志收集 8.4.0版本开始支持 -->
     <appender name="GRPC" class="org.apache.skywalking.apm.toolkit.log.logback.v1.x.log.GRPCLogClientAppender">
+        <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+            <layout class="org.apache.skywalking.apm.toolkit.log.logback.v1.x.mdc.TraceIdMDCPatternLogbackLayout">
+                <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%X{tid}] [%thread] %-5level %logger{36} -%msg%n</Pattern>
+            </layout>
+        </encoder>s
     </appender>
 
     <springProfile name="dev">
@@ -35,12 +44,14 @@
             <appender-ref ref="ASYNC"/>
         </logger>
     </springProfile>
+
     <springProfile name="local">
         <logger name="cn.iocoder.dashboard" level="INFO" additivity="false">
             <appender-ref ref="STDOUT"/>
             <appender-ref ref="GRPC"/>
         </logger>
     </springProfile>
+
     <springProfile name="default">
         <logger name="cn.iocoder.dashboard" level="INFO" additivity="false">
             <appender-ref ref="STDOUT"/>
@@ -48,7 +59,7 @@
         </logger>
     </springProfile>
 
-    <root level="DEBUG">　　　　　　
+    <root level="INFO">　　　　　　
         <appender-ref ref="STDOUT"/>　　　
         <appender-ref ref="ASYNC"/>　
     </root>

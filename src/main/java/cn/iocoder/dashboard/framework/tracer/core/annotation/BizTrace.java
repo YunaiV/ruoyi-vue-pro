@@ -10,7 +10,7 @@ import java.lang.annotation.*;
 @Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
-public @interface BizTracing {
+public @interface BizTrace {
 
     /**
      * 业务编号 tag 名
@@ -20,6 +20,11 @@ public @interface BizTracing {
      * 业务类型 tag 名
      */
     String TYPE_TAG = "biz.type";
+
+    /**
+     * @return 操作名
+     */
+    String operationName() default "";
 
     /**
      * @return 业务编号
