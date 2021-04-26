@@ -1,70 +1,62 @@
-<configuration>　　
-    　
+<configuration>
+    <!-- 变量 -->
+    <springProperty scope="context" name="yudao.info.base-package" source="yudao.info.base-package"/>
+    <property name="PATTERN_DEFAULT" value="%d{yyyy-MM-dd HH:mm:ss.SSS} | %tid | %thread | %-5level | %msg%n"/>
+
+    <!-- 控制台 Appender -->
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">　　　　　
         <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
             <layout class="org.apache.skywalking.apm.toolkit.log.logback.v1.x.TraceIdPatternLogbackLayout">
-                <pattern>%d{ISO8601} | %tid | %thread | %-5level | %msg%n</pattern>
+                <pattern>${PATTERN_DEFAULT}</pattern>
             </layout>
         </encoder>
     </appender>
 
+    <!-- 文件 Appender -->
     <appender name="FILE"  class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <FileNamePattern>./logs/ruoyi-vue-pro-%d{yyyy-MM-dd_HH}.log</FileNamePattern>
-            <MaxHistory>3</MaxHistory>
-        </rollingPolicy>
         <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
             <layout class="org.apache.skywalking.apm.toolkit.log.logback.v1.x.TraceIdPatternLogbackLayout">
-                <pattern>%d{ISO8601} | %tid | %thread | %-5level | %msg%n</pattern>
+                <pattern>${PATTERN_DEFAULT}</pattern>
             </layout>
         </encoder>
-        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
-            <MaxFileSize>10MB</MaxFileSize>
-        </triggeringPolicy>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_FILE}.%d{yyyy-MM-dd}.%i.log}</fileNamePattern>
+            <maxFileSize>10MB</maxFileSize>
+            <maxHistory>7</maxHistory>
+            <cleanHistoryOnStart>false</cleanHistoryOnStart>
+        </rollingPolicy>
     </appender>
-
     <appender name="ASYNC" class="ch.qos.logback.classic.AsyncAppender">
         <discardingThreshold>0</discardingThreshold>
         <queueSize>10</queueSize>
         <appender-ref ref="FILE"/>
     </appender>
 
-    <!-- skywalking grpc 日志收集 8.4.0版本开始支持 -->
+    <!-- SkyWalking GRPC 日志收集，实现日志中心。注意：SkyWalking 8.4.0 版本开始支持 -->
     <appender name="GRPC" class="org.apache.skywalking.apm.toolkit.log.logback.v1.x.log.GRPCLogClientAppender">
         <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
             <layout class="org.apache.skywalking.apm.toolkit.log.logback.v1.x.mdc.TraceIdMDCPatternLogbackLayout">
-                <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%X{tid}] [%thread] %-5level %logger{36} -%msg%n</Pattern>
+                <pattern>${PATTERN_DEFAULT}</pattern>
             </layout>
-        </encoder>s
+        </encoder>
     </appender>
 
-    <springProfile name="dev">
-        <logger name="cn.iocoder.dashboard" level="INFO" additivity="false">
+    <!-- 本地环境 -->
+    <springProfile name="local">
+        <logger name="${yudao.info.base-package}" level="INFO" additivity="false">
             <appender-ref ref="STDOUT"/>
+            <appender-ref ref="GRPC"/>
             <appender-ref ref="ASYNC"/>
+            <!-- 本地环境下，不打印日志文件 -->
         </logger>
     </springProfile>
-
-    <springProfile name="local">
-        <logger name="cn.iocoder.dashboard" level="INFO" additivity="false">
+    <!-- 其它环境 -->
+    <springProfile name="default">
+        <logger name="${yudao.info.base-package}" level="INFO" additivity="false">
             <appender-ref ref="STDOUT"/>
+            <appender-ref ref="ASYNC"/>
             <appender-ref ref="GRPC"/>
         </logger>
     </springProfile>
 
-    <springProfile name="default">
-        <logger name="cn.iocoder.dashboard" level="INFO" additivity="false">
-            <appender-ref ref="STDOUT"/>
-            <appender-ref ref="ASYNC"/>
-        </logger>
-    </springProfile>
-
-    <root level="INFO">　　　　　　
-        <appender-ref ref="STDOUT"/>　　　
-        <appender-ref ref="ASYNC"/>　
-    </root>
-
-    <logger name="cn.iocoder.dashboard" level="INFO">
-        <appender-ref ref="STDOUT"/>
-    </logger>
 </configuration>

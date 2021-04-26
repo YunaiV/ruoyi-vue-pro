@@ -146,6 +146,7 @@ spring:
 logging:
   file:
     path: ${user.home}/logs/ # 日志文件的路径
+    name: ${spring.application.name} # 日志文件名
 
 --- #################### 芋道相关配置 ####################
 

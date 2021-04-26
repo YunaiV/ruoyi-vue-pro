@@ -58,7 +58,7 @@ public class BizTraceAspect {
             span.setTag(BizTrace.TYPE_TAG, StrUtil.toString(SpElUtil.analysisSpEl(trace.type(), joinPoint)));
             span.setTag(BizTrace.ID_TAG, StrUtil.toString(SpElUtil.analysisSpEl(trace.id(), joinPoint)));
         } catch (Exception ex) {
-            log.error("[around][解析 bizType 与 bizId 发生异常]", ex);
+            log.error("[setBizTag][解析 bizType 与 bizId 发生异常]", ex);
         }
     }
 
