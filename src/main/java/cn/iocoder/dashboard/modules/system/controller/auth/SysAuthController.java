@@ -59,7 +59,6 @@ public class SysAuthController {
 
     @GetMapping("/get-permission-info")
     @ApiOperation("获取登陆用户的权限信息")
-    @BizTrace(id = "1", type = "'user'")
     public CommonResult<SysAuthPermissionInfoRespVO> getPermissionInfo() {
         // 获得用户信息
         SysUserDO user = userService.getUser(getLoginUserId());

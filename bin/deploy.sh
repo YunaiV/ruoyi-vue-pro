@@ -27,6 +27,7 @@ JAVA_OPS="-Xms512m -Xmx512m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=$HE
 export SW_AGENT_NAME=$SERVER_NAME
 export SW_AGENT_COLLECTOR_BACKEND_SERVICES=192.168.0.84:11800
 export SW_GRPC_LOG_SERVER_HOST=192.168.0.84
+export SW_AGENT_TRACE_IGNORE_PATH="Redisson/PING,/actuator/**,/admin/**"
 export JAVA_AGENT=-javaagent:/work/skywalking/apache-skywalking-apm-bin/agent/skywalking-agent.jar
 
 # 备份

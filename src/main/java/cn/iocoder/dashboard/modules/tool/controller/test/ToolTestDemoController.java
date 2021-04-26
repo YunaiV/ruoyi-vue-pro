@@ -5,12 +5,11 @@ import cn.iocoder.dashboard.common.pojo.CommonResult;
 import cn.iocoder.dashboard.common.pojo.PageResult;
 import cn.iocoder.dashboard.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.dashboard.framework.logger.operatelog.core.annotations.OperateLog;
+import cn.iocoder.dashboard.framework.tracer.core.annotation.BizTrace;
 import cn.iocoder.dashboard.modules.tool.controller.test.vo.*;
 import cn.iocoder.dashboard.modules.tool.convert.test.ToolTestDemoConvert;
 import cn.iocoder.dashboard.modules.tool.dal.dataobject.test.ToolTestDemoDO;
 import cn.iocoder.dashboard.modules.tool.service.test.ToolTestDemoService;
-import com.baomidou.lock.annotation.Lock4j;
-import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
@@ -66,7 +65,7 @@ public class ToolTestDemoController {
     @ApiOperation("获得测试示例")
     @ApiImplicitParam(name = "id", value = "编号", required = true, dataTypeClass = Long.class)
     @PreAuthorize("@ss.hasPermission('tool:test-demo:query')")
-    @Lock4j // 分布式锁
+//    @Lock4j // 分布式锁
     public CommonResult<ToolTestDemoRespVO> getTestDemo(@RequestParam("id") Long id) {
         if (true) { // 测试分布式锁
             ThreadUtil.sleep(5, TimeUnit.SECONDS);
@@ -79,7 +78,8 @@ public class ToolTestDemoController {
     @ApiOperation("获得测试示例列表")
     @ApiImplicitParam(name = "ids", value = "编号列表", required = true, dataTypeClass = List.class)
     @PreAuthorize("@ss.hasPermission('tool:test-demo:query')")
-    @RateLimiter(name = "backendA")
+//    @RateLimiter(name = "backendA")
+    @BizTrace(id = "1", type = "'user'")
     public CommonResult<List<ToolTestDemoRespVO>> getTestDemoList(@RequestParam("ids") Collection<Long> ids) {
         List<ToolTestDemoDO> list = testDemoService.getTestDemoList(ids);
         return success(ToolTestDemoConvert.INSTANCE.convertList(list));
