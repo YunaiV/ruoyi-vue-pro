@@ -38,7 +38,8 @@
         <lock4j.version>2.2.0</lock4j.version>
         <resilience4j.version>1.7.0</resilience4j.version>
         <!-- 监控相关 -->
-        <skywalking.version>8.3.0</skywalking.version>
+        <skywalking.version>8.5.0</skywalking.version>
+        <logback.encoder.version>6.1</logback.encoder.version>
         <spring-boot-admin.version>2.3.1</spring-boot-admin.version>
         <!-- 工具类相关 -->
         <lombok.version>1.16.14</lombok.version>
@@ -188,6 +189,16 @@
         <dependency>
             <groupId>org.apache.skywalking</groupId>
             <artifactId>apm-toolkit-trace</artifactId>
+            <version>${skywalking.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.skywalking</groupId>
+            <artifactId>apm-toolkit-logback-1.x</artifactId>
+            <version>${skywalking.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.skywalking</groupId>
+            <artifactId>apm-toolkit-opentracing</artifactId>
             <version>${skywalking.version}</version>
         </dependency>
 

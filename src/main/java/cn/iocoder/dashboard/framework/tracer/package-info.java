@@ -1,6 +1,6 @@
 /**
- * 链路追踪
+ * 使用 SkyWalking 组件，作为链路追踪、日志中心。
  *
- * 主要目的，是生成全局的链路追踪编号
+ * @author 芋道源码
  */
 package cn.iocoder.dashboard.framework.tracer;
