@@ -79,7 +79,7 @@ public class ToolTestDemoController {
     @ApiImplicitParam(name = "ids", value = "编号列表", required = true, dataTypeClass = List.class)
     @PreAuthorize("@ss.hasPermission('tool:test-demo:query')")
 //    @RateLimiter(name = "backendA")
-    @BizTrace(id = "1", type = "'user'")
+    @BizTrace(id = "#ids", type = "'user'")
     public CommonResult<List<ToolTestDemoRespVO>> getTestDemoList(@RequestParam("ids") Collection<Long> ids) {
         List<ToolTestDemoDO> list = testDemoService.getTestDemoList(ids);
         return success(ToolTestDemoConvert.INSTANCE.convertList(list));

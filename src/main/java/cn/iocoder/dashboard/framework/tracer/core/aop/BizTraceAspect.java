@@ -1,8 +1,9 @@
 package cn.iocoder.dashboard.framework.tracer.core.aop;
 
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.dashboard.framework.tracer.core.annotation.BizTrace;
-import cn.iocoder.dashboard.util.sping.SpElUtil;
+import cn.iocoder.dashboard.util.sping.SpringExpressionUtils;
 import io.opentracing.Span;
 import io.opentracing.Tracer;
 import lombok.extern.slf4j.Slf4j;
@@ -11,6 +12,9 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 
 import javax.annotation.Resource;
+import java.util.Map;
+
+import static java.util.Arrays.asList;
 
 /**
  * {@link BizTrace} 切面，记录业务链路
@@ -55,8 +59,9 @@ public class BizTraceAspect {
 
     private void setBizTag(Span span, ProceedingJoinPoint joinPoint, BizTrace trace) {
         try {
-            span.setTag(BizTrace.TYPE_TAG, StrUtil.toString(SpElUtil.analysisSpEl(trace.type(), joinPoint)));
-            span.setTag(BizTrace.ID_TAG, StrUtil.toString(SpElUtil.analysisSpEl(trace.id(), joinPoint)));
+            Map<String, Object> result = SpringExpressionUtils.parseExpressions(joinPoint, asList(trace.type(), trace.id()));
+            span.setTag(BizTrace.TYPE_TAG, MapUtil.getStr(result, trace.type()));
+            span.setTag(BizTrace.ID_TAG, MapUtil.getStr(result, trace.id()));
         } catch (Exception ex) {
             log.error("[setBizTag][解析 bizType 与 bizId 发生异常]", ex);
         }

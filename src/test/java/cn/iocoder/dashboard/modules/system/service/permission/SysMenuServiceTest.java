@@ -12,7 +12,7 @@ import cn.iocoder.dashboard.modules.system.dal.mysql.permission.SysMenuMapper;
 import cn.iocoder.dashboard.modules.system.enums.permission.MenuTypeEnum;
 import cn.iocoder.dashboard.modules.system.mq.producer.permission.SysMenuProducer;
 import cn.iocoder.dashboard.modules.system.service.permission.impl.SysMenuServiceImpl;
-import cn.iocoder.dashboard.util.AopTargetUtils;
+import cn.iocoder.dashboard.util.sping.SpringAopUtils;
 import cn.iocoder.dashboard.util.RandomUtils;
 import cn.iocoder.dashboard.util.object.ObjectUtils;
 import com.google.common.collect.Multimap;
@@ -57,7 +57,7 @@ public class SysMenuServiceTest extends BaseDbUnitTest {
         sysMenuService.initLocalCache();
 
         // 获取代理对象
-        SysMenuServiceImpl target = (SysMenuServiceImpl) AopTargetUtils.getTarget(sysMenuService);
+        SysMenuServiceImpl target = (SysMenuServiceImpl) SpringAopUtils.getTarget(sysMenuService);
 
         Map<Long, SysMenuDO> menuCache =
                 (Map<Long, SysMenuDO>) BeanUtil.getFieldValue(target, "menuCache");
@@ -227,7 +227,7 @@ public class SysMenuServiceTest extends BaseDbUnitTest {
     public void testListMenusFromCache_success() throws Exception {
         Map<Long, SysMenuDO> mockCacheMap = new HashMap<>();
         //获取代理对象
-        SysMenuServiceImpl target = (SysMenuServiceImpl) AopTargetUtils.getTarget(sysMenuService);
+        SysMenuServiceImpl target = (SysMenuServiceImpl) SpringAopUtils.getTarget(sysMenuService);
         BeanUtil.setFieldValue(target, "menuCache", mockCacheMap);
 
         Map<Long, SysMenuDO> idMenuMap = new HashMap<>();
@@ -256,7 +256,7 @@ public class SysMenuServiceTest extends BaseDbUnitTest {
     public void testListMenusFromCache2_success() throws Exception {
         Map<Long, SysMenuDO> mockCacheMap = new HashMap<>();
         //获取代理对象
-        SysMenuServiceImpl target = (SysMenuServiceImpl) AopTargetUtils.getTarget(sysMenuService);
+        SysMenuServiceImpl target = (SysMenuServiceImpl) SpringAopUtils.getTarget(sysMenuService);
         BeanUtil.setFieldValue(target, "menuCache", mockCacheMap);
 
         Map<Long, SysMenuDO> idMenuMap = new HashMap<>();

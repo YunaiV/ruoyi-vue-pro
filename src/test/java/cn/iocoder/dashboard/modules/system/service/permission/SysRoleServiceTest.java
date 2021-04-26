@@ -13,14 +13,8 @@ import cn.iocoder.dashboard.modules.system.dal.mysql.permission.SysRoleMapper;
 import cn.iocoder.dashboard.modules.system.enums.permission.SysRoleTypeEnum;
 import cn.iocoder.dashboard.modules.system.mq.producer.permission.SysRoleProducer;
 import cn.iocoder.dashboard.modules.system.service.permission.impl.SysRoleServiceImpl;
-import cn.iocoder.dashboard.util.AopTargetUtils;
-import cn.iocoder.dashboard.util.AssertUtils;
-import cn.iocoder.dashboard.util.RandomUtils;
-import cn.iocoder.dashboard.util.object.ObjectUtils;
-import com.google.common.collect.Sets;
-import org.junit.jupiter.api.Assertions;
+import cn.iocoder.dashboard.util.sping.SpringAopUtils;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
@@ -63,7 +57,7 @@ public class SysRoleServiceTest extends BaseDbUnitTest {
 
         //断言
         //获取代理对象
-        SysRoleServiceImpl target = (SysRoleServiceImpl) AopTargetUtils.getTarget(sysRoleService);
+        SysRoleServiceImpl target = (SysRoleServiceImpl) SpringAopUtils.getTarget(sysRoleService);
 
         Map<Long, SysRoleDO> roleCache = (Map<Long, SysRoleDO>) BeanUtil.getFieldValue(target, "roleCache");
         assertPojoEquals(roleDO1, roleCache.get(roleDO1.getId()));
