@@ -12,12 +12,27 @@
         <module>yudao-dependencies</module>
 <!--        <module>yudao-framework</module>-->
         <module>yudao-admin-server</module>
+        <module>yudao-framework</module>
     </modules>
 
     <name>yudao</name>
     <description>芋道项目基础脚手架</description>
     <url>https://github.com/YunaiV/ruoyi-vue-pro</url>
 
+    <properties>
+        <revision>1.0.0</revision>
+    </properties>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>cn.iocoder.boot</groupId>
+                <artifactId>yudao-dependencies</artifactId>
+                <version>${revision}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
 </project>
