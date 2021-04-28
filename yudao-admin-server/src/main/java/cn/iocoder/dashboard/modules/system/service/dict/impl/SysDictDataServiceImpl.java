@@ -250,7 +250,7 @@ public class SysDictDataServiceImpl implements SysDictDataService {
 
     @Override
     public List<DictDataRespDTO> listDictDatasFromCache(String type) {
-        return SysDictDataConvert.INSTANCE.convertList03(labelDictDataCache.row(type).values()));
+        return SysDictDataConvert.INSTANCE.convertList03(labelDictDataCache.row(type).values());
     }
 
 }

@@ -1,9 +1,13 @@
 package cn.iocoder.dashboard.framework.apollo.internals;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ClassUtil;
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.ReflectUtil;
 import cn.iocoder.dashboard.framework.apollo.core.ConfigConsts;
 import cn.iocoder.dashboard.framework.apollo.internals.dto.ConfigRespDTO;
 import cn.iocoder.dashboard.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.dashboard.util.object.ObjectUtils;
 import com.ctrip.framework.apollo.Apollo;
 import com.ctrip.framework.apollo.build.ApolloInjector;
 import com.ctrip.framework.apollo.core.utils.ApolloThreadFactory;
@@ -13,8 +17,10 @@ import com.ctrip.framework.apollo.internals.ConfigRepository;
 import com.ctrip.framework.apollo.tracer.Tracer;
 import com.ctrip.framework.apollo.util.ConfigUtil;
 import com.ctrip.framework.apollo.util.factory.PropertiesFactory;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
+import java.lang.reflect.Constructor;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
@@ -58,9 +64,7 @@ public class DBConfigRepository extends AbstractConfigRepository {
         this.propertiesFactory = ApolloInjector.getInstance(PropertiesFactory.class);
         this.m_configUtil = ApolloInjector.getInstance(ConfigUtil.class);
         // 初始化 DB
-        cn.iocoder.dashboard.modules.infra.dal.mysql.config
-        this.configFrameworkDAO = new InfConfigDAOImpl(System.getProperty(ConfigConsts.APOLLO_JDBC_URL),
-                System.getProperty(ConfigConsts.APOLLO_JDBC_USERNAME), System.getProperty(ConfigConsts.APOLLO_JDBC_PASSWORD));
+        this.configFrameworkDAO = createConfigFrameworkDAO();
 
         // 初始化加载
         this.trySync();
@@ -69,6 +73,18 @@ public class DBConfigRepository extends AbstractConfigRepository {
 
         // 设置单例
         INSTANCE = this;
+    }
+
+    @SneakyThrows
+    private static ConfigFrameworkDAO createConfigFrameworkDAO() {
+        String dao = System.getProperty(ConfigConsts.APOLLO_JDBC_DAO);
+        String url = System.getProperty(ConfigConsts.APOLLO_JDBC_URL);
+        String username = System.getProperty(ConfigConsts.APOLLO_JDBC_USERNAME);
+        String password = System.getProperty(ConfigConsts.APOLLO_JDBC_PASSWORD);
+        // 创建 DBConfigRepository 对象
+        Class<? extends ConfigFrameworkDAO> clazz = ClassUtil.loadClass(dao);
+        Constructor<? extends ConfigFrameworkDAO> constructor = ReflectUtil.getConstructor(clazz, String.class, String.class, String.class);
+        return constructor.newInstance(url, username, password);
     }
 
     /**

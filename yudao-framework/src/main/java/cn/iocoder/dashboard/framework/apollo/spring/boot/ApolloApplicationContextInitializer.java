@@ -23,8 +23,8 @@ public class ApolloApplicationContextInitializer implements EnvironmentPostProce
 
     private int order = DEFAULT_ORDER;
 
-    private static final String[] APOLLO_SYSTEM_PROPERTIES = {ConfigConsts.APOLLO_JDBC_URL,
-            ConfigConsts.APOLLO_JDBC_USERNAME, ConfigConsts.APOLLO_JDBC_PASSWORD};
+    private static final String[] APOLLO_SYSTEM_PROPERTIES = {ConfigConsts.APOLLO_JDBC_DAO,
+            ConfigConsts.APOLLO_JDBC_URL, ConfigConsts.APOLLO_JDBC_USERNAME, ConfigConsts.APOLLO_JDBC_PASSWORD};
 
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {

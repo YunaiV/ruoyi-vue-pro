@@ -66,7 +66,7 @@ public class SysAuthServiceImplTest extends BaseDbUnitTest {
         // 准备参数
         String username = randomString();
         // mock 方法
-        SysUserDO user = randomUserDO(o -> o.setUsername(username));
+        SysUserDO user = randomPojo(SysUserDO.class, o -> o.setUsername(username));
         when(userService.getUserByUsername(eq(username))).thenReturn(user);
 
         // 调用
@@ -93,7 +93,7 @@ public class SysAuthServiceImplTest extends BaseDbUnitTest {
         // 准备参数
         Long userId = randomLongId();
         // mock 方法 01
-        SysUserDO user = randomUserDO(o -> o.setId(userId));
+        SysUserDO user = randomPojo(SysUserDO.class, o -> o.setId(userId));
         when(userService.getUser(eq(userId))).thenReturn(user);
         // mock 方法 02
         Set<Long> roleIds = randomSet(Long.class);
