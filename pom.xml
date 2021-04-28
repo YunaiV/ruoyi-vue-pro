@@ -9,10 +9,9 @@
     <version>${revision}</version>
     <packaging>pom</packaging>
     <modules>
-<!--        <module>yudao-dependencies</module>-->
-<!--        <module>yudao-framework</module>-->
-        <module>yudao-admin-server</module>
+        <module>yudao-dependencies</module>
         <module>yudao-framework</module>
+        <module>yudao-admin-server</module>
     </modules>
 
     <name>yudao</name>
@@ -22,5 +21,17 @@
     <properties>
         <revision>1.0.0</revision>
     </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>cn.iocoder.boot</groupId>
+                <artifactId>yudao-dependencies</artifactId>
+                <version>${revision}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
 </project>

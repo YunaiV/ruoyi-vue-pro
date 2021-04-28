@@ -23,9 +23,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.*;
-import static cn.iocoder.dashboard.util.AssertUtils.assertPojoEquals;
-import static cn.iocoder.dashboard.util.AssertUtils.assertServiceException;
-import static cn.iocoder.dashboard.util.RandomUtils.*;
+import static cn.iocoder.dashboard.util.test.AssertUtils.assertPojoEquals;
+import static cn.iocoder.dashboard.util.test.AssertUtils.assertServiceException;
+import static cn.iocoder.dashboard.util.test.RandomUtils.*;
 import static cn.iocoder.dashboard.util.object.ObjectUtils.max;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;

@@ -1,4 +1,4 @@
-package cn.iocoder.dashboard.util;
+package cn.iocoder.dashboard.util.test;
 
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.RandomUtil;

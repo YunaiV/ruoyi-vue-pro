@@ -7,10 +7,10 @@ import static cn.iocoder.dashboard.modules.infra.enums.InfErrorCodeConstants.JOB
 import static cn.iocoder.dashboard.modules.infra.enums.InfErrorCodeConstants.JOB_HANDLER_EXISTS;
 import static cn.iocoder.dashboard.modules.infra.enums.InfErrorCodeConstants.JOB_NOT_EXISTS;
 import static cn.iocoder.dashboard.modules.infra.enums.InfErrorCodeConstants.JOB_UPDATE_ONLY_NORMAL_STATUS;
-import static cn.iocoder.dashboard.util.AssertUtils.assertPojoEquals;
-import static cn.iocoder.dashboard.util.AssertUtils.assertServiceException;
-import static cn.iocoder.dashboard.util.RandomUtils.randomPojo;
-import static cn.iocoder.dashboard.util.RandomUtils.randomString;
+import static cn.iocoder.dashboard.util.test.AssertUtils.assertPojoEquals;
+import static cn.iocoder.dashboard.util.test.AssertUtils.assertServiceException;
+import static cn.iocoder.dashboard.util.test.RandomUtils.randomPojo;
+import static cn.iocoder.dashboard.util.test.RandomUtils.randomString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;

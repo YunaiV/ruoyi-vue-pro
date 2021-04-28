@@ -1,7 +1,7 @@
 package cn.iocoder.dashboard.framework.sms.core.client.impl.yunpian;
 
 import cn.hutool.core.util.ReflectUtil;
-import cn.iocoder.dashboard.BaseMockitoUnitTest;
+import cn.iocoder.dashboard.framework.test.core.BaseMockitoUnitTest;
 import cn.iocoder.dashboard.common.core.KeyValue;
 import cn.iocoder.dashboard.common.exception.enums.GlobalErrorCodeConstants;
 import cn.iocoder.dashboard.framework.sms.core.client.SmsCommonResult;
@@ -29,7 +29,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import static cn.iocoder.dashboard.util.RandomUtils.*;
+import static cn.iocoder.dashboard.util.test.RandomUtils.*;
 import static com.yunpian.sdk.constant.Code.OK;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;

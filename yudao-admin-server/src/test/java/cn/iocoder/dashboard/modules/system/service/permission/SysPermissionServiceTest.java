@@ -14,9 +14,9 @@ import org.springframework.context.annotation.Import;
 import javax.annotation.Resource;
 import java.util.List;
 
-import static cn.iocoder.dashboard.util.AssertUtils.assertPojoEquals;
-import static cn.iocoder.dashboard.util.RandomUtils.randomLongId;
-import static cn.iocoder.dashboard.util.RandomUtils.randomPojo;
+import static cn.iocoder.dashboard.util.test.AssertUtils.assertPojoEquals;
+import static cn.iocoder.dashboard.util.test.RandomUtils.randomLongId;
+import static cn.iocoder.dashboard.util.test.RandomUtils.randomPojo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
 

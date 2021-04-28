@@ -1,7 +1,7 @@
 package cn.iocoder.dashboard.modules.system.service.sms;
 
 import cn.hutool.core.map.MapUtil;
-import cn.iocoder.dashboard.BaseMockitoUnitTest;
+import cn.iocoder.dashboard.framework.test.core.BaseMockitoUnitTest;
 import cn.iocoder.dashboard.common.core.KeyValue;
 import cn.iocoder.dashboard.common.enums.CommonStatusEnum;
 import cn.iocoder.dashboard.common.enums.UserTypeEnum;
@@ -25,8 +25,8 @@ import java.util.Map;
 
 import static cn.hutool.core.util.RandomUtil.randomEle;
 import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.*;
-import static cn.iocoder.dashboard.util.AssertUtils.assertServiceException;
-import static cn.iocoder.dashboard.util.RandomUtils.*;
+import static cn.iocoder.dashboard.util.test.AssertUtils.assertServiceException;
+import static cn.iocoder.dashboard.util.test.RandomUtils.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;

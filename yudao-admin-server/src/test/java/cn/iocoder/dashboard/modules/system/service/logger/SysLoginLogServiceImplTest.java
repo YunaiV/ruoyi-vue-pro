@@ -1,11 +1,8 @@
 package cn.iocoder.dashboard.modules.system.service.logger;
 
-import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.RandomUtil;
-import cn.hutool.core.util.ReflectUtil;
 import cn.iocoder.dashboard.BaseDbUnitTest;
 import cn.iocoder.dashboard.common.pojo.PageResult;
-import cn.iocoder.dashboard.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.dashboard.framework.tracer.core.util.TracerUtils;
 import cn.iocoder.dashboard.modules.system.controller.logger.vo.loginlog.SysLoginLogCreateReqVO;
 import cn.iocoder.dashboard.modules.system.controller.logger.vo.loginlog.SysLoginLogExportReqVO;
@@ -15,18 +12,15 @@ import cn.iocoder.dashboard.modules.system.dal.mysql.logger.SysLoginLogMapper;
 import cn.iocoder.dashboard.modules.system.enums.logger.SysLoginLogTypeEnum;
 import cn.iocoder.dashboard.modules.system.enums.logger.SysLoginResultEnum;
 import cn.iocoder.dashboard.modules.system.service.logger.impl.SysLoginLogServiceImpl;
-import cn.iocoder.dashboard.util.RandomUtils;
+import cn.iocoder.dashboard.util.test.RandomUtils;
 import cn.iocoder.dashboard.util.object.ObjectUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
-import java.lang.reflect.Field;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
-import static cn.iocoder.dashboard.util.AssertUtils.assertPojoEquals;
+import static cn.iocoder.dashboard.util.test.AssertUtils.assertPojoEquals;
 import static cn.iocoder.dashboard.util.date.DateUtils.buildTime;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

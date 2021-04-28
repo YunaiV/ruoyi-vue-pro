@@ -1,10 +1,10 @@
 package cn.iocoder.dashboard.modules.infra.service.job;
 
 import static cn.hutool.core.util.RandomUtil.randomEle;
-import static cn.iocoder.dashboard.util.AssertUtils.assertPojoEquals;
-import static cn.iocoder.dashboard.util.RandomUtils.randomLongId;
-import static cn.iocoder.dashboard.util.RandomUtils.randomPojo;
-import static cn.iocoder.dashboard.util.RandomUtils.randomString;
+import static cn.iocoder.dashboard.util.test.AssertUtils.assertPojoEquals;
+import static cn.iocoder.dashboard.util.test.RandomUtils.randomLongId;
+import static cn.iocoder.dashboard.util.test.RandomUtils.randomPojo;
+import static cn.iocoder.dashboard.util.test.RandomUtils.randomString;
 import static cn.iocoder.dashboard.util.date.DateUtils.buildTime;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;

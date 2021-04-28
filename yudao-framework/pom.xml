@@ -39,19 +39,9 @@
         <skywalking.version>8.5.0</skywalking.version>
         <logback.encoder.version>6.1</logback.encoder.version>
         <spring-boot-admin.version>2.3.1</spring-boot-admin.version>
-        <!-- 工具类相关 -->
-        <lombok.version>1.16.14</lombok.version>
-        <mapstruct.version>1.4.1.Final</mapstruct.version>
-        <hutool.version>5.6.1</hutool.version>
-        <easyexcel.verion>2.2.7</easyexcel.verion>
-        <velocity.version>2.2</velocity.version>
-        <screw.version>1.0.5</screw.version>
+        <!-- Test 测试相关 -->
         <podam.version>7.2.6.RELEASE</podam.version>
         <jedis-mock.version>0.1.16</jedis-mock.version>
-        <!-- 三方云服务相关 -->
-        <aliyun-java-sdk-core.version>4.5.18</aliyun-java-sdk-core.version>
-        <aliyun-java-sdk-dysmsapi.version>2.1.0</aliyun-java-sdk-dysmsapi.version>
-        <yunpian-java-sdk.version>1.2.7</yunpian-java-sdk.version>
     </properties>
 
     <!-- 依赖声明 -->
@@ -250,48 +240,40 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>${lombok.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct</artifactId> <!-- use mapstruct-jdk8 for Java 8 or higher -->
-            <version>${mapstruct.version}</version>
         </dependency>
         <dependency>
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct-processor</artifactId>
-            <version>${mapstruct.version}</version>
             <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct-jdk8</artifactId>
-            <version>${mapstruct.version}</version>
         </dependency>
 
         <dependency>
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-all</artifactId>
-            <version>${hutool.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>easyexcel</artifactId>
-            <version>${easyexcel.verion}</version>
         </dependency>
 
         <dependency>
             <groupId>org.apache.velocity</groupId>
             <artifactId>velocity-engine-core</artifactId>
-            <version>${velocity.version}</version>
         </dependency>
 
         <dependency>
             <groupId>cn.smallbun.screw</groupId>
             <artifactId>screw-core</artifactId> <!-- 实现数据库文档 -->
-            <version>${screw.version}</version>
         </dependency>
 
         <!-- 三方云服务相关 -->
@@ -300,18 +282,15 @@
         <dependency>
             <groupId>com.yunpian.sdk</groupId>
             <artifactId>yunpian-java-sdk</artifactId>
-            <version>${yunpian-java-sdk.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.aliyun</groupId>
             <artifactId>aliyun-java-sdk-core</artifactId>
-            <version>${aliyun-java-sdk-core.version}</version>
         </dependency>
         <dependency>
             <groupId>com.aliyun</groupId>
             <artifactId>aliyun-java-sdk-dysmsapi</artifactId>
-            <version>${aliyun-java-sdk-dysmsapi.version}</version>
         </dependency>
         <!-- SMS SDK end -->
 

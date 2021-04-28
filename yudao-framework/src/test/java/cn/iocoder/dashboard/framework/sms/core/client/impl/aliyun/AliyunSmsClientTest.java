@@ -1,7 +1,7 @@
 package cn.iocoder.dashboard.framework.sms.core.client.impl.aliyun;
 
 import cn.hutool.core.util.ReflectUtil;
-import cn.iocoder.dashboard.BaseMockitoUnitTest;
+import cn.iocoder.dashboard.framework.test.core.BaseMockitoUnitTest;
 import cn.iocoder.dashboard.common.core.KeyValue;
 import cn.iocoder.dashboard.common.exception.enums.GlobalErrorCodeConstants;
 import cn.iocoder.dashboard.framework.sms.core.client.SmsCommonResult;
@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.function.Function;
 
 import static cn.iocoder.dashboard.framework.sms.core.enums.SmsFrameworkErrorCodeConstants.SMS_API_PARAM_ERROR;
-import static cn.iocoder.dashboard.util.RandomUtils.*;
+import static cn.iocoder.dashboard.util.test.RandomUtils.*;
 import static cn.iocoder.dashboard.util.json.JsonUtils.toJsonString;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;

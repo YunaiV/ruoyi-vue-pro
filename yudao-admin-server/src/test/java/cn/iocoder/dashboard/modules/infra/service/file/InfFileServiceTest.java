@@ -16,10 +16,10 @@ import javax.annotation.Resource;
 
 import static cn.iocoder.dashboard.modules.infra.enums.InfErrorCodeConstants.FILE_NOT_EXISTS;
 import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.FILE_PATH_EXISTS;
-import static cn.iocoder.dashboard.util.AssertUtils.assertPojoEquals;
-import static cn.iocoder.dashboard.util.AssertUtils.assertServiceException;
-import static cn.iocoder.dashboard.util.RandomUtils.randomPojo;
-import static cn.iocoder.dashboard.util.RandomUtils.randomString;
+import static cn.iocoder.dashboard.util.test.AssertUtils.assertPojoEquals;
+import static cn.iocoder.dashboard.util.test.AssertUtils.assertServiceException;
+import static cn.iocoder.dashboard.util.test.RandomUtils.randomPojo;
+import static cn.iocoder.dashboard.util.test.RandomUtils.randomString;
 import static cn.iocoder.dashboard.util.date.DateUtils.buildTime;
 import static org.junit.jupiter.api.Assertions.*;
 

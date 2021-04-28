@@ -1,4 +1,4 @@
-package cn.iocoder.dashboard;
+package cn.iocoder.dashboard.framework.test.core;
 
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;

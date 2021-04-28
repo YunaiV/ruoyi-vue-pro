@@ -13,7 +13,7 @@ import cn.iocoder.dashboard.modules.system.enums.permission.MenuTypeEnum;
 import cn.iocoder.dashboard.modules.system.mq.producer.permission.SysMenuProducer;
 import cn.iocoder.dashboard.modules.system.service.permission.impl.SysMenuServiceImpl;
 import cn.iocoder.dashboard.util.sping.SpringAopUtils;
-import cn.iocoder.dashboard.util.RandomUtils;
+import cn.iocoder.dashboard.util.test.RandomUtils;
 import cn.iocoder.dashboard.util.object.ObjectUtils;
 import com.google.common.collect.Multimap;
 import org.junit.jupiter.api.Assertions;
@@ -25,9 +25,9 @@ import javax.annotation.Resource;
 import java.util.*;
 
 import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.*;
-import static cn.iocoder.dashboard.util.AssertUtils.assertPojoEquals;
-import static cn.iocoder.dashboard.util.AssertUtils.assertServiceException;
-import static cn.iocoder.dashboard.util.RandomUtils.*;
+import static cn.iocoder.dashboard.util.test.AssertUtils.assertPojoEquals;
+import static cn.iocoder.dashboard.util.test.AssertUtils.assertServiceException;
+import static cn.iocoder.dashboard.util.test.RandomUtils.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
 
