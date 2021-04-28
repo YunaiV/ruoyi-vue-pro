@@ -39,24 +39,7 @@
         <skywalking.version>8.5.0</skywalking.version>
         <logback.encoder.version>6.1</logback.encoder.version>
         <spring-boot-admin.version>2.3.1</spring-boot-admin.version>
-        <!-- Test 测试相关 -->
-        <podam.version>7.2.6.RELEASE</podam.version>
-        <jedis-mock.version>0.1.16</jedis-mock.version>
     </properties>
-
-    <!-- 依赖声明 -->
-    <dependencyManagement>
-        <dependencies>
-            <!-- 统一依赖管理 -->
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-dependencies</artifactId>
-                <version>${spring.boot.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
 
     <dependencies>
         <!-- Spring 核心 -->
@@ -205,34 +188,27 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
-<!--            <scope>test</scope>--> <!-- TODO 调整依赖 scope -->
+            <scope>provided</scope> <!-- 特殊，因为默认是 test 类型，会导致编译不通过，所以设置为 provided  -->
             <optional>true</optional>
-            <exclusions>
-                <exclusion>
-                    <artifactId>asm</artifactId>
-                    <groupId>org.ow2.asm</groupId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
         <dependency>
             <groupId>com.h2database</groupId> <!-- 单元测试，我们采用 H2 作为数据库 -->
             <artifactId>h2</artifactId>
-            <scope>test</scope>
+            <optional>true</optional>
         </dependency>
 
         <dependency>
             <groupId>com.github.fppt</groupId> <!-- 单元测试，我们采用内嵌的 Redis 数据库 -->
             <artifactId>jedis-mock</artifactId>
-            <version>${jedis-mock.version}</version>
-            <scope>test</scope>
+            <scope>provided</scope> <!-- 特殊，因为默认是 test 类型，会导致编译不通过，所以设置为 provided  -->
+            <optional>true</optional>
         </dependency>
 
         <dependency>
             <groupId>uk.co.jemos.podam</groupId> <!-- 单元测试，随机生成 POJO 类 -->
             <artifactId>podam</artifactId>
-            <version>${podam.version}</version>
-            <!--            <scope>test</scope>--> <!-- TODO 调整依赖 scope -->
+            <scope>provided</scope> <!-- 特殊，因为默认是 test 类型，会导致编译不通过，所以设置为 provided  -->
             <optional>true</optional>
         </dependency>
 
@@ -248,12 +224,11 @@
         </dependency>
         <dependency>
             <groupId>org.mapstruct</groupId>
-            <artifactId>mapstruct-processor</artifactId>
-            <optional>true</optional>
+            <artifactId>mapstruct-jdk8</artifactId>
         </dependency>
         <dependency>
             <groupId>org.mapstruct</groupId>
-            <artifactId>mapstruct-jdk8</artifactId>
+            <artifactId>mapstruct-processor</artifactId>
         </dependency>
 
         <dependency>
@@ -264,16 +239,19 @@
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>easyexcel</artifactId>
+            <optional>true</optional>
         </dependency>
 
         <dependency>
             <groupId>org.apache.velocity</groupId>
             <artifactId>velocity-engine-core</artifactId>
+            <optional>true</optional>
         </dependency>
 
         <dependency>
             <groupId>cn.smallbun.screw</groupId>
             <artifactId>screw-core</artifactId> <!-- 实现数据库文档 -->
+            <optional>true</optional>
         </dependency>
 
         <!-- 三方云服务相关 -->
@@ -282,15 +260,18 @@
         <dependency>
             <groupId>com.yunpian.sdk</groupId>
             <artifactId>yunpian-java-sdk</artifactId>
+            <optional>true</optional>
         </dependency>
 
         <dependency>
             <groupId>com.aliyun</groupId>
             <artifactId>aliyun-java-sdk-core</artifactId>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>com.aliyun</groupId>
             <artifactId>aliyun-java-sdk-dysmsapi</artifactId>
+            <optional>true</optional>
         </dependency>
         <!-- SMS SDK end -->
 
@@ -304,40 +285,12 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>${spring.boot.version}</version>
-                <configuration>
-                    <fork>true</fork>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>repackage</goal> <!-- 将原来的 jar 打入其中 -->
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
 
             <!-- 提供给 mapstruct 使用 -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>${maven-compiler-plugin.version}</version>
-                <configuration>
-                    <source>${java.version}</source> <!-- or higher, depending on your project -->
-                    <target>${java.version}</target> <!-- or higher, depending on your project -->
-                    <annotationProcessorPaths>
-                        <path>
-                            <groupId>org.mapstruct</groupId>
-                            <artifactId>mapstruct-processor</artifactId>
-                            <version>${mapstruct.version}</version>
-                        </path>
-                        <path>
-                            <groupId>org.projectlombok</groupId>
-                            <artifactId>lombok</artifactId>
-                            <version>${lombok.version}</version>
-                        </path>
-                    </annotationProcessorPaths>
-                </configuration>
             </plugin>
         </plugins>
     </build>
