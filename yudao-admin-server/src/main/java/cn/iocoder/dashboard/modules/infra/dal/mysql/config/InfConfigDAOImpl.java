@@ -1,6 +1,7 @@
 package cn.iocoder.dashboard.modules.infra.dal.mysql.config;
 
 import cn.iocoder.dashboard.framework.apollo.internals.ConfigFrameworkDAO;
+import cn.iocoder.dashboard.framework.apollo.internals.dto.ConfigRespDTO;
 import cn.iocoder.dashboard.modules.infra.dal.dataobject.config.InfConfigDO;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -32,8 +33,8 @@ public class InfConfigDAOImpl implements ConfigFrameworkDAO {
     }
 
     @Override
-    public List<InfConfigDO> selectList() {
-        return jdbcTemplate.query("SELECT `key`, `value`, update_time, deleted FROM inf_config", new BeanPropertyRowMapper<>(InfConfigDO.class));
+    public List<ConfigRespDTO> selectList() {
+        return jdbcTemplate.query("SELECT `key`, `value`, update_time, deleted FROM inf_config", new BeanPropertyRowMapper<>(ConfigRespDTO.class));
     }
 
 }

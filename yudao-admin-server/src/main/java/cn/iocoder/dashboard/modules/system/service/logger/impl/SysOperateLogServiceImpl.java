@@ -3,7 +3,7 @@ package cn.iocoder.dashboard.modules.system.service.logger.impl;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.dashboard.common.pojo.PageResult;
-import cn.iocoder.dashboard.modules.system.controller.logger.vo.operatelog.SysOperateLogCreateReqVO;
+import cn.iocoder.dashboard.framework.logger.operatelog.core.dto.OperateLogCreateReqDTO;
 import cn.iocoder.dashboard.modules.system.controller.logger.vo.operatelog.SysOperateLogExportReqVO;
 import cn.iocoder.dashboard.modules.system.controller.logger.vo.operatelog.SysOperateLogPageReqVO;
 import cn.iocoder.dashboard.modules.system.convert.logger.SysOperateLogConvert;
@@ -40,7 +40,7 @@ public class SysOperateLogServiceImpl implements SysOperateLogService {
 
     @Override
     @Async
-    public Future<Boolean> createOperateLogAsync(SysOperateLogCreateReqVO reqVO) {
+    public Future<Boolean> createOperateLogAsync(OperateLogCreateReqDTO reqVO) {
         boolean success = false;
         try {
             SysOperateLogDO logDO = SysOperateLogConvert.INSTANCE.convert(reqVO);

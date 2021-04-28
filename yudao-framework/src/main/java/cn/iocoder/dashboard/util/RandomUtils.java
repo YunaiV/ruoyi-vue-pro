@@ -3,7 +3,6 @@ package cn.iocoder.dashboard.util;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.iocoder.dashboard.common.enums.CommonStatusEnum;
-import cn.iocoder.dashboard.modules.system.dal.dataobject.user.SysUserDO;
 import uk.co.jemos.podam.api.PodamFactory;
 import uk.co.jemos.podam.api.PodamFactoryImpl;
 
@@ -69,11 +68,6 @@ public class RandomUtils {
 
     public static Integer randomCommonStatus() {
         return RandomUtil.randomEle(CommonStatusEnum.values()).getStatus();
-    }
-
-    @SafeVarargs
-    public static SysUserDO randomUserDO(Consumer<SysUserDO>... consumers) {
-        return randomPojo(SysUserDO.class, consumers);
     }
 
     @SafeVarargs

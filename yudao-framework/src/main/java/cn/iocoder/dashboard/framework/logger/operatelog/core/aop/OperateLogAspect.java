@@ -6,11 +6,11 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.servlet.ServletUtil;
 import cn.iocoder.dashboard.common.pojo.CommonResult;
 import cn.iocoder.dashboard.framework.logger.operatelog.core.annotations.OperateLog;
+import cn.iocoder.dashboard.framework.logger.operatelog.core.dto.OperateLogCreateReqDTO;
 import cn.iocoder.dashboard.framework.logger.operatelog.core.enums.OperateTypeEnum;
 import cn.iocoder.dashboard.framework.logger.operatelog.core.service.OperateLogFrameworkService;
 import cn.iocoder.dashboard.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.dashboard.framework.tracer.core.util.TracerUtils;
-import cn.iocoder.dashboard.modules.system.controller.logger.vo.operatelog.SysOperateLogCreateReqVO;
 import cn.iocoder.dashboard.util.json.JsonUtils;
 import cn.iocoder.dashboard.util.servlet.ServletUtils;
 import com.google.common.collect.Maps;
@@ -55,13 +55,13 @@ public class OperateLogAspect {
     /**
      * 用于记录操作内容的上下文
      *
-     * @see SysOperateLogCreateReqVO#getContent()
+     * @see OperateLogCreateReqDTO#getContent()
      */
     private static final ThreadLocal<String> CONTENT = new ThreadLocal<>();
     /**
      * 用于记录拓展字段的上下文
      *
-     * @see SysOperateLogCreateReqVO#getExts()
+     * @see OperateLogCreateReqDTO#getExts()
      */
     private static final ThreadLocal<Map<String, Object>> EXTS = new ThreadLocal<>();
 
@@ -130,106 +130,106 @@ public class OperateLogAspect {
 
     private void log0(ProceedingJoinPoint joinPoint, OperateLog operateLog, ApiOperation apiOperation,
                       Date startTime, Object result, Throwable exception) {
-        SysOperateLogCreateReqVO operateLogVO = new SysOperateLogCreateReqVO();
+        OperateLogCreateReqDTO operateLogDTO = new OperateLogCreateReqDTO();
         // 补全通用字段
-        operateLogVO.setTraceId(TracerUtils.getTraceId());
-        operateLogVO.setStartTime(startTime);
+        operateLogDTO.setTraceId(TracerUtils.getTraceId());
+        operateLogDTO.setStartTime(startTime);
         // 补充用户信息
-        fillUserFields(operateLogVO);
+        fillUserFields(operateLogDTO);
         // 补全模块信息
-        fillModuleFields(operateLogVO, joinPoint, operateLog, apiOperation);
+        fillModuleFields(operateLogDTO, joinPoint, operateLog, apiOperation);
         // 补全请求信息
-        fillRequestFields(operateLogVO);
+        fillRequestFields(operateLogDTO);
         // 补全方法信息
-        fillMethodFields(operateLogVO, joinPoint, operateLog, startTime, result, exception);
+        fillMethodFields(operateLogDTO, joinPoint, operateLog, startTime, result, exception);
 
         // 异步记录日志
-        operateLogFrameworkService.createOperateLogAsync(operateLogVO);
+        operateLogFrameworkService.createOperateLogAsync(operateLogDTO);
     }
 
-    private static void fillUserFields(SysOperateLogCreateReqVO operateLogVO) {
-        operateLogVO.setUserId(SecurityFrameworkUtils.getLoginUserId());
+    private static void fillUserFields(OperateLogCreateReqDTO operateLogDTO) {
+        operateLogDTO.setUserId(SecurityFrameworkUtils.getLoginUserId());
     }
 
-    private static void fillModuleFields(SysOperateLogCreateReqVO operateLogVO,
+    private static void fillModuleFields(OperateLogCreateReqDTO operateLogDTO,
                                          ProceedingJoinPoint joinPoint, OperateLog operateLog, ApiOperation apiOperation) {
         // module 属性
         if (operateLog != null) {
-            operateLogVO.setModule(operateLog.module());
+            operateLogDTO.setModule(operateLog.module());
         }
-        if (StrUtil.isEmpty(operateLogVO.getModule())) {
+        if (StrUtil.isEmpty(operateLogDTO.getModule())) {
             Api api = getClassAnnotation(joinPoint, Api.class);
             if (api != null) {
                 // 优先读取 @API 的 name 属性
                 if (StrUtil.isNotEmpty(api.value())) {
-                    operateLogVO.setModule(api.value());
+                    operateLogDTO.setModule(api.value());
                 }
                 // 没有的话，读取 @API 的 tags 属性
-                if (StrUtil.isEmpty(operateLogVO.getModule()) && ArrayUtil.isNotEmpty(api.tags())) {
-                    operateLogVO.setModule(api.tags()[0]);
+                if (StrUtil.isEmpty(operateLogDTO.getModule()) && ArrayUtil.isNotEmpty(api.tags())) {
+                    operateLogDTO.setModule(api.tags()[0]);
                 }
             }
         }
         // name 属性
         if (operateLog != null) {
-            operateLogVO.setName(operateLog.name());
+            operateLogDTO.setName(operateLog.name());
         }
-        if (StrUtil.isEmpty(operateLogVO.getName()) && apiOperation != null) {
-            operateLogVO.setName(apiOperation.value());
+        if (StrUtil.isEmpty(operateLogDTO.getName()) && apiOperation != null) {
+            operateLogDTO.setName(apiOperation.value());
         }
         // type 属性
         if (operateLog != null && ArrayUtil.isNotEmpty(operateLog.type())) {
-            operateLogVO.setType(operateLog.type()[0].getType());
+            operateLogDTO.setType(operateLog.type()[0].getType());
         }
-        if (operateLogVO.getType() == null) {
+        if (operateLogDTO.getType() == null) {
             RequestMethod requestMethod = obtainFirstMatchRequestMethod(obtainRequestMethod(joinPoint));
             OperateTypeEnum operateLogType = convertOperateLogType(requestMethod);
-            operateLogVO.setType(operateLogType != null ? operateLogType.getType() : null);
+            operateLogDTO.setType(operateLogType != null ? operateLogType.getType() : null);
         }
         // content 和 exts 属性
-        operateLogVO.setContent(CONTENT.get());
-        operateLogVO.setExts(EXTS.get());
+        operateLogDTO.setContent(CONTENT.get());
+        operateLogDTO.setExts(EXTS.get());
     }
 
-    private static void fillRequestFields(SysOperateLogCreateReqVO operateLogVO) {
+    private static void fillRequestFields(OperateLogCreateReqDTO operateLogDTO) {
         // 获得 Request 对象
         HttpServletRequest request = ServletUtils.getRequest();
         if (request == null) {
             return;
         }
         // 补全请求信息
-        operateLogVO.setRequestMethod(request.getMethod());
-        operateLogVO.setRequestUrl(request.getRequestURI());
-        operateLogVO.setUserIp(ServletUtil.getClientIP(request));
-        operateLogVO.setUserAgent(ServletUtils.getUserAgent(request));
+        operateLogDTO.setRequestMethod(request.getMethod());
+        operateLogDTO.setRequestUrl(request.getRequestURI());
+        operateLogDTO.setUserIp(ServletUtil.getClientIP(request));
+        operateLogDTO.setUserAgent(ServletUtils.getUserAgent(request));
     }
 
-    private static void fillMethodFields(SysOperateLogCreateReqVO operateLogVO,
+    private static void fillMethodFields(OperateLogCreateReqDTO operateLogDTO,
                                          ProceedingJoinPoint joinPoint, OperateLog operateLog,
                                          Date startTime, Object result, Throwable exception) {
         MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
-        operateLogVO.setJavaMethod(methodSignature.toString());
+        operateLogDTO.setJavaMethod(methodSignature.toString());
         if (operateLog == null || operateLog.logArgs()) {
-            operateLogVO.setJavaMethodArgs(obtainMethodArgs(joinPoint));
+            operateLogDTO.setJavaMethodArgs(obtainMethodArgs(joinPoint));
         }
         if (operateLog == null || operateLog.logResultData()) {
-            operateLogVO.setResultData(obtainResultData(result));
+            operateLogDTO.setResultData(obtainResultData(result));
         }
-        operateLogVO.setDuration((int) (System.currentTimeMillis() - startTime.getTime()));
+        operateLogDTO.setDuration((int) (System.currentTimeMillis() - startTime.getTime()));
         // （正常）处理 resultCode 和 resultMsg 字段
         if (result != null) {
             if (result instanceof CommonResult) {
                 CommonResult<?> commonResult = (CommonResult<?>) result;
-                operateLogVO.setResultCode(commonResult.getCode());
-                operateLogVO.setResultMsg(commonResult.getMsg());
+                operateLogDTO.setResultCode(commonResult.getCode());
+                operateLogDTO.setResultMsg(commonResult.getMsg());
             } else {
-                operateLogVO.setResultCode(SUCCESS.getCode());
+                operateLogDTO.setResultCode(SUCCESS.getCode());
             }
         }
         // （异常）处理 resultCode 和 resultMsg 字段
         if (exception != null) {
-            operateLogVO.setResultCode(INTERNAL_SERVER_ERROR.getCode());
-            operateLogVO.setResultMsg(ExceptionUtil.getRootCauseMessage(exception));
+            operateLogDTO.setResultCode(INTERNAL_SERVER_ERROR.getCode());
+            operateLogDTO.setResultMsg(ExceptionUtil.getRootCauseMessage(exception));
         }
     }
 

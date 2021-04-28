@@ -7,12 +7,37 @@
     <groupId>cn.iocoder.boot</groupId>
     <artifactId>yudao-admin-server</artifactId>
     <version>${revision}</version>
+
     <packaging>jar</packaging>
 
     <name>yudao-admin-server</name>
     <description>管理后台 Server，提供其 API 接口</description>
     <url>https://github.com/YunaiV/ruoyi-vue-pro</url>
 
+    <properties>
+        <revision>1.0.0</revision>
+    </properties>
 
+    <dependencies>
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-framework</artifactId>
+            <version>${revision}</version>
+        </dependency>
+    </dependencies>
+
+    <!-- TODO 稍后清理掉 -->
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>8</source>
+                    <target>8</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

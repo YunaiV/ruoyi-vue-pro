@@ -2,9 +2,8 @@ package cn.iocoder.dashboard.framework.apollo.internals;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.dashboard.framework.apollo.core.ConfigConsts;
+import cn.iocoder.dashboard.framework.apollo.internals.dto.ConfigRespDTO;
 import cn.iocoder.dashboard.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.dashboard.modules.infra.dal.mysql.config.InfConfigDAOImpl;
-import cn.iocoder.dashboard.modules.infra.dal.dataobject.config.InfConfigDO;
 import com.ctrip.framework.apollo.Apollo;
 import com.ctrip.framework.apollo.build.ApolloInjector;
 import com.ctrip.framework.apollo.core.utils.ApolloThreadFactory;
@@ -59,6 +58,7 @@ public class DBConfigRepository extends AbstractConfigRepository {
         this.propertiesFactory = ApolloInjector.getInstance(PropertiesFactory.class);
         this.m_configUtil = ApolloInjector.getInstance(ConfigUtil.class);
         // 初始化 DB
+        cn.iocoder.dashboard.modules.infra.dal.mysql.config
         this.configFrameworkDAO = new InfConfigDAOImpl(System.getProperty(ConfigConsts.APOLLO_JDBC_URL),
                 System.getProperty(ConfigConsts.APOLLO_JDBC_USERNAME), System.getProperty(ConfigConsts.APOLLO_JDBC_PASSWORD));
 
@@ -84,7 +84,7 @@ public class DBConfigRepository extends AbstractConfigRepository {
     @Override
     protected void sync() {
         // 第一步，尝试获取配置
-        List<InfConfigDO> configs = this.loadConfigIfUpdate(this.maxUpdateTime);
+        List<ConfigRespDTO> configs = this.loadConfigIfUpdate(this.maxUpdateTime);
         if (CollUtil.isEmpty(configs)) { // 如果没有更新，则返回
             return;
         }
@@ -94,7 +94,7 @@ public class DBConfigRepository extends AbstractConfigRepository {
         this.m_configCache = newProperties;
         // 第三步，获取最大的配置时间
         assert configs.size() > 0; // 断言，避免告警
-        this.maxUpdateTime = configs.stream().max(Comparator.comparing(BaseDO::getUpdateTime)).get().getUpdateTime();
+        this.maxUpdateTime = configs.stream().max(Comparator.comparing(ConfigRespDTO::getUpdateTime)).get().getUpdateTime();
         // 第四部，触发配置刷新！重要！！！！
         super.fireRepositoryChange(m_namespace, newProperties);
         log.info("[sync][缓存配置，数量为:{}]", configs.size());
@@ -120,9 +120,9 @@ public class DBConfigRepository extends AbstractConfigRepository {
         return ConfigSourceType.REMOTE;
     }
 
-    private Properties buildProperties(List<InfConfigDO> configs) {
+    private Properties buildProperties(List<ConfigRespDTO> configs) {
         Properties properties = propertiesFactory.getPropertiesInstance();
-        configs.stream().filter(BaseDO::getDeleted) // 过滤掉被删除的配置
+        configs.stream().filter(ConfigRespDTO::getDeleted) // 过滤掉被删除的配置
                 .forEach(config -> properties.put(config.getKey(), config.getValue()));
         return properties;
     }
@@ -153,7 +153,7 @@ public class DBConfigRepository extends AbstractConfigRepository {
      * @param maxUpdateTime 当前配置的最大更新时间
      * @return 配置列表
      */
-    private List<InfConfigDO> loadConfigIfUpdate(Date maxUpdateTime) {
+    private List<ConfigRespDTO> loadConfigIfUpdate(Date maxUpdateTime) {
         // 第一步，判断是否要更新。
         if (maxUpdateTime == null) { // 如果更新时间为空，说明 DB 一定有新数据
             log.info("[loadConfigIfUpdate][首次加载全量配置]");

@@ -1,12 +1,16 @@
 package cn.iocoder.dashboard.framework.apollo.internals;
 
-import cn.iocoder.dashboard.modules.infra.dal.dataobject.config.InfConfigDO;
+import cn.iocoder.dashboard.framework.apollo.internals.dto.ConfigRespDTO;
 
 import java.util.Date;
 import java.util.List;
 
 /**
  * 配置 Framework DAO 接口
+ *
+ * 注意，实现类必须提供 (String jdbcUrl, String username, String password) 构造方法
+ *
+ * @author 芋道源码
  */
 public interface ConfigFrameworkDAO {
 
@@ -23,6 +27,6 @@ public interface ConfigFrameworkDAO {
      *
      * @return 配置列表
      */
-    List<InfConfigDO> selectList();
+    List<ConfigRespDTO> selectList();
 
 }

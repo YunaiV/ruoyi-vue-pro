@@ -1,6 +1,7 @@
 package cn.iocoder.dashboard.modules.system.convert.dict;
 
 import cn.iocoder.dashboard.common.pojo.PageResult;
+import cn.iocoder.dashboard.framework.dict.core.dto.DictDataRespDTO;
 import cn.iocoder.dashboard.modules.system.controller.dict.vo.type.*;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.dict.SysDictTypeDO;
 import org.mapstruct.Mapper;

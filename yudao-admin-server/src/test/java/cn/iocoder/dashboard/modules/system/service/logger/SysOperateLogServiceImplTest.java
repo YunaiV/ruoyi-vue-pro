@@ -7,7 +7,7 @@ import cn.iocoder.dashboard.common.exception.enums.GlobalErrorCodeConstants;
 import cn.iocoder.dashboard.common.pojo.PageResult;
 import cn.iocoder.dashboard.framework.logger.operatelog.core.enums.OperateTypeEnum;
 import cn.iocoder.dashboard.framework.tracer.core.util.TracerUtils;
-import cn.iocoder.dashboard.modules.system.controller.logger.vo.operatelog.SysOperateLogCreateReqVO;
+import cn.iocoder.dashboard.framework.logger.operatelog.core.dto.OperateLogCreateReqDTO;
 import cn.iocoder.dashboard.modules.system.controller.logger.vo.operatelog.SysOperateLogExportReqVO;
 import cn.iocoder.dashboard.modules.system.controller.logger.vo.operatelog.SysOperateLogPageReqVO;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.logger.SysOperateLogDO;
@@ -48,7 +48,7 @@ public class SysOperateLogServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testCreateOperateLogAsync() throws InterruptedException, ExecutionException {
         String traceId = TracerUtils.getTraceId();
-        SysOperateLogCreateReqVO reqVO = RandomUtils.randomPojo(SysOperateLogCreateReqVO.class, o -> {
+        OperateLogCreateReqDTO reqVO = RandomUtils.randomPojo(OperateLogCreateReqDTO.class, o -> {
             o.setTraceId(traceId);
             o.setUserId(randomLongId());
             o.setExts(MapUtil.<String, Object>builder("orderId", randomLongId()).build());

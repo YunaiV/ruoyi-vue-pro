@@ -9,6 +9,10 @@ package cn.iocoder.dashboard.framework.apollo.core;
  */
 public class ConfigConsts {
 
+    /**
+     * {@link cn.iocoder.dashboard.framework.apollo.internals.ConfigFrameworkDAO} 的实现类
+     */
+    public static final String APOLLO_JDBC_DAO = "apollo.jdbc.dao";
     public static final String APOLLO_JDBC_URL = "apollo.jdbc.url";
     public static final String APOLLO_JDBC_USERNAME = "apollo.jdbc.username";
     public static final String APOLLO_JDBC_PASSWORD = "apollo.jdbc.password";

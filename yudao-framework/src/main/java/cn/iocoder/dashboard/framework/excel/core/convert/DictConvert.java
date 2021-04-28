@@ -2,9 +2,9 @@ package cn.iocoder.dashboard.framework.excel.core.convert;
 
 
 import cn.hutool.core.convert.Convert;
+import cn.iocoder.dashboard.framework.dict.core.dto.DictDataRespDTO;
 import cn.iocoder.dashboard.framework.dict.core.util.DictUtils;
 import cn.iocoder.dashboard.framework.excel.core.annotations.DictFormat;
-import cn.iocoder.dashboard.modules.system.dal.dataobject.dict.SysDictDataDO;
 import cn.iocoder.dashboard.modules.system.enums.dict.SysDictTypeEnum;
 import com.alibaba.excel.converters.Converter;
 import com.alibaba.excel.enums.CellDataTypeEnum;
@@ -14,7 +14,7 @@ import com.alibaba.excel.metadata.property.ExcelContentProperty;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Excel {@link SysDictDataDO} 数据字典转换器
+ * Excel {@link DictDataRespDTO} 数据字典转换器
  *
  * @author 芋道源码
  */
@@ -37,7 +37,7 @@ public class DictConvert implements Converter<Object> {
         // 使用字典解析
         SysDictTypeEnum type = getType(contentProperty);
         String label = cellData.getStringValue();
-        SysDictDataDO dictData = DictUtils.parseDictDataFromCache(type.getValue(), label);
+        DictDataRespDTO dictData = DictUtils.parseDictDataFromCache(type.getValue(), label);
         if (dictData == null) {
             log.error("[convertToJavaData][type({}) 解析不掉 label({})]", type, label);
             return null;
@@ -58,7 +58,7 @@ public class DictConvert implements Converter<Object> {
         // 使用字典格式化
         SysDictTypeEnum type = getType(contentProperty);
         String value = String.valueOf(object);
-        SysDictDataDO dictData = DictUtils.getDictDataFromCache(type.getValue(), value);
+        DictDataRespDTO dictData = DictUtils.getDictDataFromCache(type.getValue(), value);
         if (dictData == null) {
             log.error("[convertToExcelData][type({}) 转换不了 label({})]", type, value);
             return new CellData<>("");

@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.framework.dict.core.service;
 
-import cn.iocoder.dashboard.modules.system.dal.dataobject.dict.SysDictDataDO;
+import cn.iocoder.dashboard.framework.dict.core.dto.DictDataRespDTO;
 
 import java.util.List;
 
@@ -13,7 +13,7 @@ public interface DictDataFrameworkService {
      * @param value 字典数据值
      * @return 字典数据
      */
-    SysDictDataDO getDictDataFromCache(String type, String value);
+    DictDataRespDTO getDictDataFromCache(String type, String value);
 
     /**
      * 解析获得指定的字典数据，从缓存中
@@ -22,7 +22,7 @@ public interface DictDataFrameworkService {
      * @param label 字典数据标签
      * @return 字典数据
      */
-    SysDictDataDO parseDictDataFromCache(String type, String label);
+    DictDataRespDTO parseDictDataFromCache(String type, String label);
 
     /**
      * 获得指定类型的字典数据，从缓存中
@@ -30,6 +30,6 @@ public interface DictDataFrameworkService {
      * @param type 字典类型
      * @return 字典数据列表
      */
-    List<SysDictDataDO> listDictDatasFromCache(String type);
+    List<DictDataRespDTO> listDictDatasFromCache(String type);
 
 }

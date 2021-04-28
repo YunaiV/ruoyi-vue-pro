@@ -3,6 +3,7 @@ package cn.iocoder.dashboard.modules.system.service.dict.impl;
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.dashboard.common.enums.CommonStatusEnum;
 import cn.iocoder.dashboard.common.pojo.PageResult;
+import cn.iocoder.dashboard.framework.dict.core.dto.DictDataRespDTO;
 import cn.iocoder.dashboard.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.dashboard.modules.system.controller.dict.vo.data.SysDictDataCreateReqVO;
 import cn.iocoder.dashboard.modules.system.controller.dict.vo.data.SysDictDataExportReqVO;
@@ -23,7 +24,6 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
@@ -239,18 +239,18 @@ public class SysDictDataServiceImpl implements SysDictDataService {
     }
 
     @Override
-    public SysDictDataDO getDictDataFromCache(String type, String value) {
-        return valueDictDataCache.get(type, value);
+    public DictDataRespDTO getDictDataFromCache(String type, String value) {
+        return SysDictDataConvert.INSTANCE.convert02(valueDictDataCache.get(type, value));
     }
 
     @Override
-    public SysDictDataDO parseDictDataFromCache(String type, String label) {
-        return labelDictDataCache.get(type, label);
+    public DictDataRespDTO parseDictDataFromCache(String type, String label) {
+        return SysDictDataConvert.INSTANCE.convert02(labelDictDataCache.get(type, label));
     }
 
     @Override
-    public List<SysDictDataDO> listDictDatasFromCache(String type) {
-        return new ArrayList<>(labelDictDataCache.row(type).values());
+    public List<DictDataRespDTO> listDictDatasFromCache(String type) {
+        return SysDictDataConvert.INSTANCE.convertList03(labelDictDataCache.row(type).values()));
     }
 
 }

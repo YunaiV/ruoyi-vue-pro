@@ -1,7 +1,7 @@
 package cn.iocoder.dashboard.modules.system.convert.logger;
 
 import cn.iocoder.dashboard.common.pojo.PageResult;
-import cn.iocoder.dashboard.modules.system.controller.logger.vo.operatelog.SysOperateLogCreateReqVO;
+import cn.iocoder.dashboard.framework.logger.operatelog.core.dto.OperateLogCreateReqDTO;
 import cn.iocoder.dashboard.modules.system.controller.logger.vo.operatelog.SysOperateLogExcelVO;
 import cn.iocoder.dashboard.modules.system.controller.logger.vo.operatelog.SysOperateLogRespVO;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.logger.SysOperateLogDO;
@@ -21,7 +21,7 @@ public interface SysOperateLogConvert {
 
     SysOperateLogConvert INSTANCE = Mappers.getMapper(SysOperateLogConvert.class);
 
-    SysOperateLogDO convert(SysOperateLogCreateReqVO bean);
+    SysOperateLogDO convert(OperateLogCreateReqDTO bean);
 
     PageResult<SysOperateLogRespVO> convertPage(PageResult<SysOperateLogDO> page);
 

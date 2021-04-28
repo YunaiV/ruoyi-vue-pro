@@ -4,9 +4,9 @@ import cn.hutool.core.util.StrUtil;
 import cn.iocoder.dashboard.common.pojo.CommonResult;
 import cn.iocoder.dashboard.framework.security.config.SecurityProperties;
 import cn.iocoder.dashboard.framework.security.core.LoginUser;
+import cn.iocoder.dashboard.framework.security.core.service.SecurityAuthFrameworkService;
 import cn.iocoder.dashboard.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.dashboard.framework.web.core.handler.GlobalExceptionHandler;
-import cn.iocoder.dashboard.modules.system.service.auth.SysAuthService;
 import cn.iocoder.dashboard.util.servlet.ServletUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -30,7 +30,7 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
     @Resource
     private SecurityProperties securityProperties;
     @Resource
-    private SysAuthService authService;
+    private SecurityAuthFrameworkService authService;
     @Resource
     private GlobalExceptionHandler globalExceptionHandler;
 
