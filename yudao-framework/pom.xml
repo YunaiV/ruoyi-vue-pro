@@ -10,6 +10,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>yudao-framework</artifactId>
+    <packaging>jar</packaging>
+
+    <name>${artifactId}</name>
+    <description>基础框架，各种组件的拓展</description>
+    <url>https://github.com/YunaiV/ruoyi-vue-pro</url>
 
     <properties>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>

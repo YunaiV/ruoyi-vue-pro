@@ -14,7 +14,7 @@
         <module>yudao-admin-server</module>
     </modules>
 
-    <name>yudao</name>
+    <name>${artifactId}</name>
     <description>芋道项目基础脚手架</description>
     <url>https://github.com/YunaiV/ruoyi-vue-pro</url>
 

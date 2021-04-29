@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.framework.sms.core.client.impl.yunpian;
 
-import cn.iocoder.dashboard.framework.test.core.BaseMockitoUnitTest;
+import cn.iocoder.dashboard.framework.BaseMockitoUnitTest;
 import cn.iocoder.dashboard.common.exception.enums.GlobalErrorCodeConstants;
 import cn.iocoder.dashboard.framework.sms.core.enums.SmsFrameworkErrorCodeConstants;
 import org.junit.jupiter.api.Test;
