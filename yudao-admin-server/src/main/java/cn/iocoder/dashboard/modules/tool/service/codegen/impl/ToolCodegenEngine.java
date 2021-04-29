@@ -18,7 +18,6 @@ import cn.iocoder.dashboard.framework.logger.operatelog.core.enums.OperateTypeEn
 import cn.iocoder.dashboard.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.dashboard.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.dashboard.framework.mybatis.core.query.QueryWrapperX;
-import cn.iocoder.dashboard.modules.system.enums.dict.SysDictTypeEnum;
 import cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen.ToolCodegenColumnDO;
 import cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen.ToolCodegenTableDO;
 import cn.iocoder.dashboard.util.collection.CollectionUtils;
@@ -126,7 +125,8 @@ public class ToolCodegenEngine {
         // VO 类，独有字段
         globalBindingMap.put("PageParamClassName", PageParam.class.getName());
         globalBindingMap.put("DictFormatClassName", DictFormat.class.getName());
-        globalBindingMap.put("SysDictTypeEnumClassName", SysDictTypeEnum.class.getName());
+        // TODO 芋艿：代码生成器，解决下枚举类
+//        globalBindingMap.put("SysDictTypeEnumClassName", SysDictTypeEnum.class.getName());
         // DO 类，独有字段
         globalBindingMap.put("baseDOFields", ToolCodegenBuilder.BASE_DO_FIELDS);
         globalBindingMap.put("BaseDOClassName", BaseDO.class.getName());

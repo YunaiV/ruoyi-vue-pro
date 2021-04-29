@@ -2,13 +2,11 @@ package cn.iocoder.dashboard.modules.system.controller.user.vo.user;
 
 import cn.iocoder.dashboard.framework.excel.core.annotations.DictFormat;
 import cn.iocoder.dashboard.framework.excel.core.convert.DictConvert;
+import cn.iocoder.dashboard.modules.system.enums.SysDictTypeConstants;
 import com.alibaba.excel.annotation.ExcelProperty;
 import lombok.Data;
 
 import java.util.Date;
-
-import static cn.iocoder.dashboard.modules.system.enums.dict.SysDictTypeEnum.SYS_COMMON_STATUS;
-import static cn.iocoder.dashboard.modules.system.enums.dict.SysDictTypeEnum.SYS_USER_SEX;
 
 /**
  * 用户 Excel 导出 VO
@@ -32,11 +30,11 @@ public class SysUserExcelVO {
     private String mobile;
 
     @ExcelProperty(value = "用户性别", converter = DictConvert.class)
-    @DictFormat(SYS_USER_SEX)
+    @DictFormat(SysDictTypeConstants.USER_SEX)
     private Integer sex;
 
     @ExcelProperty(value = "帐号状态", converter = DictConvert.class)
-    @DictFormat(SYS_COMMON_STATUS)
+    @DictFormat(SysDictTypeConstants.COMMON_STATUS)
     private Integer status;
 
     @ExcelProperty("最后登录IP")

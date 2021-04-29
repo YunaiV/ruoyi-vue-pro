@@ -2,12 +2,12 @@ package cn.iocoder.dashboard.modules.tool.controller.test.vo;
 
 import cn.iocoder.dashboard.framework.excel.core.annotations.DictFormat;
 import cn.iocoder.dashboard.framework.excel.core.convert.DictConvert;
+import cn.iocoder.dashboard.modules.infra.enums.InfDictTypeConstants;
+import cn.iocoder.dashboard.modules.system.enums.SysDictTypeConstants;
 import com.alibaba.excel.annotation.ExcelProperty;
 import lombok.Data;
 
 import java.util.Date;
-
-import static cn.iocoder.dashboard.modules.system.enums.dict.SysDictTypeEnum.*;
 
 /**
  * 测试示例 Excel VO
@@ -24,15 +24,15 @@ public class ToolTestDemoExcelVO {
     private String name;
 
     @ExcelProperty(value = "状态", converter = DictConvert.class)
-    @DictFormat(SYS_COMMON_STATUS)
+    @DictFormat(SysDictTypeConstants.COMMON_STATUS)
     private Integer status;
 
     @ExcelProperty(value = "类型", converter = DictConvert.class)
-    @DictFormat(SYS_OPERATE_TYPE)
+    @DictFormat(SysDictTypeConstants.OPERATE_TYPE)
     private Integer type;
 
     @ExcelProperty(value = "分类", converter = DictConvert.class)
-    @DictFormat(INF_REDIS_TIMEOUT_TYPE)
+    @DictFormat(InfDictTypeConstants.REDIS_TIMEOUT_TYPE)
     private Integer category;
 
     @ExcelProperty("备注")

@@ -16,12 +16,6 @@
     <description>管理后台 Server，提供其 API 接口</description>
     <url>https://github.com/YunaiV/ruoyi-vue-pro</url>
 
-    <properties>
-        <java.version>1.8</java.version>
-        <maven.compiler.source>${java.version}</maven.compiler.source>
-        <maven.compiler.target>${java.version}</maven.compiler.target>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>cn.iocoder.boot</groupId>

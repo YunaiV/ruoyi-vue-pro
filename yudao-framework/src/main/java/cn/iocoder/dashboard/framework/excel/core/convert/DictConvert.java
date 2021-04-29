@@ -5,7 +5,6 @@ import cn.hutool.core.convert.Convert;
 import cn.iocoder.dashboard.framework.dict.core.dto.DictDataRespDTO;
 import cn.iocoder.dashboard.framework.dict.core.util.DictUtils;
 import cn.iocoder.dashboard.framework.excel.core.annotations.DictFormat;
-import cn.iocoder.dashboard.modules.system.enums.dict.SysDictTypeEnum;
 import com.alibaba.excel.converters.Converter;
 import com.alibaba.excel.enums.CellDataTypeEnum;
 import com.alibaba.excel.metadata.CellData;
@@ -35,9 +34,9 @@ public class DictConvert implements Converter<Object> {
     public Object convertToJavaData(CellData cellData, ExcelContentProperty contentProperty,
                                     GlobalConfiguration globalConfiguration) {
         // 使用字典解析
-        SysDictTypeEnum type = getType(contentProperty);
+        String type = getType(contentProperty);
         String label = cellData.getStringValue();
-        DictDataRespDTO dictData = DictUtils.parseDictDataFromCache(type.getValue(), label);
+        DictDataRespDTO dictData = DictUtils.parseDictDataFromCache(type, label);
         if (dictData == null) {
             log.error("[convertToJavaData][type({}) 解析不掉 label({})]", type, label);
             return null;
@@ -56,9 +55,9 @@ public class DictConvert implements Converter<Object> {
         }
 
         // 使用字典格式化
-        SysDictTypeEnum type = getType(contentProperty);
+        String type = getType(contentProperty);
         String value = String.valueOf(object);
-        DictDataRespDTO dictData = DictUtils.getDictDataFromCache(type.getValue(), value);
+        DictDataRespDTO dictData = DictUtils.getDictDataFromCache(type, value);
         if (dictData == null) {
             log.error("[convertToExcelData][type({}) 转换不了 label({})]", type, value);
             return new CellData<>("");
@@ -67,7 +66,7 @@ public class DictConvert implements Converter<Object> {
         return new CellData<>(dictData.getLabel());
     }
 
-    private static SysDictTypeEnum getType(ExcelContentProperty contentProperty) {
+    private static String getType(ExcelContentProperty contentProperty) {
         return contentProperty.getField().getAnnotation(DictFormat.class).value();
     }
 

@@ -2,13 +2,12 @@ package cn.iocoder.dashboard.modules.infra.controller.logger.vo.apierrorlog;
 
 import cn.iocoder.dashboard.framework.excel.core.annotations.DictFormat;
 import cn.iocoder.dashboard.framework.excel.core.convert.DictConvert;
+import cn.iocoder.dashboard.modules.infra.enums.InfDictTypeConstants;
+import cn.iocoder.dashboard.modules.system.enums.SysDictTypeConstants;
 import com.alibaba.excel.annotation.ExcelProperty;
 import lombok.Data;
 
 import java.util.Date;
-
-import static cn.iocoder.dashboard.modules.system.enums.dict.SysDictTypeEnum.INF_API_ERROR_LOG_PROCESS_STATUS;
-import static cn.iocoder.dashboard.modules.system.enums.dict.SysDictTypeEnum.USER_TYPE;
 
 /**
  * API 错误日志 Excel VO
@@ -28,7 +27,7 @@ public class InfApiErrorLogExcelVO {
     private Integer userId;
 
     @ExcelProperty(value = "用户类型", converter = DictConvert.class)
-    @DictFormat(USER_TYPE)
+    @DictFormat(SysDictTypeConstants.USER_TYPE)
     private Integer userType;
 
     @ExcelProperty("应用名")
@@ -80,7 +79,7 @@ public class InfApiErrorLogExcelVO {
     private Date createTime;
 
     @ExcelProperty(value = "处理状态", converter = DictConvert.class)
-    @DictFormat(INF_API_ERROR_LOG_PROCESS_STATUS)
+    @DictFormat(InfDictTypeConstants.API_ERROR_LOG_PROCESS_STATUS)
     private Integer processStatus;
 
     @ExcelProperty("处理时间")

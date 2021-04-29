@@ -15,14 +15,6 @@
 
     <properties>
         <revision>1.0.0</revision>
-        <!-- Maven 相关 -->
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <resource.delimiter>@</resource.delimiter>
-        <java.version>1.8</java.version>
-        <maven.compiler.source>${java.version}</maven.compiler.source>
-        <maven.compiler.target>${java.version}</maven.compiler.target>
-        <maven-compiler-plugin.version>3.8.0</maven-compiler-plugin.version>
         <!-- 统一依赖管理 -->
         <spring.boot.version>2.4.4</spring.boot.version>
         <!-- Web 相关 -->

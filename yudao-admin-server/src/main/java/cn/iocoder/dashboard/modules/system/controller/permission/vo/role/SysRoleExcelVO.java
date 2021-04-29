@@ -2,7 +2,7 @@ package cn.iocoder.dashboard.modules.system.controller.permission.vo.role;
 
 import cn.iocoder.dashboard.framework.excel.core.annotations.DictFormat;
 import cn.iocoder.dashboard.framework.excel.core.convert.DictConvert;
-import cn.iocoder.dashboard.modules.system.enums.dict.SysDictTypeEnum;
+import cn.iocoder.dashboard.modules.system.enums.SysDictTypeConstants;
 import com.alibaba.excel.annotation.ExcelProperty;
 import lombok.Data;
 
@@ -28,7 +28,7 @@ public class SysRoleExcelVO {
     private Integer dataScope;
 
     @ExcelProperty(value = "角色状态", converter = DictConvert.class)
-    @DictFormat(SysDictTypeEnum.SYS_COMMON_STATUS)
+    @DictFormat(SysDictTypeConstants.COMMON_STATUS)
     private String status;
 
 }

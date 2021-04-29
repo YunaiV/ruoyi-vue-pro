@@ -2,10 +2,9 @@ package cn.iocoder.dashboard.modules.system.controller.dept.vo.post;
 
 import cn.iocoder.dashboard.framework.excel.core.annotations.DictFormat;
 import cn.iocoder.dashboard.framework.excel.core.convert.DictConvert;
+import cn.iocoder.dashboard.modules.system.enums.SysDictTypeConstants;
 import com.alibaba.excel.annotation.ExcelProperty;
 import lombok.Data;
-
-import static cn.iocoder.dashboard.modules.system.enums.dict.SysDictTypeEnum.SYS_COMMON_STATUS;
 
 /**
  * 岗位 Excel 导出响应 VO
@@ -26,7 +25,7 @@ public class SysPostExcelVO {
     private Integer sort;
 
     @ExcelProperty(value = "状态", converter = DictConvert.class)
-    @DictFormat(SYS_COMMON_STATUS)
+    @DictFormat(SysDictTypeConstants.COMMON_STATUS)
     private String status;
 
 }

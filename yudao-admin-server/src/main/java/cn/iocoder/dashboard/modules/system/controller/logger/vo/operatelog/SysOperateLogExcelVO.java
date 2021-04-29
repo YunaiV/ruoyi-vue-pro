@@ -2,7 +2,7 @@ package cn.iocoder.dashboard.modules.system.controller.logger.vo.operatelog;
 
 import cn.iocoder.dashboard.framework.excel.core.annotations.DictFormat;
 import cn.iocoder.dashboard.framework.excel.core.convert.DictConvert;
-import cn.iocoder.dashboard.modules.system.enums.dict.SysDictTypeEnum;
+import cn.iocoder.dashboard.modules.system.enums.SysDictTypeConstants;
 import com.alibaba.excel.annotation.ExcelProperty;
 import lombok.Data;
 
@@ -24,7 +24,7 @@ public class SysOperateLogExcelVO {
     private String name;
 
     @ExcelProperty(value = "操作类型", converter = DictConvert.class)
-    @DictFormat(SysDictTypeEnum.SYS_OPERATE_TYPE)
+    @DictFormat(SysDictTypeConstants.OPERATE_TYPE)
     private String type;
 
     @ExcelProperty("操作人")

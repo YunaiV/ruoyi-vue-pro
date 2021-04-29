@@ -2,12 +2,11 @@ package cn.iocoder.dashboard.modules.infra.controller.job.vo.job;
 
 import cn.iocoder.dashboard.framework.excel.core.annotations.DictFormat;
 import cn.iocoder.dashboard.framework.excel.core.convert.DictConvert;
+import cn.iocoder.dashboard.modules.infra.enums.InfDictTypeConstants;
 import com.alibaba.excel.annotation.ExcelProperty;
 import lombok.Data;
 
 import java.util.Date;
-
-import static cn.iocoder.dashboard.modules.system.enums.dict.SysDictTypeEnum.INF_JOB_STATUS;
 
 /**
  * 定时任务 Excel VO
@@ -24,7 +23,7 @@ public class InfJobExcelVO {
     private String name;
 
     @ExcelProperty(value = "任务状态", converter = DictConvert.class)
-    @DictFormat(INF_JOB_STATUS)
+    @DictFormat(InfDictTypeConstants.JOB_STATUS)
     private Integer status;
 
     @ExcelProperty("处理器的名字")

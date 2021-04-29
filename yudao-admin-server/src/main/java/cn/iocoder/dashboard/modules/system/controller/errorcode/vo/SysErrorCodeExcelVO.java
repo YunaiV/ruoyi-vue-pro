@@ -2,12 +2,11 @@ package cn.iocoder.dashboard.modules.system.controller.errorcode.vo;
 
 import cn.iocoder.dashboard.framework.excel.core.annotations.DictFormat;
 import cn.iocoder.dashboard.framework.excel.core.convert.DictConvert;
+import cn.iocoder.dashboard.modules.infra.enums.InfDictTypeConstants;
 import com.alibaba.excel.annotation.ExcelProperty;
 import lombok.Data;
 
 import java.util.Date;
-
-import static cn.iocoder.dashboard.modules.system.enums.dict.SysDictTypeEnum.SYS_ERROR_CODE_TYPE;
 
 /**
  * 错误码 Excel VO
@@ -21,7 +20,7 @@ public class SysErrorCodeExcelVO {
     private Long id;
 
     @ExcelProperty(value = "错误码类型", converter = DictConvert.class)
-    @DictFormat(SYS_ERROR_CODE_TYPE)
+    @DictFormat(InfDictTypeConstants.ERROR_CODE_TYPE)
     private Integer type;
 
     @ExcelProperty("应用名")

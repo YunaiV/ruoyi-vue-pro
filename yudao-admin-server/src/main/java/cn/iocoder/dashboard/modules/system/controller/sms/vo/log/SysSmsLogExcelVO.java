@@ -3,13 +3,12 @@ package cn.iocoder.dashboard.modules.system.controller.sms.vo.log;
 import cn.iocoder.dashboard.framework.excel.core.annotations.DictFormat;
 import cn.iocoder.dashboard.framework.excel.core.convert.DictConvert;
 import cn.iocoder.dashboard.framework.excel.core.convert.JsonConvert;
+import cn.iocoder.dashboard.modules.system.enums.SysDictTypeConstants;
 import com.alibaba.excel.annotation.ExcelProperty;
 import lombok.Data;
 
 import java.util.Date;
 import java.util.Map;
-
-import static cn.iocoder.dashboard.modules.system.enums.dict.SysDictTypeEnum.*;
 
 /**
  * 短信日志 Excel VO
@@ -35,7 +34,7 @@ public class SysSmsLogExcelVO {
     private String templateCode;
 
     @ExcelProperty(value = "短信类型", converter = DictConvert.class)
-    @DictFormat(SYS_SMS_TEMPLATE_TYPE)
+    @DictFormat(SysDictTypeConstants.SMS_TEMPLATE_TYPE)
     private Integer templateType;
 
     @ExcelProperty("短信内容")
@@ -54,11 +53,11 @@ public class SysSmsLogExcelVO {
     private Long userId;
 
     @ExcelProperty(value = "用户类型", converter = DictConvert.class)
-    @DictFormat(USER_TYPE)
+    @DictFormat(SysDictTypeConstants.USER_TYPE)
     private Integer userType;
 
     @ExcelProperty(value = "发送状态", converter = DictConvert.class)
-    @DictFormat(SYS_SMS_SEND_STATUS)
+    @DictFormat(SysDictTypeConstants.SMS_SEND_STATUS)
     private Integer sendStatus;
 
     @ExcelProperty("发送时间")
@@ -83,7 +82,7 @@ public class SysSmsLogExcelVO {
     private String apiSerialNo;
 
     @ExcelProperty(value = "接收状态", converter = DictConvert.class)
-    @DictFormat(SYS_SMS_RECEIVE_STATUS)
+    @DictFormat(SysDictTypeConstants.SMS_RECEIVE_STATUS)
     private Integer receiveStatus;
 
     @ExcelProperty("接收时间")

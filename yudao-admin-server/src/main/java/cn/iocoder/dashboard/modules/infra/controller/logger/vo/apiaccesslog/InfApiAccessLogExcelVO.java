@@ -2,12 +2,11 @@ package cn.iocoder.dashboard.modules.infra.controller.logger.vo.apiaccesslog;
 
 import cn.iocoder.dashboard.framework.excel.core.annotations.DictFormat;
 import cn.iocoder.dashboard.framework.excel.core.convert.DictConvert;
+import cn.iocoder.dashboard.modules.system.enums.SysDictTypeConstants;
 import com.alibaba.excel.annotation.ExcelProperty;
 import lombok.Data;
 
 import java.util.Date;
-
-import static cn.iocoder.dashboard.modules.system.enums.dict.SysDictTypeEnum.USER_TYPE;
 
 /**
  * API 访问日志 Excel VO
@@ -27,7 +26,7 @@ public class InfApiAccessLogExcelVO {
     private Long userId;
 
     @ExcelProperty(value = "用户类型", converter = DictConvert.class)
-    @DictFormat(USER_TYPE)
+    @DictFormat(SysDictTypeConstants.USER_TYPE)
     private Integer userType;
 
     @ExcelProperty("应用名")

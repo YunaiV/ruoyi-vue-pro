@@ -2,12 +2,11 @@ package cn.iocoder.dashboard.modules.system.controller.sms.vo.template;
 
 import cn.iocoder.dashboard.framework.excel.core.annotations.DictFormat;
 import cn.iocoder.dashboard.framework.excel.core.convert.DictConvert;
+import cn.iocoder.dashboard.modules.system.enums.SysDictTypeConstants;
 import com.alibaba.excel.annotation.ExcelProperty;
 import lombok.Data;
 
 import java.util.Date;
-
-import static cn.iocoder.dashboard.modules.system.enums.dict.SysDictTypeEnum.*;
 
 /**
  * 短信模板 Excel VO
@@ -21,11 +20,11 @@ public class SysSmsTemplateExcelVO {
     private Long id;
 
     @ExcelProperty(value = "短信签名", converter = DictConvert.class)
-    @DictFormat(SYS_SMS_TEMPLATE_TYPE)
+    @DictFormat(SysDictTypeConstants.SMS_TEMPLATE_TYPE)
     private Integer type;
 
     @ExcelProperty(value = "开启状态", converter = DictConvert.class)
-    @DictFormat(SYS_COMMON_STATUS)
+    @DictFormat(SysDictTypeConstants.COMMON_STATUS)
     private Integer status;
 
     @ExcelProperty("模板编码")
@@ -47,7 +46,7 @@ public class SysSmsTemplateExcelVO {
     private Long channelId;
 
     @ExcelProperty(value = "短信渠道编码", converter = DictConvert.class)
-    @DictFormat(SYS_SMS_CHANNEL_CODE)
+    @DictFormat(SysDictTypeConstants.SMS_CHANNEL_CODE)
     private String channelCode;
 
     @ExcelProperty("创建时间")
