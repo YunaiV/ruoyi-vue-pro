@@ -85,7 +85,7 @@ public class SysAuthServiceImpl implements SysAuthService {
     @Override
     public String login(SysAuthLoginReqVO reqVO, String userIp, String userAgent) {
         // 判断验证码是否正确
-//        this.verifyCaptcha(reqVO.getUsername(), reqVO.getUuid(), reqVO.getCode());
+        this.verifyCaptcha(reqVO.getUsername(), reqVO.getUuid(), reqVO.getCode());
 
         // 使用账号密码，进行登陆。
         LoginUser loginUser = this.login0(reqVO.getUsername(), reqVO.getPassword());
