@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.modules.system.convert.dept;
 
-import cn.iocoder.dashboard.common.pojo.PageResult;
+import cn.iocoder.yudao.common.pojo.PageResult;
 import cn.iocoder.dashboard.modules.system.controller.dept.vo.post.*;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.dept.SysPostDO;
 import org.mapstruct.Mapper;

@@ -11,6 +11,7 @@
     <packaging>pom</packaging>
     <modules>
         <module>yudao-common</module>
+        <module>yudao-framework-all</module>
     </modules>
 
     <artifactId>yudao-framework</artifactId>

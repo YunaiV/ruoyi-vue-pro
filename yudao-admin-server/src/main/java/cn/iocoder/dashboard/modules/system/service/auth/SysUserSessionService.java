@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.modules.system.service.auth;
 
-import cn.iocoder.dashboard.common.pojo.PageResult;
+import cn.iocoder.yudao.common.pojo.PageResult;
 import cn.iocoder.dashboard.framework.security.core.LoginUser;
 import cn.iocoder.dashboard.modules.system.controller.auth.vo.session.SysUserSessionPageReqVO;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.auth.SysUserSessionDO;

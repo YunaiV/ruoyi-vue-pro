@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.modules.infra.controller.job.vo.log;
 
-import cn.iocoder.dashboard.common.pojo.PageParam;
+import cn.iocoder.yudao.common.pojo.PageParam;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -10,7 +10,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 
-import static cn.iocoder.dashboard.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
+import static cn.iocoder.yudao.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 @ApiModel("定时任务日志分页 Request VO")
 @Data

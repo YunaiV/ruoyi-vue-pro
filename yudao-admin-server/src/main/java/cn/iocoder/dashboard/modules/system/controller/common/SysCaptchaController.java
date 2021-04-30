@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.modules.system.controller.common;
 
-import cn.iocoder.dashboard.common.pojo.CommonResult;
+import cn.iocoder.yudao.common.pojo.CommonResult;
 import cn.iocoder.dashboard.modules.system.controller.common.vo.SysCaptchaImageRespVO;
 import cn.iocoder.dashboard.modules.system.service.common.SysCaptchaService;
 import io.swagger.annotations.Api;
@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 
-import static cn.iocoder.dashboard.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.common.pojo.CommonResult.success;
 
 @Api(tags = "验证码")
 @RestController

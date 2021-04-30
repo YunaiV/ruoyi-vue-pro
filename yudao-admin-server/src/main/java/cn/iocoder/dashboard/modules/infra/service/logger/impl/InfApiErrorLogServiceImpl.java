@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.modules.infra.service.logger.impl;
 
-import cn.iocoder.dashboard.common.pojo.PageResult;
+import cn.iocoder.yudao.common.pojo.PageResult;
 import cn.iocoder.dashboard.framework.logger.apilog.core.service.dto.ApiErrorLogCreateDTO;
 import cn.iocoder.dashboard.modules.infra.controller.logger.vo.apierrorlog.InfApiErrorLogExportReqVO;
 import cn.iocoder.dashboard.modules.infra.controller.logger.vo.apierrorlog.InfApiErrorLogPageReqVO;
@@ -19,7 +19,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Future;
 
-import static cn.iocoder.dashboard.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.dashboard.modules.infra.enums.InfErrorCodeConstants.API_ERROR_LOG_NOT_FOUND;
 import static cn.iocoder.dashboard.modules.infra.enums.InfErrorCodeConstants.API_ERROR_LOG_PROCESSED;
 

@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.modules.system.service.permission;
 
-import cn.iocoder.dashboard.common.pojo.PageResult;
+import cn.iocoder.yudao.common.pojo.PageResult;
 import cn.iocoder.dashboard.modules.system.controller.permission.vo.role.SysRoleCreateReqVO;
 import cn.iocoder.dashboard.modules.system.controller.permission.vo.role.SysRoleExportReqVO;
 import cn.iocoder.dashboard.modules.system.controller.permission.vo.role.SysRolePageReqVO;

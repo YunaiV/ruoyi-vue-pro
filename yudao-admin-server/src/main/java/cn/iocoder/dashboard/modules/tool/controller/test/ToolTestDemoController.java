@@ -1,8 +1,8 @@
 package cn.iocoder.dashboard.modules.tool.controller.test;
 
 import cn.hutool.core.thread.ThreadUtil;
-import cn.iocoder.dashboard.common.pojo.CommonResult;
-import cn.iocoder.dashboard.common.pojo.PageResult;
+import cn.iocoder.yudao.common.pojo.CommonResult;
+import cn.iocoder.yudao.common.pojo.PageResult;
 import cn.iocoder.dashboard.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.dashboard.framework.logger.operatelog.core.annotations.OperateLog;
 import cn.iocoder.dashboard.framework.tracer.core.annotation.BizTrace;
@@ -25,7 +25,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import static cn.iocoder.dashboard.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.common.pojo.CommonResult.success;
 import static cn.iocoder.dashboard.framework.logger.operatelog.core.enums.OperateTypeEnum.EXPORT;
 
 @Api(tags = "测试示例")

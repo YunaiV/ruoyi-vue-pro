@@ -20,6 +20,7 @@
         <!-- Web 相关 -->
         <knife4j.version>3.0.2</knife4j.version>
         <swagger-annotations.version>1.5.22</swagger-annotations.version>
+        <servlet.versoin>2.5</servlet.versoin>
         <!-- DB 相关 -->
         <mysql-connector-java.version>5.1.46</mysql-connector-java.version>
         <druid.version>1.2.4</druid.version>
@@ -45,6 +46,7 @@
         <easyexcel.verion>2.2.7</easyexcel.verion>
         <velocity.version>2.2</velocity.version>
         <screw.version>1.0.5</screw.version>
+        <guava.version>30.1.1-jre</guava.version>
         <!-- 三方云服务相关 -->
         <aliyun-java-sdk-core.version>4.5.18</aliyun-java-sdk-core.version>
         <aliyun-java-sdk-dysmsapi.version>2.1.0</aliyun-java-sdk-dysmsapi.version>
@@ -60,12 +62,6 @@
                 <version>${spring.boot.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
-                <exclusions>
-                    <exclusion>
-                        <groupId>mysql</groupId>
-                        <artifactId>mysql-connector-java</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
 
             <!-- Spring 核心 -->
@@ -213,6 +209,12 @@
 
             <!-- 工具类相关 -->
             <dependency>
+                <groupId>cn.iocoder.boot</groupId>
+                <artifactId>yudao-common</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
+            <dependency>
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok</artifactId>
                 <version>${lombok.version}</version>
@@ -256,6 +258,12 @@
                 <groupId>cn.smallbun.screw</groupId>
                 <artifactId>screw-core</artifactId> <!-- 实现数据库文档 -->
                 <version>${screw.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${guava.version}</version>
             </dependency>
 
             <!-- 三方云服务相关 -->

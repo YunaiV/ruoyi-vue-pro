@@ -2,8 +2,8 @@ package cn.iocoder.dashboard.modules.infra.service.logger;
 
 import cn.hutool.core.util.RandomUtil;
 import cn.iocoder.dashboard.BaseDbUnitTest;
-import cn.iocoder.dashboard.common.enums.UserTypeEnum;
-import cn.iocoder.dashboard.common.pojo.PageResult;
+import cn.iocoder.yudao.common.enums.UserTypeEnum;
+import cn.iocoder.yudao.common.pojo.PageResult;
 import cn.iocoder.dashboard.framework.logger.apilog.core.service.dto.ApiErrorLogCreateDTO;
 import cn.iocoder.dashboard.modules.infra.controller.logger.vo.apierrorlog.InfApiErrorLogExportReqVO;
 import cn.iocoder.dashboard.modules.infra.controller.logger.vo.apierrorlog.InfApiErrorLogPageReqVO;
@@ -11,8 +11,8 @@ import cn.iocoder.dashboard.modules.infra.dal.dataobject.logger.InfApiErrorLogDO
 import cn.iocoder.dashboard.modules.infra.dal.mysql.logger.InfApiErrorLogMapper;
 import cn.iocoder.dashboard.modules.infra.enums.logger.InfApiErrorLogProcessStatusEnum;
 import cn.iocoder.dashboard.modules.infra.service.logger.impl.InfApiErrorLogServiceImpl;
-import cn.iocoder.dashboard.util.test.RandomUtils;
-import cn.iocoder.dashboard.util.object.ObjectUtils;
+import cn.iocoder.dashboard.framework.test.core.util.RandomUtils;
+import cn.iocoder.yudao.util.object.ObjectUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
@@ -23,9 +23,9 @@ import java.util.concurrent.Future;
 
 import static cn.iocoder.dashboard.modules.infra.enums.InfErrorCodeConstants.API_ERROR_LOG_NOT_FOUND;
 import static cn.iocoder.dashboard.modules.infra.enums.InfErrorCodeConstants.API_ERROR_LOG_PROCESSED;
-import static cn.iocoder.dashboard.util.test.AssertUtils.assertPojoEquals;
-import static cn.iocoder.dashboard.util.test.AssertUtils.assertServiceException;
-import static cn.iocoder.dashboard.util.date.DateUtils.buildTime;
+import static cn.iocoder.dashboard.framework.test.core.util.AssertUtils.assertPojoEquals;
+import static cn.iocoder.dashboard.framework.test.core.util.AssertUtils.assertServiceException;
+import static cn.iocoder.yudao.util.date.DateUtils.buildTime;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 

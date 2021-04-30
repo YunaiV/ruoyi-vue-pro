@@ -1,16 +1,14 @@
 package cn.iocoder.dashboard.modules.system.dal.mysql.sms;
 
-import cn.iocoder.dashboard.common.pojo.PageResult;
+import cn.iocoder.yudao.common.pojo.PageResult;
 import cn.iocoder.dashboard.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.dashboard.framework.mybatis.core.query.QueryWrapperX;
 import cn.iocoder.dashboard.modules.system.controller.sms.vo.channel.SysSmsChannelPageReqVO;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.sms.SysSmsChannelDO;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.Date;
-import java.util.List;
 
 @Mapper
 public interface SysSmsChannelMapper extends BaseMapperX<SysSmsChannelDO> {

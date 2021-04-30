@@ -1,8 +1,8 @@
 package cn.iocoder.dashboard.modules.system.service.dept.impl;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.iocoder.dashboard.common.enums.CommonStatusEnum;
-import cn.iocoder.dashboard.common.exception.util.ServiceExceptionUtil;
+import cn.iocoder.yudao.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.dashboard.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.dashboard.modules.system.controller.dept.vo.dept.SysDeptCreateReqVO;
 import cn.iocoder.dashboard.modules.system.controller.dept.vo.dept.SysDeptListReqVO;

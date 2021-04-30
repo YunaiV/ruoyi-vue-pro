@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.modules.infra.service.job.impl;
 
-import cn.iocoder.dashboard.common.pojo.PageResult;
+import cn.iocoder.yudao.common.pojo.PageResult;
 import cn.iocoder.dashboard.framework.quartz.core.scheduler.SchedulerManager;
 import cn.iocoder.dashboard.framework.quartz.core.util.CronUtils;
 import cn.iocoder.dashboard.modules.infra.controller.job.vo.job.InfJobCreateReqVO;
@@ -21,9 +21,9 @@ import javax.annotation.Resource;
 import java.util.Collection;
 import java.util.List;
 
-import static cn.iocoder.dashboard.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.dashboard.modules.infra.enums.InfErrorCodeConstants.*;
-import static cn.iocoder.dashboard.util.collection.CollectionUtils.containsAny;
+import static cn.iocoder.yudao.util.collection.CollectionUtils.containsAny;
 
 /**
  * 定时任务 Service 实现类

@@ -1,7 +1,7 @@
 package cn.iocoder.dashboard.modules.system.service.errorcode;
 
 import cn.iocoder.dashboard.BaseDbUnitTest;
-import cn.iocoder.dashboard.common.pojo.PageResult;
+import cn.iocoder.yudao.common.pojo.PageResult;
 import cn.iocoder.dashboard.framework.errorcode.core.dto.ErrorCodeAutoGenerateReqDTO;
 import cn.iocoder.dashboard.modules.infra.enums.config.InfConfigTypeEnum;
 import cn.iocoder.dashboard.modules.system.controller.errorcode.vo.SysErrorCodeCreateReqVO;
@@ -12,8 +12,8 @@ import cn.iocoder.dashboard.modules.system.dal.dataobject.errorcode.SysErrorCode
 import cn.iocoder.dashboard.modules.system.dal.mysql.errorcode.SysErrorCodeMapper;
 import cn.iocoder.dashboard.modules.system.enums.errorcode.SysErrorCodeTypeEnum;
 import cn.iocoder.dashboard.modules.system.service.errorcode.impl.SysErrorCodeServiceImpl;
-import cn.iocoder.dashboard.util.collection.ArrayUtils;
-import cn.iocoder.dashboard.util.object.ObjectUtils;
+import cn.iocoder.yudao.util.collection.ArrayUtils;
+import cn.iocoder.yudao.util.object.ObjectUtils;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -27,10 +27,10 @@ import java.util.function.Consumer;
 import static cn.hutool.core.util.RandomUtil.randomEle;
 import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.ERROR_CODE_DUPLICATE;
 import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.ERROR_CODE_NOT_EXISTS;
-import static cn.iocoder.dashboard.util.test.AssertUtils.assertPojoEquals;
-import static cn.iocoder.dashboard.util.test.AssertUtils.assertServiceException;
-import static cn.iocoder.dashboard.util.test.RandomUtils.*;
-import static cn.iocoder.dashboard.util.date.DateUtils.buildTime;
+import static cn.iocoder.dashboard.framework.test.core.util.AssertUtils.assertPojoEquals;
+import static cn.iocoder.dashboard.framework.test.core.util.AssertUtils.assertServiceException;
+import static cn.iocoder.dashboard.framework.test.core.util.RandomUtils.*;
+import static cn.iocoder.yudao.util.date.DateUtils.buildTime;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**

@@ -2,7 +2,7 @@ package cn.iocoder.dashboard.modules.system.service.logger.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.dashboard.common.pojo.PageResult;
+import cn.iocoder.yudao.common.pojo.PageResult;
 import cn.iocoder.dashboard.framework.logger.operatelog.core.dto.OperateLogCreateReqDTO;
 import cn.iocoder.dashboard.modules.system.controller.logger.vo.operatelog.SysOperateLogExportReqVO;
 import cn.iocoder.dashboard.modules.system.controller.logger.vo.operatelog.SysOperateLogPageReqVO;
@@ -12,7 +12,7 @@ import cn.iocoder.dashboard.modules.system.dal.dataobject.user.SysUserDO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.logger.SysOperateLogMapper;
 import cn.iocoder.dashboard.modules.system.service.logger.SysOperateLogService;
 import cn.iocoder.dashboard.modules.system.service.user.SysUserService;
-import cn.iocoder.dashboard.util.string.StrUtils;
+import cn.iocoder.yudao.util.string.StrUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
@@ -26,7 +26,7 @@ import java.util.concurrent.Future;
 
 import static cn.iocoder.dashboard.modules.system.dal.dataobject.logger.SysOperateLogDO.JAVA_METHOD_ARGS_MAX_LENGTH;
 import static cn.iocoder.dashboard.modules.system.dal.dataobject.logger.SysOperateLogDO.RESULT_MAX_LENGTH;
-import static cn.iocoder.dashboard.util.collection.CollectionUtils.convertSet;
+import static cn.iocoder.yudao.util.collection.CollectionUtils.convertSet;
 
 @Service
 @Slf4j

@@ -1,8 +1,8 @@
 package cn.iocoder.dashboard.modules.system.service.dict.impl;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.iocoder.dashboard.common.enums.CommonStatusEnum;
-import cn.iocoder.dashboard.common.pojo.PageResult;
+import cn.iocoder.yudao.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.common.pojo.PageResult;
 import cn.iocoder.dashboard.framework.dict.core.dto.DictDataRespDTO;
 import cn.iocoder.dashboard.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.dashboard.modules.system.controller.dict.vo.data.SysDictDataCreateReqVO;
@@ -28,7 +28,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
-import static cn.iocoder.dashboard.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.*;
 
 /**

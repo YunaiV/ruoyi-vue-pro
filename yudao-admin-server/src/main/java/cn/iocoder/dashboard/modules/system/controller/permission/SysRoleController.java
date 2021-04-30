@@ -1,8 +1,8 @@
 package cn.iocoder.dashboard.modules.system.controller.permission;
 
-import cn.iocoder.dashboard.common.enums.CommonStatusEnum;
-import cn.iocoder.dashboard.common.pojo.CommonResult;
-import cn.iocoder.dashboard.common.pojo.PageResult;
+import cn.iocoder.yudao.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.common.pojo.CommonResult;
+import cn.iocoder.yudao.common.pojo.PageResult;
 import cn.iocoder.dashboard.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.dashboard.framework.logger.operatelog.core.annotations.OperateLog;
 import cn.iocoder.dashboard.modules.system.controller.permission.vo.role.*;
@@ -24,7 +24,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import static cn.iocoder.dashboard.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.common.pojo.CommonResult.success;
 import static cn.iocoder.dashboard.framework.logger.operatelog.core.enums.OperateTypeEnum.EXPORT;
 
 @Api(tags = "角色")

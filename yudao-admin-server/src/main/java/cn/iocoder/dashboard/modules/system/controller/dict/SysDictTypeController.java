@@ -1,7 +1,7 @@
 package cn.iocoder.dashboard.modules.system.controller.dict;
 
-import cn.iocoder.dashboard.common.pojo.CommonResult;
-import cn.iocoder.dashboard.common.pojo.PageResult;
+import cn.iocoder.yudao.common.pojo.CommonResult;
+import cn.iocoder.yudao.common.pojo.PageResult;
 import cn.iocoder.dashboard.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.dashboard.framework.logger.operatelog.core.annotations.OperateLog;
 import cn.iocoder.dashboard.modules.system.controller.dict.vo.type.*;
@@ -21,7 +21,7 @@ import javax.validation.Valid;
 import java.io.IOException;
 import java.util.List;
 
-import static cn.iocoder.dashboard.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.common.pojo.CommonResult.success;
 import static cn.iocoder.dashboard.framework.logger.operatelog.core.enums.OperateTypeEnum.EXPORT;
 
 @Api(tags = "字典类型")

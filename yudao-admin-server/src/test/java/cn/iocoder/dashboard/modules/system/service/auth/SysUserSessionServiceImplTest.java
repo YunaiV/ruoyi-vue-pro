@@ -1,12 +1,12 @@
 package cn.iocoder.dashboard.modules.system.service.auth;
 
 import static cn.hutool.core.util.RandomUtil.randomEle;
-import static cn.iocoder.dashboard.util.test.AssertUtils.assertPojoEquals;
-import static cn.iocoder.dashboard.util.test.RandomUtils.randomDate;
-import static cn.iocoder.dashboard.util.test.RandomUtils.randomLongId;
-import static cn.iocoder.dashboard.util.test.RandomUtils.randomPojo;
-import static cn.iocoder.dashboard.util.test.RandomUtils.randomString;
-import static cn.iocoder.dashboard.util.date.DateUtils.addTime;
+import static cn.iocoder.dashboard.framework.test.core.util.AssertUtils.assertPojoEquals;
+import static cn.iocoder.dashboard.framework.test.core.util.RandomUtils.randomDate;
+import static cn.iocoder.dashboard.framework.test.core.util.RandomUtils.randomLongId;
+import static cn.iocoder.dashboard.framework.test.core.util.RandomUtils.randomPojo;
+import static cn.iocoder.dashboard.framework.test.core.util.RandomUtils.randomString;
+import static cn.iocoder.yudao.util.date.DateUtils.addTime;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -27,8 +27,8 @@ import org.springframework.context.annotation.Import;
 
 import cn.hutool.core.date.DateUtil;
 import cn.iocoder.dashboard.BaseDbAndRedisUnitTest;
-import cn.iocoder.dashboard.common.enums.CommonStatusEnum;
-import cn.iocoder.dashboard.common.pojo.PageResult;
+import cn.iocoder.yudao.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.common.pojo.PageResult;
 import cn.iocoder.dashboard.framework.security.config.SecurityProperties;
 import cn.iocoder.dashboard.framework.security.core.LoginUser;
 import cn.iocoder.dashboard.modules.system.controller.auth.vo.session.SysUserSessionPageReqVO;
@@ -42,9 +42,9 @@ import cn.iocoder.dashboard.modules.system.service.auth.impl.SysUserSessionServi
 import cn.iocoder.dashboard.modules.system.service.dept.impl.SysDeptServiceImpl;
 import cn.iocoder.dashboard.modules.system.service.logger.impl.SysLoginLogServiceImpl;
 import cn.iocoder.dashboard.modules.system.service.user.SysUserServiceImpl;
-import cn.iocoder.dashboard.util.test.AssertUtils;
-import cn.iocoder.dashboard.util.test.RandomUtils;
-import cn.iocoder.dashboard.util.object.ObjectUtils;
+import cn.iocoder.dashboard.framework.test.core.util.AssertUtils;
+import cn.iocoder.dashboard.framework.test.core.util.RandomUtils;
+import cn.iocoder.yudao.util.object.ObjectUtils;
 
 /**
  * SysUserSessionServiceImpl Tester.

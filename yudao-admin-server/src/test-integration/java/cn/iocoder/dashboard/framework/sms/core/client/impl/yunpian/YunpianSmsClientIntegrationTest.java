@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.framework.sms.core.client.impl.yunpian;
 
-import cn.iocoder.dashboard.common.core.KeyValue;
+import cn.iocoder.yudao.common.core.KeyValue;
 import cn.iocoder.dashboard.framework.sms.core.client.SmsCommonResult;
 import cn.iocoder.dashboard.framework.sms.core.client.dto.SmsSendRespDTO;
 import cn.iocoder.dashboard.framework.sms.core.client.dto.SmsTemplateRespDTO;

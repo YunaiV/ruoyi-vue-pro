@@ -19,7 +19,7 @@
     <dependencies>
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
-            <artifactId>yudao-common</artifactId>
+            <artifactId>yudao-framework-all</artifactId>
             <version>${revision}</version>
         </dependency>
 

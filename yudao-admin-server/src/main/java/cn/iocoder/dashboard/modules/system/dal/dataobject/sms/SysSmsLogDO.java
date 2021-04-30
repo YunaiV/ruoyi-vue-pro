@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.modules.system.dal.dataobject.sms;
 
-import cn.iocoder.dashboard.common.enums.UserTypeEnum;
+import cn.iocoder.yudao.common.enums.UserTypeEnum;
 import cn.iocoder.dashboard.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.dashboard.framework.sms.core.enums.SmsFrameworkErrorCodeConstants;
 import cn.iocoder.dashboard.modules.system.enums.sms.SysSmsReceiveStatusEnum;

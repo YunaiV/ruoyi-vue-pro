@@ -7,10 +7,10 @@ import static cn.iocoder.dashboard.modules.infra.enums.InfErrorCodeConstants.JOB
 import static cn.iocoder.dashboard.modules.infra.enums.InfErrorCodeConstants.JOB_HANDLER_EXISTS;
 import static cn.iocoder.dashboard.modules.infra.enums.InfErrorCodeConstants.JOB_NOT_EXISTS;
 import static cn.iocoder.dashboard.modules.infra.enums.InfErrorCodeConstants.JOB_UPDATE_ONLY_NORMAL_STATUS;
-import static cn.iocoder.dashboard.util.test.AssertUtils.assertPojoEquals;
-import static cn.iocoder.dashboard.util.test.AssertUtils.assertServiceException;
-import static cn.iocoder.dashboard.util.test.RandomUtils.randomPojo;
-import static cn.iocoder.dashboard.util.test.RandomUtils.randomString;
+import static cn.iocoder.dashboard.framework.test.core.util.AssertUtils.assertPojoEquals;
+import static cn.iocoder.dashboard.framework.test.core.util.AssertUtils.assertServiceException;
+import static cn.iocoder.dashboard.framework.test.core.util.RandomUtils.randomPojo;
+import static cn.iocoder.dashboard.framework.test.core.util.RandomUtils.randomString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -29,7 +29,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
 import cn.iocoder.dashboard.BaseDbUnitTest;
-import cn.iocoder.dashboard.common.pojo.PageResult;
+import cn.iocoder.yudao.common.pojo.PageResult;
 import cn.iocoder.dashboard.framework.quartz.core.scheduler.SchedulerManager;
 import cn.iocoder.dashboard.modules.infra.controller.job.vo.job.InfJobCreateReqVO;
 import cn.iocoder.dashboard.modules.infra.controller.job.vo.job.InfJobExportReqVO;
@@ -40,7 +40,7 @@ import cn.iocoder.dashboard.modules.infra.dal.dataobject.job.InfJobDO;
 import cn.iocoder.dashboard.modules.infra.dal.mysql.job.InfJobMapper;
 import cn.iocoder.dashboard.modules.infra.enums.job.InfJobStatusEnum;
 import cn.iocoder.dashboard.modules.infra.service.job.impl.InfJobServiceImpl;
-import cn.iocoder.dashboard.util.object.ObjectUtils;
+import cn.iocoder.yudao.util.object.ObjectUtils;
 
 /**
  * {@link InfJobServiceImpl} 的单元测试

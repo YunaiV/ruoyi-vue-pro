@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.modules.tool.enums;
 
-import cn.iocoder.dashboard.common.exception.ErrorCode;
+import cn.iocoder.yudao.common.exception.ErrorCode;
 
 /**
  * Tool 错误码枚举类

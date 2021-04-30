@@ -1,7 +1,7 @@
 package cn.iocoder.dashboard.modules.system.service.notice.impl;
 
-import cn.iocoder.dashboard.common.exception.util.ServiceExceptionUtil;
-import cn.iocoder.dashboard.common.pojo.PageResult;
+import cn.iocoder.yudao.common.exception.util.ServiceExceptionUtil;
+import cn.iocoder.yudao.common.pojo.PageResult;
 import cn.iocoder.dashboard.modules.system.controller.notice.vo.SysNoticeCreateReqVO;
 import cn.iocoder.dashboard.modules.system.controller.notice.vo.SysNoticePageReqVO;
 import cn.iocoder.dashboard.modules.system.controller.notice.vo.SysNoticeUpdateReqVO;

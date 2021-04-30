@@ -31,7 +31,7 @@ public class ToolTestDemoDO extends BaseDO {
     /**
      * 状态
      *
-     * 枚举 {@link cn.iocoder.dashboard.common.enums.CommonStatusEnum}
+     * 枚举 {@link cn.iocoder.yudao.common.enums.CommonStatusEnum}
      */
     private Integer status;
     /**

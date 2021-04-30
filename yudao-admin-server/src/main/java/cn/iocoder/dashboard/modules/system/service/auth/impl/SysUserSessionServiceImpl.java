@@ -3,7 +3,7 @@ package cn.iocoder.dashboard.modules.system.service.auth.impl;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.dashboard.common.pojo.PageResult;
+import cn.iocoder.yudao.common.pojo.PageResult;
 import cn.iocoder.dashboard.framework.security.config.SecurityProperties;
 import cn.iocoder.dashboard.framework.security.core.LoginUser;
 import cn.iocoder.dashboard.framework.tracer.core.util.TracerUtils;
@@ -26,8 +26,8 @@ import java.time.Duration;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static cn.iocoder.dashboard.util.collection.CollectionUtils.convertSet;
-import static cn.iocoder.dashboard.util.date.DateUtils.addTime;
+import static cn.iocoder.yudao.util.collection.CollectionUtils.convertSet;
+import static cn.iocoder.yudao.util.date.DateUtils.addTime;
 
 /**
  * 在线用户 Session Service 实现类

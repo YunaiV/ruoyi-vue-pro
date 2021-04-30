@@ -1,7 +1,7 @@
 package cn.iocoder.dashboard.modules.infra.controller.config;
 
-import cn.iocoder.dashboard.common.pojo.CommonResult;
-import cn.iocoder.dashboard.common.pojo.PageResult;
+import cn.iocoder.yudao.common.pojo.CommonResult;
+import cn.iocoder.yudao.common.pojo.PageResult;
 import cn.iocoder.dashboard.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.dashboard.framework.logger.operatelog.core.annotations.OperateLog;
 import cn.iocoder.dashboard.modules.infra.controller.config.vo.*;
@@ -21,8 +21,8 @@ import javax.validation.Valid;
 import java.io.IOException;
 import java.util.List;
 
-import static cn.iocoder.dashboard.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.dashboard.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.common.pojo.CommonResult.success;
 import static cn.iocoder.dashboard.framework.logger.operatelog.core.enums.OperateTypeEnum.EXPORT;
 import static cn.iocoder.dashboard.modules.infra.enums.InfErrorCodeConstants.CONFIG_GET_VALUE_ERROR_IF_SENSITIVE;
 

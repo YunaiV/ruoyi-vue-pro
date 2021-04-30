@@ -1,8 +1,8 @@
 package cn.iocoder.dashboard.modules.system.service.notice;
 
 import cn.iocoder.dashboard.BaseDbUnitTest;
-import cn.iocoder.dashboard.common.enums.CommonStatusEnum;
-import cn.iocoder.dashboard.common.pojo.PageResult;
+import cn.iocoder.yudao.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.common.pojo.PageResult;
 import cn.iocoder.dashboard.modules.system.controller.notice.vo.SysNoticeCreateReqVO;
 import cn.iocoder.dashboard.modules.system.controller.notice.vo.SysNoticePageReqVO;
 import cn.iocoder.dashboard.modules.system.controller.notice.vo.SysNoticeUpdateReqVO;
@@ -10,7 +10,7 @@ import cn.iocoder.dashboard.modules.system.dal.dataobject.notice.SysNoticeDO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.notice.SysNoticeMapper;
 import cn.iocoder.dashboard.modules.system.enums.notice.SysNoticeTypeEnum;
 import cn.iocoder.dashboard.modules.system.service.notice.impl.SysNoticeServiceImpl;
-import cn.iocoder.dashboard.util.object.ObjectUtils;
+import cn.iocoder.yudao.util.object.ObjectUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
@@ -20,10 +20,10 @@ import java.util.function.Consumer;
 
 import static cn.hutool.core.util.RandomUtil.randomEle;
 import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.NOTICE_NOT_FOUND;
-import static cn.iocoder.dashboard.util.test.AssertUtils.assertPojoEquals;
-import static cn.iocoder.dashboard.util.test.AssertUtils.assertServiceException;
-import static cn.iocoder.dashboard.util.test.RandomUtils.randomLongId;
-import static cn.iocoder.dashboard.util.test.RandomUtils.randomPojo;
+import static cn.iocoder.dashboard.framework.test.core.util.AssertUtils.assertPojoEquals;
+import static cn.iocoder.dashboard.framework.test.core.util.AssertUtils.assertServiceException;
+import static cn.iocoder.dashboard.framework.test.core.util.RandomUtils.randomLongId;
+import static cn.iocoder.dashboard.framework.test.core.util.RandomUtils.randomPojo;
 import static org.junit.jupiter.api.Assertions.*;
 
 @Import(SysNoticeServiceImpl.class)

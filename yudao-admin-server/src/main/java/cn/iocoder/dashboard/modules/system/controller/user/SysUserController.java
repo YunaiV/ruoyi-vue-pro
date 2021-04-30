@@ -1,9 +1,9 @@
 package cn.iocoder.dashboard.modules.system.controller.user;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.iocoder.dashboard.common.enums.CommonStatusEnum;
-import cn.iocoder.dashboard.common.pojo.CommonResult;
-import cn.iocoder.dashboard.common.pojo.PageResult;
+import cn.iocoder.yudao.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.common.pojo.CommonResult;
+import cn.iocoder.yudao.common.pojo.PageResult;
 import cn.iocoder.dashboard.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.dashboard.framework.logger.operatelog.core.annotations.OperateLog;
 import cn.iocoder.dashboard.modules.system.controller.user.vo.user.*;
@@ -13,8 +13,8 @@ import cn.iocoder.dashboard.modules.system.dal.dataobject.user.SysUserDO;
 import cn.iocoder.dashboard.modules.system.enums.common.SysSexEnum;
 import cn.iocoder.dashboard.modules.system.service.dept.SysDeptService;
 import cn.iocoder.dashboard.modules.system.service.user.SysUserService;
-import cn.iocoder.dashboard.util.collection.CollectionUtils;
-import cn.iocoder.dashboard.util.collection.MapUtils;
+import cn.iocoder.yudao.util.collection.CollectionUtils;
+import cn.iocoder.yudao.util.collection.MapUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -30,7 +30,7 @@ import javax.validation.Valid;
 import java.io.IOException;
 import java.util.*;
 
-import static cn.iocoder.dashboard.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.common.pojo.CommonResult.success;
 import static cn.iocoder.dashboard.framework.logger.operatelog.core.enums.OperateTypeEnum.EXPORT;
 
 @Api(tags = "用户")

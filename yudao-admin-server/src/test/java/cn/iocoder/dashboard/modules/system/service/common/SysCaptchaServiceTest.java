@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
 
-import static cn.iocoder.dashboard.util.test.RandomUtils.randomString;
+import static cn.iocoder.dashboard.framework.test.core.util.RandomUtils.randomString;
 import static org.junit.jupiter.api.Assertions.*;
 
 @Import({SysCaptchaServiceImpl.class, CaptchaProperties.class, SysCaptchaRedisDAO.class})

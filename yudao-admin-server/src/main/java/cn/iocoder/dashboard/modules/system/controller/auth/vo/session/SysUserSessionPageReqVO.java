@@ -1,12 +1,10 @@
 package cn.iocoder.dashboard.modules.system.controller.auth.vo.session;
 
-import cn.iocoder.dashboard.common.pojo.PageParam;
+import cn.iocoder.yudao.common.pojo.PageParam;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-
-import javax.validation.constraints.NotEmpty;
 
 @ApiModel("在线用户 Session 分页 Request VO")
 @Data

@@ -2,9 +2,9 @@ package cn.iocoder.dashboard.modules.system.service.logger;
 
 import cn.hutool.core.map.MapUtil;
 import cn.iocoder.dashboard.BaseDbUnitTest;
-import cn.iocoder.dashboard.common.enums.CommonStatusEnum;
-import cn.iocoder.dashboard.common.exception.enums.GlobalErrorCodeConstants;
-import cn.iocoder.dashboard.common.pojo.PageResult;
+import cn.iocoder.yudao.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.common.exception.enums.GlobalErrorCodeConstants;
+import cn.iocoder.yudao.common.pojo.PageResult;
 import cn.iocoder.dashboard.framework.logger.operatelog.core.enums.OperateTypeEnum;
 import cn.iocoder.dashboard.framework.tracer.core.util.TracerUtils;
 import cn.iocoder.dashboard.framework.logger.operatelog.core.dto.OperateLogCreateReqDTO;
@@ -16,8 +16,8 @@ import cn.iocoder.dashboard.modules.system.dal.mysql.logger.SysOperateLogMapper;
 import cn.iocoder.dashboard.modules.system.enums.common.SysSexEnum;
 import cn.iocoder.dashboard.modules.system.service.logger.impl.SysOperateLogServiceImpl;
 import cn.iocoder.dashboard.modules.system.service.user.SysUserService;
-import cn.iocoder.dashboard.util.test.RandomUtils;
-import cn.iocoder.dashboard.util.object.ObjectUtils;
+import cn.iocoder.dashboard.framework.test.core.util.RandomUtils;
+import cn.iocoder.yudao.util.object.ObjectUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
@@ -27,9 +27,9 @@ import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-import static cn.iocoder.dashboard.util.test.AssertUtils.assertPojoEquals;
-import static cn.iocoder.dashboard.util.test.RandomUtils.randomLongId;
-import static cn.iocoder.dashboard.util.date.DateUtils.buildTime;
+import static cn.iocoder.dashboard.framework.test.core.util.AssertUtils.assertPojoEquals;
+import static cn.iocoder.dashboard.framework.test.core.util.RandomUtils.randomLongId;
+import static cn.iocoder.yudao.util.date.DateUtils.buildTime;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 

@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.modules.system.dal.dataobject.dict;
 
-import cn.iocoder.dashboard.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.common.enums.CommonStatusEnum;
 import cn.iocoder.dashboard.framework.mybatis.core.dataobject.BaseDO;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;

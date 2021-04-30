@@ -1,11 +1,11 @@
 package cn.iocoder.dashboard.modules.infra.service.job;
 
 import static cn.hutool.core.util.RandomUtil.randomEle;
-import static cn.iocoder.dashboard.util.test.AssertUtils.assertPojoEquals;
-import static cn.iocoder.dashboard.util.test.RandomUtils.randomLongId;
-import static cn.iocoder.dashboard.util.test.RandomUtils.randomPojo;
-import static cn.iocoder.dashboard.util.test.RandomUtils.randomString;
-import static cn.iocoder.dashboard.util.date.DateUtils.buildTime;
+import static cn.iocoder.dashboard.framework.test.core.util.AssertUtils.assertPojoEquals;
+import static cn.iocoder.dashboard.framework.test.core.util.RandomUtils.randomLongId;
+import static cn.iocoder.dashboard.framework.test.core.util.RandomUtils.randomPojo;
+import static cn.iocoder.dashboard.framework.test.core.util.RandomUtils.randomString;
+import static cn.iocoder.yudao.util.date.DateUtils.buildTime;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -18,14 +18,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
 import cn.iocoder.dashboard.BaseDbUnitTest;
-import cn.iocoder.dashboard.common.pojo.PageResult;
+import cn.iocoder.yudao.common.pojo.PageResult;
 import cn.iocoder.dashboard.modules.infra.controller.job.vo.log.InfJobLogExportReqVO;
 import cn.iocoder.dashboard.modules.infra.controller.job.vo.log.InfJobLogPageReqVO;
 import cn.iocoder.dashboard.modules.infra.dal.dataobject.job.InfJobLogDO;
 import cn.iocoder.dashboard.modules.infra.dal.mysql.job.InfJobLogMapper;
 import cn.iocoder.dashboard.modules.infra.enums.job.InfJobLogStatusEnum;
 import cn.iocoder.dashboard.modules.infra.service.job.impl.InfJobLogServiceImpl;
-import cn.iocoder.dashboard.util.object.ObjectUtils;
+import cn.iocoder.yudao.util.object.ObjectUtils;
 
 /**
  * {@link InfJobLogServiceImpl} 的单元测试

@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.modules.system.enums.errorcode;
 
-import cn.iocoder.dashboard.common.core.IntArrayValuable;
+import cn.iocoder.yudao.common.core.IntArrayValuable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

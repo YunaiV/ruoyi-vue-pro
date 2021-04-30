@@ -2,25 +2,25 @@ package cn.iocoder.dashboard.modules.infra.service.file;
 
 import cn.hutool.core.io.resource.ResourceUtil;
 import cn.iocoder.dashboard.BaseDbUnitTest;
-import cn.iocoder.dashboard.common.pojo.PageResult;
+import cn.iocoder.yudao.common.pojo.PageResult;
 import cn.iocoder.dashboard.framework.file.config.FileProperties;
 import cn.iocoder.dashboard.modules.infra.controller.file.vo.InfFilePageReqVO;
 import cn.iocoder.dashboard.modules.infra.dal.dataobject.file.InfFileDO;
 import cn.iocoder.dashboard.modules.infra.dal.mysql.file.InfFileMapper;
 import cn.iocoder.dashboard.modules.infra.service.file.impl.InfFileServiceImpl;
-import cn.iocoder.dashboard.util.object.ObjectUtils;
+import cn.iocoder.yudao.util.object.ObjectUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
 
+import static cn.iocoder.dashboard.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.dashboard.modules.infra.enums.InfErrorCodeConstants.FILE_NOT_EXISTS;
 import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.FILE_PATH_EXISTS;
-import static cn.iocoder.dashboard.util.test.AssertUtils.assertPojoEquals;
-import static cn.iocoder.dashboard.util.test.AssertUtils.assertServiceException;
-import static cn.iocoder.dashboard.util.test.RandomUtils.randomPojo;
-import static cn.iocoder.dashboard.util.test.RandomUtils.randomString;
-import static cn.iocoder.dashboard.util.date.DateUtils.buildTime;
+import static cn.iocoder.dashboard.framework.test.core.util.AssertUtils.assertServiceException;
+import static cn.iocoder.dashboard.framework.test.core.util.RandomUtils.randomPojo;
+import static cn.iocoder.dashboard.framework.test.core.util.RandomUtils.randomString;
+import static cn.iocoder.yudao.util.date.DateUtils.buildTime;
 import static org.junit.jupiter.api.Assertions.*;
 
 @Import({InfFileServiceImpl.class, FileProperties.class})

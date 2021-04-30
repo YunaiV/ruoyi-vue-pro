@@ -4,9 +4,9 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.dashboard.common.enums.CommonStatusEnum;
-import cn.iocoder.dashboard.common.exception.ServiceException;
-import cn.iocoder.dashboard.common.pojo.PageResult;
+import cn.iocoder.yudao.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.common.exception.ServiceException;
+import cn.iocoder.yudao.common.pojo.PageResult;
 import cn.iocoder.dashboard.modules.infra.service.file.InfFileService;
 import cn.iocoder.dashboard.modules.system.controller.user.vo.profile.SysUserProfileUpdatePasswordReqVO;
 import cn.iocoder.dashboard.modules.system.controller.user.vo.profile.SysUserProfileUpdateReqVO;
@@ -19,7 +19,7 @@ import cn.iocoder.dashboard.modules.system.dal.mysql.user.SysUserMapper;
 import cn.iocoder.dashboard.modules.system.service.dept.SysDeptService;
 import cn.iocoder.dashboard.modules.system.service.dept.SysPostService;
 import cn.iocoder.dashboard.modules.system.service.permission.SysPermissionService;
-import cn.iocoder.dashboard.util.collection.CollectionUtils;
+import cn.iocoder.yudao.util.collection.CollectionUtils;
 import com.google.common.annotations.VisibleForTesting;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,7 +31,7 @@ import javax.annotation.Resource;
 import java.io.InputStream;
 import java.util.*;
 
-import static cn.iocoder.dashboard.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.*;
 
 

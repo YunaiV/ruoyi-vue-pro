@@ -1,7 +1,7 @@
 package cn.iocoder.dashboard.modules.system.service.auth;
 
 import cn.iocoder.dashboard.BaseDbUnitTest;
-import cn.iocoder.dashboard.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.common.enums.CommonStatusEnum;
 import cn.iocoder.dashboard.framework.security.core.LoginUser;
 import cn.iocoder.dashboard.modules.system.controller.auth.vo.auth.SysAuthLoginReqVO;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.user.SysUserDO;
@@ -12,7 +12,7 @@ import cn.iocoder.dashboard.modules.system.service.common.SysCaptchaService;
 import cn.iocoder.dashboard.modules.system.service.logger.SysLoginLogService;
 import cn.iocoder.dashboard.modules.system.service.permission.SysPermissionService;
 import cn.iocoder.dashboard.modules.system.service.user.SysUserService;
-import cn.iocoder.dashboard.util.test.AssertUtils;
+import cn.iocoder.dashboard.framework.test.core.util.AssertUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
@@ -28,8 +28,8 @@ import javax.annotation.Resource;
 import java.util.Set;
 
 import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.*;
-import static cn.iocoder.dashboard.util.test.AssertUtils.assertServiceException;
-import static cn.iocoder.dashboard.util.test.RandomUtils.*;
+import static cn.iocoder.dashboard.framework.test.core.util.AssertUtils.assertServiceException;
+import static cn.iocoder.dashboard.framework.test.core.util.RandomUtils.*;
 import static java.util.Collections.singleton;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.eq;

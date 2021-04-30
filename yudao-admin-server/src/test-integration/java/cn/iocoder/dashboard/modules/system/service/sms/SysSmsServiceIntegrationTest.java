@@ -3,7 +3,7 @@ package cn.iocoder.dashboard.modules.system.service.sms;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.thread.ThreadUtil;
 import cn.iocoder.dashboard.BaseDbAndRedisIntegrationTest;
-import cn.iocoder.dashboard.common.enums.UserTypeEnum;
+import cn.iocoder.yudao.common.enums.UserTypeEnum;
 import cn.iocoder.dashboard.framework.sms.config.SmsConfiguration;
 import cn.iocoder.dashboard.modules.system.mq.consumer.sms.SysSmsSendConsumer;
 import cn.iocoder.dashboard.modules.system.mq.producer.sms.SysSmsProducer;

@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.modules.system.controller.dict.vo.data;
 
-import cn.iocoder.dashboard.common.pojo.PageParam;
+import cn.iocoder.yudao.common.pojo.PageParam;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;

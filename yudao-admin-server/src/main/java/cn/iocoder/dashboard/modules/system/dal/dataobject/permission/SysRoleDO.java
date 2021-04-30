@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.modules.system.dal.dataobject.permission;
 
-import cn.iocoder.dashboard.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.common.enums.CommonStatusEnum;
 import cn.iocoder.dashboard.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.dashboard.framework.mybatis.core.type.JsonLongSetTypeHandler;
 import cn.iocoder.dashboard.framework.security.core.enums.DataScopeEnum;

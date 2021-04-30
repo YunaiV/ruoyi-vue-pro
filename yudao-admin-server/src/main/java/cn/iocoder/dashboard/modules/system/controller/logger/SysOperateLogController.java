@@ -1,7 +1,7 @@
 package cn.iocoder.dashboard.modules.system.controller.logger;
 
-import cn.iocoder.dashboard.common.pojo.CommonResult;
-import cn.iocoder.dashboard.common.pojo.PageResult;
+import cn.iocoder.yudao.common.pojo.CommonResult;
+import cn.iocoder.yudao.common.pojo.PageResult;
 import cn.iocoder.dashboard.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.dashboard.framework.logger.operatelog.core.annotations.OperateLog;
 import cn.iocoder.dashboard.modules.system.controller.logger.vo.operatelog.SysOperateLogExcelVO;
@@ -13,8 +13,8 @@ import cn.iocoder.dashboard.modules.system.dal.dataobject.logger.SysOperateLogDO
 import cn.iocoder.dashboard.modules.system.dal.dataobject.user.SysUserDO;
 import cn.iocoder.dashboard.modules.system.service.logger.SysOperateLogService;
 import cn.iocoder.dashboard.modules.system.service.user.SysUserService;
-import cn.iocoder.dashboard.util.collection.CollectionUtils;
-import cn.iocoder.dashboard.util.collection.MapUtils;
+import cn.iocoder.yudao.util.collection.CollectionUtils;
+import cn.iocoder.yudao.util.collection.MapUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -32,7 +32,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import static cn.iocoder.dashboard.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.common.pojo.CommonResult.success;
 import static cn.iocoder.dashboard.framework.logger.operatelog.core.enums.OperateTypeEnum.EXPORT;
 
 @Api(tags = "操作日志")

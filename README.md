@@ -87,6 +87,15 @@
 
 ## 技术栈
 
+| 项目 | 说明 |
+| --- | --- | --- | --- |
+| `yudao-dependencies` | Maven 依赖版本管理 |
+| `yudao-framework` | Java 框架拓展 |
+| `yudao-admin-server` | 管理后台的服务端 |
+| `yudao-admin-ui` | 管理后台的 UI 界面 |
+| `yudao-user-server` | 用户前台的服务端 |
+| `yudao-user-ui` | 用户前台的 UI 界面 |
+
 ### 后端
 
 | 框架 | 说明 |  版本 | 学习指南 |

@@ -1,7 +1,7 @@
 package cn.iocoder.dashboard.modules.infra.service.config.impl;
 
-import cn.iocoder.dashboard.common.exception.util.ServiceExceptionUtil;
-import cn.iocoder.dashboard.common.pojo.PageResult;
+import cn.iocoder.yudao.common.exception.util.ServiceExceptionUtil;
+import cn.iocoder.yudao.common.pojo.PageResult;
 import cn.iocoder.dashboard.modules.infra.controller.config.vo.InfConfigCreateReqVO;
 import cn.iocoder.dashboard.modules.infra.controller.config.vo.InfConfigExportReqVO;
 import cn.iocoder.dashboard.modules.infra.controller.config.vo.InfConfigPageReqVO;

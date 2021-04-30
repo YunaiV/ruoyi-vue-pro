@@ -2,7 +2,7 @@ package cn.iocoder.dashboard.modules.infra.controller.doc;
 
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.IdUtil;
-import cn.iocoder.dashboard.util.servlet.ServletUtils;
+import cn.iocoder.yudao.util.servlet.ServletUtils;
 import cn.smallbun.screw.core.Configuration;
 import cn.smallbun.screw.core.engine.EngineConfig;
 import cn.smallbun.screw.core.engine.EngineFileType;

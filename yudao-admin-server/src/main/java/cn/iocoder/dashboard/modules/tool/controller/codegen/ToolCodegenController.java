@@ -2,8 +2,8 @@ package cn.iocoder.dashboard.modules.tool.controller.codegen;
 
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.ZipUtil;
-import cn.iocoder.dashboard.common.pojo.CommonResult;
-import cn.iocoder.dashboard.common.pojo.PageResult;
+import cn.iocoder.yudao.common.pojo.CommonResult;
+import cn.iocoder.yudao.common.pojo.PageResult;
 import cn.iocoder.dashboard.modules.tool.controller.codegen.vo.ToolCodegenDetailRespVO;
 import cn.iocoder.dashboard.modules.tool.controller.codegen.vo.ToolCodegenPreviewRespVO;
 import cn.iocoder.dashboard.modules.tool.controller.codegen.vo.ToolCodegenUpdateReqVO;
@@ -15,8 +15,8 @@ import cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen.ToolCodegenColum
 import cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen.ToolCodegenTableDO;
 import cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen.ToolSchemaTableDO;
 import cn.iocoder.dashboard.modules.tool.service.codegen.ToolCodegenService;
-import cn.iocoder.dashboard.util.collection.CollectionUtils;
-import cn.iocoder.dashboard.util.servlet.ServletUtils;
+import cn.iocoder.yudao.util.collection.CollectionUtils;
+import cn.iocoder.yudao.util.servlet.ServletUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -35,7 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static cn.iocoder.dashboard.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.common.pojo.CommonResult.success;
 
 @Api(tags = "代码生成器")
 @RestController

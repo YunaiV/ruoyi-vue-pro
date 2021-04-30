@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.modules.system.dal.mysql.notice;
 
-import cn.iocoder.dashboard.common.pojo.PageResult;
+import cn.iocoder.yudao.common.pojo.PageResult;
 import cn.iocoder.dashboard.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.dashboard.framework.mybatis.core.query.QueryWrapperX;
 import cn.iocoder.dashboard.modules.system.controller.notice.vo.SysNoticePageReqVO;

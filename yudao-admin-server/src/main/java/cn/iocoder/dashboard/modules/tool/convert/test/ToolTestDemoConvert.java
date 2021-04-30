@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.modules.tool.convert.test;
 
-import cn.iocoder.dashboard.common.pojo.PageResult;
+import cn.iocoder.yudao.common.pojo.PageResult;
 import cn.iocoder.dashboard.modules.tool.controller.test.vo.ToolTestDemoCreateReqVO;
 import cn.iocoder.dashboard.modules.tool.controller.test.vo.ToolTestDemoExcelVO;
 import cn.iocoder.dashboard.modules.tool.controller.test.vo.ToolTestDemoRespVO;

@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.modules.system.convert.sms;
 
-import cn.iocoder.dashboard.common.pojo.PageResult;
+import cn.iocoder.yudao.common.pojo.PageResult;
 import cn.iocoder.dashboard.modules.system.controller.sms.vo.template.SysSmsTemplateCreateReqVO;
 import cn.iocoder.dashboard.modules.system.controller.sms.vo.template.SysSmsTemplateExcelVO;
 import cn.iocoder.dashboard.modules.system.controller.sms.vo.template.SysSmsTemplateRespVO;

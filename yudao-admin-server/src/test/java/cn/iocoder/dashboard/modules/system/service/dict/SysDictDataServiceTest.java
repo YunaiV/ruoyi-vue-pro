@@ -1,8 +1,8 @@
 package cn.iocoder.dashboard.modules.system.service.dict;
 
 import cn.iocoder.dashboard.BaseDbUnitTest;
-import cn.iocoder.dashboard.common.enums.CommonStatusEnum;
-import cn.iocoder.dashboard.common.pojo.PageResult;
+import cn.iocoder.yudao.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.common.pojo.PageResult;
 import cn.iocoder.dashboard.modules.system.controller.dict.vo.data.SysDictDataCreateReqVO;
 import cn.iocoder.dashboard.modules.system.controller.dict.vo.data.SysDictDataExportReqVO;
 import cn.iocoder.dashboard.modules.system.controller.dict.vo.data.SysDictDataPageReqVO;
@@ -12,8 +12,8 @@ import cn.iocoder.dashboard.modules.system.dal.dataobject.dict.SysDictTypeDO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dict.SysDictDataMapper;
 import cn.iocoder.dashboard.modules.system.mq.producer.dict.SysDictDataProducer;
 import cn.iocoder.dashboard.modules.system.service.dict.impl.SysDictDataServiceImpl;
-import cn.iocoder.dashboard.util.collection.ArrayUtils;
-import cn.iocoder.dashboard.util.object.ObjectUtils;
+import cn.iocoder.yudao.util.collection.ArrayUtils;
+import cn.iocoder.yudao.util.object.ObjectUtils;
 import com.google.common.collect.ImmutableTable;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -26,9 +26,9 @@ import java.util.function.Consumer;
 
 import static cn.hutool.core.bean.BeanUtil.getFieldValue;
 import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.*;
-import static cn.iocoder.dashboard.util.test.AssertUtils.assertPojoEquals;
-import static cn.iocoder.dashboard.util.test.AssertUtils.assertServiceException;
-import static cn.iocoder.dashboard.util.test.RandomUtils.*;
+import static cn.iocoder.dashboard.framework.test.core.util.AssertUtils.assertPojoEquals;
+import static cn.iocoder.dashboard.framework.test.core.util.AssertUtils.assertServiceException;
+import static cn.iocoder.dashboard.framework.test.core.util.RandomUtils.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;

@@ -1,7 +1,7 @@
 package cn.iocoder.dashboard.modules.system.service.permission.impl;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.iocoder.dashboard.common.exception.util.ServiceExceptionUtil;
+import cn.iocoder.yudao.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.dashboard.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.dashboard.modules.system.controller.permission.vo.menu.SysMenuCreateReqVO;
 import cn.iocoder.dashboard.modules.system.controller.permission.vo.menu.SysMenuListReqVO;
@@ -14,7 +14,7 @@ import cn.iocoder.dashboard.modules.system.enums.permission.MenuTypeEnum;
 import cn.iocoder.dashboard.modules.system.mq.producer.permission.SysMenuProducer;
 import cn.iocoder.dashboard.modules.system.service.permission.SysMenuService;
 import cn.iocoder.dashboard.modules.system.service.permission.SysPermissionService;
-import cn.iocoder.dashboard.util.collection.CollectionUtils;
+import cn.iocoder.yudao.util.collection.CollectionUtils;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMultimap;

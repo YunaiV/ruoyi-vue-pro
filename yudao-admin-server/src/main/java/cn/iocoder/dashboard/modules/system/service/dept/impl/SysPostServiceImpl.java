@@ -1,7 +1,7 @@
 package cn.iocoder.dashboard.modules.system.service.dept.impl;
 
-import cn.iocoder.dashboard.common.exception.util.ServiceExceptionUtil;
-import cn.iocoder.dashboard.common.pojo.PageResult;
+import cn.iocoder.yudao.common.exception.util.ServiceExceptionUtil;
+import cn.iocoder.yudao.common.pojo.PageResult;
 import cn.iocoder.dashboard.modules.system.controller.dept.vo.post.SysPostCreateReqVO;
 import cn.iocoder.dashboard.modules.system.controller.dept.vo.post.SysPostExportReqVO;
 import cn.iocoder.dashboard.modules.system.controller.dept.vo.post.SysPostPageReqVO;

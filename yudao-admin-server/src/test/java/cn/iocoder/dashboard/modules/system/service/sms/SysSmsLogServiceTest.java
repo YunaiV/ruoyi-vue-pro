@@ -2,9 +2,9 @@ package cn.iocoder.dashboard.modules.system.service.sms;
 
 import cn.hutool.core.map.MapUtil;
 import cn.iocoder.dashboard.BaseDbUnitTest;
-import cn.iocoder.dashboard.common.enums.UserTypeEnum;
-import cn.iocoder.dashboard.common.pojo.CommonResult;
-import cn.iocoder.dashboard.common.pojo.PageResult;
+import cn.iocoder.yudao.common.enums.UserTypeEnum;
+import cn.iocoder.yudao.common.pojo.CommonResult;
+import cn.iocoder.yudao.common.pojo.PageResult;
 import cn.iocoder.dashboard.modules.system.controller.sms.vo.log.SysSmsLogExportReqVO;
 import cn.iocoder.dashboard.modules.system.controller.sms.vo.log.SysSmsLogPageReqVO;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.sms.SysSmsLogDO;
@@ -14,8 +14,8 @@ import cn.iocoder.dashboard.modules.system.enums.sms.SysSmsReceiveStatusEnum;
 import cn.iocoder.dashboard.modules.system.enums.sms.SysSmsSendStatusEnum;
 import cn.iocoder.dashboard.modules.system.enums.sms.SysSmsTemplateTypeEnum;
 import cn.iocoder.dashboard.modules.system.service.sms.impl.SysSmsLogServiceImpl;
-import cn.iocoder.dashboard.util.collection.ArrayUtils;
-import cn.iocoder.dashboard.util.object.ObjectUtils;
+import cn.iocoder.yudao.util.collection.ArrayUtils;
+import cn.iocoder.yudao.util.object.ObjectUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
@@ -27,9 +27,9 @@ import java.util.function.Consumer;
 
 import static cn.hutool.core.util.RandomUtil.randomBoolean;
 import static cn.hutool.core.util.RandomUtil.randomEle;
-import static cn.iocoder.dashboard.util.test.AssertUtils.assertPojoEquals;
-import static cn.iocoder.dashboard.util.test.RandomUtils.*;
-import static cn.iocoder.dashboard.util.date.DateUtils.buildTime;
+import static cn.iocoder.dashboard.framework.test.core.util.AssertUtils.assertPojoEquals;
+import static cn.iocoder.dashboard.framework.test.core.util.RandomUtils.*;
+import static cn.iocoder.yudao.util.date.DateUtils.buildTime;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**

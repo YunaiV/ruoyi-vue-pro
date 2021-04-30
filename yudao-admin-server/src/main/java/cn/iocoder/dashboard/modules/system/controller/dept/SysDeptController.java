@@ -1,7 +1,7 @@
 package cn.iocoder.dashboard.modules.system.controller.dept;
 
-import cn.iocoder.dashboard.common.enums.CommonStatusEnum;
-import cn.iocoder.dashboard.common.pojo.CommonResult;
+import cn.iocoder.yudao.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.common.pojo.CommonResult;
 import cn.iocoder.dashboard.modules.system.controller.dept.vo.dept.*;
 import cn.iocoder.dashboard.modules.system.convert.dept.SysDeptConvert;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.dept.SysDeptDO;
@@ -18,7 +18,7 @@ import javax.validation.Valid;
 import java.util.Comparator;
 import java.util.List;
 
-import static cn.iocoder.dashboard.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.common.pojo.CommonResult.success;
 
 @Api(tags = "部门")
 @RestController

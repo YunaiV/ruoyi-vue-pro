@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.modules.infra.controller.redis;
 
-import cn.iocoder.dashboard.common.pojo.CommonResult;
+import cn.iocoder.yudao.common.pojo.CommonResult;
 import cn.iocoder.dashboard.framework.redis.core.RedisKeyDefine;
 import cn.iocoder.dashboard.framework.redis.core.RedisKeyRegistry;
 import cn.iocoder.dashboard.modules.infra.controller.redis.vo.InfRedisKeyRespVO;
@@ -20,7 +20,7 @@ import javax.annotation.Resource;
 import java.util.List;
 import java.util.Properties;
 
-import static cn.iocoder.dashboard.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.common.pojo.CommonResult.success;
 
 @Api(tags = "Redis 监控")
 @RestController

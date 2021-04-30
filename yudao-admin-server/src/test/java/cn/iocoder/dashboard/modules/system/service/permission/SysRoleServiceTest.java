@@ -2,8 +2,8 @@ package cn.iocoder.dashboard.modules.system.service.permission;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.iocoder.dashboard.BaseDbUnitTest;
-import cn.iocoder.dashboard.common.enums.CommonStatusEnum;
-import cn.iocoder.dashboard.common.pojo.PageResult;
+import cn.iocoder.yudao.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.common.pojo.PageResult;
 import cn.iocoder.dashboard.framework.security.core.enums.DataScopeEnum;
 import cn.iocoder.dashboard.modules.system.controller.permission.vo.role.SysRoleCreateReqVO;
 import cn.iocoder.dashboard.modules.system.controller.permission.vo.role.SysRolePageReqVO;
@@ -13,7 +13,7 @@ import cn.iocoder.dashboard.modules.system.dal.mysql.permission.SysRoleMapper;
 import cn.iocoder.dashboard.modules.system.enums.permission.SysRoleTypeEnum;
 import cn.iocoder.dashboard.modules.system.mq.producer.permission.SysRoleProducer;
 import cn.iocoder.dashboard.modules.system.service.permission.impl.SysRoleServiceImpl;
-import cn.iocoder.dashboard.util.sping.SpringAopUtils;
+import cn.iocoder.yudao.util.sping.SpringAopUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
@@ -23,10 +23,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.*;
-import static cn.iocoder.dashboard.util.test.AssertUtils.assertPojoEquals;
-import static cn.iocoder.dashboard.util.test.AssertUtils.assertServiceException;
-import static cn.iocoder.dashboard.util.test.RandomUtils.*;
-import static cn.iocoder.dashboard.util.object.ObjectUtils.max;
+import static cn.iocoder.dashboard.framework.test.core.util.AssertUtils.assertPojoEquals;
+import static cn.iocoder.dashboard.framework.test.core.util.AssertUtils.assertServiceException;
+import static cn.iocoder.dashboard.framework.test.core.util.RandomUtils.*;
+import static cn.iocoder.yudao.util.object.ObjectUtils.max;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
 

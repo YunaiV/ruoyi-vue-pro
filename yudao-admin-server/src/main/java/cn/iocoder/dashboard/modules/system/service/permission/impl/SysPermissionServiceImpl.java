@@ -14,8 +14,8 @@ import cn.iocoder.dashboard.modules.system.mq.producer.permission.SysPermissionP
 import cn.iocoder.dashboard.modules.system.service.permission.SysMenuService;
 import cn.iocoder.dashboard.modules.system.service.permission.SysPermissionService;
 import cn.iocoder.dashboard.modules.system.service.permission.SysRoleService;
-import cn.iocoder.dashboard.util.collection.CollectionUtils;
-import cn.iocoder.dashboard.util.collection.MapUtils;
+import cn.iocoder.yudao.util.collection.CollectionUtils;
+import cn.iocoder.yudao.util.collection.MapUtils;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;

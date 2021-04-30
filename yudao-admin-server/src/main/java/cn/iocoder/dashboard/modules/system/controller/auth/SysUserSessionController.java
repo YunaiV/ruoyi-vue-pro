@@ -1,7 +1,7 @@
 package cn.iocoder.dashboard.modules.system.controller.auth;
 
-import cn.iocoder.dashboard.common.pojo.CommonResult;
-import cn.iocoder.dashboard.common.pojo.PageResult;
+import cn.iocoder.yudao.common.pojo.CommonResult;
+import cn.iocoder.yudao.common.pojo.PageResult;
 import cn.iocoder.dashboard.modules.system.controller.auth.vo.session.SysUserSessionPageItemRespVO;
 import cn.iocoder.dashboard.modules.system.controller.auth.vo.session.SysUserSessionPageReqVO;
 import cn.iocoder.dashboard.modules.system.convert.auth.SysUserSessionConvert;
@@ -11,7 +11,7 @@ import cn.iocoder.dashboard.modules.system.dal.dataobject.user.SysUserDO;
 import cn.iocoder.dashboard.modules.system.service.auth.SysUserSessionService;
 import cn.iocoder.dashboard.modules.system.service.dept.SysDeptService;
 import cn.iocoder.dashboard.modules.system.service.user.SysUserService;
-import cn.iocoder.dashboard.util.collection.MapUtils;
+import cn.iocoder.yudao.util.collection.MapUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
@@ -24,8 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static cn.iocoder.dashboard.common.pojo.CommonResult.success;
-import static cn.iocoder.dashboard.util.collection.CollectionUtils.convertList;
+import static cn.iocoder.yudao.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.util.collection.CollectionUtils.convertList;
 
 @Api(tags = "用户 Session")
 @RestController
