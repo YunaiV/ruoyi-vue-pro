@@ -2,7 +2,7 @@ package cn.iocoder.dashboard.modules.tool.service.codegen.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.dashboard.framework.codegen.config.CodegenProperties;
+import cn.iocoder.dashboard.modules.system.framework.codegen.config.CodegenProperties;
 import cn.iocoder.dashboard.modules.tool.controller.codegen.vo.ToolCodegenUpdateReqVO;
 import cn.iocoder.dashboard.modules.tool.controller.codegen.vo.table.ToolCodegenTablePageReqVO;
 import cn.iocoder.dashboard.modules.tool.convert.codegen.ToolCodegenConvert;

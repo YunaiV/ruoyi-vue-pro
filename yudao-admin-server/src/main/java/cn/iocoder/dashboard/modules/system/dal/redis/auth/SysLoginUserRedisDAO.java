@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.modules.system.dal.redis.auth;
 
-import cn.iocoder.dashboard.framework.security.core.LoginUser;
+import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.dashboard.modules.system.service.auth.SysUserSessionService;
 import cn.iocoder.yudao.framework.util.json.JsonUtils;
 import org.springframework.data.redis.core.StringRedisTemplate;

@@ -4,7 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.iocoder.dashboard.BaseDbUnitTest;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.dashboard.framework.security.core.enums.DataScopeEnum;
+import cn.iocoder.yudao.framework.security.core.enums.DataScopeEnum;
 import cn.iocoder.dashboard.modules.system.controller.permission.vo.role.SysRoleCreateReqVO;
 import cn.iocoder.dashboard.modules.system.controller.permission.vo.role.SysRolePageReqVO;
 import cn.iocoder.dashboard.modules.system.controller.permission.vo.role.SysRoleUpdateReqVO;

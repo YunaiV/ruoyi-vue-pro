@@ -2,8 +2,8 @@ package cn.iocoder.dashboard.modules.system.service.auth.impl;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
-import cn.iocoder.dashboard.framework.security.core.LoginUser;
-import cn.iocoder.dashboard.framework.tracer.core.util.TracerUtils;
+import cn.iocoder.yudao.framework.security.core.LoginUser;
+import cn.iocoder.yudao.framework.util.monitor.TracerUtils;
 import cn.iocoder.dashboard.modules.system.controller.auth.vo.auth.SysAuthLoginReqVO;
 import cn.iocoder.dashboard.modules.system.controller.logger.vo.loginlog.SysLoginLogCreateReqVO;
 import cn.iocoder.dashboard.modules.system.convert.auth.SysAuthConvert;

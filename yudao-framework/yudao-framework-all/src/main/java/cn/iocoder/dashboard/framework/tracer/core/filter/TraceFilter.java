@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.framework.tracer.core.filter;
 
-import cn.iocoder.dashboard.framework.tracer.core.util.TracerUtils;
+import cn.iocoder.yudao.framework.util.monitor.TracerUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;

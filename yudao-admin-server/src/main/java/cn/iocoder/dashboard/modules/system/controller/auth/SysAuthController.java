@@ -2,7 +2,7 @@ package cn.iocoder.dashboard.modules.system.controller.auth;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.dashboard.framework.logger.operatelog.core.annotations.OperateLog;
+import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.dashboard.modules.system.controller.auth.vo.auth.SysAuthLoginReqVO;
 import cn.iocoder.dashboard.modules.system.controller.auth.vo.auth.SysAuthLoginRespVO;
 import cn.iocoder.dashboard.modules.system.controller.auth.vo.auth.SysAuthMenuRespVO;
@@ -27,8 +27,8 @@ import javax.validation.Valid;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-import static cn.iocoder.dashboard.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
-import static cn.iocoder.dashboard.framework.security.core.util.SecurityFrameworkUtils.getLoginUserRoleIds;
+import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
+import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserRoleIds;
 import static cn.iocoder.yudao.framework.util.servlet.ServletUtils.getClientIP;
 import static cn.iocoder.yudao.framework.util.servlet.ServletUtils.getUserAgent;
 

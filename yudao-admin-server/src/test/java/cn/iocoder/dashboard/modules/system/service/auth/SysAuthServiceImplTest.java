@@ -2,7 +2,7 @@ package cn.iocoder.dashboard.modules.system.service.auth;
 
 import cn.iocoder.dashboard.BaseDbUnitTest;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
-import cn.iocoder.dashboard.framework.security.core.LoginUser;
+import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.dashboard.modules.system.controller.auth.vo.auth.SysAuthLoginReqVO;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.user.SysUserDO;
 import cn.iocoder.dashboard.modules.system.enums.logger.SysLoginLogTypeEnum;

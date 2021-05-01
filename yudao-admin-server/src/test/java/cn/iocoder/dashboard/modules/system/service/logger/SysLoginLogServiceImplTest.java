@@ -3,7 +3,7 @@ package cn.iocoder.dashboard.modules.system.service.logger;
 import cn.hutool.core.util.RandomUtil;
 import cn.iocoder.dashboard.BaseDbUnitTest;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.dashboard.framework.tracer.core.util.TracerUtils;
+import cn.iocoder.yudao.framework.util.monitor.TracerUtils;
 import cn.iocoder.dashboard.modules.system.controller.logger.vo.loginlog.SysLoginLogCreateReqVO;
 import cn.iocoder.dashboard.modules.system.controller.logger.vo.loginlog.SysLoginLogExportReqVO;
 import cn.iocoder.dashboard.modules.system.controller.logger.vo.loginlog.SysLoginLogPageReqVO;

@@ -3,7 +3,7 @@ package cn.iocoder.dashboard.modules.infra.controller.job;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.dashboard.framework.excel.core.util.ExcelUtils;
-import cn.iocoder.dashboard.framework.logger.operatelog.core.annotations.OperateLog;
+import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.dashboard.modules.infra.controller.job.vo.log.InfJobLogExcelVO;
 import cn.iocoder.dashboard.modules.infra.controller.job.vo.log.InfJobLogExportReqVO;
 import cn.iocoder.dashboard.modules.infra.controller.job.vo.log.InfJobLogPageReqVO;
@@ -29,7 +29,7 @@ import java.util.Collection;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-import static cn.iocoder.dashboard.framework.logger.operatelog.core.enums.OperateTypeEnum.EXPORT;
+import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 
 @Api(tags = "定时任务日志")
 @RestController

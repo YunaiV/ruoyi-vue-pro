@@ -2,7 +2,7 @@ package cn.iocoder.dashboard.framework.tracer.config;
 
 import cn.iocoder.dashboard.framework.tracer.core.aop.BizTraceAspect;
 import cn.iocoder.dashboard.framework.tracer.core.filter.TraceFilter;
-import cn.iocoder.dashboard.framework.web.core.enums.FilterOrderEnum;
+import cn.iocoder.yudao.framework.common.enums.WebFilterOrderEnum;
 import io.opentracing.Tracer;
 import org.apache.skywalking.apm.toolkit.opentracing.SkywalkingTracer;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -49,7 +49,7 @@ public class TracerAutoConfiguration {
     public FilterRegistrationBean<TraceFilter> traceFilter() {
         FilterRegistrationBean<TraceFilter> registrationBean = new FilterRegistrationBean<>();
         registrationBean.setFilter(new TraceFilter());
-        registrationBean.setOrder(FilterOrderEnum.TRACE_FILTER);
+        registrationBean.setOrder(WebFilterOrderEnum.TRACE_FILTER);
         return registrationBean;
     }
 

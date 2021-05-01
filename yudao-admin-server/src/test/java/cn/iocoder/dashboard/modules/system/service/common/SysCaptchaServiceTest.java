@@ -1,7 +1,7 @@
 package cn.iocoder.dashboard.modules.system.service.common;
 
 import cn.iocoder.dashboard.BaseRedisUnitTest;
-import cn.iocoder.dashboard.framework.captcha.config.CaptchaProperties;
+import cn.iocoder.dashboard.modules.system.framework.captcha.config.CaptchaProperties;
 import cn.iocoder.dashboard.modules.system.controller.common.vo.SysCaptchaImageRespVO;
 import cn.iocoder.dashboard.modules.system.dal.redis.common.SysCaptchaRedisDAO;
 import cn.iocoder.dashboard.modules.system.service.common.impl.SysCaptchaServiceImpl;

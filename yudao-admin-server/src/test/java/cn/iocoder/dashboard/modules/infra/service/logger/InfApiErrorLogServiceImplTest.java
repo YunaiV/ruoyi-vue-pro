@@ -4,7 +4,7 @@ import cn.hutool.core.util.RandomUtil;
 import cn.iocoder.dashboard.BaseDbUnitTest;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.dashboard.framework.logger.apilog.core.service.dto.ApiErrorLogCreateDTO;
+import cn.iocoder.yudao.framework.apilog.core.service.dto.ApiErrorLogCreateDTO;
 import cn.iocoder.dashboard.modules.infra.controller.logger.vo.apierrorlog.InfApiErrorLogExportReqVO;
 import cn.iocoder.dashboard.modules.infra.controller.logger.vo.apierrorlog.InfApiErrorLogPageReqVO;
 import cn.iocoder.dashboard.modules.infra.dal.dataobject.logger.InfApiErrorLogDO;

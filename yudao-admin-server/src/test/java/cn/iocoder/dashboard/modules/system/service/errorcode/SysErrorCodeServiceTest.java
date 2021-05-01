@@ -2,7 +2,7 @@ package cn.iocoder.dashboard.modules.system.service.errorcode;
 
 import cn.iocoder.dashboard.BaseDbUnitTest;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.dashboard.framework.errorcode.core.dto.ErrorCodeAutoGenerateReqDTO;
+import cn.iocoder.dashboard.modules.tool.framework.errorcode.core.dto.ErrorCodeAutoGenerateReqDTO;
 import cn.iocoder.dashboard.modules.infra.enums.config.InfConfigTypeEnum;
 import cn.iocoder.dashboard.modules.system.controller.errorcode.vo.SysErrorCodeCreateReqVO;
 import cn.iocoder.dashboard.modules.system.controller.errorcode.vo.SysErrorCodeExportReqVO;

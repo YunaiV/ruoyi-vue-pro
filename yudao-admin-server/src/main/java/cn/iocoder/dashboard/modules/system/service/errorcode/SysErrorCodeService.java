@@ -1,7 +1,7 @@
 package cn.iocoder.dashboard.modules.system.service.errorcode;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.dashboard.framework.errorcode.core.service.ErrorCodeFrameworkService;
+import cn.iocoder.dashboard.modules.tool.framework.errorcode.core.service.ErrorCodeFrameworkService;
 import cn.iocoder.dashboard.modules.system.controller.errorcode.vo.SysErrorCodeCreateReqVO;
 import cn.iocoder.dashboard.modules.system.controller.errorcode.vo.SysErrorCodeExportReqVO;
 import cn.iocoder.dashboard.modules.system.controller.errorcode.vo.SysErrorCodePageReqVO;

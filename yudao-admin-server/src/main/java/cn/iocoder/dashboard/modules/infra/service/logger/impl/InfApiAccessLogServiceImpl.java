@@ -1,7 +1,7 @@
 package cn.iocoder.dashboard.modules.infra.service.logger.impl;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.dashboard.framework.logger.apilog.core.service.dto.ApiAccessLogCreateDTO;
+import cn.iocoder.yudao.framework.apilog.core.service.dto.ApiAccessLogCreateDTO;
 import cn.iocoder.dashboard.modules.infra.controller.logger.vo.apiaccesslog.InfApiAccessLogExportReqVO;
 import cn.iocoder.dashboard.modules.infra.controller.logger.vo.apiaccesslog.InfApiAccessLogPageReqVO;
 import cn.iocoder.dashboard.modules.infra.convert.logger.InfApiAccessLogConvert;

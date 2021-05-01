@@ -13,6 +13,11 @@
         <module>yudao-common</module>
         <module>yudao-framework-all</module>
         <module>yudao-spring-boot-starter-mybatis</module>
+        <module>yudao-spring-boot-starter-web</module>
+        <module>yudao-spring-boot-starter-security</module>
+        <module>yudao-spring-boot-starter-monitor</module>
+        <module>yudao-spring-boot-starter-protection</module>
+        <module>yudao-spring-boot-starter-operatelog</module>
     </modules>
 
     <artifactId>yudao-framework</artifactId>

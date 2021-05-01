@@ -3,7 +3,7 @@ package cn.iocoder.dashboard.modules.infra.service.file;
 import cn.hutool.core.io.resource.ResourceUtil;
 import cn.iocoder.dashboard.BaseDbUnitTest;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.dashboard.framework.file.config.FileProperties;
+import cn.iocoder.dashboard.modules.infra.framework.file.config.FileProperties;
 import cn.iocoder.dashboard.modules.infra.controller.file.vo.InfFilePageReqVO;
 import cn.iocoder.dashboard.modules.infra.dal.dataobject.file.InfFileDO;
 import cn.iocoder.dashboard.modules.infra.dal.mysql.file.InfFileMapper;

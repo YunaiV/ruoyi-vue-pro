@@ -1,8 +1,8 @@
 package cn.iocoder.dashboard.modules.system.convert.errorcode;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.dashboard.framework.errorcode.core.dto.ErrorCodeAutoGenerateReqDTO;
-import cn.iocoder.dashboard.framework.errorcode.core.dto.ErrorCodeRespDTO;
+import cn.iocoder.dashboard.modules.tool.framework.errorcode.core.dto.ErrorCodeAutoGenerateReqDTO;
+import cn.iocoder.dashboard.modules.tool.framework.errorcode.core.dto.ErrorCodeRespDTO;
 import cn.iocoder.dashboard.modules.system.controller.errorcode.vo.SysErrorCodeCreateReqVO;
 import cn.iocoder.dashboard.modules.system.controller.errorcode.vo.SysErrorCodeExcelVO;
 import cn.iocoder.dashboard.modules.system.controller.errorcode.vo.SysErrorCodeRespVO;

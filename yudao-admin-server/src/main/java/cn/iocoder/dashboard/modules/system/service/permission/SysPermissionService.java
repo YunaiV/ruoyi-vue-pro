@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.modules.system.service.permission;
 
-import cn.iocoder.dashboard.framework.security.core.service.SecurityPermissionFrameworkService;
+import cn.iocoder.yudao.framework.security.core.service.SecurityPermissionFrameworkService;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.permission.SysMenuDO;
 import org.springframework.lang.Nullable;
 

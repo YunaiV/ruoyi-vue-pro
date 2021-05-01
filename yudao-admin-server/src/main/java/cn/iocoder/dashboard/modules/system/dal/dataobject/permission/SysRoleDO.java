@@ -3,7 +3,7 @@ package cn.iocoder.dashboard.modules.system.dal.dataobject.permission;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.framework.mybatis.core.type.JsonLongSetTypeHandler;
-import cn.iocoder.dashboard.framework.security.core.enums.DataScopeEnum;
+import cn.iocoder.yudao.framework.security.core.enums.DataScopeEnum;
 import cn.iocoder.dashboard.modules.system.enums.permission.RoleCodeEnum;
 import cn.iocoder.dashboard.modules.system.enums.permission.SysRoleTypeEnum;
 import com.baomidou.mybatisplus.annotation.TableField;

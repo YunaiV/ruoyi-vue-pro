@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.modules.system.service.auth;
 
-import cn.iocoder.dashboard.framework.security.core.service.SecurityAuthFrameworkService;
+import cn.iocoder.yudao.framework.security.core.service.SecurityAuthFrameworkService;
 import cn.iocoder.dashboard.modules.system.controller.auth.vo.auth.SysAuthLoginReqVO;
 
 /**

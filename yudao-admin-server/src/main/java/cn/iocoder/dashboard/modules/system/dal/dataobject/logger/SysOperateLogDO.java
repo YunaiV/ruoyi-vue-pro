@@ -1,7 +1,7 @@
 package cn.iocoder.dashboard.modules.system.dal.dataobject.logger;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.dashboard.framework.logger.operatelog.core.enums.OperateTypeEnum;
+import cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.user.SysUserDO;
 import com.baomidou.mybatisplus.annotation.TableField;

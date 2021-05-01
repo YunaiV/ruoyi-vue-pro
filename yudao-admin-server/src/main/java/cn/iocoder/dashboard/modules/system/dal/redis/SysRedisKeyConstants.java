@@ -1,9 +1,7 @@
 package cn.iocoder.dashboard.modules.system.dal.redis;
 
 import cn.iocoder.dashboard.framework.redis.core.RedisKeyDefine;
-import cn.iocoder.dashboard.framework.security.core.LoginUser;
-
-import java.time.Duration;
+import cn.iocoder.yudao.framework.security.core.LoginUser;
 
 import static cn.iocoder.dashboard.framework.redis.core.RedisKeyDefine.KeyTypeEnum.STRING;
 

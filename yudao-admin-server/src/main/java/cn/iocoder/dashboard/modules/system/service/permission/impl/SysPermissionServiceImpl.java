@@ -3,7 +3,7 @@ package cn.iocoder.dashboard.modules.system.service.permission.impl;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ArrayUtil;
-import cn.iocoder.dashboard.framework.security.core.util.SecurityFrameworkUtils;
+import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.dashboard.modules.system.dal.mysql.permission.SysRoleMenuMapper;
 import cn.iocoder.dashboard.modules.system.dal.mysql.permission.SysUserRoleMapper;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.permission.SysMenuDO;

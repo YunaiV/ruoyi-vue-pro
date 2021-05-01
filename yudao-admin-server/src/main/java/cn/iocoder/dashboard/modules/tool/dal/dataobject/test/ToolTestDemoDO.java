@@ -38,7 +38,7 @@ public class ToolTestDemoDO extends BaseDO {
     /**
      * 类型
      *
-     * 枚举 {@link cn.iocoder.dashboard.framework.logger.operatelog.core.enums.OperateTypeEnum}
+     * 枚举 {@link cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum}
      */
     private Integer type;
     /**
