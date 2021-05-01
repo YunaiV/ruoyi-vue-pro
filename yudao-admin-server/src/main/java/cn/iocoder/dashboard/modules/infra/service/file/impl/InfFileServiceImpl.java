@@ -1,7 +1,7 @@
 package cn.iocoder.dashboard.modules.infra.service.file.impl;
 
 import cn.hutool.core.io.FileTypeUtil;
-import cn.iocoder.yudao.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.dashboard.framework.file.config.FileProperties;
 import cn.iocoder.dashboard.modules.infra.controller.file.vo.InfFilePageReqVO;
 import cn.iocoder.dashboard.modules.infra.dal.dataobject.file.InfFileDO;
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.io.ByteArrayInputStream;
 
-import static cn.iocoder.yudao.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.dashboard.modules.infra.enums.InfErrorCodeConstants.FILE_NOT_EXISTS;
 import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.FILE_PATH_EXISTS;
 

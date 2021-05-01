@@ -1,8 +1,8 @@
 package cn.iocoder.dashboard.modules.system.service.dict;
 
 import cn.iocoder.dashboard.BaseDbUnitTest;
-import cn.iocoder.yudao.common.enums.CommonStatusEnum;
-import cn.iocoder.yudao.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.dashboard.modules.system.controller.dict.vo.type.SysDictTypeCreateReqVO;
 import cn.iocoder.dashboard.modules.system.controller.dict.vo.type.SysDictTypeExportReqVO;
 import cn.iocoder.dashboard.modules.system.controller.dict.vo.type.SysDictTypePageReqVO;
@@ -10,8 +10,8 @@ import cn.iocoder.dashboard.modules.system.controller.dict.vo.type.SysDictTypeUp
 import cn.iocoder.dashboard.modules.system.dal.dataobject.dict.SysDictTypeDO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dict.SysDictTypeMapper;
 import cn.iocoder.dashboard.modules.system.service.dict.impl.SysDictTypeServiceImpl;
-import cn.iocoder.yudao.util.collection.ArrayUtils;
-import cn.iocoder.yudao.util.object.ObjectUtils;
+import cn.iocoder.yudao.framework.util.collection.ArrayUtils;
+import cn.iocoder.yudao.framework.util.object.ObjectUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
@@ -25,7 +25,7 @@ import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.*;
 import static cn.iocoder.dashboard.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.dashboard.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.dashboard.framework.test.core.util.RandomUtils.*;
-import static cn.iocoder.yudao.util.date.DateUtils.buildTime;
+import static cn.iocoder.yudao.framework.util.date.DateUtils.buildTime;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;

@@ -1,6 +1,7 @@
 package cn.iocoder.dashboard.modules.tool.dal.dataobject.test;
 
-import cn.iocoder.dashboard.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
@@ -31,7 +32,7 @@ public class ToolTestDemoDO extends BaseDO {
     /**
      * 状态
      *
-     * 枚举 {@link cn.iocoder.yudao.common.enums.CommonStatusEnum}
+     * 枚举 {@link CommonStatusEnum}
      */
     private Integer status;
     /**

@@ -88,7 +88,7 @@
 ## 技术栈
 
 | 项目 | 说明 |
-| --- | --- | --- | --- |
+| --- | --- |
 | `yudao-dependencies` | Maven 依赖版本管理 |
 | `yudao-framework` | Java 框架拓展 |
 | `yudao-admin-server` | 管理后台的服务端 |

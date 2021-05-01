@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.modules.system.dal.dataobject.auth;
 
-import cn.iocoder.dashboard.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.dashboard.framework.security.core.LoginUser;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.user.SysUserDO;
 import com.baomidou.mybatisplus.annotation.IdType;

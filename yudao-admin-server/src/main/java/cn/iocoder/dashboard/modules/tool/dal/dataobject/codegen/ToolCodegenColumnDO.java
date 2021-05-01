@@ -1,12 +1,11 @@
 package cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen;
 
-import cn.iocoder.dashboard.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.dict.SysDictTypeDO;
 import cn.iocoder.dashboard.modules.tool.enums.codegen.ToolCodegenColumnHtmlTypeEnum;
 import cn.iocoder.dashboard.modules.tool.enums.codegen.ToolCodegenColumnListConditionEnum;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;

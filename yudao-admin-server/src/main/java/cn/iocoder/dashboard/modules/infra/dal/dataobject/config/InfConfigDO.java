@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.modules.infra.dal.dataobject.config;
 
-import cn.iocoder.dashboard.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.dashboard.modules.infra.enums.config.InfConfigTypeEnum;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;

@@ -26,7 +26,7 @@ import javax.annotation.Resource;
 /**
  * spring security配置
  *
- * @author ruoyi
+ * @author 芋道源码
  */
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
 @EnableConfigurationProperties(SecurityProperties.class)

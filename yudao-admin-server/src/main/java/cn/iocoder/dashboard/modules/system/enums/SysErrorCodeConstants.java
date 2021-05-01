@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.modules.system.enums;
 
-import cn.iocoder.yudao.common.exception.ErrorCode;
+import cn.iocoder.yudao.framework.common.exception.ErrorCode;
 
 /**
  * System 错误码枚举类

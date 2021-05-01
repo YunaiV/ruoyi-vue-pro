@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.modules.system.dal.dataobject.logger;
 
-import cn.iocoder.dashboard.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.dashboard.modules.system.enums.logger.SysLoginLogTypeEnum;
 import cn.iocoder.dashboard.modules.system.enums.logger.SysLoginResultEnum;
 import com.baomidou.mybatisplus.annotation.TableName;

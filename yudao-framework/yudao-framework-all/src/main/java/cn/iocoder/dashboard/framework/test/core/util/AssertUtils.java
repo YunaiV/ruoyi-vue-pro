@@ -2,9 +2,9 @@ package cn.iocoder.dashboard.framework.test.core.util;
 
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ReflectUtil;
-import cn.iocoder.yudao.common.exception.ErrorCode;
-import cn.iocoder.yudao.common.exception.ServiceException;
-import cn.iocoder.yudao.common.exception.util.ServiceExceptionUtil;
+import cn.iocoder.yudao.framework.common.exception.ErrorCode;
+import cn.iocoder.yudao.framework.common.exception.ServiceException;
+import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.function.Executable;
 

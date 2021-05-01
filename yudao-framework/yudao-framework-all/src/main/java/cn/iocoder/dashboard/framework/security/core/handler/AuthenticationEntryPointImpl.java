@@ -1,8 +1,8 @@
 package cn.iocoder.dashboard.framework.security.core.handler;
 
-import cn.iocoder.yudao.common.exception.enums.GlobalErrorCodeConstants;
-import cn.iocoder.yudao.common.pojo.CommonResult;
-import cn.iocoder.yudao.util.servlet.ServletUtils;
+import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants;
+import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.util.servlet.ServletUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
@@ -13,7 +13,7 @@ import javax.servlet.FilterChain;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import static cn.iocoder.yudao.common.exception.enums.GlobalErrorCodeConstants.UNAUTHORIZED;
+import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.UNAUTHORIZED;
 
 /**
  * 访问一个需要认证的 URL 资源，但是此时自己尚未认证（登录）的情况下，返回 {@link GlobalErrorCodeConstants#UNAUTHORIZED} 错误码，从而使前端重定向到登录页

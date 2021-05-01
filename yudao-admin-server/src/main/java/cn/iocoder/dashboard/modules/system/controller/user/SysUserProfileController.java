@@ -1,8 +1,8 @@
 package cn.iocoder.dashboard.modules.system.controller.user;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.iocoder.yudao.common.exception.util.ServiceExceptionUtil;
-import cn.iocoder.yudao.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
+import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.dashboard.modules.system.controller.user.vo.profile.SysUserProfileRespVO;
 import cn.iocoder.dashboard.modules.system.controller.user.vo.profile.SysUserProfileUpdatePasswordReqVO;
 import cn.iocoder.dashboard.modules.system.controller.user.vo.profile.SysUserProfileUpdateReqVO;
@@ -28,7 +28,7 @@ import javax.validation.Valid;
 import java.io.IOException;
 import java.util.List;
 
-import static cn.iocoder.yudao.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.dashboard.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.FILE_IS_EMPTY;
 

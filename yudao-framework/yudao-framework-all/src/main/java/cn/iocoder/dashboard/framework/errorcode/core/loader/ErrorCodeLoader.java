@@ -1,11 +1,11 @@
 package cn.iocoder.dashboard.framework.errorcode.core.loader;
 
-import cn.iocoder.yudao.common.exception.util.ServiceExceptionUtil;
+import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 
 /**
  * 错误码加载器
  *
- * 注意，错误码最终加载到 {@link cn.iocoder.yudao.common.exception.util.ServiceExceptionUtil} 的 MESSAGES 变量中！
+ * 注意，错误码最终加载到 {@link ServiceExceptionUtil} 的 MESSAGES 变量中！
  *
  * @author dlyan
  */

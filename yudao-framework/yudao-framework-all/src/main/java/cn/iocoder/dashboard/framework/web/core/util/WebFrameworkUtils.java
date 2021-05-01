@@ -1,7 +1,7 @@
 package cn.iocoder.dashboard.framework.web.core.util;
 
-import cn.iocoder.yudao.common.enums.UserTypeEnum;
-import cn.iocoder.yudao.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
+import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;

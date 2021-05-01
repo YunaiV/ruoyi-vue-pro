@@ -1,7 +1,7 @@
 package cn.iocoder.dashboard.framework.redis.core.stream;
 
 import cn.hutool.core.util.TypeUtil;
-import cn.iocoder.yudao.util.json.JsonUtils;
+import cn.iocoder.yudao.framework.util.json.JsonUtils;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;

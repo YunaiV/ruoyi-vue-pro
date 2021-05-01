@@ -5,7 +5,7 @@ import cn.iocoder.dashboard.modules.system.controller.dept.vo.dept.SysDeptCreate
 import cn.iocoder.dashboard.modules.system.controller.dept.vo.dept.SysDeptListReqVO;
 import cn.iocoder.dashboard.modules.system.controller.dept.vo.dept.SysDeptUpdateReqVO;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.dept.SysDeptDO;
-import cn.iocoder.yudao.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.util.collection.CollectionUtils;
 
 import java.util.Collection;
 import java.util.Collections;

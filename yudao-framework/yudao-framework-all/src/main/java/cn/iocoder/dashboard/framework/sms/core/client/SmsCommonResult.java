@@ -2,8 +2,8 @@ package cn.iocoder.dashboard.framework.sms.core.client;
 
 import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.core.lang.Assert;
-import cn.iocoder.yudao.common.exception.ErrorCode;
-import cn.iocoder.yudao.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.exception.ErrorCode;
+import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.dashboard.framework.sms.core.enums.SmsFrameworkErrorCodeConstants;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

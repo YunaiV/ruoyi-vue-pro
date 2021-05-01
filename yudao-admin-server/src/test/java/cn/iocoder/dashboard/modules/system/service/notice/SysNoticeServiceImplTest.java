@@ -1,8 +1,8 @@
 package cn.iocoder.dashboard.modules.system.service.notice;
 
 import cn.iocoder.dashboard.BaseDbUnitTest;
-import cn.iocoder.yudao.common.enums.CommonStatusEnum;
-import cn.iocoder.yudao.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.dashboard.modules.system.controller.notice.vo.SysNoticeCreateReqVO;
 import cn.iocoder.dashboard.modules.system.controller.notice.vo.SysNoticePageReqVO;
 import cn.iocoder.dashboard.modules.system.controller.notice.vo.SysNoticeUpdateReqVO;
@@ -10,7 +10,7 @@ import cn.iocoder.dashboard.modules.system.dal.dataobject.notice.SysNoticeDO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.notice.SysNoticeMapper;
 import cn.iocoder.dashboard.modules.system.enums.notice.SysNoticeTypeEnum;
 import cn.iocoder.dashboard.modules.system.service.notice.impl.SysNoticeServiceImpl;
-import cn.iocoder.yudao.util.object.ObjectUtils;
+import cn.iocoder.yudao.framework.util.object.ObjectUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 

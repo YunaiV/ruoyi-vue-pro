@@ -15,7 +15,7 @@ import org.springframework.scheduling.quartz.QuartzJobBean;
 import javax.annotation.Resource;
 import java.util.Date;
 
-import static cn.iocoder.yudao.util.date.DateUtils.diff;
+import static cn.iocoder.yudao.framework.util.date.DateUtils.diff;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
 
 /**

@@ -1,8 +1,8 @@
 package cn.iocoder.dashboard.modules.tool.dal.mysql.codegen;
 
-import cn.iocoder.yudao.common.pojo.PageResult;
-import cn.iocoder.dashboard.framework.mybatis.core.mapper.BaseMapperX;
-import cn.iocoder.dashboard.framework.mybatis.core.query.QueryWrapperX;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
+import cn.iocoder.yudao.framework.mybatis.core.query.QueryWrapperX;
 import cn.iocoder.dashboard.modules.tool.controller.codegen.vo.table.ToolCodegenTablePageReqVO;
 import cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen.ToolCodegenTableDO;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;

@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.modules.infra.dal.dataobject.job;
 
-import cn.iocoder.dashboard.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.dashboard.modules.infra.enums.job.InfJobStatusEnum;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;

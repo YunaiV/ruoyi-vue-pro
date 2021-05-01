@@ -3,15 +3,15 @@ package cn.iocoder.dashboard.framework.web.core.handler;
 import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.extra.servlet.ServletUtil;
-import cn.iocoder.yudao.common.exception.ServiceException;
-import cn.iocoder.yudao.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.exception.ServiceException;
+import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.dashboard.framework.logger.apilog.core.service.ApiErrorLogFrameworkService;
 import cn.iocoder.dashboard.framework.logger.apilog.core.service.dto.ApiErrorLogCreateDTO;
 import cn.iocoder.dashboard.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.dashboard.framework.tracer.core.util.TracerUtils;
 import cn.iocoder.dashboard.framework.web.core.util.WebFrameworkUtils;
-import cn.iocoder.yudao.util.json.JsonUtils;
-import cn.iocoder.yudao.util.servlet.ServletUtils;
+import cn.iocoder.yudao.framework.util.json.JsonUtils;
+import cn.iocoder.yudao.framework.util.servlet.ServletUtils;
 import io.github.resilience4j.ratelimiter.RequestNotPermitted;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -36,7 +36,7 @@ import javax.validation.ValidationException;
 import java.util.Date;
 import java.util.Map;
 
-import static cn.iocoder.yudao.common.exception.enums.GlobalErrorCodeConstants.*;
+import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.*;
 
 /**
  * 全局异常处理器，将 Exception 翻译成 CommonResult + 对应的异常编号

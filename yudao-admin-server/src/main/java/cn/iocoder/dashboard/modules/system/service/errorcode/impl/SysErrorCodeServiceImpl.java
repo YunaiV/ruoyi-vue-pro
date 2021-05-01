@@ -1,7 +1,7 @@
 package cn.iocoder.dashboard.modules.system.service.errorcode.impl;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.iocoder.yudao.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.dashboard.framework.errorcode.core.dto.ErrorCodeAutoGenerateReqDTO;
 import cn.iocoder.dashboard.framework.errorcode.core.dto.ErrorCodeRespDTO;
 import cn.iocoder.dashboard.modules.system.convert.errorcode.SysErrorCodeConvert;
@@ -24,10 +24,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import static cn.iocoder.yudao.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.*;
-import static cn.iocoder.yudao.util.collection.CollectionUtils.convertMap;
-import static cn.iocoder.yudao.util.collection.CollectionUtils.convertSet;
+import static cn.iocoder.yudao.framework.util.collection.CollectionUtils.convertMap;
+import static cn.iocoder.yudao.framework.util.collection.CollectionUtils.convertSet;
 
 /**
  * 错误码 Service 实现类

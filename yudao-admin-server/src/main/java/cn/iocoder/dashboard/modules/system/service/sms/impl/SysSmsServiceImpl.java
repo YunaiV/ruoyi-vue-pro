@@ -2,9 +2,9 @@ package cn.iocoder.dashboard.modules.system.service.sms.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.common.core.KeyValue;
-import cn.iocoder.yudao.common.enums.CommonStatusEnum;
-import cn.iocoder.yudao.common.enums.UserTypeEnum;
+import cn.iocoder.yudao.framework.common.core.KeyValue;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.dashboard.framework.sms.core.client.SmsClient;
 import cn.iocoder.dashboard.framework.sms.core.client.SmsClientFactory;
 import cn.iocoder.dashboard.framework.sms.core.client.SmsCommonResult;
@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static cn.iocoder.yudao.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.*;
 
 /**

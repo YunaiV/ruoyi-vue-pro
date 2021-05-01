@@ -5,7 +5,6 @@ import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.iocoder.dashboard.framework.apollo.core.ConfigConsts;
 import cn.iocoder.dashboard.framework.apollo.internals.dto.ConfigRespDTO;
-import cn.iocoder.yudao.util.object.ObjectUtils;
 import com.ctrip.framework.apollo.Apollo;
 import com.ctrip.framework.apollo.build.ApolloInjector;
 import com.ctrip.framework.apollo.core.utils.ApolloThreadFactory;

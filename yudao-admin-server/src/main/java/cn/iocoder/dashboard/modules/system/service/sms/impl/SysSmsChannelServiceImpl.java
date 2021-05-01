@@ -1,8 +1,8 @@
 package cn.iocoder.dashboard.modules.system.service.sms.impl;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.iocoder.yudao.common.pojo.PageResult;
-import cn.iocoder.dashboard.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.dashboard.framework.sms.core.client.SmsClientFactory;
 import cn.iocoder.dashboard.framework.sms.core.property.SmsChannelProperties;
 import cn.iocoder.dashboard.modules.system.controller.sms.vo.channel.SysSmsChannelCreateReqVO;
@@ -25,7 +25,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
-import static cn.iocoder.yudao.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.SMS_CHANNEL_HAS_CHILDREN;
 import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.SMS_CHANNEL_NOT_EXISTS;
 

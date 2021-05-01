@@ -1,8 +1,8 @@
 package cn.iocoder.dashboard.modules.tool.dal.mysql.test;
 
-import cn.iocoder.yudao.common.pojo.PageResult;
-import cn.iocoder.dashboard.framework.mybatis.core.mapper.BaseMapperX;
-import cn.iocoder.dashboard.framework.mybatis.core.query.QueryWrapperX;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
+import cn.iocoder.yudao.framework.mybatis.core.query.QueryWrapperX;
 import cn.iocoder.dashboard.modules.tool.controller.test.vo.ToolTestDemoExportReqVO;
 import cn.iocoder.dashboard.modules.tool.controller.test.vo.ToolTestDemoPageReqVO;
 import cn.iocoder.dashboard.modules.tool.dal.dataobject.test.ToolTestDemoDO;

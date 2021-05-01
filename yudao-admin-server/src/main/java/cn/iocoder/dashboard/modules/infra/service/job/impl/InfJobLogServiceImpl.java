@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.modules.infra.service.job.impl;
 
-import cn.iocoder.yudao.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.dashboard.modules.infra.controller.job.vo.log.InfJobLogExportReqVO;
 import cn.iocoder.dashboard.modules.infra.controller.job.vo.log.InfJobLogPageReqVO;
 import cn.iocoder.dashboard.modules.infra.dal.dataobject.job.InfJobLogDO;

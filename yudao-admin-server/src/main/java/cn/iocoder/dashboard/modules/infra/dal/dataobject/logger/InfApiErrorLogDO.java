@@ -1,7 +1,7 @@
 package cn.iocoder.dashboard.modules.infra.dal.dataobject.logger;
 
-import cn.iocoder.yudao.common.enums.UserTypeEnum;
-import cn.iocoder.dashboard.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
+import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.dashboard.modules.infra.enums.logger.InfApiErrorLogProcessStatusEnum;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.user.SysUserDO;
 import com.baomidou.mybatisplus.annotation.TableName;

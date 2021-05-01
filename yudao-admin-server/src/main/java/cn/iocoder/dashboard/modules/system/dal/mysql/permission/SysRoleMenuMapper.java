@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.modules.system.dal.mysql.permission;
 
-import cn.iocoder.dashboard.framework.mybatis.core.mapper.BaseMapperX;
+import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.permission.SysRoleMenuDO;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.apache.ibatis.annotations.Mapper;
@@ -33,7 +33,7 @@ public interface SysRoleMenuMapper extends BaseMapperX<SysRoleMenuDO> {
         delete(new QueryWrapper<SysRoleMenuDO>().eq("role_id", roleId)
                 .in("menu_id", menuIds));
     }
-    
+
     default void deleteListByMenuId(Long menuId) {
         delete(new QueryWrapper<SysRoleMenuDO>().eq("menu_id", menuId));
     }

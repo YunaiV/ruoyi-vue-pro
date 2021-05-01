@@ -2,7 +2,7 @@ package cn.iocoder.dashboard.framework.redis.core.util;
 
 import cn.iocoder.dashboard.framework.redis.core.pubsub.ChannelMessage;
 import cn.iocoder.dashboard.framework.redis.core.stream.StreamMessage;
-import cn.iocoder.yudao.util.json.JsonUtils;
+import cn.iocoder.yudao.framework.util.json.JsonUtils;
 import org.springframework.data.redis.connection.stream.RecordId;
 import org.springframework.data.redis.connection.stream.StreamRecords;
 import org.springframework.data.redis.core.RedisTemplate;

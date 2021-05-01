@@ -1,7 +1,7 @@
 package cn.iocoder.dashboard.modules.system.service.user;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.iocoder.yudao.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.dashboard.modules.system.controller.user.vo.profile.SysUserProfileUpdatePasswordReqVO;
 import cn.iocoder.dashboard.modules.system.controller.user.vo.profile.SysUserProfileUpdateReqVO;
 import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserCreateReqVO;
@@ -11,7 +11,7 @@ import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserImport
 import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserPageReqVO;
 import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserUpdateReqVO;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.user.SysUserDO;
-import cn.iocoder.yudao.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.util.collection.CollectionUtils;
 
 import java.io.InputStream;
 import java.util.Collection;

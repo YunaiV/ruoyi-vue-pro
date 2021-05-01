@@ -1,7 +1,7 @@
 package cn.iocoder.dashboard.framework.sms.core.client.impl.aliyun;
 
 import cn.iocoder.dashboard.framework.BaseMockitoUnitTest;
-import cn.iocoder.yudao.common.exception.enums.GlobalErrorCodeConstants;
+import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants;
 import cn.iocoder.dashboard.framework.sms.core.enums.SmsFrameworkErrorCodeConstants;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;

@@ -1,7 +1,7 @@
 package cn.iocoder.dashboard.framework.sms.core.client.impl.debug;
 
-import cn.iocoder.yudao.common.exception.ErrorCode;
-import cn.iocoder.yudao.common.exception.enums.GlobalErrorCodeConstants;
+import cn.iocoder.yudao.framework.common.exception.ErrorCode;
+import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants;
 import cn.iocoder.dashboard.framework.sms.core.client.SmsCodeMapping;
 
 import java.util.Objects;

@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.modules.system.controller.auth.vo.session;
 
-import cn.iocoder.yudao.common.pojo.PageParam;
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;

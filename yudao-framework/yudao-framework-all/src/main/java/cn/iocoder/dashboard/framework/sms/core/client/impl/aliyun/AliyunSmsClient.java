@@ -3,7 +3,7 @@ package cn.iocoder.dashboard.framework.sms.core.client.impl.aliyun;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.common.core.KeyValue;
+import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.dashboard.framework.sms.core.client.SmsCommonResult;
 import cn.iocoder.dashboard.framework.sms.core.client.dto.SmsReceiveRespDTO;
 import cn.iocoder.dashboard.framework.sms.core.client.dto.SmsSendRespDTO;
@@ -11,8 +11,8 @@ import cn.iocoder.dashboard.framework.sms.core.client.dto.SmsTemplateRespDTO;
 import cn.iocoder.dashboard.framework.sms.core.client.impl.AbstractSmsClient;
 import cn.iocoder.dashboard.framework.sms.core.enums.SmsTemplateAuditStatusEnum;
 import cn.iocoder.dashboard.framework.sms.core.property.SmsChannelProperties;
-import cn.iocoder.yudao.util.collection.MapUtils;
-import cn.iocoder.yudao.util.json.JsonUtils;
+import cn.iocoder.yudao.framework.util.collection.MapUtils;
+import cn.iocoder.yudao.framework.util.json.JsonUtils;
 import com.aliyuncs.AcsRequest;
 import com.aliyuncs.AcsResponse;
 import com.aliyuncs.DefaultAcsClient;
@@ -34,8 +34,8 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static cn.iocoder.yudao.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
-import static cn.iocoder.yudao.util.date.DateUtils.TIME_ZONE_DEFAULT;
+import static cn.iocoder.yudao.framework.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
+import static cn.iocoder.yudao.framework.util.date.DateUtils.TIME_ZONE_DEFAULT;
 
 /**
  * 阿里短信客户端的实现类

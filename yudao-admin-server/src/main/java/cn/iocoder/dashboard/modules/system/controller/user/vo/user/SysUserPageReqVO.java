@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.modules.system.controller.user.vo.user;
 
-import cn.iocoder.yudao.common.pojo.PageParam;
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -11,7 +11,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 
-import static cn.iocoder.yudao.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
+import static cn.iocoder.yudao.framework.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 @ApiModel("用户分页 Request VO")
 @Data

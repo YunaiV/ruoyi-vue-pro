@@ -2,9 +2,9 @@ package cn.iocoder.dashboard.modules.infra.service.logger;
 
 import cn.hutool.core.util.RandomUtil;
 import cn.iocoder.dashboard.BaseDbUnitTest;
-import cn.iocoder.yudao.common.enums.UserTypeEnum;
-import cn.iocoder.yudao.common.exception.enums.GlobalErrorCodeConstants;
-import cn.iocoder.yudao.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
+import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.dashboard.framework.logger.apilog.core.service.dto.ApiAccessLogCreateDTO;
 import cn.iocoder.dashboard.modules.infra.controller.logger.vo.apiaccesslog.InfApiAccessLogExportReqVO;
 import cn.iocoder.dashboard.modules.infra.controller.logger.vo.apiaccesslog.InfApiAccessLogPageReqVO;
@@ -12,7 +12,7 @@ import cn.iocoder.dashboard.modules.infra.dal.dataobject.logger.InfApiAccessLogD
 import cn.iocoder.dashboard.modules.infra.dal.mysql.logger.InfApiAccessLogMapper;
 import cn.iocoder.dashboard.modules.infra.service.logger.impl.InfApiAccessLogServiceImpl;
 import cn.iocoder.dashboard.framework.test.core.util.RandomUtils;
-import cn.iocoder.yudao.util.object.ObjectUtils;
+import cn.iocoder.yudao.framework.util.object.ObjectUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.concurrent.Future;
 
 import static cn.iocoder.dashboard.framework.test.core.util.AssertUtils.assertPojoEquals;
-import static cn.iocoder.yudao.util.date.DateUtils.buildTime;
+import static cn.iocoder.yudao.framework.util.date.DateUtils.buildTime;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 

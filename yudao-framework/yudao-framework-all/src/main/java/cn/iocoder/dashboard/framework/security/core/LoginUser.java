@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.framework.security.core;
 
-import cn.iocoder.yudao.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;

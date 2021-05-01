@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.modules.infra.service.logger;
 
-import cn.iocoder.yudao.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.dashboard.framework.logger.apilog.core.service.ApiErrorLogFrameworkService;
 import cn.iocoder.dashboard.modules.infra.controller.logger.vo.apierrorlog.InfApiErrorLogExportReqVO;
 import cn.iocoder.dashboard.modules.infra.controller.logger.vo.apierrorlog.InfApiErrorLogPageReqVO;

@@ -1,8 +1,8 @@
 package cn.iocoder.dashboard.modules.infra.dal.mysql.config;
 
-import cn.iocoder.yudao.common.pojo.PageResult;
-import cn.iocoder.dashboard.framework.mybatis.core.mapper.BaseMapperX;
-import cn.iocoder.dashboard.framework.mybatis.core.query.QueryWrapperX;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
+import cn.iocoder.yudao.framework.mybatis.core.query.QueryWrapperX;
 import cn.iocoder.dashboard.modules.infra.controller.config.vo.InfConfigExportReqVO;
 import cn.iocoder.dashboard.modules.infra.controller.config.vo.InfConfigPageReqVO;
 import cn.iocoder.dashboard.modules.infra.dal.dataobject.config.InfConfigDO;

@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.modules.system.service.notice;
 
-import cn.iocoder.yudao.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.dashboard.modules.system.controller.notice.vo.SysNoticeCreateReqVO;
 import cn.iocoder.dashboard.modules.system.controller.notice.vo.SysNoticePageReqVO;
 import cn.iocoder.dashboard.modules.system.controller.notice.vo.SysNoticeUpdateReqVO;

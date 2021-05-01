@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.framework.sms.core.client.impl;
 
-import cn.iocoder.yudao.common.core.KeyValue;
+import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.dashboard.framework.sms.core.client.SmsClient;
 import cn.iocoder.dashboard.framework.sms.core.client.SmsCodeMapping;
 import cn.iocoder.dashboard.framework.sms.core.client.SmsCommonResult;

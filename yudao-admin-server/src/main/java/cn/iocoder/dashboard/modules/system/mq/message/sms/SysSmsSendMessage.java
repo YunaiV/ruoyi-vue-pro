@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.modules.system.mq.message.sms;
 
-import cn.iocoder.yudao.common.core.KeyValue;
+import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.dashboard.framework.redis.core.stream.StreamMessage;
 import lombok.Data;
 

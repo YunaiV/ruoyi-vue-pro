@@ -1,7 +1,7 @@
 package cn.iocoder.dashboard.modules.system.controller.notice;
 
-import cn.iocoder.yudao.common.pojo.CommonResult;
-import cn.iocoder.yudao.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.dashboard.modules.system.controller.notice.vo.SysNoticeCreateReqVO;
 import cn.iocoder.dashboard.modules.system.controller.notice.vo.SysNoticePageReqVO;
 import cn.iocoder.dashboard.modules.system.controller.notice.vo.SysNoticeRespVO;
@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 
-import static cn.iocoder.yudao.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
 @Api(tags = "通知公告")
 @RestController

@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.modules.system.service.dict;
 
-import cn.iocoder.yudao.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.dashboard.modules.system.controller.dict.vo.type.SysDictTypeCreateReqVO;
 import cn.iocoder.dashboard.modules.system.controller.dict.vo.type.SysDictTypeExportReqVO;
 import cn.iocoder.dashboard.modules.system.controller.dict.vo.type.SysDictTypePageReqVO;

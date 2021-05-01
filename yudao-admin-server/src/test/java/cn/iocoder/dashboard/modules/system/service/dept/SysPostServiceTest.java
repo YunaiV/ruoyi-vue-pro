@@ -1,8 +1,8 @@
 package cn.iocoder.dashboard.modules.system.service.dept;
 
 import cn.iocoder.dashboard.BaseDbUnitTest;
-import cn.iocoder.yudao.common.enums.CommonStatusEnum;
-import cn.iocoder.yudao.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.dashboard.modules.system.controller.dept.vo.post.SysPostCreateReqVO;
 import cn.iocoder.dashboard.modules.system.controller.dept.vo.post.SysPostExportReqVO;
 import cn.iocoder.dashboard.modules.system.controller.dept.vo.post.SysPostPageReqVO;
@@ -10,8 +10,8 @@ import cn.iocoder.dashboard.modules.system.controller.dept.vo.post.SysPostUpdate
 import cn.iocoder.dashboard.modules.system.dal.dataobject.dept.SysPostDO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dept.SysPostMapper;
 import cn.iocoder.dashboard.modules.system.service.dept.impl.SysPostServiceImpl;
-import cn.iocoder.yudao.util.collection.ArrayUtils;
-import cn.iocoder.yudao.util.object.ObjectUtils;
+import cn.iocoder.yudao.framework.util.collection.ArrayUtils;
+import cn.iocoder.yudao.framework.util.object.ObjectUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 

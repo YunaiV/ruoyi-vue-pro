@@ -1,7 +1,7 @@
 package cn.iocoder.dashboard.modules.system.controller.auth;
 
-import cn.iocoder.yudao.common.enums.CommonStatusEnum;
-import cn.iocoder.yudao.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.dashboard.framework.logger.operatelog.core.annotations.OperateLog;
 import cn.iocoder.dashboard.modules.system.controller.auth.vo.auth.SysAuthLoginReqVO;
 import cn.iocoder.dashboard.modules.system.controller.auth.vo.auth.SysAuthLoginRespVO;
@@ -16,7 +16,7 @@ import cn.iocoder.dashboard.modules.system.service.auth.SysAuthService;
 import cn.iocoder.dashboard.modules.system.service.permission.SysPermissionService;
 import cn.iocoder.dashboard.modules.system.service.permission.SysRoleService;
 import cn.iocoder.dashboard.modules.system.service.user.SysUserService;
-import cn.iocoder.yudao.util.collection.SetUtils;
+import cn.iocoder.yudao.framework.util.collection.SetUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.validation.annotation.Validated;
@@ -26,11 +26,11 @@ import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.util.List;
 
-import static cn.iocoder.yudao.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.dashboard.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 import static cn.iocoder.dashboard.framework.security.core.util.SecurityFrameworkUtils.getLoginUserRoleIds;
-import static cn.iocoder.yudao.util.servlet.ServletUtils.getClientIP;
-import static cn.iocoder.yudao.util.servlet.ServletUtils.getUserAgent;
+import static cn.iocoder.yudao.framework.util.servlet.ServletUtils.getClientIP;
+import static cn.iocoder.yudao.framework.util.servlet.ServletUtils.getUserAgent;
 
 @Api(tags = "认证")
 @RestController

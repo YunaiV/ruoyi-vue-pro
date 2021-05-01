@@ -4,15 +4,15 @@ import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.servlet.ServletUtil;
-import cn.iocoder.yudao.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.dashboard.framework.logger.operatelog.core.annotations.OperateLog;
 import cn.iocoder.dashboard.framework.logger.operatelog.core.dto.OperateLogCreateReqDTO;
 import cn.iocoder.dashboard.framework.logger.operatelog.core.enums.OperateTypeEnum;
 import cn.iocoder.dashboard.framework.logger.operatelog.core.service.OperateLogFrameworkService;
 import cn.iocoder.dashboard.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.dashboard.framework.tracer.core.util.TracerUtils;
-import cn.iocoder.yudao.util.json.JsonUtils;
-import cn.iocoder.yudao.util.servlet.ServletUtils;
+import cn.iocoder.yudao.framework.util.json.JsonUtils;
+import cn.iocoder.yudao.framework.util.servlet.ServletUtils;
 import com.google.common.collect.Maps;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -35,8 +35,8 @@ import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
 
-import static cn.iocoder.yudao.common.exception.enums.GlobalErrorCodeConstants.INTERNAL_SERVER_ERROR;
-import static cn.iocoder.yudao.common.exception.enums.GlobalErrorCodeConstants.SUCCESS;
+import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.INTERNAL_SERVER_ERROR;
+import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.SUCCESS;
 
 /**
  * 拦截使用 @OperateLog 注解，如果满足条件，则生成操作日志。

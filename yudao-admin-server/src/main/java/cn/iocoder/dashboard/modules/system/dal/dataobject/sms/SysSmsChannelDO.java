@@ -1,7 +1,7 @@
 package cn.iocoder.dashboard.modules.system.dal.dataobject.sms;
 
-import cn.iocoder.yudao.common.enums.CommonStatusEnum;
-import cn.iocoder.dashboard.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.dashboard.framework.sms.core.enums.SmsChannelEnum;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;

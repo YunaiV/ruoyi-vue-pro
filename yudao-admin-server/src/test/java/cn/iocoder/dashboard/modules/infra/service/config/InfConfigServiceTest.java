@@ -1,7 +1,7 @@
 package cn.iocoder.dashboard.modules.infra.service.config;
 
 import cn.iocoder.dashboard.BaseDbUnitTest;
-import cn.iocoder.yudao.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.dashboard.modules.infra.controller.config.vo.InfConfigCreateReqVO;
 import cn.iocoder.dashboard.modules.infra.controller.config.vo.InfConfigExportReqVO;
 import cn.iocoder.dashboard.modules.infra.controller.config.vo.InfConfigPageReqVO;
@@ -11,8 +11,8 @@ import cn.iocoder.dashboard.modules.infra.dal.mysql.config.InfConfigMapper;
 import cn.iocoder.dashboard.modules.infra.enums.config.InfConfigTypeEnum;
 import cn.iocoder.dashboard.modules.infra.mq.producer.config.InfConfigProducer;
 import cn.iocoder.dashboard.modules.infra.service.config.impl.InfConfigServiceImpl;
-import cn.iocoder.yudao.util.collection.ArrayUtils;
-import cn.iocoder.yudao.util.object.ObjectUtils;
+import cn.iocoder.yudao.framework.util.collection.ArrayUtils;
+import cn.iocoder.yudao.framework.util.object.ObjectUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
@@ -26,7 +26,7 @@ import static cn.iocoder.dashboard.modules.infra.enums.InfErrorCodeConstants.*;
 import static cn.iocoder.dashboard.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.dashboard.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.dashboard.framework.test.core.util.RandomUtils.*;
-import static cn.iocoder.yudao.util.date.DateUtils.buildTime;
+import static cn.iocoder.yudao.framework.util.date.DateUtils.buildTime;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;

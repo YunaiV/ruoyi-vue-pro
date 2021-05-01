@@ -22,7 +22,7 @@
         <swagger-annotations.version>1.5.22</swagger-annotations.version>
         <servlet.versoin>2.5</servlet.versoin>
         <!-- DB 相关 -->
-        <mysql-connector-java.version>5.1.46</mysql-connector-java.version>
+        <mysql.version>5.1.46</mysql.version>
         <druid.version>1.2.4</druid.version>
         <mybatis-plus.version>3.4.2</mybatis-plus.version>
         <dynamic-datasource.version>3.3.2</dynamic-datasource.version>
@@ -62,6 +62,12 @@
                 <version>${spring.boot.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+                <exclusions>
+                    <exclusion>
+                        <groupId>mysql</groupId>
+                        <artifactId>mysql-connector-java</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <!-- Spring 核心 -->
@@ -100,9 +106,15 @@
 
             <!-- DB 相关 -->
             <dependency>
+                <groupId>cn.iocoder.boot</groupId>
+                <artifactId>yudao-spring-boot-starter-mybatis</artifactId>
+                <version>1.0.0</version>
+            </dependency>
+
+            <dependency>
                 <groupId>mysql</groupId>
                 <artifactId>mysql-connector-java</artifactId>
-                <version>${mysql-connector-java.version}</version>
+                <version>${mysql.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.alibaba</groupId>

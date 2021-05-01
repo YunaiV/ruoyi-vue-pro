@@ -1,14 +1,14 @@
 package cn.iocoder.dashboard.modules.infra.controller.file;
 
 import cn.hutool.core.io.IoUtil;
-import cn.iocoder.yudao.common.pojo.CommonResult;
-import cn.iocoder.yudao.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.dashboard.modules.infra.controller.file.vo.InfFilePageReqVO;
 import cn.iocoder.dashboard.modules.infra.controller.file.vo.InfFileRespVO;
 import cn.iocoder.dashboard.modules.infra.convert.file.InfFileConvert;
 import cn.iocoder.dashboard.modules.infra.dal.dataobject.file.InfFileDO;
 import cn.iocoder.dashboard.modules.infra.service.file.InfFileService;
-import cn.iocoder.yudao.util.servlet.ServletUtils;
+import cn.iocoder.yudao.framework.util.servlet.ServletUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -25,7 +25,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
 
-import static cn.iocoder.yudao.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
 @Api(tags = "文件存储")
 @RestController

@@ -1,7 +1,7 @@
 package cn.iocoder.dashboard.framework.redis.core.pubsub;
 
 import cn.hutool.core.util.TypeUtil;
-import cn.iocoder.yudao.util.json.JsonUtils;
+import cn.iocoder.yudao.framework.util.json.JsonUtils;
 import lombok.SneakyThrows;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;

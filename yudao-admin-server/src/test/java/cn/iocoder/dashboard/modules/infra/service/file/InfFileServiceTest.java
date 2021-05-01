@@ -2,13 +2,13 @@ package cn.iocoder.dashboard.modules.infra.service.file;
 
 import cn.hutool.core.io.resource.ResourceUtil;
 import cn.iocoder.dashboard.BaseDbUnitTest;
-import cn.iocoder.yudao.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.dashboard.framework.file.config.FileProperties;
 import cn.iocoder.dashboard.modules.infra.controller.file.vo.InfFilePageReqVO;
 import cn.iocoder.dashboard.modules.infra.dal.dataobject.file.InfFileDO;
 import cn.iocoder.dashboard.modules.infra.dal.mysql.file.InfFileMapper;
 import cn.iocoder.dashboard.modules.infra.service.file.impl.InfFileServiceImpl;
-import cn.iocoder.yudao.util.object.ObjectUtils;
+import cn.iocoder.yudao.framework.util.object.ObjectUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
@@ -20,7 +20,7 @@ import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.FI
 import static cn.iocoder.dashboard.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.dashboard.framework.test.core.util.RandomUtils.randomPojo;
 import static cn.iocoder.dashboard.framework.test.core.util.RandomUtils.randomString;
-import static cn.iocoder.yudao.util.date.DateUtils.buildTime;
+import static cn.iocoder.yudao.framework.util.date.DateUtils.buildTime;
 import static org.junit.jupiter.api.Assertions.*;
 
 @Import({InfFileServiceImpl.class, FileProperties.class})

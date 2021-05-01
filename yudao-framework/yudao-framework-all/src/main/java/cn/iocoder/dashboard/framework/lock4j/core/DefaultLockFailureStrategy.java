@@ -1,12 +1,12 @@
 package cn.iocoder.dashboard.framework.lock4j.core;
 
-import cn.iocoder.yudao.common.exception.ServiceException;
-import cn.iocoder.yudao.common.exception.enums.GlobalErrorCodeConstants;
+import cn.iocoder.yudao.framework.common.exception.ServiceException;
+import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants;
 import com.baomidou.lock.LockFailureStrategy;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * 自定义获取锁失败策略，抛出 {@link cn.iocoder.yudao.common.exception.ServiceException} 异常
+ * 自定义获取锁失败策略，抛出 {@link ServiceException} 异常
  */
 @Slf4j
 public class DefaultLockFailureStrategy implements LockFailureStrategy {

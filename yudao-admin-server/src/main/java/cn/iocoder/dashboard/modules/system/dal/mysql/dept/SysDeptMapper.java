@@ -1,7 +1,7 @@
 package cn.iocoder.dashboard.modules.system.dal.mysql.dept;
 
-import cn.iocoder.dashboard.framework.mybatis.core.mapper.BaseMapperX;
-import cn.iocoder.dashboard.framework.mybatis.core.query.QueryWrapperX;
+import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
+import cn.iocoder.yudao.framework.mybatis.core.query.QueryWrapperX;
 import cn.iocoder.dashboard.modules.system.controller.dept.vo.dept.SysDeptListReqVO;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.dept.SysDeptDO;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;

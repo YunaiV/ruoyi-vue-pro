@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.modules.system.service.dict.impl;
 
-import cn.iocoder.yudao.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.dashboard.modules.system.controller.dict.vo.type.SysDictTypeCreateReqVO;
 import cn.iocoder.dashboard.modules.system.controller.dict.vo.type.SysDictTypeExportReqVO;
 import cn.iocoder.dashboard.modules.system.controller.dict.vo.type.SysDictTypePageReqVO;
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.List;
 
-import static cn.iocoder.yudao.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.*;
 
 /**

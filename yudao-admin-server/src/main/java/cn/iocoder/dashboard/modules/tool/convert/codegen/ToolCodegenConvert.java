@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.modules.tool.convert.codegen;
 
-import cn.iocoder.yudao.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.dashboard.modules.tool.controller.codegen.vo.ToolCodegenDetailRespVO;
 import cn.iocoder.dashboard.modules.tool.controller.codegen.vo.ToolCodegenPreviewRespVO;
 import cn.iocoder.dashboard.modules.tool.controller.codegen.vo.ToolCodegenUpdateReqVO;

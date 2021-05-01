@@ -2,9 +2,9 @@ package cn.iocoder.dashboard.modules.system.service.sms;
 
 import cn.hutool.core.map.MapUtil;
 import cn.iocoder.dashboard.BaseMockitoUnitTest;
-import cn.iocoder.yudao.common.core.KeyValue;
-import cn.iocoder.yudao.common.enums.CommonStatusEnum;
-import cn.iocoder.yudao.common.enums.UserTypeEnum;
+import cn.iocoder.yudao.framework.common.core.KeyValue;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.dashboard.framework.sms.core.client.SmsClient;
 import cn.iocoder.dashboard.framework.sms.core.client.SmsClientFactory;
 import cn.iocoder.dashboard.framework.sms.core.client.SmsCommonResult;

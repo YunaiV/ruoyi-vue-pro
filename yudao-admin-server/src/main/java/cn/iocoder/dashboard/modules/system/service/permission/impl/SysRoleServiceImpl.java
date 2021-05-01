@@ -2,10 +2,10 @@ package cn.iocoder.dashboard.modules.system.service.permission.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
-import cn.iocoder.yudao.common.enums.CommonStatusEnum;
-import cn.iocoder.yudao.common.exception.util.ServiceExceptionUtil;
-import cn.iocoder.yudao.common.pojo.PageResult;
-import cn.iocoder.dashboard.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.dashboard.modules.system.controller.permission.vo.role.SysRoleCreateReqVO;
 import cn.iocoder.dashboard.modules.system.controller.permission.vo.role.SysRoleExportReqVO;
 import cn.iocoder.dashboard.modules.system.controller.permission.vo.role.SysRolePageReqVO;

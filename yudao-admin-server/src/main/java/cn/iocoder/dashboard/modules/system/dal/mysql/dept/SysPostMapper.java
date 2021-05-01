@@ -1,8 +1,8 @@
 package cn.iocoder.dashboard.modules.system.dal.mysql.dept;
 
-import cn.iocoder.yudao.common.pojo.PageResult;
-import cn.iocoder.dashboard.framework.mybatis.core.mapper.BaseMapperX;
-import cn.iocoder.dashboard.framework.mybatis.core.query.QueryWrapperX;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
+import cn.iocoder.yudao.framework.mybatis.core.query.QueryWrapperX;
 import cn.iocoder.dashboard.modules.system.controller.dept.vo.post.SysPostExportReqVO;
 import cn.iocoder.dashboard.modules.system.controller.dept.vo.post.SysPostPageReqVO;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.dept.SysPostDO;

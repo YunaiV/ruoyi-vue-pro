@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.framework.sms.core.client;
 
-import cn.iocoder.yudao.common.core.KeyValue;
+import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.dashboard.framework.sms.core.client.dto.SmsReceiveRespDTO;
 import cn.iocoder.dashboard.framework.sms.core.client.dto.SmsSendRespDTO;
 import cn.iocoder.dashboard.framework.sms.core.client.dto.SmsTemplateRespDTO;

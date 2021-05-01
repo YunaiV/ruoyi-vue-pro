@@ -6,7 +6,7 @@ import static cn.iocoder.dashboard.framework.test.core.util.RandomUtils.randomDa
 import static cn.iocoder.dashboard.framework.test.core.util.RandomUtils.randomLongId;
 import static cn.iocoder.dashboard.framework.test.core.util.RandomUtils.randomPojo;
 import static cn.iocoder.dashboard.framework.test.core.util.RandomUtils.randomString;
-import static cn.iocoder.yudao.util.date.DateUtils.addTime;
+import static cn.iocoder.yudao.framework.util.date.DateUtils.addTime;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -27,8 +27,8 @@ import org.springframework.context.annotation.Import;
 
 import cn.hutool.core.date.DateUtil;
 import cn.iocoder.dashboard.BaseDbAndRedisUnitTest;
-import cn.iocoder.yudao.common.enums.CommonStatusEnum;
-import cn.iocoder.yudao.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.dashboard.framework.security.config.SecurityProperties;
 import cn.iocoder.dashboard.framework.security.core.LoginUser;
 import cn.iocoder.dashboard.modules.system.controller.auth.vo.session.SysUserSessionPageReqVO;
@@ -44,7 +44,7 @@ import cn.iocoder.dashboard.modules.system.service.logger.impl.SysLoginLogServic
 import cn.iocoder.dashboard.modules.system.service.user.SysUserServiceImpl;
 import cn.iocoder.dashboard.framework.test.core.util.AssertUtils;
 import cn.iocoder.dashboard.framework.test.core.util.RandomUtils;
-import cn.iocoder.yudao.util.object.ObjectUtils;
+import cn.iocoder.yudao.framework.util.object.ObjectUtils;
 
 /**
  * SysUserSessionServiceImpl Tester.

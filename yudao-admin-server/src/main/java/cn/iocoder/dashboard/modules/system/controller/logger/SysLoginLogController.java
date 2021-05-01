@@ -1,7 +1,7 @@
 package cn.iocoder.dashboard.modules.system.controller.logger;
 
-import cn.iocoder.yudao.common.pojo.CommonResult;
-import cn.iocoder.yudao.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.dashboard.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.dashboard.framework.logger.operatelog.core.annotations.OperateLog;
 import cn.iocoder.dashboard.modules.system.controller.logger.vo.loginlog.SysLoginLogExcelVO;

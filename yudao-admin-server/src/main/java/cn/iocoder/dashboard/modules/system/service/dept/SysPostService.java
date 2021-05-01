@@ -1,7 +1,7 @@
 package cn.iocoder.dashboard.modules.system.service.dept;
 
-import cn.iocoder.yudao.common.enums.CommonStatusEnum;
-import cn.iocoder.yudao.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.dashboard.modules.system.controller.dept.vo.post.SysPostCreateReqVO;
 import cn.iocoder.dashboard.modules.system.controller.dept.vo.post.SysPostExportReqVO;
 import cn.iocoder.dashboard.modules.system.controller.dept.vo.post.SysPostPageReqVO;
@@ -12,7 +12,7 @@ import org.springframework.lang.Nullable;
 import java.util.Collection;
 import java.util.List;
 
-import static cn.iocoder.yudao.util.collection.SetUtils.asSet;
+import static cn.iocoder.yudao.framework.util.collection.SetUtils.asSet;
 
 /**
  * 岗位 Service 接口

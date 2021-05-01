@@ -1,12 +1,12 @@
 package cn.iocoder.dashboard.modules.system.convert.logger;
 
-import cn.iocoder.yudao.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.dashboard.framework.logger.operatelog.core.dto.OperateLogCreateReqDTO;
 import cn.iocoder.dashboard.modules.system.controller.logger.vo.operatelog.SysOperateLogExcelVO;
 import cn.iocoder.dashboard.modules.system.controller.logger.vo.operatelog.SysOperateLogRespVO;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.logger.SysOperateLogDO;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.user.SysUserDO;
-import cn.iocoder.yudao.util.collection.MapUtils;
+import cn.iocoder.yudao.framework.util.collection.MapUtils;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static cn.iocoder.yudao.common.exception.enums.GlobalErrorCodeConstants.SUCCESS;
+import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.SUCCESS;
 
 @Mapper
 public interface SysOperateLogConvert {

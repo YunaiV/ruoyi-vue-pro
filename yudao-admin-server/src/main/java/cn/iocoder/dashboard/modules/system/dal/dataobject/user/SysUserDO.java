@@ -1,8 +1,8 @@
 package cn.iocoder.dashboard.modules.system.dal.dataobject.user;
 
-import cn.iocoder.yudao.common.enums.CommonStatusEnum;
-import cn.iocoder.dashboard.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.dashboard.framework.mybatis.core.type.JsonLongSetTypeHandler;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.framework.mybatis.core.type.JsonLongSetTypeHandler;
 import cn.iocoder.dashboard.modules.system.enums.common.SysSexEnum;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;

@@ -1,7 +1,7 @@
 package cn.iocoder.dashboard.modules.system.service.sms.impl;
 
-import cn.iocoder.yudao.common.pojo.CommonResult;
-import cn.iocoder.yudao.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.dashboard.modules.system.controller.sms.vo.log.SysSmsLogExportReqVO;
 import cn.iocoder.dashboard.modules.system.controller.sms.vo.log.SysSmsLogPageReqVO;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.sms.SysSmsLogDO;

@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.modules.system.mq.producer.sms;
 
-import cn.iocoder.yudao.common.core.KeyValue;
+import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.dashboard.framework.redis.core.util.RedisMessageUtils;
 import cn.iocoder.dashboard.modules.system.mq.message.sms.SysSmsChannelRefreshMessage;
 import cn.iocoder.dashboard.modules.system.mq.message.sms.SysSmsSendMessage;

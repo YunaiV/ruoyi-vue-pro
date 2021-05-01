@@ -3,7 +3,7 @@ package cn.iocoder.dashboard.framework.errorcode.core.loader;
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.dashboard.framework.errorcode.core.dto.ErrorCodeRespDTO;
 import cn.iocoder.dashboard.framework.errorcode.core.service.ErrorCodeFrameworkService;
-import cn.iocoder.yudao.util.date.DateUtils;
+import cn.iocoder.yudao.framework.util.date.DateUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.event.ApplicationReadyEvent;

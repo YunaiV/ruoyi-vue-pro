@@ -2,7 +2,7 @@ package cn.iocoder.dashboard.modules.system.controller.sms;
 
 import cn.hutool.core.util.URLUtil;
 import cn.hutool.extra.servlet.ServletUtil;
-import cn.iocoder.yudao.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.dashboard.framework.logger.operatelog.core.annotations.OperateLog;
 import cn.iocoder.dashboard.framework.sms.core.enums.SmsChannelEnum;
 import cn.iocoder.dashboard.modules.system.service.sms.SysSmsService;
@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
-import static cn.iocoder.yudao.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
 @Api(tags = "短信回调")
 @RestController

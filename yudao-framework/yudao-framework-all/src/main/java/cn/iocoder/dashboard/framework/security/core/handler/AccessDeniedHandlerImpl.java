@@ -1,9 +1,9 @@
 package cn.iocoder.dashboard.framework.security.core.handler;
 
-import cn.iocoder.yudao.common.exception.enums.GlobalErrorCodeConstants;
-import cn.iocoder.yudao.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants;
+import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.dashboard.framework.security.core.util.SecurityFrameworkUtils;
-import cn.iocoder.yudao.util.servlet.ServletUtils;
+import cn.iocoder.yudao.framework.util.servlet.ServletUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
@@ -16,7 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-import static cn.iocoder.yudao.common.exception.enums.GlobalErrorCodeConstants.UNAUTHORIZED;
+import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.UNAUTHORIZED;
 
 /**
  * 访问一个需要认证的 URL 资源，已经认证（登录）但是没有权限的情况下，返回 {@link GlobalErrorCodeConstants#FORBIDDEN} 错误码。

@@ -1,9 +1,9 @@
 package cn.iocoder.dashboard.framework.sms.core.client.impl.yunpian;
 
-import cn.iocoder.yudao.common.exception.ErrorCode;
+import cn.iocoder.yudao.framework.common.exception.ErrorCode;
 import cn.iocoder.dashboard.framework.sms.core.client.SmsCodeMapping;
 
-import static cn.iocoder.yudao.common.exception.enums.GlobalErrorCodeConstants.SUCCESS;
+import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.SUCCESS;
 import static cn.iocoder.dashboard.framework.sms.core.enums.SmsFrameworkErrorCodeConstants.*;
 import static com.yunpian.sdk.constant.Code.*;
 

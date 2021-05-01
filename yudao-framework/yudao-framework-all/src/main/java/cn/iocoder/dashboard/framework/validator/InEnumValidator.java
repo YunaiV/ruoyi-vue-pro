@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.framework.validator;
 
-import cn.iocoder.yudao.common.core.IntArrayValuable;
+import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;

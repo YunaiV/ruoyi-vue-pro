@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.framework.sms.core.enums;
 
-import cn.iocoder.yudao.common.exception.ErrorCode;
+import cn.iocoder.yudao.framework.common.exception.ErrorCode;
 
 /**
  * 短信框架的错误码枚举

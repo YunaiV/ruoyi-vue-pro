@@ -1,11 +1,11 @@
 package cn.iocoder.dashboard.framework.security.core.handler;
 
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.dashboard.framework.security.config.SecurityProperties;
 import cn.iocoder.dashboard.framework.security.core.service.SecurityAuthFrameworkService;
 import cn.iocoder.dashboard.framework.security.core.util.SecurityFrameworkUtils;
-import cn.iocoder.yudao.util.servlet.ServletUtils;
+import cn.iocoder.yudao.framework.util.servlet.ServletUtils;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.stereotype.Component;

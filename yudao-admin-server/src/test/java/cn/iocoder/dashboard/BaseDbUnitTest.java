@@ -1,7 +1,7 @@
 package cn.iocoder.dashboard;
 
-import cn.iocoder.dashboard.framework.datasource.config.DataSourceConfiguration;
-import cn.iocoder.dashboard.framework.mybatis.config.MybatisConfiguration;
+import cn.iocoder.yudao.framework.datasource.config.YudaoDataSourceAutoConfiguration;
+import cn.iocoder.yudao.framework.mybatis.config.YudaoMybatisAutoConfiguration;
 import com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceAutoConfigure;
 import com.baomidou.mybatisplus.autoconfigure.MybatisPlusAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
@@ -25,12 +25,12 @@ public class BaseDbUnitTest {
 
     @Import({
             // DB 配置类
-            DataSourceConfiguration.class, // 自己的 DB 配置类
+            YudaoDataSourceAutoConfiguration.class, // 自己的 DB 配置类
             DataSourceAutoConfiguration.class, // Spring DB 自动配置类
             DataSourceTransactionManagerAutoConfiguration.class, // Spring 事务自动配置类
             DruidDataSourceAutoConfigure.class, // Druid 自动配置类
             // MyBatis 配置类
-            MybatisConfiguration.class, // 自己的 MyBatis 配置类
+            YudaoMybatisAutoConfiguration.class, // 自己的 MyBatis 配置类
             MybatisPlusAutoConfiguration.class, // MyBatis 的自动配置类
     })
     public static class Application {

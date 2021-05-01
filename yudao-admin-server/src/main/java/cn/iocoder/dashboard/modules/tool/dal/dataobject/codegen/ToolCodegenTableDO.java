@@ -1,10 +1,9 @@
 package cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen;
 
-import cn.iocoder.dashboard.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.permission.SysMenuDO;
 import cn.iocoder.dashboard.modules.tool.enums.codegen.ToolCodegenTemplateTypeEnum;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;

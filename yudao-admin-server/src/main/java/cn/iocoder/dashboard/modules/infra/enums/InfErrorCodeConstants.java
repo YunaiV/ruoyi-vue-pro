@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.modules.infra.enums;
 
-import cn.iocoder.yudao.common.exception.ErrorCode;
+import cn.iocoder.yudao.framework.common.exception.ErrorCode;
 
 /**
  * Infra 错误码枚举类

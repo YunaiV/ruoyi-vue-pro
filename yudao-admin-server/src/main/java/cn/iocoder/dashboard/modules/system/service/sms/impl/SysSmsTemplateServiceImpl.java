@@ -3,9 +3,9 @@ package cn.iocoder.dashboard.modules.system.service.sms.impl;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ReUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.common.enums.CommonStatusEnum;
-import cn.iocoder.yudao.common.pojo.PageResult;
-import cn.iocoder.dashboard.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.dashboard.framework.sms.core.client.SmsClient;
 import cn.iocoder.dashboard.framework.sms.core.client.SmsClientFactory;
 import cn.iocoder.dashboard.framework.sms.core.client.SmsCommonResult;
@@ -33,7 +33,7 @@ import javax.annotation.Resource;
 import java.util.*;
 import java.util.regex.Pattern;
 
-import static cn.iocoder.yudao.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.*;
 
 /**

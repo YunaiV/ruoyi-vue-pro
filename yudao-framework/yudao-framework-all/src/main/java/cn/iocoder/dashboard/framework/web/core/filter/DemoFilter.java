@@ -1,16 +1,16 @@
 package cn.iocoder.dashboard.framework.web.core.filter;
 
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.dashboard.framework.security.core.util.SecurityFrameworkUtils;
-import cn.iocoder.yudao.util.servlet.ServletUtils;
+import cn.iocoder.yudao.framework.util.servlet.ServletUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import static cn.iocoder.yudao.common.exception.enums.GlobalErrorCodeConstants.DEMO_DENY;
+import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.DEMO_DENY;
 
 /**
  * 演示 Filter，禁止用户发起写操作，避免影响测试数据

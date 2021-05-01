@@ -3,7 +3,7 @@ package cn.iocoder.dashboard.framework.errorcode.core.generator;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.ReflectUtil;
-import cn.iocoder.yudao.common.exception.ErrorCode;
+import cn.iocoder.yudao.framework.common.exception.ErrorCode;
 import cn.iocoder.dashboard.framework.errorcode.core.dto.ErrorCodeAutoGenerateReqDTO;
 import cn.iocoder.dashboard.framework.errorcode.core.service.ErrorCodeFrameworkService;
 import lombok.RequiredArgsConstructor;

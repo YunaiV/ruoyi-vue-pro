@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.framework.dict.core.dto;
 
-import cn.iocoder.yudao.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import lombok.Data;
 
 /**

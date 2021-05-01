@@ -3,7 +3,7 @@ package cn.iocoder.dashboard.framework.tracer.core.aop;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.dashboard.framework.tracer.core.annotation.BizTrace;
-import cn.iocoder.yudao.util.sping.SpringExpressionUtils;
+import cn.iocoder.yudao.framework.util.sping.SpringExpressionUtils;
 import io.opentracing.Span;
 import io.opentracing.Tracer;
 import lombok.extern.slf4j.Slf4j;

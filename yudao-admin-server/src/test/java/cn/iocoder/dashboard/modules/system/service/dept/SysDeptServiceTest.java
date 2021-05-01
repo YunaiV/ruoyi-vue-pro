@@ -1,7 +1,7 @@
 package cn.iocoder.dashboard.modules.system.service.dept;
 
 import cn.iocoder.dashboard.BaseDbUnitTest;
-import cn.iocoder.yudao.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.dashboard.modules.system.controller.dept.vo.dept.SysDeptCreateReqVO;
 import cn.iocoder.dashboard.modules.system.controller.dept.vo.dept.SysDeptListReqVO;
 import cn.iocoder.dashboard.modules.system.controller.dept.vo.dept.SysDeptUpdateReqVO;
@@ -10,8 +10,8 @@ import cn.iocoder.dashboard.modules.system.dal.mysql.dept.SysDeptMapper;
 import cn.iocoder.dashboard.modules.system.enums.dept.DeptIdEnum;
 import cn.iocoder.dashboard.modules.system.mq.producer.dept.SysDeptProducer;
 import cn.iocoder.dashboard.modules.system.service.dept.impl.SysDeptServiceImpl;
-import cn.iocoder.yudao.util.collection.ArrayUtils;
-import cn.iocoder.yudao.util.object.ObjectUtils;
+import cn.iocoder.yudao.framework.util.collection.ArrayUtils;
+import cn.iocoder.yudao.framework.util.object.ObjectUtils;
 import com.google.common.collect.Multimap;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;

@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.modules.system.dal.mysql.permission;
 
-import cn.iocoder.dashboard.framework.mybatis.core.mapper.BaseMapperX;
+import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.permission.SysUserRoleDO;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.apache.ibatis.annotations.Mapper;

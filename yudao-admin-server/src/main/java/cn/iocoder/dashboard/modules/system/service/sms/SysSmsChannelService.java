@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.modules.system.service.sms;
 
-import cn.iocoder.yudao.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.dashboard.modules.system.controller.sms.vo.channel.SysSmsChannelCreateReqVO;
 import cn.iocoder.dashboard.modules.system.controller.sms.vo.channel.SysSmsChannelPageReqVO;
 import cn.iocoder.dashboard.modules.system.controller.sms.vo.channel.SysSmsChannelUpdateReqVO;

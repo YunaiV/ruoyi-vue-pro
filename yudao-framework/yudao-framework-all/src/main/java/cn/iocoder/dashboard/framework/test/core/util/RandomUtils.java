@@ -2,7 +2,7 @@ package cn.iocoder.dashboard.framework.test.core.util;
 
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.RandomUtil;
-import cn.iocoder.yudao.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import uk.co.jemos.podam.api.PodamFactory;
 import uk.co.jemos.podam.api.PodamFactoryImpl;
 

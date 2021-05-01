@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.modules.infra.service.file;
 
-import cn.iocoder.yudao.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.dashboard.modules.infra.controller.file.vo.InfFilePageReqVO;
 import cn.iocoder.dashboard.modules.infra.dal.dataobject.file.InfFileDO;
 

@@ -1,8 +1,8 @@
 package cn.iocoder.dashboard.modules.infra.dal.dataobject.logger;
 
-import cn.iocoder.yudao.common.enums.UserTypeEnum;
-import cn.iocoder.yudao.common.pojo.CommonResult;
-import cn.iocoder.dashboard.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
+import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;

@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.framework.sms.core.client;
 
-import cn.iocoder.yudao.common.exception.ErrorCode;
+import cn.iocoder.yudao.framework.common.exception.ErrorCode;
 import cn.iocoder.dashboard.framework.sms.core.enums.SmsFrameworkErrorCodeConstants;
 
 import java.util.function.Function;

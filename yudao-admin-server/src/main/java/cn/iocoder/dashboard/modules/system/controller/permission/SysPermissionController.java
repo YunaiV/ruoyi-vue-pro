@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.modules.system.controller.permission;
 
-import cn.iocoder.yudao.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.dashboard.modules.system.controller.permission.vo.permission.SysPermissionAssignRoleDataScopeReqVO;
 import cn.iocoder.dashboard.modules.system.controller.permission.vo.permission.SysPermissionAssignRoleMenuReqVO;
 import cn.iocoder.dashboard.modules.system.controller.permission.vo.permission.SysPermissionAssignUserRoleReqVO;
@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import java.util.Set;
 
-import static cn.iocoder.yudao.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
 /**
  * 权限 Controller，提供赋予用户、角色的权限的 API 接口
