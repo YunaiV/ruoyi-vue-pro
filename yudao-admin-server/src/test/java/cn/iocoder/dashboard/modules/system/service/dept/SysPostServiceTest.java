@@ -21,10 +21,10 @@ import java.util.function.Consumer;
 
 import static cn.hutool.core.util.RandomUtil.randomEle;
 import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.*;
-import static cn.iocoder.dashboard.framework.test.core.util.AssertUtils.assertPojoEquals;
-import static cn.iocoder.dashboard.framework.test.core.util.AssertUtils.assertServiceException;
-import static cn.iocoder.dashboard.framework.test.core.util.RandomUtils.randomLongId;
-import static cn.iocoder.dashboard.framework.test.core.util.RandomUtils.randomPojo;
+import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
+import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
+import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomLongId;
+import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**

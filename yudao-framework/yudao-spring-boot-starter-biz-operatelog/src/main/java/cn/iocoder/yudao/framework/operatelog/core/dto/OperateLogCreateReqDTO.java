@@ -56,7 +56,7 @@ public class OperateLogCreateReqDTO {
     @NotEmpty(message = "浏览器 UserAgent 不能为空")
     private String userAgent;
 
-    @ApiModelProperty(value = "Java 方法名", required = true, example = "cn.iocoder.dashboard.UserController.save(...)")
+    @ApiModelProperty(value = "Java 方法名", required = true, example = "cn.iocoder.yudao.UserController.save(...)")
     @NotEmpty(message = "Java 方法名不能为空")
     private String javaMethod;
 

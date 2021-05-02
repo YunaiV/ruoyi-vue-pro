@@ -1,7 +1,7 @@
 package cn.iocoder.dashboard.modules.infra.dal.dataobject.job;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.dashboard.framework.quartz.core.handler.JobHandler;
+import cn.iocoder.yudao.framework.quartz.core.handler.JobHandler;
 import cn.iocoder.dashboard.modules.infra.enums.job.InfJobLogStatusEnum;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;

@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.modules.system.job.auth;
 
-import cn.iocoder.dashboard.framework.quartz.core.handler.JobHandler;
+import cn.iocoder.yudao.framework.quartz.core.handler.JobHandler;
 import cn.iocoder.dashboard.modules.system.service.auth.SysUserSessionService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;

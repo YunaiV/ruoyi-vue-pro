@@ -1,9 +1,13 @@
 package cn.iocoder.yudao.framework.web.config;
 
+import cn.iocoder.yudao.framework.apilog.core.service.ApiErrorLogFrameworkService;
 import cn.iocoder.yudao.framework.common.enums.WebFilterOrderEnum;
 import cn.iocoder.yudao.framework.web.core.filter.CacheRequestBodyFilter;
 import cn.iocoder.yudao.framework.web.core.filter.DemoFilter;
 import cn.iocoder.yudao.framework.web.core.filter.XssFilter;
+import cn.iocoder.yudao.framework.web.core.handler.GlobalExceptionHandler;
+import cn.iocoder.yudao.framework.web.core.handler.GlobalResponseBodyHandler;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -26,6 +30,11 @@ public class YudaoWebAutoConfiguration implements WebMvcConfigurer {
 
     @Resource
     private WebProperties webProperties;
+    /**
+     * 应用名
+     */
+    @Value("${spring.application.name}")
+    private String applicationName;
 
     @Override
     public void configurePathMatch(PathMatchConfigurer configurer) {
@@ -33,6 +42,16 @@ public class YudaoWebAutoConfiguration implements WebMvcConfigurer {
         configurer.addPathPrefix(webProperties.getApiPrefix(), clazz ->
                 clazz.isAnnotationPresent(RestController.class)
                 && clazz.getPackage().getName().startsWith(webProperties.getControllerPackage())); // 仅仅匹配 controller 包
+    }
+
+    @Bean
+    public GlobalExceptionHandler globalExceptionHandler(ApiErrorLogFrameworkService ApiErrorLogFrameworkService) {
+        return new GlobalExceptionHandler(applicationName, ApiErrorLogFrameworkService);
+    }
+
+    @Bean
+    public GlobalResponseBodyHandler globalResponseBodyHandler() {
+        return new GlobalResponseBodyHandler();
     }
 
     // ========== Filter 相关 ==========

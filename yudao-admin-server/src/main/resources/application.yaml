@@ -40,3 +40,5 @@ yudao:
     constants-class-list:
       - cn.iocoder.dashboard.modules.infra.enums.InfErrorCodeConstants
       - cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants
+
+debug: false

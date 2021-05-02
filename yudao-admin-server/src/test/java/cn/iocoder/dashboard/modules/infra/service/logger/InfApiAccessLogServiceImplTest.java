@@ -11,7 +11,7 @@ import cn.iocoder.dashboard.modules.infra.controller.logger.vo.apiaccesslog.InfA
 import cn.iocoder.dashboard.modules.infra.dal.dataobject.logger.InfApiAccessLogDO;
 import cn.iocoder.dashboard.modules.infra.dal.mysql.logger.InfApiAccessLogMapper;
 import cn.iocoder.dashboard.modules.infra.service.logger.impl.InfApiAccessLogServiceImpl;
-import cn.iocoder.dashboard.framework.test.core.util.RandomUtils;
+import cn.iocoder.yudao.framework.test.core.util.RandomUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
@@ -21,7 +21,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Future;
 
-import static cn.iocoder.dashboard.framework.test.core.util.AssertUtils.assertPojoEquals;
+import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildTime;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;

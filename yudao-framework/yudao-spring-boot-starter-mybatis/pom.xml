@@ -32,12 +32,6 @@
             <scope>provided</scope> <!-- 设置为 provided，只有 OncePerRequestFilter 使用到 -->
         </dependency>
 
-<!--        <dependency>-->
-<!--            <groupId>jakarta.servlet</groupId>-->
-<!--            <artifactId>jakarta.servlet-api</artifactId>-->
-<!--            <scope>provided</scope> &lt;!&ndash; 设置为 provided，只有 OncePerRequestFilter 使用到 &ndash;&gt;-->
-<!--        </dependency>-->
-
         <!-- DB 相关 -->
         <dependency>
             <groupId>mysql</groupId>

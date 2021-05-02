@@ -6,6 +6,7 @@ import cn.iocoder.yudao.framework.security.config.SecurityProperties;
 import cn.iocoder.yudao.framework.security.core.service.SecurityAuthFrameworkService;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
+import lombok.AllArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -20,14 +21,12 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author ruoyi
  */
-@Component
+@AllArgsConstructor
 public class LogoutSuccessHandlerImpl implements LogoutSuccessHandler {
 
-    @Resource
-    private SecurityProperties securityProperties;
+    private final SecurityProperties securityProperties;
 
-    @Resource
-    private SecurityAuthFrameworkService securityFrameworkService;
+    private final SecurityAuthFrameworkService securityFrameworkService;
 
     @Override
     public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {

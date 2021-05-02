@@ -13,7 +13,7 @@ import cn.iocoder.dashboard.modules.system.enums.permission.MenuTypeEnum;
 import cn.iocoder.dashboard.modules.system.mq.producer.permission.SysMenuProducer;
 import cn.iocoder.dashboard.modules.system.service.permission.impl.SysMenuServiceImpl;
 import cn.iocoder.yudao.framework.common.util.sping.SpringAopUtils;
-import cn.iocoder.dashboard.framework.test.core.util.RandomUtils;
+import cn.iocoder.yudao.framework.test.core.util.RandomUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import com.google.common.collect.Multimap;
 import org.junit.jupiter.api.Assertions;
@@ -25,9 +25,9 @@ import javax.annotation.Resource;
 import java.util.*;
 
 import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.*;
-import static cn.iocoder.dashboard.framework.test.core.util.AssertUtils.assertPojoEquals;
-import static cn.iocoder.dashboard.framework.test.core.util.AssertUtils.assertServiceException;
-import static cn.iocoder.dashboard.framework.test.core.util.RandomUtils.*;
+import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
+import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
+import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
 
@@ -108,7 +108,7 @@ public class SysMenuServiceTest extends BaseDbUnitTest {
         Long parentId = sonMenuDO.getParentId();
 
         //调用
-        SysMenuUpdateReqVO vo = RandomUtils.randomPojo(SysMenuUpdateReqVO.class, o -> {
+        SysMenuUpdateReqVO vo = randomPojo(SysMenuUpdateReqVO.class, o -> {
             o.setId(sonId);
             o.setParentId(parentId);
             o.setType(MenuTypeEnum.MENU.getType());
@@ -131,7 +131,7 @@ public class SysMenuServiceTest extends BaseDbUnitTest {
         Long parentId = 10000L;
 
         //调用
-        SysMenuUpdateReqVO vo = RandomUtils.randomPojo(SysMenuUpdateReqVO.class, o -> {
+        SysMenuUpdateReqVO vo = randomPojo(SysMenuUpdateReqVO.class, o -> {
             o.setId(sonId);
             o.setParentId(parentId);
             o.setType(MenuTypeEnum.MENU.getType());
@@ -354,7 +354,7 @@ public class SysMenuServiceTest extends BaseDbUnitTest {
     }
 
     private SysMenuDO createMenuDO(Long id, MenuTypeEnum typeEnum, String menuName, Long parentId, Integer status) {
-        return RandomUtils.randomPojo(SysMenuDO.class, o -> {
+        return randomPojo(SysMenuDO.class, o -> {
             o.setId(id);
             o.setParentId(parentId);
             o.setType(typeEnum.getType());

@@ -18,6 +18,7 @@ import cn.iocoder.dashboard.modules.system.service.permission.SysPermissionServi
 import cn.iocoder.dashboard.modules.system.service.user.SysUserService;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
@@ -46,6 +47,7 @@ import static java.util.Collections.singleton;
 public class SysAuthServiceImpl implements SysAuthService {
 
     @Resource
+    @Lazy // 延迟加载，因为存在相互依赖的问题
     private AuthenticationManager authenticationManager;
     @Resource
     private SysUserService userService;

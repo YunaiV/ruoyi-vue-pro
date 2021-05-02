@@ -1,8 +1,8 @@
 package cn.iocoder.dashboard.modules.infra.service.job.impl;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.dashboard.framework.quartz.core.scheduler.SchedulerManager;
-import cn.iocoder.dashboard.framework.quartz.core.util.CronUtils;
+import cn.iocoder.yudao.framework.quartz.core.scheduler.SchedulerManager;
+import cn.iocoder.yudao.framework.quartz.core.util.CronUtils;
 import cn.iocoder.dashboard.modules.infra.controller.job.vo.job.InfJobCreateReqVO;
 import cn.iocoder.dashboard.modules.infra.controller.job.vo.job.InfJobExportReqVO;
 import cn.iocoder.dashboard.modules.infra.controller.job.vo.job.InfJobPageReqVO;

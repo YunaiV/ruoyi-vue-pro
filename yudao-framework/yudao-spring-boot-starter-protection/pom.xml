@@ -20,7 +20,6 @@
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
             <artifactId>yudao-spring-boot-starter-redis</artifactId>
-            <scope>provided</scope> <!-- 设置为 provider 范围，因为 IdempotentConfiguration 使用到 -->
         </dependency>
 
         <!-- 服务保障相关 -->

@@ -23,10 +23,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.*;
-import static cn.iocoder.dashboard.framework.test.core.util.AssertUtils.assertPojoEquals;
-import static cn.iocoder.dashboard.framework.test.core.util.AssertUtils.assertServiceException;
-import static cn.iocoder.dashboard.framework.test.core.util.RandomUtils.*;
+import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
+import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.max;
+import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
 

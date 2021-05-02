@@ -2,7 +2,7 @@ package cn.iocoder.dashboard.modules.system.dal.dataobject.sms;
 
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.dashboard.framework.sms.core.enums.SmsFrameworkErrorCodeConstants;
+import cn.iocoder.yudao.framework.sms.core.enums.SmsFrameworkErrorCodeConstants;
 import cn.iocoder.dashboard.modules.system.enums.sms.SysSmsReceiveStatusEnum;
 import cn.iocoder.dashboard.modules.system.enums.sms.SysSmsSendStatusEnum;
 import com.baomidou.mybatisplus.annotation.TableField;

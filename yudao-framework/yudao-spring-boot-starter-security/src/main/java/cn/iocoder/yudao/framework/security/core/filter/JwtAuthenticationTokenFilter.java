@@ -8,6 +8,7 @@ import cn.iocoder.yudao.framework.security.core.service.SecurityAuthFrameworkSer
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.framework.web.core.handler.GlobalExceptionHandler;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -24,15 +25,14 @@ import java.io.IOException;
  *
  * @author ruoyi
  */
-@Component
+@AllArgsConstructor
 public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
 
-    @Resource
-    private SecurityProperties securityProperties;
-    @Resource
-    private SecurityAuthFrameworkService authService;
-    @Resource
-    private GlobalExceptionHandler globalExceptionHandler;
+    private final SecurityProperties securityProperties;
+
+    private final SecurityAuthFrameworkService authService;
+
+    private final GlobalExceptionHandler globalExceptionHandler;
 
     @Override
     @SuppressWarnings("NullableProblems")

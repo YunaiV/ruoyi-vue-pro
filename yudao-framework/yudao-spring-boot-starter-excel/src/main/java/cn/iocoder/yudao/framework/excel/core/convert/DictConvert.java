@@ -2,7 +2,7 @@ package cn.iocoder.yudao.framework.excel.core.convert;
 
 import cn.hutool.core.convert.Convert;
 import cn.iocoder.yudao.framework.dict.core.dto.DictDataRespDTO;
-import cn.iocoder.yudao.framework.dict.core.util.DictUtils;
+import cn.iocoder.yudao.framework.dict.core.util.DictFrameworkUtils;
 import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
 import com.alibaba.excel.converters.Converter;
 import com.alibaba.excel.enums.CellDataTypeEnum;
@@ -35,7 +35,7 @@ public class DictConvert implements Converter<Object> {
         // 使用字典解析
         String type = getType(contentProperty);
         String label = cellData.getStringValue();
-        DictDataRespDTO dictData = DictUtils.parseDictDataFromCache(type, label);
+        DictDataRespDTO dictData = DictFrameworkUtils.parseDictDataFromCache(type, label);
         if (dictData == null) {
             log.error("[convertToJavaData][type({}) 解析不掉 label({})]", type, label);
             return null;
@@ -56,7 +56,7 @@ public class DictConvert implements Converter<Object> {
         // 使用字典格式化
         String type = getType(contentProperty);
         String value = String.valueOf(object);
-        DictDataRespDTO dictData = DictUtils.getDictDataFromCache(type, value);
+        DictDataRespDTO dictData = DictFrameworkUtils.getDictDataFromCache(type, value);
         if (dictData == null) {
             log.error("[convertToExcelData][type({}) 转换不了 label({})]", type, value);
             return new CellData<>("");

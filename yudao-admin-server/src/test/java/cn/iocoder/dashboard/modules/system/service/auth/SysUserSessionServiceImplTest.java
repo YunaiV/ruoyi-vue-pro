@@ -1,11 +1,11 @@
 package cn.iocoder.dashboard.modules.system.service.auth;
 
 import static cn.hutool.core.util.RandomUtil.randomEle;
-import static cn.iocoder.dashboard.framework.test.core.util.AssertUtils.assertPojoEquals;
-import static cn.iocoder.dashboard.framework.test.core.util.RandomUtils.randomDate;
-import static cn.iocoder.dashboard.framework.test.core.util.RandomUtils.randomLongId;
-import static cn.iocoder.dashboard.framework.test.core.util.RandomUtils.randomPojo;
-import static cn.iocoder.dashboard.framework.test.core.util.RandomUtils.randomString;
+import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
+import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomDate;
+import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomLongId;
+import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
+import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomString;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.addTime;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -42,8 +42,8 @@ import cn.iocoder.dashboard.modules.system.service.auth.impl.SysUserSessionServi
 import cn.iocoder.dashboard.modules.system.service.dept.impl.SysDeptServiceImpl;
 import cn.iocoder.dashboard.modules.system.service.logger.impl.SysLoginLogServiceImpl;
 import cn.iocoder.dashboard.modules.system.service.user.SysUserServiceImpl;
-import cn.iocoder.dashboard.framework.test.core.util.AssertUtils;
-import cn.iocoder.dashboard.framework.test.core.util.RandomUtils;
+import cn.iocoder.yudao.framework.test.core.util.AssertUtils;
+import cn.iocoder.yudao.framework.test.core.util.RandomUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 
 /**

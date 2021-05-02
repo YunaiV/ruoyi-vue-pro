@@ -1,8 +1,7 @@
 package cn.iocoder.dashboard.modules.infra.dal.mysql.config;
 
-import cn.iocoder.dashboard.framework.apollo.internals.ConfigFrameworkDAO;
-import cn.iocoder.dashboard.framework.apollo.internals.dto.ConfigRespDTO;
-import cn.iocoder.dashboard.modules.infra.dal.dataobject.config.InfConfigDO;
+import cn.iocoder.yudao.framework.apollo.internals.ConfigFrameworkDAO;
+import cn.iocoder.yudao.framework.apollo.internals.dto.ConfigRespDTO;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;

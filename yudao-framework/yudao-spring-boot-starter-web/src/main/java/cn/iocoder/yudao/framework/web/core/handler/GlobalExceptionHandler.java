@@ -12,6 +12,7 @@ import cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import io.github.resilience4j.ratelimiter.RequestNotPermitted;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -43,14 +44,13 @@ import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeC
  * @author 芋道源码
  */
 @RestControllerAdvice
+@AllArgsConstructor
 @Slf4j
 public class GlobalExceptionHandler {
 
-    @Value("${spring.application.name}")
-    private String applicationName;
+    private final String applicationName;
 
-    @Resource
-    private ApiErrorLogFrameworkService apiErrorLogFrameworkService;
+    private final ApiErrorLogFrameworkService apiErrorLogFrameworkService;
 
     /**
      * 处理所有异常，主要是提供给 Filter 使用
