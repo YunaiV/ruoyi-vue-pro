@@ -7,7 +7,7 @@ import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.security.core.service.SecurityAuthFrameworkService;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.framework.web.core.handler.GlobalExceptionHandler;
-import cn.iocoder.yudao.framework.util.servlet.ServletUtils;
+import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 

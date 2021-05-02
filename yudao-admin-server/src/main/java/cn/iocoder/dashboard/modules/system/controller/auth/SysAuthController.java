@@ -16,7 +16,7 @@ import cn.iocoder.dashboard.modules.system.service.auth.SysAuthService;
 import cn.iocoder.dashboard.modules.system.service.permission.SysPermissionService;
 import cn.iocoder.dashboard.modules.system.service.permission.SysRoleService;
 import cn.iocoder.dashboard.modules.system.service.user.SysUserService;
-import cn.iocoder.yudao.framework.util.collection.SetUtils;
+import cn.iocoder.yudao.framework.common.util.collection.SetUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.validation.annotation.Validated;
@@ -29,8 +29,8 @@ import java.util.List;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserRoleIds;
-import static cn.iocoder.yudao.framework.util.servlet.ServletUtils.getClientIP;
-import static cn.iocoder.yudao.framework.util.servlet.ServletUtils.getUserAgent;
+import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getClientIP;
+import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getUserAgent;
 
 @Api(tags = "认证")
 @RestController

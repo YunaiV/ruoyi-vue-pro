@@ -11,7 +11,7 @@ import cn.iocoder.dashboard.modules.system.dal.dataobject.user.SysUserDO;
 import cn.iocoder.dashboard.modules.system.service.auth.SysUserSessionService;
 import cn.iocoder.dashboard.modules.system.service.dept.SysDeptService;
 import cn.iocoder.dashboard.modules.system.service.user.SysUserService;
-import cn.iocoder.yudao.framework.util.collection.MapUtils;
+import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-import static cn.iocoder.yudao.framework.util.collection.CollectionUtils.convertList;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 
 @Api(tags = "用户 Session")
 @RestController

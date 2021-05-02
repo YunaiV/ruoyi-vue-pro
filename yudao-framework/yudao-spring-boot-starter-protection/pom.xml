@@ -15,4 +15,24 @@
     <description>服务保证，提供分布式锁、幂等、限流、熔断等等功能</description>
     <url>https://github.com/YunaiV/ruoyi-vue-pro</url>
 
+    <dependencies>
+        <!-- DB 相关 -->
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-spring-boot-starter-redis</artifactId>
+            <scope>provided</scope> <!-- 设置为 provider 范围，因为 IdempotentConfiguration 使用到 -->
+        </dependency>
+
+        <!-- 服务保障相关 -->
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>lock4j-redisson-spring-boot-starter</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>io.github.resilience4j</groupId>
+            <artifactId>resilience4j-spring-boot2</artifactId>
+        </dependency>
+    </dependencies>
+
 </project>

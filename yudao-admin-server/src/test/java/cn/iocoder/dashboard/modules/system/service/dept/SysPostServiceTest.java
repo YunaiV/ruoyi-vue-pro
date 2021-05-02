@@ -10,8 +10,8 @@ import cn.iocoder.dashboard.modules.system.controller.dept.vo.post.SysPostUpdate
 import cn.iocoder.dashboard.modules.system.dal.dataobject.dept.SysPostDO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.dept.SysPostMapper;
 import cn.iocoder.dashboard.modules.system.service.dept.impl.SysPostServiceImpl;
-import cn.iocoder.yudao.framework.util.collection.ArrayUtils;
-import cn.iocoder.yudao.framework.util.object.ObjectUtils;
+import cn.iocoder.yudao.framework.common.util.collection.ArrayUtils;
+import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 

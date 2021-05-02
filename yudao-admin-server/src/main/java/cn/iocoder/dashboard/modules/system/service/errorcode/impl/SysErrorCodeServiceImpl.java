@@ -26,8 +26,8 @@ import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.*;
-import static cn.iocoder.yudao.framework.util.collection.CollectionUtils.convertMap;
-import static cn.iocoder.yudao.framework.util.collection.CollectionUtils.convertSet;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 
 /**
  * 错误码 Service 实现类

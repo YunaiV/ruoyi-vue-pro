@@ -15,8 +15,8 @@ import cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen.ToolCodegenColum
 import cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen.ToolCodegenTableDO;
 import cn.iocoder.dashboard.modules.tool.dal.dataobject.codegen.ToolSchemaTableDO;
 import cn.iocoder.dashboard.modules.tool.service.codegen.ToolCodegenService;
-import cn.iocoder.yudao.framework.util.collection.CollectionUtils;
-import cn.iocoder.yudao.framework.util.servlet.ServletUtils;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;

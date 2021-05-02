@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.modules.system.mq.consumer.permission;
 
-import cn.iocoder.dashboard.framework.redis.core.pubsub.AbstractChannelMessageListener;
+import cn.iocoder.yudao.framework.redis.core.pubsub.AbstractChannelMessageListener;
 import cn.iocoder.dashboard.modules.system.mq.message.permission.SysMenuRefreshMessage;
 import cn.iocoder.dashboard.modules.system.service.permission.SysMenuService;
 import lombok.extern.slf4j.Slf4j;

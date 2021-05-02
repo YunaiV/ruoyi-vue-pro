@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.modules.system.mq.consumer.sms;
 
-import cn.iocoder.dashboard.framework.redis.core.stream.AbstractStreamMessageListener;
+import cn.iocoder.yudao.framework.redis.core.stream.AbstractStreamMessageListener;
 import cn.iocoder.dashboard.modules.system.mq.message.sms.SysSmsSendMessage;
 import cn.iocoder.dashboard.modules.system.service.sms.SysSmsService;
 import lombok.extern.slf4j.Slf4j;

@@ -9,7 +9,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 
-import static cn.iocoder.yudao.framework.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
+import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 @ApiModel("登陆日志分页列表 Request VO")
 @Data

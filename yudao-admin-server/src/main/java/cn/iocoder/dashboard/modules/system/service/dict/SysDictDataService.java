@@ -1,7 +1,7 @@
 package cn.iocoder.dashboard.modules.system.service.dict;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.dashboard.framework.dict.core.service.DictDataFrameworkService;
+import cn.iocoder.yudao.framework.dict.core.service.DictDataFrameworkService;
 import cn.iocoder.dashboard.modules.system.controller.dict.vo.data.SysDictDataCreateReqVO;
 import cn.iocoder.dashboard.modules.system.controller.dict.vo.data.SysDictDataExportReqVO;
 import cn.iocoder.dashboard.modules.system.controller.dict.vo.data.SysDictDataPageReqVO;

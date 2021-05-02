@@ -12,7 +12,7 @@ import cn.iocoder.dashboard.modules.infra.dal.mysql.logger.InfApiErrorLogMapper;
 import cn.iocoder.dashboard.modules.infra.enums.logger.InfApiErrorLogProcessStatusEnum;
 import cn.iocoder.dashboard.modules.infra.service.logger.impl.InfApiErrorLogServiceImpl;
 import cn.iocoder.dashboard.framework.test.core.util.RandomUtils;
-import cn.iocoder.yudao.framework.util.object.ObjectUtils;
+import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
@@ -25,7 +25,7 @@ import static cn.iocoder.dashboard.modules.infra.enums.InfErrorCodeConstants.API
 import static cn.iocoder.dashboard.modules.infra.enums.InfErrorCodeConstants.API_ERROR_LOG_PROCESSED;
 import static cn.iocoder.dashboard.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.dashboard.framework.test.core.util.AssertUtils.assertServiceException;
-import static cn.iocoder.yudao.framework.util.date.DateUtils.buildTime;
+import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildTime;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 

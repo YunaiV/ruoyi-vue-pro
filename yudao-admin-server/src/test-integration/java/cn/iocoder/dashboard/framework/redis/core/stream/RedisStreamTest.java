@@ -1,8 +1,8 @@
-package cn.iocoder.dashboard.framework.redis.core.stream;
+package cn.iocoder.yudao.framework.redis.core.stream;
 
 import cn.hutool.core.thread.ThreadUtil;
 import cn.iocoder.dashboard.BaseRedisIntegrationTest;
-import cn.iocoder.dashboard.framework.redis.core.util.RedisMessageUtils;
+import cn.iocoder.yudao.framework.redis.core.util.RedisMessageUtils;
 import cn.iocoder.dashboard.modules.system.mq.consumer.mail.SysMailSendConsumer;
 import cn.iocoder.dashboard.modules.system.mq.consumer.sms.SysSmsSendConsumer;
 import cn.iocoder.dashboard.modules.system.mq.message.mail.SysMailSendMessage;

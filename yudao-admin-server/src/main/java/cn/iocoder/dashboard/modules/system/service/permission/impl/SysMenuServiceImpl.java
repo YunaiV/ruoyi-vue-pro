@@ -14,7 +14,7 @@ import cn.iocoder.dashboard.modules.system.enums.permission.MenuTypeEnum;
 import cn.iocoder.dashboard.modules.system.mq.producer.permission.SysMenuProducer;
 import cn.iocoder.dashboard.modules.system.service.permission.SysMenuService;
 import cn.iocoder.dashboard.modules.system.service.permission.SysPermissionService;
-import cn.iocoder.yudao.framework.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMultimap;

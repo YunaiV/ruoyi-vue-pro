@@ -12,8 +12,8 @@ import cn.iocoder.dashboard.modules.system.dal.dataobject.errorcode.SysErrorCode
 import cn.iocoder.dashboard.modules.system.dal.mysql.errorcode.SysErrorCodeMapper;
 import cn.iocoder.dashboard.modules.system.enums.errorcode.SysErrorCodeTypeEnum;
 import cn.iocoder.dashboard.modules.system.service.errorcode.impl.SysErrorCodeServiceImpl;
-import cn.iocoder.yudao.framework.util.collection.ArrayUtils;
-import cn.iocoder.yudao.framework.util.object.ObjectUtils;
+import cn.iocoder.yudao.framework.common.util.collection.ArrayUtils;
+import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -30,7 +30,7 @@ import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.ER
 import static cn.iocoder.dashboard.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.dashboard.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.dashboard.framework.test.core.util.RandomUtils.*;
-import static cn.iocoder.yudao.framework.util.date.DateUtils.buildTime;
+import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildTime;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**

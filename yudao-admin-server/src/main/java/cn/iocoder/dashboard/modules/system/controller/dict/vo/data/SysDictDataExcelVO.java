@@ -1,7 +1,7 @@
 package cn.iocoder.dashboard.modules.system.controller.dict.vo.data;
 
-import cn.iocoder.dashboard.framework.excel.core.annotations.DictFormat;
-import cn.iocoder.dashboard.framework.excel.core.convert.DictConvert;
+import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
+import cn.iocoder.yudao.framework.excel.core.convert.DictConvert;
 import cn.iocoder.dashboard.modules.system.enums.SysDictTypeConstants;
 import com.alibaba.excel.annotation.ExcelProperty;
 import lombok.Data;

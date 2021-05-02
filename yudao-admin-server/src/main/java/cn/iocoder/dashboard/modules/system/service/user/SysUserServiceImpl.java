@@ -19,7 +19,7 @@ import cn.iocoder.dashboard.modules.system.dal.mysql.user.SysUserMapper;
 import cn.iocoder.dashboard.modules.system.service.dept.SysDeptService;
 import cn.iocoder.dashboard.modules.system.service.dept.SysPostService;
 import cn.iocoder.dashboard.modules.system.service.permission.SysPermissionService;
-import cn.iocoder.yudao.framework.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import com.google.common.annotations.VisibleForTesting;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;

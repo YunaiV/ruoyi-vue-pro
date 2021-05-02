@@ -9,7 +9,7 @@ import cn.iocoder.dashboard.modules.system.dal.dataobject.permission.SysMenuDO;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.permission.SysRoleDO;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.user.SysUserDO;
 import cn.iocoder.dashboard.modules.system.enums.permission.MenuIdEnum;
-import cn.iocoder.yudao.framework.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;

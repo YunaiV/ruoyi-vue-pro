@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.modules.system.mq.message.mail;
 
-import cn.iocoder.dashboard.framework.redis.core.stream.StreamMessage;
+import cn.iocoder.yudao.framework.redis.core.stream.StreamMessage;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;

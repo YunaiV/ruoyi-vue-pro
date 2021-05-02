@@ -14,8 +14,8 @@ import cn.iocoder.dashboard.modules.system.enums.sms.SysSmsReceiveStatusEnum;
 import cn.iocoder.dashboard.modules.system.enums.sms.SysSmsSendStatusEnum;
 import cn.iocoder.dashboard.modules.system.enums.sms.SysSmsTemplateTypeEnum;
 import cn.iocoder.dashboard.modules.system.service.sms.impl.SysSmsLogServiceImpl;
-import cn.iocoder.yudao.framework.util.collection.ArrayUtils;
-import cn.iocoder.yudao.framework.util.object.ObjectUtils;
+import cn.iocoder.yudao.framework.common.util.collection.ArrayUtils;
+import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
@@ -29,7 +29,7 @@ import static cn.hutool.core.util.RandomUtil.randomBoolean;
 import static cn.hutool.core.util.RandomUtil.randomEle;
 import static cn.iocoder.dashboard.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.dashboard.framework.test.core.util.RandomUtils.*;
-import static cn.iocoder.yudao.framework.util.date.DateUtils.buildTime;
+import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildTime;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**

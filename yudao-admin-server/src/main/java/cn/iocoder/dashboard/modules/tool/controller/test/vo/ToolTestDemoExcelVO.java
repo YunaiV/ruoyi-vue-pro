@@ -1,7 +1,7 @@
 package cn.iocoder.dashboard.modules.tool.controller.test.vo;
 
-import cn.iocoder.dashboard.framework.excel.core.annotations.DictFormat;
-import cn.iocoder.dashboard.framework.excel.core.convert.DictConvert;
+import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
+import cn.iocoder.yudao.framework.excel.core.convert.DictConvert;
 import cn.iocoder.dashboard.modules.infra.enums.InfDictTypeConstants;
 import cn.iocoder.dashboard.modules.system.enums.SysDictTypeConstants;
 import com.alibaba.excel.annotation.ExcelProperty;

@@ -13,7 +13,7 @@ import cn.iocoder.dashboard.modules.system.dal.mysql.permission.SysRoleMapper;
 import cn.iocoder.dashboard.modules.system.enums.permission.SysRoleTypeEnum;
 import cn.iocoder.dashboard.modules.system.mq.producer.permission.SysRoleProducer;
 import cn.iocoder.dashboard.modules.system.service.permission.impl.SysRoleServiceImpl;
-import cn.iocoder.yudao.framework.util.sping.SpringAopUtils;
+import cn.iocoder.yudao.framework.common.util.sping.SpringAopUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
@@ -26,7 +26,7 @@ import static cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants.*;
 import static cn.iocoder.dashboard.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.dashboard.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.dashboard.framework.test.core.util.RandomUtils.*;
-import static cn.iocoder.yudao.framework.util.object.ObjectUtils.max;
+import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.max;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
 

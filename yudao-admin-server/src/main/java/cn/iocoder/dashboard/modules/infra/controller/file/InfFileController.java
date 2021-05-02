@@ -8,7 +8,7 @@ import cn.iocoder.dashboard.modules.infra.controller.file.vo.InfFileRespVO;
 import cn.iocoder.dashboard.modules.infra.convert.file.InfFileConvert;
 import cn.iocoder.dashboard.modules.infra.dal.dataobject.file.InfFileDO;
 import cn.iocoder.dashboard.modules.infra.service.file.InfFileService;
-import cn.iocoder.yudao.framework.util.servlet.ServletUtils;
+import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;

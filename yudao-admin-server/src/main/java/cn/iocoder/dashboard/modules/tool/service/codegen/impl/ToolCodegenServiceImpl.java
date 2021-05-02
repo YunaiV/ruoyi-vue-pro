@@ -16,7 +16,7 @@ import cn.iocoder.dashboard.modules.tool.dal.mysql.codegen.ToolSchemaColumnMappe
 import cn.iocoder.dashboard.modules.tool.dal.mysql.codegen.ToolSchemaTableMapper;
 import cn.iocoder.dashboard.modules.tool.enums.codegen.ToolCodegenImportTypeEnum;
 import cn.iocoder.dashboard.modules.tool.service.codegen.ToolCodegenService;
-import cn.iocoder.yudao.framework.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import org.apache.commons.collections4.KeyValue;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

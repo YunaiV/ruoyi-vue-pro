@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.modules.system.mq.producer.dict;
 
-import cn.iocoder.dashboard.framework.redis.core.util.RedisMessageUtils;
+import cn.iocoder.yudao.framework.redis.core.util.RedisMessageUtils;
 import cn.iocoder.dashboard.modules.system.mq.message.dict.SysDictDataRefreshMessage;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;

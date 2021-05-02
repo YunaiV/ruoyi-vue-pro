@@ -40,7 +40,7 @@ import cn.iocoder.dashboard.modules.infra.dal.dataobject.job.InfJobDO;
 import cn.iocoder.dashboard.modules.infra.dal.mysql.job.InfJobMapper;
 import cn.iocoder.dashboard.modules.infra.enums.job.InfJobStatusEnum;
 import cn.iocoder.dashboard.modules.infra.service.job.impl.InfJobServiceImpl;
-import cn.iocoder.yudao.framework.util.object.ObjectUtils;
+import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 
 /**
  * {@link InfJobServiceImpl} 的单元测试

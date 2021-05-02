@@ -1,7 +1,7 @@
 package cn.iocoder.dashboard;
 
 import cn.iocoder.dashboard.config.RedisTestConfiguration;
-import cn.iocoder.dashboard.framework.redis.config.RedisConfig;
+import cn.iocoder.yudao.framework.redis.config.RedisConfig;
 import org.redisson.spring.starter.RedissonAutoConfiguration;
 import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;

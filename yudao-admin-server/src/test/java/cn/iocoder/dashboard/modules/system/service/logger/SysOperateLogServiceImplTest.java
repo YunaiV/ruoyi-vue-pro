@@ -6,7 +6,7 @@ import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum;
-import cn.iocoder.yudao.framework.util.monitor.TracerUtils;
+import cn.iocoder.yudao.framework.common.util.monitor.TracerUtils;
 import cn.iocoder.yudao.framework.operatelog.core.dto.OperateLogCreateReqDTO;
 import cn.iocoder.dashboard.modules.system.controller.logger.vo.operatelog.SysOperateLogExportReqVO;
 import cn.iocoder.dashboard.modules.system.controller.logger.vo.operatelog.SysOperateLogPageReqVO;
@@ -17,7 +17,7 @@ import cn.iocoder.dashboard.modules.system.enums.common.SysSexEnum;
 import cn.iocoder.dashboard.modules.system.service.logger.impl.SysOperateLogServiceImpl;
 import cn.iocoder.dashboard.modules.system.service.user.SysUserService;
 import cn.iocoder.dashboard.framework.test.core.util.RandomUtils;
-import cn.iocoder.yudao.framework.util.object.ObjectUtils;
+import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
@@ -29,7 +29,7 @@ import java.util.concurrent.Future;
 
 import static cn.iocoder.dashboard.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.dashboard.framework.test.core.util.RandomUtils.randomLongId;
-import static cn.iocoder.yudao.framework.util.date.DateUtils.buildTime;
+import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildTime;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 

@@ -6,7 +6,7 @@ import static cn.iocoder.dashboard.framework.test.core.util.RandomUtils.randomDa
 import static cn.iocoder.dashboard.framework.test.core.util.RandomUtils.randomLongId;
 import static cn.iocoder.dashboard.framework.test.core.util.RandomUtils.randomPojo;
 import static cn.iocoder.dashboard.framework.test.core.util.RandomUtils.randomString;
-import static cn.iocoder.yudao.framework.util.date.DateUtils.addTime;
+import static cn.iocoder.yudao.framework.common.util.date.DateUtils.addTime;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -44,7 +44,7 @@ import cn.iocoder.dashboard.modules.system.service.logger.impl.SysLoginLogServic
 import cn.iocoder.dashboard.modules.system.service.user.SysUserServiceImpl;
 import cn.iocoder.dashboard.framework.test.core.util.AssertUtils;
 import cn.iocoder.dashboard.framework.test.core.util.RandomUtils;
-import cn.iocoder.yudao.framework.util.object.ObjectUtils;
+import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 
 /**
  * SysUserSessionServiceImpl Tester.

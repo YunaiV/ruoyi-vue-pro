@@ -44,7 +44,7 @@ public class ToolTestDemoDO extends BaseDO {
     /**
      * 分类
      *
-     * 枚举 {@link cn.iocoder.dashboard.framework.redis.core.RedisKeyDefine.TimeoutTypeEnum}
+     * 枚举 {@link cn.iocoder.yudao.framework.redis.core.RedisKeyDefine.TimeoutTypeEnum}
      */
     private Integer category;
     /**

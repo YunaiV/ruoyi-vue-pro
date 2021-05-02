@@ -2,7 +2,7 @@ package cn.iocoder.yudao.framework.security.core.handler;
 
 import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.framework.util.servlet.ServletUtils;
+import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;

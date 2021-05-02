@@ -23,7 +23,7 @@ import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.dashboard.modules.infra.enums.InfErrorCodeConstants.*;
-import static cn.iocoder.yudao.framework.util.collection.CollectionUtils.containsAny;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.containsAny;
 
 /**
  * 定时任务 Service 实现类

@@ -5,7 +5,7 @@ import static cn.iocoder.dashboard.framework.test.core.util.AssertUtils.assertPo
 import static cn.iocoder.dashboard.framework.test.core.util.RandomUtils.randomLongId;
 import static cn.iocoder.dashboard.framework.test.core.util.RandomUtils.randomPojo;
 import static cn.iocoder.dashboard.framework.test.core.util.RandomUtils.randomString;
-import static cn.iocoder.yudao.framework.util.date.DateUtils.buildTime;
+import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildTime;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -25,7 +25,7 @@ import cn.iocoder.dashboard.modules.infra.dal.dataobject.job.InfJobLogDO;
 import cn.iocoder.dashboard.modules.infra.dal.mysql.job.InfJobLogMapper;
 import cn.iocoder.dashboard.modules.infra.enums.job.InfJobLogStatusEnum;
 import cn.iocoder.dashboard.modules.infra.service.job.impl.InfJobLogServiceImpl;
-import cn.iocoder.yudao.framework.util.object.ObjectUtils;
+import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 
 /**
  * {@link InfJobLogServiceImpl} 的单元测试

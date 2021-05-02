@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.modules.infra.controller.redis.vo;
 
-import cn.iocoder.dashboard.framework.redis.core.RedisKeyDefine;
+import cn.iocoder.yudao.framework.redis.core.RedisKeyDefine;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;

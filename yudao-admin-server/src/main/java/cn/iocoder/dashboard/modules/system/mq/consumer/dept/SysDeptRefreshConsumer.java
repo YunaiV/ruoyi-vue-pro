@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.modules.system.mq.consumer.dept;
 
-import cn.iocoder.dashboard.framework.redis.core.pubsub.AbstractChannelMessageListener;
+import cn.iocoder.yudao.framework.redis.core.pubsub.AbstractChannelMessageListener;
 import cn.iocoder.dashboard.modules.system.mq.message.dept.SysDeptRefreshMessage;
 import cn.iocoder.dashboard.modules.system.service.dept.SysDeptService;
 import lombok.extern.slf4j.Slf4j;

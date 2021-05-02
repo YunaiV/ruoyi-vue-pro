@@ -2,7 +2,7 @@ package cn.iocoder.yudao.framework.jackson.config;
 
 import cn.iocoder.yudao.framework.jackson.core.databind.LocalDateTimeDeserializer;
 import cn.iocoder.yudao.framework.jackson.core.databind.LocalDateTimeSerializer;
-import cn.iocoder.yudao.framework.util.json.JsonUtils;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import org.springframework.context.annotation.Bean;

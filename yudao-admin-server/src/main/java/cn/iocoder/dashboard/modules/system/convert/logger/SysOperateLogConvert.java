@@ -6,7 +6,7 @@ import cn.iocoder.dashboard.modules.system.controller.logger.vo.operatelog.SysOp
 import cn.iocoder.dashboard.modules.system.controller.logger.vo.operatelog.SysOperateLogRespVO;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.logger.SysOperateLogDO;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.user.SysUserDO;
-import cn.iocoder.yudao.framework.util.collection.MapUtils;
+import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 

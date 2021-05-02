@@ -12,7 +12,7 @@ import org.springframework.lang.Nullable;
 import java.util.Collection;
 import java.util.List;
 
-import static cn.iocoder.yudao.framework.util.collection.SetUtils.asSet;
+import static cn.iocoder.yudao.framework.common.util.collection.SetUtils.asSet;
 
 /**
  * 岗位 Service 接口

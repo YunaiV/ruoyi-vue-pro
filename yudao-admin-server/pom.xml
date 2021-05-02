@@ -17,10 +17,10 @@
     <url>https://github.com/YunaiV/ruoyi-vue-pro</url>
 
     <dependencies>
+        <!-- 业务组件 -->
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
-            <artifactId>yudao-framework-all</artifactId>
-            <version>${revision}</version>
+            <artifactId>yudao-spring-boot-starter-biz-operatelog</artifactId>
         </dependency>
 
         <!-- Web 相关 -->
@@ -40,35 +40,33 @@
             <artifactId>yudao-spring-boot-starter-mybatis</artifactId>
         </dependency>
 
+        <!-- 监控相关 -->
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-spring-boot-starter-monitor</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>de.codecentric</groupId>
+            <artifactId>spring-boot-admin-starter-server</artifactId> <!-- 实现 Spring Boot Admin Server 服务端 -->
+        </dependency>
+
         <!-- Test 测试相关 -->
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.h2database</groupId> <!-- 单元测试，我们采用 H2 作为数据库 -->
-            <artifactId>h2</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.github.fppt</groupId> <!-- 单元测试，我们采用内嵌的 Redis 数据库 -->
-            <artifactId>jedis-mock</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>uk.co.jemos.podam</groupId> <!-- 单元测试，随机生成 POJO 类 -->
-            <artifactId>podam</artifactId>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
 
         <!-- 工具类相关 -->
         <dependency>
-            <groupId>cn.iocoder.boot</groupId>
-            <artifactId>yudao-spring-boot-starter-operatelog</artifactId>
+            <groupId>org.apache.velocity</groupId>
+            <artifactId>velocity-engine-core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.smallbun.screw</groupId>
+            <artifactId>screw-core</artifactId> <!-- 实现数据库文档 -->
         </dependency>
 
     </dependencies>

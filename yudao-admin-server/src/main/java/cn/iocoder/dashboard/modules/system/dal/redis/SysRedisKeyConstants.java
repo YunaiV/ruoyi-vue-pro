@@ -1,9 +1,9 @@
 package cn.iocoder.dashboard.modules.system.dal.redis;
 
-import cn.iocoder.dashboard.framework.redis.core.RedisKeyDefine;
+import cn.iocoder.yudao.framework.redis.core.RedisKeyDefine;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 
-import static cn.iocoder.dashboard.framework.redis.core.RedisKeyDefine.KeyTypeEnum.STRING;
+import static cn.iocoder.yudao.framework.redis.core.RedisKeyDefine.KeyTypeEnum.STRING;
 
 /**
  * System Redis Key 枚举类

@@ -7,7 +7,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 
-import static cn.iocoder.yudao.framework.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
+import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 @ApiModel("参数配置导出 Request VO")
 @Data

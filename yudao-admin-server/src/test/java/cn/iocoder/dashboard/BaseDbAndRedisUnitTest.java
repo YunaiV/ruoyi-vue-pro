@@ -1,7 +1,7 @@
 package cn.iocoder.dashboard;
 
 import cn.iocoder.dashboard.config.RedisTestConfiguration;
-import cn.iocoder.dashboard.framework.redis.config.RedisConfig;
+import cn.iocoder.yudao.framework.redis.config.RedisConfig;
 import cn.iocoder.yudao.framework.datasource.config.YudaoDataSourceAutoConfiguration;
 import cn.iocoder.yudao.framework.mybatis.config.YudaoMybatisAutoConfiguration;
 import com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceAutoConfigure;

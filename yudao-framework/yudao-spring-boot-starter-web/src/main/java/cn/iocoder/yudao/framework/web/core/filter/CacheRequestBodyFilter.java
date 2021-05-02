@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.framework.web.core.filter;
 
-import cn.iocoder.yudao.framework.util.servlet.ServletUtils;
+import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;

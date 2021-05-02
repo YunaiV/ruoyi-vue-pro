@@ -2,7 +2,7 @@ package cn.iocoder.dashboard;
 
 import cn.iocoder.yudao.framework.datasource.config.DataSourceConfiguration;
 import cn.iocoder.yudao.framework.mybatis.config.MybatisConfiguration;
-import cn.iocoder.dashboard.framework.redis.config.RedisConfig;
+import cn.iocoder.yudao.framework.redis.config.RedisConfig;
 import com.baomidou.dynamic.datasource.spring.boot.autoconfigure.DynamicDataSourceAutoConfiguration;
 import com.baomidou.mybatisplus.autoconfigure.MybatisPlusAutoConfiguration;
 import org.redisson.spring.starter.RedissonAutoConfiguration;

@@ -3,7 +3,7 @@ package cn.iocoder.dashboard.modules.system.service.dict.impl;
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.dashboard.framework.dict.core.dto.DictDataRespDTO;
+import cn.iocoder.yudao.framework.dict.core.dto.DictDataRespDTO;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.dashboard.modules.system.controller.dict.vo.data.SysDictDataCreateReqVO;
 import cn.iocoder.dashboard.modules.system.controller.dict.vo.data.SysDictDataExportReqVO;

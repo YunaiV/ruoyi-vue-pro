@@ -6,7 +6,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.security.config.SecurityProperties;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
-import cn.iocoder.yudao.framework.util.monitor.TracerUtils;
+import cn.iocoder.yudao.framework.common.util.monitor.TracerUtils;
 import cn.iocoder.dashboard.modules.system.controller.auth.vo.session.SysUserSessionPageReqVO;
 import cn.iocoder.dashboard.modules.system.controller.logger.vo.loginlog.SysLoginLogCreateReqVO;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.auth.SysUserSessionDO;
@@ -26,8 +26,8 @@ import java.time.Duration;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static cn.iocoder.yudao.framework.util.collection.CollectionUtils.convertSet;
-import static cn.iocoder.yudao.framework.util.date.DateUtils.addTime;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
+import static cn.iocoder.yudao.framework.common.util.date.DateUtils.addTime;
 
 /**
  * 在线用户 Session Service 实现类

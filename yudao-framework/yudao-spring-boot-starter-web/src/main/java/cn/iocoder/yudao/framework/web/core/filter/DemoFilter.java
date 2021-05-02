@@ -2,7 +2,7 @@ package cn.iocoder.yudao.framework.web.core.filter;
 
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.framework.util.servlet.ServletUtils;
+import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 

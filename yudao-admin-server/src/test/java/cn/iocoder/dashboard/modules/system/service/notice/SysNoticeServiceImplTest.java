@@ -10,7 +10,7 @@ import cn.iocoder.dashboard.modules.system.dal.dataobject.notice.SysNoticeDO;
 import cn.iocoder.dashboard.modules.system.dal.mysql.notice.SysNoticeMapper;
 import cn.iocoder.dashboard.modules.system.enums.notice.SysNoticeTypeEnum;
 import cn.iocoder.dashboard.modules.system.service.notice.impl.SysNoticeServiceImpl;
-import cn.iocoder.yudao.framework.util.object.ObjectUtils;
+import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 

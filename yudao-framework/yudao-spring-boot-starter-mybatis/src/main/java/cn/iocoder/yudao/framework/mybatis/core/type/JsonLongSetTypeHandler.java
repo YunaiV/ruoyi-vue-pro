@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.framework.mybatis.core.type;
 
-import cn.iocoder.yudao.framework.util.json.JsonUtils;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import com.baomidou.mybatisplus.extension.handlers.AbstractJsonTypeHandler;
 import com.fasterxml.jackson.core.type.TypeReference;
 

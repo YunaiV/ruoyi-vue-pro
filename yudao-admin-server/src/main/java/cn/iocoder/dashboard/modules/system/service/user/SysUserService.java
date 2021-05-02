@@ -11,7 +11,7 @@ import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserImport
 import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserPageReqVO;
 import cn.iocoder.dashboard.modules.system.controller.user.vo.user.SysUserUpdateReqVO;
 import cn.iocoder.dashboard.modules.system.dal.dataobject.user.SysUserDO;
-import cn.iocoder.yudao.framework.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 
 import java.io.InputStream;
 import java.util.Collection;

@@ -2,7 +2,7 @@ package cn.iocoder.dashboard.modules.system.controller.sms;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.dashboard.framework.excel.core.util.ExcelUtils;
+import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.dashboard.modules.system.controller.sms.vo.log.SysSmsLogExcelVO;
 import cn.iocoder.dashboard.modules.system.controller.sms.vo.log.SysSmsLogExportReqVO;

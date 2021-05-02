@@ -1,6 +1,6 @@
 package cn.iocoder.dashboard.modules.system.mq.message.sms;
 
-import cn.iocoder.dashboard.framework.redis.core.pubsub.ChannelMessage;
+import cn.iocoder.yudao.framework.redis.core.pubsub.ChannelMessage;
 import lombok.Data;
 
 /**
