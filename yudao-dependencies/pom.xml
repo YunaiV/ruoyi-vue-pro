@@ -193,6 +193,13 @@
                 <version>${revision}</version>
             </dependency>
 
+            <!-- 消息队列相关 -->
+            <dependency>
+                <groupId>cn.iocoder.boot</groupId>
+                <artifactId>yudao-spring-boot-starter-mq</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
             <!-- 服务保障相关 -->
             <dependency>
                 <groupId>cn.iocoder.boot</groupId>

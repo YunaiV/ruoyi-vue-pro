@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.adminserver.modules.system.mq.message.dict;
 
-import cn.iocoder.yudao.framework.redis.core.pubsub.ChannelMessage;
+import cn.iocoder.yudao.framework.mq.core.pubsub.ChannelMessage;
 import lombok.Data;
 
 /**

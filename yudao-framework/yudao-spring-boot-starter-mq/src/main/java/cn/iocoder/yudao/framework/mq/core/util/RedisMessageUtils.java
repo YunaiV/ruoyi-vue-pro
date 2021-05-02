@@ -1,7 +1,7 @@
-package cn.iocoder.yudao.framework.redis.core.util;
+package cn.iocoder.yudao.framework.mq.core.util;
 
-import cn.iocoder.yudao.framework.redis.core.pubsub.ChannelMessage;
-import cn.iocoder.yudao.framework.redis.core.stream.StreamMessage;
+import cn.iocoder.yudao.framework.mq.core.pubsub.ChannelMessage;
+import cn.iocoder.yudao.framework.mq.core.stream.StreamMessage;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import org.springframework.data.redis.connection.stream.RecordId;
 import org.springframework.data.redis.connection.stream.StreamRecords;

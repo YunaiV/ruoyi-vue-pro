@@ -65,6 +65,12 @@
             <artifactId>yudao-spring-boot-starter-job</artifactId>
         </dependency>
 
+        <!-- 消息队列相关 -->
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-spring-boot-starter-mq</artifactId>
+        </dependency>
+
         <!-- 服务保障相关 -->
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
@@ -103,6 +109,10 @@
         <dependency>
             <groupId>cn.smallbun.screw</groupId>
             <artifactId>screw-core</artifactId> <!-- 实现数据库文档 -->
+        </dependency>
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-spring-boot-starter-mq</artifactId>
         </dependency>
 
     </dependencies>

@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.framework.redis.core.stream;
+package cn.iocoder.yudao.framework.mq.core.stream;
 
 import cn.hutool.core.util.TypeUtil;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;

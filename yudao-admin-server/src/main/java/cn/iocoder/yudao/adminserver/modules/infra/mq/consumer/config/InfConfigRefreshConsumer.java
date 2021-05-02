@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.adminserver.modules.infra.mq.consumer.config;
 
 import cn.iocoder.yudao.framework.apollo.internals.DBConfigRepository;
-import cn.iocoder.yudao.framework.redis.core.pubsub.AbstractChannelMessageListener;
+import cn.iocoder.yudao.framework.mq.core.pubsub.AbstractChannelMessageListener;
 import cn.iocoder.yudao.adminserver.modules.infra.mq.message.config.InfConfigRefreshMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;

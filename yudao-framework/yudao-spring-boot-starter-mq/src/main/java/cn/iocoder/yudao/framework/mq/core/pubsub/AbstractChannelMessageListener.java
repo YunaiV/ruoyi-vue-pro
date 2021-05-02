@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.framework.redis.core.pubsub;
+package cn.iocoder.yudao.framework.mq.core.pubsub;
 
 import cn.hutool.core.util.TypeUtil;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;

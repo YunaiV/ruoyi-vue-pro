@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.adminserver.modules.system.mq.consumer.dept;
 
-import cn.iocoder.yudao.framework.redis.core.pubsub.AbstractChannelMessageListener;
+import cn.iocoder.yudao.framework.mq.core.pubsub.AbstractChannelMessageListener;
 import cn.iocoder.yudao.adminserver.modules.system.mq.message.dept.SysDeptRefreshMessage;
 import cn.iocoder.yudao.adminserver.modules.system.service.dept.SysDeptService;
 import lombok.extern.slf4j.Slf4j;

@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.adminserver.modules.system.mq.message.sms;
 
 import cn.iocoder.yudao.framework.common.core.KeyValue;
-import cn.iocoder.yudao.framework.redis.core.stream.StreamMessage;
+import cn.iocoder.yudao.framework.mq.core.stream.StreamMessage;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;

@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.adminserver.modules.system.mq.producer.permission;
 
-import cn.iocoder.yudao.framework.redis.core.util.RedisMessageUtils;
+import cn.iocoder.yudao.framework.mq.core.util.RedisMessageUtils;
 import cn.iocoder.yudao.adminserver.modules.system.mq.message.permission.SysMenuRefreshMessage;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;

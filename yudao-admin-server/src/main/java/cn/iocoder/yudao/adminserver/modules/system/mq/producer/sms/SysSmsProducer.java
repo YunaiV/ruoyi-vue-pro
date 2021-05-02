@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.adminserver.modules.system.mq.producer.sms;
 
 import cn.iocoder.yudao.framework.common.core.KeyValue;
-import cn.iocoder.yudao.framework.redis.core.util.RedisMessageUtils;
+import cn.iocoder.yudao.framework.mq.core.util.RedisMessageUtils;
 import cn.iocoder.yudao.adminserver.modules.system.mq.message.sms.SysSmsChannelRefreshMessage;
 import cn.iocoder.yudao.adminserver.modules.system.mq.message.sms.SysSmsSendMessage;
 import cn.iocoder.yudao.adminserver.modules.system.mq.message.sms.SysSmsTemplateRefreshMessage;

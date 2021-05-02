@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.adminserver.modules.system.mq.consumer.dict;
 
-import cn.iocoder.yudao.framework.redis.core.pubsub.AbstractChannelMessageListener;
+import cn.iocoder.yudao.framework.mq.core.pubsub.AbstractChannelMessageListener;
 import cn.iocoder.yudao.adminserver.modules.system.mq.message.dict.SysDictDataRefreshMessage;
 import cn.iocoder.yudao.adminserver.modules.system.service.dict.SysDictDataService;
 import lombok.extern.slf4j.Slf4j;
