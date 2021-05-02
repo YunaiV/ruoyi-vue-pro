@@ -15,8 +15,8 @@ import org.springframework.scheduling.quartz.QuartzJobBean;
 import javax.annotation.Resource;
 import java.util.Date;
 
+import static cn.hutool.core.exceptions.ExceptionUtil.getRootCauseMessage;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.diff;
-import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
 
 /**
  * 基础 Job 调用者，负责调用 {@link JobHandler#execute(String)} 执行任务

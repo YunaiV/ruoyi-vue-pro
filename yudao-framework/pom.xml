@@ -11,7 +11,6 @@
     <packaging>pom</packaging>
     <modules>
         <module>yudao-common</module>
-        <module>yudao-framework-all</module>
         <module>yudao-spring-boot-starter-mybatis</module>
         <module>yudao-spring-boot-starter-redis</module>
         <module>yudao-spring-boot-starter-web</module>

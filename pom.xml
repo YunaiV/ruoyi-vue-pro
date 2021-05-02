@@ -11,11 +11,6 @@
         <module>yudao-dependencies</module>
         <module>yudao-framework</module>
         <module>yudao-admin-server</module>
-        <module>yudao-spring-boot-starter-job</module>
-        <module>yudao-spring-boot-starter-config</module>
-        <module>yudao-spring-boot-starter-test</module>
-        <module>yudao-spring-boot-starter-biz-sms</module>
-        <module>yudao-spring-boot-starter-excel</module>
     </modules>
 
     <name>${artifactId}</name>

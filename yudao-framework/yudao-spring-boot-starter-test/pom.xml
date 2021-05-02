@@ -15,8 +15,12 @@
     <description>测试组件，用于单元测试、集成测试</description>
     <url>https://github.com/YunaiV/ruoyi-vue-pro</url>
 
-
     <dependencies>
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-common</artifactId>
+        </dependency>
+
         <!-- Test 测试相关 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

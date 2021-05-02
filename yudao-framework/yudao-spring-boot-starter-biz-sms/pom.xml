@@ -36,6 +36,12 @@
 
         <!-- 工具类相关 -->
         <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <optional>true</optional> <!-- 设置为可选，因为使用到 @VisibleForTesting 用于单元测试 -->
+        </dependency>
+
+        <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
         </dependency>
