@@ -1,6 +1,6 @@
 spring:
   application:
-    name: dashboard
+    name: yudao-admin-server
 
   profiles:
     active: local
@@ -36,6 +36,24 @@ mybatis-plus:
 --- #################### 芋道相关配置 ####################
 
 yudao:
+  info:
+    version: 1.0.0
+    base-package: cn.iocoder.yudao.adminserver
+  web:
+    api-prefix: /api
+    controller-package: ${yudao.info.base-package}
+  swagger:
+    title: 管理后台
+    description: 提供管理员管理的所有功能
+    version: ${yudao.info.version}
+    base-package: ${yudao.info.base-package}.modules
+  captcha:
+    timeout: 5m
+    width: 160
+    height: 60
+  codegen:
+    base-package: ${yudao.info.base-package}
+    db-schemas: ${spring.datasource.dynamic.datasource.master.name}
   error-code: # 错误码相关配置项
     constants-class-list:
       - cn.iocoder.dashboard.modules.infra.enums.InfErrorCodeConstants

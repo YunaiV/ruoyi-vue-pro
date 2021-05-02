@@ -99,7 +99,7 @@ apollo:
     eagerLoad:
       enabled: true # 设置 Apollo 在日志初始化前生效，可以实现日志的动态级别配置
   jdbc: # 自定义的 JDBC 配置项，用于数据库的地址
-    dao: cn.iocoder.dashboard.modules.infra.dal.mysql.config.InfConfigDAOImpl
+    dao: cn.iocoder.yudao.adminserver.modules.infra.dal.mysql.config.InfConfigDAOImpl
     url: ${spring.datasource.dynamic.datasource.master.url}
     username: ${spring.datasource.dynamic.datasource.master.username}
     password: ${spring.datasource.dynamic.datasource.master.password}
@@ -152,12 +152,6 @@ logging:
 
 # 芋道配置项，设置当前项目所有自定义的配置
 yudao:
-  info:
-    version: 1.0.0
-    base-package: cn.iocoder.dashboard
-  web:
-    api-prefix: /api
-    controller-package: ${yudao.info.base-package}
   security:
     token-header: Authorization
     token-secret: abcdefghijklmnopqrstuvwxyz
@@ -165,20 +159,8 @@ yudao:
     session-timeout: 30m
     mock-enable: true
     mock-secret: test
-  swagger:
-    title: 管理后台
-    description: 提供管理员管理的所有功能
-    version: ${yudao.info.version}
-    base-package: ${yudao.info.base-package}.modules
-  captcha:
-    timeout: 5m
-    width: 160
-    height: 60
   file:
     base-path: http://127.0.0.1:${server.port}${yudao.web.api-prefix}/system/file/get/
-  codegen:
-    base-package: ${yudao.info.base-package}
-    db-schemas: ${spring.datasource.dynamic.datasource.master.name}
   xss:
     enable: false
     exclude-urls: # 如下两个 url，仅仅是为了演示，去掉配置也没关系

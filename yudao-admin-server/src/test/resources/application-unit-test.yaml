@@ -51,12 +51,6 @@ resilience4j:
 
 # 芋道配置项，设置当前项目所有自定义的配置
 yudao:
-  info:
-    version: 1.0.0
-    base-package: cn.iocoder.dashboard
-  web:
-    api-prefix: /api
-    controller-package: ${yudao.info.base-package}
   security:
     token-header: Authorization
     token-secret: abcdefghijklmnopqrstuvwxyz
@@ -66,15 +60,8 @@ yudao:
     mock-secret: test
   swagger:
     enable: false # 单元测试，禁用 Swagger
-  captcha:
-    timeout: 5m
-    width: 160
-    height: 60
   file:
     base-path: http://127.0.0.1:${server.port}/${yudao.web.api-prefix}/file/get/
-  codegen:
-    base-package: ${yudao.info.base-package}.modules
-    db-schemas: ${spring.datasource.name}
   xss:
     enable: false
     exclude-urls: # 如下两个 url，仅仅是为了演示，去掉配置也没关系
