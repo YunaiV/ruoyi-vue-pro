@@ -9,6 +9,8 @@ import cn.smallbun.screw.core.engine.EngineFileType;
 import cn.smallbun.screw.core.engine.EngineTemplateType;
 import cn.smallbun.screw.core.execute.DocumentationExecute;
 import cn.smallbun.screw.core.process.ProcessConfig;
+import com.baomidou.dynamic.datasource.spring.boot.autoconfigure.DataSourceProperty;
+import com.baomidou.dynamic.datasource.spring.boot.autoconfigure.DynamicDataSourceProperties;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import io.swagger.annotations.Api;
@@ -32,7 +34,7 @@ import java.util.Collections;
 public class InfDbDocController {
 
     @Resource
-    private DataSourceProperties dataSourceProperties;
+    private DynamicDataSourceProperties dynamicDataSourceProperties;
 
     private static final String FILE_OUTPUT_DIR = System.getProperty("java.io.tmpdir") + File.separator
             + "db-doc";
@@ -114,11 +116,14 @@ public class InfDbDocController {
      */
     // TODO 芋艿：screw 暂时不支持 druid，尴尬
     private HikariDataSource buildDataSource() {
+        // 获得 DataSource 数据源，目前只支持首个
+        String primary = dynamicDataSourceProperties.getPrimary();
+        DataSourceProperty dataSourceProperty = dynamicDataSourceProperties.getDatasource().get(primary);
         // 创建 HikariConfig 配置类
         HikariConfig hikariConfig = new HikariConfig();
-        hikariConfig.setJdbcUrl(dataSourceProperties.getUrl());
-        hikariConfig.setUsername(dataSourceProperties.getUsername());
-        hikariConfig.setPassword(dataSourceProperties.getPassword());
+        hikariConfig.setJdbcUrl(dataSourceProperty.getUrl());
+        hikariConfig.setUsername(dataSourceProperty.getUsername());
+        hikariConfig.setPassword(dataSourceProperty.getPassword());
         hikariConfig.addDataSourceProperty("useInformationSchema", "true"); // 设置可以获取 tables remarks 信息
         // 创建数据源
         return new HikariDataSource(hikariConfig);

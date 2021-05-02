@@ -1,14 +1,13 @@
 package cn.iocoder.yudao.adminserver.modules.tool.dal.mysql.test;
 
+import java.util.*;
+
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.QueryWrapperX;
-import cn.iocoder.yudao.adminserver.modules.tool.controller.test.vo.ToolTestDemoExportReqVO;
-import cn.iocoder.yudao.adminserver.modules.tool.controller.test.vo.ToolTestDemoPageReqVO;
+import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.adminserver.modules.tool.dal.dataobject.test.ToolTestDemoDO;
 import org.apache.ibatis.annotations.Mapper;
-
-import java.util.List;
+import cn.iocoder.yudao.adminserver.modules.tool.controller.test.vo.*;
 
 /**
  * 字典类型 Mapper
@@ -26,7 +25,7 @@ public interface ToolTestDemoMapper extends BaseMapperX<ToolTestDemoDO> {
                 .eqIfPresent("category", reqVO.getCategory())
                 .eqIfPresent("remark", reqVO.getRemark())
                 .betweenIfPresent("create_time", reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
-        );
+                .orderByDesc("id"));
     }
 
     default List<ToolTestDemoDO> selectList(ToolTestDemoExportReqVO reqVO) {
@@ -37,7 +36,7 @@ public interface ToolTestDemoMapper extends BaseMapperX<ToolTestDemoDO> {
                 .eqIfPresent("category", reqVO.getCategory())
                 .eqIfPresent("remark", reqVO.getRemark())
                 .betweenIfPresent("create_time", reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
-        );
+                .orderByDesc("id"));
     }
 
 }

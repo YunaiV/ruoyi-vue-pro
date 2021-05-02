@@ -1,23 +1,20 @@
 package cn.iocoder.yudao.adminserver.modules.tool.service.test.impl;
 
-import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.adminserver.modules.tool.controller.test.vo.ToolTestDemoCreateReqVO;
-import cn.iocoder.yudao.adminserver.modules.tool.controller.test.vo.ToolTestDemoExportReqVO;
-import cn.iocoder.yudao.adminserver.modules.tool.controller.test.vo.ToolTestDemoPageReqVO;
-import cn.iocoder.yudao.adminserver.modules.tool.controller.test.vo.ToolTestDemoUpdateReqVO;
-import cn.iocoder.yudao.adminserver.modules.tool.convert.test.ToolTestDemoConvert;
-import cn.iocoder.yudao.adminserver.modules.tool.dal.dataobject.test.ToolTestDemoDO;
-import cn.iocoder.yudao.adminserver.modules.tool.dal.mysql.test.ToolTestDemoMapper;
-import cn.iocoder.yudao.adminserver.modules.tool.service.test.ToolTestDemoService;
 import org.springframework.stereotype.Service;
+import javax.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
 
-import javax.annotation.Resource;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
+import cn.iocoder.yudao.adminserver.modules.tool.controller.test.vo.*;
+import cn.iocoder.yudao.adminserver.modules.tool.dal.dataobject.test.ToolTestDemoDO;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 
-import static cn.iocoder.yudao.adminserver.modules.tool.enums.ToolErrorCodeConstants.TEST_DEMO_NOT_EXISTS;
+import cn.iocoder.yudao.adminserver.modules.tool.convert.test.ToolTestDemoConvert;
+import cn.iocoder.yudao.adminserver.modules.tool.dal.mysql.test.ToolTestDemoMapper;
+import cn.iocoder.yudao.adminserver.modules.tool.service.test.ToolTestDemoService;
+
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.adminserver.modules.tool.enums.ToolErrorCodeConstants.*;
 
 /**
  * 字典类型 Service 实现类
@@ -53,13 +50,13 @@ public class ToolTestDemoServiceImpl implements ToolTestDemoService {
     public void deleteTestDemo(Long id) {
         // 校验存在
         this.validateTestDemoExists(id);
-        // 更新
+        // 删除
         testDemoMapper.deleteById(id);
     }
 
     private void validateTestDemoExists(Long id) {
         if (testDemoMapper.selectById(id) == null) {
-            throw ServiceExceptionUtil.exception(TEST_DEMO_NOT_EXISTS);
+            throw exception(TEST_DEMO_NOT_EXISTS);
         }
     }
 
@@ -75,12 +72,12 @@ public class ToolTestDemoServiceImpl implements ToolTestDemoService {
 
     @Override
     public PageResult<ToolTestDemoDO> getTestDemoPage(ToolTestDemoPageReqVO pageReqVO) {
-		return testDemoMapper.selectPage(pageReqVO);
+        return testDemoMapper.selectPage(pageReqVO);
     }
 
     @Override
     public List<ToolTestDemoDO> getTestDemoList(ToolTestDemoExportReqVO exportReqVO) {
-		return testDemoMapper.selectList(exportReqVO);
+        return testDemoMapper.selectList(exportReqVO);
     }
 
 }

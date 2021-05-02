@@ -1,6 +1,5 @@
 package ${basePackage}.modules.${table.moduleName}.service.${table.businessName}.impl;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
@@ -14,9 +13,7 @@ import ${basePackage}.modules.${table.moduleName}.convert.${table.businessName}.
 import ${basePackage}.modules.${table.moduleName}.dal.mysql.${table.businessName}.${table.className}Mapper;
 import ${basePackage}.modules.${table.moduleName}.service.${table.businessName}.${table.className}Service;
 
-import ${ServiceExceptionUtilClassName};
-
-import static cn.iocoder.dashboard.common.exception.util.ServiceExceptionUtil.exception;
+import static ${ServiceExceptionUtilClassName}.exception;
 import static ${basePackage}.modules.${table.moduleName}.enums.${simpleModuleName_upperFirst}ErrorCodeConstants.*;
 
 /**

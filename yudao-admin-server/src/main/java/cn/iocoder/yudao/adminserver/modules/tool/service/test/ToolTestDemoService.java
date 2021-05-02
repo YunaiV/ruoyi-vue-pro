@@ -1,15 +1,10 @@
 package cn.iocoder.yudao.adminserver.modules.tool.service.test;
 
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.adminserver.modules.tool.controller.test.vo.ToolTestDemoCreateReqVO;
-import cn.iocoder.yudao.adminserver.modules.tool.controller.test.vo.ToolTestDemoExportReqVO;
-import cn.iocoder.yudao.adminserver.modules.tool.controller.test.vo.ToolTestDemoPageReqVO;
-import cn.iocoder.yudao.adminserver.modules.tool.controller.test.vo.ToolTestDemoUpdateReqVO;
+import java.util.*;
+import javax.validation.*;
+import cn.iocoder.yudao.adminserver.modules.tool.controller.test.vo.*;
 import cn.iocoder.yudao.adminserver.modules.tool.dal.dataobject.test.ToolTestDemoDO;
-
-import javax.validation.Valid;
-import java.util.Collection;
-import java.util.List;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 
 /**
  * 字典类型 Service 接口
@@ -68,7 +63,7 @@ public interface ToolTestDemoService {
      * 获得字典类型列表, 用于 Excel 导出
      *
      * @param exportReqVO 查询条件
-     * @return 字典类型分页
+     * @return 字典类型列表
      */
     List<ToolTestDemoDO> getTestDemoList(ToolTestDemoExportReqVO exportReqVO);
 

@@ -1,21 +1,19 @@
 package cn.iocoder.yudao.adminserver.modules.tool.convert.test;
 
+import java.util.*;
+
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.adminserver.modules.tool.controller.test.vo.ToolTestDemoCreateReqVO;
-import cn.iocoder.yudao.adminserver.modules.tool.controller.test.vo.ToolTestDemoExcelVO;
-import cn.iocoder.yudao.adminserver.modules.tool.controller.test.vo.ToolTestDemoRespVO;
-import cn.iocoder.yudao.adminserver.modules.tool.controller.test.vo.ToolTestDemoUpdateReqVO;
-import cn.iocoder.yudao.adminserver.modules.tool.dal.dataobject.test.ToolTestDemoDO;
+
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
-
-import java.util.List;
+import cn.iocoder.yudao.adminserver.modules.tool.controller.test.vo.*;
+import cn.iocoder.yudao.adminserver.modules.tool.dal.dataobject.test.ToolTestDemoDO;
 
 /**
-* 字典类型 Convert
-*
-* @author 芋艿
-*/
+ * 字典类型 Convert
+ *
+ * @author 芋艿
+ */
 @Mapper
 public interface ToolTestDemoConvert {
 

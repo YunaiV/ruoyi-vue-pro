@@ -125,8 +125,6 @@ public class ToolCodegenEngine {
         // VO 类，独有字段
         globalBindingMap.put("PageParamClassName", PageParam.class.getName());
         globalBindingMap.put("DictFormatClassName", DictFormat.class.getName());
-        // TODO 芋艿：代码生成器，解决下枚举类
-//        globalBindingMap.put("SysDictTypeEnumClassName", SysDictTypeEnum.class.getName());
         // DO 类，独有字段
         globalBindingMap.put("baseDOFields", ToolCodegenBuilder.BASE_DO_FIELDS);
         globalBindingMap.put("BaseDOClassName", BaseDO.class.getName());

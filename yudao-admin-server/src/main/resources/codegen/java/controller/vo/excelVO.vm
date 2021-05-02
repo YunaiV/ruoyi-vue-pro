@@ -10,7 +10,6 @@ import com.alibaba.excel.annotation.ExcelProperty;
 import ${DictFormatClassName};
 import ${DictConvertClassName};
 
-import static ${SysDictTypeEnumClassName}.*;
 #break
 #end
 #end
@@ -27,7 +26,7 @@ public class ${table.className}ExcelVO {
     #if (${column.listOperationResult})##返回字段
     #if ("$!column.dictType" != "")##处理枚举值
     @ExcelProperty(value = "${column.columnComment}", converter = DictConvert.class)
-    @DictFormat(${column.dictType.toUpperCase()})
+    @DictFormat("${column.dictType}") // TODO 代码优化：建议设置到对应的 XXXDictTypeConstants 枚举类中
     #else
     @ExcelProperty("${column.columnComment}")
     #end

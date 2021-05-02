@@ -1,16 +1,15 @@
 package cn.iocoder.yudao.adminserver.modules.tool.dal.dataobject.test;
 
-import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
+import java.util.*;
+import com.baomidou.mybatisplus.annotation.*;
+import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 
 /**
-* 字典类型 DO
-*
-* @author 芋艿
-*/
+ * 字典类型 DO
+ *
+ * @author 芋艿
+ */
 @TableName("tool_test_demo")
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -31,20 +30,14 @@ public class ToolTestDemoDO extends BaseDO {
     private String name;
     /**
      * 状态
-     *
-     * 枚举 {@link CommonStatusEnum}
      */
     private Integer status;
     /**
      * 类型
-     *
-     * 枚举 {@link cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum}
      */
     private Integer type;
     /**
      * 分类
-     *
-     * 枚举 {@link cn.iocoder.yudao.framework.redis.core.RedisKeyDefine.TimeoutTypeEnum}
      */
     private Integer category;
     /**
