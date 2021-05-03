@@ -24,7 +24,7 @@ import java.util.List;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 
-@Api("短信模板")
+@Api(tags = "短信模板")
 @RestController
 @RequestMapping("/system/sms-template")
 public class SysSmsTemplateController {
