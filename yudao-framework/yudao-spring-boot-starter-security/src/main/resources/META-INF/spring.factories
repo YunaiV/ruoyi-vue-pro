@@ -1,0 +1,3 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  cn.iocoder.yudao.framework.security.config.YudaoSecurityAutoConfiguration,\
+  cn.iocoder.yudao.framework.security.config.YudaoWebSecurityConfigurerAdapter
