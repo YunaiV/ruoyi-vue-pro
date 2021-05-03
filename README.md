@@ -127,10 +127,15 @@
 
 | 模块 | biu |  biu | biu |
 | --- | --- | --- | --- |
-| 首页 | ![登录](http://www.iocoder.cn/images/ruoyi-vue-pro/登录.jpg) | ![首页](http://www.iocoder.cn/images/ruoyi-vue-pro/首页.jpg) | ![个人中心](http://www.iocoder.cn/images/ruoyi-vue-pro/个人中心.jpg) |
+| 登陆 & 首页 | ![登录](http://www.iocoder.cn/images/ruoyi-vue-pro/登录.jpg) | ![首页](http://www.iocoder.cn/images/ruoyi-vue-pro/首页.jpg) | ![个人中心](http://www.iocoder.cn/images/ruoyi-vue-pro/个人中心.jpg) |
 | 用户 | ![用户管理](http://www.iocoder.cn/images/ruoyi-vue-pro/用户管理.jpg) | ![在线用户](http://www.iocoder.cn/images/ruoyi-vue-pro/在线用户.jpg) | - |
-| 部门 | ![部门管理](http://www.iocoder.cn/images/ruoyi-vue-pro/部门管理.jpg) | ![岗位管理](http://www.iocoder.cn/images/ruoyi-vue-pro/岗位管理.jpg) | - |
-| 权限 | ![菜单管理](http://www.iocoder.cn/images/ruoyi-vue-pro/菜单管理.jpg) | ![角色管理](http://www.iocoder.cn/images/ruoyi-vue-pro/角色管理.jpg) | - |
+| 部门 & 岗位 | ![部门管理](http://www.iocoder.cn/images/ruoyi-vue-pro/部门管理.jpg) | ![岗位管理](http://www.iocoder.cn/images/ruoyi-vue-pro/岗位管理.jpg) | - |
+| 菜单 & 角色 | ![菜单管理](http://www.iocoder.cn/images/ruoyi-vue-pro/菜单管理.jpg) | ![角色管理](http://www.iocoder.cn/images/ruoyi-vue-pro/角色管理.jpg) | - |
+| 审计日志 | ![操作日志](http://www.iocoder.cn/images/ruoyi-vue-pro/操作日志.jpg) | ![角色管理](http://www.iocoder.cn/images/ruoyi-vue-pro/角色管理.jpg) | - |
+| 短信 | ![短信渠道](http://www.iocoder.cn/images/ruoyi-vue-pro/短信渠道.jpg) | ![短信模板](http://www.iocoder.cn/images/ruoyi-vue-pro/短信模板.jpg) | ![短信日志](http://www.iocoder.cn/images/ruoyi-vue-pro/短信日志.jpg) |
+| 字典 | ![字典类型](http://www.iocoder.cn/images/ruoyi-vue-pro/字典类型.jpg) | ![字典数据](http://www.iocoder.cn/images/ruoyi-vue-pro/字典数据.jpg) | - |
+| 错误码 & 通知 | ![错误码管理](http://www.iocoder.cn/images/ruoyi-vue-pro/错误码管理.jpg) | ![通知公告](http://www.iocoder.cn/images/ruoyi-vue-pro/通知公告.jpg) | - |
+
 
 ### 基础设施
 
