@@ -340,7 +340,7 @@ public class OperateLogAspect {
         // 递归，处理数组、Collection、Map 的情况
         if (Collection.class.isAssignableFrom(clazz)) {
             return ((Collection<?>) object).stream()
-                    .anyMatch((Predicate<Object>) o -> isIgnoreArgs(object));
+                    .anyMatch((Predicate<Object>) OperateLogAspect::isIgnoreArgs);
         }
         if (Map.class.isAssignableFrom(clazz)) {
             return isIgnoreArgs(((Map<?, ?>) object).values());

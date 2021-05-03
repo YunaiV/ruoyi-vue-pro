@@ -58,19 +58,19 @@
 
     <!-- 本地环境 -->
     <springProfile name="local">
-        <logger name="${yudao.info.base-package}" level="INFO" additivity="false">
+        <root level="INFO">
             <appender-ref ref="STDOUT"/>
             <appender-ref ref="GRPC"/> <!-- 本地环境下，如果不想接入 SkyWalking 日志服务，可以注释掉本行 -->
             <appender-ref ref="ASYNC"/>  <!-- 本地环境下，如果不想打印日志，可以注释掉本行 -->
-        </logger>
+        </root>
     </springProfile>
     <!-- 其它环境 -->
     <springProfile name="default">
-        <logger name="${yudao.info.base-package}" level="INFO" additivity="false">
+        <root level="INFO">
             <appender-ref ref="STDOUT"/>
             <appender-ref ref="ASYNC"/>
             <appender-ref ref="GRPC"/>
-        </logger>
+        </root>
     </springProfile>
 
 </configuration>

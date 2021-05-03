@@ -3,6 +3,7 @@ package cn.iocoder.yudao.framework.mq.config;
 import cn.hutool.system.SystemUtil;
 import cn.iocoder.yudao.framework.mq.core.pubsub.AbstractChannelMessageListener;
 import cn.iocoder.yudao.framework.mq.core.stream.AbstractStreamMessageListener;
+import cn.iocoder.yudao.framework.redis.config.YudaoRedisAutoConfiguration;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
@@ -26,7 +27,7 @@ import java.util.List;
  * @author 芋道源码
  */
 @Configuration
-@AutoConfigureAfter(YudaoMQAutoConfiguration.class)
+@AutoConfigureAfter(YudaoRedisAutoConfiguration.class)
 @Slf4j
 public class YudaoMQAutoConfiguration {
 

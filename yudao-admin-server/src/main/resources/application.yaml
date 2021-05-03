@@ -56,7 +56,7 @@ yudao:
     db-schemas: ${spring.datasource.dynamic.datasource.master.name}
   error-code: # 错误码相关配置项
     constants-class-list:
-      - cn.iocoder.dashboard.modules.infra.enums.InfErrorCodeConstants
-      - cn.iocoder.dashboard.modules.system.enums.SysErrorCodeConstants
+      - cn.iocoder.yudao.adminserver.modules.infra.enums.InfErrorCodeConstants
+      - cn.iocoder.yudao.adminserver.modules.system.enums.SysErrorCodeConstants
 
 debug: false

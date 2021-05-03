@@ -6,6 +6,7 @@ import cn.iocoder.yudao.framework.tracer.core.annotation.BizTrace;
 import cn.iocoder.yudao.framework.common.util.sping.SpringExpressionUtils;
 import io.opentracing.Span;
 import io.opentracing.Tracer;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -22,19 +23,19 @@ import static java.util.Arrays.asList;
  * @author mashu
  */
 @Aspect
+@AllArgsConstructor
 @Slf4j
 public class BizTraceAspect {
 
     private static final String BIZ_OPERATION_NAME_PREFIX = "Biz/";
 
-    @Resource
-    private Tracer tracer;
+    private final Tracer tracer;
 
     @Around(value = "@annotation(trace)")
     public Object around(ProceedingJoinPoint joinPoint, BizTrace trace) throws Throwable {
         // 创建 span
         String operationName = getOperationName(joinPoint, trace);
-        Span span = tracer.buildSpan(operationName).startManual();
+        Span span = tracer.buildSpan(operationName).start();
         try {
             // 执行原有方法
             return joinPoint.proceed();

@@ -33,7 +33,7 @@ public class YudaoTracerAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public BizTraceAspect bizTracingAop() {
-        return new BizTraceAspect();
+        return new BizTraceAspect(tracer());
     }
 
     @Bean
