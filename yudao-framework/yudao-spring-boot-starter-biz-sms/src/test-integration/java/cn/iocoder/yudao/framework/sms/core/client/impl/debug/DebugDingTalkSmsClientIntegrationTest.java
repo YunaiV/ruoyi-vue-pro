@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.adminserver.framework.sms.core.client.impl.debug;
+package cn.iocoder.yudao.framework.sms.core.client.impl.debug;
 
 import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.sms.core.client.SmsCommonResult;

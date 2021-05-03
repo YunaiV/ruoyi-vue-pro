@@ -27,6 +27,12 @@
             <artifactId>spring-boot-starter</artifactId>
         </dependency>
 
+        <!-- 监控相关 -->
+        <dependency>
+            <groupId>io.opentracing</groupId>
+            <artifactId>opentracing-util</artifactId> <!-- aliyun 短信需要，进行链路追踪 -->
+        </dependency>
+
         <!-- Test 测试相关 -->
         <dependency>
             <groupId>cn.iocoder.boot</groupId>

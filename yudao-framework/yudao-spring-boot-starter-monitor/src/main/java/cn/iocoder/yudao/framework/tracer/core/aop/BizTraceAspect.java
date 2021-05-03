@@ -4,15 +4,16 @@ import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.tracer.core.annotation.BizTrace;
 import cn.iocoder.yudao.framework.common.util.sping.SpringExpressionUtils;
+import cn.iocoder.yudao.framework.tracer.core.util.TracerFrameworkUtils;
 import io.opentracing.Span;
 import io.opentracing.Tracer;
+import io.opentracing.tag.Tags;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 
-import javax.annotation.Resource;
 import java.util.Map;
 
 import static java.util.Arrays.asList;
@@ -35,10 +36,15 @@ public class BizTraceAspect {
     public Object around(ProceedingJoinPoint joinPoint, BizTrace trace) throws Throwable {
         // 创建 span
         String operationName = getOperationName(joinPoint, trace);
-        Span span = tracer.buildSpan(operationName).start();
+        Span span = tracer.buildSpan(operationName)
+                .withTag(Tags.COMPONENT.getKey(), "biz")
+                .startManual();
         try {
             // 执行原有方法
             return joinPoint.proceed();
+        } catch (Throwable throwable) {
+            TracerFrameworkUtils.onError(throwable, span);
+            throw throwable;
         } finally {
             // 设置 Span 的 biz 属性
             setBizTag(span, joinPoint, trace);
