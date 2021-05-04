@@ -127,28 +127,28 @@
 
 | 模块 | biu |  biu | biu |
 | --- | --- | --- | --- |
-| 登陆 & 首页 | ![登录](http://staitc2.iocoder.cn/images/ruoyi-vue-pro/登录.jpg) | ![首页](http://staitc2.iocoder.cn/images/ruoyi-vue-pro/首页.jpg) | ![个人中心](http://staitc2.iocoder.cn/images/ruoyi-vue-pro/个人中心.jpg) |
-| 用户 | ![用户管理](http://staitc2.iocoder.cn/images/ruoyi-vue-pro/用户管理.jpg) | ![在线用户](http://staitc2.iocoder.cn/images/ruoyi-vue-pro/在线用户.jpg) | - |
-| 部门 & 岗位 | ![部门管理](http://staitc2.iocoder.cn/images/ruoyi-vue-pro/部门管理.jpg) | ![岗位管理](http://staitc2.iocoder.cn/images/ruoyi-vue-pro/岗位管理.jpg) | - |
-| 菜单 & 角色 | ![菜单管理](http://staitc2.iocoder.cn/images/ruoyi-vue-pro/菜单管理.jpg) | ![角色管理](http://staitc2.iocoder.cn/images/ruoyi-vue-pro/角色管理.jpg) | - |
-| 审计日志 | ![操作日志](http://staitc2.iocoder.cn/images/ruoyi-vue-pro/操作日志.jpg) | ![登陆日志](http://staitc2.iocoder.cn/images/ruoyi-vue-pro/登陆日志.jpg) | - |
-| 短信 | ![短信渠道](http://staitc2.iocoder.cn/images/ruoyi-vue-pro/短信渠道.jpg) | ![短信模板](http://staitc2.iocoder.cn/images/ruoyi-vue-pro/短信模板.jpg) | ![短信日志](http://staitc2.iocoder.cn/images/ruoyi-vue-pro/短信日志.jpg) |
-| 字典 | ![字典类型](http://staitc2.iocoder.cn/images/ruoyi-vue-pro/字典类型.jpg) | ![字典数据](http://staitc2.iocoder.cn/images/ruoyi-vue-pro/字典数据.jpg) | - |
-| 错误码 & 通知 | ![错误码管理](http://staitc2.iocoder.cn/images/ruoyi-vue-pro/错误码管理.jpg) | ![通知公告](http://staitc2.iocoder.cn/images/ruoyi-vue-pro/通知公告.jpg) | - |
+| 登陆 & 首页 | ![登录](https://static.iocoder.cn/images/ruoyi-vue-pro/登录.jpg) | ![首页](https://static.iocoder.cn/images/ruoyi-vue-pro/首页.jpg) | ![个人中心](https://static.iocoder.cn/images/ruoyi-vue-pro/个人中心.jpg) |
+| 用户 | ![用户管理](https://static.iocoder.cn/images/ruoyi-vue-pro/用户管理.jpg) | ![在线用户](https://static.iocoder.cn/images/ruoyi-vue-pro/在线用户.jpg) | - |
+| 部门 & 岗位 | ![部门管理](https://static.iocoder.cn/images/ruoyi-vue-pro/部门管理.jpg) | ![岗位管理](https://static.iocoder.cn/images/ruoyi-vue-pro/岗位管理.jpg) | - |
+| 菜单 & 角色 | ![菜单管理](https://static.iocoder.cn/images/ruoyi-vue-pro/菜单管理.jpg) | ![角色管理](https://static.iocoder.cn/images/ruoyi-vue-pro/角色管理.jpg) | - |
+| 审计日志 | ![操作日志](https://static.iocoder.cn/images/ruoyi-vue-pro/操作日志.jpg) | ![登陆日志](https://static.iocoder.cn/images/ruoyi-vue-pro/登陆日志.jpg) | - |
+| 短信 | ![短信渠道](https://static.iocoder.cn/images/ruoyi-vue-pro/短信渠道.jpg) | ![短信模板](https://static.iocoder.cn/images/ruoyi-vue-pro/短信模板.jpg) | ![短信日志](https://static.iocoder.cn/images/ruoyi-vue-pro/短信日志.jpg) |
+| 字典 | ![字典类型](https://static.iocoder.cn/images/ruoyi-vue-pro/字典类型.jpg) | ![字典数据](https://static.iocoder.cn/images/ruoyi-vue-pro/字典数据.jpg) | - |
+| 错误码 & 通知 | ![错误码管理](https://static.iocoder.cn/images/ruoyi-vue-pro/错误码管理.jpg) | ![通知公告](https://static.iocoder.cn/images/ruoyi-vue-pro/通知公告.jpg) | - |
 
 ### 基础设施
 
 | 模块 | biu |  biu | biu |
 | --- | --- | --- | --- |
-| 文件 & 配置 | ![文件管理](http://staitc2.iocoder.cn/images/ruoyi-vue-pro/文件管理.jpg) | ![配置管理](http://staitc2.iocoder.cn/images/ruoyi-vue-pro/配置管理.jpg) | - |
-| 定时任务 | ![定时任务](http://staitc2.iocoder.cn/images/ruoyi-vue-pro/定时任务.jpg) | ![任务日志](http://staitc2.iocoder.cn/images/ruoyi-vue-pro/任务日志.jpg) | - |
-| API 日志 | ![访问日志](http://staitc2.iocoder.cn/images/ruoyi-vue-pro/访问日志.jpg) | ![错误日志](http://staitc2.iocoder.cn/images/ruoyi-vue-pro/错误日志.jpg) | - |
-| MySQL & Redis | ![MySQL](http://staitc2.iocoder.cn/images/ruoyi-vue-pro/MySQL.jpg) | ![Redis](http://staitc2.iocoder.cn/images/ruoyi-vue-pro/Redis.jpg) | - |
-| 监控平台 | ![Java监控](http://staitc2.iocoder.cn/images/ruoyi-vue-pro/Java监控.jpg) | ![链路追踪](http://staitc2.iocoder.cn/images/ruoyi-vue-pro/链路追踪.jpg) | ![日志中心](http://staitc2.iocoder.cn/images/ruoyi-vue-pro/日志中心.jpg) |
+| 文件 & 配置 | ![文件管理](https://static.iocoder.cn/images/ruoyi-vue-pro/文件管理.jpg) | ![配置管理](https://static.iocoder.cn/images/ruoyi-vue-pro/配置管理.jpg) | - |
+| 定时任务 | ![定时任务](https://static.iocoder.cn/images/ruoyi-vue-pro/定时任务.jpg) | ![任务日志](https://static.iocoder.cn/images/ruoyi-vue-pro/任务日志.jpg) | - |
+| API 日志 | ![访问日志](https://static.iocoder.cn/images/ruoyi-vue-pro/访问日志.jpg) | ![错误日志](https://static.iocoder.cn/images/ruoyi-vue-pro/错误日志.jpg) | - |
+| MySQL & Redis | ![MySQL](https://static.iocoder.cn/images/ruoyi-vue-pro/MySQL.jpg) | ![Redis](https://static.iocoder.cn/images/ruoyi-vue-pro/Redis.jpg) | - |
+| 监控平台 | ![Java监控](https://static.iocoder.cn/images/ruoyi-vue-pro/Java监控.jpg) | ![链路追踪](https://static.iocoder.cn/images/ruoyi-vue-pro/链路追踪.jpg) | ![日志中心](https://static.iocoder.cn/images/ruoyi-vue-pro/日志中心.jpg) |
 
 ### 研发工具
 
 | 模块 | biu |  biu | biu |
 | --- | --- | --- | --- |
-| 代码生成 | ![代码生成](http://staitc2.iocoder.cn/images/ruoyi-vue-pro/代码生成.jpg) | ![生成效果](http://staitc2.iocoder.cn/images/ruoyi-vue-pro/生成效果.jpg) | ![表单构建](http://staitc2.iocoder.cn/images/ruoyi-vue-pro/表单构建.jpg) |
-| 文档 | ![系统接口](http://staitc2.iocoder.cn/images/ruoyi-vue-pro/系统接口.jpg) | ![数据库文档](http://staitc2.iocoder.cn/images/ruoyi-vue-pro/数据库文档.jpg) | - |
+| 代码生成 | ![代码生成](https://static.iocoder.cn/images/ruoyi-vue-pro/代码生成.jpg) | ![生成效果](https://static.iocoder.cn/images/ruoyi-vue-pro/生成效果.jpg) | ![表单构建](https://static.iocoder.cn/images/ruoyi-vue-pro/表单构建.jpg) |
+| 文档 | ![系统接口](https://static.iocoder.cn/images/ruoyi-vue-pro/系统接口.jpg) | ![数据库文档](https://static.iocoder.cn/images/ruoyi-vue-pro/数据库文档.jpg) | - |
