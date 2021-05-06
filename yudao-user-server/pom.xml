@@ -9,19 +9,15 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>yudao-admin-server</artifactId>
+    <artifactId>yudao-user-server</artifactId>
     <packaging>jar</packaging>
 
     <name>yudao-admin-server</name>
-    <description>管理后台 Server，提供其 API 接口</description>
+    <description>用户前台 Server，提供其 API 接口</description>
     <url>https://github.com/YunaiV/ruoyi-vue-pro</url>
 
     <dependencies>
         <!-- 业务组件 -->
-        <dependency>
-            <groupId>cn.iocoder.boot</groupId>
-            <artifactId>yudao-spring-boot-starter-biz-operatelog</artifactId>
-        </dependency>
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
             <artifactId>yudao-spring-boot-starter-biz-dict</artifactId>
@@ -60,10 +56,6 @@
         </dependency>
 
         <!-- Job 定时任务相关 -->
-        <dependency>
-            <groupId>cn.iocoder.boot</groupId>
-            <artifactId>yudao-spring-boot-starter-job</artifactId>
-        </dependency>
 
         <!-- 消息队列相关 -->
         <dependency>
@@ -83,11 +75,6 @@
             <artifactId>yudao-spring-boot-starter-monitor</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>de.codecentric</groupId>
-            <artifactId>spring-boot-admin-starter-server</artifactId> <!-- 实现 Spring Boot Admin Server 服务端 -->
-        </dependency>
-
         <!-- Test 测试相关 -->
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
@@ -96,20 +83,6 @@
         </dependency>
 
         <!-- 工具类相关 -->
-        <dependency>
-            <groupId>cn.iocoder.boot</groupId>
-            <artifactId>yudao-spring-boot-starter-excel</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.velocity</groupId>
-            <artifactId>velocity-engine-core</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>cn.smallbun.screw</groupId>
-            <artifactId>screw-core</artifactId> <!-- 实现数据库文档 -->
-        </dependency>
 
     </dependencies>
 

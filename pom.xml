@@ -11,6 +11,7 @@
         <module>yudao-dependencies</module>
         <module>yudao-framework</module>
         <module>yudao-admin-server</module>
+        <module>yudao-user-server</module>
     </modules>
 
     <name>${artifactId}</name>
