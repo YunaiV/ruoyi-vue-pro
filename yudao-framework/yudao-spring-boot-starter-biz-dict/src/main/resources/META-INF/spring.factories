@@ -1,2 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  cn.iocoder.yudao.framework.operatelog.config.YudaoOperateLogAutoConfiguration
+  cn.iocoder.yudao.framework.dict.config.YudaoDictAutoConfiguration
