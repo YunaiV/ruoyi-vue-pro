@@ -3,7 +3,7 @@ package cn.iocoder.yudao.framework.tracer.core.aop;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.tracer.core.annotation.BizTrace;
-import cn.iocoder.yudao.framework.common.util.sping.SpringExpressionUtils;
+import cn.iocoder.yudao.framework.common.util.spring.SpringExpressionUtils;
 import cn.iocoder.yudao.framework.tracer.core.util.TracerFrameworkUtils;
 import io.opentracing.Span;
 import io.opentracing.Tracer;

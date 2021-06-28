@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.framework.common.util.sping;
+package cn.iocoder.yudao.framework.common.util.spring;
 
 import cn.hutool.core.bean.BeanUtil;
 import org.springframework.aop.framework.AdvisedSupport;

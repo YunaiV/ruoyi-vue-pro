@@ -13,7 +13,7 @@ import cn.iocoder.yudao.adminserver.modules.system.dal.mysql.permission.SysRoleM
 import cn.iocoder.yudao.adminserver.modules.system.enums.permission.SysRoleTypeEnum;
 import cn.iocoder.yudao.adminserver.modules.system.mq.producer.permission.SysRoleProducer;
 import cn.iocoder.yudao.adminserver.modules.system.service.permission.impl.SysRoleServiceImpl;
-import cn.iocoder.yudao.framework.common.util.sping.SpringAopUtils;
+import cn.iocoder.yudao.framework.common.util.spring.SpringAopUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
