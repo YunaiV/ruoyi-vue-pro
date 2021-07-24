@@ -70,7 +70,6 @@
             <appender-ref ref="STDOUT"/>
             <appender-ref ref="ASYNC"/>
             <appender-ref ref="GRPC"/>
-            <appender-ref ref="FILE"/>
         </root>
     </springProfile>
 

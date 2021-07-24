@@ -1,0 +1,41 @@
+#!groovy
+pipeline {
+
+  agent any
+
+  tools { nodejs "nodejs" }
+
+  parameters {
+    string(name: 'TAG_NAME', defaultValue: '', description: '')
+  }
+
+  environment {
+    APP_NAME = 'yudao-admin-ui'
+    NGINX_WORKDIR = '/home/pi/mydata/nginx/html/'
+  }
+
+  stages {
+    stage('检出') {
+      steps {
+        git url: "https://gitee.com/will-we/ruoyi-vue-pro.git",
+          branch: "devops"
+      }
+    }
+
+    stage('构建') {
+      steps {
+        sh 'cnpm --prefix '+ "${env.APP_NAME}" +' install'
+        sh 'cnpm --prefix '+ "${env.APP_NAME}" +' run build:demo1024'
+      }
+    }
+
+    stage('部署') {
+      steps {
+        sh 'cp -rf ' + "${env.APP_NAME}" + '/dist/. ' + "${env.NGINX_WORKDIR}"
+        sh 'tar -zcvf ' + "${env.APP_NAME}" + '/'+ "${env.APP_NAME}" + '.tar.gz ' + "${env.APP_NAME}" + '/dist/'
+        archiveArtifacts  "${env.APP_NAME}" + '/'+ "${env.APP_NAME}" + '.tar.gz'
+        //TODO 考虑刷新缓存的问题
+      }
+    }
+  }
+}
