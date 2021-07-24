@@ -8,7 +8,7 @@ set -e
 
 DATE=$(date +%Y%m%d%H%M)
 # 基础路径
-BASE_PATH=/work/projects/yudao-admin-server
+BASE_PATH=/media/pi/KINGTON/data/work/projects/yudao-admin-server
 # 编译后 jar 的地址。部署时，Jenkins 会上传 jar 包到该目录下
 SOURCE_PATH=$BASE_PATH/build
 # 服务名称。同时约定部署服务的 jar 包名字也为它。
@@ -24,11 +24,11 @@ HEAP_ERROR_PATH=$BASE_PATH/heapError
 JAVA_OPS="-Xms512m -Xmx512m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=$HEAP_ERROR_PATH"
 
 # SkyWalking Agent 配置
-export SW_AGENT_NAME=$SERVER_NAME
-export SW_AGENT_COLLECTOR_BACKEND_SERVICES=192.168.0.84:11800
-export SW_GRPC_LOG_SERVER_HOST=192.168.0.84
-export SW_AGENT_TRACE_IGNORE_PATH="Redisson/PING,/actuator/**,/admin/**"
-export JAVA_AGENT=-javaagent:/work/skywalking/apache-skywalking-apm-bin/agent/skywalking-agent.jar
+#export SW_AGENT_NAME=$SERVER_NAME
+#export SW_AGENT_COLLECTOR_BACKEND_SERVICES=192.168.0.84:11800
+#export SW_GRPC_LOG_SERVER_HOST=192.168.0.84
+#export SW_AGENT_TRACE_IGNORE_PATH="Redisson/PING,/actuator/**,/admin/**"
+#export JAVA_AGENT=-javaagent:/work/skywalking/apache-skywalking-apm-bin/agent/skywalking-agent.jar
 
 # 备份
 function backup() {
@@ -159,7 +159,7 @@ function deploy() {
     # 启动 Java 服务
     start
     # 健康检查
-    healthCheck
+#    healthCheck
 }
 
 deploy
