@@ -10,7 +10,8 @@ pipeline {
   }
 
   environment {
-    APP_NAME = 'yudao-admin-ui'
+    APP_NAME = 'yudao-admin'
+    APP_PACKAGE='yudao-admin-ui'
     NGINX_WORKDIR = '/home/pi/mydata/nginx/html/'
   }
 
@@ -24,8 +25,8 @@ pipeline {
 
     stage('构建') {
       steps {
-        sh 'cnpm --prefix '+ "${env.APP_NAME}" +' install'
-        sh 'cnpm --prefix '+ "${env.APP_NAME}" +' run build:prod'
+        sh 'cnpm --prefix '+ "${env.APP_PACKAGE}" +' install'
+        sh 'cnpm --prefix '+ "${env.APP_PACKAGE}" +' run build:prod'
       }
     }
 
