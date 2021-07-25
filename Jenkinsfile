@@ -36,6 +36,13 @@ pipeline {
 
         stage('构建') {
             steps {
+                // TODO 解决多环境链接、密码不同配置临时方案
+                sh 'if [ ! -d "' + "${env.HOME}" + '/resources" ];then\n' +
+                        '  echo "配置文件不存在无需修改"\n' +
+                        'else\n' +
+                        '  cp  -rf  /home/pi/resources/*.yaml ' + "${env.APP_NAME}" + '/src/main/resources\n' +
+                        '  echo "配置文件替换"\n' +
+                        'fi'
                 sh 'mvn clean package -Dmaven.test.skip=true'
             }
         }

@@ -1,25 +1,19 @@
 package cn.iocoder.yudao.adminserver.modules.infra.controller.job;
 
-import cn.iocoder.yudao.adminserver.modules.infra.controller.job.vo.job.*;
-import cn.iocoder.yudao.adminserver.modules.infra.convert.job.InfJobConvert;
-import cn.iocoder.yudao.adminserver.modules.infra.dal.dataobject.job.InfJobDO;
-import cn.iocoder.yudao.adminserver.modules.infra.service.job.InfJobService;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.framework.quartz.core.util.CronUtils;
+import cn.iocoder.yudao.adminserver.modules.infra.controller.job.vo.job.*;
+import cn.iocoder.yudao.adminserver.modules.infra.convert.job.InfJobConvert;
+import cn.iocoder.yudao.adminserver.modules.infra.dal.dataobject.job.InfJobDO;
+import cn.iocoder.yudao.adminserver.modules.infra.service.job.InfJobService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
-import org.quartz.impl.StdScheduler;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.ScheduledAnnotationBeanPostProcessor;
-import org.springframework.scheduling.config.ScheduledTask;
-import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -28,7 +22,10 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
@@ -41,15 +38,6 @@ public class InfJobController {
 
     @Resource
     private InfJobService jobService;
-
-    @Autowired
-    private SchedulerFactoryBean schedulerFactoryBean;
-
-    @Autowired
-    private StdScheduler stdScheduler;
-
-    @Autowired
-    private ScheduledAnnotationBeanPostProcessor scheduledAnnotationBeanPostProcessor;
 
     @PostMapping("/create")
     @ApiOperation("创建定时任务")
@@ -123,15 +111,6 @@ public class InfJobController {
     @PreAuthorize("@ss.hasPermission('infra:job:query')")
     public CommonResult<PageResult<InfJobRespVO>> getJobPage(@Valid InfJobPageReqVO pageVO) {
         PageResult<InfJobDO> pageResult = jobService.getJobPage(pageVO);
-        Scheduler scheduler = schedulerFactoryBean.getScheduler();
-        Set<ScheduledTask> scheduledTasks = scheduledAnnotationBeanPostProcessor.getScheduledTasks();
-        Iterator<ScheduledTask> scheduledTaskIterator = scheduledTasks.iterator();
-        while (scheduledTaskIterator.hasNext()) {
-            System.err.println("=================================");
-            ScheduledTask scheduledTask = scheduledTaskIterator.next();
-            scheduledAnnotationBeanPostProcessor.postProcessAfterInitialization(scheduledTask, scheduledTask.toString());
-            System.err.println("=================================");
-        }
         return success(InfJobConvert.INSTANCE.convertPage(pageResult));
     }
 
