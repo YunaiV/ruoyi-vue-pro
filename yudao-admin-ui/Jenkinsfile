@@ -25,7 +25,7 @@ pipeline {
     stage('构建') {
       steps {
         sh 'cnpm --prefix '+ "${env.APP_NAME}" +' install'
-        sh 'cnpm --prefix '+ "${env.APP_NAME}" +' run build:demo1024'
+        sh 'cnpm --prefix '+ "${env.APP_NAME}" +' run build:prod'
       }
     }
 
