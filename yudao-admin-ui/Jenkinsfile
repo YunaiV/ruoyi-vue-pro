@@ -32,10 +32,11 @@ pipeline {
 
     stage('部署') {
       steps {
+        sh 'rm -f ' + "${env.APP_NAME}" + '/'+ "${env.APP_NAME}" + '.tar.gz'
         sh 'mkdir -p ' + "${env.NGINX_WORKDIR}" + "${env.APP_NAME}"
         sh 'cp -rf ' + "${env.APP_PACKAGE}" + '/dist/. ' + "${env.NGINX_WORKDIR}" + "${env.APP_NAME}"
-        sh 'tar -zcvf ' + "${env.APP_NAME}" + '/'+ "${env.APP_NAME}" + '.tar.gz ' + "${env.APP_PACKAGE}" + '/dist/'
-        archiveArtifacts  "${env.APP_NAME}" + '/'+ "${env.APP_NAME}" + '.tar.gz'
+        sh 'tar -zcvf ' + "${env.APP_PACKAGE}" + '/'+ "${env.APP_PACKAGE}" + '.tar.gz ' + "${env.APP_PACKAGE}" + '/dist/'
+        archiveArtifacts  "${env.APP_PACKAGE}" + '/'+ "${env.APP_PACKAGE}" + '.tar.gz'
         //TODO 考虑刷新缓存的问题
       }
     }
