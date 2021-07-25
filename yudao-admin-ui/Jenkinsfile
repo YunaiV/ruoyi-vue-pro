@@ -33,8 +33,8 @@ pipeline {
     stage('部署') {
       steps {
         sh 'mkdir -p ' + "${env.NGINX_WORKDIR}" + "${env.APP_NAME}"
-        sh 'cp -rf ' + "${env.APP_NAME}" + '/dist/. ' + "${env.NGINX_WORKDIR}" + "${env.APP_NAME}"
-        sh 'tar -zcvf ' + "${env.APP_NAME}" + '/'+ "${env.APP_NAME}" + '.tar.gz ' + "${env.APP_NAME}" + '/dist/'
+        sh 'cp -rf ' + "${env.APP_PACKAGE}" + '/dist/. ' + "${env.NGINX_WORKDIR}" + "${env.APP_NAME}"
+        sh 'tar -zcvf ' + "${env.APP_NAME}" + '/'+ "${env.APP_NAME}" + '.tar.gz ' + "${env.APP_PACKAGE}" + '/dist/'
         archiveArtifacts  "${env.APP_NAME}" + '/'+ "${env.APP_NAME}" + '.tar.gz'
         //TODO 考虑刷新缓存的问题
       }
