@@ -10,7 +10,7 @@ pipeline {
   }
 
   environment {
-    APP_NAME = 'yudao-admin'
+    APP_NAME = 'yudao-admin-ui'
     NGINX_WORKDIR = '/home/pi/mydata/nginx/html/'
   }
 
@@ -31,6 +31,7 @@ pipeline {
 
     stage('部署') {
       steps {
+        sh 'mkdir -p ' + "${env.NGINX_WORKDIR}" + "${env.APP_NAME}"
         sh 'cp -rf ' + "${env.APP_NAME}" + '/dist/. ' + "${env.NGINX_WORKDIR}" + "${env.APP_NAME}"
         sh 'tar -zcvf ' + "${env.APP_NAME}" + '/'+ "${env.APP_NAME}" + '.tar.gz ' + "${env.APP_NAME}" + '/dist/'
         archiveArtifacts  "${env.APP_NAME}" + '/'+ "${env.APP_NAME}" + '.tar.gz'
