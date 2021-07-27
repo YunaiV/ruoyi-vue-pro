@@ -41,7 +41,7 @@
         <podam.version>7.2.6.RELEASE</podam.version>
         <jedis-mock.version>0.1.16</jedis-mock.version>
         <!-- 工具类相关 -->
-        <lombok.version>1.16.14</lombok.version>
+        <lombok.version>1.18.12</lombok.version>
         <mapstruct.version>1.4.1.Final</mapstruct.version>
         <hutool.version>5.6.1</hutool.version>
         <easyexcel.verion>2.2.7</easyexcel.verion>

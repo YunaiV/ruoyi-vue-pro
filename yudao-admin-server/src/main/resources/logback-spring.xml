@@ -65,7 +65,7 @@
         </root>
     </springProfile>
     <!-- 其它环境 -->
-    <springProfile name="default">
+    <springProfile name="dev,default">
         <root level="INFO">
             <appender-ref ref="STDOUT"/>
             <appender-ref ref="ASYNC"/>

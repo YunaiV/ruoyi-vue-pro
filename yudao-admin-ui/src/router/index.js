@@ -122,6 +122,7 @@ export const constantRoutes = [
 ]
 
 export default new Router({
+  base: process.env.VUE_APP_APP_NAME ? process.env.VUE_APP_APP_NAME : "/",
   mode: 'history', // 去掉url中的#
   scrollBehavior: () => ({ y: 0 }),
   routes: constantRoutes
