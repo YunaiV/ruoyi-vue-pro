@@ -39,6 +39,19 @@
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
 
+        <!-- justAuth 集成第三方登录 -->
+        <dependency>
+            <groupId>top.dcenter</groupId>
+            <artifactId>justAuth-spring-security-starter</artifactId>
+            <version>1.1.25</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>slf4j-api</artifactId>
+                    <groupId>org.slf4j</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
     </dependencies>
 
 </project>

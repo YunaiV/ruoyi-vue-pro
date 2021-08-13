@@ -4,6 +4,8 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.social.SysUserSocialDO;
+import cn.iocoder.yudao.adminserver.modules.system.dal.mysql.social.SysUserSocialMapper;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -49,6 +51,8 @@ public class SysUserServiceImpl implements SysUserService {
 
     @Resource
     private SysUserMapper userMapper;
+    @Resource
+    private SysUserSocialMapper userSocialMapper;
 
     @Resource
     private SysDeptService deptService;
@@ -72,6 +76,15 @@ public class SysUserServiceImpl implements SysUserService {
         user.setPassword(passwordEncoder.encode(reqVO.getPassword())); // 加密密码
         userMapper.insert(user);
         return user.getId();
+    }
+
+    @Override
+    public Long bindSocialUSer(Long sysUserId, String socialUSerId) {
+        SysUserSocialDO userSocialDO = new SysUserSocialDO();
+        userSocialDO.setUserId(sysUserId);
+        userSocialDO.setSocialUserId(socialUSerId);
+        userSocialMapper.insert(userSocialDO);
+        return userSocialDO.getUserId();
     }
 
     @Override

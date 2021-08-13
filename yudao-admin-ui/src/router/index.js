@@ -44,6 +44,11 @@ export const constantRoutes = [
     hidden: true
   },
   {
+    path: '/oauthLogin/gitee',
+    component: (resolve) => require(['@/views/oauthLogin'], resolve),
+    hidden: true
+  },
+  {
     path: '/404',
     component: (resolve) => require(['@/views/error/404'], resolve),
     hidden: true

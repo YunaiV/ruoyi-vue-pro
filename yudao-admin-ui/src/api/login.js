@@ -38,3 +38,19 @@ export function getCodeImg() {
     method: 'get'
   })
 }
+
+// 接入第三方登录
+export function giteeLogin() {
+  return request({
+    url: '/auth2/authorization/gitee',
+    method: 'get'
+  })
+}
+
+export function getToken(path) {
+  console.log({path});
+  return request({
+    url: '/auth2/login/gitee' +  path,
+    method: 'get'
+  })
+}

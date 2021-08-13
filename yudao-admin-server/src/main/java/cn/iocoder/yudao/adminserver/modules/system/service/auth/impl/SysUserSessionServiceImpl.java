@@ -18,7 +18,11 @@ import cn.iocoder.yudao.adminserver.modules.system.enums.logger.SysLoginResultEn
 import cn.iocoder.yudao.adminserver.modules.system.service.auth.SysUserSessionService;
 import cn.iocoder.yudao.adminserver.modules.system.service.logger.SysLoginLogService;
 import cn.iocoder.yudao.adminserver.modules.system.service.user.SysUserService;
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.google.common.collect.Lists;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -34,6 +38,7 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.addTime;
  *
  * @author 芋道源码
  */
+@Slf4j
 @Service
 public class SysUserSessionServiceImpl implements SysUserSessionService {
 
@@ -89,6 +94,15 @@ public class SysUserSessionServiceImpl implements SysUserSessionService {
     @Override
     public LoginUser getLoginUser(String sessionId) {
         return loginUserRedisDAO.get(sessionId);
+    }
+
+    @Override
+    public String getSessionId(String username) {
+        QueryWrapper<SysUserSessionDO> wrapper = new QueryWrapper<>();
+        wrapper.eq("username", username);
+        wrapper.orderByDesc("create_time");
+        SysUserSessionDO sysUserSessionDO = userSessionMapper.selectOne(wrapper);
+        return sysUserSessionDO.getId();
     }
 
     @Override

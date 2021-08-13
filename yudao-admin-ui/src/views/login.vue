@@ -45,6 +45,11 @@
           <span v-else>登 录 中...</span>
         </el-button>
       </el-form-item>
+      <el-form-item style="width:100%;">
+        <el-button @click="doAuth2Login" title="使用 Gitee 帐号登录">
+          <span class="gitee-login-title">使用 Gitee 帐号登录</span>
+        </el-button>
+      </el-form-item>
     </el-form>
     <!--  底部  -->
     <div class="el-login-footer">
@@ -54,7 +59,7 @@
 </template>
 
 <script>
-import { getCodeImg } from "@/api/login";
+import { getCodeImg,giteeLogin } from "@/api/login";
 import Cookies from "js-cookie";
 import { encrypt, decrypt } from '@/utils/jsencrypt'
 
@@ -134,6 +139,14 @@ export default {
             this.getCode();
           });
         }
+      });
+    },
+    doAuth2Login() {
+      console.log("开始Oauth登录...");
+      this.loading = true;
+      giteeLogin().then((res) => {
+        console.log(res.url);
+        window.location.href = res.url;
       });
     }
   }

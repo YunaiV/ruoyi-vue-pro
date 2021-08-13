@@ -1,15 +1,12 @@
 package cn.iocoder.yudao.framework.security.config;
 
 import cn.iocoder.yudao.framework.security.core.filter.JwtAuthenticationTokenFilter;
-import cn.iocoder.yudao.framework.security.core.handler.AccessDeniedHandlerImpl;
-import cn.iocoder.yudao.framework.security.core.handler.AuthenticationEntryPointImpl;
-import cn.iocoder.yudao.framework.security.core.handler.LogoutSuccessHandlerImpl;
+import cn.iocoder.yudao.framework.security.core.handler.AbstractSignUpUrlAuthenticationSuccessHandler;
 import cn.iocoder.yudao.framework.security.core.service.SecurityAuthFrameworkService;
 import cn.iocoder.yudao.framework.web.config.WebProperties;
-import cn.iocoder.yudao.framework.web.core.handler.GlobalExceptionHandler;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -19,13 +16,15 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
+import top.dcenter.ums.security.core.oauth.config.Auth2AutoConfigurer;
+import top.dcenter.ums.security.core.oauth.properties.Auth2Properties;
+import top.dcenter.ums.security.core.oauth.properties.OneClickLoginProperties;
 
 import javax.annotation.Resource;
 
@@ -48,7 +47,7 @@ public class YudaoWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdap
      * 自定义用户【认证】逻辑
      */
     @Resource
-    private UserDetailsService userDetailsService;
+    private SecurityAuthFrameworkService userDetailsService;
     /**
      * Spring Security 加密器
      */
@@ -74,6 +73,15 @@ public class YudaoWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdap
      */
     @Resource
     private JwtAuthenticationTokenFilter authenticationTokenFilter;
+
+    @Autowired
+    private Auth2AutoConfigurer auth2AutoConfigurer;
+    @Autowired
+    private Auth2Properties auth2Properties;
+    @Autowired
+    private OneClickLoginProperties oneClickLoginProperties;
+    @Autowired
+    private AbstractSignUpUrlAuthenticationSuccessHandler authenticationSuccessHandler;
 
     /**
      * 由于 Spring Security 创建 AuthenticationManager 对象时，没声明 @Bean 注解，导致无法被注入
@@ -114,7 +122,11 @@ public class YudaoWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdap
      */
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
+
         httpSecurity
+                // ========= start: 使用 justAuth-spring-security-starter 必须步骤 =========
+                // 添加 Auth2AutoConfigurer 使 OAuth2(justAuth) login 生效.
+                .apply(this.auth2AutoConfigurer).and()
                 // 开启跨域
                 .cors().and()
                 // CSRF 禁用，因为不使用 Session
@@ -123,39 +135,59 @@ public class YudaoWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdap
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 // 一堆自定义的 Spring Security 处理器
                 .exceptionHandling().authenticationEntryPoint(authenticationEntryPoint)
-                    .accessDeniedHandler(accessDeniedHandler).and()
+                .accessDeniedHandler(accessDeniedHandler).and()
+                .formLogin().loginPage(api("/login")).successHandler(authenticationSuccessHandler).and()
                 // 设置每个请求的权限
                 .authorizeRequests()
-                    // 登陆的接口，可匿名访问
-                    .antMatchers(api("/login")).anonymous()
-                    // 通用的接口，可匿名访问 TODO 芋艿：需要抽象出去
-                    .antMatchers(api("/system/captcha/**")).anonymous()
-                    // 静态资源，可匿名访问
-                    .antMatchers(HttpMethod.GET, "/*.html", "/**/*.html", "/**/*.css", "/**/*.js").permitAll()
-                    // 文件的获取接口，可匿名访问
-                    .antMatchers(api("/infra/file/get/**")).anonymous()
-                    // Swagger 接口文档
-                    .antMatchers("/swagger-ui.html").anonymous()
-                    .antMatchers("/swagger-resources/**").anonymous()
-                    .antMatchers("/webjars/**").anonymous()
-                    .antMatchers("/*/api-docs").anonymous()
-                    // Spring Boot Admin Server 的安全配置 TODO 芋艿：需要抽象出去
-                    .antMatchers(adminSeverContextPath).anonymous()
-                    .antMatchers(adminSeverContextPath + "/**").anonymous()
-                    // Spring Boot Actuator 的安全配置
-                    .antMatchers("/actuator").anonymous()
-                    .antMatchers("/actuator/**").anonymous()
-                    // Druid 监控 TODO 芋艿：需要抽象出去
-                    .antMatchers("/druid/**").anonymous()
-                    // 短信回调 API TODO 芋艿：需要抽象出去
-                    .antMatchers(api("/system/sms/callback/**")).anonymous()
-                    // 除上面外的所有请求全部需要鉴权认证
-                    .anyRequest().authenticated()
+                // 登陆的接口，可匿名访问
+                .antMatchers(api("/login")).anonymous()
+                // 通用的接口，可匿名访问 TODO 芋艿：需要抽象出去
+                .antMatchers(api("/system/captcha/**")).anonymous()
+                // 静态资源，可匿名访问
+                .antMatchers(HttpMethod.GET, "/*.html", "/**/*.html", "/**/*.css", "/**/*.js").permitAll()
+                // 文件的获取接口，可匿名访问
+                .antMatchers(api("/infra/file/get/**")).anonymous()
+                // Swagger 接口文档
+                .antMatchers("/swagger-ui.html").anonymous()
+                .antMatchers("/favicon.ico").anonymous()
+                .antMatchers("/swagger-resources/**").anonymous()
+                .antMatchers("/webjars/**").anonymous()
+                .antMatchers("/*/api-docs").anonymous()
+                // Spring Boot Admin Server 的安全配置 TODO 芋艿：需要抽象出去
+                .antMatchers(adminSeverContextPath).anonymous()
+                .antMatchers(adminSeverContextPath + "/**").anonymous()
+                // Spring Boot Actuator 的安全配置
+                .antMatchers("/actuator").anonymous()
+                .antMatchers("/actuator/**").anonymous()
+                // Druid 监控 TODO 芋艿：需要抽象出去
+                .antMatchers("/druid/**").anonymous()
+                // 短信回调 API TODO 芋艿：需要抽象出去
+                .antMatchers(api("/system/sms/callback/**")).anonymous()
+                // oAuth2 auth2/login/gitee
+                .antMatchers(api("/auth2/login/**")).anonymous()
+                .antMatchers(api("/auth2/authorization/**")).anonymous()
+                .antMatchers("/api/callback/**").anonymous()
+                // 除上面外的所有请求全部需要鉴权认证
+                .anyRequest().authenticated()
                 .and()
                 .headers().frameOptions().disable();
         httpSecurity.logout().logoutUrl(api("/logout")).logoutSuccessHandler(logoutSuccessHandler);
         // 添加 JWT Filter
         httpSecurity.addFilterBefore(authenticationTokenFilter, UsernamePasswordAuthenticationFilter.class);
+
+//        // 放行第三方登录入口地址与第三方登录回调地址
+//        // @formatter:off
+//        httpSecurity.authorizeRequests()
+//                .antMatchers(HttpMethod.GET,
+//                        auth2Properties.getRedirectUrlPrefix() + "/*",
+//                        auth2Properties.getAuthLoginUrlPrefix() + "/*")
+//                .permitAll();
+//        httpSecurity.authorizeRequests()
+//                .antMatchers(HttpMethod.POST,
+//                        oneClickLoginProperties.getLoginProcessingUrl())
+//                .permitAll();
+//        // @formatter:on
+//        // ========= end: 使用 justAuth-spring-security-starter 必须步骤 =========
     }
 
     private String api(String url) {

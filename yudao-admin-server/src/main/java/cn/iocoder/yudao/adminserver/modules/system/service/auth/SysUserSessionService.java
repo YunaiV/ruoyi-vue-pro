@@ -46,6 +46,13 @@ public interface SysUserSessionService {
     LoginUser getLoginUser(String sessionId);
 
     /**
+     * 获取当前登录用户信息
+     * @param username 用户名称
+     * @return 在线用户
+     */
+    String getSessionId(String username);
+
+    /**
      * 获得 Session 超时时间，单位：毫秒
      *
      * @return 超时时间

@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.adminserver.modules.system.controller.auth;
 
+import cn.iocoder.yudao.adminserver.modules.system.service.auth.SysUserSessionService;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
@@ -19,6 +20,8 @@ import cn.iocoder.yudao.adminserver.modules.system.service.user.SysUserService;
 import cn.iocoder.yudao.framework.common.util.collection.SetUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -46,12 +49,25 @@ public class SysAuthController {
     private SysRoleService roleService;
     @Resource
     private SysPermissionService permissionService;
+    @Resource
+    private SysUserSessionService sysUserSessionService;
 
     @PostMapping("/login")
     @ApiOperation("使用账号密码登录")
     @OperateLog(enable = false) // 避免 Post 请求被记录操作日志
     public CommonResult<SysAuthLoginRespVO> login(@RequestBody @Valid SysAuthLoginReqVO reqVO) {
         String token = authService.login(reqVO, getClientIP(), getUserAgent());
+        // 返回结果
+        return success(SysAuthLoginRespVO.builder().token(token).build());
+    }
+
+    @RequestMapping("/auth2/login/{oauthType}")
+    @ApiOperation("第三方登录")
+    @OperateLog(enable = false) // 避免 Post 请求被记录操作日志
+    public CommonResult<SysAuthLoginRespVO> login(@PathVariable String oauthType) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        //TODO NPE
+        String token = sysUserSessionService.getSessionId(authentication.getName());
         // 返回结果
         return success(SysAuthLoginRespVO.builder().token(token).build());
     }
