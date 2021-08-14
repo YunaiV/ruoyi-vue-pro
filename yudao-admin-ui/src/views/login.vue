@@ -45,10 +45,14 @@
           <span v-else>登 录 中...</span>
         </el-button>
       </el-form-item>
+      
       <el-form-item style="width:100%;">
-        <el-button @click="doAuth2Login" title="使用 Gitee 帐号登录">
-          <span class="gitee-login-title">使用 Gitee 帐号登录</span>
-        </el-button>
+          <div class="oauth-login" style="display:flex">
+            <div class="oauth-login-item" v-for="item in oauthProviders" :key="item.code" @click="doAuth2Login(item)">
+              <img :src=item.img height="25px" width="25px" alt="登录" >
+              <span>{{item.title}}</span>
+            </div>
+        </div>
       </el-form-item>
     </el-form>
     <!--  底部  -->
@@ -59,7 +63,7 @@
 </template>
 
 <script>
-import { getCodeImg,giteeLogin } from "@/api/login";
+import { getCodeImg,oAuthLogin } from "@/api/login";
 import Cookies from "js-cookie";
 import { encrypt, decrypt } from '@/utils/jsencrypt'
 
@@ -76,6 +80,23 @@ export default {
         code: "",
         uuid: ""
       },
+      oauthProviders: [
+        {
+          img: "https://cdn.jsdelivr.net/gh/justauth/justauth-oauth-logo@1.2/gitee.png",
+          title: "码云",
+          code: "gitee"
+        },
+        {
+          img: "https://cdn.jsdelivr.net/gh/justauth/justauth-oauth-logo@1.2/wechat.png",
+          title: "微信",
+          code: "weixin"
+        },
+        {
+          img: "https://cdn.jsdelivr.net/gh/justauth/justauth-oauth-logo@1.2/qq.png",
+          title: "QQ",
+          code: "qq"
+        }
+      ],
       loginRules: {
         username: [
           { required: true, trigger: "blur", message: "用户名不能为空" }
@@ -141,10 +162,10 @@ export default {
         }
       });
     },
-    doAuth2Login() {
-      console.log("开始Oauth登录...");
+    doAuth2Login(provider) {
+      console.log("开始Oauth登录...%o", provider.code);
       this.loading = true;
-      giteeLogin().then((res) => {
+      oAuthLogin(provider.code).then((res) => {
         console.log(res.url);
         window.location.href = res.url;
       });
@@ -213,5 +234,22 @@ export default {
 }
 .login-code-img {
   height: 38px;
+}
+.oauth-login {
+  display: flex;
+  cursor:pointer;
+}
+.oauth-login-item {
+  display: flex;
+  align-items: center;
+  margin-right: 10px;
+}
+.oauth-login-item img {
+  height: 25px;
+  width: 25px;
+}
+.oauth-login-item span:hover {
+  text-decoration: underline red;
+  color: red;
 }
 </style>

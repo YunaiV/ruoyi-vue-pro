@@ -40,9 +40,9 @@ export function getCodeImg() {
 }
 
 // 接入第三方登录
-export function giteeLogin() {
+export function oAuthLogin(provider) {
   return request({
-    url: '/auth2/authorization/gitee',
+    url: '/auth2/authorization/' + provider,
     method: 'get'
   })
 }
@@ -50,7 +50,7 @@ export function giteeLogin() {
 export function getToken(path) {
   console.log({path});
   return request({
-    url: '/auth2/login/gitee' +  path,
+    url: '/auth2/login/github' +  path,
     method: 'get'
   })
 }
