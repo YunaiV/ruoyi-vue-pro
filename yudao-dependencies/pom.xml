@@ -396,6 +396,15 @@
                 <version>${aliyun-java-sdk-dysmsapi.version}</version>
             </dependency>
             <!-- SMS SDK end -->
+
+
+            <!-- activiti begin -->
+            <dependency>
+                <groupId>cn.iocoder.boot</groupId>
+                <artifactId>yudao-spring-boot-starter-activiti</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <!-- activiti end -->
         </dependencies>
     </dependencyManagement>
 
