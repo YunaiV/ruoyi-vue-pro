@@ -43,13 +43,13 @@ spring:
       primary: master
       datasource:
         master:
-          name: ruoyi_vue_pro
+          name: ruoyi-vue-pro
           url: jdbc:mysql://127.0.0.1:3306/${spring.datasource.dynamic.datasource.master.name}?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=CTT
           driver-class-name: com.mysql.jdbc.Driver
           username: root
           password: root
         slave: # 模拟从库，可根据自己需要修改
-          name: ruoyi_vue_pro
+          name: ruoyi-vue-pro
           url: jdbc:mysql://127.0.0.1:3306/${spring.datasource.dynamic.datasource.slave.name}?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=CTT
           driver-class-name: com.mysql.jdbc.Driver
           username: root
@@ -65,6 +65,7 @@ spring:
     #activiti7默认不生成历史信息表，需手动设置开启
     db-history-used: true
     check-process-definitions: true
+    #full：保存历史数据的最高级别，可保存全部流程相关细节，包括流程流转各节点参数
     history-level: full
 
 

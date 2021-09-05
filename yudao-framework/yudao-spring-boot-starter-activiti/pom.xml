@@ -33,7 +33,7 @@
             <version>${activiti.version}</version>
             <type>pom</type>
         </dependency>
-
+        <!--使用mybatis plus需排除掉mybatis-->
         <dependency>
             <groupId>org.activiti</groupId>
             <artifactId>activiti-spring-boot-starter</artifactId>
