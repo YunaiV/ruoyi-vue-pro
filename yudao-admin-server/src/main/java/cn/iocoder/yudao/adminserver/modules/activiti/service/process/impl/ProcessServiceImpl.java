@@ -45,7 +45,7 @@ public class ProcessServiceImpl implements ProcessService {
             List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().deploymentId(deployment.getId()).list();
             processDefinitions.forEach((processDefinition)->{
                 //设置线上部署流程模型名字
-                String proDefId= processDefinition.getId();
+                String proDefId = processDefinition.getId();
                 repositoryService.setProcessDefinitionCategory(proDefId,fileName);
                 log.info("流程文件部署成功，流程ID="+proDefId);
             });
