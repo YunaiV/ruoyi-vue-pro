@@ -149,6 +149,8 @@ public class YudaoWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdap
                     .antMatchers("/druid/**").anonymous()
                     // 短信回调 API TODO 芋艿：需要抽象出去
                     .antMatchers(api("/system/sms/callback/**")).anonymous()
+                    // WebSocket
+                    .antMatchers("/ws/**").anonymous()
                     // 除上面外的所有请求全部需要鉴权认证
                     .anyRequest().authenticated()
                 .and()
