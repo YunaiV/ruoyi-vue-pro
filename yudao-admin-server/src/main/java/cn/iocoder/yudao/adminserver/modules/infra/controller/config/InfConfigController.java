@@ -96,7 +96,7 @@ public class InfConfigController {
     public void exportSysConfig(@Valid InfConfigExportReqVO reqVO,
                                 HttpServletResponse response) throws IOException {
         List<InfConfigDO> list = configService.getConfigList(reqVO);
-        // 拼接数据
+        // 拼接数据 测试
         List<InfConfigExcelVO> datas = InfConfigConvert.INSTANCE.convertList(list);
         // 输出
         ExcelUtils.write(response, "参数配置.xls", "数据", InfConfigExcelVO.class, datas);
