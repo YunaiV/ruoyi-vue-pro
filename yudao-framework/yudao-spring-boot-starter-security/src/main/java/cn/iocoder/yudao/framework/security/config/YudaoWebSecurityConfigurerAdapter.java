@@ -169,7 +169,8 @@ public class YudaoWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdap
                 // 设置每个请求的权限 ②：每个项目的自定义规则
                 .and().authorizeRequests(authorizeRequestsCustomizer)
                 // 设置每个请求的权限 ③：兜底规则，必须认证
-                .authorizeRequests().anyRequest().authenticated();
+//                .authorizeRequests().anyRequest().authenticated()
+        ;
         // 添加 JWT Filter
         httpSecurity.addFilterBefore(authenticationTokenFilter, UsernamePasswordAuthenticationFilter.class);
 

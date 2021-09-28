@@ -87,7 +87,8 @@ public class DefaultSignUpUrlAuthenticationSuccessHandler extends AbstractSignUp
     }
 
     private String getUrl() {
-        return "http://localhost/oauthLogin/gitee?token=";
+//        return "http://localhost/oauthLogin/gitee?token=";
+        return "http://127.0.0.1:1024/oauthLogin/gitee?token=";
     }
 
     /**
