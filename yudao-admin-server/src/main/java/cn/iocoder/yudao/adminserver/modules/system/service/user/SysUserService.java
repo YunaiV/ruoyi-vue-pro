@@ -82,7 +82,7 @@ public interface SysUserService {
     void updateUserPassword(Long id, String password);
 
     /**
-     * 修改密码
+     * 修改状态
      *
      * @param id     用户编号
      * @param status 状态
