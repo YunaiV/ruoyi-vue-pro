@@ -14,10 +14,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configurers.ExpressionUrlAuthorizationConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -40,9 +42,6 @@ public class YudaoWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdap
 
     @Resource
     private WebProperties webProperties;
-
-    @Value("${spring.boot.admin.context-path:''}")
-    private String adminSeverContextPath;
 
     /**
      * 自定义用户【认证】逻辑
@@ -74,6 +73,13 @@ public class YudaoWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdap
      */
     @Resource
     private JwtAuthenticationTokenFilter authenticationTokenFilter;
+    /**
+     * 自定义的权限映射 Bean
+     *
+     * @see #configure(HttpSecurity)
+     */
+    @Resource
+    private Customizer<ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry> authorizeRequestsCustomizer;
 
     /**
      * 由于 Spring Security 创建 AuthenticationManager 对象时，没声明 @Bean 注解，导致无法被注入
@@ -121,15 +127,16 @@ public class YudaoWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdap
                 .csrf().disable()
                 // 基于 token 机制，所以不需要 Session
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+                .headers().frameOptions().disable().and()
                 // 一堆自定义的 Spring Security 处理器
                 .exceptionHandling().authenticationEntryPoint(authenticationEntryPoint)
                     .accessDeniedHandler(accessDeniedHandler).and()
-                // 设置每个请求的权限
-                .authorizeRequests()
+                .logout().logoutUrl(api("/logout")).logoutSuccessHandler(logoutSuccessHandler); // 登出
+
+        // 设置每个请求的权限 ①：全局共享规则
+        httpSecurity.authorizeRequests()
                     // 登陆的接口，可匿名访问
                     .antMatchers(api("/login")).anonymous()
-                    // 通用的接口，可匿名访问 TODO 芋艿：需要抽象出去
-                    .antMatchers(api("/system/captcha/**")).anonymous()
                     // 静态资源，可匿名访问
                     .antMatchers(HttpMethod.GET, "/*.html", "/**/*.html", "/**/*.css", "/**/*.js").permitAll()
                     // 文件的获取接口，可匿名访问
@@ -139,21 +146,15 @@ public class YudaoWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdap
                     .antMatchers("/swagger-resources/**").anonymous()
                     .antMatchers("/webjars/**").anonymous()
                     .antMatchers("/*/api-docs").anonymous()
-                    // Spring Boot Admin Server 的安全配置 TODO 芋艿：需要抽象出去
-                    .antMatchers(adminSeverContextPath).anonymous()
-                    .antMatchers(adminSeverContextPath + "/**").anonymous()
                     // Spring Boot Actuator 的安全配置
                     .antMatchers("/actuator").anonymous()
                     .antMatchers("/actuator/**").anonymous()
-                    // Druid 监控 TODO 芋艿：需要抽象出去
+                    // Druid 监控 TODO 芋艿：等对接了 druid admin 后，在调整下。
                     .antMatchers("/druid/**").anonymous()
-                    // 短信回调 API TODO 芋艿：需要抽象出去
-                    .antMatchers(api("/system/sms/callback/**")).anonymous()
-                    // 除上面外的所有请求全部需要鉴权认证
-                    .anyRequest().authenticated()
-                .and()
-                .headers().frameOptions().disable();
-        httpSecurity.logout().logoutUrl(api("/logout")).logoutSuccessHandler(logoutSuccessHandler);
+                // 设置每个请求的权限 ②：每个项目的自定义规则
+                .and().authorizeRequests(authorizeRequestsCustomizer)
+                // 设置每个请求的权限 ③：兜底规则，必须认证
+                .authorizeRequests().anyRequest().authenticated();
         // 添加 JWT Filter
         httpSecurity.addFilterBefore(authenticationTokenFilter, UsernamePasswordAuthenticationFilter.class);
     }
