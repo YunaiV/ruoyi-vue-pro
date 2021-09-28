@@ -167,3 +167,221 @@ yudao:
       - ${spring.boot.admin.context-path}/** # 不处理 Spring Boot Admin 的请求
       - ${management.endpoints.web.base-path}/** # 不处理 Actuator 的请求
   demo: false # 关闭演示模式
+
+
+# ums core
+ums:
+  one-click-login:
+    # 一键登录是否开启, 默认 false
+    enable: true
+    # 一键登录请求处理 url, 默认 /authentication/one-click
+    login-processing-url: /authentication/one-click
+    # token 参数名称, 默认: accessToken
+    token-param-name: accessToken
+    # 其他请求参数名称列表(包括请求头名称), 此参数会传递到 OneClickLoginService.callback(String, Map)
+    # 与 UserDetailsRegisterService.registerUser(String, Map); 默认为: 空
+    other-param-names:
+      - imei
+  # ================ 第三方授权登录相关配置 ================
+  oauth:
+    # 第三方授权登录后如未注册用户是否支持自动注册功能, 默认: true
+    auto-sign-up: true
+    # 第三方授权登录后如未注册用户不支持自动注册功能, 则跳转到此 url 进行注册逻辑, 此 url 必须开发者自己实现; 默认: /signUp.html;
+    # 注意: 当 autoSignUp = false 时, 此属性才生效.
+    # 例如: 1. 设置值 "/signUp", 则跳转指定到 "/signUp" 进行注册.
+    # 2. 想返回自定义 json 数据到前端, 这里要设置 null , 在 Auth2LoginAuthenticationFilter 设置的 AuthenticationSuccessHandler
+    # 上处理返回 json; 判断是否为临时用户的条件是: Authentication.getPrincipal() 是否为 TemporaryUser 类型.
+    sign-up-url: null
+    # 用于第三方授权登录时, 未开启自动注册且用户是第一次授权登录的临时用户密码, 默认为: "". 注意: 生产环境更换密码
+    temporary-user-password: ""
+    # 用于第三方授权登录时, 未开启自动注册且用户是第一次授权登录的临时用户的默认权限, 多个权限用逗号分开, 默认为: "ROLE_TEMPORARY_USER"
+    temporary-user-authorities: ROLE_TEMPORARY_USER
+    # 抑制反射警告, 支持 JDK11, 默认: false , 在确认 WARNING: An illegal reflective access operation has occurred 安全后, 可以打开此设置, 可以抑制反射警告.
+    suppress-reflect-warning: true
+    # 第三方服务商: providerId, 支持所有 JustAuth 支持的第三方授权登录, 目前有 32 家第三方授权登录
+    github:
+      # 根据是否有设置 clientId 来动态加载相应 JustAuth 的 AuthXxxRequest
+      client-id: 4d4ee00e82f669f2ea8d
+      client-secret: 4050be113a83556b63bd991d606fded437b05235
+      scopes:
+    #        - 'repo:status'
+    #        - 'public_repo'
+    #        - 'repo:invite'
+    #        - 'user:follow'
+    gitee:
+      client-id: eb5e3298cc10ead57cd40f9f36e7154ab2ea54dcb519684d7e10ca3fec5b1c1a
+      client-secret: 495b5542dc007e2d46d316c527bd05dac586f2ec31b96c551e164387b5edb1cb
+      scopes:
+        - user_info
+#    # 自定义 OAuth2 Login
+#    customize:
+#      client-id: c971cf1634460e18310a5d7cb0f55d7d143a72015b2f29aee6a0e8911efac7eb
+#      client-secret: 309c9521721e3eb385a99a6bde2755f3107c7e15f3b8e0527c9f3ea4d1ce33bb
+#      # 自定义第三方授权登录时, 当 Auth2Properties#customize 时有效, 此字段必须以驼峰方式命名.
+#      # 比如此字段的值为 umsCustomize, 那么 /auth2/authorization/customize 会替换为 /auth2/authorization/umsCustomize
+#      customize-provider-id: giteeCustomize
+#      # 自定义第三方授权登录, 当 Auth2Properties#customize 时有效, 设置第三方是否在国外, 默认: false.
+#      # 如果为 false 时, 设置 {@link HttpConfig} 的超时时间为 ums.oauth.proxy.timeout 的值.
+#      # 如果为 true 时, 设置 {@link HttpConfig} 的超时时间为 ums.oauth.proxy.foreignTimeout 的值.
+#      customize-is-foreign: false
+    # 第三方登录授权登录 url 前缀, 不包含 ServletContextPath，默认为 /auth2/authorization.
+    auth-login-url-prefix: /api/auth2/authorization
+    # 第三方登录回调处理 url 前缀 ，也就是 RedirectUrl 的前缀, 不包含 ServletContextPath，默认为 /auth2/login.
+    redirect-url-prefix: /api/auth2/login
+    # 第三方登录回调的域名, 例如：http://localhost:9090 默认为 "http://127.0.0.1"，
+    # redirectUrl 直接由 {domain}/{servletContextPath}/{redirectUrlPrefix}/{providerId}(ums.oauth.[qq/gitee/weibo])组成
+    domain: http://localhost:48080
+    # 第三方授权登录成功后的默认权限, 多个权限用逗号分开, 默认为: "ROLE_USER"
+    default-authorities: ROLE_USER
+    # 是否支持内置的第三方登录用户表(user_connection) 和 auth_token 表. 默认: true.
+    # 注意: 如果为 false, 则必须重新实现 ConnectionService 接口.
+    enable-user-connection-and-auth-token-table: true
+    # 是否支持内置的第三方登录 token 表(auth_token). 默认: true.
+    enable-auth-token-table: true
+
+
+    # ================ start: 定时刷新 access token 定时任务相关配置 ================
+
+    # 是否支持定时刷新 AccessToken 定时任务. 默认: false.
+    # 支持分布式(分布式 IOC 容器中必须有 RedisConnectionFactory, 也就是说, 是否分布式执行依据 IOC 容器中是否有 RedisConnectionFactory)
+    enableRefreshTokenJob: false
+    # A cron-like expression. 0 * 2 * * ? 分别对应: second/minute/hour/day of month/month/day of week,
+    # 默认为: "0 * 2 * * ?", 凌晨 2 点启动定时任务, 支持分布式(分布式 IOC 容器中必须有 {@link RedisConnectionFactory},
+    # 也就是说, 是否分布式执行依据 IOC 容器中是否有 {@link RedisConnectionFactory})
+    refresh-token-job-cron: 0 0/5 * * * ?
+    # 定时刷新 accessToken 任务时, 批处理数据库的记录数. 注意: 分布式应用时, 此配置不同服务器配置必须是一样的. batchCount 大小需要根据实际生产环境进行优化
+    batch-count: 1000
+    # accessToken 的剩余有效期内进行刷新 accessToken, 默认: 24, 单位: 小时. 注意: 需要根据实际生产环境进行优化
+    remaining-expire-in: 24
+
+    # ================ start: 定时刷新 access token 定时任务相关配置 ================
+
+    # JustAuth 内部参数设置
+    just-auth:
+      # 忽略校验 state 参数，默认不开启。当 ignoreCheckState 为 true 时， me.zhyd.oauth.request.AuthDefaultRequest.login(AuthCallback) 将不会校验 state 的合法性。
+      # 使用场景：当且仅当使用自实现 state 校验逻辑时开启
+      # 以下场景使用方案仅作参考：
+      # 1. 授权、登录为同端，并且全部使用 JustAuth 实现时，该值建议设为 false;
+      # 2. 授权和登录为不同端实现时，比如前端页面拼装 authorizeUrl，并且前端自行对state进行校验，后端只负责使用code获取用户信息时，该值建议设为 true;
+      # 如非特殊需要，不建议开启这个配置
+      # 该方案主要为了解决以下类似场景的问题：Since: 1.15.6, See Also: https://github.com/justauth/JustAuth/issues/83
+      ignoreCheckState: false
+      # 默认 state 缓存过期时间：3分钟(PT180S) 鉴于授权过程中，根据个人的操作习惯，或者授权平台的不同（google等），每个授权流程的耗时也有差异，
+      # 不过单个授权流程一般不会太长 本缓存工具默认的过期时间设置为3分钟，即程序默认认为3分钟内的授权有效，超过3分钟则默认失效，失效后删除
+      # 注意: 这是为了测试打断点时用的, 生产环境自己设置为合适数组或默认
+      timeout: PT1800S
+      # JustAuth state 缓存类型, 默认 session
+      cacheType: session
+      # JustAuth state 缓存 key 前缀
+      cacheKeyPrefix: 'JUST_AUTH:'
+
+    # 用于 JustAuth 的代理(HttpClient)设置
+    proxy:
+      # 是否支持代理, 默认为: false.
+      enable: false
+      # 针对国外服务可以单独设置代理类型, 默认 Proxy.Type.HTTP, enable = true 时生效.
+      proxy: HTTP
+      # 代理 host, enable = true 时生效.
+      hostname:
+      # 代理端口, enable = true 时生效.
+      port:
+      # 用于国内代理(HttpClient)超时, 默认 PT3S
+      timeout: PT3S
+      # 用于国外网站代理(HttpClient)超时, 默认 PT15S
+      foreign-timeout: PT150S
+
+
+  # =============== start: 第三方登录时用的数据库表 user_connection 与 auth_token 添加 redis cache ===============
+  cache:
+    # redisCacheManager 设置, 默认实现: 对查询结果 null 值进行缓存, 添加时更新缓存 null 值.
+    redis:
+      # 是否开启缓存, 默认 false
+      open: false
+      # 是否使用 spring IOC 容器中的 RedisConnectionFactory， 默认： false
+      # 如果使用 spring IOC 容器中的 RedisConnectionFactory，则要注意 cache.database-index 要与 spring.redis.database 一样。
+      use-ioc-redis-connection-factory: true
+      cache:
+        # redis cache 存放的 database index, 默认: 0
+        database-index: 1
+        # 设置缓存管理器管理的缓存的默认过期时间, 默认: 200s
+        default-expire-time: PT200S
+        # cache ttl 。使用 0 声明一个永久的缓存。 默认: 180, 单位: 秒<br>
+        # 取缓存时间的 20% 作为动态的随机变量上下浮动, 防止同时缓存失效而缓存击穿
+        entry-ttl: PT180S
+        # Names of the default caches to consider for caching operations defined in the annotated class.
+        # 此设置不对 user_connection 与 auth_token 使用的缓存名称(UCC/UCHC/UCHACC)产生影响.
+        cache-names:
+          - cacheName
+  # =============== end: 第三方登录时用的数据库表 user_connection 与 auth_token 添加 redis cache ===============
+
+  # =============== start: 线程池配置 ===============
+  executor:
+    # 启动第三方授权登录用户的 accessToken 的定时任务时的 Executor 属性, 注意: 需要根据实际生产环境进行优化
+    job-task-scheduled-executor:
+      # 线程池中空闲时保留的线程数, 默认: 0
+      core-pool-size: 0
+      # keep alive time, 默认: 10
+      keep-alive-time: 0
+      # keepAliveTime 时间单位, 默认: 毫秒
+      time-unit: milliseconds
+      # 线程池名称, 默认: accessTokenJob
+      pool-name: accessTokenJob
+      # 拒绝策略, 默认: ABORT
+      rejected-execution-handler-policy: abort
+      # 线程池关闭过程的超时时间, 默认: PT10S
+      executor-shutdown-timeout: PT10S
+    # 更新第三方授权登录用户的 accessToken 的执行逻辑, 向本地数据库 auth_token 表获取过期或在一定时间内过期的 token 记录,
+    # 用 refreshToken 向第三方服务商更新 accessToken 信息的 Executor 属性,
+    # 注意: 定时刷新 accessToken 的执行逻辑是多线程的, 需要根据实际生产环境进行优化
+    refresh-token:
+      # 程池中空闲时保留的线程数, 默认: 0
+      core-pool-size: 0
+      # 最大线程数, 默认: 本机核心数
+      maximum-pool-size: 8
+      # keep alive time, 默认: 5
+      keep-alive-time: 5
+      # keepAliveTime 时间单位, 默认: 秒
+      time-unit: seconds
+      # blocking queue capacity, 默认: maximumPoolSize * 2
+      blocking-queue-capacity: 16
+      # 线程池名称, 默认: refreshToken
+      pool-name: refreshToken
+      # 拒绝策略, 默认: CALLER_RUNS 注意: 一般情况下不要更改默认设置, 没有实现 RefreshToken 逻辑被拒绝执行后的处理逻辑, 除非自己实现RefreshTokenJob.refreshTokenJob() 对 RefreshToken 逻辑被拒绝执行后的处理逻辑.
+      rejected-execution-handler-policy: caller_runs
+      # 线程池关闭过程的超时时间, 默认: 10 秒
+      executor-shutdown-timeout: PT10S
+    # 第三方授权登录时, 异步更新用户的第三方授权用户信息与 token 信息的 Executor 属性,
+    # 注意: 第三方授权登录时是异步更新第三方用户信息与 token 信息到本地数据库时使用此配置, 需要根据实际生产环境进行优化
+    user-connection-update:
+      # 程池中空闲时保留的线程数, 默认: 5
+      core-pool-size: 5
+      # 最大线程数, 默认: 本机核心数
+      maximum-pool-size: 8
+      # keep alive time, 默认: 10
+      keep-alive-time:
+      # keepAliveTime 时间单位, 默认: 秒
+      time-unit: seconds
+      # blocking queue capacity, 默认: maximumPoolSize * 2
+      blocking-queue-capacity: 16
+      # 线程池名称, 默认: updateConnection
+      pool-name: updateConnection
+      # 拒绝策略, 默认: CALLER_RUNS 注意: 一般情况下不要更改默认设置, 除非自己实现Auth2LoginAuthenticationProvider更新逻辑;
+      # 改成 ABORT 也支持, 默认实现 Auth2LoginAuthenticationProvider 是异步更新被拒绝执行后, 会执行同步更新.
+      rejected-execution-handler-policy: caller_runs
+      # 线程池关闭过程的超时时间, 默认: PT10S
+      executor-shutdown-timeout: PT10S
+  # =============== end: 线程池配置 ===============
+
+  # =============== start: user_connection repository 配置 ===============
+  repository:
+
+    # 第三方登录用户数据库表的字段 accessToken 与 refreshToken 加密专用密码
+    text-encryptor-password: 7ca5d913a17b4942942d16a974e3fecc
+    # 第三方登录用户数据库表的字段 accessToken 与 refreshToken 加密专用 salt
+    text-encryptor-salt: cd538b1b077542aca5f86942b6507fe2
+    # 是否在启动时检查并自动创建 userConnectionTableName 与 authTokenTableName, 默认: TRUE
+    enableStartUpInitializeTable: true
+    # 其他的有: 数据库表名称, 字段名称, curd sql 语句 等设置, 一般不需要更改,
+    # 如果要添加字段: 具体查看 RepositoryProperties 与 Auth2JdbcUsersConnectionRepository
+  # =============== end: user_connection repository 配置 ===============
+
