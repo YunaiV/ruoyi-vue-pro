@@ -40,9 +40,9 @@ export function getCodeImg() {
 }
 
 // 接入第三方登录
-export function oAuthLogin(provider) {
+export function oAuthLogin(type, redirectUri) {
   return request({
-    url: '/auth2/authorization/' + provider,
+    url: '/third-login-redirect?type=' + type + '&redirectUri=' + redirectUri,
     method: 'get'
   })
 }

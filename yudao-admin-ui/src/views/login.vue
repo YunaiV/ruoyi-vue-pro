@@ -8,24 +8,12 @@
         </el-input>
       </el-form-item>
       <el-form-item prop="password">
-        <el-input
-          v-model="loginForm.password"
-          type="password"
-          auto-complete="off"
-          placeholder="密码"
-          @keyup.enter.native="handleLogin"
-        >
+        <el-input v-model="loginForm.password" type="password" auto-complete="off" placeholder="密码" @keyup.enter.native="handleLogin">
           <svg-icon slot="prefix" icon-class="password" class="el-input__icon input-icon" />
         </el-input>
       </el-form-item>
       <el-form-item prop="code">
-        <el-input
-          v-model="loginForm.code"
-          auto-complete="off"
-          placeholder="验证码"
-          style="width: 63%"
-          @keyup.enter.native="handleLogin"
-        >
+        <el-input v-model="loginForm.code" auto-complete="off" placeholder="验证码" style="width: 63%" @keyup.enter.native="handleLogin">
           <svg-icon slot="prefix" icon-class="validCode" class="el-input__icon input-icon" />
         </el-input>
         <div class="login-code">
@@ -34,18 +22,12 @@
       </el-form-item>
       <el-checkbox v-model="loginForm.rememberMe" style="margin:0px 0px 25px 0px;">记住密码</el-checkbox>
       <el-form-item style="width:100%;">
-        <el-button
-          :loading="loading"
-          size="medium"
-          type="primary"
-          style="width:100%;"
-          @click.native.prevent="handleLogin"
-        >
+        <el-button :loading="loading" size="medium" type="primary" style="width:100%;" @click.native.prevent="handleLogin">
           <span v-if="!loading">登 录</span>
           <span v-else>登 录 中...</span>
         </el-button>
       </el-form-item>
-      
+
       <el-form-item style="width:100%;">
           <div class="oauth-login" style="display:flex">
             <div class="oauth-login-item" v-for="item in oauthProviders" :key="item.code" @click="doAuth2Login(item)">
@@ -80,21 +62,19 @@ export default {
         code: "",
         uuid: ""
       },
-      oauthProviders: [
-        {
+      oauthProviders: [{
           img: "https://cdn.jsdelivr.net/gh/justauth/justauth-oauth-logo@1.2/gitee.png",
           title: "码云",
-          code: "gitee"
-        },
-        {
+          source: "gitee",
+          type: 10
+        }, {
           img: "https://cdn.jsdelivr.net/gh/justauth/justauth-oauth-logo@1.2/wechat.png",
           title: "微信",
-          code: "weixin"
-        },
-        {
+        source: "weixin"
+        }, {
           img: "https://cdn.jsdelivr.net/gh/justauth/justauth-oauth-logo@1.2/qq.png",
           title: "QQ",
-          code: "qq"
+          source: "qq"
         }
       ],
       loginRules: {
@@ -163,11 +143,15 @@ export default {
       });
     },
     doAuth2Login(provider) {
-      console.log("开始Oauth登录...%o", provider.code);
+      // console.log("开始Oauth登录...%o", provider.code);
+      // 设置登陆中
       this.loading = true;
-      oAuthLogin(provider.code).then((res) => {
-        console.log(res.url);
-        window.location.href = res.url;
+      // 计算 redirectUri
+      const redirectUri = location.origin + '/third-login';
+      // 进行跳转
+      oAuthLogin(provider.type, redirectUri).then((res) => {
+        // console.log(res.url);
+        window.location.href = res.data;
       });
     }
   }

@@ -22,23 +22,15 @@
  */
 package cn.iocoder.yudao.framework.security.core.handler;
 
-import cn.iocoder.yudao.framework.security.core.LoginUser;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 import org.springframework.security.web.savedrequest.RequestCache;
-import org.springframework.security.web.savedrequest.SavedRequest;
-import top.dcenter.ums.security.core.oauth.userdetails.TemporaryUser;
-import top.dcenter.ums.security.core.vo.ResponseResult;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-
-import static org.springframework.util.StringUtils.hasText;
-import static top.dcenter.ums.security.core.oauth.util.MvcUtil.*;
 
 /**
  * @author weir

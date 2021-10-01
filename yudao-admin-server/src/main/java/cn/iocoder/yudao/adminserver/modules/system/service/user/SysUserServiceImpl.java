@@ -4,7 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.social.SysUserSocialDO;
+import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.user.SysUserSocialDO;
 import cn.iocoder.yudao.adminserver.modules.system.dal.mysql.social.SysUserSocialMapper;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
@@ -82,7 +82,7 @@ public class SysUserServiceImpl implements SysUserService {
     public Long bindSocialUSer(Long sysUserId, String socialUSerId) {
         SysUserSocialDO userSocialDO = new SysUserSocialDO();
         userSocialDO.setUserId(sysUserId);
-        userSocialDO.setSocialUserId(socialUSerId);
+//        userSocialDO.setSocialUserId(socialUSerId);
         userSocialMapper.insert(userSocialDO);
         return userSocialDO.getUserId();
     }

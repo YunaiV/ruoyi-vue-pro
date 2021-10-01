@@ -24,9 +24,6 @@ import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
-import top.dcenter.ums.security.core.oauth.config.Auth2AutoConfigurer;
-import top.dcenter.ums.security.core.oauth.properties.Auth2Properties;
-import top.dcenter.ums.security.core.oauth.properties.OneClickLoginProperties;
 
 import javax.annotation.Resource;
 
@@ -80,15 +77,6 @@ public class YudaoWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdap
     @Resource
     private Customizer<ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry> authorizeRequestsCustomizer;
 
-    @Autowired
-    private Auth2AutoConfigurer auth2AutoConfigurer;
-    @Autowired
-    private Auth2Properties auth2Properties;
-    @Autowired
-    private OneClickLoginProperties oneClickLoginProperties;
-    @Autowired
-    private AbstractSignUpUrlAuthenticationSuccessHandler authenticationSuccessHandler;
-
     /**
      * 由于 Spring Security 创建 AuthenticationManager 对象时，没声明 @Bean 注解，导致无法被注入
      * 通过覆写父类的该方法，添加 @Bean 注解，解决该问题
@@ -129,9 +117,6 @@ public class YudaoWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdap
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
-                // ========= start: 使用 justAuth-spring-security-starter 必须步骤 =========
-                // 添加 Auth2AutoConfigurer 使 OAuth2(justAuth) login 生效.
-                .apply(this.auth2AutoConfigurer).and()
                 // 开启跨域
                 .cors().and()
                 // CSRF 禁用，因为不使用 Session
@@ -174,19 +159,6 @@ public class YudaoWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdap
         // 添加 JWT Filter
         httpSecurity.addFilterBefore(authenticationTokenFilter, UsernamePasswordAuthenticationFilter.class);
 
-//        // 放行第三方登录入口地址与第三方登录回调地址
-//        // @formatter:off
-//        httpSecurity.authorizeRequests()
-//                .antMatchers(HttpMethod.GET,
-//                        auth2Properties.getRedirectUrlPrefix() + "/*",
-//                        auth2Properties.getAuthLoginUrlPrefix() + "/*")
-//                .permitAll();
-//        httpSecurity.authorizeRequests()
-//                .antMatchers(HttpMethod.POST,
-//                        oneClickLoginProperties.getLoginProcessingUrl())
-//                .permitAll();
-//        // @formatter:on
-//        // ========= end: 使用 justAuth-spring-security-starter 必须步骤 =========
     }
 
     private String api(String url) {
