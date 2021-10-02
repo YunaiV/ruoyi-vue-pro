@@ -41,6 +41,7 @@ public class SysUserSocialDO extends BaseDO {
      * 三方平台的类型
      */
     private SysUserSocialTypeEnum type;
+
     /**
      * 三方 openid
      */
@@ -56,6 +57,10 @@ public class SysUserSocialDO extends BaseDO {
      * 如果没有 unionId 的平台，直接使用 openid 作为该字段的值
      */
     private String unionId;
+    /**
+     * 原始 Token 数据，一般是 JSON 格式
+     */
+    private String rawTokenInfo;
 
     /**
      * 用户昵称
@@ -66,9 +71,9 @@ public class SysUserSocialDO extends BaseDO {
      */
     private String avatar;
     /**
-     * 原始数据，一般是 JSON 格式
+     * 原始用户数据，一般是 JSON 格式
      */
-    private String info;
+    private String rawUserInfo;
 
 }
 

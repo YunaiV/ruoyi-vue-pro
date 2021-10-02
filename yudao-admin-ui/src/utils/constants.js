@@ -66,3 +66,11 @@ export const InfApiErrorLogProcessStatusEnum = {
   DONE: 1, // 已处理
   IGNORE: 2, // 已忽略
 }
+
+/**
+ * 用户的三方平台的类型枚举
+ */
+export const SysUserSocialTypeEnum = {
+  GITEE: 10,
+  DINGTALK: 20,
+}

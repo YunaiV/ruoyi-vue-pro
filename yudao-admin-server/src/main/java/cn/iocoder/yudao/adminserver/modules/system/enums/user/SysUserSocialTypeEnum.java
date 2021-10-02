@@ -3,6 +3,7 @@ package cn.iocoder.yudao.adminserver.modules.system.enums.user;
 import cn.hutool.core.util.ArrayUtil;
 import cn.iocoder.yudao.adminserver.modules.system.enums.errorcode.SysErrorCodeTypeEnum;
 import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import jodd.util.ArraysUtil;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,6 +20,7 @@ import java.util.Arrays;
 public enum SysUserSocialTypeEnum implements IntArrayValuable {
 
     GITEE(10, "GITEE"), // https://gitee.com/api/v5/oauth_doc#/
+    DINGTALK(20, "DINGTALK"), // https://developers.dingtalk.com/document/app/obtain-identity-credentials
     ;
 
     public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(SysUserSocialTypeEnum::getType).toArray();

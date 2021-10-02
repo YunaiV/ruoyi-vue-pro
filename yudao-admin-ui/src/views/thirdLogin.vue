@@ -1,7 +1,7 @@
 <template>
   <div class="login">
     <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form">
-      <h3 class="title">芋道后台管理系统</h3>
+      <h3 class="title">绑定账号</h3>
       <el-form-item prop="username">
         <el-input v-model="loginForm.username" type="text" auto-complete="off" placeholder="账号">
           <svg-icon slot="prefix" icon-class="user" class="el-input__icon input-icon" />
@@ -12,30 +12,13 @@
           <svg-icon slot="prefix" icon-class="password" class="el-input__icon input-icon" />
         </el-input>
       </el-form-item>
-      <el-form-item prop="code">
-        <el-input v-model="loginForm.code" auto-complete="off" placeholder="验证码" style="width: 63%" @keyup.enter.native="handleLogin">
-          <svg-icon slot="prefix" icon-class="validCode" class="el-input__icon input-icon" />
-        </el-input>
-        <div class="login-code">
-          <img :src="codeUrl" @click="getCode" class="login-code-img"/>
-        </div>
-      </el-form-item>
-      <el-checkbox v-model="loginForm.rememberMe" style="margin:0px 0px 25px 0px;">记住密码</el-checkbox>
       <el-form-item style="width:100%;">
         <el-button :loading="loading" size="medium" type="primary" style="width:100%;" @click.native.prevent="handleLogin">
-          <span v-if="!loading">登 录</span>
-          <span v-else>登 录 中...</span>
+          <span v-if="!loading">提 交</span>
+          <span v-else>提 交 中...</span>
         </el-button>
       </el-form-item>
 
-      <el-form-item style="width:100%;">
-          <div class="oauth-login" style="display:flex">
-            <div class="oauth-login-item" v-for="item in oauthProviders" :key="item.code" @click="doAuth2Login(item)">
-              <img :src=item.img height="25px" width="25px" alt="登录" >
-              <span>{{item.title}}</span>
-            </div>
-        </div>
-      </el-form-item>
     </el-form>
     <!--  底部  -->
     <div class="el-login-footer">
@@ -45,34 +28,19 @@
 </template>
 
 <script>
-import { getCodeImg,thirdLoginRedirect } from "@/api/login";
+import { thirdLogin } from "@/api/login";
 import Cookies from "js-cookie";
 import { encrypt, decrypt } from '@/utils/jsencrypt'
 
 export default {
-  name: "Login",
+  name: "ThirdLogin",
   data() {
     return {
-      codeUrl: "",
       loginForm: {
         username: "admin",
         password: "admin123",
         rememberMe: false,
-        code: "",
-        uuid: ""
       },
-      oauthProviders: [{
-          img: "https://cdn.jsdelivr.net/gh/justauth/justauth-oauth-logo@1.2/gitee.png",
-          title: "码云",
-          source: "gitee",
-          type: 10
-        }, {
-          img: "https://cdn.jsdelivr.net/gh/justauth/justauth-oauth-logo@1.2/dingtalk.png",
-          title: "钉钉",
-          source: "dingtalk",
-          type: 20
-        }
-      ],
       loginRules: {
         username: [
           { required: true, trigger: "blur", message: "用户名不能为空" }
@@ -80,10 +48,13 @@ export default {
         password: [
           { required: true, trigger: "blur", message: "密码不能为空" }
         ],
-        code: [{ required: true, trigger: "change", message: "验证码不能为空" }]
       },
       loading: false,
-      redirect: undefined
+      redirect: undefined,
+      // 三方登陆相关
+      type: undefined,
+      code: undefined,
+      state: undefined,
     };
   },
   watch: {
@@ -95,17 +66,16 @@ export default {
     }
   },
   created() {
-    this.getCode();
     this.getCookie();
+    // 三方登陆相关
+    this.type = 10;
+    this.code = this.$route.query.code;
+    this.state = this.$route.query.state;
+    thirdLogin(this.type, this.code, this.state).then(res => {
+      debugger
+    });
   },
   methods: {
-    getCode() {
-      getCodeImg().then(res => {
-        res = res.data;
-        this.codeUrl = "data:image/gif;base64," + res.img;
-        this.loginForm.uuid = res.uuid;
-      });
-    },
     getCookie() {
       const username = Cookies.get("username");
       const password = Cookies.get("password");
@@ -123,33 +93,16 @@ export default {
           if (this.loginForm.rememberMe) {
             Cookies.set("username", this.loginForm.username, { expires: 30 });
             Cookies.set("password", encrypt(this.loginForm.password), { expires: 30 });
-            Cookies.set('rememberMe', this.loginForm.rememberMe, { expires: 30 });
           } else {
             Cookies.remove("username");
             Cookies.remove("password");
-            Cookies.remove('rememberMe');
           }
           this.$store.dispatch("Login", this.loginForm).then(() => {
             this.$router.push({ path: this.redirect || "/" }).catch(()=>{});
           }).catch(() => {
             this.loading = false;
-            this.getCode();
           });
         }
-      });
-    },
-    doAuth2Login(provider) {
-      // console.log("开始Oauth登录...%o", provider.code);
-      // 设置登陆中
-      this.loading = true;
-      // 计算 redirectUri
-      // const redirectUri = location.origin + '/third-login';
-      // const redirectUri = 'http://127.0.0.1:48080/api/gitee/callback';
-      const redirectUri = 'http://127.0.0.1:48080/api/dingtalk/callback';
-      // 进行跳转
-      thirdLoginRedirect(provider.type, redirectUri).then((res) => {
-        // console.log(res.url);
-        window.location.href = res.data;
       });
     }
   }
@@ -216,22 +169,5 @@ export default {
 }
 .login-code-img {
   height: 38px;
-}
-.oauth-login {
-  display: flex;
-  cursor:pointer;
-}
-.oauth-login-item {
-  display: flex;
-  align-items: center;
-  margin-right: 10px;
-}
-.oauth-login-item img {
-  height: 25px;
-  width: 25px;
-}
-.oauth-login-item span:hover {
-  text-decoration: underline red;
-  color: red;
 }
 </style>

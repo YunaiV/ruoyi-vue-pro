@@ -173,8 +173,12 @@ justauth:
   type:
     GITEE:
       client-id: 6bb0b37a8a017e5e2dc4c34ca4756dcf80e8e392585e7035d3ede7a6db50426e
-      client-secret: f117b9de5e9267bcd48db83d4cb078ea8cf9a5d17cda83481e3d9090df3fa01d
+      client-secret: ba9f1f42e77be71f461b54da83b6f4b45a052dd7f93418f00f91f4e6934dfd1f
       ignore-check-redirect-uri: true
 #      redirect-uri: http://127.0.0.1:48080/api/gitee/callback
+    DINGTALK:
+      client-id: dingvrnreaje3yqvzhxg
+      client-secret: i8E6iZyDvZj51JIb0tYsYfVQYOks9Cq1lgryEjFRqC79P3iJcrxEwT6Qk2QvLrLI
+      ignore-check-redirect-uri: true
   cache:
     type: default

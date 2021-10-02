@@ -39,18 +39,23 @@ export function getCodeImg() {
   })
 }
 
-// 接入第三方登录
-export function oAuthLogin(type, redirectUri) {
+// 三方登陆的跳转
+export function thirdLoginRedirect(type, redirectUri) {
   return request({
     url: '/third-login-redirect?type=' + type + '&redirectUri=' + redirectUri,
     method: 'get'
   })
 }
 
-export function getToken(path) {
-  console.log({path});
+// 三方登陆，使用 code 授权码
+export function thirdLogin(type, code, state) {
   return request({
-    url: '/auth2/login/github' +  path,
-    method: 'get'
+    url: '/third-login',
+    method: 'post',
+    data: {
+      type,
+      code,
+      state
+    }
   })
 }

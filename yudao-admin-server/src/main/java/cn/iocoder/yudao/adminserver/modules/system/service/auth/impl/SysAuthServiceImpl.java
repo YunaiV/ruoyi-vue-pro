@@ -1,7 +1,11 @@
 package cn.iocoder.yudao.adminserver.modules.system.service.auth.impl;
 
+import cn.hutool.json.JSONUtil;
+import cn.iocoder.yudao.adminserver.modules.system.controller.auth.vo.auth.SysAuthThirdLoginReqVO;
+import cn.iocoder.yudao.adminserver.modules.system.enums.user.SysUserSocialTypeEnum;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.common.util.monitor.TracerUtils;
 import cn.iocoder.yudao.adminserver.modules.system.controller.auth.vo.auth.SysAuthLoginReqVO;
@@ -17,7 +21,12 @@ import cn.iocoder.yudao.adminserver.modules.system.service.logger.SysLoginLogSer
 import cn.iocoder.yudao.adminserver.modules.system.service.permission.SysPermissionService;
 import cn.iocoder.yudao.adminserver.modules.system.service.user.SysUserService;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
+import com.xkcoding.justauth.AuthRequestFactory;
 import lombok.extern.slf4j.Slf4j;
+import me.zhyd.oauth.model.AuthCallback;
+import me.zhyd.oauth.model.AuthResponse;
+import me.zhyd.oauth.model.AuthUser;
+import me.zhyd.oauth.request.AuthRequest;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -60,6 +69,9 @@ public class SysAuthServiceImpl implements SysAuthService {
     @Resource
     private SysUserSessionService userSessionService;
 
+    @Resource
+    private AuthRequestFactory authRequestFactory;
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         // 获取 username 对应的 SysUserDO
@@ -95,6 +107,24 @@ public class SysAuthServiceImpl implements SysAuthService {
 
         // 缓存登陆用户到 Redis 中，返回 sessionId 编号
         return userSessionService.createUserSession(loginUser, userIp, userAgent);
+    }
+
+    @Override
+    public String thirdLogin(SysAuthThirdLoginReqVO reqVO, String userIp, String userAgent) {
+        // 使用 code 授权码，进行登陆
+        AuthRequest authRequest = authRequestFactory.get(SysUserSocialTypeEnum.valueOfType(reqVO.getType()).getSource());
+        AuthCallback authCallback = SysAuthConvert.INSTANCE.convert(reqVO);
+        AuthResponse<?> authResponse = authRequest.login(authCallback);
+        log.info("[thirdLogin][请求三方平台 type({}) request({}) response({})]", reqVO.getType(), JsonUtils.toJsonString(authCallback),
+                JsonUtils.toJsonString(authResponse));
+        if (!authResponse.ok()) {
+            throw new RuntimeException(""); // TODO 芋艿：补全
+        }
+        AuthUser authUser = (AuthUser) authResponse.getData();
+
+        // 查找到对应的
+
+        return null;
     }
 
     private void verifyCaptcha(String username, String captchaUUID, String captchaCode) {

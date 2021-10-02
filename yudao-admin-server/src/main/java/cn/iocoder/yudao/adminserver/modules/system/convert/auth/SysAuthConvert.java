@@ -2,6 +2,7 @@ package cn.iocoder.yudao.adminserver.modules.system.convert.auth;
 
 import cn.iocoder.yudao.adminserver.modules.system.controller.auth.vo.auth.SysAuthMenuRespVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.auth.vo.auth.SysAuthPermissionInfoRespVO;
+import cn.iocoder.yudao.adminserver.modules.system.controller.auth.vo.auth.SysAuthThirdLoginReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.user.vo.profile.SysUserProfileUpdatePasswordReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.user.vo.profile.SysUserProfileUpdateReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.user.vo.user.SysUserCreateReqVO;
@@ -11,6 +12,7 @@ import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.user.SysUserDO
 import cn.iocoder.yudao.adminserver.modules.system.enums.permission.MenuIdEnum;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
+import me.zhyd.oauth.model.AuthCallback;
 import me.zhyd.oauth.model.AuthUser;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -42,6 +44,8 @@ public interface SysAuthConvert {
     LoginUser convert(SysUserProfileUpdateReqVO reqVO);
 
     LoginUser convert(SysUserProfileUpdatePasswordReqVO reqVO);
+
+    AuthCallback convert(SysAuthThirdLoginReqVO bean);
 
     /**
      * 将菜单列表，构建成菜单树
