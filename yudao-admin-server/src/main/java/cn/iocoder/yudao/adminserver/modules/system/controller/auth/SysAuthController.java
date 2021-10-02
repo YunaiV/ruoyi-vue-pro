@@ -1,12 +1,13 @@
 package cn.iocoder.yudao.adminserver.modules.system.controller.auth;
 
+import cn.hutool.json.JSONUtil;
 import cn.iocoder.yudao.adminserver.modules.system.controller.auth.vo.auth.*;
 import cn.iocoder.yudao.adminserver.modules.system.convert.auth.SysAuthConvert;
 import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.permission.SysMenuDO;
 import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.permission.SysRoleDO;
 import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.user.SysUserDO;
 import cn.iocoder.yudao.adminserver.modules.system.enums.permission.MenuTypeEnum;
-import cn.iocoder.yudao.adminserver.modules.system.enums.user.SysUserSocialTypeEnum;
+import cn.iocoder.yudao.adminserver.modules.system.enums.user.SysSocialTypeEnum;
 import cn.iocoder.yudao.adminserver.modules.system.service.auth.SysAuthService;
 import cn.iocoder.yudao.adminserver.modules.system.service.permission.SysPermissionService;
 import cn.iocoder.yudao.adminserver.modules.system.service.permission.SysRoleService;
@@ -22,6 +23,9 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import me.zhyd.oauth.model.AuthCallback;
+import me.zhyd.oauth.model.AuthResponse;
+import me.zhyd.oauth.model.AuthUser;
 import me.zhyd.oauth.request.AuthRequest;
 import me.zhyd.oauth.utils.AuthStateUtils;
 import org.springframework.validation.annotation.Validated;
@@ -107,7 +111,7 @@ public class SysAuthController {
     public CommonResult<String> socialLoginRedirect(@RequestParam("type") Integer type,
                                                     @RequestParam("redirectUri") String redirectUri) {
         // 获得对应的 AuthRequest 实现
-        AuthRequest authRequest = authRequestFactory.get(SysUserSocialTypeEnum.valueOfType(type).getSource());
+        AuthRequest authRequest = authRequestFactory.get(SysSocialTypeEnum.valueOfType(type).getSource());
         // 生成跳转地址
         String authorizeUri = authRequest.authorize(AuthStateUtils.createState());
         authorizeUri = HttpUtils.replaceUrlQuery(authorizeUri, "redirect_uri", redirectUri);
@@ -132,12 +136,12 @@ public class SysAuthController {
         return success(SysAuthLoginRespVO.builder().token(token).build());
     }
 
-//    @RequestMapping("/{type}/callback")
-//    public AuthResponse login(@PathVariable String type, AuthCallback callback) {
-//        AuthRequest authRequest = authRequestFactory.get(type);
-//        AuthResponse<AuthUser> response = authRequest.login(callback);
-//        log.info("【response】= {}", JSONUtil.toJsonStr(response));
-//        return response;
-//    }
+    @RequestMapping("/{type}/callback")
+    public AuthResponse login(@PathVariable String type, AuthCallback callback) {
+        AuthRequest authRequest = authRequestFactory.get(type);
+        AuthResponse<AuthUser> response = authRequest.login(callback);
+        log.info("【response】= {}", JSONUtil.toJsonStr(response));
+        return response;
+    }
 
 }

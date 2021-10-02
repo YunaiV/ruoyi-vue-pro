@@ -68,7 +68,7 @@ export default {
   created() {
     this.getCookie();
     // 三方登陆相关
-    this.type = 20;
+    this.type = 10; // TODO 芋艿：需要改
     this.code = this.$route.query.code;
     this.state = this.$route.query.state;
     this.$store.dispatch("SocialLogin", {

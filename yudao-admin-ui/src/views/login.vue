@@ -71,6 +71,11 @@ export default {
           title: "钉钉",
           source: "dingtalk",
           type: 20
+        } , {
+          img: "https://cdn.jsdelivr.net/gh/justauth/justauth-oauth-logo@1.2/wechat_enterprise.png",
+          title: "企业微信",
+          source: "wechat_enterprise",
+          type: 30
         }
       ],
       loginRules: {
@@ -143,8 +148,8 @@ export default {
       // 设置登陆中
       this.loading = true;
       // 计算 redirectUri
-      const redirectUri = location.origin + '/social-login';
-      // const redirectUri = 'http://127.0.0.1:48080/api/gitee/callback';
+      // const redirectUri = location.origin + '/social-login';
+      const redirectUri = 'http://127.0.0.1:48080/api/gitee/callback';
       // const redirectUri = 'http://127.0.0.1:48080/api/dingtalk/callback';
       // 进行跳转
       socialLoginRedirect(provider.type, redirectUri).then((res) => {

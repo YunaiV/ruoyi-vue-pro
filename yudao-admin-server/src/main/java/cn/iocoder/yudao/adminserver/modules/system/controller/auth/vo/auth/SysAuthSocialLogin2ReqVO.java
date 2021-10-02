@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.adminserver.modules.system.controller.auth.vo.auth;
 
-import cn.iocoder.yudao.adminserver.modules.system.enums.user.SysUserSocialTypeEnum;
+import cn.iocoder.yudao.adminserver.modules.system.enums.user.SysSocialTypeEnum;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -22,7 +22,7 @@ import javax.validation.constraints.Pattern;
 public class SysAuthSocialLogin2ReqVO {
 
     @ApiModelProperty(value = "社交平台的类型", required = true, example = "10", notes = "参见 SysUserSocialTypeEnum 枚举值")
-    @InEnum(SysUserSocialTypeEnum.class)
+    @InEnum(SysSocialTypeEnum.class)
     @NotNull(message = "社交平台的类型不能为空")
     private Integer type;
 

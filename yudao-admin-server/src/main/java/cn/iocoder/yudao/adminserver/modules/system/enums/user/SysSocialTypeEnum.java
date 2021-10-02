@@ -8,19 +8,20 @@ import lombok.Getter;
 import java.util.Arrays;
 
 /**
- * 用户的社交平台的类型枚举
+ * 社交用户的类型枚举
  *
  * @author 芋道源码
  */
 @Getter
 @AllArgsConstructor
-public enum SysUserSocialTypeEnum implements IntArrayValuable {
+public enum SysSocialTypeEnum implements IntArrayValuable {
 
     GITEE(10, "GITEE"), // https://gitee.com/api/v5/oauth_doc#/
     DINGTALK(20, "DINGTALK"), // https://developers.dingtalk.com/document/app/obtain-identity-credentials
+    WECHAT_ENTERPRISE(30, "WECHAT_ENTERPRISE"), // https://xkcoding.com/2019/08/06/use-justauth-integration-wechat-enterprise.html
     ;
 
-    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(SysUserSocialTypeEnum::getType).toArray();
+    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(SysSocialTypeEnum::getType).toArray();
 
     /**
      * 类型
@@ -36,7 +37,7 @@ public enum SysUserSocialTypeEnum implements IntArrayValuable {
         return ARRAYS;
     }
 
-    public static SysUserSocialTypeEnum valueOfType(Integer type) {
+    public static SysSocialTypeEnum valueOfType(Integer type) {
         return ArrayUtil.firstMatch(o -> o.getType().equals(type), values());
     }
 

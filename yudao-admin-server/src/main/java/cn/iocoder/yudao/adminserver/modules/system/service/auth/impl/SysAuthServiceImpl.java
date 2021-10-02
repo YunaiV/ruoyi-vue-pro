@@ -7,7 +7,7 @@ import cn.iocoder.yudao.adminserver.modules.system.controller.auth.vo.auth.SysAu
 import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.user.SysSocialUserDO;
 import cn.iocoder.yudao.adminserver.modules.system.dal.mysql.user.SysSocialUserMapper;
 import cn.iocoder.yudao.adminserver.modules.system.dal.redis.auth.SysAuthSocialUserRedisDAO;
-import cn.iocoder.yudao.adminserver.modules.system.enums.user.SysUserSocialTypeEnum;
+import cn.iocoder.yudao.adminserver.modules.system.enums.user.SysSocialTypeEnum;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
@@ -256,7 +256,7 @@ public class SysAuthServiceImpl implements SysAuthService {
     }
 
     private AuthUser obtainAuthUser(Integer type, AuthCallback authCallback) {
-        AuthRequest authRequest = authRequestFactory.get(SysUserSocialTypeEnum.valueOfType(type).getSource());
+        AuthRequest authRequest = authRequestFactory.get(SysSocialTypeEnum.valueOfType(type).getSource());
         AuthResponse<?> authResponse = authRequest.login(authCallback);
         log.info("[obtainAuthUser][请求三方平台 type({}) request({}) response({})]", type, JsonUtils.toJsonString(authCallback),
                 JsonUtils.toJsonString(authResponse));
