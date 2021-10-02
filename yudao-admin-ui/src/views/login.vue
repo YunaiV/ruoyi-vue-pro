@@ -45,7 +45,7 @@
 </template>
 
 <script>
-import { getCodeImg,thirdLoginRedirect } from "@/api/login";
+import { getCodeImg,socialLoginRedirect } from "@/api/login";
 import Cookies from "js-cookie";
 import { encrypt, decrypt } from '@/utils/jsencrypt'
 
@@ -143,11 +143,11 @@ export default {
       // 设置登陆中
       this.loading = true;
       // 计算 redirectUri
-      // const redirectUri = location.origin + '/third-login';
+      const redirectUri = location.origin + '/social-login';
       // const redirectUri = 'http://127.0.0.1:48080/api/gitee/callback';
-      const redirectUri = 'http://127.0.0.1:48080/api/dingtalk/callback';
+      // const redirectUri = 'http://127.0.0.1:48080/api/dingtalk/callback';
       // 进行跳转
-      thirdLoginRedirect(provider.type, redirectUri).then((res) => {
+      socialLoginRedirect(provider.type, redirectUri).then((res) => {
         // console.log(res.url);
         window.location.href = res.data;
       });

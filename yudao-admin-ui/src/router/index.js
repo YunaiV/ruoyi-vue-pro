@@ -44,8 +44,8 @@ export const constantRoutes = [
     hidden: true
   },
   {
-    path: '/third-login',
-    component: (resolve) => require(['@/views/thirdLogin'], resolve),
+    path: '/social-login',
+    component: (resolve) => require(['@/views/socialLogin'], resolve),
     hidden: true
   },
   {

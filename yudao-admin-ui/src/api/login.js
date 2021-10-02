@@ -39,23 +39,38 @@ export function getCodeImg() {
   })
 }
 
-// 三方登陆的跳转
-export function thirdLoginRedirect(type, redirectUri) {
+// 社交登陆的跳转
+export function socialLoginRedirect(type, redirectUri) {
   return request({
-    url: '/third-login-redirect?type=' + type + '&redirectUri=' + redirectUri,
+    url: '/social-login-redirect?type=' + type + '&redirectUri=' + redirectUri,
     method: 'get'
   })
 }
 
-// 三方登陆，使用 code 授权码
-export function thirdLogin(type, code, state) {
+// 社交登陆，使用 code 授权码
+export function socialLogin(type, code, state) {
   return request({
-    url: '/third-login',
+    url: '/social-login',
     method: 'post',
     data: {
       type,
       code,
       state
+    }
+  })
+}
+
+// 社交登陆，使用 code 授权码 + + 账号密码
+export function socialLogin2(type, code, state, username, password) {
+  return request({
+    url: '/social-login2',
+    method: 'post',
+    data: {
+      type,
+      code,
+      state,
+      username,
+      password
     }
   })
 }

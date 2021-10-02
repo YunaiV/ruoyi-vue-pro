@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.adminserver.modules.system.controller.auth;
 
-import cn.hutool.json.JSONUtil;
 import cn.iocoder.yudao.adminserver.modules.system.controller.auth.vo.auth.*;
 import cn.iocoder.yudao.adminserver.modules.system.convert.auth.SysAuthConvert;
 import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.permission.SysMenuDO;
@@ -23,9 +22,6 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import me.zhyd.oauth.model.AuthCallback;
-import me.zhyd.oauth.model.AuthResponse;
-import me.zhyd.oauth.model.AuthUser;
 import me.zhyd.oauth.request.AuthRequest;
 import me.zhyd.oauth.utils.AuthStateUtils;
 import org.springframework.validation.annotation.Validated;
@@ -100,16 +96,16 @@ public class SysAuthController {
         return success(SysAuthConvert.INSTANCE.buildMenuTree(menuList));
     }
 
-    // ========== 三方登陆相关 ==========
+    // ========== 社交登陆相关 ==========
 
-    @GetMapping("/third-login-redirect")
-    @ApiOperation("三方登陆的跳转")
+    @GetMapping("/social-login-redirect")
+    @ApiOperation("社交登陆的跳转")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "type", value = "三方类型", required = true, dataTypeClass = Integer.class),
             @ApiImplicitParam(name = "redirectUri", value = "回调路径", dataTypeClass = String.class)
     })
-    public CommonResult<String> thirdLoginRedirect(@RequestParam("type") Integer type,
-                                                   @RequestParam("redirectUri") String redirectUri) {
+    public CommonResult<String> socialLoginRedirect(@RequestParam("type") Integer type,
+                                                    @RequestParam("redirectUri") String redirectUri) {
         // 获得对应的 AuthRequest 实现
         AuthRequest authRequest = authRequestFactory.get(SysUserSocialTypeEnum.valueOfType(type).getSource());
         // 生成跳转地址
@@ -118,20 +114,30 @@ public class SysAuthController {
         return CommonResult.success(authorizeUri);
     }
 
-    @PostMapping("/third-login")
-    @ApiOperation("三方登陆，使用 code 授权码")
+    @PostMapping("/social-login")
+    @ApiOperation("社交登陆，使用 code 授权码")
     @OperateLog(enable = false) // 避免 Post 请求被记录操作日志
-    public CommonResult<SysAuthLoginRespVO> thirdLogin(@RequestBody @Valid SysAuthThirdLoginReqVO reqVO) {
-        String token = authService.thirdLogin(reqVO, getClientIP(), getUserAgent());
-        return null;
+    public CommonResult<SysAuthLoginRespVO> socialLogin(@RequestBody @Valid SysAuthSocialLoginReqVO reqVO) {
+        String token = authService.socialLogin(reqVO, getClientIP(), getUserAgent());
+        // 返回结果
+        return success(SysAuthLoginRespVO.builder().token(token).build());
     }
 
-    @RequestMapping("/{type}/callback")
-    public AuthResponse login(@PathVariable String type, AuthCallback callback) {
-        AuthRequest authRequest = authRequestFactory.get(type);
-        AuthResponse<AuthUser> response = authRequest.login(callback);
-        log.info("【response】= {}", JSONUtil.toJsonStr(response));
-        return response;
+    @PostMapping("/social-login2")
+    @ApiOperation("社交登陆，使用 code 授权码 + 账号密码")
+    @OperateLog(enable = false) // 避免 Post 请求被记录操作日志
+    public CommonResult<SysAuthLoginRespVO> socialLogin2(@RequestBody @Valid SysAuthSocialLogin2ReqVO reqVO) {
+        String token = authService.socialLogin2(reqVO, getClientIP(), getUserAgent());
+        // 返回结果
+        return success(SysAuthLoginRespVO.builder().token(token).build());
     }
+
+//    @RequestMapping("/{type}/callback")
+//    public AuthResponse login(@PathVariable String type, AuthCallback callback) {
+//        AuthRequest authRequest = authRequestFactory.get(type);
+//        AuthResponse<AuthUser> response = authRequest.login(callback);
+//        log.info("【response】= {}", JSONUtil.toJsonStr(response));
+//        return response;
+//    }
 
 }

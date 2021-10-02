@@ -14,16 +14,16 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
-@ApiModel("三方登陆 Request VO，使用 code 授权码")
+@ApiModel("社交登陆 Request VO，使用 code 授权码")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class SysAuthThirdLoginReqVO {
+public class SysAuthSocialLoginReqVO {
 
-    @ApiModelProperty(value = "三方平台的类型", required = true, example = "10", notes = "参见 SysUserSocialTypeEnum 枚举值")
+    @ApiModelProperty(value = "社交平台的类型", required = true, example = "10", notes = "参见 SysUserSocialTypeEnum 枚举值")
     @InEnum(SysUserSocialTypeEnum.class)
-    @NotNull(message = "三方平台的类型不能为空")
+    @NotNull(message = "社交平台的类型不能为空")
     private Integer type;
 
     @ApiModelProperty(value = "授权码", required = true, example = "1024")

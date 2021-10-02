@@ -28,7 +28,7 @@
 </template>
 
 <script>
-import { thirdLogin } from "@/api/login";
+import { socialLogin } from "@/api/login";
 import Cookies from "js-cookie";
 import { encrypt, decrypt } from '@/utils/jsencrypt'
 
@@ -39,7 +39,7 @@ export default {
       loginForm: {
         username: "admin",
         password: "admin123",
-        rememberMe: false,
+        rememberMe: false, // TODO 芋艿：后面看情况，去掉这块
       },
       loginRules: {
         username: [
@@ -68,11 +68,17 @@ export default {
   created() {
     this.getCookie();
     // 三方登陆相关
-    this.type = 10;
+    this.type = 20;
     this.code = this.$route.query.code;
     this.state = this.$route.query.state;
-    thirdLogin(this.type, this.code, this.state).then(res => {
-      debugger
+    this.$store.dispatch("SocialLogin", {
+      code: this.code,
+      state: this.state,
+      type: this.type
+    }).then(() => {
+      this.$router.push({ path: this.redirect || "/" }).catch(()=>{});
+    }).catch(() => {
+      this.loading = false;
     });
   },
   methods: {
@@ -97,7 +103,13 @@ export default {
             Cookies.remove("username");
             Cookies.remove("password");
           }
-          this.$store.dispatch("Login", this.loginForm).then(() => {
+          this.$store.dispatch("SocialLogin2", {
+            code: this.code,
+            state: this.state,
+            type: this.type,
+            username: this.loginForm.username,
+            password: this.loginForm.password
+          }).then(() => {
             this.$router.push({ path: this.redirect || "/" }).catch(()=>{});
           }).catch(() => {
             this.loading = false;

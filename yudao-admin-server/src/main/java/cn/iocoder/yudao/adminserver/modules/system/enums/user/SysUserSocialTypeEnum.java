@@ -1,17 +1,14 @@
 package cn.iocoder.yudao.adminserver.modules.system.enums.user;
 
 import cn.hutool.core.util.ArrayUtil;
-import cn.iocoder.yudao.adminserver.modules.system.enums.errorcode.SysErrorCodeTypeEnum;
 import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import jodd.util.ArraysUtil;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.util.Arrays;
 
 /**
- * 用户的三方平台的类型枚举
+ * 用户的社交平台的类型枚举
  *
  * @author 芋道源码
  */

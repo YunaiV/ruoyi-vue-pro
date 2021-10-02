@@ -1,4 +1,4 @@
-import { login, logout, getInfo } from '@/api/login'
+import {login, logout, getInfo, socialLogin, socialLogin2} from '@/api/login'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 
 const user = {
@@ -37,6 +37,42 @@ const user = {
       const uuid = userInfo.uuid
       return new Promise((resolve, reject) => {
         login(username, password, code, uuid).then(res => {
+          res = res.data;
+          setToken(res.token)
+          commit('SET_TOKEN', res.token)
+          resolve()
+        }).catch(error => {
+          reject(error)
+        })
+      })
+    },
+
+    // 社交登陆
+    SocialLogin({ commit }, userInfo) {
+      const code = userInfo.code
+      const state = userInfo.state
+      const type = userInfo.type
+      return new Promise((resolve, reject) => {
+        socialLogin(type, code, state).then(res => {
+          res = res.data;
+          setToken(res.token)
+          commit('SET_TOKEN', res.token)
+          resolve()
+        }).catch(error => {
+          reject(error)
+        })
+      })
+    },
+
+    // 社交登陆
+    SocialLogin2({ commit }, userInfo) {
+      const code = userInfo.code
+      const state = userInfo.state
+      const type = userInfo.type
+      const username = userInfo.username.trim()
+      const password = userInfo.password
+      return new Promise((resolve, reject) => {
+        socialLogin2(type, code, state, username, password).then(res => {
           res = res.data;
           setToken(res.token)
           commit('SET_TOKEN', res.token)
