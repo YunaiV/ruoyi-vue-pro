@@ -4,11 +4,6 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.user.SysSocialUserDO;
-import cn.iocoder.yudao.adminserver.modules.system.dal.mysql.social.SysUserSocialMapper;
-import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
-import cn.iocoder.yudao.framework.common.exception.ServiceException;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.adminserver.modules.infra.service.file.InfFileService;
 import cn.iocoder.yudao.adminserver.modules.system.controller.user.vo.profile.SysUserProfileUpdatePasswordReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.user.vo.profile.SysUserProfileUpdateReqVO;
@@ -17,10 +12,14 @@ import cn.iocoder.yudao.adminserver.modules.system.convert.user.SysUserConvert;
 import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.dept.SysDeptDO;
 import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.dept.SysPostDO;
 import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.user.SysUserDO;
+import cn.iocoder.yudao.adminserver.modules.system.dal.mysql.social.SysUserSocialMapper;
 import cn.iocoder.yudao.adminserver.modules.system.dal.mysql.user.SysUserMapper;
 import cn.iocoder.yudao.adminserver.modules.system.service.dept.SysDeptService;
 import cn.iocoder.yudao.adminserver.modules.system.service.dept.SysPostService;
 import cn.iocoder.yudao.adminserver.modules.system.service.permission.SysPermissionService;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.exception.ServiceException;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import com.google.common.annotations.VisibleForTesting;
 import lombok.extern.slf4j.Slf4j;
@@ -33,9 +32,8 @@ import javax.annotation.Resource;
 import java.io.InputStream;
 import java.util.*;
 
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.adminserver.modules.system.enums.SysErrorCodeConstants.*;
-
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 
 /**
  * 用户 Service 实现类
@@ -76,15 +74,6 @@ public class SysUserServiceImpl implements SysUserService {
         user.setPassword(passwordEncoder.encode(reqVO.getPassword())); // 加密密码
         userMapper.insert(user);
         return user.getId();
-    }
-
-    @Override
-    public Long bindSocialUSer(Long sysUserId, String socialUSerId) {
-        SysSocialUserDO userSocialDO = new SysSocialUserDO();
-        userSocialDO.setUserId(sysUserId);
-//        userSocialDO.setSocialUserId(socialUSerId);
-        userSocialMapper.insert(userSocialDO);
-        return userSocialDO.getUserId();
     }
 
     @Override

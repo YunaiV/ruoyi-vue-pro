@@ -51,24 +51,27 @@ export default {
       },
       loading: false,
       redirect: undefined,
-      // 三方登陆相关
+      // 社交登陆相关
       type: undefined,
       code: undefined,
       state: undefined,
     };
   },
-  watch: {
-    $route: {
-      handler: function(route) {
-        this.redirect = route.query && route.query.redirect;
-      },
-      immediate: true
-    }
-  },
+  // watch: {
+  //   $route: {
+  //     handler: function(route) {
+  //       this.redirect = route.query && route.query.redirect;
+  //     },
+  //     immediate: true
+  //   }
+  // },
   created() {
     this.getCookie();
-    // 三方登陆相关
-    this.type = 10; // TODO 芋艿：需要改
+    // 重定向地址
+    this.redirect = this.$route.query.redirect;
+    debugger
+    // 社交登陆相关
+    this.type = this.$route.query.type;
     this.code = this.$route.query.code;
     this.state = this.$route.query.state;
     this.$store.dispatch("SocialLogin", {

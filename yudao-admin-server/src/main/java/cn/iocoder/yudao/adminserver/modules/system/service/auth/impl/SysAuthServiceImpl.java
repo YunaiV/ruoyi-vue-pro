@@ -258,7 +258,7 @@ public class SysAuthServiceImpl implements SysAuthService {
     private AuthUser obtainAuthUser(Integer type, AuthCallback authCallback) {
         AuthRequest authRequest = authRequestFactory.get(SysSocialTypeEnum.valueOfType(type).getSource());
         AuthResponse<?> authResponse = authRequest.login(authCallback);
-        log.info("[obtainAuthUser][请求三方平台 type({}) request({}) response({})]", type, JsonUtils.toJsonString(authCallback),
+        log.info("[obtainAuthUser][请求社交平台 type({}) request({}) response({})]", type, JsonUtils.toJsonString(authCallback),
                 JsonUtils.toJsonString(authResponse));
         if (!authResponse.ok()) {
             throw exception(AUTH_THIRD_OAUTH_FAILURE, authResponse.getMsg());

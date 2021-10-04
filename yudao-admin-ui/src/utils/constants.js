@@ -68,9 +68,25 @@ export const InfApiErrorLogProcessStatusEnum = {
 }
 
 /**
- * 用户的三方平台的类型枚举
+ * 用户的社交平台的类型枚举
  */
 export const SysUserSocialTypeEnum = {
-  GITEE: 10,
-  DINGTALK: 20,
+  // GITEE: {
+  //   title: "码云",
+  //   type: 10,
+  //   source: "gitee",
+  //   img: "https://cdn.jsdelivr.net/gh/justauth/justauth-oauth-logo@1.11/gitee.png",
+  // },
+  DINGTALK: {
+    title: "钉钉",
+    type: 20,
+    source: "dingtalk",
+    img: "https://cdn.jsdelivr.net/gh/justauth/justauth-oauth-logo@1.11/dingtalk.png",
+  },
+  WECHAT_ENTERPRISE: {
+    title: "企业微信",
+    type: 30,
+    source: "wechat_enterprise",
+    img: "https://cdn.jsdelivr.net/gh/justauth/justauth-oauth-logo@1.11/wechat_enterprise.png",
+  }
 }

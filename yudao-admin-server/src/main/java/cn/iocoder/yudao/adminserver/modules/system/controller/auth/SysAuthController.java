@@ -105,7 +105,7 @@ public class SysAuthController {
     @GetMapping("/social-login-redirect")
     @ApiOperation("社交登陆的跳转")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "type", value = "三方类型", required = true, dataTypeClass = Integer.class),
+            @ApiImplicitParam(name = "type", value = "社交类型", required = true, dataTypeClass = Integer.class),
             @ApiImplicitParam(name = "redirectUri", value = "回调路径", dataTypeClass = String.class)
     })
     public CommonResult<String> socialLoginRedirect(@RequestParam("type") Integer type,

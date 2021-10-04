@@ -35,14 +35,6 @@ public interface SysUserService {
     Long createUser(SysUserCreateReqVO reqVO);
 
     /**
-     * 绑定第三方用户
-     * @param sysUserId 系统用户ID
-     * @param socialUSerId 第三方唯一标识
-     * @return
-     */
-    Long bindSocialUSer(Long sysUserId, String socialUSerId);
-
-    /**
      * 修改用户
      *
      * @param reqVO 用户信息

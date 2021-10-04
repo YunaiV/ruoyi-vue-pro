@@ -30,8 +30,8 @@
 
       <el-form-item style="width:100%;">
           <div class="oauth-login" style="display:flex">
-            <div class="oauth-login-item" v-for="item in oauthProviders" :key="item.code" @click="doAuth2Login(item)">
-              <img :src=item.img height="25px" width="25px" alt="登录" >
+            <div class="oauth-login-item" v-for="item in SysUserSocialTypeEnum" :key="item.type" @click="doSocialLogin(item)">
+              <img :src="item.img" height="25px" width="25px" alt="登录" >
               <span>{{item.title}}</span>
             </div>
         </div>
@@ -48,6 +48,7 @@
 import { getCodeImg,socialLoginRedirect } from "@/api/login";
 import Cookies from "js-cookie";
 import { encrypt, decrypt } from '@/utils/jsencrypt'
+import {InfApiErrorLogProcessStatusEnum, SysUserSocialTypeEnum} from "@/utils/constants";
 
 export default {
   name: "Login",
@@ -61,23 +62,6 @@ export default {
         code: "",
         uuid: ""
       },
-      oauthProviders: [{
-          img: "https://cdn.jsdelivr.net/gh/justauth/justauth-oauth-logo@1.2/gitee.png",
-          title: "码云",
-          source: "gitee",
-          type: 10
-        }, {
-          img: "https://cdn.jsdelivr.net/gh/justauth/justauth-oauth-logo@1.2/dingtalk.png",
-          title: "钉钉",
-          source: "dingtalk",
-          type: 20
-        } , {
-          img: "https://cdn.jsdelivr.net/gh/justauth/justauth-oauth-logo@1.2/wechat_enterprise.png",
-          title: "企业微信",
-          source: "wechat_enterprise",
-          type: 30
-        }
-      ],
       loginRules: {
         username: [
           { required: true, trigger: "blur", message: "用户名不能为空" }
@@ -88,18 +72,22 @@ export default {
         code: [{ required: true, trigger: "change", message: "验证码不能为空" }]
       },
       loading: false,
-      redirect: undefined
+      redirect: undefined,
+      // 枚举
+      SysUserSocialTypeEnum: SysUserSocialTypeEnum,
     };
   },
-  watch: {
-    $route: {
-      handler: function(route) {
-        this.redirect = route.query && route.query.redirect;
-      },
-      immediate: true
-    }
-  },
+  // watch: {
+  //   $route: {
+  //     handler: function(route) {
+  //       this.redirect = route.query && route.query.redirect;
+  //     },
+  //     immediate: true
+  //   }
+  // },
   created() {
+    // 重定向地址
+    this.redirect = this.$route.query.redirect;
     this.getCode();
     this.getCookie();
   },
@@ -143,16 +131,16 @@ export default {
         }
       });
     },
-    doAuth2Login(provider) {
-      // console.log("开始Oauth登录...%o", provider.code);
+    doSocialLogin(socialTypeEnum) {
+      // console.log("开始Oauth登录...%o", socialTypeEnum.code);
       // 设置登陆中
       this.loading = true;
       // 计算 redirectUri
-      // const redirectUri = location.origin + '/social-login';
-      const redirectUri = 'http://127.0.0.1:48080/api/gitee/callback';
+      const redirectUri = location.origin + '/social-login?type=' + socialTypeEnum.type + '&redirect=' + (this.redirect || "/"); // 重定向不能丢
+      // const redirectUri = 'http://127.0.0.1:48080/api/gitee/callback';
       // const redirectUri = 'http://127.0.0.1:48080/api/dingtalk/callback';
       // 进行跳转
-      socialLoginRedirect(provider.type, redirectUri).then((res) => {
+      socialLoginRedirect(socialTypeEnum.type, encodeURIComponent(redirectUri)).then((res) => {
         // console.log(res.url);
         window.location.href = res.data;
       });
