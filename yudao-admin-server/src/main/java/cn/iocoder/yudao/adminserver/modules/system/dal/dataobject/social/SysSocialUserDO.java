@@ -1,5 +1,6 @@
-package cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.user;
+package cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.social;
 
+import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.user.SysUserDO;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import com.baomidou.mybatisplus.annotation.TableId;

@@ -17,7 +17,6 @@ public interface SysErrorCodeConstants {
     ErrorCode AUTH_LOGIN_CAPTCHA_NOT_FOUND = new ErrorCode(1002000003, "验证码不存在");
     ErrorCode AUTH_LOGIN_CAPTCHA_CODE_ERROR = new ErrorCode(1002000004, "验证码不正确");
     ErrorCode AUTH_THIRD_LOGIN_NOT_BIND = new ErrorCode(1002000005, "未绑定账号，需要进行绑定");
-    ErrorCode AUTH_THIRD_OAUTH_FAILURE = new ErrorCode(1002000006, "社交授权失败，原因是：{}");
 
     // ========== TOKEN 模块 1002001000 ==========
     ErrorCode TOKEN_EXPIRED = new ErrorCode(1002001000, "Token 已经过期");
@@ -97,5 +96,8 @@ public interface SysErrorCodeConstants {
     // ========== 错误码模块 1002013000 ==========
     ErrorCode ERROR_CODE_NOT_EXISTS = new ErrorCode(1002013000, "错误码不存在");
     ErrorCode ERROR_CODE_DUPLICATE = new ErrorCode(1002013001, "已经存在编码为【{}】的错误码");
+
+    // ========== 社交模块 1002014000 ==========
+    ErrorCode SOCIAL_AUTH_FAILURE = new ErrorCode(1002014000, "社交授权失败，原因是：{}");
 
 }

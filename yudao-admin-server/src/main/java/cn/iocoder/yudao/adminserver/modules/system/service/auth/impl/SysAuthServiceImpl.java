@@ -1,17 +1,13 @@
 package cn.iocoder.yudao.adminserver.modules.system.service.auth.impl;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.adminserver.modules.system.controller.auth.vo.auth.SysAuthSocialLogin2ReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.auth.vo.auth.SysAuthSocialLoginReqVO;
-import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.user.SysSocialUserDO;
-import cn.iocoder.yudao.adminserver.modules.system.dal.mysql.user.SysSocialUserMapper;
-import cn.iocoder.yudao.adminserver.modules.system.dal.redis.auth.SysAuthSocialUserRedisDAO;
-import cn.iocoder.yudao.adminserver.modules.system.enums.user.SysSocialTypeEnum;
+import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.social.SysSocialUserDO;
+import cn.iocoder.yudao.adminserver.modules.system.dal.mysql.social.SysSocialUserMapper;
+import cn.iocoder.yudao.adminserver.modules.system.service.social.SysSocialService;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
-import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
-import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.common.util.monitor.TracerUtils;
 import cn.iocoder.yudao.adminserver.modules.system.controller.auth.vo.auth.SysAuthLoginReqVO;
@@ -27,12 +23,8 @@ import cn.iocoder.yudao.adminserver.modules.system.service.logger.SysLoginLogSer
 import cn.iocoder.yudao.adminserver.modules.system.service.permission.SysPermissionService;
 import cn.iocoder.yudao.adminserver.modules.system.service.user.SysUserService;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
-import com.xkcoding.justauth.AuthRequestFactory;
 import lombok.extern.slf4j.Slf4j;
-import me.zhyd.oauth.model.AuthCallback;
-import me.zhyd.oauth.model.AuthResponse;
 import me.zhyd.oauth.model.AuthUser;
-import me.zhyd.oauth.request.AuthRequest;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -47,7 +39,6 @@ import org.springframework.util.Assert;
 
 import javax.annotation.Resource;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -77,14 +68,11 @@ public class SysAuthServiceImpl implements SysAuthService {
     private SysLoginLogService loginLogService;
     @Resource
     private SysUserSessionService userSessionService;
-
     @Resource
-    private SysAuthSocialUserRedisDAO authSocialUserRedisDAO;
+    private SysSocialService socialService;
+
     @Resource
     private SysSocialUserMapper socialUserMapper;
-
-    @Resource
-    private AuthRequestFactory authRequestFactory;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -189,13 +177,12 @@ public class SysAuthServiceImpl implements SysAuthService {
     @Override
     public String socialLogin(SysAuthSocialLoginReqVO reqVO, String userIp, String userAgent) {
         // 使用 code 授权码，进行登陆
-        AuthCallback authCallback = SysAuthConvert.INSTANCE.convert(reqVO);
-        AuthUser authUser = this.obtainAuthUserFromCache(reqVO.getType(), authCallback);
+        AuthUser authUser = socialService.getAuthUser(reqVO.getType(), reqVO.getCode(), reqVO.getState());
+        Assert.notNull(authUser, "授权用户不为空");
 
         // 如果未绑定 SysSocialUserDO 用户，则无法自动登陆，进行报错
-        String unionId = getAuthUserUnionId(authUser);
-        List<SysSocialUserDO> socialUsers = socialUserMapper.selectListByTypeAndUnionId(UserTypeEnum.ADMIN.getValue(),
-                reqVO.getType(), unionId);
+        String unionId = socialService.getAuthUserUnionId(authUser);
+        List<SysSocialUserDO> socialUsers = socialService.getAllSocialUserList(reqVO.getType(), unionId);
         if (CollUtil.isEmpty(socialUsers)) {
             throw exception(AUTH_THIRD_LOGIN_NOT_BIND);
         }
@@ -209,8 +196,8 @@ public class SysAuthServiceImpl implements SysAuthService {
         // TODO 芋艿：需要改造下，增加各种登陆方式
         loginUser.setRoleIds(this.getUserRoleIds(loginUser.getId())); // 获取用户角色列表
 
-        // 保存社交用户
-        this.saveSocialUser(reqVO.getType(), socialUsers, loginUser.getId(), authUser);
+        // 绑定社交用户（更新）
+        socialService.bindSocialUser(loginUser.getId(), reqVO.getType(), authUser);
 
         // 缓存登陆用户到 Redis 中，返回 sessionId 编号
         return userSessionService.createUserSession(loginUser, userIp, userAgent);
@@ -219,89 +206,18 @@ public class SysAuthServiceImpl implements SysAuthService {
     @Override
     public String socialLogin2(SysAuthSocialLogin2ReqVO reqVO, String userIp, String userAgent) {
         // 使用 code 授权码，进行登陆
-        AuthCallback authCallback = SysAuthConvert.INSTANCE.convert(reqVO);
-        AuthUser authUser = this.obtainAuthUserFromCache(reqVO.getType(), authCallback);
-
-        // 查询社交对应的 SysSocialUserDO 用户
-        String unionId = getAuthUserUnionId(authUser);
-        List<SysSocialUserDO> socialUsers = socialUserMapper.selectListByTypeAndUnionId(UserTypeEnum.ADMIN.getValue(),
-                reqVO.getType(), unionId);
+        AuthUser authUser = socialService.getAuthUser(reqVO.getType(), reqVO.getCode(), reqVO.getState());
+        Assert.notNull(authUser, "授权用户不为空");
 
         // 使用账号密码，进行登陆。
         LoginUser loginUser = this.login0(reqVO.getUsername(), reqVO.getPassword()); // TODO 芋艿：需要改造下，增加各种登陆方式
         loginUser.setRoleIds(this.getUserRoleIds(loginUser.getId())); // 获取用户角色列表
 
-        // 保存社交用户
-        this.saveSocialUser(reqVO.getType(), socialUsers, loginUser.getId(), authUser);
+        // 绑定社交用户（新增）
+        socialService.bindSocialUser(loginUser.getId(), reqVO.getType(), authUser);
 
         // 缓存登陆用户到 Redis 中，返回 sessionId 编号
         return userSessionService.createUserSession(loginUser, userIp, userAgent);
-    }
-
-    private static String getAuthUserUnionId(AuthUser authUser) {
-        return StrUtil.blankToDefault(authUser.getToken().getUnionId(), authUser.getUuid());
-    }
-
-    private AuthUser obtainAuthUserFromCache(Integer type, AuthCallback authCallback) {
-        // 从缓存中获取
-        AuthUser authUser = authSocialUserRedisDAO.get(type, authCallback);
-        if (authUser != null) {
-            return authUser;
-        }
-
-        // 请求获取
-        authUser = this.obtainAuthUser(type, authCallback);
-        authSocialUserRedisDAO.set(type, authCallback, authUser);
-        return authUser;
-    }
-
-    private AuthUser obtainAuthUser(Integer type, AuthCallback authCallback) {
-        AuthRequest authRequest = authRequestFactory.get(SysSocialTypeEnum.valueOfType(type).getSource());
-        AuthResponse<?> authResponse = authRequest.login(authCallback);
-        log.info("[obtainAuthUser][请求社交平台 type({}) request({}) response({})]", type, JsonUtils.toJsonString(authCallback),
-                JsonUtils.toJsonString(authResponse));
-        if (!authResponse.ok()) {
-            throw exception(AUTH_THIRD_OAUTH_FAILURE, authResponse.getMsg());
-        }
-        return (AuthUser) authResponse.getData();
-    }
-
-    /**
-     * 保存社交用户
-     *
-     * @param socialUsers 已存在的社交用户列表
-     * @param userId 绑定的用户编号
-     * @param authUser 需要保存的社交用户信息
-     */
-    private void saveSocialUser(Integer type, List<SysSocialUserDO> socialUsers, Long userId, AuthUser authUser) {
-        // 逻辑一：如果 socialUsers 指定的 userId 改变，需要进行更新
-        // 例如说，一个微信 unionId 对应了多个社交账号，结果其中有个关联了新的 userId，则其它也要跟着修改
-        // 考虑到 socialUsers 一般比较少，直接 for 循环更新即可
-        socialUsers.forEach(socialUser -> {
-            if (Objects.equals(socialUser.getUserId(), userId)) {
-                return;
-            }
-            socialUserMapper.updateById(new SysSocialUserDO().setUserId(socialUser.getUserId()).setUserId(userId));
-        });
-
-        // 逻辑二：如果 authUser 不存在于 socialUsers 中，则进行新增；否则，进行更新
-        SysSocialUserDO saveSocialUser = CollUtil.findOneByField(socialUsers, "openid", authUser.getUuid());
-        if (saveSocialUser == null) {
-            saveSocialUser = new SysSocialUserDO();
-            saveSocialUser.setUserId(userId).setUserType(UserTypeEnum.ADMIN.getValue());
-            saveSocialUser.setType(type).setOpenid(authUser.getUuid()).setToken(authUser.getToken().getAccessToken())
-                    .setUnionId(getAuthUserUnionId(authUser)).setRawTokenInfo(JsonUtils.toJsonString(authUser.getToken()));
-            saveSocialUser.setNickname(authUser.getNickname()).setAvatar(authUser.getAvatar())
-                            .setRawUserInfo(JsonUtils.toJsonString(authUser.getRawUserInfo()));
-            socialUserMapper.insert(saveSocialUser);
-        } else {
-            saveSocialUser = new SysSocialUserDO().setId(saveSocialUser.getId());
-            saveSocialUser.setToken(authUser.getToken().getAccessToken()).setUnionId(getAuthUserUnionId(authUser))
-                    .setRawTokenInfo(JsonUtils.toJsonString(authUser.getToken()));
-            saveSocialUser.setNickname(authUser.getNickname()).setAvatar(authUser.getAvatar())
-                    .setRawUserInfo(JsonUtils.toJsonString(authUser.getRawUserInfo()));
-            socialUserMapper.updateById(saveSocialUser);
-        }
     }
 
     @Override

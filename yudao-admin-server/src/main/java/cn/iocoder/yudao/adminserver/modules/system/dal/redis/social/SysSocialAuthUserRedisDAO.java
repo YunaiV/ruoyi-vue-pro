@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.adminserver.modules.system.dal.redis.auth;
+package cn.iocoder.yudao.adminserver.modules.system.dal.redis.social;
 
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import me.zhyd.oauth.model.AuthCallback;
@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
 
-import static cn.iocoder.yudao.adminserver.modules.system.dal.redis.SysRedisKeyConstants.AUTH_SOCIAL_USER;
+import static cn.iocoder.yudao.adminserver.modules.system.dal.redis.SysRedisKeyConstants.SOCIAL_AUTH_USER;
 
 /**
  * 社交 {@link me.zhyd.oauth.model.AuthUser} 的 RedisDAO
@@ -16,7 +16,7 @@ import static cn.iocoder.yudao.adminserver.modules.system.dal.redis.SysRedisKeyC
  * @author 芋道源码
  */
 @Repository
-public class SysAuthSocialUserRedisDAO {
+public class SysSocialAuthUserRedisDAO {
 
     @Resource
     private StringRedisTemplate stringRedisTemplate;
@@ -28,11 +28,11 @@ public class SysAuthSocialUserRedisDAO {
 
     public void set(Integer type, AuthCallback authCallback, AuthUser authUser) {
         String redisKey = formatKey(type, authCallback.getCode());
-        stringRedisTemplate.opsForValue().set(redisKey, JsonUtils.toJsonString(authUser), AUTH_SOCIAL_USER.getTimeout());
+        stringRedisTemplate.opsForValue().set(redisKey, JsonUtils.toJsonString(authUser), SOCIAL_AUTH_USER.getTimeout());
     }
 
     private static String formatKey(Integer type, String code) {
-        return String.format(AUTH_SOCIAL_USER.getKeyTemplate(), type, code);
+        return String.format(SOCIAL_AUTH_USER.getKeyTemplate(), type, code);
     }
 
 }

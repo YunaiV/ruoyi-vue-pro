@@ -185,4 +185,6 @@ justauth:
       agent-id: 1000004
       ignore-check-redirect-uri: true
   cache:
-    type: default
+    type: REDIS
+    prefix: 'social_auth_state:' # 缓存前缀，目前只对 Redis 缓存生效，默认 JUSTAUTH::STATE::
+    timeout: 24h # 超时时长，目前只对 Redis 缓存生效，默认 3 分钟

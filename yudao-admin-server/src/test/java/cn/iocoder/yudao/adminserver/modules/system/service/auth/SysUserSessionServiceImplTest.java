@@ -41,7 +41,7 @@ import cn.iocoder.yudao.adminserver.modules.system.enums.common.SysSexEnum;
 import cn.iocoder.yudao.adminserver.modules.system.service.auth.impl.SysUserSessionServiceImpl;
 import cn.iocoder.yudao.adminserver.modules.system.service.dept.impl.SysDeptServiceImpl;
 import cn.iocoder.yudao.adminserver.modules.system.service.logger.impl.SysLoginLogServiceImpl;
-import cn.iocoder.yudao.adminserver.modules.system.service.user.SysUserServiceImpl;
+import cn.iocoder.yudao.adminserver.modules.system.service.user.impl.SysUserServiceImpl;
 import cn.iocoder.yudao.framework.test.core.util.AssertUtils;
 import cn.iocoder.yudao.framework.test.core.util.RandomUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;

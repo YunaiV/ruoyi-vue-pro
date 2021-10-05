@@ -11,6 +11,7 @@ import cn.iocoder.yudao.adminserver.modules.system.enums.user.SysSocialTypeEnum;
 import cn.iocoder.yudao.adminserver.modules.system.service.auth.SysAuthService;
 import cn.iocoder.yudao.adminserver.modules.system.service.permission.SysPermissionService;
 import cn.iocoder.yudao.adminserver.modules.system.service.permission.SysRoleService;
+import cn.iocoder.yudao.adminserver.modules.system.service.social.SysSocialService;
 import cn.iocoder.yudao.adminserver.modules.system.service.user.SysUserService;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
@@ -56,9 +57,8 @@ public class SysAuthController {
     private SysRoleService roleService;
     @Resource
     private SysPermissionService permissionService;
-
     @Resource
-    private AuthRequestFactory authRequestFactory;
+    private SysSocialService socialService;
 
     @PostMapping("/login")
     @ApiOperation("使用账号密码登录")
@@ -110,12 +110,7 @@ public class SysAuthController {
     })
     public CommonResult<String> socialLoginRedirect(@RequestParam("type") Integer type,
                                                     @RequestParam("redirectUri") String redirectUri) {
-        // 获得对应的 AuthRequest 实现
-        AuthRequest authRequest = authRequestFactory.get(SysSocialTypeEnum.valueOfType(type).getSource());
-        // 生成跳转地址
-        String authorizeUri = authRequest.authorize(AuthStateUtils.createState());
-        authorizeUri = HttpUtils.replaceUrlQuery(authorizeUri, "redirect_uri", redirectUri);
-        return CommonResult.success(authorizeUri);
+        return CommonResult.success(socialService.getAuthorizeUrl(type, redirectUri));
     }
 
     @PostMapping("/social-login")
@@ -134,14 +129,6 @@ public class SysAuthController {
         String token = authService.socialLogin2(reqVO, getClientIP(), getUserAgent());
         // 返回结果
         return success(SysAuthLoginRespVO.builder().token(token).build());
-    }
-
-    @RequestMapping("/{type}/callback")
-    public AuthResponse login(@PathVariable String type, AuthCallback callback) {
-        AuthRequest authRequest = authRequestFactory.get(type);
-        AuthResponse<AuthUser> response = authRequest.login(callback);
-        log.info("【response】= {}", JSONUtil.toJsonStr(response));
-        return response;
     }
 
 }

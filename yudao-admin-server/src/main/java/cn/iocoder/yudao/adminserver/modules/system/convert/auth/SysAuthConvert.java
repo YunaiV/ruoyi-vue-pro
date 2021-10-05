@@ -43,10 +43,6 @@ public interface SysAuthConvert {
 
     LoginUser convert(SysUserProfileUpdatePasswordReqVO reqVO);
 
-    AuthCallback convert(SysAuthSocialLoginReqVO bean);
-
-    AuthCallback convert(SysAuthSocialLogin2ReqVO bean);
-
     /**
      * 将菜单列表，构建成菜单树
      *

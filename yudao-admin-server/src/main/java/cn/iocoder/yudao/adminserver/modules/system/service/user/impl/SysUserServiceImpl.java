@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.adminserver.modules.system.service.user;
+package cn.iocoder.yudao.adminserver.modules.system.service.user.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.IoUtil;
@@ -12,11 +12,11 @@ import cn.iocoder.yudao.adminserver.modules.system.convert.user.SysUserConvert;
 import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.dept.SysDeptDO;
 import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.dept.SysPostDO;
 import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.user.SysUserDO;
-import cn.iocoder.yudao.adminserver.modules.system.dal.mysql.social.SysUserSocialMapper;
 import cn.iocoder.yudao.adminserver.modules.system.dal.mysql.user.SysUserMapper;
 import cn.iocoder.yudao.adminserver.modules.system.service.dept.SysDeptService;
 import cn.iocoder.yudao.adminserver.modules.system.service.dept.SysPostService;
 import cn.iocoder.yudao.adminserver.modules.system.service.permission.SysPermissionService;
+import cn.iocoder.yudao.adminserver.modules.system.service.user.SysUserService;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -49,8 +49,6 @@ public class SysUserServiceImpl implements SysUserService {
 
     @Resource
     private SysUserMapper userMapper;
-    @Resource
-    private SysUserSocialMapper userSocialMapper;
 
     @Resource
     private SysDeptService deptService;
@@ -218,7 +216,7 @@ public class SysUserServiceImpl implements SysUserService {
     }
 
     @VisibleForTesting
-    void checkUserExists(Long id) {
+    public void checkUserExists(Long id) {
         if (id == null) {
             return;
         }
@@ -229,7 +227,7 @@ public class SysUserServiceImpl implements SysUserService {
     }
 
     @VisibleForTesting
-    void checkUsernameUnique(Long id, String username) {
+    public void checkUsernameUnique(Long id, String username) {
         if (StrUtil.isBlank(username)) {
             return;
         }
@@ -247,7 +245,7 @@ public class SysUserServiceImpl implements SysUserService {
     }
 
     @VisibleForTesting
-    void checkEmailUnique(Long id, String email) {
+    public void checkEmailUnique(Long id, String email) {
         if (StrUtil.isBlank(email)) {
             return;
         }
@@ -265,7 +263,7 @@ public class SysUserServiceImpl implements SysUserService {
     }
 
     @VisibleForTesting
-    void checkMobileUnique(Long id, String mobile) {
+    public void checkMobileUnique(Long id, String mobile) {
         if (StrUtil.isBlank(mobile)) {
             return;
         }
@@ -283,7 +281,7 @@ public class SysUserServiceImpl implements SysUserService {
     }
 
     @VisibleForTesting
-    void checkDeptEnable(Long deptId) {
+    public void checkDeptEnable(Long deptId) {
         if (deptId == null) { // 允许不选择
             return;
         }
@@ -297,7 +295,7 @@ public class SysUserServiceImpl implements SysUserService {
     }
 
     @VisibleForTesting
-    void checkPostEnable(Set<Long> postIds) {
+    public void checkPostEnable(Set<Long> postIds) {
         if (CollUtil.isEmpty(postIds)) { // 允许不选择
             return;
         }
@@ -324,7 +322,7 @@ public class SysUserServiceImpl implements SysUserService {
      * @param oldPassword 旧密码
      */
     @VisibleForTesting
-    void checkOldPassword(Long id, String oldPassword) {
+    public void checkOldPassword(Long id, String oldPassword) {
         SysUserDO user = userMapper.selectById(id);
         if (user == null) {
             throw exception(USER_NOT_EXISTS);
