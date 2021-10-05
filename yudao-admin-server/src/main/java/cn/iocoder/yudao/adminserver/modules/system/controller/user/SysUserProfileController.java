@@ -89,14 +89,14 @@ public class SysUserProfileController {
         return success(true);
     }
 
-    @PutMapping("/upload-avatar")
+    @PutMapping("/update-avatar")
     @ApiOperation("上传用户个人头像")
-    public CommonResult<Boolean> updateUserAvatar(@RequestParam("avatarFile") MultipartFile file) throws IOException {
+    public CommonResult<String> updateUserAvatar(@RequestParam("avatarFile") MultipartFile file) throws IOException {
         if (file.isEmpty()) {
             throw ServiceExceptionUtil.exception(FILE_IS_EMPTY);
         }
-        userService.updateUserAvatar(getLoginUserId(), file.getInputStream());
-        return success(true);
+        String avatar = userService.updateUserAvatar(getLoginUserId(), file.getInputStream());
+        return success(avatar);
     }
 
 }

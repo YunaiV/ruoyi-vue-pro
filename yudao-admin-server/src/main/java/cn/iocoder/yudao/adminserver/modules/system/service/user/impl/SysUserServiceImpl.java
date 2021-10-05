@@ -105,7 +105,7 @@ public class SysUserServiceImpl implements SysUserService {
     }
 
     @Override
-    public void updateUserAvatar(Long id, InputStream avatarFile) {
+    public String updateUserAvatar(Long id, InputStream avatarFile) {
         this.checkUserExists(id);
         // 存储文件
         String avatar = fileService.createFile(IdUtil.fastUUID(), IoUtil.readBytes(avatarFile));
@@ -114,6 +114,7 @@ public class SysUserServiceImpl implements SysUserService {
         sysUserDO.setId(id);
         sysUserDO.setAvatar(avatar);
         userMapper.updateById(sysUserDO);
+        return avatar;
     }
 
     @Override
