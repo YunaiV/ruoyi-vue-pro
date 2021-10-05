@@ -11,7 +11,7 @@
  Target Server Version : 80026
  File Encoding         : 65001
 
- Date: 03/10/2021 00:35:02
+ Date: 06/10/2021 01:02:54
 */
 
 SET NAMES utf8mb4;
@@ -43,7 +43,7 @@ CREATE TABLE `inf_api_access_log` (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=963 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='API 访问日志表';
+) ENGINE=InnoDB AUTO_INCREMENT=1302 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='API 访问日志表';
 
 -- ----------------------------
 -- Records of inf_api_access_log
@@ -84,7 +84,7 @@ CREATE TABLE `inf_api_error_log` (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=40 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='系统异常日志';
+) ENGINE=InnoDB AUTO_INCREMENT=42 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='系统异常日志';
 
 -- ----------------------------
 -- Records of inf_api_error_log
@@ -201,7 +201,7 @@ CREATE TABLE `inf_job_log` (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=1644 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='定时任务日志表';
+) ENGINE=InnoDB AUTO_INCREMENT=1969 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='定时任务日志表';
 
 -- ----------------------------
 -- Records of inf_job_log
@@ -264,7 +264,7 @@ CREATE TABLE `sys_dict_data` (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=80 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='字典数据表';
+) ENGINE=InnoDB AUTO_INCREMENT=86 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='字典数据表';
 
 -- ----------------------------
 -- Records of sys_dict_data
@@ -339,6 +339,12 @@ INSERT INTO `sys_dict_data` VALUES (76, 2, '接收失败', '20', 'sys_sms_receiv
 INSERT INTO `sys_dict_data` VALUES (77, 0, '调试(钉钉)', 'DEBUG_DING_TALK', 'sys_sms_channel_code', 0, NULL, '1', '2021-04-13 00:20:37', '1', '2021-04-13 00:20:37', b'0');
 INSERT INTO `sys_dict_data` VALUES (78, 1, '自动生成', '1', 'sys_error_code_type', 0, NULL, '1', '2021-04-21 00:06:48', '1', '2021-04-13 22:06:44', b'0');
 INSERT INTO `sys_dict_data` VALUES (79, 2, '手动编辑', '2', 'sys_error_code_type', 0, NULL, '1', '2021-04-21 00:07:14', '1', '2021-04-13 22:06:49', b'0');
+INSERT INTO `sys_dict_data` VALUES (80, 100, '账号登录', '100', 'sys_login_type', 0, '账号登录', '1', '2021-10-06 00:52:02', '1', '2021-10-06 00:52:43', b'0');
+INSERT INTO `sys_dict_data` VALUES (81, 101, '社交登录', '101', 'sys_login_type', 0, '社交登录', '1', '2021-10-06 00:52:17', '1', '2021-10-06 00:52:17', b'0');
+INSERT INTO `sys_dict_data` VALUES (82, 102, 'Mock 登录', '102', 'sys_login_type', 0, 'Mock 登录', '1', '2021-10-06 00:52:32', '1', '2021-10-06 00:52:39', b'0');
+INSERT INTO `sys_dict_data` VALUES (83, 200, '主动登出', '200', 'sys_login_type', 0, '主动登出', '1', '2021-10-06 00:52:58', '1', '2021-10-06 00:52:58', b'0');
+INSERT INTO `sys_dict_data` VALUES (84, 201, '超时登出', '201', 'sys_login_type', 0, '超时登出', '1', '2021-10-06 00:53:17', '1', '2021-10-06 00:53:17', b'0');
+INSERT INTO `sys_dict_data` VALUES (85, 202, '强制登出', '202', 'sys_login_type', 0, '强制退出', '1', '2021-10-06 00:53:41', '1', '2021-10-06 00:53:41', b'0');
 COMMIT;
 
 -- ----------------------------
@@ -358,7 +364,7 @@ CREATE TABLE `sys_dict_type` (
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE KEY `dict_type` (`type`)
-) ENGINE=InnoDB AUTO_INCREMENT=116 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='字典类型表';
+) ENGINE=InnoDB AUTO_INCREMENT=117 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='字典类型表';
 
 -- ----------------------------
 -- Records of sys_dict_type
@@ -386,6 +392,7 @@ INSERT INTO `sys_dict_type` VALUES (112, '短信模板的类型', 'sys_sms_templ
 INSERT INTO `sys_dict_type` VALUES (113, '短信发送状态', 'sys_sms_send_status', 0, NULL, '1', '2021-04-11 20:18:03', '1', '2021-04-11 09:30:02', b'0');
 INSERT INTO `sys_dict_type` VALUES (114, '短信接收状态', 'sys_sms_receive_status', 0, NULL, '1', '2021-04-11 20:27:14', '1', '2021-04-11 20:27:14', b'0');
 INSERT INTO `sys_dict_type` VALUES (115, '错误码的类型', 'sys_error_code_type', 0, NULL, '1', '2021-04-21 00:06:30', '1', '2021-04-13 22:07:12', b'0');
+INSERT INTO `sys_dict_type` VALUES (116, '登陆日志的类型', 'sys_login_type', 0, '登陆日志的类型', '1', '2021-10-06 00:50:46', '1', '2021-10-06 00:50:46', b'0');
 COMMIT;
 
 -- ----------------------------
@@ -405,7 +412,7 @@ CREATE TABLE `sys_error_code` (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=4018 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='错误码表';
+) ENGINE=InnoDB AUTO_INCREMENT=4019 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='错误码表';
 
 -- ----------------------------
 -- Records of sys_error_code
@@ -490,6 +497,7 @@ INSERT INTO `sys_error_code` VALUES (4014, 1, 'dashboard', 1002013000, '错误�
 INSERT INTO `sys_error_code` VALUES (4015, 1, 'dashboard', 1002013001, '已经存在编码为【{}】的错误码', '', NULL, '2021-04-22 00:04:06', NULL, '2021-04-22 00:04:06', b'0');
 INSERT INTO `sys_error_code` VALUES (4016, 1, 'yudao-admin-server', 1002000005, '未绑定账号，需要进行绑定', '', NULL, '2021-10-02 22:14:57', NULL, '2021-10-02 22:14:57', b'0');
 INSERT INTO `sys_error_code` VALUES (4017, 1, 'yudao-admin-server', 1002000006, '三方授权失败，原因是：{}', '', NULL, '2021-10-02 22:14:57', NULL, '2021-10-02 22:14:57', b'0');
+INSERT INTO `sys_error_code` VALUES (4018, 1, 'yudao-admin-server', 1002014000, '社交授权失败，原因是：{}', '', NULL, '2021-10-05 23:23:10', NULL, '2021-10-05 23:23:10', b'0');
 COMMIT;
 
 -- ----------------------------
@@ -500,6 +508,8 @@ CREATE TABLE `sys_login_log` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '访问ID',
   `log_type` bigint NOT NULL COMMENT '日志类型',
   `trace_id` varchar(64) NOT NULL DEFAULT '' COMMENT '链路追踪编号',
+  `user_id` bigint NOT NULL DEFAULT '0' COMMENT '用户编号',
+  `user_type` tinyint NOT NULL DEFAULT '0' COMMENT '用户类型',
   `username` varchar(50) NOT NULL DEFAULT '' COMMENT '用户账号',
   `result` tinyint NOT NULL COMMENT '登陆结果',
   `user_ip` varchar(50) NOT NULL COMMENT '用户 IP',
@@ -510,7 +520,7 @@ CREATE TABLE `sys_login_log` (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=85 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='系统访问记录';
+) ENGINE=InnoDB AUTO_INCREMENT=108 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='系统访问记录';
 
 -- ----------------------------
 -- Records of sys_login_log
@@ -736,7 +746,7 @@ CREATE TABLE `sys_operate_log` (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='操作日志记录';
+) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='操作日志记录';
 
 -- ----------------------------
 -- Records of sys_operate_log
@@ -1113,14 +1123,13 @@ CREATE TABLE `sys_social_user` (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC COMMENT='社交用户\n';
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC COMMENT='社交用户\n';
 
 -- ----------------------------
 -- Records of sys_social_user
 -- ----------------------------
 BEGIN;
-INSERT INTO `sys_social_user` VALUES (1, 1, 2, 20, 'IPRmJ0wvBptiPIlGEZiPewGwiEiE', NULL, 'IPRmJ0wvBptiPIlGEZiPewGwiEiE', '{\"accessToken\":null,\"expireIn\":0,\"refreshToken\":null,\"refreshTokenExpireIn\":0,\"uid\":null,\"openId\":\"0TvabQWZs9g6UedEWZKSegiEiE\",\"accessCode\":null,\"unionId\":\"IPRmJ0wvBptiPIlGEZiPewGwiEiE\",\"scope\":null,\"tokenType\":null,\"idToken\":null,\"macAlgorithm\":null,\"macKey\":null,\"code\":null,\"oauthToken\":null,\"oauthTokenSecret\":null,\"userId\":null,\"screenName\":null,\"oauthCallbackConfirmed\":null}', '王文斌（芋艿）（正在输出）', NULL, '{\"nick\":\"王文斌（芋艿）（正在输出）\",\"unionid\":\"IPRmJ0wvBptiPIlGEZiPewGwiEiE\",\"dingId\":\"$:LWCP_v1:$r28ct/waSBPp5Gk7a6kDXA==\",\"openid\":\"0TvabQWZs9g6UedEWZKSegiEiE\",\"main_org_auth_high_level\":false}', NULL, '2021-10-02 23:55:05', NULL, '2021-10-02 23:55:05', b'0');
-INSERT INTO `sys_social_user` VALUES (2, 1, 2, 30, 'WangWenBin', 'vT6R7p_P7OPAgIm5CejTNJnsFoglANQbcLOY1eJ307y7-HyqlNtwy_2rudvOrmbdvjG2JV1qqhUAjXmvQTa_ZG6XPfJBArBdoy-6kagQM3qlfoEcL_B5Vs9Ek1pr-0QfvJtCzR1igSPc36DX9c1VoAJVwj3MQQqPJbMcpWziw8yCtJBpJblclWa8B_R2qo-oz6S2qtd4nm-sEk2AEfEiyA', 'WangWenBin', '{\"accessToken\":\"vT6R7p_P7OPAgIm5CejTNJnsFoglANQbcLOY1eJ307y7-HyqlNtwy_2rudvOrmbdvjG2JV1qqhUAjXmvQTa_ZG6XPfJBArBdoy-6kagQM3qlfoEcL_B5Vs9Ek1pr-0QfvJtCzR1igSPc36DX9c1VoAJVwj3MQQqPJbMcpWziw8yCtJBpJblclWa8B_R2qo-oz6S2qtd4nm-sEk2AEfEiyA\",\"expireIn\":7200,\"refreshToken\":null,\"refreshTokenExpireIn\":0,\"uid\":null,\"openId\":null,\"accessCode\":null,\"unionId\":null,\"scope\":null,\"tokenType\":null,\"idToken\":null,\"macAlgorithm\":null,\"macKey\":null,\"code\":\"03ZbxKrm0PVIm9zZekVR6jdstF-MLj-UaD7TItXB9a8\",\"oauthToken\":null,\"oauthTokenSecret\":null,\"userId\":null,\"screenName\":null,\"oauthCallbackConfirmed\":null}', '', 'http://wework.qpic.cn/bizmail/nVd9hF56dvRicUAyGjVFNVDWz8mBb3Z1E0OtCrFMQnBuX0ia09EsIImw/0', '{\"errcode\":0,\"isleader\":0,\"gender\":\"1\",\"mobile\":\"15601691399\",\"errmsg\":\"ok\",\"is_leader_in_dept\":[],\"telephone\":\"\",\"avatar\":\"http://wework.qpic.cn/bizmail/nVd9hF56dvRicUAyGjVFNVDWz8mBb3Z1E0OtCrFMQnBuX0ia09EsIImw/0\",\"hide_mobile\":0,\"userid\":\"WangWenBin\",\"thumb_avatar\":\"http://wework.qpic.cn/bizmail/nVd9hF56dvRicUAyGjVFNVDWz8mBb3Z1E0OtCrFMQnBuX0ia09EsIImw/100\",\"enable\":1,\"name\":\"王文斌\",\"extattr\":{\"attrs\":[]},\"qr_code\":\"https://open.work.weixin.qq.com/wwopen/userQRCode?vcode=vc63b488dbf4ca7122\",\"alias\":\"\",\"position\":\"\",\"department\":[],\"email\":\"\",\"status\":1,\"order\":[]}', NULL, '2021-10-03 00:23:42', NULL, '2021-10-03 00:26:08', b'0');
+INSERT INTO `sys_social_user` VALUES (4, 1, 2, 20, 'IPRmJ0wvBptiPIlGEZiPewGwiEiE', NULL, 'IPRmJ0wvBptiPIlGEZiPewGwiEiE', '{\"accessToken\":null,\"expireIn\":0,\"refreshToken\":null,\"refreshTokenExpireIn\":0,\"uid\":null,\"openId\":\"0TvabQWZs9g6UedEWZKSegiEiE\",\"accessCode\":null,\"unionId\":\"IPRmJ0wvBptiPIlGEZiPewGwiEiE\",\"scope\":null,\"tokenType\":null,\"idToken\":null,\"macAlgorithm\":null,\"macKey\":null,\"code\":null,\"oauthToken\":null,\"oauthTokenSecret\":null,\"userId\":null,\"screenName\":null,\"oauthCallbackConfirmed\":null}', '王文斌（芋艿）（正在输出）', NULL, '{\"nick\":\"王文斌（芋艿）（正在输出）\",\"unionid\":\"IPRmJ0wvBptiPIlGEZiPewGwiEiE\",\"dingId\":\"$:LWCP_v1:$r28ct/waSBPp5Gk7a6kDXA==\",\"openid\":\"0TvabQWZs9g6UedEWZKSegiEiE\",\"main_org_auth_high_level\":false}', NULL, '2021-10-06 00:43:17', NULL, '2021-10-06 00:43:34', b'0');
 COMMIT;
 
 -- ----------------------------
@@ -1215,90 +1224,6 @@ CREATE TABLE `sys_user_session` (
 -- Records of sys_user_session
 -- ----------------------------
 BEGIN;
-INSERT INTO `sys_user_session` VALUES ('04c6624c7bf14b1ba1a01cb976a9d876', 1, '2021-04-05 21:40:12', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-05 20:21:09', NULL, '2021-04-01 12:25:35', b'1');
-INSERT INTO `sys_user_session` VALUES ('05f2bf20ddf14aea8750dd35f6ab6ec0', 1, '2021-09-28 10:24:21', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.63 Safari/537.36', NULL, '2021-09-28 09:54:21', NULL, '2021-09-29 01:11:12', b'1');
-INSERT INTO `sys_user_session` VALUES ('0d46a41bf48149389f38c65f6d6a6019', 1, '2021-10-03 00:55:44', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.63 Safari/537.36', NULL, '2021-10-03 00:25:44', NULL, '2021-10-03 00:25:44', b'0');
-INSERT INTO `sys_user_session` VALUES ('0e235ce5ae7342a09b372a00bd7d1b41', 1, '2021-04-05 01:43:22', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-05 00:51:03', NULL, '2021-04-01 04:18:06', b'1');
-INSERT INTO `sys_user_session` VALUES ('0e6943f8ca9b4215a014843eb489ccc7', 1, '2021-04-05 22:53:22', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-05 21:43:59', NULL, '2021-04-01 17:25:41', b'1');
-INSERT INTO `sys_user_session` VALUES ('12166cd28b4f448ea468d13c471dfc6e', 1, '2021-04-09 19:48:58', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-09 19:18:58', NULL, '2021-04-02 04:33:15', b'1');
-INSERT INTO `sys_user_session` VALUES ('134d908ae33146bd9b5291471c04f604', 1, '2021-04-10 00:29:28', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-09 23:10:26', NULL, '2021-04-02 08:08:17', b'1');
-INSERT INTO `sys_user_session` VALUES ('1407ce21e47947b9b8d93bff1b55c7d6', 1, '2021-04-07 01:09:11', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-07 00:07:43', NULL, '2021-04-01 18:10:44', b'1');
-INSERT INTO `sys_user_session` VALUES ('1477c38290ff4cee8887ebfe593faa02', 1, '2021-04-17 23:34:57', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-17 23:04:57', NULL, '2021-04-12 21:36:29', b'1');
-INSERT INTO `sys_user_session` VALUES ('1692c9438b0b4fcca0a9beb5567d037f', 106, '2021-09-28 10:23:20', 'zhijiantianya', '0:0:0:0:0:0:0:1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.63 Safari/537.36', NULL, '2021-09-28 09:53:20', NULL, '2021-09-28 01:53:27', b'1');
-INSERT INTO `sys_user_session` VALUES ('2cb9742c5b8a49a8946b549442433f30', 1, '2021-10-02 18:58:45', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.63 Safari/537.36', NULL, '2021-10-02 18:28:45', NULL, '2021-10-02 10:28:50', b'1');
-INSERT INTO `sys_user_session` VALUES ('2dc53e6470e64e2a9ca32500423a66ba', 1, '2021-10-03 00:55:47', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.63 Safari/537.36', NULL, '2021-10-03 00:25:47', NULL, '2021-10-02 16:25:51', b'1');
-INSERT INTO `sys_user_session` VALUES ('347ec49c06d74d138a95266cbb5535a0', 1, '2021-04-21 00:45:41', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-21 00:03:50', NULL, '2021-04-13 18:38:39', b'1');
-INSERT INTO `sys_user_session` VALUES ('352fd65e03cd48c19240d26fbc5dab07', 1, '2021-04-26 01:30:30', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-26 01:00:30', NULL, '2021-04-25 17:04:39', b'1');
-INSERT INTO `sys_user_session` VALUES ('36b6673599134b00aa2b25d4a2a7d9f9', 1, '2021-04-26 02:01:07', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-26 01:31:07', NULL, '2021-04-25 17:56:14', b'1');
-INSERT INTO `sys_user_session` VALUES ('36c310c5a56e4858bb96877547f1c67b', 1, '2021-05-03 11:15:14', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-05-03 10:45:14', NULL, '2021-09-28 01:07:19', b'1');
-INSERT INTO `sys_user_session` VALUES ('39fc76e86c7b469fa04b246523da536d', 1, '2021-04-26 23:04:36', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-26 22:34:36', NULL, '2021-04-26 13:39:54', b'1');
-INSERT INTO `sys_user_session` VALUES ('3c75ea73e13b4857a18eb57ca2eea80f', 1, '2021-04-11 20:06:52', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-11 19:36:52', NULL, '2021-04-11 09:10:53', b'1');
-INSERT INTO `sys_user_session` VALUES ('4092c5d0a1d74fca9fb69e2702ef83a2', 1, '2021-04-26 01:00:07', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-26 00:30:07', NULL, '2021-04-25 16:30:09', b'1');
-INSERT INTO `sys_user_session` VALUES ('40d532d8900c43b791266429a7911751', 1, '2021-04-05 22:11:34', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-05 21:41:34', NULL, '2021-04-01 12:28:20', b'1');
-INSERT INTO `sys_user_session` VALUES ('41419ad4943244caa921a43a174f8594', 1, '2021-10-03 00:53:42', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.63 Safari/537.36', NULL, '2021-10-03 00:23:42', NULL, '2021-10-02 16:24:32', b'1');
-INSERT INTO `sys_user_session` VALUES ('43676e85d0e04980b2a67181f8d9933b', 1, '2021-04-11 10:41:09', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-11 09:56:31', NULL, '2021-04-02 17:32:07', b'1');
-INSERT INTO `sys_user_session` VALUES ('505b4e7d8b0d4b40aa23bf540da81234', 1, '2021-03-14 01:25:13', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', NULL, '2021-03-14 00:31:43', NULL, '2021-03-13 07:35:26', b'1');
-INSERT INTO `sys_user_session` VALUES ('53aacbadecbf490b998dd011f39ed6ae', 1, '2021-09-28 10:23:35', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.63 Safari/537.36', NULL, '2021-09-28 09:53:35', NULL, '2021-09-28 01:53:39', b'1');
-INSERT INTO `sys_user_session` VALUES ('53c07f8d545349618f3633a1ffb2fc40', 1, '2021-04-26 23:18:27', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-26 22:48:27', NULL, '2021-04-26 14:45:51', b'1');
-INSERT INTO `sys_user_session` VALUES ('56a92b99f7b642ccbb7508042a25cb0c', 1, '2021-04-11 21:16:33', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-11 20:14:54', NULL, '2021-04-11 10:08:20', b'1');
-INSERT INTO `sys_user_session` VALUES ('5a7248bf87d14e7e9f0578b05969986c', 1, '2021-03-13 10:42:50', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', NULL, '2021-03-13 09:37:36', NULL, '2021-03-12 19:53:07', b'1');
-INSERT INTO `sys_user_session` VALUES ('5c30d80eb72048daa1a24d3d4f01317b', 1, '2021-04-12 00:31:10', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-11 23:08:14', NULL, '2021-04-11 15:47:45', b'1');
-INSERT INTO `sys_user_session` VALUES ('5dca80a5c61541479a4dbb6e004c2e28', 1, '2021-04-14 00:57:25', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-13 23:38:30', NULL, '2021-04-12 17:33:48', b'1');
-INSERT INTO `sys_user_session` VALUES ('6108c616991b45b9b891ff46163f95b1', 1, '2021-04-26 00:52:13', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-26 00:22:13', NULL, '2021-04-25 16:22:57', b'1');
-INSERT INTO `sys_user_session` VALUES ('611f8446edb249b78319a8967563c574', 106, '2021-09-28 10:12:39', 'zhijiantianya', '0:0:0:0:0:0:0:1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.63 Safari/537.36', NULL, '2021-09-28 09:42:39', NULL, '2021-09-29 01:11:12', b'1');
-INSERT INTO `sys_user_session` VALUES ('72e0d4e1398642e2a5dc7cac2fd9c3a0', 1, '2021-04-26 01:58:09', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-26 01:04:50', NULL, '2021-04-25 17:30:12', b'1');
-INSERT INTO `sys_user_session` VALUES ('7324a76b029a49ee95bf54ceb4164ba9', 1, '2021-04-13 01:29:14', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-13 00:18:40', NULL, '2021-04-11 23:15:00', b'1');
-INSERT INTO `sys_user_session` VALUES ('749619894bc441bb9773902515f81e6a', 1, '2021-04-11 00:39:51', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-11 00:09:51', NULL, '2021-04-02 16:50:56', b'1');
-INSERT INTO `sys_user_session` VALUES ('750dca41b315488b8c17e1c0f8b6a519', 1, '2021-04-21 01:24:28', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-21 00:54:28', NULL, '2021-04-13 21:42:10', b'1');
-INSERT INTO `sys_user_session` VALUES ('7768ae62ad974fd989f5159649a4be82', 1, '2021-04-11 00:53:39', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-10 23:23:27', NULL, '2021-04-02 17:04:58', b'1');
-INSERT INTO `sys_user_session` VALUES ('79efcb8f64aa42af9f4b327fb383532f', 1, '2021-04-11 22:44:07', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-11 21:34:53', NULL, '2021-04-11 14:10:45', b'1');
-INSERT INTO `sys_user_session` VALUES ('7b412bc5c1fe48d7897f10e30a75fa93', 1, '2021-05-03 02:53:53', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-05-03 02:02:56', NULL, '2021-04-29 21:28:43', b'1');
-INSERT INTO `sys_user_session` VALUES ('7b9e55b7188d49ea968abbf3ca9457ba', 1, '2021-10-03 00:19:30', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.63 Safari/537.36', NULL, '2021-10-02 23:49:30', NULL, '2021-10-02 16:20:00', b'1');
-INSERT INTO `sys_user_session` VALUES ('7eea227a8ef5445189f5fbec39f799c1', 1, '2021-04-26 00:46:00', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-26 00:04:01', NULL, '2021-04-25 16:16:06', b'1');
-INSERT INTO `sys_user_session` VALUES ('7ff1aa5bba8a42f295cd438f4aacc40f', 1, '2021-04-26 00:46:15', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-26 00:16:15', NULL, '2021-04-25 16:16:28', b'1');
-INSERT INTO `sys_user_session` VALUES ('83b227ad356f4343b01d321ad26807ce', 1, '2021-04-22 00:49:12', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-21 23:33:02', NULL, '2021-04-25 15:49:09', b'1');
-INSERT INTO `sys_user_session` VALUES ('87d5b95fdad9447189a95abf8a5152df', 1, '2021-04-17 23:01:18', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-17 22:31:18', NULL, '2021-04-12 21:03:27', b'1');
-INSERT INTO `sys_user_session` VALUES ('8b3eac5e4a104a4191c8070e03d553ea', 1, '2021-04-05 02:45:12', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-05 02:15:12', NULL, '2021-04-01 11:05:25', b'1');
-INSERT INTO `sys_user_session` VALUES ('92df075e593a483c8cf114f84f04cc13', 1, '2021-10-03 00:19:27', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.63 Safari/537.36', NULL, '2021-10-02 23:49:27', NULL, '2021-10-02 16:20:00', b'1');
-INSERT INTO `sys_user_session` VALUES ('931c0b94936542d884bff469a37d8501', 1, '2021-04-26 00:53:46', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-26 00:23:46', NULL, '2021-04-25 16:24:02', b'1');
-INSERT INTO `sys_user_session` VALUES ('93fb9dff9e824a9096a2bbce52ec0a72', 106, '2021-09-28 10:14:01', 'zhijiantianya', '0:0:0:0:0:0:0:1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.63 Safari/537.36', NULL, '2021-09-28 09:44:01', NULL, '2021-09-29 01:11:12', b'1');
-INSERT INTO `sys_user_session` VALUES ('961970e9418d4d20a3f6487f2003d489', 1, '2021-05-03 01:46:56', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-05-03 01:16:56', NULL, '2021-04-29 17:51:38', b'1');
-INSERT INTO `sys_user_session` VALUES ('9ae27346d8b7491aad1385f51e8aa196', 1, '2021-03-13 14:02:12', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', NULL, '2021-03-13 10:43:06', NULL, '2021-03-13 06:40:35', b'1');
-INSERT INTO `sys_user_session` VALUES ('a2fb443b31c049008975ff8ee5499db1', 1, '2021-04-11 09:42:09', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-11 09:12:09', NULL, '2021-04-02 17:16:00', b'1');
-INSERT INTO `sys_user_session` VALUES ('a4860c716dc5459a852e6eb70ee9f9ac', 106, '2021-09-28 10:12:28', 'zhijiantianya', '0:0:0:0:0:0:0:1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.63 Safari/537.36', NULL, '2021-09-28 09:42:28', NULL, '2021-09-29 01:11:12', b'1');
-INSERT INTO `sys_user_session` VALUES ('a71a74adf9d141e2849d2a411d558205', 1, '2021-04-17 18:24:44', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-17 17:54:44', NULL, '2021-04-12 17:54:50', b'1');
-INSERT INTO `sys_user_session` VALUES ('ab2099c12f5c4b0288c60abe8cfff307', 1, '2021-04-18 01:41:46', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-18 01:01:35', NULL, '2021-04-13 05:14:54', b'1');
-INSERT INTO `sys_user_session` VALUES ('ae9ee7452ee54e4b983d658188c15c4d', 1, '2021-03-14 21:32:57', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', NULL, '2021-03-14 20:25:00', NULL, '2021-03-13 15:19:10', b'1');
-INSERT INTO `sys_user_session` VALUES ('b25659890f4645049d1fa0e2767649ae', 1, '2021-05-02 23:47:04', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-05-02 23:01:26', NULL, '2021-04-29 15:41:42', b'1');
-INSERT INTO `sys_user_session` VALUES ('b45d7fba74c64b75b2da0b3bf88b6b84', 1, '2021-10-03 00:19:39', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.63 Safari/537.36', NULL, '2021-10-02 23:49:39', NULL, '2021-10-02 16:20:00', b'1');
-INSERT INTO `sys_user_session` VALUES ('b727853eccea4c8589e006ffea985146', 1, '2021-04-12 01:36:00', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-12 01:06:00', NULL, '2021-04-11 19:40:07', b'1');
-INSERT INTO `sys_user_session` VALUES ('b86f118e7a584a88af2122e08c765afa', 1, '2021-10-03 00:25:05', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.63 Safari/537.36', NULL, '2021-10-02 23:55:05', NULL, '2021-10-02 16:18:29', b'1');
-INSERT INTO `sys_user_session` VALUES ('b97cce5f119c474fb7dcff9c46541dc5', 1, '2021-04-26 00:57:09', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-26 00:27:09', NULL, '2021-04-25 16:27:10', b'1');
-INSERT INTO `sys_user_session` VALUES ('b9ee6fde7bf74ed49cad99abf86c94d6', 1, '2021-04-18 20:21:02', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-18 19:18:52', NULL, '2021-04-13 06:36:39', b'1');
-INSERT INTO `sys_user_session` VALUES ('bb4ad4579bd1436c859b94228967582f', 1, '2021-04-18 20:52:38', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-18 20:22:38', NULL, '2021-04-13 07:14:58', b'1');
-INSERT INTO `sys_user_session` VALUES ('c095616db95044c5bed66a3f84519b8b', 1, '2021-04-11 19:59:33', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-11 19:29:33', NULL, '2021-04-11 09:04:19', b'1');
-INSERT INTO `sys_user_session` VALUES ('c342d0f097d144e38f4bee87b8b227b6', 1, '2021-10-03 00:19:31', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.63 Safari/537.36', NULL, '2021-10-02 23:49:31', NULL, '2021-10-02 16:20:00', b'1');
-INSERT INTO `sys_user_session` VALUES ('c8805f37eb76432c89d6d54feb14756f', 1, '2021-04-18 21:54:56', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-18 21:00:38', NULL, '2021-04-13 17:45:30', b'1');
-INSERT INTO `sys_user_session` VALUES ('ccec247d69f5445cabd9f2cc2c219ead', 1, '2021-04-26 00:51:56', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-26 00:21:56', NULL, '2021-04-25 16:22:10', b'1');
-INSERT INTO `sys_user_session` VALUES ('cee634e685c746bda24d43debab7abd8', 1, '2021-04-26 00:54:12', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-26 00:24:12', NULL, '2021-04-25 16:24:14', b'1');
-INSERT INTO `sys_user_session` VALUES ('ceee9f8ff5cf44a4b9576c7590e848ca', 1, '2021-10-03 00:56:08', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.63 Safari/537.36', NULL, '2021-10-03 00:26:08', NULL, '2021-10-02 16:28:53', b'1');
-INSERT INTO `sys_user_session` VALUES ('d07fa3ca0a6b4a1aa77e7cc24b521fa5', 1, '2021-04-26 01:00:57', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-26 00:30:57', NULL, '2021-04-25 16:30:58', b'1');
-INSERT INTO `sys_user_session` VALUES ('d0adf48f82914212b947e5ab04d9fb65', 1, '2021-03-21 19:16:28', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-03-21 18:13:37', NULL, '2021-03-15 05:53:20', b'1');
-INSERT INTO `sys_user_session` VALUES ('d6840a71da1b4c96b83a118543ce4d56', 1, '2021-09-27 13:17:12', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.63 Safari/537.36', NULL, '2021-09-27 12:47:12', NULL, '2021-09-28 01:07:19', b'1');
-INSERT INTO `sys_user_session` VALUES ('dfbce0af867547f4bb01ac6f2e583337', 1, '2021-04-11 17:06:15', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-11 16:36:15', NULL, '2021-04-11 08:24:03', b'1');
-INSERT INTO `sys_user_session` VALUES ('e154d98c038c4bf187325c6c6bb72b13', 1, '2021-05-03 01:09:20', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-05-02 23:52:50', NULL, '2021-04-29 16:59:52', b'1');
-INSERT INTO `sys_user_session` VALUES ('e3539526beea4083b92c795250d9fd51', 1, '2021-10-03 00:23:29', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.63 Safari/537.36', NULL, '2021-10-02 23:53:29', NULL, '2021-10-02 15:54:01', b'1');
-INSERT INTO `sys_user_session` VALUES ('e3d8de99f61c46759b7c32ebf86c3a40', 1, '2021-09-29 09:57:41', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.63 Safari/537.36', NULL, '2021-09-29 09:27:41', NULL, '2021-09-29 01:27:58', b'1');
-INSERT INTO `sys_user_session` VALUES ('e57c7628f7eb49bd930c40bf83bdbfd0', 1, '2021-09-28 10:23:52', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.63 Safari/537.36', NULL, '2021-09-28 09:53:52', NULL, '2021-09-28 01:54:01', b'1');
-INSERT INTO `sys_user_session` VALUES ('e5ecf10e40a5463b8f9b5b453cb1649b', 1, '2021-04-11 17:06:22', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-11 16:36:22', NULL, '2021-04-11 08:24:03', b'1');
-INSERT INTO `sys_user_session` VALUES ('e6d6cd3a8b894f2bb8e07e0cad234e4d', 1, '2021-10-03 00:24:13', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.63 Safari/537.36', NULL, '2021-10-02 23:54:13', NULL, '2021-10-02 15:54:21', b'1');
-INSERT INTO `sys_user_session` VALUES ('e80c2400724042a2ab73732166cde8fc', 1, '2021-03-21 21:17:12', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-03-21 20:47:12', NULL, '2021-03-15 08:18:56', b'1');
-INSERT INTO `sys_user_session` VALUES ('e8872f5192584440a548641b83c877ef', 1, '2021-03-21 18:36:01', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-03-21 17:51:48', NULL, '2021-03-15 03:54:20', b'1');
-INSERT INTO `sys_user_session` VALUES ('f1ab99b09b5a475795579ff99d60ac78', 1, '2021-03-14 23:04:31', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', NULL, '2021-03-14 21:12:44', NULL, '2021-03-15 03:32:38', b'1');
-INSERT INTO `sys_user_session` VALUES ('f2a4182f62ea4559b9946a523928fac4', 1, '2021-04-10 01:45:57', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-10 00:55:38', NULL, '2021-04-02 14:52:48', b'1');
-INSERT INTO `sys_user_session` VALUES ('f853b50d064340a581e9a49bba9411fc', 1, '2021-03-10 01:55:41', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36', NULL, '2021-03-10 01:11:53', NULL, '2021-03-12 18:37:05', b'1');
-INSERT INTO `sys_user_session` VALUES ('fb341cc0cfdd4cc7b5058f2a3bc279bc', 1, '2021-04-26 00:46:50', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36', NULL, '2021-04-26 00:16:50', NULL, '2021-04-25 16:18:36', b'1');
-INSERT INTO `sys_user_session` VALUES ('fce675d238d94c90bd1f0580cbf3c250', 1, '2021-10-03 00:16:06', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.63 Safari/537.36', NULL, '2021-10-02 23:46:06', NULL, '2021-10-02 15:46:12', b'1');
 COMMIT;
 
 -- ----------------------------

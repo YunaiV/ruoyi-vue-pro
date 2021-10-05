@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.logger;
 
+import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.adminserver.modules.system.enums.logger.SysLoginLogTypeEnum;
 import cn.iocoder.yudao.adminserver.modules.system.enums.logger.SysLoginResultEnum;
@@ -35,6 +36,16 @@ public class SysLoginLogDO extends BaseDO {
      * 链路追踪编号
      */
     private String traceId;
+    /**
+     * 用户编号
+     */
+    private Long userId;
+    /**
+     * 用户类型
+     *
+     * 枚举 {@link UserTypeEnum}
+     */
+    private Integer userType;
     /**
      * 用户账号
      *

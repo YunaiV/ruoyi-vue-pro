@@ -20,6 +20,10 @@ public class SysLoginLogExcelVO {
     @ExcelProperty("用户账号")
     private String username;
 
+    @ExcelProperty(value = "日志类型", converter = DictConvert.class)
+    @DictFormat(SysDictTypeConstants.LOGIN_TYPE)
+    private Integer logType;
+
     @ExcelProperty(value = "登陆结果", converter = DictConvert.class)
     @DictFormat(SysDictTypeConstants.LOGIN_RESULT)
     private Integer result;

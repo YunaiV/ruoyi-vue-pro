@@ -2,22 +2,10 @@
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" :inline="true" label-width="68px">
       <el-form-item label="登录地址" prop="userIp">
-        <el-input
-          v-model="queryParams.userIp"
-          placeholder="请输入登录地址"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
+        <el-input v-model="queryParams.userIp" placeholder="请输入登录地址" clearable size="small" @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item label="用户名称" prop="username">
-        <el-input
-          v-model="queryParams.username"
-          placeholder="请输入用户名称"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
+        <el-input v-model="queryParams.username" placeholder="请输入用户名称" clearable size="small" @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item>
         <el-button type="cyan" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
@@ -25,11 +13,7 @@
       </el-form-item>
 
     </el-form>
-    <el-table
-      v-loading="loading"
-      :data="list"
-      style="width: 100%;"
-    >
+    <el-table v-loading="loading" :data="list" style="width: 100%;">
       <el-table-column label="会话编号" align="center" prop="id" width="300" />
       <el-table-column label="登录名称" align="center" prop="username" width="100" />
       <el-table-column label="部门名称" align="center" prop="deptName" width="100" />
@@ -42,13 +26,8 @@
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-          <el-button
-            size="mini"
-            type="text"
-            icon="el-icon-delete"
-            @click="handleForceLogout(scope.row)"
-            v-hasPermi="['system:user-session:delete']"
-          >强退</el-button>
+          <el-button size="mini" type="text" icon="el-icon-delete" @click="handleForceLogout(scope.row)"
+            v-hasPermi="['system:user-session:delete']">强退</el-button>
         </template>
       </el-table-column>
     </el-table>

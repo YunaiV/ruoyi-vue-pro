@@ -1,5 +1,8 @@
 package cn.iocoder.yudao.adminserver.modules.system.service.logger.impl;
 
+import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.user.SysUserDO;
+import cn.iocoder.yudao.adminserver.modules.system.service.user.SysUserService;
+import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.adminserver.modules.system.controller.logger.vo.loginlog.SysLoginLogCreateReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.logger.vo.loginlog.SysLoginLogExportReqVO;
@@ -21,10 +24,19 @@ public class SysLoginLogServiceImpl implements SysLoginLogService {
 
     @Resource
     private SysLoginLogMapper loginLogMapper;
+    @Resource
+    private SysUserService userService;
 
     @Override
     public void createLoginLog(SysLoginLogCreateReqVO reqVO) {
         SysLoginLogDO loginLog = SysLoginLogConvert.INSTANCE.convert(reqVO);
+        // 获得用户
+        SysUserDO user = userService.getUserByUsername(reqVO.getUsername());
+        if (user != null) {
+            loginLog.setUserId(user.getId());
+        }
+        loginLog.setUserType(UserTypeEnum.ADMIN.getValue());
+        // 插入
         loginLogMapper.insert(loginLog);
     }
 

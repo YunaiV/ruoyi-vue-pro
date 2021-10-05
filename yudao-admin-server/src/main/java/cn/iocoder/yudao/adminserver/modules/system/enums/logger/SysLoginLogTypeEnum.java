@@ -12,6 +12,7 @@ public enum SysLoginLogTypeEnum {
 
     LOGIN_USERNAME(100), // 使用账号登录
     LOGIN_SOCIAL(101), // 使用社交登陆
+    LOGIN_MOCK(102), // 使用 Mock 登陆
 
     LOGOUT_SELF(200),  // 自己主动登出
     LOGOUT_TIMEOUT(201), // 超时登出
