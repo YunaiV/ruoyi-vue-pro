@@ -32,10 +32,9 @@ public class InfApiAccessLogServiceImpl implements InfApiAccessLogService {
     @Override
     @Async
     public Future<Boolean> createApiAccessLogAsync(ApiAccessLogCreateDTO createDTO) {
-        // 插入
         InfApiAccessLogDO apiAccessLog = InfApiAccessLogConvert.INSTANCE.convert(createDTO);
         int insert = apiAccessLogMapper.insert(apiAccessLog);
-        return new AsyncResult<>(insert == 1);
+        return new AsyncResult<>(insert > 1);
     }
 
     @Override

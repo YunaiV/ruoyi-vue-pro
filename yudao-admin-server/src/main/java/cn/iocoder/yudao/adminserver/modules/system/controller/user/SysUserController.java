@@ -167,7 +167,7 @@ public class SysUserController {
     @PreAuthorize("@ss.hasPermission('system:user:import')")
     public CommonResult<SysUserImportRespVO> importExcel(@RequestParam("file") MultipartFile file,
              @RequestParam(value = "updateSupport", required = false, defaultValue = "false") Boolean updateSupport) throws Exception {
-        List<SysUserImportExcelVO> list = ExcelUtils.raed(file, SysUserImportExcelVO.class);
+        List<SysUserImportExcelVO> list = ExcelUtils.read(file, SysUserImportExcelVO.class);
         return success(userService.importUsers(list, updateSupport));
     }
 

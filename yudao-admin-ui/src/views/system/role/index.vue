@@ -66,7 +66,7 @@
       </el-table-column>
     </el-table>
 
-    <pagination v-show="total>0" :total="total" :page.sync="queryParams.pageNum" :limit.sync="queryParams.pageSize"
+    <pagination v-show="total>0" :total="total" :page.sync="queryParams.pageNo" :limit.sync="queryParams.pageSize"
                 @pagination="getList"/>
 
     <!-- 添加或修改角色配置对话框 -->

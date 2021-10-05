@@ -12,7 +12,7 @@ import cn.iocoder.yudao.adminserver.modules.system.dal.mysql.permission.SysMenuM
 import cn.iocoder.yudao.adminserver.modules.system.enums.permission.MenuTypeEnum;
 import cn.iocoder.yudao.adminserver.modules.system.mq.producer.permission.SysMenuProducer;
 import cn.iocoder.yudao.adminserver.modules.system.service.permission.impl.SysMenuServiceImpl;
-import cn.iocoder.yudao.framework.common.util.sping.SpringAopUtils;
+import cn.iocoder.yudao.framework.common.util.spring.SpringAopUtils;
 import cn.iocoder.yudao.framework.test.core.util.RandomUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import com.google.common.collect.Multimap;
