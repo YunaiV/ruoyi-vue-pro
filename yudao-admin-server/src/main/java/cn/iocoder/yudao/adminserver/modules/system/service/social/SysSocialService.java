@@ -4,6 +4,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.social.SysSocialUserDO;
 import cn.iocoder.yudao.adminserver.modules.system.enums.user.SysSocialTypeEnum;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
+import io.swagger.models.auth.In;
 import me.zhyd.oauth.model.AuthUser;
 
 import javax.validation.constraints.NotNull;
@@ -52,6 +53,14 @@ public interface SysSocialService {
     List<SysSocialUserDO> getAllSocialUserList(Integer type, String unionId);
 
     /**
+     * 获得指定用户的社交用户列表
+     *
+     * @param userId 用户编号
+     * @return 社交用户列表
+     */
+    List<SysSocialUserDO> getSocialUserList(Long userId);
+
+    /**
      * 绑定社交用户
      *
      * @param userId 用户编号
@@ -59,5 +68,14 @@ public interface SysSocialService {
      * @param authUser 授权用户
      */
     void bindSocialUser(Long userId, Integer type, AuthUser authUser);
+
+    /**
+     * 取消绑定社交用户
+     *
+     * @param userId 用户编号
+     * @param type 社交平台的类型 {@link SysSocialTypeEnum}
+     * @param unionId 社交平台的 unionId
+     */
+    void unbindSocialUser(Long userId, Integer type, String unionId);
 
 }

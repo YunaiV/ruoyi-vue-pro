@@ -9,7 +9,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 /**
- * 登陆日志 Base VO，提供给添加、修改、详细的子 VO 使用
+ * 登录日志 Base VO，提供给添加、修改、详细的子 VO 使用
  * 如果子 VO 存在差异的字段，请不要添加到这里，影响 Swagger 文档生成
  */
 @Data
@@ -28,8 +28,8 @@ public class SysLoginLogBaseVO {
     @Size(max = 30, message = "用户账号长度不能超过30个字符")
     private String username;
 
-    @ApiModelProperty(value = "登陆结果", required = true, example = "1", notes = "参见 SysLoginResultEnum 枚举类")
-    @NotNull(message = "登陆结果不能为空")
+    @ApiModelProperty(value = "登录结果", required = true, example = "1", notes = "参见 SysLoginResultEnum 枚举类")
+    @NotNull(message = "登录结果不能为空")
     private Integer result;
 
     @ApiModelProperty(value = "用户 IP", required = true, example = "127.0.0.1")

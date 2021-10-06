@@ -236,7 +236,7 @@ public class SysAuthServiceImplTest extends BaseDbUnitTest {
         when(authentication.getPrincipal()).thenReturn(loginUser);
         // mock 获得 User 拥有的角色编号数组
         when(permissionService.getUserRoleIds(userId, singleton(CommonStatusEnum.ENABLE.getStatus()))).thenReturn(userRoleIds);
-        // mock 缓存登陆用户到 Redis
+        // mock 缓存登录用户到 Redis
         when(userSessionService.createUserSession(loginUser, userIp, userAgent)).thenReturn(sessionId);
         // 调用, 并断言异常
         String login = authService.login(reqVO, userIp, userAgent);

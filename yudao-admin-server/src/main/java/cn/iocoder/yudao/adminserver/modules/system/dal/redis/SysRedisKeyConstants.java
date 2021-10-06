@@ -15,7 +15,7 @@ import static cn.iocoder.yudao.framework.redis.core.RedisKeyDefine.KeyTypeEnum.S
  */
 public interface SysRedisKeyConstants {
 
-    RedisKeyDefine LOGIN_USER = new RedisKeyDefine("登陆用户的缓存",
+    RedisKeyDefine LOGIN_USER = new RedisKeyDefine("登录用户的缓存",
             "login_user:%s", // 参数为 sessionId
             STRING, LoginUser.class, RedisKeyDefine.TimeoutTypeEnum.DYNAMIC);
 

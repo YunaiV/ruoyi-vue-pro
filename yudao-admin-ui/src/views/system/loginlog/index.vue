@@ -132,7 +132,7 @@ export default {
         }).then(function() {
           return exportLoginLog(queryParams);
         }).then(response => {
-          this.downloadExcel(response, '登陆日志.xls');
+          this.downloadExcel(response, '登录日志.xls');
         })
     }
   }

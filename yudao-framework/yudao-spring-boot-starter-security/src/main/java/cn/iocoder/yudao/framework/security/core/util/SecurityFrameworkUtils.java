@@ -84,7 +84,7 @@ public class SecurityFrameworkUtils {
     /**
      * 设置当前用户
      *
-     * @param loginUser 登陆用户
+     * @param loginUser 登录用户
      * @param request 请求
      */
     public static void setLoginUser(LoginUser loginUser, HttpServletRequest request) {

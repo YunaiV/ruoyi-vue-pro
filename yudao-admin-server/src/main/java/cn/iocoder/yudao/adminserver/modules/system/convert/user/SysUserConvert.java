@@ -7,6 +7,7 @@ import cn.iocoder.yudao.adminserver.modules.system.controller.user.vo.user.*;
 import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.dept.SysDeptDO;
 import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.dept.SysPostDO;
 import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.permission.SysRoleDO;
+import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.social.SysSocialUserDO;
 import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.user.SysUserDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
@@ -41,5 +42,7 @@ public interface SysUserConvert {
     SysUserDO convert(SysUserProfileUpdatePasswordReqVO bean);
 
     List<SysUserProfileRespVO.Post> convertList02(List<SysPostDO> list);
+
+    List<SysUserProfileRespVO.SocialUser> convertList03(List<SysSocialUserDO> list);
 
 }

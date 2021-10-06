@@ -34,7 +34,7 @@ public class YudaoSecurityAutoConfiguration {
     private SecurityProperties securityProperties;
 
     /**
-     * 处理用户未登陆拦截的切面的 Bean
+     * 处理用户未登录拦截的切面的 Bean
      */
     @Bean
     public PreAuthenticatedAspect preAuthenticatedAspect() {

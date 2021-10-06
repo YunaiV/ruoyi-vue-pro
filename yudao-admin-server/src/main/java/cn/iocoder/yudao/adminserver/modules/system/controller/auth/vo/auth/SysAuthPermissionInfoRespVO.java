@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.Set;
 
-@ApiModel(value = "登陆用户的权限信息 Response VO", description = "额外包括用户信息和角色列表")
+@ApiModel(value = "登录用户的权限信息 Response VO", description = "额外包括用户信息和角色列表")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

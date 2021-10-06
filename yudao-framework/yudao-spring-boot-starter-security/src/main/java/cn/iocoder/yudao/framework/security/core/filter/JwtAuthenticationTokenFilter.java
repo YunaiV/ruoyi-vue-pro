@@ -63,7 +63,7 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
     }
 
     /**
-     * 模拟登陆用户，方便日常开发调试
+     * 模拟登录用户，方便日常开发调试
      *
      * 注意，在线上环境下，一定要关闭该功能！！！
      *

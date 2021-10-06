@@ -39,15 +39,15 @@ export function getCodeImg() {
   })
 }
 
-// 社交登陆的跳转
-export function socialLoginRedirect(type, redirectUri) {
+// 社交授权的跳转
+export function socialAuthRedirect(type, redirectUri) {
   return request({
-    url: '/social-login-redirect?type=' + type + '&redirectUri=' + redirectUri,
+    url: '/social-auth-redirect?type=' + type + '&redirectUri=' + redirectUri,
     method: 'get'
   })
 }
 
-// 社交登陆，使用 code 授权码
+// 社交登录，使用 code 授权码
 export function socialLogin(type, code, state) {
   return request({
     url: '/social-login',
@@ -60,7 +60,7 @@ export function socialLogin(type, code, state) {
   })
 }
 
-// 社交登陆，使用 code 授权码 + + 账号密码
+// 社交登录，使用 code 授权码 + + 账号密码
 export function socialLogin2(type, code, state, username, password) {
   return request({
     url: '/social-login2',

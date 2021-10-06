@@ -41,7 +41,7 @@ public class SysSmsServiceIntegrationTest extends BaseDbAndRedisIntegrationTest 
         Integer userType = UserTypeEnum.ADMIN.getValue();
         String templateCode = "test_01";
         Map<String, Object> templateParams = MapUtil.<String, Object>builder()
-                .put("operation", "登陆").put("code", "1234").build();
+                .put("operation", "登录").put("code", "1234").build();
         // 调用
         smsService.sendSingleSms(mobile, userId, userType, templateCode, templateParams);
 

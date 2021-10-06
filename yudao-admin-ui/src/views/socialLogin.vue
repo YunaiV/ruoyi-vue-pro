@@ -51,7 +51,7 @@ export default {
       },
       loading: false,
       redirect: undefined,
-      // 社交登陆相关
+      // 社交登录相关
       type: undefined,
       code: undefined,
       state: undefined,
@@ -70,7 +70,7 @@ export default {
     // 重定向地址
     this.redirect = this.$route.query.redirect;
     debugger
-    // 社交登陆相关
+    // 社交登录相关
     this.type = this.$route.query.type;
     this.code = this.$route.query.code;
     this.state = this.$route.query.state;

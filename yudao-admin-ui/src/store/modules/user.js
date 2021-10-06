@@ -47,7 +47,7 @@ const user = {
       })
     },
 
-    // 社交登陆
+    // 社交登录
     SocialLogin({ commit }, userInfo) {
       const code = userInfo.code
       const state = userInfo.state
@@ -64,7 +64,7 @@ const user = {
       })
     },
 
-    // 社交登陆
+    // 社交登录
     SocialLogin2({ commit }, userInfo) {
       const code = userInfo.code
       const state = userInfo.state

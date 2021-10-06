@@ -12,8 +12,8 @@ public interface SysDictTypeConstants {
 
     String USER_SEX = "sys_user_sex"; // 用户性别
     String OPERATE_TYPE = "sys_operate_type"; // 操作类型
-    String LOGIN_TYPE = "sys_login_type"; // 登陆日志的类型
-    String LOGIN_RESULT = "sys_login_result"; // 登陆结果
+    String LOGIN_TYPE = "sys_login_type"; // 登录日志的类型
+    String LOGIN_RESULT = "sys_login_result"; // 登录结果
     String CONFIG_TYPE = "sys_config_type"; // 参数配置类型
     String BOOLEAN_STRING = "sys_boolean_string"; // Boolean 是否类型
 

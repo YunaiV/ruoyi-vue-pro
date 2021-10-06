@@ -5,7 +5,7 @@ import cn.iocoder.yudao.framework.security.core.service.SecurityAuthFrameworkSer
 /**
  * 认证 Service 接口
  *
- * 提供用户的账号密码登陆、token 的校验等认证相关的功能
+ * 提供用户的账号密码登录、token 的校验等认证相关的功能
  *
  * @author 芋道源码
  */

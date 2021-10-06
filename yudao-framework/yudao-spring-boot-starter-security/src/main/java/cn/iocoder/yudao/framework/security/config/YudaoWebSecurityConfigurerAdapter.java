@@ -131,7 +131,7 @@ public class YudaoWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdap
 
         // 设置每个请求的权限 ①：全局共享规则
         httpSecurity.authorizeRequests()
-                    // 登陆的接口，可匿名访问
+                    // 登录的接口，可匿名访问
                     .antMatchers(api("/login")).anonymous()
                     // 静态资源，可匿名访问
                     .antMatchers(HttpMethod.GET, "/*.html", "/**/*.html", "/**/*.css", "/**/*.js").permitAll()

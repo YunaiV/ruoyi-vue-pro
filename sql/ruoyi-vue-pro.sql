@@ -299,12 +299,12 @@ INSERT INTO `sys_dict_data` VALUES (35, 2, '指定部门数据权限', '2', 'sys
 INSERT INTO `sys_dict_data` VALUES (36, 3, '本部门数据权限', '3', 'sys_data_scope', 0, '本部门数据权限', 'admin', '2021-01-05 17:03:48', '', '2021-01-06 19:38:29', b'0');
 INSERT INTO `sys_dict_data` VALUES (37, 4, '本部门及以下数据权限', '4', 'sys_data_scope', 0, '本部门及以下数据权限', 'admin', '2021-01-05 17:03:48', '', '2021-01-06 19:38:32', b'0');
 INSERT INTO `sys_dict_data` VALUES (38, 5, '仅本人数据权限', '5', 'sys_data_scope', 0, '仅本人数据权限', 'admin', '2021-01-05 17:03:48', '', '2021-01-06 19:38:38', b'0');
-INSERT INTO `sys_dict_data` VALUES (39, 0, '成功', '0', 'sys_login_result', 0, '登陆结果 - 成功', '', '2021-01-18 06:17:36', '', '2021-01-18 06:17:36', b'0');
-INSERT INTO `sys_dict_data` VALUES (40, 10, '账号或密码不正确', '10', 'sys_login_result', 0, '登陆结果 - 账号或密码不正确', '', '2021-01-18 06:17:54', '', '2021-01-18 06:17:54', b'0');
-INSERT INTO `sys_dict_data` VALUES (41, 20, '用户被禁用', '20', 'sys_login_result', 0, '登陆结果 - 用户被禁用', '', '2021-01-18 06:17:54', '', '2021-01-18 06:19:02', b'0');
-INSERT INTO `sys_dict_data` VALUES (42, 30, '验证码不存在', '30', 'sys_login_result', 0, '登陆结果 - 验证码不存在', '', '2021-01-18 06:17:54', '', '2021-01-18 06:19:24', b'0');
-INSERT INTO `sys_dict_data` VALUES (43, 31, '验证码不正确', '31', 'sys_login_result', 0, '登陆结果 - 验证码不正确', '', '2021-01-18 06:17:54', '', '2021-01-18 06:19:33', b'0');
-INSERT INTO `sys_dict_data` VALUES (44, 100, '未知异常', '100', 'sys_login_result', 0, '登陆结果 - 未知异常', '', '2021-01-18 06:17:54', '', '2021-01-18 06:19:57', b'0');
+INSERT INTO `sys_dict_data` VALUES (39, 0, '成功', '0', 'sys_login_result', 0, '登录结果 - 成功', '', '2021-01-18 06:17:36', '', '2021-01-18 06:17:36', b'0');
+INSERT INTO `sys_dict_data` VALUES (40, 10, '账号或密码不正确', '10', 'sys_login_result', 0, '登录结果 - 账号或密码不正确', '', '2021-01-18 06:17:54', '', '2021-01-18 06:17:54', b'0');
+INSERT INTO `sys_dict_data` VALUES (41, 20, '用户被禁用', '20', 'sys_login_result', 0, '登录结果 - 用户被禁用', '', '2021-01-18 06:17:54', '', '2021-01-18 06:19:02', b'0');
+INSERT INTO `sys_dict_data` VALUES (42, 30, '验证码不存在', '30', 'sys_login_result', 0, '登录结果 - 验证码不存在', '', '2021-01-18 06:17:54', '', '2021-01-18 06:19:24', b'0');
+INSERT INTO `sys_dict_data` VALUES (43, 31, '验证码不正确', '31', 'sys_login_result', 0, '登录结果 - 验证码不正确', '', '2021-01-18 06:17:54', '', '2021-01-18 06:19:33', b'0');
+INSERT INTO `sys_dict_data` VALUES (44, 100, '未知异常', '100', 'sys_login_result', 0, '登录结果 - 未知异常', '', '2021-01-18 06:17:54', '', '2021-01-18 06:19:57', b'0');
 INSERT INTO `sys_dict_data` VALUES (45, 1, '是', 'true', 'sys_boolean_string', 0, 'Boolean 是否类型 - 是', '', '2021-01-19 03:20:55', '', '2021-01-19 03:21:08', b'0');
 INSERT INTO `sys_dict_data` VALUES (46, 1, '否', 'false', 'sys_boolean_string', 0, 'Boolean 是否类型 - 否', '', '2021-01-19 03:20:55', '', '2021-01-19 03:21:39', b'0');
 INSERT INTO `sys_dict_data` VALUES (47, 1, '永不超时', '1', 'inf_redis_timeout_type', 0, 'Redis 未设置超时的情况', '', '2021-01-26 00:53:17', '', '2021-01-26 00:53:17', b'0');
@@ -380,7 +380,7 @@ INSERT INTO `sys_dict_type` VALUES (8, '通知状态', 'sys_notice_status', 0, N
 INSERT INTO `sys_dict_type` VALUES (9, '操作类型', 'sys_oper_type', 0, NULL, 'admin', '2021-01-05 17:03:48', '', '2021-01-05 17:03:48', b'0');
 INSERT INTO `sys_dict_type` VALUES (10, '系统状态', 'sys_common_status', 0, NULL, 'admin', '2021-01-05 17:03:48', '', '2021-01-05 17:03:48', b'0');
 INSERT INTO `sys_dict_type` VALUES (11, 'Boolean 是否类型', 'sys_boolean_string', 0, 'boolean 转是否', '', '2021-01-19 03:20:08', '', '2021-01-19 03:20:08', b'0');
-INSERT INTO `sys_dict_type` VALUES (104, '登陆结果', 'sys_login_result', 0, '登陆结果', '', '2021-01-18 06:17:11', '', '2021-01-18 06:17:11', b'0');
+INSERT INTO `sys_dict_type` VALUES (104, '登录结果', 'sys_login_result', 0, '登录结果', '', '2021-01-18 06:17:11', '', '2021-01-18 06:17:11', b'0');
 INSERT INTO `sys_dict_type` VALUES (105, 'Redis 超时类型', 'inf_redis_timeout_type', 0, 'RedisKeyDefine.TimeoutTypeEnum', '', '2021-01-26 00:52:50', '', '2021-01-26 00:52:50', b'0');
 INSERT INTO `sys_dict_type` VALUES (106, '代码生成模板类型', 'tool_codegen_template_type', 0, NULL, '', '2021-02-05 07:08:06', '', '2021-02-05 07:08:06', b'0');
 INSERT INTO `sys_dict_type` VALUES (107, '定时任务状态', 'inf_job_status', 0, NULL, '', '2021-02-07 07:44:16', '', '2021-02-07 07:44:16', b'0');
@@ -392,7 +392,7 @@ INSERT INTO `sys_dict_type` VALUES (112, '短信模板的类型', 'sys_sms_templ
 INSERT INTO `sys_dict_type` VALUES (113, '短信发送状态', 'sys_sms_send_status', 0, NULL, '1', '2021-04-11 20:18:03', '1', '2021-04-11 09:30:02', b'0');
 INSERT INTO `sys_dict_type` VALUES (114, '短信接收状态', 'sys_sms_receive_status', 0, NULL, '1', '2021-04-11 20:27:14', '1', '2021-04-11 20:27:14', b'0');
 INSERT INTO `sys_dict_type` VALUES (115, '错误码的类型', 'sys_error_code_type', 0, NULL, '1', '2021-04-21 00:06:30', '1', '2021-04-13 22:07:12', b'0');
-INSERT INTO `sys_dict_type` VALUES (116, '登陆日志的类型', 'sys_login_type', 0, '登陆日志的类型', '1', '2021-10-06 00:50:46', '1', '2021-10-06 00:50:46', b'0');
+INSERT INTO `sys_dict_type` VALUES (116, '登录日志的类型', 'sys_login_type', 0, '登录日志的类型', '1', '2021-10-06 00:50:46', '1', '2021-10-06 00:50:46', b'0');
 COMMIT;
 
 -- ----------------------------
@@ -511,7 +511,7 @@ CREATE TABLE `sys_login_log` (
   `user_id` bigint NOT NULL DEFAULT '0' COMMENT '用户编号',
   `user_type` tinyint NOT NULL DEFAULT '0' COMMENT '用户类型',
   `username` varchar(50) NOT NULL DEFAULT '' COMMENT '用户账号',
-  `result` tinyint NOT NULL COMMENT '登陆结果',
+  `result` tinyint NOT NULL COMMENT '登录结果',
   `user_ip` varchar(50) NOT NULL COMMENT '用户 IP',
   `user_agent` varchar(512) NOT NULL COMMENT '浏览器 UA',
   `creator` varchar(64) DEFAULT '' COMMENT '创建者',

@@ -17,7 +17,7 @@ import javax.annotation.Resource;
 import java.util.List;
 
 /**
- * 登陆日志 Service 实现
+ * 登录日志 Service 实现
  */
 @Service
 public class SysLoginLogServiceImpl implements SysLoginLogService {

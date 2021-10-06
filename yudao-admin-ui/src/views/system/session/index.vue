@@ -17,7 +17,7 @@
       <el-table-column label="会话编号" align="center" prop="id" width="300" />
       <el-table-column label="登录名称" align="center" prop="username" width="100" />
       <el-table-column label="部门名称" align="center" prop="deptName" width="100" />
-      <el-table-column label="登陆地址" align="center" prop="userIp" width="100" />
+      <el-table-column label="登录地址" align="center" prop="userIp" width="100" />
       <el-table-column label="userAgent" align="center" prop="userAgent" :show-overflow-tooltip="true" />
       <el-table-column label="登录时间" align="center" prop="createTime" width="180">
         <template slot-scope="scope">

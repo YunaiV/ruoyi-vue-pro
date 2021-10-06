@@ -45,7 +45,7 @@
 </template>
 
 <script>
-import { getCodeImg,socialLoginRedirect } from "@/api/login";
+import { getCodeImg,socialAuthRedirect } from "@/api/login";
 import Cookies from "js-cookie";
 import { encrypt, decrypt } from '@/utils/jsencrypt'
 import {InfApiErrorLogProcessStatusEnum, SysUserSocialTypeEnum} from "@/utils/constants";
@@ -133,14 +133,14 @@ export default {
     },
     doSocialLogin(socialTypeEnum) {
       // console.log("开始Oauth登录...%o", socialTypeEnum.code);
-      // 设置登陆中
+      // 设置登录中
       this.loading = true;
       // 计算 redirectUri
       const redirectUri = location.origin + '/social-login?type=' + socialTypeEnum.type + '&redirect=' + (this.redirect || "/"); // 重定向不能丢
       // const redirectUri = 'http://127.0.0.1:48080/api/gitee/callback';
       // const redirectUri = 'http://127.0.0.1:48080/api/dingtalk/callback';
       // 进行跳转
-      socialLoginRedirect(socialTypeEnum.type, encodeURIComponent(redirectUri)).then((res) => {
+      socialAuthRedirect(socialTypeEnum.type, encodeURIComponent(redirectUri)).then((res) => {
         // console.log(res.url);
         window.location.href = res.data;
       });

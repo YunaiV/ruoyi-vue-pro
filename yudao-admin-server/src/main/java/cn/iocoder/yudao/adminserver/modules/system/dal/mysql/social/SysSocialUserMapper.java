@@ -21,4 +21,8 @@ public interface SysSocialUserMapper extends BaseMapperX<SysSocialUserDO> {
                 .in("type", types).eq("user_id", userId));
     }
 
+    default List<SysSocialUserDO> selectListByUserId(Integer userType, Long userId) {
+        return selectList(new QueryWrapper<SysSocialUserDO>().eq("user_type", userType).eq("user_id", userId));
+    }
+
 }

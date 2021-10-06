@@ -127,11 +127,11 @@
 
 | 模块 | biu |  biu | biu |
 | --- | --- | --- | --- |
-| 登陆 & 首页 | ![登录](https://static.iocoder.cn/images/ruoyi-vue-pro/登录.jpg) | ![首页](https://static.iocoder.cn/images/ruoyi-vue-pro/首页.jpg) | ![个人中心](https://static.iocoder.cn/images/ruoyi-vue-pro/个人中心.jpg) |
+| 登录 & 首页 | ![登录](https://static.iocoder.cn/images/ruoyi-vue-pro/登录.jpg) | ![首页](https://static.iocoder.cn/images/ruoyi-vue-pro/首页.jpg) | ![个人中心](https://static.iocoder.cn/images/ruoyi-vue-pro/个人中心.jpg) |
 | 用户 | ![用户管理](https://static.iocoder.cn/images/ruoyi-vue-pro/用户管理.jpg) | ![在线用户](https://static.iocoder.cn/images/ruoyi-vue-pro/在线用户.jpg) | - |
 | 部门 & 岗位 | ![部门管理](https://static.iocoder.cn/images/ruoyi-vue-pro/部门管理.jpg) | ![岗位管理](https://static.iocoder.cn/images/ruoyi-vue-pro/岗位管理.jpg) | - |
 | 菜单 & 角色 | ![菜单管理](https://static.iocoder.cn/images/ruoyi-vue-pro/菜单管理.jpg) | ![角色管理](https://static.iocoder.cn/images/ruoyi-vue-pro/角色管理.jpg) | - |
-| 审计日志 | ![操作日志](https://static.iocoder.cn/images/ruoyi-vue-pro/操作日志.jpg) | ![登陆日志](https://static.iocoder.cn/images/ruoyi-vue-pro/登陆日志.jpg) | - |
+| 审计日志 | ![操作日志](https://static.iocoder.cn/images/ruoyi-vue-pro/操作日志.jpg) | ![登录日志](https://static.iocoder.cn/images/ruoyi-vue-pro/登录日志.jpg) | - |
 | 短信 | ![短信渠道](https://static.iocoder.cn/images/ruoyi-vue-pro/短信渠道.jpg) | ![短信模板](https://static.iocoder.cn/images/ruoyi-vue-pro/短信模板.jpg) | ![短信日志](https://static.iocoder.cn/images/ruoyi-vue-pro/短信日志.jpg) |
 | 字典 | ![字典类型](https://static.iocoder.cn/images/ruoyi-vue-pro/字典类型.jpg) | ![字典数据](https://static.iocoder.cn/images/ruoyi-vue-pro/字典数据.jpg) | - |
 | 错误码 & 通知 | ![错误码管理](https://static.iocoder.cn/images/ruoyi-vue-pro/错误码管理.jpg) | ![通知公告](https://static.iocoder.cn/images/ruoyi-vue-pro/通知公告.jpg) | - |

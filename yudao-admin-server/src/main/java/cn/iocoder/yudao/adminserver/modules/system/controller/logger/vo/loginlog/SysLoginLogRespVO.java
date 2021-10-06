@@ -9,7 +9,7 @@ import lombok.ToString;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 
-@ApiModel("登陆日志 Response VO")
+@ApiModel("登录日志 Response VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
@@ -26,7 +26,7 @@ public class SysLoginLogRespVO extends SysLoginLogBaseVO {
     @NotNull(message = "用户类型不能为空")
     private Integer userType;
 
-    @ApiModelProperty(value = "登陆时间", required = true)
+    @ApiModelProperty(value = "登录时间", required = true)
     private Date createTime;
 
 }

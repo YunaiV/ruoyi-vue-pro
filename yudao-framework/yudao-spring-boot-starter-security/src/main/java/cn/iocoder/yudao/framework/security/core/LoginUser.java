@@ -12,7 +12,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * 登陆用户信息
+ * 登录用户信息
  *
  * @author 芋道源码
  */

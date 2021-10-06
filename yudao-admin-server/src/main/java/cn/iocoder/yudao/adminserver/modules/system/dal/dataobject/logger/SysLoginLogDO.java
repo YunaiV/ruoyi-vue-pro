@@ -10,9 +10,9 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 /**
- * 登陆日志表
+ * 登录日志表
  *
- * 注意，包括登陆和登出两种行为
+ * 注意，包括登录和登出两种行为
  *
  * @author ruoyi
  */
@@ -53,7 +53,7 @@ public class SysLoginLogDO extends BaseDO {
      */
     private String username;
     /**
-     * 登陆结果
+     * 登录结果
      *
      * 枚举 {@link SysLoginResultEnum}
      */

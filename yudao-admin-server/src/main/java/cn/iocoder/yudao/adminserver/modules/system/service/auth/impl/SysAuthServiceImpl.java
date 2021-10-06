@@ -2,6 +2,7 @@ package cn.iocoder.yudao.adminserver.modules.system.service.auth.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.adminserver.modules.system.controller.auth.vo.auth.SysAuthLoginReqVO;
+import cn.iocoder.yudao.adminserver.modules.system.controller.auth.vo.auth.SysAuthSocialBindReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.auth.vo.auth.SysAuthSocialLogin2ReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.auth.vo.auth.SysAuthSocialLoginReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.logger.vo.loginlog.SysLoginLogCreateReqVO;
@@ -18,7 +19,6 @@ import cn.iocoder.yudao.adminserver.modules.system.service.permission.SysPermiss
 import cn.iocoder.yudao.adminserver.modules.system.service.social.SysSocialService;
 import cn.iocoder.yudao.adminserver.modules.system.service.user.SysUserService;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
-import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.framework.common.util.monitor.TracerUtils;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
@@ -101,11 +101,11 @@ public class SysAuthServiceImpl implements SysAuthService {
         // 判断验证码是否正确
         this.verifyCaptcha(reqVO.getUsername(), reqVO.getUuid(), reqVO.getCode());
 
-        // 使用账号密码，进行登陆。
+        // 使用账号密码，进行登录。
         LoginUser loginUser = this.login0(reqVO.getUsername(), reqVO.getPassword());
         loginUser.setRoleIds(this.getUserRoleIds(loginUser.getId())); // 获取用户角色列表
 
-        // 缓存登陆用户到 Redis 中，返回 sessionId 编号
+        // 缓存登录用户到 Redis 中，返回 sessionId 编号
         return userSessionService.createUserSession(loginUser, userIp, userAgent);
     }
 
@@ -114,13 +114,13 @@ public class SysAuthServiceImpl implements SysAuthService {
         String code = captchaService.getCaptchaCode(captchaUUID);
         // 验证码不存在
         if (code == null) {
-            // 创建登陆失败日志（验证码不存在）
+            // 创建登录失败日志（验证码不存在）
             this.createLoginLog(username, logTypeEnum, SysLoginResultEnum.CAPTCHA_NOT_FOUND);
             throw exception(AUTH_LOGIN_CAPTCHA_NOT_FOUND);
         }
         // 验证码不正确
         if (!code.equals(captchaCode)) {
-            // 创建登陆失败日志（验证码不正确)
+            // 创建登录失败日志（验证码不正确)
             this.createLoginLog(username, logTypeEnum, SysLoginResultEnum.CAPTCHA_CODE_ERROR);
             throw exception(AUTH_LOGIN_CAPTCHA_CODE_ERROR);
         }
@@ -147,7 +147,7 @@ public class SysAuthServiceImpl implements SysAuthService {
             this.createLoginLog(username, logTypeEnum, SysLoginResultEnum.UNKNOWN_ERROR);
             throw exception(AUTH_LOGIN_FAIL_UNKNOWN);
         }
-        // 登陆成功的日志
+        // 登录成功的日志
         Assert.notNull(authentication.getPrincipal(), "Principal 不会为空");
         this.createLoginLog(username, logTypeEnum, SysLoginResultEnum.SUCCESS);
         return (LoginUser) authentication.getPrincipal();
@@ -176,18 +176,18 @@ public class SysAuthServiceImpl implements SysAuthService {
 
     @Override
     public String socialLogin(SysAuthSocialLoginReqVO reqVO, String userIp, String userAgent) {
-        // 使用 code 授权码，进行登陆
+        // 使用 code 授权码，进行登录
         AuthUser authUser = socialService.getAuthUser(reqVO.getType(), reqVO.getCode(), reqVO.getState());
         Assert.notNull(authUser, "授权用户不为空");
 
-        // 如果未绑定 SysSocialUserDO 用户，则无法自动登陆，进行报错
+        // 如果未绑定 SysSocialUserDO 用户，则无法自动登录，进行报错
         String unionId = socialService.getAuthUserUnionId(authUser);
         List<SysSocialUserDO> socialUsers = socialService.getAllSocialUserList(reqVO.getType(), unionId);
         if (CollUtil.isEmpty(socialUsers)) {
             throw exception(AUTH_THIRD_LOGIN_NOT_BIND);
         }
 
-        // 自动登陆
+        // 自动登录
         SysUserDO user = userService.getUser(socialUsers.get(0).getUserId());
         if (user == null) {
             throw exception(USER_NOT_EXISTS);
@@ -196,31 +196,41 @@ public class SysAuthServiceImpl implements SysAuthService {
 
         // 创建 LoginUser 对象
         LoginUser loginUser = SysAuthConvert.INSTANCE.convert(user);
-        // TODO 芋艿：需要改造下，增加各种登陆方式
+        // TODO 芋艿：需要改造下，增加各种登录方式
         loginUser.setRoleIds(this.getUserRoleIds(loginUser.getId())); // 获取用户角色列表
 
         // 绑定社交用户（更新）
         socialService.bindSocialUser(loginUser.getId(), reqVO.getType(), authUser);
 
-        // 缓存登陆用户到 Redis 中，返回 sessionId 编号
+        // 缓存登录用户到 Redis 中，返回 sessionId 编号
         return userSessionService.createUserSession(loginUser, userIp, userAgent);
     }
 
     @Override
     public String socialLogin2(SysAuthSocialLogin2ReqVO reqVO, String userIp, String userAgent) {
-        // 使用 code 授权码，进行登陆
+        // 使用 code 授权码，进行登录
         AuthUser authUser = socialService.getAuthUser(reqVO.getType(), reqVO.getCode(), reqVO.getState());
         Assert.notNull(authUser, "授权用户不为空");
 
-        // 使用账号密码，进行登陆。
+        // 使用账号密码，进行登录。
         LoginUser loginUser = this.login0(reqVO.getUsername(), reqVO.getPassword());
         loginUser.setRoleIds(this.getUserRoleIds(loginUser.getId())); // 获取用户角色列表
 
         // 绑定社交用户（新增）
         socialService.bindSocialUser(loginUser.getId(), reqVO.getType(), authUser);
 
-        // 缓存登陆用户到 Redis 中，返回 sessionId 编号
+        // 缓存登录用户到 Redis 中，返回 sessionId 编号
         return userSessionService.createUserSession(loginUser, userIp, userAgent);
+    }
+
+    @Override
+    public void socialBind(Long userId, SysAuthSocialBindReqVO reqVO) {
+        // 使用 code 授权码，进行登录
+        AuthUser authUser = socialService.getAuthUser(reqVO.getType(), reqVO.getCode(), reqVO.getState());
+        Assert.notNull(authUser, "授权用户不为空");
+
+        // 绑定社交用户（新增）
+        socialService.bindSocialUser(userId, reqVO.getType(), authUser);
     }
 
     @Override
@@ -269,7 +279,7 @@ public class SysAuthServiceImpl implements SysAuthService {
         // 重新加载 SysUserDO 信息
         SysUserDO user = userService.getUser(loginUser.getId());
         if (user == null || CommonStatusEnum.DISABLE.getStatus().equals(user.getStatus())) {
-            throw exception(TOKEN_EXPIRED); // 校验 token 时，用户被禁用的情况下，也认为 token 过期，方便前端跳转到登陆界面
+            throw exception(TOKEN_EXPIRED); // 校验 token 时，用户被禁用的情况下，也认为 token 过期，方便前端跳转到登录界面
         }
 
         // 刷新 LoginUser 缓存
