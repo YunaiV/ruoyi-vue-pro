@@ -1,11 +1,8 @@
 package cn.iocoder.yudao.framework.security.config;
 
-import cn.iocoder.yudao.framework.security.core.filter.JwtAuthenticationTokenFilter;
-import cn.iocoder.yudao.framework.security.core.handler.AbstractSignUpUrlAuthenticationSuccessHandler;
+import cn.iocoder.yudao.framework.security.core.filter.JWTAuthenticationTokenFilter;
 import cn.iocoder.yudao.framework.security.core.service.SecurityAuthFrameworkService;
 import cn.iocoder.yudao.framework.web.config.WebProperties;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,7 +18,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.access.AccessDeniedHandler;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 
@@ -68,7 +64,7 @@ public class YudaoWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdap
      * Token 认证过滤器 Bean
      */
     @Resource
-    private JwtAuthenticationTokenFilter authenticationTokenFilter;
+    private JWTAuthenticationTokenFilter authenticationTokenFilter;
     /**
      * 自定义的权限映射 Bean
      *
@@ -154,11 +150,10 @@ public class YudaoWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdap
                 // 设置每个请求的权限 ②：每个项目的自定义规则
                 .and().authorizeRequests(authorizeRequestsCustomizer)
                 // 设置每个请求的权限 ③：兜底规则，必须认证
-//                .authorizeRequests().anyRequest().authenticated()
+                .authorizeRequests().anyRequest().authenticated()
         ;
         // 添加 JWT Filter
         httpSecurity.addFilterBefore(authenticationTokenFilter, UsernamePasswordAuthenticationFilter.class);
-
     }
 
     private String api(String url) {

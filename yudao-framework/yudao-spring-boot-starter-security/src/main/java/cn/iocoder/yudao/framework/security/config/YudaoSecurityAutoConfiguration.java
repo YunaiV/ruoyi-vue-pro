@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.framework.security.config;
 
 import cn.iocoder.yudao.framework.security.core.aop.PreAuthenticatedAspect;
-import cn.iocoder.yudao.framework.security.core.filter.JwtAuthenticationTokenFilter;
+import cn.iocoder.yudao.framework.security.core.filter.JWTAuthenticationTokenFilter;
 import cn.iocoder.yudao.framework.security.core.handler.AccessDeniedHandlerImpl;
 import cn.iocoder.yudao.framework.security.core.handler.AuthenticationEntryPointImpl;
 import cn.iocoder.yudao.framework.security.core.handler.LogoutSuccessHandlerImpl;
@@ -80,9 +80,9 @@ public class YudaoSecurityAutoConfiguration {
      * Token 认证过滤器 Bean
      */
     @Bean
-    public JwtAuthenticationTokenFilter authenticationTokenFilter(SecurityAuthFrameworkService securityFrameworkService,
+    public JWTAuthenticationTokenFilter authenticationTokenFilter(SecurityAuthFrameworkService securityFrameworkService,
                                                                   GlobalExceptionHandler globalExceptionHandler) {
-        return new JwtAuthenticationTokenFilter(securityProperties, securityFrameworkService, globalExceptionHandler);
+        return new JWTAuthenticationTokenFilter(securityProperties, securityFrameworkService, globalExceptionHandler);
     }
 
 }
