@@ -107,7 +107,7 @@ public class SysSocialServiceImpl implements SysSocialService {
         // 逻辑三：如果 authUser 不存在于 socialUsers 中，则进行新增；否则，进行更新
         SysSocialUserDO socialUser = CollUtil.findOneByField(socialUsers, "openid", authUser.getUuid());
         SysSocialUserDO saveSocialUser = SysSocialUserDO.builder() // 新增和更新的通用属性
-                .token(authUser.getToken().getAccessToken()).rawUserInfo(toJsonString(authUser.getToken()))
+                .token(authUser.getToken().getAccessToken()).rawTokenInfo(toJsonString(authUser.getToken()))
                 .nickname(authUser.getNickname()).avatar(authUser.getAvatar()).rawUserInfo(toJsonString(authUser.getRawUserInfo()))
                 .build();
         if (socialUser == null) {
@@ -129,7 +129,7 @@ public class SysSocialServiceImpl implements SysSocialService {
         }
         // 校验，是否解绑的是非自己的
         socialUsers.forEach(socialUser -> {
-            if (Objects.equals(socialUser.getUserId(), userId)) {
+            if (!Objects.equals(socialUser.getUserId(), userId)) {
                 throw exception(SOCIAL_UNBIND_NOT_SELF);
             }
         });

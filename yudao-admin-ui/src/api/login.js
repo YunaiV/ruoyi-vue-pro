@@ -74,3 +74,28 @@ export function socialLogin2(type, code, state, username, password) {
     }
   })
 }
+
+// 社交绑定，使用 code 授权码
+export function socialBind(type, code, state) {
+  return request({
+    url: '/social-bind',
+    method: 'post',
+    data: {
+      type,
+      code,
+      state,
+    }
+  })
+}
+
+// 取消社交绑定
+export function socialUnbind(type, unionId) {
+  return request({
+    url: '/social-unbind',
+    method: 'delete',
+    data: {
+      type,
+      unionId
+    }
+  })
+}

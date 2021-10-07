@@ -69,7 +69,6 @@ export default {
     this.getCookie();
     // 重定向地址
     this.redirect = this.$route.query.redirect;
-    debugger
     // 社交登录相关
     this.type = this.$route.query.type;
     this.code = this.$route.query.code;
