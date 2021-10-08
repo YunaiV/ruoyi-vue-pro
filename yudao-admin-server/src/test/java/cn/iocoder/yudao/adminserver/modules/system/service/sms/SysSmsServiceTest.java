@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.adminserver.modules.system.service.sms;
 
 import cn.hutool.core.map.MapUtil;
-import cn.iocoder.yudao.adminserver.BaseMockitoUnitTest;
 import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
@@ -14,6 +13,7 @@ import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.sms.SysSmsTemp
 import cn.iocoder.yudao.adminserver.modules.system.mq.message.sms.SysSmsSendMessage;
 import cn.iocoder.yudao.adminserver.modules.system.mq.producer.sms.SysSmsProducer;
 import cn.iocoder.yudao.adminserver.modules.system.service.sms.impl.SysSmsServiceImpl;
+import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;

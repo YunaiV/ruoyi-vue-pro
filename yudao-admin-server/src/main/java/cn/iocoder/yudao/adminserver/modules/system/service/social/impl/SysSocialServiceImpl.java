@@ -9,6 +9,7 @@ import cn.iocoder.yudao.adminserver.modules.system.service.social.SysSocialServi
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.http.HttpUtils;
+import com.google.common.annotations.VisibleForTesting;
 import com.xkcoding.justauth.AuthRequestFactory;
 import lombok.extern.slf4j.Slf4j;
 import me.zhyd.oauth.model.AuthCallback;
@@ -138,10 +139,11 @@ public class SysSocialServiceImpl implements SysSocialService {
         socialUserMapper.deleteBatchIds(CollectionUtils.convertSet(socialUsers, SysSocialUserDO::getId));
     }
 
-    private void unbindOldSocialUser(Long userId, Integer type, String newUnionId) {
+    @VisibleForTesting
+    public void unbindOldSocialUser(Long userId, Integer type, String newUnionId) {
         List<Integer> types = SysSocialTypeEnum.getRelationTypes(type);
-        List<SysSocialUserDO> oldSocialUsers = socialUserMapper.selectListByTypeAndUserId(UserTypeEnum.ADMIN.getValue(),
-                types, userId);
+        List<SysSocialUserDO> oldSocialUsers = socialUserMapper.selectListByTypeAndUserId(
+                UserTypeEnum.ADMIN.getValue(), types, userId);
         // 如果新老的 unionId 是一致的，说明无需解绑
         if (CollUtil.isEmpty(oldSocialUsers) || Objects.equals(newUnionId, oldSocialUsers.get(0).getUnionId())) {
             return;
