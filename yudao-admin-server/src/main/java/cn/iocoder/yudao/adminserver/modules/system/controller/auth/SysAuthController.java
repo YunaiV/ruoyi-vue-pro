@@ -1,13 +1,11 @@
 package cn.iocoder.yudao.adminserver.modules.system.controller.auth;
 
-import cn.hutool.json.JSONUtil;
 import cn.iocoder.yudao.adminserver.modules.system.controller.auth.vo.auth.*;
 import cn.iocoder.yudao.adminserver.modules.system.convert.auth.SysAuthConvert;
 import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.permission.SysMenuDO;
 import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.permission.SysRoleDO;
 import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.user.SysUserDO;
 import cn.iocoder.yudao.adminserver.modules.system.enums.permission.MenuTypeEnum;
-import cn.iocoder.yudao.adminserver.modules.system.enums.user.SysSocialTypeEnum;
 import cn.iocoder.yudao.adminserver.modules.system.service.auth.SysAuthService;
 import cn.iocoder.yudao.adminserver.modules.system.service.permission.SysPermissionService;
 import cn.iocoder.yudao.adminserver.modules.system.service.permission.SysRoleService;
@@ -16,19 +14,12 @@ import cn.iocoder.yudao.adminserver.modules.system.service.user.SysUserService;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.collection.SetUtils;
-import cn.iocoder.yudao.framework.common.util.http.HttpUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
-import com.xkcoding.justauth.AuthRequestFactory;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import me.zhyd.oauth.model.AuthCallback;
-import me.zhyd.oauth.model.AuthResponse;
-import me.zhyd.oauth.model.AuthUser;
-import me.zhyd.oauth.request.AuthRequest;
-import me.zhyd.oauth.utils.AuthStateUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 

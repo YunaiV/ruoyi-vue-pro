@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.userserver.modules.system.dict;
+package cn.iocoder.yudao.userserver.modules.system.service.dict;
 
 import cn.iocoder.yudao.framework.dict.core.service.DictDataFrameworkService;
 

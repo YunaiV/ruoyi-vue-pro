@@ -4,7 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.social.SysSocialUserDO;
 import cn.iocoder.yudao.adminserver.modules.system.dal.mysql.social.SysSocialUserMapper;
 import cn.iocoder.yudao.adminserver.modules.system.dal.redis.social.SysSocialAuthUserRedisDAO;
-import cn.iocoder.yudao.adminserver.modules.system.enums.user.SysSocialTypeEnum;
+import cn.iocoder.yudao.adminserver.modules.system.enums.social.SysSocialTypeEnum;
 import cn.iocoder.yudao.adminserver.modules.system.service.social.SysSocialService;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;

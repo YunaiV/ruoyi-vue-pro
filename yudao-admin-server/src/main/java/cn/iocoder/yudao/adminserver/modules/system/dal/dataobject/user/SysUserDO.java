@@ -14,7 +14,7 @@ import java.util.Date;
 import java.util.Set;
 
 /**
- * 用户 DO
+ * 管理后台的用户 DO
  *
  * @author ruoyi
  */
