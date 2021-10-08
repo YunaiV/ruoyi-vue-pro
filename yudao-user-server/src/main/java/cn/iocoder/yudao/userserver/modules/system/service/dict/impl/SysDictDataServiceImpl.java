@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.userserver.modules.system.dict.impl;
+package cn.iocoder.yudao.userserver.modules.system.service.dict.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.dict.core.dto.DictDataRespDTO;
@@ -6,7 +6,7 @@ import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.userserver.modules.system.convert.dict.SysDictDataConvert;
 import cn.iocoder.yudao.userserver.modules.system.dal.dataobject.dict.SysDictDataDO;
 import cn.iocoder.yudao.userserver.modules.system.dal.mysql.dict.SysDictDataMapper;
-import cn.iocoder.yudao.userserver.modules.system.dict.SysDictDataService;
+import cn.iocoder.yudao.userserver.modules.system.service.dict.SysDictDataService;
 import com.google.common.collect.ImmutableTable;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;

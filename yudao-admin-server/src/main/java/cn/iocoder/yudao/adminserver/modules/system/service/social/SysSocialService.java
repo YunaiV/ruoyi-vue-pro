@@ -2,9 +2,8 @@ package cn.iocoder.yudao.adminserver.modules.system.service.social;
 
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.social.SysSocialUserDO;
-import cn.iocoder.yudao.adminserver.modules.system.enums.user.SysSocialTypeEnum;
+import cn.iocoder.yudao.adminserver.modules.system.enums.social.SysSocialTypeEnum;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
-import io.swagger.models.auth.In;
 import me.zhyd.oauth.model.AuthUser;
 
 import javax.validation.constraints.NotNull;

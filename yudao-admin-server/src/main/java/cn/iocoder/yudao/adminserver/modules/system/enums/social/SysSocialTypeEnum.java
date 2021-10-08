@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.adminserver.modules.system.enums.user;
+package cn.iocoder.yudao.adminserver.modules.system.enums.social;
 
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.ArrayUtil;
