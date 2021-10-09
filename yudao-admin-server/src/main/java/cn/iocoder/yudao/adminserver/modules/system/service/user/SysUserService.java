@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 用户 Service 接口
+ * 后台用户 Service 接口
  *
  * @author 芋道源码
  */

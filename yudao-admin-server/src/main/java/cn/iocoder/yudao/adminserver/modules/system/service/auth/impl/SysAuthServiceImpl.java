@@ -38,6 +38,7 @@ import org.springframework.util.Assert;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import static cn.iocoder.yudao.adminserver.modules.system.enums.SysErrorCodeConstants.*;
@@ -154,14 +155,24 @@ public class SysAuthServiceImpl implements SysAuthService {
     }
 
     private void createLoginLog(String username, SysLoginLogTypeEnum logTypeEnum, SysLoginResultEnum loginResult) {
+        // 获得用户
+        SysUserDO user = userService.getUserByUsername(username);
+        // 插入登录日志
         SysLoginLogCreateReqVO reqVO = new SysLoginLogCreateReqVO();
         reqVO.setLogType(logTypeEnum.getType());
         reqVO.setTraceId(TracerUtils.getTraceId());
+        if (user != null) {
+            reqVO.setUserId(user.getId());
+        }
         reqVO.setUsername(username);
         reqVO.setUserAgent(ServletUtils.getUserAgent());
         reqVO.setUserIp(ServletUtils.getClientIP());
         reqVO.setResult(loginResult.getResult());
         loginLogService.createLoginLog(reqVO);
+        // 更新最后登录时间
+        if (user != null && Objects.equals(SysLoginResultEnum.SUCCESS.getResult(), loginResult.getResult())) {
+
+        }
     }
 
     /**

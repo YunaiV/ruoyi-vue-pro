@@ -24,7 +24,7 @@ public class LoginUser implements UserDetails {
      */
     private Long id;
     /**
-     * 科室编号
+     * 部门编号
      */
     private Long deptId;
     /**
@@ -48,6 +48,8 @@ public class LoginUser implements UserDetails {
      * 状态
      */
     private Integer status;
+
+    // TODO @芋艿：怎么去掉 deptId
 
     @Override
     @JsonIgnore// 避免序列化

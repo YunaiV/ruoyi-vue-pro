@@ -2,6 +2,7 @@ package cn.iocoder.yudao.userserver.modules.member.controller.auth;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.userserver.modules.member.controller.auth.vo.*;
+import cn.iocoder.yudao.userserver.modules.member.service.auth.MbrAuthService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -10,7 +11,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import javax.validation.Valid;
+
+import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getClientIP;
+import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getUserAgent;
 
 @Api(tags = "认证")
 @RestController
@@ -19,13 +25,15 @@ import javax.validation.Valid;
 @Slf4j
 public class MbrAuthController {
 
+    @Resource
+    private MbrAuthService authService;
+
     @PostMapping("/login")
     @ApiOperation("使用手机 + 密码登录")
     public CommonResult<MbrAuthLoginRespVO> login(@RequestBody @Valid MbrAuthLoginReqVO reqVO) {
-//        String token = authService.login(reqVO, getClientIP(), getUserAgent());
-//        // 返回结果
-//        return success(MbrAuthLoginRespVO.builder().token(token).build());
-        return null;
+        String token = authService.login(reqVO, getClientIP(), getUserAgent());
+        // 返回结果
+        return success(MbrAuthLoginRespVO.builder().token(token).build());
     }
 
     @PostMapping("/sms-login")

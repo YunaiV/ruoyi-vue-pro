@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.adminserver.modules.system.controller.logger.vo.loginlog;
 
 import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -11,4 +12,8 @@ import lombok.ToString;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class SysLoginLogCreateReqVO extends SysLoginLogBaseVO {
+
+    @ApiModelProperty(value = "用户编号", example = "1")
+    private Long userId;
+
 }
