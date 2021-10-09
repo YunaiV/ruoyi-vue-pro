@@ -11,13 +11,13 @@ import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.user.SysUserDO
 import cn.iocoder.yudao.adminserver.modules.system.enums.logger.SysLoginLogTypeEnum;
 import cn.iocoder.yudao.adminserver.modules.system.enums.logger.SysLoginResultEnum;
 import cn.iocoder.yudao.adminserver.modules.system.service.auth.SysAuthService;
-import cn.iocoder.yudao.adminserver.modules.system.service.auth.SysUserSessionService;
 import cn.iocoder.yudao.adminserver.modules.system.service.common.SysCaptchaService;
 import cn.iocoder.yudao.adminserver.modules.system.service.logger.SysLoginLogService;
 import cn.iocoder.yudao.adminserver.modules.system.service.logger.dto.SysLoginLogCreateReqDTO;
 import cn.iocoder.yudao.adminserver.modules.system.service.permission.SysPermissionService;
 import cn.iocoder.yudao.adminserver.modules.system.service.social.SysSocialService;
 import cn.iocoder.yudao.adminserver.modules.system.service.user.SysUserService;
+import cn.iocoder.yudao.coreservice.modules.system.service.auth.SysUserSessionCoreService;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.util.monitor.TracerUtils;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
@@ -67,7 +67,7 @@ public class SysAuthServiceImpl implements SysAuthService {
     @Resource
     private SysLoginLogService loginLogService;
     @Resource
-    private SysUserSessionService userSessionService;
+    private SysUserSessionCoreService userSessionCoreService;
     @Resource
     private SysSocialService socialService;
 
@@ -107,7 +107,7 @@ public class SysAuthServiceImpl implements SysAuthService {
         loginUser.setRoleIds(this.getUserRoleIds(loginUser.getId())); // 获取用户角色列表
 
         // 缓存登录用户到 Redis 中，返回 sessionId 编号
-        return userSessionService.createUserSession(loginUser, userIp, userAgent);
+        return userSessionCoreService.createUserSession(loginUser, userIp, userAgent);
     }
 
     private void verifyCaptcha(String username, String captchaUUID, String captchaCode) {
@@ -214,7 +214,7 @@ public class SysAuthServiceImpl implements SysAuthService {
         socialService.bindSocialUser(loginUser.getId(), reqVO.getType(), authUser);
 
         // 缓存登录用户到 Redis 中，返回 sessionId 编号
-        return userSessionService.createUserSession(loginUser, userIp, userAgent);
+        return userSessionCoreService.createUserSession(loginUser, userIp, userAgent);
     }
 
     @Override
@@ -231,7 +231,7 @@ public class SysAuthServiceImpl implements SysAuthService {
         socialService.bindSocialUser(loginUser.getId(), reqVO.getType(), authUser);
 
         // 缓存登录用户到 Redis 中，返回 sessionId 编号
-        return userSessionService.createUserSession(loginUser, userIp, userAgent);
+        return userSessionCoreService.createUserSession(loginUser, userIp, userAgent);
     }
 
     @Override
@@ -247,12 +247,12 @@ public class SysAuthServiceImpl implements SysAuthService {
     @Override
     public void logout(String token) {
         // 查询用户信息
-        LoginUser loginUser = userSessionService.getLoginUser(token);
+        LoginUser loginUser = userSessionCoreService.getLoginUser(token);
         if (loginUser == null) {
             return;
         }
         // 删除 session
-        userSessionService.deleteUserSession(token);
+        userSessionCoreService.deleteUserSession(token);
         // 记录登出日子和
         this.createLogoutLog(loginUser.getUsername());
     }
@@ -271,7 +271,7 @@ public class SysAuthServiceImpl implements SysAuthService {
     @Override
     public LoginUser verifyTokenAndRefresh(String token) {
         // 获得 LoginUser
-        LoginUser loginUser = userSessionService.getLoginUser(token);
+        LoginUser loginUser = userSessionCoreService.getLoginUser(token);
         if (loginUser == null) {
             return null;
         }
@@ -283,7 +283,7 @@ public class SysAuthServiceImpl implements SysAuthService {
     private void refreshLoginUserCache(String token, LoginUser loginUser) {
         // 每 1/3 的 Session 超时时间，刷新 LoginUser 缓存
         if (System.currentTimeMillis() - loginUser.getUpdateTime().getTime() <
-                userSessionService.getSessionTimeoutMillis() / 3) {
+                userSessionCoreService.getSessionTimeoutMillis() / 3) {
             return;
         }
 
@@ -296,7 +296,7 @@ public class SysAuthServiceImpl implements SysAuthService {
         // 刷新 LoginUser 缓存
         loginUser.setDeptId(user.getDeptId());
         loginUser.setRoleIds(this.getUserRoleIds(loginUser.getId()));
-        userSessionService.refreshUserSession(token, loginUser);
+        userSessionCoreService.refreshUserSession(token, loginUser);
     }
 
 }

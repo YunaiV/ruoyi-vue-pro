@@ -10,6 +10,7 @@ import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.permission.Sys
 import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.permission.SysRoleDO;
 import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.user.SysUserDO;
 import cn.iocoder.yudao.adminserver.modules.system.enums.permission.MenuIdEnum;
+import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import me.zhyd.oauth.model.AuthCallback;
@@ -27,7 +28,12 @@ public interface SysAuthConvert {
 
     @Mapping(source = "updateTime", target = "updateTime", ignore = true)
         // 字段相同，但是含义不同，忽略
-    LoginUser convert(SysUserDO bean);
+    LoginUser convert0(SysUserDO bean);
+
+    default LoginUser convert(SysUserDO bean) {
+        // 目的，为了设置 UserTypeEnum.ADMIN.getValue()
+        return convert0(bean).setUserType(UserTypeEnum.ADMIN.getValue());
+    }
 
     default SysAuthPermissionInfoRespVO convert(SysUserDO user, List<SysRoleDO> roleList, List<SysMenuDO> menuList) {
         return SysAuthPermissionInfoRespVO.builder()
@@ -38,10 +44,6 @@ public interface SysAuthConvert {
     }
 
     SysAuthMenuRespVO convertTreeNode(SysMenuDO menu);
-
-    LoginUser convert(SysUserProfileUpdateReqVO reqVO);
-
-    LoginUser convert(SysUserProfileUpdatePasswordReqVO reqVO);
 
     /**
      * 将菜单列表，构建成菜单树

@@ -1,8 +1,8 @@
-package cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.auth;
+package cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.auth;
 
+import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
-import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.user.SysUserDO;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -35,7 +35,7 @@ public class SysUserSessionDO extends BaseDO {
     /**
      * 用户编号
      *
-     * 关联 {@link SysUserDO#getId()}
+     * 关联 SysUserDO.id 或者 MbrUserDO.id
      */
     private Long userId;
     /**

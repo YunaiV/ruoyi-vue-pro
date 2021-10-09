@@ -1,6 +1,8 @@
 package cn.iocoder.yudao.adminserver.modules.system.service.auth;
 
 import cn.iocoder.yudao.adminserver.BaseDbUnitTest;
+import cn.iocoder.yudao.adminserver.modules.system.service.social.SysSocialService;
+import cn.iocoder.yudao.coreservice.modules.system.service.auth.SysUserSessionCoreService;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.adminserver.modules.system.controller.auth.vo.auth.SysAuthLoginReqVO;
@@ -59,7 +61,9 @@ public class SysAuthServiceImplTest extends BaseDbUnitTest {
     @MockBean
     private SysLoginLogService loginLogService;
     @MockBean
-    private SysUserSessionService userSessionService;
+    private SysUserSessionCoreService userSessionCoreService;
+    @MockBean
+    private SysSocialService socialService;
 
     @Test
     public void testLoadUserByUsername_success() {
@@ -237,7 +241,7 @@ public class SysAuthServiceImplTest extends BaseDbUnitTest {
         // mock 获得 User 拥有的角色编号数组
         when(permissionService.getUserRoleIds(userId, singleton(CommonStatusEnum.ENABLE.getStatus()))).thenReturn(userRoleIds);
         // mock 缓存登录用户到 Redis
-        when(userSessionService.createUserSession(loginUser, userIp, userAgent)).thenReturn(sessionId);
+        when(userSessionCoreService.createUserSession(loginUser, userIp, userAgent)).thenReturn(sessionId);
         // 调用, 并断言异常
         String login = authService.login(reqVO, userIp, userAgent);
         assertEquals(sessionId, login);
@@ -255,11 +259,11 @@ public class SysAuthServiceImplTest extends BaseDbUnitTest {
         String token = randomString();
         LoginUser loginUser = randomPojo(LoginUser.class);
         // mock
-        when(userSessionService.getLoginUser(token)).thenReturn(loginUser);
+        when(userSessionCoreService.getLoginUser(token)).thenReturn(loginUser);
         // 调用
         authService.logout(token);
         // 校验调用参数
-        verify(userSessionService, times(1)).deleteUserSession(token);
+        verify(userSessionCoreService, times(1)).deleteUserSession(token);
         verify(loginLogService, times(1)).createLoginLog(
             argThat(o -> o.getLogType().equals(SysLoginLogTypeEnum.LOGOUT_SELF.getType())
                     && o.getResult().equals(SysLoginResultEnum.SUCCESS.getResult()))

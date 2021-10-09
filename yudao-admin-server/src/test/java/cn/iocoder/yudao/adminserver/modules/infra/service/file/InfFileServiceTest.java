@@ -10,6 +10,7 @@ import cn.iocoder.yudao.adminserver.modules.infra.dal.mysql.file.InfFileMapper;
 import cn.iocoder.yudao.adminserver.modules.infra.service.file.impl.InfFileServiceImpl;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
@@ -29,8 +30,9 @@ public class InfFileServiceTest extends BaseDbUnitTest {
     @Resource
     private InfFileServiceImpl fileService;
 
-    @Resource
+    @MockBean
     private FileProperties fileProperties;
+
     @Resource
     private InfFileMapper fileMapper;
 

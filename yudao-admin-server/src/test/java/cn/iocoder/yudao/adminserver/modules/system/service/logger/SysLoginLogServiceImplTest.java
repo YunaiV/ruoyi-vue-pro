@@ -3,6 +3,7 @@ package cn.iocoder.yudao.adminserver.modules.system.service.logger;
 import cn.hutool.core.util.RandomUtil;
 import cn.iocoder.yudao.adminserver.BaseDbUnitTest;
 import cn.iocoder.yudao.adminserver.modules.system.service.logger.dto.SysLoginLogCreateReqDTO;
+import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.monitor.TracerUtils;
 import cn.iocoder.yudao.adminserver.modules.system.controller.logger.vo.loginlog.SysLoginLogExportReqVO;
@@ -62,6 +63,7 @@ public class SysLoginLogServiceImplTest extends BaseDbUnitTest {
         SysLoginLogDO loginLogDO = RandomUtils.randomPojo(SysLoginLogDO.class, logDO -> {
             logDO.setLogType(RandomUtil.randomEle(SysLoginLogTypeEnum.values()).getType());
             logDO.setTraceId(TracerUtils.getTraceId());
+            logDO.setUserType(RandomUtil.randomEle(UserTypeEnum.values()).getValue());
 
             logDO.setUserIp("192.168.199.16");
             logDO.setUsername("wangkai");
@@ -100,13 +102,13 @@ public class SysLoginLogServiceImplTest extends BaseDbUnitTest {
 
     @Test
     public void testGetLoginLogList() {
-
         // 构造测试数据
 
         // 登录成功的
         SysLoginLogDO loginLogDO = RandomUtils.randomPojo(SysLoginLogDO.class, logDO -> {
             logDO.setLogType(RandomUtil.randomEle(SysLoginLogTypeEnum.values()).getType());
             logDO.setTraceId(TracerUtils.getTraceId());
+            logDO.setUserType(RandomUtil.randomEle(UserTypeEnum.values()).getValue());
 
             logDO.setUserIp("192.168.111.16");
             logDO.setUsername("wangxiaokai");

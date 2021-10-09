@@ -1,11 +1,12 @@
 package cn.iocoder.yudao.adminserver.modules.system.controller.auth;
 
+import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.auth.SysUserSessionDO;
+import cn.iocoder.yudao.coreservice.modules.system.service.auth.SysUserSessionCoreService;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.adminserver.modules.system.controller.auth.vo.session.SysUserSessionPageItemRespVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.auth.vo.session.SysUserSessionPageReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.convert.auth.SysUserSessionConvert;
-import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.auth.SysUserSessionDO;
 import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.dept.SysDeptDO;
 import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.user.SysUserDO;
 import cn.iocoder.yudao.adminserver.modules.system.service.auth.SysUserSessionService;
@@ -34,6 +35,8 @@ public class SysUserSessionController {
 
     @Resource
     private SysUserSessionService userSessionService;
+    @Resource
+    private SysUserSessionCoreService userSessionCoreService;
     @Resource
     private SysUserService userService;
     @Resource
@@ -72,7 +75,7 @@ public class SysUserSessionController {
             example = "fe50b9f6-d177-44b1-8da9-72ea34f63db7")
     @PreAuthorize("@ss.hasPermission('system:user-session:delete')")
     public CommonResult<Boolean> deleteUserSession(@RequestParam("id") String id) {
-        userSessionService.deleteUserSession(id);
+        userSessionCoreService.deleteUserSession(id);
         return success(true);
     }
 

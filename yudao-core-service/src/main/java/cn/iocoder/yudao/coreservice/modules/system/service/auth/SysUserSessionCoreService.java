@@ -1,13 +1,13 @@
-package cn.iocoder.yudao.userserver.modules.system.service.auth;
+package cn.iocoder.yudao.coreservice.modules.system.service.auth;
 
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 
 /**
- * 在线用户 Session Service 接口
+ * 在线用户 Session Core Service 接口
  *
  * @author 芋道源码
  */
-public interface SysUserSessionService {
+public interface SysUserSessionCoreService {
 
     /**
      * 创建在线用户 Session
@@ -41,13 +41,6 @@ public interface SysUserSessionService {
      * @return 在线用户
      */
     LoginUser getLoginUser(String sessionId);
-
-    /**
-     * 获取当前登录用户信息
-     * @param username 用户名称
-     * @return 在线用户
-     */
-    String getSessionId(String username);
 
     /**
      * 获得 Session 超时时间，单位：毫秒
