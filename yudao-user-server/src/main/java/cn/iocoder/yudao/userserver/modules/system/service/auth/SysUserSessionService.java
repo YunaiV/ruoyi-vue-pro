@@ -1,9 +1,6 @@
-package cn.iocoder.yudao.adminserver.modules.system.service.auth;
+package cn.iocoder.yudao.userserver.modules.system.service.auth;
 
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
-import cn.iocoder.yudao.adminserver.modules.system.controller.auth.vo.session.SysUserSessionPageReqVO;
-import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.auth.SysUserSessionDO;
 
 /**
  * 在线用户 Session Service 接口
@@ -46,24 +43,17 @@ public interface SysUserSessionService {
     LoginUser getLoginUser(String sessionId);
 
     /**
+     * 获取当前登录用户信息
+     * @param username 用户名称
+     * @return 在线用户
+     */
+    String getSessionId(String username);
+
+    /**
      * 获得 Session 超时时间，单位：毫秒
      *
      * @return 超时时间
      */
     Long getSessionTimeoutMillis();
 
-    /**
-     * 获得在线用户分页列表
-     *
-     * @param reqVO 分页条件
-     * @return 份额与列表
-     */
-    PageResult<SysUserSessionDO> getUserSessionPage(SysUserSessionPageReqVO reqVO);
-
-    /**
-     * 移除超时的在线用户
-     *
-     * @return {@link Long } 移出的超时用户数量
-     **/
-    long clearSessionTimeout();
 }

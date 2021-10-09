@@ -42,6 +42,14 @@ public interface SysUserService {
     void updateUser(SysUserUpdateReqVO reqVO);
 
     /**
+     * 更新用户的最后登陆信息
+     *
+     * @param id 用户编号
+     * @param loginIp 登陆 IP
+     */
+    void updateUserLogin(Long id, String loginIp);
+
+    /**
      * 修改用户个人信息
      *
      * @param id 用户编号

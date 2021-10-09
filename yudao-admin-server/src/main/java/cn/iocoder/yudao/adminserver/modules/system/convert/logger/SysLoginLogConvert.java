@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.adminserver.modules.system.convert.logger;
 
+import cn.iocoder.yudao.adminserver.modules.system.service.logger.dto.SysLoginLogCreateReqDTO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.adminserver.modules.system.controller.logger.vo.loginlog.SysLoginLogCreateReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.logger.vo.loginlog.SysLoginLogExcelVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.logger.vo.loginlog.SysLoginLogRespVO;
 import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.logger.SysLoginLogDO;
@@ -15,7 +15,7 @@ public interface SysLoginLogConvert {
 
     SysLoginLogConvert INSTANCE = Mappers.getMapper(SysLoginLogConvert.class);
 
-    SysLoginLogDO convert(SysLoginLogCreateReqVO bean);
+    SysLoginLogDO convert(SysLoginLogCreateReqDTO bean);
 
     PageResult<SysLoginLogRespVO> convertPage(PageResult<SysLoginLogDO> page);
 

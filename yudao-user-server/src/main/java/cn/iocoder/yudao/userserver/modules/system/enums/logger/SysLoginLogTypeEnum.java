@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.adminserver.modules.system.enums.logger;
+package cn.iocoder.yudao.userserver.modules.system.enums.logger;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

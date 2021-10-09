@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
+import java.util.Date;
 
 /**
  * User Service 实现类
@@ -25,6 +26,11 @@ public class MbrUserServiceImpl implements MbrUserService {
     @Override
     public MbrUserDO getUserByMobile(String mobile) {
         return userMapper.selectByMobile(mobile);
+    }
+
+    @Override
+    public void updateUserLogin(Long id, String loginIp) {
+        userMapper.updateById(new MbrUserDO().setId(id).setLoginIp(loginIp).setLoginDate(new Date()));
     }
 
 }

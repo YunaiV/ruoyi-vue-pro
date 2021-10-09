@@ -1,9 +1,9 @@
-package cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.logger;
+package cn.iocoder.yudao.userserver.modules.system.dal.mysql.logger;
 
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.yudao.adminserver.modules.system.enums.logger.SysLoginLogTypeEnum;
-import cn.iocoder.yudao.adminserver.modules.system.enums.logger.SysLoginResultEnum;
+import cn.iocoder.yudao.userserver.modules.system.enums.logger.SysLoginLogTypeEnum;
+import cn.iocoder.yudao.userserver.modules.system.enums.logger.SysLoginResultEnum;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

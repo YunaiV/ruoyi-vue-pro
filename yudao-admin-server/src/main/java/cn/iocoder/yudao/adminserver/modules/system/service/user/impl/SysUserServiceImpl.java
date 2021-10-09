@@ -85,6 +85,11 @@ public class SysUserServiceImpl implements SysUserService {
     }
 
     @Override
+    public void updateUserLogin(Long id, String loginIp) {
+        userMapper.updateById(new SysUserDO().setId(id).setLoginIp(loginIp).setLoginDate(new Date()));
+    }
+
+    @Override
     public void updateUserProfile(Long id, SysUserProfileUpdateReqVO reqVO) {
         // 校验正确性
         this.checkUserExists(id);

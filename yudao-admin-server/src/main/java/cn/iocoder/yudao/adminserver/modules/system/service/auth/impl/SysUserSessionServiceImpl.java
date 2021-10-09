@@ -3,12 +3,7 @@ package cn.iocoder.yudao.adminserver.modules.system.service.auth.impl;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.security.config.SecurityProperties;
-import cn.iocoder.yudao.framework.security.core.LoginUser;
-import cn.iocoder.yudao.framework.common.util.monitor.TracerUtils;
 import cn.iocoder.yudao.adminserver.modules.system.controller.auth.vo.session.SysUserSessionPageReqVO;
-import cn.iocoder.yudao.adminserver.modules.system.controller.logger.vo.loginlog.SysLoginLogCreateReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.auth.SysUserSessionDO;
 import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.user.SysUserDO;
 import cn.iocoder.yudao.adminserver.modules.system.dal.mysql.auth.SysUserSessionMapper;
@@ -17,10 +12,13 @@ import cn.iocoder.yudao.adminserver.modules.system.enums.logger.SysLoginLogTypeE
 import cn.iocoder.yudao.adminserver.modules.system.enums.logger.SysLoginResultEnum;
 import cn.iocoder.yudao.adminserver.modules.system.service.auth.SysUserSessionService;
 import cn.iocoder.yudao.adminserver.modules.system.service.logger.SysLoginLogService;
+import cn.iocoder.yudao.adminserver.modules.system.service.logger.dto.SysLoginLogCreateReqDTO;
 import cn.iocoder.yudao.adminserver.modules.system.service.user.SysUserService;
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.monitor.TracerUtils;
+import cn.iocoder.yudao.framework.security.config.SecurityProperties;
+import cn.iocoder.yudao.framework.security.core.LoginUser;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -62,7 +60,8 @@ public class SysUserSessionServiceImpl implements SysUserSessionService {
         loginUserRedisDAO.set(sessionId, loginUser);
         // 写入 DB 中
         SysUserSessionDO userSession = SysUserSessionDO.builder().id(sessionId)
-                .userId(loginUser.getId()).userIp(userIp).userAgent(userAgent).username(loginUser.getUsername())
+                .userId(loginUser.getId()).userType(UserTypeEnum.ADMIN.getValue())
+                .userIp(userIp).userAgent(userAgent).username(loginUser.getUsername())
                 .sessionTimeout(addTime(Duration.ofMillis(getSessionTimeoutMillis())))
                 .build();
         userSessionMapper.insert(userSession);
@@ -94,15 +93,6 @@ public class SysUserSessionServiceImpl implements SysUserSessionService {
     @Override
     public LoginUser getLoginUser(String sessionId) {
         return loginUserRedisDAO.get(sessionId);
-    }
-
-    @Override
-    public String getSessionId(String username) {
-        QueryWrapper<SysUserSessionDO> wrapper = new QueryWrapper<>();
-        wrapper.eq("username", username);
-        wrapper.orderByDesc("create_time");
-        SysUserSessionDO sysUserSessionDO = userSessionMapper.selectOne(wrapper);
-        return sysUserSessionDO.getId();
     }
 
     @Override
@@ -142,14 +132,14 @@ public class SysUserSessionServiceImpl implements SysUserSessionService {
 
     private void createTimeoutLogoutLog(Collection<SysUserSessionDO> timeoutSessionDOS) {
         for (SysUserSessionDO timeoutSessionDO : timeoutSessionDOS) {
-            SysLoginLogCreateReqVO reqVO = new SysLoginLogCreateReqVO();
-            reqVO.setLogType(SysLoginLogTypeEnum.LOGOUT_TIMEOUT.getType());
-            reqVO.setTraceId(TracerUtils.getTraceId());
-            reqVO.setUsername(timeoutSessionDO.getUsername());
-            reqVO.setUserAgent(timeoutSessionDO.getUserAgent());
-            reqVO.setUserIp(timeoutSessionDO.getUserIp());
-            reqVO.setResult(SysLoginResultEnum.SUCCESS.getResult());
-            loginLogService.createLoginLog(reqVO);
+            SysLoginLogCreateReqDTO reqDTO = new SysLoginLogCreateReqDTO();
+            reqDTO.setLogType(SysLoginLogTypeEnum.LOGOUT_TIMEOUT.getType());
+            reqDTO.setTraceId(TracerUtils.getTraceId());
+            reqDTO.setUsername(timeoutSessionDO.getUsername());
+            reqDTO.setUserAgent(timeoutSessionDO.getUserAgent());
+            reqDTO.setUserIp(timeoutSessionDO.getUserIp());
+            reqDTO.setResult(SysLoginResultEnum.SUCCESS.getResult());
+            loginLogService.createLoginLog(reqDTO);
         }
     }
 
