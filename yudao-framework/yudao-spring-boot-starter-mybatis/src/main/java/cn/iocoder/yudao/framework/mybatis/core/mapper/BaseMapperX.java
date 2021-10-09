@@ -36,4 +36,8 @@ public interface BaseMapperX<T> extends BaseMapper<T> {
         return selectList(new QueryWrapper<>());
     }
 
+    default List<T> selectList(String field, Object value) {
+        return selectList(new QueryWrapper<T>().eq(field, value));
+    }
+
 }

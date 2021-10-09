@@ -102,7 +102,7 @@ public class SysSocialServiceImpl implements SysSocialService {
             if (Objects.equals(socialUser.getUserId(), userId)) {
                 return;
             }
-            socialUserMapper.updateById(new SysSocialUserDO().setUserId(socialUser.getUserId()).setUserId(userId));
+            socialUserMapper.updateById(new SysSocialUserDO().setId(socialUser.getId()).setUserId(userId));
         });
 
         // 逻辑三：如果 authUser 不存在于 socialUsers 中，则进行新增；否则，进行更新
