@@ -22,7 +22,7 @@ public class SysLoginUserRedisDAO {
     @Resource
     private StringRedisTemplate stringRedisTemplate;
     @Resource
-    private SysUserSessionService sysUserSessionService;
+    private SysUserSessionService sysUserSessionService; // TODO 芋艿：得看看怎么拿出去
 
     public LoginUser get(String sessionId) {
         String redisKey = formatKey(sessionId);

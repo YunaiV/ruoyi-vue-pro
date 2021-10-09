@@ -33,7 +33,7 @@
               </li>
               <li class="list-group-item">
                 <svg-icon icon-class="peoples" />所属角色
-                <div class="pull-right">{{ user.roles.map(post => post.name).join(',') }}</div>
+                <div class="pull-right" v-if="user.roles">{{ user.roles.map(role => role.name).join(',') }}</div>
               </li>
               <li class="list-group-item">
                 <svg-icon icon-class="date" />创建日期
@@ -55,6 +55,9 @@
             <el-tab-pane label="修改密码" name="resetPwd">
               <resetPwd :user="user" />
             </el-tab-pane>
+            <el-tab-pane label="社交信息" name="userSocial">
+              <userSocial :user="user" :getUser="getUser" :setActiveTab="setActiveTab" />
+            </el-tab-pane>
           </el-tabs>
         </el-card>
       </el-col>
@@ -66,11 +69,12 @@
 import userAvatar from "./userAvatar";
 import userInfo from "./userInfo";
 import resetPwd from "./resetPwd";
+import userSocial from "./userSocial";
 import { getUserProfile } from "@/api/system/user";
 
 export default {
   name: "Profile",
-  components: { userAvatar, userInfo, resetPwd },
+  components: { userAvatar, userInfo, resetPwd, userSocial },
   data() {
     return {
       user: {},
@@ -87,6 +91,9 @@ export default {
       getUserProfile().then(response => {
         this.user = response.data;
       });
+    },
+    setActiveTab(activeTab) {
+      this.activeTab = activeTab
     }
   }
 };

@@ -1,12 +1,9 @@
-package cn.iocoder.yudao.adminserver.modules.system.service.user;
+package cn.iocoder.yudao.adminserver.modules.system.service.user.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
-import cn.iocoder.yudao.framework.common.exception.ServiceException;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.adminserver.modules.infra.service.file.InfFileService;
 import cn.iocoder.yudao.adminserver.modules.system.controller.user.vo.profile.SysUserProfileUpdatePasswordReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.user.vo.profile.SysUserProfileUpdateReqVO;
@@ -19,6 +16,10 @@ import cn.iocoder.yudao.adminserver.modules.system.dal.mysql.user.SysUserMapper;
 import cn.iocoder.yudao.adminserver.modules.system.service.dept.SysDeptService;
 import cn.iocoder.yudao.adminserver.modules.system.service.dept.SysPostService;
 import cn.iocoder.yudao.adminserver.modules.system.service.permission.SysPermissionService;
+import cn.iocoder.yudao.adminserver.modules.system.service.user.SysUserService;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.exception.ServiceException;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import com.google.common.annotations.VisibleForTesting;
 import lombok.extern.slf4j.Slf4j;
@@ -31,9 +32,8 @@ import javax.annotation.Resource;
 import java.io.InputStream;
 import java.util.*;
 
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.adminserver.modules.system.enums.SysErrorCodeConstants.*;
-
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 
 /**
  * 用户 Service 实现类
@@ -105,7 +105,7 @@ public class SysUserServiceImpl implements SysUserService {
     }
 
     @Override
-    public void updateUserAvatar(Long id, InputStream avatarFile) {
+    public String updateUserAvatar(Long id, InputStream avatarFile) {
         this.checkUserExists(id);
         // 存储文件
         String avatar = fileService.createFile(IdUtil.fastUUID(), IoUtil.readBytes(avatarFile));
@@ -114,6 +114,7 @@ public class SysUserServiceImpl implements SysUserService {
         sysUserDO.setId(id);
         sysUserDO.setAvatar(avatar);
         userMapper.updateById(sysUserDO);
+        return avatar;
     }
 
     @Override
@@ -216,7 +217,7 @@ public class SysUserServiceImpl implements SysUserService {
     }
 
     @VisibleForTesting
-    void checkUserExists(Long id) {
+    public void checkUserExists(Long id) {
         if (id == null) {
             return;
         }
@@ -227,7 +228,7 @@ public class SysUserServiceImpl implements SysUserService {
     }
 
     @VisibleForTesting
-    void checkUsernameUnique(Long id, String username) {
+    public void checkUsernameUnique(Long id, String username) {
         if (StrUtil.isBlank(username)) {
             return;
         }
@@ -245,7 +246,7 @@ public class SysUserServiceImpl implements SysUserService {
     }
 
     @VisibleForTesting
-    void checkEmailUnique(Long id, String email) {
+    public void checkEmailUnique(Long id, String email) {
         if (StrUtil.isBlank(email)) {
             return;
         }
@@ -263,7 +264,7 @@ public class SysUserServiceImpl implements SysUserService {
     }
 
     @VisibleForTesting
-    void checkMobileUnique(Long id, String mobile) {
+    public void checkMobileUnique(Long id, String mobile) {
         if (StrUtil.isBlank(mobile)) {
             return;
         }
@@ -281,7 +282,7 @@ public class SysUserServiceImpl implements SysUserService {
     }
 
     @VisibleForTesting
-    void checkDeptEnable(Long deptId) {
+    public void checkDeptEnable(Long deptId) {
         if (deptId == null) { // 允许不选择
             return;
         }
@@ -295,7 +296,7 @@ public class SysUserServiceImpl implements SysUserService {
     }
 
     @VisibleForTesting
-    void checkPostEnable(Set<Long> postIds) {
+    public void checkPostEnable(Set<Long> postIds) {
         if (CollUtil.isEmpty(postIds)) { // 允许不选择
             return;
         }
@@ -322,7 +323,7 @@ public class SysUserServiceImpl implements SysUserService {
      * @param oldPassword 旧密码
      */
     @VisibleForTesting
-    void checkOldPassword(Long id, String oldPassword) {
+    public void checkOldPassword(Long id, String oldPassword) {
         SysUserDO user = userMapper.selectById(id);
         if (user == null) {
             throw exception(USER_NOT_EXISTS);

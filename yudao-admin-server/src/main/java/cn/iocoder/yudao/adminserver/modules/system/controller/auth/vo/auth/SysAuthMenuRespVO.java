@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-@ApiModel("登陆用户的菜单信息 Response VO")
+@ApiModel("登录用户的菜单信息 Response VO")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

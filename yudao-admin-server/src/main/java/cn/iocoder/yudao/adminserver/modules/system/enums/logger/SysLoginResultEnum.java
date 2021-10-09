@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
- * 登陆结果的枚举类
+ * 登录结果的枚举类
  */
 @Getter
 @AllArgsConstructor
