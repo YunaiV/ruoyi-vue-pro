@@ -12,13 +12,14 @@ import cn.iocoder.yudao.adminserver.modules.system.enums.logger.SysLoginLogTypeE
 import cn.iocoder.yudao.adminserver.modules.system.enums.logger.SysLoginResultEnum;
 import cn.iocoder.yudao.adminserver.modules.system.service.auth.SysAuthService;
 import cn.iocoder.yudao.adminserver.modules.system.service.common.SysCaptchaService;
-import cn.iocoder.yudao.adminserver.modules.system.service.logger.SysLoginLogService;
-import cn.iocoder.yudao.adminserver.modules.system.service.logger.dto.SysLoginLogCreateReqDTO;
 import cn.iocoder.yudao.adminserver.modules.system.service.permission.SysPermissionService;
 import cn.iocoder.yudao.adminserver.modules.system.service.social.SysSocialService;
 import cn.iocoder.yudao.adminserver.modules.system.service.user.SysUserService;
 import cn.iocoder.yudao.coreservice.modules.system.service.auth.SysUserSessionCoreService;
+import cn.iocoder.yudao.coreservice.modules.system.service.logger.SysLoginLogCoreService;
+import cn.iocoder.yudao.coreservice.modules.system.service.logger.dto.SysLoginLogCreateReqDTO;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.util.monitor.TracerUtils;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
@@ -65,7 +66,7 @@ public class SysAuthServiceImpl implements SysAuthService {
     @Resource
     private SysCaptchaService captchaService;
     @Resource
-    private SysLoginLogService loginLogService;
+    private SysLoginLogCoreService loginLogCoreService;
     @Resource
     private SysUserSessionCoreService userSessionCoreService;
     @Resource
@@ -164,11 +165,12 @@ public class SysAuthServiceImpl implements SysAuthService {
         if (user != null) {
             reqDTO.setUserId(user.getId());
         }
+        reqDTO.setUserType(UserTypeEnum.ADMIN.getValue());
         reqDTO.setUsername(username);
         reqDTO.setUserAgent(ServletUtils.getUserAgent());
         reqDTO.setUserIp(ServletUtils.getClientIP());
         reqDTO.setResult(loginResult.getResult());
-        loginLogService.createLoginLog(reqDTO);
+        loginLogCoreService.createLoginLog(reqDTO);
         // 更新最后登录时间
         if (user != null && Objects.equals(SysLoginResultEnum.SUCCESS.getResult(), loginResult.getResult())) {
             userService.updateUserLogin(user.getId(), ServletUtils.getClientIP());
@@ -258,14 +260,16 @@ public class SysAuthServiceImpl implements SysAuthService {
     }
 
     private void createLogoutLog(String username) {
+        // TODO 芋艿：这里未设置 userId
         SysLoginLogCreateReqDTO reqDTO = new SysLoginLogCreateReqDTO();
         reqDTO.setLogType(SysLoginLogTypeEnum.LOGOUT_SELF.getType());
         reqDTO.setTraceId(TracerUtils.getTraceId());
+        reqDTO.setUserType(UserTypeEnum.ADMIN.getValue());
         reqDTO.setUsername(username);
         reqDTO.setUserAgent(ServletUtils.getUserAgent());
         reqDTO.setUserIp(ServletUtils.getClientIP());
         reqDTO.setResult(SysLoginResultEnum.SUCCESS.getResult());
-        loginLogService.createLoginLog(reqDTO);
+        loginLogCoreService.createLoginLog(reqDTO);
     }
 
     @Override

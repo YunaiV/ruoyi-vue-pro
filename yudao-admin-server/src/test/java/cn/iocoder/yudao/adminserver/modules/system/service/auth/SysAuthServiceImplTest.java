@@ -3,6 +3,7 @@ package cn.iocoder.yudao.adminserver.modules.system.service.auth;
 import cn.iocoder.yudao.adminserver.BaseDbUnitTest;
 import cn.iocoder.yudao.adminserver.modules.system.service.social.SysSocialService;
 import cn.iocoder.yudao.coreservice.modules.system.service.auth.SysUserSessionCoreService;
+import cn.iocoder.yudao.coreservice.modules.system.service.logger.SysLoginLogCoreService;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.adminserver.modules.system.controller.auth.vo.auth.SysAuthLoginReqVO;
@@ -11,7 +12,6 @@ import cn.iocoder.yudao.adminserver.modules.system.enums.logger.SysLoginLogTypeE
 import cn.iocoder.yudao.adminserver.modules.system.enums.logger.SysLoginResultEnum;
 import cn.iocoder.yudao.adminserver.modules.system.service.auth.impl.SysAuthServiceImpl;
 import cn.iocoder.yudao.adminserver.modules.system.service.common.SysCaptchaService;
-import cn.iocoder.yudao.adminserver.modules.system.service.logger.SysLoginLogService;
 import cn.iocoder.yudao.adminserver.modules.system.service.permission.SysPermissionService;
 import cn.iocoder.yudao.adminserver.modules.system.service.user.SysUserService;
 import cn.iocoder.yudao.framework.test.core.util.AssertUtils;
@@ -59,7 +59,7 @@ public class SysAuthServiceImplTest extends BaseDbUnitTest {
     @MockBean
     private SysCaptchaService captchaService;
     @MockBean
-    private SysLoginLogService loginLogService;
+    private SysLoginLogCoreService loginLogCoreService;
     @MockBean
     private SysUserSessionCoreService userSessionCoreService;
     @MockBean
@@ -132,7 +132,7 @@ public class SysAuthServiceImplTest extends BaseDbUnitTest {
         // 调用, 并断言异常
         assertServiceException(() -> authService.login(reqVO, userIp, userAgent), AUTH_LOGIN_CAPTCHA_NOT_FOUND);
         // 校验调用参数
-        verify(loginLogService, times(1)).createLoginLog(
+        verify(loginLogCoreService, times(1)).createLoginLog(
             argThat(o -> o.getLogType().equals(SysLoginLogTypeEnum.LOGIN_USERNAME.getType())
                     && o.getResult().equals(SysLoginResultEnum.CAPTCHA_NOT_FOUND.getResult()))
         );
@@ -150,7 +150,7 @@ public class SysAuthServiceImplTest extends BaseDbUnitTest {
         // 调用, 并断言异常
         assertServiceException(() -> authService.login(reqVO, userIp, userAgent), AUTH_LOGIN_CAPTCHA_CODE_ERROR);
         // 校验调用参数
-        verify(loginLogService, times(1)).createLoginLog(
+        verify(loginLogCoreService, times(1)).createLoginLog(
             argThat(o -> o.getLogType().equals(SysLoginLogTypeEnum.LOGIN_USERNAME.getType())
                     && o.getResult().equals(SysLoginResultEnum.CAPTCHA_CODE_ERROR.getResult()))
         );
@@ -171,7 +171,7 @@ public class SysAuthServiceImplTest extends BaseDbUnitTest {
         assertServiceException(() -> authService.login(reqVO, userIp, userAgent), AUTH_LOGIN_BAD_CREDENTIALS);
         // 校验调用参数
         verify(captchaService, times(1)).deleteCaptchaCode(reqVO.getUuid());
-        verify(loginLogService, times(1)).createLoginLog(
+        verify(loginLogCoreService, times(1)).createLoginLog(
             argThat(o -> o.getLogType().equals(SysLoginLogTypeEnum.LOGIN_USERNAME.getType())
                     && o.getResult().equals(SysLoginResultEnum.BAD_CREDENTIALS.getResult()))
         );
@@ -192,7 +192,7 @@ public class SysAuthServiceImplTest extends BaseDbUnitTest {
         assertServiceException(() -> authService.login(reqVO, userIp, userAgent), AUTH_LOGIN_USER_DISABLED);
         // 校验调用参数
         verify(captchaService, times(1)).deleteCaptchaCode(reqVO.getUuid());
-        verify(loginLogService, times(1)).createLoginLog(
+        verify(loginLogCoreService, times(1)).createLoginLog(
             argThat(o -> o.getLogType().equals(SysLoginLogTypeEnum.LOGIN_USERNAME.getType())
                     && o.getResult().equals(SysLoginResultEnum.USER_DISABLED.getResult()))
         );
@@ -213,7 +213,7 @@ public class SysAuthServiceImplTest extends BaseDbUnitTest {
         assertServiceException(() -> authService.login(reqVO, userIp, userAgent), AUTH_LOGIN_FAIL_UNKNOWN);
         // 校验调用参数
         verify(captchaService, times(1)).deleteCaptchaCode(reqVO.getUuid());
-        verify(loginLogService, times(1)).createLoginLog(
+        verify(loginLogCoreService, times(1)).createLoginLog(
             argThat(o -> o.getLogType().equals(SysLoginLogTypeEnum.LOGIN_USERNAME.getType())
                     && o.getResult().equals(SysLoginResultEnum.UNKNOWN_ERROR.getResult()))
         );
@@ -247,7 +247,7 @@ public class SysAuthServiceImplTest extends BaseDbUnitTest {
         assertEquals(sessionId, login);
         // 校验调用参数
         verify(captchaService, times(1)).deleteCaptchaCode(reqVO.getUuid());
-        verify(loginLogService, times(1)).createLoginLog(
+        verify(loginLogCoreService, times(1)).createLoginLog(
             argThat(o -> o.getLogType().equals(SysLoginLogTypeEnum.LOGIN_USERNAME.getType())
                     && o.getResult().equals(SysLoginResultEnum.SUCCESS.getResult()))
         );
@@ -264,7 +264,7 @@ public class SysAuthServiceImplTest extends BaseDbUnitTest {
         authService.logout(token);
         // 校验调用参数
         verify(userSessionCoreService, times(1)).deleteUserSession(token);
-        verify(loginLogService, times(1)).createLoginLog(
+        verify(loginLogCoreService, times(1)).createLoginLog(
             argThat(o -> o.getLogType().equals(SysLoginLogTypeEnum.LOGOUT_SELF.getType())
                     && o.getResult().equals(SysLoginResultEnum.SUCCESS.getResult()))
         );

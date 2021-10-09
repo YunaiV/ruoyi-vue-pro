@@ -26,8 +26,7 @@ public interface SysAuthConvert {
 
     SysAuthConvert INSTANCE = Mappers.getMapper(SysAuthConvert.class);
 
-    @Mapping(source = "updateTime", target = "updateTime", ignore = true)
-        // 字段相同，但是含义不同，忽略
+    @Mapping(source = "updateTime", target = "updateTime", ignore = true) // 字段相同，但是含义不同，忽略
     LoginUser convert0(SysUserDO bean);
 
     default LoginUser convert(SysUserDO bean) {

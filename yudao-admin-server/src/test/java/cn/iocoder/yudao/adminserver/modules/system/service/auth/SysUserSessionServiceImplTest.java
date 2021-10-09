@@ -5,13 +5,13 @@ import cn.iocoder.yudao.adminserver.BaseDbAndRedisUnitTest;
 import cn.iocoder.yudao.adminserver.modules.system.controller.auth.vo.session.SysUserSessionPageReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.user.SysUserDO;
 import cn.iocoder.yudao.adminserver.modules.system.dal.mysql.auth.SysUserSessionMapper;
-import cn.iocoder.yudao.adminserver.modules.system.dal.mysql.user.SysUserMapper;
 import cn.iocoder.yudao.adminserver.modules.system.enums.common.SysSexEnum;
 import cn.iocoder.yudao.adminserver.modules.system.service.auth.impl.SysUserSessionServiceImpl;
 import cn.iocoder.yudao.adminserver.modules.system.service.logger.SysLoginLogService;
 import cn.iocoder.yudao.adminserver.modules.system.service.user.SysUserService;
 import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.auth.SysUserSessionDO;
 import cn.iocoder.yudao.coreservice.modules.system.dal.redis.auth.SysLoginUserCoreRedisDAO;
+import cn.iocoder.yudao.coreservice.modules.system.service.logger.SysLoginLogCoreService;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -22,8 +22,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -55,7 +53,7 @@ public class SysUserSessionServiceImplTest extends BaseDbAndRedisUnitTest {
     @MockBean
     private SysUserService userService;
     @MockBean
-    private SysLoginLogService loginLogService;
+    private SysLoginLogCoreService loginLogCoreService;
     @MockBean
     private SysLoginUserCoreRedisDAO loginUserCoreRedisDAO;
 

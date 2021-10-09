@@ -1,20 +1,18 @@
 package cn.iocoder.yudao.userserver.modules.member.service.auth.impl;
 
+import cn.iocoder.yudao.coreservice.modules.system.service.auth.SysUserSessionCoreService;
+import cn.iocoder.yudao.coreservice.modules.system.service.logger.SysLoginLogCoreService;
+import cn.iocoder.yudao.coreservice.modules.system.service.logger.dto.SysLoginLogCreateReqDTO;
 import cn.iocoder.yudao.framework.common.util.monitor.TracerUtils;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.userserver.modules.member.controller.auth.vo.MbrAuthLoginReqVO;
 import cn.iocoder.yudao.userserver.modules.member.convert.user.MbrAuthConvert;
 import cn.iocoder.yudao.userserver.modules.member.dal.dataobject.user.MbrUserDO;
-import cn.iocoder.yudao.userserver.modules.member.enums.MbrErrorCodeConstants;
 import cn.iocoder.yudao.userserver.modules.member.service.auth.MbrAuthService;
 import cn.iocoder.yudao.userserver.modules.member.service.user.MbrUserService;
-import cn.iocoder.yudao.userserver.modules.system.enums.logger.SysLoginLogTypeEnum;
-import cn.iocoder.yudao.userserver.modules.system.enums.logger.SysLoginResultEnum;
-import cn.iocoder.yudao.userserver.modules.system.service.auth.SysUserSessionService;
-import cn.iocoder.yudao.userserver.modules.system.service.logger.SysLoginLogService;
-import cn.iocoder.yudao.userserver.modules.system.service.logger.dto.SysLoginLogCreateReqDTO;
-import cn.iocoder.yudao.userserver.modules.system.service.logger.impl.SysLoginLogServiceImpl;
+import cn.iocoder.yudao.coreservice.modules.system.enums.logger.SysLoginLogTypeEnum;
+import cn.iocoder.yudao.coreservice.modules.system.enums.logger.SysLoginResultEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -29,7 +27,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import javax.annotation.Resource;
-
 import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -51,9 +48,9 @@ public class MbrAuthServiceImpl implements MbrAuthService {
     @Resource
     private MbrUserService userService;
     @Resource
-    private SysLoginLogService loginLogService;
+    private SysLoginLogCoreService loginLogCoreService;
     @Resource
-    private SysUserSessionService userSessionService;
+    private SysUserSessionCoreService userSessionCoreService;
 
     @Override
     public UserDetails loadUserByUsername(String mobile) throws UsernameNotFoundException {
@@ -72,7 +69,7 @@ public class MbrAuthServiceImpl implements MbrAuthService {
         LoginUser loginUser = this.login0(reqVO.getMobile(), reqVO.getPassword());
 
         // 缓存登录用户到 Redis 中，返回 sessionId 编号
-        return userSessionService.createUserSession(loginUser, userIp, userAgent);
+        return userSessionCoreService.createUserSession(loginUser, userIp, userAgent);
     }
 
     private LoginUser login0(String username, String password) {
@@ -114,7 +111,7 @@ public class MbrAuthServiceImpl implements MbrAuthService {
         reqDTO.setUserAgent(ServletUtils.getUserAgent());
         reqDTO.setUserIp(ServletUtils.getClientIP());
         reqDTO.setResult(loginResult.getResult());
-        loginLogService.createLoginLog(reqDTO);
+        loginLogCoreService.createLoginLog(reqDTO);
         // 更新最后登录时间
         if (user != null && Objects.equals(SysLoginResultEnum.SUCCESS.getResult(), loginResult.getResult())) {
             userService.updateUserLogin(user.getId(), ServletUtils.getClientIP());

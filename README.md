@@ -88,6 +88,9 @@
 | `yudao-admin-ui` | 管理后台的 UI 界面 |
 | `yudao-user-server` | 用户前台的服务端 |
 | `yudao-user-ui` | 用户前台的 UI 界面 |
+| `yudao-core-service` | 通用服务，提供共享逻辑 |
+
+> 友情提示：`yudao-admin-server` 和 `yudao-user-server` 会存在需要复用的逻辑，通过 `yudao-core-service` 实现。
 
 ### 后端
 

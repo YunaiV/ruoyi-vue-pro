@@ -9,10 +9,12 @@ import cn.iocoder.yudao.adminserver.modules.system.enums.logger.SysLoginLogTypeE
 import cn.iocoder.yudao.adminserver.modules.system.enums.logger.SysLoginResultEnum;
 import cn.iocoder.yudao.adminserver.modules.system.service.auth.SysUserSessionService;
 import cn.iocoder.yudao.adminserver.modules.system.service.logger.SysLoginLogService;
-import cn.iocoder.yudao.adminserver.modules.system.service.logger.dto.SysLoginLogCreateReqDTO;
 import cn.iocoder.yudao.adminserver.modules.system.service.user.SysUserService;
 import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.auth.SysUserSessionDO;
 import cn.iocoder.yudao.coreservice.modules.system.dal.redis.auth.SysLoginUserCoreRedisDAO;
+import cn.iocoder.yudao.coreservice.modules.system.service.logger.SysLoginLogCoreService;
+import cn.iocoder.yudao.coreservice.modules.system.service.logger.dto.SysLoginLogCreateReqDTO;
+import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.monitor.TracerUtils;
 import com.google.common.collect.Lists;
@@ -42,7 +44,7 @@ public class SysUserSessionServiceImpl implements SysUserSessionService {
     @Resource
     private SysUserService userService;
     @Resource
-    private SysLoginLogService loginLogService;
+    private SysLoginLogCoreService loginLogCoreService;
 
     @Resource
     private SysLoginUserCoreRedisDAO loginUserCoreRedisDAO;
@@ -84,11 +86,12 @@ public class SysUserSessionServiceImpl implements SysUserSessionService {
             SysLoginLogCreateReqDTO reqDTO = new SysLoginLogCreateReqDTO();
             reqDTO.setLogType(SysLoginLogTypeEnum.LOGOUT_TIMEOUT.getType());
             reqDTO.setTraceId(TracerUtils.getTraceId());
+            reqDTO.setUserType(UserTypeEnum.ADMIN.getValue());
             reqDTO.setUsername(timeoutSessionDO.getUsername());
             reqDTO.setUserAgent(timeoutSessionDO.getUserAgent());
             reqDTO.setUserIp(timeoutSessionDO.getUserIp());
             reqDTO.setResult(SysLoginResultEnum.SUCCESS.getResult());
-            loginLogService.createLoginLog(reqDTO);
+            loginLogCoreService.createLoginLog(reqDTO);
         }
     }
 

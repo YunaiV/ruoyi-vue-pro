@@ -1,11 +1,11 @@
 package cn.iocoder.yudao.adminserver.modules.system.dal.mysql.logger;
 
+import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.logger.SysLoginLogDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.QueryWrapperX;
 import cn.iocoder.yudao.adminserver.modules.system.controller.logger.vo.loginlog.SysLoginLogExportReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.logger.vo.loginlog.SysLoginLogPageReqVO;
-import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.logger.SysLoginLogDO;
 import cn.iocoder.yudao.adminserver.modules.system.enums.logger.SysLoginResultEnum;
 import org.apache.ibatis.annotations.Mapper;
 
