@@ -41,7 +41,7 @@ public class InfFileController {
     @ApiOperation("上传文件")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "file", value = "文件附件", required = true, dataTypeClass = MultipartFile.class),
-            @ApiImplicitParam(name = "path", value = "文件路径", required = false, example = "yudaoyuanma.png", dataTypeClass = String.class)
+            @ApiImplicitParam(name = "path", value = "文件路径", example = "yudaoyuanma.png", dataTypeClass = String.class)
     })
     public CommonResult<String> uploadFile(@RequestParam("file") MultipartFile file,
                                            @RequestParam("path") String path) throws IOException {

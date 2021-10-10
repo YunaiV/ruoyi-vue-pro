@@ -1,15 +1,9 @@
 package cn.iocoder.yudao.framework.security.config;
 
-import cn.iocoder.yudao.framework.security.core.filter.JwtAuthenticationTokenFilter;
-import cn.iocoder.yudao.framework.security.core.handler.AccessDeniedHandlerImpl;
-import cn.iocoder.yudao.framework.security.core.handler.AuthenticationEntryPointImpl;
-import cn.iocoder.yudao.framework.security.core.handler.LogoutSuccessHandlerImpl;
+import cn.iocoder.yudao.framework.security.core.filter.JWTAuthenticationTokenFilter;
 import cn.iocoder.yudao.framework.security.core.service.SecurityAuthFrameworkService;
 import cn.iocoder.yudao.framework.web.config.WebProperties;
-import cn.iocoder.yudao.framework.web.core.handler.GlobalExceptionHandler;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -21,8 +15,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.configurers.ExpressionUrlAuthorizationConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.access.AccessDeniedHandler;
@@ -47,7 +39,7 @@ public class YudaoWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdap
      * 自定义用户【认证】逻辑
      */
     @Resource
-    private UserDetailsService userDetailsService;
+    private SecurityAuthFrameworkService userDetailsService;
     /**
      * Spring Security 加密器
      */
@@ -72,7 +64,7 @@ public class YudaoWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdap
      * Token 认证过滤器 Bean
      */
     @Resource
-    private JwtAuthenticationTokenFilter authenticationTokenFilter;
+    private JWTAuthenticationTokenFilter authenticationTokenFilter;
     /**
      * 自定义的权限映射 Bean
      *
@@ -135,7 +127,7 @@ public class YudaoWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdap
 
         // 设置每个请求的权限 ①：全局共享规则
         httpSecurity.authorizeRequests()
-                    // 登陆的接口，可匿名访问
+                    // 登录的接口，可匿名访问
                     .antMatchers(api("/login")).anonymous()
                     // 静态资源，可匿名访问
                     .antMatchers(HttpMethod.GET, "/*.html", "/**/*.html", "/**/*.css", "/**/*.js").permitAll()
@@ -153,10 +145,15 @@ public class YudaoWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdap
                     .antMatchers("/druid/**").anonymous()
                     // WebSocket
                     .antMatchers("/ws/**").anonymous()
+                    // oAuth2 auth2/login/gitee
+                    .antMatchers(api("/auth2/login/**")).anonymous()
+                    .antMatchers(api("/auth2/authorization/**")).anonymous()
+                    .antMatchers("/api/callback/**").anonymous()
                 // 设置每个请求的权限 ②：每个项目的自定义规则
                 .and().authorizeRequests(authorizeRequestsCustomizer)
                 // 设置每个请求的权限 ③：兜底规则，必须认证
-                .authorizeRequests().anyRequest().authenticated();
+                .authorizeRequests().anyRequest().authenticated()
+        ;
         // 添加 JWT Filter
         httpSecurity.addFilterBefore(authenticationTokenFilter, UsernamePasswordAuthenticationFilter.class);
     }

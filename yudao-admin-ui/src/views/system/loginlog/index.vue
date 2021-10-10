@@ -37,7 +37,7 @@
       <el-table-column label="访问编号" align="center" prop="id" />
       <el-table-column label="日志类型" align="center" prop="logType">
         <template slot-scope="scope">
-          <span>{{ scope.row.logType === 100 ? '登录' : '退出' }}</span>
+          <span>{{ getDictDataLabel(DICT_TYPE.SYS_LOGIN_TYPE, scope.row.logType) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="用户名称" align="center" prop="username" />
@@ -132,7 +132,7 @@ export default {
         }).then(function() {
           return exportLoginLog(queryParams);
         }).then(response => {
-          this.downloadExcel(response, '登陆日志.xls');
+          this.downloadExcel(response, '登录日志.xls');
         })
     }
   }

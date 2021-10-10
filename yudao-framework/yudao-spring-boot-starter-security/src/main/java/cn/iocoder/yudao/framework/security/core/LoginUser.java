@@ -8,10 +8,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
- * 登陆用户信息
+ * 登录用户信息
  *
  * @author 芋道源码
  */
@@ -69,7 +70,7 @@ public class LoginUser implements UserDetails {
     @Override
     @JsonIgnore// 避免序列化
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        return new HashSet<>();
     }
 
     @Override

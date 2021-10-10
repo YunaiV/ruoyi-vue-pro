@@ -280,7 +280,7 @@ public class SysPermissionServiceImpl implements SysPermissionService {
             return true;
         }
 
-        // 获得当前登陆的角色。如果为空，说明没有权限
+        // 获得当前登录的角色。如果为空，说明没有权限
         Set<Long> roleIds = SecurityFrameworkUtils.getLoginUserRoleIds();
         if (CollUtil.isEmpty(roleIds)) {
             return false;
@@ -315,7 +315,7 @@ public class SysPermissionServiceImpl implements SysPermissionService {
             return true;
         }
 
-        // 获得当前登陆的角色。如果为空，说明没有权限
+        // 获得当前登录的角色。如果为空，说明没有权限
         Set<Long> roleIds = SecurityFrameworkUtils.getLoginUserRoleIds();
         if (CollUtil.isEmpty(roleIds)) {
             return false;

@@ -63,7 +63,7 @@ public interface SysUserService {
      * @param id         用户 id
      * @param avatarFile 头像文件
      */
-    void updateUserAvatar(Long id, InputStream avatarFile);
+    String updateUserAvatar(Long id, InputStream avatarFile);
 
     /**
      * 修改密码

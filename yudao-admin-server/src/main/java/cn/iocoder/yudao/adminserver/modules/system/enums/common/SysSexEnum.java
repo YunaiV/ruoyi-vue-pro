@@ -11,10 +11,12 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum SysSexEnum {
-
-    MALE(1), // 男
-    FEMALE(2); // 女
-
+    /** 男 */
+    MALE(1),
+    /** 女 */
+    FEMALE(2),
+    /* 未知 */
+    UNKNOWN(3);
     /**
      * 性别
      */

@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.logger;
 
+import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.adminserver.modules.system.enums.logger.SysLoginLogTypeEnum;
 import cn.iocoder.yudao.adminserver.modules.system.enums.logger.SysLoginResultEnum;
@@ -9,9 +10,9 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 /**
- * 登陆日志表
+ * 登录日志表
  *
- * 注意，包括登陆和登出两种行为
+ * 注意，包括登录和登出两种行为
  *
  * @author ruoyi
  */
@@ -36,13 +37,23 @@ public class SysLoginLogDO extends BaseDO {
      */
     private String traceId;
     /**
+     * 用户编号
+     */
+    private Long userId;
+    /**
+     * 用户类型
+     *
+     * 枚举 {@link UserTypeEnum}
+     */
+    private Integer userType;
+    /**
      * 用户账号
      *
      * 冗余，因为账号可以变更
      */
     private String username;
     /**
-     * 登陆结果
+     * 登录结果
      *
      * 枚举 {@link SysLoginResultEnum}
      */

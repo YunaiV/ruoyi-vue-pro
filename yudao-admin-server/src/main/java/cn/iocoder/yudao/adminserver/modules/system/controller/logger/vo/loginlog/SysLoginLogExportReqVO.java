@@ -9,7 +9,7 @@ import java.util.Date;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
-@ApiModel("登陆日志分页列表 Request VO")
+@ApiModel("登录日志分页列表 Request VO")
 @Data
 public class SysLoginLogExportReqVO {
 

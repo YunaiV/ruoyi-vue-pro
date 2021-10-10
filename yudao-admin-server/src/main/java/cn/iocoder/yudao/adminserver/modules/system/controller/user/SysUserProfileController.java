@@ -1,6 +1,8 @@
 package cn.iocoder.yudao.adminserver.modules.system.controller.user;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.social.SysSocialUserDO;
+import cn.iocoder.yudao.adminserver.modules.system.service.social.SysSocialService;
 import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.adminserver.modules.system.controller.user.vo.profile.SysUserProfileRespVO;
@@ -52,6 +54,8 @@ public class SysUserProfileController {
     private SysPermissionService permissionService;
     @Resource
     private SysRoleService roleService;
+    @Resource
+    private SysSocialService socialService;
 
     @GetMapping("/get")
     @ApiOperation("获得登录用户信息")
@@ -72,6 +76,9 @@ public class SysUserProfileController {
             List<SysPostDO> posts = postService.getPosts(user.getPostIds());
             resp.setPosts(SysUserConvert.INSTANCE.convertList02(posts));
         }
+        // 获得社交用户信息
+        List<SysSocialUserDO> socialUsers = socialService.getSocialUserList(user.getId());
+        resp.setSocialUsers(SysUserConvert.INSTANCE.convertList03(socialUsers));
         return success(resp);
     }
 
@@ -89,14 +96,14 @@ public class SysUserProfileController {
         return success(true);
     }
 
-    @PutMapping("/upload-avatar")
+    @PutMapping("/update-avatar")
     @ApiOperation("上传用户个人头像")
-    public CommonResult<Boolean> updateUserAvatar(@RequestParam("avatarFile") MultipartFile file) throws IOException {
+    public CommonResult<String> updateUserAvatar(@RequestParam("avatarFile") MultipartFile file) throws IOException {
         if (file.isEmpty()) {
             throw ServiceExceptionUtil.exception(FILE_IS_EMPTY);
         }
-        userService.updateUserAvatar(getLoginUserId(), file.getInputStream());
-        return success(true);
+        String avatar = userService.updateUserAvatar(getLoginUserId(), file.getInputStream());
+        return success(avatar);
     }
 
 }

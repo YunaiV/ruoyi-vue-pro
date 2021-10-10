@@ -3,6 +3,7 @@ package cn.iocoder.yudao.adminserver.modules.system.service.user;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.iocoder.yudao.adminserver.BaseDbUnitTest;
+import cn.iocoder.yudao.adminserver.modules.system.service.user.impl.SysUserServiceImpl;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.adminserver.modules.infra.service.file.InfFileService;

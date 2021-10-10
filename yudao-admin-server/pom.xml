@@ -124,6 +124,12 @@
             <groupId>cn.iocoder.boot</groupId>
             <artifactId>yudao-spring-boot-starter-websocket</artifactId>
         </dependency>
+        <!-- TODO 后续看情况，进行调整 -->
+        <dependency>
+            <groupId>com.xkcoding.justauth</groupId>
+            <artifactId>justauth-spring-boot-starter</artifactId>
+            <version>1.4.0</version>
+        </dependency>
     </dependencies>
 
     <build>
