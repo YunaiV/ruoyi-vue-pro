@@ -26,7 +26,7 @@
         <druid.version>1.2.4</druid.version>
         <mybatis-plus.version>3.4.2</mybatis-plus.version>
         <dynamic-datasource.version>3.3.2</dynamic-datasource.version>
-        <redisson.version>3.15.1</redisson.version>
+        <redisson.version>3.16.3</redisson.version>
         <!-- Config 配置中心相关 -->
         <apollo.version>1.7.0</apollo.version>
         <!-- Job 定时任务相关 -->

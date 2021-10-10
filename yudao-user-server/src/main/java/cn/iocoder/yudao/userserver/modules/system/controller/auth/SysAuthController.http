@@ -1,0 +1,8 @@
+### 请求 /login 接口 => 成功
+POST {{userServerUrl}}/login
+Content-Type: application/json
+
+{
+  "mobile": "15601691300",
+  "password": "admin123"
+}

@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.userserver.modules.member.controller.auth.vo;
+package cn.iocoder.yudao.userserver.modules.system.controller.auth.vo;
 
 import cn.iocoder.yudao.framework.common.validation.Mobile;
 import io.swagger.annotations.ApiModel;
@@ -16,7 +16,7 @@ import javax.validation.constraints.NotEmpty;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class MbrAuthLoginReqVO {
+public class SysAuthLoginReqVO {
 
     @ApiModelProperty(value = "手机号", required = true, example = "15601691300")
     @NotEmpty(message = "手机号不能为空")

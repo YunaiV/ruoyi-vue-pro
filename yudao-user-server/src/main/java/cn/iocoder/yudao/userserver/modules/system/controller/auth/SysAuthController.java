@@ -1,8 +1,8 @@
-package cn.iocoder.yudao.userserver.modules.member.controller.auth;
+package cn.iocoder.yudao.userserver.modules.system.controller.auth;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.userserver.modules.member.controller.auth.vo.*;
-import cn.iocoder.yudao.userserver.modules.member.service.auth.MbrAuthService;
+import cn.iocoder.yudao.userserver.modules.system.controller.auth.vo.*;
+import cn.iocoder.yudao.userserver.modules.system.service.auth.SysAuthService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -23,14 +23,14 @@ import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getUse
 @RequestMapping("/")
 @Validated
 @Slf4j
-public class MbrAuthController {
+public class SysAuthController {
 
     @Resource
-    private MbrAuthService authService;
+    private SysAuthService authService;
 
     @PostMapping("/login")
     @ApiOperation("使用手机 + 密码登录")
-    public CommonResult<MbrAuthLoginRespVO> login(@RequestBody @Valid MbrAuthLoginReqVO reqVO) {
+    public CommonResult<MbrAuthLoginRespVO> login(@RequestBody @Valid SysAuthLoginReqVO reqVO) {
         String token = authService.login(reqVO, getClientIP(), getUserAgent());
         // 返回结果
         return success(MbrAuthLoginRespVO.builder().token(token).build());
@@ -38,7 +38,7 @@ public class MbrAuthController {
 
     @PostMapping("/sms-login")
     @ApiOperation("使用手机 + 验证码登录")
-    public CommonResult<MbrAuthLoginRespVO> smsLogin(@RequestBody @Valid MbrAuthLoginReqVO reqVO) {
+    public CommonResult<MbrAuthLoginRespVO> smsLogin(@RequestBody @Valid SysAuthLoginReqVO reqVO) {
         return null;
     }
 
@@ -53,7 +53,7 @@ public class MbrAuthController {
 
     @PostMapping("/reset-password")
     @ApiOperation(value = "重置密码", notes = "用户忘记密码时使用")
-    public CommonResult<Boolean> resetPassword(@RequestBody @Valid MbrAuthResetPasswordReqVO reqVO) {
+    public CommonResult<Boolean> resetPassword(@RequestBody @Valid SysAuthResetPasswordReqVO reqVO) {
         return null;
     }
 

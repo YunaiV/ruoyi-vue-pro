@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.userserver.modules.member.service.auth.impl;
+package cn.iocoder.yudao.userserver.modules.system.service.auth.impl;
 
 import cn.iocoder.yudao.coreservice.modules.system.service.auth.SysUserSessionCoreService;
 import cn.iocoder.yudao.coreservice.modules.system.service.logger.SysLoginLogCoreService;
@@ -6,10 +6,10 @@ import cn.iocoder.yudao.coreservice.modules.system.service.logger.dto.SysLoginLo
 import cn.iocoder.yudao.framework.common.util.monitor.TracerUtils;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
-import cn.iocoder.yudao.userserver.modules.member.controller.auth.vo.MbrAuthLoginReqVO;
-import cn.iocoder.yudao.userserver.modules.member.convert.user.MbrAuthConvert;
+import cn.iocoder.yudao.userserver.modules.system.controller.auth.vo.SysAuthLoginReqVO;
+import cn.iocoder.yudao.userserver.modules.system.convert.auth.MbrAuthConvert;
 import cn.iocoder.yudao.userserver.modules.member.dal.dataobject.user.MbrUserDO;
-import cn.iocoder.yudao.userserver.modules.member.service.auth.MbrAuthService;
+import cn.iocoder.yudao.userserver.modules.system.service.auth.SysAuthService;
 import cn.iocoder.yudao.userserver.modules.member.service.user.MbrUserService;
 import cn.iocoder.yudao.coreservice.modules.system.enums.logger.SysLoginLogTypeEnum;
 import cn.iocoder.yudao.coreservice.modules.system.enums.logger.SysLoginResultEnum;
@@ -30,7 +30,7 @@ import javax.annotation.Resource;
 import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.userserver.modules.member.enums.MbrErrorCodeConstants.*;
+import static cn.iocoder.yudao.userserver.modules.system.enums.SysErrorCodeConstants.*;
 
 /**
  * Auth Service 实现类
@@ -39,7 +39,7 @@ import static cn.iocoder.yudao.userserver.modules.member.enums.MbrErrorCodeConst
  */
 @Service
 @Slf4j
-public class MbrAuthServiceImpl implements MbrAuthService {
+public class SysAuthServiceImpl implements SysAuthService {
 
     @Resource
     @Lazy // 延迟加载，因为存在相互依赖的问题
@@ -64,7 +64,7 @@ public class MbrAuthServiceImpl implements MbrAuthService {
     }
 
     @Override
-    public String login(MbrAuthLoginReqVO reqVO, String userIp, String userAgent) {
+    public String login(SysAuthLoginReqVO reqVO, String userIp, String userAgent) {
         // 使用手机 + 密码，进行登录。
         LoginUser loginUser = this.login0(reqVO.getMobile(), reqVO.getPassword());
 

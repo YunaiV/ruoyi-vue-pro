@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.userserver.modules.member.controller.auth.vo;
+package cn.iocoder.yudao.userserver.modules.system.controller.auth.vo;
 
 import cn.iocoder.yudao.framework.common.validation.Mobile;
 import io.swagger.annotations.ApiModel;

@@ -1,9 +1,10 @@
-package cn.iocoder.yudao.userserver.modules.member.convert.user;
+package cn.iocoder.yudao.userserver.modules.system.convert.auth;
 
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.userserver.modules.member.dal.dataobject.user.MbrUserDO;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 @Mapper
@@ -11,6 +12,7 @@ public interface MbrAuthConvert {
 
     MbrAuthConvert INSTANCE = Mappers.getMapper(MbrAuthConvert.class);
 
+    @Mapping(source = "mobile", target = "username")
     LoginUser convert0(MbrUserDO bean);
 
     default LoginUser convert(MbrUserDO bean) {
