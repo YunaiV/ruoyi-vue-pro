@@ -1,6 +1,8 @@
 package cn.iocoder.yudao.userserver.modules.system.controller.auth.vo;
 
+import cn.iocoder.yudao.framework.common.validation.InEnum;
 import cn.iocoder.yudao.framework.common.validation.Mobile;
+import cn.iocoder.yudao.userserver.modules.system.enums.sms.SysSmsSceneEnum;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -19,6 +21,7 @@ public class MbrAuthSendSmsReqVO {
 
     @ApiModelProperty(value = "发送场景", example = "1", notes = "对应 MbrSmsSceneEnum 枚举")
     @NotNull(message = "发送场景不能为空")
+    @InEnum(SysSmsSceneEnum.class)
     private Integer scene;
 
 }

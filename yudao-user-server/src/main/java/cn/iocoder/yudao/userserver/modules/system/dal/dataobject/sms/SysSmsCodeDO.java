@@ -1,9 +1,8 @@
-package cn.iocoder.yudao.userserver.modules.member.dal.mysql.sms;
+package cn.iocoder.yudao.userserver.modules.system.dal.dataobject.sms;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 import lombok.experimental.Accessors;
 
 import java.util.Date;
@@ -15,11 +14,13 @@ import java.util.Date;
  *
  * @author 芋道源码
  */
-@TableName("mbr_sms_code")
+@TableName("sys_sms_code")
 @Data
 @EqualsAndHashCode(callSuper = true)
-@Accessors(chain = true)
-public class MbrSmsCodeDO extends BaseDO {
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class SysSmsCodeDO extends BaseDO {
 
     /**
      * 编号
@@ -36,7 +37,7 @@ public class MbrSmsCodeDO extends BaseDO {
     /**
      * 发送场景
      *
-     * 枚举 {@link MbrSmsCodeDO}
+     * 枚举 {@link SysSmsCodeDO}
      */
     private Integer scene;
     /**

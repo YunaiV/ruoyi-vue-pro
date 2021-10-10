@@ -3,6 +3,7 @@ package cn.iocoder.yudao.userserver.modules.system.controller.auth;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.userserver.modules.system.controller.auth.vo.*;
 import cn.iocoder.yudao.userserver.modules.system.service.auth.SysAuthService;
+import cn.iocoder.yudao.userserver.modules.system.service.sms.SysSmsCodeService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -27,6 +28,8 @@ public class SysAuthController {
 
     @Resource
     private SysAuthService authService;
+    @Resource
+    private SysSmsCodeService smsCodeService;
 
     @PostMapping("/login")
     @ApiOperation("使用手机 + 密码登录")
@@ -45,10 +48,8 @@ public class SysAuthController {
     @PostMapping("/send-sms-code")
     @ApiOperation("发送手机验证码")
     public CommonResult<Boolean> sendSmsCode(@RequestBody @Valid MbrAuthSendSmsReqVO reqVO) {
-//        passportManager.sendSmsCode(sendSmsCodeDTO, HttpUtil.getIp(request));
-//        // 返回成功
-//        return success(true);
-        return null;
+        smsCodeService.sendSmsCode(reqVO.getMobile(), reqVO.getScene(), getClientIP());
+        return success(true);
     }
 
     @PostMapping("/reset-password")

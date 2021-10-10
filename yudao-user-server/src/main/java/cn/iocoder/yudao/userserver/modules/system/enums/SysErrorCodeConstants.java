@@ -14,4 +14,11 @@ public interface SysErrorCodeConstants {
     ErrorCode AUTH_LOGIN_USER_DISABLED = new ErrorCode(1005000001, "登录失败，账号被禁用");
     ErrorCode AUTH_LOGIN_FAIL_UNKNOWN = new ErrorCode(1005000002, "登录失败"); // 登录失败的兜底，未知原因
 
+    // ========== SMS CODE 模块 1005001000 ==========
+    ErrorCode USER_SMS_CODE_NOT_FOUND = new ErrorCode(1005001000, "验证码不存在");
+    ErrorCode USER_SMS_CODE_EXPIRED = new ErrorCode(1005001001, "验证码已过期");
+    ErrorCode USER_SMS_CODE_USED = new ErrorCode(1005001002, "验证码已使用");
+    ErrorCode USER_SMS_CODE_NOT_CORRECT = new ErrorCode(1005001003, "验证码不正确");
+    ErrorCode USER_SMS_CODE_EXCEED_SEND_MAXIMUM_QUANTITY_PER_DAY = new ErrorCode(1005001004, "超过每日短信发送数量");
+    ErrorCode USER_SMS_CODE_SEND_TOO_FAST = new ErrorCode(1005001005, "短信发送过于频率");
 }

@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.userserver.modules.member.enums.sms;
+package cn.iocoder.yudao.userserver.modules.system.enums.sms;
 
 import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
 import lombok.AllArgsConstructor;
@@ -13,13 +13,13 @@ import java.util.Arrays;
  */
 @Getter
 @AllArgsConstructor
-public enum MbrSmsSceneEnum implements IntArrayValuable {
+public enum SysSmsSceneEnum implements IntArrayValuable {
 
     LOGIN_BY_SMS(1, "手机号登陆"),
     CHANGE_MOBILE_BY_SMS(2, "更换手机号"),
             ;
 
-    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(MbrSmsSceneEnum::getScene).toArray();
+    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(SysSmsSceneEnum::getScene).toArray();
 
     private final Integer scene;
     private final String name;
