@@ -86,7 +86,8 @@ public class SysUserSessionServiceImpl implements SysUserSessionService {
             SysLoginLogCreateReqDTO reqDTO = new SysLoginLogCreateReqDTO();
             reqDTO.setLogType(SysLoginLogTypeEnum.LOGOUT_TIMEOUT.getType());
             reqDTO.setTraceId(TracerUtils.getTraceId());
-            reqDTO.setUserType(UserTypeEnum.ADMIN.getValue());
+            reqDTO.setUserId(timeoutSessionDO.getUserId());
+            reqDTO.setUserType(timeoutSessionDO.getUserType());
             reqDTO.setUsername(timeoutSessionDO.getUsername());
             reqDTO.setUserAgent(timeoutSessionDO.getUserAgent());
             reqDTO.setUserIp(timeoutSessionDO.getUserIp());
