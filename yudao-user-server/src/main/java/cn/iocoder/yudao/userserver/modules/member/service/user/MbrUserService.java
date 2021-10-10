@@ -25,4 +25,12 @@ public interface MbrUserService {
      */
     void updateUserLogin(Long id, String loginIp);
 
+    /**
+     * 通过用户 ID 查询用户
+     *
+     * @param id 用户ID
+     * @return 用户对象信息
+     */
+    MbrUserDO getUser(Long id);
+
 }

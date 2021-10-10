@@ -33,4 +33,9 @@ public class MbrUserServiceImpl implements MbrUserService {
         userMapper.updateById(new MbrUserDO().setId(id).setLoginIp(loginIp).setLoginDate(new Date()));
     }
 
+    @Override
+    public MbrUserDO getUser(Long id) {
+        return userMapper.selectById(id);
+    }
+
 }

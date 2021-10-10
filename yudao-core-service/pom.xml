@@ -61,6 +61,12 @@
             <artifactId>yudao-spring-boot-starter-redis</artifactId>
         </dependency>
 
+        <!-- Config 配置中心相关 -->
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-spring-boot-starter-config</artifactId>
+        </dependency>
+
         <!-- Test 测试相关 -->
         <dependency>
             <groupId>cn.iocoder.boot</groupId>

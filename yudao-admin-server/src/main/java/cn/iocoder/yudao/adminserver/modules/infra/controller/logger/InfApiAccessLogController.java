@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.adminserver.modules.infra.controller.logger;
 
+import cn.iocoder.yudao.coreservice.modules.infra.dal.dataobject.logger.InfApiAccessLogDO;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
@@ -9,7 +10,6 @@ import cn.iocoder.yudao.adminserver.modules.infra.controller.logger.vo.apiaccess
 import cn.iocoder.yudao.adminserver.modules.infra.controller.logger.vo.apiaccesslog.InfApiAccessLogPageReqVO;
 import cn.iocoder.yudao.adminserver.modules.infra.controller.logger.vo.apiaccesslog.InfApiAccessLogRespVO;
 import cn.iocoder.yudao.adminserver.modules.infra.convert.logger.InfApiAccessLogConvert;
-import cn.iocoder.yudao.adminserver.modules.infra.dal.dataobject.logger.InfApiAccessLogDO;
 import cn.iocoder.yudao.adminserver.modules.infra.service.logger.InfApiAccessLogService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

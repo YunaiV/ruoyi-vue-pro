@@ -2,13 +2,13 @@ package cn.iocoder.yudao.adminserver.modules.infra.service.logger;
 
 import cn.hutool.core.util.RandomUtil;
 import cn.iocoder.yudao.adminserver.BaseDbUnitTest;
+import cn.iocoder.yudao.coreservice.modules.infra.dal.dataobject.logger.InfApiAccessLogDO;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.apilog.core.service.dto.ApiAccessLogCreateDTO;
 import cn.iocoder.yudao.adminserver.modules.infra.controller.logger.vo.apiaccesslog.InfApiAccessLogExportReqVO;
 import cn.iocoder.yudao.adminserver.modules.infra.controller.logger.vo.apiaccesslog.InfApiAccessLogPageReqVO;
-import cn.iocoder.yudao.adminserver.modules.infra.dal.dataobject.logger.InfApiAccessLogDO;
 import cn.iocoder.yudao.adminserver.modules.infra.dal.mysql.logger.InfApiAccessLogMapper;
 import cn.iocoder.yudao.adminserver.modules.infra.service.logger.impl.InfApiAccessLogServiceImpl;
 import cn.iocoder.yudao.framework.test.core.util.RandomUtils;
@@ -37,26 +37,6 @@ public class InfApiAccessLogServiceImplTest extends BaseDbUnitTest {
 
     @Resource
     private InfApiAccessLogMapper infApiAccessLogMapper;
-
-    @Test
-    public void testCreateApiAccessLogAsync() throws Exception {
-        ApiAccessLogCreateDTO createDTO = RandomUtils.randomPojo(
-                ApiAccessLogCreateDTO.class,
-                dto -> dto.setUserType(RandomUtil.randomEle(UserTypeEnum.values()).getValue())
-        );
-
-        // 执行service方法
-        Future<Boolean> future = infApiAccessLogServiceImpl.createApiAccessLogAsync(createDTO);
-
-        // 等异步执行完
-        future.get();
-
-        InfApiAccessLogDO infApiAccessLogDO = infApiAccessLogMapper.selectOne(null);
-        // 断言
-        assertNotNull(infApiAccessLogDO);
-        // 断言，忽略基本字段
-        assertPojoEquals(createDTO, infApiAccessLogDO);
-    }
 
     @Test
     public void testGetApiAccessLogPage() {

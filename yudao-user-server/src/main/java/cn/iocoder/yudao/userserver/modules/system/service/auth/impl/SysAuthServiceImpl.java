@@ -7,7 +7,7 @@ import cn.iocoder.yudao.framework.common.util.monitor.TracerUtils;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.userserver.modules.system.controller.auth.vo.SysAuthLoginReqVO;
-import cn.iocoder.yudao.userserver.modules.system.convert.auth.MbrAuthConvert;
+import cn.iocoder.yudao.userserver.modules.system.convert.auth.SysAuthConvert;
 import cn.iocoder.yudao.userserver.modules.member.dal.dataobject.user.MbrUserDO;
 import cn.iocoder.yudao.userserver.modules.system.service.auth.SysAuthService;
 import cn.iocoder.yudao.userserver.modules.member.service.user.MbrUserService;
@@ -60,7 +60,7 @@ public class SysAuthServiceImpl implements SysAuthService {
             throw new UsernameNotFoundException(mobile);
         }
         // 创建 LoginUser 对象
-        return MbrAuthConvert.INSTANCE.convert(user);
+        return SysAuthConvert.INSTANCE.convert(user);
     }
 
     @Override
@@ -125,7 +125,15 @@ public class SysAuthServiceImpl implements SysAuthService {
 
     @Override
     public LoginUser mockLogin(Long userId) {
-        return null;
+        // 获取用户编号对应的 MbrUserDO
+        MbrUserDO user = userService.getUser(userId);
+        if (user == null) {
+            throw new UsernameNotFoundException(String.valueOf(userId));
+        }
+        this.createLoginLog(user.getMobile(), SysLoginLogTypeEnum.LOGIN_MOCK, SysLoginResultEnum.SUCCESS);
+
+        // 创建 LoginUser 对象
+        return SysAuthConvert.INSTANCE.convert(user);
     }
 
     @Override

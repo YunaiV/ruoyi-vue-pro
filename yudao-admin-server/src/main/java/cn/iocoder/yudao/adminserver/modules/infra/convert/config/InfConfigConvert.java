@@ -1,11 +1,11 @@
 package cn.iocoder.yudao.adminserver.modules.infra.convert.config;
 
+import cn.iocoder.yudao.coreservice.modules.infra.dal.dataobject.config.InfConfigDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.adminserver.modules.infra.controller.config.vo.InfConfigCreateReqVO;
 import cn.iocoder.yudao.adminserver.modules.infra.controller.config.vo.InfConfigExcelVO;
 import cn.iocoder.yudao.adminserver.modules.infra.controller.config.vo.InfConfigRespVO;
 import cn.iocoder.yudao.adminserver.modules.infra.controller.config.vo.InfConfigUpdateReqVO;
-import cn.iocoder.yudao.adminserver.modules.infra.dal.dataobject.config.InfConfigDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 

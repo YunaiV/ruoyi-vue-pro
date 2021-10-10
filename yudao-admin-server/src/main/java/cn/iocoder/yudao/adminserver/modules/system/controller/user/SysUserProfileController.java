@@ -34,9 +34,6 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 import static cn.iocoder.yudao.adminserver.modules.system.enums.SysErrorCodeConstants.FILE_IS_EMPTY;
 
-/**
- * @author niudehua
- */
 @Api(tags = "用户个人中心")
 @RestController
 @RequestMapping("/system/user/profile")
