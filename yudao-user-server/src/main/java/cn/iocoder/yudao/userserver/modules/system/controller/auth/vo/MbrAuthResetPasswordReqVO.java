@@ -16,7 +16,7 @@ import javax.validation.constraints.Pattern;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class SysAuthResetPasswordReqVO {
+public class MbrAuthResetPasswordReqVO {
 
     @ApiModelProperty(value = "新密码", required = true, example = "buzhidao")
     @NotEmpty(message = "新密码不能为空")

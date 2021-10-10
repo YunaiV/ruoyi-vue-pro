@@ -1,18 +1,24 @@
 package cn.iocoder.yudao.userserver.modules.system.service.auth.impl;
 
+import cn.hutool.core.lang.Assert;
 import cn.iocoder.yudao.coreservice.modules.system.service.auth.SysUserSessionCoreService;
 import cn.iocoder.yudao.coreservice.modules.system.service.logger.SysLoginLogCoreService;
 import cn.iocoder.yudao.coreservice.modules.system.service.logger.dto.SysLoginLogCreateReqDTO;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.util.monitor.TracerUtils;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.userserver.modules.system.controller.auth.vo.SysAuthLoginReqVO;
+import cn.iocoder.yudao.userserver.modules.system.controller.auth.vo.SysAuthSmsLoginReqVO;
 import cn.iocoder.yudao.userserver.modules.system.convert.auth.SysAuthConvert;
 import cn.iocoder.yudao.userserver.modules.member.dal.dataobject.user.MbrUserDO;
+import cn.iocoder.yudao.userserver.modules.system.enums.sms.SysSmsSceneEnum;
 import cn.iocoder.yudao.userserver.modules.system.service.auth.SysAuthService;
 import cn.iocoder.yudao.userserver.modules.member.service.user.MbrUserService;
 import cn.iocoder.yudao.coreservice.modules.system.enums.logger.SysLoginLogTypeEnum;
 import cn.iocoder.yudao.coreservice.modules.system.enums.logger.SysLoginResultEnum;
+import cn.iocoder.yudao.userserver.modules.system.service.sms.SysSmsCodeService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -24,7 +30,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.Objects;
@@ -48,6 +54,8 @@ public class SysAuthServiceImpl implements SysAuthService {
     @Resource
     private MbrUserService userService;
     @Resource
+    private SysSmsCodeService smsCodeService;
+    @Resource
     private SysLoginLogCoreService loginLogCoreService;
     @Resource
     private SysUserSessionCoreService userSessionCoreService;
@@ -67,6 +75,25 @@ public class SysAuthServiceImpl implements SysAuthService {
     public String login(SysAuthLoginReqVO reqVO, String userIp, String userAgent) {
         // 使用手机 + 密码，进行登录。
         LoginUser loginUser = this.login0(reqVO.getMobile(), reqVO.getPassword());
+
+        // 缓存登录用户到 Redis 中，返回 sessionId 编号
+        return userSessionCoreService.createUserSession(loginUser, userIp, userAgent);
+    }
+
+    @Override
+    @Transactional
+    public String smsLogin(SysAuthSmsLoginReqVO reqVO, String userIp, String userAgent) {
+        // 校验验证码
+        smsCodeService.useSmsCode(reqVO.getMobile(), SysSmsSceneEnum.LOGIN_BY_SMS.getScene(),
+                reqVO.getCode(), userIp);
+
+        // 获得获得注册用户
+        MbrUserDO user = userService.createUserIfAbsent(reqVO.getMobile(), userIp);
+        Assert.notNull(user, "获取用户失败，结果为空");
+
+        // 执行登陆
+        this.createLoginLog(user.getMobile(), SysLoginLogTypeEnum.LOGIN_SMS, SysLoginResultEnum.SUCCESS);
+        LoginUser loginUser = SysAuthConvert.INSTANCE.convert(user);
 
         // 缓存登录用户到 Redis 中，返回 sessionId 编号
         return userSessionCoreService.createUserSession(loginUser, userIp, userAgent);
@@ -120,7 +147,31 @@ public class SysAuthServiceImpl implements SysAuthService {
 
     @Override
     public LoginUser verifyTokenAndRefresh(String token) {
-        return null;
+        // 获得 LoginUser
+        LoginUser loginUser = userSessionCoreService.getLoginUser(token);
+        if (loginUser == null) {
+            return null;
+        }
+        // 刷新 LoginUser 缓存
+        this.refreshLoginUserCache(token, loginUser);
+        return loginUser;
+    }
+
+    private void refreshLoginUserCache(String token, LoginUser loginUser) {
+        // 每 1/3 的 Session 超时时间，刷新 LoginUser 缓存
+        if (System.currentTimeMillis() - loginUser.getUpdateTime().getTime() <
+                userSessionCoreService.getSessionTimeoutMillis() / 3) {
+            return;
+        }
+
+        // 重新加载 MbrUserDO 信息
+        MbrUserDO user = userService.getUser(loginUser.getId());
+        if (user == null || CommonStatusEnum.DISABLE.getStatus().equals(user.getStatus())) {
+            throw exception(AUTH_TOKEN_EXPIRED); // 校验 token 时，用户被禁用的情况下，也认为 token 过期，方便前端跳转到登录界面
+        }
+
+        // 刷新 LoginUser 缓存
+        userSessionCoreService.refreshUserSession(token, loginUser);
     }
 
     @Override
@@ -130,6 +181,8 @@ public class SysAuthServiceImpl implements SysAuthService {
         if (user == null) {
             throw new UsernameNotFoundException(String.valueOf(userId));
         }
+
+        // 执行登陆
         this.createLoginLog(user.getMobile(), SysLoginLogTypeEnum.LOGIN_MOCK, SysLoginResultEnum.SUCCESS);
 
         // 创建 LoginUser 对象
@@ -138,7 +191,28 @@ public class SysAuthServiceImpl implements SysAuthService {
 
     @Override
     public void logout(String token) {
+        // 查询用户信息
+        LoginUser loginUser = userSessionCoreService.getLoginUser(token);
+        if (loginUser == null) {
+            return;
+        }
+        // 删除 session
+        userSessionCoreService.deleteUserSession(token);
+        // 记录登出日志
+        this.createLogoutLog(loginUser.getId(), loginUser.getUsername());
+    }
 
+    private void createLogoutLog(Long userId, String username) {
+        SysLoginLogCreateReqDTO reqDTO = new SysLoginLogCreateReqDTO();
+        reqDTO.setLogType(SysLoginLogTypeEnum.LOGOUT_SELF.getType());
+        reqDTO.setTraceId(TracerUtils.getTraceId());
+        reqDTO.setUserId(userId);
+        reqDTO.setUserType(UserTypeEnum.MEMBER.getValue());
+        reqDTO.setUsername(username);
+        reqDTO.setUserAgent(ServletUtils.getUserAgent());
+        reqDTO.setUserIp(ServletUtils.getClientIP());
+        reqDTO.setResult(SysLoginResultEnum.SUCCESS.getResult());
+        loginLogCoreService.createLoginLog(reqDTO);
     }
 
 }

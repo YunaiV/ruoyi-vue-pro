@@ -13,7 +13,7 @@ import javax.validation.constraints.NotNull;
 @ApiModel("发送手机验证码 Response VO")
 @Data
 @Accessors(chain = true)
-public class MbrAuthSendSmsReqVO {
+public class SysAuthSendSmsReqVO {
 
     @ApiModelProperty(value = "手机号", example = "15601691234")
     @Mobile

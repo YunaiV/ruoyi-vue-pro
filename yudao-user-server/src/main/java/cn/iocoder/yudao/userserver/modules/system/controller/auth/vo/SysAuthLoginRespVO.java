@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class MbrAuthLoginRespVO {
+public class SysAuthLoginRespVO {
 
     @ApiModelProperty(value = "token", required = true, example = "yudaoyuanma")
     private String token;

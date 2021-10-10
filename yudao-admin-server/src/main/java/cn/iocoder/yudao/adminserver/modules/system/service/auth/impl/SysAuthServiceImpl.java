@@ -255,15 +255,15 @@ public class SysAuthServiceImpl implements SysAuthService {
         }
         // 删除 session
         userSessionCoreService.deleteUserSession(token);
-        // 记录登出日子和
-        this.createLogoutLog(loginUser.getUsername());
+        // 记录登出日志
+        this.createLogoutLog(loginUser.getId(), loginUser.getUsername());
     }
 
-    private void createLogoutLog(String username) {
-        // TODO 芋艿：这里未设置 userId
+    private void createLogoutLog(Long userId, String username) {
         SysLoginLogCreateReqDTO reqDTO = new SysLoginLogCreateReqDTO();
         reqDTO.setLogType(SysLoginLogTypeEnum.LOGOUT_SELF.getType());
         reqDTO.setTraceId(TracerUtils.getTraceId());
+        reqDTO.setUserId(userId);
         reqDTO.setUserType(UserTypeEnum.ADMIN.getValue());
         reqDTO.setUsername(username);
         reqDTO.setUserAgent(ServletUtils.getUserAgent());
@@ -294,7 +294,7 @@ public class SysAuthServiceImpl implements SysAuthService {
         // 重新加载 SysUserDO 信息
         SysUserDO user = userService.getUser(loginUser.getId());
         if (user == null || CommonStatusEnum.DISABLE.getStatus().equals(user.getStatus())) {
-            throw exception(TOKEN_EXPIRED); // 校验 token 时，用户被禁用的情况下，也认为 token 过期，方便前端跳转到登录界面
+            throw exception(AUTH_TOKEN_EXPIRED); // 校验 token 时，用户被禁用的情况下，也认为 token 过期，方便前端跳转到登录界面
         }
 
         // 刷新 LoginUser 缓存

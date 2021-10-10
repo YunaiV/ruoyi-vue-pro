@@ -33,28 +33,30 @@ public class SysAuthController {
 
     @PostMapping("/login")
     @ApiOperation("使用手机 + 密码登录")
-    public CommonResult<MbrAuthLoginRespVO> login(@RequestBody @Valid SysAuthLoginReqVO reqVO) {
+    public CommonResult<SysAuthLoginRespVO> login(@RequestBody @Valid SysAuthLoginReqVO reqVO) {
         String token = authService.login(reqVO, getClientIP(), getUserAgent());
         // 返回结果
-        return success(MbrAuthLoginRespVO.builder().token(token).build());
+        return success(SysAuthLoginRespVO.builder().token(token).build());
     }
 
     @PostMapping("/sms-login")
     @ApiOperation("使用手机 + 验证码登录")
-    public CommonResult<MbrAuthLoginRespVO> smsLogin(@RequestBody @Valid SysAuthLoginReqVO reqVO) {
-        return null;
+    public CommonResult<SysAuthLoginRespVO> smsLogin(@RequestBody @Valid SysAuthSmsLoginReqVO reqVO) {
+        String token = authService.smsLogin(reqVO, getClientIP(), getUserAgent());
+        // 返回结果
+        return success(SysAuthLoginRespVO.builder().token(token).build());
     }
 
     @PostMapping("/send-sms-code")
     @ApiOperation("发送手机验证码")
-    public CommonResult<Boolean> sendSmsCode(@RequestBody @Valid MbrAuthSendSmsReqVO reqVO) {
+    public CommonResult<Boolean> sendSmsCode(@RequestBody @Valid SysAuthSendSmsReqVO reqVO) {
         smsCodeService.sendSmsCode(reqVO.getMobile(), reqVO.getScene(), getClientIP());
         return success(true);
     }
 
     @PostMapping("/reset-password")
     @ApiOperation(value = "重置密码", notes = "用户忘记密码时使用")
-    public CommonResult<Boolean> resetPassword(@RequestBody @Valid SysAuthResetPasswordReqVO reqVO) {
+    public CommonResult<Boolean> resetPassword(@RequestBody @Valid MbrAuthResetPasswordReqVO reqVO) {
         return null;
     }
 
@@ -74,7 +76,7 @@ public class SysAuthController {
 
     @PostMapping("/social-login")
     @ApiOperation("社交登录，使用 code 授权码")
-        public CommonResult<MbrAuthLoginRespVO> socialLogin(@RequestBody @Valid MbrAuthSocialLoginReqVO reqVO) {
+        public CommonResult<SysAuthLoginRespVO> socialLogin(@RequestBody @Valid MbrAuthSocialLoginReqVO reqVO) {
 //        String token = authService.socialLogin(reqVO, getClientIP(), getUserAgent());
 //        // 返回结果
 //        return success(MbrAuthLoginRespVO.builder().token(token).build());
@@ -83,7 +85,7 @@ public class SysAuthController {
 
     @PostMapping("/social-login2")
     @ApiOperation("社交登录，使用 code 授权码 + 账号密码")
-    public CommonResult<MbrAuthLoginRespVO> socialLogin2(@RequestBody @Valid MbrAuthSocialLogin2ReqVO reqVO) {
+    public CommonResult<SysAuthLoginRespVO> socialLogin2(@RequestBody @Valid MbrAuthSocialLogin2ReqVO reqVO) {
 //        String token = authService.socialLogin2(reqVO, getClientIP(), getUserAgent());
 //        // 返回结果
 //        return success(MbrAuthLoginRespVO.builder().token(token).build());

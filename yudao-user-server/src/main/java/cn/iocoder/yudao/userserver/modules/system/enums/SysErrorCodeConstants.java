@@ -13,6 +13,7 @@ public interface SysErrorCodeConstants {
     ErrorCode AUTH_LOGIN_BAD_CREDENTIALS = new ErrorCode(1005000000, "登录失败，账号密码不正确");
     ErrorCode AUTH_LOGIN_USER_DISABLED = new ErrorCode(1005000001, "登录失败，账号被禁用");
     ErrorCode AUTH_LOGIN_FAIL_UNKNOWN = new ErrorCode(1005000002, "登录失败"); // 登录失败的兜底，未知原因
+    ErrorCode AUTH_TOKEN_EXPIRED = new ErrorCode(1005000003, "Token 已经过期");
 
     // ========== SMS CODE 模块 1005001000 ==========
     ErrorCode USER_SMS_CODE_NOT_FOUND = new ErrorCode(1005001000, "验证码不存在");
