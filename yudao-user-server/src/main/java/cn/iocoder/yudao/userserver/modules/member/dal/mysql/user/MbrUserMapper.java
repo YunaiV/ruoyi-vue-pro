@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.userserver.modules.member.dal.mysql.user;
 
+import cn.iocoder.yudao.coreservice.modules.member.dal.dataobject.user.MbrUserDO;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
-import cn.iocoder.yudao.userserver.modules.member.dal.dataobject.user.MbrUserDO;
 import org.apache.ibatis.annotations.Mapper;
 
 /**

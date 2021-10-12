@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.userserver.modules.member.dal.dataobject.user;
+package cn.iocoder.yudao.coreservice.modules.member.dal.dataobject.user;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;

@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.userserver.modules.system.convert.auth;
 
+import cn.iocoder.yudao.coreservice.modules.member.dal.dataobject.user.MbrUserDO;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
-import cn.iocoder.yudao.userserver.modules.member.dal.dataobject.user.MbrUserDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;

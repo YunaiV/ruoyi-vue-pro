@@ -1,7 +1,10 @@
 package cn.iocoder.yudao.userserver.modules.system.service.sms.impl;
 
+import cn.hutool.core.map.MapUtil;
+import cn.iocoder.yudao.coreservice.modules.system.service.sms.SysSmsCoreService;
 import cn.iocoder.yudao.userserver.modules.system.dal.dataobject.sms.SysSmsCodeDO;
 import cn.iocoder.yudao.userserver.modules.system.dal.mysql.sms.SysSmsCodeMapper;
+import cn.iocoder.yudao.userserver.modules.system.enums.sms.SysSmsTemplateCodeConstants;
 import cn.iocoder.yudao.userserver.modules.system.framework.sms.SmsCodeProperties;
 import cn.iocoder.yudao.userserver.modules.system.service.sms.SysSmsCodeService;
 import org.springframework.stereotype.Service;
@@ -29,12 +32,16 @@ public class SysSmsCodeServiceImpl implements SysSmsCodeService {
     @Resource
     private SysSmsCodeMapper smsCodeMapper;
 
+    @Resource
+    private SysSmsCoreService smsCoreService;
+
     @Override
     public void sendSmsCode(String mobile, Integer scene, String createIp) {
         // 创建验证码
         String code = this.createSmsCode(mobile, scene, createIp);
         // 发送验证码
-        // TODO 芋艿：重要，发送短信验证码
+        smsCoreService.sendSingleSmsToMember(mobile, null, SysSmsTemplateCodeConstants.USER_SMS_LOGIN,
+                MapUtil.of("code", code));
     }
 
     private String createSmsCode(String mobile, Integer scene, String ip) {

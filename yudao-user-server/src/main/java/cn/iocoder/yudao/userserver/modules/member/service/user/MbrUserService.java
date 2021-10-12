@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.userserver.modules.member.service.user;
 
+import cn.iocoder.yudao.coreservice.modules.member.dal.dataobject.user.MbrUserDO;
 import cn.iocoder.yudao.framework.common.validation.Mobile;
-import cn.iocoder.yudao.userserver.modules.member.dal.dataobject.user.MbrUserDO;
 
 /**
  * 前台用户 Service 接口
