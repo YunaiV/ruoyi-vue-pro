@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.adminserver.modules.system.mq.message.sms;
+package cn.iocoder.yudao.coreservice.modules.system.mq.message.sms;
 
 import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.mq.core.stream.StreamMessage;

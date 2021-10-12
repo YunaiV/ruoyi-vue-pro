@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.sms;
+package cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.sms;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;

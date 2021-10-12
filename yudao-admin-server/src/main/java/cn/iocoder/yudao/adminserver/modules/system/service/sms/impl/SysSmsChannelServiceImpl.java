@@ -1,19 +1,19 @@
 package cn.iocoder.yudao.adminserver.modules.system.service.sms.impl;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.yudao.framework.sms.core.client.SmsClientFactory;
-import cn.iocoder.yudao.framework.sms.core.property.SmsChannelProperties;
 import cn.iocoder.yudao.adminserver.modules.system.controller.sms.vo.channel.SysSmsChannelCreateReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.sms.vo.channel.SysSmsChannelPageReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.sms.vo.channel.SysSmsChannelUpdateReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.convert.sms.SysSmsChannelConvert;
-import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.sms.SysSmsChannelDO;
 import cn.iocoder.yudao.adminserver.modules.system.dal.mysql.sms.SysSmsChannelMapper;
 import cn.iocoder.yudao.adminserver.modules.system.mq.producer.sms.SysSmsProducer;
 import cn.iocoder.yudao.adminserver.modules.system.service.sms.SysSmsChannelService;
 import cn.iocoder.yudao.adminserver.modules.system.service.sms.SysSmsTemplateService;
+import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.sms.SysSmsChannelDO;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.framework.sms.core.client.SmsClientFactory;
+import cn.iocoder.yudao.framework.sms.core.property.SmsChannelProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -25,9 +25,9 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.adminserver.modules.system.enums.SysErrorCodeConstants.SMS_CHANNEL_HAS_CHILDREN;
 import static cn.iocoder.yudao.adminserver.modules.system.enums.SysErrorCodeConstants.SMS_CHANNEL_NOT_EXISTS;
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 
 /**
  * 短信渠道Service实现类

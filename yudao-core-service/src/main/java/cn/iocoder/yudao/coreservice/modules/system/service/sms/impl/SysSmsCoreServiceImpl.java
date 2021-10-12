@@ -1,7 +1,15 @@
-package cn.iocoder.yudao.adminserver.modules.system.service.sms.impl;
+package cn.iocoder.yudao.coreservice.modules.system.service.sms.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.sms.SysSmsTemplateDO;
+import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.user.SysUserDO;
+import cn.iocoder.yudao.coreservice.modules.system.mq.message.sms.SysSmsSendMessage;
+import cn.iocoder.yudao.coreservice.modules.system.mq.producer.sms.SysSmsCoreProducer;
+import cn.iocoder.yudao.coreservice.modules.system.service.sms.SysSmsCoreService;
+import cn.iocoder.yudao.coreservice.modules.system.service.sms.SysSmsLogCoreService;
+import cn.iocoder.yudao.coreservice.modules.system.service.sms.SysSmsTemplateCoreService;
+import cn.iocoder.yudao.coreservice.modules.system.service.user.SysUserCoreService;
 import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
@@ -10,16 +18,7 @@ import cn.iocoder.yudao.framework.sms.core.client.SmsClientFactory;
 import cn.iocoder.yudao.framework.sms.core.client.SmsCommonResult;
 import cn.iocoder.yudao.framework.sms.core.client.dto.SmsReceiveRespDTO;
 import cn.iocoder.yudao.framework.sms.core.client.dto.SmsSendRespDTO;
-import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.sms.SysSmsTemplateDO;
-import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.user.SysUserDO;
-import cn.iocoder.yudao.adminserver.modules.system.mq.message.sms.SysSmsSendMessage;
-import cn.iocoder.yudao.adminserver.modules.system.mq.producer.sms.SysSmsProducer;
-import cn.iocoder.yudao.adminserver.modules.system.service.sms.SysSmsLogService;
-import cn.iocoder.yudao.adminserver.modules.system.service.sms.SysSmsService;
-import cn.iocoder.yudao.adminserver.modules.system.service.sms.SysSmsTemplateService;
-import cn.iocoder.yudao.adminserver.modules.system.service.user.SysUserService;
 import com.google.common.annotations.VisibleForTesting;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
@@ -28,36 +27,35 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static cn.iocoder.yudao.coreservice.modules.system.enums.SysErrorCodeConstants.*;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.adminserver.modules.system.enums.SysErrorCodeConstants.*;
 
 /**
- * 短信日志Service实现类
+ * 短信 Service Core 实现
  *
- * @author zzf
- * @date 2021/1/25 9:25
+ * @author 芋道源码
  */
 @Service
-@Slf4j
-public class SysSmsServiceImpl implements SysSmsService {
+public class SysSmsCoreServiceImpl implements SysSmsCoreService {
 
     @Resource
-    private SysSmsTemplateService smsTemplateService;
+    private SysUserCoreService sysUserCoreService;
     @Resource
-    private SysSmsLogService smsLogService;
+    private SysSmsTemplateCoreService smsTemplateCoreService;
     @Resource
-    private SysSmsProducer smsProducer;
+    private SysSmsLogCoreService smsLogCoreService;
+
     @Resource
     private SmsClientFactory smsClientFactory;
 
     @Resource
-    private SysUserService userService;
+    private SysSmsCoreProducer smsCoreProducer;
 
     @Override
     public Long sendSingleSmsToAdmin(String mobile, Long userId, String templateCode, Map<String, Object> templateParams) {
         // 如果 mobile 为空，则加载用户编号对应的手机号
         if (StrUtil.isEmpty(mobile)) {
-            SysUserDO user = userService.getUser(userId);
+            SysUserDO user = sysUserCoreService.getUser(userId);
             if (user != null) {
                 mobile = user.getMobile();
             }
@@ -83,12 +81,13 @@ public class SysSmsServiceImpl implements SysSmsService {
 
         // 创建发送日志
         Boolean isSend = CommonStatusEnum.ENABLE.getStatus().equals(template.getStatus()); // 如果模板被禁用，则不发送短信，只记录日志
-        String content = smsTemplateService.formatSmsTemplateContent(template.getContent(), templateParams);
-        Long sendLogId = smsLogService.createSmsLog(mobile, userId, userType, isSend, template, content, templateParams);
+        String content = smsTemplateCoreService.formatSmsTemplateContent(template.getContent(), templateParams);
+        Long sendLogId = smsLogCoreService.createSmsLog(mobile, userId, userType, isSend, template, content, templateParams);
 
         // 发送 MQ 消息，异步执行发送短信
         if (isSend) {
-            smsProducer.sendSmsSendMessage(sendLogId, mobile, template.getChannelId(), template.getApiTemplateId(), newTemplateParams);
+            smsCoreProducer.sendSmsSendMessage(sendLogId, mobile, template.getChannelId(),
+                    template.getApiTemplateId(), newTemplateParams);
         }
         return sendLogId;
     }
@@ -102,10 +101,10 @@ public class SysSmsServiceImpl implements SysSmsService {
     @VisibleForTesting
     public SysSmsTemplateDO checkSmsTemplateValid(String templateCode) {
         // 获得短信模板。考虑到效率，从缓存中获取
-        SysSmsTemplateDO template = smsTemplateService.getSmsTemplateByCodeFromCache(templateCode);
+        SysSmsTemplateDO template = smsTemplateCoreService.getSmsTemplateByCodeFromCache(templateCode);
         // 短信模板不存在
         if (template == null) {
-            throw exception(SMS_TEMPLATE_NOT_EXISTS);
+            throw exception(SMS_SEND_TEMPLATE_NOT_EXISTS);
         }
         return template;
     }
@@ -138,6 +137,7 @@ public class SysSmsServiceImpl implements SysSmsService {
         return mobile;
     }
 
+
     @Override
     public void doSendSms(SysSmsSendMessage message) {
         // 获得渠道对应的 SmsClient 客户端
@@ -146,7 +146,7 @@ public class SysSmsServiceImpl implements SysSmsService {
         // 发送短信
         SmsCommonResult<SmsSendRespDTO> sendResult = smsClient.sendSms(message.getLogId(), message.getMobile(),
                 message.getApiTemplateId(), message.getTemplateParams());
-        smsLogService.updateSmsSendResult(message.getLogId(), sendResult.getCode(), sendResult.getMsg(),
+        smsLogCoreService.updateSmsSendResult(message.getLogId(), sendResult.getCode(), sendResult.getMsg(),
                 sendResult.getApiCode(), sendResult.getApiMsg(), sendResult.getApiRequestId(),
                 sendResult.getData() != null ? sendResult.getData().getSerialNo() : null);
     }
@@ -161,11 +161,9 @@ public class SysSmsServiceImpl implements SysSmsService {
         if (CollUtil.isEmpty(receiveResults)) {
             return;
         }
-        // 更新短信日志的接收结果. 因为量一般不打，所以先使用 for 循环更新
-        receiveResults.forEach(result -> {
-            smsLogService.updateSmsReceiveResult(result.getLogId(), result.getSuccess(), result.getReceiveTime(),
-                    result.getErrorCode(), result.getErrorCode());
-        });
+        // 更新短信日志的接收结果. 因为量一般不大，所以先使用 for 循环更新
+        receiveResults.forEach(result -> smsLogCoreService.updateSmsReceiveResult(result.getLogId(),
+                result.getSuccess(), result.getReceiveTime(), result.getErrorCode(), result.getErrorCode()));
     }
 
 }

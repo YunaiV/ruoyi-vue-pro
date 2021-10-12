@@ -1,14 +1,14 @@
 package cn.iocoder.yudao.adminserver.modules.system.controller.sms;
 
+import cn.iocoder.yudao.adminserver.modules.system.controller.sms.vo.template.*;
+import cn.iocoder.yudao.adminserver.modules.system.convert.sms.SysSmsTemplateConvert;
+import cn.iocoder.yudao.adminserver.modules.system.service.sms.SysSmsTemplateService;
+import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.sms.SysSmsTemplateDO;
+import cn.iocoder.yudao.coreservice.modules.system.service.sms.SysSmsCoreService;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
-import cn.iocoder.yudao.adminserver.modules.system.controller.sms.vo.template.*;
-import cn.iocoder.yudao.adminserver.modules.system.convert.sms.SysSmsTemplateConvert;
-import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.sms.SysSmsTemplateDO;
-import cn.iocoder.yudao.adminserver.modules.system.service.sms.SysSmsService;
-import cn.iocoder.yudao.adminserver.modules.system.service.sms.SysSmsTemplateService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
@@ -32,7 +32,7 @@ public class SysSmsTemplateController {
     @Resource
     private SysSmsTemplateService smsTemplateService;
     @Resource
-    private SysSmsService smsService;
+    private SysSmsCoreService smsCoreService;
 
     @PostMapping("/create")
     @ApiOperation("创建短信模板")
@@ -91,7 +91,7 @@ public class SysSmsTemplateController {
     @ApiOperation("发送短信")
     @PreAuthorize("@ss.hasPermission('system:sms-template:send-sms')")
     public CommonResult<Long> sendSms(@Valid @RequestBody SysSmsTemplateSendReqVO sendReqVO) {
-        return success(smsService.sendSingleSms(sendReqVO.getMobile(), null, null,
+        return success(smsCoreService.sendSingleSms(sendReqVO.getMobile(), null, null,
                 sendReqVO.getTemplateCode(), sendReqVO.getTemplateParams()));
     }
 

@@ -1,8 +1,8 @@
-package cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.sms;
+package cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.sms;
 
+import cn.iocoder.yudao.coreservice.modules.system.enums.sms.SysSmsTemplateTypeEnum;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.yudao.adminserver.modules.system.enums.sms.SysSmsTemplateTypeEnum;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;

@@ -1,19 +1,20 @@
 package cn.iocoder.yudao.adminserver.modules.system.service.auth;
 
 import cn.iocoder.yudao.adminserver.BaseDbUnitTest;
-import cn.iocoder.yudao.adminserver.modules.system.service.social.SysSocialService;
-import cn.iocoder.yudao.coreservice.modules.system.service.auth.SysUserSessionCoreService;
-import cn.iocoder.yudao.coreservice.modules.system.service.logger.SysLoginLogCoreService;
-import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
-import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.adminserver.modules.system.controller.auth.vo.auth.SysAuthLoginReqVO;
-import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.user.SysUserDO;
 import cn.iocoder.yudao.adminserver.modules.system.enums.logger.SysLoginLogTypeEnum;
 import cn.iocoder.yudao.adminserver.modules.system.enums.logger.SysLoginResultEnum;
 import cn.iocoder.yudao.adminserver.modules.system.service.auth.impl.SysAuthServiceImpl;
 import cn.iocoder.yudao.adminserver.modules.system.service.common.SysCaptchaService;
 import cn.iocoder.yudao.adminserver.modules.system.service.permission.SysPermissionService;
+import cn.iocoder.yudao.adminserver.modules.system.service.social.SysSocialService;
 import cn.iocoder.yudao.adminserver.modules.system.service.user.SysUserService;
+import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.user.SysUserDO;
+import cn.iocoder.yudao.coreservice.modules.system.service.auth.SysUserSessionCoreService;
+import cn.iocoder.yudao.coreservice.modules.system.service.logger.SysLoginLogCoreService;
+import cn.iocoder.yudao.coreservice.modules.system.service.user.SysUserCoreService;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.test.core.util.AssertUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -50,6 +51,8 @@ public class SysAuthServiceImplTest extends BaseDbUnitTest {
 
     @MockBean
     private SysUserService userService;
+    @MockBean
+    private SysUserCoreService userCoreService;
     @MockBean
     private SysPermissionService permissionService;
     @MockBean
@@ -98,7 +101,7 @@ public class SysAuthServiceImplTest extends BaseDbUnitTest {
         Long userId = randomLongId();
         // mock 方法 01
         SysUserDO user = randomPojo(SysUserDO.class, o -> o.setId(userId));
-        when(userService.getUser(eq(userId))).thenReturn(user);
+        when(userCoreService.getUser(eq(userId))).thenReturn(user);
         // mock 方法 02
         Set<Long> roleIds = randomSet(Long.class);
         when(permissionService.getUserRoleIds(eq(userId), eq(singleton(CommonStatusEnum.ENABLE.getStatus()))))

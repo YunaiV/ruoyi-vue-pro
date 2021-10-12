@@ -1,21 +1,22 @@
-package cn.iocoder.yudao.adminserver.modules.system.service.sms;
+package cn.iocoder.yudao.coreservice.modules.system.service.sms;
 
-import cn.iocoder.yudao.adminserver.modules.system.mq.message.sms.SysSmsSendMessage;
+import cn.iocoder.yudao.coreservice.modules.system.mq.message.sms.SysSmsSendMessage;
 
 import java.util.List;
 import java.util.Map;
 
 /**
- * 短信Service接口
- * 只支持异步，因此没有返回值
+ * 短信 Service Core 接口
  *
- * @author zzf
- * @date 2021/1/25 9:24
+ * 接入方，通过调用 send 开头的方法，创建发送短信的任务到 MQ 中
+ * 后续，yudao-admin-server 监听 MQ，执行真正的短信发送逻辑
+ *
+ * @author 芋道源码
  */
-public interface SysSmsService {
+public interface SysSmsCoreService {
 
     /**
-     * 发送单条短信给用户（管理员）
+     * 发送单条短信给后台用户
      *
      * 在 mobile 为空时，使用 userId 加载对应管理员的手机号
      *
@@ -29,7 +30,7 @@ public interface SysSmsService {
                               String templateCode, Map<String, Object> templateParams);
 
     /**
-     * 发送单条短信给用户（会员）
+     * 发送单条短信给前台用户
      *
      * 在 mobile 为空时，使用 userId 加载对应会员的手机号
      *
@@ -40,7 +41,7 @@ public interface SysSmsService {
      * @return 发送日志编号
      */
     Long sendSingleSmsToMember(String mobile, Long userId,
-                              String templateCode, Map<String, Object> templateParams);
+                               String templateCode, Map<String, Object> templateParams);
 
     Long sendSingleSms(String mobile, Long userId, Integer userType,
                        String templateCode, Map<String, Object> templateParams);

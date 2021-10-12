@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.adminserver.modules.system.enums.common;
+package cn.iocoder.yudao.coreservice.modules.system.enums.common;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,12 +11,14 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum SysSexEnum {
+
     /** 男 */
     MALE(1),
     /** 女 */
     FEMALE(2),
     /* 未知 */
     UNKNOWN(3);
+
     /**
      * 性别
      */

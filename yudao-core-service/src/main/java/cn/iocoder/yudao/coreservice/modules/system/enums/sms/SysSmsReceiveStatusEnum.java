@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.adminserver.modules.system.enums.sms;
+package cn.iocoder.yudao.coreservice.modules.system.enums.sms;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

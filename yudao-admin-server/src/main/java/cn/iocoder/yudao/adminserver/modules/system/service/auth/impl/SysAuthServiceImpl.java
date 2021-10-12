@@ -7,7 +7,6 @@ import cn.iocoder.yudao.adminserver.modules.system.controller.auth.vo.auth.SysAu
 import cn.iocoder.yudao.adminserver.modules.system.controller.auth.vo.auth.SysAuthSocialLoginReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.convert.auth.SysAuthConvert;
 import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.social.SysSocialUserDO;
-import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.user.SysUserDO;
 import cn.iocoder.yudao.adminserver.modules.system.enums.logger.SysLoginLogTypeEnum;
 import cn.iocoder.yudao.adminserver.modules.system.enums.logger.SysLoginResultEnum;
 import cn.iocoder.yudao.adminserver.modules.system.service.auth.SysAuthService;
@@ -15,9 +14,11 @@ import cn.iocoder.yudao.adminserver.modules.system.service.common.SysCaptchaServ
 import cn.iocoder.yudao.adminserver.modules.system.service.permission.SysPermissionService;
 import cn.iocoder.yudao.adminserver.modules.system.service.social.SysSocialService;
 import cn.iocoder.yudao.adminserver.modules.system.service.user.SysUserService;
+import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.user.SysUserDO;
 import cn.iocoder.yudao.coreservice.modules.system.service.auth.SysUserSessionCoreService;
 import cn.iocoder.yudao.coreservice.modules.system.service.logger.SysLoginLogCoreService;
 import cn.iocoder.yudao.coreservice.modules.system.service.logger.dto.SysLoginLogCreateReqDTO;
+import cn.iocoder.yudao.coreservice.modules.system.service.user.SysUserCoreService;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.util.monitor.TracerUtils;
@@ -62,6 +63,8 @@ public class SysAuthServiceImpl implements SysAuthService {
     @Resource
     private SysUserService userService;
     @Resource
+    private SysUserCoreService userCoreService;
+    @Resource
     private SysPermissionService permissionService;
     @Resource
     private SysCaptchaService captchaService;
@@ -86,7 +89,7 @@ public class SysAuthServiceImpl implements SysAuthService {
     @Override
     public LoginUser mockLogin(Long userId) {
         // 获取用户编号对应的 SysUserDO
-        SysUserDO user = userService.getUser(userId);
+        SysUserDO user = userCoreService.getUser(userId);
         if (user == null) {
             throw new UsernameNotFoundException(String.valueOf(userId));
         }
@@ -201,7 +204,7 @@ public class SysAuthServiceImpl implements SysAuthService {
         }
 
         // 自动登录
-        SysUserDO user = userService.getUser(socialUsers.get(0).getUserId());
+        SysUserDO user = userCoreService.getUser(socialUsers.get(0).getUserId());
         if (user == null) {
             throw exception(USER_NOT_EXISTS);
         }
@@ -292,7 +295,7 @@ public class SysAuthServiceImpl implements SysAuthService {
         }
 
         // 重新加载 SysUserDO 信息
-        SysUserDO user = userService.getUser(loginUser.getId());
+        SysUserDO user = userCoreService.getUser(loginUser.getId());
         if (user == null || CommonStatusEnum.DISABLE.getStatus().equals(user.getStatus())) {
             throw exception(AUTH_TOKEN_EXPIRED); // 校验 token 时，用户被禁用的情况下，也认为 token 过期，方便前端跳转到登录界面
         }

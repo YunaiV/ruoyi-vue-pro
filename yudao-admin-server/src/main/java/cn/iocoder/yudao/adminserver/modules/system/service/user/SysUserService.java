@@ -1,16 +1,11 @@
 package cn.iocoder.yudao.adminserver.modules.system.service.user;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.adminserver.modules.system.controller.user.vo.profile.SysUserProfileUpdatePasswordReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.user.vo.profile.SysUserProfileUpdateReqVO;
-import cn.iocoder.yudao.adminserver.modules.system.controller.user.vo.user.SysUserCreateReqVO;
-import cn.iocoder.yudao.adminserver.modules.system.controller.user.vo.user.SysUserExportReqVO;
-import cn.iocoder.yudao.adminserver.modules.system.controller.user.vo.user.SysUserImportExcelVO;
-import cn.iocoder.yudao.adminserver.modules.system.controller.user.vo.user.SysUserImportRespVO;
-import cn.iocoder.yudao.adminserver.modules.system.controller.user.vo.user.SysUserPageReqVO;
-import cn.iocoder.yudao.adminserver.modules.system.controller.user.vo.user.SysUserUpdateReqVO;
-import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.user.SysUserDO;
+import cn.iocoder.yudao.adminserver.modules.system.controller.user.vo.user.*;
+import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.user.SysUserDO;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 
 import java.io.InputStream;
@@ -103,14 +98,6 @@ public interface SysUserService {
      * @return 用户对象信息
      */
     SysUserDO getUserByUsername(String username);
-
-    /**
-     * 通过用户 ID 查询用户
-     *
-     * @param id 用户ID
-     * @return 用户对象信息
-     */
-    SysUserDO getUser(Long id);
 
     /**
      * 获得用户分页列表

@@ -4,13 +4,13 @@ import cn.iocoder.yudao.adminserver.modules.system.controller.auth.vo.auth.*;
 import cn.iocoder.yudao.adminserver.modules.system.convert.auth.SysAuthConvert;
 import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.permission.SysMenuDO;
 import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.permission.SysRoleDO;
-import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.user.SysUserDO;
 import cn.iocoder.yudao.adminserver.modules.system.enums.permission.MenuTypeEnum;
 import cn.iocoder.yudao.adminserver.modules.system.service.auth.SysAuthService;
 import cn.iocoder.yudao.adminserver.modules.system.service.permission.SysPermissionService;
 import cn.iocoder.yudao.adminserver.modules.system.service.permission.SysRoleService;
 import cn.iocoder.yudao.adminserver.modules.system.service.social.SysSocialService;
-import cn.iocoder.yudao.adminserver.modules.system.service.user.SysUserService;
+import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.user.SysUserDO;
+import cn.iocoder.yudao.coreservice.modules.system.service.user.SysUserCoreService;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.collection.SetUtils;
@@ -43,7 +43,7 @@ public class SysAuthController {
     @Resource
     private SysAuthService authService;
     @Resource
-    private SysUserService userService;
+    private SysUserCoreService userCoreService;
     @Resource
     private SysRoleService roleService;
     @Resource
@@ -64,7 +64,7 @@ public class SysAuthController {
     @ApiOperation("获取登录用户的权限信息")
     public CommonResult<SysAuthPermissionInfoRespVO> getPermissionInfo() {
         // 获得用户信息
-        SysUserDO user = userService.getUser(getLoginUserId());
+        SysUserDO user = userCoreService.getUser(getLoginUserId());
         if (user == null) {
             return null;
         }
