@@ -16,8 +16,7 @@ public interface ApiAccessLogFrameworkService {
      * 创建 API 访问日志
      *
      * @param createDTO 创建信息
-     * @return 是否创建成功
      */
-    Future<Boolean> createApiAccessLogAsync(@Valid ApiAccessLogCreateDTO createDTO);
+    void createApiAccessLogAsync(@Valid ApiAccessLogCreateDTO createDTO);
 
 }

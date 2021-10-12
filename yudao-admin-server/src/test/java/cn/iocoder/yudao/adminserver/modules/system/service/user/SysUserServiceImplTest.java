@@ -3,21 +3,21 @@ package cn.iocoder.yudao.adminserver.modules.system.service.user;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.iocoder.yudao.adminserver.BaseDbUnitTest;
-import cn.iocoder.yudao.adminserver.modules.system.service.user.impl.SysUserServiceImpl;
-import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.adminserver.modules.infra.service.file.InfFileService;
 import cn.iocoder.yudao.adminserver.modules.system.controller.user.vo.profile.SysUserProfileUpdatePasswordReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.user.vo.profile.SysUserProfileUpdateReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.user.vo.user.*;
 import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.dept.SysDeptDO;
 import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.dept.SysPostDO;
-import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.user.SysUserDO;
 import cn.iocoder.yudao.adminserver.modules.system.dal.mysql.user.SysUserMapper;
-import cn.iocoder.yudao.adminserver.modules.system.enums.common.SysSexEnum;
 import cn.iocoder.yudao.adminserver.modules.system.service.dept.SysDeptService;
 import cn.iocoder.yudao.adminserver.modules.system.service.dept.SysPostService;
 import cn.iocoder.yudao.adminserver.modules.system.service.permission.SysPermissionService;
+import cn.iocoder.yudao.adminserver.modules.system.service.user.impl.SysUserServiceImpl;
+import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.user.SysUserDO;
+import cn.iocoder.yudao.coreservice.modules.system.enums.common.SysSexEnum;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.ArrayUtils;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
@@ -36,9 +36,9 @@ import java.util.function.Consumer;
 import static cn.hutool.core.util.RandomUtil.randomBytes;
 import static cn.hutool.core.util.RandomUtil.randomEle;
 import static cn.iocoder.yudao.adminserver.modules.system.enums.SysErrorCodeConstants.*;
+import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildTime;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildTime;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
 import static org.assertj.core.util.Lists.newArrayList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -243,7 +243,7 @@ public class SysUserServiceImplTest extends BaseDbUnitTest {
         // 调用数据
         userService.deleteUser(userId);
         // 校验结果
-        assertNull(userService.getUser(userId));
+        assertNull(userMapper.selectById(userId));
         // 校验调用次数
         verify(permissionService, times(1)).processUserDeleted(eq(userId));
     }

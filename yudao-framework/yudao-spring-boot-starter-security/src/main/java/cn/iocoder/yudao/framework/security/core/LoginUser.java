@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.framework.security.core;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
@@ -24,7 +25,13 @@ public class LoginUser implements UserDetails {
      */
     private Long id;
     /**
-     * 科室编号
+     * 用户类型
+     *
+     * 关联 {@link UserTypeEnum}
+     */
+    private Integer userType;
+    /**
+     * 部门编号
      */
     private Long deptId;
     /**
@@ -48,6 +55,8 @@ public class LoginUser implements UserDetails {
      * 状态
      */
     private Integer status;
+
+    // TODO @芋艿：怎么去掉 deptId
 
     @Override
     @JsonIgnore// 避免序列化

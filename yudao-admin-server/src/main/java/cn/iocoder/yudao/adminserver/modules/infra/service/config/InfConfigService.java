@@ -1,11 +1,11 @@
 package cn.iocoder.yudao.adminserver.modules.infra.service.config;
 
+import cn.iocoder.yudao.coreservice.modules.infra.dal.dataobject.config.InfConfigDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.adminserver.modules.infra.controller.config.vo.InfConfigCreateReqVO;
 import cn.iocoder.yudao.adminserver.modules.infra.controller.config.vo.InfConfigExportReqVO;
 import cn.iocoder.yudao.adminserver.modules.infra.controller.config.vo.InfConfigPageReqVO;
 import cn.iocoder.yudao.adminserver.modules.infra.controller.config.vo.InfConfigUpdateReqVO;
-import cn.iocoder.yudao.adminserver.modules.infra.dal.dataobject.config.InfConfigDO;
 
 import javax.validation.Valid;
 import java.util.List;

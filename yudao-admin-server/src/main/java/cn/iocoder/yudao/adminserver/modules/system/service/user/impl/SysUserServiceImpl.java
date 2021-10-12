@@ -11,12 +11,12 @@ import cn.iocoder.yudao.adminserver.modules.system.controller.user.vo.user.*;
 import cn.iocoder.yudao.adminserver.modules.system.convert.user.SysUserConvert;
 import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.dept.SysDeptDO;
 import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.dept.SysPostDO;
-import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.user.SysUserDO;
 import cn.iocoder.yudao.adminserver.modules.system.dal.mysql.user.SysUserMapper;
 import cn.iocoder.yudao.adminserver.modules.system.service.dept.SysDeptService;
 import cn.iocoder.yudao.adminserver.modules.system.service.dept.SysPostService;
 import cn.iocoder.yudao.adminserver.modules.system.service.permission.SysPermissionService;
 import cn.iocoder.yudao.adminserver.modules.system.service.user.SysUserService;
+import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.user.SysUserDO;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -82,6 +82,11 @@ public class SysUserServiceImpl implements SysUserService {
         // 更新用户
         SysUserDO updateObj = SysUserConvert.INSTANCE.convert(reqVO);
         userMapper.updateById(updateObj);
+    }
+
+    @Override
+    public void updateUserLogin(Long id, String loginIp) {
+        userMapper.updateById(new SysUserDO().setId(id).setLoginIp(loginIp).setLoginDate(new Date()));
     }
 
     @Override
@@ -152,11 +157,6 @@ public class SysUserServiceImpl implements SysUserService {
     @Override
     public SysUserDO getUserByUsername(String username) {
         return userMapper.selectByUsername(username);
-    }
-
-    @Override
-    public SysUserDO getUser(Long id) {
-        return userMapper.selectById(id);
     }
 
     @Override

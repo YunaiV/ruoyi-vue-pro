@@ -1,12 +1,12 @@
 package cn.iocoder.yudao.adminserver.modules.system.service.dict;
 
+import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.dict.SysDictDataDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.dict.core.service.DictDataFrameworkService;
 import cn.iocoder.yudao.adminserver.modules.system.controller.dict.vo.data.SysDictDataCreateReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.dict.vo.data.SysDictDataExportReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.dict.vo.data.SysDictDataPageReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.dict.vo.data.SysDictDataUpdateReqVO;
-import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.dict.SysDictDataDO;
 
 import java.util.List;
 
@@ -15,12 +15,7 @@ import java.util.List;
  *
  * @author ruoyi
  */
-public interface SysDictDataService extends DictDataFrameworkService {
-
-    /**
-     * 初始化字典数据的本地缓存
-     */
-    void initLocalCache();
+public interface SysDictDataService {
 
     /**
      * 创建字典数据

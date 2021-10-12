@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.adminserver.modules.infra.service.file;
 
+import cn.iocoder.yudao.coreservice.modules.infra.dal.dataobject.file.InfFileDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.adminserver.modules.infra.controller.file.vo.InfFilePageReqVO;
-import cn.iocoder.yudao.adminserver.modules.infra.dal.dataobject.file.InfFileDO;
 
 /**
  * 文件 Service 接口

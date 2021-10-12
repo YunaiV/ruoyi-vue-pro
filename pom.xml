@@ -12,6 +12,7 @@
         <module>yudao-framework</module>
         <module>yudao-admin-server</module>
         <module>yudao-user-server</module>
+        <module>yudao-core-service</module>
     </modules>
 
     <name>${artifactId}</name>
