@@ -1,17 +1,20 @@
 package cn.iocoder.yudao.adminserver.modules.system.service.auth;
 
 import cn.iocoder.yudao.adminserver.BaseDbUnitTest;
-import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
-import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.adminserver.modules.system.controller.auth.vo.auth.SysAuthLoginReqVO;
-import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.user.SysUserDO;
 import cn.iocoder.yudao.adminserver.modules.system.enums.logger.SysLoginLogTypeEnum;
 import cn.iocoder.yudao.adminserver.modules.system.enums.logger.SysLoginResultEnum;
 import cn.iocoder.yudao.adminserver.modules.system.service.auth.impl.SysAuthServiceImpl;
 import cn.iocoder.yudao.adminserver.modules.system.service.common.SysCaptchaService;
-import cn.iocoder.yudao.adminserver.modules.system.service.logger.SysLoginLogService;
 import cn.iocoder.yudao.adminserver.modules.system.service.permission.SysPermissionService;
+import cn.iocoder.yudao.adminserver.modules.system.service.social.SysSocialService;
 import cn.iocoder.yudao.adminserver.modules.system.service.user.SysUserService;
+import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.user.SysUserDO;
+import cn.iocoder.yudao.coreservice.modules.system.service.auth.SysUserSessionCoreService;
+import cn.iocoder.yudao.coreservice.modules.system.service.logger.SysLoginLogCoreService;
+import cn.iocoder.yudao.coreservice.modules.system.service.user.SysUserCoreService;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.test.core.util.AssertUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -49,6 +52,8 @@ public class SysAuthServiceImplTest extends BaseDbUnitTest {
     @MockBean
     private SysUserService userService;
     @MockBean
+    private SysUserCoreService userCoreService;
+    @MockBean
     private SysPermissionService permissionService;
     @MockBean
     private AuthenticationManager authenticationManager;
@@ -57,9 +62,11 @@ public class SysAuthServiceImplTest extends BaseDbUnitTest {
     @MockBean
     private SysCaptchaService captchaService;
     @MockBean
-    private SysLoginLogService loginLogService;
+    private SysLoginLogCoreService loginLogCoreService;
     @MockBean
-    private SysUserSessionService userSessionService;
+    private SysUserSessionCoreService userSessionCoreService;
+    @MockBean
+    private SysSocialService socialService;
 
     @Test
     public void testLoadUserByUsername_success() {
@@ -94,7 +101,7 @@ public class SysAuthServiceImplTest extends BaseDbUnitTest {
         Long userId = randomLongId();
         // mock 方法 01
         SysUserDO user = randomPojo(SysUserDO.class, o -> o.setId(userId));
-        when(userService.getUser(eq(userId))).thenReturn(user);
+        when(userCoreService.getUser(eq(userId))).thenReturn(user);
         // mock 方法 02
         Set<Long> roleIds = randomSet(Long.class);
         when(permissionService.getUserRoleIds(eq(userId), eq(singleton(CommonStatusEnum.ENABLE.getStatus()))))
@@ -128,7 +135,7 @@ public class SysAuthServiceImplTest extends BaseDbUnitTest {
         // 调用, 并断言异常
         assertServiceException(() -> authService.login(reqVO, userIp, userAgent), AUTH_LOGIN_CAPTCHA_NOT_FOUND);
         // 校验调用参数
-        verify(loginLogService, times(1)).createLoginLog(
+        verify(loginLogCoreService, times(1)).createLoginLog(
             argThat(o -> o.getLogType().equals(SysLoginLogTypeEnum.LOGIN_USERNAME.getType())
                     && o.getResult().equals(SysLoginResultEnum.CAPTCHA_NOT_FOUND.getResult()))
         );
@@ -146,7 +153,7 @@ public class SysAuthServiceImplTest extends BaseDbUnitTest {
         // 调用, 并断言异常
         assertServiceException(() -> authService.login(reqVO, userIp, userAgent), AUTH_LOGIN_CAPTCHA_CODE_ERROR);
         // 校验调用参数
-        verify(loginLogService, times(1)).createLoginLog(
+        verify(loginLogCoreService, times(1)).createLoginLog(
             argThat(o -> o.getLogType().equals(SysLoginLogTypeEnum.LOGIN_USERNAME.getType())
                     && o.getResult().equals(SysLoginResultEnum.CAPTCHA_CODE_ERROR.getResult()))
         );
@@ -167,7 +174,7 @@ public class SysAuthServiceImplTest extends BaseDbUnitTest {
         assertServiceException(() -> authService.login(reqVO, userIp, userAgent), AUTH_LOGIN_BAD_CREDENTIALS);
         // 校验调用参数
         verify(captchaService, times(1)).deleteCaptchaCode(reqVO.getUuid());
-        verify(loginLogService, times(1)).createLoginLog(
+        verify(loginLogCoreService, times(1)).createLoginLog(
             argThat(o -> o.getLogType().equals(SysLoginLogTypeEnum.LOGIN_USERNAME.getType())
                     && o.getResult().equals(SysLoginResultEnum.BAD_CREDENTIALS.getResult()))
         );
@@ -188,7 +195,7 @@ public class SysAuthServiceImplTest extends BaseDbUnitTest {
         assertServiceException(() -> authService.login(reqVO, userIp, userAgent), AUTH_LOGIN_USER_DISABLED);
         // 校验调用参数
         verify(captchaService, times(1)).deleteCaptchaCode(reqVO.getUuid());
-        verify(loginLogService, times(1)).createLoginLog(
+        verify(loginLogCoreService, times(1)).createLoginLog(
             argThat(o -> o.getLogType().equals(SysLoginLogTypeEnum.LOGIN_USERNAME.getType())
                     && o.getResult().equals(SysLoginResultEnum.USER_DISABLED.getResult()))
         );
@@ -209,7 +216,7 @@ public class SysAuthServiceImplTest extends BaseDbUnitTest {
         assertServiceException(() -> authService.login(reqVO, userIp, userAgent), AUTH_LOGIN_FAIL_UNKNOWN);
         // 校验调用参数
         verify(captchaService, times(1)).deleteCaptchaCode(reqVO.getUuid());
-        verify(loginLogService, times(1)).createLoginLog(
+        verify(loginLogCoreService, times(1)).createLoginLog(
             argThat(o -> o.getLogType().equals(SysLoginLogTypeEnum.LOGIN_USERNAME.getType())
                     && o.getResult().equals(SysLoginResultEnum.UNKNOWN_ERROR.getResult()))
         );
@@ -237,13 +244,13 @@ public class SysAuthServiceImplTest extends BaseDbUnitTest {
         // mock 获得 User 拥有的角色编号数组
         when(permissionService.getUserRoleIds(userId, singleton(CommonStatusEnum.ENABLE.getStatus()))).thenReturn(userRoleIds);
         // mock 缓存登录用户到 Redis
-        when(userSessionService.createUserSession(loginUser, userIp, userAgent)).thenReturn(sessionId);
+        when(userSessionCoreService.createUserSession(loginUser, userIp, userAgent)).thenReturn(sessionId);
         // 调用, 并断言异常
         String login = authService.login(reqVO, userIp, userAgent);
         assertEquals(sessionId, login);
         // 校验调用参数
         verify(captchaService, times(1)).deleteCaptchaCode(reqVO.getUuid());
-        verify(loginLogService, times(1)).createLoginLog(
+        verify(loginLogCoreService, times(1)).createLoginLog(
             argThat(o -> o.getLogType().equals(SysLoginLogTypeEnum.LOGIN_USERNAME.getType())
                     && o.getResult().equals(SysLoginResultEnum.SUCCESS.getResult()))
         );
@@ -255,12 +262,12 @@ public class SysAuthServiceImplTest extends BaseDbUnitTest {
         String token = randomString();
         LoginUser loginUser = randomPojo(LoginUser.class);
         // mock
-        when(userSessionService.getLoginUser(token)).thenReturn(loginUser);
+        when(userSessionCoreService.getLoginUser(token)).thenReturn(loginUser);
         // 调用
         authService.logout(token);
         // 校验调用参数
-        verify(userSessionService, times(1)).deleteUserSession(token);
-        verify(loginLogService, times(1)).createLoginLog(
+        verify(userSessionCoreService, times(1)).deleteUserSession(token);
+        verify(loginLogCoreService, times(1)).createLoginLog(
             argThat(o -> o.getLogType().equals(SysLoginLogTypeEnum.LOGOUT_SELF.getType())
                     && o.getResult().equals(SysLoginResultEnum.SUCCESS.getResult()))
         );

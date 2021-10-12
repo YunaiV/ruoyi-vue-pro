@@ -1,12 +1,12 @@
 package cn.iocoder.yudao.adminserver.modules.system.controller.dict;
 
+import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.dict.SysDictDataDO;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.adminserver.modules.system.controller.dict.vo.data.*;
 import cn.iocoder.yudao.adminserver.modules.system.convert.dict.SysDictDataConvert;
-import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.dict.SysDictDataDO;
 import cn.iocoder.yudao.adminserver.modules.system.service.dict.SysDictDataService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;

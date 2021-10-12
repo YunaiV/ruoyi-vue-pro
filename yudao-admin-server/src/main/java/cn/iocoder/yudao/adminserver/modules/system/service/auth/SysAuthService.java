@@ -6,7 +6,7 @@ import cn.iocoder.yudao.framework.security.core.service.SecurityAuthFrameworkSer
 import javax.validation.Valid;
 
 /**
- * 认证 Service 接口
+ * 管理后台的认证 Service 接口
  *
  * 提供用户的账号密码登录、token 的校验等认证相关的功能
  *

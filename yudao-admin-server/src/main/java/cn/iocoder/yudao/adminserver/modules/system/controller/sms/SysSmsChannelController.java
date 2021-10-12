@@ -1,11 +1,11 @@
 package cn.iocoder.yudao.adminserver.modules.system.controller.sms;
 
-import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.adminserver.modules.system.controller.sms.vo.channel.*;
 import cn.iocoder.yudao.adminserver.modules.system.convert.sms.SysSmsChannelConvert;
-import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.sms.SysSmsChannelDO;
 import cn.iocoder.yudao.adminserver.modules.system.service.sms.SysSmsChannelService;
+import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.sms.SysSmsChannelDO;
+import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;

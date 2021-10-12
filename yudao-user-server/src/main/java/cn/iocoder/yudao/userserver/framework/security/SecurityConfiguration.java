@@ -18,7 +18,7 @@ public class SecurityConfiguration {
     @Bean
     public Customizer<ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry> authorizeRequestsCustomizer() {
         return registry -> {
-            registry.antMatchers(api("/**")).anonymous(); // 默认 API 都是用户可访问
+            registry.antMatchers(api("/**")).permitAll(); // 默认 API 都是用户可访问
         };
     }
 

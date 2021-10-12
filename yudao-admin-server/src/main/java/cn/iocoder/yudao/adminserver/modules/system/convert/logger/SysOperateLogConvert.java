@@ -1,12 +1,12 @@
 package cn.iocoder.yudao.adminserver.modules.system.convert.logger;
 
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.operatelog.core.dto.OperateLogCreateReqDTO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.logger.vo.operatelog.SysOperateLogExcelVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.logger.vo.operatelog.SysOperateLogRespVO;
 import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.logger.SysOperateLogDO;
-import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.user.SysUserDO;
+import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.user.SysUserDO;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
+import cn.iocoder.yudao.framework.operatelog.core.dto.OperateLogCreateReqDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 

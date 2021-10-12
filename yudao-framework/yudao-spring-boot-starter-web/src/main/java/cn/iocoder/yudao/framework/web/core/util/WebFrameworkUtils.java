@@ -17,11 +17,16 @@ import javax.servlet.http.HttpServletRequest;
 public class WebFrameworkUtils {
 
     private static final String REQUEST_ATTRIBUTE_LOGIN_USER_ID = "login_user_id";
+    private static final String REQUEST_ATTRIBUTE_LOGIN_USER_TYPE = "login_user_type";
 
     private static final String REQUEST_ATTRIBUTE_COMMON_RESULT = "common_result";
 
     public static void setLoginUserId(ServletRequest request, Long userId) {
         request.setAttribute(REQUEST_ATTRIBUTE_LOGIN_USER_ID, userId);
+    }
+
+    public static void setLoginUserType(ServletRequest request, Integer userType) {
+        request.setAttribute(REQUEST_ATTRIBUTE_LOGIN_USER_TYPE, userType);
     }
 
     /**
@@ -37,13 +42,22 @@ public class WebFrameworkUtils {
         return (Long) request.getAttribute(REQUEST_ATTRIBUTE_LOGIN_USER_ID);
     }
 
+    /**
+     * 获得当前用户的类型，从请求中
+     *
+     * @param request 请求
+     * @return 用户编号
+     */
+    public static Integer getLoginUserType(HttpServletRequest request) {
+        if (request == null) {
+            return null;
+        }
+        return (Integer) request.getAttribute(REQUEST_ATTRIBUTE_LOGIN_USER_TYPE);
+    }
+
     public static Long getLoginUserId() {
         HttpServletRequest request = getRequest();
         return getLoginUserId(request);
-    }
-
-    public static Integer getUserType(HttpServletRequest request) {
-        return UserTypeEnum.ADMIN.getValue(); // TODO 芋艿：等后续优化
     }
 
     public static void setCommonResult(ServletRequest request, CommonResult<?> result) {

@@ -5,20 +5,22 @@ import cn.iocoder.yudao.adminserver.modules.system.controller.auth.vo.auth.SysAu
 import cn.iocoder.yudao.adminserver.modules.system.controller.auth.vo.auth.SysAuthSocialBindReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.auth.vo.auth.SysAuthSocialLogin2ReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.auth.vo.auth.SysAuthSocialLoginReqVO;
-import cn.iocoder.yudao.adminserver.modules.system.controller.logger.vo.loginlog.SysLoginLogCreateReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.convert.auth.SysAuthConvert;
 import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.social.SysSocialUserDO;
-import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.user.SysUserDO;
 import cn.iocoder.yudao.adminserver.modules.system.enums.logger.SysLoginLogTypeEnum;
 import cn.iocoder.yudao.adminserver.modules.system.enums.logger.SysLoginResultEnum;
 import cn.iocoder.yudao.adminserver.modules.system.service.auth.SysAuthService;
-import cn.iocoder.yudao.adminserver.modules.system.service.auth.SysUserSessionService;
 import cn.iocoder.yudao.adminserver.modules.system.service.common.SysCaptchaService;
-import cn.iocoder.yudao.adminserver.modules.system.service.logger.SysLoginLogService;
 import cn.iocoder.yudao.adminserver.modules.system.service.permission.SysPermissionService;
 import cn.iocoder.yudao.adminserver.modules.system.service.social.SysSocialService;
 import cn.iocoder.yudao.adminserver.modules.system.service.user.SysUserService;
+import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.user.SysUserDO;
+import cn.iocoder.yudao.coreservice.modules.system.service.auth.SysUserSessionCoreService;
+import cn.iocoder.yudao.coreservice.modules.system.service.logger.SysLoginLogCoreService;
+import cn.iocoder.yudao.coreservice.modules.system.service.logger.dto.SysLoginLogCreateReqDTO;
+import cn.iocoder.yudao.coreservice.modules.system.service.user.SysUserCoreService;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.util.monitor.TracerUtils;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
@@ -38,6 +40,7 @@ import org.springframework.util.Assert;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import static cn.iocoder.yudao.adminserver.modules.system.enums.SysErrorCodeConstants.*;
@@ -60,13 +63,15 @@ public class SysAuthServiceImpl implements SysAuthService {
     @Resource
     private SysUserService userService;
     @Resource
+    private SysUserCoreService userCoreService;
+    @Resource
     private SysPermissionService permissionService;
     @Resource
     private SysCaptchaService captchaService;
     @Resource
-    private SysLoginLogService loginLogService;
+    private SysLoginLogCoreService loginLogCoreService;
     @Resource
-    private SysUserSessionService userSessionService;
+    private SysUserSessionCoreService userSessionCoreService;
     @Resource
     private SysSocialService socialService;
 
@@ -84,7 +89,7 @@ public class SysAuthServiceImpl implements SysAuthService {
     @Override
     public LoginUser mockLogin(Long userId) {
         // 获取用户编号对应的 SysUserDO
-        SysUserDO user = userService.getUser(userId);
+        SysUserDO user = userCoreService.getUser(userId);
         if (user == null) {
             throw new UsernameNotFoundException(String.valueOf(userId));
         }
@@ -106,7 +111,7 @@ public class SysAuthServiceImpl implements SysAuthService {
         loginUser.setRoleIds(this.getUserRoleIds(loginUser.getId())); // 获取用户角色列表
 
         // 缓存登录用户到 Redis 中，返回 sessionId 编号
-        return userSessionService.createUserSession(loginUser, userIp, userAgent);
+        return userSessionCoreService.createUserSession(loginUser, userIp, userAgent);
     }
 
     private void verifyCaptcha(String username, String captchaUUID, String captchaCode) {
@@ -154,14 +159,25 @@ public class SysAuthServiceImpl implements SysAuthService {
     }
 
     private void createLoginLog(String username, SysLoginLogTypeEnum logTypeEnum, SysLoginResultEnum loginResult) {
-        SysLoginLogCreateReqVO reqVO = new SysLoginLogCreateReqVO();
-        reqVO.setLogType(logTypeEnum.getType());
-        reqVO.setTraceId(TracerUtils.getTraceId());
-        reqVO.setUsername(username);
-        reqVO.setUserAgent(ServletUtils.getUserAgent());
-        reqVO.setUserIp(ServletUtils.getClientIP());
-        reqVO.setResult(loginResult.getResult());
-        loginLogService.createLoginLog(reqVO);
+        // 获得用户
+        SysUserDO user = userService.getUserByUsername(username);
+        // 插入登录日志
+        SysLoginLogCreateReqDTO reqDTO = new SysLoginLogCreateReqDTO();
+        reqDTO.setLogType(logTypeEnum.getType());
+        reqDTO.setTraceId(TracerUtils.getTraceId());
+        if (user != null) {
+            reqDTO.setUserId(user.getId());
+        }
+        reqDTO.setUserType(UserTypeEnum.ADMIN.getValue());
+        reqDTO.setUsername(username);
+        reqDTO.setUserAgent(ServletUtils.getUserAgent());
+        reqDTO.setUserIp(ServletUtils.getClientIP());
+        reqDTO.setResult(loginResult.getResult());
+        loginLogCoreService.createLoginLog(reqDTO);
+        // 更新最后登录时间
+        if (user != null && Objects.equals(SysLoginResultEnum.SUCCESS.getResult(), loginResult.getResult())) {
+            userService.updateUserLogin(user.getId(), ServletUtils.getClientIP());
+        }
     }
 
     /**
@@ -188,7 +204,7 @@ public class SysAuthServiceImpl implements SysAuthService {
         }
 
         // 自动登录
-        SysUserDO user = userService.getUser(socialUsers.get(0).getUserId());
+        SysUserDO user = userCoreService.getUser(socialUsers.get(0).getUserId());
         if (user == null) {
             throw exception(USER_NOT_EXISTS);
         }
@@ -203,7 +219,7 @@ public class SysAuthServiceImpl implements SysAuthService {
         socialService.bindSocialUser(loginUser.getId(), reqVO.getType(), authUser);
 
         // 缓存登录用户到 Redis 中，返回 sessionId 编号
-        return userSessionService.createUserSession(loginUser, userIp, userAgent);
+        return userSessionCoreService.createUserSession(loginUser, userIp, userAgent);
     }
 
     @Override
@@ -220,7 +236,7 @@ public class SysAuthServiceImpl implements SysAuthService {
         socialService.bindSocialUser(loginUser.getId(), reqVO.getType(), authUser);
 
         // 缓存登录用户到 Redis 中，返回 sessionId 编号
-        return userSessionService.createUserSession(loginUser, userIp, userAgent);
+        return userSessionCoreService.createUserSession(loginUser, userIp, userAgent);
     }
 
     @Override
@@ -236,31 +252,33 @@ public class SysAuthServiceImpl implements SysAuthService {
     @Override
     public void logout(String token) {
         // 查询用户信息
-        LoginUser loginUser = userSessionService.getLoginUser(token);
+        LoginUser loginUser = userSessionCoreService.getLoginUser(token);
         if (loginUser == null) {
             return;
         }
         // 删除 session
-        userSessionService.deleteUserSession(token);
-        // 记录登出日子和
-        this.createLogoutLog(loginUser.getUsername());
+        userSessionCoreService.deleteUserSession(token);
+        // 记录登出日志
+        this.createLogoutLog(loginUser.getId(), loginUser.getUsername());
     }
 
-    private void createLogoutLog(String username) {
-        SysLoginLogCreateReqVO reqVO = new SysLoginLogCreateReqVO();
-        reqVO.setLogType(SysLoginLogTypeEnum.LOGOUT_SELF.getType());
-        reqVO.setTraceId(TracerUtils.getTraceId());
-        reqVO.setUsername(username);
-        reqVO.setUserAgent(ServletUtils.getUserAgent());
-        reqVO.setUserIp(ServletUtils.getClientIP());
-        reqVO.setResult(SysLoginResultEnum.SUCCESS.getResult());
-        loginLogService.createLoginLog(reqVO);
+    private void createLogoutLog(Long userId, String username) {
+        SysLoginLogCreateReqDTO reqDTO = new SysLoginLogCreateReqDTO();
+        reqDTO.setLogType(SysLoginLogTypeEnum.LOGOUT_SELF.getType());
+        reqDTO.setTraceId(TracerUtils.getTraceId());
+        reqDTO.setUserId(userId);
+        reqDTO.setUserType(UserTypeEnum.ADMIN.getValue());
+        reqDTO.setUsername(username);
+        reqDTO.setUserAgent(ServletUtils.getUserAgent());
+        reqDTO.setUserIp(ServletUtils.getClientIP());
+        reqDTO.setResult(SysLoginResultEnum.SUCCESS.getResult());
+        loginLogCoreService.createLoginLog(reqDTO);
     }
 
     @Override
     public LoginUser verifyTokenAndRefresh(String token) {
         // 获得 LoginUser
-        LoginUser loginUser = userSessionService.getLoginUser(token);
+        LoginUser loginUser = userSessionCoreService.getLoginUser(token);
         if (loginUser == null) {
             return null;
         }
@@ -272,20 +290,20 @@ public class SysAuthServiceImpl implements SysAuthService {
     private void refreshLoginUserCache(String token, LoginUser loginUser) {
         // 每 1/3 的 Session 超时时间，刷新 LoginUser 缓存
         if (System.currentTimeMillis() - loginUser.getUpdateTime().getTime() <
-                userSessionService.getSessionTimeoutMillis() / 3) {
+                userSessionCoreService.getSessionTimeoutMillis() / 3) {
             return;
         }
 
         // 重新加载 SysUserDO 信息
-        SysUserDO user = userService.getUser(loginUser.getId());
+        SysUserDO user = userCoreService.getUser(loginUser.getId());
         if (user == null || CommonStatusEnum.DISABLE.getStatus().equals(user.getStatus())) {
-            throw exception(TOKEN_EXPIRED); // 校验 token 时，用户被禁用的情况下，也认为 token 过期，方便前端跳转到登录界面
+            throw exception(AUTH_TOKEN_EXPIRED); // 校验 token 时，用户被禁用的情况下，也认为 token 过期，方便前端跳转到登录界面
         }
 
         // 刷新 LoginUser 缓存
         loginUser.setDeptId(user.getDeptId());
         loginUser.setRoleIds(this.getUserRoleIds(loginUser.getId()));
-        userSessionService.refreshUserSession(token, loginUser);
+        userSessionCoreService.refreshUserSession(token, loginUser);
     }
 
 }

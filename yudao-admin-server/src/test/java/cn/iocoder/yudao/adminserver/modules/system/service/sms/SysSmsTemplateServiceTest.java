@@ -1,43 +1,39 @@
 package cn.iocoder.yudao.adminserver.modules.system.service.sms;
 
 import cn.iocoder.yudao.adminserver.BaseDbUnitTest;
-import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
-import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.sms.core.client.SmsClient;
-import cn.iocoder.yudao.framework.sms.core.client.SmsClientFactory;
-import cn.iocoder.yudao.framework.sms.core.client.SmsCommonResult;
-import cn.iocoder.yudao.framework.sms.core.client.dto.SmsTemplateRespDTO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.sms.vo.template.SysSmsTemplateCreateReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.sms.vo.template.SysSmsTemplateExportReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.sms.vo.template.SysSmsTemplatePageReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.sms.vo.template.SysSmsTemplateUpdateReqVO;
-import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.sms.SysSmsChannelDO;
-import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.sms.SysSmsTemplateDO;
 import cn.iocoder.yudao.adminserver.modules.system.dal.mysql.sms.SysSmsTemplateMapper;
-import cn.iocoder.yudao.adminserver.modules.system.enums.sms.SysSmsTemplateTypeEnum;
 import cn.iocoder.yudao.adminserver.modules.system.mq.producer.sms.SysSmsProducer;
 import cn.iocoder.yudao.adminserver.modules.system.service.sms.impl.SysSmsTemplateServiceImpl;
+import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.sms.SysSmsChannelDO;
+import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.sms.SysSmsTemplateDO;
+import cn.iocoder.yudao.coreservice.modules.system.enums.sms.SysSmsTemplateTypeEnum;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.ArrayUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
+import cn.iocoder.yudao.framework.sms.core.client.SmsClient;
+import cn.iocoder.yudao.framework.sms.core.client.SmsClientFactory;
+import cn.iocoder.yudao.framework.sms.core.client.SmsCommonResult;
+import cn.iocoder.yudao.framework.sms.core.client.dto.SmsTemplateRespDTO;
 import com.google.common.collect.Lists;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
-import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Consumer;
 
-import static cn.hutool.core.bean.BeanUtil.getFieldValue;
 import static cn.hutool.core.util.RandomUtil.randomEle;
 import static cn.iocoder.yudao.adminserver.modules.system.enums.SysErrorCodeConstants.*;
+import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildTime;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildTime;
-import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.max;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.eq;
@@ -65,27 +61,6 @@ public class SysSmsTemplateServiceTest extends BaseDbUnitTest {
     private SmsClient smsClient;
     @MockBean
     private SysSmsProducer smsProducer;
-
-    @Test
-    @SuppressWarnings("unchecked")
-    void testInitLocalCache() {
-        // mock 数据
-        SysSmsTemplateDO smsTemplate01 = randomSmsTemplateDO();
-        smsTemplateMapper.insert(smsTemplate01);
-        SysSmsTemplateDO smsTemplate02 = randomSmsTemplateDO();
-        smsTemplateMapper.insert(smsTemplate02);
-
-        // 调用
-        smsTemplateService.initLocalCache();
-        // 断言 deptCache 缓存
-        Map<String, SysSmsTemplateDO> smsTemplateCache = (Map<String, SysSmsTemplateDO>) getFieldValue(smsTemplateService, "smsTemplateCache");
-        assertEquals(2, smsTemplateCache.size());
-        assertPojoEquals(smsTemplate01, smsTemplateCache.get(smsTemplate01.getCode()));
-        assertPojoEquals(smsTemplate02, smsTemplateCache.get(smsTemplate02.getCode()));
-        // 断言 maxUpdateTime 缓存
-        Date maxUpdateTime = (Date) getFieldValue(smsTemplateService, "maxUpdateTime");
-        assertEquals(max(smsTemplate01.getUpdateTime(), smsTemplate02.getUpdateTime()), maxUpdateTime);
-    }
 
     @Test
     public void testParseTemplateContentParams() {

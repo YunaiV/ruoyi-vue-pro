@@ -1,16 +1,15 @@
 package cn.iocoder.yudao.adminserver.modules.system.service.sms;
 
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.adminserver.modules.system.controller.sms.vo.template.SysSmsTemplateCreateReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.sms.vo.template.SysSmsTemplateExportReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.sms.vo.template.SysSmsTemplatePageReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.sms.vo.template.SysSmsTemplateUpdateReqVO;
-import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.sms.SysSmsTemplateDO;
+import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.sms.SysSmsTemplateDO;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 
 import javax.validation.Valid;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 短信模板 Service 接口
@@ -21,34 +20,12 @@ import java.util.Map;
 public interface SysSmsTemplateService {
 
     /**
-     * 初始化短信模板的本地缓存
-     */
-    void initLocalCache();
-
-    /**
      * 获得短信模板
      *
      * @param code 模板编码
      * @return 短信模板
      */
     SysSmsTemplateDO getSmsTemplateByCode(String code);
-
-    /**
-     * 获得短信模板，从缓存中
-     *
-     * @param code 模板编码
-     * @return 短信模板
-     */
-    SysSmsTemplateDO getSmsTemplateByCodeFromCache(String code);
-
-    /**
-     * 格式化短信内容
-     *
-     * @param content 短信模板的内容
-     * @param params 内容的参数
-     * @return 格式化后的内容
-     */
-    String formatSmsTemplateContent(String content, Map<String, Object> params);
 
     /**
      * 创建短信模板

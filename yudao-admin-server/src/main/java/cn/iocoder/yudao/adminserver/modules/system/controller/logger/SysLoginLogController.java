@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.adminserver.modules.system.controller.logger;
 
+import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.logger.SysLoginLogDO;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
@@ -9,7 +10,6 @@ import cn.iocoder.yudao.adminserver.modules.system.controller.logger.vo.loginlog
 import cn.iocoder.yudao.adminserver.modules.system.controller.logger.vo.loginlog.SysLoginLogPageReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.logger.vo.loginlog.SysLoginLogRespVO;
 import cn.iocoder.yudao.adminserver.modules.system.convert.logger.SysLoginLogConvert;
-import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.logger.SysLoginLogDO;
 import cn.iocoder.yudao.adminserver.modules.system.service.logger.SysLoginLogService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
