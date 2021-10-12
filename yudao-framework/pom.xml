@@ -29,6 +29,7 @@
         <module>yudao-spring-boot-starter-biz-dict</module>
         <module>yudao-spring-boot-starter-biz-sms</module>
         <module>yudao-spring-boot-starter-extension</module>
+        <module>yudao-spring-boot-starter-biz-pay</module>
     </modules>
 
     <artifactId>yudao-framework</artifactId>
