@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.adminserver.modules.system.enums;
 
 import cn.iocoder.yudao.framework.common.exception.ErrorCode;
+import javafx.beans.binding.MapExpression;
 
 /**
  * System 错误码枚举类
@@ -12,13 +13,11 @@ public interface SysErrorCodeConstants {
     // ========== AUTH 模块 1002000000 ==========
     ErrorCode AUTH_LOGIN_BAD_CREDENTIALS = new ErrorCode(1002000000, "登录失败，账号密码不正确");
     ErrorCode AUTH_LOGIN_USER_DISABLED = new ErrorCode(1002000001, "登录失败，账号被禁用");
-    ErrorCode AUTH_LOGIN_FAIL_UNKNOWN = new ErrorCode(1002000002, "登录失败"); // 登陆失败的兜底，位置原因
+    ErrorCode AUTH_LOGIN_FAIL_UNKNOWN = new ErrorCode(1002000002, "登录失败"); // 登录失败的兜底，未知原因
     ErrorCode AUTH_LOGIN_CAPTCHA_NOT_FOUND = new ErrorCode(1002000003, "验证码不存在");
     ErrorCode AUTH_LOGIN_CAPTCHA_CODE_ERROR = new ErrorCode(1002000004, "验证码不正确");
-
-    // ========== TOKEN 模块 1002001000 ==========
-    ErrorCode TOKEN_EXPIRED = new ErrorCode(1002001000, "Token 已经过期");
-    ErrorCode TOKEN_PARSE_FAIL = new ErrorCode(1002001001, "Token 解析失败");
+    ErrorCode AUTH_THIRD_LOGIN_NOT_BIND = new ErrorCode(1002000005, "未绑定账号，需要进行绑定");
+    ErrorCode AUTH_TOKEN_EXPIRED = new ErrorCode(1002000006, "Token 已经过期");
 
     // ========== 菜单模块 1002002000 ==========
     ErrorCode MENU_NAME_DUPLICATE = new ErrorCode(1002002000, "已经存在该名字的菜单");
@@ -87,12 +86,12 @@ public interface SysErrorCodeConstants {
     ErrorCode SMS_TEMPLATE_NOT_EXISTS = new ErrorCode(1002011000, "短信模板不存在");
     ErrorCode SMS_TEMPLATE_CODE_DUPLICATE = new ErrorCode(1002011001, "已经存在编码为【{}】的短信模板");
 
-    // ========== 短信发送 1002012000 ==========
-    ErrorCode SMS_SEND_MOBILE_NOT_EXISTS = new ErrorCode(1002012000, "手机号不存在");
-    ErrorCode SMS_SEND_MOBILE_TEMPLATE_PARAM_MISS = new ErrorCode(1002012001, "模板参数({})缺失");
-
     // ========== 错误码模块 1002013000 ==========
     ErrorCode ERROR_CODE_NOT_EXISTS = new ErrorCode(1002013000, "错误码不存在");
     ErrorCode ERROR_CODE_DUPLICATE = new ErrorCode(1002013001, "已经存在编码为【{}】的错误码");
+
+    // ========== 社交模块 1002014000 ==========
+    ErrorCode SOCIAL_AUTH_FAILURE = new ErrorCode(1002014000, "社交授权失败，原因是：{}");
+    ErrorCode SOCIAL_UNBIND_NOT_SELF = new ErrorCode(1002014001, "社交解绑失败，非当前用户绑定");
 
 }

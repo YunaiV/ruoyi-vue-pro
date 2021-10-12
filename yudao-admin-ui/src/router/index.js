@@ -44,6 +44,11 @@ export const constantRoutes = [
     hidden: true
   },
   {
+    path: '/social-login',
+    component: (resolve) => require(['@/views/socialLogin'], resolve),
+    hidden: true
+  },
+  {
     path: '/404',
     component: (resolve) => require(['@/views/error/404'], resolve),
     hidden: true

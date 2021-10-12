@@ -1,12 +1,12 @@
 package cn.iocoder.yudao.adminserver.modules.infra.controller.config;
 
+import cn.iocoder.yudao.coreservice.modules.infra.dal.dataobject.config.InfConfigDO;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.adminserver.modules.infra.controller.config.vo.*;
 import cn.iocoder.yudao.adminserver.modules.infra.convert.config.InfConfigConvert;
-import cn.iocoder.yudao.adminserver.modules.infra.dal.dataobject.config.InfConfigDO;
 import cn.iocoder.yudao.adminserver.modules.infra.service.config.InfConfigService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;

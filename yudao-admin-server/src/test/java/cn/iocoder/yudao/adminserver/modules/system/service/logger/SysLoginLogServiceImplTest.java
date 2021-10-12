@@ -2,12 +2,12 @@ package cn.iocoder.yudao.adminserver.modules.system.service.logger;
 
 import cn.hutool.core.util.RandomUtil;
 import cn.iocoder.yudao.adminserver.BaseDbUnitTest;
+import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.logger.SysLoginLogDO;
+import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.monitor.TracerUtils;
-import cn.iocoder.yudao.adminserver.modules.system.controller.logger.vo.loginlog.SysLoginLogCreateReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.logger.vo.loginlog.SysLoginLogExportReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.logger.vo.loginlog.SysLoginLogPageReqVO;
-import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.logger.SysLoginLogDO;
 import cn.iocoder.yudao.adminserver.modules.system.dal.mysql.logger.SysLoginLogMapper;
 import cn.iocoder.yudao.adminserver.modules.system.enums.logger.SysLoginLogTypeEnum;
 import cn.iocoder.yudao.adminserver.modules.system.enums.logger.SysLoginResultEnum;
@@ -34,34 +34,13 @@ public class SysLoginLogServiceImplTest extends BaseDbUnitTest {
     private SysLoginLogMapper loginLogMapper;
 
     @Test
-    public void testCreateLoginLog() {
-        String traceId = TracerUtils.getTraceId();
-        SysLoginLogCreateReqVO reqVO = RandomUtils.randomPojo(SysLoginLogCreateReqVO.class, vo -> {
-            // 指定随机的范围,避免超出范围入库失败
-            vo.setLogType(RandomUtil.randomEle(SysLoginLogTypeEnum.values()).getType());
-            vo.setResult(RandomUtil.randomEle(SysLoginResultEnum.values()).getResult());
-            // 使用TracerUtils生成的TraceId
-            vo.setTraceId(traceId);
-        });
-
-        // 执行service方法
-        sysLoginLogService.createLoginLog(reqVO);
-
-        // 断言，忽略基本字段
-        SysLoginLogDO sysLoginLogDO = loginLogMapper.selectOne(null);
-        assertPojoEquals(reqVO, sysLoginLogDO);
-    }
-
-
-    @Test
     public void testGetLoginLogPage() {
-
         // 构造测试数据
-
         // 登录成功的
         SysLoginLogDO loginLogDO = RandomUtils.randomPojo(SysLoginLogDO.class, logDO -> {
             logDO.setLogType(RandomUtil.randomEle(SysLoginLogTypeEnum.values()).getType());
             logDO.setTraceId(TracerUtils.getTraceId());
+            logDO.setUserType(RandomUtil.randomEle(UserTypeEnum.values()).getValue());
 
             logDO.setUserIp("192.168.199.16");
             logDO.setUsername("wangkai");
@@ -100,13 +79,13 @@ public class SysLoginLogServiceImplTest extends BaseDbUnitTest {
 
     @Test
     public void testGetLoginLogList() {
-
         // 构造测试数据
 
         // 登录成功的
         SysLoginLogDO loginLogDO = RandomUtils.randomPojo(SysLoginLogDO.class, logDO -> {
             logDO.setLogType(RandomUtil.randomEle(SysLoginLogTypeEnum.values()).getType());
             logDO.setTraceId(TracerUtils.getTraceId());
+            logDO.setUserType(RandomUtil.randomEle(UserTypeEnum.values()).getValue());
 
             logDO.setUserIp("192.168.111.16");
             logDO.setUsername("wangxiaokai");

@@ -1,11 +1,11 @@
 package cn.iocoder.yudao.adminserver.modules.system.convert.sms;
 
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.adminserver.modules.system.controller.sms.vo.template.SysSmsTemplateCreateReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.sms.vo.template.SysSmsTemplateExcelVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.sms.vo.template.SysSmsTemplateRespVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.sms.vo.template.SysSmsTemplateUpdateReqVO;
-import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.sms.SysSmsTemplateDO;
+import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.sms.SysSmsTemplateDO;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 

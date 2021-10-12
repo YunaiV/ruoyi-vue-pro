@@ -1,16 +1,16 @@
 package cn.iocoder.yudao.adminserver.modules.system.controller.sms;
 
-import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
-import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.adminserver.modules.system.controller.sms.vo.log.SysSmsLogExcelVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.sms.vo.log.SysSmsLogExportReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.sms.vo.log.SysSmsLogPageReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.sms.vo.log.SysSmsLogRespVO;
 import cn.iocoder.yudao.adminserver.modules.system.convert.sms.SysSmsLogConvert;
-import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.sms.SysSmsLogDO;
 import cn.iocoder.yudao.adminserver.modules.system.service.sms.SysSmsLogService;
+import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.sms.SysSmsLogDO;
+import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
+import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.security.access.prepost.PreAuthorize;

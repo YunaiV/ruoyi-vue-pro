@@ -16,8 +16,7 @@ public interface ApiErrorLogFrameworkService {
      * 创建 API 错误日志
      *
      * @param createDTO 创建信息
-     * @return 是否创建成功
      */
-    Future<Boolean> createApiErrorLogAsync(@Valid ApiErrorLogCreateDTO createDTO);
+    void createApiErrorLogAsync(@Valid ApiErrorLogCreateDTO createDTO);
 
 }

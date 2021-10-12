@@ -11,6 +11,8 @@
         <module>yudao-dependencies</module>
         <module>yudao-framework</module>
         <module>yudao-admin-server</module>
+        <module>yudao-user-server</module>
+        <module>yudao-core-service</module>
     </modules>
 
     <name>${artifactId}</name>
@@ -18,7 +20,7 @@
     <url>https://github.com/YunaiV/ruoyi-vue-pro</url>
 
     <properties>
-        <revision>1.0.0</revision>
+        <revision>1.1.0-snapshot</revision>
         <!-- Maven 相关 -->
         <java.version>1.8</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>

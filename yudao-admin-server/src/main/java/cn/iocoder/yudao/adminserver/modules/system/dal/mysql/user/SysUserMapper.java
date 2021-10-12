@@ -1,11 +1,11 @@
 package cn.iocoder.yudao.adminserver.modules.system.dal.mysql.user;
 
+import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.user.SysUserDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.QueryWrapperX;
 import cn.iocoder.yudao.adminserver.modules.system.controller.user.vo.user.SysUserExportReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.user.vo.user.SysUserPageReqVO;
-import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.user.SysUserDO;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -19,12 +19,12 @@ public interface SysUserMapper extends BaseMapperX<SysUserDO> {
         return selectOne(new QueryWrapper<SysUserDO>().eq("username", username));
     }
 
-    default SysUserDO selectByMobile(String mobile) {
-        return selectOne(new QueryWrapper<SysUserDO>().eq("mobile", mobile));
-    }
-
     default SysUserDO selectByEmail(String email) {
         return selectOne(new QueryWrapper<SysUserDO>().eq("email", email));
+    }
+
+    default SysUserDO selectByMobile(String mobile) {
+        return selectOne(new QueryWrapper<SysUserDO>().eq("mobile", mobile));
     }
 
     default PageResult<SysUserDO> selectPage(SysUserPageReqVO reqVO, Collection<Long> deptIds) {

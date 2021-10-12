@@ -38,3 +38,64 @@ export function getCodeImg() {
     method: 'get'
   })
 }
+
+// 社交授权的跳转
+export function socialAuthRedirect(type, redirectUri) {
+  return request({
+    url: '/social-auth-redirect?type=' + type + '&redirectUri=' + redirectUri,
+    method: 'get'
+  })
+}
+
+// 社交登录，使用 code 授权码
+export function socialLogin(type, code, state) {
+  return request({
+    url: '/social-login',
+    method: 'post',
+    data: {
+      type,
+      code,
+      state
+    }
+  })
+}
+
+// 社交登录，使用 code 授权码 + + 账号密码
+export function socialLogin2(type, code, state, username, password) {
+  return request({
+    url: '/social-login2',
+    method: 'post',
+    data: {
+      type,
+      code,
+      state,
+      username,
+      password
+    }
+  })
+}
+
+// 社交绑定，使用 code 授权码
+export function socialBind(type, code, state) {
+  return request({
+    url: '/social-bind',
+    method: 'post',
+    data: {
+      type,
+      code,
+      state,
+    }
+  })
+}
+
+// 取消社交绑定
+export function socialUnbind(type, unionId) {
+  return request({
+    url: '/social-unbind',
+    method: 'delete',
+    data: {
+      type,
+      unionId
+    }
+  })
+}

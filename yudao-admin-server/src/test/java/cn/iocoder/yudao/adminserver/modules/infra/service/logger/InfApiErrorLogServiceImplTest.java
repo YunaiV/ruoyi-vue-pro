@@ -2,12 +2,12 @@ package cn.iocoder.yudao.adminserver.modules.infra.service.logger;
 
 import cn.hutool.core.util.RandomUtil;
 import cn.iocoder.yudao.adminserver.BaseDbUnitTest;
+import cn.iocoder.yudao.coreservice.modules.infra.dal.dataobject.logger.InfApiErrorLogDO;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.apilog.core.service.dto.ApiErrorLogCreateDTO;
 import cn.iocoder.yudao.adminserver.modules.infra.controller.logger.vo.apierrorlog.InfApiErrorLogExportReqVO;
 import cn.iocoder.yudao.adminserver.modules.infra.controller.logger.vo.apierrorlog.InfApiErrorLogPageReqVO;
-import cn.iocoder.yudao.adminserver.modules.infra.dal.dataobject.logger.InfApiErrorLogDO;
 import cn.iocoder.yudao.adminserver.modules.infra.dal.mysql.logger.InfApiErrorLogMapper;
 import cn.iocoder.yudao.adminserver.modules.infra.enums.logger.InfApiErrorLogProcessStatusEnum;
 import cn.iocoder.yudao.adminserver.modules.infra.service.logger.impl.InfApiErrorLogServiceImpl;
@@ -40,28 +40,6 @@ public class InfApiErrorLogServiceImplTest extends BaseDbUnitTest {
 
     @Resource
     private InfApiErrorLogMapper infApiErrorLogMapper;
-
-
-    @Test
-    public void testCreateApiErrorLogAsync() throws Exception {
-        ApiErrorLogCreateDTO createDTO = RandomUtils.randomPojo(
-                ApiErrorLogCreateDTO.class,
-                dto -> dto.setUserType(RandomUtil.randomEle(UserTypeEnum.values()).getValue())
-        );
-
-        // 执行service方法
-        Future<Boolean> future = infApiErrorLogServiceImpl.createApiErrorLogAsync(createDTO);
-
-        // 等异步执行完
-        future.get();
-
-        InfApiErrorLogDO infApiErrorLogDO = infApiErrorLogMapper.selectOne(null);
-        // 断言
-        assertNotNull(infApiErrorLogDO);
-        // 断言，忽略基本字段
-        assertPojoEquals(createDTO, infApiErrorLogDO);
-    }
-
 
     @Test
     public void testGetApiErrorLogPage() {
@@ -204,4 +182,5 @@ public class InfApiErrorLogServiceImplTest extends BaseDbUnitTest {
         // 验证 progressUserId 是否修改成功
         assertEquals(processUserId, secondSelect.getProcessUserId());
     }
+
 }

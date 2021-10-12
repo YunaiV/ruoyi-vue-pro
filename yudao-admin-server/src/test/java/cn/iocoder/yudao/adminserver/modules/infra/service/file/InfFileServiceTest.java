@@ -2,14 +2,15 @@ package cn.iocoder.yudao.adminserver.modules.infra.service.file;
 
 import cn.hutool.core.io.resource.ResourceUtil;
 import cn.iocoder.yudao.adminserver.BaseDbUnitTest;
+import cn.iocoder.yudao.coreservice.modules.infra.dal.dataobject.file.InfFileDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.adminserver.modules.infra.framework.file.config.FileProperties;
 import cn.iocoder.yudao.adminserver.modules.infra.controller.file.vo.InfFilePageReqVO;
-import cn.iocoder.yudao.adminserver.modules.infra.dal.dataobject.file.InfFileDO;
 import cn.iocoder.yudao.adminserver.modules.infra.dal.mysql.file.InfFileMapper;
 import cn.iocoder.yudao.adminserver.modules.infra.service.file.impl.InfFileServiceImpl;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
@@ -29,8 +30,9 @@ public class InfFileServiceTest extends BaseDbUnitTest {
     @Resource
     private InfFileServiceImpl fileService;
 
-    @Resource
+    @MockBean
     private FileProperties fileProperties;
+
     @Resource
     private InfFileMapper fileMapper;
 

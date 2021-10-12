@@ -44,13 +44,13 @@ spring:
       datasource:
         master:
           name: ruoyi-vue-pro
-          url: jdbc:mysql://400-infra.server.iocoder.cn:3306/${spring.datasource.dynamic.datasource.master.name}?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=CTT
+          url: jdbc:mysql://400-infra.server.iocoder.cn:3306/${spring.datasource.dynamic.datasource.master.name}?useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=CTT
           driver-class-name: com.mysql.jdbc.Driver
           username: root
           password: 3WLiVUBEwTbvAfsh
         slave: # 模拟从库，可根据自己需要修改 # 模拟从库，可根据自己需要修改
           name: ruoyi-vue-pro
-          url: jdbc:mysql://400-infra.server.iocoder.cn:3306/${spring.datasource.dynamic.datasource.slave.name}?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=CTT
+          url: jdbc:mysql://400-infra.server.iocoder.cn:3306/${spring.datasource.dynamic.datasource.slave.name}?useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=CTT
           driver-class-name: com.mysql.jdbc.Driver
           username: root
           password: 3WLiVUBEwTbvAfsh
@@ -99,7 +99,7 @@ apollo:
     eagerLoad:
       enabled: true # 设置 Apollo 在日志初始化前生效，可以实现日志的动态级别配置
   jdbc: # 自定义的 JDBC 配置项，用于数据库的地址
-    dao: cn.iocoder.yudao.adminserver.modules.infra.dal.mysql.config.InfConfigDAOImpl
+    dao: cn.iocoder.yudao.coreservice.modules.infra.dal.mysql.config.InfConfigCoreDAOImpl
     url: ${spring.datasource.dynamic.datasource.master.url}
     username: ${spring.datasource.dynamic.datasource.master.username}
     password: ${spring.datasource.dynamic.datasource.master.password}

@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.adminserver.modules.infra.service.config.impl;
 
+import cn.iocoder.yudao.coreservice.modules.infra.dal.dataobject.config.InfConfigDO;
 import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.adminserver.modules.infra.controller.config.vo.InfConfigCreateReqVO;
@@ -8,7 +9,6 @@ import cn.iocoder.yudao.adminserver.modules.infra.controller.config.vo.InfConfig
 import cn.iocoder.yudao.adminserver.modules.infra.controller.config.vo.InfConfigUpdateReqVO;
 import cn.iocoder.yudao.adminserver.modules.infra.convert.config.InfConfigConvert;
 import cn.iocoder.yudao.adminserver.modules.infra.dal.mysql.config.InfConfigMapper;
-import cn.iocoder.yudao.adminserver.modules.infra.dal.dataobject.config.InfConfigDO;
 import cn.iocoder.yudao.adminserver.modules.infra.enums.config.InfConfigTypeEnum;
 import cn.iocoder.yudao.adminserver.modules.infra.mq.producer.config.InfConfigProducer;
 import cn.iocoder.yudao.adminserver.modules.infra.service.config.InfConfigService;

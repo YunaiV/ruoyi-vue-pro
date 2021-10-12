@@ -150,8 +150,8 @@ public class ToolCodegenEngine {
         bindingMap.put("simpleModuleName", simpleModuleName); // 将 system 转成 sys
         bindingMap.put("simpleModuleName_upperFirst", upperFirst(simpleModuleName)); // 将 sys 转成 Sys
         // className 相关
-        String simpleClassName = subAfter(table.getClassName(), upperFirst(simpleModuleName)
-                , false); // 将 TestDictType 转换成 DictType. 因为在 create 等方法后，不需要带上 Test 前缀
+        // 去掉指定前缀  将 TestDictType 转换成 DictType. 因为在 create 等方法后，不需要带上 Test 前缀
+        String simpleClassName = removePrefix(table.getClassName(), upperFirst(simpleModuleName));
         bindingMap.put("simpleClassName", simpleClassName);
         bindingMap.put("simpleClassName_underlineCase", toUnderlineCase(simpleClassName)); // 将 DictType 转换成 dict_type
         bindingMap.put("classNameVar", lowerFirst(simpleClassName)); // 将 DictType 转换成 dictType，用于变量

@@ -14,7 +14,7 @@
     <url>https://github.com/YunaiV/ruoyi-vue-pro</url>
 
     <properties>
-        <revision>1.0.0</revision>
+        <revision>1.1.0-snapshot</revision>
         <!-- 统一依赖管理 -->
         <spring.boot.version>2.4.5</spring.boot.version>
         <!-- Web 相关 -->
@@ -26,7 +26,7 @@
         <druid.version>1.2.4</druid.version>
         <mybatis-plus.version>3.4.2</mybatis-plus.version>
         <dynamic-datasource.version>3.3.2</dynamic-datasource.version>
-        <redisson.version>3.15.1</redisson.version>
+        <redisson.version>3.16.3</redisson.version>
         <!-- Config 配置中心相关 -->
         <apollo.version>1.7.0</apollo.version>
         <!-- Job 定时任务相关 -->
@@ -34,14 +34,14 @@
         <lock4j.version>2.2.0</lock4j.version>
         <resilience4j.version>1.7.0</resilience4j.version>
         <!-- 监控相关 -->
-        <skywalking.version>8.5.0</skywalking.version>
+        <skywalking.version>8.7.0</skywalking.version>
         <spring-boot-admin.version>2.3.1</spring-boot-admin.version>
-        <opentracing.version>0.30.0</opentracing.version>
+        <opentracing.version>0.31.0</opentracing.version>
         <!-- Test 测试相关 -->
         <podam.version>7.2.6.RELEASE</podam.version>
         <jedis-mock.version>0.1.16</jedis-mock.version>
         <!-- 工具类相关 -->
-        <lombok.version>1.18.12</lombok.version>
+        <lombok.version>1.18.20</lombok.version>
         <mapstruct.version>1.4.1.Final</mapstruct.version>
         <hutool.version>5.6.1</hutool.version>
         <easyexcel.verion>2.2.7</easyexcel.verion>
@@ -49,7 +49,7 @@
         <screw.version>1.0.5</screw.version>
         <guava.version>30.1.1-jre</guava.version>
         <!-- 三方云服务相关 -->
-        <aliyun-java-sdk-core.version>4.5.18</aliyun-java-sdk-core.version>
+        <aliyun-java-sdk-core.version>4.5.25</aliyun-java-sdk-core.version>
         <aliyun-java-sdk-dysmsapi.version>2.1.0</aliyun-java-sdk-dysmsapi.version>
         <yunpian-java-sdk.version>1.2.7</yunpian-java-sdk.version>
     </properties>
@@ -72,6 +72,11 @@
             </dependency>
 
             <!-- 业务组件 -->
+            <dependency>
+                <groupId>cn.iocoder.boot</groupId>
+                <artifactId>yudao-core-service</artifactId>
+                <version>${revision}</version>
+            </dependency>
             <dependency>
                 <groupId>cn.iocoder.boot</groupId>
                 <artifactId>yudao-spring-boot-starter-biz-operatelog</artifactId>
@@ -252,10 +257,30 @@
                 <groupId>org.apache.skywalking</groupId>
                 <artifactId>apm-toolkit-opentracing</artifactId>
                 <version>${skywalking.version}</version>
+<!--                <exclusions>-->
+<!--                    <exclusion>-->
+<!--                        <artifactId>opentracing-api</artifactId>-->
+<!--                        <groupId>io.opentracing</groupId>-->
+<!--                    </exclusion>-->
+<!--                    <exclusion>-->
+<!--                        <artifactId>opentracing-util</artifactId>-->
+<!--                        <groupId>io.opentracing</groupId>-->
+<!--                    </exclusion>-->
+<!--                </exclusions>-->
+            </dependency>
+            <dependency>
+                <groupId>io.opentracing</groupId>
+                <artifactId>opentracing-api</artifactId>
+                <version>${opentracing.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.opentracing</groupId>
                 <artifactId>opentracing-util</artifactId>
+                <version>${opentracing.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.opentracing</groupId>
+                <artifactId>opentracing-noop</artifactId>
                 <version>${opentracing.version}</version>
             </dependency>
 

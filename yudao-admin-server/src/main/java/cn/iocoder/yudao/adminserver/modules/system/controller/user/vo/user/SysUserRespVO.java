@@ -19,7 +19,7 @@ public class SysUserRespVO extends SysUserBaseVO {
     @ApiModelProperty(value = "状态", required = true, example = "1", notes = "参见 SysCommonStatusEnum 枚举类")
     private Integer status;
 
-    @ApiModelProperty(value = "最后登陆 IP", required = true, example = "192.168.1.1")
+    @ApiModelProperty(value = "最后登录 IP", required = true, example = "192.168.1.1")
     private String loginIp;
 
     @ApiModelProperty(value = "最后登录时间", required = true, example = "时间戳格式")
