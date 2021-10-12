@@ -7,9 +7,9 @@ import cn.iocoder.yudao.adminserver.modules.system.mq.consumer.sms.SysSmsSendCon
 import cn.iocoder.yudao.adminserver.modules.system.mq.producer.sms.SysSmsProducer;
 import cn.iocoder.yudao.adminserver.modules.system.service.sms.impl.SysSmsChannelServiceImpl;
 import cn.iocoder.yudao.adminserver.modules.system.service.sms.impl.SysSmsLogServiceImpl;
-import cn.iocoder.yudao.adminserver.modules.system.service.sms.impl.SysSmsServiceImpl;
 import cn.iocoder.yudao.adminserver.modules.system.service.sms.impl.SysSmsTemplateServiceImpl;
 import cn.iocoder.yudao.adminserver.modules.system.service.user.SysUserService;
+import cn.iocoder.yudao.coreservice.modules.system.service.sms.impl.SysSmsCoreServiceImpl;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.sms.config.YudaoSmsAutoConfiguration;
 import org.junit.jupiter.api.Test;
@@ -20,13 +20,14 @@ import javax.annotation.Resource;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+// TODO @芋艿：需要迁移
 @Import({YudaoSmsAutoConfiguration.class,
-        SysSmsChannelServiceImpl.class, SysSmsServiceImpl.class, SysSmsTemplateServiceImpl.class, SysSmsLogServiceImpl.class,
+        SysSmsChannelServiceImpl.class, SysSmsCoreServiceImpl.class, SysSmsTemplateServiceImpl.class, SysSmsLogServiceImpl.class,
         SysSmsProducer.class, SysSmsSendConsumer.class})
 public class SysSmsServiceIntegrationTest extends BaseDbAndRedisIntegrationTest {
 
     @Resource
-    private SysSmsServiceImpl smsService;
+    private SysSmsCoreServiceImpl smsService;
     @Resource
     private SysSmsChannelServiceImpl smsChannelService;
 
