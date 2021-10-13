@@ -1108,6 +1108,12 @@ INSERT INTO `sys_dict_data` VALUES (76, 2, '接收失败', '20', 'sys_sms_receiv
 INSERT INTO `sys_dict_data` VALUES (77, 0, '调试(钉钉)', 'DEBUG_DING_TALK', 'sys_sms_channel_code', 0, NULL, '1', '2021-04-13 00:20:37', '1', '2021-04-13 00:20:37', b'0');
 INSERT INTO `sys_dict_data` VALUES (78, 1, '自动生成', '1', 'sys_error_code_type', 0, NULL, '1', '2021-04-21 00:06:48', '1', '2021-04-13 22:06:44', b'0');
 INSERT INTO `sys_dict_data` VALUES (79, 2, '手动编辑', '2', 'sys_error_code_type', 0, NULL, '1', '2021-04-21 00:07:14', '1', '2021-04-13 22:06:49', b'0');
+INSERT INTO `sys_dict_data` VALUES (80,0,'病假','1','oa_leave_type',0,NULL,'1','2021-09-21 22:35:28','1','2021-09-21 14:59:27',0x00);
+INSERT INTO `sys_dict_data` VALUES (81,1,'事假','2','oa_leave_type',0,NULL,'1','2021-09-21 22:36:11','1','2021-09-21 14:59:27',0x00);
+INSERT INTO `sys_dict_data` VALUES (82,2,'婚假','3','oa_leave_type',0,NULL,'1','2021-09-21 22:36:38','1','2021-09-21 14:59:27',0x00);
+INSERT INTO `sys_dict_data` VALUES (83,0,'处理中','1','oa_leave_status',0,NULL,'1','2021-09-21 22:46:46','1','2021-10-12 22:12:20',0x00);
+INSERT INTO `sys_dict_data` VALUES (84,1,'流程结束','2','oa_leave_status',0,NULL,'1','2021-09-21 22:47:03','1','2021-10-12 22:12:58',0x00);
+INSERT INTO `sys_dict_data` VALUES (85,2,'完成','3','oa_leave_status',0,NULL,'1','2021-09-21 22:47:25','1','2021-10-12 14:13:06',0x01);
 COMMIT;
 
 -- ----------------------------
@@ -1155,6 +1161,9 @@ INSERT INTO `sys_dict_type` VALUES (112, '短信模板的类型', 'sys_sms_templ
 INSERT INTO `sys_dict_type` VALUES (113, '短信发送状态', 'sys_sms_send_status', 0, NULL, '1', '2021-04-11 20:18:03', '1', '2021-04-11 09:30:02', b'0');
 INSERT INTO `sys_dict_type` VALUES (114, '短信接收状态', 'sys_sms_receive_status', 0, NULL, '1', '2021-04-11 20:27:14', '1', '2021-04-11 20:27:14', b'0');
 INSERT INTO `sys_dict_type` VALUES (115, '错误码的类型', 'sys_error_code_type', 0, NULL, '1', '2021-04-21 00:06:30', '1', '2021-04-13 22:07:12', b'0');
+INSERT INTO `sys_dict_type` VALUES (116,'请假类型','oa_leave_type',0,NULL,'1','2021-09-21 22:34:33','1','2021-09-21 15:00:38',0x00);
+INSERT INTO `sys_dict_type` VALUES (117,'请假流程状态','oa_leave_status',0,NULL,'1','2021-09-21 22:46:04','1','2021-09-21 15:00:38',0x00);
+
 COMMIT;
 
 -- ----------------------------
@@ -1357,6 +1366,7 @@ INSERT INTO `sys_menu` VALUES (1, '系统管理', '', 1, 1, 0, '/system', 'syste
 INSERT INTO `sys_menu` VALUES (2, '基础设施', '', 1, 2, 0, '/infra', 'monitor', NULL, 0, 'admin', '2021-01-05 17:03:48', '', '2021-01-20 14:18:35', b'0');
 INSERT INTO `sys_menu` VALUES (3, '研发工具', '', 1, 3, 0, '/tool', 'tool', NULL, 0, 'admin', '2021-01-05 17:03:48', '', '2021-02-06 12:44:42', b'0');
 INSERT INTO `sys_menu` VALUES (4, '若依官网', '', 1, 4, 0, 'http://ruoyi.vip', 'guide', NULL, 0, 'admin', '2021-01-05 17:03:48', '', '2021-01-20 21:54:28', b'1');
+INSERT INTO `sys_menu` VALUES (5,'OA 办公','',1,4,0,'/oa','people',NULL,0,'admin','2021-09-20 16:26:19','1','2021-09-20 13:55:54',0x00);
 INSERT INTO `sys_menu` VALUES (100, '用户管理', 'system:user:list', 2, 1, 1, 'user', 'user', 'system/user/index', 0, 'admin', '2021-01-05 17:03:48', '', '2021-01-05 22:36:45', b'0');
 INSERT INTO `sys_menu` VALUES (101, '角色管理', '', 2, 2, 1, 'role', 'peoples', 'system/role/index', 0, 'admin', '2021-01-05 17:03:48', '1', '2021-03-14 22:04:49', b'0');
 INSERT INTO `sys_menu` VALUES (102, '菜单管理', '', 2, 3, 1, 'menu', 'tree-table', 'system/menu/index', 0, 'admin', '2021-01-05 17:03:48', '1', '2021-03-14 22:04:28', b'0');
@@ -1485,6 +1495,14 @@ INSERT INTO `sys_menu` VALUES (1113, '错误码更新', 'system:error-code:updat
 INSERT INTO `sys_menu` VALUES (1114, '错误码删除', 'system:error-code:delete', 3, 4, 1110, '', '', '', 0, '', '2021-04-13 21:46:42', '', '2021-04-13 22:09:51', b'0');
 INSERT INTO `sys_menu` VALUES (1115, '错误码导出', 'system:error-code:export', 3, 5, 1110, '', '', '', 0, '', '2021-04-13 21:46:42', '', '2021-04-13 22:09:55', b'0');
 INSERT INTO `sys_menu` VALUES (1116, '日志中心', '', 2, 8, 2, 'log-center', 'log', 'infra/skywalking/log', 0, '1', '2021-04-26 22:35:45', '1', '2021-04-26 22:37:25', b'0');
+INSERT INTO `sys_menu` VALUES (1118,'请假申请','',2,0,5,'oa/leave','user','oa/leave/index',0,'','2021-09-20 08:51:03','1','2021-10-12 22:19:02',0x00);
+INSERT INTO `sys_menu` VALUES (1119,'请假申请查询','oa:leave:query',3,1,1118,'','','',0,'','2021-09-20 08:51:03','','2021-09-20 08:51:03',0x00);
+INSERT INTO `sys_menu` VALUES (1120,'请假申请创建','oa:leave:create',3,2,1118,'','','',0,'','2021-09-20 08:51:03','','2021-09-20 08:51:03',0x00);
+INSERT INTO `sys_menu` VALUES (1121,'请假申请更新','oa:leave:update',3,3,1118,'','','',0,'','2021-09-20 08:51:03','','2021-09-20 08:51:03',0x00);
+INSERT INTO `sys_menu` VALUES (1122,'请假申请删除','oa:leave:delete',3,4,1118,'','','',0,'','2021-09-20 08:51:03','','2021-09-20 08:51:03',0x00);
+INSERT INTO `sys_menu` VALUES (1123,'请假申请导出','oa:leave:export',3,5,1118,'','','',0,'','2021-09-20 08:51:03','','2021-09-20 08:51:03',0x00);
+INSERT INTO `sys_menu` VALUES (1124,'待办任务','',2,2,5,'todo','edit','oa/todo/index',0,'1','2021-09-20 22:10:09','1','2021-09-21 23:17:12',0x00);
+
 COMMIT;
 
 -- ----------------------------
@@ -1958,6 +1976,7 @@ INSERT INTO `sys_user` VALUES (2, 'ry', '$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ul
 INSERT INTO `sys_user` VALUES (100, 'yudao', '$2a$10$11U48RhyJ5pSBYWSn12AD./ld671.ycSzJHbyrtpeoMeYiw31eo8a', '芋道', '不要吓我', 100, '[1]', 'yudao@iocoder.cn', '15601691300', 1, '', 1, '', NULL, '', '2021-01-07 09:07:17', '1', '2021-03-14 22:35:17', b'0');
 INSERT INTO `sys_user` VALUES (103, 'yuanma', '', '源码', NULL, 100, NULL, 'yuanma@iocoder.cn', '15601701300', 0, '', 0, '', NULL, '', '2021-01-13 23:50:35', '', '2021-01-13 23:50:35', b'0');
 INSERT INTO `sys_user` VALUES (104, 'test', '$2a$10$.TOFpaIiI3PzEwkGrNq0Eu6Cc3rOqJMxTb1DqeSEM8StxaGPBRKoi', '测试号', NULL, 100, '[]', '', '15601691200', 1, '', 0, '', NULL, '', '2021-01-21 02:13:53', '1', '2021-03-14 22:36:38', b'0');
+INSERT INTO `sys_user` VALUES (105,'hradmin','$2a$10$JEhJOL25X1eMnFfR3PILo.MoAljf29YukpL2w6H9GvVGjmqOCuh.O','hr-mgr','hr 管理员',100,'[3]','','',1,'',0,'',NULL,'1','2021-09-25 16:50:41','1','2021-09-25 01:14:09',0x00);
 COMMIT;
 
 -- ----------------------------
@@ -1987,6 +2006,7 @@ INSERT INTO `sys_user_role` VALUES (4, 100, 101, '', NULL, '', NULL, b'0');
 INSERT INTO `sys_user_role` VALUES (5, 100, 1, '', NULL, '', NULL, b'0');
 INSERT INTO `sys_user_role` VALUES (6, 100, 2, '', NULL, '', NULL, b'0');
 INSERT INTO `sys_user_role` VALUES (7, 104, 101, '', NULL, '', NULL, b'0');
+INSERT INTO `sys_user_role` VALUES (8,105,1,'1','2021-09-25 16:51:44','1','2021-09-25 16:51:44',0x00);
 COMMIT;
 
 -- ----------------------------
@@ -2424,5 +2444,28 @@ BEGIN;
 INSERT INTO `tool_test_demo` VALUES (106, '老五1', 0, 1, 1, '牛逼哈2', '', '2021-02-06 13:25:00', '', '2021-02-06 14:00:37', b'1');
 INSERT INTO `tool_test_demo` VALUES (107, '哈哈哈哈', 1, 0, 1, 'biubiubui', '', '2021-02-06 14:00:54', '', '2021-02-06 14:00:54', b'0');
 COMMIT;
+
+
+DROP TABLE IF EXISTS `oa_leave`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `oa_leave` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '请假表单主键',
+  `process_instance_id` varchar(64) DEFAULT NULL COMMENT '流程id',
+  `status` tinyint(4) NOT NULL COMMENT '状态',
+  `user_id` varchar(20) NOT NULL COMMENT '申请人id',
+  `start_time` datetime NOT NULL COMMENT '开始时间',
+  `end_time` datetime NOT NULL COMMENT '结束时间',
+  `leave_type` varchar(20) DEFAULT NULL COMMENT '请假类型',
+  `reason` varchar(2000) DEFAULT NULL COMMENT '原因',
+  `apply_time` datetime NOT NULL COMMENT '申请时间',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='请假申请表';
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 SET FOREIGN_KEY_CHECKS = 1;

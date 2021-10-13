@@ -29,6 +29,9 @@ export const DICT_TYPE = {
   INF_API_ERROR_LOG_PROCESS_STATUS: 'inf_api_error_log_process_status',
 
   TOOL_CODEGEN_TEMPLATE_TYPE: 'tool_codegen_template_type',
+
+  OA_LEAVE_STATUS: 'oa_leave_status',
+  OA_LEAVE_TYPE: 'oa_leave_type'
 }
 
 /**

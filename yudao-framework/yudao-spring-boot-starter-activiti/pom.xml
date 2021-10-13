@@ -19,20 +19,29 @@
     <properties>
         <activiti.version>7.1.0.M6</activiti.version>
     </properties>
-
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.activiti.dependencies</groupId>
+                <artifactId>activiti-dependencies</artifactId>
+                <version>${activiti.version}</version>
+                <scope>import</scope>
+                <type>pom</type>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
     <dependencies>
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
             <artifactId>yudao-common</artifactId>
         </dependency>
 
-
         <dependency>
-            <groupId>org.activiti.dependencies</groupId>
-            <artifactId>activiti-dependencies</artifactId>
-            <version>${activiti.version}</version>
-            <type>pom</type>
+            <groupId>org.mybatis</groupId>
+            <artifactId>mybatis</artifactId>
+            <optional>true</optional>
         </dependency>
+
         <!--使用mybatis plus需排除掉mybatis-->
         <dependency>
             <groupId>org.activiti</groupId>
@@ -50,6 +59,10 @@
                 <exclusion>
                     <groupId>org.mybatis</groupId>
                     <artifactId>mybatis</artifactId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>el-api</artifactId>
+                    <groupId>javax.el</groupId>
                 </exclusion>
             </exclusions>
         </dependency>

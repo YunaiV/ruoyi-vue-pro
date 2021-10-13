@@ -31,6 +31,11 @@
             <artifactId>yudao-spring-boot-starter-biz-sms</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-spring-boot-starter-activiti</artifactId>
+        </dependency>
+
         <!-- Web 相关 -->
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
@@ -106,6 +111,8 @@
             <groupId>cn.iocoder.boot</groupId>
             <artifactId>yudao-spring-boot-starter-excel</artifactId>
         </dependency>
+
+
 
         <dependency>
             <groupId>org.apache.velocity</groupId>

@@ -90,13 +90,18 @@ public class SecurityFrameworkUtils {
     public static void setLoginUser(LoginUser loginUser, HttpServletRequest request) {
         // 创建 UsernamePasswordAuthenticationToken 对象
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                loginUser, null, null);
+                loginUser, null, loginUser.getAuthorities());
         authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
         // 设置到上下文
+        //何时调用  SecurityContextHolder.clearContext. spring security filter 应该会调用 clearContext
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
         // 额外设置到 request 中，用于 ApiAccessLogFilter 可以获取到用户编号；
         // 原因是，Spring Security 的 Filter 在 ApiAccessLogFilter 后面，在它记录访问日志时，线上上下文已经没有用户编号等信息
         WebFrameworkUtils.setLoginUserId(request, loginUser.getId());
+
+        org.activiti.engine.impl.identity.Authentication.setAuthenticatedUserId(loginUser.getUsername());
+
+
     }
 
 }

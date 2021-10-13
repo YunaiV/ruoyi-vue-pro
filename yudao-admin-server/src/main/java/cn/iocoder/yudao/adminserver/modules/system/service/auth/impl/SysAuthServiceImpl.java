@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.adminserver.modules.system.service.auth.impl;
 
+import cn.iocoder.yudao.adminserver.modules.system.service.dept.SysPostService;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
@@ -31,10 +32,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import javax.annotation.Resource;
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.adminserver.modules.system.enums.SysErrorCodeConstants.*;
+import static java.util.Collections.EMPTY_LIST;
 import static java.util.Collections.singleton;
 
 /**
@@ -59,6 +64,8 @@ public class SysAuthServiceImpl implements SysAuthService {
     private SysLoginLogService loginLogService;
     @Resource
     private SysUserSessionService userSessionService;
+    @Resource
+    private SysPostService sysPostService;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -68,7 +75,9 @@ public class SysAuthServiceImpl implements SysAuthService {
             throw new UsernameNotFoundException(username);
         }
         // 创建 LoginUser 对象
-        return SysAuthConvert.INSTANCE.convert(user);
+        LoginUser loginUser =  SysAuthConvert.INSTANCE.convert(user);
+        loginUser.setPostIds(user.getPostIds());
+        return loginUser;
     }
 
     @Override
@@ -92,9 +101,16 @@ public class SysAuthServiceImpl implements SysAuthService {
         // 使用账号密码，进行登陆。
         LoginUser loginUser = this.login0(reqVO.getUsername(), reqVO.getPassword());
         loginUser.setRoleIds(this.getUserRoleIds(loginUser.getId())); // 获取用户角色列表
-
+        loginUser.setGroups(this.getUserPosts(loginUser.getPostIds()));
         // 缓存登陆用户到 Redis 中，返回 sessionId 编号
         return userSessionService.createUserSession(loginUser, userIp, userAgent);
+    }
+
+
+    private List<String> getUserPosts(Set<Long> postIds) {
+        return Optional.ofNullable(postIds).map(ids->
+               sysPostService.getPosts(ids).stream().map(post -> post.getCode()).collect(Collectors.toList())
+        ).orElse(EMPTY_LIST);
     }
 
     private void verifyCaptcha(String username, String captchaUUID, String captchaCode) {
@@ -122,6 +138,7 @@ public class SysAuthServiceImpl implements SysAuthService {
             // 调用 Spring Security 的 AuthenticationManager#authenticate(...) 方法，使用账号密码进行认证
             // 在其内部，会调用到 loadUserByUsername 方法，获取 User 信息
             authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+           //  org.activiti.engine.impl.identity.Authentication.setAuthenticatedUserId(username);
         } catch (BadCredentialsException badCredentialsException) {
             this.createLoginLog(username, SysLoginResultEnum.BAD_CREDENTIALS);
             throw exception(AUTH_LOGIN_BAD_CREDENTIALS);
