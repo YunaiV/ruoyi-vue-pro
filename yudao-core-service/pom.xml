@@ -12,7 +12,7 @@
     <artifactId>yudao-core-service</artifactId>
     <packaging>jar</packaging>
 
-    <name>yudao-admin-server</name>
+    <name>yudao-core-service</name>
     <description>
         公共服务，通过 jar 包的方式，被 yudao-admin-server、yudao-user-service 使用。例如说：
             1. 日志相关：访问日志、登录日志、异常日志等等
