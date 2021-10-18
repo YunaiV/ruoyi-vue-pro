@@ -17,8 +17,8 @@ public class PayOrderSubmitReqDTO implements Serializable {
     /**
      * 应用编号
      */
-    @NotEmpty(message = "应用编号不能为空")
-    private String appId;
+    @NotNull(message = "应用编号不能为空")
+    private Long appId;
 
     /**
      * 支付单编号

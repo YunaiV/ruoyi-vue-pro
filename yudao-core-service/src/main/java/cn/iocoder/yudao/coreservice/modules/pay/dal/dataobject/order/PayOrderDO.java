@@ -28,12 +28,6 @@ public class PayOrderDO extends BaseDO {
      * 订单编号，数据库自增
      */
     private Long id;
-//    /**
-//     * 订单号，根据规则生成
-//     *
-//     * 例如说，P202110132239124200055
-//     */
-//    private String no;
     /**
      * 商户编号
      *
@@ -53,7 +47,7 @@ public class PayOrderDO extends BaseDO {
      */
     private Long channelId;
     /**
-     * 商户编码
+     * 渠道编码
      *
      * 枚举 {@link PayChannelCodeEnum}
      */
@@ -132,6 +126,12 @@ public class PayOrderDO extends BaseDO {
      * 页面跳转地址
      */
     private String returnUrl;
+    /**
+     * 支付成功的订单拓展单编号
+     *
+     * 关联 {@link PayOrderDO#getId()}
+     */
+    private Long successExtensionId;
 
     // TODO 芋艿：可能要优化
     /**
