@@ -1,11 +1,15 @@
-package cn.iocoder.yudao.adminserver.modules.pay.dal.dataobject.order;
+package cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.order;
 
-import cn.iocoder.yudao.adminserver.modules.pay.dal.dataobject.merchant.PayAppDO;
-import cn.iocoder.yudao.adminserver.modules.pay.dal.dataobject.merchant.PayChannelDO;
-import cn.iocoder.yudao.adminserver.modules.pay.dal.dataobject.merchant.PayMerchantDO;
-import cn.iocoder.yudao.adminserver.modules.pay.enums.PayChannelCodeEnum;
+import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.merchant.PayAppDO;
+import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.merchant.PayChannelDO;
+import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.merchant.PayMerchantDO;
+import cn.iocoder.yudao.coreservice.modules.pay.enums.merchant.PayChannelCodeEnum;
+import cn.iocoder.yudao.coreservice.modules.pay.enums.order.PayOrderStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import java.util.Date;
 
@@ -14,19 +18,22 @@ import java.util.Date;
  *
  * @author 芋道源码
  */
+@TableName("pay_order")
 @Data
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
 public class PayOrderDO extends BaseDO {
 
     /**
      * 订单编号，数据库自增
      */
     private Long id;
-    /**
-     * 订单号，根据规则生成
-     *
-     * 例如说，P202110132239124200055
-     */
-    private String no;
+//    /**
+//     * 订单号，根据规则生成
+//     *
+//     * 例如说，P202110132239124200055
+//     */
+//    private String no;
     /**
      * 商户编号
      *
@@ -42,7 +49,7 @@ public class PayOrderDO extends BaseDO {
     /**
      * 渠道编号
      *
-     * 关联 {@link PayChannelDO#getMerchantId()}
+     * 关联 {@link PayChannelDO#getId()}
      */
     private Long channelId;
     /**
@@ -55,10 +62,10 @@ public class PayOrderDO extends BaseDO {
     // ========== 商户相关字段 ==========
 
     /**
-     * 商户订单号
+     * 商户订单编号
      * 例如说，内部系统 A 的订单号。需要保证每个 PayMerchantDO 唯一 TODO 芋艿：需要在测试下
      */
-    private String merchantOrderNo;
+    private String merchantOrderId;
     /**
      * 商品标题
      */
@@ -71,11 +78,6 @@ public class PayOrderDO extends BaseDO {
      * 商户拓展参数
      */
     private String merchantExtra;
-    /**
-     * 通知商户支付结果的回调状态
-     * TODO 芋艿：0 未发送 1 已发送
-     */
-    private Integer notifyStatus;
 
     // ========== 订单相关字段 ==========
 
@@ -96,9 +98,14 @@ public class PayOrderDO extends BaseDO {
     /**
      * 支付状态
      *
-     * TODO 芋艿：状态枚举
+     * 枚举 {@link PayOrderStatusEnum}
      */
     private Integer status;
+    /**
+     * 通知商户支付结果的回调状态
+     * TODO 芋艿：0 未发送 1 已发送
+     */
+    private Integer notifyStatus;
     /**
      * 客户端 IP
      */
@@ -110,7 +117,7 @@ public class PayOrderDO extends BaseDO {
     /**
      * 订单失效时间
      */
-    private Date expiredTime;
+    private Date expireTime;
     /**
      * 支付渠道的额外参数
      *

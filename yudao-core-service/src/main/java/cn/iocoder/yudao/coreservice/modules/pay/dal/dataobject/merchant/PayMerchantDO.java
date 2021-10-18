@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.adminserver.modules.pay.dal.dataobject.merchant;
+package cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.merchant;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;

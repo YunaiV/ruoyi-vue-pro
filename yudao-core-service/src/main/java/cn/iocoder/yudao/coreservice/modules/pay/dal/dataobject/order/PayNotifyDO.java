@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.adminserver.modules.pay.dal.dataobject.order;
+package cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.order;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import lombok.Data;

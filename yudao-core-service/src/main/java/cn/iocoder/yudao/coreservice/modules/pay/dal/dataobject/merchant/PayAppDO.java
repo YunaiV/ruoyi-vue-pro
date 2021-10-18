@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.adminserver.modules.pay.dal.dataobject.merchant;
+package cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.merchant;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
@@ -23,11 +23,6 @@ public class PayAppDO extends BaseDO {
     @TableId
     private Long id;
     /**
-     * 应用号
-     * 例如说，60cc81e0e4b06afc4d3f0cfq
-     */
-    private String no;
-    /**
      * 应用名
      */
     private String name;
@@ -46,6 +41,14 @@ public class PayAppDO extends BaseDO {
      * TODO 芋艿：用途
      */
     private String secret;
+    /**
+     * 支付结果的回调地址
+     */
+    private String payNotifyUrl;
+    /**
+     * 退款结果的回调地址
+     */
+    private String refundNotifyUrl;
 
     /**
      * 商户编号

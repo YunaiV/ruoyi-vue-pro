@@ -11,23 +11,24 @@
 
     <artifactId>yudao-spring-boot-starter-biz-pay</artifactId>
     <name>${artifactId}</name>
-    <description>支付核心业务</description>
+    <description>支付拓展，基于 IJPay 简单封装，支持微信、支付宝等常见支付渠道</description>
 
     <dependencies>
-        <dependency>
-            <groupId>cn.iocoder.boot</groupId>
-            <artifactId>yudao-spring-boot-starter-extension</artifactId>
-            <version>${revision}</version>
-        </dependency>
-
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
             <artifactId>yudao-common</artifactId>
         </dependency>
 
+        <!-- 三方云服务相关 -->
         <dependency>
-            <groupId>cn.iocoder.boot</groupId>
-            <artifactId>yudao-spring-boot-starter-biz-operatelog</artifactId>
+            <groupId>com.github.javen205</groupId>
+            <artifactId>IJPay-AliPay</artifactId>
+            <version>2.7.8</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.javen205</groupId>
+            <artifactId>IJPay-WxPay</artifactId>
+            <version>2.7.8</version>
         </dependency>
     </dependencies>
 </project>

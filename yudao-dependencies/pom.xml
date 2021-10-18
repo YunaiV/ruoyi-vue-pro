@@ -52,6 +52,7 @@
         <aliyun-java-sdk-core.version>4.5.25</aliyun-java-sdk-core.version>
         <aliyun-java-sdk-dysmsapi.version>2.1.0</aliyun-java-sdk-dysmsapi.version>
         <yunpian-java-sdk.version>1.2.7</yunpian-java-sdk.version>
+        <justauth.version>1.4.0</justauth.version>
     </properties>
 
     <dependencyManagement>
@@ -90,6 +91,11 @@
             <dependency>
                 <groupId>cn.iocoder.boot</groupId>
                 <artifactId>yudao-spring-boot-starter-biz-sms</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.iocoder.boot</groupId>
+                <artifactId>yudao-spring-boot-starter-biz-pay</artifactId>
                 <version>${revision}</version>
             </dependency>
 
@@ -421,6 +427,13 @@
                 <version>${aliyun-java-sdk-dysmsapi.version}</version>
             </dependency>
             <!-- SMS SDK end -->
+
+            <dependency>
+                <groupId>com.xkcoding.justauth</groupId>
+                <artifactId>justauth-spring-boot-starter</artifactId>
+                <version>${justauth.version}</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 

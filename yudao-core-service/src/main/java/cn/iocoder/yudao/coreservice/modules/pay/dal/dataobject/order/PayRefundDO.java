@@ -1,9 +1,9 @@
-package cn.iocoder.yudao.adminserver.modules.pay.dal.dataobject.order;
+package cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.order;
 
-import cn.iocoder.yudao.adminserver.modules.pay.dal.dataobject.merchant.PayAppDO;
-import cn.iocoder.yudao.adminserver.modules.pay.dal.dataobject.merchant.PayChannelDO;
-import cn.iocoder.yudao.adminserver.modules.pay.dal.dataobject.merchant.PayMerchantDO;
-import cn.iocoder.yudao.adminserver.modules.pay.enums.PayChannelCodeEnum;
+import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.merchant.PayAppDO;
+import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.merchant.PayChannelDO;
+import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.merchant.PayMerchantDO;
+import cn.iocoder.yudao.coreservice.modules.pay.enums.merchant.PayChannelCodeEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import lombok.Data;
 
@@ -45,7 +45,7 @@ public class PayRefundDO extends BaseDO {
     /**
      * 渠道编号
      *
-     * 关联 {@link PayChannelDO#getMerchantId()}
+     * 关联 {@link PayChannelDO#getId()}
      */
     private Long channelId;
     /**
@@ -80,6 +80,11 @@ public class PayRefundDO extends BaseDO {
      */
     private Integer status;
     /**
+     * 通知商户退款结果的回调状态
+     * TODO 芋艿：0 未发送 1 已发送
+     */
+    private Integer notifyStatus;
+    /**
      * 客户端 IP
      */
     private String clientIp;
@@ -98,7 +103,7 @@ public class PayRefundDO extends BaseDO {
     /**
      * 退款失效时间
      */
-    private Date expiredTime;
+    private Date expireTime;
     /**
      * 支付渠道的额外参数
      *
