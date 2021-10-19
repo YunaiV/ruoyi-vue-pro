@@ -13,7 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.List;
 
 /**
- * 短信客户端抽象类
+ * 短信客户端的抽象类，提供模板方法，减少子类的冗余代码
  *
  * @author zzf
  * @date 2021/2/1 9:28
