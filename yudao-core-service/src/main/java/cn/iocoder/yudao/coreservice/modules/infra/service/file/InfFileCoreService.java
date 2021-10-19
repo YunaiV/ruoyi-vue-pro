@@ -1,15 +1,17 @@
-package cn.iocoder.yudao.adminserver.modules.infra.service.file;
+package cn.iocoder.yudao.coreservice.modules.infra.service.file;
 
 import cn.iocoder.yudao.coreservice.modules.infra.dal.dataobject.file.InfFileDO;
+import cn.iocoder.yudao.coreservice.modules.infra.file.vo.InfFilePageReqVO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.adminserver.modules.infra.controller.file.vo.InfFilePageReqVO;
 
 /**
- * 文件 Service 接口
- *
- * @author 芋道源码
+ * @Class:ruoyi-vue-pro.cn.iocoder.yudao.coreservice.modules.infra.service.file.InfFileCoreService
+ * @Descript: 文件 core Service 接口
+ * @Author:宋天
+ * @Date:2021/10/19
  */
-public interface InfFileService {
+public interface InfFileCoreService {
+
 
     /**
      * 保存文件，并返回文件的访问路径
@@ -42,5 +44,4 @@ public interface InfFileService {
      * @return 文件分页
      */
     PageResult<InfFileDO> getFilePage(InfFilePageReqVO pageReqVO);
-
 }

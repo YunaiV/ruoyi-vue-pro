@@ -1,31 +1,32 @@
-package cn.iocoder.yudao.adminserver.modules.infra.service.file.impl;
+package cn.iocoder.yudao.coreservice.modules.infra.service.file.impl;
 
 import cn.hutool.core.io.FileTypeUtil;
 import cn.iocoder.yudao.coreservice.modules.infra.dal.dataobject.file.InfFileDO;
+import cn.iocoder.yudao.coreservice.modules.infra.dal.mysql.file.InfFileCoreMapper;
+import cn.iocoder.yudao.coreservice.modules.infra.file.vo.InfFilePageReqVO;
+import cn.iocoder.yudao.coreservice.modules.infra.framework.file.config.FileProperties;
+import cn.iocoder.yudao.coreservice.modules.infra.service.file.InfFileCoreService;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.adminserver.modules.infra.framework.file.config.FileProperties;
-import cn.iocoder.yudao.adminserver.modules.infra.controller.file.vo.InfFilePageReqVO;
-import cn.iocoder.yudao.adminserver.modules.infra.dal.mysql.file.InfFileMapper;
-import cn.iocoder.yudao.adminserver.modules.infra.service.file.InfFileService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.io.ByteArrayInputStream;
 
+import static cn.iocoder.yudao.coreservice.modules.system.enums.SysErrorCodeConstants.FILE_NOT_EXISTS;
+import static cn.iocoder.yudao.coreservice.modules.system.enums.SysErrorCodeConstants.FILE_PATH_EXISTS;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.adminserver.modules.infra.enums.InfErrorCodeConstants.FILE_NOT_EXISTS;
-import static cn.iocoder.yudao.adminserver.modules.system.enums.SysErrorCodeConstants.FILE_PATH_EXISTS;
 
 /**
- * 文件 Service 实现类
- *
- * @author 芋道源码
+ * @Class:ruoyi-vue-pro.cn.iocoder.yudao.coreservice.modules.infra.service.file.impl.InfFileCoreServiceImpl
+ * @Descript: core service 文件实现类
+ * @Author:宋天
+ * @Date:2021/10/19
  */
 @Service
-public class InfFileServiceImpl implements InfFileService {
+public class InfFileCoreServiceImpl implements InfFileCoreService {
 
     @Resource
-    private InfFileMapper fileMapper;
+    private InfFileCoreMapper fileMapper;
 
     @Resource
     private FileProperties fileProperties;

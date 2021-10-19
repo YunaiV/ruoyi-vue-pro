@@ -3,7 +3,6 @@ package cn.iocoder.yudao.adminserver.modules.system.service.user;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.iocoder.yudao.adminserver.BaseDbUnitTest;
-import cn.iocoder.yudao.adminserver.modules.infra.service.file.InfFileService;
 import cn.iocoder.yudao.adminserver.modules.system.controller.user.vo.profile.SysUserProfileUpdatePasswordReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.user.vo.profile.SysUserProfileUpdateReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.user.vo.user.*;
@@ -14,6 +13,7 @@ import cn.iocoder.yudao.adminserver.modules.system.service.dept.SysDeptService;
 import cn.iocoder.yudao.adminserver.modules.system.service.dept.SysPostService;
 import cn.iocoder.yudao.adminserver.modules.system.service.permission.SysPermissionService;
 import cn.iocoder.yudao.adminserver.modules.system.service.user.impl.SysUserServiceImpl;
+import cn.iocoder.yudao.coreservice.modules.infra.service.file.InfFileCoreService;
 import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.user.SysUserDO;
 import cn.iocoder.yudao.coreservice.modules.system.enums.common.SysSexEnum;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
@@ -69,7 +69,7 @@ public class SysUserServiceImplTest extends BaseDbUnitTest {
     @MockBean
     private PasswordEncoder passwordEncoder;
     @MockBean
-    private InfFileService fileService;
+    private InfFileCoreService fileService;
 
     @Test
     public void testCreatUser_success() {

@@ -2,12 +2,12 @@ package cn.iocoder.yudao.adminserver.modules.infra.controller.file;
 
 import cn.hutool.core.io.IoUtil;
 import cn.iocoder.yudao.coreservice.modules.infra.dal.dataobject.file.InfFileDO;
+import cn.iocoder.yudao.coreservice.modules.infra.service.file.InfFileCoreService;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.adminserver.modules.infra.controller.file.vo.InfFilePageReqVO;
-import cn.iocoder.yudao.adminserver.modules.infra.controller.file.vo.InfFileRespVO;
+import cn.iocoder.yudao.coreservice.modules.infra.file.vo.InfFilePageReqVO;
+import cn.iocoder.yudao.coreservice.modules.infra.file.vo.InfFileRespVO;
 import cn.iocoder.yudao.adminserver.modules.infra.convert.file.InfFileConvert;
-import cn.iocoder.yudao.adminserver.modules.infra.service.file.InfFileService;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -35,7 +35,7 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 public class InfFileController {
 
     @Resource
-    private InfFileService fileService;
+    private InfFileCoreService fileService;
 
     @PostMapping("/upload")
     @ApiOperation("上传文件")

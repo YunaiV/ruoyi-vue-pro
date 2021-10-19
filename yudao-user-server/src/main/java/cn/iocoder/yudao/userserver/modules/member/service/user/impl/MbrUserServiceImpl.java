@@ -1,17 +1,26 @@
 package cn.iocoder.yudao.userserver.modules.member.service.user.impl;
 
+import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.IdUtil;
+import cn.iocoder.yudao.coreservice.modules.infra.service.file.InfFileCoreService;
 import cn.iocoder.yudao.coreservice.modules.member.dal.dataobject.user.MbrUserDO;
+import cn.iocoder.yudao.coreservice.modules.system.controller.user.vo.SysUserCoreProfileRespVo;
+import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.user.SysUserDO;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.userserver.modules.member.dal.mysql.user.MbrUserMapper;
 import cn.iocoder.yudao.userserver.modules.member.service.user.MbrUserService;
+import com.google.common.annotations.VisibleForTesting;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
+import java.io.InputStream;
 import java.util.Date;
+
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.userserver.modules.member.enums.MbrErrorCodeConstants.USER_NOT_EXISTS;
 
 /**
  * User Service 实现类
@@ -25,6 +34,9 @@ public class MbrUserServiceImpl implements MbrUserService {
 
     @Resource
     private MbrUserMapper userMapper;
+
+    @Resource
+    private InfFileCoreService fileCoreService;
 
     @Resource
     private PasswordEncoder passwordEncoder;
@@ -68,4 +80,53 @@ public class MbrUserServiceImpl implements MbrUserService {
         return userMapper.selectById(id);
     }
 
+    @Override
+    public void reviseNickname(Long loginUserId, String nickName) {
+        MbrUserDO mbrUserDO = userMapper.selectById(loginUserId);
+        // 仅当新昵称不等于旧昵称时进行修改
+        if (!nickName.equals(mbrUserDO.getNickname())){
+            MbrUserDO user = new MbrUserDO();
+            user.setId(mbrUserDO.getId());
+            user.setNickname(nickName);
+            userMapper.updateById(user);
+        }
+    }
+
+    @Override
+    public String reviseAvatar(Long loginUserId, InputStream avatarFile) {
+        this.checkUserExists(loginUserId);
+        // 创建文件
+        String avatar = fileCoreService.createFile(IdUtil.fastUUID(), IoUtil.readBytes(avatarFile));
+        // 更新头像路径
+        MbrUserDO userDO = new MbrUserDO();
+        userDO.setId(loginUserId);
+        userDO.setAvatar(avatar);
+        userMapper.updateById(userDO);
+        return avatar;
+    }
+
+    @Override
+    public SysUserCoreProfileRespVo getUserInfo(Long loginUserId) {
+        MbrUserDO mbrUserDO = userMapper.selectById(loginUserId);
+        if (mbrUserDO == null){
+            log.error("用户不存在:{}",loginUserId);
+            throw exception(USER_NOT_EXISTS);
+        }
+
+        SysUserCoreProfileRespVo userRes = new SysUserCoreProfileRespVo();
+        userRes.setNickName(mbrUserDO.getNickname());
+        userRes.setAvatar(mbrUserDO.getAvatar());
+        return userRes;
+    }
+
+    @VisibleForTesting
+    public void checkUserExists(Long id) {
+        if (id == null) {
+            return;
+        }
+        MbrUserDO user = userMapper.selectById(id);
+        if (user == null) {
+            throw exception(USER_NOT_EXISTS);
+        }
+    }
 }

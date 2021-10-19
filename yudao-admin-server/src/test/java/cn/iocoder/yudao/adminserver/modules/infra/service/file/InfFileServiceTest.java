@@ -3,11 +3,11 @@ package cn.iocoder.yudao.adminserver.modules.infra.service.file;
 import cn.hutool.core.io.resource.ResourceUtil;
 import cn.iocoder.yudao.adminserver.BaseDbUnitTest;
 import cn.iocoder.yudao.coreservice.modules.infra.dal.dataobject.file.InfFileDO;
+import cn.iocoder.yudao.coreservice.modules.infra.dal.mysql.file.InfFileCoreMapper;
+import cn.iocoder.yudao.coreservice.modules.infra.service.file.impl.InfFileCoreServiceImpl;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.adminserver.modules.infra.framework.file.config.FileProperties;
-import cn.iocoder.yudao.adminserver.modules.infra.controller.file.vo.InfFilePageReqVO;
-import cn.iocoder.yudao.adminserver.modules.infra.dal.mysql.file.InfFileMapper;
-import cn.iocoder.yudao.adminserver.modules.infra.service.file.impl.InfFileServiceImpl;
+import cn.iocoder.yudao.coreservice.modules.infra.framework.file.config.FileProperties;
+import cn.iocoder.yudao.coreservice.modules.infra.file.vo.InfFilePageReqVO;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -15,8 +15,8 @@ import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
 
+import static cn.iocoder.yudao.coreservice.modules.system.enums.SysErrorCodeConstants.FILE_NOT_EXISTS;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
-import static cn.iocoder.yudao.adminserver.modules.infra.enums.InfErrorCodeConstants.FILE_NOT_EXISTS;
 import static cn.iocoder.yudao.adminserver.modules.system.enums.SysErrorCodeConstants.FILE_PATH_EXISTS;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
@@ -24,17 +24,17 @@ import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomString
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildTime;
 import static org.junit.jupiter.api.Assertions.*;
 
-@Import({InfFileServiceImpl.class, FileProperties.class})
+@Import({InfFileCoreServiceImpl.class, FileProperties.class})
 public class InfFileServiceTest extends BaseDbUnitTest {
 
     @Resource
-    private InfFileServiceImpl fileService;
+    private InfFileCoreServiceImpl fileService;
 
     @MockBean
     private FileProperties fileProperties;
 
     @Resource
-    private InfFileMapper fileMapper;
+    private InfFileCoreMapper fileMapper;
 
     @Test
     public void testCreateFile_success() {
