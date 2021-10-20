@@ -19,6 +19,16 @@
             <artifactId>yudao-common</artifactId>
         </dependency>
 
+        <!-- 工具类相关 -->
+        <dependency>
+            <groupId>jakarta.validation</groupId>
+            <artifactId>jakarta.validation-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.validator</groupId>
+            <artifactId>hibernate-validator</artifactId>
+        </dependency>
+
         <!-- 三方云服务相关 -->
         <dependency>
             <groupId>com.github.javen205</groupId>
@@ -30,5 +40,6 @@
             <artifactId>IJPay-WxPay</artifactId>
             <version>2.7.8</version>
         </dependency>
+
     </dependencies>
 </project>

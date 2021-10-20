@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.framework.pay.core.client.alipay;
+package cn.iocoder.yudao.framework.pay.core.client.impl.alipay;
 
 import lombok.Data;
 
@@ -15,11 +15,11 @@ public class AlipayPayConfig {
     /**
      * 网关地址 - 线上
      */
-    private static final String SERVER_URL_PROD = "https://openapi.alipay.com/gateway.do";
+    public static final String SERVER_URL_PROD = "https://openapi.alipay.com/gateway.do";
     /**
      * 网关地址 - 沙箱
      */
-    private static final String SERVER_URL_SANDBOX = "https://openapi.alipay.com/gateway.do";
+    public static final String SERVER_URL_SANDBOX = "https://openapi.alipaydev.com/gateway.do";
 
     /**
      * 公钥类型 - 公钥模式
@@ -33,7 +33,7 @@ public class AlipayPayConfig {
     /**
      * 签名算法类型 - RSA
      */
-    private static final String SIGN_TYPE_DEFAULT = "RSA2";
+    public static final String SIGN_TYPE_DEFAULT = "RSA2";
 
     /**
      * 网关地址

@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.framework.pay.core;
+package cn.iocoder.yudao.framework.pay.core.client;
 
 /**
  * 支付客户端的配置，本质是支付渠道的配置

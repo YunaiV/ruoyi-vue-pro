@@ -83,7 +83,8 @@ public class YunpianSmsClient extends AbstractSmsClient {
         }
         // 参考 https://www.yunpian.com/official/document/sms/zh_cn/introduction_demos_encode_sample 格式化
         StringJoiner joiner = new StringJoiner("&");
-        templateParams.forEach(param -> joiner.add(String.format("#%s#=%s", param.getKey(), URLUtil.encode(String.valueOf(param.getValue())))));
+        templateParams.forEach(param -> joiner.add(String.format("#%s#=%s", param.getKey(),
+                URLUtil.encode(String.valueOf(param.getValue())))));
         return joiner.toString();
     }
 
