@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.coreservice.modules.infra.file.vo;
+package cn.iocoder.yudao.coreservice.modules.infra.controller.file.vo;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;

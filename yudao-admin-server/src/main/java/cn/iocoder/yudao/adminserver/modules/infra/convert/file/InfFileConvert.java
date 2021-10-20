@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.adminserver.modules.infra.convert.file;
 
+import cn.iocoder.yudao.coreservice.modules.infra.controller.file.vo.InfFileRespVO;
 import cn.iocoder.yudao.coreservice.modules.infra.dal.dataobject.file.InfFileDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.coreservice.modules.infra.file.vo.InfFileRespVO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 

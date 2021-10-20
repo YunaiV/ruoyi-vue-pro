@@ -4,8 +4,7 @@ import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.iocoder.yudao.coreservice.modules.infra.service.file.InfFileCoreService;
 import cn.iocoder.yudao.coreservice.modules.member.dal.dataobject.user.MbrUserDO;
-import cn.iocoder.yudao.coreservice.modules.system.controller.user.vo.SysUserCoreProfileRespVo;
-import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.user.SysUserDO;
+import cn.iocoder.yudao.userserver.modules.member.controller.user.vo.SysUserInfoRespVO;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.userserver.modules.member.dal.mysql.user.MbrUserMapper;
 import cn.iocoder.yudao.userserver.modules.member.service.user.MbrUserService;
@@ -81,52 +80,51 @@ public class MbrUserServiceImpl implements MbrUserService {
     }
 
     @Override
-    public void reviseNickname(Long loginUserId, String nickName) {
-        MbrUserDO mbrUserDO = userMapper.selectById(loginUserId);
+    public void updateNickname(Long userId, String nickName) {
+        MbrUserDO user = this.checkUserExists(userId);
         // 仅当新昵称不等于旧昵称时进行修改
-        if (!nickName.equals(mbrUserDO.getNickname())){
-            MbrUserDO user = new MbrUserDO();
-            user.setId(mbrUserDO.getId());
-            user.setNickname(nickName);
-            userMapper.updateById(user);
+        if (nickName.equals(user.getNickname())){
+            return;
         }
+        MbrUserDO userDO = new MbrUserDO();
+        userDO.setId(user.getId());
+        userDO.setNickname(nickName);
+        userMapper.updateById(userDO);
     }
 
     @Override
-    public String reviseAvatar(Long loginUserId, InputStream avatarFile) {
-        this.checkUserExists(loginUserId);
+    public String reviseAvatar(Long userId, InputStream avatarFile) {
+        this.checkUserExists(userId);
         // 创建文件
         String avatar = fileCoreService.createFile(IdUtil.fastUUID(), IoUtil.readBytes(avatarFile));
         // 更新头像路径
-        MbrUserDO userDO = new MbrUserDO();
-        userDO.setId(loginUserId);
-        userDO.setAvatar(avatar);
+        MbrUserDO userDO = MbrUserDO.builder()
+                .id(userId)
+                .avatar(avatar)
+                .build();
         userMapper.updateById(userDO);
         return avatar;
     }
 
     @Override
-    public SysUserCoreProfileRespVo getUserInfo(Long loginUserId) {
-        MbrUserDO mbrUserDO = userMapper.selectById(loginUserId);
-        if (mbrUserDO == null){
-            log.error("用户不存在:{}",loginUserId);
-            throw exception(USER_NOT_EXISTS);
-        }
-
-        SysUserCoreProfileRespVo userRes = new SysUserCoreProfileRespVo();
-        userRes.setNickName(mbrUserDO.getNickname());
-        userRes.setAvatar(mbrUserDO.getAvatar());
-        return userRes;
+    public SysUserInfoRespVO getUserInfo(Long userId) {
+        MbrUserDO user = this.checkUserExists(userId);
+        SysUserInfoRespVO userResp = new SysUserInfoRespVO();
+        userResp.setNickName(user.getNickname());
+        userResp.setAvatar(user.getAvatar());
+        return userResp;
     }
 
     @VisibleForTesting
-    public void checkUserExists(Long id) {
+    public MbrUserDO checkUserExists(Long id) {
         if (id == null) {
-            return;
+            return null;
         }
         MbrUserDO user = userMapper.selectById(id);
         if (user == null) {
             throw exception(USER_NOT_EXISTS);
+        }else{
+            return user;
         }
     }
 }

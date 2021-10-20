@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.coreservice.modules.infra.file.vo;
+package cn.iocoder.yudao.coreservice.modules.infra.controller.file.vo;
 
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import io.swagger.annotations.ApiModel;

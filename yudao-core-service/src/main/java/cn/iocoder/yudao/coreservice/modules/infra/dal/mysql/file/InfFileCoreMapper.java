@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.coreservice.modules.infra.dal.mysql.file;
 
-import cn.iocoder.yudao.coreservice.modules.infra.file.vo.InfFilePageReqVO;
+import cn.iocoder.yudao.coreservice.modules.infra.controller.file.vo.InfFilePageReqVO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.coreservice.modules.infra.dal.dataobject.file.InfFileDO;

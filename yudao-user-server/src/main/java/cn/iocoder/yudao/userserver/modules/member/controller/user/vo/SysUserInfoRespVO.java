@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.coreservice.modules.system.controller.user.vo;
+package cn.iocoder.yudao.userserver.modules.member.controller.user.vo;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -6,11 +6,11 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+@ApiModel("用户个人信息 Response VO")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@ApiModel("用户个人中心信息 Response VO")
-public class SysUserCoreProfileRespVo {
+public class SysUserInfoRespVO {
 
     @ApiModelProperty(value = "用户昵称", required = true, example = "芋艿")
     private String nickName;

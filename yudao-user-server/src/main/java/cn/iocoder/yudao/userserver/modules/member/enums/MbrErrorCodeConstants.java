@@ -9,9 +9,9 @@ import cn.iocoder.yudao.framework.common.exception.ErrorCode;
  */
 public interface MbrErrorCodeConstants {
 
-    // 用户相关
-    ErrorCode USER_NOT_EXISTS = new ErrorCode(1004000000, "用户不存在");
+    // ==========用户相关============
+    ErrorCode USER_NOT_EXISTS = new ErrorCode(1004001000, "用户不存在");
 
-    // 文件相关
-    ErrorCode FILE_IS_EMPTY = new ErrorCode(1004000000, "用户不存在");
+    // ==========文件相关 ===========
+    ErrorCode FILE_IS_EMPTY = new ErrorCode(1004002000, "文件不存在");
 }

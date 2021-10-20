@@ -3,24 +3,20 @@ package cn.iocoder.yudao.coreservice.modules.infra.service.file.impl;
 import cn.hutool.core.io.FileTypeUtil;
 import cn.iocoder.yudao.coreservice.modules.infra.dal.dataobject.file.InfFileDO;
 import cn.iocoder.yudao.coreservice.modules.infra.dal.mysql.file.InfFileCoreMapper;
-import cn.iocoder.yudao.coreservice.modules.infra.file.vo.InfFilePageReqVO;
 import cn.iocoder.yudao.coreservice.modules.infra.framework.file.config.FileProperties;
 import cn.iocoder.yudao.coreservice.modules.infra.service.file.InfFileCoreService;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.io.ByteArrayInputStream;
 
-import static cn.iocoder.yudao.coreservice.modules.system.enums.SysErrorCodeConstants.FILE_NOT_EXISTS;
-import static cn.iocoder.yudao.coreservice.modules.system.enums.SysErrorCodeConstants.FILE_PATH_EXISTS;
+import static cn.iocoder.yudao.coreservice.modules.system.enums.SysErrorCodeConstants.*;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 
 /**
- * @Class:ruoyi-vue-pro.cn.iocoder.yudao.coreservice.modules.infra.service.file.impl.InfFileCoreServiceImpl
- * @Descript: core service 文件实现类
- * @Author:宋天
- * @Date:2021/10/19
+ * core service 文件实现类
+ *
+ * @author 宋天
  */
 @Service
 public class InfFileCoreServiceImpl implements InfFileCoreService {
@@ -63,11 +59,6 @@ public class InfFileCoreServiceImpl implements InfFileCoreService {
     @Override
     public InfFileDO getFile(String path) {
         return fileMapper.selectById(path);
-    }
-
-    @Override
-    public PageResult<InfFileDO> getFilePage(InfFilePageReqVO pageReqVO) {
-        return fileMapper.selectPage(pageReqVO);
     }
 
 }
