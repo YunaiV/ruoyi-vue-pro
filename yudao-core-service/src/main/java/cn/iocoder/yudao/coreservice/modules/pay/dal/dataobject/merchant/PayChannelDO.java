@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.merchant;
 
-import cn.iocoder.yudao.coreservice.modules.pay.enums.merchant.PayChannelCodeEnum;
+import cn.iocoder.yudao.framework.sms.core.enums.PayChannelCodeEnum;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import lombok.Data;

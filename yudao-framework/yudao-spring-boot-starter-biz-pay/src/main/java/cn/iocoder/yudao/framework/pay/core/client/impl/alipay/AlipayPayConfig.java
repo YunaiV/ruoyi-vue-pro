@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.framework.pay.core.client.impl.alipay;
 
+import cn.iocoder.yudao.framework.pay.core.client.PayClientConfig;
 import lombok.Data;
 
 // TODO 芋艿：参数校验
@@ -10,7 +11,7 @@ import lombok.Data;
  * @author 芋道源码
  */
 @Data
-public class AlipayPayConfig {
+public class AlipayPayConfig implements PayClientConfig {
 
     /**
      * 网关地址 - 线上

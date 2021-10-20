@@ -30,11 +30,6 @@ public abstract class AbstractSmsClient implements SmsClient {
      */
     protected final SmsCodeMapping codeMapping;
 
-    /**
-     * 短信客户端有参构造函数
-     *
-     * @param properties 短信配置
-     */
     public AbstractSmsClient(SmsChannelProperties properties, SmsCodeMapping codeMapping) {
         this.properties = properties;
         this.codeMapping = codeMapping;
@@ -48,6 +43,11 @@ public abstract class AbstractSmsClient implements SmsClient {
         log.info("[init][配置({}) 初始化完成]", properties);
     }
 
+    /**
+     * 自定义初始化
+     */
+    protected abstract void doInit();
+
     public final void refresh(SmsChannelProperties properties) {
         // 判断是否更新
         if (properties.equals(this.properties)) {
@@ -58,11 +58,6 @@ public abstract class AbstractSmsClient implements SmsClient {
         // 初始化
         this.init();
     }
-
-    /**
-     * 自定义初始化
-     */
-    protected abstract void doInit();
 
     @Override
     public Long getId() {

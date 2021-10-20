@@ -10,6 +10,13 @@ import cn.iocoder.yudao.framework.pay.core.client.dto.PayOrderUnifiedReqDTO;
  */
 public interface PayClient {
 
+    /**
+     * 获得渠道编号
+     *
+     * @return 渠道编号
+     */
+    Long getId();
+
     // TODO 缺少注释
     CommonResult<Object> unifiedOrder(PayOrderUnifiedReqDTO reqDTO);
 

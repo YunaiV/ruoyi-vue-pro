@@ -29,6 +29,11 @@
             <artifactId>hibernate-validator</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+
         <!-- 三方云服务相关 -->
         <dependency>
             <groupId>com.github.javen205</groupId>

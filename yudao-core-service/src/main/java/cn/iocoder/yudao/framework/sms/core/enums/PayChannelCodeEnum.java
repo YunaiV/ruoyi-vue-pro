@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.coreservice.modules.pay.enums.merchant;
+package cn.iocoder.yudao.framework.sms.core.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
