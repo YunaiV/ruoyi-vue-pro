@@ -13,5 +13,5 @@ public interface MbrErrorCodeConstants {
     ErrorCode USER_NOT_EXISTS = new ErrorCode(1004001000, "用户不存在");
 
     // ==========文件相关 ===========
-    ErrorCode FILE_IS_EMPTY = new ErrorCode(1004002000, "文件不存在");
+    ErrorCode FILE_IS_EMPTY = new ErrorCode(1004002000, "文件为空");
 }
