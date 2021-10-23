@@ -57,6 +57,11 @@ public class PayOrderCoreServiceImpl implements PayOrderCoreService {
     private PayOrderExtensionCoreMapper payOrderExtensionCoreMapper;
 
     @Override
+    public PayOrderDO getPayOrder(Long id) {
+        return payOrderCoreMapper.selectById(id);
+    }
+
+    @Override
     public Long createPayOrder(PayOrderCreateReqDTO reqDTO) {
         // 校验 App
         PayAppDO app = payAppCoreService.validPayApp(reqDTO.getAppId());

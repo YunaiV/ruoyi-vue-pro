@@ -1,7 +1,5 @@
 package cn.iocoder.yudao.coreservice.modules.pay.service.order.dto;
 
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -32,7 +30,7 @@ public class PayOrderSubmitReqDTO implements Serializable {
     /**
      * 支付渠道
      */
-    @NotNull(message = "支付渠道")
+    @NotEmpty(message = "支付渠道不能为空")
     private String channelCode;
 
     /**
@@ -44,7 +42,6 @@ public class PayOrderSubmitReqDTO implements Serializable {
     /**
      * 支付渠道的额外参数
      */
-    @TableField(typeHandler = JacksonTypeHandler.class)
     private Map<String, String> channelExtras;
 
 }

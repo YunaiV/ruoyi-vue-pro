@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.coreservice.modules.pay.service.order;
 
+import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.order.PayOrderDO;
 import cn.iocoder.yudao.coreservice.modules.pay.service.order.dto.PayOrderCreateReqDTO;
 import cn.iocoder.yudao.coreservice.modules.pay.service.order.dto.PayOrderSubmitReqDTO;
 import cn.iocoder.yudao.coreservice.modules.pay.service.order.dto.PayOrderSubmitRespDTO;
@@ -12,6 +13,14 @@ import javax.validation.Valid;
  * @author 芋道源码
  */
 public interface PayOrderCoreService {
+
+   /**
+    * 获得支付单
+    *
+    * @param id 支付单编号
+    * @return 支付单
+    */
+   PayOrderDO getPayOrder(Long id);
 
    /**
     * 创建支付单
