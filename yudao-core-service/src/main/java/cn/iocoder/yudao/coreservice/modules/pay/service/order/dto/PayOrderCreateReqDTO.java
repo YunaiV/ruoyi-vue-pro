@@ -21,10 +21,10 @@ public class PayOrderCreateReqDTO implements Serializable {
     @NotEmpty(message = "应用编号不能为空")
     private Long appId;
     /**
-     * 客户端 IP
+     * 用户 IP
      */
-    @NotEmpty(message = "客户端 IP 不能为空")
-    private String clientIp;
+    @NotEmpty(message = "用户 IP 不能为空")
+    private String userIp;
 
     // ========== 商户相关字段 ==========
 
@@ -40,7 +40,7 @@ public class PayOrderCreateReqDTO implements Serializable {
     @Length(max = 32, message = "商品标题不能超过 32")
     private String subject;
     /**
-     * 商品描述信息
+     * 商品描述
      */
     @NotEmpty(message = "商品描述信息不能为空")
     @Length(max = 128, message = "商品描述信息长度不能超过128")

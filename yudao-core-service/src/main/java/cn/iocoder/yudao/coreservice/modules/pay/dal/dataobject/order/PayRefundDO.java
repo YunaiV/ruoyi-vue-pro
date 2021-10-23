@@ -67,10 +67,10 @@ public class PayRefundDO extends BaseDO {
      * 例如说，内部系统 A 的退款订单号。需要保证每个 PayMerchantDO 唯一 TODO 芋艿：需要在测试下
      */
     private String merchantRefundNo;
-    /**
-     * 商户拓展参数
-     */
-    private String merchantExtra;
+//    /**
+//     * 商户拓展参数
+//     */
+//    private String merchantExtra;
 
     // ========== 退款相关字段 ==========
     /**
@@ -85,9 +85,9 @@ public class PayRefundDO extends BaseDO {
      */
     private Integer notifyStatus;
     /**
-     * 客户端 IP
+     * 用户 IP
      */
-    private String clientIp;
+    private String userIp;
     /**
      * 退款金额，单位：分
      */
@@ -114,16 +114,6 @@ public class PayRefundDO extends BaseDO {
      * 异步通知地址
      */
     private String notifyUrl;
-
-    // TODO 芋艿：可能要优化
-    /**
-     * 渠道支付错误码
-     */
-    private String errorCode;
-    /**
-     * 渠道支付错误消息
-     */
-    private String errorMessage;
 
     // ========== 渠道相关字段 ==========
     /**

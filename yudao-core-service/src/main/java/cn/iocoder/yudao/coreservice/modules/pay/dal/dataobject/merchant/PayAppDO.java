@@ -3,7 +3,8 @@ package cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.merchant;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import com.baomidou.mybatisplus.annotation.TableId;
-import lombok.Data;
+import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.*;
 
 /**
  * 支付应用 DO
@@ -14,7 +15,13 @@ import lombok.Data;
  *
  * @author 芋道源码
  */
+@TableName("pay_app")
 @Data
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class PayAppDO extends BaseDO {
 
     /**
@@ -36,11 +43,6 @@ public class PayAppDO extends BaseDO {
      * 备注
      */
     private String remark;
-    /**
-     * 应用私钥
-     * TODO 芋艿：用途
-     */
-    private String secret;
     /**
      * 支付结果的回调地址
      */

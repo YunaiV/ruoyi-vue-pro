@@ -11,6 +11,11 @@ import cn.iocoder.yudao.framework.common.exception.ServiceException;
 public interface PayChannelCoreService {
 
     /**
+     * 初始化支付客户端
+     */
+    void initPayClients();
+
+    /**
      * 支付渠道的合法性
      *
      * 如果不合法，抛出 {@link ServiceException} 业务异常

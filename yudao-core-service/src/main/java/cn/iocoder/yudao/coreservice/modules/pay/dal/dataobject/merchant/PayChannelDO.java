@@ -1,9 +1,13 @@
 package cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.merchant;
 
-import cn.iocoder.yudao.framework.pay.core.enums.PayChannelEnum;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import lombok.Data;
+import cn.iocoder.yudao.framework.pay.core.client.PayClientConfig;
+import cn.iocoder.yudao.framework.pay.core.enums.PayChannelEnum;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
+import lombok.*;
 
 /**
  * 支付渠道 DO
@@ -14,6 +18,12 @@ import lombok.Data;
  * @author 芋道源码
  */
 @Data
+@TableName(value = "pay_channel", autoResultMap = true)
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class PayChannelDO extends BaseDO {
 
     /**
@@ -48,8 +58,11 @@ public class PayChannelDO extends BaseDO {
      *
      * 关联 {@link PayAppDO#getId()}
      */
-    private String appId;
-
-    // TODO 芋艿：不同渠道的配置。暂时考虑硬编码
+    private Long appId;
+    /**
+     * 支付渠道配置
+     */
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private PayClientConfig config;
 
 }

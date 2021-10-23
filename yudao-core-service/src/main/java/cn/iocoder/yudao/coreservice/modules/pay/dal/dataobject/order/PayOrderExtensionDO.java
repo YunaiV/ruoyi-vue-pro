@@ -4,9 +4,7 @@ import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.merchant.PayChann
 import cn.iocoder.yudao.coreservice.modules.pay.enums.order.PayOrderStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.experimental.Accessors;
+import lombok.*;
 
 /**
  * 支付订单拓展 DO
@@ -17,7 +15,10 @@ import lombok.experimental.Accessors;
 @TableName("pay_order_extension")
 @Data
 @EqualsAndHashCode(callSuper = true)
-@Accessors(chain = true)
+@ToString(callSuper = true)
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class PayOrderExtensionDO extends BaseDO {
 
     /**
@@ -25,7 +26,7 @@ public class PayOrderExtensionDO extends BaseDO {
      */
     private Long id;
     /**
-     * 订单号，根据规则生成
+     * 支付订单号，根据规则生成
      * 调用支付渠道时，使用该字段作为对接的订单号。
      * 1. 调用微信支付 https://api.mch.weixin.qq.com/pay/unifiedorder 时，使用该字段作为 out_trade_no
      * 2. 调用支付宝 https://opendocs.alipay.com/apis 时，使用该字段作为 out_trade_no
@@ -50,9 +51,9 @@ public class PayOrderExtensionDO extends BaseDO {
      */
     private Integer channelCode;
     /**
-     * 客户端 IP
+     * 用户 IP
      */
-    private String clientIp;
+    private String userIp;
     /**
      * 支付状态
      *

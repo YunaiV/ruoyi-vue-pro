@@ -16,10 +16,10 @@ import java.util.Date;
 public class PayOrderUnifiedReqDTO {
 
     /**
-     * 客户端 IP
+     * 用户 IP
      */
-    @NotEmpty(message = "客户端 IP 不能为空")
-    private String clientIp;
+    @NotEmpty(message = "用户 IP 不能为空")
+    private String userIp;
 
     // ========== 商户相关字段 ==========
 

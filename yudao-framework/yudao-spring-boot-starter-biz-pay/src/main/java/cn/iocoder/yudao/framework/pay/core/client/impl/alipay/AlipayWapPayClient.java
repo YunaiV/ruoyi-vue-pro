@@ -46,7 +46,7 @@ public class AlipayWapPayClient extends AbstractPayClient<AlipayPayClientConfig>
         model.setTotalAmount(calculateAmount(reqDTO.getAmount()).toString());
         model.setProductCode("QUICK_WAP_PAY"); // TODO 芋艿：这里咋整
         model.setSellerId("2088102147948060"); // TODO 芋艿：这里咋整
-        // TODO 芋艿：clientIp + expireTime
+        // TODO 芋艿：userIp + expireTime
         // 构建 AlipayTradeWapPayRequest
         AlipayTradeWapPayRequest request = new AlipayTradeWapPayRequest();
         request.setBizModel(model);

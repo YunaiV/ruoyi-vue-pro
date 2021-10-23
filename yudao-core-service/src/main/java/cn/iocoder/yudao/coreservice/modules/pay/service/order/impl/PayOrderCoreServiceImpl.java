@@ -18,6 +18,8 @@ import cn.iocoder.yudao.coreservice.modules.pay.service.order.dto.PayOrderSubmit
 import cn.iocoder.yudao.coreservice.modules.pay.service.order.dto.PayOrderSubmitRespDTO;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
+import cn.iocoder.yudao.framework.pay.core.client.PayClient;
+import cn.iocoder.yudao.framework.pay.core.client.PayClientFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -25,8 +27,7 @@ import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.util.Date;
 
-import static cn.iocoder.yudao.coreservice.modules.pay.enums.PayErrorCodeConstants.PAY_ORDER_NOT_FOUND;
-import static cn.iocoder.yudao.coreservice.modules.pay.enums.PayErrorCodeConstants.PAY_ORDER_STATUS_IS_NOT_WAITING;
+import static cn.iocoder.yudao.coreservice.modules.pay.enums.PayErrorCodeCoreConstants.*;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 
 /**
@@ -43,6 +44,9 @@ public class PayOrderCoreServiceImpl implements PayOrderCoreService {
     private PayAppCoreService payAppCoreService;
     @Resource
     private PayChannelCoreService payChannelCoreService;
+
+    @Resource
+    private PayClientFactory payClientFactory;
 
     @Resource
     private PayOrderCoreMapper payOrderCoreMapper;
@@ -79,6 +83,12 @@ public class PayOrderCoreServiceImpl implements PayOrderCoreService {
         PayAppDO app = payAppCoreService.validPayApp(reqDTO.getId());
         // 校验支付渠道是否有效
         PayChannelDO channel = payChannelCoreService.validPayChannel(reqDTO.getId(), reqDTO.getChannelCode());
+        // 校验支付客户端是否正确初始化
+        PayClient client = payClientFactory.getPayClient(channel.getId());
+        if (client == null) {
+            log.error("[submitPayOrder][渠道编号({}) 找不到对应的支付客户端]", channel.getId());
+            throw exception(PAY_CHANNEL_CLIENT_NOT_FOUND);
+        }
 
         // 获得 PayOrderDO ，并校验其是否存在
         PayOrderDO order = payOrderCoreMapper.selectById(reqDTO.getId());
@@ -96,13 +106,14 @@ public class PayOrderCoreServiceImpl implements PayOrderCoreService {
         payOrderExtensionCoreMapper.insert(orderExtension);
 
         // 调用三方接口
-        AbstractThirdPayClient thirdPayClient = ThirdPayClientFactory.getThirdPayClient(submitReqDTO.getPayChannel());
-        CommonResult<String> invokeResult = thirdPayClient.submitTransaction(payTransaction, orderExtension, null); // TODO 暂时传入 extra = null
+        // TODO 暂时传入 extra = null
+        CommonResult<?> invokeResult = client.unifiedOrder(PayOrderCoreConvert.INSTANCE.convert2(reqDTO));
         invokeResult.checkError();
 
         // TODO 轮询三方接口，是否已经支付的任务
         // 返回成功
-        return new PayOrderSubmitRespDTO().setExtensionId(orderExtension.getId()).setInvokeResponse(invokeResult.getData());
+        return new PayOrderSubmitRespDTO().setExtensionId(orderExtension.getId())
+                .setInvokeResponse(JsonUtils.toJsonString(invokeResult));
     }
 
     private String generateOrderExtensionNo() {

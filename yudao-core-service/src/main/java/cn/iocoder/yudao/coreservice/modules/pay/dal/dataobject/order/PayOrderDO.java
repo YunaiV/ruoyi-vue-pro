@@ -3,15 +3,16 @@ package cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.order;
 import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.merchant.PayAppDO;
 import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.merchant.PayChannelDO;
 import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.merchant.PayMerchantDO;
-import cn.iocoder.yudao.framework.pay.core.enums.PayChannelEnum;
 import cn.iocoder.yudao.coreservice.modules.pay.enums.order.PayOrderStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.framework.pay.core.enums.PayChannelEnum;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
+import lombok.*;
 
 import java.util.Date;
+import java.util.Map;
 
 /**
  * 支付订单 DO
@@ -22,6 +23,9 @@ import java.util.Date;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class PayOrderDO extends BaseDO {
 
     /**
@@ -68,10 +72,10 @@ public class PayOrderDO extends BaseDO {
      * 商品描述信息
      */
     private String body;
-    /**
-     * 商户拓展参数
-     */
-    private String merchantExtra;
+//    /**
+//     * 商户拓展参数
+//     */
+//    private Map<String, String> merchantExtras;
 
     // ========== 订单相关字段 ==========
 
@@ -80,13 +84,13 @@ public class PayOrderDO extends BaseDO {
      */
     private Long amount;
     /**
-     * 渠道手续费
+     * 渠道手续费，单位：百分比
      *
      * 冗余 {@link PayChannelDO#getFeeRate()}
      */
     private Double channelFeeRate;
     /**
-     * 渠道手续金额
+     * 渠道手续金额，单位：分
      */
     private Long channelFeeAmount;
     /**
@@ -101,47 +105,34 @@ public class PayOrderDO extends BaseDO {
      */
     private Integer notifyStatus;
     /**
-     * 客户端 IP
+     * 用户 IP
      */
-    private String clientIp;
-    /**
-     * 订单支付成功时间
-     */
-    private Date successTime;
+    private String userIp;
     /**
      * 订单失效时间
      */
     private Date expireTime;
     /**
-     * 支付渠道的额外参数
-     *
-     * 参见 https://www.pingxx.com/api/支付渠道%20extra%20参数说明.html
+     * 订单支付成功时间
      */
-    private String channelExtra;
-    /**
-     * 异步通知地址
-     */
-    private String notifyUrl;
-    /**
-     * 页面跳转地址
-     */
-    private String returnUrl;
+    private Date successTime;
     /**
      * 支付成功的订单拓展单编号
      *
      * 关联 {@link PayOrderDO#getId()}
      */
     private Long successExtensionId;
-
-    // TODO 芋艿：可能要优化
     /**
-     * 渠道支付错误码
+     * 支付渠道的额外参数
+     *
+     * 参见 https://www.pingxx.com/api/支付渠道%20extra%20参数说明.html
      */
-    private String errorCode;
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private Map<String, String> channelExtras;
     /**
-     * 渠道支付错误消息
+     * 异步通知地址
      */
-    private String errorMessage;
+    private String notifyUrl;
 
     // ========== 退款相关字段 ==========
     /**

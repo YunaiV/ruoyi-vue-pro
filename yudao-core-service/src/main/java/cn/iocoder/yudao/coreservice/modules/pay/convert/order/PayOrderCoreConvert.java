@@ -4,6 +4,7 @@ import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.order.PayOrderDO;
 import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.order.PayOrderExtensionDO;
 import cn.iocoder.yudao.coreservice.modules.pay.service.order.dto.PayOrderCreateReqDTO;
 import cn.iocoder.yudao.coreservice.modules.pay.service.order.dto.PayOrderSubmitReqDTO;
+import cn.iocoder.yudao.framework.pay.core.client.dto.PayOrderUnifiedReqDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
@@ -15,5 +16,7 @@ public interface PayOrderCoreConvert {
     PayOrderDO convert(PayOrderCreateReqDTO bean);
 
     PayOrderExtensionDO convert(PayOrderSubmitReqDTO bean);
+
+    PayOrderUnifiedReqDTO convert2(PayOrderSubmitReqDTO bean);
 
 }

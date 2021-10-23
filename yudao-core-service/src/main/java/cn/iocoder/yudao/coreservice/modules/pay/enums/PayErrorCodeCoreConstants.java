@@ -3,11 +3,11 @@ package cn.iocoder.yudao.coreservice.modules.pay.enums;
 import cn.iocoder.yudao.framework.common.exception.ErrorCode;
 
 /**
- * Pay 错误码枚举类
+ * Pay 错误码 Core 枚举类
  *
  * pay 系统，使用 1-007-000-000 段
  */
-public interface PayErrorCodeConstants {
+public interface PayErrorCodeCoreConstants {
 
     // ========== APP 模块 1-007-000-000 ==========
     ErrorCode PAY_APP_NOT_FOUND = new ErrorCode(1007000000, "App 不存在");
@@ -15,7 +15,8 @@ public interface PayErrorCodeConstants {
 
     // ========== CHANNEL 模块 1-007-001-000 ==========
     ErrorCode PAY_CHANNEL_NOT_FOUND = new ErrorCode(1007001000, "支付渠道的配置不存在");
-    ErrorCode PAY_CHANNEL_IS_DISABLE = new ErrorCode(1007001000, "支付渠道已经禁用");
+    ErrorCode PAY_CHANNEL_IS_DISABLE = new ErrorCode(1007001001, "支付渠道已经禁用");
+    ErrorCode PAY_CHANNEL_CLIENT_NOT_FOUND = new ErrorCode(1007001002, "支付渠道的客户端不存在");
 
     // ========== ORDER 模块 1-007-002-000 ==========
     ErrorCode PAY_ORDER_NOT_FOUND = new ErrorCode(100401000, "支付订单不存在");
