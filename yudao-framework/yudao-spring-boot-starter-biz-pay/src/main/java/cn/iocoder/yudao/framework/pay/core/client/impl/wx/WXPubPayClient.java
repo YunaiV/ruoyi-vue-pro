@@ -3,8 +3,8 @@ package cn.iocoder.yudao.framework.pay.core.client.impl.wx;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.io.FileUtils;
+import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.pay.core.client.PayCommonResult;
 import cn.iocoder.yudao.framework.pay.core.client.dto.PayOrderUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.client.impl.AbstractPayClient;
@@ -21,7 +21,6 @@ import com.github.binarywang.wxpay.service.WxPayService;
 import com.github.binarywang.wxpay.service.impl.WxPayServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 
-import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
 import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString;
 import static cn.iocoder.yudao.framework.pay.core.client.impl.wx.WXCodeMapping.CODE_SUCCESS;
 import static cn.iocoder.yudao.framework.pay.core.client.impl.wx.WXCodeMapping.MESSAGE_SUCCESS;
@@ -62,7 +61,7 @@ public class WXPubPayClient extends AbstractPayClient<WXPayClientConfig> {
     }
 
     @Override
-    public CommonResult<WxPayMpOrderResult> unifiedOrder(PayOrderUnifiedReqDTO reqDTO) {
+    public PayCommonResult<WxPayMpOrderResult> doUnifiedOrder(PayOrderUnifiedReqDTO reqDTO) {
         WxPayMpOrderResult response;
         try {
             switch (config.getApiVersion()) {
@@ -80,8 +79,8 @@ public class WXPubPayClient extends AbstractPayClient<WXPayClientConfig> {
             }
         } catch (WxPayException e) {
             log.error("[unifiedOrder][request({}) 发起支付失败，原因({})]", toJsonString(reqDTO), e);
-            return PayCommonResult.build(defaultIfNull(e.getErrCode(), e.getReturnCode()),
-                    defaultIfNull(e.getErrCodeDes(), e.getReturnMsg()),null, codeMapping);
+            return PayCommonResult.build(ObjectUtils.defaultIfNull(e.getErrCode(), e.getReturnCode(), "CustomErrorCode"),
+                    ObjectUtils.defaultIfNull(e.getErrCodeDes(), e.getCustomErrorMsg()),null, codeMapping);
         }
         return PayCommonResult.build(CODE_SUCCESS, MESSAGE_SUCCESS, response, codeMapping);
     }
@@ -92,9 +91,9 @@ public class WXPubPayClient extends AbstractPayClient<WXPayClientConfig> {
                 .outTradeNo(reqDTO.getMerchantOrderId())
                 // TODO 芋艿：貌似没 title？
                 .body(reqDTO.getBody())
-                .totalFee(reqDTO.getAmount()) // 单位分
+                .totalFee(reqDTO.getAmount().intValue()) // 单位分
                 .timeExpire(DateUtil.format(reqDTO.getExpireTime(), "yyyyMMddHHmmss"))
-                .spbillCreateIp(reqDTO.getClientIp())
+                .spbillCreateIp(reqDTO.getUserIp())
                 .openid("ockUAwIZ-0OeMZl9ogcZ4ILrGba0") // TODO 芋艿：先随便写死
                 .notifyUrl(reqDTO.getNotifyUrl())
                 .build();
@@ -108,10 +107,10 @@ public class WXPubPayClient extends AbstractPayClient<WXPayClientConfig> {
         request.setOutTradeNo(reqDTO.getMerchantOrderId());
         // TODO 芋艿：貌似没 title？
         request.setDescription(reqDTO.getBody());
-        request.setAmount(new WxPayUnifiedOrderV3Request.Amount().setTotal(reqDTO.getAmount())); // 单位分
+        request.setAmount(new WxPayUnifiedOrderV3Request.Amount().setTotal(reqDTO.getAmount().intValue())); // 单位分
         request.setTimeExpire(DateUtil.format(reqDTO.getExpireTime(), "yyyyMMddHHmmss"));
         request.setPayer(new WxPayUnifiedOrderV3Request.Payer().setOpenid("ockUAwIZ-0OeMZl9ogcZ4ILrGba0")); // TODO 芋艿：先随便写死
-        request.setSceneInfo(new WxPayUnifiedOrderV3Request.SceneInfo().setPayerClientIp(reqDTO.getClientIp()));
+        request.setSceneInfo(new WxPayUnifiedOrderV3Request.SceneInfo().setPayerClientIp(reqDTO.getUserIp()));
         request.setNotifyUrl(reqDTO.getNotifyUrl());
         // 执行请求
         return client.createOrderV3(TradeTypeEnum.JSAPI, request);

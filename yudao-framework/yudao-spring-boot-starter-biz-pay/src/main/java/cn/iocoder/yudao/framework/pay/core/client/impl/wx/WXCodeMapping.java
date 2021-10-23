@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.framework.pay.core.client.impl.wx;
 
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.exception.ErrorCode;
 import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants;
 import cn.iocoder.yudao.framework.pay.core.client.AbstractPayCodeMapping;
@@ -42,6 +43,11 @@ public class WXCodeMapping extends AbstractPayCodeMapping {
         if (Objects.equals(apiCode, "PARAM_ERROR")) {
             if (Objects.equals(apiMsg, "无效的openid")) {
                 return PAY_OPENID_ERROR;
+            }
+        }
+        if (Objects.equals(apiCode, "CustomErrorCode")) {
+            if (StrUtil.contains(apiMsg, "必填字段")) {
+                return PAY_PARAM_MISSING;
             }
         }
         return null;

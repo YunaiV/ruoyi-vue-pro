@@ -117,11 +117,11 @@ public class PayClientFactoryImplTest {
 
     private static PayOrderUnifiedReqDTO buildPayOrderUnifiedReqDTO() {
         PayOrderUnifiedReqDTO reqDTO = new PayOrderUnifiedReqDTO();
-        reqDTO.setAmount(123);
+        reqDTO.setAmount(123L);
         reqDTO.setSubject("IPhone 13");
         reqDTO.setBody("biubiubiu");
         reqDTO.setMerchantOrderId(String.valueOf(System.currentTimeMillis()));
-        reqDTO.setClientIp("127.0.0.1");
+        reqDTO.setUserIp("127.0.0.1");
         reqDTO.setNotifyUrl("http://127.0.0.1:8080");
         return reqDTO;
     }

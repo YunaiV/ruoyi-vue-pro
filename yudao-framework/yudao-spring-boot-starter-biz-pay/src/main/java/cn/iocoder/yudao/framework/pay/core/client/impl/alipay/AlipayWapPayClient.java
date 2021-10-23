@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.framework.pay.core.client.impl.alipay;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.pay.core.client.PayCommonResult;
 import cn.iocoder.yudao.framework.pay.core.client.dto.PayOrderUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.client.impl.AbstractPayClient;
@@ -37,7 +36,7 @@ public class AlipayWapPayClient extends AbstractPayClient<AlipayPayClientConfig>
     }
 
     @Override
-    public CommonResult<AlipayTradeWapPayResponse> unifiedOrder(PayOrderUnifiedReqDTO reqDTO) {
+    public PayCommonResult<AlipayTradeWapPayResponse> doUnifiedOrder(PayOrderUnifiedReqDTO reqDTO) {
         // 构建 AlipayTradeWapPayModel 请求
         AlipayTradeWapPayModel model = new AlipayTradeWapPayModel();
         model.setOutTradeNo(reqDTO.getMerchantOrderId());

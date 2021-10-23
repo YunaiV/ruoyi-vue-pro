@@ -3,16 +3,15 @@ package cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.order;
 import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.merchant.PayAppDO;
 import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.merchant.PayChannelDO;
 import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.merchant.PayMerchantDO;
+import cn.iocoder.yudao.coreservice.modules.pay.enums.order.PayOrderNotifyStatusEnum;
+import cn.iocoder.yudao.coreservice.modules.pay.enums.order.PayOrderRefundStatusEnum;
 import cn.iocoder.yudao.coreservice.modules.pay.enums.order.PayOrderStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.framework.pay.core.enums.PayChannelEnum;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.*;
 
 import java.util.Date;
-import java.util.Map;
 
 /**
  * 支付订单 DO
@@ -61,7 +60,7 @@ public class PayOrderDO extends BaseDO {
 
     /**
      * 商户订单编号
-     * 例如说，内部系统 A 的订单号。需要保证每个 PayMerchantDO 唯一 TODO 芋艿：需要在测试下
+     * 例如说，内部系统 A 的订单号。需要保证每个 PayMerchantDO 唯一
      */
     private String merchantOrderId;
     /**
@@ -72,6 +71,16 @@ public class PayOrderDO extends BaseDO {
      * 商品描述信息
      */
     private String body;
+    /**
+     * 异步通知地址
+     */
+    private String notifyUrl;
+    /**
+     * 通知商户支付结果的回调状态
+     *
+     * 枚举 {@link PayOrderNotifyStatusEnum}
+     */
+    private Integer notifyStatus;
 //    /**
 //     * 商户拓展参数
 //     */
@@ -100,11 +109,6 @@ public class PayOrderDO extends BaseDO {
      */
     private Integer status;
     /**
-     * 通知商户支付结果的回调状态
-     * TODO 芋艿：0 未发送 1 已发送
-     */
-    private Integer notifyStatus;
-    /**
      * 用户 IP
      */
     private String userIp;
@@ -122,23 +126,12 @@ public class PayOrderDO extends BaseDO {
      * 关联 {@link PayOrderDO#getId()}
      */
     private Long successExtensionId;
-    /**
-     * 支付渠道的额外参数
-     *
-     * 参见 https://www.pingxx.com/api/支付渠道%20extra%20参数说明.html
-     */
-    @TableField(typeHandler = JacksonTypeHandler.class)
-    private Map<String, String> channelExtras;
-    /**
-     * 异步通知地址
-     */
-    private String notifyUrl;
 
     // ========== 退款相关字段 ==========
     /**
      * 退款状态
      *
-     * TODO 芋艿：0 - 未退款；1 - 部分退款； 2 - 全额退款
+     * 枚举 {@link PayOrderRefundStatusEnum}
      */
     private Integer refundStatus;
     /**

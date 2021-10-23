@@ -20,6 +20,7 @@ public interface PayFrameworkErrorCodeConstants {
 
     // ========== 其它相关 2002000900 开头 ==========
     ErrorCode PAY_OPENID_ERROR = new ErrorCode(2002000900, "无效的 openid"); // 例如说，微信 openid 未授权过
+    ErrorCode PAY_PARAM_MISSING = new ErrorCode(2002000901, "请求参数缺失"); // 例如说，支付少传了金额
 
     ErrorCode EXCEPTION = new ErrorCode(2002000999, "调用异常");
 

@@ -9,6 +9,7 @@ import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.order.PayOrderDO;
 import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.order.PayOrderExtensionDO;
 import cn.iocoder.yudao.coreservice.modules.pay.dal.mysql.order.PayOrderCoreMapper;
 import cn.iocoder.yudao.coreservice.modules.pay.dal.mysql.order.PayOrderExtensionCoreMapper;
+import cn.iocoder.yudao.coreservice.modules.pay.enums.order.PayOrderNotifyStatusEnum;
 import cn.iocoder.yudao.coreservice.modules.pay.enums.order.PayOrderStatusEnum;
 import cn.iocoder.yudao.coreservice.modules.pay.service.merchant.PayAppCoreService;
 import cn.iocoder.yudao.coreservice.modules.pay.service.merchant.PayChannelCoreService;
@@ -20,12 +21,14 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.pay.core.client.PayClient;
 import cn.iocoder.yudao.framework.pay.core.client.PayClientFactory;
+import cn.iocoder.yudao.framework.pay.core.client.dto.PayOrderUnifiedReqDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
-import javax.validation.Valid;
 import java.util.Date;
+import java.util.Objects;
 
 import static cn.iocoder.yudao.coreservice.modules.pay.enums.PayErrorCodeCoreConstants.*;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -36,7 +39,7 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
  * @author 芋道源码
  */
 @Service
-@Valid
+@Validated
 @Slf4j
 public class PayOrderCoreServiceImpl implements PayOrderCoreService {
 
@@ -68,10 +71,16 @@ public class PayOrderCoreServiceImpl implements PayOrderCoreService {
         }
 
         // 创建支付交易单
-        // TODO 芋艿：需要看看，还有啥要补全的字段
         order = PayOrderCoreConvert.INSTANCE.convert(reqDTO)
-                .setStatus(PayOrderStatusEnum.WAITING.getStatus())
-                .setNotifyUrl(app.getPayNotifyUrl());
+                .setMerchantId(app.getMerchantId()).setAppId(app.getId());
+        // 商户相关字段
+        order.setNotifyUrl(app.getPayNotifyUrl())
+                .setNotifyStatus(PayOrderNotifyStatusEnum.NO.getStatus());
+        // 订单相关字段
+        order.setStatus(PayOrderStatusEnum.WAITING.getStatus());
+        // 退款相关字段
+        order.setRefundStatus(PayOrderNotifyStatusEnum.NO.getStatus())
+                .setRefundTimes(0).setRefundAmount(0L);
         payOrderCoreMapper.insert(order);
         // 最终返回
         return order.getId();
@@ -80,9 +89,9 @@ public class PayOrderCoreServiceImpl implements PayOrderCoreService {
     @Override
     public PayOrderSubmitRespDTO submitPayOrder(PayOrderSubmitReqDTO reqDTO) {
         // 校验 App
-        PayAppDO app = payAppCoreService.validPayApp(reqDTO.getId());
+        PayAppDO app = payAppCoreService.validPayApp(reqDTO.getAppId());
         // 校验支付渠道是否有效
-        PayChannelDO channel = payChannelCoreService.validPayChannel(reqDTO.getId(), reqDTO.getChannelCode());
+        PayChannelDO channel = payChannelCoreService.validPayChannel(reqDTO.getAppId(), reqDTO.getChannelCode());
         // 校验支付客户端是否正确初始化
         PayClient client = payClientFactory.getPayClient(channel.getId());
         if (client == null) {
@@ -92,7 +101,7 @@ public class PayOrderCoreServiceImpl implements PayOrderCoreService {
 
         // 获得 PayOrderDO ，并校验其是否存在
         PayOrderDO order = payOrderCoreMapper.selectById(reqDTO.getId());
-        if (order == null || order.getAppId().equals(reqDTO.getAppId())) { // 是否存在
+        if (order == null || !Objects.equals(order.getAppId(), reqDTO.getAppId())) { // 是否存在
             throw exception(PAY_ORDER_NOT_FOUND);
         }
         if (!PayOrderStatusEnum.WAITING.getStatus().equals(order.getStatus())) { // 校验状态，必须是待支付
@@ -102,18 +111,25 @@ public class PayOrderCoreServiceImpl implements PayOrderCoreService {
         // 插入 PayOrderExtensionDO
         PayOrderExtensionDO orderExtension = PayOrderCoreConvert.INSTANCE.convert(reqDTO)
                 .setOrderId(order.getId()).setNo(generateOrderExtensionNo())
+                .setChannelId(channel.getId()).setChannelCode(channel.getCode())
                 .setStatus(PayOrderStatusEnum.WAITING.getStatus());
         payOrderExtensionCoreMapper.insert(orderExtension);
 
         // 调用三方接口
-        // TODO 暂时传入 extra = null
-        CommonResult<?> invokeResult = client.unifiedOrder(PayOrderCoreConvert.INSTANCE.convert2(reqDTO));
-        invokeResult.checkError();
+        PayOrderUnifiedReqDTO unifiedOrderReqDTO = PayOrderCoreConvert.INSTANCE.convert2(reqDTO);
+        // 商户相关字段
+        unifiedOrderReqDTO.setMerchantOrderId(order.getMerchantOrderId())
+                .setSubject(order.getSubject()).setBody(order.getBody())
+                .setNotifyUrl(app.getPayNotifyUrl());
+        // 订单相关字段
+        unifiedOrderReqDTO.setAmount(order.getAmount()).setExpireTime(order.getExpireTime());
+        CommonResult<?> unifiedOrderResult = client.unifiedOrder(unifiedOrderReqDTO);
+        unifiedOrderResult.checkError();
 
         // TODO 轮询三方接口，是否已经支付的任务
         // 返回成功
         return new PayOrderSubmitRespDTO().setExtensionId(orderExtension.getId())
-                .setInvokeResponse(JsonUtils.toJsonString(invokeResult));
+                .setInvokeResponse(JsonUtils.toJsonString(unifiedOrderResult));
     }
 
     private String generateOrderExtensionNo() {

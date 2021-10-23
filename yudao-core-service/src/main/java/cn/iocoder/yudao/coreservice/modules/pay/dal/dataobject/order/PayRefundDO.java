@@ -71,6 +71,15 @@ public class PayRefundDO extends BaseDO {
 //     * 商户拓展参数
 //     */
 //    private String merchantExtra;
+    /**
+     * 异步通知地址
+     */
+    private String notifyUrl;
+    /**
+     * 通知商户退款结果的回调状态
+     * TODO 芋艿：0 未发送 1 已发送
+     */
+    private Integer notifyStatus;
 
     // ========== 退款相关字段 ==========
     /**
@@ -79,11 +88,6 @@ public class PayRefundDO extends BaseDO {
      * TODO 芋艿：状态枚举
      */
     private Integer status;
-    /**
-     * 通知商户退款结果的回调状态
-     * TODO 芋艿：0 未发送 1 已发送
-     */
-    private Integer notifyStatus;
     /**
      * 用户 IP
      */
@@ -110,10 +114,6 @@ public class PayRefundDO extends BaseDO {
      * 参见 https://www.pingxx.com/api/Refunds%20退款概述.html
      */
     private String channelExtra;
-    /**
-     * 异步通知地址
-     */
-    private String notifyUrl;
 
     // ========== 渠道相关字段 ==========
     /**

@@ -3,8 +3,12 @@ package cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.order;
 import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.merchant.PayChannelDO;
 import cn.iocoder.yudao.coreservice.modules.pay.enums.order.PayOrderStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.*;
+
+import java.util.Map;
 
 /**
  * 支付订单拓展 DO
@@ -49,7 +53,7 @@ public class PayOrderExtensionDO extends BaseDO {
     /**
      * 渠道编码
      */
-    private Integer channelCode;
+    private String channelCode;
     /**
      * 用户 IP
      */
@@ -61,6 +65,13 @@ public class PayOrderExtensionDO extends BaseDO {
      * 注意，只包含上述枚举的 WAITING 和 SUCCESS
      */
     private Integer status;
+    /**
+     * 支付渠道的额外参数
+     *
+     * 参见 https://www.pingxx.com/api/支付渠道%20extra%20参数说明.html
+     */
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private Map<String, String> channelExtras;
     /**
      * 支付渠道异步通知的内容
      *

@@ -1,11 +1,14 @@
 package cn.iocoder.yudao.coreservice.modules.pay.service.order.dto;
 
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
+import java.util.Map;
 
 /**
  * 支付单提交 Request DTO
@@ -37,5 +40,11 @@ public class PayOrderSubmitReqDTO implements Serializable {
      */
     @NotEmpty(message = "用户 IP 不能为空")
     private String userIp;
+
+    /**
+     * 支付渠道的额外参数
+     */
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private Map<String, String> channelExtras;
 
 }

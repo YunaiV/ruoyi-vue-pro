@@ -28,6 +28,6 @@ public interface PayOrderCoreService {
     * @param reqDTO 提交请求
     * @return 提交结果
     */
-   PayOrderSubmitRespDTO submitPayOrder(PayOrderSubmitReqDTO reqDTO);
+   PayOrderSubmitRespDTO submitPayOrder(@Valid PayOrderSubmitReqDTO reqDTO);
 
 }

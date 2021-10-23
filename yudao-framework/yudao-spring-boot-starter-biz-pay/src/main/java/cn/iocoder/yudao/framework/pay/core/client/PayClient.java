@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.framework.pay.core.client;
 
-import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.pay.core.client.dto.PayOrderUnifiedReqDTO;
 
 /**
@@ -17,7 +16,12 @@ public interface PayClient {
      */
     Long getId();
 
-    // TODO 缺少注释
-    CommonResult<?> unifiedOrder(PayOrderUnifiedReqDTO reqDTO);
+    /**
+     * 调用支付渠道，统一下单
+     *
+     * @param reqDTO 下单信息
+     * @return 各支付渠道的返回结果
+     */
+    PayCommonResult<?> unifiedOrder(PayOrderUnifiedReqDTO reqDTO);
 
 }

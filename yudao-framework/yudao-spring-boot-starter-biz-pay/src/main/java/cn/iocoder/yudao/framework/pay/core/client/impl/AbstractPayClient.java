@@ -1,9 +1,14 @@
 package cn.iocoder.yudao.framework.pay.core.client.impl;
 
+import cn.hutool.extra.validation.ValidationUtil;
+import cn.iocoder.yudao.framework.pay.core.client.AbstractPayCodeMapping;
 import cn.iocoder.yudao.framework.pay.core.client.PayClient;
 import cn.iocoder.yudao.framework.pay.core.client.PayClientConfig;
-import cn.iocoder.yudao.framework.pay.core.client.AbstractPayCodeMapping;
+import cn.iocoder.yudao.framework.pay.core.client.PayCommonResult;
+import cn.iocoder.yudao.framework.pay.core.client.dto.PayOrderUnifiedReqDTO;
 import lombok.extern.slf4j.Slf4j;
+
+import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString;
 
 /**
  * 支付客户端的抽象类，提供模板方法，减少子类的冗余代码
@@ -30,7 +35,7 @@ public abstract class AbstractPayClient<Config extends PayClientConfig> implemen
      */
     protected Config config;
 
-    protected Double calculateAmount(Integer amount) {
+    protected Double calculateAmount(Long amount) {
         return amount / 100.0;
     }
 
@@ -69,5 +74,24 @@ public abstract class AbstractPayClient<Config extends PayClientConfig> implemen
     public Long getId() {
         return channelId;
     }
+
+    @Override
+    public final PayCommonResult<?> unifiedOrder(PayOrderUnifiedReqDTO reqDTO) {
+        ValidationUtil.validate(reqDTO);
+        // 执行短信发送
+        PayCommonResult<?> result;
+        try {
+            result = doUnifiedOrder(reqDTO);
+        } catch (Throwable ex) {
+            // 打印异常日志
+            log.error("[unifiedOrder][request({}) 发起支付失败]", toJsonString(reqDTO), ex);
+            // 封装返回
+            return PayCommonResult.error(ex);
+        }
+        return result;
+    }
+
+    protected abstract PayCommonResult<?> doUnifiedOrder(PayOrderUnifiedReqDTO reqDTO)
+            throws Throwable;
 
 }

@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.framework.pay.core.client.impl.alipay;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.pay.core.client.PayCommonResult;
 import cn.iocoder.yudao.framework.pay.core.client.dto.PayOrderUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.client.impl.AbstractPayClient;
@@ -42,7 +41,7 @@ public class AlipayQrPayClient extends AbstractPayClient<AlipayPayClientConfig> 
     }
 
     @Override
-    public CommonResult<AlipayTradePrecreateResponse> unifiedOrder(PayOrderUnifiedReqDTO reqDTO) {
+    public PayCommonResult<AlipayTradePrecreateResponse> doUnifiedOrder(PayOrderUnifiedReqDTO reqDTO) {
         // 构建 AlipayTradePrecreateModel 请求
         AlipayTradePrecreateModel model = new AlipayTradePrecreateModel();
         model.setOutTradeNo(reqDTO.getMerchantOrderId());

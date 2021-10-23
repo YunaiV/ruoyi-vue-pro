@@ -54,7 +54,7 @@ public class PayOrderUnifiedReqDTO {
      */
     @NotNull(message = "支付金额不能为空")
     @DecimalMin(value = "0", inclusive = false, message = "支付金额必须大于零")
-    private Integer amount;
+    private Long amount;
 
     /**
      * 支付过期时间

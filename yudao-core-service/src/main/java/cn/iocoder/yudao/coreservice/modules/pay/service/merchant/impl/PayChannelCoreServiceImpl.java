@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 
@@ -50,6 +51,7 @@ public class PayChannelCoreServiceImpl implements PayChannelCoreService {
     private PayClientFactory payClientFactory;
 
     @Override
+    @PostConstruct
     public void initPayClients() {
         // 获取支付渠道，如果有更新
         List<PayChannelDO> payChannels = this.loadPayChannelIfUpdate(maxUpdateTime);
