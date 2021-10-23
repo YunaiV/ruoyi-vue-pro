@@ -1,10 +1,9 @@
 package cn.iocoder.yudao.adminserver.modules.infra.service.logger;
 
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.apilog.core.service.ApiErrorLogFrameworkService;
 import cn.iocoder.yudao.adminserver.modules.infra.controller.logger.vo.apierrorlog.InfApiErrorLogExportReqVO;
 import cn.iocoder.yudao.adminserver.modules.infra.controller.logger.vo.apierrorlog.InfApiErrorLogPageReqVO;
-import cn.iocoder.yudao.adminserver.modules.infra.dal.dataobject.logger.InfApiErrorLogDO;
+import cn.iocoder.yudao.coreservice.modules.infra.dal.dataobject.logger.InfApiErrorLogDO;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 
 import java.util.List;
 
@@ -13,7 +12,7 @@ import java.util.List;
  *
  * @author 芋道源码
  */
-public interface InfApiErrorLogService extends ApiErrorLogFrameworkService {
+public interface InfApiErrorLogService {
 
     /**
      * 获得 API 错误日志分页

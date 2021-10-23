@@ -5,6 +5,7 @@ import cn.hutool.core.util.StrUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -18,6 +19,10 @@ import java.util.List;
 public class JsonUtils {
 
     private static ObjectMapper objectMapper = new ObjectMapper();
+
+    static {
+        objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+    }
 
     /**
      * 初始化 objectMapper 属性

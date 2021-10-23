@@ -1,9 +1,10 @@
 package cn.iocoder.yudao.adminserver.modules.activiti.service.config;
 
-import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.user.SysUserDO;
+
 import cn.iocoder.yudao.adminserver.modules.system.service.dept.SysPostService;
 import cn.iocoder.yudao.adminserver.modules.system.service.permission.SysPermissionService;
 import cn.iocoder.yudao.adminserver.modules.system.service.user.SysUserService;
+import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.user.SysUserDO;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import org.activiti.api.runtime.shared.identity.UserGroupManager;
@@ -37,9 +38,9 @@ public class UserGroupManagerService implements UserGroupManager {
      */
     @Override
     public List<String> getUserGroups(String userId) {
-        final LoginUser loginUser = (LoginUser) userDetailsService.loadUserByUsername(userId);
-        final Long id = loginUser.getId();
-        final SysUserDO user = userService.getUser(id);
+//        final LoginUser loginUser = (LoginUser) userDetailsService.loadUserByUsername(userId);
+//        final Long id = loginUser.getId();
+        final SysUserDO user = userService.getUserByUsername(userId);
         return  sysPostService.getPosts(user.getPostIds()).stream().map(post -> post.getCode()).collect(Collectors.toList());
 
     }

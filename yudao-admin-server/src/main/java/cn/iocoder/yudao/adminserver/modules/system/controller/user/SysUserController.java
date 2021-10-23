@@ -1,20 +1,21 @@
 package cn.iocoder.yudao.adminserver.modules.system.controller.user;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
-import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
-import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.adminserver.modules.system.controller.user.vo.user.*;
 import cn.iocoder.yudao.adminserver.modules.system.convert.user.SysUserConvert;
 import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.dept.SysDeptDO;
-import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.user.SysUserDO;
-import cn.iocoder.yudao.adminserver.modules.system.enums.common.SysSexEnum;
 import cn.iocoder.yudao.adminserver.modules.system.service.dept.SysDeptService;
 import cn.iocoder.yudao.adminserver.modules.system.service.user.SysUserService;
+import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.user.SysUserDO;
+import cn.iocoder.yudao.coreservice.modules.system.enums.common.SysSexEnum;
+import cn.iocoder.yudao.coreservice.modules.system.service.user.SysUserCoreService;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
+import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
+import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -41,6 +42,8 @@ public class SysUserController {
 
     @Resource
     private SysUserService userService;
+    @Resource
+    private SysUserCoreService userCoreService;
     @Resource
     private SysDeptService deptService;
 
@@ -113,7 +116,7 @@ public class SysUserController {
     @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
     @PreAuthorize("@ss.hasPermission('system:user:query')")
     public CommonResult<SysUserRespVO> getInfo(@RequestParam("id") Long id) {
-        return success(SysUserConvert.INSTANCE.convert(userService.getUser(id)));
+        return success(SysUserConvert.INSTANCE.convert(userCoreService.getUser(id)));
     }
 
     @GetMapping("/export")
@@ -167,7 +170,7 @@ public class SysUserController {
     @PreAuthorize("@ss.hasPermission('system:user:import')")
     public CommonResult<SysUserImportRespVO> importExcel(@RequestParam("file") MultipartFile file,
              @RequestParam(value = "updateSupport", required = false, defaultValue = "false") Boolean updateSupport) throws Exception {
-        List<SysUserImportExcelVO> list = ExcelUtils.raed(file, SysUserImportExcelVO.class);
+        List<SysUserImportExcelVO> list = ExcelUtils.read(file, SysUserImportExcelVO.class);
         return success(userService.importUsers(list, updateSupport));
     }
 

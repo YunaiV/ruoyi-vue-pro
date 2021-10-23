@@ -26,7 +26,7 @@ public class SysUserSessionPageItemRespVO extends PageParam {
     @ApiModelProperty(value = "浏览器 UserAgent", required = true, example = "Mozilla/5.0")
     private String userAgent;
 
-    @ApiModelProperty(value = "登陆时间", required = true)
+    @ApiModelProperty(value = "登录时间", required = true)
     private Date createTime;
 
     @ApiModelProperty(value = "用户账号", required = true, example = "yudao")

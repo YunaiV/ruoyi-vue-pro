@@ -1,10 +1,10 @@
 package cn.iocoder.yudao.adminserver.modules.infra.dal.mysql.file;
 
+import cn.iocoder.yudao.coreservice.modules.infra.dal.dataobject.file.InfFileDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.QueryWrapperX;
 import cn.iocoder.yudao.adminserver.modules.infra.controller.file.vo.InfFilePageReqVO;
-import cn.iocoder.yudao.adminserver.modules.infra.dal.dataobject.file.InfFileDO;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper

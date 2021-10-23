@@ -1,34 +1,33 @@
 package cn.iocoder.yudao.adminserver.modules.system.convert.auth;
 
-import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.adminserver.modules.system.controller.auth.vo.auth.SysAuthMenuRespVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.auth.vo.auth.SysAuthPermissionInfoRespVO;
-import cn.iocoder.yudao.adminserver.modules.system.controller.user.vo.profile.SysUserProfileUpdatePasswordReqVO;
-import cn.iocoder.yudao.adminserver.modules.system.controller.user.vo.profile.SysUserProfileUpdateReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.permission.SysMenuDO;
 import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.permission.SysRoleDO;
-import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.user.SysUserDO;
 import cn.iocoder.yudao.adminserver.modules.system.enums.permission.MenuIdEnum;
+import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.user.SysUserDO;
+import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.security.core.LoginUser;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Mapper
 public interface SysAuthConvert {
 
     SysAuthConvert INSTANCE = Mappers.getMapper(SysAuthConvert.class);
 
-    @Mapping(source = "updateTime", target = "updateTime", ignore = true)
-        // 字段相同，但是含义不同，忽略
-    LoginUser convert(SysUserDO bean);
+    @Mapping(source = "updateTime", target = "updateTime", ignore = true) // 字段相同，但是含义不同，忽略
+    LoginUser convert0(SysUserDO bean);
+
+    default LoginUser convert(SysUserDO bean) {
+        // 目的，为了设置 UserTypeEnum.ADMIN.getValue()
+        return convert0(bean).setUserType(UserTypeEnum.ADMIN.getValue());
+    }
 
     default SysAuthPermissionInfoRespVO convert(SysUserDO user, List<SysRoleDO> roleList, List<SysMenuDO> menuList) {
         return SysAuthPermissionInfoRespVO.builder()
@@ -39,10 +38,6 @@ public interface SysAuthConvert {
     }
 
     SysAuthMenuRespVO convertTreeNode(SysMenuDO menu);
-
-    LoginUser convert(SysUserProfileUpdateReqVO reqVO);
-
-    LoginUser convert(SysUserProfileUpdatePasswordReqVO reqVO);
 
     /**
      * 将菜单列表，构建成菜单树

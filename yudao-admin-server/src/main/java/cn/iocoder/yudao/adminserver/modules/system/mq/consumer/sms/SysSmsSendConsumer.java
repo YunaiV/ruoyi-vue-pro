@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.adminserver.modules.system.mq.consumer.sms;
 
+import cn.iocoder.yudao.coreservice.modules.system.mq.message.sms.SysSmsSendMessage;
+import cn.iocoder.yudao.coreservice.modules.system.service.sms.SysSmsCoreService;
 import cn.iocoder.yudao.framework.mq.core.stream.AbstractStreamMessageListener;
-import cn.iocoder.yudao.adminserver.modules.system.mq.message.sms.SysSmsSendMessage;
-import cn.iocoder.yudao.adminserver.modules.system.service.sms.SysSmsService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -19,12 +19,12 @@ import javax.annotation.Resource;
 public class SysSmsSendConsumer extends AbstractStreamMessageListener<SysSmsSendMessage> {
 
     @Resource
-    private SysSmsService smsService;
+    private SysSmsCoreService smsCoreService;
 
     @Override
     public void onMessage(SysSmsSendMessage message) {
         log.info("[onMessage][消息内容({})]", message);
-        smsService.doSendSms(message);
+        smsCoreService.doSendSms(message);
     }
 
 }

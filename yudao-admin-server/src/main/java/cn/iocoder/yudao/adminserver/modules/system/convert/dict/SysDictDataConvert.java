@@ -1,9 +1,9 @@
 package cn.iocoder.yudao.adminserver.modules.system.convert.dict;
 
+import cn.iocoder.yudao.adminserver.modules.system.controller.dict.vo.data.*;
+import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.dict.SysDictDataDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.dict.core.dto.DictDataRespDTO;
-import cn.iocoder.yudao.adminserver.modules.system.controller.dict.vo.data.*;
-import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.dict.SysDictDataDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 

@@ -1,12 +1,12 @@
 package cn.iocoder.yudao.adminserver.modules.infra.controller.file;
 
 import cn.hutool.core.io.IoUtil;
+import cn.iocoder.yudao.coreservice.modules.infra.dal.dataobject.file.InfFileDO;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.adminserver.modules.infra.controller.file.vo.InfFilePageReqVO;
 import cn.iocoder.yudao.adminserver.modules.infra.controller.file.vo.InfFileRespVO;
 import cn.iocoder.yudao.adminserver.modules.infra.convert.file.InfFileConvert;
-import cn.iocoder.yudao.adminserver.modules.infra.dal.dataobject.file.InfFileDO;
 import cn.iocoder.yudao.adminserver.modules.infra.service.file.InfFileService;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import io.swagger.annotations.Api;
@@ -41,7 +41,7 @@ public class InfFileController {
     @ApiOperation("上传文件")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "file", value = "文件附件", required = true, dataTypeClass = MultipartFile.class),
-            @ApiImplicitParam(name = "path", value = "文件路径", required = false, example = "yudaoyuanma.png", dataTypeClass = String.class)
+            @ApiImplicitParam(name = "path", value = "文件路径", example = "yudaoyuanma.png", dataTypeClass = String.class)
     })
     public CommonResult<String> uploadFile(@RequestParam("file") MultipartFile file,
                                            @RequestParam("path") String path) throws IOException {
