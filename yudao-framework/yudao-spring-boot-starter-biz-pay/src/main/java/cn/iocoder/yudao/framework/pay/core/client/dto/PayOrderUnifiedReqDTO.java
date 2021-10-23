@@ -2,6 +2,7 @@ package cn.iocoder.yudao.framework.pay.core.client.dto;
 
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
+import org.hibernate.validator.constraints.URL;
 
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotEmpty;
@@ -39,6 +40,12 @@ public class PayOrderUnifiedReqDTO {
     @NotEmpty(message = "商品描述信息不能为空")
     @Length(max = 128, message = "商品描述信息长度不能超过128")
     private String body;
+    /**
+     * 支付结果的回调地址
+     */
+    @NotEmpty(message = "支付结果的回调地址不能为空")
+    @URL(message = "支付结果的回调地址必须是 URL 格式")
+    private String notifyUrl;
 
     // ========== 订单相关字段 ==========
 
@@ -54,5 +61,8 @@ public class PayOrderUnifiedReqDTO {
      */
     @NotNull(message = "支付过期时间不能为空")
     private Date expireTime;
+
+    // ========== 拓展参数 ==========
+    // TODO 芋艿：待完善
 
 }

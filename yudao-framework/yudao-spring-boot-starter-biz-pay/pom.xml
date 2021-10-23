@@ -11,7 +11,10 @@
 
     <artifactId>yudao-spring-boot-starter-biz-pay</artifactId>
     <name>${artifactId}</name>
-    <description>支付拓展，基于 IJPay 简单封装，支持微信、支付宝等常见支付渠道</description>
+    <description>支付拓展，接入国内多个支付渠道
+        1. 支付宝，基于官方 SDK 接入
+        2. 微信支付，基于 weixin-java-pay 接入
+    </description>
 
     <dependencies>
         <dependency>
@@ -34,17 +37,36 @@
             <artifactId>slf4j-api</artifactId>
         </dependency>
 
-        <!-- 三方云服务相关 -->
         <dependency>
-            <groupId>com.github.javen205</groupId>
-            <artifactId>IJPay-AliPay</artifactId>
-            <version>2.7.8</version>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.github.javen205</groupId>
-            <artifactId>IJPay-WxPay</artifactId>
-            <version>2.7.8</version>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
         </dependency>
 
+        <!-- 三方云服务相关 -->
+<!--        <dependency>-->
+<!--            <groupId>com.github.javen205</groupId>-->
+<!--            <artifactId>IJPay-AliPay</artifactId>-->
+<!--            <version>2.7.8</version>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>com.github.javen205</groupId>-->
+<!--            <artifactId>IJPay-WxPay</artifactId>-->
+<!--            <version>2.7.8</version>-->
+<!--        </dependency>-->
+        <dependency>
+            <groupId>com.alipay.sdk</groupId>
+            <artifactId>alipay-sdk-java</artifactId>
+            <version>4.17.9.ALL</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.binarywang</groupId>
+            <artifactId>weixin-java-pay</artifactId>
+            <version>4.1.9.B</version>
+        </dependency>
+        <!-- TODO 芋艿：清理 -->
     </dependencies>
 </project>

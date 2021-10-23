@@ -18,6 +18,6 @@ public interface PayClient {
     Long getId();
 
     // TODO 缺少注释
-    CommonResult<Object> unifiedOrder(PayOrderUnifiedReqDTO reqDTO);
+    CommonResult<?> unifiedOrder(PayOrderUnifiedReqDTO reqDTO);
 
 }

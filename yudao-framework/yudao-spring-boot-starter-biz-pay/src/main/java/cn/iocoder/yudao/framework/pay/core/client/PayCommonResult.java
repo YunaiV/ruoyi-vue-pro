@@ -35,16 +35,13 @@ public class PayCommonResult<T> extends CommonResult<T> {
     private PayCommonResult() {
     }
 
-    public static <T> PayCommonResult<T> build(String apiCode, String apiMsg, T data, PayCodeMapping codeMapping) {
+    public static <T> PayCommonResult<T> build(String apiCode, String apiMsg, T data, AbstractPayCodeMapping codeMapping) {
         Assert.notNull(codeMapping, "参数 codeMapping 不能为空");
         PayCommonResult<T> result = new PayCommonResult<T>().setApiCode(apiCode).setApiMsg(apiMsg);
         result.setData(data);
         // 翻译错误码
         if (codeMapping != null) {
-            ErrorCode errorCode = codeMapping.apply(apiCode);
-            if (errorCode == null) {
-                errorCode = PayFrameworkErrorCodeConstants.EXCEPTION;
-            }
+            ErrorCode errorCode = codeMapping.apply(apiCode, apiMsg);
             result.setCode(errorCode.getCode()).setMsg(errorCode.getMsg());
         }
         return result;

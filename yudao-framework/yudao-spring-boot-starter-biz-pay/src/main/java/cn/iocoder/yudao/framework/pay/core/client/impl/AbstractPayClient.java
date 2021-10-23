@@ -2,7 +2,7 @@ package cn.iocoder.yudao.framework.pay.core.client.impl;
 
 import cn.iocoder.yudao.framework.pay.core.client.PayClient;
 import cn.iocoder.yudao.framework.pay.core.client.PayClientConfig;
-import cn.iocoder.yudao.framework.pay.core.client.PayCodeMapping;
+import cn.iocoder.yudao.framework.pay.core.client.AbstractPayCodeMapping;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -24,7 +24,7 @@ public abstract class AbstractPayClient<Config extends PayClientConfig> implemen
     /**
      * 错误码枚举类
      */
-    protected PayCodeMapping codeMapping;
+    protected AbstractPayCodeMapping codeMapping;
     /**
      * 支付配置
      */
@@ -34,7 +34,7 @@ public abstract class AbstractPayClient<Config extends PayClientConfig> implemen
         return amount / 100.0;
     }
 
-    public AbstractPayClient(Long channelId, String channelCode, Config config, PayCodeMapping codeMapping) {
+    public AbstractPayClient(Long channelId, String channelCode, Config config, AbstractPayCodeMapping codeMapping) {
         this.channelId = channelId;
         this.channelCode = channelCode;
         this.codeMapping = codeMapping;

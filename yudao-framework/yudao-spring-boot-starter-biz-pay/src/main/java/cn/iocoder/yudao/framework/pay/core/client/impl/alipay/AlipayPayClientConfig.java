@@ -11,7 +11,7 @@ import lombok.Data;
  * @author 芋道源码
  */
 @Data
-public class AlipayPayConfig implements PayClientConfig {
+public class AlipayPayClientConfig implements PayClientConfig {
 
     /**
      * 网关地址 - 线上
