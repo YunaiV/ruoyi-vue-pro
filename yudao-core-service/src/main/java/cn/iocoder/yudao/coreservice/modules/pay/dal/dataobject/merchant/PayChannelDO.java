@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.merchant;
 
-import cn.iocoder.yudao.framework.sms.core.enums.PayChannelCodeEnum;
+import cn.iocoder.yudao.framework.pay.core.enums.PayChannelEnum;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import lombok.Data;
@@ -23,7 +23,7 @@ public class PayChannelDO extends BaseDO {
     /**
      * 渠道编码
      *
-     * 枚举 {@link PayChannelCodeEnum}
+     * 枚举 {@link PayChannelEnum}
      */
     private String code;
     /**

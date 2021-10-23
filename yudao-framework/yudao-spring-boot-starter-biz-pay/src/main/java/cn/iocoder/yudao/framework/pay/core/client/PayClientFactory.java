@@ -22,6 +22,7 @@ public interface PayClientFactory {
      * @param channelCode 渠道编码
      * @param config 支付配置
      */
-     void createOrUpdatePayClient(Long channelId, String channelCode, PayClientConfig config);
+    <Config extends PayClientConfig> void createOrUpdatePayClient(Long channelId, String channelCode,
+                                                                  Config config);
 
 }

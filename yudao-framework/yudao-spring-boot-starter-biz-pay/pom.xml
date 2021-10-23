@@ -68,5 +68,12 @@
             <version>4.1.9.B</version>
         </dependency>
         <!-- TODO 芋艿：清理 -->
+
+        <!-- Test 测试相关 -->
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 </project>

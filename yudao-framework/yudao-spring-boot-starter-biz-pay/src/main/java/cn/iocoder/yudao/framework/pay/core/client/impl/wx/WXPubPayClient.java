@@ -2,13 +2,13 @@ package cn.iocoder.yudao.framework.pay.core.client.impl.wx;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.io.FileUtils;
 import cn.iocoder.yudao.framework.pay.core.client.PayCommonResult;
 import cn.iocoder.yudao.framework.pay.core.client.dto.PayOrderUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.client.impl.AbstractPayClient;
+import cn.iocoder.yudao.framework.pay.core.enums.PayChannelEnum;
 import com.github.binarywang.wxpay.bean.order.WxPayMpOrderResult;
 import com.github.binarywang.wxpay.bean.request.WxPayUnifiedOrderRequest;
 import com.github.binarywang.wxpay.bean.request.WxPayUnifiedOrderV3Request;
@@ -20,9 +20,6 @@ import com.github.binarywang.wxpay.exception.WxPayException;
 import com.github.binarywang.wxpay.service.WxPayService;
 import com.github.binarywang.wxpay.service.impl.WxPayServiceImpl;
 import lombok.extern.slf4j.Slf4j;
-
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 
 import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
 import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString;
@@ -39,8 +36,8 @@ public class WXPubPayClient extends AbstractPayClient<WXPayClientConfig> {
 
     private WxPayService client;
 
-    public WXPubPayClient(Long channelId, String channelCode, WXPayClientConfig config) {
-        super(channelId, channelCode, config, new WXCodeMapping());
+    public WXPubPayClient(Long channelId, WXPayClientConfig config) {
+        super(channelId, PayChannelEnum.WX_PUB.getCode(), config, new WXCodeMapping());
     }
 
     @Override
@@ -118,31 +115,6 @@ public class WXPubPayClient extends AbstractPayClient<WXPayClientConfig> {
         request.setNotifyUrl(reqDTO.getNotifyUrl());
         // 执行请求
         return client.createOrderV3(TradeTypeEnum.JSAPI, request);
-    }
-
-    public static void main(String[] args) throws FileNotFoundException {
-        WXPayClientConfig config = new WXPayClientConfig();
-        config.setAppId("wx041349c6f39b268b");
-        config.setMchId("1545083881");
-        config.setMchKey("0alL64UDQdlCwiKZ73ib7ypaIjMns06p");
-        config.setApiVersion(WXPayClientConfig.API_VERSION_V3);
-//        config.setKeyContent(IoUtil.readUtf8(new FileInputStream("/Users/yunai/Downloads/wx_pay/apiclient_cert.p12")));
-        config.setPrivateKeyContent(IoUtil.readUtf8(new FileInputStream("/Users/yunai/Downloads/wx_pay/apiclient_key.pem")));
-        config.setPrivateCertContent(IoUtil.readUtf8(new FileInputStream("/Users/yunai/Downloads/wx_pay/apiclient_cert.pem")));
-        config.setApiV3Key("joerVi8y5DJ3o4ttA0o1uH47Xz1u2Ase");
-
-        WXPubPayClient client = new WXPubPayClient(1L, "biu", config);
-        client.init();
-
-        PayOrderUnifiedReqDTO reqDTO = new PayOrderUnifiedReqDTO();
-        reqDTO.setAmount(123);
-        reqDTO.setSubject("IPhone 13");
-        reqDTO.setBody("biubiubiu");
-        reqDTO.setMerchantOrderId(String.valueOf(System.currentTimeMillis()));
-        reqDTO.setClientIp("127.0.0.1");
-        reqDTO.setNotifyUrl("http://127.0.0.1:8080");
-        CommonResult<WxPayMpOrderResult> result = client.unifiedOrder(reqDTO);
-        System.out.println(result);
     }
 
 }

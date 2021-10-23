@@ -3,7 +3,7 @@ package cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.order;
 import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.merchant.PayAppDO;
 import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.merchant.PayChannelDO;
 import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.merchant.PayMerchantDO;
-import cn.iocoder.yudao.framework.sms.core.enums.PayChannelCodeEnum;
+import cn.iocoder.yudao.framework.pay.core.enums.PayChannelEnum;
 import cn.iocoder.yudao.coreservice.modules.pay.enums.order.PayOrderStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -49,7 +49,7 @@ public class PayOrderDO extends BaseDO {
     /**
      * 渠道编码
      *
-     * 枚举 {@link PayChannelCodeEnum}
+     * 枚举 {@link PayChannelEnum}
      */
     private String channelCode;
 
