@@ -2,7 +2,7 @@ package cn.iocoder.yudao.adminserver.modules.infra.service.file;
 
 import cn.hutool.core.io.resource.ResourceUtil;
 import cn.iocoder.yudao.adminserver.BaseDbUnitTest;
-import cn.iocoder.yudao.coreservice.modules.infra.controller.file.vo.InfFilePageReqVO;
+import cn.iocoder.yudao.adminserver.modules.infra.controller.file.vo.InfFilePageReqVO;
 import cn.iocoder.yudao.coreservice.modules.infra.dal.dataobject.file.InfFileDO;
 import cn.iocoder.yudao.coreservice.modules.infra.dal.mysql.file.InfFileCoreMapper;
 import cn.iocoder.yudao.coreservice.modules.infra.service.file.impl.InfFileCoreServiceImpl;

@@ -3,9 +3,9 @@ GET {{userServerUrl}}/system/user/profile/get
 Authorization: Bearer test245
 
 ### 请求 /system/user/profile/revise-nickname 接口 成功
-PUT http://localhost:28080/api/system/user/profile/update-nickname?nickName=yunai222
+PUT {{userServerUrl}}/system/user/profile/update-nickname?nickName=yunai222
 Authorization: Bearer test245
 
 ### 请求 /system/user/profile/get-user-info 接口 成功
-GET http://localhost:28080/api/system/user/profile/get-user-info?id=245
+GET {{userServerUrl}}/system/user/profile/get-user-info?id=245
 Authorization: Bearer test245

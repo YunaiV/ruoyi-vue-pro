@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.userserver.modules.member.controller.user;
 
-import cn.iocoder.yudao.userserver.modules.member.controller.user.vo.SysUserInfoRespVO;
+import cn.iocoder.yudao.userserver.modules.member.controller.user.vo.MbrUserInfoRespVO;
 import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
@@ -30,13 +30,6 @@ public class SysUserProfileController {
     @Resource
     private MbrUserService userService;
 
-    @GetMapping("/get")
-    @ApiOperation("获得登录用户信息")
-    @PreAuthenticated
-    public CommonResult<Boolean> profile() {
-        return null;
-    }
-
     @PutMapping("/update-nickname")
     @ApiOperation("修改用户昵称")
     @PreAuthenticated
@@ -45,21 +38,21 @@ public class SysUserProfileController {
         return success(true);
     }
 
-    @PutMapping("/revise-avatar")
+    @PutMapping("/update-avatar")
     @ApiOperation("修改用户头像")
     @PreAuthenticated
-    public CommonResult<String> reviseAvatar(@RequestParam("avatarFile") MultipartFile file) throws IOException {
+    public CommonResult<String> updateAvatar(@RequestParam("avatarFile") MultipartFile file) throws IOException {
         if (file.isEmpty()) {
             throw ServiceExceptionUtil.exception(FILE_IS_EMPTY);
         }
-        String avatar = userService.reviseAvatar(getLoginUserId(), file.getInputStream());
+        String avatar = userService.updateAvatar(getLoginUserId(), file.getInputStream());
         return success(avatar);
     }
 
     @GetMapping("/get-user-info")
     @ApiOperation("获取用户头像与昵称")
     @PreAuthenticated
-    public CommonResult<SysUserInfoRespVO> getUserInfo() {
+    public CommonResult<MbrUserInfoRespVO> getUserInfo() {
         return success(userService.getUserInfo(getLoginUserId()));
     }
 }

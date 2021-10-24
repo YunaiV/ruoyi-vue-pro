@@ -2,7 +2,7 @@ package cn.iocoder.yudao.adminserver.modules.infra.controller.file;
 
 import cn.hutool.core.io.IoUtil;
 import cn.iocoder.yudao.adminserver.modules.infra.service.file.InfFileService;
-import cn.iocoder.yudao.coreservice.modules.infra.controller.file.vo.InfFilePageReqVO;
+import cn.iocoder.yudao.adminserver.modules.infra.controller.file.vo.InfFilePageReqVO;
 import cn.iocoder.yudao.coreservice.modules.infra.controller.file.vo.InfFileRespVO;
 import cn.iocoder.yudao.coreservice.modules.infra.dal.dataobject.file.InfFileDO;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;

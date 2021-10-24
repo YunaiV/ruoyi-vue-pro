@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.userserver.modules.member.service.user;
 
 import cn.iocoder.yudao.coreservice.modules.member.dal.dataobject.user.MbrUserDO;
-import cn.iocoder.yudao.userserver.modules.member.controller.user.vo.SysUserInfoRespVO;
+import cn.iocoder.yudao.userserver.modules.member.controller.user.vo.MbrUserInfoRespVO;
 import cn.iocoder.yudao.framework.common.validation.Mobile;
 
 import java.io.InputStream;
@@ -60,13 +60,13 @@ public interface MbrUserService {
      * @param inputStream 头像文件
      * @return 头像url
      */
-    String reviseAvatar(Long userId, InputStream inputStream);
+    String updateAvatar(Long userId, InputStream inputStream);
 
     /**
      * 根据用户id，获取用户头像与昵称
      * @param userId 用户id
      * @return 用户响应实体类
      */
-    SysUserInfoRespVO getUserInfo(Long userId);
+    MbrUserInfoRespVO getUserInfo(Long userId);
 
 }

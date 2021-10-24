@@ -4,7 +4,7 @@ import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.iocoder.yudao.coreservice.modules.infra.service.file.InfFileCoreService;
 import cn.iocoder.yudao.coreservice.modules.member.dal.dataobject.user.MbrUserDO;
-import cn.iocoder.yudao.userserver.modules.member.controller.user.vo.SysUserInfoRespVO;
+import cn.iocoder.yudao.userserver.modules.member.controller.user.vo.MbrUserInfoRespVO;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.userserver.modules.member.dal.mysql.user.MbrUserMapper;
 import cn.iocoder.yudao.userserver.modules.member.service.user.MbrUserService;
@@ -93,7 +93,7 @@ public class MbrUserServiceImpl implements MbrUserService {
     }
 
     @Override
-    public String reviseAvatar(Long userId, InputStream avatarFile) {
+    public String updateAvatar(Long userId, InputStream avatarFile) {
         this.checkUserExists(userId);
         // 创建文件
         String avatar = fileCoreService.createFile(IdUtil.fastUUID(), IoUtil.readBytes(avatarFile));
@@ -107,9 +107,9 @@ public class MbrUserServiceImpl implements MbrUserService {
     }
 
     @Override
-    public SysUserInfoRespVO getUserInfo(Long userId) {
+    public MbrUserInfoRespVO getUserInfo(Long userId) {
         MbrUserDO user = this.checkUserExists(userId);
-        SysUserInfoRespVO userResp = new SysUserInfoRespVO();
+        MbrUserInfoRespVO userResp = new MbrUserInfoRespVO();
         userResp.setNickName(user.getNickname());
         userResp.setAvatar(user.getAvatar());
         return userResp;

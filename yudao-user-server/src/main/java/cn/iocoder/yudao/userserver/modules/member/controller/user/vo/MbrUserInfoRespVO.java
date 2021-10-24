@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class SysUserInfoRespVO {
+public class MbrUserInfoRespVO {
 
     @ApiModelProperty(value = "用户昵称", required = true, example = "芋艿")
     private String nickName;
