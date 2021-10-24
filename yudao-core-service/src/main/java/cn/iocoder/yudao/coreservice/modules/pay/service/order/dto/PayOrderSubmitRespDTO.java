@@ -18,6 +18,6 @@ public class PayOrderSubmitRespDTO implements Serializable {
     /**
      * 调用支付渠道的响应结果
      */
-    private String invokeResponse;
+    private Object invokeResponse;
 
 }

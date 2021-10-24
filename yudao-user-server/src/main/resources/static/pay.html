@@ -13,10 +13,14 @@
 </div>
 </body>
 <script>
+    let shopOrderId = undefined;
+    let payOrderId = undefined;
+    let server = 'http://127.0.0.1:28080';
     $(function() {
         // 获得 JsapiTicket
+        // 参考 https://developers.weixin.qq.com/doc/offiaccount/OA_Web_Apps/JS-SDK.html 文档
         $.ajax({
-            url: "http://127.0.0.1:28080/api/wx/mp/create-jsapi-signature?url=" + document.location.href,
+            url: server + "/api/wx/mp/create-jsapi-signature?url=" + document.location.href,
             method: 'POST',
             success: function( result ) {
                 if (result.code !== 0) {
@@ -24,19 +28,77 @@
                     return;
                 }
                 var jsapiTicket = result.data;
-                jsapiTicket.jsApiList = [];
-                jsapiTicket.debug = true;
+                jsapiTicket.jsApiList = ['chooseWXPay'];
+                jsapiTicket.debug = false;
 
                 // 初始化 JS
                 wx.config(jsapiTicket);
             }
         });
+
+        // 自动发起商城订单编号
+        $.ajax({
+            url: server + "/api/shop/order/create",
+            method: 'POST',
+            success: function( result ) {
+                if (result.code !== 0) {
+                    alert('创建商城订单失败，原因：' + result.msg)
+                    return;
+                }
+                shopOrderId = result.data.id;
+                payOrderId = result.data.payOrderId;
+                console.log("商城订单：" + shopOrderId)
+                console.log("支付订单：" + payOrderId)
+            }
+        })
     })
 
+    // 微信公众号
     $( "#wx_pub").on( "click", function() {
-        wx.ready(function(){
-            alert('ok');
-        });
+        if (typeof WeixinJSBridge == "undefined") {
+            if (document.addEventListener) {
+                document.addEventListener('WeixinJSBridgeReady', onBridgeReady, false);
+            } else if (document.attachEvent) {
+                document.attachEvent('WeixinJSBridgeReady', onBridgeReady);
+                document.attachEvent('onWeixinJSBridgeReady', onBridgeReady);
+            }
+        } else {
+            onBridgeReady()
+        }
+
+        function onBridgeReady() {
+            $.ajax({
+                url: server + "/api/pay/order/submit",
+                method: 'POST',
+                dataType: "json",
+                contentType: "application/json",
+                data: JSON.stringify({
+                    "id": payOrderId,
+                    "channelCode": 'wx_pub',
+                }),
+                success: function( result ) {
+                    if (result.code !== 0) {
+                        alert('提交支付订单失败，原因：' + result.msg)
+                        return;
+                    }
+                    alert('开始调用微信支付');
+                    let data = result.data.invokeResponse;
+                    wx.chooseWXPay({
+                        timestamp: data.timeStamp,
+                        nonceStr: data.nonceStr,
+                        package: data.package,
+                        signType: data.signType,
+                        paySign: data.paySign,
+                        success: function (res) {
+                            alert(JSON.stringify(res));
+                        },
+                        error: function(e) {
+                            alert(JSON.stringify(e));
+                        }
+                    });
+                }
+            })
+        }
     });
 </script>
 </html>

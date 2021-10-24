@@ -134,7 +134,7 @@ public class PayOrderCoreServiceImpl implements PayOrderCoreService {
         // TODO 轮询三方接口，是否已经支付的任务
         // 返回成功
         return new PayOrderSubmitRespDTO().setExtensionId(orderExtension.getId())
-                .setInvokeResponse(JsonUtils.toJsonString(unifiedOrderResult));
+                .setInvokeResponse(unifiedOrderResult.getData());
     }
 
     private String generateOrderExtensionNo() {

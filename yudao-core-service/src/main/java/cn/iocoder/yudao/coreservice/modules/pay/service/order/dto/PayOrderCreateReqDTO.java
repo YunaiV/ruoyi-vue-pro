@@ -18,7 +18,7 @@ public class PayOrderCreateReqDTO implements Serializable {
     /**
      * 应用编号
      */
-    @NotEmpty(message = "应用编号不能为空")
+    @NotNull(message = "应用编号不能为空")
     private Long appId;
     /**
      * 用户 IP
