@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>支付测试页</title>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.js"></script>
+    <script src="http://res.wx.qq.com/open/js/jweixin-1.6.0.js"></script>
+</head>
+<body>
+<div>点击如下按钮，发起支付的测试</div>
+<div>
+    <button id="wx_pub">微信公众号</button>
+</div>
+</body>
+<script>
+    $(function() {
+        // 获得 JsapiTicket
+        $.ajax({
+            url: "http://127.0.0.1:28080/api/wx/mp/create-jsapi-signature?url=" + document.location.href,
+            method: 'POST',
+            success: function( result ) {
+                if (result.code !== 0) {
+                    alert('获取 JsapiTicket 失败，原因：' + result.msg)
+                    return;
+                }
+                var jsapiTicket = result.data;
+                jsapiTicket.jsApiList = [];
+                jsapiTicket.debug = true;
+
+                // 初始化 JS
+                wx.config(jsapiTicket);
+            }
+        });
+    })
+
+    $( "#wx_pub").on( "click", function() {
+        wx.ready(function(){
+            alert('ok');
+        });
+    });
+</script>
+</html>
