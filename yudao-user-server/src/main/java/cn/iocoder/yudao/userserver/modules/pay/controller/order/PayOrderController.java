@@ -49,9 +49,10 @@ public class PayOrderController {
 
     // ========== 支付渠道的回调 ==========
 
-    @PostMapping("/notify/wx-pub")
+    @PostMapping("/notify/wx-pub/{channelId}")
     @ApiOperation("通知微信公众号的结果")
-    public String notifyWxPayOrder(@RequestBody String xmlData) {
+    public String notifyWxPayOrder(@PathVariable("channelId") Long channelId,
+                                   @RequestBody String xmlData) {
         System.out.println(xmlData);
         return "success";
     }

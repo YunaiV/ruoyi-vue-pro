@@ -130,7 +130,7 @@ public class PayOrderCoreServiceImpl implements PayOrderCoreService {
         // 商户相关字段
         unifiedOrderReqDTO.setMerchantOrderId(order.getMerchantOrderId())
                 .setSubject(order.getSubject()).setBody(order.getBody())
-                .setNotifyUrl(genChannelPayNotifyUrl(reqDTO.getChannelCode()));
+                .setNotifyUrl(genChannelPayNotifyUrl(channel));
         // 订单相关字段
         unifiedOrderReqDTO.setAmount(order.getAmount()).setExpireTime(order.getExpireTime());
         CommonResult<?> unifiedOrderResult = client.unifiedOrder(unifiedOrderReqDTO);
@@ -145,12 +145,13 @@ public class PayOrderCoreServiceImpl implements PayOrderCoreService {
     /**
      * 根据支付渠道的编码，生成支付渠道的回调地址
      *
-     * @param channelCode 支付渠道的编码
+     * @param channel 支付渠道
      * @return 支付渠道的回调地址
      */
-    private String genChannelPayNotifyUrl(String channelCode) {
+    private String genChannelPayNotifyUrl(PayChannelDO channel) {
         // _ 转化为 - 的原因，是因为 URL 我们统一采用中划线的原则
-        return payProperties.getPayNotifyUrl() + "/" + StrUtil.replace(channelCode, "_", "-");
+        return payProperties.getPayNotifyUrl() + "/" + StrUtil.replace(channel.getCode(), "_", "-")
+                + "/" + channel.getId();
     }
 
     private String generateOrderExtensionNo() {
