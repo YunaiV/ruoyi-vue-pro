@@ -32,7 +32,7 @@ public class PayOrderController {
     @PostMapping("/submit")
     @ApiOperation("提交支付订单")
 //    @PreAuthenticated // TODO 暂时不加登陆验证，前端暂时没做好
-    public CommonResult<PayOrderSubmitRespVO> submit(@RequestBody PayOrderSubmitReqVO reqVO) {
+    public CommonResult<PayOrderSubmitRespVO> submitPayOrder(@RequestBody PayOrderSubmitReqVO reqVO) {
         // 获得订单
         PayOrderDO payOrder = payOrderCoreService.getPayOrder(reqVO.getId());
 
@@ -45,6 +45,15 @@ public class PayOrderController {
 
         // 拼接返回
         return success(PayOrderSubmitRespVO.builder().invokeResponse(respDTO.getInvokeResponse()).build());
+    }
+
+    // ========== 支付渠道的回调 ==========
+
+    @PostMapping("/notify/wx-pub")
+    @ApiOperation("通知微信公众号的结果")
+    public String notifyWxPayOrder(@RequestBody String xmlData) {
+        System.out.println(xmlData);
+        return "success";
     }
 
 }

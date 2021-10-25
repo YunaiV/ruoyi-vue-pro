@@ -18,6 +18,8 @@
     let payOrderId = undefined;
     // let server = 'http://127.0.0.1:28080';
     let server = 'http://niubi.natapp1.cc';
+    // TODO openid
+    let openid = "ockUAwIZ-0OeMZl9ogcZ4ILrGba0";
     $(function() {
         // 获得 JsapiTicket
         // 参考 https://developers.weixin.qq.com/doc/offiaccount/OA_Web_Apps/JS-SDK.html 文档
@@ -73,6 +75,8 @@
         }
 
         // 提交支付
+        // 参考 https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=7_7&index=6 文档
+        // 参考 https://segmentfault.com/a/1190000020704650 文档
         $.ajax({
             url: server + "/api/pay/order/submit",
             method: 'POST',
@@ -81,6 +85,9 @@
             data: JSON.stringify({
                 "id": payOrderId,
                 "channelCode": 'wx_pub',
+                "channelExtras": {
+                    "openid": openid
+                }
             }),
             success: function( result ) {
                 if (result.code !== 0) {

@@ -2,6 +2,7 @@ package cn.iocoder.yudao.framework.pay.core.client.impl.wx;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.io.FileUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
@@ -94,7 +95,7 @@ public class WXPubPayClient extends AbstractPayClient<WXPayClientConfig> {
                 .totalFee(reqDTO.getAmount().intValue()) // 单位分
                 .timeExpire(DateUtil.format(reqDTO.getExpireTime(), "yyyyMMddHHmmss"))
                 .spbillCreateIp(reqDTO.getUserIp())
-                .openid("ockUAwIZ-0OeMZl9ogcZ4ILrGba0") // TODO 芋艿：先随便写死
+                .openid(getOpenid(reqDTO))
                 .notifyUrl(reqDTO.getNotifyUrl())
                 .build();
         // 执行请求
@@ -109,11 +110,20 @@ public class WXPubPayClient extends AbstractPayClient<WXPayClientConfig> {
         request.setDescription(reqDTO.getBody());
         request.setAmount(new WxPayUnifiedOrderV3Request.Amount().setTotal(reqDTO.getAmount().intValue())); // 单位分
         request.setTimeExpire(DateUtil.format(reqDTO.getExpireTime(), "yyyyMMddHHmmss"));
-        request.setPayer(new WxPayUnifiedOrderV3Request.Payer().setOpenid("ockUAwIZ-0OeMZl9ogcZ4ILrGba0")); // TODO 芋艿：先随便写死
+        request.setPayer(new WxPayUnifiedOrderV3Request.Payer().setOpenid(getOpenid(reqDTO)));
         request.setSceneInfo(new WxPayUnifiedOrderV3Request.SceneInfo().setPayerClientIp(reqDTO.getUserIp()));
         request.setNotifyUrl(reqDTO.getNotifyUrl());
         // 执行请求
         return client.createOrderV3(TradeTypeEnum.JSAPI, request);
+    }
+
+
+    private static String getOpenid(PayOrderUnifiedReqDTO reqDTO) {
+        String openid = MapUtil.getStr(reqDTO.getChannelExtras(), "openid");
+        if (StrUtil.isEmpty(openid)) {
+            throw new IllegalArgumentException("支付请求的 openid 不能为空！");
+        }
+        return openid;
     }
 
 }

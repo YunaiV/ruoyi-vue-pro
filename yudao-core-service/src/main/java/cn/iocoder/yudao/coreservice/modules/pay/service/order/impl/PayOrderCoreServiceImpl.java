@@ -2,6 +2,7 @@ package cn.iocoder.yudao.coreservice.modules.pay.service.order.impl;
 
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.RandomUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.coreservice.modules.pay.convert.order.PayOrderCoreConvert;
 import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.merchant.PayAppDO;
 import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.merchant.PayChannelDO;
@@ -19,6 +20,7 @@ import cn.iocoder.yudao.coreservice.modules.pay.service.order.dto.PayOrderSubmit
 import cn.iocoder.yudao.coreservice.modules.pay.service.order.dto.PayOrderSubmitRespDTO;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
+import cn.iocoder.yudao.framework.pay.config.PayProperties;
 import cn.iocoder.yudao.framework.pay.core.client.PayClient;
 import cn.iocoder.yudao.framework.pay.core.client.PayClientFactory;
 import cn.iocoder.yudao.framework.pay.core.client.dto.PayOrderUnifiedReqDTO;
@@ -42,6 +44,9 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 @Validated
 @Slf4j
 public class PayOrderCoreServiceImpl implements PayOrderCoreService {
+
+    @Resource
+    private PayProperties payProperties;
 
     @Resource
     private PayAppCoreService payAppCoreService;
@@ -125,7 +130,7 @@ public class PayOrderCoreServiceImpl implements PayOrderCoreService {
         // 商户相关字段
         unifiedOrderReqDTO.setMerchantOrderId(order.getMerchantOrderId())
                 .setSubject(order.getSubject()).setBody(order.getBody())
-                .setNotifyUrl(app.getPayNotifyUrl());
+                .setNotifyUrl(genChannelPayNotifyUrl(reqDTO.getChannelCode()));
         // 订单相关字段
         unifiedOrderReqDTO.setAmount(order.getAmount()).setExpireTime(order.getExpireTime());
         CommonResult<?> unifiedOrderResult = client.unifiedOrder(unifiedOrderReqDTO);
@@ -135,6 +140,17 @@ public class PayOrderCoreServiceImpl implements PayOrderCoreService {
         // 返回成功
         return new PayOrderSubmitRespDTO().setExtensionId(orderExtension.getId())
                 .setInvokeResponse(unifiedOrderResult.getData());
+    }
+
+    /**
+     * 根据支付渠道的编码，生成支付渠道的回调地址
+     *
+     * @param channelCode 支付渠道的编码
+     * @return 支付渠道的回调地址
+     */
+    private String genChannelPayNotifyUrl(String channelCode) {
+        // _ 转化为 - 的原因，是因为 URL 我们统一采用中划线的原则
+        return payProperties.getPayNotifyUrl() + "/" + StrUtil.replace(channelCode, "_", "-");
     }
 
     private String generateOrderExtensionNo() {

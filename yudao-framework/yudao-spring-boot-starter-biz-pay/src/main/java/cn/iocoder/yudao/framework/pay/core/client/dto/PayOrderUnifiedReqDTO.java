@@ -8,6 +8,7 @@ import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
+import java.util.Map;
 
 /**
  * 统一下单 Request DTO
@@ -63,6 +64,11 @@ public class PayOrderUnifiedReqDTO {
     private Date expireTime;
 
     // ========== 拓展参数 ==========
-    // TODO 芋艿：待完善
+    /**
+     * 支付渠道的额外参数
+     *
+     * 例如说，微信公众号需要传递 openid 参数
+     */
+    private Map<String, String> channelExtras;
 
 }
