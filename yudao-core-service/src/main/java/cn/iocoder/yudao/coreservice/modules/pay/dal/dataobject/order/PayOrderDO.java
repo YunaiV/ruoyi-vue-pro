@@ -121,6 +121,10 @@ public class PayOrderDO extends BaseDO {
      */
     private Date successTime;
     /**
+     * 订单支付通知时间，即支付渠道的通知时间
+     */
+    private Date notifyTime;
+    /**
      * 支付成功的订单拓展单编号
      *
      * 关联 {@link PayOrderDO#getId()}

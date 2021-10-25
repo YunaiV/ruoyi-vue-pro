@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.framework.pay.core.client;
 
+import cn.iocoder.yudao.framework.pay.core.client.dto.PayOrderNotifyRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.PayOrderUnifiedReqDTO;
 
 /**
@@ -23,5 +24,14 @@ public interface PayClient {
      * @return 各支付渠道的返回结果
      */
     PayCommonResult<?> unifiedOrder(PayOrderUnifiedReqDTO reqDTO);
+
+    /**
+     * 解析支付单的通知结果
+     *
+     * @param data 通知结果
+     * @return 解析结果
+     * @throws Exception 解析失败，抛出异常
+     */
+    PayOrderNotifyRespDTO parseOrderNotify(String data) throws Exception;
 
 }

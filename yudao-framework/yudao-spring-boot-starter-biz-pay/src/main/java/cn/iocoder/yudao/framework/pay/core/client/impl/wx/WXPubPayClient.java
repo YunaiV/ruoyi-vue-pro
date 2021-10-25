@@ -2,14 +2,17 @@ package cn.iocoder.yudao.framework.pay.core.client.impl.wx;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.io.FileUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.pay.core.client.PayCommonResult;
+import cn.iocoder.yudao.framework.pay.core.client.dto.PayOrderNotifyRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.PayOrderUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.client.impl.AbstractPayClient;
 import cn.iocoder.yudao.framework.pay.core.enums.PayChannelEnum;
+import com.github.binarywang.wxpay.bean.notify.WxPayOrderNotifyResult;
 import com.github.binarywang.wxpay.bean.order.WxPayMpOrderResult;
 import com.github.binarywang.wxpay.bean.request.WxPayUnifiedOrderRequest;
 import com.github.binarywang.wxpay.bean.request.WxPayUnifiedOrderV3Request;
@@ -21,6 +24,8 @@ import com.github.binarywang.wxpay.exception.WxPayException;
 import com.github.binarywang.wxpay.service.WxPayService;
 import com.github.binarywang.wxpay.service.impl.WxPayServiceImpl;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString;
 import static cn.iocoder.yudao.framework.pay.core.client.impl.wx.WXCodeMapping.CODE_SUCCESS;
@@ -124,6 +129,15 @@ public class WXPubPayClient extends AbstractPayClient<WXPayClientConfig> {
             throw new IllegalArgumentException("支付请求的 openid 不能为空！");
         }
         return openid;
+    }
+
+    @Override
+    public PayOrderNotifyRespDTO parseOrderNotify(String data) throws WxPayException {
+        WxPayOrderNotifyResult notifyResult = client.parseOrderNotifyResult(data);
+        Assert.isTrue(Objects.equals(notifyResult.getResultCode(), "SUCCESS"), "支付结果非 SUCCESS");
+        // 转换结果
+        return new PayOrderNotifyRespDTO(notifyResult.getOutTradeNo(), notifyResult.getTransactionId(),
+                DateUtil.parse(notifyResult.getTimeEnd(), "yyyyMMddHHmmss"), data);
     }
 
 }

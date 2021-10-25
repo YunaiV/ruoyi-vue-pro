@@ -39,4 +39,13 @@ public interface PayOrderCoreService {
     */
    PayOrderSubmitRespDTO submitPayOrder(@Valid PayOrderSubmitReqDTO reqDTO);
 
+   /**
+    * 通知支付单成功
+    *
+    * @param channelId 渠道编号
+    * @param channelCode 渠道编码
+    * @param notifyData 通知数据
+    */
+   void notifyPayOrder(Long channelId, String channelCode, String notifyData) throws Exception;
+
 }

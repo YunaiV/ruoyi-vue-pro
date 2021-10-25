@@ -2,6 +2,7 @@ package cn.iocoder.yudao.framework.pay.core.client.impl.alipay;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.iocoder.yudao.framework.pay.core.client.PayCommonResult;
+import cn.iocoder.yudao.framework.pay.core.client.dto.PayOrderNotifyRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.PayOrderUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.client.impl.AbstractPayClient;
 import cn.iocoder.yudao.framework.pay.core.enums.PayChannelEnum;
@@ -65,4 +66,9 @@ public class AlipayQrPayClient extends AbstractPayClient<AlipayPayClientConfig> 
         return PayCommonResult.build(response.getCode(), response.getMsg(), response, codeMapping);
     }
 
+    @Override
+    public PayOrderNotifyRespDTO parseOrderNotify(String data) throws Exception {
+        // TODO 芋艿：待完成
+        return null;
+    }
 }

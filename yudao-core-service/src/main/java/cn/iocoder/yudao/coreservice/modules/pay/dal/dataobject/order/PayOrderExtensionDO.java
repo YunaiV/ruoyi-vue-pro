@@ -77,6 +77,6 @@ public class PayOrderExtensionDO extends BaseDO {
      *
      * 在支持成功后，会记录回调的数据
      */
-    private String channelCallbackData;
+    private String channelNotifyData;
 
 }
