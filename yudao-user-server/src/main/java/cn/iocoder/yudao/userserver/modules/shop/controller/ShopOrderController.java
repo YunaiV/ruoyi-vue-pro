@@ -43,7 +43,7 @@ public class ShopOrderController {
         reqDTO.setMerchantOrderId(String.valueOf(System.currentTimeMillis()));
         reqDTO.setSubject("标题：" + shopOrderId);
         reqDTO.setBody("内容：" + shopOrderId);
-        reqDTO.setAmount(100);
+        reqDTO.setAmount(1); // 单位：分
         reqDTO.setExpireTime(DateUtils.addTime(Duration.ofDays(1)));
         Long payOrderId = payOrderCoreService.createPayOrder(reqDTO);
 
