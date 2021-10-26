@@ -6,6 +6,7 @@ import cn.iocoder.yudao.coreservice.modules.pay.service.order.PayOrderCoreServic
 import cn.iocoder.yudao.coreservice.modules.pay.service.order.dto.PayOrderSubmitReqDTO;
 import cn.iocoder.yudao.coreservice.modules.pay.service.order.dto.PayOrderSubmitRespDTO;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.pay.core.enums.PayChannelEnum;
 import cn.iocoder.yudao.userserver.modules.pay.controller.order.vo.PayOrderSubmitReqVO;
 import cn.iocoder.yudao.userserver.modules.pay.controller.order.vo.PayOrderSubmitRespVO;
 import io.swagger.annotations.Api;
@@ -52,8 +53,8 @@ public class PayOrderController {
     @PostMapping("/notify/wx-pub/{channelId}")
     @ApiOperation("通知微信公众号的结果")
     public String notifyWxPayOrder(@PathVariable("channelId") Long channelId,
-                                   @RequestBody String xmlData) {
-        System.out.println(xmlData);
+                                   @RequestBody String xmlData) throws Exception {
+        payOrderCoreService.notifyPayOrder(channelId, PayChannelEnum.WX_PUB.getCode(), xmlData);
         return "success";
     }
 

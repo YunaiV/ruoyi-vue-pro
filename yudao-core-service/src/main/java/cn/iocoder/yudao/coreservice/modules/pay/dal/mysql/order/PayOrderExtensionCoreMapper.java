@@ -8,8 +8,8 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface PayOrderExtensionCoreMapper extends BaseMapperX<PayOrderExtensionDO> {
 
-    default PayOrderExtensionDO selectByOrderExtensionNo(String orderExtensionNo) {
-        return selectOne("order_extension_no", orderExtensionNo);
+    default PayOrderExtensionDO selectByNo(String no) {
+        return selectOne("no", no);
     }
 
     default int updateByIdAndStatus(Long id, Integer status, PayOrderExtensionDO update) {

@@ -96,15 +96,26 @@ public class PayChannelCoreServiceImpl implements PayChannelCoreService {
     }
 
     @Override
+    public PayChannelDO validPayChannel(Long id) {
+        PayChannelDO channel = payChannelCoreMapper.selectById(id);
+        this.validPayChannel(channel);
+        return channel;
+    }
+
+    @Override
     public PayChannelDO validPayChannel(Long appId, String code) {
         PayChannelDO channel = payChannelCoreMapper.selectByAppIdAndCode(appId, code);
+        this.validPayChannel(channel);
+        return channel;
+    }
+
+    private void validPayChannel(PayChannelDO channel) {
         if (channel == null) {
             throw exception(PAY_CHANNEL_NOT_FOUND);
         }
         if (CommonStatusEnum.DISABLE.getStatus().equals(channel.getStatus())) {
             throw exception(PayErrorCodeCoreConstants.PAY_CHANNEL_IS_DISABLE);
         }
-        return channel;
     }
 
 }

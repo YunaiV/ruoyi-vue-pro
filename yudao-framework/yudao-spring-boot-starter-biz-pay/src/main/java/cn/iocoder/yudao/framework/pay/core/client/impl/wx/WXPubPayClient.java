@@ -122,7 +122,6 @@ public class WXPubPayClient extends AbstractPayClient<WXPayClientConfig> {
         return client.createOrderV3(TradeTypeEnum.JSAPI, request);
     }
 
-
     private static String getOpenid(PayOrderUnifiedReqDTO reqDTO) {
         String openid = MapUtil.getStr(reqDTO.getChannelExtras(), "openid");
         if (StrUtil.isEmpty(openid)) {
@@ -136,8 +135,10 @@ public class WXPubPayClient extends AbstractPayClient<WXPayClientConfig> {
         WxPayOrderNotifyResult notifyResult = client.parseOrderNotifyResult(data);
         Assert.isTrue(Objects.equals(notifyResult.getResultCode(), "SUCCESS"), "支付结果非 SUCCESS");
         // 转换结果
-        return new PayOrderNotifyRespDTO(notifyResult.getOutTradeNo(), notifyResult.getTransactionId(),
-                DateUtil.parse(notifyResult.getTimeEnd(), "yyyyMMddHHmmss"), data);
+        return PayOrderNotifyRespDTO.builder().orderExtensionNo(notifyResult.getOutTradeNo())
+                .channelOrderNo(notifyResult.getTransactionId()).channelUserId(notifyResult.getOpenid())
+                .successTime(DateUtil.parse(notifyResult.getTimeEnd(), "yyyyMMddHHmmss"))
+                .data(data).build();
     }
 
 }

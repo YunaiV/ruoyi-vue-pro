@@ -10,10 +10,13 @@ import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.order.PayOrderDO;
 import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.order.PayOrderExtensionDO;
 import cn.iocoder.yudao.coreservice.modules.pay.dal.mysql.order.PayOrderCoreMapper;
 import cn.iocoder.yudao.coreservice.modules.pay.dal.mysql.order.PayOrderExtensionCoreMapper;
+import cn.iocoder.yudao.coreservice.modules.pay.enums.notify.PayNotifyTypeEnum;
 import cn.iocoder.yudao.coreservice.modules.pay.enums.order.PayOrderNotifyStatusEnum;
 import cn.iocoder.yudao.coreservice.modules.pay.enums.order.PayOrderStatusEnum;
 import cn.iocoder.yudao.coreservice.modules.pay.service.merchant.PayAppCoreService;
 import cn.iocoder.yudao.coreservice.modules.pay.service.merchant.PayChannelCoreService;
+import cn.iocoder.yudao.coreservice.modules.pay.service.notify.PayNotifyCoreService;
+import cn.iocoder.yudao.coreservice.modules.pay.service.notify.dto.PayNotifyTaskCreateReqDTO;
 import cn.iocoder.yudao.coreservice.modules.pay.service.order.PayOrderCoreService;
 import cn.iocoder.yudao.coreservice.modules.pay.service.order.dto.PayOrderCreateReqDTO;
 import cn.iocoder.yudao.coreservice.modules.pay.service.order.dto.PayOrderSubmitReqDTO;
@@ -27,6 +30,7 @@ import cn.iocoder.yudao.framework.pay.core.client.dto.PayOrderNotifyRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.PayOrderUnifiedReqDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
@@ -53,6 +57,8 @@ public class PayOrderCoreServiceImpl implements PayOrderCoreService {
     private PayAppCoreService payAppCoreService;
     @Resource
     private PayChannelCoreService payChannelCoreService;
+    @Resource
+    private PayNotifyCoreService payNotifyCoreService;
 
     @Resource
     private PayClientFactory payClientFactory;
@@ -129,7 +135,7 @@ public class PayOrderCoreServiceImpl implements PayOrderCoreService {
         // 调用三方接口
         PayOrderUnifiedReqDTO unifiedOrderReqDTO = PayOrderCoreConvert.INSTANCE.convert2(reqDTO);
         // 商户相关字段
-        unifiedOrderReqDTO.setMerchantOrderId(order.getMerchantOrderId())
+        unifiedOrderReqDTO.setMerchantOrderId(orderExtension.getNo()) // 注意，此处使用的是 PayOrderExtensionDO.no 属性！
                 .setSubject(order.getSubject()).setBody(order.getBody())
                 .setNotifyUrl(genChannelPayNotifyUrl(channel));
         // 订单相关字段
@@ -174,12 +180,13 @@ public class PayOrderCoreServiceImpl implements PayOrderCoreService {
     }
 
     @Override
+    @Transactional
     public void notifyPayOrder(Long channelId, String channelCode, String notifyData) throws Exception {
         // TODO 芋艿，记录回调日志
         log.info("[notifyPayOrder][channelId({}) 回调数据({})]", channelId, notifyData);
 
         // 校验支付渠道是否有效
-        PayChannelDO channel = payChannelCoreService.validPayChannel(channelId, channelCode);
+        PayChannelDO channel = payChannelCoreService.validPayChannel(channelId);
         // 校验支付客户端是否正确初始化
         PayClient client = payClientFactory.getPayClient(channel.getId());
         if (client == null) {
@@ -191,7 +198,7 @@ public class PayOrderCoreServiceImpl implements PayOrderCoreService {
 
         // TODO 芋艿，先最严格的校验。即使调用方重复调用，实际哪个订单已经被重复回调的支付，也返回 false 。也没问题，因为实际已经回调成功了。
         // 1.1 查询 PayOrderExtensionDO
-        PayOrderExtensionDO orderExtension = payOrderExtensionCoreMapper.selectByOrderExtensionNo(
+        PayOrderExtensionDO orderExtension = payOrderExtensionCoreMapper.selectByNo(
                 notifyRespDTO.getOrderExtensionNo());
         if (orderExtension == null) {
             throw exception(PAY_ORDER_EXTENSION_NOT_FOUND);
@@ -200,7 +207,7 @@ public class PayOrderCoreServiceImpl implements PayOrderCoreService {
             throw exception(PAY_ORDER_EXTENSION_STATUS_IS_NOT_WAITING);
         }
         // 1.2 更新 PayOrderExtensionDO
-        int updateCounts = payOrderExtensionCoreMapper.updateByIdAndStatus(orderExtension.getOrderId(),
+        int updateCounts = payOrderExtensionCoreMapper.updateByIdAndStatus(orderExtension.getId(),
                 PayOrderStatusEnum.WAITING.getStatus(), PayOrderExtensionDO.builder().id(orderExtension.getId())
                         .status(PayOrderStatusEnum.SUCCESS.getStatus()).channelNotifyData(notifyData).build());
         if (updateCounts == 0) { // 校验状态，必须是待支付
@@ -219,15 +226,17 @@ public class PayOrderCoreServiceImpl implements PayOrderCoreService {
         // 2.2 更新 PayOrderDO
         updateCounts = payOrderCoreMapper.updateByIdAndStatus(order.getId(), PayOrderStatusEnum.WAITING.getStatus(),
                 PayOrderDO.builder().status(PayOrderStatusEnum.SUCCESS.getStatus()).channelId(channelId).channelCode(channelCode)
-                        .successTime(notifyRespDTO.getSuccessTime()).notifyTime(new Date())
-                        .successExtensionId(orderExtension.getId()).build());
+                        .successTime(notifyRespDTO.getSuccessTime()).successExtensionId(orderExtension.getId())
+                        .channelOrderNo(notifyRespDTO.getChannelOrderNo()).channelUserId(notifyRespDTO.getChannelUserId())
+                        .notifyTime(new Date()).build());
         if (updateCounts == 0) { // 校验状态，必须是待支付
             throw exception(PAY_ORDER_STATUS_IS_NOT_WAITING);
         }
         log.info("[notifyPayOrder][支付订单({}) 更新为已支付]", order.getId());
 
         // 3. 插入支付通知记录
-//        payNotifyService.addPayTransactionNotifyTask(order, orderExtension);
+        payNotifyCoreService.createPayNotifyTask(PayNotifyTaskCreateReqDTO.builder()
+                .type(PayNotifyTypeEnum.ORDER.getType()).dataId(order.getId()).build());
     }
 
 }

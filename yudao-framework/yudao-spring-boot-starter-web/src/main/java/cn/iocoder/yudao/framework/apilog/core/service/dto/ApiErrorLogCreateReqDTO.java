@@ -13,7 +13,7 @@ import java.util.Date;
  */
 @Data
 @Accessors(chain = true)
-public class ApiErrorLogCreateDTO {
+public class ApiErrorLogCreateReqDTO {
 
     /**
      * 链路编号

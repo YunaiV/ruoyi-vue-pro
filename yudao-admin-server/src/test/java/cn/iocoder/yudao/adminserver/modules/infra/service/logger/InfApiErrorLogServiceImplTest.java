@@ -1,11 +1,9 @@
 package cn.iocoder.yudao.adminserver.modules.infra.service.logger;
 
-import cn.hutool.core.util.RandomUtil;
 import cn.iocoder.yudao.adminserver.BaseDbUnitTest;
 import cn.iocoder.yudao.coreservice.modules.infra.dal.dataobject.logger.InfApiErrorLogDO;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.apilog.core.service.dto.ApiErrorLogCreateDTO;
 import cn.iocoder.yudao.adminserver.modules.infra.controller.logger.vo.apierrorlog.InfApiErrorLogExportReqVO;
 import cn.iocoder.yudao.adminserver.modules.infra.controller.logger.vo.apierrorlog.InfApiErrorLogPageReqVO;
 import cn.iocoder.yudao.adminserver.modules.infra.dal.mysql.logger.InfApiErrorLogMapper;
@@ -19,7 +17,6 @@ import org.springframework.context.annotation.Import;
 import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.Future;
 
 import static cn.iocoder.yudao.adminserver.modules.infra.enums.InfErrorCodeConstants.API_ERROR_LOG_NOT_FOUND;
 import static cn.iocoder.yudao.adminserver.modules.infra.enums.InfErrorCodeConstants.API_ERROR_LOG_PROCESSED;

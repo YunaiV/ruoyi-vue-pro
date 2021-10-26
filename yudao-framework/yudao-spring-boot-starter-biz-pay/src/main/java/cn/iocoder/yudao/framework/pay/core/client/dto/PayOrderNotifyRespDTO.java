@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.framework.pay.core.client.dto;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -12,6 +13,7 @@ import java.util.Date;
  * @author 芋道源码
  */
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class PayOrderNotifyRespDTO {
@@ -21,11 +23,15 @@ public class PayOrderNotifyRespDTO {
      */
     private String orderExtensionNo;
     /**
-     * 支付渠道
+     * 支付渠道编号
      */
     private String channelOrderNo;
     /**
-     * 支付渠道
+     * 支付渠道用户编号
+     */
+    private String channelUserId;
+    /**
+     * 支付成功时间
      */
     private Date successTime;
 
