@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.social;
+package cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.social;
 
 import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.user.SysUserDO;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;

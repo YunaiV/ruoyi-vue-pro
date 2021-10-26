@@ -1,6 +1,6 @@
-package cn.iocoder.yudao.adminserver.modules.system.dal.mysql.social;
+package cn.iocoder.yudao.coreservice.modules.system.dal.mysql.social;
 
-import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.social.SysSocialUserDO;
+import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.social.SysSocialUserDO;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.apache.ibatis.annotations.Mapper;

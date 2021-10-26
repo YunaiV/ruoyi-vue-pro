@@ -1,25 +1,29 @@
 package cn.iocoder.yudao.userserver.modules.system.service.auth.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.iocoder.yudao.coreservice.modules.member.dal.dataobject.user.MbrUserDO;
+import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.social.SysSocialUserDO;
+import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.user.SysUserDO;
 import cn.iocoder.yudao.coreservice.modules.system.enums.logger.SysLoginLogTypeEnum;
 import cn.iocoder.yudao.coreservice.modules.system.enums.logger.SysLoginResultEnum;
 import cn.iocoder.yudao.coreservice.modules.system.service.auth.SysUserSessionCoreService;
 import cn.iocoder.yudao.coreservice.modules.system.service.logger.SysLoginLogCoreService;
 import cn.iocoder.yudao.coreservice.modules.system.service.logger.dto.SysLoginLogCreateReqDTO;
+import cn.iocoder.yudao.coreservice.modules.system.service.social.SysSocialService;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.util.monitor.TracerUtils;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.userserver.modules.member.service.user.MbrUserService;
-import cn.iocoder.yudao.userserver.modules.system.controller.auth.vo.SysAuthLoginReqVO;
-import cn.iocoder.yudao.userserver.modules.system.controller.auth.vo.SysAuthSmsLoginReqVO;
+import cn.iocoder.yudao.userserver.modules.system.controller.auth.vo.*;
 import cn.iocoder.yudao.userserver.modules.system.convert.auth.SysAuthConvert;
 import cn.iocoder.yudao.userserver.modules.system.enums.sms.SysSmsSceneEnum;
 import cn.iocoder.yudao.userserver.modules.system.service.auth.SysAuthService;
 import cn.iocoder.yudao.userserver.modules.system.service.sms.SysSmsCodeService;
 import lombok.extern.slf4j.Slf4j;
+import me.zhyd.oauth.model.AuthUser;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -33,6 +37,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
+import java.util.List;
 import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -59,6 +65,9 @@ public class SysAuthServiceImpl implements SysAuthService {
     private SysLoginLogCoreService loginLogCoreService;
     @Resource
     private SysUserSessionCoreService userSessionCoreService;
+    @Resource
+    private SysSocialService socialService;
+    private static final UserTypeEnum userTypeEnum = UserTypeEnum.MEMBER;
 
     @Override
     public UserDetails loadUserByUsername(String mobile) throws UsernameNotFoundException {
@@ -97,6 +106,65 @@ public class SysAuthServiceImpl implements SysAuthService {
 
         // 缓存登录用户到 Redis 中，返回 sessionId 编号
         return userSessionCoreService.createUserSession(loginUser, userIp, userAgent);
+    }
+
+    @Override
+    public String socialLogin(MbrAuthSocialLoginReqVO reqVO, String userIp, String userAgent) {
+        // 使用 code 授权码，进行登录
+        AuthUser authUser = socialService.getAuthUser(reqVO.getType(), reqVO.getCode(), reqVO.getState());
+        org.springframework.util.Assert.notNull(authUser, "授权用户不为空");
+
+        // 如果未绑定 SysSocialUserDO 用户，则无法自动登录，进行报错
+        String unionId = socialService.getAuthUserUnionId(authUser);
+        List<SysSocialUserDO> socialUsers = socialService.getAllSocialUserList(reqVO.getType(), unionId, userTypeEnum);
+        if (CollUtil.isEmpty(socialUsers)) {
+            throw exception(AUTH_THIRD_LOGIN_NOT_BIND);
+        }
+
+        // 自动登录
+        MbrUserDO user = userService.getUser(socialUsers.get(0).getUserId());
+        if (user == null) {
+            throw exception(USER_NOT_EXISTS);
+        }
+        this.createLoginLog(user.getMobile(), SysLoginLogTypeEnum.LOGIN_SOCIAL, SysLoginResultEnum.SUCCESS);
+
+        // 创建 LoginUser 对象
+        LoginUser loginUser = SysAuthConvert.INSTANCE.convert(user);
+        // TODO 芋艿：需要改造下，增加各种登录方式
+//        loginUser.setRoleIds(this.getUserRoleIds(loginUser.getId())); // 获取用户角色列表
+
+        // 绑定社交用户（更新）
+        socialService.bindSocialUser(loginUser.getId(), reqVO.getType(), authUser, userTypeEnum);
+
+        // 缓存登录用户到 Redis 中，返回 sessionId 编号
+        return userSessionCoreService.createUserSession(loginUser, userIp, userAgent);
+    }
+
+    @Override
+    public String socialLogin2(MbrAuthSocialLogin2ReqVO reqVO, String userIp, String userAgent) {
+        // 使用 code 授权码，进行登录
+        AuthUser authUser = socialService.getAuthUser(reqVO.getType(), reqVO.getCode(), reqVO.getState());
+        org.springframework.util.Assert.notNull(authUser, "授权用户不为空");
+
+        // 使用账号密码，进行登录。
+        LoginUser loginUser = this.login0(reqVO.getUsername(), reqVO.getPassword());
+//        loginUser.setRoleIds(this.getUserRoleIds(loginUser.getId())); // 获取用户角色列表
+
+        // 绑定社交用户（新增）
+        socialService.bindSocialUser(loginUser.getId(), reqVO.getType(), authUser, userTypeEnum);
+
+        // 缓存登录用户到 Redis 中，返回 sessionId 编号
+        return userSessionCoreService.createUserSession(loginUser, userIp, userAgent);
+    }
+
+    @Override
+    public void socialBind(Long userId, MbrAuthSocialBindReqVO reqVO) {
+        // 使用 code 授权码，进行登录
+        AuthUser authUser = socialService.getAuthUser(reqVO.getType(), reqVO.getCode(), reqVO.getState());
+        org.springframework.util.Assert.notNull(authUser, "授权用户不为空");
+
+        // 绑定社交用户（新增）
+        socialService.bindSocialUser(userId, reqVO.getType(), authUser, userTypeEnum);
     }
 
     private LoginUser login0(String username, String password) {
@@ -207,7 +275,7 @@ public class SysAuthServiceImpl implements SysAuthService {
         reqDTO.setLogType(SysLoginLogTypeEnum.LOGOUT_SELF.getType());
         reqDTO.setTraceId(TracerUtils.getTraceId());
         reqDTO.setUserId(userId);
-        reqDTO.setUserType(UserTypeEnum.MEMBER.getValue());
+        reqDTO.setUserType(userTypeEnum.getValue());
         reqDTO.setUsername(username);
         reqDTO.setUserAgent(ServletUtils.getUserAgent());
         reqDTO.setUserIp(ServletUtils.getClientIP());

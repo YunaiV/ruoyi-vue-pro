@@ -19,12 +19,5 @@ public interface SysRedisKeyConstants {
             "captcha_code:%s", // 参数为 uuid
             STRING, String.class, RedisKeyDefine.TimeoutTypeEnum.DYNAMIC);
 
-    RedisKeyDefine SOCIAL_AUTH_USER = new RedisKeyDefine("社交的授权用户",
-            "social_auth_user:%d:%s", // 参数为 type，code
-            STRING, AuthUser.class, Duration.ofDays(1));
-
-    RedisKeyDefine SOCIAL_AUTH_STATE = new RedisKeyDefine("社交的 state",
-            "social_auth_state:%s", // 参数为 state
-            STRING, String.class, Duration.ofHours(24)); // 值为 state
 
 }
