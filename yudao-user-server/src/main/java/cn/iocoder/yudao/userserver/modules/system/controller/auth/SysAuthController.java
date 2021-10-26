@@ -83,13 +83,14 @@ public class SysAuthController {
     }
 
     @GetMapping("/social-login-get")
-    @ApiOperation("社交登录，使用 code 授权码")
+    @ApiOperation("微信公众号授权回调地址，输出social-login2的必要参数用于测试，使用 code 授权码")
     @ResponseBody
     @Deprecated
     public CommonResult<MbrAuthSocialLoginReqVO> socialLoginGet(HttpServletRequest request,String code,String state) {
         // 返回结果
         MbrAuthSocialLoginReqVO reqVO = MbrAuthSocialLoginReqVO.builder().state(state).code(code).build();
         reqVO.setType(12);
+        //输出social-login2的必要参数用于测试
         System.out.println(JSON.toJSON(reqVO));
         return success(reqVO);
     }
