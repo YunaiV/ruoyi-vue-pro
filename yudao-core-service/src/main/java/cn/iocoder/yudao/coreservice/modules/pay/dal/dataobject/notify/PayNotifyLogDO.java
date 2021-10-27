@@ -3,9 +3,7 @@ package cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.notify;
 import cn.iocoder.yudao.coreservice.modules.pay.enums.notify.PayNotifyStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.experimental.Accessors;
+import lombok.*;
 
 /**
  * 商户支付、退款等的通知 Log
@@ -16,7 +14,9 @@ import lombok.experimental.Accessors;
 @TableName("pay_notify_log")
 @Data
 @EqualsAndHashCode(callSuper = true)
-@Accessors(chain = true)
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class PayNotifyLogDO extends BaseDO {
 
     /**
@@ -24,13 +24,15 @@ public class PayNotifyLogDO extends BaseDO {
      */
     private Long id;
     /**
-     * 通知编号
+     * 通知任务编号
      *
      * 关联 {@link PayNotifyTaskDO#getId()}
      */
-    private Long notifyId;
+    private Long taskId;
     /**
-     * 当前通知次数
+     * 第几次被通知
+     *
+     * 对应到 {@link PayNotifyTaskDO#getNotifyTimes()}
      */
     private Integer notifyTimes;
     /**
