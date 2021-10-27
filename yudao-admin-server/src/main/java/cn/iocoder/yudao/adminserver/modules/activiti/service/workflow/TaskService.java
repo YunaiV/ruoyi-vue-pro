@@ -20,4 +20,6 @@ public interface TaskService {
     TaskHandleVO getTaskSteps(TaskQueryReqVO taskQuery);
 
     List<TaskStepVO> getHistorySteps(String processInstanceId);
+
+    TodoTaskRespVO getTaskFormKey(TaskQueryReqVO taskQuery);
 }

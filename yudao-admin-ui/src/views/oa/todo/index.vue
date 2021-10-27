@@ -47,7 +47,7 @@
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" v-if="scope.row.status == 1"  @click="handleClaim(scope.row)">签收</el-button>
-          <el-button size="mini" type="text" icon="el-icon-edit" v-if="scope.row.status == 2"  @click="handleLeaveApprove(scope.row)">办理</el-button>
+          <el-button size="mini" type="text" icon="el-icon-edit" v-if="scope.row.status == 2"  @click="getTaskFormKey(scope.row)">办理</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -107,7 +107,7 @@
 </template>
 
 <script>
-import { completeTask, taskSteps, deleteLeave, getLeave, getTodoTaskPage, claimTask } from "@/api/oa/todo";
+import { completeTask, taskSteps, getTaskFormKey,deleteLeave, getLeave, getTodoTaskPage, claimTask } from "@/api/oa/todo";
 import { getDictDataLabel, getDictDatas, DICT_TYPE } from '@/utils/dict'
 export default {
   name: "Todo",
@@ -220,7 +220,26 @@ export default {
       this.resetForm("queryForm");
       this.handleQuery();
     },
-
+    getTaskFormKey(row) {
+      const taskId = row.id;
+      const data = {
+        taskId : taskId
+      }
+      getTaskFormKey(data).then(response => {
+        const resp = response.data;
+        const path = resp.formKey;
+        const taskId = resp.id;
+        const businessKey =  resp.businessKey;
+        const route = {
+          path: path,
+          query: {
+            businessKey: businessKey,
+            taskId:taskId
+          }
+        }
+        this.$router.replace(route);
+      });
+    },
     handleLeaveApprove(row) {
       this.reset();
       const businessKey = row.businessKey;

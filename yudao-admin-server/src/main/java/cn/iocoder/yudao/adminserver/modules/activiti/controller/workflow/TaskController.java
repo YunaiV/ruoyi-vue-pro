@@ -43,6 +43,11 @@ public class TaskController {
         return success( taskService.getTaskSteps(taskQuery));
     }
 
+    @PostMapping("/formKey")
+    public CommonResult<TodoTaskRespVO> getTaskFormKey(@RequestBody TaskQueryReqVO taskQuery) {
+        return success( taskService.getTaskFormKey(taskQuery));
+    }
+
     @PostMapping("/complete")
     public CommonResult<Boolean> complete(@RequestBody TaskReqVO taskReq) {
         taskService.completeTask(taskReq);

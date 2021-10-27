@@ -117,14 +117,14 @@ public class TaskServiceImpl implements TaskService {
                 .withVariables(taskReq.getVariables())
                 .build());
 
-        if(variables.containsValue(Boolean.FALSE)){
-            final String businessKey = task.getBusinessKey();
-            UpdateWrapper<OaLeaveDO> updateWrapper = new UpdateWrapper<>();
-            updateWrapper.eq("id", Long.valueOf(businessKey));
-            OaLeaveDO updateDo = new OaLeaveDO();
-            updateDo.setStatus(2);
-            leaveMapper.update(updateDo, updateWrapper);
-        }
+//        if(variables.containsValue(Boolean.FALSE)){
+//            final String businessKey = task.getBusinessKey();
+//            UpdateWrapper<OaLeaveDO> updateWrapper = new UpdateWrapper<>();
+//            updateWrapper.eq("id", Long.valueOf(businessKey));
+//            OaLeaveDO updateDo = new OaLeaveDO();
+//            updateDo.setStatus(2);
+//            leaveMapper.update(updateDo, updateWrapper);
+//        }
 
     }
 
@@ -152,19 +152,19 @@ public class TaskServiceImpl implements TaskService {
     public TaskHandleVO getTaskSteps(TaskQueryReqVO taskQuery) {
         TaskHandleVO handleVO = new TaskHandleVO();
 
-        String processKey = taskQuery.getProcessKey();
-        if ("leave".equals(processKey)) {
-            String businessKey = taskQuery.getBusinessKey();
-            final OaLeaveDO leave = leaveMapper.selectById(Long.valueOf(businessKey));
-            handleVO.setFormObject( OaLeaveConvert.INSTANCE.convert(leave));
-        }
+//        String processKey = taskQuery.getProcessKey();
+//        if ("leave".equals(processKey)) {
+//            String businessKey = taskQuery.getBusinessKey();
+//            final OaLeaveDO leave = leaveMapper.selectById(Long.valueOf(businessKey));
+//            handleVO.setFormObject( OaLeaveConvert.INSTANCE.convert(leave));
+//        }
 
+//
+//        final String taskDefKey = task.getTaskDefinitionKey();
+//        final String variableName = Optional.ofNullable(taskVariable.get(taskDefKey)).orElse("");
+//        handleVO.setTaskVariable(variableName);
         final Task task = taskRuntime.task(taskQuery.getTaskId());
-        final String taskDefKey = task.getTaskDefinitionKey();
-        final String variableName = Optional.ofNullable(taskVariable.get(taskDefKey)).orElse("");
 
-
-        handleVO.setTaskVariable(variableName);
         List<TaskStepVO> steps = getTaskSteps(task.getProcessInstanceId());
 
         handleVO.setHistoryTask(steps);
@@ -189,6 +189,7 @@ public class TaskServiceImpl implements TaskService {
             step.setStartTime(instance.getStartTime());
             step.setEndTime(instance.getEndTime());
             step.setAssignee(instance.getAssignee());
+            step.setStatus(1);
             final List<Comment> comments = activitiTaskService.getTaskComments(instance.getTaskId());
             if(comments.size()>0){
                 step.setComment(comments.get(0).getFullMessage());
@@ -204,15 +205,14 @@ public class TaskServiceImpl implements TaskService {
                 .activityType("userTask")
                 .unfinished().list();
 
-        if(unfinished.size()>0) {
-
-            final HistoricActivityInstance unFinishedActiviti = unfinished.get(0);
+        for (HistoricActivityInstance instance : unfinished) {
             TaskStepVO step = new TaskStepVO();
-            step.setStepName(unFinishedActiviti.getActivityName());
-            step.setStartTime(unFinishedActiviti.getStartTime());
-            step.setEndTime(unFinishedActiviti.getEndTime());
-            step.setAssignee(Optional.ofNullable(unFinishedActiviti.getAssignee()).orElse(""));
+            step.setStepName(instance.getActivityName());
+            step.setStartTime(instance.getStartTime());
+            step.setEndTime(instance.getEndTime());
+            step.setAssignee(Optional.ofNullable(instance.getAssignee()).orElse(""));
             step.setComment("");
+            step.setStatus(0);
             steps.add(step);
         }
         return steps;
@@ -225,6 +225,15 @@ public class TaskServiceImpl implements TaskService {
         return getTaskSteps(processInstanceId);
     }
 
+    @Override
+    public TodoTaskRespVO getTaskFormKey(TaskQueryReqVO taskQuery) {
+        final Task task = taskRuntime.task(taskQuery.getTaskId());
+        TodoTaskRespVO respVO = new TodoTaskRespVO();
+        respVO.setFormKey(task.getFormKey());
+        respVO.setBusinessKey(task.getBusinessKey());
+        respVO.setId(task.getId());
+        return respVO;
+    }
 
 
 //    private List<String> getHighLightedFlows(ProcessDefinitionEntity processDefinition, String processInstanceId) {

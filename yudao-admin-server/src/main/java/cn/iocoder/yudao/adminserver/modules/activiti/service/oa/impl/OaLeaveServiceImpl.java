@@ -2,6 +2,9 @@ package cn.iocoder.yudao.adminserver.modules.activiti.service.oa.impl;
 
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import org.activiti.api.task.model.Task;
+import org.activiti.api.task.model.builders.TaskPayloadBuilder;
+import org.activiti.api.task.runtime.TaskRuntime;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +41,12 @@ public class OaLeaveServiceImpl implements OaLeaveService {
     @Resource
     private RuntimeService runtimeService;
 
+    @Resource
+    private org.activiti.engine.TaskService activitiTaskService;
+
+    @Resource
+    private TaskRuntime taskRuntime;
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Long createLeave(OaLeaveCreateReqVO createReqVO) {
@@ -52,7 +61,7 @@ public class OaLeaveServiceImpl implements OaLeaveService {
         variables.put("deptLeader", "admin");
         final Long id = leave.getId();
         String businessKey = String.valueOf(id);
-        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("leave", businessKey, variables);
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(createReqVO.getProcessKey(), businessKey, variables);
 
         final String processInstanceId = processInstance.getProcessInstanceId();
 
@@ -67,12 +76,29 @@ public class OaLeaveServiceImpl implements OaLeaveService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void updateLeave(OaLeaveUpdateReqVO updateReqVO) {
+
         // 校验存在
         this.validateLeaveExists(updateReqVO.getId());
-        // 更新
-        OaLeaveDO updateObj = OaLeaveConvert.INSTANCE.convert(updateReqVO);
-        leaveMapper.updateById(updateObj);
+
+        final Task task = taskRuntime.task(updateReqVO.getTaskId());
+        activitiTaskService.addComment(task.getId(), task.getProcessInstanceId(), updateReqVO.getComment());
+        Map<String, Object> variables = updateReqVO.getVariables();
+
+        //如何得到部门领导人， 暂时写死
+        variables.put("deptLeader", "admin");
+        taskRuntime.complete(TaskPayloadBuilder.complete().withTaskId(task.getId())
+                .withVariables(variables)
+                .build());
+        final Object reApply = variables.get("reApply");
+        if((reApply instanceof Boolean) && (Boolean)reApply){
+            // 更新 表单
+            OaLeaveDO updateObj = OaLeaveConvert.INSTANCE.convert(updateReqVO);
+            leaveMapper.updateById(updateObj);
+        }
+
+
     }
 
     @Override
