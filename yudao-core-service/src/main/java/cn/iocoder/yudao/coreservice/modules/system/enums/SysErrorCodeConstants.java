@@ -17,4 +17,5 @@ public interface SysErrorCodeConstants {
     // ========= 文件相关 1006001000=================
     ErrorCode FILE_PATH_EXISTS = new ErrorCode(1006001000, "文件路径已存在");
     ErrorCode FILE_NOT_EXISTS = new ErrorCode(1006001002, "文件不存在");
+
 }
