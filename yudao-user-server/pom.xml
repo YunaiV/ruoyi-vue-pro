@@ -12,7 +12,7 @@
     <artifactId>yudao-user-server</artifactId>
     <packaging>jar</packaging>
 
-    <name>yudao-admin-server</name>
+    <name>yudao-user-server</name>
     <description>用户前台 Server，提供其 API 接口</description>
     <url>https://github.com/YunaiV/ruoyi-vue-pro</url>
 
