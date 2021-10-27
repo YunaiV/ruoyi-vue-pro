@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.adminserver.modules.infra.framework.file.config;
+package cn.iocoder.yudao.coreservice.modules.infra.framework.file.config;
 
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;

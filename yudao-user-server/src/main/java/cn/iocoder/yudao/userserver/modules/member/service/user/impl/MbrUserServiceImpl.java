@@ -1,17 +1,25 @@
 package cn.iocoder.yudao.userserver.modules.member.service.user.impl;
 
+import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.IdUtil;
+import cn.iocoder.yudao.coreservice.modules.infra.service.file.InfFileCoreService;
 import cn.iocoder.yudao.coreservice.modules.member.dal.dataobject.user.MbrUserDO;
+import cn.iocoder.yudao.userserver.modules.member.controller.user.vo.MbrUserInfoRespVO;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.userserver.modules.member.dal.mysql.user.MbrUserMapper;
 import cn.iocoder.yudao.userserver.modules.member.service.user.MbrUserService;
+import com.google.common.annotations.VisibleForTesting;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
+import java.io.InputStream;
 import java.util.Date;
+
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.userserver.modules.member.enums.MbrErrorCodeConstants.USER_NOT_EXISTS;
 
 /**
  * User Service 实现类
@@ -25,6 +33,9 @@ public class MbrUserServiceImpl implements MbrUserService {
 
     @Resource
     private MbrUserMapper userMapper;
+
+    @Resource
+    private InfFileCoreService fileCoreService;
 
     @Resource
     private PasswordEncoder passwordEncoder;
@@ -68,4 +79,52 @@ public class MbrUserServiceImpl implements MbrUserService {
         return userMapper.selectById(id);
     }
 
+    @Override
+    public void updateNickname(Long userId, String nickName) {
+        MbrUserDO user = this.checkUserExists(userId);
+        // 仅当新昵称不等于旧昵称时进行修改
+        if (nickName.equals(user.getNickname())){
+            return;
+        }
+        MbrUserDO userDO = new MbrUserDO();
+        userDO.setId(user.getId());
+        userDO.setNickname(nickName);
+        userMapper.updateById(userDO);
+    }
+
+    @Override
+    public String updateAvatar(Long userId, InputStream avatarFile) {
+        this.checkUserExists(userId);
+        // 创建文件
+        String avatar = fileCoreService.createFile(IdUtil.fastUUID(), IoUtil.readBytes(avatarFile));
+        // 更新头像路径
+        MbrUserDO userDO = MbrUserDO.builder()
+                .id(userId)
+                .avatar(avatar)
+                .build();
+        userMapper.updateById(userDO);
+        return avatar;
+    }
+
+    @Override
+    public MbrUserInfoRespVO getUserInfo(Long userId) {
+        MbrUserDO user = this.checkUserExists(userId);
+        MbrUserInfoRespVO userResp = new MbrUserInfoRespVO();
+        userResp.setNickName(user.getNickname());
+        userResp.setAvatar(user.getAvatar());
+        return userResp;
+    }
+
+    @VisibleForTesting
+    public MbrUserDO checkUserExists(Long id) {
+        if (id == null) {
+            return null;
+        }
+        MbrUserDO user = userMapper.selectById(id);
+        if (user == null) {
+            throw exception(USER_NOT_EXISTS);
+        }else{
+            return user;
+        }
+    }
 }
