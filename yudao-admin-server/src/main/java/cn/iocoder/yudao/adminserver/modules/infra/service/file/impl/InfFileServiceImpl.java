@@ -21,24 +21,6 @@ public class InfFileServiceImpl implements InfFileService {
     @Resource
     private InfFileMapper fileMapper;
 
-    @Resource
-    private InfFileCoreService fileCoreService;
-
-    @Override
-    public String createFile(String path, byte[] content) {
-        return fileCoreService.createFile(path,content);
-    }
-
-    @Override
-    public void deleteFile(String id) {
-        fileCoreService.deleteFile(id);
-    }
-
-    @Override
-    public InfFileDO getFile(String path) {
-        return fileCoreService.getFile(path);
-    }
-
     @Override
     public PageResult<InfFileDO> getFilePage(InfFilePageReqVO pageReqVO) {
         return fileMapper.selectPage(pageReqVO);

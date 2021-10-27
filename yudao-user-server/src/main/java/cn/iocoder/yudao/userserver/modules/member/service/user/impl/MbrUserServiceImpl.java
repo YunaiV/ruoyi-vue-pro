@@ -109,6 +109,7 @@ public class MbrUserServiceImpl implements MbrUserService {
     @Override
     public MbrUserInfoRespVO getUserInfo(Long userId) {
         MbrUserDO user = this.checkUserExists(userId);
+        // 拼接返回结果
         MbrUserInfoRespVO userResp = new MbrUserInfoRespVO();
         userResp.setNickName(user.getNickname());
         userResp.setAvatar(user.getAvatar());

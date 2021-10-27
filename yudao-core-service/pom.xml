@@ -5,7 +5,7 @@
     <parent>
         <artifactId>yudao</artifactId>
         <groupId>cn.iocoder.boot</groupId>
-        <version>1.1.0-snapshot</version>
+        <version>1.2.0-snapshot</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 

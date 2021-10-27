@@ -55,5 +55,6 @@ public class SysUserProfileController {
     public CommonResult<MbrUserInfoRespVO> getUserInfo() {
         return success(userService.getUserInfo(getLoginUserId()));
     }
+
 }
 

@@ -5,6 +5,7 @@ import cn.iocoder.yudao.adminserver.modules.infra.service.file.InfFileService;
 import cn.iocoder.yudao.adminserver.modules.infra.controller.file.vo.InfFilePageReqVO;
 import cn.iocoder.yudao.coreservice.modules.infra.controller.file.vo.InfFileRespVO;
 import cn.iocoder.yudao.coreservice.modules.infra.dal.dataobject.file.InfFileDO;
+import cn.iocoder.yudao.coreservice.modules.infra.service.file.InfFileCoreService;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.adminserver.modules.infra.convert.file.InfFileConvert;
@@ -36,6 +37,8 @@ public class InfFileController {
 
     @Resource
     private InfFileService fileService;
+    @Resource
+    private InfFileCoreService fileCoreService;
 
     @PostMapping("/upload")
     @ApiOperation("上传文件")
@@ -45,7 +48,7 @@ public class InfFileController {
     })
     public CommonResult<String> uploadFile(@RequestParam("file") MultipartFile file,
                                            @RequestParam("path") String path) throws IOException {
-        return success(fileService.createFile(path, IoUtil.readBytes(file.getInputStream())));
+        return success(fileCoreService.createFile(path, IoUtil.readBytes(file.getInputStream())));
     }
 
     @DeleteMapping("/delete")
@@ -53,7 +56,7 @@ public class InfFileController {
     @ApiImplicitParam(name = "id", value = "编号", required = true)
     @PreAuthorize("@ss.hasPermission('infra:file:delete')")
     public CommonResult<Boolean> deleteFile(@RequestParam("id") String id) {
-        fileService.deleteFile(id);
+        fileCoreService.deleteFile(id);
         return success(true);
     }
 
@@ -61,7 +64,7 @@ public class InfFileController {
     @ApiOperation("下载文件")
     @ApiImplicitParam(name = "path", value = "文件附件", required = true, dataTypeClass = MultipartFile.class)
     public void getFile(HttpServletResponse response, @PathVariable("path") String path) throws IOException {
-        InfFileDO file = fileService.getFile(path);
+        InfFileDO file = fileCoreService.getFile(path);
         if (file == null) {
             log.warn("[getFile][path({}) 文件不存在]", path);
             response.setStatus(HttpStatus.NOT_FOUND.value());
