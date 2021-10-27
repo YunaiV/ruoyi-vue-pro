@@ -6,6 +6,8 @@ import java.util.Date;
 
 /**
  * 时间工具类
+ *
+ * @author 芋道源码
  */
 public class DateUtils {
 
@@ -13,6 +15,11 @@ public class DateUtils {
      * 时区 - 默认
      */
     public static final String TIME_ZONE_DEFAULT = "GMT+8";
+
+    /**
+     * 秒转换成毫秒
+     */
+    public static final long SECOND_MILLIS = 1000;
 
     public static final String FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND = "yyyy-MM-dd HH:mm:ss";
 
@@ -72,6 +79,14 @@ public class DateUtils {
             return a;
         }
         return a.compareTo(b) > 0 ? a : b;
+    }
+
+    public static boolean beforeNow(Date date) {
+        return date.getTime() < System.currentTimeMillis();
+    }
+
+    public static boolean afterNow(Date date) {
+        return date.getTime() >= System.currentTimeMillis();
     }
 
 }

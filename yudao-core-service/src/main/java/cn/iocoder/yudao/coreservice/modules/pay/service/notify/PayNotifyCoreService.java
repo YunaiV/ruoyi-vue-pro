@@ -22,7 +22,8 @@ public interface PayNotifyCoreService {
      * 执行支付通知
      *
      * 注意，该方法提供给定时任务调用。目前是 yudao-admin-server 进行调用
+     * @return 通知数量
      */
-    void executeNotify();
+    int executeNotify() throws InterruptedException;
 
 }

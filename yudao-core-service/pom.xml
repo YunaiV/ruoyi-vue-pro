@@ -77,6 +77,12 @@
             <artifactId>yudao-spring-boot-starter-mq</artifactId>
         </dependency>
 
+        <!-- 服务保障相关 -->
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-spring-boot-starter-protection</artifactId>
+        </dependency>
+
         <!-- Test 测试相关 -->
         <dependency>
             <groupId>cn.iocoder.boot</groupId>

@@ -34,15 +34,11 @@ public class PayNotifyLogDO extends BaseDO {
      */
     private Integer notifyTimes;
     /**
-     * 请求参数
-     */
-    private String request;
-    /**
-     * 响应结果
+     * HTTP 响应结果
      */
     private String response;
     /**
-     * 状态
+     * 支付通知状态
      *
      * 外键 {@link PayNotifyStatusEnum}
      */

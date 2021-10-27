@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.userserver.modules.shop.controller;
 
+import cn.iocoder.yudao.coreservice.modules.pay.service.notify.vo.PayNotifyOrderReqVO;
 import cn.iocoder.yudao.coreservice.modules.pay.service.order.PayOrderCoreService;
 import cn.iocoder.yudao.coreservice.modules.pay.service.order.dto.PayOrderCreateReqDTO;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
@@ -10,10 +11,12 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
 import java.time.Duration;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -50,6 +53,13 @@ public class ShopOrderController {
         // 拼接返回
         return success(ShopOrderCreateRespVO.builder().id(shopOrderId)
                 .payOrderId(payOrderId).build());
+    }
+
+    @PostMapping("/pay-notify")
+    @ApiOperation("支付回调")
+    public CommonResult<Boolean> payNotify(@RequestBody @Valid PayNotifyOrderReqVO reqVO) {
+        log.info("[payNotify][回调成功]");
+        return success(true);
     }
 
 }
