@@ -15,6 +15,7 @@ import java.util.List;
  *
  * @author 芋道源码
  */
+// TODO @timfruit：SysSocialCoreService 改名，方便区分
 public interface SysSocialService {
 
     /**
@@ -77,5 +78,6 @@ public interface SysSocialService {
      * @param unionId 社交平台的 unionId
      */
     void unbindSocialUser(Long userId, Integer type, String unionId,UserTypeEnum userTypeEnum);
+    // TODO @timfruit：逗号后面要有空格；缺少了 @userTypeEnum 的注释，都补充下哈。
 
 }

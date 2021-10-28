@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.Mapper;
 import java.util.Collection;
 import java.util.List;
 
+// TODO @timfruit：SysSocialUserCoreMapper 改名，方便区分
 @Mapper
 public interface SysSocialUserMapper extends BaseMapperX<SysSocialUserDO> {
 

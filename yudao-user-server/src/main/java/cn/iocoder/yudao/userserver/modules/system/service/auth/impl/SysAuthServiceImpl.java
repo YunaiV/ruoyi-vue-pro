@@ -4,7 +4,6 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.iocoder.yudao.coreservice.modules.member.dal.dataobject.user.MbrUserDO;
 import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.social.SysSocialUserDO;
-import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.user.SysUserDO;
 import cn.iocoder.yudao.coreservice.modules.system.enums.logger.SysLoginLogTypeEnum;
 import cn.iocoder.yudao.coreservice.modules.system.enums.logger.SysLoginResultEnum;
 import cn.iocoder.yudao.coreservice.modules.system.service.auth.SysUserSessionCoreService;
@@ -37,7 +36,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import javax.validation.Valid;
 import java.util.List;
 import java.util.Objects;
 
@@ -130,8 +128,6 @@ public class SysAuthServiceImpl implements SysAuthService {
 
         // 创建 LoginUser 对象
         LoginUser loginUser = SysAuthConvert.INSTANCE.convert(user);
-        // TODO 芋艿：需要改造下，增加各种登录方式
-//        loginUser.setRoleIds(this.getUserRoleIds(loginUser.getId())); // 获取用户角色列表
 
         // 绑定社交用户（更新）
         socialService.bindSocialUser(loginUser.getId(), reqVO.getType(), authUser, userTypeEnum);

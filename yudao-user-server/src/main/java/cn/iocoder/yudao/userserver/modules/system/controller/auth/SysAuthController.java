@@ -3,7 +3,6 @@ package cn.iocoder.yudao.userserver.modules.system.controller.auth;
 import cn.iocoder.yudao.coreservice.modules.system.service.social.SysSocialService;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.userserver.modules.system.controller.auth.vo.*;
 import cn.iocoder.yudao.userserver.modules.system.service.auth.SysAuthService;
 import cn.iocoder.yudao.userserver.modules.system.service.sms.SysSmsCodeService;
@@ -82,6 +81,7 @@ public class SysAuthController {
         return CommonResult.success(socialService.getAuthorizeUrl(type, redirectUri));
     }
 
+    // TODO @timfruit：这个接口，是要删除的么？
     @GetMapping("/social-login-get")
     @ApiOperation("微信公众号授权回调地址，输出social-login2的必要参数用于测试，使用 code 授权码")
     @ResponseBody

@@ -21,6 +21,7 @@ public enum SysSocialTypeEnum implements IntArrayValuable {
     GITEE(10, "GITEE"), // https://gitee.com/api/v5/oauth_doc#/
     DINGTALK(20, "DINGTALK"), // https://developers.dingtalk.com/document/app/obtain-identity-credentials
     WECHAT_ENTERPRISE(30, "WECHAT_ENTERPRISE"), // https://xkcoding.com/2019/08/06/use-justauth-integration-wechat-enterprise.html
+    // TODO @timfruit：微信平台，从 30 开始递增哈。另外，尽量不要出现，先 12，然后 11，有序，嘿嘿。
     /**
      * 微信公众平台 - H5
      */

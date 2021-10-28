@@ -75,6 +75,7 @@ public class SysAuthServiceImpl implements SysAuthService {
     @Resource
     private SysSocialService socialService;
 
+    // TODO @timfruit：静态枚举类，需要都大写，例如说 USER_TYPE_ENUM；静态变量，放在普通变量前面；这个实践不错哈。
     private static final UserTypeEnum userTypeEnum = UserTypeEnum.ADMIN;
 
     @Override
@@ -214,7 +215,6 @@ public class SysAuthServiceImpl implements SysAuthService {
 
         // 创建 LoginUser 对象
         LoginUser loginUser = SysAuthConvert.INSTANCE.convert(user);
-        // TODO 芋艿：需要改造下，增加各种登录方式
         loginUser.setRoleIds(this.getUserRoleIds(loginUser.getId())); // 获取用户角色列表
 
         // 绑定社交用户（更新）
