@@ -1,7 +1,10 @@
 package cn.iocoder.yudao.userserver.modules.member.service.user;
 
 import cn.iocoder.yudao.coreservice.modules.member.dal.dataobject.user.MbrUserDO;
+import cn.iocoder.yudao.userserver.modules.member.controller.user.vo.MbrUserInfoRespVO;
 import cn.iocoder.yudao.framework.common.validation.Mobile;
+
+import java.io.InputStream;
 
 /**
  * 前台用户 Service 接口
@@ -43,5 +46,27 @@ public interface MbrUserService {
      * @return 用户对象信息
      */
     MbrUserDO getUser(Long id);
+
+    /**
+     * 修改用户昵称
+     * @param userId 用户id
+     * @param nickName 用户新昵称
+     */
+    void updateNickname(Long userId, String nickName);
+
+    /**
+     * 修改用户头像
+     * @param userId 用户id
+     * @param inputStream 头像文件
+     * @return 头像url
+     */
+    String updateAvatar(Long userId, InputStream inputStream);
+
+    /**
+     * 根据用户id，获取用户头像与昵称
+     * @param userId 用户id
+     * @return 用户响应实体类
+     */
+    MbrUserInfoRespVO getUserInfo(Long userId);
 
 }

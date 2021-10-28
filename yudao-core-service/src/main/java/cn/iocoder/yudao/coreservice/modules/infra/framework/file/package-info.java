@@ -13,4 +13,4 @@
  * 综合考虑，暂时使用方案 3 的方式，比较适合这样一个 all in one 的项目。
  * 随着文件的量级大了之后，还是推荐采用云服务。
  */
-package cn.iocoder.yudao.adminserver.modules.infra.framework.file;
+package cn.iocoder.yudao.coreservice.modules.infra.framework.file;

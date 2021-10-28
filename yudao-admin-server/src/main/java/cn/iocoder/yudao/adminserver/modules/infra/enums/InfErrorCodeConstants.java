@@ -27,7 +27,4 @@ public interface InfErrorCodeConstants {
     ErrorCode API_ERROR_LOG_NOT_FOUND = new ErrorCode(1001002000, "API 错误日志不存在");
     ErrorCode API_ERROR_LOG_PROCESSED = new ErrorCode(1001002001, "API 错误日志已处理");
 
-    // ========== 文件 1001003000 ==========
-    ErrorCode FILE_NOT_EXISTS = new ErrorCode(1001003000, "文件不存在");
-
 }

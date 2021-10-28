@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.adminserver.modules.system.enums;
 
 import cn.iocoder.yudao.framework.common.exception.ErrorCode;
-import javafx.beans.binding.MapExpression;
 
 /**
  * System 错误码枚举类
