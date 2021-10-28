@@ -102,6 +102,8 @@ public class SysAuthController {
         return success(SysAuthLoginRespVO.builder().token(token).build());
     }
 
+    // TODO @timfruit：社交登陆时，使用手机验证码来验证哈。这块我当时没设计好，改改，嘿嘿。
+
     @PostMapping("/social-login2")
     @ApiOperation("社交登录，使用 code 授权码 + 账号密码")
     public CommonResult<SysAuthLoginRespVO> socialLogin2(@RequestBody @Valid MbrAuthSocialLogin2ReqVO reqVO) {
