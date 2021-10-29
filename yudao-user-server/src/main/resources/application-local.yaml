@@ -158,10 +158,19 @@ justauth:
       client-secret: 1wTb7hYxnpT2TUbIeHGXGo7T0odav1ic10mLdyyATOw
       agent-id: 1000004
       ignore-check-redirect-uri: true
-    WECHAT_MP: # 微信公众平台 - H5  https://mp.weixin.qq.com/debug/cgi-bin/sandboxinfo?action=showinfo&t=sandbox/index
+    WECHAT_MP: # 微信公众平台 - 移动端H5  https://mp.weixin.qq.com/debug/cgi-bin/sandboxinfo?action=showinfo&t=sandbox/index
       client-id: wxa5a05b85ac361f96
       client-secret: 247073c7cebb67f27f0e769195c2a57e
       ignore-check-redirect-uri: true
+  extend:
+    enum-class: cn.iocoder.yudao.coreservice.modules.system.compent.justauth.AuthExtendSource
+    config:
+      WECHAT_MINI_PROGRAM: # 微信小程序 扩展
+        request-class: cn.iocoder.yudao.coreservice.modules.system.compent.justauth.AuthWeChatMiniProgramRequest
+        client-id: wx44d047d87e6284d8
+        client-secret: 21c3b7a8a51ee1b8f5cf875848ed4466
+        ignore-check-redirect-uri: true
+        ignore-check-state: true
   cache:
     type: REDIS
     prefix: 'social_auth_state:' # 缓存前缀，目前只对 Redis 缓存生效，默认 JUSTAUTH::STATE::
