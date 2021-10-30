@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.adminserver.modules.system.enums;
 
 import cn.iocoder.yudao.framework.common.exception.ErrorCode;
-import javafx.beans.binding.MapExpression;
 
 /**
  * System 错误码枚举类
@@ -90,8 +89,6 @@ public interface SysErrorCodeConstants {
     ErrorCode ERROR_CODE_NOT_EXISTS = new ErrorCode(1002013000, "错误码不存在");
     ErrorCode ERROR_CODE_DUPLICATE = new ErrorCode(1002013001, "已经存在编码为【{}】的错误码");
 
-    // ========== 社交模块 1002014000 ==========
-    ErrorCode SOCIAL_AUTH_FAILURE = new ErrorCode(1002014000, "社交授权失败，原因是：{}");
-    ErrorCode SOCIAL_UNBIND_NOT_SELF = new ErrorCode(1002014001, "社交解绑失败，非当前用户绑定");
+
 
 }

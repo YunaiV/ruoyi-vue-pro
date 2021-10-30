@@ -1,11 +1,11 @@
 package cn.iocoder.yudao.adminserver.modules.system.service.social;
 
 import cn.iocoder.yudao.adminserver.BaseDbAndRedisUnitTest;
-import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.social.SysSocialUserDO;
-import cn.iocoder.yudao.adminserver.modules.system.dal.mysql.social.SysSocialUserMapper;
-import cn.iocoder.yudao.adminserver.modules.system.dal.redis.social.SysSocialAuthUserRedisDAO;
-import cn.iocoder.yudao.adminserver.modules.system.enums.social.SysSocialTypeEnum;
-import cn.iocoder.yudao.adminserver.modules.system.service.social.impl.SysSocialServiceImpl;
+import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.social.SysSocialUserDO;
+import cn.iocoder.yudao.coreservice.modules.system.dal.mysql.social.SysSocialUserMapper;
+import cn.iocoder.yudao.coreservice.modules.system.dal.redis.social.SysSocialAuthUserRedisDAO;
+import cn.iocoder.yudao.coreservice.modules.system.enums.social.SysSocialTypeEnum;
+import cn.iocoder.yudao.coreservice.modules.system.service.social.impl.SysSocialServiceImpl;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import com.xkcoding.justauth.AuthRequestFactory;
 import me.zhyd.oauth.model.AuthUser;
@@ -23,6 +23,7 @@ import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomLongId
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+// TODO @timfruit：这个单元测试，挪到 yudao-core-service
 /**
  * {@link SysSocialServiceImpl} 的单元测试类
  *
@@ -53,7 +54,7 @@ public class SysSocialServiceTest extends BaseDbAndRedisUnitTest {
         // mock 方法
 
         // 调用
-        socialService.bindSocialUser(userId, type, authUser);
+        socialService.bindSocialUser(userId, type, authUser, UserTypeEnum.ADMIN);
         // 断言
         List<SysSocialUserDO> socialUsers = socialUserMapper.selectList("user_id", userId);
         assertEquals(1, socialUsers.size());
@@ -78,7 +79,7 @@ public class SysSocialServiceTest extends BaseDbAndRedisUnitTest {
         // mock 方法
 
         // 调用
-        socialService.bindSocialUser(userId, type, authUser);
+        socialService.bindSocialUser(userId, type, authUser, UserTypeEnum.ADMIN);
         // 断言
         List<SysSocialUserDO> socialUsers = socialUserMapper.selectList("user_id", userId);
         assertEquals(1, socialUsers.size());
@@ -103,7 +104,7 @@ public class SysSocialServiceTest extends BaseDbAndRedisUnitTest {
         // mock 方法
 
         // 调用
-        socialService.bindSocialUser(userId, type, authUser);
+        socialService.bindSocialUser(userId, type, authUser, UserTypeEnum.ADMIN);
         // 断言
         List<SysSocialUserDO> socialUsers = socialUserMapper.selectList("user_id", userId);
         assertEquals(1, socialUsers.size());
@@ -140,7 +141,7 @@ public class SysSocialServiceTest extends BaseDbAndRedisUnitTest {
         String newUnionId = oldSocialUser.getUnionId();
 
         // 调用
-        socialService.unbindOldSocialUser(userId, type, newUnionId);
+        socialService.unbindOldSocialUser(userId, type, newUnionId, UserTypeEnum.ADMIN);
         // 断言
         assertEquals(1L, socialUserMapper.selectCount(null).longValue());
     }
@@ -163,7 +164,7 @@ public class SysSocialServiceTest extends BaseDbAndRedisUnitTest {
         String newUnionId = randomString(10);
 
         // 调用
-        socialService.unbindOldSocialUser(userId, type, newUnionId);
+        socialService.unbindOldSocialUser(userId, type, newUnionId, UserTypeEnum.ADMIN);
         // 断言
         assertEquals(0L, socialUserMapper.selectCount(null).longValue());
     }

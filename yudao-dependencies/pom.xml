@@ -14,7 +14,7 @@
     <url>https://github.com/YunaiV/ruoyi-vue-pro</url>
 
     <properties>
-        <revision>1.1.0-snapshot</revision>
+        <revision>1.2.0-snapshot</revision>
         <!-- 统一依赖管理 -->
         <spring.boot.version>2.4.5</spring.boot.version>
         <!-- Web 相关 -->
@@ -52,6 +52,7 @@
         <aliyun-java-sdk-core.version>4.5.25</aliyun-java-sdk-core.version>
         <aliyun-java-sdk-dysmsapi.version>2.1.0</aliyun-java-sdk-dysmsapi.version>
         <yunpian-java-sdk.version>1.2.7</yunpian-java-sdk.version>
+        <justauth.version>1.4.0</justauth.version>
     </properties>
 
     <dependencyManagement>
@@ -90,6 +91,16 @@
             <dependency>
                 <groupId>cn.iocoder.boot</groupId>
                 <artifactId>yudao-spring-boot-starter-biz-sms</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.iocoder.boot</groupId>
+                <artifactId>yudao-spring-boot-starter-biz-pay</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.iocoder.boot</groupId>
+                <artifactId>yudao-spring-boot-starter-biz-weixin</artifactId>
                 <version>${revision}</version>
             </dependency>
 
@@ -399,7 +410,6 @@
                 <artifactId>yunpian-java-sdk</artifactId>
                 <version>${yunpian-java-sdk.version}</version>
             </dependency>
-
             <dependency>
                 <groupId>com.aliyun</groupId>
                 <artifactId>aliyun-java-sdk-core</artifactId>
@@ -421,6 +431,13 @@
                 <version>${aliyun-java-sdk-dysmsapi.version}</version>
             </dependency>
             <!-- SMS SDK end -->
+
+            <dependency>
+                <groupId>com.xkcoding.justauth</groupId>
+                <artifactId>justauth-spring-boot-starter</artifactId> <!-- 社交登陆（例如说，个人微信、企业微信等等） -->
+                <version>${justauth.version}</version>
+            </dependency>
+
 
 
             <!-- activiti begin -->

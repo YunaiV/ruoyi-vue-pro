@@ -7,11 +7,11 @@ import cn.iocoder.yudao.adminserver.modules.system.enums.logger.SysLoginResultEn
 import cn.iocoder.yudao.adminserver.modules.system.service.auth.impl.SysAuthServiceImpl;
 import cn.iocoder.yudao.adminserver.modules.system.service.common.SysCaptchaService;
 import cn.iocoder.yudao.adminserver.modules.system.service.permission.SysPermissionService;
-import cn.iocoder.yudao.adminserver.modules.system.service.social.SysSocialService;
 import cn.iocoder.yudao.adminserver.modules.system.service.user.SysUserService;
 import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.user.SysUserDO;
 import cn.iocoder.yudao.coreservice.modules.system.service.auth.SysUserSessionCoreService;
 import cn.iocoder.yudao.coreservice.modules.system.service.logger.SysLoginLogCoreService;
+import cn.iocoder.yudao.coreservice.modules.system.service.social.SysSocialService;
 import cn.iocoder.yudao.coreservice.modules.system.service.user.SysUserCoreService;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.security.core.LoginUser;

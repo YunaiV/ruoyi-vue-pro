@@ -33,7 +33,7 @@ import static cn.iocoder.yudao.adminserver.modules.system.enums.SysErrorCodeCons
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 
 /**
- * 短信模板Service实现类
+ * 短信模板 Service 实现类
  *
  * @author zzf
  * @date 2021/1/25 9:25

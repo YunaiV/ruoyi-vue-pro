@@ -14,4 +14,12 @@ public interface SysErrorCodeConstants {
     ErrorCode SMS_SEND_MOBILE_TEMPLATE_PARAM_MISS = new ErrorCode(1006000001, "模板参数({})缺失");
     ErrorCode SMS_SEND_TEMPLATE_NOT_EXISTS = new ErrorCode(1006000000, "短信模板不存在");
 
+    // ========= 文件相关 1006001000=================
+    ErrorCode FILE_PATH_EXISTS = new ErrorCode(1006001000, "文件路径已存在");
+    ErrorCode FILE_NOT_EXISTS = new ErrorCode(1006001002, "文件不存在");
+
+    // ========== 社交模块 1006002000 ==========
+    ErrorCode SOCIAL_AUTH_FAILURE = new ErrorCode(1006002000, "社交授权失败，原因是：{}");
+    ErrorCode SOCIAL_UNBIND_NOT_SELF = new ErrorCode(1006002001, "社交解绑失败，非当前用户绑定");
+
 }

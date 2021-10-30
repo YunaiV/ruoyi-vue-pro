@@ -29,4 +29,13 @@ public class ObjectUtils {
         return obj1.compareTo(obj2) > 0 ? obj1 : obj2;
     }
 
+    public static <T> T defaultIfNull(T... array) {
+        for (T item : array) {
+            if (item != null) {
+                return item;
+            }
+        }
+        return null;
+    }
+
 }
