@@ -1,6 +1,6 @@
-package cn.iocoder.yudao.adminserver.modules.system.dal.mysql.social;
+package cn.iocoder.yudao.coreservice.modules.system.dal.mysql.social;
 
-import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.social.SysSocialUserDO;
+import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.social.SysSocialUserDO;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.apache.ibatis.annotations.Mapper;
@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.Mapper;
 import java.util.Collection;
 import java.util.List;
 
+// TODO @timfruit：SysSocialUserCoreMapper 改名，方便区分
 @Mapper
 public interface SysSocialUserMapper extends BaseMapperX<SysSocialUserDO> {
 

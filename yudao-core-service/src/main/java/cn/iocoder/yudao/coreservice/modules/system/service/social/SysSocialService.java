@@ -1,8 +1,9 @@
-package cn.iocoder.yudao.adminserver.modules.system.service.social;
+package cn.iocoder.yudao.coreservice.modules.system.service.social;
 
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.social.SysSocialUserDO;
-import cn.iocoder.yudao.adminserver.modules.system.enums.social.SysSocialTypeEnum;
+import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.social.SysSocialUserDO;
+import cn.iocoder.yudao.coreservice.modules.system.enums.social.SysSocialTypeEnum;
+import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import me.zhyd.oauth.model.AuthUser;
 
@@ -14,6 +15,7 @@ import java.util.List;
  *
  * @author 芋道源码
  */
+// TODO @timfruit：SysSocialCoreService 改名，方便区分
 public interface SysSocialService {
 
     /**
@@ -49,7 +51,7 @@ public interface SysSocialService {
      * @param unionId 社交平台的 unionId
      * @return 社交用户列表
      */
-    List<SysSocialUserDO> getAllSocialUserList(Integer type, String unionId);
+    List<SysSocialUserDO> getAllSocialUserList(Integer type, String unionId, UserTypeEnum userTypeEnum);
 
     /**
      * 获得指定用户的社交用户列表
@@ -57,7 +59,7 @@ public interface SysSocialService {
      * @param userId 用户编号
      * @return 社交用户列表
      */
-    List<SysSocialUserDO> getSocialUserList(Long userId);
+    List<SysSocialUserDO> getSocialUserList(Long userId, UserTypeEnum userTypeEnum);
 
     /**
      * 绑定社交用户
@@ -66,7 +68,7 @@ public interface SysSocialService {
      * @param type 社交平台的类型 {@link SysSocialTypeEnum}
      * @param authUser 授权用户
      */
-    void bindSocialUser(Long userId, Integer type, AuthUser authUser);
+    void bindSocialUser(Long userId, Integer type, AuthUser authUser, UserTypeEnum userTypeEnum);
 
     /**
      * 取消绑定社交用户
@@ -75,6 +77,7 @@ public interface SysSocialService {
      * @param type 社交平台的类型 {@link SysSocialTypeEnum}
      * @param unionId 社交平台的 unionId
      */
-    void unbindSocialUser(Long userId, Integer type, String unionId);
+    void unbindSocialUser(Long userId, Integer type, String unionId,UserTypeEnum userTypeEnum);
+    // TODO @timfruit：逗号后面要有空格；缺少了 @userTypeEnum 的注释，都补充下哈。
 
 }

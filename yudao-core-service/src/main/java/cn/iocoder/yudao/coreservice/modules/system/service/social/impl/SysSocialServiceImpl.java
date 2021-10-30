@@ -1,11 +1,11 @@
-package cn.iocoder.yudao.adminserver.modules.system.service.social.impl;
+package cn.iocoder.yudao.coreservice.modules.system.service.social.impl;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.social.SysSocialUserDO;
-import cn.iocoder.yudao.adminserver.modules.system.dal.mysql.social.SysSocialUserMapper;
-import cn.iocoder.yudao.adminserver.modules.system.dal.redis.social.SysSocialAuthUserRedisDAO;
-import cn.iocoder.yudao.adminserver.modules.system.enums.social.SysSocialTypeEnum;
-import cn.iocoder.yudao.adminserver.modules.system.service.social.SysSocialService;
+import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.social.SysSocialUserDO;
+import cn.iocoder.yudao.coreservice.modules.system.dal.mysql.social.SysSocialUserMapper;
+import cn.iocoder.yudao.coreservice.modules.system.dal.redis.social.SysSocialAuthUserRedisDAO;
+import cn.iocoder.yudao.coreservice.modules.system.enums.social.SysSocialTypeEnum;
+import cn.iocoder.yudao.coreservice.modules.system.service.social.SysSocialService;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.http.HttpUtils;
@@ -25,8 +25,8 @@ import javax.annotation.Resource;
 import java.util.List;
 import java.util.Objects;
 
-import static cn.iocoder.yudao.adminserver.modules.system.enums.SysErrorCodeConstants.SOCIAL_AUTH_FAILURE;
-import static cn.iocoder.yudao.adminserver.modules.system.enums.SysErrorCodeConstants.SOCIAL_UNBIND_NOT_SELF;
+import static cn.iocoder.yudao.coreservice.modules.system.enums.SysErrorCodeConstants.SOCIAL_AUTH_FAILURE;
+import static cn.iocoder.yudao.coreservice.modules.system.enums.SysErrorCodeConstants.SOCIAL_UNBIND_NOT_SELF;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString;
 
@@ -75,25 +75,25 @@ public class SysSocialServiceImpl implements SysSocialService {
     }
 
     @Override
-    public List<SysSocialUserDO> getAllSocialUserList(Integer type, String unionId) {
+    public List<SysSocialUserDO> getAllSocialUserList(Integer type, String unionId,UserTypeEnum userTypeEnum) {
         List<Integer> types = SysSocialTypeEnum.getRelationTypes(type);
-        return socialUserMapper.selectListByTypeAndUnionId(UserTypeEnum.ADMIN.getValue(), types, unionId);
+        return socialUserMapper.selectListByTypeAndUnionId(userTypeEnum.getValue(), types, unionId);
     }
 
     @Override
-    public List<SysSocialUserDO> getSocialUserList(Long userId) {
-        return socialUserMapper.selectListByUserId(UserTypeEnum.ADMIN.getValue(), userId);
+    public List<SysSocialUserDO> getSocialUserList(Long userId,UserTypeEnum userTypeEnum) {
+        return socialUserMapper.selectListByUserId(userTypeEnum.getValue(), userId);
     }
 
     @Override
     @Transactional
-    public void bindSocialUser(Long userId, Integer type, AuthUser authUser) {
+    public void bindSocialUser(Long userId, Integer type, AuthUser authUser, UserTypeEnum userTypeEnum) {
         // 获得 unionId 对应的 SysSocialUserDO 列表
         String unionId = getAuthUserUnionId(authUser);
-        List<SysSocialUserDO> socialUsers = this.getAllSocialUserList(type, unionId);
+        List<SysSocialUserDO> socialUsers = this.getAllSocialUserList(type, unionId, userTypeEnum);
 
         // 逻辑一：如果 userId 之前绑定过该 type 的其它账号，需要进行解绑
-        this.unbindOldSocialUser(userId, type, unionId);
+        this.unbindOldSocialUser(userId, type, unionId, userTypeEnum);
 
         // 逻辑二：如果 socialUsers 指定的 userId 改变，需要进行更新
         // 例如说，一个微信 unionId 对应了多个社交账号，结果其中有个关联了新的 userId，则其它也要跟着修改
@@ -112,7 +112,7 @@ public class SysSocialServiceImpl implements SysSocialService {
                 .nickname(authUser.getNickname()).avatar(authUser.getAvatar()).rawUserInfo(toJsonString(authUser.getRawUserInfo()))
                 .build();
         if (socialUser == null) {
-            saveSocialUser.setUserId(userId).setUserType(UserTypeEnum.ADMIN.getValue())
+            saveSocialUser.setUserId(userId).setUserType(userTypeEnum.getValue())
                     .setType(type).setOpenid(authUser.getUuid()).setUnionId(unionId);
             socialUserMapper.insert(saveSocialUser);
         } else {
@@ -122,9 +122,9 @@ public class SysSocialServiceImpl implements SysSocialService {
     }
 
     @Override
-    public void unbindSocialUser(Long userId, Integer type, String unionId) {
+    public void unbindSocialUser(Long userId, Integer type, String unionId, UserTypeEnum userTypeEnum) {
         // 获得 unionId 对应的所有 SysSocialUserDO 社交用户
-        List<SysSocialUserDO> socialUsers = this.getAllSocialUserList(type, unionId);
+        List<SysSocialUserDO> socialUsers = this.getAllSocialUserList(type, unionId, userTypeEnum);
         if (CollUtil.isEmpty(socialUsers)) {
             return;
         }
@@ -140,10 +140,10 @@ public class SysSocialServiceImpl implements SysSocialService {
     }
 
     @VisibleForTesting
-    public void unbindOldSocialUser(Long userId, Integer type, String newUnionId) {
+    public void unbindOldSocialUser(Long userId, Integer type, String newUnionId, UserTypeEnum userTypeEnum) {
         List<Integer> types = SysSocialTypeEnum.getRelationTypes(type);
         List<SysSocialUserDO> oldSocialUsers = socialUserMapper.selectListByTypeAndUserId(
-                UserTypeEnum.ADMIN.getValue(), types, userId);
+                userTypeEnum.getValue(), types, userId);
         // 如果新老的 unionId 是一致的，说明无需解绑
         if (CollUtil.isEmpty(oldSocialUsers) || Objects.equals(newUnionId, oldSocialUsers.get(0).getUnionId())) {
             return;
