@@ -28,9 +28,9 @@
         <el-select v-model="queryParams.leaveType" placeholder="请选择请假类型">
           <el-option
             v-for="dict in leaveTypeDictData"
-            :key="parseInt(dict.value)"
+            :key="dict.value"
             :label="dict.label"
-            :value="parseInt(dict.value)"
+            :value="dict.value"
           />
         </el-select>
       </el-form-item>
@@ -49,10 +49,6 @@
 
     <!-- 操作工具栏 -->
     <el-row :gutter="10" class="mb8">
-      <el-col :span="1.5">
-        <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="handleAdd"
-                   v-hasPermi="['oa:leave:create']">新增</el-button>
-      </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
@@ -71,7 +67,7 @@
           <span>{{ parseTime(scope.row.endTime) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="请假类型" align="center" prop="leaveType" />
+      <el-table-column label="请假类型" align="center" prop="leaveType" :formatter="leaveTypeFormat" />
       <el-table-column label="原因" align="center" prop="reason" />
       <el-table-column label="申请时间" align="center" prop="applyTime" width="180">
         <template slot-scope="scope">
@@ -102,9 +98,9 @@
           <el-select v-model="form.leaveType" placeholder="请选择">
             <el-option
               v-for="dict in leaveTypeDictData"
-              :key="parseInt(dict.value)"
+              :key="dict.value"
               :label="dict.label"
-              :value="parseInt(dict.value)"
+              :value="dict.value"
             />
           </el-select>
         </el-form-item>
@@ -142,12 +138,12 @@
     </el-dialog>
 
     <el-dialog :title="title" :visible.sync="dialogStepsVisible" width="600px" append-to-body>
-      <el-steps :active="handleTask.historyTask.length-1" finish-status="success" >
-        <el-step :title="item.stepName " :description="' 办理人：' + item.assignee " icon="el-icon-edit"  v-for="(item) in handleTask.historyTask"></el-step>
+      <el-steps :active="stepActive" finish-status="success" >
+        <el-step :title="stepTitle(item)" :description="' 办理人：' + item.assignee " icon="el-icon-edit"  v-for="(item) in handleTask.historyTask"></el-step>
       </el-steps>
       <br/>
-      <el-steps direction="vertical" :active="handleTask.historyTask.length-1">
-        <el-step :title="item.stepName" :description=" ' 意见：'+ item.comment" v-for="(item) in handleTask.historyTask"></el-step>
+      <el-steps direction="vertical" :active="stepActive">
+        <el-step :title="stepTitle(item)" :description="stepDes(item)" v-for="(item) in handleTask.historyTask"></el-step>
       </el-steps>
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="dialogStepsVisible = false">确 定</el-button>
@@ -199,10 +195,7 @@ export default {
       // 表单参数
       form: {},
       handleTask: {
-        historyTask:[{
-          stepName:"步骤一"
-        }
-        ],
+        historyTask:[],
         taskVariable: "",
         formObject: {}
       },
@@ -218,12 +211,49 @@ export default {
       statusFormat(row, column) {
         return getDictDataLabel(DICT_TYPE.OA_LEAVE_STATUS, row.status)
       },
+      leaveTypeFormat(row, column) {
+        return getDictDataLabel(DICT_TYPE.OA_LEAVE_TYPE, row.leaveType)
+      },
       leaveTypeDictData: getDictDatas(DICT_TYPE.OA_LEAVE_TYPE),
       leaveStatusData: getDictDatas(DICT_TYPE.OA_LEAVE_STATUS)
     };
   },
   created() {
     this.getList();
+  },
+  computed: {
+    stepActive: function () {
+      let idx = 0;
+      for (let i = 0; i < this.handleTask.historyTask.length; i++) {
+        if (this.handleTask.historyTask[i].status === 1) {
+          idx = idx + 1;
+        } else {
+          break;
+        }
+      }
+      return idx;
+    },
+    stepTitle() {
+      return function (item) {
+        let name = item.stepName;
+        if (item.status === 1) {
+          name += '(已完成)'
+        }
+        if (item.status === 0) {
+          name += '(进行中)'
+        }
+        return name;
+      }
+    },
+    stepDes() {
+      return function (item) {
+        let desc = "";
+        if (item.status === 1) {
+          desc += "审批人：[" + item.assignee + "]    审批意见: [" + item.comment + "]   审批时间: " + this.parseTime(item.endTime);
+        }
+        return desc;
+      }
+    }
   },
   methods: {
     /** 查询列表 */

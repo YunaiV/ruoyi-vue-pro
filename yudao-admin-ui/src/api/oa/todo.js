@@ -67,6 +67,14 @@ export function taskSteps(data) {
   })
 }
 
+export function getTaskFormKey(data) {
+  return request({
+    url: '/workflow/task/formKey',
+    method: 'post',
+    data: data
+  })
+}
+
 export function processHistorySteps(id) {
   return request({
     url: '/workflow/task/process/history-steps?id='+id,

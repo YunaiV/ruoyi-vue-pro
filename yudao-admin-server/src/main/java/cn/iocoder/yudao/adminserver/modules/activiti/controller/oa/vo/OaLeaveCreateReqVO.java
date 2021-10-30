@@ -11,4 +11,5 @@ import javax.validation.constraints.*;
 @ToString(callSuper = true)
 public class OaLeaveCreateReqVO extends OaLeaveBaseVO {
 
+    private String processKey;
 }

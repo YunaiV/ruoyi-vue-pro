@@ -1847,13 +1847,14 @@ INSERT INTO `sys_menu` VALUES (1113, '错误码更新', 'system:error-code:updat
 INSERT INTO `sys_menu` VALUES (1114, '错误码删除', 'system:error-code:delete', 3, 4, 1110, '', '', '', 0, '', '2021-04-13 21:46:42', '', '2021-04-13 22:09:51', b'0');
 INSERT INTO `sys_menu` VALUES (1115, '错误码导出', 'system:error-code:export', 3, 5, 1110, '', '', '', 0, '', '2021-04-13 21:46:42', '', '2021-04-13 22:09:55', b'0');
 INSERT INTO `sys_menu` VALUES (1116, '日志中心', '', 2, 8, 2, 'log-center', 'log', 'infra/skywalking/log', 0, '1', '2021-04-26 22:35:45', '1', '2021-04-26 22:37:25', b'0');
-INSERT INTO `sys_menu` VALUES (1118,'请假申请','',2,0,5,'oa/leave','user','oa/leave/index',0,'','2021-09-20 08:51:03','1','2021-10-12 22:19:02',0x00);
+INSERT INTO `sys_menu` VALUES (1118,'请假查询','',2,0,5,'oa/leave','user','oa/leave/index',0,'','2021-09-20 08:51:03','1','2021-10-12 22:19:02',0x00);
 INSERT INTO `sys_menu` VALUES (1119,'请假申请查询','oa:leave:query',3,1,1118,'','','',0,'','2021-09-20 08:51:03','','2021-09-20 08:51:03',0x00);
 INSERT INTO `sys_menu` VALUES (1120,'请假申请创建','oa:leave:create',3,2,1118,'','','',0,'','2021-09-20 08:51:03','','2021-09-20 08:51:03',0x00);
 INSERT INTO `sys_menu` VALUES (1121,'请假申请更新','oa:leave:update',3,3,1118,'','','',0,'','2021-09-20 08:51:03','','2021-09-20 08:51:03',0x00);
 INSERT INTO `sys_menu` VALUES (1122,'请假申请删除','oa:leave:delete',3,4,1118,'','','',0,'','2021-09-20 08:51:03','','2021-09-20 08:51:03',0x00);
 INSERT INTO `sys_menu` VALUES (1123,'请假申请导出','oa:leave:export',3,5,1118,'','','',0,'','2021-09-20 08:51:03','','2021-09-20 08:51:03',0x00);
 INSERT INTO `sys_menu` VALUES (1124,'待办任务','',2,2,5,'todo','edit','oa/todo/index',0,'1','2021-09-20 22:10:09','1','2021-09-21 23:17:12',0x00);
+INSERT INTO `sys_menu` VALUES (1125,'流程申请','',2,3,5,'flow','form','oa/flow/index',0,'1','2021-10-23 22:10:09','1','2021-10-23 23:17:12',0x00);
 
 COMMIT;
 

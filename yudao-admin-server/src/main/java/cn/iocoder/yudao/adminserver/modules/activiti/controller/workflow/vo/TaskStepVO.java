@@ -19,4 +19,6 @@ public class TaskStepVO {
 
     private String comment;
 
+    private Integer status;
+
 }

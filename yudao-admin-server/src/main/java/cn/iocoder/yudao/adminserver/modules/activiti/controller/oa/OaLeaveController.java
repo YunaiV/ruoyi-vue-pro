@@ -41,6 +41,14 @@ public class OaLeaveController {
     @ApiOperation("创建请假申请")
     @PreAuthorize("@ss.hasPermission('oa:leave:create')")
     public CommonResult<Long> createLeave(@Valid @RequestBody OaLeaveCreateReqVO createReqVO) {
+        createReqVO.setProcessKey("leave");
+        return success(leaveService.createLeave(createReqVO));
+    }
+
+    @PostMapping("/form-key/create")
+    @ApiOperation("创建外置请假申请")
+    public CommonResult<Long> createFormKeyLeave(@Valid @RequestBody OaLeaveCreateReqVO createReqVO) {
+        createReqVO.setProcessKey("leave-formkey");
         return success(leaveService.createLeave(createReqVO));
     }
 

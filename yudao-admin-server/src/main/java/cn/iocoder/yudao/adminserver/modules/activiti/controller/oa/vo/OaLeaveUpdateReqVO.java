@@ -15,4 +15,11 @@ public class OaLeaveUpdateReqVO extends OaLeaveBaseVO {
     @NotNull(message = "请假表单主键不能为空")
     private Long id;
 
+
+    private String taskId;
+
+    private String comment;
+
+    private Map<String,Object> variables;
+
 }
