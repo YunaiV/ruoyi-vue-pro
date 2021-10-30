@@ -99,10 +99,8 @@ public class SecurityFrameworkUtils {
         // 原因是，Spring Security 的 Filter 在 ApiAccessLogFilter 后面，在它记录访问日志时，线上上下文已经没有用户编号等信息
         WebFrameworkUtils.setLoginUserId(request, loginUser.getId());
         WebFrameworkUtils.setLoginUserType(request, loginUser.getUserType());
-
+        // TODO @jason：使用 userId 会不会更合适哈？
         org.activiti.engine.impl.identity.Authentication.setAuthenticatedUserId(loginUser.getUsername());
-
-
     }
 
 }

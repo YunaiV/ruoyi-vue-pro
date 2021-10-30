@@ -1,33 +1,32 @@
 package cn.iocoder.yudao.adminserver.modules.activiti.controller.oa;
 
-import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
-import org.springframework.web.bind.annotation.*;
-import javax.annotation.Resource;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.security.access.prepost.PreAuthorize;
-
-import io.swagger.annotations.*;
-
-import javax.validation.constraints.*;
-import javax.validation.*;
-import javax.servlet.http.*;
-import java.util.*;
-import java.io.IOException;
-
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-
-import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
-
-import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
-import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.*;
-
 import cn.iocoder.yudao.adminserver.modules.activiti.controller.oa.vo.*;
-import cn.iocoder.yudao.adminserver.modules.activiti.dal.dataobject.oa.OaLeaveDO;
 import cn.iocoder.yudao.adminserver.modules.activiti.convert.oa.OaLeaveConvert;
+import cn.iocoder.yudao.adminserver.modules.activiti.dal.dataobject.oa.OaLeaveDO;
 import cn.iocoder.yudao.adminserver.modules.activiti.service.oa.OaLeaveService;
+import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
+import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
+import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiOperation;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.List;
+
+import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
+
+// TODO @jason：Oa=》OA 会不会好点，名词缩写哈
 @Api(tags = "请假申请")
 @RestController
 @RequestMapping("/oa/leave")
@@ -41,6 +40,7 @@ public class OaLeaveController {
     @ApiOperation("创建请假申请")
     @PreAuthorize("@ss.hasPermission('oa:leave:create')")
     public CommonResult<Long> createLeave(@Valid @RequestBody OaLeaveCreateReqVO createReqVO) {
+        // TODO @芋艿：processKey 自己去理解下。不过得把 leave 变成枚举
         createReqVO.setProcessKey("leave");
         return success(leaveService.createLeave(createReqVO));
     }
@@ -48,6 +48,7 @@ public class OaLeaveController {
     @PostMapping("/form-key/create")
     @ApiOperation("创建外置请假申请")
     public CommonResult<Long> createFormKeyLeave(@Valid @RequestBody OaLeaveCreateReqVO createReqVO) {
+        // TODO @芋艿：processKey 自己去理解下。不过得把 formkey 变成枚举
         createReqVO.setProcessKey("leave-formkey");
         return success(leaveService.createLeave(createReqVO));
     }
@@ -92,6 +93,7 @@ public class OaLeaveController {
     @PreAuthorize("@ss.hasPermission('oa:leave:query')")
     public CommonResult<PageResult<OaLeaveRespVO>> getLeavePage(@Valid OaLeavePageReqVO pageVO) {
         //值查询自己申请请假
+        // TODO @芋艿：这里的传值，到底前端搞，还是后端搞。
         pageVO.setUserId(SecurityFrameworkUtils.getLoginUser().getUsername());
         PageResult<OaLeaveDO> pageResult = leaveService.getLeavePage(pageVO);
         return success(OaLeaveConvert.INSTANCE.convertPage(pageResult));
