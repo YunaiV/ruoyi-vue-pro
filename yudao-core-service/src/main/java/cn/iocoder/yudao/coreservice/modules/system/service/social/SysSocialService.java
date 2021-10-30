@@ -59,7 +59,7 @@ public interface SysSocialService {
      * @param userId 用户编号
      * @return 社交用户列表
      */
-    List<SysSocialUserDO> getSocialUserList(Long userId,UserTypeEnum userTypeEnum);
+    List<SysSocialUserDO> getSocialUserList(Long userId, UserTypeEnum userTypeEnum);
 
     /**
      * 绑定社交用户

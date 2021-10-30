@@ -87,7 +87,7 @@ public class SysSocialServiceImpl implements SysSocialService {
 
     @Override
     @Transactional
-    public void bindSocialUser(Long userId, Integer type, AuthUser authUser,UserTypeEnum userTypeEnum) {
+    public void bindSocialUser(Long userId, Integer type, AuthUser authUser, UserTypeEnum userTypeEnum) {
         // 获得 unionId 对应的 SysSocialUserDO 列表
         String unionId = getAuthUserUnionId(authUser);
         List<SysSocialUserDO> socialUsers = this.getAllSocialUserList(type, unionId, userTypeEnum);
