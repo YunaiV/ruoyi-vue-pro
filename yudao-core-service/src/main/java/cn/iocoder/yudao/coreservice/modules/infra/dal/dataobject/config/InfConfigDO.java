@@ -11,7 +11,7 @@ import lombok.ToString;
 /**
  * 参数配置表
  *
- * @author ruoyi
+ * @author 芋道源码
  */
 @TableName("inf_config")
 @Data

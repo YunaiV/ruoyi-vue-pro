@@ -5,15 +5,13 @@ import cn.iocoder.yudao.coreservice.modules.infra.dal.dataobject.logger.InfApiEr
 import cn.iocoder.yudao.coreservice.modules.infra.dal.mysql.logger.InfApiErrorLogCoreMapper;
 import cn.iocoder.yudao.coreservice.modules.infra.enums.logger.InfApiErrorLogProcessStatusEnum;
 import cn.iocoder.yudao.coreservice.modules.infra.service.logger.InfApiErrorLogCoreService;
-import cn.iocoder.yudao.framework.apilog.core.service.dto.ApiErrorLogCreateDTO;
+import cn.iocoder.yudao.framework.apilog.core.service.dto.ApiErrorLogCreateReqDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
-import java.util.concurrent.Future;
 
 /**
  * API 错误日志 Service 实现类
@@ -30,7 +28,7 @@ public class InfApiErrorLogCoreServiceImpl implements InfApiErrorLogCoreService 
 
     @Override
     @Async
-    public void createApiErrorLogAsync(ApiErrorLogCreateDTO createDTO) {
+    public void createApiErrorLogAsync(ApiErrorLogCreateReqDTO createDTO) {
         InfApiErrorLogDO apiErrorLog = InfApiErrorLogCoreConvert.INSTANCE.convert(createDTO);
         apiErrorLog.setProcessStatus(InfApiErrorLogProcessStatusEnum.INIT.getStatus());
         apiErrorLogMapper.insert(apiErrorLog);

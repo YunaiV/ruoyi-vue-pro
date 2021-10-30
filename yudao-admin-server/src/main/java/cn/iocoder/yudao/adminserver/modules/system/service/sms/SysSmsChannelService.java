@@ -11,7 +11,7 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * 短信渠道Service接口
+ * 短信渠道 Service 接口
  *
  * @author zzf
  * @date 2021/1/25 9:24

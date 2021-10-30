@@ -11,7 +11,7 @@ import java.util.Date;
  * @author 芋道源码
  */
 @Data
-public class ApiAccessLogCreateDTO {
+public class ApiAccessLogCreateReqDTO {
 
     /**
      * 链路追踪编号
