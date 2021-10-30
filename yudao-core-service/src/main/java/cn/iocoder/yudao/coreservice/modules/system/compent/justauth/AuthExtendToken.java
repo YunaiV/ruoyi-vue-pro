@@ -4,6 +4,7 @@ import lombok.*;
 import me.zhyd.oauth.model.AuthToken;
 
 /**
+ * TODO @timfruit：类注释
  * @author timfruit
  * @date 2021-10-29
  */
@@ -12,10 +13,10 @@ import me.zhyd.oauth.model.AuthToken;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AuthExtendToken extends AuthToken {
+
     /**
      * 微信小程序 会话密钥
      */
     private String miniSessionKey;
-
 
 }

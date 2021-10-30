@@ -11,13 +11,17 @@ import me.zhyd.oauth.request.AuthDefaultRequest;
 import me.zhyd.oauth.utils.HttpUtils;
 import me.zhyd.oauth.utils.UrlBuilder;
 
+// TODO @timfruit：新建一个 yudao-spring-boot-starter-biz-social 包，把这个拓展拿进去哈。另外，可以思考下。
+// 1. application-local.yaml 的配置里，justauth.extend.enum-class 能否不配置，而是自动配置好
+// 2. application-local.yaml 的配置里，justauth.extend.extend.config.WECHAT_MINI_PROGRAM 有办法和 justauth.type.WECHAT_MP 持平
 /**
- * 微信小程序
+ * 微信小程序登陆
  *
  * @author timfruit
  * @date 2021-10-29
  */
 public class AuthWeChatMiniProgramRequest extends AuthDefaultRequest {
+
     public AuthWeChatMiniProgramRequest(AuthConfig config) {
         super(config, AuthExtendSource.WECHAT_MINI_PROGRAM);
     }
@@ -30,11 +34,11 @@ public class AuthWeChatMiniProgramRequest extends AuthDefaultRequest {
     protected AuthToken getAccessToken(AuthCallback authCallback) {
         // https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/login/auth.code2Session.html
         String response = new HttpUtils(config.getHttpConfig()).get(accessTokenUrl(authCallback.getCode()));
-        JSONObject accessTokenObject = JSONObject.parseObject(response);
+        JSONObject accessTokenObject = JSONObject.parseObject(response); // TODO @timfruit：使用 JsonUtils，项目尽量避免直接使用某个 json 库
 
         this.checkResponse(accessTokenObject);
 
-        AuthExtendToken token=new AuthExtendToken();
+        AuthExtendToken token = new AuthExtendToken();
         token.setMiniSessionKey(accessTokenObject.getString("session_key"));
         token.setOpenId(accessTokenObject.getString("openid"));
         token.setUnionId(accessTokenObject.getString("unionid"));
@@ -62,16 +66,16 @@ public class AuthWeChatMiniProgramRequest extends AuthDefaultRequest {
      */
     private void checkResponse(JSONObject object) {
         int code = object.getIntValue("errcode");
-        if(code != 0){
+        if(code != 0){ // TODO @timfruit：if (code != 0) { ，注意空格
             throw new AuthException(object.getIntValue("errcode"), object.getString("errmsg"));
         }
     }
 
     /**
-     * 返回获取accessToken的url
+     * 返回获取 accessToken 的 url
      *
      * @param code 授权码
-     * @return 返回获取accessToken的url
+     * @return 返回获取 accessToken 的 url
      */
     @Override
     protected String accessTokenUrl(String code) {
@@ -82,4 +86,5 @@ public class AuthWeChatMiniProgramRequest extends AuthDefaultRequest {
                 .queryParam("grant_type", "authorization_code")
                 .build();
     }
+
 }
