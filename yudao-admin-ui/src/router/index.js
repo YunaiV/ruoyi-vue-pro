@@ -123,6 +123,76 @@ export const constantRoutes = [
         meta: { title: '修改生成配置' }
       }
     ]
+  },
+  {
+    path: '/flow',
+    component: Layout,
+    hidden: true,
+    redirect: 'noredirect',
+    children: [
+      {
+        path: 'leave/apply',
+        component: (resolve) => require(['@/views/oa/leave/apply/index'], resolve),
+        name: '请假表单',
+        meta: { title: '请假表单', icon: 'form' }
+      }
+    ]
+  },
+  {
+    path: '/flow',
+    component: Layout,
+    hidden: true,
+    redirect: 'noredirect',
+    children: [
+      {
+        path: 'leave/approve-leader',
+        component: (resolve) => require(['@/views/oa/leave/approve-leader/index'], resolve),
+        name: '请假表单-部门领导审批',
+        meta: { title: '请假表单-部门领导审批', icon: 'form' }
+      }
+    ]
+  },
+  {
+    path: '/flow',
+    component: Layout,
+    hidden: true,
+    redirect: 'noredirect',
+    children: [
+      {
+        path: 'leave/approve-hr',
+        component: (resolve) => require(['@/views/oa/leave/approve-hr/index'], resolve),
+        name: '请假表单-人事审批',
+        meta: { title: '请假表单-人事审批', icon: 'form' }
+      }
+    ]
+  },
+  {
+    path: '/flow',
+    component: Layout,
+    hidden: true,
+    redirect: 'noredirect',
+    children: [
+      {
+        path: 'leave/confirm',
+        component: (resolve) => require(['@/views/oa/leave/confirm/index'], resolve),
+        name: '请假表单-确认',
+        meta: { title: '请假表单-确认', icon: 'form' }
+      }
+    ]
+  },
+  {
+    path: '/flow',
+    component: Layout,
+    hidden: true,
+    redirect: 'noredirect',
+    children: [
+      {
+        path: 'leave/modify',
+        component: (resolve) => require(['@/views/oa/leave/modify/index'], resolve),
+        name: '请假表单-修改',
+        meta: { title: '请假表单-修改', icon: 'form' }
+      }
+    ]
   }
 ]
 

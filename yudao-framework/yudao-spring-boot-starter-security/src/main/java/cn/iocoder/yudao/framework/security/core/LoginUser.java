@@ -5,12 +5,10 @@ import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * 登录用户信息
@@ -56,6 +54,18 @@ public class LoginUser implements UserDetails {
      */
     private Integer status;
 
+
+    /**
+     * 所属岗位
+     */
+    private Set<Long> postIds;
+
+    /**
+     * group  目前指岗位代替
+     */
+    private List<String> groups;
+
+
     // TODO @芋艿：怎么去掉 deptId
 
     @Override
@@ -65,7 +75,6 @@ public class LoginUser implements UserDetails {
     }
 
     @Override
-    @JsonIgnore
     public String getUsername() {
         return username;
     }
@@ -79,7 +88,9 @@ public class LoginUser implements UserDetails {
     @Override
     @JsonIgnore// 避免序列化
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return new HashSet<>();
+        List<GrantedAuthority> list = new ArrayList<>(1);
+        list.add(new SimpleGrantedAuthority("ROLE_ACTIVITI_USER"));
+        return list;
     }
 
     @Override
