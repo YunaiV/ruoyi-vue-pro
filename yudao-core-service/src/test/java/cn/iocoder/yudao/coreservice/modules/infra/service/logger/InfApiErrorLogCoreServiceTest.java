@@ -5,7 +5,7 @@ import cn.iocoder.yudao.coreservice.BaseDbUnitTest;
 import cn.iocoder.yudao.coreservice.modules.infra.dal.dataobject.logger.InfApiErrorLogDO;
 import cn.iocoder.yudao.coreservice.modules.infra.dal.mysql.logger.InfApiErrorLogCoreMapper;
 import cn.iocoder.yudao.coreservice.modules.infra.service.logger.impl.InfApiErrorLogCoreServiceImpl;
-import cn.iocoder.yudao.framework.apilog.core.service.dto.ApiErrorLogCreateDTO;
+import cn.iocoder.yudao.framework.apilog.core.service.dto.ApiErrorLogCreateReqDTO;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.test.core.util.RandomUtils;
 import org.junit.jupiter.api.Test;
@@ -31,7 +31,7 @@ public class InfApiErrorLogCoreServiceTest extends BaseDbUnitTest {
     @Test
     public void testCreateApiErrorLogAsync() {
         // 准备参数
-        ApiErrorLogCreateDTO createDTO = RandomUtils.randomPojo(ApiErrorLogCreateDTO.class,
+        ApiErrorLogCreateReqDTO createDTO = RandomUtils.randomPojo(ApiErrorLogCreateReqDTO.class,
                 dto -> dto.setUserType(RandomUtil.randomEle(UserTypeEnum.values()).getValue()));
 
         // 调用

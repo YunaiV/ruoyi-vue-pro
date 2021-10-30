@@ -20,6 +20,10 @@ spring:
       write-durations-as-timestamps: true # 设置 Duration 的格式，使用时间戳
       fail-on-empty-beans: false # 允许序列化无属性的 Bean
 
+  # 静态资源
+  mvc:
+    static-path-pattern: /static/**
+
 # MyBatis Plus 的配置项
 mybatis-plus:
   configuration:
@@ -32,6 +36,8 @@ mybatis-plus:
       logic-not-delete-value: 0 # 逻辑未删除值(默认为 0)
   mapper-locations: classpath*:mapper/*.xml
   type-aliases-package: ${yudao.info.base-package}.modules.*.dal.dataobject, ${yudao.core-service.base-package}.modules.*.dal.dataobject
+
+
 
 --- #################### 芋道相关配置 ####################
 

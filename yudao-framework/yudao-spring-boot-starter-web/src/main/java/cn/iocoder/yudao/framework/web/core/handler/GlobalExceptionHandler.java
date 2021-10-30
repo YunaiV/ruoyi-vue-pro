@@ -6,7 +6,7 @@ import cn.hutool.extra.servlet.ServletUtil;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.apilog.core.service.ApiErrorLogFrameworkService;
-import cn.iocoder.yudao.framework.apilog.core.service.dto.ApiErrorLogCreateDTO;
+import cn.iocoder.yudao.framework.apilog.core.service.dto.ApiErrorLogCreateReqDTO;
 import cn.iocoder.yudao.framework.common.util.monitor.TracerUtils;
 import cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
@@ -15,7 +15,6 @@ import io.github.resilience4j.ratelimiter.RequestNotPermitted;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.util.Assert;
 import org.springframework.validation.BindException;
@@ -28,7 +27,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
-import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
@@ -231,7 +229,7 @@ public class GlobalExceptionHandler {
 
     private void createExceptionLog(HttpServletRequest req, Throwable e) {
         // 插入错误日志
-        ApiErrorLogCreateDTO errorLog = new ApiErrorLogCreateDTO();
+        ApiErrorLogCreateReqDTO errorLog = new ApiErrorLogCreateReqDTO();
         try {
             // 初始化 errorLog
             initExceptionLog(errorLog, req, e);
@@ -242,7 +240,7 @@ public class GlobalExceptionHandler {
         }
     }
 
-    private void initExceptionLog(ApiErrorLogCreateDTO errorLog, HttpServletRequest request, Throwable e) {
+    private void initExceptionLog(ApiErrorLogCreateReqDTO errorLog, HttpServletRequest request, Throwable e) {
         // 处理用户信息
         errorLog.setUserId(WebFrameworkUtils.getLoginUserId(request));
         errorLog.setUserType(WebFrameworkUtils.getLoginUserType(request));

@@ -138,6 +138,9 @@ yudao:
       - ${spring.boot.admin.context-path}/** # 不处理 Spring Boot Admin 的请求
       - ${management.endpoints.web.base-path}/** # 不处理 Actuator 的请求
   demo: true # 开启演示模式
+  pay:
+    pay-notify-url: http://niubi.natapp1.cc/api/pay/order/notify
+    refund-notify-url: http://niubi.natapp1.cc/api/pay/refund/notify
 
 
 justauth:

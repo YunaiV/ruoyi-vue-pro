@@ -19,9 +19,9 @@ import me.zhyd.oauth.request.AuthRequest;
 import me.zhyd.oauth.utils.AuthStateUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
-import javax.validation.Valid;
 import java.util.List;
 import java.util.Objects;
 
@@ -36,7 +36,7 @@ import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString
  * @author 芋道源码
  */
 @Service
-@Valid
+@Validated
 @Slf4j
 public class SysSocialServiceImpl implements SysSocialService {
 
