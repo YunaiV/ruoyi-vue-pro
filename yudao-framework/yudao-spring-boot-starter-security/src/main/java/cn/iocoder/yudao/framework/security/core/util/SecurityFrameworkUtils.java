@@ -100,6 +100,7 @@ public class SecurityFrameworkUtils {
         WebFrameworkUtils.setLoginUserId(request, loginUser.getId());
         WebFrameworkUtils.setLoginUserType(request, loginUser.getUserType());
         // TODO @jason：使用 userId 会不会更合适哈？
+        // TODO @芋道源码 该值被赋值给 user task 中assignee ， username 显示更直白一点
         org.activiti.engine.impl.identity.Authentication.setAuthenticatedUserId(loginUser.getUsername());
     }
 

@@ -1,12 +1,12 @@
 package cn.iocoder.yudao.adminserver.modules.activiti.service.workflow.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.adminserver.modules.activiti.controller.workflow.vo.*;
-import cn.iocoder.yudao.adminserver.modules.activiti.dal.mysql.oa.OaLeaveMapper;
+import cn.iocoder.yudao.adminserver.modules.activiti.convert.workflow.TaskConvert;
 import cn.iocoder.yudao.adminserver.modules.activiti.service.workflow.TaskService;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
-import com.google.common.collect.ImmutableMap;
 import org.activiti.api.runtime.shared.query.Page;
 import org.activiti.api.runtime.shared.query.Pageable;
 import org.activiti.api.task.model.Task;
@@ -16,7 +16,6 @@ import org.activiti.api.task.runtime.TaskRuntime;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.history.HistoricActivityInstance;
-import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.task.Comment;
 import org.springframework.stereotype.Service;
@@ -25,7 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -44,13 +42,6 @@ public class TaskServiceImpl implements TaskService {
     @Resource
     private RepositoryService repositoryService;
 
-    @Resource
-    private OaLeaveMapper leaveMapper;
-
-    private static Map<String,String>  taskVariable =  ImmutableMap.<String,String>builder()
-                    .put("deptLeaderVerify","deptLeaderApproved")
-                    .put("hrVerify","hrApproved")
-                    .build();
 
     public TaskServiceImpl() {
 
@@ -58,25 +49,16 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public PageResult<TodoTaskRespVO> getTodoTaskPage(TodoTaskPageReqVO pageReqVO) {
-        final LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
         // TODO @jason：封装一个方法，用于转换成 activiti 的分页对象
         final Pageable pageable = Pageable.of((pageReqVO.getPageNo() - 1) * pageReqVO.getPageSize(), pageReqVO.getPageSize());
         Page<Task> pageTasks = taskRuntime.tasks(pageable);
-        // TODO @jason：convert 里转换
-        List<Task> tasks = pageTasks.getContent();
         int totalItems = pageTasks.getTotalItems();
+        List<Task> tasks = pageTasks.getContent();
         final List<TodoTaskRespVO> respVOList = tasks.stream().map(task -> {
-            TodoTaskRespVO respVO = new TodoTaskRespVO();
-            respVO.setId(task.getId());
-            final ProcessDefinition definition = repositoryService.getProcessDefinition(task.getProcessDefinitionId());
-            respVO.setProcessName(definition.getName());
-            respVO.setProcessKey(definition.getKey());
-            respVO.setBusinessKey(task.getBusinessKey());
-            respVO.setStatus(task.getAssignee() == null ? 1 : 2);
-            return respVO;
+            ProcessDefinition definition = repositoryService.getProcessDefinition(task.getProcessDefinitionId());
+            return  TaskConvert.INSTANCE.convert(task, definition);
         }).collect(Collectors.toList());
-        // TODO @jason：要注意泛型哈。
-        return new PageResult(respVOList, Long.valueOf(totalItems)); // TODO @jason：(long) 转换即可
+        return new PageResult<>(respVOList, (long)totalItems);
     }
 
 
@@ -88,35 +70,22 @@ public class TaskServiceImpl implements TaskService {
                                 .build());
     }
 
-    @Override
-    public void getTaskHistory(String taskId) {
-        final List<HistoricProcessInstance> list = historyService.createHistoricProcessInstanceQuery().
-                processInstanceId("8e2801fc-1a38-11ec-98ce-74867a13730f").list();
-    }
 
-    // TODO @jason：一个方法里，会有多个方法的调用，最好写下对应的注释。这样容易理解
+    /**
+     * 工作流，完成 userTask, 完成用户任务 一般传入参数 1。是否同意（variables).  2. 评论(comment)
+     * variables 变量名 和 评论 由前台传入
+     * @param taskReq
+     */
     @Override
     @Transactional
     public void completeTask(TaskReqVO taskReq) {
         final Task task = taskRuntime.task(taskReq.getTaskId());
-
-        final Map<String, Object> variables = taskReq.getVariables();
 
         activitiTaskService.addComment(taskReq.getTaskId(), task.getProcessInstanceId(), taskReq.getComment());
 
         taskRuntime.complete(TaskPayloadBuilder.complete().withTaskId(taskReq.getTaskId())
                 .withVariables(taskReq.getVariables())
                 .build());
-
-//        if(variables.containsValue(Boolean.FALSE)){
-//            final String businessKey = task.getBusinessKey();
-//            UpdateWrapper<OaLeaveDO> updateWrapper = new UpdateWrapper<>();
-//            updateWrapper.eq("id", Long.valueOf(businessKey));
-//            OaLeaveDO updateDo = new OaLeaveDO();
-//            updateDo.setStatus(2);
-//            leaveMapper.update(updateDo, updateWrapper);
-//        }
-
     }
 
 //    @Override
@@ -142,22 +111,8 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public TaskHandleVO getTaskSteps(TaskQueryReqVO taskQuery) {
         TaskHandleVO handleVO = new TaskHandleVO();
-
-//        String processKey = taskQuery.getProcessKey();
-//        if ("leave".equals(processKey)) {
-//            String businessKey = taskQuery.getBusinessKey();
-//            final OaLeaveDO leave = leaveMapper.selectById(Long.valueOf(businessKey));
-//            handleVO.setFormObject( OaLeaveConvert.INSTANCE.convert(leave));
-//        }
-
-//
-//        final String taskDefKey = task.getTaskDefinitionKey();
-//        final String variableName = Optional.ofNullable(taskVariable.get(taskDefKey)).orElse("");
-//        handleVO.setTaskVariable(variableName);
         final Task task = taskRuntime.task(taskQuery.getTaskId());
-
         List<TaskStepVO> steps = getTaskSteps(task.getProcessInstanceId());
-
         handleVO.setHistoryTask(steps);
         return handleVO;
     }
@@ -173,21 +128,13 @@ public class TaskServiceImpl implements TaskService {
         // 获得对应的步骤
         List<TaskStepVO> steps = new ArrayList<>();
         finished.forEach(instance -> {
-            // TODO @jason：放到 convert 里
-            TaskStepVO step = new TaskStepVO();
-            step.setStepName(instance.getActivityName());
-            step.setStartTime(instance.getStartTime());
-            step.setEndTime(instance.getEndTime());
-            step.setAssignee(instance.getAssignee());
-            step.setStatus(1);
-            // TODO @jason：一般判数组为空，使用 CollUtil.isEmpty 会好点哈。另外，null 时候，不用填写 "" 的哈
+            TaskStepVO stepVO = TaskConvert.INSTANCE.convert(instance);
+            stepVO.setStatus(1);
             List<Comment> comments = activitiTaskService.getTaskComments(instance.getTaskId());
-            if (comments.size() > 0) {
-                step.setComment(comments.get(0).getFullMessage());
-            } else {
-                step.setComment("");
+            if (!CollUtil.isEmpty(comments)) {
+                stepVO.setComment(Optional.ofNullable(comments.get(0)).map(t->t.getFullMessage()).orElse(""));
             }
-            steps.add(step);
+            steps.add(stepVO);
         });
 
         // 获得未完成的活动
@@ -197,16 +144,11 @@ public class TaskServiceImpl implements TaskService {
                 .activityType("userTask")
                 .unfinished().list();
         // 获得对应的步骤
-        // TODO @json：其实已完成和未完成，它们的 convert 的逻辑，是一致的
         for (HistoricActivityInstance instance : unfinished) {
-            TaskStepVO step = new TaskStepVO();
-            step.setStepName(instance.getActivityName());
-            step.setStartTime(instance.getStartTime());
-            step.setEndTime(instance.getEndTime());
-            step.setAssignee(Optional.ofNullable(instance.getAssignee()).orElse(""));
-            step.setComment("");
-            step.setStatus(0);
-            steps.add(step);
+            TaskStepVO stepVO = TaskConvert.INSTANCE.convert(instance);
+            stepVO.setComment("");
+            stepVO.setStatus(0);
+            steps.add(stepVO);
         }
         return steps;
     }

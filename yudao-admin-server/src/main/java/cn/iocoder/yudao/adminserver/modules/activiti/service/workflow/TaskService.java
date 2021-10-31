@@ -12,7 +12,6 @@ public interface TaskService {
 
     void claimTask(String taskId);
 
-    void getTaskHistory(String taskId);
 
     void completeTask(TaskReqVO taskReq);
 

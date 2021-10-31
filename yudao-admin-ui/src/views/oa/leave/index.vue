@@ -139,7 +139,7 @@
 
     <el-dialog :title="title" :visible.sync="dialogStepsVisible" width="600px" append-to-body>
       <el-steps :active="stepActive" finish-status="success" >
-        <el-step :title="stepTitle(item)" :description="' 办理人：' + item.assignee " icon="el-icon-edit"  v-for="(item) in handleTask.historyTask"></el-step>
+        <el-step :title="stepTitle(item)" :description="stepAssignee(item.assignee)" icon="el-icon-edit"  v-for="(item) in handleTask.historyTask"></el-step>
       </el-steps>
       <br/>
       <el-steps direction="vertical" :active="stepActive">
@@ -250,6 +250,17 @@ export default {
         let desc = "";
         if (item.status === 1) {
           desc += "审批人：[" + item.assignee + "]    审批意见: [" + item.comment + "]   审批时间: " + this.parseTime(item.endTime);
+        }
+        return desc;
+      }
+    },
+    stepAssignee() {
+      return function (assignee) {
+        let desc = "";
+        if(assignee){
+          desc += "办理人：[" + assignee + "]";
+        }else{
+          desc += "办理人未签收";
         }
         return desc;
       }

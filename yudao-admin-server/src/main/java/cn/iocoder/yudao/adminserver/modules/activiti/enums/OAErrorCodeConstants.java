@@ -8,6 +8,6 @@ import cn.iocoder.yudao.framework.common.exception.ErrorCode;
  * 001 oa
  * activiti 系统，使用 1-003-000-000 段
  */
-public interface OaErrorCodeConstants {
+public interface OAErrorCodeConstants {
     ErrorCode LEAVE_NOT_EXISTS = new ErrorCode(1003001001, "请假申请不存在");
 }
