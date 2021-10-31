@@ -12,7 +12,7 @@ import com.alibaba.excel.annotation.ExcelProperty;
  * @author 芋艿
  */
 @Data
-public class OaLeaveExcelVO {
+public class OALeaveExcelVO {
 
     @ExcelProperty("请假表单主键")
     private Long id;

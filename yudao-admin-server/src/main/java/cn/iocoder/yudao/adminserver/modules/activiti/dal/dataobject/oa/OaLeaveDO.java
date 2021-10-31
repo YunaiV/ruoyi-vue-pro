@@ -17,7 +17,7 @@ import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class OaLeaveDO extends BaseDO {
+public class OALeaveDO extends BaseDO {
 
     /**
      * 请假表单主键

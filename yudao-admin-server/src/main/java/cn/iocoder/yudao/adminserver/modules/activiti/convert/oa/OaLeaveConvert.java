@@ -2,12 +2,12 @@ package cn.iocoder.yudao.adminserver.modules.activiti.convert.oa;
 
 import java.util.*;
 
+import cn.iocoder.yudao.adminserver.modules.activiti.dal.dataobject.oa.OALeaveDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 import cn.iocoder.yudao.adminserver.modules.activiti.controller.oa.vo.*;
-import cn.iocoder.yudao.adminserver.modules.activiti.dal.dataobject.oa.OaLeaveDO;
 
 /**
  * 请假申请 Convert
@@ -15,20 +15,20 @@ import cn.iocoder.yudao.adminserver.modules.activiti.dal.dataobject.oa.OaLeaveDO
  * @author 芋艿
  */
 @Mapper
-public interface OaLeaveConvert {
+public interface OALeaveConvert {
 
-    OaLeaveConvert INSTANCE = Mappers.getMapper(OaLeaveConvert.class);
+    OALeaveConvert INSTANCE = Mappers.getMapper(OALeaveConvert.class);
 
-    OaLeaveDO convert(OaLeaveCreateReqVO bean);
+    OALeaveDO convert(OALeaveCreateReqVO bean);
 
-    OaLeaveDO convert(OaLeaveUpdateReqVO bean);
+    OALeaveDO convert(OALeaveUpdateReqVO bean);
 
-    OaLeaveRespVO convert(OaLeaveDO bean);
+    OALeaveRespVO convert(OALeaveDO bean);
 
-    List<OaLeaveRespVO> convertList(List<OaLeaveDO> list);
+    List<OALeaveRespVO> convertList(List<OALeaveDO> list);
 
-    PageResult<OaLeaveRespVO> convertPage(PageResult<OaLeaveDO> page);
+    PageResult<OALeaveRespVO> convertPage(PageResult<OALeaveDO> page);
 
-    List<OaLeaveExcelVO> convertList02(List<OaLeaveDO> list);
+    List<OALeaveExcelVO> convertList02(List<OALeaveDO> list);
 
 }

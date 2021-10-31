@@ -12,7 +12,7 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class OaLeavePageReqVO extends PageParam {
+public class OALeavePageReqVO extends PageParam {
 
     @ApiModelProperty(value = "流程id")
     private String processInstanceId;

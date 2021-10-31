@@ -10,7 +10,7 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 
 @ApiModel(value = "请假申请 Excel 导出 Request VO", description = "参数和 OaLeavePageReqVO 是一致的")
 @Data
-public class OaLeaveExportReqVO {
+public class OALeaveExportReqVO {
 
     @ApiModelProperty(value = "流程id")
     private String processInstanceId;

@@ -13,7 +13,7 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 * 如果子 VO 存在差异的字段，请不要添加到这里，影响 Swagger 文档生成
 */
 @Data
-public class OaLeaveBaseVO {
+public class OALeaveBaseVO {
 
     @ApiModelProperty(value = "流程id")
     private String processInstanceId;

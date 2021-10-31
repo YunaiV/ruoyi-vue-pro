@@ -1,16 +1,15 @@
 package cn.iocoder.yudao.adminserver.modules.activiti.service.oa.impl;
 
-import cn.iocoder.yudao.adminserver.modules.activiti.controller.oa.vo.OaLeaveCreateReqVO;
-import cn.iocoder.yudao.adminserver.modules.activiti.controller.oa.vo.OaLeaveExportReqVO;
-import cn.iocoder.yudao.adminserver.modules.activiti.controller.oa.vo.OaLeavePageReqVO;
-import cn.iocoder.yudao.adminserver.modules.activiti.controller.oa.vo.OaLeaveUpdateReqVO;
-import cn.iocoder.yudao.adminserver.modules.activiti.convert.oa.OaLeaveConvert;
-import cn.iocoder.yudao.adminserver.modules.activiti.dal.dataobject.oa.OaLeaveDO;
+import cn.iocoder.yudao.adminserver.modules.activiti.controller.oa.vo.OALeaveCreateReqVO;
+import cn.iocoder.yudao.adminserver.modules.activiti.controller.oa.vo.OALeaveUpdateReqVO;
+import cn.iocoder.yudao.adminserver.modules.activiti.controller.oa.vo.OALeaveExportReqVO;
+import cn.iocoder.yudao.adminserver.modules.activiti.controller.oa.vo.OALeavePageReqVO;
+import cn.iocoder.yudao.adminserver.modules.activiti.convert.oa.OALeaveConvert;
+import cn.iocoder.yudao.adminserver.modules.activiti.dal.dataobject.oa.OALeaveDO;
 import cn.iocoder.yudao.adminserver.modules.activiti.dal.mysql.oa.OaLeaveMapper;
-import cn.iocoder.yudao.adminserver.modules.activiti.service.oa.OaLeaveService;
+import cn.iocoder.yudao.adminserver.modules.activiti.service.oa.OALeaveService;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import org.activiti.api.task.model.Task;
 import org.activiti.api.task.model.builders.TaskPayloadBuilder;
 import org.activiti.api.task.runtime.TaskRuntime;
@@ -21,12 +20,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-import static cn.iocoder.yudao.adminserver.modules.activiti.enums.OaErrorCodeConstants.LEAVE_NOT_EXISTS;
+import static cn.iocoder.yudao.adminserver.modules.activiti.enums.OAErrorCodeConstants.LEAVE_NOT_EXISTS;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 
 /**
@@ -36,7 +32,7 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
  */
 @Service
 @Validated
-public class OaLeaveServiceImpl implements OaLeaveService {
+public class OALeaveServiceImpl implements OALeaveService {
 
     @Resource
     private OaLeaveMapper leaveMapper;
@@ -52,9 +48,9 @@ public class OaLeaveServiceImpl implements OaLeaveService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Long createLeave(OaLeaveCreateReqVO createReqVO) {
+    public Long createLeave(OALeaveCreateReqVO createReqVO) {
         // 插入 OA 请假单
-        OaLeaveDO leave = OaLeaveConvert.INSTANCE.convert(createReqVO);
+        OALeaveDO leave = OALeaveConvert.INSTANCE.convert(createReqVO);
         leave.setStatus(1);
         leave.setUserId(SecurityFrameworkUtils.getLoginUser().getUsername());
         leaveMapper.insert(leave);
@@ -68,19 +64,17 @@ public class OaLeaveServiceImpl implements OaLeaveService {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(createReqVO.getProcessKey(), businessKey, variables);
         String processInstanceId = processInstance.getProcessInstanceId();
 
-        // TODO @json：service 不要出现 dao 的元素，例如说 UpdateWrapper。这里，我们可以调用 updateById 方法
         // 将工作流的编号，更新到 OA 请假单中
-        UpdateWrapper<OaLeaveDO> updateWrapper = new UpdateWrapper<>();
-        updateWrapper.eq("id", id);
-        OaLeaveDO updateDo = new OaLeaveDO();
+        OALeaveDO updateDo = new OALeaveDO();
         updateDo.setProcessInstanceId(processInstanceId);
-        leaveMapper.update(updateDo, updateWrapper);
+        updateDo.setId(id);
+        leaveMapper.updateById(updateDo);
         return id;
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void updateLeave(OaLeaveUpdateReqVO updateReqVO) {
+    public void updateLeave(OALeaveUpdateReqVO updateReqVO) {
         // 校验存在
         this.validateLeaveExists(updateReqVO.getId());
 
@@ -93,12 +87,12 @@ public class OaLeaveServiceImpl implements OaLeaveService {
         taskRuntime.complete(TaskPayloadBuilder.complete().withTaskId(task.getId())
                 .withVariables(variables)
                 .build());
-        // TODO @jason：不需要加 final 哈。虽然是不变，但是代码比较少这么去写
-        final Object reApply = variables.get("reApply");
-        // TODO @jason：直接使用 Objects.equals(reApply, true) 就可以
-        if((reApply instanceof Boolean) && (Boolean)reApply){
+
+        // TOTO @芋道源码 貌似 IDEA 会自动加上final（不需要加 final 哈。虽然是不变，但是代码比较少这么去写)
+        Object reApply = variables.get("reApply");
+        if(Objects.equals(reApply, true)){
             // 更新 表单
-            OaLeaveDO updateObj = OaLeaveConvert.INSTANCE.convert(updateReqVO);
+            OALeaveDO updateObj = OALeaveConvert.INSTANCE.convert(updateReqVO);
             leaveMapper.updateById(updateObj);
         }
     }
@@ -110,6 +104,8 @@ public class OaLeaveServiceImpl implements OaLeaveService {
         // 删除
         leaveMapper.deleteById(id);
         // TODO @jason：需要调用 runtimeService 的 delete 方法，删除？？？
+        // TOTO @芋道源码 目前页面暂时没有实现基于业务表单的删除, 该代码自动生成的。
+        // TODO @芋道源码  我理解提交流程后，是不允许删除的？ ， 只能在流程处理中作废流程
     }
 
     private void validateLeaveExists(Long id) {
@@ -119,22 +115,22 @@ public class OaLeaveServiceImpl implements OaLeaveService {
     }
 
     @Override
-    public OaLeaveDO getLeave(Long id) {
+    public OALeaveDO getLeave(Long id) {
         return leaveMapper.selectById(id);
     }
 
     @Override
-    public List<OaLeaveDO> getLeaveList(Collection<Long> ids) {
+    public List<OALeaveDO> getLeaveList(Collection<Long> ids) {
         return leaveMapper.selectBatchIds(ids);
     }
 
     @Override
-    public PageResult<OaLeaveDO> getLeavePage(OaLeavePageReqVO pageReqVO) {
+    public PageResult<OALeaveDO> getLeavePage(OALeavePageReqVO pageReqVO) {
         return leaveMapper.selectPage(pageReqVO);
     }
 
     @Override
-    public List<OaLeaveDO> getLeaveList(OaLeaveExportReqVO exportReqVO) {
+    public List<OALeaveDO> getLeaveList(OALeaveExportReqVO exportReqVO) {
         return leaveMapper.selectList(exportReqVO);
     }
 

@@ -13,7 +13,7 @@ import java.util.Map;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class OaLeaveUpdateReqVO extends OaLeaveBaseVO {
+public class OALeaveUpdateReqVO extends OALeaveBaseVO {
 
     @ApiModelProperty(value = "请假表单主键", required = true)
     @NotNull(message = "请假表单主键不能为空")

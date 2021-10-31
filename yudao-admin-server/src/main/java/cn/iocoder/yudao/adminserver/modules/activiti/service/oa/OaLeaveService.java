@@ -1,11 +1,11 @@
 package cn.iocoder.yudao.adminserver.modules.activiti.service.oa;
 
 
-import cn.iocoder.yudao.adminserver.modules.activiti.controller.oa.vo.OaLeaveCreateReqVO;
-import cn.iocoder.yudao.adminserver.modules.activiti.controller.oa.vo.OaLeaveExportReqVO;
-import cn.iocoder.yudao.adminserver.modules.activiti.controller.oa.vo.OaLeavePageReqVO;
-import cn.iocoder.yudao.adminserver.modules.activiti.controller.oa.vo.OaLeaveUpdateReqVO;
-import cn.iocoder.yudao.adminserver.modules.activiti.dal.dataobject.oa.OaLeaveDO;
+import cn.iocoder.yudao.adminserver.modules.activiti.controller.oa.vo.OALeaveCreateReqVO;
+import cn.iocoder.yudao.adminserver.modules.activiti.controller.oa.vo.OALeaveUpdateReqVO;
+import cn.iocoder.yudao.adminserver.modules.activiti.controller.oa.vo.OALeaveExportReqVO;
+import cn.iocoder.yudao.adminserver.modules.activiti.controller.oa.vo.OALeavePageReqVO;
+import cn.iocoder.yudao.adminserver.modules.activiti.dal.dataobject.oa.OALeaveDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 
 import javax.validation.Valid;
@@ -17,7 +17,7 @@ import java.util.List;
  *
  * @author 芋艿
  */
-public interface OaLeaveService {
+public interface OALeaveService {
 
     /**
      * 创建请假申请
@@ -25,14 +25,14 @@ public interface OaLeaveService {
      * @param createReqVO 创建信息
      * @return 编号
      */
-    Long createLeave(@Valid OaLeaveCreateReqVO createReqVO);
+    Long createLeave(@Valid OALeaveCreateReqVO createReqVO);
 
     /**
      * 更新请假申请
      *
      * @param updateReqVO 更新信息
      */
-    void updateLeave(@Valid OaLeaveUpdateReqVO updateReqVO);
+    void updateLeave(@Valid OALeaveUpdateReqVO updateReqVO);
 
     /**
      * 删除请假申请
@@ -47,7 +47,7 @@ public interface OaLeaveService {
      * @param id 编号
      * @return 请假申请
      */
-    OaLeaveDO getLeave(Long id);
+    OALeaveDO getLeave(Long id);
 
     /**
      * 获得请假申请列表
@@ -55,7 +55,7 @@ public interface OaLeaveService {
      * @param ids 编号
      * @return 请假申请列表
      */
-    List<OaLeaveDO> getLeaveList(Collection<Long> ids);
+    List<OALeaveDO> getLeaveList(Collection<Long> ids);
 
     /**
      * 获得请假申请分页
@@ -63,7 +63,7 @@ public interface OaLeaveService {
      * @param pageReqVO 分页查询
      * @return 请假申请分页
      */
-    PageResult<OaLeaveDO> getLeavePage(OaLeavePageReqVO pageReqVO);
+    PageResult<OALeaveDO> getLeavePage(OALeavePageReqVO pageReqVO);
 
     /**
      * 获得请假申请列表, 用于 Excel 导出
@@ -71,6 +71,6 @@ public interface OaLeaveService {
      * @param exportReqVO 查询条件
      * @return 请假申请列表
      */
-    List<OaLeaveDO> getLeaveList(OaLeaveExportReqVO exportReqVO);
+    List<OALeaveDO> getLeaveList(OALeaveExportReqVO exportReqVO);
 
 }
