@@ -89,6 +89,8 @@ public class LoginUser implements UserDetails {
     @JsonIgnore// 避免序列化
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<GrantedAuthority> list = new ArrayList<>(1);
+        // 设置 ROLE_ACTIVITI_USER 角色，保证 activiti7 在 Security 验证时，可以通过。参考 https://juejin.cn/post/6972369247041224712 文章
+        // TODO 芋艿：这里估计得优化下
         list.add(new SimpleGrantedAuthority("ROLE_ACTIVITI_USER"));
         return list;
     }
