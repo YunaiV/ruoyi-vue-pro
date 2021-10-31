@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.userserver.modules.system.controller.auth;
 
-import cn.iocoder.yudao.coreservice.modules.system.service.social.SysSocialService;
+import cn.iocoder.yudao.coreservice.modules.system.service.social.SysSocialCoreService;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.userserver.modules.system.controller.auth.vo.*;
@@ -36,7 +36,7 @@ public class SysAuthController {
     @Resource
     private SysSmsCodeService smsCodeService;
     @Resource
-    private SysSocialService socialService;
+    private SysSocialCoreService socialService;
 
 
     @PostMapping("/login")

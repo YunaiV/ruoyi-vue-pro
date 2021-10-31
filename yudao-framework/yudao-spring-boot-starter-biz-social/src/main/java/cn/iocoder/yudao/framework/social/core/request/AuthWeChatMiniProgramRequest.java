@@ -1,6 +1,9 @@
-package cn.iocoder.yudao.coreservice.modules.system.compent.justauth;
+package cn.iocoder.yudao.framework.social.core.request;
 
-import com.alibaba.fastjson.JSONObject;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
+import cn.iocoder.yudao.framework.social.core.enums.AuthExtendSource;
+import cn.iocoder.yudao.framework.social.core.model.AuthExtendToken;
+import lombok.Data;
 import me.zhyd.oauth.cache.AuthStateCache;
 import me.zhyd.oauth.config.AuthConfig;
 import me.zhyd.oauth.exception.AuthException;
@@ -11,9 +14,6 @@ import me.zhyd.oauth.request.AuthDefaultRequest;
 import me.zhyd.oauth.utils.HttpUtils;
 import me.zhyd.oauth.utils.UrlBuilder;
 
-// TODO @timfruit：新建一个 yudao-spring-boot-starter-biz-social 包，把这个拓展拿进去哈。另外，可以思考下。
-// 1. application-local.yaml 的配置里，justauth.extend.enum-class 能否不配置，而是自动配置好
-// 2. application-local.yaml 的配置里，justauth.extend.extend.config.WECHAT_MINI_PROGRAM 有办法和 justauth.type.WECHAT_MP 持平
 /**
  * 微信小程序登陆
  *
@@ -34,14 +34,14 @@ public class AuthWeChatMiniProgramRequest extends AuthDefaultRequest {
     protected AuthToken getAccessToken(AuthCallback authCallback) {
         // https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/login/auth.code2Session.html
         String response = new HttpUtils(config.getHttpConfig()).get(accessTokenUrl(authCallback.getCode()));
-        JSONObject accessTokenObject = JSONObject.parseObject(response); // TODO @timfruit：使用 JsonUtils，项目尽量避免直接使用某个 json 库
+        CodeSessionResponse accessTokenObject = JsonUtils.parseObject(response, CodeSessionResponse.class);
 
         this.checkResponse(accessTokenObject);
 
         AuthExtendToken token = new AuthExtendToken();
-        token.setMiniSessionKey(accessTokenObject.getString("session_key"));
-        token.setOpenId(accessTokenObject.getString("openid"));
-        token.setUnionId(accessTokenObject.getString("unionid"));
+        token.setMiniSessionKey(accessTokenObject.session_key);
+        token.setOpenId(accessTokenObject.openid);
+        token.setUnionId(accessTokenObject.unionid);
         return token;
     }
 
@@ -64,10 +64,9 @@ public class AuthWeChatMiniProgramRequest extends AuthDefaultRequest {
      *
      * @param object 请求响应内容
      */
-    private void checkResponse(JSONObject object) {
-        int code = object.getIntValue("errcode");
-        if(code != 0){ // TODO @timfruit：if (code != 0) { ，注意空格
-            throw new AuthException(object.getIntValue("errcode"), object.getString("errmsg"));
+    private void checkResponse(CodeSessionResponse object) {
+        if (object.errcode != 0) {
+            throw new AuthException(object.errcode, object.errmsg);
         }
     }
 
@@ -85,6 +84,15 @@ public class AuthWeChatMiniProgramRequest extends AuthDefaultRequest {
                 .queryParam("js_code", code)
                 .queryParam("grant_type", "authorization_code")
                 .build();
+    }
+
+    @Data
+    private static class CodeSessionResponse {
+        private int errcode;
+        private String errmsg;
+        private String session_key;
+        private String openid;
+        private String unionid;
     }
 
 }

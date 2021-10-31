@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.coreservice.modules.system.compent.justauth;
+package cn.iocoder.yudao.framework.social.core.enums;
 
 import me.zhyd.oauth.config.AuthSource;
 

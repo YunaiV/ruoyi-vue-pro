@@ -2,15 +2,15 @@ package cn.iocoder.yudao.coreservice.modules.system.service.social.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.social.SysSocialUserDO;
-import cn.iocoder.yudao.coreservice.modules.system.dal.mysql.social.SysSocialUserMapper;
+import cn.iocoder.yudao.coreservice.modules.system.dal.mysql.social.SysSocialUserCoreMapper;
 import cn.iocoder.yudao.coreservice.modules.system.dal.redis.social.SysSocialAuthUserRedisDAO;
 import cn.iocoder.yudao.coreservice.modules.system.enums.social.SysSocialTypeEnum;
-import cn.iocoder.yudao.coreservice.modules.system.service.social.SysSocialService;
+import cn.iocoder.yudao.coreservice.modules.system.service.social.SysSocialCoreService;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.http.HttpUtils;
+import cn.iocoder.yudao.framework.social.core.YudaoAuthRequestFactory;
 import com.google.common.annotations.VisibleForTesting;
-import com.xkcoding.justauth.AuthRequestFactory;
 import lombok.extern.slf4j.Slf4j;
 import me.zhyd.oauth.model.AuthCallback;
 import me.zhyd.oauth.model.AuthResponse;
@@ -38,21 +38,21 @@ import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString
 @Service
 @Validated
 @Slf4j
-public class SysSocialServiceImpl implements SysSocialService {
+public class SysSocialCoreServiceImpl implements SysSocialCoreService {
 
     @Resource
-    private AuthRequestFactory authRequestFactory;
+    private YudaoAuthRequestFactory yudaoAuthRequestFactory;
 
     @Resource
     private SysSocialAuthUserRedisDAO authSocialUserRedisDAO;
 
     @Resource
-    private SysSocialUserMapper socialUserMapper;
+    private SysSocialUserCoreMapper socialUserMapper;
 
     @Override
     public String getAuthorizeUrl(Integer type, String redirectUri) {
         // 获得对应的 AuthRequest 实现
-        AuthRequest authRequest = authRequestFactory.get(SysSocialTypeEnum.valueOfType(type).getSource());
+        AuthRequest authRequest = yudaoAuthRequestFactory.get(SysSocialTypeEnum.valueOfType(type).getSource());
         // 生成跳转地址
         String authorizeUri = authRequest.authorize(AuthStateUtils.createState());
         return HttpUtils.replaceUrlQuery(authorizeUri, "redirect_uri", redirectUri);
@@ -161,7 +161,7 @@ public class SysSocialServiceImpl implements SysSocialService {
      * @return 授权的用户
      */
     private AuthUser getAuthUser0(Integer type, AuthCallback authCallback) {
-        AuthRequest authRequest = authRequestFactory.get(SysSocialTypeEnum.valueOfType(type).getSource());
+        AuthRequest authRequest = yudaoAuthRequestFactory.get(SysSocialTypeEnum.valueOfType(type).getSource());
         AuthResponse<?> authResponse = authRequest.login(authCallback);
         log.info("[getAuthUser0][请求社交平台 type({}) request({}) response({})]", type, toJsonString(authCallback),
                 toJsonString(authResponse));

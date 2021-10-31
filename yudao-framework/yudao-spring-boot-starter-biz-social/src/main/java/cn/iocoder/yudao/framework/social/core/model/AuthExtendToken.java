@@ -1,10 +1,11 @@
-package cn.iocoder.yudao.coreservice.modules.system.compent.justauth;
+package cn.iocoder.yudao.framework.social.core.model;
 
 import lombok.*;
 import me.zhyd.oauth.model.AuthToken;
 
 /**
- * TODO @timfruit：类注释
+ * 授权所需的token 拓展类
+ *
  * @author timfruit
  * @date 2021-10-29
  */

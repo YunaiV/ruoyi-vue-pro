@@ -8,9 +8,8 @@ import org.apache.ibatis.annotations.Mapper;
 import java.util.Collection;
 import java.util.List;
 
-// TODO @timfruit：SysSocialUserCoreMapper 改名，方便区分
 @Mapper
-public interface SysSocialUserMapper extends BaseMapperX<SysSocialUserDO> {
+public interface SysSocialUserCoreMapper extends BaseMapperX<SysSocialUserDO> {
 
     default List<SysSocialUserDO> selectListByTypeAndUnionId(Integer userType, Collection<Integer> types, String unionId) {
         return selectList(new QueryWrapper<SysSocialUserDO>().eq("user_type", userType)
