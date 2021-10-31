@@ -41,6 +41,7 @@ public class OALeaveController {
     @PreAuthorize("@ss.hasPermission('oa:leave:create')")
     public CommonResult<Long> createLeave(@Valid @RequestBody OALeaveCreateReqVO createReqVO) {
         // TODO @芋艿：processKey 自己去理解下。不过得把 leave 变成枚举
+        // TODO @芋艿 该方法没有用到， 是前一个版本的， 可以删掉。
         createReqVO.setProcessKey("leave");
         return success(leaveService.createLeave(createReqVO));
     }
@@ -49,6 +50,7 @@ public class OALeaveController {
     @ApiOperation("创建外置请假申请")
     public CommonResult<Long> createFormKeyLeave(@Valid @RequestBody OALeaveCreateReqVO createReqVO) {
         // TODO @芋艿：processKey 自己去理解下。不过得把 formkey 变成枚举
+        // TODO @芋艿 : processKey 是 bpmn  <process> 中定义的id, 提交业务表单时候， 需要启动流程， 或许从前台传更合适
         createReqVO.setProcessKey("leave-formkey");
         return success(leaveService.createLeave(createReqVO));
     }
