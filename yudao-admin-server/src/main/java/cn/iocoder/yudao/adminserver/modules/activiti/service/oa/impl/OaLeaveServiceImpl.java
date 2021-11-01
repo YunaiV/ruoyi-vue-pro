@@ -52,6 +52,7 @@ public class OALeaveServiceImpl implements OALeaveService {
         // 插入 OA 请假单
         OALeaveDO leave = OALeaveConvert.INSTANCE.convert(createReqVO);
         leave.setStatus(1);
+        // TODO @jason：应该是存储 userId？？
         leave.setUserId(SecurityFrameworkUtils.getLoginUser().getUsername());
         leaveMapper.insert(leave);
 

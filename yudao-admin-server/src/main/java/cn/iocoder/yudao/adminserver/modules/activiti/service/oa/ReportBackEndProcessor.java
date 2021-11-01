@@ -9,12 +9,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 
+// TODO @jason：类注释
 @Component
 public class ReportBackEndProcessor implements ExecutionListener {
 
     @Resource
     private OaLeaveMapper leaveMapper;
-
 
     @Override
     @Transactional(rollbackFor = Exception.class)

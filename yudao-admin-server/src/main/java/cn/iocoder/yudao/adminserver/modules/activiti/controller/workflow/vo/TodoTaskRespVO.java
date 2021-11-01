@@ -2,13 +2,14 @@ package cn.iocoder.yudao.adminserver.modules.activiti.controller.workflow.vo;
 
 import io.swagger.annotations.ApiModel;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 @ApiModel("待办任务 Response VO")
 @Data
 @ToString
 public class TodoTaskRespVO {
+
+    // TODO @jason：swagger 注解。这样接口文档才完整哈
 
     private String id;
 

@@ -5,7 +5,6 @@ import cn.iocoder.yudao.adminserver.modules.activiti.controller.workflow.vo.*;
 import cn.iocoder.yudao.adminserver.modules.activiti.convert.workflow.TaskConvert;
 import cn.iocoder.yudao.adminserver.modules.activiti.service.workflow.TaskService;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import org.activiti.api.runtime.shared.query.Page;
 import org.activiti.api.runtime.shared.query.Pageable;
@@ -41,11 +40,6 @@ public class TaskServiceImpl implements TaskService {
 
     @Resource
     private RepositoryService repositoryService;
-
-
-    public TaskServiceImpl() {
-
-    }
 
     @Override
     public PageResult<TodoTaskRespVO> getTodoTaskPage(TodoTaskPageReqVO pageReqVO) {
@@ -129,9 +123,11 @@ public class TaskServiceImpl implements TaskService {
         List<TaskStepVO> steps = new ArrayList<>();
         finished.forEach(instance -> {
             TaskStepVO stepVO = TaskConvert.INSTANCE.convert(instance);
-            stepVO.setStatus(1);
+            stepVO.setStatus(1); // TODO @jason：1 这个 magic number 要枚举起来。
+            // TODO @jason：可以考虑把 comments 读取后，在统一调用 convert 拼接。另外 Comment 是废弃的类，有没其它可以使用的哈？
             List<Comment> comments = activitiTaskService.getTaskComments(instance.getTaskId());
             if (!CollUtil.isEmpty(comments)) {
+                // TODO @jason：IDEA 在 t.getFullMessage() 有提示告警，可以解决下。
                 stepVO.setComment(Optional.ofNullable(comments.get(0)).map(t->t.getFullMessage()).orElse(""));
             }
             steps.add(stepVO);

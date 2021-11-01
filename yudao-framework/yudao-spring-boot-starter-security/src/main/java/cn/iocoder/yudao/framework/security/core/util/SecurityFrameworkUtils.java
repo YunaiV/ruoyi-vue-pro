@@ -101,6 +101,7 @@ public class SecurityFrameworkUtils {
         WebFrameworkUtils.setLoginUserType(request, loginUser.getUserType());
         // TODO @jason：使用 userId 会不会更合适哈？
         // TODO @芋道源码 该值被赋值给 user task 中assignee ， username 显示更直白一点
+        // TODO @jason：有办法设置 userId，然后 activiti 有地方读取到 username 么？毕竟 username 只是 User 的登陆账号，并不能绝对像 userId 代表一个用户
         org.activiti.engine.impl.identity.Authentication.setAuthenticatedUserId(loginUser.getUsername());
     }
 

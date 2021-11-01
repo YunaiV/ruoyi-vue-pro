@@ -6,6 +6,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import java.util.List;
 
 // TODO @芋艿：前缀，注释
+// TODO @json：类和方法的注释。咱是开源项目，有注释，大家才能更容易读懂
 public interface TaskService {
 
     PageResult<TodoTaskRespVO> getTodoTaskPage(TodoTaskPageReqVO pageReqVO);
