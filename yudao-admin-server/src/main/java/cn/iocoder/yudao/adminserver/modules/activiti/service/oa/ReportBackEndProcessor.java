@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.adminserver.modules.activiti.service.oa;
 
 import cn.iocoder.yudao.adminserver.modules.activiti.dal.dataobject.oa.OALeaveDO;
-import cn.iocoder.yudao.adminserver.modules.activiti.dal.mysql.oa.OaLeaveMapper;
+import cn.iocoder.yudao.adminserver.modules.activiti.dal.mysql.oa.OALeaveMapper;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.ExecutionListener;
 import org.springframework.stereotype.Component;
@@ -14,7 +14,7 @@ import javax.annotation.Resource;
 public class ReportBackEndProcessor implements ExecutionListener {
 
     @Resource
-    private OaLeaveMapper leaveMapper;
+    private OALeaveMapper leaveMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)

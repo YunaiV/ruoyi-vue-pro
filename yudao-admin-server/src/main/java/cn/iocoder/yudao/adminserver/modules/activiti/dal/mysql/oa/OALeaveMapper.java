@@ -15,7 +15,7 @@ import cn.iocoder.yudao.adminserver.modules.activiti.controller.oa.vo.*;
  * @author 芋艿
  */
 @Mapper
-public interface OaLeaveMapper extends BaseMapperX<OALeaveDO> {
+public interface OALeaveMapper extends BaseMapperX<OALeaveDO> {
 
     default PageResult<OALeaveDO> selectPage(OALeavePageReqVO reqVO) {
         return selectPage(reqVO, new QueryWrapperX<OALeaveDO>()

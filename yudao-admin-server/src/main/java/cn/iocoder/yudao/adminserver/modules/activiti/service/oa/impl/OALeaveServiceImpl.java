@@ -6,7 +6,7 @@ import cn.iocoder.yudao.adminserver.modules.activiti.controller.oa.vo.OALeaveExp
 import cn.iocoder.yudao.adminserver.modules.activiti.controller.oa.vo.OALeavePageReqVO;
 import cn.iocoder.yudao.adminserver.modules.activiti.convert.oa.OALeaveConvert;
 import cn.iocoder.yudao.adminserver.modules.activiti.dal.dataobject.oa.OALeaveDO;
-import cn.iocoder.yudao.adminserver.modules.activiti.dal.mysql.oa.OaLeaveMapper;
+import cn.iocoder.yudao.adminserver.modules.activiti.dal.mysql.oa.OALeaveMapper;
 import cn.iocoder.yudao.adminserver.modules.activiti.service.oa.OALeaveService;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
@@ -35,7 +35,7 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 public class OALeaveServiceImpl implements OALeaveService {
 
     @Resource
-    private OaLeaveMapper leaveMapper;
+    private OALeaveMapper leaveMapper;
 
     @Resource
     private RuntimeService runtimeService;
@@ -52,6 +52,7 @@ public class OALeaveServiceImpl implements OALeaveService {
         // 插入 OA 请假单
         OALeaveDO leave = OALeaveConvert.INSTANCE.convert(createReqVO);
         leave.setStatus(1);
+        // TODO @jason：应该是存储 userId？？
         leave.setUserId(SecurityFrameworkUtils.getLoginUser().getUsername());
         leaveMapper.insert(leave);
 
