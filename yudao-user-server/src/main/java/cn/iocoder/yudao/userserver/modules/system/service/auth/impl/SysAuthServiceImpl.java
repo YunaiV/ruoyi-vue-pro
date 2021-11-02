@@ -65,7 +65,7 @@ public class SysAuthServiceImpl implements SysAuthService {
     private SysUserSessionCoreService userSessionCoreService;
     @Resource
     private SysSocialCoreService socialService;
-    private static final UserTypeEnum USER_TYPE_ENUM = UserTypeEnum.MEMBER;
+    private static final UserTypeEnum USER_TYPE_ENUM = UserTypeEnum.MEMBER; // TODO @timfruit 挪到类的最前面。一般是 静态变量，到成员变量的顺序。
 
     @Override
     public UserDetails loadUserByUsername(String mobile) throws UsernameNotFoundException {

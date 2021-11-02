@@ -2,6 +2,7 @@ package cn.iocoder.yudao.framework.social.core.enums;
 
 import me.zhyd.oauth.config.AuthSource;
 
+// TODO @timfruit：类注释
 public enum AuthExtendSource implements AuthSource {
 
     /**
@@ -27,7 +28,5 @@ public enum AuthExtendSource implements AuthSource {
             throw new UnsupportedOperationException("不支持获取用户信息url, 请使用小程序内置函数wx.getUserProfile()获取用户信息");
         }
     }
-
-    ;
 
 }

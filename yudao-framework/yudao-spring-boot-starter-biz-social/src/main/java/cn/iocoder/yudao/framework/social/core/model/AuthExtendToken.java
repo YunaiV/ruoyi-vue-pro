@@ -4,7 +4,7 @@ import lombok.*;
 import me.zhyd.oauth.model.AuthToken;
 
 /**
- * 授权所需的token 拓展类
+ * 授权所需的 token 拓展类
  *
  * @author timfruit
  * @date 2021-10-29
@@ -16,7 +16,7 @@ import me.zhyd.oauth.model.AuthToken;
 public class AuthExtendToken extends AuthToken {
 
     /**
-     * 微信小程序 会话密钥
+     * 微信小程序 - 会话密钥
      */
     private String miniSessionKey;
 

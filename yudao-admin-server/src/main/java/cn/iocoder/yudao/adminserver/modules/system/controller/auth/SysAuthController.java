@@ -50,7 +50,7 @@ public class SysAuthController {
     @Resource
     private SysPermissionService permissionService;
     @Resource
-    private SysSocialCoreService socialService;
+    private SysSocialCoreService socialCoreService;
 
     @PostMapping("/login")
     @ApiOperation("使用账号密码登录")
@@ -102,7 +102,7 @@ public class SysAuthController {
     })
     public CommonResult<String> socialAuthRedirect(@RequestParam("type") Integer type,
                                                     @RequestParam("redirectUri") String redirectUri) {
-        return CommonResult.success(socialService.getAuthorizeUrl(type, redirectUri));
+        return CommonResult.success(socialCoreService.getAuthorizeUrl(type, redirectUri));
     }
 
     @PostMapping("/social-login")
@@ -133,7 +133,7 @@ public class SysAuthController {
     @DeleteMapping("/social-unbind")
     @ApiOperation("取消社交绑定")
     public CommonResult<Boolean> socialUnbind(@RequestBody SysAuthSocialUnbindReqVO reqVO) {
-        socialService.unbindSocialUser(getLoginUserId(), reqVO.getType(), reqVO.getUnionId(), UserTypeEnum.ADMIN);
+        socialCoreService.unbindSocialUser(getLoginUserId(), reqVO.getType(), reqVO.getUnionId(), UserTypeEnum.ADMIN);
         return CommonResult.success(true);
     }
 

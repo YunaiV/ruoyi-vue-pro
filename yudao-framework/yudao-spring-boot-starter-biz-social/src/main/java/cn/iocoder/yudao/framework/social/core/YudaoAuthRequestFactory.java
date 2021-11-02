@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.framework.social.core;
 
 import cn.hutool.core.util.EnumUtil;
-import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.social.core.enums.AuthExtendSource;
 import cn.iocoder.yudao.framework.social.core.request.AuthWeChatMiniProgramRequest;
 import com.xkcoding.http.config.HttpConfig;
@@ -18,12 +17,14 @@ import java.net.Proxy;
 import java.util.Map;
 
 /**
- * 第三方授权拓展request工厂类
+ * 第三方授权拓展 request 工厂类
+ * TODO @timfruit 可以说明下，为啥有了 AuthRequestFactory 类，咱还需要自定义
  *
  * @author timfruit
  * @date 2021-10-31
  */
 public class YudaoAuthRequestFactory extends AuthRequestFactory {
+
     protected JustAuthProperties properties;
     protected AuthStateCache authStateCache;
 
@@ -34,7 +35,7 @@ public class YudaoAuthRequestFactory extends AuthRequestFactory {
     }
 
     /**
-     * 返回AuthRequest对象
+     * 返回 AuthRequest 对象
      *
      * @param source {@link AuthSource}
      * @return {@link AuthRequest}
@@ -86,6 +87,7 @@ public class YudaoAuthRequestFactory extends AuthRequestFactory {
      * @param authConfig {@link AuthConfig}
      */
     protected void configureHttpConfig(String authSource, AuthConfig authConfig, JustAuthProperties.JustAuthHttpConfig httpConfig) {
+        // TODO @timfruit：可以改成反射调用父类的方法。可能有一定的损耗，但是可以忽略不计的
         if (null == httpConfig) {
             return;
         }

@@ -86,6 +86,7 @@ public class AuthWeChatMiniProgramRequest extends AuthDefaultRequest {
                 .build();
     }
 
+    // TODO @timfruit：我们要采用驼峰的命名方式。不匹配的，可以通过 jackson 的自定义注解映射
     @Data
     private static class CodeSessionResponse {
         private int errcode;
