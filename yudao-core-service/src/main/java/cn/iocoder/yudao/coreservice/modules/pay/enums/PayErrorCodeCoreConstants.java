@@ -28,4 +28,8 @@ public interface PayErrorCodeCoreConstants {
     ErrorCode PAY_ORDER_EXTENSION_STATUS_IS_NOT_WAITING = new ErrorCode(1007003001, "支付交易拓展单不处于待支付");
     ErrorCode PAY_ORDER_EXTENSION_STATUS_IS_NOT_SUCCESS = new ErrorCode(1007003002, "支付订单不处于已支付");
 
+    /**
+     * ========== 支付商户信息 1-007-004-000 ==========
+     */
+    ErrorCode MERCHANT_NOT_EXISTS = new ErrorCode(1007004000, "支付商户信息不存在");
 }
