@@ -53,6 +53,7 @@ public class AlipayQrPayClient extends AbstractPayClient<AlipayPayClientConfig> 
         // 构建 AlipayTradePrecreateRequest
         AlipayTradePrecreateRequest request = new AlipayTradePrecreateRequest();
         request.setBizModel(model);
+        request.setNotifyUrl(reqDTO.getNotifyUrl());
 
         // 执行请求
         AlipayTradePrecreateResponse response;

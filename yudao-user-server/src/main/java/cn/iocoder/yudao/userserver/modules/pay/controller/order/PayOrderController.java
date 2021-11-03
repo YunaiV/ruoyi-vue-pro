@@ -51,10 +51,24 @@ public class PayOrderController {
     // ========== 支付渠道的回调 ==========
 
     @PostMapping("/notify/wx-pub/{channelId}")
-    @ApiOperation("通知微信公众号的结果")
+    @ApiOperation("通知微信公众号支付的结果")
     public String notifyWxPayOrder(@PathVariable("channelId") Long channelId,
                                    @RequestBody String xmlData) throws Exception {
         payOrderCoreService.notifyPayOrder(channelId, PayChannelEnum.WX_PUB.getCode(), xmlData);
+        return "success";
+    }
+
+    @PostMapping("/notify/alipay-qr/{channelId}")
+    @ApiOperation("通知支付宝扫码支付的结果")
+    public String notifyAlipayQrPayOrder(@PathVariable("channelId") Long channelId,
+                                         @RequestBody String data) {
+        return "success";
+    }
+
+    @RequestMapping("/notify/test")
+    @ApiOperation("通知的测试接口")
+    public String notifyTest() {
+//        System.out.println(data);
         return "success";
     }
 
