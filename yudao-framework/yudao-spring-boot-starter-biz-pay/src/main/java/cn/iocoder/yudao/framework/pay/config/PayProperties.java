@@ -29,4 +29,11 @@ public class PayProperties {
     @URL(message = "退款回调地址的格式必须是 URL")
     private String refundNotifyUrl;
 
+
+    /**
+     * 支付完成的返回地址
+     */
+    @URL(message = "支付返回的地址的格式必须是 URL")
+    private String returnUrl;
+
 }

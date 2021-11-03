@@ -50,6 +50,9 @@ public class PayOrderUnifiedReqDTO {
     @URL(message = "支付结果的回调地址必须是 URL 格式")
     private String notifyUrl;
 
+    @URL(message = "支付结果的return 必须是 URL 格式")
+    private String returnUrl;
+
     // ========== 订单相关字段 ==========
 
     /**
