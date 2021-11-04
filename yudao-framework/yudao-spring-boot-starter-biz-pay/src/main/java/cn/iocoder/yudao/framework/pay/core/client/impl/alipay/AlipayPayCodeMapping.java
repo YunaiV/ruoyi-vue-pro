@@ -19,7 +19,7 @@ public class AlipayPayCodeMapping extends AbstractPayCodeMapping {
             return GlobalErrorCodeConstants.SUCCESS;
         }
         // alipay wap  api code 返回为null, 暂时定为-9999
-        if(Objects.equals(apiCode, "-9999")){
+        if(Objects.equals(apiCode, "-9999")){ // TODO @jason：空格要注意哈。if () {
             return GlobalErrorCodeConstants.SUCCESS;
         }
         return null;

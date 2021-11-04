@@ -51,6 +51,7 @@ public class AlipayWapPayClient extends AbstractPayClient<AlipayPayClientConfig>
         model.setTotalAmount(calculateAmount(reqDTO.getAmount()).toString());
         model.setProductCode("QUICK_WAP_PAY"); // TODO 芋艿：这里咋整
         //TODO 芋艿：这里咋整  jason @芋艿 可以去掉吧,
+        // TODO @jason: 这个支付方式，需要有 sellerId 么？
         //model.setSellerId("2088102147948060");
         model.setTimeExpire(DateUtil.format(reqDTO.getExpireTime(),"yyyy-MM-dd HH:mm:ss"));
         // TODO 芋艿：userIp
@@ -76,7 +77,7 @@ public class AlipayWapPayClient extends AbstractPayClient<AlipayPayClientConfig>
         }
     }
 
-
+    // TODO @jason: 注释记得补下哈
     /**
      *  //https://opendocs.alipay.com/open/203/105286
      * @param data 通知结果
@@ -92,4 +93,5 @@ public class AlipayWapPayClient extends AbstractPayClient<AlipayPayClientConfig>
                 .successTime(DateUtil.parse(params.get("notify_time"), "yyyy-MM-dd HH:mm:ss"))
                 .data(data.getOrigData()).build();
     }
+
 }

@@ -44,13 +44,15 @@ public class PayOrderUnifiedReqDTO {
     @Length(max = 128, message = "商品描述信息长度不能超过128")
     private String body;
     /**
-     * 支付结果的回调地址
+     * 支付结果的 notify 回调地址
      */
     @NotEmpty(message = "支付结果的回调地址不能为空")
-    @URL(message = "支付结果的回调地址必须是 URL 格式")
+    @URL(message = "支付结果的 notify 回调地址必须是 URL 格式")
     private String notifyUrl;
-
-    @URL(message = "支付结果的return 必须是 URL 格式")
+    /**
+     * 支付结果的 return 回调地址
+     */
+    @URL(message = "支付结果的 return 回调地址必须是 URL 格式")
     private String returnUrl;
 
     // ========== 订单相关字段 ==========
