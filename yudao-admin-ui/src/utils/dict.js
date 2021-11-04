@@ -30,6 +30,9 @@ export const DICT_TYPE = {
   INF_API_ERROR_LOG_PROCESS_STATUS: 'inf_api_error_log_process_status',
 
   TOOL_CODEGEN_TEMPLATE_TYPE: 'tool_codegen_template_type',
+
+  // 商户状态
+  PAY_MERCHANT_STATUS: 'pay_merchant_status'
 }
 
 /**
