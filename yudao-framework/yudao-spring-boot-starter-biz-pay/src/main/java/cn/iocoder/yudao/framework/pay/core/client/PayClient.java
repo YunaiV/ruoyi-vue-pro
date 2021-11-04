@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.framework.pay.core.client;
 
+import cn.iocoder.yudao.framework.pay.core.client.dto.NotifyDataDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.PayOrderNotifyRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.PayOrderUnifiedReqDTO;
 
@@ -32,6 +33,6 @@ public interface PayClient {
      * @return 解析结果
      * @throws Exception 解析失败，抛出异常
      */
-    PayOrderNotifyRespDTO parseOrderNotify(String data) throws Exception;
+    PayOrderNotifyRespDTO parseOrderNotify(NotifyDataDTO data) throws Exception;
 
 }

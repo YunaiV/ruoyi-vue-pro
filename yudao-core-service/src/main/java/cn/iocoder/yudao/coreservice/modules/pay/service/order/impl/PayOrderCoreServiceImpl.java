@@ -18,6 +18,7 @@ import cn.iocoder.yudao.coreservice.modules.pay.service.merchant.PayChannelCoreS
 import cn.iocoder.yudao.coreservice.modules.pay.service.notify.PayNotifyCoreService;
 import cn.iocoder.yudao.coreservice.modules.pay.service.notify.dto.PayNotifyTaskCreateReqDTO;
 import cn.iocoder.yudao.coreservice.modules.pay.service.order.PayOrderCoreService;
+
 import cn.iocoder.yudao.coreservice.modules.pay.service.order.dto.PayOrderCreateReqDTO;
 import cn.iocoder.yudao.coreservice.modules.pay.service.order.dto.PayOrderSubmitReqDTO;
 import cn.iocoder.yudao.coreservice.modules.pay.service.order.dto.PayOrderSubmitRespDTO;
@@ -26,6 +27,7 @@ import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.pay.config.PayProperties;
 import cn.iocoder.yudao.framework.pay.core.client.PayClient;
 import cn.iocoder.yudao.framework.pay.core.client.PayClientFactory;
+import cn.iocoder.yudao.framework.pay.core.client.dto.NotifyDataDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.PayOrderNotifyRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.PayOrderUnifiedReqDTO;
 import lombok.extern.slf4j.Slf4j;
@@ -135,9 +137,11 @@ public class PayOrderCoreServiceImpl implements PayOrderCoreService {
         // 调用三方接口
         PayOrderUnifiedReqDTO unifiedOrderReqDTO = PayOrderCoreConvert.INSTANCE.convert2(reqDTO);
         // 商户相关字段
+        //TODO jason @芋艿 是否加一个属性  如tradeNo 支付订单号， 用这个merchantOrderId让人迷糊
         unifiedOrderReqDTO.setMerchantOrderId(orderExtension.getNo()) // 注意，此处使用的是 PayOrderExtensionDO.no 属性！
                 .setSubject(order.getSubject()).setBody(order.getBody())
-                .setNotifyUrl(genChannelPayNotifyUrl(channel));
+                .setNotifyUrl(genChannelPayNotifyUrl(channel))
+                .setReturnUrl(genChannelReturnUrl(channel));
         // 订单相关字段
         unifiedOrderReqDTO.setAmount(order.getAmount()).setExpireTime(order.getExpireTime());
         CommonResult<?> unifiedOrderResult = client.unifiedOrder(unifiedOrderReqDTO);
@@ -147,6 +151,16 @@ public class PayOrderCoreServiceImpl implements PayOrderCoreService {
         // 返回成功
         return new PayOrderSubmitRespDTO().setExtensionId(orderExtension.getId())
                 .setInvokeResponse(unifiedOrderResult.getData());
+    }
+
+    /**
+     * 根据支付渠道的编码，生成支付渠道的返回地址
+     * @param channel
+     * @return
+     */
+    private String genChannelReturnUrl(PayChannelDO channel) {
+        return payProperties.getReturnUrl() + "/" + StrUtil.replace(channel.getCode(), "_", "-")
+                + "/" + channel.getId();
     }
 
     /**
@@ -181,9 +195,9 @@ public class PayOrderCoreServiceImpl implements PayOrderCoreService {
 
     @Override
     @Transactional
-    public void notifyPayOrder(Long channelId, String channelCode, String notifyData) throws Exception {
+    public void notifyPayOrder(Long channelId, String channelCode, NotifyDataDTO notifyData) throws Exception {
         // TODO 芋艿，记录回调日志
-        log.info("[notifyPayOrder][channelId({}) 回调数据({})]", channelId, notifyData);
+        log.info("[notifyPayOrder][channelId({}) 回调数据({})]", channelId, notifyData.getOrigData());
 
         // 校验支付渠道是否有效
         PayChannelDO channel = payChannelCoreService.validPayChannel(channelId);
@@ -193,6 +207,7 @@ public class PayOrderCoreServiceImpl implements PayOrderCoreService {
             log.error("[notifyPayOrder][渠道编号({}) 找不到对应的支付客户端]", channel.getId());
             throw exception(PAY_CHANNEL_CLIENT_NOT_FOUND);
         }
+        //TODO @jason 校验 是否支付宝调用。 使用 支付宝publickey 或者payclient 加一个校验方法
         // 解析支付结果
         PayOrderNotifyRespDTO notifyRespDTO = client.parseOrderNotify(notifyData);
 
@@ -207,9 +222,10 @@ public class PayOrderCoreServiceImpl implements PayOrderCoreService {
             throw exception(PAY_ORDER_EXTENSION_STATUS_IS_NOT_WAITING);
         }
         // 1.2 更新 PayOrderExtensionDO
+        //TODO @jason notifyRespDTO.getTradeStatus() 需要根据不同的状态更新成不同的值 PayOrderStatusEnum
         int updateCounts = payOrderExtensionCoreMapper.updateByIdAndStatus(orderExtension.getId(),
                 PayOrderStatusEnum.WAITING.getStatus(), PayOrderExtensionDO.builder().id(orderExtension.getId())
-                        .status(PayOrderStatusEnum.SUCCESS.getStatus()).channelNotifyData(notifyData).build());
+                        .status(PayOrderStatusEnum.SUCCESS.getStatus()).channelNotifyData(notifyData.getOrigData()).build());
         if (updateCounts == 0) { // 校验状态，必须是待支付
             throw exception(PAY_ORDER_EXTENSION_STATUS_IS_NOT_WAITING);
         }
