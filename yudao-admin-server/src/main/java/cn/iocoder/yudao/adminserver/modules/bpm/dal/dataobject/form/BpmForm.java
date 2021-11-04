@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.adminserver.modules.workflow.dal.dataobject.form;
+package cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.form;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -15,14 +15,14 @@ import java.util.List;
  *
  * @author 芋道源码
  */
-@TableName(value = "wf_form", autoResultMap = true)
+@TableName(value = "bpm_form", autoResultMap = true)
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class WfForm extends BaseDO {
+public class BpmForm extends BaseDO {
 
     /**
      * 编号

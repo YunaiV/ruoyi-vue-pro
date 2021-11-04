@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.adminserver.modules.workflow.dal.dataobject.form;
+package cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.form;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -22,7 +22,7 @@ import java.util.Map;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class WfFormData extends BaseDO {
+public class BpmFormData extends BaseDO {
 
     /**
      * 编号
@@ -31,13 +31,13 @@ public class WfFormData extends BaseDO {
     /**
      * 表单编号
      *
-     * 关联 {@link WfForm#getId()}
+     * 关联 {@link BpmForm#getId()}
      */
     private Long formId;
     /**
      * 表单配置
      *
-     * 冗余 {@link WfForm#getFields()}
+     * 冗余 {@link BpmForm#getFields()}
      * 主要考虑，表单是可以修改的
      */
     @TableField(typeHandler = JacksonTypeHandler.class)

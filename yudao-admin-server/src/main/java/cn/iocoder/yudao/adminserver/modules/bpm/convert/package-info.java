@@ -3,4 +3,4 @@
  *
  * 目前使用 MapStruct 框架
  */
-package cn.iocoder.yudao.adminserver.modules.workflow.convert;
+package cn.iocoder.yudao.adminserver.modules.bpm.convert;
