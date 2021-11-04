@@ -7,6 +7,6 @@ import io.swagger.annotations.*;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class OsFormCreateReqVO extends OsFormBaseVO {
+public class WfFormCreateReqVO extends WfFormBaseVO {
 
 }

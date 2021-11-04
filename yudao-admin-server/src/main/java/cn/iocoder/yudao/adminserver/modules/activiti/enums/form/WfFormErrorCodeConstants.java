@@ -9,6 +9,6 @@ import cn.iocoder.yudao.framework.common.exception.ErrorCode;
  * 001 oa
  * activiti 系统，使用 1-003-000-000 段
  */
-public interface FormErrorCodeConstants {
+public interface WfFormErrorCodeConstants {
     ErrorCode FORM_NOT_EXISTS = new ErrorCode(1003001002, "动态表单不存在");
 }

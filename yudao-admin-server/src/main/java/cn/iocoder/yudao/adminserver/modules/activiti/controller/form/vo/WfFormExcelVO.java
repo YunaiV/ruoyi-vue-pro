@@ -11,7 +11,7 @@ import com.alibaba.excel.annotation.ExcelProperty;
  * @author 芋艿
  */
 @Data
-public class OsFormExcelVO {
+public class WfFormExcelVO {
 
     @ExcelProperty("表单编号")
     private Long id;

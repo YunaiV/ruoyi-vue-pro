@@ -1,17 +1,19 @@
 package cn.iocoder.yudao.adminserver.modules.activiti.controller.form.vo;
 
 import lombok.*;
+import java.util.*;
 import io.swagger.annotations.*;
-import javax.validation.constraints.*;
 
-@ApiModel("动态表单更新 Request VO")
+@ApiModel("动态表单 Response VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class OsFormUpdateReqVO extends OsFormBaseVO {
+public class WfFormRespVO extends WfFormBaseVO {
 
     @ApiModelProperty(value = "表单编号", required = true)
-    @NotNull(message = "表单编号不能为空")
     private Long id;
+
+    @ApiModelProperty(value = "创建时间", required = true)
+    private Date createTime;
 
 }

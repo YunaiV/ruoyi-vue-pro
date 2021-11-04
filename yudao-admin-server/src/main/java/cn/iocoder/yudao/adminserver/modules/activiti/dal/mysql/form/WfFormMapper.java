@@ -2,9 +2,9 @@ package cn.iocoder.yudao.adminserver.modules.activiti.dal.mysql.form;
 
 
 
-import cn.iocoder.yudao.adminserver.modules.activiti.controller.form.vo.OsFormExportReqVO;
-import cn.iocoder.yudao.adminserver.modules.activiti.controller.form.vo.OsFormPageReqVO;
-import cn.iocoder.yudao.adminserver.modules.activiti.dal.dataobject.form.OsFormDO;
+import cn.iocoder.yudao.adminserver.modules.activiti.controller.form.vo.WfFormExportReqVO;
+import cn.iocoder.yudao.adminserver.modules.activiti.controller.form.vo.WfFormPageReqVO;
+import cn.iocoder.yudao.adminserver.modules.activiti.dal.dataobject.form.WfForm;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.QueryWrapperX;
@@ -15,13 +15,13 @@ import java.util.List;
 /**
  * 动态表单 Mapper
  *
- * @author 芋艿
+ * @author 风里雾里
  */
 @Mapper
-public interface OsFormMapper extends BaseMapperX<OsFormDO> {
+public interface WfFormMapper extends BaseMapperX<WfForm> {
 
-    default PageResult<OsFormDO> selectPage(OsFormPageReqVO reqVO) {
-        return selectPage(reqVO, new QueryWrapperX<OsFormDO>()
+    default PageResult<WfForm> selectPage(WfFormPageReqVO reqVO) {
+        return selectPage(reqVO, new QueryWrapperX<WfForm>()
                 .likeIfPresent("name", reqVO.getName())
                 .eqIfPresent("status", reqVO.getStatus())
                 .eqIfPresent("form_json", reqVO.getFormJson())
@@ -30,8 +30,8 @@ public interface OsFormMapper extends BaseMapperX<OsFormDO> {
                 .orderByDesc("id")        );
     }
 
-    default List<OsFormDO> selectList(OsFormExportReqVO reqVO) {
-        return selectList(new QueryWrapperX<OsFormDO>()
+    default List<WfForm> selectList(WfFormExportReqVO reqVO) {
+        return selectList(new QueryWrapperX<WfForm>()
                 .likeIfPresent("name", reqVO.getName())
                 .eqIfPresent("status", reqVO.getStatus())
                 .eqIfPresent("form_json", reqVO.getFormJson())

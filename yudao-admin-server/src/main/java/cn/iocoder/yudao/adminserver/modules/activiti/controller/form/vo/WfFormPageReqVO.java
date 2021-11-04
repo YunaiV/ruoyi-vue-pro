@@ -3,12 +3,15 @@ package cn.iocoder.yudao.adminserver.modules.activiti.controller.form.vo;
 import lombok.*;
 import java.util.*;
 import io.swagger.annotations.*;
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import org.springframework.format.annotation.DateTimeFormat;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
-@ApiModel(value = "动态表单 Excel 导出 Request VO", description = "参数和 OsFormPageReqVO 是一致的")
+@ApiModel("动态表单分页 Request VO")
 @Data
-public class OsFormExportReqVO {
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
+public class WfFormPageReqVO extends PageParam {
 
     @ApiModelProperty(value = "表单名称")
     private String name;
