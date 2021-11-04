@@ -60,7 +60,7 @@ public class SysDictTypeController {
 
     @ApiOperation("/获得字典类型的分页列表")
     @GetMapping("/page")
-    @PreAuthorize("@ss.hasPermission('system:dict:quey')")
+    @PreAuthorize("@ss.hasPermission('system:dict:query')")
     public CommonResult<PageResult<SysDictTypeRespVO>> pageDictTypes(@Valid SysDictTypePageReqVO reqVO) {
         return success(SysDictTypeConvert.INSTANCE.convertPage(dictTypeService.getDictTypePage(reqVO)));
     }
@@ -68,7 +68,7 @@ public class SysDictTypeController {
     @ApiOperation("/查询字典类型详细")
     @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
     @GetMapping(value = "/get")
-    @PreAuthorize("@ss.hasPermission('system:dict:quey')")
+    @PreAuthorize("@ss.hasPermission('system:dict:query')")
     public CommonResult<SysDictTypeRespVO> getDictType(@RequestParam("id") Long id) {
         return success(SysDictTypeConvert.INSTANCE.convert(dictTypeService.getDictType(id)));
     }
@@ -83,7 +83,7 @@ public class SysDictTypeController {
 
     @ApiOperation("导出数据类型")
     @GetMapping("/export")
-    @PreAuthorize("@ss.hasPermission('system:dict:quey')")
+    @PreAuthorize("@ss.hasPermission('system:dict:query')")
     @OperateLog(type = EXPORT)
     public void export(HttpServletResponse response, @Valid SysDictTypeExportReqVO reqVO) throws IOException {
         List<SysDictTypeDO> list = dictTypeService.getDictTypeList(reqVO);
