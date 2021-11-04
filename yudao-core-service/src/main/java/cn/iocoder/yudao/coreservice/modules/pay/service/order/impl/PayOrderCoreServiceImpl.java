@@ -159,7 +159,7 @@ public class PayOrderCoreServiceImpl implements PayOrderCoreService {
      * @return
      */
     private String genChannelReturnUrl(PayChannelDO channel) {
-        return payProperties.getReturnUrl() + "/" + StrUtil.replace(channel.getCode(), "_", "-")
+        return payProperties.getPayReturnUrl() + "/" + StrUtil.replace(channel.getCode(), "_", "-")
                 + "/" + channel.getId();
     }
 

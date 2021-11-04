@@ -155,4 +155,4 @@ yudao:
   pay:
     pay-notify-url: http://jg6rde.natappfree.cc/api/pay/order/notify
     refund-notify-url: http://jg6rde.natappfree.cc/api/pay/refund/notify
-    return-url: http://jg6rde.natappfree.cc/api/pay/order/return
+    pay-return-url: http://jg6rde.natappfree.cc/api/pay/order/return

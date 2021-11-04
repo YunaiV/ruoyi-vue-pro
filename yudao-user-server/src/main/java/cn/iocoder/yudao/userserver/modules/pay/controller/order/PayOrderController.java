@@ -84,22 +84,21 @@ public class PayOrderController {
     public String notifyAliPayWapPayOrder(@PathVariable("channelId") Long channelId,
                                           @RequestParam Map<String, String> params,
                                           @RequestBody String originData) throws Exception {
-        //TODO @jason 校验 是否支付宝调用。 使用 支付宝publickey payclient 或许加一个校验方法
+        //TODO @jason 校验 是否支付宝调用。 payclient 中加一个校验方法
         payOrderCoreService.notifyPayOrder(channelId, PayChannelEnum.ALIPAY_WAP.getCode(), PayNotifyDataDTO.builder().params(params).body(originData).build());
         return "success";
     }
 
-    // TODO @jason 如果有些字段不注释，可以删除哈。不然 IDEA 会报警
+
     /**
      * https://opendocs.alipay.com/open/203/105285#%E5%89%8D%E5%8F%B0%E5%9B%9E%E8%B7%B3%E5%8F%82%E6%95%B0%E8%AF%B4%E6%98%8E
-     * @param channelId
-     * @return
-     * @throws Exception
+     * @param channelId 渠道id
+     * @return 返回跳转页面
      */
     @GetMapping(value = "/return/alipay-wap/{channelId}")
     @ApiOperation("支付宝wap页面回跳")
     public String returnAliPayWapPayOrder(@PathVariable("channelId") Long channelId){
-        //TODO @jason 校验 是否支付宝调用。 支付宝publickey 可以根据 appId 跳转不同的页面
+        //TODO 校验 是否支付宝调用。 可以根据 appId 跳转不同的页面
         return "支付成功";
     }
 

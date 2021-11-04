@@ -9,18 +9,17 @@
 <body>
 <div>点击如下按钮，发起支付的测试</div>
 <div>
-    <button id="alipay_wap">支付宝h5</button>
+    <button id="alipay_wap">支付宝手机网站支付</button>
 </div>
 <div id="dynamic_form"></div>
 </body>
 <script>
-    // TODO @jason：copy 过来后，有些注释要改过来哈
+
     let shopOrderId = undefined;
     let payOrderId = undefined;
      let server = 'http://127.0.0.1:28080';
     //let server = 'http://niubi.natapp1.cc';
-    // TODO openid
-    //let openid = "ockUAwIZ-0OeMZl9ogcZ4ILrGba0";
+
     $(function() {
         // 自动发起商城订单编号
         $.ajax({
@@ -38,7 +37,7 @@
             }
         })
     });
-    // 微信公众号
+
     $( "#alipay_wap").on( "click", function() {
         // 提交支付
         $.ajax({
@@ -56,7 +55,7 @@
                     return;
                 }
                 alert('点击确定，开始支付');
-                // 开始调用微信支付
+                //支付宝 手机WAP 返回表单，自动跳到支付宝支付页面
                 let data = result.data.invokeResponse;
                 $("#dynamic_form").html(data.body);
             }

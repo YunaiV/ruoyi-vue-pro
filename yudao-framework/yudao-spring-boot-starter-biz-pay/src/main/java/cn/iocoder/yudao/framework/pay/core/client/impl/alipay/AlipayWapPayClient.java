@@ -51,7 +51,8 @@ public class AlipayWapPayClient extends AbstractPayClient<AlipayPayClientConfig>
         model.setTotalAmount(calculateAmount(reqDTO.getAmount()).toString());
         model.setProductCode("QUICK_WAP_PAY"); // TODO 芋艿：这里咋整
         //TODO 芋艿：这里咋整  jason @芋艿 可以去掉吧,
-        // TODO @jason: 这个支付方式，需要有 sellerId 么？
+        // TODO 芋艿 似乎这里不用传sellerId
+        // https://opendocs.alipay.com/apis/api_1/alipay.trade.wap.pay
         //model.setSellerId("2088102147948060");
         model.setTimeExpire(DateUtil.format(reqDTO.getExpireTime(),"yyyy-MM-dd HH:mm:ss"));
         // TODO 芋艿：userIp
@@ -77,12 +78,13 @@ public class AlipayWapPayClient extends AbstractPayClient<AlipayPayClientConfig>
         }
     }
 
-    // TODO @jason: 注释记得补下哈
+
     /**
+     * 从支付宝通知返回参数中解析 PayOrderNotifyRespDTO, 通知具体参数参考
      *  //https://opendocs.alipay.com/open/203/105286
      * @param data 通知结果
-     * @return
-     * @throws Exception
+     * @return 解析结果 PayOrderNotifyRespDTO
+     * @throws Exception  解析失败，抛出异常
      */
     @Override
     public PayOrderNotifyRespDTO parseOrderNotify(PayNotifyDataDTO data) throws Exception {
