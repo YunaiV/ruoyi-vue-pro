@@ -8,7 +8,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.io.FileUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.pay.core.client.PayCommonResult;
-import cn.iocoder.yudao.framework.pay.core.client.dto.NotifyDataDTO;
+import cn.iocoder.yudao.framework.pay.core.client.dto.PayNotifyDataDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.PayOrderNotifyRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.PayOrderUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.client.impl.AbstractPayClient;
@@ -132,14 +132,14 @@ public class WXPubPayClient extends AbstractPayClient<WXPayClientConfig> {
     }
 
     @Override
-    public PayOrderNotifyRespDTO parseOrderNotify(NotifyDataDTO data) throws WxPayException {
-        WxPayOrderNotifyResult notifyResult = client.parseOrderNotifyResult(data.getOrigData());
+    public PayOrderNotifyRespDTO parseOrderNotify(PayNotifyDataDTO data) throws WxPayException {
+        WxPayOrderNotifyResult notifyResult = client.parseOrderNotifyResult(data.getBody());
         Assert.isTrue(Objects.equals(notifyResult.getResultCode(), "SUCCESS"), "支付结果非 SUCCESS");
         // 转换结果
         return PayOrderNotifyRespDTO.builder().orderExtensionNo(notifyResult.getOutTradeNo())
                 .channelOrderNo(notifyResult.getTransactionId()).channelUserId(notifyResult.getOpenid())
                 .successTime(DateUtil.parse(notifyResult.getTimeEnd(), "yyyyMMddHHmmss"))
-                .data(data.getOrigData()).build();
+                .data(data.getBody()).build();
     }
 
 }

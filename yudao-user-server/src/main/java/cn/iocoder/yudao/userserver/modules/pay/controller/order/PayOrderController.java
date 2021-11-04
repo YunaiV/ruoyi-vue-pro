@@ -6,7 +6,7 @@ import cn.iocoder.yudao.coreservice.modules.pay.service.order.PayOrderCoreServic
 import cn.iocoder.yudao.coreservice.modules.pay.service.order.dto.PayOrderSubmitReqDTO;
 import cn.iocoder.yudao.coreservice.modules.pay.service.order.dto.PayOrderSubmitRespDTO;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.framework.pay.core.client.dto.NotifyDataDTO;
+import cn.iocoder.yudao.framework.pay.core.client.dto.PayNotifyDataDTO;
 import cn.iocoder.yudao.framework.pay.core.enums.PayChannelEnum;
 import cn.iocoder.yudao.userserver.modules.pay.controller.order.vo.PayOrderSubmitReqVO;
 import cn.iocoder.yudao.userserver.modules.pay.controller.order.vo.PayOrderSubmitRespVO;
@@ -58,14 +58,17 @@ public class PayOrderController {
     @ApiOperation("通知微信公众号支付的结果")
     public String notifyWxPayOrder(@PathVariable("channelId") Long channelId,
                                    @RequestBody String xmlData) throws Exception {
-        payOrderCoreService.notifyPayOrder(channelId, PayChannelEnum.WX_PUB.getCode(), NotifyDataDTO.builder().origData(xmlData).build());
+        payOrderCoreService.notifyPayOrder(channelId, PayChannelEnum.WX_PUB.getCode(), PayNotifyDataDTO.builder().body(xmlData).build());
         return "success";
     }
 
     @PostMapping("/notify/alipay-qr/{channelId}")
     @ApiOperation("通知支付宝扫码支付的结果")
     public String notifyAlipayQrPayOrder(@PathVariable("channelId") Long channelId,
-                                         @RequestBody String data) {
+                                         @RequestParam Map<String, String> params,
+                                         @RequestBody String originData) throws Exception{
+        payOrderCoreService.notifyPayOrder(channelId, PayChannelEnum.ALIPAY_QR.getCode(),
+                PayNotifyDataDTO.builder().params(params).body(originData).build());
         return "success";
     }
 
@@ -82,7 +85,7 @@ public class PayOrderController {
                                           @RequestParam Map<String, String> params,
                                           @RequestBody String originData) throws Exception {
         //TODO @jason 校验 是否支付宝调用。 使用 支付宝publickey payclient 或许加一个校验方法
-        payOrderCoreService.notifyPayOrder(channelId, PayChannelEnum.ALIPAY_WAP.getCode(), NotifyDataDTO.builder().params(params).origData(originData).build());
+        payOrderCoreService.notifyPayOrder(channelId, PayChannelEnum.ALIPAY_WAP.getCode(), PayNotifyDataDTO.builder().params(params).body(originData).build());
         return "success";
     }
 
@@ -100,4 +103,12 @@ public class PayOrderController {
         return "支付成功";
     }
 
+
+    @GetMapping(value = "/return/alipay-qr/{channelId}")
+    @ApiOperation("支付宝wap页面回跳")
+    public String returnAliPayQrPayOrder(@PathVariable("channelId") Long channelId){
+        //TODO @jason 校验 是否支付宝调用。 支付宝publickey 可以根据 appId 跳转不同的页面
+        System.out.println("支付成功");
+        return "支付成功";
+    }
 }

@@ -3,7 +3,7 @@ package cn.iocoder.yudao.framework.pay.core.client.impl.alipay;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.iocoder.yudao.framework.pay.core.client.PayCommonResult;
-import cn.iocoder.yudao.framework.pay.core.client.dto.NotifyDataDTO;
+import cn.iocoder.yudao.framework.pay.core.client.dto.PayNotifyDataDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.PayOrderNotifyRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.PayOrderUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.client.impl.AbstractPayClient;
@@ -85,13 +85,13 @@ public class AlipayWapPayClient extends AbstractPayClient<AlipayPayClientConfig>
      * @throws Exception
      */
     @Override
-    public PayOrderNotifyRespDTO parseOrderNotify(NotifyDataDTO data) throws Exception {
+    public PayOrderNotifyRespDTO parseOrderNotify(PayNotifyDataDTO data) throws Exception {
         Map<String, String> params = data.getParams();
         return  PayOrderNotifyRespDTO.builder().orderExtensionNo(params.get("out_trade_no"))
                 .channelOrderNo(params.get("trade_no")).channelUserId(params.get("seller_id"))
                 .tradeStatus(params.get("trade_status"))
                 .successTime(DateUtil.parse(params.get("notify_time"), "yyyy-MM-dd HH:mm:ss"))
-                .data(data.getOrigData()).build();
+                .data(data.getBody()).build();
     }
 
 }

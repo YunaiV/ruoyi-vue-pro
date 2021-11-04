@@ -27,7 +27,7 @@ import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.pay.config.PayProperties;
 import cn.iocoder.yudao.framework.pay.core.client.PayClient;
 import cn.iocoder.yudao.framework.pay.core.client.PayClientFactory;
-import cn.iocoder.yudao.framework.pay.core.client.dto.NotifyDataDTO;
+import cn.iocoder.yudao.framework.pay.core.client.dto.PayNotifyDataDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.PayOrderNotifyRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.PayOrderUnifiedReqDTO;
 import lombok.extern.slf4j.Slf4j;
@@ -195,9 +195,9 @@ public class PayOrderCoreServiceImpl implements PayOrderCoreService {
 
     @Override
     @Transactional
-    public void notifyPayOrder(Long channelId, String channelCode, NotifyDataDTO notifyData) throws Exception {
+    public void notifyPayOrder(Long channelId, String channelCode, PayNotifyDataDTO notifyData) throws Exception {
         // TODO 芋艿，记录回调日志
-        log.info("[notifyPayOrder][channelId({}) 回调数据({})]", channelId, notifyData.getOrigData());
+        log.info("[notifyPayOrder][channelId({}) 回调数据({})]", channelId, notifyData.getBody());
 
         // 校验支付渠道是否有效
         PayChannelDO channel = payChannelCoreService.validPayChannel(channelId);
@@ -225,7 +225,7 @@ public class PayOrderCoreServiceImpl implements PayOrderCoreService {
         //TODO @jason notifyRespDTO.getTradeStatus() 需要根据不同的状态更新成不同的值 PayOrderStatusEnum
         int updateCounts = payOrderExtensionCoreMapper.updateByIdAndStatus(orderExtension.getId(),
                 PayOrderStatusEnum.WAITING.getStatus(), PayOrderExtensionDO.builder().id(orderExtension.getId())
-                        .status(PayOrderStatusEnum.SUCCESS.getStatus()).channelNotifyData(notifyData.getOrigData()).build());
+                        .status(PayOrderStatusEnum.SUCCESS.getStatus()).channelNotifyData(notifyData.getBody()).build());
         if (updateCounts == 0) { // 校验状态，必须是待支付
             throw exception(PAY_ORDER_EXTENSION_STATUS_IS_NOT_WAITING);
         }
