@@ -56,7 +56,7 @@ public class SysNoticeController {
 
     @GetMapping("/page")
     @ApiOperation("获取通知公告列表")
-    @PreAuthorize("@ss.hasPermission('system:notice:quey')")
+    @PreAuthorize("@ss.hasPermission('system:notice:query')")
     public CommonResult<PageResult<SysNoticeRespVO>> pageNotices(@Validated SysNoticePageReqVO reqVO) {
         return success(SysNoticeConvert.INSTANCE.convertPage(noticeService.pageNotices(reqVO)));
     }
@@ -64,7 +64,7 @@ public class SysNoticeController {
     @GetMapping("/get")
     @ApiOperation("获得通知公告")
     @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
-    @PreAuthorize("@ss.hasPermission('system:notice:quey')")
+    @PreAuthorize("@ss.hasPermission('system:notice:query')")
     public CommonResult<SysNoticeRespVO> getNotice(@RequestParam("id") Long id) {
         return success(SysNoticeConvert.INSTANCE.convert(noticeService.getNotice(id)));
     }
