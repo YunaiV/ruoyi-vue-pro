@@ -72,15 +72,16 @@ public class PayOrderController {
         return "success";
     }
 
-    @RequestMapping("/notify/test")
-    @ApiOperation("通知的测试接口")
-    public String notifyTest() {
-//        System.out.println(data);
-        return "success";
+    @GetMapping(value = "/return/alipay-qr/{channelId}")
+    @ApiOperation("支付宝 wap 页面回跳")
+    public String returnAliPayQrPayOrder(@PathVariable("channelId") Long channelId){
+        //TODO @jason 校验 是否支付宝调用。 支付宝publickey 可以根据 appId 跳转不同的页面
+        System.out.println("支付成功");
+        return "支付成功";
     }
 
     @PostMapping(value = "/notify/alipay-wap/{channelId}", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    @ApiOperation("支付宝wap页面回调")
+    @ApiOperation("支付宝 wap 页面回调")
     public String notifyAliPayWapPayOrder(@PathVariable("channelId") Long channelId,
                                           @RequestParam Map<String, String> params,
                                           @RequestBody String originData) throws Exception {
@@ -89,25 +90,23 @@ public class PayOrderController {
         return "success";
     }
 
-
     /**
      * https://opendocs.alipay.com/open/203/105285#%E5%89%8D%E5%8F%B0%E5%9B%9E%E8%B7%B3%E5%8F%82%E6%95%B0%E8%AF%B4%E6%98%8E
      * @param channelId 渠道id
      * @return 返回跳转页面
      */
     @GetMapping(value = "/return/alipay-wap/{channelId}")
-    @ApiOperation("支付宝wap页面回跳")
+    @ApiOperation("支付宝 wap 页面回跳")
     public String returnAliPayWapPayOrder(@PathVariable("channelId") Long channelId){
         //TODO 校验 是否支付宝调用。 可以根据 appId 跳转不同的页面
         return "支付成功";
     }
 
-
-    @GetMapping(value = "/return/alipay-qr/{channelId}")
-    @ApiOperation("支付宝wap页面回跳")
-    public String returnAliPayQrPayOrder(@PathVariable("channelId") Long channelId){
-        //TODO @jason 校验 是否支付宝调用。 支付宝publickey 可以根据 appId 跳转不同的页面
-        System.out.println("支付成功");
-        return "支付成功";
+    @RequestMapping("/notify/test")
+    @ApiOperation("通知的测试接口")
+    public String notifyTest() {
+//        System.out.println(data);
+        return "success";
     }
+
 }

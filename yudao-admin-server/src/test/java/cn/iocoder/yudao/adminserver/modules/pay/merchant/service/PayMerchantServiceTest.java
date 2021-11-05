@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
 * {@link PayMerchantServiceImpl} 的单元测试类
 *
-* @author 芋艿
+* @author 芋艿 // TODO @aquan：修改成自己的。。。
 */
 @Import(PayMerchantServiceImpl.class)
 public class PayMerchantServiceTest extends BaseDbUnitTest {
@@ -51,6 +51,7 @@ public class PayMerchantServiceTest extends BaseDbUnitTest {
         assertNotNull(merchantId);
         // 校验记录的属性是否正确
         PayMerchantDO merchant = merchantMapper.selectById(merchantId);
+        // TODO @aquan：需要判断 no 非空
         assertPojoEquals(reqVO, merchant,"no");
     }
 

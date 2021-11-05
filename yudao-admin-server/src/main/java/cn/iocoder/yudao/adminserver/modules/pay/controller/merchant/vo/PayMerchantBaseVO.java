@@ -12,6 +12,7 @@ import javax.validation.constraints.NotNull;
 @Data
 public class PayMerchantBaseVO {
 
+    // TODO @aquan：no 应该不允许修改。啊哈哈，我的原型没画对
     @ApiModelProperty(value = "商户号")
     private String no;
 

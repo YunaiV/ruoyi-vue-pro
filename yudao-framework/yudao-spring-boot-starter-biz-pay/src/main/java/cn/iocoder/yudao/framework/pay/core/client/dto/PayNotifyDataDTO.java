@@ -6,7 +6,7 @@ import lombok.ToString;
 
 import java.util.Map;
 
-
+// TODO @jason：注释要写下哈。字段不要使用 // 注释，非标准
 @Data
 @ToString
 @Builder

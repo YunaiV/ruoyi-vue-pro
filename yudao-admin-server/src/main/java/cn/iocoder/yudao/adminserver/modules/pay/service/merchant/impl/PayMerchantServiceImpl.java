@@ -9,7 +9,6 @@ import cn.iocoder.yudao.adminserver.modules.pay.convert.merchant.PayMerchantConv
 import cn.iocoder.yudao.adminserver.modules.pay.dal.mysql.merchant.PayMerchantMapper;
 import cn.iocoder.yudao.adminserver.modules.pay.service.merchant.PayMerchantService;
 import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.merchant.PayMerchantDO;
-import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.user.SysUserDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import com.google.common.annotations.VisibleForTesting;
 import org.springframework.stereotype.Service;
@@ -20,7 +19,7 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
-import static cn.iocoder.yudao.coreservice.modules.pay.enums.PayErrorCodeCoreConstants.*;
+import static cn.iocoder.yudao.coreservice.modules.pay.enums.PayErrorCodeCoreConstants.MERCHANT_NOT_EXISTS;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 /**
  * 支付商户信息 Service 实现类
@@ -39,6 +38,7 @@ public class PayMerchantServiceImpl implements PayMerchantService {
         // 插入
         PayMerchantDO merchant = PayMerchantConvert.INSTANCE.convert(createReqVO);
         // 根据 年月日时分秒毫秒 生成时间戳
+        // TODO @aquan：生成 no 可以单独一个小方法
         String merchantNo = "M" + DateUtil.format(LocalDateTime.now(),"yyyyMMddHHmmssSSS");
         merchant.setNo(merchantNo);
         merchantMapper.insert(merchant);

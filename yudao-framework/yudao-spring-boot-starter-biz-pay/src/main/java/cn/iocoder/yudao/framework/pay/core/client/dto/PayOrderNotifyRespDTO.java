@@ -42,7 +42,6 @@ public class PayOrderNotifyRespDTO {
      */
     private String data;
 
-
     /**
      * TODO @jason 结合其他的渠道定义成枚举,
      * alipay

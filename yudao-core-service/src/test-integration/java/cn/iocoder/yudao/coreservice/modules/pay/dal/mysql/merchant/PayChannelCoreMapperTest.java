@@ -21,10 +21,10 @@ public class PayChannelCoreMapperTest extends BaseDbAndRedisIntegrationTest {
     private PayChannelCoreMapper payChannelCoreMapper;
 
     /**
-     * 插入初始配置
+     * 插入 {@link PayChannelEnum#WX_PUB} 初始配置
      */
     @Test
-    public void testInsert() throws FileNotFoundException {
+    public void testInsertWxPub() throws FileNotFoundException {
         PayChannelDO payChannelDO = new PayChannelDO();
         payChannelDO.setCode(PayChannelEnum.WX_PUB.getCode());
         payChannelDO.setStatus(CommonStatusEnum.ENABLE.getStatus());
@@ -45,11 +45,12 @@ public class PayChannelCoreMapperTest extends BaseDbAndRedisIntegrationTest {
         payChannelCoreMapper.insert(payChannelDO);
     }
 
+    // TODO @ouyang：Zfb 改成 AlipayQr
     /**
-     * 插入支付宝 初始配置
+     * 插入 {@link PayChannelEnum#ALIPAY_QR} 初始配置
      */
     @Test
-    public void testInsertZfb() throws FileNotFoundException {
+    public void testInsertZfb() {
         PayChannelDO payChannelDO = new PayChannelDO();
         payChannelDO.setCode(PayChannelEnum.ALIPAY_QR.getCode());
         payChannelDO.setStatus(CommonStatusEnum.ENABLE.getStatus());
