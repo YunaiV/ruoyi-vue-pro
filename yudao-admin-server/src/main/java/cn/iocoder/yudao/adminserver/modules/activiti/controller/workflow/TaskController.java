@@ -9,6 +9,7 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.List;
 
@@ -56,5 +57,16 @@ public class TaskController {
     public CommonResult<List<TaskStepVO>> getHistorySteps(@RequestParam("id") String processInstanceId) {
         return success(taskService.getHistorySteps(processInstanceId));
     }
+
+    /**
+     * 返回高亮的流转图SVG
+     * @param processInstanceId
+     */
+    @GetMapping("/process/highlight-img/{id}")
+    public void getHighlightImg(@PathVariable("id") String processInstanceId, HttpServletResponse response) {
+        taskService.getHighlightImg(processInstanceId, response);
+    }
+
+
 
 }

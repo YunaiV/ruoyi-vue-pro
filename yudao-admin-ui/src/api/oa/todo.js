@@ -81,3 +81,11 @@ export function processHistorySteps(id) {
     method: 'get'
   })
 }
+
+
+export function getHighlightImg(id) {
+  return request({
+    url: '/workflow/task/process/highlight-img/'+id,
+    method: 'get'
+  })
+}

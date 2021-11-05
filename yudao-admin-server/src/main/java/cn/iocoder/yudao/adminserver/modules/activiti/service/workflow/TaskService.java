@@ -3,6 +3,7 @@ package cn.iocoder.yudao.adminserver.modules.activiti.service.workflow;
 import cn.iocoder.yudao.adminserver.modules.activiti.controller.workflow.vo.*;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 // TODO @芋艿：前缀，注释
@@ -23,4 +24,11 @@ public interface TaskService {
 
     TodoTaskRespVO getTaskFormKey(TaskQueryReqVO taskQuery);
 
+
+    /**
+     * 返回高亮的流转进程
+     * @param processInstanceId 实例Id
+     * @param response 响应
+     */
+    void getHighlightImg(String processInstanceId, HttpServletResponse response);
 }
