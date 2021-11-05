@@ -23,6 +23,7 @@ import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.history.HistoricActivityInstance;
 import org.activiti.engine.history.HistoricProcessInstance;
+import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Comment;
@@ -34,7 +35,9 @@ import org.springframework.util.CollectionUtils;
 
 
 import javax.annotation.Resource;
+import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletResponse;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
@@ -225,28 +228,28 @@ public class TaskServiceImpl implements TaskService {
 
 
     @Override
-    public void getHighlightImg(String processDefinitionId, HttpServletResponse response) {
+    public void getHighlightImg(String processInstanceId, HttpServletResponse response) {
         // 查询历史
-        HistoricProcessInstance hpi = historyService.createHistoricProcessInstanceQuery().processInstanceId(processDefinitionId).singleResult();
+       HistoricProcessInstance hpi = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
         // 如果有结束时间
         if (hpi == null) {
             return;
         }
         // 没有结束时间。说明流程在执行过程中
-        ProcessInstance pi = runtimeService.createProcessInstanceQuery().processInstanceId(processDefinitionId).singleResult();
+        ProcessInstance pi = runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
         BpmnModel bpmnModel = repositoryService.getBpmnModel(pi.getProcessDefinitionId());
         List<String> highLightedActivities = new ArrayList<>();
 
-        List<HistoricActivityInstance> historicActivityInstances = historyService.createHistoricActivityInstanceQuery().processInstanceId(processDefinitionId)
+        List<HistoricActivityInstance> historicActivityInstances = historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstanceId)
                 .orderByHistoricActivityInstanceId().asc().list();
         // 获取所有活动节点
         List<HistoricActivityInstance> finishedInstances = historyService.createHistoricActivityInstanceQuery()
-                .processInstanceId(processDefinitionId).finished().list();
+                .processInstanceId(processInstanceId).finished().list();
         for (HistoricActivityInstance hai : finishedInstances) {
             highLightedActivities.add(hai.getActivityId());
         }
         // 已完成的节点+当前节点
-        highLightedActivities.addAll(runtimeService.getActiveActivityIds(processDefinitionId));
+        highLightedActivities.addAll(runtimeService.getActiveActivityIds(processInstanceId));
 
         // 经过的流
         List<String> highLightedFlowIds = getHighLightedFlows(bpmnModel, historicActivityInstances);
@@ -264,6 +267,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     private void responseImage(HttpServletResponse response, InputStream inputStream, String picName) throws IOException {
+        BufferedImage src = ImageIO.read(inputStream);
         response.setContentType("application/octet-stream;charset=UTF-8");
         response.setHeader("Content-Disposition", "attachment; filename=" + URLEncoder.encode(picName, "UTF-8"));
         byte[] b = new byte[1024];

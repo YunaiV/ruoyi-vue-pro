@@ -27,7 +27,8 @@ public interface TaskService {
 
     /**
      * 返回高亮的流转进程
-     * @param processInstanceId
+     * @param processInstanceId 实例Id
+     * @param response 响应
      */
     void getHighlightImg(String processInstanceId, HttpServletResponse response);
 }

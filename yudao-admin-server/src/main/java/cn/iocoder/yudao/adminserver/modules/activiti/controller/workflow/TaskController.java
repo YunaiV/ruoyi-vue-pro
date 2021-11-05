@@ -59,7 +59,7 @@ public class TaskController {
     }
 
     /**
-     * 返回高亮的流转进程
+     * 返回高亮的流转图SVG
      * @param processInstanceId
      */
     @GetMapping("/process/highlight-img/{id}")
