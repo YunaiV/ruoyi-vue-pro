@@ -267,7 +267,6 @@ public class TaskServiceImpl implements TaskService {
     }
 
     private void responseImage(HttpServletResponse response, InputStream inputStream, String picName) throws IOException {
-        BufferedImage src = ImageIO.read(inputStream);
         response.setContentType("application/octet-stream;charset=UTF-8");
         response.setHeader("Content-Disposition", "attachment; filename=" + URLEncoder.encode(picName, "UTF-8"));
         byte[] b = new byte[1024];
