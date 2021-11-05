@@ -56,6 +56,8 @@ import static java.util.Collections.singleton;
 @Slf4j
 public class SysAuthServiceImpl implements SysAuthService {
 
+    private static final UserTypeEnum USER_TYPE_ENUM = UserTypeEnum.ADMIN;
+
     @Resource
     @Lazy // 延迟加载，因为存在相互依赖的问题
     private AuthenticationManager authenticationManager;
@@ -75,7 +77,6 @@ public class SysAuthServiceImpl implements SysAuthService {
     @Resource
     private SysSocialCoreService socialService;
 
-    private static final UserTypeEnum USER_TYPE_ENUM = UserTypeEnum.ADMIN;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

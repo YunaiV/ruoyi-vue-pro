@@ -3,6 +3,7 @@ package cn.iocoder.yudao.framework.social.core.request;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.social.core.enums.AuthExtendSource;
 import cn.iocoder.yudao.framework.social.core.model.AuthExtendToken;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import me.zhyd.oauth.cache.AuthStateCache;
 import me.zhyd.oauth.config.AuthConfig;
@@ -39,7 +40,7 @@ public class AuthWeChatMiniProgramRequest extends AuthDefaultRequest {
         this.checkResponse(accessTokenObject);
 
         AuthExtendToken token = new AuthExtendToken();
-        token.setMiniSessionKey(accessTokenObject.session_key);
+        token.setMiniSessionKey(accessTokenObject.sessionKey);
         token.setOpenId(accessTokenObject.openid);
         token.setUnionId(accessTokenObject.unionid);
         return token;
@@ -86,12 +87,12 @@ public class AuthWeChatMiniProgramRequest extends AuthDefaultRequest {
                 .build();
     }
 
-    // TODO @timfruit：我们要采用驼峰的命名方式。不匹配的，可以通过 jackson 的自定义注解映射
     @Data
     private static class CodeSessionResponse {
         private int errcode;
         private String errmsg;
-        private String session_key;
+        @JsonProperty("session_key")
+        private String sessionKey;
         private String openid;
         private String unionid;
     }

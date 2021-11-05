@@ -2,7 +2,11 @@ package cn.iocoder.yudao.framework.social.core.enums;
 
 import me.zhyd.oauth.config.AuthSource;
 
-// TODO @timfruit：类注释
+/**
+ * 拓展JustAuth各api需要的url， 用枚举类分平台类型管理<br>
+ *
+ * 默认配置{@link me.zhyd.oauth.config.AuthDefaultSource}
+ */
 public enum AuthExtendSource implements AuthSource {
 
     /**

@@ -51,6 +51,8 @@ import static cn.iocoder.yudao.userserver.modules.system.enums.SysErrorCodeConst
 @Slf4j
 public class SysAuthServiceImpl implements SysAuthService {
 
+    private static final UserTypeEnum USER_TYPE_ENUM = UserTypeEnum.MEMBER;
+
     @Resource
     @Lazy // 延迟加载，因为存在相互依赖的问题
     private AuthenticationManager authenticationManager;
@@ -65,7 +67,7 @@ public class SysAuthServiceImpl implements SysAuthService {
     private SysUserSessionCoreService userSessionCoreService;
     @Resource
     private SysSocialCoreService socialService;
-    private static final UserTypeEnum USER_TYPE_ENUM = UserTypeEnum.MEMBER; // TODO @timfruit 挪到类的最前面。一般是 静态变量，到成员变量的顺序。
+
 
     @Override
     public UserDetails loadUserByUsername(String mobile) throws UsernameNotFoundException {

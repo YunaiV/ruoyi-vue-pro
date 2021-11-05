@@ -1,24 +1,21 @@
 package cn.iocoder.yudao.framework.social.core;
 
 import cn.hutool.core.util.EnumUtil;
+import cn.hutool.core.util.ReflectUtil;
 import cn.iocoder.yudao.framework.social.core.enums.AuthExtendSource;
 import cn.iocoder.yudao.framework.social.core.request.AuthWeChatMiniProgramRequest;
-import com.xkcoding.http.config.HttpConfig;
 import com.xkcoding.justauth.AuthRequestFactory;
 import com.xkcoding.justauth.autoconfigure.JustAuthProperties;
 import me.zhyd.oauth.cache.AuthStateCache;
 import me.zhyd.oauth.config.AuthConfig;
 import me.zhyd.oauth.config.AuthSource;
 import me.zhyd.oauth.request.AuthRequest;
-import org.springframework.util.CollectionUtils;
 
-import java.net.InetSocketAddress;
-import java.net.Proxy;
-import java.util.Map;
+import java.lang.reflect.Method;
 
 /**
  * 第三方授权拓展 request 工厂类
- * TODO @timfruit 可以说明下，为啥有了 AuthRequestFactory 类，咱还需要自定义
+ * (为使得拓展配置和默认配置齐平，自定义本工厂类)
  *
  * @author timfruit
  * @date 2021-10-31
@@ -70,7 +67,10 @@ public class YudaoAuthRequestFactory extends AuthRequestFactory {
         }
 
         // 配置 http config
-        configureHttpConfig(authExtendSource.name(), config, properties.getHttpConfig());
+        Method method = ReflectUtil.getMethod(AuthRequestFactory.class, "configureHttpConfig",
+                String.class, AuthConfig.class, JustAuthProperties.JustAuthHttpConfig.class);
+        ReflectUtil.invoke(this, method,
+                authExtendSource.name(), config, properties.getHttpConfig());
 
         switch (authExtendSource) {
             case WECHAT_MINI_PROGRAM:
@@ -78,33 +78,6 @@ public class YudaoAuthRequestFactory extends AuthRequestFactory {
             default:
                 return null;
         }
-    }
-
-    /**
-     * 配置 http 相关的配置
-     *
-     * @param authSource {@link AuthSource}
-     * @param authConfig {@link AuthConfig}
-     */
-    protected void configureHttpConfig(String authSource, AuthConfig authConfig, JustAuthProperties.JustAuthHttpConfig httpConfig) {
-        // TODO @timfruit：可以改成反射调用父类的方法。可能有一定的损耗，但是可以忽略不计的
-        if (null == httpConfig) {
-            return;
-        }
-        Map<String, JustAuthProperties.JustAuthProxyConfig> proxyConfigMap = httpConfig.getProxy();
-        if (CollectionUtils.isEmpty(proxyConfigMap)) {
-            return;
-        }
-        JustAuthProperties.JustAuthProxyConfig proxyConfig = proxyConfigMap.get(authSource);
-
-        if (null == proxyConfig) {
-            return;
-        }
-
-        authConfig.setHttpConfig(HttpConfig.builder()
-                .timeout(httpConfig.getTimeout())
-                .proxy(new Proxy(Proxy.Type.valueOf(proxyConfig.getType()), new InetSocketAddress(proxyConfig.getHostname(), proxyConfig.getPort())))
-                .build());
     }
 
 }
