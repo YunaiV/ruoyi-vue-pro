@@ -53,7 +53,10 @@
           <el-step :title="stepTitle(item)" :description="stepDes(item)" v-for="(item) in handleTask.historyTask" ></el-step>
         </el-steps>
       </el-tab-pane>
-      <el-tab-pane label="流程图">流程图-TODO</el-tab-pane>
+      <el-tab-pane label="流程图">
+        <!-- TODO 云扬四海  svg 要如何展示 -->
+        流程图-TODO
+      </el-tab-pane>
     </el-tabs>
 
   </div>
@@ -61,7 +64,7 @@
 
 <script>
 import { getLeave } from "@/api/oa/leave"
-import { completeTask,taskSteps } from "@/api/oa/todo";
+import { completeTask,taskSteps, getHighlightImg } from "@/api/oa/todo";
 import { getDictDataLabel, getDictDatas, DICT_TYPE } from '@/utils/dict'
 export default {
   name: "HrApproveLeave",
@@ -82,6 +85,7 @@ export default {
         approved : 1,
         variables: {},
         taskId: "",
+        processInstanceId: "",
         comment: "同意"
       },
       approvedData: [
@@ -139,6 +143,7 @@ export default {
     const businessKey = this.$route.query.businessKey;
     const taskId = this.$route.query.taskId;
     this.leaveApprove.taskId = taskId;
+    this.leaveApprove.processInstanceId = this.$route.query.processInstanceId;
     this.getForm(businessKey);
   },
   methods: {
@@ -174,8 +179,8 @@ export default {
       }
       taskSteps(data).then(response => {
         this.handleTask = response.data;
-
       });
+      getHighlightImg(this.leaveApprove.processInstanceId);
     },
     approveChange(){
       if (this.leaveApprove.approved === 1) {

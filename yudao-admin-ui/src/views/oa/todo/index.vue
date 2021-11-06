@@ -26,24 +26,6 @@
       <el-table-column label="任务Id" align="center" prop="id" />
       <el-table-column label="流程名称" align="center" prop="processName" />
       <el-table-column label="任务状态" align="center"  :formatter="statusFormat" prop="status" />
-<!--      <el-table-column label="申请人id" align="center" prop="userId" />-->
-<!--      <el-table-column label="开始时间" align="center" prop="startTime" width="180">-->
-<!--        <template slot-scope="scope">-->
-<!--          <span>{{ parseTime(scope.row.startTime) }}</span>-->
-<!--        </template>-->
-<!--      </el-table-column>-->
-<!--      <el-table-column label="结束时间" align="center" prop="endTime" width="180">-->
-<!--        <template slot-scope="scope">-->
-<!--          <span>{{ parseTime(scope.row.endTime) }}</span>-->
-<!--        </template>-->
-<!--      </el-table-column>-->
-<!--      <el-table-column label="请假类型" align="center" prop="leaveType" />-->
-<!--      <el-table-column label="原因" align="center" prop="reason" />-->
-<!--      <el-table-column label="申请时间" align="center" prop="applyTime" width="180">-->
-<!--        <template slot-scope="scope">-->
-<!--          <span>{{ parseTime(scope.row.applyTime) }}</span>-->
-<!--        </template>-->
-<!--      </el-table-column>-->
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" v-if="scope.row.status == 1"  @click="handleClaim(scope.row)">签收</el-button>
@@ -234,7 +216,8 @@ export default {
           path: path,
           query: {
             businessKey: businessKey,
-            taskId:taskId
+            taskId:taskId,
+            processInstanceId : resp.processInstanceId
           }
         }
         this.$router.replace(route);
