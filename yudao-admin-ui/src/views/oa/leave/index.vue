@@ -358,6 +358,7 @@ export default {
     },
     /** 审批进度 */
     handleStep(row) {
+      const that = this;
       const id = row.processInstanceId;
       processHistorySteps(id).then(response => {
         this.handleTask.historyTask = response.data;

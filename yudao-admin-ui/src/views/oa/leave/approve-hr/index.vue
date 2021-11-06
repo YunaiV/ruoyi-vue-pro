@@ -54,8 +54,7 @@
         </el-steps>
       </el-tab-pane>
       <el-tab-pane label="流程图">
-        <!-- TODO 云扬四海  svg 要如何展示 -->
-        流程图-TODO
+        <div v-html="highlightSvgUrl"></div>
       </el-tab-pane>
     </el-tabs>
 
@@ -98,6 +97,7 @@ export default {
           label: '不同意'
         }
       ],
+      highlightSvgUrl: "",
       statusFormat(row, column) {
         return getDictDataLabel(DICT_TYPE.OA_LEAVE_STATUS, row.status)
       },
@@ -145,8 +145,15 @@ export default {
     this.leaveApprove.taskId = taskId;
     this.leaveApprove.processInstanceId = this.$route.query.processInstanceId;
     this.getForm(businessKey);
+    this.getHighlightImg(this.leaveApprove.processInstanceId);
   },
   methods: {
+    getHighlightImg(processInstanceId){
+      getHighlightImg(processInstanceId).then(response => {
+        console.log(response)
+        this.highlightSvgUrl = response
+      })
+    },
     /** 提交按钮 */
     submitForm() {
       this.$refs["taskForm"].validate(valid => {
@@ -180,7 +187,6 @@ export default {
       taskSteps(data).then(response => {
         this.handleTask = response.data;
       });
-      getHighlightImg(this.leaveApprove.processInstanceId);
     },
     approveChange(){
       if (this.leaveApprove.approved === 1) {
