@@ -174,21 +174,24 @@ public class TaskServiceImpl implements TaskService {
     public void getHighlightImg(String processInstanceId, HttpServletResponse response) {
         // 查询历史
         //TODO 云扬四海 貌似流程结束后，点击审批进度会报错
-       HistoricProcessInstance hpi = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
-        // 如果有结束时间
+        // TODO @Li：一些 historyService 的查询，貌似比较通用，是不是抽一些小方法出来
+        HistoricProcessInstance hpi = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
+        // 如果有结束时间 TODO @Li：如果查询不到，是不是抛出一个业务异常比较好哈？
         if (hpi == null) {
             return;
         }
         // 没有结束时间。说明流程在执行过程中
+        // TODO @Li：一些 runtimeService 的查询，貌似比较通用，是不是抽一些小方法出来
         ProcessInstance pi = runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
-        BpmnModel bpmnModel = repositoryService.getBpmnModel(pi.getProcessDefinitionId());
+        BpmnModel bpmnModel = repositoryService.getBpmnModel(pi.getProcessDefinitionId()); // TODO @Li：这块和下面的逻辑比较相关，可以在后面一点查询。
         List<String> highLightedActivities = new ArrayList<>();
 
         List<HistoricActivityInstance> historicActivityInstances = historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstanceId)
-                .orderByHistoricActivityInstanceId().asc().list();
+                .orderByHistoricActivityInstanceId().asc().list(); // TODO @Li：这块和下面的逻辑比较相关，可以在后面一点查询。
         // 获取所有活动节点
         List<HistoricActivityInstance> finishedInstances = historyService.createHistoricActivityInstanceQuery()
                 .processInstanceId(processInstanceId).finished().list();
+        // TODO @Li：highLightedActivities 结果，可以使用 CollUtils.buildList() 方法。即使不用，也应该用 stream。简洁很重要。
         for (HistoricActivityInstance hai : finishedInstances) {
             highLightedActivities.add(hai.getActivityId());
         }
@@ -199,6 +202,7 @@ public class TaskServiceImpl implements TaskService {
         List<String> highLightedFlowIds = getHighLightedFlows(bpmnModel, historicActivityInstances);
 
         //设置"宋体"
+        // TODO @Li：Service 返回 bytes，最终 Controller 去写
         try (InputStream inputStream = processDiagramGenerator.generateDiagram(bpmnModel, highLightedActivities, highLightedFlowIds,
                 "宋体", "宋体", "宋体")){
             String picName = hpi.getProcessDefinitionName()+".svg";
@@ -207,9 +211,9 @@ public class TaskServiceImpl implements TaskService {
         } catch (IOException e) {
             log.error(ExceptionUtils.getStackTrace(e));
         }
-
     }
 
+    // TODO @Li：参考 ServletUtils 方法。如果没有满足的，可以在写一个。
     private void responseImage(HttpServletResponse response, InputStream inputStream, String picName) throws IOException {
         response.setContentType("application/octet-stream;charset=UTF-8");
         response.setHeader("Content-Disposition", "attachment; filename=" + URLEncoder.encode(picName, "UTF-8"));
@@ -220,6 +224,8 @@ public class TaskServiceImpl implements TaskService {
         }
         response.flushBuffer();
     }
+
+    // TODO @Li：这个方法的可读性还有一定的优化空间，可以思考下哈。
     /**
      * 获取已经流转的线 https://blog.csdn.net/qiuxinfa123/article/details/119579863
      * @see
@@ -244,6 +250,7 @@ public class TaskServiceImpl implements TaskService {
             }
         }
 
+        // TODO @Li：这两个变量，直接放到循环里。这种优化一般不需要做的，对性能影响超级小。
         FlowNode currentFlowNode;
         FlowNode targetFlowNode;
         // 遍历已完成的活动实例，从每个实例的outgoingFlows中找到已执行的
@@ -252,11 +259,10 @@ public class TaskServiceImpl implements TaskService {
             currentFlowNode = (FlowNode) bpmnModel.getMainProcess().getFlowElement(currentActivityInstance.getActivityId(), true);
             List<SequenceFlow> sequenceFlows = currentFlowNode.getOutgoingFlows();
 
-            /**
-             * 遍历outgoingFlows并找到已流转的 满足如下条件认为已已流转：
-             * 1.当前节点是并行网关或兼容网关，则通过outgoingFlows能够在历史活动中找到的全部节点均为已流转
-             * 2.当前节点是以上两种类型之外的，通过outgoingFlows查找到的时间最早的流转节点视为有效流转
-             */
+            // 遍历outgoingFlows并找到已流转的 满足如下条件认为已已流转：
+            // 1.当前节点是并行网关或兼容网关，则通过outgoingFlows能够在历史活动中找到的全部节点均为已流转
+            // 2.当前节点是以上两种类型之外的，通过outgoingFlows查找到的时间最早的流转节点视为有效流转
+            // TODO @Li：“parallelGateway” 和 "inclusiveGateway"，有对应的枚举么？如果木有，可以自己枚举哈
             if ("parallelGateway".equals(currentActivityInstance.getActivityType()) || "inclusiveGateway".equals(currentActivityInstance.getActivityType())) {
                 // 遍历历史活动节点，找到匹配流程目标节点的
                 for (SequenceFlow sequenceFlow : sequenceFlows) {
@@ -266,6 +272,7 @@ public class TaskServiceImpl implements TaskService {
                     }
                 }
             } else {
+                // TODO @Li：如果是为了获取到时间更早的一个，是不是遍历的过程中，就可以解决
                 List<Map<String, Object>> tempMapList = new ArrayList<>();
                 for (SequenceFlow sequenceFlow : sequenceFlows) {
                     for (HistoricActivityInstance historicActivityInstance : historicActivityInstances) {
@@ -283,6 +290,7 @@ public class TaskServiceImpl implements TaskService {
                     long earliestStamp = 0L;
                     String highLightedFlowId = null;
                     for (Map<String, Object> map : tempMapList) {
+                        // TODO @Li：可以使用 MapUtil 去 get 值
                         long highLightedFlowStartTime = Long.valueOf(map.get("highLightedFlowStartTime").toString());
                         if (earliestStamp == 0 || earliestStamp >= highLightedFlowStartTime) {
                             highLightedFlowId = map.get("highLightedFlowId").toString();

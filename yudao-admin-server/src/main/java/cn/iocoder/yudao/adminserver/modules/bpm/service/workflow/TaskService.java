@@ -6,7 +6,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
-
+// TODO @jason：前缀
 /**
  * 用户任务服务接口
  */
@@ -25,13 +25,12 @@ public interface TaskService {
      */
     void claimTask(String taskId);
 
-
+    // TODO @jason：可以把实现方法的注释，统一写到接口里
     /**
      * 办理完成用户任务
      * @param taskReq 任务参数， 包含任务的参数，和 评论
      */
     void completeTask(TaskReqVO taskReq);
-
 
     /**
      * 根据任务id, 查询已经完成的用户任务，未完成的用户任务
@@ -44,7 +43,6 @@ public interface TaskService {
      * @param processInstanceId 流程实例id
      */
     List<TaskStepVO> getHistorySteps(String processInstanceId);
-
 
     /**
      * 获取用户任务的 formKey, 对应外置表单， 需要根据formKey 对应业务表单

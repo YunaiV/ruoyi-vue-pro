@@ -26,11 +26,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
-import javax.validation.constraints.NotNull;
 import java.util.*;
 
 import static cn.iocoder.yudao.adminserver.modules.bpm.enums.oa.OAErrorCodeConstants.*;
-import static cn.iocoder.yudao.adminserver.modules.system.enums.SysErrorCodeConstants.POST_CODE_DUPLICATE;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 
 /**
@@ -116,6 +114,7 @@ public class OALeaveServiceImpl implements OALeaveService {
         }
     }
 
+    // TODO @jason：要不，请假不支持删除，只支持取消？
     @Override
     public void deleteLeave(Long id) {
         // 校验存在

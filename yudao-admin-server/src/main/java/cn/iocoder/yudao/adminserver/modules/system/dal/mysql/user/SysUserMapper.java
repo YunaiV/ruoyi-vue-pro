@@ -56,6 +56,7 @@ public interface SysUserMapper extends BaseMapperX<SysUserDO> {
         return selectList(new QueryWrapperX<SysUserDO>().like("username", username));
     }
 
+    // TODO jason：变量平铺比较好
     default List<SysUserDO> selectListByBaseVO(SysUserBaseVO reqVO) {
         return selectList(new QueryWrapperX<SysUserDO>().likeIfPresent("username", reqVO.getUsername())
                 .likeIfPresent("nickname", reqVO.getNickname())
