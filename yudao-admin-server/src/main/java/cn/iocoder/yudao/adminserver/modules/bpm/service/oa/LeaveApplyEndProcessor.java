@@ -28,12 +28,12 @@ public class LeaveApplyEndProcessor implements ExecutionListener {
         final Object approved = delegateExecution.getVariable("approved");
         OALeaveDO updateDo = new OALeaveDO();
         updateDo.setId(Long.valueOf(businessKey));
-        // TODO @jason：代码的格式哈。} else { 。另外，这里可以简化成，二元表达式
         if (Objects.equals(approved, true)) {
             updateDo.setStatus(FlowStatusEnum.PASS.getStatus());
-        }else{
+        } else {
             updateDo.setStatus(FlowStatusEnum.REJECTED.getStatus());
         }
+
         leaveMapper.updateById(updateDo);
     }
 
