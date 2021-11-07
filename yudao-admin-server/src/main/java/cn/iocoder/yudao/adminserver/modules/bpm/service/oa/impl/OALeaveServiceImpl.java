@@ -1,13 +1,19 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.service.oa.impl;
 
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.oa.vo.OALeaveCreateReqVO;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.oa.vo.OALeaveUpdateReqVO;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.oa.vo.OALeaveExportReqVO;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.oa.vo.OALeavePageReqVO;
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.date.DateUtil;
+import cn.iocoder.yudao.adminserver.modules.bpm.controller.oa.vo.*;
 import cn.iocoder.yudao.adminserver.modules.bpm.convert.oa.OALeaveConvert;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.leave.OALeaveDO;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.mysql.oa.OALeaveMapper;
+import cn.iocoder.yudao.adminserver.modules.bpm.enums.FlowStatusEnum;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.oa.OALeaveService;
+import cn.iocoder.yudao.adminserver.modules.system.controller.user.vo.user.SysUserBaseVO;
+import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.dept.SysPostDO;
+import cn.iocoder.yudao.adminserver.modules.system.dal.mysql.dept.SysPostMapper;
+import cn.iocoder.yudao.adminserver.modules.system.dal.mysql.user.SysUserMapper;
+import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.user.SysUserDO;
+import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import org.activiti.api.task.model.Task;
@@ -20,9 +26,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
+import javax.validation.constraints.NotNull;
 import java.util.*;
 
-import static cn.iocoder.yudao.adminserver.modules.bpm.enums.oa.OAErrorCodeConstants.LEAVE_NOT_EXISTS;
+import static cn.iocoder.yudao.adminserver.modules.bpm.enums.oa.OAErrorCodeConstants.*;
+import static cn.iocoder.yudao.adminserver.modules.system.enums.SysErrorCodeConstants.POST_CODE_DUPLICATE;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 
 /**
@@ -46,23 +54,33 @@ public class OALeaveServiceImpl implements OALeaveService {
     @Resource
     private TaskRuntime taskRuntime;
 
+    @Resource
+    private SysPostMapper sysPostMapper;
+
+    @Resource
+    private SysUserMapper sysUserMapper;
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Long createLeave(OALeaveCreateReqVO createReqVO) {
         // 插入 OA 请假单
         OALeaveDO leave = OALeaveConvert.INSTANCE.convert(createReqVO);
-        leave.setStatus(1);
+        leave.setStatus(FlowStatusEnum.HANDLE.getStatus());
         // TODO @jason：应该是存储 userId？？
         leave.setUserId(SecurityFrameworkUtils.getLoginUser().getUsername());
         leaveMapper.insert(leave);
-
+        Date startTime = createReqVO.getStartTime();
+        Date endTime = createReqVO.getEndTime();
+        long day = DateUtil.betweenDay(startTime, endTime, false);
+        if (day <= 0) {
+            throw ServiceExceptionUtil.exception(DAY_LEAVE_ERROR);
+        }
+        Map<String, Object> taskVariables = createReqVO.getTaskVariables();
+        taskVariables.put("day", day);
         // 创建工作流
-        Map<String, Object> variables = new HashMap<>();
-        // 如何得到部门领导人，暂时写死
-        variables.put("deptLeader", "admin"); // TODO @芋艿：需要部门的负责人
         Long id = leave.getId();
         String businessKey = String.valueOf(id);
-        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(createReqVO.getProcessKey(), businessKey, variables);
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(createReqVO.getProcessKey(), businessKey, taskVariables);
         String processInstanceId = processInstance.getProcessInstanceId();
 
         // 将工作流的编号，更新到 OA 请假单中
@@ -104,9 +122,6 @@ public class OALeaveServiceImpl implements OALeaveService {
         this.validateLeaveExists(id);
         // 删除
         leaveMapper.deleteById(id);
-        // TODO @jason：需要调用 runtimeService 的 delete 方法，删除？？？
-        // TOTO @芋道源码 目前页面暂时没有实现基于业务表单的删除, 该代码自动生成的。
-        // TODO @芋道源码  我理解提交流程后，是不允许删除的？ ， 只能在流程处理中作废流程
     }
 
     private void validateLeaveExists(Long id) {
@@ -133,6 +148,66 @@ public class OALeaveServiceImpl implements OALeaveService {
     @Override
     public List<OALeaveDO> getLeaveList(OALeaveExportReqVO exportReqVO) {
         return leaveMapper.selectList(exportReqVO);
+    }
+
+
+    /**
+     * 获取本人请假申请流程中审批人员
+     * @return 包括，本人部门的项目经理， 部门经理，  hr
+     */
+    @Override
+    public OALeaveApplyMembersVO getLeaveApplyMembers() {
+        final Long id = SecurityFrameworkUtils.getLoginUser().getId();
+        //项目经理
+        //TODO jason 定义enum
+        SysPostDO pmPostDO = sysPostMapper.selectByCode("pm");
+        if (Objects.isNull(pmPostDO)) {
+            throw ServiceExceptionUtil.exception(PM_POST_NOT_EXISTS);
+        }
+        SysUserDO userDO = sysUserMapper.selectById(id);
+        Set<Long>  postIds  = new HashSet<>(8);
+        postIds.add( pmPostDO.getId());
+        SysUserBaseVO baseVO = new SysUserBaseVO();
+        baseVO.setDeptId(userDO.getDeptId())
+                .setPostIds(postIds);
+        final List<SysUserDO> pmUsers = sysUserMapper.selectListByBaseVO(baseVO);
+        if (CollUtil.isEmpty(pmUsers)) {
+            throw ServiceExceptionUtil.exception(DEPART_PM_POST_NOT_EXISTS);
+        }
+
+        //部门经理
+        SysPostDO bmPostDO = sysPostMapper.selectByCode("bm");
+        if (Objects.isNull(bmPostDO)) {
+            throw ServiceExceptionUtil.exception(BM_POST_NOT_EXISTS);
+        }
+        userDO = sysUserMapper.selectById(id);
+        postIds  = new HashSet<>(8);
+        postIds.add( bmPostDO.getId());
+        baseVO = new SysUserBaseVO();
+        baseVO.setDeptId(userDO.getDeptId())
+                .setPostIds(postIds);
+        final List<SysUserDO> bmUsers = sysUserMapper.selectListByBaseVO(baseVO);
+        if (CollUtil.isEmpty(bmUsers)) {
+            throw ServiceExceptionUtil.exception(DEPART_BM_POST_NOT_EXISTS);
+        }
+        //人事
+        SysPostDO hrPostDO = sysPostMapper.selectByCode("hr");
+        if (Objects.isNull(hrPostDO)) {
+            throw ServiceExceptionUtil.exception(HR_POST_NOT_EXISTS);
+        }
+        userDO = sysUserMapper.selectById(id);
+        postIds  = new HashSet<>(8);
+        postIds.add( hrPostDO.getId());
+        baseVO = new SysUserBaseVO();
+        baseVO.setDeptId(userDO.getDeptId())
+                .setPostIds(postIds);
+        final List<SysUserDO> hrUsers = sysUserMapper.selectListByBaseVO(baseVO);
+        if (CollUtil.isEmpty(hrUsers)) {
+            throw ServiceExceptionUtil.exception(DEPART_BM_POST_NOT_EXISTS);
+        }
+        return OALeaveApplyMembersVO.builder().pm(pmUsers.get(0).getUsername())
+                .bm(bmUsers.get(0).getUsername())
+                .hr(hrUsers.get(0).getUsername()).build();
     }
 
 }

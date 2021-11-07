@@ -49,6 +49,9 @@
 
     <!-- 操作工具栏 -->
     <el-row :gutter="10" class="mb8">
+      <el-col :span="1.5">
+        <el-button type="primary" icon="el-icon-plus" size="mini" @click="handleAdd">新增</el-button>
+      </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
@@ -155,7 +158,7 @@
 </template>
 
 <script>
-import { createLeave, updateLeave, deleteLeave, getLeave, getLeavePage, exportLeaveExcel } from "@/api/oa/leave"
+import { createLeave, updateLeave, getLeaveApplyMembers, getLeave, getLeavePage, exportLeaveExcel } from "@/api/oa/leave"
 import { getDictDataLabel, getDictDatas, DICT_TYPE } from '@/utils/dict'
 import { processHistorySteps,getHighlightImg } from '@/api/oa/todo'
 export default {
@@ -319,9 +322,17 @@ export default {
     },
     /** 新增按钮操作 */
     handleAdd() {
-      this.reset();
-      this.open = true;
-      this.title = "添加请假申请";
+      getLeaveApplyMembers().then(response => {
+        const route = {
+          path: '/flow/leave/apply',
+          query: {
+            hr:  response.data.hr,
+            pm:  response.data.pm,
+            bm : response.data.bm
+          }
+        }
+        this.$router.replace(route);
+      });
     },
     /** 详情按钮操作 */
     handleDetail(row) {

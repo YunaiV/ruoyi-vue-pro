@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <el-row>
-      <el-button type="primary" v-on:click="leave">请假申请</el-button>
+      <div>TODO @芋艿, 待办请假和 已办请假，感觉可以做成通用，不同的业务表单对应的待办任务和已办任务可以通用，或许可以想个更通用的名字 </div>
     </el-row>
   </div>
 </template>
@@ -25,12 +25,12 @@ export default {
 
   },
   methods: {
-    leave() {
-      getStartForm('leave-formkey').then(response => {
-        const route = response.data;
-        this.$router.replace(route);
-      });
-    }
+    // leave() {
+    //   getStartForm('leave-formkey').then(response => {
+    //     const route = response.data;
+    //     this.$router.replace(route);
+    //   });
+    // }
   }
 };
 </script>

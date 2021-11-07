@@ -133,8 +133,8 @@ export const constantRoutes = [
       {
         path: 'leave/apply',
         component: (resolve) => require(['@/views/oa/leave/apply/index'], resolve),
-        name: '请假表单',
-        meta: { title: '请假表单', icon: 'form' }
+        name: '请假表单-申请',
+        meta: { title: '请假表单-申请', icon: 'form' }
       }
     ]
   },
@@ -145,52 +145,10 @@ export const constantRoutes = [
     redirect: 'noredirect',
     children: [
       {
-        path: 'leave/approve-leader',
-        component: (resolve) => require(['@/views/oa/leave/approve-leader/index'], resolve),
-        name: '请假表单-部门领导审批',
-        meta: { title: '请假表单-部门领导审批', icon: 'form' }
-      }
-    ]
-  },
-  {
-    path: '/flow',
-    component: Layout,
-    hidden: true,
-    redirect: 'noredirect',
-    children: [
-      {
-        path: 'leave/approve-hr',
-        component: (resolve) => require(['@/views/oa/leave/approve-hr/index'], resolve),
-        name: '请假表单-人事审批',
-        meta: { title: '请假表单-人事审批', icon: 'form' }
-      }
-    ]
-  },
-  {
-    path: '/flow',
-    component: Layout,
-    hidden: true,
-    redirect: 'noredirect',
-    children: [
-      {
-        path: 'leave/confirm',
-        component: (resolve) => require(['@/views/oa/leave/confirm/index'], resolve),
-        name: '请假表单-确认',
-        meta: { title: '请假表单-确认', icon: 'form' }
-      }
-    ]
-  },
-  {
-    path: '/flow',
-    component: Layout,
-    hidden: true,
-    redirect: 'noredirect',
-    children: [
-      {
-        path: 'leave/modify',
-        component: (resolve) => require(['@/views/oa/leave/modify/index'], resolve),
-        name: '请假表单-修改',
-        meta: { title: '请假表单-修改', icon: 'form' }
+        path: 'leave/approve',
+        component: (resolve) => require(['@/views/oa/leave/approve/index'], resolve),
+        name: '请假表单-审批',
+        meta: { title: '请假表单-审批', icon: 'form' }
       }
     ]
   }

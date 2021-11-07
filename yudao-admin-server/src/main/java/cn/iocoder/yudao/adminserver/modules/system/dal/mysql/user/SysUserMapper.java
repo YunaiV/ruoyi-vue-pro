@@ -1,6 +1,8 @@
 package cn.iocoder.yudao.adminserver.modules.system.dal.mysql.user;
 
+import cn.iocoder.yudao.adminserver.modules.system.controller.user.vo.user.SysUserBaseVO;
 import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.user.SysUserDO;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.QueryWrapperX;
@@ -8,9 +10,11 @@ import cn.iocoder.yudao.adminserver.modules.system.controller.user.vo.user.SysUs
 import cn.iocoder.yudao.adminserver.modules.system.controller.user.vo.user.SysUserPageReqVO;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.logging.log4j.util.Strings;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 @Mapper
 public interface SysUserMapper extends BaseMapperX<SysUserDO> {
@@ -50,6 +54,14 @@ public interface SysUserMapper extends BaseMapperX<SysUserDO> {
 
     default List<SysUserDO> selectListByUsername(String username) {
         return selectList(new QueryWrapperX<SysUserDO>().like("username", username));
+    }
+
+    default List<SysUserDO> selectListByBaseVO(SysUserBaseVO reqVO) {
+        return selectList(new QueryWrapperX<SysUserDO>().likeIfPresent("username", reqVO.getUsername())
+                .likeIfPresent("nickname", reqVO.getNickname())
+                .eq("status", CommonStatusEnum.ENABLE.getStatus())
+                .eq("dept_id", reqVO.getDeptId())
+                .likeIfPresent("post_ids", Optional.ofNullable(reqVO.getPostIds()).map(t -> Strings.join(t, ',')).orElse("")));
     }
 
 }

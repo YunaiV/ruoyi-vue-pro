@@ -38,7 +38,7 @@
 </template>
 
 <script>
-import { createFormKeyLeave } from "@/api/oa/leave"
+import { createFormKeyLeave} from "@/api/oa/leave"
 import { getDictDataLabel, getDictDatas, DICT_TYPE } from '@/utils/dict'
 export default {
   name: "ApplyLeave",
@@ -47,13 +47,21 @@ export default {
   data() {
     return {
       // 表单参数
-      form: {},
+      form: {
+        processKey: 'leave-update',
+        taskVariables:{
+          hr: "",
+          pm: "",
+          bm: ""
+        }
+      },
       // 表单校验
       rules: {
         startTime: [{ required: true, message: "开始时间不能为空", trigger: "blur" }],
         endTime: [{ required: true, message: "结束时间不能为空", trigger: "blur" }],
         applyTime: [{ required: true, message: "申请时间不能为空", trigger: "blur" }],
       },
+
       statusFormat(row, column) {
         return getDictDataLabel(DICT_TYPE.OA_LEAVE_STATUS, row.status)
       },
@@ -62,6 +70,9 @@ export default {
     };
   },
   created() {
+    this.form.taskVariables.hr = this.$route.query.hr;
+    this.form.taskVariables.pm = this.$route.query.pm;
+    this.form.taskVariables.bm = this.$route.query.bm;
   },
   methods: {
     /** 提交按钮 */
@@ -70,13 +81,7 @@ export default {
         if (!valid) {
           return;
         }
-        // 修改的提交
-        // if (this.form.id != null) {
-        //   updateLeave(this.form).then(response => {
-        //     this.msgSuccess("修改成功");
-        //   });
-        //   return;
-        // }
+
         // 添加的提交
         createFormKeyLeave(this.form).then(response => {
           this.msgSuccess("新增成功");

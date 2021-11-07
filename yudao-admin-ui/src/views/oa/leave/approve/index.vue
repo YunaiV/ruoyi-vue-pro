@@ -62,11 +62,11 @@
 </template>
 
 <script>
-import { getLeave } from "@/api/oa/leave"
+import { getLeave,getLeaveApplyMembers } from "@/api/oa/leave"
 import { completeTask,taskSteps, getHighlightImg } from "@/api/oa/todo";
 import { getDictDataLabel, getDictDatas, DICT_TYPE } from '@/utils/dict'
 export default {
-  name: "HrApproveLeave",
+  name: "ApproveLeave",
   components: {
   },
   data() {
@@ -82,7 +82,11 @@ export default {
       },
       leaveApprove: {
         approved : 1,
-        variables: {},
+        variables: {
+          hr: "",
+          pm: "",
+          bm: ""
+        },
         taskId: "",
         processInstanceId: "",
         comment: "同意"
@@ -161,12 +165,13 @@ export default {
           return;
         }
         if (this.leaveApprove.approved == 1) {
-          this.leaveApprove.variables["hrApproved"] = true;
+          this.leaveApprove.variables["approved"] = true;
         }
         if (this.leaveApprove.approved == 0) {
-          this.leaveApprove.variables["hrApproved"] = false;
+          this.leaveApprove.variables["approved"] = false;
         }
         completeTask(this.leaveApprove).then(response => {
+
           this.msgSuccess("执行任务成功");
           this.$store.dispatch('tagsView/delView', this.$route).then(({ visitedViews }) => {
             //if (this.isActive(this.$route)) {
@@ -186,6 +191,12 @@ export default {
       }
       taskSteps(data).then(response => {
         this.handleTask = response.data;
+      });
+
+      getLeaveApplyMembers().then(response => {
+        this.leaveApprove.variables.hr = response.data.hr;
+        this.leaveApprove.variables.bm = response.data.bm;
+        this.leaveApprove.variables.pm = response.data.pm;
       });
     },
     approveChange(){

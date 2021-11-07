@@ -1,10 +1,7 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.service.oa;
 
 
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.oa.vo.OALeaveCreateReqVO;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.oa.vo.OALeaveUpdateReqVO;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.oa.vo.OALeaveExportReqVO;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.oa.vo.OALeavePageReqVO;
+import cn.iocoder.yudao.adminserver.modules.bpm.controller.oa.vo.*;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.leave.OALeaveDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 
@@ -73,4 +70,11 @@ public interface OALeaveService {
      */
     List<OALeaveDO> getLeaveList(OALeaveExportReqVO exportReqVO);
 
+
+
+    /**
+     * 获取本人请假申请流程中审批人员
+     * @return  包括，本人部门的项目经理， 部门经理，  HR
+     */
+    OALeaveApplyMembersVO getLeaveApplyMembers();
 }

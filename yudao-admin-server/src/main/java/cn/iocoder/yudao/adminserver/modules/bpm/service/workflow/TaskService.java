@@ -6,22 +6,50 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
-// TODO @芋艿：前缀，注释
-// TODO @json：类和方法的注释。咱是开源项目，有注释，大家才能更容易读懂
+
+/**
+ * 用户任务服务接口
+ */
 public interface TaskService {
 
+
+    /**
+     * 获取当前用户的待办任务， 分页
+     */
     PageResult<TodoTaskRespVO> getTodoTaskPage(TodoTaskPageReqVO pageReqVO);
 
+
+    /**
+     * 签收任务
+     * @param taskId  用户任务id
+     */
     void claimTask(String taskId);
 
 
+    /**
+     * 办理完成用户任务
+     * @param taskReq 任务参数， 包含任务的参数，和 评论
+     */
     void completeTask(TaskReqVO taskReq);
 
-//    void flowImage(String taskId, HttpServletResponse response);
+
+    /**
+     * 根据任务id, 查询已经完成的用户任务，未完成的用户任务
+     * @param taskQuery 查询参数  一般 taskId
+     */
     TaskHandleVO getTaskSteps(TaskQueryReqVO taskQuery);
 
+    /**
+     * 根据流程实例id, 查询历史用户任务，包括已完成，未完成
+     * @param processInstanceId 流程实例id
+     */
     List<TaskStepVO> getHistorySteps(String processInstanceId);
 
+
+    /**
+     * 获取用户任务的 formKey, 对应外置表单， 需要根据formKey 对应业务表单
+     * @param taskQuery 查询参数 ,一般taskId
+     */
     TodoTaskRespVO getTaskFormKey(TaskQueryReqVO taskQuery);
 
 

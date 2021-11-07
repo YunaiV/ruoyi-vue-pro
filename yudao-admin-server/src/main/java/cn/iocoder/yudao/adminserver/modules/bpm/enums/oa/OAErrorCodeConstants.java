@@ -10,4 +10,10 @@ import cn.iocoder.yudao.framework.common.exception.ErrorCode;
  */
 public interface OAErrorCodeConstants {
     ErrorCode LEAVE_NOT_EXISTS = new ErrorCode(1003001001, "请假申请不存在");
+    ErrorCode PM_POST_NOT_EXISTS = new ErrorCode(1003001002, "项目经理岗位未设置");
+    ErrorCode DEPART_PM_POST_NOT_EXISTS = new ErrorCode(1003001003, "部门的项目经理不存在");
+    ErrorCode BM_POST_NOT_EXISTS = new ErrorCode(1003001004, "部门经理岗位未设置");
+    ErrorCode DEPART_BM_POST_NOT_EXISTS = new ErrorCode(1003001005, "部门的部门经理不存在");
+    ErrorCode HR_POST_NOT_EXISTS = new ErrorCode(1003001006, "HR岗位未设置");
+    ErrorCode DAY_LEAVE_ERROR = new ErrorCode(1003001007, "请假天数必须大于0");
 }

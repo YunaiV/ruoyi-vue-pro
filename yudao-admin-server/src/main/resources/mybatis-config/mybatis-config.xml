@@ -6,6 +6,7 @@
     <settings>
         <setting name="lazyLoadingEnabled" value="false" />
         <setting name="mapUnderscoreToCamelCase" value="true"/>
+<!--        <setting name="logImpl" value="STDOUT_LOGGING"/>-->
     </settings>
     <typeAliases>
         <typeAlias type="org.activiti.engine.impl.persistence.ByteArrayRefTypeHandler" alias="ByteArrayRefTypeHandler"/>

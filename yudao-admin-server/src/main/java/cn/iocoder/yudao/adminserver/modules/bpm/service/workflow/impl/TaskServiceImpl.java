@@ -89,7 +89,7 @@ public class TaskServiceImpl implements TaskService {
     /**
      * 工作流，完成 userTask, 完成用户任务 一般传入参数 1。是否同意（variables).  2. 评论(comment)
      * variables 变量名 和 评论 由前台传入
-     * @param taskReq
+     * @param taskReq 任务参数
      */
     @Override
     @Transactional
@@ -103,25 +103,7 @@ public class TaskServiceImpl implements TaskService {
                 .build());
     }
 
-//    @Override
-//    public void flowImage(String taskId, HttpServletResponse response) {
-//
-//        final Task task = taskRuntime.task(taskId);
-//        BpmnModel bpmnModel = repositoryService.getBpmnModel(task.getProcessDefinitionId());
-//        final Process process = bpmnModel.getMainProcess();
-//        ProcessDefinitionEntity processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(task.getProcessDefinitionId()).singleResult();
-//        List<String> activeActivityIds = runtimeService.getActiveActivityIds(executionId);
-//        List<String> highLightedFlows = getHighLightedFlows(processDefinition, processInstance.getId());
-//        ProcessDiagramGenerator diagramGenerator = processEngineConfiguration.getProcessDiagramGenerator();
-//        InputStream imageStream =diagramGenerator.generateDiagram(bpmnModel, "png", activeActivityIds, highLightedFlows);
-//
-//        // 输出资源内容到相应对象
-//        byte[] b = new byte[1024];
-//        int len;
-//        while ((len = imageStream.read(b, 0, 1024)) != -1) {
-//            response.getOutputStream().write(b, 0, len);
-//        }
-//    }
+
 
     @Override
     public TaskHandleVO getTaskSteps(TaskQueryReqVO taskQuery) {
@@ -148,8 +130,7 @@ public class TaskServiceImpl implements TaskService {
             // TODO @jason：可以考虑把 comments 读取后，在统一调用 convert 拼接。另外 Comment 是废弃的类，有没其它可以使用的哈？
             List<Comment> comments = activitiTaskService.getTaskComments(instance.getTaskId());
             if (!CollUtil.isEmpty(comments)) {
-                // TODO @jason：IDEA 在 t.getFullMessage() 有提示告警，可以解决下。
-                stepVO.setComment(Optional.ofNullable(comments.get(0)).map(t->t.getFullMessage()).orElse(""));
+                stepVO.setComment(Optional.ofNullable(comments.get(0)).map(Comment::getFullMessage).orElse(""));
             }
             steps.add(stepVO);
         });
@@ -188,45 +169,11 @@ public class TaskServiceImpl implements TaskService {
         return respVO;
     }
 
-//    private List<String> getHighLightedFlows(ProcessDefinitionEntity processDefinition, String processInstanceId) {
-//
-//        List<String> highLightedFlows = new ArrayList<String>();
-//        List<HistoricActivityInstance> historicActivityInstances = historyService
-//                .createHistoricActivityInstanceQuery()
-//                .processInstanceId(processInstanceId)
-//                .orderByHistoricActivityInstanceStartTime().asc().list();
-//
-//        List<String> historicActivityInstanceList = new ArrayList<String>();
-//        for (HistoricActivityInstance hai : historicActivityInstances) {
-//            historicActivityInstanceList.add(hai.getActivityId());
-//        }
-
-//        // add current activities to list
-//        List<String> highLightedActivities = runtimeService.getActiveActivityIds(processInstanceId);
-//        historicActivityInstanceList.addAll(highLightedActivities);
-
-        // activities and their sequence-flows
-//        for (ActivityImpl activity : processDefinition.getActivities()) {
-//            int index = historicActivityInstanceList.indexOf(activity.getId());
-//
-//            if (index >= 0 && index + 1 < historicActivityInstanceList.size()) {
-//                List<PvmTransition> pvmTransitionList = activity
-//                        .getOutgoingTransitions();
-//                for (PvmTransition pvmTransition : pvmTransitionList) {
-//                    String destinationFlowId = pvmTransition.getDestination().getId();
-//                    if (destinationFlowId.equals(historicActivityInstanceList.get(index + 1))) {
-//                        highLightedFlows.add(pvmTransition.getId());
-//                    }
-//                }
-//            }
-//        }
-//        return highLightedFlows;
-//    }
-
 
     @Override
     public void getHighlightImg(String processInstanceId, HttpServletResponse response) {
         // 查询历史
+        //TODO 云扬四海 貌似流程结束后，点击审批进度会报错
        HistoricProcessInstance hpi = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
         // 如果有结束时间
         if (hpi == null) {
