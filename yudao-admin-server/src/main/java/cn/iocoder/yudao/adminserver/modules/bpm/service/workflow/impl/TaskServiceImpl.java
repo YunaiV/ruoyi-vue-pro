@@ -1,10 +1,13 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.service.workflow.impl;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.io.IoUtil;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.workflow.vo.*;
 import cn.iocoder.yudao.adminserver.modules.bpm.convert.workflow.TaskConvert;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.workflow.TaskService;
+import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.activiti.api.runtime.shared.query.Page;
@@ -13,6 +16,7 @@ import org.activiti.api.task.model.Task;
 import org.activiti.api.task.model.builders.ClaimTaskPayloadBuilder;
 import org.activiti.api.task.model.builders.TaskPayloadBuilder;
 import org.activiti.api.task.runtime.TaskRuntime;
+import org.activiti.bpmn.constants.BpmnXMLConstants;
 import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.bpmn.model.FlowNode;
 import org.activiti.bpmn.model.SequenceFlow;
@@ -28,16 +32,18 @@ import org.activiti.image.ProcessDiagramGenerator;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static cn.iocoder.yudao.adminserver.modules.bpm.enums.oa.OAErrorCodeConstants.*;
 
 @Slf4j
 @Service
@@ -171,69 +177,60 @@ public class TaskServiceImpl implements TaskService {
 
 
     @Override
-    public void getHighlightImg(String processInstanceId, HttpServletResponse response) {
+    public FileResp getHighlightImg(String processInstanceId) {
         // 查询历史
         //TODO 云扬四海 貌似流程结束后，点击审批进度会报错
         // TODO @Li：一些 historyService 的查询，貌似比较通用，是不是抽一些小方法出来
         HistoricProcessInstance hpi = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
-        // 如果有结束时间 TODO @Li：如果查询不到，是不是抛出一个业务异常比较好哈？
+        // 如果不存在实例。 说明数据异常
         if (hpi == null) {
-            return;
+            throw ServiceExceptionUtil.exception(PROCESS_INSTANCE_NOT_EXISTS);
         }
         // 没有结束时间。说明流程在执行过程中
         // TODO @Li：一些 runtimeService 的查询，貌似比较通用，是不是抽一些小方法出来
         ProcessInstance pi = runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
-        BpmnModel bpmnModel = repositoryService.getBpmnModel(pi.getProcessDefinitionId()); // TODO @Li：这块和下面的逻辑比较相关，可以在后面一点查询。
-        List<String> highLightedActivities = new ArrayList<>();
 
-        List<HistoricActivityInstance> historicActivityInstances = historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstanceId)
-                .orderByHistoricActivityInstanceId().asc().list(); // TODO @Li：这块和下面的逻辑比较相关，可以在后面一点查询。
+        List<String> highLightedActivities = new ArrayList<>();
         // 获取所有活动节点
         List<HistoricActivityInstance> finishedInstances = historyService.createHistoricActivityInstanceQuery()
                 .processInstanceId(processInstanceId).finished().list();
         // TODO @Li：highLightedActivities 结果，可以使用 CollUtils.buildList() 方法。即使不用，也应该用 stream。简洁很重要。
-        for (HistoricActivityInstance hai : finishedInstances) {
-            highLightedActivities.add(hai.getActivityId());
-        }
+        finishedInstances.stream()
+                .map(HistoricActivityInstance::getActivityId)
+                .forEach(highLightedActivities::add);
         // 已完成的节点+当前节点
         highLightedActivities.addAll(runtimeService.getActiveActivityIds(processInstanceId));
 
+        BpmnModel bpmnModel = repositoryService.getBpmnModel(pi.getProcessDefinitionId());
         // 经过的流
-        List<String> highLightedFlowIds = getHighLightedFlows(bpmnModel, historicActivityInstances);
+        List<String> highLightedFlowIds = getHighLightedFlows(bpmnModel, processInstanceId);
 
         //设置"宋体"
-        // TODO @Li：Service 返回 bytes，最终 Controller 去写
         try (InputStream inputStream = processDiagramGenerator.generateDiagram(bpmnModel, highLightedActivities, highLightedFlowIds,
                 "宋体", "宋体", "宋体")){
-            String picName = hpi.getProcessDefinitionName()+".svg";
-            // 输出到浏览器
-            responseImage(response, inputStream, picName);
+            FileResp fileResp = new FileResp();
+            String picName = hpi.getProcessDefinitionName() + ".svg";
+            fileResp.setFileName(picName);
+            fileResp.setFileByte(IoUtil.readBytes(inputStream));
+            return fileResp;
         } catch (IOException e) {
             log.error(ExceptionUtils.getStackTrace(e));
+            throw ServiceExceptionUtil.exception(HIGHLIGHT_IMG_ERROR);
         }
-    }
-
-    // TODO @Li：参考 ServletUtils 方法。如果没有满足的，可以在写一个。
-    private void responseImage(HttpServletResponse response, InputStream inputStream, String picName) throws IOException {
-        response.setContentType("application/octet-stream;charset=UTF-8");
-        response.setHeader("Content-Disposition", "attachment; filename=" + URLEncoder.encode(picName, "UTF-8"));
-        byte[] b = new byte[1024];
-        int len = -1;
-        while ((len = inputStream.read(b, 0, 1024)) != -1) {
-            response.getOutputStream().write(b, 0, len);
-        }
-        response.flushBuffer();
     }
 
     // TODO @Li：这个方法的可读性还有一定的优化空间，可以思考下哈。
     /**
-     * 获取已经流转的线 https://blog.csdn.net/qiuxinfa123/article/details/119579863
-     * @see
+     * 获取指定 processInstanceId 已经高亮的Flows
+     * 获取已经流转的线 参考： https://blog.csdn.net/qiuxinfa123/article/details/119579863
      * @param bpmnModel model
-     * @param historicActivityInstances 高亮线条
-     * @return
+     * @param processInstanceId 流程实例Id
+     * @return 获取已经流转的列表
      */
-    private List<String> getHighLightedFlows(BpmnModel bpmnModel, List<HistoricActivityInstance> historicActivityInstances) {
+    private List<String> getHighLightedFlows(BpmnModel bpmnModel, String processInstanceId) {
+        // 获取所有的线条
+        List<HistoricActivityInstance> historicActivityInstances = historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstanceId)
+                .orderByHistoricActivityInstanceId().asc().list();
         // 高亮流程已发生流转的线id集合
         List<String> highLightedFlowIds = new ArrayList<>();
         // 全部活动节点
@@ -249,57 +246,43 @@ public class TaskServiceImpl implements TaskService {
                 finishedActivityInstances.add(historicActivityInstance);
             }
         }
-
-        // TODO @Li：这两个变量，直接放到循环里。这种优化一般不需要做的，对性能影响超级小。
-        FlowNode currentFlowNode;
-        FlowNode targetFlowNode;
+        // 提取活动id 是唯一的。塞入Map
+        Map<String, HistoricActivityInstance> historicActivityInstanceMap = CollectionUtils.convertMap(historicActivityInstances, HistoricActivityInstance::getActivityId);
         // 遍历已完成的活动实例，从每个实例的outgoingFlows中找到已执行的
         for (HistoricActivityInstance currentActivityInstance : finishedActivityInstances) {
             // 获得当前活动对应的节点信息及outgoingFlows信息
-            currentFlowNode = (FlowNode) bpmnModel.getMainProcess().getFlowElement(currentActivityInstance.getActivityId(), true);
+            FlowNode currentFlowNode = (FlowNode) bpmnModel.getMainProcess().getFlowElement(currentActivityInstance.getActivityId(), true);
             List<SequenceFlow> sequenceFlows = currentFlowNode.getOutgoingFlows();
 
             // 遍历outgoingFlows并找到已流转的 满足如下条件认为已已流转：
             // 1.当前节点是并行网关或兼容网关，则通过outgoingFlows能够在历史活动中找到的全部节点均为已流转
             // 2.当前节点是以上两种类型之外的，通过outgoingFlows查找到的时间最早的流转节点视为有效流转
-            // TODO @Li：“parallelGateway” 和 "inclusiveGateway"，有对应的枚举么？如果木有，可以自己枚举哈
-            if ("parallelGateway".equals(currentActivityInstance.getActivityType()) || "inclusiveGateway".equals(currentActivityInstance.getActivityType())) {
+            if (BpmnXMLConstants.ELEMENT_GATEWAY_PARALLEL.equals(currentActivityInstance.getActivityType())
+                    || BpmnXMLConstants.ELEMENT_GATEWAY_INCLUSIVE.equals(currentActivityInstance.getActivityType())) {
                 // 遍历历史活动节点，找到匹配流程目标节点的
                 for (SequenceFlow sequenceFlow : sequenceFlows) {
-                    targetFlowNode = (FlowNode) bpmnModel.getMainProcess().getFlowElement(sequenceFlow.getTargetRef(), true);
+                    FlowNode targetFlowNode = (FlowNode) bpmnModel.getMainProcess().getFlowElement(sequenceFlow.getTargetRef(), true);
                     if (historicActivityNodes.contains(targetFlowNode)) {
                         highLightedFlowIds.add(targetFlowNode.getId());
                     }
                 }
             } else {
-                // TODO @Li：如果是为了获取到时间更早的一个，是不是遍历的过程中，就可以解决
-                List<Map<String, Object>> tempMapList = new ArrayList<>();
+                long earliestStamp = 0L;
+                String highLightedFlowId = null;
+                // 循环流出的流
                 for (SequenceFlow sequenceFlow : sequenceFlows) {
-                    for (HistoricActivityInstance historicActivityInstance : historicActivityInstances) {
-                        if (historicActivityInstance.getActivityId().equals(sequenceFlow.getTargetRef())) {
-                            Map<String, Object> map = new HashMap<>();
-                            map.put("highLightedFlowId", sequenceFlow.getId());
-                            map.put("highLightedFlowStartTime", historicActivityInstance.getStartTime().getTime());
-                            tempMapList.add(map);
-                        }
+                    HistoricActivityInstance historicActivityInstance = historicActivityInstanceMap.get(sequenceFlow.getTargetRef());
+                    if (historicActivityInstance == null) {
+                        continue;
                     }
-                }
-
-                if (!CollectionUtils.isEmpty(tempMapList)) {
+                    final long startTime = historicActivityInstance.getStartTime().getTime();
                     // 遍历匹配的集合，取得开始时间最早的一个
-                    long earliestStamp = 0L;
-                    String highLightedFlowId = null;
-                    for (Map<String, Object> map : tempMapList) {
-                        // TODO @Li：可以使用 MapUtil 去 get 值
-                        long highLightedFlowStartTime = Long.valueOf(map.get("highLightedFlowStartTime").toString());
-                        if (earliestStamp == 0 || earliestStamp >= highLightedFlowStartTime) {
-                            highLightedFlowId = map.get("highLightedFlowId").toString();
-                            earliestStamp = highLightedFlowStartTime;
-                        }
+                    if (earliestStamp == 0 || earliestStamp >= startTime) {
+                        highLightedFlowId = sequenceFlow.getId();
+                        earliestStamp = startTime;
                     }
-                    highLightedFlowIds.add(highLightedFlowId);
                 }
-
+                highLightedFlowIds.add(highLightedFlowId);
             }
 
         }

@@ -4,6 +4,7 @@ import cn.iocoder.yudao.adminserver.modules.bpm.controller.workflow.vo.*;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.workflow.TaskService;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.io.IOException;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -63,8 +65,9 @@ public class TaskController {
      * @param processInstanceId
      */
     @GetMapping("/process/highlight-img/{id}")
-    public void getHighlightImg(@PathVariable("id") String processInstanceId, HttpServletResponse response) {
-        taskService.getHighlightImg(processInstanceId, response);
+    public void getHighlightImg(@PathVariable("id") String processInstanceId, HttpServletResponse response) throws IOException {
+        FileResp fileResp = taskService.getHighlightImg(processInstanceId);
+        ServletUtils.writeAttachment(response, fileResp.getFileName(), fileResp.getFileByte());
     }
 
 

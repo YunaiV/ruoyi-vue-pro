@@ -16,4 +16,7 @@ public interface OAErrorCodeConstants {
     ErrorCode DEPART_BM_POST_NOT_EXISTS = new ErrorCode(1003001005, "部门的部门经理不存在");
     ErrorCode HR_POST_NOT_EXISTS = new ErrorCode(1003001006, "HR岗位未设置");
     ErrorCode DAY_LEAVE_ERROR = new ErrorCode(1003001007, "请假天数必须大于0");
+
+    ErrorCode PROCESS_INSTANCE_NOT_EXISTS = new ErrorCode(1003001008, "流程实例不存在");
+    ErrorCode HIGHLIGHT_IMG_ERROR = new ErrorCode(1003001009, "获取高亮流程图异常");
 }
