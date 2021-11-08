@@ -15,7 +15,10 @@ import org.springframework.stereotype.Component;
 public class YudaoActivitiConfiguration {
 
 
-    // TODO @Li：可以说明下 ProcessDiagramGenerator 作用
+    /**
+     * 流程中生成基于图表交换信息的 svg 的类。 提供绘制方法
+     * @return ProcessDiagramGenerator
+     */
     @Bean
     public ProcessDiagramGenerator processDiagramGenerator (){
         return new DefaultProcessDiagramGenerator();
