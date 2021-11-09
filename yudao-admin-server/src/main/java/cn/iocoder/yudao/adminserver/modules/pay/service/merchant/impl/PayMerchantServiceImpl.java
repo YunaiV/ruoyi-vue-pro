@@ -10,6 +10,8 @@ import cn.iocoder.yudao.adminserver.modules.pay.dal.mysql.merchant.PayMerchantMa
 import cn.iocoder.yudao.adminserver.modules.pay.service.merchant.PayMerchantService;
 import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.merchant.PayMerchantDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.google.common.annotations.VisibleForTesting;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -24,7 +26,7 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 /**
  * 支付商户信息 Service 实现类
  *
- * @author 芋艿
+ * @author aquan
  */
 @Service
 @Validated
@@ -37,10 +39,7 @@ public class PayMerchantServiceImpl implements PayMerchantService {
     public Long createMerchant(PayMerchantCreateReqVO createReqVO) {
         // 插入
         PayMerchantDO merchant = PayMerchantConvert.INSTANCE.convert(createReqVO);
-        // 根据 年月日时分秒毫秒 生成时间戳
-        // TODO @aquan：生成 no 可以单独一个小方法
-        String merchantNo = "M" + DateUtil.format(LocalDateTime.now(),"yyyyMMddHHmmssSSS");
-        merchant.setNo(merchantNo);
+        merchant.setNo(this.generateMerchantNo());
         merchantMapper.insert(merchant);
         // 返回
         return merchant.getId();
@@ -107,6 +106,35 @@ public class PayMerchantServiceImpl implements PayMerchantService {
     }
 
     /**
+     * 根据商户名称模糊查询商户集合
+     *
+     * @param merchantName 商户名称
+     * @return 商户集合
+     */
+    @Override
+    public List<PayMerchantDO> getMerchantListByName(String merchantName) {
+        return this.merchantMapper.selectList(new QueryWrapper<PayMerchantDO>()
+                .lambda().likeRight(PayMerchantDO::getName, merchantName));
+    }
+
+    /**
+     * 根据商户名称模糊查询一定数量的商户集合
+     *
+     * @param merchantName 商户名称
+     * @return 商户集合
+     */
+    @Override
+    public List<PayMerchantDO> getMerchantListByNameLimit(String merchantName) {
+
+        LambdaQueryWrapper<PayMerchantDO> queryWrapper = new QueryWrapper<PayMerchantDO>().lambda()
+                .select(PayMerchantDO::getId, PayMerchantDO::getName)
+                .likeRight(PayMerchantDO::getName, merchantName)
+                .last("limit 200");
+
+        return this.merchantMapper.selectList(queryWrapper);
+    }
+
+    /**
      * 检查商户是否存在
      * @param id 商户编号
      */
@@ -119,6 +147,25 @@ public class PayMerchantServiceImpl implements PayMerchantService {
         if (merchant == null) {
             throw exception(MERCHANT_NOT_EXISTS);
         }
+    }
+
+    /**
+     * 获得指定编号的商户列表
+     *
+     * @param merchantIds 商户编号数组
+     * @return 商户列表
+     */
+    @Override
+    public List<PayMerchantDO> getSimpleMerchants(Collection<Long> merchantIds) {
+        return merchantMapper.selectBatchIds(merchantIds);
+    }
+
+    /**
+     * 根据年月日时分秒毫秒生成商户号
+     * @return 商户号
+     */
+    private String generateMerchantNo(){
+       return  "M" + DateUtil.format(LocalDateTime.now(),"yyyyMMddHHmmssSSS");
     }
 
 

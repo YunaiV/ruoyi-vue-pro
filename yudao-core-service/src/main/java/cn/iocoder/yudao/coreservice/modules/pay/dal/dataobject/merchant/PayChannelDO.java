@@ -48,6 +48,11 @@ public class PayChannelDO extends BaseDO {
     private Double feeRate;
 
     /**
+     * 备注
+     */
+    private String remark;
+
+    /**
      * 商户编号
      *
      * 关联 {@link PayMerchantDO#getId()}

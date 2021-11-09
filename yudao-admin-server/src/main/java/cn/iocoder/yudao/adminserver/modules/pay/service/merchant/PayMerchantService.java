@@ -2,9 +2,13 @@ package cn.iocoder.yudao.adminserver.modules.pay.service.merchant;
 
 import java.util.*;
 import javax.validation.*;
+
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.adminserver.modules.pay.controller.merchant.vo.*;
+import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.dept.SysDeptDO;
 import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.merchant.PayMerchantDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 
 /**
  * 支付商户信息 Service 接口
@@ -69,9 +73,46 @@ public interface PayMerchantService {
 
     /**
      * 修改商户状态
-     * @param id 商户编号
+     *
+     * @param id     商户编号
      * @param status 状态
      */
     void updateMerchantStatus(Long id, Integer status);
 
+    /**
+     * 根据商户名称模糊查询商户集合
+     *
+     * @param merchantName 商户名称
+     * @return 商户集合
+     */
+    List<PayMerchantDO> getMerchantListByName(String merchantName);
+
+    /**
+     * 根据商户名称模糊查询一定数量的商户集合
+     * @param merchantName 商户名称
+     * @return 商户集合
+     */
+    List<PayMerchantDO> getMerchantListByNameLimit(String merchantName);
+
+    /**
+     * 获得指定编号的商户列表
+     *
+     * @param merchantIds 商户编号数组
+     * @return 商户列表
+     */
+    List<PayMerchantDO> getSimpleMerchants(Collection<Long> merchantIds);
+
+    /**
+     * 获得指定编号的商户 Map
+     *
+     * @param merchantIds 商户编号数组
+     * @return 商户 Map
+     */
+    default Map<Long, PayMerchantDO> getMerchantMap(Collection<Long> merchantIds){
+        if (CollUtil.isEmpty(merchantIds)) {
+            return Collections.emptyMap();
+        }
+        List<PayMerchantDO> list = getSimpleMerchants(merchantIds);
+        return CollectionUtils.convertMap(list, PayMerchantDO::getId);
+    }
 }

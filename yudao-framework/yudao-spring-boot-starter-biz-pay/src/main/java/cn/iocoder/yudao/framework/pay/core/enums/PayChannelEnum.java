@@ -15,7 +15,8 @@ import lombok.Getter;
 public enum PayChannelEnum {
 
     WX_PUB("wx_pub", "微信 JSAPI 支付"), // 公众号的网页
-    WX_LITE("wx_lit","微信小程序支付"),
+    // TODO @芋艿 这个地方你写的是 wx_lit 是不是少写了一个e？ 还是我这里多加了一个e
+    WX_LITE("wx_lite","微信小程序支付"),
     WX_APP("wx_app", "微信 App 支付"),
 
     ALIPAY_PC("alipay_pc", "支付宝 PC 网站支付"),

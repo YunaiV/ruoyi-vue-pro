@@ -33,7 +33,6 @@ public class PayMerchantDO extends BaseDO {
      * 例如说，M233666999
      * 只有新增时插入，不允许修改
      */
-    @TableField(fill = FieldFill.INSERT) // TODO @aquan：Service 逻辑里设置，所以不用这个注解哈
     private String no;
     /**
      * 商户全称

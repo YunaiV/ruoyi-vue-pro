@@ -32,4 +32,18 @@ public interface PayErrorCodeCoreConstants {
      * ========== 支付商户信息 1-007-004-000 ==========
      */
     ErrorCode MERCHANT_NOT_EXISTS = new ErrorCode(1007004000, "支付商户信息不存在");
+
+
+    /**
+     * ========== 支付应用信息 1-007-005-000 ==========
+     */
+    ErrorCode APP_NOT_EXISTS = new ErrorCode(1007005000, "支付应用信息不存在");
+
+
+    /**
+     * ========== 支付渠道 1-007-006-000 ==========
+     */
+    ErrorCode CHANNEL_NOT_EXISTS = new ErrorCode(1007006000, "支付渠道不存在");
+    ErrorCode CHANNEL_KEY_READ_ERROR = new ErrorCode(1007006002, "支付渠道秘钥文件读取失败");
+    ErrorCode EXIST_SAME_CHANNEL_ERROR = new ErrorCode(1007006003, "已存在相同的渠道");
 }

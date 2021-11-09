@@ -1,6 +1,9 @@
 package cn.iocoder.yudao.adminserver.modules.pay.merchant.service;
 
 import cn.hutool.core.util.RandomUtil;
+import cn.hutool.http.HttpUtil;
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
 import cn.iocoder.yudao.adminserver.BaseDbUnitTest;
 import cn.iocoder.yudao.adminserver.modules.pay.controller.merchant.vo.PayMerchantCreateReqVO;
 import cn.iocoder.yudao.adminserver.modules.pay.controller.merchant.vo.PayMerchantExportReqVO;
@@ -28,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
 * {@link PayMerchantServiceImpl} 的单元测试类
 *
-* @author 芋艿 // TODO @aquan：修改成自己的。。。
+* @author aquan
 */
 @Import(PayMerchantServiceImpl.class)
 public class PayMerchantServiceTest extends BaseDbUnitTest {

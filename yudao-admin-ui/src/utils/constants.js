@@ -16,7 +16,7 @@ export const SysCommonStatusEnum = {
  * 菜单的类型枚举
  */
 export const SysMenuTypeEnum = {
-  DIR : 1, // 目录
+  DIR: 1, // 目录
   MENU: 2, // 菜单
   BUTTON: 3 // 按钮
 }
@@ -89,4 +89,35 @@ export const SysUserSocialTypeEnum = {
     source: "wechat_enterprise",
     img: "https://cdn.jsdelivr.net/gh/justauth/justauth-oauth-logo@1.11/wechat_enterprise.png",
   }
+}
+
+export const PayChannelEnum = {
+  WX_PUB: {
+    "code": "wx_pub",
+    "name": "微信 JSAPI 支付",
+  },
+  WX_LITE: {
+    "code": "wx_lite",
+    "name": "微信小程序支付"
+  },
+  WX_APP: {
+    "code": "wx_app",
+    "name": "微信 APP 支付"
+  },
+  ALIPAY_PC: {
+    "code": "alipay_pc",
+    "name": "支付宝 PC 网站支付"
+  },
+  ALIPAY_WAP: {
+    "code": "alipay_wap",
+    "name": "支付宝 WAP 网站支付"
+  },
+  ALIPAY_APP: {
+    "code": "alipay_app",
+    "name": "支付宝 APP 支付"
+  },
+  ALIPAY_QR: {
+    "code": "alipay_qr",
+    "name": "支付宝扫码支付"
+  },
 }

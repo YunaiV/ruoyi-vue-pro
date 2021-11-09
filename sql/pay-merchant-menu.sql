@@ -1,9 +1,4 @@
 -- 支付模块-商户中心-菜单SQL
--- 菜单 SQL
-INSERT INTO `sys_menu` (
-    `name`, `permission`,`menu_type`,`sort`, `parent_id`, `path`, `icon`, `component`,
-                        `status`, `creator`,`create_time`, `updater`, `update_time`, `deleted`
-) VALUES ('支付管理',  '', 1, 4,0, '/pay','pay', NULL, 0, '1', '2021-11-03 10:35:04', '1', '2021-11-03 10:35:04', b'0');
 
 INSERT INTO `sys_menu`(
     `name`, `permission`, `menu_type`, `sort`, `parent_id`,

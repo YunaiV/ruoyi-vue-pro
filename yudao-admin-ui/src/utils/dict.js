@@ -32,7 +32,14 @@ export const DICT_TYPE = {
   TOOL_CODEGEN_TEMPLATE_TYPE: 'tool_codegen_template_type',
 
   // 商户状态
-  PAY_MERCHANT_STATUS: 'pay_merchant_status'
+  PAY_MERCHANT_STATUS: 'pay_merchant_status',
+  // 应用状态
+  PAY_APP_STATUS: 'pay_app_status',
+  // 渠道状态
+  PAY_CHANNEL_STATUS: 'pay_channel_status',
+  // 微信渠道版本
+  PAY_CHANNEL_WECHAT_VERSION:'pay_channel_wechat_version',
+
 }
 
 /**

@@ -3,7 +3,6 @@ package cn.iocoder.yudao.adminserver.modules.pay.controller.merchant;
 import cn.iocoder.yudao.adminserver.modules.pay.controller.merchant.vo.*;
 import cn.iocoder.yudao.adminserver.modules.pay.convert.merchant.PayMerchantConvert;
 import cn.iocoder.yudao.adminserver.modules.pay.service.merchant.PayMerchantService;
-import cn.iocoder.yudao.adminserver.modules.system.controller.user.vo.user.SysUserUpdateStatusReqVO;
 import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.merchant.PayMerchantDO;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -74,6 +73,15 @@ public class PayMerchantController {
     public CommonResult<PayMerchantRespVO> getMerchant(@RequestParam("id") Long id) {
         PayMerchantDO merchant = merchantService.getMerchant(id);
         return success(PayMerchantConvert.INSTANCE.convert(merchant));
+    }
+
+    @GetMapping("/list-name")
+    @ApiOperation("根据商户名称获得支付商户信息列表")
+    @ApiImplicitParam(name = "name", value = "商户名称", required = true, example = "芋道", dataTypeClass = Long.class)
+    @PreAuthorize("@ss.hasPermission('pay:merchant:query')")
+    public CommonResult<List<PayMerchantRespVO>> getMerchantListByName(@RequestParam("name") String name) {
+        List<PayMerchantDO> merchantListDO = merchantService.getMerchantListByNameLimit(name);
+        return success(PayMerchantConvert.INSTANCE.convertList(merchantListDO));
     }
 
     @GetMapping("/list")

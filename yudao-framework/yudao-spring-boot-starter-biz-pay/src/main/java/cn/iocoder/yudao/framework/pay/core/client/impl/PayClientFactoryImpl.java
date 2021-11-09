@@ -58,8 +58,11 @@ public class PayClientFactoryImpl implements PayClientFactory {
         PayChannelEnum channelEnum = PayChannelEnum.getByCode(channelCode);
         Assert.notNull(channelEnum, String.format("支付渠道(%s) 为空", channelEnum));
         // 创建客户端
+        // TODO @芋艿 WX_LITE WX_APP 如果不添加在 项目启动的时候去初始化会报错无法启动。所以我手动加了两个，具体需要你来配
         switch (channelEnum) {
             case WX_PUB: return (AbstractPayClient<Config>) new WXPubPayClient(channelId, (WXPayClientConfig) config);
+            case WX_LITE: return (AbstractPayClient<Config>) new WXPubPayClient(channelId, (WXPayClientConfig) config);
+            case WX_APP: return (AbstractPayClient<Config>) new WXPubPayClient(channelId, (WXPayClientConfig) config);
             case ALIPAY_WAP: return (AbstractPayClient<Config>) new AlipayWapPayClient(channelId, (AlipayPayClientConfig) config);
             case ALIPAY_QR: return (AbstractPayClient<Config>) new AlipayQrPayClient(channelId, (AlipayPayClientConfig) config);
         }

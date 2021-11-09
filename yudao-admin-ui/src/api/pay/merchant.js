@@ -46,6 +46,16 @@ export function getMerchant(id) {
     method: 'get'
   })
 }
+// 根据商户名称搜索商户列表
+export function getMerchantListByName(name) {
+  return request({
+    url: '/pay/merchant/list-name',
+    params:{
+      name:name
+    },
+    method: 'get'
+  })
+}
 
 // 获得支付商户信息分页
 export function getMerchantPage(query) {

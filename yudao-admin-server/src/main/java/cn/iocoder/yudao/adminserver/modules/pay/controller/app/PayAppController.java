@@ -1,0 +1,175 @@
+package cn.iocoder.yudao.adminserver.modules.pay.controller.app;
+
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.adminserver.modules.pay.controller.app.vo.*;
+import cn.iocoder.yudao.adminserver.modules.pay.convert.app.PayAppConvert;
+import cn.iocoder.yudao.adminserver.modules.pay.service.app.PayAppService;
+import cn.iocoder.yudao.adminserver.modules.pay.service.channel.PayChannelService;
+import cn.iocoder.yudao.adminserver.modules.pay.service.merchant.PayMerchantService;
+import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.merchant.PayAppDO;
+import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.merchant.PayChannelDO;
+import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.merchant.PayMerchantDO;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
+import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+
+import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
+
+/**
+ * 支付应用信息 controller 组件
+ *
+ * @author aquan
+ */
+@Slf4j
+@Api(tags = "支付应用信息")
+@RestController
+@RequestMapping("/pay/app")
+@Validated
+public class PayAppController {
+
+    @Resource
+    private PayAppService appService;
+
+    @Resource
+    private PayChannelService channelService;
+
+
+    @Resource
+    private PayMerchantService merchantService;
+
+    @PostMapping("/create")
+    @ApiOperation("创建支付应用信息")
+    @PreAuthorize("@ss.hasPermission('pay:app:create')")
+    public CommonResult<Long> createApp(@Valid @RequestBody PayAppCreateReqVO createReqVO) {
+        return success(appService.createApp(createReqVO));
+    }
+
+    @PutMapping("/update")
+    @ApiOperation("更新支付应用信息")
+    @PreAuthorize("@ss.hasPermission('pay:app:update')")
+    public CommonResult<Boolean> updateApp(@Valid @RequestBody PayAppUpdateReqVO updateReqVO) {
+        appService.updateApp(updateReqVO);
+        return success(true);
+    }
+
+    @PutMapping("/update-status")
+    @ApiOperation("更新支付应用状态")
+    @PreAuthorize("@ss.hasPermission('pay:app:update')")
+    public CommonResult<Boolean> updateAppStatus(@Valid @RequestBody PayAppUpdateStatusReqVO updateReqVO) {
+        appService.updateAppStatus(updateReqVO.getId(), updateReqVO.getStatus());
+        return success(true);
+    }
+
+    @DeleteMapping("/delete")
+    @ApiOperation("删除支付应用信息")
+    @ApiImplicitParam(name = "id", value = "编号", required = true)
+    @PreAuthorize("@ss.hasPermission('pay:app:delete')")
+    public CommonResult<Boolean> deleteApp(@RequestParam("id") Long id) {
+        appService.deleteApp(id);
+        return success(true);
+    }
+
+    @GetMapping("/get")
+    @ApiOperation("获得支付应用信息")
+    @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
+    @PreAuthorize("@ss.hasPermission('pay:app:query')")
+    public CommonResult<PayAppRespVO> getApp(@RequestParam("id") Long id) {
+        PayAppDO app = appService.getApp(id);
+        return success(PayAppConvert.INSTANCE.convert(app));
+    }
+
+    @GetMapping("/list")
+    @ApiOperation("获得支付应用信息列表")
+    @ApiImplicitParam(name = "ids", value = "编号列表", required = true, example = "1024,2048", dataTypeClass = List.class)
+    @PreAuthorize("@ss.hasPermission('pay:app:query')")
+    public CommonResult<List<PayAppRespVO>> getAppList(@RequestParam("ids") Collection<Long> ids) {
+        List<PayAppDO> list = appService.getAppList(ids);
+        return success(PayAppConvert.INSTANCE.convertList(list));
+    }
+
+    @GetMapping("/page")
+    @ApiOperation("获得支付应用信息分页")
+    @PreAuthorize("@ss.hasPermission('pay:app:query')")
+    public CommonResult<PageResult<PayAppPageItemRespVO>> getAppPage(@Valid PayAppPageReqVO pageVO) {
+        // 得到应用分页列表
+        PageResult<PayAppDO> pageResult = appService.getAppPage(pageVO);
+        if (CollUtil.isEmpty(pageResult.getList())) {
+            return success(new PageResult<>(pageResult.getTotal()));
+        }
+
+        // 得到所有的应用编号，查出所有的通道
+        Collection<Long> payAppIds = CollectionUtils.convertList(pageResult.getList(), PayAppDO::getId);
+        List<PayChannelDO> channels = channelService.getSimpleChannels(payAppIds);
+
+        // 得到所有的商户信息
+        Collection<Long> merchantIds = CollectionUtils.convertList(pageResult.getList(), PayAppDO::getMerchantId);
+        Map<Long, PayMerchantDO> deptMap = merchantService.getMerchantMap(merchantIds);
+
+        // 利用反射将通道数据复制到返回的数据结构中去
+        List<PayAppPageItemRespVO> appList = new ArrayList<>(pageResult.getList().size());
+        pageResult.getList().forEach(app -> {
+            // 写入应用信息的数据
+            PayAppPageItemRespVO respVO = PayAppConvert.INSTANCE.pageConvert(app);
+            // 写入商户的数据
+            respVO.setPayMerchant(PayAppConvert.INSTANCE.convert(deptMap.get(app.getMerchantId())));
+            // 写入支付渠道信息的数据
+            PayAppPageItemRespVO.PayChannel payChannel = new PayAppPageItemRespVO.PayChannel();
+            channels.forEach(c -> {
+                if (c.getAppId().equals(app.getId())) {
+                    // 获取 set 方法
+                    String methodName = StrUtil.toCamelCase("set_" + c.getCode());
+                    try {
+                        // 根据 set 方法将值写入
+                        payChannel.getClass().getMethod(methodName, Integer.class)
+                                .invoke(payChannel, CommonStatusEnum.ENABLE.getStatus());
+                    } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
+                        log.error("[getAppPage]调用方法[{}]设置参数[{}]异常", c.getCode(), methodName);
+                    }
+                }
+            });
+            respVO.setPayChannel(payChannel);
+            appList.add(respVO);
+        });
+
+        return success(new PageResult<>(appList, pageResult.getTotal()));
+    }
+
+    @GetMapping("/export-excel")
+    @ApiOperation("导出支付应用信息 Excel")
+    @PreAuthorize("@ss.hasPermission('pay:app:export')")
+    @OperateLog(type = EXPORT)
+    public void exportAppExcel(@Valid PayAppExportReqVO exportReqVO,
+                               HttpServletResponse response) throws IOException {
+        List<PayAppDO> list = appService.getAppList(exportReqVO);
+        // 导出 Excel
+        List<PayAppExcelVO> datas = PayAppConvert.INSTANCE.convertList02(list);
+        ExcelUtils.write(response, "支付应用信息.xls", "数据", PayAppExcelVO.class, datas);
+    }
+
+
+
+}
