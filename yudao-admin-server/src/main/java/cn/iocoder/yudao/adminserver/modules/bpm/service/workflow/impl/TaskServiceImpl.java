@@ -5,7 +5,6 @@ import cn.hutool.core.io.IoUtil;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.workflow.vo.*;
 import cn.iocoder.yudao.adminserver.modules.bpm.convert.workflow.TaskConvert;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.workflow.TaskService;
-import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
@@ -33,17 +32,18 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletResponse;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URLEncoder;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static cn.iocoder.yudao.adminserver.modules.bpm.enums.oa.OAErrorCodeConstants.*;
+import static cn.iocoder.yudao.adminserver.modules.bpm.enums.oa.OAErrorCodeConstants.HIGHLIGHT_IMG_ERROR;
+import static cn.iocoder.yudao.adminserver.modules.bpm.enums.oa.OAErrorCodeConstants.PROCESS_INSTANCE_NOT_EXISTS;
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 
 @Slf4j
 @Service
@@ -166,7 +166,7 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public TodoTaskRespVO getTaskFormKey(TaskQueryReqVO taskQuery) {
         final Task task = taskRuntime.task(taskQuery.getTaskId());
-        // 转换结果
+        // 转换结果 TODO @jason：放到 convert 类里
         TodoTaskRespVO respVO = new TodoTaskRespVO();
         respVO.setFormKey(task.getFormKey());
         respVO.setBusinessKey(task.getBusinessKey());
@@ -174,7 +174,6 @@ public class TaskServiceImpl implements TaskService {
         respVO.setProcessInstanceId(task.getProcessInstanceId());
         return respVO;
     }
-
 
     @Override
     public FileResp getHighlightImg(String processInstanceId) {
@@ -184,7 +183,7 @@ public class TaskServiceImpl implements TaskService {
         HistoricProcessInstance hpi = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
         // 如果不存在实例。 说明数据异常
         if (hpi == null) {
-            throw ServiceExceptionUtil.exception(PROCESS_INSTANCE_NOT_EXISTS);
+            throw exception(PROCESS_INSTANCE_NOT_EXISTS);
         }
         // 没有结束时间。说明流程在执行过程中
         // TODO @Li：一些 runtimeService 的查询，貌似比较通用，是不是抽一些小方法出来
@@ -194,9 +193,7 @@ public class TaskServiceImpl implements TaskService {
         // 获取所有活动节点
         List<HistoricActivityInstance> finishedInstances = historyService.createHistoricActivityInstanceQuery()
                 .processInstanceId(processInstanceId).finished().list();
-        // TODO @Li：highLightedActivities 结果，可以使用 CollUtils.buildList() 方法。即使不用，也应该用 stream。简洁很重要。
-        finishedInstances.stream()
-                .map(HistoricActivityInstance::getActivityId)
+        finishedInstances.stream().map(HistoricActivityInstance::getActivityId)
                 .forEach(highLightedActivities::add);
         // 已完成的节点+当前节点
         highLightedActivities.addAll(runtimeService.getActiveActivityIds(processInstanceId));
@@ -209,13 +206,14 @@ public class TaskServiceImpl implements TaskService {
         try (InputStream inputStream = processDiagramGenerator.generateDiagram(bpmnModel, highLightedActivities, highLightedFlowIds,
                 "宋体", "宋体", "宋体")){
             FileResp fileResp = new FileResp();
-            String picName = hpi.getProcessDefinitionName() + ".svg";
+            String picName = hpi.getProcessDefinitionName() + ".svg"; // TODO @Li：一次性的变量，可以直接 set 的时候，直接拼接
             fileResp.setFileName(picName);
             fileResp.setFileByte(IoUtil.readBytes(inputStream));
             return fileResp;
         } catch (IOException e) {
+            // TODO @Li：log.error("[getHighlightImg][流程({}) 生成图表失败]", processInstanceId, e)
             log.error(ExceptionUtils.getStackTrace(e));
-            throw ServiceExceptionUtil.exception(HIGHLIGHT_IMG_ERROR);
+            throw exception(HIGHLIGHT_IMG_ERROR);
         }
     }
 

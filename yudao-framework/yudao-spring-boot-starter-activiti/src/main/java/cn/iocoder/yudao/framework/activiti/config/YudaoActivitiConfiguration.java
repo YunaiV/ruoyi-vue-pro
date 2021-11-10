@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.framework.activiti.config;
 
 import lombok.AllArgsConstructor;
-import org.activiti.api.runtime.shared.identity.UserGroupManager;
 import org.activiti.image.ProcessDiagramGenerator;
 import org.activiti.image.impl.DefaultProcessDiagramGenerator;
 import org.activiti.spring.SpringProcessEngineConfiguration;
@@ -14,13 +13,11 @@ import org.springframework.stereotype.Component;
 @Configuration
 public class YudaoActivitiConfiguration {
 
-
     /**
-     * 流程中生成基于图表交换信息的 svg 的类。 提供绘制方法
-     * @return ProcessDiagramGenerator
+     * Activiti 流程图的生成器。目前管理后台的流程图 svg，通过它绘制生成。
      */
     @Bean
-    public ProcessDiagramGenerator processDiagramGenerator (){
+    public ProcessDiagramGenerator processDiagramGenerator() {
         return new DefaultProcessDiagramGenerator();
     }
 

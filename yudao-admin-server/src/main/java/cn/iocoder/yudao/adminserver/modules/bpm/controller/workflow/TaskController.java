@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.controller.workflow;
 
+import cn.hutool.core.io.IoUtil;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.workflow.vo.*;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.workflow.TaskService;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
@@ -60,6 +61,7 @@ public class TaskController {
         return success(taskService.getHistorySteps(processInstanceId));
     }
 
+    // TODO @Li: 项目里，暂时不使用 path 路径参数，监控等麻烦
     /**
      * 返回高亮的流转图SVG
      * @param processInstanceId
@@ -69,7 +71,5 @@ public class TaskController {
         FileResp fileResp = taskService.getHighlightImg(processInstanceId);
         ServletUtils.writeAttachment(response, fileResp.getFileName(), fileResp.getFileByte());
     }
-
-
 
 }
