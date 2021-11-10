@@ -62,5 +62,7 @@ public class PayWechatChannelUpdateReqVO extends PayChannelBaseVO {
 
         @ApiModelProperty(value = "apiclient_cert.pem 证书对应的字符串", required = true, example = "-----BEGIN CERTIFICATE-----")
         private String privateCertContent;
+
+        // TODO @aquan：参数校验。可以使用 @AssertTrue，v2 和 v3 的
     }
 }

@@ -1,21 +1,20 @@
 package cn.iocoder.yudao.adminserver.modules.pay.service.channel;
 
-import java.util.*;
-import javax.validation.*;
-
 import cn.iocoder.yudao.adminserver.modules.pay.controller.channel.vo.*;
 import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.merchant.PayChannelDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.Valid;
+import java.util.Collection;
+import java.util.List;
+
 /**
- * 支付渠道
- * Service 接口
+ * 支付渠道 Service 接口
  *
- * @author 芋艿
+ * @author 芋艿 // TODO @aquan：作者不要我
  */
 public interface PayChannelService {
-
 
     /**
      * 创建支付渠道
@@ -72,8 +71,7 @@ public interface PayChannelService {
      * 列表, 用于 Excel 导出
      *
      * @param exportReqVO 查询条件
-     * @return 支付渠道
-     * 列表
+     * @return 支付渠道列表
      */
     List<PayChannelDO> getChannelList(PayChannelExportReqVO exportReqVO);
 
@@ -83,6 +81,7 @@ public interface PayChannelService {
      * @param payIds 支付应用编号集合
      * @return 支付渠道
      */
+    // TODO @aquan：暂时不用提供这种哈。之前提供的原因，是数据字典比较特殊。
     List<PayChannelDO> getSimpleChannels(Collection<Long> payIds);
 
     /**
@@ -91,6 +90,7 @@ public interface PayChannelService {
      * @param file pem公私钥文件
      * @return 解析后的字符串
      */
+    // TODO @aquan：可以前端读取么？
     String parsingPemFile(MultipartFile file);
 
     /**
@@ -99,6 +99,7 @@ public interface PayChannelService {
      * @param reqVO 创建信息
      * @return 创建结果
      */
+    // TODO @aquan：pojo 如果要做参数校验，需要添加 @Valid
     Long createWechatChannel(PayWechatChannelCreateReqVO reqVO);
 
     /**

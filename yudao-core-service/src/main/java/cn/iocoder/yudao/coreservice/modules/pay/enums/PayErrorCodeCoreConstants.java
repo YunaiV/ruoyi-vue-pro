@@ -45,5 +45,7 @@ public interface PayErrorCodeCoreConstants {
      */
     ErrorCode CHANNEL_NOT_EXISTS = new ErrorCode(1007006000, "支付渠道不存在");
     ErrorCode CHANNEL_KEY_READ_ERROR = new ErrorCode(1007006002, "支付渠道秘钥文件读取失败");
+    // TODO @aquan：下面这个错误码，缺了 CHANNEL 前缀。另外，错误码的分段，上面有啦，合并下进去哈
     ErrorCode EXIST_SAME_CHANNEL_ERROR = new ErrorCode(1007006003, "已存在相同的渠道");
+
 }

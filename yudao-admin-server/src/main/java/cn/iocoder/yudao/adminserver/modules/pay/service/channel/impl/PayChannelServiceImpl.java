@@ -1,43 +1,34 @@
 package cn.iocoder.yudao.adminserver.modules.pay.service.channel.impl;
 
 import cn.hutool.core.io.IoUtil;
-import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.merchant.PayChannelDO;
-import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
-import cn.iocoder.yudao.framework.pay.core.client.impl.wx.WXPayClientConfig;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.databind.json.JsonMapper;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-
-import javax.annotation.Resource;
-
-import org.springframework.util.Assert;
-import org.springframework.validation.annotation.Validated;
-
-import java.io.IOException;
-import java.util.*;
-
 import cn.iocoder.yudao.adminserver.modules.pay.controller.channel.vo.*;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
-
 import cn.iocoder.yudao.adminserver.modules.pay.convert.channel.PayChannelConvert;
 import cn.iocoder.yudao.adminserver.modules.pay.dal.mysql.channel.PayChannelMapper;
 import cn.iocoder.yudao.adminserver.modules.pay.service.channel.PayChannelService;
+import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.merchant.PayChannelDO;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.pay.core.client.impl.wx.WXPayClientConfig;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.Resource;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.List;
 
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.coreservice.modules.pay.enums.PayErrorCodeCoreConstants.*;
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 
 /**
- * 支付渠道
- * Service 实现类
+ * 支付渠道 Service 实现类
  *
- * @author 芋艿
+ * @author 芋艿 // TODO aquan：作者写自己哈
  */
-@Slf4j
 @Service
+@Slf4j
 @Validated
 public class PayChannelServiceImpl implements PayChannelService {
 
@@ -162,6 +153,7 @@ public class PayChannelServiceImpl implements PayChannelService {
         );
     }
 
+    // TODO @aquan：service 不出现 mybatis plus 哈
     /**
      * 根据条件获取通道
      *

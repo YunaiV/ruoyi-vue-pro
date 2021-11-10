@@ -1,7 +1,5 @@
 package cn.iocoder.yudao.adminserver.modules.pay.app.service;
 
-import javax.annotation.Resource;
-
 import cn.iocoder.yudao.adminserver.BaseDbUnitTest;
 import cn.iocoder.yudao.adminserver.modules.pay.controller.app.vo.PayAppCreateReqVO;
 import cn.iocoder.yudao.adminserver.modules.pay.controller.app.vo.PayAppExportReqVO;
@@ -10,21 +8,20 @@ import cn.iocoder.yudao.adminserver.modules.pay.controller.app.vo.PayAppUpdateRe
 import cn.iocoder.yudao.adminserver.modules.pay.dal.mysql.app.PayAppMapper;
 import cn.iocoder.yudao.adminserver.modules.pay.service.app.impl.PayAppServiceImpl;
 import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.merchant.PayAppDO;
-import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-
+import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
-import java.util.*;
 
-import static cn.iocoder.yudao.coreservice.modules.pay.enums.PayErrorCodeCoreConstants.*;
+import javax.annotation.Resource;
+import java.util.List;
+
+import static cn.iocoder.yudao.coreservice.modules.pay.enums.PayErrorCodeCoreConstants.APP_NOT_EXISTS;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildTime;
-import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
+import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomLongId;
+import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
 import static org.junit.jupiter.api.Assertions.*;
-
-import static org.mockito.Mockito.*;
 
 /**
 * {@link PayAppServiceImpl} 的单元测试类
@@ -148,7 +145,7 @@ public class PayAppServiceTest extends BaseDbUnitTest {
        assertPojoEquals(dbApp, pageResult.getList().get(0));
     }
 
-    @Test // TODO 请修改 null 为需要的值
+    @Test // TODO aquan：请修改 null 为需要的值
     public void testGetAppList() {
        // mock 数据
        PayAppDO dbApp = randomPojo(PayAppDO.class, o -> { // 等会查询到

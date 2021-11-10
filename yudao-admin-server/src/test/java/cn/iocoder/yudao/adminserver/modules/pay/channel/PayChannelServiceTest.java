@@ -1,29 +1,27 @@
 package cn.iocoder.yudao.adminserver.modules.pay.channel;
 
-import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.merchant.PayChannelDO;
-import org.junit.jupiter.api.Test;
-
-import javax.annotation.Resource;
-
 import cn.iocoder.yudao.adminserver.BaseDbUnitTest;
-import cn.iocoder.yudao.adminserver.modules.pay.service.channel.impl.PayChannelServiceImpl;
-import cn.iocoder.yudao.adminserver.modules.pay.controller.channel.vo.*;
+import cn.iocoder.yudao.adminserver.modules.pay.controller.channel.vo.PayChannelCreateReqVO;
+import cn.iocoder.yudao.adminserver.modules.pay.controller.channel.vo.PayChannelExportReqVO;
+import cn.iocoder.yudao.adminserver.modules.pay.controller.channel.vo.PayChannelPageReqVO;
+import cn.iocoder.yudao.adminserver.modules.pay.controller.channel.vo.PayChannelUpdateReqVO;
 import cn.iocoder.yudao.adminserver.modules.pay.dal.mysql.channel.PayChannelMapper;
-import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
+import cn.iocoder.yudao.adminserver.modules.pay.service.channel.impl.PayChannelServiceImpl;
+import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.merchant.PayChannelDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-
+import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
-import java.util.*;
 
-import static cn.iocoder.yudao.coreservice.modules.pay.enums.PayErrorCodeCoreConstants.*;
+import javax.annotation.Resource;
+import java.util.List;
+
+import static cn.iocoder.yudao.coreservice.modules.pay.enums.PayErrorCodeCoreConstants.CHANNEL_NOT_EXISTS;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildTime;
-import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
+import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomLongId;
+import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
 import static org.junit.jupiter.api.Assertions.*;
-
-import static org.mockito.Mockito.*;
 
 /**
 * {@link PayChannelServiceImpl} 的单元测试类
@@ -152,7 +150,7 @@ public class PayChannelServiceTest extends BaseDbUnitTest {
        assertPojoEquals(dbChannel, pageResult.getList().get(0));
     }
 
-    @Test // TODO 请修改 null 为需要的值
+    @Test // TODO aquan：请修改 null 为需要的值
     public void testGetChannelList() {
        // mock 数据
        PayChannelDO dbChannel = randomPojo(PayChannelDO.class, o -> { // 等会查询到

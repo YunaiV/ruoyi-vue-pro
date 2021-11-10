@@ -1,14 +1,19 @@
 package cn.iocoder.yudao.adminserver.modules.pay.service.merchant;
 
-import java.util.*;
-import javax.validation.*;
-
 import cn.hutool.core.collection.CollUtil;
-import cn.iocoder.yudao.adminserver.modules.pay.controller.merchant.vo.*;
-import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.dept.SysDeptDO;
+import cn.iocoder.yudao.adminserver.modules.pay.controller.merchant.vo.PayMerchantCreateReqVO;
+import cn.iocoder.yudao.adminserver.modules.pay.controller.merchant.vo.PayMerchantExportReqVO;
+import cn.iocoder.yudao.adminserver.modules.pay.controller.merchant.vo.PayMerchantPageReqVO;
+import cn.iocoder.yudao.adminserver.modules.pay.controller.merchant.vo.PayMerchantUpdateReqVO;
 import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.merchant.PayMerchantDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+
+import javax.validation.Valid;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 支付商户信息 Service 接口
@@ -87,6 +92,7 @@ public interface PayMerchantService {
      */
     List<PayMerchantDO> getMerchantListByName(String merchantName);
 
+    // TODO aquan：暂时不用提供这样的检索。商户不多的。
     /**
      * 根据商户名称模糊查询一定数量的商户集合
      * @param merchantName 商户名称
@@ -100,6 +106,7 @@ public interface PayMerchantService {
      * @param merchantIds 商户编号数组
      * @return 商户列表
      */
+    // TODO @aquan：和 getMerchantList 重复了
     List<PayMerchantDO> getSimpleMerchants(Collection<Long> merchantIds);
 
     /**
@@ -108,11 +115,13 @@ public interface PayMerchantService {
      * @param merchantIds 商户编号数组
      * @return 商户 Map
      */
-    default Map<Long, PayMerchantDO> getMerchantMap(Collection<Long> merchantIds){
+    default Map<Long, PayMerchantDO> getMerchantMap(Collection<Long> merchantIds) {
+        // TODO @aquan：可以不用判空，交给 getMerchantList 解决
         if (CollUtil.isEmpty(merchantIds)) {
             return Collections.emptyMap();
         }
         List<PayMerchantDO> list = getSimpleMerchants(merchantIds);
         return CollectionUtils.convertMap(list, PayMerchantDO::getId);
     }
+
 }

@@ -1,26 +1,31 @@
 package cn.iocoder.yudao.adminserver.modules.pay.service.app.impl;
 
 import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.adminserver.modules.pay.controller.app.vo.PayAppCreateReqVO;
+import cn.iocoder.yudao.adminserver.modules.pay.controller.app.vo.PayAppExportReqVO;
+import cn.iocoder.yudao.adminserver.modules.pay.controller.app.vo.PayAppPageReqVO;
+import cn.iocoder.yudao.adminserver.modules.pay.controller.app.vo.PayAppUpdateReqVO;
+import cn.iocoder.yudao.adminserver.modules.pay.convert.app.PayAppConvert;
+import cn.iocoder.yudao.adminserver.modules.pay.dal.mysql.app.PayAppMapper;
+import cn.iocoder.yudao.adminserver.modules.pay.service.app.PayAppService;
 import cn.iocoder.yudao.adminserver.modules.pay.service.merchant.PayMerchantService;
 import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.merchant.PayAppDO;
 import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.merchant.PayMerchantDO;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import com.google.common.annotations.VisibleForTesting;
 import org.springframework.stereotype.Service;
-import javax.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
 
-import java.util.*;
-import cn.iocoder.yudao.adminserver.modules.pay.controller.app.vo.*;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import javax.annotation.Resource;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
-import cn.iocoder.yudao.adminserver.modules.pay.convert.app.PayAppConvert;
-import cn.iocoder.yudao.adminserver.modules.pay.dal.mysql.app.PayAppMapper;
-import cn.iocoder.yudao.adminserver.modules.pay.service.app.PayAppService;
-
+import static cn.iocoder.yudao.coreservice.modules.pay.enums.PayErrorCodeCoreConstants.APP_NOT_EXISTS;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.coreservice.modules.pay.enums.PayErrorCodeCoreConstants.*;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 
 /**
  * 支付应用信息 Service 实现类
@@ -84,7 +89,8 @@ public class PayAppServiceImpl implements PayAppService {
 
     @Override
     public PageResult<PayAppDO> getAppPage(PayAppPageReqVO pageReqVO) {
-        return appMapper.selectPage(pageReqVO,this.getMerchantCondition(pageReqVO.getMerchantName()));
+        // TODO @aquan：会有一个场景，merchantName 匹配不到商户编号的时候，应该返回没数据的
+        return appMapper.selectPage(pageReqVO, this.getMerchantCondition(pageReqVO.getMerchantName()));
     }
 
     @Override
@@ -94,6 +100,7 @@ public class PayAppServiceImpl implements PayAppService {
 
     /**
      * 获取商户编号集合，根据商户名称模糊查询得到所有的商户编号集合
+     *
      * @param merchantName 商户名称
      * @return 商户编号集合
      */
@@ -101,7 +108,7 @@ public class PayAppServiceImpl implements PayAppService {
         if (StrUtil.isBlank(merchantName)) {
             return Collections.emptySet();
         }
-        return CollectionUtils.convertSet(merchantService.getMerchantListByName(merchantName), PayMerchantDO::getId);
+        return convertSet(merchantService.getMerchantListByName(merchantName), PayMerchantDO::getId);
     }
 
     /**

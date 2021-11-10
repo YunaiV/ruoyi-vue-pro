@@ -61,5 +61,5 @@ yudao:
       - cn.iocoder.yudao.adminserver.modules.infra.enums.InfErrorCodeConstants
       - cn.iocoder.yudao.adminserver.modules.system.enums.SysErrorCodeConstants
   pay:
-    payReturnUrl: http://127.0.0.1
+    payReturnUrl: http://127.0.0.1 # TODO @aquan：这个变量，配置到 dev 或者 local 里，不同环境有差别哈
 debug: false

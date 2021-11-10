@@ -1,13 +1,15 @@
 package cn.iocoder.yudao.adminserver.modules.pay.dal.mysql.app;
 
-import java.util.*;
-
+import cn.iocoder.yudao.adminserver.modules.pay.controller.app.vo.PayAppExportReqVO;
+import cn.iocoder.yudao.adminserver.modules.pay.controller.app.vo.PayAppPageReqVO;
 import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.merchant.PayAppDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.mybatis.core.query.QueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
+import cn.iocoder.yudao.framework.mybatis.core.query.QueryWrapperX;
 import org.apache.ibatis.annotations.Mapper;
-import cn.iocoder.yudao.adminserver.modules.pay.controller.app.vo.*;
+
+import java.util.Collection;
+import java.util.List;
 
 /**
  * 支付应用信息 Mapper
@@ -17,7 +19,7 @@ import cn.iocoder.yudao.adminserver.modules.pay.controller.app.vo.*;
 @Mapper
 public interface PayAppMapper extends BaseMapperX<PayAppDO> {
 
-    default PageResult<PayAppDO> selectPage(PayAppPageReqVO reqVO,Collection<Long> merchantIds) {
+    default PageResult<PayAppDO> selectPage(PayAppPageReqVO reqVO, Collection<Long> merchantIds) {
         return selectPage(reqVO, new QueryWrapperX<PayAppDO>()
                 .likeIfPresent("name", reqVO.getName())
                 .eqIfPresent("status", reqVO.getStatus())
@@ -38,7 +40,7 @@ public interface PayAppMapper extends BaseMapperX<PayAppDO> {
                 .eqIfPresent("refund_notify_url", reqVO.getRefundNotifyUrl())
                 .eqIfPresent("merchant_id", reqVO.getMerchantId())
                 .betweenIfPresent("create_time", reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
-                .orderByDesc("id")        );
+                .orderByDesc("id"));
     }
 
 }

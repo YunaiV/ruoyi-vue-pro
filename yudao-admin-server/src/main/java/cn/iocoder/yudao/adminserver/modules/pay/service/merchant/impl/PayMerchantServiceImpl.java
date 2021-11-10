@@ -113,6 +113,7 @@ public class PayMerchantServiceImpl implements PayMerchantService {
      */
     @Override
     public List<PayMerchantDO> getMerchantListByName(String merchantName) {
+        // TODO @aquan：Service 层，不要出现 mybatis plus 的代码，要放到 mapper 里提供。技术与业务分离，原则上
         return this.merchantMapper.selectList(new QueryWrapper<PayMerchantDO>()
                 .lambda().likeRight(PayMerchantDO::getName, merchantName));
     }
@@ -160,6 +161,7 @@ public class PayMerchantServiceImpl implements PayMerchantService {
         return merchantMapper.selectBatchIds(merchantIds);
     }
 
+    // TODO @芋艿：后续增加下合适的算法
     /**
      * 根据年月日时分秒毫秒生成商户号
      * @return 商户号
@@ -167,6 +169,5 @@ public class PayMerchantServiceImpl implements PayMerchantService {
     private String generateMerchantNo(){
        return  "M" + DateUtil.format(LocalDateTime.now(),"yyyyMMddHHmmssSSS");
     }
-
 
 }
