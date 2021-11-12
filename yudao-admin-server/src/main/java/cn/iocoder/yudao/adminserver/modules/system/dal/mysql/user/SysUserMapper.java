@@ -15,6 +15,7 @@ import org.apache.logging.log4j.util.Strings;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Mapper
 public interface SysUserMapper extends BaseMapperX<SysUserDO> {
@@ -56,13 +57,12 @@ public interface SysUserMapper extends BaseMapperX<SysUserDO> {
         return selectList(new QueryWrapperX<SysUserDO>().like("username", username));
     }
 
-    // TODO jason：变量平铺比较好
-    default List<SysUserDO> selectListByBaseVO(SysUserBaseVO reqVO) {
-        return selectList(new QueryWrapperX<SysUserDO>().likeIfPresent("username", reqVO.getUsername())
-                .likeIfPresent("nickname", reqVO.getNickname())
+
+    default List<SysUserDO> selectListByDepartIdAndPostId(Long departId, Long postId) {
+        return selectList(new QueryWrapperX<SysUserDO>()
                 .eq("status", CommonStatusEnum.ENABLE.getStatus())
-                .eq("dept_id", reqVO.getDeptId())
-                .likeIfPresent("post_ids", Optional.ofNullable(reqVO.getPostIds()).map(t -> Strings.join(t, ',')).orElse("")));
+                .eq("dept_id", departId)
+                .likeIfPresent("post_ids", Optional.ofNullable(postId).map(t -> String.valueOf(postId)).orElse("")));
     }
 
 }

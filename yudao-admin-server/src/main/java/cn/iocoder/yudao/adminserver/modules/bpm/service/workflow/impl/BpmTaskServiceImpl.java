@@ -4,7 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.workflow.vo.*;
 import cn.iocoder.yudao.adminserver.modules.bpm.convert.workflow.TaskConvert;
-import cn.iocoder.yudao.adminserver.modules.bpm.service.workflow.TaskService;
+import cn.iocoder.yudao.adminserver.modules.bpm.service.workflow.BpmTaskService;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
@@ -41,13 +41,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static cn.iocoder.yudao.adminserver.modules.bpm.enums.oa.OAErrorCodeConstants.HIGHLIGHT_IMG_ERROR;
-import static cn.iocoder.yudao.adminserver.modules.bpm.enums.oa.OAErrorCodeConstants.PROCESS_INSTANCE_NOT_EXISTS;
+import static cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants.HIGHLIGHT_IMG_ERROR;
+import static cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants.PROCESS_INSTANCE_NOT_EXISTS;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 
 @Slf4j
 @Service
-public class TaskServiceImpl implements TaskService {
+public class BpmTaskServiceImpl implements BpmTaskService {
 
     @Resource
     private  TaskRuntime taskRuntime;
@@ -76,7 +76,6 @@ public class TaskServiceImpl implements TaskService {
         List<Task> tasks = pageTasks.getContent();
         final List<TodoTaskRespVO> respVOList = tasks.stream().map(task -> {
             ProcessDefinition definition = repositoryService.getProcessDefinition(task.getProcessDefinitionId());
-            definition.getId();
             return  TaskConvert.INSTANCE.convert(task, definition);
         }).collect(Collectors.toList());
         return new PageResult<>(respVOList, (long)totalItems);
@@ -92,11 +91,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
 
-    /**
-     * 工作流，完成 userTask, 完成用户任务 一般传入参数 1。是否同意（variables).  2. 评论(comment)
-     * variables 变量名 和 评论 由前台传入
-     * @param taskReq 任务参数
-     */
+
     @Override
     @Transactional
     public void completeTask(TaskReqVO taskReq) {
@@ -166,13 +161,7 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public TodoTaskRespVO getTaskFormKey(TaskQueryReqVO taskQuery) {
         final Task task = taskRuntime.task(taskQuery.getTaskId());
-        // 转换结果 TODO @jason：放到 convert 类里
-        TodoTaskRespVO respVO = new TodoTaskRespVO();
-        respVO.setFormKey(task.getFormKey());
-        respVO.setBusinessKey(task.getBusinessKey());
-        respVO.setId(task.getId());
-        respVO.setProcessInstanceId(task.getProcessInstanceId());
-        return respVO;
+        return TaskConvert.INSTANCE.convert(task);
     }
 
     @Override

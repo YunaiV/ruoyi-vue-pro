@@ -25,6 +25,10 @@ public interface TaskConvert {
     })
     TodoTaskRespVO convert(Task task, ProcessDefinition definition);
 
+    @Mappings(value = {
+            @Mapping(source = "assignee", target = "status",qualifiedByName = "convertAssigneeToStatus")
+    })
+    TodoTaskRespVO convert(Task task);
 
     @Named("convertAssigneeToStatus")
     default Integer convertAssigneeToStatus(String assignee) {

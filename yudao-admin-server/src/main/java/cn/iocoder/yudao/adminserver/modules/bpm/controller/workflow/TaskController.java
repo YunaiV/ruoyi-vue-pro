@@ -1,8 +1,7 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.controller.workflow;
 
-import cn.hutool.core.io.IoUtil;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.workflow.vo.*;
-import cn.iocoder.yudao.adminserver.modules.bpm.service.workflow.TaskService;
+import cn.iocoder.yudao.adminserver.modules.bpm.service.workflow.BpmTaskService;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
@@ -25,40 +24,40 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 public class TaskController {
 
     @Resource
-    private TaskService taskService;
+    private BpmTaskService bpmTaskService;
 
     @GetMapping("/todo/page")
     @ApiOperation("获取待办任务分页")
     public CommonResult<PageResult<TodoTaskRespVO>> getTodoTaskPage(@Valid TodoTaskPageReqVO pageVO) {
-        return success(taskService.getTodoTaskPage(pageVO));
+        return success(bpmTaskService.getTodoTaskPage(pageVO));
     }
 
     @GetMapping("/claim")
     @ApiOperation("签收任务")
     public CommonResult<Boolean> claimTask(@RequestParam("id") String taskId) {
-        taskService.claimTask(taskId);
+        bpmTaskService.claimTask(taskId);
         return success(true);
     }
 
     @PostMapping("/task-steps")
     public CommonResult<TaskHandleVO> getTaskSteps(@RequestBody TaskQueryReqVO taskQuery) {
-        return success(taskService.getTaskSteps(taskQuery));
+        return success(bpmTaskService.getTaskSteps(taskQuery));
     }
 
     @PostMapping("/formKey")
     public CommonResult<TodoTaskRespVO> getTaskFormKey(@RequestBody TaskQueryReqVO taskQuery) {
-        return success(taskService.getTaskFormKey(taskQuery));
+        return success(bpmTaskService.getTaskFormKey(taskQuery));
     }
 
     @PostMapping("/complete")
     public CommonResult<Boolean> complete(@RequestBody TaskReqVO taskReq) {
-        taskService.completeTask(taskReq);
+        bpmTaskService.completeTask(taskReq);
         return success(true);
     }
 
     @GetMapping("/process/history-steps")
     public CommonResult<List<TaskStepVO>> getHistorySteps(@RequestParam("id") String processInstanceId) {
-        return success(taskService.getHistorySteps(processInstanceId));
+        return success(bpmTaskService.getHistorySteps(processInstanceId));
     }
 
     // TODO @Li: 项目里，暂时不使用 path 路径参数，监控等麻烦
@@ -68,7 +67,7 @@ public class TaskController {
      */
     @GetMapping("/process/highlight-img/{id}")
     public void getHighlightImg(@PathVariable("id") String processInstanceId, HttpServletResponse response) throws IOException {
-        FileResp fileResp = taskService.getHighlightImg(processInstanceId);
+        FileResp fileResp = bpmTaskService.getHighlightImg(processInstanceId);
         ServletUtils.writeAttachment(response, fileResp.getFileName(), fileResp.getFileByte());
     }
 

@@ -28,7 +28,7 @@ import org.springframework.validation.annotation.Validated;
 import javax.annotation.Resource;
 import java.util.*;
 
-import static cn.iocoder.yudao.adminserver.modules.bpm.enums.oa.OAErrorCodeConstants.*;
+import static cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants.*;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 
 /**
@@ -164,12 +164,7 @@ public class OALeaveServiceImpl implements OALeaveService {
             throw ServiceExceptionUtil.exception(PM_POST_NOT_EXISTS);
         }
         SysUserDO userDO = sysUserMapper.selectById(id);
-        Set<Long>  postIds  = new HashSet<>(8);
-        postIds.add( pmPostDO.getId());
-        SysUserBaseVO baseVO = new SysUserBaseVO();
-        baseVO.setDeptId(userDO.getDeptId())
-                .setPostIds(postIds);
-        final List<SysUserDO> pmUsers = sysUserMapper.selectListByBaseVO(baseVO);
+        final List<SysUserDO> pmUsers = sysUserMapper.selectListByDepartIdAndPostId(userDO.getDeptId(), pmPostDO.getId());
         if (CollUtil.isEmpty(pmUsers)) {
             throw ServiceExceptionUtil.exception(DEPART_PM_POST_NOT_EXISTS);
         }
@@ -179,13 +174,8 @@ public class OALeaveServiceImpl implements OALeaveService {
         if (Objects.isNull(bmPostDO)) {
             throw ServiceExceptionUtil.exception(BM_POST_NOT_EXISTS);
         }
-        userDO = sysUserMapper.selectById(id);
-        postIds  = new HashSet<>(8);
-        postIds.add( bmPostDO.getId());
-        baseVO = new SysUserBaseVO();
-        baseVO.setDeptId(userDO.getDeptId())
-                .setPostIds(postIds);
-        final List<SysUserDO> bmUsers = sysUserMapper.selectListByBaseVO(baseVO);
+
+        final List<SysUserDO> bmUsers = sysUserMapper.selectListByDepartIdAndPostId(userDO.getDeptId(), bmPostDO.getId());
         if (CollUtil.isEmpty(bmUsers)) {
             throw ServiceExceptionUtil.exception(DEPART_BM_POST_NOT_EXISTS);
         }
@@ -194,13 +184,7 @@ public class OALeaveServiceImpl implements OALeaveService {
         if (Objects.isNull(hrPostDO)) {
             throw ServiceExceptionUtil.exception(HR_POST_NOT_EXISTS);
         }
-        userDO = sysUserMapper.selectById(id);
-        postIds  = new HashSet<>(8);
-        postIds.add( hrPostDO.getId());
-        baseVO = new SysUserBaseVO();
-        baseVO.setDeptId(userDO.getDeptId())
-                .setPostIds(postIds);
-        final List<SysUserDO> hrUsers = sysUserMapper.selectListByBaseVO(baseVO);
+        final List<SysUserDO> hrUsers = sysUserMapper.selectListByDepartIdAndPostId(userDO.getDeptId(), hrPostDO.getId());
         if (CollUtil.isEmpty(hrUsers)) {
             throw ServiceExceptionUtil.exception(DEPART_BM_POST_NOT_EXISTS);
         }

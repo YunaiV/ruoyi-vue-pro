@@ -6,11 +6,10 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
-// TODO @jason：前缀
 /**
- * 用户任务服务接口
+ * 工作流用户任务服务接口
  */
-public interface TaskService {
+public interface BpmTaskService {
 
 
     /**
@@ -25,10 +24,11 @@ public interface TaskService {
      */
     void claimTask(String taskId);
 
-    // TODO @jason：可以把实现方法的注释，统一写到接口里
+
     /**
-     * 办理完成用户任务
-     * @param taskReq 任务参数， 包含任务的参数，和 评论
+     * 工作流，完成 userTask, 完成用户任务 一般传入参数 1。是否同意（variables).  2. 评论(comment)
+     * variables 变量名 和 评论 由前台传入
+     * @param taskReq 任务参数
      */
     void completeTask(TaskReqVO taskReq);
 
