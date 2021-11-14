@@ -3,7 +3,6 @@ package cn.iocoder.yudao.adminserver.modules.bpm.service.workflow;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.workflow.vo.*;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 
-import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 /**
@@ -17,13 +16,11 @@ public interface BpmTaskService {
      */
     PageResult<TodoTaskRespVO> getTodoTaskPage(TodoTaskPageReqVO pageReqVO);
 
-
     /**
      * 签收任务
      * @param taskId  用户任务id
      */
     void claimTask(String taskId);
-
 
     /**
      * 工作流，完成 userTask, 完成用户任务 一般传入参数 1。是否同意（variables).  2. 评论(comment)
