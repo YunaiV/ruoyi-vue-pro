@@ -8,7 +8,6 @@ import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.leave.OALeaveDO;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.mysql.oa.OALeaveMapper;
 import cn.iocoder.yudao.adminserver.modules.bpm.enums.FlowStatusEnum;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.oa.OALeaveService;
-import cn.iocoder.yudao.adminserver.modules.system.controller.user.vo.user.SysUserBaseVO;
 import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.dept.SysPostDO;
 import cn.iocoder.yudao.adminserver.modules.system.dal.mysql.dept.SysPostMapper;
 import cn.iocoder.yudao.adminserver.modules.system.dal.mysql.user.SysUserMapper;
@@ -71,7 +70,7 @@ public class OALeaveServiceImpl implements OALeaveService {
         Date endTime = createReqVO.getEndTime();
         long day = DateUtil.betweenDay(startTime, endTime, false);
         if (day <= 0) {
-            throw ServiceExceptionUtil.exception(DAY_LEAVE_ERROR);
+            throw ServiceExceptionUtil.exception(OA_DAY_LEAVE_ERROR);
         }
         Map<String, Object> taskVariables = createReqVO.getTaskVariables();
         taskVariables.put("day", day);
@@ -125,7 +124,7 @@ public class OALeaveServiceImpl implements OALeaveService {
 
     private void validateLeaveExists(Long id) {
         if (leaveMapper.selectById(id) == null) {
-            throw exception(LEAVE_NOT_EXISTS);
+            throw exception(OA_LEAVE_NOT_EXISTS);
         }
     }
 
@@ -161,32 +160,32 @@ public class OALeaveServiceImpl implements OALeaveService {
         //TODO jason 定义enum
         SysPostDO pmPostDO = sysPostMapper.selectByCode("pm");
         if (Objects.isNull(pmPostDO)) {
-            throw ServiceExceptionUtil.exception(PM_POST_NOT_EXISTS);
+            throw ServiceExceptionUtil.exception(OA_PM_POST_NOT_EXISTS);
         }
         SysUserDO userDO = sysUserMapper.selectById(id);
         final List<SysUserDO> pmUsers = sysUserMapper.selectListByDepartIdAndPostId(userDO.getDeptId(), pmPostDO.getId());
         if (CollUtil.isEmpty(pmUsers)) {
-            throw ServiceExceptionUtil.exception(DEPART_PM_POST_NOT_EXISTS);
+            throw ServiceExceptionUtil.exception(OA_DEPART_PM_POST_NOT_EXISTS);
         }
 
         //部门经理
         SysPostDO bmPostDO = sysPostMapper.selectByCode("bm");
         if (Objects.isNull(bmPostDO)) {
-            throw ServiceExceptionUtil.exception(BM_POST_NOT_EXISTS);
+            throw ServiceExceptionUtil.exception(OA_BM_POST_NOT_EXISTS);
         }
 
         final List<SysUserDO> bmUsers = sysUserMapper.selectListByDepartIdAndPostId(userDO.getDeptId(), bmPostDO.getId());
         if (CollUtil.isEmpty(bmUsers)) {
-            throw ServiceExceptionUtil.exception(DEPART_BM_POST_NOT_EXISTS);
+            throw ServiceExceptionUtil.exception(OA_DEPART_BM_POST_NOT_EXISTS);
         }
         //人事
         SysPostDO hrPostDO = sysPostMapper.selectByCode("hr");
         if (Objects.isNull(hrPostDO)) {
-            throw ServiceExceptionUtil.exception(HR_POST_NOT_EXISTS);
+            throw ServiceExceptionUtil.exception(OA_HR_POST_NOT_EXISTS);
         }
         final List<SysUserDO> hrUsers = sysUserMapper.selectListByDepartIdAndPostId(userDO.getDeptId(), hrPostDO.getId());
         if (CollUtil.isEmpty(hrUsers)) {
-            throw ServiceExceptionUtil.exception(DEPART_BM_POST_NOT_EXISTS);
+            throw ServiceExceptionUtil.exception(OA_DEPART_BM_POST_NOT_EXISTS);
         }
         return OALeaveApplyMembersVO.builder().pm(pmUsers.get(0).getUsername())
                 .bm(bmUsers.get(0).getUsername())
