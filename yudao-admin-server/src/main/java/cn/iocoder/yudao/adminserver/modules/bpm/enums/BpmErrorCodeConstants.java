@@ -26,5 +26,7 @@ public interface BpmErrorCodeConstants {
 
     // ========== OA 工作流模块 1-004-001-000 ==========
     ErrorCode BPMN_MODEL_EDITOR_SOURCE_NOT_EXISTS = new ErrorCode(1004001001, "模型数据为空，请先成功设计流程并保存");
+    ErrorCode BPMN_MODEL_ERROR = new ErrorCode(1004001002, "工作流模型异常");
+    ErrorCode BPMN_MODEL_PROCESS_NOT_EXISTS = new ErrorCode(1004001003, "流程数据为空");
 
 }
