@@ -23,4 +23,8 @@ public interface BpmErrorCodeConstants {
     ErrorCode OA_HR_POST_NOT_EXISTS = new ErrorCode(1003001006, "HR岗位未设置");
     ErrorCode OA_DAY_LEAVE_ERROR = new ErrorCode(1003001007, "请假天数必须>=1");
 
+
+    // ========== OA 工作流模块 1-004-001-000 ==========
+    ErrorCode BPMN_MODEL_EDITOR_SOURCE_NOT_EXISTS = new ErrorCode(1004001001, "模型数据为空，请先成功设计流程并保存");
+
 }
