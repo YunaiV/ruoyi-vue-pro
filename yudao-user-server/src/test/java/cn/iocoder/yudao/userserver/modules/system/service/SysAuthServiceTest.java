@@ -16,6 +16,7 @@ import cn.iocoder.yudao.userserver.modules.member.dal.mysql.user.MbrUserMapper;
 import cn.iocoder.yudao.userserver.modules.member.service.user.MbrUserService;
 import cn.iocoder.yudao.userserver.modules.member.service.user.impl.MbrUserServiceImpl;
 import cn.iocoder.yudao.userserver.modules.system.controller.auth.vo.MbrAuthResetPasswordReqVO;
+import cn.iocoder.yudao.userserver.modules.system.controller.auth.vo.MbrAuthUpdatePasswordReqVO;
 import cn.iocoder.yudao.userserver.modules.system.service.auth.SysAuthService;
 import cn.iocoder.yudao.userserver.modules.system.service.auth.impl.SysAuthServiceImpl;
 import cn.iocoder.yudao.userserver.modules.system.service.sms.SysSmsCodeService;
@@ -78,9 +79,10 @@ public class SysAuthServiceTest extends BaseDbAndRedisUnitTest {
         String newPassword = randomString();
 
         // 请求实体
-        MbrAuthResetPasswordReqVO reqVO = new MbrAuthResetPasswordReqVO();
-        reqVO.setOldPassword(userDO.getPassword());
-        reqVO.setPassword(newPassword);
+        MbrAuthUpdatePasswordReqVO reqVO = MbrAuthUpdatePasswordReqVO.builder()
+                .oldPassword(userDO.getPassword())
+                .password(newPassword)
+                .build();
 
         // 测试桩
         // 这两个相等是为了返回ture这个结果
@@ -103,10 +105,10 @@ public class SysAuthServiceTest extends BaseDbAndRedisUnitTest {
         // 随机验证码
         String code = randomNumbers(4);
 
-        MbrAuthResetPasswordReqVO reqVO = new MbrAuthResetPasswordReqVO();
-        reqVO.setPassword(password);
-        reqVO.setCode(code);
-
+        MbrAuthResetPasswordReqVO reqVO = MbrAuthResetPasswordReqVO.builder()
+                .password(password)
+                .code(code)
+                .build();
         // 放入code+手机号
         stringRedisTemplate.opsForValue().set(code,userDO.getMobile(),10, TimeUnit.MINUTES);
 

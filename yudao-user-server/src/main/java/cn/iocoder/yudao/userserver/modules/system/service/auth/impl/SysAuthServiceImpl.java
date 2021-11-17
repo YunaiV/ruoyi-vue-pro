@@ -25,7 +25,6 @@ import cn.iocoder.yudao.userserver.modules.system.service.sms.SysSmsCodeService;
 import com.google.common.annotations.VisibleForTesting;
 import lombok.extern.slf4j.Slf4j;
 import me.zhyd.oauth.model.AuthUser;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -41,6 +40,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Objects;
 
@@ -280,7 +280,7 @@ public class SysAuthServiceImpl implements SysAuthService {
     }
 
     @Override
-    public void updatePassword(Long userId, MbrAuthResetPasswordReqVO reqVO) {
+    public void updatePassword(Long userId, @Valid MbrAuthUpdatePasswordReqVO reqVO) {
         // 检验旧密码
         MbrUserDO userDO = checkOldPassword(userId, reqVO.getOldPassword());
 

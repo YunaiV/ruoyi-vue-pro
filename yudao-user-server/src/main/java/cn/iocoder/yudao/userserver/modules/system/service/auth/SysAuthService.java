@@ -68,7 +68,7 @@ public interface SysAuthService extends SecurityAuthFrameworkService {
      * @param userId 用户id
      * @param userReqVO 用户请求实体类
      */
-    void updatePassword(Long userId, MbrAuthResetPasswordReqVO userReqVO);
+    void updatePassword(Long userId, @Valid MbrAuthUpdatePasswordReqVO userReqVO);
 
     /**
      * 忘记密码

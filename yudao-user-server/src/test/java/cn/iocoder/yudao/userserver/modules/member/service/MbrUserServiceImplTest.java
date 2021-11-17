@@ -120,7 +120,6 @@ public class MbrUserServiceImplTest extends BaseDbAndRedisUnitTest {
 
         // 验证旧手机验证码是否正确
         sysSmsCodeService.useSmsCode(oldMobile,SysSmsSceneEnum.CHANGE_MOBILE_BY_SMS.getScene(),"123","1.1.1.1");
-
         // 验证新手机
         SysAuthSendSmsReqVO smsReqVO = new SysAuthSendSmsReqVO();
         smsReqVO.setMobile(oldMobile);

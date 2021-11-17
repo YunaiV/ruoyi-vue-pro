@@ -80,7 +80,8 @@ public class SysAuthController {
 
     @PostMapping("/reset-password")
     @ApiOperation(value = "重置密码", notes = "用户忘记密码时使用")
-    public CommonResult<Boolean> resetPassword(@RequestBody @Validated(MbrAuthResetPasswordReqVO.resetPasswordValidView.class) MbrAuthResetPasswordReqVO reqVO) {
+    @PreAuthenticated
+    public CommonResult<Boolean> resetPassword(@RequestBody @Valid MbrAuthResetPasswordReqVO reqVO) {
         authService.resetPassword(reqVO);
         return success(true);
     }
@@ -88,7 +89,7 @@ public class SysAuthController {
     @PostMapping("/update-password")
     @ApiOperation(value = "修改用户密码",notes = "用户修改密码时使用")
     @PreAuthenticated
-    public CommonResult<Boolean> updatePassword(@RequestBody @Validated(MbrAuthResetPasswordReqVO.updatePasswordValidView.class) MbrAuthResetPasswordReqVO reqVO) {
+    public CommonResult<Boolean> updatePassword(@RequestBody @Valid MbrAuthUpdatePasswordReqVO reqVO) {
         authService.updatePassword(getLoginUserId(), reqVO);
         return success(true);
     }
