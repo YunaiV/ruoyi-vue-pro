@@ -3,6 +3,7 @@ package cn.iocoder.yudao.userserver.modules.member.service.user;
 import cn.iocoder.yudao.coreservice.modules.member.dal.dataobject.user.MbrUserDO;
 import cn.iocoder.yudao.userserver.modules.member.controller.user.vo.MbrUserInfoRespVO;
 import cn.iocoder.yudao.framework.common.validation.Mobile;
+import cn.iocoder.yudao.userserver.modules.member.controller.user.vo.MbrUserUpdateMobileReqVO;
 
 import java.io.InputStream;
 
@@ -68,5 +69,12 @@ public interface MbrUserService {
      * @return 用户响应实体类
      */
     MbrUserInfoRespVO getUserInfo(Long userId);
+
+    /**
+     * 修改手机
+     * @param userId 用户id
+     * @param reqVO 请求实体
+     */
+    void updateMobile(Long userId, MbrUserUpdateMobileReqVO reqVO);
 
 }

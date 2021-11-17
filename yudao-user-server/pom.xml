@@ -91,6 +91,13 @@
             <scope>test</scope>
         </dependency>
 
+        <!--单元测试相关-->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+
         <!-- 工具类相关 -->
 
     </dependencies>

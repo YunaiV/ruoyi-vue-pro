@@ -17,7 +17,9 @@ public enum SysSmsSceneEnum implements IntArrayValuable {
 
     LOGIN_BY_SMS(1, "手机号登陆"),
     CHANGE_MOBILE_BY_SMS(2, "更换手机号"),
-            ;
+    FORGET_MOBILE_BY_SMS(3, "忘记密码"),
+    CHECK_CODE_BY_SMS(4, "审核验证码"),
+    ;
 
     public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(SysSmsSceneEnum::getScene).toArray();
 

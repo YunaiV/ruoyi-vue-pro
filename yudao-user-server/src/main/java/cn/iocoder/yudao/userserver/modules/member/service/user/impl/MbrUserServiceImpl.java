@@ -6,8 +6,10 @@ import cn.iocoder.yudao.coreservice.modules.infra.service.file.InfFileCoreServic
 import cn.iocoder.yudao.coreservice.modules.member.dal.dataobject.user.MbrUserDO;
 import cn.iocoder.yudao.userserver.modules.member.controller.user.vo.MbrUserInfoRespVO;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.userserver.modules.member.controller.user.vo.MbrUserUpdateMobileReqVO;
 import cn.iocoder.yudao.userserver.modules.member.dal.mysql.user.MbrUserMapper;
 import cn.iocoder.yudao.userserver.modules.member.service.user.MbrUserService;
+import cn.iocoder.yudao.userserver.modules.system.service.auth.SysAuthService;
 import com.google.common.annotations.VisibleForTesting;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -39,6 +41,9 @@ public class MbrUserServiceImpl implements MbrUserService {
 
     @Resource
     private PasswordEncoder passwordEncoder;
+
+    @Resource
+    private SysAuthService sysAuthService;
 
     @Override
     public MbrUserDO getUserByMobile(String mobile) {
@@ -114,6 +119,17 @@ public class MbrUserServiceImpl implements MbrUserService {
         userResp.setNickName(user.getNickname());
         userResp.setAvatar(user.getAvatar());
         return userResp;
+    }
+
+    @Override
+    public void updateMobile(Long userId, MbrUserUpdateMobileReqVO reqVO) {
+        // 检测用户是否存在
+        MbrUserDO userDO = checkUserExists(userId);
+        // 检测手机与验证码是否匹配
+        sysAuthService.checkIfMobileMatchCodeAndDeleteCode(userDO.getMobile(),reqVO.getCode());
+        // 更新用户手机
+        userDO.setMobile(reqVO.getMobile());
+        userMapper.updateById(userDO);
     }
 
     @VisibleForTesting
