@@ -77,6 +77,10 @@ export default {
   },
   methods: {
     commitForm(){
+      if (!this.form.class || this.form.class === "" ) {
+        this.msgError("class不能为空");
+        return;
+      }
       const from = this.form
       const filterArr = this.listenerTable.filter(
           (item) => (item.event === from.event && from.type === item.type && from.class === item.class)

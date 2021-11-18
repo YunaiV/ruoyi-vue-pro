@@ -69,6 +69,10 @@ export default {
   },
   methods: {
     commitForm(){
+      if (!this.formData.class || this.formData.class === "" ) {
+        this.msgError("class不能为空");
+        return;
+      }
       const from = this.formData;
       // 获取原数组中是否存在这个class了 如果存在就退出不操作
       const filterArr = this.globalFormTable.filter(
