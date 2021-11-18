@@ -99,6 +99,19 @@ export const constantRoutes = [
     ]
   },
   {
+    path: '/bpmn',
+    component: Layout,
+    hidden: true,
+    children: [
+      {
+        path: 'model',
+        component: (resolve) => require(['@/views/bpm/model'], resolve),
+        name: 'model',
+        meta: { title: '工作流模型', icon: '' }
+      }
+    ]
+  },
+  {
     path: '/job',
     component: Layout,
     hidden: true,

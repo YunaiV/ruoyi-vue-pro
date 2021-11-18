@@ -43,8 +43,8 @@ public class ModelController {
 
     @GetMapping ("/page")
     @ApiOperation(value = "分页数据")
-    public PageResult<Model> pageList(ModelPageReqVo modelPageReqVo) {
-       return bpmModelService.pageList(modelPageReqVo);
+    public CommonResult<PageResult<Model>> pageList(ModelPageReqVo modelPageReqVo) {
+       return CommonResult.success(bpmModelService.pageList(modelPageReqVo));
     }
 
     @PostMapping("/create")
