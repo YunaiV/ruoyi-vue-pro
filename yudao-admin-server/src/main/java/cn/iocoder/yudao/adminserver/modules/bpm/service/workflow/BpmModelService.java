@@ -1,15 +1,11 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.service.workflow;
 
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.workflow.vo.FileResp;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.workflow.vo.model.ModelCreateVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.workflow.vo.model.ModelPageReqVo;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.workflow.vo.model.ModelRespVo;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.workflow.vo.model.ModelUpdateVO;
+import cn.iocoder.yudao.adminserver.modules.bpm.controller.workflow.vo.model.ModelVO;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import org.activiti.engine.repository.Model;
-
-import javax.servlet.http.HttpServletResponse;
 
 /**
  * 工作流模型接口
@@ -27,16 +23,16 @@ public interface BpmModelService {
 
     /**
      * 新增一个模型
-     * @param modelCreateVO 模型对象
+     * @param modelVO 模型对象
      * @return 返回成功
      */
-    CommonResult<String> newModel(ModelCreateVO modelCreateVO);
+    CommonResult<String> newModel(ModelVO modelVO);
     /**
      * 修改模型属性，填充bpmn数据
-     * @param modelUpdateVO 模型对象
+     * @param modelVO 模型对象
      * @return 返回成功
      */
-    CommonResult<String> updateModel(ModelUpdateVO modelUpdateVO);
+    CommonResult<String> updateModel(ModelVO modelVO);
 
     /**
      * 部署模型 使模型成为一个 process

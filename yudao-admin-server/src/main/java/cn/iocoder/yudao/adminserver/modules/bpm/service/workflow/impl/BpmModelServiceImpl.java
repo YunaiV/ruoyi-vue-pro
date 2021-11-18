@@ -1,12 +1,9 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.service.workflow.impl;
 
-import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.workflow.vo.FileResp;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.workflow.vo.model.ModelCreateVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.workflow.vo.model.ModelPageReqVo;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.workflow.vo.model.ModelRespVo;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.workflow.vo.model.ModelUpdateVO;
+import cn.iocoder.yudao.adminserver.modules.bpm.controller.workflow.vo.model.ModelVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.workflow.BpmModelService;
 import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
@@ -15,26 +12,20 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.activiti.api.runtime.shared.query.Pageable;
 import org.activiti.bpmn.converter.BpmnXMLConverter;
 import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.Model;
 import org.activiti.engine.repository.ModelQuery;
-import org.activiti.engine.repository.ProcessDefinition;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
-import javax.servlet.http.HttpServletResponse;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
@@ -64,64 +55,67 @@ public class BpmModelServiceImpl implements BpmModelService {
     }
 
     @Override
-    public CommonResult<String> newModel(ModelCreateVO modelCreateVO) {
+    public CommonResult<String> newModel(ModelVO modelVO) {
         try {
             //初始化一个空模型
             Model model = repositoryService.newModel();
-            String name = Optional.ofNullable(modelCreateVO.getName()).orElse("new-process");
+            String name = Optional.ofNullable(modelVO.getName()).orElse("new-process");
             //设置一些默认信息
             model.setName(name);
-            model.setKey(Optional.ofNullable(modelCreateVO.getKey()).orElse("processKey"));
-            model.setMetaInfo(JsonUtils.toJsonString(modelCreateVO));
+            model.setKey(Optional.ofNullable(modelVO.getKey()).orElse("processKey"));
+            model.setMetaInfo(JsonUtils.toJsonString(modelVO));
             repositoryService.saveModel(model);
-            return CommonResult.success("保存成功");
+            if (!ObjectUtils.isEmpty(modelVO.getBpmnXml())) {
+                repositoryService.addModelEditorSource(model.getId(), modelVO.getBpmnXml().getBytes(StandardCharsets.UTF_8));
+            }
+            return CommonResult.success(model.getId());
         }catch (Exception e){
-            log.info("模型创建失败！modelCreateVO = {} e = {} ", modelCreateVO, ExceptionUtils.getStackTrace(e));
+            log.info("模型创建失败！modelVO = {} e = {} ", modelVO, ExceptionUtils.getStackTrace(e));
             throw ServiceExceptionUtil.exception(BpmErrorCodeConstants.BPMN_MODEL_ERROR);
         }
 
     }
 
     @Override
-    public CommonResult<String> updateModel(ModelUpdateVO modelUpdateVO) {
+    public CommonResult<String> updateModel(ModelVO modelVO) {
         try {
-            Model model = repositoryService.getModel(modelUpdateVO.getId());
+            Model model = repositoryService.getModel(modelVO.getId());
             if (ObjectUtils.isEmpty(model)) {
                 throw ServiceExceptionUtil.exception(BpmErrorCodeConstants.BPMN_MODEL_EDITOR_SOURCE_NOT_EXISTS);
             }
             // 只能修改名字跟描述
-            ModelCreateVO modelCreateVO = JsonUtils.parseObject(model.getMetaInfo(), ModelCreateVO.class);
+            ModelVO modelCreateVO = JsonUtils.parseObject(model.getMetaInfo(), ModelVO.class);
             if (ObjectUtils.isEmpty(modelCreateVO)) {
-                modelCreateVO = new ModelCreateVO();
+                modelCreateVO = new ModelVO();
             }
-            modelCreateVO.setName(modelUpdateVO.getName());
-            modelCreateVO.setDescription(modelUpdateVO.getDescription());
+            modelCreateVO.setName(modelVO.getName());
+            modelCreateVO.setDescription(modelVO.getDescription());
             model.setMetaInfo(JsonUtils.toJsonString(modelCreateVO));
-            model.setName(modelUpdateVO.getName());
+            model.setName(modelVO.getName());
+            model.setKey(modelVO.getKey());
             // 更新模型
             repositoryService.saveModel(model);
 
-            repositoryService.addModelEditorSource(model.getId(), modelUpdateVO.getBpmnXml().getBytes(StandardCharsets.UTF_8));
+            repositoryService.addModelEditorSource(model.getId(), modelVO.getBpmnXml().getBytes(StandardCharsets.UTF_8));
 
             return CommonResult.success("保存成功");
         }catch (Exception e){
-            log.info("模型更新失败！modelUpdateVO = {} e = {} ", modelUpdateVO, ExceptionUtils.getStackTrace(e));
+            log.info("模型更新失败！modelVO = {}", modelVO, e);
             throw ServiceExceptionUtil.exception(BpmErrorCodeConstants.BPMN_MODEL_ERROR);
         }
     }
 
     @Override
     public CommonResult<String> deploy(String modelId) {
-        // 获取模型
-        Model modelData = repositoryService.getModel(modelId);
-        if (ObjectUtils.isEmpty(modelData)) {
-            throw ServiceExceptionUtil.exception(BpmErrorCodeConstants.BPMN_MODEL_EDITOR_SOURCE_NOT_EXISTS);
-        }
-        byte[] bytes = repositoryService.getModelEditorSource(modelData.getId());
-        if (bytes == null) {
-            throw ServiceExceptionUtil.exception(BpmErrorCodeConstants.BPMN_MODEL_EDITOR_SOURCE_NOT_EXISTS);
-        }
         try {
+            Model modelData = repositoryService.getModel(modelId);
+            if (ObjectUtils.isEmpty(modelData)) {
+                throw ServiceExceptionUtil.exception(BpmErrorCodeConstants.BPMN_MODEL_EDITOR_SOURCE_NOT_EXISTS);
+            }
+            byte[] bytes = repositoryService.getModelEditorSource(modelData.getId());
+            if (bytes == null) {
+                throw ServiceExceptionUtil.exception(BpmErrorCodeConstants.BPMN_MODEL_EDITOR_SOURCE_NOT_EXISTS);
+            }
             // 将xml转换为流
             ByteArrayInputStream inputStream = new ByteArrayInputStream(bytes);
             XMLInputFactory xif = XMLInputFactory.newInstance();
@@ -148,21 +142,21 @@ public class BpmModelServiceImpl implements BpmModelService {
     }
 
     @Override
-    public FileResp exportBpmnXml(String deploymentId) {
-
-        // 查询流程定义
-        ProcessDefinition pd = repositoryService.createProcessDefinitionQuery().deploymentId(deploymentId).singleResult();
-        if (ObjectUtils.isEmpty(pd)) {
-            throw ServiceExceptionUtil.exception(BpmErrorCodeConstants.BPMN_PROCESS_DEFINITION_NOT_EXISTS);
+    public FileResp exportBpmnXml(String modelId) {
+        try {
+            Model modelData = repositoryService.getModel(modelId);
+            if (ObjectUtils.isEmpty(modelData)) {
+                throw ServiceExceptionUtil.exception(BpmErrorCodeConstants.BPMN_MODEL_EDITOR_SOURCE_NOT_EXISTS);
+            }
+            byte[] bytes = repositoryService.getModelEditorSource(modelData.getId());
+            FileResp fileResp = new FileResp();
+            fileResp.setFileName(String.format("%s.bpmn", Optional.ofNullable(modelData.getName()).orElse("流程图")));
+            fileResp.setFileByte(bytes);
+            return fileResp;
+        } catch (Exception e) {
+            log.info("模型部署失败！modelId = {} e = {} ", modelId, ExceptionUtils.getStackTrace(e));
+            throw ServiceExceptionUtil.exception(BpmErrorCodeConstants.BPMN_MODEL_ERROR);
         }
-        String resourceName = Optional.ofNullable(pd.getDiagramResourceName()).orElse(pd.getResourceName());
-        InputStream inputStream = repositoryService.getResourceAsStream(deploymentId,
-                resourceName);
-        FileResp fileResp = new FileResp();
-
-        fileResp.setFileName(String.format("%s.bpmn", Optional.ofNullable(pd.getName()).orElse("流程图")));
-        fileResp.setFileByte(IoUtil.readBytes(inputStream));
-        return fileResp;
     }
 
     @Override

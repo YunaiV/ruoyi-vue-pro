@@ -2,10 +2,7 @@
   <div>
     <el-button-group>
       <el-tooltip class="item" effect="dark" content="保存并发布" placement="bottom">
-        <el-button type="primary" size="small" @click="deploy"><i class="fa fa-save"> 保存并发布</i></el-button>
-      </el-tooltip>
-      <el-tooltip class="item" effect="dark" content="保存草稿" placement="bottom">
-        <el-button type="primary" size="small" @click="save"><i class="fa fa-save"> 保存草稿</i></el-button>
+        <el-button type="primary" size="small" @click="save"><i class="fa fa-save"> 保存</i></el-button>
       </el-tooltip>
       <el-tooltip class="item" effect="dark" content="打开流程文件" placement="bottom">
         <el-button type="primary" size="small"  @click="importXml"><i class="fa fa-folder-open"></i></el-button>
@@ -32,10 +29,13 @@
       <el-tooltip class="item" effect="dark" content="缩小" placement="bottom">
         <el-button size="small" @click="zoom(-0.05)"><i class="fa fa-search-minus"></i></el-button>
       </el-tooltip>
-      <el-tooltip class="item" effect="dark" content="重置" placement="bottom">
+      <el-tooltip class="item" effect="dark" content="重置大小" placement="bottom">
         <el-button size="small" @click="zoom(0)"><i class="fa fa-arrows"></i></el-button>
       </el-tooltip>
     </el-button-group>
+
+    <div class="closeClass" @click="beforeClose()"><i class="el-icon-close"></i></div>
+
   </div>
 </template>
 
@@ -74,15 +74,15 @@
           }
           _svg = svg;
         })
-        that.post(this.Apis.deployProcess, {
-          processKey: "s1111",
-          processName: "阿达达",
-          resourceName: "test01",
-          xml: _xml,
-          svg: _svg
-        }, function (data) {
-          console.log(data)
-        });
+        // that.post(this.Apis.deployProcess, {
+        //   processKey: "s1111",
+        //   processName: "阿达达",
+        //   resourceName: "test01",
+        //   xml: _xml,
+        //   svg: _svg
+        // }, function (data) {
+        //   console.log(data)
+        // });
       },
       save(){
         let that = this;
@@ -129,11 +129,24 @@
         let newScale = !val ? 1.0 : ((this.scale + val) <= 0.2) ? 0.2 : (this.scale + val);
         this.modeler.get('canvas').zoom(newScale);
         this.scale = newScale;
+      },
+      beforeClose(val) {
+        this.$emit("beforeClose");
       }
     }
   }
 </script>
 
 <style scoped>
+.closeClass{
 
+  float: right;
+  width: 50px;
+  height: 50px;
+  font-size: 20px;
+}
+
+.closeClass:hover{
+  cursor:pointer;
+}
 </style>

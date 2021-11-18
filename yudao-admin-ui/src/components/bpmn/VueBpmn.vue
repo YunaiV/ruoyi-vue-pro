@@ -4,7 +4,7 @@
     <el-row>
       <el-col :span="24">
         <vue-header class="bpmn-viewer-header" :processData="initData" :modeler="bpmnModeler" @restart="restart" @importXml="importXml"
-                    @handleExportSvg="handleExportSvg" @handleExportBpmn="handleExportBpmn" @processSave="processSave"></vue-header>
+                    @handleExportSvg="handleExportSvg" @handleExportBpmn="handleExportBpmn" @processSave="processSave" @beforeClose="beforeClose"></vue-header>
       </el-col>
     </el-row>
     <el-row style="margin-left: 1%">
@@ -61,6 +61,7 @@
     },
     props: {
       product: String,
+      bpmnData: Object,
       bpmnXml: {
         type: String,
         required: false
@@ -80,8 +81,13 @@
     mounted() {
       let processId = new Date().getTime();
       this.initTemplate = templateXml.initTemplate(processId)
-      this.initData = {key: "process" + processId, name: "流程" + processId, xml: this.initTemplate}
-      if (this.bpmnXml != null) {
+
+      this.initData = {
+        key: this.bpmnData.key ? this.bpmnData.key : "process" + processId,
+        name: this.bpmnData.name ? this.bpmnData.name : "流程" + processId,
+        description: this.bpmnData.metaInfo ? JSON.parse(this.bpmnData.metaInfo).description : "" ,
+        xml: this.initTemplate}
+      if (this.bpmnXml != null && this.bpmnXml !== "") {
         this.initTemplate = this.bpmnXml
       }
       this.init();
@@ -205,14 +211,21 @@
       },
       processSave(data){
         let initData = this.initData;
-        data.procId = initData.key;
-        data.name = initData.name;
-        this.$emit("processSave",data);
+        const dataXml = this.bpmnData
+        dataXml.bpmnXml = this.xmlShow;
+        dataXml.name = initData.name;
+        dataXml.key = initData.key;
+        dataXml.description = initData.description;
+        this.$emit("processSave",dataXml);
       },
       restart() {
         let processId = new Date().getTime();
         this.initTemplate = templateXml.initTemplate(processId)
-        this.initData = {key: "process" + processId, name: "流程" + processId, xml: this.initTemplate}
+        this.initData = {
+          key: this.bpmnData.key ? this.bpmnData.key : "process" + processId,
+          name: this.bpmnData.name ? this.bpmnData.name : "流程" + processId,
+          description: this.bpmnData.metaInfo ? JSON.parse(this.bpmnData.metaInfo).description : "" ,
+          xml: this.initTemplate}
         this.initDiagram(this.initTemplate)
       },
       importXml() {
@@ -244,6 +257,9 @@
           }
         }
         return moddleExtensions;
+      },
+      beforeClose() {
+        this.$emit("beforeClose");
       }
     }
   }

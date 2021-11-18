@@ -8,7 +8,10 @@ import lombok.Data;
  * @author yunlongn
  */
 @Data
-public class ModelCreateVO {
+public class ModelVO {
+
+    @ApiModelProperty(value = "模型Id")
+    private String id;
 
     @ApiModelProperty(value = "模型名字", required = true)
     private String name;
@@ -21,4 +24,7 @@ public class ModelCreateVO {
 
     @ApiModelProperty(value = "key值")
     private String key;
+
+    @ApiModelProperty(value = "bpmnXml")
+    private String bpmnXml;
 }

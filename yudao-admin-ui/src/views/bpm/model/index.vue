@@ -10,17 +10,18 @@
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
-
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
-        <el-button type="warning" icon="el-icon-download" size="mini" @click="handleExport"
-                   v-hasPermi="['system:login-log:export']">导出</el-button>
-        <el-button type="warning" icon="el-icon-download" size="mini" @click="openBpmn"
-                   v-hasPermi="['system:login-log:export']">新建</el-button>
+        <el-button
+          type="primary"
+          icon="el-icon-plus"
+          size="mini"
+          @click="openBpmn"
+          v-hasPermi="['infra:config:create']"
+        >新建流程</el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
-
     <el-table v-loading="loading" :data="list">
       <el-table-column label="ID" align="center" prop="id" />
       <el-table-column label="name" align="center" prop="metaInfo" >
@@ -33,18 +34,30 @@
           <span>{{ JSON.parse(scope.row.metaInfo).description }}</span>
         </template>
       </el-table-column>
+      <el-table-column label="创建时间" align="center" prop="createTime" >
+        <template slot-scope="scope">
+          <span>{{ parseTime(scope.row.createTime) }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="操作" align="center" >
+        <template slot-scope="scope">
+          <el-button size="mini" type="text" icon="el-icon-setting" @click="change(scope.row)">设计流程</el-button>
+          <el-button size="mini" type="text" icon="el-icon-delete" @click="modelDelete(scope.row)">删除</el-button>
+          <el-button size="mini" type="text" icon="el-icon-thumb" @click="modelDeploy(scope.row)">发布</el-button>
+        </template>
+      </el-table-column>
     </el-table>
 
     <pagination v-show="total>0" :total="total" :page.sync="queryParams.pageNo" :limit.sync="queryParams.pageSize"
                 @pagination="getList"/>
-    <el-dialog title="新建流程" :visible.sync="showBpmnBool" :before-close="close" :fullscreen="true">
-      <vue-bpmn product="activiti" @processSave="processSave"></vue-bpmn>
+    <el-dialog :visible.sync="showBpmnBool" :before-close="close" :fullscreen="true">
+      <vue-bpmn v-if="showBpmnBool" product="activiti" @processSave="processSave" :bpmnXml="bpmnXML" :bpmnData="bpmnData" @beforeClose="close"></vue-bpmn>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import { page } from "@/api/bpm/model";
+import { page, exportBpmnXml, modelUpdate, modelSave, modelDelete, modelDeploy } from "@/api/bpm/model";
 import VueBpmn from "@/components/bpmn/VueBpmn";
 
 export default {
@@ -61,6 +74,7 @@ export default {
       // 表格数据
       list: [],
       bpmnXML: null,
+      bpmnData: {},
       // 查询参数
       queryParams: {
         pageNo: 1,
@@ -98,27 +112,81 @@ export default {
       this.resetForm("queryForm");
       this.handleQuery();
     },
-    /** 导出按钮操作 */
-    handleExport() {
-      const queryParams = this.queryParams;
-      this.$confirm('是否确认导出所有操作日志数据项?', "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(function() {
-          return exportLoginLog(queryParams);
-        }).then(response => {
-          this.downloadExcel(response, '登录日志.xls');
+    processSave(data) {
+      const that = this;
+      // 如果存在id 说明是修改
+      if (data.id) {
+        let postData = JSON.parse(data.metaInfo)
+        postData.bpmnXml = data.bpmnXml
+        postData.id = data.id
+        postData.name = data.name
+        postData.key = data.key
+        postData.description = data.description
+        modelUpdate(postData).then(response => {
+          this.msgSuccess("保存成功");
         })
-    },
-    processSave() {
-      console.log("processSave")
+        this.showBpmnBool = false
+        this.getList();
+        return
+      }
+      modelSave(data).then(response => {
+        that.bpmnData.id = response.data
+        this.msgSuccess("保存成功");
+      })
+
+      this.showBpmnBool = false
+      this.getList();
     },
     openBpmn() {
+      this.bpmnData = {}
+      this.bpmnXML = ""
       this.showBpmnBool = true
     },
     close() {
       this.showBpmnBool = false
+      this.getList();
+    },
+    change(row) {
+      const that = this;
+      this.bpmnXML = ""
+      this.bpmnData = {}
+      exportBpmnXml({
+        modelId: row.id
+      }).then(response => {
+        that.bpmnXML = response
+        that.bpmnData = row
+        that.showBpmnBool = true
+      })
+    },
+    modelDelete(row) {
+      const that = this;
+      this.$confirm('是否删除该流程！！', "警告", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      }).then(function() {
+        modelDelete({
+          modelId: row.id
+        }).then(response => {
+          that.getList();
+          that.msgSuccess("删除成功");
+        })
+      })
+    },
+    modelDeploy(row) {
+      const that = this;
+      this.$confirm('是否部署该流程！！', "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "success"
+      }).then(function() {
+        modelDeploy({
+          modelId: row.id
+        }).then(response => {
+          that.getList();
+          that.msgSuccess("部署成功");
+        })
+      })
     }
   }
 };
