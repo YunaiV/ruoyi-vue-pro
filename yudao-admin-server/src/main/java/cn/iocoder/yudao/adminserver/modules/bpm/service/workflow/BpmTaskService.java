@@ -51,6 +51,7 @@ public interface BpmTaskService {
     /**
      * 返回高亮的流转进程
      * @param processInstanceId 实例Id
+     * @return {@link FileResp} 返回文件
      */
     FileResp getHighlightImg(String processInstanceId);
 }

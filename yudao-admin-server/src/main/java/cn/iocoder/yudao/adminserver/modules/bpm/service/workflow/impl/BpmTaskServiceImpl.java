@@ -31,6 +31,7 @@ import org.activiti.image.ProcessDiagramGenerator;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 
 import javax.annotation.Resource;
 import java.io.IOException;
@@ -174,6 +175,18 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         if (hpi == null) {
             throw exception(PROCESS_INSTANCE_NOT_EXISTS);
         }
+        // 如果有结束时间 返回model的流程图
+        if (!ObjectUtils.isEmpty(hpi.getEndTime())) {
+            ProcessDefinition pd = repositoryService.createProcessDefinitionQuery().processDefinitionId(hpi.getProcessDefinitionId()).singleResult();
+            String resourceName = Optional.ofNullable(pd.getDiagramResourceName()).orElse(pd.getResourceName());
+            BpmnModel bpmnModel = repositoryService.getBpmnModel(pd.getId());
+            InputStream inputStream = processDiagramGenerator.generateDiagram(bpmnModel, new ArrayList<>(1), new ArrayList<>(1),
+                    "宋体", "宋体", "宋体");
+            FileResp fileResp = new FileResp();
+            fileResp.setFileName( resourceName + ".svg");
+            fileResp.setFileByte(IoUtil.readBytes(inputStream));
+            return fileResp;
+        }
         // 没有结束时间。说明流程在执行过程中
         // TODO @Li：一些 runtimeService 的查询，貌似比较通用，是不是抽一些小方法出来
         ProcessInstance pi = runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
@@ -195,13 +208,11 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         try (InputStream inputStream = processDiagramGenerator.generateDiagram(bpmnModel, highLightedActivities, highLightedFlowIds,
                 "宋体", "宋体", "宋体")){
             FileResp fileResp = new FileResp();
-            String picName = hpi.getProcessDefinitionName() + ".svg"; // TODO @Li：一次性的变量，可以直接 set 的时候，直接拼接
-            fileResp.setFileName(picName);
+            fileResp.setFileName( hpi.getProcessDefinitionName() + ".svg");
             fileResp.setFileByte(IoUtil.readBytes(inputStream));
             return fileResp;
         } catch (IOException e) {
-            // TODO @Li：log.error("[getHighlightImg][流程({}) 生成图表失败]", processInstanceId, e)
-            log.error(ExceptionUtils.getStackTrace(e));
+            log.error("[getHighlightImg][流程({}) 生成图表失败]", processInstanceId, e);
             throw exception(HIGHLIGHT_IMG_ERROR);
         }
     }

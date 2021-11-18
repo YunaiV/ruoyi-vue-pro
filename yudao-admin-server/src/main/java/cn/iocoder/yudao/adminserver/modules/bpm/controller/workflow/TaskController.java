@@ -60,13 +60,12 @@ public class TaskController {
         return success(bpmTaskService.getHistorySteps(processInstanceId));
     }
 
-    // TODO @Li: 项目里，暂时不使用 path 路径参数，监控等麻烦
     /**
      * 返回高亮的流转图SVG
-     * @param processInstanceId
+     * @param processInstanceId 流程Id
      */
-    @GetMapping("/process/highlight-img/{id}")
-    public void getHighlightImg(@PathVariable("id") String processInstanceId, HttpServletResponse response) throws IOException {
+    @GetMapping("/process/highlight-img")
+    public void getHighlightImg(@RequestParam String processInstanceId, HttpServletResponse response) throws IOException {
         FileResp fileResp = bpmTaskService.getHighlightImg(processInstanceId);
         ServletUtils.writeAttachment(response, fileResp.getFileName(), fileResp.getFileByte());
     }
