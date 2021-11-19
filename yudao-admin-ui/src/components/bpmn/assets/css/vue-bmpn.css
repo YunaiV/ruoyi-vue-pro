@@ -31,25 +31,25 @@
 .el-collapse-item__header{
     padding-left: 15px;
 }
-.djs-direct-editing-parent{
+.bpmnclass .djs-direct-editing-parent{
     /*display: none;*/
 }
-.bpmn-panel {
+.bpmnclass .bpmn-panel {
     /*width: 370px;*/
     border: 1px solid #eeeeee;
     padding: 0 5px;
 }
-.el-select--small{
+.bpmnclass .el-select--small{
     width: 100%;
 }
-.el-dialog > .el-dialog__header{
-    padding: 5px 20px  ;
+.bpmnclass > .is-fullscreen > .el-dialog__header:first-of-type{
+    padding: 0  ;
 }
-.el-dialog > .el-dialog__body{
+.bpmnclass .el-dialog > .el-dialog__body{
     padding: 0px;
-    margin: 0 20px;
-    border: 1px solid #cccccc;
+    margin: 0 ;
+    /*border: 1px solid #cccccc;*/
 }
-.default-undo{
+.bpmnclass .default-undo{
     color: #c0c4cc;
 }

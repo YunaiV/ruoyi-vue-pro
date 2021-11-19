@@ -115,7 +115,5 @@ export default {
 </script>
 
 <style scoped>
-/deep/.el-dialog > .el-dialog__header{
-  padding: 24px 20px
-}
+
 </style>

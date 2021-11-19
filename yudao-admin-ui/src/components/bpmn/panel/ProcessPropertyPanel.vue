@@ -95,9 +95,10 @@
 </template>
 
 <script>
-  import GlobalEventListenerDialog from "./dialog/GlobalEventListenerDialog"
-  import EventListenerDialog from "./dialog/EventListenerDialog"
-  export default {
+import GlobalEventListenerDialog from "./dialog/GlobalEventListenerDialog"
+import EventListenerDialog from "./dialog/EventListenerDialog"
+
+export default {
     name: "ProcessProperty",
     data() {
       return {
@@ -232,7 +233,7 @@
 </script>
 
 <style scoped>
-.title span{
+.bpmnclass .title span{
   font-weight: bold;
   margin-left: 5px;
 }

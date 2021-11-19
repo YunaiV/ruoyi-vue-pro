@@ -24,44 +24,35 @@
     </el-row>
     <el-table v-loading="loading" :data="list">
       <el-table-column label="ID" align="center" prop="id" />
-      <el-table-column label="name" align="center" prop="metaInfo" >
-        <template slot-scope="scope">
-          <span>{{ scope.row.metaInfo ? JSON.parse(scope.row.metaInfo).name : "" }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="description" align="center" prop="metaInfo" >
-        <template slot-scope="scope">
-          <span>{{ JSON.parse(scope.row.metaInfo).description }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="创建时间" align="center" prop="createTime" >
-        <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.createTime) }}</span>
-        </template>
-      </el-table-column>
+      <el-table-column label="流程名字" align="center" prop="name" />
+<!--      <el-table-column label="创建时间" align="center" prop="createTime" >-->
+<!--        <template slot-scope="scope">-->
+<!--          <span>{{ parseTime(scope.row.createTime) }}</span>-->
+<!--        </template>-->
+<!--      </el-table-column>-->
       <el-table-column label="操作" align="center" >
         <template slot-scope="scope">
-          <el-button size="mini" type="text" icon="el-icon-setting" @click="change(scope.row)">设计流程</el-button>
-          <el-button size="mini" type="text" icon="el-icon-delete" @click="modelDelete(scope.row)">删除</el-button>
-          <el-button size="mini" type="text" icon="el-icon-thumb" @click="modelDeploy(scope.row)">发布</el-button>
+<!--          <el-button size="mini" type="text" icon="el-icon-setting" @click="change(scope.row)">设计流程</el-button>-->
+<!--          <el-button size="mini" type="text" icon="el-icon-delete" @click="modelDelete(scope.row)">删除</el-button>-->
+<!--          <el-button size="mini" type="text" icon="el-icon-thumb" @click="modelDeploy(scope.row)">发布</el-button>-->
         </template>
       </el-table-column>
     </el-table>
 
     <pagination v-show="total>0" :total="total" :page.sync="queryParams.pageNo" :limit.sync="queryParams.pageSize"
                 @pagination="getList"/>
-    <el-dialog class="bpmnclass dialogClass" :visible.sync="showBpmnBool" :before-close="close" :fullscreen="true">
+    <el-dialog :visible.sync="showBpmnBool" :before-close="close" :fullscreen="true">
       <vue-bpmn v-if="showBpmnBool" product="activiti" @processSave="processSave" :bpmnXml="bpmnXML" :bpmnData="bpmnData" @beforeClose="close"></vue-bpmn>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import {exportBpmnXml, modelDelete, modelDeploy, modelSave, modelUpdate, page} from "@/api/bpm/model";
+import {page} from "@/api/bpm/processDefinition";
 import VueBpmn from "@/components/bpmn/VueBpmn";
 
 export default {
-  name: "model",
+  name: "processDefinition",
   data() {
     return {
       // 遮罩层
@@ -96,6 +87,7 @@ export default {
           this.loading = false;
         }
       );
+
     },
     // 登录状态字典翻译
     statusFormat(row, column) {
@@ -201,9 +193,6 @@ export default {
 }
 .v-modal{
   z-index: 2000!important;
-}
-.dialogClass{
-  padding: 0  ;
 }
 </style>
 

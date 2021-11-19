@@ -1,11 +1,9 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-
-Vue.use(Router)
-
 /* Layout */
 import Layout from '@/layout'
-import ParentView from '@/components/ParentView';
+
+Vue.use(Router)
 
 /**
  * Note: 路由配置项
@@ -95,19 +93,6 @@ export const constantRoutes = [
         component: (resolve) => require(['@/views/system/dict/data'], resolve),
         name: 'Data',
         meta: { title: '字典数据', icon: '' }
-      }
-    ]
-  },
-  {
-    path: '/bpmn',
-    component: Layout,
-    hidden: true,
-    children: [
-      {
-        path: 'model',
-        component: (resolve) => require(['@/views/bpm/model'], resolve),
-        name: 'model',
-        meta: { title: '工作流模型', icon: '' }
       }
     ]
   },

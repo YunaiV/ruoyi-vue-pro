@@ -1,5 +1,5 @@
 <template>
-  <div class="">
+  <div class="bpmnclass">
     <ImportDialog :dialogVisibleBool="importXmlShow" @closeShowXmlDialog="closeShowXmlDialog"></ImportDialog>
     <el-row>
       <el-col :span="24">
@@ -28,25 +28,25 @@
 </template>
 
 <script>
-  import templateXml from "./data/template";
-  import ImportDialog from "./dialog/ImportDialog";
-  // import activitiCom from "../provider/activiti";
-  // import BpmnModeler2 from 'bpmn-js/lib/Modeler';
-  import BpmnModeler from 'jeeplus-bpmn/lib/Modeler'
-  import customTranslate from "./data/translate/customTranslate";
-  import VueHeader from "./Header";
-  import BpmnPanel from "./panel/index";
-  import activitiModule from './data/activiti.json'
-  import flowableModule from './data/flowable.json'
-  import './assets/css/vue-bmpn.css'
-  import './assets/css/font-awesome.min.css'
+import templateXml from "./data/template";
+import ImportDialog from "./dialog/ImportDialog";
+// import activitiCom from "../provider/activiti";
+// import BpmnModeler2 from 'bpmn-js/lib/Modeler';
+import BpmnModeler from 'jeeplus-bpmn/lib/Modeler'
+import customTranslate from "./data/translate/customTranslate";
+import VueHeader from "./Header";
+import BpmnPanel from "./panel/index";
+import activitiModule from './data/activiti.json'
+import flowableModule from './data/flowable.json'
+import './assets/css/vue-bmpn.css'
+import './assets/css/font-awesome.min.css'
 
-  import 'bpmn-js/dist/assets/diagram-js.css'
-  import 'bpmn-js/dist/assets/bpmn-font/css/bpmn.css'
-  import 'bpmn-js/dist/assets/bpmn-font/css/bpmn-codes.css'
-  import 'bpmn-js/dist/assets/bpmn-font/css/bpmn-embedded.css'
-  import './assets/css/vue-bmpn.css'
-  export default {
+import 'bpmn-js/dist/assets/diagram-js.css'
+import 'bpmn-js/dist/assets/bpmn-font/css/bpmn.css'
+import 'bpmn-js/dist/assets/bpmn-font/css/bpmn-codes.css'
+import 'bpmn-js/dist/assets/bpmn-font/css/bpmn-embedded.css'
+
+export default {
     name: "VueBpmn",
     data() {
       return {

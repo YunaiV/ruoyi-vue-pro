@@ -1194,6 +1194,10 @@ INSERT INTO `sys_menu` VALUES (1122, '请假申请删除', 'oa:leave:delete', 3,
 INSERT INTO `sys_menu` VALUES (1123, '请假申请导出', 'oa:leave:export', 3, 5, 1118, '', '', '', 0, '', '2021-09-20 08:51:03', '', '2021-09-20 08:51:03', b'0');
 INSERT INTO `sys_menu` VALUES (1124, '待办请假', '', 2, 2, 5, 'todo', 'edit', 'oa/todo/index', 0, '1', '2021-09-20 22:10:09', '1', '2021-09-21 23:17:12', b'0');
 INSERT INTO `sys_menu` VALUES (1125, '已办请假', '', 2, 3, 5, 'flow', 'form', 'oa/flow/index', 0, '1', '2021-10-23 22:10:09', '1', '2021-10-23 23:17:12', b'0');
+INSERT INTO `sys_menu` VALUES (1128, '工作流程定义', '', 2, 2, 1126, 'processDefinition/index', '#', 'bpm/processDefinition/index', 0, '1', '2021-11-19 11:18:38', '1', '2021-11-19 11:18:38', b'0');
+INSERT INTO `sys_menu` VALUES (1127, '工作流设计', '', 2, 1, 1126, 'model/index', '#', 'bpm/model/index', 0, '1', '2021-11-19 10:59:36', '1', '2021-11-19 11:01:59', b'0');
+INSERT INTO `sys_menu` VALUES (1126, '工作流管理', '', 1, 5, 0, '/bpm', 'tree-table', NULL, 0, '1', '2021-11-19 10:57:49', '1', '2021-11-19 11:05:05', b'0');
+
 COMMIT;
 
 -- ----------------------------

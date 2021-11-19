@@ -67,8 +67,8 @@
 
 <script>
 import EventListenerDialog from "./dialog/EventListenerDialog"
-import GlobalEventListenerDialog from "./dialog/GlobalEventListenerDialog";
-  export default {
+
+export default {
     name: "NodePropertyPanel",
     data() {
       return {
@@ -233,7 +233,7 @@ import GlobalEventListenerDialog from "./dialog/GlobalEventListenerDialog";
 </script>
 
 <style scoped>
-.title span{
+.bpmnclass .title span{
   font-weight: bold;
   margin-left: 5px;
 }

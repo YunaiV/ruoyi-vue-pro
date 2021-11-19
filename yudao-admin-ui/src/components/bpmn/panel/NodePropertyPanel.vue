@@ -129,7 +129,8 @@
 <script>
 import EventListenerDialog from "./dialog/EventListenerDialog"
 import UserSelectDialog from "./dialog/UserSelectDialog"
-  export default {
+
+export default {
     name: "NodePropertyPanel",
     data() {
       return {
@@ -269,32 +270,32 @@ import UserSelectDialog from "./dialog/UserSelectDialog"
 </script>
 
 <style scoped>
-.title span{
+.bpmnclass .title span{
   font-weight: bold;
   margin-left: 5px;
 }
-/deep/.el-select .el-input .el-select__caret{
+.bpmnclass .el-select .el-input .el-select__caret{
   margin-top: 5px;
 }
-/deep/.el-input__icon{
+.bpmnclass .el-input__icon{
   height: 20px !important;
   line-height: 20px !important;
 }
-/deep/.el-input-group__append{
+.bpmnclass .el-input-group__append{
   padding: 0 5px !important;
 }
-.icon-div{
+.bpmnclass .icon-div{
   font-size: 1.2em;
   font-weight: bold !important;
   width: 100%;
 }
-.icon-div i{
+.bpmnclass .icon-div i{
   padding: 5px;
 }
-.icon-div i:hover{
+.bpmnclass .icon-div i:hover{
   cursor:pointer;
 }
-.ant-divider-vertical {
+.bpmnclass .ant-divider-vertical {
   position: relative;
   top: -0.08em;
   display: inline-block;
@@ -303,7 +304,7 @@ import UserSelectDialog from "./dialog/UserSelectDialog"
   /*margin: 0 8px;*/
   vertical-align: middle;
 }
-.ant-divider {
+.bpmnclass .ant-divider {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
