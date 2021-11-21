@@ -28,6 +28,12 @@ public interface PayErrorCodeCoreConstants {
     ErrorCode PAY_ORDER_EXTENSION_STATUS_IS_NOT_WAITING = new ErrorCode(1007003001, "支付交易拓展单不处于待支付");
     ErrorCode PAY_ORDER_EXTENSION_STATUS_IS_NOT_SUCCESS = new ErrorCode(1007003002, "支付订单不处于已支付");
 
+    // ========== 支付模块(退款) 1-007-006-000 ==========
+    ErrorCode PAY_REFUND_AMOUNT_EXCEED = new ErrorCode(1007006000, "退款金额超过订单可退款金额");
+    ErrorCode PAY_REFUND_ALL_REFUNDED = new ErrorCode(1007006001, "订单已经全额退款");
+    ErrorCode PAY_REFUND_CHN_ORDER_NO_IS_NULL = new ErrorCode(1007006002, "该订单的渠道订单为空");
+    ErrorCode PAY_REFUND_POST_HANDLER_NOT_FOUND = new ErrorCode(1007006002, "未找到对应的退款后置处理类");
+
     /**
      * ========== 支付商户信息 1-007-004-000 ==========
      */
@@ -41,11 +47,11 @@ public interface PayErrorCodeCoreConstants {
 
 
     /**
-     * ========== 支付渠道 1-007-006-000 ==========
+     * ========== 支付渠道 1-007-001-000 ==========
      */
-    ErrorCode CHANNEL_NOT_EXISTS = new ErrorCode(1007006000, "支付渠道不存在");
-    ErrorCode CHANNEL_KEY_READ_ERROR = new ErrorCode(1007006002, "支付渠道秘钥文件读取失败");
+    ErrorCode CHANNEL_NOT_EXISTS = new ErrorCode(1007001003, "支付渠道不存在");
+    ErrorCode CHANNEL_KEY_READ_ERROR = new ErrorCode(1007001004, "支付渠道秘钥文件读取失败");
     // TODO @aquan：下面这个错误码，缺了 CHANNEL 前缀。另外，错误码的分段，上面有啦，合并下进去哈
-    ErrorCode EXIST_SAME_CHANNEL_ERROR = new ErrorCode(1007006003, "已存在相同的渠道");
+    ErrorCode EXIST_SAME_CHANNEL_ERROR = new ErrorCode(1007001005, "已存在相同的渠道");
 
 }

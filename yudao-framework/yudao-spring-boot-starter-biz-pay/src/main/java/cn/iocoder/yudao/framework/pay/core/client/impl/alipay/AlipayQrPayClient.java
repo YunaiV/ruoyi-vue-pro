@@ -3,9 +3,7 @@ package cn.iocoder.yudao.framework.pay.core.client.impl.alipay;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.iocoder.yudao.framework.pay.core.client.PayCommonResult;
-import cn.iocoder.yudao.framework.pay.core.client.dto.PayNotifyDataDTO;
-import cn.iocoder.yudao.framework.pay.core.client.dto.PayOrderNotifyRespDTO;
-import cn.iocoder.yudao.framework.pay.core.client.dto.PayOrderUnifiedReqDTO;
+import cn.iocoder.yudao.framework.pay.core.client.dto.*;
 import cn.iocoder.yudao.framework.pay.core.client.impl.AbstractPayClient;
 import cn.iocoder.yudao.framework.pay.core.enums.PayChannelEnum;
 import com.alipay.api.AlipayApiException;
@@ -71,6 +69,8 @@ public class AlipayQrPayClient extends AbstractPayClient<AlipayPayClientConfig> 
         return PayCommonResult.build(response.getCode(), response.getMsg(), response, codeMapping);
     }
 
+
+
     @Override
     public PayOrderNotifyRespDTO parseOrderNotify(PayNotifyDataDTO data) throws Exception {
         //结果转换
@@ -81,5 +81,11 @@ public class AlipayQrPayClient extends AbstractPayClient<AlipayPayClientConfig> 
                 .successTime(DateUtil.parse(params.get("notify_time"), "yyyy-MM-dd HH:mm:ss"))
                 .data(data.getBody()).build();
 
+    }
+
+    @Override
+    protected PayRefundUnifiedRespDTO doUnifiedRefund(PayRefundUnifiedReqDTO reqDTO) throws Throwable {
+        //TODO 需要实现
+        throw new UnsupportedOperationException();
     }
 }

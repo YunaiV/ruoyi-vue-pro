@@ -4,7 +4,7 @@ import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.merchant.PayAppDO
 import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.merchant.PayChannelDO;
 import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.merchant.PayMerchantDO;
 import cn.iocoder.yudao.coreservice.modules.pay.enums.order.PayOrderNotifyStatusEnum;
-import cn.iocoder.yudao.coreservice.modules.pay.enums.order.PayOrderRefundStatusEnum;
+import cn.iocoder.yudao.coreservice.modules.pay.enums.order.PayRefundTypeEnum;
 import cn.iocoder.yudao.coreservice.modules.pay.enums.order.PayOrderStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.framework.pay.core.enums.PayChannelEnum;
@@ -135,7 +135,7 @@ public class PayOrderDO extends BaseDO {
     /**
      * 退款状态
      *
-     * 枚举 {@link PayOrderRefundStatusEnum}
+     * 枚举 {@link PayRefundTypeEnum}
      */
     private Integer refundStatus;
     /**

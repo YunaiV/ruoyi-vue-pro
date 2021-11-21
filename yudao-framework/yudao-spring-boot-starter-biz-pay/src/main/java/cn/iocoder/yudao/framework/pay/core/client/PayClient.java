@@ -1,9 +1,7 @@
 package cn.iocoder.yudao.framework.pay.core.client;
 
 
-import cn.iocoder.yudao.framework.pay.core.client.dto.PayNotifyDataDTO;
-import cn.iocoder.yudao.framework.pay.core.client.dto.PayOrderNotifyRespDTO;
-import cn.iocoder.yudao.framework.pay.core.client.dto.PayOrderUnifiedReqDTO;
+import cn.iocoder.yudao.framework.pay.core.client.dto.*;
 
 /**
  * 支付客户端，用于对接各支付渠道的 SDK，实现发起支付、退款等功能
@@ -35,5 +33,13 @@ public interface PayClient {
      * @throws Exception 解析失败，抛出异常
      */
     PayOrderNotifyRespDTO parseOrderNotify(PayNotifyDataDTO data) throws Exception;
+
+
+    /**
+     * 调用支付渠道，进行退款
+     * @param reqDTO  统一退款请求信息
+     * @return 各支付渠道的统一返回结果
+     */
+    PayRefundUnifiedRespDTO unifiedRefund(PayRefundUnifiedReqDTO reqDTO);
 
 }

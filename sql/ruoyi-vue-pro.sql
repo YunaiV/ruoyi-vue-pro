@@ -953,7 +953,7 @@ CREATE TABLE `pay_app` (
 -- Records of pay_app
 -- ----------------------------
 BEGIN;
-INSERT INTO `pay_app` VALUES (6, '芋道', 0, '我是一个公众号', 'http://127.0.0.1:28080/api/shop/order/pay-notify', 'http://127.0.0.1', 1, '', '2021-10-23 08:49:25', '', '2021-10-27 00:26:35', b'0');
+INSERT INTO `pay_app` VALUES (6, '芋道', 0, '我是一个公众号', 'http://127.0.0.1:28080/api/shop/order/pay-notify', 'http://127.0.0.1:28080/api/shop/order/refund-notify', 1, '', '2021-10-23 08:49:25', '', '2021-10-27 00:26:35', b'0');
 COMMIT;
 
 -- ----------------------------
@@ -1239,6 +1239,43 @@ INSERT INTO `pay_order` VALUES (119, 1, 6, 9, 'wx_pub', '1635311881440', '标题
 INSERT INTO `pay_order` VALUES (120, 1, 6, 9, 'wx_pub', '1635311949168', '标题：1635311949168', '内容：1635311949168', 'http://127.0.0.1:28080/api/shop/order/pay-notify', 0, 1, 0, 0, 10, '101.82.233.75', '2021-10-28 13:19:09', '2021-10-27 13:19:15', '2021-10-27 13:19:15', 99, 0, 0, 0, 'ockUAwIZ-0OeMZl9ogcZ4ILrGba0', '4200001181202110277723215336', NULL, '2021-10-27 13:19:09', NULL, '2021-10-27 13:19:15', b'0');
 INSERT INTO `pay_order` VALUES (121, 1, 6, 9, 'wx_pub', '1635312124657', '标题：1635312124656', '内容：1635312124656', 'http://127.0.0.1:28080/api/shop/order/pay-notify', 0, 1, 0, 0, 10, '101.82.233.75', '2021-10-28 13:22:05', '2021-10-27 13:22:15', '2021-10-27 13:22:16', 100, 0, 0, 0, 'ockUAwIZ-0OeMZl9ogcZ4ILrGba0', '4200001174202110278060590766', NULL, '2021-10-27 13:22:05', NULL, '2021-10-27 13:22:16', b'0');
 COMMIT;
+
+DROP TABLE IF EXISTS `pay_refund`;
+CREATE TABLE `pay_refund` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '支付退款编号',
+  `req_no` varchar(64) NOT NULL COMMENT '退款单请求号',
+  `merchant_id` bigint NOT NULL COMMENT '商户编号',
+  `app_id` bigint NOT NULL COMMENT '应用编号',
+  `channel_id` bigint NOT NULL COMMENT '渠道编号',
+  `channel_code` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '渠道编码',
+  `order_id` bigint NOT NULL COMMENT '支付订单编号 pay_order 表id',
+  `trade_no` varchar(64) NOT NULL COMMENT '交易订单号 pay_extension 表no 字段',
+  `merchant_order_id` varchar(64) NOT NULL COMMENT '商户订单编号（商户系统生成）',
+  `merchant_refund_no` varchar(64) NOT NULL COMMENT '商户退款订单号（商户系统生成）',
+  `notify_url` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '异步通知商户地址',
+  `notify_status` tinyint NOT NULL COMMENT '通知商户退款结果的回调状态',
+  `status` tinyint NOT NULL COMMENT '退款状态',
+  `type` tinyint NOT NULL COMMENT '退款类型(部分退款，全部退款)',
+  `pay_amount` bigint NOT NULL COMMENT '支付金额,单位分',
+  `refund_amount` bigint NOT NULL COMMENT '退款金额,单位分',
+  `reason` VARCHAR(256) NOT NULL COMMENT '退款原因',
+  `user_ip` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '用户 IP',
+  `channel_order_no` varchar(64) NOT NULL COMMENT '渠道订单号，pay_order 中的channel_order_no 对应',
+  `channel_refund_no` varchar(64) DEFAULT NULL COMMENT '渠道退款单号，渠道返回',
+  `channel_error_code` varchar(128) DEFAULT NULL COMMENT '渠道调用报错时，错误码',
+  `channel_error_msg` varchar(256) DEFAULT NULL COMMENT '渠道调用报错时，错误信息',
+  `channel_extras` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '支付渠道的额外参数',
+  `expire_time` datetime  DEFAULT NULL COMMENT '退款失效时间',
+  `success_time` datetime DEFAULT NULL COMMENT '退款成功时间',
+  `notify_time` datetime DEFAULT NULL COMMENT '退款通知时间',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='退款订单';
+
 
 -- ----------------------------
 -- Table structure for pay_order_extension

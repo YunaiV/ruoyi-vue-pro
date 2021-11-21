@@ -6,7 +6,12 @@ import cn.iocoder.yudao.framework.pay.core.client.PayClient;
 import cn.iocoder.yudao.framework.pay.core.client.PayClientConfig;
 import cn.iocoder.yudao.framework.pay.core.client.PayCommonResult;
 import cn.iocoder.yudao.framework.pay.core.client.dto.PayOrderUnifiedReqDTO;
+import cn.iocoder.yudao.framework.pay.core.client.dto.PayRefundUnifiedReqDTO;
+import cn.iocoder.yudao.framework.pay.core.client.dto.PayRefundUnifiedRespDTO;
+import cn.iocoder.yudao.framework.pay.core.enums.PayChannelRespEnum;
 import lombok.extern.slf4j.Slf4j;
+
+import java.net.SocketTimeoutException;
 
 import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString;
 
@@ -22,6 +27,7 @@ public abstract class AbstractPayClient<Config extends PayClientConfig> implemen
      * 渠道编号
      */
     private final Long channelId;
+
     /**
      * 渠道编码
      */
@@ -91,7 +97,37 @@ public abstract class AbstractPayClient<Config extends PayClientConfig> implemen
         return result;
     }
 
+
+
     protected abstract PayCommonResult<?> doUnifiedOrder(PayOrderUnifiedReqDTO reqDTO)
             throws Throwable;
+
+
+    @Override
+    public PayRefundUnifiedRespDTO unifiedRefund(PayRefundUnifiedReqDTO reqDTO) {
+
+        PayRefundUnifiedRespDTO resp;
+        try {
+            resp = doUnifiedRefund(reqDTO);
+        }catch (SocketTimeoutException ex){
+            //网络 read time out 异常
+            log.error("[unifiedRefund][request({}) 发起退款失败,网络读超时，退款状态未知]", toJsonString(reqDTO), ex);
+            return PayRefundUnifiedRespDTO.builder()
+                    .exceptionMsg(ex.getMessage())
+                    .respEnum(PayChannelRespEnum.READ_TIME_OUT_EXCEPTION)
+                    .build();
+        } catch (Throwable ex) {
+            // 打印异常日志
+            log.error("[unifiedRefund][request({}) 发起退款失败]", toJsonString(reqDTO), ex);
+            return PayRefundUnifiedRespDTO.builder()
+                    .exceptionMsg(ex.getMessage())
+                    .respEnum(PayChannelRespEnum.CALL_EXCEPTION)
+                    .build();
+        }
+        return resp;
+    }
+
+
+    protected abstract PayRefundUnifiedRespDTO doUnifiedRefund(PayRefundUnifiedReqDTO reqDTO) throws Throwable;
 
 }
