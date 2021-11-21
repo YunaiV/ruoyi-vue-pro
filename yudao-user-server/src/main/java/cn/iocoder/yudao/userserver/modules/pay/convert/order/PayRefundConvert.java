@@ -8,7 +8,8 @@ import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
 /**
- * 支付退款 Convert // TODO @jason：类注释，和下面，有一个空行哈
+ * 支付退款 Convert
+ *
  * @author jason
  */
 @Mapper

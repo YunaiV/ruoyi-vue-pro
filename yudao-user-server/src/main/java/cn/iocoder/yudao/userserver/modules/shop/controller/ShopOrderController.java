@@ -57,8 +57,6 @@ public class ShopOrderController {
                 .payOrderId(payOrderId).build());
     }
 
-
-    // TODO @jason：方法之间，空一行即可哈
     @PostMapping("/pay-notify")
     @ApiOperation("支付回调")
     public CommonResult<Boolean> payNotify(@RequestBody @Valid PayNotifyOrderReqVO reqVO) {

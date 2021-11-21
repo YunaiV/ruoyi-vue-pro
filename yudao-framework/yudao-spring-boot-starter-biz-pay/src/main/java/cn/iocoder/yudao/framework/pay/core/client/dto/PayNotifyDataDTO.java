@@ -15,11 +15,15 @@ import java.util.Map;
 @Builder
 public class PayNotifyDataDTO {
 
-    // TODO @jason：使用 /** */ 的形式注释哈
-    //返回的所有参数
+
+    /**
+     *  HTTP 回调接口的 request body
+     */
     private String body;
 
 
-    //form 格式的 data;
+    /**
+     * HTTP 回调接口 content type 为 application/x-www-form-urlencoded 的所有参数
+     */
     private Map<String,String> params;
 }
