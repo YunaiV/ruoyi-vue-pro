@@ -27,8 +27,8 @@ public class PayAppExportReqVO {
     @ApiModelProperty(value = "退款结果的回调地址")
     private String refundNotifyUrl;
 
-    @ApiModelProperty(value = "商户编号")
-    private Long merchantId;
+    @ApiModelProperty(value = "商户名称")
+    private String merchantName;
 
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     @ApiModelProperty(value = "开始创建时间")

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-dialog :visible.sync="transferParam.open" @close="close" append-to-body>
+    <el-dialog :visible.sync="transferParam.wechatOpen" @close="close" append-to-body width="800px">
       <el-form ref="wechatJsApiForm" :model="form" :rules="rules" size="medium" label-width="100px"
                v-loading="transferParam.loading">
         <el-form-item label-width="180px" label="渠道费率" prop="feeRate">
@@ -22,7 +22,7 @@
             </el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label-width="180px" label="API  版本" prop="weChatConfig.apiVersion">
+        <el-form-item label-width="180px" label="API 版本" prop="weChatConfig.apiVersion">
           <el-radio-group v-model="form.weChatConfig.apiVersion" size="medium">
             <el-radio v-for="dict in versionDictDatas" :key="dict.value" :label="dict.value">
               {{ dict.label }}
@@ -32,9 +32,13 @@
         <el-form-item label-width="180px" label="商户秘钥" prop="weChatConfig.mchKey"
                       v-if="form.weChatConfig.apiVersion === 'v2'">
           <el-input v-model="form.weChatConfig.mchKey" placeholder="请输入商户秘钥" clearable
-                    :style="{width: '100%'}"></el-input>
+                    :style="{width: '100%'}" type="textarea" :autosize="{minRows: 8, maxRows: 8}"></el-input>
         </el-form-item>
         <div v-if="form.weChatConfig.apiVersion === 'v3'">
+          <el-form-item label-width="180px" label="API V3秘钥" prop="weChatConfig.apiV3Key">
+            <el-input v-model="form.weChatConfig.apiV3Key" placeholder="请输入API V3秘钥" clearable
+                      :style="{width: '100%'}" type="textarea" :autosize="{minRows: 8, maxRows: 8}"></el-input>
+          </el-form-item>
           <el-form-item label-width="180px" label="apiclient_key.perm证书" prop="weChatConfig.privateKeyContent">
             <el-input v-model="form.weChatConfig.privateKeyContent" type="textarea"
                       placeholder="请上传apiclient_key.perm证书"
@@ -45,9 +49,9 @@
                        :limit="1"
                        :accept="fileAccept"
                        :headers="header"
-                       :action="pemUploadAction"
+                       action=""
                        :before-upload="pemFileBeforeUpload"
-                       :on-success="privateKeyUploadSuccess"
+                       :http-request="privateKeyUpload"
             >
               <el-button size="small" type="primary" icon="el-icon-upload">点击上传</el-button>
             </el-upload>
@@ -62,9 +66,9 @@
                        :limit="1"
                        :accept="fileAccept"
                        :headers="header"
-                       :action="pemUploadAction"
+                       action=""
                        :before-upload="pemFileBeforeUpload"
-                       :on-success="privateCertUploadSuccess"
+                       :http-request="privateCertUpload"
             >
               <el-button size="small" type="primary" icon="el-icon-upload">点击上传</el-button>
             </el-upload>
@@ -83,10 +87,28 @@
 </template>
 <script>
 import {DICT_TYPE, getDictDatas} from "@/utils/dict";
-import {createWechatChannel, getWechatChannel, updateWechatChannel} from "@/api/pay/channel";
+import {createChannel, getChannel, updateChannel} from "@/api/pay/channel";
+
+const defaultForm = {
+  code: '',
+  status: null,
+  remark: '',
+  feeRate: null,
+  appId: '',
+  merchantId: null,
+  weChatConfig: {
+    appId: '',
+    mchId: '',
+    apiVersion: '',
+    mchKey: '',
+    privateKeyContent: '',
+    privateCertContent: '',
+    apiV3Key:'',
+  }
+}
 
 export default {
-  name: "wechatJsApiForm",
+  name: "wechatChannelForm",
   components: {},
   props: {
     // 传输的参数
@@ -96,7 +118,7 @@ export default {
       // 是否修改
       "edit": false,
       // 是否显示
-      "open": false,
+      "wechatOpen": false,
       // 应用ID
       "appId": null,
       // 渠道编码
@@ -112,22 +134,7 @@ export default {
   },
   data() {
     return {
-      form: {
-        code: undefined,
-        status: undefined,
-        remark: undefined,
-        feeRate: undefined,
-        appId: undefined,
-        merchantId: undefined,
-        weChatConfig: {
-          appId: undefined,
-          mchId: undefined,
-          apiVersion: undefined,
-          mchKey: undefined,
-          privateKeyContent: undefined,
-          privateCertContent: undefined,
-        }
-      },
+      form: JSON.parse(JSON.stringify(defaultForm)),
       rules: {
         feeRate: [{
           required: true,
@@ -147,12 +154,12 @@ export default {
         status: [{
           required: true,
           message: '渠道状态不能为空',
-          trigger: 'change'
+          trigger: 'blur'
         }],
         'weChatConfig.apiVersion': [{
           required: true,
           message: 'API版本不能为空',
-          trigger: 'change'
+          trigger: 'blur'
         }],
         'weChatConfig.mchKey': [{
           required: true,
@@ -169,12 +176,16 @@ export default {
           message: '请上传apiclient_cert.perm证书',
           trigger: 'blur'
         }],
+        'weChatConfig.apiV3Key': [{
+          required: true,
+          message: '请上传apiV3秘钥值',
+          trigger: 'blur'
+        }],
       },
       // 文件上传的header
       header: {
         "Authorization": null
       },
-      pemUploadAction: 'http://127.0.0.1:48080/api/pay/channel/parsing-pem',
       fileAccept: ".pem",
       // 渠道状态 数据字典
       statusDictDatas: getDictDatas(DICT_TYPE.PAY_CHANNEL_STATUS),
@@ -185,51 +196,66 @@ export default {
     transferParam: {
       deep: true,  // 深度监听
       handler(newVal) {
-        this.form.code = newVal.payCode;
-        this.form.appId = newVal.appId;
-        this.form.merchantId = newVal.payMerchant.id;
-        // 只有在初次进来为编辑 并且为加载中的时候才回去请求数据
-        if (newVal.edit === true && newVal.loading) {
-          this.init();
+        if (newVal.wechatOpen) {
+          this.form.code = newVal.payCode;
+          this.form.appId = newVal.appId;
+          this.form.merchantId = newVal.payMerchant.id;
+          // 只有在初次进来为编辑 并且为加载中的时候才回去请求数据
+          if (newVal.edit && newVal.loading) {
+            this.init();
+          }
         }
       }
     }
   },
-  created() {
-    this.header.Authorization = "Bearer " + this.$store.getters.token;
-  },
   methods: {
     init() {
-      getWechatChannel(this.transferParam.payMerchant.id, this.transferParam.appId, this.transferParam.payCode)
+      getChannel(this.transferParam.payMerchant.id, this.transferParam.appId, this.transferParam.payCode)
         .then(response => {
-          this.form = response.data;
+          this.form.id = response.data.id;
+          this.form.feeRate = response.data.feeRate;
+          this.form.appId = response.data.appId;
+          this.form.status = response.data.status;
+          this.form.remark = response.data.remark;
+
+          let config = JSON.parse(response.data.config);
+          this.form.weChatConfig.appId = config.appId;
+          this.form.weChatConfig.apiVersion = config.apiVersion;
+          this.form.weChatConfig.mchId = config.mchId;
+          this.form.weChatConfig.mchKey = config.mchKey;
+          this.form.weChatConfig.privateKeyContent = config.privateKeyContent;
+          this.form.weChatConfig.privateCertContent = config.privateCertContent;
+          this.form.weChatConfig.apiV3Key = config.apiV3Key;
           this.transferParam.loading = false;
         })
     },
     close() {
-      this.transferParam.open = false;
-      this.$refs['wechatJsApiForm'].resetFields();
+      this.transferParam.wechatOpen = false;
+      this.form = JSON.parse(JSON.stringify(defaultForm));
     },
     handleConfirm() {
       this.$refs['wechatJsApiForm'].validate(valid => {
         if (!valid) {
           return
         }
+        let data = this.form;
+        data.config = JSON.stringify(this.form.weChatConfig);
         if (this.transferParam.edit) {
-          updateWechatChannel(this.form).then(response => {
-            if (response.code === 0 ) {
+          updateChannel(data).then(response => {
+            if (response.code === 0) {
               this.msgSuccess("修改成功");
               this.close();
             }
 
           })
         } else {
-          createWechatChannel(this.form).then(response => {
-           if (response.code === 0) {
-             this.msgSuccess("新增成功");
-             this.$parent.refreshTable();
-             this.close();
-           }
+
+          createChannel(data).then(response => {
+            if (response.code === 0) {
+              this.msgSuccess("新增成功");
+              this.$parent.refreshTable();
+              this.close();
+            }
           });
         }
       });
@@ -246,11 +272,19 @@ export default {
       }
       return isRightSize
     },
-    privateKeyUploadSuccess(response) {
-      this.form.weChatConfig.privateKeyContent = response.data;
+    privateKeyUpload(event) {
+      const readFile = new FileReader()
+      readFile.onload = (e) => {
+        this.form.weChatConfig.privateKeyContent = e.target.result
+      }
+      readFile.readAsText(event.file);
     },
-    privateCertUploadSuccess(response) {
-      this.form.weChatConfig.privateCertContent = response.data;
+    privateCertUpload(event) {
+      const readFile = new FileReader()
+      readFile.onload = (e) => {
+        this.form.weChatConfig.privateCertContent = e.target.result
+      }
+      readFile.readAsText(event.file);
     }
   }
 }

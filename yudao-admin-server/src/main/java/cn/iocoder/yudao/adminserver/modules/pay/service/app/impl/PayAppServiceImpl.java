@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.adminserver.modules.pay.service.app.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.adminserver.modules.pay.controller.app.vo.PayAppCreateReqVO;
 import cn.iocoder.yudao.adminserver.modules.pay.controller.app.vo.PayAppExportReqVO;
@@ -7,6 +8,7 @@ import cn.iocoder.yudao.adminserver.modules.pay.controller.app.vo.PayAppPageReqV
 import cn.iocoder.yudao.adminserver.modules.pay.controller.app.vo.PayAppUpdateReqVO;
 import cn.iocoder.yudao.adminserver.modules.pay.convert.app.PayAppConvert;
 import cn.iocoder.yudao.adminserver.modules.pay.dal.mysql.app.PayAppMapper;
+import cn.iocoder.yudao.adminserver.modules.pay.dal.mysql.merchant.PayMerchantMapper;
 import cn.iocoder.yudao.adminserver.modules.pay.service.app.PayAppService;
 import cn.iocoder.yudao.adminserver.modules.pay.service.merchant.PayMerchantService;
 import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.merchant.PayAppDO;
@@ -18,10 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static cn.iocoder.yudao.coreservice.modules.pay.enums.PayErrorCodeCoreConstants.APP_NOT_EXISTS;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -43,7 +42,7 @@ public class PayAppServiceImpl implements PayAppService {
      * 商户 service 组件
      */
     @Resource
-    private PayMerchantService merchantService;
+    private PayMerchantMapper merchantMapper;
 
     @Override
     public Long createApp(PayAppCreateReqVO createReqVO) {
@@ -89,13 +88,20 @@ public class PayAppServiceImpl implements PayAppService {
 
     @Override
     public PageResult<PayAppDO> getAppPage(PayAppPageReqVO pageReqVO) {
-        // TODO @aquan：会有一个场景，merchantName 匹配不到商户编号的时候，应该返回没数据的
-        return appMapper.selectPage(pageReqVO, this.getMerchantCondition(pageReqVO.getMerchantName()));
+        Set<Long> merchantIdList = this.getMerchantCondition(pageReqVO.getMerchantName());
+        if (StrUtil.isNotBlank(pageReqVO.getMerchantName()) && CollectionUtil.isEmpty(merchantIdList)) {
+            return new PageResult<>();
+        }
+        return appMapper.selectPage(pageReqVO, merchantIdList);
     }
 
     @Override
     public List<PayAppDO> getAppList(PayAppExportReqVO exportReqVO) {
-        return appMapper.selectList(exportReqVO);
+        Set<Long> merchantIdList = this.getMerchantCondition(exportReqVO.getMerchantName());
+        if (StrUtil.isNotBlank(exportReqVO.getMerchantName()) && CollectionUtil.isEmpty(merchantIdList)) {
+            return new ArrayList<>();
+        }
+        return appMapper.selectList(exportReqVO, merchantIdList);
     }
 
     /**
@@ -108,7 +114,7 @@ public class PayAppServiceImpl implements PayAppService {
         if (StrUtil.isBlank(merchantName)) {
             return Collections.emptySet();
         }
-        return convertSet(merchantService.getMerchantListByName(merchantName), PayMerchantDO::getId);
+        return convertSet(merchantMapper.getMerchantListByName(merchantName), PayMerchantDO::getId);
     }
 
     /**
@@ -131,6 +137,7 @@ public class PayAppServiceImpl implements PayAppService {
 
     /**
      * 检查商户是否存在
+     *
      * @param id 商户编号
      */
     @VisibleForTesting

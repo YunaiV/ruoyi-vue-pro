@@ -1,23 +1,35 @@
 package cn.iocoder.yudao.adminserver.modules.pay.service.channel.impl;
 
 import cn.hutool.core.io.IoUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.adminserver.modules.pay.controller.channel.vo.*;
 import cn.iocoder.yudao.adminserver.modules.pay.convert.channel.PayChannelConvert;
 import cn.iocoder.yudao.adminserver.modules.pay.dal.mysql.channel.PayChannelMapper;
 import cn.iocoder.yudao.adminserver.modules.pay.service.channel.PayChannelService;
 import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.merchant.PayChannelDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
+import cn.iocoder.yudao.framework.pay.core.client.impl.alipay.AlipayPayClientConfig;
 import cn.iocoder.yudao.framework.pay.core.client.impl.wx.WXPayClientConfig;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import cn.iocoder.yudao.framework.pay.core.enums.PayChannelEnum;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.coreservice.modules.pay.enums.PayErrorCodeCoreConstants.*;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -25,7 +37,7 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 /**
  * 支付渠道 Service 实现类
  *
- * @author 芋艿 // TODO aquan：作者写自己哈
+ * @author aquan
  */
 @Service
 @Slf4j
@@ -36,11 +48,18 @@ public class PayChannelServiceImpl implements PayChannelService {
     private PayChannelMapper channelMapper;
 
     @Override
-    public Long createChannel(PayChannelCreateReqVO createReqVO) {
-        // 插入
-        PayChannelDO channel = PayChannelConvert.INSTANCE.convert(createReqVO);
+    public Long createChannel(PayChannelCreateReqVO reqVO) {
+
+        // 判断是否有重复的有责无法新增
+        Integer channelCount = this.getChannelCountByConditions(reqVO.getMerchantId(), reqVO.getAppId(), reqVO.getCode());
+        if (channelCount > 0) {
+            throw exception(CHANNEL_EXIST_SAME_CHANNEL_ERROR);
+        }
+
+        PayChannelDO channel = PayChannelConvert.INSTANCE.convert(reqVO);
+        settingConfigAndCheckParam(channel, reqVO.getConfig());
+
         channelMapper.insert(channel);
-        // 返回
         return channel.getId();
     }
 
@@ -49,8 +68,9 @@ public class PayChannelServiceImpl implements PayChannelService {
         // 校验存在
         this.validateChannelExists(updateReqVO.getId());
         // 更新
-        PayChannelDO updateObj = PayChannelConvert.INSTANCE.convert(updateReqVO);
-        channelMapper.updateById(updateObj);
+        PayChannelDO channel = PayChannelConvert.INSTANCE.convert(updateReqVO);
+        settingConfigAndCheckParam(channel, updateReqVO.getConfig());
+        channelMapper.updateById(channel);
     }
 
     @Override
@@ -88,53 +108,16 @@ public class PayChannelServiceImpl implements PayChannelService {
     }
 
     /**
-     * 根据支付应用ID集合获取所有的支付渠道
+     * 根据支付应用ID集合获得支付渠道列表
      *
-     * @param payIds 支付应用编号集合
-     * @return 支付渠道
+     * @param appIds 应用编号集合
+     * @return 支付渠道列表
      */
     @Override
-    public List<PayChannelDO> getSimpleChannels(Collection<Long> payIds) {
-        return channelMapper.selectList(new QueryWrapper<PayChannelDO>().lambda().in(PayChannelDO::getAppId, payIds));
+    public List<PayChannelDO> getChannelListByAppIds(Collection<Long> appIds) {
+        return channelMapper.getChannelListByAppIds(appIds);
     }
 
-    /**
-     * 解析pem文件获取公钥私钥字符串
-     *
-     * @param file pem公私钥文件
-     * @return 解析后的字符串
-     */
-    @Override
-    public String parsingPemFile(MultipartFile file) {
-        try {
-            return IoUtil.readUtf8(file.getInputStream());
-        } catch (IOException e) {
-            log.error("[parsingPemToString]读取pem[{}]文件错误", file.getOriginalFilename());
-            throw exception(CHANNEL_KEY_READ_ERROR);
-        }
-    }
-
-    /**
-     * 创建微信的渠道配置
-     *
-     * @param reqVO 创建信息
-     * @return 创建结果
-     */
-    @Override
-    public Long createWechatChannel(PayWechatChannelCreateReqVO reqVO) {
-
-        // 判断是否有重复的有责无法新增
-        Integer channelCount = this.getChannelCountByConditions(reqVO.getMerchantId(), reqVO.getAppId(), reqVO.getCode());
-        if (channelCount > 0) {
-            throw exception(EXIST_SAME_CHANNEL_ERROR);
-        }
-
-        PayChannelDO channel = PayChannelConvert.INSTANCE.convert(reqVO);
-        WXPayClientConfig config = PayChannelConvert.INSTANCE.configConvert(reqVO.getWeChatConfig());
-        channel.setConfig(config);
-        channelMapper.insert(channel);
-        return channel.getId();
-    }
 
     /**
      * 根据条件获取通道数量
@@ -146,14 +129,9 @@ public class PayChannelServiceImpl implements PayChannelService {
      */
     @Override
     public Integer getChannelCountByConditions(Long merchantId, Long appid, String code) {
-        return this.channelMapper.selectCount(new QueryWrapper<PayChannelDO>().lambda()
-                .eq(PayChannelDO::getMerchantId, merchantId)
-                .eq(PayChannelDO::getAppId, appid)
-                .eq(PayChannelDO::getCode, code)
-        );
+        return this.channelMapper.getChannelCountByConditions(merchantId, appid, code);
     }
 
-    // TODO @aquan：service 不出现 mybatis plus 哈
     /**
      * 根据条件获取通道
      *
@@ -164,25 +142,76 @@ public class PayChannelServiceImpl implements PayChannelService {
      */
     @Override
     public PayChannelDO getChannelByConditions(Long merchantId, Long appid, String code) {
-        return this.channelMapper.selectOne((new QueryWrapper<PayChannelDO>().lambda()
-                .eq(PayChannelDO::getMerchantId, merchantId)
-                .eq(PayChannelDO::getAppId, appid)
-                .eq(PayChannelDO::getCode, code)
-        ));
+        return this.channelMapper.getChannelByConditions(merchantId, appid, code);
     }
 
     /**
-     * 更新微信支付渠道
+     * 检测微信秘钥参数
      *
-     * @param updateReqVO 更新信息
+     * @param config 信秘钥参数
      */
-    @Override
-    public void updateWechatChannel(PayWechatChannelUpdateReqVO updateReqVO) {
-        // 校验存在
-        this.validateChannelExists(updateReqVO.getId());
-        PayChannelDO channel = PayChannelConvert.INSTANCE.convert(updateReqVO);
-        WXPayClientConfig config = PayChannelConvert.INSTANCE.configConvert(updateReqVO.getWeChatConfig());
-        channel.setConfig(config);
-        this.channelMapper.updateById(channel);
+    private void wechatParamCheck(WXPayClientConfig config) {
+        // 针对于 V2 或者 V3 版本的参数校验
+        if (WXPayClientConfig.API_VERSION_V2.equals(config.getApiVersion())) {
+            Assert.notNull(config.getMchKey(), CHANNEL_WECHAT_VERSION_2_MCH_KEY_IS_NULL.getMsg());
+        }
+        if (WXPayClientConfig.API_VERSION_V3.equals(config.getApiVersion())) {
+            Assert.notNull(config.getPrivateKeyContent(), CHANNEL_WECHAT_VERSION_3_PRIVATE_KEY_IS_NULL.getMsg());
+            Assert.notNull(config.getPrivateCertContent(), CHANNEL_WECHAT_VERSION_3_CERT_KEY_IS_NULL.getMsg());
+        }
+    }
+
+
+
+    /**
+     * 设置渠道配置以及参数校验
+     *
+     * @param channel   渠道
+     * @param configStr 配置
+     */
+    private void settingConfigAndCheckParam(PayChannelDO channel, String configStr) {
+
+        // 得到这个渠道是微信的还是支付宝的
+        String channelType = PayChannelEnum.verifyWechatOrAliPay(channel.getCode());
+        Assert.notNull(channelType, CHANNEL_NOT_EXISTS.getMsg());
+
+        // 进行验证
+        ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
+        Validator validator = validatorFactory.getValidator();
+
+        // 微信的验证
+        if (PayChannelEnum.WECHAT.equals(channelType)) {
+
+            WXPayClientConfig config = JSON.parseObject(configStr, WXPayClientConfig.class);
+            // 判断是V2 版本还是 V3 版本
+            Class clazz = config.getApiVersion().equals(WXPayClientConfig.API_VERSION_V2)
+                    ? WXPayClientConfig.V2.class : WXPayClientConfig.V3.class;
+            // 手动调用validate进行验证
+            Set<ConstraintViolation<WXPayClientConfig>> validate = validator.validate(config,clazz);
+
+            // 断言没有异常
+            Assert.isTrue(validate.isEmpty(), validate.stream().map(ConstraintViolation::getMessage)
+                    .collect(Collectors.joining(",")));
+
+            channel.setConfig(config);
+        }
+
+        // 支付宝验证
+        if (PayChannelEnum.ALIPAY.equals(channelType)) {
+
+            AlipayPayClientConfig config = JSON.parseObject(configStr, AlipayPayClientConfig.class);
+
+            // 判断是V2 版本还是 V3 版本
+            Class clazz = config.getMode().equals(AlipayPayClientConfig.MODE_PUBLIC_KEY)
+                    ? AlipayPayClientConfig.ModePublicKey.class : AlipayPayClientConfig.ModeCertificate.class;
+            // 手动调用validate进行验证
+            Set<ConstraintViolation<AlipayPayClientConfig>> validate = validator.validate(config,clazz);
+
+            // 断言没有异常
+            Assert.isTrue(validate.isEmpty(), validate.stream().map(ConstraintViolation::getMessage)
+                    .collect(Collectors.joining(",")));
+            channel.setConfig(config);
+        }
+
     }
 }

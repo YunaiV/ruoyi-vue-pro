@@ -1,40 +1,35 @@
 package cn.iocoder.yudao.adminserver.modules.pay.controller.channel;
 
-import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.merchant.PayChannelDO;
-import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
-import cn.iocoder.yudao.framework.pay.core.client.impl.wx.WXPayClientConfig;
-import cn.iocoder.yudao.framework.pay.core.client.impl.wx.WXPubPayClient;
-import org.springframework.util.Assert;
-import org.springframework.web.bind.annotation.*;
-
-import javax.annotation.Resource;
-
-import org.springframework.validation.annotation.Validated;
-import org.springframework.security.access.prepost.PreAuthorize;
-
-import io.swagger.annotations.*;
-
-import javax.validation.*;
-import javax.servlet.http.*;
-import java.util.*;
-import java.io.IOException;
-
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-
-import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-
-import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
-
-import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
-
-import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.*;
-
 import cn.iocoder.yudao.adminserver.modules.pay.controller.channel.vo.*;
 import cn.iocoder.yudao.adminserver.modules.pay.convert.channel.PayChannelConvert;
 import cn.iocoder.yudao.adminserver.modules.pay.service.channel.PayChannelService;
-import org.springframework.web.multipart.MultipartFile;
+import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.merchant.PayChannelDO;
+import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
+import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.List;
+
+import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
+
+/**
+ * 支付渠道 controller 组件
+ * @author aquan
+ */
 @Api(tags = "支付渠道")
 @RestController
 @RequestMapping("/pay/channel")
@@ -44,7 +39,7 @@ public class PayChannelController {
     @Resource
     private PayChannelService channelService;
 
-    // todo 芋艿 这几个生成的方法是没用到的 您看要不删除了把？ -----start
+
     @PostMapping("/create")
     @ApiOperation("创建支付渠道 ")
     @PreAuthorize("@ss.hasPermission('pay:channel:create')")
@@ -108,28 +103,7 @@ public class PayChannelController {
         ExcelUtils.write(response, "支付渠道.xls", "数据", PayChannelExcelVO.class, datas);
     }
 
-    // todo 芋艿 这几个生成的方法是没用到的 您看要不删除了把？ -----end
-
-    @PostMapping("/parsing-pem")
-    @ApiOperation("解析pem证书转换为字符串")
-    @PreAuthorize("@ss.hasPermission('pay:channel:parsing')")
-    @ApiImplicitParam(name = "file", value = "pem文件", required = true, dataTypeClass = MultipartFile.class)
-    public CommonResult<String> parsingPemFile(@RequestParam("file") MultipartFile file) {
-        return success(channelService.parsingPemFile(file));
-    }
-
-    @PostMapping("/create-wechat")
-    @ApiOperation("创建支付渠道 ")
-    @PreAuthorize("@ss.hasPermission('pay:channel:create')")
-    public CommonResult<Long> createWechatChannel(@Valid @RequestBody PayWechatChannelCreateReqVO reqVO) {
-        // 针对于 V2 或者 V3 版本的参数校验
-        this.paramAdvanceCheck(reqVO.getWeChatConfig().getApiVersion(),reqVO.getWeChatConfig().getMchKey(),
-                reqVO.getWeChatConfig().getPrivateKeyContent(),reqVO.getWeChatConfig().getPrivateCertContent());
-
-        return success(channelService.createWechatChannel(reqVO));
-    }
-
-    @GetMapping("/get-wechat")
+    @GetMapping("/get-channel")
     @ApiOperation("根据条件查询微信支付渠道")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "merchantId", value = "商户编号",
@@ -140,51 +114,16 @@ public class PayChannelController {
                     required = true, example = "wx_pub", dataTypeClass = String.class)
     })
     @PreAuthorize("@ss.hasPermission('pay:channel:query')")
-    public CommonResult<PayWeChatChannelRespVO> getWeChatChannel(
+    public CommonResult<PayChannelRespVO> getChannel(
             @RequestParam Long merchantId, @RequestParam Long appId, @RequestParam String code) {
 
         // 獲取渠道
         PayChannelDO channel = channelService.getChannelByConditions(merchantId, appId, code);
         if (channel == null) {
-            return success(new PayWeChatChannelRespVO());
+            return success(new PayChannelRespVO());
         }
-
         // 拼凑数据
-        PayWeChatChannelRespVO respVo = PayChannelConvert.INSTANCE.convert2(channel);
-        WXPayClientConfig config = (WXPayClientConfig) channel.getConfig();
-        respVo.setWeChatConfig(PayChannelConvert.INSTANCE.configConvert(config));
+        PayChannelRespVO respVo = PayChannelConvert.INSTANCE.convert(channel);
         return success(respVo);
     }
-
-    @PutMapping("/update-wechat")
-    @ApiOperation("更新微信支付渠道 ")
-    @PreAuthorize("@ss.hasPermission('pay:channel:update')")
-    public CommonResult<Boolean> updateWechatChannel(@Valid @RequestBody PayWechatChannelUpdateReqVO updateReqVO) {
-
-        // 针对于 V2 或者 V3 版本的参数校验
-        this.paramAdvanceCheck(updateReqVO.getWeChatConfig().getApiVersion(),updateReqVO.getWeChatConfig().getMchKey(),
-                updateReqVO.getWeChatConfig().getPrivateKeyContent(),updateReqVO.getWeChatConfig().getPrivateCertContent());
-
-        channelService.updateWechatChannel(updateReqVO);
-        return success(true);
-    }
-
-    /**
-     * 预检测微信秘钥参数
-     * @param version 版本
-     * @param mchKey v2版本秘钥
-     * @param privateKeyContent  v3版本apiclient_key
-     * @param privateCertContent v3版本中apiclient_cert
-     */
-    private void paramAdvanceCheck(String version, String mchKey, String privateKeyContent, String privateCertContent) {
-        // 针对于 V2 或者 V3 版本的参数校验
-        if (version.equals(WXPayClientConfig.API_VERSION_V2)) {
-            Assert.notNull(mchKey, "v2版本中商户密钥不可为空");
-        }
-        if (version.equals(WXPayClientConfig.API_VERSION_V3)) {
-            Assert.notNull(privateKeyContent, "v3版本apiclient_key.pem不可为空");
-            Assert.notNull(privateCertContent, "v3版本中apiclient_cert.pem不可为空");
-        }
-    }
-
 }

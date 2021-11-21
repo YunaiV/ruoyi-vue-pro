@@ -6,6 +6,7 @@ import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.merchant.PayChann
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.query.QueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.apache.ibatis.annotations.Mapper;
 import cn.iocoder.yudao.adminserver.modules.pay.controller.channel.vo.*;
 
@@ -26,7 +27,7 @@ public interface PayChannelMapper extends BaseMapperX<PayChannelDO> {
                 .eqIfPresent("fee_rate", reqVO.getFeeRate())
                 .eqIfPresent("merchant_id", reqVO.getMerchantId())
                 .eqIfPresent("app_id", reqVO.getAppId())
-                .eqIfPresent("config", reqVO.getConfig())
+                // .eqIfPresent("config", reqVO.getConfig())
                 .betweenIfPresent("create_time", reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
                 .orderByDesc("id")        );
     }
@@ -39,9 +40,52 @@ public interface PayChannelMapper extends BaseMapperX<PayChannelDO> {
                 .eqIfPresent("fee_rate", reqVO.getFeeRate())
                 .eqIfPresent("merchant_id", reqVO.getMerchantId())
                 .eqIfPresent("app_id", reqVO.getAppId())
-                .eqIfPresent("config", reqVO.getConfig())
+                // .eqIfPresent("config", reqVO.getConfig())
                 .betweenIfPresent("create_time", reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
                 .orderByDesc("id")        );
     }
 
+    /**
+     * 根据条件获取通道数量
+     *
+     * @param merchantId 商户编号
+     * @param appid      应用编号
+     * @param code       通道编码
+     * @return 数量
+     */
+    default Integer getChannelCountByConditions(Long merchantId, Long appid, String code) {
+
+        return this.selectCount(new QueryWrapper<PayChannelDO>().lambda()
+                .eq(PayChannelDO::getMerchantId, merchantId)
+                .eq(PayChannelDO::getAppId, appid)
+                .eq(PayChannelDO::getCode, code)
+        );
+    }
+
+    /**
+     * 根据条件获取通道
+     *
+     * @param merchantId 商户编号
+     * @param appid      应用编号
+     * @param code       通道编码
+     * @return 数量
+     */
+    default PayChannelDO getChannelByConditions(Long merchantId, Long appid, String code) {
+        return this.selectOne((new QueryWrapper<PayChannelDO>().lambda()
+                .eq(PayChannelDO::getMerchantId, merchantId)
+                .eq(PayChannelDO::getAppId, appid)
+                .eq(PayChannelDO::getCode, code)
+        ));
+    }
+
+    /**
+     * 根据支付应用ID集合获得支付渠道列表
+     *
+     * @param appIds 应用编号集合
+     * @return 支付渠道列表
+     */
+    default List<PayChannelDO> getChannelListByAppIds(Collection<Long> appIds){
+        return this.selectList(new QueryWrapper<PayChannelDO>().lambda()
+                .in(PayChannelDO::getAppId, appIds));
+    }
 }

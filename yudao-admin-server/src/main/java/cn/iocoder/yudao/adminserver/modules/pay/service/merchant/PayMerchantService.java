@@ -101,26 +101,13 @@ public interface PayMerchantService {
     List<PayMerchantDO> getMerchantListByNameLimit(String merchantName);
 
     /**
-     * 获得指定编号的商户列表
-     *
-     * @param merchantIds 商户编号数组
-     * @return 商户列表
-     */
-    // TODO @aquan：和 getMerchantList 重复了
-    List<PayMerchantDO> getSimpleMerchants(Collection<Long> merchantIds);
-
-    /**
      * 获得指定编号的商户 Map
      *
      * @param merchantIds 商户编号数组
      * @return 商户 Map
      */
     default Map<Long, PayMerchantDO> getMerchantMap(Collection<Long> merchantIds) {
-        // TODO @aquan：可以不用判空，交给 getMerchantList 解决
-        if (CollUtil.isEmpty(merchantIds)) {
-            return Collections.emptyMap();
-        }
-        List<PayMerchantDO> list = getSimpleMerchants(merchantIds);
+        List<PayMerchantDO> list =  this.getMerchantList(merchantIds);
         return CollectionUtils.convertMap(list, PayMerchantDO::getId);
     }
 

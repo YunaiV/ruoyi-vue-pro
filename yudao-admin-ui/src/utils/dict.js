@@ -39,7 +39,12 @@ export const DICT_TYPE = {
   PAY_CHANNEL_STATUS: 'pay_channel_status',
   // 微信渠道版本
   PAY_CHANNEL_WECHAT_VERSION:'pay_channel_wechat_version',
-
+  // 支付渠道支付宝算法类型
+  PAY_CHANNEL_ALIPAY_SIGN_TYPE:'pay_channel_alipay_sign_type',
+  // 支付宝公钥类型
+  PAY_CHANNEL_ALIPAY_MODE:'pay_channel_alipay_mode',
+  // 支付宝网关地址
+  PAY_CHANNEL_ALIPAY_SERVER_TYPE:'pay_channel_alipay_server_type',
 }
 
 /**

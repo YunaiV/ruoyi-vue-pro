@@ -1,9 +1,6 @@
-package cn.iocoder.yudao.adminserver.modules.pay.merchant.service;
+package cn.iocoder.yudao.adminserver.modules.pay.service.merchant;
 
 import cn.hutool.core.util.RandomUtil;
-import cn.hutool.http.HttpUtil;
-import cn.hutool.json.JSONObject;
-import cn.hutool.json.JSONUtil;
 import cn.iocoder.yudao.adminserver.BaseDbUnitTest;
 import cn.iocoder.yudao.adminserver.modules.pay.controller.merchant.vo.PayMerchantCreateReqVO;
 import cn.iocoder.yudao.adminserver.modules.pay.controller.merchant.vo.PayMerchantExportReqVO;
@@ -54,8 +51,7 @@ public class PayMerchantServiceTest extends BaseDbUnitTest {
         assertNotNull(merchantId);
         // 校验记录的属性是否正确
         PayMerchantDO merchant = merchantMapper.selectById(merchantId);
-        // TODO @aquan：需要判断 no 非空
-        assertPojoEquals(reqVO, merchant,"no");
+        assertPojoEquals(reqVO, merchant);
     }
 
     @Test

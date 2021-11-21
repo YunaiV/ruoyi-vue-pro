@@ -31,14 +31,14 @@ public interface PayAppMapper extends BaseMapperX<PayAppDO> {
                 .orderByDesc("id"));
     }
 
-    default List<PayAppDO> selectList(PayAppExportReqVO reqVO) {
+    default List<PayAppDO> selectList(PayAppExportReqVO reqVO, Collection<Long> merchantIds) {
         return selectList(new QueryWrapperX<PayAppDO>()
                 .likeIfPresent("name", reqVO.getName())
                 .eqIfPresent("status", reqVO.getStatus())
                 .eqIfPresent("remark", reqVO.getRemark())
                 .eqIfPresent("pay_notify_url", reqVO.getPayNotifyUrl())
                 .eqIfPresent("refund_notify_url", reqVO.getRefundNotifyUrl())
-                .eqIfPresent("merchant_id", reqVO.getMerchantId())
+                .inIfPresent("merchant_id", merchantIds)
                 .betweenIfPresent("create_time", reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
                 .orderByDesc("id"));
     }

@@ -16,4 +16,6 @@ public class PayChannelRespVO extends PayChannelBaseVO {
     @ApiModelProperty(value = "创建时间", required = true)
     private Date createTime;
 
+    @ApiModelProperty(value = "配置", required = true)
+    private String config;
 }

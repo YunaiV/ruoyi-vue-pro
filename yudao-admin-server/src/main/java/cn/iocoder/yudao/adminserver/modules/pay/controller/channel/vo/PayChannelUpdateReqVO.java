@@ -15,4 +15,7 @@ public class PayChannelUpdateReqVO extends PayChannelBaseVO {
     @NotNull(message = "商户编号不能为空")
     private Long id;
 
+    @ApiModelProperty(value = "通道配置的json字符串")
+    @NotBlank(message = "通道配置不能为空")
+    private String config;
 }

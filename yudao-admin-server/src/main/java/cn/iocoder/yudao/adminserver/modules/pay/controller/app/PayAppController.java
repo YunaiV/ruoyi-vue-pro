@@ -123,7 +123,7 @@ public class PayAppController {
 
         // 得到所有的应用编号，查出所有的通道
         Collection<Long> payAppIds = CollectionUtils.convertList(pageResult.getList(), PayAppDO::getId);
-        List<PayChannelDO> channels = channelService.getSimpleChannels(payAppIds);
+        List<PayChannelDO> channels = channelService.getChannelListByAppIds(payAppIds);
 
         // 得到所有的商户信息
         Collection<Long> merchantIds = CollectionUtils.convertList(pageResult.getList(), PayAppDO::getMerchantId);

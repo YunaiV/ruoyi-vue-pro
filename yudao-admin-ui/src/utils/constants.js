@@ -121,3 +121,8 @@ export const PayChannelEnum = {
     "name": "支付宝扫码支付"
   },
 }
+
+export const PayType = {
+  WECHAT: "WECHAT",
+  ALIPAY: "ALIPAY"
+}

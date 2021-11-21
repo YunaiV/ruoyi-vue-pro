@@ -28,12 +28,12 @@ export function deleteChannel(id) {
 }
 
 // 获得支付渠道
-export function getChannel(id) {
-  return request({
-    url: '/pay/channel/get?id=' + id,
-    method: 'get'
-  })
-}
+// export function getChannel(id) {
+//   return request({
+//     url: '/pay/channel/get?id=' + id,
+//     method: 'get'
+//   })
+// }
 
 
 
@@ -56,19 +56,10 @@ export function exportChannelExcel(query) {
   })
 }
 
-// 创建微信支付渠道
-export function createWechatChannel(data) {
-  return request({
-    url: '/pay/channel/create-wechat',
-    method: 'post',
-    data: data
-  })
-}
-
 // 获得支付渠道
-export function getWechatChannel(merchantId,appId,code) {
+export function getChannel(merchantId,appId,code) {
   return request({
-    url: '/pay/channel/get-wechat',
+    url: '/pay/channel/get-channel',
     params:{
       merchantId:merchantId,
       appId:appId,
@@ -78,11 +69,3 @@ export function getWechatChannel(merchantId,appId,code) {
   })
 }
 
-// 更新支付渠道
-export function updateWechatChannel(data) {
-  return request({
-    url: '/pay/channel/update-wechat',
-    method: 'put',
-    data: data
-  })
-}

@@ -57,68 +57,104 @@
       <el-table-column label="支付宝配置" align="center">
         <el-table-column :label="payChannelEnum.ALIPAY_APP.name" align="center">
           <template slot-scope="scope">
-            <el-button type="success" icon="el-icon-check" circle
-                       v-if="scope.row.payChannel.alipayApp === sysCommonStatusEnum.ENABLE"></el-button>
-            <el-button type="danger" icon="el-icon-close" circle
-                       v-if="scope.row.payChannel.alipayApp === sysCommonStatusEnum.DISABLE"></el-button>
+            <el-button
+              type="success" icon="el-icon-check" circle
+              @click="handleUpdateChannel(scope.row,payChannelEnum.ALIPAY_APP.code,payType.ALIPAY)"
+              v-if="scope.row.payChannel.alipayApp === sysCommonStatusEnum.ENABLE">
+            </el-button>
+            <el-button
+              type="danger" icon="el-icon-close" circle
+              @click="handleCreateChannel(scope.row,payChannelEnum.ALIPAY_APP.code,payType.ALIPAY)"
+              v-if="scope.row.payChannel.alipayApp === sysCommonStatusEnum.DISABLE">
+            </el-button>
           </template>
         </el-table-column>
         <el-table-column :label="payChannelEnum.ALIPAY_PC.name" align="center">
           <template slot-scope="scope">
-            <el-button type="success" icon="el-icon-check" circle
-                       v-if="scope.row.payChannel.alipayPc === sysCommonStatusEnum.ENABLE"></el-button>
-            <el-button type="danger" icon="el-icon-close" circle
-                       v-if="scope.row.payChannel.alipayPc === sysCommonStatusEnum.DISABLE"></el-button>
+            <el-button
+              type="success" icon="el-icon-check" circle
+              @click="handleUpdateChannel(scope.row,payChannelEnum.ALIPAY_PC.code,payType.ALIPAY)"
+              v-if="scope.row.payChannel.alipayPc === sysCommonStatusEnum.ENABLE">
+            </el-button>
+            <el-button
+              type="danger" icon="el-icon-close" circle
+              @click="handleCreateChannel(scope.row,payChannelEnum.ALIPAY_PC.code,payType.ALIPAY)"
+              v-if="scope.row.payChannel.alipayPc === sysCommonStatusEnum.DISABLE">
+            </el-button>
           </template>
         </el-table-column>
         <el-table-column :label="payChannelEnum.ALIPAY_WAP.name" align="center">
           <template slot-scope="scope">
-            <el-button type="success" icon="el-icon-check" circle
-                       v-if="scope.row.payChannel.alipayWap === sysCommonStatusEnum.ENABLE"></el-button>
-            <el-button type="danger" icon="el-icon-close" circle
-                       v-if="scope.row.payChannel.alipayWap === sysCommonStatusEnum.DISABLE"></el-button>
+            <el-button
+              type="success" icon="el-icon-check" circle
+              @click="handleUpdateChannel(scope.row,payChannelEnum.ALIPAY_WAP.code,payType.ALIPAY)"
+              v-if="scope.row.payChannel.alipayWap === sysCommonStatusEnum.ENABLE">
+            </el-button>
+            <el-button
+              type="danger" icon="el-icon-close" circle
+              @click="handleCreateChannel(scope.row,payChannelEnum.ALIPAY_WAP.code,payType.ALIPAY)"
+              v-if="scope.row.payChannel.alipayWap === sysCommonStatusEnum.DISABLE">
+            </el-button>
           </template>
         </el-table-column>
         <el-table-column :label="payChannelEnum.ALIPAY_QR.name" align="center">
           <template slot-scope="scope">
-            <el-button type="success" icon="el-icon-check" circle
-                       v-if="scope.row.payChannel.alipayQr === sysCommonStatusEnum.ENABLE"></el-button>
-            <el-button type="danger" icon="el-icon-close" circle
-                       v-if="scope.row.payChannel.alipayQr === sysCommonStatusEnum.DISABLE"></el-button>
+            <el-button
+              type="success" icon="el-icon-check" circle
+              @click="handleUpdateChannel(scope.row,payChannelEnum.ALIPAY_QR.code,payType.ALIPAY)"
+              v-if="scope.row.payChannel.alipayQr === sysCommonStatusEnum.ENABLE">
+
+            </el-button>
+            <el-button
+              type="danger" icon="el-icon-close" circle
+              @click="handleCreateChannel(scope.row,payChannelEnum.ALIPAY_QR.code,payType.ALIPAY)"
+              v-if="scope.row.payChannel.alipayQr === sysCommonStatusEnum.DISABLE">
+
+            </el-button>
           </template>
         </el-table-column>
       </el-table-column>
       <el-table-column label="微信配置" align="center">
         <el-table-column :label="payChannelEnum.WX_LITE.name" align="center">
           <template slot-scope="scope">
-            <el-button type="success" icon="el-icon-check" circle
-                       @click="handleUpdateChannel(scope.row,payChannelEnum.WX_LITE.code)"
-                       v-if="scope.row.payChannel.wxLite === sysCommonStatusEnum.ENABLE"></el-button>
-            <el-button type="danger" icon="el-icon-close" circle
-                       @click="handleCreateChannel(scope.row,payChannelEnum.WX_LITE.code)"
-                       v-if="scope.row.payChannel.wxLite === sysCommonStatusEnum.DISABLE"></el-button>
+            <el-button
+              type="success" icon="el-icon-check" circle
+              @click="handleUpdateChannel(scope.row,payChannelEnum.WX_LITE.code,payType.WECHAT)"
+              v-if="scope.row.payChannel.wxLite === sysCommonStatusEnum.ENABLE">
+            </el-button>
+            <el-button
+              type="danger" icon="el-icon-close" circle
+              @click="handleCreateChannel(scope.row,payChannelEnum.WX_LITE.code,payType.WECHAT)"
+              v-if="scope.row.payChannel.wxLite === sysCommonStatusEnum.DISABLE">
+            </el-button>
           </template>
         </el-table-column>
         <el-table-column :label="payChannelEnum.WX_PUB.name" align="center">
           <template slot-scope="scope">
             <el-button
               type="success" icon="el-icon-check" circle
-              @click="handleUpdateChannel(scope.row,payChannelEnum.WX_PUB.code)"
+              @click="handleUpdateChannel(scope.row,payChannelEnum.WX_PUB.code,payType.WECHAT)"
               v-if="scope.row.payChannel.wxPub === sysCommonStatusEnum.ENABLE">
             </el-button>
-            <el-button type="danger" icon="el-icon-close" circle
-                       @click="handleCreateChannel(scope.row,payChannelEnum.WX_PUB.code)"
-                       v-if="scope.row.payChannel.wxPub === sysCommonStatusEnum.DISABLE"></el-button>
+            <el-button
+              type="danger" icon="el-icon-close" circle
+              @click="handleCreateChannel(scope.row,payChannelEnum.WX_PUB.code,payType.WECHAT)"
+              v-if="scope.row.payChannel.wxPub === sysCommonStatusEnum.DISABLE">
+            </el-button>
           </template>
         </el-table-column>
         <el-table-column :label="payChannelEnum.WX_APP.name" align="center">
           <template slot-scope="scope">
-            <el-button type="success" icon="el-icon-check" circle
-                       @click="handleUpdateChannel(scope.row,payChannelEnum.WX_APP.code)"
-                       v-if="scope.row.payChannel.wxApp === sysCommonStatusEnum.ENABLE"></el-button>
-            <el-button type="danger" icon="el-icon-close" circle
-                       @click="handleCreateChannel(scope.row,payChannelEnum.WX_APP.code)"
-                       v-if="scope.row.payChannel.wxApp === sysCommonStatusEnum.DISABLE"></el-button>
+            <el-button
+              type="success" icon="el-icon-check" circle
+              @click="handleUpdateChannel(scope.row,payChannelEnum.WX_APP.code,payType.WECHAT)"
+              v-if="scope.row.payChannel.wxApp === sysCommonStatusEnum.ENABLE">
+            </el-button>
+            <el-button
+              type="danger" icon="el-icon-close" circle
+              @click="handleCreateChannel(scope.row,payChannelEnum.WX_APP.code,payType.WECHAT)"
+              v-if="scope.row.payChannel.wxApp === sysCommonStatusEnum.DISABLE">
+            </el-button>
           </template>
         </el-table-column>
       </el-table-column>
@@ -186,21 +222,24 @@
       </div>
     </el-dialog>
 
-    <wechat-js-api-form :transferParam="wechatChannelParam"></wechat-js-api-form>
+    <wechat-channel-form :transferParam="channelParam"></wechat-channel-form>
+    <ali-pay-channel-form :transferParam="channelParam"></ali-pay-channel-form>
   </div>
 </template>
 
 <script>
 import {createApp, updateApp, changeAppStatus, deleteApp, getApp, getAppPage, exportAppExcel} from "@/api/pay/app";
 import {DICT_TYPE, getDictDatas} from "@/utils/dict";
-import {PayChannelEnum, SysCommonStatusEnum} from "@/utils/constants";
+import {PayType, PayChannelEnum, SysCommonStatusEnum} from "@/utils/constants";
 import {getMerchantListByName} from "@/api/pay/merchant";
-import wechatJsApiForm from "@/views/pay/app/components/wechatJsApiForm";
+import wechatChannelForm from "@/views/pay/app/components/wechatChannelForm";
+import aliPayChannelForm from "@/views/pay/app/components/aliPayChannelForm";
 
 export default {
   name: "App",
   components: {
-    "wechatJsApiForm": wechatJsApiForm
+    "wechatChannelForm": wechatChannelForm,
+    "aliPayChannelForm": aliPayChannelForm
   },
   data() {
     return {
@@ -243,16 +282,20 @@ export default {
       sysCommonStatusEnum: SysCommonStatusEnum,
       // 支付渠道枚举
       payChannelEnum: PayChannelEnum,
+      // 支付类型
+      payType: PayType,
       // 商户列表
       merchantList: [],
       // 是否显示支付窗口
       payOpen: false,
       // 微信组件传参参数
-      wechatChannelParam: {
+      channelParam: {
         // 是否修改
-        "edit":false,
-        // 是否显示
-        "open":false,
+        "edit": false,
+        // 微信是否显示
+        "wechatOpen": false,
+        // 支付宝是否显示
+        "aliPayOpen": false,
         // 应用ID
         "appId": null,
         // 渠道编码
@@ -279,7 +322,6 @@ export default {
       this.addBeginAndEndTime(params, this.dateRangeCreateTime, 'createTime');
       // 执行查询
       getAppPage(params).then(response => {
-        console.log(response.data);
         this.list = response.data.list;
         this.total = response.data.total;
         this.loading = false;
@@ -355,9 +397,9 @@ export default {
         // 修改的提交
         if (this.form.id != null) {
           updateApp(this.form).then(response => {
-             this.msgSuccess("修改成功");
-             this.open = false;
-             this.getList();
+            this.msgSuccess("修改成功");
+            this.open = false;
+            this.getList();
           });
           return;
         }
@@ -407,33 +449,47 @@ export default {
      */
     handleGetMerchantListByName(name) {
       getMerchantListByName(name).then(response => {
-        console.log(response)
         this.merchantList = response.data;
       });
     },
     /**
      * 修改支付渠道信息
      */
-    handleUpdateChannel(row, payCode) {
-      this.wechatChannelParam.edit = true;
-      this.wechatChannelParam.loading = true;
-      this.wechatChannelParam.appId = row.id;
-      this.wechatChannelParam.payCode = payCode;
-      this.wechatChannelParam.payMerchant = row.payMerchant;
-      this.wechatChannelParam.open = true;
+    handleUpdateChannel(row, payCode, type) {
+      this.settingChannelParam(row, payCode, type)
+      this.channelParam.edit = true;
+      this.channelParam.loading = true;
+
     },
     /**
      * 新增支付渠道信息
      */
-    handleCreateChannel(row, payCode) {
-      this.wechatChannelParam.edit = false;
-      this.wechatChannelParam.loading = false;
-      this.wechatChannelParam.appId = row.id;
-      this.wechatChannelParam.payCode = payCode;
-      this.wechatChannelParam.payMerchant = row.payMerchant;
-      this.wechatChannelParam.open = true;
+    handleCreateChannel(row, payCode, type) {
+      this.settingChannelParam(row, payCode, type)
+      this.channelParam.edit = false;
+      this.channelParam.loading = false;
+
+
     },
-    refreshTable(){
+    /**
+     * 设置支付渠道信息
+     */
+    settingChannelParam(row, payCode, type) {
+      if (type === PayType.WECHAT) {
+        this.channelParam.wechatOpen = true;
+        this.channelParam.aliPayOpen = false;
+      }
+      if (type === PayType.ALIPAY) {
+        this.channelParam.aliPayOpen = true;
+        this.channelParam.wechatOpen = false;
+      }
+      this.channelParam.edit = false;
+      this.channelParam.loading = false;
+      this.channelParam.appId = row.id;
+      this.channelParam.payCode = payCode;
+      this.channelParam.payMerchant = row.payMerchant;
+    },
+    refreshTable() {
       this.getList();
     }
   }

@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * 支付渠道 Service 接口
  *
- * @author 芋艿 // TODO @aquan：作者不要我
+ * @author aquan
  */
 public interface PayChannelService {
 
@@ -76,31 +76,12 @@ public interface PayChannelService {
     List<PayChannelDO> getChannelList(PayChannelExportReqVO exportReqVO);
 
     /**
-     * 根据支付应用ID集合获取所有的支付渠道
+     * 根据支付应用ID集合获得支付渠道列表
      *
-     * @param payIds 支付应用编号集合
-     * @return 支付渠道
+     * @param appIds 应用编号集合
+     * @return 支付渠道列表
      */
-    // TODO @aquan：暂时不用提供这种哈。之前提供的原因，是数据字典比较特殊。
-    List<PayChannelDO> getSimpleChannels(Collection<Long> payIds);
-
-    /**
-     * 解析pem文件获取公钥私钥字符串
-     *
-     * @param file pem公私钥文件
-     * @return 解析后的字符串
-     */
-    // TODO @aquan：可以前端读取么？
-    String parsingPemFile(MultipartFile file);
-
-    /**
-     * 创建微信的渠道配置
-     *
-     * @param reqVO 创建信息
-     * @return 创建结果
-     */
-    // TODO @aquan：pojo 如果要做参数校验，需要添加 @Valid
-    Long createWechatChannel(PayWechatChannelCreateReqVO reqVO);
+    List<PayChannelDO> getChannelListByAppIds(Collection<Long> appIds);
 
     /**
      * 根据条件获取通道数量
@@ -122,10 +103,5 @@ public interface PayChannelService {
      */
     PayChannelDO getChannelByConditions(Long merchantId, Long appid, String code);
 
-    /**
-     * 更新微信支付渠道
-     *
-     * @param updateReqVO 更新信息
-     */
-    void updateWechatChannel(PayWechatChannelUpdateReqVO updateReqVO);
+
 }

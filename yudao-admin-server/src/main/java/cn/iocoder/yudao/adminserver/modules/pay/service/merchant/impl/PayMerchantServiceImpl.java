@@ -113,9 +113,7 @@ public class PayMerchantServiceImpl implements PayMerchantService {
      */
     @Override
     public List<PayMerchantDO> getMerchantListByName(String merchantName) {
-        // TODO @aquan：Service 层，不要出现 mybatis plus 的代码，要放到 mapper 里提供。技术与业务分离，原则上
-        return this.merchantMapper.selectList(new QueryWrapper<PayMerchantDO>()
-                .lambda().likeRight(PayMerchantDO::getName, merchantName));
+        return this.merchantMapper.getMerchantListByName(merchantName);
     }
 
     /**
@@ -150,16 +148,6 @@ public class PayMerchantServiceImpl implements PayMerchantService {
         }
     }
 
-    /**
-     * 获得指定编号的商户列表
-     *
-     * @param merchantIds 商户编号数组
-     * @return 商户列表
-     */
-    @Override
-    public List<PayMerchantDO> getSimpleMerchants(Collection<Long> merchantIds) {
-        return merchantMapper.selectBatchIds(merchantIds);
-    }
 
     // TODO @芋艿：后续增加下合适的算法
     /**

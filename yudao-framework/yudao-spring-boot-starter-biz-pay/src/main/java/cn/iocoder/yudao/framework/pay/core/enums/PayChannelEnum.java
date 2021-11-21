@@ -15,8 +15,6 @@ import lombok.Getter;
 public enum PayChannelEnum {
 
     WX_PUB("wx_pub", "微信 JSAPI 支付"), // 公众号的网页
-    // TODO @芋艿 这个地方你写的是 wx_lit 是不是少写了一个e？ 还是我这里多加了一个e
-    // TODO @aquan：这里就是 lite 哈，轻量
     WX_LITE("wx_lite","微信小程序支付"),
     WX_APP("wx_app", "微信 App 支付"),
 
@@ -36,8 +34,38 @@ public enum PayChannelEnum {
      */
     private String name;
 
+    /**
+     * 微信支付
+     */
+    public static final String WECHAT = "WECHAT";
+
+    /**
+     * 支付宝支付
+     */
+    public static final String ALIPAY = "ALIPAY";
+
     public static PayChannelEnum getByCode(String code) {
         return ArrayUtil.firstMatch(o -> o.getCode().equals(code), values());
+    }
+
+    /**
+     * 判断当前渠道是那种支付方式
+     * @param code
+     * @return
+     */
+    public static String verifyWechatOrAliPay(String code){
+        switch (PayChannelEnum.getByCode(code)){
+            case WX_PUB:
+            case WX_LITE:
+            case WX_APP:
+                return WECHAT;
+            case ALIPAY_PC:
+            case ALIPAY_WAP:
+            case ALIPAY_APP:
+            case ALIPAY_QR:
+                return ALIPAY;
+        }
+        return null;
     }
 
 }
