@@ -124,7 +124,7 @@ public class PayMerchantServiceImpl implements PayMerchantService {
      */
     @Override
     public List<PayMerchantDO> getMerchantListByNameLimit(String merchantName) {
-
+        // TODO @aquan：mybatis plus 哈
         LambdaQueryWrapper<PayMerchantDO> queryWrapper = new QueryWrapper<PayMerchantDO>().lambda()
                 .select(PayMerchantDO::getId, PayMerchantDO::getName)
                 .likeRight(PayMerchantDO::getName, merchantName)

@@ -10,6 +10,8 @@ import java.io.FileNotFoundException;
 
 // TODO 芋艿：参数校验
 
+// TODO @aquan: 不要全文件格式化哈，去掉下 <p> 看着不太友好哈
+
 /**
  * 微信支付的 PayClientConfig 实现类
  * 属性主要来自 {@link com.github.binarywang.wxpay.config.WxPayConfig} 的必要属性
@@ -71,6 +73,7 @@ public class WXPayClientConfig implements PayClientConfig {
      * <p>
      * 注意，可通过 {@link #main(String[])} 读取
      */
+    // TODO @aquan：对于只有一个值的时候，直接 groups = V3.class 即可，简洁。例如说，我们在 Spring MVC 注解，url 可以多个，也只写单个，一个道理哈
     @NotBlank(message = "apiclient_key 不能为空", groups = {V3.class})
     private String privateKeyContent;
     /**

@@ -19,7 +19,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
-import javax.validation.Validator;
 import java.util.List;
 
 import static cn.iocoder.yudao.coreservice.modules.pay.enums.PayErrorCodeCoreConstants.CHANNEL_NOT_EXISTS;
@@ -70,7 +69,7 @@ public class PayChannelServiceTest extends BaseDbUnitTest {
 
     @Test
     public void testCreateWechatVersion3Channel_success() {
-        // 准备参数
+        // 准备参数 TODO @aquan：多余的空行去掉哈。例如说 74 行。
 
         WXPayClientConfig v3Config = getV3Config();
         PayChannelCreateReqVO reqVO = randomPojo(PayChannelCreateReqVO.class, o -> {

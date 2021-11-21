@@ -1,31 +1,28 @@
 package cn.iocoder.yudao.adminserver.modules.pay.service.channel.impl;
 
-import cn.hutool.core.io.IoUtil;
-import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.adminserver.modules.pay.controller.channel.vo.*;
+import cn.iocoder.yudao.adminserver.modules.pay.controller.channel.vo.PayChannelCreateReqVO;
+import cn.iocoder.yudao.adminserver.modules.pay.controller.channel.vo.PayChannelExportReqVO;
+import cn.iocoder.yudao.adminserver.modules.pay.controller.channel.vo.PayChannelPageReqVO;
+import cn.iocoder.yudao.adminserver.modules.pay.controller.channel.vo.PayChannelUpdateReqVO;
 import cn.iocoder.yudao.adminserver.modules.pay.convert.channel.PayChannelConvert;
 import cn.iocoder.yudao.adminserver.modules.pay.dal.mysql.channel.PayChannelMapper;
 import cn.iocoder.yudao.adminserver.modules.pay.service.channel.PayChannelService;
 import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.merchant.PayChannelDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.pay.core.client.impl.alipay.AlipayPayClientConfig;
 import cn.iocoder.yudao.framework.pay.core.client.impl.wx.WXPayClientConfig;
 import cn.iocoder.yudao.framework.pay.core.enums.PayChannelEnum;
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -49,16 +46,16 @@ public class PayChannelServiceImpl implements PayChannelService {
 
     @Override
     public Long createChannel(PayChannelCreateReqVO reqVO) {
-
+        // TODO @aquan：感觉获得那一条比较合适。因为是有唯一性的。注释有错别字哈。
         // 判断是否有重复的有责无法新增
         Integer channelCount = this.getChannelCountByConditions(reqVO.getMerchantId(), reqVO.getAppId(), reqVO.getCode());
         if (channelCount > 0) {
             throw exception(CHANNEL_EXIST_SAME_CHANNEL_ERROR);
         }
 
+        // 新增渠道
         PayChannelDO channel = PayChannelConvert.INSTANCE.convert(reqVO);
         settingConfigAndCheckParam(channel, reqVO.getConfig());
-
         channelMapper.insert(channel);
         return channel.getId();
     }
@@ -170,16 +167,17 @@ public class PayChannelServiceImpl implements PayChannelService {
      * @param configStr 配置
      */
     private void settingConfigAndCheckParam(PayChannelDO channel, String configStr) {
-
         // 得到这个渠道是微信的还是支付宝的
         String channelType = PayChannelEnum.verifyWechatOrAliPay(channel.getCode());
         Assert.notNull(channelType, CHANNEL_NOT_EXISTS.getMsg());
 
         // 进行验证
+        // TODO @阿全：Spring 可以注入 Validator 哈
         ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
         Validator validator = validatorFactory.getValidator();
 
         // 微信的验证
+        // TODO @aquan：这么实现，可扩性不好。@AssertTrue 注解。
         if (PayChannelEnum.WECHAT.equals(channelType)) {
 
             WXPayClientConfig config = JSON.parseObject(configStr, WXPayClientConfig.class);

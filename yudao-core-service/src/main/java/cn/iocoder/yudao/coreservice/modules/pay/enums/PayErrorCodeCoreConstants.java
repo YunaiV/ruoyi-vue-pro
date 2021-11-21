@@ -27,6 +27,7 @@ public interface PayErrorCodeCoreConstants {
     ErrorCode CHANNEL_WECHAT_VERSION_2_MCH_KEY_IS_NULL = new ErrorCode(1007001006,"微信渠道v2版本中商户密钥不可为空");
     ErrorCode CHANNEL_WECHAT_VERSION_3_PRIVATE_KEY_IS_NULL = new ErrorCode(1007001006,"微信渠道v3版本apiclient_key.pem不可为空");
     ErrorCode CHANNEL_WECHAT_VERSION_3_CERT_KEY_IS_NULL = new ErrorCode(1007001006,"微信渠道v3版本中apiclient_cert.pem不可为空");
+
     /**
      * ========== ORDER 模块 1-007-002-000 ==========
      */
@@ -47,6 +48,8 @@ public interface PayErrorCodeCoreConstants {
     ErrorCode PAY_REFUND_ALL_REFUNDED = new ErrorCode(1007006001, "订单已经全额退款");
     ErrorCode PAY_REFUND_CHN_ORDER_NO_IS_NULL = new ErrorCode(1007006002, "该订单的渠道订单为空");
     ErrorCode PAY_REFUND_POST_HANDLER_NOT_FOUND = new ErrorCode(1007006002, "未找到对应的退款后置处理类");
+
+    // TODO @aquan：下面还两个要合并上去哈。另外一般中英文之间要有空格。例如说， 新建一个 order 数据；这样可读性更好。
 
     /**
      * ========== 支付商户信息 1-007-004-000 ==========
