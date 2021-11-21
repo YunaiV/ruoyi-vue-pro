@@ -285,6 +285,7 @@ public class SysAuthServiceImpl implements SysAuthService {
         MbrUserDO userDO = checkOldPassword(userId, reqVO.getOldPassword());
 
         // 更新用户密码
+        // TODO @宋天：不要更新整个对象哈
         userDO.setPassword(passwordEncoder.encode(reqVO.getPassword()));
         userMapper.updateById(userDO);
     }
@@ -299,6 +300,8 @@ public class SysAuthServiceImpl implements SysAuthService {
         }
         // TODO @芋艿 这一步没必要检验验证码与手机是否匹配，因为是根据验证码去redis中查找手机号，然后根据手机号查询用户
         //  也就是说 即便黑客以其他方式将验证码发送到自己手机上，最终还是会根据手机号查询用户然后进行重置密码的操作，不存在安全问题
+
+        // TODO @宋天：这块微信在讨论下哈~~~
 
         // 校验验证码
         smsCodeService.useSmsCode(userDO.getMobile(), SysSmsSceneEnum.FORGET_MOBILE_BY_SMS.getScene(), reqVO.getCode(),getClientIP());

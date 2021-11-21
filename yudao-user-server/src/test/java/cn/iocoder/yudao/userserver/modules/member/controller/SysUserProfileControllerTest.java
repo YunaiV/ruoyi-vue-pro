@@ -22,6 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  *
  * @author 宋天
  */
+// TODO @宋天：controller 的单测可以不写哈，因为收益太低了。未来我们做 qa 自动化测试
 public class SysUserProfileControllerTest {
 
     private MockMvc mockMvc;
@@ -35,7 +36,7 @@ public class SysUserProfileControllerTest {
     @Mock
     private SysSmsCodeService smsCodeService;
 
-    @Before
+    @Before // TODO @宋天：使用 junit5 哈
     public void setup() {
         // 初始化
         MockitoAnnotations.openMocks(this);
@@ -52,7 +53,7 @@ public class SysUserProfileControllerTest {
                         .content("{\"mobile\":\"15819844280\",\"code\":\"123456\"}}"))
                 .andExpect(status().isOk())
                 .andDo(MockMvcResultHandlers.print());
-
+// TODO @宋天：方法的结尾，不用空行哈
     }
 
 

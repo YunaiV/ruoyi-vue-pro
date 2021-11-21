@@ -58,10 +58,14 @@ public class SysSmsCodeServiceImpl implements SysSmsCodeService {
         // 创建验证码
         String code = this.createSmsCode(mobile, scene, createIp);
         // 发送验证码
+        // TODO @宋天：这里可以拓展下 SysSmsSceneEnum，支持设置对应的短信模板编号（不同场景的短信文案是不同的)、是否要校验手机号已经注册。这样 Controller 就可以收口成一个接口了。相当于说，不同场景，不同策略
         smsCoreService.sendSingleSmsToMember(mobile, null, SysSmsTemplateCodeConstants.USER_SMS_LOGIN,
                 MapUtil.of("code", code));
 
         // 存储手机号与验证码到redis，用于标记
+        // TODO @宋天：SysSmsCodeDO 表应该足够，无需增加额外的 redis 存储哇
+        // TODO @宋天：Redis 相关的操作，不要散落到业务层，而是写一个它对应的 RedisDAO。这样，实现业务与技术的解耦
+        // TODO @宋天：直接使用 code 作为 key，会存在 2 个问题：1）code 可能会冲突，多个手机号之间；2）缺少前缀。例如说 sms_code_${code}
         stringRedisTemplate.opsForValue().set(code,mobile,CODE_TIME, TimeUnit.MINUTES);
     }
 

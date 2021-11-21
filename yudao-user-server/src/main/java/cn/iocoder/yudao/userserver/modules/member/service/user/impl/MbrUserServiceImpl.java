@@ -126,8 +126,10 @@ public class MbrUserServiceImpl implements MbrUserService {
         // 检测用户是否存在
         MbrUserDO userDO = checkUserExists(userId);
         // 检测手机与验证码是否匹配
+        // TODO @宋天：修改手机的时候。应该要校验，老手机 + 老手机 code；新手机 + 新手机 code
         sysAuthService.checkIfMobileMatchCodeAndDeleteCode(userDO.getMobile(),reqVO.getCode());
         // 更新用户手机
+        // TODO @宋天：更新的时候，单独创建对象。直接全量更新，会可能导致属性覆盖。可以看看打印出来的 SQL 哈
         userDO.setMobile(reqVO.getMobile());
         userMapper.updateById(userDO);
     }

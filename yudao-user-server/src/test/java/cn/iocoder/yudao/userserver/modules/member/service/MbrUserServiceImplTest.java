@@ -6,7 +6,6 @@ import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.util.collection.ArrayUtils;
 import cn.iocoder.yudao.framework.redis.config.YudaoRedisAutoConfiguration;
 import cn.iocoder.yudao.userserver.BaseDbAndRedisUnitTest;
-import cn.iocoder.yudao.userserver.BaseDbUnitTest;
 import cn.iocoder.yudao.userserver.modules.member.controller.user.vo.MbrUserInfoRespVO;
 import cn.iocoder.yudao.userserver.modules.member.controller.user.vo.MbrUserUpdateMobileReqVO;
 import cn.iocoder.yudao.userserver.modules.member.dal.mysql.user.MbrUserMapper;
@@ -15,7 +14,6 @@ import cn.iocoder.yudao.userserver.modules.system.controller.auth.vo.SysAuthSend
 import cn.iocoder.yudao.userserver.modules.system.enums.sms.SysSmsSceneEnum;
 import cn.iocoder.yudao.userserver.modules.system.service.auth.impl.SysAuthServiceImpl;
 import cn.iocoder.yudao.userserver.modules.system.service.sms.SysSmsCodeService;
-import cn.iocoder.yudao.userserver.modules.system.service.sms.impl.SysSmsCodeServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
@@ -23,14 +21,16 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.annotation.Resource;
-import java.io.*;
+import java.io.ByteArrayInputStream;
 import java.util.function.Consumer;
 
 import static cn.hutool.core.util.RandomUtil.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomString;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
+
+// TODO @芋艿：单测的 review，等逻辑都达成一致后
 /**
  * {@link MbrUserServiceImpl} 的单元测试类
  *

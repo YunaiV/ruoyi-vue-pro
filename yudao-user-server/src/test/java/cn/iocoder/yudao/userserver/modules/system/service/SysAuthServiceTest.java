@@ -1,8 +1,6 @@
 package cn.iocoder.yudao.userserver.modules.system.service;
 
-import cn.hutool.core.util.ArrayUtil;
 import cn.iocoder.yudao.coreservice.modules.member.dal.dataobject.user.MbrUserDO;
-import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.user.SysUserDO;
 import cn.iocoder.yudao.coreservice.modules.system.service.auth.SysUserSessionCoreService;
 import cn.iocoder.yudao.coreservice.modules.system.service.logger.SysLoginLogCoreService;
 import cn.iocoder.yudao.coreservice.modules.system.service.social.SysSocialService;
@@ -10,11 +8,8 @@ import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.util.collection.ArrayUtils;
 import cn.iocoder.yudao.framework.redis.config.YudaoRedisAutoConfiguration;
 import cn.iocoder.yudao.userserver.BaseDbAndRedisUnitTest;
-import cn.iocoder.yudao.userserver.BaseDbUnitTest;
-import cn.iocoder.yudao.userserver.config.RedisTestConfiguration;
 import cn.iocoder.yudao.userserver.modules.member.dal.mysql.user.MbrUserMapper;
 import cn.iocoder.yudao.userserver.modules.member.service.user.MbrUserService;
-import cn.iocoder.yudao.userserver.modules.member.service.user.impl.MbrUserServiceImpl;
 import cn.iocoder.yudao.userserver.modules.system.controller.auth.vo.MbrAuthResetPasswordReqVO;
 import cn.iocoder.yudao.userserver.modules.system.controller.auth.vo.MbrAuthUpdatePasswordReqVO;
 import cn.iocoder.yudao.userserver.modules.system.service.auth.SysAuthService;
@@ -28,17 +23,17 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.annotation.Resource;
-
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 import static cn.hutool.core.util.RandomUtil.randomEle;
 import static cn.hutool.core.util.RandomUtil.randomNumbers;
-import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
+import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
+import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
-
+// TODO @芋艿：单测的 review，等逻辑都达成一致后
 /**
  * {@link SysAuthService} 的单元测试类
  *
@@ -67,7 +62,6 @@ public class SysAuthServiceTest extends BaseDbAndRedisUnitTest {
     private MbrUserMapper mbrUserMapper;
     @Resource
     private SysAuthServiceImpl authService;
-
 
     @Test
     public void testUpdatePassword_success(){

@@ -70,6 +70,7 @@ public class SysUserProfileController {
     @PreAuthenticated
     public CommonResult<Boolean> updateMobile(@RequestBody @Valid MbrUserUpdateMobileReqVO reqVO) {
         // 校验验证码
+        // TODO @宋天：统一到 userService.updateMobile 方法里
         smsCodeService.useSmsCode(reqVO.getMobile(),SysSmsSceneEnum.CHANGE_MOBILE_BY_SMS.getScene(), reqVO.getCode(),getClientIP());
 
         userService.updateMobile(getLoginUserId(), reqVO);
