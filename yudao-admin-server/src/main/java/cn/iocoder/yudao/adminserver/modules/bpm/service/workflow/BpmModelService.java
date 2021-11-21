@@ -13,20 +13,23 @@ import org.activiti.engine.repository.Model;
  */
 public interface BpmModelService {
 
-
     /**
      * 模型数据分页返回
      * @param modelPageReqVo 分页入参
      * @return 分页model
      */
+    // TODO @Li：getBpmModelPage。命名上，项目是 动词 + 完整实体；
     PageResult<Model> pageList(ModelPageReqVo modelPageReqVo);
 
+    // TODO @Li：不用返回 CommonResult
+    // TODO @Li：createBpmModal。
     /**
      * 新增一个模型
      * @param modelVO 模型对象
      * @return 返回成功
      */
     CommonResult<String> newModel(ModelVO modelVO);
+
     /**
      * 修改模型属性，填充bpmn数据
      * @param modelVO 模型对象

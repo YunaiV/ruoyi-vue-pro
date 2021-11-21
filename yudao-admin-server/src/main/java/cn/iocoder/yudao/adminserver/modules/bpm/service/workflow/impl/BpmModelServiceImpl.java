@@ -32,6 +32,7 @@ import java.util.Optional;
 
 /**
  * 工作流模型实现
+ *
  * @author yunlongn
  */
 @Slf4j
@@ -40,7 +41,6 @@ import java.util.Optional;
 public class BpmModelServiceImpl implements BpmModelService {
 
     private final RepositoryService repositoryService;
-
 
     @Override
     public PageResult<Model> pageList(ModelPageReqVo modelPageReqVo) {
@@ -59,6 +59,7 @@ public class BpmModelServiceImpl implements BpmModelService {
         try {
             //初始化一个空模型
             Model model = repositoryService.newModel();
+            // TODO @Li：name 可以直接赋值过去哈，不用声明一个变量
             String name = Optional.ofNullable(modelVO.getName()).orElse("new-process");
             //设置一些默认信息
             model.setName(name);
@@ -70,10 +71,11 @@ public class BpmModelServiceImpl implements BpmModelService {
             }
             return CommonResult.success(model.getId());
         }catch (Exception e){
+            // TODO @Li：这里可以捕获，交给全局么？
+            // TODO @Li：异常，是不是 error 比较合适，然后堆栈使用 e 直接打印即可
             log.info("模型创建失败！modelVO = {} e = {} ", modelVO, ExceptionUtils.getStackTrace(e));
             throw ServiceExceptionUtil.exception(BpmErrorCodeConstants.BPMN_MODEL_ERROR);
         }
-
     }
 
     @Override
@@ -117,6 +119,7 @@ public class BpmModelServiceImpl implements BpmModelService {
                 throw ServiceExceptionUtil.exception(BpmErrorCodeConstants.BPMN_MODEL_EDITOR_SOURCE_NOT_EXISTS);
             }
             // 将xml转换为流
+            // TODO @Li：这里是标准逻辑，看看 hutool 有没工具类提供。如果没有，咱自己封装一个
             ByteArrayInputStream inputStream = new ByteArrayInputStream(bytes);
             XMLInputFactory xif = XMLInputFactory.newInstance();
             InputStreamReader in = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
@@ -161,7 +164,9 @@ public class BpmModelServiceImpl implements BpmModelService {
 
     @Override
     public CommonResult<String> deleteModel(String modelId) {
+        // TODO @Li：activitie 是逻辑删除么？
         repositoryService.deleteModel(modelId);
         return CommonResult.success("删除成功");
     }
+
 }
