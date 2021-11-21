@@ -6,6 +6,7 @@ import cn.iocoder.yudao.adminserver.modules.system.enums.logger.SysLoginLogTypeE
 import cn.iocoder.yudao.adminserver.modules.system.enums.logger.SysLoginResultEnum;
 import cn.iocoder.yudao.adminserver.modules.system.service.auth.impl.SysAuthServiceImpl;
 import cn.iocoder.yudao.adminserver.modules.system.service.common.SysCaptchaService;
+import cn.iocoder.yudao.adminserver.modules.system.service.dept.SysPostService;
 import cn.iocoder.yudao.adminserver.modules.system.service.permission.SysPermissionService;
 import cn.iocoder.yudao.adminserver.modules.system.service.user.SysUserService;
 import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.user.SysUserDO;
@@ -67,6 +68,8 @@ public class SysAuthServiceImplTest extends BaseDbUnitTest {
     private SysUserSessionCoreService userSessionCoreService;
     @MockBean
     private SysSocialService socialService;
+    @MockBean
+    private SysPostService postService;
 
     @Test
     public void testLoadUserByUsername_success() {

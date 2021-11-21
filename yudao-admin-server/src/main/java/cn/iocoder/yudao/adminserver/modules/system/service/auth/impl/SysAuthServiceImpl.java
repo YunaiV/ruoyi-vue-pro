@@ -1,21 +1,17 @@
 package cn.iocoder.yudao.adminserver.modules.system.service.auth.impl;
 
-import cn.iocoder.yudao.adminserver.modules.system.service.auth.SysUserSessionService;
-import cn.iocoder.yudao.adminserver.modules.system.service.dept.SysPostService;
-import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
-import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
-import cn.iocoder.yudao.framework.security.core.LoginUser;
-import cn.iocoder.yudao.framework.common.util.monitor.TracerUtils;
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.adminserver.modules.system.controller.auth.vo.auth.SysAuthLoginReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.auth.vo.auth.SysAuthSocialBindReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.auth.vo.auth.SysAuthSocialLogin2ReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.auth.vo.auth.SysAuthSocialLoginReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.convert.auth.SysAuthConvert;
+import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.dept.SysPostDO;
 import cn.iocoder.yudao.adminserver.modules.system.enums.logger.SysLoginLogTypeEnum;
 import cn.iocoder.yudao.adminserver.modules.system.enums.logger.SysLoginResultEnum;
 import cn.iocoder.yudao.adminserver.modules.system.service.auth.SysAuthService;
 import cn.iocoder.yudao.adminserver.modules.system.service.common.SysCaptchaService;
+import cn.iocoder.yudao.adminserver.modules.system.service.dept.SysPostService;
 import cn.iocoder.yudao.adminserver.modules.system.service.permission.SysPermissionService;
 import cn.iocoder.yudao.adminserver.modules.system.service.user.SysUserService;
 import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.social.SysSocialUserDO;
@@ -45,16 +41,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import javax.annotation.Resource;
+import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.adminserver.modules.system.enums.SysErrorCodeConstants.*;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.adminserver.modules.system.enums.SysErrorCodeConstants.*;
-import static java.util.Collections.EMPTY_LIST;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static java.util.Collections.singleton;
 
 /**
@@ -83,7 +77,8 @@ public class SysAuthServiceImpl implements SysAuthService {
     @Resource
     private SysUserSessionCoreService userSessionCoreService;
     @Resource
-    private SysPostService sysPostService;
+    private SysPostService postService;
+    @Resource
     private SysSocialService socialService;
 
     // TODO @timfruit：静态枚举类，需要都大写，例如说 USER_TYPE_ENUM；静态变量，放在普通变量前面；这个实践不错哈。
@@ -130,11 +125,11 @@ public class SysAuthServiceImpl implements SysAuthService {
         return userSessionCoreService.createUserSession(loginUser, userIp, userAgent);
     }
 
-
     private List<String> getUserPosts(Set<Long> postIds) {
-        return Optional.ofNullable(postIds).map(ids->
-               sysPostService.getPosts(ids).stream().map(post -> post.getCode()).collect(Collectors.toList())
-        ).orElse(EMPTY_LIST);
+        if (CollUtil.isEmpty(postIds)) {
+            return Collections.emptyList();
+        }
+        return convertList(postService.getPosts(postIds), SysPostDO::getCode);
     }
 
     private void verifyCaptcha(String username, String captchaUUID, String captchaCode) {
