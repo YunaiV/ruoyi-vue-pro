@@ -25,6 +25,7 @@ public class AlipayQrPayClientTest extends BaseMockitoUnitTest {
         .setAppId("2021000118634035")
         .setServerUrl(AlipayPayClientConfig.SERVER_URL_SANDBOX)
         .setSignType(AlipayPayClientConfig.SIGN_TYPE_DEFAULT)
+        // TODO @tina：key 可以随机就好，简洁一点哈。
         .setPrivateKey("MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCHsEV1cDupwJ" +
                 "v890x84qbppUtRIfhaKSwSVN0thCcsDCaAsGR5MZslDkO8NCT9V4r2SVXjyY7eJUZlZd1M0C8T" +
                 "01Tg4UOx5LUbic0O3A1uJMy6V1n9IyYwbAW3AEZhBd5bSbPgrqvmv3NeWSTQT6Anxnllf+2iDH" +
@@ -50,8 +51,8 @@ public class AlipayQrPayClientTest extends BaseMockitoUnitTest {
                 "gnZFv2gK51HExF8v/BaP7P979PhFMgWTqmOOI+Dtno5s+yD09XTY1WkshbLk6i4g2Xlr8fyW9ODnkU88RI2w9UdPhQU4cPPwBN" +
                 "lrsYhKkVK2OxwM3kFqjoBBY0CZoZCsSQ3LDH5WeZqPArlsS6xa2zqJBuuoKjMrdpELl3eXSjP8K54eDJCbeetCZNKWLL3DPahTPB7LZ" +
                 "ikfYmslb0QUvCgGapD0xkS7eVq70NaL1G57MWABs4tbfWgxike4Daj3EfUrzIVspQxj7w8HEj9WozJPgL88kSJSits0pqD3n5r8HSuseQIDAQAB");
-    // 创建客户端
 
+    // TODO @tina：= 前后要有空格哈
     @InjectMocks
     AlipayQrPayClient client=new AlipayQrPayClient(10L,config);
 
@@ -66,7 +67,8 @@ public class AlipayQrPayClientTest extends BaseMockitoUnitTest {
     }
     @Test
     public void create() throws AlipayApiException {
-
+        // TODO @tina：参数可以尽量随机一点，使用随机方法。这样的好处是，避免对固定参数的依赖，导致可能仅仅满足固定参数的结果
+        // 这里，设置可以直接随机整个对象。
         Long shopOrderId = System.currentTimeMillis();
         PayOrderUnifiedReqDTO reqDTO=new PayOrderUnifiedReqDTO();
         reqDTO.setMerchantOrderId(String.valueOf(System.currentTimeMillis()));
@@ -88,6 +90,7 @@ public class AlipayQrPayClientTest extends BaseMockitoUnitTest {
         // 断言
         assertEquals(response.getCode(), result.getApiCode());
         assertEquals(response.getMsg(), result.getApiMsg());
+        // TODO @tina：这个断言木有过？
         assertEquals(GlobalErrorCodeConstants.SUCCESS.getCode(), result.getCode());
         assertEquals(GlobalErrorCodeConstants.SUCCESS.getMsg(), result.getMsg());
 

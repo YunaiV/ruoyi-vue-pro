@@ -105,12 +105,11 @@ public abstract class AbstractPayClient<Config extends PayClientConfig> implemen
 
     @Override
     public PayRefundUnifiedRespDTO unifiedRefund(PayRefundUnifiedReqDTO reqDTO) {
-
         PayRefundUnifiedRespDTO resp;
         try {
             resp = doUnifiedRefund(reqDTO);
-        }catch (SocketTimeoutException ex){
-            //网络 read time out 异常
+        } catch (SocketTimeoutException ex){
+            // 网络 read time out 异常
             log.error("[unifiedRefund][request({}) 发起退款失败,网络读超时，退款状态未知]", toJsonString(reqDTO), ex);
             return PayRefundUnifiedRespDTO.builder()
                     .exceptionMsg(ex.getMessage())

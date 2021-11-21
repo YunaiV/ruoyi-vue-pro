@@ -22,7 +22,6 @@ public class PayRefundReqVO {
     @NotEmpty(message = "退款金额")
     private Long amount;
 
-
     @ApiModelProperty(value = "退款原因", required = true, example = "不喜欢")
     @NotEmpty(message = "退款原因")
     private String reason;

@@ -15,6 +15,7 @@ import java.util.Map;
 @Builder
 public class PayNotifyDataDTO {
 
+    // TODO @jason：使用 /** */ 的形式注释哈
     //返回的所有参数
     private String body;
 

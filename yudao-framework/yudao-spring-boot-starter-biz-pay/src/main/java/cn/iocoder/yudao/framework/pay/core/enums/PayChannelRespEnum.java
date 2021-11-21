@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.framework.pay.core.enums;
 
+// TODO @芋艿：感觉情况有点多，得讨论下
 /**
  * 统一的渠道返回结果
  * @author  jason
