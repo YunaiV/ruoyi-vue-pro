@@ -47,8 +47,8 @@ public interface PayErrorCodeCoreConstants {
     ErrorCode PAY_REFUND_AMOUNT_EXCEED = new ErrorCode(1007006000, "退款金额超过订单可退款金额");
     ErrorCode PAY_REFUND_ALL_REFUNDED = new ErrorCode(1007006001, "订单已经全额退款");
     ErrorCode PAY_REFUND_CHN_ORDER_NO_IS_NULL = new ErrorCode(1007006002, "该订单的渠道订单为空");
-    ErrorCode PAY_REFUND_POST_HANDLER_NOT_FOUND = new ErrorCode(1007006002, "未找到对应的退款后置处理类");
-
+    ErrorCode PAY_REFUND_POST_HANDLER_NOT_FOUND = new ErrorCode(1007006003, "未找到对应的退款后置处理类");
+    ErrorCode PAY_REFUND_NOT_FOUND = new ErrorCode(1007006004, "支付退款单不存在");
     // TODO @aquan：下面还两个要合并上去哈。另外一般中英文之间要有空格。例如说， 新建一个 order 数据；这样可读性更好。
 
     /**

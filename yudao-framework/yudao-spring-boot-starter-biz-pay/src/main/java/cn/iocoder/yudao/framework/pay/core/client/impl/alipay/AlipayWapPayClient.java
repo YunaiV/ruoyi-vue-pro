@@ -6,6 +6,7 @@ import cn.iocoder.yudao.framework.pay.core.client.PayCommonResult;
 import cn.iocoder.yudao.framework.pay.core.client.dto.*;
 import cn.iocoder.yudao.framework.pay.core.client.impl.AbstractPayClient;
 import cn.iocoder.yudao.framework.pay.core.enums.PayChannelEnum;
+import cn.iocoder.yudao.framework.pay.core.enums.PayNotifyRefundStatusEnum;
 import cn.iocoder.yudao.framework.pay.core.enums.PayChannelRespEnum;
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.AlipayConfig;
@@ -103,7 +104,6 @@ public class AlipayWapPayClient extends AbstractPayClient<AlipayPayClientConfig>
                 .data(data.getBody()).build();
     }
 
-
     @Override
     protected PayRefundUnifiedRespDTO doUnifiedRefund(PayRefundUnifiedReqDTO reqDTO)  {
         AlipayTradeRefundModel model=new AlipayTradeRefundModel();
@@ -119,11 +119,10 @@ public class AlipayWapPayClient extends AbstractPayClient<AlipayPayClientConfig>
             AlipayTradeRefundResponse response =  client.execute(refundRequest);
             log.info("[doUnifiedRefund][response({}) 发起退款 渠道返回", toJsonString(response));
             if (response.isSuccess()) {
-                //退款成功
+                //退款成功,更新为PROCESSING_NOTIFY， 而不是 SYNC_SUCCESS 通过支付宝回调接口处理。退款导致触发的异步通知，
+                //退款导致触发的异步通知是发送到支付接口中设置的notify_url
                 //TODO 沙箱环境 返回 的tradeNo(渠道退款单号） 和 订单的tradNo 是一个值，是不是理解不对?
-                respDTO.setRespEnum(PayChannelRespEnum.SYNC_SUCCESS)
-                        .setChannelRefundNo(response.getTradeNo())
-                        .setPayTradeNo(response.getOutTradeNo());
+                respDTO.setRespEnum(PayChannelRespEnum.PROCESSING_NOTIFY);
             }else{
                 //特殊处理 sub_code  ACQ.SYSTEM_ERROR（系统错误）， 需要调用重试任务
                 //沙箱环境返回的貌似是”aop.ACQ.SYSTEM_ERROR“， 用contain
@@ -153,12 +152,20 @@ public class AlipayWapPayClient extends AbstractPayClient<AlipayPayClientConfig>
                         .setChannelErrMsg(e.getErrMsg())
                         .setRespEnum(PayChannelRespEnum.CALL_EXCEPTION);
             }
-
             return respDTO;
-
         }
+    }
 
-
+    @Override
+    public PayRefundNotifyDTO parseRefundNotify(PayNotifyDataDTO notifyData) {
+        Map<String, String> params = notifyData.getParams();
+        PayRefundNotifyDTO notifyDTO = PayRefundNotifyDTO.builder().channelOrderNo(params.get("trade_no"))
+                .tradeNo(params.get("out_trade_no"))
+                .reqNo(params.get("out_biz_no"))
+                .status(PayNotifyRefundStatusEnum.SUCCESS)
+                .refundSuccessTime(DateUtil.parse(params.get("gmt_refund"), "yyyy-MM-dd HH:mm:ss"))
+                .build();
+        return notifyDTO;
     }
 
 }

@@ -37,6 +37,7 @@ public class PayRefundController {
         reqBO.setUserIp(getClientIP());
         //TODO 测试暂时模拟生成商户退款订单
         reqBO.setMerchantRefundNo(PaySeqUtils.genMerchantRefundNo());
+        //reqBO.setMerchantRefundNo("MO202111210814084370000");
         return CommonResult.success( PayRefundConvert.INSTANCE.convert(payRefundCoreService.refund(reqBO)));
     }
 }

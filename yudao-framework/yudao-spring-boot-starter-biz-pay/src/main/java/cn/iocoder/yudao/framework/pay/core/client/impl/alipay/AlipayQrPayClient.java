@@ -84,6 +84,12 @@ public class AlipayQrPayClient extends AbstractPayClient<AlipayPayClientConfig> 
     }
 
     @Override
+    public PayRefundNotifyDTO parseRefundNotify(PayNotifyDataDTO notifyData) {
+        //TODO 需要实现
+        throw new UnsupportedOperationException("需要实现");
+    }
+
+    @Override
     protected PayRefundUnifiedRespDTO doUnifiedRefund(PayRefundUnifiedReqDTO reqDTO) throws Throwable {
         //TODO 需要实现
         throw new UnsupportedOperationException();

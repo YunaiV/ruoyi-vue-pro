@@ -3,6 +3,7 @@ package cn.iocoder.yudao.userserver.modules.pay.controller.order;
 import cn.hutool.core.bean.BeanUtil;
 import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.order.PayOrderDO;
 import cn.iocoder.yudao.coreservice.modules.pay.service.order.PayOrderCoreService;
+import cn.iocoder.yudao.coreservice.modules.pay.service.order.PayRefundCoreService;
 import cn.iocoder.yudao.coreservice.modules.pay.service.order.dto.PayOrderSubmitReqDTO;
 import cn.iocoder.yudao.coreservice.modules.pay.service.order.dto.PayOrderSubmitRespDTO;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
@@ -33,6 +34,9 @@ public class PayOrderController {
 
     @Resource
     private PayOrderCoreService payOrderCoreService;
+
+    @Resource
+    private PayRefundCoreService payRefundCoreService;
 
     @PostMapping("/submit")
     @ApiOperation("提交支付订单")
@@ -85,10 +89,20 @@ public class PayOrderController {
     public String notifyAliPayWapPayOrder(@PathVariable("channelId") Long channelId,
                                           @RequestParam Map<String, String> params,
                                           @RequestBody String originData) throws Exception {
-        //TODO @jason 校验 是否支付宝调用。 payclient 中加一个校验方法
-        payOrderCoreService.notifyPayOrder(channelId, PayChannelEnum.ALIPAY_WAP.getCode(), PayNotifyDataDTO.builder().params(params).body(originData).build());
+        //TODO 校验是否支付宝调用。 payclient 中加一个校验方法
+        //支付宝退款交易也会触发支付回调接口
+        //参考 https://opensupport.alipay.com/support/helpcenter/193/201602484851
+        //判断是否为支付宝的退款交易
+        if(isAliPayRefund(params)) {
+            //退款通知
+            payRefundCoreService.notifyPayRefund(channelId,PayChannelEnum.ALIPAY_WAP.getCode(), PayNotifyDataDTO.builder().params(params).body(originData).build());
+        }else{
+            //支付通知
+            payOrderCoreService.notifyPayOrder(channelId, PayChannelEnum.ALIPAY_WAP.getCode(), PayNotifyDataDTO.builder().params(params).body(originData).build());
+        }
         return "success";
     }
+
 
     /**
      * https://opendocs.alipay.com/open/203/105285#%E5%89%8D%E5%8F%B0%E5%9B%9E%E8%B7%B3%E5%8F%82%E6%95%B0%E8%AF%B4%E6%98%8E
@@ -100,6 +114,19 @@ public class PayOrderController {
     public String returnAliPayWapPayOrder(@PathVariable("channelId") Long channelId){
         //TODO 校验 是否支付宝调用。 可以根据 appId 跳转不同的页面
         return "支付成功";
+    }
+
+    /**
+     * 是否是支付宝的退款交易
+     * @param params http content-type application/x-www-form-urlencoded 的参数
+     * @return
+     */
+    private boolean  isAliPayRefund(Map<String, String> params) {
+        if (params.containsKey("refund_fee")) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     @RequestMapping("/notify/test")

@@ -42,4 +42,11 @@ public interface PayClient {
      */
     PayRefundUnifiedRespDTO unifiedRefund(PayRefundUnifiedReqDTO reqDTO);
 
+    /**
+     * 解析支付退款通知数据
+     * @param notifyData  支付退款通知请求数据
+     * @return 支付退款通知的Notify DTO
+     */
+    PayRefundNotifyDTO parseRefundNotify(PayNotifyDataDTO notifyData);
+
 }
