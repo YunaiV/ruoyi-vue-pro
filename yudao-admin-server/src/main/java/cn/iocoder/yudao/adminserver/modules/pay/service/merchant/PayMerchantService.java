@@ -92,14 +92,6 @@ public interface PayMerchantService {
      */
     List<PayMerchantDO> getMerchantListByName(String merchantName);
 
-    // TODO aquan：暂时不用提供这样的检索。商户不多的。
-    /**
-     * 根据商户名称模糊查询一定数量的商户集合
-     * @param merchantName 商户名称
-     * @return 商户集合
-     */
-    List<PayMerchantDO> getMerchantListByNameLimit(String merchantName);
-
     /**
      * 获得指定编号的商户 Map
      *

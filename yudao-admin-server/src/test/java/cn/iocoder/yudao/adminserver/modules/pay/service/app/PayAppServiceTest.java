@@ -92,7 +92,7 @@ public class PayAppServiceTest extends BaseDbUnitTest {
         PayAppUpdateReqVO reqVO = randomPojo(PayAppUpdateReqVO.class, o ->
                 o.setStatus((RandomUtil.randomEle(CommonStatusEnum.values()).getStatus())));
         // 调用, 并断言异常
-        assertServiceException(() -> appService.updateApp(reqVO), APP_NOT_EXISTS);
+        assertServiceException(() -> appService.updateApp(reqVO), PAY_APP_NOT_FOUND);
     }
 
     @Test
@@ -116,7 +116,7 @@ public class PayAppServiceTest extends BaseDbUnitTest {
         Long id = randomLongId();
 
         // 调用, 并断言异常
-        assertServiceException(() -> appService.deleteApp(id), APP_NOT_EXISTS);
+        assertServiceException(() -> appService.deleteApp(id), PAY_APP_NOT_FOUND);
     }
 
     @Test

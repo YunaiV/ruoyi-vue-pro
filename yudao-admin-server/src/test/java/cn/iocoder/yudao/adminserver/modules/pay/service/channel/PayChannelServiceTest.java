@@ -34,7 +34,10 @@ import static org.junit.jupiter.api.Assertions.*;
  *
  * @author 芋艿
  */
-@Import(PayChannelServiceImpl.class)
+@Import({
+        PayChannelServiceImpl.class,
+        PayChannelConfig.class
+})
 public class PayChannelServiceTest extends BaseDbUnitTest {
 
     @Resource
@@ -42,7 +45,6 @@ public class PayChannelServiceTest extends BaseDbUnitTest {
 
     @Resource
     private PayChannelMapper channelMapper;
-
 
     @Test
     public void testCreateWechatVersion2Channel_success() {
@@ -69,8 +71,7 @@ public class PayChannelServiceTest extends BaseDbUnitTest {
 
     @Test
     public void testCreateWechatVersion3Channel_success() {
-        // 准备参数 TODO @aquan：多余的空行去掉哈。例如说 74 行。
-
+        // 准备参数
         WXPayClientConfig v3Config = getV3Config();
         PayChannelCreateReqVO reqVO = randomPojo(PayChannelCreateReqVO.class, o -> {
             o.setCode(PayChannelEnum.WX_PUB.getCode());

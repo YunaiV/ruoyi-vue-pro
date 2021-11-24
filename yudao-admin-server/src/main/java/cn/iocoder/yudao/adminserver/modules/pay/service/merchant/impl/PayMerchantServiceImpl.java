@@ -10,8 +10,6 @@ import cn.iocoder.yudao.adminserver.modules.pay.dal.mysql.merchant.PayMerchantMa
 import cn.iocoder.yudao.adminserver.modules.pay.service.merchant.PayMerchantService;
 import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.merchant.PayMerchantDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.google.common.annotations.VisibleForTesting;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -21,7 +19,7 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
-import static cn.iocoder.yudao.coreservice.modules.pay.enums.PayErrorCodeCoreConstants.MERCHANT_NOT_EXISTS;
+import static cn.iocoder.yudao.coreservice.modules.pay.enums.PayErrorCodeCoreConstants.PAY_MERCHANT_NOT_EXISTS;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 /**
  * 支付商户信息 Service 实现类
@@ -64,7 +62,7 @@ public class PayMerchantServiceImpl implements PayMerchantService {
 
     private void validateMerchantExists(Long id) {
         if (merchantMapper.selectById(id) == null) {
-            throw exception(MERCHANT_NOT_EXISTS);
+            throw exception(PAY_MERCHANT_NOT_EXISTS);
         }
     }
 
@@ -116,22 +114,6 @@ public class PayMerchantServiceImpl implements PayMerchantService {
         return this.merchantMapper.getMerchantListByName(merchantName);
     }
 
-    /**
-     * 根据商户名称模糊查询一定数量的商户集合
-     *
-     * @param merchantName 商户名称
-     * @return 商户集合
-     */
-    @Override
-    public List<PayMerchantDO> getMerchantListByNameLimit(String merchantName) {
-        // TODO @aquan：mybatis plus 哈
-        LambdaQueryWrapper<PayMerchantDO> queryWrapper = new QueryWrapper<PayMerchantDO>().lambda()
-                .select(PayMerchantDO::getId, PayMerchantDO::getName)
-                .likeRight(PayMerchantDO::getName, merchantName)
-                .last("limit 200");
-
-        return this.merchantMapper.selectList(queryWrapper);
-    }
 
     /**
      * 检查商户是否存在
@@ -144,7 +126,7 @@ public class PayMerchantServiceImpl implements PayMerchantService {
         }
         PayMerchantDO merchant = merchantMapper.selectById(id);
         if (merchant == null) {
-            throw exception(MERCHANT_NOT_EXISTS);
+            throw exception(PAY_MERCHANT_NOT_EXISTS);
         }
     }
 

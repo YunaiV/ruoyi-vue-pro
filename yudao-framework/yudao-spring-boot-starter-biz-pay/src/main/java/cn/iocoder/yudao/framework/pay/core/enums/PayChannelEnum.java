@@ -1,6 +1,9 @@
 package cn.iocoder.yudao.framework.pay.core.enums;
 
 import cn.hutool.core.util.ArrayUtil;
+import cn.iocoder.yudao.framework.pay.core.client.PayClientConfig;
+import cn.iocoder.yudao.framework.pay.core.client.impl.alipay.AlipayPayClientConfig;
+import cn.iocoder.yudao.framework.pay.core.client.impl.wx.WXPayClientConfig;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -49,21 +52,21 @@ public enum PayChannelEnum {
     }
 
     /**
-     * 判断当前渠道是那种支付方式
-     * @param code
-     * @return
+     * 根据编码得到支付类
+     * @param code 编码
+     * @return 支付配置类
      */
-    public static String verifyWechatOrAliPay(String code){
+    public static Class<? extends PayClientConfig> findByCodeGetClass(String code){
         switch (PayChannelEnum.getByCode(code)){
             case WX_PUB:
             case WX_LITE:
             case WX_APP:
-                return WECHAT;
+                return WXPayClientConfig.class;
             case ALIPAY_PC:
             case ALIPAY_WAP:
             case ALIPAY_APP:
             case ALIPAY_QR:
-                return ALIPAY;
+                return AlipayPayClientConfig.class;
         }
         return null;
     }

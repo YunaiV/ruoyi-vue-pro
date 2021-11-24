@@ -18,7 +18,7 @@ import org.springframework.context.annotation.Import;
 import javax.annotation.Resource;
 import java.util.List;
 
-import static cn.iocoder.yudao.coreservice.modules.pay.enums.PayErrorCodeCoreConstants.MERCHANT_NOT_EXISTS;
+import static cn.iocoder.yudao.coreservice.modules.pay.enums.PayErrorCodeCoreConstants.PAY_MERCHANT_NOT_EXISTS;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildTime;
@@ -79,7 +79,7 @@ public class PayMerchantServiceTest extends BaseDbUnitTest {
         PayMerchantUpdateReqVO reqVO = randomPojo(PayMerchantUpdateReqVO.class);
 
         // 调用, 并断言异常
-        assertServiceException(() -> merchantService.updateMerchant(reqVO), MERCHANT_NOT_EXISTS);
+        assertServiceException(() -> merchantService.updateMerchant(reqVO), PAY_MERCHANT_NOT_EXISTS);
     }
 
     @Test
@@ -103,7 +103,7 @@ public class PayMerchantServiceTest extends BaseDbUnitTest {
         Long id = randomLongId();
 
         // 调用, 并断言异常
-        assertServiceException(() -> merchantService.deleteMerchant(id), MERCHANT_NOT_EXISTS);
+        assertServiceException(() -> merchantService.deleteMerchant(id), PAY_MERCHANT_NOT_EXISTS);
     }
 
     @Test

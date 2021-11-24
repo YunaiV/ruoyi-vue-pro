@@ -80,7 +80,7 @@ public class PayMerchantController {
     @ApiImplicitParam(name = "name", value = "商户名称", required = true, example = "芋道", dataTypeClass = Long.class)
     @PreAuthorize("@ss.hasPermission('pay:merchant:query')")
     public CommonResult<List<PayMerchantRespVO>> getMerchantListByName(@RequestParam("name") String name) {
-        List<PayMerchantDO> merchantListDO = merchantService.getMerchantListByNameLimit(name);
+        List<PayMerchantDO> merchantListDO = merchantService.getMerchantListByName(name);
         return success(PayMerchantConvert.INSTANCE.convertList(merchantListDO));
     }
 

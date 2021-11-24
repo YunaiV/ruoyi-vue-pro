@@ -22,7 +22,7 @@ import org.springframework.validation.annotation.Validated;
 import javax.annotation.Resource;
 import java.util.*;
 
-import static cn.iocoder.yudao.coreservice.modules.pay.enums.PayErrorCodeCoreConstants.APP_NOT_EXISTS;
+import static cn.iocoder.yudao.coreservice.modules.pay.enums.PayErrorCodeCoreConstants.*;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 
@@ -72,7 +72,7 @@ public class PayAppServiceImpl implements PayAppService {
 
     private void validateAppExists(Long id) {
         if (appMapper.selectById(id) == null) {
-            throw exception(APP_NOT_EXISTS);
+            throw exception(PAY_APP_NOT_FOUND);
         }
     }
 
@@ -148,7 +148,7 @@ public class PayAppServiceImpl implements PayAppService {
         }
         PayAppDO payApp = appMapper.selectById(id);
         if (payApp == null) {
-            throw exception(APP_NOT_EXISTS);
+            throw exception(PAY_APP_NOT_FOUND);
         }
     }
 }

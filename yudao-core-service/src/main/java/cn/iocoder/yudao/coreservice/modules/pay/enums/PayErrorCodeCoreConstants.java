@@ -22,7 +22,6 @@ public interface PayErrorCodeCoreConstants {
     ErrorCode PAY_CHANNEL_IS_DISABLE = new ErrorCode(1007001001, "支付渠道已经禁用");
     ErrorCode PAY_CHANNEL_CLIENT_NOT_FOUND = new ErrorCode(1007001002, "支付渠道的客户端不存在");
     ErrorCode CHANNEL_NOT_EXISTS = new ErrorCode(1007001003, "支付渠道不存在");
-    ErrorCode CHANNEL_KEY_READ_ERROR = new ErrorCode(1007001004, "支付渠道秘钥文件读取失败");
     ErrorCode CHANNEL_EXIST_SAME_CHANNEL_ERROR = new ErrorCode(1007001005, "已存在相同的渠道");
     ErrorCode CHANNEL_WECHAT_VERSION_2_MCH_KEY_IS_NULL = new ErrorCode(1007001006,"微信渠道v2版本中商户密钥不可为空");
     ErrorCode CHANNEL_WECHAT_VERSION_3_PRIVATE_KEY_IS_NULL = new ErrorCode(1007001006,"微信渠道v3版本apiclient_key.pem不可为空");
@@ -49,18 +48,14 @@ public interface PayErrorCodeCoreConstants {
     ErrorCode PAY_REFUND_CHN_ORDER_NO_IS_NULL = new ErrorCode(1007006002, "该订单的渠道订单为空");
     ErrorCode PAY_REFUND_POST_HANDLER_NOT_FOUND = new ErrorCode(1007006003, "未找到对应的退款后置处理类");
     ErrorCode PAY_REFUND_NOT_FOUND = new ErrorCode(1007006004, "支付退款单不存在");
-    // TODO @aquan：下面还两个要合并上去哈。另外一般中英文之间要有空格。例如说， 新建一个 order 数据；这样可读性更好。
 
     /**
      * ========== 支付商户信息 1-007-004-000 ==========
      */
-    ErrorCode MERCHANT_NOT_EXISTS = new ErrorCode(1007004000, "支付商户信息不存在");
+    ErrorCode PAY_MERCHANT_NOT_EXISTS = new ErrorCode(1007004000, "支付商户信息不存在");
 
 
-    /**
-     * ========== 支付应用信息 1-007-005-000 ==========
-     */
-    ErrorCode APP_NOT_EXISTS = new ErrorCode(1007005000, "支付应用信息不存在");
+
 
 
 }
