@@ -8,8 +8,8 @@
 		}, {
 			"path": "pages/tabbar/user",
 			"style": {
-				"navigationBarTitleText": "",
-				"enablePullDownRefresh": false
+				"navigationBarTitleText": "我的",
+				"navigationStyle": "custom"
 			}
 		}
 	],

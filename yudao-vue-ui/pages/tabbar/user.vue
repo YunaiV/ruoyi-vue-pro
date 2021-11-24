@@ -53,12 +53,14 @@
 		
 		<!-- 功能入口 -->
 		<view class="option-wrap">
-			<mix-list-cell icon="icon-iconfontweixin" iconColor="#fa436a" title="我的钱包" @onClick="navTo('/pages/wallet/index', {login: true})"></mix-list-cell>
-			<mix-list-cell icon="icon-dizhi" iconColor="#5fcda2" title="地址管理" @onClick="navTo('/pages/address/list', {login: true})"></mix-list-cell>
+			<!-- <mix-list-cell icon="icon-iconfontweixin" iconColor="#fa436a" title="我的钱包" @onClick="navTo('/pages/wallet/index', {login: true})"></mix-list-cell> -->
+			<!-- <mix-list-cell icon="icon-dizhi" iconColor="#5fcda2" title="地址管理" @onClick="navTo('/pages/address/list', {login: true})"></mix-list-cell> -->
 			<!-- <mix-list-cell icon="icon-share" iconColor="#9789f7" title="分享" tips="呼朋唤友赢好礼"></mix-list-cell> -->
-			<mix-list-cell icon="icon-shoucang_xuanzhongzhuangtai" iconColor="#54b4ef" title="我的收藏" @onClick="navTo('/pages/favorite/favorite', {login: true})"></mix-list-cell>
-			<mix-list-cell icon="icon-pinglun-copy" iconColor="#ee883b" title="意见反馈" @onClick="navTo('/pages/feedback/feedback', {login: true})"></mix-list-cell>
-			<mix-list-cell icon="icon-shezhi1" iconColor="#37b0fb" title="设置" border="" @onClick="navTo('/pages/set/set', {login: true})"></mix-list-cell>
+			<!-- <mix-list-cell icon="icon-shoucang_xuanzhongzhuangtai" iconColor="#54b4ef" title="我的收藏" @onClick="navTo('/pages/favorite/favorite', {login: true})"></mix-list-cell> -->
+			<!-- <mix-list-cell icon="icon-pinglun-copy" iconColor="#ee883b" title="意见反馈" @onClick="navTo('/pages/feedback/feedback', {login: true})"></mix-list-cell> -->
+			<!-- <mix-list-cell icon="icon-shezhi1" iconColor="#37b0fb" title="设置" border="" @onClick="navTo('/pages/set/set', {login: true})"></mix-list-cell> -->
+			<mix-list-cell icon="icon-bianji" iconColor="#5fcda2" title="个人信息" border="" @onClick="navTo('/pages/set/set', {login: true})"></mix-list-cell>
+			<mix-list-cell icon="icon-shezhi1" iconColor="#37b0fb" title="账号安全" border="" @onClick="navTo('/pages/set/set', {login: true})"></mix-list-cell>
 		</view>
 	</view>
 </template>
@@ -152,7 +154,7 @@
 		margin: 20rpx auto 0;
 		background: #fff;
 		border-radius: 10rpx;
-		.order-header{
+		.order-header {
 			padding: 28rpx 20rpx 6rpx 26rpx;
 			.title {
 				flex: 1;
@@ -209,49 +211,11 @@
 		}
 	}
 
-	.option-wrap{
+	.option-wrap {
 		width: 700rpx;
 		margin: 20rpx auto 0;
 		margin-top: 20rpx;
 		background: #fff;
-		border-radius:10rpx;
-		
-		.sec-header{
-			padding: 26rpx 14rpx 0 24rpx;
-			font-size: 28rpx;
-			color: #333;
-			
-			.icon-lishijilu{
-				font-size: 46rpx;
-				color: #50bf8b;
-				margin-right: 16rpx;
-				line-height: 40rpx;
-			}
-			.icon-lajitong{
-				padding: 4rpx 10rpx;
-				font-size: 36rpx;
-				color: #999;
-			}
-		}
-		.pro-list{
-			flex-wrap: nowrap;
-			padding: 20rpx 0 12rpx;
-			
-			&:before, &:after{
-				content: '';
-				min-width: 30rpx;
-				height: 30rpx;
-			}
-			&:after{
-				min-width: 20rpx;
-			}
-			image{
-				flex-shrink: 0;
-				width: 144rpx;
-				height: 144rpx;
-				margin-right: 16rpx;
-				border-radius: 8rpx;
-			}
-		}
+		border-radius: 10rpx;
 	}
 </style>

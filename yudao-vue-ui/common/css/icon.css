@@ -2,7 +2,7 @@
 	font-family: "mix-icon";
 	font-weight: normal;
 	font-style: normal;
-	src: url('https://at.alicdn.com/t/font_1913318_2ui3nitf38x.ttf') format('truetype');
+	src: url('https://at.alicdn.com/t/font_1913318_2ui3nitf38x.ttf') format('truetype'); // TODO 芋艿: icon 怎么搞？
 }
 
 .mix-icon {
@@ -105,9 +105,9 @@
   content: "\e60c";
 }
 
-.icon-bangzhu1:before {
-  content: "\e63d";
-}
+/* .icon-bangzhu1:before {
+  content: "\e63d"; // 帮助
+} */
 
 .icon-xingxing:before {
   content: "\e70b";
@@ -154,7 +154,7 @@
 }
 
 .icon-bianji:before {
-  content: "\e60d";
+  content: "\e60d"; // 编辑
 }
 
 .icon-yanzhengma1:before {
