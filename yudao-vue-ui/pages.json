@@ -11,7 +11,21 @@
 				"navigationBarTitleText": "我的",
 				"navigationStyle": "custom"
 			}
-		}
+		}, {
+			"path": "pages/auth/login",
+			"style": {
+				"navigationBarTitleText": "登录",
+				"navigationStyle":"custom",
+				"app-plus": {
+					"animationType": "slide-in-bottom"
+				}
+			}
+		}, {
+            "path" : "pages/set/userInfo",
+            "style" : {
+				"navigationBarTitleText": "个人资料"
+			}
+        }
 	],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",

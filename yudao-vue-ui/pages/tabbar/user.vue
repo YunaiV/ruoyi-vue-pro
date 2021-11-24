@@ -59,7 +59,7 @@
 			<!-- <mix-list-cell icon="icon-shoucang_xuanzhongzhuangtai" iconColor="#54b4ef" title="我的收藏" @onClick="navTo('/pages/favorite/favorite', {login: true})"></mix-list-cell> -->
 			<!-- <mix-list-cell icon="icon-pinglun-copy" iconColor="#ee883b" title="意见反馈" @onClick="navTo('/pages/feedback/feedback', {login: true})"></mix-list-cell> -->
 			<!-- <mix-list-cell icon="icon-shezhi1" iconColor="#37b0fb" title="设置" border="" @onClick="navTo('/pages/set/set', {login: true})"></mix-list-cell> -->
-			<mix-list-cell icon="icon-bianji" iconColor="#5fcda2" title="个人信息" border="" @onClick="navTo('/pages/set/set', {login: true})"></mix-list-cell>
+			<mix-list-cell icon="icon-bianji" iconColor="#5fcda2" title="个人信息" border="" @onClick="navTo('/pages/set/userInfo', {login: true})"></mix-list-cell>
 			<mix-list-cell icon="icon-shezhi1" iconColor="#37b0fb" title="账号安全" border="" @onClick="navTo('/pages/set/set', {login: true})"></mix-list-cell>
 		</view>
 	</view>
