@@ -23,11 +23,10 @@ public interface PayRefundCoreService {
     /**
      * 渠道的退款通知
      * @param channelId  渠道编号
-     * @param channelCode 渠道编码
      * @param notifyData  通知数据
      * @throws Exception 退款通知异常
      */
-    void notifyPayRefund(Long channelId, String channelCode, PayNotifyDataDTO notifyData) throws Exception;
+    void notifyPayRefund(Long channelId, PayNotifyDataDTO notifyData) throws Exception;
 
 
 

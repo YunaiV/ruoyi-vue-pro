@@ -2,6 +2,7 @@ package cn.iocoder.yudao.userserver.modules.pay.controller.order;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.order.PayOrderDO;
+import cn.iocoder.yudao.coreservice.modules.pay.service.order.PayCommonCoreService;
 import cn.iocoder.yudao.coreservice.modules.pay.service.order.PayOrderCoreService;
 import cn.iocoder.yudao.coreservice.modules.pay.service.order.PayRefundCoreService;
 import cn.iocoder.yudao.coreservice.modules.pay.service.order.dto.PayOrderSubmitReqDTO;
@@ -38,6 +39,9 @@ public class PayOrderController {
     @Resource
     private PayRefundCoreService payRefundCoreService;
 
+    @Resource PayCommonCoreService commonCoreService;
+
+
     @PostMapping("/submit")
     @ApiOperation("提交支付订单")
 //    @PreAuthenticated // TODO 暂时不加登陆验证，前端暂时没做好
@@ -57,82 +61,53 @@ public class PayOrderController {
     }
 
     // ========== 支付渠道的回调 ==========
-
+    //TODO 芋道源码 换成了统一的地址了 /notify/{channelId}，测试通过可以删除
     @PostMapping("/notify/wx-pub/{channelId}")
     @ApiOperation("通知微信公众号支付的结果")
     public String notifyWxPayOrder(@PathVariable("channelId") Long channelId,
                                    @RequestBody String xmlData) throws Exception {
-        payOrderCoreService.notifyPayOrder(channelId, PayChannelEnum.WX_PUB.getCode(), PayNotifyDataDTO.builder().body(xmlData).build());
+        payOrderCoreService.notifyPayOrder(channelId,  PayNotifyDataDTO.builder().body(xmlData).build());
         return "success";
     }
-
-    @PostMapping("/notify/alipay-qr/{channelId}")
-    @ApiOperation("通知支付宝扫码支付的结果")
-    public String notifyAlipayQrPayOrder(@PathVariable("channelId") Long channelId,
-                                         @RequestParam Map<String, String> params,
-                                         @RequestBody String originData) throws Exception{
-        payOrderCoreService.notifyPayOrder(channelId, PayChannelEnum.ALIPAY_QR.getCode(),
-                PayNotifyDataDTO.builder().params(params).body(originData).build());
-        return "success";
-    }
-
-    @GetMapping(value = "/return/alipay-qr/{channelId}")
-    @ApiOperation("支付宝 wap 页面回跳")
-    public String returnAliPayQrPayOrder(@PathVariable("channelId") Long channelId){
-        //TODO @jason 校验 是否支付宝调用。 支付宝publickey 可以根据 appId 跳转不同的页面
-        System.out.println("支付成功");
-        return "支付成功";
-    }
-
-    @PostMapping(value = "/notify/alipay-wap/{channelId}", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    @ApiOperation("支付宝 wap 页面回调")
-    public String notifyAliPayWapPayOrder(@PathVariable("channelId") Long channelId,
-                                          @RequestParam Map<String, String> params,
-                                          @RequestBody String originData) throws Exception {
-        //TODO 校验是否支付宝调用。 payclient 中加一个校验方法
-        //支付宝退款交易也会触发支付回调接口
-        //参考 https://opensupport.alipay.com/support/helpcenter/193/201602484851
-        //判断是否为支付宝的退款交易
-        if(isAliPayRefund(params)) {
-            //退款通知
-            payRefundCoreService.notifyPayRefund(channelId,PayChannelEnum.ALIPAY_WAP.getCode(), PayNotifyDataDTO.builder().params(params).body(originData).build());
-        }else{
-            //支付通知
-            payOrderCoreService.notifyPayOrder(channelId, PayChannelEnum.ALIPAY_WAP.getCode(), PayNotifyDataDTO.builder().params(params).body(originData).build());
-        }
-        return "success";
-    }
-
 
     /**
+     * 统一的跳转页面， 支付宝跳转参数说明
      * https://opendocs.alipay.com/open/203/105285#%E5%89%8D%E5%8F%B0%E5%9B%9E%E8%B7%B3%E5%8F%82%E6%95%B0%E8%AF%B4%E6%98%8E
      * @param channelId 渠道id
      * @return 返回跳转页面
      */
-    @GetMapping(value = "/return/alipay-wap/{channelId}")
-    @ApiOperation("支付宝 wap 页面回跳")
-    public String returnAliPayWapPayOrder(@PathVariable("channelId") Long channelId){
-        //TODO 校验 是否支付宝调用。 可以根据 appId 跳转不同的页面
-        return "支付成功";
+    @GetMapping(value = "/return/{channelId}")
+    @ApiOperation("渠道统一的支付成功返回地址")
+    public String returnAliPayOrder(@PathVariable("channelId") Long channelId, @RequestParam Map<String, String> params){
+        //TODO 可以根据渠道和 app_id 返回不同的页面
+        log.info("app_id  is {}", params.get("app_id"));
+        return String.format("渠道[%s]支付成功", String.valueOf(channelId));
     }
 
     /**
-     * 是否是支付宝的退款交易
-     * @param params http content-type application/x-www-form-urlencoded 的参数
-     * @return
+     * 统一的渠道支付回调，支付宝的退款回调
+     * @param channelId 渠道编号
+     * @param params form 参数
+     * @param originData http request body
+     * @return 成功返回 "success"
      */
-    private boolean  isAliPayRefund(Map<String, String> params) {
-        if (params.containsKey("refund_fee")) {
-            return true;
-        } else {
-            return false;
+    @PostMapping(value = "/notify/{channelId}")
+    @ApiOperation("渠道统一的支付成功,或退款成功 通知url")
+    public String notifyChannelPay(@PathVariable("channelId") Long channelId,
+                               @RequestParam Map<String, String> params,
+                               @RequestBody String originData) throws Exception {
+        //校验是否是渠道回调
+        commonCoreService.verifyNotifyData(channelId, PayNotifyDataDTO.builder().params(params).body(originData).build());
+        //支付宝退款交易也会触发支付回调接口
+        //参考 https://opensupport.alipay.com/support/helpcenter/193/201602484851
+        //判断是否为退款通知
+        if(commonCoreService.isRefundNotify(channelId, PayNotifyDataDTO.builder().params(params).body(originData).build())) {
+            //退款通知
+            payRefundCoreService.notifyPayRefund(channelId,PayNotifyDataDTO.builder().params(params).body(originData).build());
+        }else{
+            //支付通知
+            payOrderCoreService.notifyPayOrder(channelId,PayNotifyDataDTO.builder().params(params).body(originData).build());
         }
-    }
-
-    @RequestMapping("/notify/test")
-    @ApiOperation("通知的测试接口")
-    public String notifyTest() {
-//        System.out.println(data);
         return "success";
     }
 

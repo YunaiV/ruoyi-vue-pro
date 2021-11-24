@@ -40,7 +40,9 @@ public class PayRefundChannelQueryHandler extends PayRefundAbstractChannelPostHa
         //更新退款单表
         PayRefundDO updateRefundDO = new PayRefundDO();
         updateRefundDO.setId(respBO.getRefundId())
-                .setStatus(refundStatus.getStatus());
+                .setStatus(refundStatus.getStatus())
+                .setChannelErrorCode(respBO.getChannelErrCode())
+                .setChannelErrorMsg(respBO.getChannelErrMsg());
         updatePayRefund(updateRefundDO);
 
         PayOrderDO updateOrderDO = new PayOrderDO();

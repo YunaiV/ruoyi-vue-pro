@@ -155,24 +155,22 @@ public class PayOrderCoreServiceImpl implements PayOrderCoreService {
 
     /**
      * 根据支付渠道的编码，生成支付渠道的返回地址
-     * @param channel
-     * @return
+     * @param channel 支付渠道
+     * @return 支付成功返回的地址。 配置地址 + "/" + channel id
      */
     private String genChannelReturnUrl(PayChannelDO channel) {
-        return payProperties.getPayReturnUrl() + "/" + StrUtil.replace(channel.getCode(), "_", "-")
-                + "/" + channel.getId();
+        return payProperties.getPayReturnUrl() + "/" + channel.getId();
     }
 
     /**
      * 根据支付渠道的编码，生成支付渠道的回调地址
      *
      * @param channel 支付渠道
-     * @return 支付渠道的回调地址
+     * @return 支付渠道的回调地址  配置地址 + "/" + channel id
      */
     private String genChannelPayNotifyUrl(PayChannelDO channel) {
-        // _ 转化为 - 的原因，是因为 URL 我们统一采用中划线的原则
-        return payProperties.getPayNotifyUrl() + "/" + StrUtil.replace(channel.getCode(), "_", "-")
-                + "/" + channel.getId();
+        //去掉channel code, 似乎没啥用， 用统一的回调地址
+        return payProperties.getPayNotifyUrl() + "/" + channel.getId();
     }
 
     private String generateOrderExtensionNo() {
@@ -195,7 +193,7 @@ public class PayOrderCoreServiceImpl implements PayOrderCoreService {
 
     @Override
     @Transactional
-    public void notifyPayOrder(Long channelId, String channelCode, PayNotifyDataDTO notifyData) throws Exception {
+    public void notifyPayOrder(Long channelId,  PayNotifyDataDTO notifyData) throws Exception {
         // TODO 芋艿，记录回调日志
         log.info("[notifyPayOrder][channelId({}) 回调数据({})]", channelId, notifyData.getBody());
 
@@ -207,7 +205,7 @@ public class PayOrderCoreServiceImpl implements PayOrderCoreService {
             log.error("[notifyPayOrder][渠道编号({}) 找不到对应的支付客户端]", channel.getId());
             throw exception(PAY_CHANNEL_CLIENT_NOT_FOUND);
         }
-        //TODO @jason 校验 是否支付宝调用。 使用 支付宝publickey 或者payclient 加一个校验方法
+
         // 解析支付结果
         PayOrderNotifyRespDTO notifyRespDTO = client.parseOrderNotify(notifyData);
 
@@ -222,7 +220,7 @@ public class PayOrderCoreServiceImpl implements PayOrderCoreService {
             throw exception(PAY_ORDER_EXTENSION_STATUS_IS_NOT_WAITING);
         }
         // 1.2 更新 PayOrderExtensionDO
-        //TODO @jason notifyRespDTO.getTradeStatus() 需要根据不同的状态更新成不同的值 PayOrderStatusEnum
+        //TODO 支付宝交易超时 TRADE_FINISHED 需要更新交易关闭
         int updateCounts = payOrderExtensionCoreMapper.updateByIdAndStatus(orderExtension.getId(),
                 PayOrderStatusEnum.WAITING.getStatus(), PayOrderExtensionDO.builder().id(orderExtension.getId())
                         .status(PayOrderStatusEnum.SUCCESS.getStatus()).channelNotifyData(notifyData.getBody()).build());
@@ -241,7 +239,7 @@ public class PayOrderCoreServiceImpl implements PayOrderCoreService {
         }
         // 2.2 更新 PayOrderDO
         updateCounts = payOrderCoreMapper.updateByIdAndStatus(order.getId(), PayOrderStatusEnum.WAITING.getStatus(),
-                PayOrderDO.builder().status(PayOrderStatusEnum.SUCCESS.getStatus()).channelId(channelId).channelCode(channelCode)
+                PayOrderDO.builder().status(PayOrderStatusEnum.SUCCESS.getStatus()).channelId(channelId).channelCode(channel.getCode())
                         .successTime(notifyRespDTO.getSuccessTime()).successExtensionId(orderExtension.getId())
                         .channelOrderNo(notifyRespDTO.getChannelOrderNo()).channelUserId(notifyRespDTO.getChannelUserId())
                         .notifyTime(new Date()).build());

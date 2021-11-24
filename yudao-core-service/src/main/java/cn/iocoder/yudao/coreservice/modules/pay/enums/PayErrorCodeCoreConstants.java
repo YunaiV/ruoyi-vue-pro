@@ -24,9 +24,9 @@ public interface PayErrorCodeCoreConstants {
     ErrorCode CHANNEL_NOT_EXISTS = new ErrorCode(1007001003, "支付渠道不存在");
     ErrorCode CHANNEL_EXIST_SAME_CHANNEL_ERROR = new ErrorCode(1007001005, "已存在相同的渠道");
     ErrorCode CHANNEL_WECHAT_VERSION_2_MCH_KEY_IS_NULL = new ErrorCode(1007001006,"微信渠道v2版本中商户密钥不可为空");
-    ErrorCode CHANNEL_WECHAT_VERSION_3_PRIVATE_KEY_IS_NULL = new ErrorCode(1007001006,"微信渠道v3版本apiclient_key.pem不可为空");
-    ErrorCode CHANNEL_WECHAT_VERSION_3_CERT_KEY_IS_NULL = new ErrorCode(1007001006,"微信渠道v3版本中apiclient_cert.pem不可为空");
-
+    ErrorCode CHANNEL_WECHAT_VERSION_3_PRIVATE_KEY_IS_NULL = new ErrorCode(1007001007,"微信渠道v3版本apiclient_key.pem不可为空");
+    ErrorCode CHANNEL_WECHAT_VERSION_3_CERT_KEY_IS_NULL = new ErrorCode(1007001008,"微信渠道v3版本中apiclient_cert.pem不可为空");
+    ErrorCode PAY_CHANNEL_NOTIFY_VERIFY_FAILED = new ErrorCode(1007001009, "渠道通知校验失败");
     /**
      * ========== ORDER 模块 1-007-002-000 ==========
      */

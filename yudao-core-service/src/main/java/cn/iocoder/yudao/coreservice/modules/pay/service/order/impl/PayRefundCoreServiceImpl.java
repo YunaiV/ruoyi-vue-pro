@@ -182,7 +182,7 @@ public class PayRefundCoreServiceImpl implements PayRefundCoreService {
 
 
     @Override
-    public void notifyPayRefund(Long channelId, String channelCode, PayNotifyDataDTO notifyData) {
+    public void notifyPayRefund(Long channelId, PayNotifyDataDTO notifyData) {
         log.info("[notifyPayRefund][channelId({}) 回调数据({})]", channelId, notifyData.getBody());
         // 校验支付渠道是否有效
         PayChannelDO channel = payChannelCoreService.validPayChannel(channelId);

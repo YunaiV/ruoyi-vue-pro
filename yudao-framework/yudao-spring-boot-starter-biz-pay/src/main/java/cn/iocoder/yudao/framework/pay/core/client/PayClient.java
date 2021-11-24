@@ -49,4 +49,22 @@ public interface PayClient {
      */
     PayRefundNotifyDTO parseRefundNotify(PayNotifyDataDTO notifyData);
 
+
+    /**
+     * 验证是否渠道通知
+     * @param notifyData 通知数据
+     * @return 默认是 true
+     */
+    default boolean verifyNotifyData(PayNotifyDataDTO notifyData){
+        return true;
+    }
+
+    /**
+     * 是否退款通知
+     * @param notifyData  通知数据
+     * @return 默认是 false
+     */
+    default  boolean isRefundNotify(PayNotifyDataDTO notifyData){
+        return false;
+    }
 }
