@@ -19,7 +19,7 @@
 			<!-- 下面的圆弧 -->
 			<image class="user-background-arc-line" src="/static/icon/arc.png" mode="aspectFill"></image>
 		</view>
-		
+
 		<!-- 订单信息 -->
 		<view class="order-wrap">
 			<view class="order-header row" @click="navTo('/pages/order/list?current=0', {login: true})">
@@ -50,7 +50,7 @@
 				</view>
 			</view>
 		</view>
-		
+
 		<!-- 功能入口 -->
 		<view class="option-wrap">
 			<!-- <mix-list-cell icon="icon-iconfontweixin" iconColor="#fa436a" title="我的钱包" @onClick="navTo('/pages/wallet/index', {login: true})"></mix-list-cell> -->
@@ -95,7 +95,7 @@
 	.user-wrapper {
 		position: relative;
 		overflow: hidden;
-		padding-top: calc(var(--status-bar-height) + 52rpx);	
+		padding-top: calc(var(--status-bar-height) + 52rpx);
 		padding-bottom: 6rpx;
 		.user {
 			display: flex;
