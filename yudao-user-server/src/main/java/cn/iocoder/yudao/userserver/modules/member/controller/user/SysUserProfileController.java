@@ -27,7 +27,7 @@ import static cn.iocoder.yudao.userserver.modules.member.enums.MbrErrorCodeConst
 
 @Api(tags = "用户个人中心")
 @RestController
-@RequestMapping("/system/user/profile")
+@RequestMapping("/member/user/profile")
 @Validated
 @Slf4j
 public class SysUserProfileController {
@@ -57,13 +57,12 @@ public class SysUserProfileController {
         return success(avatar);
     }
 
-    @GetMapping("/get-user-info")
-    @ApiOperation("获取用户头像与昵称")
+    @GetMapping("/get")
+    @ApiOperation("获得基本信息")
     @PreAuthenticated
     public CommonResult<MbrUserInfoRespVO> getUserInfo() {
         return success(userService.getUserInfo(getLoginUserId()));
     }
-
 
     @PostMapping("/update-mobile")
     @ApiOperation(value = "修改用户手机")

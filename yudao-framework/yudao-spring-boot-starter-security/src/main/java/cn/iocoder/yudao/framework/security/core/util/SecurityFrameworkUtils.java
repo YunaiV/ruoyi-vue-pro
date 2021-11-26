@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.framework.security.core.util;
 
+import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils;
 import org.springframework.lang.Nullable;
@@ -11,6 +12,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -100,7 +102,9 @@ public class SecurityFrameworkUtils {
         WebFrameworkUtils.setLoginUserId(request, loginUser.getId());
         WebFrameworkUtils.setLoginUserType(request, loginUser.getUserType());
         // TODO @jason：使用 userId 会不会更合适哈？
-        org.activiti.engine.impl.identity.Authentication.setAuthenticatedUserId(loginUser.getUsername());
+        if (Objects.equals(UserTypeEnum.ADMIN.getValue(), loginUser.getUserType())) {
+            org.activiti.engine.impl.identity.Authentication.setAuthenticatedUserId(loginUser.getUsername());
+        }
     }
 
 }

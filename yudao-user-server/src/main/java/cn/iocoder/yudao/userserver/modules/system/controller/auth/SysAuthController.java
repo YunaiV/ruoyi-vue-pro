@@ -40,7 +40,6 @@ public class SysAuthController {
     @Resource
     private SysSocialService socialService;
 
-
     @PostMapping("/login")
     @ApiOperation("使用手机 + 密码登录")
     public CommonResult<SysAuthLoginRespVO> login(@RequestBody @Valid SysAuthLoginReqVO reqVO) {

@@ -82,7 +82,8 @@
 			};
 		},
 		onShow() {
-			// TODO 芋艿：加载用户信息
+			// 获得用户信息
+			this.$store.dispatch('obtainUserInfo');
 			// TODO 芋艿：获得订单数量
 		}
 	}

@@ -65,6 +65,7 @@ public interface MbrUserService {
 
     /**
      * 根据用户id，获取用户头像与昵称
+     *
      * @param userId 用户id
      * @return 用户响应实体类
      */

@@ -1,18 +1,18 @@
 const BASE_URL = 'http://127.0.0.1:28080/api/';
-import { msg } from './util'
+import { msg, getAuthToken } from './util'
 
 export const request = (options) => {
 	return new Promise((resolve, reject) => {
 		// 发起请求
+		const authToken = getAuthToken();
 		uni.request({
 			url: BASE_URL + options.url,
 			method: options.method || 'GET',
 			data: options.data || {},
 			header: {
-				'Authorization': '' // TODO 芋艿：带 token
+				'Authorization': authToken ? `Bearer ${authToken}` : ''
 			}
 		}).then(res => {
-			debugger
 			res = res[1];
 			const statusCode = res.statusCode;
 			if (statusCode !== 200) {

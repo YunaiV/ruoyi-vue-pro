@@ -42,7 +42,7 @@
 							placeholder="请输入密码"	placeholder-style="color: #909399"/>
 					</view>
 				</view>
-				<mix-button ref="confirmBtn" text="立即登录" marginTop="60rpx" @onConfirm="login"></mix-button>
+				<mix-button ref="confirmBtn" text="立即登录" marginTop="60rpx" @onConfirm="mobileLogin"></mix-button>
 				<!-- 切换登陆 -->
 				<view class="login-type" v-if="loginType == 'code'" @click="setLoginType('password')">账号密码登录</view>
 				<view class="login-type" v-else @click="setLoginType('code')">免密登录</view>
@@ -78,9 +78,11 @@
 </template>
 
 <script>
-	import {checkStr} from '@/common/js/util'
+	import { checkStr } from '@/common/js/util'
+	import { login, smsLogin } from '@/api/system/auth.js'
 	import loginMpWx from './mixin/login-mp-wx.js'
 	import loginAppWx from './mixin/login-app-wx.js'
+
 	export default{
 		mixins: [loginMpWx, loginAppWx],
 		data(){
@@ -95,17 +97,10 @@
 		onLoad() {
 		},
 		methods: {
-			loginSuccessCallBack(data){
-				this.$util.msg('登录成功');
-				this.$store.commit('setToken', data);
-				setTimeout(()=>{
-					uni.navigateBack();
-				}, 1000)
-			},
 			// 手机号登录
-			async login(){
-				// 参数校验
-				if (!this.agreement){
+			async mobileLogin() {
+				// 参数校验 TODO 芋艿：表单校验的支持
+				if (!this.agreement) {
 					this.$util.msg('请阅读并同意用户服务及隐私协议');
 					this.$refs.confirmBtn.stop();
 					return;
@@ -116,23 +111,37 @@
 					this.$refs.confirmBtn.stop();
 					return;
 				}
-				if (!checkStr(code, 'mobileCode')) {
-					this.$util.msg('验证码错误');
+				if (this.loginType === 'code' && !checkStr(code, 'mobileCode')) {
+					this.$util.msg('验证码格式错误');
+					this.$refs.confirmBtn.stop();
+					return;
+				}
+				if (this.loginType === 'password' && !checkStr(password, 'pwd')) {
+					this.$util.msg('密码格式错误');
 					this.$refs.confirmBtn.stop();
 					return;
 				}
 				
 				// 执行登陆
-				const res = await this.$request('user', 'login', {mobile,code});
-				this.$refs.confirmBtn.stop();
-				
-				if (res.status === 1){
-					this.loginSuccessCallBack(res.data);
-				} else{
-					this.$util.msg(res.msg);
+				try {
+					const data = this.loginType === 'code' ? await smsLogin(mobile, code)
+						: await login(mobile, password);
+					// 登陆成功
+					this.loginSuccessCallBack(data);
+				} finally {
+					this.$refs.confirmBtn.stop();
 				}
 			},
-			navBack(){
+			// 登陆成功的处理逻辑
+			loginSuccessCallBack(data){
+				this.$util.msg('登录成功');
+				this.$store.commit('setToken', data);
+				// TODO 芋艿：如果当前页是第一页，则无法返回。期望是能够回到首页
+				setTimeout(()=>{
+					uni.navigateBack();
+				}, 1000)
+			},
+			navBack() {
 				uni.navigateBack();
 			},
 			setLoginType(loginType) {
