@@ -19,30 +19,23 @@
 			<view class="welcome">手机登录/注册</view>
 			<!-- 手机验证码登录 -->
 			<view class="input-content">
-				<view class="input-item">
-					<text class="title">手机号码</text>
-					<view class="row">
-						<input v-model="mobile" type="number" maxlength="11" 
-							placeholder="请输入手机号码"	placeholder-style="color: #909399"/>
-					</view>
-				</view>
-				<!-- 判断使用验证码还是密码 -->
-				<view class="input-item" v-if="loginType == 'code'">
-					<text class="title">验证码</text>
-					<view class="row">
-						<input v-model="code" type="number" maxlength="6"
-							placeholder="请输入手机验证码" placeholder-style="color: #909399">
-						<mix-code :mobile="mobile" templateCode="SMS_194050994"></mix-code>
-					</view>					
-				</view>
-				<view class="input-item" v-else>
-					<text class="title">密码</text>
-					<view class="row">
-						<input v-model="password" type="password" maxlength="16" 
-							placeholder="请输入密码"	placeholder-style="color: #909399"/>
-					</view>
-				</view>
-				<mix-button ref="confirmBtn" text="立即登录" marginTop="60rpx" @onConfirm="mobileLogin"></mix-button>
+				<u--form labelPosition="left" :model="form" :rules="rules" ref="form" errorType="toast">
+					<u-form-item prop="mobile" borderBottom>
+						<u--input type="number" v-model="form.mobile" placeholder="请输入手机号" border="none"></u--input>
+					</u-form-item>
+					<!-- 判断使用验证码还是密码 -->
+					<u-form-item prop="code" borderBottom v-if="loginType == 'code'">
+						<u--input type="number" v-model="form.code" placeholder="请输入验证码" border="none"></u--input>
+						<u-button slot="right" @tap="getCode" :text="tips" type="success" size="mini" :disabled="disabled1"></u-button>
+						<u-code ref="uCode" @change="codeChange" seconds="60" @start="disabled1 = true" @end="disabled1 = false"></u-code>
+					</u-form-item>
+					<u-form-item prop="password" borderBottom v-else>
+						<u--input password v-model="form.password" placeholder="请输入密码" border="none"></u--input>
+					</u-form-item>
+				</u--form>
+				
+				<u-button class="login-button" text="立即登录" type="error" shape="circle" @click="mobileLogin"
+					:loading="loading"></u-button>
 				<!-- 切换登陆 -->
 				<view class="login-type" v-if="loginType == 'code'" @click="setLoginType('password')">账号密码登录</view>
 				<view class="login-type" v-else @click="setLoginType('code')">免密登录</view>
@@ -71,9 +64,6 @@
 			</view>
 			<!-- #endif -->
 		</view>
-		
-		<!-- Loading 框 -->
-		<mix-loading v-if="isLoading"></mix-loading>
 	</view>
 </template>
 
@@ -85,52 +75,59 @@
 
 	export default{
 		mixins: [loginMpWx, loginAppWx],
-		data(){
+		data() {
 			return {
-				loginType: 'code', // 登录方式，code 验证码；password 密码
-				mobile: '',
-				code: '',
-				password: '',
 				agreement: true,
+				loginType: 'password', // 登录方式，code 验证码；password 密码
+				loading: false, // 表单提交
+				rules: {
+					mobile: [{
+						required: true, 
+						message: '请输入手机号'
+					}, {
+						validator: (rule, value, callback) => {
+							return uni.$u.test.mobile(value);
+						},
+						message: '手机号码不正确'
+					}],
+					code: [],
+					password: []
+				},
+				form: {
+					mobile: '',
+					code: '',
+					password: '',
+				},
+				disabled1: false,
+				tips: '',
 			}
 		},
 		onLoad() {
+			this.setLoginType(this.loginType);
 		},
 		methods: {
 			// 手机号登录
-			async mobileLogin() {
-				// 参数校验 TODO 芋艿：表单校验的支持
+			mobileLogin() {
 				if (!this.agreement) {
 					this.$util.msg('请阅读并同意用户服务及隐私协议');
-					this.$refs.confirmBtn.stop();
 					return;
 				}
-				const {mobile, code, password} = this;
-				if (!checkStr(mobile, 'mobile')){
-					this.$util.msg('请输入正确的手机号码');
-					this.$refs.confirmBtn.stop();
-					return;
-				}
-				if (this.loginType === 'code' && !checkStr(code, 'mobileCode')) {
-					this.$util.msg('验证码格式错误');
-					this.$refs.confirmBtn.stop();
-					return;
-				}
-				if (this.loginType === 'password' && !checkStr(password, 'pwd')) {
-					this.$util.msg('密码格式错误');
-					this.$refs.confirmBtn.stop();
-					return;
-				}
-				
-				// 执行登陆
-				try {
-					const data = this.loginType === 'code' ? await smsLogin(mobile, code)
-						: await login(mobile, password);
-					// 登陆成功
-					this.loginSuccessCallBack(data);
-				} finally {
-					this.$refs.confirmBtn.stop();
-				}
+				this.$refs.form.validate().then(() => {
+					this.loading = true;
+					// 执行登陆
+					const { mobile, code, password} = this.form;
+					const loginPromise = this.loginType == 'password' ? login(mobile, password) :
+						smsLogin(mobile, code);
+					loginPromise.then(data => {
+						// 登陆成功
+						this.loginSuccessCallBack(data);
+					}).catch(errors => {
+					}).finally(() => {
+						this.loading = false;
+					})
+				}).catch(errors => {
+					debugger;
+				});
 			},
 			// 登陆成功的处理逻辑
 			loginSuccessCallBack(data){
@@ -146,6 +143,28 @@
 			},
 			setLoginType(loginType) {
 				this.loginType = loginType;
+				// 修改校验规则
+				this.rules.code = [];
+				this.rules.password = [];
+				if (loginType == 'code') {
+					this.rules.code = [{
+						required: true,
+						message: '请输入验证码'
+					}, {
+						min: 1000,
+						max: 999999,
+						message: '验证码不正确'
+					}];
+				} else {
+					this.rules.password = [{
+						required: true,
+						message: '请输入密码'
+					}, {
+						min: 4,
+						max: 16,
+						message: '密码不正确'
+					}]
+				}
 			},
 			//同意协议
 			checkAgreement(){
@@ -161,12 +180,32 @@
 					}
 				}))
 			},
+			codeChange(text) {
+				this.tips = text;
+			},
+			getCode() {
+				if (this.$refs.uCode.canGetCode) {
+					// 模拟向后端请求验证码
+					uni.showLoading({
+						title: '正在获取验证码'
+					})
+					setTimeout(() => {
+						uni.hideLoading();
+						// 这里此提示会被this.start()方法中的提示覆盖
+						uni.$u.toast('验证码已发送');
+						// 通知验证码组件内部开始倒计时
+						this.$refs.uCode.start();
+					}, 2000);
+				} else {
+					uni.$u.toast('倒计时结束后再发送');
+				}
+			},
 		}
 	}
 </script>
 
 <style>
-	page{
+	page {
 		background: #fff;
 	}
 </style>
@@ -243,35 +282,8 @@
 	/** 手机登录部分 */
 	.input-content {
 		padding: 0 60rpx;
-		.input-item {
-			display:flex;
-			flex-direction: column;
-			align-items:flex-start;
-			justify-content: center;
-			padding: 0 30rpx;
-			background: #f8f6fc;
-			height: 120rpx;
-			border-radius: 4px;
-			margin-bottom: 50rpx;
-			&:last-child{
-				margin-bottom: 0;
-			}
-			.row{
-				width: 100%;
-			}
-			.title{
-				height: 50rpx;
-				line-height: 56rpx;
-				font-size: 26rpx;
-				color: #606266;
-			}
-			input {
-				flex: 1;
-				height: 60rpx;
-				font-size: 30rpx;
-				color: #303133;
-				width: 100%;
-			}	
+		.login-button {
+			margin-top: 30rpx;
 		}
 		.login-type {
 			display: flex;

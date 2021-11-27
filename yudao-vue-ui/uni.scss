@@ -1,42 +1,13 @@
-$base-color: #ff536f;
-
-
-$main:#07c160; //主背景色
-$lightMain: rgba($main,0.1); //淡主色
-$mainInverse:#fff; //与主色搭配的反色
-$mainGradual:linear-gradient(to top right,$main,rgba($main,0.2));//渐变主色
-$mainGradualInverse:#fff;//与渐变主色搭配的反色
-
-/* 配色 */
-$red:#e1251b; //红色
-$lightRed:rgba(225, 37, 27, 0.08);//淡淡的红色
-
-$black: #000; 
-$lightBlack:#e6e6e6;
-
-$yellow:#f69c00;
-$lightYellow:#fef3d1;
-
-$green:#07c160;
-$lightGreen:#dff5e2;
-
-$orange: #F74F0E;
-$lightOrange: #fedfd3;
-
-$blue:#0081ff;
-$lightBlue:#e6f2ff;
-
-$brown:	#8B4513;
-$lightBrown:#ffdbc1; 
-
-$purple:#6739b6;
-$lightPurple:#e7dff5;
-
-$white : #fff ;
-$black : #000 ;
-$gray : #777 ;
-$grey : #82939c ;
-	
-$borderColor:#e0e0e0;
-
 @import '@/uni_modules/uview-ui/theme.scss';
+
+.u-button--success {
+	background-color: #5ac725 !important; // TODO 芋艿：莫名不行
+}
+.u-button--primary {
+	background-color: #3c9cff !important; // TODO 芋艿：莫名不行
+}
+.u-button--error {
+	background-color: #f56c6c !important; // TODO 芋艿：莫名不行
+}
+
+$base-color: #ff536f;
