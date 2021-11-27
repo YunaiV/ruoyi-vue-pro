@@ -61,7 +61,7 @@ export const msg = (title = '', param={}) => {
  * @return {Boolean} 是否登陆
  */
 export const isLogin = (options = {}) => {
-	const token = this.getAuthToken();
+	const token = getAuthToken();
 	if (token) {
 		return true;
 	}

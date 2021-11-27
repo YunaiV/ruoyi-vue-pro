@@ -5,8 +5,7 @@
 			<view class="avatar-wrap" @click="chooseImage">
 				<image class="avatar" :src="tempAvatar || userInfo.avatar || '/static/icon/default-avatar.png'" mode="aspectFill"></image>
 				<!-- 进度遮盖 -->
-				<view 
-					class="progress center"
+				<view class="progress center"
 					:class="{
 						'no-transtion': uploadProgress === 0,
 						show: uploadProgress != 100
@@ -14,26 +13,12 @@
 					:style="{
 						width: uploadProgress + '%',
 						height: uploadProgress + '%',
-					}"
-				></view>
+					}"></view>
 			</view>
 		</view>
 		<view class="cell b-b">
 			<text class="tit fill">昵称</text>
 			<input class="input" v-model="userInfo.nickname" type="text" maxlength="8" placeholder="请输入昵称" placeholder-class="placeholder">
-		</view>
-		<view class="cell b-b">
-			<text class="tit fill">性别</text>
-			<view class="checkbox center" @click="changeGender(1)">
-				<text v-if="userInfo.gender == 1" class="mix-icon icon-xuanzhong"></text>
-				<text v-else class="mix-icon icon-yk_yuanquan"></text>
-				<text>男</text>
-			</view>
-			<view class="checkbox center" @click="changeGender(2)">
-				<text v-if="userInfo.gender == 2" class="mix-icon icon-xuanzhong"></text>
-				<text v-else class="mix-icon icon-yk_yuanquan"></text>
-				<text>女</text>
-			</view>
 		</view>
 		
 		<mix-button ref="confirmBtn" text="保存资料" marginTop="80rpx" @onConfirm="confirm"></mix-button>
@@ -65,11 +50,12 @@
 			this.userInfo = {avatar, nickname, gender};
 		},
 		methods: {
-			//提交修改
-			async confirm(){
+			// 提交修改
+			async confirm() {
+				// 校验信息是否变化
 				const {uploadProgress, userInfo, curUserInfo} = this;
 				let isUpdate = false;
-				for(let key in userInfo){
+				for (let key in userInfo) {
 					if(userInfo[key] !== curUserInfo[key]){
 						isUpdate = true;
 						break;
@@ -95,11 +81,6 @@
 					this.$refs.confirmBtn.stop();
 					return;
 				}
-				if (!userInfo.gender) {
-					this.$util.msg('请选择您的性别');
-					this.$refs.confirmBtn.stop();
-					return;
-				}
 				const res = await this.$request('user', 'update', userInfo);
 				this.$refs.confirmBtn.stop();
 				this.$util.msg(res.msg);
@@ -110,7 +91,7 @@
 					}, 1000)
 				}
 			},
-			//选择头像
+			// 选择头像
 			chooseImage(){
 				uni.chooseImage({
 					count: 1,
@@ -121,7 +102,7 @@
 					}
 				});
 			}, 
-			//裁剪回调
+			// 裁剪回调
 			async setAvatar(filePath){
 				this.tempAvatar = filePath;
 				this.uploadProgress = 0;
@@ -151,10 +132,6 @@
 						this.$util.msg('头像上传失败');
 					}
 				}
-			},
-			//修改性别
-			changeGender(gender){
-				this.$set(this.userInfo, 'gender', gender)
 			}
 		}
 	}

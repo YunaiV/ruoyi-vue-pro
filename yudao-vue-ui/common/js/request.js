@@ -1,5 +1,7 @@
-const BASE_URL = 'http://127.0.0.1:28080/api/';
+import store from '@/store'
 import { msg, getAuthToken } from './util'
+
+const BASE_URL = 'http://127.0.0.1:28080/api/';
 
 export const request = (options) => {
 	return new Promise((resolve, reject) => {

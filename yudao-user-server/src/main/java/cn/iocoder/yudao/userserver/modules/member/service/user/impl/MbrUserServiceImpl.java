@@ -7,6 +7,7 @@ import cn.iocoder.yudao.coreservice.modules.member.dal.dataobject.user.MbrUserDO
 import cn.iocoder.yudao.userserver.modules.member.controller.user.vo.MbrUserInfoRespVO;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.userserver.modules.member.controller.user.vo.MbrUserUpdateMobileReqVO;
+import cn.iocoder.yudao.userserver.modules.member.convert.user.UserProfileConvert;
 import cn.iocoder.yudao.userserver.modules.member.dal.mysql.user.MbrUserMapper;
 import cn.iocoder.yudao.userserver.modules.member.service.user.MbrUserService;
 import cn.iocoder.yudao.userserver.modules.system.service.auth.SysAuthService;
@@ -115,10 +116,7 @@ public class MbrUserServiceImpl implements MbrUserService {
     public MbrUserInfoRespVO getUserInfo(Long userId) {
         MbrUserDO user = this.checkUserExists(userId);
         // 拼接返回结果
-        MbrUserInfoRespVO userResp = new MbrUserInfoRespVO();
-        userResp.setNickName(user.getNickname());
-        userResp.setAvatar(user.getAvatar());
-        return userResp;
+        return UserProfileConvert.INSTANCE.convert(user);
     }
 
     @Override

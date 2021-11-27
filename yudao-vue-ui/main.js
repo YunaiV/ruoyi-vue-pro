@@ -1,5 +1,8 @@
 import App from './App'
 
+import uView from '@/uni_modules/uview-ui'
+Vue.use(uView)
+
 // 全局 Mixin
 import mixin from './common/mixin/mixin'
 Vue.mixin(mixin) 

@@ -75,6 +75,7 @@
 	/*每个页面公共css */
 	@import url("./common/css/common.css");
 	@import url("./common/css/icon.css");
+	@import "@/uni_modules/uview-ui/index.scss";
 	
 	.lazyload{
 		position: relative;

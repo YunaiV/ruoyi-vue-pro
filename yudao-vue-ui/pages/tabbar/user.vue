@@ -52,27 +52,20 @@
 		</view>
 
 		<!-- 功能入口 -->
-		<view class="option-wrap">
-			<!-- <mix-list-cell icon="icon-iconfontweixin" iconColor="#fa436a" title="我的钱包" @onClick="navTo('/pages/wallet/index', {login: true})"></mix-list-cell> -->
-			<!-- <mix-list-cell icon="icon-dizhi" iconColor="#5fcda2" title="地址管理" @onClick="navTo('/pages/address/list', {login: true})"></mix-list-cell> -->
-			<!-- <mix-list-cell icon="icon-share" iconColor="#9789f7" title="分享" tips="呼朋唤友赢好礼"></mix-list-cell> -->
-			<!-- <mix-list-cell icon="icon-shoucang_xuanzhongzhuangtai" iconColor="#54b4ef" title="我的收藏" @onClick="navTo('/pages/favorite/favorite', {login: true})"></mix-list-cell> -->
-			<!-- <mix-list-cell icon="icon-pinglun-copy" iconColor="#ee883b" title="意见反馈" @onClick="navTo('/pages/feedback/feedback', {login: true})"></mix-list-cell> -->
-			<!-- <mix-list-cell icon="icon-shezhi1" iconColor="#37b0fb" title="设置" border="" @onClick="navTo('/pages/set/set', {login: true})"></mix-list-cell> -->
-			<mix-list-cell icon="icon-bianji" iconColor="#5fcda2" title="个人信息" border="" @onClick="navTo('/pages/set/userInfo', {login: true})"></mix-list-cell>
-			<mix-list-cell icon="icon-shezhi1" iconColor="#37b0fb" title="账号安全" border="" @onClick="navTo('/pages/set/set', {login: true})"></mix-list-cell>
-		</view>
+		<u-cell-group class="option1-wrap">
+			<u-cell icon="edit-pen" title="个人信息" isLink @click="navTo('/pages/set/userInfo', {login: true})"></u-cell>
+			<u-cell icon="setting" title="账号安全" isLink @click="navTo('/pages/set/set', {login: true})"></u-cell>
+		</u-cell-group>
 	</view>
 </template>
 
 <script>
+	import { mapState, mapGetters } from 'vuex'
+	import { isLogin } from '@/common/js/util.js'
+	
 	export default {
 		data() {
 			return {
-				userInfo: { // TODO 芋艿：读取
-					nickname: '芋艿'
-				},
-				hasLogin: true, // TODO 芋艿：读取
 				orderCount: { // TODO 芋艿：读取
 					c0: 1,
 					c1: 2,
@@ -81,9 +74,15 @@
 				}
 			};
 		},
+		computed: {
+			...mapState(['userInfo']),
+			...mapGetters(['hasLogin']),
+		},
 		onShow() {
-			// 获得用户信息
-			this.$store.dispatch('obtainUserInfo');
+			// 获得用户信息 TODO 芋艿：
+			// if (isLogin()) {
+			// 	this.$store.dispatch('obtainUserInfo');
+			// }
 			// TODO 芋艿：获得订单数量
 		}
 	}
@@ -210,13 +209,5 @@
 				}
 			}
 		}
-	}
-
-	.option-wrap {
-		width: 700rpx;
-		margin: 20rpx auto 0;
-		margin-top: 20rpx;
-		background: #fff;
-		border-radius: 10rpx;
 	}
 </style>
