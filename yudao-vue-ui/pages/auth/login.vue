@@ -1,11 +1,8 @@
 <template>
 	<view class="app">
-		<!-- 左下角的环 -->
-		<view class="left-bottom-sign"></view>
-		<!-- 右上角的折角 -->
-		<view class="right-top-sign"></view>
 		<!-- 左上角的 x 关闭 -->
 		<view class="back-btn mix-icon icon-guanbi" @click="navBack"></view>
+				
 		<!-- 用户协议 -->
 		<view class="agreement center">
 			<text class="mix-icon icon-xuanzhong" :class="{active: agreement}" @click="checkAgreement"></text>
@@ -26,8 +23,8 @@
 					<!-- 判断使用验证码还是密码 -->
 					<u-form-item prop="code" borderBottom v-if="loginType == 'code'">
 						<u--input type="number" v-model="form.code" placeholder="请输入验证码" border="none"></u--input>
-						<u-button slot="right" @tap="getCode" :text="tips" type="success" size="mini" :disabled="disabled1"></u-button>
-						<u-code ref="uCode" @change="codeChange" seconds="60" @start="disabled1 = true" @end="disabled1 = false"></u-code>
+						<u-button slot="right" @tap="getCode" :text="uCode.tips" type="success" size="mini" :disabled="uCode.disabled"></u-button>
+						<u-code ref="uCode" @change="codeChange" seconds="60" @start="uCode.disabled === true" @end="uCode.disabled === false"></u-code>
 					</u-form-item>
 					<u-form-item prop="password" borderBottom v-else>
 						<u--input password v-model="form.password" placeholder="请输入密码" border="none"></u--input>
@@ -69,7 +66,7 @@
 
 <script>
 	import { checkStr } from '@/common/js/util'
-	import { login, smsLogin } from '@/api/system/auth.js'
+	import { login, smsLogin, sendSmsCode } from '@/api/system/auth.js'
 	import loginMpWx from './mixin/login-mp-wx.js'
 	import loginAppWx from './mixin/login-app-wx.js'
 
@@ -78,7 +75,7 @@
 		data() {
 			return {
 				agreement: true,
-				loginType: 'password', // 登录方式，code 验证码；password 密码
+				loginType: 'code', // 登录方式，code 验证码；password 密码
 				loading: false, // 表单提交
 				rules: {
 					mobile: [{
@@ -98,8 +95,10 @@
 					code: '',
 					password: '',
 				},
-				disabled1: false,
-				tips: '',
+				uCode: {
+					tips: '',
+					disable: false,
+				}
 			}
 		},
 		onLoad() {
@@ -126,11 +125,10 @@
 						this.loading = false;
 					})
 				}).catch(errors => {
-					debugger;
 				});
 			},
 			// 登陆成功的处理逻辑
-			loginSuccessCallBack(data){
+			loginSuccessCallBack(data) {
 				this.$util.msg('登录成功');
 				this.$store.commit('setToken', data);
 				// TODO 芋艿：如果当前页是第一页，则无法返回。期望是能够回到首页
@@ -139,7 +137,9 @@
 				}, 1000)
 			},
 			navBack() {
-				uni.navigateBack();
+				uni.navigateBack({
+					delta: 1
+				});
 			},
 			setLoginType(loginType) {
 				this.loginType = loginType;
@@ -151,8 +151,8 @@
 						required: true,
 						message: '请输入验证码'
 					}, {
-						min: 1000,
-						max: 999999,
+						min: 4,
+						max: 6,
 						message: '验证码不正确'
 					}];
 				} else {
@@ -181,24 +181,27 @@
 				}))
 			},
 			codeChange(text) {
-				this.tips = text;
+				this.uCode.tips = text;
 			},
 			getCode() {
-				if (this.$refs.uCode.canGetCode) {
-					// 模拟向后端请求验证码
-					uni.showLoading({
-						title: '正在获取验证码'
-					})
-					setTimeout(() => {
-						uni.hideLoading();
-						// 这里此提示会被this.start()方法中的提示覆盖
+				// 处于发送中，则跳过
+				if (!this.$refs.uCode.canGetCode) {
+					return;
+				}
+				// 校验手机号
+				this.$refs.form.validateField('mobile', errors => {
+					if (errors.length > 0) {
+						uni.$u.toast(errors[0].message);
+						return;
+					}
+					// 发送验证码 TODO 芋艿，枚举类
+					sendSmsCode(this.form.mobile, 1).then(data => {
 						uni.$u.toast('验证码已发送');
 						// 通知验证码组件内部开始倒计时
 						this.$refs.uCode.start();
-					}, 2000);
-				} else {
-					uni.$u.toast('倒计时结束后再发送');
-				}
+					}).catch(erros => {
+					})
+				})
 			},
 		}
 	}
@@ -243,40 +246,8 @@
 	.left-top-sign {
 		font-size: 120rpx;
 		color: #f8f8f8;
-		position:relative;
+		position: relative;
 		left: -12rpx;
-	}
-	.left-bottom-sign {
-		position: absolute;
-		left: -270rpx;
-		bottom: -320rpx;
-		border: 100rpx solid #d0d1fd;
-		border-radius: 50%;
-		padding: 180rpx;
-	}
-	.right-top-sign {
-		position:absolute;
-		top: 80rpx;
-		right: -30rpx;
-		z-index: 95;
-		&:before, &:after{
-			display:block;
-			content:"";
-			width: 400rpx;
-			height: 80rpx;
-			background: #b4f3e2;
-		}
-		&:before{
-			transform: rotate(50deg);
-			border-top-right-radius: 50px;
-		}
-		&:after{
-			position: absolute;
-			right: -198rpx;
-			top: 0;
-			transform: rotate(-50deg);
-			border-top-left-radius: 50px;
-		}
 	}
 	
 	/** 手机登录部分 */
