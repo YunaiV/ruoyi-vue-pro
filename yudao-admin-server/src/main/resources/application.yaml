@@ -73,5 +73,7 @@ yudao:
     constants-class-list:
       - cn.iocoder.yudao.adminserver.modules.infra.enums.InfErrorCodeConstants
       - cn.iocoder.yudao.adminserver.modules.system.enums.SysErrorCodeConstants
+  tenant:
+    tables: sys_user
 
 debug: false

@@ -287,6 +287,7 @@ CREATE TABLE IF NOT EXISTS "sys_user" (
     "updater" varchar(64) default '',
     "update_time" timestamp not null default current_timestamp,
     "deleted" bit not null default false,
+    "tenant_id" bigint not null default  '0',
     primary key ("id")
 ) comment '用户信息表';
 

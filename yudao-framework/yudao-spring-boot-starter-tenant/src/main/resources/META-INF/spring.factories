@@ -1,0 +1,3 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  cn.iocoder.yudao.framework.tenant.config.YudaoTenantDatabaseAutoConfiguration,\
+  cn.iocoder.yudao.framework.tenant.config.YudaoTenantWebAutoConfiguration

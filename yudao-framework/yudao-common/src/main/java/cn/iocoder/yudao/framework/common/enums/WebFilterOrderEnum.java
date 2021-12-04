@@ -17,9 +17,11 @@ public interface WebFilterOrderEnum {
 
     // OrderedRequestContextFilter 默认为 -105，用于国际化上下文等等
 
-    int API_ACCESS_LOG_FILTER = -104; // 需要保证在 RequestBodyCacheFilter 后面
+    int TENANT_FILTER = - 100; // 需要保证在 ApiAccessLogFilter 前面
 
-    int XSS_FILTER = -103;  // 需要保证在 RequestBodyCacheFilter 后面
+    int API_ACCESS_LOG_FILTER = -90; // 需要保证在 RequestBodyCacheFilter 后面
+
+    int XSS_FILTER = -80;  // 需要保证在 RequestBodyCacheFilter 后面
 
     // Spring Security Filter 默认为 -100，可见 SecurityProperties 配置属性类
 

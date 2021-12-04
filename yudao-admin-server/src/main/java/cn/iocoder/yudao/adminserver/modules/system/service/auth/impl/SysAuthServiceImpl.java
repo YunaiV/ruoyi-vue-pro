@@ -133,9 +133,13 @@ public class SysAuthServiceImpl implements SysAuthService {
     }
 
     private void verifyCaptcha(String username, String captchaUUID, String captchaCode) {
+        // 如果验证码关闭，则不进行校验
+        if (!captchaService.isCaptchaEnable()) {
+            return;
+        }
+        // 验证码不存在
         final SysLoginLogTypeEnum logTypeEnum = SysLoginLogTypeEnum.LOGIN_USERNAME;
         String code = captchaService.getCaptchaCode(captchaUUID);
-        // 验证码不存在
         if (code == null) {
             // 创建登录失败日志（验证码不存在）
             this.createLoginLog(username, logTypeEnum, SysLoginResultEnum.CAPTCHA_NOT_FOUND);

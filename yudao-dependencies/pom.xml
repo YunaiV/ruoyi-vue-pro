@@ -48,6 +48,7 @@
         <velocity.version>2.2</velocity.version>
         <screw.version>1.0.5</screw.version>
         <guava.version>30.1.1-jre</guava.version>
+        <transmittable-thread-local.version>2.12.2</transmittable-thread-local.version>
         <!-- 三方云服务相关 -->
         <aliyun-java-sdk-core.version>4.5.25</aliyun-java-sdk-core.version>
         <aliyun-java-sdk-dysmsapi.version>2.1.0</aliyun-java-sdk-dysmsapi.version>
@@ -351,6 +352,12 @@
             </dependency>
 
             <dependency>
+                <groupId>cn.iocoder.boot</groupId>
+                <artifactId>yudao-spring-boot-starter-tenant</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
+            <dependency>
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok</artifactId>
                 <version>${lombok.version}</version>
@@ -400,6 +407,12 @@
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
                 <version>${guava.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>transmittable-thread-local</artifactId> <!-- 解决 ThreadLocal 父子线程的传值问题 -->
+                <version>${transmittable-thread-local.version}</version>
             </dependency>
 
             <!-- 三方云服务相关 -->

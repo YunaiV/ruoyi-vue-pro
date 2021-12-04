@@ -20,8 +20,20 @@
 			<text class="tit fill">昵称</text>
 			<input class="input" v-model="userInfo.nickname" type="text" maxlength="8" placeholder="请输入昵称" placeholder-class="placeholder">
 		</view>
+		<u-cell-group>
+			<u-cell title="昵称" :value="userInfo.nickname" isLink @click="nicknameClick()"></u-cell>
+		</u-cell-group>
 		
-		<mix-button ref="confirmBtn" text="保存资料" marginTop="80rpx" @onConfirm="confirm"></mix-button>
+		<u-modal :show="nicknameOpen" title="修改昵称" showCancelButton @confirm="nicknameSubmit" @cancel="nicknameCancel">
+			<view class="slot-content">
+				<u--form labelPosition="left" :model="nicknameForm" :rules="nicknameRules" ref="nicknameForm" errorType="toast">
+					<u-form-item prop="nickname">
+						<u--input v-model="nicknameForm.nickname" placeholder="请输入昵称" border="none"></u--input>
+					</u-form-item>
+				</u--form>
+			</view>
+		</u-modal>
+		
 	</view>
 </template>
 
@@ -32,6 +44,16 @@
 				uploadProgress: 100, //头像上传进度
 				tempAvatar: '', 
 				userInfo: {},
+				nicknameOpen: false,
+				nicknameForm: {
+					nickname: ''
+				},
+				nicknameRules: {
+					nickname: [{
+						required: true,
+						message: '请输入昵称'
+					}]
+				}
 			}
 		},
 		computed: {
@@ -50,6 +72,30 @@
 			this.userInfo = {avatar, nickname, gender};
 		},
 		methods: {
+			nicknameClick() {
+				this.nicknameOpen = true;
+				this.nicknameForm.nickname = this.userInfo.nickname;
+			},
+			nicknameCancel() {
+				this.nicknameOpen = false;
+			},
+			nicknameSubmit() {
+				this.$refs.nicknameForm.validate().then(() => {
+					this.loading = true;
+					// 执行登陆
+					const { mobile, code, password} = this.form;
+					const loginPromise = this.loginType == 'password' ? login(mobile, password) :
+						smsLogin(mobile, code);
+					loginPromise.then(data => {
+						// 登陆成功
+						this.loginSuccessCallBack(data);
+					}).catch(errors => {
+					}).finally(() => {
+						this.loading = false;
+					})
+				}).catch(errors => {
+				});
+			},
 			// 提交修改
 			async confirm() {
 				// 校验信息是否变化

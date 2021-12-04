@@ -32,6 +32,7 @@
         <module>yudao-spring-boot-starter-biz-pay</module>
         <module>yudao-spring-boot-starter-biz-weixin</module>
         <module>yudao-spring-boot-starter-extension</module>
+        <module>yudao-spring-boot-starter-tenant</module>
     </modules>
 
     <artifactId>yudao-framework</artifactId>

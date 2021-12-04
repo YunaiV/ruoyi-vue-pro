@@ -41,8 +41,8 @@ public class SysUserProfileController {
     @PutMapping("/update-nickname")
     @ApiOperation("修改用户昵称")
     @PreAuthenticated
-    public CommonResult<Boolean> updateNickname(@RequestParam("nickName") String nickName) {
-        userService.updateNickname(getLoginUserId(), nickName);
+    public CommonResult<Boolean> updateNickname(@RequestParam("nickname") String nickname) {
+        userService.updateNickname(getLoginUserId(), nickname);
         return success(true);
     }
 

@@ -51,9 +51,9 @@ public interface MbrUserService {
     /**
      * 修改用户昵称
      * @param userId 用户id
-     * @param nickName 用户新昵称
+     * @param nickname 用户新昵称
      */
-    void updateNickname(Long userId, String nickName);
+    void updateNickname(Long userId, String nickname);
 
     /**
      * 修改用户头像

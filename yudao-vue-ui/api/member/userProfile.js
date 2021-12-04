@@ -7,3 +7,17 @@ export function getUserInfo() {
     method: 'get'
   })
 }
+
+// 修改
+export function updateNickname(nickname) {
+	return request({
+		url: 'member/user/profile/update-nickname',
+		method: 'post',
+		header: {
+			"Content-Type": "application/x-www-form-urlencoded"
+		},
+		data: {
+			nickname
+		}
+	})
+}
