@@ -3,6 +3,11 @@
     <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form">
       <h3 class="title">芋道后台管理系统</h3>
       <el-form-item prop="username">
+        <el-input v-model="loginForm.tenantId" type="text" auto-complete="off" placeholder="租户">
+          <svg-icon slot="prefix" icon-class="tree" class="el-input__icon input-icon" />
+        </el-input>
+      </el-form-item>
+      <el-form-item prop="username">
         <el-input v-model="loginForm.username" type="text" auto-complete="off" placeholder="账号">
           <svg-icon slot="prefix" icon-class="user" class="el-input__icon input-icon" />
         </el-input>
@@ -56,6 +61,7 @@ export default {
     return {
       codeUrl: "",
       loginForm: {
+        tenantId: "",
         username: "admin",
         password: "admin123",
         rememberMe: false,
@@ -63,6 +69,9 @@ export default {
         uuid: ""
       },
       loginRules: {
+        tenantId: [
+          { required: true, trigger: "blur", message: "租户不能为空" },
+        ],
         username: [
           { required: true, trigger: "blur", message: "用户名不能为空" }
         ],
@@ -103,16 +112,19 @@ export default {
       const username = Cookies.get("username");
       const password = Cookies.get("password");
       const rememberMe = Cookies.get('rememberMe')
+      const tenantId = Cookies.get('tenantId');
       this.loginForm = {
         username: username === undefined ? this.loginForm.username : username,
         password: password === undefined ? this.loginForm.password : decrypt(password),
-        rememberMe: rememberMe === undefined ? false : Boolean(rememberMe)
+        rememberMe: rememberMe === undefined ? false : Boolean(rememberMe),
+        tenantId: tenantId === undefined ? 0 : tenantId, // TODO 芋艿：优化下，magic number
       };
     },
     handleLogin() {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
           this.loading = true;
+          // 设置 Cookie
           if (this.loginForm.rememberMe) {
             Cookies.set("username", this.loginForm.username, { expires: 30 });
             Cookies.set("password", encrypt(this.loginForm.password), { expires: 30 });
@@ -122,6 +134,9 @@ export default {
             Cookies.remove("password");
             Cookies.remove('rememberMe');
           }
+          // 设置租户
+          Cookies.set("tenantId", this.loginForm.tenantId);
+          // 发起登陆
           this.$store.dispatch("Login", this.loginForm).then(() => {
             this.$router.push({ path: this.redirect || "/" }).catch(()=>{});
           }).catch(() => {
@@ -167,7 +182,7 @@ export default {
 .login-form {
   border-radius: 6px;
   background: #ffffff;
-  width: 400px;
+  width: 500px;
   padding: 25px 25px 5px 25px;
   .el-input {
     height: 38px;
