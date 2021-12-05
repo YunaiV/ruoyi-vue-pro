@@ -3,11 +3,11 @@ package cn.iocoder.yudao.framework.mq.core.stream;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
- * Redis Stream Message 接口
+ * Redis Stream Message 抽象类
  *
  * @author 芋道源码
  */
-public interface StreamMessage {
+public abstract class AbstractStreamMessage {
 
     /**
      * 获得 Redis Stream Key
@@ -15,6 +15,6 @@ public interface StreamMessage {
      * @return Channel
      */
     @JsonIgnore // 避免序列化
-    String getStreamKey();
+    public abstract String getStreamKey();
 
 }

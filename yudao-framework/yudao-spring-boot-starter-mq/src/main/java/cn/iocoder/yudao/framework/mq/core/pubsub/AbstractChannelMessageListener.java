@@ -15,7 +15,7 @@ import java.lang.reflect.Type;
  *
  * @author 芋道源码
  */
-public abstract class AbstractChannelMessageListener<T extends ChannelMessage> implements MessageListener {
+public abstract class AbstractChannelMessageListener<T extends AbstractChannelMessage> implements MessageListener {
 
     /**
      * 消息类型

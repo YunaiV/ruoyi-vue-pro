@@ -19,7 +19,7 @@ import java.lang.reflect.Type;
  *
  * @author 芋道源码
  */
-public abstract class AbstractStreamMessageListener<T extends StreamMessage>
+public abstract class AbstractStreamMessageListener<T extends AbstractStreamMessage>
         implements StreamListener<String, ObjectRecord<String, String>> {
 
     /**
@@ -39,7 +39,7 @@ public abstract class AbstractStreamMessageListener<T extends StreamMessage>
     @Getter
     private String group;
     /**
-     *
+     * RedisTemplate
      */
     @Setter
     private RedisTemplate<String, ?> redisTemplate;

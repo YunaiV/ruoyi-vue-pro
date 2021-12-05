@@ -1,12 +1,12 @@
 package cn.iocoder.yudao.framework.mq.config;
 
 import cn.hutool.system.SystemUtil;
+import cn.iocoder.yudao.framework.mq.core.RedisMQTemplate;
 import cn.iocoder.yudao.framework.mq.core.pubsub.AbstractChannelMessageListener;
 import cn.iocoder.yudao.framework.mq.core.stream.AbstractStreamMessageListener;
 import cn.iocoder.yudao.framework.redis.config.YudaoRedisAutoConfiguration;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
-import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -15,6 +15,7 @@ import org.springframework.data.redis.connection.stream.ObjectRecord;
 import org.springframework.data.redis.connection.stream.ReadOffset;
 import org.springframework.data.redis.connection.stream.StreamOffset;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.stream.StreamMessageListenerContainer;
@@ -30,6 +31,13 @@ import java.util.List;
 @AutoConfigureAfter(YudaoRedisAutoConfiguration.class)
 @Slf4j
 public class YudaoMQAutoConfiguration {
+
+    @Bean
+    public RedisMQTemplate redisMQTemplate(StringRedisTemplate stringRedisTemplate) {
+        return new RedisMQTemplate(stringRedisTemplate);
+    }
+
+    // ========== 消费者相关 ==========
 
     /**
      * 创建 Redis Pub/Sub 广播消费的容器
@@ -71,7 +79,6 @@ public class YudaoMQAutoConfiguration {
 
         // 第二步，注册监听器，消费对应的 Stream 主题
         String consumerName = buildConsumerName();
-//        String consumerName = "110";
         listeners.forEach(listener -> {
             // 创建 listener 对应的消费者分组
             try {
