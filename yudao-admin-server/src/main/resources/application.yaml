@@ -74,6 +74,6 @@ yudao:
       - cn.iocoder.yudao.adminserver.modules.infra.enums.InfErrorCodeConstants
       - cn.iocoder.yudao.adminserver.modules.system.enums.SysErrorCodeConstants
   tenant:
-    tables: sys_user
+    tables: sys_user, sys_user_session
 
 debug: false
