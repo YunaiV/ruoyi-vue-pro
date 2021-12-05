@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.framework.mq.core.message;
 
+import lombok.Data;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -8,12 +10,13 @@ import java.util.Map;
  *
  * @author 芋道源码
  */
+@Data
 public abstract class AbstractRedisMessage {
 
     /**
      * 头
      */
-    private final Map<String, String> headers = new HashMap<>();
+    private Map<String, String> headers = new HashMap<>();
 
     public String getHeader(String key) {
         return headers.get(key);

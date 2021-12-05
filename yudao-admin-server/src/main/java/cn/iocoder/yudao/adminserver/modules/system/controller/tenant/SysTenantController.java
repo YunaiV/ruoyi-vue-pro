@@ -21,7 +21,7 @@ public class SysTenantController {
     @ApiImplicitParam(name = "name", value = "租户名", required = true, example = "芋道源码", dataTypeClass = Long.class)
     public CommonResult<Long> getTenantIdByName(@RequestParam("name") String name) {
         if (Objects.equals("芋道源码", name)) {
-            return CommonResult.success(0L);
+            return CommonResult.success(1L);
         }
         return CommonResult.success(null);
     }

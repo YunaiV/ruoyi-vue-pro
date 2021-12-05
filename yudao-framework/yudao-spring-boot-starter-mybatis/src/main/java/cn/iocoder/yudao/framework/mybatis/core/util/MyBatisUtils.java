@@ -40,10 +40,11 @@ public class MyBatisUtils {
      *
      * @param interceptor 链
      * @param inner 拦截器
+     * @param index 位置
      */
-    public static void addInterceptor(MybatisPlusInterceptor interceptor, InnerInterceptor inner) {
+    public static void addInterceptor(MybatisPlusInterceptor interceptor, InnerInterceptor inner, int index) {
         List<InnerInterceptor> inners = new ArrayList<>(interceptor.getInterceptors());
-        inners.add(0, inner);
+        inners.add(index, inner);
         interceptor.setInterceptors(inners);
     }
 
