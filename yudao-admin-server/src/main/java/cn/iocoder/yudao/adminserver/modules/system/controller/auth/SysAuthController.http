@@ -18,7 +18,7 @@ tenant-id: 1
 ### 请求 /list-menus 接口 => 成功
 GET {{baseUrl}}/list-menus
 Authorization: Bearer {{token}}
-#Authorization: Bearer 0d161f69c9ac4c7f836e1b850715a7b0
+#Authorization: Bearer a6aa7714a2e44c95aaa8a2c5adc2a67a
 tenant-id: 1
 
 ### 请求 /druid/xxx 接口 => 失败 TODO 临时测试

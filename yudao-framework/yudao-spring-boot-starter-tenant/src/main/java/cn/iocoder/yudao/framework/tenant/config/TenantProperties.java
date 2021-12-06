@@ -14,6 +14,15 @@ import java.util.Set;
 @Data
 public class TenantProperties {
 
+//    /**
+//     * 租户是否开启
+//     */
+//    private static final Boolean ENABLE_DEFAULT = true;
+//
+//    /**
+//     * 是否开启
+//     */
+//    private Boolean enable = ENABLE_DEFAULT;
     /**
      * 需要多租户的表
      *

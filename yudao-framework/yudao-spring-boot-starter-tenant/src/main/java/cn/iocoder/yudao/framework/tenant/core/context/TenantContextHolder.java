@@ -11,8 +11,26 @@ public class TenantContextHolder {
 
     private static final ThreadLocal<Long> TENANT_ID = new TransmittableThreadLocal<>();
 
+    /**
+     * 获得租户编号。
+     *
+     * @return 租户编号
+     */
     public static Long getTenantId() {
         return TENANT_ID.get();
+    }
+
+    /**
+     * 获得租户编号。如果不存在，则抛出 NullPointerException 异常
+     *
+     * @return 租户编号
+     */
+    public static Long getRequiredTenantId() {
+        Long tenantId = getTenantId();
+        if (tenantId == null) {
+            throw new NullPointerException("TenantContextHolder 不存在租户编号");
+        }
+        return tenantId;
     }
 
     public static void setTenantId(Long tenantId) {

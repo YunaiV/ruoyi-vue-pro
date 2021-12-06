@@ -20,8 +20,7 @@ public class TenantDatabaseInterceptor implements TenantLineHandler {
 
     @Override
     public Expression getTenantId() {
-        // TODO 芋艿：暂时不考虑获取不到的情况。此时，会存在 NPE 的报错
-        return new StringValue(TenantContextHolder.getTenantId().toString());
+        return new StringValue(TenantContextHolder.getRequiredTenantId().toString());
     }
 
     @Override

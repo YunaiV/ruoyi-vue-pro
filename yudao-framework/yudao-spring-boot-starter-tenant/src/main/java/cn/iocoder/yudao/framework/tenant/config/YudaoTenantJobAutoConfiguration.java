@@ -8,12 +8,14 @@ import cn.iocoder.yudao.framework.tenant.core.service.TenantFrameworkService;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 /**
  * 多租户针对 Job 的自动配置
  *
  * @author 芋道源码
  */
+@Configuration
 public class YudaoTenantJobAutoConfiguration {
 
     @Bean
