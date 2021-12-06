@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
- * 多租户 Web 过滤器
+ * 多租户 Context Web 过滤器
  * 将请求 Header 中的 tenant-id 解析出来，添加到 {@link TenantContextHolder} 中，这样后续的 DB 等操作，可以获得到租户编号。
  *
  * Q：会不会存在模拟 tenant-id 导致跨租户的问题？
@@ -19,7 +19,7 @@ import java.io.IOException;
  *
  * @author 芋道源码
  */
-public class TenantWebFilter extends OncePerRequestFilter {
+public class TenantContextWebFilter extends OncePerRequestFilter {
 
     private static final String HEADER_TENANT_ID = "tenant-id";
 

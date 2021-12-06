@@ -98,4 +98,16 @@ public class RedisKeyDefine {
         this(memo, keyTemplate, keyType, valueType, timeoutType, Duration.ZERO);
     }
 
+    /**
+     * 格式化 Key
+     *
+     * 注意，内部采用 {@link String#format(String, Object...)} 实现
+     *
+     * @param args 格式化的参数
+     * @return Key
+     */
+    public String formatKey(Object... args) {
+        return String.format(keyTemplate, args);
+    }
+
 }

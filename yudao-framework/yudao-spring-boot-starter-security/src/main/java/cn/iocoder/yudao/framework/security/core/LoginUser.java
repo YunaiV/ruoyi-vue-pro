@@ -29,10 +29,6 @@ public class LoginUser implements UserDetails {
      */
     private Integer userType;
     /**
-     * 部门编号
-     */
-    private Long deptId;
-    /**
      * 角色编号数组
      */
     private Set<Long> roleIds;
@@ -53,21 +49,27 @@ public class LoginUser implements UserDetails {
      * 状态
      */
     private Integer status;
+    /**
+     * 租户编号
+     */
+    private Long tenantId;
 
+    // ========== UserTypeEnum.ADMIN 独有字段 ==========
+    // TODO 芋艿：可以通过定义一个 Map<String, String> exts 的方式，去除管理员的字段。不过这样会导致系统比较复杂，所以暂时不去掉先；
 
+    /**
+     * 部门编号
+     */
+    private Long deptId;
     /**
      * 所属岗位
      */
     private Set<Long> postIds;
-
     /**
      * group  目前指岗位代替
      */
     // TODO jason：这个字段，改成 postCodes 明确更好哈
     private List<String> groups;
-
-
-    // TODO @芋艿：怎么去掉 deptId
 
     @Override
     @JsonIgnore// 避免序列化

@@ -10,5 +10,6 @@
  *      2）Spring Security：
  *          TransmittableThreadLocalSecurityContextHolderStrategy
  *          和 YudaoSecurityAutoConfiguration#securityContextHolderMethodInvokingFactoryBean() 方法
+ * 6. Redis：通过在 Redis Key 上拼接租户编号的方式，进行隔离。
  */
 package cn.iocoder.yudao.framework.tenant;

@@ -17,7 +17,7 @@ public interface WebFilterOrderEnum {
 
     // OrderedRequestContextFilter 默认为 -105，用于国际化上下文等等
 
-    int TENANT_FILTER = - 100; // 需要保证在 ApiAccessLogFilter 前面
+    int TENANT_CONTEXT_FILTER = - 100; // 需要保证在 ApiAccessLogFilter 前面
 
     int API_ACCESS_LOG_FILTER = -90; // 需要保证在 RequestBodyCacheFilter 后面
 
