@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.coreservice.modules.infra.dal.dataobject.logger;
 
-import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
-import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.coreservice.modules.infra.enums.logger.InfApiErrorLogProcessStatusEnum;
+import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
+import cn.iocoder.yudao.framework.tenant.core.db.TenantBaseDO;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
@@ -21,7 +21,7 @@ import java.util.Date;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class InfApiErrorLogDO extends BaseDO {
+public class InfApiErrorLogDO extends TenantBaseDO {
 
     /**
      * 编号

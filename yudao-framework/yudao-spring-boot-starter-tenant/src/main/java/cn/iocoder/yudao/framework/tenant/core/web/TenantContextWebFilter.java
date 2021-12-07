@@ -14,9 +14,6 @@ import java.io.IOException;
  * 多租户 Context Web 过滤器
  * 将请求 Header 中的 tenant-id 解析出来，添加到 {@link TenantContextHolder} 中，这样后续的 DB 等操作，可以获得到租户编号。
  *
- * Q：会不会存在模拟 tenant-id 导致跨租户的问题？
- * A：用户登陆后，获得的 Token 是基于租户级别隔离，从而保证授权失败。
- *
  * @author 芋道源码
  */
 public class TenantContextWebFilter extends OncePerRequestFilter {
