@@ -24,7 +24,7 @@
         <!-- DB 相关 -->
         <mysql.version>5.1.46</mysql.version>
         <druid.version>1.2.4</druid.version>
-        <mybatis-plus.version>3.4.2</mybatis-plus.version>
+        <mybatis-plus.version>3.4.3.4</mybatis-plus.version>
         <dynamic-datasource.version>3.3.2</dynamic-datasource.version>
         <redisson.version>3.16.3</redisson.version>
         <!-- Config 配置中心相关 -->

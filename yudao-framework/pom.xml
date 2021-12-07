@@ -33,7 +33,7 @@
         <module>yudao-spring-boot-starter-biz-weixin</module>
         <module>yudao-spring-boot-starter-extension</module>
         <module>yudao-spring-boot-starter-tenant</module>
-        <module>yudao-spring-boot-starter-datascope</module>
+        <module>yudao-spring-boot-starter-data-permission</module>
     </modules>
 
     <artifactId>yudao-framework</artifactId>
