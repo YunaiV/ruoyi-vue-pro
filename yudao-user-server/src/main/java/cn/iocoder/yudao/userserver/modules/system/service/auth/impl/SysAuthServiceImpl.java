@@ -140,19 +140,21 @@ public class SysAuthServiceImpl implements SysAuthService {
 
     @Override
     public String socialLogin2(MbrAuthSocialLogin2ReqVO reqVO, String userIp, String userAgent) {
-        // 使用 code 授权码，进行登录
         AuthUser authUser = socialService.getAuthUser(reqVO.getType(), reqVO.getCode(), reqVO.getState());
         org.springframework.util.Assert.notNull(authUser, "授权用户不为空");
 
-        // 使用账号密码，进行登录。
-        LoginUser loginUser = this.login0(reqVO.getUsername(), reqVO.getPassword());
-//        loginUser.setRoleIds(this.getUserRoleIds(loginUser.getId())); // 获取用户角色列表
+        // 使用手机号、手机验证码登录
+        SysAuthSmsLoginReqVO loginReqVO = SysAuthSmsLoginReqVO
+                .builder()
+                .mobile(reqVO.getMobile())
+                .code(reqVO.getSmsCode())
+                .build();
+        String sessionId = this.smsLogin(loginReqVO, userIp, userAgent);
+        LoginUser loginUser = userSessionCoreService.getLoginUser(sessionId);
 
         // 绑定社交用户（新增）
         socialService.bindSocialUser(loginUser.getId(), reqVO.getType(), authUser, USER_TYPE_ENUM);
-
-        // 缓存登录用户到 Redis 中，返回 sessionId 编号
-        return userSessionCoreService.createUserSession(loginUser, userIp, userAgent);
+        return sessionId;
     }
 
     @Override

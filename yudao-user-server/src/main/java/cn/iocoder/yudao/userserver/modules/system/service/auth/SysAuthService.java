@@ -46,7 +46,7 @@ public interface SysAuthService extends SecurityAuthFrameworkService {
     String socialLogin(@Valid MbrAuthSocialLoginReqVO reqVO, String userIp, String userAgent);
 
     /**
-     * 社交登录，使用 code 授权码 + 账号密码
+     * 社交登录，使用 手机号 + 手机验证码
      *
      * @param reqVO 登录信息
      * @param userIp 用户 IP
