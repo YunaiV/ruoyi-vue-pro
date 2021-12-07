@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.framework.datascope.core.interceptor;
+package cn.iocoder.yudao.framework.datapermission.core.interceptor;
 
 import org.junit.jupiter.api.Test;
 
@@ -9,7 +9,7 @@ public class DataPermissionInterceptorTest {
     private final DataPermissionInterceptor interceptor = new DataPermissionInterceptor();
 
     @Test
-    void selectSingle() {
+    public void selectSingle() {
         // 单表
         assertSql("select * from entity where id = ?",
                 "SELECT * FROM entity WHERE id = ? AND tenant_id = 1");
@@ -27,6 +27,10 @@ public class DataPermissionInterceptorTest {
 
     private void assertSql(String sql, String targetSql) {
         assertThat(interceptor.parserSingle(sql, null)).isEqualTo(targetSql);
+    }
+
+    public static void main(String[] args) {
+        System.out.println("123");
     }
 
 }

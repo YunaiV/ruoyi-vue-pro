@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.framework.datascope.core.interceptor;
+package cn.iocoder.yudao.framework.datapermission.core.interceptor;
 
 import com.baomidou.mybatisplus.core.plugins.InterceptorIgnoreHelper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
