@@ -24,7 +24,6 @@ import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
 
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.LinkedList;
@@ -35,9 +34,11 @@ public class DataPermissionInterceptor extends JsqlParserSupport implements Inne
 //    private TenantLineHandler tenantLineHandler;
 
     @Override
-    public void beforeQuery(Executor executor, MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql) throws SQLException {
+    public void beforeQuery(Executor executor, MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql) {
+        // TODO 芋艿：这个判断，后续读懂下
         if (InterceptorIgnoreHelper.willIgnoreTenantLine(ms.getId())) return;
         PluginUtils.MPBoundSql mpBs = PluginUtils.mpBoundSql(boundSql);
+        // TODO 芋艿：null=》DataScope
         mpBs.sql(parserSingle(mpBs.sql(), null));
     }
 
@@ -121,20 +122,6 @@ public class DataPermissionInterceptor extends JsqlParserSupport implements Inne
             }
         }
         return equalsTo;
-    }
-
-    /**
-     * 追加 SelectItem
-     *
-     * @param selectItems SelectItem
-     */
-    protected void appendSelectItem(List<SelectItem> selectItems) {
-        if (CollectionUtils.isEmpty(selectItems)) return;
-        if (selectItems.size() == 1) {
-            SelectItem item = selectItems.get(0);
-            if (item instanceof AllColumns || item instanceof AllTableColumns) return;
-        }
-        selectItems.add(new SelectExpressionItem(new Column(getTenantIdColumn())));
     }
 
     /**
@@ -376,12 +363,6 @@ public class DataPermissionInterceptor extends JsqlParserSupport implements Inne
         column.append(getTenantIdColumn());
         return new Column(column.toString());
     }
-
-//    @Override
-//    public void setProperties(Properties properties) {
-//        PropertyMapper.newInstance(properties).whenNotBlank("tenantLineHandler",
-//                ClassUtils::newInstance, this::setTenantLineHandler);
-//    }
 
     // TODO 芋艿：未实现
 
