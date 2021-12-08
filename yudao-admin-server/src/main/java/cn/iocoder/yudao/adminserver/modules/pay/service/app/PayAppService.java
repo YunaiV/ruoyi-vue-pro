@@ -1,12 +1,17 @@
 package cn.iocoder.yudao.adminserver.modules.pay.service.app;
 
-import java.util.*;
-import javax.validation.*;
-
-import cn.iocoder.yudao.adminserver.modules.pay.controller.app.vo.*;
+import cn.iocoder.yudao.adminserver.modules.pay.controller.app.vo.PayAppCreateReqVO;
+import cn.iocoder.yudao.adminserver.modules.pay.controller.app.vo.PayAppExportReqVO;
+import cn.iocoder.yudao.adminserver.modules.pay.controller.app.vo.PayAppPageReqVO;
+import cn.iocoder.yudao.adminserver.modules.pay.controller.app.vo.PayAppUpdateReqVO;
 import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.merchant.PayAppDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import org.springframework.web.multipart.MultipartFile;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+
+import javax.validation.Valid;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 支付应用信息 Service 接口
@@ -77,5 +82,22 @@ public interface PayAppService {
      */
     void updateAppStatus(Long id, Integer status);
 
+    /**
+     * 根据商户 ID 获得支付应用信息列表,
+     *
+     * @param merchantId 商户 ID
+     * @return 支付应用信息列表
+     */
+    List<PayAppDO> getListByMerchantId(String merchantId);
 
+    /**
+     * 获得指定编号的商户 Map
+     *
+     * @param appIdList 应用编号集合
+     * @return 商户 Map
+     */
+    default Map<Long, PayAppDO> getAppMap(Collection<Long> appIdList) {
+        List<PayAppDO> list =  this.getAppList(appIdList);
+        return CollectionUtils.convertMap(list, PayAppDO::getId);
+    }
 }

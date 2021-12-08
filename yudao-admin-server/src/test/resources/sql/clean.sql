@@ -28,4 +28,5 @@ DELETE FROM "sys_social_user";
 -- pay 开头的 DB
 DELETE FROM pay_merchant;
 DELETE FROM pay_app;
-DELETE FROM pay_channel
+DELETE FROM pay_channel;
+delete from pay_order;

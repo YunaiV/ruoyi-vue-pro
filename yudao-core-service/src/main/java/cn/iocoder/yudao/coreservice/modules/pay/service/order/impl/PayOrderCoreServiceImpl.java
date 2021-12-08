@@ -2,7 +2,6 @@ package cn.iocoder.yudao.coreservice.modules.pay.service.order.impl;
 
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.RandomUtil;
-import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.coreservice.modules.pay.convert.order.PayOrderCoreConvert;
 import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.merchant.PayAppDO;
 import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.merchant.PayChannelDO;
@@ -18,7 +17,6 @@ import cn.iocoder.yudao.coreservice.modules.pay.service.merchant.PayChannelCoreS
 import cn.iocoder.yudao.coreservice.modules.pay.service.notify.PayNotifyCoreService;
 import cn.iocoder.yudao.coreservice.modules.pay.service.notify.dto.PayNotifyTaskCreateReqDTO;
 import cn.iocoder.yudao.coreservice.modules.pay.service.order.PayOrderCoreService;
-
 import cn.iocoder.yudao.coreservice.modules.pay.service.order.dto.PayOrderCreateReqDTO;
 import cn.iocoder.yudao.coreservice.modules.pay.service.order.dto.PayOrderSubmitReqDTO;
 import cn.iocoder.yudao.coreservice.modules.pay.service.order.dto.PayOrderSubmitRespDTO;
@@ -98,6 +96,7 @@ public class PayOrderCoreServiceImpl implements PayOrderCoreService {
         // 订单相关字段
         order.setStatus(PayOrderStatusEnum.WAITING.getStatus());
         // 退款相关字段
+        // todo @芋艿 创建支付的订单的退款状态枚举是不是有问题，应该是 PayRefundTypeEnum 吧 您这填写的是 PayOrderNotifyStatusEnum 回调状态枚举
         order.setRefundStatus(PayOrderNotifyStatusEnum.NO.getStatus())
                 .setRefundTimes(0).setRefundAmount(0L);
         payOrderCoreMapper.insert(order);

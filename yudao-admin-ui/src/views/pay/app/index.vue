@@ -195,7 +195,6 @@
               :value="item.id">
             </el-option>
           </el-select>
-          <!--          <el-input v-model="form.merchantId" placeholder="请输入商户编号"/>-->
         </el-form-item>
         <el-form-item label="开启状态" prop="status">
           <el-radio-group v-model="form.status">
@@ -221,7 +220,6 @@
         <el-button @click="cancel">取 消</el-button>
       </div>
     </el-dialog>
-
     <wechat-channel-form :transferParam="channelParam"></wechat-channel-form>
     <ali-pay-channel-form :transferParam="channelParam"></ali-pay-channel-form>
   </div>
@@ -312,6 +310,7 @@ export default {
   },
   created() {
     this.getList();
+    this.handleGetMerchantListByName(null);
   },
   methods: {
     /** 查询列表 */

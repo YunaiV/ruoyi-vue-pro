@@ -65,3 +65,14 @@ export function exportAppExcel(query) {
     responseType: 'blob'
   })
 }
+
+// 根据商ID称搜索应用列表
+export function getAppListByMerchantId(merchantId) {
+  return request({
+    url: '/pay/app/list-merchant-id',
+    params:{
+      merchantId:merchantId
+    },
+    method: 'get'
+  })
+}

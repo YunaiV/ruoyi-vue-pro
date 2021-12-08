@@ -18,13 +18,11 @@ import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
@@ -170,6 +168,14 @@ public class PayAppController {
         ExcelUtils.write(response, "支付应用信息.xls", "数据", PayAppExcelVO.class, datas);
     }
 
+    @GetMapping("/list-merchant-id")
+    @ApiOperation("根据商户 ID 查询支付应用信息")
+    @ApiImplicitParam(name = "merchantId", value = "商户ID", required = true, example = "1", dataTypeClass = Long.class)
+    @PreAuthorize("@ss.hasPermission('pay:merchant:query')")
+    public CommonResult<List<PayAppRespVO>> getMerchantListByName(@RequestParam String merchantId) {
+        List<PayAppDO> appListDO = appService.getListByMerchantId(merchantId);
+        return success(PayAppConvert.INSTANCE.convertList(appListDO));
+    }
 
 
 }

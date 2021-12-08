@@ -10,7 +10,6 @@ import cn.iocoder.yudao.adminserver.modules.pay.convert.app.PayAppConvert;
 import cn.iocoder.yudao.adminserver.modules.pay.dal.mysql.app.PayAppMapper;
 import cn.iocoder.yudao.adminserver.modules.pay.dal.mysql.merchant.PayMerchantMapper;
 import cn.iocoder.yudao.adminserver.modules.pay.service.app.PayAppService;
-import cn.iocoder.yudao.adminserver.modules.pay.service.merchant.PayMerchantService;
 import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.merchant.PayAppDO;
 import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.merchant.PayMerchantDO;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
@@ -22,7 +21,7 @@ import org.springframework.validation.annotation.Validated;
 import javax.annotation.Resource;
 import java.util.*;
 
-import static cn.iocoder.yudao.coreservice.modules.pay.enums.PayErrorCodeCoreConstants.*;
+import static cn.iocoder.yudao.coreservice.modules.pay.enums.PayErrorCodeCoreConstants.PAY_APP_NOT_FOUND;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 
@@ -134,6 +133,16 @@ public class PayAppServiceImpl implements PayAppService {
         appMapper.updateById(app);
     }
 
+    /**
+     * 根据商户 ID 获得支付应用信息列表,
+     *
+     * @param merchantId 商户 ID
+     * @return 支付应用信息列表
+     */
+    @Override
+    public List<PayAppDO> getListByMerchantId(String merchantId) {
+        return appMapper.getListByMerchantId(merchantId);
+    }
 
     /**
      * 检查商户是否存在

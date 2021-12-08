@@ -6,8 +6,6 @@ import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.merchant.PayMerch
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.QueryWrapperX;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -49,6 +47,7 @@ public interface PayMerchantMapper extends BaseMapperX<PayMerchantDO> {
      * @return 商户集合
      */
     default List<PayMerchantDO> getMerchantListByName(String merchantName) {
-        return this.selectList(new LambdaQueryWrapper<PayMerchantDO>().like(PayMerchantDO::getName, merchantName));
+        return this.selectList(new QueryWrapperX<PayMerchantDO>()
+                .likeIfPresent("name", merchantName));
     }
 }

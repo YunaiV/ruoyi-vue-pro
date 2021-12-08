@@ -170,6 +170,7 @@ export default {
       this.addBeginAndEndTime(params, this.dateRangeCreateTime, 'createTime');
       // 执行查询
       getMerchantPage(params).then(response => {
+        console.log(response.data);
         this.list = response.data.list;
         this.total = response.data.total;
         this.loading = false;

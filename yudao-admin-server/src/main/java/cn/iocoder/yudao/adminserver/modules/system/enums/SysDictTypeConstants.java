@@ -22,4 +22,19 @@ public interface SysDictTypeConstants {
     String SMS_SEND_STATUS = "sys_sms_send_status"; // 短信发送状态
     String SMS_RECEIVE_STATUS = "sys_sms_receive_status"; // 短信接收状态
 
+    /**
+     * 支付-订单-订单状态
+     */
+    String PAY_ORDER_STATUS = "pay_order_status";
+
+    /**
+     * 支付-订单-订单回调商户状态
+     */
+    String PAY_ORDER_NOTIFY_STATUS = "pay_order_notify_status";
+
+    /**
+     * 支付-订单-订单退款状态
+     */
+    String PAY_ORDER_REFUND_STATUS = "pay_order_refund_status";
+
 }

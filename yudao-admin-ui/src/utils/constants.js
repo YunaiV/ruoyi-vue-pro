@@ -91,6 +91,9 @@ export const SysUserSocialTypeEnum = {
   }
 }
 
+/**
+ * 支付渠道枚举
+ */
 export const PayChannelEnum = {
   WX_PUB: {
     "code": "wx_pub",
@@ -122,7 +125,65 @@ export const PayChannelEnum = {
   },
 }
 
+/**
+ * 支付类型枚举
+ */
 export const PayType = {
   WECHAT: "WECHAT",
   ALIPAY: "ALIPAY"
 }
+
+/**
+ * 支付订单状态枚举
+ */
+export const payOrderStatusEnum = {
+  WAITING: {
+    status: 0,
+    name: '未支付'
+  },
+  SUCCESS: {
+    status: 10,
+    name: '已支付'
+  },
+  CLOSED: {
+    status: 20,
+    name: '未支付'
+  }
+}
+
+/**
+ * 支付订单回调状态枚举
+ */
+export const payOrderNotifyStatusEnum = {
+  NO: {
+    status: 0,
+    name: '未通知'
+  },
+  SUCCESS: {
+    status: 10,
+    name: '通知成功'
+  },
+  FAILURE: {
+    status: 20,
+    name: '通知失败'
+  }
+}
+
+/**
+ * 支付订单退款状态枚举
+ */
+export const payOrderRefundStatusEnum = {
+  NO: {
+    status: 0,
+    name: '未退款'
+  },
+  SOME: {
+    status: 10,
+    name: '部分退款'
+  },
+  ALL: {
+    status: 20,
+    name: '全部退款'
+  }
+}
+

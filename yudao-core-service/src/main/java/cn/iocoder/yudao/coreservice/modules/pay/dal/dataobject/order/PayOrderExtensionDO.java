@@ -16,7 +16,7 @@ import java.util.Map;
  *
  * @author 芋道源码
  */
-@TableName("pay_order_extension")
+@TableName(value = "pay_order_extension",autoResultMap = true)
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
