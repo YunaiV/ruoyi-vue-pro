@@ -1,12 +1,20 @@
 package cn.iocoder.yudao.framework.datapermission.core.interceptor;
 
+import cn.iocoder.yudao.framework.datapermission.core.rule.DataPermissionRuleFactory;
+import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class DataPermissionInterceptorTest {
+public class DataPermissionInterceptorTest extends BaseMockitoUnitTest {
 
-    private final DataPermissionInterceptor interceptor = new DataPermissionInterceptor();
+    @InjectMocks
+    private DataPermissionInterceptor interceptor;
+
+    @Mock
+    private DataPermissionRuleFactory ruleFactory;
 
     @Test
     public void selectSingle() {
