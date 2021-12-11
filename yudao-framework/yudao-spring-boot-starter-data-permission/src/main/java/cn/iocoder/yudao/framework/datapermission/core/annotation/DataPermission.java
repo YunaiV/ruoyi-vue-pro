@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.framework.datapermission.config;
+package cn.iocoder.yudao.framework.datapermission.core.annotation;
 
 import cn.iocoder.yudao.framework.datapermission.core.rule.DataPermissionRule;
 
@@ -25,11 +25,11 @@ public @interface DataPermission {
     /**
      * 生效的数据权限规则数组，优先级高于 {@link #excludeRules()}
      */
-    Class<DataPermissionRule>[] includeRules() default {};
+    Class<? extends DataPermissionRule>[] includeRules() default {};
 
     /**
      * 排除的数据权限规则数组，优先级最低
      */
-    Class<DataPermissionRule>[] excludeRules() default {};
+    Class<? extends DataPermissionRule>[] excludeRules() default {};
 
 }

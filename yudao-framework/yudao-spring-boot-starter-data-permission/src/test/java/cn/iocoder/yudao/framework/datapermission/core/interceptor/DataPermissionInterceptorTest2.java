@@ -8,13 +8,15 @@ import net.sf.jsqlparser.expression.Alias;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.LongValue;
 import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
+import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
+import net.sf.jsqlparser.expression.operators.relational.InExpression;
 import net.sf.jsqlparser.schema.Column;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.util.collection.SetUtils.asSet;
@@ -44,7 +46,8 @@ public class DataPermissionInterceptorTest2 extends BaseMockitoUnitTest {
 
             @Override
             public Set<String> getTableNames() {
-                return asSet("entity", "entity1", "entity2", "t1", "t2");
+                return asSet("entity", "entity1", "entity2", "t1", "t2", // 支持 MyBatis Plus 的单元测试
+                        "t_user", "t_role"); // 满足自己的单元测试
             }
 
             @Override
@@ -55,8 +58,27 @@ public class DataPermissionInterceptorTest2 extends BaseMockitoUnitTest {
             }
 
         };
+        // 部门的数据权限规则
+        DataPermissionRule deptRule = new DataPermissionRule() {
+
+            private static final String COLUMN = "dept_id";
+
+            @Override
+            public Set<String> getTableNames() {
+                return asSet("t_user");  // 满足自己的单元测试
+            }
+
+            @Override
+            public Expression getExpression(String tableName, Alias tableAlias) {
+                Column column = MyBatisUtils.buildColumn(tableName, tableAlias, COLUMN);
+                ExpressionList values = new ExpressionList(new LongValue(10L),
+                        new LongValue(20L));
+                return new InExpression(column, values);
+            }
+
+        };
         // 设置到上下文，保证
-        DataPermissionInterceptor.ContextHolder.init(Collections.singletonList(tenantRule));
+        DataPermissionInterceptor.ContextHolder.init(Arrays.asList(tenantRule, deptRule));
     }
 
     @Test
@@ -252,7 +274,6 @@ public class DataPermissionInterceptorTest2 extends BaseMockitoUnitTest {
 //                "WHERE (e.id = ? OR e.name = ?) AND e.tenant_id = 1");
     }
 
-
     @Test
     void selectWithAs() {
         assertSql("with with_as_A as (select * from entity) select * from with_as_A",
@@ -261,6 +282,89 @@ public class DataPermissionInterceptorTest2 extends BaseMockitoUnitTest {
 
     private void assertSql(String sql, String targetSql) {
         assertEquals(targetSql, interceptor.parserSingle(sql, null));
+    }
+
+    // ========== 额外的测试 ==========
+
+    @Test
+    public void testSelectSingle() {
+        // 单表
+        assertSql("select * from t_user where id = ?",
+                "SELECT * FROM t_user WHERE id = ? AND tenant_id = 1 AND dept_id IN (10, 20)");
+
+        assertSql("select * from t_user where id = ? or name = ?",
+                "SELECT * FROM t_user WHERE (id = ? OR name = ?) AND tenant_id = 1 AND dept_id IN (10, 20)");
+
+        assertSql("SELECT * FROM t_user WHERE (id = ? OR name = ?)",
+                "SELECT * FROM t_user WHERE (id = ? OR name = ?) AND tenant_id = 1 AND dept_id IN (10, 20)");
+
+        /* not */
+        assertSql("SELECT * FROM t_user WHERE not (id = ? OR name = ?)",
+                "SELECT * FROM t_user WHERE NOT (id = ? OR name = ?) AND tenant_id = 1 AND dept_id IN (10, 20)");
+    }
+
+    @Test
+    public void testSelectLeftJoin() {
+        // left join
+        assertSql("SELECT * FROM t_user e " +
+                        "left join t_role e1 on e1.id = e.id " +
+                        "WHERE e.id = ? OR e.name = ?",
+                "SELECT * FROM t_user e " +
+                        "LEFT JOIN t_role e1 ON e1.id = e.id AND e1.tenant_id = 1 " +
+                        "WHERE (e.id = ? OR e.name = ?) AND e.tenant_id = 1 AND e.dept_id IN (10, 20)");
+
+        // 条件 e.id = ? OR e.name = ? 带括号
+        assertSql("SELECT * FROM t_user e " +
+                        "left join t_role e1 on e1.id = e.id " +
+                        "WHERE (e.id = ? OR e.name = ?)",
+                "SELECT * FROM t_user e " +
+                        "LEFT JOIN t_role e1 ON e1.id = e.id AND e1.tenant_id = 1 " +
+                        "WHERE (e.id = ? OR e.name = ?) AND e.tenant_id = 1 AND e.dept_id IN (10, 20)");
+    }
+
+    @Test
+    public void testSelectRightJoin() {
+        // right join
+        assertSql("SELECT * FROM t_user e " +
+                        "right join t_role e1 on e1.id = e.id " +
+                        "WHERE e.id = ? OR e.name = ?",
+                "SELECT * FROM t_user e " +
+                        "RIGHT JOIN t_role e1 ON e1.id = e.id AND e1.tenant_id = 1 " +
+                        "WHERE (e.id = ? OR e.name = ?) AND e.tenant_id = 1 AND e.dept_id IN (10, 20)");
+
+        // 条件 e.id = ? OR e.name = ? 带括号
+        assertSql("SELECT * FROM t_user e " +
+                        "right join t_role e1 on e1.id = e.id " +
+                        "WHERE (e.id = ? OR e.name = ?)",
+                "SELECT * FROM t_user e " +
+                        "RIGHT JOIN t_role e1 ON e1.id = e.id AND e1.tenant_id = 1 " +
+                        "WHERE (e.id = ? OR e.name = ?) AND e.tenant_id = 1 AND e.dept_id IN (10, 20)");
+    }
+
+    @Test
+    public void testSelectInnerJoin() {
+        // inner join
+        assertSql("SELECT * FROM t_user e " +
+                        "inner join entity1 e1 on e1.id = e.id " +
+                        "WHERE e.id = ? OR e.name = ?",
+                "SELECT * FROM t_user e " +
+                        "INNER JOIN entity1 e1 ON e1.id = e.id AND e1.tenant_id = 1 " +
+                        "WHERE (e.id = ? OR e.name = ?) AND e.tenant_id = 1 AND e.dept_id IN (10, 20)");
+
+        // 条件 e.id = ? OR e.name = ? 带括号
+        assertSql("SELECT * FROM t_user e " +
+                        "inner join t_role e1 on e1.id = e.id " +
+                        "WHERE (e.id = ? OR e.name = ?)",
+                "SELECT * FROM t_user e " +
+                        "INNER JOIN t_role e1 ON e1.id = e.id AND e1.tenant_id = 1 " +
+                        "WHERE (e.id = ? OR e.name = ?) AND e.tenant_id = 1 AND e.dept_id IN (10, 20)");
+
+        // 垃圾 inner join todo
+//        assertSql("SELECT * FROM entity,entity1 " +
+//                "WHERE entity.id = entity1.id",
+//            "SELECT * FROM entity e " +
+//                "INNER JOIN entity1 e1 ON e1.id = e.id AND e1.tenant_id = 1 " +
+//                "WHERE (e.id = ? OR e.name = ?) AND e.tenant_id = 1");
     }
 
 }
