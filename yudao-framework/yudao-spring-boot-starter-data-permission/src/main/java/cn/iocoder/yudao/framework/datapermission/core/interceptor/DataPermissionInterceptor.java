@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.PluginUtils;
 import com.baomidou.mybatisplus.extension.parser.JsqlParserSupport;
 import com.baomidou.mybatisplus.extension.plugins.inner.InnerInterceptor;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.sf.jsqlparser.expression.*;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
@@ -48,6 +49,7 @@ public class DataPermissionInterceptor extends JsqlParserSupport implements Inne
 
     private final DataPermissionRuleFactory ruleFactory;
 
+    @Getter
     private final MappedStatementCache mappedStatementCache = new MappedStatementCache();
 
     @Override // SELECT 场景
@@ -442,13 +444,14 @@ public class DataPermissionInterceptor extends JsqlParserSupport implements Inne
      *
      * @author 芋道源码
      */
-    private static final class MappedStatementCache {
+    static final class MappedStatementCache {
 
         /**
-         * 无需重写的映射
+         * 指定数据权限规则，对指定 MappedStatement 无需重写（不生效)的缓存
          *
          * value：{@link MappedStatement#getId()} 编号
          */
+        @Getter
         private final Map<Class<? extends DataPermissionRule>, Set<String>> noRewritableMappedStatements = new ConcurrentHashMap<>();
 
         /**
@@ -467,7 +470,7 @@ public class DataPermissionInterceptor extends JsqlParserSupport implements Inne
             // 任一规则不在 noRewritableMap 中，则说明可能需要重写
             for (DataPermissionRule rule : rules) {
                 Set<String> mappedStatementIds = noRewritableMappedStatements.get(rule.getClass());
-                if (!CollUtil.contains(mappedStatementIds, ms.getId())) { // 不存在，则说明可能要重写
+                if (!CollUtil.contains(mappedStatementIds, ms.getId())) {
                     return false;
                 }
             }
@@ -489,6 +492,14 @@ public class DataPermissionInterceptor extends JsqlParserSupport implements Inne
                     noRewritableMappedStatements.put(rule.getClass(), SetUtils.asSet(ms.getId()));
                 }
             }
+        }
+
+        /**
+         * 清空缓存
+         * 目前主要提供给单元测试
+         */
+        public void clear() {
+            noRewritableMappedStatements.clear();
         }
 
     }
