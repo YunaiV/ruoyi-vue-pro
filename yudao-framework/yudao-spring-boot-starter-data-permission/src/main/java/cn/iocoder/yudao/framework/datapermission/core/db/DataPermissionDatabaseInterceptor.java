@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.framework.datapermission.core.interceptor;
+package cn.iocoder.yudao.framework.datapermission.core.db;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.util.collection.SetUtils;
@@ -45,7 +45,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author 芋道源码
  */
 @RequiredArgsConstructor
-public class DataPermissionInterceptor extends JsqlParserSupport implements InnerInterceptor {
+public class DataPermissionDatabaseInterceptor extends JsqlParserSupport implements InnerInterceptor {
 
     private final DataPermissionRuleFactory ruleFactory;
 

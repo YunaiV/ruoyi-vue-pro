@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.framework.datapermission.core.interceptor;
+package cn.iocoder.yudao.framework.datapermission.core.db;
 
 import cn.iocoder.yudao.framework.datapermission.core.rule.DataPermissionRule;
 import cn.iocoder.yudao.framework.datapermission.core.rule.DataPermissionRuleFactory;
@@ -23,16 +23,16 @@ import static cn.iocoder.yudao.framework.common.util.collection.SetUtils.asSet;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * {@link DataPermissionInterceptor} 的单元测试
+ * {@link DataPermissionDatabaseInterceptor} 的单元测试
  * 主要复用了 MyBatis Plus 的 TenantLineInnerInterceptorTest 的单元测试
  * 不过它的单元测试不是很规范，考虑到是复用的，所以暂时不进行修改~
  *
  * @author 芋道源码
  */
-public class DataPermissionInterceptorTest2 extends BaseMockitoUnitTest {
+public class DataPermissionDatabaseInterceptorTest2 extends BaseMockitoUnitTest {
 
     @InjectMocks
-    private DataPermissionInterceptor interceptor;
+    private DataPermissionDatabaseInterceptor interceptor;
 
     @Mock
     private DataPermissionRuleFactory ruleFactory;
@@ -78,7 +78,7 @@ public class DataPermissionInterceptorTest2 extends BaseMockitoUnitTest {
 
         };
         // 设置到上下文，保证
-        DataPermissionInterceptor.ContextHolder.init(Arrays.asList(tenantRule, deptRule));
+        DataPermissionDatabaseInterceptor.ContextHolder.init(Arrays.asList(tenantRule, deptRule));
     }
 
     @Test

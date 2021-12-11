@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.framework.datapermission.core.interceptor;
+package cn.iocoder.yudao.framework.datapermission.core.db;
 
 import cn.iocoder.yudao.framework.common.util.collection.SetUtils;
 import cn.iocoder.yudao.framework.datapermission.core.rule.DataPermissionRule;
@@ -29,17 +29,17 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 /**
- * {@link DataPermissionInterceptor} 的单元测试
- * 主要测试 {@link DataPermissionInterceptor#beforePrepare(StatementHandler, Connection, Integer)}
- * 和 {@link DataPermissionInterceptor#beforeUpdate(Executor, MappedStatement, Object)}
+ * {@link DataPermissionDatabaseInterceptor} 的单元测试
+ * 主要测试 {@link DataPermissionDatabaseInterceptor#beforePrepare(StatementHandler, Connection, Integer)}
+ * 和 {@link DataPermissionDatabaseInterceptor#beforeUpdate(Executor, MappedStatement, Object)}
  * 以及在这个过程中，ContextHolder 和 MappedStatementCache
  *
  * @author 芋道源码
  */
-public class DataPermissionInterceptorTest extends BaseMockitoUnitTest {
+public class DataPermissionDatabaseInterceptorTest extends BaseMockitoUnitTest {
 
     @InjectMocks
-    private DataPermissionInterceptor interceptor;
+    private DataPermissionDatabaseInterceptor interceptor;
 
     @Mock
     private DataPermissionRuleFactory ruleFactory;
@@ -47,7 +47,7 @@ public class DataPermissionInterceptorTest extends BaseMockitoUnitTest {
     @BeforeEach
     public void setUp() {
         // 清理上下文
-        DataPermissionInterceptor.ContextHolder.clear();
+        DataPermissionDatabaseInterceptor.ContextHolder.clear();
         // 清空缓存
         interceptor.getMappedStatementCache().clear();
     }
