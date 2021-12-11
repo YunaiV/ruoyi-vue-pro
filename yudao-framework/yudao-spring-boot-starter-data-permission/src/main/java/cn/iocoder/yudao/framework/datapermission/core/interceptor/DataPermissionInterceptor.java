@@ -330,6 +330,7 @@ public class DataPermissionInterceptor extends JsqlParserSupport implements Inne
 //                boolean needIgnore = ignoreTable(fromTable.getName());
 //                // 表名压栈，忽略的表压入 null，以便后续不处理
 //                tables.push(needIgnore ? null : fromTable);
+                tables.push(fromTable);
                 // 尾缀多个 on 表达式的时候统一处理
                 if (originOnExpressions.size() > 1) {
                     Collection<Expression> onExpressions = new LinkedList<>();
@@ -457,7 +458,7 @@ public class DataPermissionInterceptor extends JsqlParserSupport implements Inne
      *
      * @author 芋道源码
      */
-    private static final class ContextHolder {
+    static final class ContextHolder {
 
         /**
          * 该 {@link MappedStatement} 对应的规则

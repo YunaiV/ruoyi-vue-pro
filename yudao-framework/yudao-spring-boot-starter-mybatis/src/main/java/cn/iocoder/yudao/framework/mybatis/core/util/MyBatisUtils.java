@@ -7,6 +7,8 @@ import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.InnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import net.sf.jsqlparser.expression.Alias;
+import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
 
 import java.util.ArrayList;
@@ -65,6 +67,18 @@ public class MyBatisUtils {
             tableName = tableName.substring(1, tableName.length() - 1);
         }
         return tableName;
+    }
+
+    /**
+     * 构建 Column 对象
+     *
+     * @param tableName 表名
+     * @param tableAlias 别名
+     * @param column 字段名
+     * @return Column 对象
+     */
+    public static Column buildColumn(String tableName, Alias tableAlias, String column) {
+        return new Column(tableAlias != null ? tableAlias.getName() + "." + column : column);
     }
 
 }
