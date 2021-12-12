@@ -34,7 +34,7 @@ public class DataPermissionAnnotationInterceptor implements MethodInterceptor {
         // 入栈
         DataPermission dataPermission = this.findAnnotation(methodInvocation);
         if (dataPermission != null) {
-            DataPermissionContextHolder.push(dataPermission);
+            DataPermissionContextHolder.add(dataPermission);
         }
         try {
             // 执行逻辑
@@ -42,7 +42,7 @@ public class DataPermissionAnnotationInterceptor implements MethodInterceptor {
         } finally {
             // 出栈
             if (dataPermission != null) {
-                DataPermissionContextHolder.poll();
+                DataPermissionContextHolder.remove();
             }
         }
     }

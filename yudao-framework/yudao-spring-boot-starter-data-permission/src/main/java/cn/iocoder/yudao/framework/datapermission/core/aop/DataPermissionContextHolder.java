@@ -3,8 +3,8 @@ package cn.iocoder.yudao.framework.datapermission.core.aop;
 import cn.iocoder.yudao.framework.datapermission.core.annotation.DataPermission;
 import com.alibaba.ttl.TransmittableThreadLocal;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * {@link DataPermission} 注解的 Context 上下文
@@ -13,16 +13,19 @@ import java.util.Deque;
  */
 public class DataPermissionContextHolder {
 
-    private static final ThreadLocal<Deque<DataPermission>> DATA_PERMISSIONS =
-            TransmittableThreadLocal.withInitial(ArrayDeque::new);
+    /**
+     * 使用 List 的原因，可能存在方法的嵌套调用
+     */
+    private static final ThreadLocal<LinkedList<DataPermission>> DATA_PERMISSIONS =
+            TransmittableThreadLocal.withInitial(LinkedList::new);
 
     /**
      * 获得当前的 DataPermission 注解
      *
      * @return DataPermission 注解
      */
-    public static DataPermission peek() {
-        return DATA_PERMISSIONS.get().remove();
+    public static DataPermission get() {
+        return DATA_PERMISSIONS.get().peekLast();
     }
 
     /**
@@ -30,8 +33,8 @@ public class DataPermissionContextHolder {
      *
      * @param dataPermission DataPermission 注解
      */
-    public static void push(DataPermission dataPermission) {
-        DATA_PERMISSIONS.get().push(dataPermission);
+    public static void add(DataPermission dataPermission) {
+        DATA_PERMISSIONS.get().addLast(dataPermission);
     }
 
     /**
@@ -39,13 +42,31 @@ public class DataPermissionContextHolder {
      *
      * @return DataPermission 注解
      */
-    public static DataPermission poll() {
-        DataPermission dataPermission = DATA_PERMISSIONS.get().poll();
+    public static DataPermission remove() {
+        DataPermission dataPermission = DATA_PERMISSIONS.get().removeLast();
         // 无元素时，清空 ThreadLocal
-        if (dataPermission == null) {
+        if (DATA_PERMISSIONS.get().isEmpty()) {
             DATA_PERMISSIONS.remove();
         }
         return dataPermission;
+    }
+
+    /**
+     * 获得所有 DataPermission
+     *
+     * @return DataPermission 队列
+     */
+    public static List<DataPermission> getAll() {
+        return DATA_PERMISSIONS.get();
+    }
+
+    /**
+     * 清空上下文
+     *
+     * 目前仅仅用于单测
+     */
+    public static void clear() {
+        DATA_PERMISSIONS.remove();
     }
 
 }
