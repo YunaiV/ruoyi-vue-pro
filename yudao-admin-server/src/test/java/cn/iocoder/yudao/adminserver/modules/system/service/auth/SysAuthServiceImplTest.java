@@ -89,7 +89,6 @@ public class SysAuthServiceImplTest extends BaseDbUnitTest {
         LoginUser loginUser = (LoginUser) authService.loadUserByUsername(username);
         // 校验
         AssertUtils.assertPojoEquals(user, loginUser, "updateTime");
-        assertNull(loginUser.getRoleIds()); // 此时不会加载角色，所以是空的
     }
 
     @Test

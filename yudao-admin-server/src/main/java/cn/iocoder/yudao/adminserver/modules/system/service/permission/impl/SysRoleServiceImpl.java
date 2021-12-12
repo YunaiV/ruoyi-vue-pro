@@ -18,6 +18,7 @@ import cn.iocoder.yudao.adminserver.modules.system.enums.permission.SysRoleTypeE
 import cn.iocoder.yudao.adminserver.modules.system.mq.producer.permission.SysRoleProducer;
 import cn.iocoder.yudao.adminserver.modules.system.service.permission.SysPermissionService;
 import cn.iocoder.yudao.adminserver.modules.system.service.permission.SysRoleService;
+import cn.iocoder.yudao.framework.security.core.enums.DataScopeEnum;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 import lombok.extern.slf4j.Slf4j;
@@ -127,6 +128,7 @@ public class SysRoleServiceImpl implements SysRoleService {
         SysRoleDO role = SysRoleConvert.INSTANCE.convert(reqVO);
         role.setType(SysRoleTypeEnum.CUSTOM.getType());
         role.setStatus(CommonStatusEnum.ENABLE.getStatus());
+        role.setDataScope(DataScopeEnum.ALL.getScope()); // 默认可查看所有数据。原因是，可能一些项目不需要项目权限
         roleMapper.insert(role);
         // 发送刷新消息
         roleProducer.sendRoleRefreshMessage();
