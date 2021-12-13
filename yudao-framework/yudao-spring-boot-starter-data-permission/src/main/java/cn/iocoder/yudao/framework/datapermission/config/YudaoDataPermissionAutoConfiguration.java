@@ -18,7 +18,7 @@ import java.util.List;
  * @author 芋道源码
  */
 @Configuration
-public class DataPermissionAutoConfiguration {
+public class YudaoDataPermissionAutoConfiguration {
 
     @Bean
     public DataPermissionRuleFactory dataPermissionRuleFactory(List<DataPermissionRule> rules) {

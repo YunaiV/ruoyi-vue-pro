@@ -1,9 +1,9 @@
-package cn.iocoder.yudao.adminserver.framework.datapermission.core.rule;
+package cn.iocoder.yudao.framework.datapermission.core.dept.rule;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.adminserver.framework.datapermission.core.service.DeptDataPermissionService;
-import cn.iocoder.yudao.adminserver.framework.datapermission.core.service.dto.DeptDataPermissionRespDTO;
+import cn.iocoder.yudao.framework.datapermission.core.dept.service.DeptDataPermissionFrameworkService;
+import cn.iocoder.yudao.framework.datapermission.core.dept.service.dto.DeptDataPermissionRespDTO;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.datapermission.core.rule.DataPermissionRule;
@@ -51,7 +51,7 @@ public class DeptDataPermissionRule implements DataPermissionRule {
     private static final String DEPT_COLUMN_NAME = "dept_id";
     private static final String USER_COLUMN_NAME = "user_id";
 
-    private final DeptDataPermissionService deptDataPermissionService;
+    private final DeptDataPermissionFrameworkService deptDataPermissionService;
 
     /**
      * 基于部门的表字段配置
@@ -60,7 +60,7 @@ public class DeptDataPermissionRule implements DataPermissionRule {
      * key：表名
      * value：字段名
      */
-    private final Map<String, String> DEPT_TABLE_CONFIG = new HashMap<>();
+    private final Map<String, String> deptColumns = new HashMap<>();
     /**
      * 基于用户的表字段配置
      * 一般情况下，每个表的部门编号字段是 dept_id，通过该配置自定义。
@@ -68,9 +68,9 @@ public class DeptDataPermissionRule implements DataPermissionRule {
      * key：表名
      * value：字段名
      */
-    private final Map<String, String> USER_TABLE_CONFIG = new HashMap<>();
+    private final Map<String, String> userColumns = new HashMap<>();
     /**
-     * 所有表名，是 {@link #DEPT_TABLE_CONFIG} 和 {@link #USER_TABLE_CONFIG} 的合集
+     * 所有表名，是 {@link #deptColumns} 和 {@link #userColumns} 的合集
      */
     private final Set<String> TABLE_NAMES = new HashSet<>();
 
@@ -126,7 +126,7 @@ public class DeptDataPermissionRule implements DataPermissionRule {
 
     private Expression buildDeptExpression(String tableName, Alias tableAlias, Set<Long> deptIds) {
         // 如果不存在配置，则无需作为条件
-        String columnName = DEPT_TABLE_CONFIG.get(tableName);
+        String columnName = deptColumns.get(tableName);
         if (StrUtil.isEmpty(columnName)) {
             return null;
         }
@@ -140,7 +140,7 @@ public class DeptDataPermissionRule implements DataPermissionRule {
         if (Boolean.FALSE.equals(self)) {
             return null;
         }
-        String columnName = USER_TABLE_CONFIG.get(tableName);
+        String columnName = userColumns.get(tableName);
         if (StrUtil.isEmpty(columnName)) {
             return null;
         }
@@ -150,23 +150,23 @@ public class DeptDataPermissionRule implements DataPermissionRule {
 
     // ==================== 添加配置 ====================
 
-    public void addDeptTableConfig(Class<? extends BaseDO> entityClass) {
-        addDeptTableConfig(entityClass, DEPT_COLUMN_NAME);
+    public void addDeptColumn(Class<? extends BaseDO> entityClass) {
+        addDeptColumn(entityClass, DEPT_COLUMN_NAME);
     }
 
-    public void addDeptTableConfig(Class<? extends BaseDO> entityClass, String columnName) {
+    public void addDeptColumn(Class<? extends BaseDO> entityClass, String columnName) {
         String tableName = TableInfoHelper.getTableInfo(entityClass).getTableName();
-        DEPT_TABLE_CONFIG.put(tableName, columnName);
+        deptColumns.put(tableName, columnName);
         TABLE_NAMES.add(tableName);
     }
 
-    public void addUserTableConfig(Class<? extends BaseDO> entityClass) {
-        addUserTableConfig(entityClass, DEPT_COLUMN_NAME);
+    public void addUserColumn(Class<? extends BaseDO> entityClass) {
+        addUserColumn(entityClass, USER_COLUMN_NAME);
     }
 
-    public void addUserTableConfig(Class<? extends BaseDO> entityClass, String columnName) {
+    public void addUserColumn(Class<? extends BaseDO> entityClass, String columnName) {
         String tableName = TableInfoHelper.getTableInfo(entityClass).getTableName();
-        USER_TABLE_CONFIG.put(tableName, columnName);
+        userColumns.put(tableName, columnName);
         TABLE_NAMES.add(tableName);
     }
 

@@ -1,2 +1,3 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  cn.iocoder.yudao.framework.datapermission.config.DataPermissionAutoConfiguration
+  cn.iocoder.yudao.framework.datapermission.config.YudaoDataPermissionAutoConfiguration,\
+  cn.iocoder.yudao.framework.datapermission.config.YudaoDeptDataPermissionAutoConfiguration

@@ -21,6 +21,13 @@
             <artifactId>yudao-common</artifactId>
         </dependency>
 
+        <!-- Web 相关 -->
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-spring-boot-starter-security</artifactId>
+            <optional>true</optional> <!-- 可选，如果使用 DeptDataPermissionRule 必须提供 -->
+        </dependency>
+
         <!-- DB 相关 -->
         <dependency>
             <groupId>cn.iocoder.boot</groupId>

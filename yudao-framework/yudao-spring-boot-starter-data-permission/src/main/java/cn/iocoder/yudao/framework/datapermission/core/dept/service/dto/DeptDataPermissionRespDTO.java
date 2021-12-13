@@ -1,10 +1,8 @@
-package cn.iocoder.yudao.adminserver.framework.datapermission.core.service.dto;
+package cn.iocoder.yudao.framework.datapermission.core.dept.service.dto;
 
 import lombok.Data;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 /**
