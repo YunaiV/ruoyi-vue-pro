@@ -91,7 +91,8 @@ public class DeptDataPermissionRule implements DataPermissionRule {
         DeptDataPermissionRespDTO deptDataPermission = deptDataPermissionService.getDeptDataPermission(loginUser);
         if (deptDataPermission == null) {
             log.error("[getExpression][LoginUser({}) 获取数据权限为 null]", JsonUtils.toJsonString(loginUser));
-            return null;
+            throw new NullPointerException(String.format("LoginUser(%d) Table(%s/%s) 未返回数据权限",
+                    loginUser.getId(), tableName, tableAlias.getName()));
         }
 
         // 情况一，如果是 ALL 可查看全部，则无需拼接条件
@@ -111,7 +112,7 @@ public class DeptDataPermissionRule implements DataPermissionRule {
         if (deptExpression == null && userExpression == null) {
             log.error("[getExpression][LoginUser({}) Table({}/{}) DeptDataPermission({}) 构建的条件为空]",
                     JsonUtils.toJsonString(loginUser), tableName, tableAlias, JsonUtils.toJsonString(deptDataPermission));
-            throw new NullPointerException(String.format("LoginUser(%d) tableName(%s) tableAlias(%s) 构建的条件为空",
+            throw new NullPointerException(String.format("LoginUser(%d) Table(%s/%s) 构建的条件为空",
                     loginUser.getId(), tableName, tableAlias.getName()));
         }
         if (deptExpression == null) {
@@ -128,6 +129,10 @@ public class DeptDataPermissionRule implements DataPermissionRule {
         // 如果不存在配置，则无需作为条件
         String columnName = deptColumns.get(tableName);
         if (StrUtil.isEmpty(columnName)) {
+            return null;
+        }
+        // 如果为空，则无条件
+        if (CollUtil.isEmpty(deptIds)) {
             return null;
         }
         // 拼接条件
@@ -156,6 +161,10 @@ public class DeptDataPermissionRule implements DataPermissionRule {
 
     public void addDeptColumn(Class<? extends BaseDO> entityClass, String columnName) {
         String tableName = TableInfoHelper.getTableInfo(entityClass).getTableName();
+       addDeptColumn(tableName, columnName);
+    }
+
+    public void addDeptColumn(String tableName, String columnName) {
         deptColumns.put(tableName, columnName);
         TABLE_NAMES.add(tableName);
     }
@@ -166,6 +175,10 @@ public class DeptDataPermissionRule implements DataPermissionRule {
 
     public void addUserColumn(Class<? extends BaseDO> entityClass, String columnName) {
         String tableName = TableInfoHelper.getTableInfo(entityClass).getTableName();
+        addUserColumn(tableName, columnName);
+    }
+
+    public void addUserColumn(String tableName, String columnName) {
         userColumns.put(tableName, columnName);
         TABLE_NAMES.add(tableName);
     }
