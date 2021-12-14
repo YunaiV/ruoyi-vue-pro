@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.framework.security.core.util;
 
+import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils;
 import org.springframework.lang.Nullable;
@@ -11,6 +12,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -93,14 +95,17 @@ public class SecurityFrameworkUtils {
                 loginUser, null, loginUser.getAuthorities());
         authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
         // 设置到上下文
-        //何时调用  SecurityContextHolder.clearContext. spring security filter 应该会调用 clearContext
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
         // 额外设置到 request 中，用于 ApiAccessLogFilter 可以获取到用户编号；
         // 原因是，Spring Security 的 Filter 在 ApiAccessLogFilter 后面，在它记录访问日志时，线上上下文已经没有用户编号等信息
         WebFrameworkUtils.setLoginUserId(request, loginUser.getId());
         WebFrameworkUtils.setLoginUserType(request, loginUser.getUserType());
         // TODO @jason：使用 userId 会不会更合适哈？
-        org.activiti.engine.impl.identity.Authentication.setAuthenticatedUserId(loginUser.getUsername());
+        // TODO @芋艿：activiti 需要使用 ttl 上下文
+        // TODO @jason：清理问题
+        if (Objects.equals(UserTypeEnum.ADMIN.getValue(), loginUser.getUserType())) {
+            org.activiti.engine.impl.identity.Authentication.setAuthenticatedUserId(loginUser.getUsername());
+        }
     }
 
 }

@@ -1,16 +1,16 @@
 package cn.iocoder.yudao.adminserver.modules.infra.service.logger;
 
 import cn.iocoder.yudao.adminserver.BaseDbUnitTest;
-import cn.iocoder.yudao.coreservice.modules.infra.dal.dataobject.logger.InfApiErrorLogDO;
-import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.adminserver.modules.infra.controller.logger.vo.apierrorlog.InfApiErrorLogExportReqVO;
 import cn.iocoder.yudao.adminserver.modules.infra.controller.logger.vo.apierrorlog.InfApiErrorLogPageReqVO;
 import cn.iocoder.yudao.adminserver.modules.infra.dal.mysql.logger.InfApiErrorLogMapper;
 import cn.iocoder.yudao.adminserver.modules.infra.enums.logger.InfApiErrorLogProcessStatusEnum;
 import cn.iocoder.yudao.adminserver.modules.infra.service.logger.impl.InfApiErrorLogServiceImpl;
-import cn.iocoder.yudao.framework.test.core.util.RandomUtils;
+import cn.iocoder.yudao.coreservice.modules.infra.dal.dataobject.logger.InfApiErrorLogDO;
+import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
+import cn.iocoder.yudao.framework.test.core.util.RandomUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
@@ -20,11 +20,10 @@ import java.util.List;
 
 import static cn.iocoder.yudao.adminserver.modules.infra.enums.InfErrorCodeConstants.API_ERROR_LOG_NOT_FOUND;
 import static cn.iocoder.yudao.adminserver.modules.infra.enums.InfErrorCodeConstants.API_ERROR_LOG_PROCESSED;
+import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildTime;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildTime;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * {@link InfApiErrorLogServiceImpl} 单元测试
@@ -60,17 +59,17 @@ public class InfApiErrorLogServiceImplTest extends BaseDbUnitTest {
 
         // 下面几个都是不匹配的数据
         // userId 不同的
-        infApiErrorLogMapper.insert(ObjectUtils.clone(infApiErrorLogDO, logDO -> logDO.setUserId(3344L)));
+        infApiErrorLogMapper.insert(ObjectUtils.cloneIgnoreId(infApiErrorLogDO, logDO -> logDO.setUserId(3344L)));
         // userType
-        infApiErrorLogMapper.insert(ObjectUtils.clone(infApiErrorLogDO, logDO -> logDO.setUserType(UserTypeEnum.MEMBER.getValue())));
+        infApiErrorLogMapper.insert(ObjectUtils.cloneIgnoreId(infApiErrorLogDO, logDO -> logDO.setUserType(UserTypeEnum.MEMBER.getValue())));
         // applicationName 不同的
-        infApiErrorLogMapper.insert(ObjectUtils.clone(infApiErrorLogDO, logDO -> logDO.setApplicationName("test")));
+        infApiErrorLogMapper.insert(ObjectUtils.cloneIgnoreId(infApiErrorLogDO, logDO -> logDO.setApplicationName("test")));
         // requestUrl 不同的
-        infApiErrorLogMapper.insert(ObjectUtils.clone(infApiErrorLogDO, logDO -> logDO.setRequestUrl("bar")));
+        infApiErrorLogMapper.insert(ObjectUtils.cloneIgnoreId(infApiErrorLogDO, logDO -> logDO.setRequestUrl("bar")));
         // 构造一个早期时间 2021-02-06 00:00:00
-        infApiErrorLogMapper.insert(ObjectUtils.clone(infApiErrorLogDO, logDO -> logDO.setExceptionTime(buildTime(2021, 2, 6))));
+        infApiErrorLogMapper.insert(ObjectUtils.cloneIgnoreId(infApiErrorLogDO, logDO -> logDO.setExceptionTime(buildTime(2021, 2, 6))));
         // progressStatus 不同的
-        infApiErrorLogMapper.insert(ObjectUtils.clone(infApiErrorLogDO, logDO -> logDO.setProcessStatus(InfApiErrorLogProcessStatusEnum.DONE.getStatus())));
+        infApiErrorLogMapper.insert(ObjectUtils.cloneIgnoreId(infApiErrorLogDO, logDO -> logDO.setProcessStatus(InfApiErrorLogProcessStatusEnum.DONE.getStatus())));
 
         // 构造调用参数
         InfApiErrorLogPageReqVO reqVO = new InfApiErrorLogPageReqVO();
@@ -113,17 +112,17 @@ public class InfApiErrorLogServiceImplTest extends BaseDbUnitTest {
 
         // 下面几个都是不匹配的数据
         // userId 不同的
-        infApiErrorLogMapper.insert(ObjectUtils.clone(infApiErrorLogDO, logDO -> logDO.setUserId(3344L)));
+        infApiErrorLogMapper.insert(ObjectUtils.cloneIgnoreId(infApiErrorLogDO, logDO -> logDO.setUserId(3344L)));
         // userType
-        infApiErrorLogMapper.insert(ObjectUtils.clone(infApiErrorLogDO, logDO -> logDO.setUserType(UserTypeEnum.MEMBER.getValue())));
+        infApiErrorLogMapper.insert(ObjectUtils.cloneIgnoreId(infApiErrorLogDO, logDO -> logDO.setUserType(UserTypeEnum.MEMBER.getValue())));
         // applicationName 不同的
-        infApiErrorLogMapper.insert(ObjectUtils.clone(infApiErrorLogDO, logDO -> logDO.setApplicationName("test")));
+        infApiErrorLogMapper.insert(ObjectUtils.cloneIgnoreId(infApiErrorLogDO, logDO -> logDO.setApplicationName("test")));
         // requestUrl 不同的
-        infApiErrorLogMapper.insert(ObjectUtils.clone(infApiErrorLogDO, logDO -> logDO.setRequestUrl("bar")));
+        infApiErrorLogMapper.insert(ObjectUtils.cloneIgnoreId(infApiErrorLogDO, logDO -> logDO.setRequestUrl("bar")));
         // 构造一个早期时间 2021-02-06 00:00:00
-        infApiErrorLogMapper.insert(ObjectUtils.clone(infApiErrorLogDO, logDO -> logDO.setExceptionTime(buildTime(2021, 2, 6))));
+        infApiErrorLogMapper.insert(ObjectUtils.cloneIgnoreId(infApiErrorLogDO, logDO -> logDO.setExceptionTime(buildTime(2021, 2, 6))));
         // progressStatus 不同的
-        infApiErrorLogMapper.insert(ObjectUtils.clone(infApiErrorLogDO, logDO -> logDO.setProcessStatus(InfApiErrorLogProcessStatusEnum.DONE.getStatus())));
+        infApiErrorLogMapper.insert(ObjectUtils.cloneIgnoreId(infApiErrorLogDO, logDO -> logDO.setProcessStatus(InfApiErrorLogProcessStatusEnum.DONE.getStatus())));
 
         // 构造调用参数
         InfApiErrorLogExportReqVO reqVO = new InfApiErrorLogExportReqVO();

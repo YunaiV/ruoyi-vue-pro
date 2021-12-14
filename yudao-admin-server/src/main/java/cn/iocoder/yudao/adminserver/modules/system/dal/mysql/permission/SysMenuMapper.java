@@ -19,7 +19,7 @@ public interface SysMenuMapper extends BaseMapperX<SysMenuDO> {
     }
 
     default Integer selectCountByParentId(Long parentId) {
-        return selectCount(new QueryWrapper<SysMenuDO>().eq("parent_id", parentId));
+        return selectCount("parent_id", parentId);
     }
 
     default List<SysMenuDO> selectList(SysMenuListReqVO reqVO) {

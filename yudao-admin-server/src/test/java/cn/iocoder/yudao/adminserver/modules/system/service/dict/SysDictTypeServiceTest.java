@@ -57,13 +57,13 @@ public class SysDictTypeServiceTest extends BaseDbUnitTest {
        });
        dictTypeMapper.insert(dbDictType);
        // 测试 name 不匹配
-       dictTypeMapper.insert(ObjectUtils.clone(dbDictType, o -> o.setName("tudou")));
+       dictTypeMapper.insert(ObjectUtils.cloneIgnoreId(dbDictType, o -> o.setName("tudou")));
        // 测试 type 不匹配
-       dictTypeMapper.insert(ObjectUtils.clone(dbDictType, o -> o.setType("土豆")));
+       dictTypeMapper.insert(ObjectUtils.cloneIgnoreId(dbDictType, o -> o.setType("土豆")));
        // 测试 status 不匹配
-       dictTypeMapper.insert(ObjectUtils.clone(dbDictType, o -> o.setStatus(CommonStatusEnum.DISABLE.getStatus())));
+       dictTypeMapper.insert(ObjectUtils.cloneIgnoreId(dbDictType, o -> o.setStatus(CommonStatusEnum.DISABLE.getStatus())));
        // 测试 createTime 不匹配
-       dictTypeMapper.insert(ObjectUtils.clone(dbDictType, o -> o.setCreateTime(buildTime(2021, 1, 1))));
+       dictTypeMapper.insert(ObjectUtils.cloneIgnoreId(dbDictType, o -> o.setCreateTime(buildTime(2021, 1, 1))));
        // 准备参数
        SysDictTypePageReqVO reqVO = new SysDictTypePageReqVO();
        reqVO.setName("nai");
@@ -91,13 +91,13 @@ public class SysDictTypeServiceTest extends BaseDbUnitTest {
         });
         dictTypeMapper.insert(dbDictType);
         // 测试 name 不匹配
-        dictTypeMapper.insert(ObjectUtils.clone(dbDictType, o -> o.setName("tudou")));
+        dictTypeMapper.insert(ObjectUtils.cloneIgnoreId(dbDictType, o -> o.setName("tudou")));
         // 测试 type 不匹配
-        dictTypeMapper.insert(ObjectUtils.clone(dbDictType, o -> o.setType("土豆")));
+        dictTypeMapper.insert(ObjectUtils.cloneIgnoreId(dbDictType, o -> o.setType("土豆")));
         // 测试 status 不匹配
-        dictTypeMapper.insert(ObjectUtils.clone(dbDictType, o -> o.setStatus(CommonStatusEnum.DISABLE.getStatus())));
+        dictTypeMapper.insert(ObjectUtils.cloneIgnoreId(dbDictType, o -> o.setStatus(CommonStatusEnum.DISABLE.getStatus())));
         // 测试 createTime 不匹配
-        dictTypeMapper.insert(ObjectUtils.clone(dbDictType, o -> o.setCreateTime(buildTime(2021, 1, 1))));
+        dictTypeMapper.insert(ObjectUtils.cloneIgnoreId(dbDictType, o -> o.setCreateTime(buildTime(2021, 1, 1))));
         // 准备参数
         SysDictTypeExportReqVO reqVO = new SysDictTypeExportReqVO();
         reqVO.setName("nai");

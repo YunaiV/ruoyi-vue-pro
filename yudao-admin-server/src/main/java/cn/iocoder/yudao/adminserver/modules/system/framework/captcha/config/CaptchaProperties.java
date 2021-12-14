@@ -12,6 +12,13 @@ import java.time.Duration;
 @Data
 public class CaptchaProperties {
 
+    private static final Boolean ENABLE_DEFAULT = true;
+
+    /**
+     * 是否开启
+     * 注意，这里仅仅是后端 Server 是否校验，暂时不控制前端的逻辑
+     */
+    private Boolean enable = ENABLE_DEFAULT;
     /**
      * 验证码的过期时间
      */

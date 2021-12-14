@@ -3,7 +3,7 @@ package cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.logger;
 import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.user.SysUserDO;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum;
-import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.framework.tenant.core.db.TenantBaseDO;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -22,7 +22,7 @@ import java.util.Map;
 @TableName(value = "sys_operate_log", autoResultMap = true)
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class SysOperateLogDO extends BaseDO {
+public class SysOperateLogDO extends TenantBaseDO {
 
     /**
      * {@link #javaMethodArgs} 的最大长度

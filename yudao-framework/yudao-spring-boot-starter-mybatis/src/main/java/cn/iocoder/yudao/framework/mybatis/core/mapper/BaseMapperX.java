@@ -33,7 +33,7 @@ public interface BaseMapperX<T> extends BaseMapper<T> {
     }
 
     default Integer selectCount(String field, Object value) {
-        return selectCount(new QueryWrapper<T>().eq(field, value));
+        return selectCount(new QueryWrapper<T>().eq(field, value)).intValue();
     }
 
     default List<T> selectList() {

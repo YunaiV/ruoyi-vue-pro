@@ -117,7 +117,15 @@
             <artifactId>yudao-spring-boot-starter-excel</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-spring-boot-starter-tenant</artifactId>
+        </dependency>
 
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-spring-boot-starter-data-permission</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.apache.velocity</groupId>

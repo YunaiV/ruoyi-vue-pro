@@ -1,11 +1,11 @@
-### 请求 /system/user/profile/get 接口 => 没有权限
-GET {{userServerUrl}}/system/user/profile/get
+### 请求 /member/user/profile/get 接口 => 没有权限
+GET {{userServerUrl}}/member/user/profile/get
 Authorization: Bearer test245
 
-### 请求 /system/user/profile/revise-nickname 接口 成功
-PUT {{userServerUrl}}/system/user/profile/update-nickname?nickName=yunai222
+### 请求 /member/user/profile/revise-nickname 接口 成功
+PUT {{userServerUrl}}/member/user/profile/update-nickname?nickName=yunai222
 Authorization: Bearer test245
 
-### 请求 /system/user/profile/get-user-info 接口 成功
-GET {{userServerUrl}}/system/user/profile/get-user-info?id=245
+### 请求 /member/user/profile/get-user-info 接口 成功
+GET {{userServerUrl}}/member/user/profile/get-user-info?id=245
 Authorization: Bearer test245

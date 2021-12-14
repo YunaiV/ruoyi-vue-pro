@@ -91,6 +91,14 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- TODO @宋天：junit 已经在 yudao-spring-boot-starter-test 啦，不用在引入哈 -->
+        <!--单元测试相关-->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+
         <!-- 工具类相关 -->
 
     </dependencies>

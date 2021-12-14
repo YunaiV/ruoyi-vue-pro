@@ -1,15 +1,12 @@
 package cn.iocoder.yudao.adminserver.modules.system.mq.producer.sms;
 
-import cn.iocoder.yudao.framework.common.core.KeyValue;
-import cn.iocoder.yudao.framework.mq.core.util.RedisMessageUtils;
 import cn.iocoder.yudao.adminserver.modules.system.mq.message.sms.SysSmsChannelRefreshMessage;
 import cn.iocoder.yudao.adminserver.modules.system.mq.message.sms.SysSmsTemplateRefreshMessage;
+import cn.iocoder.yudao.framework.mq.core.RedisMQTemplate;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.List;
 
 /**
  * Sms 短信相关消息的 Producer
@@ -22,14 +19,14 @@ import java.util.List;
 public class SysSmsProducer {
 
     @Resource
-    private StringRedisTemplate stringRedisTemplate;
+    private RedisMQTemplate redisMQTemplate;
 
     /**
      * 发送 {@link SysSmsChannelRefreshMessage} 消息
      */
     public void sendSmsChannelRefreshMessage() {
         SysSmsChannelRefreshMessage message = new SysSmsChannelRefreshMessage();
-        RedisMessageUtils.sendChannelMessage(stringRedisTemplate, message);
+        redisMQTemplate.send(message);
     }
 
     /**
@@ -37,7 +34,7 @@ public class SysSmsProducer {
      */
     public void sendSmsTemplateRefreshMessage() {
         SysSmsTemplateRefreshMessage message = new SysSmsTemplateRefreshMessage();
-        RedisMessageUtils.sendChannelMessage(stringRedisTemplate, message);
+        redisMQTemplate.send(message);
     }
 
 }

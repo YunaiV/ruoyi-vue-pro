@@ -3,7 +3,9 @@ package cn.iocoder.yudao.userserver.modules.system.controller.auth;
 import cn.iocoder.yudao.coreservice.modules.system.service.social.SysSocialService;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.userserver.modules.system.controller.auth.vo.*;
+import cn.iocoder.yudao.userserver.modules.system.enums.sms.SysSmsSceneEnum;
 import cn.iocoder.yudao.userserver.modules.system.service.auth.SysAuthService;
 import cn.iocoder.yudao.userserver.modules.system.service.sms.SysSmsCodeService;
 import com.alibaba.fastjson.JSON;
@@ -38,7 +40,6 @@ public class SysAuthController {
     @Resource
     private SysSocialService socialService;
 
-
     @PostMapping("/login")
     @ApiOperation("使用手机 + 密码登录")
     public CommonResult<SysAuthLoginRespVO> login(@RequestBody @Valid SysAuthLoginReqVO reqVO) {
@@ -56,16 +57,49 @@ public class SysAuthController {
     }
 
     @PostMapping("/send-sms-code")
-    @ApiOperation("发送手机验证码")
+    @ApiOperation(value = "发送手机验证码",notes = "不检测该手机号是否已被注册")
     public CommonResult<Boolean> sendSmsCode(@RequestBody @Valid SysAuthSendSmsReqVO reqVO) {
         smsCodeService.sendSmsCode(reqVO.getMobile(), reqVO.getScene(), getClientIP());
         return success(true);
     }
 
+    @PostMapping("/send-sms-new-code")
+    @ApiOperation(value = "发送手机验证码",notes = "检测该手机号是否已被注册，用于修改手机时使用")
+    public CommonResult<Boolean> sendSmsNewCode(@RequestBody @Valid SysAuthSendSmsReqVO reqVO) {
+        smsCodeService.sendSmsNewCode(reqVO);
+        return success(true);
+    }
+
+    @GetMapping("/send-sms-code-login")
+    @ApiOperation(value = "向已登录用户发送验证码",notes = "修改手机时验证原手机号使用")
+    public CommonResult<Boolean> sendSmsCodeLogin() {
+        smsCodeService.sendSmsCodeLogin(getLoginUserId());
+        return success(true);
+    }
+
     @PostMapping("/reset-password")
     @ApiOperation(value = "重置密码", notes = "用户忘记密码时使用")
+    @PreAuthenticated
     public CommonResult<Boolean> resetPassword(@RequestBody @Valid MbrAuthResetPasswordReqVO reqVO) {
-        return null;
+        authService.resetPassword(reqVO);
+        return success(true);
+    }
+
+    @PostMapping("/update-password")
+    @ApiOperation(value = "修改用户密码",notes = "用户修改密码时使用")
+    @PreAuthenticated
+    public CommonResult<Boolean> updatePassword(@RequestBody @Valid MbrAuthUpdatePasswordReqVO reqVO) {
+        authService.updatePassword(getLoginUserId(), reqVO);
+        return success(true);
+    }
+
+    @PostMapping("/check-sms-code")
+    @ApiOperation(value = "校验验证码是否正确")
+    @PreAuthenticated
+    public CommonResult<Boolean> checkSmsCode(@RequestBody @Valid SysAuthSmsLoginReqVO reqVO) {
+        // TODO @宋天：check 的时候，不应该使用 useSmsCode 哈，这样验证码就直接被使用了。另外，check 开头的方法，更多是校验的逻辑，不会有 update 数据的动作。这点，在方法命名上，也是要注意的
+        smsCodeService.useSmsCode(reqVO.getMobile(),SysSmsSceneEnum.CHECK_CODE_BY_SMS.getScene(),reqVO.getCode(),getClientIP());
+        return success(true);
     }
 
     // ========== 社交登录相关 ==========
