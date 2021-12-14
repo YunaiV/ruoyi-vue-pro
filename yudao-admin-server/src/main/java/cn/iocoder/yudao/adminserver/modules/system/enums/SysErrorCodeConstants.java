@@ -85,10 +85,12 @@ public interface SysErrorCodeConstants {
     ErrorCode SMS_TEMPLATE_NOT_EXISTS = new ErrorCode(1002011000, "短信模板不存在");
     ErrorCode SMS_TEMPLATE_CODE_DUPLICATE = new ErrorCode(1002011001, "已经存在编码为【{}】的短信模板");
 
+    // ========== 租户模块 1002012000 ==========
+    ErrorCode TENANT_NOT_EXISTS = new ErrorCode(1002012000, "租户不存在");
+
     // ========== 错误码模块 1002013000 ==========
     ErrorCode ERROR_CODE_NOT_EXISTS = new ErrorCode(1002013000, "错误码不存在");
     ErrorCode ERROR_CODE_DUPLICATE = new ErrorCode(1002013001, "已经存在编码为【{}】的错误码");
-
 
 
 }

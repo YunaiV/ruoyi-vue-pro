@@ -6,7 +6,7 @@
     <settings>
         <setting name="lazyLoadingEnabled" value="false" />
         <setting name="mapUnderscoreToCamelCase" value="true"/>
-        <setting name="logImpl" value="org.apache.ibatis.logging.stdout.StdOutImpl"/>
+        <setting name="logImpl" value="org.apache.ibatis.logging.stdout.StdOutImpl"/> <!-- 如果不想打 SQL 日志，可以注释掉 -->
     </settings>
     <typeAliases>
         <typeAlias type="org.activiti.engine.impl.persistence.ByteArrayRefTypeHandler" alias="ByteArrayRefTypeHandler"/>

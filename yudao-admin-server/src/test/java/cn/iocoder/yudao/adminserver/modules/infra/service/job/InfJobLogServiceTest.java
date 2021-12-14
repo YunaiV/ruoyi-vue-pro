@@ -84,7 +84,7 @@ public class InfJobLogServiceTest extends BaseDbUnitTest {
             o.setExecuteIndex(1);
             o.setStatus(randomEle(InfJobLogStatusEnum.values()).getStatus()); // 保证 status 的范围
         });
-        InfJobLogDO cloneJobLog = ObjectUtils.clone(dbJobLog, o -> o.setHandlerName(randomString()));
+        InfJobLogDO cloneJobLog = ObjectUtils.cloneIgnoreId(dbJobLog, o -> o.setHandlerName(randomString()));
         jobLogMapper.insert(dbJobLog);
         // 测试 handlerName 不匹配
         jobLogMapper.insert(cloneJobLog);
@@ -111,15 +111,15 @@ public class InfJobLogServiceTest extends BaseDbUnitTest {
         });
         jobLogMapper.insert(dbJobLog);
         // 测试 jobId 不匹配
-        jobLogMapper.insert(ObjectUtils.clone(dbJobLog, o -> o.setJobId(randomLongId())));
+        jobLogMapper.insert(ObjectUtils.cloneIgnoreId(dbJobLog, o -> o.setJobId(randomLongId())));
         // 测试 handlerName 不匹配
-        jobLogMapper.insert(ObjectUtils.clone(dbJobLog, o -> o.setHandlerName(randomString())));
+        jobLogMapper.insert(ObjectUtils.cloneIgnoreId(dbJobLog, o -> o.setHandlerName(randomString())));
         // 测试 beginTime 不匹配
-        jobLogMapper.insert(ObjectUtils.clone(dbJobLog, o -> o.setBeginTime(buildTime(2021, 1, 7))));
+        jobLogMapper.insert(ObjectUtils.cloneIgnoreId(dbJobLog, o -> o.setBeginTime(buildTime(2021, 1, 7))));
         // 测试 endTime 不匹配
-        jobLogMapper.insert(ObjectUtils.clone(dbJobLog, o -> o.setEndTime(buildTime(2021, 1, 9))));
+        jobLogMapper.insert(ObjectUtils.cloneIgnoreId(dbJobLog, o -> o.setEndTime(buildTime(2021, 1, 9))));
         // 测试 status 不匹配
-        jobLogMapper.insert(ObjectUtils.clone(dbJobLog, o -> o.setStatus(InfJobLogStatusEnum.FAILURE.getStatus())));
+        jobLogMapper.insert(ObjectUtils.cloneIgnoreId(dbJobLog, o -> o.setStatus(InfJobLogStatusEnum.FAILURE.getStatus())));
         // 准备参数
         InfJobLogPageReqVO reqVo = new InfJobLogPageReqVO();
         reqVo.setJobId(dbJobLog.getJobId());
@@ -147,15 +147,15 @@ public class InfJobLogServiceTest extends BaseDbUnitTest {
         });
         jobLogMapper.insert(dbJobLog);
         // 测试 jobId 不匹配
-        jobLogMapper.insert(ObjectUtils.clone(dbJobLog, o -> o.setJobId(randomLongId())));
+        jobLogMapper.insert(ObjectUtils.cloneIgnoreId(dbJobLog, o -> o.setJobId(randomLongId())));
         // 测试 handlerName 不匹配
-        jobLogMapper.insert(ObjectUtils.clone(dbJobLog, o -> o.setHandlerName(randomString())));
+        jobLogMapper.insert(ObjectUtils.cloneIgnoreId(dbJobLog, o -> o.setHandlerName(randomString())));
         // 测试 beginTime 不匹配
-        jobLogMapper.insert(ObjectUtils.clone(dbJobLog, o -> o.setBeginTime(buildTime(2021, 1, 7))));
+        jobLogMapper.insert(ObjectUtils.cloneIgnoreId(dbJobLog, o -> o.setBeginTime(buildTime(2021, 1, 7))));
         // 测试 endTime 不匹配
-        jobLogMapper.insert(ObjectUtils.clone(dbJobLog, o -> o.setEndTime(buildTime(2021, 1, 9))));
+        jobLogMapper.insert(ObjectUtils.cloneIgnoreId(dbJobLog, o -> o.setEndTime(buildTime(2021, 1, 9))));
         // 测试 status 不匹配
-        jobLogMapper.insert(ObjectUtils.clone(dbJobLog, o -> o.setStatus(InfJobLogStatusEnum.FAILURE.getStatus())));
+        jobLogMapper.insert(ObjectUtils.cloneIgnoreId(dbJobLog, o -> o.setStatus(InfJobLogStatusEnum.FAILURE.getStatus())));
         // 准备参数
         InfJobLogExportReqVO reqVo = new InfJobLogExportReqVO();
         reqVo.setJobId(dbJobLog.getJobId());

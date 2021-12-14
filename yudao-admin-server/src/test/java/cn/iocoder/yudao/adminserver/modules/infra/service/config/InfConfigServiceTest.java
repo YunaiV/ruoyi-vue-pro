@@ -172,13 +172,13 @@ public class InfConfigServiceTest extends BaseDbUnitTest {
         });
         configMapper.insert(dbConfig);
         // 测试 name 不匹配
-        configMapper.insert(ObjectUtils.clone(dbConfig, o -> o.setName("土豆")));
+        configMapper.insert(ObjectUtils.cloneIgnoreId(dbConfig, o -> o.setName("土豆")));
         // 测试 key 不匹配
-        configMapper.insert(ObjectUtils.clone(dbConfig, o -> o.setKey("tudou")));
+        configMapper.insert(ObjectUtils.cloneIgnoreId(dbConfig, o -> o.setKey("tudou")));
         // 测试 type 不匹配
-        configMapper.insert(ObjectUtils.clone(dbConfig, o -> o.setType(InfConfigTypeEnum.CUSTOM.getType())));
+        configMapper.insert(ObjectUtils.cloneIgnoreId(dbConfig, o -> o.setType(InfConfigTypeEnum.CUSTOM.getType())));
         // 测试 createTime 不匹配
-        configMapper.insert(ObjectUtils.clone(dbConfig, o -> o.setCreateTime(buildTime(2021, 1, 1))));
+        configMapper.insert(ObjectUtils.cloneIgnoreId(dbConfig, o -> o.setCreateTime(buildTime(2021, 1, 1))));
         // 准备参数
         InfConfigPageReqVO reqVO = new InfConfigPageReqVO();
         reqVO.setName("艿");
@@ -206,13 +206,13 @@ public class InfConfigServiceTest extends BaseDbUnitTest {
         });
         configMapper.insert(dbConfig);
         // 测试 name 不匹配
-        configMapper.insert(ObjectUtils.clone(dbConfig, o -> o.setName("土豆")));
+        configMapper.insert(ObjectUtils.cloneIgnoreId(dbConfig, o -> o.setName("土豆")));
         // 测试 key 不匹配
-        configMapper.insert(ObjectUtils.clone(dbConfig, o -> o.setKey("tudou")));
+        configMapper.insert(ObjectUtils.cloneIgnoreId(dbConfig, o -> o.setKey("tudou")));
         // 测试 type 不匹配
-        configMapper.insert(ObjectUtils.clone(dbConfig, o -> o.setType(InfConfigTypeEnum.CUSTOM.getType())));
+        configMapper.insert(ObjectUtils.cloneIgnoreId(dbConfig, o -> o.setType(InfConfigTypeEnum.CUSTOM.getType())));
         // 测试 createTime 不匹配
-        configMapper.insert(ObjectUtils.clone(dbConfig, o -> o.setCreateTime(buildTime(2021, 1, 1))));
+        configMapper.insert(ObjectUtils.cloneIgnoreId(dbConfig, o -> o.setCreateTime(buildTime(2021, 1, 1))));
         // 准备参数
         InfConfigExportReqVO reqVO = new InfConfigExportReqVO();
         reqVO.setName("艿");
