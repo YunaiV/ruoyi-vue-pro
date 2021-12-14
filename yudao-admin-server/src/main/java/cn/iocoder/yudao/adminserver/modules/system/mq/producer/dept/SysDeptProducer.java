@@ -1,8 +1,7 @@
 package cn.iocoder.yudao.adminserver.modules.system.mq.producer.dept;
 
-import cn.iocoder.yudao.framework.mq.core.util.RedisMessageUtils;
 import cn.iocoder.yudao.adminserver.modules.system.mq.message.dept.SysDeptRefreshMessage;
-import org.springframework.data.redis.core.StringRedisTemplate;
+import cn.iocoder.yudao.framework.mq.core.RedisMQTemplate;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -14,14 +13,14 @@ import javax.annotation.Resource;
 public class SysDeptProducer {
 
     @Resource
-    private StringRedisTemplate stringRedisTemplate;
+    private RedisMQTemplate redisMQTemplate;
 
     /**
      * 发送 {@link SysDeptRefreshMessage} 消息
      */
     public void sendDeptRefreshMessage() {
         SysDeptRefreshMessage message = new SysDeptRefreshMessage();
-        RedisMessageUtils.sendChannelMessage(stringRedisTemplate, message);
+        redisMQTemplate.send(message);
     }
 
 }

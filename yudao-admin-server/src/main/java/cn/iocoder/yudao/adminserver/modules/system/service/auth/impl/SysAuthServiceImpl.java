@@ -92,9 +92,7 @@ public class SysAuthServiceImpl implements SysAuthService {
             throw new UsernameNotFoundException(username);
         }
         // 创建 LoginUser 对象
-        LoginUser loginUser =  SysAuthConvert.INSTANCE.convert(user);
-        loginUser.setPostIds(user.getPostIds());
-        return loginUser;
+        return this.buildLoginUser(user);
     }
 
     @Override
@@ -107,9 +105,7 @@ public class SysAuthServiceImpl implements SysAuthService {
         this.createLoginLog(user.getUsername(), SysLoginLogTypeEnum.LOGIN_MOCK, SysLoginResultEnum.SUCCESS);
 
         // 创建 LoginUser 对象
-        LoginUser loginUser = SysAuthConvert.INSTANCE.convert(user);
-        loginUser.setRoleIds(this.getUserRoleIds(loginUser.getId())); // 获取用户角色列表
-        return loginUser;
+        return this.buildLoginUser(user);
     }
 
     @Override
@@ -117,10 +113,9 @@ public class SysAuthServiceImpl implements SysAuthService {
         // 判断验证码是否正确
         this.verifyCaptcha(reqVO.getUsername(), reqVO.getUuid(), reqVO.getCode());
 
-        // 使用账号密码，进行登录。
+        // 使用账号密码，进行登录
         LoginUser loginUser = this.login0(reqVO.getUsername(), reqVO.getPassword());
-        loginUser.setRoleIds(this.getUserRoleIds(loginUser.getId())); // 获取用户角色列表
-        loginUser.setGroups(this.getUserPosts(loginUser.getPostIds()));
+
         // 缓存登陆用户到 Redis 中，返回 sessionId 编号
         return userSessionCoreService.createUserSession(loginUser, userIp, userAgent);
     }
@@ -133,9 +128,13 @@ public class SysAuthServiceImpl implements SysAuthService {
     }
 
     private void verifyCaptcha(String username, String captchaUUID, String captchaCode) {
+        // 如果验证码关闭，则不进行校验
+        if (!captchaService.isCaptchaEnable()) {
+            return;
+        }
+        // 验证码不存在
         final SysLoginLogTypeEnum logTypeEnum = SysLoginLogTypeEnum.LOGIN_USERNAME;
         String code = captchaService.getCaptchaCode(captchaUUID);
-        // 验证码不存在
         if (code == null) {
             // 创建登录失败日志（验证码不存在）
             this.createLoginLog(username, logTypeEnum, SysLoginResultEnum.CAPTCHA_NOT_FOUND);
@@ -230,8 +229,7 @@ public class SysAuthServiceImpl implements SysAuthService {
         this.createLoginLog(user.getUsername(), SysLoginLogTypeEnum.LOGIN_SOCIAL, SysLoginResultEnum.SUCCESS);
 
         // 创建 LoginUser 对象
-        LoginUser loginUser = SysAuthConvert.INSTANCE.convert(user);
-        loginUser.setRoleIds(this.getUserRoleIds(loginUser.getId())); // 获取用户角色列表
+        LoginUser loginUser = this.buildLoginUser(user);
 
         // 绑定社交用户（更新）
         socialService.bindSocialUser(loginUser.getId(), reqVO.getType(), authUser, userTypeEnum);
@@ -248,7 +246,6 @@ public class SysAuthServiceImpl implements SysAuthService {
 
         // 使用账号密码，进行登录。
         LoginUser loginUser = this.login0(reqVO.getUsername(), reqVO.getPassword());
-        loginUser.setRoleIds(this.getUserRoleIds(loginUser.getId())); // 获取用户角色列表
 
         // 绑定社交用户（新增）
         socialService.bindSocialUser(loginUser.getId(), reqVO.getType(), authUser, userTypeEnum);
@@ -301,15 +298,14 @@ public class SysAuthServiceImpl implements SysAuthService {
             return null;
         }
         // 刷新 LoginUser 缓存
-        this.refreshLoginUserCache(token, loginUser);
-        return loginUser;
+        return this.refreshLoginUserCache(token, loginUser);
     }
 
-    private void refreshLoginUserCache(String token, LoginUser loginUser) {
+    private LoginUser refreshLoginUserCache(String token, LoginUser loginUser) {
         // 每 1/3 的 Session 超时时间，刷新 LoginUser 缓存
         if (System.currentTimeMillis() - loginUser.getUpdateTime().getTime() <
                 userSessionCoreService.getSessionTimeoutMillis() / 3) {
-            return;
+            return loginUser;
         }
 
         // 重新加载 SysUserDO 信息
@@ -319,9 +315,18 @@ public class SysAuthServiceImpl implements SysAuthService {
         }
 
         // 刷新 LoginUser 缓存
+        LoginUser newLoginUser= this.buildLoginUser(user);
+        userSessionCoreService.refreshUserSession(token, newLoginUser);
+        return newLoginUser;
+    }
+
+    private LoginUser buildLoginUser(SysUserDO user) {
+        LoginUser loginUser = SysAuthConvert.INSTANCE.convert(user);
+        // 补全字段
         loginUser.setDeptId(user.getDeptId());
         loginUser.setRoleIds(this.getUserRoleIds(loginUser.getId()));
-        userSessionCoreService.refreshUserSession(token, loginUser);
+        loginUser.setGroups(this.getUserPosts(user.getPostIds()));
+        return loginUser;
     }
 
 }

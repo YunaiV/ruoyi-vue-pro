@@ -133,11 +133,11 @@ public class SysRoleServiceTest extends BaseDbUnitTest {
 
         //调用
         Set<Long> deptIdSet = Arrays.asList(1L, 2L, 3L, 4L, 5L).stream().collect(Collectors.toSet());
-        sysRoleService.updateRoleDataScope(roleId, DataScopeEnum.DEPT_CUSTOM.getScore(), deptIdSet);
+        sysRoleService.updateRoleDataScope(roleId, DataScopeEnum.DEPT_CUSTOM.getScope(), deptIdSet);
 
         //断言
         SysRoleDO newRoleDO = roleMapper.selectById(roleId);
-        assertEquals(DataScopeEnum.DEPT_CUSTOM.getScore(), newRoleDO.getDataScope());
+        assertEquals(DataScopeEnum.DEPT_CUSTOM.getScope(), newRoleDO.getDataScope());
 
         Set<Long> newDeptIdSet = newRoleDO.getDataScopeDeptIds();
         assertTrue(deptIdSet.size() == newDeptIdSet.size());
@@ -242,7 +242,7 @@ public class SysRoleServiceTest extends BaseDbUnitTest {
             o.setCode("code");
             o.setType(SysRoleTypeEnum.CUSTOM.getType());
             o.setStatus(1);
-            o.setDataScope(DataScopeEnum.ALL.getScore());
+            o.setDataScope(DataScopeEnum.ALL.getScope());
         });
         roleMapper.insert(roleDO);
 
@@ -293,7 +293,7 @@ public class SysRoleServiceTest extends BaseDbUnitTest {
             o.setName(name);
             o.setType(typeEnum.getType());
             o.setStatus(status);
-            o.setDataScope(scopeEnum.getScore());
+            o.setDataScope(scopeEnum.getScope());
             o.setCode(code);
         });
         return roleDO;

@@ -17,6 +17,7 @@ import cn.iocoder.yudao.coreservice.modules.system.service.user.SysUserCoreServi
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.test.core.util.AssertUtils;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
@@ -71,6 +72,11 @@ public class SysAuthServiceImplTest extends BaseDbUnitTest {
     @MockBean
     private SysPostService postService;
 
+    @BeforeEach
+    public void setUp() {
+        when(captchaService.isCaptchaEnable()).thenReturn(true);
+    }
+
     @Test
     public void testLoadUserByUsername_success() {
         // 准备参数
@@ -83,7 +89,6 @@ public class SysAuthServiceImplTest extends BaseDbUnitTest {
         LoginUser loginUser = (LoginUser) authService.loadUserByUsername(username);
         // 校验
         AssertUtils.assertPojoEquals(user, loginUser, "updateTime");
-        assertNull(loginUser.getRoleIds()); // 此时不会加载角色，所以是空的
     }
 
     @Test

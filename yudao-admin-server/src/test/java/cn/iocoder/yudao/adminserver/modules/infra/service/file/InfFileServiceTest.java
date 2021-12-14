@@ -41,14 +41,14 @@ public class InfFileServiceTest extends BaseDbUnitTest {
         });
         fileMapper.insert(dbFile);
         // 测试 id 不匹配
-        fileMapper.insert(ObjectUtils.clone(dbFile, o -> o.setId("tudou")));
+        fileMapper.insert(ObjectUtils.cloneIgnoreId(dbFile, o -> o.setId("tudou")));
         // 测试 type 不匹配
-        fileMapper.insert(ObjectUtils.clone(dbFile, o -> {
+        fileMapper.insert(ObjectUtils.cloneIgnoreId(dbFile, o -> {
             o.setId("yudao02");
             o.setType("png");
         }));
         // 测试 createTime 不匹配
-        fileMapper.insert(ObjectUtils.clone(dbFile, o -> {
+        fileMapper.insert(ObjectUtils.cloneIgnoreId(dbFile, o -> {
             o.setId("yudao03");
             o.setCreateTime(buildTime(2020, 1, 15));
         }));

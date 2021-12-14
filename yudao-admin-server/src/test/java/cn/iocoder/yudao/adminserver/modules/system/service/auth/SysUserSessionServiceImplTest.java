@@ -73,12 +73,12 @@ public class SysUserSessionServiceImplTest extends BaseDbAndRedisUnitTest {
         });
         userSessionMapper.insert(dbSession);
         // 测试 username 不匹配
-        userSessionMapper.insert(ObjectUtils.clone(dbSession, o -> {
+        userSessionMapper.insert(ObjectUtils.cloneIgnoreId(dbSession, o -> {
             o.setId(randomString());
             o.setUserId(123456L);
         }));
         // 测试 userIp 不匹配
-        userSessionMapper.insert(ObjectUtils.clone(dbSession, o -> {
+        userSessionMapper.insert(ObjectUtils.cloneIgnoreId(dbSession, o -> {
             o.setId(randomString());
             o.setUserIp("testUserIp");
         }));

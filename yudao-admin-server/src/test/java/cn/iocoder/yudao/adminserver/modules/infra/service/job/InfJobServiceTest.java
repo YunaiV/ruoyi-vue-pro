@@ -230,7 +230,7 @@ public class InfJobServiceTest extends BaseDbUnitTest {
         InfJobDO dbJob = randomPojo(InfJobDO.class, o -> {
             o.setStatus(randomEle(InfJobStatusEnum.values()).getStatus()); // 保证 status 的范围
         });
-        InfJobDO cloneJob = ObjectUtils.clone(dbJob, o -> o.setHandlerName(randomString()));
+        InfJobDO cloneJob = ObjectUtils.cloneIgnoreId(dbJob, o -> o.setHandlerName(randomString()));
         jobMapper.insert(dbJob);
         // 测试 handlerName 不匹配
         jobMapper.insert(cloneJob);
@@ -255,11 +255,11 @@ public class InfJobServiceTest extends BaseDbUnitTest {
         });
         jobMapper.insert(dbJob);
         // 测试 name 不匹配
-        jobMapper.insert(ObjectUtils.clone(dbJob, o -> o.setName("土豆")));
+        jobMapper.insert(ObjectUtils.cloneIgnoreId(dbJob, o -> o.setName("土豆")));
         // 测试 status 不匹配
-        jobMapper.insert(ObjectUtils.clone(dbJob, o -> o.setStatus(InfJobStatusEnum.NORMAL.getStatus())));
+        jobMapper.insert(ObjectUtils.cloneIgnoreId(dbJob, o -> o.setStatus(InfJobStatusEnum.NORMAL.getStatus())));
         // 测试 handlerName 不匹配
-        jobMapper.insert(ObjectUtils.clone(dbJob, o -> o.setHandlerName(randomString())));
+        jobMapper.insert(ObjectUtils.cloneIgnoreId(dbJob, o -> o.setHandlerName(randomString())));
         // 准备参数
         InfJobPageReqVO reqVo = new InfJobPageReqVO();
         reqVo.setName("定时");
@@ -283,11 +283,11 @@ public class InfJobServiceTest extends BaseDbUnitTest {
         });
         jobMapper.insert(dbJob);
         // 测试 name 不匹配
-        jobMapper.insert(ObjectUtils.clone(dbJob, o -> o.setName("土豆")));
+        jobMapper.insert(ObjectUtils.cloneIgnoreId(dbJob, o -> o.setName("土豆")));
         // 测试 status 不匹配
-        jobMapper.insert(ObjectUtils.clone(dbJob, o -> o.setStatus(InfJobStatusEnum.NORMAL.getStatus())));
+        jobMapper.insert(ObjectUtils.cloneIgnoreId(dbJob, o -> o.setStatus(InfJobStatusEnum.NORMAL.getStatus())));
         // 测试 handlerName 不匹配
-        jobMapper.insert(ObjectUtils.clone(dbJob, o -> o.setHandlerName(randomString())));
+        jobMapper.insert(ObjectUtils.cloneIgnoreId(dbJob, o -> o.setHandlerName(randomString())));
         // 准备参数
         InfJobExportReqVO reqVo = new InfJobExportReqVO();
         reqVo.setName("定时");

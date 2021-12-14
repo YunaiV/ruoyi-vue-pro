@@ -131,15 +131,15 @@ public class SysErrorCodeServiceTest extends BaseDbUnitTest {
         });
         errorCodeMapper.insert(dbErrorCode);
         // 测试 type 不匹配
-        errorCodeMapper.insert(ObjectUtils.clone(dbErrorCode, o -> o.setType(SysErrorCodeTypeEnum.MANUAL_OPERATION.getType())));
+        errorCodeMapper.insert(ObjectUtils.cloneIgnoreId(dbErrorCode, o -> o.setType(SysErrorCodeTypeEnum.MANUAL_OPERATION.getType())));
         // 测试 applicationName 不匹配
-        errorCodeMapper.insert(ObjectUtils.clone(dbErrorCode, o -> o.setApplicationName("yunai")));
+        errorCodeMapper.insert(ObjectUtils.cloneIgnoreId(dbErrorCode, o -> o.setApplicationName("yunai")));
         // 测试 code 不匹配
-        errorCodeMapper.insert(ObjectUtils.clone(dbErrorCode, o -> o.setCode(2)));
+        errorCodeMapper.insert(ObjectUtils.cloneIgnoreId(dbErrorCode, o -> o.setCode(2)));
         // 测试 message 不匹配
-        errorCodeMapper.insert(ObjectUtils.clone(dbErrorCode, o -> o.setMessage("nai")));
+        errorCodeMapper.insert(ObjectUtils.cloneIgnoreId(dbErrorCode, o -> o.setMessage("nai")));
         // 测试 createTime 不匹配
-        errorCodeMapper.insert(ObjectUtils.clone(dbErrorCode, o -> o.setCreateTime(buildTime(2020, 12, 12))));
+        errorCodeMapper.insert(ObjectUtils.cloneIgnoreId(dbErrorCode, o -> o.setCreateTime(buildTime(2020, 12, 12))));
         return dbErrorCode;
     }
 

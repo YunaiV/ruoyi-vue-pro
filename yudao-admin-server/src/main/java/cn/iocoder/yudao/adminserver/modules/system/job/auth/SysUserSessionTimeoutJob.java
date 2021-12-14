@@ -2,6 +2,7 @@ package cn.iocoder.yudao.adminserver.modules.system.job.auth;
 
 import cn.iocoder.yudao.framework.quartz.core.handler.JobHandler;
 import cn.iocoder.yudao.adminserver.modules.system.service.auth.SysUserSessionService;
+import cn.iocoder.yudao.framework.tenant.core.job.TenantJob;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -13,6 +14,7 @@ import javax.annotation.Resource;
  * @author 願
  */
 @Component
+@TenantJob
 @Slf4j
 public class SysUserSessionTimeoutJob implements JobHandler {
 
