@@ -48,7 +48,7 @@ public class SysPermissionServiceImpl implements SysPermissionService {
     /**
      * LoginUser 的 Context 缓存 Key
      */
-    private static final String CONTEXT_KEY = SysPermissionServiceImpl.class.getSimpleName();
+    public static final String CONTEXT_KEY = SysPermissionServiceImpl.class.getSimpleName();
 
     /**
      * 定时执行 {@link #schedulePeriodicRefresh()} 的周期
