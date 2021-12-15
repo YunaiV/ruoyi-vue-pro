@@ -232,7 +232,7 @@ public class SysAuthServiceImpl implements SysAuthService {
         LoginUser loginUser = this.buildLoginUser(user);
 
         // 绑定社交用户（更新）
-        socialService.bindSocialUser(loginUser.getId(), reqVO.getType(), authUser, userTypeEnum);
+        socialService.bindSocialUser(loginUser.getId(), reqVO.getType(), authUser, USER_TYPE_ENUM);
 
         // 缓存登录用户到 Redis 中，返回 sessionId 编号
         return userSessionCoreService.createUserSession(loginUser, userIp, userAgent);

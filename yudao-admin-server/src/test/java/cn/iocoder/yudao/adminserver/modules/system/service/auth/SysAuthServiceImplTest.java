@@ -69,7 +69,6 @@ public class SysAuthServiceImplTest extends BaseDbUnitTest {
     private SysUserSessionCoreService userSessionCoreService;
     @MockBean
     private SysSocialCoreService socialService;
-    private SysSocialService socialService;
     @MockBean
     private SysPostService postService;
 

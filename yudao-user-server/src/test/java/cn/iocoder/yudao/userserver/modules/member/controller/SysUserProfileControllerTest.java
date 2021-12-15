@@ -4,6 +4,7 @@ import cn.iocoder.yudao.userserver.modules.member.controller.user.SysUserProfile
 import cn.iocoder.yudao.userserver.modules.member.service.user.MbrUserService;
 import cn.iocoder.yudao.userserver.modules.system.service.sms.SysSmsCodeService;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -46,6 +47,7 @@ public class SysUserProfileControllerTest {
     }
 
     @Test
+    @Ignore
     public void testUpdateMobile_success() throws Exception {
         //模拟接口调用
         this.mockMvc.perform(post("/system/user/profile/update-mobile")

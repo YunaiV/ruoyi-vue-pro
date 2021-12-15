@@ -74,7 +74,6 @@ public class SysAuthServiceImpl implements SysAuthService {
     @Resource
     private SysSocialCoreService socialService;
 
-    private SysSocialService socialService;
     @Resource
     private StringRedisTemplate stringRedisTemplate;
     @Resource
