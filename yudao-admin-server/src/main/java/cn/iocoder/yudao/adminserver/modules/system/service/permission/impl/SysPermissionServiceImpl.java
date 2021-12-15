@@ -3,19 +3,25 @@ package cn.iocoder.yudao.adminserver.modules.system.service.permission.impl;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ArrayUtil;
-import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
-import cn.iocoder.yudao.adminserver.modules.system.dal.mysql.permission.SysRoleMenuMapper;
-import cn.iocoder.yudao.adminserver.modules.system.dal.mysql.permission.SysUserRoleMapper;
+import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.dept.SysDeptDO;
 import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.permission.SysMenuDO;
 import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.permission.SysRoleDO;
 import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.permission.SysRoleMenuDO;
 import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.permission.SysUserRoleDO;
+import cn.iocoder.yudao.adminserver.modules.system.dal.mysql.permission.SysRoleMenuMapper;
+import cn.iocoder.yudao.adminserver.modules.system.dal.mysql.permission.SysUserRoleMapper;
 import cn.iocoder.yudao.adminserver.modules.system.mq.producer.permission.SysPermissionProducer;
+import cn.iocoder.yudao.adminserver.modules.system.service.dept.SysDeptService;
 import cn.iocoder.yudao.adminserver.modules.system.service.permission.SysMenuService;
 import cn.iocoder.yudao.adminserver.modules.system.service.permission.SysPermissionService;
 import cn.iocoder.yudao.adminserver.modules.system.service.permission.SysRoleService;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
+import cn.iocoder.yudao.framework.datapermission.core.dept.service.dto.DeptDataPermissionRespDTO;
+import cn.iocoder.yudao.framework.security.core.LoginUser;
+import cn.iocoder.yudao.framework.security.core.enums.DataScopeEnum;
+import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
@@ -38,6 +44,11 @@ import java.util.*;
 @Service("ss") // 使用 Spring Security 的缩写，方便食用
 @Slf4j
 public class SysPermissionServiceImpl implements SysPermissionService {
+
+    /**
+     * LoginUser 的 Context 缓存 Key
+     */
+    public static final String CONTEXT_KEY = SysPermissionServiceImpl.class.getSimpleName();
 
     /**
      * 定时执行 {@link #schedulePeriodicRefresh()} 的周期
@@ -75,6 +86,8 @@ public class SysPermissionServiceImpl implements SysPermissionService {
     private SysRoleService roleService;
     @Resource
     private SysMenuService menuService;
+    @Resource
+    private SysDeptService deptService;
 
     @Resource
     private SysPermissionProducer permissionProducer;
@@ -327,6 +340,60 @@ public class SysPermissionServiceImpl implements SysPermissionService {
         Set<String> userRoles = CollectionUtils.convertSet(roleService.getRolesFromCache(roleIds),
                 SysRoleDO::getCode);
         return CollUtil.containsAny(userRoles, Sets.newHashSet(roles));
+    }
+
+    @Override
+    public DeptDataPermissionRespDTO getDeptDataPermission(LoginUser loginUser) {
+        // 判断是否 context 已经缓存
+        DeptDataPermissionRespDTO result = loginUser.getContext(CONTEXT_KEY, DeptDataPermissionRespDTO.class);
+        if (result != null) {
+            return result;
+        }
+
+        // 创建 DeptDataPermissionRespDTO 对象
+        result = new DeptDataPermissionRespDTO();
+        List<SysRoleDO> roles = roleService.getRolesFromCache(loginUser.getRoleIds());
+        for (SysRoleDO role : roles) {
+            // 为空时，跳过
+            if (role.getDataScope() == null) {
+                continue;
+            }
+            // 情况一，ALL
+            if (Objects.equals(role.getDataScope(), DataScopeEnum.ALL.getScope())) {
+                result.setAll(true);
+                continue;
+            }
+            // 情况二，DEPT_CUSTOM
+            if (Objects.equals(role.getDataScope(), DataScopeEnum.DEPT_CUSTOM.getScope())) {
+                CollUtil.addAll(result.getDeptIds(), role.getDataScopeDeptIds());
+                // 自定义可见部门时，保证可以看到自己所在的部门。否则，一些场景下可能会有问题。
+                // 例如说，登录时，基于 t_user 的 username 查询会可能被 dept_id 过滤掉
+                CollUtil.addAll(result.getDeptIds(), loginUser.getDeptId());
+                continue;
+            }
+            // 情况三，DEPT_ONLY
+            if (Objects.equals(role.getDataScope(), DataScopeEnum.DEPT_ONLY.getScope())) {
+                CollectionUtils.addIfNotNull(result.getDeptIds(), loginUser.getDeptId());
+                continue;
+            }
+            // 情况四，DEPT_DEPT_AND_CHILD
+            if (Objects.equals(role.getDataScope(), DataScopeEnum.DEPT_AND_CHILD.getScope())) {
+                List<SysDeptDO> depts = deptService.getDeptsByParentIdFromCache(loginUser.getDeptId(), true);
+                CollUtil.addAll(result.getDeptIds(), CollectionUtils.convertList(depts, SysDeptDO::getId));
+                continue;
+            }
+            // 情况五，SELF
+            if (Objects.equals(role.getDataScope(), DataScopeEnum.SELF.getScope())) {
+                result.setSelf(true);
+                continue;
+            }
+            // 未知情况，error log 即可
+            log.error("[getDeptDataPermission][LoginUser({}) role({}) 无法处理]", loginUser.getId(), JsonUtils.toJsonString(result));
+        }
+
+        // 添加到缓存，并返回
+        loginUser.setContext(CONTEXT_KEY, result);
+        return result;
     }
 
 }

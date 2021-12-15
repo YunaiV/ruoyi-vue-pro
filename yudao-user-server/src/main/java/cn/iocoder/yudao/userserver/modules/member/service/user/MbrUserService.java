@@ -3,6 +3,7 @@ package cn.iocoder.yudao.userserver.modules.member.service.user;
 import cn.iocoder.yudao.coreservice.modules.member.dal.dataobject.user.MbrUserDO;
 import cn.iocoder.yudao.userserver.modules.member.controller.user.vo.MbrUserInfoRespVO;
 import cn.iocoder.yudao.framework.common.validation.Mobile;
+import cn.iocoder.yudao.userserver.modules.member.controller.user.vo.MbrUserUpdateMobileReqVO;
 
 import java.io.InputStream;
 
@@ -50,9 +51,9 @@ public interface MbrUserService {
     /**
      * 修改用户昵称
      * @param userId 用户id
-     * @param nickName 用户新昵称
+     * @param nickname 用户新昵称
      */
-    void updateNickname(Long userId, String nickName);
+    void updateNickname(Long userId, String nickname);
 
     /**
      * 修改用户头像
@@ -64,9 +65,17 @@ public interface MbrUserService {
 
     /**
      * 根据用户id，获取用户头像与昵称
+     *
      * @param userId 用户id
      * @return 用户响应实体类
      */
     MbrUserInfoRespVO getUserInfo(Long userId);
+
+    /**
+     * 修改手机
+     * @param userId 用户id
+     * @param reqVO 请求实体
+     */
+    void updateMobile(Long userId, MbrUserUpdateMobileReqVO reqVO);
 
 }

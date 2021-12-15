@@ -1,3 +1,4 @@
 ### 请求 /system/user/page 接口 => 没有权限
 GET {{baseUrl}}/system/user/page?pageNo=1&pageSize=10
-Authorization: Bearer test104 # 使用测试账号
+Authorization: Bearer test1 # 使用测试账号
+tenant-id: 1

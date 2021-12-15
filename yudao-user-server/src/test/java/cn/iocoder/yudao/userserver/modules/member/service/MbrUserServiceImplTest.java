@@ -2,50 +2,63 @@ package cn.iocoder.yudao.userserver.modules.member.service;
 
 import cn.iocoder.yudao.coreservice.modules.infra.service.file.InfFileCoreService;
 import cn.iocoder.yudao.coreservice.modules.member.dal.dataobject.user.MbrUserDO;
-import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.user.SysUserDO;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.util.collection.ArrayUtils;
-import cn.iocoder.yudao.userserver.BaseDbUnitTest;
+import cn.iocoder.yudao.framework.redis.config.YudaoRedisAutoConfiguration;
+import cn.iocoder.yudao.userserver.BaseDbAndRedisUnitTest;
 import cn.iocoder.yudao.userserver.modules.member.controller.user.vo.MbrUserInfoRespVO;
+import cn.iocoder.yudao.userserver.modules.member.controller.user.vo.MbrUserUpdateMobileReqVO;
 import cn.iocoder.yudao.userserver.modules.member.dal.mysql.user.MbrUserMapper;
 import cn.iocoder.yudao.userserver.modules.member.service.user.impl.MbrUserServiceImpl;
+import cn.iocoder.yudao.userserver.modules.system.controller.auth.vo.SysAuthSendSmsReqVO;
+import cn.iocoder.yudao.userserver.modules.system.enums.sms.SysSmsSceneEnum;
+import cn.iocoder.yudao.userserver.modules.system.service.auth.impl.SysAuthServiceImpl;
+import cn.iocoder.yudao.userserver.modules.system.service.sms.SysSmsCodeService;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.util.Assert;
 
 import javax.annotation.Resource;
-import java.io.*;
+import java.io.ByteArrayInputStream;
 import java.util.function.Consumer;
 
-import static cn.hutool.core.util.RandomUtil.randomBytes;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static cn.hutool.core.util.RandomUtil.randomEle;
+import static cn.hutool.core.util.RandomUtil.*;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomString;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
+
+// TODO @芋艿：单测的 review，等逻辑都达成一致后
 /**
  * {@link MbrUserServiceImpl} 的单元测试类
  *
  * @author 宋天
  */
-@Import(MbrUserServiceImpl.class)
-public class MbrUserServiceImplTest extends BaseDbUnitTest {
+@Import({MbrUserServiceImpl.class, YudaoRedisAutoConfiguration.class})
+public class MbrUserServiceImplTest extends BaseDbAndRedisUnitTest {
 
     @Resource
     private MbrUserServiceImpl mbrUserService;
 
     @Resource
+    private StringRedisTemplate stringRedisTemplate;
+
+    @Resource
     private MbrUserMapper userMapper;
+
+    @MockBean
+    private SysAuthServiceImpl authService;
 
     @MockBean
     private InfFileCoreService fileCoreService;
 
     @MockBean
     private PasswordEncoder passwordEncoder;
+
+    @MockBean
+    private SysSmsCodeService sysSmsCodeService;
 
     @Test
     public void testUpdateNickName_success(){
@@ -92,6 +105,36 @@ public class MbrUserServiceImplTest extends BaseDbUnitTest {
         String str = mbrUserService.updateAvatar(userId, avatarFile);
         // 断言
         assertEquals(avatar, str);
+    }
+
+    @Test
+    public void updateMobile_success(){
+        // mock数据
+        String oldMobile = randomNumbers(11);
+        MbrUserDO userDO = randomMbrUserDO();
+        userDO.setMobile(oldMobile);
+        userMapper.insert(userDO);
+
+        // 验证旧手机
+        sysSmsCodeService.sendSmsCodeLogin(userDO.getId());
+
+        // 验证旧手机验证码是否正确
+        sysSmsCodeService.useSmsCode(oldMobile,SysSmsSceneEnum.CHANGE_MOBILE_BY_SMS.getScene(),"123","1.1.1.1");
+        // 验证新手机
+        SysAuthSendSmsReqVO smsReqVO = new SysAuthSendSmsReqVO();
+        smsReqVO.setMobile(oldMobile);
+        smsReqVO.setScene(SysSmsSceneEnum.CHANGE_MOBILE_BY_SMS.getScene());
+        sysSmsCodeService.sendSmsNewCode(smsReqVO);
+
+        // 更新手机号
+        String newMobile = randomNumbers(11);
+        String code = randomNumbers(4);
+        MbrUserUpdateMobileReqVO reqVO = new MbrUserUpdateMobileReqVO();
+        reqVO.setMobile(newMobile);
+        reqVO.setCode(code);
+        mbrUserService.updateMobile(userDO.getId(),reqVO);
+
+        assertEquals(mbrUserService.getUser(userDO.getId()).getMobile(),newMobile);
     }
 
     // ========== 随机对象 ==========

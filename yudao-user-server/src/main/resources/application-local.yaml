@@ -63,6 +63,11 @@ spring:
 
 --- #################### 定时任务相关配置 ####################
 
+# Quartz 配置项，对应 QuartzProperties 配置类
+spring:
+  quartz:
+    auto-startup: false # 无需使用 Quartz，交给 yudao-admin-server 环境
+
 --- #################### 配置中心相关配置 ####################
 
 # Apollo 配置中心

@@ -1,2 +1,3 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  cn.iocoder.yudao.framework.quartz.config.YudaoQuartzAutoConfiguration
+  cn.iocoder.yudao.framework.quartz.config.YudaoQuartzAutoConfiguration,\
+  cn.iocoder.yudao.framework.quartz.config.YudaoAsyncAutoConfiguration

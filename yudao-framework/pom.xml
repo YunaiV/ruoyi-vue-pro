@@ -24,6 +24,9 @@
 
         <module>yudao-spring-boot-starter-excel</module>
         <module>yudao-spring-boot-starter-test</module>
+        <module>yudao-spring-boot-starter-activiti</module>
+        <module>yudao-spring-boot-starter-tenant</module>
+        <module>yudao-spring-boot-starter-data-permission</module>
 
         <module>yudao-spring-boot-starter-biz-operatelog</module>
         <module>yudao-spring-boot-starter-biz-dict</module>

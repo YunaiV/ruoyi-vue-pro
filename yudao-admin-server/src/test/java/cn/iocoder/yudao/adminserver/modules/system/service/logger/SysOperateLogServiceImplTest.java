@@ -87,15 +87,15 @@ public class SysOperateLogServiceImplTest extends BaseDbUnitTest {
 
         // 下面几个是不匹配的数据
         // 随机 userId
-        operateLogMapper.insert(ObjectUtils.clone(sysOperateLogDO, logDO -> logDO.setUserId(userId + 1)));
+        operateLogMapper.insert(ObjectUtils.cloneIgnoreId(sysOperateLogDO, logDO -> logDO.setUserId(userId + 1)));
         // module 不同
-        operateLogMapper.insert(ObjectUtils.clone(sysOperateLogDO, logDO -> logDO.setModule("user")));
+        operateLogMapper.insert(ObjectUtils.cloneIgnoreId(sysOperateLogDO, logDO -> logDO.setModule("user")));
         // type 不同
-        operateLogMapper.insert(ObjectUtils.clone(sysOperateLogDO, logDO -> logDO.setType(OperateTypeEnum.IMPORT.getType())));
+        operateLogMapper.insert(ObjectUtils.cloneIgnoreId(sysOperateLogDO, logDO -> logDO.setType(OperateTypeEnum.IMPORT.getType())));
         // createTime 不同
-        operateLogMapper.insert(ObjectUtils.clone(sysOperateLogDO, logDO -> logDO.setStartTime(buildTime(2021, 2, 6))));
+        operateLogMapper.insert(ObjectUtils.cloneIgnoreId(sysOperateLogDO, logDO -> logDO.setStartTime(buildTime(2021, 2, 6))));
         // resultCode 不同
-        operateLogMapper.insert(ObjectUtils.clone(sysOperateLogDO, logDO -> logDO.setResultCode(GlobalErrorCodeConstants.BAD_REQUEST.getCode())));
+        operateLogMapper.insert(ObjectUtils.cloneIgnoreId(sysOperateLogDO, logDO -> logDO.setResultCode(GlobalErrorCodeConstants.BAD_REQUEST.getCode())));
 
         // 构造调用参数
         SysOperateLogPageReqVO reqVO = new SysOperateLogPageReqVO();
@@ -138,15 +138,15 @@ public class SysOperateLogServiceImplTest extends BaseDbUnitTest {
 
         // 下面几个是不匹配的数据
         // 随机 userId
-        operateLogMapper.insert(ObjectUtils.clone(sysOperateLogDO, logDO -> logDO.setUserId(userId + 1)));
+        operateLogMapper.insert(ObjectUtils.cloneIgnoreId(sysOperateLogDO, logDO -> logDO.setUserId(userId + 1)));
         // module 不同
-        operateLogMapper.insert(ObjectUtils.clone(sysOperateLogDO, logDO -> logDO.setModule("user")));
+        operateLogMapper.insert(ObjectUtils.cloneIgnoreId(sysOperateLogDO, logDO -> logDO.setModule("user")));
         // type 不同
-        operateLogMapper.insert(ObjectUtils.clone(sysOperateLogDO, logDO -> logDO.setType(OperateTypeEnum.IMPORT.getType())));
+        operateLogMapper.insert(ObjectUtils.cloneIgnoreId(sysOperateLogDO, logDO -> logDO.setType(OperateTypeEnum.IMPORT.getType())));
         // createTime 不同
-        operateLogMapper.insert(ObjectUtils.clone(sysOperateLogDO, logDO -> logDO.setStartTime(buildTime(2021, 2, 6))));
+        operateLogMapper.insert(ObjectUtils.cloneIgnoreId(sysOperateLogDO, logDO -> logDO.setStartTime(buildTime(2021, 2, 6))));
         // resultCode 不同
-        operateLogMapper.insert(ObjectUtils.clone(sysOperateLogDO, logDO -> logDO.setResultCode(GlobalErrorCodeConstants.BAD_REQUEST.getCode())));
+        operateLogMapper.insert(ObjectUtils.cloneIgnoreId(sysOperateLogDO, logDO -> logDO.setResultCode(GlobalErrorCodeConstants.BAD_REQUEST.getCode())));
 
         // 构造调用参数
         SysOperateLogExportReqVO reqVO = new SysOperateLogExportReqVO();

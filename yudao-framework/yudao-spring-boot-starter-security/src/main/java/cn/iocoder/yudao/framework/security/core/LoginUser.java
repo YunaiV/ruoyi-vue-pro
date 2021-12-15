@@ -1,16 +1,15 @@
 package cn.iocoder.yudao.framework.security.core;
 
+import cn.hutool.core.map.MapUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * 登录用户信息
@@ -31,14 +30,6 @@ public class LoginUser implements UserDetails {
      */
     private Integer userType;
     /**
-     * 部门编号
-     */
-    private Long deptId;
-    /**
-     * 角色编号数组
-     */
-    private Set<Long> roleIds;
-    /**
      * 最后更新时间
      */
     private Date updateTime;
@@ -55,8 +46,39 @@ public class LoginUser implements UserDetails {
      * 状态
      */
     private Integer status;
+    /**
+     * 租户编号
+     */
+    private Long tenantId;
 
-    // TODO @芋艿：怎么去掉 deptId
+    // ========== UserTypeEnum.ADMIN 独有字段 ==========
+    // TODO 芋艿：可以通过定义一个 Map<String, String> exts 的方式，去除管理员的字段。不过这样会导致系统比较复杂，所以暂时不去掉先；
+    /**
+     * 角色编号数组
+     */
+    private Set<Long> roleIds;
+    /**
+     * 部门编号
+     */
+    private Long deptId;
+    /**
+     * 所属岗位
+     */
+    private Set<Long> postIds;
+    /**
+     * group  目前指岗位代替
+     */
+    // TODO jason：这个字段，改成 postCodes 明确更好哈
+    private List<String> groups;
+
+    // ========== 上下文 ==========
+    /**
+     * 上下文字段，不进行持久化
+     *
+     * 1. 用于基于 LoginUser 维度的临时缓存
+     */
+    @JsonIgnore
+    private Map<String, Object> context;
 
     @Override
     @JsonIgnore// 避免序列化
@@ -65,7 +87,6 @@ public class LoginUser implements UserDetails {
     }
 
     @Override
-    @JsonIgnore
     public String getUsername() {
         return username;
     }
@@ -79,7 +100,10 @@ public class LoginUser implements UserDetails {
     @Override
     @JsonIgnore// 避免序列化
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return new HashSet<>();
+        List<GrantedAuthority> list = new ArrayList<>(1);
+        // TODO @芋艿：看看有没更优化的方案
+        list.add(new SimpleGrantedAuthority("ROLE_ACTIVITI_USER"));
+        return list;
     }
 
     @Override
@@ -98,6 +122,19 @@ public class LoginUser implements UserDetails {
     @JsonIgnore// 避免序列化
     public boolean isCredentialsNonExpired() {
         return true;  // 返回 true，不依赖 Spring Security 判断
+    }
+
+    // ========== 上下文 ==========
+
+    public void setContext(String key, Object value) {
+        if (context == null) {
+            context = new HashMap<>();
+        }
+        context.put(key, value);
+    }
+
+    public <T> T getContext(String key, Class<T> type) {
+        return MapUtil.get(context, key, type);
     }
 
 }

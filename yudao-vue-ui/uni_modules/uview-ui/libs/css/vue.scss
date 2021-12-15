@@ -1,0 +1,27 @@
+// 历遍生成4个方向的底部安全区
+@each $d in top, right, bottom, left {
+	.u-safe-area-inset-#{$d} {
+		padding-#{$d}: 0;
+		padding-#{$d}: constant(safe-area-inset-#{$d});  
+		padding-#{$d}: env(safe-area-inset-#{$d});  
+	}
+}
+
+//提升H5端uni.toast()的层级，避免被uView的modal等遮盖
+/* #ifdef H5 */
+uni-toast {
+    z-index: 10090;
+}
+uni-toast .uni-toast {
+   z-index: 10090;
+}
+/* #endif */
+
+// 隐藏scroll-view的滚动条
+::-webkit-scrollbar {
+    display: none;  
+    width: 0 !important;  
+    height: 0 !important;  
+    -webkit-appearance: none;  
+    background: transparent;  
+}

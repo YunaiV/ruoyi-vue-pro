@@ -90,3 +90,6 @@ yudao:
     base-package: cn.iocoder.yudao.adminserver
   core-service:
     base-package: cn.iocoder.yudao.coreservice
+  pay:
+    pay-notify-url: http://niubi.natapp1.cc/api/pay/order/notify
+    refund-notify-url: http://niubi.natapp1.cc/api/pay/refund/notify

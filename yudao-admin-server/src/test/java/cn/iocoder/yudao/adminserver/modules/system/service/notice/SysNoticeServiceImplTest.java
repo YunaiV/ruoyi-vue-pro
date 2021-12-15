@@ -46,9 +46,9 @@ class SysNoticeServiceImplTest extends BaseDbUnitTest {
         sysNoticeMapper.insert(dbNotice);
 
         // 测试 title 不匹配
-        sysNoticeMapper.insert(ObjectUtils.clone(dbNotice, o -> o.setTitle("尼古拉斯凯奇也来啦！")));
+        sysNoticeMapper.insert(ObjectUtils.cloneIgnoreId(dbNotice, o -> o.setTitle("尼古拉斯凯奇也来啦！")));
         // 测试 status 不匹配
-        sysNoticeMapper.insert(ObjectUtils.clone(dbNotice, o -> o.setStatus(CommonStatusEnum.DISABLE.getStatus())));
+        sysNoticeMapper.insert(ObjectUtils.cloneIgnoreId(dbNotice, o -> o.setStatus(CommonStatusEnum.DISABLE.getStatus())));
 
 
         // 查询

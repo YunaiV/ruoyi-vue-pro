@@ -15,15 +15,18 @@ import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.util.monitor.TracerUtils;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
+import cn.iocoder.yudao.userserver.modules.member.dal.mysql.user.MbrUserMapper;
 import cn.iocoder.yudao.userserver.modules.member.service.user.MbrUserService;
 import cn.iocoder.yudao.userserver.modules.system.controller.auth.vo.*;
 import cn.iocoder.yudao.userserver.modules.system.convert.auth.SysAuthConvert;
 import cn.iocoder.yudao.userserver.modules.system.enums.sms.SysSmsSceneEnum;
 import cn.iocoder.yudao.userserver.modules.system.service.auth.SysAuthService;
 import cn.iocoder.yudao.userserver.modules.system.service.sms.SysSmsCodeService;
+import com.google.common.annotations.VisibleForTesting;
 import lombok.extern.slf4j.Slf4j;
 import me.zhyd.oauth.model.AuthUser;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
@@ -32,14 +35,17 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getClientIP;
 import static cn.iocoder.yudao.userserver.modules.system.enums.SysErrorCodeConstants.*;
 
 /**
@@ -68,6 +74,15 @@ public class SysAuthServiceImpl implements SysAuthService {
     @Resource
     private SysSocialCoreService socialService;
 
+    private SysSocialService socialService;
+    @Resource
+    private StringRedisTemplate stringRedisTemplate;
+    @Resource
+    private PasswordEncoder passwordEncoder;
+    @Resource
+    private MbrUserMapper userMapper;
+
+    private static final UserTypeEnum userTypeEnum = UserTypeEnum.MEMBER;
 
     @Override
     public UserDetails loadUserByUsername(String mobile) throws UsernameNotFoundException {
@@ -204,12 +219,12 @@ public class SysAuthServiceImpl implements SysAuthService {
         }
         reqDTO.setUsername(mobile);
         reqDTO.setUserAgent(ServletUtils.getUserAgent());
-        reqDTO.setUserIp(ServletUtils.getClientIP());
+        reqDTO.setUserIp(getClientIP());
         reqDTO.setResult(loginResult.getResult());
         loginLogCoreService.createLoginLog(reqDTO);
         // 更新最后登录时间
         if (user != null && Objects.equals(SysLoginResultEnum.SUCCESS.getResult(), loginResult.getResult())) {
-            userService.updateUserLogin(user.getId(), ServletUtils.getClientIP());
+            userService.updateUserLogin(user.getId(), getClientIP());
         }
     }
 
@@ -270,6 +285,69 @@ public class SysAuthServiceImpl implements SysAuthService {
         this.createLogoutLog(loginUser.getId(), loginUser.getUsername());
     }
 
+    @Override
+    public void updatePassword(Long userId, @Valid MbrAuthUpdatePasswordReqVO reqVO) {
+        // 检验旧密码
+        MbrUserDO userDO = checkOldPassword(userId, reqVO.getOldPassword());
+
+        // 更新用户密码
+        // TODO @宋天：不要更新整个对象哈
+        userDO.setPassword(passwordEncoder.encode(reqVO.getPassword()));
+        userMapper.updateById(userDO);
+    }
+
+    @Override
+    public void resetPassword(MbrAuthResetPasswordReqVO reqVO) {
+        // 根据验证码取出手机号，并查询用户
+        String mobile = stringRedisTemplate.opsForValue().get(reqVO.getCode());
+        MbrUserDO userDO = userMapper.selectByMobile(mobile);
+        if (userDO == null){
+            throw exception(USER_NOT_EXISTS);
+        }
+        // TODO @芋艿 这一步没必要检验验证码与手机是否匹配，因为是根据验证码去redis中查找手机号，然后根据手机号查询用户
+        //  也就是说 即便黑客以其他方式将验证码发送到自己手机上，最终还是会根据手机号查询用户然后进行重置密码的操作，不存在安全问题
+
+        // TODO @宋天：这块微信在讨论下哈~~~
+
+        // 校验验证码
+        smsCodeService.useSmsCode(userDO.getMobile(), SysSmsSceneEnum.FORGET_MOBILE_BY_SMS.getScene(), reqVO.getCode(),getClientIP());
+
+        // 更新密码
+        userDO.setPassword(passwordEncoder.encode(reqVO.getPassword()));
+        userMapper.updateById(userDO);
+    }
+
+    @Override
+    public void checkIfMobileMatchCodeAndDeleteCode(String phone, String code) {
+        // 检验用户手机与验证码是否匹配
+        String mobile = stringRedisTemplate.opsForValue().get(code);
+        if (!phone.equals(mobile)){
+            throw exception(USER_CODE_FAILED);
+        }
+        // 销毁redis中此验证码
+        stringRedisTemplate.delete(code);
+    }
+
+    /**
+     * 校验旧密码
+     *
+     * @param id          用户 id
+     * @param oldPassword 旧密码
+     * @return MbrUserDO 用户实体
+     */
+    @VisibleForTesting
+    public MbrUserDO checkOldPassword(Long id, String oldPassword) {
+        MbrUserDO user = userMapper.selectById(id);
+        if (user == null) {
+            throw exception(USER_NOT_EXISTS);
+        }
+        // 参数：未加密密码，编码后的密码
+        if (!passwordEncoder.matches(oldPassword,user.getPassword())) {
+            throw exception(USER_PASSWORD_FAILED);
+        }
+        return user;
+    }
+
     private void createLogoutLog(Long userId, String username) {
         SysLoginLogCreateReqDTO reqDTO = new SysLoginLogCreateReqDTO();
         reqDTO.setLogType(SysLoginLogTypeEnum.LOGOUT_SELF.getType());
@@ -278,7 +356,7 @@ public class SysAuthServiceImpl implements SysAuthService {
         reqDTO.setUserType(USER_TYPE_ENUM.getValue());
         reqDTO.setUsername(username);
         reqDTO.setUserAgent(ServletUtils.getUserAgent());
-        reqDTO.setUserIp(ServletUtils.getClientIP());
+        reqDTO.setUserIp(getClientIP());
         reqDTO.setResult(SysLoginResultEnum.SUCCESS.getResult());
         loginLogCoreService.createLoginLog(reqDTO);
     }

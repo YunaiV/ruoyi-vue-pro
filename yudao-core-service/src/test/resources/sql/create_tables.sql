@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS "inf_file" (
     "updater" varchar(64) DEFAULT '',
     "update_time" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "deleted" bit NOT NULL DEFAULT FALSE,
+    "tenant_id" bigint not null default  '0',
     PRIMARY KEY ("id")
 ) COMMENT '文件表';
 
@@ -27,6 +28,7 @@ CREATE TABLE IF NOT EXISTS `sys_user_session` (
     `updater` varchar(64) DEFAULT '' ,
     "update_time" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "deleted" bit NOT NULL DEFAULT FALSE,
+    "tenant_id" bigint not null default  '0',
     PRIMARY KEY (`id`)
 ) COMMENT '用户在线 Session';
 
@@ -67,6 +69,7 @@ CREATE TABLE IF NOT EXISTS "inf_api_access_log" (
     "updater" varchar(64) default '',
     "update_time" timestamp not null default current_timestamp,
     "deleted" bit not null default false,
+    "tenant_id" bigint not null default  '0',
     primary key ("id")
 ) COMMENT 'API 访问日志表';
 
@@ -98,6 +101,7 @@ CREATE TABLE IF NOT EXISTS "inf_api_error_log" (
     "updater" varchar(64) default '',
     "update_time" timestamp not null default current_timestamp,
     "deleted" bit not null default false,
+    "tenant_id" bigint not null default  '0',
     primary key ("id")
 ) COMMENT '系统异常日志';
 
@@ -151,6 +155,7 @@ CREATE TABLE IF NOT EXISTS "sys_sms_log" (
     "updater" varchar(64) DEFAULT '',
     "update_time" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "deleted" bit NOT NULL DEFAULT FALSE,
+    "tenant_id" bigint not null default  '0',
     PRIMARY KEY ("id")
 ) COMMENT '短信日志';
 
@@ -169,5 +174,6 @@ CREATE TABLE IF NOT EXISTS `sys_login_log` (
     `updater`   varchar(64)           DEFAULT '',
     `update_time` datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     `deleted`     bit(1)       NOT NULL DEFAULT '0',
+    "tenant_id" bigint not null default  '0',
     PRIMARY KEY (`id`)
 ) COMMENT ='系统访问记录';

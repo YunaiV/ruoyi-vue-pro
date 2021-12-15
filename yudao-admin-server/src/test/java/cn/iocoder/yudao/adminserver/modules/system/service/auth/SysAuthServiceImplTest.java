@@ -6,6 +6,7 @@ import cn.iocoder.yudao.adminserver.modules.system.enums.logger.SysLoginLogTypeE
 import cn.iocoder.yudao.adminserver.modules.system.enums.logger.SysLoginResultEnum;
 import cn.iocoder.yudao.adminserver.modules.system.service.auth.impl.SysAuthServiceImpl;
 import cn.iocoder.yudao.adminserver.modules.system.service.common.SysCaptchaService;
+import cn.iocoder.yudao.adminserver.modules.system.service.dept.SysPostService;
 import cn.iocoder.yudao.adminserver.modules.system.service.permission.SysPermissionService;
 import cn.iocoder.yudao.adminserver.modules.system.service.user.SysUserService;
 import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.user.SysUserDO;
@@ -16,6 +17,7 @@ import cn.iocoder.yudao.coreservice.modules.system.service.user.SysUserCoreServi
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.test.core.util.AssertUtils;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
@@ -67,6 +69,14 @@ public class SysAuthServiceImplTest extends BaseDbUnitTest {
     private SysUserSessionCoreService userSessionCoreService;
     @MockBean
     private SysSocialCoreService socialService;
+    private SysSocialService socialService;
+    @MockBean
+    private SysPostService postService;
+
+    @BeforeEach
+    public void setUp() {
+        when(captchaService.isCaptchaEnable()).thenReturn(true);
+    }
 
     @Test
     public void testLoadUserByUsername_success() {
@@ -80,7 +90,6 @@ public class SysAuthServiceImplTest extends BaseDbUnitTest {
         LoginUser loginUser = (LoginUser) authService.loadUserByUsername(username);
         // 校验
         AssertUtils.assertPojoEquals(user, loginUser, "updateTime");
-        assertNull(loginUser.getRoleIds()); // 此时不会加载角色，所以是空的
     }
 
     @Test
