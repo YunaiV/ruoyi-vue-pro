@@ -267,11 +267,4 @@ public class SysDeptServiceImpl implements SysDeptService {
         }
     }
 
-//    @Override
-//    @DataScope(deptAlias = "d")
-//    public List<SysDept> selectDeptList(SysDept dept)
-//    {
-//        return deptMapper.selectDeptList(dept);
-//    }
-
 }

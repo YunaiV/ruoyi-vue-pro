@@ -369,6 +369,11 @@ public class DataPermissionDatabaseInterceptor extends JsqlParserSupport impleme
             if (!rule.getTableNames().contains(table.getName())) {
                 continue;
             }
+            // 如果有匹配的规则，说明可重写。
+            // 为什么不是有 allExpression 非空才重写呢？在生成 column = value 过滤条件时，会因为 value 不存在，导致未重写。
+            // 这样导致第一次无 value，被标记成无需重写；但是第二次有 value，此时会需要重写。
+            ContextHolder.setRewrite(true);
+
             // 单条规则的条件
             String tableName = MyBatisUtils.getTableName(table);
             Expression oneExpress = rule.getExpression(tableName, table.getAlias());
@@ -377,10 +382,6 @@ public class DataPermissionDatabaseInterceptor extends JsqlParserSupport impleme
                     : new AndExpression(allExpression, oneExpress);
         }
 
-        // 如果条件非空，说明已经重写了
-        if (allExpression != null) {
-            ContextHolder.setRewrite(true);
-        }
         return allExpression;
     }
 
@@ -393,7 +394,7 @@ public class DataPermissionDatabaseInterceptor extends JsqlParserSupport impleme
         if (ContextHolder.getRewrite()) {
             return;
         }
-        // 有重写，进行添加
+        // 无重写，进行添加
         mappedStatementCache.addNoRewritable(ms, ContextHolder.getRules());
     }
 
