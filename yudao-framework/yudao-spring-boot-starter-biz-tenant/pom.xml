@@ -8,11 +8,11 @@
         <version>${revision}</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>yudao-spring-boot-starter-data-permission</artifactId>
+    <artifactId>yudao-spring-boot-starter-biz-tenant</artifactId>
     <packaging>jar</packaging>
 
     <name>${artifactId}</name>
-    <description>数据权限</description>
+    <description>多租户</description>
     <url>https://github.com/YunaiV/ruoyi-vue-pro</url>
 
     <dependencies>
@@ -25,7 +25,6 @@
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
             <artifactId>yudao-spring-boot-starter-security</artifactId>
-            <optional>true</optional> <!-- 可选，如果使用 DeptDataPermissionRule 必须提供 -->
         </dependency>
 
         <!-- DB 相关 -->
@@ -34,10 +33,27 @@
             <artifactId>yudao-spring-boot-starter-mybatis</artifactId>
         </dependency>
 
-        <!-- Test 测试相关 -->
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
-            <artifactId>yudao-spring-boot-starter-test</artifactId>
+            <artifactId>yudao-spring-boot-starter-redis</artifactId>
+        </dependency>
+
+        <!-- Job 定时任务相关 -->
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-spring-boot-starter-job</artifactId>
+        </dependency>
+
+        <!-- 消息队列相关 -->
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-spring-boot-starter-mq</artifactId>
+        </dependency>
+
+        <!-- Test 测试相关 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

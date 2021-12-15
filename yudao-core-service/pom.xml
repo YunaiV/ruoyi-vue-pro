@@ -36,6 +36,10 @@
             <groupId>cn.iocoder.boot</groupId>
             <artifactId>yudao-spring-boot-starter-biz-pay</artifactId>
         </dependency>
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-spring-boot-starter-biz-tenant</artifactId>
+        </dependency>
 
         <!-- Web 相关 -->
         <dependency>
@@ -91,10 +95,6 @@
         </dependency>
 
         <!-- 工具类相关 -->
-        <dependency>
-            <groupId>cn.iocoder.boot</groupId>
-            <artifactId>yudao-spring-boot-starter-tenant</artifactId>
-        </dependency>
 
         <dependency>
             <groupId>com.google.guava</groupId>
