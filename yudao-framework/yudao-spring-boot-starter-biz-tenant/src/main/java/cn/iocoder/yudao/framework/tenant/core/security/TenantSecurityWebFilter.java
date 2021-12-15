@@ -30,6 +30,7 @@ public class TenantSecurityWebFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         LoginUser user = SecurityFrameworkUtils.getLoginUser();
         assert user != null; // shouldNotFilter 已经校验
+        // 校验租户是否匹配。
         if (!Objects.equals(user.getTenantId(), TenantContextHolder.getTenantId())) {
             log.error("[doFilterInternal][租户({}) User({}/{}) 越权访问租户({}) URL({}/{})]",
                     user.getTenantId(), user.getId(), user.getUserType(),

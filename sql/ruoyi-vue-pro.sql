@@ -11,7 +11,7 @@
  Target Server Version : 80026
  File Encoding         : 65001
 
- Date: 14/12/2021 22:59:14
+ Date: 15/12/2021 13:07:09
 */
 
 SET NAMES utf8mb4;
@@ -22,29 +22,29 @@ SET FOREIGN_KEY_CHECKS = 0;
 -- ----------------------------
 DROP TABLE IF EXISTS `inf_api_access_log`;
 CREATE TABLE `inf_api_access_log` (
-                                      `id` bigint NOT NULL AUTO_INCREMENT COMMENT '日志主键',
-                                      `trace_id` varchar(64) NOT NULL DEFAULT '' COMMENT '链路追踪编号',
-                                      `user_id` bigint NOT NULL DEFAULT '0' COMMENT '用户编号',
-                                      `user_type` tinyint NOT NULL DEFAULT '0' COMMENT '用户类型',
-                                      `application_name` varchar(50) NOT NULL COMMENT '应用名',
-                                      `request_method` varchar(16) NOT NULL DEFAULT '' COMMENT '请求方法名',
-                                      `request_url` varchar(255) NOT NULL DEFAULT '' COMMENT '请求地址',
-                                      `request_params` varchar(8000) NOT NULL DEFAULT '' COMMENT '请求参数',
-                                      `user_ip` varchar(50) NOT NULL COMMENT '用户 IP',
-                                      `user_agent` varchar(512) NOT NULL COMMENT '浏览器 UA',
-                                      `begin_time` datetime NOT NULL COMMENT '开始请求时间',
-                                      `end_time` datetime NOT NULL COMMENT '结束请求时间',
-                                      `duration` int NOT NULL COMMENT '执行时长',
-                                      `result_code` int NOT NULL DEFAULT '0' COMMENT '结果码',
-                                      `result_msg` varchar(512) DEFAULT '' COMMENT '结果提示',
-                                      `creator` varchar(64) DEFAULT '' COMMENT '创建者',
-                                      `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-                                      `updater` varchar(64) DEFAULT '' COMMENT '更新者',
-                                      `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-                                      `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
-                                      `tenant_id` bigint NOT NULL DEFAULT '0' COMMENT '租户编号',
-                                      PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=3162 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='API 访问日志表';
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '日志主键',
+  `trace_id` varchar(64) COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '链路追踪编号',
+  `user_id` bigint NOT NULL DEFAULT '0' COMMENT '用户编号',
+  `user_type` tinyint NOT NULL DEFAULT '0' COMMENT '用户类型',
+  `application_name` varchar(50) COLLATE utf8mb4_general_ci NOT NULL COMMENT '应用名',
+  `request_method` varchar(16) COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '请求方法名',
+  `request_url` varchar(255) COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '请求地址',
+  `request_params` varchar(8000) COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '请求参数',
+  `user_ip` varchar(50) COLLATE utf8mb4_general_ci NOT NULL COMMENT '用户 IP',
+  `user_agent` varchar(512) COLLATE utf8mb4_general_ci NOT NULL COMMENT '浏览器 UA',
+  `begin_time` datetime NOT NULL COMMENT '开始请求时间',
+  `end_time` datetime NOT NULL COMMENT '结束请求时间',
+  `duration` int NOT NULL COMMENT '执行时长',
+  `result_code` int NOT NULL DEFAULT '0' COMMENT '结果码',
+  `result_msg` varchar(512) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '结果提示',
+  `creator` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  `tenant_id` bigint NOT NULL DEFAULT '0' COMMENT '租户编号',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=3282 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='API 访问日志表';
 
 -- ----------------------------
 -- Records of inf_api_access_log
@@ -57,35 +57,35 @@ COMMIT;
 -- ----------------------------
 DROP TABLE IF EXISTS `inf_api_error_log`;
 CREATE TABLE `inf_api_error_log` (
-                                     `id` int NOT NULL AUTO_INCREMENT COMMENT '编号',
-                                     `trace_id` varchar(64) NOT NULL COMMENT '链路追踪编号\n     *\n     * 一般来说，通过链路追踪编号，可以将访问日志，错误日志，链路追踪日志，logger 打印日志等，结合在一起，从而进行排错。',
-                                     `user_id` int NOT NULL DEFAULT '0' COMMENT '用户编号',
-                                     `user_type` tinyint NOT NULL DEFAULT '0' COMMENT '用户类型',
-                                     `application_name` varchar(50) NOT NULL COMMENT '应用名\n     *\n     * 目前读取 spring.application.name',
-                                     `request_method` varchar(16) NOT NULL COMMENT '请求方法名',
-                                     `request_url` varchar(255) NOT NULL COMMENT '请求地址',
-                                     `request_params` varchar(8000) NOT NULL COMMENT '请求参数',
-                                     `user_ip` varchar(50) NOT NULL COMMENT '用户 IP',
-                                     `user_agent` varchar(512) NOT NULL COMMENT '浏览器 UA',
-                                     `exception_time` datetime NOT NULL COMMENT '异常发生时间',
-                                     `exception_name` varchar(128) NOT NULL DEFAULT '' COMMENT '异常名\n     *\n     * {@link Throwable#getClass()} 的类全名',
-                                     `exception_message` text NOT NULL COMMENT '异常导致的消息\n     *\n     * {@link cn.iocoder.common.framework.util.ExceptionUtil#getMessage(Throwable)}',
-                                     `exception_root_cause_message` text NOT NULL COMMENT '异常导致的根消息\n     *\n     * {@link cn.iocoder.common.framework.util.ExceptionUtil#getRootCauseMessage(Throwable)}',
-                                     `exception_stack_trace` text NOT NULL COMMENT '异常的栈轨迹\n     *\n     * {@link cn.iocoder.common.framework.util.ExceptionUtil#getServiceException(Exception)}',
-                                     `exception_class_name` varchar(512) NOT NULL COMMENT '异常发生的类全名\n     *\n     * {@link StackTraceElement#getClassName()}',
-                                     `exception_file_name` varchar(512) NOT NULL COMMENT '异常发生的类文件\n     *\n     * {@link StackTraceElement#getFileName()}',
-                                     `exception_method_name` varchar(512) NOT NULL COMMENT '异常发生的方法名\n     *\n     * {@link StackTraceElement#getMethodName()}',
-                                     `exception_line_number` int NOT NULL COMMENT '异常发生的方法所在行\n     *\n     * {@link StackTraceElement#getLineNumber()}',
-                                     `process_status` tinyint NOT NULL COMMENT '处理状态',
-                                     `process_time` datetime DEFAULT NULL COMMENT '处理时间',
-                                     `process_user_id` int DEFAULT '0' COMMENT '处理用户编号',
-                                     `creator` varchar(64) DEFAULT '' COMMENT '创建者',
-                                     `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-                                     `updater` varchar(64) DEFAULT '' COMMENT '更新者',
-                                     `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-                                     `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
-                                     `tenant_id` bigint NOT NULL DEFAULT '0' COMMENT '租户编号',
-                                     PRIMARY KEY (`id`) USING BTREE
+  `id` int NOT NULL AUTO_INCREMENT COMMENT '编号',
+  `trace_id` varchar(64) COLLATE utf8mb4_general_ci NOT NULL COMMENT '链路追踪编号\n     *\n     * 一般来说，通过链路追踪编号，可以将访问日志，错误日志，链路追踪日志，logger 打印日志等，结合在一起，从而进行排错。',
+  `user_id` int NOT NULL DEFAULT '0' COMMENT '用户编号',
+  `user_type` tinyint NOT NULL DEFAULT '0' COMMENT '用户类型',
+  `application_name` varchar(50) COLLATE utf8mb4_general_ci NOT NULL COMMENT '应用名\n     *\n     * 目前读取 spring.application.name',
+  `request_method` varchar(16) COLLATE utf8mb4_general_ci NOT NULL COMMENT '请求方法名',
+  `request_url` varchar(255) COLLATE utf8mb4_general_ci NOT NULL COMMENT '请求地址',
+  `request_params` varchar(8000) COLLATE utf8mb4_general_ci NOT NULL COMMENT '请求参数',
+  `user_ip` varchar(50) COLLATE utf8mb4_general_ci NOT NULL COMMENT '用户 IP',
+  `user_agent` varchar(512) COLLATE utf8mb4_general_ci NOT NULL COMMENT '浏览器 UA',
+  `exception_time` datetime NOT NULL COMMENT '异常发生时间',
+  `exception_name` varchar(128) COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '异常名\n     *\n     * {@link Throwable#getClass()} 的类全名',
+  `exception_message` text COLLATE utf8mb4_general_ci NOT NULL COMMENT '异常导致的消息\n     *\n     * {@link cn.iocoder.common.framework.util.ExceptionUtil#getMessage(Throwable)}',
+  `exception_root_cause_message` text COLLATE utf8mb4_general_ci NOT NULL COMMENT '异常导致的根消息\n     *\n     * {@link cn.iocoder.common.framework.util.ExceptionUtil#getRootCauseMessage(Throwable)}',
+  `exception_stack_trace` text COLLATE utf8mb4_general_ci NOT NULL COMMENT '异常的栈轨迹\n     *\n     * {@link cn.iocoder.common.framework.util.ExceptionUtil#getServiceException(Exception)}',
+  `exception_class_name` varchar(512) COLLATE utf8mb4_general_ci NOT NULL COMMENT '异常发生的类全名\n     *\n     * {@link StackTraceElement#getClassName()}',
+  `exception_file_name` varchar(512) COLLATE utf8mb4_general_ci NOT NULL COMMENT '异常发生的类文件\n     *\n     * {@link StackTraceElement#getFileName()}',
+  `exception_method_name` varchar(512) COLLATE utf8mb4_general_ci NOT NULL COMMENT '异常发生的方法名\n     *\n     * {@link StackTraceElement#getMethodName()}',
+  `exception_line_number` int NOT NULL COMMENT '异常发生的方法所在行\n     *\n     * {@link StackTraceElement#getLineNumber()}',
+  `process_status` tinyint NOT NULL COMMENT '处理状态',
+  `process_time` datetime DEFAULT NULL COMMENT '处理时间',
+  `process_user_id` int DEFAULT '0' COMMENT '处理用户编号',
+  `creator` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  `tenant_id` bigint NOT NULL DEFAULT '0' COMMENT '租户编号',
+  PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=81 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='系统异常日志';
 
 -- ----------------------------
@@ -99,20 +99,20 @@ COMMIT;
 -- ----------------------------
 DROP TABLE IF EXISTS `inf_config`;
 CREATE TABLE `inf_config` (
-                              `id` int NOT NULL AUTO_INCREMENT COMMENT '参数主键',
-                              `group` varchar(50) NOT NULL COMMENT '参数分组',
-                              `type` tinyint NOT NULL COMMENT '参数类型',
-                              `name` varchar(100) NOT NULL DEFAULT '' COMMENT '参数名称',
-                              `key` varchar(100) NOT NULL DEFAULT '' COMMENT '参数键名',
-                              `value` varchar(500) NOT NULL DEFAULT '' COMMENT '参数键值',
-                              `sensitive` bit(1) NOT NULL COMMENT '是否敏感',
-                              `remark` varchar(500) DEFAULT NULL COMMENT '备注',
-                              `creator` varchar(64) DEFAULT '' COMMENT '创建者',
-                              `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-                              `updater` varchar(64) DEFAULT '' COMMENT '更新者',
-                              `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-                              `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
-                              PRIMARY KEY (`id`) USING BTREE
+  `id` int NOT NULL AUTO_INCREMENT COMMENT '参数主键',
+  `group` varchar(50) COLLATE utf8mb4_general_ci NOT NULL COMMENT '参数分组',
+  `type` tinyint NOT NULL COMMENT '参数类型',
+  `name` varchar(100) COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '参数名称',
+  `key` varchar(100) COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '参数键名',
+  `value` varchar(500) COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '参数键值',
+  `sensitive` bit(1) NOT NULL COMMENT '是否敏感',
+  `remark` varchar(500) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '备注',
+  `creator` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='参数配置表';
 
 -- ----------------------------
@@ -131,16 +131,16 @@ COMMIT;
 -- ----------------------------
 DROP TABLE IF EXISTS `inf_file`;
 CREATE TABLE `inf_file` (
-                            `id` varchar(188) NOT NULL COMMENT '文件路径',
-                            `type` varchar(63) DEFAULT NULL COMMENT '文件类型',
-                            `content` mediumblob NOT NULL COMMENT '文件内容',
-                            `creator` varchar(64) DEFAULT '' COMMENT '创建者',
-                            `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-                            `updater` varchar(64) DEFAULT '' COMMENT '更新者',
-                            `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-                            `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
-                            `tenant_id` bigint NOT NULL DEFAULT '0' COMMENT '租户编号',
-                            PRIMARY KEY (`id`) USING BTREE
+  `id` varchar(188) COLLATE utf8mb4_general_ci NOT NULL COMMENT '文件路径',
+  `type` varchar(63) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '文件类型',
+  `content` mediumblob NOT NULL COMMENT '文件内容',
+  `creator` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  `tenant_id` bigint NOT NULL DEFAULT '0' COMMENT '租户编号',
+  PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='文件表';
 
 -- ----------------------------
@@ -163,21 +163,21 @@ COMMIT;
 -- ----------------------------
 DROP TABLE IF EXISTS `inf_job`;
 CREATE TABLE `inf_job` (
-                           `id` bigint NOT NULL AUTO_INCREMENT COMMENT '任务编号',
-                           `name` varchar(32) NOT NULL COMMENT '任务名称',
-                           `status` tinyint NOT NULL COMMENT '任务状态',
-                           `handler_name` varchar(64) NOT NULL COMMENT '处理器的名字',
-                           `handler_param` varchar(255) DEFAULT NULL COMMENT '处理器的参数',
-                           `cron_expression` varchar(32) NOT NULL COMMENT 'CRON 表达式',
-                           `retry_count` int NOT NULL DEFAULT '0' COMMENT '重试次数',
-                           `retry_interval` int NOT NULL DEFAULT '0' COMMENT '重试间隔',
-                           `monitor_timeout` int NOT NULL DEFAULT '0' COMMENT '监控超时时间',
-                           `creator` varchar(64) DEFAULT '' COMMENT '创建者',
-                           `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-                           `updater` varchar(64) DEFAULT '' COMMENT '更新者',
-                           `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-                           `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
-                           PRIMARY KEY (`id`) USING BTREE
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '任务编号',
+  `name` varchar(32) COLLATE utf8mb4_general_ci NOT NULL COMMENT '任务名称',
+  `status` tinyint NOT NULL COMMENT '任务状态',
+  `handler_name` varchar(64) COLLATE utf8mb4_general_ci NOT NULL COMMENT '处理器的名字',
+  `handler_param` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '处理器的参数',
+  `cron_expression` varchar(32) COLLATE utf8mb4_general_ci NOT NULL COMMENT 'CRON 表达式',
+  `retry_count` int NOT NULL DEFAULT '0' COMMENT '重试次数',
+  `retry_interval` int NOT NULL DEFAULT '0' COMMENT '重试间隔',
+  `monitor_timeout` int NOT NULL DEFAULT '0' COMMENT '监控超时时间',
+  `creator` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='定时任务表';
 
 -- ----------------------------
@@ -195,22 +195,22 @@ COMMIT;
 -- ----------------------------
 DROP TABLE IF EXISTS `inf_job_log`;
 CREATE TABLE `inf_job_log` (
-                               `id` bigint NOT NULL AUTO_INCREMENT COMMENT '日志编号',
-                               `job_id` bigint NOT NULL COMMENT '任务编号',
-                               `handler_name` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '处理器的名字',
-                               `handler_param` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '处理器的参数',
-                               `execute_index` tinyint NOT NULL DEFAULT '1' COMMENT '第几次执行',
-                               `begin_time` datetime NOT NULL COMMENT '开始执行时间',
-                               `end_time` datetime DEFAULT NULL COMMENT '结束执行时间',
-                               `duration` int DEFAULT NULL COMMENT '执行时长',
-                               `status` tinyint NOT NULL COMMENT '任务状态',
-                               `result` varchar(4000) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '结果数据',
-                               `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
-                               `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-                               `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
-                               `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-                               `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
-                               PRIMARY KEY (`id`) USING BTREE
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '日志编号',
+  `job_id` bigint NOT NULL COMMENT '任务编号',
+  `handler_name` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '处理器的名字',
+  `handler_param` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '处理器的参数',
+  `execute_index` tinyint NOT NULL DEFAULT '1' COMMENT '第几次执行',
+  `begin_time` datetime NOT NULL COMMENT '开始执行时间',
+  `end_time` datetime DEFAULT NULL COMMENT '结束执行时间',
+  `duration` int DEFAULT NULL COMMENT '执行时长',
+  `status` tinyint NOT NULL COMMENT '任务状态',
+  `result` varchar(4000) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '结果数据',
+  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=25274 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='定时任务日志表';
 
 -- ----------------------------
@@ -224,23 +224,23 @@ COMMIT;
 -- ----------------------------
 DROP TABLE IF EXISTS `mbr_user`;
 CREATE TABLE `mbr_user` (
-                            `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号',
-                            `nickname` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL DEFAULT '' COMMENT '用户昵称',
-                            `avatar` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL DEFAULT '' COMMENT '头像',
-                            `status` tinyint NOT NULL COMMENT '状态',
-                            `mobile` varchar(11) COLLATE utf8mb4_bin NOT NULL COMMENT '手机号',
-                            `password` varchar(100) COLLATE utf8mb4_bin NOT NULL DEFAULT '' COMMENT '密码',
-                            `register_ip` varchar(32) COLLATE utf8mb4_bin NOT NULL COMMENT '注册 IP',
-                            `login_ip` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '最后登录IP',
-                            `login_date` datetime DEFAULT NULL COMMENT '最后登录时间',
-                            `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT '' COMMENT '创建者',
-                            `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-                            `updater` varchar(64) COLLATE utf8mb4_bin DEFAULT '' COMMENT '更新者',
-                            `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-                            `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
-                            `tenant_id` bigint NOT NULL DEFAULT '0' COMMENT '租户编号',
-                            PRIMARY KEY (`id`) USING BTREE,
-                            UNIQUE KEY `uk_mobile` (`mobile`) USING BTREE COMMENT '手机号'
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号',
+  `nickname` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL DEFAULT '' COMMENT '用户昵称',
+  `avatar` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL DEFAULT '' COMMENT '头像',
+  `status` tinyint NOT NULL COMMENT '状态',
+  `mobile` varchar(11) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT '手机号',
+  `password` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL DEFAULT '' COMMENT '密码',
+  `register_ip` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT '注册 IP',
+  `login_ip` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '最后登录IP',
+  `login_date` datetime DEFAULT NULL COMMENT '最后登录时间',
+  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  `tenant_id` bigint NOT NULL DEFAULT '0' COMMENT '租户编号',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE KEY `uk_mobile` (`mobile`) USING BTREE COMMENT '手机号'
 ) ENGINE=InnoDB AUTO_INCREMENT=247 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin COMMENT='用户';
 
 -- ----------------------------
@@ -256,21 +256,21 @@ COMMIT;
 -- ----------------------------
 DROP TABLE IF EXISTS `oa_leave`;
 CREATE TABLE `oa_leave` (
-                            `id` bigint NOT NULL AUTO_INCREMENT COMMENT '请假表单主键',
-                            `process_instance_id` varchar(64) DEFAULT NULL COMMENT '流程id',
-                            `status` tinyint NOT NULL COMMENT '状态',
-                            `user_id` varchar(20) NOT NULL COMMENT '申请人id',
-                            `start_time` datetime NOT NULL COMMENT '开始时间',
-                            `end_time` datetime NOT NULL COMMENT '结束时间',
-                            `leave_type` varchar(20) DEFAULT NULL COMMENT '请假类型',
-                            `reason` varchar(2000) DEFAULT NULL COMMENT '原因',
-                            `apply_time` datetime NOT NULL COMMENT '申请时间',
-                            `creator` varchar(64) DEFAULT '' COMMENT '创建者',
-                            `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-                            `updater` varchar(64) DEFAULT '' COMMENT '更新者',
-                            `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-                            `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
-                            PRIMARY KEY (`id`)
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '请假表单主键',
+  `process_instance_id` varchar(64) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '流程id',
+  `status` tinyint NOT NULL COMMENT '状态',
+  `user_id` varchar(20) COLLATE utf8mb4_general_ci NOT NULL COMMENT '申请人id',
+  `start_time` datetime NOT NULL COMMENT '开始时间',
+  `end_time` datetime NOT NULL COMMENT '结束时间',
+  `leave_type` varchar(20) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '请假类型',
+  `reason` varchar(2000) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '原因',
+  `apply_time` datetime NOT NULL COMMENT '申请时间',
+  `creator` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='请假申请表';
 
 -- ----------------------------
@@ -286,19 +286,19 @@ COMMIT;
 -- ----------------------------
 DROP TABLE IF EXISTS `pay_app`;
 CREATE TABLE `pay_app` (
-                           `id` bigint NOT NULL AUTO_INCREMENT COMMENT '应用编号',
-                           `name` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '应用名',
-                           `status` tinyint NOT NULL COMMENT '开启状态',
-                           `remark` varchar(255) DEFAULT NULL COMMENT '备注',
-                           `pay_notify_url` varchar(1024) NOT NULL COMMENT '支付结果的回调地址',
-                           `refund_notify_url` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '退款结果的回调地址',
-                           `merchant_id` bigint NOT NULL COMMENT '商户编号',
-                           `creator` varchar(64) DEFAULT '' COMMENT '创建者',
-                           `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-                           `updater` varchar(64) DEFAULT '' COMMENT '更新者',
-                           `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-                           `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
-                           PRIMARY KEY (`id`) USING BTREE
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '应用编号',
+  `name` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '应用名',
+  `status` tinyint NOT NULL COMMENT '开启状态',
+  `remark` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '备注',
+  `pay_notify_url` varchar(1024) COLLATE utf8mb4_general_ci NOT NULL COMMENT '支付结果的回调地址',
+  `refund_notify_url` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '退款结果的回调地址',
+  `merchant_id` bigint NOT NULL COMMENT '商户编号',
+  `creator` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='支付应用信息';
 
 -- ----------------------------
@@ -313,21 +313,21 @@ COMMIT;
 -- ----------------------------
 DROP TABLE IF EXISTS `pay_channel`;
 CREATE TABLE `pay_channel` (
-                               `id` bigint NOT NULL AUTO_INCREMENT COMMENT '商户编号',
-                               `code` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '渠道编码',
-                               `status` tinyint NOT NULL COMMENT '开启状态',
-                               `remark` varchar(255) DEFAULT NULL COMMENT '备注',
-                               `fee_rate` double NOT NULL DEFAULT '0' COMMENT '渠道费率，单位：百分比',
-                               `merchant_id` bigint NOT NULL COMMENT '商户编号',
-                               `app_id` bigint NOT NULL COMMENT '应用编号',
-                               `config` varchar(4096) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '支付渠道配置',
-                               `creator` varchar(64) DEFAULT '' COMMENT '创建者',
-                               `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-                               `updater` varchar(64) DEFAULT '' COMMENT '更新者',
-                               `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-                               `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
-                               PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='支付渠道\n';
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '商户编号',
+  `code` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '渠道编码',
+  `status` tinyint NOT NULL COMMENT '开启状态',
+  `remark` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '备注',
+  `fee_rate` double NOT NULL DEFAULT '0' COMMENT '渠道费率，单位：百分比',
+  `merchant_id` bigint NOT NULL COMMENT '商户编号',
+  `app_id` bigint NOT NULL COMMENT '应用编号',
+  `config` varchar(4096) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '支付渠道配置',
+  `creator` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='支付渠道\n';
 
 -- ----------------------------
 -- Records of pay_channel
@@ -339,6 +339,7 @@ INSERT INTO `pay_channel` VALUES (11, 'wx_pub', 0, NULL, 1, 1, 6, '{\"@class\":\
 INSERT INTO `pay_channel` VALUES (12, 'wx_pub', 0, NULL, 1, 1, 6, '{\"@class\":\"cn.iocoder.yudao.framework.pay.core.client.impl.wx.WXPayClientConfig\",\"appId\":\"wx041349c6f39b268b\",\"mchId\":\"1545083881\",\"apiVersion\":\"v2\",\"mchKey\":\"0alL64UDQdlCwiKZ73ib7ypaIjMns06p\",\"privateKeyContent\":\"-----BEGIN PRIVATE KEY-----\\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQC5q2hYE3loOQoH\\nl/2kh/epuj17W8VpV5vBl7ysJWAbBXux6mlq4gKTHD0QUQdiKtDEUm/bKC9Bi6VU\\nuklM5Y8oCaCbhjklHRbET8jsgd9phSNGviHclYRLsQRO8oXnN89kN0y7DYKm0hYd\\nmaiS12Z3v8VaImSTr4HVeHlC/z3S6mdwSr263stKt931YTcbTj/QFH7znsv9Na0u\\nX6LaMBEEAsJctWdm8Ndrd1tGh9Fzf0DA5VRXsJR3kkWspy+IwiDTPV/FDKOU9NJC\\nSxMmDePerTfkoZ2s1rltqBK0ykDJrXtxR+hTzEsKZ/KpNi8tyYpfNZsviHIlUsLP\\nFJ5UvUhpAgMBAAECggEAd90NltazqTIxpGdeCwrwOzWNnYbIclJprlhMKIJUgf1P\\nNrPTbHoOGXTAgzkcYCat8iAaMEzH/TOu/3zn92m3uqxEcEL9v1UBLqknWHAbkB6w\\ngGocqDAqYUcdNe5hvbyM+fCta5C0SQgV2PQrHOlMMICwYpkTfzhtxCdreXIYMoGg\\nJEIRkZWgrm/N7LTtNgizznuUjy6OURWjXaWKPcs3b3j6G1gLj9Vp++z4y0u51nqM\\n4R6fcvl8M6BjlcC8zo6DbOvCW8cXtuXsnru+2TPrUnsGeybJok4fEQsfW1BvpvPo\\nief38rYJn4OWxIrHcpWrhNtXtgRPeiMGFfIsEQDmVQKBgQDzXK6Nn3Nr3TFfGVTy\\n8QYrzOuY2NqzH8nnsLL6qn3HoKxTv+PcFKOTPsi6f4hIYCzBP0esRrPv0ffMu9oQ\\nJvFtCJvMmcKGtp0Q5hcj0y/XkbC3AWuahJtBv8lhKXVnQXSL0j3+ombljw4/8yN0\\nAzgBz+j/skQQgZ3sN5h+DHGtgwKBgQDDT784/2pd4m86c/uBmrwYfqu6MJo0eHJh\\n1XPtE+u8pOHyNTFk77rKobKDqN5VlrF0uEmBc/08LKhyxJ3vh/zAbcmqT1Mq778y\\nAKKUtVmvcaVDrvSQHsnhj0zt4SHGmmU34U2b9hV+nocq5VszX6/jp//HJi9bs3We\\ndAzfFCmaowKBgC1MmDVGc+6lCraf+X8LPFHU4Bnga70h8qxM6NPd/nG1R76DHn/t\\n25DiA+0rJgwK0unZxJadxoqic9TJNssA5Lmd+5o3GM2Imm311mLVwbcHqHQ4MHZf\\nrqKrd2m9lNv2hCIurVmDk1Gxsj5XHMdQfhFgSQengCHubp30r07vNA3PAoGAUEAE\\nIjdQTSMs8KeXP7mEb8wcY3R05/pVhT1fVJpK0kgtTofss7yM05V88/v+3sv8Pik6\\niqZN9tuimwWOn00Q3UA/DGtrkMjRlooMQ24AW8YmUZkhg9YivTtUMKnAZwopbLx2\\nVw7V5iDdCRMUVheK/c+ZmQpnixZBzcmBQGfYcGECgYBjEq3Mem+Aw6pXOu6+0FwH\\n9y6Xi4HhBkq0OOZZuXFtWVry7YrD3pBgzWVAZJqJCkyPKKZzCzwdbFd3u0lYBs35\\nzYgx7ug4hR+wfI980a3vxjcWGOqnOUUnUJ7ucIa+KDgnYV/bBy4jqpVreXmWAJXl\\nfyjG3eLWBrtrsI9YX6zeAA==\\n-----END PRIVATE KEY-----\\n\",\"privateCertContent\":\"-----BEGIN CERTIFICATE-----\\nMIID6TCCAtGgAwIBAgIUNkEHq6aQcF80NSYqWS58ybsJzI4wDQYJKoZIhvcNAQEL\\nBQAwXjELMAkGA1UEBhMCQ04xEzARBgNVBAoTClRlbnBheS5jb20xHTAbBgNVBAsT\\nFFRlbnBheS5jb20gQ0EgQ2VudGVyMRswGQYDVQQDExJUZW5wYXkuY29tIFJvb3Qg\\nQ0EwHhcNMjExMDIxMDU0NTQxWhcNMjYxMDIwMDU0NTQxWjB7MRMwEQYDVQQDDAox\\nNTQ1MDgzODgxMRswGQYDVQQKDBLlvq7kv6HllYbmiLfns7vnu58xJzAlBgNVBAsM\\nHuWOhuWfjuWMuuWkp+adjuWwp+aXpeeUqOWTgeW6lzELMAkGA1UEBgwCQ04xETAP\\nBgNVBAcMCFNoZW5aaGVuMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA\\nuatoWBN5aDkKB5f9pIf3qbo9e1vFaVebwZe8rCVgGwV7seppauICkxw9EFEHYirQ\\nxFJv2ygvQYulVLpJTOWPKAmgm4Y5JR0WxE/I7IHfaYUjRr4h3JWES7EETvKF5zfP\\nZDdMuw2CptIWHZmoktdmd7/FWiJkk6+B1Xh5Qv890upncEq9ut7LSrfd9WE3G04/\\n0BR+857L/TWtLl+i2jARBALCXLVnZvDXa3dbRofRc39AwOVUV7CUd5JFrKcviMIg\\n0z1fxQyjlPTSQksTJg3j3q035KGdrNa5bagStMpAya17cUfoU8xLCmfyqTYvLcmK\\nXzWbL4hyJVLCzxSeVL1IaQIDAQABo4GBMH8wCQYDVR0TBAIwADALBgNVHQ8EBAMC\\nBPAwZQYDVR0fBF4wXDBaoFigVoZUaHR0cDovL2V2Y2EuaXRydXMuY29tLmNuL3B1\\nYmxpYy9pdHJ1c2NybD9DQT0xQkQ0MjIwRTUwREJDMDRCMDZBRDM5NzU0OTg0NkMw\\nMUMzRThFQkQyMA0GCSqGSIb3DQEBCwUAA4IBAQBe7XgncAY/1PLbCsnMsYt11k3V\\n2cdNZ+yuCxhlOEKk3nHE6WCTL6zL0qWlTKKpnw1rE/+4OS76Tg72wWXcHfHDAOgt\\n9icp62cKx1WO3QweeZpSvLDmtdLgKKrqeIWh+rL8+ZhuAOxSkaRwcsMTWDaLeDOi\\n0pGeqvfG8WNhPxkkaSI8xbiTK641Yg9WT/Q4yfHS7Q6wg1dj9YQdo0dvVB0S2Nir\\nX9IK6PUaHDnQeFKDmKgLkDGLaKaiijEvC91wMEE6qB8b0eNhciaxq2YhGHcFmSRP\\nWUyc5CmBadt7wIOH5Z3bfuwWGxqxKjNw/baM/d+nk7hlDr01YL9c0g16B9MW\\n-----END CERTIFICATE-----\\n\",\"apiV3Key\":\"joerVi8y5DJ3o4ttA0o1uH47Xz1u2Ase\"}', NULL, '2021-12-14 22:06:10', NULL, '2021-12-14 22:06:10', b'0');
 INSERT INTO `pay_channel` VALUES (13, 'wx_pub', 0, NULL, 1, 1, 6, '{\"@class\":\"cn.iocoder.yudao.framework.pay.core.client.impl.wx.WXPayClientConfig\",\"appId\":\"wx041349c6f39b268b\",\"mchId\":\"1545083881\",\"apiVersion\":\"v2\",\"mchKey\":\"0alL64UDQdlCwiKZ73ib7ypaIjMns06p\",\"privateKeyContent\":\"-----BEGIN PRIVATE KEY-----\\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQC5q2hYE3loOQoH\\nl/2kh/epuj17W8VpV5vBl7ysJWAbBXux6mlq4gKTHD0QUQdiKtDEUm/bKC9Bi6VU\\nuklM5Y8oCaCbhjklHRbET8jsgd9phSNGviHclYRLsQRO8oXnN89kN0y7DYKm0hYd\\nmaiS12Z3v8VaImSTr4HVeHlC/z3S6mdwSr263stKt931YTcbTj/QFH7znsv9Na0u\\nX6LaMBEEAsJctWdm8Ndrd1tGh9Fzf0DA5VRXsJR3kkWspy+IwiDTPV/FDKOU9NJC\\nSxMmDePerTfkoZ2s1rltqBK0ykDJrXtxR+hTzEsKZ/KpNi8tyYpfNZsviHIlUsLP\\nFJ5UvUhpAgMBAAECggEAd90NltazqTIxpGdeCwrwOzWNnYbIclJprlhMKIJUgf1P\\nNrPTbHoOGXTAgzkcYCat8iAaMEzH/TOu/3zn92m3uqxEcEL9v1UBLqknWHAbkB6w\\ngGocqDAqYUcdNe5hvbyM+fCta5C0SQgV2PQrHOlMMICwYpkTfzhtxCdreXIYMoGg\\nJEIRkZWgrm/N7LTtNgizznuUjy6OURWjXaWKPcs3b3j6G1gLj9Vp++z4y0u51nqM\\n4R6fcvl8M6BjlcC8zo6DbOvCW8cXtuXsnru+2TPrUnsGeybJok4fEQsfW1BvpvPo\\nief38rYJn4OWxIrHcpWrhNtXtgRPeiMGFfIsEQDmVQKBgQDzXK6Nn3Nr3TFfGVTy\\n8QYrzOuY2NqzH8nnsLL6qn3HoKxTv+PcFKOTPsi6f4hIYCzBP0esRrPv0ffMu9oQ\\nJvFtCJvMmcKGtp0Q5hcj0y/XkbC3AWuahJtBv8lhKXVnQXSL0j3+ombljw4/8yN0\\nAzgBz+j/skQQgZ3sN5h+DHGtgwKBgQDDT784/2pd4m86c/uBmrwYfqu6MJo0eHJh\\n1XPtE+u8pOHyNTFk77rKobKDqN5VlrF0uEmBc/08LKhyxJ3vh/zAbcmqT1Mq778y\\nAKKUtVmvcaVDrvSQHsnhj0zt4SHGmmU34U2b9hV+nocq5VszX6/jp//HJi9bs3We\\ndAzfFCmaowKBgC1MmDVGc+6lCraf+X8LPFHU4Bnga70h8qxM6NPd/nG1R76DHn/t\\n25DiA+0rJgwK0unZxJadxoqic9TJNssA5Lmd+5o3GM2Imm311mLVwbcHqHQ4MHZf\\nrqKrd2m9lNv2hCIurVmDk1Gxsj5XHMdQfhFgSQengCHubp30r07vNA3PAoGAUEAE\\nIjdQTSMs8KeXP7mEb8wcY3R05/pVhT1fVJpK0kgtTofss7yM05V88/v+3sv8Pik6\\niqZN9tuimwWOn00Q3UA/DGtrkMjRlooMQ24AW8YmUZkhg9YivTtUMKnAZwopbLx2\\nVw7V5iDdCRMUVheK/c+ZmQpnixZBzcmBQGfYcGECgYBjEq3Mem+Aw6pXOu6+0FwH\\n9y6Xi4HhBkq0OOZZuXFtWVry7YrD3pBgzWVAZJqJCkyPKKZzCzwdbFd3u0lYBs35\\nzYgx7ug4hR+wfI980a3vxjcWGOqnOUUnUJ7ucIa+KDgnYV/bBy4jqpVreXmWAJXl\\nfyjG3eLWBrtrsI9YX6zeAA==\\n-----END PRIVATE KEY-----\\n\",\"privateCertContent\":\"-----BEGIN CERTIFICATE-----\\nMIID6TCCAtGgAwIBAgIUNkEHq6aQcF80NSYqWS58ybsJzI4wDQYJKoZIhvcNAQEL\\nBQAwXjELMAkGA1UEBhMCQ04xEzARBgNVBAoTClRlbnBheS5jb20xHTAbBgNVBAsT\\nFFRlbnBheS5jb20gQ0EgQ2VudGVyMRswGQYDVQQDExJUZW5wYXkuY29tIFJvb3Qg\\nQ0EwHhcNMjExMDIxMDU0NTQxWhcNMjYxMDIwMDU0NTQxWjB7MRMwEQYDVQQDDAox\\nNTQ1MDgzODgxMRswGQYDVQQKDBLlvq7kv6HllYbmiLfns7vnu58xJzAlBgNVBAsM\\nHuWOhuWfjuWMuuWkp+adjuWwp+aXpeeUqOWTgeW6lzELMAkGA1UEBgwCQ04xETAP\\nBgNVBAcMCFNoZW5aaGVuMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA\\nuatoWBN5aDkKB5f9pIf3qbo9e1vFaVebwZe8rCVgGwV7seppauICkxw9EFEHYirQ\\nxFJv2ygvQYulVLpJTOWPKAmgm4Y5JR0WxE/I7IHfaYUjRr4h3JWES7EETvKF5zfP\\nZDdMuw2CptIWHZmoktdmd7/FWiJkk6+B1Xh5Qv890upncEq9ut7LSrfd9WE3G04/\\n0BR+857L/TWtLl+i2jARBALCXLVnZvDXa3dbRofRc39AwOVUV7CUd5JFrKcviMIg\\n0z1fxQyjlPTSQksTJg3j3q035KGdrNa5bagStMpAya17cUfoU8xLCmfyqTYvLcmK\\nXzWbL4hyJVLCzxSeVL1IaQIDAQABo4GBMH8wCQYDVR0TBAIwADALBgNVHQ8EBAMC\\nBPAwZQYDVR0fBF4wXDBaoFigVoZUaHR0cDovL2V2Y2EuaXRydXMuY29tLmNuL3B1\\nYmxpYy9pdHJ1c2NybD9DQT0xQkQ0MjIwRTUwREJDMDRCMDZBRDM5NzU0OTg0NkMw\\nMUMzRThFQkQyMA0GCSqGSIb3DQEBCwUAA4IBAQBe7XgncAY/1PLbCsnMsYt11k3V\\n2cdNZ+yuCxhlOEKk3nHE6WCTL6zL0qWlTKKpnw1rE/+4OS76Tg72wWXcHfHDAOgt\\n9icp62cKx1WO3QweeZpSvLDmtdLgKKrqeIWh+rL8+ZhuAOxSkaRwcsMTWDaLeDOi\\n0pGeqvfG8WNhPxkkaSI8xbiTK641Yg9WT/Q4yfHS7Q6wg1dj9YQdo0dvVB0S2Nir\\nX9IK6PUaHDnQeFKDmKgLkDGLaKaiijEvC91wMEE6qB8b0eNhciaxq2YhGHcFmSRP\\nWUyc5CmBadt7wIOH5Z3bfuwWGxqxKjNw/baM/d+nk7hlDr01YL9c0g16B9MW\\n-----END CERTIFICATE-----\\n\",\"apiV3Key\":\"joerVi8y5DJ3o4ttA0o1uH47Xz1u2Ase\"}', NULL, '2021-12-14 22:09:39', NULL, '2021-12-14 22:09:39', b'0');
 INSERT INTO `pay_channel` VALUES (14, 'wx_pub', 0, NULL, 1, 1, 6, '{\"@class\":\"cn.iocoder.yudao.framework.pay.core.client.impl.wx.WXPayClientConfig\",\"appId\":\"wx041349c6f39b268b\",\"mchId\":\"1545083881\",\"apiVersion\":\"v2\",\"mchKey\":\"0alL64UDQdlCwiKZ73ib7ypaIjMns06p\",\"privateKeyContent\":\"-----BEGIN PRIVATE KEY-----\\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQC5q2hYE3loOQoH\\nl/2kh/epuj17W8VpV5vBl7ysJWAbBXux6mlq4gKTHD0QUQdiKtDEUm/bKC9Bi6VU\\nuklM5Y8oCaCbhjklHRbET8jsgd9phSNGviHclYRLsQRO8oXnN89kN0y7DYKm0hYd\\nmaiS12Z3v8VaImSTr4HVeHlC/z3S6mdwSr263stKt931YTcbTj/QFH7znsv9Na0u\\nX6LaMBEEAsJctWdm8Ndrd1tGh9Fzf0DA5VRXsJR3kkWspy+IwiDTPV/FDKOU9NJC\\nSxMmDePerTfkoZ2s1rltqBK0ykDJrXtxR+hTzEsKZ/KpNi8tyYpfNZsviHIlUsLP\\nFJ5UvUhpAgMBAAECggEAd90NltazqTIxpGdeCwrwOzWNnYbIclJprlhMKIJUgf1P\\nNrPTbHoOGXTAgzkcYCat8iAaMEzH/TOu/3zn92m3uqxEcEL9v1UBLqknWHAbkB6w\\ngGocqDAqYUcdNe5hvbyM+fCta5C0SQgV2PQrHOlMMICwYpkTfzhtxCdreXIYMoGg\\nJEIRkZWgrm/N7LTtNgizznuUjy6OURWjXaWKPcs3b3j6G1gLj9Vp++z4y0u51nqM\\n4R6fcvl8M6BjlcC8zo6DbOvCW8cXtuXsnru+2TPrUnsGeybJok4fEQsfW1BvpvPo\\nief38rYJn4OWxIrHcpWrhNtXtgRPeiMGFfIsEQDmVQKBgQDzXK6Nn3Nr3TFfGVTy\\n8QYrzOuY2NqzH8nnsLL6qn3HoKxTv+PcFKOTPsi6f4hIYCzBP0esRrPv0ffMu9oQ\\nJvFtCJvMmcKGtp0Q5hcj0y/XkbC3AWuahJtBv8lhKXVnQXSL0j3+ombljw4/8yN0\\nAzgBz+j/skQQgZ3sN5h+DHGtgwKBgQDDT784/2pd4m86c/uBmrwYfqu6MJo0eHJh\\n1XPtE+u8pOHyNTFk77rKobKDqN5VlrF0uEmBc/08LKhyxJ3vh/zAbcmqT1Mq778y\\nAKKUtVmvcaVDrvSQHsnhj0zt4SHGmmU34U2b9hV+nocq5VszX6/jp//HJi9bs3We\\ndAzfFCmaowKBgC1MmDVGc+6lCraf+X8LPFHU4Bnga70h8qxM6NPd/nG1R76DHn/t\\n25DiA+0rJgwK0unZxJadxoqic9TJNssA5Lmd+5o3GM2Imm311mLVwbcHqHQ4MHZf\\nrqKrd2m9lNv2hCIurVmDk1Gxsj5XHMdQfhFgSQengCHubp30r07vNA3PAoGAUEAE\\nIjdQTSMs8KeXP7mEb8wcY3R05/pVhT1fVJpK0kgtTofss7yM05V88/v+3sv8Pik6\\niqZN9tuimwWOn00Q3UA/DGtrkMjRlooMQ24AW8YmUZkhg9YivTtUMKnAZwopbLx2\\nVw7V5iDdCRMUVheK/c+ZmQpnixZBzcmBQGfYcGECgYBjEq3Mem+Aw6pXOu6+0FwH\\n9y6Xi4HhBkq0OOZZuXFtWVry7YrD3pBgzWVAZJqJCkyPKKZzCzwdbFd3u0lYBs35\\nzYgx7ug4hR+wfI980a3vxjcWGOqnOUUnUJ7ucIa+KDgnYV/bBy4jqpVreXmWAJXl\\nfyjG3eLWBrtrsI9YX6zeAA==\\n-----END PRIVATE KEY-----\\n\",\"privateCertContent\":\"-----BEGIN CERTIFICATE-----\\nMIID6TCCAtGgAwIBAgIUNkEHq6aQcF80NSYqWS58ybsJzI4wDQYJKoZIhvcNAQEL\\nBQAwXjELMAkGA1UEBhMCQ04xEzARBgNVBAoTClRlbnBheS5jb20xHTAbBgNVBAsT\\nFFRlbnBheS5jb20gQ0EgQ2VudGVyMRswGQYDVQQDExJUZW5wYXkuY29tIFJvb3Qg\\nQ0EwHhcNMjExMDIxMDU0NTQxWhcNMjYxMDIwMDU0NTQxWjB7MRMwEQYDVQQDDAox\\nNTQ1MDgzODgxMRswGQYDVQQKDBLlvq7kv6HllYbmiLfns7vnu58xJzAlBgNVBAsM\\nHuWOhuWfjuWMuuWkp+adjuWwp+aXpeeUqOWTgeW6lzELMAkGA1UEBgwCQ04xETAP\\nBgNVBAcMCFNoZW5aaGVuMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA\\nuatoWBN5aDkKB5f9pIf3qbo9e1vFaVebwZe8rCVgGwV7seppauICkxw9EFEHYirQ\\nxFJv2ygvQYulVLpJTOWPKAmgm4Y5JR0WxE/I7IHfaYUjRr4h3JWES7EETvKF5zfP\\nZDdMuw2CptIWHZmoktdmd7/FWiJkk6+B1Xh5Qv890upncEq9ut7LSrfd9WE3G04/\\n0BR+857L/TWtLl+i2jARBALCXLVnZvDXa3dbRofRc39AwOVUV7CUd5JFrKcviMIg\\n0z1fxQyjlPTSQksTJg3j3q035KGdrNa5bagStMpAya17cUfoU8xLCmfyqTYvLcmK\\nXzWbL4hyJVLCzxSeVL1IaQIDAQABo4GBMH8wCQYDVR0TBAIwADALBgNVHQ8EBAMC\\nBPAwZQYDVR0fBF4wXDBaoFigVoZUaHR0cDovL2V2Y2EuaXRydXMuY29tLmNuL3B1\\nYmxpYy9pdHJ1c2NybD9DQT0xQkQ0MjIwRTUwREJDMDRCMDZBRDM5NzU0OTg0NkMw\\nMUMzRThFQkQyMA0GCSqGSIb3DQEBCwUAA4IBAQBe7XgncAY/1PLbCsnMsYt11k3V\\n2cdNZ+yuCxhlOEKk3nHE6WCTL6zL0qWlTKKpnw1rE/+4OS76Tg72wWXcHfHDAOgt\\n9icp62cKx1WO3QweeZpSvLDmtdLgKKrqeIWh+rL8+ZhuAOxSkaRwcsMTWDaLeDOi\\n0pGeqvfG8WNhPxkkaSI8xbiTK641Yg9WT/Q4yfHS7Q6wg1dj9YQdo0dvVB0S2Nir\\nX9IK6PUaHDnQeFKDmKgLkDGLaKaiijEvC91wMEE6qB8b0eNhciaxq2YhGHcFmSRP\\nWUyc5CmBadt7wIOH5Z3bfuwWGxqxKjNw/baM/d+nk7hlDr01YL9c0g16B9MW\\n-----END CERTIFICATE-----\\n\",\"apiV3Key\":\"joerVi8y5DJ3o4ttA0o1uH47Xz1u2Ase\"}', NULL, '2021-12-14 22:38:49', NULL, '2021-12-14 22:38:49', b'0');
+INSERT INTO `pay_channel` VALUES (15, 'wx_pub', 0, NULL, 1, 1, 6, '{\"@class\":\"cn.iocoder.yudao.framework.pay.core.client.impl.wx.WXPayClientConfig\",\"appId\":\"wx041349c6f39b268b\",\"mchId\":\"1545083881\",\"apiVersion\":\"v2\",\"mchKey\":\"0alL64UDQdlCwiKZ73ib7ypaIjMns06p\",\"privateKeyContent\":\"-----BEGIN PRIVATE KEY-----\\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQC5q2hYE3loOQoH\\nl/2kh/epuj17W8VpV5vBl7ysJWAbBXux6mlq4gKTHD0QUQdiKtDEUm/bKC9Bi6VU\\nuklM5Y8oCaCbhjklHRbET8jsgd9phSNGviHclYRLsQRO8oXnN89kN0y7DYKm0hYd\\nmaiS12Z3v8VaImSTr4HVeHlC/z3S6mdwSr263stKt931YTcbTj/QFH7znsv9Na0u\\nX6LaMBEEAsJctWdm8Ndrd1tGh9Fzf0DA5VRXsJR3kkWspy+IwiDTPV/FDKOU9NJC\\nSxMmDePerTfkoZ2s1rltqBK0ykDJrXtxR+hTzEsKZ/KpNi8tyYpfNZsviHIlUsLP\\nFJ5UvUhpAgMBAAECggEAd90NltazqTIxpGdeCwrwOzWNnYbIclJprlhMKIJUgf1P\\nNrPTbHoOGXTAgzkcYCat8iAaMEzH/TOu/3zn92m3uqxEcEL9v1UBLqknWHAbkB6w\\ngGocqDAqYUcdNe5hvbyM+fCta5C0SQgV2PQrHOlMMICwYpkTfzhtxCdreXIYMoGg\\nJEIRkZWgrm/N7LTtNgizznuUjy6OURWjXaWKPcs3b3j6G1gLj9Vp++z4y0u51nqM\\n4R6fcvl8M6BjlcC8zo6DbOvCW8cXtuXsnru+2TPrUnsGeybJok4fEQsfW1BvpvPo\\nief38rYJn4OWxIrHcpWrhNtXtgRPeiMGFfIsEQDmVQKBgQDzXK6Nn3Nr3TFfGVTy\\n8QYrzOuY2NqzH8nnsLL6qn3HoKxTv+PcFKOTPsi6f4hIYCzBP0esRrPv0ffMu9oQ\\nJvFtCJvMmcKGtp0Q5hcj0y/XkbC3AWuahJtBv8lhKXVnQXSL0j3+ombljw4/8yN0\\nAzgBz+j/skQQgZ3sN5h+DHGtgwKBgQDDT784/2pd4m86c/uBmrwYfqu6MJo0eHJh\\n1XPtE+u8pOHyNTFk77rKobKDqN5VlrF0uEmBc/08LKhyxJ3vh/zAbcmqT1Mq778y\\nAKKUtVmvcaVDrvSQHsnhj0zt4SHGmmU34U2b9hV+nocq5VszX6/jp//HJi9bs3We\\ndAzfFCmaowKBgC1MmDVGc+6lCraf+X8LPFHU4Bnga70h8qxM6NPd/nG1R76DHn/t\\n25DiA+0rJgwK0unZxJadxoqic9TJNssA5Lmd+5o3GM2Imm311mLVwbcHqHQ4MHZf\\nrqKrd2m9lNv2hCIurVmDk1Gxsj5XHMdQfhFgSQengCHubp30r07vNA3PAoGAUEAE\\nIjdQTSMs8KeXP7mEb8wcY3R05/pVhT1fVJpK0kgtTofss7yM05V88/v+3sv8Pik6\\niqZN9tuimwWOn00Q3UA/DGtrkMjRlooMQ24AW8YmUZkhg9YivTtUMKnAZwopbLx2\\nVw7V5iDdCRMUVheK/c+ZmQpnixZBzcmBQGfYcGECgYBjEq3Mem+Aw6pXOu6+0FwH\\n9y6Xi4HhBkq0OOZZuXFtWVry7YrD3pBgzWVAZJqJCkyPKKZzCzwdbFd3u0lYBs35\\nzYgx7ug4hR+wfI980a3vxjcWGOqnOUUnUJ7ucIa+KDgnYV/bBy4jqpVreXmWAJXl\\nfyjG3eLWBrtrsI9YX6zeAA==\\n-----END PRIVATE KEY-----\\n\",\"privateCertContent\":\"-----BEGIN CERTIFICATE-----\\nMIID6TCCAtGgAwIBAgIUNkEHq6aQcF80NSYqWS58ybsJzI4wDQYJKoZIhvcNAQEL\\nBQAwXjELMAkGA1UEBhMCQ04xEzARBgNVBAoTClRlbnBheS5jb20xHTAbBgNVBAsT\\nFFRlbnBheS5jb20gQ0EgQ2VudGVyMRswGQYDVQQDExJUZW5wYXkuY29tIFJvb3Qg\\nQ0EwHhcNMjExMDIxMDU0NTQxWhcNMjYxMDIwMDU0NTQxWjB7MRMwEQYDVQQDDAox\\nNTQ1MDgzODgxMRswGQYDVQQKDBLlvq7kv6HllYbmiLfns7vnu58xJzAlBgNVBAsM\\nHuWOhuWfjuWMuuWkp+adjuWwp+aXpeeUqOWTgeW6lzELMAkGA1UEBgwCQ04xETAP\\nBgNVBAcMCFNoZW5aaGVuMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA\\nuatoWBN5aDkKB5f9pIf3qbo9e1vFaVebwZe8rCVgGwV7seppauICkxw9EFEHYirQ\\nxFJv2ygvQYulVLpJTOWPKAmgm4Y5JR0WxE/I7IHfaYUjRr4h3JWES7EETvKF5zfP\\nZDdMuw2CptIWHZmoktdmd7/FWiJkk6+B1Xh5Qv890upncEq9ut7LSrfd9WE3G04/\\n0BR+857L/TWtLl+i2jARBALCXLVnZvDXa3dbRofRc39AwOVUV7CUd5JFrKcviMIg\\n0z1fxQyjlPTSQksTJg3j3q035KGdrNa5bagStMpAya17cUfoU8xLCmfyqTYvLcmK\\nXzWbL4hyJVLCzxSeVL1IaQIDAQABo4GBMH8wCQYDVR0TBAIwADALBgNVHQ8EBAMC\\nBPAwZQYDVR0fBF4wXDBaoFigVoZUaHR0cDovL2V2Y2EuaXRydXMuY29tLmNuL3B1\\nYmxpYy9pdHJ1c2NybD9DQT0xQkQ0MjIwRTUwREJDMDRCMDZBRDM5NzU0OTg0NkMw\\nMUMzRThFQkQyMA0GCSqGSIb3DQEBCwUAA4IBAQBe7XgncAY/1PLbCsnMsYt11k3V\\n2cdNZ+yuCxhlOEKk3nHE6WCTL6zL0qWlTKKpnw1rE/+4OS76Tg72wWXcHfHDAOgt\\n9icp62cKx1WO3QweeZpSvLDmtdLgKKrqeIWh+rL8+ZhuAOxSkaRwcsMTWDaLeDOi\\n0pGeqvfG8WNhPxkkaSI8xbiTK641Yg9WT/Q4yfHS7Q6wg1dj9YQdo0dvVB0S2Nir\\nX9IK6PUaHDnQeFKDmKgLkDGLaKaiijEvC91wMEE6qB8b0eNhciaxq2YhGHcFmSRP\\nWUyc5CmBadt7wIOH5Z3bfuwWGxqxKjNw/baM/d+nk7hlDr01YL9c0g16B9MW\\n-----END CERTIFICATE-----\\n\",\"apiV3Key\":\"joerVi8y5DJ3o4ttA0o1uH47Xz1u2Ase\"}', NULL, '2021-12-15 09:32:26', NULL, '2021-12-15 09:32:26', b'0');
 COMMIT;
 
 -- ----------------------------
@@ -346,18 +347,18 @@ COMMIT;
 -- ----------------------------
 DROP TABLE IF EXISTS `pay_merchant`;
 CREATE TABLE `pay_merchant` (
-                                `id` bigint NOT NULL AUTO_INCREMENT COMMENT '商户编号',
-                                `no` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '商户号',
-                                `name` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '商户全称',
-                                `short_name` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '商户简称',
-                                `status` tinyint NOT NULL COMMENT '开启状态',
-                                `remark` varchar(255) DEFAULT NULL COMMENT '备注',
-                                `creator` varchar(64) DEFAULT '' COMMENT '创建者',
-                                `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-                                `updater` varchar(64) DEFAULT '' COMMENT '更新者',
-                                `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-                                `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
-                                PRIMARY KEY (`id`) USING BTREE
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '商户编号',
+  `no` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '商户号',
+  `name` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '商户全称',
+  `short_name` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '商户简称',
+  `status` tinyint NOT NULL COMMENT '开启状态',
+  `remark` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '备注',
+  `creator` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='支付商户信息';
 
 -- ----------------------------
@@ -372,17 +373,17 @@ COMMIT;
 -- ----------------------------
 DROP TABLE IF EXISTS `pay_notify_log`;
 CREATE TABLE `pay_notify_log` (
-                                  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '日志编号',
-                                  `task_id` bigint NOT NULL COMMENT '通知任务编号',
-                                  `notify_times` tinyint NOT NULL COMMENT '第几次被通知',
-                                  `response` varchar(2048) NOT NULL COMMENT '请求参数',
-                                  `status` tinyint NOT NULL COMMENT '通知状态',
-                                  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
-                                  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-                                  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
-                                  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-                                  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
-                                  PRIMARY KEY (`id`) USING BTREE
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '日志编号',
+  `task_id` bigint NOT NULL COMMENT '通知任务编号',
+  `notify_times` tinyint NOT NULL COMMENT '第几次被通知',
+  `response` varchar(2048) COLLATE utf8mb4_general_ci NOT NULL COMMENT '请求参数',
+  `status` tinyint NOT NULL COMMENT '通知状态',
+  `creator` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=363051 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='支付通知 App 的日志';
 
 -- ----------------------------
@@ -396,24 +397,24 @@ COMMIT;
 -- ----------------------------
 DROP TABLE IF EXISTS `pay_notify_task`;
 CREATE TABLE `pay_notify_task` (
-                                   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '任务编号',
-                                   `merchant_id` bigint NOT NULL COMMENT '商户编号',
-                                   `app_id` bigint NOT NULL COMMENT '应用编号',
-                                   `type` tinyint NOT NULL COMMENT '通知类型',
-                                   `data_id` bigint NOT NULL COMMENT '数据编号',
-                                   `status` tinyint NOT NULL COMMENT '通知状态',
-                                   `merchant_order_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '商户订单编号',
-                                   `next_notify_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '下一次通知时间',
-                                   `last_execute_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '最后一次执行时间',
-                                   `notify_times` tinyint NOT NULL COMMENT '当前通知次数',
-                                   `max_notify_times` tinyint NOT NULL COMMENT '最大可通知次数',
-                                   `notify_url` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '异步通知地址',
-                                   `creator` varchar(64) DEFAULT '' COMMENT '创建者',
-                                   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-                                   `updater` varchar(64) DEFAULT '' COMMENT '更新者',
-                                   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-                                   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
-                                   PRIMARY KEY (`id`) USING BTREE
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '任务编号',
+  `merchant_id` bigint NOT NULL COMMENT '商户编号',
+  `app_id` bigint NOT NULL COMMENT '应用编号',
+  `type` tinyint NOT NULL COMMENT '通知类型',
+  `data_id` bigint NOT NULL COMMENT '数据编号',
+  `status` tinyint NOT NULL COMMENT '通知状态',
+  `merchant_order_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '商户订单编号',
+  `next_notify_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '下一次通知时间',
+  `last_execute_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '最后一次执行时间',
+  `notify_times` tinyint NOT NULL COMMENT '当前通知次数',
+  `max_notify_times` tinyint NOT NULL COMMENT '最大可通知次数',
+  `notify_url` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '异步通知地址',
+  `creator` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=112 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='商户支付、退款等的通知\n';
 
 -- ----------------------------
@@ -443,36 +444,36 @@ COMMIT;
 -- ----------------------------
 DROP TABLE IF EXISTS `pay_order`;
 CREATE TABLE `pay_order` (
-                             `id` bigint NOT NULL AUTO_INCREMENT COMMENT '支付订单编号',
-                             `merchant_id` bigint NOT NULL COMMENT '商户编号',
-                             `app_id` bigint NOT NULL COMMENT '应用编号',
-                             `channel_id` bigint DEFAULT NULL COMMENT '渠道编号',
-                             `channel_code` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '渠道编码',
-                             `merchant_order_id` varchar(64) NOT NULL COMMENT '商户订单编号',
-                             `subject` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '商品标题',
-                             `body` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '商品描述',
-                             `notify_url` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '异步通知地址',
-                             `notify_status` tinyint NOT NULL COMMENT '通知商户支付结果的回调状态',
-                             `amount` bigint NOT NULL COMMENT '支付金额，单位：分',
-                             `channel_fee_rate` double DEFAULT '0' COMMENT '渠道手续费，单位：百分比',
-                             `channel_fee_amount` bigint DEFAULT '0' COMMENT '渠道手续金额，单位：分',
-                             `status` tinyint NOT NULL COMMENT '支付状态',
-                             `user_ip` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '用户 IP',
-                             `expire_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '订单失效时间',
-                             `success_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '订单支付成功时间',
-                             `notify_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '订单支付通知时间',
-                             `success_extension_id` bigint DEFAULT NULL COMMENT '支付成功的订单拓展单编号',
-                             `refund_status` tinyint NOT NULL COMMENT '退款状态',
-                             `refund_times` tinyint NOT NULL COMMENT '退款次数',
-                             `refund_amount` bigint NOT NULL COMMENT '退款总金额，单位：分',
-                             `channel_user_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '渠道用户编号',
-                             `channel_order_no` varchar(64) DEFAULT NULL COMMENT '渠道订单号',
-                             `creator` varchar(64) DEFAULT '' COMMENT '创建者',
-                             `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-                             `updater` varchar(64) DEFAULT '' COMMENT '更新者',
-                             `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-                             `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
-                             PRIMARY KEY (`id`) USING BTREE
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '支付订单编号',
+  `merchant_id` bigint NOT NULL COMMENT '商户编号',
+  `app_id` bigint NOT NULL COMMENT '应用编号',
+  `channel_id` bigint DEFAULT NULL COMMENT '渠道编号',
+  `channel_code` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '渠道编码',
+  `merchant_order_id` varchar(64) COLLATE utf8mb4_general_ci NOT NULL COMMENT '商户订单编号',
+  `subject` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '商品标题',
+  `body` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '商品描述',
+  `notify_url` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '异步通知地址',
+  `notify_status` tinyint NOT NULL COMMENT '通知商户支付结果的回调状态',
+  `amount` bigint NOT NULL COMMENT '支付金额，单位：分',
+  `channel_fee_rate` double DEFAULT '0' COMMENT '渠道手续费，单位：百分比',
+  `channel_fee_amount` bigint DEFAULT '0' COMMENT '渠道手续金额，单位：分',
+  `status` tinyint NOT NULL COMMENT '支付状态',
+  `user_ip` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '用户 IP',
+  `expire_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '订单失效时间',
+  `success_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '订单支付成功时间',
+  `notify_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '订单支付通知时间',
+  `success_extension_id` bigint DEFAULT NULL COMMENT '支付成功的订单拓展单编号',
+  `refund_status` tinyint NOT NULL COMMENT '退款状态',
+  `refund_times` tinyint NOT NULL COMMENT '退款次数',
+  `refund_amount` bigint NOT NULL COMMENT '退款总金额，单位：分',
+  `channel_user_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '渠道用户编号',
+  `channel_order_no` varchar(64) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '渠道订单号',
+  `creator` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=122 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='支付订单\n';
 
 -- ----------------------------
@@ -598,21 +599,21 @@ COMMIT;
 -- ----------------------------
 DROP TABLE IF EXISTS `pay_order_extension`;
 CREATE TABLE `pay_order_extension` (
-                                       `id` bigint NOT NULL AUTO_INCREMENT COMMENT '支付订单编号',
-                                       `no` varchar(64) NOT NULL COMMENT '支付订单号',
-                                       `order_id` bigint NOT NULL COMMENT '支付订单编号',
-                                       `channel_id` bigint NOT NULL COMMENT '渠道编号',
-                                       `channel_code` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '渠道编码',
-                                       `user_ip` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '用户 IP',
-                                       `status` tinyint NOT NULL COMMENT '支付状态',
-                                       `channel_extras` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '支付渠道的额外参数',
-                                       `channel_notify_data` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '支付渠道异步通知的内容',
-                                       `creator` varchar(64) DEFAULT '' COMMENT '创建者',
-                                       `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-                                       `updater` varchar(64) DEFAULT '' COMMENT '更新者',
-                                       `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-                                       `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
-                                       PRIMARY KEY (`id`) USING BTREE
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '支付订单编号',
+  `no` varchar(64) COLLATE utf8mb4_general_ci NOT NULL COMMENT '支付订单号',
+  `order_id` bigint NOT NULL COMMENT '支付订单编号',
+  `channel_id` bigint NOT NULL COMMENT '渠道编号',
+  `channel_code` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '渠道编码',
+  `user_ip` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '用户 IP',
+  `status` tinyint NOT NULL COMMENT '支付状态',
+  `channel_extras` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '支付渠道的额外参数',
+  `channel_notify_data` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '支付渠道异步通知的内容',
+  `creator` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=101 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='支付订单\n';
 
 -- ----------------------------
@@ -718,37 +719,37 @@ COMMIT;
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_dept`;
 CREATE TABLE `sys_dept` (
-                            `id` bigint NOT NULL AUTO_INCREMENT COMMENT '部门id',
-                            `name` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '部门名称',
-                            `parent_id` bigint NOT NULL DEFAULT '0' COMMENT '父部门id',
-                            `sort` int NOT NULL DEFAULT '0' COMMENT '显示顺序',
-                            `leader` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '负责人',
-                            `phone` varchar(11) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '联系电话',
-                            `email` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '邮箱',
-                            `status` tinyint NOT NULL COMMENT '部门状态（0正常 1停用）',
-                            `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
-                            `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-                            `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
-                            `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-                            `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
-                            `tenant_id` bigint NOT NULL DEFAULT '0' COMMENT '租户编号',
-                            PRIMARY KEY (`id`) USING BTREE
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '部门id',
+  `name` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '部门名称',
+  `parent_id` bigint NOT NULL DEFAULT '0' COMMENT '父部门id',
+  `sort` int NOT NULL DEFAULT '0' COMMENT '显示顺序',
+  `leader` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '负责人',
+  `phone` varchar(11) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '联系电话',
+  `email` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '邮箱',
+  `status` tinyint NOT NULL COMMENT '部门状态（0正常 1停用）',
+  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  `tenant_id` bigint NOT NULL DEFAULT '0' COMMENT '租户编号',
+  PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=110 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='部门表';
 
 -- ----------------------------
 -- Records of sys_dept
 -- ----------------------------
 BEGIN;
-INSERT INTO `sys_dept` VALUES (100, '芋道源码', 0, 0, '若依', '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '', '2021-01-06 19:45:52', b'0', 0);
-INSERT INTO `sys_dept` VALUES (101, '深圳总公司', 100, 1, '若依', '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '1', '2021-03-14 20:26:18', b'0', 0);
-INSERT INTO `sys_dept` VALUES (102, '长沙分公司', 100, 2, '若依', '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '', '2021-01-05 17:03:47', b'0', 0);
-INSERT INTO `sys_dept` VALUES (103, '研发部门', 101, 1, '若依', '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '', '2021-01-05 17:03:47', b'0', 0);
-INSERT INTO `sys_dept` VALUES (104, '市场部门', 101, 2, '若依', '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '', '2021-01-05 17:03:47', b'0', 0);
-INSERT INTO `sys_dept` VALUES (105, '测试部门', 101, 3, '若依', '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '', '2021-01-05 17:03:47', b'0', 0);
-INSERT INTO `sys_dept` VALUES (106, '财务部门', 101, 4, '若依', '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '', '2021-01-05 17:03:47', b'0', 0);
-INSERT INTO `sys_dept` VALUES (107, '运维部门', 101, 5, '若依', '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '', '2021-01-05 17:03:47', b'0', 0);
-INSERT INTO `sys_dept` VALUES (108, '市场部门', 102, 1, '若依', '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '', '2021-01-05 17:03:47', b'0', 0);
-INSERT INTO `sys_dept` VALUES (109, '财务部门', 102, 2, '若依', '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '', '2021-01-05 17:03:47', b'0', 0);
+INSERT INTO `sys_dept` VALUES (100, '芋道源码', 0, 0, '若依', '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '', '2021-12-15 05:01:45', b'0', 1);
+INSERT INTO `sys_dept` VALUES (101, '深圳总公司', 100, 1, '若依', '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '1', '2021-12-15 05:01:44', b'0', 1);
+INSERT INTO `sys_dept` VALUES (102, '长沙分公司', 100, 2, '若依', '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '', '2021-12-15 05:01:40', b'0', 1);
+INSERT INTO `sys_dept` VALUES (103, '研发部门', 101, 1, '若依', '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '', '2021-12-15 05:01:41', b'0', 1);
+INSERT INTO `sys_dept` VALUES (104, '市场部门', 101, 2, '若依', '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '', '2021-12-15 05:01:38', b'0', 1);
+INSERT INTO `sys_dept` VALUES (105, '测试部门', 101, 3, '若依', '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '', '2021-12-15 05:01:37', b'0', 1);
+INSERT INTO `sys_dept` VALUES (106, '财务部门', 101, 4, '若依', '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '', '2021-12-15 05:01:35', b'0', 1);
+INSERT INTO `sys_dept` VALUES (107, '运维部门', 101, 5, '若依', '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '', '2021-12-15 05:01:33', b'0', 1);
+INSERT INTO `sys_dept` VALUES (108, '市场部门', 102, 1, '若依', '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '', '2021-12-15 05:01:31', b'0', 1);
+INSERT INTO `sys_dept` VALUES (109, '财务部门', 102, 2, '若依', '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '', '2021-12-15 05:01:29', b'0', 1);
 COMMIT;
 
 -- ----------------------------
@@ -756,19 +757,19 @@ COMMIT;
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_dict_data`;
 CREATE TABLE `sys_dict_data` (
-                                 `id` bigint NOT NULL AUTO_INCREMENT COMMENT '字典编码',
-                                 `sort` int NOT NULL DEFAULT '0' COMMENT '字典排序',
-                                 `label` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '字典标签',
-                                 `value` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '字典键值',
-                                 `dict_type` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '字典类型',
-                                 `status` tinyint NOT NULL DEFAULT '0' COMMENT '状态（0正常 1停用）',
-                                 `remark` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '备注',
-                                 `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
-                                 `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-                                 `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
-                                 `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-                                 `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
-                                 PRIMARY KEY (`id`) USING BTREE
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '字典编码',
+  `sort` int NOT NULL DEFAULT '0' COMMENT '字典排序',
+  `label` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '字典标签',
+  `value` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '字典键值',
+  `dict_type` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '字典类型',
+  `status` tinyint NOT NULL DEFAULT '0' COMMENT '状态（0正常 1停用）',
+  `remark` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '备注',
+  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=100 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='字典数据表';
 
 -- ----------------------------
@@ -871,18 +872,18 @@ COMMIT;
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_dict_type`;
 CREATE TABLE `sys_dict_type` (
-                                 `id` bigint NOT NULL AUTO_INCREMENT COMMENT '字典主键',
-                                 `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '字典名称',
-                                 `type` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '字典类型',
-                                 `status` tinyint NOT NULL DEFAULT '0' COMMENT '状态（0正常 1停用）',
-                                 `remark` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '备注',
-                                 `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
-                                 `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-                                 `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
-                                 `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-                                 `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
-                                 PRIMARY KEY (`id`) USING BTREE,
-                                 UNIQUE KEY `dict_type` (`type`)
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '字典主键',
+  `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '字典名称',
+  `type` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '字典类型',
+  `status` tinyint NOT NULL DEFAULT '0' COMMENT '状态（0正常 1停用）',
+  `remark` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '备注',
+  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE KEY `dict_type` (`type`)
 ) ENGINE=InnoDB AUTO_INCREMENT=123 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='字典类型表';
 
 -- ----------------------------
@@ -925,18 +926,18 @@ COMMIT;
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_error_code`;
 CREATE TABLE `sys_error_code` (
-                                  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '错误码编号',
-                                  `type` tinyint NOT NULL DEFAULT '0' COMMENT '错误码类型',
-                                  `application_name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '应用名',
-                                  `code` int NOT NULL DEFAULT '0' COMMENT '错误码编码',
-                                  `message` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '错误码错误提示',
-                                  `memo` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '备注',
-                                  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
-                                  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-                                  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
-                                  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-                                  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
-                                  PRIMARY KEY (`id`) USING BTREE
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '错误码编号',
+  `type` tinyint NOT NULL DEFAULT '0' COMMENT '错误码类型',
+  `application_name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '应用名',
+  `code` int NOT NULL DEFAULT '0' COMMENT '错误码编码',
+  `message` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '错误码错误提示',
+  `memo` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '备注',
+  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=4020 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='错误码表';
 
 -- ----------------------------
@@ -1031,23 +1032,23 @@ COMMIT;
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_login_log`;
 CREATE TABLE `sys_login_log` (
-                                 `id` bigint NOT NULL AUTO_INCREMENT COMMENT '访问ID',
-                                 `log_type` bigint NOT NULL COMMENT '日志类型',
-                                 `trace_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '链路追踪编号',
-                                 `user_id` bigint NOT NULL DEFAULT '0' COMMENT '用户编号',
-                                 `user_type` tinyint NOT NULL DEFAULT '0' COMMENT '用户类型',
-                                 `username` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '用户账号',
-                                 `result` tinyint NOT NULL COMMENT '登陆结果',
-                                 `user_ip` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '用户 IP',
-                                 `user_agent` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '浏览器 UA',
-                                 `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
-                                 `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-                                 `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
-                                 `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-                                 `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
-                                 `tenant_id` bigint NOT NULL DEFAULT '0' COMMENT '租户编号',
-                                 PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=469 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='系统访问记录';
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '访问ID',
+  `log_type` bigint NOT NULL COMMENT '日志类型',
+  `trace_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '链路追踪编号',
+  `user_id` bigint NOT NULL DEFAULT '0' COMMENT '用户编号',
+  `user_type` tinyint NOT NULL DEFAULT '0' COMMENT '用户类型',
+  `username` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '用户账号',
+  `result` tinyint NOT NULL COMMENT '登陆结果',
+  `user_ip` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '用户 IP',
+  `user_agent` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '浏览器 UA',
+  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  `tenant_id` bigint NOT NULL DEFAULT '0' COMMENT '租户编号',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=474 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='系统访问记录';
 
 -- ----------------------------
 -- Records of sys_login_log
@@ -1060,23 +1061,23 @@ COMMIT;
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_menu`;
 CREATE TABLE `sys_menu` (
-                            `id` bigint NOT NULL AUTO_INCREMENT COMMENT '菜单ID',
-                            `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '菜单名称',
-                            `permission` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '权限标识',
-                            `menu_type` tinyint NOT NULL COMMENT '菜单类型（M目录 C菜单 F按钮）',
-                            `sort` int NOT NULL DEFAULT '0' COMMENT '显示顺序',
-                            `parent_id` bigint NOT NULL DEFAULT '0' COMMENT '父菜单ID',
-                            `path` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '路由地址',
-                            `icon` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '#' COMMENT '菜单图标',
-                            `component` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '组件路径',
-                            `status` tinyint NOT NULL DEFAULT '0' COMMENT '菜单状态（0正常 1停用）',
-                            `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
-                            `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-                            `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
-                            `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-                            `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
-                            `tenant_id` bigint NOT NULL DEFAULT '0' COMMENT '租户编号',
-                            PRIMARY KEY (`id`) USING BTREE
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '菜单ID',
+  `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '菜单名称',
+  `permission` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '权限标识',
+  `menu_type` tinyint NOT NULL COMMENT '菜单类型（M目录 C菜单 F按钮）',
+  `sort` int NOT NULL DEFAULT '0' COMMENT '显示顺序',
+  `parent_id` bigint NOT NULL DEFAULT '0' COMMENT '父菜单ID',
+  `path` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '路由地址',
+  `icon` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '#' COMMENT '菜单图标',
+  `component` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '组件路径',
+  `status` tinyint NOT NULL DEFAULT '0' COMMENT '菜单状态（0正常 1停用）',
+  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  `tenant_id` bigint NOT NULL DEFAULT '0' COMMENT '租户编号',
+  PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=1144 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='菜单权限表';
 
 -- ----------------------------
@@ -1249,27 +1250,27 @@ COMMIT;
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_notice`;
 CREATE TABLE `sys_notice` (
-                              `id` bigint NOT NULL AUTO_INCREMENT COMMENT '公告ID',
-                              `title` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '公告标题',
-                              `content` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '公告内容',
-                              `notice_type` tinyint NOT NULL COMMENT '公告类型（1通知 2公告）',
-                              `status` tinyint NOT NULL DEFAULT '0' COMMENT '公告状态（0正常 1关闭）',
-                              `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
-                              `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-                              `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
-                              `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-                              `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
-                              `tenant_id` bigint NOT NULL DEFAULT '0' COMMENT '租户编号',
-                              PRIMARY KEY (`id`) USING BTREE
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '公告ID',
+  `title` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '公告标题',
+  `content` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '公告内容',
+  `notice_type` tinyint NOT NULL COMMENT '公告类型（1通知 2公告）',
+  `status` tinyint NOT NULL DEFAULT '0' COMMENT '公告状态（0正常 1关闭）',
+  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  `tenant_id` bigint NOT NULL DEFAULT '0' COMMENT '租户编号',
+  PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='通知公告表';
 
 -- ----------------------------
 -- Records of sys_notice
 -- ----------------------------
 BEGIN;
-INSERT INTO `sys_notice` VALUES (1, '温馨提醒：2018-07-01 若依新版本发布啦', '新版本内容', 2, 0, 'admin', '2021-01-05 17:03:48', '', '2021-01-05 17:03:48', b'0', 0);
-INSERT INTO `sys_notice` VALUES (2, '维护通知：2018-07-01 若依系统凌晨维护', '维护内容', 1, 0, 'admin', '2021-01-05 17:03:48', '', '2021-01-05 17:03:48', b'0', 0);
-INSERT INTO `sys_notice` VALUES (3, '1133', '<p>222333</p>', 1, 0, '', '2021-01-13 05:24:52', '', '2021-01-13 05:25:01', b'1', 0);
+INSERT INTO `sys_notice` VALUES (1, '温馨提醒：2018-07-01 若依新版本发布啦', '新版本内容', 2, 0, 'admin', '2021-01-05 17:03:48', '', '2021-12-15 05:02:23', b'0', 1);
+INSERT INTO `sys_notice` VALUES (2, '维护通知：2018-07-01 若依系统凌晨维护', '维护内容', 1, 0, 'admin', '2021-01-05 17:03:48', '', '2021-12-15 05:02:22', b'0', 1);
+INSERT INTO `sys_notice` VALUES (3, '1133', '<p>222333</p>', 1, 0, '', '2021-01-13 05:24:52', '', '2021-12-15 05:02:21', b'1', 1);
 COMMIT;
 
 -- ----------------------------
@@ -1277,33 +1278,33 @@ COMMIT;
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_operate_log`;
 CREATE TABLE `sys_operate_log` (
-                                   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '日志主键',
-                                   `trace_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '链路追踪编号',
-                                   `user_id` bigint NOT NULL COMMENT '用户编号',
-                                   `module` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '模块标题',
-                                   `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '操作名',
-                                   `operate_type` bigint NOT NULL DEFAULT '0' COMMENT '操作分类',
-                                   `content` varchar(2000) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '操作内容',
-                                   `exts` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '拓展字段',
-                                   `request_method` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '请求方法名',
-                                   `request_url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '请求地址',
-                                   `user_ip` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '用户 IP',
-                                   `user_agent` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '浏览器 UA',
-                                   `java_method` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT 'Java 方法名',
-                                   `java_method_args` varchar(8000) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT 'Java 方法的参数',
-                                   `start_time` datetime NOT NULL COMMENT '操作时间',
-                                   `duration` int NOT NULL COMMENT '执行时长',
-                                   `result_code` int NOT NULL DEFAULT '0' COMMENT '结果码',
-                                   `result_msg` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '结果提示',
-                                   `result_data` varchar(4000) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '结果数据',
-                                   `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
-                                   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-                                   `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
-                                   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-                                   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
-                                   `tenant_id` bigint NOT NULL DEFAULT '0' COMMENT '租户编号',
-                                   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=83 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='操作日志记录';
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '日志主键',
+  `trace_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '链路追踪编号',
+  `user_id` bigint NOT NULL COMMENT '用户编号',
+  `module` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '模块标题',
+  `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '操作名',
+  `operate_type` bigint NOT NULL DEFAULT '0' COMMENT '操作分类',
+  `content` varchar(2000) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '操作内容',
+  `exts` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '拓展字段',
+  `request_method` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '请求方法名',
+  `request_url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '请求地址',
+  `user_ip` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '用户 IP',
+  `user_agent` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '浏览器 UA',
+  `java_method` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT 'Java 方法名',
+  `java_method_args` varchar(8000) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT 'Java 方法的参数',
+  `start_time` datetime NOT NULL COMMENT '操作时间',
+  `duration` int NOT NULL COMMENT '执行时长',
+  `result_code` int NOT NULL DEFAULT '0' COMMENT '结果码',
+  `result_msg` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '结果提示',
+  `result_data` varchar(4000) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '结果数据',
+  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  `tenant_id` bigint NOT NULL DEFAULT '0' COMMENT '租户编号',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=85 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='操作日志记录';
 
 -- ----------------------------
 -- Records of sys_operate_log
@@ -1316,19 +1317,19 @@ COMMIT;
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_post`;
 CREATE TABLE `sys_post` (
-                            `id` bigint NOT NULL AUTO_INCREMENT COMMENT '岗位ID',
-                            `code` varchar(64) NOT NULL COMMENT '岗位编码',
-                            `name` varchar(50) NOT NULL COMMENT '岗位名称',
-                            `sort` int NOT NULL COMMENT '显示顺序',
-                            `status` tinyint NOT NULL COMMENT '状态（0正常 1停用）',
-                            `remark` varchar(500) DEFAULT NULL COMMENT '备注',
-                            `creator` varchar(64) DEFAULT '' COMMENT '创建者',
-                            `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-                            `updater` varchar(64) DEFAULT '' COMMENT '更新者',
-                            `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-                            `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
-                            `tenant_id` bigint NOT NULL DEFAULT '0' COMMENT '租户编号',
-                            PRIMARY KEY (`id`) USING BTREE
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '岗位ID',
+  `code` varchar(64) COLLATE utf8mb4_general_ci NOT NULL COMMENT '岗位编码',
+  `name` varchar(50) COLLATE utf8mb4_general_ci NOT NULL COMMENT '岗位名称',
+  `sort` int NOT NULL COMMENT '显示顺序',
+  `status` tinyint NOT NULL COMMENT '状态（0正常 1停用）',
+  `remark` varchar(500) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '备注',
+  `creator` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  `tenant_id` bigint NOT NULL DEFAULT '0' COMMENT '租户编号',
+  PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='岗位信息表';
 
 -- ----------------------------
@@ -1347,28 +1348,28 @@ COMMIT;
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_role`;
 CREATE TABLE `sys_role` (
-                            `id` bigint NOT NULL AUTO_INCREMENT COMMENT '角色ID',
-                            `name` varchar(30) NOT NULL COMMENT '角色名称',
-                            `code` varchar(100) NOT NULL COMMENT '角色权限字符串',
-                            `sort` int NOT NULL COMMENT '显示顺序',
-                            `data_scope` tinyint NOT NULL DEFAULT '1' COMMENT '数据范围（1：全部数据权限 2：自定数据权限 3：本部门数据权限 4：本部门及以下数据权限）',
-                            `data_scope_dept_ids` varchar(500) NOT NULL DEFAULT '' COMMENT '数据范围(指定部门数组)',
-                            `status` tinyint NOT NULL COMMENT '角色状态（0正常 1停用）',
-                            `type` tinyint NOT NULL COMMENT '角色类型',
-                            `remark` varchar(500) DEFAULT NULL COMMENT '备注',
-                            `creator` varchar(64) DEFAULT '' COMMENT '创建者',
-                            `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-                            `updater` varchar(64) DEFAULT '' COMMENT '更新者',
-                            `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-                            `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
-                            PRIMARY KEY (`id`) USING BTREE
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '角色ID',
+  `name` varchar(30) COLLATE utf8mb4_general_ci NOT NULL COMMENT '角色名称',
+  `code` varchar(100) COLLATE utf8mb4_general_ci NOT NULL COMMENT '角色权限字符串',
+  `sort` int NOT NULL COMMENT '显示顺序',
+  `data_scope` tinyint NOT NULL DEFAULT '1' COMMENT '数据范围（1：全部数据权限 2：自定数据权限 3：本部门数据权限 4：本部门及以下数据权限）',
+  `data_scope_dept_ids` varchar(500) COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '数据范围(指定部门数组)',
+  `status` tinyint NOT NULL COMMENT '角色状态（0正常 1停用）',
+  `type` tinyint NOT NULL COMMENT '角色类型',
+  `remark` varchar(500) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '备注',
+  `creator` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=102 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='角色信息表';
 
 -- ----------------------------
 -- Records of sys_role
 -- ----------------------------
 BEGIN;
-INSERT INTO `sys_role` VALUES (1, '超级管理员', 'admin', 1, 2, '', 0, 1, '超级管理员', 'admin', '2021-01-05 17:03:48', '', '2021-12-13 01:22:23', b'0');
+INSERT INTO `sys_role` VALUES (1, '超级管理员', 'admin', 1, 1, '', 0, 1, '超级管理员', 'admin', '2021-01-05 17:03:48', '', '2021-12-15 04:52:44', b'0');
 INSERT INTO `sys_role` VALUES (2, '普通角色', 'common', 2, 2, '', 0, 1, '普通角色', 'admin', '2021-01-05 17:03:48', '', '2021-01-06 11:46:58', b'0');
 INSERT INTO `sys_role` VALUES (101, '测试账号', 'test', 0, 2, '[104]', 0, 2, '132', '', '2021-01-06 13:49:35', '1', '2021-03-14 22:17:20', b'0');
 COMMIT;
@@ -1378,15 +1379,15 @@ COMMIT;
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_role_menu`;
 CREATE TABLE `sys_role_menu` (
-                                 `id` bigint NOT NULL AUTO_INCREMENT COMMENT '自增编号',
-                                 `role_id` bigint NOT NULL COMMENT '角色ID',
-                                 `menu_id` bigint NOT NULL COMMENT '菜单ID',
-                                 `creator` varchar(64) DEFAULT '' COMMENT '创建者',
-                                 `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-                                 `updater` varchar(64) DEFAULT '' COMMENT '更新者',
-                                 `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-                                 `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
-                                 PRIMARY KEY (`id`) USING BTREE
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '自增编号',
+  `role_id` bigint NOT NULL COMMENT '角色ID',
+  `menu_id` bigint NOT NULL COMMENT '菜单ID',
+  `creator` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=239 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='角色和菜单关联表';
 
 -- ----------------------------
@@ -1554,20 +1555,20 @@ COMMIT;
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_sms_channel`;
 CREATE TABLE `sys_sms_channel` (
-                                   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号',
-                                   `signature` varchar(10) NOT NULL COMMENT '短信签名',
-                                   `code` varchar(63) NOT NULL COMMENT '渠道编码',
-                                   `status` tinyint NOT NULL COMMENT '开启状态',
-                                   `remark` varchar(255) DEFAULT NULL COMMENT '备注',
-                                   `api_key` varchar(128) NOT NULL COMMENT '短信 API 的账号',
-                                   `api_secret` varchar(128) DEFAULT NULL COMMENT '短信 API 的秘钥',
-                                   `callback_url` varchar(255) DEFAULT NULL COMMENT '短信发送回调 URL',
-                                   `creator` varchar(64) DEFAULT '' COMMENT '创建者',
-                                   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-                                   `updater` varchar(64) DEFAULT '' COMMENT '更新者',
-                                   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-                                   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
-                                   PRIMARY KEY (`id`) USING BTREE
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号',
+  `signature` varchar(10) COLLATE utf8mb4_general_ci NOT NULL COMMENT '短信签名',
+  `code` varchar(63) COLLATE utf8mb4_general_ci NOT NULL COMMENT '渠道编码',
+  `status` tinyint NOT NULL COMMENT '开启状态',
+  `remark` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '备注',
+  `api_key` varchar(128) COLLATE utf8mb4_general_ci NOT NULL COMMENT '短信 API 的账号',
+  `api_secret` varchar(128) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '短信 API 的秘钥',
+  `callback_url` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '短信发送回调 URL',
+  `creator` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='短信渠道';
 
 -- ----------------------------
@@ -1585,22 +1586,22 @@ COMMIT;
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_sms_code`;
 CREATE TABLE `sys_sms_code` (
-                                `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号',
-                                `mobile` varchar(11) NOT NULL COMMENT '手机号',
-                                `code` varchar(6) NOT NULL COMMENT '验证码',
-                                `create_ip` varchar(15) NOT NULL COMMENT '创建 IP',
-                                `scene` tinyint NOT NULL COMMENT '发送场景',
-                                `today_index` tinyint NOT NULL COMMENT '今日发送的第几条',
-                                `used` tinyint NOT NULL COMMENT '是否使用',
-                                `used_time` datetime DEFAULT NULL COMMENT '使用时间',
-                                `used_ip` varchar(255) DEFAULT NULL COMMENT '使用 IP',
-                                `creator` varchar(64) DEFAULT '' COMMENT '创建者',
-                                `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-                                `updater` varchar(64) DEFAULT '' COMMENT '更新者',
-                                `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-                                `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
-                                PRIMARY KEY (`id`) USING BTREE,
-                                KEY `idx_mobile` (`mobile`) USING BTREE COMMENT '手机号'
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号',
+  `mobile` varchar(11) COLLATE utf8mb4_general_ci NOT NULL COMMENT '手机号',
+  `code` varchar(6) COLLATE utf8mb4_general_ci NOT NULL COMMENT '验证码',
+  `create_ip` varchar(15) COLLATE utf8mb4_general_ci NOT NULL COMMENT '创建 IP',
+  `scene` tinyint NOT NULL COMMENT '发送场景',
+  `today_index` tinyint NOT NULL COMMENT '今日发送的第几条',
+  `used` tinyint NOT NULL COMMENT '是否使用',
+  `used_time` datetime DEFAULT NULL COMMENT '使用时间',
+  `used_ip` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '使用 IP',
+  `creator` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `idx_mobile` (`mobile`) USING BTREE COMMENT '手机号'
 ) ENGINE=InnoDB AUTO_INCREMENT=462 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='手机验证码';
 
 -- ----------------------------
@@ -1631,36 +1632,36 @@ COMMIT;
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_sms_log`;
 CREATE TABLE `sys_sms_log` (
-                               `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号',
-                               `channel_id` bigint NOT NULL COMMENT '短信渠道编号',
-                               `channel_code` varchar(63) NOT NULL COMMENT '短信渠道编码',
-                               `template_id` bigint NOT NULL COMMENT '模板编号',
-                               `template_code` varchar(63) NOT NULL COMMENT '模板编码',
-                               `template_type` tinyint NOT NULL COMMENT '短信类型',
-                               `template_content` varchar(255) NOT NULL COMMENT '短信内容',
-                               `template_params` varchar(255) NOT NULL COMMENT '短信参数',
-                               `api_template_id` varchar(63) NOT NULL COMMENT '短信 API 的模板编号',
-                               `mobile` varchar(11) NOT NULL COMMENT '手机号',
-                               `user_id` bigint DEFAULT NULL COMMENT '用户编号',
-                               `user_type` tinyint DEFAULT NULL COMMENT '用户类型',
-                               `send_status` tinyint NOT NULL DEFAULT '0' COMMENT '发送状态',
-                               `send_time` datetime DEFAULT NULL COMMENT '发送时间',
-                               `send_code` int DEFAULT NULL COMMENT '发送结果的编码',
-                               `send_msg` varchar(255) DEFAULT NULL COMMENT '发送结果的提示',
-                               `api_send_code` varchar(63) DEFAULT NULL COMMENT '短信 API 发送结果的编码',
-                               `api_send_msg` varchar(255) DEFAULT NULL COMMENT '短信 API 发送失败的提示',
-                               `api_request_id` varchar(255) DEFAULT NULL COMMENT '短信 API 发送返回的唯一请求 ID',
-                               `api_serial_no` varchar(255) DEFAULT NULL COMMENT '短信 API 发送返回的序号',
-                               `receive_status` tinyint NOT NULL DEFAULT '0' COMMENT '接收状态',
-                               `receive_time` datetime DEFAULT NULL COMMENT '接收时间',
-                               `api_receive_code` varchar(63) DEFAULT NULL COMMENT 'API 接收结果的编码',
-                               `api_receive_msg` varchar(255) DEFAULT NULL COMMENT 'API 接收结果的说明',
-                               `creator` varchar(64) DEFAULT '' COMMENT '创建者',
-                               `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-                               `updater` varchar(64) DEFAULT '' COMMENT '更新者',
-                               `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-                               `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
-                               PRIMARY KEY (`id`) USING BTREE
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号',
+  `channel_id` bigint NOT NULL COMMENT '短信渠道编号',
+  `channel_code` varchar(63) COLLATE utf8mb4_general_ci NOT NULL COMMENT '短信渠道编码',
+  `template_id` bigint NOT NULL COMMENT '模板编号',
+  `template_code` varchar(63) COLLATE utf8mb4_general_ci NOT NULL COMMENT '模板编码',
+  `template_type` tinyint NOT NULL COMMENT '短信类型',
+  `template_content` varchar(255) COLLATE utf8mb4_general_ci NOT NULL COMMENT '短信内容',
+  `template_params` varchar(255) COLLATE utf8mb4_general_ci NOT NULL COMMENT '短信参数',
+  `api_template_id` varchar(63) COLLATE utf8mb4_general_ci NOT NULL COMMENT '短信 API 的模板编号',
+  `mobile` varchar(11) COLLATE utf8mb4_general_ci NOT NULL COMMENT '手机号',
+  `user_id` bigint DEFAULT NULL COMMENT '用户编号',
+  `user_type` tinyint DEFAULT NULL COMMENT '用户类型',
+  `send_status` tinyint NOT NULL DEFAULT '0' COMMENT '发送状态',
+  `send_time` datetime DEFAULT NULL COMMENT '发送时间',
+  `send_code` int DEFAULT NULL COMMENT '发送结果的编码',
+  `send_msg` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '发送结果的提示',
+  `api_send_code` varchar(63) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '短信 API 发送结果的编码',
+  `api_send_msg` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '短信 API 发送失败的提示',
+  `api_request_id` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '短信 API 发送返回的唯一请求 ID',
+  `api_serial_no` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '短信 API 发送返回的序号',
+  `receive_status` tinyint NOT NULL DEFAULT '0' COMMENT '接收状态',
+  `receive_time` datetime DEFAULT NULL COMMENT '接收时间',
+  `api_receive_code` varchar(63) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT 'API 接收结果的编码',
+  `api_receive_msg` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT 'API 接收结果的说明',
+  `creator` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=33 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='短信日志';
 
 -- ----------------------------
@@ -1674,23 +1675,23 @@ COMMIT;
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_sms_template`;
 CREATE TABLE `sys_sms_template` (
-                                    `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号',
-                                    `type` tinyint NOT NULL COMMENT '短信签名',
-                                    `status` tinyint NOT NULL COMMENT '开启状态',
-                                    `code` varchar(63) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '模板编码',
-                                    `name` varchar(63) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '模板名称',
-                                    `content` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '模板内容',
-                                    `params` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '参数数组',
-                                    `remark` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '备注',
-                                    `api_template_id` varchar(63) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '短信 API 的模板编号',
-                                    `channel_id` bigint NOT NULL COMMENT '短信渠道编号',
-                                    `channel_code` varchar(63) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '短信渠道编码',
-                                    `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
-                                    `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-                                    `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
-                                    `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-                                    `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
-                                    PRIMARY KEY (`id`) USING BTREE
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号',
+  `type` tinyint NOT NULL COMMENT '短信签名',
+  `status` tinyint NOT NULL COMMENT '开启状态',
+  `code` varchar(63) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '模板编码',
+  `name` varchar(63) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '模板名称',
+  `content` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '模板内容',
+  `params` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '参数数组',
+  `remark` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '备注',
+  `api_template_id` varchar(63) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '短信 API 的模板编号',
+  `channel_id` bigint NOT NULL COMMENT '短信渠道编号',
+  `channel_code` varchar(63) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '短信渠道编码',
+  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='短信模板';
 
 -- ----------------------------
@@ -1711,23 +1712,23 @@ COMMIT;
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_social_user`;
 CREATE TABLE `sys_social_user` (
-                                   `id` bigint unsigned NOT NULL AUTO_INCREMENT COMMENT '主键(自增策略)',
-                                   `user_id` bigint NOT NULL COMMENT '关联的用户编号',
-                                   `user_type` tinyint NOT NULL DEFAULT '0' COMMENT '用户类型',
-                                   `type` tinyint NOT NULL COMMENT '社交平台的类型',
-                                   `openid` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '社交 openid',
-                                   `token` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '社交 token',
-                                   `union_id` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '社交的全局编号',
-                                   `raw_token_info` varchar(1024) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '原始 Token 数据，一般是 JSON 格式',
-                                   `nickname` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '用户昵称',
-                                   `avatar` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '用户头像',
-                                   `raw_user_info` varchar(1024) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '原始用户数据，一般是 JSON 格式',
-                                   `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '创建者',
-                                   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-                                   `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '更新者',
-                                   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-                                   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
-                                   PRIMARY KEY (`id`) USING BTREE
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT COMMENT '主键(自增策略)',
+  `user_id` bigint NOT NULL COMMENT '关联的用户编号',
+  `user_type` tinyint NOT NULL DEFAULT '0' COMMENT '用户类型',
+  `type` tinyint NOT NULL COMMENT '社交平台的类型',
+  `openid` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '社交 openid',
+  `token` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '社交 token',
+  `union_id` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '社交的全局编号',
+  `raw_token_info` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '原始 Token 数据，一般是 JSON 格式',
+  `nickname` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '用户昵称',
+  `avatar` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '用户头像',
+  `raw_user_info` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '原始用户数据，一般是 JSON 格式',
+  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC COMMENT='社交用户';
 
 -- ----------------------------
@@ -1743,17 +1744,17 @@ COMMIT;
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_tenant`;
 CREATE TABLE `sys_tenant` (
-                              `id` bigint NOT NULL AUTO_INCREMENT COMMENT '租户编号',
-                              `name` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '租户名',
-                              `contact_name` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '联系人',
-                              `contact_mobile` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '联系手机',
-                              `status` tinyint NOT NULL DEFAULT '0' COMMENT '租户状态（0正常 1停用）',
-                              `creator` varchar(64) DEFAULT '' COMMENT '创建者',
-                              `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-                              `updater` varchar(64) DEFAULT '' COMMENT '更新者',
-                              `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-                              `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
-                              PRIMARY KEY (`id`) USING BTREE
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '租户编号',
+  `name` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '租户名',
+  `contact_name` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '联系人',
+  `contact_mobile` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '联系手机',
+  `status` tinyint NOT NULL DEFAULT '0' COMMENT '租户状态（0正常 1停用）',
+  `creator` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=109 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='租户表';
 
 -- ----------------------------
@@ -1770,34 +1771,34 @@ COMMIT;
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_user`;
 CREATE TABLE `sys_user` (
-                            `id` bigint NOT NULL AUTO_INCREMENT COMMENT '用户ID',
-                            `username` varchar(30) NOT NULL COMMENT '用户账号',
-                            `password` varchar(100) NOT NULL DEFAULT '' COMMENT '密码',
-                            `nickname` varchar(30) NOT NULL COMMENT '用户昵称',
-                            `remark` varchar(500) DEFAULT NULL COMMENT '备注',
-                            `dept_id` bigint DEFAULT NULL COMMENT '部门ID',
-                            `post_ids` varchar(255) DEFAULT NULL COMMENT '岗位编号数组',
-                            `email` varchar(50) DEFAULT '' COMMENT '用户邮箱',
-                            `mobile` varchar(11) DEFAULT '' COMMENT '手机号码',
-                            `sex` tinyint DEFAULT '0' COMMENT '用户性别',
-                            `avatar` varchar(100) DEFAULT '' COMMENT '头像地址',
-                            `status` tinyint NOT NULL DEFAULT '0' COMMENT '帐号状态（0正常 1停用）',
-                            `login_ip` varchar(50) DEFAULT '' COMMENT '最后登录IP',
-                            `login_date` datetime DEFAULT NULL COMMENT '最后登录时间',
-                            `creator` varchar(64) DEFAULT '' COMMENT '创建者',
-                            `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-                            `updater` varchar(64) DEFAULT '' COMMENT '更新者',
-                            `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-                            `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
-                            `tenant_id` bigint NOT NULL DEFAULT '0' COMMENT '租户编号',
-                            PRIMARY KEY (`id`) USING BTREE
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '用户ID',
+  `username` varchar(30) COLLATE utf8mb4_general_ci NOT NULL COMMENT '用户账号',
+  `password` varchar(100) COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '密码',
+  `nickname` varchar(30) COLLATE utf8mb4_general_ci NOT NULL COMMENT '用户昵称',
+  `remark` varchar(500) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '备注',
+  `dept_id` bigint DEFAULT NULL COMMENT '部门ID',
+  `post_ids` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '岗位编号数组',
+  `email` varchar(50) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '用户邮箱',
+  `mobile` varchar(11) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '手机号码',
+  `sex` tinyint DEFAULT '0' COMMENT '用户性别',
+  `avatar` varchar(100) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '头像地址',
+  `status` tinyint NOT NULL DEFAULT '0' COMMENT '帐号状态（0正常 1停用）',
+  `login_ip` varchar(50) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '最后登录IP',
+  `login_date` datetime DEFAULT NULL COMMENT '最后登录时间',
+  `creator` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  `tenant_id` bigint NOT NULL DEFAULT '0' COMMENT '租户编号',
+  PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=107 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='用户信息表';
 
 -- ----------------------------
 -- Records of sys_user
 -- ----------------------------
 BEGIN;
-INSERT INTO `sys_user` VALUES (1, 'admin', '$2a$10$0acJOIk2D25/oC87nyclE..0lzeu9DtQ/n3geP4fkun/zIVRhHJIO', '芋道源码', '管理员', 103, '[1]', 'aoteman@126.com', '15612345678', 1, 'http://127.0.0.1:48080/api/infra/file/get/7e7ed694-2242-46cf-9ac9-0709debcc22f', 0, '127.0.0.1', '2021-12-14 20:22:55', 'admin', '2021-01-05 17:03:47', NULL, '2021-12-14 20:22:55', b'0', 1);
+INSERT INTO `sys_user` VALUES (1, 'admin', '$2a$10$0acJOIk2D25/oC87nyclE..0lzeu9DtQ/n3geP4fkun/zIVRhHJIO', '芋道源码', '管理员', 103, '[1]', 'aoteman@126.com', '15612345678', 1, 'http://127.0.0.1:48080/api/infra/file/get/7e7ed694-2242-46cf-9ac9-0709debcc22f', 0, '127.0.0.1', '2021-12-15 12:33:21', 'admin', '2021-01-05 17:03:47', NULL, '2021-12-15 12:33:21', b'0', 1);
 INSERT INTO `sys_user` VALUES (2, 'ry', '$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', '若依', '测试员', 103, '[2]', 'ry@qq.com', '15666666666', 1, '', 0, '127.0.0.1', '2021-01-05 17:03:47', 'admin', '2021-01-05 17:03:47', '', '2021-12-13 01:26:34', b'1', 1);
 INSERT INTO `sys_user` VALUES (100, 'yudao', '$2a$10$11U48RhyJ5pSBYWSn12AD./ld671.ycSzJHbyrtpeoMeYiw31eo8a', '芋道', '不要吓我', 103, '[1]', 'yudao@iocoder.cn', '15601691300', 1, '', 1, '', NULL, '', '2021-01-07 09:07:17', '1', '2021-12-13 01:26:55', b'0', 1);
 INSERT INTO `sys_user` VALUES (103, 'yuanma', '', '源码', NULL, 100, NULL, 'yuanma@iocoder.cn', '15601701300', 0, '', 0, '', NULL, '', '2021-01-13 23:50:35', '', '2021-12-05 02:22:01', b'0', 1);
@@ -1811,16 +1812,16 @@ COMMIT;
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_user_role`;
 CREATE TABLE `sys_user_role` (
-                                 `id` bigint NOT NULL AUTO_INCREMENT COMMENT '自增编号',
-                                 `user_id` bigint NOT NULL COMMENT '用户ID',
-                                 `role_id` bigint NOT NULL COMMENT '角色ID',
-                                 `creator` varchar(64) DEFAULT '' COMMENT '创建者',
-                                 `create_time` datetime DEFAULT NULL COMMENT '创建时间',
-                                 `updater` varchar(64) DEFAULT '' COMMENT '更新者',
-                                 `update_time` datetime DEFAULT NULL COMMENT '更新时间',
-                                 `deleted` bit(1) DEFAULT b'0' COMMENT '是否删除',
-                                 `tenant_id` bigint NOT NULL DEFAULT '0' COMMENT '租户编号',
-                                 PRIMARY KEY (`id`) USING BTREE
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '自增编号',
+  `user_id` bigint NOT NULL COMMENT '用户ID',
+  `role_id` bigint NOT NULL COMMENT '角色ID',
+  `creator` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
+  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
+  `updater` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
+  `update_time` datetime DEFAULT NULL COMMENT '更新时间',
+  `deleted` bit(1) DEFAULT b'0' COMMENT '是否删除',
+  `tenant_id` bigint NOT NULL DEFAULT '0' COMMENT '租户编号',
+  PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='用户和角色关联表';
 
 -- ----------------------------
@@ -1843,116 +1844,26 @@ COMMIT;
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_user_session`;
 CREATE TABLE `sys_user_session` (
-                                    `id` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '会话编号',
-                                    `user_id` bigint NOT NULL COMMENT '用户编号',
-                                    `user_type` tinyint NOT NULL DEFAULT '0' COMMENT '用户类型',
-                                    `session_timeout` datetime NOT NULL COMMENT '会话超时时间',
-                                    `username` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '用户账号',
-                                    `user_ip` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '用户 IP',
-                                    `user_agent` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '浏览器 UA',
-                                    `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
-                                    `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-                                    `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
-                                    `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-                                    `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
-                                    `tenant_id` bigint NOT NULL DEFAULT '0' COMMENT '租户编号',
-                                    PRIMARY KEY (`id`) USING BTREE
+  `id` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '会话编号',
+  `user_id` bigint NOT NULL COMMENT '用户编号',
+  `user_type` tinyint NOT NULL DEFAULT '0' COMMENT '用户类型',
+  `session_timeout` datetime NOT NULL COMMENT '会话超时时间',
+  `username` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '用户账号',
+  `user_ip` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '用户 IP',
+  `user_agent` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '浏览器 UA',
+  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  `tenant_id` bigint NOT NULL DEFAULT '0' COMMENT '租户编号',
+  PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='用户在线 Session';
 
 -- ----------------------------
 -- Records of sys_user_session
 -- ----------------------------
 BEGIN;
-INSERT INTO `sys_user_session` VALUES ('01e54f75b0a54c01b569adff3b33eec4', 245, 1, '2021-11-26 10:04:53', '15601691300', '127.0.0.1', 'Mozilla/5.0 (Linux; Android 6.0.1; Moto G (4)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Mobile Safari/537.36', NULL, '2021-11-26 09:34:53', NULL, '2021-12-05 02:41:50', b'1', 1);
-INSERT INTO `sys_user_session` VALUES ('02f40128d6ae47caae7ebe1eac9300b6', 245, 1, '2021-10-10 18:50:20', '15601691300', '127.0.0.1', 'Apache-HttpClient/4.5.13 (Java/11.0.11)', NULL, '2021-10-10 18:20:20', NULL, '2021-12-05 02:41:50', b'1', 1);
-INSERT INTO `sys_user_session` VALUES ('088ef4bb73b5423faf5746e1e9780bec', 1, 2, '2021-12-06 01:29:47', 'admin', '127.0.0.1', 'Apache-HttpClient/4.5.13 (Java/11.0.11)', NULL, '2021-12-06 00:59:47', NULL, '2021-12-06 00:59:47', b'0', 0);
-INSERT INTO `sys_user_session` VALUES ('0d161f69c9ac4c7f836e1b850715a7b0', 1, 2, '2021-12-06 01:52:11', 'admin', '127.0.0.1', 'Apache-HttpClient/4.5.13 (Java/11.0.11)', NULL, '2021-12-06 01:22:11', NULL, '2021-12-06 01:22:11', b'0', 1);
-INSERT INTO `sys_user_session` VALUES ('0d6466a5035c40a3a9398f55edc32efc', 245, 1, '2021-11-26 09:57:19', '15601691300', '127.0.0.1', 'Mozilla/5.0 (Linux; Android 6.0.1; Moto G (4)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Mobile Safari/537.36', NULL, '2021-11-26 09:27:19', NULL, '2021-12-05 02:41:50', b'1', 1);
-INSERT INTO `sys_user_session` VALUES ('0e174b5eb969452a8d414df6384fd13f', 245, 1, '2021-11-26 10:04:25', '15601691300', '127.0.0.1', 'Mozilla/5.0 (Linux; Android 6.0.1; Moto G (4)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Mobile Safari/537.36', NULL, '2021-11-26 09:34:25', NULL, '2021-12-05 02:41:50', b'1', 1);
-INSERT INTO `sys_user_session` VALUES ('112ac5cf97a34607b13ad0a5831df9af', 1, 2, '2021-10-12 09:34:24', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.71 Safari/537.36', NULL, '2021-10-12 08:20:37', NULL, '2021-12-05 02:41:50', b'1', 1);
-INSERT INTO `sys_user_session` VALUES ('11460601b012499a83dae897acdb54fe', 1, 2, '2021-12-06 22:57:36', 'admin', '127.0.0.1', 'Apache-HttpClient/4.5.13 (Java/11.0.11)', NULL, '2021-12-06 22:27:36', NULL, '2021-12-06 22:27:36', b'0', 1);
-INSERT INTO `sys_user_session` VALUES ('187482d1c6034f6795f9a8b4e1d041b7', 1, 2, '2021-12-05 18:25:37', 'admin', '127.0.0.1', 'Apache-HttpClient/4.5.13 (Java/11.0.11)', NULL, '2021-12-05 17:55:37', NULL, '2021-12-05 17:55:37', b'0', 0);
-INSERT INTO `sys_user_session` VALUES ('1b10af63a571471daa51a3a4671ebd8b', 1, 2, '2021-12-12 19:18:00', 'admin', '127.0.0.1', 'Apache-HttpClient/4.5.13 (Java/11.0.11)', NULL, '2021-12-12 18:48:00', NULL, '2021-12-12 18:48:00', b'0', 1);
-INSERT INTO `sys_user_session` VALUES ('1e9372b2e67c4e9c924d45232c9cf704', 1, 2, '2021-12-06 01:30:53', 'admin', '127.0.0.1', 'Apache-HttpClient/4.5.13 (Java/11.0.11)', NULL, '2021-12-06 01:00:53', NULL, '2021-12-06 01:00:53', b'0', 0);
-INSERT INTO `sys_user_session` VALUES ('2308c190eb504bafadac3b322df759dc', 1, 2, '2021-10-30 14:10:10', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.81 Safari/537.36', NULL, '2021-10-30 13:40:10', NULL, '2021-12-05 02:41:50', b'1', 1);
-INSERT INTO `sys_user_session` VALUES ('2d8e3e05ce4e41a29f1fd6f96d93030f', 245, 1, '2021-11-25 22:56:24', '15601691300', '127.0.0.1', 'Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1', NULL, '2021-11-25 22:26:24', NULL, '2021-12-05 02:41:50', b'1', 1);
-INSERT INTO `sys_user_session` VALUES ('2e6520714c4845ed8835aa4aea5eeff4', 245, 1, '2021-11-26 09:55:15', '15601691300', '127.0.0.1', 'Mozilla/5.0 (Linux; Android 6.0.1; Moto G (4)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Mobile Safari/537.36', NULL, '2021-11-26 09:25:15', NULL, '2021-12-05 02:41:50', b'1', 1);
-INSERT INTO `sys_user_session` VALUES ('305dfd92dfae464ba2db2a6ef8b97da9', 1, 2, '2021-12-06 01:49:09', 'admin', '127.0.0.1', 'Apache-HttpClient/4.5.13 (Java/11.0.11)', NULL, '2021-12-06 01:19:09', NULL, '2021-12-06 01:19:09', b'0', 1);
-INSERT INTO `sys_user_session` VALUES ('315a63226f7d4d4b8643c0dce7108fd2', 1, 2, '2021-12-06 01:16:39', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2021-12-06 00:46:39', NULL, '2021-12-05 16:48:35', b'1', 0);
-INSERT INTO `sys_user_session` VALUES ('348e808ab4424221ae0ee2d27dc700af', 1, 2, '2021-12-06 22:55:41', 'admin', '127.0.0.1', 'Apache-HttpClient/4.5.13 (Java/11.0.11)', NULL, '2021-12-06 22:25:41', NULL, '2021-12-06 22:25:41', b'0', 1);
-INSERT INTO `sys_user_session` VALUES ('3d5c6594daa94d459ab6c8e1cb181e8e', 1, 2, '2021-12-06 01:56:30', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2021-12-06 01:26:30', NULL, '2021-12-06 01:26:30', b'0', 1);
-INSERT INTO `sys_user_session` VALUES ('41ee0bcc792c4d919e9411b076276aeb', 245, 1, '2021-11-25 22:56:24', '15601691300', '127.0.0.1', 'Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1', NULL, '2021-11-25 22:26:24', NULL, '2021-12-05 02:41:50', b'1', 1);
-INSERT INTO `sys_user_session` VALUES ('422781d95d6b49169a3e8ca184ccaa0d', 245, 1, '2021-11-26 13:19:28', '15601691300', '127.0.0.1', 'Mozilla/5.0 (Linux; Android 6.0.1; Moto G (4)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Mobile Safari/537.36', NULL, '2021-11-26 12:36:00', NULL, '2021-12-05 02:41:50', b'1', 1);
-INSERT INTO `sys_user_session` VALUES ('430715f372d54178aada46808589498c', 245, 1, '2021-11-26 09:57:49', '15601691300', '127.0.0.1', 'Mozilla/5.0 (Linux; Android 6.0.1; Moto G (4)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Mobile Safari/537.36', NULL, '2021-11-26 09:27:49', NULL, '2021-12-05 02:41:50', b'1', 1);
-INSERT INTO `sys_user_session` VALUES ('48d5450ed7ee48589f2030afa36b26db', 1, 2, '2021-12-04 21:29:54', 'admin', '127.0.0.1', 'Apache-HttpClient/4.5.13 (Java/11.0.11)', NULL, '2021-12-04 20:59:54', NULL, '2021-12-05 02:41:50', b'1', 1);
-INSERT INTO `sys_user_session` VALUES ('49a719b8744c4b99b7ca53b46c413a68', 1, 2, '2021-12-14 10:38:43', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2021-12-14 09:43:22', NULL, '2021-12-14 10:08:43', b'0', 1);
-INSERT INTO `sys_user_session` VALUES ('4a8347de279e4dd8a1e3f6e93047c612', 1, 2, '2021-12-14 21:29:27', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2021-12-14 20:22:55', NULL, '2021-12-14 20:59:27', b'0', 1);
-INSERT INTO `sys_user_session` VALUES ('549f940264cc4edf8ed78a9a0bafd7db', 245, 1, '2021-10-10 17:25:06', '15601691300', '127.0.0.1', 'Apache-HttpClient/4.5.13 (Java/11.0.11)', NULL, '2021-10-10 16:55:06', NULL, '2021-12-05 02:41:50', b'1', 1);
-INSERT INTO `sys_user_session` VALUES ('55f80d1a547a4900b40ed49e059872a0', 1, 2, '2021-12-05 18:28:43', 'admin', '127.0.0.1', 'Apache-HttpClient/4.5.13 (Java/11.0.11)', NULL, '2021-12-05 17:58:43', NULL, '2021-12-05 17:58:43', b'0', 0);
-INSERT INTO `sys_user_session` VALUES ('595b5a61273340dea7c583c06323c335', 1, 2, '2021-12-06 01:31:17', 'admin', '127.0.0.1', 'Apache-HttpClient/4.5.13 (Java/11.0.11)', NULL, '2021-12-06 01:01:17', NULL, '2021-12-06 01:01:17', b'0', 0);
-INSERT INTO `sys_user_session` VALUES ('5a16ffa063a34a329650d1565c486ce1', 245, 1, '2021-11-25 22:56:24', '15601691300', '127.0.0.1', 'Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1', NULL, '2021-11-25 22:26:24', NULL, '2021-12-05 02:41:50', b'1', 1);
-INSERT INTO `sys_user_session` VALUES ('5b24604023df4adf8e3aa31b7cd12b71', 1, 2, '2021-12-05 00:40:36', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2021-12-05 00:10:36', NULL, '2021-12-05 02:41:50', b'1', 1);
-INSERT INTO `sys_user_session` VALUES ('5c8f2bb378aa4f8b92ef5b52a6ab282b', 245, 1, '2021-10-10 18:50:07', '15601691300', '127.0.0.1', 'Apache-HttpClient/4.5.13 (Java/11.0.11)', NULL, '2021-10-10 18:20:07', NULL, '2021-12-05 02:41:50', b'1', 1);
-INSERT INTO `sys_user_session` VALUES ('5efe7272e0414d38be45f26228be6dfd', 1, 2, '2021-10-27 09:00:10', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.81 Safari/537.36', NULL, '2021-10-27 08:30:10', NULL, '2021-12-05 02:41:50', b'1', 1);
-INSERT INTO `sys_user_session` VALUES ('5fc867db5eb3463f8c7d9e6f4d2e0f05', 1, 2, '2021-10-30 17:41:47', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.81 Safari/537.36', NULL, '2021-10-30 17:11:47', NULL, '2021-12-05 02:41:50', b'1', 1);
-INSERT INTO `sys_user_session` VALUES ('60b382f4b5e649c59eed9756dbcbf648', 1, 2, '2021-12-12 19:18:56', 'admin', '127.0.0.1', 'Apache-HttpClient/4.5.13 (Java/11.0.11)', NULL, '2021-12-12 18:48:56', NULL, '2021-12-12 18:48:56', b'0', 1);
-INSERT INTO `sys_user_session` VALUES ('6614287351414862a657c826b93871b4', 245, 1, '2021-11-26 10:08:48', '15601691300', '127.0.0.1', 'Mozilla/5.0 (Linux; Android 6.0.1; Moto G (4)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Mobile Safari/537.36', NULL, '2021-11-26 09:38:48', NULL, '2021-12-05 02:41:50', b'1', 1);
-INSERT INTO `sys_user_session` VALUES ('66c38e3a2f304428bdf351d0232f5f19', 245, 1, '2021-11-25 23:59:30', '15601691300', '127.0.0.1', 'Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1', NULL, '2021-11-25 23:29:30', NULL, '2021-12-05 02:41:50', b'1', 1);
-INSERT INTO `sys_user_session` VALUES ('77c72cf07bdf484b82a61b6a86df1e29', 245, 1, '2021-11-25 22:56:07', '15601691300', '127.0.0.1', 'Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1', NULL, '2021-11-25 22:26:07', NULL, '2021-12-05 02:41:50', b'1', 1);
-INSERT INTO `sys_user_session` VALUES ('785497ff09144c9fbb3e2d7eeeb569c2', 245, 1, '2021-11-26 10:15:25', '15601691300', '127.0.0.1', 'Mozilla/5.0 (Linux; Android 6.0.1; Moto G (4)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Mobile Safari/537.36', NULL, '2021-11-26 09:45:25', NULL, '2021-12-05 02:41:50', b'1', 1);
-INSERT INTO `sys_user_session` VALUES ('78c34a300fe449e391d8187a61164b6e', 1, 2, '2021-10-11 08:35:34', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.71 Safari/537.36', NULL, '2021-10-11 07:55:00', NULL, '2021-12-05 02:41:50', b'1', 1);
-INSERT INTO `sys_user_session` VALUES ('793ee411b8ba409d8f35c6c521e3b75d', 105, 2, '2021-10-30 14:11:04', 'hradmin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.81 Safari/537.36', NULL, '2021-10-30 13:41:04', NULL, '2021-12-05 02:41:50', b'1', 1);
-INSERT INTO `sys_user_session` VALUES ('7aca1bf7085444559b7e921fbd448a1e', 1, 2, '2021-12-06 01:31:19', 'admin', '127.0.0.1', 'Apache-HttpClient/4.5.13 (Java/11.0.11)', NULL, '2021-12-06 01:01:19', NULL, '2021-12-06 01:01:19', b'0', 0);
-INSERT INTO `sys_user_session` VALUES ('7d8c45a4c00644af8e5f7c8f8b8f37e0', 245, 1, '2021-11-25 22:56:44', '15601691300', '127.0.0.1', 'Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1', NULL, '2021-11-25 22:26:44', NULL, '2021-12-05 02:41:50', b'1', 1);
-INSERT INTO `sys_user_session` VALUES ('806c34e429a24e75ae2bbd17cf99b52c', 245, 1, '2021-11-25 22:58:58', '15601691300', '127.0.0.1', 'Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1', NULL, '2021-11-25 22:28:58', NULL, '2021-12-05 02:41:50', b'1', 1);
-INSERT INTO `sys_user_session` VALUES ('84836ccb50d843d797eefc33cd25adae', 245, 1, '2021-11-26 09:44:14', '15601691300', '127.0.0.1', 'Mozilla/5.0 (Linux; Android 6.0.1; Moto G (4)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Mobile Safari/537.36', NULL, '2021-11-26 09:14:14', NULL, '2021-12-05 02:41:50', b'1', 1);
-INSERT INTO `sys_user_session` VALUES ('8648b75ba55f48be95440c3386989206', 105, 2, '2021-10-30 21:59:57', 'hradmin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.81 Safari/537.36', NULL, '2021-10-30 21:19:36', NULL, '2021-12-05 02:41:50', b'1', 1);
-INSERT INTO `sys_user_session` VALUES ('867b3884d1084114baee80ef2ed0fa5d', 245, 1, '2021-11-26 10:03:57', '15601691300', '127.0.0.1', 'Mozilla/5.0 (Linux; Android 6.0.1; Moto G (4)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Mobile Safari/537.36', NULL, '2021-11-26 09:33:57', NULL, '2021-12-05 02:41:50', b'1', 1);
-INSERT INTO `sys_user_session` VALUES ('86b2e205f6924e3691b29fee8ad3b056', 245, 1, '2021-11-25 21:14:50', '15601691300', '127.0.0.1', 'Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1', NULL, '2021-11-25 20:44:50', NULL, '2021-12-05 02:41:50', b'1', 1);
-INSERT INTO `sys_user_session` VALUES ('88da23cc6b754bf8973991dbe6c7a50f', 245, 1, '2021-11-26 08:14:28', '15601691300', '127.0.0.1', 'Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1', NULL, '2021-11-26 07:44:28', NULL, '2021-12-05 02:41:50', b'1', 1);
-INSERT INTO `sys_user_session` VALUES ('8a1a62eeed564b37b018b9241928c6f9', 105, 2, '2021-10-30 17:42:59', 'hradmin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.81 Safari/537.36', NULL, '2021-10-30 17:12:59', NULL, '2021-12-05 02:41:50', b'1', 1);
-INSERT INTO `sys_user_session` VALUES ('8b2f3876504e47939f6bb36084dd1944', 1, 2, '2021-12-05 23:26:23', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2021-12-05 22:44:41', NULL, '2021-12-05 22:56:23', b'0', 0);
-INSERT INTO `sys_user_session` VALUES ('8dc5776d684e4ca0864f2ed7e52ca087', 245, 1, '2021-11-25 22:27:33', '15601691300', '127.0.0.1', 'Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1', NULL, '2021-11-25 21:57:33', NULL, '2021-12-05 02:41:50', b'1', 1);
-INSERT INTO `sys_user_session` VALUES ('8f3ef6f4af4f4330a0a13ffa6bf0f82c', 245, 1, '2021-11-28 00:13:17', '15601691300', '127.0.0.1', 'Mozilla/5.0 (Linux; Android 6.0.1; Moto G (4)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Mobile Safari/537.36', NULL, '2021-11-27 23:43:17', NULL, '2021-12-05 02:41:50', b'1', 1);
-INSERT INTO `sys_user_session` VALUES ('8f4d894746394901bcf7dcf6d4321868', 245, 1, '2021-10-10 23:04:03', '15601691300', '127.0.0.1', 'Apache-HttpClient/4.5.13 (Java/11.0.11)', NULL, '2021-10-10 22:34:03', NULL, '2021-12-05 02:41:50', b'1', 1);
-INSERT INTO `sys_user_session` VALUES ('945adc9a9a27465baf4394529c7602c8', 245, 1, '2021-11-25 13:42:41', '15601691300', '127.0.0.1', 'Apache-HttpClient/4.5.13 (Java/11.0.11)', NULL, '2021-11-25 13:12:41', NULL, '2021-12-05 02:41:50', b'1', 1);
-INSERT INTO `sys_user_session` VALUES ('99f61b1508a74ea2b895aeb65d3f381f', 105, 2, '2021-10-30 14:08:10', 'hradmin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.81 Safari/537.36', NULL, '2021-10-30 13:38:10', NULL, '2021-12-05 02:41:50', b'1', 1);
-INSERT INTO `sys_user_session` VALUES ('9ddb53d391f9413cbd460ec2461ceeb0', 1, 2, '2021-10-12 10:07:20', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.71 Safari/537.36', NULL, '2021-10-12 09:22:43', NULL, '2021-12-05 02:41:50', b'1', 1);
-INSERT INTO `sys_user_session` VALUES ('a411c20349354e219f54909947c1b849', 245, 1, '2021-11-26 10:10:09', '15601691300', '127.0.0.1', 'Mozilla/5.0 (Linux; Android 6.0.1; Moto G (4)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Mobile Safari/537.36', NULL, '2021-11-26 09:40:09', NULL, '2021-12-05 02:41:50', b'1', 1);
-INSERT INTO `sys_user_session` VALUES ('a6a781e9d02a4e23941c44dd0db4dcfd', 245, 1, '2021-11-26 09:56:09', '15601691300', '127.0.0.1', 'Mozilla/5.0 (Linux; Android 6.0.1; Moto G (4)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Mobile Safari/537.36', NULL, '2021-11-26 09:26:09', NULL, '2021-12-05 02:41:50', b'1', 1);
-INSERT INTO `sys_user_session` VALUES ('a6aa7714a2e44c95aaa8a2c5adc2a67a', 1, 2, '2021-12-06 13:37:56', 'admin', '127.0.0.1', 'Apache-HttpClient/4.5.13 (Java/11.0.11)', NULL, '2021-12-06 13:07:56', NULL, '2021-12-06 13:07:56', b'0', 1);
-INSERT INTO `sys_user_session` VALUES ('a7b38989fd2a4128b547780e19438db9', 245, 1, '2021-11-25 22:56:01', '15601691300', '127.0.0.1', 'Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1', NULL, '2021-11-25 22:26:01', NULL, '2021-12-05 02:41:50', b'1', 1);
-INSERT INTO `sys_user_session` VALUES ('a7bf7346fd6a4f94a06029db9b9beb8f', 245, 1, '2021-11-25 22:58:31', '15601691300', '127.0.0.1', 'Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1', NULL, '2021-11-25 22:28:31', NULL, '2021-12-05 02:41:50', b'1', 1);
-INSERT INTO `sys_user_session` VALUES ('a810c2959a5b41ecbf3be7d49545c411', 1, 2, '2021-12-05 00:42:12', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2021-12-05 00:12:12', NULL, '2021-12-05 02:41:50', b'1', 1);
-INSERT INTO `sys_user_session` VALUES ('b25ba932d4774b148a204df4a6911f95', 1, 2, '2021-12-04 23:19:16', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2021-12-04 22:49:16', NULL, '2021-12-05 02:41:50', b'1', 1);
-INSERT INTO `sys_user_session` VALUES ('b2c787e6a1aa4160920336c9b67b738e', 1, 2, '2021-12-06 01:19:19', 'admin', '127.0.0.1', 'Apache-HttpClient/4.5.13 (Java/11.0.11)', NULL, '2021-12-06 00:49:19', NULL, '2021-12-06 00:49:19', b'0', 0);
-INSERT INTO `sys_user_session` VALUES ('b3f0a1aa486343788305243bd222a22d', 1, 2, '2021-10-30 14:04:52', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.81 Safari/537.36', NULL, '2021-10-30 13:34:52', NULL, '2021-12-05 02:41:50', b'1', 1);
-INSERT INTO `sys_user_session` VALUES ('b5849f33630144a6911854c86c19e6f1', 245, 1, '2021-10-30 10:38:42', '15601691300', '127.0.0.1', 'Mozilla/5.0 (iPhone; CPU iPhone OS 11_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E217 MicroMessenger/6.8.0(0x16080000) NetType/WIFI Language/en Branch/Br_trunk MiniProgramEnv/Mac', NULL, '2021-10-30 10:08:42', NULL, '2021-12-05 02:41:50', b'1', 1);
-INSERT INTO `sys_user_session` VALUES ('c166a8f52f7e42a49c9a5c3d3b21be82', 1, 2, '2021-12-06 01:19:27', 'admin', '127.0.0.1', 'Apache-HttpClient/4.5.13 (Java/11.0.11)', NULL, '2021-12-06 00:49:27', NULL, '2021-12-06 00:49:27', b'0', 0);
-INSERT INTO `sys_user_session` VALUES ('c1b76bdaf2c146c581caa4d7fd81ee66', 246, 1, '2021-10-10 23:06:27', '15601691301', '127.0.0.1', 'Apache-HttpClient/4.5.13 (Java/11.0.11)', NULL, '2021-10-10 22:36:27', NULL, '2021-12-05 02:41:50', b'1', 1);
-INSERT INTO `sys_user_session` VALUES ('c894b8c213ca4b30b0f5e900353108c4', 1, 2, '2021-12-06 22:59:10', 'admin', '127.0.0.1', 'Apache-HttpClient/4.5.13 (Java/11.0.11)', NULL, '2021-12-06 22:29:10', NULL, '2021-12-06 22:29:10', b'0', 1);
-INSERT INTO `sys_user_session` VALUES ('cbc36fe506cf4b26be2e1c27ee00460c', 245, 1, '2021-11-28 21:55:25', '15601691300', '127.0.0.1', 'Mozilla/5.0 (Linux; Android 6.0.1; Moto G (4)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Mobile Safari/537.36', '245', '2021-11-28 20:47:51', NULL, '2021-12-05 02:41:50', b'1', 1);
-INSERT INTO `sys_user_session` VALUES ('cbc4ded131fc411ab7953f9ff303392c', 245, 1, '2021-11-26 07:45:52', '15601691300', '127.0.0.1', 'Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1', NULL, '2021-11-26 07:15:52', NULL, '2021-12-05 02:41:50', b'1', 1);
-INSERT INTO `sys_user_session` VALUES ('cd87c53716bf409cb75f01476d1b9dab', 245, 1, '2021-11-25 13:50:46', '15601691300', '127.0.0.1', 'Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1', NULL, '2021-11-25 13:20:46', NULL, '2021-12-05 02:41:50', b'1', 1);
-INSERT INTO `sys_user_session` VALUES ('cefa650e55aa4e9d8ec17d8796e18057', 1, 2, '2021-12-04 23:17:11', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2021-12-04 22:47:11', NULL, '2021-12-05 02:41:50', b'1', 1);
-INSERT INTO `sys_user_session` VALUES ('d177703bdcc3464a871c8393f6107253', 1, 2, '2021-12-06 01:48:14', 'admin', '127.0.0.1', 'Apache-HttpClient/4.5.13 (Java/11.0.11)', NULL, '2021-12-06 01:18:14', NULL, '2021-12-06 01:18:14', b'0', 1);
-INSERT INTO `sys_user_session` VALUES ('d527f9e2c3db47e892033551cdd6df70', 245, 1, '2021-11-26 08:05:58', '15601691300', '127.0.0.1', 'Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1', NULL, '2021-11-26 07:35:58', NULL, '2021-12-05 02:41:50', b'1', 1);
-INSERT INTO `sys_user_session` VALUES ('d6b4180a11a547b28d57e44a7fcf0dda', 1, 2, '2021-10-30 14:11:37', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.81 Safari/537.36', NULL, '2021-10-30 13:41:37', NULL, '2021-12-05 02:41:50', b'1', 1);
-INSERT INTO `sys_user_session` VALUES ('d9477b8ec8cd41b6809066da0696ee0d', 245, 1, '2021-11-25 22:56:16', '15601691300', '127.0.0.1', 'Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1', NULL, '2021-11-25 22:26:16', NULL, '2021-12-05 02:41:50', b'1', 1);
-INSERT INTO `sys_user_session` VALUES ('db4c2ce5a6b54460848bc6e89b7dfa0d', 245, 1, '2021-11-26 09:40:43', '15601691300', '127.0.0.1', 'Mozilla/5.0 (Linux; Android 6.0.1; Moto G (4)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Mobile Safari/537.36', NULL, '2021-11-26 09:10:43', NULL, '2021-12-05 02:41:50', b'1', 1);
-INSERT INTO `sys_user_session` VALUES ('dbedf41caf264bc19d03cfd56666aec6', 245, 1, '2021-11-26 09:54:29', '15601691300', '127.0.0.1', 'Mozilla/5.0 (Linux; Android 6.0.1; Moto G (4)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Mobile Safari/537.36', NULL, '2021-11-26 09:24:29', NULL, '2021-12-05 02:41:50', b'1', 1);
-INSERT INTO `sys_user_session` VALUES ('dcb1de2e2ef14e37bca3e64f5bbb603f', 245, 1, '2021-10-10 18:55:16', '15601691300', '127.0.0.1', 'Apache-HttpClient/4.5.13 (Java/11.0.11)', NULL, '2021-10-10 18:25:16', NULL, '2021-12-05 02:41:50', b'1', 1);
-INSERT INTO `sys_user_session` VALUES ('e1ec7a36910849bd86aa09b416824675', 245, 1, '2021-11-25 13:50:42', '15601691300', '127.0.0.1', 'Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1', NULL, '2021-11-25 13:20:42', NULL, '2021-12-05 02:41:50', b'1', 1);
-INSERT INTO `sys_user_session` VALUES ('e206ac2498054d0c822392e599f6151a', 1, 2, '2021-10-10 00:17:31', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.71 Safari/537.36', NULL, '2021-10-09 23:47:31', NULL, '2021-12-05 02:41:50', b'1', 1);
-INSERT INTO `sys_user_session` VALUES ('e23f3e6d396a4d1eafa03e2ad569af43', 245, 1, '2021-11-25 21:15:04', '15601691300', '127.0.0.1', 'Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1', NULL, '2021-11-25 20:45:04', NULL, '2021-12-05 02:41:50', b'1', 1);
-INSERT INTO `sys_user_session` VALUES ('e24b67872cfb4c698aa727006820eafc', 245, 1, '2021-10-10 18:49:55', '15601691300', '127.0.0.1', 'Apache-HttpClient/4.5.13 (Java/11.0.11)', NULL, '2021-10-10 18:19:55', NULL, '2021-12-05 02:41:50', b'1', 1);
-INSERT INTO `sys_user_session` VALUES ('e35210f39f0346b491d227bfa911129d', 1, 2, '2021-12-12 19:17:59', 'admin', '127.0.0.1', 'Apache-HttpClient/4.5.13 (Java/11.0.11)', NULL, '2021-12-12 18:47:59', NULL, '2021-12-12 18:47:59', b'0', 1);
-INSERT INTO `sys_user_session` VALUES ('e3f3909606f94d5192a218e0b68cfdfb', 245, 1, '2021-11-25 22:56:09', '15601691300', '127.0.0.1', 'Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1', NULL, '2021-11-25 22:26:09', NULL, '2021-12-05 02:41:50', b'1', 1);
-INSERT INTO `sys_user_session` VALUES ('e627b998dd52401d972ec37fd97431fe', 245, 1, '2021-11-26 09:36:43', '15601691300', '127.0.0.1', 'Mozilla/5.0 (Linux; Android 6.0.1; Moto G (4)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Mobile Safari/537.36', NULL, '2021-11-26 09:06:43', NULL, '2021-12-05 02:41:50', b'1', 1);
-INSERT INTO `sys_user_session` VALUES ('ea1fdc1e14444b59989f0d80acbfe0a7', 105, 2, '2021-10-30 14:09:50', 'hradmin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.81 Safari/537.36', NULL, '2021-10-30 13:39:50', NULL, '2021-12-05 02:41:50', b'1', 1);
-INSERT INTO `sys_user_session` VALUES ('ebe27b0064564a52b3f8a184642e6008', 245, 1, '2021-11-28 21:17:49', '15601691300', '127.0.0.1', 'Mozilla/5.0 (Linux; Android 6.0.1; Moto G (4)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Mobile Safari/537.36', NULL, '2021-11-28 20:37:02', NULL, '2021-12-05 02:41:50', b'1', 1);
-INSERT INTO `sys_user_session` VALUES ('f826e83191f3421091f73735c2b78aab', 1, 2, '2021-12-06 01:21:20', 'admin', '127.0.0.1', 'Apache-HttpClient/4.5.13 (Java/11.0.11)', NULL, '2021-12-06 00:51:20', NULL, '2021-12-06 00:51:20', b'0', 0);
-INSERT INTO `sys_user_session` VALUES ('fef1ea274b4f4d8b840cb583f45ea104', 1, 2, '2021-12-06 01:19:33', 'admin', '127.0.0.1', 'Apache-HttpClient/4.5.13 (Java/11.0.11)', NULL, '2021-12-06 00:49:33', NULL, '2021-12-06 00:49:33', b'0', 0);
 COMMIT;
 
 -- ----------------------------
@@ -1960,31 +1871,31 @@ COMMIT;
 -- ----------------------------
 DROP TABLE IF EXISTS `tool_codegen_column`;
 CREATE TABLE `tool_codegen_column` (
-                                       `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号',
-                                       `table_id` bigint NOT NULL COMMENT '表编号',
-                                       `column_name` varchar(200) NOT NULL COMMENT '字段名',
-                                       `column_type` varchar(100) NOT NULL COMMENT '字段类型',
-                                       `column_comment` varchar(500) NOT NULL COMMENT '字段描述',
-                                       `nullable` bit(1) NOT NULL COMMENT '是否允许为空',
-                                       `primary_key` bit(1) NOT NULL COMMENT '是否主键',
-                                       `auto_Increment` char(1) NOT NULL COMMENT '是否自增',
-                                       `ordinal_position` int NOT NULL COMMENT '排序',
-                                       `java_type` varchar(32) NOT NULL COMMENT 'Java 属性类型',
-                                       `java_field` varchar(64) NOT NULL COMMENT 'Java 属性名',
-                                       `dict_type` varchar(200) DEFAULT '' COMMENT '字典类型',
-                                       `example` varchar(64) DEFAULT NULL COMMENT '数据示例',
-                                       `create_operation` bit(1) NOT NULL COMMENT '是否为 Create 创建操作的字段',
-                                       `update_operation` bit(1) NOT NULL COMMENT '是否为 Update 更新操作的字段',
-                                       `list_operation` bit(1) NOT NULL COMMENT '是否为 List 查询操作的字段',
-                                       `list_operation_condition` varchar(32) NOT NULL DEFAULT '=' COMMENT 'List 查询操作的条件类型',
-                                       `list_operation_result` bit(1) NOT NULL COMMENT '是否为 List 查询操作的返回字段',
-                                       `html_type` varchar(32) NOT NULL COMMENT '显示类型',
-                                       `creator` varchar(64) DEFAULT '' COMMENT '创建者',
-                                       `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-                                       `updater` varchar(64) DEFAULT '' COMMENT '更新者',
-                                       `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-                                       `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
-                                       PRIMARY KEY (`id`) USING BTREE
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号',
+  `table_id` bigint NOT NULL COMMENT '表编号',
+  `column_name` varchar(200) COLLATE utf8mb4_general_ci NOT NULL COMMENT '字段名',
+  `column_type` varchar(100) COLLATE utf8mb4_general_ci NOT NULL COMMENT '字段类型',
+  `column_comment` varchar(500) COLLATE utf8mb4_general_ci NOT NULL COMMENT '字段描述',
+  `nullable` bit(1) NOT NULL COMMENT '是否允许为空',
+  `primary_key` bit(1) NOT NULL COMMENT '是否主键',
+  `auto_Increment` char(1) COLLATE utf8mb4_general_ci NOT NULL COMMENT '是否自增',
+  `ordinal_position` int NOT NULL COMMENT '排序',
+  `java_type` varchar(32) COLLATE utf8mb4_general_ci NOT NULL COMMENT 'Java 属性类型',
+  `java_field` varchar(64) COLLATE utf8mb4_general_ci NOT NULL COMMENT 'Java 属性名',
+  `dict_type` varchar(200) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '字典类型',
+  `example` varchar(64) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '数据示例',
+  `create_operation` bit(1) NOT NULL COMMENT '是否为 Create 创建操作的字段',
+  `update_operation` bit(1) NOT NULL COMMENT '是否为 Update 更新操作的字段',
+  `list_operation` bit(1) NOT NULL COMMENT '是否为 List 查询操作的字段',
+  `list_operation_condition` varchar(32) COLLATE utf8mb4_general_ci NOT NULL DEFAULT '=' COMMENT 'List 查询操作的条件类型',
+  `list_operation_result` bit(1) NOT NULL COMMENT '是否为 List 查询操作的返回字段',
+  `html_type` varchar(32) COLLATE utf8mb4_general_ci NOT NULL COMMENT '显示类型',
+  `creator` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=479 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='代码生成表字段定义';
 
 -- ----------------------------
@@ -2210,24 +2121,24 @@ COMMIT;
 -- ----------------------------
 DROP TABLE IF EXISTS `tool_codegen_table`;
 CREATE TABLE `tool_codegen_table` (
-                                      `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号',
-                                      `import_type` tinyint NOT NULL DEFAULT '1' COMMENT '导入类型',
-                                      `table_name` varchar(200) NOT NULL DEFAULT '' COMMENT '表名称',
-                                      `table_comment` varchar(500) NOT NULL DEFAULT '' COMMENT '表描述',
-                                      `remark` varchar(500) DEFAULT NULL COMMENT '备注',
-                                      `module_name` varchar(30) NOT NULL COMMENT '模块名',
-                                      `business_name` varchar(30) NOT NULL COMMENT '业务名',
-                                      `class_name` varchar(100) NOT NULL DEFAULT '' COMMENT '类名称',
-                                      `class_comment` varchar(50) NOT NULL COMMENT '类描述',
-                                      `author` varchar(50) NOT NULL COMMENT '作者',
-                                      `template_type` tinyint NOT NULL DEFAULT '1' COMMENT '模板类型',
-                                      `parent_menu_id` bigint DEFAULT NULL COMMENT '父菜单编号',
-                                      `creator` varchar(64) DEFAULT '' COMMENT '创建者',
-                                      `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-                                      `updater` varchar(64) DEFAULT '' COMMENT '更新者',
-                                      `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-                                      `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
-                                      PRIMARY KEY (`id`) USING BTREE
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号',
+  `import_type` tinyint NOT NULL DEFAULT '1' COMMENT '导入类型',
+  `table_name` varchar(200) COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '表名称',
+  `table_comment` varchar(500) COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '表描述',
+  `remark` varchar(500) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '备注',
+  `module_name` varchar(30) COLLATE utf8mb4_general_ci NOT NULL COMMENT '模块名',
+  `business_name` varchar(30) COLLATE utf8mb4_general_ci NOT NULL COMMENT '业务名',
+  `class_name` varchar(100) COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '类名称',
+  `class_comment` varchar(50) COLLATE utf8mb4_general_ci NOT NULL COMMENT '类描述',
+  `author` varchar(50) COLLATE utf8mb4_general_ci NOT NULL COMMENT '作者',
+  `template_type` tinyint NOT NULL DEFAULT '1' COMMENT '模板类型',
+  `parent_menu_id` bigint DEFAULT NULL COMMENT '父菜单编号',
+  `creator` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=40 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='代码生成表定义';
 
 -- ----------------------------
@@ -2256,18 +2167,18 @@ COMMIT;
 -- ----------------------------
 DROP TABLE IF EXISTS `tool_test_demo`;
 CREATE TABLE `tool_test_demo` (
-                                  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号',
-                                  `name` varchar(100) NOT NULL DEFAULT '' COMMENT '名字',
-                                  `status` tinyint NOT NULL DEFAULT '0' COMMENT '状态',
-                                  `type` tinyint NOT NULL COMMENT '类型',
-                                  `category` tinyint NOT NULL COMMENT '分类',
-                                  `remark` varchar(500) DEFAULT NULL COMMENT '备注',
-                                  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
-                                  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-                                  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
-                                  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-                                  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
-                                  PRIMARY KEY (`id`) USING BTREE
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号',
+  `name` varchar(100) COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '名字',
+  `status` tinyint NOT NULL DEFAULT '0' COMMENT '状态',
+  `type` tinyint NOT NULL COMMENT '类型',
+  `category` tinyint NOT NULL COMMENT '分类',
+  `remark` varchar(500) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '备注',
+  `creator` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=108 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='字典类型表';
 
 -- ----------------------------
