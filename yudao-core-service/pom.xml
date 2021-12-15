@@ -101,12 +101,6 @@
             <artifactId>guava</artifactId>
         </dependency>
 
-        <!-- 三方云服务相关 -->
-        <dependency>
-            <groupId>com.xkcoding.justauth</groupId>
-            <artifactId>justauth-spring-boot-starter</artifactId>
-        </dependency>
-
     </dependencies>
 
 </project>

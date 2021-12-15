@@ -8,3 +8,4 @@ DELETE FROM "sys_user_session";
 DELETE FROM "sys_dict_data";
 DELETE FROM "sys_sms_template";
 DELETE FROM "sys_sms_log";
+DELETE FROM "sys_social_user";

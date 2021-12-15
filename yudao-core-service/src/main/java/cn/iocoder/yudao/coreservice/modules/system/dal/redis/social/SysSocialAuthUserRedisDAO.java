@@ -10,9 +10,8 @@ import javax.annotation.Resource;
 
 import static cn.iocoder.yudao.coreservice.modules.system.dal.redis.SysRedisKeyCoreConstants.SOCIAL_AUTH_USER;
 
-// TODO @timfruit，这里的 AuthUser 还是保留全路径，主要想体现出来，不是自己定义的
 /**
- * 社交 {@link AuthUser} 的 RedisDAO
+ * 社交 {@link me.zhyd.oauth.model.AuthUser} 的 RedisDAO
  *
  * @author 芋道源码
  */
