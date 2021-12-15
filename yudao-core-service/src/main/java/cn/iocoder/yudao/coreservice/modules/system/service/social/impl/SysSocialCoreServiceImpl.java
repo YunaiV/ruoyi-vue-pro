@@ -2,10 +2,10 @@ package cn.iocoder.yudao.coreservice.modules.system.service.social.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.social.SysSocialUserDO;
-import cn.iocoder.yudao.coreservice.modules.system.dal.mysql.social.SysSocialUserMapper;
+import cn.iocoder.yudao.coreservice.modules.system.dal.mysql.social.SysSocialUserCoreMapper;
 import cn.iocoder.yudao.coreservice.modules.system.dal.redis.social.SysSocialAuthUserRedisDAO;
 import cn.iocoder.yudao.coreservice.modules.system.enums.social.SysSocialTypeEnum;
-import cn.iocoder.yudao.coreservice.modules.system.service.social.SysSocialService;
+import cn.iocoder.yudao.coreservice.modules.system.service.social.SysSocialCoreService;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.http.HttpUtils;
@@ -38,7 +38,7 @@ import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString
 @Service
 @Validated
 @Slf4j
-public class SysSocialServiceImpl implements SysSocialService {
+public class SysSocialCoreServiceImpl implements SysSocialCoreService {
 
     @Resource
     private AuthRequestFactory authRequestFactory;
@@ -47,7 +47,7 @@ public class SysSocialServiceImpl implements SysSocialService {
     private SysSocialAuthUserRedisDAO authSocialUserRedisDAO;
 
     @Resource
-    private SysSocialUserMapper socialUserMapper;
+    private SysSocialUserCoreMapper socialUserMapper;
 
     @Override
     public String getAuthorizeUrl(Integer type, String redirectUri) {

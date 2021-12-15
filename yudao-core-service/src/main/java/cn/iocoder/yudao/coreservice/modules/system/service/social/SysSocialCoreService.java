@@ -15,8 +15,7 @@ import java.util.List;
  *
  * @author 芋道源码
  */
-// TODO @timfruit：SysSocialCoreService 改名，方便区分
-public interface SysSocialService {
+public interface SysSocialCoreService {
 
     /**
      * 获得社交平台的授权 URL
@@ -50,6 +49,7 @@ public interface SysSocialService {
      * @param type 社交平台的类型 {@link SysSocialTypeEnum}
      * @param unionId 社交平台的 unionId
      * @return 社交用户列表
+     * @param userTypeEnum 全局用户类型
      */
     List<SysSocialUserDO> getAllSocialUserList(Integer type, String unionId, UserTypeEnum userTypeEnum);
 
@@ -58,6 +58,7 @@ public interface SysSocialService {
      *
      * @param userId 用户编号
      * @return 社交用户列表
+     * @param userTypeEnum 全局用户类型
      */
     List<SysSocialUserDO> getSocialUserList(Long userId, UserTypeEnum userTypeEnum);
 
@@ -67,6 +68,7 @@ public interface SysSocialService {
      * @param userId 用户编号
      * @param type 社交平台的类型 {@link SysSocialTypeEnum}
      * @param authUser 授权用户
+     * @param userTypeEnum 全局用户类型
      */
     void bindSocialUser(Long userId, Integer type, AuthUser authUser, UserTypeEnum userTypeEnum);
 
@@ -76,8 +78,8 @@ public interface SysSocialService {
      * @param userId 用户编号
      * @param type 社交平台的类型 {@link SysSocialTypeEnum}
      * @param unionId 社交平台的 unionId
+     * @param userTypeEnum 全局用户类型
      */
-    void unbindSocialUser(Long userId, Integer type, String unionId,UserTypeEnum userTypeEnum);
-    // TODO @timfruit：逗号后面要有空格；缺少了 @userTypeEnum 的注释，都补充下哈。
+    void unbindSocialUser(Long userId, Integer type, String unionId, UserTypeEnum userTypeEnum);
 
 }

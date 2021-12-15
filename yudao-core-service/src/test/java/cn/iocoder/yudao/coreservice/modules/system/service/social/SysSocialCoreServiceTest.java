@@ -1,11 +1,11 @@
-package cn.iocoder.yudao.adminserver.modules.system.service.social;
+package cn.iocoder.yudao.coreservice.modules.system.service.social;
 
-import cn.iocoder.yudao.adminserver.BaseDbAndRedisUnitTest;
+import cn.iocoder.yudao.coreservice.BaseDbAndRedisUnitTest;
 import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.social.SysSocialUserDO;
-import cn.iocoder.yudao.coreservice.modules.system.dal.mysql.social.SysSocialUserMapper;
+import cn.iocoder.yudao.coreservice.modules.system.dal.mysql.social.SysSocialUserCoreMapper;
 import cn.iocoder.yudao.coreservice.modules.system.dal.redis.social.SysSocialAuthUserRedisDAO;
 import cn.iocoder.yudao.coreservice.modules.system.enums.social.SysSocialTypeEnum;
-import cn.iocoder.yudao.coreservice.modules.system.service.social.impl.SysSocialServiceImpl;
+import cn.iocoder.yudao.coreservice.modules.system.service.social.impl.SysSocialCoreServiceImpl;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import com.xkcoding.justauth.AuthRequestFactory;
 import me.zhyd.oauth.model.AuthUser;
@@ -23,20 +23,19 @@ import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomLongId
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-// TODO @timfruit：这个单元测试，挪到 yudao-core-service
 /**
- * {@link SysSocialServiceImpl} 的单元测试类
+ * {@link SysSocialCoreServiceImpl} 的单元测试类
  *
  * @author 芋道源码
  */
-@Import({SysSocialServiceImpl.class, SysSocialAuthUserRedisDAO.class})
-public class SysSocialServiceTest extends BaseDbAndRedisUnitTest {
+@Import({SysSocialCoreServiceImpl.class, SysSocialAuthUserRedisDAO.class})
+public class SysSocialCoreServiceTest extends BaseDbAndRedisUnitTest {
 
     @Resource
-    private SysSocialServiceImpl socialService;
+    private SysSocialCoreServiceImpl socialService;
 
     @Resource
-    private SysSocialUserMapper socialUserMapper;
+    private SysSocialUserCoreMapper socialUserMapper;
 
     @MockBean
     private AuthRequestFactory authRequestFactory;

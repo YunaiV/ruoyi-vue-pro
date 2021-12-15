@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.userserver.modules.system.controller.auth;
 
-import cn.iocoder.yudao.coreservice.modules.system.service.social.SysSocialService;
+import cn.iocoder.yudao.coreservice.modules.system.service.social.SysSocialCoreService;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
@@ -38,7 +38,7 @@ public class SysAuthController {
     @Resource
     private SysSmsCodeService smsCodeService;
     @Resource
-    private SysSocialService socialService;
+    private SysSocialCoreService socialService;
 
     @PostMapping("/login")
     @ApiOperation("使用手机 + 密码登录")
@@ -115,19 +115,6 @@ public class SysAuthController {
         return CommonResult.success(socialService.getAuthorizeUrl(type, redirectUri));
     }
 
-    // TODO @timfruit：这个接口，是要删除的么？
-    @GetMapping("/social-login-get")
-    @ApiOperation("微信公众号授权回调地址，输出social-login2的必要参数用于测试，使用 code 授权码")
-    @ResponseBody
-    @Deprecated
-    public CommonResult<MbrAuthSocialLoginReqVO> socialLoginGet(HttpServletRequest request,String code,String state) {
-        // 返回结果
-        MbrAuthSocialLoginReqVO reqVO = MbrAuthSocialLoginReqVO.builder().state(state).code(code).build();
-        reqVO.setType(12);
-        //输出social-login2的必要参数用于测试
-        System.out.println(JSON.toJSON(reqVO));
-        return success(reqVO);
-    }
 
     @PostMapping("/social-login")
     @ApiOperation("社交登录，使用 code 授权码")
@@ -136,10 +123,9 @@ public class SysAuthController {
         return success(SysAuthLoginRespVO.builder().token(token).build());
     }
 
-    // TODO @timfruit：社交登陆时，使用手机验证码来验证哈。这块我当时没设计好，改改，嘿嘿。
 
     @PostMapping("/social-login2")
-    @ApiOperation("社交登录，使用 code 授权码 + 账号密码")
+    @ApiOperation("社交登录，使用 手机号 + 手机验证码")
     public CommonResult<SysAuthLoginRespVO> socialLogin2(@RequestBody @Valid MbrAuthSocialLogin2ReqVO reqVO) {
         String token = authService.socialLogin2(reqVO, getClientIP(), getUserAgent());
         return success(SysAuthLoginRespVO.builder().token(token).build());
