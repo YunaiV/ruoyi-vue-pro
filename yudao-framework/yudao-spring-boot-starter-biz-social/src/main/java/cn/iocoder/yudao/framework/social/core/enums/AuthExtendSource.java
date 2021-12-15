@@ -3,16 +3,19 @@ package cn.iocoder.yudao.framework.social.core.enums;
 import me.zhyd.oauth.config.AuthSource;
 
 /**
- * 拓展JustAuth各api需要的url， 用枚举类分平台类型管理<br>
+ * 拓展JustAuth各api需要的url， 用枚举类分平台类型管理
  *
- * 默认配置{@link me.zhyd.oauth.config.AuthDefaultSource}
+ * 默认配置 {@link me.zhyd.oauth.config.AuthDefaultSource}
+ *
+ * @author timfruit
  */
 public enum AuthExtendSource implements AuthSource {
 
     /**
      * 微信小程序授权登录
      */
-    WECHAT_MINI_PROGRAM{
+    WECHAT_MINI_PROGRAM {
+
         @Override
         public String authorize() {
             // https://developers.weixin.qq.com/miniprogram/dev/framework/open-ability/login.html
