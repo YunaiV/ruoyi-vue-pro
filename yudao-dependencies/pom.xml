@@ -115,6 +115,11 @@
                 <artifactId>yudao-spring-boot-starter-biz-data-permission</artifactId>
                 <version>${revision}</version>
             </dependency>
+            <dependency>
+                <groupId>cn.iocoder.boot</groupId>
+                <artifactId>yudao-spring-boot-starter-biz-social</artifactId>
+                <version>${revision}</version>
+            </dependency>
 
             <!-- Spring 核心 -->
             <dependency>
@@ -466,8 +471,6 @@
                 <artifactId>justauth-spring-boot-starter</artifactId> <!-- 社交登陆（例如说，个人微信、企业微信等等） -->
                 <version>${justauth.version}</version>
             </dependency>
-
-
 
             <!-- activiti begin -->
             <dependency>
