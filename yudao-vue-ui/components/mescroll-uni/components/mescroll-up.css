@@ -1,0 +1,47 @@
+/* 上拉加载区域 */
+.mescroll-upwarp {
+	box-sizing: border-box;
+	min-height: 110rpx;
+	padding: 30rpx 0;
+	text-align: center;
+	clear: both;
+}
+
+/*提示文本 */
+.mescroll-upwarp .upwarp-tip,
+.mescroll-upwarp .upwarp-nodata {
+	display: inline-block;
+	font-size: 28rpx;
+	vertical-align: middle;
+	/* color: gray; 已在style设置color,此处删去*/
+}
+
+.mescroll-upwarp .upwarp-tip {
+	margin-left: 16rpx;
+}
+
+/*旋转进度条 */
+.mescroll-upwarp .upwarp-progress {
+	display: inline-block;
+	width: 32rpx;
+	height: 32rpx;
+	border-radius: 50%;
+	border: 2rpx solid gray;
+	border-bottom-color: transparent !important; /*已在style设置border-color,此处需加 !important*/
+	vertical-align: middle;
+}
+
+/* 旋转动画 */
+.mescroll-upwarp .mescroll-rotate {
+	animation: mescrollUpRotate 0.6s linear infinite;
+}
+
+@keyframes mescrollUpRotate {
+	0% {
+		transform: rotate(0deg);
+	}
+
+	100% {
+		transform: rotate(360deg);
+	}
+}

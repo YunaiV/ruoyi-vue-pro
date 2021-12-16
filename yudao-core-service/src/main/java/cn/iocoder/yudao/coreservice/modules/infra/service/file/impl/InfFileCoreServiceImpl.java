@@ -58,7 +58,7 @@ public class InfFileCoreServiceImpl implements InfFileCoreService {
 
     @Override
     public InfFileDO getFile(String path) {
-        return fileMapper.selectById(path);
+        return fileMapper.selectByPath(path);
     }
 
 }

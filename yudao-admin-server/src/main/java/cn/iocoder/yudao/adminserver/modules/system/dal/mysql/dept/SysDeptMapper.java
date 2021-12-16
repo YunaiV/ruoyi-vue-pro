@@ -24,7 +24,7 @@ public interface SysDeptMapper extends BaseMapperX<SysDeptDO> {
     }
 
     default Integer selectCountByParentId(Long parentId) {
-        return selectCount(new QueryWrapper<SysDeptDO>().eq("parent_id", parentId));
+        return selectCount("parent_id", parentId);
     }
 
     default boolean selectExistsByUpdateTimeAfter(Date maxUpdateTime) {

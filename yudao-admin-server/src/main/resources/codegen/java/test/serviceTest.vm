@@ -10,7 +10,6 @@ import ${basePackage}.modules.${table.moduleName}.service.${table.businessName}.
 import ${basePackage}.modules.${table.moduleName}.controller.${table.businessName}.vo.*;
 import ${basePackage}.modules.${table.moduleName}.dal.dataobject.${table.businessName}.${table.className}DO;
 import ${basePackage}.modules.${table.moduleName}.dal.mysql.${table.businessName}.${table.className}Mapper;
-import ${basePackage}.util.object.ObjectUtils;
 import ${PageResultClassName};
 
 import javax.annotation.Resource;
@@ -19,9 +18,10 @@ import java.util.*;
 
 import static cn.hutool.core.util.RandomUtil.*;
 import static ${basePackage}.modules.${table.moduleName}.enums.${simpleModuleName_upperFirst}ErrorCodeConstants.*;
-import static ${basePackage}.util.AssertUtils.*;
-import static ${basePackage}.util.RandomUtils.*;
-import static ${basePackage}.util.date.DateUtils.*;
+import static ${baseFrameworkPackage}.test.core.util.AssertUtils.*;
+import static ${baseFrameworkPackage}.test.core.util.RandomUtils.*;
+import static ${ObjectUtilsClassName}.*;
+import static ${DateUtilsClassName}.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -41,7 +41,7 @@ import static org.mockito.Mockito.*;
        #if (${column.listOperation})
        #set ($JavaField = $column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})##首字母大写
        // 测试 ${column.javaField} 不匹配
-       ${classNameVar}Mapper.insert(ObjectUtils.clone(db${simpleClassName}, o -> o.set$JavaField(null)));
+       ${classNameVar}Mapper.insert(cloneIgnoreId(db${simpleClassName}, o -> o.set$JavaField(null)));
        #end
        #end
        // 准备参数

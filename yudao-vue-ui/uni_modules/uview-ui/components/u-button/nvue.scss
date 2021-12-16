@@ -1,0 +1,46 @@
+$u-button-active-opacity:0.75 !default;
+$u-button-loading-text-margin-left:4px !default;
+$u-button-text-color: #FFFFFF !default;
+$u-button-text-plain-error-color:$u-error !default;
+$u-button-text-plain-warning-color:$u-warning !default;
+$u-button-text-plain-success-color:$u-success !default;
+$u-button-text-plain-info-color:$u-info !default;
+$u-button-text-plain-primary-color:$u-primary !default;
+.u-button {
+	&--active {
+		opacity: $u-button-active-opacity;
+	}
+	
+	&--active--plain {
+		background-color: rgb(217, 217, 217);
+	}
+	
+	&__loading-text {
+		margin-left:$u-button-loading-text-margin-left;
+	}
+	
+	&__text,
+	&__loading-text {
+		color:$u-button-text-color;
+	}
+	
+	&__text--plain--error {
+		color:$u-button-text-plain-error-color;
+	}
+	
+	&__text--plain--warning {
+		color:$u-button-text-plain-warning-color;
+	}
+	
+	&__text--plain--success{
+		color:$u-button-text-plain-success-color;
+	}
+	
+	&__text--plain--info {
+		color:$u-button-text-plain-info-color;
+	}
+	
+	&__text--plain--primary {
+		color:$u-button-text-plain-primary-color;
+	}
+}

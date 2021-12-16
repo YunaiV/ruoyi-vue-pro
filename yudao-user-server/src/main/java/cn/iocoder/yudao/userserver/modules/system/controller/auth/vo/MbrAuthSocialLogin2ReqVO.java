@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.userserver.modules.system.controller.auth.vo;
 
+import cn.iocoder.yudao.coreservice.modules.system.enums.social.SysSocialTypeEnum;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
-import cn.iocoder.yudao.userserver.modules.member.enums.social.SysSocialTypeEnum;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -34,15 +34,16 @@ public class MbrAuthSocialLogin2ReqVO {
     @NotEmpty(message = "state 不能为空")
     private String state;
 
-    @ApiModelProperty(value = "账号", required = true, example = "yudaoyuanma")
-    @NotEmpty(message = "登录账号不能为空")
-    @Length(min = 4, max = 16, message = "账号长度为 4-16 位")
-    @Pattern(regexp = "^[A-Za-z0-9]+$", message = "账号格式为数字以及字母")
-    private String username;
+    @ApiModelProperty(value = "手机号", required = true, example = "15119100000")
+    @NotEmpty(message = "手机号不能为空")
+    @Length(min = 11, max = 11, message = "手机号是11位数字")
+    private String mobile;
 
-    @ApiModelProperty(value = "密码", required = true, example = "buzhidao")
-    @NotEmpty(message = "密码不能为空")
-    @Length(min = 4, max = 16, message = "密码长度为 4-16 位")
-    private String password;
+    @ApiModelProperty(value = "手机验证码", required = true, example = "1024")
+    @NotEmpty(message = "手机验证码不能为空")
+    @Length(min = 4, max = 6, message = "手机验证码长度为 4-6 位")
+    @Pattern(regexp = "^[0-9]+$", message = "手机验证码必须都是数字")
+    private String smsCode;
+
 
 }

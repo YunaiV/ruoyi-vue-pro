@@ -1,8 +1,7 @@
 package cn.iocoder.yudao.adminserver.modules.system.mq.producer.permission;
 
-import cn.iocoder.yudao.framework.mq.core.util.RedisMessageUtils;
 import cn.iocoder.yudao.adminserver.modules.system.mq.message.permission.SysRoleMenuRefreshMessage;
-import org.springframework.data.redis.core.StringRedisTemplate;
+import cn.iocoder.yudao.framework.mq.core.RedisMQTemplate;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -14,14 +13,14 @@ import javax.annotation.Resource;
 public class SysPermissionProducer {
 
     @Resource
-    private StringRedisTemplate stringRedisTemplate;
+    private RedisMQTemplate redisMQTemplate;
 
     /**
      * 发送 {@link SysRoleMenuRefreshMessage} 消息
      */
     public void sendRoleMenuRefreshMessage() {
         SysRoleMenuRefreshMessage message = new SysRoleMenuRefreshMessage();
-        RedisMessageUtils.sendChannelMessage(stringRedisTemplate, message);
+        redisMQTemplate.send(message);
     }
 
 }

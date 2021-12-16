@@ -169,9 +169,12 @@ public class SysDeptServiceImpl implements SysDeptService {
 
     @Override
     public List<SysDeptDO> getDeptsByParentIdFromCache(Long parentId, boolean recursive) {
-        List<SysDeptDO> result = new ArrayList<>();
+        if (parentId == null) {
+            return Collections.emptyList();
+        }
+        List<SysDeptDO> result = new ArrayList<>(); // TODO 芋艿：待优化，新增缓存，避免每次遍历的计算
         // 递归，简单粗暴
-        this.listDeptsByParentIdFromCache(result, parentId,
+        this.getDeptsByParentIdFromCache(result, parentId,
                 recursive ? Integer.MAX_VALUE : 1, // 如果递归获取，则无限；否则，只递归 1 次
                 parentDeptCache);
         return result;
@@ -185,8 +188,8 @@ public class SysDeptServiceImpl implements SysDeptService {
      * @param recursiveCount 递归次数
      * @param parentDeptMap 父部门 Map，使用缓存，避免变化
      */
-    private void listDeptsByParentIdFromCache(List<SysDeptDO> result, Long parentId, int recursiveCount,
-                                              Multimap<Long, SysDeptDO> parentDeptMap) {
+    private void getDeptsByParentIdFromCache(List<SysDeptDO> result, Long parentId, int recursiveCount,
+                                             Multimap<Long, SysDeptDO> parentDeptMap) {
         // 递归次数为 0，结束！
         if (recursiveCount == 0) {
             return;
@@ -198,7 +201,7 @@ public class SysDeptServiceImpl implements SysDeptService {
         }
         result.addAll(depts);
         // 继续递归
-        depts.forEach(dept -> listDeptsByParentIdFromCache(result, dept.getId(),
+        depts.forEach(dept -> getDeptsByParentIdFromCache(result, dept.getId(),
                 recursiveCount - 1, parentDeptMap));
     }
 
@@ -263,12 +266,5 @@ public class SysDeptServiceImpl implements SysDeptService {
             throw ServiceExceptionUtil.exception(DEPT_NAME_DUPLICATE);
         }
     }
-
-//    @Override
-//    @DataScope(deptAlias = "d")
-//    public List<SysDept> selectDeptList(SysDept dept)
-//    {
-//        return deptMapper.selectDeptList(dept);
-//    }
 
 }

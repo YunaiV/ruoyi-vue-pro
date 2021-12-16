@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.coreservice.modules.infra.dal.dataobject.file;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.framework.tenant.core.db.TenantBaseDO;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -21,7 +22,7 @@ import java.io.InputStream;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class InfFileDO extends BaseDO {
+public class InfFileDO extends TenantBaseDO {
 
     /**
      * 文件路径

@@ -122,6 +122,17 @@
             <artifactId>jakarta.validation-api</artifactId>
             <scope>provided</scope> <!-- 设置为 provided，主要是 PageParam 使用到 -->
         </dependency>
+
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-all</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>transmittable-thread-local</artifactId>
+        </dependency>
+
     </dependencies>
 
 </project>

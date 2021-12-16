@@ -1,0 +1,204 @@
+/**
+ * 监听页面内值的变化,主要用于动态开关swipe-action
+ * @param {Object} newValue
+ * @param {Object} oldValue
+ * @param {Object} ownerInstance
+ * @param {Object} instance
+ */
+function sizeReady(newValue, oldValue, ownerInstance, instance) {
+	var state = instance.getState()
+	state.position = JSON.parse(newValue)
+	if (!state.position || state.position.length === 0) return
+	var show = state.position[0].show
+	state.left = state.left || state.position[0].left;
+	// 通过用户变量,开启或关闭
+	if (show) {
+		openState(true, instance, ownerInstance)
+	} else {
+		openState(false, instance, ownerInstance)
+	}
+}
+
+/**
+ * 开始触摸操作
+ * @param {Object} e
+ * @param {Object} ins
+ */
+function touchstart(e, ins) {
+	var instance = e.instance;
+	var state = instance.getState();
+	var pageX = e.touches[0].pageX;
+	// 开始触摸时移除动画类
+	instance.removeClass('ani');
+	var owner = ins.selectAllComponents('.button-hock')
+	for (var i = 0; i < owner.length; i++) {
+		owner[i].removeClass('ani');
+	}
+	// state.position = JSON.parse(instance.getDataset().position);
+	state.left = state.left || state.position[0].left;
+	// 获取最终按钮组的宽度
+	state.width = pageX - state.left;
+	ins.callMethod('closeSwipe')
+}
+
+/**
+ * 开始滑动操作
+ * @param {Object} e
+ * @param {Object} ownerInstance
+ */
+function touchmove(e, ownerInstance) {
+	var instance = e.instance;
+	var disabled = instance.getDataset().disabled
+	var state = instance.getState()
+	// fix by mehaotian, TODO 兼容 app-vue 获取dataset为字符串 , h5 获取 为 undefined 的问题,待框架修复
+	disabled = (typeof(disabled) === 'string' ? JSON.parse(disabled) : disabled) || false;
+
+	if (disabled) return
+	var pageX = e.touches[0].pageX;
+	move(pageX - state.width, instance, ownerInstance)
+}
+
+/**
+ * 结束触摸操作
+ * @param {Object} e
+ * @param {Object} ownerInstance
+ */
+function touchend(e, ownerInstance) {
+	var instance = e.instance;
+	var disabled = instance.getDataset().disabled
+	var state = instance.getState()
+
+	// fix by mehaotian, TODO 兼容 app-vue 获取dataset为字符串 , h5 获取 为 undefined 的问题,待框架修复
+	disabled = (typeof(disabled) === 'string' ? JSON.parse(disabled) : disabled) || false;
+
+	if (disabled) return
+	// 滑动过程中触摸结束,通过阙值判断是开启还是关闭
+	// fixed by mehaotian 定时器解决点击按钮，touchend 触发比 click 事件时机早的问题 ，主要是 ios13
+	moveDirection(state.left, -40, instance, ownerInstance)
+}
+
+/**
+ * 设置移动距离
+ * @param {Object} value
+ * @param {Object} instance
+ * @param {Object} ownerInstance
+ */
+function move(value, instance, ownerInstance) {
+	var state = instance.getState()
+	// 获取可滑动范围
+	var x = Math.max(-state.position[1].width, Math.min((value), 0));
+	state.left = x;
+	instance.setStyle({
+		transform: 'translateX(' + x + 'px)',
+		'-webkit-transform': 'translateX(' + x + 'px)'
+	})
+	// 折叠按钮动画
+	buttonFold(x, instance, ownerInstance)
+}
+
+/**
+ * 移动方向判断
+ * @param {Object} left
+ * @param {Object} value
+ * @param {Object} ownerInstance
+ * @param {Object} ins
+ */
+function moveDirection(left, value, ins, ownerInstance) {
+	var state = ins.getState()
+	var position = state.position
+	var isopen = state.isopen
+	if (!position[1].width) {
+		openState(false, ins, ownerInstance)
+		return
+	}
+	// 如果已经是打开状态,进行判断是否关闭,还是保留打开状态
+	if (isopen) {
+		if (-left <= position[1].width) {
+			openState(false, ins, ownerInstance)
+		} else {
+			openState(true, ins, ownerInstance)
+		}
+		return
+	}
+	// 如果是关闭状态,进行判断是否打开,还是保留关闭状态
+	if (left <= value) {
+		openState(true, ins, ownerInstance)
+	} else {
+		openState(false, ins, ownerInstance)
+	}
+}
+
+/**
+ * 设置按钮移动距离
+ * @param {Object} value
+ * @param {Object} instance
+ * @param {Object} ownerInstance
+ */
+function buttonFold(value, instance, ownerInstance) {
+	var ins = ownerInstance.selectAllComponents('.button-hock');
+	var state = instance.getState();
+	var position = state.position;
+	var arr = [];
+	var w = 0;
+	for (var i = 0; i < ins.length; i++) {
+		if (!ins[i].getDataset().button) return
+		var btnData = JSON.parse(ins[i].getDataset().button)
+
+		// fix by mehaotian TODO 在 app-vue 中,字符串转对象,需要转两次,这里先这么兼容
+		if (typeof(btnData) === 'string') {
+			btnData = JSON.parse(btnData)
+		}
+
+		var button = btnData[i] && btnData[i].width || 0
+		w += button
+		arr.push(-w)
+		// 动态计算按钮组每个按钮的折叠动画移动距离
+		var distance = arr[i - 1] + value * (arr[i - 1] / position[1].width)
+		if (i != 0) {
+			ins[i].setStyle({
+				transform: 'translateX(' + distance + 'px)',
+			})
+		}
+	}
+}
+
+/**
+ * 开启状态
+ * @param {Boolean} type
+ * @param {Object} ins
+ * @param {Object} ownerInstance
+ */
+function openState(type, ins, ownerInstance) {
+	var state = ins.getState()
+	var position = state.position
+	if (state.isopen === undefined) {
+		state.isopen = false
+	}
+	// 只有状态有改变才会通知页面改变状态
+	if (state.isopen !== type) {
+		// 通知页面,已经打开
+		ownerInstance.callMethod('change', {
+			open: type
+		})
+	}
+	// 设置打开和移动状态
+	state.isopen = type
+
+
+	// 添加动画类
+	ins.addClass('ani');
+	var owner = ownerInstance.selectAllComponents('.button-hock')
+	for (var i = 0; i < owner.length; i++) {
+		owner[i].addClass('ani');
+	}
+	// 设置最终移动位置
+	move(type ? -position[1].width : 0, ins, ownerInstance)
+
+}
+
+module.exports = {
+	sizeReady: sizeReady,
+	touchstart: touchstart,
+	touchmove: touchmove,
+	touchend: touchend
+}

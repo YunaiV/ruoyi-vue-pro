@@ -8,10 +8,11 @@ import cn.iocoder.yudao.adminserver.modules.system.enums.permission.MenuTypeEnum
 import cn.iocoder.yudao.adminserver.modules.system.service.auth.SysAuthService;
 import cn.iocoder.yudao.adminserver.modules.system.service.permission.SysPermissionService;
 import cn.iocoder.yudao.adminserver.modules.system.service.permission.SysRoleService;
-import cn.iocoder.yudao.adminserver.modules.system.service.social.SysSocialService;
 import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.user.SysUserDO;
+import cn.iocoder.yudao.coreservice.modules.system.service.social.SysSocialCoreService;
 import cn.iocoder.yudao.coreservice.modules.system.service.user.SysUserCoreService;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.collection.SetUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
@@ -49,7 +50,7 @@ public class SysAuthController {
     @Resource
     private SysPermissionService permissionService;
     @Resource
-    private SysSocialService socialService;
+    private SysSocialCoreService socialCoreService;
 
     @PostMapping("/login")
     @ApiOperation("使用账号密码登录")
@@ -101,7 +102,7 @@ public class SysAuthController {
     })
     public CommonResult<String> socialAuthRedirect(@RequestParam("type") Integer type,
                                                     @RequestParam("redirectUri") String redirectUri) {
-        return CommonResult.success(socialService.getAuthorizeUrl(type, redirectUri));
+        return CommonResult.success(socialCoreService.getAuthorizeUrl(type, redirectUri));
     }
 
     @PostMapping("/social-login")
@@ -132,7 +133,7 @@ public class SysAuthController {
     @DeleteMapping("/social-unbind")
     @ApiOperation("取消社交绑定")
     public CommonResult<Boolean> socialUnbind(@RequestBody SysAuthSocialUnbindReqVO reqVO) {
-        socialService.unbindSocialUser(getLoginUserId(), reqVO.getType(), reqVO.getUnionId());
+        socialCoreService.unbindSocialUser(getLoginUserId(), reqVO.getType(), reqVO.getUnionId(), UserTypeEnum.ADMIN);
         return CommonResult.success(true);
     }
 

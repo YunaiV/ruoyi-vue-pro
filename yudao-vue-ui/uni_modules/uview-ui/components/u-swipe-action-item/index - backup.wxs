@@ -1,0 +1,256 @@
+/**
+ * 此为wxs模块，只支持APP-VUE，微信和QQ小程序以及H5平台
+ * wxs内部不支持es6语法，变量只能使用var定义，无法使用解构，箭头函数等特性
+ */
+
+// 开始触摸
+function touchstart(event, ownerInstance) {
+	// 触发事件的组件的ComponentDescriptor实例
+	var instance = event.instance
+	// wxs内的局部变量快照，此快照是属于整个组件的，在touchstart和touchmove事件中都能获取到相同的结果
+	var state = instance.getState()
+	if (state.disable) return
+	var touches = event.touches
+	// 如果进行的是多指触控，不允许进行操作
+	if (touches && touches.length > 1) return
+	// 标识当前为滑动中状态
+	state.moving = true
+	// 记录触摸开始点的坐标值
+	state.startX = touches[0].pageX
+	state.startY = touches[0].pageY
+}
+
+// 触摸滑动
+function touchmove(event, ownerInstance) {
+	// 触发事件的组件的ComponentDescriptor实例
+	var instance = event.instance
+	// wxs内的局部变量快照
+	var state = instance.getState()
+	if (state.disabled || !state.moving) return
+
+	var touches = event.touches
+	var pageX = touches[0].pageX
+	var pageY = touches[0].pageY
+	var moveX = pageX - state.startX
+	var moveY = pageY - state.startY
+	var buttonsWidth = state.buttonsWidth
+
+	// 移动的X轴距离大于Y轴距离，也即终点与起点位置连线，与X轴夹角小于45度时，禁止页面滚动
+	if (Math.abs(moveX) > Math.abs(moveY) || Math.abs(moveX) > state.threshold) {
+		event.preventDefault()
+		event.stopPropagation()
+	}
+	// 如果移动的X轴距离小于Y轴距离，也即终点位置与起点位置连线，与Y轴夹角小于45度时，认为是页面上下滑动，而不是左右滑动单元格
+	if (Math.abs(moveX) < Math.abs(moveY)) return
+
+	// 限制右滑的距离，不允许内容部分往右偏移，右滑会导致X轴偏移值大于0，以此做判断
+	// 此处不能直接return，因为滑动过程中会缺失某些关键点坐标，会导致错乱，最好的办法就是
+	// 在超出后，设置为0
+	if (state.status === 'open') {
+		// 在开启状态下，向左滑动，需忽略
+		if (moveX < 0) moveX = 0
+		// 想要收起菜单，最大能移动的距离为按钮的总宽度
+		if (moveX > buttonsWidth) moveX = buttonsWidth
+		// 如果是已经打开了的状态，向左滑动时，移动收起菜单
+		moveSwipeAction(-buttonsWidth + moveX, instance, ownerInstance)
+	} else {
+		// 关闭状态下，右滑动需忽略
+		if (moveX > 0) moveX = 0
+		// 滑动的距离不允许超过所有按钮的总宽度，此时只能是左滑，最终设置按钮的总宽度，同时为负数
+		if (Math.abs(moveX) > buttonsWidth) moveX = -buttonsWidth
+		// 只要是在滑过程中，就不断移动菜单的内容部分，从而使隐藏的菜单显示出来
+		moveSwipeAction(moveX, instance, ownerInstance)
+	}
+}
+
+// 触摸结束
+function touchend(event, ownerInstance) {
+	// 触发事件的组件的ComponentDescriptor实例
+	var instance = event.instance
+	// wxs内的局部变量快照
+	var state = instance.getState()
+	if (!state.moving || state.disabled) return
+	var touches = event.changedTouches ? event.changedTouches[0] : {}
+	var pageX = touches.pageX
+	var pageY = touches.pageY
+	var moveX = pageX - state.startX
+	if (state.status === 'open') {
+		// 在展开的状态下，继续左滑，无需操作
+		if (moveX < 0) return
+		// 在开启状态下，点击一下内容区域，moveX为0，也即没有进行移动，这时执行收起菜单逻辑
+		if (moveX === 0) {
+			return closeSwipeAction(instance, ownerInstance)
+		}
+		// 在开启状态下，滑动距离小于阈值，则默认为不关闭，同时恢复原来的打开状态
+		if (Math.abs(moveX) < state.threshold) {
+			openSwipeAction(instance, ownerInstance)
+		} else {
+			// 如果滑动距离大于阈值，则执行收起逻辑
+			closeSwipeAction(instance, ownerInstance)
+		}
+	} else {
+		// 在关闭的状态下，右滑，无需操作
+		if (moveX > 0) return
+		// 理由同上
+		if (Math.abs(moveX) < state.threshold) {
+			closeSwipeAction(instance, ownerInstance)
+		} else {
+			openSwipeAction(instance, ownerInstance)
+		}
+	}
+}
+
+// 获取过渡时间
+function getDuration(value) {
+	if (value.toString().indexOf('s') >= 0) return value
+	return value > 30 ? value + 'ms' : value + 's'
+}
+
+// 滑动结束时判断滑动的方向
+function getMoveDirection(instance, ownerInstance) {
+	var state = instance.getState()
+}
+
+// 移动滑动选择器内容区域，同时显示出其隐藏的菜单
+function moveSwipeAction(moveX, instance, ownerInstance) {
+	var state = instance.getState()
+	// 获取所有按钮的实例，需要通过它去设置按钮的位移
+	var buttons = ownerInstance.selectAllComponents('.u-swipe-action-item__right__button')
+	var len = buttons.length
+	var previewButtonsMoveX = 0
+
+	// 设置菜单内容部分的偏移
+	instance.requestAnimationFrame(function() {
+		instance.setStyle({
+			// 设置translateX的值
+			'transition': 'none',
+			transform: 'translateX(' + moveX + 'px)',
+			'-webkit-transform': 'translateX(' + moveX + 'px)'
+		})
+		// 折叠按钮动画
+		for (var i = len - 1; i >= 0; i--) {
+			// 通过比例，得出元素自身该移动的距离
+			var translateX = state.buttons[i].width / state.buttonsWidth * moveX
+			// 最终移动的距离，是通过自身比例算出的距离，再加上在它之前所有按钮移动的距离之和
+			var realTranslateX = translateX + previewButtonsMoveX
+			buttons[i].setStyle({
+				// 在移动期间，不能使用过渡效果，否则会造成卡顿，本质原因是每次移动一点，就要花一定时间去过渡这个过程
+				'transition': 'none',
+				'transform': 'translateX(' + realTranslateX + 'px)',
+				'-webkit-transform': 'translateX(' + realTranslateX + 'px)'
+			})
+			// 记录本按钮之前的所有按钮的移动距离之和
+			previewButtonsMoveX += translateX
+		}
+	})
+}
+
+// 一次性展开滑动菜单
+function openSwipeAction(instance, ownerInstance) {
+	var state = instance.getState()
+	// 获取所有按钮的实例，需要通过它去设置按钮的位移
+	var buttons = ownerInstance.selectAllComponents('.u-swipe-action-item__right__button')
+	var len = buttons.length
+	// 处理duration单位问题
+	const duration = getDuration(state.duration)
+	// 展开过程中，是向左移动，所以X的偏移应该为负值
+	var buttonsWidth = -state.buttonsWidth
+	var previewButtonsMoveX = 0
+	instance.requestAnimationFrame(function() {
+		// 设置菜单主体内容
+		instance.setStyle({
+			'transition': 'transform ' + duration,
+			'transform': 'translateX(' + buttonsWidth + 'px)',
+			'-webkit-transform': 'translateX(' + buttonsWidth + 'px)',
+		})
+		// 设置各个隐藏的按钮为展开的状态
+		for (var i = len - 1; i >= 0; i--) {
+			// 通过比例，得出元素自身该移动的距离
+			var translateX = state.buttons[i].width / state.buttonsWidth * buttonsWidth
+			// 最终移动的距离，是通过自身比例算出的距离，再加上在它之前所有按钮移动的距离之和
+			var realTranslateX = translateX + previewButtonsMoveX
+			buttons[i].setStyle({
+				// 在移动期间，需要加上动画效果
+				'transition': 'transform ' + duration,
+				'transform': 'translateX(' + realTranslateX + 'px)',
+				'-webkit-transform': 'translateX(' + realTranslateX + 'px)'
+			})
+			// 记录本按钮之前的所有按钮的移动距离之和
+			previewButtonsMoveX += translateX
+		}
+	})
+	setStatus('open', instance)
+}
+
+// 标记菜单的当前状态，open-已经打开，close-已经关闭
+function setStatus(status, instance) {
+	var state = instance.getState()
+	state.status = status
+}
+
+// 一次性收起滑动菜单
+function closeSwipeAction(instance, ownerInstance) {
+	var state = instance.getState()
+	// 获取所有按钮的实例，需要通过它去设置按钮的位移
+	var buttons = ownerInstance.selectAllComponents('.u-swipe-action-item__right__button')
+	var len = buttons.length
+	// 处理duration单位问题
+	const duration = getDuration(state.duration)
+	instance.requestAnimationFrame(function() {
+		// 设置菜单主体内容
+		instance.setStyle({
+			'transition': 'transform ' + duration,
+			'transform': 'translateX(0px)',
+			'-webkit-transform': 'translateX(0px)'
+		})
+		// 设置各个隐藏的按钮为收起的状态
+		for (var i = len - 1; i >= 0; i--) {
+			buttons[i].setStyle({
+				'transition': 'transform ' + duration,
+				'transform': 'translateX(0px)',
+				'-webkit-transform': 'translateX(0px)'
+			})
+		}
+	})
+	setStatus('close', instance)
+}
+
+// show的状态发生变化
+function showChange(newValue, oldValue, ownerInstance, instance) {
+	var state = instance.getState()
+	if (state.disabled) return
+	// 打开或关闭单元格
+	if (newValue) {
+		openSwipeAction(instance, ownerInstance)
+	} else {
+		closeSwipeAction(instance, ownerInstance)
+	}
+}
+
+// 菜单尺寸发生变化
+function sizeChange(newValue, oldValue, ownerInstance, instance) {
+	// wxs内的局部变量快照
+	var state = instance.getState()
+	state.disabled = newValue.disabled
+	state.duration = newValue.duration
+	state.show = newValue.show
+	state.threshold = newValue.threshold
+	state.buttons = newValue.buttons
+
+	var len = state.buttons.length
+	if (len) {
+		var buttonsWidth = 0
+		var buttons = newValue.buttons
+		for (var i = 0; i < len; i++) {
+			buttonsWidth += buttons[i].width
+		}
+	}
+	state.buttonsWidth = buttonsWidth
+}
+
+module.exports = {
+	touchstart: touchstart,
+	touchmove: touchmove,
+	touchend: touchend,
+	sizeChange: sizeChange
+}

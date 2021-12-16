@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.adminserver.modules.system.controller.auth.vo.auth;
 
-import cn.iocoder.yudao.adminserver.modules.system.enums.social.SysSocialTypeEnum;
+import cn.iocoder.yudao.coreservice.modules.system.enums.social.SysSocialTypeEnum;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;

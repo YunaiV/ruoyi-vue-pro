@@ -169,11 +169,11 @@ public class SysSmsChannelServiceTest extends BaseDbUnitTest {
        });
        smsChannelMapper.insert(dbSmsChannel);
        // 测试 signature 不匹配
-       smsChannelMapper.insert(ObjectUtils.clone(dbSmsChannel, o -> o.setSignature("源码")));
+       smsChannelMapper.insert(ObjectUtils.cloneIgnoreId(dbSmsChannel, o -> o.setSignature("源码")));
        // 测试 status 不匹配
-       smsChannelMapper.insert(ObjectUtils.clone(dbSmsChannel, o -> o.setStatus(CommonStatusEnum.DISABLE.getStatus())));
+       smsChannelMapper.insert(ObjectUtils.cloneIgnoreId(dbSmsChannel, o -> o.setStatus(CommonStatusEnum.DISABLE.getStatus())));
        // 测试 createTime 不匹配
-       smsChannelMapper.insert(ObjectUtils.clone(dbSmsChannel, o -> o.setCreateTime(buildTime(2020, 11, 11))));
+       smsChannelMapper.insert(ObjectUtils.cloneIgnoreId(dbSmsChannel, o -> o.setCreateTime(buildTime(2020, 11, 11))));
        // 准备参数
        SysSmsChannelPageReqVO reqVO = new SysSmsChannelPageReqVO();
        reqVO.setSignature("芋道");

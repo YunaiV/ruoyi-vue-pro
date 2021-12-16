@@ -8,15 +8,16 @@ import cn.iocoder.yudao.adminserver.modules.system.convert.user.SysUserConvert;
 import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.dept.SysDeptDO;
 import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.dept.SysPostDO;
 import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.permission.SysRoleDO;
-import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.social.SysSocialUserDO;
 import cn.iocoder.yudao.adminserver.modules.system.service.dept.SysDeptService;
 import cn.iocoder.yudao.adminserver.modules.system.service.dept.SysPostService;
 import cn.iocoder.yudao.adminserver.modules.system.service.permission.SysPermissionService;
 import cn.iocoder.yudao.adminserver.modules.system.service.permission.SysRoleService;
-import cn.iocoder.yudao.adminserver.modules.system.service.social.SysSocialService;
 import cn.iocoder.yudao.adminserver.modules.system.service.user.SysUserService;
+import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.social.SysSocialUserDO;
 import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.user.SysUserDO;
+import cn.iocoder.yudao.coreservice.modules.system.service.social.SysSocialCoreService;
 import cn.iocoder.yudao.coreservice.modules.system.service.user.SysUserCoreService;
+import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import io.swagger.annotations.Api;
@@ -55,7 +56,7 @@ public class SysUserProfileController {
     @Resource
     private SysRoleService roleService;
     @Resource
-    private SysSocialService socialService;
+    private SysSocialCoreService socialService;
 
     @GetMapping("/get")
     @ApiOperation("获得登录用户信息")
@@ -77,7 +78,7 @@ public class SysUserProfileController {
             resp.setPosts(SysUserConvert.INSTANCE.convertList02(posts));
         }
         // 获得社交用户信息
-        List<SysSocialUserDO> socialUsers = socialService.getSocialUserList(user.getId());
+        List<SysSocialUserDO> socialUsers = socialService.getSocialUserList(user.getId(), UserTypeEnum.ADMIN);
         resp.setSocialUsers(SysUserConvert.INSTANCE.convertList03(socialUsers));
         return success(resp);
     }

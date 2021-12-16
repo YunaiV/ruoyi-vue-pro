@@ -59,19 +59,19 @@ public class InfApiAccessLogServiceImplTest extends BaseDbUnitTest {
 
         // 下面几个都是不匹配的数据
         // userId 不同的
-        infApiAccessLogMapper.insert(ObjectUtils.clone(infApiAccessLogDO, logDO -> logDO.setUserId(3344L)));
+        infApiAccessLogMapper.insert(ObjectUtils.cloneIgnoreId(infApiAccessLogDO, logDO -> logDO.setUserId(3344L)));
         // userType
-        infApiAccessLogMapper.insert(ObjectUtils.clone(infApiAccessLogDO, logDO -> logDO.setUserType(UserTypeEnum.MEMBER.getValue())));
+        infApiAccessLogMapper.insert(ObjectUtils.cloneIgnoreId(infApiAccessLogDO, logDO -> logDO.setUserType(UserTypeEnum.MEMBER.getValue())));
         // applicationName 不同的
-        infApiAccessLogMapper.insert(ObjectUtils.clone(infApiAccessLogDO, logDO -> logDO.setApplicationName("test")));
+        infApiAccessLogMapper.insert(ObjectUtils.cloneIgnoreId(infApiAccessLogDO, logDO -> logDO.setApplicationName("test")));
         // requestUrl 不同的
-        infApiAccessLogMapper.insert(ObjectUtils.clone(infApiAccessLogDO, logDO -> logDO.setRequestUrl("bar")));
+        infApiAccessLogMapper.insert(ObjectUtils.cloneIgnoreId(infApiAccessLogDO, logDO -> logDO.setRequestUrl("bar")));
         // 构造一个早期时间 2021-02-06 00:00:00
-        infApiAccessLogMapper.insert(ObjectUtils.clone(infApiAccessLogDO, logDO -> logDO.setBeginTime(buildTime(2021, 2, 6))));
+        infApiAccessLogMapper.insert(ObjectUtils.cloneIgnoreId(infApiAccessLogDO, logDO -> logDO.setBeginTime(buildTime(2021, 2, 6))));
         // duration 不同的
-        infApiAccessLogMapper.insert(ObjectUtils.clone(infApiAccessLogDO, logDO -> logDO.setDuration(100)));
+        infApiAccessLogMapper.insert(ObjectUtils.cloneIgnoreId(infApiAccessLogDO, logDO -> logDO.setDuration(100)));
         // resultCode 不同的
-        infApiAccessLogMapper.insert(ObjectUtils.clone(infApiAccessLogDO, logDO -> logDO.setResultCode(2)));
+        infApiAccessLogMapper.insert(ObjectUtils.cloneIgnoreId(infApiAccessLogDO, logDO -> logDO.setResultCode(2)));
 
         // 构造调用参数
         InfApiAccessLogPageReqVO reqVO = new InfApiAccessLogPageReqVO();
@@ -117,19 +117,19 @@ public class InfApiAccessLogServiceImplTest extends BaseDbUnitTest {
 
         // 下面几个都是不匹配的数据
         // userId 不同的
-        infApiAccessLogMapper.insert(ObjectUtils.clone(infApiAccessLogDO, logDO -> logDO.setUserId(3344L)));
+        infApiAccessLogMapper.insert(ObjectUtils.cloneIgnoreId(infApiAccessLogDO, logDO -> logDO.setUserId(3344L)));
         // userType
-        infApiAccessLogMapper.insert(ObjectUtils.clone(infApiAccessLogDO, logDO -> logDO.setUserType(UserTypeEnum.MEMBER.getValue())));
+        infApiAccessLogMapper.insert(ObjectUtils.cloneIgnoreId(infApiAccessLogDO, logDO -> logDO.setUserType(UserTypeEnum.MEMBER.getValue())));
         // applicationName 不同的
-        infApiAccessLogMapper.insert(ObjectUtils.clone(infApiAccessLogDO, logDO -> logDO.setApplicationName("test")));
+        infApiAccessLogMapper.insert(ObjectUtils.cloneIgnoreId(infApiAccessLogDO, logDO -> logDO.setApplicationName("test")));
         // requestUrl 不同的
-        infApiAccessLogMapper.insert(ObjectUtils.clone(infApiAccessLogDO, logDO -> logDO.setRequestUrl("bar")));
+        infApiAccessLogMapper.insert(ObjectUtils.cloneIgnoreId(infApiAccessLogDO, logDO -> logDO.setRequestUrl("bar")));
         // 构造一个早期时间 2021-02-06 00:00:00
-        infApiAccessLogMapper.insert(ObjectUtils.clone(infApiAccessLogDO, logDO -> logDO.setBeginTime(buildTime(2021, 2, 6))));
+        infApiAccessLogMapper.insert(ObjectUtils.cloneIgnoreId(infApiAccessLogDO, logDO -> logDO.setBeginTime(buildTime(2021, 2, 6))));
         // duration 不同的
-        infApiAccessLogMapper.insert(ObjectUtils.clone(infApiAccessLogDO, logDO -> logDO.setDuration(100)));
+        infApiAccessLogMapper.insert(ObjectUtils.cloneIgnoreId(infApiAccessLogDO, logDO -> logDO.setDuration(100)));
         // resultCode 不同的
-        infApiAccessLogMapper.insert(ObjectUtils.clone(infApiAccessLogDO, logDO -> logDO.setResultCode(2)));
+        infApiAccessLogMapper.insert(ObjectUtils.cloneIgnoreId(infApiAccessLogDO, logDO -> logDO.setResultCode(2)));
 
         // 构造调用参数
         InfApiAccessLogExportReqVO reqVO = new InfApiAccessLogExportReqVO();
