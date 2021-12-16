@@ -58,9 +58,9 @@
     <!-- 使用 aliyun 的 Maven 源，提升下载速度 -->
     <repositories>
         <repository>
-            <id>aliyun</id>
+            <id>aliyunmaven</id>
             <name>aliyun</name>
-            <url>http://maven.aliyun.com/nexus/content/groups/public</url>
+            <url>https://maven.aliyun.com/repository/public</url>
         </repository>
     </repositories>
 

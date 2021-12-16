@@ -6,6 +6,12 @@ spring:
 --- #################### 数据库相关配置 ####################
 
 spring:
+#  sql:
+#    init:
+#      schema-locations: classpath:sql/create_tables.sql
+#      username: sa
+#      password:
+#      enabled: true
   # 数据源配置项
   datasource:
     name: ruoyi-vue-pro
@@ -23,6 +29,9 @@ spring:
     host: 127.0.0.1 # 地址
     port: 16379 # 端口（单元测试，使用 16379 端口）
     database: 0 # 数据库索引
+  integration:
+    jdbc:
+      initialize-schema:
 
 mybatis:
   lazy-initialization: true # 单元测试，设置 MyBatis Mapper 延迟加载，加速每个单元测试
