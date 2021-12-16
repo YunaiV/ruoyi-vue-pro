@@ -33,7 +33,7 @@ mybatis-plus:
       logic-not-delete-value: 0 # 逻辑未删除值(默认为 0)
   mapper-locations: classpath*:mapper/*.xml
   config-location: classpath:mybatis-config/mybatis-config.xml
-  configuration-properties:
+  configuration-properties: # TODO jason：这些配置的作用，要注释下哈
     prefix: ""
     wildcardEscapeClause: ""
     limitBefore: ""

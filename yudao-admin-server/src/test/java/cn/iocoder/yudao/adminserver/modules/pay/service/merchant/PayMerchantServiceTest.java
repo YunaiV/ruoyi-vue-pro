@@ -11,7 +11,6 @@ import cn.iocoder.yudao.adminserver.modules.pay.service.merchant.impl.PayMerchan
 import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.merchant.PayMerchantDO;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
@@ -19,10 +18,12 @@ import javax.annotation.Resource;
 import java.util.List;
 
 import static cn.iocoder.yudao.coreservice.modules.pay.enums.PayErrorCodeCoreConstants.PAY_MERCHANT_NOT_EXISTS;
+import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildTime;
+import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildTime;
-import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
+import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomLongId;
+import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -119,17 +120,17 @@ public class PayMerchantServiceTest extends BaseDbUnitTest {
        });
        merchantMapper.insert(dbMerchant);
        // 测试 no 不匹配
-       merchantMapper.insert(ObjectUtils.clone(dbMerchant, o -> o.setNo("M200000")));
+       merchantMapper.insert(cloneIgnoreId(dbMerchant, o -> o.setNo("M200000")));
        // 测试 name 不匹配
-       merchantMapper.insert(ObjectUtils.clone(dbMerchant, o -> o.setName("斌哥的杂货铺")));
+       merchantMapper.insert(cloneIgnoreId(dbMerchant, o -> o.setName("斌哥的杂货铺")));
        // 测试 shortName 不匹配
-       merchantMapper.insert(ObjectUtils.clone(dbMerchant, o -> o.setShortName("斌斌子")));
+       merchantMapper.insert(cloneIgnoreId(dbMerchant, o -> o.setShortName("斌斌子")));
        // 测试 status 不匹配
-       merchantMapper.insert(ObjectUtils.clone(dbMerchant, o -> o.setStatus(CommonStatusEnum.DISABLE.getStatus())));
+       merchantMapper.insert(cloneIgnoreId(dbMerchant, o -> o.setStatus(CommonStatusEnum.DISABLE.getStatus())));
        // 测试 remark 不匹配
-       merchantMapper.insert(ObjectUtils.clone(dbMerchant, o -> o.setRemark("斌哥的杂货铺")));
+       merchantMapper.insert(cloneIgnoreId(dbMerchant, o -> o.setRemark("斌哥的杂货铺")));
        // 测试 createTime 不匹配
-       merchantMapper.insert(ObjectUtils.clone(dbMerchant, o -> o.setCreateTime(buildTime(2022,12,4))));
+       merchantMapper.insert(cloneIgnoreId(dbMerchant, o -> o.setCreateTime(buildTime(2022,12,4))));
        // 准备参数
        PayMerchantPageReqVO reqVO = new PayMerchantPageReqVO();
        reqVO.setNo("M1008611");
@@ -161,17 +162,17 @@ public class PayMerchantServiceTest extends BaseDbUnitTest {
        });
         merchantMapper.insert(dbMerchant);
         // 测试 no 不匹配
-        merchantMapper.insert(ObjectUtils.clone(dbMerchant, o -> o.setNo("M200000")));
+        merchantMapper.insert(cloneIgnoreId(dbMerchant, o -> o.setNo("M200000")));
         // 测试 name 不匹配
-        merchantMapper.insert(ObjectUtils.clone(dbMerchant, o -> o.setName("斌哥的杂货铺")));
+        merchantMapper.insert(cloneIgnoreId(dbMerchant, o -> o.setName("斌哥的杂货铺")));
         // 测试 shortName 不匹配
-        merchantMapper.insert(ObjectUtils.clone(dbMerchant, o -> o.setShortName("斌斌子")));
+        merchantMapper.insert(cloneIgnoreId(dbMerchant, o -> o.setShortName("斌斌子")));
         // 测试 status 不匹配
-        merchantMapper.insert(ObjectUtils.clone(dbMerchant, o -> o.setStatus(CommonStatusEnum.DISABLE.getStatus())));
+        merchantMapper.insert(cloneIgnoreId(dbMerchant, o -> o.setStatus(CommonStatusEnum.DISABLE.getStatus())));
         // 测试 remark 不匹配
-        merchantMapper.insert(ObjectUtils.clone(dbMerchant, o -> o.setRemark("斌哥的杂货铺")));
+        merchantMapper.insert(cloneIgnoreId(dbMerchant, o -> o.setRemark("斌哥的杂货铺")));
         // 测试 createTime 不匹配
-        merchantMapper.insert(ObjectUtils.clone(dbMerchant, o -> o.setCreateTime(buildTime(2022,12,4))));
+        merchantMapper.insert(cloneIgnoreId(dbMerchant, o -> o.setCreateTime(buildTime(2022,12,4))));
        // 准备参数
        PayMerchantExportReqVO reqVO = new PayMerchantExportReqVO();
        reqVO.setNo("M1008611");
