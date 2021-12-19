@@ -9,7 +9,10 @@ import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.userserver.modules.member.controller.user.vo.MbrUserUpdateMobileReqVO;
 import cn.iocoder.yudao.userserver.modules.member.dal.mysql.user.MbrUserMapper;
 import cn.iocoder.yudao.userserver.modules.member.service.user.MbrUserService;
+import cn.iocoder.yudao.userserver.modules.system.dal.dataobject.sms.SysSmsCodeDO;
+import cn.iocoder.yudao.userserver.modules.system.enums.sms.SysSmsSceneEnum;
 import cn.iocoder.yudao.userserver.modules.system.service.auth.SysAuthService;
+import cn.iocoder.yudao.userserver.modules.system.service.sms.SysSmsCodeService;
 import com.google.common.annotations.VisibleForTesting;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,7 +24,10 @@ import java.io.InputStream;
 import java.util.Date;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getClientIP;
 import static cn.iocoder.yudao.userserver.modules.member.enums.MbrErrorCodeConstants.USER_NOT_EXISTS;
+import static cn.iocoder.yudao.userserver.modules.system.enums.SysErrorCodeConstants.USER_SMS_CODE_IS_UNUSED;
+import static cn.iocoder.yudao.userserver.modules.system.enums.SysErrorCodeConstants.USER_SMS_CODE_NOT_CORRECT;
 
 /**
  * User Service 实现类
@@ -44,6 +50,10 @@ public class MbrUserServiceImpl implements MbrUserService {
 
     @Resource
     private SysAuthService sysAuthService;
+
+    @Resource
+    private SysSmsCodeService smsCodeService;
+
 
     @Override
     public MbrUserDO getUserByMobile(String mobile) {
@@ -124,12 +134,21 @@ public class MbrUserServiceImpl implements MbrUserService {
     @Override
     public void updateMobile(Long userId, MbrUserUpdateMobileReqVO reqVO) {
         // 检测用户是否存在
-        MbrUserDO userDO = checkUserExists(userId);
-        // 检测手机与验证码是否匹配
-        // TODO @宋天：修改手机的时候。应该要校验，老手机 + 老手机 code；新手机 + 新手机 code
-        sysAuthService.checkIfMobileMatchCodeAndDeleteCode(userDO.getMobile(),reqVO.getCode());
+        checkUserExists(userId);
+        // 校验验证码，并标记为已使用
+        smsCodeService.useSmsCode(reqVO.getMobile(), SysSmsSceneEnum.CHANGE_MOBILE_BY_SMS.getScene(), reqVO.getCode(),getClientIP());
+
+        // 检测新手机和旧手机的验证码是否在30分钟内
+        SysSmsCodeDO smsOldCodeDO = smsCodeService.checkCodeIsExpired(reqVO.getOldMobile(), reqVO.getOldCode(), SysSmsSceneEnum.CHANGE_MOBILE_BY_SMS.getScene());
+        SysSmsCodeDO smsNewCodeDO = smsCodeService.checkCodeIsExpired(reqVO.getMobile(), reqVO.getCode(), SysSmsSceneEnum.CHANGE_MOBILE_BY_SMS.getScene());
+
+        // 判断新旧code是否未被使用，如果是，抛出异常
+        if (Boolean.FALSE.equals(smsOldCodeDO.getUsed()) || Boolean.FALSE.equals(smsNewCodeDO.getUsed())){
+            throw exception(USER_SMS_CODE_IS_UNUSED);
+        }
+
         // 更新用户手机
-        // TODO @宋天：更新的时候，单独创建对象。直接全量更新，会可能导致属性覆盖。可以看看打印出来的 SQL 哈
+        MbrUserDO userDO = MbrUserDO.builder().build();
         userDO.setMobile(reqVO.getMobile());
         userMapper.updateById(userDO);
     }
