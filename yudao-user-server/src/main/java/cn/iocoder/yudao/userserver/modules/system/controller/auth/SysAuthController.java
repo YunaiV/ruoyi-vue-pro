@@ -93,14 +93,6 @@ public class SysAuthController {
         return success(true);
     }
 
-    @PostMapping("/check-sms-code")
-    @ApiOperation(value = "校验验证码是否正确")
-    @PreAuthenticated
-    public CommonResult<Boolean> checkSmsCode(@RequestBody @Valid SysAuthSmsLoginReqVO reqVO) {
-        // TODO @宋天：check 的时候，不应该使用 useSmsCode 哈，这样验证码就直接被使用了。另外，check 开头的方法，更多是校验的逻辑，不会有 update 数据的动作。这点，在方法命名上，也是要注意的
-        smsCodeService.useSmsCode(reqVO.getMobile(),SysSmsSceneEnum.CHECK_CODE_BY_SMS.getScene(),reqVO.getCode(),getClientIP());
-        return success(true);
-    }
 
     // ========== 社交登录相关 ==========
 

@@ -2,7 +2,10 @@ package cn.iocoder.yudao.userserver.modules.system.service.sms;
 
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.validation.Mobile;
+import cn.iocoder.yudao.userserver.modules.system.controller.auth.vo.SysAuthCheckCodeReqVO;
 import cn.iocoder.yudao.userserver.modules.system.controller.auth.vo.SysAuthSendSmsReqVO;
+import cn.iocoder.yudao.userserver.modules.system.controller.auth.vo.SysAuthSmsLoginReqVO;
+import cn.iocoder.yudao.userserver.modules.system.dal.dataobject.sms.SysSmsCodeDO;
 import cn.iocoder.yudao.userserver.modules.system.enums.sms.SysSmsSceneEnum;
 
 /**
@@ -44,4 +47,14 @@ public interface SysSmsCodeService {
      * @param userId 用户id
      */
     void sendSmsCodeLogin(Long userId);
+
+    /**
+     * 检测手机验证码是否有效
+     * @param mobile 手机号
+     * @param code 验证码
+     * @param scene 发送场景 {@link SysSmsSceneEnum}
+     * @return SysSmsCodeDO 手机验证码
+     */
+    SysSmsCodeDO checkCodeIsExpired(String mobile, String code, Integer scene);
+
 }

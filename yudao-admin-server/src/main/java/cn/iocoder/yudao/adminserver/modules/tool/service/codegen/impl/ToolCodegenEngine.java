@@ -191,7 +191,7 @@ public class ToolCodegenEngine {
     }
 
     private static String javaFilePath(String path) {
-        return "java/${basePackage}/${table.moduleName}/" + path + ".java";
+        return "java/${basePackage}/modules/${table.moduleName}/" + path + ".java";
     }
 
     private static String vueTemplatePath(String path) {

@@ -64,8 +64,15 @@ public class ToolCodegenSQLParser {
     private static ToolSchemaTableDO parseTable(SQLCreateTableStatement statement) {
         return ToolSchemaTableDO.builder()
                 .tableName(statement.getTableSource().getTableName(true))
-                .tableComment(((SQLCharExpr) statement.getComment()).getText())
+                .tableComment(getCommentText(statement))
                 .build();
+    }
+
+    private static String getCommentText(SQLCreateTableStatement statement) {
+        if (statement == null || statement.getComment() == null) {
+            return "";
+        }
+        return ((SQLCharExpr) statement.getComment()).getText();
     }
 
     private static List<ToolSchemaColumnDO> parseColumns(SQLCreateTableStatement statement) {
