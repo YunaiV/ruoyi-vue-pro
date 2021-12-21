@@ -13,7 +13,6 @@ import cn.iocoder.yudao.coreservice.modules.pay.enums.order.PayOrderStatusEnum;
 import cn.iocoder.yudao.coreservice.modules.pay.enums.order.PayRefundTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.date.DateUtils;
-import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.pay.core.enums.PayChannelEnum;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
@@ -22,6 +21,7 @@ import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
 
+import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -80,23 +80,23 @@ public class PayOrderServiceTest extends BaseDbUnitTest {
         });
         orderMapper.insert(dbOrder);
         // 测试 merchantId 不匹配
-        orderMapper.insert(ObjectUtils.clone(dbOrder, o -> o.setMerchantId(2L)));
+        orderMapper.insert(cloneIgnoreId(dbOrder, o -> o.setMerchantId(2L)));
         // 测试 appId 不匹配
-        orderMapper.insert(ObjectUtils.clone(dbOrder, o -> o.setAppId(2L)));
+        orderMapper.insert(cloneIgnoreId(dbOrder, o -> o.setAppId(2L)));
         // 测试 channelId 不匹配
-        orderMapper.insert(ObjectUtils.clone(dbOrder, o -> o.setChannelId(2L)));
+        orderMapper.insert(cloneIgnoreId(dbOrder, o -> o.setChannelId(2L)));
         // 测试 channelCode 不匹配
-        orderMapper.insert(ObjectUtils.clone(dbOrder, o -> o.setChannelCode(PayChannelEnum.ALIPAY_APP.getCode())));
+        orderMapper.insert(cloneIgnoreId(dbOrder, o -> o.setChannelCode(PayChannelEnum.ALIPAY_APP.getCode())));
         // 测试 merchantOrderId 不匹配
-        orderMapper.insert(ObjectUtils.clone(dbOrder, o -> o.setMerchantOrderId(generateNo())));
+        orderMapper.insert(cloneIgnoreId(dbOrder, o -> o.setMerchantOrderId(generateNo())));
         // 测试 notifyStatus 不匹配
-        orderMapper.insert(ObjectUtils.clone(dbOrder, o -> o.setNotifyStatus(PayOrderNotifyStatusEnum.FAILURE.getStatus())));
+        orderMapper.insert(cloneIgnoreId(dbOrder, o -> o.setNotifyStatus(PayOrderNotifyStatusEnum.FAILURE.getStatus())));
         // 测试 status 不匹配
-        orderMapper.insert(ObjectUtils.clone(dbOrder, o -> o.setStatus(PayOrderStatusEnum.CLOSED.getStatus())));
+        orderMapper.insert(cloneIgnoreId(dbOrder, o -> o.setStatus(PayOrderStatusEnum.CLOSED.getStatus())));
         // 测试 refundStatus 不匹配
-        orderMapper.insert(ObjectUtils.clone(dbOrder, o -> o.setRefundStatus(PayRefundTypeEnum.ALL.getStatus())));
+        orderMapper.insert(cloneIgnoreId(dbOrder, o -> o.setRefundStatus(PayRefundTypeEnum.ALL.getStatus())));
         // 测试 createTime 不匹配
-        orderMapper.insert(ObjectUtils.clone(dbOrder, o -> o.setCreateTime(DateUtils.buildTime(2019, 1, 1, 10, 10,
+        orderMapper.insert(cloneIgnoreId(dbOrder, o -> o.setCreateTime(DateUtils.buildTime(2019, 1, 1, 10, 10,
                 1))));
         // 准备参数
         PayOrderPageReqVO reqVO = new PayOrderPageReqVO();
@@ -155,23 +155,23 @@ public class PayOrderServiceTest extends BaseDbUnitTest {
         });
         orderMapper.insert(dbOrder);
         // 测试 merchantId 不匹配
-        orderMapper.insert(ObjectUtils.clone(dbOrder, o -> o.setMerchantId(2L)));
+        orderMapper.insert(cloneIgnoreId(dbOrder, o -> o.setMerchantId(2L)));
         // 测试 appId 不匹配
-        orderMapper.insert(ObjectUtils.clone(dbOrder, o -> o.setAppId(2L)));
+        orderMapper.insert(cloneIgnoreId(dbOrder, o -> o.setAppId(2L)));
         // 测试 channelId 不匹配
-        orderMapper.insert(ObjectUtils.clone(dbOrder, o -> o.setChannelId(2L)));
+        orderMapper.insert(cloneIgnoreId(dbOrder, o -> o.setChannelId(2L)));
         // 测试 channelCode 不匹配
-        orderMapper.insert(ObjectUtils.clone(dbOrder, o -> o.setChannelCode(PayChannelEnum.ALIPAY_APP.getCode())));
+        orderMapper.insert(cloneIgnoreId(dbOrder, o -> o.setChannelCode(PayChannelEnum.ALIPAY_APP.getCode())));
         // 测试 merchantOrderId 不匹配
-        orderMapper.insert(ObjectUtils.clone(dbOrder, o -> o.setMerchantOrderId(generateNo())));
+        orderMapper.insert(cloneIgnoreId(dbOrder, o -> o.setMerchantOrderId(generateNo())));
         // 测试 notifyStatus 不匹配
-        orderMapper.insert(ObjectUtils.clone(dbOrder, o -> o.setNotifyStatus(PayOrderNotifyStatusEnum.FAILURE.getStatus())));
+        orderMapper.insert(cloneIgnoreId(dbOrder, o -> o.setNotifyStatus(PayOrderNotifyStatusEnum.FAILURE.getStatus())));
         // 测试 status 不匹配
-        orderMapper.insert(ObjectUtils.clone(dbOrder, o -> o.setStatus(PayOrderStatusEnum.CLOSED.getStatus())));
+        orderMapper.insert(cloneIgnoreId(dbOrder, o -> o.setStatus(PayOrderStatusEnum.CLOSED.getStatus())));
         // 测试 refundStatus 不匹配
-        orderMapper.insert(ObjectUtils.clone(dbOrder, o -> o.setRefundStatus(PayRefundTypeEnum.ALL.getStatus())));
+        orderMapper.insert(cloneIgnoreId(dbOrder, o -> o.setRefundStatus(PayRefundTypeEnum.ALL.getStatus())));
         // 测试 createTime 不匹配
-        orderMapper.insert(ObjectUtils.clone(dbOrder, o -> o.setCreateTime(DateUtils.buildTime(2019, 1, 1, 10, 10,
+        orderMapper.insert(cloneIgnoreId(dbOrder, o -> o.setCreateTime(DateUtils.buildTime(2019, 1, 1, 10, 10,
                 1))));
         // 准备参数
         PayOrderExportReqVO reqVO = new PayOrderExportReqVO();

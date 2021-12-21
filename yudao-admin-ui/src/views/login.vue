@@ -2,6 +2,11 @@
   <div class="login">
     <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form">
       <h3 class="title">芋道后台管理系统</h3>
+      <el-form-item prop="tenantName">
+        <el-input v-model="loginForm.tenantName" type="text" auto-complete="off" placeholder='租户'>
+          <svg-icon slot="prefix" icon-class="tree" class="el-input__icon input-icon" />
+        </el-input>
+      </el-form-item>
       <el-form-item prop="username">
         <el-input v-model="loginForm.username" type="text" auto-complete="off" placeholder="账号">
           <svg-icon slot="prefix" icon-class="user" class="el-input__icon input-icon" />
@@ -46,6 +51,7 @@
 
 <script>
 import { getCodeImg,socialAuthRedirect } from "@/api/login";
+import { getTenantIdByName } from "@/api/system/tenant";
 import Cookies from "js-cookie";
 import { encrypt, decrypt } from '@/utils/jsencrypt'
 import {InfApiErrorLogProcessStatusEnum, SysUserSocialTypeEnum} from "@/utils/constants";
@@ -60,9 +66,29 @@ export default {
         password: "admin123",
         rememberMe: false,
         code: "",
-        uuid: ""
+        uuid: "",
+        tenantName: "芋道源码",
       },
       loginRules: {
+        tenantName: [
+          { required: true, trigger: "blur", message: "租户不能为空" },
+          {
+            validator: (rule, value, callback) => {
+              // debugger
+              getTenantIdByName(value).then(res => {
+                const tenantId = res.data;
+                if (tenantId >= 0) {
+                  // 设置租户
+                  Cookies.set("tenantId", tenantId);
+                  callback();
+                } else {
+                  callback('租户不存在');
+                }
+              });
+            },
+            trigger: 'blur'
+          }
+        ],
         username: [
           { required: true, trigger: "blur", message: "用户名不能为空" }
         ],
@@ -103,25 +129,31 @@ export default {
       const username = Cookies.get("username");
       const password = Cookies.get("password");
       const rememberMe = Cookies.get('rememberMe')
+      const tenantName = Cookies.get('tenantName');
       this.loginForm = {
         username: username === undefined ? this.loginForm.username : username,
         password: password === undefined ? this.loginForm.password : decrypt(password),
-        rememberMe: rememberMe === undefined ? false : Boolean(rememberMe)
+        rememberMe: rememberMe === undefined ? false : Boolean(rememberMe),
+        tenantName: tenantName === undefined ? this.loginForm.tenantName : tenantName,
       };
     },
     handleLogin() {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
           this.loading = true;
+          // 设置 Cookie
           if (this.loginForm.rememberMe) {
             Cookies.set("username", this.loginForm.username, { expires: 30 });
             Cookies.set("password", encrypt(this.loginForm.password), { expires: 30 });
             Cookies.set('rememberMe', this.loginForm.rememberMe, { expires: 30 });
+            Cookies.set('tenantName', this.loginForm.tenantName, { expires: 30 });
           } else {
             Cookies.remove("username");
             Cookies.remove("password");
             Cookies.remove('rememberMe');
+            Cookies.remove('tenantName');
           }
+          // 发起登陆
           this.$store.dispatch("Login", this.loginForm).then(() => {
             this.$router.push({ path: this.redirect || "/" }).catch(()=>{});
           }).catch(() => {
@@ -167,7 +199,7 @@ export default {
 .login-form {
   border-radius: 6px;
   background: #ffffff;
-  width: 400px;
+  width: 500px;
   padding: 25px 25px 5px 25px;
   .el-input {
     height: 38px;

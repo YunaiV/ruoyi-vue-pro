@@ -190,19 +190,19 @@ public class SysSmsTemplateServiceTest extends BaseDbUnitTest {
        });
        smsTemplateMapper.insert(dbSmsTemplate);
        // 测试 type 不匹配
-       smsTemplateMapper.insert(ObjectUtils.clone(dbSmsTemplate, o -> o.setType(SysSmsTemplateTypeEnum.VERIFICATION_CODE.getType())));
+       smsTemplateMapper.insert(ObjectUtils.cloneIgnoreId(dbSmsTemplate, o -> o.setType(SysSmsTemplateTypeEnum.VERIFICATION_CODE.getType())));
        // 测试 status 不匹配
-       smsTemplateMapper.insert(ObjectUtils.clone(dbSmsTemplate, o -> o.setStatus(CommonStatusEnum.DISABLE.getStatus())));
+       smsTemplateMapper.insert(ObjectUtils.cloneIgnoreId(dbSmsTemplate, o -> o.setStatus(CommonStatusEnum.DISABLE.getStatus())));
        // 测试 code 不匹配
-       smsTemplateMapper.insert(ObjectUtils.clone(dbSmsTemplate, o -> o.setCode("yuanma")));
+       smsTemplateMapper.insert(ObjectUtils.cloneIgnoreId(dbSmsTemplate, o -> o.setCode("yuanma")));
        // 测试 content 不匹配
-       smsTemplateMapper.insert(ObjectUtils.clone(dbSmsTemplate, o -> o.setContent("源码")));
+       smsTemplateMapper.insert(ObjectUtils.cloneIgnoreId(dbSmsTemplate, o -> o.setContent("源码")));
        // 测试 apiTemplateId 不匹配
-       smsTemplateMapper.insert(ObjectUtils.clone(dbSmsTemplate, o -> o.setApiTemplateId("nai")));
+       smsTemplateMapper.insert(ObjectUtils.cloneIgnoreId(dbSmsTemplate, o -> o.setApiTemplateId("nai")));
        // 测试 channelId 不匹配
-       smsTemplateMapper.insert(ObjectUtils.clone(dbSmsTemplate, o -> o.setChannelId(2L)));
+       smsTemplateMapper.insert(ObjectUtils.cloneIgnoreId(dbSmsTemplate, o -> o.setChannelId(2L)));
        // 测试 createTime 不匹配
-       smsTemplateMapper.insert(ObjectUtils.clone(dbSmsTemplate, o -> o.setCreateTime(buildTime(2021, 12, 12))));
+       smsTemplateMapper.insert(ObjectUtils.cloneIgnoreId(dbSmsTemplate, o -> o.setCreateTime(buildTime(2021, 12, 12))));
        // 准备参数
        SysSmsTemplatePageReqVO reqVO = new SysSmsTemplatePageReqVO();
        reqVO.setType(SysSmsTemplateTypeEnum.PROMOTION.getType());
@@ -236,19 +236,19 @@ public class SysSmsTemplateServiceTest extends BaseDbUnitTest {
         });
         smsTemplateMapper.insert(dbSmsTemplate);
         // 测试 type 不匹配
-        smsTemplateMapper.insert(ObjectUtils.clone(dbSmsTemplate, o -> o.setType(SysSmsTemplateTypeEnum.VERIFICATION_CODE.getType())));
+        smsTemplateMapper.insert(ObjectUtils.cloneIgnoreId(dbSmsTemplate, o -> o.setType(SysSmsTemplateTypeEnum.VERIFICATION_CODE.getType())));
         // 测试 status 不匹配
-        smsTemplateMapper.insert(ObjectUtils.clone(dbSmsTemplate, o -> o.setStatus(CommonStatusEnum.DISABLE.getStatus())));
+        smsTemplateMapper.insert(ObjectUtils.cloneIgnoreId(dbSmsTemplate, o -> o.setStatus(CommonStatusEnum.DISABLE.getStatus())));
         // 测试 code 不匹配
-        smsTemplateMapper.insert(ObjectUtils.clone(dbSmsTemplate, o -> o.setCode("yuanma")));
+        smsTemplateMapper.insert(ObjectUtils.cloneIgnoreId(dbSmsTemplate, o -> o.setCode("yuanma")));
         // 测试 content 不匹配
-        smsTemplateMapper.insert(ObjectUtils.clone(dbSmsTemplate, o -> o.setContent("源码")));
+        smsTemplateMapper.insert(ObjectUtils.cloneIgnoreId(dbSmsTemplate, o -> o.setContent("源码")));
         // 测试 apiTemplateId 不匹配
-        smsTemplateMapper.insert(ObjectUtils.clone(dbSmsTemplate, o -> o.setApiTemplateId("nai")));
+        smsTemplateMapper.insert(ObjectUtils.cloneIgnoreId(dbSmsTemplate, o -> o.setApiTemplateId("nai")));
         // 测试 channelId 不匹配
-        smsTemplateMapper.insert(ObjectUtils.clone(dbSmsTemplate, o -> o.setChannelId(2L)));
+        smsTemplateMapper.insert(ObjectUtils.cloneIgnoreId(dbSmsTemplate, o -> o.setChannelId(2L)));
         // 测试 createTime 不匹配
-        smsTemplateMapper.insert(ObjectUtils.clone(dbSmsTemplate, o -> o.setCreateTime(buildTime(2021, 12, 12))));
+        smsTemplateMapper.insert(ObjectUtils.cloneIgnoreId(dbSmsTemplate, o -> o.setCreateTime(buildTime(2021, 12, 12))));
         // 准备参数
         SysSmsTemplateExportReqVO reqVO = new SysSmsTemplateExportReqVO();
         reqVO.setType(SysSmsTemplateTypeEnum.PROMOTION.getType());

@@ -33,6 +33,7 @@
 |  | 菜单管理 | 配置系统菜单，操作权限，按钮权限标识等 |
 |  | 部门管理 | 配置系统组织机构（公司、部门、小组），树结构展现支持数据权限 |
 |  | 岗位管理 | 配置系统用户所属担任职务 |
+|  | 租户管理 | 配置系统租户，支持 SaaS 场景下的多租户功能 |
 |  | 字典管理 | 对系统中经常使用的一些较为固定的数据进行维护 |
 | 🚀 | 短信管理 | 短信渠道、短息模板、短信日志，对接阿里云、云片等主流短信平台 |
 | 🚀 | 操作日志 | 系统正常操作日志记录和查询，集成 Swagger 生成日志内容 |
@@ -96,21 +97,21 @@
 
 | 框架 | 说明 |  版本 | 学习指南 |
 | --- | --- | --- | --- |
-| [Spring Boot](https://spring.io/projects/spring-boot) | 应用开发框架 | 2.4.5 | [文档](https://github.com/YunaiV/SpringBoot-Labs) |
+| [Spring Boot](https://spring.io/projects/spring-boot) | 应用开发框架 | 2.4.12 | [文档](https://github.com/YunaiV/SpringBoot-Labs) |
 | [MySQL](https://www.mysql.com/cn/) | 数据库服务器 | 5.7 |  |
-| [Druid](https://github.com/alibaba/druid) | JDBC 连接池、监控组件 | 1.2.4 | [文档](http://www.iocoder.cn/Spring-Boot/datasource-pool/?yudao) |
-| [MyBatis Plus](https://mp.baomidou.com/) | MyBatis 增强工具包 | 3.4.1 | [文档](http://www.iocoder.cn/Spring-Boot/MyBatis/?yudao) |
-| [Dynamic Datasource](https://dynamic-datasource.com/) | 动态数据源 | 3.3.2 | [文档](http://www.iocoder.cn/Spring-Boot/datasource-pool/?yudao) |
+| [Druid](https://github.com/alibaba/druid) | JDBC 连接池、监控组件 | 1.2.8 | [文档](http://www.iocoder.cn/Spring-Boot/datasource-pool/?yudao) |
+| [MyBatis Plus](https://mp.baomidou.com/) | MyBatis 增强工具包 | 3.4.3.4 | [文档](http://www.iocoder.cn/Spring-Boot/MyBatis/?yudao) |
+| [Dynamic Datasource](https://dynamic-datasource.com/) | 动态数据源 | 3.5.0 | [文档](http://www.iocoder.cn/Spring-Boot/datasource-pool/?yudao) |
 | [Redis](https://redis.io/) | key-value 数据库 | 5.0 |  |
-| [Redisson](https://github.com/redisson/redisson) | Redis 客户端 | 3.1.46 | [文档](http://www.iocoder.cn/Spring-Boot/Redis/?yudao) |
-| [Spring MVC](https://github.com/spring-projects/spring-framework/tree/master/spring-webmvc) | MVC 框架  | 5.4.6 | [文档](http://www.iocoder.cn/SpringMVC/MVC/?yudao) |
-| [Spring Security](https://github.com/spring-projects/spring-security) | Spring 安全框架 | 5.4.6 | [文档](http://www.iocoder.cn/Spring-Boot/Spring-Security/?yudao) |
+| [Redisson](https://github.com/redisson/redisson) | Redis 客户端 | 3.16.6 | [文档](http://www.iocoder.cn/Spring-Boot/Redis/?yudao) |
+| [Spring MVC](https://github.com/spring-projects/spring-framework/tree/master/spring-webmvc) | MVC 框架  | 5.3.13 | [文档](http://www.iocoder.cn/SpringMVC/MVC/?yudao) |
+| [Spring Security](https://github.com/spring-projects/spring-security) | Spring 安全框架 | 5.4.9 | [文档](http://www.iocoder.cn/Spring-Boot/Spring-Security/?yudao) |
 | [Hibernate Validator](https://github.com/hibernate/hibernate-validator) | 参数校验组件 | 6.1.7 | [文档](http://www.iocoder.cn/Spring-Boot/Validation/?yudao) |
 | [Quartz](https://github.com/quartz-scheduler) | 任务调度组件 | 2.3.2 | [文档](http://www.iocoder.cn/Spring-Boot/Job/?yudao) |
 | [Knife4j](https://gitee.com/xiaoym/knife4j) | Swagger 增强 UI 实现 | 3.0.2 | [文档](http://www.iocoder.cn/Spring-Boot/Swagger/?yudao) |
 | [Resilience4j](https://github.com/resilience4j/resilience4j) | 服务保障组件 | 1.7.0 | [文档](http://www.iocoder.cn/Spring-Boot/Resilience4j/?yudao) |
 | [SkyWalking](https://skywalking.apache.org/) | 分布式应用追踪系统 | 8.5.0 | [文档](http://www.iocoder.cn/Spring-Boot/SkyWalking/?yudao) |
-| [Spring Boot Admin](https://github.com/codecentric/spring-boot-admin) | Spring Boot 监控平台 | 2.3.1 | [文档](http://www.iocoder.cn/Spring-Boot/Admin/?yudao) |
+| [Spring Boot Admin](https://github.com/codecentric/spring-boot-admin) | Spring Boot 监控平台 | 2.4.2 | [文档](http://www.iocoder.cn/Spring-Boot/Admin/?yudao) |
 | [Jackson](https://github.com/FasterXML/jackson) | JSON 工具库 | 2.11.4 |  |
 | [MapStruct](https://mapstruct.org/) | Java Bean 转换 | 1.4.1 | [文档](http://www.iocoder.cn/Spring-Boot/MapStruct/?yudao) |
 | [Lombok](https://projectlombok.org/) | 消除冗长的 Java 代码 | 1.16.14 | [文档](http://www.iocoder.cn/Spring-Boot/Lombok/?yudao) |

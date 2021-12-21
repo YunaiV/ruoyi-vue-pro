@@ -6,19 +6,14 @@ import cn.iocoder.yudao.adminserver.modules.pay.controller.app.vo.PayAppCreateRe
 import cn.iocoder.yudao.adminserver.modules.pay.controller.app.vo.PayAppExportReqVO;
 import cn.iocoder.yudao.adminserver.modules.pay.controller.app.vo.PayAppPageReqVO;
 import cn.iocoder.yudao.adminserver.modules.pay.controller.app.vo.PayAppUpdateReqVO;
-
-
 import cn.iocoder.yudao.adminserver.modules.pay.dal.mysql.app.PayAppMapper;
 import cn.iocoder.yudao.adminserver.modules.pay.dal.mysql.merchant.PayMerchantMapper;
 import cn.iocoder.yudao.adminserver.modules.pay.service.app.impl.PayAppServiceImpl;
-import cn.iocoder.yudao.adminserver.modules.pay.service.merchant.PayMerchantService;
 import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.merchant.PayAppDO;
 import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.merchant.PayMerchantDO;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mockito;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
@@ -27,8 +22,9 @@ import javax.annotation.Resource;
 import java.util.Collections;
 import java.util.List;
 
-import static cn.iocoder.yudao.coreservice.modules.pay.enums.PayErrorCodeCoreConstants.*;
+import static cn.iocoder.yudao.coreservice.modules.pay.enums.PayErrorCodeCoreConstants.PAY_APP_NOT_FOUND;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildTime;
+import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomLongId;
@@ -151,19 +147,19 @@ public class PayAppServiceTest extends BaseDbUnitTest {
 
         appMapper.insert(dbApp);
         // 测试 name 不匹配
-        appMapper.insert(ObjectUtils.clone(dbApp, o -> o.setName("敏敏姐的杂货铺")));
+        appMapper.insert(cloneIgnoreId(dbApp, o -> o.setName("敏敏姐的杂货铺")));
         // 测试 status 不匹配
-        appMapper.insert(ObjectUtils.clone(dbApp, o -> o.setStatus(CommonStatusEnum.DISABLE.getStatus())));
+        appMapper.insert(cloneIgnoreId(dbApp, o -> o.setStatus(CommonStatusEnum.DISABLE.getStatus())));
         // 测试 remark 不匹配
-        appMapper.insert(ObjectUtils.clone(dbApp, o -> o.setRemark("灿灿姐的小卖部")));
+        appMapper.insert(cloneIgnoreId(dbApp, o -> o.setRemark("灿灿姐的小卖部")));
         // 测试 payNotifyUrl 不匹配
-        appMapper.insert(ObjectUtils.clone(dbApp, o -> o.setPayNotifyUrl("xm.com")));
+        appMapper.insert(cloneIgnoreId(dbApp, o -> o.setPayNotifyUrl("xm.com")));
         // 测试 refundNotifyUrl 不匹配
-        appMapper.insert(ObjectUtils.clone(dbApp, o -> o.setRefundNotifyUrl("hc.com")));
+        appMapper.insert(cloneIgnoreId(dbApp, o -> o.setRefundNotifyUrl("hc.com")));
         // 测试 merchantId 不匹配
-        appMapper.insert(ObjectUtils.clone(dbApp, o -> o.setMerchantId(mismatchMerchantId)));
+        appMapper.insert(cloneIgnoreId(dbApp, o -> o.setMerchantId(mismatchMerchantId)));
         // 测试 createTime 不匹配
-        appMapper.insert(ObjectUtils.clone(dbApp, o -> o.setCreateTime(buildTime(2021,12,21))));
+        appMapper.insert(cloneIgnoreId(dbApp, o -> o.setCreateTime(buildTime(2021,12,21))));
         // 准备参数
         PayAppPageReqVO reqVO = new PayAppPageReqVO();
         reqVO.setName("灿灿姐的杂货铺");
@@ -215,19 +211,19 @@ public class PayAppServiceTest extends BaseDbUnitTest {
 
         appMapper.insert(dbApp);
         // 测试 name 不匹配
-        appMapper.insert(ObjectUtils.clone(dbApp, o -> o.setName("敏敏姐的杂货铺")));
+        appMapper.insert(cloneIgnoreId(dbApp, o -> o.setName("敏敏姐的杂货铺")));
         // 测试 status 不匹配
-        appMapper.insert(ObjectUtils.clone(dbApp, o -> o.setStatus(CommonStatusEnum.DISABLE.getStatus())));
+        appMapper.insert(cloneIgnoreId(dbApp, o -> o.setStatus(CommonStatusEnum.DISABLE.getStatus())));
         // 测试 remark 不匹配
-        appMapper.insert(ObjectUtils.clone(dbApp, o -> o.setRemark("灿灿姐的小卖部")));
+        appMapper.insert(cloneIgnoreId(dbApp, o -> o.setRemark("灿灿姐的小卖部")));
         // 测试 payNotifyUrl 不匹配
-        appMapper.insert(ObjectUtils.clone(dbApp, o -> o.setPayNotifyUrl("xm.com")));
+        appMapper.insert(cloneIgnoreId(dbApp, o -> o.setPayNotifyUrl("xm.com")));
         // 测试 refundNotifyUrl 不匹配
-        appMapper.insert(ObjectUtils.clone(dbApp, o -> o.setRefundNotifyUrl("hc.com")));
+        appMapper.insert(cloneIgnoreId(dbApp, o -> o.setRefundNotifyUrl("hc.com")));
         // 测试 merchantId 不匹配
-        appMapper.insert(ObjectUtils.clone(dbApp, o -> o.setMerchantId(mismatchMerchantId)));
+        appMapper.insert(cloneIgnoreId(dbApp, o -> o.setMerchantId(mismatchMerchantId)));
         // 测试 createTime 不匹配
-        appMapper.insert(ObjectUtils.clone(dbApp, o -> o.setCreateTime(buildTime(2021,12,21))));
+        appMapper.insert(cloneIgnoreId(dbApp, o -> o.setCreateTime(buildTime(2021,12,21))));
         // 准备参数
         PayAppExportReqVO reqVO = new PayAppExportReqVO();
         reqVO.setName("灿灿姐的杂货铺");

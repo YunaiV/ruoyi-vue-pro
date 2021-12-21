@@ -83,9 +83,9 @@ class SysDeptServiceTest extends BaseDbUnitTest {
         });
         deptMapper.insert(dept);
         // 测试 name 不匹配
-        deptMapper.insert(ObjectUtils.clone(dept, o -> o.setName("发")));
+        deptMapper.insert(ObjectUtils.cloneIgnoreId(dept, o -> o.setName("发")));
         // 测试 status 不匹配
-        deptMapper.insert(ObjectUtils.clone(dept, o -> o.setStatus(CommonStatusEnum.DISABLE.getStatus())));
+        deptMapper.insert(ObjectUtils.cloneIgnoreId(dept, o -> o.setStatus(CommonStatusEnum.DISABLE.getStatus())));
         // 准备参数
         SysDeptListReqVO reqVO = new SysDeptListReqVO();
         reqVO.setName("开");

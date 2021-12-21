@@ -31,6 +31,9 @@ export const DICT_TYPE = {
 
   TOOL_CODEGEN_TEMPLATE_TYPE: 'tool_codegen_template_type',
 
+  OA_LEAVE_STATUS: 'oa_leave_status',
+  OA_LEAVE_TYPE: 'oa_leave_type',
+
   // 商户状态
   PAY_MERCHANT_STATUS: 'pay_merchant_status',
   // 应用状态

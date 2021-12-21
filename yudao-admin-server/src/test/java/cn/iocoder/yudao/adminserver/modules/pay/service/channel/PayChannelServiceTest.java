@@ -10,7 +10,6 @@ import cn.iocoder.yudao.adminserver.modules.pay.service.channel.impl.PayChannelS
 import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.merchant.PayChannelDO;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.pay.core.client.impl.alipay.AlipayPayClientConfig;
 import cn.iocoder.yudao.framework.pay.core.client.impl.wx.WXPayClientConfig;
 import cn.iocoder.yudao.framework.pay.core.enums.PayChannelEnum;
@@ -23,6 +22,7 @@ import java.util.List;
 
 import static cn.iocoder.yudao.coreservice.modules.pay.enums.PayErrorCodeCoreConstants.CHANNEL_NOT_EXISTS;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildTime;
+import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomLongId;
@@ -222,37 +222,37 @@ public class PayChannelServiceTest extends BaseDbUnitTest {
         // 执行拷贝的时候会出现异常，所以在插入后要重置为null 后续在写入新的
         dbChannel.setConfig(null);
         // 测试 code 不匹配
-        channelMapper.insert(ObjectUtils.clone(dbChannel, o -> {
+        channelMapper.insert(cloneIgnoreId(dbChannel, o -> {
             o.setConfig(payClientConfig);
             o.setCode(PayChannelEnum.WX_PUB.getCode());
         }));
         // 测试 status 不匹配
-        channelMapper.insert(ObjectUtils.clone(dbChannel, o -> {
+        channelMapper.insert(cloneIgnoreId(dbChannel, o -> {
             o.setConfig(payClientConfig);
             o.setStatus(CommonStatusEnum.DISABLE.getStatus());
         }));
         // 测试 remark 不匹配
-        channelMapper.insert(ObjectUtils.clone(dbChannel, o ->{
+        channelMapper.insert(cloneIgnoreId(dbChannel, o ->{
             o.setConfig(payClientConfig);
             o.setRemark("敏敏子的渠道");
         }));
         // 测试 feeRate 不匹配
-        channelMapper.insert(ObjectUtils.clone(dbChannel, o -> {
+        channelMapper.insert(cloneIgnoreId(dbChannel, o -> {
             o.setConfig(payClientConfig);
             o.setFeeRate(1.23);
         }));
         // 测试 merchantId 不匹配
-        channelMapper.insert(ObjectUtils.clone(dbChannel, o -> {
+        channelMapper.insert(cloneIgnoreId(dbChannel, o -> {
             o.setConfig(payClientConfig);
             o.setMerchantId(2L);
         }));
         // 测试 appId 不匹配
-        channelMapper.insert(ObjectUtils.clone(dbChannel, o -> {
+        channelMapper.insert(cloneIgnoreId(dbChannel, o -> {
             o.setConfig(payClientConfig);
             o.setAppId(2L);
         }));
         // 测试 createTime 不匹配
-        channelMapper.insert(ObjectUtils.clone(dbChannel, o -> {
+        channelMapper.insert(cloneIgnoreId(dbChannel, o -> {
             o.setConfig(payClientConfig);
             o.setCreateTime(buildTime(2021, 10, 20));
         }));
@@ -296,37 +296,37 @@ public class PayChannelServiceTest extends BaseDbUnitTest {
         // 执行拷贝的时候会出现异常，所以在插入后要重置为null 后续在写入新的
         dbChannel.setConfig(null);
         // 测试 code 不匹配
-        channelMapper.insert(ObjectUtils.clone(dbChannel, o -> {
+        channelMapper.insert(cloneIgnoreId(dbChannel, o -> {
             o.setConfig(payClientConfig);
             o.setCode(PayChannelEnum.WX_PUB.getCode());
         }));
         // 测试 status 不匹配
-        channelMapper.insert(ObjectUtils.clone(dbChannel, o -> {
+        channelMapper.insert(cloneIgnoreId(dbChannel, o -> {
             o.setConfig(payClientConfig);
             o.setStatus(CommonStatusEnum.DISABLE.getStatus());
         }));
         // 测试 remark 不匹配
-        channelMapper.insert(ObjectUtils.clone(dbChannel, o ->{
+        channelMapper.insert(cloneIgnoreId(dbChannel, o ->{
             o.setConfig(payClientConfig);
             o.setRemark("敏敏子的渠道");
         }));
         // 测试 feeRate 不匹配
-        channelMapper.insert(ObjectUtils.clone(dbChannel, o -> {
+        channelMapper.insert(cloneIgnoreId(dbChannel, o -> {
             o.setConfig(payClientConfig);
             o.setFeeRate(1.23);
         }));
         // 测试 merchantId 不匹配
-        channelMapper.insert(ObjectUtils.clone(dbChannel, o -> {
+        channelMapper.insert(cloneIgnoreId(dbChannel, o -> {
             o.setConfig(payClientConfig);
             o.setMerchantId(2L);
         }));
         // 测试 appId 不匹配
-        channelMapper.insert(ObjectUtils.clone(dbChannel, o -> {
+        channelMapper.insert(cloneIgnoreId(dbChannel, o -> {
             o.setConfig(payClientConfig);
             o.setAppId(2L);
         }));
         // 测试 createTime 不匹配
-        channelMapper.insert(ObjectUtils.clone(dbChannel, o -> {
+        channelMapper.insert(cloneIgnoreId(dbChannel, o -> {
             o.setConfig(payClientConfig);
             o.setCreateTime(buildTime(2021, 10, 20));
         }));

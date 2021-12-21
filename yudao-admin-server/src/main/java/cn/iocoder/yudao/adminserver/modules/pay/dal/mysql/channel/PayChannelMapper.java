@@ -1,14 +1,16 @@
 package cn.iocoder.yudao.adminserver.modules.pay.dal.mysql.channel;
 
-import java.util.*;
-
+import cn.iocoder.yudao.adminserver.modules.pay.controller.channel.vo.PayChannelExportReqVO;
+import cn.iocoder.yudao.adminserver.modules.pay.controller.channel.vo.PayChannelPageReqVO;
 import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.merchant.PayChannelDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.mybatis.core.query.QueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
+import cn.iocoder.yudao.framework.mybatis.core.query.QueryWrapperX;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.apache.ibatis.annotations.Mapper;
-import cn.iocoder.yudao.adminserver.modules.pay.controller.channel.vo.*;
+
+import java.util.Collection;
+import java.util.List;
 
 /**
  * 支付渠道
@@ -53,13 +55,12 @@ public interface PayChannelMapper extends BaseMapperX<PayChannelDO> {
      * @param code       通道编码
      * @return 数量
      */
+    // TODO @aquan：Mapper 的操作，和 db 保持一致
     default Integer getChannelCountByConditions(Long merchantId, Long appid, String code) {
-
         return this.selectCount(new QueryWrapper<PayChannelDO>().lambda()
                 .eq(PayChannelDO::getMerchantId, merchantId)
                 .eq(PayChannelDO::getAppId, appid)
-                .eq(PayChannelDO::getCode, code)
-        );
+                .eq(PayChannelDO::getCode, code)).intValue();
     }
 
     /**

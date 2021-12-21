@@ -10,6 +10,7 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.adminserver.modules.infra.convert.file.InfFileConvert;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
+import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -64,6 +65,7 @@ public class InfFileController {
     @ApiOperation("下载文件")
     @ApiImplicitParam(name = "path", value = "文件附件", required = true, dataTypeClass = MultipartFile.class)
     public void getFile(HttpServletResponse response, @PathVariable("path") String path) throws IOException {
+        TenantContextHolder.setNullTenantId();
         InfFileDO file = fileCoreService.getFile(path);
         if (file == null) {
             log.warn("[getFile][path({}) 文件不存在]", path);

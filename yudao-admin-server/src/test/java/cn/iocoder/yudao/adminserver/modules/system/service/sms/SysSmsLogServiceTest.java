@@ -57,19 +57,19 @@ public class SysSmsLogServiceTest extends BaseDbUnitTest {
        });
        smsLogMapper.insert(dbSmsLog);
        // 测试 channelId 不匹配
-       smsLogMapper.insert(ObjectUtils.clone(dbSmsLog, o -> o.setChannelId(2L)));
+       smsLogMapper.insert(ObjectUtils.cloneIgnoreId(dbSmsLog, o -> o.setChannelId(2L)));
        // 测试 templateId 不匹配
-       smsLogMapper.insert(ObjectUtils.clone(dbSmsLog, o -> o.setTemplateId(20L)));
+       smsLogMapper.insert(ObjectUtils.cloneIgnoreId(dbSmsLog, o -> o.setTemplateId(20L)));
        // 测试 mobile 不匹配
-       smsLogMapper.insert(ObjectUtils.clone(dbSmsLog, o -> o.setMobile("18818260999")));
+       smsLogMapper.insert(ObjectUtils.cloneIgnoreId(dbSmsLog, o -> o.setMobile("18818260999")));
        // 测试 sendStatus 不匹配
-       smsLogMapper.insert(ObjectUtils.clone(dbSmsLog, o -> o.setSendStatus(SysSmsSendStatusEnum.IGNORE.getStatus())));
+       smsLogMapper.insert(ObjectUtils.cloneIgnoreId(dbSmsLog, o -> o.setSendStatus(SysSmsSendStatusEnum.IGNORE.getStatus())));
        // 测试 sendTime 不匹配
-       smsLogMapper.insert(ObjectUtils.clone(dbSmsLog, o -> o.setSendTime(buildTime(2020, 12, 12))));
+       smsLogMapper.insert(ObjectUtils.cloneIgnoreId(dbSmsLog, o -> o.setSendTime(buildTime(2020, 12, 12))));
        // 测试 receiveStatus 不匹配
-       smsLogMapper.insert(ObjectUtils.clone(dbSmsLog, o -> o.setReceiveStatus(SysSmsReceiveStatusEnum.SUCCESS.getStatus())));
+       smsLogMapper.insert(ObjectUtils.cloneIgnoreId(dbSmsLog, o -> o.setReceiveStatus(SysSmsReceiveStatusEnum.SUCCESS.getStatus())));
        // 测试 receiveTime 不匹配
-       smsLogMapper.insert(ObjectUtils.clone(dbSmsLog, o -> o.setReceiveTime(buildTime(2021, 12, 12))));
+       smsLogMapper.insert(ObjectUtils.cloneIgnoreId(dbSmsLog, o -> o.setReceiveTime(buildTime(2021, 12, 12))));
        // 准备参数
        SysSmsLogPageReqVO reqVO = new SysSmsLogPageReqVO();
        reqVO.setChannelId(1L);
@@ -104,19 +104,19 @@ public class SysSmsLogServiceTest extends BaseDbUnitTest {
         });
         smsLogMapper.insert(dbSmsLog);
         // 测试 channelId 不匹配
-        smsLogMapper.insert(ObjectUtils.clone(dbSmsLog, o -> o.setChannelId(2L)));
+        smsLogMapper.insert(ObjectUtils.cloneIgnoreId(dbSmsLog, o -> o.setChannelId(2L)));
         // 测试 templateId 不匹配
-        smsLogMapper.insert(ObjectUtils.clone(dbSmsLog, o -> o.setTemplateId(20L)));
+        smsLogMapper.insert(ObjectUtils.cloneIgnoreId(dbSmsLog, o -> o.setTemplateId(20L)));
         // 测试 mobile 不匹配
-        smsLogMapper.insert(ObjectUtils.clone(dbSmsLog, o -> o.setMobile("18818260999")));
+        smsLogMapper.insert(ObjectUtils.cloneIgnoreId(dbSmsLog, o -> o.setMobile("18818260999")));
         // 测试 sendStatus 不匹配
-        smsLogMapper.insert(ObjectUtils.clone(dbSmsLog, o -> o.setSendStatus(SysSmsSendStatusEnum.IGNORE.getStatus())));
+        smsLogMapper.insert(ObjectUtils.cloneIgnoreId(dbSmsLog, o -> o.setSendStatus(SysSmsSendStatusEnum.IGNORE.getStatus())));
         // 测试 sendTime 不匹配
-        smsLogMapper.insert(ObjectUtils.clone(dbSmsLog, o -> o.setSendTime(buildTime(2020, 12, 12))));
+        smsLogMapper.insert(ObjectUtils.cloneIgnoreId(dbSmsLog, o -> o.setSendTime(buildTime(2020, 12, 12))));
         // 测试 receiveStatus 不匹配
-        smsLogMapper.insert(ObjectUtils.clone(dbSmsLog, o -> o.setReceiveStatus(SysSmsReceiveStatusEnum.SUCCESS.getStatus())));
+        smsLogMapper.insert(ObjectUtils.cloneIgnoreId(dbSmsLog, o -> o.setReceiveStatus(SysSmsReceiveStatusEnum.SUCCESS.getStatus())));
         // 测试 receiveTime 不匹配
-        smsLogMapper.insert(ObjectUtils.clone(dbSmsLog, o -> o.setReceiveTime(buildTime(2021, 12, 12))));
+        smsLogMapper.insert(ObjectUtils.cloneIgnoreId(dbSmsLog, o -> o.setReceiveTime(buildTime(2021, 12, 12))));
         // 准备参数
         SysSmsLogExportReqVO reqVO = new SysSmsLogExportReqVO();
         reqVO.setChannelId(1L);

@@ -14,19 +14,19 @@
     <url>https://github.com/YunaiV/ruoyi-vue-pro</url>
 
     <properties>
-        <revision>1.2.0-snapshot</revision>
+        <revision>1.3.0-snapshot</revision>
         <!-- 统一依赖管理 -->
-        <spring.boot.version>2.4.5</spring.boot.version>
+        <spring.boot.version>2.4.12</spring.boot.version>
         <!-- Web 相关 -->
         <knife4j.version>3.0.2</knife4j.version>
         <swagger-annotations.version>1.5.22</swagger-annotations.version>
         <servlet.versoin>2.5</servlet.versoin>
         <!-- DB 相关 -->
         <mysql.version>5.1.46</mysql.version>
-        <druid.version>1.2.4</druid.version>
-        <mybatis-plus.version>3.4.2</mybatis-plus.version>
-        <dynamic-datasource.version>3.3.2</dynamic-datasource.version>
-        <redisson.version>3.16.3</redisson.version>
+        <druid.version>1.2.8</druid.version>
+        <mybatis-plus.version>3.4.3.4</mybatis-plus.version>
+        <dynamic-datasource.version>3.5.0</dynamic-datasource.version>
+        <redisson.version>3.16.6</redisson.version>
         <!-- Config 配置中心相关 -->
         <apollo.version>1.7.0</apollo.version>
         <!-- Job 定时任务相关 -->
@@ -40,6 +40,7 @@
         <!-- Test 测试相关 -->
         <podam.version>7.2.6.RELEASE</podam.version>
         <jedis-mock.version>0.1.16</jedis-mock.version>
+        <mockito-inline.version>3.6.28</mockito-inline.version>
         <!-- 工具类相关 -->
         <lombok.version>1.18.20</lombok.version>
         <mapstruct.version>1.4.1.Final</mapstruct.version>
@@ -48,6 +49,7 @@
         <velocity.version>2.2</velocity.version>
         <screw.version>1.0.5</screw.version>
         <guava.version>30.1.1-jre</guava.version>
+        <transmittable-thread-local.version>2.12.2</transmittable-thread-local.version>
         <!-- 三方云服务相关 -->
         <aliyun-java-sdk-core.version>4.5.25</aliyun-java-sdk-core.version>
         <aliyun-java-sdk-dysmsapi.version>2.1.0</aliyun-java-sdk-dysmsapi.version>
@@ -101,6 +103,21 @@
             <dependency>
                 <groupId>cn.iocoder.boot</groupId>
                 <artifactId>yudao-spring-boot-starter-biz-weixin</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.iocoder.boot</groupId>
+                <artifactId>yudao-spring-boot-starter-biz-tenant</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.iocoder.boot</groupId>
+                <artifactId>yudao-spring-boot-starter-biz-data-permission</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.iocoder.boot</groupId>
+                <artifactId>yudao-spring-boot-starter-biz-social</artifactId>
                 <version>${revision}</version>
             </dependency>
 
@@ -311,6 +328,13 @@
                 <groupId>cn.iocoder.boot</groupId>
                 <artifactId>yudao-spring-boot-starter-test</artifactId>
                 <version>${revision}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-inline</artifactId>
+                <version>${mockito-inline.version}</version> <!-- 支持 Mockito 的 final 类与 static 方法的 mock -->
             </dependency>
 
             <dependency>
@@ -321,6 +345,10 @@
                     <exclusion>
                         <artifactId>asm</artifactId>
                         <groupId>org.ow2.asm</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.mockito</groupId>
+                        <artifactId>mockito-core</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>
@@ -402,6 +430,12 @@
                 <version>${guava.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>transmittable-thread-local</artifactId> <!-- 解决 ThreadLocal 父子线程的传值问题 -->
+                <version>${transmittable-thread-local.version}</version>
+            </dependency>
+
             <!-- 三方云服务相关 -->
 
             <!-- SMS SDK begin -->
@@ -410,7 +444,6 @@
                 <artifactId>yunpian-java-sdk</artifactId>
                 <version>${yunpian-java-sdk.version}</version>
             </dependency>
-
             <dependency>
                 <groupId>com.aliyun</groupId>
                 <artifactId>aliyun-java-sdk-core</artifactId>
@@ -435,10 +468,17 @@
 
             <dependency>
                 <groupId>com.xkcoding.justauth</groupId>
-                <artifactId>justauth-spring-boot-starter</artifactId>
+                <artifactId>justauth-spring-boot-starter</artifactId> <!-- 社交登陆（例如说，个人微信、企业微信等等） -->
                 <version>${justauth.version}</version>
             </dependency>
 
+            <!-- activiti begin -->
+            <dependency>
+                <groupId>cn.iocoder.boot</groupId>
+                <artifactId>yudao-spring-boot-starter-activiti</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <!-- activiti end -->
         </dependencies>
     </dependencyManagement>
 

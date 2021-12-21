@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.notice;
 
-import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
-import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.adminserver.modules.system.enums.notice.SysNoticeTypeEnum;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.tenant.core.db.TenantBaseDO;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
@@ -16,7 +16,7 @@ import lombok.EqualsAndHashCode;
 @TableName("sys_notice")
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class SysNoticeDO extends BaseDO {
+public class SysNoticeDO extends TenantBaseDO {
 
     /**
      * 公告ID
