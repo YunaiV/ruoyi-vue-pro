@@ -3,8 +3,8 @@ package cn.iocoder.yudao.adminserver.modules.pay.service.order;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.iocoder.yudao.adminserver.BaseDbUnitTest;
-import cn.iocoder.yudao.adminserver.modules.pay.controller.order.vo.PayOrderExportReqVO;
-import cn.iocoder.yudao.adminserver.modules.pay.controller.order.vo.PayOrderPageReqVO;
+import cn.iocoder.yudao.adminserver.modules.pay.controller.order.vo.order.PayOrderExportReqVO;
+import cn.iocoder.yudao.adminserver.modules.pay.controller.order.vo.order.PayOrderPageReqVO;
 import cn.iocoder.yudao.adminserver.modules.pay.dal.mysql.order.PayOrderMapper;
 import cn.iocoder.yudao.adminserver.modules.pay.service.order.impl.PayOrderServiceImpl;
 import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.order.PayOrderDO;
@@ -44,7 +44,7 @@ public class PayOrderServiceTest extends BaseDbUnitTest {
         return DateUtil.format(new Date(), "yyyyMMddHHmmss") + RandomUtil.randomInt(100000, 999999);
     }
 
-    @Test // TODO 请修改 null 为需要的值
+    @Test
     public void testGetOrderPage() {
 
         String merchantOrderId = generateNo();
@@ -120,7 +120,7 @@ public class PayOrderServiceTest extends BaseDbUnitTest {
         // assertEquals(0, dbOrder.getUpdateTime().compareTo(pageResult.getList().get(0).getUpdateTime()));
     }
 
-    @Test // TODO 请修改 null 为需要的值
+    @Test
     public void testGetOrderList() {
         // mock 数据
         String merchantOrderId = generateNo();

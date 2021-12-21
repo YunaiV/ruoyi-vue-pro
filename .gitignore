@@ -42,3 +42,5 @@ nbdist/
 !*/build/*.java
 !*/build/*.html
 !*/build/*.xml
+
+yudao-user-server/src/main/resources/application-local.yaml

@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.adminserver.modules.pay.controller.order.vo;
+package cn.iocoder.yudao.adminserver.modules.pay.controller.order.vo.order;
 
 import cn.iocoder.yudao.adminserver.modules.system.enums.SysDictTypeConstants;
 import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;

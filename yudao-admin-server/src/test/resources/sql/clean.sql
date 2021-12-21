@@ -29,4 +29,5 @@ DELETE FROM "sys_social_user";
 DELETE FROM pay_merchant;
 DELETE FROM pay_app;
 DELETE FROM pay_channel;
-delete from pay_order;
+DELETE FROM pay_order;
+DELETE FROM pay_refund;

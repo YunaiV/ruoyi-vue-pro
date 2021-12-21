@@ -3,7 +3,7 @@ package cn.iocoder.yudao.coreservice.modules.pay.service.order.impl;
 import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.order.PayOrderDO;
 import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.order.PayRefundDO;
 import cn.iocoder.yudao.coreservice.modules.pay.dal.mysql.order.PayOrderCoreMapper;
-import cn.iocoder.yudao.coreservice.modules.pay.dal.mysql.order.PayRefundMapper;
+import cn.iocoder.yudao.coreservice.modules.pay.dal.mysql.order.PayRefundCoreMapper;
 import cn.iocoder.yudao.coreservice.modules.pay.enums.order.PayRefundStatusEnum;
 import cn.iocoder.yudao.coreservice.modules.pay.service.order.PayRefundAbstractChannelPostHandler;
 import cn.iocoder.yudao.coreservice.modules.pay.service.order.bo.PayRefundPostReqBO;
@@ -22,7 +22,7 @@ public class PayRefundChannelQueryHandler extends PayRefundAbstractChannelPostHa
 
 
     public PayRefundChannelQueryHandler(PayOrderCoreMapper payOrderCoreMapper,
-                                        PayRefundMapper payRefundMapper) {
+                                        PayRefundCoreMapper payRefundMapper) {
         super(payOrderCoreMapper, payRefundMapper);
     }
 

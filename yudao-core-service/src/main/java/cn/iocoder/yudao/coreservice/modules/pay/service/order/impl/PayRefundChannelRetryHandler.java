@@ -3,14 +3,12 @@ package cn.iocoder.yudao.coreservice.modules.pay.service.order.impl;
 import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.order.PayOrderDO;
 import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.order.PayRefundDO;
 import cn.iocoder.yudao.coreservice.modules.pay.dal.mysql.order.PayOrderCoreMapper;
-import cn.iocoder.yudao.coreservice.modules.pay.dal.mysql.order.PayRefundMapper;
+import cn.iocoder.yudao.coreservice.modules.pay.dal.mysql.order.PayRefundCoreMapper;
 import cn.iocoder.yudao.coreservice.modules.pay.enums.order.PayRefundStatusEnum;
 import cn.iocoder.yudao.coreservice.modules.pay.service.order.PayRefundAbstractChannelPostHandler;
 import cn.iocoder.yudao.coreservice.modules.pay.service.order.bo.PayRefundPostReqBO;
 import cn.iocoder.yudao.framework.pay.core.enums.PayChannelRespEnum;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 /**
  * 支付退款订单渠道返回重试的后置处理类
@@ -21,7 +19,7 @@ public class PayRefundChannelRetryHandler extends PayRefundAbstractChannelPostHa
 
 
     public PayRefundChannelRetryHandler(PayOrderCoreMapper payOrderCoreMapper,
-                                        PayRefundMapper payRefundMapper) {
+                                        PayRefundCoreMapper payRefundMapper) {
         super(payOrderCoreMapper, payRefundMapper);
     }
 

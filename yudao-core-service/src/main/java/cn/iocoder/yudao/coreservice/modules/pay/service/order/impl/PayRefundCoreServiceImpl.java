@@ -9,7 +9,7 @@ import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.order.PayOrderExt
 import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.order.PayRefundDO;
 import cn.iocoder.yudao.coreservice.modules.pay.dal.mysql.order.PayOrderCoreMapper;
 import cn.iocoder.yudao.coreservice.modules.pay.dal.mysql.order.PayOrderExtensionCoreMapper;
-import cn.iocoder.yudao.coreservice.modules.pay.dal.mysql.order.PayRefundMapper;
+import cn.iocoder.yudao.coreservice.modules.pay.dal.mysql.order.PayRefundCoreMapper;
 import cn.iocoder.yudao.coreservice.modules.pay.enums.notify.PayNotifyTypeEnum;
 import cn.iocoder.yudao.coreservice.modules.pay.enums.order.PayOrderNotifyStatusEnum;
 import cn.iocoder.yudao.coreservice.modules.pay.service.notify.PayNotifyCoreService;
@@ -52,7 +52,7 @@ public class PayRefundCoreServiceImpl implements PayRefundCoreService {
     private PayOrderCoreMapper payOrderCoreMapper;
 
     @Resource
-    private PayRefundMapper payRefundMapper;
+    private PayRefundCoreMapper payRefundCoreMapper;
 
     @Resource
     private PayOrderExtensionCoreMapper payOrderExtensionCoreMapper;
@@ -145,7 +145,7 @@ public class PayRefundCoreServiceImpl implements PayRefundCoreService {
                 .type(refundType.getStatus())
                 .build();
 
-         payRefundMapper.insert(refundDO);
+         payRefundCoreMapper.insert(refundDO);
 
          PayRefundUnifiedReqDTO unifiedReqDTO = PayRefundUnifiedReqDTO.builder()
                 .userIp(reqBO.getUserIp())
@@ -197,7 +197,7 @@ public class PayRefundCoreServiceImpl implements PayRefundCoreService {
 
         if(Objects.equals(PayNotifyRefundStatusEnum.SUCCESS,refundNotify.getStatus())){
             //退款成功。 支付宝只有退款成功才会发通知
-            PayRefundDO refundDO = payRefundMapper.selectByReqNo(refundNotify.getReqNo());
+            PayRefundDO refundDO = payRefundCoreMapper.selectByReqNo(refundNotify.getReqNo());
             if (refundDO == null) {
                 log.error("不存在 seqNo 为{} 的支付退款单",refundNotify.getReqNo());
                 throw exception(PAY_REFUND_NOT_FOUND);
@@ -227,7 +227,7 @@ public class PayRefundCoreServiceImpl implements PayRefundCoreService {
                     .setTradeNo(refundNotify.getTradeNo())
                     .setNotifyTime(new Date())
                     .setStatus(PayRefundStatusEnum.SUCCESS.getStatus());
-            payRefundMapper.updateById(updateRefundDO);
+            payRefundCoreMapper.updateById(updateRefundDO);
 
             //插入退款通知记录
             // TODO 通知商户成功或者失败. 现在通知似乎没有实现， 只是回调

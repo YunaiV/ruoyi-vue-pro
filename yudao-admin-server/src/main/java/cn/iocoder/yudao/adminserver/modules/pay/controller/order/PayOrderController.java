@@ -2,7 +2,7 @@ package cn.iocoder.yudao.adminserver.modules.pay.controller.order;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
-import cn.iocoder.yudao.adminserver.modules.pay.controller.order.vo.*;
+import cn.iocoder.yudao.adminserver.modules.pay.controller.order.vo.order.*;
 import cn.iocoder.yudao.adminserver.modules.pay.convert.order.PayOrderConvert;
 import cn.iocoder.yudao.adminserver.modules.pay.service.app.PayAppService;
 import cn.iocoder.yudao.adminserver.modules.pay.service.merchant.PayMerchantService;
@@ -33,7 +33,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -100,15 +99,6 @@ public class PayOrderController {
         }
 
         return success(respVO);
-    }
-
-    @GetMapping("/list")
-    @ApiOperation("获得支付订单列表")
-    @ApiImplicitParam(name = "ids", value = "编号列表", required = true, example = "1024,2048", dataTypeClass = List.class)
-    @PreAuthorize("@ss.hasPermission('pay:order:query')")
-    public CommonResult<List<PayOrderRespVO>> getOrderList(@RequestParam("ids") Collection<Long> ids) {
-        List<PayOrderDO> list = orderService.getOrderList(ids);
-        return success(PayOrderConvert.INSTANCE.convertList(list));
     }
 
     @GetMapping("/page")

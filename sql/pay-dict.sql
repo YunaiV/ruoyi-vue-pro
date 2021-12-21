@@ -172,3 +172,20 @@ INSERT INTO `sys_dict_data`(`sort`, `label`, `value`, `dict_type`, `status`, `re
                             `updater`, `update_time`, `deleted`)
 VALUES (3, '全部退款', '20', 'pay_order_refund_status', 0, '全部退款', '1', '2021-12-03 11:30:52', '1', '2021-12-03 11:34:14',
         b'0');
+
+-- 退款订单状态
+INSERT INTO `sys_dict_type`(`name`, `type`, `status`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES ('退款订单状态', 'pay_refund_order_status', 0, '退款订单状态', '1', '2021-12-10 16:42:50', '1', '2021-12-10 16:42:50', b'0');
+INSERT INTO `sys_dict_data`(`id`, `sort`, `label`, `value`, `dict_type`, `status`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (117, 1, '退款订单生成', '0', 'pay_refund_order_status', 0, '退款订单生成', '1', '2021-12-10 16:44:44', '1', '2021-12-10 16:44:44', b'0');
+INSERT INTO `sys_dict_data`(`id`, `sort`, `label`, `value`, `dict_type`, `status`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (118, 2, '退款成功', '1', 'pay_refund_order_status', 0, '退款成功', '1', '2021-12-10 16:44:59', '1', '2021-12-10 16:44:59', b'0');
+INSERT INTO `sys_dict_data`(`id`, `sort`, `label`, `value`, `dict_type`, `status`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (119, 3, '退款失败', '2', 'pay_refund_order_status', 0, '退款失败', '1', '2021-12-10 16:45:10', '1', '2021-12-10 16:45:10', b'0');
+INSERT INTO `sys_dict_data`(`id`, `sort`, `label`, `value`, `dict_type`, `status`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (120, 4, '退款中, 渠道通知结果', '3', 'pay_refund_order_status', 0, '退款中, 渠道通知结果', '1', '2021-12-10 16:45:32', '1', '2021-12-10 16:45:32', b'0');
+INSERT INTO `sys_dict_data`(`id`, `sort`, `label`, `value`, `dict_type`, `status`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (121, 5, '退款中, 系统查询结果', '4', 'pay_refund_order_status', 0, '退款中, 系统查询结果', '1', '2021-12-10 16:45:48', '1', '2021-12-10 16:45:48', b'0');
+INSERT INTO `sys_dict_data`(`id`, `sort`, `label`, `value`, `dict_type`, `status`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (122, 6, '状态未知，需要重试', '5', 'pay_refund_order_status', 0, '状态未知，需要重试', '1', '2021-12-10 16:46:03', '1', '2021-12-10 16:46:03', b'0');
+INSERT INTO `sys_dict_data`(`id`, `sort`, `label`, `value`, `dict_type`, `status`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (123, 7, '状态未知，系统查询结果', '6', 'pay_refund_order_status', 0, '状态未知，系统查询结果', '1', '2021-12-10 16:46:13', '1', '2021-12-10 16:46:13', b'0');
+INSERT INTO `sys_dict_data`(`id`, `sort`, `label`, `value`, `dict_type`, `status`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (124, 8, '退款关闭', '99', 'pay_refund_order_status', 0, '退款关闭', '1', '2021-12-10 16:46:26', '1', '2021-12-10 16:46:26', b'0');
+
+-- 退款订单类别
+INSERT INTO `sys_dict_type`(`name`, `type`, `status`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES ('退款订单类别', 'pay_refund_order_type', 0, '退款订单类别', '1', '2021-12-10 17:14:53', '1', '2021-12-10 17:14:53', b'0');
+INSERT INTO `ruoyi-vue-pro`.`sys_dict_data`(`id`, `sort`, `label`, `value`, `dict_type`, `status`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (125, 1, '未退款', '0', 'pay_refund_order_type', 0, '未退款', '1', '2021-12-10 17:15:11', '1', '2021-12-10 17:15:11', b'0');
+INSERT INTO `ruoyi-vue-pro`.`sys_dict_data`(`id`, `sort`, `label`, `value`, `dict_type`, `status`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (126, 2, '部分退款', '10', 'pay_refund_order_type', 0, '部分退款', '1', '2021-12-10 17:15:24', '1', '2021-12-10 17:15:24', b'0');
+INSERT INTO `ruoyi-vue-pro`.`sys_dict_data`(`id`, `sort`, `label`, `value`, `dict_type`, `status`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (127, 3, '全部退款', '20', 'pay_refund_order_type', 0, '全部退款', '1', '2021-12-10 17:15:34', '1', '2021-12-10 17:15:34', b'0');

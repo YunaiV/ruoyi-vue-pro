@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.adminserver.modules.pay.controller.order.vo;
+package cn.iocoder.yudao.adminserver.modules.pay.controller.order.vo.order;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;

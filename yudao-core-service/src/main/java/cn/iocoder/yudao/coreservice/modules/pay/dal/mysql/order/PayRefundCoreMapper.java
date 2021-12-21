@@ -10,7 +10,7 @@ import org.apache.ibatis.annotations.Mapper;
  *
  */
 @Mapper
-public interface PayRefundMapper extends BaseMapperX<PayRefundDO> {
+public interface PayRefundCoreMapper extends BaseMapperX<PayRefundDO> {
 
     default PayRefundDO selectByReqNo(String reqNo) {
         return selectOne("req_no", reqNo);
