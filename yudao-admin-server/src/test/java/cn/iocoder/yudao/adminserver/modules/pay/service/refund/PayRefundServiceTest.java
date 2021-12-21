@@ -11,7 +11,6 @@ import cn.iocoder.yudao.coreservice.modules.pay.enums.order.PayRefundStatusEnum;
 import cn.iocoder.yudao.coreservice.modules.pay.enums.order.PayRefundTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.date.DateUtils;
-import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.pay.core.enums.PayChannelEnum;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
@@ -19,9 +18,11 @@ import org.springframework.context.annotation.Import;
 import javax.annotation.Resource;
 import java.util.List;
 
+import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
 
 /**
  * {@link PayRefundServiceImpl} 的单元测试类
@@ -72,24 +73,24 @@ public class PayRefundServiceTest extends BaseDbUnitTest {
         });
         refundMapper.insert(dbRefund);
         // 测试 reqNo 不匹配
-        refundMapper.insert(ObjectUtils.clone(dbRefund, o -> o.setReqNo("RF1111112")));
+        refundMapper.insert(cloneIgnoreId(dbRefund, o -> o.setReqNo("RF1111112")));
         // 测试 merchantId 不匹配
-        refundMapper.insert(ObjectUtils.clone(dbRefund, o -> o.setMerchantId(2L)));
+        refundMapper.insert(cloneIgnoreId(dbRefund, o -> o.setMerchantId(2L)));
         // 测试 appId 不匹配
-        refundMapper.insert(ObjectUtils.clone(dbRefund, o -> o.setAppId(2L)));
+        refundMapper.insert(cloneIgnoreId(dbRefund, o -> o.setAppId(2L)));
         // 测试 channelCode 不匹配
-        refundMapper.insert(ObjectUtils.clone(dbRefund, o -> o.setChannelCode(PayChannelEnum.ALIPAY_APP.getCode())));
+        refundMapper.insert(cloneIgnoreId(dbRefund, o -> o.setChannelCode(PayChannelEnum.ALIPAY_APP.getCode())));
         // 测试 merchantRefundNo 不匹配
-        refundMapper.insert(ObjectUtils.clone(dbRefund, o -> o.setMerchantRefundNo("MRF1111112")));
+        refundMapper.insert(cloneIgnoreId(dbRefund, o -> o.setMerchantRefundNo("MRF1111112")));
         // 测试 notifyStatus 不匹配
         refundMapper.insert(
-                ObjectUtils.clone(dbRefund, o -> o.setNotifyStatus(PayOrderNotifyStatusEnum.FAILURE.getStatus())));
+                cloneIgnoreId(dbRefund, o -> o.setNotifyStatus(PayOrderNotifyStatusEnum.FAILURE.getStatus())));
         // 测试 status 不匹配
-        refundMapper.insert(ObjectUtils.clone(dbRefund, o -> o.setStatus(PayRefundStatusEnum.CLOSE.getStatus())));
+        refundMapper.insert(cloneIgnoreId(dbRefund, o -> o.setStatus(PayRefundStatusEnum.CLOSE.getStatus())));
         // 测试 type 不匹配
-        refundMapper.insert(ObjectUtils.clone(dbRefund, o -> o.setType(PayRefundTypeEnum.ALL.getStatus())));
+        refundMapper.insert(cloneIgnoreId(dbRefund, o -> o.setType(PayRefundTypeEnum.ALL.getStatus())));
         // 测试 createTime 不匹配
-        refundMapper.insert(ObjectUtils.clone(dbRefund, o ->
+        refundMapper.insert(cloneIgnoreId(dbRefund, o ->
                 o.setCreateTime(DateUtils.buildTime(2022, 1, 1, 10, 10, 10))));
         // 准备参数
         PayRefundPageReqVO reqVO = new PayRefundPageReqVO();
@@ -147,24 +148,24 @@ public class PayRefundServiceTest extends BaseDbUnitTest {
         });
         refundMapper.insert(dbRefund);
         // 测试 reqNo 不匹配
-        refundMapper.insert(ObjectUtils.clone(dbRefund, o -> o.setReqNo("RF1111112")));
+        refundMapper.insert(cloneIgnoreId(dbRefund, o -> o.setReqNo("RF1111112")));
         // 测试 merchantId 不匹配
-        refundMapper.insert(ObjectUtils.clone(dbRefund, o -> o.setMerchantId(2L)));
+        refundMapper.insert(cloneIgnoreId(dbRefund, o -> o.setMerchantId(2L)));
         // 测试 appId 不匹配
-        refundMapper.insert(ObjectUtils.clone(dbRefund, o -> o.setAppId(2L)));
+        refundMapper.insert(cloneIgnoreId(dbRefund, o -> o.setAppId(2L)));
         // 测试 channelCode 不匹配
-        refundMapper.insert(ObjectUtils.clone(dbRefund, o -> o.setChannelCode(PayChannelEnum.ALIPAY_APP.getCode())));
+        refundMapper.insert(cloneIgnoreId(dbRefund, o -> o.setChannelCode(PayChannelEnum.ALIPAY_APP.getCode())));
         // 测试 merchantRefundNo 不匹配
-        refundMapper.insert(ObjectUtils.clone(dbRefund, o -> o.setMerchantRefundNo("MRF1111112")));
+        refundMapper.insert(cloneIgnoreId(dbRefund, o -> o.setMerchantRefundNo("MRF1111112")));
         // 测试 notifyStatus 不匹配
         refundMapper.insert(
-                ObjectUtils.clone(dbRefund, o -> o.setNotifyStatus(PayOrderNotifyStatusEnum.FAILURE.getStatus())));
+                cloneIgnoreId(dbRefund, o -> o.setNotifyStatus(PayOrderNotifyStatusEnum.FAILURE.getStatus())));
         // 测试 status 不匹配
-        refundMapper.insert(ObjectUtils.clone(dbRefund, o -> o.setStatus(PayRefundStatusEnum.CLOSE.getStatus())));
+        refundMapper.insert(cloneIgnoreId(dbRefund, o -> o.setStatus(PayRefundStatusEnum.CLOSE.getStatus())));
         // 测试 type 不匹配
-        refundMapper.insert(ObjectUtils.clone(dbRefund, o -> o.setType(PayRefundTypeEnum.ALL.getStatus())));
+        refundMapper.insert(cloneIgnoreId(dbRefund, o -> o.setType(PayRefundTypeEnum.ALL.getStatus())));
         // 测试 createTime 不匹配
-        refundMapper.insert(ObjectUtils.clone(dbRefund, o ->
+        refundMapper.insert(cloneIgnoreId(dbRefund, o ->
                 o.setCreateTime(DateUtils.buildTime(2022, 1, 1, 10, 10, 10))));
 
         // 准备参数
