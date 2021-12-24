@@ -96,15 +96,15 @@ public class MbrUserServiceImpl implements MbrUserService {
     }
 
     @Override
-    public void updateNickname(Long userId, String nickName) {
+    public void updateNickname(Long userId, String nickname) {
         MbrUserDO user = this.checkUserExists(userId);
         // 仅当新昵称不等于旧昵称时进行修改
-        if (nickName.equals(user.getNickname())){
+        if (nickname.equals(user.getNickname())){
             return;
         }
         MbrUserDO userDO = new MbrUserDO();
         userDO.setId(user.getId());
-        userDO.setNickname(nickName);
+        userDO.setNickname(nickname);
         userMapper.updateById(userDO);
     }
 

@@ -3,7 +3,7 @@ package cn.iocoder.yudao.userserver.modules.system.service;
 import cn.iocoder.yudao.coreservice.modules.member.dal.dataobject.user.MbrUserDO;
 import cn.iocoder.yudao.coreservice.modules.system.service.auth.SysUserSessionCoreService;
 import cn.iocoder.yudao.coreservice.modules.system.service.logger.SysLoginLogCoreService;
-import cn.iocoder.yudao.coreservice.modules.system.service.social.SysSocialService;
+import cn.iocoder.yudao.coreservice.modules.system.service.social.SysSocialCoreService;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.util.collection.ArrayUtils;
 import cn.iocoder.yudao.framework.redis.config.YudaoRedisAutoConfiguration;
@@ -53,7 +53,7 @@ public class SysAuthServiceTest extends BaseDbAndRedisUnitTest {
     @MockBean
     private SysUserSessionCoreService userSessionCoreService;
     @MockBean
-    private SysSocialService socialService;
+    private SysSocialCoreService socialService;
     @Resource
     private StringRedisTemplate stringRedisTemplate;
     @MockBean

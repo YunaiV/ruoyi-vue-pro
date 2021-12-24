@@ -36,6 +36,11 @@ public class SysCaptchaServiceImpl implements SysCaptchaService {
     }
 
     @Override
+    public Boolean isCaptchaEnable() {
+        return captchaProperties.getEnable();
+    }
+
+    @Override
     public String getCaptchaCode(String uuid) {
         return captchaRedisDAO.get(uuid);
     }

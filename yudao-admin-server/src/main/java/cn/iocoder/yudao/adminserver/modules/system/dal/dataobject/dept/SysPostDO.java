@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.dept;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
-import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.framework.tenant.core.db.TenantBaseDO;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
@@ -15,14 +15,13 @@ import lombok.EqualsAndHashCode;
 @TableName("sys_post")
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class SysPostDO extends BaseDO {
+public class SysPostDO extends TenantBaseDO {
 
     /**
      * 岗位序号
      */
     @TableId
     private Long id;
-
     /**
      * 岗位名称
      */

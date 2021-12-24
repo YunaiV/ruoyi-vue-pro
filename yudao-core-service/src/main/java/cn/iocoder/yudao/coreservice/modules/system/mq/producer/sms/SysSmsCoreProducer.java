@@ -2,9 +2,8 @@ package cn.iocoder.yudao.coreservice.modules.system.mq.producer.sms;
 
 import cn.iocoder.yudao.coreservice.modules.system.mq.message.sms.SysSmsSendMessage;
 import cn.iocoder.yudao.framework.common.core.KeyValue;
-import cn.iocoder.yudao.framework.mq.core.util.RedisMessageUtils;
+import cn.iocoder.yudao.framework.mq.core.RedisMQTemplate;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -21,7 +20,7 @@ import java.util.List;
 public class SysSmsCoreProducer {
 
     @Resource
-    private StringRedisTemplate stringRedisTemplate;
+    private RedisMQTemplate redisMQTemplate;
 
     /**
      * 发送 {@link SysSmsSendMessage} 消息
@@ -36,7 +35,7 @@ public class SysSmsCoreProducer {
                                    Long channelId, String apiTemplateId, List<KeyValue<String, Object>> templateParams) {
         SysSmsSendMessage message = new SysSmsSendMessage().setLogId(logId).setMobile(mobile);
         message.setChannelId(channelId).setApiTemplateId(apiTemplateId).setTemplateParams(templateParams);
-        RedisMessageUtils.sendStreamMessage(stringRedisTemplate, message);
+        redisMQTemplate.send(message);
     }
 
 }

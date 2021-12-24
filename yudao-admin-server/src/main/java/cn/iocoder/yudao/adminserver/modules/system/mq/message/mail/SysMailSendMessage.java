@@ -1,7 +1,8 @@
 package cn.iocoder.yudao.adminserver.modules.system.mq.message.mail;
 
-import cn.iocoder.yudao.framework.mq.core.stream.StreamMessage;
+import cn.iocoder.yudao.framework.mq.core.stream.AbstractStreamMessage;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.validation.constraints.NotNull;
 import java.util.Map;
@@ -12,7 +13,8 @@ import java.util.Map;
  * @author 芋道源码
  */
 @Data
-public class SysMailSendMessage implements StreamMessage {
+@EqualsAndHashCode(callSuper = true)
+public class SysMailSendMessage extends AbstractStreamMessage {
 
     /**
      * 邮箱地址

@@ -63,6 +63,11 @@ spring:
 
 --- #################### 定时任务相关配置 ####################
 
+# Quartz 配置项，对应 QuartzProperties 配置类
+spring:
+  quartz:
+    auto-startup: false # 无需使用 Quartz，交给 yudao-admin-server 环境
+
 --- #################### 配置中心相关配置 ####################
 
 # Apollo 配置中心
@@ -145,24 +150,16 @@ yudao:
 
 justauth:
   enabled: true
-  type: # TODO @timfruit：GITEE、DINGTALK、WECHAT_ENTERPRISE 这个几个，对于用户端是不需要的哈，可以删除噢
-    GITEE: # Gitee
-      client-id: ee61f0374a4c6c404a8717094caa7a410d76950e45ff60348015830c519ba5c1
-      client-secret: 7c044a5671be3b051414db0cf2cec6ad702dd298d2416ba24ceaf608e6fa26f9
-      ignore-check-redirect-uri: true
-    DINGTALK: # 钉钉
-      client-id: dingvrnreaje3yqvzhxg
-      client-secret: i8E6iZyDvZj51JIb0tYsYfVQYOks9Cq1lgryEjFRqC79P3iJcrxEwT6Qk2QvLrLI
-      ignore-check-redirect-uri: true
-    WECHAT_ENTERPRISE: # 企业微信
-      client-id: wwd411c69a39ad2e54
-      client-secret: 1wTb7hYxnpT2TUbIeHGXGo7T0odav1ic10mLdyyATOw
-      agent-id: 1000004
-      ignore-check-redirect-uri: true
-    WECHAT_MP: # 微信公众平台 - H5  https://mp.weixin.qq.com/debug/cgi-bin/sandboxinfo?action=showinfo&t=sandbox/index
+  type:
+    WECHAT_MP: # 微信公众平台 - 移动端 H5 https://www.yuque.com/docs/share/a795bef6-ee8a-494a-8dc4-2ef41927743b?#%20%E3%80%8A%E5%BE%AE%E4%BF%A1%E5%85%AC%E4%BC%97%E5%8F%B7%E6%B5%8B%E8%AF%95%E3%80%8B
       client-id: wxa5a05b85ac361f96
       client-secret: 247073c7cebb67f27f0e769195c2a57e
       ignore-check-redirect-uri: true
+    WECHAT_MINI_PROGRAM: # 微信小程序 https://www.yuque.com/docs/share/88e3d30a-6830-45fc-8c25-dae485aef3aa?#%20%E3%80%8A%E5%B0%8F%E7%A8%8B%E5%BA%8F%E6%8E%88%E6%9D%83%E7%99%BB%E5%BD%95%E3%80%8B
+      client-id: wx44d047d87e6284d8
+      client-secret: 21c3b7a8a51ee1b8f5cf875848ed4466
+      ignore-check-redirect-uri: true
+      ignore-check-state: true
   cache:
     type: REDIS
     prefix: 'social_auth_state:' # 缓存前缀，目前只对 Redis 缓存生效，默认 JUSTAUTH::STATE::

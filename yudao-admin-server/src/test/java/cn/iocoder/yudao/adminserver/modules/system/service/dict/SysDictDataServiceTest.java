@@ -14,17 +14,14 @@ import cn.iocoder.yudao.adminserver.modules.system.mq.producer.dict.SysDictDataP
 import cn.iocoder.yudao.adminserver.modules.system.service.dict.impl.SysDictDataServiceImpl;
 import cn.iocoder.yudao.framework.common.util.collection.ArrayUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
-import com.google.common.collect.ImmutableTable;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
-import java.util.Date;
 import java.util.List;
 import java.util.function.Consumer;
 
-import static cn.hutool.core.bean.BeanUtil.getFieldValue;
 import static cn.iocoder.yudao.adminserver.modules.system.enums.SysErrorCodeConstants.*;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
@@ -61,11 +58,11 @@ public class SysDictDataServiceTest extends BaseDbUnitTest {
         });
         dictDataMapper.insert(dbDictData);
         // 测试 label 不匹配
-        dictDataMapper.insert(ObjectUtils.clone(dbDictData, o -> o.setLabel("艿")));
+        dictDataMapper.insert(ObjectUtils.cloneIgnoreId(dbDictData, o -> o.setLabel("艿")));
         // 测试 dictType 不匹配
-        dictDataMapper.insert(ObjectUtils.clone(dbDictData, o -> o.setDictType("nai")));
+        dictDataMapper.insert(ObjectUtils.cloneIgnoreId(dbDictData, o -> o.setDictType("nai")));
         // 测试 status 不匹配
-        dictDataMapper.insert(ObjectUtils.clone(dbDictData, o -> o.setStatus(CommonStatusEnum.DISABLE.getStatus())));
+        dictDataMapper.insert(ObjectUtils.cloneIgnoreId(dbDictData, o -> o.setStatus(CommonStatusEnum.DISABLE.getStatus())));
         // 准备参数
         SysDictDataPageReqVO reqVO = new SysDictDataPageReqVO();
         reqVO.setLabel("芋");
@@ -90,11 +87,11 @@ public class SysDictDataServiceTest extends BaseDbUnitTest {
         });
         dictDataMapper.insert(dbDictData);
         // 测试 label 不匹配
-        dictDataMapper.insert(ObjectUtils.clone(dbDictData, o -> o.setLabel("艿")));
+        dictDataMapper.insert(ObjectUtils.cloneIgnoreId(dbDictData, o -> o.setLabel("艿")));
         // 测试 dictType 不匹配
-        dictDataMapper.insert(ObjectUtils.clone(dbDictData, o -> o.setDictType("nai")));
+        dictDataMapper.insert(ObjectUtils.cloneIgnoreId(dbDictData, o -> o.setDictType("nai")));
         // 测试 status 不匹配
-        dictDataMapper.insert(ObjectUtils.clone(dbDictData, o -> o.setStatus(CommonStatusEnum.DISABLE.getStatus())));
+        dictDataMapper.insert(ObjectUtils.cloneIgnoreId(dbDictData, o -> o.setStatus(CommonStatusEnum.DISABLE.getStatus())));
         // 准备参数
         SysDictDataExportReqVO reqVO = new SysDictDataExportReqVO();
         reqVO.setLabel("芋");

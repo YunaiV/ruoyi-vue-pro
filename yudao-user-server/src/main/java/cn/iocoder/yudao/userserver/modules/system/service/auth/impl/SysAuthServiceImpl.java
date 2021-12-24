@@ -9,7 +9,7 @@ import cn.iocoder.yudao.coreservice.modules.system.enums.logger.SysLoginResultEn
 import cn.iocoder.yudao.coreservice.modules.system.service.auth.SysUserSessionCoreService;
 import cn.iocoder.yudao.coreservice.modules.system.service.logger.SysLoginLogCoreService;
 import cn.iocoder.yudao.coreservice.modules.system.service.logger.dto.SysLoginLogCreateReqDTO;
-import cn.iocoder.yudao.coreservice.modules.system.service.social.SysSocialService;
+import cn.iocoder.yudao.coreservice.modules.system.service.social.SysSocialCoreService;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.util.monitor.TracerUtils;
@@ -40,7 +40,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import javax.validation.Valid;
 import java.util.List;
 import java.util.Objects;
 
@@ -57,6 +56,8 @@ import static cn.iocoder.yudao.userserver.modules.system.enums.SysErrorCodeConst
 @Slf4j
 public class SysAuthServiceImpl implements SysAuthService {
 
+    private static final UserTypeEnum USER_TYPE_ENUM = UserTypeEnum.MEMBER;
+
     @Resource
     @Lazy // 延迟加载，因为存在相互依赖的问题
     private AuthenticationManager authenticationManager;
@@ -70,7 +71,8 @@ public class SysAuthServiceImpl implements SysAuthService {
     @Resource
     private SysUserSessionCoreService userSessionCoreService;
     @Resource
-    private SysSocialService socialService;
+    private SysSocialCoreService socialService;
+
     @Resource
     private StringRedisTemplate stringRedisTemplate;
     @Resource
@@ -127,7 +129,7 @@ public class SysAuthServiceImpl implements SysAuthService {
 
         // 如果未绑定 SysSocialUserDO 用户，则无法自动登录，进行报错
         String unionId = socialService.getAuthUserUnionId(authUser);
-        List<SysSocialUserDO> socialUsers = socialService.getAllSocialUserList(reqVO.getType(), unionId, userTypeEnum);
+        List<SysSocialUserDO> socialUsers = socialService.getAllSocialUserList(reqVO.getType(), unionId, USER_TYPE_ENUM);
         if (CollUtil.isEmpty(socialUsers)) {
             throw exception(AUTH_THIRD_LOGIN_NOT_BIND);
         }
@@ -143,7 +145,7 @@ public class SysAuthServiceImpl implements SysAuthService {
         LoginUser loginUser = SysAuthConvert.INSTANCE.convert(user);
 
         // 绑定社交用户（更新）
-        socialService.bindSocialUser(loginUser.getId(), reqVO.getType(), authUser, userTypeEnum);
+        socialService.bindSocialUser(loginUser.getId(), reqVO.getType(), authUser, USER_TYPE_ENUM);
 
         // 缓存登录用户到 Redis 中，返回 sessionId 编号
         return userSessionCoreService.createUserSession(loginUser, userIp, userAgent);
@@ -151,19 +153,21 @@ public class SysAuthServiceImpl implements SysAuthService {
 
     @Override
     public String socialLogin2(MbrAuthSocialLogin2ReqVO reqVO, String userIp, String userAgent) {
-        // 使用 code 授权码，进行登录
         AuthUser authUser = socialService.getAuthUser(reqVO.getType(), reqVO.getCode(), reqVO.getState());
         org.springframework.util.Assert.notNull(authUser, "授权用户不为空");
 
-        // 使用账号密码，进行登录。
-        LoginUser loginUser = this.login0(reqVO.getUsername(), reqVO.getPassword());
-//        loginUser.setRoleIds(this.getUserRoleIds(loginUser.getId())); // 获取用户角色列表
+        // 使用手机号、手机验证码登录
+        SysAuthSmsLoginReqVO loginReqVO = SysAuthSmsLoginReqVO
+                .builder()
+                .mobile(reqVO.getMobile())
+                .code(reqVO.getSmsCode())
+                .build();
+        String sessionId = this.smsLogin(loginReqVO, userIp, userAgent);
+        LoginUser loginUser = userSessionCoreService.getLoginUser(sessionId);
 
         // 绑定社交用户（新增）
-        socialService.bindSocialUser(loginUser.getId(), reqVO.getType(), authUser, userTypeEnum);
-
-        // 缓存登录用户到 Redis 中，返回 sessionId 编号
-        return userSessionCoreService.createUserSession(loginUser, userIp, userAgent);
+        socialService.bindSocialUser(loginUser.getId(), reqVO.getType(), authUser, USER_TYPE_ENUM);
+        return sessionId;
     }
 
     @Override
@@ -173,7 +177,7 @@ public class SysAuthServiceImpl implements SysAuthService {
         org.springframework.util.Assert.notNull(authUser, "授权用户不为空");
 
         // 绑定社交用户（新增）
-        socialService.bindSocialUser(userId, reqVO.getType(), authUser, userTypeEnum);
+        socialService.bindSocialUser(userId, reqVO.getType(), authUser, USER_TYPE_ENUM);
     }
 
     private LoginUser login0(String username, String password) {
@@ -340,7 +344,7 @@ public class SysAuthServiceImpl implements SysAuthService {
         reqDTO.setLogType(SysLoginLogTypeEnum.LOGOUT_SELF.getType());
         reqDTO.setTraceId(TracerUtils.getTraceId());
         reqDTO.setUserId(userId);
-        reqDTO.setUserType(userTypeEnum.getValue());
+        reqDTO.setUserType(USER_TYPE_ENUM.getValue());
         reqDTO.setUsername(username);
         reqDTO.setUserAgent(ServletUtils.getUserAgent());
         reqDTO.setUserIp(getClientIP());

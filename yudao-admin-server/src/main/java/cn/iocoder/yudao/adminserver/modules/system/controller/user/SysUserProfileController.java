@@ -15,7 +15,7 @@ import cn.iocoder.yudao.adminserver.modules.system.service.permission.SysRoleSer
 import cn.iocoder.yudao.adminserver.modules.system.service.user.SysUserService;
 import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.social.SysSocialUserDO;
 import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.user.SysUserDO;
-import cn.iocoder.yudao.coreservice.modules.system.service.social.SysSocialService;
+import cn.iocoder.yudao.coreservice.modules.system.service.social.SysSocialCoreService;
 import cn.iocoder.yudao.coreservice.modules.system.service.user.SysUserCoreService;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
@@ -56,7 +56,7 @@ public class SysUserProfileController {
     @Resource
     private SysRoleService roleService;
     @Resource
-    private SysSocialService socialService;
+    private SysSocialCoreService socialService;
 
     @GetMapping("/get")
     @ApiOperation("获得登录用户信息")

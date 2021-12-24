@@ -10,9 +10,11 @@ import java.util.Date;
 
 /**
  * 基础实体对象
+ *
+ * @author 芋道源码
  */
 @Data
-public class BaseDO implements Serializable {
+public abstract class BaseDO implements Serializable {
 
     /**
      * 创建时间

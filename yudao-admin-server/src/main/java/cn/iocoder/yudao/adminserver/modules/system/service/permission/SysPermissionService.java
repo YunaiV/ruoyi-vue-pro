@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.adminserver.modules.system.service.permission;
 
+import cn.iocoder.yudao.framework.datapermission.core.dept.service.DeptDataPermissionFrameworkService;
 import cn.iocoder.yudao.framework.security.core.service.SecurityPermissionFrameworkService;
 import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.permission.SysMenuDO;
 import org.springframework.lang.Nullable;
@@ -15,7 +16,7 @@ import java.util.Set;
  *
  * @author 芋道源码
  */
-public interface SysPermissionService extends SecurityPermissionFrameworkService {
+public interface SysPermissionService extends SecurityPermissionFrameworkService, DeptDataPermissionFrameworkService {
 
     /**
      * 初始化权限的本地缓存

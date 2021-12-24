@@ -19,7 +19,7 @@ import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.user.SysUserDO
 import cn.iocoder.yudao.coreservice.modules.system.service.auth.SysUserSessionCoreService;
 import cn.iocoder.yudao.coreservice.modules.system.service.logger.SysLoginLogCoreService;
 import cn.iocoder.yudao.coreservice.modules.system.service.logger.dto.SysLoginLogCreateReqDTO;
-import cn.iocoder.yudao.coreservice.modules.system.service.social.SysSocialService;
+import cn.iocoder.yudao.coreservice.modules.system.service.social.SysSocialCoreService;
 import cn.iocoder.yudao.coreservice.modules.system.service.user.SysUserCoreService;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
@@ -60,6 +60,8 @@ import static java.util.Collections.singleton;
 @Slf4j
 public class SysAuthServiceImpl implements SysAuthService {
 
+    private static final UserTypeEnum USER_TYPE_ENUM = UserTypeEnum.ADMIN;
+
     @Resource
     @Lazy // 延迟加载，因为存在相互依赖的问题
     private AuthenticationManager authenticationManager;
@@ -79,10 +81,8 @@ public class SysAuthServiceImpl implements SysAuthService {
     @Resource
     private SysPostService postService;
     @Resource
-    private SysSocialService socialService;
+    private SysSocialCoreService socialService;
 
-    // TODO @timfruit：静态枚举类，需要都大写，例如说 USER_TYPE_ENUM；静态变量，放在普通变量前面；这个实践不错哈。
-    private static final UserTypeEnum userTypeEnum = UserTypeEnum.ADMIN;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -92,9 +92,7 @@ public class SysAuthServiceImpl implements SysAuthService {
             throw new UsernameNotFoundException(username);
         }
         // 创建 LoginUser 对象
-        LoginUser loginUser =  SysAuthConvert.INSTANCE.convert(user);
-        loginUser.setPostIds(user.getPostIds());
-        return loginUser;
+        return this.buildLoginUser(user);
     }
 
     @Override
@@ -107,9 +105,7 @@ public class SysAuthServiceImpl implements SysAuthService {
         this.createLoginLog(user.getUsername(), SysLoginLogTypeEnum.LOGIN_MOCK, SysLoginResultEnum.SUCCESS);
 
         // 创建 LoginUser 对象
-        LoginUser loginUser = SysAuthConvert.INSTANCE.convert(user);
-        loginUser.setRoleIds(this.getUserRoleIds(loginUser.getId())); // 获取用户角色列表
-        return loginUser;
+        return this.buildLoginUser(user);
     }
 
     @Override
@@ -117,10 +113,9 @@ public class SysAuthServiceImpl implements SysAuthService {
         // 判断验证码是否正确
         this.verifyCaptcha(reqVO.getUsername(), reqVO.getUuid(), reqVO.getCode());
 
-        // 使用账号密码，进行登录。
+        // 使用账号密码，进行登录
         LoginUser loginUser = this.login0(reqVO.getUsername(), reqVO.getPassword());
-        loginUser.setRoleIds(this.getUserRoleIds(loginUser.getId())); // 获取用户角色列表
-        loginUser.setGroups(this.getUserPosts(loginUser.getPostIds()));
+
         // 缓存登陆用户到 Redis 中，返回 sessionId 编号
         return userSessionCoreService.createUserSession(loginUser, userIp, userAgent);
     }
@@ -133,9 +128,13 @@ public class SysAuthServiceImpl implements SysAuthService {
     }
 
     private void verifyCaptcha(String username, String captchaUUID, String captchaCode) {
+        // 如果验证码关闭，则不进行校验
+        if (!captchaService.isCaptchaEnable()) {
+            return;
+        }
+        // 验证码不存在
         final SysLoginLogTypeEnum logTypeEnum = SysLoginLogTypeEnum.LOGIN_USERNAME;
         String code = captchaService.getCaptchaCode(captchaUUID);
-        // 验证码不存在
         if (code == null) {
             // 创建登录失败日志（验证码不存在）
             this.createLoginLog(username, logTypeEnum, SysLoginResultEnum.CAPTCHA_NOT_FOUND);
@@ -217,7 +216,7 @@ public class SysAuthServiceImpl implements SysAuthService {
 
         // 如果未绑定 SysSocialUserDO 用户，则无法自动登录，进行报错
         String unionId = socialService.getAuthUserUnionId(authUser);
-        List<SysSocialUserDO> socialUsers = socialService.getAllSocialUserList(reqVO.getType(), unionId, userTypeEnum);
+        List<SysSocialUserDO> socialUsers = socialService.getAllSocialUserList(reqVO.getType(), unionId, USER_TYPE_ENUM);
         if (CollUtil.isEmpty(socialUsers)) {
             throw exception(AUTH_THIRD_LOGIN_NOT_BIND);
         }
@@ -230,11 +229,10 @@ public class SysAuthServiceImpl implements SysAuthService {
         this.createLoginLog(user.getUsername(), SysLoginLogTypeEnum.LOGIN_SOCIAL, SysLoginResultEnum.SUCCESS);
 
         // 创建 LoginUser 对象
-        LoginUser loginUser = SysAuthConvert.INSTANCE.convert(user);
-        loginUser.setRoleIds(this.getUserRoleIds(loginUser.getId())); // 获取用户角色列表
+        LoginUser loginUser = this.buildLoginUser(user);
 
         // 绑定社交用户（更新）
-        socialService.bindSocialUser(loginUser.getId(), reqVO.getType(), authUser, userTypeEnum);
+        socialService.bindSocialUser(loginUser.getId(), reqVO.getType(), authUser, USER_TYPE_ENUM);
 
         // 缓存登录用户到 Redis 中，返回 sessionId 编号
         return userSessionCoreService.createUserSession(loginUser, userIp, userAgent);
@@ -248,10 +246,9 @@ public class SysAuthServiceImpl implements SysAuthService {
 
         // 使用账号密码，进行登录。
         LoginUser loginUser = this.login0(reqVO.getUsername(), reqVO.getPassword());
-        loginUser.setRoleIds(this.getUserRoleIds(loginUser.getId())); // 获取用户角色列表
 
         // 绑定社交用户（新增）
-        socialService.bindSocialUser(loginUser.getId(), reqVO.getType(), authUser, userTypeEnum);
+        socialService.bindSocialUser(loginUser.getId(), reqVO.getType(), authUser, USER_TYPE_ENUM);
 
         // 缓存登录用户到 Redis 中，返回 sessionId 编号
         return userSessionCoreService.createUserSession(loginUser, userIp, userAgent);
@@ -264,7 +261,7 @@ public class SysAuthServiceImpl implements SysAuthService {
         Assert.notNull(authUser, "授权用户不为空");
 
         // 绑定社交用户（新增）
-        socialService.bindSocialUser(userId, reqVO.getType(), authUser, userTypeEnum);
+        socialService.bindSocialUser(userId, reqVO.getType(), authUser, USER_TYPE_ENUM);
     }
 
     @Override
@@ -285,7 +282,7 @@ public class SysAuthServiceImpl implements SysAuthService {
         reqDTO.setLogType(SysLoginLogTypeEnum.LOGOUT_SELF.getType());
         reqDTO.setTraceId(TracerUtils.getTraceId());
         reqDTO.setUserId(userId);
-        reqDTO.setUserType(userTypeEnum.getValue());
+        reqDTO.setUserType(USER_TYPE_ENUM.getValue());
         reqDTO.setUsername(username);
         reqDTO.setUserAgent(ServletUtils.getUserAgent());
         reqDTO.setUserIp(ServletUtils.getClientIP());
@@ -301,15 +298,14 @@ public class SysAuthServiceImpl implements SysAuthService {
             return null;
         }
         // 刷新 LoginUser 缓存
-        this.refreshLoginUserCache(token, loginUser);
-        return loginUser;
+        return this.refreshLoginUserCache(token, loginUser);
     }
 
-    private void refreshLoginUserCache(String token, LoginUser loginUser) {
+    private LoginUser refreshLoginUserCache(String token, LoginUser loginUser) {
         // 每 1/3 的 Session 超时时间，刷新 LoginUser 缓存
         if (System.currentTimeMillis() - loginUser.getUpdateTime().getTime() <
                 userSessionCoreService.getSessionTimeoutMillis() / 3) {
-            return;
+            return loginUser;
         }
 
         // 重新加载 SysUserDO 信息
@@ -319,9 +315,18 @@ public class SysAuthServiceImpl implements SysAuthService {
         }
 
         // 刷新 LoginUser 缓存
+        LoginUser newLoginUser= this.buildLoginUser(user);
+        userSessionCoreService.refreshUserSession(token, newLoginUser);
+        return newLoginUser;
+    }
+
+    private LoginUser buildLoginUser(SysUserDO user) {
+        LoginUser loginUser = SysAuthConvert.INSTANCE.convert(user);
+        // 补全字段
         loginUser.setDeptId(user.getDeptId());
         loginUser.setRoleIds(this.getUserRoleIds(loginUser.getId()));
-        userSessionCoreService.refreshUserSession(token, loginUser);
+        loginUser.setGroups(this.getUserPosts(user.getPostIds()));
+        return loginUser;
     }
 
 }

@@ -51,13 +51,13 @@ public class SysLoginLogServiceImplTest extends BaseDbUnitTest {
 
         // 下面几个都是不匹配的数据
         // 登录失败的
-        loginLogMapper.insert(ObjectUtils.clone(loginLogDO, logDO -> logDO.setResult(SysLoginResultEnum.CAPTCHA_CODE_ERROR.getResult())));
+        loginLogMapper.insert(ObjectUtils.cloneIgnoreId(loginLogDO, logDO -> logDO.setResult(SysLoginResultEnum.CAPTCHA_CODE_ERROR.getResult())));
         // 不同ip段的
-        loginLogMapper.insert(ObjectUtils.clone(loginLogDO, logDO -> logDO.setUserIp("192.168.128.18")));
+        loginLogMapper.insert(ObjectUtils.cloneIgnoreId(loginLogDO, logDO -> logDO.setUserIp("192.168.128.18")));
         // 不同username
-        loginLogMapper.insert(ObjectUtils.clone(loginLogDO, logDO -> logDO.setUsername("yunai")));
+        loginLogMapper.insert(ObjectUtils.cloneIgnoreId(loginLogDO, logDO -> logDO.setUsername("yunai")));
         // 构造一个早期时间 2021-02-06 00:00:00
-        loginLogMapper.insert(ObjectUtils.clone(loginLogDO, logDO -> logDO.setCreateTime(buildTime(2021, 2, 6))));
+        loginLogMapper.insert(ObjectUtils.cloneIgnoreId(loginLogDO, logDO -> logDO.setCreateTime(buildTime(2021, 2, 6))));
 
 
         // 构造调用参数
@@ -96,13 +96,13 @@ public class SysLoginLogServiceImplTest extends BaseDbUnitTest {
 
         // 下面几个都是不匹配的数据
         // 登录失败的
-        loginLogMapper.insert(ObjectUtils.clone(loginLogDO, logDO -> logDO.setResult(SysLoginResultEnum.CAPTCHA_CODE_ERROR.getResult())));
+        loginLogMapper.insert(ObjectUtils.cloneIgnoreId(loginLogDO, logDO -> logDO.setResult(SysLoginResultEnum.CAPTCHA_CODE_ERROR.getResult())));
         // 不同ip段的
-        loginLogMapper.insert(ObjectUtils.clone(loginLogDO, logDO -> logDO.setUserIp("192.168.128.18")));
+        loginLogMapper.insert(ObjectUtils.cloneIgnoreId(loginLogDO, logDO -> logDO.setUserIp("192.168.128.18")));
         // 不同username
-        loginLogMapper.insert(ObjectUtils.clone(loginLogDO, logDO -> logDO.setUsername("yunai")));
+        loginLogMapper.insert(ObjectUtils.cloneIgnoreId(loginLogDO, logDO -> logDO.setUsername("yunai")));
         // 构造一个早期时间 2021-02-06 00:00:00
-        loginLogMapper.insert(ObjectUtils.clone(loginLogDO, logDO -> logDO.setCreateTime(buildTime(2021, 2, 6))));
+        loginLogMapper.insert(ObjectUtils.cloneIgnoreId(loginLogDO, logDO -> logDO.setCreateTime(buildTime(2021, 2, 6))));
 
 
         // 构造调用参数

@@ -309,15 +309,15 @@ public class SysUserServiceImplTest extends BaseDbUnitTest {
         });
         userMapper.insert(dbUser);
         // 测试 username 不匹配
-        userMapper.insert(ObjectUtils.clone(dbUser, o -> o.setUsername("yuanma")));
+        userMapper.insert(ObjectUtils.cloneIgnoreId(dbUser, o -> o.setUsername("yuanma")));
         // 测试 mobile 不匹配
-        userMapper.insert(ObjectUtils.clone(dbUser, o -> o.setMobile("18818260888")));
+        userMapper.insert(ObjectUtils.cloneIgnoreId(dbUser, o -> o.setMobile("18818260888")));
         // 测试 status 不匹配
-        userMapper.insert(ObjectUtils.clone(dbUser, o -> o.setStatus(CommonStatusEnum.DISABLE.getStatus())));
+        userMapper.insert(ObjectUtils.cloneIgnoreId(dbUser, o -> o.setStatus(CommonStatusEnum.DISABLE.getStatus())));
         // 测试 createTime 不匹配
-        userMapper.insert(ObjectUtils.clone(dbUser, o -> o.setCreateTime(buildTime(2020, 11, 11))));
+        userMapper.insert(ObjectUtils.cloneIgnoreId(dbUser, o -> o.setCreateTime(buildTime(2020, 11, 11))));
         // 测试 dept 不匹配
-        userMapper.insert(ObjectUtils.clone(dbUser, o -> o.setDeptId(0L)));
+        userMapper.insert(ObjectUtils.cloneIgnoreId(dbUser, o -> o.setDeptId(0L)));
         return dbUser;
     }
 

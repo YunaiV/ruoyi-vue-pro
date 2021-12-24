@@ -42,7 +42,10 @@ public class SysUserSessionCoreServiceTest extends BaseDbAndRedisUnitTest {
         // 准备参数
         String userIp = randomString();
         String userAgent = randomString();
-        LoginUser loginUser = randomPojo(LoginUser.class, o -> o.setUserType(randomEle(UserTypeEnum.values()).getValue()));
+        LoginUser loginUser = randomPojo(LoginUser.class, o -> {
+            o.setUserType(randomEle(UserTypeEnum.values()).getValue());
+            o.setTenantId(0L); // 租户设置为 0，因为暂未启用多租户组件
+        });
         // mock 方法
         when(securityProperties.getSessionTimeout()).thenReturn(Duration.ofDays(1));
 

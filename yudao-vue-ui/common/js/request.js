@@ -12,6 +12,7 @@ export const request = (options) => {
 			method: options.method || 'GET',
 			data: options.data || {},
 			header: {
+				...options.header,
 				'Authorization': authToken ? `Bearer ${authToken}` : ''
 			}
 		}).then(res => {
