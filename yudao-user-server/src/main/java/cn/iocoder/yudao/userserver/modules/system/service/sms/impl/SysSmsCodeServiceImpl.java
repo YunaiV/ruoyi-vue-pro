@@ -4,7 +4,6 @@ import cn.hutool.core.map.MapUtil;
 import cn.iocoder.yudao.coreservice.modules.member.dal.dataobject.user.MbrUserDO;
 import cn.iocoder.yudao.coreservice.modules.system.service.sms.SysSmsCoreService;
 import cn.iocoder.yudao.userserver.modules.member.service.user.MbrUserService;
-import cn.iocoder.yudao.userserver.modules.system.controller.auth.vo.SysAuthCheckCodeReqVO;
 import cn.iocoder.yudao.userserver.modules.system.controller.auth.vo.SysAuthSendSmsReqVO;
 import cn.iocoder.yudao.userserver.modules.system.dal.dataobject.sms.SysSmsCodeDO;
 import cn.iocoder.yudao.userserver.modules.system.dal.mysql.sms.SysSmsCodeMapper;
@@ -92,20 +91,13 @@ public class SysSmsCodeServiceImpl implements SysSmsCodeService {
 
     @Override
     public void useSmsCode(String mobile, Integer scene, String code, String usedIp) {
-        // 校验验证码
-        SysSmsCodeDO lastSmsCode = smsCodeMapper.selectLastByMobile(mobile, null,scene);
-        if (lastSmsCode == null) { // 若验证码不存在，抛出异常
-            throw exception(USER_SMS_CODE_NOT_FOUND);
-        }
-        if (System.currentTimeMillis() - lastSmsCode.getCreateTime().getTime()
-                >= smsCodeProperties.getExpireTimes().toMillis()) { // 验证码已过期
-            throw exception(USER_SMS_CODE_EXPIRED);
-        }
-        if (lastSmsCode.getUsed()) { // 验证码已使用
+
+        // 检测验证码是否有效
+        SysSmsCodeDO lastSmsCode = this.checkCodeIsExpired(mobile, code, scene);
+
+        // 判断验证码是否已被使用
+        if (Boolean.TRUE.equals(lastSmsCode.getUsed())) {
             throw exception(USER_SMS_CODE_USED);
-        }
-        if (!lastSmsCode.getCode().equals(code)) {
-            throw exception(USER_SMS_CODE_NOT_CORRECT);
         }
 
         // 使用验证码
@@ -125,19 +117,20 @@ public class SysSmsCodeServiceImpl implements SysSmsCodeService {
 
     @Override
     public SysSmsCodeDO checkCodeIsExpired(String mobile, String code, Integer scene) {
-        SysSmsCodeDO lastSmsCode = smsCodeMapper.selectLastByMobile(mobile, code, scene);
+        // 校验验证码
+        SysSmsCodeDO lastSmsCode = smsCodeMapper.selectLastByMobile(mobile,code,scene);
 
-        // 检测验证码是否存在
-        if (lastSmsCode == null){
-            throw exception(USER_SMS_CODE_EXPIRED);
+        // 若验证码不存在，抛出异常
+        if (lastSmsCode == null) {
+            throw exception(USER_SMS_CODE_NOT_FOUND);
         }
-
-        // 检测验证码是否过期
         if (System.currentTimeMillis() - lastSmsCode.getCreateTime().getTime()
-                >= smsCodeProperties.getExpireTimes().toMillis()) {
+                >= smsCodeProperties.getExpireTimes().toMillis()) { // 验证码已过期
             throw exception(USER_SMS_CODE_EXPIRED);
         }
+
         return lastSmsCode;
+
     }
 
 }

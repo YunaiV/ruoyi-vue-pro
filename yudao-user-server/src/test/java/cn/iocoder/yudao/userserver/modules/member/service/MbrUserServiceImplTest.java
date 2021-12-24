@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.userserver.modules.member.service;
 
+import cn.hutool.core.util.RandomUtil;
 import cn.iocoder.yudao.coreservice.modules.infra.service.file.InfFileCoreService;
 import cn.iocoder.yudao.coreservice.modules.member.dal.dataobject.user.MbrUserDO;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
@@ -10,8 +11,7 @@ import cn.iocoder.yudao.userserver.modules.member.controller.user.vo.MbrUserInfo
 import cn.iocoder.yudao.userserver.modules.member.controller.user.vo.MbrUserUpdateMobileReqVO;
 import cn.iocoder.yudao.userserver.modules.member.dal.mysql.user.MbrUserMapper;
 import cn.iocoder.yudao.userserver.modules.member.service.user.impl.MbrUserServiceImpl;
-import cn.iocoder.yudao.userserver.modules.system.controller.auth.vo.SysAuthSendSmsReqVO;
-import cn.iocoder.yudao.userserver.modules.system.enums.sms.SysSmsSceneEnum;
+import cn.iocoder.yudao.userserver.modules.system.dal.dataobject.sms.SysSmsCodeDO;
 import cn.iocoder.yudao.userserver.modules.system.service.auth.impl.SysAuthServiceImpl;
 import cn.iocoder.yudao.userserver.modules.system.service.sms.SysSmsCodeService;
 import org.junit.jupiter.api.Test;
@@ -27,6 +27,7 @@ import java.util.function.Consumer;
 import static cn.hutool.core.util.RandomUtil.*;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomString;
+import static cn.iocoder.yudao.userserver.modules.system.enums.sms.SysSmsSceneEnum.CHANGE_MOBILE_BY_SMS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
@@ -115,23 +116,24 @@ public class MbrUserServiceImplTest extends BaseDbAndRedisUnitTest {
         userDO.setMobile(oldMobile);
         userMapper.insert(userDO);
 
-        // 验证旧手机
-        sysSmsCodeService.sendSmsCodeLogin(userDO.getId());
 
-        // 验证旧手机验证码是否正确
-        sysSmsCodeService.useSmsCode(oldMobile,SysSmsSceneEnum.CHANGE_MOBILE_BY_SMS.getScene(),"123","1.1.1.1");
-        // 验证新手机
-        SysAuthSendSmsReqVO smsReqVO = new SysAuthSendSmsReqVO();
-        smsReqVO.setMobile(oldMobile);
-        smsReqVO.setScene(SysSmsSceneEnum.CHANGE_MOBILE_BY_SMS.getScene());
-        sysSmsCodeService.sendSmsNewCode(smsReqVO);
+        // 旧手机和旧验证码
+        SysSmsCodeDO codeDO = new SysSmsCodeDO();
+        String oldCode = RandomUtil.randomString(4);
+        codeDO.setMobile(userDO.getMobile());
+        codeDO.setCode(oldCode);
+        codeDO.setScene(CHANGE_MOBILE_BY_SMS.getScene());
+        codeDO.setUsed(Boolean.FALSE);
+        when(sysSmsCodeService.checkCodeIsExpired(codeDO.getMobile(),codeDO.getCode(),codeDO.getScene())).thenReturn(codeDO);
 
         // 更新手机号
         String newMobile = randomNumbers(11);
-        String code = randomNumbers(4);
+        String newCode = randomNumbers(4);
         MbrUserUpdateMobileReqVO reqVO = new MbrUserUpdateMobileReqVO();
         reqVO.setMobile(newMobile);
-        reqVO.setCode(code);
+        reqVO.setCode(newCode);
+        reqVO.setOldMobile(oldMobile);
+        reqVO.setOldCode(oldCode);
         mbrUserService.updateMobile(userDO.getId(),reqVO);
 
         assertEquals(mbrUserService.getUser(userDO.getId()).getMobile(),newMobile);
