@@ -21,6 +21,7 @@ import java.util.List;
 
 import static cn.iocoder.yudao.coreservice.modules.pay.enums.PayErrorCodeCoreConstants.PAY_MERCHANT_NOT_EXISTS;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+
 /**
  * 支付商户信息 Service 实现类
  *
@@ -86,6 +87,7 @@ public class PayMerchantServiceImpl implements PayMerchantService {
         return merchantMapper.selectList(exportReqVO);
     }
 
+    // TODO @aquan：接口上已经有注释，这里不用在有啦
     /**
      * 修改商户状态
      *
@@ -114,7 +116,6 @@ public class PayMerchantServiceImpl implements PayMerchantService {
         return this.merchantMapper.getMerchantListByName(merchantName);
     }
 
-
     /**
      * 检查商户是否存在
      * @param id 商户编号
@@ -134,6 +135,7 @@ public class PayMerchantServiceImpl implements PayMerchantService {
     // TODO @芋艿：后续增加下合适的算法
     /**
      * 根据年月日时分秒毫秒生成商户号
+     *
      * @return 商户号
      */
     private String generateMerchantNo(){

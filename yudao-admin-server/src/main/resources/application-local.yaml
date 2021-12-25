@@ -44,17 +44,16 @@ spring:
       datasource:
         master:
           name: ruoyi-vue-pro
-          url: jdbc:mysql://rm-j6cxl87683w973f78ho.mysql.rds.aliyuncs.com:3306/${spring.datasource.dynamic.datasource.master.name}?useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=CTT
+          url: jdbc:mysql://127.0.0.1:3306/${spring.datasource.dynamic.datasource.master.name}?useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=CTT
           driver-class-name: com.mysql.jdbc.Driver
-          username: chenquan
-          password: Miraclequan@990429
+          username: root
+          password: 123456
         slave: # 模拟从库，可根据自己需要修改
           name: ruoyi-vue-pro
-          url: jdbc:mysql://rm-j6cxl87683w973f78ho.mysql.rds.aliyuncs.com:3306/${spring.datasource.dynamic.datasource.slave.name}?useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=CTT
+          url: jdbc:mysql://127.0.0.1:3306/${spring.datasource.dynamic.datasource.slave.name}?useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=CTT
           driver-class-name: com.mysql.jdbc.Driver
-          username: chenquan
-          password: Miraclequan@990429
-
+          username: root
+          password: 123456
 
   activiti:
     #1.false:默认值，activiti启动时，对比数据库表中保存的版本，如果不匹配。将抛出异常

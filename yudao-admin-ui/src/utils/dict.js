@@ -35,7 +35,7 @@ export const DICT_TYPE = {
   OA_LEAVE_TYPE: 'oa_leave_type',
 
   // 商户状态
-  PAY_MERCHANT_STATUS: 'pay_merchant_status',
+  PAY_MERCHANT_STATUS: 'pay_merchant_status', // TODO @aquan：一般使用 COMMON_RESULT 即可。保持数值一致，以后加更多状态的时候，在单独数据字典
   // 应用状态
   PAY_APP_STATUS: 'pay_app_status',
   // 渠道状态

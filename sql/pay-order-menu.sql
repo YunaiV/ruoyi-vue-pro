@@ -1,7 +1,7 @@
 -- 菜单 SQL
 INSERT INTO `sys_menu`(`name`, `permission`, `menu_type`, `sort`, `parent_id`,
                        `path`, `icon`, `component`, `status`)
-VALUES ('支付订单管理', '', 2, 0, ${table.parentMenuId},
+VALUES ('支付订单管理', '', 2, 0, 1117,
         'order', '', 'pay/order/index', 0);
 
 -- 按钮父菜单ID

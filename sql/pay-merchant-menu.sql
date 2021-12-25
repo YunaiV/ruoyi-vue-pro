@@ -5,7 +5,7 @@ INSERT INTO `sys_menu`(
     `path`, `icon`, `component`, `status`
 )
 VALUES (
-    '支付商户信息管理', '', 2, 0, ${table.parentMenuId},
+    '支付商户信息管理', '', 2, 0, 1117,
     'merchant', '', 'pay/merchant/index', 0
 );
 
