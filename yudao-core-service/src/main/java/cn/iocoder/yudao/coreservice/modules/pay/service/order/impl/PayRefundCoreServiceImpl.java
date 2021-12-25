@@ -50,18 +50,17 @@ public class PayRefundCoreServiceImpl implements PayRefundCoreService {
 
     @Resource
     private PayOrderCoreMapper payOrderCoreMapper;
-
     @Resource
     private PayRefundCoreMapper payRefundCoreMapper;
-
     @Resource
     private PayOrderExtensionCoreMapper payOrderExtensionCoreMapper;
 
     @Resource
     private PayAppCoreService payAppCoreService;
-
     @Resource
     private PayChannelCoreService payChannelCoreService;
+    @Resource
+    private PayNotifyCoreService payNotifyCoreService;
 
     @Resource
     private PayClientFactory payClientFactory;
@@ -72,25 +71,18 @@ public class PayRefundCoreServiceImpl implements PayRefundCoreService {
     @Resource
     private List<PayRefundChannelPostHandler> handlerList;
 
-    @Resource
-    private PayNotifyCoreService payNotifyCoreService;
-
-
+    // TODO @json：mapHandlers
     private final EnumMap<PayChannelRespEnum, PayRefundChannelPostHandler> mapHandler = new EnumMap<>(PayChannelRespEnum.class);
-
-
 
     @PostConstruct
     public void init(){
-
         if (Objects.nonNull(handlerList)) {
-            handlerList.forEach(t->{
-                for (PayChannelRespEnum item : t.supportHandleResp()) {
-                    mapHandler.put(item, t);
+            handlerList.forEach(handler -> {
+                for (PayChannelRespEnum item : handler.supportHandleResp()) {
+                    mapHandler.put(item, handler);
                 }
             });
         }
-
     }
 
     @Override
@@ -113,16 +105,16 @@ public class PayRefundCoreServiceImpl implements PayRefundCoreService {
             throw exception(PAY_CHANNEL_CLIENT_NOT_FOUND);
         }
 
-        //校验退款的条件
+        // 校验退款的条件
         validatePayRefund(reqBO, order);
 
-        //退款类型
+        // 退款类型
         PayRefundTypeEnum refundType = PayRefundTypeEnum.SOME;
         if (Objects.equals(reqBO.getAmount(), order.getAmount())) {
             refundType = PayRefundTypeEnum.ALL;
         }
 
-        //退款单入库 退款单状态：生成,  没有和渠道产生交互
+        // 退款单入库 退款单状态：生成,  没有和渠道产生交互
         PayOrderExtensionDO orderExtensionDO = payOrderExtensionCoreMapper.selectById(order.getSuccessExtensionId());
         PayRefundDO refundDO = PayRefundDO.builder().channelOrderNo(order.getChannelOrderNo())
                 .appId(order.getAppId())
@@ -144,9 +136,9 @@ public class PayRefundCoreServiceImpl implements PayRefundCoreService {
                 .reqNo(PaySeqUtils.genRefundReqNo())
                 .type(refundType.getStatus())
                 .build();
-
          payRefundCoreMapper.insert(refundDO);
 
+         // TODO @jason：可以把“调用渠道进行退款"写到这里，这样分块更明确
          PayRefundUnifiedReqDTO unifiedReqDTO = PayRefundUnifiedReqDTO.builder()
                 .userIp(reqBO.getUserIp())
                 .channelOrderNo(refundDO.getChannelOrderNo())
@@ -156,13 +148,14 @@ public class PayRefundCoreServiceImpl implements PayRefundCoreService {
                 .reason(refundDO.getReason())
                 .build();
 
-         //调用渠道进行退款
+         // 调用渠道进行退款
          PayRefundUnifiedRespDTO refundUnifiedRespDTO = client.unifiedRefund(unifiedReqDTO);
 
-        //根据渠道返回，获取退款后置处理，由postHandler 进行处理
+         // TODO @jason：下面这块，是一整块逻辑，不要空开。不然阅读的时候，会以为不是一块逻辑
+         // 根据渠道返回，获取退款后置处理，由postHandler 进行处理
          PayRefundChannelPostHandler payRefundChannelPostHandler = mapHandler.get(refundUnifiedRespDTO.getRespEnum());
 
-         if(Objects.isNull(payRefundChannelPostHandler)){
+         if (Objects.isNull(payRefundChannelPostHandler)) {
              throw exception(PAY_REFUND_POST_HANDLER_NOT_FOUND);
          }
 
@@ -192,11 +185,12 @@ public class PayRefundCoreServiceImpl implements PayRefundCoreService {
             log.error("[notifyPayOrder][渠道编号({}) 找不到对应的支付客户端]", channel.getId());
             throw exception(PAY_CHANNEL_CLIENT_NOT_FOUND);
         }
-        //解析渠道退款通知数据， 统一处理
+        // 解析渠道退款通知数据， 统一处理
         PayRefundNotifyDTO refundNotify = client.parseRefundNotify(notifyData);
 
-        if(Objects.equals(PayNotifyRefundStatusEnum.SUCCESS,refundNotify.getStatus())){
-            //退款成功。 支付宝只有退款成功才会发通知
+        // TODO @jason：抽一个 notifyPayRefundSuccess 方法
+        if (Objects.equals(PayNotifyRefundStatusEnum.SUCCESS,refundNotify.getStatus())){
+            // 退款成功。 支付宝只有退款成功才会发通知
             PayRefundDO refundDO = payRefundCoreMapper.selectByReqNo(refundNotify.getReqNo());
             if (refundDO == null) {
                 log.error("不存在 seqNo 为{} 的支付退款单",refundNotify.getReqNo());
@@ -208,9 +202,9 @@ public class PayRefundCoreServiceImpl implements PayRefundCoreService {
             if(PayRefundTypeEnum.ALL.getStatus().equals(type)){
                 orderStatus = PayOrderStatusEnum.CLOSED;
             }
-             //更新支付订单
+            // 更新支付订单
             PayOrderDO payOrderDO = payOrderCoreMapper.selectById(refundDO.getOrderId());
-             //需更新已退金额
+            // 需更新已退金额
             Long refundedAmount = payOrderDO.getRefundAmount();
             PayOrderDO updateOrderDO = new PayOrderDO();
             updateOrderDO.setId(refundDO.getOrderId())
@@ -219,7 +213,7 @@ public class PayRefundCoreServiceImpl implements PayRefundCoreService {
                     .setRefundStatus(type);
             payOrderCoreMapper.updateById(updateOrderDO);
 
-            //跟新退款订单
+            // 跟新退款订单
             PayRefundDO updateRefundDO = new PayRefundDO();
             updateRefundDO.setId(refundDO.getId())
                     .setSuccessTime(refundNotify.getRefundSuccessTime())
@@ -233,10 +227,9 @@ public class PayRefundCoreServiceImpl implements PayRefundCoreService {
             // TODO 通知商户成功或者失败. 现在通知似乎没有实现， 只是回调
             payNotifyCoreService.createPayNotifyTask(PayNotifyTaskCreateReqDTO.builder()
                     .type(PayNotifyTypeEnum.REFUND.getType()).dataId(refundDO.getId()).build());
-        }else{
+        } else {
             //TODO 退款失败
         }
-
     }
 
     /**
@@ -245,7 +238,6 @@ public class PayRefundCoreServiceImpl implements PayRefundCoreService {
      * @param order 原始支付订单信息
      */
     private void validatePayRefund(PayRefundReqBO reqBO, PayOrderDO order) {
-
         // 校验状态，必须是支付状态
         if (!PayOrderStatusEnum.SUCCESS.getStatus().equals(order.getStatus())) {
             throw exception(PAY_ORDER_STATUS_IS_NOT_SUCCESS);
@@ -258,10 +250,11 @@ public class PayRefundCoreServiceImpl implements PayRefundCoreService {
         if(reqBO.getAmount() + order.getRefundAmount() > order.getAmount()){
             throw exception(PAY_REFUND_AMOUNT_EXCEED);
         }
-        //校验渠道订单号
+        // 校验渠道订单号
         if (StrUtil.isEmpty(order.getChannelOrderNo())) {
             throw exception(PAY_REFUND_CHN_ORDER_NO_IS_NULL);
         }
         //TODO  退款的期限  退款次数的控制
     }
+
 }

@@ -47,6 +47,4 @@ public interface PayOrderCoreService {
     */
    void notifyPayOrder(Long channelId,  PayNotifyDataDTO notifyData) throws Exception;
 
-
-
 }

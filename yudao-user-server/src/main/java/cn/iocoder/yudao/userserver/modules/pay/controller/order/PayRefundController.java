@@ -32,7 +32,7 @@ public class PayRefundController {
 
     @PostMapping("/refund")
     @ApiOperation("提交退款订单")
-    public CommonResult<PayRefundRespVO> refund(@RequestBody  PayRefundReqVO reqVO){
+    public CommonResult<PayRefundRespVO> refund(@RequestBody PayRefundReqVO reqVO){
         PayRefundReqBO reqBO = PayRefundConvert.INSTANCE.convert(reqVO);
         reqBO.setUserIp(getClientIP());
         //TODO 测试暂时模拟生成商户退款订单
@@ -40,4 +40,5 @@ public class PayRefundController {
         //reqBO.setMerchantRefundNo("MO202111210814084370000");
         return CommonResult.success( PayRefundConvert.INSTANCE.convert(payRefundCoreService.refund(reqBO)));
     }
+
 }

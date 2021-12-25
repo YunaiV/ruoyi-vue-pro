@@ -34,7 +34,6 @@ public interface PayClient {
      */
     PayOrderNotifyRespDTO parseOrderNotify(PayNotifyDataDTO data) throws Exception;
 
-
     /**
      * 调用支付渠道，进行退款
      * @param reqDTO  统一退款请求信息
@@ -49,22 +48,26 @@ public interface PayClient {
      */
     PayRefundNotifyDTO parseRefundNotify(PayNotifyDataDTO notifyData);
 
-
+    // TODO @芋艿：后续改成非 default，避免不知道去实现
     /**
      * 验证是否渠道通知
+     *
      * @param notifyData 通知数据
      * @return 默认是 true
      */
-    default boolean verifyNotifyData(PayNotifyDataDTO notifyData){
+    default boolean verifyNotifyData(PayNotifyDataDTO notifyData) {
         return true;
     }
 
+    // TODO @芋艿：后续改成非 default，避免不知道去实现
     /**
-     * 是否退款通知
+     * 判断是否为退款通知
+     *
      * @param notifyData  通知数据
      * @return 默认是 false
      */
     default  boolean isRefundNotify(PayNotifyDataDTO notifyData){
         return false;
     }
+
 }

@@ -2,27 +2,27 @@ package cn.iocoder.yudao.userserver.modules.pay.controller.order;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.order.PayOrderDO;
-import cn.iocoder.yudao.coreservice.modules.pay.service.order.PayCommonCoreService;
 import cn.iocoder.yudao.coreservice.modules.pay.service.order.PayOrderCoreService;
 import cn.iocoder.yudao.coreservice.modules.pay.service.order.PayRefundCoreService;
 import cn.iocoder.yudao.coreservice.modules.pay.service.order.dto.PayOrderSubmitReqDTO;
 import cn.iocoder.yudao.coreservice.modules.pay.service.order.dto.PayOrderSubmitRespDTO;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.pay.core.client.PayClient;
+import cn.iocoder.yudao.framework.pay.core.client.PayClientFactory;
 import cn.iocoder.yudao.framework.pay.core.client.dto.PayNotifyDataDTO;
-import cn.iocoder.yudao.framework.pay.core.enums.PayChannelEnum;
 import cn.iocoder.yudao.userserver.modules.pay.controller.order.vo.PayOrderSubmitReqVO;
 import cn.iocoder.yudao.userserver.modules.pay.controller.order.vo.PayOrderSubmitRespVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-
 import java.util.Map;
 
+import static cn.iocoder.yudao.coreservice.modules.pay.enums.PayErrorCodeCoreConstants.PAY_CHANNEL_CLIENT_NOT_FOUND;
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getClientIP;
 
@@ -35,11 +35,11 @@ public class PayOrderController {
 
     @Resource
     private PayOrderCoreService payOrderCoreService;
-
     @Resource
     private PayRefundCoreService payRefundCoreService;
 
-    @Resource PayCommonCoreService commonCoreService;
+    @Resource
+    private PayClientFactory payClientFactory;
 
 
     @PostMapping("/submit")
@@ -81,11 +81,12 @@ public class PayOrderController {
     public String returnAliPayOrder(@PathVariable("channelId") Long channelId, @RequestParam Map<String, String> params){
         //TODO 可以根据渠道和 app_id 返回不同的页面
         log.info("app_id  is {}", params.get("app_id"));
-        return String.format("渠道[%s]支付成功", String.valueOf(channelId));
+        return String.format("渠道[%s]支付成功", channelId);
     }
 
     /**
      * 统一的渠道支付回调，支付宝的退款回调
+     *
      * @param channelId 渠道编号
      * @param params form 参数
      * @param originData http request body
@@ -94,20 +95,27 @@ public class PayOrderController {
     @PostMapping(value = "/notify/{channelId}")
     @ApiOperation("渠道统一的支付成功,或退款成功 通知url")
     public String notifyChannelPay(@PathVariable("channelId") Long channelId,
-                               @RequestParam Map<String, String> params,
-                               @RequestBody String originData) throws Exception {
-        //校验是否是渠道回调
-        commonCoreService.verifyNotifyData(channelId, PayNotifyDataDTO.builder().params(params).body(originData).build());
-        //支付宝退款交易也会触发支付回调接口
-        //参考 https://opensupport.alipay.com/support/helpcenter/193/201602484851
-        //判断是否为退款通知
-        if(commonCoreService.isRefundNotify(channelId, PayNotifyDataDTO.builder().params(params).body(originData).build())) {
-            //退款通知
-            payRefundCoreService.notifyPayRefund(channelId,PayNotifyDataDTO.builder().params(params).body(originData).build());
-        }else{
-            //支付通知
-            payOrderCoreService.notifyPayOrder(channelId,PayNotifyDataDTO.builder().params(params).body(originData).build());
+                                   @RequestParam Map<String, String> params,
+                                   @RequestBody String originData) throws Exception {
+        // 校验支付渠道是否存在
+        PayClient payClient = payClientFactory.getPayClient(channelId);
+        if (payClient == null) {
+            log.error("[notifyPayOrder][渠道编号({}) 找不到对应的支付客户端]", channelId);
+            throw exception(PAY_CHANNEL_CLIENT_NOT_FOUND);
         }
+
+        // 校验通知数据是否合法
+        PayNotifyDataDTO notifyData = PayNotifyDataDTO.builder().params(params).body(originData).build();
+        payClient.verifyNotifyData(notifyData);
+
+        // 如果是退款，则发起退款通知
+        if (payClient.isRefundNotify(notifyData)) {
+            payRefundCoreService.notifyPayRefund(channelId, PayNotifyDataDTO.builder().params(params).body(originData).build());
+            return "success";
+        }
+
+        // 如果非退款，则发起支付通知
+        payOrderCoreService.notifyPayOrder(channelId, PayNotifyDataDTO.builder().params(params).body(originData).build());
         return "success";
     }
 

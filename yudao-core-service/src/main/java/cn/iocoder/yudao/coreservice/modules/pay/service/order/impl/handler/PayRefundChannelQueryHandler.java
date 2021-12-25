@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.coreservice.modules.pay.service.order.impl;
+package cn.iocoder.yudao.coreservice.modules.pay.service.order.impl.handler;
 
 import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.order.PayOrderDO;
 import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.order.PayRefundDO;
@@ -10,31 +10,37 @@ import cn.iocoder.yudao.coreservice.modules.pay.service.order.bo.PayRefundPostRe
 import cn.iocoder.yudao.framework.pay.core.enums.PayChannelRespEnum;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
+
 /**
- * 支付退款订单渠道返回重试的后置处理类
- * {@link PayChannelRespEnum#RETRY_FAILURE}
+ * 支付退款订单渠道返回需调用查询接口的后置处理类
+ * {@link PayChannelRespEnum#PROCESSING_QUERY} //TODO 芋道源码 是不是微信有这样的情况
+ * {@link PayChannelRespEnum#READ_TIME_OUT_EXCEPTION}
  */
 @Service
-public class PayRefundChannelRetryHandler extends PayRefundAbstractChannelPostHandler {
+public class PayRefundChannelQueryHandler extends PayRefundAbstractChannelPostHandler {
 
 
-    public PayRefundChannelRetryHandler(PayOrderCoreMapper payOrderCoreMapper,
+    public PayRefundChannelQueryHandler(PayOrderCoreMapper payOrderCoreMapper,
                                         PayRefundCoreMapper payRefundMapper) {
         super(payOrderCoreMapper, payRefundMapper);
     }
 
     @Override
     public PayChannelRespEnum[] supportHandleResp() {
-        return new PayChannelRespEnum[] {PayChannelRespEnum.RETRY_FAILURE};
+        return new PayChannelRespEnum[]{PayChannelRespEnum.PROCESSING_QUERY, PayChannelRespEnum.READ_TIME_OUT_EXCEPTION};
     }
 
     @Override
     public void handleRefundChannelResp(PayRefundPostReqBO respBO) {
-
-        PayRefundDO updateRefundDO = new PayRefundDO();
+        final PayChannelRespEnum respEnum = respBO.getRespEnum();
+        PayRefundStatusEnum refundStatus =
+                Objects.equals(PayChannelRespEnum.PROCESSING_QUERY, respEnum) ? PayRefundStatusEnum.PROCESSING_QUERY
+                        : PayRefundStatusEnum.UNKNOWN_QUERY;
         //更新退款单表
+        PayRefundDO updateRefundDO = new PayRefundDO();
         updateRefundDO.setId(respBO.getRefundId())
-                .setStatus(PayRefundStatusEnum.UNKNOWN_RETRY.getStatus())
+                .setStatus(refundStatus.getStatus())
                 .setChannelErrorCode(respBO.getChannelErrCode())
                 .setChannelErrorMsg(respBO.getChannelErrMsg());
         updatePayRefund(updateRefundDO);
@@ -45,6 +51,6 @@ public class PayRefundChannelRetryHandler extends PayRefundAbstractChannelPostHa
                 .setRefundTimes(respBO.getRefundedTimes() + 1);
         updatePayOrder(updateOrderDO);
 
-        //TODO 发起重试任务
+        //TODO 发起查询任务
     }
 }

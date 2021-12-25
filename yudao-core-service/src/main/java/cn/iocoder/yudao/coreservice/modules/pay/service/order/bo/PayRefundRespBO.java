@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
+// TODO @jason：改到 dto 哈。我们项目，统一使用 DTO
 /**
  * 退款申请单 Response DTO
  */
