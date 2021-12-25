@@ -41,7 +41,7 @@ import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.E
  * 支付应用信息 controller 组件
  *
  * @author aquan
- */
+ */ // TODO @aquan：一般 controller 上就不写注释了，因为有 swagger 注解，不然就重复啦
 @Slf4j
 @Api(tags = "支付应用信息")
 @RestController
@@ -51,11 +51,8 @@ public class PayAppController {
 
     @Resource
     private PayAppService appService;
-
     @Resource
     private PayChannelService channelService;
-
-
     @Resource
     private PayMerchantService merchantService;
 
@@ -135,6 +132,7 @@ public class PayAppController {
             // 写入商户的数据
             respVO.setPayMerchant(PayAppConvert.INSTANCE.convert(deptMap.get(app.getMerchantId())));
             // 写入支付渠道信息的数据
+            // TODO @aquan：VO 里返回的 payChannel，是不是用一个 Set 集合就好了，里面是渠道的枚举值
             PayAppPageItemRespVO.PayChannel payChannel = new PayAppPageItemRespVO.PayChannel();
             channels.forEach(c -> {
                 if (c.getAppId().equals(app.getId())) {
@@ -176,6 +174,5 @@ public class PayAppController {
         List<PayAppDO> appListDO = appService.getListByMerchantId(merchantId);
         return success(PayAppConvert.INSTANCE.convertList(appListDO));
     }
-
 
 }

@@ -36,10 +36,6 @@ public class PayAppServiceImpl implements PayAppService {
 
     @Resource
     private PayAppMapper appMapper;
-
-    /**
-     * 商户 service 组件
-     */
     @Resource
     private PayMerchantMapper merchantMapper;
 
@@ -151,7 +147,6 @@ public class PayAppServiceImpl implements PayAppService {
      */
     @VisibleForTesting
     public void checkAppExists(Long id) {
-
         if (id == null) {
             return;
         }
@@ -160,4 +155,5 @@ public class PayAppServiceImpl implements PayAppService {
             throw exception(PAY_APP_NOT_FOUND);
         }
     }
+
 }

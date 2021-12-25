@@ -467,8 +467,6 @@ export default {
       this.settingChannelParam(row, payCode, type)
       this.channelParam.edit = false;
       this.channelParam.loading = false;
-
-
     },
     /**
      * 设置支付渠道信息

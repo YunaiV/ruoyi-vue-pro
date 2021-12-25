@@ -72,4 +72,5 @@ public class PayAppPageItemRespVO extends PayAppBaseVO {
         @ApiModelProperty(value = "支付宝扫码支付", required = true, example = "1")
         private Integer alipayQr = CommonStatusEnum.DISABLE.getStatus();
     }
+
 }
