@@ -11,8 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 支付订单
- * Service 接口
+ * 支付订单 Service 接口
  *
  * @author aquan
  */
