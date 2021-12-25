@@ -11,11 +11,8 @@ import cn.iocoder.yudao.adminserver.modules.pay.service.channel.PayChannelServic
 import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.merchant.PayChannelDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.pay.core.client.PayClientConfig;
-import cn.iocoder.yudao.framework.pay.core.client.impl.wx.WXPayClientConfig;
 import cn.iocoder.yudao.framework.pay.core.enums.PayChannelEnum;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.validation.annotation.Validated;
@@ -25,7 +22,8 @@ import javax.validation.Validator;
 import java.util.Collection;
 import java.util.List;
 
-import static cn.iocoder.yudao.coreservice.modules.pay.enums.PayErrorCodeCoreConstants.*;
+import static cn.iocoder.yudao.coreservice.modules.pay.enums.PayErrorCodeCoreConstants.CHANNEL_EXIST_SAME_CHANNEL_ERROR;
+import static cn.iocoder.yudao.coreservice.modules.pay.enums.PayErrorCodeCoreConstants.CHANNEL_NOT_EXISTS;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 
 /**
@@ -48,6 +46,7 @@ public class PayChannelServiceImpl implements PayChannelService {
     public Long createChannel(PayChannelCreateReqVO reqVO) {
         // 断言是否有重复的
         PayChannelDO channelDO = this.getChannelByConditions(reqVO.getMerchantId(), reqVO.getAppId(), reqVO.getCode());
+        // TODO @aquan：这里会抛出系统异常，不会抛出 ServiceException
         Assert.isNull(channelDO, CHANNEL_EXIST_SAME_CHANNEL_ERROR.getMsg());
 
         // 新增渠道
@@ -154,4 +153,5 @@ public class PayChannelServiceImpl implements PayChannelService {
         config.verifyParam(validator);
         channel.setConfig(config);
     }
+
 }

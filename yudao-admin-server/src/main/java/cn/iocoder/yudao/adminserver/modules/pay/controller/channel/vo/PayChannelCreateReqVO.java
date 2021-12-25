@@ -14,10 +14,8 @@ import javax.validation.constraints.NotBlank;
 @ToString(callSuper = true)
 public class PayChannelCreateReqVO extends PayChannelBaseVO {
 
-
-    @ApiModelProperty(value = "通道配置的json字符串")
+    @ApiModelProperty(value = "通道配置的 json 字符串")
     @NotBlank(message = "通道配置不能为空")
     private String config;
-
 
 }

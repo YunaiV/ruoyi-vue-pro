@@ -1,18 +1,12 @@
 package cn.iocoder.yudao.framework.pay.core.client.impl.wx;
 
 import cn.hutool.core.io.IoUtil;
-import cn.hutool.json.JSONObject;
-import cn.hutool.json.JSONUtil;
 import cn.iocoder.yudao.framework.pay.core.client.PayClientConfig;
-import com.alibaba.fastjson.JSON;
 import lombok.Data;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 
-import javax.annotation.Resource;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
-import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotBlank;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -95,7 +89,6 @@ public class WXPayClientConfig implements PayClientConfig {
     @NotBlank(message = "apiV3 秘钥值 不能为空", groups = V3.class)
     private String apiV3Key;
 
-
     /**
      * 分组校验 v2版本
      */
@@ -108,6 +101,7 @@ public class WXPayClientConfig implements PayClientConfig {
     public interface V3 {
     }
 
+    // TODO @aquan：1）已经有注释，不用重复注释；2）方法名改成 validate，比较适合 validator；3）断言是否有异常，可以封一个 ConstraintViolationException 异常
     /**
      * 验证配置参数是否正确
      * @param validator 校验对象
@@ -128,6 +122,5 @@ public class WXPayClientConfig implements PayClientConfig {
         /// String path = "/Users/yunai/Downloads/wx_pay/apiclient_cert.pem";
         System.out.println(IoUtil.readUtf8(new FileInputStream(path)));
     }
-
 
 }

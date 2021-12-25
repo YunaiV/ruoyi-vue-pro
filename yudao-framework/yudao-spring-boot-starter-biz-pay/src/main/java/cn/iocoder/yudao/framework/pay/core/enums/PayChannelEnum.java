@@ -51,12 +51,14 @@ public enum PayChannelEnum {
         return ArrayUtil.firstMatch(o -> o.getCode().equals(code), values());
     }
 
+    // TODO @aquan：加一个 configClass 字段，不用 switch 的方式哈。不然新增一个支付方式，需要改的方法有点多
     /**
      * 根据编码得到支付类
+     *
      * @param code 编码
      * @return 支付配置类
      */
-    public static Class<? extends PayClientConfig> findByCodeGetClass(String code){
+    public static Class<? extends PayClientConfig> findByCodeGetClass(String code) {
         switch (PayChannelEnum.getByCode(code)){
             case WX_PUB:
             case WX_LITE:
