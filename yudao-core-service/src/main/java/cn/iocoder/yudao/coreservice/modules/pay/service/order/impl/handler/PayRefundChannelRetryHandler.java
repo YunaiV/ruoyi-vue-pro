@@ -6,7 +6,7 @@ import cn.iocoder.yudao.coreservice.modules.pay.dal.mysql.order.PayOrderCoreMapp
 import cn.iocoder.yudao.coreservice.modules.pay.dal.mysql.order.PayRefundCoreMapper;
 import cn.iocoder.yudao.coreservice.modules.pay.enums.order.PayRefundStatusEnum;
 import cn.iocoder.yudao.coreservice.modules.pay.service.order.PayRefundAbstractChannelPostHandler;
-import cn.iocoder.yudao.coreservice.modules.pay.service.order.bo.PayRefundPostReqBO;
+import cn.iocoder.yudao.coreservice.modules.pay.service.order.dto.PayRefundPostReqDTO;
 import cn.iocoder.yudao.framework.pay.core.enums.PayChannelRespEnum;
 import org.springframework.stereotype.Service;
 
@@ -29,20 +29,20 @@ public class PayRefundChannelRetryHandler extends PayRefundAbstractChannelPostHa
     }
 
     @Override
-    public void handleRefundChannelResp(PayRefundPostReqBO respBO) {
+    public void handleRefundChannelResp(PayRefundPostReqDTO req) {
 
         PayRefundDO updateRefundDO = new PayRefundDO();
         //更新退款单表
-        updateRefundDO.setId(respBO.getRefundId())
+        updateRefundDO.setId(req.getRefundId())
                 .setStatus(PayRefundStatusEnum.UNKNOWN_RETRY.getStatus())
-                .setChannelErrorCode(respBO.getChannelErrCode())
-                .setChannelErrorMsg(respBO.getChannelErrMsg());
+                .setChannelErrorCode(req.getChannelErrCode())
+                .setChannelErrorMsg(req.getChannelErrMsg());
         updatePayRefund(updateRefundDO);
 
         PayOrderDO updateOrderDO = new PayOrderDO();
         //更新订单表
-        updateOrderDO.setId(respBO.getOrderId())
-                .setRefundTimes(respBO.getRefundedTimes() + 1);
+        updateOrderDO.setId(req.getOrderId())
+                .setRefundTimes(req.getRefundedTimes() + 1);
         updatePayOrder(updateOrderDO);
 
         //TODO 发起重试任务

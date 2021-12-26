@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.coreservice.modules.pay.service.order.bo;
+package cn.iocoder.yudao.coreservice.modules.pay.service.order.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
-// TODO @jason：改到 dto 哈。我们项目，统一使用 DTO
 /**
  * 退款申请单 Request DTO
  */
@@ -15,7 +14,7 @@ import lombok.experimental.Accessors;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PayRefundReqBO {
+public class PayRefundReqDTO {
 
     /**
      * 支付订单编号自增

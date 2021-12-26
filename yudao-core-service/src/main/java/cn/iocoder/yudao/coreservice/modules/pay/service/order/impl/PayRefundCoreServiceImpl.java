@@ -14,6 +14,8 @@ import cn.iocoder.yudao.coreservice.modules.pay.enums.notify.PayNotifyTypeEnum;
 import cn.iocoder.yudao.coreservice.modules.pay.enums.order.PayOrderNotifyStatusEnum;
 import cn.iocoder.yudao.coreservice.modules.pay.service.notify.PayNotifyCoreService;
 import cn.iocoder.yudao.coreservice.modules.pay.service.notify.dto.PayNotifyTaskCreateReqDTO;
+import cn.iocoder.yudao.coreservice.modules.pay.service.order.dto.PayRefundPostReqDTO;
+import cn.iocoder.yudao.coreservice.modules.pay.service.order.dto.PayRefundReqDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.PayRefundNotifyDTO;
 import cn.iocoder.yudao.coreservice.modules.pay.enums.order.PayRefundTypeEnum;
 import cn.iocoder.yudao.coreservice.modules.pay.enums.order.PayOrderStatusEnum;
@@ -22,9 +24,7 @@ import cn.iocoder.yudao.coreservice.modules.pay.service.merchant.PayAppCoreServi
 import cn.iocoder.yudao.coreservice.modules.pay.service.merchant.PayChannelCoreService;
 import cn.iocoder.yudao.coreservice.modules.pay.service.order.PayRefundCoreService;
 import cn.iocoder.yudao.coreservice.modules.pay.service.order.PayRefundChannelPostHandler;
-import cn.iocoder.yudao.coreservice.modules.pay.service.order.bo.PayRefundPostReqBO;
-import cn.iocoder.yudao.coreservice.modules.pay.service.order.bo.PayRefundReqBO;
-import cn.iocoder.yudao.coreservice.modules.pay.service.order.bo.PayRefundRespBO;
+import cn.iocoder.yudao.coreservice.modules.pay.service.order.dto.PayRefundRespDTO;
 import cn.iocoder.yudao.coreservice.modules.pay.util.PaySeqUtils;
 import cn.iocoder.yudao.framework.pay.core.client.PayClient;
 import cn.iocoder.yudao.framework.pay.core.client.PayClientFactory;
@@ -71,15 +71,14 @@ public class PayRefundCoreServiceImpl implements PayRefundCoreService {
     @Resource
     private List<PayRefundChannelPostHandler> handlerList;
 
-    // TODO @json：mapHandlers
-    private final EnumMap<PayChannelRespEnum, PayRefundChannelPostHandler> mapHandler = new EnumMap<>(PayChannelRespEnum.class);
+    private final EnumMap<PayChannelRespEnum, PayRefundChannelPostHandler> mapHandlers = new EnumMap<>(PayChannelRespEnum.class);
 
     @PostConstruct
     public void init(){
         if (Objects.nonNull(handlerList)) {
             handlerList.forEach(handler -> {
                 for (PayChannelRespEnum item : handler.supportHandleResp()) {
-                    mapHandler.put(item, handler);
+                    mapHandlers.put(item, handler);
                 }
             });
         }
@@ -87,9 +86,9 @@ public class PayRefundCoreServiceImpl implements PayRefundCoreService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public PayRefundRespBO refund(PayRefundReqBO reqBO) {
+    public PayRefundRespDTO submitRefundOrder(PayRefundReqDTO req) {
         // 获得 PayOrderDO
-        PayOrderDO order = payOrderCoreMapper.selectById(reqBO.getPayOrderId());
+        PayOrderDO order = payOrderCoreMapper.selectById(req.getPayOrderId());
         // 校验订单是否存在
         if (Objects.isNull(order) ) {
             throw exception(PAY_ORDER_NOT_FOUND);
@@ -106,14 +105,13 @@ public class PayRefundCoreServiceImpl implements PayRefundCoreService {
         }
 
         // 校验退款的条件
-        validatePayRefund(reqBO, order);
+        validatePayRefund(req, order);
 
         // 退款类型
         PayRefundTypeEnum refundType = PayRefundTypeEnum.SOME;
-        if (Objects.equals(reqBO.getAmount(), order.getAmount())) {
+        if (Objects.equals(req.getAmount(), order.getAmount())) {
             refundType = PayRefundTypeEnum.ALL;
         }
-
         // 退款单入库 退款单状态：生成,  没有和渠道产生交互
         PayOrderExtensionDO orderExtensionDO = payOrderExtensionCoreMapper.selectById(order.getSuccessExtensionId());
         PayRefundDO refundDO = PayRefundDO.builder().channelOrderNo(order.getChannelOrderNo())
@@ -123,54 +121,47 @@ public class PayRefundCoreServiceImpl implements PayRefundCoreService {
                 .channelId(order.getChannelId())
                 .merchantId(order.getMerchantId())
                 .orderId(order.getId())
-                .merchantRefundNo(reqBO.getMerchantRefundNo())
+                .merchantRefundNo(req.getMerchantRefundNo())
                 .notifyUrl(app.getRefundNotifyUrl())
                 .payAmount(order.getAmount())
-                .refundAmount(reqBO.getAmount())
-                .userIp(reqBO.getUserIp())
+                .refundAmount(req.getAmount())
+                .userIp(req.getUserIp())
                 .merchantOrderId(order.getMerchantOrderId())
                 .tradeNo(orderExtensionDO.getNo())
                 .status(PayRefundStatusEnum.CREATE.getStatus())
-                .reason(reqBO.getReason())
+                .reason(req.getReason())
                 .notifyStatus(PayOrderNotifyStatusEnum.NO.getStatus())
                 .reqNo(PaySeqUtils.genRefundReqNo())
                 .type(refundType.getStatus())
                 .build();
          payRefundCoreMapper.insert(refundDO);
 
-         // TODO @jason：可以把“调用渠道进行退款"写到这里，这样分块更明确
+        // 调用渠道进行退款
          PayRefundUnifiedReqDTO unifiedReqDTO = PayRefundUnifiedReqDTO.builder()
-                .userIp(reqBO.getUserIp())
+                .userIp(req.getUserIp())
                 .channelOrderNo(refundDO.getChannelOrderNo())
                 .payTradeNo(refundDO.getTradeNo())
                 .refundReqNo(refundDO.getReqNo())
-                .amount(reqBO.getAmount())
+                .amount(req.getAmount())
                 .reason(refundDO.getReason())
                 .build();
-
-         // 调用渠道进行退款
          PayRefundUnifiedRespDTO refundUnifiedRespDTO = client.unifiedRefund(unifiedReqDTO);
-
-         // TODO @jason：下面这块，是一整块逻辑，不要空开。不然阅读的时候，会以为不是一块逻辑
          // 根据渠道返回，获取退款后置处理，由postHandler 进行处理
-         PayRefundChannelPostHandler payRefundChannelPostHandler = mapHandler.get(refundUnifiedRespDTO.getRespEnum());
-
+         PayRefundChannelPostHandler payRefundChannelPostHandler = mapHandlers.get(refundUnifiedRespDTO.getRespEnum());
          if (Objects.isNull(payRefundChannelPostHandler)) {
              throw exception(PAY_REFUND_POST_HANDLER_NOT_FOUND);
          }
-
-         PayRefundPostReqBO bo = PayRefundCoreConvert.INSTANCE.convert(refundUnifiedRespDTO);
-         bo.setRefundAmount(reqBO.getAmount())
+         PayRefundPostReqDTO dto = PayRefundCoreConvert.INSTANCE.convert(refundUnifiedRespDTO);
+         dto.setRefundAmount(req.getAmount())
             .setRefundedAmount(order.getRefundAmount())
             .setRefundedTimes(order.getRefundTimes())
             .setRefundId(refundDO.getId())
             .setOrderId(order.getId())
             .setRefundTypeEnum(refundType);
-
          //调用退款的后置处理
-         payRefundChannelPostHandler.handleRefundChannelResp(bo);
+         payRefundChannelPostHandler.handleRefundChannelResp(dto);
 
-         return PayRefundRespBO.builder().refundId(refundDO.getId()).build();
+         return PayRefundRespDTO.builder().refundId(refundDO.getId()).build();
     }
 
 
@@ -234,10 +225,10 @@ public class PayRefundCoreServiceImpl implements PayRefundCoreService {
 
     /**
      * 校验是否进行退款
-     * @param reqBO 退款申请信息
+     * @param req 退款申请信息
      * @param order 原始支付订单信息
      */
-    private void validatePayRefund(PayRefundReqBO reqBO, PayOrderDO order) {
+    private void validatePayRefund(PayRefundReqDTO req, PayOrderDO order) {
         // 校验状态，必须是支付状态
         if (!PayOrderStatusEnum.SUCCESS.getStatus().equals(order.getStatus())) {
             throw exception(PAY_ORDER_STATUS_IS_NOT_SUCCESS);
@@ -247,7 +238,7 @@ public class PayRefundCoreServiceImpl implements PayRefundCoreService {
             throw exception(PAY_REFUND_ALL_REFUNDED);
         }
         // 校验金额 退款金额不能大于 原定的金额
-        if(reqBO.getAmount() + order.getRefundAmount() > order.getAmount()){
+        if(req.getAmount() + order.getRefundAmount() > order.getAmount()){
             throw exception(PAY_REFUND_AMOUNT_EXCEED);
         }
         // 校验渠道订单号

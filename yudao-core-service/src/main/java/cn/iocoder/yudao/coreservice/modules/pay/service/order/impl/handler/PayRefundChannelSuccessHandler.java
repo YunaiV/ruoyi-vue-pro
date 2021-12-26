@@ -9,7 +9,7 @@ import cn.iocoder.yudao.coreservice.modules.pay.enums.order.PayRefundStatusEnum;
 import cn.iocoder.yudao.coreservice.modules.pay.service.notify.PayNotifyCoreService;
 import cn.iocoder.yudao.coreservice.modules.pay.service.notify.dto.PayNotifyTaskCreateReqDTO;
 import cn.iocoder.yudao.coreservice.modules.pay.service.order.PayRefundAbstractChannelPostHandler;
-import cn.iocoder.yudao.coreservice.modules.pay.service.order.bo.PayRefundPostReqBO;
+import cn.iocoder.yudao.coreservice.modules.pay.service.order.dto.PayRefundPostReqDTO;
 import cn.iocoder.yudao.framework.pay.core.enums.PayChannelRespEnum;
 import org.springframework.stereotype.Service;
 
@@ -38,27 +38,27 @@ public class PayRefundChannelSuccessHandler extends PayRefundAbstractChannelPost
     }
 
     @Override
-    public void handleRefundChannelResp(PayRefundPostReqBO respBO) {
+    public void handleRefundChannelResp(PayRefundPostReqDTO req) {
         //退款成功
         PayRefundDO updateRefundDO = new PayRefundDO();
         //更新退款单表
-        updateRefundDO.setId(respBO.getRefundId())
+        updateRefundDO.setId(req.getRefundId())
                 .setStatus(PayRefundStatusEnum.SUCCESS.getStatus())
-                .setChannelRefundNo(respBO.getChannelRefundNo())
+                .setChannelRefundNo(req.getChannelRefundNo())
                 .setSuccessTime(new Date());
         updatePayRefund(updateRefundDO);
 
         PayOrderDO updateOrderDO = new PayOrderDO();
         //更新订单表
-        updateOrderDO.setId(respBO.getOrderId())
-                .setRefundTimes(respBO.getRefundedTimes() + 1)
-                .setRefundStatus(respBO.getRefundTypeEnum().getStatus())
-                .setRefundAmount(respBO.getRefundedAmount()+respBO.getRefundAmount());
+        updateOrderDO.setId(req.getOrderId())
+                .setRefundTimes(req.getRefundedTimes() + 1)
+                .setRefundStatus(req.getRefundTypeEnum().getStatus())
+                .setRefundAmount(req.getRefundedAmount()+ req.getRefundAmount());
          updatePayOrder(updateOrderDO);
 
          // 立刻插入退款通知记录
         // TODO 通知商户成功或者失败. 现在通知似乎没有实现， 只是回调
         payNotifyCoreService.createPayNotifyTask(PayNotifyTaskCreateReqDTO.builder()
-                .type(PayNotifyTypeEnum.REFUND.getType()).dataId(respBO.getRefundId()).build());
+                .type(PayNotifyTypeEnum.REFUND.getType()).dataId(req.getRefundId()).build());
     }
 }

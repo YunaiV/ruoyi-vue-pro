@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.coreservice.modules.pay.service.order.bo;
+package cn.iocoder.yudao.coreservice.modules.pay.service.order.dto;
 
 import cn.iocoder.yudao.coreservice.modules.pay.enums.order.PayRefundTypeEnum;
 import cn.iocoder.yudao.framework.pay.core.enums.PayChannelRespEnum;
@@ -8,13 +8,15 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
-// TODO @jason：改到 dto 哈。我们项目，统一使用 DTO
+/**
+ * 退款后置处理请求 Request DTO
+ */
 @Data
 @Accessors(chain = true)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PayRefundPostReqBO {
+public class PayRefundPostReqDTO {
 
 
     /**

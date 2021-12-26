@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.coreservice.modules.pay.service.order;
 
-import cn.iocoder.yudao.coreservice.modules.pay.service.order.bo.PayRefundPostReqBO;
+import cn.iocoder.yudao.coreservice.modules.pay.service.order.dto.PayRefundPostReqDTO;
 import cn.iocoder.yudao.framework.pay.core.enums.PayChannelRespEnum;
 
 /**
@@ -20,7 +20,7 @@ public interface PayRefundChannelPostHandler {
     /**
      * 根据渠道返回，处理支付退款单
      *
-     * @param respBO
+     * @param req 退款后置处理请求
      */
-    void handleRefundChannelResp(PayRefundPostReqBO respBO);
+    void handleRefundChannelResp(PayRefundPostReqDTO req);
 }
