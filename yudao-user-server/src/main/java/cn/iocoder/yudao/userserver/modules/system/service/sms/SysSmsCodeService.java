@@ -2,7 +2,6 @@ package cn.iocoder.yudao.userserver.modules.system.service.sms;
 
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.validation.Mobile;
-import cn.iocoder.yudao.userserver.modules.system.controller.auth.vo.SysAuthSendSmsReqVO;
 import cn.iocoder.yudao.userserver.modules.system.dal.dataobject.sms.SysSmsCodeDO;
 import cn.iocoder.yudao.userserver.modules.system.enums.sms.SysSmsSceneEnum;
 
@@ -21,13 +20,6 @@ public interface SysSmsCodeService {
      * @param createIp 发送 IP
      */
     void sendSmsCode(@Mobile String mobile, Integer scene, String createIp);
-
-    /**
-     * 发送短信验证码，并检测手机号是否已被注册
-     *
-     * @param reqVO 请求实体
-     */
-    void sendSmsNewCode(SysAuthSendSmsReqVO reqVO);
 
     /**
      * 验证短信验证码，并进行使用

@@ -4,11 +4,9 @@ import cn.hutool.core.map.MapUtil;
 import cn.iocoder.yudao.coreservice.modules.member.dal.dataobject.user.MbrUserDO;
 import cn.iocoder.yudao.coreservice.modules.system.service.sms.SysSmsCoreService;
 import cn.iocoder.yudao.userserver.modules.member.service.user.MbrUserService;
-import cn.iocoder.yudao.userserver.modules.system.controller.auth.vo.SysAuthSendSmsReqVO;
 import cn.iocoder.yudao.userserver.modules.system.dal.dataobject.sms.SysSmsCodeDO;
 import cn.iocoder.yudao.userserver.modules.system.dal.mysql.sms.SysSmsCodeMapper;
 import cn.iocoder.yudao.userserver.modules.system.enums.sms.SysSmsSceneEnum;
-import cn.iocoder.yudao.userserver.modules.system.enums.sms.SysSmsTemplateCodeConstants;
 import cn.iocoder.yudao.userserver.modules.system.framework.sms.SmsCodeProperties;
 import cn.iocoder.yudao.userserver.modules.system.service.sms.SysSmsCodeService;
 import org.springframework.stereotype.Service;
@@ -47,22 +45,29 @@ public class SysSmsCodeServiceImpl implements SysSmsCodeService {
     public void sendSmsCode(String mobile, Integer scene, String createIp) {
         // 创建验证码
         String code = this.createSmsCode(mobile, scene, createIp);
+
+        // 获取发送模板
+        String codeTemplate = SysSmsSceneEnum.getCodeByScene(scene);
+
+        // 如果是更换手机号发送验证码，则需要检测手机号是否被注册
+        if (SysSmsSceneEnum.CHANGE_MOBILE_BY_SMS.getScene().equals(scene)){
+            this.checkMobileIsRegister(mobile,scene);
+        }
+
         // 发送验证码
-        // TODO @宋天：这里可以拓展下 SysSmsSceneEnum，支持设置对应的短信模板编号（不同场景的短信文案是不同的)、是否要校验手机号已经注册。这样 Controller 就可以收口成一个接口了。相当于说，不同场景，不同策略
-        smsCoreService.sendSingleSmsToMember(mobile, null, SysSmsTemplateCodeConstants.USER_SMS_LOGIN,
+        smsCoreService.sendSingleSmsToMember(mobile, null, codeTemplate,
                 MapUtil.of("code", code));
     }
 
-    @Override
-    public void sendSmsNewCode(SysAuthSendSmsReqVO reqVO) {
+    public void checkMobileIsRegister(String mobile, Integer scene) {
         // 检测手机号是否已被使用
-        MbrUserDO userByMobile = mbrUserService.getUserByMobile(reqVO.getMobile());
+        MbrUserDO userByMobile = mbrUserService.getUserByMobile(mobile);
         if (userByMobile != null){
             throw exception(USER_SMS_CODE_IS_EXISTS);
         }
 
         // 发送短信
-        this.sendSmsCode(reqVO.getMobile(),reqVO.getScene(),getClientIP());
+        this.sendSmsCode(mobile,scene,getClientIP());
     }
 
     private String createSmsCode(String mobile, Integer scene, String ip) {
