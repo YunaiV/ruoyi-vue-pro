@@ -57,6 +57,7 @@ public class PayMerchantServiceImpl implements PayMerchantService {
     public void deleteMerchant(Long id) {
         // 校验存在
         this.validateMerchantExists(id);
+        // TODO @aquan：需要校验 PayApp 是否都在。如果在的情况下，不允许删除
         // 删除
         merchantMapper.deleteById(id);
     }

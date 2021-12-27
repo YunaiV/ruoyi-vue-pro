@@ -61,6 +61,7 @@ public class PayAppServiceImpl implements PayAppService {
     public void deleteApp(Long id) {
         // 校验存在
         this.validateAppExists(id);
+        // TODO aquan：校验是否存在进行中的支付单、退款单，如果是，则不允许删除。
         // 删除
         appMapper.deleteById(id);
     }
