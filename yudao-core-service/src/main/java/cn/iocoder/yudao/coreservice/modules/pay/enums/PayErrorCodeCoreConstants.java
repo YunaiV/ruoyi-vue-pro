@@ -46,8 +46,9 @@ public interface PayErrorCodeCoreConstants {
     ErrorCode PAY_REFUND_AMOUNT_EXCEED = new ErrorCode(1007006000, "退款金额超过订单可退款金额");
     ErrorCode PAY_REFUND_ALL_REFUNDED = new ErrorCode(1007006001, "订单已经全额退款");
     ErrorCode PAY_REFUND_CHN_ORDER_NO_IS_NULL = new ErrorCode(1007006002, "该订单的渠道订单为空");
-    ErrorCode PAY_REFUND_POST_HANDLER_NOT_FOUND = new ErrorCode(1007006003, "未找到对应的退款后置处理类");
+    ErrorCode PAY_REFUND_SUCCEED = new ErrorCode(1007006003, "已经退款成功");
     ErrorCode PAY_REFUND_NOT_FOUND = new ErrorCode(1007006004, "支付退款单不存在");
+
 
     /**
      * ========== 支付商户信息 1-007-004-000 ==========

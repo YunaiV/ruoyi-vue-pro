@@ -48,6 +48,7 @@ public class PayRefundUnifiedReqDTO {
      * https://api.mch.weixin.qq.com/v3/refund/domestic/refunds 中的 out_refund_no
      * https://opendocs.alipay.com/apis alipay.trade.refund 中的 out_request_no
      * 退款请求单号  同一退款请求单号多次请求只退一笔。
+     * 使用 商户的退款单号。{PayRefundDO 字段 merchantRefundNo}
      */
     @NotEmpty(message = "退款请求单号")
     private String refundReqNo;

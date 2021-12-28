@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.framework.pay.core.client.impl;
 
 import cn.hutool.extra.validation.ValidationUtil;
+import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants;
 import cn.iocoder.yudao.framework.pay.core.client.AbstractPayCodeMapping;
 import cn.iocoder.yudao.framework.pay.core.client.PayClient;
 import cn.iocoder.yudao.framework.pay.core.client.PayClientConfig;
@@ -8,11 +9,9 @@ import cn.iocoder.yudao.framework.pay.core.client.PayCommonResult;
 import cn.iocoder.yudao.framework.pay.core.client.dto.PayOrderUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.PayRefundUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.PayRefundUnifiedRespDTO;
-import cn.iocoder.yudao.framework.pay.core.enums.PayChannelRespEnum;
 import lombok.extern.slf4j.Slf4j;
 
-import java.net.SocketTimeoutException;
-
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString;
 
 /**
@@ -108,20 +107,10 @@ public abstract class AbstractPayClient<Config extends PayClientConfig> implemen
         PayRefundUnifiedRespDTO resp;
         try {
             resp = doUnifiedRefund(reqDTO);
-        } catch (SocketTimeoutException ex){
-            // 网络 read time out 异常
-            log.error("[unifiedRefund][request({}) 发起退款失败,网络读超时，退款状态未知]", toJsonString(reqDTO), ex);
-            return PayRefundUnifiedRespDTO.builder()
-                    .exceptionMsg(ex.getMessage())
-                    .respEnum(PayChannelRespEnum.READ_TIME_OUT_EXCEPTION)
-                    .build();
-        } catch (Throwable ex) {
-            // 打印异常日志
+        }  catch (Throwable ex) {
+            // 记录异常日志
             log.error("[unifiedRefund][request({}) 发起退款失败]", toJsonString(reqDTO), ex);
-            return PayRefundUnifiedRespDTO.builder()
-                    .exceptionMsg(ex.getMessage())
-                    .respEnum(PayChannelRespEnum.CALL_EXCEPTION)
-                    .build();
+            throw exception(GlobalErrorCodeConstants.INTERNAL_SERVER_ERROR);
         }
         return resp;
     }

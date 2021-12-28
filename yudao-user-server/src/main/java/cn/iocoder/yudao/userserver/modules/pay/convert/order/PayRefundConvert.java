@@ -19,5 +19,5 @@ public interface PayRefundConvert {
 
     PayRefundReqDTO convert(PayRefundReqVO reqVO);
 
-    PayRefundRespVO convert(PayRefundRespDTO respBO);
+    PayRefundRespVO convert(PayRefundRespDTO req);
 }

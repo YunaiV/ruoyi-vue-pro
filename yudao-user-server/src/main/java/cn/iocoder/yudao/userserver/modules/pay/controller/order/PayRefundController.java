@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.userserver.modules.pay.controller.order;
 
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.coreservice.modules.pay.service.order.PayRefundCoreService;
 import cn.iocoder.yudao.coreservice.modules.pay.service.order.dto.PayRefundReqDTO;
 import cn.iocoder.yudao.coreservice.modules.pay.util.PaySeqUtils;
@@ -36,8 +37,9 @@ public class PayRefundController {
         PayRefundReqDTO req = PayRefundConvert.INSTANCE.convert(reqVO);
         req.setUserIp(getClientIP());
         //TODO 测试暂时模拟生成商户退款订单
-        req.setMerchantRefundNo(PaySeqUtils.genMerchantRefundNo());
-        //req.setMerchantRefundNo("MO202111210814084370000");
+        if(StrUtil.isEmpty(reqVO.getMerchantRefundNo())) {
+            req.setMerchantRefundNo(PaySeqUtils.genMerchantRefundNo());
+        }
         return CommonResult.success( PayRefundConvert.INSTANCE.convert(payRefundCoreService.submitRefundOrder(req)));
     }
 

@@ -5,7 +5,7 @@ import cn.hutool.core.date.DateUtil;
 import cn.iocoder.yudao.framework.pay.core.client.AbstractPayCodeMapping;
 import cn.iocoder.yudao.framework.pay.core.client.dto.*;
 import cn.iocoder.yudao.framework.pay.core.client.impl.AbstractPayClient;
-import cn.iocoder.yudao.framework.pay.core.enums.PayChannelRespEnum;
+import cn.iocoder.yudao.framework.pay.core.enums.PayChannelRefundRespEnum;
 import cn.iocoder.yudao.framework.pay.core.enums.PayNotifyRefundStatusEnum;
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.AlipayConfig;
@@ -17,7 +17,6 @@ import com.alipay.api.response.AlipayTradeRefundResponse;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
-import java.net.SocketTimeoutException;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
@@ -118,43 +117,21 @@ public abstract class AbstractAlipayClient extends AbstractPayClient<AlipayPayCl
                 //退款成功,更新为PROCESSING_NOTIFY， 而不是 SYNC_SUCCESS 通过支付宝回调接口处理。退款导致触发的异步通知，
                 //退款导致触发的异步通知是发送到支付接口中设置的notify_url
                 //TODO 沙箱环境 返回 的tradeNo(渠道退款单号） 和 订单的tradNo 是一个值，是不是理解不对?
-                respDTO.setRespEnum(PayChannelRespEnum.PROCESSING_NOTIFY);
+                respDTO.setChannelResp(PayChannelRefundRespEnum.SUCCESS)
+                        .setChannelCode(response.getCode())
+                        .setChannelMsg(response.getMsg());
             }else{
-                //特殊处理 sub_code  ACQ.SYSTEM_ERROR（系统错误）， 需要调用重试任务
-                //沙箱环境返回的貌似是”aop.ACQ.SYSTEM_ERROR“， 用contain
-                if (response.getSubCode().contains("ACQ.SYSTEM_ERROR")) {
-                    respDTO.setRespEnum(PayChannelRespEnum.RETRY_FAILURE)
-                            .setChannelErrMsg(response.getSubMsg())
-                            .setChannelErrCode(response.getSubCode());
-                }else{
-                    //交易已关闭，需要查询确认退款是否已经完成
-                    if("ACQ.TRADE_HAS_CLOSE".equals(response.getSubCode())){
-                        respDTO.setRespEnum(PayChannelRespEnum.PROCESSING_QUERY)
-                                .setChannelErrMsg(response.getSubMsg())
-                                .setChannelErrCode(response.getSubCode());
-                    }else {
-                        //其他当做不可以重试的错误
-                        respDTO.setRespEnum(PayChannelRespEnum.CAN_NOT_RETRY_FAILURE)
-                                .setChannelErrCode(response.getSubCode())
-                                .setChannelErrMsg(response.getSubMsg());
-                    }
-                }
+                respDTO.setChannelResp(PayChannelRefundRespEnum.FAILURE)
+                        .setChannelCode(response.getSubCode())
+                        .setChannelMsg(response.getSubMsg());
             }
             return respDTO;
         } catch (AlipayApiException e) {
             //TODO 记录异常日志
             log.error("[doUnifiedRefund][request({}) 发起退款失败,网络读超时，退款状态未知]", toJsonString(reqDTO), e);
-            Throwable cause = e.getCause();
-            //网络 read time out 异常, 退款状态未知
-            if (cause instanceof SocketTimeoutException) {
-                respDTO.setExceptionMsg(e.getMessage())
-                        .setRespEnum(PayChannelRespEnum.READ_TIME_OUT_EXCEPTION);
-            }else{
-                respDTO.setExceptionMsg(e.getMessage())
-                        .setChannelErrCode(e.getErrCode())
-                        .setChannelErrMsg(e.getErrMsg())
-                        .setRespEnum(PayChannelRespEnum.CALL_EXCEPTION);
-            }
+            respDTO.setChannelResp(PayChannelRefundRespEnum.FAILURE)
+                    .setChannelCode(e.getErrCode())
+                    .setChannelMsg(e.getErrMsg());
             return respDTO;
         }
     }
