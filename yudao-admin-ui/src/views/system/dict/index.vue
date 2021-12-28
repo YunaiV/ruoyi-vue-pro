@@ -95,6 +95,7 @@ import { listType, getType, delType, addType, updateType, exportType } from "@/a
 
 import { SysCommonStatusEnum } from '@/utils/constants'
 import { getDictDataLabel, getDictDatas, DICT_TYPE } from '@/utils/dict'
+import { createQueryParam } from '@/utils/ruoyi'
 
 export default {
   name: "Dict",
@@ -150,7 +151,7 @@ export default {
     getList() {
       this.loading = true;
       // 处理查询参数
-      let params = {...this.queryParams};
+      let params = createQueryParam(this.queryParams);
       this.addBeginAndEndTime(params, this.dateRangeCreateTime, 'createTime');
       // 执行查询
       listType(params).then(response => {
@@ -243,7 +244,7 @@ export default {
     /** 导出按钮操作 */
     handleExport() {
       // 处理查询参数
-      let params = {...this.queryParams};
+      let params = createQueryParam(this.queryParams);
       params.pageNo = undefined;
       params.pageSize = undefined;
       this.addBeginAndEndTime(params, this.dateRangeCreateTime, 'createTime');

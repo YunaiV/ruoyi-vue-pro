@@ -121,6 +121,7 @@
 <script>
 import { updateApiErrorLogProcess, getApiErrorLogPage, exportApiErrorLogExcel } from "@/api/infra/apiErrorLog";
 import { InfApiErrorLogProcessStatusEnum } from '@/utils/constants'
+import { createQueryParam } from '@/utils/ruoyi'
 
 export default {
   name: "ApiErrorLog",
@@ -165,7 +166,7 @@ export default {
     getList() {
       this.loading = true;
       // 处理查询参数
-      let params = {...this.queryParams};
+      let params = createQueryParam(this.queryParams);
       this.addBeginAndEndTime(params, this.dateRangeExceptionTime, 'exceptionTime');
       // 执行查询
       getApiErrorLogPage(params).then(response => {
@@ -217,7 +218,7 @@ export default {
     /** 导出按钮操作 */
     handleExport() {
       // 处理查询参数
-      let params = {...this.queryParams};
+      let params = createQueryParam(this.queryParams);
       params.pageNo = undefined;
       params.pageSize = undefined;
       this.addBeginAndEndTime(params, this.dateRangeExceptionTime, 'exceptionTime');

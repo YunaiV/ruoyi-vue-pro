@@ -114,6 +114,7 @@
 
 <script>
 import { getApiAccessLogPage, exportApiAccessLogExcel } from "@/api/infra/apiAccessLog";
+import { createQueryParam } from '@/utils/ruoyi'
 
 export default {
   name: "ApiAccessLog",
@@ -157,7 +158,7 @@ export default {
     getList() {
       this.loading = true;
       // 处理查询参数
-      let params = {...this.queryParams};
+      let params = createQueryParam(this.queryParams);
       this.addBeginAndEndTime(params, this.dateRangeBeginTime, 'beginTime');
       // 执行查询
       getApiAccessLogPage(params).then(response => {
@@ -195,7 +196,7 @@ export default {
     /** 导出按钮操作 */
     handleExport() {
       // 处理查询参数
-      let params = {...this.queryParams};
+      let params = createQueryParam(this.queryParams);
       params.pageNo = undefined;
       params.pageSize = undefined;
       this.addBeginAndEndTime(params, this.dateRangeBeginTime, 'beginTime');

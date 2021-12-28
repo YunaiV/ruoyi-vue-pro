@@ -131,6 +131,7 @@
 
 <script>
 import { createTestDemo, updateTestDemo, deleteTestDemo, getTestDemo, getTestDemoPage, exportTestDemoExcel } from "@/api/tool/testDemo";
+import { createQueryParam } from '@/utils/ruoyi'
 
 export default {
   name: "TestDemo",
@@ -180,7 +181,7 @@ export default {
     /** 查询列表 */
     getList() {
       this.loading = true;
-      let params = {...this.queryParams};
+      let params = createQueryParam(this.queryParams);
       this.addBeginAndEndTime(params, this.dateRangeCreateTime, 'createTime');
       // 执行查询
       getTestDemoPage(params).then(response => {
@@ -277,7 +278,7 @@ export default {
     },
     /** 导出按钮操作 */
     handleExport() {
-      let params = {...this.queryParams};
+      let params = createQueryParam(this.queryParams);
       this.addBeginAndEndTime(params, this.dateRangeCreateTime, 'createTime');
       this.$confirm('是否确认导出所有测试示例数据项?', "警告", {
         confirmButtonText: "确定",

@@ -97,6 +97,7 @@
 
 <script>
 import { createErrorCode, updateErrorCode, deleteErrorCode, getErrorCode, getErrorCodePage, exportErrorCodeExcel } from "@/api/system/errorCode";
+import { createQueryParam } from '@/utils/ruoyi'
 
 export default {
   name: "ErrorCode",
@@ -144,7 +145,7 @@ export default {
     getList() {
       this.loading = true;
       // 处理查询参数
-      let params = {...this.queryParams};
+      let params = createQueryParam(this.queryParams);
       this.addBeginAndEndTime(params, this.dateRangeCreateTime, 'createTime');
       // 执行查询
       getErrorCodePage(params).then(response => {
@@ -236,7 +237,7 @@ export default {
     /** 导出按钮操作 */
     handleExport() {
       // 处理查询参数
-      let params = {...this.queryParams};
+      let params = createQueryParam(this.queryParams);
       params.pageNo = undefined;
       params.pageSize = undefined;
       this.addBeginAndEndTime(params, this.dateRangeCreateTime, 'createTime');

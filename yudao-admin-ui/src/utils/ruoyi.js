@@ -102,7 +102,7 @@ export function addBeginAndEndTime(params, dateRange, propName) {
 export function selectDictLabel(datas, value) {
 	var actions = [];
 	Object.keys(datas).some((key) => {
-		if (datas[key].dictValue == ('' + value)) {
+		if (datas[key].dictValue === ('' + value)) {
 			actions.push(datas[key].dictLabel);
 			return true;
 		}
@@ -170,10 +170,25 @@ export function sprintf(str) {
 
 // 转换字符串，undefined,null等转化为""
 export function praseStrEmpty(str) {
-	if (!str || str == "undefined" || str == "null") {
+	if (!str || str === "undefined" || str === "null") {
 		return "";
 	}
 	return str;
+}
+
+/**
+ * 创建查询请求入参
+ * 通常后端接口入参认为null是没值，但空字符串是有值。
+ * 避免这里错误的将
+ * @param obj
+ * @returns {{}}
+ */
+export function createQueryParam(obj){
+  const param = {};
+  Object.keys(obj).some(str =>{
+    param[str] =  obj[str] === "" ?  null : obj[str];
+  })
+  return param;
 }
 
 /**

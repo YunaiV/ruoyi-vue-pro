@@ -109,6 +109,7 @@
 <script>
 import { completeTask, taskSteps, getTaskFormKey,deleteLeave, getLeave, getTodoTaskPage, claimTask } from "@/api/oa/todo";
 import { getDictDataLabel, getDictDatas, DICT_TYPE } from '@/utils/dict'
+import { createQueryParam } from '@/utils/ruoyi'
 export default {
   name: "Todo",
   components: {
@@ -175,7 +176,7 @@ export default {
     getList() {
       this.loading = true;
       // 处理查询参数
-      let params = {...this.queryParams};
+      let params = createQueryParam(this.queryParams);
       // 执行查询
       getTodoTaskPage(params).then(response => {
         this.list = response.data.list;

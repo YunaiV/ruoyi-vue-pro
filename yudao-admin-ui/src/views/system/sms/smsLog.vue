@@ -183,6 +183,7 @@
 <script>
 import { getSmsLogPage, exportSmsLogExcel } from "@/api/system/sms/smsLog";
 import {  getSimpleSmsChannels } from "@/api/system/sms/smsChannel";
+import { createQueryParam } from '@/utils/ruoyi'
 
 export default {
   name: "SmsLog",
@@ -232,7 +233,7 @@ export default {
     getList() {
       this.loading = true;
       // 处理查询参数
-      let params = {...this.queryParams};
+      let params = createQueryParam(this.queryParams);
       this.addBeginAndEndTime(params, this.dateRangeSendTime, 'sendTime');
       this.addBeginAndEndTime(params, this.dateRangeReceiveTime, 'receiveTime');
       // 执行查询
@@ -262,7 +263,7 @@ export default {
     /** 导出按钮操作 */
     handleExport() {
       // 处理查询参数
-      let params = {...this.queryParams};
+      let params = createQueryParam(this.queryParams);
       params.pageNo = undefined;
       params.pageSize = undefined;
       this.addBeginAndEndTime(params, this.dateRangeSendTime, 'sendTime');

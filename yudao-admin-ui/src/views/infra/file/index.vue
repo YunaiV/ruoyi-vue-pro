@@ -81,6 +81,7 @@
 <script>
 import { deleteFile, getFilePage } from "@/api/infra/file";
 import {getToken} from "@/utils/auth";
+import { createQueryParam } from '@/utils/ruoyi'
 
 export default {
   name: "File",
@@ -124,7 +125,7 @@ export default {
     getList() {
       this.loading = true;
       // 处理查询参数
-      let params = {...this.queryParams};
+      let params = createQueryParam(this.queryParams);
       this.addBeginAndEndTime(params, this.dateRangeCreateTime, 'createTime');
       // 执行查询
       getFilePage(params).then(response => {
