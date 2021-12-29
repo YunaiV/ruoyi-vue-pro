@@ -46,9 +46,6 @@ public class PayOrderDetailsRespVO extends PayOrderBaseVO {
         @ApiModelProperty(value = "支付订单号")
         private String no;
 
-        @ApiModelProperty(value = "支付渠道的额外参数")
-        private String channelExtras;
-
         @ApiModelProperty(value = "支付异步通知的内容")
         private String channelNotifyData;
     }

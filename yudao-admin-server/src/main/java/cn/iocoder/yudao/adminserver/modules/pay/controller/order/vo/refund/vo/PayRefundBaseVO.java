@@ -16,10 +16,6 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @Data
 public class PayRefundBaseVO {
 
-    @ApiModelProperty(value = "退款单请求号", required = true)
-    @NotNull(message = "退款单请求号不能为空")
-    private String reqNo;
-
     @ApiModelProperty(value = "商户编号", required = true)
     @NotNull(message = "商户编号不能为空")
     private Long merchantId;

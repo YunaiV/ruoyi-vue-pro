@@ -16,7 +16,7 @@ import java.util.Map;
 /**
  * 支付商户信息 Service 接口
  *
- * @author 芋艿 TODO @aquan：作者是你哈
+ * @author aquan
  */
 public interface PayMerchantService {
 

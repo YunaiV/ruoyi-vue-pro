@@ -236,9 +236,6 @@
         <el-descriptions-item label="商品描述">
           {{ orderDetail.body }}
         </el-descriptions-item>
-        <el-descriptions-item label="支付通道额外扩展参数">
-          {{ orderDetail.payOrderExtension.channelExtras }}
-        </el-descriptions-item>
         <el-descriptions-item label="支付通道异步回调内容">
           {{ orderDetail.payOrderExtension.channelNotifyData }}
         </el-descriptions-item>
@@ -278,7 +275,6 @@ const defaultOrderDetail = {
   notifyTime: '',
   expireTime: '',
   payOrderExtension: {
-    channelExtras: '',
     channelNotifyData: '',
     no: ''
   }

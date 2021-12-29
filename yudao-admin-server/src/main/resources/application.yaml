@@ -75,6 +75,4 @@ yudao:
       - cn.iocoder.yudao.adminserver.modules.system.enums.SysErrorCodeConstants
   tenant: # 多租户相关配置项
     tables: # 配置需要开启多租户的表；如果实体已经继承 TenantBaseDO 类，则无需重复配置
-  pay:
-    payReturnUrl: http://127.0.0.1 # TODO @aquan：这个变量，配置到 dev 或者 local 里，不同环境有差别哈
 debug: false

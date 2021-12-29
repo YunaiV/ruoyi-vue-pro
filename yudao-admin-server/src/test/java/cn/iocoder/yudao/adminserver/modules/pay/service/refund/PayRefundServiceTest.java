@@ -72,8 +72,6 @@ public class PayRefundServiceTest extends BaseDbUnitTest {
             o.setUpdateTime(DateUtils.buildTime(2021, 1, 1, 10, 10, 35));
         });
         refundMapper.insert(dbRefund);
-        // 测试 reqNo 不匹配
-        refundMapper.insert(cloneIgnoreId(dbRefund, o -> o.setReqNo("RF1111112")));
         // 测试 merchantId 不匹配
         refundMapper.insert(cloneIgnoreId(dbRefund, o -> o.setMerchantId(2L)));
         // 测试 appId 不匹配
@@ -94,7 +92,6 @@ public class PayRefundServiceTest extends BaseDbUnitTest {
                 o.setCreateTime(DateUtils.buildTime(2022, 1, 1, 10, 10, 10))));
         // 准备参数
         PayRefundPageReqVO reqVO = new PayRefundPageReqVO();
-        reqVO.setReqNo("RF0000001");
         reqVO.setMerchantId(1L);
         reqVO.setAppId(1L);
         reqVO.setChannelCode(PayChannelEnum.WX_PUB.getCode());
@@ -147,8 +144,6 @@ public class PayRefundServiceTest extends BaseDbUnitTest {
             o.setUpdateTime(DateUtils.buildTime(2021, 1, 1, 10, 10, 35));
         });
         refundMapper.insert(dbRefund);
-        // 测试 reqNo 不匹配
-        refundMapper.insert(cloneIgnoreId(dbRefund, o -> o.setReqNo("RF1111112")));
         // 测试 merchantId 不匹配
         refundMapper.insert(cloneIgnoreId(dbRefund, o -> o.setMerchantId(2L)));
         // 测试 appId 不匹配
@@ -170,7 +165,6 @@ public class PayRefundServiceTest extends BaseDbUnitTest {
 
         // 准备参数
         PayRefundExportReqVO reqVO = new PayRefundExportReqVO();
-        reqVO.setReqNo("RF0000001");
         reqVO.setMerchantId(1L);
         reqVO.setAppId(1L);
         reqVO.setChannelCode(PayChannelEnum.WX_PUB.getCode());

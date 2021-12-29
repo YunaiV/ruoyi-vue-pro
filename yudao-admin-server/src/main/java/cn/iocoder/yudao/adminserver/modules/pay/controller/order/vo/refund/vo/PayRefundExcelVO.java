@@ -22,9 +22,6 @@ public class PayRefundExcelVO {
     @ExcelProperty("商品名称")
     private String subject;
 
-    @ExcelProperty("退款单请求号")
-    private String reqNo;
-
     @ExcelProperty(value = "商户名称")
     private String merchantName;
 

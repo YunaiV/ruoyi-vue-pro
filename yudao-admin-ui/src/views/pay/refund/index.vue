@@ -43,20 +43,17 @@
           <el-option v-for="dict in payChannelCodeDictDatum" :key="dict.value" :label="dict.label" :value="dict.value"/>
         </el-select>
       </el-form-item>
-      <el-form-item label="退款单号" prop="reqNo">
-        <el-input v-model="queryParams.reqNo" placeholder="请输入退款单请求号" clearable size="small"
-                  @keyup.enter.native="handleQuery"/>
-      </el-form-item>
-      <el-form-item label="商户退款订单号" prop="merchantRefundNo">
-        <el-input v-model="queryParams.merchantRefundNo" placeholder="请输入商户退款订单号" clearable size="small"
-                  @keyup.enter.native="handleQuery"/>
-      </el-form-item>
       <el-form-item label="退款类型" prop="type">
         <el-select v-model="queryParams.type" placeholder="请选择退款类型" clearable size="small">
           <el-option v-for="dict in payRefundOrderTypeDictDatum" :key="parseInt(dict.value)"
                      :label="dict.label" :value="parseInt(dict.value)"/>
         </el-select>
       </el-form-item>
+      <el-form-item label="商户退款订单号" prop="merchantRefundNo">
+        <el-input v-model="queryParams.merchantRefundNo" placeholder="请输入商户退款订单号" clearable size="small"
+                  @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+
       <el-form-item label="退款状态" prop="status">
         <el-select v-model="queryParams.status" placeholder="请选择退款状态" clearable size="small">
           <el-option v-for="dict in payRefundOrderDictDatum" :key="parseInt(dict.value)"
@@ -112,15 +109,15 @@
       </el-table-column>
       <!--      <el-table-column label="交易订单号" align="center" prop="tradeNo" width="140"/>-->
       <!--      <el-table-column label="商户订单编号" align="center" prop="merchantOrderId" width="140"/>-->
-      <el-table-column label="退款订单号" align="left" width="230">
+      <el-table-column label="商户订单号" align="left" width="230">
         <template v-slot="scope">
           <p class="order-font">
             <el-tag size="mini">退款</el-tag>
-            {{ scope.row.reqNo }}
+            {{ scope.row.merchantRefundNo }}
           </p>
           <p class="order-font">
-            <el-tag size="mini" type="success">商户</el-tag>
-            {{ scope.row.merchantRefundNo }}
+            <el-tag type="success">交易</el-tag>
+            {{ scope.row.merchantOrderId }}
           </p>
         </template>
       </el-table-column>
@@ -201,9 +198,6 @@
       <el-descriptions :column="2" label-class-name="desc-label">
         <el-descriptions-item label="商户退款单号">
           <el-tag  size="mini">{{ refundDetail.merchantRefundNo }}</el-tag>
-        </el-descriptions-item>
-        <el-descriptions-item label="商户退款请求单号" size="mini">
-          <el-tag type="success" size="mini">{{ refundDetail.reqNo }}</el-tag>
         </el-descriptions-item>
         <el-descriptions-item label="商户订单号">{{ refundDetail.merchantOrderId }}</el-descriptions-item>
         <el-descriptions-item label="交易订单号">{{ refundDetail.tradeNo }}</el-descriptions-item>
@@ -299,7 +293,6 @@ const defaultRefundDetail = {
   payAmount: null,
   reason: '',
   refundAmount: null,
-  reqNo: '',
   status: null,
   subject: '',
   successTime: null,
@@ -333,7 +326,6 @@ export default {
       queryParams: {
         pageNo: 1,
         pageSize: 10,
-        reqNo: null,
         merchantId: null,
         appId: null,
         channelId: null,

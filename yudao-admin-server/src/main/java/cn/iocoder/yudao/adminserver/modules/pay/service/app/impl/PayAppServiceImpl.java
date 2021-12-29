@@ -9,9 +9,13 @@ import cn.iocoder.yudao.adminserver.modules.pay.controller.app.vo.PayAppUpdateRe
 import cn.iocoder.yudao.adminserver.modules.pay.convert.app.PayAppConvert;
 import cn.iocoder.yudao.adminserver.modules.pay.dal.mysql.app.PayAppMapper;
 import cn.iocoder.yudao.adminserver.modules.pay.dal.mysql.merchant.PayMerchantMapper;
+import cn.iocoder.yudao.adminserver.modules.pay.dal.mysql.order.PayOrderMapper;
+import cn.iocoder.yudao.adminserver.modules.pay.dal.mysql.order.PayRefundMapper;
 import cn.iocoder.yudao.adminserver.modules.pay.service.app.PayAppService;
 import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.merchant.PayAppDO;
 import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.merchant.PayMerchantDO;
+import cn.iocoder.yudao.coreservice.modules.pay.enums.order.PayOrderStatusEnum;
+import cn.iocoder.yudao.coreservice.modules.pay.enums.order.PayRefundStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import com.google.common.annotations.VisibleForTesting;
@@ -21,7 +25,7 @@ import org.springframework.validation.annotation.Validated;
 import javax.annotation.Resource;
 import java.util.*;
 
-import static cn.iocoder.yudao.coreservice.modules.pay.enums.PayErrorCodeCoreConstants.PAY_APP_NOT_FOUND;
+import static cn.iocoder.yudao.coreservice.modules.pay.enums.PayErrorCodeCoreConstants.*;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 
@@ -36,8 +40,16 @@ public class PayAppServiceImpl implements PayAppService {
 
     @Resource
     private PayAppMapper appMapper;
+
     @Resource
     private PayMerchantMapper merchantMapper;
+
+    @Resource
+    private PayOrderMapper orderMapper;
+
+    @Resource
+    private PayRefundMapper refundMapper;
+
 
     @Override
     public Long createApp(PayAppCreateReqVO createReqVO) {
@@ -61,7 +73,8 @@ public class PayAppServiceImpl implements PayAppService {
     public void deleteApp(Long id) {
         // 校验存在
         this.validateAppExists(id);
-        // TODO aquan：校验是否存在进行中的支付单、退款单，如果是，则不允许删除。
+        this.validateOrderTransactionExist(id);
+
         // 删除
         appMapper.deleteById(id);
     }
@@ -155,6 +168,23 @@ public class PayAppServiceImpl implements PayAppService {
         if (payApp == null) {
             throw exception(PAY_APP_NOT_FOUND);
         }
+    }
+
+    /**
+     * 验证是否存在交易中或者退款中等处理中状态的订单
+     *
+     * @param appId 应用 ID
+     */
+    private void validateOrderTransactionExist(Long appId) {
+        // 查看交易订单
+        if (orderMapper.selectCount(appId, PayOrderStatusEnum.WAITING.getStatus()) > 0) {
+            throw exception(PAY_APP_EXIST_TRANSACTION_ORDER_CANT_DELETE);
+        }
+        // 查看退款订单
+        if (refundMapper.selectCount(appId,   PayRefundStatusEnum.CREATE.getStatus()) > 0) {
+            throw exception(PAY_APP_EXIST_TRANSACTION_ORDER_CANT_DELETE);
+        }
+
     }
 
 }

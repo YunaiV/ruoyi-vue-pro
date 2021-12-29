@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.adminserver.modules.pay.controller.app;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.adminserver.modules.pay.controller.app.vo.*;
 import cn.iocoder.yudao.adminserver.modules.pay.convert.app.PayAppConvert;
 import cn.iocoder.yudao.adminserver.modules.pay.service.app.PayAppService;
@@ -10,12 +9,12 @@ import cn.iocoder.yudao.adminserver.modules.pay.service.merchant.PayMerchantServ
 import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.merchant.PayAppDO;
 import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.merchant.PayChannelDO;
 import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.merchant.PayMerchantDO;
-import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
+import cn.iocoder.yudao.framework.pay.core.enums.PayChannelEnum;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
@@ -28,20 +27,11 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 
-/**
- * 支付应用信息 controller 组件
- *
- * @author aquan
- */ // TODO @aquan：一般 controller 上就不写注释了，因为有 swagger 注解，不然就重复啦
 @Slf4j
 @Api(tags = "支付应用信息")
 @RestController
@@ -119,6 +109,7 @@ public class PayAppController {
         // 得到所有的应用编号，查出所有的通道
         Collection<Long> payAppIds = CollectionUtils.convertList(pageResult.getList(), PayAppDO::getId);
         List<PayChannelDO> channels = channelService.getChannelListByAppIds(payAppIds);
+        Iterator<PayChannelDO> iterator = channels.iterator();
 
         // 得到所有的商户信息
         Collection<Long> merchantIds = CollectionUtils.convertList(pageResult.getList(), PayAppDO::getMerchantId);
@@ -132,22 +123,15 @@ public class PayAppController {
             // 写入商户的数据
             respVO.setPayMerchant(PayAppConvert.INSTANCE.convert(deptMap.get(app.getMerchantId())));
             // 写入支付渠道信息的数据
-            // TODO @aquan：VO 里返回的 payChannel，是不是用一个 Set 集合就好了，里面是渠道的枚举值
-            PayAppPageItemRespVO.PayChannel payChannel = new PayAppPageItemRespVO.PayChannel();
-            channels.forEach(c -> {
-                if (c.getAppId().equals(app.getId())) {
-                    // 获取 set 方法
-                    String methodName = StrUtil.toCamelCase("set_" + c.getCode());
-                    try {
-                        // 根据 set 方法将值写入
-                        payChannel.getClass().getMethod(methodName, Integer.class)
-                                .invoke(payChannel, CommonStatusEnum.ENABLE.getStatus());
-                    } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
-                        log.error("[getAppPage]调用方法[{}]设置参数[{}]异常", c.getCode(), methodName);
-                    }
+            Set<String> channelCodes = new HashSet<>(PayChannelEnum.values().length);
+            while (iterator.hasNext()) {
+                PayChannelDO channelDO = iterator.next();
+                if (channelDO.getAppId().equals(app.getId())) {
+                    channelCodes.add(channelDO.getCode());
+                    iterator.remove();
                 }
-            });
-            respVO.setPayChannel(payChannel);
+            }
+            respVO.setChannelCodes(channelCodes);
             appList.add(respVO);
         });
 

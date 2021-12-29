@@ -14,6 +14,7 @@ public interface PayErrorCodeCoreConstants {
      */
     ErrorCode PAY_APP_NOT_FOUND = new ErrorCode(1007000000, "App 不存在");
     ErrorCode PAY_APP_IS_DISABLE = new ErrorCode(1007000002, "App 已经被禁用");
+    ErrorCode PAY_APP_EXIST_TRANSACTION_ORDER_CANT_DELETE =  new ErrorCode(1007000003, "支付应用存在交易中的订单,无法删除");
 
     /**
      * ========== CHANNEL 模块 1-007-001-000 ==========
@@ -54,6 +55,7 @@ public interface PayErrorCodeCoreConstants {
      * ========== 支付商户信息 1-007-004-000 ==========
      */
     ErrorCode PAY_MERCHANT_NOT_EXISTS = new ErrorCode(1007004000, "支付商户信息不存在");
+    ErrorCode PAY_MERCHANT_EXIST_APP_CANT_DELETE = new ErrorCode(1007004001, "支付商户存在支付应用,无法删除");
 
 
 

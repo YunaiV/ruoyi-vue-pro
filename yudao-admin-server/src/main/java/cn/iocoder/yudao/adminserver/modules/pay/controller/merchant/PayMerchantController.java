@@ -75,7 +75,7 @@ public class PayMerchantController {
         return success(PayMerchantConvert.INSTANCE.convert(merchant));
     }
 
-    @GetMapping("/list-name") // TODO @aquan：/list-name =》/list-by-name
+    @GetMapping("/list-by-name")
     @ApiOperation("根据商户名称获得支付商户信息列表")
     @ApiImplicitParam(name = "name", value = "商户名称", example = "芋道", dataTypeClass = Long.class)
     @PreAuthorize("@ss.hasPermission('pay:merchant:query')")

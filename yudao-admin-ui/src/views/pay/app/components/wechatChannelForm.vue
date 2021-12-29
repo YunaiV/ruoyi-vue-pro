@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-dialog :visible.sync="transferParam.wechatOpen" @close="close" append-to-body width="800px">
+    <el-dialog :visible.sync="transferParam.wechatOpen" :title="title" @close="close" append-to-body width="800px">
       <el-form ref="wechatJsApiForm" :model="form" :rules="rules" size="medium" label-width="100px"
                v-loading="transferParam.loading">
         <el-form-item label-width="180px" label="渠道费率" prop="feeRate">
@@ -134,6 +134,7 @@ export default {
   },
   data() {
     return {
+      title:'',
       form: JSON.parse(JSON.stringify(defaultForm)),
       rules: {
         feeRate: [{
@@ -188,7 +189,7 @@ export default {
       },
       fileAccept: ".pem",
       // 渠道状态 数据字典
-      statusDictDatas: getDictDatas(DICT_TYPE.PAY_CHANNEL_STATUS),
+      statusDictDatas: getDictDatas(DICT_TYPE.SYS_COMMON_STATUS),
       versionDictDatas: getDictDatas(DICT_TYPE.PAY_CHANNEL_WECHAT_VERSION),
     }
   },
@@ -202,7 +203,10 @@ export default {
           this.form.merchantId = newVal.payMerchant.id;
           // 只有在初次进来为编辑 并且为加载中的时候才回去请求数据
           if (newVal.edit && newVal.loading) {
+            this.title = "编辑支付渠道";
             this.init();
+          } else {
+            this.title = "创建支付渠道";
           }
         }
       }

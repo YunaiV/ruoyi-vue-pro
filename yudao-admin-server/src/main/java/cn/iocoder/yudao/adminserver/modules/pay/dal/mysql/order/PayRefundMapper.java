@@ -6,6 +6,7 @@ import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.order.PayRefundDO
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.QueryWrapperX;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -20,7 +21,6 @@ public interface PayRefundMapper extends BaseMapperX<PayRefundDO> {
 
     default PageResult<PayRefundDO> selectPage(PayRefundPageReqVO reqVO) {
         return selectPage(reqVO, new QueryWrapperX<PayRefundDO>()
-                .likeIfPresent("req_no", reqVO.getReqNo())
                 .eqIfPresent("merchant_id", reqVO.getMerchantId())
                 .eqIfPresent("app_id", reqVO.getAppId())
                 .eqIfPresent("channel_code", reqVO.getChannelCode())
@@ -37,7 +37,6 @@ public interface PayRefundMapper extends BaseMapperX<PayRefundDO> {
                 .eqIfPresent("merchant_id", reqVO.getMerchantId())
                 .eqIfPresent("app_id", reqVO.getAppId())
                 .eqIfPresent("channel_code", reqVO.getChannelCode())
-                .likeIfPresent("req_no", reqVO.getReqNo())
                 .likeIfPresent("merchant_refund_no", reqVO.getMerchantRefundNo())
                 .eqIfPresent("type", reqVO.getType())
                 .eqIfPresent("status", reqVO.getStatus())
@@ -46,4 +45,17 @@ public interface PayRefundMapper extends BaseMapperX<PayRefundDO> {
                 .orderByDesc("id"));
     }
 
+    /**
+     * 查询符合的订单数量
+     *
+     * @param appId 应用编号
+     * @param status 订单状态
+     * @return 条数
+     */
+    default Long selectCount(Long appId, Integer status) {
+
+        return selectCount(new LambdaQueryWrapper<PayRefundDO>()
+                .eq(PayRefundDO::getAppId, appId)
+                .eq(PayRefundDO::getStatus, status));
+    }
 }

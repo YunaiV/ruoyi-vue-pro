@@ -62,7 +62,6 @@ public interface PayRefundConvert {
         PayRefundExcelVO payRefundExcelVO = new PayRefundExcelVO();
 
         payRefundExcelVO.setId(bean.getId());
-        payRefundExcelVO.setReqNo(bean.getReqNo());
         payRefundExcelVO.setTradeNo(bean.getTradeNo());
         payRefundExcelVO.setMerchantOrderId(bean.getMerchantOrderId());
         payRefundExcelVO.setMerchantRefundNo(bean.getMerchantRefundNo());

@@ -34,12 +34,6 @@ export const DICT_TYPE = {
   OA_LEAVE_STATUS: 'oa_leave_status',
   OA_LEAVE_TYPE: 'oa_leave_type',
 
-  // 商户状态
-  PAY_MERCHANT_STATUS: 'pay_merchant_status', // TODO @aquan：一般使用 COMMON_RESULT 即可。保持数值一致，以后加更多状态的时候，在单独数据字典
-  // 应用状态
-  PAY_APP_STATUS: 'pay_app_status',
-  // 渠道状态
-  PAY_CHANNEL_STATUS: 'pay_channel_status',
   // 微信渠道版本
   PAY_CHANNEL_WECHAT_VERSION:'pay_channel_wechat_version',
   // 支付渠道支付宝算法类型

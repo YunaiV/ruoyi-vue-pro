@@ -55,8 +55,7 @@ public interface PayChannelMapper extends BaseMapperX<PayChannelDO> {
      * @param code       通道编码
      * @return 数量
      */
-    // TODO @aquan：Mapper 的操作，和 db 保持一致
-    default Integer getChannelCountByConditions(Long merchantId, Long appid, String code) {
+    default Integer selectCount(Long merchantId, Long appid, String code) {
         return this.selectCount(new QueryWrapper<PayChannelDO>().lambda()
                 .eq(PayChannelDO::getMerchantId, merchantId)
                 .eq(PayChannelDO::getAppId, appid)
@@ -71,7 +70,7 @@ public interface PayChannelMapper extends BaseMapperX<PayChannelDO> {
      * @param code       通道编码
      * @return 数量
      */
-    default PayChannelDO getChannelByConditions(Long merchantId, Long appid, String code) {
+    default PayChannelDO selectOne(Long merchantId, Long appid, String code) {
         return this.selectOne((new QueryWrapper<PayChannelDO>().lambda()
                 .eq(PayChannelDO::getMerchantId, merchantId)
                 .eq(PayChannelDO::getAppId, appid)

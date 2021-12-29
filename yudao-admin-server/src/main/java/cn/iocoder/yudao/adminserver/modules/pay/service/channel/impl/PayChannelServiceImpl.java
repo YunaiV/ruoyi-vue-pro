@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.adminserver.modules.pay.service.channel.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONUtil;
 import cn.iocoder.yudao.adminserver.modules.pay.controller.channel.vo.PayChannelCreateReqVO;
 import cn.iocoder.yudao.adminserver.modules.pay.controller.channel.vo.PayChannelExportReqVO;
@@ -14,7 +15,6 @@ import cn.iocoder.yudao.framework.pay.core.client.PayClientConfig;
 import cn.iocoder.yudao.framework.pay.core.enums.PayChannelEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
@@ -46,8 +46,9 @@ public class PayChannelServiceImpl implements PayChannelService {
     public Long createChannel(PayChannelCreateReqVO reqVO) {
         // 断言是否有重复的
         PayChannelDO channelDO = this.getChannelByConditions(reqVO.getMerchantId(), reqVO.getAppId(), reqVO.getCode());
-        // TODO @aquan：这里会抛出系统异常，不会抛出 ServiceException
-        Assert.isNull(channelDO, CHANNEL_EXIST_SAME_CHANNEL_ERROR.getMsg());
+        if (ObjectUtil.isNotNull(channelDO)) {
+            throw exception(CHANNEL_EXIST_SAME_CHANNEL_ERROR);
+        }
 
         // 新增渠道
         PayChannelDO channel = PayChannelConvert.INSTANCE.convert(reqVO);
@@ -122,7 +123,7 @@ public class PayChannelServiceImpl implements PayChannelService {
      */
     @Override
     public Integer getChannelCountByConditions(Long merchantId, Long appid, String code) {
-        return this.channelMapper.getChannelCountByConditions(merchantId, appid, code);
+        return this.channelMapper.selectCount(merchantId, appid, code);
     }
 
     /**
@@ -135,7 +136,7 @@ public class PayChannelServiceImpl implements PayChannelService {
      */
     @Override
     public PayChannelDO getChannelByConditions(Long merchantId, Long appid, String code) {
-        return this.channelMapper.getChannelByConditions(merchantId, appid, code);
+        return this.channelMapper.selectOne(merchantId, appid, code);
     }
 
     /**
@@ -146,11 +147,14 @@ public class PayChannelServiceImpl implements PayChannelService {
      */
     private void settingConfigAndCheckParam(PayChannelDO channel, String configStr) {
         // 得到这个渠道是微信的还是支付宝的
-        Class<? extends PayClientConfig> payClass = PayChannelEnum.findByCodeGetClass(channel.getCode());
-        Assert.notNull(payClass, CHANNEL_NOT_EXISTS.getMsg());
+        Class<? extends PayClientConfig> payClass = PayChannelEnum.getByCode(channel.getCode()).getConfigClass();
+        if (ObjectUtil.isNull(payClass)) {
+            throw exception(CHANNEL_NOT_EXISTS);
+        }
         PayClientConfig config = JSONUtil.toBean(configStr, payClass);
+
         // 验证参数
-        config.verifyParam(validator);
+        config.validate(validator);
         channel.setConfig(config);
     }
 

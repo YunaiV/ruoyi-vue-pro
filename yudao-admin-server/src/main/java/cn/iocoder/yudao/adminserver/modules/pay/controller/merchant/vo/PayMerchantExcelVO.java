@@ -2,11 +2,10 @@ package cn.iocoder.yudao.adminserver.modules.pay.controller.merchant.vo;
 
 import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
 import cn.iocoder.yudao.framework.excel.core.convert.DictConvert;
-import lombok.*;
-import java.util.*;
-import io.swagger.annotations.*;
-
 import com.alibaba.excel.annotation.ExcelProperty;
+import lombok.Data;
+
+import java.util.Date;
 
 /**
  * 支付商户信息 Excel VO
@@ -29,7 +28,7 @@ public class PayMerchantExcelVO {
     private String shortName;
 
     @ExcelProperty(value = "开启状态",converter = DictConvert.class)
-    @DictFormat("pay_merchant_status")
+    @DictFormat("sys_common_status")
     private Integer status;
 
     @ExcelProperty("备注")

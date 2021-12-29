@@ -17,18 +17,21 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum PayChannelEnum {
 
-    WX_PUB("wx_pub", "微信 JSAPI 支付"), // 公众号的网页
-    WX_LITE("wx_lite","微信小程序支付"),
-    WX_APP("wx_app", "微信 App 支付"),
+    /**
+     * 公众号网页
+     */
+    WX_PUB("wx_pub", "微信 JSAPI 支付", WXPayClientConfig.class),
+    WX_LITE("wx_lite", "微信小程序支付", WXPayClientConfig.class),
+    WX_APP("wx_app", "微信 App 支付", WXPayClientConfig.class),
 
-    ALIPAY_PC("alipay_pc", "支付宝 PC 网站支付"),
-    ALIPAY_WAP("alipay_wap", "支付宝 Wap 网站支付"),
-    ALIPAY_APP("alipay_app", "支付宝App 支付"),
-    ALIPAY_QR("alipay_qr", "支付宝扫码支付");
+    ALIPAY_PC("alipay_pc", "支付宝 PC 网站支付", AlipayPayClientConfig.class),
+    ALIPAY_WAP("alipay_wap", "支付宝 Wap 网站支付", AlipayPayClientConfig.class),
+    ALIPAY_APP("alipay_app", "支付宝App 支付", AlipayPayClientConfig.class),
+    ALIPAY_QR("alipay_qr", "支付宝扫码支付", AlipayPayClientConfig.class);
 
     /**
      * 编码
-     *
+     * <p>
      * 参考 https://www.pingxx.com/api/支付渠道属性值.html
      */
     private String code;
@@ -36,6 +39,11 @@ public enum PayChannelEnum {
      * 名字
      */
     private String name;
+
+    /**
+     * 配置类
+     */
+    private Class<? extends PayClientConfig> configClass;
 
     /**
      * 微信支付
@@ -50,27 +58,6 @@ public enum PayChannelEnum {
     public static PayChannelEnum getByCode(String code) {
         return ArrayUtil.firstMatch(o -> o.getCode().equals(code), values());
     }
-
-    // TODO @aquan：加一个 configClass 字段，不用 switch 的方式哈。不然新增一个支付方式，需要改的方法有点多
-    /**
-     * 根据编码得到支付类
-     *
-     * @param code 编码
-     * @return 支付配置类
-     */
-    public static Class<? extends PayClientConfig> findByCodeGetClass(String code) {
-        switch (PayChannelEnum.getByCode(code)){
-            case WX_PUB:
-            case WX_LITE:
-            case WX_APP:
-                return WXPayClientConfig.class;
-            case ALIPAY_PC:
-            case ALIPAY_WAP:
-            case ALIPAY_APP:
-            case ALIPAY_QR:
-                return AlipayPayClientConfig.class;
-        }
-        return null;
-    }
+    
 
 }

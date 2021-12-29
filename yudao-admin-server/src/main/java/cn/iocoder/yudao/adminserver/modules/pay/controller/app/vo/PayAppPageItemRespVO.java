@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.adminserver.modules.pay.controller.app.vo;
 
-import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -8,7 +7,13 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 import java.util.Date;
+import java.util.Set;
 
+/**
+ * 支付应用信息分页查询 Response VO
+ *
+ * @author aquan
+ */
 @ApiModel(value = "支付应用信息分页查询 Response VO", description = "相比于支付信息，还会多出应用渠道的开关信息")
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -38,39 +43,8 @@ public class PayAppPageItemRespVO extends PayAppBaseVO {
 
     }
 
-    /**
-     * 支付渠道
-     */
-    private PayChannel payChannel;
+    @ApiModelProperty(value = "渠道编码集合", required = true, example = "alipay_pc,alipay_wap...")
+    private Set<String> channelCodes;
 
-    /**
-     * 支付渠道开通情况
-     * 1默认为未开通当前支付渠道，0为已开通支付渠道
-     */
-    @Data
-    @ApiModel("支付渠道")
-    public static class PayChannel {
-
-        @ApiModelProperty(value = "微信 JSAPI 支付", required = true, example = "1")
-        private Integer wxPub = CommonStatusEnum.DISABLE.getStatus();
-
-        @ApiModelProperty(value = "微信小程序支付", required = true, example = "1")
-        private Integer wxLite = CommonStatusEnum.DISABLE.getStatus();
-
-        @ApiModelProperty(value = "微信 App 支付", required = true, example = "1")
-        private Integer wxApp = CommonStatusEnum.DISABLE.getStatus();
-
-        @ApiModelProperty(value = "支付宝 PC 网站支付", required = true, example = "1")
-        private Integer alipayPc = CommonStatusEnum.DISABLE.getStatus();
-
-        @ApiModelProperty(value = "支付宝 Wap 网站支付", required = true, example = "1")
-        private Integer alipayWap = CommonStatusEnum.DISABLE.getStatus();
-
-        @ApiModelProperty(value = "支付宝App 支付", required = true, example = "1")
-        private Integer alipayApp = CommonStatusEnum.DISABLE.getStatus();
-
-        @ApiModelProperty(value = "支付宝扫码支付", required = true, example = "1")
-        private Integer alipayQr = CommonStatusEnum.DISABLE.getStatus();
-    }
 
 }

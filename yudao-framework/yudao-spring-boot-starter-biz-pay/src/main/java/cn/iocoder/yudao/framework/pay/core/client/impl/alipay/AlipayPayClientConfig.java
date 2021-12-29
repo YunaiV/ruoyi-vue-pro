@@ -2,17 +2,12 @@ package cn.iocoder.yudao.framework.pay.core.client.impl.alipay;
 
 import cn.iocoder.yudao.framework.pay.core.client.PayClientConfig;
 import lombok.Data;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.Assert;
 
-import javax.annotation.Resource;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
-import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 // TODO 芋艿：参数校验
 
@@ -114,18 +109,9 @@ public class AlipayPayClientConfig implements PayClientConfig {
     public interface ModeCertificate {
     }
 
-    /**
-     * 验证配置参数是否正确
-     * @param validator 校验对象
-     */
     @Override
-    public void verifyParam(Validator validator) {
-        // 手动调用validate进行验证
-        Set<ConstraintViolation<AlipayPayClientConfig>> validate = validator.validate(this,
+    public Set<ConstraintViolation<PayClientConfig>> verifyParam(Validator validator) {
+        return validator.validate(this,
                 MODE_PUBLIC_KEY.equals(this.getMode()) ? ModePublicKey.class : ModeCertificate.class);
-
-        // 断言没有异常
-        Assert.isTrue(validate.isEmpty(), validate.stream().map(ConstraintViolation::getMessage)
-                .collect(Collectors.joining(",")));
     }
 }

@@ -60,12 +60,24 @@ public interface PayAppMapper extends BaseMapperX<PayAppDO> {
 
     /**
      * 根据 商户 ID 查询支付应用信息
+     *
      * @param merchantId 商户 ID
      * @return 支付应用信息列表
      */
-    default List<PayAppDO> getListByMerchantId(String merchantId){
+    default List<PayAppDO> getListByMerchantId(String merchantId) {
         return selectList(new LambdaQueryWrapper<PayAppDO>()
                 .select(PayAppDO::getId, PayAppDO::getName)
                 .eq(PayAppDO::getMerchantId, merchantId));
     }
+
+    /**
+     * 根据商户号统计存在的支付应用数量
+     *
+     * @param merchantId 商户 ID
+     * @return 支付应用数量
+     */
+    default Long selectCount(Long merchantId) {
+        return selectCount(new LambdaQueryWrapper<PayAppDO>().eq(PayAppDO::getMerchantId, merchantId));
+    }
+
 }

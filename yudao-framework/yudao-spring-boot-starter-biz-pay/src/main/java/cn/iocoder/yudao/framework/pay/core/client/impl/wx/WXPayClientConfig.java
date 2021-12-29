@@ -3,7 +3,6 @@ package cn.iocoder.yudao.framework.pay.core.client.impl.wx;
 import cn.hutool.core.io.IoUtil;
 import cn.iocoder.yudao.framework.pay.core.client.PayClientConfig;
 import lombok.Data;
-import org.springframework.util.Assert;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
@@ -11,7 +10,6 @@ import javax.validation.constraints.NotBlank;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 // TODO 芋艿：参数校验
 
@@ -101,19 +99,9 @@ public class WXPayClientConfig implements PayClientConfig {
     public interface V3 {
     }
 
-    // TODO @aquan：1）已经有注释，不用重复注释；2）方法名改成 validate，比较适合 validator；3）断言是否有异常，可以封一个 ConstraintViolationException 异常
-    /**
-     * 验证配置参数是否正确
-     * @param validator 校验对象
-     */
     @Override
-    public void verifyParam(Validator validator) {
-        // 手动调用validate进行验证
-        Set<ConstraintViolation<PayClientConfig>> validate = validator.validate(this,
-                this.getApiVersion().equals(API_VERSION_V2) ? V2.class : V3.class);
-        // 断言没有异常
-        Assert.isTrue(validate.isEmpty(), validate.stream().map(ConstraintViolation::getMessage)
-                .collect(Collectors.joining(",")));
+    public Set<ConstraintViolation<PayClientConfig>> verifyParam(Validator validator) {
+        return validator.validate(this, this.getApiVersion().equals(API_VERSION_V2) ? V2.class : V3.class);
     }
 
     public static void main(String[] args) throws FileNotFoundException {

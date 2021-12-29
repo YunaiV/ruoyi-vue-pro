@@ -8,8 +8,6 @@ import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.order.PayOrderDO;
 import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.order.PayOrderExtensionDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.Mappings;
 import org.mapstruct.factory.Mappers;
 
 import java.math.BigDecimal;
@@ -44,10 +42,6 @@ public interface PayOrderConvert {
      * @param bean 订单扩展DO
      * @return 详细订单扩展 RespVO
      */
-    @Mappings({
-            @Mapping(target = "channelExtras"
-                    , expression = "java(bean.getChannelExtras() != null ? bean.getChannelExtras().toString():null)")
-    })
     PayOrderDetailsRespVO.PayOrderExtension orderDetailExtensionConvert(PayOrderExtensionDO bean);
 
     List<PayOrderRespVO> convertList(List<PayOrderDO> list);

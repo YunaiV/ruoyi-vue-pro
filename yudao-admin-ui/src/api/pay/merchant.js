@@ -49,7 +49,7 @@ export function getMerchant(id) {
 // 根据商户名称搜索商户列表
 export function getMerchantListByName(name) {
   return request({
-    url: '/pay/merchant/list-name',
+    url: '/pay/merchant/list-by-name',
     params:{
       name:name
     },

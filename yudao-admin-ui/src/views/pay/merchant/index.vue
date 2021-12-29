@@ -154,8 +154,8 @@ export default {
         shortName: [{ required: true, message: "商户简称不能为空", trigger: "blur" }],
         status: [{ required: true, message: "开启状态不能为空", trigger: "blur" }],
       },
-      // 数据字典
-      statusDictDatas: getDictDatas(DICT_TYPE.PAY_MERCHANT_STATUS)
+      // 商户状态数据字典
+      statusDictDatas: getDictDatas(DICT_TYPE.SYS_COMMON_STATUS)
     };
   },
   created() {
