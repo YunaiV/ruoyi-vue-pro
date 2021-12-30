@@ -181,10 +181,9 @@ public class PayAppServiceImpl implements PayAppService {
             throw exception(PAY_APP_EXIST_TRANSACTION_ORDER_CANT_DELETE);
         }
         // 查看退款订单
-        if (refundMapper.selectCount(appId,   PayRefundStatusEnum.CREATE.getStatus()) > 0) {
+        if (refundMapper.selectCount(appId, PayRefundStatusEnum.CREATE.getStatus()) > 0) {
             throw exception(PAY_APP_EXIST_TRANSACTION_ORDER_CANT_DELETE);
         }
-
     }
 
 }

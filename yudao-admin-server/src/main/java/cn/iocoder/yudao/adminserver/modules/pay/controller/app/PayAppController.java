@@ -109,6 +109,7 @@ public class PayAppController {
         // 得到所有的应用编号，查出所有的通道
         Collection<Long> payAppIds = CollectionUtils.convertList(pageResult.getList(), PayAppDO::getId);
         List<PayChannelDO> channels = channelService.getChannelListByAppIds(payAppIds);
+        // TODO @aquan：可以基于 appId 简历一个 multiMap。这样下面，直接 get 到之后，CollUtil buildSet 即可
         Iterator<PayChannelDO> iterator = channels.iterator();
 
         // 得到所有的商户信息
