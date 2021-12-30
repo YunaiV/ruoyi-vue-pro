@@ -149,7 +149,20 @@ export const constantRoutes = [
         meta: { title: '请假表单-审批', icon: 'form' }
       }
     ]
-  }
+  },
+  {
+    path: '/bpm',
+    component: Layout,
+    hidden: true,
+    children: [
+      {
+        path: 'manager/form/edit',
+        component: (resolve) => require(['@/views/bpm/form/build/index'], resolve),
+        name: '流程表单-编辑',
+        meta: { title: '流程表单-编辑' }
+      }
+    ]
+  },
 ]
 
 export default new Router({
