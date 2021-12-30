@@ -1,9 +1,11 @@
 package cn.iocoder.yudao.userserver.modules.system.controller.auth;
 
-import cn.iocoder.yudao.coreservice.modules.system.service.social.SysSocialService;
+import cn.iocoder.yudao.coreservice.modules.system.service.social.SysSocialCoreService;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.userserver.modules.system.controller.auth.vo.*;
+import cn.iocoder.yudao.userserver.modules.system.enums.sms.SysSmsSceneEnum;
 import cn.iocoder.yudao.userserver.modules.system.service.auth.SysAuthService;
 import cn.iocoder.yudao.userserver.modules.system.service.sms.SysSmsCodeService;
 import com.alibaba.fastjson.JSON;
@@ -36,8 +38,7 @@ public class SysAuthController {
     @Resource
     private SysSmsCodeService smsCodeService;
     @Resource
-    private SysSocialService socialService;
-
+    private SysSocialCoreService socialService;
 
     @PostMapping("/login")
     @ApiOperation("使用手机 + 密码登录")
@@ -56,16 +57,49 @@ public class SysAuthController {
     }
 
     @PostMapping("/send-sms-code")
-    @ApiOperation("发送手机验证码")
+    @ApiOperation(value = "发送手机验证码",notes = "不检测该手机号是否已被注册")
     public CommonResult<Boolean> sendSmsCode(@RequestBody @Valid SysAuthSendSmsReqVO reqVO) {
         smsCodeService.sendSmsCode(reqVO.getMobile(), reqVO.getScene(), getClientIP());
         return success(true);
     }
 
+    @PostMapping("/send-sms-new-code")
+    @ApiOperation(value = "发送手机验证码",notes = "检测该手机号是否已被注册，用于修改手机时使用")
+    public CommonResult<Boolean> sendSmsNewCode(@RequestBody @Valid SysAuthSendSmsReqVO reqVO) {
+        smsCodeService.sendSmsNewCode(reqVO);
+        return success(true);
+    }
+
+    @GetMapping("/send-sms-code-login")
+    @ApiOperation(value = "向已登录用户发送验证码",notes = "修改手机时验证原手机号使用")
+    public CommonResult<Boolean> sendSmsCodeLogin() {
+        smsCodeService.sendSmsCodeLogin(getLoginUserId());
+        return success(true);
+    }
+
     @PostMapping("/reset-password")
     @ApiOperation(value = "重置密码", notes = "用户忘记密码时使用")
+    @PreAuthenticated
     public CommonResult<Boolean> resetPassword(@RequestBody @Valid MbrAuthResetPasswordReqVO reqVO) {
-        return null;
+        authService.resetPassword(reqVO);
+        return success(true);
+    }
+
+    @PostMapping("/update-password")
+    @ApiOperation(value = "修改用户密码",notes = "用户修改密码时使用")
+    @PreAuthenticated
+    public CommonResult<Boolean> updatePassword(@RequestBody @Valid MbrAuthUpdatePasswordReqVO reqVO) {
+        authService.updatePassword(getLoginUserId(), reqVO);
+        return success(true);
+    }
+
+    @PostMapping("/check-sms-code")
+    @ApiOperation(value = "校验验证码是否正确")
+    @PreAuthenticated
+    public CommonResult<Boolean> checkSmsCode(@RequestBody @Valid SysAuthSmsLoginReqVO reqVO) {
+        // TODO @宋天：check 的时候，不应该使用 useSmsCode 哈，这样验证码就直接被使用了。另外，check 开头的方法，更多是校验的逻辑，不会有 update 数据的动作。这点，在方法命名上，也是要注意的
+        smsCodeService.useSmsCode(reqVO.getMobile(),SysSmsSceneEnum.CHECK_CODE_BY_SMS.getScene(),reqVO.getCode(),getClientIP());
+        return success(true);
     }
 
     // ========== 社交登录相关 ==========
@@ -81,19 +115,6 @@ public class SysAuthController {
         return CommonResult.success(socialService.getAuthorizeUrl(type, redirectUri));
     }
 
-    // TODO @timfruit：这个接口，是要删除的么？
-    @GetMapping("/social-login-get")
-    @ApiOperation("微信公众号授权回调地址，输出social-login2的必要参数用于测试，使用 code 授权码")
-    @ResponseBody
-    @Deprecated
-    public CommonResult<MbrAuthSocialLoginReqVO> socialLoginGet(HttpServletRequest request,String code,String state) {
-        // 返回结果
-        MbrAuthSocialLoginReqVO reqVO = MbrAuthSocialLoginReqVO.builder().state(state).code(code).build();
-        reqVO.setType(12);
-        //输出social-login2的必要参数用于测试
-        System.out.println(JSON.toJSON(reqVO));
-        return success(reqVO);
-    }
 
     @PostMapping("/social-login")
     @ApiOperation("社交登录，使用 code 授权码")
@@ -102,10 +123,9 @@ public class SysAuthController {
         return success(SysAuthLoginRespVO.builder().token(token).build());
     }
 
-    // TODO @timfruit：社交登陆时，使用手机验证码来验证哈。这块我当时没设计好，改改，嘿嘿。
 
     @PostMapping("/social-login2")
-    @ApiOperation("社交登录，使用 code 授权码 + 账号密码")
+    @ApiOperation("社交登录，使用 手机号 + 手机验证码")
     public CommonResult<SysAuthLoginRespVO> socialLogin2(@RequestBody @Valid MbrAuthSocialLogin2ReqVO reqVO) {
         String token = authService.socialLogin2(reqVO, getClientIP(), getUserAgent());
         return success(SysAuthLoginRespVO.builder().token(token).build());

@@ -1,0 +1,121 @@
+/**
+ * 使用wxs方案实现slider
+ * 兼容微信，QQ，H5，Vue版的安卓和iOS
+ */
+/**
+ * 开始滑动操作
+ * @param {Object} e
+ * @param {Object} ownerInstance
+ */
+function onTouchMove(e, ownerInstance) {
+	// wxs事件对象下有一个instance属性，表示当前触发此事件的组件的实例，通过该实例，可以获取相关的dataset，设置样式等信息
+	// https://developers.weixin.qq.com/miniprogram/dev/framework/view/interactive-animation.html
+	var instance = e.instance;
+	// getState()为一个对象，挂载在instance上，类似组件的data一样，可以存放一些变量，供以后的触发事件中使用
+	var state = instance.getState()
+
+	// 滑块组件的整体尺寸信息
+	var mp = state.mp
+	if(mp.disabled) {
+		return
+	}
+	
+	var distanceX = getTouchX(e) - mp.left
+	// 获得移动距离对整个滑块的百分比值，此为带有多位小数的值，step大于1时，不能用此更新视图
+	var percent = (distanceX / mp.width) * 100
+
+	updateSliderPlacement(instance, ownerInstance, percent, 'moving')
+	
+	// 阻止页面滚动，可以保证在滑动过程中，不让页面可以上下滚动，造成不好的体验
+	e.stopPropagation && e.stopPropagation() 
+	e.preventDefault && e.preventDefault()
+}
+
+function onClick(e, ownerInstance) {
+	var instance = e.instance
+	var state = instance.getState()
+	var mp = state.mp
+	if(mp.disabled) {
+		return
+	}
+	
+	// 直接点击滑块的情况，计算方式与onTouchMove方法相同
+	var value = ((e.detail.x - mp.left) / mp.width) * 100
+	updateSliderPlacement(instance, ownerInstance, value, 'click')
+}
+
+function sizeReady(newValue, oldValue, ownerInstance, instance) {
+	// 页面初始化时候，也会触发此方法，传递的值为空，这里不执行往后的逻辑
+	if(!newValue || newValue.disabled) {
+		return 
+	}
+	var state = instance.getState()
+	state.mp = newValue
+	updateSliderPlacement(instance, ownerInstance, newValue.value)
+}
+
+// 设置滑点的位置
+function updateSliderPlacement(instance, ownerInstance, value, event) {
+	var state = instance.getState()
+	var mp = state.mp
+	if(mp.disabled) {
+		return
+	}
+
+	var percent = 0
+	if (mp.step > 1) {
+		// 如果step步进大于1，需要跳步，所以需要使用Math.round进行取整
+		percent = Math.round(Math.max(mp.min, Math.min(value, mp.max)) / mp.step) * mp.step
+	} else {
+		// 当step=1时，无需跳步，充分利用wxs性能，滑块实时跟随手势，达到丝滑的效果
+		percent = Math.max(mp.min, Math.min(value, mp.max))
+	}
+	// 返回组件的实例
+	var gapInstance = ownerInstance.selectComponent('.u-slider__gap')
+	// 在移动期间，不允许transition动画，否则会造成卡顿
+	gapInstance[event === 'click' ? 'addClass' : 'removeClass']('u-slider__gap--ani')
+	// 调用逻辑层的方法，修改v-model绑定的值
+	ownerInstance.callMethod('updateValue', Math.round(percent))
+	if(event) {
+		ownerInstance.callMethod('emitEvent', {
+			event: event,
+			value: Math.round(percent)
+		})
+	}
+	
+	// 设置移动的值
+	gapInstance.requestAnimationFrame(function() {
+		gapInstance.setStyle({
+			width: percent / 100 * mp.width + 'px',
+		})
+	})
+}
+
+// 开始滑动
+function onTouchStart(e, ownerInstance) {
+	ownerInstance.callMethod('emitEvent', {
+		event: 'start', 
+		value: null
+	})
+}
+
+// 停止滑动
+function onTouchEnd(e, ownerInstance) {
+	ownerInstance.callMethod('emitEvent', {
+		event: 'end', 
+		value: null
+	})
+}
+
+// 获取当前手势点的X轴位移值
+function getTouchX(e) {
+	return e.touches[0].clientX
+}
+
+module.exports = {
+	onTouchStart: onTouchStart,
+	onTouchMove: onTouchMove,
+	onTouchEnd: onTouchEnd,
+	sizeReady: sizeReady,
+	onClick: onClick
+}

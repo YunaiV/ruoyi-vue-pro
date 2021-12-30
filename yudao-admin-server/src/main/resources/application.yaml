@@ -22,7 +22,7 @@ spring:
 
 # MyBatis Plus 的配置项
 mybatis-plus:
-#  在 mybatis-config/mybatis-config.xml 中设置
+#  在 mybatis-config/mybatis-config.xml 中设置 TODO jason：看看有没其它解决方案
 #  configuration:
 #    map-underscore-to-camel-case: true # 虽然默认为 true ，但是还是显示去指定下。
 #    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl # 打印日志
@@ -74,5 +74,7 @@ yudao:
       - cn.iocoder.yudao.adminserver.modules.infra.enums.InfErrorCodeConstants
       - cn.iocoder.yudao.adminserver.modules.system.enums.SysErrorCodeConstants
       - cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants
+  tenant: # 多租户相关配置项
+    tables: # 配置需要开启多租户的表；如果实体已经继承 TenantBaseDO 类，则无需重复配置
 
 debug: false

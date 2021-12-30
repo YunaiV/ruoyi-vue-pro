@@ -12,7 +12,10 @@
     <packaging>jar</packaging>
 
     <name>${artifactId}</name>
-    <description>定时任务，基于 Quartz 拓展</description>
+    <description>任务拓展
+        1. 定时任务，基于 Quartz 拓展
+        2. 异步任务，基于 Spring Async 拓展
+    </description>
     <url>https://github.com/YunaiV/ruoyi-vue-pro</url>
 
     <dependencies>

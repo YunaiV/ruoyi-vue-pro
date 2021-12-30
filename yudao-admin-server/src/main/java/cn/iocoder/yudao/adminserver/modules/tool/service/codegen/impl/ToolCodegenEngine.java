@@ -10,6 +10,7 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.adminserver.modules.system.framework.codegen.config.CodegenProperties;
+import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
 import cn.iocoder.yudao.framework.excel.core.convert.DictConvert;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
@@ -119,6 +120,8 @@ public class ToolCodegenEngine {
     private void initGlobalBindingMap() {
         // 全局配置
         globalBindingMap.put("basePackage", codegenProperties.getBasePackage());
+        globalBindingMap.put("baseFrameworkPackage", StrUtil.subBefore(codegenProperties.getBasePackage(),
+                '.', true) + '.' + "framework");
         // 全局 Java Bean
         globalBindingMap.put("CommonResultClassName", CommonResult.class.getName());
         globalBindingMap.put("PageResultClassName", PageResult.class.getName());
@@ -134,6 +137,7 @@ public class ToolCodegenEngine {
         globalBindingMap.put("ServiceExceptionUtilClassName", ServiceExceptionUtil.class.getName());
         globalBindingMap.put("DateUtilsClassName", DateUtils.class.getName());
         globalBindingMap.put("ExcelUtilsClassName", ExcelUtils.class.getName());
+        globalBindingMap.put("ObjectUtilsClassName", ObjectUtils.class.getName());
         globalBindingMap.put("DictConvertClassName", DictConvert.class.getName());
         globalBindingMap.put("OperateLogClassName", OperateLog.class.getName());
         globalBindingMap.put("OperateTypeEnumClassName", OperateTypeEnum.class.getName());
@@ -191,7 +195,7 @@ public class ToolCodegenEngine {
     }
 
     private static String javaFilePath(String path) {
-        return "java/${basePackage}/${table.moduleName}/" + path + ".java";
+        return "java/${basePackage}/modules/${table.moduleName}/" + path + ".java";
     }
 
     private static String vueTemplatePath(String path) {

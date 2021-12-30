@@ -16,6 +16,7 @@ import org.apache.commons.collections4.keyvalue.DefaultKeyValue;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static com.alibaba.druid.sql.SQLUtils.normalize;
 
@@ -63,8 +64,15 @@ public class ToolCodegenSQLParser {
     private static ToolSchemaTableDO parseTable(SQLCreateTableStatement statement) {
         return ToolSchemaTableDO.builder()
                 .tableName(statement.getTableSource().getTableName(true))
-                .tableComment(((SQLCharExpr) statement.getComment()).getText())
+                .tableComment(getCommentText(statement))
                 .build();
+    }
+
+    private static String getCommentText(SQLCreateTableStatement statement) {
+        if (statement == null || statement.getComment() == null) {
+            return "";
+        }
+        return ((SQLCharExpr) statement.getComment()).getText();
     }
 
     private static List<ToolSchemaColumnDO> parseColumns(SQLCreateTableStatement statement) {
@@ -97,7 +105,8 @@ public class ToolCodegenSQLParser {
         columns.add(ToolSchemaColumnDO.builder()
                 .columnName(normalize(definition.getColumnName()))
                 .columnType(definition.getDataType().toString())
-                .columnComment(normalize(definition.getComment().toString()))
+                .columnComment(Objects.isNull(definition.getComment()) ? ""
+                        : normalize(definition.getComment().toString()))
                 .nullable(!text.contains(" NOT NULL"))
                 .primaryKey(false)
                 .autoIncrement(text.contains("AUTO_INCREMENT"))

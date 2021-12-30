@@ -49,9 +49,9 @@ class SysPostServiceTest extends BaseDbUnitTest {
         });
         postMapper.insert(postDO);
         // 测试 name 不匹配
-        postMapper.insert(ObjectUtils.clone(postDO, o -> o.setName("程序员")));
+        postMapper.insert(ObjectUtils.cloneIgnoreId(postDO, o -> o.setName("程序员")));
         // 测试 status 不匹配
-        postMapper.insert(ObjectUtils.clone(postDO, o -> o.setStatus(CommonStatusEnum.DISABLE.getStatus())));
+        postMapper.insert(ObjectUtils.cloneIgnoreId(postDO, o -> o.setStatus(CommonStatusEnum.DISABLE.getStatus())));
 
         // 准备参数
         SysPostPageReqVO reqVO = new SysPostPageReqVO();
@@ -76,9 +76,9 @@ class SysPostServiceTest extends BaseDbUnitTest {
         });
         postMapper.insert(postDO);
         // 测试 name 不匹配
-        postMapper.insert(ObjectUtils.clone(postDO, o -> o.setName("程序员")));
+        postMapper.insert(ObjectUtils.cloneIgnoreId(postDO, o -> o.setName("程序员")));
         // 测试 status 不匹配
-        postMapper.insert(ObjectUtils.clone(postDO, o -> o.setStatus(CommonStatusEnum.DISABLE.getStatus())));
+        postMapper.insert(ObjectUtils.cloneIgnoreId(postDO, o -> o.setStatus(CommonStatusEnum.DISABLE.getStatus())));
         // 准备参数
         SysPostExportReqVO reqVO = new SysPostExportReqVO();
         reqVO.setName("码");

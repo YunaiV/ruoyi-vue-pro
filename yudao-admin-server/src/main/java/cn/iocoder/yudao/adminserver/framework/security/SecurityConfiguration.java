@@ -22,9 +22,11 @@ public class SecurityConfiguration {
     @Bean
     public Customizer<ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry> authorizeRequestsCustomizer() {
         return registry -> {
-            // 通用的接口，可匿名访问 TODO 芋艿：需要抽象出去
+            // 验证码的接口
             registry.antMatchers(api("/system/captcha/**")).anonymous();
-            // Spring Boot Admin Server 的安全配置 TODO 芋艿：需要抽象出去
+            // 获得租户编号的接口
+            registry.antMatchers(api("/system/tenant/get-id-by-name")).anonymous();
+            // Spring Boot Admin Server 的安全配置
             registry.antMatchers(adminSeverContextPath).anonymous()
                     .antMatchers(adminSeverContextPath + "/**").anonymous();
             // 短信回调 API

@@ -2,10 +2,10 @@ package cn.iocoder.yudao.adminserver.modules.infra.service.file;
 
 import cn.iocoder.yudao.adminserver.BaseDbUnitTest;
 import cn.iocoder.yudao.adminserver.modules.infra.controller.file.vo.InfFilePageReqVO;
+import cn.iocoder.yudao.adminserver.modules.infra.service.file.impl.InfFileServiceImpl;
 import cn.iocoder.yudao.coreservice.modules.infra.dal.dataobject.file.InfFileDO;
 import cn.iocoder.yudao.coreservice.modules.infra.dal.mysql.file.InfFileCoreMapper;
 import cn.iocoder.yudao.coreservice.modules.infra.framework.file.config.FileProperties;
-import cn.iocoder.yudao.coreservice.modules.infra.service.file.impl.InfFileCoreServiceImpl;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import org.junit.jupiter.api.Test;
@@ -19,7 +19,7 @@ import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEq
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@Import({InfFileCoreServiceImpl.class, FileProperties.class})
+@Import({InfFileServiceImpl.class, FileProperties.class})
 public class InfFileServiceTest extends BaseDbUnitTest {
 
     @Resource
@@ -41,14 +41,14 @@ public class InfFileServiceTest extends BaseDbUnitTest {
         });
         fileMapper.insert(dbFile);
         // 测试 id 不匹配
-        fileMapper.insert(ObjectUtils.clone(dbFile, o -> o.setId("tudou")));
+        fileMapper.insert(ObjectUtils.cloneIgnoreId(dbFile, o -> o.setId("tudou")));
         // 测试 type 不匹配
-        fileMapper.insert(ObjectUtils.clone(dbFile, o -> {
+        fileMapper.insert(ObjectUtils.cloneIgnoreId(dbFile, o -> {
             o.setId("yudao02");
             o.setType("png");
         }));
         // 测试 createTime 不匹配
-        fileMapper.insert(ObjectUtils.clone(dbFile, o -> {
+        fileMapper.insert(ObjectUtils.cloneIgnoreId(dbFile, o -> {
             o.setId("yudao03");
             o.setCreateTime(buildTime(2020, 1, 15));
         }));

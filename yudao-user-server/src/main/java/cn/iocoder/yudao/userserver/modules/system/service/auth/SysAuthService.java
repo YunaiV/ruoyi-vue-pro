@@ -46,7 +46,7 @@ public interface SysAuthService extends SecurityAuthFrameworkService {
     String socialLogin(@Valid MbrAuthSocialLoginReqVO reqVO, String userIp, String userAgent);
 
     /**
-     * 社交登录，使用 code 授权码 + 账号密码
+     * 社交登录，使用 手机号 + 手机验证码
      *
      * @param reqVO 登录信息
      * @param userIp 用户 IP
@@ -63,4 +63,23 @@ public interface SysAuthService extends SecurityAuthFrameworkService {
      */
     void socialBind(Long userId, @Valid MbrAuthSocialBindReqVO reqVO);
 
+    /**
+     * 修改用户密码
+     * @param userId 用户id
+     * @param userReqVO 用户请求实体类
+     */
+    void updatePassword(Long userId, @Valid MbrAuthUpdatePasswordReqVO userReqVO);
+
+    /**
+     * 忘记密码
+     * @param userReqVO 用户请求实体类
+     */
+    void resetPassword(MbrAuthResetPasswordReqVO userReqVO);
+
+    /**
+     * 检测手机与验证码是否匹配
+     * @param phone 手机号
+     * @param code 验证码
+     */
+    void checkIfMobileMatchCodeAndDeleteCode(String phone,String code);
 }
