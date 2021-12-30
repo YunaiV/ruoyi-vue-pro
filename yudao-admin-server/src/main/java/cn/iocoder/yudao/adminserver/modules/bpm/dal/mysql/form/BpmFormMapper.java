@@ -22,20 +22,6 @@ public interface BpmFormMapper extends BaseMapperX<BpmForm> {
     default PageResult<BpmForm> selectPage(BpmFormPageReqVO reqVO) {
         return selectPage(reqVO, new QueryWrapperX<BpmForm>()
                 .likeIfPresent("name", reqVO.getName())
-                .eqIfPresent("status", reqVO.getStatus())
-                .eqIfPresent("form_json", reqVO.getFormJson())
-                .eqIfPresent("remark", reqVO.getRemark())
-                .betweenIfPresent("create_time", reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
-                .orderByDesc("id"));
-    }
-
-    default List<BpmForm> selectList(BpmFormExportReqVO reqVO) {
-        return selectList(new QueryWrapperX<BpmForm>()
-                .likeIfPresent("name", reqVO.getName())
-                .eqIfPresent("status", reqVO.getStatus())
-                .eqIfPresent("form_json", reqVO.getFormJson())
-                .eqIfPresent("remark", reqVO.getRemark())
-                .betweenIfPresent("create_time", reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
                 .orderByDesc("id"));
     }
 

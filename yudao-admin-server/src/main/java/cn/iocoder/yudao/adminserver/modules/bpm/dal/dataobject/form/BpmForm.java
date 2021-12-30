@@ -37,10 +37,10 @@ public class BpmForm extends BaseDO {
      * 状态
      */
     private Integer status;
-    /**
-     * 表单JSON
-     */
-    private String formJson;
+//    /**
+//     * 表单JSON
+//     */
+//    private String formJson;
     /**
      * 表单配置
      *

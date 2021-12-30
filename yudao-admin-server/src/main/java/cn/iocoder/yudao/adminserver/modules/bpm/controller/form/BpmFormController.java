@@ -84,16 +84,4 @@ public class BpmFormController {
         return success(BpmFormConvert.INSTANCE.convertPage(pageResult));
     }
 
-    @GetMapping("/export-excel")
-    @ApiOperation("导出动态表单 Excel")
-    @PreAuthorize("@ss.hasPermission('bpm:form:export')")
-    @OperateLog(type = EXPORT)
-    public void exportFormExcel(@Valid BpmFormExportReqVO exportReqVO,
-              HttpServletResponse response) throws IOException {
-        List<BpmForm> list = formService.getFormList(exportReqVO);
-        // 导出 Excel
-        List<BpmFormExcelVO> datas = BpmFormConvert.INSTANCE.convertList02(list);
-        ExcelUtils.write(response, "动态表单.xls", "数据", BpmFormExcelVO.class, datas);
-    }
-
 }

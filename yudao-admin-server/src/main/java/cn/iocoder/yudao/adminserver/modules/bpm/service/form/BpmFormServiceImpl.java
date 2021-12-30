@@ -77,9 +77,4 @@ public class BpmFormServiceImpl implements BpmFormService {
         return formMapper.selectPage(pageReqVO);
     }
 
-    @Override
-    public List<BpmForm> getFormList(BpmFormExportReqVO exportReqVO) {
-        return formMapper.selectList(exportReqVO);
-    }
-
 }

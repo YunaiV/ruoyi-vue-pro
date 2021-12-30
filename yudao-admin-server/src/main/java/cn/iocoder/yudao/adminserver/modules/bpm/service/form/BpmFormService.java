@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.service.form;
 
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.form.vo.BpmFormCreateReqVO;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.form.vo.BpmFormExportReqVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.form.vo.BpmFormPageReqVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.form.vo.BpmFormUpdateReqVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.form.BpmForm;
@@ -64,13 +63,5 @@ public interface BpmFormService {
      * @return 动态表单分页
      */
     PageResult<BpmForm> getFormPage(BpmFormPageReqVO pageReqVO);
-
-    /**
-     * 获得动态表单列表, 用于 Excel 导出
-     *
-     * @param exportReqVO 查询条件
-     * @return 动态表单列表
-     */
-    List<BpmForm> getFormList(BpmFormExportReqVO exportReqVO);
 
 }
