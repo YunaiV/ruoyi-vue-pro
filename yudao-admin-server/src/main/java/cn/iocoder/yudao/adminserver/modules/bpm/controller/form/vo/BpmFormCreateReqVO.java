@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.adminserver.modules.activiti.controller.form.vo;
+package cn.iocoder.yudao.adminserver.modules.bpm.controller.form.vo;
 
 import lombok.*;
 import io.swagger.annotations.*;
@@ -7,6 +7,6 @@ import io.swagger.annotations.*;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class WfFormCreateReqVO extends WfFormBaseVO {
+public class BpmFormCreateReqVO extends BpmFormBaseVO {
 
 }

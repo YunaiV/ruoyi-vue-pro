@@ -15,7 +15,7 @@ import java.util.Map;
  *
  * @author 芋道源码
  */
-@TableName(value = "wf_form", autoResultMap = true)
+@TableName(value = "bpm_form_data", autoResultMap = true)
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
@@ -34,6 +34,10 @@ public class BpmFormData extends BaseDO {
      * 关联 {@link BpmForm#getId()}
      */
     private Long formId;
+    /**
+     * 状态
+     */
+    private Integer status;
     /**
      * 表单配置
      *

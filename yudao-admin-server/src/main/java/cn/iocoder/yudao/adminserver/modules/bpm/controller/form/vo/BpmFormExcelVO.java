@@ -1,9 +1,9 @@
-package cn.iocoder.yudao.adminserver.modules.activiti.controller.form.vo;
-
-import lombok.*;
-import java.util.*;
+package cn.iocoder.yudao.adminserver.modules.bpm.controller.form.vo;
 
 import com.alibaba.excel.annotation.ExcelProperty;
+import lombok.Data;
+
+import java.util.Date;
 
 /**
  * 动态表单 Excel VO
@@ -11,7 +11,7 @@ import com.alibaba.excel.annotation.ExcelProperty;
  * @author 芋艿
  */
 @Data
-public class WfFormExcelVO {
+public class BpmFormExcelVO {
 
     @ExcelProperty("表单编号")
     private Long id;

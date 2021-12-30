@@ -34,6 +34,14 @@ public class BpmForm extends BaseDO {
      */
     private String name;
     /**
+     * 状态
+     */
+    private Integer status;
+    /**
+     * 表单JSON
+     */
+    private String formJson;
+    /**
      * 表单配置
      *
      * 目前直接将 https://github.com/JakHuang/form-generator 生成的 JSON 串，直接保存

@@ -23,11 +23,13 @@ public interface BpmErrorCodeConstants {
     ErrorCode OA_HR_POST_NOT_EXISTS = new ErrorCode(1003001006, "HR岗位未设置");
     ErrorCode OA_DAY_LEAVE_ERROR = new ErrorCode(1003001007, "请假天数必须>=1");
 
-
-    // ========== OA 工作流模块 1-004-001-000 ==========
+    // ========== OA 工作流模块 1-003-002-000 ==========
     ErrorCode BPMN_MODEL_EDITOR_SOURCE_NOT_EXISTS = new ErrorCode(1004001001, "模型数据为空，请先成功设计流程并保存");
     ErrorCode BPMN_MODEL_ERROR = new ErrorCode(1004001002, "工作流模型异常");
     ErrorCode BPMN_MODEL_PROCESS_NOT_EXISTS = new ErrorCode(1004001003, "流程数据为空");
     ErrorCode BPMN_PROCESS_DEFINITION_NOT_EXISTS = new ErrorCode(1004001004, "流程定义不存在");
+
+    // ========== 动态表单模块 1-003-003-000 ==========
+    ErrorCode BPM_FORM_NOT_EXISTS = new ErrorCode(1003001002, "动态表单不存在");
 
 }

@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.adminserver.modules.activiti.controller.form.vo;
+package cn.iocoder.yudao.adminserver.modules.bpm.controller.form.vo;
 
 import lombok.*;
 import io.swagger.annotations.*;
@@ -9,7 +9,7 @@ import javax.validation.constraints.*;
 * 如果子 VO 存在差异的字段，请不要添加到这里，影响 Swagger 文档生成
 */
 @Data
-public class WfFormBaseVO {
+public class BpmFormBaseVO {
 
     @ApiModelProperty(value = "表单名称", required = true)
     @NotNull(message = "表单名称不能为空")

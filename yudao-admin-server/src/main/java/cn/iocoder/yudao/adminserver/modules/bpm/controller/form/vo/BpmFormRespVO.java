@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.adminserver.modules.activiti.controller.form.vo;
+package cn.iocoder.yudao.adminserver.modules.bpm.controller.form.vo;
 
 import lombok.*;
 import java.util.*;
@@ -8,7 +8,7 @@ import io.swagger.annotations.*;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class WfFormRespVO extends WfFormBaseVO {
+public class BpmFormRespVO extends BpmFormBaseVO {
 
     @ApiModelProperty(value = "表单编号", required = true)
     private Long id;

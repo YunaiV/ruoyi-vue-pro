@@ -1,10 +1,9 @@
-package cn.iocoder.yudao.adminserver.modules.activiti.dal.mysql.form;
+package cn.iocoder.yudao.adminserver.modules.bpm.dal.mysql.form;
 
 
-
-import cn.iocoder.yudao.adminserver.modules.activiti.controller.form.vo.WfFormExportReqVO;
-import cn.iocoder.yudao.adminserver.modules.activiti.controller.form.vo.WfFormPageReqVO;
-import cn.iocoder.yudao.adminserver.modules.activiti.dal.dataobject.form.WfForm;
+import cn.iocoder.yudao.adminserver.modules.bpm.controller.form.vo.BpmFormExportReqVO;
+import cn.iocoder.yudao.adminserver.modules.bpm.controller.form.vo.BpmFormPageReqVO;
+import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.form.BpmForm;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.QueryWrapperX;
@@ -18,26 +17,26 @@ import java.util.List;
  * @author 风里雾里
  */
 @Mapper
-public interface WfFormMapper extends BaseMapperX<WfForm> {
+public interface BpmFormMapper extends BaseMapperX<BpmForm> {
 
-    default PageResult<WfForm> selectPage(WfFormPageReqVO reqVO) {
-        return selectPage(reqVO, new QueryWrapperX<WfForm>()
+    default PageResult<BpmForm> selectPage(BpmFormPageReqVO reqVO) {
+        return selectPage(reqVO, new QueryWrapperX<BpmForm>()
                 .likeIfPresent("name", reqVO.getName())
                 .eqIfPresent("status", reqVO.getStatus())
                 .eqIfPresent("form_json", reqVO.getFormJson())
                 .eqIfPresent("remark", reqVO.getRemark())
                 .betweenIfPresent("create_time", reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
-                .orderByDesc("id")        );
+                .orderByDesc("id"));
     }
 
-    default List<WfForm> selectList(WfFormExportReqVO reqVO) {
-        return selectList(new QueryWrapperX<WfForm>()
+    default List<BpmForm> selectList(BpmFormExportReqVO reqVO) {
+        return selectList(new QueryWrapperX<BpmForm>()
                 .likeIfPresent("name", reqVO.getName())
                 .eqIfPresent("status", reqVO.getStatus())
                 .eqIfPresent("form_json", reqVO.getFormJson())
                 .eqIfPresent("remark", reqVO.getRemark())
                 .betweenIfPresent("create_time", reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
-                .orderByDesc("id")        );
+                .orderByDesc("id"));
     }
 
 }

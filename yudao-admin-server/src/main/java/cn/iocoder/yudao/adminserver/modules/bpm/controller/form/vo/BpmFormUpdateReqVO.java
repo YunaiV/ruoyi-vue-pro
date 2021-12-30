@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.adminserver.modules.activiti.controller.form.vo;
+package cn.iocoder.yudao.adminserver.modules.bpm.controller.form.vo;
 
 import lombok.*;
 import io.swagger.annotations.*;
@@ -8,7 +8,7 @@ import javax.validation.constraints.*;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class WfFormUpdateReqVO extends WfFormBaseVO {
+public class BpmFormUpdateReqVO extends BpmFormBaseVO {
 
     @ApiModelProperty(value = "表单编号", required = true)
     @NotNull(message = "表单编号不能为空")

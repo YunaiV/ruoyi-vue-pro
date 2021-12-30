@@ -1,9 +1,9 @@
-package cn.iocoder.yudao.adminserver.modules.activiti.controller.form;
+package cn.iocoder.yudao.adminserver.modules.bpm.controller.form;
 
-import cn.iocoder.yudao.adminserver.modules.activiti.controller.form.vo.*;
-import cn.iocoder.yudao.adminserver.modules.activiti.convert.form.WfFormConvert;
-import cn.iocoder.yudao.adminserver.modules.activiti.dal.dataobject.form.WfForm;
-import cn.iocoder.yudao.adminserver.modules.activiti.service.form.WfFormService;
+import cn.iocoder.yudao.adminserver.modules.bpm.convert.form.BpmFormConvert;
+import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.form.BpmForm;
+import cn.iocoder.yudao.adminserver.modules.bpm.service.form.BpmFormService;
+import cn.iocoder.yudao.adminserver.modules.bpm.controller.form.vo.*;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
@@ -25,27 +25,26 @@ import java.util.List;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 
-// TODO @风里雾里： Os=》Wf，/os 改成 /wl 开头。目前这个模块，咱先定位成给工作流用的
 @Api(tags = "动态表单")
 @RestController
-@RequestMapping("/wl/form")
+@RequestMapping("/bpm/form")
 @Validated
-public class WlFormController {
+public class BpmFormController {
 
     @Resource
-    private WfFormService formService;
+    private BpmFormService formService;
 
     @PostMapping("/create")
     @ApiOperation("创建动态表单")
-    @PreAuthorize("@ss.hasPermission('os:form:create')")
-    public CommonResult<Long> createForm(@Valid @RequestBody WfFormCreateReqVO createReqVO) {
+    @PreAuthorize("@ss.hasPermission('bpm:form:create')")
+    public CommonResult<Long> createForm(@Valid @RequestBody BpmFormCreateReqVO createReqVO) {
         return success(formService.createForm(createReqVO));
     }
 
     @PutMapping("/update")
     @ApiOperation("更新动态表单")
-    @PreAuthorize("@ss.hasPermission('os:form:update')")
-    public CommonResult<Boolean> updateForm(@Valid @RequestBody WfFormUpdateReqVO updateReqVO) {
+    @PreAuthorize("@ss.hasPermission('bpm:form:update')")
+    public CommonResult<Boolean> updateForm(@Valid @RequestBody BpmFormUpdateReqVO updateReqVO) {
         formService.updateForm(updateReqVO);
         return success(true);
     }
@@ -53,7 +52,7 @@ public class WlFormController {
     @DeleteMapping("/delete")
     @ApiOperation("删除动态表单")
     @ApiImplicitParam(name = "id", value = "编号", required = true)
-    @PreAuthorize("@ss.hasPermission('os:form:delete')")
+    @PreAuthorize("@ss.hasPermission('bpm:form:delete')")
     public CommonResult<Boolean> deleteForm(@RequestParam("id") Long id) {
         formService.deleteForm(id);
         return success(true);
@@ -62,39 +61,39 @@ public class WlFormController {
     @GetMapping("/get")
     @ApiOperation("获得动态表单")
     @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
-    @PreAuthorize("@ss.hasPermission('os:form:query')")
-    public CommonResult<WfFormRespVO> getForm(@RequestParam("id") Long id) {
-        WfForm form = formService.getForm(id);
-        return success(WfFormConvert.INSTANCE.convert(form));
+    @PreAuthorize("@ss.hasPermission('bpm:form:query')")
+    public CommonResult<BpmFormRespVO> getForm(@RequestParam("id") Long id) {
+        BpmForm form = formService.getForm(id);
+        return success(BpmFormConvert.INSTANCE.convert(form));
     }
 
     @GetMapping("/list")
     @ApiOperation("获得动态表单列表")
     @ApiImplicitParam(name = "ids", value = "编号列表", required = true, example = "1024,2048", dataTypeClass = List.class)
-    @PreAuthorize("@ss.hasPermission('os:form:query')")
-    public CommonResult<List<WfFormRespVO>> getFormList(@RequestParam("ids") Collection<Long> ids) {
-        List<WfForm> list = formService.getFormList(ids);
-        return success(WfFormConvert.INSTANCE.convertList(list));
+    @PreAuthorize("@ss.hasPermission('bpm:form:query')")
+    public CommonResult<List<BpmFormRespVO>> getFormList(@RequestParam("ids") Collection<Long> ids) {
+        List<BpmForm> list = formService.getFormList(ids);
+        return success(BpmFormConvert.INSTANCE.convertList(list));
     }
 
     @GetMapping("/page")
     @ApiOperation("获得动态表单分页")
-    @PreAuthorize("@ss.hasPermission('os:form:query')")
-    public CommonResult<PageResult<WfFormRespVO>> getFormPage(@Valid WfFormPageReqVO pageVO) {
-        PageResult<WfForm> pageResult = formService.getFormPage(pageVO);
-        return success(WfFormConvert.INSTANCE.convertPage(pageResult));
+    @PreAuthorize("@ss.hasPermission('bpm:form:query')")
+    public CommonResult<PageResult<BpmFormRespVO>> getFormPage(@Valid BpmFormPageReqVO pageVO) {
+        PageResult<BpmForm> pageResult = formService.getFormPage(pageVO);
+        return success(BpmFormConvert.INSTANCE.convertPage(pageResult));
     }
 
     @GetMapping("/export-excel")
     @ApiOperation("导出动态表单 Excel")
-    @PreAuthorize("@ss.hasPermission('os:form:export')")
+    @PreAuthorize("@ss.hasPermission('bpm:form:export')")
     @OperateLog(type = EXPORT)
-    public void exportFormExcel(@Valid WfFormExportReqVO exportReqVO,
+    public void exportFormExcel(@Valid BpmFormExportReqVO exportReqVO,
               HttpServletResponse response) throws IOException {
-        List<WfForm> list = formService.getFormList(exportReqVO);
+        List<BpmForm> list = formService.getFormList(exportReqVO);
         // 导出 Excel
-        List<WfFormExcelVO> datas = WfFormConvert.INSTANCE.convertList02(list);
-        ExcelUtils.write(response, "动态表单.xls", "数据", WfFormExcelVO.class, datas);
+        List<BpmFormExcelVO> datas = BpmFormConvert.INSTANCE.convertList02(list);
+        ExcelUtils.write(response, "动态表单.xls", "数据", BpmFormExcelVO.class, datas);
     }
 
 }
