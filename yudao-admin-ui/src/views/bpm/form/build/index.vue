@@ -72,6 +72,21 @@
               </div>
             </div>
           </draggable>
+          <!-- 动态表单 -->
+          <el-form ref="form" :model="form" :rules="rules" label-width="80px">
+            <el-form-item label="表单名" prop="name">
+              <el-input v-model="form.name" placeholder="请输入表单名" />
+            </el-form-item>
+            <el-form-item label="开启状态" prop="status">
+              <el-radio-group v-model="form.status">
+                <el-radio v-for="dict in this.getDictDatas(DICT_TYPE.SYS_COMMON_STATUS)"
+                          :key="dict.value" :label="parseInt(dict.value)">{{dict.label}}</el-radio>
+              </el-radio-group>
+            </el-form-item>
+            <el-form-item label="备注" prop="remark">
+              <el-input v-model="form.remark" placeholder="请输入备注" />
+            </el-form-item>
+          </el-form>
         </div>
       </el-scrollbar>
     </div>
@@ -177,7 +192,7 @@ export default {
     return {
       logo,
       idGlobal: 100,
-      formConf,
+      formConf, //
       inputComponents,
       selectComponents,
       layoutComponents,
@@ -190,7 +205,16 @@ export default {
       dialogVisible: false,
       generateConf: null,
       showFileName: false,
-      activeData: drawingDefalut[0]
+      activeData: drawingDefalut[0],
+
+      // 表单参数
+      form: {},
+      // 表单校验
+      rules: {
+        name: [{ required: true, message: "表单名不能为空", trigger: "blur" }],
+        status: [{ required: true, message: "开启状态不能为空", trigger: "blur" }],
+        fields: [{ required: true, message: "表单配置不能为空", trigger: "blur" }],
+      }
     }
   },
   computed: {
