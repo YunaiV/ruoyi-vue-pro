@@ -16,8 +16,9 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 public class PayRefundReqDTO {
 
+    // TODO @jason：增加下 validation 注解哈
     /**
-     * 支付订单编号自增
+     * 支付订单编号
      */
     private Long payOrderId;
 
@@ -31,10 +32,10 @@ public class PayRefundReqDTO {
      */
     private String reason;
 
-
     /**
      * 商户退款订单号
      */
+    // TODO @jason：merchantRefundNo=》merchantRefundId，保持和 PayOrder 的 merchantOrderId 一致哈
     private String merchantRefundNo;
 
     /**

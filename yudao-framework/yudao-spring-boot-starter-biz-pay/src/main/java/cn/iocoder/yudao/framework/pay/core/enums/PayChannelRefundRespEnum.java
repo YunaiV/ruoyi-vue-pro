@@ -11,6 +11,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum PayChannelRefundRespEnum {
+
     SUCCESS(1, "退款成功"),
     FAILURE(2, "退款失败"),
     PROCESSING(3,"退款处理中"),
@@ -18,4 +19,5 @@ public enum PayChannelRefundRespEnum {
 
     private final Integer status;
     private final String name;
+
 }

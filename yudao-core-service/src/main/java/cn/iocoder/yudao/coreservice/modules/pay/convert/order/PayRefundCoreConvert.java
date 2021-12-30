@@ -12,8 +12,6 @@ public interface PayRefundCoreConvert {
 
     PayRefundCoreConvert INSTANCE = Mappers.getMapper(PayRefundCoreConvert.class);
 
-
-
     //TODO 太多需要处理了， 暂时不用
     @Mappings(value = {
             @Mapping(source = "amount", target = "payAmount"),
@@ -21,4 +19,5 @@ public interface PayRefundCoreConvert {
             @Mapping(target = "status",ignore = true)
     })
     PayRefundDO convert(PayOrderDO orderDO);
+
 }

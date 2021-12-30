@@ -3,6 +3,8 @@ package cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.order;
 import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.merchant.PayAppDO;
 import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.merchant.PayChannelDO;
 import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.merchant.PayMerchantDO;
+import cn.iocoder.yudao.coreservice.modules.pay.enums.order.PayRefundStatusEnum;
+import cn.iocoder.yudao.coreservice.modules.pay.enums.order.PayRefundTypeEnum;
 import cn.iocoder.yudao.framework.pay.core.enums.PayChannelEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -79,7 +81,6 @@ public class PayRefundDO extends BaseDO {
      */
     private Long orderId;
 
-
     /**
      * 交易订单号，根据规则生成
      * 调用支付渠道时，使用该字段作为对接的订单号。
@@ -110,7 +111,6 @@ public class PayRefundDO extends BaseDO {
      * 防止该笔交易重复退款。支付宝会保证同样的退款请求号多次请求只会退一次。
      * 退款单请求号，根据规则生成
      * 例如说，R202109181134287570000
-     *
      */
     private String merchantRefundNo;
 
@@ -129,19 +129,22 @@ public class PayRefundDO extends BaseDO {
     /**
      * 退款状态
      *
+     * 枚举 {@link PayRefundStatusEnum}
      */
     private Integer status;
 
     /**
      * 退款类型(部分退款，全部退款)
+     *
+     * 枚举 {@link PayRefundTypeEnum}
      */
     private Integer type;
     /**
-     * 支付金额,单位分
+     * 支付金额，单位：分
      */
     private Long payAmount;
     /**
-     * 退款金额,单位分
+     * 退款金额，单位：分
      */
     private Long refundAmount;
 
@@ -149,7 +152,6 @@ public class PayRefundDO extends BaseDO {
      * 退款原因
      */
     private String reason;
-
 
     /**
      * 用户 IP
