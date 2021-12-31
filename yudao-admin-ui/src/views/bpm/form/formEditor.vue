@@ -32,7 +32,7 @@
             </div>
           </draggable>
           <div class="components-title">
-            <svg-icon icon-class="component" /> 布局型组件
+            <svg-icon icon-class="component" />布局型组件
           </div>
           <draggable class="components-draggable" :list="layoutComponents" :group="{ name: 'componentsGroup', pull: 'clone', put: false }"
                      :clone="cloneComponent" draggable=".components-item" :sort="false" @end="onEnd">
@@ -66,11 +66,10 @@
     <div class="center-board">
       <!-- 上面：操作按钮 -->
       <div class="action-bar">
-        <el-button class="delete-btn" icon="el-icon-delete" type="text" @click="empty">
-          清空
-        </el-button>
+        <el-button icon="el-icon-check" type="text" @click="save">保存</el-button>
+        <el-button class="delete-btn" icon="el-icon-delete" type="text" @click="empty">清空</el-button>
       </div>
-      <!-- 中间，表单 -->
+      <!-- 中间，表单项 -->
       <el-scrollbar class="center-scrollbar">
         <el-row class="center-board-row" :gutter="formConf.gutter">
           <el-form :size="formConf.size" :label-position="formConf.labelPosition" :disabled="formConf.disabled"
@@ -102,6 +101,8 @@ import drawingDefalut from '@/utils/generator/drawingDefalut'
 // import logo from '@/assets/logo/logo.png'
 import DraggableItem from './../../tool/build/DraggableItem'
 import RightPanel from './../../tool/build/RightPanel'
+import {createForm, getForm, updateForm} from "@/api/bpm/form";
+import {SysCommonStatusEnum} from "@/utils/constants";
 
 // const emptyActiveData = { style: {}, autosize: {} }
 let oldActiveId
@@ -123,22 +124,25 @@ export default {
       selectComponents,
       layoutComponents,
       labelWidth: 100,
-      drawingList: drawingDefalut, // 表单项的数组
-      drawingData: {},
-      activeId: drawingDefalut[0].formId,
+
+      drawingData: {}, // 生成后的表单数据
+
+      drawingList: [], // 表单项的数组
+      activeId: 0,
+      activeData: {},
       // drawerVisible: false,
       // formData: {},
       // dialogVisible: false,
       // showFileName: false,
-      activeData: drawingDefalut[0],
 
       // 表单参数
-      form: {},
+      form: {
+        status: SysCommonStatusEnum.ENABLE,
+      },
       // 表单校验
       rules: {
         name: [{ required: true, message: "表单名不能为空", trigger: "blur" }],
         status: [{ required: true, message: "开启状态不能为空", trigger: "blur" }],
-        fields: [{ required: true, message: "表单配置不能为空", trigger: "blur" }],
       }
     }
   },
@@ -159,6 +163,23 @@ export default {
         oldActiveId = val
       },
       immediate: true
+    }
+  },
+  created() {
+    // 读取表单配置
+    const formId = this.$route.query && this.$route.query.formId
+    if (formId) {
+      getForm(formId).then(response => {
+        const data = response.data
+        this.form = {
+          id: data.id,
+          name: data.name,
+          status: data.status,
+          remark: data.remark
+        }
+        this.formConf = JSON.parse(data.conf)
+        this.drawingList = this.decodeFields(data.fields)
+      });
     }
   },
   methods: {
@@ -201,6 +222,53 @@ export default {
         fields: JSON.parse(JSON.stringify(this.drawingList)),
         ...this.formConf
       }
+    },
+    save() {
+      // this.AssembleFormData()
+      // console.log(this.formData)
+      this.$refs["form"].validate(valid => {
+        if (!valid) {
+          return;
+        }
+        const form = {
+          conf: JSON.stringify(this.formConf), // 表单配置
+          // fields: JSON.stringify(this.drawingList), // 表单项的数组
+          fields: this.encodeFields(), // 表单项的数组
+          ...this.form // 表单名等
+        }
+        // 修改的提交
+        if (this.form.id != null) {
+          updateForm(form).then(response => {
+            this.msgSuccess("修改成功");
+            this.close()
+          });
+          return;
+        }
+        // 添加的提交
+        createForm(form).then(response => {
+          this.msgSuccess("新增成功");
+          this.close()
+        });
+      });
+    },
+    /** 关闭按钮 */
+    close() {
+      this.$store.dispatch("tagsView/delView", this.$route);
+      this.$router.push({ path: "/bpm/manager/form", query: { t: Date.now()}})
+    },
+    encodeFields() {
+      const fields = []
+      this.drawingList.forEach(item => {
+        fields.push(JSON.stringify(item))
+      })
+      return fields
+    },
+    decodeFields(fields) {
+      const drawingList = []
+      fields.forEach(item => {
+        drawingList.push(JSON.parse(item))
+      })
+      return drawingList
     },
     empty() {
       this.$confirm('确定要清空所有组件吗？', '提示', { type: 'warning' }).then(

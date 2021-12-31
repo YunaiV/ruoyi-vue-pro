@@ -30,7 +30,6 @@
           <span>{{ getDictDataLabel(DICT_TYPE.SYS_COMMON_STATUS, scope.row.status) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="表单配置" align="center" prop="fields" />
       <el-table-column label="备注" align="center" prop="remark" />
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
         <template slot-scope="scope">
@@ -49,36 +48,11 @@
     <!-- 分页组件 -->
     <pagination v-show="total > 0" :total="total" :page.sync="queryParams.pageNo" :limit.sync="queryParams.pageSize"
                 @pagination="getList"/>
-
-    <!-- 对话框(添加 / 修改) -->
-    <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
-      <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="表单名" prop="name">
-          <el-input v-model="form.name" placeholder="请输入表单名" />
-        </el-form-item>
-        <el-form-item label="开启状态" prop="status">
-          <el-radio-group v-model="form.status">
-            <el-radio v-for="dict in this.getDictDatas(DICT_TYPE.SYS_COMMON_STATUS)"
-                      :key="dict.value" :label="parseInt(dict.value)">{{dict.label}}</el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item label="表单配置" prop="fields">
-          <el-input v-model="form.fields" placeholder="请输入表单配置" />
-        </el-form-item>
-        <el-form-item label="备注" prop="remark">
-          <el-input v-model="form.remark" placeholder="请输入备注" />
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="submitForm">确 定</el-button>
-        <el-button @click="cancel">取 消</el-button>
-      </div>
-    </el-dialog>
   </div>
 </template>
 
 <script>
-import { createForm, updateForm, deleteForm, getForm, getFormPage, exportFormExcel } from "@/api/bpm/form";
+import { deleteForm, getFormPage} from "@/api/bpm/form";
 
 export default {
   name: "Form",
@@ -94,24 +68,12 @@ export default {
       total: 0,
       // 工作流的列表
       list: [],
-      // 弹出层标题
-      title: "",
-      // 是否显示弹出层
-      open: false,
       // 查询参数
       queryParams: {
         pageNo: 1,
         pageSize: 10,
         name: null,
       },
-      // 表单参数
-      form: {},
-      // 表单校验
-      rules: {
-        name: [{ required: true, message: "表单名不能为空", trigger: "blur" }],
-        status: [{ required: true, message: "开启状态不能为空", trigger: "blur" }],
-        fields: [{ required: true, message: "表单配置不能为空", trigger: "blur" }],
-      }
     };
   },
   created() {
@@ -130,22 +92,6 @@ export default {
         this.loading = false;
       });
     },
-    /** 取消按钮 */
-    cancel() {
-      this.open = false;
-      this.reset();
-    },
-    /** 表单重置 */
-    reset() {
-      this.form = {
-        id: undefined,
-        name: undefined,
-        status: undefined,
-        fields: undefined,
-        remark: undefined,
-      };
-      this.resetForm("form");
-    },
     /** 搜索按钮操作 */
     handleQuery() {
       this.queryParams.pageNo = 1;
@@ -158,41 +104,17 @@ export default {
     },
     /** 新增按钮操作 */
     handleAdd() {
-      this.reset();
-      this.open = true;
-      this.title = "添加工作流的";
+      this.$router.push({
+        path:"/bpm/manager/form/edit"
+      });
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
-      this.reset();
-      const id = row.id;
-      getForm(id).then(response => {
-        this.form = response.data;
-        this.open = true;
-        this.title = "修改工作流的";
-      });
-    },
-    /** 提交按钮 */
-    submitForm() {
-      this.$refs["form"].validate(valid => {
-        if (!valid) {
-          return;
+      this.$router.push({
+        path:"/bpm/manager/form/edit",
+        query:{
+          formId: row.id
         }
-        // 修改的提交
-        if (this.form.id != null) {
-          updateForm(this.form).then(response => {
-            this.msgSuccess("修改成功");
-            this.open = false;
-            this.getList();
-          });
-          return;
-        }
-        // 添加的提交
-        createForm(this.form).then(response => {
-          this.msgSuccess("新增成功");
-          this.open = false;
-          this.getList();
-        });
       });
     },
     /** 删除按钮操作 */

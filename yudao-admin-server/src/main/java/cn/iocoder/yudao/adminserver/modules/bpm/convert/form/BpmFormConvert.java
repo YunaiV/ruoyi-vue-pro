@@ -1,10 +1,9 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.convert.form;
 
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.form.vo.BpmFormCreateReqVO;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.form.vo.BpmFormExcelVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.form.vo.BpmFormRespVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.form.vo.BpmFormUpdateReqVO;
-import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.form.BpmForm;
+import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.form.BpmFormDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
@@ -21,16 +20,14 @@ public interface BpmFormConvert {
 
     BpmFormConvert INSTANCE = Mappers.getMapper(BpmFormConvert.class);
 
-    BpmForm convert(BpmFormCreateReqVO bean);
+    BpmFormDO convert(BpmFormCreateReqVO bean);
 
-    BpmForm convert(BpmFormUpdateReqVO bean);
+    BpmFormDO convert(BpmFormUpdateReqVO bean);
 
-    BpmFormRespVO convert(BpmForm bean);
+    BpmFormRespVO convert(BpmFormDO bean);
 
-    List<BpmFormRespVO> convertList(List<BpmForm> list);
+    List<BpmFormRespVO> convertList(List<BpmFormDO> list);
 
-    PageResult<BpmFormRespVO> convertPage(PageResult<BpmForm> page);
-
-    List<BpmFormExcelVO> convertList02(List<BpmForm> list);
+    PageResult<BpmFormRespVO> convertPage(PageResult<BpmFormDO> page);
 
 }

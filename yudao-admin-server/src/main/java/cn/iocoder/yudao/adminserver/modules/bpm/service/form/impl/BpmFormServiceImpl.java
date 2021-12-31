@@ -1,12 +1,12 @@
-package cn.iocoder.yudao.adminserver.modules.bpm.service.form;
+package cn.iocoder.yudao.adminserver.modules.bpm.service.form.impl;
 
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.form.vo.BpmFormCreateReqVO;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.form.vo.BpmFormExportReqVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.form.vo.BpmFormPageReqVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.form.vo.BpmFormUpdateReqVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.convert.form.BpmFormConvert;
-import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.form.BpmForm;
+import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.form.BpmFormDO;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.mysql.form.BpmFormMapper;
+import cn.iocoder.yudao.adminserver.modules.bpm.service.form.BpmFormService;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -33,7 +33,7 @@ public class BpmFormServiceImpl implements BpmFormService {
     @Override
     public Long createForm(BpmFormCreateReqVO createReqVO) {
         // 插入
-        BpmForm form = BpmFormConvert.INSTANCE.convert(createReqVO);
+        BpmFormDO form = BpmFormConvert.INSTANCE.convert(createReqVO);
         formMapper.insert(form);
         // 返回
         return form.getId();
@@ -44,7 +44,7 @@ public class BpmFormServiceImpl implements BpmFormService {
         // 校验存在
         this.validateFormExists(updateReqVO.getId());
         // 更新
-        BpmForm updateObj = BpmFormConvert.INSTANCE.convert(updateReqVO);
+        BpmFormDO updateObj = BpmFormConvert.INSTANCE.convert(updateReqVO);
         formMapper.updateById(updateObj);
     }
 
@@ -63,17 +63,17 @@ public class BpmFormServiceImpl implements BpmFormService {
     }
 
     @Override
-    public BpmForm getForm(Long id) {
+    public BpmFormDO getForm(Long id) {
         return formMapper.selectById(id);
     }
 
     @Override
-    public List<BpmForm> getFormList(Collection<Long> ids) {
+    public List<BpmFormDO> getFormList(Collection<Long> ids) {
         return formMapper.selectBatchIds(ids);
     }
 
     @Override
-    public PageResult<BpmForm> getFormPage(BpmFormPageReqVO pageReqVO) {
+    public PageResult<BpmFormDO> getFormPage(BpmFormPageReqVO pageReqVO) {
         return formMapper.selectPage(pageReqVO);
     }
 

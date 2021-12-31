@@ -3,7 +3,7 @@ package cn.iocoder.yudao.adminserver.modules.bpm.service.form;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.form.vo.BpmFormCreateReqVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.form.vo.BpmFormPageReqVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.form.vo.BpmFormUpdateReqVO;
-import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.form.BpmForm;
+import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.form.BpmFormDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 
 import javax.validation.Valid;
@@ -46,7 +46,7 @@ public interface BpmFormService {
      * @param id 编号
      * @return 动态表单
      */
-    BpmForm getForm(Long id);
+    BpmFormDO getForm(Long id);
 
     /**
      * 获得动态表单列表
@@ -54,7 +54,7 @@ public interface BpmFormService {
      * @param ids 编号
      * @return 动态表单列表
      */
-    List<BpmForm> getFormList(Collection<Long> ids);
+    List<BpmFormDO> getFormList(Collection<Long> ids);
 
     /**
      * 获得动态表单分页
@@ -62,6 +62,6 @@ public interface BpmFormService {
      * @param pageReqVO 分页查询
      * @return 动态表单分页
      */
-    PageResult<BpmForm> getFormPage(BpmFormPageReqVO pageReqVO);
+    PageResult<BpmFormDO> getFormPage(BpmFormPageReqVO pageReqVO);
 
 }

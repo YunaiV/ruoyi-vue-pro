@@ -1,13 +1,11 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.controller.form;
 
 import cn.iocoder.yudao.adminserver.modules.bpm.convert.form.BpmFormConvert;
-import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.form.BpmForm;
+import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.form.BpmFormDO;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.form.BpmFormService;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.form.vo.*;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
-import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
@@ -16,14 +14,11 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 
 @Api(tags = "动态表单")
 @RestController
@@ -63,7 +58,7 @@ public class BpmFormController {
     @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
     @PreAuthorize("@ss.hasPermission('bpm:form:query')")
     public CommonResult<BpmFormRespVO> getForm(@RequestParam("id") Long id) {
-        BpmForm form = formService.getForm(id);
+        BpmFormDO form = formService.getForm(id);
         return success(BpmFormConvert.INSTANCE.convert(form));
     }
 
@@ -72,7 +67,7 @@ public class BpmFormController {
     @ApiImplicitParam(name = "ids", value = "编号列表", required = true, example = "1024,2048", dataTypeClass = List.class)
     @PreAuthorize("@ss.hasPermission('bpm:form:query')")
     public CommonResult<List<BpmFormRespVO>> getFormList(@RequestParam("ids") Collection<Long> ids) {
-        List<BpmForm> list = formService.getFormList(ids);
+        List<BpmFormDO> list = formService.getFormList(ids);
         return success(BpmFormConvert.INSTANCE.convertList(list));
     }
 
@@ -80,7 +75,7 @@ public class BpmFormController {
     @ApiOperation("获得动态表单分页")
     @PreAuthorize("@ss.hasPermission('bpm:form:query')")
     public CommonResult<PageResult<BpmFormRespVO>> getFormPage(@Valid BpmFormPageReqVO pageVO) {
-        PageResult<BpmForm> pageResult = formService.getFormPage(pageVO);
+        PageResult<BpmFormDO> pageResult = formService.getFormPage(pageVO);
         return success(BpmFormConvert.INSTANCE.convertPage(pageResult));
     }
 

@@ -11,18 +11,15 @@ import javax.validation.constraints.*;
 @Data
 public class BpmFormBaseVO {
 
-    @ApiModelProperty(value = "表单名称", required = true)
+    @ApiModelProperty(value = "表单名称", required = true, example = "芋道")
     @NotNull(message = "表单名称不能为空")
     private String name;
 
-    @ApiModelProperty(value = "商户状态", required = true)
-    @NotNull(message = "商户状态不能为空")
+    @ApiModelProperty(value = "表单状态", required = true, notes = "参见 CommonStatusEnum 枚举", example = "1")
+    @NotNull(message = "表单状态不能为空")
     private Integer status;
 
-    @ApiModelProperty(value = "表单JSON")
-    private String formJson;
-
-    @ApiModelProperty(value = "备注")
+    @ApiModelProperty(value = "备注", example = "我是备注")
     private String remark;
 
 }
