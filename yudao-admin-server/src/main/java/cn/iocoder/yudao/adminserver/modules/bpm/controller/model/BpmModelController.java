@@ -1,50 +1,50 @@
-package cn.iocoder.yudao.adminserver.modules.bpm.controller.workflow;
+package cn.iocoder.yudao.adminserver.modules.bpm.controller.model;
 
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.workflow.vo.FileResp;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.workflow.vo.model.ModelPageReqVo;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.workflow.vo.model.ModelVO;
+import cn.iocoder.yudao.adminserver.modules.bpm.controller.model.vo.ModelPageReqVO;
+import cn.iocoder.yudao.adminserver.modules.bpm.controller.model.vo.BpmModelCreateReqVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.workflow.BpmModelService;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.activiti.engine.repository.Model;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-/**
- * 工作流模型
- * @author yunlongn
- */
-@Slf4j
-@RestController
-@RequestMapping("/workflow/models")
-@Api(tags = "工作流模型")
-@RequiredArgsConstructor
-public class ModelController {
+import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
-    private final BpmModelService bpmModelService;
+@Api(tags = "流程定义")
+@RestController
+@RequestMapping("/bpm/model")
+@Validated
+public class BpmModelController {
+
+    @Resource
+    private BpmModelService bpmModelService;
+
+    // TODO @芋艿：权限
 
     @GetMapping ("/page")
     @ApiOperation(value = "分页数据")
-    public CommonResult<PageResult<Model>> pageList(ModelPageReqVo modelPageReqVo) {
-       return CommonResult.success(bpmModelService.pageList(modelPageReqVo));
+    public CommonResult<PageResult<Model>> getModelPage(ModelPageReqVO pageVO) {
+       return success(bpmModelService.getModelPage(pageVO));
     }
 
     @PostMapping("/create")
     @ApiOperation(value = "新建模型")
-    public CommonResult<String> newModel(@RequestBody ModelVO modelVO) {
-       return bpmModelService.newModel(modelVO);
+    public CommonResult<String> createModel(@RequestBody BpmModelCreateReqVO createRetVO) {
+       return success(bpmModelService.createModel(createRetVO));
     }
 
     @PostMapping("/update")
     @ApiOperation(value = "修改模型属性")
-    public CommonResult<String> updateModel(@RequestBody ModelVO modelVO) {
+    public CommonResult<String> updateModel(@RequestBody BpmModelCreateReqVO modelVO) {
        return bpmModelService.updateModel(modelVO);
     }
 
