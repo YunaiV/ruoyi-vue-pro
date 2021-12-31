@@ -5,9 +5,9 @@
       <el-tab-pane label="表单属性" name="form" />
     </el-tabs>
     <div class="field-box">
-      <a class="document-link" target="_blank" :href="documentLink" title="查看组件文档">
-        <i class="el-icon-link" />
-      </a>
+<!--      <a class="document-link" target="_blank" :href="documentLink" title="查看组件文档">-->
+<!--        <i class="el-icon-link" />-->
+<!--      </a>-->
       <el-scrollbar class="right-scrollbar">
         <!-- 组件属性 -->
         <el-form v-show="currentTab==='field' && showField" size="small" label-width="90px">

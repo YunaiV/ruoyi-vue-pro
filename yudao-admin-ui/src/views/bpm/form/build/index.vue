@@ -2,28 +2,17 @@
   <div class="container">
     <div class="left-board">
       <div class="logo-wrapper">
-        <div class="logo">
-          <img :src="logo" alt="logo"> Form Generator
-        </div>
+        <div class="logo">流程表单</div>
       </div>
       <el-scrollbar class="left-scrollbar">
+        <!-- 左边：表单项 -->
         <div class="components-list">
           <div class="components-title">
             <svg-icon icon-class="component" />输入型组件
           </div>
-          <draggable
-            class="components-draggable"
-            :list="inputComponents"
-            :group="{ name: 'componentsGroup', pull: 'clone', put: false }"
-            :clone="cloneComponent"
-            draggable=".components-item"
-            :sort="false"
-            @end="onEnd"
-          >
-            <div
-              v-for="(element, index) in inputComponents" :key="index" class="components-item"
-              @click="addComponent(element)"
-            >
+          <draggable class="components-draggable" :list="inputComponents" :group="{ name: 'componentsGroup', pull: 'clone', put: false }"
+            :clone="cloneComponent" draggable=".components-item" :sort="false" @end="onEnd">
+            <div v-for="(element, index) in inputComponents" :key="index" class="components-item" @click="addComponent(element)">
               <div class="components-body">
                 <svg-icon :icon-class="element.tagIcon" />
                 {{ element.label }}
@@ -33,21 +22,9 @@
           <div class="components-title">
             <svg-icon icon-class="component" />选择型组件
           </div>
-          <draggable
-            class="components-draggable"
-            :list="selectComponents"
-            :group="{ name: 'componentsGroup', pull: 'clone', put: false }"
-            :clone="cloneComponent"
-            draggable=".components-item"
-            :sort="false"
-            @end="onEnd"
-          >
-            <div
-              v-for="(element, index) in selectComponents"
-              :key="index"
-              class="components-item"
-              @click="addComponent(element)"
-            >
+          <draggable class="components-draggable" :list="selectComponents" :group="{ name: 'componentsGroup', pull: 'clone', put: false }"
+            :clone="cloneComponent" draggable=".components-item" :sort="false" @end="onEnd">
+            <div v-for="(element, index) in selectComponents" :key="index" class="components-item" @click="addComponent(element)">
               <div class="components-body">
                 <svg-icon :icon-class="element.tagIcon" />
                 {{ element.label }}
@@ -57,22 +34,17 @@
           <div class="components-title">
             <svg-icon icon-class="component" /> 布局型组件
           </div>
-          <draggable
-            class="components-draggable" :list="layoutComponents"
-            :group="{ name: 'componentsGroup', pull: 'clone', put: false }" :clone="cloneComponent"
-            draggable=".components-item" :sort="false" @end="onEnd"
-          >
-            <div
-              v-for="(element, index) in layoutComponents" :key="index" class="components-item"
-              @click="addComponent(element)"
-            >
+          <draggable class="components-draggable" :list="layoutComponents" :group="{ name: 'componentsGroup', pull: 'clone', put: false }"
+                     :clone="cloneComponent" draggable=".components-item" :sort="false" @end="onEnd">
+            <div v-for="(element, index) in layoutComponents" :key="index" class="components-item" @click="addComponent(element)">
               <div class="components-body">
                 <svg-icon :icon-class="element.tagIcon" />
                 {{ element.label }}
               </div>
             </div>
           </draggable>
-          <!-- 动态表单 -->
+
+          <!-- 左边：动态表单 -->
           <el-form ref="form" :model="form" :rules="rules" label-width="80px">
             <el-form-item label="表单名" prop="name">
               <el-input v-model="form.name" placeholder="请输入表单名" />
@@ -84,7 +56,7 @@
               </el-radio-group>
             </el-form-item>
             <el-form-item label="备注" prop="remark">
-              <el-input v-model="form.remark" placeholder="请输入备注" />
+              <el-input type="textarea" v-model="form.remark" placeholder="请输入备注" />
             </el-form-item>
           </el-form>
         </div>
@@ -92,38 +64,21 @@
     </div>
 
     <div class="center-board">
+      <!-- 上面：操作按钮 -->
       <div class="action-bar">
-        <el-button icon="el-icon-download" type="text" @click="download">
-          导出vue文件
-        </el-button>
-        <el-button class="copy-btn-main" icon="el-icon-document-copy" type="text" @click="copy">
-          复制代码
-        </el-button>
         <el-button class="delete-btn" icon="el-icon-delete" type="text" @click="empty">
           清空
         </el-button>
       </div>
+      <!-- 中间，表单 -->
       <el-scrollbar class="center-scrollbar">
         <el-row class="center-board-row" :gutter="formConf.gutter">
-          <el-form
-            :size="formConf.size"
-            :label-position="formConf.labelPosition"
-            :disabled="formConf.disabled"
-            :label-width="formConf.labelWidth + 'px'"
-          >
+          <el-form :size="formConf.size" :label-position="formConf.labelPosition" :disabled="formConf.disabled"
+            :label-width="formConf.labelWidth + 'px'">
             <draggable class="drawing-board" :list="drawingList" :animation="340" group="componentsGroup">
-              <draggable-item
-                v-for="(element, index) in drawingList"
-                :key="element.renderKey"
-                :drawing-list="drawingList"
-                :element="element"
-                :index="index"
-                :active-id="activeId"
-                :form-conf="formConf"
-                @activeItem="activeFormItem"
-                @copyItem="drawingItemCopy"
-                @deleteItem="drawingItemDelete"
-              />
+              <draggable-item v-for="(element, index) in drawingList" :key="element.renderKey" :drawing-list="drawingList"
+                :element="element" :index="index" :active-id="activeId" :form-conf="formConf"
+                @activeItem="activeFormItem" @copyItem="drawingItemCopy" @deleteItem="drawingItemDelete"/>
             </draggable>
             <div v-show="!drawingList.length" class="empty-info">
               从左侧拖入或点选组件进行表单设计
@@ -133,28 +88,14 @@
       </el-scrollbar>
     </div>
 
-    <right-panel
-      :active-data="activeData"
-      :form-conf="formConf"
-      :show-field="!!drawingList.length"
-      @tag-change="tagChange"
-    />
+    <!-- 右边：组件属性/表单属性 -->
+    <right-panel :active-data="activeData" :form-conf="formConf" :show-field="!!drawingList.length" @tag-change="tagChange"/>
 
-    <code-type-dialog
-      :visible.sync="dialogVisible"
-      title="选择生成类型"
-      :show-file-name="showFileName"
-      @confirm="generate"
-    />
-    <input id="copyNode" type="hidden">
   </div>
 </template>
 
 <script>
 import draggable from 'vuedraggable'
-import { saveAs } from 'file-saver'
-import beautifier from 'js-beautify'
-import ClipboardJS from 'clipboard'
 import render from '@/utils/generator/render'
 import RightPanel from './RightPanel'
 import {
@@ -163,17 +104,8 @@ import {
   layoutComponents,
   formConf
 } from '@/utils/generator/config'
-import {
-  exportDefault, beautifierConf, isNumberStr, titleCase
-} from '@/utils/index'
-import {
-  makeUpHtml, vueTemplate, vueScript, cssStyle
-} from '@/utils/generator/html'
-import { makeUpJs } from '@/utils/generator/js'
-import { makeUpCss } from '@/utils/generator/css'
 import drawingDefalut from '@/utils/generator/drawingDefalut'
-import logo from '@/assets/logo/logo.png'
-import CodeTypeDialog from './CodeTypeDialog'
+// import logo from '@/assets/logo/logo.png'
 import DraggableItem from './DraggableItem'
 
 const emptyActiveData = { style: {}, autosize: {} }
@@ -185,26 +117,24 @@ export default {
     draggable,
     render,
     RightPanel,
-    CodeTypeDialog,
     DraggableItem
   },
   data() {
     return {
-      logo,
+      // logo,
       idGlobal: 100,
-      formConf, //
+      formConf, // 表单格式
       inputComponents,
       selectComponents,
       layoutComponents,
       labelWidth: 100,
-      drawingList: drawingDefalut,
+      drawingList: drawingDefalut, // 表单项的数组
       drawingData: {},
       activeId: drawingDefalut[0].formId,
-      drawerVisible: false,
-      formData: {},
-      dialogVisible: false,
-      generateConf: null,
-      showFileName: false,
+      // drawerVisible: false,
+      // formData: {},
+      // dialogVisible: false,
+      // showFileName: false,
       activeData: drawingDefalut[0],
 
       // 表单参数
@@ -237,22 +167,6 @@ export default {
       },
       immediate: true
     }
-  },
-  mounted() {
-    const clipboard = new ClipboardJS('#copyNode', {
-      text: trigger => {
-        const codeStr = this.generateCode()
-        this.$notify({
-          title: '成功',
-          message: '代码已复制到剪切板，可粘贴。',
-          type: 'success'
-        })
-        return codeStr
-      }
-    })
-    clipboard.on('error', e => {
-      this.$message.error('代码复制失败')
-    })
   },
   methods: {
     activeFormItem(element) {
@@ -288,28 +202,12 @@ export default {
       }
       return tempActiveData
     },
+    // 获得表单数据
     AssembleFormData() {
       this.formData = {
         fields: JSON.parse(JSON.stringify(this.drawingList)),
         ...this.formConf
       }
-    },
-    generate(data) {
-      const func = this[`exec${titleCase(this.operationType)}`]
-      this.generateConf = data
-      func && func(data)
-    },
-    execRun(data) {
-      this.AssembleFormData()
-      this.drawerVisible = true
-    },
-    execDownload(data) {
-      const codeStr = this.generateCode()
-      const blob = new Blob([codeStr], { type: 'text/plain;charset=utf-8' })
-      saveAs(blob, data.fileName)
-    },
-    execCopy(data) {
-      document.getElementById('copyNode').click()
     },
     empty() {
       this.$confirm('确定要清空所有组件吗？', '提示', { type: 'warning' }).then(
@@ -345,29 +243,6 @@ export default {
           this.activeFormItem(this.drawingList[len - 1])
         }
       })
-    },
-    generateCode() {
-      const { type } = this.generateConf
-      this.AssembleFormData()
-      const script = vueScript(makeUpJs(this.formData, type))
-      const html = vueTemplate(makeUpHtml(this.formData, type))
-      const css = cssStyle(makeUpCss(this.formData))
-      return beautifier.html(html + script + css, beautifierConf.html)
-    },
-    download() {
-      this.dialogVisible = true
-      this.showFileName = true
-      this.operationType = 'download'
-    },
-    run() {
-      this.dialogVisible = true
-      this.showFileName = false
-      this.operationType = 'run'
-    },
-    copy() {
-      this.dialogVisible = true
-      this.showFileName = false
-      this.operationType = 'copy'
     },
     tagChange(newTag) {
       newTag = this.cloneComponent(newTag)
@@ -654,19 +529,6 @@ $lighterBlue: #409EFF;
   font-weight: 600;
   font-size: 17px;
   white-space: nowrap;
-  > img{
-    width: 30px;
-    height: 30px;
-    vertical-align: top;
-  }
-  .github{
-    display: inline-block;
-    vertical-align: sub;
-    margin-left: 15px;
-    > img{
-      height: 22px;
-    }
-  }
 }
 
 .center-board-row {
