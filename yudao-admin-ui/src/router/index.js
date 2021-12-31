@@ -157,7 +157,7 @@ export const constantRoutes = [
     children: [
       {
         path: 'manager/form/edit',
-        component: (resolve) => require(['@/views/bpm/form/build/index'], resolve),
+        component: (resolve) => require(['@/views/bpm/form/formEditor'], resolve),
         name: '流程表单-编辑',
         meta: { title: '流程表单-编辑' }
       }

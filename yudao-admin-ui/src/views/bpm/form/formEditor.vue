@@ -97,18 +97,13 @@
 <script>
 import draggable from 'vuedraggable'
 import render from '@/utils/generator/render'
-import RightPanel from './RightPanel'
-import {
-  inputComponents,
-  selectComponents,
-  layoutComponents,
-  formConf
-} from '@/utils/generator/config'
+import { inputComponents, selectComponents, layoutComponents, formConf} from '@/utils/generator/config'
 import drawingDefalut from '@/utils/generator/drawingDefalut'
 // import logo from '@/assets/logo/logo.png'
-import DraggableItem from './DraggableItem'
+import DraggableItem from './../../tool/build/DraggableItem'
+import RightPanel from './../../tool/build/RightPanel'
 
-const emptyActiveData = { style: {}, autosize: {} }
+// const emptyActiveData = { style: {}, autosize: {} }
 let oldActiveId
 let tempActiveData
 
@@ -146,8 +141,6 @@ export default {
         fields: [{ required: true, message: "表单配置不能为空", trigger: "blur" }],
       }
     }
-  },
-  computed: {
   },
   watch: {
     // eslint-disable-next-line func-names
