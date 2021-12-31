@@ -118,7 +118,7 @@ export default {
   data() {
     return {
       // logo,
-      idGlobal: 100,
+      idGlobal: 100, // 自动 ID 生成时，全局递增。例如说 field100
       formConf, // 表单格式
       inputComponents,
       selectComponents,
@@ -128,7 +128,7 @@ export default {
       drawingData: {}, // 生成后的表单数据
 
       drawingList: [], // 表单项的数组
-      activeId: 0,
+      activeId: undefined,
       activeData: {},
       // drawerVisible: false,
       // formData: {},
@@ -179,6 +179,8 @@ export default {
         }
         this.formConf = JSON.parse(data.conf)
         this.drawingList = this.decodeFields(data.fields)
+        // 设置 idGlobal，避免重复
+        this.idGlobal += this.drawingList.length
       });
     }
   },

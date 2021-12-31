@@ -11,11 +11,41 @@
  Target Server Version : 80026
  File Encoding         : 65001
 
- Date: 15/12/2021 13:07:09
+ Date: 31/12/2021 23:18:07
 */
 
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
+
+-- ----------------------------
+-- Table structure for bpm_form
+-- ----------------------------
+DROP TABLE IF EXISTS `bpm_form`;
+CREATE TABLE `bpm_form` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号',
+  `name` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '表单名',
+  `status` tinyint NOT NULL COMMENT '开启状态',
+  `fields` varchar(5000) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '表单项的数组',
+  `conf` varchar(1000) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '表单的配置',
+  `remark` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '备注',
+  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='工作流的表单定义\n';
+
+-- ----------------------------
+-- Records of bpm_form
+-- ----------------------------
+BEGIN;
+INSERT INTO `bpm_form` VALUES (7, '啊1', 1, '[\"{\\\"label\\\":\\\"密码\\\",\\\"tag\\\":\\\"el-input\\\",\\\"tagIcon\\\":\\\"password\\\",\\\"placeholder\\\":\\\"请输入密码\\\",\\\"span\\\":24,\\\"show-password\\\":true,\\\"labelWidth\\\":null,\\\"style\\\":{\\\"width\\\":\\\"100%\\\"},\\\"clearable\\\":true,\\\"prepend\\\":\\\"\\\",\\\"append\\\":\\\"\\\",\\\"prefix-icon\\\":\\\"\\\",\\\"suffix-icon\\\":\\\"\\\",\\\"maxlength\\\":null,\\\"show-word-limit\\\":false,\\\"readonly\\\":false,\\\"disabled\\\":false,\\\"required\\\":true,\\\"regList\\\":[],\\\"changeTag\\\":true,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/input\\\",\\\"formId\\\":102,\\\"renderKey\\\":1640930414772,\\\"layout\\\":\\\"colFormItem\\\",\\\"vModel\\\":\\\"field102\\\",\\\"defaultValue\\\":\\\"admin123\\\"}\",\"{\\\"label\\\":\\\"级联选择\\\",\\\"tag\\\":\\\"el-cascader\\\",\\\"tagIcon\\\":\\\"cascader\\\",\\\"placeholder\\\":\\\"请选择级联选择级联选择级联选择\\\",\\\"defaultValue\\\":[],\\\"span\\\":24,\\\"labelWidth\\\":null,\\\"style\\\":{\\\"width\\\":\\\"100%\\\"},\\\"props\\\":{\\\"props\\\":{\\\"multiple\\\":false}},\\\"show-all-levels\\\":true,\\\"disabled\\\":false,\\\"clearable\\\":true,\\\"filterable\\\":false,\\\"required\\\":true,\\\"options\\\":[{\\\"id\\\":1,\\\"value\\\":1,\\\"label\\\":\\\"选项1\\\",\\\"children\\\":[{\\\"id\\\":2,\\\"value\\\":2,\\\"label\\\":\\\"选项1-1\\\"}]}],\\\"dataType\\\":\\\"dynamic\\\",\\\"labelKey\\\":\\\"label\\\",\\\"valueKey\\\":\\\"value\\\",\\\"childrenKey\\\":\\\"children\\\",\\\"separator\\\":\\\"/\\\",\\\"regList\\\":[],\\\"changeTag\\\":true,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/cascader\\\",\\\"formId\\\":101,\\\"renderKey\\\":1640960350991,\\\"layout\\\":\\\"colFormItem\\\",\\\"vModel\\\":\\\"field101\\\"}\",\"{\\\"label\\\":\\\"生活\\\",\\\"tag\\\":\\\"el-input\\\",\\\"tagIcon\\\":\\\"input\\\",\\\"placeholder\\\":\\\"请输入生活生活生活\\\",\\\"span\\\":24,\\\"labelWidth\\\":null,\\\"style\\\":{\\\"width\\\":\\\"100%\\\"},\\\"clearable\\\":true,\\\"prepend\\\":\\\"\\\",\\\"append\\\":\\\"\\\",\\\"prefix-icon\\\":\\\"\\\",\\\"suffix-icon\\\":\\\"\\\",\\\"maxlength\\\":null,\\\"show-word-limit\\\":false,\\\"readonly\\\":false,\\\"disabled\\\":false,\\\"required\\\":true,\\\"regList\\\":[],\\\"changeTag\\\":true,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/input\\\",\\\"formId\\\":101,\\\"renderKey\\\":1640930388977,\\\"layout\\\":\\\"colFormItem\\\",\\\"vModel\\\":\\\"field101\\\",\\\"defaultValue\\\":\\\"admin\\\"}\"]', '{\"formRef\":\"elForm\",\"formModel\":\"formData\",\"size\":\"medium\",\"labelPosition\":\"right\",\"labelWidth\":100,\"formRules\":\"rules\",\"gutter\":15,\"disabled\":false,\"span\":24,\"formBtns\":true}', '哈哈哈哈biu', '1', '2021-12-31 10:10:13', '1', '2021-12-31 14:27:22', b'1');
+INSERT INTO `bpm_form` VALUES (8, '啊哈哈', 0, '[]', '{\"formRef\":\"elForm\",\"formModel\":\"formData\",\"size\":\"medium\",\"labelPosition\":\"right\",\"labelWidth\":100,\"formRules\":\"rules\",\"gutter\":15,\"disabled\":false,\"span\":24,\"formBtns\":true}', '哈哈哈哈', '1', '2021-12-31 10:17:26', '1', '2021-12-31 14:27:20', b'1');
+INSERT INTO `bpm_form` VALUES (9, '新增', 0, '[\"{\\\"label\\\":\\\"单行文本\\\",\\\"tag\\\":\\\"el-input\\\",\\\"tagIcon\\\":\\\"input\\\",\\\"placeholder\\\":\\\"请输入单行文本\\\",\\\"span\\\":24,\\\"labelWidth\\\":null,\\\"style\\\":{\\\"width\\\":\\\"100%\\\"},\\\"clearable\\\":true,\\\"prepend\\\":\\\"\\\",\\\"append\\\":\\\"\\\",\\\"prefix-icon\\\":\\\"\\\",\\\"suffix-icon\\\":\\\"\\\",\\\"maxlength\\\":null,\\\"show-word-limit\\\":false,\\\"readonly\\\":false,\\\"disabled\\\":false,\\\"required\\\":true,\\\"regList\\\":[],\\\"changeTag\\\":true,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/input\\\",\\\"formId\\\":101,\\\"renderKey\\\":1640959561705,\\\"layout\\\":\\\"colFormItem\\\",\\\"vModel\\\":\\\"field101\\\"}\",\"{\\\"label\\\":\\\"单选框组\\\",\\\"tag\\\":\\\"el-radio-group\\\",\\\"tagIcon\\\":\\\"radio\\\",\\\"span\\\":24,\\\"labelWidth\\\":null,\\\"style\\\":{},\\\"optionType\\\":\\\"default\\\",\\\"border\\\":false,\\\"size\\\":\\\"medium\\\",\\\"disabled\\\":false,\\\"required\\\":true,\\\"options\\\":[{\\\"label\\\":\\\"选项一\\\",\\\"value\\\":1},{\\\"label\\\":\\\"选项二\\\",\\\"value\\\":2}],\\\"regList\\\":[],\\\"changeTag\\\":true,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/radio\\\",\\\"formId\\\":102,\\\"renderKey\\\":1640959563240,\\\"layout\\\":\\\"colFormItem\\\",\\\"vModel\\\":\\\"field102\\\"}\"]', '{\"formRef\":\"elForm\",\"formModel\":\"formData\",\"size\":\"medium\",\"labelPosition\":\"right\",\"labelWidth\":100,\"formRules\":\"rules\",\"gutter\":15,\"disabled\":false,\"span\":24,\"formBtns\":true}', '哈哈哈', '1', '2021-12-31 22:06:11', '1', '2021-12-31 14:27:19', b'1');
+INSERT INTO `bpm_form` VALUES (10, '11333', 1, '[\"{\\\"label\\\":\\\"多行文本\\\",\\\"tag\\\":\\\"el-input\\\",\\\"tagIcon\\\":\\\"textarea\\\",\\\"type\\\":\\\"textarea\\\",\\\"placeholder\\\":\\\"请输入多行文本多行文本多行文本\\\",\\\"span\\\":24,\\\"labelWidth\\\":null,\\\"autosize\\\":{\\\"minRows\\\":4,\\\"maxRows\\\":4},\\\"style\\\":{\\\"width\\\":\\\"100%\\\"},\\\"maxlength\\\":null,\\\"show-word-limit\\\":false,\\\"readonly\\\":false,\\\"disabled\\\":false,\\\"required\\\":true,\\\"regList\\\":[],\\\"changeTag\\\":true,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/input\\\",\\\"formId\\\":101,\\\"renderKey\\\":1640959720587,\\\"layout\\\":\\\"colFormItem\\\",\\\"vModel\\\":\\\"field101\\\",\\\"defaultValue\\\":\\\"1111\\\"}\",\"{\\\"label\\\":\\\"滑块\\\",\\\"tag\\\":\\\"el-slider\\\",\\\"tagIcon\\\":\\\"slider\\\",\\\"defaultValue\\\":0,\\\"span\\\":24,\\\"labelWidth\\\":null,\\\"disabled\\\":false,\\\"required\\\":true,\\\"min\\\":0,\\\"max\\\":100,\\\"step\\\":1,\\\"show-stops\\\":false,\\\"range\\\":false,\\\"regList\\\":[],\\\"changeTag\\\":true,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/slider\\\",\\\"formId\\\":101,\\\"renderKey\\\":1640959732257,\\\"layout\\\":\\\"colFormItem\\\",\\\"vModel\\\":\\\"field101\\\"}\"]', '{\"formRef\":\"elForm\",\"formModel\":\"formData\",\"size\":\"medium\",\"labelPosition\":\"left\",\"labelWidth\":100,\"formRules\":\"rules\",\"gutter\":15,\"disabled\":false,\"span\":24,\"formBtns\":true}', '222211', '1', '2021-12-31 22:08:45', '1', '2021-12-31 14:27:17', b'1');
+INSERT INTO `bpm_form` VALUES (11, '1', 0, '[\"{\\\"label\\\":\\\"单行文本\\\",\\\"tag\\\":\\\"el-input\\\",\\\"tagIcon\\\":\\\"input\\\",\\\"placeholder\\\":\\\"请输入单行文本\\\",\\\"span\\\":24,\\\"labelWidth\\\":null,\\\"style\\\":{\\\"width\\\":\\\"100%\\\"},\\\"clearable\\\":true,\\\"prepend\\\":\\\"\\\",\\\"append\\\":\\\"\\\",\\\"prefix-icon\\\":\\\"\\\",\\\"suffix-icon\\\":\\\"\\\",\\\"maxlength\\\":null,\\\"show-word-limit\\\":false,\\\"readonly\\\":false,\\\"disabled\\\":false,\\\"required\\\":true,\\\"regList\\\":[],\\\"changeTag\\\":true,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/input\\\",\\\"formId\\\":101,\\\"renderKey\\\":1640960802256,\\\"layout\\\":\\\"colFormItem\\\",\\\"vModel\\\":\\\"aoteman\\\",\\\"defaultValue\\\":\\\"admin\\\"}\",\"{\\\"label\\\":\\\"密码\\\",\\\"tag\\\":\\\"el-input\\\",\\\"tagIcon\\\":\\\"password\\\",\\\"placeholder\\\":\\\"请输入密码\\\",\\\"span\\\":24,\\\"show-password\\\":true,\\\"labelWidth\\\":null,\\\"style\\\":{\\\"width\\\":\\\"100%\\\"},\\\"clearable\\\":true,\\\"prepend\\\":\\\"\\\",\\\"append\\\":\\\"\\\",\\\"prefix-icon\\\":\\\"\\\",\\\"suffix-icon\\\":\\\"\\\",\\\"maxlength\\\":null,\\\"show-word-limit\\\":false,\\\"readonly\\\":false,\\\"disabled\\\":false,\\\"required\\\":true,\\\"regList\\\":[],\\\"changeTag\\\":true,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/input\\\",\\\"formId\\\":102,\\\"renderKey\\\":1640960803756,\\\"layout\\\":\\\"colFormItem\\\",\\\"vModel\\\":\\\"password\\\",\\\"defaultValue\\\":\\\"admin123\\\"}\"]', '{\"formRef\":\"elForm\",\"formModel\":\"formData\",\"size\":\"medium\",\"labelPosition\":\"right\",\"labelWidth\":100,\"formRules\":\"rules\",\"gutter\":15,\"disabled\":false,\"span\":24,\"formBtns\":true}', '23', '1', '2021-12-31 22:26:53', '1', '2021-12-31 23:14:43', b'0');
+COMMIT;
 
 -- ----------------------------
 -- Table structure for inf_api_access_log
@@ -44,7 +74,7 @@ CREATE TABLE `inf_api_access_log` (
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   `tenant_id` bigint NOT NULL DEFAULT '0' COMMENT '租户编号',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=3282 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='API 访问日志表';
+) ENGINE=InnoDB AUTO_INCREMENT=5185 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='API 访问日志表';
 
 -- ----------------------------
 -- Records of inf_api_access_log
@@ -86,7 +116,7 @@ CREATE TABLE `inf_api_error_log` (
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   `tenant_id` bigint NOT NULL DEFAULT '0' COMMENT '租户编号',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=81 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='系统异常日志';
+) ENGINE=InnoDB AUTO_INCREMENT=101 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='系统异常日志';
 
 -- ----------------------------
 -- Records of inf_api_error_log
@@ -119,7 +149,7 @@ CREATE TABLE `inf_config` (
 -- Records of inf_config
 -- ----------------------------
 BEGIN;
-INSERT INTO `inf_config` VALUES (1, 'ui', 1, '主框架页-默认皮肤样式名称', 'sys.index.skinName', 'skin-blue', b'0', '蓝色 skin-blue、绿色 skin-green、紫色 skin-purple、红色 skin-red、黄色 skin-yellow', 'admin', '2021-01-05 17:03:48', '', '2021-01-05 17:03:48', b'0');
+INSERT INTO `inf_config` VALUES (1, 'ui', 1, '主框架页-默认皮肤样式名称', 'sys.index.skinName', 'skin-blue', b'0', '蓝色 skin-blue、绿色 skin-green、紫色 skin-purple、红色 skin-red、黄色 skin-yellow', 'admin', '2021-01-05 17:03:48', '1', '2021-12-16 07:42:36', b'0');
 INSERT INTO `inf_config` VALUES (2, 'biz', 1, '用户管理-账号初始密码', 'sys.user.init-password', '123456', b'0', '初始化密码 123456', 'admin', '2021-01-05 17:03:48', '', '2021-04-13 03:48:02', b'0');
 INSERT INTO `inf_config` VALUES (3, 'ui', 1, '主框架页-侧边栏主题', 'sys.index.sideTheme', 'theme-dark', b'0', '深色主题theme-dark，浅色主题theme-light', 'admin', '2021-01-05 17:03:48', '', '2021-01-19 03:05:21', b'0');
 INSERT INTO `inf_config` VALUES (4, '1', 2, 'xxx', 'demo.test', '10', b'0', '5', '', '2021-01-19 03:10:26', '', '2021-01-20 09:25:55', b'0');
@@ -715,6 +745,51 @@ INSERT INTO `pay_order_extension` VALUES (100, '20211027132205235959', 121, 9, '
 COMMIT;
 
 -- ----------------------------
+-- Table structure for pay_refund
+-- ----------------------------
+DROP TABLE IF EXISTS `pay_refund`;
+CREATE TABLE `pay_refund` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '支付退款编号',
+  `req_no` varchar(64) NOT NULL COMMENT '退款单请求号',
+  `merchant_id` bigint NOT NULL COMMENT '商户编号',
+  `app_id` bigint NOT NULL COMMENT '应用编号',
+  `channel_id` bigint NOT NULL COMMENT '渠道编号',
+  `channel_code` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '渠道编码',
+  `order_id` bigint NOT NULL COMMENT '支付订单编号 pay_order 表id',
+  `trade_no` varchar(64) NOT NULL COMMENT '交易订单号 pay_extension 表no 字段',
+  `merchant_order_id` varchar(64) NOT NULL COMMENT '商户订单编号（商户系统生成）',
+  `merchant_refund_no` varchar(64) NOT NULL COMMENT '商户退款订单号（商户系统生成）',
+  `notify_url` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '异步通知商户地址',
+  `notify_status` tinyint NOT NULL COMMENT '通知商户退款结果的回调状态',
+  `status` tinyint NOT NULL COMMENT '退款状态',
+  `type` tinyint NOT NULL COMMENT '退款类型(部分退款，全部退款)',
+  `pay_amount` bigint NOT NULL COMMENT '支付金额,单位分',
+  `refund_amount` bigint NOT NULL COMMENT '退款金额,单位分',
+  `reason` varchar(256) NOT NULL COMMENT '退款原因',
+  `user_ip` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '用户 IP',
+  `channel_order_no` varchar(64) NOT NULL COMMENT '渠道订单号，pay_order 中的channel_order_no 对应',
+  `channel_refund_no` varchar(64) DEFAULT NULL COMMENT '渠道退款单号，渠道返回',
+  `channel_error_code` varchar(128) DEFAULT NULL COMMENT '渠道调用报错时，错误码',
+  `channel_error_msg` varchar(256) DEFAULT NULL COMMENT '渠道调用报错时，错误信息',
+  `channel_extras` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '支付渠道的额外参数',
+  `expire_time` datetime DEFAULT NULL COMMENT '退款失效时间',
+  `success_time` datetime DEFAULT NULL COMMENT '退款成功时间',
+  `notify_time` datetime DEFAULT NULL COMMENT '退款通知时间',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='退款订单';
+
+-- ----------------------------
+-- Records of pay_refund
+-- ----------------------------
+BEGIN;
+COMMIT;
+
+-- ----------------------------
 -- Table structure for sys_dept
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_dept`;
@@ -770,7 +845,7 @@ CREATE TABLE `sys_dict_data` (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=100 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='字典数据表';
+) ENGINE=InnoDB AUTO_INCREMENT=1125 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='字典数据表';
 
 -- ----------------------------
 -- Records of sys_dict_data
@@ -857,14 +932,37 @@ INSERT INTO `sys_dict_data` VALUES (88, 2, '婚假', '3', 'oa_leave_type', 0, NU
 INSERT INTO `sys_dict_data` VALUES (89, 0, '处理中', '1', 'oa_leave_status', 0, NULL, '1', '2021-09-21 22:46:46', '1', '2021-10-12 22:12:20', b'0');
 INSERT INTO `sys_dict_data` VALUES (90, 1, '流程结束', '2', 'oa_leave_status', 0, NULL, '1', '2021-09-21 22:47:03', '1', '2021-10-12 22:12:58', b'0');
 INSERT INTO `sys_dict_data` VALUES (91, 2, '完成', '3', 'oa_leave_status', 0, NULL, '1', '2021-09-21 22:47:25', '1', '2021-10-12 14:13:06', b'1');
-INSERT INTO `sys_dict_data` VALUES (92, 1, '启用', '0', 'pay_merchant_status', 0, '商户启用', '1', '2021-11-03 11:30:52', '1', '2021-11-03 11:31:15', b'0');
-INSERT INTO `sys_dict_data` VALUES (93, 2, '停用', '1', 'pay_merchant_status', 0, '商户停用', '1', '2021-11-03 11:31:05', '1', '2021-11-03 11:31:05', b'0');
-INSERT INTO `sys_dict_data` VALUES (94, 1, '开启', '0', 'pay_app_status', 0, NULL, '1', '2021-11-06 19:42:10', '1', '2021-11-06 19:42:10', b'0');
-INSERT INTO `sys_dict_data` VALUES (95, 2, '关闭', '1', 'pay_app_status', 0, NULL, '1', '2021-11-06 19:42:17', '1', '2021-11-06 19:42:17', b'0');
-INSERT INTO `sys_dict_data` VALUES (96, 1, '开启', '0', 'pay_channel_status', 0, '开启', '1', '2021-11-08 16:47:45', '1', '2021-11-08 16:47:45', b'0');
-INSERT INTO `sys_dict_data` VALUES (97, 2, '关闭', '1', 'pay_channel_status', 0, '关闭', '1', '2021-11-08 16:47:52', '1', '2021-11-08 16:47:52', b'0');
 INSERT INTO `sys_dict_data` VALUES (98, 1, 'v2', 'v2', 'pay_channel_wechat_version', 0, 'v2版本', '1', '2021-11-08 17:00:58', '1', '2021-11-08 17:00:58', b'0');
 INSERT INTO `sys_dict_data` VALUES (99, 2, 'v3', 'v3', 'pay_channel_wechat_version', 0, 'v3版本', '1', '2021-11-08 17:01:07', '1', '2021-11-08 17:01:07', b'0');
+INSERT INTO `sys_dict_data` VALUES (108, 1, 'RSA2', 'RSA2', 'pay_channel_alipay_sign_type', 0, 'RSA2', '1', '2021-11-18 15:39:29', '1', '2021-11-18 15:39:29', b'0');
+INSERT INTO `sys_dict_data` VALUES (109, 1, '公钥模式', '1', 'pay_channel_alipay_mode', 0, '公钥模式：privateKey + alipayPublicKey', '1', '2021-11-18 15:45:23', '1', '2021-11-18 15:45:23', b'0');
+INSERT INTO `sys_dict_data` VALUES (110, 2, '证书模式', '2', 'pay_channel_alipay_mode', 0, '证书模式：appCertContent + alipayPublicCertContent + rootCertContent', '1', '2021-11-18 15:45:40', '1', '2021-11-18 15:45:40', b'0');
+INSERT INTO `sys_dict_data` VALUES (111, 1, '线上', 'https://openapi.alipay.com/gateway.do', 'pay_channel_alipay_server_type', 0, '网关地址 - 线上', '1', '2021-11-18 16:59:32', '1', '2021-11-21 17:37:29', b'0');
+INSERT INTO `sys_dict_data` VALUES (112, 2, '沙箱', 'https://openapi.alipaydev.com/gateway.do', 'pay_channel_alipay_server_type', 0, '网关地址 - 沙箱', '1', '2021-11-18 16:59:48', '1', '2021-11-21 17:37:39', b'0');
+INSERT INTO `sys_dict_data` VALUES (113, 1, '微信 JSAPI 支付', 'wx_pub', 'pay_channel_code_type', 0, '微信 JSAPI（公众号） 支付', '1', '2021-12-03 10:40:24', '1', '2021-12-04 16:41:00', b'0');
+INSERT INTO `sys_dict_data` VALUES (114, 2, '微信小程序支付', 'wx_lite', 'pay_channel_code_type', 0, '微信小程序支付', '1', '2021-12-03 10:41:06', '1', '2021-12-03 10:41:06', b'0');
+INSERT INTO `sys_dict_data` VALUES (115, 3, '微信 App 支付', 'wx_app', 'pay_channel_code_type', 0, '微信 App 支付', '1', '2021-12-03 10:41:20', '1', '2021-12-03 10:41:20', b'0');
+INSERT INTO `sys_dict_data` VALUES (116, 4, '支付宝 PC 网站支付', 'alipay_pc', 'pay_channel_code_type', 0, '支付宝 PC 网站支付', '1', '2021-12-03 10:42:09', '1', '2021-12-03 10:42:09', b'0');
+INSERT INTO `sys_dict_data` VALUES (117, 5, '支付宝 Wap 网站支付', 'alipay_wap', 'pay_channel_code_type', 0, '支付宝 Wap 网站支付', '1', '2021-12-03 10:42:26', '1', '2021-12-03 10:42:26', b'0');
+INSERT INTO `sys_dict_data` VALUES (118, 6, '支付宝App 支付', 'alipay_app', 'pay_channel_code_type', 0, '支付宝App 支付', '1', '2021-12-03 10:42:55', '1', '2021-12-03 10:42:55', b'0');
+INSERT INTO `sys_dict_data` VALUES (119, 7, '支付宝扫码支付', 'alipay_qr', 'pay_channel_code_type', 0, '支付宝扫码支付', '1', '2021-12-03 10:43:10', '1', '2021-12-03 10:43:10', b'0');
+INSERT INTO `sys_dict_data` VALUES (120, 1, '通知成功', '10', 'pay_order_notify_status', 0, '通知成功', '1', '2021-12-03 11:02:41', '1', '2021-12-03 11:02:41', b'0');
+INSERT INTO `sys_dict_data` VALUES (121, 2, '通知失败', '20', 'pay_order_notify_status', 0, '通知失败', '1', '2021-12-03 11:02:59', '1', '2021-12-03 11:02:59', b'0');
+INSERT INTO `sys_dict_data` VALUES (122, 3, '未通知', '0', 'pay_order_notify_status', 0, '未通知', '1', '2021-12-03 11:03:10', '1', '2021-12-03 11:03:10', b'0');
+INSERT INTO `sys_dict_data` VALUES (123, 1, '支付成功', '10', 'pay_order_status', 0, '支付成功', '1', '2021-12-03 11:18:29', '1', '2021-12-03 11:28:32', b'0');
+INSERT INTO `sys_dict_data` VALUES (124, 2, '支付关闭', '20', 'pay_order_status', 0, '支付关闭', '1', '2021-12-03 11:18:42', '1', '2021-12-03 11:28:34', b'0');
+INSERT INTO `sys_dict_data` VALUES (125, 3, '未支付', '0', 'pay_order_status', 0, '未支付', '1', '2021-12-03 11:18:18', '1', '2021-12-03 11:28:36', b'0');
+INSERT INTO `sys_dict_data` VALUES (126, 1, '未退款', '0', 'pay_order_refund_status', 0, '未退款', '1', '2021-12-03 11:30:35', '1', '2021-12-03 11:34:05', b'0');
+INSERT INTO `sys_dict_data` VALUES (127, 2, '部分退款', '10', 'pay_order_refund_status', 0, '部分退款', '1', '2021-12-03 11:30:44', '1', '2021-12-03 11:34:10', b'0');
+INSERT INTO `sys_dict_data` VALUES (128, 3, '全部退款', '20', 'pay_order_refund_status', 0, '全部退款', '1', '2021-12-03 11:30:52', '1', '2021-12-03 11:34:14', b'0');
+INSERT INTO `sys_dict_data` VALUES (1117, 1, '退款订单生成', '0', 'pay_refund_order_status', 0, '退款订单生成', '1', '2021-12-10 16:44:44', '1', '2021-12-10 16:44:44', b'0');
+INSERT INTO `sys_dict_data` VALUES (1118, 2, '退款成功', '1', 'pay_refund_order_status', 0, '退款成功', '1', '2021-12-10 16:44:59', '1', '2021-12-10 16:44:59', b'0');
+INSERT INTO `sys_dict_data` VALUES (1119, 3, '退款失败', '2', 'pay_refund_order_status', 0, '退款失败', '1', '2021-12-10 16:45:10', '1', '2021-12-10 16:45:10', b'0');
+INSERT INTO `sys_dict_data` VALUES (1120, 4, '退款中, 渠道通知结果', '3', 'pay_refund_order_status', 0, '退款中, 渠道通知结果', '1', '2021-12-10 16:45:32', '1', '2021-12-10 16:45:32', b'0');
+INSERT INTO `sys_dict_data` VALUES (1121, 5, '退款中, 系统查询结果', '4', 'pay_refund_order_status', 0, '退款中, 系统查询结果', '1', '2021-12-10 16:45:48', '1', '2021-12-10 16:45:48', b'0');
+INSERT INTO `sys_dict_data` VALUES (1122, 6, '状态未知，需要重试', '5', 'pay_refund_order_status', 0, '状态未知，需要重试', '1', '2021-12-10 16:46:03', '1', '2021-12-10 16:46:03', b'0');
+INSERT INTO `sys_dict_data` VALUES (1123, 7, '状态未知，系统查询结果', '6', 'pay_refund_order_status', 0, '状态未知，系统查询结果', '1', '2021-12-10 16:46:13', '1', '2021-12-10 16:46:13', b'0');
+INSERT INTO `sys_dict_data` VALUES (1124, 8, '退款关闭', '99', 'pay_refund_order_status', 0, '退款关闭', '1', '2021-12-10 16:46:26', '1', '2021-12-10 16:46:26', b'0');
 COMMIT;
 
 -- ----------------------------
@@ -884,7 +982,7 @@ CREATE TABLE `sys_dict_type` (
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE KEY `dict_type` (`type`)
-) ENGINE=InnoDB AUTO_INCREMENT=123 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='字典类型表';
+) ENGINE=InnoDB AUTO_INCREMENT=137 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='字典类型表';
 
 -- ----------------------------
 -- Records of sys_dict_type
@@ -915,10 +1013,16 @@ INSERT INTO `sys_dict_type` VALUES (115, '错误码的类型', 'sys_error_code_t
 INSERT INTO `sys_dict_type` VALUES (116, '登陆日志的类型', 'sys_login_type', 0, '登陆日志的类型', '1', '2021-10-06 00:50:46', '1', '2021-10-06 00:50:46', b'0');
 INSERT INTO `sys_dict_type` VALUES (117, '请假类型', 'oa_leave_type', 0, NULL, '1', '2021-09-21 22:34:33', '1', '2021-09-21 15:00:38', b'0');
 INSERT INTO `sys_dict_type` VALUES (118, '请假流程状态', 'oa_leave_status', 0, NULL, '1', '2021-09-21 22:46:04', '1', '2021-09-21 15:00:38', b'0');
-INSERT INTO `sys_dict_type` VALUES (119, '商户状态', 'pay_merchant_status', 0, '商户的启用于停用状态', '1', '2021-11-03 11:29:04', '1', '2021-11-03 11:29:04', b'0');
-INSERT INTO `sys_dict_type` VALUES (120, '支付应用状态', 'pay_app_status', 0, '支付应用的启停状态', '1', '2021-11-06 19:41:50', '1', '2021-11-06 19:41:50', b'0');
-INSERT INTO `sys_dict_type` VALUES (121, '支付渠道状态', 'pay_channel_status', 0, '支付渠道的启停状态', '1', '2021-11-08 16:47:21', '1', '2021-11-08 16:47:21', b'0');
 INSERT INTO `sys_dict_type` VALUES (122, '支付渠道微信版本', 'pay_channel_wechat_version', 0, '支付渠道微信版本', '1', '2021-11-08 17:00:26', '1', '2021-11-08 17:00:26', b'0');
+INSERT INTO `sys_dict_type` VALUES (127, '支付渠道支付宝算法类型', 'pay_channel_alipay_sign_type', 0, '支付渠道支付宝算法类型', '1', '2021-11-18 15:39:09', '1', '2021-11-18 15:39:09', b'0');
+INSERT INTO `sys_dict_type` VALUES (128, '支付渠道支付宝公钥类型', 'pay_channel_alipay_mode', 0, '支付渠道支付宝公钥类型', '1', '2021-11-18 15:44:28', '1', '2021-11-18 15:44:28', b'0');
+INSERT INTO `sys_dict_type` VALUES (129, '支付宝网关地址', 'pay_channel_alipay_server_type', 0, '支付宝网关地址', '1', '2021-11-18 16:58:55', '1', '2021-11-18 17:01:34', b'0');
+INSERT INTO `sys_dict_type` VALUES (130, '支付渠道编码类型', 'pay_channel_code_type', 0, '支付渠道的编码', '1', '2021-12-03 10:35:08', '1', '2021-12-03 10:35:08', b'0');
+INSERT INTO `sys_dict_type` VALUES (131, '支付订单回调状态', 'pay_order_notify_status', 0, '支付订单回调状态', '1', '2021-12-03 10:53:29', '1', '2021-12-03 10:53:29', b'0');
+INSERT INTO `sys_dict_type` VALUES (132, '支付订单状态', 'pay_order_status', 0, '支付订单状态', '1', '2021-12-03 11:17:50', '1', '2021-12-03 11:17:50', b'0');
+INSERT INTO `sys_dict_type` VALUES (133, '支付订单退款状态', 'pay_order_refund_status', 0, '支付订单退款状态', '1', '2021-12-03 11:27:31', '1', '2021-12-03 11:27:31', b'0');
+INSERT INTO `sys_dict_type` VALUES (134, '退款订单状态', 'pay_refund_order_status', 0, '退款订单状态', '1', '2021-12-10 16:42:50', '1', '2021-12-10 16:42:50', b'0');
+INSERT INTO `sys_dict_type` VALUES (135, '退款订单类别', 'pay_refund_order_type', 0, '退款订单类别', '1', '2021-12-10 17:14:53', '1', '2021-12-10 17:14:53', b'0');
 COMMIT;
 
 -- ----------------------------
@@ -938,7 +1042,7 @@ CREATE TABLE `sys_error_code` (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=4020 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='错误码表';
+) ENGINE=InnoDB AUTO_INCREMENT=4035 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='错误码表';
 
 -- ----------------------------
 -- Records of sys_error_code
@@ -1025,6 +1129,21 @@ INSERT INTO `sys_error_code` VALUES (4016, 1, 'yudao-admin-server', 1002000005, 
 INSERT INTO `sys_error_code` VALUES (4017, 1, 'yudao-admin-server', 1002000006, 'Token 已经过期', '', NULL, '2021-10-02 22:14:57', NULL, '2021-10-10 22:47:27', b'0');
 INSERT INTO `sys_error_code` VALUES (4018, 1, 'yudao-admin-server', 1002014000, '社交授权失败，原因是：{}', '', NULL, '2021-10-05 23:23:10', NULL, '2021-10-05 23:23:10', b'0');
 INSERT INTO `sys_error_code` VALUES (4019, 1, 'yudao-admin-server', 1002014001, '社交解绑失败，非当前用户绑定', '', NULL, '2021-10-06 09:31:54', NULL, '2021-10-06 09:31:54', b'0');
+INSERT INTO `sys_error_code` VALUES (4020, 1, 'yudao-admin-server', 1003000001, '流程实例不存在', '', NULL, '2021-12-30 20:02:57', NULL, '2021-12-30 20:02:57', b'0');
+INSERT INTO `sys_error_code` VALUES (4021, 1, 'yudao-admin-server', 1003000002, '获取高亮流程图异常', '', NULL, '2021-12-30 20:02:57', NULL, '2021-12-30 20:02:57', b'0');
+INSERT INTO `sys_error_code` VALUES (4022, 1, 'yudao-admin-server', 1003001001, '请假申请不存在', '', NULL, '2021-12-30 20:02:57', NULL, '2021-12-30 20:02:57', b'0');
+INSERT INTO `sys_error_code` VALUES (4023, 1, 'yudao-admin-server', 1003001002, '项目经理岗位未设置', '', NULL, '2021-12-30 20:02:57', NULL, '2021-12-31 22:02:34', b'0');
+INSERT INTO `sys_error_code` VALUES (4024, 1, 'yudao-admin-server', 1003001003, '部门的项目经理不存在', '', NULL, '2021-12-30 20:02:57', NULL, '2021-12-30 20:02:57', b'0');
+INSERT INTO `sys_error_code` VALUES (4025, 1, 'yudao-admin-server', 1003001004, '部门经理岗位未设置', '', NULL, '2021-12-30 20:02:57', NULL, '2021-12-30 20:02:57', b'0');
+INSERT INTO `sys_error_code` VALUES (4026, 1, 'yudao-admin-server', 1003001005, '部门的部门经理不存在', '', NULL, '2021-12-30 20:02:57', NULL, '2021-12-30 20:02:57', b'0');
+INSERT INTO `sys_error_code` VALUES (4027, 1, 'yudao-admin-server', 1003001006, 'HR岗位未设置', '', NULL, '2021-12-30 20:02:57', NULL, '2021-12-30 20:02:57', b'0');
+INSERT INTO `sys_error_code` VALUES (4028, 1, 'yudao-admin-server', 1003001007, '请假天数必须>=1', '', NULL, '2021-12-30 20:02:57', NULL, '2021-12-30 20:02:57', b'0');
+INSERT INTO `sys_error_code` VALUES (4029, 1, 'yudao-admin-server', 1004001001, '模型数据为空，请先成功设计流程并保存', '', NULL, '2021-12-30 20:02:57', NULL, '2021-12-30 20:02:57', b'0');
+INSERT INTO `sys_error_code` VALUES (4030, 1, 'yudao-admin-server', 1004001002, '工作流模型异常', '', NULL, '2021-12-30 20:02:57', NULL, '2021-12-30 20:02:57', b'0');
+INSERT INTO `sys_error_code` VALUES (4031, 1, 'yudao-admin-server', 1004001003, '流程数据为空', '', NULL, '2021-12-30 20:02:57', NULL, '2021-12-30 20:02:57', b'0');
+INSERT INTO `sys_error_code` VALUES (4032, 1, 'yudao-admin-server', 1004001004, '流程定义不存在', '', NULL, '2021-12-30 20:02:57', NULL, '2021-12-30 20:02:57', b'0');
+INSERT INTO `sys_error_code` VALUES (4033, 1, 'yudao-admin-server', 1003003000, '表单项({}) 和 ({}) 使用了相同的字段名({})', '', NULL, '2021-12-31 23:08:54', NULL, '2021-12-31 23:14:16', b'0');
+INSERT INTO `sys_error_code` VALUES (4034, 1, 'yudao-admin-server', 1003003000, '表单项({}) 和 ({}) 使用了相同的字段名({})', '', NULL, '2021-12-31 23:08:54', NULL, '2021-12-31 23:08:54', b'0');
 COMMIT;
 
 -- ----------------------------
@@ -1048,7 +1167,7 @@ CREATE TABLE `sys_login_log` (
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   `tenant_id` bigint NOT NULL DEFAULT '0' COMMENT '租户编号',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=474 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='系统访问记录';
+) ENGINE=InnoDB AUTO_INCREMENT=499 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='系统访问记录';
 
 -- ----------------------------
 -- Records of sys_login_log
@@ -1078,17 +1197,17 @@ CREATE TABLE `sys_menu` (
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   `tenant_id` bigint NOT NULL DEFAULT '0' COMMENT '租户编号',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=1144 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='菜单权限表';
+) ENGINE=InnoDB AUTO_INCREMENT=1193 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='菜单权限表';
 
 -- ----------------------------
 -- Records of sys_menu
 -- ----------------------------
 BEGIN;
-INSERT INTO `sys_menu` VALUES (1, '系统管理', '', 1, 1, 0, '/system', 'system', NULL, 0, 'admin', '2021-01-05 17:03:48', '1', '2021-12-05 22:51:03', b'0', 0);
-INSERT INTO `sys_menu` VALUES (2, '基础设施', '', 1, 2, 0, '/infra', 'monitor', NULL, 0, 'admin', '2021-01-05 17:03:48', '', '2021-01-20 14:18:35', b'0', 0);
-INSERT INTO `sys_menu` VALUES (3, '研发工具', '', 1, 3, 0, '/tool', 'tool', NULL, 0, 'admin', '2021-01-05 17:03:48', '', '2021-02-06 12:44:42', b'0', 0);
+INSERT INTO `sys_menu` VALUES (1, '系统管理', '', 1, 10, 0, '/system', 'system', NULL, 0, 'admin', '2021-01-05 17:03:48', '1', '2021-12-25 16:43:08', b'0', 0);
+INSERT INTO `sys_menu` VALUES (2, '基础设施', '', 1, 20, 0, '/infra', 'monitor', NULL, 0, 'admin', '2021-01-05 17:03:48', '1', '2021-12-25 16:43:18', b'0', 0);
+INSERT INTO `sys_menu` VALUES (3, '研发工具', '', 1, 30, 0, '/tool', 'tool', NULL, 0, 'admin', '2021-01-05 17:03:48', '1', '2021-12-25 16:43:13', b'0', 0);
 INSERT INTO `sys_menu` VALUES (4, '若依官网', '', 1, 4, 0, 'http://ruoyi.vip', 'guide', NULL, 0, 'admin', '2021-01-05 17:03:48', '', '2021-01-20 21:54:28', b'1', 0);
-INSERT INTO `sys_menu` VALUES (5, 'OA 办公', '', 1, 4, 0, '/oa', 'people', NULL, 0, 'admin', '2021-09-20 16:26:19', '1', '2021-09-20 13:55:54', b'0', 0);
+INSERT INTO `sys_menu` VALUES (5, 'OA 办公', '', 1, 40, 0, '/oa', 'people', NULL, 0, 'admin', '2021-09-20 16:26:19', '1', '2021-12-25 16:43:22', b'0', 0);
 INSERT INTO `sys_menu` VALUES (100, '用户管理', 'system:user:list', 2, 1, 1, 'user', 'user', 'system/user/index', 0, 'admin', '2021-01-05 17:03:48', '', '2021-01-05 22:36:45', b'0', 0);
 INSERT INTO `sys_menu` VALUES (101, '角色管理', '', 2, 2, 1, 'role', 'peoples', 'system/role/index', 0, 'admin', '2021-01-05 17:03:48', '1', '2021-03-14 22:04:49', b'0', 0);
 INSERT INTO `sys_menu` VALUES (102, '菜单管理', '', 2, 3, 1, 'menu', 'tree-table', 'system/menu/index', 0, 'admin', '2021-01-05 17:03:48', '1', '2021-03-14 22:04:28', b'0', 0);
@@ -1217,6 +1336,7 @@ INSERT INTO `sys_menu` VALUES (1113, '错误码更新', 'system:error-code:updat
 INSERT INTO `sys_menu` VALUES (1114, '错误码删除', 'system:error-code:delete', 3, 4, 1110, '', '', '', 0, '', '2021-04-13 21:46:42', '', '2021-04-13 22:09:51', b'0', 0);
 INSERT INTO `sys_menu` VALUES (1115, '错误码导出', 'system:error-code:export', 3, 5, 1110, '', '', '', 0, '', '2021-04-13 21:46:42', '', '2021-04-13 22:09:55', b'0', 0);
 INSERT INTO `sys_menu` VALUES (1116, '日志中心', '', 2, 8, 2, 'log-center', 'log', 'infra/skywalking/log', 0, '1', '2021-04-26 22:35:45', '1', '2021-04-26 22:37:25', b'0', 0);
+INSERT INTO `sys_menu` VALUES (1117, '支付管理', '', 1, 11, 0, '/pay', 'money', NULL, 0, '1', '2021-12-25 16:43:41', '1', '2021-12-25 16:46:40', b'0', 0);
 INSERT INTO `sys_menu` VALUES (1118, '请假查询', '', 2, 0, 5, 'oa/leave', 'user', 'oa/leave/index', 0, '', '2021-09-20 08:51:03', '1', '2021-10-12 22:19:02', b'0', 0);
 INSERT INTO `sys_menu` VALUES (1119, '请假申请查询', 'oa:leave:query', 3, 1, 1118, '', '', '', 0, '', '2021-09-20 08:51:03', '', '2021-09-20 08:51:03', b'0', 0);
 INSERT INTO `sys_menu` VALUES (1120, '请假申请创建', 'oa:leave:create', 3, 2, 1118, '', '', '', 0, '', '2021-09-20 08:51:03', '', '2021-09-20 08:51:03', b'0', 0);
@@ -1225,7 +1345,7 @@ INSERT INTO `sys_menu` VALUES (1122, '请假申请删除', 'oa:leave:delete', 3,
 INSERT INTO `sys_menu` VALUES (1123, '请假申请导出', 'oa:leave:export', 3, 5, 1118, '', '', '', 0, '', '2021-09-20 08:51:03', '', '2021-09-20 08:51:03', b'0', 0);
 INSERT INTO `sys_menu` VALUES (1124, '待办任务', '', 2, 2, 5, 'todo', 'edit', 'oa/todo/index', 0, '1', '2021-09-20 22:10:09', '1', '2021-09-21 23:17:12', b'0', 0);
 INSERT INTO `sys_menu` VALUES (1125, '流程申请', '', 2, 3, 5, 'flow', 'form', 'oa/flow/index', 0, '1', '2021-10-23 22:10:09', '1', '2021-10-23 23:17:12', b'0', 0);
-INSERT INTO `sys_menu` VALUES (1126, '支付应用信息管理', '', 2, 0, 1117, 'app', '', 'pay/app/index', 0, '', '2021-11-10 01:13:30', '', '2021-11-10 01:13:30', b'0', 0);
+INSERT INTO `sys_menu` VALUES (1126, '应用信息', '', 2, 1, 1117, 'app', 'table', 'pay/app/index', 0, '', '2021-11-10 01:13:30', '1', '2021-12-25 16:56:41', b'0', 0);
 INSERT INTO `sys_menu` VALUES (1127, '支付应用信息查询', 'pay:app:query', 3, 1, 1126, '', '', '', 0, '', '2021-11-10 01:13:31', '', '2021-11-10 01:13:31', b'0', 0);
 INSERT INTO `sys_menu` VALUES (1128, '支付应用信息创建', 'pay:app:create', 3, 2, 1126, '', '', '', 0, '', '2021-11-10 01:13:31', '', '2021-11-10 01:13:31', b'0', 0);
 INSERT INTO `sys_menu` VALUES (1129, '支付应用信息更新', 'pay:app:update', 3, 3, 1126, '', '', '', 0, '', '2021-11-10 01:13:31', '', '2021-11-10 01:13:31', b'0', 0);
@@ -1243,6 +1363,44 @@ INSERT INTO `sys_menu` VALUES (1140, '租户创建', 'system:tenant:create', 3, 
 INSERT INTO `sys_menu` VALUES (1141, '租户更新', 'system:tenant:update', 3, 3, 1138, '', '', '', 0, '', '2021-12-14 12:31:44', '', '2021-12-14 12:31:44', b'0', 0);
 INSERT INTO `sys_menu` VALUES (1142, '租户删除', 'system:tenant:delete', 3, 4, 1138, '', '', '', 0, '', '2021-12-14 12:31:44', '', '2021-12-14 12:31:44', b'0', 0);
 INSERT INTO `sys_menu` VALUES (1143, '租户导出', 'system:tenant:export', 3, 5, 1138, '', '', '', 0, '', '2021-12-14 12:31:44', '', '2021-12-14 12:31:44', b'0', 0);
+INSERT INTO `sys_menu` VALUES (1144, '支付应用信息管理', '', 2, 0, 1117, 'app', '', 'pay/app/index', 0, '', '2021-12-25 08:26:31', '', '2021-12-25 08:48:05', b'1', 0);
+INSERT INTO `sys_menu` VALUES (1145, '支付应用信息查询', 'pay:app:query', 3, 1, 1144, '', '', '', 0, '', '2021-12-25 08:26:31', '', '2021-12-25 08:47:53', b'1', 0);
+INSERT INTO `sys_menu` VALUES (1146, '支付应用信息创建', 'pay:app:create', 3, 2, 1144, '', '', '', 0, '', '2021-12-25 08:26:31', '', '2021-12-25 08:47:51', b'1', 0);
+INSERT INTO `sys_menu` VALUES (1147, '支付应用信息更新', 'pay:app:update', 3, 3, 1144, '', '', '', 0, '', '2021-12-25 08:26:31', '', '2021-12-25 08:47:48', b'1', 0);
+INSERT INTO `sys_menu` VALUES (1148, '支付应用信息删除', 'pay:app:delete', 3, 4, 1144, '', '', '', 0, '', '2021-12-25 08:26:31', '', '2021-12-25 08:47:46', b'1', 0);
+INSERT INTO `sys_menu` VALUES (1149, '支付应用信息导出', 'pay:app:export', 3, 5, 1144, '', '', '', 0, '', '2021-12-25 08:26:31', '', '2021-12-25 08:47:43', b'1', 0);
+INSERT INTO `sys_menu` VALUES (1150, '秘钥解析', 'pay:channel:parsing', 3, 6, 1129, '', '', '', 0, '1', '2021-11-08 15:15:47', '1', '2021-11-08 15:15:47', b'0', 0);
+INSERT INTO `sys_menu` VALUES (1156, '支付订单查询', 'pay:order:query', 3, 1, 1155, '', '', '', 0, '', '2021-12-25 08:29:01', '', '2021-12-25 08:29:01', b'0', 0);
+INSERT INTO `sys_menu` VALUES (1157, '支付订单创建', 'pay:order:create', 3, 2, 1155, '', '', '', 0, '', '2021-12-25 08:29:01', '', '2021-12-25 08:29:01', b'0', 0);
+INSERT INTO `sys_menu` VALUES (1158, '支付订单更新', 'pay:order:update', 3, 3, 1155, '', '', '', 0, '', '2021-12-25 08:29:01', '', '2021-12-25 08:29:01', b'0', 0);
+INSERT INTO `sys_menu` VALUES (1159, '支付订单删除', 'pay:order:delete', 3, 4, 1155, '', '', '', 0, '', '2021-12-25 08:29:01', '', '2021-12-25 08:29:01', b'0', 0);
+INSERT INTO `sys_menu` VALUES (1160, '支付订单导出', 'pay:order:export', 3, 5, 1155, '', '', '', 0, '', '2021-12-25 08:29:01', '', '2021-12-25 08:29:01', b'0', 0);
+INSERT INTO `sys_menu` VALUES (1161, '退款订单', '', 2, 3, 1117, 'refund', 'order', 'pay/refund/index', 0, '', '2021-12-25 08:29:07', '1', '2021-12-25 19:30:22', b'0', 0);
+INSERT INTO `sys_menu` VALUES (1162, '退款订单查询', 'pay:refund:query', 3, 1, 1161, '', '', '', 0, '', '2021-12-25 08:29:07', '', '2021-12-25 08:29:07', b'0', 0);
+INSERT INTO `sys_menu` VALUES (1163, '退款订单创建', 'pay:refund:create', 3, 2, 1161, '', '', '', 0, '', '2021-12-25 08:29:07', '', '2021-12-25 08:29:07', b'0', 0);
+INSERT INTO `sys_menu` VALUES (1164, '退款订单更新', 'pay:refund:update', 3, 3, 1161, '', '', '', 0, '', '2021-12-25 08:29:07', '', '2021-12-25 08:29:07', b'0', 0);
+INSERT INTO `sys_menu` VALUES (1165, '退款订单删除', 'pay:refund:delete', 3, 4, 1161, '', '', '', 0, '', '2021-12-25 08:29:07', '', '2021-12-25 08:29:07', b'0', 0);
+INSERT INTO `sys_menu` VALUES (1166, '退款订单导出', 'pay:refund:export', 3, 5, 1161, '', '', '', 0, '', '2021-12-25 08:29:07', '', '2021-12-25 08:29:07', b'0', 0);
+INSERT INTO `sys_menu` VALUES (1173, '支付订单', '', 2, 2, 1117, 'order', 'pay', 'pay/order/index', 0, '', '2021-12-25 08:49:43', '1', '2021-12-25 19:29:54', b'0', 0);
+INSERT INTO `sys_menu` VALUES (1174, '支付订单查询', 'pay:order:query', 3, 1, 1173, '', '', '', 0, '', '2021-12-25 08:49:43', '', '2021-12-25 08:49:43', b'0', 0);
+INSERT INTO `sys_menu` VALUES (1175, '支付订单创建', 'pay:order:create', 3, 2, 1173, '', '', '', 0, '', '2021-12-25 08:49:43', '', '2021-12-25 08:49:43', b'0', 0);
+INSERT INTO `sys_menu` VALUES (1176, '支付订单更新', 'pay:order:update', 3, 3, 1173, '', '', '', 0, '', '2021-12-25 08:49:43', '', '2021-12-25 08:49:43', b'0', 0);
+INSERT INTO `sys_menu` VALUES (1177, '支付订单删除', 'pay:order:delete', 3, 4, 1173, '', '', '', 0, '', '2021-12-25 08:49:43', '', '2021-12-25 08:49:43', b'0', 0);
+INSERT INTO `sys_menu` VALUES (1178, '支付订单导出', 'pay:order:export', 3, 5, 1173, '', '', '', 0, '', '2021-12-25 08:49:43', '', '2021-12-25 08:49:43', b'0', 0);
+INSERT INTO `sys_menu` VALUES (1179, '商户信息', '', 2, 0, 1117, 'merchant', 'merchant', 'pay/merchant/index', 0, '', '2021-12-25 09:01:44', '1', '2021-12-25 17:02:13', b'0', 0);
+INSERT INTO `sys_menu` VALUES (1180, '支付商户信息查询', 'pay:merchant:query', 3, 1, 1179, '', '', '', 0, '', '2021-12-25 09:01:44', '', '2021-12-25 09:01:44', b'0', 0);
+INSERT INTO `sys_menu` VALUES (1181, '支付商户信息创建', 'pay:merchant:create', 3, 2, 1179, '', '', '', 0, '', '2021-12-25 09:01:44', '', '2021-12-25 09:01:44', b'0', 0);
+INSERT INTO `sys_menu` VALUES (1182, '支付商户信息更新', 'pay:merchant:update', 3, 3, 1179, '', '', '', 0, '', '2021-12-25 09:01:44', '', '2021-12-25 09:01:44', b'0', 0);
+INSERT INTO `sys_menu` VALUES (1183, '支付商户信息删除', 'pay:merchant:delete', 3, 4, 1179, '', '', '', 0, '', '2021-12-25 09:01:44', '', '2021-12-25 09:01:44', b'0', 0);
+INSERT INTO `sys_menu` VALUES (1184, '支付商户信息导出', 'pay:merchant:export', 3, 5, 1179, '', '', '', 0, '', '2021-12-25 09:01:44', '', '2021-12-25 09:01:44', b'0', 0);
+INSERT INTO `sys_menu` VALUES (1185, '工作流', '', 1, 50, 0, '/bpm', 'tool', NULL, 0, '1', '2021-12-30 20:26:36', '1', '2021-12-30 20:26:36', b'0', 0);
+INSERT INTO `sys_menu` VALUES (1186, '流程管理', '', 1, 10, 1185, 'manager', 'nested', NULL, 0, '1', '2021-12-30 20:28:30', '1', '2021-12-30 20:28:57', b'0', 0);
+INSERT INTO `sys_menu` VALUES (1187, '流程表单', '', 2, 0, 1186, 'form', '', 'bpm/form/index', 0, '', '2021-12-30 12:38:22', '1', '2021-12-30 20:38:48', b'0', 0);
+INSERT INTO `sys_menu` VALUES (1188, '流程表单的查询', 'bpm:form:query', 3, 1, 1187, '', '', '', 0, '', '2021-12-30 12:38:22', '1', '2021-12-30 20:38:56', b'0', 0);
+INSERT INTO `sys_menu` VALUES (1189, '流程表单的创建', 'bpm:form:create', 3, 2, 1187, '', '', '', 0, '', '2021-12-30 12:38:22', '1', '2021-12-30 20:39:00', b'0', 0);
+INSERT INTO `sys_menu` VALUES (1190, '流程表单的更新', 'bpm:form:update', 3, 3, 1187, '', '', '', 0, '', '2021-12-30 12:38:22', '1', '2021-12-30 20:39:04', b'0', 0);
+INSERT INTO `sys_menu` VALUES (1191, '流程表单的删除', 'bpm:form:delete', 3, 4, 1187, '', '', '', 0, '', '2021-12-30 12:38:22', '1', '2021-12-30 20:39:08', b'0', 0);
+INSERT INTO `sys_menu` VALUES (1192, '流程表单的导出', 'bpm:form:export', 3, 5, 1187, '', '', '', 0, '', '2021-12-30 12:38:22', '1', '2021-12-30 20:39:13', b'0', 0);
 COMMIT;
 
 -- ----------------------------
@@ -1304,7 +1462,7 @@ CREATE TABLE `sys_operate_log` (
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   `tenant_id` bigint NOT NULL DEFAULT '0' COMMENT '租户编号',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=85 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='操作日志记录';
+) ENGINE=InnoDB AUTO_INCREMENT=174 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='操作日志记录';
 
 -- ----------------------------
 -- Records of sys_operate_log
@@ -1371,7 +1529,7 @@ CREATE TABLE `sys_role` (
 BEGIN;
 INSERT INTO `sys_role` VALUES (1, '超级管理员', 'admin', 1, 1, '', 0, 1, '超级管理员', 'admin', '2021-01-05 17:03:48', '', '2021-12-15 04:52:44', b'0');
 INSERT INTO `sys_role` VALUES (2, '普通角色', 'common', 2, 2, '', 0, 1, '普通角色', 'admin', '2021-01-05 17:03:48', '', '2021-01-06 11:46:58', b'0');
-INSERT INTO `sys_role` VALUES (101, '测试账号', 'test', 0, 2, '[104]', 0, 2, '132', '', '2021-01-06 13:49:35', '1', '2021-03-14 22:17:20', b'0');
+INSERT INTO `sys_role` VALUES (101, '测试账号', 'test', 0, 2, '[102,108,109]', 0, 2, '132', '', '2021-01-06 13:49:35', '1', '2021-12-16 09:27:01', b'0');
 COMMIT;
 
 -- ----------------------------
@@ -1388,7 +1546,7 @@ CREATE TABLE `sys_role_menu` (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=239 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='角色和菜单关联表';
+) ENGINE=InnoDB AUTO_INCREMENT=253 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='角色和菜单关联表';
 
 -- ----------------------------
 -- Records of sys_role_menu
@@ -1548,6 +1706,20 @@ INSERT INTO `sys_role_menu` VALUES (235, 101, 101, '', '2021-01-21 03:23:27', ''
 INSERT INTO `sys_role_menu` VALUES (236, 101, 1063, '', '2021-01-21 03:23:27', '', '2021-01-21 03:23:27', b'0');
 INSERT INTO `sys_role_menu` VALUES (237, 101, 1064, '', '2021-01-21 03:23:27', '', '2021-01-21 03:23:27', b'0');
 INSERT INTO `sys_role_menu` VALUES (238, 101, 1065, '', '2021-01-21 03:23:27', '', '2021-01-21 03:23:27', b'0');
+INSERT INTO `sys_role_menu` VALUES (239, 101, 100, '1', '2021-12-15 22:47:51', '1', '2021-12-15 22:47:51', b'0');
+INSERT INTO `sys_role_menu` VALUES (240, 101, 1001, '1', '2021-12-15 22:47:51', '1', '2021-12-15 22:47:51', b'0');
+INSERT INTO `sys_role_menu` VALUES (241, 101, 1002, '1', '2021-12-15 22:47:51', '1', '2021-12-15 22:47:51', b'0');
+INSERT INTO `sys_role_menu` VALUES (242, 101, 1003, '1', '2021-12-15 22:47:51', '1', '2021-12-15 22:47:51', b'0');
+INSERT INTO `sys_role_menu` VALUES (243, 101, 1004, '1', '2021-12-15 22:47:51', '1', '2021-12-15 22:47:51', b'0');
+INSERT INTO `sys_role_menu` VALUES (244, 101, 1005, '1', '2021-12-15 22:47:51', '1', '2021-12-15 22:47:51', b'0');
+INSERT INTO `sys_role_menu` VALUES (245, 101, 1006, '1', '2021-12-15 22:47:51', '1', '2021-12-15 22:47:51', b'0');
+INSERT INTO `sys_role_menu` VALUES (246, 101, 1007, '1', '2021-12-15 22:47:51', '1', '2021-12-15 22:47:51', b'0');
+INSERT INTO `sys_role_menu` VALUES (247, 101, 1138, '1', '2021-12-15 22:47:51', '1', '2021-12-15 22:47:51', b'0');
+INSERT INTO `sys_role_menu` VALUES (248, 101, 1139, '1', '2021-12-15 22:47:51', '1', '2021-12-15 22:47:51', b'0');
+INSERT INTO `sys_role_menu` VALUES (249, 101, 1140, '1', '2021-12-15 22:47:51', '1', '2021-12-15 22:47:51', b'0');
+INSERT INTO `sys_role_menu` VALUES (250, 101, 1141, '1', '2021-12-15 22:47:51', '1', '2021-12-15 22:47:51', b'0');
+INSERT INTO `sys_role_menu` VALUES (251, 101, 1142, '1', '2021-12-15 22:47:51', '1', '2021-12-15 22:47:51', b'0');
+INSERT INTO `sys_role_menu` VALUES (252, 101, 1143, '1', '2021-12-15 22:47:51', '1', '2021-12-15 22:47:51', b'0');
 COMMIT;
 
 -- ----------------------------
@@ -1798,13 +1970,13 @@ CREATE TABLE `sys_user` (
 -- Records of sys_user
 -- ----------------------------
 BEGIN;
-INSERT INTO `sys_user` VALUES (1, 'admin', '$2a$10$0acJOIk2D25/oC87nyclE..0lzeu9DtQ/n3geP4fkun/zIVRhHJIO', '芋道源码', '管理员', 103, '[1]', 'aoteman@126.com', '15612345678', 1, 'http://127.0.0.1:48080/api/infra/file/get/7e7ed694-2242-46cf-9ac9-0709debcc22f', 0, '127.0.0.1', '2021-12-15 12:33:21', 'admin', '2021-01-05 17:03:47', NULL, '2021-12-15 12:33:21', b'0', 1);
+INSERT INTO `sys_user` VALUES (1, 'admin', '$2a$10$0acJOIk2D25/oC87nyclE..0lzeu9DtQ/n3geP4fkun/zIVRhHJIO', '芋道源码', '管理员', 103, '[1]', 'aoteman@126.com', '15612345678', 1, 'http://127.0.0.1:48080/api/infra/file/get/7e7ed694-2242-46cf-9ac9-0709debcc22f', 0, '127.0.0.1', '2021-12-31 22:57:57', 'admin', '2021-01-05 17:03:47', NULL, '2021-12-31 22:57:57', b'0', 1);
 INSERT INTO `sys_user` VALUES (2, 'ry', '$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', '若依', '测试员', 103, '[2]', 'ry@qq.com', '15666666666', 1, '', 0, '127.0.0.1', '2021-01-05 17:03:47', 'admin', '2021-01-05 17:03:47', '', '2021-12-13 01:26:34', b'1', 1);
-INSERT INTO `sys_user` VALUES (100, 'yudao', '$2a$10$11U48RhyJ5pSBYWSn12AD./ld671.ycSzJHbyrtpeoMeYiw31eo8a', '芋道', '不要吓我', 103, '[1]', 'yudao@iocoder.cn', '15601691300', 1, '', 1, '', NULL, '', '2021-01-07 09:07:17', '1', '2021-12-13 01:26:55', b'0', 1);
-INSERT INTO `sys_user` VALUES (103, 'yuanma', '', '源码', NULL, 100, NULL, 'yuanma@iocoder.cn', '15601701300', 0, '', 0, '', NULL, '', '2021-01-13 23:50:35', '', '2021-12-05 02:22:01', b'0', 1);
-INSERT INTO `sys_user` VALUES (104, 'test', '$2a$10$.TOFpaIiI3PzEwkGrNq0Eu6Cc3rOqJMxTb1DqeSEM8StxaGPBRKoi', '测试号', NULL, 100, '[]', '', '15601691200', 1, '', 0, '127.0.0.1', '2021-12-13 07:41:55', '', '2021-01-21 02:13:53', NULL, '2021-12-13 07:41:55', b'0', 1);
-INSERT INTO `sys_user` VALUES (105, 'hradmin', '$2a$10$JEhJOL25X1eMnFfR3PILo.MoAljf29YukpL2w6H9GvVGjmqOCuh.O', 'hr-mgr', 'hr 管理员', 100, '[3]', '', '', 1, '', 0, '127.0.0.1', '2021-10-30 21:19:36', '1', '2021-09-25 16:50:41', NULL, '2021-12-05 02:22:03', b'0', 1);
-INSERT INTO `sys_user` VALUES (106, 'zhijiantianya', '$2a$10$Y0hSfV2udA8quqMeWukhTuHEoKpQ5tDhclG8WUWSOH7o/MGw185Ti', '芋道源码', '', NULL, NULL, '', '', 3, 'https://portrait.gitee.com/uploads/avatars/user/0/176_zhijiantianya_1578913741.png', 0, '', NULL, NULL, '2021-09-28 09:40:59', NULL, '2021-12-05 02:22:04', b'0', 1);
+INSERT INTO `sys_user` VALUES (100, 'yudao', '$2a$10$11U48RhyJ5pSBYWSn12AD./ld671.ycSzJHbyrtpeoMeYiw31eo8a', '芋道', '不要吓我', 104, '[1]', 'yudao@iocoder.cn', '15601691300', 1, '', 1, '', NULL, '', '2021-01-07 09:07:17', '104', '2021-12-16 09:26:10', b'0', 1);
+INSERT INTO `sys_user` VALUES (103, 'yuanma', '', '源码', NULL, 106, NULL, 'yuanma@iocoder.cn', '15601701300', 0, '', 0, '', NULL, '', '2021-01-13 23:50:35', '104', '2021-12-16 09:26:05', b'0', 1);
+INSERT INTO `sys_user` VALUES (104, 'test', '$2a$10$CkyM2xvzUhSWsh.JqGcSju.KjlPsaX1A76wO8O/mYtkpQvcp2jWTW', '测试号', NULL, 107, '[]', '', '15601691200', 1, '', 0, '127.0.0.1', '2021-12-16 09:27:08', '', '2021-01-21 02:13:53', NULL, '2021-12-16 09:27:08', b'0', 1);
+INSERT INTO `sys_user` VALUES (105, 'hradmin', '$2a$10$JEhJOL25X1eMnFfR3PILo.MoAljf29YukpL2w6H9GvVGjmqOCuh.O', 'hr-mgr', 'hr 管理员', 109, '[3]', '', '18818260000', 1, '', 0, '127.0.0.1', '2021-10-30 21:19:36', '1', '2021-09-25 16:50:41', '1', '2021-12-16 09:26:41', b'0', 1);
+INSERT INTO `sys_user` VALUES (106, 'zhijiantianya', '$2a$10$Y0hSfV2udA8quqMeWukhTuHEoKpQ5tDhclG8WUWSOH7o/MGw185Ti', '芋道源码', '', NULL, NULL, '', '', 3, 'https://portrait.gitee.com/uploads/avatars/user/0/176_zhijiantianya_1578913741.png', 0, '', NULL, NULL, '2021-09-28 09:40:59', NULL, '2021-12-15 14:44:47', b'1', 1);
 COMMIT;
 
 -- ----------------------------
@@ -1835,7 +2007,7 @@ INSERT INTO `sys_user_role` VALUES (4, 100, 101, '', NULL, '', NULL, b'0', 0);
 INSERT INTO `sys_user_role` VALUES (5, 100, 1, '', NULL, '', NULL, b'0', 0);
 INSERT INTO `sys_user_role` VALUES (6, 100, 2, '', NULL, '', NULL, b'0', 0);
 INSERT INTO `sys_user_role` VALUES (7, 104, 101, '', NULL, '', NULL, b'0', 0);
-INSERT INTO `sys_user_role` VALUES (8, 106, 1, NULL, '2021-09-28 09:40:59', NULL, '2021-09-28 09:40:59', b'0', 0);
+INSERT INTO `sys_user_role` VALUES (8, 106, 1, NULL, '2021-09-28 09:40:59', NULL, '2021-09-28 09:40:59', b'1', 0);
 INSERT INTO `sys_user_role` VALUES (9, 105, 1, '1', '2021-10-30 13:40:48', '1', '2021-10-30 13:40:48', b'0', 0);
 COMMIT;
 
@@ -1864,6 +2036,25 @@ CREATE TABLE `sys_user_session` (
 -- Records of sys_user_session
 -- ----------------------------
 BEGIN;
+INSERT INTO `sys_user_session` VALUES ('0180929bb4b244b891253885e86ad9d1', 1, 2, '2021-12-16 09:37:48', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2021-12-16 09:07:48', NULL, '2021-12-16 09:07:48', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('01b7469337864db7a9b65747f38fa928', 1, 2, '2021-12-31 14:29:42', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2021-12-31 13:49:05', NULL, '2021-12-31 13:59:42', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('0b8545465544481da4d162a3a74a552e', 1, 2, '2021-12-15 23:48:37', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2021-12-15 22:44:07', NULL, '2021-12-15 23:18:37', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('1995595036aa4652bb887c43cfd35ba8', 1, 2, '2021-12-31 23:39:16', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2021-12-31 22:57:57', NULL, '2021-12-31 23:09:16', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('1b848d99cde6448097dcedc83fda4c0a', 1, 2, '2021-12-31 10:45:09', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2021-12-31 08:35:36', NULL, '2021-12-31 10:15:09', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('1bc6ad0827fe48099bcbdb9a206818ac', 104, 2, '2021-12-15 23:48:59', 'test', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2021-12-15 23:18:59', NULL, '2021-12-15 23:18:59', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('2ec1ca2d0053415599fa18e6bddf710e', 104, 2, '2021-12-16 10:08:04', 'test', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2021-12-16 09:27:08', NULL, '2021-12-16 09:38:04', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('345ad9af8d0c46c8ad285b57cabfd060', 1, 2, '2021-12-25 19:57:51', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2021-12-25 19:15:06', NULL, '2021-12-25 19:27:51', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('47949a90a88d4c49823d70995d980ee9', 1, 2, '2021-12-16 10:04:30', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2021-12-16 09:20:41', NULL, '2021-12-16 09:34:30', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('495da339c78846609991d9bc66e17dcf', 1, 2, '2021-12-31 22:54:24', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2021-12-31 21:47:55', NULL, '2021-12-31 22:24:24', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('4e00d142b22e4826938de31c221b6b32', 104, 2, '2021-12-16 09:54:24', 'test', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2021-12-16 09:24:24', NULL, '2021-12-16 01:27:04', b'1', 1);
+INSERT INTO `sys_user_session` VALUES ('64f51e60527349d6b4a0a74f3d8eca97', 104, 2, '2021-12-16 07:37:54', 'test', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2021-12-16 07:07:54', NULL, '2021-12-16 07:07:54', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('945e4bb19f4d4c28ba7135218ee3abe3', 1, 2, '2021-12-16 08:28:54', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2021-12-16 07:42:25', NULL, '2021-12-16 07:58:54', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('9ee1349d7d3043759cb742a0fa5a3163', 1, 2, '2021-12-25 19:08:33', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2021-12-25 18:38:33', NULL, '2021-12-25 18:38:33', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('a155e6dfe4b74fbaa69fcca239facc40', 1, 2, '2021-12-16 07:37:39', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2021-12-16 07:07:39', NULL, '2021-12-16 07:07:39', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('a55b31ff9e6a41fcb931d2244b4240a8', 1, 2, '2021-12-30 22:32:56', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2021-12-30 20:04:02', NULL, '2021-12-30 22:02:56', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('ab449ce8f2ea456591d23515c188c242', 1, 2, '2021-12-25 17:55:45', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2021-12-25 16:42:42', NULL, '2021-12-25 17:25:45', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('da04f99dc14a4f28a8a77178861cb3ed', 104, 2, '2021-12-15 23:37:58', 'test', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2021-12-15 22:47:31', NULL, '2021-12-15 15:11:55', b'1', 1);
+INSERT INTO `sys_user_session` VALUES ('fe82f6ecb17449b595c7d6bd4bc1d371', 1, 2, '2021-12-15 23:16:49', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2021-12-15 22:46:49', NULL, '2021-12-15 14:46:53', b'1', 1);
 COMMIT;
 
 -- ----------------------------
@@ -1896,25 +2087,25 @@ CREATE TABLE `tool_codegen_column` (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=479 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='代码生成表字段定义';
+) ENGINE=InnoDB AUTO_INCREMENT=489 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='代码生成表字段定义';
 
 -- ----------------------------
 -- Records of tool_codegen_column
 -- ----------------------------
 BEGIN;
-INSERT INTO `tool_codegen_column` VALUES (243, 21, 'id', 'int(5)', '参数主键', b'0', b'1', '1', 1, 'Integer', 'id', '', NULL, b'0', b'1', b'0', '=', b'1', 'input', '', '2021-02-06 19:51:35', '', '2021-02-06 19:51:35', b'0');
-INSERT INTO `tool_codegen_column` VALUES (244, 21, 'group', 'varchar(50)', '参数分组', b'0', b'0', '0', 2, 'String', 'group', '', NULL, b'1', b'1', b'0', '=', b'1', 'input', '', '2021-02-06 19:51:35', '', '2021-03-06 02:20:02', b'0');
-INSERT INTO `tool_codegen_column` VALUES (245, 21, 'type', 'tinyint(4)', '参数类型', b'0', b'0', '0', 3, 'Integer', 'type', '', NULL, b'1', b'1', b'1', '=', b'1', 'select', '', '2021-02-06 19:51:35', '', '2021-02-06 19:51:35', b'0');
-INSERT INTO `tool_codegen_column` VALUES (246, 21, 'name', 'varchar(100)', '参数名称', b'0', b'0', '0', 4, 'String', 'name', '', NULL, b'1', b'1', b'1', 'LIKE', b'1', 'input', '', '2021-02-06 19:51:35', '', '2021-02-06 19:51:35', b'0');
-INSERT INTO `tool_codegen_column` VALUES (247, 21, 'key', 'varchar(100)', '参数键名', b'0', b'0', '0', 5, 'String', 'key', '', NULL, b'1', b'1', b'1', '=', b'1', 'input', '', '2021-02-06 19:51:35', '', '2021-02-06 19:51:35', b'0');
-INSERT INTO `tool_codegen_column` VALUES (248, 21, 'value', 'varchar(500)', '参数键值', b'0', b'0', '0', 6, 'String', 'value', '', NULL, b'1', b'1', b'0', '=', b'1', 'input', '', '2021-02-06 19:51:35', '', '2021-03-06 02:20:02', b'0');
-INSERT INTO `tool_codegen_column` VALUES (249, 21, 'sensitive', 'bit(1)', '是否敏感', b'0', b'0', '0', 7, 'Boolean', 'sensitive', '', NULL, b'1', b'1', b'0', '=', b'1', 'radio', '', '2021-02-06 19:51:35', '', '2021-03-06 02:20:02', b'0');
-INSERT INTO `tool_codegen_column` VALUES (250, 21, 'remark', 'varchar(500)', '备注', b'1', b'0', '0', 8, 'String', 'remark', '', NULL, b'1', b'1', b'0', '=', b'1', 'input', '', '2021-02-06 19:51:35', '', '2021-03-06 02:20:02', b'0');
-INSERT INTO `tool_codegen_column` VALUES (251, 21, 'creator', 'varchar(64)', '创建者', b'1', b'0', '0', 9, 'String', 'createBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-02-06 19:51:35', '', '2021-02-06 19:51:35', b'0');
-INSERT INTO `tool_codegen_column` VALUES (252, 21, 'create_time', 'datetime', '创建时间', b'0', b'0', '0', 10, 'Date', 'createTime', '', NULL, b'0', b'0', b'1', 'BETWEEN', b'1', 'datetime', '', '2021-02-06 19:51:35', '', '2021-02-06 19:51:35', b'0');
-INSERT INTO `tool_codegen_column` VALUES (253, 21, 'updater', 'varchar(64)', '更新者', b'1', b'0', '0', 11, 'String', 'updateBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-02-06 19:51:35', '', '2021-02-06 19:51:35', b'0');
-INSERT INTO `tool_codegen_column` VALUES (254, 21, 'update_time', 'datetime', '更新时间', b'0', b'0', '0', 12, 'Date', 'updateTime', '', NULL, b'0', b'0', b'0', 'BETWEEN', b'0', 'datetime', '', '2021-02-06 19:51:35', '', '2021-02-06 19:51:35', b'0');
-INSERT INTO `tool_codegen_column` VALUES (255, 21, 'deleted', 'bit(1)', '是否删除', b'0', b'0', '0', 13, 'Boolean', 'deleted', '', NULL, b'0', b'0', b'0', '=', b'0', 'radio', '', '2021-02-06 19:51:35', '', '2021-02-06 19:51:35', b'0');
+INSERT INTO `tool_codegen_column` VALUES (243, 21, 'id', 'int(5)', '参数主键', b'0', b'1', '1', 1, 'Integer', 'id', '', NULL, b'0', b'1', b'0', '=', b'1', 'input', '', '2021-02-06 19:51:35', '1', '2021-12-31 22:06:46', b'0');
+INSERT INTO `tool_codegen_column` VALUES (244, 21, 'group', 'varchar(50)', '参数分组', b'0', b'0', '0', 2, 'String', 'group', '', NULL, b'1', b'1', b'0', '=', b'1', 'input', '', '2021-02-06 19:51:35', '1', '2021-12-31 22:06:46', b'0');
+INSERT INTO `tool_codegen_column` VALUES (245, 21, 'type', 'tinyint(4)', '参数类型', b'0', b'0', '0', 3, 'Integer', 'type', '', NULL, b'1', b'1', b'1', '=', b'1', 'select', '', '2021-02-06 19:51:35', '1', '2021-12-31 22:06:46', b'0');
+INSERT INTO `tool_codegen_column` VALUES (246, 21, 'name', 'varchar(100)', '参数名称', b'0', b'0', '0', 4, 'String', 'name', '', NULL, b'1', b'1', b'1', 'LIKE', b'1', 'input', '', '2021-02-06 19:51:35', '1', '2021-12-31 22:06:46', b'0');
+INSERT INTO `tool_codegen_column` VALUES (247, 21, 'key', 'varchar(100)', '参数键名', b'0', b'0', '0', 5, 'String', 'key', '', NULL, b'1', b'1', b'1', '=', b'1', 'input', '', '2021-02-06 19:51:35', '1', '2021-12-31 22:06:46', b'0');
+INSERT INTO `tool_codegen_column` VALUES (248, 21, 'value', 'varchar(500)', '参数键值', b'0', b'0', '0', 6, 'String', 'value', '', NULL, b'1', b'1', b'0', '=', b'1', 'input', '', '2021-02-06 19:51:35', '1', '2021-12-31 22:06:46', b'0');
+INSERT INTO `tool_codegen_column` VALUES (249, 21, 'sensitive', 'bit(1)', '是否敏感', b'0', b'0', '0', 7, 'Boolean', 'sensitive', '', NULL, b'1', b'1', b'0', '=', b'1', 'radio', '', '2021-02-06 19:51:35', '1', '2021-12-31 22:06:46', b'0');
+INSERT INTO `tool_codegen_column` VALUES (250, 21, 'remark', 'varchar(500)', '备注', b'1', b'0', '0', 8, 'String', 'remark', '', NULL, b'1', b'1', b'0', '=', b'1', 'input', '', '2021-02-06 19:51:35', '1', '2021-12-31 22:06:46', b'0');
+INSERT INTO `tool_codegen_column` VALUES (251, 21, 'creator', 'varchar(64)', '创建者', b'1', b'0', '0', 9, 'String', 'createBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-02-06 19:51:35', '1', '2021-12-31 22:06:46', b'0');
+INSERT INTO `tool_codegen_column` VALUES (252, 21, 'create_time', 'datetime', '创建时间', b'0', b'0', '0', 10, 'Date', 'createTime', '', NULL, b'0', b'0', b'1', 'BETWEEN', b'1', 'datetime', '', '2021-02-06 19:51:35', '1', '2021-12-31 22:06:46', b'0');
+INSERT INTO `tool_codegen_column` VALUES (253, 21, 'updater', 'varchar(64)', '更新者', b'1', b'0', '0', 11, 'String', 'updateBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-02-06 19:51:35', '1', '2021-12-31 22:06:46', b'0');
+INSERT INTO `tool_codegen_column` VALUES (254, 21, 'update_time', 'datetime', '更新时间', b'0', b'0', '0', 12, 'Date', 'updateTime', '', NULL, b'0', b'0', b'0', 'BETWEEN', b'0', 'datetime', '', '2021-02-06 19:51:35', '1', '2021-12-31 22:06:46', b'0');
+INSERT INTO `tool_codegen_column` VALUES (255, 21, 'deleted', 'bit(1)', '是否删除', b'0', b'0', '0', 13, 'Boolean', 'deleted', '', NULL, b'0', b'0', b'0', '=', b'0', 'radio', '', '2021-02-06 19:51:35', '1', '2021-12-31 22:06:46', b'0');
 INSERT INTO `tool_codegen_column` VALUES (269, 24, 'id', 'bigint(20)', '任务编号', b'0', b'1', '1', 1, 'Long', 'id', '', '1024', b'0', b'1', b'0', '=', b'1', 'input', '', '2021-02-07 06:39:34', '', '2021-02-07 06:44:19', b'0');
 INSERT INTO `tool_codegen_column` VALUES (270, 24, 'name', 'varchar(32)', '任务名称', b'0', b'0', '0', 2, 'String', 'name', '', '测试任务', b'1', b'1', b'1', 'LIKE', b'1', 'input', '', '2021-02-07 06:39:34', '', '2021-02-07 06:44:19', b'0');
 INSERT INTO `tool_codegen_column` VALUES (271, 24, 'status', 'tinyint(4)', '任务状态', b'0', b'0', '0', 3, 'Integer', 'status', 'inf_job_status', '1', b'0', b'0', b'1', '=', b'1', 'radio', '', '2021-02-07 06:39:34', '', '2021-02-07 07:55:17', b'0');
@@ -2114,6 +2305,16 @@ INSERT INTO `tool_codegen_column` VALUES (475, 39, 'create_time', 'datetime', '�
 INSERT INTO `tool_codegen_column` VALUES (476, 39, 'updater', 'varchar(64)', '更新者', b'1', b'0', '0', 8, 'String', 'updater', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '1', '2021-12-14 09:51:12', '1', '2021-12-14 10:02:12', b'0');
 INSERT INTO `tool_codegen_column` VALUES (477, 39, 'update_time', 'datetime', '更新时间', b'0', b'0', '0', 9, 'Date', 'updateTime', '', NULL, b'0', b'0', b'0', 'BETWEEN', b'0', 'datetime', '1', '2021-12-14 09:51:12', '1', '2021-12-14 10:02:12', b'0');
 INSERT INTO `tool_codegen_column` VALUES (478, 39, 'deleted', 'bit(1)', '是否删除', b'0', b'0', '0', 10, 'Boolean', 'deleted', '', NULL, b'0', b'0', b'0', '=', b'0', 'radio', '1', '2021-12-14 09:51:12', '1', '2021-12-14 10:02:12', b'0');
+INSERT INTO `tool_codegen_column` VALUES (479, 40, 'id', 'bigint', '编号', b'0', b'1', '1', 1, 'Long', 'id', '', NULL, b'0', b'1', b'0', '=', b'1', 'input', '1', '2021-12-30 20:33:27', '1', '2021-12-30 20:37:58', b'0');
+INSERT INTO `tool_codegen_column` VALUES (480, 40, 'name', 'varchar(64)', '表单名', b'0', b'0', '0', 2, 'String', 'name', '', NULL, b'1', b'1', b'1', 'LIKE', b'1', 'input', '1', '2021-12-30 20:33:27', '1', '2021-12-30 20:37:58', b'0');
+INSERT INTO `tool_codegen_column` VALUES (481, 40, 'status', 'tinyint', '开启状态', b'0', b'0', '0', 3, 'Integer', 'status', 'sys_common_status', NULL, b'1', b'1', b'0', '=', b'1', 'radio', '1', '2021-12-30 20:33:27', '1', '2021-12-30 20:37:58', b'0');
+INSERT INTO `tool_codegen_column` VALUES (482, 40, 'fields', 'varchar(1024)', '表单配置', b'0', b'0', '0', 4, 'String', 'fields', '', NULL, b'1', b'1', b'0', '=', b'1', 'input', '1', '2021-12-30 20:33:27', '1', '2021-12-30 20:37:58', b'0');
+INSERT INTO `tool_codegen_column` VALUES (483, 40, 'remark', 'varchar(255)', '备注', b'1', b'0', '0', 5, 'String', 'remark', '', NULL, b'1', b'1', b'0', '=', b'1', 'input', '1', '2021-12-30 20:33:27', '1', '2021-12-30 20:37:58', b'0');
+INSERT INTO `tool_codegen_column` VALUES (484, 40, 'creator', 'varchar(64)', '创建者', b'1', b'0', '0', 6, 'String', 'creator', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '1', '2021-12-30 20:33:27', '1', '2021-12-30 20:37:58', b'0');
+INSERT INTO `tool_codegen_column` VALUES (485, 40, 'create_time', 'datetime', '创建时间', b'0', b'0', '0', 7, 'Date', 'createTime', '', NULL, b'0', b'0', b'0', 'BETWEEN', b'1', 'datetime', '1', '2021-12-30 20:33:27', '1', '2021-12-30 20:37:58', b'0');
+INSERT INTO `tool_codegen_column` VALUES (486, 40, 'updater', 'varchar(64)', '更新者', b'1', b'0', '0', 8, 'String', 'updater', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '1', '2021-12-30 20:33:27', '1', '2021-12-30 20:37:58', b'0');
+INSERT INTO `tool_codegen_column` VALUES (487, 40, 'update_time', 'datetime', '更新时间', b'0', b'0', '0', 9, 'Date', 'updateTime', '', NULL, b'0', b'0', b'0', 'BETWEEN', b'0', 'datetime', '1', '2021-12-30 20:33:27', '1', '2021-12-30 20:37:58', b'0');
+INSERT INTO `tool_codegen_column` VALUES (488, 40, 'deleted', 'bit(1)', '是否删除', b'0', b'0', '0', 10, 'Boolean', 'deleted', '', NULL, b'0', b'0', b'0', '=', b'0', 'radio', '1', '2021-12-30 20:33:27', '1', '2021-12-30 20:37:58', b'0');
 COMMIT;
 
 -- ----------------------------
@@ -2139,13 +2340,13 @@ CREATE TABLE `tool_codegen_table` (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=40 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='代码生成表定义';
+) ENGINE=InnoDB AUTO_INCREMENT=41 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='代码生成表定义';
 
 -- ----------------------------
 -- Records of tool_codegen_table
 -- ----------------------------
 BEGIN;
-INSERT INTO `tool_codegen_table` VALUES (21, 1, 'inf_config', '参数配置表', NULL, 'infra', 'config', 'InfConfig', '参数配置', '芋艿', 1, NULL, '', '2021-02-06 19:51:35', '', '2021-02-06 19:51:35', b'0');
+INSERT INTO `tool_codegen_table` VALUES (21, 1, 'inf_config', '参数配置表', NULL, 'infra', 'config', 'InfConfig', '参数配置', '芋艿', 1, NULL, '', '2021-02-06 19:51:35', '1', '2021-12-31 22:06:46', b'0');
 INSERT INTO `tool_codegen_table` VALUES (22, 2, 'sys_file', '文件表\n', NULL, 'system', 'file', 'SysFile', '文件', '芋艿', 1, NULL, '', '2021-02-06 20:28:34', '', '2021-02-06 20:28:34', b'0');
 INSERT INTO `tool_codegen_table` VALUES (24, 1, 'inf_job', '定时任务表', NULL, 'infra', 'job', 'InfJob', '定时任务', '芋道源码', 1, NULL, '', '2021-02-07 06:39:34', '', '2021-02-07 06:46:56', b'0');
 INSERT INTO `tool_codegen_table` VALUES (25, 1, 'inf_job_log', '定时任务日志表', NULL, 'infra', 'jobLog', 'InfJobLog', '定时任务', '芋艿', 1, NULL, '', '2021-02-08 04:58:41', '', '2021-02-08 10:09:52', b'0');
@@ -2160,6 +2361,7 @@ INSERT INTO `tool_codegen_table` VALUES (36, 1, 'sys_sms_log', '短信日志', N
 INSERT INTO `tool_codegen_table` VALUES (37, 1, 'inf_error_code', '错误码表', NULL, 'infra', 'errorcode', 'InfErrorCode', '错误码', '芋道源码', 1, 2, '1', '2021-04-20 15:27:45', '1', '2021-04-21 00:55:37', b'0');
 INSERT INTO `tool_codegen_table` VALUES (38, 1, 'tool_test_demo', '字典类型表', NULL, 'tool', 'test', 'ToolTestDemo', '字典类型', '芋艿', 1, NULL, '1', '2021-04-26 12:25:51', '1', '2021-05-03 00:45:45', b'0');
 INSERT INTO `tool_codegen_table` VALUES (39, 1, 'sys_tenant', '租户表', NULL, 'system', 'tenant', 'SysTenant', '租户', '芋道源码', 1, 1, '1', '2021-12-05 01:04:21', '1', '2021-12-14 10:02:12', b'0');
+INSERT INTO `tool_codegen_table` VALUES (40, 1, 'bpm_form', '工作流的表单定义', NULL, 'bpm', 'form', 'BpmForm', '工作流的', '芋道源码', 1, 1186, '1', '2021-12-30 12:32:54', '1', '2021-12-30 20:37:58', b'0');
 COMMIT;
 
 -- ----------------------------

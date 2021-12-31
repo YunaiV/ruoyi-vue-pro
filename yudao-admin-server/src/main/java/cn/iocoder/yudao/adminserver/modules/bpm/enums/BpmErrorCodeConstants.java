@@ -30,6 +30,7 @@ public interface BpmErrorCodeConstants {
     ErrorCode BPMN_PROCESS_DEFINITION_NOT_EXISTS = new ErrorCode(1004001004, "流程定义不存在");
 
     // ========== 动态表单模块 1-003-003-000 ==========
-    ErrorCode BPM_FORM_NOT_EXISTS = new ErrorCode(1003001002, "动态表单不存在");
+    ErrorCode BPM_FORM_NOT_EXISTS = new ErrorCode(1003003000, "动态表单不存在");
+    ErrorCode BPM_FORM_FIELD_REPEAT = new ErrorCode(1003003000, "表单项({}) 和 ({}) 使用了相同的字段名({})");
 
 }

@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.service.form.impl;
 
+import cn.hutool.core.lang.Assert;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.form.vo.BpmFormCreateReqVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.form.vo.BpmFormPageReqVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.form.vo.BpmFormUpdateReqVO;
@@ -7,14 +8,19 @@ import cn.iocoder.yudao.adminserver.modules.bpm.convert.form.BpmFormConvert;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.form.BpmFormDO;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.mysql.form.BpmFormMapper;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.form.BpmFormService;
+import cn.iocoder.yudao.adminserver.modules.bpm.service.form.dto.BpmFormFieldRespDTO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import static cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants.BPM_FORM_FIELD_REPEAT;
 import static cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants.BPM_FORM_NOT_EXISTS;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 
@@ -32,6 +38,7 @@ public class BpmFormServiceImpl implements BpmFormService {
 
     @Override
     public Long createForm(BpmFormCreateReqVO createReqVO) {
+        this.checkFields(createReqVO.getFields());
         // 插入
         BpmFormDO form = BpmFormConvert.INSTANCE.convert(createReqVO);
         formMapper.insert(form);
@@ -41,6 +48,7 @@ public class BpmFormServiceImpl implements BpmFormService {
 
     @Override
     public void updateForm(BpmFormUpdateReqVO updateReqVO) {
+        this.checkFields(updateReqVO.getFields());
         // 校验存在
         this.validateFormExists(updateReqVO.getId());
         // 更新
@@ -75,6 +83,26 @@ public class BpmFormServiceImpl implements BpmFormService {
     @Override
     public PageResult<BpmFormDO> getFormPage(BpmFormPageReqVO pageReqVO) {
         return formMapper.selectPage(pageReqVO);
+    }
+
+    /**
+     * 校验 Field，避免 field 重复
+     *
+     * @param fields field 数组
+     */
+    private void checkFields(List<String> fields) {
+        Map<String, String> fieldMap = new HashMap<>(); // key 是 vModel，value 是 label
+        for (String field : fields) {
+            BpmFormFieldRespDTO fieldDTO = JsonUtils.parseObject(field, BpmFormFieldRespDTO.class);
+            Assert.notNull(fieldDTO);
+            String oldLabel = fieldMap.put(fieldDTO.getVModel(), fieldDTO.getLabel());
+            // 如果不存在，则直接返回
+            if (oldLabel == null) {
+                continue;
+            }
+            // 如果存在，则报错
+            throw exception(BPM_FORM_FIELD_REPEAT, oldLabel, fieldDTO.getLabel(), fieldDTO.getVModel());
+        }
     }
 
 }
