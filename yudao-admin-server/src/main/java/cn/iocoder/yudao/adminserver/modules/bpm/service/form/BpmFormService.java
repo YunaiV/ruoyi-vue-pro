@@ -1,14 +1,18 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.service.form;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.form.vo.BpmFormCreateReqVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.form.vo.BpmFormPageReqVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.form.vo.BpmFormUpdateReqVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.form.BpmFormDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 
 import javax.validation.Valid;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -55,6 +59,19 @@ public interface BpmFormService {
      * @return 动态表单列表
      */
     List<BpmFormDO> getFormList(Collection<Long> ids);
+
+    /**
+     * 获得动态表单 Map
+     *
+     * @param ids 编号
+     * @return 动态表单 Map
+     */
+    default Map<Long, BpmFormDO> getFormMap(Collection<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return Collections.emptyMap();
+        }
+        return CollectionUtils.convertMap(this.getFormList(ids), BpmFormDO::getId);
+    }
 
     /**
      * 获得动态表单分页

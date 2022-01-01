@@ -1,5 +1,6 @@
-package cn.iocoder.yudao.adminserver.modules.bpm.service.workflow;
+package cn.iocoder.yudao.adminserver.modules.bpm.service.model;
 
+import cn.iocoder.yudao.adminserver.modules.bpm.controller.model.vo.BpmModelRespVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.workflow.vo.FileResp;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.model.vo.ModelPageReqVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.model.vo.BpmModelCreateReqVO;
@@ -20,7 +21,7 @@ public interface BpmModelService {
      * @param pageVO 分页查询
      * @return 流程定义分页
      */
-    PageResult<Model> getModelPage(ModelPageReqVO pageVO);
+    PageResult<BpmModelRespVO> getModelPage(ModelPageReqVO pageVO);
 
     // TODO @Li：不用返回 CommonResult
     // TODO @Li：createBpmModal。

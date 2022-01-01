@@ -1,15 +1,15 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.controller.model;
 
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.workflow.vo.FileResp;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.model.vo.ModelPageReqVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.model.vo.BpmModelCreateReqVO;
-import cn.iocoder.yudao.adminserver.modules.bpm.service.workflow.BpmModelService;
+import cn.iocoder.yudao.adminserver.modules.bpm.controller.model.vo.BpmModelRespVO;
+import cn.iocoder.yudao.adminserver.modules.bpm.controller.model.vo.ModelPageReqVO;
+import cn.iocoder.yudao.adminserver.modules.bpm.controller.workflow.vo.FileResp;
+import cn.iocoder.yudao.adminserver.modules.bpm.service.model.BpmModelService;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.activiti.engine.repository.Model;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,7 +32,7 @@ public class BpmModelController {
 
     @GetMapping ("/page")
     @ApiOperation(value = "分页数据")
-    public CommonResult<PageResult<Model>> getModelPage(ModelPageReqVO pageVO) {
+    public CommonResult<PageResult<BpmModelRespVO>> getModelPage(ModelPageReqVO pageVO) {
        return success(bpmModelService.getModelPage(pageVO));
     }
 

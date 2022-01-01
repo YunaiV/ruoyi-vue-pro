@@ -1,5 +1,7 @@
 <template>
   <div class="app-container">
+
+    <!-- 搜索工作栏 -->
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
       <el-form-item label="模型名字" prop="name">
         <el-input v-model="queryParams.name" placeholder="请输入模型名字" clearable style="width: 240px;" size="small"
@@ -10,36 +12,31 @@
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
+
+    <!-- 操作工具栏 -->
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
-        <el-button
-          type="primary"
-          icon="el-icon-plus"
-          size="mini"
-          @click="openBpmn"
-          v-hasPermi="['infra:config:create']"
-        >新建流程</el-button>
+        <el-button type="primary" icon="el-icon-plus" size="mini" @click="openBpmn"
+                   v-hasPermi="['infra:config:create']">新建流程</el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
+
+    <!-- 列表 -->
     <el-table v-loading="loading" :data="list">
-      <el-table-column label="ID" align="center" prop="id" />
-      <el-table-column label="name" align="center" prop="metaInfo" >
-        <template slot-scope="scope">
-          <span>{{ scope.row.metaInfo ? JSON.parse(scope.row.metaInfo).name : "" }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="description" align="center" prop="metaInfo" >
-        <template slot-scope="scope">
-          <span>{{ JSON.parse(scope.row.metaInfo).description }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="创建时间" align="center" prop="createTime" >
+      <el-table-column label="流程编号" align="center" prop="id" :show-overflow-tooltip="true" />
+      <el-table-column label="流程标识" align="center" prop="key" />
+      <el-table-column label="流程名称" align="center" prop="name" />
+      <el-table-column label="流程分类" align="center" prop="category" />
+      <el-table-column label="表单信息" align="center" prop="formName" />
+      <el-table-column label="流程版本" align="center" prop="revision" />
+      <el-table-column label="状态" align="center" prop="rversion" />
+      <el-table-column label="创建时间" align="center" prop="createTime" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" >
+      <el-table-column label="操作" align="center" width="240">
         <template slot-scope="scope">
           <el-button size="mini" type="text" icon="el-icon-setting" @click="change(scope.row)">设计流程</el-button>
           <el-button size="mini" type="text" icon="el-icon-delete" @click="modelDelete(scope.row)">删除</el-button>

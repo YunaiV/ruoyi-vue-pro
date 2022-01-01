@@ -14,10 +14,6 @@ import javax.validation.constraints.NotEmpty;
 @ToString(callSuper = true)
 public class BpmModelCreateReqVO extends BpmModelBaseVO {
 
-    @ApiModelProperty(value = "流程标识", required = true, example = "process_yudao")
-    @NotEmpty(message = "流程标识不能为空")
-    private String key;
-
     @ApiModelProperty(value = "BPMN XML", required = true)
     @NotEmpty(message = "BPMN XML 不能为空")
     private String bpmnXml;
