@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.adminserver.modules.bpm.service.workflow.impl;
+package cn.iocoder.yudao.adminserver.modules.bpm.service.model.impl;
 
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.model.vo.BpmModelCreateReqVO;
@@ -8,6 +8,7 @@ import cn.iocoder.yudao.adminserver.modules.bpm.controller.workflow.vo.FileResp;
 import cn.iocoder.yudao.adminserver.modules.bpm.convert.model.ModelConvert;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.form.BpmFormDO;
 import cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants;
+import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmDefinitionService;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.form.BpmFormService;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.model.BpmModelService;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.model.dto.BpmModelMetaInfoRespDTO;
@@ -23,6 +24,7 @@ import org.activiti.engine.RepositoryService;
 import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.Model;
 import org.activiti.engine.repository.ModelQuery;
+import org.activiti.engine.repository.ProcessDefinition;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,16 +37,15 @@ import javax.xml.stream.XMLStreamReader;
 import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import static cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants.BPM_MODEL_KEY_EXISTS;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 
 /**
  * 流程定义实现
+ * 主要进行 Activiti {@link Model} 的维护
  *
  * @author yunlongn
  */
@@ -53,10 +54,14 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 @Slf4j
 public class BpmModelServiceImpl implements BpmModelService {
 
+    private static final String BPMN_FILE_SUFFIX = ".bpmn";
+
     @Resource
     private RepositoryService repositoryService;
     @Resource
     private BpmFormService bpmFormService;
+    @Resource
+    private BpmDefinitionService bpmDefinitionService;
 
     @Override
     public PageResult<BpmModelRespVO> getModelPage(ModelPageReqVO pageVO) {
@@ -67,7 +72,6 @@ public class BpmModelServiceImpl implements BpmModelService {
         // 执行查询
         List<Model> models = modelQuery.orderByCreateTime().desc()
                 .listPage(PageUtils.getStart(pageVO), pageVO.getPageSize());
-        long modelCount = modelQuery.count();
 
         // 获得 Form Map
         Set<Long> formIds = CollectionUtils.convertSet(models, model -> {
@@ -75,8 +79,16 @@ public class BpmModelServiceImpl implements BpmModelService {
             return metaInfo != null ? metaInfo.getFormId() : null;
         });
         Map<Long, BpmFormDO> formMap = bpmFormService.getFormMap(formIds);
+
+        // 获得 ProcessDefinition Map
+        Set<String> deploymentIds = new HashSet<>();
+        models.forEach(model -> CollectionUtils.addIfNotNull(deploymentIds, model.getId()));
+        List<ProcessDefinition> processDefinitions = bpmDefinitionService.getProcessDefinitionListByDeploymentIds(deploymentIds);
+        Map<String, ProcessDefinition> processDefinitionMap = convertMap(processDefinitions, ProcessDefinition::getDeploymentId);
+
         // 拼接结果
-        return new PageResult<>(ModelConvert.INSTANCE.convertList(models, formMap), modelCount);
+        long modelCount = modelQuery.count();
+        return new PageResult<>(ModelConvert.INSTANCE.convertList(models, formMap, processDefinitionMap), modelCount);
     }
 
     @Override
@@ -97,6 +109,38 @@ public class BpmModelServiceImpl implements BpmModelService {
         repositoryService.addModelEditorSource(model.getId(), StrUtil.utf8Bytes(createReqVO.getBpmnXml()));
         return model.getId();
     }
+
+//    @Override
+//    @Transactional(rollbackFor = Exception.class) // 因为进行多个 activiti 操作，所以开启事务
+//    public String createModel(BpmModelCreateReqVO createReqVO) {
+//        Deployment deploy = repositoryService.createDeployment()
+//                .key(createReqVO.getKey()).name(createReqVO.getName()).category(createReqVO.getCategory())
+//                .addString(createReqVO.getName() + BPMN_FILE_SUFFIX, createReqVO.getBpmnXml())
+//                .deploy();
+//        // 设置 ProcessDefinition 的 category 分类
+//        ProcessDefinition definition = repositoryService.createProcessDefinitionQuery().deploymentId(deploy.getId()).singleResult();
+//        repositoryService.setProcessDefinitionCategory(definition.getId(), createReqVO.getCategory());
+//        return definition.getId();
+//    }
+
+//    @Override
+//    @Transactional(rollbackFor = Exception.class) // 因为进行多个 activiti 操作，所以开启事务
+//    public String createModel(BpmModelCreateReqVO createReqVO) {
+//        // 校验流程标识已经存在
+//        Model keyModel = this.getModelByKey(createReqVO.getKey());
+//        if (keyModel != null) {
+//            throw exception(BPM_MODEL_KEY_EXISTS);
+//        }
+//
+//        // 创建流程定义
+//        Model model = repositoryService.newModel();
+//        ModelConvert.INSTANCE.copy(model, createReqVO);
+//        // 保存流程定义
+//        repositoryService.saveModel(model);
+//        // 添加 BPMN XML
+//        repositoryService.addModelEditorSource(model.getId(), StrUtil.utf8Bytes(createReqVO.getBpmnXml()));
+//        return model.getId();
+//    }
 
     @Override
     public CommonResult<String> updateModel(BpmModelCreateReqVO modelVO) {

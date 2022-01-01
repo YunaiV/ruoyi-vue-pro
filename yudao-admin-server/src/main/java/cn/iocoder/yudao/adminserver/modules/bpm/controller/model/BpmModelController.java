@@ -19,7 +19,7 @@ import java.io.IOException;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
-@Api(tags = "流程定义")
+@Api(tags = "流程模型")
 @RestController
 @RequestMapping("/bpm/model")
 @Validated

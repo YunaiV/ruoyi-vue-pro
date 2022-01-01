@@ -8,7 +8,7 @@ import lombok.ToString;
 
 import javax.validation.constraints.NotEmpty;
 
-@ApiModel("流程定义的创建 Request VO")
+@ApiModel("流程模型的创建 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
@@ -18,6 +18,4 @@ public class BpmModelCreateReqVO extends BpmModelBaseVO {
     @NotEmpty(message = "BPMN XML 不能为空")
     private String bpmnXml;
 
-//    @ApiModelProperty(value = "版本号")
-//    private Integer revision;
 }

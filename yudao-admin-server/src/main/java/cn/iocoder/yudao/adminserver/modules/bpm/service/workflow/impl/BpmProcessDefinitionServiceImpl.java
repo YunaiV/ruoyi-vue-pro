@@ -1,11 +1,12 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.service.workflow.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.workflow.vo.FileResp;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.workflow.vo.processdefinition.ProcessDefinitionPageReqVo;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.workflow.vo.processdefinition.ProcessDefinitionRespVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.convert.workflow.ProcessDefinitionConvert;
-import cn.iocoder.yudao.adminserver.modules.bpm.service.workflow.BpmProcessDefinitionService;
+import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmDefinitionService;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +18,9 @@ import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.repository.ProcessDefinitionQuery;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -27,7 +30,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class BpmProcessDefinitionServiceImpl implements BpmProcessDefinitionService {
+public class BpmProcessDefinitionServiceImpl implements BpmDefinitionService {
 
     private final RepositoryService repositoryService;
 
@@ -57,4 +60,13 @@ public class BpmProcessDefinitionServiceImpl implements BpmProcessDefinitionServ
         fileResp.setFileByte(bpmnBytes);
         return fileResp;
     }
+
+    @Override
+    public List<ProcessDefinition> getProcessDefinitionListByDeploymentIds(Set<String> deploymentIds) {
+        if (CollUtil.isEmpty(deploymentIds)) {
+            return Collections.emptyList();
+        }
+        return repositoryService.createProcessDefinitionQuery().deploymentIds(deploymentIds).list();
+    }
+
 }

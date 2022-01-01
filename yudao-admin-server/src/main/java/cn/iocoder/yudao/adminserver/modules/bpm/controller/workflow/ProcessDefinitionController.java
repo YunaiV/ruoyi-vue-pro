@@ -3,7 +3,7 @@ package cn.iocoder.yudao.adminserver.modules.bpm.controller.workflow;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.workflow.vo.FileResp;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.workflow.vo.processdefinition.ProcessDefinitionPageReqVo;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.workflow.vo.processdefinition.ProcessDefinitionRespVO;
-import cn.iocoder.yudao.adminserver.modules.bpm.service.workflow.BpmProcessDefinitionService;
+import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmDefinitionService;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
@@ -30,7 +30,7 @@ public class ProcessDefinitionController {
     @Resource
     private ProcessRuntime processRuntime;
     @Resource
-    private BpmProcessDefinitionService bpmProcessDefinitionService;
+    private BpmDefinitionService bpmProcessDefinitionService;
 
 
     @GetMapping(value = "/getStartForm")

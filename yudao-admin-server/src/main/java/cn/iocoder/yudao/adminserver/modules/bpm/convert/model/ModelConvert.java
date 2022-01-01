@@ -6,8 +6,8 @@ import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.form.BpmFormDO;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.model.dto.BpmModelMetaInfoRespDTO;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
-import org.activiti.engine.impl.persistence.entity.ModelEntity;
 import org.activiti.engine.repository.Model;
+import org.activiti.engine.repository.ProcessDefinition;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
@@ -25,15 +25,17 @@ public interface ModelConvert {
 
     ModelConvert INSTANCE = Mappers.getMapper(ModelConvert.class);
 
-    default List<BpmModelRespVO> convertList(List<Model> list, Map<Long, BpmFormDO> formMap) {
+    default List<BpmModelRespVO> convertList(List<Model> list, Map<Long, BpmFormDO> formMap,
+                                             Map<String, ProcessDefinition> processDefinitionMap) {
         return CollectionUtils.convertList(list, model -> {
             BpmModelMetaInfoRespDTO metaInfo = JsonUtils.parseObject(model.getMetaInfo(), BpmModelMetaInfoRespDTO.class);
             BpmFormDO form = metaInfo != null ? formMap.get(metaInfo.getFormId()) : null;
-            return convert(model, form);
+            ProcessDefinition processDefinition = model.getDeploymentId() != null ? processDefinitionMap.get(model.getDeploymentId()) : null;
+            return convert(model, form, processDefinition);
         });
     }
 
-    default BpmModelRespVO convert(Model model, BpmFormDO form) {
+    default BpmModelRespVO convert(Model model, BpmFormDO form, ProcessDefinition processDefinition) {
         BpmModelRespVO modelRespVO = new BpmModelRespVO();
         modelRespVO.setId(model.getId());
         modelRespVO.setName(model.getName());
@@ -48,10 +50,7 @@ public interface ModelConvert {
             modelRespVO.setFormId(form.getId());
             modelRespVO.setFormName(form.getName());
         }
-        if (model instanceof ModelEntity) {
-            ModelEntity modelEntity = (ModelEntity) model;
-            modelRespVO.setRevision(modelEntity.getRevision());
-        }
+        modelRespVO.setProcessDefinition(this.convert(processDefinition));
         return modelRespVO;
     }
 
@@ -68,5 +67,7 @@ public interface ModelConvert {
         metaInfo.setFormId(formId);
         return metaInfo;
     }
+
+    BpmModelRespVO.ProcessDefinition convert(ProcessDefinition bean);
 
 }

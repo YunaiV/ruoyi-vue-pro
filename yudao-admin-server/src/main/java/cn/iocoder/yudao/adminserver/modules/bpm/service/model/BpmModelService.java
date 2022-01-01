@@ -1,35 +1,34 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.service.model;
 
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.model.vo.BpmModelRespVO;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.workflow.vo.FileResp;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.model.vo.ModelPageReqVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.model.vo.BpmModelCreateReqVO;
+import cn.iocoder.yudao.adminserver.modules.bpm.controller.model.vo.BpmModelRespVO;
+import cn.iocoder.yudao.adminserver.modules.bpm.controller.model.vo.ModelPageReqVO;
+import cn.iocoder.yudao.adminserver.modules.bpm.controller.workflow.vo.FileResp;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import org.activiti.engine.repository.Model;
 
 /**
- * 流程定义接口
+ * 流程模型接口
  *
  * @author yunlongn
  */
 public interface BpmModelService {
 
     /**
-     * 获得流程定义分页
+     * 获得流程模型分页
      *
      * @param pageVO 分页查询
-     * @return 流程定义分页
+     * @return 流程模型分页
      */
     PageResult<BpmModelRespVO> getModelPage(ModelPageReqVO pageVO);
 
     // TODO @Li：不用返回 CommonResult
     // TODO @Li：createBpmModal。
     /**
-     * 创建流程定义
+     * 创建流程模型
      *
      * @param modelVO 创建信息
-     * @return 创建的流程定义的编号
+     * @return 创建的流程模型的编号
      */
     String createModel(BpmModelCreateReqVO modelVO);
 
