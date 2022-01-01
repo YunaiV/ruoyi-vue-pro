@@ -2,7 +2,9 @@
 <!--  <div id="app">-->
   <div class="app-container">
 
-    <my-process-palette />
+    <!-- TODO 芋艿：去除测试任务 -->
+<!--    <my-process-palette />-->
+
     <my-process-designer
       :key="`designer-${reloadIndex}`"
       v-model="xmlString"
@@ -53,16 +55,17 @@
       </el-form>
     </el-drawer>
 
-    <div class="info-tip">
-      <p>注：activiti 好像不支持表单配置，控制台可能会报错</p>
-      <p>更多配置请查看源码：<a href="https://github.com/miyuesc/bpmn-process-designer">MiyueSC/bpmn-process-designer</a></p>
-      <p>疑问请在此留言：<a href="https://github.com/miyuesc/bpmn-process-designer/issues/16">MiyueSC/bpmn-process-designer/issues</a></p>
-    </div>
+    <!-- TODO 芋艿：去掉多余的 faq -->
+<!--    <div class="info-tip">-->
+<!--      <p>注：activiti 好像不支持表单配置，控制台可能会报错</p>-->
+<!--      <p>更多配置请查看源码：<a href="https://github.com/miyuesc/bpmn-process-designer">MiyueSC/bpmn-process-designer</a></p>-->
+<!--      <p>疑问请在此留言：<a href="https://github.com/miyuesc/bpmn-process-designer/issues/16">MiyueSC/bpmn-process-designer/issues</a></p>-->
+<!--    </div>-->
   </div>
 </template>
 
 <script>
-import translations from "./translations";
+import translations from "@/components/bpmnProcessDesigner/src/translations";
 // 自定义渲染（隐藏了 label 标签）
 // TODO 芋艿：custom render 依赖报错
 // import CustomRenderer from "@/modules/custom-renderer";
@@ -197,13 +200,16 @@ body {
     cursor: pointer;
   }
 }
-.info-tip {
-  position: fixed;
-  top: 40px;
-  right: 500px;
-  z-index: 10;
-  color: #999999;
-}
+
+// TODO 芋艿：去掉多余的 faq
+//.info-tip {
+//  position: fixed;
+//  top: 40px;
+//  right: 500px;
+//  z-index: 10;
+//  color: #999999;
+//}
+
 .control-form {
   .el-radio {
     width: 100%;
@@ -216,6 +222,16 @@ body {
   background: rgba(0, 0, 0, 0.6);
   border-radius: 4px;
   color: #fafafa;
+}
+
+.bjs-container {
+  height: 400px !important; // TODO 芋艿：bjs 容器的高度不对，临时改下
+}
+.process-panel__container { // TODO 芋艿：右边的位置不对，临时改下
+  margin-top: -200px;
+  float: right;
+  height: 800px;
+  z-index: 2147483647 !important;
 }
 
 body,
