@@ -1,9 +1,6 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.controller.model;
 
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.model.vo.BpmModelCreateReqVO;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.model.vo.BpmModelPageItemRespVO;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.model.vo.BpmModelRespVO;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.model.vo.ModelPageReqVO;
+import cn.iocoder.yudao.adminserver.modules.bpm.controller.model.vo.*;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.model.BpmModelService;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -49,16 +46,19 @@ public class BpmModelController {
        return success(bpmModelService.createModel(createRetVO));
     }
 
-    @PostMapping("/update")
-    @ApiOperation(value = "修改模型属性")
-    public CommonResult<String> updateModel(@RequestBody BpmModelCreateReqVO modelVO) {
-       return bpmModelService.updateModel(modelVO);
+    @PutMapping("/update")
+    @ApiOperation(value = "修改模型")
+    public CommonResult<Boolean> updateModel(@RequestBody BpmModelUpdateReqVO modelVO) {
+        bpmModelService.updateModel(modelVO);
+        return success(true);
     }
 
-    @PostMapping("/delete")
-    @ApiOperation(value = "删除模型")
-    public CommonResult<String> deleteModel(@RequestParam String modelId) {
-       return bpmModelService.deleteModel(modelId);
+    @DeleteMapping("/delete")
+    @ApiOperation("删除模型")
+    @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = String.class)
+    public CommonResult<Boolean> deleteModel(@RequestParam("id")  String id) {
+        bpmModelService.deleteModel(id);
+        return success(true);
     }
 
     @PostMapping("/deploy")

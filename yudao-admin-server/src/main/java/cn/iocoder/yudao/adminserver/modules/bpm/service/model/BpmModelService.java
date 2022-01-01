@@ -1,11 +1,10 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.service.model;
 
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.model.vo.BpmModelCreateReqVO;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.model.vo.BpmModelPageItemRespVO;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.model.vo.BpmModelRespVO;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.model.vo.ModelPageReqVO;
+import cn.iocoder.yudao.adminserver.modules.bpm.controller.model.vo.*;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+
+import javax.validation.Valid;
 
 /**
  * 流程模型接口
@@ -30,22 +29,20 @@ public interface BpmModelService {
      */
     BpmModelRespVO getModel(String id);
 
-    // TODO @Li：不用返回 CommonResult
-    // TODO @Li：createBpmModal。
     /**
      * 创建流程模型
      *
      * @param modelVO 创建信息
      * @return 创建的流程模型的编号
      */
-    String createModel(BpmModelCreateReqVO modelVO);
+    String createModel(@Valid BpmModelCreateReqVO modelVO);
 
     /**
-     * 修改模型属性，填充bpmn数据
-     * @param modelVO 模型对象
-     * @return 返回成功
+     * 修改流程模型
+     *
+     * @param updateReqVO 更新信息
      */
-    CommonResult<String> updateModel(BpmModelCreateReqVO modelVO);
+    void updateModel(@Valid BpmModelUpdateReqVO updateReqVO);
 
     /**
      * 部署模型 使模型成为一个 process
@@ -56,9 +53,9 @@ public interface BpmModelService {
 
     /**
      * 删除模型
-     * @param modelId 模型Id
-     * @return 返回成功
+     *
+     * @param id 编号
      */
-    CommonResult<String> deleteModel(String modelId);
+    void deleteModel(String id);
 
 }

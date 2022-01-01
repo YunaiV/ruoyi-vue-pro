@@ -16,7 +16,7 @@
     <!-- 操作工具栏 -->
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
-        <el-button type="primary" icon="el-icon-plus" size="mini" @click="openBpmn"
+        <el-button type="primary" icon="el-icon-plus" size="mini" @click="handleAdd"
                    v-hasPermi="['infra:config:create']">新建流程</el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
@@ -38,26 +38,26 @@
       </el-table-column>
       <el-table-column label="操作" align="center" width="240">
         <template slot-scope="scope">
-          <el-button size="mini" type="text" icon="el-icon-setting" @click="change(scope.row)">设计流程</el-button>
+          <el-button size="mini" type="text" icon="el-icon-setting" @click="handleUpdate(scope.row)">设计流程</el-button>
           <el-button size="mini" type="text" icon="el-icon-delete" @click="modelDelete(scope.row)">删除</el-button>
           <el-button size="mini" type="text" icon="el-icon-thumb" @click="modelDeploy(scope.row)">发布</el-button>
         </template>
       </el-table-column>
     </el-table>
-
+    <!-- 分页组件 -->
     <pagination v-show="total>0" :total="total" :page.sync="queryParams.pageNo" :limit.sync="queryParams.pageSize"
                 @pagination="getList"/>
 
-
-    <el-dialog class="bpmnclass dialogClass" :visible.sync="showBpmnBool" :before-close="close" :fullscreen="true">
-      <vue-bpmn v-if="showBpmnBool" product="activiti" @processSave="processSave"
-                :bpmnXml="bpmnXML" :bpmnData="bpmnData" @beforeClose="close" />
+    <!-- 流程编辑器 -->
+    <el-dialog class="bpmnclass dialogClass" :visible.sync="showBpmnOpen" :before-cancel="cancel" :fullscreen="true">
+      <vue-bpmn v-if="showBpmnOpen" product="activiti" @processSave="processSave"
+                :bpmnXml="bpmnXML" :bpmnData="bpmnData" @beforeClose="cancel" />
     </el-dialog>
   </div>
 </template>
 
 <script>
-import {modelDelete, modelDeploy, modelSave, modelUpdate, page, getModel} from "@/api/bpm/model";
+import {deleteModel, deployModel, createModel, updateModel, getModelPage, getModel} from "@/api/bpm/model";
 import VueBpmn from "@/components/bpmn/VueBpmn";
 
 export default {
@@ -68,7 +68,6 @@ export default {
       loading: true,
       // 显示搜索条件
       showSearch: true,
-      showBpmnBool: false,
       // 总条数
       total: 0,
       // 表格数据
@@ -79,6 +78,7 @@ export default {
         pageSize: 10
       },
       // BPMN 数据
+      showBpmnOpen: false,
       bpmnXML: null,
       bpmnData: {},
     };
@@ -88,19 +88,20 @@ export default {
     this.getList();
   },
   methods: {
-    /** 查询登录日志列表 */
+    /** 查询流程模型列表 */
     getList() {
       this.loading = true;
-      page(this.queryParams).then(response => {
+      getModelPage(this.queryParams).then(response => {
           this.list = response.data.list;
           this.total = response.data.total;
           this.loading = false;
         }
       );
     },
-    // 登录状态字典翻译
-    statusFormat(row, column) {
-      return this.selectDictLabel(this.statusOptions, row.status);
+    // 表单重置
+    reset() {
+      this.bpmnData = {}
+      this.bpmnXML = ""
     },
     /** 搜索按钮操作 */
     handleQuery() {
@@ -114,49 +115,48 @@ export default {
       this.handleQuery();
     },
     processSave(data) {
-      const that = this;
-      // 如果存在id 说明是修改
+      // 修改的提交
       if (data.id) {
-        let postData = JSON.parse(data.metaInfo)
-        postData.bpmnXml = data.bpmnXml
-        postData.id = data.id
-        postData.name = data.name
-        postData.key = data.key
-        postData.description = data.description
-        modelUpdate(postData).then(response => {
-          this.msgSuccess("保存成功");
+        updateModel(data).then(response => {
+          this.msgSuccess("修改成功");
+          // 关闭弹窗，刷新列表
+          this.showBpmnOpen = false
+          this.getList();
         })
-        this.showBpmnBool = false
-        this.getList();
         return
       }
-      modelSave(data).then(response => {
-        that.bpmnData.id = response.data
+      // 添加的提交
+      createModel(data).then(response => {
+        this.bpmnData.id = response.data
         this.msgSuccess("保存成功");
+        // 关闭弹窗，刷新列表
+        this.showBpmnOpen = false
+        this.getList();
       })
-
-      this.showBpmnBool = false
-      this.getList();
     },
-    openBpmn() {
-      this.bpmnData = {}
-      this.bpmnXML = ""
-      this.showBpmnBool = true
-    },
-    close() {
-      this.showBpmnBool = false
-      this.getList();
-    },
-    change(row) {
+    handleAdd() {
       // 重置 Model 信息
-      this.bpmnXML = ""
-      this.bpmnData = {}
+      this.reset()
+      // 打开弹窗
+      this.showBpmnOpen = true
+    },
+    cancel() {
+      // 打开弹窗
+      this.showBpmnOpen = false
+      // 重置 Model 信息
+      this.reset()
+      // 刷新列表
+      this.getList()
+    },
+    handleUpdate(row) {
+      // 重置 Model 信息
+      this.reset()
       // 获得 Model 信息
       getModel(row.id).then(response => {
         this.bpmnXML = response.data.bpmnXml
         this.bpmnData = response.data
         // 打开弹窗
-        this.showBpmnBool = true
+        this.showBpmnOpen = true
       })
     },
     modelDelete(row) {
@@ -166,9 +166,7 @@ export default {
         cancelButtonText: "取消",
         type: "warning"
       }).then(function() {
-        modelDelete({
-          modelId: row.id
-        }).then(response => {
+        deleteModel(row.id).then(response => {
           that.getList();
           that.msgSuccess("删除成功");
         })
@@ -181,7 +179,7 @@ export default {
         cancelButtonText: "取消",
         type: "success"
       }).then(function() {
-        modelDeploy({
+        deployModel({
           modelId: row.id
         }).then(response => {
           that.getList();

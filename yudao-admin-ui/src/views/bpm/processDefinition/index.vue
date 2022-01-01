@@ -33,8 +33,8 @@
       <el-table-column label="操作" align="center" >
         <template slot-scope="scope">
 <!--          <el-button size="mini" type="text" icon="el-icon-setting" @click="change(scope.row)">设计流程</el-button>-->
-<!--          <el-button size="mini" type="text" icon="el-icon-delete" @click="modelDelete(scope.row)">删除</el-button>-->
-<!--          <el-button size="mini" type="text" icon="el-icon-thumb" @click="modelDeploy(scope.row)">发布</el-button>-->
+<!--          <el-button size="mini" type="text" icon="el-icon-delete" @click="deleteModel(scope.row)">删除</el-button>-->
+<!--          <el-button size="mini" type="text" icon="el-icon-thumb" @click="deployModel(scope.row)">发布</el-button>-->
         </template>
       </el-table-column>
     </el-table>
@@ -114,14 +114,14 @@ export default {
         postData.name = data.name
         postData.key = data.key
         postData.description = data.description
-        modelUpdate(postData).then(response => {
+        updateModel(postData).then(response => {
           this.msgSuccess("保存成功");
         })
         this.showBpmnBool = false
         this.getList();
         return
       }
-      modelSave(data).then(response => {
+      createModel(data).then(response => {
         that.bpmnData.id = response.data
         this.msgSuccess("保存成功");
       })
@@ -151,7 +151,7 @@ export default {
         cancelButtonText: "取消",
         type: "warning"
       }).then(function() {
-        modelDelete({
+        deleteModel({
           modelId: row.id
         }).then(response => {
           that.getList();
@@ -166,7 +166,7 @@ export default {
         cancelButtonText: "取消",
         type: "success"
       }).then(function() {
-        modelDeploy({
+        deployModel({
           modelId: row.id
         }).then(response => {
           that.getList();

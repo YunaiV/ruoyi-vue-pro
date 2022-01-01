@@ -3,6 +3,7 @@ package cn.iocoder.yudao.adminserver.modules.bpm.convert.model;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.model.vo.BpmModelCreateReqVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.model.vo.BpmModelPageItemRespVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.model.vo.BpmModelRespVO;
+import cn.iocoder.yudao.adminserver.modules.bpm.controller.model.vo.BpmModelUpdateReqVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.form.BpmFormDO;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.model.dto.BpmModelMetaInfoRespDTO;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
@@ -60,6 +61,12 @@ public interface ModelConvert {
     default void copy(Model model, BpmModelCreateReqVO bean) {
         model.setName(bean.getName());
         model.setKey(bean.getKey());
+        model.setCategory(bean.getCategory());
+        model.setMetaInfo(JsonUtils.toJsonString(this.buildMetaInfo(bean.getDescription(), bean.getFormId())));
+    }
+
+    default void copy(Model model, BpmModelUpdateReqVO bean) {
+        model.setName(bean.getName());
         model.setCategory(bean.getCategory());
         model.setMetaInfo(JsonUtils.toJsonString(this.buildMetaInfo(bean.getDescription(), bean.getFormId())));
     }

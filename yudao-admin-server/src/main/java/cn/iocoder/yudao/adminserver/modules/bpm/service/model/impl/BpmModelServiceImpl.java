@@ -2,10 +2,7 @@ package cn.iocoder.yudao.adminserver.modules.bpm.service.model.impl;
 
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.model.vo.BpmModelCreateReqVO;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.model.vo.BpmModelPageItemRespVO;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.model.vo.BpmModelRespVO;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.model.vo.ModelPageReqVO;
+import cn.iocoder.yudao.adminserver.modules.bpm.controller.model.vo.*;
 import cn.iocoder.yudao.adminserver.modules.bpm.convert.model.ModelConvert;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.form.BpmFormDO;
 import cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants;
@@ -115,6 +112,7 @@ public class BpmModelServiceImpl implements BpmModelService {
         if (keyModel != null) {
             throw exception(BPM_MODEL_KEY_EXISTS);
         }
+        // TODO @芋艿：需要校验下 key 的格式
 
         // 创建流程定义
         Model model = repositoryService.newModel();
@@ -139,53 +137,22 @@ public class BpmModelServiceImpl implements BpmModelService {
 //        return definition.getId();
 //    }
 
-//    @Override
-//    @Transactional(rollbackFor = Exception.class) // 因为进行多个 activiti 操作，所以开启事务
-//    public String createModel(BpmModelCreateReqVO createReqVO) {
-//        // 校验流程标识已经存在
-//        Model keyModel = this.getModelByKey(createReqVO.getKey());
-//        if (keyModel != null) {
-//            throw exception(BPM_MODEL_KEY_EXISTS);
-//        }
-//
-//        // 创建流程定义
-//        Model model = repositoryService.newModel();
-//        ModelConvert.INSTANCE.copy(model, createReqVO);
-//        // 保存流程定义
-//        repositoryService.saveModel(model);
-//        // 添加 BPMN XML
-//        repositoryService.addModelEditorSource(model.getId(), StrUtil.utf8Bytes(createReqVO.getBpmnXml()));
-//        return model.getId();
-//    }
-
     @Override
-    public CommonResult<String> updateModel(BpmModelCreateReqVO modelVO) {
-//        try {
-//            Model model = repositoryService.getModel(modelVO.getId());
-//            if (ObjectUtils.isEmpty(model)) {
-//                throw ServiceExceptionUtil.exception(BpmErrorCodeConstants.BPMN_MODEL_EDITOR_SOURCE_NOT_EXISTS);
-//            }
-//            // 只能修改名字跟描述
-//            BpmModelCreateReqVO modelCreateVO = JsonUtils.parseObject(model.getMetaInfo(), BpmModelCreateReqVO.class);
-//            if (ObjectUtils.isEmpty(modelCreateVO)) {
-//                modelCreateVO = new BpmModelCreateReqVO();
-//            }
-//            modelCreateVO.setName(modelVO.getName());
-//            modelCreateVO.setDescription(modelVO.getDescription());
-//            model.setMetaInfo(JsonUtils.toJsonString(modelCreateVO));
-//            model.setName(modelVO.getName());
-//            model.setKey(modelVO.getKey());
-//            // 更新模型
-//            repositoryService.saveModel(model);
-//
-//            repositoryService.addModelEditorSource(model.getId(), modelVO.getBpmnXml().getBytes(StandardCharsets.UTF_8));
-//
-//            return CommonResult.success("保存成功");
-//        }catch (Exception e){
-//            log.info("模型更新失败！modelVO = {}", modelVO, e);
-//            throw ServiceExceptionUtil.exception(BpmErrorCodeConstants.BPMN_MODEL_ERROR);
-//        }
-        return null;
+    @Transactional(rollbackFor = Exception.class) // 因为进行多个 activiti 操作，所以开启事务
+    public void updateModel(BpmModelUpdateReqVO updateReqVO) {
+        // 校验流程模型存在
+        Model model = repositoryService.getModel(updateReqVO.getId());
+        if (model == null) {
+            throw exception(BpmErrorCodeConstants.BPMN_MODEL_NOT_EXISTS);
+        }
+        // TODO @芋艿：需要校验下 key 的格式
+
+        // 修改流程定义
+        ModelConvert.INSTANCE.copy(model, updateReqVO);
+        // 更新模型
+        repositoryService.saveModel(model);
+        // 更新 BPMN XML
+        repositoryService.addModelEditorSource(model.getId(), StrUtil.utf8Bytes(updateReqVO.getBpmnXml()));
     }
 
     @Override
@@ -193,11 +160,11 @@ public class BpmModelServiceImpl implements BpmModelService {
         try {
             Model modelData = repositoryService.getModel(modelId);
             if (ObjectUtils.isEmpty(modelData)) {
-                throw exception(BpmErrorCodeConstants.BPMN_MODEL_EDITOR_SOURCE_NOT_EXISTS);
+                throw exception(BpmErrorCodeConstants.BPMN_MODEL_NOT_EXISTS);
             }
             byte[] bytes = repositoryService.getModelEditorSource(modelData.getId());
             if (bytes == null) {
-                throw exception(BpmErrorCodeConstants.BPMN_MODEL_EDITOR_SOURCE_NOT_EXISTS);
+                throw exception(BpmErrorCodeConstants.BPMN_MODEL_NOT_EXISTS);
             }
             // 将xml转换为流
             // TODO @Li：这里是标准逻辑，看看 hutool 有没工具类提供。如果没有，咱自己封装一个
@@ -226,10 +193,14 @@ public class BpmModelServiceImpl implements BpmModelService {
     }
 
     @Override
-    public CommonResult<String> deleteModel(String modelId) {
-        // TODO @Li：activitie 是逻辑删除么？
-        repositoryService.deleteModel(modelId);
-        return CommonResult.success("删除成功");
+    public void deleteModel(String id) {
+        // 校验流程模型存在
+        Model model = repositoryService.getModel(id);
+        if (model == null) {
+            throw exception(BpmErrorCodeConstants.BPMN_MODEL_NOT_EXISTS);
+        }
+        // 执行删除
+        repositoryService.deleteModel(id);
     }
 
     private Model getModelByKey(String key) {
