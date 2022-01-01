@@ -163,6 +163,19 @@ export const constantRoutes = [
       }
     ]
   },
+  {
+    path: '/bpm',
+    component: Layout,
+    hidden: true,
+    children: [
+      {
+        path: 'manager/model/edit',
+        component: (resolve) => require(['@/views/bpm/model/modelEditor'], resolve),
+        name: '流程模型-编辑',
+        meta: { title: '流程模型-编辑' }
+      }
+    ]
+  },
 ]
 
 export default new Router({

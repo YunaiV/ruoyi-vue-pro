@@ -59,7 +59,10 @@
     "vue-cropper": "0.5.5",
     "vue-router": "3.4.9",
     "vuedraggable": "2.24.3",
-    "vuex": "3.6.0"
+    "vuex": "3.6.0",
+    "bpmn-js-token-simulation": "^0.10.0",
+    "min-dash": "^3.5.2",
+    "xml-js": "^1.6.11"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "4.4.6",
@@ -77,7 +80,19 @@
     "script-ext-html-webpack-plugin": "2.1.5",
     "svg-sprite-loader": "5.1.1",
     "vue-template-compiler": "2.6.12",
-    "vue2-ace-editor": "^0.0.15"
+    "vue2-ace-editor": "^0.0.15",
+    "@vue/compiler-sfc": "^3.0.1",
+    "@vue/eslint-config-prettier": "^5.0.0",
+    "axios": "^0.21.1",
+    "bpmn-js": "^7.4.0",
+    "bpmn-js-properties-panel": "^0.37.2",
+    "camunda-bpmn-moddle": "^4.4.1",
+    "compression-webpack-plugin": "^6.1.1",
+    "element-ui": "^2.13.2",
+    "eslint-plugin-prettier": "^3.1.0",
+    "fs-extra": "^8.1.0",
+    "terser-webpack-plugin": "^4.2.3",
+    "webpack-bundle-analyzer": "^3.9.0"
   },
   "engines": {
     "node": ">=8.9",
