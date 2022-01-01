@@ -47,14 +47,17 @@
 
     <pagination v-show="total>0" :total="total" :page.sync="queryParams.pageNo" :limit.sync="queryParams.pageSize"
                 @pagination="getList"/>
+
+
     <el-dialog class="bpmnclass dialogClass" :visible.sync="showBpmnBool" :before-close="close" :fullscreen="true">
-      <vue-bpmn v-if="showBpmnBool" product="activiti" @processSave="processSave" :bpmnXml="bpmnXML" :bpmnData="bpmnData" @beforeClose="close"></vue-bpmn>
+      <vue-bpmn v-if="showBpmnBool" product="activiti" @processSave="processSave"
+                :bpmnXml="bpmnXML" :bpmnData="bpmnData" @beforeClose="close" />
     </el-dialog>
   </div>
 </template>
 
 <script>
-import {exportBpmnXml, modelDelete, modelDeploy, modelSave, modelUpdate, page} from "@/api/bpm/model";
+import {modelDelete, modelDeploy, modelSave, modelUpdate, page, getModel} from "@/api/bpm/model";
 import VueBpmn from "@/components/bpmn/VueBpmn";
 
 export default {
@@ -70,13 +73,14 @@ export default {
       total: 0,
       // 表格数据
       list: [],
-      bpmnXML: null,
-      bpmnData: {},
       // 查询参数
       queryParams: {
         pageNo: 1,
         pageSize: 10
-      }
+      },
+      // BPMN 数据
+      bpmnXML: null,
+      bpmnData: {},
     };
   },
   components: {VueBpmn},
@@ -144,15 +148,15 @@ export default {
       this.getList();
     },
     change(row) {
-      const that = this;
+      // 重置 Model 信息
       this.bpmnXML = ""
       this.bpmnData = {}
-      exportBpmnXml({
-        modelId: row.id
-      }).then(response => {
-        that.bpmnXML = response
-        that.bpmnData = row
-        that.showBpmnBool = true
+      // 获得 Model 信息
+      getModel(row.id).then(response => {
+        this.bpmnXML = response.data.bpmnXml
+        this.bpmnData = response.data
+        // 打开弹窗
+        this.showBpmnBool = true
       })
     },
     modelDelete(row) {

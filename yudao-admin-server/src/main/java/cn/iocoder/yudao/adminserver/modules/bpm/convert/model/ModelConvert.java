@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.convert.model;
 
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.model.vo.BpmModelCreateReqVO;
+import cn.iocoder.yudao.adminserver.modules.bpm.controller.model.vo.BpmModelPageItemRespVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.model.vo.BpmModelRespVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.form.BpmFormDO;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.model.dto.BpmModelMetaInfoRespDTO;
@@ -25,8 +26,8 @@ public interface ModelConvert {
 
     ModelConvert INSTANCE = Mappers.getMapper(ModelConvert.class);
 
-    default List<BpmModelRespVO> convertList(List<Model> list, Map<Long, BpmFormDO> formMap,
-                                             Map<String, ProcessDefinition> processDefinitionMap) {
+    default List<BpmModelPageItemRespVO> convertList(List<Model> list, Map<Long, BpmFormDO> formMap,
+                                                     Map<String, ProcessDefinition> processDefinitionMap) {
         return CollectionUtils.convertList(list, model -> {
             BpmModelMetaInfoRespDTO metaInfo = JsonUtils.parseObject(model.getMetaInfo(), BpmModelMetaInfoRespDTO.class);
             BpmFormDO form = metaInfo != null ? formMap.get(metaInfo.getFormId()) : null;
@@ -35,8 +36,8 @@ public interface ModelConvert {
         });
     }
 
-    default BpmModelRespVO convert(Model model, BpmFormDO form, ProcessDefinition processDefinition) {
-        BpmModelRespVO modelRespVO = new BpmModelRespVO();
+    default BpmModelPageItemRespVO convert(Model model, BpmFormDO form, ProcessDefinition processDefinition) {
+        BpmModelPageItemRespVO modelRespVO = new BpmModelPageItemRespVO();
         modelRespVO.setId(model.getId());
         modelRespVO.setName(model.getName());
         modelRespVO.setKey(model.getKey());
@@ -54,6 +55,8 @@ public interface ModelConvert {
         return modelRespVO;
     }
 
+    BpmModelRespVO convert(Model model);
+
     default void copy(Model model, BpmModelCreateReqVO bean) {
         model.setName(bean.getName());
         model.setKey(bean.getKey());
@@ -68,6 +71,6 @@ public interface ModelConvert {
         return metaInfo;
     }
 
-    BpmModelRespVO.ProcessDefinition convert(ProcessDefinition bean);
+    BpmModelPageItemRespVO.ProcessDefinition convert(ProcessDefinition bean);
 
 }

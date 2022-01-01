@@ -1,10 +1,11 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.service.model.impl;
 
+import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.model.vo.BpmModelCreateReqVO;
+import cn.iocoder.yudao.adminserver.modules.bpm.controller.model.vo.BpmModelPageItemRespVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.model.vo.BpmModelRespVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.model.vo.ModelPageReqVO;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.workflow.vo.FileResp;
 import cn.iocoder.yudao.adminserver.modules.bpm.convert.model.ModelConvert;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.form.BpmFormDO;
 import cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants;
@@ -37,7 +38,10 @@ import javax.xml.stream.XMLStreamReader;
 import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants.BPM_MODEL_KEY_EXISTS;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -64,7 +68,7 @@ public class BpmModelServiceImpl implements BpmModelService {
     private BpmDefinitionService bpmDefinitionService;
 
     @Override
-    public PageResult<BpmModelRespVO> getModelPage(ModelPageReqVO pageVO) {
+    public PageResult<BpmModelPageItemRespVO> getModelPage(ModelPageReqVO pageVO) {
         ModelQuery modelQuery = repositoryService.createModelQuery();
         if (StrUtil.isNotBlank(pageVO.getName())) {
             modelQuery.modelNameLike("%" + pageVO.getName() + "%"); // 模糊匹配
@@ -89,6 +93,18 @@ public class BpmModelServiceImpl implements BpmModelService {
         // 拼接结果
         long modelCount = modelQuery.count();
         return new PageResult<>(ModelConvert.INSTANCE.convertList(models, formMap, processDefinitionMap), modelCount);
+    }
+
+    @Override
+    public BpmModelRespVO getModel(String id) {
+        Model model = repositoryService.getModel(id);
+        BpmModelRespVO modelRespVO = ModelConvert.INSTANCE.convert(model);
+        // 拼接 bpmn XML
+        byte[] bpmnBytes = repositoryService.getModelEditorSource(id);
+        if (ArrayUtil.isNotEmpty(bpmnBytes)) {
+            modelRespVO.setBpmnXml(StrUtil.utf8Str(bpmnBytes));
+        }
+        return modelRespVO;
     }
 
     @Override
@@ -203,24 +219,6 @@ public class BpmModelServiceImpl implements BpmModelService {
                     .deploy();
             // 部署成功
             return CommonResult.success(deployment.getId());
-        } catch (Exception e) {
-            log.info("模型部署失败！modelId = {} e = {} ", modelId, ExceptionUtils.getStackTrace(e));
-            throw exception(BpmErrorCodeConstants.BPMN_MODEL_ERROR);
-        }
-    }
-
-    @Override
-    public FileResp exportBpmnXml(String modelId) {
-        try {
-            Model modelData = repositoryService.getModel(modelId);
-            if (ObjectUtils.isEmpty(modelData)) {
-                throw exception(BpmErrorCodeConstants.BPMN_MODEL_EDITOR_SOURCE_NOT_EXISTS);
-            }
-            byte[] bytes = repositoryService.getModelEditorSource(modelData.getId());
-            FileResp fileResp = new FileResp();
-            fileResp.setFileName(String.format("%s.bpmn", Optional.ofNullable(modelData.getName()).orElse("流程图")));
-            fileResp.setFileByte(bytes);
-            return fileResp;
         } catch (Exception e) {
             log.info("模型部署失败！modelId = {} e = {} ", modelId, ExceptionUtils.getStackTrace(e));
             throw exception(BpmErrorCodeConstants.BPMN_MODEL_ERROR);

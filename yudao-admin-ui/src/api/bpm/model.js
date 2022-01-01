@@ -8,11 +8,10 @@ export function page(query) {
   })
 }
 
-export function exportBpmnXml(query) {
+export function getModel(id) {
   return request({
-    url: '/bpm/model/exportBpmnXml',
-    method: 'get',
-    params: query
+    url: '/bpm/model/get?id=' + id,
+    method: 'get'
   })
 }
 

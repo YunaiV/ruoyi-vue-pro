@@ -1,21 +1,19 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.controller.model;
 
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.model.vo.BpmModelCreateReqVO;
+import cn.iocoder.yudao.adminserver.modules.bpm.controller.model.vo.BpmModelPageItemRespVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.model.vo.BpmModelRespVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.model.vo.ModelPageReqVO;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.workflow.vo.FileResp;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.model.BpmModelService;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
@@ -31,9 +29,18 @@ public class BpmModelController {
     // TODO @芋艿：权限
 
     @GetMapping ("/page")
-    @ApiOperation(value = "分页数据")
-    public CommonResult<PageResult<BpmModelRespVO>> getModelPage(ModelPageReqVO pageVO) {
+    @ApiOperation(value = "获得模型分页")
+    public CommonResult<PageResult<BpmModelPageItemRespVO>> getModelPage(ModelPageReqVO pageVO) {
        return success(bpmModelService.getModelPage(pageVO));
+    }
+
+    @GetMapping("/get")
+    @ApiOperation("获得模型")
+    @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = String.class)
+//    @PreAuthorize("@ss.hasPermission('bpm:form:query')")
+    public CommonResult<BpmModelRespVO> getModel(@RequestParam("id") String id) {
+        BpmModelRespVO model = bpmModelService.getModel(id);
+        return success(model);
     }
 
     @PostMapping("/create")
@@ -58,13 +65,6 @@ public class BpmModelController {
     @ApiOperation(value = "部署模型")
     public CommonResult<String> deploy(@RequestParam String modelId) {
        return bpmModelService.deploy(modelId);
-    }
-
-    @GetMapping("/exportBpmnXml")
-    @ApiOperation(value = "导出模型Xml")
-    public void export(@RequestParam String modelId, HttpServletResponse response) throws IOException {
-        FileResp fileResp = bpmModelService.exportBpmnXml(modelId);
-        ServletUtils.writeAttachment(response, fileResp.getFileName(), fileResp.getFileByte());
     }
 
 }

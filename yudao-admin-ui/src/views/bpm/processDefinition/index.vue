@@ -142,13 +142,7 @@ export default {
       const that = this;
       this.bpmnXML = ""
       this.bpmnData = {}
-      exportBpmnXml({
-        modelId: row.id
-      }).then(response => {
-        that.bpmnXML = response
-        that.bpmnData = row
-        that.showBpmnBool = true
-      })
+      // TODO @芋艿：修改成 getModel
     },
     modelDelete(row) {
       const that = this;

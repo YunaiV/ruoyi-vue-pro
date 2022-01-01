@@ -1,9 +1,9 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.service.model;
 
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.model.vo.BpmModelCreateReqVO;
+import cn.iocoder.yudao.adminserver.modules.bpm.controller.model.vo.BpmModelPageItemRespVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.model.vo.BpmModelRespVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.model.vo.ModelPageReqVO;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.workflow.vo.FileResp;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 
@@ -20,7 +20,15 @@ public interface BpmModelService {
      * @param pageVO 分页查询
      * @return 流程模型分页
      */
-    PageResult<BpmModelRespVO> getModelPage(ModelPageReqVO pageVO);
+    PageResult<BpmModelPageItemRespVO> getModelPage(ModelPageReqVO pageVO);
+
+    /**
+     * 获得流程模块
+     *
+     * @param id 编号
+     * @return 流程模型
+     */
+    BpmModelRespVO getModel(String id);
 
     // TODO @Li：不用返回 CommonResult
     // TODO @Li：createBpmModal。
@@ -47,16 +55,10 @@ public interface BpmModelService {
     CommonResult<String> deploy(String modelId);
 
     /**
-     * 导出模型
-     * @param modelId 模型Id
-     * @return {@link FileResp} 返回文件
-     */
-    FileResp exportBpmnXml(String modelId);
-
-    /**
      * 删除模型
      * @param modelId 模型Id
      * @return 返回成功
      */
     CommonResult<String> deleteModel(String modelId);
+
 }
