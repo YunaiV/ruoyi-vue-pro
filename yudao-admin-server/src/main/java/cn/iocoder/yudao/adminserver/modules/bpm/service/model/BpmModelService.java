@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.service.model;
 
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.model.vo.*;
-import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 
 import javax.validation.Valid;
@@ -45,11 +44,11 @@ public interface BpmModelService {
     void updateModel(@Valid BpmModelUpdateReqVO updateReqVO);
 
     /**
-     * 部署模型 使模型成为一个 process
-     * @param modelId 模型Id
-     * @return 返回成功
+     * 将流程模型，部署成一个流程定义
+     *
+     * @param id 编号
      */
-    CommonResult<String> deploy(String modelId);
+    void deployModel(String id);
 
     /**
      * 删除模型

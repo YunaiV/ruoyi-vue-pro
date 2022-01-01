@@ -25,10 +25,10 @@ public class BpmModelController {
 
     // TODO @芋艿：权限
 
-    @GetMapping ("/page")
+    @GetMapping("/page")
     @ApiOperation(value = "获得模型分页")
     public CommonResult<PageResult<BpmModelPageItemRespVO>> getModelPage(ModelPageReqVO pageVO) {
-       return success(bpmModelService.getModelPage(pageVO));
+        return success(bpmModelService.getModelPage(pageVO));
     }
 
     @GetMapping("/get")
@@ -43,7 +43,7 @@ public class BpmModelController {
     @PostMapping("/create")
     @ApiOperation(value = "新建模型")
     public CommonResult<String> createModel(@RequestBody BpmModelCreateReqVO createRetVO) {
-       return success(bpmModelService.createModel(createRetVO));
+        return success(bpmModelService.createModel(createRetVO));
     }
 
     @PutMapping("/update")
@@ -56,15 +56,17 @@ public class BpmModelController {
     @DeleteMapping("/delete")
     @ApiOperation("删除模型")
     @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = String.class)
-    public CommonResult<Boolean> deleteModel(@RequestParam("id")  String id) {
+    public CommonResult<Boolean> deleteModel(@RequestParam("id") String id) {
         bpmModelService.deleteModel(id);
         return success(true);
     }
 
     @PostMapping("/deploy")
     @ApiOperation(value = "部署模型")
-    public CommonResult<String> deploy(@RequestParam String modelId) {
-       return bpmModelService.deploy(modelId);
+    @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = String.class)
+    public CommonResult<Boolean> deployModel(@RequestParam("id") String id) {
+        bpmModelService.deployModel(id);
+        return success(true);
     }
 
 }

@@ -38,10 +38,9 @@ export function deleteModel(id) {
   })
 }
 
-export function deployModel(data) {
+export function deployModel(id) {
   return request({
-    url: '/bpm/model/deploy?modelId='+ data.modelId,
-    method: 'POST',
-    data: data
+    url: '/bpm/model/deploy?id=' + id,
+    method: 'POST'
   })
 }

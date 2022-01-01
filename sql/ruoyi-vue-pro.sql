@@ -2391,4 +2391,18 @@ INSERT INTO `tool_test_demo` VALUES (106, '老五1', 0, 1, 1, '牛逼哈2', '', 
 INSERT INTO `tool_test_demo` VALUES (107, '哈哈哈哈', 1, 0, 1, 'biubiubui', '', '2021-02-06 14:00:54', '', '2021-02-06 14:00:54', b'0');
 COMMIT;
 
+CREATE TABLE `bpm_process_definition` (
+                                          `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号',
+                                          `process_definition_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '流程定义的编号',
+                                          `description` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '描述',
+                                          `form_id` bigint DEFAULT NULL COMMENT '表单编号',
+                                          `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
+                                          `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+                                          `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
+                                          `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+                                          `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+                                          PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Bpm 流程定义的拓展表\n';
+
 SET FOREIGN_KEY_CHECKS = 1;
+

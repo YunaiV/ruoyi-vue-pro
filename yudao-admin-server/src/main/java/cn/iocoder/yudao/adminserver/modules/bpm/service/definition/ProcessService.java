@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.adminserver.modules.bpm.service.process;
+package cn.iocoder.yudao.adminserver.modules.bpm.service.definition;
 
 import org.springframework.web.multipart.MultipartFile;
 
@@ -8,6 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
  * @author ZJQ
  * @date 2021/9/5 21:00
  */
+@Deprecated
 public interface ProcessService {
 
     /**

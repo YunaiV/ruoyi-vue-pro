@@ -27,10 +27,9 @@
       <el-table-column label="流程编号" align="center" prop="id" :show-overflow-tooltip="true" />
       <el-table-column label="流程标识" align="center" prop="key" />
       <el-table-column label="流程名称" align="center" prop="name" />
-      <el-table-column label="流程分类" align="center" prop="category" />
-      <el-table-column label="表单信息" align="center" prop="formName" />
-      <el-table-column label="流程版本" align="center" prop="revision" />
-      <el-table-column label="状态" align="center" prop="rversion" />
+      <el-table-column label="流程分类" align="center" prop="category" /> <!-- TODO 芋艿：数据字典的格式化 -->
+      <el-table-column label="表单信息" align="center" prop="formId" /> <!-- TODO 芋艿：需要支持表单的点击 -->
+      <el-table-column label="流程版本" align="center" prop="processDefinition.version" />
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
@@ -39,8 +38,9 @@
       <el-table-column label="操作" align="center" width="240">
         <template slot-scope="scope">
           <el-button size="mini" type="text" icon="el-icon-setting" @click="handleUpdate(scope.row)">设计流程</el-button>
-          <el-button size="mini" type="text" icon="el-icon-delete" @click="modelDelete(scope.row)">删除</el-button>
-          <el-button size="mini" type="text" icon="el-icon-thumb" @click="modelDeploy(scope.row)">发布</el-button>
+          <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)">删除</el-button>
+          <el-button size="mini" type="text" icon="el-icon-thumb" @click="handleDeploy(scope.row)">发布</el-button>
+          <!-- TODO 芋艿：流程定义 -->
         </template>
       </el-table-column>
     </el-table>
@@ -115,6 +115,10 @@ export default {
       this.handleQuery();
     },
     processSave(data) {
+      // TODO 芋艿：临时写死的参数
+      data.category = '1'
+      data.formId = 11
+
       // 修改的提交
       if (data.id) {
         updateModel(data).then(response => {
@@ -159,7 +163,7 @@ export default {
         this.showBpmnOpen = true
       })
     },
-    modelDelete(row) {
+    handleDelete(row) {
       const that = this;
       this.$confirm('是否删除该流程！！', "警告", {
         confirmButtonText: "确定",
@@ -172,16 +176,14 @@ export default {
         })
       })
     },
-    modelDeploy(row) {
+    handleDeploy(row) {
       const that = this;
       this.$confirm('是否部署该流程！！', "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "success"
       }).then(function() {
-        deployModel({
-          modelId: row.id
-        }).then(response => {
+        deployModel(row.id).then(response => {
           that.getList();
           that.msgSuccess("部署成功");
         })

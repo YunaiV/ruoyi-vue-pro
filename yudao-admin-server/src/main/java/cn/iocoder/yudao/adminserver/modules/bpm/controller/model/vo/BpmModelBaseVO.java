@@ -4,7 +4,6 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 
 /**
 * 流程模型 Base VO，提供给添加、修改、详细的子 VO 使用
@@ -22,7 +21,6 @@ public class BpmModelBaseVO {
     private String name;
 
     @ApiModelProperty(value = "流程描述", example = "我是描述")
-    @NotEmpty(message = "流程描述不能为空")
     private String description;
 
     @ApiModelProperty(value = "流程分类", notes = "参见 bpm_model_category 数据字典", example = "1")
@@ -30,7 +28,6 @@ public class BpmModelBaseVO {
     private String category;
 
     @ApiModelProperty(value = "表单编号", example = "1024")
-    @NotNull(message = "表单编号不能为空")
     private Long formId;
 
 }

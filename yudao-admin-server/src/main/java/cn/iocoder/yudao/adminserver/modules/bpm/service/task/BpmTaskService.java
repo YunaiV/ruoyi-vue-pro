@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.adminserver.modules.bpm.service.workflow;
+package cn.iocoder.yudao.adminserver.modules.bpm.service.task;
 
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.workflow.vo.*;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;

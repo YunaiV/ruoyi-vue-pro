@@ -1,6 +1,6 @@
-package cn.iocoder.yudao.adminserver.modules.bpm.service.process.impl;
+package cn.iocoder.yudao.adminserver.modules.bpm.service.definition;
 
-import cn.iocoder.yudao.adminserver.modules.bpm.service.process.ProcessService;
+import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.ProcessService;
 import lombok.extern.slf4j.Slf4j;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.repository.Deployment;
@@ -25,6 +25,7 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
  */
 @Service
 @Slf4j
+@Deprecated
 public class ProcessServiceImpl implements ProcessService {
 
     private static final String BPMN20_XML = "bpmn20.xml";

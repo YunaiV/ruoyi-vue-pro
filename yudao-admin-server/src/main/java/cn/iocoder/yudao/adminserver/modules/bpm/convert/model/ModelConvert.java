@@ -5,6 +5,7 @@ import cn.iocoder.yudao.adminserver.modules.bpm.controller.model.vo.BpmModelPage
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.model.vo.BpmModelRespVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.model.vo.BpmModelUpdateReqVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.form.BpmFormDO;
+import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.dto.BpmDefinitionCreateReqDTO;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.model.dto.BpmModelMetaInfoRespDTO;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
@@ -57,6 +58,19 @@ public interface ModelConvert {
     }
 
     BpmModelRespVO convert(Model model);
+
+    default BpmDefinitionCreateReqDTO convert2(Model model) {
+        BpmDefinitionCreateReqDTO createReqDTO = new BpmDefinitionCreateReqDTO();
+        createReqDTO.setName(model.getName());
+        createReqDTO.setKey(model.getKey());
+        createReqDTO.setCategory(model.getCategory());
+        BpmModelMetaInfoRespDTO metaInfo = JsonUtils.parseObject(model.getMetaInfo(), BpmModelMetaInfoRespDTO.class);
+        if (metaInfo != null) {
+            createReqDTO.setDescription(metaInfo.getDescription());
+            createReqDTO.setFormId(metaInfo.getFormId());
+        }
+        return createReqDTO;
+    }
 
     default void copy(Model model, BpmModelCreateReqVO bean) {
         model.setName(bean.getName());
