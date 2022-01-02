@@ -4,19 +4,17 @@
 
     <!-- TODO 芋艿：去除测试任务 -->
 <!--    <my-process-palette />-->
-
     <my-process-designer
       :key="`designer-${reloadIndex}`"
       v-model="xmlString"
       v-bind="controlForm"
       keyboard
       ref="processDesigner"
-      @element-click="elementClick"
       @init-finished="initModeler"
     />
     <my-properties-panel :key="`penal-${reloadIndex}`" :bpmn-modeler="modeler" :prefix="controlForm.prefix" class="process-panel" />
 
-    <!-- demo config -->
+    <!-- 右边的全局设置 -->
     <div class="demo-control-bar">
       <div class="open-control-dialog" @click="controlDrawerVisible = true"><i class="el-icon-setting"></i></div>
     </div>
@@ -84,7 +82,7 @@ export default {
   components: { MyProcessPalette },
   data() {
     return {
-      xmlString: "",
+      xmlString: "", // BPMN XML
       modeler: null,
       reloadIndex: 0,
       controlDrawerVisible: false,
@@ -95,7 +93,7 @@ export default {
         simulation: true,
         labelEditing: false,
         labelVisible: false,
-        prefix: "flowable",
+        prefix: "activiti",
         headerButtonSize: "mini",
         // additionalModel: []
         additionalModel: [CustomContentPadProvider, CustomPaletteProvider]
@@ -138,44 +136,17 @@ export default {
     //   this.addis.customRenderer = status ? CustomRenderer : false;
     //   this.reloadProcessDesigner();
     // },
-    elementClick(element) {
-      this.element = element;
-
-      !this.elementOverlayIds && (this.elementOverlayIds = {});
-
-      !this.overlays && (this.overlays = this.modeler.get("overlays"));
-      !this.contextPad && (this.contextPad = this.modeler.get("contextPad"));
-
-      this.modeler.on("element.hover", ({ element }) => {
-        if (!this.elementOverlayIds[element.id] && element.type !== "bpmn:Process") {
-          this.elementOverlayIds[element.id] = this.overlays.add(element, {
-            position: { left: 0, bottom: 0 },
-            html: `<div class="element-overlays">
-            <p>Elemet id: ${element.id}</p>
-            <p>Elemet type: ${element.type}</p>
-          </div>`
-          });
-        }
-      });
-
-      this.modeler.on("element.out", ({ element }) => {
-        if (element) {
-          this.overlays.remove({ element });
-          this.elementOverlayIds[element.id] = null;
-        }
-      });
-    }
   }
 };
 </script>
 
 <style lang="scss">
-body {
-  overflow: hidden;
-  margin: 0;
-  box-sizing: border-box;
-}
-//#app {
+//body {
+//  overflow: hidden;
+//  margin: 0;
+//  box-sizing: border-box;
+//}
+//.app {
 //  width: 100%;
 //  height: 100%;
 //  box-sizing: border-box;
@@ -224,45 +195,22 @@ body {
   color: #fafafa;
 }
 
-.bjs-container {
-  height: 400px !important; // TODO 芋艿：bjs 容器的高度不对，临时改下
+.my-process-designer {
+  height: calc(100vh - 84px);
+  //height: 800px !important; // TODO 芋艿：bjs 容器的高度不对，临时改下
+  //z-index: 0 !important;
+  //pointer-events: none !important;
 }
 .process-panel__container { // TODO 芋艿：右边的位置不对，临时改下
-  margin-top: -200px;
-  float: right;
-  height: 800px;
-  z-index: 2147483647 !important;
+  //margin-top: -800px !important;
+  //float: right;
+  //margin-left: 800px !important;
+  //height: 800px;
+  //z-index: 2147483647 !important;
+  //cursor:pointer !important;
+  position: absolute;
+  right: 0;
+  top: 55px;
 }
 
-body,
-body * {
-  /* 滚动条 */
-  &::-webkit-scrollbar-track-piece {
-    background-color: #fff; /*滚动条的背景颜色*/
-    -webkit-border-radius: 0; /*滚动条的圆角宽度*/
-  }
-  &::-webkit-scrollbar {
-    width: 10px; /*滚动条的宽度*/
-    height: 8px; /*滚动条的高度*/
-  }
-  &::-webkit-scrollbar-thumb:vertical {
-    /*垂直滚动条的样式*/
-    height: 50px;
-    background-color: rgba(153, 153, 153, 0.5);
-    -webkit-border-radius: 4px;
-    outline: 2px solid #fff;
-    outline-offset: -2px;
-    border: 2px solid #fff;
-  }
-  &::-webkit-scrollbar-thumb {
-    /*滚动条的hover样式*/
-    background-color: rgba(159, 159, 159, 0.3);
-    -webkit-border-radius: 4px;
-  }
-  &::-webkit-scrollbar-thumb:hover {
-    /*滚动条的hover样式*/
-    background-color: rgba(159, 159, 159, 0.5);
-    -webkit-border-radius: 4px;
-  }
-}
 </style>

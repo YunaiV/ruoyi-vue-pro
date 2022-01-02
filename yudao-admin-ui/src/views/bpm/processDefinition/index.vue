@@ -42,14 +42,14 @@
     <pagination v-show="total>0" :total="total" :page.sync="queryParams.pageNo" :limit.sync="queryParams.pageSize"
                 @pagination="getList"/>
     <el-dialog :visible.sync="showBpmnBool" :before-close="close" :fullscreen="true">
-      <vue-bpmn v-if="showBpmnBool" product="activiti" @processSave="processSave" :bpmnXml="bpmnXML" :bpmnData="bpmnData" @beforeClose="close"></vue-bpmn>
+<!--      <vue-bpmn v-if="showBpmnBool" product="activiti" @processSave="processSave" :bpmnXml="bpmnXML" :bpmnData="bpmnData" @beforeClose="close"></vue-bpmn>-->
     </el-dialog>
   </div>
 </template>
 
 <script>
 import {page} from "@/api/bpm/processDefinition";
-import VueBpmn from "@/components/bpmn/VueBpmn";
+// import VueBpmn from "@/components/bpmn/VueBpmn";
 
 export default {
   name: "processDefinition",
@@ -73,7 +73,7 @@ export default {
       }
     };
   },
-  components: {VueBpmn},
+  // components: {VueBpmn},
   created() {
     this.getList();
   },

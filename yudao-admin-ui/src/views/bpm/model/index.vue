@@ -68,10 +68,10 @@
                 @pagination="getList"/>
 
     <!-- 流程编辑器 -->
-    <el-dialog class="bpmnclass dialogClass" :visible.sync="showBpmnOpen" :before-cancel="cancel" :fullscreen="true">
-      <vue-bpmn v-if="showBpmnOpen" product="activiti" @processSave="processSave"
-                :bpmnXml="bpmnXML" :bpmnData="bpmnData" @beforeClose="cancel" />
-    </el-dialog>
+<!--    <el-dialog class="bpmnclass dialogClass" :visible.sync="showBpmnOpen" :before-cancel="cancel" :fullscreen="true">-->
+<!--      <vue-bpmn v-if="showBpmnOpen" product="activiti" @processSave="processSave"-->
+<!--                :bpmnXml="bpmnXML" :bpmnData="bpmnData" @beforeClose="cancel" />-->
+<!--    </el-dialog>-->
 
     <!-- 流程表单配置详情 -->
     <el-dialog title="表单详情" :visible.sync="detailOpen" width="50%" append-to-body>
@@ -84,7 +84,7 @@
 
 <script>
 import {deleteModel, deployModel, createModel, updateModel, getModelPage, getModel} from "@/api/bpm/model";
-import VueBpmn from "@/components/bpmn/VueBpmn";
+// import VueBpmn from "@/components/bpmn/VueBpmn";
 import {DICT_TYPE, getDictDatas} from "@/utils/dict";
 import {getForm} from "@/api/bpm/form";
 import {decodeFields} from "@/utils/formGenerator";
@@ -94,7 +94,7 @@ export default {
   name: "model",
   components: {
     Parser,
-    VueBpmn
+    // VueBpmn
   },
   data() {
     return {
