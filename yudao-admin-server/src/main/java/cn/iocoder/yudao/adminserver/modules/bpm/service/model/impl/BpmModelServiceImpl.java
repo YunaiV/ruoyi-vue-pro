@@ -55,8 +55,14 @@ public class BpmModelServiceImpl implements BpmModelService {
     @Override
     public PageResult<BpmModelPageItemRespVO> getModelPage(ModelPageReqVO pageVO) {
         ModelQuery modelQuery = repositoryService.createModelQuery();
+        if (StrUtil.isNotBlank(pageVO.getKey())) {
+            modelQuery.modelKey(pageVO.getKey());
+        }
         if (StrUtil.isNotBlank(pageVO.getName())) {
             modelQuery.modelNameLike("%" + pageVO.getName() + "%"); // 模糊匹配
+        }
+        if (StrUtil.isNotBlank(pageVO.getCategory())) {
+            modelQuery.modelCategory(pageVO.getCategory());
         }
         // 执行查询
         List<Model> models = modelQuery.orderByCreateTime().desc()

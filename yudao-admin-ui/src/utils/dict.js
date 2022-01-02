@@ -8,6 +8,7 @@ import store from '@/store'
 export const DICT_TYPE = {
   USER_TYPE: 'user_type',
 
+  // system
   SYS_COMMON_STATUS: 'sys_common_status',
   SYS_MENU_TYPE: 'sys_menu_type',
   SYS_ROLE_TYPE: 'sys_role_type',
@@ -24,13 +25,17 @@ export const DICT_TYPE = {
   SYS_SMS_RECEIVE_STATUS: 'sys_sms_receive_status',
   SYS_ERROR_CODE_TYPE: 'sys_error_code_type',
 
+  // infra
   INF_REDIS_TIMEOUT_TYPE: 'inf_redis_timeout_type',
   INF_JOB_STATUS: 'inf_job_status',
   INF_JOB_LOG_STATUS: 'inf_job_log_status',
   INF_API_ERROR_LOG_PROCESS_STATUS: 'inf_api_error_log_process_status',
 
+  // tool
   TOOL_CODEGEN_TEMPLATE_TYPE: 'tool_codegen_template_type',
 
+  // bpm
+  BPM_MODEL_CATEGORY: 'bpm_model_category',
   OA_LEAVE_STATUS: 'flow_status',
   OA_LEAVE_TYPE: 'oa_leave_type'
 }

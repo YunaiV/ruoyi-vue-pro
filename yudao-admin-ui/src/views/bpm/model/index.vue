@@ -3,9 +3,18 @@
 
     <!-- 搜索工作栏 -->
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="模型名字" prop="name">
-        <el-input v-model="queryParams.name" placeholder="请输入模型名字" clearable style="width: 240px;" size="small"
+      <el-form-item label="流程标识" prop="key">
+        <el-input v-model="queryParams.key" placeholder="请输入流程标识" clearable style="width: 240px;" size="small"
                   @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="流程名称" prop="name">
+        <el-input v-model="queryParams.name" placeholder="请输入流程名称" clearable style="width: 240px;" size="small"
+                  @keyup.enter.native="handleQuery"/>
+      </el-form-item>
+      <el-form-item label="流程分类" prop="category">
+        <el-select v-model="queryParams.category" placeholder="流程分类" clearable size="small" style="width: 240px">
+          <el-option v-for="dict in categoryDictDatas" :key="parseInt(dict.value)" :label="dict.label" :value="parseInt(dict.value)"/>
+        </el-select>
       </el-form-item>
       <el-form-item>
         <el-button type="cyan" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
@@ -24,10 +33,13 @@
 
     <!-- 列表 -->
     <el-table v-loading="loading" :data="list">
-      <el-table-column label="流程编号" align="center" prop="id" :show-overflow-tooltip="true" />
       <el-table-column label="流程标识" align="center" prop="key" />
       <el-table-column label="流程名称" align="center" prop="name" />
-      <el-table-column label="流程分类" align="center" prop="category" /> <!-- TODO 芋艿：数据字典的格式化 -->
+      <el-table-column label="流程分类" align="center" prop="category">
+        <template slot-scope="scope">
+          <span>{{ getDictDataLabel(DICT_TYPE.BPM_MODEL_CATEGORY, scope.row.category) }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="表单信息" align="center" prop="formId" /> <!-- TODO 芋艿：需要支持表单的点击 -->
       <el-table-column label="流程版本" align="center" prop="processDefinition.version" />
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
@@ -59,6 +71,7 @@
 <script>
 import {deleteModel, deployModel, createModel, updateModel, getModelPage, getModel} from "@/api/bpm/model";
 import VueBpmn from "@/components/bpmn/VueBpmn";
+import {DICT_TYPE, getDictDatas} from "@/utils/dict";
 
 export default {
   name: "model",
@@ -77,10 +90,14 @@ export default {
         pageNo: 1,
         pageSize: 10
       },
+
       // BPMN 数据
       showBpmnOpen: false,
       bpmnXML: null,
       bpmnData: {},
+
+      // 数据字典
+      categoryDictDatas: getDictDatas(DICT_TYPE.BPM_MODEL_CATEGORY),
     };
   },
   components: {VueBpmn},
