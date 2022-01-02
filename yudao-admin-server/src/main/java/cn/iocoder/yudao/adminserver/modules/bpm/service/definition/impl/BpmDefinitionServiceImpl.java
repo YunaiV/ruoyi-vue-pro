@@ -11,6 +11,7 @@ import cn.iocoder.yudao.adminserver.modules.bpm.dal.mysql.definition.BpmProcessD
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmDefinitionService;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.dto.BpmDefinitionCreateReqDTO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.activiti.bpmn.converter.BpmnXMLConverter;
 import org.activiti.bpmn.model.BpmnModel;
@@ -23,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -75,6 +77,26 @@ public class BpmDefinitionServiceImpl implements BpmDefinitionService {
     @Override
     public ProcessDefinition getDefinition(String id) {
         return repositoryService.getProcessDefinition(id);
+    }
+
+    @Override
+    public Deployment getDeployment(String id) {
+        if (StrUtil.isEmpty(id)) {
+            return null;
+        }
+        return repositoryService.createDeploymentQuery().deploymentId(id).singleResult();
+    }
+
+    @Override
+    public List<Deployment> getDeployments(Set<String> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return Collections.emptyList();
+        }
+        List<Deployment> list = new ArrayList<>(ids.size());
+        for (String id : ids) {
+            CollectionUtils.addIfNotNull(list, getDeployment(id));
+        }
+        return list;
     }
 
     @Override

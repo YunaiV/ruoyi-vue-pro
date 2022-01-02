@@ -16,6 +16,7 @@ import cn.iocoder.yudao.framework.common.util.object.PageUtils;
 import cn.iocoder.yudao.framework.common.util.validation.ValidationUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.activiti.engine.RepositoryService;
+import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.Model;
 import org.activiti.engine.repository.ModelQuery;
 import org.activiti.engine.repository.ProcessDefinition;
@@ -75,15 +76,17 @@ public class BpmModelServiceImpl implements BpmModelService {
         });
         Map<Long, BpmFormDO> formMap = bpmFormService.getFormMap(formIds);
 
-        // 获得 ProcessDefinition Map
+        // 获得 Deployment Map
         Set<String> deploymentIds = new HashSet<>();
         models.forEach(model -> CollectionUtils.addIfNotNull(deploymentIds, model.getDeploymentId()));
+        Map<String, Deployment> deploymentMap = bpmDefinitionService.getDeploymentMap(deploymentIds);
+        // 获得 ProcessDefinition Map
         List<ProcessDefinition> processDefinitions = bpmDefinitionService.getDefinitionListByDeploymentIds(deploymentIds);
         Map<String, ProcessDefinition> processDefinitionMap = convertMap(processDefinitions, ProcessDefinition::getDeploymentId);
 
         // 拼接结果
         long modelCount = modelQuery.count();
-        return new PageResult<>(ModelConvert.INSTANCE.convertList(models, formMap, processDefinitionMap), modelCount);
+        return new PageResult<>(ModelConvert.INSTANCE.convertList(models, formMap, deploymentMap, processDefinitionMap), modelCount);
     }
 
     @Override

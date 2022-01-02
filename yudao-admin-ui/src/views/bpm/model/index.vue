@@ -34,14 +34,14 @@
     <!-- 列表 -->
     <el-table v-loading="loading" :data="list">
       <el-table-column label="流程标识" align="center" prop="key" />
-      <el-table-column label="流程名称" align="center" prop="name">
+      <el-table-column label="流程名称" align="center" prop="name" width="200">
         <template slot-scope="scope">
           <el-button type="text" @click="handleBpmnDetail(scope.row)">
             <span>{{ scope.row.name }}</span>
           </el-button>
         </template>
       </el-table-column>
-      <el-table-column label="流程分类" align="center" prop="category">
+      <el-table-column label="流程分类" align="center" prop="category" width="100">
         <template slot-scope="scope">
           <span>{{ getDictDataLabel(DICT_TYPE.BPM_MODEL_CATEGORY, scope.row.category) }}</span>
         </template>
@@ -54,18 +54,38 @@
           <label v-else>暂无表单</label>
         </template>
       </el-table-column>
-      <el-table-column label="流程版本" align="center" prop="processDefinition.version" />
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" width="240">
+      <el-table-column label="最新部署的流程定义" align="center">
+        <el-table-column label="流程版本" align="center" prop="processDefinition.version" width="80">
+          <template slot-scope="scope">
+            <el-tag size="medium" v-if="scope.row.processDefinition">v{{ scope.row.processDefinition.version }}</el-tag>
+            <el-tag size="medium" type="warning" v-else>未部署</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column label="激活状态" align="center" prop="processDefinition.version" width="80">
+          <template slot-scope="scope">
+<!--            <el-tag type="success" v-if="scope.row.processDefinition && scope.row.processDefinition.suspensionState === 1">激活</el-tag>-->
+<!--            <el-tag type="warning" v-if="scope.row.processDefinition && scope.row.processDefinition.suspensionState === 2">挂起</el-tag>-->
+            <el-switch v-if="scope.row.processDefinition" v-model="scope.row.processDefinition.suspensionState"
+                       :active-value="1" :inactive-value="2" @change="handleStatusChange(scope.row)" />
+          </template>
+        </el-table-column>
+        <el-table-column label="部署时间" align="center" prop="createTime" width="180">
+          <template slot-scope="scope">
+            <span v-if="scope.row.processDefinition">{{ parseTime(scope.row.processDefinition.deploymentTime) }}</span>
+          </template>
+        </el-table-column>
+      </el-table-column>
+      <el-table-column label="操作" align="center" width="300">
         <template slot-scope="scope">
           <el-button size="mini" type="text" icon="el-icon-setting" @click="handleUpdate(scope.row)">设计流程</el-button>
+          <el-button size="mini" type="text" icon="el-icon-thumb" @click="handleDeploy(scope.row)">发布流程</el-button>
+          <el-button size="mini" type="text" icon="el-icon-ice-cream-round" @click="handleDeploy(scope.row)">流程定义</el-button>
           <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)">删除</el-button>
-          <el-button size="mini" type="text" icon="el-icon-thumb" @click="handleDeploy(scope.row)">发布</el-button>
-          <!-- TODO 芋艿：流程定义 -->
         </template>
       </el-table-column>
     </el-table>

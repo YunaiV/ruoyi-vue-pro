@@ -38,6 +38,12 @@ public class BpmModelPageItemRespVO extends BpmModelBaseVO {
         @ApiModelProperty(value = "版本", required = true, example = "1")
         private Integer version;
 
+        @ApiModelProperty(value = "部署时间", required = true)
+        private Date deploymentTime;
+
+        @ApiModelProperty(value = "中断状态", required = true, example = "1", notes = "参见 SuspensionState 枚举")
+        private Integer suspensionState;
+
     }
 
 }
