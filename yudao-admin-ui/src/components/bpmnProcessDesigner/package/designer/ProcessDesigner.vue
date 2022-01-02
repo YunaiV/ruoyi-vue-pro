@@ -4,7 +4,7 @@
       <slot name="control-header"></slot>
       <template v-if="!$slots['control-header']">
         <el-button-group key="file-control">
-          <el-button :size="headerButtonSize" :type="headerButtonType" icon="el-icon-folder-opened" @click="$refs.refFile.click()">打开文件</el-button>
+          <el-button :size="headerButtonSize" icon="el-icon-folder-opened" @click="$refs.refFile.click()">打开文件</el-button>
           <el-tooltip effect="light">
             <div slot="content">
               <el-button :size="headerButtonSize" type="text" @click="downloadProcessAsXml()">下载为XML文件</el-button>
@@ -13,7 +13,7 @@
               <br />
               <el-button :size="headerButtonSize" type="text" @click="downloadProcessAsBpmn()">下载为BPMN文件</el-button>
             </div>
-            <el-button :size="headerButtonSize" :type="headerButtonType" icon="el-icon-download">下载文件</el-button>
+            <el-button :size="headerButtonSize" icon="el-icon-download">下载文件</el-button>
           </el-tooltip>
           <el-tooltip effect="light">
             <div slot="content">
@@ -21,10 +21,10 @@
               <br />
               <el-button :size="headerButtonSize" type="text" @click="previewProcessJson">预览JSON</el-button>
             </div>
-            <el-button :size="headerButtonSize" :type="headerButtonType" icon="el-icon-view">预览</el-button>
+            <el-button :size="headerButtonSize" icon="el-icon-view">预览</el-button>
           </el-tooltip>
           <el-tooltip v-if="simulation" effect="light" :content="this.simulationStatus ? '退出模拟' : '开启模拟'">
-            <el-button :size="headerButtonSize" :type="headerButtonType" icon="el-icon-cpu" @click="processSimulation">
+            <el-button :size="headerButtonSize" icon="el-icon-cpu" @click="processSimulation">
               模拟
             </el-button>
           </el-tooltip>
@@ -72,6 +72,7 @@
             <el-button :size="headerButtonSize" icon="el-icon-refresh" @click="processRestart" />
           </el-tooltip>
         </el-button-group>
+        <el-button :size="headerButtonSize" :type="headerButtonType" icon="el-icon-plus" @click="processSave">保存模型</el-button>
       </template>
       <!-- 用于打开本地文件-->
       <input type="file" id="files" ref="refFile" style="display: none" accept=".xml, .bpmn" @change="importLocalFile" />
@@ -111,8 +112,9 @@ export default {
   componentName: "MyProcessDesigner",
   props: {
     value: String, // xml 字符串
-    processId: String,
-    processName: String,
+    processId: String, // 流程 key 标识
+    processName: String, // 流程 name 名字
+    formId: Number, // 流程 form 表单编号
     translations: Object, // 自定义的翻译文件
     additionalModel: [Object, Array], // 自定义model
     moddleExtension: Object, // 自定义moddle
@@ -243,6 +245,11 @@ export default {
       this.$emit("destroy", this.bpmnModeler);
       this.bpmnModeler = null;
     });
+  },
+  watch: {
+    value: function (newValue) { // 在 xmlString 发生变化时，重新创建，从而绘制流程图
+      this.createNewDiagram(newValue);
+    }
   },
   methods: {
     initBpmnModeler() {
@@ -445,6 +452,17 @@ export default {
         this.previewType = "json";
         this.previewModelVisible = true;
       });
+    },
+    /* ------------------------------------------------ 芋道源码 methods ------------------------------------------------------ */
+    async processSave() {
+      const { err, xml } = await this.bpmnModeler.saveXML();
+      // 读取异常时抛出异常
+      if (err) {
+        this.msgError('保存模型失败，请重试！')
+        return
+      }
+      // 触发 save 事件
+      this.$emit('save', xml)
     }
   }
 };

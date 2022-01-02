@@ -26,6 +26,8 @@ public interface BpmErrorCodeConstants {
     // ========== OA 工作流模块 1-009-002-000 ==========
     ErrorCode BPM_MODEL_KEY_EXISTS = new ErrorCode(1009002000, "已经存在流程标识为【{}】的流程");
     ErrorCode BPMN_MODEL_NOT_EXISTS = new ErrorCode(1009002001, "流程模型不存在");
+    ErrorCode BPMN_MODEL_KEY_VALID = new ErrorCode(1009002002, "流程标识格式不正确，需要以字母或下划线开头，后接任意字母、数字、中划线、下划线、句点！");
+
 
     ErrorCode BPMN_MODEL_ERROR = new ErrorCode(1004001002, "工作流模型异常");
     ErrorCode BPMN_MODEL_PROCESS_NOT_EXISTS = new ErrorCode(1004001009, "流程数据为空");

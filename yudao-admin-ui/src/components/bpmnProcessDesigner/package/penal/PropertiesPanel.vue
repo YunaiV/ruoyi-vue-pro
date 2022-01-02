@@ -3,7 +3,8 @@
     <el-collapse v-model="activeTab">
       <el-collapse-item name="base">
         <div slot="title" class="panel-tab__title"><i class="el-icon-info"></i>常规</div>
-        <element-base-info :id-edit-disabled="idEditDisabled" :business-object="elementBusinessObject" :type="elementType" />
+        <element-base-info :id-edit-disabled="idEditDisabled" :business-object="elementBusinessObject" :type="elementType"
+                           :model="model" />
       </el-collapse-item>
       <el-collapse-item name="condition" v-if="elementType === 'Process'" key="message">
         <div slot="title" class="panel-tab__title"><i class="el-icon-s-comment"></i>消息与信号</div>
@@ -89,7 +90,8 @@ export default {
     idEditDisabled: {
       type: Boolean,
       default: false
-    }
+    },
+    model: Object, // 流程模型的数据
   },
   provide() {
     return {
@@ -159,6 +161,7 @@ export default {
     // 初始化数据
     initFormOnChanged(element) {
       let activatedElement = element;
+      // debugger
       if (!activatedElement) {
         activatedElement =
           window.bpmnInstances.elementRegistry.find(el => el.type === "bpmn:Process") ??

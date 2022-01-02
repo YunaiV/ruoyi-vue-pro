@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
+import java.util.Date;
+
 @ApiModel("流程模型的创建 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -17,5 +19,8 @@ public class BpmModelRespVO extends BpmModelBaseVO {
 
     @ApiModelProperty(value = "BPMN XML", required = true)
     private String bpmnXml;
+
+    @ApiModelProperty(value = "创建时间", required = true)
+    private Date createTime;
 
 }

@@ -13,6 +13,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.object.PageUtils;
+import cn.iocoder.yudao.framework.common.util.validation.ValidationUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.repository.Model;
@@ -29,8 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants.BPMN_MODEL_NOT_EXISTS;
-import static cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants.BPM_MODEL_KEY_EXISTS;
+import static cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants.*;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 
@@ -89,6 +89,9 @@ public class BpmModelServiceImpl implements BpmModelService {
     @Override
     public BpmModelRespVO getModel(String id) {
         Model model = repositoryService.getModel(id);
+        if (model == null) {
+            return null;
+        }
         BpmModelRespVO modelRespVO = ModelConvert.INSTANCE.convert(model);
         // 拼接 bpmn XML
         byte[] bpmnBytes = repositoryService.getModelEditorSource(id);
@@ -99,12 +102,12 @@ public class BpmModelServiceImpl implements BpmModelService {
     @Override
     @Transactional(rollbackFor = Exception.class) // 因为进行多个 activiti 操作，所以开启事务
     public String createModel(BpmModelCreateReqVO createReqVO) {
+        checkKeyNCName(createReqVO.getKey());
         // 校验流程标识已经存在
         Model keyModel = this.getModelByKey(createReqVO.getKey());
         if (keyModel != null) {
-            throw exception(BPM_MODEL_KEY_EXISTS);
+            throw exception(BPM_MODEL_KEY_EXISTS, createReqVO.getKey());
         }
-        // TODO @芋艿：需要校验下 key 的格式
 
         // 创建流程定义
         Model model = repositoryService.newModel();
@@ -119,12 +122,12 @@ public class BpmModelServiceImpl implements BpmModelService {
     @Override
     @Transactional(rollbackFor = Exception.class) // 因为进行多个 activiti 操作，所以开启事务
     public void updateModel(BpmModelUpdateReqVO updateReqVO) {
+        checkKeyNCName(updateReqVO.getKey());
         // 校验流程模型存在
         Model model = repositoryService.getModel(updateReqVO.getId());
         if (model == null) {
             throw exception(BPMN_MODEL_NOT_EXISTS);
         }
-        // TODO @芋艿：需要校验下 key 的格式
 
         // 修改流程定义
         ModelConvert.INSTANCE.copy(model, updateReqVO);
@@ -171,6 +174,12 @@ public class BpmModelServiceImpl implements BpmModelService {
 
     private Model getModelByKey(String key) {
         return repositoryService.createModelQuery().modelKey(key).singleResult();
+    }
+
+    private void checkKeyNCName(String key) {
+        if (!ValidationUtils.isXmlNCName(key)) {
+            throw exception(BPMN_MODEL_KEY_VALID);
+        }
     }
 
 }

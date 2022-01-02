@@ -76,6 +76,11 @@ public class BpmFormServiceImpl implements BpmFormService {
     }
 
     @Override
+    public List<BpmFormDO> getFormList() {
+        return formMapper.selectList();
+    }
+
+    @Override
     public List<BpmFormDO> getFormList(Collection<Long> ids) {
         return formMapper.selectBatchIds(ids);
     }

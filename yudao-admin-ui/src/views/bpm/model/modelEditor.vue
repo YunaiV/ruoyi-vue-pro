@@ -1,11 +1,14 @@
 <template>
   <div class="app-container">
 
-    <!-- 流程编辑器 -->
+    <!-- 流程设计器，负责绘制流程等 -->
     <my-process-designer :key="`designer-${reloadIndex}`" v-model="xmlString" v-bind="controlForm"
-      keyboard ref="processDesigner" @init-finished="initModeler"/>
-    <!-- 右边工具栏 -->
-    <my-properties-panel :key="`penal-${reloadIndex}`" :bpmn-modeler="modeler" :prefix="controlForm.prefix" class="process-panel" />
+      keyboard ref="processDesigner" @init-finished="initModeler"
+      @save="save"/>
+
+    <!-- 流程属性器，负责编辑每个流程节点的属性 -->
+    <my-properties-panel :key="`penal-${reloadIndex}`" :bpmn-modeler="modeler" :prefix="controlForm.prefix" class="process-panel"
+      :model="model" />
 
   </div>
 </template>
@@ -18,6 +21,7 @@ import CustomContentPadProvider from "@/components/bpmnProcessDesigner/package/d
 import CustomPaletteProvider from "@/components/bpmnProcessDesigner/package/designer/plugins/palette";
 // import xmlObj2json from "./utils/xml2json";
 import MyProcessPalette from "@/components/bpmnProcessDesigner/package/palette/ProcessPalette";
+import {createModel, getModel, updateModel} from "@/api/bpm/model";
 // 自定义侧边栏
 // import MyProcessPanel from "../package/process-panel/ProcessPanel";
 
@@ -32,23 +36,34 @@ export default {
       controlDrawerVisible: false,
       translationsSelf: translations,
       controlForm: {
-        processId: "",
-        processName: "",
         simulation: true,
         labelEditing: false,
         labelVisible: false,
         prefix: "activiti",
         headerButtonSize: "mini",
-        // additionalModel: []
         additionalModel: [CustomContentPadProvider, CustomPaletteProvider]
       },
       addis: {
         CustomContentPadProvider,
         CustomPaletteProvider
-      }
+      },
+      // 流程模型的信息
+      model: {},
     };
   },
-  created() {},
+  created() {
+    // 如果 modelId 非空，说明是修改流程模型
+    const modelId = this.$route.query && this.$route.query.modelId
+    if (modelId) {
+      getModel(modelId).then(response => {
+        this.xmlString = response.data.bpmnXml
+        this.model = {
+          ...response.data,
+          bpmnXml: undefined, // 清空 bpmnXml 属性
+        }
+      })
+    }
+  },
   methods: {
     initModeler(modeler) {
       setTimeout(() => {
@@ -70,7 +85,34 @@ export default {
       //   this.xmlString = undefined;
       //   this.$refs.processDesigner.processRestart();
       // }
-    }
+    },
+    save(bpmnXml) {
+      const data = {
+        ...this.model,
+        bpmnXml: bpmnXml, // this.bpmnXml 只是初始化流程图，后续修改无法通过它获得
+      }
+
+      // 修改的提交
+      if (data.id) {
+        updateModel(data).then(response => {
+          this.msgSuccess("修改成功")
+          // 跳转回去
+          this.close()
+        })
+        return
+      }
+      // 添加的提交
+      createModel(data).then(response => {
+        this.msgSuccess("保存成功")
+        // 跳转回去
+        this.close()
+      })
+    },
+    /** 关闭按钮 */
+    close() {
+      this.$store.dispatch("tagsView/delView", this.$route);
+      this.$router.push({ path: "/bpm/manager/model", query: { t: Date.now()}})
+    },
   }
 };
 </script>

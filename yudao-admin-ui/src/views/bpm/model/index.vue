@@ -67,12 +67,6 @@
     <pagination v-show="total>0" :total="total" :page.sync="queryParams.pageNo" :limit.sync="queryParams.pageSize"
                 @pagination="getList"/>
 
-    <!-- 流程编辑器 -->
-<!--    <el-dialog class="bpmnclass dialogClass" :visible.sync="showBpmnOpen" :before-cancel="cancel" :fullscreen="true">-->
-<!--      <vue-bpmn v-if="showBpmnOpen" product="activiti" @processSave="processSave"-->
-<!--                :bpmnXml="bpmnXML" :bpmnData="bpmnData" @beforeClose="cancel" />-->
-<!--    </el-dialog>-->
-
     <!-- 流程表单配置详情 -->
     <el-dialog title="表单详情" :visible.sync="detailOpen" width="50%" append-to-body>
       <div class="test-form">
@@ -83,8 +77,7 @@
 </template>
 
 <script>
-import {deleteModel, deployModel, createModel, updateModel, getModelPage, getModel} from "@/api/bpm/model";
-// import VueBpmn from "@/components/bpmn/VueBpmn";
+import {deleteModel, deployModel, getModelPage} from "@/api/bpm/model";
 import {DICT_TYPE, getDictDatas} from "@/utils/dict";
 import {getForm} from "@/api/bpm/form";
 import {decodeFields} from "@/utils/formGenerator";
@@ -93,8 +86,7 @@ import Parser from '@/components/parser/Parser'
 export default {
   name: "model",
   components: {
-    Parser,
-    // VueBpmn
+    Parser
   },
   data() {
     return {
@@ -157,55 +149,22 @@ export default {
       this.resetForm("queryForm");
       this.handleQuery();
     },
-    processSave(data) {
-      // TODO 芋艿：临时写死的参数
-      data.category = '1'
-      data.formId = 11
-
-      // 修改的提交
-      if (data.id) {
-        updateModel(data).then(response => {
-          this.msgSuccess("修改成功");
-          // 关闭弹窗，刷新列表
-          this.showBpmnOpen = false
-          this.getList();
-        })
-        return
-      }
-      // 添加的提交
-      createModel(data).then(response => {
-        this.bpmnData.id = response.data
-        this.msgSuccess("保存成功");
-        // 关闭弹窗，刷新列表
-        this.showBpmnOpen = false
-        this.getList();
-      })
-    },
+    /** 新增按钮操作 */
     handleAdd() {
-      // 重置 Model 信息
-      this.reset()
-      // 打开弹窗
-      this.showBpmnOpen = true
+      this.$router.push({
+        path:"/bpm/manager/model/edit"
+      });
     },
-    cancel() {
-      // 打开弹窗
-      this.showBpmnOpen = false
-      // 重置 Model 信息
-      this.reset()
-      // 刷新列表
-      this.getList()
-    },
+    /** 修改按钮操作 */
     handleUpdate(row) {
-      // 重置 Model 信息
-      this.reset()
-      // 获得 Model 信息
-      getModel(row.id).then(response => {
-        this.bpmnXML = response.data.bpmnXml
-        this.bpmnData = response.data
-        // 打开弹窗
-        this.showBpmnOpen = true
-      })
+      this.$router.push({
+        path:"/bpm/manager/model/edit",
+        query:{
+          modelId: row.id
+        }
+      });
     },
+    /** 删除按钮操作 */
     handleDelete(row) {
       const that = this;
       this.$confirm('是否删除该流程！！', "警告", {
@@ -219,6 +178,7 @@ export default {
         })
       })
     },
+    /** 部署按钮操作 */
     handleDeploy(row) {
       const that = this;
       this.$confirm('是否部署该流程！！', "提示", {
@@ -248,19 +208,3 @@ export default {
   }
 };
 </script>
-<style>
-.el-dialog > .el-dialog__body{
-  margin: 0;
-  border: 0;
-}
-.bpmn-viewer-header{
-  background: white;
-}
-.v-modal{
-  z-index: 2000!important;
-}
-.dialogClass{
-  padding: 0  ;
-}
-</style>
-

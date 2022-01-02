@@ -1,9 +1,9 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.controller.form;
 
+import cn.iocoder.yudao.adminserver.modules.bpm.controller.form.vo.*;
 import cn.iocoder.yudao.adminserver.modules.bpm.convert.form.BpmFormConvert;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.form.BpmFormDO;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.form.BpmFormService;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.form.vo.*;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import io.swagger.annotations.Api;
@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
-import java.util.Collection;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -62,13 +61,11 @@ public class BpmFormController {
         return success(BpmFormConvert.INSTANCE.convert(form));
     }
 
-    @GetMapping("/list")
-    @ApiOperation("获得动态表单列表")
-    @ApiImplicitParam(name = "ids", value = "编号列表", required = true, example = "1024,2048", dataTypeClass = List.class)
-    @PreAuthorize("@ss.hasPermission('bpm:form:query')")
-    public CommonResult<List<BpmFormRespVO>> getFormList(@RequestParam("ids") Collection<Long> ids) {
-        List<BpmFormDO> list = formService.getFormList(ids);
-        return success(BpmFormConvert.INSTANCE.convertList(list));
+    @GetMapping("/list-all-simple")
+    @ApiOperation(value = "获得动态表单的精简列表", notes = "用于表单下拉框")
+    public CommonResult<List<BpmFormSimpleRespVO>> getSimpleForms() {
+        List<BpmFormDO> list = formService.getFormList();
+        return success(BpmFormConvert.INSTANCE.convertList2(list));
     }
 
     @GetMapping("/page")

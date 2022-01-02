@@ -7,6 +7,7 @@ import cn.iocoder.yudao.adminserver.modules.bpm.controller.form.vo.BpmFormUpdate
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.form.BpmFormDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import org.activiti.engine.repository.Model;
 
 import javax.validation.Valid;
 import java.util.Collection;
@@ -51,6 +52,13 @@ public interface BpmFormService {
      * @return 动态表单
      */
     BpmFormDO getForm(Long id);
+
+    /**
+     * 获得动态表单列表
+     *
+     * @return 动态表单列表
+     */
+    List<BpmFormDO> getFormList();
 
     /**
      * 获得动态表单列表

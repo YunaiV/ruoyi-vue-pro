@@ -2,6 +2,7 @@ package cn.iocoder.yudao.adminserver.modules.bpm.convert.form;
 
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.form.vo.BpmFormCreateReqVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.form.vo.BpmFormRespVO;
+import cn.iocoder.yudao.adminserver.modules.bpm.controller.form.vo.BpmFormSimpleRespVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.form.vo.BpmFormUpdateReqVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.form.BpmFormDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -26,7 +27,7 @@ public interface BpmFormConvert {
 
     BpmFormRespVO convert(BpmFormDO bean);
 
-    List<BpmFormRespVO> convertList(List<BpmFormDO> list);
+    List<BpmFormSimpleRespVO> convertList2(List<BpmFormDO> list);
 
     PageResult<BpmFormRespVO> convertPage(PageResult<BpmFormDO> page);
 

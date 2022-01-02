@@ -57,7 +57,20 @@ public interface ModelConvert {
         return modelRespVO;
     }
 
-    BpmModelRespVO convert(Model model);
+    default BpmModelRespVO convert(Model model) {
+        BpmModelRespVO modelRespVO = new BpmModelRespVO();
+        modelRespVO.setId(model.getId());
+        modelRespVO.setName(model.getName());
+        modelRespVO.setKey(model.getKey());
+        modelRespVO.setCategory(model.getCategory());
+        modelRespVO.setCreateTime(model.getCreateTime());
+        BpmModelMetaInfoRespDTO metaInfo = JsonUtils.parseObject(model.getMetaInfo(), BpmModelMetaInfoRespDTO.class);
+        if (metaInfo != null) {
+            modelRespVO.setFormId(metaInfo.getFormId());
+            modelRespVO.setDescription(metaInfo.getDescription());
+        }
+        return modelRespVO;
+    }
 
     default BpmDefinitionCreateReqDTO convert2(Model model) {
         BpmDefinitionCreateReqDTO createReqDTO = new BpmDefinitionCreateReqDTO();

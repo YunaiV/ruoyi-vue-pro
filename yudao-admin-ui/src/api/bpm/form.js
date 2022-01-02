@@ -43,5 +43,10 @@ export function getFormPage(query) {
   })
 }
 
-export class exportFormExcel {
+// 获得动态表单的精简列表
+export function getSimpleForms() {
+  return request({
+    url: '/bpm/form/list-all-simple',
+    method: 'get'
+  })
 }

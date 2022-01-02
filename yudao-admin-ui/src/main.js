@@ -76,11 +76,10 @@ Vue.component('RightToolbar', RightToolbar)
 Vue.use(permission)
 // Vue.use(hljs.vuePlugin);
 
-// TODO 芋艿：bpmnProcessDesigner 引入
+// bpmnProcessDesigner 需要引入
 import MyPD from "@/components/bpmnProcessDesigner/package/index.js";
 Vue.use(MyPD);
 import "@/components/bpmnProcessDesigner/package/theme/index.scss";
-// TODO 芋艿：bpmnProcessDesigner 引入
 import "bpmn-js/dist/assets/diagram-js.css";
 import "bpmn-js/dist/assets/bpmn-font/css/bpmn.css";
 import "bpmn-js/dist/assets/bpmn-font/css/bpmn-codes.css";
