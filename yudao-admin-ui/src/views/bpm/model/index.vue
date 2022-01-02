@@ -40,7 +40,14 @@
           <span>{{ getDictDataLabel(DICT_TYPE.BPM_MODEL_CATEGORY, scope.row.category) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="表单信息" align="center" prop="formId" /> <!-- TODO 芋艿：需要支持表单的点击 -->
+      <el-table-column label="表单信息" align="center" prop="formId">
+        <template slot-scope="scope">
+          <el-button v-if="scope.row.formId" type="text" @click="handleFormDetail(scope.row)">
+            <span>{{ scope.row.formName }}</span>
+          </el-button>
+          <label v-else>暂无表单</label>
+        </template>
+      </el-table-column>
       <el-table-column label="流程版本" align="center" prop="processDefinition.version" />
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
         <template slot-scope="scope">
@@ -65,6 +72,13 @@
       <vue-bpmn v-if="showBpmnOpen" product="activiti" @processSave="processSave"
                 :bpmnXml="bpmnXML" :bpmnData="bpmnData" @beforeClose="cancel" />
     </el-dialog>
+
+    <!-- 流程表单配置详情 -->
+    <el-dialog title="表单详情" :visible.sync="detailOpen" width="50%" append-to-body>
+      <div class="test-form">
+        <parser :key="new Date().getTime()" :form-conf="detailForm" />
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -72,9 +86,16 @@
 import {deleteModel, deployModel, createModel, updateModel, getModelPage, getModel} from "@/api/bpm/model";
 import VueBpmn from "@/components/bpmn/VueBpmn";
 import {DICT_TYPE, getDictDatas} from "@/utils/dict";
+import {getForm} from "@/api/bpm/form";
+import {decodeFields} from "@/utils/formGenerator";
+import Parser from '@/components/parser/Parser'
 
 export default {
   name: "model",
+  components: {
+    Parser,
+    VueBpmn
+  },
   data() {
     return {
       // 遮罩层
@@ -96,11 +117,16 @@ export default {
       bpmnXML: null,
       bpmnData: {},
 
+      // 流程表单详情
+      detailOpen: false,
+      detailForm: {
+        fields: []
+      },
+
       // 数据字典
       categoryDictDatas: getDictDatas(DICT_TYPE.BPM_MODEL_CATEGORY),
     };
   },
-  components: {VueBpmn},
   created() {
     this.getList();
   },
@@ -205,7 +231,20 @@ export default {
           that.msgSuccess("部署成功");
         })
       })
-    }
+    },
+    /** 流程表单的详情按钮操作 */
+    handleFormDetail(row) {
+      getForm(row.formId).then(response => {
+        // 设置值
+        const data = response.data
+        this.detailForm = {
+          ...JSON.parse(data.conf),
+          fields: decodeFields(data.fields)
+        }
+        // 弹窗打开
+        this.detailOpen = true
+      })
+    },
   }
 };
 </script>

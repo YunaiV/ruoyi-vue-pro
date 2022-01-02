@@ -169,6 +169,7 @@ import {
 import loadBeautifier from '@/utils/loadBeautifier'
 import {SysCommonStatusEnum} from "@/utils/constants";
 import {createForm, getForm, updateForm} from "@/api/bpm/form";
+import {decodeFields} from "@/utils/formGenerator";
 
 let beautifier
 const emptyActiveData = { style: {}, autosize: {} }
@@ -316,7 +317,7 @@ export default {
           remark: data.remark
         }
         this.formConf = JSON.parse(data.conf)
-        this.drawingList = this.decodeFields(data.fields)
+        this.drawingList = decodeFields(data.fields)
         // 设置激活的表单项
         this.activeData = this.drawingList[0]
         this.activeId = this.activeData.__config__.formId
@@ -428,7 +429,6 @@ export default {
         }
         const form = {
           conf: JSON.stringify(this.formConf), // 表单配置
-          // fields: JSON.stringify(this.drawingList), // 表单项的数组
           fields: this.encodeFields(), // 表单项的数组
           ...this.form // 表单名等
         }
@@ -458,13 +458,6 @@ export default {
         fields.push(JSON.stringify(item))
       })
       return fields
-    },
-    decodeFields(fields) {
-      const drawingList = []
-      fields.forEach(item => {
-        drawingList.push(JSON.parse(item))
-      })
-      return drawingList
     },
     generate(data) {
       const func = this[`exec${titleCase(this.operationType)}`]
