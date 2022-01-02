@@ -11,7 +11,7 @@
  Target Server Version : 80026
  File Encoding         : 65001
 
- Date: 31/12/2021 23:18:07
+ Date: 02/01/2022 19:25:42
 */
 
 SET NAMES utf8mb4;
@@ -34,7 +34,7 @@ CREATE TABLE `bpm_form` (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='工作流的表单定义\n';
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='工作流的表单定义\n';
 
 -- ----------------------------
 -- Records of bpm_form
@@ -44,7 +44,31 @@ INSERT INTO `bpm_form` VALUES (7, '啊1', 1, '[\"{\\\"label\\\":\\\"密码\\\",\
 INSERT INTO `bpm_form` VALUES (8, '啊哈哈', 0, '[]', '{\"formRef\":\"elForm\",\"formModel\":\"formData\",\"size\":\"medium\",\"labelPosition\":\"right\",\"labelWidth\":100,\"formRules\":\"rules\",\"gutter\":15,\"disabled\":false,\"span\":24,\"formBtns\":true}', '哈哈哈哈', '1', '2021-12-31 10:17:26', '1', '2021-12-31 14:27:20', b'1');
 INSERT INTO `bpm_form` VALUES (9, '新增', 0, '[\"{\\\"label\\\":\\\"单行文本\\\",\\\"tag\\\":\\\"el-input\\\",\\\"tagIcon\\\":\\\"input\\\",\\\"placeholder\\\":\\\"请输入单行文本\\\",\\\"span\\\":24,\\\"labelWidth\\\":null,\\\"style\\\":{\\\"width\\\":\\\"100%\\\"},\\\"clearable\\\":true,\\\"prepend\\\":\\\"\\\",\\\"append\\\":\\\"\\\",\\\"prefix-icon\\\":\\\"\\\",\\\"suffix-icon\\\":\\\"\\\",\\\"maxlength\\\":null,\\\"show-word-limit\\\":false,\\\"readonly\\\":false,\\\"disabled\\\":false,\\\"required\\\":true,\\\"regList\\\":[],\\\"changeTag\\\":true,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/input\\\",\\\"formId\\\":101,\\\"renderKey\\\":1640959561705,\\\"layout\\\":\\\"colFormItem\\\",\\\"vModel\\\":\\\"field101\\\"}\",\"{\\\"label\\\":\\\"单选框组\\\",\\\"tag\\\":\\\"el-radio-group\\\",\\\"tagIcon\\\":\\\"radio\\\",\\\"span\\\":24,\\\"labelWidth\\\":null,\\\"style\\\":{},\\\"optionType\\\":\\\"default\\\",\\\"border\\\":false,\\\"size\\\":\\\"medium\\\",\\\"disabled\\\":false,\\\"required\\\":true,\\\"options\\\":[{\\\"label\\\":\\\"选项一\\\",\\\"value\\\":1},{\\\"label\\\":\\\"选项二\\\",\\\"value\\\":2}],\\\"regList\\\":[],\\\"changeTag\\\":true,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/radio\\\",\\\"formId\\\":102,\\\"renderKey\\\":1640959563240,\\\"layout\\\":\\\"colFormItem\\\",\\\"vModel\\\":\\\"field102\\\"}\"]', '{\"formRef\":\"elForm\",\"formModel\":\"formData\",\"size\":\"medium\",\"labelPosition\":\"right\",\"labelWidth\":100,\"formRules\":\"rules\",\"gutter\":15,\"disabled\":false,\"span\":24,\"formBtns\":true}', '哈哈哈', '1', '2021-12-31 22:06:11', '1', '2021-12-31 14:27:19', b'1');
 INSERT INTO `bpm_form` VALUES (10, '11333', 1, '[\"{\\\"label\\\":\\\"多行文本\\\",\\\"tag\\\":\\\"el-input\\\",\\\"tagIcon\\\":\\\"textarea\\\",\\\"type\\\":\\\"textarea\\\",\\\"placeholder\\\":\\\"请输入多行文本多行文本多行文本\\\",\\\"span\\\":24,\\\"labelWidth\\\":null,\\\"autosize\\\":{\\\"minRows\\\":4,\\\"maxRows\\\":4},\\\"style\\\":{\\\"width\\\":\\\"100%\\\"},\\\"maxlength\\\":null,\\\"show-word-limit\\\":false,\\\"readonly\\\":false,\\\"disabled\\\":false,\\\"required\\\":true,\\\"regList\\\":[],\\\"changeTag\\\":true,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/input\\\",\\\"formId\\\":101,\\\"renderKey\\\":1640959720587,\\\"layout\\\":\\\"colFormItem\\\",\\\"vModel\\\":\\\"field101\\\",\\\"defaultValue\\\":\\\"1111\\\"}\",\"{\\\"label\\\":\\\"滑块\\\",\\\"tag\\\":\\\"el-slider\\\",\\\"tagIcon\\\":\\\"slider\\\",\\\"defaultValue\\\":0,\\\"span\\\":24,\\\"labelWidth\\\":null,\\\"disabled\\\":false,\\\"required\\\":true,\\\"min\\\":0,\\\"max\\\":100,\\\"step\\\":1,\\\"show-stops\\\":false,\\\"range\\\":false,\\\"regList\\\":[],\\\"changeTag\\\":true,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/slider\\\",\\\"formId\\\":101,\\\"renderKey\\\":1640959732257,\\\"layout\\\":\\\"colFormItem\\\",\\\"vModel\\\":\\\"field101\\\"}\"]', '{\"formRef\":\"elForm\",\"formModel\":\"formData\",\"size\":\"medium\",\"labelPosition\":\"left\",\"labelWidth\":100,\"formRules\":\"rules\",\"gutter\":15,\"disabled\":false,\"span\":24,\"formBtns\":true}', '222211', '1', '2021-12-31 22:08:45', '1', '2021-12-31 14:27:17', b'1');
-INSERT INTO `bpm_form` VALUES (11, '1', 0, '[\"{\\\"label\\\":\\\"单行文本\\\",\\\"tag\\\":\\\"el-input\\\",\\\"tagIcon\\\":\\\"input\\\",\\\"placeholder\\\":\\\"请输入单行文本\\\",\\\"span\\\":24,\\\"labelWidth\\\":null,\\\"style\\\":{\\\"width\\\":\\\"100%\\\"},\\\"clearable\\\":true,\\\"prepend\\\":\\\"\\\",\\\"append\\\":\\\"\\\",\\\"prefix-icon\\\":\\\"\\\",\\\"suffix-icon\\\":\\\"\\\",\\\"maxlength\\\":null,\\\"show-word-limit\\\":false,\\\"readonly\\\":false,\\\"disabled\\\":false,\\\"required\\\":true,\\\"regList\\\":[],\\\"changeTag\\\":true,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/input\\\",\\\"formId\\\":101,\\\"renderKey\\\":1640960802256,\\\"layout\\\":\\\"colFormItem\\\",\\\"vModel\\\":\\\"aoteman\\\",\\\"defaultValue\\\":\\\"admin\\\"}\",\"{\\\"label\\\":\\\"密码\\\",\\\"tag\\\":\\\"el-input\\\",\\\"tagIcon\\\":\\\"password\\\",\\\"placeholder\\\":\\\"请输入密码\\\",\\\"span\\\":24,\\\"show-password\\\":true,\\\"labelWidth\\\":null,\\\"style\\\":{\\\"width\\\":\\\"100%\\\"},\\\"clearable\\\":true,\\\"prepend\\\":\\\"\\\",\\\"append\\\":\\\"\\\",\\\"prefix-icon\\\":\\\"\\\",\\\"suffix-icon\\\":\\\"\\\",\\\"maxlength\\\":null,\\\"show-word-limit\\\":false,\\\"readonly\\\":false,\\\"disabled\\\":false,\\\"required\\\":true,\\\"regList\\\":[],\\\"changeTag\\\":true,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/input\\\",\\\"formId\\\":102,\\\"renderKey\\\":1640960803756,\\\"layout\\\":\\\"colFormItem\\\",\\\"vModel\\\":\\\"password\\\",\\\"defaultValue\\\":\\\"admin123\\\"}\"]', '{\"formRef\":\"elForm\",\"formModel\":\"formData\",\"size\":\"medium\",\"labelPosition\":\"right\",\"labelWidth\":100,\"formRules\":\"rules\",\"gutter\":15,\"disabled\":false,\"span\":24,\"formBtns\":true}', '23', '1', '2021-12-31 22:26:53', '1', '2021-12-31 23:14:43', b'0');
+INSERT INTO `bpm_form` VALUES (11, 'biubiu', 0, '[\"{\\\"__config__\\\":{\\\"label\\\":\\\"级联选择\\\",\\\"url\\\":\\\"https://www.fastmock.site/mock/f8d7a54fb1e60561e2f720d5a810009d/fg/cascaderList\\\",\\\"method\\\":\\\"get\\\",\\\"dataPath\\\":\\\"list\\\",\\\"dataConsumer\\\":\\\"options\\\",\\\"showLabel\\\":true,\\\"labelWidth\\\":null,\\\"tag\\\":\\\"el-cascader\\\",\\\"tagIcon\\\":\\\"cascader\\\",\\\"layout\\\":\\\"colFormItem\\\",\\\"defaultValue\\\":[1,2],\\\"dataType\\\":\\\"dynamic\\\",\\\"span\\\":24,\\\"required\\\":true,\\\"regList\\\":[],\\\"changeTag\\\":true,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/cascader\\\",\\\"formId\\\":121,\\\"renderKey\\\":\\\"1211641097528784\\\"},\\\"options\\\":[{\\\"id\\\":1,\\\"value\\\":1,\\\"label\\\":\\\"动态选项1\\\",\\\"children\\\":[{\\\"id\\\":2,\\\"value\\\":2,\\\"label\\\":\\\"动态选项1-1\\\"}]}],\\\"placeholder\\\":\\\"请选择级联选择\\\",\\\"style\\\":{\\\"width\\\":\\\"100%\\\"},\\\"props\\\":{\\\"props\\\":{\\\"multiple\\\":false,\\\"label\\\":\\\"label\\\",\\\"value\\\":\\\"value\\\",\\\"children\\\":\\\"children\\\"}},\\\"show-all-levels\\\":true,\\\"disabled\\\":false,\\\"clearable\\\":true,\\\"filterable\\\":false,\\\"separator\\\":\\\"/\\\",\\\"__vModel__\\\":\\\"field121\\\"}\",\"{\\\"__config__\\\":{\\\"label\\\":\\\"多选框组\\\",\\\"tag\\\":\\\"el-checkbox-group\\\",\\\"tagIcon\\\":\\\"checkbox\\\",\\\"defaultValue\\\":[],\\\"span\\\":24,\\\"showLabel\\\":true,\\\"labelWidth\\\":null,\\\"layout\\\":\\\"colFormItem\\\",\\\"optionType\\\":\\\"default\\\",\\\"required\\\":true,\\\"regList\\\":[],\\\"changeTag\\\":true,\\\"border\\\":false,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/checkbox\\\",\\\"formId\\\":122,\\\"renderKey\\\":\\\"1221641097529857\\\"},\\\"__slot__\\\":{\\\"options\\\":[{\\\"label\\\":\\\"选项一\\\",\\\"value\\\":1},{\\\"label\\\":\\\"选项二\\\",\\\"value\\\":2}]},\\\"style\\\":{},\\\"size\\\":\\\"medium\\\",\\\"disabled\\\":false,\\\"__vModel__\\\":\\\"field122\\\"}\"]', '{\"formRef\":\"elForm\",\"formModel\":\"formData\",\"size\":\"medium\",\"labelPosition\":\"right\",\"labelWidth\":100,\"formRules\":\"rules\",\"gutter\":15,\"disabled\":false,\"span\":24,\"formBtns\":true}', '嘿嘿', '1', '2022-01-02 12:25:55', '1', '2022-01-02 04:46:41', b'0');
+COMMIT;
+
+-- ----------------------------
+-- Table structure for bpm_process_definition
+-- ----------------------------
+DROP TABLE IF EXISTS `bpm_process_definition`;
+CREATE TABLE `bpm_process_definition` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号',
+  `process_definition_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '流程定义的编号',
+  `description` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '描述',
+  `form_id` bigint DEFAULT NULL COMMENT '表单编号',
+  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Bpm 流程定义的拓展表\n';
+
+-- ----------------------------
+-- Records of bpm_process_definition
+-- ----------------------------
+BEGIN;
+INSERT INTO `bpm_process_definition` VALUES (12, 'process1641042089407:5:6d9a655c-6b0b-11ec-bfb7-cacd34981f8e', '', 11, '1', '2022-01-01 22:02:17', '1', '2022-01-01 22:02:17', b'0');
 COMMIT;
 
 -- ----------------------------
@@ -74,7 +98,7 @@ CREATE TABLE `inf_api_access_log` (
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   `tenant_id` bigint NOT NULL DEFAULT '0' COMMENT '租户编号',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=5185 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='API 访问日志表';
+) ENGINE=InnoDB AUTO_INCREMENT=7244 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='API 访问日志表';
 
 -- ----------------------------
 -- Records of inf_api_access_log
@@ -116,7 +140,7 @@ CREATE TABLE `inf_api_error_log` (
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   `tenant_id` bigint NOT NULL DEFAULT '0' COMMENT '租户编号',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=101 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='系统异常日志';
+) ENGINE=InnoDB AUTO_INCREMENT=111 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='系统异常日志';
 
 -- ----------------------------
 -- Records of inf_api_error_log
@@ -845,7 +869,7 @@ CREATE TABLE `sys_dict_data` (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=1125 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='字典数据表';
+) ENGINE=InnoDB AUTO_INCREMENT=1127 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='字典数据表';
 
 -- ----------------------------
 -- Records of sys_dict_data
@@ -963,6 +987,8 @@ INSERT INTO `sys_dict_data` VALUES (1121, 5, '退款中, 系统查询结果', '4
 INSERT INTO `sys_dict_data` VALUES (1122, 6, '状态未知，需要重试', '5', 'pay_refund_order_status', 0, '状态未知，需要重试', '1', '2021-12-10 16:46:03', '1', '2021-12-10 16:46:03', b'0');
 INSERT INTO `sys_dict_data` VALUES (1123, 7, '状态未知，系统查询结果', '6', 'pay_refund_order_status', 0, '状态未知，系统查询结果', '1', '2021-12-10 16:46:13', '1', '2021-12-10 16:46:13', b'0');
 INSERT INTO `sys_dict_data` VALUES (1124, 8, '退款关闭', '99', 'pay_refund_order_status', 0, '退款关闭', '1', '2021-12-10 16:46:26', '1', '2021-12-10 16:46:26', b'0');
+INSERT INTO `sys_dict_data` VALUES (1125, 0, '默认', '1', 'bpm_model_category', 0, '流程分类 - 默认', '1', '2022-01-02 08:41:11', '1', '2022-01-02 08:41:11', b'0');
+INSERT INTO `sys_dict_data` VALUES (1126, 0, 'OA', '2', 'bpm_model_category', 0, '流程分类 - OA', '1', '2022-01-02 08:41:22', '1', '2022-01-02 08:41:22', b'0');
 COMMIT;
 
 -- ----------------------------
@@ -982,7 +1008,7 @@ CREATE TABLE `sys_dict_type` (
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE KEY `dict_type` (`type`)
-) ENGINE=InnoDB AUTO_INCREMENT=137 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='字典类型表';
+) ENGINE=InnoDB AUTO_INCREMENT=139 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='字典类型表';
 
 -- ----------------------------
 -- Records of sys_dict_type
@@ -1023,6 +1049,8 @@ INSERT INTO `sys_dict_type` VALUES (132, '支付订单状态', 'pay_order_status
 INSERT INTO `sys_dict_type` VALUES (133, '支付订单退款状态', 'pay_order_refund_status', 0, '支付订单退款状态', '1', '2021-12-03 11:27:31', '1', '2021-12-03 11:27:31', b'0');
 INSERT INTO `sys_dict_type` VALUES (134, '退款订单状态', 'pay_refund_order_status', 0, '退款订单状态', '1', '2021-12-10 16:42:50', '1', '2021-12-10 16:42:50', b'0');
 INSERT INTO `sys_dict_type` VALUES (135, '退款订单类别', 'pay_refund_order_type', 0, '退款订单类别', '1', '2021-12-10 17:14:53', '1', '2021-12-10 17:14:53', b'0');
+INSERT INTO `sys_dict_type` VALUES (137, '流程分类', '流程分类', 0, '流程分类', '1', '2022-01-02 08:40:17', '1', '2022-01-02 00:40:34', b'1');
+INSERT INTO `sys_dict_type` VALUES (138, '流程分类', 'bpm_model_category', 0, '流程分类', '1', '2022-01-02 08:40:45', '1', '2022-01-02 08:40:45', b'0');
 COMMIT;
 
 -- ----------------------------
@@ -1042,108 +1070,12 @@ CREATE TABLE `sys_error_code` (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=4035 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='错误码表';
+) ENGINE=InnoDB AUTO_INCREMENT=4049 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='错误码表';
 
 -- ----------------------------
 -- Records of sys_error_code
 -- ----------------------------
 BEGIN;
-INSERT INTO `sys_error_code` VALUES (3939, 2, 'dashboard', 1001000001, '参数配置不存在', 'ceshi', NULL, '2021-04-20 23:52:56', '1', '2021-04-21 23:44:15', b'0');
-INSERT INTO `sys_error_code` VALUES (3940, 1, 'dashboard', 1001000002, '参数配置 key 重复', '', NULL, '2021-04-20 23:52:56', NULL, '2021-04-20 23:52:56', b'0');
-INSERT INTO `sys_error_code` VALUES (3941, 1, 'dashboard', 1001000003, '不能删除类型为系统内置的参数配置', '', NULL, '2021-04-20 23:52:56', NULL, '2021-04-20 23:52:56', b'0');
-INSERT INTO `sys_error_code` VALUES (3942, 1, 'dashboard', 1001000004, '不允许获取敏感配置到前端', '', NULL, '2021-04-20 23:52:56', NULL, '2021-04-20 23:52:56', b'0');
-INSERT INTO `sys_error_code` VALUES (3943, 1, 'dashboard', 1001001000, '定时任务不存在', '', NULL, '2021-04-20 23:52:56', NULL, '2021-04-20 23:52:56', b'0');
-INSERT INTO `sys_error_code` VALUES (3944, 1, 'dashboard', 1001001001, '定时任务的处理器已经存在', '', NULL, '2021-04-20 23:52:56', NULL, '2021-04-20 23:52:56', b'0');
-INSERT INTO `sys_error_code` VALUES (3945, 1, 'dashboard', 1001001002, '只允许修改为开启或者关闭状态', '', NULL, '2021-04-20 23:52:56', NULL, '2021-04-20 23:52:56', b'0');
-INSERT INTO `sys_error_code` VALUES (3946, 1, 'dashboard', 1001001003, '定时任务已经处于该状态，无需修改', '', NULL, '2021-04-20 23:52:56', NULL, '2021-04-20 23:52:56', b'0');
-INSERT INTO `sys_error_code` VALUES (3947, 1, 'dashboard', 1001001004, '只有开启状态的任务，才可以修改', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3948, 1, 'dashboard', 1001001005, 'CRON 表达式不正确', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3949, 2, 'dashboard', 1001002000, 'API 错误日志不存在', '', NULL, '2021-04-20 23:52:57', '1', '2021-04-13 21:55:55', b'1');
-INSERT INTO `sys_error_code` VALUES (3950, 1, 'dashboard', 1001002001, 'API 错误日志已处理', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3951, 1, 'dashboard', 1001003000, '文件不存在', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3952, 1, 'dashboard', 1002000000, '登录失败，账号密码不正确', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3953, 1, 'dashboard', 1002000001, '登录失败，账号被禁用', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3954, 1, 'dashboard', 1002000002, '登录失败', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3955, 1, 'dashboard', 1002000003, '验证码不存在', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3956, 1, 'dashboard', 1002000004, '验证码不正确', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3957, 1, 'dashboard', 1002001000, 'Token 已经过期', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3958, 1, 'dashboard', 1002001001, 'Token 解析失败', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3959, 1, 'dashboard', 1002002000, '已经存在该名字的菜单', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3960, 1, 'dashboard', 1002002001, '父菜单不存在', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3961, 1, 'dashboard', 1002002002, '不能设置自己为父菜单', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3962, 1, 'dashboard', 1002002003, '菜单不存在', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3963, 1, 'dashboard', 1002002004, '存在子菜单，无法删除', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3964, 1, 'dashboard', 1002002005, '父菜单的类型必须是目录或者菜单', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3965, 1, 'dashboard', 1002003000, '角色不存在', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3966, 1, 'dashboard', 1002003001, '已经存在名为【{}】的角色', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3967, 1, 'dashboard', 1002003002, '已经存在编码为【{}】的角色', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3968, 1, 'dashboard', 1002003004, '不能操作类型为系统内置的角色', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3969, 1, 'dashboard', 1002004000, '用户账号已经存在', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3970, 1, 'dashboard', 1002004001, '已经存在该名字的部门', '', NULL, '2021-04-20 23:52:57', NULL, '2021-05-02 23:18:32', b'0');
-INSERT INTO `sys_error_code` VALUES (3971, 1, 'dashboard', 1002004002, '父级部门不存在', '', NULL, '2021-04-20 23:52:57', NULL, '2021-05-02 23:18:32', b'0');
-INSERT INTO `sys_error_code` VALUES (3972, 1, 'dashboard', 1002004003, '用户不存在', '', NULL, '2021-04-20 23:52:57', NULL, '2021-05-02 23:18:32', b'0');
-INSERT INTO `sys_error_code` VALUES (3973, 1, 'dashboard', 1002004004, '存在子部门，无法删除', '', NULL, '2021-04-20 23:52:57', NULL, '2021-05-02 23:18:32', b'0');
-INSERT INTO `sys_error_code` VALUES (3974, 1, 'dashboard', 1002004005, '不能设置自己为父部门', '', NULL, '2021-04-20 23:52:57', NULL, '2021-05-02 23:18:32', b'0');
-INSERT INTO `sys_error_code` VALUES (3975, 1, 'dashboard', 1002004001, '已经存在该名字的部门', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3976, 1, 'dashboard', 1002004002, '父级部门不存在', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3977, 1, 'dashboard', 1002004003, '当前部门不存在', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3978, 1, 'dashboard', 1002004004, '存在子部门，无法删除', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3979, 1, 'dashboard', 1002004005, '不能设置自己为父部门', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3980, 1, 'dashboard', 1002004006, '部门中存在员工，无法删除', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3981, 1, 'dashboard', 1002004007, '部门不处于开启状态，不允许选择', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3982, 1, 'dashboard', 1002004008, '不能设置自己的子部门为父部门', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3983, 1, 'dashboard', 1002005001, '已经存在该标识的岗位', '', NULL, '2021-04-20 23:52:57', NULL, '2021-05-02 23:18:32', b'0');
-INSERT INTO `sys_error_code` VALUES (3984, 1, 'dashboard', 1002005002, '岗位({}) 不处于开启状态，不允许选择', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3985, 1, 'dashboard', 1002005001, '已经存在该名字的岗位', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3986, 1, 'dashboard', 1002005001, '已经存在该标识的岗位', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3987, 1, 'dashboard', 1002006001, '当前字典类型不存在', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3988, 1, 'dashboard', 1002006002, '字典类型不处于开启状态，不允许选择', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3989, 1, 'dashboard', 1002006003, '已经存在该名字的字典类型', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3990, 1, 'dashboard', 1002006004, '无法删除，该字典类型还有字典数据', '', NULL, '2021-04-20 23:52:57', NULL, '2021-05-02 23:18:32', b'0');
-INSERT INTO `sys_error_code` VALUES (3991, 1, 'dashboard', 1002006004, '无法删除，该字典类型还有字典数据', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3992, 1, 'dashboard', 1002007001, '当前字典数据不存在', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3993, 1, 'dashboard', 1002007002, '字典数据不处于开启状态，不允许选择', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3994, 1, 'dashboard', 1002007003, '已经存在该值的字典数据', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3995, 1, 'dashboard', 1002008001, '当前通知公告不存在', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3996, 1, 'dashboard', 1002009001, '文件路径已经存在', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-21 00:03:20', b'0');
-INSERT INTO `sys_error_code` VALUES (3997, 1, 'dashboard', 1002009002, '文件上传失败', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3998, 1, 'dashboard', 1002009003, '文件为空', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3999, 1, 'dashboard', 1002011000, '短信模板不存在', '', NULL, '2021-04-20 23:52:57', NULL, '2021-05-02 23:18:32', b'0');
-INSERT INTO `sys_error_code` VALUES (4000, 1, 'dashboard', 1002011001, '已经存在编码为【{}】的短信模板', '', NULL, '2021-04-20 23:52:57', NULL, '2021-05-02 23:18:32', b'0');
-INSERT INTO `sys_error_code` VALUES (4001, 2, 'dashboard', 1002011002, '无法删除，该短信渠道还有短信模板', '', NULL, '2021-04-20 23:52:57', '1', '2021-04-22 00:06:52', b'0');
-INSERT INTO `sys_error_code` VALUES (4002, 1, 'dashboard', 1002011000, '短信模板不存在', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (4003, 1, 'dashboard', 1002011001, '已经存在编码为【{}】的短信模板', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (4004, 1, 'dashboard', 1002012000, '手机号不存在', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (4005, 1, 'dashboard', 1002012001, '模板参数({})缺失', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (4006, 1, 'dashboard', 1002009000, '错误码不存在', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (4007, 1, 'dashboard', 1002009001, '已经存在编码为【{}}】的错误码', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (4008, 1, 'dashboard', 1002004003, '不能修改类型为系统内置的错误码', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (4009, 1, 'dashboard', 1001004000, '错误码不存在', '', NULL, '2021-04-21 00:38:01', NULL, '2021-04-21 00:38:01', b'0');
-INSERT INTO `sys_error_code` VALUES (4010, 1, 'dashboard', 1001004001, '已经存在编码为【{}】的错误码', '', NULL, '2021-04-21 00:38:01', NULL, '2021-04-21 23:48:44', b'0');
-INSERT INTO `sys_error_code` VALUES (4011, 1, 'dashboard', 1001004002, '不能修改类型为系统内置的错误码', '', NULL, '2021-04-21 00:38:01', NULL, '2021-04-21 00:38:01', b'0');
-INSERT INTO `sys_error_code` VALUES (4012, 2, 'dashboard', 1201002000, '啦啦啦啦', 'biubiub', '1', '2021-04-21 23:46:02', '1', '2021-04-21 23:46:02', b'0');
-INSERT INTO `sys_error_code` VALUES (4013, 1, 'dashboard', 1001002000, 'API 错误日志不存在', '', NULL, '2021-04-21 23:48:44', NULL, '2021-04-21 23:48:44', b'0');
-INSERT INTO `sys_error_code` VALUES (4014, 1, 'dashboard', 1002013000, '错误码不存在', '', NULL, '2021-04-22 00:04:06', NULL, '2021-04-22 00:04:06', b'0');
-INSERT INTO `sys_error_code` VALUES (4015, 1, 'dashboard', 1002013001, '已经存在编码为【{}】的错误码', '', NULL, '2021-04-22 00:04:06', NULL, '2021-04-22 00:04:06', b'0');
-INSERT INTO `sys_error_code` VALUES (4016, 1, 'yudao-admin-server', 1002000005, '未绑定账号，需要进行绑定', '', NULL, '2021-10-02 22:14:57', NULL, '2021-10-02 22:14:57', b'0');
-INSERT INTO `sys_error_code` VALUES (4017, 1, 'yudao-admin-server', 1002000006, 'Token 已经过期', '', NULL, '2021-10-02 22:14:57', NULL, '2021-10-10 22:47:27', b'0');
-INSERT INTO `sys_error_code` VALUES (4018, 1, 'yudao-admin-server', 1002014000, '社交授权失败，原因是：{}', '', NULL, '2021-10-05 23:23:10', NULL, '2021-10-05 23:23:10', b'0');
-INSERT INTO `sys_error_code` VALUES (4019, 1, 'yudao-admin-server', 1002014001, '社交解绑失败，非当前用户绑定', '', NULL, '2021-10-06 09:31:54', NULL, '2021-10-06 09:31:54', b'0');
-INSERT INTO `sys_error_code` VALUES (4020, 1, 'yudao-admin-server', 1003000001, '流程实例不存在', '', NULL, '2021-12-30 20:02:57', NULL, '2021-12-30 20:02:57', b'0');
-INSERT INTO `sys_error_code` VALUES (4021, 1, 'yudao-admin-server', 1003000002, '获取高亮流程图异常', '', NULL, '2021-12-30 20:02:57', NULL, '2021-12-30 20:02:57', b'0');
-INSERT INTO `sys_error_code` VALUES (4022, 1, 'yudao-admin-server', 1003001001, '请假申请不存在', '', NULL, '2021-12-30 20:02:57', NULL, '2021-12-30 20:02:57', b'0');
-INSERT INTO `sys_error_code` VALUES (4023, 1, 'yudao-admin-server', 1003001002, '项目经理岗位未设置', '', NULL, '2021-12-30 20:02:57', NULL, '2021-12-31 22:02:34', b'0');
-INSERT INTO `sys_error_code` VALUES (4024, 1, 'yudao-admin-server', 1003001003, '部门的项目经理不存在', '', NULL, '2021-12-30 20:02:57', NULL, '2021-12-30 20:02:57', b'0');
-INSERT INTO `sys_error_code` VALUES (4025, 1, 'yudao-admin-server', 1003001004, '部门经理岗位未设置', '', NULL, '2021-12-30 20:02:57', NULL, '2021-12-30 20:02:57', b'0');
-INSERT INTO `sys_error_code` VALUES (4026, 1, 'yudao-admin-server', 1003001005, '部门的部门经理不存在', '', NULL, '2021-12-30 20:02:57', NULL, '2021-12-30 20:02:57', b'0');
-INSERT INTO `sys_error_code` VALUES (4027, 1, 'yudao-admin-server', 1003001006, 'HR岗位未设置', '', NULL, '2021-12-30 20:02:57', NULL, '2021-12-30 20:02:57', b'0');
-INSERT INTO `sys_error_code` VALUES (4028, 1, 'yudao-admin-server', 1003001007, '请假天数必须>=1', '', NULL, '2021-12-30 20:02:57', NULL, '2021-12-30 20:02:57', b'0');
-INSERT INTO `sys_error_code` VALUES (4029, 1, 'yudao-admin-server', 1004001001, '模型数据为空，请先成功设计流程并保存', '', NULL, '2021-12-30 20:02:57', NULL, '2021-12-30 20:02:57', b'0');
-INSERT INTO `sys_error_code` VALUES (4030, 1, 'yudao-admin-server', 1004001002, '工作流模型异常', '', NULL, '2021-12-30 20:02:57', NULL, '2021-12-30 20:02:57', b'0');
-INSERT INTO `sys_error_code` VALUES (4031, 1, 'yudao-admin-server', 1004001003, '流程数据为空', '', NULL, '2021-12-30 20:02:57', NULL, '2021-12-30 20:02:57', b'0');
-INSERT INTO `sys_error_code` VALUES (4032, 1, 'yudao-admin-server', 1004001004, '流程定义不存在', '', NULL, '2021-12-30 20:02:57', NULL, '2021-12-30 20:02:57', b'0');
-INSERT INTO `sys_error_code` VALUES (4033, 1, 'yudao-admin-server', 1003003000, '表单项({}) 和 ({}) 使用了相同的字段名({})', '', NULL, '2021-12-31 23:08:54', NULL, '2021-12-31 23:14:16', b'0');
-INSERT INTO `sys_error_code` VALUES (4034, 1, 'yudao-admin-server', 1003003000, '表单项({}) 和 ({}) 使用了相同的字段名({})', '', NULL, '2021-12-31 23:08:54', NULL, '2021-12-31 23:08:54', b'0');
 COMMIT;
 
 -- ----------------------------
@@ -1167,7 +1099,7 @@ CREATE TABLE `sys_login_log` (
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   `tenant_id` bigint NOT NULL DEFAULT '0' COMMENT '租户编号',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=499 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='系统访问记录';
+) ENGINE=InnoDB AUTO_INCREMENT=513 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='系统访问记录';
 
 -- ----------------------------
 -- Records of sys_login_log
@@ -1197,7 +1129,7 @@ CREATE TABLE `sys_menu` (
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   `tenant_id` bigint NOT NULL DEFAULT '0' COMMENT '租户编号',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=1193 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='菜单权限表';
+) ENGINE=InnoDB AUTO_INCREMENT=1194 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='菜单权限表';
 
 -- ----------------------------
 -- Records of sys_menu
@@ -1395,12 +1327,13 @@ INSERT INTO `sys_menu` VALUES (1183, '支付商户信息删除', 'pay:merchant:d
 INSERT INTO `sys_menu` VALUES (1184, '支付商户信息导出', 'pay:merchant:export', 3, 5, 1179, '', '', '', 0, '', '2021-12-25 09:01:44', '', '2021-12-25 09:01:44', b'0', 0);
 INSERT INTO `sys_menu` VALUES (1185, '工作流', '', 1, 50, 0, '/bpm', 'tool', NULL, 0, '1', '2021-12-30 20:26:36', '1', '2021-12-30 20:26:36', b'0', 0);
 INSERT INTO `sys_menu` VALUES (1186, '流程管理', '', 1, 10, 1185, 'manager', 'nested', NULL, 0, '1', '2021-12-30 20:28:30', '1', '2021-12-30 20:28:57', b'0', 0);
-INSERT INTO `sys_menu` VALUES (1187, '流程表单', '', 2, 0, 1186, 'form', '', 'bpm/form/index', 0, '', '2021-12-30 12:38:22', '1', '2021-12-30 20:38:48', b'0', 0);
+INSERT INTO `sys_menu` VALUES (1187, '流程表单', '', 2, 0, 1186, 'form', 'form', 'bpm/form/index', 0, '', '2021-12-30 12:38:22', '1', '2021-12-31 23:20:38', b'0', 0);
 INSERT INTO `sys_menu` VALUES (1188, '流程表单的查询', 'bpm:form:query', 3, 1, 1187, '', '', '', 0, '', '2021-12-30 12:38:22', '1', '2021-12-30 20:38:56', b'0', 0);
 INSERT INTO `sys_menu` VALUES (1189, '流程表单的创建', 'bpm:form:create', 3, 2, 1187, '', '', '', 0, '', '2021-12-30 12:38:22', '1', '2021-12-30 20:39:00', b'0', 0);
 INSERT INTO `sys_menu` VALUES (1190, '流程表单的更新', 'bpm:form:update', 3, 3, 1187, '', '', '', 0, '', '2021-12-30 12:38:22', '1', '2021-12-30 20:39:04', b'0', 0);
 INSERT INTO `sys_menu` VALUES (1191, '流程表单的删除', 'bpm:form:delete', 3, 4, 1187, '', '', '', 0, '', '2021-12-30 12:38:22', '1', '2021-12-30 20:39:08', b'0', 0);
 INSERT INTO `sys_menu` VALUES (1192, '流程表单的导出', 'bpm:form:export', 3, 5, 1187, '', '', '', 0, '', '2021-12-30 12:38:22', '1', '2021-12-30 20:39:13', b'0', 0);
+INSERT INTO `sys_menu` VALUES (1193, '流程定义', '', 2, 1, 1186, 'model', 'guide', 'bpm/model/index', 0, '1', '2021-12-31 23:24:58', '1', '2021-12-31 23:24:58', b'0', 0);
 COMMIT;
 
 -- ----------------------------
@@ -1462,7 +1395,7 @@ CREATE TABLE `sys_operate_log` (
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   `tenant_id` bigint NOT NULL DEFAULT '0' COMMENT '租户编号',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=174 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='操作日志记录';
+) ENGINE=InnoDB AUTO_INCREMENT=245 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='操作日志记录';
 
 -- ----------------------------
 -- Records of sys_operate_log
@@ -1970,7 +1903,7 @@ CREATE TABLE `sys_user` (
 -- Records of sys_user
 -- ----------------------------
 BEGIN;
-INSERT INTO `sys_user` VALUES (1, 'admin', '$2a$10$0acJOIk2D25/oC87nyclE..0lzeu9DtQ/n3geP4fkun/zIVRhHJIO', '芋道源码', '管理员', 103, '[1]', 'aoteman@126.com', '15612345678', 1, 'http://127.0.0.1:48080/api/infra/file/get/7e7ed694-2242-46cf-9ac9-0709debcc22f', 0, '127.0.0.1', '2021-12-31 22:57:57', 'admin', '2021-01-05 17:03:47', NULL, '2021-12-31 22:57:57', b'0', 1);
+INSERT INTO `sys_user` VALUES (1, 'admin', '$2a$10$0acJOIk2D25/oC87nyclE..0lzeu9DtQ/n3geP4fkun/zIVRhHJIO', '芋道源码', '管理员', 103, '[1]', 'aoteman@126.com', '15612345678', 1, 'http://127.0.0.1:48080/api/infra/file/get/7e7ed694-2242-46cf-9ac9-0709debcc22f', 0, '127.0.0.1', '2022-01-02 17:02:50', 'admin', '2021-01-05 17:03:47', NULL, '2022-01-02 17:02:50', b'0', 1);
 INSERT INTO `sys_user` VALUES (2, 'ry', '$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', '若依', '测试员', 103, '[2]', 'ry@qq.com', '15666666666', 1, '', 0, '127.0.0.1', '2021-01-05 17:03:47', 'admin', '2021-01-05 17:03:47', '', '2021-12-13 01:26:34', b'1', 1);
 INSERT INTO `sys_user` VALUES (100, 'yudao', '$2a$10$11U48RhyJ5pSBYWSn12AD./ld671.ycSzJHbyrtpeoMeYiw31eo8a', '芋道', '不要吓我', 104, '[1]', 'yudao@iocoder.cn', '15601691300', 1, '', 1, '', NULL, '', '2021-01-07 09:07:17', '104', '2021-12-16 09:26:10', b'0', 1);
 INSERT INTO `sys_user` VALUES (103, 'yuanma', '', '源码', NULL, 106, NULL, 'yuanma@iocoder.cn', '15601701300', 0, '', 0, '', NULL, '', '2021-01-13 23:50:35', '104', '2021-12-16 09:26:05', b'0', 1);
@@ -2038,23 +1971,37 @@ CREATE TABLE `sys_user_session` (
 BEGIN;
 INSERT INTO `sys_user_session` VALUES ('0180929bb4b244b891253885e86ad9d1', 1, 2, '2021-12-16 09:37:48', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2021-12-16 09:07:48', NULL, '2021-12-16 09:07:48', b'0', 1);
 INSERT INTO `sys_user_session` VALUES ('01b7469337864db7a9b65747f38fa928', 1, 2, '2021-12-31 14:29:42', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2021-12-31 13:49:05', NULL, '2021-12-31 13:59:42', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('09c26e452a6c44129a2d495478b40d27', 1, 2, '2022-01-02 13:25:15', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2022-01-02 12:06:51', NULL, '2022-01-02 12:55:15', b'0', 1);
 INSERT INTO `sys_user_session` VALUES ('0b8545465544481da4d162a3a74a552e', 1, 2, '2021-12-15 23:48:37', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2021-12-15 22:44:07', NULL, '2021-12-15 23:18:37', b'0', 1);
-INSERT INTO `sys_user_session` VALUES ('1995595036aa4652bb887c43cfd35ba8', 1, 2, '2021-12-31 23:39:16', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2021-12-31 22:57:57', NULL, '2021-12-31 23:09:16', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('1995595036aa4652bb887c43cfd35ba8', 1, 2, '2022-01-01 00:18:24', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2021-12-31 22:57:57', NULL, '2021-12-31 23:48:24', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('1b6154299e1a470ebf80d2eaef72b0e2', 1, 2, '2022-01-02 11:59:52', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2022-01-02 09:30:29', NULL, '2022-01-02 11:29:52', b'0', 1);
 INSERT INTO `sys_user_session` VALUES ('1b848d99cde6448097dcedc83fda4c0a', 1, 2, '2021-12-31 10:45:09', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2021-12-31 08:35:36', NULL, '2021-12-31 10:15:09', b'0', 1);
 INSERT INTO `sys_user_session` VALUES ('1bc6ad0827fe48099bcbdb9a206818ac', 104, 2, '2021-12-15 23:48:59', 'test', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2021-12-15 23:18:59', NULL, '2021-12-15 23:18:59', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('28d90f7da308407296fface4ca68d732', 1, 2, '2022-01-01 21:54:30', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2022-01-01 21:01:18', NULL, '2022-01-01 21:24:30', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('2d920ad234a442cd98f5f517d50d6b60', 1, 2, '2022-01-02 16:47:41', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2022-01-02 14:34:30', NULL, '2022-01-02 16:17:41', b'0', 1);
 INSERT INTO `sys_user_session` VALUES ('2ec1ca2d0053415599fa18e6bddf710e', 104, 2, '2021-12-16 10:08:04', 'test', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2021-12-16 09:27:08', NULL, '2021-12-16 09:38:04', b'0', 1);
 INSERT INTO `sys_user_session` VALUES ('345ad9af8d0c46c8ad285b57cabfd060', 1, 2, '2021-12-25 19:57:51', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2021-12-25 19:15:06', NULL, '2021-12-25 19:27:51', b'0', 1);
 INSERT INTO `sys_user_session` VALUES ('47949a90a88d4c49823d70995d980ee9', 1, 2, '2021-12-16 10:04:30', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2021-12-16 09:20:41', NULL, '2021-12-16 09:34:30', b'0', 1);
 INSERT INTO `sys_user_session` VALUES ('495da339c78846609991d9bc66e17dcf', 1, 2, '2021-12-31 22:54:24', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2021-12-31 21:47:55', NULL, '2021-12-31 22:24:24', b'0', 1);
 INSERT INTO `sys_user_session` VALUES ('4e00d142b22e4826938de31c221b6b32', 104, 2, '2021-12-16 09:54:24', 'test', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2021-12-16 09:24:24', NULL, '2021-12-16 01:27:04', b'1', 1);
+INSERT INTO `sys_user_session` VALUES ('5921e2838860430b80d02c2dc5bc9b14', 1, 2, '2022-01-01 18:38:17', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2022-01-01 17:19:06', NULL, '2022-01-01 18:08:17', b'0', 1);
 INSERT INTO `sys_user_session` VALUES ('64f51e60527349d6b4a0a74f3d8eca97', 104, 2, '2021-12-16 07:37:54', 'test', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2021-12-16 07:07:54', NULL, '2021-12-16 07:07:54', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('79924bcc8d594452a8ee8406d312b2c2', 1, 2, '2022-01-01 23:37:34', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2022-01-01 22:02:06', NULL, '2022-01-01 23:07:34', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('9122b55409a94388a7b277ad808a127c', 1, 2, '2022-01-01 17:18:53', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2022-01-01 16:20:04', NULL, '2022-01-01 16:48:53', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('91b94971b7f044c8b68420e6ef7377af', 1, 2, '2022-01-02 17:32:50', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2022-01-02 17:02:50', NULL, '2022-01-02 17:02:50', b'0', 1);
 INSERT INTO `sys_user_session` VALUES ('945e4bb19f4d4c28ba7135218ee3abe3', 1, 2, '2021-12-16 08:28:54', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2021-12-16 07:42:25', NULL, '2021-12-16 07:58:54', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('9526809b303f489b8aab0c05e6b483dd', 1, 2, '2022-01-01 00:51:19', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2022-01-01 00:21:19', NULL, '2022-01-01 00:21:19', b'0', 1);
 INSERT INTO `sys_user_session` VALUES ('9ee1349d7d3043759cb742a0fa5a3163', 1, 2, '2021-12-25 19:08:33', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2021-12-25 18:38:33', NULL, '2021-12-25 18:38:33', b'0', 1);
 INSERT INTO `sys_user_session` VALUES ('a155e6dfe4b74fbaa69fcca239facc40', 1, 2, '2021-12-16 07:37:39', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2021-12-16 07:07:39', NULL, '2021-12-16 07:07:39', b'0', 1);
 INSERT INTO `sys_user_session` VALUES ('a55b31ff9e6a41fcb931d2244b4240a8', 1, 2, '2021-12-30 22:32:56', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2021-12-30 20:04:02', NULL, '2021-12-30 22:02:56', b'0', 1);
 INSERT INTO `sys_user_session` VALUES ('ab449ce8f2ea456591d23515c188c242', 1, 2, '2021-12-25 17:55:45', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2021-12-25 16:42:42', NULL, '2021-12-25 17:25:45', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('b12325b8930245c09b75aa100dc1124d', 1, 2, '2022-01-01 09:12:53', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2022-01-01 08:09:05', NULL, '2022-01-01 08:42:53', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('bd655254904748f79c0ad47dfb49d457', 1, 2, '2022-01-01 08:05:32', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2022-01-01 07:35:32', NULL, '2022-01-01 07:35:32', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('c09baa895d79468db63417f60c65573c', 1, 2, '2022-01-01 11:33:44', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2022-01-01 10:13:48', NULL, '2022-01-01 11:03:44', b'0', 1);
 INSERT INTO `sys_user_session` VALUES ('da04f99dc14a4f28a8a77178861cb3ed', 104, 2, '2021-12-15 23:37:58', 'test', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2021-12-15 22:47:31', NULL, '2021-12-15 15:11:55', b'1', 1);
+INSERT INTO `sys_user_session` VALUES ('e290aebda5f34c379d0cf3e013cbcc8b', 1, 2, '2022-01-02 09:27:23', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2022-01-02 08:32:23', NULL, '2022-01-02 08:57:23', b'0', 1);
 INSERT INTO `sys_user_session` VALUES ('fe82f6ecb17449b595c7d6bd4bc1d371', 1, 2, '2021-12-15 23:16:49', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2021-12-15 22:46:49', NULL, '2021-12-15 14:46:53', b'1', 1);
+INSERT INTO `sys_user_session` VALUES ('ffeae9ee4b8649b6b9ececaa502a934d', 1, 2, '2022-01-01 19:56:49', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2022-01-01 18:47:31', NULL, '2022-01-01 19:26:49', b'0', 1);
 COMMIT;
 
 -- ----------------------------
@@ -2391,18 +2338,4 @@ INSERT INTO `tool_test_demo` VALUES (106, '老五1', 0, 1, 1, '牛逼哈2', '', 
 INSERT INTO `tool_test_demo` VALUES (107, '哈哈哈哈', 1, 0, 1, 'biubiubui', '', '2021-02-06 14:00:54', '', '2021-02-06 14:00:54', b'0');
 COMMIT;
 
-CREATE TABLE `bpm_process_definition` (
-                                          `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号',
-                                          `process_definition_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '流程定义的编号',
-                                          `description` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '描述',
-                                          `form_id` bigint DEFAULT NULL COMMENT '表单编号',
-                                          `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
-                                          `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-                                          `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
-                                          `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-                                          `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
-                                          PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Bpm 流程定义的拓展表\n';
-
 SET FOREIGN_KEY_CHECKS = 1;
-
