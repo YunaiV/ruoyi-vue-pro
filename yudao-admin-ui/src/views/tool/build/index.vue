@@ -131,7 +131,7 @@ import JsonDrawer from './JsonDrawer'
 import RightPanel from './RightPanel'
 import {
   inputComponents, selectComponents, layoutComponents, formConf
-} from '@/utils/generator/config'
+} from '@/components/generator/config'
 import {
   exportDefault, beautifierConf, isNumberStr, titleCase, deepClone, isObjectObject
 } from '@/utils/index'
