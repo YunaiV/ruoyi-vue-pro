@@ -125,6 +125,10 @@ export default {
         //   ...JSON.parse(data.conf),
         //   fields: this.decodeFields(data.fields)
         // }
+        console.log({
+          ...JSON.parse(data.conf),
+          fields: this.decodeFields(data.fields)
+        })
         this.detailForm = {
           fields: [
             {
@@ -292,7 +296,6 @@ export default {
           formBtns: true,
           unFocusedComponentBorder: false
         }
-        console.log(this.detailForm)
       });
     },
     decodeFields(fields) {

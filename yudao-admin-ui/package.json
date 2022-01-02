@@ -62,7 +62,9 @@
     "vuex": "3.6.0",
     "bpmn-js-token-simulation": "^0.10.0",
     "min-dash": "^3.5.2",
-    "xml-js": "^1.6.11"
+    "xml-js": "^1.6.11",
+    "@babel/parser": "^7.7.4",
+    "throttle-debounce": "^2.1.0"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "4.4.6",
@@ -92,7 +94,9 @@
     "eslint-plugin-prettier": "^3.1.0",
     "fs-extra": "^8.1.0",
     "terser-webpack-plugin": "^4.2.3",
-    "webpack-bundle-analyzer": "^3.9.0"
+    "webpack-bundle-analyzer": "^3.9.0",
+    "eslint-config-airbnb-base": "^14.0.0",
+    "eslint-plugin-import": "^2.20.0"
   },
   "engines": {
     "node": ">=8.9",
