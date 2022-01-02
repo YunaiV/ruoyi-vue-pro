@@ -1,72 +1,17 @@
 <template>
-<!--  <div id="app">-->
   <div class="app-container">
 
-    <!-- TODO 芋艿：去除测试任务 -->
-<!--    <my-process-palette />-->
-    <my-process-designer
-      :key="`designer-${reloadIndex}`"
-      v-model="xmlString"
-      v-bind="controlForm"
-      keyboard
-      ref="processDesigner"
-      @init-finished="initModeler"
-    />
+    <!-- 流程编辑器 -->
+    <my-process-designer :key="`designer-${reloadIndex}`" v-model="xmlString" v-bind="controlForm"
+      keyboard ref="processDesigner" @init-finished="initModeler"/>
+    <!-- 右边工具栏 -->
     <my-properties-panel :key="`penal-${reloadIndex}`" :bpmn-modeler="modeler" :prefix="controlForm.prefix" class="process-panel" />
 
-    <!-- 右边的全局设置 -->
-    <div class="demo-control-bar">
-      <div class="open-control-dialog" @click="controlDrawerVisible = true"><i class="el-icon-setting"></i></div>
-    </div>
-    <el-drawer :visible.sync="controlDrawerVisible" size="400px" title="偏好设置" append-to-body destroy-on-close>
-      <el-form :model="controlForm" size="small" label-width="100px" class="control-form" @submit.native.prevent>
-        <el-form-item label="流程ID">
-          <el-input v-model="controlForm.processId" @change="reloadProcessDesigner" />
-        </el-form-item>
-        <el-form-item label="流程名称">
-          <el-input v-model="controlForm.processName" @change="reloadProcessDesigner" />
-        </el-form-item>
-        <el-form-item label="流转模拟">
-          <el-switch v-model="controlForm.simulation" inactive-text="停用" active-text="启用" @change="reloadProcessDesigner" />
-        </el-form-item>
-        <el-form-item label="禁用双击">
-          <el-switch v-model="controlForm.labelEditing" inactive-text="停用" active-text="启用" @change="changeLabelEditingStatus" />
-        </el-form-item>
-        <!-- TODO 芋艿：custom render 依赖报错 -->
-<!--        <el-form-item label="隐藏label">-->
-<!--          <el-switch v-model="controlForm.labelVisible" inactive-text="停用" active-text="启用" @change="changeLabelVisibleStatus" />-->
-<!--        </el-form-item>-->
-        <el-form-item label="流程引擎">
-          <el-radio-group v-model="controlForm.prefix" @change="reloadProcessDesigner(true)">
-            <el-radio label="camunda">camunda</el-radio>
-            <el-radio label="flowable">flowable</el-radio>
-            <el-radio label="activiti">activiti</el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item label="工具栏">
-          <el-radio-group v-model="controlForm.headerButtonSize">
-            <el-radio label="mini">mini</el-radio>
-            <el-radio label="small">small</el-radio>
-            <el-radio label="medium">medium</el-radio>
-          </el-radio-group>
-        </el-form-item>
-      </el-form>
-    </el-drawer>
-
-    <!-- TODO 芋艿：去掉多余的 faq -->
-<!--    <div class="info-tip">-->
-<!--      <p>注：activiti 好像不支持表单配置，控制台可能会报错</p>-->
-<!--      <p>更多配置请查看源码：<a href="https://github.com/miyuesc/bpmn-process-designer">MiyueSC/bpmn-process-designer</a></p>-->
-<!--      <p>疑问请在此留言：<a href="https://github.com/miyuesc/bpmn-process-designer/issues/16">MiyueSC/bpmn-process-designer/issues</a></p>-->
-<!--    </div>-->
   </div>
 </template>
 
 <script>
 import translations from "@/components/bpmnProcessDesigner/src/translations";
-// 自定义渲染（隐藏了 label 标签）
-// TODO 芋艿：custom render 依赖报错
-// import CustomRenderer from "@/modules/custom-renderer";
 // 自定义元素选中时的弹出菜单（修改 默认任务 为 用户任务）
 import CustomContentPadProvider from "@/components/bpmnProcessDesigner/package/designer/plugins/content-pad";
 // 自定义左侧菜单（修改 默认任务 为 用户任务）
@@ -75,7 +20,6 @@ import CustomPaletteProvider from "@/components/bpmnProcessDesigner/package/desi
 import MyProcessPalette from "@/components/bpmnProcessDesigner/package/palette/ProcessPalette";
 // 自定义侧边栏
 // import MyProcessPanel from "../package/process-panel/ProcessPanel";
-
 
 export default {
   name: "App",
@@ -126,16 +70,7 @@ export default {
       //   this.xmlString = undefined;
       //   this.$refs.processDesigner.processRestart();
       // }
-    },
-    changeLabelEditingStatus(status) {
-      this.addis.labelEditing = status ? { labelEditingProvider: ["value", ""] } : false;
-      this.reloadProcessDesigner();
-    },
-    // TODO 芋艿：custom render 依赖报错
-    // changeLabelVisibleStatus(status) {
-    //   this.addis.customRenderer = status ? CustomRenderer : false;
-    //   this.reloadProcessDesigner();
-    // },
+    }
   }
 };
 </script>
@@ -211,6 +146,7 @@ export default {
   position: absolute;
   right: 0;
   top: 55px;
+  height: calc(100vh - 84px);
 }
 
 </style>
