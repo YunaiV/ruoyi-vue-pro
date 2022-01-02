@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.adminserver.modules.bpm.controller.workflow.vo.processdefinition;
+package cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo;
 
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import io.swagger.annotations.ApiModel;
@@ -7,14 +7,13 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-/**
- * @author yunlong.li
- */
 @Data
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 @ApiModel("流程定义分页 Request VO")
-public class ProcessDefinitionPageReqVo extends PageParam {
-    @ApiModelProperty("流程名字")
-    private String name;
+public class BpmProcessDefinitionPageReqVO extends PageParam {
+
+    @ApiModelProperty(value = "标识", example = "process1641042089407", notes = "精准匹配")
+    private String key;
+
 }

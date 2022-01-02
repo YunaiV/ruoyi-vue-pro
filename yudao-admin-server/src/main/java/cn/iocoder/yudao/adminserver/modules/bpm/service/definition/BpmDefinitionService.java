@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.service.definition;
 
+import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.BpmProcessDefinitionPageItemRespVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.workflow.vo.FileResp;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.workflow.vo.processdefinition.ProcessDefinitionPageReqVo;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.workflow.vo.processdefinition.ProcessDefinitionRespVO;
+import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.BpmProcessDefinitionPageReqVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.dto.BpmDefinitionCreateReqDTO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
@@ -18,21 +18,24 @@ import java.util.Set;
  * 流程定义接口
  *
  * @author yunlong.li
+ * @author ZJQ
  */
 public interface BpmDefinitionService {
 
     /**
-     * 流程定义分页
-     * @param processDefinitionPageReqVo 分页入参
-     * @return 分页model
+     * 获得流程定义分页
+     *
+     * @param pageReqVO 分页入参
+     * @return 流程定义 Page
      */
-    PageResult<ProcessDefinitionRespVO> pageList(ProcessDefinitionPageReqVo processDefinitionPageReqVo);
+    PageResult<BpmProcessDefinitionPageItemRespVO> getDefinitionPage(BpmProcessDefinitionPageReqVO pageReqVO);
 
     /**
      * 导出流程 bpmn 模型
      * @param processDefinitionId 分页入参
      * @return 分页model
      */
+    // TODO 芋艿：考虑下重写
     FileResp export(String processDefinitionId);
 
     /**

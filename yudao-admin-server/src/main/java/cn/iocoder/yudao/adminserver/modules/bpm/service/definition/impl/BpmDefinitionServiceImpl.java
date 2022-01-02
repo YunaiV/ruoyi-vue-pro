@@ -2,16 +2,19 @@ package cn.iocoder.yudao.adminserver.modules.bpm.service.definition.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.BpmProcessDefinitionPageItemRespVO;
+import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.BpmProcessDefinitionPageReqVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.workflow.vo.FileResp;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.workflow.vo.processdefinition.ProcessDefinitionPageReqVo;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.workflow.vo.processdefinition.ProcessDefinitionRespVO;
-import cn.iocoder.yudao.adminserver.modules.bpm.convert.workflow.BpmDefinitionConvert;
+import cn.iocoder.yudao.adminserver.modules.bpm.convert.definition.BpmDefinitionConvert;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.definition.BpmProcessDefinitionDO;
+import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.form.BpmFormDO;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.mysql.definition.BpmProcessDefinitionMapper;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmDefinitionService;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.dto.BpmDefinitionCreateReqDTO;
+import cn.iocoder.yudao.adminserver.modules.bpm.service.form.BpmFormService;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.common.util.object.PageUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.activiti.bpmn.converter.BpmnXMLConverter;
 import org.activiti.bpmn.model.BpmnModel;
@@ -24,17 +27,16 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.*;
+
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 
 /**
  * 流程定义实现
  * 主要进行 Activiti {@link ProcessDefinition} 和 {@link Deployment} 的维护
  *
  * @author yunlongn
+ * @author ZJQ
  */
 @Service
 @Validated
@@ -45,28 +47,51 @@ public class BpmDefinitionServiceImpl implements BpmDefinitionService {
 
     @Resource
     private RepositoryService repositoryService;
+    @Resource
+    private BpmFormService bpmFormService;
 
     @Resource
     private BpmProcessDefinitionMapper processDefinitionMapper;
 
     @Override
-    public PageResult<ProcessDefinitionRespVO> pageList(ProcessDefinitionPageReqVo processDefinitionPageReqVo) {
-        ProcessDefinitionQuery processDefinitionQuery = repositoryService.createProcessDefinitionQuery();
-        String likeName = processDefinitionPageReqVo.getName();
-        if (StrUtil.isNotBlank(likeName)){
-            processDefinitionQuery.processDefinitionNameLike("%"+likeName+"%");
+    public PageResult<BpmProcessDefinitionPageItemRespVO> getDefinitionPage(BpmProcessDefinitionPageReqVO pageVO) {
+        ProcessDefinitionQuery definitionQuery = repositoryService.createProcessDefinitionQuery();
+        if (StrUtil.isNotBlank(pageVO.getKey())) {
+            definitionQuery.processDefinitionKey(pageVO.getKey());
         }
-        List<ProcessDefinition> processDefinitions = processDefinitionQuery.orderByProcessDefinitionId().desc()
-                .listPage((processDefinitionPageReqVo.getPageNo() - 1) * processDefinitionPageReqVo.getPageSize(),
-                        processDefinitionPageReqVo.getPageSize());
-        final List<ProcessDefinitionRespVO> respVOList = processDefinitions.stream()
-                .map(BpmDefinitionConvert.INSTANCE::convert).collect(Collectors.toList());
-        return new PageResult<>(respVOList, processDefinitionQuery.count());
+        // 执行查询
+        List<ProcessDefinition> processDefinitions = definitionQuery.orderByProcessDefinitionId().desc()
+                .listPage(PageUtils.getStart(pageVO), pageVO.getPageSize());
+        if (CollUtil.isEmpty(processDefinitions)) {
+            return new PageResult<>(Collections.emptyList(), definitionQuery.count());
+        }
+
+        // 获得 Deployment Map
+        Set<String> deploymentIds = new HashSet<>();
+        processDefinitions.forEach(definition -> CollectionUtils.addIfNotNull(deploymentIds, definition.getDeploymentId()));
+        Map<String, Deployment> deploymentMap = getDeploymentMap(deploymentIds);
+
+        // 获得 BpmProcessDefinitionDO Map
+        List<BpmProcessDefinitionDO> processDefinitionDOs = Collections.emptyList();
+        processDefinitionDOs = processDefinitionMapper.selectListByProcessDefinitionIds(
+                convertList(processDefinitions, ProcessDefinition::getId));
+        Map<String, BpmProcessDefinitionDO> processDefinitionDOMap = CollectionUtils.convertMap(processDefinitionDOs,
+                BpmProcessDefinitionDO::getProcessDefinitionId);
+
+        // 获得 Form Map
+        Set<Long> formIds = CollectionUtils.convertSet(processDefinitionDOs, BpmProcessDefinitionDO::getFormId);
+        Map<Long, BpmFormDO> formMap = bpmFormService.getFormMap(formIds);
+
+        // 拼接结果
+        long definitionCount = definitionQuery.count();
+        return new PageResult<>(BpmDefinitionConvert.INSTANCE.convertList(processDefinitions, deploymentMap,
+                processDefinitionDOMap, formMap), definitionCount);
     }
 
     @Override
     public FileResp export(String processDefinitionId) {
         BpmnModel bpmnModel = repositoryService.getBpmnModel(processDefinitionId);
+
         byte[] bpmnBytes = new BpmnXMLConverter().convertToXML(bpmnModel);
         FileResp fileResp = new FileResp();
         fileResp.setFileName( "export");
@@ -121,7 +146,7 @@ public class BpmDefinitionServiceImpl implements BpmDefinitionService {
         repositoryService.setProcessDefinitionCategory(definition.getId(), createReqDTO.getCategory());
 
         // 插入拓展表
-        BpmProcessDefinitionDO definitionDO = BpmDefinitionConvert.INSTANCE.convert(createReqDTO)
+        BpmProcessDefinitionDO definitionDO = BpmDefinitionConvert.INSTANCE.convert2(createReqDTO)
                 .setProcessDefinitionId(definition.getId());
         processDefinitionMapper.insert(definitionDO);
         return definition.getId();

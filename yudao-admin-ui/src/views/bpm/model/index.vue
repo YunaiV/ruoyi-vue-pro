@@ -68,8 +68,6 @@
         </el-table-column>
         <el-table-column label="激活状态" align="center" prop="processDefinition.version" width="80">
           <template slot-scope="scope">
-<!--            <el-tag type="success" v-if="scope.row.processDefinition && scope.row.processDefinition.suspensionState === 1">激活</el-tag>-->
-<!--            <el-tag type="warning" v-if="scope.row.processDefinition && scope.row.processDefinition.suspensionState === 2">挂起</el-tag>-->
             <el-switch v-if="scope.row.processDefinition" v-model="scope.row.processDefinition.suspensionState"
                        :active-value="1" :inactive-value="2" @change="handleStatusChange(scope.row)" />
           </template>
@@ -84,7 +82,7 @@
         <template slot-scope="scope">
           <el-button size="mini" type="text" icon="el-icon-setting" @click="handleUpdate(scope.row)">设计流程</el-button>
           <el-button size="mini" type="text" icon="el-icon-thumb" @click="handleDeploy(scope.row)">发布流程</el-button>
-          <el-button size="mini" type="text" icon="el-icon-ice-cream-round" @click="handleDeploy(scope.row)">流程定义</el-button>
+          <el-button size="mini" type="text" icon="el-icon-ice-cream-round" @click="handleDefinitionList(scope.row)">流程定义</el-button>
           <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)">删除</el-button>
         </template>
       </el-table-column>
@@ -244,6 +242,15 @@ export default {
         this.showBpmnOpen = true
       })
     },
+    /** 跳转流程定义的列表 */
+    handleDefinitionList(row) {
+      this.$router.push({
+        path:"/bpm/manager/definition",
+        query:{
+          key: row.key
+        }
+      });
+    }
   }
 };
 </script>

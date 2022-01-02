@@ -179,13 +179,13 @@ export const constantRoutes = [
   {
     path: '/bpm',
     component: Layout,
-    hidden: true, // TODO 芋艿：未来可删除，暂时作为一个测试页
+    hidden: true,
     children: [
       {
-        path: 'manager/model/view',
-        component: (resolve) => require(['@/views/bpm/model/modelViewer'], resolve),
-        name: '流程模型-浏览',
-        meta: { title: '流程模型-浏览' }
+        path: 'manager/definition',
+        component: (resolve) => require(['@/views/bpm/definition/index'], resolve),
+        name: '流程定义',
+        meta: { title: '流程定义' }
       }
     ]
   },

@@ -1,15 +1,15 @@
-package cn.iocoder.yudao.adminserver.modules.bpm.controller.workflow;
+package cn.iocoder.yudao.adminserver.modules.bpm.controller.definition;
 
+import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.BpmProcessDefinitionPageItemRespVO;
+import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.BpmProcessDefinitionPageReqVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.workflow.vo.FileResp;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.workflow.vo.processdefinition.ProcessDefinitionPageReqVo;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.workflow.vo.processdefinition.ProcessDefinitionRespVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmDefinitionService;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.activiti.api.process.runtime.ProcessRuntime;
-import org.activiti.engine.RepositoryService;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -19,39 +19,38 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-// TODO @json：swagger 和 validation 的注解，后续要补全下哈。可以等 workflow 基本写的差不多之后
+import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+
+@Api(tags = "流程定义")
 @RestController
-@RequestMapping("/workflow/process/definition")
+@RequestMapping("/bpm/definition")
+@Validated
 public class ProcessDefinitionController {
 
     @Resource
-    private RepositoryService repositoryService;
+    private BpmDefinitionService bpmDefinitionService;
 
-    @Resource
-    private ProcessRuntime processRuntime;
-    @Resource
-    private BpmDefinitionService bpmProcessDefinitionService;
+    // TODO 芋艿：权限
 
+    @GetMapping ("/page")
+    @ApiOperation(value = "获得流程定义分页")
+    public CommonResult<PageResult<BpmProcessDefinitionPageItemRespVO>> getDefinitionPage(BpmProcessDefinitionPageReqVO pageReqVO) {
+        return success(bpmDefinitionService.getDefinitionPage(pageReqVO));
+    }
 
     @GetMapping(value = "/getStartForm")
     public CommonResult<String> getStartForm(@RequestParam("processKey") String processKey){
 //        final ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().
 //                processDefinitionKey(processKey).latestVersion().singleResult();
 //        processRuntime.processDefinition(processDefinition.getId()).getFormKey();
-        //这样查似乎有问题？？， 暂时写死
-        return CommonResult.success("/flow/leave/apply");
-    }
-
-    @GetMapping ("/page")
-    @ApiOperation(value = "流程定义分页数据")
-    public CommonResult<PageResult<ProcessDefinitionRespVO>> pageList(ProcessDefinitionPageReqVo processDefinitionPageReqVo) {
-        return CommonResult.success(bpmProcessDefinitionService.pageList(processDefinitionPageReqVo));
+        // TODO 这样查似乎有问题？？， 暂时写死
+        return success("/flow/leave/apply");
     }
 
     @GetMapping ("/export")
     @ApiOperation(value = "流程定义的bpmnXml导出")
-    public void pageList(@RequestParam String processDefinitionId, HttpServletResponse response) throws IOException {
-        FileResp fileResp = bpmProcessDefinitionService.export(processDefinitionId);
+    public void getDefinitionPage(@RequestParam String processDefinitionId, HttpServletResponse response) throws IOException {
+        FileResp fileResp = bpmDefinitionService.export(processDefinitionId);
         ServletUtils.writeAttachment(response, fileResp.getFileName(), fileResp.getFileByte());
     }
 

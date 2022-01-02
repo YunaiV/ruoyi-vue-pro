@@ -1,9 +1,8 @@
 import request from '@/utils/request'
 
-
-export function page(query) {
+export function getDefinitionPage(query) {
   return request({
-    url: '/workflow/process/definition/page',
+    url: '/bpm/definition/page',
     method: 'get',
     params: query
   })
