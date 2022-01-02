@@ -80,8 +80,8 @@
     <div class="my-process-designer__container">
       <div class="my-process-designer__canvas" ref="bpmn-canvas"></div>
     </div>
-    <el-dialog title="预览" width="60%" :visible.sync="previewModelVisible" append-to-body destroy-on-close>
-      <highlightjs :language="previewType" :code="previewResult" />
+    <el-dialog title="预览" width="80%" :visible.sync="previewModelVisible" append-to-body destroy-on-close>
+      <pre><code class="hljs" v-html="highlightedCode(previewType, previewResult)"></code></pre>
     </el-dialog>
   </div>
 </template>
@@ -106,6 +106,12 @@ import activitiModdleExtension from "./plugins/extension-moddle/activiti";
 import flowableModdleExtension from "./plugins/extension-moddle/flowable";
 // 引入json转换与高亮
 import convert from "xml-js";
+
+// 代码高亮插件
+import hljs from "highlight.js/lib/highlight";
+import "highlight.js/styles/github-gist.css";
+hljs.registerLanguage("xml", require("highlight.js/lib/languages/xml"));
+hljs.registerLanguage("json", require("highlight.js/lib/languages/json"));
 
 export default {
   name: "MyProcessDesigner",
@@ -463,7 +469,12 @@ export default {
       }
       // 触发 save 事件
       this.$emit('save', xml)
-    }
+    },
+    /** 高亮显示 */
+    highlightedCode(previewType, previewResult) {
+      const result = hljs.highlight(previewType, previewResult || "", true);
+      return result.value || '&nbsp;';
+    },
   }
 };
 </script>
