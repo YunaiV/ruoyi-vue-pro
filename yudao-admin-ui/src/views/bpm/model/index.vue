@@ -34,7 +34,13 @@
     <!-- 列表 -->
     <el-table v-loading="loading" :data="list">
       <el-table-column label="流程标识" align="center" prop="key" />
-      <el-table-column label="流程名称" align="center" prop="name" />
+      <el-table-column label="流程名称" align="center" prop="name">
+        <template slot-scope="scope">
+          <el-button type="text" @click="handleBpmnDetail(scope.row)">
+            <span>{{ scope.row.name }}</span>
+          </el-button>
+        </template>
+      </el-table-column>
       <el-table-column label="流程分类" align="center" prop="category">
         <template slot-scope="scope">
           <span>{{ getDictDataLabel(DICT_TYPE.BPM_MODEL_CATEGORY, scope.row.category) }}</span>
@@ -69,15 +75,18 @@
 
     <!-- 流程表单配置详情 -->
     <el-dialog title="表单详情" :visible.sync="detailOpen" width="50%" append-to-body>
-      <div class="test-form">
-        <parser :key="new Date().getTime()" :form-conf="detailForm" />
-      </div>
+      <parser :key="new Date().getTime()" :form-conf="detailForm" />
+    </el-dialog>
+
+    <!-- 流程模型图的预览 -->
+    <el-dialog title="流程图" :visible.sync="showBpmnOpen" width="80%" append-to-body>
+      <my-process-viewer key="designer" v-model="bpmnXML" v-bind="bpmnControlForm" />
     </el-dialog>
   </div>
 </template>
 
 <script>
-import {deleteModel, deployModel, getModelPage} from "@/api/bpm/model";
+import {deleteModel, deployModel, getModelPage, getModel} from "@/api/bpm/model";
 import {DICT_TYPE, getDictDatas} from "@/utils/dict";
 import {getForm} from "@/api/bpm/form";
 import {decodeFields} from "@/utils/formGenerator";
@@ -107,7 +116,9 @@ export default {
       // BPMN 数据
       showBpmnOpen: false,
       bpmnXML: null,
-      bpmnData: {},
+      bpmnControlForm: {
+        prefix: "activiti"
+      },
 
       // 流程表单详情
       detailOpen: false,
@@ -205,6 +216,22 @@ export default {
         this.detailOpen = true
       })
     },
+    /** 流程图的详情按钮操作 */
+    handleBpmnDetail(row) {
+      getModel(row.id).then(response => {
+        this.bpmnXML = response.data.bpmnXml
+        // 弹窗打开
+        this.showBpmnOpen = true
+      })
+    },
   }
 };
 </script>
+
+<style lang="scss">
+
+.my-process-designer {
+  height: calc(100vh - 200px);
+}
+
+</style>
