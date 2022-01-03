@@ -26,7 +26,7 @@
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
         <el-button type="primary" icon="el-icon-plus" size="mini" @click="handleAdd"
-                   v-hasPermi="['infra:config:create']">新建流程</el-button>
+                   v-hasPermi="['infra:config:create']">新建流程模型</el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
@@ -72,7 +72,7 @@
                        :active-value="1" :inactive-value="2" @change="handleStatusChange(scope.row)" />
           </template>
         </el-table-column>
-        <el-table-column label="部署时间" align="center" prop="createTime" width="180">
+        <el-table-column label="部署时间" align="center" prop="deploymentTime" width="180">
           <template slot-scope="scope">
             <span v-if="scope.row.processDefinition">{{ parseTime(scope.row.processDefinition.deploymentTime) }}</span>
           </template>
@@ -256,9 +256,7 @@ export default {
 </script>
 
 <style lang="scss">
-
 .my-process-designer {
   height: calc(100vh - 200px);
 }
-
 </style>

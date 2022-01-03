@@ -48,6 +48,8 @@ public class BpmDefinitionServiceImpl implements BpmDefinitionService {
 
     private static final String BPMN_FILE_SUFFIX = ".bpmn";
 
+    private static final BpmnXMLConverter BPMN_XML_CONVERTER = new BpmnXMLConverter();
+
     @Resource
     private RepositoryService repositoryService;
     @Resource
@@ -92,14 +94,18 @@ public class BpmDefinitionServiceImpl implements BpmDefinitionService {
     }
 
     @Override
-    public FileResp export(String processDefinitionId) {
-        BpmnModel bpmnModel = repositoryService.getBpmnModel(processDefinitionId);
+    public String getDefinitionBpmnXML(String id) {
+        BpmnModel bpmnModel = repositoryService.getBpmnModel(id);
+        if (bpmnModel == null) {
+            return null;
+        }
+        byte[] bpmnBytes = BPMN_XML_CONVERTER.convertToXML(bpmnModel);
+        return StrUtil.utf8Str(bpmnBytes);
+    }
 
-        byte[] bpmnBytes = new BpmnXMLConverter().convertToXML(bpmnModel);
-        FileResp fileResp = new FileResp();
-        fileResp.setFileName( "export");
-        fileResp.setFileByte(bpmnBytes);
-        return fileResp;
+    @Override
+    public BpmnModel getBpmnModel(String processDefinitionId) {
+        return repositoryService.getBpmnModel(processDefinitionId);
     }
 
     @Override

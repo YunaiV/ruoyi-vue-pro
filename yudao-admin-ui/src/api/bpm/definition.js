@@ -8,9 +8,9 @@ export function getDefinitionPage(query) {
   })
 }
 
-export function exportProcessDefinition(query) {
+export function getDefinitionBpmnXML(id) {
   return request({
-    url: '/workflow/process/definition/export?processDefinitionId='+query.id,
+    url: '/bpm/definition/get-bpmn-xml?id=' + id,
     method: 'get'
   })
 }

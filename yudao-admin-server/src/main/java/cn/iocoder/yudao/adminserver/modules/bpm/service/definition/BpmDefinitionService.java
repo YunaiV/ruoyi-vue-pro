@@ -1,11 +1,11 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.service.definition;
 
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.BpmProcessDefinitionPageItemRespVO;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.workflow.vo.FileResp;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.BpmProcessDefinitionPageReqVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.dto.BpmDefinitionCreateReqDTO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.ProcessDefinition;
 
@@ -31,12 +31,20 @@ public interface BpmDefinitionService {
     PageResult<BpmProcessDefinitionPageItemRespVO> getDefinitionPage(BpmProcessDefinitionPageReqVO pageReqVO);
 
     /**
-     * 导出流程 bpmn 模型
-     * @param processDefinitionId 分页入参
-     * @return 分页model
+     * 获得流程定义对应的 BPMN XML
+     *
+     * @param id 流程定义编号
+     * @return BPMN XML
      */
-    // TODO 芋艿：考虑下重写
-    FileResp export(String processDefinitionId);
+    String getDefinitionBpmnXML(String id);
+
+    /**
+     * 获得 Bpmn 模型
+     *
+     * @param processDefinitionId 流程定义的编号
+     * @return Bpmn 模型
+     */
+    BpmnModel getBpmnModel(String processDefinitionId);
 
     /**
      * 获得编号对应的 ProcessDefinition

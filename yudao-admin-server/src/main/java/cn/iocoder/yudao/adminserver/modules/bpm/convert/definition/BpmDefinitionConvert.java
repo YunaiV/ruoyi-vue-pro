@@ -5,6 +5,7 @@ import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.definition.BpmPro
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.form.BpmFormDO;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.dto.BpmDefinitionCreateReqDTO;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import org.activiti.engine.impl.persistence.entity.SuspensionState;
 import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.mapstruct.Mapper;
@@ -36,6 +37,7 @@ public interface BpmDefinitionConvert {
     default BpmProcessDefinitionPageItemRespVO convert(ProcessDefinition bean, Deployment deployment,
                                                        BpmProcessDefinitionDO processDefinitionDO, BpmFormDO form) {
         BpmProcessDefinitionPageItemRespVO respVO = convert(bean);
+        respVO.setSuspensionState(bean.isSuspended() ? SuspensionState.SUSPENDED.getStateCode() : SuspensionState.ACTIVE.getStateCode());
         if (deployment != null) {
             respVO.setDeploymentTime(deployment.getDeploymentTime());
         }

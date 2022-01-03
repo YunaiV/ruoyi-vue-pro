@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
 
-import static cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants.BPM_FORM_NOT_EXISTS;
+import static cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants.FORM_NOT_EXISTS;
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
@@ -72,7 +72,7 @@ public class BpmFormServiceTest extends BaseDbUnitTest {
         BpmFormUpdateReqVO reqVO = randomPojo(BpmFormUpdateReqVO.class);
 
         // 调用, 并断言异常
-        assertServiceException(() -> formService.updateForm(reqVO), BPM_FORM_NOT_EXISTS);
+        assertServiceException(() -> formService.updateForm(reqVO), FORM_NOT_EXISTS);
     }
 
     @Test
@@ -95,7 +95,7 @@ public class BpmFormServiceTest extends BaseDbUnitTest {
         Long id = randomLongId();
 
         // 调用, 并断言异常
-        assertServiceException(() -> formService.deleteForm(id), BPM_FORM_NOT_EXISTS);
+        assertServiceException(() -> formService.deleteForm(id), FORM_NOT_EXISTS);
     }
 
     @Test

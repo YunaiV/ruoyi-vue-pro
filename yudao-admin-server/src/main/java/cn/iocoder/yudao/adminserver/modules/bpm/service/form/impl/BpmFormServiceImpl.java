@@ -20,8 +20,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants.BPM_FORM_FIELD_REPEAT;
-import static cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants.BPM_FORM_NOT_EXISTS;
+import static cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants.FORM_FIELD_REPEAT;
+import static cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants.FORM_NOT_EXISTS;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 
 /**
@@ -66,7 +66,7 @@ public class BpmFormServiceImpl implements BpmFormService {
 
     private void validateFormExists(Long id) {
         if (formMapper.selectById(id) == null) {
-            throw exception(BPM_FORM_NOT_EXISTS);
+            throw exception(FORM_NOT_EXISTS);
         }
     }
 
@@ -106,7 +106,7 @@ public class BpmFormServiceImpl implements BpmFormService {
                 continue;
             }
             // 如果存在，则报错
-            throw exception(BPM_FORM_FIELD_REPEAT, oldLabel, fieldDTO.getLabel(), fieldDTO.getVModel());
+            throw exception(FORM_FIELD_REPEAT, oldLabel, fieldDTO.getLabel(), fieldDTO.getVModel());
         }
     }
 

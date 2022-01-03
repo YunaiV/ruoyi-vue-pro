@@ -109,7 +109,7 @@ public class BpmModelServiceImpl implements BpmModelService {
         // 校验流程标识已经存在
         Model keyModel = this.getModelByKey(createReqVO.getKey());
         if (keyModel != null) {
-            throw exception(BPM_MODEL_KEY_EXISTS, createReqVO.getKey());
+            throw exception(MODEL_KEY_EXISTS, createReqVO.getKey());
         }
 
         // 创建流程定义
@@ -129,7 +129,7 @@ public class BpmModelServiceImpl implements BpmModelService {
         // 校验流程模型存在
         Model model = repositoryService.getModel(updateReqVO.getId());
         if (model == null) {
-            throw exception(BPMN_MODEL_NOT_EXISTS);
+            throw exception(MODEL_NOT_EXISTS);
         }
 
         // 修改流程定义
@@ -146,11 +146,11 @@ public class BpmModelServiceImpl implements BpmModelService {
         // 校验流程模型存在
         Model model = repositoryService.getModel(id);
         if (ObjectUtils.isEmpty(model)) {
-            throw exception(BPMN_MODEL_NOT_EXISTS);
+            throw exception(MODEL_NOT_EXISTS);
         }
         byte[] bpmnBytes = repositoryService.getModelEditorSource(model.getId());
         if (bpmnBytes == null) {
-            throw exception(BPMN_MODEL_NOT_EXISTS);
+            throw exception(MODEL_NOT_EXISTS);
         }
 
         // 创建流程定义
@@ -169,7 +169,7 @@ public class BpmModelServiceImpl implements BpmModelService {
         // 校验流程模型存在
         Model model = repositoryService.getModel(id);
         if (model == null) {
-            throw exception(BPMN_MODEL_NOT_EXISTS);
+            throw exception(MODEL_NOT_EXISTS);
         }
         // 执行删除
         repositoryService.deleteModel(id);
@@ -181,7 +181,7 @@ public class BpmModelServiceImpl implements BpmModelService {
 
     private void checkKeyNCName(String key) {
         if (!ValidationUtils.isXmlNCName(key)) {
-            throw exception(BPMN_MODEL_KEY_VALID);
+            throw exception(MODEL_KEY_VALID);
         }
     }
 

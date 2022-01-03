@@ -2,12 +2,11 @@ package cn.iocoder.yudao.adminserver.modules.bpm.controller.definition;
 
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.BpmProcessDefinitionPageItemRespVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.BpmProcessDefinitionPageReqVO;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.workflow.vo.FileResp;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmDefinitionService;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,8 +15,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
@@ -38,6 +35,7 @@ public class ProcessDefinitionController {
         return success(bpmDefinitionService.getDefinitionPage(pageReqVO));
     }
 
+    // TODO 芋艿：需要重写该方法
     @GetMapping(value = "/getStartForm")
     public CommonResult<String> getStartForm(@RequestParam("processKey") String processKey){
 //        final ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().
@@ -47,11 +45,12 @@ public class ProcessDefinitionController {
         return success("/flow/leave/apply");
     }
 
-    @GetMapping ("/export")
-    @ApiOperation(value = "流程定义的bpmnXml导出")
-    public void getDefinitionPage(@RequestParam String processDefinitionId, HttpServletResponse response) throws IOException {
-        FileResp fileResp = bpmDefinitionService.export(processDefinitionId);
-        ServletUtils.writeAttachment(response, fileResp.getFileName(), fileResp.getFileByte());
+    @GetMapping ("/get-bpmn-xml")
+    @ApiOperation(value = "获得流程定义的 BPMN XML")
+    @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = String.class)
+    public CommonResult<String> getDefinitionBpmnXML(@RequestParam("id") String id) {
+        String bpmnXML = bpmDefinitionService.getDefinitionBpmnXML(id);
+        return success(bpmnXML);
     }
 
 }
