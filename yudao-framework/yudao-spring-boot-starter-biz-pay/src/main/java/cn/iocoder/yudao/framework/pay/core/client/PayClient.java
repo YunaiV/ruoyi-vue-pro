@@ -39,7 +39,7 @@ public interface PayClient {
      * @param reqDTO  统一退款请求信息
      * @return 各支付渠道的统一返回结果
      */
-    PayRefundUnifiedRespDTO unifiedRefund(PayRefundUnifiedReqDTO reqDTO);
+    PayCommonResult<PayRefundUnifiedRespDTO> unifiedRefund(PayRefundUnifiedReqDTO reqDTO);
 
     /**
      * 解析支付退款通知数据

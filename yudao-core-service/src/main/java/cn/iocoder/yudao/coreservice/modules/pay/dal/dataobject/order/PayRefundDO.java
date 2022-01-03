@@ -36,20 +36,6 @@ public class PayRefundDO extends BaseDO {
     @TableId
     private Long id;
 
-     /**
-     * https://api.mch.weixin.qq.com/v3/refund/domestic/refunds 中的 out_refund_no
-     * https://opendocs.alipay.com/apis alipay.trade.refund 中的 out_request_no
-     * 退款请求号。
-     * 标识一次退款请求，需要保证在交易号下唯一，如需部分退款，则此参数必传。
-     * 注：针对同一次退款请求，如果调用接口失败或异常了，重试时需要保证退款请求号不能变更，
-     * 防止该笔交易重复退款。支付宝会保证同样的退款请求号多次请求只会退一次。
-     * 退款单请求号，根据规则生成
-     * 例如说，R202109181134287570000
-      * 废弃，使用 merchantRefundNo 做退款请求号
-     */
-    @Deprecated
-    private String reqNo;
-
     /**
      * 商户编号
      *

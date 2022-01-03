@@ -607,7 +607,7 @@ CREATE TABLE `pay_order_extension` (
   `user_ip` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '用户 IP',
   `status` tinyint NOT NULL COMMENT '支付状态',
   `channel_extras` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '支付渠道的额外参数',
-  `channel_notify_data` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '支付渠道异步通知的内容',
+  `channel_notify_data` varchar(2048) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '支付渠道异步通知的内容',
   `creator` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `updater` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
@@ -720,7 +720,6 @@ COMMIT;
 DROP TABLE IF EXISTS `pay_refund`;
 CREATE TABLE `pay_refund` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '支付退款编号',
-  `req_no` varchar(64) NOT NULL COMMENT '退款单请求号',
   `merchant_id` bigint NOT NULL COMMENT '商户编号',
   `app_id` bigint NOT NULL COMMENT '应用编号',
   `channel_id` bigint NOT NULL COMMENT '渠道编号',

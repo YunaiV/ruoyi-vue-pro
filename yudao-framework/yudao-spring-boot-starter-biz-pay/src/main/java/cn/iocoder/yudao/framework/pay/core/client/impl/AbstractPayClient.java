@@ -103,19 +103,19 @@ public abstract class AbstractPayClient<Config extends PayClientConfig> implemen
 
 
     @Override
-    public PayRefundUnifiedRespDTO unifiedRefund(PayRefundUnifiedReqDTO reqDTO) {
-        PayRefundUnifiedRespDTO resp;
+    public PayCommonResult<PayRefundUnifiedRespDTO> unifiedRefund(PayRefundUnifiedReqDTO reqDTO) {
+        PayCommonResult<PayRefundUnifiedRespDTO> resp;
         try {
             resp = doUnifiedRefund(reqDTO);
         }  catch (Throwable ex) {
             // 记录异常日志
             log.error("[unifiedRefund][request({}) 发起退款失败]", toJsonString(reqDTO), ex);
-            throw exception(GlobalErrorCodeConstants.INTERNAL_SERVER_ERROR);
+            resp = PayCommonResult.error(ex);
         }
         return resp;
     }
 
 
-    protected abstract PayRefundUnifiedRespDTO doUnifiedRefund(PayRefundUnifiedReqDTO reqDTO) throws Throwable;
+    protected abstract PayCommonResult<PayRefundUnifiedRespDTO> doUnifiedRefund(PayRefundUnifiedReqDTO reqDTO) throws Throwable;
 
 }

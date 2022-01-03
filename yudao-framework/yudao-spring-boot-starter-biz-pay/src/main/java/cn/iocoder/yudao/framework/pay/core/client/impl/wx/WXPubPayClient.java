@@ -149,7 +149,7 @@ public class WXPubPayClient extends AbstractPayClient<WXPayClientConfig> {
 
 
     @Override
-    protected PayRefundUnifiedRespDTO doUnifiedRefund(PayRefundUnifiedReqDTO reqDTO) throws Throwable {
+    protected PayCommonResult<PayRefundUnifiedRespDTO> doUnifiedRefund(PayRefundUnifiedReqDTO reqDTO) throws Throwable {
         //TODO 需要实现
         throw new UnsupportedOperationException();
     }

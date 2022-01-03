@@ -43,7 +43,6 @@ public class PayRefundServiceTest extends BaseDbUnitTest {
     public void testGetRefundPage() {
         // mock 数据
         PayRefundDO dbRefund = randomPojo(PayRefundDO.class, o -> { // 等会查询到
-            o.setReqNo("RF0000001");
             o.setMerchantId(1L);
             o.setAppId(1L);
             o.setChannelId(1L);
@@ -115,7 +114,6 @@ public class PayRefundServiceTest extends BaseDbUnitTest {
     public void testGetRefundList() {
         // mock 数据
         PayRefundDO dbRefund = randomPojo(PayRefundDO.class, o -> { // 等会查询到
-            o.setReqNo("RF0000001");
             o.setMerchantId(1L);
             o.setAppId(1L);
             o.setChannelId(1L);

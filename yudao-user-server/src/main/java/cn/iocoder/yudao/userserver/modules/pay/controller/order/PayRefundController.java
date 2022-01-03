@@ -37,8 +37,8 @@ public class PayRefundController {
         PayRefundReqDTO req = PayRefundConvert.INSTANCE.convert(reqVO);
         req.setUserIp(getClientIP());
         //TODO 测试暂时模拟生成商户退款订单
-        if(StrUtil.isEmpty(reqVO.getMerchantRefundNo())) {
-            req.setMerchantRefundNo(PaySeqUtils.genMerchantRefundNo());
+        if(StrUtil.isEmpty(reqVO.getMerchantRefundId())) {
+            req.setMerchantRefundId(PaySeqUtils.genMerchantRefundNo());
         }
         return CommonResult.success( PayRefundConvert.INSTANCE.convert(payRefundCoreService.submitRefundOrder(req)));
     }

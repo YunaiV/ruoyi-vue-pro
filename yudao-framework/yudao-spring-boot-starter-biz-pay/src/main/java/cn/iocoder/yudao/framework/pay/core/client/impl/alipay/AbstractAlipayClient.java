@@ -3,9 +3,9 @@ package cn.iocoder.yudao.framework.pay.core.client.impl.alipay;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.iocoder.yudao.framework.pay.core.client.AbstractPayCodeMapping;
+import cn.iocoder.yudao.framework.pay.core.client.PayCommonResult;
 import cn.iocoder.yudao.framework.pay.core.client.dto.*;
 import cn.iocoder.yudao.framework.pay.core.client.impl.AbstractPayClient;
-import cn.iocoder.yudao.framework.pay.core.enums.PayChannelRefundRespEnum;
 import cn.iocoder.yudao.framework.pay.core.enums.PayNotifyRefundStatusEnum;
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.AlipayConfig;
@@ -100,39 +100,32 @@ public abstract class AbstractAlipayClient extends AbstractPayClient<AlipayPayCl
      * @return 退款请求 Response
      */
     @Override
-    protected PayRefundUnifiedRespDTO doUnifiedRefund(PayRefundUnifiedReqDTO reqDTO)  {
+    protected PayCommonResult<PayRefundUnifiedRespDTO> doUnifiedRefund(PayRefundUnifiedReqDTO reqDTO)  {
         AlipayTradeRefundModel model=new AlipayTradeRefundModel();
         model.setTradeNo(reqDTO.getChannelOrderNo());
         model.setOutTradeNo(reqDTO.getPayTradeNo());
-        model.setOutRequestNo(reqDTO.getRefundReqNo());
+        model.setOutRequestNo(reqDTO.getMerchantRefundId());
         model.setRefundAmount(calculateAmount(reqDTO.getAmount()).toString());
         model.setRefundReason(reqDTO.getReason());
         AlipayTradeRefundRequest refundRequest = new AlipayTradeRefundRequest();
         refundRequest.setBizModel(model);
-        PayRefundUnifiedRespDTO respDTO = new PayRefundUnifiedRespDTO();
         try {
             AlipayTradeRefundResponse response =  client.execute(refundRequest);
             log.info("[doUnifiedRefund][response({}) 发起退款 渠道返回", toJsonString(response));
             if (response.isSuccess()) {
-                //退款成功,更新为PROCESSING_NOTIFY， 而不是 SYNC_SUCCESS 通过支付宝回调接口处理。退款导致触发的异步通知，
                 //退款导致触发的异步通知是发送到支付接口中设置的notify_url
-                //TODO 沙箱环境 返回 的tradeNo(渠道退款单号） 和 订单的tradNo 是一个值，是不是理解不对?
-                respDTO.setChannelResp(PayChannelRefundRespEnum.SUCCESS)
-                        .setChannelCode(response.getCode())
-                        .setChannelMsg(response.getMsg());
+                //支付宝不返回退款单号，设置为空
+                PayRefundUnifiedRespDTO respDTO = new PayRefundUnifiedRespDTO();
+                respDTO.setChannelRefundId("");
+                return PayCommonResult.build(response.getCode(), response.getMsg(), respDTO, codeMapping);
             }else{
-                respDTO.setChannelResp(PayChannelRefundRespEnum.FAILURE)
-                        .setChannelCode(response.getSubCode())
-                        .setChannelMsg(response.getSubMsg());
+                //失败。需要抛出异常
+                return PayCommonResult.build(response.getCode(), response.getMsg(), null, codeMapping);
             }
-            return respDTO;
         } catch (AlipayApiException e) {
             //TODO 记录异常日志
             log.error("[doUnifiedRefund][request({}) 发起退款失败,网络读超时，退款状态未知]", toJsonString(reqDTO), e);
-            respDTO.setChannelResp(PayChannelRefundRespEnum.FAILURE)
-                    .setChannelCode(e.getErrCode())
-                    .setChannelMsg(e.getErrMsg());
-            return respDTO;
+            return PayCommonResult.build(e.getErrCode(), e.getErrMsg(), null, codeMapping);
         }
     }
 

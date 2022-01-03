@@ -43,7 +43,6 @@ public class PayRefundUnifiedReqDTO {
      */
     private String payTradeNo;
 
-    // TODO @jason：这个字段，要不就使用 merchantRefundId，更直接
     /**
      * https://api.mch.weixin.qq.com/v3/refund/domestic/refunds 中的 out_refund_no
      * https://opendocs.alipay.com/apis alipay.trade.refund 中的 out_trade_no
@@ -51,7 +50,7 @@ public class PayRefundUnifiedReqDTO {
      * 使用 商户的退款单号。{PayRefundDO 字段 merchantRefundNo}
      */
     @NotEmpty(message = "退款请求单号")
-    private String refundReqNo;
+    private String merchantRefundId;
 
     /**
      * 退款原因

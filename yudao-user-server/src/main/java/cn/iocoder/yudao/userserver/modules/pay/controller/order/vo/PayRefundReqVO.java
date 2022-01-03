@@ -29,6 +29,6 @@ public class PayRefundReqVO {
     @ApiModelProperty(value = "商户退款订单号", required = true, example = "MR202111180000000001")
     //TODO 测试暂时模拟生成
     //@NotEmpty(message = "商户退款订单号")
-    private String merchantRefundNo;
+    private String merchantRefundId;
 
 }

@@ -17,24 +17,6 @@ import lombok.experimental.Accessors;
 public class PayRefundRespDTO {
 
     /**
-     * 渠道返回结果
-     * 退款处理中和退款成功  返回  1
-     * 失败和其他情况 返回 2
-     */
-    // TODO @jason：这个 result，可以使用 CommonResult 里呢
-    private Integer channelReturnResult;
-
-    /**
-     * 渠道返回 code
-     */
-    private String channelReturnCode;
-
-    /**
-     * 渠道返回消息
-     */
-    private String  channelReturnMsg;
-
-    /**
      * 支付退款单编号，自增
      */
     private Long refundId;
