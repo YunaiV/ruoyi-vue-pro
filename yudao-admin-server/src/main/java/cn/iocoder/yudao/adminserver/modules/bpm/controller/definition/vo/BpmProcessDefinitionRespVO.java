@@ -8,7 +8,7 @@ import javax.validation.constraints.NotEmpty;
 
 @ApiModel("流程定义 Response VO")
 @Data
-public class ProcessDefinitionRespVO {
+public class BpmProcessDefinitionRespVO {
 
     @ApiModelProperty(value = "编号", required = true, example = "1024")
     private String id;

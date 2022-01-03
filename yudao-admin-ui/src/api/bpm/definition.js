@@ -1,16 +1,16 @@
 import request from '@/utils/request'
 
-export function getDefinitionPage(query) {
+export function getProcessDefinitionPage(query) {
   return request({
-    url: '/bpm/definition/page',
+    url: '/bpm/process-definition/page',
     method: 'get',
     params: query
   })
 }
 
-export function getDefinitionBpmnXML(id) {
+export function getProcessDefinitionBpmnXML(id) {
   return request({
-    url: '/bpm/definition/get-bpmn-xml?id=' + id,
+    url: '/bpm/process-definition/get-bpmn-xml?id=' + id,
     method: 'get'
   })
 }

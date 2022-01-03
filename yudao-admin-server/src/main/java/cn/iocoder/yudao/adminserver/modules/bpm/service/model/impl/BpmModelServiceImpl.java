@@ -4,7 +4,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.model.vo.*;
 import cn.iocoder.yudao.adminserver.modules.bpm.convert.model.BpmModelConvert;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.form.BpmFormDO;
-import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmDefinitionService;
+import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmProcessDefinitionService;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.dto.BpmDefinitionCreateReqDTO;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.form.BpmFormService;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.model.BpmModelService;
@@ -52,7 +52,7 @@ public class BpmModelServiceImpl implements BpmModelService {
     @Resource
     private BpmFormService bpmFormService;
     @Resource
-    private BpmDefinitionService bpmDefinitionService;
+    private BpmProcessDefinitionService bpmProcessDefinitionService;
 
     @Override
     public PageResult<BpmModelPageItemRespVO> getModelPage(ModelPageReqVO pageVO) {
@@ -80,9 +80,9 @@ public class BpmModelServiceImpl implements BpmModelService {
         // 获得 Deployment Map
         Set<String> deploymentIds = new HashSet<>();
         models.forEach(model -> CollectionUtils.addIfNotNull(deploymentIds, model.getDeploymentId()));
-        Map<String, Deployment> deploymentMap = bpmDefinitionService.getDeploymentMap(deploymentIds);
+        Map<String, Deployment> deploymentMap = bpmProcessDefinitionService.getDeploymentMap(deploymentIds);
         // 获得 ProcessDefinition Map
-        List<ProcessDefinition> processDefinitions = bpmDefinitionService.getDefinitionListByDeploymentIds(deploymentIds);
+        List<ProcessDefinition> processDefinitions = bpmProcessDefinitionService.getProcessDefinitionListByDeploymentIds(deploymentIds);
         Map<String, ProcessDefinition> processDefinitionMap = convertMap(processDefinitions, ProcessDefinition::getDeploymentId);
 
         // 拼接结果
@@ -157,18 +157,18 @@ public class BpmModelServiceImpl implements BpmModelService {
         // 创建流程定义
         BpmDefinitionCreateReqDTO definitionCreateReqDTO = BpmModelConvert.INSTANCE.convert2(model)
                 .setBpmnXml(StrUtil.utf8Str(bpmnBytes));
-        String definitionId = bpmDefinitionService.createDefinition(definitionCreateReqDTO);
+        String definitionId = bpmProcessDefinitionService.createProcessDefinition(definitionCreateReqDTO);
 
         // 将老的流程定义进行挂起。也就是说，只有最新部署的流程定义，才可以发起任务。
         if (StrUtil.isNotEmpty(model.getDeploymentId())) {
-            ProcessDefinition oldDefinition = bpmDefinitionService.getDefinitionByDeploymentId(model.getDeploymentId());
+            ProcessDefinition oldDefinition = bpmProcessDefinitionService.getProcessDefinitionByDeploymentId(model.getDeploymentId());
             if (oldDefinition != null) {
-                bpmDefinitionService.updateDefinitionSuspensionState(oldDefinition.getId(), SuspensionState.SUSPENDED.getStateCode());
+                bpmProcessDefinitionService.updateProcessDefinitionState(oldDefinition.getId(), SuspensionState.SUSPENDED.getStateCode());
             }
         }
 
         // 更新 model 的 deploymentId，进行关联
-        ProcessDefinition definition = bpmDefinitionService.getDefinition(definitionId);
+        ProcessDefinition definition = bpmProcessDefinitionService.getProcessDefinition(definitionId);
         model.setDeploymentId(definition.getDeploymentId());
         repositoryService.saveModel(model);
     }
@@ -192,13 +192,13 @@ public class BpmModelServiceImpl implements BpmModelService {
             throw exception(MODEL_NOT_EXISTS);
         }
         // 校验流程定义存在
-        ProcessDefinition definition = bpmDefinitionService.getDefinitionByDeploymentId(model.getDeploymentId());
+        ProcessDefinition definition = bpmProcessDefinitionService.getProcessDefinitionByDeploymentId(model.getDeploymentId());
         if (definition == null) {
-            throw exception(DEFINITION_NOT_EXISTS);
+            throw exception(PROCESS_DEFINITION_NOT_EXISTS);
         }
 
         // 更新状态
-        bpmDefinitionService.updateDefinitionSuspensionState(definition.getId(), state);
+        bpmProcessDefinitionService.updateProcessDefinitionState(definition.getId(), state);
     }
 
     private Model getModelByKey(String key) {

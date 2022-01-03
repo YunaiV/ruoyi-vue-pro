@@ -20,7 +20,7 @@ import java.util.Set;
  * @author yunlong.li
  * @author ZJQ
  */
-public interface BpmDefinitionService {
+public interface BpmProcessDefinitionService {
 
     /**
      * 获得流程定义分页
@@ -28,7 +28,7 @@ public interface BpmDefinitionService {
      * @param pageReqVO 分页入参
      * @return 流程定义 Page
      */
-    PageResult<BpmProcessDefinitionPageItemRespVO> getDefinitionPage(BpmProcessDefinitionPageReqVO pageReqVO);
+    PageResult<BpmProcessDefinitionPageItemRespVO> getProcessDefinitionPage(BpmProcessDefinitionPageReqVO pageReqVO);
 
     /**
      * 获得流程定义对应的 BPMN XML
@@ -36,7 +36,7 @@ public interface BpmDefinitionService {
      * @param id 流程定义编号
      * @return BPMN XML
      */
-    String getDefinitionBpmnXML(String id);
+    String getProcessDefinitionBpmnXML(String id);
 
     /**
      * 获得 Bpmn 模型
@@ -52,7 +52,7 @@ public interface BpmDefinitionService {
      * @param id 编号
      * @return 流程定义
      */
-    ProcessDefinition getDefinition(String id);
+    ProcessDefinition getProcessDefinition(String id);
 
     /**
      * 获得 id 对应的 Deployment
@@ -86,7 +86,7 @@ public interface BpmDefinitionService {
      * @param deploymentId 部署编号
      * @return 流程定义
      */
-    ProcessDefinition getDefinitionByDeploymentId(String deploymentId);
+    ProcessDefinition getProcessDefinitionByDeploymentId(String deploymentId);
 
     /**
      * 获得 deploymentIds 对应的 ProcessDefinition 数组
@@ -94,7 +94,7 @@ public interface BpmDefinitionService {
      * @param deploymentIds 部署编号的数组
      * @return 流程定义的数组
      */
-    List<ProcessDefinition> getDefinitionListByDeploymentIds(Set<String> deploymentIds);
+    List<ProcessDefinition> getProcessDefinitionListByDeploymentIds(Set<String> deploymentIds);
 
     /**
      * 创建流程定义
@@ -102,7 +102,7 @@ public interface BpmDefinitionService {
      * @param createReqDTO 创建信息
      * @return 流程编号
      */
-    String createDefinition(@Valid BpmDefinitionCreateReqDTO createReqDTO);
+    String createProcessDefinition(@Valid BpmDefinitionCreateReqDTO createReqDTO);
 
     /**
      * 更新流程定义的挂起状态
@@ -110,6 +110,6 @@ public interface BpmDefinitionService {
      * @param id 流程定义的编号
      * @param state 挂起状态 {@link org.activiti.engine.impl.persistence.entity.SuspensionState}
      */
-    void updateDefinitionSuspensionState(String id, Integer state);
+    void updateProcessDefinitionState(String id, Integer state);
 
 }

@@ -2,7 +2,7 @@ package cn.iocoder.yudao.adminserver.modules.bpm.controller.definition;
 
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.BpmProcessDefinitionPageItemRespVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.BpmProcessDefinitionPageReqVO;
-import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmDefinitionService;
+import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmProcessDefinitionService;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import io.swagger.annotations.Api;
@@ -21,18 +21,19 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
 @Api(tags = "流程定义")
 @RestController
-@RequestMapping("/bpm/definition")
+@RequestMapping("/bpm/process-definition")
 @Validated
-public class BpmDefinitionController {
+public class BpmProcessDefinitionController {
 
     @Resource
-    private BpmDefinitionService bpmDefinitionService;
+    private BpmProcessDefinitionService bpmDefinitionService;
 
     @GetMapping ("/page")
     @ApiOperation(value = "获得流程定义分页")
     @PreAuthorize("@ss.hasPermission('bpm:model:query')") // 暂时使用 model 的权限标识
-    public CommonResult<PageResult<BpmProcessDefinitionPageItemRespVO>> getDefinitionPage(BpmProcessDefinitionPageReqVO pageReqVO) {
-        return success(bpmDefinitionService.getDefinitionPage(pageReqVO));
+    public CommonResult<PageResult<BpmProcessDefinitionPageItemRespVO>> getProcessDefinitionPage(
+            BpmProcessDefinitionPageReqVO pageReqVO) {
+        return success(bpmDefinitionService.getProcessDefinitionPage(pageReqVO));
     }
 
     // TODO 芋艿：需要重写该方法
@@ -49,8 +50,8 @@ public class BpmDefinitionController {
     @ApiOperation(value = "获得流程定义的 BPMN XML")
     @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = String.class)
     @PreAuthorize("@ss.hasPermission('bpm:model:query')") // 暂时使用 model 的权限标识
-    public CommonResult<String> getDefinitionBpmnXML(@RequestParam("id") String id) {
-        String bpmnXML = bpmDefinitionService.getDefinitionBpmnXML(id);
+    public CommonResult<String> getProcessDefinitionBpmnXML(@RequestParam("id") String id) {
+        String bpmnXML = bpmDefinitionService.getProcessDefinitionBpmnXML(id);
         return success(bpmnXML);
     }
 

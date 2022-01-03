@@ -13,7 +13,6 @@ public interface BpmErrorCodeConstants {
     ErrorCode PROCESS_INSTANCE_NOT_EXISTS = new ErrorCode(1009000001, "流程实例不存在");
     ErrorCode HIGHLIGHT_IMG_ERROR = new ErrorCode(1009000002, "获取高亮流程图异常");
 
-
     // ========== OA 流程模块 1-009-001-000 ==========
     ErrorCode OA_LEAVE_NOT_EXISTS = new ErrorCode(1009001001, "请假申请不存在");
     ErrorCode OA_PM_POST_NOT_EXISTS = new ErrorCode(1009001002, "项目经理岗位未设置");
@@ -29,9 +28,9 @@ public interface BpmErrorCodeConstants {
     ErrorCode MODEL_KEY_VALID = new ErrorCode(1009002002, "流程标识格式不正确，需要以字母或下划线开头，后接任意字母、数字、中划线、下划线、句点！");
 
     // ========== 流程定义 1-009-003-000 ==========
-    ErrorCode DEFINITION_KEY_NOT_MATCH = new ErrorCode(1009003000, "流程定义的标识期望是({})，当前是({})，请修改 BPMN 流程图");
-    ErrorCode DEFINITION_NAME_NOT_MATCH = new ErrorCode(1009003001, "流程定义的名字期望是({})，当前是({})，请修改 BPMN 流程图");
-    ErrorCode DEFINITION_NOT_EXISTS = new ErrorCode(1009003002, "流程定义不存在");
+    ErrorCode PROCESS_DEFINITION_KEY_NOT_MATCH = new ErrorCode(1009003000, "流程定义的标识期望是({})，当前是({})，请修改 BPMN 流程图");
+    ErrorCode PROCESS_DEFINITION_NAME_NOT_MATCH = new ErrorCode(1009003001, "流程定义的名字期望是({})，当前是({})，请修改 BPMN 流程图");
+    ErrorCode PROCESS_DEFINITION_NOT_EXISTS = new ErrorCode(1009003002, "流程定义不存在");
 
     // ========== 动态表单模块 1-009-004-000 ==========
     ErrorCode FORM_NOT_EXISTS = new ErrorCode(1009004000, "动态表单不存在");

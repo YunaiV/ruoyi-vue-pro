@@ -60,7 +60,7 @@
 </template>
 
 <script>
-import {getDefinitionBpmnXML, getDefinitionPage} from "@/api/bpm/definition";
+import {getProcessDefinitionBpmnXML, getProcessDefinitionPage} from "@/api/bpm/definition";
 import {DICT_TYPE, getDictDatas} from "@/utils/dict";
 import {getForm} from "@/api/bpm/form";
 import {decodeFields} from "@/utils/formGenerator";
@@ -113,7 +113,7 @@ export default {
     /** 查询流程定义列表 */
     getList() {
       this.loading = true;
-      getDefinitionPage(this.queryParams).then(response => {
+      getProcessDefinitionPage(this.queryParams).then(response => {
           this.list = response.data.list;
           this.total = response.data.total;
           this.loading = false;
@@ -135,7 +135,7 @@ export default {
     },
     /** 流程图的详情按钮操作 */
     handleBpmnDetail(row) {
-      getDefinitionBpmnXML(row.id).then(response => {
+      getProcessDefinitionBpmnXML(row.id).then(response => {
         this.bpmnXML = response.data
         // 弹窗打开
         this.showBpmnOpen = true

@@ -8,7 +8,7 @@ import cn.iocoder.yudao.adminserver.modules.bpm.convert.definition.BpmDefinition
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.definition.BpmProcessDefinitionDO;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.form.BpmFormDO;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.mysql.definition.BpmProcessDefinitionMapper;
-import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmDefinitionService;
+import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmProcessDefinitionService;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.dto.BpmDefinitionCreateReqDTO;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.form.BpmFormService;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -29,8 +29,8 @@ import org.springframework.validation.annotation.Validated;
 import javax.annotation.Resource;
 import java.util.*;
 
-import static cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants.DEFINITION_KEY_NOT_MATCH;
-import static cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants.DEFINITION_NAME_NOT_MATCH;
+import static cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants.PROCESS_DEFINITION_KEY_NOT_MATCH;
+import static cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants.PROCESS_DEFINITION_NAME_NOT_MATCH;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 
@@ -44,7 +44,7 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 @Service
 @Validated
 @Slf4j
-public class BpmDefinitionServiceImpl implements BpmDefinitionService {
+public class BpmProcessDefinitionServiceImpl implements BpmProcessDefinitionService {
 
     private static final String BPMN_FILE_SUFFIX = ".bpmn";
 
@@ -59,7 +59,7 @@ public class BpmDefinitionServiceImpl implements BpmDefinitionService {
     private BpmProcessDefinitionMapper processDefinitionMapper;
 
     @Override
-    public PageResult<BpmProcessDefinitionPageItemRespVO> getDefinitionPage(BpmProcessDefinitionPageReqVO pageVO) {
+    public PageResult<BpmProcessDefinitionPageItemRespVO> getProcessDefinitionPage(BpmProcessDefinitionPageReqVO pageVO) {
         ProcessDefinitionQuery definitionQuery = repositoryService.createProcessDefinitionQuery();
         if (StrUtil.isNotBlank(pageVO.getKey())) {
             definitionQuery.processDefinitionKey(pageVO.getKey());
@@ -94,7 +94,7 @@ public class BpmDefinitionServiceImpl implements BpmDefinitionService {
     }
 
     @Override
-    public String getDefinitionBpmnXML(String id) {
+    public String getProcessDefinitionBpmnXML(String id) {
         BpmnModel bpmnModel = repositoryService.getBpmnModel(id);
         if (bpmnModel == null) {
             return null;
@@ -109,7 +109,7 @@ public class BpmDefinitionServiceImpl implements BpmDefinitionService {
     }
 
     @Override
-    public ProcessDefinition getDefinition(String id) {
+    public ProcessDefinition getProcessDefinition(String id) {
         return repositoryService.getProcessDefinition(id);
     }
 
@@ -134,12 +134,12 @@ public class BpmDefinitionServiceImpl implements BpmDefinitionService {
     }
 
     @Override
-    public ProcessDefinition getDefinitionByDeploymentId(String deploymentId) {
+    public ProcessDefinition getProcessDefinitionByDeploymentId(String deploymentId) {
         return repositoryService.createProcessDefinitionQuery().deploymentId(deploymentId).singleResult();
     }
 
     @Override
-    public List<ProcessDefinition> getDefinitionListByDeploymentIds(Set<String> deploymentIds) {
+    public List<ProcessDefinition> getProcessDefinitionListByDeploymentIds(Set<String> deploymentIds) {
         if (CollUtil.isEmpty(deploymentIds)) {
             return Collections.emptyList();
         }
@@ -148,7 +148,7 @@ public class BpmDefinitionServiceImpl implements BpmDefinitionService {
 
     @Override
     @Transactional(rollbackFor = Exception.class) // 因为进行多个 activiti 操作，所以开启事务
-    public String createDefinition(BpmDefinitionCreateReqDTO createReqDTO) {
+    public String createProcessDefinition(BpmDefinitionCreateReqDTO createReqDTO) {
         // 创建 Deployment 部署
         Deployment deploy = repositoryService.createDeployment()
                 .key(createReqDTO.getKey()).name(createReqDTO.getName()).category(createReqDTO.getCategory())
@@ -162,10 +162,10 @@ public class BpmDefinitionServiceImpl implements BpmDefinitionService {
         // 注意 2，目前该项目的设计上，需要保证 Model、Deployment、ProcessDefinition 使用相同的 key，保证关联性。
         //          否则，会导致 ProcessDefinition 的分页无法查询到。
         if (!Objects.equals(definition.getKey(), createReqDTO.getKey())) {
-            throw exception(DEFINITION_KEY_NOT_MATCH, createReqDTO.getKey(), definition.getKey());
+            throw exception(PROCESS_DEFINITION_KEY_NOT_MATCH, createReqDTO.getKey(), definition.getKey());
         }
         if (!Objects.equals(definition.getName(), createReqDTO.getName())) {
-            throw exception(DEFINITION_NAME_NOT_MATCH, createReqDTO.getName(), definition.getName());
+            throw exception(PROCESS_DEFINITION_NAME_NOT_MATCH, createReqDTO.getName(), definition.getName());
         }
 
         // 插入拓展表
@@ -176,7 +176,7 @@ public class BpmDefinitionServiceImpl implements BpmDefinitionService {
     }
 
     @Override
-    public void updateDefinitionSuspensionState(String id, Integer state) {
+    public void updateProcessDefinitionState(String id, Integer state) {
         // 激活
         if (Objects.equals(SuspensionState.ACTIVE.getStateCode(), state)) {
             repositoryService.activateProcessDefinitionById(id, true, null);
@@ -187,7 +187,7 @@ public class BpmDefinitionServiceImpl implements BpmDefinitionService {
             repositoryService.suspendProcessDefinitionById(id, true, null);
             return;
         }
-        log.error("[updateDefinitionSuspensionState][流程定义({}) 修改未知状态({})]", id, state);
+        log.error("[updateProcessDefinitionState][流程定义({}) 修改未知状态({})]", id, state);
     }
 
 }

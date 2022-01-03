@@ -12,7 +12,7 @@ import java.util.Date;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class BpmProcessDefinitionPageItemRespVO extends ProcessDefinitionRespVO {
+public class BpmProcessDefinitionPageItemRespVO extends BpmProcessDefinitionRespVO {
 
     @ApiModelProperty(value = "表单名字", example = "请假表单")
     private String formName;
