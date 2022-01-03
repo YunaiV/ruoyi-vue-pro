@@ -3,10 +3,10 @@
     <el-form size="mini" label-width="90px" :model="model" :rules="rules" @submit.native.prevent>
       <el-form-item label="流程标识" prop="key">
         <el-input v-model="model.key" placeholder="请输入流标标识"
-                  :disabled="model.id !== undefined && model.id.length > 0"/>
+                  :disabled="model.id !== undefined && model.id.length > 0" @change="handleKeyUpdate" />
       </el-form-item>
       <el-form-item label="流程名称" prop="name">
-        <el-input v-model="model.name" placeholder="请输入流程名称" clearable />
+        <el-input v-model="model.name" placeholder="请输入流程名称" clearable @change="handleNameUpdate" />
       </el-form-item>
       <el-form-item label="流程分类" prop="category">
         <el-select v-model="model.category" placeholder="请选择流程分类" clearable style="width: 100%">
@@ -70,6 +70,15 @@ export default {
     resetBaseInfo() {
       this.bpmnElement = window?.bpmnInstances?.bpmnElement;
       this.elementBaseInfo = JSON.parse(JSON.stringify(this.bpmnElement.businessObject));
+    },
+    handleKeyUpdate(value) {
+      // 在 BPMN 的 XML 中，流程标识 key，其实对应的是 id 节点
+      this.elementBaseInfo['id'] = value;
+      this.updateBaseInfo('id');
+    },
+    handleNameUpdate(value) {
+      this.elementBaseInfo['name'] = value;
+      this.updateBaseInfo('name');
     },
     updateBaseInfo(key) {
       // 触发 elementBaseInfo 对应的字段
