@@ -1,9 +1,11 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.controller.model;
 
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.model.vo.*;
+import cn.iocoder.yudao.adminserver.modules.bpm.convert.model.BpmModelConvert;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.model.BpmModelService;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.io.IoUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
@@ -11,6 +13,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.io.IOException;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
@@ -23,7 +26,7 @@ public class BpmModelController {
     @Resource
     private BpmModelService bpmModelService;
 
-    // TODO @芋艿：权限
+    // TODO @芋艿：权限、参数校验
 
     @GetMapping("/page")
     @ApiOperation(value = "获得模型分页")
@@ -44,6 +47,15 @@ public class BpmModelController {
     @ApiOperation(value = "新建模型")
     public CommonResult<String> createModel(@RequestBody BpmModelCreateReqVO createRetVO) {
         return success(bpmModelService.createModel(createRetVO));
+    }
+
+    @PostMapping("/import")
+    @ApiOperation(value = "导入模型")
+    public CommonResult<String> importModel(BpmModeImportReqVO importReqVO) throws IOException {
+        BpmModelCreateReqVO createReqVO = BpmModelConvert.INSTANCE.convert(importReqVO);
+        // 读取文件
+        createReqVO.setBpmnXml(IoUtils.readUtf8(importReqVO.getBpmnFile().getInputStream(), false));
+        return success(bpmModelService.createModel(createReqVO));
     }
 
     @PutMapping("/update")

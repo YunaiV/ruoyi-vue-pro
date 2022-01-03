@@ -1,9 +1,6 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.convert.model;
 
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.model.vo.BpmModelCreateReqVO;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.model.vo.BpmModelPageItemRespVO;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.model.vo.BpmModelRespVO;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.model.vo.BpmModelUpdateReqVO;
+import cn.iocoder.yudao.adminserver.modules.bpm.controller.model.vo.*;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.form.BpmFormDO;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.dto.BpmDefinitionCreateReqDTO;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.model.dto.BpmModelMetaInfoRespDTO;
@@ -26,9 +23,9 @@ import java.util.Map;
  * @author yunlongn
  */
 @Mapper
-public interface ModelConvert {
+public interface BpmModelConvert {
 
-    ModelConvert INSTANCE = Mappers.getMapper(ModelConvert.class);
+    BpmModelConvert INSTANCE = Mappers.getMapper(BpmModelConvert.class);
 
     default List<BpmModelPageItemRespVO> convertList(List<Model> list, Map<Long, BpmFormDO> formMap,
                                                      Map<String, Deployment> deploymentMap,
@@ -115,5 +112,7 @@ public interface ModelConvert {
     }
 
     BpmModelPageItemRespVO.ProcessDefinition convert(ProcessDefinition bean);
+
+    BpmModelCreateReqVO convert(BpmModeImportReqVO bean);
 
 }

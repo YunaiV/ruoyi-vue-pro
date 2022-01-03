@@ -22,7 +22,7 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 @RestController
 @RequestMapping("/bpm/definition")
 @Validated
-public class ProcessDefinitionController {
+public class BpmDefinitionController {
 
     @Resource
     private BpmDefinitionService bpmDefinitionService;

@@ -2,7 +2,7 @@ package cn.iocoder.yudao.adminserver.modules.bpm.service.model.impl;
 
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.model.vo.*;
-import cn.iocoder.yudao.adminserver.modules.bpm.convert.model.ModelConvert;
+import cn.iocoder.yudao.adminserver.modules.bpm.convert.model.BpmModelConvert;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.form.BpmFormDO;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmDefinitionService;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.dto.BpmDefinitionCreateReqDTO;
@@ -87,7 +87,7 @@ public class BpmModelServiceImpl implements BpmModelService {
 
         // 拼接结果
         long modelCount = modelQuery.count();
-        return new PageResult<>(ModelConvert.INSTANCE.convertList(models, formMap, deploymentMap, processDefinitionMap), modelCount);
+        return new PageResult<>(BpmModelConvert.INSTANCE.convertList(models, formMap, deploymentMap, processDefinitionMap), modelCount);
     }
 
     @Override
@@ -96,7 +96,7 @@ public class BpmModelServiceImpl implements BpmModelService {
         if (model == null) {
             return null;
         }
-        BpmModelRespVO modelRespVO = ModelConvert.INSTANCE.convert(model);
+        BpmModelRespVO modelRespVO = BpmModelConvert.INSTANCE.convert(model);
         // 拼接 bpmn XML
         byte[] bpmnBytes = repositoryService.getModelEditorSource(id);
         modelRespVO.setBpmnXml(StrUtil.utf8Str(bpmnBytes));
@@ -115,7 +115,7 @@ public class BpmModelServiceImpl implements BpmModelService {
 
         // 创建流程定义
         Model model = repositoryService.newModel();
-        ModelConvert.INSTANCE.copy(model, createReqVO);
+        BpmModelConvert.INSTANCE.copy(model, createReqVO);
         // 保存流程定义
         repositoryService.saveModel(model);
         // 添加 BPMN XML
@@ -134,7 +134,7 @@ public class BpmModelServiceImpl implements BpmModelService {
         }
 
         // 修改流程定义
-        ModelConvert.INSTANCE.copy(model, updateReqVO);
+        BpmModelConvert.INSTANCE.copy(model, updateReqVO);
         // 更新模型
         repositoryService.saveModel(model);
         // 更新 BPMN XML
@@ -155,7 +155,7 @@ public class BpmModelServiceImpl implements BpmModelService {
         }
 
         // 创建流程定义
-        BpmDefinitionCreateReqDTO definitionCreateReqDTO = ModelConvert.INSTANCE.convert2(model)
+        BpmDefinitionCreateReqDTO definitionCreateReqDTO = BpmModelConvert.INSTANCE.convert2(model)
                 .setBpmnXml(StrUtil.utf8Str(bpmnBytes));
         String definitionId = bpmDefinitionService.createDefinition(definitionCreateReqDTO);
 

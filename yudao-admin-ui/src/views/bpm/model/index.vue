@@ -28,6 +28,10 @@
         <el-button type="primary" icon="el-icon-plus" size="mini" @click="handleAdd"
                    v-hasPermi="['infra:config:create']">新建流程模型</el-button>
       </el-col>
+      <el-col :span="1.5">
+        <el-button type="info" icon="el-icon-upload2" size="mini" @click="handleImport"
+                   v-hasPermi="['system:user:import']">导入流程模型</el-button>
+      </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
@@ -100,15 +104,75 @@
     <el-dialog title="流程图" :visible.sync="showBpmnOpen" width="80%" append-to-body>
       <my-process-viewer key="designer" v-model="bpmnXML" v-bind="bpmnControlForm" />
     </el-dialog>
+
+    <!-- 用户导入对话框 -->
+    <el-dialog title="导入流程模型" :visible.sync="upload.open" width="400px" append-to-body>
+      <el-upload
+        ref="upload"
+        :limit="1"
+        accept=".bpmn, .xml"
+        :headers="upload.headers"
+        :action="upload.url"
+        :disabled="upload.isUploading"
+        :on-progress="handleFileUploadProgress"
+        :on-success="handleFileSuccess"
+        :auto-upload="false"
+        name="bpmnFile"
+        :data="upload.form"
+        drag
+      >
+        <i class="el-icon-upload"></i>
+        <div class="el-upload__text">
+          将文件拖到此处，或
+          <em>点击上传</em>
+        </div>
+        <div class="el-upload__tip" style="color:red" slot="tip">提示：仅允许导入“bpm”或“xml”格式文件！</div>
+
+        <!--        <div class="el-upload__tip" slot="tip">-->
+<!--          流程名称：<el-input v-model="upload.name"/>-->
+<!--          流程分类：<el-input v-model="upload.category"/>-->
+<!--        </div>-->
+        <div class="el-upload__tip" slot="tip">
+          <el-form ref="uploadForm" size="mini" label-width="90px" :model="upload.form" :rules="upload.rules" @submit.native.prevent>
+            <el-form-item label="流程标识" prop="key">
+              <el-input v-model="upload.form.key" placeholder="请输入流标标识" />
+            </el-form-item>
+            <el-form-item label="流程名称" prop="name">
+              <el-input v-model="upload.form.name" placeholder="请输入流程名称" clearable />
+            </el-form-item>
+            <el-form-item label="流程分类" prop="category">
+              <el-select v-model="upload.form.category" placeholder="请选择流程分类" clearable style="width: 100%">
+                <el-option v-for="dict in categoryDictDatas" :key="dict.value" :label="dict.label" :value="dict.value"/>
+              </el-select>
+            </el-form-item>
+            <el-form-item label="流程表单" prop="formId">
+              <el-select v-model="upload.form.formId" placeholder="请选择流程表单，非必选哟！" clearable style="width: 100%">
+                <el-option v-for="form in forms" :key="form.id" :label="form.name" :value="form.id"/>
+              </el-select>
+            </el-form-item>
+            <el-form-item label="流程描述" prop="description">
+              <el-input type="textarea" v-model="upload.form.description" clearable />
+            </el-form-item>
+          </el-form>
+        </div>
+      </el-upload>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="submitFileForm">确 定</el-button>
+        <el-button @click="uploadClose">取 消</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import {deleteModel, deployModel, getModelPage, getModel, updateModelState} from "@/api/bpm/model";
 import {DICT_TYPE, getDictDatas} from "@/utils/dict";
-import {getForm} from "@/api/bpm/form";
+import {getForm, getSimpleForms} from "@/api/bpm/form";
 import {decodeFields} from "@/utils/formGenerator";
 import Parser from '@/components/parser/Parser'
+import {getToken} from "@/utils/auth";
+import {getBaseHeader} from "@/utils/request";
+import {addUser, updateUser} from "@/api/system/user";
 
 export default {
   name: "model",
@@ -144,12 +208,38 @@ export default {
         fields: []
       },
 
+      // 流程导入参数
+      upload: {
+        // 是否显示弹出层（用户导入）
+        open: false,
+        // 是否禁用上传
+        isUploading: false,
+        // 设置上传的请求头部
+        headers: getBaseHeader(),
+        // 上传的地址
+        url: process.env.VUE_APP_BASE_API + '/api/' + "/bpm/model/import",
+        // 表单
+        form: {},
+        // 校验规则
+        rules: {
+          key: [{ required: true, message: "流程标识不能为空", trigger: "blur" }],
+          name: [{ required: true, message: "流程名称不能为空", trigger: "blur" }],
+          category: [{ required: true, message: "流程分类不能为空", trigger: "blur" }],
+        },
+      },
+      // 流程表单的下拉框的数据
+      forms: [],
+
       // 数据字典
       categoryDictDatas: getDictDatas(DICT_TYPE.BPM_MODEL_CATEGORY),
     };
   },
   created() {
     this.getList();
+    // 获得流程表单的下拉框的数据
+    getSimpleForms().then(response => {
+      this.forms = response.data
+    })
   },
   methods: {
     /** 查询流程模型列表 */
@@ -265,6 +355,45 @@ export default {
       }).then(() => {
         this.getList();
         this.msgSuccess(statusState + "成功");
+      })
+    },
+    /** 导入按钮操作 */
+    handleImport() {
+      this.upload.open = true;
+    },
+    // 文件上传中处理
+    handleFileUploadProgress(event, file, fileList) {
+      this.upload.isUploading = true;
+    },
+    // 文件上传成功处理
+    handleFileSuccess(response, file, fileList) {
+      if (response.code !== 0) {
+        this.msgError(response.msg)
+        return;
+      }
+      // 重置表单
+      this.uploadClose();
+      // 提示，并刷新
+      this.msgSuccess("上传成功！请点击【设计流程】按钮，进行编辑保存后，才可以进行【发布流程】");
+      this.getList();
+    },
+    uploadClose() {
+      // 关闭弹窗
+      this.upload.open = false;
+      // 重置上传状态和文件
+      this.upload.isUploading = false;
+      this.$refs.upload.clearFiles();
+      // 重置表单
+      this.upload.form = {};
+      this.resetForm("uploadForm");
+    },
+    /** 提交上传文件 */
+    submitFileForm() {
+      this.$refs["uploadForm"].validate(valid => {
+        if (!valid) {
+          return;
+        }
+        this.$refs.upload.submit();
       })
     },
   }
