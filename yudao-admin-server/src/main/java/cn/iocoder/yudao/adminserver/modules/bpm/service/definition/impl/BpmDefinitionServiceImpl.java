@@ -29,6 +29,9 @@ import org.springframework.validation.annotation.Validated;
 import javax.annotation.Resource;
 import java.util.*;
 
+import static cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants.DEFINITION_KEY_NOT_MATCH;
+import static cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants.DEFINITION_NAME_NOT_MATCH;
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 
 /**
@@ -144,6 +147,15 @@ public class BpmDefinitionServiceImpl implements BpmDefinitionService {
         // 设置 ProcessDefinition 的 category 分类
         ProcessDefinition definition = repositoryService.createProcessDefinitionQuery().deploymentId(deploy.getId()).singleResult();
         repositoryService.setProcessDefinitionCategory(definition.getId(), createReqDTO.getCategory());
+        // 注意 1，ProcessDefinition 的 key 和 name 是通过 BPMN 中的 <bpmn2:process /> 的 id 和 name 决定
+        // 注意 2，目前该项目的设计上，需要保证 Model、Deployment、ProcessDefinition 使用相同的 key，保证关联性。
+        //          否则，会导致 ProcessDefinition 的分页无法查询到。
+        if (!Objects.equals(definition.getKey(), createReqDTO.getKey())) {
+            throw exception(DEFINITION_KEY_NOT_MATCH, createReqDTO.getKey(), definition.getKey());
+        }
+        if (!Objects.equals(definition.getName(), createReqDTO.getName())) {
+            throw exception(DEFINITION_NAME_NOT_MATCH, createReqDTO.getName(), definition.getName());
+        }
 
         // 插入拓展表
         BpmProcessDefinitionDO definitionDO = BpmDefinitionConvert.INSTANCE.convert2(createReqDTO)

@@ -23,18 +23,21 @@ public interface BpmErrorCodeConstants {
     ErrorCode OA_HR_POST_NOT_EXISTS = new ErrorCode(1009001006, "HR岗位未设置");
     ErrorCode OA_DAY_LEAVE_ERROR = new ErrorCode(1009001007, "请假天数必须>=1");
 
-    // ========== OA 工作流模块 1-009-002-000 ==========
-    ErrorCode BPM_MODEL_KEY_EXISTS = new ErrorCode(1009002000, "已经存在流程标识为【{}】的流程");
-    ErrorCode BPMN_MODEL_NOT_EXISTS = new ErrorCode(1009002001, "流程模型不存在");
-    ErrorCode BPMN_MODEL_KEY_VALID = new ErrorCode(1009002002, "流程标识格式不正确，需要以字母或下划线开头，后接任意字母、数字、中划线、下划线、句点！");
+    // ========== 流程模型 1-009-002-000 ==========
+    ErrorCode MODEL_KEY_EXISTS = new ErrorCode(1009002000, "已经存在流程标识为【{}】的流程");
+    ErrorCode MODEL_NOT_EXISTS = new ErrorCode(1009002001, "流程模型不存在");
+    ErrorCode MODEL_KEY_VALID = new ErrorCode(1009002002, "流程标识格式不正确，需要以字母或下划线开头，后接任意字母、数字、中划线、下划线、句点！");
 
+    // ========== 流程模型 1-009-003-000 ==========
+    ErrorCode DEFINITION_KEY_NOT_MATCH = new ErrorCode(1009003000, "流程定义的标识期望是({})，当前是({})，请修改 BPMN 流程图");
+    ErrorCode DEFINITION_NAME_NOT_MATCH = new ErrorCode(1009003000, "流程定义的名字期望是({})，当前是({})，请修改 BPMN 流程图");
 
-    ErrorCode BPMN_MODEL_ERROR = new ErrorCode(1004001002, "工作流模型异常");
+    ErrorCode BPMN = new ErrorCode(1004001002, "工作流模型异常");
     ErrorCode BPMN_MODEL_PROCESS_NOT_EXISTS = new ErrorCode(1004001009, "流程数据为空");
     ErrorCode BPMN_PROCESS_DEFINITION_NOT_EXISTS = new ErrorCode(1004001004, "流程定义不存在");
 
-    // ========== 动态表单模块 1-009-003-000 ==========
-    ErrorCode BPM_FORM_NOT_EXISTS = new ErrorCode(1009003000, "动态表单不存在");
-    ErrorCode BPM_FORM_FIELD_REPEAT = new ErrorCode(1009003000, "表单项({}) 和 ({}) 使用了相同的字段名({})");
+    // ========== 动态表单模块 1-009-004-000 ==========
+    ErrorCode FORM_NOT_EXISTS = new ErrorCode(1009004000, "动态表单不存在");
+    ErrorCode FORM_FIELD_REPEAT = new ErrorCode(1009004000, "表单项({}) 和 ({}) 使用了相同的字段名({})");
 
 }
