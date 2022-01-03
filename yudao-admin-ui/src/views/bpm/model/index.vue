@@ -69,7 +69,7 @@
         <el-table-column label="激活状态" align="center" prop="processDefinition.version" width="80">
           <template slot-scope="scope">
             <el-switch v-if="scope.row.processDefinition" v-model="scope.row.processDefinition.suspensionState"
-                       :active-value="1" :inactive-value="2" @change="handleStatusChange(scope.row)" />
+                       :active-value="1" :inactive-value="2" @change="handleChangeState(scope.row)" />
           </template>
         </el-table-column>
         <el-table-column label="部署时间" align="center" prop="deploymentTime" width="180">
@@ -104,7 +104,7 @@
 </template>
 
 <script>
-import {deleteModel, deployModel, getModelPage, getModel} from "@/api/bpm/model";
+import {deleteModel, deployModel, getModelPage, getModel, updateModelState} from "@/api/bpm/model";
 import {DICT_TYPE, getDictDatas} from "@/utils/dict";
 import {getForm} from "@/api/bpm/form";
 import {decodeFields} from "@/utils/formGenerator";
@@ -250,7 +250,23 @@ export default {
           key: row.key
         }
       });
-    }
+    },
+    /** 更新状态操作 */
+    handleChangeState(row) {
+      const id = row.id;
+      let state = row.processDefinition.suspensionState;
+      let statusState = state === 1 ? '激活' : '挂起';
+      this.$confirm('是否确认' + statusState + '流程名字为"' + row.name + '"的数据项?', "警告", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      }).then(function() {
+        return updateModelState(id, state);
+      }).then(() => {
+        this.getList();
+        this.msgSuccess(statusState + "成功");
+      })
+    },
   }
 };
 </script>

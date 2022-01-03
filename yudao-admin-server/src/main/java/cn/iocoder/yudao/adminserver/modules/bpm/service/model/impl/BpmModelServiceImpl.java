@@ -16,6 +16,7 @@ import cn.iocoder.yudao.framework.common.util.object.PageUtils;
 import cn.iocoder.yudao.framework.common.util.validation.ValidationUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.activiti.engine.RepositoryService;
+import org.activiti.engine.impl.persistence.entity.SuspensionState;
 import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.Model;
 import org.activiti.engine.repository.ModelQuery;
@@ -158,6 +159,14 @@ public class BpmModelServiceImpl implements BpmModelService {
                 .setBpmnXml(StrUtil.utf8Str(bpmnBytes));
         String definitionId = bpmDefinitionService.createDefinition(definitionCreateReqDTO);
 
+        // 将老的流程定义进行挂起。也就是说，只有最新部署的流程定义，才可以发起任务。
+        if (StrUtil.isNotEmpty(model.getDeploymentId())) {
+            ProcessDefinition oldDefinition = bpmDefinitionService.getDefinitionByDeploymentId(model.getDeploymentId());
+            if (oldDefinition != null) {
+                bpmDefinitionService.updateDefinitionSuspensionState(oldDefinition.getId(), SuspensionState.SUSPENDED.getStateCode());
+            }
+        }
+
         // 更新 model 的 deploymentId，进行关联
         ProcessDefinition definition = bpmDefinitionService.getDefinition(definitionId);
         model.setDeploymentId(definition.getDeploymentId());
@@ -173,6 +182,23 @@ public class BpmModelServiceImpl implements BpmModelService {
         }
         // 执行删除
         repositoryService.deleteModel(id);
+    }
+
+    @Override
+    public void updateModelState(String id, Integer state) {
+        // 校验流程模型存在
+        Model model = repositoryService.getModel(id);
+        if (model == null) {
+            throw exception(MODEL_NOT_EXISTS);
+        }
+        // 校验流程定义存在
+        ProcessDefinition definition = bpmDefinitionService.getDefinitionByDeploymentId(model.getDeploymentId());
+        if (definition == null) {
+            throw exception(DEFINITION_NOT_EXISTS);
+        }
+
+        // 更新状态
+        bpmDefinitionService.updateDefinitionSuspensionState(definition.getId(), state);
     }
 
     private Model getModelByKey(String key) {

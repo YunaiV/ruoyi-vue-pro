@@ -2,8 +2,8 @@
   <div class="app-container">
     <!-- 列表 -->
     <el-table v-loading="loading" :data="list">
-      <el-table-column label="定义编号" align="center" prop="id" />
-      <el-table-column label="定义名称" align="center" prop="name" width="200">
+      <el-table-column label="定义编号" align="center" prop="id" width="400" />
+      <el-table-column label="定义名称" align="center" prop="name" width="100">
         <template slot-scope="scope">
           <el-button type="text" @click="handleBpmnDetail(scope.row)">
             <span>{{ scope.row.name }}</span>

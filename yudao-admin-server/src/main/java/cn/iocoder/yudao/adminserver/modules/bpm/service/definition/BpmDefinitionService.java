@@ -81,6 +81,14 @@ public interface BpmDefinitionService {
     }
 
     /**
+     * 获得 deploymentId 对应的 ProcessDefinition
+     *
+     * @param deploymentId 部署编号
+     * @return 流程定义
+     */
+    ProcessDefinition getDefinitionByDeploymentId(String deploymentId);
+
+    /**
      * 获得 deploymentIds 对应的 ProcessDefinition 数组
      *
      * @param deploymentIds 部署编号的数组
@@ -95,5 +103,13 @@ public interface BpmDefinitionService {
      * @return 流程编号
      */
     String createDefinition(@Valid BpmDefinitionCreateReqDTO createReqDTO);
+
+    /**
+     * 更新流程定义的挂起状态
+     *
+     * @param id 流程定义的编号
+     * @param state 挂起状态 {@link org.activiti.engine.impl.persistence.entity.SuspensionState}
+     */
+    void updateDefinitionSuspensionState(String id, Integer state);
 
 }

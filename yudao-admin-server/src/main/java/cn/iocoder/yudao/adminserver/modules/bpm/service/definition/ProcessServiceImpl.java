@@ -56,31 +56,6 @@ public class ProcessServiceImpl implements ProcessService {
     }
 
     /**
-     * 激活或者挂起流程模型实体
-     * @param processDefinitionId 流程模型实体id
-     * @param type 类型
-     * @return 提示
-     */
-    @Override
-    public String setActivOrHang(String processDefinitionId, String type) {
-        String result = "无操作";
-        switch (type){
-            case "active":
-                repositoryService.activateProcessDefinitionById(processDefinitionId,true,null);
-                result = "已激活ID为【"+processDefinitionId+"】的流程模型实例";
-                break;
-            case "suspend":
-                repositoryService.suspendProcessDefinitionById(processDefinitionId,true,null);
-                result = "已挂起ID为【"+processDefinitionId+"】的流程模型实例";
-                break;
-            default:
-                break;
-        }
-        return result;
-    }
-
-
-    /**
      * 根据上传文件类型对应实现不同方式的流程部署
      * @param inputStream 文件输入流
      * @param fileName 文件名

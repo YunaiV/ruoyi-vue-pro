@@ -57,4 +57,12 @@ public interface BpmModelService {
      */
     void deleteModel(String id);
 
+    /**
+     * 修改模型的状态，实际更新的部署的流程定义的状态
+     *
+     * @param id 编号
+     * @param state 状态 {@link org.activiti.engine.impl.persistence.entity.SuspensionState}
+     */
+    void updateModelState(String id, Integer state);
+
 }

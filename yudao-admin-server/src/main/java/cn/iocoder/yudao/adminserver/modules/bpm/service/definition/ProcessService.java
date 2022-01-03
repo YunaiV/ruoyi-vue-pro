@@ -17,14 +17,4 @@ public interface ProcessService {
      */
     void deployProcess(MultipartFile multipartFile);
 
-
-    /**
-     * 激活或者挂起流程模型实体
-     * @param processDefinitionId 流程模型实体id
-     * @param type 类型
-     * @return 状态
-     */
-    String setActivOrHang(String processDefinitionId,String type);
-
-
 }

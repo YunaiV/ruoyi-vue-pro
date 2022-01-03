@@ -4,7 +4,6 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.BpmProcessDefinitionPageItemRespVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.BpmProcessDefinitionPageReqVO;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.workflow.vo.FileResp;
 import cn.iocoder.yudao.adminserver.modules.bpm.convert.definition.BpmDefinitionConvert;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.definition.BpmProcessDefinitionDO;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.form.BpmFormDO;
@@ -19,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.activiti.bpmn.converter.BpmnXMLConverter;
 import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.engine.RepositoryService;
+import org.activiti.engine.impl.persistence.entity.SuspensionState;
 import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.repository.ProcessDefinitionQuery;
@@ -134,6 +134,11 @@ public class BpmDefinitionServiceImpl implements BpmDefinitionService {
     }
 
     @Override
+    public ProcessDefinition getDefinitionByDeploymentId(String deploymentId) {
+        return repositoryService.createProcessDefinitionQuery().deploymentId(deploymentId).singleResult();
+    }
+
+    @Override
     public List<ProcessDefinition> getDefinitionListByDeploymentIds(Set<String> deploymentIds) {
         if (CollUtil.isEmpty(deploymentIds)) {
             return Collections.emptyList();
@@ -168,6 +173,21 @@ public class BpmDefinitionServiceImpl implements BpmDefinitionService {
                 .setProcessDefinitionId(definition.getId());
         processDefinitionMapper.insert(definitionDO);
         return definition.getId();
+    }
+
+    @Override
+    public void updateDefinitionSuspensionState(String id, Integer state) {
+        // 激活
+        if (Objects.equals(SuspensionState.ACTIVE.getStateCode(), state)) {
+            repositoryService.activateProcessDefinitionById(id, true, null);
+            return;
+        }
+        // 挂起
+        if (Objects.equals(SuspensionState.SUSPENDED.getStateCode(), state)) {
+            repositoryService.suspendProcessDefinitionById(id, true, null);
+            return;
+        }
+        log.error("[updateDefinitionSuspensionState][流程定义({}) 修改未知状态({})]", id, state);
     }
 
 }

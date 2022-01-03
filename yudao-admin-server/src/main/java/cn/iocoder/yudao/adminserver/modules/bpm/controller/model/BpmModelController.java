@@ -69,4 +69,11 @@ public class BpmModelController {
         return success(true);
     }
 
+    @PutMapping("/update-state")
+    @ApiOperation(value = "修改模型的状态", notes = "实际更新的部署的流程定义的状态")
+    public CommonResult<Boolean> updateModelState(@RequestBody BpmModelUpdateStateReqVO reqVO) {
+        bpmModelService.updateModelState(reqVO.getId(), reqVO.getState());
+        return success(true);
+    }
+
 }

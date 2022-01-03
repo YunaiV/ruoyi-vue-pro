@@ -23,6 +23,18 @@ export function updateModel(data) {
   })
 }
 
+// 任务状态修改
+export function updateModelState(id, state) {
+  return request({
+    url: '/bpm/model/update-state',
+    method: 'put',
+    data: {
+      id,
+      state
+    }
+  })
+}
+
 export function createModel(data) {
   return request({
     url: '/bpm/model/create',
