@@ -19,7 +19,7 @@
         </el-select>
       </el-form-item>
       <el-form-item label="流程描述" prop="description">
-        <el-input type="textarea" v-model="model.description" clearable />
+        <el-input type="textarea" v-model="model.description" clearable @change="handleDescriptionUpdate" />
       </el-form-item>
     </el-form>
   </div>
@@ -72,6 +72,16 @@ export default {
       this.elementBaseInfo = JSON.parse(JSON.stringify(this.bpmnElement.businessObject));
     },
     handleKeyUpdate(value) {
+      // 校验 value 的值，只有 XML NCName 通过的情况下，才进行赋值。否则，会导致流程图报错，无法绘制的问题
+      if (!value) {
+        return;
+      }
+      if (!value.match(/[a-zA-Z_][\-_.0-9_a-zA-Z$]*/)) {
+        console.log('key 不满足 XML NCName 规则，所以不进行赋值');
+        return;
+      }
+      console.log('key 满足 XML NCName 规则，所以进行赋值');
+
       // 在 BPMN 的 XML 中，流程标识 key，其实对应的是 id 节点
       this.elementBaseInfo['id'] = value;
       this.updateBaseInfo('id');
@@ -79,6 +89,11 @@ export default {
     handleNameUpdate(value) {
       this.elementBaseInfo['name'] = value;
       this.updateBaseInfo('name');
+    },
+    handleDescriptionUpdate(value) {
+      // TODO 芋艿：documentation 暂时无法修改，后续在看看
+      // this.elementBaseInfo['documentation'] = value;
+      // this.updateBaseInfo('documentation');
     },
     updateBaseInfo(key) {
       // 触发 elementBaseInfo 对应的字段
