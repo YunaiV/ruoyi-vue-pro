@@ -58,13 +58,24 @@ export default {
           this.$nextTick(() => this.resetBaseInfo());
         }
       }
-    }
+    },
+    // 'model.key': {
+    //   immediate: false,
+    //   handler: function (val) {
+    //     this.handleKeyUpdate(val)
+    //   }
+    // }
   },
   created() {
     // 获得流程表单的下拉框的数据
     getSimpleForms().then(response => {
       this.forms = response.data
     })
+    // 针对上传的 bpmn 流程图时，需要延迟 1 秒的时间，保证 key 和 name 的更新
+    setTimeout(() => {
+      this.handleKeyUpdate(this.model.key)
+      this.handleNameUpdate(this.model.name)
+    }, 1000)
   },
   methods: {
     resetBaseInfo() {
@@ -87,6 +98,9 @@ export default {
       this.updateBaseInfo('id');
     },
     handleNameUpdate(value) {
+      if (!value) {
+        return
+      }
       this.elementBaseInfo['name'] = value;
       this.updateBaseInfo('name');
     },
