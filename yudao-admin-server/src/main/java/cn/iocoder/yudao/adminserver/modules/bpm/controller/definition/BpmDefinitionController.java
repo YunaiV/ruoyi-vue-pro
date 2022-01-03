@@ -8,6 +8,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,10 +28,9 @@ public class BpmDefinitionController {
     @Resource
     private BpmDefinitionService bpmDefinitionService;
 
-    // TODO 芋艿：权限
-
     @GetMapping ("/page")
     @ApiOperation(value = "获得流程定义分页")
+    @PreAuthorize("@ss.hasPermission('bpm:model:query')") // 暂时使用 model 的权限标识
     public CommonResult<PageResult<BpmProcessDefinitionPageItemRespVO>> getDefinitionPage(BpmProcessDefinitionPageReqVO pageReqVO) {
         return success(bpmDefinitionService.getDefinitionPage(pageReqVO));
     }
@@ -48,6 +48,7 @@ public class BpmDefinitionController {
     @GetMapping ("/get-bpmn-xml")
     @ApiOperation(value = "获得流程定义的 BPMN XML")
     @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = String.class)
+    @PreAuthorize("@ss.hasPermission('bpm:model:query')") // 暂时使用 model 的权限标识
     public CommonResult<String> getDefinitionBpmnXML(@RequestParam("id") String id) {
         String bpmnXML = bpmDefinitionService.getDefinitionBpmnXML(id);
         return success(bpmnXML);

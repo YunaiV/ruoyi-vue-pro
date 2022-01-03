@@ -26,11 +26,11 @@
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
         <el-button type="primary" icon="el-icon-plus" size="mini" @click="handleAdd"
-                   v-hasPermi="['infra:config:create']">新建流程模型</el-button>
+                   v-hasPermi="['bpm:model:create']">新建流程模型</el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button type="info" icon="el-icon-upload2" size="mini" @click="handleImport"
-                   v-hasPermi="['system:user:import']">导入流程模型</el-button>
+                   v-hasPermi="['bpm:model:import']">导入流程模型</el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
@@ -84,10 +84,14 @@
       </el-table-column>
       <el-table-column label="操作" align="center" width="300">
         <template slot-scope="scope">
-          <el-button size="mini" type="text" icon="el-icon-setting" @click="handleUpdate(scope.row)">设计流程</el-button>
-          <el-button size="mini" type="text" icon="el-icon-thumb" @click="handleDeploy(scope.row)">发布流程</el-button>
-          <el-button size="mini" type="text" icon="el-icon-ice-cream-round" @click="handleDefinitionList(scope.row)">流程定义</el-button>
-          <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)">删除</el-button>
+          <el-button size="mini" type="text" icon="el-icon-setting" @click="handleUpdate(scope.row)"
+                     v-hasPermi="['bpm:model:update']">设计流程</el-button>
+          <el-button size="mini" type="text" icon="el-icon-thumb" @click="handleDeploy(scope.row)"
+                     v-hasPermi="['bpm:model:deploy']">发布流程</el-button>
+          <el-button size="mini" type="text" icon="el-icon-ice-cream-round" @click="handleDefinitionList(scope.row)"
+                     v-hasPermi="['bpm:model:query']">流程定义</el-button>
+          <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)"
+                     v-hasPermi="['bpm:model:delete']">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
