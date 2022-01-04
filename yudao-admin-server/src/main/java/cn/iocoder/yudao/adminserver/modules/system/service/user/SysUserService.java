@@ -108,6 +108,14 @@ public interface SysUserService {
     PageResult<SysUserDO> getUserPage(SysUserPageReqVO reqVO);
 
     /**
+     * 获得用户
+     *
+     * @param id 用户编号
+     * @return 用户
+     */
+    SysUserDO getUser(Long id);
+
+    /**
      * 获得用户列表
      *
      * @param reqVO 列表请求

@@ -1,11 +1,9 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-
-Vue.use(Router)
-
 /* Layout */
 import Layout from '@/layout'
-import ParentView from '@/components/ParentView';
+
+Vue.use(Router)
 
 /**
  * Note: 路由配置项
@@ -133,8 +131,8 @@ export const constantRoutes = [
       {
         path: 'leave/apply',
         component: (resolve) => require(['@/views/oa/leave/apply/index'], resolve),
-        name: '请假表单',
-        meta: { title: '请假表单', icon: 'form' }
+        name: '请假表单-申请',
+        meta: { title: '请假表单-申请', icon: 'form' }
       }
     ]
   },
@@ -145,55 +143,52 @@ export const constantRoutes = [
     redirect: 'noredirect',
     children: [
       {
-        path: 'leave/approve-leader',
-        component: (resolve) => require(['@/views/oa/leave/approve-leader/index'], resolve),
-        name: '请假表单-部门领导审批',
-        meta: { title: '请假表单-部门领导审批', icon: 'form' }
+        path: 'leave/approve',
+        component: (resolve) => require(['@/views/oa/leave/approve/index'], resolve),
+        name: '请假表单-审批',
+        meta: { title: '请假表单-审批', icon: 'form' }
       }
     ]
   },
   {
-    path: '/flow',
+    path: '/bpm',
     component: Layout,
     hidden: true,
-    redirect: 'noredirect',
     children: [
       {
-        path: 'leave/approve-hr',
-        component: (resolve) => require(['@/views/oa/leave/approve-hr/index'], resolve),
-        name: '请假表单-人事审批',
-        meta: { title: '请假表单-人事审批', icon: 'form' }
+        path: 'manager/form/edit',
+        component: (resolve) => require(['@/views/bpm/form/formEditor'], resolve),
+        name: '流程表单-编辑',
+        meta: { title: '流程表单-编辑' }
       }
     ]
   },
   {
-    path: '/flow',
+    path: '/bpm',
     component: Layout,
     hidden: true,
-    redirect: 'noredirect',
     children: [
       {
-        path: 'leave/confirm',
-        component: (resolve) => require(['@/views/oa/leave/confirm/index'], resolve),
-        name: '请假表单-确认',
-        meta: { title: '请假表单-确认', icon: 'form' }
+        path: 'manager/model/edit',
+        component: (resolve) => require(['@/views/bpm/model/modelEditor'], resolve),
+        name: '流程模型-编辑',
+        meta: { title: '流程模型-编辑' }
       }
     ]
   },
   {
-    path: '/flow',
+    path: '/bpm',
     component: Layout,
     hidden: true,
-    redirect: 'noredirect',
     children: [
       {
-        path: 'leave/modify',
-        component: (resolve) => require(['@/views/oa/leave/modify/index'], resolve),
-        name: '请假表单-修改',
-        meta: { title: '请假表单-修改', icon: 'form' }
+        path: 'manager/definition',
+        component: (resolve) => require(['@/views/bpm/definition/index'], resolve),
+        name: '流程定义',
+        meta: { title: '流程定义' }
       }
     ]
-  }
+  },
 ]
 
 export default new Router({

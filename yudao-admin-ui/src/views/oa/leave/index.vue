@@ -49,6 +49,9 @@
 
     <!-- 操作工具栏 -->
     <el-row :gutter="10" class="mb8">
+      <el-col :span="1.5">
+        <el-button type="primary" icon="el-icon-plus" size="mini" @click="handleAdd">新增</el-button>
+      </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
@@ -137,11 +140,12 @@
       </div>
     </el-dialog>
 
-    <el-dialog :title="title" :visible.sync="dialogStepsVisible" width="600px" append-to-body>
+    <el-dialog :title="title" :visible.sync="dialogStepsVisible" width="750px" append-to-body>
       <el-steps :active="stepActive" finish-status="success" >
-        <el-step :title="stepTitle(item)" :description="' 办理人：' + item.assignee " icon="el-icon-edit"  v-for="(item) in handleTask.historyTask"></el-step>
+        <el-step :title="stepTitle(item)" :description="stepAssignee(item.assignee)" icon="el-icon-edit"  v-for="(item) in handleTask.historyTask"></el-step>
       </el-steps>
       <br/>
+      <div v-html="svgUrl"></div>
       <el-steps direction="vertical" :active="stepActive">
         <el-step :title="stepTitle(item)" :description="stepDes(item)" v-for="(item) in handleTask.historyTask"></el-step>
       </el-steps>
@@ -154,9 +158,9 @@
 </template>
 
 <script>
-import { createLeave, updateLeave, deleteLeave, getLeave, getLeavePage, exportLeaveExcel } from "@/api/oa/leave"
+import { createLeave, updateLeave, getLeaveApplyMembers, getLeave, getLeavePage, exportLeaveExcel } from "@/api/oa/leave"
 import { getDictDataLabel, getDictDatas, DICT_TYPE } from '@/utils/dict'
-import { processHistorySteps } from '@/api/oa/todo'
+import { processHistorySteps,getHighlightImg } from '@/api/oa/todo'
 export default {
   name: "Leave",
   components: {
@@ -194,6 +198,7 @@ export default {
       },
       // 表单参数
       form: {},
+      svgUrl: "",
       handleTask: {
         historyTask:[],
         taskVariable: "",
@@ -253,6 +258,17 @@ export default {
         }
         return desc;
       }
+    },
+    stepAssignee() {
+      return function (assignee) {
+        let desc = "";
+        if(assignee){
+          desc += "办理人：[" + assignee + "]";
+        }else{
+          desc += "办理人未签收";
+        }
+        return desc;
+      }
     }
   },
   methods: {
@@ -306,9 +322,17 @@ export default {
     },
     /** 新增按钮操作 */
     handleAdd() {
-      this.reset();
-      this.open = true;
-      this.title = "添加请假申请";
+      getLeaveApplyMembers().then(response => {
+        const route = {
+          path: '/flow/leave/apply',
+          query: {
+            hr:  response.data.hr,
+            pm:  response.data.pm,
+            bm : response.data.bm
+          }
+        }
+        this.$router.replace(route);
+      });
     },
     /** 详情按钮操作 */
     handleDetail(row) {
@@ -345,11 +369,15 @@ export default {
     },
     /** 审批进度 */
     handleStep(row) {
+      const that = this;
       const id = row.processInstanceId;
       processHistorySteps(id).then(response => {
         this.handleTask.historyTask = response.data;
         this.dialogStepsVisible = true
         this.title = "审批进度";
+        getHighlightImg(row.processInstanceId).then(response => {
+          that.svgUrl = response
+        })
       });
     },
     /** 导出按钮操作 */

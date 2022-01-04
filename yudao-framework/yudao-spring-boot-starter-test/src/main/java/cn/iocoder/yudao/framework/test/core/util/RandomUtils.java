@@ -31,6 +31,14 @@ public class RandomUtils {
         // 字符串
         PODAM_FACTORY.getStrategy().addOrReplaceTypeManufacturer(String.class,
                 (dataProviderStrategy, attributeMetadata, map) -> randomString());
+        // Integer
+        PODAM_FACTORY.getStrategy().addOrReplaceTypeManufacturer(Integer.class, (dataProviderStrategy, attributeMetadata, map) -> {
+            // 如果是 status 的字段，返回 0 或 1
+            if (attributeMetadata.getAttributeName().equals("status")) {
+                return RandomUtil.randomEle(CommonStatusEnum.values()).getStatus();
+            }
+            return RandomUtil.randomInt();
+        });
         // Boolean
         PODAM_FACTORY.getStrategy().addOrReplaceTypeManufacturer(Boolean.class, (dataProviderStrategy, attributeMetadata, map) -> {
             // 如果是 deleted 的字段，返回非删除

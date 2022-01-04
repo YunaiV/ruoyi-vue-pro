@@ -1,0 +1,28 @@
+{
+  "name": "form-gen-tinymce",
+  "version": "1.0.0",
+  "description": "富文本编辑器tinymce的一个vue版本封装。使用cdn动态脚本引入的方式加载。",
+  "main": "lib/form-gen-tinymce.umd.js",
+  "directories": {
+    "example": "example"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JakHuang/form-generator.git"
+  },
+  "keywords": [
+    "tinymce-vue"
+  ],
+  "dependencies": {
+    "throttle-debounce": "^2.1.0"
+  },
+  "author": "jakHuang",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/JakHuang/form-generator/issues"
+  },
+  "homepage": "https://github.com/JakHuang/form-generator/blob/dev/src/components/tinymce"
+}

@@ -1,0 +1,13 @@
+### 请求 /login 接口 => 成功
+POST {{baseUrl}}/bpm/process-instance/create
+Content-Type: application/json
+tenant-id: 1
+Authorization: Bearer {{token}}
+
+{
+  "processDefinitionId": "leave:7:20ada39c-6c95-11ec-88b1-cacd34981f8e",
+  "variables": {
+    "a": 1,
+    "b": "2"
+  }
+}

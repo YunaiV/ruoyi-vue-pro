@@ -121,4 +121,11 @@ service.interceptors.response.use(res => {
   }
 )
 
+export function getBaseHeader() {
+  return {
+    'Authorization': "Bearer " + getToken(),
+    'tenant-id': Cookies.get('tenantId'),
+  }
+}
+
 export default service

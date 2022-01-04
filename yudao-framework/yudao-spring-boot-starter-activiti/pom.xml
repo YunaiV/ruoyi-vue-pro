@@ -19,6 +19,7 @@
     <properties>
         <activiti.version>7.1.0.M6</activiti.version>
     </properties>
+    <!-- TODO @jason：后续弄到 yudao-dependencies 里 -->
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -65,6 +66,11 @@
                     <groupId>javax.el</groupId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.activiti</groupId>
+            <artifactId>activiti-image-generator</artifactId>
+            <version>${activiti.version}</version>
         </dependency>
     </dependencies>
 

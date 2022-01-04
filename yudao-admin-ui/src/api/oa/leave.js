@@ -51,6 +51,13 @@ export function createFormKeyLeave(data) {
   })
 }
 
+export function getLeaveApplyMembers() {
+  return request({
+    url: '/oa/leave/getLeaveApplyMembers',
+    method: 'get'
+  })
+}
+
 // 导出请假申请 Excel
 export function exportLeaveExcel(query) {
   return request({
