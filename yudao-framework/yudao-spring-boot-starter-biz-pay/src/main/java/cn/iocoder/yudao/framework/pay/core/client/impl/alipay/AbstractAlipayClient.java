@@ -118,12 +118,11 @@ public abstract class AbstractAlipayClient extends AbstractPayClient<AlipayPayCl
                 PayRefundUnifiedRespDTO respDTO = new PayRefundUnifiedRespDTO();
                 respDTO.setChannelRefundId("");
                 return PayCommonResult.build(response.getCode(), response.getMsg(), respDTO, codeMapping);
-            }else{
-                //失败。需要抛出异常
-                return PayCommonResult.build(response.getCode(), response.getMsg(), null, codeMapping);
             }
+            // 失败。需要抛出异常
+            return PayCommonResult.build(response.getCode(), response.getMsg(), null, codeMapping);
         } catch (AlipayApiException e) {
-            //TODO 记录异常日志
+            // TODO 记录异常日志
             log.error("[doUnifiedRefund][request({}) 发起退款失败,网络读超时，退款状态未知]", toJsonString(reqDTO), e);
             return PayCommonResult.build(e.getErrCode(), e.getErrMsg(), null, codeMapping);
         }

@@ -98,6 +98,7 @@ public class PayRefundDO extends BaseDO {
      * 退款单请求号，根据规则生成
      * 例如说，R202109181134287570000
      */
+    // TODO @jason：merchantRefundNo =》merchantRefundOId
     private String merchantRefundNo;
 
     /**

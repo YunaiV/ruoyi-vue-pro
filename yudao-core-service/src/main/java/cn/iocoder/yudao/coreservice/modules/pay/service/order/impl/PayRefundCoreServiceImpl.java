@@ -101,7 +101,8 @@ public class PayRefundCoreServiceImpl implements PayRefundCoreService {
             }
             //可以重复提交，保证 退款请求号 一致，由渠道保证幂等
         }else {
-            //成功，插入退款单 状态为生成.没有和渠道交互
+            // 成功，插入退款单 状态为生成.没有和渠道交互
+            // TODO @jason：搞到 convert 里。一些额外的自动，手动 set 下；
             payRefundDO = PayRefundDO.builder().channelOrderNo(order.getChannelOrderNo())
                     .appId(order.getAppId())
                     .channelOrderNo(order.getChannelOrderNo())
@@ -123,6 +124,7 @@ public class PayRefundCoreServiceImpl implements PayRefundCoreService {
                     .build();
             payRefundCoreMapper.insert(payRefundDO);
         }
+        // TODO @jason：搞到 convert 里。一些额外的自动，手动 set 下；
         PayRefundUnifiedReqDTO unifiedReqDTO = new PayRefundUnifiedReqDTO();
         unifiedReqDTO.setUserIp(req.getUserIp())
                 .setAmount(req.getAmount())
@@ -132,10 +134,11 @@ public class PayRefundCoreServiceImpl implements PayRefundCoreService {
                 .setReason(req.getReason());
         // 向渠道发起退款申请
         PayCommonResult<PayRefundUnifiedRespDTO> refundUnifiedResult = client.unifiedRefund(unifiedReqDTO);
-        //检查是否失败，失败抛出业务异常。
-        //TODO 渠道的异常记录
+        // 检查是否失败，失败抛出业务异常。
+        // TODO 渠道的异常记录。
+        // TODO @jason：可以先打个 warn log 哈；
         refundUnifiedResult.checkError();
-        //成功在 退款回调中处理
+        // 成功在 退款回调中处理
         return PayRefundRespDTO.builder().refundId(payRefundDO.getId()).build();
     }
 
