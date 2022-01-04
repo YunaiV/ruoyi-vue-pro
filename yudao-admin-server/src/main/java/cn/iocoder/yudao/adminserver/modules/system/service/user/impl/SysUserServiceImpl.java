@@ -165,6 +165,11 @@ public class SysUserServiceImpl implements SysUserService {
     }
 
     @Override
+    public SysUserDO getUser(Long id) {
+        return userMapper.selectById(id);
+    }
+
+    @Override
     public List<SysUserDO> getUsers(SysUserExportReqVO reqVO) {
         return userMapper.selectList(reqVO, this.getDeptCondition(reqVO.getDeptId()));
     }

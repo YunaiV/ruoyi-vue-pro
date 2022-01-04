@@ -31,9 +31,13 @@ public interface BpmErrorCodeConstants {
     ErrorCode PROCESS_DEFINITION_KEY_NOT_MATCH = new ErrorCode(1009003000, "流程定义的标识期望是({})，当前是({})，请修改 BPMN 流程图");
     ErrorCode PROCESS_DEFINITION_NAME_NOT_MATCH = new ErrorCode(1009003001, "流程定义的名字期望是({})，当前是({})，请修改 BPMN 流程图");
     ErrorCode PROCESS_DEFINITION_NOT_EXISTS = new ErrorCode(1009003002, "流程定义不存在");
+    ErrorCode PROCESS_DEFINITION_IS_SUSPENDED = new ErrorCode(1009003002, "流程定义处于挂起状态");
 
-    // ========== 动态表单模块 1-009-004-000 ==========
-    ErrorCode FORM_NOT_EXISTS = new ErrorCode(1009004000, "动态表单不存在");
-    ErrorCode FORM_FIELD_REPEAT = new ErrorCode(1009004000, "表单项({}) 和 ({}) 使用了相同的字段名({})");
+    // ========== 流程实例 1-009-004-000 ==========
+
+
+    // ========== 动态表单模块 1-009-010-000 ==========
+    ErrorCode FORM_NOT_EXISTS = new ErrorCode(1009010000, "动态表单不存在");
+    ErrorCode FORM_FIELD_REPEAT = new ErrorCode(1009010000, "表单项({}) 和 ({}) 使用了相同的字段名({})");
 
 }

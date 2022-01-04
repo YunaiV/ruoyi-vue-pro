@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.framework.security.core.util;
 
-import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils;
 import org.springframework.lang.Nullable;
@@ -12,7 +11,6 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -100,15 +98,15 @@ public class SecurityFrameworkUtils {
         // 原因是，Spring Security 的 Filter 在 ApiAccessLogFilter 后面，在它记录访问日志时，线上上下文已经没有用户编号等信息
         WebFrameworkUtils.setLoginUserId(request, loginUser.getId());
         WebFrameworkUtils.setLoginUserType(request, loginUser.getUserType());
-        // TODO @jason：使用 userId 会不会更合适哈？
-        // TODO @芋艿：activiti 需要使用 ttl 上下文
-        // TODO @jason：清理问题
-        if (Objects.equals(UserTypeEnum.ADMIN.getValue(), loginUser.getUserType())) {
-            org.activiti.engine.impl.identity.Authentication.setAuthenticatedUserId(loginUser.getUsername());
-        }
-        // TODO @芋道源码 该值被赋值给 user task 中assignee ， username 显示更直白一点
-        // TODO @jason：有办法设置 userId，然后 activiti 有地方读取到 username 么？毕竟 username 只是 User 的登陆账号，并不能绝对像 userId 代表一个用户
-        org.activiti.engine.impl.identity.Authentication.setAuthenticatedUserId(loginUser.getUsername());
+//        // TODO @jason：使用 userId 会不会更合适哈？
+//        // TODO @芋艿：activiti 需要使用 ttl 上下文
+//        // TODO @jason：清理问题
+//        if (Objects.equals(UserTypeEnum.ADMIN.getValue(), loginUser.getUserType())) {
+//            org.activiti.engine.impl.identity.Authentication.setAuthenticatedUserId(loginUser.getUsername());
+//        }
+//        // TODO @芋道源码 该值被赋值给 user task 中assignee ， username 显示更直白一点
+//        // TODO @jason：有办法设置 userId，然后 activiti 有地方读取到 username 么？毕竟 username 只是 User 的登陆账号，并不能绝对像 userId 代表一个用户
+//        org.activiti.engine.impl.identity.Authentication.setAuthenticatedUserId(loginUser.getUsername());
     }
 
 }
