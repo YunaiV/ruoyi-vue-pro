@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 
-import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
 @Api(tags = "流程实例") // 流程实例，通过流程定义创建的一次“申请”
@@ -29,7 +28,9 @@ public class BpmProcessInstanceController {
     @PostMapping("/create")
     @ApiOperation("新建流程实例")
     public CommonResult<String> createProcessInstance(@Valid @RequestBody BpmProcessInstanceCreateReqVO createReqVO) {
-        return success(processInstanceService.createProcessInstance(getLoginUserId(), createReqVO));
+//        return success(processInstanceService.createProcessInstance(getLoginUserId(), createReqVO));
+        processInstanceService.getMyProcessInstancePage(getLoginUserId());
+        return null;
     }
 
 }

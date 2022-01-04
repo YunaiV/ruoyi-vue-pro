@@ -11,6 +11,7 @@ import org.activiti.engine.HistoryService;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
+import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.history.HistoricProcessInstanceQuery;
 import org.activiti.engine.impl.identity.Authentication;
 import org.activiti.engine.repository.ProcessDefinition;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
+import java.util.List;
 import java.util.Map;
 
 import static cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants.PROCESS_DEFINITION_IS_SUSPENDED;
@@ -92,9 +94,16 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
     }
 
     public void getMyProcessInstancePage(Long userId) {
+        // id title 所属流程 当前审批环节 状态 结果 创建时间 提交申请时间 【标题、状态】「ActBusiness」
+        // id title 流程类别 流程版本 提交时间 流程状态 耗时 当前节点 办理 【标题、提交时间】「HistoricProcessInstanceQuery」
+
+        runtimeService.createProcessInstanceQuery().list();
         HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService.createHistoricProcessInstanceQuery()
                 .startedBy(String.valueOf(userId)) // 发起人是自己
                 .orderByProcessInstanceStartTime().desc(); // 按照发起时间倒序
+        List<HistoricProcessInstance> list = historicProcessInstanceQuery.list();
+        System.out.println("test");
+
     }
 
 }

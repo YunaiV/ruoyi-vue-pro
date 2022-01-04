@@ -20,4 +20,6 @@ public interface BpmProcessInstanceService {
      */
     String createProcessInstance(Long userId, @Valid BpmProcessInstanceCreateReqVO createReqVO);
 
+    void getMyProcessInstancePage(Long userId);
+
 }
