@@ -1,9 +1,12 @@
 package cn.iocoder.yudao.framework.activiti.config;
 
+import cn.iocoder.yudao.framework.activiti.core.web.ActivitiWebFilter;
+import cn.iocoder.yudao.framework.common.enums.WebFilterOrderEnum;
 import org.activiti.image.ProcessDiagramGenerator;
 import org.activiti.image.impl.DefaultProcessDiagramGenerator;
 import org.activiti.spring.boot.ProcessEngineConfigurationConfigurer;
 import org.apache.ibatis.session.SqlSessionFactory;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -24,6 +27,14 @@ public class YudaoActivitiConfiguration {
     @Bean
     public ProcessEngineConfigurationConfigurer processEngineConfigurationConfigurer(SqlSessionFactory sqlSessionFactory) {
         return springProcessEngineConfiguration -> springProcessEngineConfiguration.setSqlSessionFactory(sqlSessionFactory);
+    }
+
+    @Bean
+    public FilterRegistrationBean<ActivitiWebFilter> activitiWebFilter() {
+        FilterRegistrationBean<ActivitiWebFilter> registrationBean = new FilterRegistrationBean<>();
+        registrationBean.setFilter(new ActivitiWebFilter());
+        registrationBean.setOrder(WebFilterOrderEnum.ACTIVITI_FILTER);
+        return registrationBean;
     }
 
 }

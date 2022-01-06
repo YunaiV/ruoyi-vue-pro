@@ -13,7 +13,6 @@ import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.history.HistoricProcessInstanceQuery;
-import org.activiti.engine.impl.identity.Authentication;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
@@ -70,12 +69,8 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
             throw exception(PROCESS_DEFINITION_IS_SUSPENDED);
         }
 
-        // 设置流程发起人
-        Authentication.setAuthenticatedUserId(String.valueOf(userId));
-
         // 创建流程实例
         Map<String, Object> variables = createReqVO.getVariables();
-        variables.put("INITIATOR", userId); // TODO 芋艿：初始化人员
         ProcessInstance instance = runtimeService.startProcessInstanceById(createReqVO.getProcessDefinitionId(), variables);
 
         // 添加初始的评论 TODO 芋艿：在思考下
@@ -96,6 +91,8 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
     public void getMyProcessInstancePage(Long userId) {
         // id title 所属流程 当前审批环节 状态 结果 创建时间 提交申请时间 【标题、状态】「ActBusiness」
         // id title 流程类别 流程版本 提交时间 流程状态 耗时 当前节点 办理 【标题、提交时间】「HistoricProcessInstanceQuery」
+
+        // id title 所属流程 流程类别 创建时间 状态 当前审批环节 【标题、状态】
 
         runtimeService.createProcessInstanceQuery().list();
         HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService.createHistoricProcessInstanceQuery()

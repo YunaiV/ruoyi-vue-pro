@@ -6,7 +6,7 @@ import cn.iocoder.yudao.adminserver.modules.bpm.controller.oa.vo.*;
 import cn.iocoder.yudao.adminserver.modules.bpm.convert.oa.OALeaveConvert;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.leave.OALeaveDO;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.mysql.oa.OALeaveMapper;
-import cn.iocoder.yudao.adminserver.modules.bpm.enums.FlowStatusEnum;
+import cn.iocoder.yudao.adminserver.modules.bpm.enums.task.ProcessInstanceResultEnum;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.oa.OALeaveService;
 import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.dept.SysPostDO;
 import cn.iocoder.yudao.adminserver.modules.system.dal.mysql.dept.SysPostMapper;
@@ -62,7 +62,7 @@ public class OALeaveServiceImpl implements OALeaveService {
     public Long createLeave(OALeaveCreateReqVO createReqVO) {
         // 插入 OA 请假单
         OALeaveDO leave = OALeaveConvert.INSTANCE.convert(createReqVO);
-        leave.setStatus(FlowStatusEnum.HANDLE.getStatus());
+        leave.setStatus(ProcessInstanceResultEnum.PROCESS.getResult());
         // TODO @jason：应该是存储 userId？？
         leave.setUserId(SecurityFrameworkUtils.getLoginUser().getUsername());
         leaveMapper.insert(leave);
