@@ -30,6 +30,9 @@ public class BpmProcessInstanceMyPageReqVO extends PageParam {
     @ApiModelProperty(value = "流程实例的结果", notes = "参见 bpm_process_instance_result", example = "2")
     private Integer result;
 
+    @ApiModelProperty(value = "流程分类", notes = "参见 bpm_model_category 数据字典", example = "1")
+    private String category;
+
     @ApiModelProperty(value = "开始的创建时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private Date beginCreateTime;

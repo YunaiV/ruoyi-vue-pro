@@ -36,16 +36,6 @@ public class BpmProcessDefinitionController {
         return success(bpmDefinitionService.getProcessDefinitionPage(pageReqVO));
     }
 
-    // TODO 芋艿：需要重写该方法
-    @GetMapping(value = "/getStartForm")
-    public CommonResult<String> getStartForm(@RequestParam("processKey") String processKey){
-//        final ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().
-//                processDefinitionKey(processKey).latestVersion().singleResult();
-//        processRuntime.processDefinition(processDefinition.getId()).getFormKey();
-        // TODO 这样查似乎有问题？？， 暂时写死
-        return success("/flow/leave/apply");
-    }
-
     @GetMapping ("/get-bpmn-xml")
     @ApiOperation(value = "获得流程定义的 BPMN XML")
     @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = String.class)

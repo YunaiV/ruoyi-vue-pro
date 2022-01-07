@@ -28,8 +28,11 @@ public class BpmProcessInstancePageItemRespVO {
     @ApiModelProperty(value = "流程实例的结果", required = true, notes = "参见 bpm_process_instance_result", example = "2")
     private Integer result;
 
-    @ApiModelProperty(value = "创建时间", required = true)
+    @ApiModelProperty(value = "提交时间", required = true)
     private Date createTime;
+
+    @ApiModelProperty(value = "结束时间", required = true)
+    private Date endTime;
 
     // TODO 芋艿：tasks
 
