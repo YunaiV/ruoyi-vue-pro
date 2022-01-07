@@ -31,7 +31,6 @@ public class BpmProcessInstanceController {
     public CommonResult<String> createProcessInstance(@Valid @RequestBody BpmProcessInstanceCreateReqVO createReqVO) {
         return success(processInstanceService.createProcessInstance(getLoginUserId(), createReqVO));
 //        processInstanceService.getMyProcessInstancePage(getLoginUserId());
-        return null;
     }
 
 }

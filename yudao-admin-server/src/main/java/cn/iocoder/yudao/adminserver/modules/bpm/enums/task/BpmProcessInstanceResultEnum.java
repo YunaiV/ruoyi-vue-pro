@@ -6,17 +6,19 @@ import lombok.Getter;
 /**
  * 流程实例的结果
  *
- * @author 芋道源码
+ * @author jason
  */
 @Getter
 @AllArgsConstructor
-public enum ProcessInstanceStatusEnum {
+public enum BpmProcessInstanceResultEnum {
 
-    RUNNING(1, "进行中"),
-    FINISH(2, "已完成");
+    PROCESS(1, "处理中"),
+    PASS(2, "通过"),
+    REJECT(3, "不通过"),
+    CANCEL(4, "撤销");
 
     /**
-     * 状态
+     * 结果
      */
     private final Integer result;
     /**

@@ -3,6 +3,7 @@ package cn.iocoder.yudao.framework.mybatis.core.dataobject;
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableLogic;
+import lombok.Builder;
 import lombok.Data;
 
 import java.io.Serializable;

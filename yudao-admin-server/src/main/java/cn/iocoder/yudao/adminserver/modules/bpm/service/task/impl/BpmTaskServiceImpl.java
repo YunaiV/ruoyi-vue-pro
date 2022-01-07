@@ -3,7 +3,7 @@ package cn.iocoder.yudao.adminserver.modules.bpm.service.task.impl;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.workflow.vo.*;
-import cn.iocoder.yudao.adminserver.modules.bpm.convert.workflow.TaskConvert;
+import cn.iocoder.yudao.adminserver.modules.bpm.convert.task.TaskConvert;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.task.BpmTaskService;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;

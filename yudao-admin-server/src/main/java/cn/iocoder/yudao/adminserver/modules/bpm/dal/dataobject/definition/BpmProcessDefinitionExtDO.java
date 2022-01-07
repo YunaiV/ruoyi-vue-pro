@@ -13,14 +13,14 @@ import org.activiti.engine.repository.ProcessDefinition;
  *
  * @author 芋道源码
  */
-@TableName(value = "bpm_process_definition", autoResultMap = true)
+@TableName(value = "bpm_process_definition_ext", autoResultMap = true)
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class BpmProcessDefinitionDO extends BaseDO {
+public class BpmProcessDefinitionExtDO extends BaseDO {
 
     /**
      * 编号

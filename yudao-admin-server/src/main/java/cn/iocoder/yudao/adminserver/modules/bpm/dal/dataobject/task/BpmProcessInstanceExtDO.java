@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.task;
 
-import cn.iocoder.yudao.adminserver.modules.bpm.enums.task.ProcessInstanceResultEnum;
-import cn.iocoder.yudao.adminserver.modules.bpm.enums.task.ProcessInstanceStatusEnum;
+import cn.iocoder.yudao.adminserver.modules.bpm.enums.task.BpmProcessInstanceResultEnum;
+import cn.iocoder.yudao.adminserver.modules.bpm.enums.task.BpmProcessInstanceStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
@@ -44,13 +44,13 @@ public class BpmProcessInstanceExtDO extends BaseDO {
     /**
      * 流程实例的状态
      *
-     * 枚举 {@link ProcessInstanceStatusEnum}
+     * 枚举 {@link BpmProcessInstanceStatusEnum}
      */
     private Integer status;
     /**
      * 结果
      *
-     * 枚举 {@link ProcessInstanceResultEnum}
+     * 枚举 {@link BpmProcessInstanceResultEnum}
      */
     private Integer result;
 
