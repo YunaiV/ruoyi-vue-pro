@@ -6,6 +6,7 @@ import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 import org.activiti.engine.history.HistoricProcessInstance;
+import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
 
 /**
@@ -18,9 +19,9 @@ import org.activiti.engine.runtime.ProcessInstance;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
+//@Builder
+//@NoArgsConstructor
+//@AllArgsConstructor
 public class BpmProcessInstanceExtDO extends BaseDO {
 
     /**
@@ -42,13 +43,26 @@ public class BpmProcessInstanceExtDO extends BaseDO {
      */
     private String processInstanceId;
     /**
+     * 流程定义的编号
+     *
+     * 关联 {@link ProcessDefinition#getId()}
+     */
+    private String processDefinitionId;
+    /**
+     * 流程分类
+     *
+     * 冗余 {@link ProcessDefinition#getCategory()}
+     * 数据字典 bpm_model_category
+     */
+    private String category;
+    /**
      * 流程实例的状态
      *
      * 枚举 {@link BpmProcessInstanceStatusEnum}
      */
     private Integer status;
     /**
-     * 结果
+     * 流程实例的结果
      *
      * 枚举 {@link BpmProcessInstanceResultEnum}
      */

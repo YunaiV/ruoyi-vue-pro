@@ -1,4 +1,4 @@
-### 请求 /login 接口 => 成功
+### 请求 /bpm/process-instance/create 接口 => 成功
 POST {{baseUrl}}/bpm/process-instance/create
 Content-Type: application/json
 tenant-id: 1
@@ -11,3 +11,8 @@ Authorization: Bearer {{token}}
     "b": "2"
   }
 }
+
+### 请求 /bpm/process-instance/my-page 接口 => 成功
+GET {{baseUrl}}/bpm/process-instance/my-page
+tenant-id: 1
+Authorization: Bearer {{token}}
