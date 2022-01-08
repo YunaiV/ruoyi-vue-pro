@@ -31,9 +31,15 @@ public class BpmTaskController {
     // TODO 芋艿：权限、validation；
 
     @GetMapping("todo-page")
-    @ApiOperation("获取 TODO 待办任务分页")
+    @ApiOperation("获取 Todo 待办任务分页")
     public CommonResult<PageResult<BpmTaskTodoPageItemRespVO>> getTodoTaskPage(@Valid BpmTaskTodoPageReqVO pageVO) {
         return success(taskService.getTodoTaskPage(getLoginUserId(), pageVO));
+    }
+
+    @GetMapping("done-page")
+    @ApiOperation("获取 Done 已办任务分页")
+    public CommonResult<PageResult<BpmTaskDonePageItemRespVO>> getTodoTaskPage(@Valid BpmTaskDonePageReqVO pageVO) {
+        return success(taskService.getDoneTaskPage(getLoginUserId(), pageVO));
     }
 
     @PostMapping("/task-steps")

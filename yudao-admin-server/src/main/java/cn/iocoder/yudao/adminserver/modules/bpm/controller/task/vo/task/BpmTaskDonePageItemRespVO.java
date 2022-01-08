@@ -6,9 +6,9 @@ import lombok.Data;
 
 import java.util.Date;
 
-@ApiModel("流程任务的 Running 进行中的分页项 Response VO")
+@ApiModel("流程任务的 Done 已完成的分页项 Response VO")
 @Data
-public class BpmTaskTodoPageItemRespVO {
+public class BpmTaskDonePageItemRespVO {
 
     @ApiModelProperty(value = "任务编号", required = true, example = "1024")
     private String id;
@@ -22,8 +22,11 @@ public class BpmTaskTodoPageItemRespVO {
     @ApiModelProperty(value = "创建时间", required = true)
     private Date createTime;
 
-    @ApiModelProperty(value = "激活状态", required = true, example = "1", notes = "参见 SuspensionState 枚举")
-    private Integer suspensionState;
+    @ApiModelProperty(value = "结束时间", required = true)
+    private Date endTime;
+
+    @ApiModelProperty(value = "持续时间", required = true, example = "1000")
+    private Long durationInMillis;
 
     /**
      * 所属流程实例
@@ -50,5 +53,11 @@ public class BpmTaskTodoPageItemRespVO {
         private String processDefinitionId;
 
     }
+
+
+    // 任务编号、流程名称、任务节点、流程发起人、接收时间、审批时间、耗时【名称、开始时间】「流程记录、撤回」
+    // 任务编号、任务名称、所属流程、委托代办人、流程发起人、优先级、审批操作、审批意见、耗时、创建时间【名称、开始时间】「申请详情」
+
+    // 任务编号、任务名称、流程名称、流程发起人、接收时间、审批时间、耗时【名称、接收时间】「详情」TODO 撤回
 
 }

@@ -1,10 +1,12 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.convert.task;
 
+import cn.iocoder.yudao.adminserver.modules.bpm.controller.task.vo.task.BpmTaskDonePageItemRespVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.task.vo.task.BpmTaskTodoPageItemRespVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.task.vo.task.TaskStepVO;
 import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.user.SysUserDO;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import org.activiti.engine.history.HistoricActivityInstance;
+import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.impl.persistence.entity.SuspensionState;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
@@ -60,5 +62,29 @@ public interface BpmTaskConvert {
         return suspended ? SuspensionState.SUSPENDED.getStateCode() :
                 SuspensionState.ACTIVE.getStateCode();
     }
+
+    default List<BpmTaskDonePageItemRespVO> convertList2(List<HistoricTaskInstance> tasks,
+                                                         Map<String, ProcessInstance> processInstanceMap,
+                                                         Map<Long, SysUserDO> userMap) {
+        return CollectionUtils.convertList(tasks, task -> {
+            ProcessInstance processInstance = processInstanceMap.get(task.getProcessInstanceId());
+            return convert(task, processInstance, userMap.get(Long.valueOf(processInstance.getStartUserId())));
+        });
+    }
+
+    @Mappings({
+            @Mapping(source = "task.id", target = "id"),
+            @Mapping(source = "task.name", target = "name"),
+            @Mapping(source = "task.claimTime", target = "claimTime"),
+            @Mapping(source = "task.createTime", target = "createTime"),
+            @Mapping(source = "task.endTime", target = "endTime"),
+            @Mapping(source = "task.durationInMillis", target = "durationInMillis"),
+            @Mapping(source = "processInstance.id", target = "processInstance.id"),
+            @Mapping(source = "processInstance.name", target = "processInstance.name"),
+            @Mapping(source = "processInstance.startUserId", target = "processInstance.startUserId"),
+            @Mapping(source = "processInstance.processDefinitionId", target = "processInstance.processDefinitionId"),
+            @Mapping(source = "user.nickname", target = "processInstance.startUserNickname")
+    })
+    BpmTaskDonePageItemRespVO convert(HistoricTaskInstance task, ProcessInstance processInstance, SysUserDO user);
 
 }

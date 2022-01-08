@@ -23,6 +23,8 @@ import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.history.HistoricActivityInstance;
 import org.activiti.engine.history.HistoricProcessInstance;
+import org.activiti.engine.history.HistoricTaskInstance;
+import org.activiti.engine.history.HistoricTaskInstanceQuery;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Comment;
@@ -83,7 +85,8 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     public PageResult<BpmTaskTodoPageItemRespVO> getTodoTaskPage(Long userId, BpmTaskTodoPageReqVO pageVO) {
         // 查询待办任务
         TaskQuery taskQuery = taskService.createTaskQuery()
-                .taskAssignee(String.valueOf(userId));
+                .taskAssignee(String.valueOf(userId)) // 分配给自己
+                .orderByTaskCreateTime().desc(); // 创建时间倒序
         if (StrUtil.isNotBlank(pageVO.getName())) {
             taskQuery.taskNameLike("%" + pageVO.getName() + "%");
         }
@@ -94,8 +97,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
             taskQuery.taskCreatedBefore(pageVO.getEndCreateTime());
         }
         // 执行查询
-        List<Task> tasks = taskQuery.orderByTaskCreateTime().desc() // 创建时间倒序
-                .listPage(PageUtils.getStart(pageVO), pageVO.getPageSize());
+        List<Task> tasks = taskQuery.listPage(PageUtils.getStart(pageVO), pageVO.getPageSize());
         if (CollUtil.isEmpty(tasks)) {
             return PageResult.empty(taskQuery.count());
         }
@@ -103,12 +105,44 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         // 获得 ProcessInstance Map
         Map<String, ProcessInstance> processInstanceMap = processInstanceService.getProcessInstanceMap(
                 convertSet(tasks, Task::getProcessInstanceId));
-
         // 获得 User Map
         Map<Long, SysUserDO> userMap = userService.getUserMap(
                 convertSet(processInstanceMap.values(), instance -> Long.valueOf(instance.getStartUserId())));
         // 拼接结果
         return new PageResult<>(BpmTaskConvert.INSTANCE.convertList(tasks, processInstanceMap, userMap),
+                taskQuery.count());
+    }
+
+    @Override
+    public PageResult<BpmTaskDonePageItemRespVO> getDoneTaskPage(Long userId, BpmTaskDonePageReqVO pageVO) {
+        // 查询已办任务
+        HistoricTaskInstanceQuery taskQuery = historyService.createHistoricTaskInstanceQuery()
+                .finished() // 已完成
+                .taskAssignee(String.valueOf(userId)) // 分配给自己
+                .orderByHistoricTaskInstanceEndTime().desc(); // 审批时间倒序
+        if (StrUtil.isNotBlank(pageVO.getName())) {
+            taskQuery.taskNameLike("%" + pageVO.getName() + "%");
+        }
+        if (pageVO.getBeginCreateTime() != null) {
+            taskQuery.taskCreatedAfter(pageVO.getBeginCreateTime());
+        }
+        if (pageVO.getEndCreateTime() != null) {
+            taskQuery.taskCreatedBefore(pageVO.getEndCreateTime());
+        }
+        // 执行查询
+        List<HistoricTaskInstance> tasks = taskQuery.listPage(PageUtils.getStart(pageVO), pageVO.getPageSize());
+        if (CollUtil.isEmpty(tasks)) {
+            return PageResult.empty(taskQuery.count());
+        }
+
+        // 获得 ProcessInstance Map
+        Map<String, ProcessInstance> processInstanceMap = processInstanceService.getProcessInstanceMap(
+                convertSet(tasks, HistoricTaskInstance::getProcessInstanceId));
+        // 获得 User Map
+        Map<Long, SysUserDO> userMap = userService.getUserMap(
+                convertSet(processInstanceMap.values(), instance -> Long.valueOf(instance.getStartUserId())));
+        // 拼接结果
+        return new PageResult<>(BpmTaskConvert.INSTANCE.convertList2(tasks, processInstanceMap, userMap),
                 taskQuery.count());
     }
 
@@ -122,11 +156,6 @@ public class BpmTaskServiceImpl implements BpmTaskService {
 
     }
 
-    // 任务编号、流程名称、任务节点、流程发起人、接收时间、审批时间、耗时【名称、开始时间】「流程记录、撤回」
-    // 任务编号、任务名称、所属流程、委托代办人、流程发起人、优先级、审批操作、审批意见、耗时、创建时间【名称、开始时间】「申请详情」
-
-    // 任务编号、任务名称、流程名称、流程发起人、接收时间、审批时间、耗时【名称、接收时间】「详情」TODO 撤回
-
     @Override
     @Transactional
     public void completeTask(TaskReqVO taskReq) {
@@ -138,8 +167,6 @@ public class BpmTaskServiceImpl implements BpmTaskService {
 //                .withVariables(taskReq.getVariables())
 //                .build());
     }
-
-
 
     @Override
     public TaskHandleVO getTaskSteps(TaskQueryReqVO taskQuery) {

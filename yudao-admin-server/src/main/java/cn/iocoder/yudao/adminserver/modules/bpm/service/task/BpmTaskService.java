@@ -44,13 +44,22 @@ public interface BpmTaskService {
     }
 
     /**
-     * 获得流程任务分页
+     * 获得待办的流程任务分页
      *
      * @param userId 用户编号
      * @param pageReqVO 分页请求
      * @return 流程任务分页
      */
     PageResult<BpmTaskTodoPageItemRespVO> getTodoTaskPage(Long userId, BpmTaskTodoPageReqVO pageReqVO);
+
+    /**
+     * 获得已办的流程任务分页
+     *
+     * @param userId 用户编号
+     * @param pageReqVO 分页请求
+     * @return 流程任务分页
+     */
+    PageResult<BpmTaskDonePageItemRespVO> getDoneTaskPage(Long userId, BpmTaskDonePageReqVO pageReqVO);
 
     /**
      * 将流程任务分配给指定用户
