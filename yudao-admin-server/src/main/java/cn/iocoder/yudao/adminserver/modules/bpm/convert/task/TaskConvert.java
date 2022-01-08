@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.convert.task;
 
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.workflow.vo.TaskStepVO;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.workflow.vo.TodoTaskRespVO;
+import cn.iocoder.yudao.adminserver.modules.bpm.controller.task.vo.task.TaskStepVO;
+import cn.iocoder.yudao.adminserver.modules.bpm.controller.task.vo.task.TodoTaskRespVO;
 import org.activiti.api.task.model.Task;
 import org.activiti.engine.history.HistoricActivityInstance;
 import org.activiti.engine.repository.ProcessDefinition;

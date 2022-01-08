@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.util.Date;
+import java.util.List;
 
 @ApiModel("流程实例的分页 Item Response VO")
 @Data
@@ -34,6 +35,21 @@ public class BpmProcessInstancePageItemRespVO {
     @ApiModelProperty(value = "结束时间", required = true)
     private Date endTime;
 
-    // TODO 芋艿：tasks
+    /**
+     * 当前任务
+     */
+    private List<Task> tasks;
+
+    @ApiModel("流程任务")
+    @Data
+    public static class Task {
+
+        @ApiModelProperty(value = "流程任务的编号", required = true, example = "1024")
+        private String id;
+
+        @ApiModelProperty(value = "任务名称", required = true, example = "芋道")
+        private String name;
+
+    }
 
 }

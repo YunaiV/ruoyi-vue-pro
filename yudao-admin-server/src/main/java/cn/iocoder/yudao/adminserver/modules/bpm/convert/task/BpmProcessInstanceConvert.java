@@ -5,12 +5,15 @@ import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.task.BpmProcessIn
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
+import org.activiti.engine.task.Task;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
+import java.util.Map;
+import java.util.function.Consumer;
 
 /**
  * 流程实例 Convert
@@ -32,9 +35,16 @@ public interface BpmProcessInstanceConvert {
     })
     BpmProcessInstanceExtDO convert(ProcessInstance instance, ProcessDefinition definition);
 
-    PageResult<BpmProcessInstancePageItemRespVO> convertPage(PageResult<BpmProcessInstanceExtDO> page);
+    default PageResult<BpmProcessInstancePageItemRespVO> convertPage(PageResult<BpmProcessInstanceExtDO> page,
+                                                                     Map<String, List<Task>> taskMap) {
+        List<BpmProcessInstancePageItemRespVO> list = convertList(page.getList());
+        list.forEach(respVO -> respVO.setTasks(convertList2(taskMap.get(respVO.getId()))));
+        return new PageResult<>(list, page.getTotal());
+    }
 
     List<BpmProcessInstancePageItemRespVO> convertList(List<BpmProcessInstanceExtDO> list);
+
+    List<BpmProcessInstancePageItemRespVO.Task> convertList2(List<Task> tasks);
 
     @Mapping(source = "processInstanceId", target = "id")
     BpmProcessInstancePageItemRespVO convert(BpmProcessInstanceExtDO bean);

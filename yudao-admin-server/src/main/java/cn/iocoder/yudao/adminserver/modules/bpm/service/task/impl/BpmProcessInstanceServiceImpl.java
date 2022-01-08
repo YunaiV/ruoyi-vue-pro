@@ -12,9 +12,11 @@ import cn.iocoder.yudao.adminserver.modules.bpm.enums.task.BpmProcessInstanceRes
 import cn.iocoder.yudao.adminserver.modules.bpm.enums.task.BpmProcessInstanceStatusEnum;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmProcessDefinitionService;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.task.BpmProcessInstanceService;
+import cn.iocoder.yudao.adminserver.modules.bpm.service.task.BpmTaskService;
 import cn.iocoder.yudao.adminserver.modules.system.service.user.SysUserService;
 import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.user.SysUserDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.RuntimeService;
@@ -34,6 +36,7 @@ import java.util.Map;
 import static cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants.PROCESS_DEFINITION_IS_SUSPENDED;
 import static cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants.PROCESS_DEFINITION_NOT_EXISTS;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 
 /**
  * 流程实例 Service 实现类
@@ -55,7 +58,7 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
     @Resource
     private RuntimeService runtimeService;
     @Resource
-    private TaskService taskService;
+    private BpmTaskService taskService;
     @Resource
     private HistoryService historyService;
 
@@ -88,17 +91,17 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         createProcessInstanceExt(instance, definition);
 
         // 添加初始的评论 TODO 芋艿：在思考下
-        Task task = taskService.createTaskQuery().processInstanceId(instance.getId()).singleResult();
-        if (task != null) {
-            SysUserDO user = userService.getUser(userId);
-            Assert.notNull(user, "用户({})不存在", userId);
-            String type = "normal";
-            taskService.addComment(task.getId(), instance.getProcessInstanceId(), type,
-                    String.format("%s 发起流程申请", user.getNickname()));
-            // TODO 芋艿：应该不用下面两个步骤
-//           taskService.setAssignee(task.getId(), String.valueOf(userId));
-//            taskService.complete(task.getId(), variables);
-        }
+//        Task task = taskService.createTaskQuery().processInstanceId(instance.getId()).singleResult();
+//        if (task != null) {
+//            SysUserDO user = userService.getUser(userId);
+//            Assert.notNull(user, "用户({})不存在", userId);
+//            String type = "normal";
+//            taskService.addComment(task.getId(), instance.getProcessInstanceId(), type,
+//                    String.format("%s 发起流程申请", user.getNickname()));
+//            // TODO 芋艿：应该不用下面两个步骤
+////           taskService.setAssignee(task.getId(), String.valueOf(userId));
+////            taskService.complete(task.getId(), variables);
+//        }
         return instance.getId();
     }
 
@@ -123,24 +126,12 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         if (CollUtil.isEmpty(pageResult.getList())) {
             return new PageResult<>(pageResult.getTotal());
         }
-        // TODO 芋艿：tasks
+
+        // 获得流程 Task Map
+        List<String> processInstanceIds = convertList(pageResult.getList(), BpmProcessInstanceExtDO::getProcessInstanceId);
+        Map<String, List<Task>> taskMap = taskService.getTaskMapByProcessInstanceIds(processInstanceIds);
         // 转换返回
-        return BpmProcessInstanceConvert.INSTANCE.convertPage(pageResult);
-    }
-
-    public void getMyProcessInstancePage(Long userId) {
-        // id title 所属流程 当前审批环节 状态 结果 创建时间 提交申请时间 【标题、状态】「ActBusiness」
-        // id title 流程类别 流程版本 提交时间 流程状态 耗时 当前节点 办理 【标题、提交时间】「HistoricProcessInstanceQuery」
-
-        // id name 所属流程 流程类别 创建时间 状态 当前审批环节 【标题、流程、时间、状态、结果】
-
-        runtimeService.createProcessInstanceQuery().list();
-        HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService.createHistoricProcessInstanceQuery()
-                .startedBy(String.valueOf(userId)) // 发起人是自己
-                .orderByProcessInstanceStartTime().desc(); // 按照发起时间倒序
-        List<HistoricProcessInstance> list = historicProcessInstanceQuery.list();
-        System.out.println("test");
-
+        return BpmProcessInstanceConvert.INSTANCE.convertPage(pageResult, taskMap);
     }
 
     /**

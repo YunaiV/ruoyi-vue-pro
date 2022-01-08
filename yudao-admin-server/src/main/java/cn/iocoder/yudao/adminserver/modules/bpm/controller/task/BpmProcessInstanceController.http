@@ -5,7 +5,7 @@ tenant-id: 1
 Authorization: Bearer {{token}}
 
 {
-  "processDefinitionId": "leave:7:20ada39c-6c95-11ec-88b1-cacd34981f8e",
+  "processDefinitionId": "gateway_test:2:00e52d8e-701b-11ec-aca9-a2380e71991a",
   "variables": {
     "a": 1,
     "b": "2"

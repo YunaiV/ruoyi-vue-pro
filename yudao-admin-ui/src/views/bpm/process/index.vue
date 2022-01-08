@@ -54,7 +54,13 @@
           <span>{{ getDictDataLabel(DICT_TYPE.BPM_MODEL_CATEGORY, scope.row.category) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="当前审批任务" align="center" prop="tasks" /> <!-- TODO 芋艿：待完善 -->
+      <el-table-column label="当前审批任务" align="center" prop="tasks">
+        <template slot-scope="scope">
+          <el-button v-for="task in scope.row.tasks" type="text" @click="handleFormDetail(task.id)">
+            <span>{{ task.name }}</span>
+          </el-button>
+        </template>
+      </el-table-column>
       <el-table-column label="状态" align="center" prop="status">
         <template slot-scope="scope">
           <span>

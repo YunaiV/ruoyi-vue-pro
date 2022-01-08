@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.adminserver.modules.bpm.controller.workflow.vo;
+package cn.iocoder.yudao.adminserver.modules.bpm.controller.task.vo.task;
 
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import io.swagger.annotations.ApiModel;
