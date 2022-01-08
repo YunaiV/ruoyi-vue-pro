@@ -166,13 +166,8 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         return runtimeService.createProcessInstanceQuery().processInstanceIds(ids).list();
     }
 
-    /**
-     * 获得流程实例
-     *
-     * @param id 流程实例的编号
-     * @return 流程实例
-     */
-    private ProcessInstance getProcessInstance(String id) {
+    @Override
+    public ProcessInstance getProcessInstance(String id) {
         return runtimeService.createProcessInstanceQuery().processInstanceId(id).singleResult();
     }
 

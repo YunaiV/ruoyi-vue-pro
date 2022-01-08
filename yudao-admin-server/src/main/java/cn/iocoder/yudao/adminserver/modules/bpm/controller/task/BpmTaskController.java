@@ -42,15 +42,16 @@ public class BpmTaskController {
         return success(taskService.getDoneTaskPage(getLoginUserId(), pageVO));
     }
 
+    @PutMapping("/complete")
+    @ApiOperation(value = "完成任务", notes = "审批通过 or 不通过")
+    public CommonResult<Boolean> completeTask(@Valid @RequestBody BpmTaskCompleteReqVO reqVO) {
+        taskService.completeTask(reqVO);
+        return success(true);
+    }
+
     @PostMapping("/task-steps")
     public CommonResult<TaskHandleVO> getTaskSteps(@RequestBody TaskQueryReqVO taskQuery) {
         return success(taskService.getTaskSteps(taskQuery));
-    }
-
-    @PostMapping("/complete")
-    public CommonResult<Boolean> complete(@RequestBody TaskReqVO taskReq) {
-        taskService.completeTask(taskReq);
-        return success(true);
     }
 
     @GetMapping("/process/history-steps")

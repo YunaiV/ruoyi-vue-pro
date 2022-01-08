@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import org.activiti.engine.task.Task;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Map;
 
@@ -70,29 +71,24 @@ public interface BpmTaskService {
     void updateTaskAssign(String id, Long userId);
 
     /**
-     * 签收任务
+     * 完成任务（审批通过 / 不通过）
      *
-     * @param id  任务编号
+     * @param taskReq 完成请求
      */
-    void claimTask(String id);
-
-    /**
-     * 工作流，完成 userTask, 完成用户任务 一般传入参数 1。是否同意（variables).  2. 评论(comment)
-     * variables 变量名 和 评论 由前台传入
-     * @param taskReq 任务参数
-     */
-    void completeTask(TaskReqVO taskReq);
+    void completeTask(@Valid BpmTaskCompleteReqVO taskReq);
 
     /**
      * 根据任务id, 查询已经完成的用户任务，未完成的用户任务
      * @param taskQuery 查询参数  一般 taskId
      */
+    @Deprecated
     TaskHandleVO getTaskSteps(TaskQueryReqVO taskQuery);
 
     /**
      * 根据流程实例id, 查询历史用户任务，包括已完成，未完成
      * @param processInstanceId 流程实例id
      */
+    @Deprecated
     List<TaskStepVO> getHistorySteps(String processInstanceId);
 
     /**
@@ -101,4 +97,5 @@ public interface BpmTaskService {
      * @return {@link FileResp} 返回文件
      */
     FileResp getHighlightImg(String processInstanceId);
+
 }

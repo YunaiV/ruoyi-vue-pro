@@ -41,7 +41,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 
-import static cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants.HIGHLIGHT_IMG_ERROR;
+import static cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants.*;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 
@@ -157,20 +157,24 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     }
 
     @Override
-    public void claimTask(String id) {
+    @Transactional(rollbackFor = Exception.class)
+    public void completeTask(BpmTaskCompleteReqVO reqVO) {
+        // 校验任务存在
+        Task task = getTask(reqVO.getId());
+        if (task == null) {
+            throw exception(TASK_COMPLETE_FAIL_NOT_EXISTS);
+        }
+        // 校验流程实例存在
+        ProcessInstance instance = processInstanceService.getProcessInstance(task.getProcessInstanceId());
+        if (instance == null) {
+            throw exception(PROCESS_INSTANCE_NOT_EXISTS);
+        }
 
-    }
+        // 完成（审批）任务
+        taskService.complete(task.getId(), instance.getProcessVariables());
 
-    @Override
-    @Transactional
-    public void completeTask(TaskReqVO taskReq) {
-//        final Task task = taskRuntime.task(taskReq.getTaskId());
-//
-//        taskService.addComment(taskReq.getTaskId(), task.getProcessInstanceId(), taskReq.getComment());
-//
-//        taskRuntime.complete(TaskPayloadBuilder.complete().withTaskId(taskReq.getTaskId())
-//                .withVariables(taskReq.getVariables())
-//                .build());
+        // TODO 芋艿：添加评论
+//        taskService.addComment(task.getId(), task.getProcessInstanceId(), reqVO.getComment());
     }
 
     @Override
@@ -347,4 +351,9 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         }
         return highLightedFlowIds;
     }
+
+    private Task getTask(String id) {
+        return taskService.createTaskQuery().taskId(id).singleResult();
+    }
+
 }

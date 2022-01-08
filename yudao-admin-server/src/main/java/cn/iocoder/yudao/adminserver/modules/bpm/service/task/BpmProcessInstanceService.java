@@ -48,6 +48,14 @@ public interface BpmProcessInstanceService {
                                                                           @Valid BpmProcessInstanceMyPageReqVO pageReqVO);
 
     /**
+     * 获得流程实例
+     *
+     * @param id 流程实例的编号
+     * @return 流程实例
+     */
+    ProcessInstance getProcessInstance(String id);
+
+    /**
      * 获得流程实例列表
      *
      * @param ids 流程实例的编号集合
