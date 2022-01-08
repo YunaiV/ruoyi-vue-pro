@@ -29,7 +29,7 @@
           <el-tag size="medium" type="warning" v-else>未部署</el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="激活状态" align="center" prop="version" width="80">
+      <el-table-column label="状态" align="center" prop="version" width="80">
         <template slot-scope="scope">
             <el-tag type="success" v-if="scope.row.suspensionState === 1">激活</el-tag>
             <el-tag type="warning" v-if="scope.row.suspensionState === 2">挂起</el-tag>

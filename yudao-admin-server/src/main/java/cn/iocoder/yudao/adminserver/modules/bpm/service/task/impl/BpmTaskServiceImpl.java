@@ -85,7 +85,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         TaskQuery taskQuery = taskService.createTaskQuery()
                 .taskAssignee(String.valueOf(userId));
         if (StrUtil.isNotBlank(pageVO.getName())) {
-            taskQuery.taskName("%s" + pageVO.getName() + "%s");
+            taskQuery.taskNameLike("%" + pageVO.getName() + "%");
         }
         if (pageVO.getBeginCreateTime() != null) {
             taskQuery.taskCreatedAfter(pageVO.getBeginCreateTime());

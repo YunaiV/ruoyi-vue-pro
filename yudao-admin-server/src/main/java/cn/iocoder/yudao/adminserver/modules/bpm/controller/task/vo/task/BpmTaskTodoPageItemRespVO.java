@@ -19,8 +19,11 @@ public class BpmTaskTodoPageItemRespVO {
     @ApiModelProperty(value = "接收时间", required = true)
     private Date claimTime;
 
-    @ApiModelProperty(value = "任务状态", notes = "参见 bpm_process_instance_status", example = "1")
-    private Integer status;
+    @ApiModelProperty(value = "创建时间", required = true)
+    private Date createTime;
+
+    @ApiModelProperty(value = "激活状态", required = true, example = "1", notes = "参见 SuspensionState 枚举")
+    private Integer suspensionState;
 
     /**
      * 所属流程实例
@@ -33,6 +36,9 @@ public class BpmTaskTodoPageItemRespVO {
 
         @ApiModelProperty(value = "流程实例编号", required = true, example = "1024")
         private String id;
+
+        @ApiModelProperty(value = "流程实例名称", required = true, example = "芋道")
+        private String name;
 
         @ApiModelProperty(value = "发起人的用户编号", required = true, example = "1024")
         private Long startUserId;

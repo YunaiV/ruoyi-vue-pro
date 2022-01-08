@@ -45,16 +45,18 @@ public interface BpmTaskConvert {
             @Mapping(source = "task.id", target = "id"),
             @Mapping(source = "task.name", target = "name"),
             @Mapping(source = "task.claimTime", target = "claimTime"),
-            @Mapping(source = "task.suspended", target = "status", qualifiedByName = "convertSuspendedToStatus"),
+            @Mapping(source = "task.createTime", target = "createTime"),
+            @Mapping(source = "task.suspended", target = "suspensionState", qualifiedByName = "convertSuspendedToSuspensionState"),
             @Mapping(source = "processInstance.id", target = "processInstance.id"),
+            @Mapping(source = "processInstance.name", target = "processInstance.name"),
             @Mapping(source = "processInstance.startUserId", target = "processInstance.startUserId"),
             @Mapping(source = "processInstance.processDefinitionId", target = "processInstance.processDefinitionId"),
             @Mapping(source = "user.nickname", target = "processInstance.startUserNickname")
     })
     BpmTaskTodoPageItemRespVO convert(Task task, ProcessInstance processInstance, SysUserDO user);
 
-    @Named("convertSuspendedToStatus")
-    default Integer convertAssigneeToStatus(boolean suspended) {
+    @Named("convertSuspendedToSuspensionState")
+    default Integer convertSuspendedToSuspensionState(boolean suspended) {
         return suspended ? SuspensionState.SUSPENDED.getStateCode() :
                 SuspensionState.ACTIVE.getStateCode();
     }
