@@ -17,6 +17,7 @@ import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 /**
  * Bpm 流程定义的 Convert
@@ -59,10 +60,18 @@ public interface BpmDefinitionConvert {
 
     BpmProcessDefinitionExtDO convert2(BpmDefinitionCreateReqDTO bean);
 
-    @Named("convertList3")
-    List<BpmProcessDefinitionRespVO> convertList3(List<ProcessDefinition> list);
+    default List<BpmProcessDefinitionRespVO> convertList3(List<ProcessDefinition> list,
+                                                          Map<String, BpmProcessDefinitionExtDO> processDefinitionDOMap) {
+        return CollectionUtils.convertList(list, processDefinition -> {
+            BpmProcessDefinitionRespVO respVO = convert3(processDefinition);
+            BpmProcessDefinitionExtDO processDefinitionExtDO = processDefinitionDOMap.get(processDefinition.getId());
+            if (processDefinitionExtDO != null) {
+                respVO.setFormId(processDefinitionExtDO.getFormId());
+            }
+            return respVO;
+        });
+    }
 
-    @Named("convert3")
     @Mapping(source = "suspended", target = "suspensionState", qualifiedByName = "convertSuspendedToSuspensionState")
     BpmProcessDefinitionRespVO convert3(ProcessDefinition bean);
 

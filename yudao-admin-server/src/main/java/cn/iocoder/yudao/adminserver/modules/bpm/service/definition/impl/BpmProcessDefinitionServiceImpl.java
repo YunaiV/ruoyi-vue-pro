@@ -79,8 +79,7 @@ public class BpmProcessDefinitionServiceImpl implements BpmProcessDefinitionServ
         Map<String, Deployment> deploymentMap = getDeploymentMap(deploymentIds);
 
         // 获得 BpmProcessDefinitionDO Map
-        List<BpmProcessDefinitionExtDO> processDefinitionDOs = Collections.emptyList();
-        processDefinitionDOs = processDefinitionMapper.selectListByProcessDefinitionIds(
+        List<BpmProcessDefinitionExtDO> processDefinitionDOs = processDefinitionMapper.selectListByProcessDefinitionIds(
                 convertList(processDefinitions, ProcessDefinition::getId));
         Map<String, BpmProcessDefinitionExtDO> processDefinitionDOMap = CollectionUtils.convertMap(processDefinitionDOs,
                 BpmProcessDefinitionExtDO::getProcessDefinitionId);
@@ -104,8 +103,16 @@ public class BpmProcessDefinitionServiceImpl implements BpmProcessDefinitionServ
         } else if (Objects.equals(SuspensionState.ACTIVE.getStateCode(), listReqVO.getSuspensionState())) {
             definitionQuery.active();
         }
+        // 执行查询
+        List<ProcessDefinition> processDefinitions = definitionQuery.list();
+
+        // 获得 BpmProcessDefinitionDO Map
+        List<BpmProcessDefinitionExtDO> processDefinitionDOs = processDefinitionMapper.selectListByProcessDefinitionIds(
+                convertList(processDefinitions, ProcessDefinition::getId));
+        Map<String, BpmProcessDefinitionExtDO> processDefinitionDOMap = CollectionUtils.convertMap(processDefinitionDOs,
+                BpmProcessDefinitionExtDO::getProcessDefinitionId);
         // 执行查询，并返回
-        return BpmDefinitionConvert.INSTANCE.convertList3(definitionQuery.list());
+        return BpmDefinitionConvert.INSTANCE.convertList3(processDefinitions, processDefinitionDOMap);
     }
 
     @Override

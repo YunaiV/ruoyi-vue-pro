@@ -8,6 +8,14 @@ export function getMyProcessInstancePage(query) {
   })
 }
 
+export function createProcessInstance(data) {
+  return request({
+    url: '/bpm/process-instance/create',
+    method: 'POST',
+    data: data
+  })
+}
+
 export function cancelProcessInstance(id, reason) {
   return request({
     url: '/bpm/process-instance/cancel',

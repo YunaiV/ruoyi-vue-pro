@@ -47,7 +47,7 @@
 
     <!-- 列表 -->
     <el-table v-loading="loading" :data="list">
-      <el-table-column label="编号" align="center" prop="id" width="300" />
+      <el-table-column label="编号" align="center" prop="id" width="320" />
       <el-table-column label="流程名" align="center" prop="name" />
       <el-table-column label="流程分类" align="center" prop="category">
         <template slot-scope="scope">

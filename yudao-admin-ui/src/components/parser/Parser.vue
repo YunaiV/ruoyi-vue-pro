@@ -173,8 +173,13 @@ export default {
     submitForm() {
       this.$refs[this.formConf.formRef].validate(valid => {
         if (!valid) return false
-        // 触发sumit事件
-        this.$emit('submit', this[this.formConf.formModel])
+        // 触发 submit 事件
+        // update by 芋道源码
+        // this.$emit('submit', this[this.formConf.formModel])
+        this.$emit('submit', {
+          conf: this.formConfCopy,
+          values: this[this.formConf.formModel]
+        })
         return true
       })
     }

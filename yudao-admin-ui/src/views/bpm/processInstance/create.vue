@@ -1,70 +1,65 @@
 <template>
   <div class="app-container">
-    <!-- 列表 -->
-    <el-table v-loading="loading" :data="list">
-      <el-table-column label="定义编号" align="center" prop="id" width="400" />
-      <el-table-column label="定义名称" align="center" prop="name" width="100">
-        <template slot-scope="scope">
-          <el-button type="text" @click="handleBpmnDetail(scope.row)">
-            <span>{{ scope.row.name }}</span>
-          </el-button>
-        </template>
-      </el-table-column>
-      <el-table-column label="定义分类" align="center" prop="category" width="100">
-        <template slot-scope="scope">
-          <span>{{ getDictDataLabel(DICT_TYPE.BPM_MODEL_CATEGORY, scope.row.category) }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="表单信息" align="center" prop="formId">
-        <template slot-scope="scope">
-          <el-button v-if="scope.row.formId" type="text" @click="handleFormDetail(scope.row)">
-            <span>{{ scope.row.formName }}</span>
-          </el-button>
-          <label v-else>暂无表单</label>
-        </template>
-      </el-table-column>
-      <el-table-column label="流程版本" align="center" prop="processDefinition.version" width="80">
-        <template slot-scope="scope">
-          <el-tag size="medium" v-if="scope.row">v{{ scope.row.version }}</el-tag>
-          <el-tag size="medium" type="warning" v-else>未部署</el-tag>
-        </template>
-      </el-table-column>
-      <el-table-column label="状态" align="center" prop="version" width="80">
-        <template slot-scope="scope">
-          <el-tag type="success" v-if="scope.row.suspensionState === 1">激活</el-tag>
-          <el-tag type="warning" v-if="scope.row.suspensionState === 2">挂起</el-tag>
-        </template>
-      </el-table-column>
-      <el-table-column label="部署时间" align="center" prop="deploymentTime" width="180">
-        <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.deploymentTime) }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="定义描述" align="center" prop="description" width="300" show-overflow-tooltip />
-    </el-table>
+    <!-- 第一步，通过流程定义的列表，选择对应的流程 -->
+    <div v-if="!selectProcessInstance">
+      <el-table v-loading="loading" :data="list">
+        <el-table-column label="流程名称" align="center" prop="name" width="200">
+          <template slot-scope="scope">
+            <el-button type="text" @click="handleBpmnDetail(scope.row)">
+              <span>{{ scope.row.name }}</span>
+            </el-button>
+          </template>
+        </el-table-column>
+        <el-table-column label="流程分类" align="center" prop="category" width="100">
+          <template slot-scope="scope">
+            <span>{{ getDictDataLabel(DICT_TYPE.BPM_MODEL_CATEGORY, scope.row.category) }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="流程版本" align="center" prop="processDefinition.version" width="80">
+          <template slot-scope="scope">
+            <el-tag size="medium" v-if="scope.row">v{{ scope.row.version }}</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column label="流程描述" align="center" prop="description" width="300" show-overflow-tooltip />
+        <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+          <template slot-scope="scope">
+            <el-button type="text" size="small" icon="el-icon-plus" @click="handleSelect(scope.row)">选择</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+    </div>
+    <!-- 第二步，填写表单，进行流程的提交 -->
+    <div v-else>
+      <el-card class="box-card" >
+        <div slot="header" class="clearfix">
+          <span class="el-icon-document">{{ selectProcessInstance.name }}</span>
+          <el-button style="float: right;" type="primary" @click="selectProcessInstance = undefined">选择其它流程</el-button>
+        </div>
+        <el-col :span="16" :offset="6">
+          <div>
+            <parser :key="new Date().getTime()" :form-conf="detailForm" @submit="submitForm" />
+          </div>
+        </el-col>
+      </el-card>
+    </div>
 
-    <!-- 流程表单配置详情 -->
-    <el-dialog title="表单详情" :visible.sync="detailOpen" width="50%" append-to-body>
-      <parser :key="new Date().getTime()" :form-conf="detailForm" />
-    </el-dialog>
-
-    <!-- 流程模型图的预览 -->
-    <el-dialog title="流程图" :visible.sync="showBpmnOpen" width="80%" append-to-body>
+    <el-card class="box-card">
+      <div slot="header" class="clearfix">
+        <span class="el-icon-picture-outline">流程图</span>
+      </div>
       <my-process-viewer key="designer" v-model="bpmnXML" v-bind="bpmnControlForm" />
-    </el-dialog>
+    </el-card>
 
-    <!-- 分页组件 -->
-    <pagination v-show="total>0" :total="total" :page.sync="queryParams.pageNo" :limit.sync="queryParams.pageSize"
-                @pagination="getList"/>
   </div>
 </template>
 
 <script>
-import {getProcessDefinitionBpmnXML, getProcessDefinitionPage} from "@/api/bpm/definition";
+import {getProcessDefinitionBpmnXML, getProcessDefinitionList} from "@/api/bpm/definition";
 import {DICT_TYPE, getDictDatas} from "@/utils/dict";
 import {getForm} from "@/api/bpm/form";
 import {decodeFields} from "@/utils/formGenerator";
 import Parser from '@/components/parser/Parser'
+import {createProcessInstance} from "@/api/bpm/processInstance";
 
 export default {
   name: "processDefinition",
@@ -79,49 +74,51 @@ export default {
       total: 0,
       // 表格数据
       list: [],
-      // 查询参数
-      queryParams: {
-        pageNo: 1,
-        pageSize: 10
-      },
 
       // 流程表单详情
-      detailOpen: false,
       detailForm: {
         fields: []
       },
 
       // BPMN 数据
-      showBpmnOpen: false,
       bpmnXML: null,
       bpmnControlForm: {
         prefix: "activiti"
       },
+
+      // 流程表单
+      selectProcessInstance: undefined, // 选择的流程实例
 
       // 数据字典
       categoryDictDatas: getDictDatas(DICT_TYPE.BPM_MODEL_CATEGORY),
     };
   },
   created() {
-    const key = this.$route.query && this.$route.query.key
-    if (key) {
-      this.queryParams['key'] = key
-    }
     this.getList();
   },
   methods: {
     /** 查询流程定义列表 */
     getList() {
       this.loading = true;
-      getProcessDefinitionPage(this.queryParams).then(response => {
-          this.list = response.data.list;
-          this.total = response.data.total;
-          this.loading = false;
+      getProcessDefinitionList({
+        suspensionState: 1
+      }).then(response => {
+          this.list = response.data
+          this.loading = false
         }
       );
     },
-    /** 流程表单的详情按钮操作 */
-    handleFormDetail(row) {
+    /** 处理选择流程的按钮操作 **/
+    handleSelect(row) {
+      // 如果无表单，则无法发起流程
+      if (!row.formId) {
+        this.$message.error('该流程未绑定表单，无法发起流程！请重新选择你要发起的流程');
+        return;
+      }
+      // 设置选择的流程
+      this.selectProcessInstance = row;
+
+      // 加载对应的表单
       getForm(row.formId).then(response => {
         // 设置值
         const data = response.data
@@ -129,16 +126,36 @@ export default {
           ...JSON.parse(data.conf),
           fields: decodeFields(data.fields)
         }
-        // 弹窗打开
-        this.detailOpen = true
-      })
-    },
-    /** 流程图的详情按钮操作 */
-    handleBpmnDetail(row) {
+      });
+
+      // 加载流程图
       getProcessDefinitionBpmnXML(row.id).then(response => {
         this.bpmnXML = response.data
-        // 弹窗打开
-        this.showBpmnOpen = true
+      })
+    },
+    /** 提交按钮 */
+    submitForm(params) {
+      if (!params) {
+        return;
+      }
+      // 设置表单禁用
+      const conf = params.conf;
+      conf.disabled = true; // 表单禁用
+      conf.formBtns = false; // 按钮隐藏
+
+      // 提交表单，创建流程
+      const variables = params.values;
+      createProcessInstance({
+        processDefinitionId: this.selectProcessInstance.id,
+        variables: variables
+      }).then(response => {
+        this.msgSuccess("发起流程成功");
+        // 关闭当前窗口
+        this.$store.dispatch("tagsView/delView", this.$route);
+        this.$router.go(-1);
+      }).catch(() => {
+        conf.disabled = false; // 表单开启
+        conf.formBtns = true; // 按钮展示
       })
     },
   }
@@ -148,5 +165,10 @@ export default {
 <style lang="scss">
 .my-process-designer {
   height: calc(100vh - 200px);
+}
+
+.box-card {
+  width: 100%;
+  margin-bottom: 20px;
 }
 </style>
