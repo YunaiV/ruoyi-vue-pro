@@ -176,6 +176,9 @@ public class SysUserServiceImpl implements SysUserService {
 
     @Override
     public List<SysUserDO> getUsers(Collection<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return Collections.emptyList();
+        }
         return userMapper.selectBatchIds(ids);
     }
 

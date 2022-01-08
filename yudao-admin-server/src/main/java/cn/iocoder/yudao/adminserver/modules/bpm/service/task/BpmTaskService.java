@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.service.task;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.task.vo.task.*;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
@@ -8,7 +7,6 @@ import org.activiti.engine.task.Task;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * 工作任务 Service 接口
@@ -17,6 +15,14 @@ import java.util.Set;
  * @author 芋道源码
  */
 public interface BpmTaskService {
+
+    /**
+     * 获得流程任务列表
+     *
+     * @param processInstanceId 流程实例的编号
+     * @return 流程任务列表
+     */
+    List<Task> getTasksByProcessInstanceId(String processInstanceId);
 
     /**
      * 获得流程任务列表
@@ -38,15 +44,28 @@ public interface BpmTaskService {
     }
 
     /**
-     * 获取当前用户的待办任务， 分页
+     * 获得流程任务分页
+     *
+     * @param userId 用户编号
+     * @param pageReqVO 分页请求
+     * @return 流程任务分页
      */
-    PageResult<TodoTaskRespVO> getTodoTaskPage(TodoTaskPageReqVO pageReqVO);
+    PageResult<BpmTaskTodoPageItemRespVO> getTodoTaskPage(Long userId, BpmTaskTodoPageReqVO pageReqVO);
+
+    /**
+     * 将流程任务分配给指定用户
+     *
+     * @param id 流程任务编号
+     * @param userId 用户编号
+     */
+    void updateTaskAssign(String id, Long userId);
 
     /**
      * 签收任务
-     * @param taskId  用户任务id
+     *
+     * @param id  任务编号
      */
-    void claimTask(String taskId);
+    void claimTask(String id);
 
     /**
      * 工作流，完成 userTask, 完成用户任务 一般传入参数 1。是否同意（variables).  2. 评论(comment)
@@ -66,13 +85,6 @@ public interface BpmTaskService {
      * @param processInstanceId 流程实例id
      */
     List<TaskStepVO> getHistorySteps(String processInstanceId);
-
-    /**
-     * 获取用户任务的 formKey, 对应外置表单， 需要根据formKey 对应业务表单
-     * @param taskQuery 查询参数 ,一般taskId
-     */
-    TodoTaskRespVO getTaskFormKey(TaskQueryReqVO taskQuery);
-
 
     /**
      * 返回高亮的流转进程

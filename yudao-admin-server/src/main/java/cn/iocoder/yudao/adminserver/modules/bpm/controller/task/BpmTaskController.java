@@ -7,6 +7,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -16,48 +17,39 @@ import java.io.IOException;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils.getLoginUserId;
 
-// TODO @json：swagger 和 validation 的注解，后续要补全下哈。可以等 workflow 基本写的差不多之后
-@Api(tags = "工作流待办任务")
+@Api(tags = "流程任务")
 @RestController
-@RequestMapping("/workflow/task")
-public class TaskController {
+@RequestMapping("/bpm/task")
+@Validated
+public class BpmTaskController {
 
     @Resource
-    private BpmTaskService bpmTaskService;
+    private BpmTaskService taskService;
 
-    @GetMapping("/todo/page")
-    @ApiOperation("获取待办任务分页")
-    public CommonResult<PageResult<TodoTaskRespVO>> getTodoTaskPage(@Valid TodoTaskPageReqVO pageVO) {
-        return success(bpmTaskService.getTodoTaskPage(pageVO));
-    }
+    // TODO 芋艿：权限、validation；
 
-    @GetMapping("/claim")
-    @ApiOperation("签收任务")
-    public CommonResult<Boolean> claimTask(@RequestParam("id") String taskId) {
-        bpmTaskService.claimTask(taskId);
-        return success(true);
+    @GetMapping("todo-page")
+    @ApiOperation("获取 TODO 待办任务分页")
+    public CommonResult<PageResult<BpmTaskTodoPageItemRespVO>> getTodoTaskPage(@Valid BpmTaskTodoPageReqVO pageVO) {
+        return success(taskService.getTodoTaskPage(getLoginUserId(), pageVO));
     }
 
     @PostMapping("/task-steps")
     public CommonResult<TaskHandleVO> getTaskSteps(@RequestBody TaskQueryReqVO taskQuery) {
-        return success(bpmTaskService.getTaskSteps(taskQuery));
-    }
-
-    @PostMapping("/formKey")
-    public CommonResult<TodoTaskRespVO> getTaskFormKey(@RequestBody TaskQueryReqVO taskQuery) {
-        return success(bpmTaskService.getTaskFormKey(taskQuery));
+        return success(taskService.getTaskSteps(taskQuery));
     }
 
     @PostMapping("/complete")
     public CommonResult<Boolean> complete(@RequestBody TaskReqVO taskReq) {
-        bpmTaskService.completeTask(taskReq);
+        taskService.completeTask(taskReq);
         return success(true);
     }
 
     @GetMapping("/process/history-steps")
     public CommonResult<List<TaskStepVO>> getHistorySteps(@RequestParam("id") String processInstanceId) {
-        return success(bpmTaskService.getHistorySteps(processInstanceId));
+        return success(taskService.getHistorySteps(processInstanceId));
     }
 
     /**
@@ -66,7 +58,7 @@ public class TaskController {
      */
     @GetMapping("/process/highlight-img")
     public void getHighlightImg(@RequestParam String processInstanceId, HttpServletResponse response) throws IOException {
-        FileResp fileResp = bpmTaskService.getHighlightImg(processInstanceId);
+        FileResp fileResp = taskService.getHighlightImg(processInstanceId);
         ServletUtils.writeAttachment(response, fileResp.getFileName(), fileResp.getFileByte());
     }
 

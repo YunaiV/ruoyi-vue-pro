@@ -12,7 +12,7 @@ public interface BpmProcessInstanceExtMapper extends BaseMapperX<BpmProcessInsta
 
     default PageResult<BpmProcessInstanceExtDO> selectPage(Long userId, BpmProcessInstanceMyPageReqVO reqVO) {
         return selectPage(reqVO, new QueryWrapperX<BpmProcessInstanceExtDO>()
-                .eqIfPresent("user_id", userId)
+                .eqIfPresent("start_user_id", userId)
                 .likeIfPresent("name", reqVO.getName())
                 .eqIfPresent("process_definition_id", reqVO.getProcessDefinitionId())
                 .eqIfPresent("category", reqVO.getCategory())

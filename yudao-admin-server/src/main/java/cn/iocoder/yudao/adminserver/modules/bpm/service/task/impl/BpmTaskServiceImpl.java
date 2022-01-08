@@ -2,16 +2,17 @@ package cn.iocoder.yudao.adminserver.modules.bpm.service.task.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.IoUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.task.vo.task.*;
-import cn.iocoder.yudao.adminserver.modules.bpm.convert.task.TaskConvert;
+import cn.iocoder.yudao.adminserver.modules.bpm.convert.task.BpmTaskConvert;
+import cn.iocoder.yudao.adminserver.modules.bpm.service.task.BpmProcessInstanceService;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.task.BpmTaskService;
+import cn.iocoder.yudao.adminserver.modules.system.service.user.SysUserService;
+import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.user.SysUserDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
-import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
+import cn.iocoder.yudao.framework.common.util.object.PageUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.activiti.api.task.model.builders.ClaimTaskPayloadBuilder;
-import org.activiti.api.task.model.builders.TaskPayloadBuilder;
-import org.activiti.api.task.runtime.TaskRuntime;
 import org.activiti.bpmn.constants.BpmnXMLConstants;
 import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.bpmn.model.FlowNode;
@@ -26,7 +27,9 @@ import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Comment;
 import org.activiti.engine.task.Task;
+import org.activiti.engine.task.TaskQuery;
 import org.activiti.image.ProcessDiagramGenerator;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
@@ -39,13 +42,12 @@ import java.util.*;
 import static cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants.HIGHLIGHT_IMG_ERROR;
 import static cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants.PROCESS_INSTANCE_NOT_EXISTS;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 
 @Slf4j
 @Service
 public class BpmTaskServiceImpl implements BpmTaskService {
 
-    @Resource
-    private  TaskRuntime taskRuntime;
     @Resource
     private TaskService taskService;
     @Resource
@@ -58,6 +60,17 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     @Resource
     private ProcessDiagramGenerator processDiagramGenerator;
 
+    @Resource
+    private SysUserService userService;
+    @Resource
+    @Lazy // 解决循环依赖
+    private BpmProcessInstanceService processInstanceService;
+
+    @Override
+    public List<Task> getTasksByProcessInstanceId(String processInstanceId) {
+        return taskService.createTaskQuery().processInstanceId(processInstanceId).list();
+    }
+
     @Override
     public List<Task> getTasksByProcessInstanceIds(List<String> processInstanceIds) {
         if (CollUtil.isEmpty(processInstanceIds)) {
@@ -67,30 +80,52 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     }
 
     @Override
-    public PageResult<TodoTaskRespVO> getTodoTaskPage(TodoTaskPageReqVO pageReqVO) {
-        // TODO @jason：封装一个方法，用于转换成 activiti 的分页对象
-//        final Pageable pageable = Pageable.of((pageReqVO.getPageNo() - 1) * pageReqVO.getPageSize(), pageReqVO.getPageSize());
-//        Page<Task> pageTasks = taskRuntime.tasks(pageable);
-//        int totalItems = pageTasks.getTotalItems();
-//        List<Task> tasks = pageTasks.getContent();
-//        final List<TodoTaskRespVO> respVOList = tasks.stream().map(task -> {
-//            ProcessDefinition definition = repositoryService.getProcessDefinition(task.getProcessDefinitionId());
-//            return  TaskConvert.INSTANCE.convert(task, definition);
-//        }).collect(Collectors.toList());
-//        return new PageResult<>(respVOList, (long)totalItems);
-        return null;
-    }
+    public PageResult<BpmTaskTodoPageItemRespVO> getTodoTaskPage(Long userId, BpmTaskTodoPageReqVO pageVO) {
+        // 查询待办任务
+        TaskQuery taskQuery = taskService.createTaskQuery()
+                .taskAssignee(String.valueOf(userId));
+        if (StrUtil.isNotBlank(pageVO.getName())) {
+            taskQuery.taskName("%s" + pageVO.getName() + "%s");
+        }
+        if (pageVO.getBeginCreateTime() != null) {
+            taskQuery.taskCreatedAfter(pageVO.getBeginCreateTime());
+        }
+        if (pageVO.getEndCreateTime() != null) {
+            taskQuery.taskCreatedBefore(pageVO.getEndCreateTime());
+        }
+        // 执行查询
+        List<Task> tasks = taskQuery.orderByTaskCreateTime().desc() // 创建时间倒序
+                .listPage(PageUtils.getStart(pageVO), pageVO.getPageSize());
+        if (CollUtil.isEmpty(tasks)) {
+            return PageResult.empty(taskQuery.count());
+        }
 
+        // 获得 ProcessInstance Map
+        Map<String, ProcessInstance> processInstanceMap = processInstanceService.getProcessInstanceMap(
+                convertSet(tasks, Task::getProcessInstanceId));
+
+        // 获得 User Map
+        Map<Long, SysUserDO> userMap = userService.getUserMap(
+                convertSet(processInstanceMap.values(), instance -> Long.valueOf(instance.getStartUserId())));
+        // 拼接结果
+        return new PageResult<>(BpmTaskConvert.INSTANCE.convertList(tasks, processInstanceMap, userMap),
+                taskQuery.count());
+    }
 
     @Override
-    public void claimTask(String taskId) {
-        taskRuntime.claim(new ClaimTaskPayloadBuilder()
-                                .withTaskId(taskId)
-                                .withAssignee(SecurityFrameworkUtils.getLoginUser().getUsername())
-                                .build());
+    public void updateTaskAssign(String id, Long userId) {
+        taskService.setAssignee(id, String.valueOf(userId));
     }
 
+    @Override
+    public void claimTask(String id) {
 
+    }
+
+    // 任务编号、流程名称、任务节点、流程发起人、接收时间、审批时间、耗时【名称、开始时间】「流程记录、撤回」
+    // 任务编号、任务名称、所属流程、委托代办人、流程发起人、优先级、审批操作、审批意见、耗时、创建时间【名称、开始时间】「申请详情」
+
+    // 任务编号、任务名称、流程名称、流程发起人、接收时间、审批时间、耗时【名称、接收时间】「详情」TODO 撤回
 
     @Override
     @Transactional
@@ -126,7 +161,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         // 获得对应的步骤
         List<TaskStepVO> steps = new ArrayList<>();
         finished.forEach(instance -> {
-            TaskStepVO stepVO = TaskConvert.INSTANCE.convert(instance);
+            TaskStepVO stepVO = BpmTaskConvert.INSTANCE.convert(instance);
             stepVO.setStatus(1); // TODO @jason：1 这个 magic number 要枚举起来。
             // TODO @jason：可以考虑把 comments 读取后，在统一调用 convert 拼接。另外 Comment 是废弃的类，有没其它可以使用的哈？
             List<Comment> comments = taskService.getTaskComments(instance.getTaskId());
@@ -144,7 +179,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                 .unfinished().list();
         // 获得对应的步骤
         for (HistoricActivityInstance instance : unfinished) {
-            TaskStepVO stepVO = TaskConvert.INSTANCE.convert(instance);
+            TaskStepVO stepVO = BpmTaskConvert.INSTANCE.convert(instance);
             stepVO.setComment("");
             stepVO.setStatus(0);
             steps.add(stepVO);
@@ -156,13 +191,6 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     @Override
     public List<TaskStepVO> getHistorySteps(String processInstanceId) {
         return getTaskSteps(processInstanceId);
-    }
-
-    @Override
-    public TodoTaskRespVO getTaskFormKey(TaskQueryReqVO taskQuery) {
-//        final Task task = taskRuntime.task(taskQuery.getTaskId());
-//        return TaskConvert.INSTANCE.convert(task);
-        return null;
     }
 
     @Override

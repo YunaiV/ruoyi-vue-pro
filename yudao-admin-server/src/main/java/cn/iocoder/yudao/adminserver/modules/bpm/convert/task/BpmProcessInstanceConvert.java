@@ -26,7 +26,7 @@ public interface BpmProcessInstanceConvert {
     BpmProcessInstanceConvert INSTANCE = Mappers.getMapper(BpmProcessInstanceConvert.class);
 
     @Mappings({
-            @Mapping(source = "instance.startUserId", target = "userId"),
+            @Mapping(source = "instance.startUserId", target = "startUserId"),
             @Mapping(source = "instance.id", target = "processInstanceId"),
             @Mapping(source = "instance.startTime", target = "createTime"),
             @Mapping(source = "definition.id", target = "processDefinitionId"),

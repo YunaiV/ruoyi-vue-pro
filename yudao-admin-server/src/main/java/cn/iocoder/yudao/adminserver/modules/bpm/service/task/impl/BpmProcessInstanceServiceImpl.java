@@ -26,12 +26,16 @@ import org.activiti.engine.history.HistoricProcessInstanceQuery;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.function.Consumer;
 
 import static cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants.PROCESS_DEFINITION_IS_SUSPENDED;
 import static cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants.PROCESS_DEFINITION_NOT_EXISTS;
@@ -58,12 +62,13 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
     @Resource
     private RuntimeService runtimeService;
     @Resource
-    private BpmTaskService taskService;
-    @Resource
     private HistoryService historyService;
 
     @Resource
     private SysUserService userService;
+    @Resource
+    @Lazy // 解决循环依赖
+    private BpmTaskService taskService;
     @Resource
     private BpmProcessDefinitionService processDefinitionService;
 
@@ -71,7 +76,7 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
     private BpmProcessInstanceExtMapper processInstanceExtMapper;
 
     @Override
-//    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public String createProcessInstance(Long userId, BpmProcessInstanceCreateReqVO createReqVO) {
         // 校验流程定义
         ProcessDefinition definition = processDefinitionService.getProcessDefinition(createReqVO.getProcessDefinitionId());
@@ -89,6 +94,10 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         runtimeService.setProcessInstanceName(instance.getId(), definition.getName());
         // 记录流程实例的拓展表
         createProcessInstanceExt(instance, definition);
+
+        // TODO 芋艿：临时使用, 保证分配
+        List<Task> tasks = taskService.getTasksByProcessInstanceId(instance.getId());
+        tasks.forEach(task -> taskService.updateTaskAssign(task.getId(), userId));
 
         // 添加初始的评论 TODO 芋艿：在思考下
 //        Task task = taskService.createTaskQuery().processInstanceId(instance.getId()).singleResult();
@@ -132,6 +141,11 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         Map<String, List<Task>> taskMap = taskService.getTaskMapByProcessInstanceIds(processInstanceIds);
         // 转换返回
         return BpmProcessInstanceConvert.INSTANCE.convertPage(pageResult, taskMap);
+    }
+
+    @Override
+    public List<ProcessInstance> getProcessInstances(Set<String> ids) {
+        return runtimeService.createProcessInstanceQuery().processInstanceIds(ids).list();
     }
 
     /**

@@ -33,7 +33,7 @@ public class BpmProcessInstanceExtDO extends BaseDO {
      *
      * 冗余 {@link HistoricProcessInstance#getStartUserId()}
      */
-    private Long userId;
+    private Long startUserId;
     /**
      * 流程实例的名字
      *
