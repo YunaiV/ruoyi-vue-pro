@@ -7,3 +7,14 @@ export function getMyProcessInstancePage(query) {
     params: query
   })
 }
+
+export function cancelProcessInstance(id, reason) {
+  return request({
+    url: '/bpm/process-instance/cancel',
+    method: 'DELETE',
+    data: {
+      id,
+      reason
+    }
+  })
+}

@@ -15,7 +15,7 @@ public enum BpmProcessInstanceResultEnum {
     PROCESS(1, "处理中"),
     PASS(2, "通过"),
     REJECT(3, "不通过"),
-    CANCEL(4, "撤销");
+    CANCEL(4, "已取消");
 
     /**
      * 结果

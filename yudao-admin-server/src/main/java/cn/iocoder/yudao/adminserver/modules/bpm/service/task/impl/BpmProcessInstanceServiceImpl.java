@@ -2,6 +2,7 @@ package cn.iocoder.yudao.adminserver.modules.bpm.service.task.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
+import cn.iocoder.yudao.adminserver.modules.bpm.controller.task.vo.instance.BpmProcessInstanceCancelReqVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.task.vo.instance.BpmProcessInstanceCreateReqVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.task.vo.instance.BpmProcessInstanceMyPageReqVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.task.vo.instance.BpmProcessInstancePageItemRespVO;
@@ -37,8 +38,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 
-import static cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants.PROCESS_DEFINITION_IS_SUSPENDED;
-import static cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants.PROCESS_DEFINITION_NOT_EXISTS;
+import static cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants.*;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 
@@ -125,6 +125,23 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         instanceExt.setStatus(BpmProcessInstanceStatusEnum.RUNNING.getStatus());
         instanceExt.setResult(BpmProcessInstanceResultEnum.PROCESS.getResult());
         processInstanceExtMapper.insert(instanceExt);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void cancelProcessInstance(Long userId, BpmProcessInstanceCancelReqVO cancelReqVO) {
+        // 校验流程实例存在
+        ProcessInstance instance = getProcessInstance(cancelReqVO.getId());
+        if (instance == null) {
+            throw exception(PROCESS_INSTANCE_CANCEL_FAIL_NOT_EXISTS);
+        }
+
+        // 通过删除流程实例，实现流程实例的取消
+        runtimeService.deleteProcessInstance(cancelReqVO.getId(), cancelReqVO.getReason());
+        // 更新流程实例的拓展表为取消状态
+        processInstanceExtMapper.updateByProcessInstanceId(cancelReqVO.getId(),
+                new BpmProcessInstanceExtDO().setStatus(BpmProcessInstanceStatusEnum.FINISH.getStatus())
+                        .setResult(BpmProcessInstanceResultEnum.CANCEL.getResult()));
     }
 
     @Override

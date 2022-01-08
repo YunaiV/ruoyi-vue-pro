@@ -42,7 +42,6 @@ import java.io.InputStream;
 import java.util.*;
 
 import static cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants.HIGHLIGHT_IMG_ERROR;
-import static cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants.PROCESS_INSTANCE_NOT_EXISTS;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 
@@ -228,7 +227,8 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         HistoricProcessInstance hpi = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
         // 如果不存在实例。 说明数据异常
         if (hpi == null) {
-            throw exception(PROCESS_INSTANCE_NOT_EXISTS);
+//            throw exception(PROCESS_INSTANCE_NOT_EXISTS);
+            throw new RuntimeException("不存在");
         }
         // 如果有结束时间 返回model的流程图
         if (!ObjectUtils.isEmpty(hpi.getEndTime())) {

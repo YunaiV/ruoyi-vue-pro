@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.controller.task;
 
+import cn.iocoder.yudao.adminserver.modules.bpm.controller.task.vo.instance.BpmProcessInstanceCancelReqVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.task.vo.instance.BpmProcessInstanceCreateReqVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.task.vo.instance.BpmProcessInstanceMyPageReqVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.task.vo.instance.BpmProcessInstancePageItemRespVO;
@@ -32,6 +33,13 @@ public class BpmProcessInstanceController {
     @ApiOperation("新建流程实例")
     public CommonResult<String> createProcessInstance(@Valid @RequestBody BpmProcessInstanceCreateReqVO createReqVO) {
         return success(processInstanceService.createProcessInstance(getLoginUserId(), createReqVO));
+    }
+
+    @DeleteMapping("/cancel")
+    @ApiOperation(value = "取消流程实例", notes = "撤回发起的流程")
+    public CommonResult<Boolean> cancelProcessInstance(@Valid @RequestBody BpmProcessInstanceCancelReqVO cancelReqVO) {
+        processInstanceService.cancelProcessInstance(getLoginUserId(), cancelReqVO);
+        return success(true);
     }
 
     @GetMapping("/my-page")

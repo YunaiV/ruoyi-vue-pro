@@ -12,6 +12,17 @@ Authorization: Bearer {{token}}
   }
 }
 
+### 请求 /bpm/process-instance/cancel 接口 => 成功
+DELETE {{baseUrl}}/bpm/process-instance/cancel
+Content-Type: application/json
+tenant-id: 1
+Authorization: Bearer {{token}}
+
+{
+  "id": "b9220387-7088-11ec-bcae-a2380e71991a",
+  "reason": "我就取消"
+}
+
 ### 请求 /bpm/process-instance/my-page 接口 => 成功
 GET {{baseUrl}}/bpm/process-instance/my-page
 tenant-id: 1

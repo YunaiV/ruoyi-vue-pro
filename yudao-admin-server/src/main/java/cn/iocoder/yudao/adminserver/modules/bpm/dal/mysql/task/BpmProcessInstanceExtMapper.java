@@ -5,6 +5,7 @@ import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.task.BpmProcessIn
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.QueryWrapperX;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
@@ -20,6 +21,10 @@ public interface BpmProcessInstanceExtMapper extends BaseMapperX<BpmProcessInsta
                 .eqIfPresent("result", reqVO.getResult())
                 .betweenIfPresent("create_time", reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
                 .orderByDesc("id"));
+    }
+
+    default void updateByProcessInstanceId(String processInstanceId, BpmProcessInstanceExtDO updateObj) {
+        update(updateObj, new QueryWrapper<BpmProcessInstanceExtDO>().eq("process_instance_id", processInstanceId));
     }
 
 }

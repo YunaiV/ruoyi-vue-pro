@@ -25,17 +25,13 @@ public class BpmProcessInstanceEventListener implements ActivitiEventListener {
 
     @Override
     public void onEvent(ActivitiEvent event) {
-        // 不处理  ActivitiEventType.PROCESS_STARTED 事件。原因：事件发布时，流程实例还没进行入库，就已经发布了 ActivitiEvent 事件
+        // 不处理 ActivitiEventType.PROCESS_STARTED 事件。原因：事件发布时，流程实例还没进行入库，就已经发布了 ActivitiEvent 事件
+        // 不处理 ActivitiEventType.PROCESS_CANCELLED 事件。原因：直接在 BpmTaskService#cancelProcessInstance 更新记录
 
         // 正常完成
         if (event.getType() == ActivitiEventType.PROCESS_COMPLETED
             || event.getType() == ActivitiEventType.PROCESS_COMPLETED_WITH_ERROR_END_EVENT) {
-            return;
-        }
-        // 取消
-        if (event.getType() == ActivitiEventType.PROCESS_CANCELLED) {
-            // TODO
-            System.out.println();
+            // TODO 芋艿：更新
         }
     }
 

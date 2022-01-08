@@ -103,8 +103,9 @@
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-<!--          <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"-->
-<!--                     v-hasPermi="['bpm:process-instance-ext:update']">修改</el-button>-->
+          <!-- TODO 芋艿：权限 -->
+          <el-button type="text" size="small" icon="el-icon-delete" v-if="scope.row.result === 1"
+                     @click="handleCancel(scope.row)">取消</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -162,8 +163,9 @@ import {
   deleteProcessInstanceExt,
   getProcessInstanceExt,
   getProcessInstanceExtPage,
-  exportProcessInstanceExtExcel
+  exportProcessInstanceExtExcel, cancelProcessInstance
 } from "@/api/bpm/processInstance";
+import {deleteErrorCode} from "@/api/system/errorCode";
 
 export default {
   name: "ProcessInstanceExt",
@@ -283,7 +285,23 @@ export default {
           this.getList();
         });
       });
-    }
+    },
+    /** 取消按钮操作 */
+    handleCancel(row) {
+      const id = row.id;
+      this.$prompt('请输出取消原因？', "取消流程", {
+        type: 'warning',
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        inputPattern: /^[\s\S]*.*[^\s][\s\S]*$/, // 判断非空，且非空格
+        inputErrorMessage: "取消原因不能为空",
+      }).then(({ value }) => {
+        return cancelProcessInstance(id, value);
+      }).then(() => {
+        this.getList();
+        this.msgSuccess("取消成功");
+      })
+    },
   }
 };
 </script>
