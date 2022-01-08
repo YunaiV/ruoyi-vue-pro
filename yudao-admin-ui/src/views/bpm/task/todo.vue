@@ -16,8 +16,6 @@
       </el-form-item>
     </el-form>
 
-
-
     <!-- 列表 -->
     <el-table v-loading="loading" :data="list">
       <el-table-column label="任务编号" align="center" prop="id" width="300" />

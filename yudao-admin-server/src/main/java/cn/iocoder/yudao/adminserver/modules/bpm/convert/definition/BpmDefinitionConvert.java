@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.convert.definition;
 
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.BpmProcessDefinitionPageItemRespVO;
+import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.BpmProcessDefinitionRespVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.definition.BpmProcessDefinitionExtDO;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.form.BpmFormDO;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.dto.BpmDefinitionCreateReqDTO;
@@ -9,6 +10,9 @@ import org.activiti.engine.impl.persistence.entity.SuspensionState;
 import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.Mappings;
+import org.mapstruct.Named;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
@@ -54,5 +58,18 @@ public interface BpmDefinitionConvert {
     BpmProcessDefinitionPageItemRespVO convert(ProcessDefinition bean);
 
     BpmProcessDefinitionExtDO convert2(BpmDefinitionCreateReqDTO bean);
+
+    @Named("convertList3")
+    List<BpmProcessDefinitionRespVO> convertList3(List<ProcessDefinition> list);
+
+    @Named("convert3")
+    @Mapping(source = "suspended", target = "suspensionState", qualifiedByName = "convertSuspendedToSuspensionState")
+    BpmProcessDefinitionRespVO convert3(ProcessDefinition bean);
+
+    @Named("convertSuspendedToSuspensionState")
+    default Integer convertSuspendedToSuspensionState(boolean suspended) {
+        return suspended ? SuspensionState.SUSPENDED.getStateCode() :
+                SuspensionState.ACTIVE.getStateCode();
+    }
 
 }

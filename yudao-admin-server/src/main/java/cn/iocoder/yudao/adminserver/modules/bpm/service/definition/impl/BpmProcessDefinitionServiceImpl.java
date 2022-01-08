@@ -2,8 +2,10 @@ package cn.iocoder.yudao.adminserver.modules.bpm.service.definition.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.BpmProcessDefinitionListReqVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.BpmProcessDefinitionPageItemRespVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.BpmProcessDefinitionPageReqVO;
+import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.BpmProcessDefinitionRespVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.convert.definition.BpmDefinitionConvert;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.definition.BpmProcessDefinitionExtDO;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.form.BpmFormDO;
@@ -91,6 +93,19 @@ public class BpmProcessDefinitionServiceImpl implements BpmProcessDefinitionServ
         long definitionCount = definitionQuery.count();
         return new PageResult<>(BpmDefinitionConvert.INSTANCE.convertList(processDefinitions, deploymentMap,
                 processDefinitionDOMap, formMap), definitionCount);
+    }
+
+    @Override
+    public List<BpmProcessDefinitionRespVO> getProcessDefinitionList(BpmProcessDefinitionListReqVO listReqVO) {
+        // 拼接查询条件
+        ProcessDefinitionQuery definitionQuery = repositoryService.createProcessDefinitionQuery();
+        if (Objects.equals(SuspensionState.SUSPENDED.getStateCode(), listReqVO.getSuspensionState())) {
+            definitionQuery.suspended();
+        } else if (Objects.equals(SuspensionState.ACTIVE.getStateCode(), listReqVO.getSuspensionState())) {
+            definitionQuery.active();
+        }
+        // 执行查询，并返回
+        return BpmDefinitionConvert.INSTANCE.convertList3(definitionQuery.list());
     }
 
     @Override

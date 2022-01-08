@@ -113,45 +113,6 @@
     <pagination v-show="total > 0" :total="total" :page.sync="queryParams.pageNo" :limit.sync="queryParams.pageSize"
                 @pagination="getList"/>
 
-    <!-- 对话框(添加 / 修改) -->
-    <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
-      <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="发起流程的用户编号" prop="userId">
-          <el-input v-model="form.userId" placeholder="请输入发起流程的用户编号" />
-        </el-form-item>
-        <el-form-item label="流程实例的名字" prop="name">
-          <el-input v-model="form.name" placeholder="请输入流程实例的名字" />
-        </el-form-item>
-        <el-form-item label="流程实例的编号" prop="processInstanceId">
-          <el-input v-model="form.processInstanceId" placeholder="请输入流程实例的编号" />
-        </el-form-item>
-        <el-form-item label="流程定义的编号" prop="processDefinitionId">
-          <el-input v-model="form.processDefinitionId" placeholder="请输入流程定义的编号" />
-        </el-form-item>
-        <el-form-item label="流程分类" prop="category">
-          <el-select v-model="form.category" placeholder="请选择流程分类">
-            <el-option v-for="dict in this.getDictDatas(DICT_TYPE.BPM_MODEL_CATEGORY)"
-                       :key="dict.value" :label="dict.label" :value="dict.value" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="流程实例的名字" prop="status">
-          <el-select v-model="form.status" placeholder="请选择流程实例的名字">
-            <el-option v-for="dict in this.getDictDatas(DICT_TYPE.BPM_PROCESS_INSTANCE_STATUS)"
-                       :key="dict.value" :label="dict.label" :value="parseInt(dict.value)" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="流程实例的结果" prop="result">
-          <el-select v-model="form.result" placeholder="请选择流程实例的结果">
-            <el-option v-for="dict in this.getDictDatas(DICT_TYPE.BPM_PROCESS_INSTANCE_RESULT)"
-                       :key="dict.value" :label="dict.label" :value="parseInt(dict.value)" />
-          </el-select>
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="submitForm">确 定</el-button>
-        <el-button @click="cancel">取 消</el-button>
-      </div>
-    </el-dialog>
   </div>
 </template>
 
@@ -181,10 +142,7 @@ export default {
       total: 0,
       // 工作流的流程实例的拓展列表
       list: [],
-      // 弹出层标题
-      title: "",
       // 是否显示弹出层
-      open: false,
       dateRangeCreateTime: [],
       // 查询参数
       queryParams: {
@@ -195,18 +153,6 @@ export default {
         category: null,
         status: null,
         result: null,
-      },
-      // 表单参数
-      form: {},
-      // 表单校验
-      rules: {
-        userId: [{ required: true, message: "发起流程的用户编号不能为空", trigger: "blur" }],
-        name: [{ required: true, message: "流程实例的名字不能为空", trigger: "blur" }],
-        processInstanceId: [{ required: true, message: "流程实例的编号不能为空", trigger: "blur" }],
-        processDefinitionId: [{ required: true, message: "流程定义的编号不能为空", trigger: "blur" }],
-        category: [{ required: true, message: "流程分类不能为空", trigger: "change" }],
-        status: [{ required: true, message: "流程实例的名字不能为空", trigger: "change" }],
-        result: [{ required: true, message: "流程实例的结果不能为空", trigger: "change" }],
       }
     };
   },
@@ -227,25 +173,6 @@ export default {
         this.loading = false;
       });
     },
-    /** 取消按钮 */
-    cancel() {
-      this.open = false;
-      this.reset();
-    },
-    /** 表单重置 */
-    reset() {
-      this.form = {
-        id: undefined,
-        userId: undefined,
-        name: undefined,
-        processInstanceId: undefined,
-        processDefinitionId: undefined,
-        category: undefined,
-        status: undefined,
-        result: undefined,
-      };
-      this.resetForm("form");
-    },
     /** 搜索按钮操作 */
     handleQuery() {
       this.queryParams.pageNo = 1;
@@ -257,34 +184,9 @@ export default {
       this.resetForm("queryForm");
       this.handleQuery();
     },
-    /** 新增按钮操作 */
+    /** 新增按钮操作 **/
     handleAdd() {
-      this.reset();
-      this.open = true;
-      this.title = "添加工作流的流程实例的拓展";
-    },
-    /** 提交按钮 */
-    submitForm() {
-      this.$refs["form"].validate(valid => {
-        if (!valid) {
-          return;
-        }
-        // 修改的提交
-        if (this.form.id != null) {
-          updateProcessInstanceExt(this.form).then(response => {
-            this.msgSuccess("修改成功");
-            this.open = false;
-            this.getList();
-          });
-          return;
-        }
-        // 添加的提交
-        createProcessInstanceExt(this.form).then(response => {
-          this.msgSuccess("新增成功");
-          this.open = false;
-          this.getList();
-        });
-      });
+      this.$router.push({ path: "/bpm/process-instance/create"})
     },
     /** 取消按钮操作 */
     handleCancel(row) {

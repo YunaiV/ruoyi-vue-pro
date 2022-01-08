@@ -20,5 +20,4 @@ public class BpmProcessDefinitionPageItemRespVO extends BpmProcessDefinitionResp
     @ApiModelProperty(value = "部署时间", required = true)
     private Date deploymentTime;
 
-
 }

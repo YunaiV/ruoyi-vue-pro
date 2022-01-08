@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 工作任务 Service 接口
+ * 流程任务 Service 接口
  *
  * @author jason
  * @author 芋道源码

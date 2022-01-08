@@ -45,6 +45,12 @@ import static cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstan
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 
+/**
+ * 流程任务 Service 实现类
+ *
+ * @author jason
+ * @author 芋道源码
+ */
 @Slf4j
 @Service
 public class BpmTaskServiceImpl implements BpmTaskService {

@@ -135,6 +135,7 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         if (instance == null) {
             throw exception(PROCESS_INSTANCE_CANCEL_FAIL_NOT_EXISTS);
         }
+        // TODO 芋艿：只能自己取消流程
 
         // 通过删除流程实例，实现流程实例的取消
         runtimeService.deleteProcessInstance(cancelReqVO.getId(), cancelReqVO.getReason());
