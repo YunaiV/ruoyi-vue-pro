@@ -5,6 +5,8 @@ import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.task.vo.task.*;
 import cn.iocoder.yudao.adminserver.modules.bpm.convert.task.BpmTaskConvert;
+import cn.iocoder.yudao.adminserver.modules.bpm.enums.task.BpmProcessInstanceDeleteReasonEnum;
+import cn.iocoder.yudao.adminserver.modules.bpm.enums.task.BpmProcessInstanceResultEnum;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.task.BpmProcessInstanceService;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.task.BpmTaskService;
 import cn.iocoder.yudao.adminserver.modules.system.service.user.SysUserService;
@@ -37,6 +39,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
@@ -158,7 +161,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void completeTask(BpmTaskCompleteReqVO reqVO) {
+    public void approveTask(BpmTaskApproveReqVO reqVO) {
         // 校验任务存在
         Task task = getTask(reqVO.getId());
         if (task == null) {
@@ -170,8 +173,31 @@ public class BpmTaskServiceImpl implements BpmTaskService {
             throw exception(PROCESS_INSTANCE_NOT_EXISTS);
         }
 
-        // 完成（审批）任务
-        taskService.complete(task.getId(), instance.getProcessVariables());
+        // 完成任务，审批通过
+        taskService.complete(task.getId(), instance.getProcessVariables()); // TODO 芋艿：variables 的选择
+
+        // TODO 芋艿：添加评论
+//        taskService.addComment(task.getId(), task.getProcessInstanceId(), reqVO.getComment());
+    }
+
+    @Override
+    public void rejectTask(@Valid BpmTaskRejectReqVO reqVO) {
+        // 校验任务存在
+        Task task = getTask(reqVO.getId());
+        if (task == null) {
+            throw exception(TASK_COMPLETE_FAIL_NOT_EXISTS);
+        }
+        // 校验流程实例存在
+        ProcessInstance instance = processInstanceService.getProcessInstance(task.getProcessInstanceId());
+        if (instance == null) {
+            throw exception(PROCESS_INSTANCE_NOT_EXISTS);
+        }
+
+        // 删除流程实例，以实现驳回任务时，取消整个审批流程
+        processInstanceService.deleteProcessInstance(instance.getId(), BpmProcessInstanceDeleteReasonEnum.REJECT_TASK.getReason());
+        // 更新流程实例为不通过
+        processInstanceService.updateProcessInstanceResult(instance.getProcessInstanceId(),
+                BpmProcessInstanceResultEnum.REJECT.getResult());
 
         // TODO 芋艿：添加评论
 //        taskService.addComment(task.getId(), task.getProcessInstanceId(), reqVO.getComment());

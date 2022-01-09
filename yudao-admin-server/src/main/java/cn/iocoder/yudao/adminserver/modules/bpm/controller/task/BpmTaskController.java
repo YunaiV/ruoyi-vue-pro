@@ -42,10 +42,17 @@ public class BpmTaskController {
         return success(taskService.getDoneTaskPage(getLoginUserId(), pageVO));
     }
 
-    @PutMapping("/complete")
-    @ApiOperation(value = "完成任务", notes = "审批通过 or 不通过")
-    public CommonResult<Boolean> completeTask(@Valid @RequestBody BpmTaskCompleteReqVO reqVO) {
-        taskService.completeTask(reqVO);
+    @PutMapping("/approve")
+    @ApiOperation("通过任务")
+    public CommonResult<Boolean> approveTask(@Valid @RequestBody BpmTaskApproveReqVO reqVO) {
+        taskService.approveTask(reqVO);
+        return success(true);
+    }
+
+    @PutMapping("/reject")
+    @ApiOperation("不通过任务")
+    public CommonResult<Boolean> rejectTask(@Valid @RequestBody BpmTaskRejectReqVO reqVO) {
+        taskService.rejectTask(reqVO);
         return success(true);
     }
 

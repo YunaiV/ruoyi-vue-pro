@@ -64,11 +64,11 @@
       <el-table-column label="状态" align="center" prop="status">
         <template slot-scope="scope">
           <span>
-            <el-tag type="primary" v-if="scope.row.result === 1"> <!-- 进行中 -->
-              {{ getDictDataLabel(DICT_TYPE.BPM_PROCESS_INSTANCE_STATUS, scope.row.result) }}
+            <el-tag type="primary" v-if="scope.row.status === 1"> <!-- 进行中 -->
+              {{ getDictDataLabel(DICT_TYPE.BPM_PROCESS_INSTANCE_STATUS, scope.row.status) }}
             </el-tag>
-             <el-tag type="success" v-if="scope.row.result === 2"> <!-- 已结束 -->
-              {{ getDictDataLabel(DICT_TYPE.BPM_PROCESS_INSTANCE_STATUS, scope.row.result) }}
+             <el-tag type="success" v-if="scope.row.status === 2"> <!-- 已结束 -->
+              {{ getDictDataLabel(DICT_TYPE.BPM_PROCESS_INSTANCE_STATUS, scope.row.status) }}
             </el-tag>
           </span>
         </template>

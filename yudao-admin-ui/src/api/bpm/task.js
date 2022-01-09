@@ -8,3 +8,26 @@ export function getTodoTaskPage(query) {
   })
 }
 
+export function completeTask(data) {
+  return request({
+    url: '/bpm/task/complete',
+    method: 'PUT',
+    data: data
+  })
+}
+
+export function approveTask(data) {
+  return request({
+    url: '/bpm/task/approve',
+    method: 'PUT',
+    data: data
+  })
+}
+
+export function rejectTask(data) {
+  return request({
+    url: '/bpm/task/reject',
+    method: 'PUT',
+    data: data
+  })
+}

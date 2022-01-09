@@ -13,7 +13,7 @@ import lombok.Getter;
 public enum BpmProcessInstanceResultEnum {
 
     PROCESS(1, "处理中"),
-    PASS(2, "通过"),
+    APPROVE(2, "通过"),
     REJECT(3, "不通过"),
     CANCEL(4, "已取消");
 

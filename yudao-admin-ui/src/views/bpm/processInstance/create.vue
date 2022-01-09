@@ -41,14 +41,13 @@
           </div>
         </el-col>
       </el-card>
+      <el-card class="box-card">
+        <div slot="header" class="clearfix">
+          <span class="el-icon-picture-outline">流程图</span>
+        </div>
+        <my-process-viewer key="designer" v-model="bpmnXML" v-bind="bpmnControlForm" />
+      </el-card>
     </div>
-
-    <el-card class="box-card">
-      <div slot="header" class="clearfix">
-        <span class="el-icon-picture-outline">流程图</span>
-      </div>
-      <my-process-viewer key="designer" v-model="bpmnXML" v-bind="bpmnControlForm" />
-    </el-card>
 
   </div>
 </template>

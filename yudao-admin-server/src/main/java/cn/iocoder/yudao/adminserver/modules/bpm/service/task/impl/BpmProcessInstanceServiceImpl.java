@@ -140,9 +140,18 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         // 通过删除流程实例，实现流程实例的取消
         runtimeService.deleteProcessInstance(cancelReqVO.getId(), cancelReqVO.getReason());
         // 更新流程实例的拓展表为取消状态
-        processInstanceExtMapper.updateByProcessInstanceId(cancelReqVO.getId(),
-                new BpmProcessInstanceExtDO().setStatus(BpmProcessInstanceStatusEnum.FINISH.getStatus())
-                        .setResult(BpmProcessInstanceResultEnum.CANCEL.getResult()));
+        updateProcessInstanceResult(cancelReqVO.getId(), BpmProcessInstanceResultEnum.CANCEL.getResult());
+    }
+
+    @Override
+    public void deleteProcessInstance(String id, String reason) {
+        runtimeService.deleteProcessInstance(id, reason);
+    }
+
+    @Override
+    public void updateProcessInstanceResult(String id, Integer result) {
+        processInstanceExtMapper.updateByProcessInstanceId(id, new BpmProcessInstanceExtDO()
+                .setStatus(BpmProcessInstanceStatusEnum.FINISH.getStatus()).setResult(result));
     }
 
     @Override

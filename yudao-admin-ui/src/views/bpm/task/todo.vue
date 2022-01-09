@@ -37,6 +37,8 @@
         <template slot-scope="scope">
           <!-- TODO 权限、颜色 -->
           <el-button size="mini" type="text" icon="el-icon-edit">审批</el-button>
+          <el-button size="mini" type="text" icon="el-icon-edit" @click="audit(scope.row, true)">通过</el-button>
+          <el-button size="mini" type="text" icon="el-icon-edit"  @click="audit(scope.row, false)">不通过</el-button>
           <el-button size="mini" type="text" icon="el-icon-edit" v-if="scope.row.suspensionState === 2">激活</el-button>
           <el-button size="mini" type="text" icon="el-icon-edit" v-if="scope.row.suspensionState === 1">挂起</el-button>
         </template>
@@ -50,7 +52,7 @@
 </template>
 
 <script>
-import { getTodoTaskPage } from '@/api/bpm/task'
+import {approveTask, completeTask, getTodoTaskPage, rejectTask} from '@/api/bpm/task'
 
 export default {
   name: "Todo",
@@ -124,6 +126,19 @@ export default {
       this.resetForm("queryForm");
       this.handleQuery();
     },
+    audit(row, pass) {
+      if (pass) {
+        approveTask({
+          id: row.id,
+          comment: '通过'
+        })
+      } else {
+        rejectTask({
+          id: row.id,
+          comment: '不通过'
+        })
+      }
+    }
   }
 };
 </script>

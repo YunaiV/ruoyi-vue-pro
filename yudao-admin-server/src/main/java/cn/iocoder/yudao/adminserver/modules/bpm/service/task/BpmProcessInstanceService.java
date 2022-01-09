@@ -4,6 +4,8 @@ import cn.iocoder.yudao.adminserver.modules.bpm.controller.task.vo.instance.BpmP
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.task.vo.instance.BpmProcessInstanceCreateReqVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.task.vo.instance.BpmProcessInstanceMyPageReqVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.task.vo.instance.BpmProcessInstancePageItemRespVO;
+import cn.iocoder.yudao.adminserver.modules.bpm.enums.task.BpmProcessInstanceDeleteReasonEnum;
+import cn.iocoder.yudao.adminserver.modules.bpm.enums.task.BpmProcessInstanceResultEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import org.activiti.engine.runtime.ProcessInstance;
@@ -36,6 +38,22 @@ public interface BpmProcessInstanceService {
      * @param cancelReqVO 取消信息
      */
     void cancelProcessInstance(Long userId, @Valid BpmProcessInstanceCancelReqVO cancelReqVO);
+
+    /**
+     * 删除流程实例
+     *
+     * @param id 流程编号
+     * @param reason 删除原因。可选 {@link BpmProcessInstanceDeleteReasonEnum}
+     */
+    void deleteProcessInstance(String id, String reason);
+
+    /**
+     * 更新流程实例的结果
+     *
+     * @param id 流程编号
+     * @param result 结果，{@link BpmProcessInstanceResultEnum}
+     */
+    void updateProcessInstanceResult(String id, Integer result);
 
     /**
      * 获得流程实例的分页

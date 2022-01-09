@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.service.task.listener;
 
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.task.BpmProcessInstanceExtDO;
+import cn.iocoder.yudao.adminserver.modules.bpm.enums.task.BpmProcessInstanceResultEnum;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.task.BpmProcessInstanceService;
 import org.activiti.engine.delegate.event.ActivitiEvent;
 import org.activiti.engine.delegate.event.ActivitiEventListener;
@@ -31,7 +32,9 @@ public class BpmProcessInstanceEventListener implements ActivitiEventListener {
         // 正常完成
         if (event.getType() == ActivitiEventType.PROCESS_COMPLETED
             || event.getType() == ActivitiEventType.PROCESS_COMPLETED_WITH_ERROR_END_EVENT) {
-            // TODO 芋艿：更新
+            // 正常完成，说明所有流程任务都是审批通过
+            processInstanceService.updateProcessInstanceResult(event.getProcessInstanceId(),
+                    BpmProcessInstanceResultEnum.APPROVE.getResult());
         }
     }
 

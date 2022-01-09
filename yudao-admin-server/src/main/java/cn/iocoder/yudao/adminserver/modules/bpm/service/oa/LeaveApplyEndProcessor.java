@@ -29,7 +29,7 @@ public class LeaveApplyEndProcessor implements ExecutionListener {
         OALeaveDO updateDo = new OALeaveDO();
         updateDo.setId(Long.valueOf(businessKey));
         if (Objects.equals(approved, true)) {
-            updateDo.setStatus(BpmProcessInstanceResultEnum.PASS.getResult());
+            updateDo.setStatus(BpmProcessInstanceResultEnum.APPROVE.getResult());
         } else {
             updateDo.setStatus(BpmProcessInstanceResultEnum.REJECT.getResult());
         }

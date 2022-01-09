@@ -71,11 +71,18 @@ public interface BpmTaskService {
     void updateTaskAssign(String id, Long userId);
 
     /**
-     * 完成任务（审批通过 / 不通过）
+     * 通过任务
      *
-     * @param taskReq 完成请求
+     * @param reqVO 通过请求
      */
-    void completeTask(@Valid BpmTaskCompleteReqVO taskReq);
+    void approveTask(@Valid BpmTaskApproveReqVO reqVO);
+
+    /**
+     * 不通过任务
+     *
+     * @param reqVO 不通过请求
+     */
+    void rejectTask(@Valid BpmTaskRejectReqVO reqVO);
 
     /**
      * 根据任务id, 查询已经完成的用户任务，未完成的用户任务
