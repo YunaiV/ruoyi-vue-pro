@@ -105,4 +105,34 @@ public interface BpmTaskService {
      */
     FileResp getHighlightImg(String processInstanceId);
 
+    // ========== Task 拓展表相关 ==========
+
+    /**
+     * 创建 Task 拓展记录
+     *
+     * @param task 任务实体
+     */
+    void createTaskExt(org.activiti.api.task.model.Task task);
+
+    /**
+     * 更新 Task 拓展记录
+     *
+     * @param task 任务实体
+     */
+    void updateTaskExt(org.activiti.api.task.model.Task task);
+
+    /**
+     * 更新 Task 拓展记录为取消
+     *
+     * @param task 任务实体
+     */
+    void updateTaskExtCancel(org.activiti.api.task.model.Task task);
+
+    /**
+     * 更新 Task 拓展记录为完成
+     *
+     * @param task 任务实体
+     */
+    void updateTaskExtComplete(org.activiti.api.task.model.Task task);
+
 }

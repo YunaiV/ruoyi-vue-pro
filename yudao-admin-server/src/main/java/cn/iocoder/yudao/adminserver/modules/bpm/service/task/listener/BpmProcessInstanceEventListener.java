@@ -1,12 +1,13 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.service.task.listener;
 
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.task.BpmProcessInstanceExtDO;
-import cn.iocoder.yudao.adminserver.modules.bpm.enums.task.BpmProcessInstanceResultEnum;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.task.BpmProcessInstanceService;
-import org.activiti.engine.delegate.event.ActivitiEvent;
-import org.activiti.engine.delegate.event.ActivitiEventListener;
-import org.activiti.engine.delegate.event.ActivitiEventType;
-import org.activiti.engine.runtime.ProcessInstance;
+import org.activiti.api.model.shared.event.RuntimeEvent;
+import org.activiti.api.process.model.ProcessInstance;
+import org.activiti.api.process.model.events.ProcessRuntimeEvent;
+import org.activiti.api.process.runtime.events.listener.ProcessEventListener;
+import org.activiti.api.process.runtime.events.listener.ProcessRuntimeEventListener;
+import org.activiti.api.task.model.events.TaskRuntimeEvent;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
@@ -18,29 +19,40 @@ import javax.annotation.Resource;
  * @author 芋道源码
  */
 @Component
-public class BpmProcessInstanceEventListener implements ActivitiEventListener {
+public class BpmProcessInstanceEventListener<T extends RuntimeEvent<?, ?>>
+        implements ProcessRuntimeEventListener<T> {
 
     @Resource
     @Lazy // 解决循环依赖
     private BpmProcessInstanceService processInstanceService;
 
     @Override
-    public void onEvent(ActivitiEvent event) {
-        // 不处理 ActivitiEventType.PROCESS_STARTED 事件。原因：事件发布时，流程实例还没进行入库，就已经发布了 ActivitiEvent 事件
-        // 不处理 ActivitiEventType.PROCESS_CANCELLED 事件。原因：直接在 BpmTaskService#cancelProcessInstance 更新记录
-
-        // 正常完成
-        if (event.getType() == ActivitiEventType.PROCESS_COMPLETED
-            || event.getType() == ActivitiEventType.PROCESS_COMPLETED_WITH_ERROR_END_EVENT) {
-            // 正常完成，说明所有流程任务都是审批通过
-            processInstanceService.updateProcessInstanceResult(event.getProcessInstanceId(),
-                    BpmProcessInstanceResultEnum.APPROVE.getResult());
+    @SuppressWarnings("unchecked")
+    public void onEvent(T rawEvent) {
+        // 由于 ProcessRuntimeEventListener 无法保证只监听 ProcessRuntimeEvent 事件，所以通过这样的方式
+        if (!(rawEvent instanceof ProcessRuntimeEvent)) {
+            return;
         }
-    }
+        ProcessRuntimeEvent<ProcessInstance> event = (ProcessRuntimeEvent<ProcessInstance>) rawEvent;
 
-    @Override
-    public boolean isFailOnException() {
-        return true;
+        // 创建时，插入拓展表
+        if (event.getEventType() == ProcessRuntimeEvent.ProcessEvents.PROCESS_CREATED) {
+            processInstanceService.createProcessInstanceExt(event.getEntity());
+            return;
+        }
+        // 取消时，更新拓展表为取消
+        if (event.getEventType() == ProcessRuntimeEvent.ProcessEvents.PROCESS_CANCELLED) {
+            processInstanceService.updateProcessInstanceExtCancel(event.getEntity());
+            return;
+        }
+        // 完成时，更新拓展表为已完成
+        if (event.getEventType() == ProcessRuntimeEvent.ProcessEvents.PROCESS_COMPLETED) {
+            processInstanceService.updateProcessInstanceExtComplete(event.getEntity());
+            return;
+        }
+
+        // 其它事件，进行更新拓展表
+        processInstanceService.updateProcessInstanceExt(event.getEntity());
     }
 
 }

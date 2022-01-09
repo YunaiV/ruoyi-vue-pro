@@ -5,7 +5,8 @@ import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.task.vo.task.*;
 import cn.iocoder.yudao.adminserver.modules.bpm.convert.task.BpmTaskConvert;
-import cn.iocoder.yudao.adminserver.modules.bpm.enums.task.BpmProcessInstanceDeleteReasonEnum;
+import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.task.BpmTaskExtDO;
+import cn.iocoder.yudao.adminserver.modules.bpm.dal.mysql.task.BpmTaskExtMapper;
 import cn.iocoder.yudao.adminserver.modules.bpm.enums.task.BpmProcessInstanceResultEnum;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.task.BpmProcessInstanceService;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.task.BpmTaskService;
@@ -75,6 +76,9 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     @Resource
     @Lazy // 解决循环依赖
     private BpmProcessInstanceService processInstanceService;
+
+    @Resource
+    private BpmTaskExtMapper taskExtMapper;
 
     @Override
     public List<Task> getTasksByProcessInstanceId(String processInstanceId) {
@@ -175,12 +179,16 @@ public class BpmTaskServiceImpl implements BpmTaskService {
 
         // 完成任务，审批通过
         taskService.complete(task.getId(), instance.getProcessVariables()); // TODO 芋艿：variables 的选择
+        // 更新任务拓展表为通过
+        taskExtMapper.updateByTaskId(new BpmTaskExtDO().setTaskId(task.getId())
+                .setResult(BpmProcessInstanceResultEnum.APPROVE.getResult()).setComment(reqVO.getComment()));
 
         // TODO 芋艿：添加评论
 //        taskService.addComment(task.getId(), task.getProcessInstanceId(), reqVO.getComment());
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void rejectTask(@Valid BpmTaskRejectReqVO reqVO) {
         // 校验任务存在
         Task task = getTask(reqVO.getId());
@@ -193,11 +201,13 @@ public class BpmTaskServiceImpl implements BpmTaskService {
             throw exception(PROCESS_INSTANCE_NOT_EXISTS);
         }
 
-        // 删除流程实例，以实现驳回任务时，取消整个审批流程
-        processInstanceService.deleteProcessInstance(instance.getId(), BpmProcessInstanceDeleteReasonEnum.REJECT_TASK.getReason());
         // 更新流程实例为不通过
         processInstanceService.updateProcessInstanceResult(instance.getProcessInstanceId(),
                 BpmProcessInstanceResultEnum.REJECT.getResult());
+
+        // 更新任务拓展表为不通过
+        taskExtMapper.updateByTaskId(new BpmTaskExtDO().setTaskId(task.getId())
+                .setResult(BpmProcessInstanceResultEnum.REJECT.getResult()).setComment(reqVO.getComment()));
 
         // TODO 芋艿：添加评论
 //        taskService.addComment(task.getId(), task.getProcessInstanceId(), reqVO.getComment());
@@ -380,6 +390,37 @@ public class BpmTaskServiceImpl implements BpmTaskService {
 
     private Task getTask(String id) {
         return taskService.createTaskQuery().taskId(id).singleResult();
+    }
+
+    // ========== Task 拓展表相关 ==========
+
+    @Override
+    public void createTaskExt(org.activiti.api.task.model.Task task) {
+        BpmTaskExtDO taskExtDO = BpmTaskConvert.INSTANCE.convert(task)
+                .setResult(BpmProcessInstanceResultEnum.PROCESS.getResult());
+        taskExtMapper.insert(taskExtDO);
+    }
+
+    @Override
+    public void updateTaskExt(org.activiti.api.task.model.Task task) {
+        BpmTaskExtDO taskExtDO = BpmTaskConvert.INSTANCE.convert(task);
+        taskExtMapper.updateByTaskId(taskExtDO);
+    }
+
+    @Override
+    public void updateTaskExtCancel(org.activiti.api.task.model.Task task) {
+        BpmTaskExtDO taskExtDO = BpmTaskConvert.INSTANCE.convert(task)
+                .setEndTime(new Date()) // 由于 Task 里没有办法拿到 endTime，所以这里设置
+                .setResult(BpmProcessInstanceResultEnum.CANCEL.getResult());
+        taskExtMapper.updateByTaskId(taskExtDO);
+    }
+
+    @Override
+    public void updateTaskExtComplete(org.activiti.api.task.model.Task task) {
+        BpmTaskExtDO taskExtDO = BpmTaskConvert.INSTANCE.convert(task)
+                .setEndTime(task.getCompletedDate())
+                .setResult(BpmProcessInstanceResultEnum.APPROVE.getResult());
+        taskExtMapper.updateByTaskId(taskExtDO);
     }
 
 }

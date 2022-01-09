@@ -7,8 +7,11 @@ import cn.iocoder.yudao.adminserver.modules.bpm.controller.task.vo.instance.BpmP
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.task.vo.instance.BpmProcessInstanceMyPageReqVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.task.vo.instance.BpmProcessInstancePageItemRespVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.convert.task.BpmProcessInstanceConvert;
+import cn.iocoder.yudao.adminserver.modules.bpm.convert.task.BpmTaskConvert;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.task.BpmProcessInstanceExtDO;
+import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.task.BpmTaskExtDO;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.mysql.task.BpmProcessInstanceExtMapper;
+import cn.iocoder.yudao.adminserver.modules.bpm.enums.task.BpmProcessInstanceDeleteReasonEnum;
 import cn.iocoder.yudao.adminserver.modules.bpm.enums.task.BpmProcessInstanceResultEnum;
 import cn.iocoder.yudao.adminserver.modules.bpm.enums.task.BpmProcessInstanceStatusEnum;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmProcessDefinitionService;
@@ -33,9 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
 
 import static cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants.*;
@@ -92,8 +93,9 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         ProcessInstance instance = runtimeService.startProcessInstanceById(createReqVO.getProcessDefinitionId(), variables);
         // 设置流程名字
         runtimeService.setProcessInstanceName(instance.getId(), definition.getName());
-        // 记录流程实例的拓展表
-        createProcessInstanceExt(instance, definition);
+        // 更新流程实例拓展表的 category TODO 芋艿：暂时没好的办法，task 的 category 不正确。另外，definition 返回的 category 也不太正确，后续在解决；
+        processInstanceExtMapper.updateByProcessInstanceId(new BpmProcessInstanceExtDO()
+                .setProcessInstanceId(instance.getId()).setCategory(definition.getCategory()));
 
         // TODO 芋艿：临时使用, 保证分配
         List<Task> tasks = taskService.getTasksByProcessInstanceId(instance.getId());
@@ -114,19 +116,6 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         return instance.getId();
     }
 
-    /**
-     * 创建流程实例的拓展
-     *
-     * @param definition 流程定义
-     * @param instance 流程实例
-     */
-    private void createProcessInstanceExt(ProcessInstance instance, ProcessDefinition definition) {
-        BpmProcessInstanceExtDO instanceExt = BpmProcessInstanceConvert.INSTANCE.convert(instance, definition);
-        instanceExt.setStatus(BpmProcessInstanceStatusEnum.RUNNING.getStatus());
-        instanceExt.setResult(BpmProcessInstanceResultEnum.PROCESS.getResult());
-        processInstanceExtMapper.insert(instanceExt);
-    }
-
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void cancelProcessInstance(Long userId, BpmProcessInstanceCancelReqVO cancelReqVO) {
@@ -135,12 +124,13 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         if (instance == null) {
             throw exception(PROCESS_INSTANCE_CANCEL_FAIL_NOT_EXISTS);
         }
-        // TODO 芋艿：只能自己取消流程
+        // 只能取消自己的
+        if (!Objects.equals(instance.getStartUserId(), String.valueOf(userId))) {
+            throw exception(PROCESS_INSTANCE_CANCEL_FAIL_NOT_SELF);
+        }
 
         // 通过删除流程实例，实现流程实例的取消
         runtimeService.deleteProcessInstance(cancelReqVO.getId(), cancelReqVO.getReason());
-        // 更新流程实例的拓展表为取消状态
-        updateProcessInstanceResult(cancelReqVO.getId(), BpmProcessInstanceResultEnum.CANCEL.getResult());
     }
 
     @Override
@@ -149,8 +139,14 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void updateProcessInstanceResult(String id, Integer result) {
-        processInstanceExtMapper.updateByProcessInstanceId(id, new BpmProcessInstanceExtDO()
+        // 删除流程实例，以实现驳回任务时，取消整个审批流程
+        if (Objects.equals(result, BpmProcessInstanceResultEnum.REJECT.getResult())) {
+            deleteProcessInstance(id, BpmProcessInstanceDeleteReasonEnum.REJECT_TASK.getReason());
+        }
+        // 更新 status + result
+        processInstanceExtMapper.updateByProcessInstanceId(new BpmProcessInstanceExtDO().setProcessInstanceId(id)
                 .setStatus(BpmProcessInstanceStatusEnum.FINISH.getStatus()).setResult(result));
     }
 
@@ -194,6 +190,38 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
     @Override
     public List<HistoricProcessInstance> getHistoricProcessInstances(Set<String> ids) {
         return historyService.createHistoricProcessInstanceQuery().processInstanceIds(ids).list();
+    }
+
+    @Override
+    public void createProcessInstanceExt(org.activiti.api.process.model.ProcessInstance instance) {
+        BpmProcessInstanceExtDO instanceExtDO = BpmProcessInstanceConvert.INSTANCE.convert(instance)
+                .setStatus(BpmProcessInstanceStatusEnum.RUNNING.getStatus())
+                .setResult(BpmProcessInstanceResultEnum.PROCESS.getResult());
+        processInstanceExtMapper.insert(instanceExtDO);
+    }
+
+    @Override
+    public void updateProcessInstanceExt(org.activiti.api.process.model.ProcessInstance instance) {
+        BpmProcessInstanceExtDO instanceExtDO = BpmProcessInstanceConvert.INSTANCE.convert(instance);
+        processInstanceExtMapper.updateByProcessInstanceId(instanceExtDO);
+    }
+
+    @Override
+    public void updateProcessInstanceExtCancel(org.activiti.api.process.model.ProcessInstance instance) {
+        BpmProcessInstanceExtDO instanceExtDO = BpmProcessInstanceConvert.INSTANCE.convert(instance)
+                .setEndTime(new Date()) // 由于 ProcessInstance 里没有办法拿到 endTime，所以这里设置
+                .setStatus(BpmProcessInstanceStatusEnum.FINISH.getStatus())
+                .setResult(BpmProcessInstanceResultEnum.CANCEL.getResult());
+        processInstanceExtMapper.updateByProcessInstanceId(instanceExtDO);
+    }
+
+    @Override
+    public void updateProcessInstanceExtComplete(org.activiti.api.process.model.ProcessInstance instance) {
+        BpmProcessInstanceExtDO instanceExtDO = BpmProcessInstanceConvert.INSTANCE.convert(instance)
+                .setEndTime(new Date()) // 由于 ProcessInstance 里没有办法拿到 endTime，所以这里设置
+                .setStatus(BpmProcessInstanceStatusEnum.FINISH.getStatus())
+                .setResult(BpmProcessInstanceResultEnum.APPROVE.getResult()); // 如果正常完全，说明审批通过
+        processInstanceExtMapper.updateByProcessInstanceId(instanceExtDO);
     }
 
 }

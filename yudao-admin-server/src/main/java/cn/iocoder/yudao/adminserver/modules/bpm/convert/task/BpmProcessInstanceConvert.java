@@ -11,6 +11,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 import org.mapstruct.factory.Mappers;
 
+import java.sql.SQLXML;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -48,5 +49,13 @@ public interface BpmProcessInstanceConvert {
 
     @Mapping(source = "processInstanceId", target = "id")
     BpmProcessInstancePageItemRespVO convert(BpmProcessInstanceExtDO bean);
+
+    @Mappings({
+            @Mapping(source = "id", target = "processInstanceId"),
+            @Mapping(source = "startDate", target = "createTime"),
+            @Mapping(source = "initiator", target = "startUserId"),
+            @Mapping(source = "status", target = "status", ignore = true)
+    })
+    BpmProcessInstanceExtDO convert(org.activiti.api.process.model.ProcessInstance bean);
 
 }

@@ -46,10 +46,12 @@ public interface BpmProcessInstanceService {
      * @param id 流程编号
      * @param reason 删除原因。可选 {@link BpmProcessInstanceDeleteReasonEnum}
      */
+    @Deprecated
     void deleteProcessInstance(String id, String reason);
 
     /**
      * 更新流程实例的结果
+     * 1. 如果更新为已拒绝时，会进行任务的删除
      *
      * @param id 流程编号
      * @param result 结果，{@link BpmProcessInstanceResultEnum}
@@ -117,5 +119,33 @@ public interface BpmProcessInstanceService {
     default Map<String, HistoricProcessInstance> getHistoricProcessInstanceMap(Set<String> ids) {
         return CollectionUtils.convertMap(getHistoricProcessInstances(ids), HistoricProcessInstance::getId);
     }
+
+    /**
+     * 创建 ProcessInstance 拓展记录
+     *
+     * @param instance 流程任务
+     */
+    void createProcessInstanceExt(org.activiti.api.process.model.ProcessInstance instance);
+
+    /**
+     * 更新 ProcessInstance 拓展记录
+     *
+     * @param instance 流程任务
+     */
+    void updateProcessInstanceExt(org.activiti.api.process.model.ProcessInstance instance);
+
+    /**
+     * 更新 ProcessInstance 拓展记录为取消
+     *
+     * @param instance 流程任务
+     */
+    void updateProcessInstanceExtCancel(org.activiti.api.process.model.ProcessInstance instance);
+
+    /**
+     * 更新 ProcessInstance 拓展记录为完成
+     *
+     * @param instance 流程任务
+     */
+    void updateProcessInstanceExtComplete(org.activiti.api.process.model.ProcessInstance instance);
 
 }

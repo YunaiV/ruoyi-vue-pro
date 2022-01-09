@@ -35,6 +35,7 @@ public interface BpmErrorCodeConstants {
     // ========== 流程实例 1-009-004-000 ==========
     ErrorCode PROCESS_INSTANCE_NOT_EXISTS = new ErrorCode(1009004000, "流程实例不存在");
     ErrorCode PROCESS_INSTANCE_CANCEL_FAIL_NOT_EXISTS = new ErrorCode(1009004001, "流程取消失败，流程不处于运行中");
+    ErrorCode PROCESS_INSTANCE_CANCEL_FAIL_NOT_SELF = new ErrorCode(1009004002, "流程取消失败，该流程不是你发起的");
 
     // ========== 流程实例 1-009-005-000 ==========
     ErrorCode TASK_COMPLETE_FAIL_NOT_EXISTS = new ErrorCode(1009004000, "审批任务失败，原因：该任务不处于未审批");

@@ -3,6 +3,7 @@ package cn.iocoder.yudao.adminserver.modules.bpm.convert.task;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.task.vo.task.BpmTaskDonePageItemRespVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.task.vo.task.BpmTaskTodoPageItemRespVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.task.vo.task.TaskStepVO;
+import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.task.BpmTaskExtDO;
 import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.user.SysUserDO;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import org.activiti.engine.history.HistoricActivityInstance;
@@ -87,5 +88,12 @@ public interface BpmTaskConvert {
             @Mapping(source = "user.nickname", target = "processInstance.startUserNickname")
     })
     BpmTaskDonePageItemRespVO convert(HistoricTaskInstance task, HistoricProcessInstance processInstance, SysUserDO user);
+
+    @Mappings({
+            @Mapping(source = "id", target = "taskId"),
+            @Mapping(source = "assignee", target = "assigneeUserId"),
+            @Mapping(source = "createdDate", target = "createTime")
+    })
+    BpmTaskExtDO convert(org.activiti.api.task.model.Task bean);
 
 }
