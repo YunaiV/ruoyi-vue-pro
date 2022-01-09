@@ -14,7 +14,6 @@
 //   paletteProvider: ["type", PaletteProvider]
 // };
 
-// custom/index.js
 import CustomPalette from "./CustomPalette";
 
 export default {

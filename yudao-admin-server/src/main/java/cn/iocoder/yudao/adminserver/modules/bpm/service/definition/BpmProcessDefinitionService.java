@@ -1,7 +1,9 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.service.definition;
 
+import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.BpmProcessDefinitionListReqVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.BpmProcessDefinitionPageItemRespVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.BpmProcessDefinitionPageReqVO;
+import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.BpmProcessDefinitionRespVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.dto.BpmDefinitionCreateReqDTO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
@@ -31,6 +33,14 @@ public interface BpmProcessDefinitionService {
     PageResult<BpmProcessDefinitionPageItemRespVO> getProcessDefinitionPage(BpmProcessDefinitionPageReqVO pageReqVO);
 
     /**
+     * 获得流程定义列表
+     *
+     * @param listReqVO 列表入参
+     * @return 流程定义列表
+     */
+    List<BpmProcessDefinitionRespVO> getProcessDefinitionList(BpmProcessDefinitionListReqVO listReqVO);
+
+    /**
      * 获得流程定义对应的 BPMN XML
      *
      * @param id 流程定义编号
@@ -53,6 +63,16 @@ public interface BpmProcessDefinitionService {
      * @return 流程定义
      */
     ProcessDefinition getProcessDefinition(String id);
+
+    /**
+     * 获得编号对应的 ProcessDefinition
+     *
+     * 相比 {@link #getProcessDefinition(String)} 方法，category 的取值是正确
+     *
+     * @param id 编号
+     * @return 流程定义
+     */
+    ProcessDefinition getProcessDefinition2(String id);
 
     /**
      * 获得 id 对应的 Deployment

@@ -9,8 +9,6 @@ import java.util.Map;
 
 @ApiModel("流程实例的创建 Request VO")
 @Data
-//@EqualsAndHashCode(callSuper = true)
-//@ToString(callSuper = true)
 public class BpmProcessInstanceCreateReqVO {
 
     @ApiModelProperty(value = "流程定义的编号", required = true, example = "1024")

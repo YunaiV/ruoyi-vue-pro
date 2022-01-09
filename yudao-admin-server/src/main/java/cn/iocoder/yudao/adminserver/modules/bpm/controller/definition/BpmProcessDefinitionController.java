@@ -1,7 +1,9 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.controller.definition;
 
+import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.BpmProcessDefinitionListReqVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.BpmProcessDefinitionPageItemRespVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.BpmProcessDefinitionPageReqVO;
+import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.BpmProcessDefinitionRespVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmProcessDefinitionService;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -16,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
@@ -36,14 +40,11 @@ public class BpmProcessDefinitionController {
         return success(bpmDefinitionService.getProcessDefinitionPage(pageReqVO));
     }
 
-    // TODO 芋艿：需要重写该方法
-    @GetMapping(value = "/getStartForm")
-    public CommonResult<String> getStartForm(@RequestParam("processKey") String processKey){
-//        final ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().
-//                processDefinitionKey(processKey).latestVersion().singleResult();
-//        processRuntime.processDefinition(processDefinition.getId()).getFormKey();
-        // TODO 这样查似乎有问题？？， 暂时写死
-        return success("/flow/leave/apply");
+    @GetMapping ("/list")
+    @ApiOperation(value = "获得流程定义列表")
+    public CommonResult<List<BpmProcessDefinitionRespVO>> getProcessDefinitionList(
+            BpmProcessDefinitionListReqVO listReqVO) {
+        return success(bpmDefinitionService.getProcessDefinitionList(listReqVO));
     }
 
     @GetMapping ("/get-bpmn-xml")

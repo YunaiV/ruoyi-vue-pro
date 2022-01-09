@@ -1,52 +1,102 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.service.task;
 
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.workflow.vo.*;
+import cn.iocoder.yudao.adminserver.modules.bpm.controller.task.vo.task.*;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import org.activiti.engine.task.Task;
 
+import javax.validation.Valid;
 import java.util.List;
+import java.util.Map;
 
 /**
- * 工作流用户任务服务接口
+ * 流程任务 Service 接口
+ *
+ * @author jason
+ * @author 芋道源码
  */
 public interface BpmTaskService {
 
+    /**
+     * 获得流程任务列表
+     *
+     * @param processInstanceId 流程实例的编号
+     * @return 流程任务列表
+     */
+    List<Task> getTasksByProcessInstanceId(String processInstanceId);
 
     /**
-     * 获取当前用户的待办任务， 分页
+     * 获得流程任务列表
+     *
+     * @param processInstanceIds 流程实例的编号数组
+     * @return 流程任务列表
      */
-    PageResult<TodoTaskRespVO> getTodoTaskPage(TodoTaskPageReqVO pageReqVO);
+    List<Task> getTasksByProcessInstanceIds(List<String> processInstanceIds);
 
     /**
-     * 签收任务
-     * @param taskId  用户任务id
+     * 获得流程任务 Map
+     *
+     * @param processInstanceIds 流程实例的编号数组
+     * @return 流程任务 Map
      */
-    void claimTask(String taskId);
+    default Map<String, List<Task>> getTaskMapByProcessInstanceIds(List<String> processInstanceIds) {
+        return CollectionUtils.convertMultiMap(getTasksByProcessInstanceIds(processInstanceIds),
+                Task::getProcessInstanceId);
+    }
 
     /**
-     * 工作流，完成 userTask, 完成用户任务 一般传入参数 1。是否同意（variables).  2. 评论(comment)
-     * variables 变量名 和 评论 由前台传入
-     * @param taskReq 任务参数
+     * 获得待办的流程任务分页
+     *
+     * @param userId 用户编号
+     * @param pageReqVO 分页请求
+     * @return 流程任务分页
      */
-    void completeTask(TaskReqVO taskReq);
+    PageResult<BpmTaskTodoPageItemRespVO> getTodoTaskPage(Long userId, BpmTaskTodoPageReqVO pageReqVO);
+
+    /**
+     * 获得已办的流程任务分页
+     *
+     * @param userId 用户编号
+     * @param pageReqVO 分页请求
+     * @return 流程任务分页
+     */
+    PageResult<BpmTaskDonePageItemRespVO> getDoneTaskPage(Long userId, BpmTaskDonePageReqVO pageReqVO);
+
+    /**
+     * 将流程任务分配给指定用户
+     *
+     * @param id 流程任务编号
+     * @param userId 用户编号
+     */
+    void updateTaskAssign(String id, Long userId);
+
+    /**
+     * 通过任务
+     *
+     * @param reqVO 通过请求
+     */
+    void approveTask(@Valid BpmTaskApproveReqVO reqVO);
+
+    /**
+     * 不通过任务
+     *
+     * @param reqVO 不通过请求
+     */
+    void rejectTask(@Valid BpmTaskRejectReqVO reqVO);
 
     /**
      * 根据任务id, 查询已经完成的用户任务，未完成的用户任务
      * @param taskQuery 查询参数  一般 taskId
      */
+    @Deprecated
     TaskHandleVO getTaskSteps(TaskQueryReqVO taskQuery);
 
     /**
      * 根据流程实例id, 查询历史用户任务，包括已完成，未完成
      * @param processInstanceId 流程实例id
      */
+    @Deprecated
     List<TaskStepVO> getHistorySteps(String processInstanceId);
-
-    /**
-     * 获取用户任务的 formKey, 对应外置表单， 需要根据formKey 对应业务表单
-     * @param taskQuery 查询参数 ,一般taskId
-     */
-    TodoTaskRespVO getTaskFormKey(TaskQueryReqVO taskQuery);
-
 
     /**
      * 返回高亮的流转进程
@@ -54,4 +104,35 @@ public interface BpmTaskService {
      * @return {@link FileResp} 返回文件
      */
     FileResp getHighlightImg(String processInstanceId);
+
+    // ========== Task 拓展表相关 ==========
+
+    /**
+     * 创建 Task 拓展记录
+     *
+     * @param task 任务实体
+     */
+    void createTaskExt(org.activiti.api.task.model.Task task);
+
+    /**
+     * 更新 Task 拓展记录
+     *
+     * @param task 任务实体
+     */
+    void updateTaskExt(org.activiti.api.task.model.Task task);
+
+    /**
+     * 更新 Task 拓展记录为取消
+     *
+     * @param task 任务实体
+     */
+    void updateTaskExtCancel(org.activiti.api.task.model.Task task);
+
+    /**
+     * 更新 Task 拓展记录为完成
+     *
+     * @param task 任务实体
+     */
+    void updateTaskExtComplete(org.activiti.api.task.model.Task task);
+
 }

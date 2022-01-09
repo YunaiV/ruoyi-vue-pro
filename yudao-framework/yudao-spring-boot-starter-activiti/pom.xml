@@ -37,6 +37,14 @@
             <artifactId>yudao-common</artifactId>
         </dependency>
 
+        <!-- Web 相关 -->
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-spring-boot-starter-security</artifactId>
+        </dependency>
+
+
+
         <dependency>
             <groupId>org.mybatis</groupId>
             <artifactId>mybatis</artifactId>
@@ -72,6 +80,7 @@
             <artifactId>activiti-image-generator</artifactId>
             <version>${activiti.version}</version>
         </dependency>
+
     </dependencies>
 
 </project>

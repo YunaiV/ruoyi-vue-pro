@@ -2,7 +2,7 @@ package cn.iocoder.yudao.adminserver.modules.bpm.service.oa;
 
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.leave.OALeaveDO;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.mysql.oa.OALeaveMapper;
-import cn.iocoder.yudao.adminserver.modules.bpm.enums.FlowStatusEnum;
+import cn.iocoder.yudao.adminserver.modules.bpm.enums.task.BpmProcessInstanceResultEnum;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.ExecutionListener;
 import org.springframework.stereotype.Component;
@@ -29,9 +29,9 @@ public class LeaveApplyEndProcessor implements ExecutionListener {
         OALeaveDO updateDo = new OALeaveDO();
         updateDo.setId(Long.valueOf(businessKey));
         if (Objects.equals(approved, true)) {
-            updateDo.setStatus(FlowStatusEnum.PASS.getStatus());
+            updateDo.setStatus(BpmProcessInstanceResultEnum.APPROVE.getResult());
         } else {
-            updateDo.setStatus(FlowStatusEnum.REJECTED.getStatus());
+            updateDo.setStatus(BpmProcessInstanceResultEnum.REJECT.getResult());
         }
 
         leaveMapper.updateById(updateDo);

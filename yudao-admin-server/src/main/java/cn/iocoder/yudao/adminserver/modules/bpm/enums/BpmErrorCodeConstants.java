@@ -10,7 +10,6 @@ import cn.iocoder.yudao.framework.common.exception.ErrorCode;
 public interface BpmErrorCodeConstants {
 
     // ==========  通用流程处理 模块 1-009-000-000 ==========
-    ErrorCode PROCESS_INSTANCE_NOT_EXISTS = new ErrorCode(1009000001, "流程实例不存在");
     ErrorCode HIGHLIGHT_IMG_ERROR = new ErrorCode(1009000002, "获取高亮流程图异常");
 
     // ========== OA 流程模块 1-009-001-000 ==========
@@ -34,7 +33,12 @@ public interface BpmErrorCodeConstants {
     ErrorCode PROCESS_DEFINITION_IS_SUSPENDED = new ErrorCode(1009003002, "流程定义处于挂起状态");
 
     // ========== 流程实例 1-009-004-000 ==========
+    ErrorCode PROCESS_INSTANCE_NOT_EXISTS = new ErrorCode(1009004000, "流程实例不存在");
+    ErrorCode PROCESS_INSTANCE_CANCEL_FAIL_NOT_EXISTS = new ErrorCode(1009004001, "流程取消失败，流程不处于运行中");
+    ErrorCode PROCESS_INSTANCE_CANCEL_FAIL_NOT_SELF = new ErrorCode(1009004002, "流程取消失败，该流程不是你发起的");
 
+    // ========== 流程实例 1-009-005-000 ==========
+    ErrorCode TASK_COMPLETE_FAIL_NOT_EXISTS = new ErrorCode(1009004000, "审批任务失败，原因：该任务不处于未审批");
 
     // ========== 动态表单模块 1-009-010-000 ==========
     ErrorCode FORM_NOT_EXISTS = new ErrorCode(1009010000, "动态表单不存在");

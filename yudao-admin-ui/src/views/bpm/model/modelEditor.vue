@@ -175,17 +175,8 @@ export default {
 
 .my-process-designer {
   height: calc(100vh - 84px);
-  //height: 800px !important; // TODO 芋艿：bjs 容器的高度不对，临时改下
-  //z-index: 0 !important;
-  //pointer-events: none !important;
 }
-.process-panel__container { // TODO 芋艿：右边的位置不对，临时改下
-  //margin-top: -800px !important;
-  //float: right;
-  //margin-left: 800px !important;
-  //height: 800px;
-  //z-index: 2147483647 !important;
-  //cursor:pointer !important;
+.process-panel__container {
   position: absolute;
   right: 0;
   top: 55px;

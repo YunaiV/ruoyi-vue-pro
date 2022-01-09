@@ -1,26 +1,36 @@
 <template>
   <div class="panel-tab__content">
     <el-form size="mini" label-width="90px" :model="model" :rules="rules" @submit.native.prevent>
-      <el-form-item label="流程标识" prop="key">
-        <el-input v-model="model.key" placeholder="请输入流标标识"
-                  :disabled="model.id !== undefined && model.id.length > 0" @change="handleKeyUpdate" />
-      </el-form-item>
-      <el-form-item label="流程名称" prop="name">
-        <el-input v-model="model.name" placeholder="请输入流程名称" clearable @change="handleNameUpdate" />
-      </el-form-item>
-      <el-form-item label="流程分类" prop="category">
-        <el-select v-model="model.category" placeholder="请选择流程分类" clearable style="width: 100%">
-          <el-option v-for="dict in categoryDictDatas" :key="dict.value" :label="dict.label" :value="dict.value"/>
-        </el-select>
-      </el-form-item>
-      <el-form-item label="流程表单" prop="formId">
-        <el-select v-model="model.formId" placeholder="请选择流程表单，非必选哟！" clearable style="width: 100%">
-          <el-option v-for="form in forms" :key="form.id" :label="form.name" :value="form.id"/>
-        </el-select>
-      </el-form-item>
-      <el-form-item label="流程描述" prop="description">
-        <el-input type="textarea" v-model="model.description" clearable @change="handleDescriptionUpdate" />
-      </el-form-item>
+      <div v-if="elementBaseInfo.$type === 'bpmn:Process'"> <!-- 如果是 Process 信息的时候，使用自定义表单 -->
+        <el-form-item label="流程标识" prop="key">
+          <el-input v-model="model.key" placeholder="请输入流标标识"
+                    :disabled="model.id !== undefined && model.id.length > 0" @change="handleKeyUpdate" />
+        </el-form-item>
+        <el-form-item label="流程名称" prop="name">
+          <el-input v-model="model.name" placeholder="请输入流程名称" clearable @change="handleNameUpdate" />
+        </el-form-item>
+        <el-form-item label="流程分类" prop="category">
+          <el-select v-model="model.category" placeholder="请选择流程分类" clearable style="width: 100%">
+            <el-option v-for="dict in categoryDictDatas" :key="dict.value" :label="dict.label" :value="dict.value"/>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="流程表单" prop="formId">
+          <el-select v-model="model.formId" placeholder="请选择流程表单，非必选哟！" clearable style="width: 100%">
+            <el-option v-for="form in forms" :key="form.id" :label="form.name" :value="form.id"/>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="流程描述" prop="description">
+          <el-input type="textarea" v-model="model.description" clearable @change="handleDescriptionUpdate" />
+        </el-form-item>
+      </div>
+      <div v-else>
+        <el-form-item label="ID">
+          <el-input v-model="elementBaseInfo.id" clearable @change="updateBaseInfo('id')"/>
+        </el-form-item>
+        <el-form-item label="名称">
+          <el-input v-model="elementBaseInfo.name" clearable @change="updateBaseInfo('name')" />
+        </el-form-item>
+      </div>
     </el-form>
   </div>
 </template>
