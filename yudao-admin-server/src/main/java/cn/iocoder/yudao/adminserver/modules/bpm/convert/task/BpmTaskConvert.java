@@ -65,12 +65,14 @@ public interface BpmTaskConvert {
                 SuspensionState.ACTIVE.getStateCode();
     }
 
-    default List<BpmTaskDonePageItemRespVO> convertList2(List<HistoricTaskInstance> tasks,
+    default List<BpmTaskDonePageItemRespVO> convertList2(List<HistoricTaskInstance> tasks, Map<String, BpmTaskExtDO> bpmTaskExtDOMap,
                                                          Map<String, HistoricProcessInstance> historicProcessInstanceMap,
                                                          Map<Long, SysUserDO> userMap) {
         return CollectionUtils.convertList(tasks, task -> {
+            BpmTaskExtDO taskExtDO = bpmTaskExtDOMap.get(task.getId());
             HistoricProcessInstance processInstance = historicProcessInstanceMap.get(task.getProcessInstanceId());
-            return convert(task, processInstance, userMap.get(Long.valueOf(processInstance.getStartUserId())));
+            SysUserDO userDO = userMap.get(Long.valueOf(processInstance.getStartUserId()));
+            return convert(task, taskExtDO, processInstance, userDO);
         });
     }
 
@@ -81,13 +83,15 @@ public interface BpmTaskConvert {
             @Mapping(source = "task.createTime", target = "createTime"),
             @Mapping(source = "task.endTime", target = "endTime"),
             @Mapping(source = "task.durationInMillis", target = "durationInMillis"),
+            @Mapping(source = "taskExtDO.result", target = "result"),
+            @Mapping(source = "taskExtDO.comment", target = "comment"),
             @Mapping(source = "processInstance.id", target = "processInstance.id"),
             @Mapping(source = "processInstance.name", target = "processInstance.name"),
             @Mapping(source = "processInstance.startUserId", target = "processInstance.startUserId"),
             @Mapping(source = "processInstance.processDefinitionId", target = "processInstance.processDefinitionId"),
             @Mapping(source = "user.nickname", target = "processInstance.startUserNickname")
     })
-    BpmTaskDonePageItemRespVO convert(HistoricTaskInstance task, HistoricProcessInstance processInstance, SysUserDO user);
+    BpmTaskDonePageItemRespVO convert(HistoricTaskInstance task, BpmTaskExtDO taskExtDO, HistoricProcessInstance processInstance, SysUserDO user);
 
     @Mappings({
             @Mapping(source = "id", target = "taskId"),

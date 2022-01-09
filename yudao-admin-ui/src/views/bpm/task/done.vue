@@ -18,10 +18,29 @@
 
     <!-- 列表 -->
     <el-table v-loading="loading" :data="list">
-      <el-table-column label="任务编号" align="center" prop="id" width="300" />
-      <el-table-column label="任务名称" align="center" prop="name" />
-      <el-table-column label="所属流程" align="center" prop="processInstance.name" />
+      <el-table-column label="任务编号" align="center" prop="id" width="320" fixed />
+      <el-table-column label="任务名称" align="center" prop="name" width="200" />
+      <el-table-column label="所属流程" align="center" prop="processInstance.name" width="200" />
       <el-table-column label="流程发起人" align="center" prop="processInstance.startUserNickname" />
+      <el-table-column label="结果" align="center" prop="result">
+        <template slot-scope="scope">
+          <span>
+            <el-tag type="primary" v-if="scope.row.result === 1"> <!-- 进行中 -->
+              {{ getDictDataLabel(DICT_TYPE.BPM_PROCESS_INSTANCE_RESULT, scope.row.result) }}
+            </el-tag>
+             <el-tag type="success" v-if="scope.row.result === 2"> <!-- 通过 -->
+              {{ getDictDataLabel(DICT_TYPE.BPM_PROCESS_INSTANCE_RESULT, scope.row.result) }}
+            </el-tag>
+             <el-tag type="danger" v-if="scope.row.result === 3"> <!-- 不通过 -->
+              {{ getDictDataLabel(DICT_TYPE.BPM_PROCESS_INSTANCE_RESULT, scope.row.result) }}
+            </el-tag>
+             <el-tag type="info" v-if="scope.row.result === 4"> <!-- 撤回 -->
+              {{ getDictDataLabel(DICT_TYPE.BPM_PROCESS_INSTANCE_RESULT, scope.row.result) }}
+            </el-tag>
+          </span>
+        </template>
+      </el-table-column>
+      <el-table-column label="审批意见" align="center" prop="comment" width="200" />
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
@@ -32,8 +51,13 @@
           <span>{{ parseTime(scope.row.endTime) }}</span>
         </template>
       </el-table-column>
+      <el-table-column label="耗时" align="center" prop="durationInMillis" width="180">
+        <template slot-scope="scope">
+          <span>{{ getDateStar(scope.row.durationInMillis) }}</span>
+        </template>
+      </el-table-column>
       <!-- TODO 耗时 -->
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" fixed="right" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <!-- TODO 权限、颜色 -->
           <el-button size="mini" type="text" icon="el-icon-edit">详情</el-button>
@@ -49,6 +73,7 @@
 
 <script>
 import {getDoneTaskPage} from '@/api/bpm/task'
+import {getDate} from "@/utils/dateUtils";
 
 export default {
   name: "Done",
@@ -100,6 +125,9 @@ export default {
       this.resetForm("queryForm");
       this.handleQuery();
     },
+    getDateStar(ms) {
+      return getDate(ms);
+    }
   }
 };
 </script>

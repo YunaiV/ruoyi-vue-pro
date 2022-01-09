@@ -47,6 +47,7 @@ import java.util.*;
 
 import static cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants.*;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 
 /**
@@ -147,6 +148,9 @@ public class BpmTaskServiceImpl implements BpmTaskService {
             return PageResult.empty(taskQuery.count());
         }
 
+        // 获得 TaskExtDO Map
+        List<BpmTaskExtDO> bpmTaskExtDOs = taskExtMapper.selectListByTaskIds(convertSet(tasks, HistoricTaskInstance::getId));
+        Map<String, BpmTaskExtDO> bpmTaskExtDOMap = convertMap(bpmTaskExtDOs, BpmTaskExtDO::getTaskId);
         // 获得 ProcessInstance Map
         Map<String, HistoricProcessInstance> historicProcessInstanceMap = processInstanceService.getHistoricProcessInstanceMap(
                 convertSet(tasks, HistoricTaskInstance::getProcessInstanceId));
@@ -154,7 +158,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         Map<Long, SysUserDO> userMap = userService.getUserMap(
                 convertSet(historicProcessInstanceMap.values(), instance -> Long.valueOf(instance.getStartUserId())));
         // 拼接结果
-        return new PageResult<>(BpmTaskConvert.INSTANCE.convertList2(tasks, historicProcessInstanceMap, userMap),
+        return new PageResult<>(BpmTaskConvert.INSTANCE.convertList2(tasks, bpmTaskExtDOMap, historicProcessInstanceMap, userMap),
                 taskQuery.count());
     }
 

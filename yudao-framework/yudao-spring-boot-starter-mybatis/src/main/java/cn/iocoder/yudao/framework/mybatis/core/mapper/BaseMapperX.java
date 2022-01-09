@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -42,6 +43,10 @@ public interface BaseMapperX<T> extends BaseMapper<T> {
 
     default List<T> selectList(String field, Object value) {
         return selectList(new QueryWrapper<T>().eq(field, value));
+    }
+
+    default List<T> selectList(String field, Collection<?> values) {
+        return selectList(new QueryWrapper<T>().in(field, values));
     }
 
 }
