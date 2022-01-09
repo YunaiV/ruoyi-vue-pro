@@ -144,13 +144,13 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         }
 
         // 获得 ProcessInstance Map
-        Map<String, ProcessInstance> processInstanceMap = processInstanceService.getProcessInstanceMap(
+        Map<String, HistoricProcessInstance> historicProcessInstanceMap = processInstanceService.getHistoricProcessInstanceMap(
                 convertSet(tasks, HistoricTaskInstance::getProcessInstanceId));
         // 获得 User Map
         Map<Long, SysUserDO> userMap = userService.getUserMap(
-                convertSet(processInstanceMap.values(), instance -> Long.valueOf(instance.getStartUserId())));
+                convertSet(historicProcessInstanceMap.values(), instance -> Long.valueOf(instance.getStartUserId())));
         // 拼接结果
-        return new PageResult<>(BpmTaskConvert.INSTANCE.convertList2(tasks, processInstanceMap, userMap),
+        return new PageResult<>(BpmTaskConvert.INSTANCE.convertList2(tasks, historicProcessInstanceMap, userMap),
                 taskQuery.count());
     }
 

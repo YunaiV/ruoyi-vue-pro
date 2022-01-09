@@ -27,20 +27,16 @@
           <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="状态" align="center" prop="version" width="80">
+      <el-table-column label="审批时间" align="center" prop="endTime" width="180">
         <template slot-scope="scope">
-          <el-tag type="success" v-if="scope.row.suspensionState === 1">激活</el-tag>
-          <el-tag type="warning" v-if="scope.row.suspensionState === 2">挂起</el-tag>
+          <span>{{ parseTime(scope.row.endTime) }}</span>
         </template>
       </el-table-column>
+      <!-- TODO 耗时 -->
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <!-- TODO 权限、颜色 -->
-          <el-button size="mini" type="text" icon="el-icon-edit">审批</el-button>
-          <el-button size="mini" type="text" icon="el-icon-edit" @click="audit(scope.row, true)">通过</el-button>
-          <el-button size="mini" type="text" icon="el-icon-edit"  @click="audit(scope.row, false)">不通过</el-button>
-          <el-button size="mini" type="text" icon="el-icon-edit" v-if="scope.row.suspensionState === 2">激活</el-button>
-          <el-button size="mini" type="text" icon="el-icon-edit" v-if="scope.row.suspensionState === 1">挂起</el-button>
+          <el-button size="mini" type="text" icon="el-icon-edit">详情</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -52,10 +48,10 @@
 </template>
 
 <script>
-import {approveTask, getTodoTaskPage, rejectTask} from '@/api/bpm/task'
+import {getDoneTaskPage} from '@/api/bpm/task'
 
 export default {
-  name: "Todo",
+  name: "Done",
   components: {
   },
   data() {
@@ -87,7 +83,7 @@ export default {
       // 处理查询参数
       let params = {...this.queryParams};
       this.addBeginAndEndTime(params, this.dateRangeCreateTime, 'createTime');
-      getTodoTaskPage(params).then(response => {
+      getDoneTaskPage(params).then(response => {
         this.list = response.data.list;
         this.total = response.data.total;
         this.loading = false;
@@ -104,19 +100,6 @@ export default {
       this.resetForm("queryForm");
       this.handleQuery();
     },
-    audit(row, pass) {
-      if (pass) {
-        approveTask({
-          id: row.id,
-          comment: '通过'
-        })
-      } else {
-        rejectTask({
-          id: row.id,
-          comment: '不通过'
-        })
-      }
-    }
   }
 };
 </script>

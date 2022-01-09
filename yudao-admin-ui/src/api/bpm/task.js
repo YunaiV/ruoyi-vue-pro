@@ -8,6 +8,14 @@ export function getTodoTaskPage(query) {
   })
 }
 
+export function getDoneTaskPage(query) {
+  return request({
+    url: '/bpm/task/done-page',
+    method: 'get',
+    params: query
+  })
+}
+
 export function completeTask(data) {
   return request({
     url: '/bpm/task/complete',

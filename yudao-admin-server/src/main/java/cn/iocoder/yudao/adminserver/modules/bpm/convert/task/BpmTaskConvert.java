@@ -6,6 +6,7 @@ import cn.iocoder.yudao.adminserver.modules.bpm.controller.task.vo.task.TaskStep
 import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.user.SysUserDO;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import org.activiti.engine.history.HistoricActivityInstance;
+import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.impl.persistence.entity.SuspensionState;
 import org.activiti.engine.runtime.ProcessInstance;
@@ -64,10 +65,10 @@ public interface BpmTaskConvert {
     }
 
     default List<BpmTaskDonePageItemRespVO> convertList2(List<HistoricTaskInstance> tasks,
-                                                         Map<String, ProcessInstance> processInstanceMap,
+                                                         Map<String, HistoricProcessInstance> historicProcessInstanceMap,
                                                          Map<Long, SysUserDO> userMap) {
         return CollectionUtils.convertList(tasks, task -> {
-            ProcessInstance processInstance = processInstanceMap.get(task.getProcessInstanceId());
+            HistoricProcessInstance processInstance = historicProcessInstanceMap.get(task.getProcessInstanceId());
             return convert(task, processInstance, userMap.get(Long.valueOf(processInstance.getStartUserId())));
         });
     }
@@ -85,6 +86,6 @@ public interface BpmTaskConvert {
             @Mapping(source = "processInstance.processDefinitionId", target = "processInstance.processDefinitionId"),
             @Mapping(source = "user.nickname", target = "processInstance.startUserNickname")
     })
-    BpmTaskDonePageItemRespVO convert(HistoricTaskInstance task, ProcessInstance processInstance, SysUserDO user);
+    BpmTaskDonePageItemRespVO convert(HistoricTaskInstance task, HistoricProcessInstance processInstance, SysUserDO user);
 
 }

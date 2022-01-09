@@ -186,8 +186,14 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
      * @param id 流程实例的编号
      * @return 历史的流程实例
      */
-    private HistoricProcessInstance getHistoricProcessInstance(String id) {
+    @Override
+    public HistoricProcessInstance getHistoricProcessInstance(String id) {
         return historyService.createHistoricProcessInstanceQuery().processInstanceId(id).singleResult();
+    }
+
+    @Override
+    public List<HistoricProcessInstance> getHistoricProcessInstances(Set<String> ids) {
+        return historyService.createHistoricProcessInstanceQuery().processInstanceIds(ids).list();
     }
 
 }

@@ -8,6 +8,7 @@ import cn.iocoder.yudao.adminserver.modules.bpm.enums.task.BpmProcessInstanceDel
 import cn.iocoder.yudao.adminserver.modules.bpm.enums.task.BpmProcessInstanceResultEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.runtime.ProcessInstance;
 
 import javax.validation.Valid;
@@ -89,6 +90,32 @@ public interface BpmProcessInstanceService {
      */
     default Map<String, ProcessInstance> getProcessInstanceMap(Set<String> ids) {
         return CollectionUtils.convertMap(getProcessInstances(ids), ProcessInstance::getProcessInstanceId);
+    }
+
+    /**
+     * 获得历史的流程实例
+     *
+     * @param id 流程实例的编号
+     * @return 历史的流程实例
+     */
+    HistoricProcessInstance getHistoricProcessInstance(String id);
+
+    /**
+     * 获得历史的流程实例列表
+     *
+     * @param ids 流程实例的编号集合
+     * @return 历史的流程实例列表
+     */
+    List<HistoricProcessInstance> getHistoricProcessInstances(Set<String> ids);
+
+    /**
+     * 获得历史的流程实例 Map
+     *
+     * @param ids 流程实例的编号集合
+     * @return 历史的流程实例列表 Map
+     */
+    default Map<String, HistoricProcessInstance> getHistoricProcessInstanceMap(Set<String> ids) {
+        return CollectionUtils.convertMap(getHistoricProcessInstances(ids), HistoricProcessInstance::getId);
     }
 
 }
