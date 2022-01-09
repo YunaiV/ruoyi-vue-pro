@@ -1,15 +1,12 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.service.task.impl;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.lang.Assert;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.task.vo.instance.BpmProcessInstanceCancelReqVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.task.vo.instance.BpmProcessInstanceCreateReqVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.task.vo.instance.BpmProcessInstanceMyPageReqVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.task.vo.instance.BpmProcessInstancePageItemRespVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.convert.task.BpmProcessInstanceConvert;
-import cn.iocoder.yudao.adminserver.modules.bpm.convert.task.BpmTaskConvert;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.task.BpmProcessInstanceExtDO;
-import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.task.BpmTaskExtDO;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.mysql.task.BpmProcessInstanceExtMapper;
 import cn.iocoder.yudao.adminserver.modules.bpm.enums.task.BpmProcessInstanceDeleteReasonEnum;
 import cn.iocoder.yudao.adminserver.modules.bpm.enums.task.BpmProcessInstanceResultEnum;
@@ -18,15 +15,11 @@ import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmProcessDef
 import cn.iocoder.yudao.adminserver.modules.bpm.service.task.BpmProcessInstanceService;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.task.BpmTaskService;
 import cn.iocoder.yudao.adminserver.modules.system.service.user.SysUserService;
-import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.user.SysUserDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.RuntimeService;
-import org.activiti.engine.TaskService;
 import org.activiti.engine.history.HistoricProcessInstance;
-import org.activiti.engine.history.HistoricProcessInstanceQuery;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
@@ -37,7 +30,6 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import java.util.*;
-import java.util.function.Consumer;
 
 import static cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants.*;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -93,9 +85,6 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         ProcessInstance instance = runtimeService.startProcessInstanceById(createReqVO.getProcessDefinitionId(), variables);
         // 设置流程名字
         runtimeService.setProcessInstanceName(instance.getId(), definition.getName());
-        // 更新流程实例拓展表的 category TODO 芋艿：暂时没好的办法，task 的 category 不正确。另外，definition 返回的 category 也不太正确，后续在解决；
-        processInstanceExtMapper.updateByProcessInstanceId(new BpmProcessInstanceExtDO()
-                .setProcessInstanceId(instance.getId()).setCategory(definition.getCategory()));
 
         // TODO 芋艿：临时使用, 保证分配
         List<Task> tasks = taskService.getTasksByProcessInstanceId(instance.getId());
@@ -194,7 +183,11 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
 
     @Override
     public void createProcessInstanceExt(org.activiti.api.process.model.ProcessInstance instance) {
+        // 获得流程定义
+        ProcessDefinition definition = processDefinitionService.getProcessDefinition2(instance.getProcessDefinitionId());
+        // 插入 BpmProcessInstanceExtDO 对象
         BpmProcessInstanceExtDO instanceExtDO = BpmProcessInstanceConvert.INSTANCE.convert(instance)
+                .setCategory(definition.getCategory())
                 .setStatus(BpmProcessInstanceStatusEnum.RUNNING.getStatus())
                 .setResult(BpmProcessInstanceResultEnum.PROCESS.getResult());
         processInstanceExtMapper.insert(instanceExtDO);

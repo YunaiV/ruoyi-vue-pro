@@ -46,19 +46,4 @@ public class BpmTaskEventListener<T extends TaskRuntimeEvent<? extends Task>>
         taskService.updateTaskExt(event.getEntity());
     }
 
-//    // Task 创建时，插入拓展表
-//        if (event.getType() == ActivitiEventType.TASK_CREATED) {
-//        System.out.println(event);
-//        return;
-//    }
-//
-//        if (event.getType() == ActivitiEventType.TASK_COMPLETED) {
-//        System.out.println(event);
-//        // 不处理；
-//    } else if (event.getType() == ActivitiEventType.ENTITY_DELETED) {
-//        // 假设是
-//        System.out.println(event);
-//    }
-//        System.out.println(event);
-
 }

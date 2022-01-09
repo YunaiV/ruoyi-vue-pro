@@ -396,6 +396,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
 
     @Override
     public void createTaskExt(org.activiti.api.task.model.Task task) {
+        // 插入 BpmTaskExtDO 记录
         BpmTaskExtDO taskExtDO = BpmTaskConvert.INSTANCE.convert(task)
                 .setResult(BpmProcessInstanceResultEnum.PROCESS.getResult());
         taskExtMapper.insert(taskExtDO);
