@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.adminserver.modules.bpm.service.model;
+package cn.iocoder.yudao.adminserver.modules.bpm.service.definition;
 
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.model.vo.*;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;

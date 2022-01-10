@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.adminserver.modules.bpm.service.model.dto;
+package cn.iocoder.yudao.adminserver.modules.bpm.service.definition.dto;
 
 import lombok.Data;
 

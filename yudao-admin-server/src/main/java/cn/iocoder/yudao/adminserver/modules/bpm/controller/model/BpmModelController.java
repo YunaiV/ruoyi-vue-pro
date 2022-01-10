@@ -2,7 +2,7 @@ package cn.iocoder.yudao.adminserver.modules.bpm.controller.model;
 
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.model.vo.*;
 import cn.iocoder.yudao.adminserver.modules.bpm.convert.model.BpmModelConvert;
-import cn.iocoder.yudao.adminserver.modules.bpm.service.model.BpmModelService;
+import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmModelService;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.io.IoUtils;

@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.adminserver.modules.bpm.service.model.impl;
+package cn.iocoder.yudao.adminserver.modules.bpm.service.definition.impl;
 
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.model.vo.*;
@@ -7,8 +7,8 @@ import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.form.BpmFormDO;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmProcessDefinitionService;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.dto.BpmDefinitionCreateReqDTO;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.form.BpmFormService;
-import cn.iocoder.yudao.adminserver.modules.bpm.service.model.BpmModelService;
-import cn.iocoder.yudao.adminserver.modules.bpm.service.model.dto.BpmModelMetaInfoRespDTO;
+import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmModelService;
+import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.dto.BpmModelMetaInfoRespDTO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
@@ -30,8 +30,6 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamReader;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -216,11 +214,11 @@ public class BpmModelServiceImpl implements BpmModelService {
         }
     }
 
-//    public static void main(String[] args) {
-//        // 创建转换对象
-//        BpmnXMLConverter converter = new BpmnXMLConverter();
-//        BpmnModel bpmnModel = converter.convertToBpmnModel(new StringStreamSource(""), true, true);
-//        bpmnModel.getProcesses()
-//    }
+    public static void main(String[] args) {
+        // 创建转换对象
+        BpmnXMLConverter converter = new BpmnXMLConverter();
+        BpmnModel bpmnModel = converter.convertToBpmnModel(new StringStreamSource(""), true, true);
+        bpmnModel.getProcesses().get(0).getId()
+    }
 
 }
