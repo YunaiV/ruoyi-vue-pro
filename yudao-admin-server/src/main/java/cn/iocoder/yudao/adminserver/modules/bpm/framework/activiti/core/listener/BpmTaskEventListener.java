@@ -1,10 +1,14 @@
-package cn.iocoder.yudao.adminserver.modules.bpm.service.task.listener;
+package cn.iocoder.yudao.adminserver.modules.bpm.framework.activiti.core.listener;
 
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.task.BpmTaskExtDO;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.task.BpmTaskService;
+import org.activiti.api.model.shared.event.RuntimeEvent;
+import org.activiti.api.process.model.ProcessInstance;
+import org.activiti.api.process.model.events.ProcessRuntimeEvent;
 import org.activiti.api.task.model.Task;
 import org.activiti.api.task.model.events.TaskRuntimeEvent;
 import org.activiti.api.task.runtime.events.listener.TaskEventListener;
+import org.activiti.api.task.runtime.events.listener.TaskRuntimeEventListener;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
@@ -16,15 +20,22 @@ import javax.annotation.Resource;
  * @author 芋道源码
  */
 @Component
-public class BpmTaskEventListener<T extends TaskRuntimeEvent<? extends Task>>
-        implements TaskEventListener<T> {
+public class BpmTaskEventListener<T extends RuntimeEvent<?, ?>>
+        implements TaskRuntimeEventListener<T> {
 
     @Resource
     @Lazy // 解决循环依赖
     private BpmTaskService taskService;
 
     @Override
-    public void onEvent(T event) {
+    @SuppressWarnings("unchecked")
+    public void onEvent(T rawEvent) {
+        // 由于 TaskRuntimeEventListener 无法保证只监听 TaskRuntimeEvent 事件，所以通过这样的方式
+        if (!(rawEvent instanceof TaskRuntimeEvent)) {
+            return;
+        }
+        TaskRuntimeEvent<Task> event = (TaskRuntimeEvent<Task>) rawEvent;
+
         // 创建时，插入拓展表
         if (event.getEventType() == TaskRuntimeEvent.TaskEvents.TASK_CREATED) {
             taskService.createTaskExt(event.getEntity());

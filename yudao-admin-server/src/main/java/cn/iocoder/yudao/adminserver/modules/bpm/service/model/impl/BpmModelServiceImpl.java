@@ -15,8 +15,11 @@ import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.object.PageUtils;
 import cn.iocoder.yudao.framework.common.util.validation.ValidationUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.activiti.bpmn.converter.BpmnXMLConverter;
+import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.impl.persistence.entity.SuspensionState;
+import org.activiti.engine.impl.util.io.StringStreamSource;
 import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.Model;
 import org.activiti.engine.repository.ModelQuery;
@@ -27,6 +30,8 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamReader;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -210,5 +215,12 @@ public class BpmModelServiceImpl implements BpmModelService {
             throw exception(MODEL_KEY_VALID);
         }
     }
+
+//    public static void main(String[] args) {
+//        // 创建转换对象
+//        BpmnXMLConverter converter = new BpmnXMLConverter();
+//        BpmnModel bpmnModel = converter.convertToBpmnModel(new StringStreamSource(""), true, true);
+//        bpmnModel.getProcesses()
+//    }
 
 }

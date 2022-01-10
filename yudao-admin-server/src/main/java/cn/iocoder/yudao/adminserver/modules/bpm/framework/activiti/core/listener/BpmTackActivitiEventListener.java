@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.adminserver.modules.bpm.service.task.listener;
+package cn.iocoder.yudao.adminserver.modules.bpm.framework.activiti.core.listener;
 
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmProcessDefinitionService;
