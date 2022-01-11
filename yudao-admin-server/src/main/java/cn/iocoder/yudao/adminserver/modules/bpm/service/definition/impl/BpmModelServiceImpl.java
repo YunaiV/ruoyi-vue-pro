@@ -9,6 +9,7 @@ import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.dto.BpmDefini
 import cn.iocoder.yudao.adminserver.modules.bpm.service.form.BpmFormService;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmModelService;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.dto.BpmModelMetaInfoRespDTO;
+import cn.iocoder.yudao.framework.activiti.core.util.ActivitiUtils;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
@@ -108,7 +109,7 @@ public class BpmModelServiceImpl implements BpmModelService {
 
     @Override
     @Transactional(rollbackFor = Exception.class) // 因为进行多个 activiti 操作，所以开启事务
-    public String createModel(BpmModelCreateReqVO createReqVO) {
+    public String createModel(BpmModelCreateReqVO createReqVO, String bpmnXml) {
         checkKeyNCName(createReqVO.getKey());
         // 校验流程标识已经存在
         Model keyModel = this.getModelByKey(createReqVO.getKey());
@@ -121,6 +122,8 @@ public class BpmModelServiceImpl implements BpmModelService {
         BpmModelConvert.INSTANCE.copy(model, createReqVO);
         // 保存流程定义
         repositoryService.saveModel(model);
+        // 保存 BPMN XML
+        saveModelBpmnXml(model, bpmnXml);
         return model.getId();
     }
 
@@ -138,7 +141,16 @@ public class BpmModelServiceImpl implements BpmModelService {
         // 更新模型
         repositoryService.saveModel(model);
         // 更新 BPMN XML
-        repositoryService.addModelEditorSource(model.getId(), StrUtil.utf8Bytes(updateReqVO.getBpmnXml()));
+        saveModelBpmnXml(model, updateReqVO.getBpmnXml());
+    }
+
+    private void saveModelBpmnXml(Model model, String bpmnXml) {
+        if (StrUtil.isEmpty(bpmnXml)) {
+            return;
+        }
+        byte[] bpmnBytes = ActivitiUtils.replaceBpmnMainProcessIdAndName(bpmnXml,
+                model.getKey(), model.getName());
+        repositoryService.addModelEditorSource(model.getId(), bpmnBytes);
     }
 
     @Override
@@ -211,11 +223,10 @@ public class BpmModelServiceImpl implements BpmModelService {
         }
     }
 
-//    public static void main(String[] args) {
-//        // 创建转换对象
-//        BpmnXMLConverter converter = new BpmnXMLConverter();
-//        BpmnModel bpmnModel = converter.convertToBpmnModel(new StringStreamSource(""), true, true);
-//        bpmnModel.getProcesses().get(0).getId()
-//    }
+    public static void main(String[] args) {
+        // 创建转换对象
+        BpmnXMLConverter converter = new BpmnXMLConverter();
+        BpmnModel bpmnModel = converter.convertToBpmnModel(new StringStreamSource(""), true, true);
+    }
 
 }

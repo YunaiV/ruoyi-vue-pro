@@ -307,7 +307,7 @@ export default {
           return;
         }
         createModel(this.form).then(response => {
-          this.msgSuccess("新增成功");
+          this.msgSuccess("新建流程模型成功");
           this.open = false;
           this.getList();
         });
@@ -404,7 +404,7 @@ export default {
       // 重置表单
       this.uploadClose();
       // 提示，并刷新
-      this.msgSuccess("上传成功！请点击【设计流程】按钮，进行编辑保存后，才可以进行【发布流程】");
+      this.msgSuccess("导入流程模型成功");
       this.getList();
     },
     uploadClose() {

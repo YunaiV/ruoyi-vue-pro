@@ -47,7 +47,7 @@ public class BpmModelController {
     @ApiOperation(value = "新建模型")
     @PreAuthorize("@ss.hasPermission('bpm:model:create')")
     public CommonResult<String> createModel(@Valid @RequestBody BpmModelCreateReqVO createRetVO) {
-        return success(bpmModelService.createModel(createRetVO));
+        return success(bpmModelService.createModel(createRetVO, null));
     }
 
     @PostMapping("/import")
@@ -56,8 +56,8 @@ public class BpmModelController {
     public CommonResult<String> importModel(@Valid BpmModeImportReqVO importReqVO) throws IOException {
         BpmModelCreateReqVO createReqVO = BpmModelConvert.INSTANCE.convert(importReqVO);
         // 读取文件
-//        createReqVO.setBpmnXml(IoUtils.readUtf8(importReqVO.getBpmnFile().getInputStream(), false));
-        return success(bpmModelService.createModel(createReqVO));
+        String bpmnXml = IoUtils.readUtf8(importReqVO.getBpmnFile().getInputStream(), false);
+        return success(bpmModelService.createModel(createReqVO, bpmnXml));
     }
 
     @PutMapping("/update")
