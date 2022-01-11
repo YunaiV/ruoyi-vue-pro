@@ -149,7 +149,7 @@ public class BpmModelServiceImpl implements BpmModelService {
         if (StrUtil.isEmpty(bpmnXml)) {
             return;
         }
-        repositoryService.addModelEditorSource(model.getId(), bpmnXml.getBytes(StandardCharsets.UTF_8));
+        repositoryService.addModelEditorSource(model.getId(), StrUtil.utf8Bytes(bpmnXml));
     }
 
     @Override

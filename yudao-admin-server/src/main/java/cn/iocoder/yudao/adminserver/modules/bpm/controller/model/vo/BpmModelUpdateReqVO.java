@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.controller.model.vo;
 
+import cn.iocoder.yudao.adminserver.modules.bpm.enums.definition.BpmModelFormTypeEnum;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -10,9 +11,7 @@ import javax.validation.constraints.NotEmpty;
 
 @ApiModel("流程模型的更新 Request VO")
 @Data
-@EqualsAndHashCode(callSuper = true)
-@ToString(callSuper = true)
-public class BpmModelUpdateReqVO extends BpmModelBaseVO {
+public class BpmModelUpdateReqVO {
 
     @ApiModelProperty(value = "编号", required = true, example = "1024")
     @NotEmpty(message = "编号不能为空")
@@ -27,10 +26,18 @@ public class BpmModelUpdateReqVO extends BpmModelBaseVO {
     @ApiModelProperty(value = "流程分类", notes = "参见 bpm_model_category 数据字典", example = "1")
     private String category;
 
-    @ApiModelProperty(value = "表单编号", example = "1024")
-    private Long formId;
-
     @ApiModelProperty(value = "BPMN XML", required = true)
     private String bpmnXml;
+
+    @ApiModelProperty(value = "表单类型", notes = "参见 bpm_model_form_type 数据字典", example = "1")
+    private Integer formType;
+    @ApiModelProperty(value = "表单编号", example = "1024", notes = "在表单类型为 {@link BpmModelFormTypeEnum#CUSTOM} 时，必须非空")
+    private Long formId;
+    @ApiModelProperty(value = "自定义表单的提交路径，使用 Vue 的路由地址", example = "/bpm/oa/leave/create",
+            notes = "在表单类型为 {@link BpmModelFormTypeEnum#CUSTOM} 时，必须非空")
+    private String formCustomCreatePath;
+    @ApiModelProperty(value = "自定义表单的查看路径，使用 Vue 的路由地址", example = "/bpm/oa/leave/view",
+            notes = "在表单类型为 {@link BpmModelFormTypeEnum#CUSTOM} 时，必须非空")
+    private String formCustomViewPath;
 
 }

@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.convert.model;
 
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.model.vo.*;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.form.BpmFormDO;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.dto.BpmDefinitionCreateReqDTO;
@@ -15,10 +16,11 @@ import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 
 /**
- * 流程定义 Convert
+ * 流程模型 Convert
  *
  * @author yunlongn
  */
@@ -95,20 +97,34 @@ public interface BpmModelConvert {
     default void copy(Model model, BpmModelCreateReqVO bean) {
         model.setName(bean.getName());
         model.setKey(bean.getKey());
-        model.setMetaInfo(JsonUtils.toJsonString(this.buildMetaInfo(bean.getDescription(), null)));
+        model.setMetaInfo(buildMetaInfoStr(null, bean.getDescription(), null, null,
+                null, null));
     }
 
     default void copy(Model model, BpmModelUpdateReqVO bean) {
         model.setName(bean.getName());
         model.setCategory(bean.getCategory());
-        model.setMetaInfo(JsonUtils.toJsonString(this.buildMetaInfo(bean.getDescription(), bean.getFormId())));
+        model.setMetaInfo(buildMetaInfoStr(JsonUtils.parseObject(model.getMetaInfo(), BpmModelMetaInfoRespDTO.class),
+                bean.getDescription(), bean.getFormType(), bean.getFormId(),
+                bean.getFormCustomCreatePath(), bean.getFormCustomViewPath()));
     }
 
-    default BpmModelMetaInfoRespDTO buildMetaInfo(String description, Long formId) {
-        BpmModelMetaInfoRespDTO metaInfo = new BpmModelMetaInfoRespDTO();
-        metaInfo.setDescription(description);
-        metaInfo.setFormId(formId);
-        return metaInfo;
+    default String buildMetaInfoStr(BpmModelMetaInfoRespDTO metaInfo, String description, Integer formType,
+                                    Long formId, String formCustomCreatePath, String formCustomViewPath) {
+        if (metaInfo == null) {
+            metaInfo = new BpmModelMetaInfoRespDTO();
+        }
+        // 只有非空，才进行设置，避免更新时的覆盖
+        if (StrUtil.isNotEmpty(description)) {
+            metaInfo.setDescription(description);
+        }
+        if (Objects.nonNull(formType)) {
+            metaInfo.setFormType(formType);
+            metaInfo.setFormId(formId);
+            metaInfo.setFormCustomCreatePath(formCustomCreatePath);
+            metaInfo.setFormCustomViewPath(formCustomViewPath);
+        }
+        return JsonUtils.toJsonString(metaInfo);
     }
 
     BpmModelPageItemRespVO.ProcessDefinition convert(ProcessDefinition bean);

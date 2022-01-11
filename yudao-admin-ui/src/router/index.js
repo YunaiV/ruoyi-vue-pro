@@ -171,8 +171,8 @@ export const constantRoutes = [
       {
         path: 'manager/model/edit',
         component: (resolve) => require(['@/views/bpm/model/modelEditor'], resolve),
-        name: '流程模型-编辑',
-        meta: { title: '流程模型-编辑' }
+        name: '设计流程',
+        meta: { title: '设计流程' }
       }
     ]
   },
