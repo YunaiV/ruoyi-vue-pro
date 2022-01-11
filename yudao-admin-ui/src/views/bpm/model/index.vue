@@ -137,18 +137,18 @@
               </el-radio>
             </el-radio-group>
           </el-form-item>
-          <el-form-item v-if="form.formType === 10" label="流程表单" prop="formId" required error="流程表单不能为空">
+          <el-form-item v-if="form.formType === 10" label="流程表单" prop="formId">
             <el-select v-model="form.formId" clearable style="width: 100%">
               <el-option v-for="form in forms" :key="form.id" :label="form.name" :value="form.id"/>
             </el-select>
           </el-form-item>
-          <el-form-item v-if="form.formType === 20" label="表单提交路由" prop="formCustomCreatePath" required error="表单提交路由不能为空">
+          <el-form-item v-if="form.formType === 20" label="表单提交路由" prop="formCustomCreatePath" >
             <el-input v-model="form.formCustomCreatePath" placeholder="请输入表单提交路由" style="width: 330px;" />
             <el-tooltip class="item" effect="light" content="自定义表单的提交路径，使用 Vue 的路由地址，例如说：bpm/oa/leave/create" placement="top">
               <i style="padding-left: 5px;" class="el-icon-question" />
             </el-tooltip>
           </el-form-item>
-          <el-form-item v-if="form.formType === 20" label="表单查看路由" prop="formCustomViewPath" required error="表单查看路由不能为空">
+          <el-form-item v-if="form.formType === 20" label="表单查看路由" prop="formCustomViewPath">
             <el-input v-model="form.formCustomViewPath" placeholder="请输入表单查看路由" style="width: 330px;" />
             <el-tooltip class="item" effect="light" content="自定义表单的查看路径，使用 Vue 的路由地址，例如说：bpm/oa/leave/view" placement="top">
               <i style="padding-left: 5px;" class="el-icon-question" />
@@ -257,6 +257,9 @@ export default {
         key: [{ required: true, message: "流程标识不能为空", trigger: "blur" }],
         name: [{ required: true, message: "流程名称不能为空", trigger: "blur" }],
         formType: [{ required: true, message: "流程名称不能为空", trigger: "blur" }],
+        formId: [{ required: true, message: "业务表单不能为空", trigger: "blur" }],
+        formCustomCreatePath: [{ required: true, message: "表单提交路由不能为空", trigger: "blur" }],
+        formCustomViewPath: [{ required: true, message: "表单查看路由不能为空", trigger: "blur" }],
       },
 
       // 流程导入参数
@@ -349,7 +352,7 @@ export default {
         ...row
       };
       // 触发一次校验
-      this.$refs["form"].validate();
+      // this.$refs["form"].validate();
     },
     /** 设计按钮操作 */
     handleDesign(row) {
