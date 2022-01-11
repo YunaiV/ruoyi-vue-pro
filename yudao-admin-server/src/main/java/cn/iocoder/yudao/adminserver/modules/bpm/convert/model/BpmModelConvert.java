@@ -12,6 +12,7 @@ import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.Model;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.mapstruct.Mapper;
+import org.mapstruct.MappingTarget;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
@@ -44,18 +45,15 @@ public interface BpmModelConvert {
     default BpmModelPageItemRespVO convert(Model model, BpmFormDO form, Deployment deployment, ProcessDefinition processDefinition) {
         BpmModelPageItemRespVO modelRespVO = new BpmModelPageItemRespVO();
         modelRespVO.setId(model.getId());
-        modelRespVO.setName(model.getName());
-        modelRespVO.setKey(model.getKey());
-        modelRespVO.setCategory(model.getCategory());
         modelRespVO.setCreateTime(model.getCreateTime());
-        BpmModelMetaInfoRespDTO metaInfo = JsonUtils.parseObject(model.getMetaInfo(), BpmModelMetaInfoRespDTO.class);
-        if (metaInfo != null) {
-            modelRespVO.setDescription(metaInfo.getDescription());
-        }
+        // 通用 copy
+        copyTo(model, modelRespVO);
+        // Form
         if (form != null) {
             modelRespVO.setFormId(form.getId());
             modelRespVO.setFormName(form.getName());
         }
+        // ProcessDefinition
         modelRespVO.setProcessDefinition(this.convert(processDefinition));
         if (modelRespVO.getProcessDefinition() != null) {
             modelRespVO.getProcessDefinition().setSuspensionState(processDefinition.isSuspended() ?
@@ -68,17 +66,22 @@ public interface BpmModelConvert {
     default BpmModelRespVO convert(Model model) {
         BpmModelRespVO modelRespVO = new BpmModelRespVO();
         modelRespVO.setId(model.getId());
-        modelRespVO.setName(model.getName());
-        modelRespVO.setKey(model.getKey());
-        modelRespVO.setCategory(model.getCategory());
         modelRespVO.setCreateTime(model.getCreateTime());
-        BpmModelMetaInfoRespDTO metaInfo = JsonUtils.parseObject(model.getMetaInfo(), BpmModelMetaInfoRespDTO.class);
-        if (metaInfo != null) {
-            modelRespVO.setFormId(metaInfo.getFormId());
-            modelRespVO.setDescription(metaInfo.getDescription());
-        }
+        // 通用 copy
+        copyTo(model, modelRespVO);
         return modelRespVO;
     }
+
+    default void copyTo(Model model, BpmModelBaseVO to) {
+        to.setName(model.getName());
+        to.setKey(model.getKey());
+        to.setCategory(model.getCategory());
+        // metaInfo
+        BpmModelMetaInfoRespDTO metaInfo = JsonUtils.parseObject(model.getMetaInfo(), BpmModelMetaInfoRespDTO.class);
+        copyTo(metaInfo, to);
+    }
+
+    void copyTo(BpmModelMetaInfoRespDTO from, @MappingTarget BpmModelBaseVO to);
 
     default BpmDefinitionCreateReqDTO convert2(Model model) {
         BpmDefinitionCreateReqDTO createReqDTO = new BpmDefinitionCreateReqDTO();

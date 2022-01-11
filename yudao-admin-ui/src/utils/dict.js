@@ -36,6 +36,7 @@ export const DICT_TYPE = {
 
   // bpm
   BPM_MODEL_CATEGORY: 'bpm_model_category',
+  BPM_MODEL_FORM_TYPE: 'bpm_model_form_type',
   BPM_PROCESS_INSTANCE_STATUS: 'bpm_process_instance_status',
   BPM_PROCESS_INSTANCE_RESULT: 'bpm_process_instance_result',
   OA_LEAVE_STATUS: 'flow_status',

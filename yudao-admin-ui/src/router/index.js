@@ -169,7 +169,7 @@ export const constantRoutes = [
     hidden: true,
     children: [
       {
-        path: 'manager/model/edit',
+        path: 'manager/model/design',
         component: (resolve) => require(['@/views/bpm/model/modelEditor'], resolve),
         name: '设计流程',
         meta: { title: '设计流程' }
