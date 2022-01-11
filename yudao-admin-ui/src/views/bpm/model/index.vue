@@ -404,7 +404,7 @@ export default {
       // 重置表单
       this.uploadClose();
       // 提示，并刷新
-      this.msgSuccess("导入流程模型成功");
+      this.msgSuccess("导入流程模型成功！请点击【设计流程】按钮，进行编辑保存后，才可以进行【发布流程】");
       this.getList();
     },
     uploadClose() {

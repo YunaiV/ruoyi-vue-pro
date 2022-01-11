@@ -31,6 +31,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
+import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -148,9 +149,7 @@ public class BpmModelServiceImpl implements BpmModelService {
         if (StrUtil.isEmpty(bpmnXml)) {
             return;
         }
-        byte[] bpmnBytes = ActivitiUtils.replaceBpmnMainProcessIdAndName(bpmnXml,
-                model.getKey(), model.getName());
-        repositoryService.addModelEditorSource(model.getId(), bpmnBytes);
+        repositoryService.addModelEditorSource(model.getId(), bpmnXml.getBytes(StandardCharsets.UTF_8));
     }
 
     @Override
