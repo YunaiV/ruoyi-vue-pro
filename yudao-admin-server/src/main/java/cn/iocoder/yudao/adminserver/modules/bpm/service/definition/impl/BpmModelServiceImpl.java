@@ -1,15 +1,14 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.service.definition.impl;
 
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.model.vo.*;
-import cn.iocoder.yudao.adminserver.modules.bpm.convert.model.BpmModelConvert;
-import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.form.BpmFormDO;
+import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.model.*;
+import cn.iocoder.yudao.adminserver.modules.bpm.convert.definition.BpmModelConvert;
+import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.definition.BpmFormDO;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmProcessDefinitionService;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.dto.BpmDefinitionCreateReqDTO;
-import cn.iocoder.yudao.adminserver.modules.bpm.service.form.BpmFormService;
+import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmFormService;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmModelService;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.dto.BpmModelMetaInfoRespDTO;
-import cn.iocoder.yudao.framework.activiti.core.util.ActivitiUtils;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
@@ -31,7 +30,6 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
-import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;

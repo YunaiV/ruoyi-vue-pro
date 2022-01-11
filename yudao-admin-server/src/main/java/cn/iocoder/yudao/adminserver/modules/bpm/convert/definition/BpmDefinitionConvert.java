@@ -1,9 +1,9 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.convert.definition;
 
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.BpmProcessDefinitionPageItemRespVO;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.BpmProcessDefinitionRespVO;
+import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.process.BpmProcessDefinitionPageItemRespVO;
+import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.process.BpmProcessDefinitionRespVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.definition.BpmProcessDefinitionExtDO;
-import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.form.BpmFormDO;
+import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.definition.BpmFormDO;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.dto.BpmDefinitionCreateReqDTO;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import org.activiti.engine.impl.persistence.entity.SuspensionState;
@@ -11,13 +11,11 @@ import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.Mappings;
 import org.mapstruct.Named;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 
 /**
  * Bpm 流程定义的 Convert
