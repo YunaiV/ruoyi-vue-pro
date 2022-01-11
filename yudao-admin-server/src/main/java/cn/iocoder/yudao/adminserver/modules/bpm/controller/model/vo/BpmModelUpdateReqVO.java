@@ -18,8 +18,19 @@ public class BpmModelUpdateReqVO extends BpmModelBaseVO {
     @NotEmpty(message = "编号不能为空")
     private String id;
 
+    @ApiModelProperty(value = "流程名称", example = "芋道")
+    private String name;
+
+    @ApiModelProperty(value = "流程描述", example = "我是描述")
+    private String description;
+
+    @ApiModelProperty(value = "流程分类", notes = "参见 bpm_model_category 数据字典", example = "1")
+    private String category;
+
+    @ApiModelProperty(value = "表单编号", example = "1024")
+    private Long formId;
+
     @ApiModelProperty(value = "BPMN XML", required = true)
-    @NotEmpty(message = "BPMN XML 不能为空")
     private String bpmnXml;
 
 }

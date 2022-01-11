@@ -56,7 +56,7 @@ public class BpmModelController {
     public CommonResult<String> importModel(@Valid BpmModeImportReqVO importReqVO) throws IOException {
         BpmModelCreateReqVO createReqVO = BpmModelConvert.INSTANCE.convert(importReqVO);
         // 读取文件
-        createReqVO.setBpmnXml(IoUtils.readUtf8(importReqVO.getBpmnFile().getInputStream(), false));
+//        createReqVO.setBpmnXml(IoUtils.readUtf8(importReqVO.getBpmnFile().getInputStream(), false));
         return success(bpmModelService.createModel(createReqVO));
     }
 

@@ -121,15 +121,12 @@ public class BpmModelServiceImpl implements BpmModelService {
         BpmModelConvert.INSTANCE.copy(model, createReqVO);
         // 保存流程定义
         repositoryService.saveModel(model);
-        // 添加 BPMN XML
-        repositoryService.addModelEditorSource(model.getId(), StrUtil.utf8Bytes(createReqVO.getBpmnXml()));
         return model.getId();
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class) // 因为进行多个 activiti 操作，所以开启事务
     public void updateModel(BpmModelUpdateReqVO updateReqVO) {
-        checkKeyNCName(updateReqVO.getKey());
         // 校验流程模型存在
         Model model = repositoryService.getModel(updateReqVO.getId());
         if (model == null) {

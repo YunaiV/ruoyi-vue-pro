@@ -95,8 +95,7 @@ public interface BpmModelConvert {
     default void copy(Model model, BpmModelCreateReqVO bean) {
         model.setName(bean.getName());
         model.setKey(bean.getKey());
-        model.setCategory(bean.getCategory());
-        model.setMetaInfo(JsonUtils.toJsonString(this.buildMetaInfo(bean.getDescription(), bean.getFormId())));
+        model.setMetaInfo(JsonUtils.toJsonString(this.buildMetaInfo(bean.getDescription(), null)));
     }
 
     default void copy(Model model, BpmModelUpdateReqVO bean) {

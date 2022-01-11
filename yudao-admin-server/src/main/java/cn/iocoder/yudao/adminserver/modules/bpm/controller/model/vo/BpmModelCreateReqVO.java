@@ -10,12 +10,17 @@ import javax.validation.constraints.NotEmpty;
 
 @ApiModel("流程模型的创建 Request VO")
 @Data
-@EqualsAndHashCode(callSuper = true)
-@ToString(callSuper = true)
-public class BpmModelCreateReqVO extends BpmModelBaseVO {
+public class BpmModelCreateReqVO {
 
-    @ApiModelProperty(value = "BPMN XML", required = true)
-    @NotEmpty(message = "BPMN XML 不能为空")
-    private String bpmnXml;
+    @ApiModelProperty(value = "流程标识", required = true, example = "process_yudao")
+    @NotEmpty(message = "流程标识不能为空")
+    private String key;
+
+    @ApiModelProperty(value = "流程名称", required = true, example = "芋道")
+    @NotEmpty(message = "流程名称不能为空")
+    private String name;
+
+    @ApiModelProperty(value = "流程描述", example = "我是描述")
+    private String description;
 
 }

@@ -109,50 +109,49 @@
       <my-process-viewer key="designer" v-model="bpmnXML" v-bind="bpmnControlForm" />
     </el-dialog>
 
+    <!-- 对话框(添加) -->
+    <el-dialog title="新建模型" :visible.sync="open" width="500px" append-to-body>
+      <el-form ref="form" :model="form" :rules="rules" label-width="80px">
+        <el-form-item label="流程标识" prop="key">
+          <el-input v-model="form.key" placeholder="请输入流标标识" style="width: 350px;" />
+          <el-tooltip class="item" effect="light" content="新建后，流程标识不可修改！" placement="top">
+            <i style="padding-left: 5px;" class="el-icon-question" />
+          </el-tooltip>
+        </el-form-item>
+        <el-form-item label="流程名称" prop="name">
+          <el-input v-model="form.name" placeholder="请输入流程名称" clearable />
+        </el-form-item>
+        <el-form-item label="流程描述" prop="description">
+          <el-input type="textarea" v-model="form.description" clearable />
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="submitForm">确 定</el-button>
+        <el-button @click="cancel">取 消</el-button>
+      </div>
+    </el-dialog>
+
     <!-- 用户导入对话框 -->
     <el-dialog title="导入流程模型" :visible.sync="upload.open" width="400px" append-to-body>
-      <el-upload
-        ref="upload"
-        :limit="1"
-        accept=".bpmn, .xml"
-        :headers="upload.headers"
-        :action="upload.url"
-        :disabled="upload.isUploading"
-        :on-progress="handleFileUploadProgress"
-        :on-success="handleFileSuccess"
-        :auto-upload="false"
-        name="bpmnFile"
-        :data="upload.form"
-        drag
-      >
+      <el-upload ref="upload" :limit="1" accept=".bpmn, .xml" :headers="upload.headers" :action="upload.url"
+        :disabled="upload.isUploading" :on-progress="handleFileUploadProgress" :on-success="handleFileSuccess"
+        :auto-upload="false" name="bpmnFile" :data="upload.form" drag>
         <i class="el-icon-upload"></i>
         <div class="el-upload__text">
           将文件拖到此处，或
           <em>点击上传</em>
         </div>
         <div class="el-upload__tip" style="color:red" slot="tip">提示：仅允许导入“bpm”或“xml”格式文件！</div>
-
-        <!--        <div class="el-upload__tip" slot="tip">-->
-<!--          流程名称：<el-input v-model="upload.name"/>-->
-<!--          流程分类：<el-input v-model="upload.category"/>-->
-<!--        </div>-->
         <div class="el-upload__tip" slot="tip">
           <el-form ref="uploadForm" size="mini" label-width="90px" :model="upload.form" :rules="upload.rules" @submit.native.prevent>
             <el-form-item label="流程标识" prop="key">
-              <el-input v-model="upload.form.key" placeholder="请输入流标标识" />
+              <el-input v-model="upload.form.key" placeholder="请输入流标标识" style="width: 250px;" />
+              <el-tooltip class="item" effect="light" content="新建后，流程标识不可修改！" placement="top">
+                <i style="padding-left: 5px;" class="el-icon-question" />
+              </el-tooltip>
             </el-form-item>
             <el-form-item label="流程名称" prop="name">
               <el-input v-model="upload.form.name" placeholder="请输入流程名称" clearable />
-            </el-form-item>
-            <el-form-item label="流程分类" prop="category">
-              <el-select v-model="upload.form.category" placeholder="请选择流程分类" clearable style="width: 100%">
-                <el-option v-for="dict in categoryDictDatas" :key="dict.value" :label="dict.label" :value="dict.value"/>
-              </el-select>
-            </el-form-item>
-            <el-form-item label="流程表单" prop="formId">
-              <el-select v-model="upload.form.formId" placeholder="请选择流程表单，非必选哟！" clearable style="width: 100%">
-                <el-option v-for="form in forms" :key="form.id" :label="form.name" :value="form.id"/>
-              </el-select>
             </el-form-item>
             <el-form-item label="流程描述" prop="description">
               <el-input type="textarea" v-model="upload.form.description" clearable />
@@ -169,14 +168,12 @@
 </template>
 
 <script>
-import {deleteModel, deployModel, getModelPage, getModel, updateModelState} from "@/api/bpm/model";
+import {deleteModel, deployModel, getModelPage, getModel, updateModelState, createModel} from "@/api/bpm/model";
 import {DICT_TYPE, getDictDatas} from "@/utils/dict";
 import {getForm, getSimpleForms} from "@/api/bpm/form";
 import {decodeFields} from "@/utils/formGenerator";
 import Parser from '@/components/parser/Parser'
-import {getToken} from "@/utils/auth";
 import {getBaseHeader} from "@/utils/request";
-import {addUser, updateUser} from "@/api/system/user";
 
 export default {
   name: "model",
@@ -212,6 +209,15 @@ export default {
         fields: []
       },
 
+      // 流程表单
+      open: false,
+      form: {},
+      // 表单校验
+      rules: {
+        key: [{ required: true, message: "流程标识不能为空", trigger: "blur" }],
+        name: [{ required: true, message: "流程名称不能为空", trigger: "blur" }],
+      },
+
       // 流程导入参数
       upload: {
         // 是否显示弹出层（用户导入）
@@ -228,7 +234,6 @@ export default {
         rules: {
           key: [{ required: true, message: "流程标识不能为空", trigger: "blur" }],
           name: [{ required: true, message: "流程名称不能为空", trigger: "blur" }],
-          category: [{ required: true, message: "流程分类不能为空", trigger: "blur" }],
         },
       },
       // 流程表单的下拉框的数据
@@ -256,10 +261,19 @@ export default {
         }
       );
     },
+    /** 取消按钮 */
+    cancel() {
+      this.open = false;
+      this.reset();
+    },
     // 表单重置
     reset() {
-      this.bpmnData = {}
-      this.bpmnXML = ""
+      this.form = {
+        key: undefined,
+        name: undefined,
+        description: undefined
+      };
+      this.resetForm("form");
     },
     /** 搜索按钮操作 */
     handleQuery() {
@@ -274,9 +288,8 @@ export default {
     },
     /** 新增按钮操作 */
     handleAdd() {
-      this.$router.push({
-        path:"/bpm/manager/model/edit"
-      });
+      this.reset();
+      this.open = true;
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
@@ -285,6 +298,19 @@ export default {
         query:{
           modelId: row.id
         }
+      });
+    },
+    /** 提交按钮 */
+    submitForm() {
+      this.$refs["form"].validate(valid => {
+        if (!valid) {
+          return;
+        }
+        createModel(this.form).then(response => {
+          this.msgSuccess("新增成功");
+          this.open = false;
+          this.getList();
+        });
       });
     },
     /** 删除按钮操作 */

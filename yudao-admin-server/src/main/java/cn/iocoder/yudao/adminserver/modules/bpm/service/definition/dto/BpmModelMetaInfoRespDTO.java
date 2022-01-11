@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.service.definition.dto;
 
+import cn.iocoder.yudao.adminserver.modules.bpm.enums.definition.BpmModelFormTypeEnum;
 import lombok.Data;
 
 /**
@@ -16,8 +17,23 @@ public class BpmModelMetaInfoRespDTO {
      */
     private String description;
     /**
+     * 表单类型
+     */
+    private Long formType;
+    /**
      * 表单编号
+     * 在表单类型为 {@link BpmModelFormTypeEnum#NORMAL} 时
      */
     private Long formId;
+    /**
+     * 自定义表单的提交路径，使用 Vue 的路由地址
+     * 在表单类型为 {@link BpmModelFormTypeEnum#CUSTOM} 时
+     */
+    private String formCustomSubmitPath;
+    /**
+     * 自定义表单的查看路径，使用 Vue 的路由地址
+     * 在表单类型为 {@link BpmModelFormTypeEnum#CUSTOM} 时
+     */
+    private String formCustomViewPath;
 
 }
