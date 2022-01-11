@@ -1,8 +1,10 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.framework.activiti.core.behavior;
 
 import cn.iocoder.yudao.adminserver.modules.bpm.framework.activiti.core.behavior.BpmUserTaskActivitiBehavior;
+import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmTaskRuleService;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Setter;
 import lombok.ToString;
 import org.activiti.bpmn.model.UserTask;
 import org.activiti.engine.impl.bpmn.behavior.UserTaskActivityBehavior;
@@ -19,9 +21,14 @@ import org.activiti.engine.impl.bpmn.parser.factory.DefaultActivityBehaviorFacto
 @ToString(callSuper = true)
 public class BpmActivityBehaviorFactory extends DefaultActivityBehaviorFactory {
 
+    @Setter
+    private BpmTaskRuleService bpmTaskRuleService;
+
     @Override
     public UserTaskActivityBehavior createUserTaskActivityBehavior(UserTask userTask) {
-        return new BpmUserTaskActivitiBehavior(userTask);
+        BpmUserTaskActivitiBehavior userTaskActivityBehavior = new BpmUserTaskActivitiBehavior(userTask);
+        userTaskActivityBehavior.setBpmTaskRuleService(bpmTaskRuleService);
+        return userTaskActivityBehavior;
     }
 
     // TODO 芋艿：并行任务 ParallelMultiInstanceBehavior

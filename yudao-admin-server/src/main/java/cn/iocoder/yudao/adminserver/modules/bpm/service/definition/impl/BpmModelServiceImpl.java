@@ -214,11 +214,11 @@ public class BpmModelServiceImpl implements BpmModelService {
         }
     }
 
-    public static void main(String[] args) {
-        // 创建转换对象
-        BpmnXMLConverter converter = new BpmnXMLConverter();
-        BpmnModel bpmnModel = converter.convertToBpmnModel(new StringStreamSource(""), true, true);
-        bpmnModel.getProcesses().get(0).getId()
-    }
+//    public static void main(String[] args) {
+//        // 创建转换对象
+//        BpmnXMLConverter converter = new BpmnXMLConverter();
+//        BpmnModel bpmnModel = converter.convertToBpmnModel(new StringStreamSource(""), true, true);
+//        bpmnModel.getProcesses().get(0).getId()
+//    }
 
 }

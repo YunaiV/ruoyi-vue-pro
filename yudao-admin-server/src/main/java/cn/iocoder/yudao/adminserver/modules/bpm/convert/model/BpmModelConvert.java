@@ -80,6 +80,7 @@ public interface BpmModelConvert {
 
     default BpmDefinitionCreateReqDTO convert2(Model model) {
         BpmDefinitionCreateReqDTO createReqDTO = new BpmDefinitionCreateReqDTO();
+        createReqDTO.setModelId(model.getId());
         createReqDTO.setName(model.getName());
         createReqDTO.setKey(model.getKey());
         createReqDTO.setCategory(model.getCategory());

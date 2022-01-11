@@ -2,6 +2,7 @@ package cn.iocoder.yudao.adminserver.modules.bpm.framework.activiti.config;
 
 import cn.iocoder.yudao.adminserver.modules.bpm.framework.activiti.core.behavior.BpmActivityBehaviorFactory;
 import cn.iocoder.yudao.adminserver.modules.bpm.framework.activiti.core.listener.BpmTackActivitiEventListener;
+import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmTaskRuleService;
 import org.activiti.spring.boot.ProcessEngineConfigurationConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -44,8 +45,10 @@ public class BpmActivitiConfiguration {
     }
 
     @Bean
-    public BpmActivityBehaviorFactory bpmActivityBehaviorFactory() {
-        return new BpmActivityBehaviorFactory();
+    public BpmActivityBehaviorFactory bpmActivityBehaviorFactory(BpmTaskRuleService taskRuleService) {
+        BpmActivityBehaviorFactory bpmActivityBehaviorFactory = new BpmActivityBehaviorFactory();
+        bpmActivityBehaviorFactory.setBpmTaskRuleService(taskRuleService);
+        return bpmActivityBehaviorFactory;
     }
 
 }

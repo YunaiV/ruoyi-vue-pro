@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
+import org.activiti.engine.repository.Model;
 import org.activiti.engine.repository.ProcessDefinition;
 
 /**
@@ -33,6 +34,12 @@ public class BpmProcessDefinitionExtDO extends BaseDO {
      * 关联 {@link ProcessDefinition#getId()}
      */
     private String processDefinitionId;
+    /**
+     * 流程模型的编号
+     *
+     * 关联 {@link Model#getId()}
+     */
+    private String modelId;
     /**
      * 描述
      */

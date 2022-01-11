@@ -11,6 +11,11 @@ import javax.validation.constraints.NotEmpty;
 public class BpmDefinitionCreateReqDTO {
 
     /**
+     * 流程模型的编号
+     */
+    @NotEmpty(message = "流程模型编号不能为空")
+    private String modelId;
+    /**
      * 流程标识
      */
     @NotEmpty(message = "流程标识不能为空")

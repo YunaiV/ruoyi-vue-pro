@@ -3,6 +3,7 @@ package cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.definition;
 import cn.iocoder.yudao.adminserver.modules.bpm.enums.definition.BpmTaskRuleScriptEnum;
 import cn.iocoder.yudao.adminserver.modules.bpm.enums.definition.BpmTaskRuleTypeEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.framework.mybatis.core.type.JsonLongSetTypeHandler;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -13,9 +14,14 @@ import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.task.Task;
 
 import java.util.List;
+import java.util.Set;
 
 /**
- * Bpm 任务规则表
+ * Bpm 任务规则表，用于自定义配置每个任务的负责人的分配规则。
+ * 也就是说，废弃 BPMN 原本的 UserTask 设置的 assignee、candidateUsers 等配置，而是通过使用该规则进行计算对应的负责人。
+ *
+ * 1. 默认情况下，{@link #processDefinitionId} 为 {@link #PROCESS_DEFINITION_ID_NULL} 值，表示贵改则与流程模型关联
+ * 2. 在流程模型部署后，会将他的所有规则记录，复制出一份新部署出来的流程定义，通过设置 {@link #processDefinitionId} 为新的流程定义的编号进行关联
  *
  * @author 芋道源码
  */
@@ -27,6 +33,11 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BpmTaskRuleDO extends BaseDO {
+
+    /**
+     * {@link #processDefinitionId} 空串，用于标识属于流程模型，而不属于流程定义
+     */
+    private static final String PROCESS_DEFINITION_ID_NULL = "";
 
     /**
      * 编号
@@ -58,6 +69,7 @@ public class BpmTaskRuleDO extends BaseDO {
      *
      * 枚举 {@link BpmTaskRuleTypeEnum}
      */
+    @TableField("`type`")
     private Integer type;
     /**
      * 规则值数组，一般关联指定表的编号
@@ -70,7 +82,7 @@ public class BpmTaskRuleDO extends BaseDO {
      * 5. {@link BpmTaskRuleTypeEnum#USER_GROUP} 时：用户组编号
      * 6. {@link BpmTaskRuleTypeEnum#SCRIPT} 时：脚本编号，目前通过 {@link BpmTaskRuleScriptEnum#getId()} 标识
      */
-    @TableField(typeHandler = JacksonTypeHandler.class)
-    private List<Long> values;
+    @TableField(typeHandler = JsonLongSetTypeHandler.class)
+    private Set<Long> options;
 
 }
