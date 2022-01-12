@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.service.definition.impl;
 
+import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.model.*;
 import cn.iocoder.yudao.adminserver.modules.bpm.convert.definition.BpmModelConvert;
@@ -9,6 +10,7 @@ import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.dto.BpmDefini
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmFormService;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmModelService;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.dto.BpmModelMetaInfoRespDTO;
+import cn.iocoder.yudao.framework.activiti.core.util.ActivitiUtils;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
@@ -208,6 +210,15 @@ public class BpmModelServiceImpl implements BpmModelService {
 
         // 更新状态
         bpmProcessDefinitionService.updateProcessDefinitionState(definition.getId(), state);
+    }
+
+    @Override
+    public BpmnModel getBpmnModel(String id) {
+        byte[] bpmnBytes = repositoryService.getModelEditorSource(id);
+        if (ArrayUtil.isEmpty(bpmnBytes)) {
+            return null;
+        }
+        return ActivitiUtils.buildBpmnModel(bpmnBytes);
     }
 
     private Model getModelByKey(String key) {

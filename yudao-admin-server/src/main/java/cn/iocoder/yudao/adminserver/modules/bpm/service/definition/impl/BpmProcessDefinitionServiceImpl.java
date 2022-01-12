@@ -6,7 +6,7 @@ import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.process
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.process.BpmProcessDefinitionPageItemRespVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.process.BpmProcessDefinitionPageReqVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.process.BpmProcessDefinitionRespVO;
-import cn.iocoder.yudao.adminserver.modules.bpm.convert.definition.BpmDefinitionConvert;
+import cn.iocoder.yudao.adminserver.modules.bpm.convert.definition.BpmProcessDefinitionConvert;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.definition.BpmProcessDefinitionExtDO;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.definition.BpmFormDO;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.mysql.definition.BpmProcessDefinitionExtMapper;
@@ -90,7 +90,7 @@ public class BpmProcessDefinitionServiceImpl implements BpmProcessDefinitionServ
 
         // 拼接结果
         long definitionCount = definitionQuery.count();
-        return new PageResult<>(BpmDefinitionConvert.INSTANCE.convertList(processDefinitions, deploymentMap,
+        return new PageResult<>(BpmProcessDefinitionConvert.INSTANCE.convertList(processDefinitions, deploymentMap,
                 processDefinitionDOMap, formMap), definitionCount);
     }
 
@@ -112,7 +112,7 @@ public class BpmProcessDefinitionServiceImpl implements BpmProcessDefinitionServ
         Map<String, BpmProcessDefinitionExtDO> processDefinitionDOMap = CollectionUtils.convertMap(processDefinitionDOs,
                 BpmProcessDefinitionExtDO::getProcessDefinitionId);
         // 执行查询，并返回
-        return BpmDefinitionConvert.INSTANCE.convertList3(processDefinitions, processDefinitionDOMap);
+        return BpmProcessDefinitionConvert.INSTANCE.convertList3(processDefinitions, processDefinitionDOMap);
     }
 
     @Override
@@ -196,7 +196,7 @@ public class BpmProcessDefinitionServiceImpl implements BpmProcessDefinitionServ
         }
 
         // 插入拓展表
-        BpmProcessDefinitionExtDO definitionDO = BpmDefinitionConvert.INSTANCE.convert2(createReqDTO)
+        BpmProcessDefinitionExtDO definitionDO = BpmProcessDefinitionConvert.INSTANCE.convert2(createReqDTO)
                 .setProcessDefinitionId(definition.getId());
         processDefinitionMapper.insert(definitionDO);
         return definition.getId();

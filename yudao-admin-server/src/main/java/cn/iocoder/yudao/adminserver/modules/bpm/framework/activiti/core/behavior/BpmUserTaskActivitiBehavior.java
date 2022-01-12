@@ -3,11 +3,10 @@ package cn.iocoder.yudao.adminserver.modules.bpm.framework.activiti.core.behavio
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.definition.BpmTaskRuleDO;
-import cn.iocoder.yudao.adminserver.modules.bpm.enums.definition.BpmTaskRuleTypeEnum;
-import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmTaskRuleService;
+import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.definition.BpmTaskAssignRuleDO;
+import cn.iocoder.yudao.adminserver.modules.bpm.enums.definition.BpmTaskAssignRuleTypeEnum;
+import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmTaskAssignRuleService;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
-import cn.iocoder.yudao.framework.common.util.collection.SetUtils;
 import lombok.Setter;
 import org.activiti.bpmn.model.UserTask;
 import org.activiti.engine.ActivitiException;
@@ -29,7 +28,7 @@ import java.util.Set;
 public class BpmUserTaskActivitiBehavior extends UserTaskActivityBehavior {
 
     @Setter
-    private BpmTaskRuleService bpmTaskRuleService;
+    private BpmTaskAssignRuleService bpmTaskRuleService;
 
     public BpmUserTaskActivitiBehavior(UserTask userTask) {
         super(userTask);
@@ -40,7 +39,7 @@ public class BpmUserTaskActivitiBehavior extends UserTaskActivityBehavior {
                                      String assignee, String owner, List<String> candidateUsers, List<String> candidateGroups,
                                      TaskEntity task, ExpressionManager expressionManager, DelegateExecution execution) {
         // 获得任务的规则
-        BpmTaskRuleDO rule = getTaskRule(task);
+        BpmTaskAssignRuleDO rule = getTaskRule(task);
         // 获得任务的候选用户们
         Set<Long> candidateUserIds = calculateTaskCandidateUsers(task, rule);
         // 设置负责人
@@ -53,8 +52,8 @@ public class BpmUserTaskActivitiBehavior extends UserTaskActivityBehavior {
         }
     }
 
-    private BpmTaskRuleDO getTaskRule(TaskEntity task) {
-        List<BpmTaskRuleDO> taskRules = bpmTaskRuleService.getTaskRulesByProcessDefinitionId(task.getProcessDefinitionId(),
+    private BpmTaskAssignRuleDO getTaskRule(TaskEntity task) {
+        List<BpmTaskAssignRuleDO> taskRules = bpmTaskRuleService.getTaskAssignRulesByProcessDefinitionId(task.getProcessDefinitionId(),
                 task.getTaskDefinitionKey());
         if (CollUtil.isEmpty(taskRules)) {
             throw new ActivitiException(StrUtil.format("流程任务({}/{}/{}) 找不到符合的任务规则",
@@ -73,17 +72,17 @@ public class BpmUserTaskActivitiBehavior extends UserTaskActivityBehavior {
         return CollUtil.get(candidateUserIds, index);
     }
 
-    private Set<Long> calculateTaskCandidateUsers(TaskEntity task, BpmTaskRuleDO rule) {
+    private Set<Long> calculateTaskCandidateUsers(TaskEntity task, BpmTaskAssignRuleDO rule) {
         Set<Long> assigneeUserIds = null;
-        if (Objects.equals(BpmTaskRuleTypeEnum.ROLE.getType(), rule.getType())) {
+        if (Objects.equals(BpmTaskAssignRuleTypeEnum.ROLE.getType(), rule.getType())) {
             assigneeUserIds = calculateTaskCandidateUsersByRole(task, rule);
-        } else if (Objects.equals(BpmTaskRuleTypeEnum.DEPT.getType(), rule.getType())) {
+        } else if (Objects.equals(BpmTaskAssignRuleTypeEnum.DEPT.getType(), rule.getType())) {
             assigneeUserIds = calculateTaskCandidateUsersByDept(task, rule);
-        } else if (Objects.equals(BpmTaskRuleTypeEnum.DEPT_LEADER.getType(), rule.getType())) {
+        } else if (Objects.equals(BpmTaskAssignRuleTypeEnum.DEPT_LEADER.getType(), rule.getType())) {
             assigneeUserIds = calculateTaskCandidateUsersByDept(task, rule);
-        } else if (Objects.equals(BpmTaskRuleTypeEnum.USER.getType(), rule.getType())) {
+        } else if (Objects.equals(BpmTaskAssignRuleTypeEnum.USER.getType(), rule.getType())) {
             assigneeUserIds = calculateTaskCandidateUsersByUser(task, rule);
-        } else if (Objects.equals(BpmTaskRuleTypeEnum.USER_GROUP.getType(), rule.getType())) {
+        } else if (Objects.equals(BpmTaskAssignRuleTypeEnum.USER_GROUP.getType(), rule.getType())) {
             assigneeUserIds = calculateTaskCandidateUsersByUser(task, rule);
         }
 
@@ -96,28 +95,28 @@ public class BpmUserTaskActivitiBehavior extends UserTaskActivityBehavior {
         return assigneeUserIds;
     }
 
-    private Set<Long> calculateTaskCandidateUsersByRole(TaskEntity task, BpmTaskRuleDO rule) {
+    private Set<Long> calculateTaskCandidateUsersByRole(TaskEntity task, BpmTaskAssignRuleDO rule) {
         throw new UnsupportedOperationException("暂不支持该任务规则");
     }
 
 
-    private Set<Long> calculateTaskCandidateUsersByDept(TaskEntity task, BpmTaskRuleDO rule) {
+    private Set<Long> calculateTaskCandidateUsersByDept(TaskEntity task, BpmTaskAssignRuleDO rule) {
         throw new UnsupportedOperationException("暂不支持该任务规则");
     }
 
-    private Set<Long> calculateTaskCandidateUsersByDeptLeader(TaskEntity task, BpmTaskRuleDO rule) {
+    private Set<Long> calculateTaskCandidateUsersByDeptLeader(TaskEntity task, BpmTaskAssignRuleDO rule) {
         throw new UnsupportedOperationException("暂不支持该任务规则");
     }
 
-    private Set<Long> calculateTaskCandidateUsersByUser(TaskEntity task, BpmTaskRuleDO rule) {
+    private Set<Long> calculateTaskCandidateUsersByUser(TaskEntity task, BpmTaskAssignRuleDO rule) {
         return rule.getOptions();
     }
 
-    private Set<Long> calculateTaskCandidateUsersByUserGroup(TaskEntity task, BpmTaskRuleDO rule) {
+    private Set<Long> calculateTaskCandidateUsersByUserGroup(TaskEntity task, BpmTaskAssignRuleDO rule) {
         throw new UnsupportedOperationException("暂不支持该任务规则");
     }
 
-    private Set<Long> calculateTaskCandidateUsersByScript(TaskEntity task, BpmTaskRuleDO rule) {
+    private Set<Long> calculateTaskCandidateUsersByScript(TaskEntity task, BpmTaskAssignRuleDO rule) {
         throw new UnsupportedOperationException("暂不支持该任务规则");
     }
 

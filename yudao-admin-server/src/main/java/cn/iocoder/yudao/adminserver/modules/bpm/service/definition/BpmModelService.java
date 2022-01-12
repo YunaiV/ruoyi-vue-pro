@@ -2,6 +2,7 @@ package cn.iocoder.yudao.adminserver.modules.bpm.service.definition;
 
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.model.*;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import org.activiti.bpmn.model.BpmnModel;
 
 import javax.validation.Valid;
 
@@ -65,5 +66,13 @@ public interface BpmModelService {
      * @param state 状态 {@link org.activiti.engine.impl.persistence.entity.SuspensionState}
      */
     void updateModelState(String id, Integer state);
+
+    /**
+     * 获得流程模型编号对应的 BPMN Model
+     *
+     * @param id 流程模型编号
+     * @return BPMN Model
+     */
+    BpmnModel getBpmnModel(String id);
 
 }

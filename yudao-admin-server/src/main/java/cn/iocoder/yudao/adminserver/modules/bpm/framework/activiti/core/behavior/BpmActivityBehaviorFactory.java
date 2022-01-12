@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.framework.activiti.core.behavior;
 
-import cn.iocoder.yudao.adminserver.modules.bpm.framework.activiti.core.behavior.BpmUserTaskActivitiBehavior;
-import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmTaskRuleService;
+import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmTaskAssignRuleService;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Setter;
@@ -22,7 +21,7 @@ import org.activiti.engine.impl.bpmn.parser.factory.DefaultActivityBehaviorFacto
 public class BpmActivityBehaviorFactory extends DefaultActivityBehaviorFactory {
 
     @Setter
-    private BpmTaskRuleService bpmTaskRuleService;
+    private BpmTaskAssignRuleService bpmTaskRuleService;
 
     @Override
     public UserTaskActivityBehavior createUserTaskActivityBehavior(UserTask userTask) {

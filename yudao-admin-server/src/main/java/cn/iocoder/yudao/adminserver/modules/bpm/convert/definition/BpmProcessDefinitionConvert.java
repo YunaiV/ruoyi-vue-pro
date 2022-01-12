@@ -23,9 +23,9 @@ import java.util.Map;
  * @author yunlong.li
  */
 @Mapper
-public interface BpmDefinitionConvert {
+public interface BpmProcessDefinitionConvert {
 
-    BpmDefinitionConvert INSTANCE = Mappers.getMapper(BpmDefinitionConvert.class);
+    BpmProcessDefinitionConvert INSTANCE = Mappers.getMapper(BpmProcessDefinitionConvert.class);
 
     default List<BpmProcessDefinitionPageItemRespVO> convertList(List<ProcessDefinition> list, Map<String, Deployment> deploymentMap,
                                                                  Map<String, BpmProcessDefinitionExtDO> processDefinitionDOMap, Map<Long, BpmFormDO> formMap) {

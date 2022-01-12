@@ -4,13 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
- * BPM 任务规则的类型枚举
+ * BPM 任务分配规则的类型枚举
  *
  * @author 芋道源码
  */
 @Getter
 @AllArgsConstructor
-public enum BpmTaskRuleTypeEnum {
+public enum BpmTaskAssignRuleTypeEnum {
 
     ROLE(10, "指定角色"),
 
