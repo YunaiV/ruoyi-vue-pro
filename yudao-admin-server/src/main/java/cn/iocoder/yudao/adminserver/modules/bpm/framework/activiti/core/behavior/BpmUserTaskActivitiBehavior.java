@@ -53,7 +53,7 @@ public class BpmUserTaskActivitiBehavior extends UserTaskActivityBehavior {
     }
 
     private BpmTaskAssignRuleDO getTaskRule(TaskEntity task) {
-        List<BpmTaskAssignRuleDO> taskRules = bpmTaskRuleService.getTaskAssignRulesByProcessDefinitionId(task.getProcessDefinitionId(),
+        List<BpmTaskAssignRuleDO> taskRules = bpmTaskRuleService.getTaskAssignRuleListByProcessDefinitionId(task.getProcessDefinitionId(),
                 task.getTaskDefinitionKey());
         if (CollUtil.isEmpty(taskRules)) {
             throw new ActivitiException(StrUtil.format("流程任务({}/{}/{}) 找不到符合的任务规则",

@@ -82,12 +82,15 @@
           </template>
         </el-table-column>
       </el-table-column>
-      <el-table-column label="操作" align="center" width="380" fixed="right">
+      <el-table-column label="操作" align="center" width="450" fixed="right">
         <template slot-scope="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
                      v-hasPermi="['bpm:model:update']">修改流程</el-button>
           <el-button size="mini" type="text" icon="el-icon-setting" @click="handleDesign(scope.row)"
                      v-hasPermi="['bpm:model:update']">设计流程</el-button>
+          <!-- TODO 权限 -->
+          <el-button size="mini" type="text" icon="el-icon-s-custom" @click="handleAssignRule(scope.row)"
+                     v-hasPermi="['bpm:model:update']">分配规则</el-button>
           <el-button size="mini" type="text" icon="el-icon-thumb" @click="handleDeploy(scope.row)"
                      v-hasPermi="['bpm:model:deploy']">发布流程</el-button>
           <el-button size="mini" type="text" icon="el-icon-ice-cream-round" @click="handleDefinitionList(scope.row)"
@@ -195,6 +198,53 @@
         <el-button @click="uploadClose">取 消</el-button>
       </div>
     </el-dialog>
+
+    <!-- ========== 流程任务分配规则 ========== -->
+    <!-- 列表弹窗 -->
+    <el-dialog title="任务分配规则" :visible.sync="taskAssignRule.listOpen" width="800px" append-to-body>
+      <el-table v-loading="taskAssignRule.loading" :data="taskAssignRule.list">
+        <el-table-column label="任务名" align="center" prop="taskDefinitionName" width="120" fixed />
+        <el-table-column label="任务标识" align="center" prop="taskDefinitionKey" width="300" />
+        <el-table-column label="规则类型" align="center" prop="type">
+          <template slot-scope="scope">
+            <span>{{ getDictDataLabel(DICT_TYPE.BPM_TASK_ASSIGN_RULE_TYPE, scope.row.type) }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="规则范围" align="center" prop="options" />
+        <el-table-column label="操作" align="center" width="80" fixed="right">
+          <template slot-scope="scope">
+            <!-- TODO 权限 -->
+            <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdateTaskAssignRule(scope.row)"
+                       v-hasPermi="['bpm:model:update']">修改</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+    </el-dialog>
+    <!-- 添加/修改弹窗 -->
+    <el-dialog title="修改任务规则" :visible.sync="taskAssignRule.open" width="500px" append-to-body>
+      <el-form ref="form" :model="taskAssignRule.form" :rules="taskAssignRule.rules" label-width="110px">
+        <el-form-item label="任务名称" prop="taskDefinitionName">
+          <el-input v-model="taskAssignRule.form.taskDefinitionName" disabled />
+        </el-form-item>
+        <el-form-item label="任务标识" prop="taskDefinitionKey">
+          <el-input v-model="taskAssignRule.form.taskDefinitionKey" disabled />
+        </el-form-item>
+        <el-form-item label="规则类型" prop="type">
+          <el-select v-model="taskAssignRule.form.type" clearable style="width: 100%">
+            <el-option v-for="dict in taskAssignRuleDictDatas" :key="parseInt(dict.value)" :label="dict.label" :value="parseInt(dict.value)"/>
+          </el-select>
+        </el-form-item>
+        <el-form-item v-if="taskAssignRule.form.type === 10" label="指定角色" prop="roleIds">
+          <el-select v-model="form.formId" clearable style="width: 100%">
+            <el-option v-for="item in taskAssignRule.roleOptions" :key="parseInt(item.id)" :label="item.name" :value="parseInt(item.id)" />
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="submitForm">确 定</el-button>
+        <el-button @click="cancel">取 消</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -213,6 +263,8 @@ import {getForm, getSimpleForms} from "@/api/bpm/form";
 import {decodeFields} from "@/utils/formGenerator";
 import Parser from '@/components/parser/Parser'
 import {getBaseHeader} from "@/utils/request";
+import {getTaskAssignRuleList} from "@/api/bpm/taskAssignRule";
+import {listSimpleRoles} from "@/api/system/role";
 
 export default {
   name: "model",
@@ -262,6 +314,22 @@ export default {
         formCustomViewPath: [{ required: true, message: "表单查看路由不能为空", trigger: "blur" }],
       },
 
+      // 任务分配规则表单
+      taskAssignRule: {
+        row: undefined, // 选中的流程模型
+        list: [], // 选中流程模型的任务分配规则们
+        listOpen: false, // 列表是否打开
+        loading: false, // 加载中
+        open: false, // 是否打开
+        form: {}, // 表单
+        rules: { // 表单校验规则
+          type: [{ required: true, message: "规则类型不能为空", trigger: "change" }],
+          roleIds: [{required: true, message: "指定角色不能为空", trigger: "change" }],
+        },
+        // 各种下拉框
+        roleOptions: [],
+      },
+
       // 流程导入参数
       upload: {
         // 是否显示弹出层（用户导入）
@@ -285,7 +353,8 @@ export default {
 
       // 数据字典
       categoryDictDatas: getDictDatas(DICT_TYPE.BPM_MODEL_CATEGORY),
-      modelFormTypeDictDatas: getDictDatas(DICT_TYPE.BPM_MODEL_FORM_TYPE)
+      modelFormTypeDictDatas: getDictDatas(DICT_TYPE.BPM_MODEL_FORM_TYPE),
+      taskAssignRuleDictDatas: getDictDatas(DICT_TYPE.BPM_TASK_ASSIGN_RULE_TYPE),
     };
   },
   created() {
@@ -504,6 +573,40 @@ export default {
         this.$refs.upload.submit();
       })
     },
+    // ========== ==========
+    doGetTaskAssignRuleList() {
+      this.taskAssignRule.loading = true;
+      getTaskAssignRuleList({
+        modelId: this.taskAssignRule.row.id
+      }).then(response => {
+        this.taskAssignRule.loading = false;
+        this.taskAssignRule.list = response.data;
+      })
+    },
+    /** 处理任务分配规则列表的按钮操作 */
+    handleAssignRule(row) {
+      this.taskAssignRule.row = row;
+      this.taskAssignRule.listOpen = true;
+      this.doGetTaskAssignRuleList();
+      // 获得角色列表
+      this.taskAssignRule.roleOptions = [];
+      listSimpleRoles().then(response => {
+        // 处理 roleOptions 参数
+        this.taskAssignRule.roleOptions.push(...response.data);
+      });
+    },
+    /** 处理修改任务分配规则的按钮操作 */
+    handleUpdateTaskAssignRule(row) {
+      this.taskAssignRule.form = {
+        ...row,
+        options: []
+      };
+      // TODO 芋艿：需要搞一搞
+      if (row.type === 10) {
+        this.taskAssignRule.form.role = row.options;
+      }
+      this.taskAssignRule.open = true;
+    }
   }
 };
 </script>

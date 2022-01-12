@@ -40,29 +40,29 @@ public class BpmTaskAssignRuleServiceImpl implements BpmTaskAssignRuleService {
     private BpmProcessDefinitionService processDefinitionService;
 
     @Override
-    public List<BpmTaskAssignRuleDO> getTaskAssignRulesByProcessDefinitionId(String processDefinitionId,
-                                                                             String taskDefinitionKey) {
+    public List<BpmTaskAssignRuleDO> getTaskAssignRuleListByProcessDefinitionId(String processDefinitionId,
+                                                                                String taskDefinitionKey) {
         return taskRuleMapper.selectListByProcessDefinitionId(processDefinitionId, taskDefinitionKey);
     }
 
     @Override
-    public List<BpmTaskAssignRuleDO> getTaskAssignRulesByModelId(String modelId) {
+    public List<BpmTaskAssignRuleDO> getTaskAssignRuleListByModelId(String modelId) {
         return taskRuleMapper.selectListByModelId(modelId);
     }
 
     @Override
-    public List<BpmTaskAssignRuleRespVO> getTaskAssignRules(String modelId, String processDefinitionId) {
+    public List<BpmTaskAssignRuleRespVO> getTaskAssignRuleList(String modelId, String processDefinitionId) {
         // 获得规则
         List<BpmTaskAssignRuleDO> rules = Collections.emptyList();
         BpmnModel model = null;
         if (StrUtil.isNotEmpty(modelId)) {
-            rules = getTaskAssignRulesByModelId(modelId);
+            rules = getTaskAssignRuleListByModelId(modelId);
             model = modelService.getBpmnModel(modelId);
         } else if (StrUtil.isNotEmpty(processDefinitionId)) {
-            rules = getTaskAssignRulesByProcessDefinitionId(processDefinitionId, null);
+            rules = getTaskAssignRuleListByProcessDefinitionId(processDefinitionId, null);
             model = processDefinitionService.getBpmnModel(processDefinitionId);
         }
-        if (CollUtil.isEmpty(rules) || model == null) {
+        if (model == null) {
             return Collections.emptyList();
         }
 

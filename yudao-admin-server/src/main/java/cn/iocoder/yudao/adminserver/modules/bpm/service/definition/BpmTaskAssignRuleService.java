@@ -20,8 +20,8 @@ public interface BpmTaskAssignRuleService {
      * @param taskDefinitionKey 流程任务定义的 Key。允许空
      * @return 任务规则数组
      */
-    List<BpmTaskAssignRuleDO> getTaskAssignRulesByProcessDefinitionId(String processDefinitionId,
-                                                                      @Nullable String taskDefinitionKey);
+    List<BpmTaskAssignRuleDO> getTaskAssignRuleListByProcessDefinitionId(String processDefinitionId,
+                                                                         @Nullable String taskDefinitionKey);
 
     /**
      * 获得流程模型的任务规则数组
@@ -29,7 +29,7 @@ public interface BpmTaskAssignRuleService {
      * @param modelId 流程模型的编号
      * @return 任务规则数组
      */
-    List<BpmTaskAssignRuleDO> getTaskAssignRulesByModelId(String modelId);
+    List<BpmTaskAssignRuleDO> getTaskAssignRuleListByModelId(String modelId);
 
 
     /**
@@ -39,7 +39,7 @@ public interface BpmTaskAssignRuleService {
      * @param processDefinitionId 流程定义的编号
      * @return 任务规则数组
      */
-    List<BpmTaskAssignRuleRespVO> getTaskAssignRules(String modelId, String processDefinitionId);
+    List<BpmTaskAssignRuleRespVO> getTaskAssignRuleList(String modelId, String processDefinitionId);
 
     // TODO 芋艿：创建任务规则
     // TODO 芋艿：复制任务规则
