@@ -379,4 +379,9 @@ public class SysUserServiceImpl implements SysUserService {
         return respVO;
     }
 
+    @Override
+    public List<SysUserDO> getUsersByStatus(Integer status) {
+        return userMapper.selectListByStatus(status);
+    }
+
 }

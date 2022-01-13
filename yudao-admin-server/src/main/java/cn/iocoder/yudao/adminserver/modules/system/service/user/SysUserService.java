@@ -169,4 +169,12 @@ public interface SysUserService {
      */
     SysUserImportRespVO importUsers(List<SysUserImportExcelVO> importUsers, boolean isUpdateSupport);
 
+    /**
+     * 获得指定状态的用户们
+     *
+     * @param status 状态
+     * @return 用户们
+     */
+    List<SysUserDO> getUsersByStatus(Integer status);
+
 }
