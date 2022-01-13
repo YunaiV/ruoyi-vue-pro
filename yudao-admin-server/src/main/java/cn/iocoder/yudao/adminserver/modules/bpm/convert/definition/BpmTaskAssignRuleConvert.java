@@ -39,4 +39,6 @@ public interface BpmTaskAssignRuleConvert {
 
     BpmTaskAssignRuleDO convert(BpmTaskAssignRuleUpdateReqVO bean);
 
+    List<BpmTaskAssignRuleDO> convertList2(List<BpmTaskAssignRuleRespVO> list);
+
 }

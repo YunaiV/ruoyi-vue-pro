@@ -1,14 +1,18 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.service.definition.dto;
 
+import cn.iocoder.yudao.adminserver.modules.bpm.enums.definition.BpmModelFormTypeEnum;
 import lombok.Data;
 
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 /**
  * 流程定义创建 Request DTO
  */
 @Data
 public class BpmDefinitionCreateReqDTO {
+
+    // ========== 模型相关 ==========
 
     /**
      * 流程模型的编号
@@ -40,9 +44,30 @@ public class BpmDefinitionCreateReqDTO {
      */
     @NotEmpty(message = "BPMN XML 不能为空")
     private String bpmnXml;
+
+    // ========== 表单相关 ==========
+
     /**
-     * 动态表单编号，允许空
+     * 表单类型
+     */
+    @NotNull(message = "表单类型不能为空")
+    private Integer formType;
+    /**
+     * 动态表单编号
+     * 在表单类型为 {@link BpmModelFormTypeEnum#NORMAL} 时
      */
     private Long formId;
+    /**
+     * 自定义表单的提交路径，使用 Vue 的路由地址
+     * 在表单类型为 {@link BpmModelFormTypeEnum#CUSTOM} 时
+     */
+    private String formCustomCreatePath;
+    /**
+     * 自定义表单的查看路径，使用 Vue 的路由地址
+     * 在表单类型为 {@link BpmModelFormTypeEnum#CUSTOM} 时
+     */
+    private String formCustomViewPath;
+
+
 
 }

@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.framework.activiti.core.behavior;
 
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmTaskAssignRuleService;
+import cn.iocoder.yudao.adminserver.modules.system.service.permission.SysPermissionService;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Setter;
@@ -22,11 +23,14 @@ public class BpmActivityBehaviorFactory extends DefaultActivityBehaviorFactory {
 
     @Setter
     private BpmTaskAssignRuleService bpmTaskRuleService;
+    @Setter
+    private SysPermissionService permissionService;
 
     @Override
     public UserTaskActivityBehavior createUserTaskActivityBehavior(UserTask userTask) {
         BpmUserTaskActivitiBehavior userTaskActivityBehavior = new BpmUserTaskActivitiBehavior(userTask);
         userTaskActivityBehavior.setBpmTaskRuleService(bpmTaskRuleService);
+        userTaskActivityBehavior.setPermissionService(permissionService);
         return userTaskActivityBehavior;
     }
 

@@ -90,12 +90,12 @@ public interface BpmModelConvert {
         createReqDTO.setKey(model.getKey());
         createReqDTO.setCategory(model.getCategory());
         BpmModelMetaInfoRespDTO metaInfo = JsonUtils.parseObject(model.getMetaInfo(), BpmModelMetaInfoRespDTO.class);
-        if (metaInfo != null) {
-            createReqDTO.setDescription(metaInfo.getDescription());
-            createReqDTO.setFormId(metaInfo.getFormId());
-        }
+        // metaInfo
+        copyTo(metaInfo, createReqDTO);
         return createReqDTO;
     }
+
+    void copyTo(BpmModelMetaInfoRespDTO from, @MappingTarget BpmDefinitionCreateReqDTO to);
 
     default void copy(Model model, BpmModelCreateReqVO bean) {
         model.setName(bean.getName());

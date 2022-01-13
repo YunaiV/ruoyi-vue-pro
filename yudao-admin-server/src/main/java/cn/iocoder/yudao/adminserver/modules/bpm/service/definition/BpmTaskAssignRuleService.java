@@ -4,6 +4,7 @@ import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.rule.Bp
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.rule.BpmTaskAssignRuleRespVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.rule.BpmTaskAssignRuleUpdateReqVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.definition.BpmTaskAssignRuleDO;
+import org.activiti.engine.repository.ProcessDefinition;
 import org.springframework.lang.Nullable;
 
 import javax.validation.Valid;
@@ -34,7 +35,6 @@ public interface BpmTaskAssignRuleService {
      */
     List<BpmTaskAssignRuleDO> getTaskAssignRuleListByModelId(String modelId);
 
-
     /**
      * 获得流程定义的任务分配规则数组
      *
@@ -58,5 +58,14 @@ public interface BpmTaskAssignRuleService {
      * @param reqVO 创建信息
      */
     void updateTaskAssignRule(@Valid BpmTaskAssignRuleUpdateReqVO reqVO);
+
+    /**
+     * 将流程流程模型的任务分配规则，复制一份给流程定义
+     * 目的：每次流程模型部署时，都会生成一个新的流程定义，此时考虑到每次部署的流程不可变性，所以需要复制一份给该流程定义
+     *
+     * @param fromModelId 流程模型编号
+     * @param toProcessDefinitionId 流程定义编号
+     */
+    void copyTaskAssignRules(String fromModelId, String toProcessDefinitionId);
 
 }

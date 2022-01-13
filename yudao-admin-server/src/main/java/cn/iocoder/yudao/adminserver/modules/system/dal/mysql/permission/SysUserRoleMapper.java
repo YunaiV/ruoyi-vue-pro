@@ -31,8 +31,7 @@ public interface SysUserRoleMapper extends BaseMapperX<SysUserRoleDO> {
             entity.setRoleId(roleId);
             return entity;
         }).collect(Collectors.toList());
-        // TODO 芋艿，mybatis plus 增加批量插入的功能
-        list.forEach(this::insert);
+        insertBatch(list);
     }
 
     default void deleteListByUserIdAndRoleIdIds(Long userId, Collection<Long> roleIds) {

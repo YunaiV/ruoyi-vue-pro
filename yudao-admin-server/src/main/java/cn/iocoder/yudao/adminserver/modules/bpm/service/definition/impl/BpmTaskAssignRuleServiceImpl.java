@@ -17,6 +17,7 @@ import cn.iocoder.yudao.framework.activiti.core.util.ActivitiUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.bpmn.model.UserTask;
+import org.activiti.engine.repository.ProcessDefinition;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -26,6 +27,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import static cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants.*;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -121,6 +123,19 @@ public class BpmTaskAssignRuleServiceImpl implements BpmTaskAssignRuleService {
 
         // 执行更新
         taskRuleMapper.updateById(BpmTaskAssignRuleConvert.INSTANCE.convert(reqVO));
+    }
+
+    @Override
+    public void copyTaskAssignRules(String fromModelId, String toProcessDefinitionId) {
+        List<BpmTaskAssignRuleRespVO> rules = getTaskAssignRuleList(fromModelId, null);
+        if (CollUtil.isEmpty(rules)) {
+            return;
+        }
+        // 开始复制
+        List<BpmTaskAssignRuleDO> newRules = BpmTaskAssignRuleConvert.INSTANCE.convertList2(rules);
+        newRules.forEach(rule -> rule.setProcessDefinitionId(toProcessDefinitionId).setId(null)
+                .setCreateTime(null).setUpdateTime(null));
+        taskRuleMapper.insertBatch(newRules);
     }
 
     private void validTaskAssignRuleOptions(Integer type, Set<Long> options) {
