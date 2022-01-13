@@ -210,7 +210,13 @@
             <span>{{ getDictDataLabel(DICT_TYPE.BPM_TASK_ASSIGN_RULE_TYPE, scope.row.type) }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="规则范围" align="center" prop="options" />
+        <el-table-column label="规则范围" align="center" prop="options" width="200px">
+          <template slot-scope="scope">
+            <el-tag size="medium" v-if="scope.row.options" v-for="option in scope.row.options">
+              {{ getAssignRuleOptionName(scope.row.type, option) }}
+            </el-tag>
+          </template>
+        </el-table-column>
         <el-table-column label="操作" align="center" width="80" fixed="right">
           <template slot-scope="scope">
             <!-- TODO 权限 -->
@@ -604,9 +610,9 @@ export default {
         ...row,
         options: []
       };
-      // TODO 芋艿：需要搞一搞
+      // 将 options 赋值到对应的 roleIds 等选项
       if (row.type === 10) {
-        this.taskAssignRule.form.role = row.options;
+        this.taskAssignRule.form.roleIds = row.options;
       }
       this.taskAssignRule.open = true;
     },
@@ -619,12 +625,14 @@ export default {
             ...this.taskAssignRule.form,
             taskDefinitionName: undefined,
           };
+          // 将 roleIds 等选项赋值到 options 中
           if (form.type === 10) {
             form.options = form.roleIds;
           }
           form.roleIds = undefined;
           // 新增
           if (!form.id) {
+            form.modelId = this.taskAssignRule.row.id // 模型编号
             createTaskAssignRule(form).then(response => {
               this.msgSuccess("修改成功");
               this.taskAssignRule.open = false;
@@ -647,10 +655,20 @@ export default {
       this.taskAssignRule.open = false;
       this.resetAssignRuleForm();
     },
-    // 表单重置
+    /** 表单重置 */
     resetAssignRuleForm() {
       this.taskAssignRule.form = {};
       this.resetForm("taskAssignRuleForm");
+    },
+    getAssignRuleOptionName(type, option) {
+      if (type === 10) {
+        for (const roleOption of this.taskAssignRule.roleOptions) {
+          if (roleOption.id === option) {
+            return roleOption.name;
+          }
+        }
+      }
+      return '未知(' + option + ')';
     }
   }
 };

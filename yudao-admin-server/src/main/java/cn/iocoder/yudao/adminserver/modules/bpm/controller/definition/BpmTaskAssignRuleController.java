@@ -31,8 +31,8 @@ public class BpmTaskAssignRuleController {
     }
 
     @PostMapping("/create")
-    public CommonResult<String> createTaskAssignRule(@Valid @RequestBody BpmTaskAssignRuleCreateReqVO reqVO) {
-        return success("1024");
+    public CommonResult<Long> createTaskAssignRule(@Valid @RequestBody BpmTaskAssignRuleCreateReqVO reqVO) {
+        return success(taskAssignRuleService.createTaskAssignRule(reqVO));
     }
 
     @PutMapping("/update")

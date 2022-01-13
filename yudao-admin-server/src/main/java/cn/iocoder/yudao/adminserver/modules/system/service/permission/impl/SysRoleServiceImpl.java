@@ -5,6 +5,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.permission.vo.role.SysRoleCreateReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.permission.vo.role.SysRoleExportReqVO;
@@ -33,9 +34,11 @@ import org.springframework.util.StringUtils;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.adminserver.modules.system.enums.SysErrorCodeConstants.*;
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 
 /**
  * 角色 Service 实现类
@@ -234,8 +237,28 @@ public class SysRoleServiceImpl implements SysRoleService {
     }
 
     @Override
-    public List<SysRoleDO> getRoles(SysRoleExportReqVO reqVO) {
+    public List<SysRoleDO> getRoleList(SysRoleExportReqVO reqVO) {
         return roleMapper.listRoles(reqVO);
+    }
+
+    @Override
+    public void validRoles(Collection<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return;
+        }
+        // 获得角色信息
+        List<SysRoleDO> roles = roleMapper.selectBatchIds(ids);
+        Map<Long, SysRoleDO> roleMap = CollectionUtils.convertMap(roles, SysRoleDO::getId);
+        // 校验
+        ids.forEach(id -> {
+            SysRoleDO role = roleMap.get(id);
+            if (role == null) {
+                throw exception(ROLE_NOT_EXISTS);
+            }
+            if (!CommonStatusEnum.ENABLE.getStatus().equals(role.getStatus())) {
+                throw exception(ROLE_IS_DISABLE, role.getName());
+            }
+        });
     }
 
     /**
@@ -253,7 +276,7 @@ public class SysRoleServiceImpl implements SysRoleService {
         // 1. 该 name 名字被其它角色所使用
         SysRoleDO role = roleMapper.selectByName(name);
         if (role != null && !role.getId().equals(id)) {
-            throw ServiceExceptionUtil.exception(ROLE_NAME_DUPLICATE, name);
+            throw exception(ROLE_NAME_DUPLICATE, name);
         }
         // 2. 是否存在相同编码的角色
         if (!StringUtils.hasText(code)) {
@@ -262,7 +285,7 @@ public class SysRoleServiceImpl implements SysRoleService {
         // 该 code 编码被其它角色所使用
         role = roleMapper.selectByCode(code);
         if (role != null && !role.getId().equals(id)) {
-            throw ServiceExceptionUtil.exception(ROLE_CODE_DUPLICATE, code);
+            throw exception(ROLE_CODE_DUPLICATE, code);
         }
     }
 
@@ -275,18 +298,12 @@ public class SysRoleServiceImpl implements SysRoleService {
     public void checkUpdateRole(Long id) {
         SysRoleDO roleDO = roleMapper.selectById(id);
         if (roleDO == null) {
-            throw ServiceExceptionUtil.exception(ROLE_NOT_EXISTS);
+            throw exception(ROLE_NOT_EXISTS);
         }
         // 内置角色，不允许删除
         if (SysRoleTypeEnum.SYSTEM.getType().equals(roleDO.getType())) {
-            throw ServiceExceptionUtil.exception(ROLE_CAN_NOT_UPDATE_SYSTEM_TYPE_ROLE);
+            throw exception(ROLE_CAN_NOT_UPDATE_SYSTEM_TYPE_ROLE);
         }
     }
-
-//    @Override
-//    @DataScope(deptAlias = "d")
-//    public List<SysRole> selectRoleList(SysRole role) {
-//        return roleMapper.selectRoleList(role);
-//    }
 
 }

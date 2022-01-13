@@ -24,4 +24,12 @@ public interface BpmTaskAssignRuleMapper extends BaseMapperX<BpmTaskAssignRuleDO
                 .eq("process_definition_id", BpmTaskAssignRuleDO.PROCESS_DEFINITION_ID_NULL));
     }
 
+    default BpmTaskAssignRuleDO selectListByModelIdAndTaskDefinitionKey(String modelId,
+                                                                        String taskDefinitionKey) {
+        return selectOne(new QueryWrapperX<BpmTaskAssignRuleDO>()
+                .eq("model_id", modelId)
+                .eq("process_definition_id", BpmTaskAssignRuleDO.PROCESS_DEFINITION_ID_NULL)
+                .eq("task_definition_key", taskDefinitionKey));
+    }
+
 }

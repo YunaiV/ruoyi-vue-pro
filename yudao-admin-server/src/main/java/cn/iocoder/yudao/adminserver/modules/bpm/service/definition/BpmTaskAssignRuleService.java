@@ -1,9 +1,11 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.service.definition;
 
+import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.rule.BpmTaskAssignRuleCreateReqVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.rule.BpmTaskAssignRuleRespVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.definition.BpmTaskAssignRuleDO;
 import org.springframework.lang.Nullable;
 
+import javax.validation.Valid;
 import java.util.List;
 
 /**
@@ -35,13 +37,20 @@ public interface BpmTaskAssignRuleService {
     /**
      * 获得流程定义的任务分配规则数组
      *
-     * @param processDefinitionId 流程模型的编号
+     * @param modelId 流程模型的编号
      * @param processDefinitionId 流程定义的编号
      * @return 任务规则数组
      */
     List<BpmTaskAssignRuleRespVO> getTaskAssignRuleList(String modelId, String processDefinitionId);
 
-    // TODO 芋艿：创建任务规则
+    /**
+     * 创建任务分配规则
+     *
+     * @param reqVO 创建信息
+     * @return 规则编号
+     */
+    Long createTaskAssignRule(@Valid BpmTaskAssignRuleCreateReqVO reqVO);
+
     // TODO 芋艿：复制任务规则
 
 }

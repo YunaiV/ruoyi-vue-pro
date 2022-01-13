@@ -1,7 +1,10 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.rule;
 
-import java.util.Set;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
+@Data
+@EqualsAndHashCode(callSuper = true)
 public class BpmTaskAssignRuleCreateReqVO extends BpmTaskAssignRuleBaseVO {
 
     private String modelId;

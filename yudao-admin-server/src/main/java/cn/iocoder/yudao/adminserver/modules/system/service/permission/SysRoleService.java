@@ -127,6 +127,15 @@ public interface SysRoleService {
      * @param reqVO 列表查询
      * @return 角色列表
      */
-    List<SysRoleDO> getRoles(SysRoleExportReqVO reqVO);
+    List<SysRoleDO> getRoleList(SysRoleExportReqVO reqVO);
+
+    /**
+     * 校验角色们是否有效。如下情况，视为无效：
+     * 1. 角色编号不存在
+     * 2. 角色被禁用
+     *
+     * @param ids 角色编号数组
+     */
+    void validRoles(Collection<Long> ids);
 
 }
