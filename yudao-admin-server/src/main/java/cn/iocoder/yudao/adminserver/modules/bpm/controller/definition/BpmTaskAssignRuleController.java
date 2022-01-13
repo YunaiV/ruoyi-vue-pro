@@ -1,16 +1,15 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.controller.definition;
 
+import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.rule.BpmTaskAssignRuleCreateReqVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.rule.BpmTaskAssignRuleRespVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmTaskAssignRuleService;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import io.swagger.annotations.Api;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -29,6 +28,16 @@ public class BpmTaskAssignRuleController {
             @RequestParam(value = "modelId", required = false) String modelId,
             @RequestParam(value = "processDefinitionId", required = false) String processDefinitionId) {
         return success(taskAssignRuleService.getTaskAssignRuleList(modelId, processDefinitionId));
+    }
+
+    @PostMapping("/create")
+    public CommonResult<String> createTaskAssignRule(@Valid @RequestBody BpmTaskAssignRuleCreateReqVO reqVO) {
+        return success("1024");
+    }
+
+    @PutMapping("/update")
+    public CommonResult<Boolean> updateTaskAssignRule(@Valid @RequestBody BpmTaskAssignRuleCreateReqVO reqVO) {
+        return success(true);
     }
 
 }

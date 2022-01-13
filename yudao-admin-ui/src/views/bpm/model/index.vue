@@ -222,7 +222,7 @@
     </el-dialog>
     <!-- 添加/修改弹窗 -->
     <el-dialog title="修改任务规则" :visible.sync="taskAssignRule.open" width="500px" append-to-body>
-      <el-form ref="form" :model="taskAssignRule.form" :rules="taskAssignRule.rules" label-width="110px">
+      <el-form ref="taskAssignRuleForm" :model="taskAssignRule.form" :rules="taskAssignRule.rules" label-width="110px">
         <el-form-item label="任务名称" prop="taskDefinitionName">
           <el-input v-model="taskAssignRule.form.taskDefinitionName" disabled />
         </el-form-item>
@@ -235,14 +235,14 @@
           </el-select>
         </el-form-item>
         <el-form-item v-if="taskAssignRule.form.type === 10" label="指定角色" prop="roleIds">
-          <el-select v-model="form.formId" clearable style="width: 100%">
+          <el-select v-model="taskAssignRule.form.roleIds" multiple clearable style="width: 100%">
             <el-option v-for="item in taskAssignRule.roleOptions" :key="parseInt(item.id)" :label="item.name" :value="parseInt(item.id)" />
           </el-select>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="submitForm">确 定</el-button>
-        <el-button @click="cancel">取 消</el-button>
+        <el-button type="primary" @click="submitAssignRuleForm">确 定</el-button>
+        <el-button @click="cancelAssignRuleForm">取 消</el-button>
       </div>
     </el-dialog>
   </div>
@@ -263,7 +263,7 @@ import {getForm, getSimpleForms} from "@/api/bpm/form";
 import {decodeFields} from "@/utils/formGenerator";
 import Parser from '@/components/parser/Parser'
 import {getBaseHeader} from "@/utils/request";
-import {getTaskAssignRuleList} from "@/api/bpm/taskAssignRule";
+import {createTaskAssignRule, getTaskAssignRuleList, updateTaskAssignRule} from "@/api/bpm/taskAssignRule";
 import {listSimpleRoles} from "@/api/system/role";
 
 export default {
@@ -597,6 +597,9 @@ export default {
     },
     /** 处理修改任务分配规则的按钮操作 */
     handleUpdateTaskAssignRule(row) {
+      // 先重置标识
+      this.resetAssignRuleForm();
+      // 设置表单
       this.taskAssignRule.form = {
         ...row,
         options: []
@@ -606,6 +609,48 @@ export default {
         this.taskAssignRule.form.role = row.options;
       }
       this.taskAssignRule.open = true;
+    },
+    /** 提交任务分配规则的表单 */
+    submitAssignRuleForm() {
+      this.$refs["taskAssignRuleForm"].validate(valid => {
+        if (valid) {
+          // 构建表单
+          let form = {
+            ...this.taskAssignRule.form,
+            taskDefinitionName: undefined,
+          };
+          if (form.type === 10) {
+            form.options = form.roleIds;
+          }
+          form.roleIds = undefined;
+          // 新增
+          if (!form.id) {
+            createTaskAssignRule(form).then(response => {
+              this.msgSuccess("修改成功");
+              this.taskAssignRule.open = false;
+              this.doGetTaskAssignRuleList();
+            });
+            // 修改
+          } else {
+            form.taskDefinitionKey = undefined; // 无法修改
+            updateTaskAssignRule(form).then(response => {
+              this.msgSuccess("修改成功");
+              this.taskAssignRule.open = false;
+              this.doGetTaskAssignRuleList();
+            });
+          }
+        }
+      });
+    },
+    /** 取消任务分配规则的表单 */
+    cancelAssignRuleForm() {
+      this.taskAssignRule.open = false;
+      this.resetAssignRuleForm();
+    },
+    // 表单重置
+    resetAssignRuleForm() {
+      this.taskAssignRule.form = {};
+      this.resetForm("taskAssignRuleForm");
     }
   }
 };
