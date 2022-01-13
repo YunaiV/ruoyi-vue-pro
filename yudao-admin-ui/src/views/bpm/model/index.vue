@@ -245,6 +245,10 @@
             <el-option v-for="item in taskAssignRule.roleOptions" :key="parseInt(item.id)" :label="item.name" :value="parseInt(item.id)" />
           </el-select>
         </el-form-item>
+        <el-form-item v-if="taskAssignRule.form.type === 20 || taskAssignRule.form.type === 21" label="指定部门" prop="deptIds">
+          <treeselect v-model="taskAssignRule.form.deptIds" :options="taskAssignRule.deptTreeOptions" multiple flat :defaultExpandLevel="3"
+                      placeholder="请选择指定部门" :normalizer="normalizer"/>
+        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitAssignRuleForm">确 定</el-button>
@@ -271,11 +275,16 @@ import Parser from '@/components/parser/Parser'
 import {getBaseHeader} from "@/utils/request";
 import {createTaskAssignRule, getTaskAssignRuleList, updateTaskAssignRule} from "@/api/bpm/taskAssignRule";
 import {listSimpleRoles} from "@/api/system/role";
+import {listSimpleDepts} from "@/api/system/dept";
+
+import Treeselect from "@riophae/vue-treeselect";
+import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 
 export default {
   name: "model",
   components: {
-    Parser
+    Parser,
+    Treeselect
   },
   data() {
     return {
@@ -331,9 +340,12 @@ export default {
         rules: { // 表单校验规则
           type: [{ required: true, message: "规则类型不能为空", trigger: "change" }],
           roleIds: [{required: true, message: "指定角色不能为空", trigger: "change" }],
+          deptIds: [{required: true, message: "指定部门不能为空", trigger: "change" }],
         },
         // 各种下拉框
         roleOptions: [],
+        deptOptions: [],
+        deptTreeOptions: [],
       },
 
       // 流程导入参数
@@ -460,9 +472,18 @@ export default {
         }
         // 创建
         createModel(this.form).then(response => {
-          this.msgSuccess("新建流程成功");
           this.open = false;
           this.getList();
+          this.$alert('<strong>新建模型成功！</strong>后续需要执行如下 4 个步骤：' +
+            '<div>1. 点击【修改流程】按钮，配置流程的分类、表单信息</div>' +
+            '<div>2. 点击【设计流程】按钮，绘制流程图</div>' +
+            '<div>3. 点击【分配规则】按钮，设置每个用户任务的审批人</div>' +
+            '<div>4. 点击【发布流程】按钮，完成流程的最终发布</div>' +
+            '另外，每次流程修改后，都需要点击【发布流程】按钮，才能正式生效！！！',
+            '重要提示', {
+              dangerouslyUseHTMLString: true,
+              type: 'success'
+            });
         });
       });
     },
@@ -597,8 +618,15 @@ export default {
       // 获得角色列表
       this.taskAssignRule.roleOptions = [];
       listSimpleRoles().then(response => {
-        // 处理 roleOptions 参数
         this.taskAssignRule.roleOptions.push(...response.data);
+      });
+      // 获得部门列表
+      this.taskAssignRule.deptOptions = [];
+      this.taskAssignRule.deptTreeOptions = [];
+      listSimpleDepts().then(response => {
+        // 处理 roleOptions 参数
+        this.taskAssignRule.deptOptions.push(...response.data);
+        this.taskAssignRule.deptTreeOptions.push(...this.handleTree(response.data, "id"));
       });
     },
     /** 处理修改任务分配规则的按钮操作 */
@@ -610,10 +638,13 @@ export default {
         ...row,
         options: [],
         roleIds: [],
+        deptIds: [],
       };
       // 将 options 赋值到对应的 roleIds 等选项
       if (row.type === 10) {
         this.taskAssignRule.form.roleIds.push(...row.options);
+      } else if (row.type === 20 || row.type === 21) {
+        this.taskAssignRule.form.deptIds.push(...row.options);
       }
       this.taskAssignRule.open = true;
     },
@@ -629,8 +660,11 @@ export default {
           // 将 roleIds 等选项赋值到 options 中
           if (form.type === 10) {
             form.options = form.roleIds;
+          } else if (form.type === 20 || form.type === 21) {
+            form.options = form.deptIds;
           }
           form.roleIds = undefined;
+          form.deptIds = undefined;
           // 新增
           if (!form.id) {
             form.modelId = this.taskAssignRule.row.id // 模型编号
@@ -668,8 +702,22 @@ export default {
             return roleOption.name;
           }
         }
+      } else if (type === 20 || type === 21) {
+        for (const deptOption of this.taskAssignRule.deptOptions) {
+          if (deptOption.id === option) {
+            return deptOption.name;
+          }
+        }
       }
       return '未知(' + option + ')';
+    },
+    // 格式化部门的下拉框
+    normalizer(node) {
+      return {
+        id: node.id,
+        label: node.name,
+        children: node.children
+      }
     }
   }
 };

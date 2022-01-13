@@ -12,8 +12,10 @@ import cn.iocoder.yudao.adminserver.modules.bpm.enums.definition.BpmTaskAssignRu
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmModelService;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmProcessDefinitionService;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmTaskAssignRuleService;
+import cn.iocoder.yudao.adminserver.modules.system.service.dept.SysDeptService;
 import cn.iocoder.yudao.adminserver.modules.system.service.permission.SysRoleService;
 import cn.iocoder.yudao.framework.activiti.core.util.ActivitiUtils;
+import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.bpmn.model.UserTask;
@@ -51,6 +53,8 @@ public class BpmTaskAssignRuleServiceImpl implements BpmTaskAssignRuleService {
     private BpmProcessDefinitionService processDefinitionService;
     @Resource
     private SysRoleService roleService;
+    @Resource
+    private SysDeptService deptService;
 
     @Override
     public List<BpmTaskAssignRuleDO> getTaskAssignRuleListByProcessDefinitionId(String processDefinitionId,
@@ -141,7 +145,9 @@ public class BpmTaskAssignRuleServiceImpl implements BpmTaskAssignRuleService {
     private void validTaskAssignRuleOptions(Integer type, Set<Long> options) {
         if (Objects.equals(type, BpmTaskAssignRuleTypeEnum.ROLE.getType())) {
             roleService.validRoles(options);
-            return;
+        } else if (ObjectUtils.equalsAny(BpmTaskAssignRuleTypeEnum.DEPT.getType(),
+                BpmTaskAssignRuleTypeEnum.DEPT_LEADER.getType())) {
+            deptService.validDepts(options);
         }
         // TODO 其它的
     }
