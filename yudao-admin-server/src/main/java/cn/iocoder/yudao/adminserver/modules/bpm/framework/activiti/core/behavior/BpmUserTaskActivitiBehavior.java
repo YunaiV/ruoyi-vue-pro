@@ -6,6 +6,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.definition.BpmTaskAssignRuleDO;
 import cn.iocoder.yudao.adminserver.modules.bpm.enums.definition.BpmTaskAssignRuleTypeEnum;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmTaskAssignRuleService;
+import cn.iocoder.yudao.adminserver.modules.system.service.permission.SysPermissionService;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import lombok.Setter;
 import org.activiti.bpmn.model.UserTask;
@@ -29,6 +30,8 @@ public class BpmUserTaskActivitiBehavior extends UserTaskActivityBehavior {
 
     @Setter
     private BpmTaskAssignRuleService bpmTaskRuleService;
+    @Setter
+    private SysPermissionService permissionService;
 
     public BpmUserTaskActivitiBehavior(UserTask userTask) {
         super(userTask);
@@ -96,9 +99,8 @@ public class BpmUserTaskActivitiBehavior extends UserTaskActivityBehavior {
     }
 
     private Set<Long> calculateTaskCandidateUsersByRole(TaskEntity task, BpmTaskAssignRuleDO rule) {
-        throw new UnsupportedOperationException("暂不支持该任务规则");
+        return permissionService.getUserRoleIdListByRoleIds(rule.getOptions());
     }
-
 
     private Set<Long> calculateTaskCandidateUsersByDept(TaskEntity task, BpmTaskAssignRuleDO rule) {
         throw new UnsupportedOperationException("暂不支持该任务规则");

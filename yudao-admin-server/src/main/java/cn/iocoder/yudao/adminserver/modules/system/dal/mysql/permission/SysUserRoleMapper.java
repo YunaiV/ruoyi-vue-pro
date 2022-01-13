@@ -16,6 +16,14 @@ public interface SysUserRoleMapper extends BaseMapperX<SysUserRoleDO> {
         return selectList(new QueryWrapper<SysUserRoleDO>().eq("user_id", userId));
     }
 
+    default List<SysUserRoleDO> selectListByRoleId(Long roleId) {
+        return selectList(new QueryWrapper<SysUserRoleDO>().eq("role_id", roleId));
+    }
+
+    default List<SysUserRoleDO> selectListByRoleIds(Collection<Long> roleIds) {
+        return selectList("role_id", roleIds);
+    }
+
     default void insertList(Long userId, Collection<Long> roleIds) {
         List<SysUserRoleDO> list = roleIds.stream().map(roleId -> {
             SysUserRoleDO entity = new SysUserRoleDO();

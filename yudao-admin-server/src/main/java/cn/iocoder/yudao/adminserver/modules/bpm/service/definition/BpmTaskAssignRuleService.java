@@ -2,6 +2,7 @@ package cn.iocoder.yudao.adminserver.modules.bpm.service.definition;
 
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.rule.BpmTaskAssignRuleCreateReqVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.rule.BpmTaskAssignRuleRespVO;
+import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.rule.BpmTaskAssignRuleUpdateReqVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.definition.BpmTaskAssignRuleDO;
 import org.springframework.lang.Nullable;
 
@@ -51,6 +52,11 @@ public interface BpmTaskAssignRuleService {
      */
     Long createTaskAssignRule(@Valid BpmTaskAssignRuleCreateReqVO reqVO);
 
-    // TODO 芋艿：复制任务规则
+    /**
+     * 更新任务分配规则
+     *
+     * @param reqVO 创建信息
+     */
+    void updateTaskAssignRule(@Valid BpmTaskAssignRuleUpdateReqVO reqVO);
 
 }

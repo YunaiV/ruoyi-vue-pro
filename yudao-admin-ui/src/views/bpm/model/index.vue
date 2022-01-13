@@ -204,13 +204,13 @@
     <el-dialog title="任务分配规则" :visible.sync="taskAssignRule.listOpen" width="800px" append-to-body>
       <el-table v-loading="taskAssignRule.loading" :data="taskAssignRule.list">
         <el-table-column label="任务名" align="center" prop="taskDefinitionName" width="120" fixed />
-        <el-table-column label="任务标识" align="center" prop="taskDefinitionKey" width="300" />
-        <el-table-column label="规则类型" align="center" prop="type">
+        <el-table-column label="任务标识" align="center" prop="taskDefinitionKey" width="120" show-tooltip-when-overflow />
+        <el-table-column label="规则类型" align="center" prop="type" width="120">
           <template slot-scope="scope">
             <span>{{ getDictDataLabel(DICT_TYPE.BPM_TASK_ASSIGN_RULE_TYPE, scope.row.type) }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="规则范围" align="center" prop="options" width="200px">
+        <el-table-column label="规则范围" align="center" prop="options" width="300px">
           <template slot-scope="scope">
             <el-tag size="medium" v-if="scope.row.options" v-for="option in scope.row.options">
               {{ getAssignRuleOptionName(scope.row.type, option) }}
@@ -608,11 +608,12 @@ export default {
       // 设置表单
       this.taskAssignRule.form = {
         ...row,
-        options: []
+        options: [],
+        roleIds: [],
       };
       // 将 options 赋值到对应的 roleIds 等选项
       if (row.type === 10) {
-        this.taskAssignRule.form.roleIds = row.options;
+        this.taskAssignRule.form.roleIds.push(...row.options);
       }
       this.taskAssignRule.open = true;
     },

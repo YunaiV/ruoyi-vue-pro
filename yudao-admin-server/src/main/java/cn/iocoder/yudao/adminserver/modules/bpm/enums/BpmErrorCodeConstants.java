@@ -42,6 +42,8 @@ public interface BpmErrorCodeConstants {
 
     // ========== 流程任务分配规则 1-009-006-000 ==========
     ErrorCode TASK_ASSIGN_RULE_EXISTS = new ErrorCode(1009006000, "流程({}) 的任务({}) 已经存在分配规则");
+    ErrorCode TASK_ASSIGN_RULE_NOT_EXISTS = new ErrorCode(1009006000, "流程任务分配规则不存在");
+    ErrorCode TASK_UPDATE_FAIL_NOT_MODEL = new ErrorCode(1009006000, "只有流程模型的任务分配规则，才允许被修改");
 
     // ========== 动态表单模块 1-009-010-000 ==========
     ErrorCode FORM_NOT_EXISTS = new ErrorCode(1009010000, "动态表单不存在");

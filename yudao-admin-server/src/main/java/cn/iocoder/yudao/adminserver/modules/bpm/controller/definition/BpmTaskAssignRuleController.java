@@ -2,6 +2,7 @@ package cn.iocoder.yudao.adminserver.modules.bpm.controller.definition;
 
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.rule.BpmTaskAssignRuleCreateReqVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.rule.BpmTaskAssignRuleRespVO;
+import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.rule.BpmTaskAssignRuleUpdateReqVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmTaskAssignRuleService;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import io.swagger.annotations.Api;
@@ -36,7 +37,8 @@ public class BpmTaskAssignRuleController {
     }
 
     @PutMapping("/update")
-    public CommonResult<Boolean> updateTaskAssignRule(@Valid @RequestBody BpmTaskAssignRuleCreateReqVO reqVO) {
+    public CommonResult<Boolean> updateTaskAssignRule(@Valid @RequestBody BpmTaskAssignRuleUpdateReqVO reqVO) {
+        taskAssignRuleService.updateTaskAssignRule(reqVO);
         return success(true);
     }
 

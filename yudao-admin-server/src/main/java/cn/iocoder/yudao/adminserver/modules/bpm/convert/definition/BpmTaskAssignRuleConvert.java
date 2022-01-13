@@ -3,6 +3,7 @@ package cn.iocoder.yudao.adminserver.modules.bpm.convert.definition;
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.rule.BpmTaskAssignRuleCreateReqVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.rule.BpmTaskAssignRuleRespVO;
+import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.rule.BpmTaskAssignRuleUpdateReqVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.definition.BpmTaskAssignRuleDO;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import org.activiti.bpmn.model.UserTask;
@@ -35,5 +36,7 @@ public interface BpmTaskAssignRuleConvert {
     BpmTaskAssignRuleRespVO convert(BpmTaskAssignRuleDO bean);
 
     BpmTaskAssignRuleDO convert(BpmTaskAssignRuleCreateReqVO bean);
+
+    BpmTaskAssignRuleDO convert(BpmTaskAssignRuleUpdateReqVO bean);
 
 }
