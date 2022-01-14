@@ -4,11 +4,18 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.definition.BpmTaskAssignRuleDO;
+import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.definition.BpmUserGroupDO;
 import cn.iocoder.yudao.adminserver.modules.bpm.enums.definition.BpmTaskAssignRuleTypeEnum;
+import cn.iocoder.yudao.adminserver.modules.bpm.framework.activiti.core.behavior.script.BpmTaskAssignScript;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmTaskAssignRuleService;
+import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmUserGroupService;
+import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.dept.SysDeptDO;
+import cn.iocoder.yudao.adminserver.modules.system.service.dept.SysDeptService;
 import cn.iocoder.yudao.adminserver.modules.system.service.permission.SysPermissionService;
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.adminserver.modules.system.service.user.SysUserService;
+import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.user.SysUserDO;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.activiti.bpmn.model.UserTask;
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.delegate.DelegateExecution;
@@ -17,24 +24,47 @@ import org.activiti.engine.impl.el.ExpressionManager;
 import org.activiti.engine.impl.persistence.entity.TaskEntity;
 import org.activiti.engine.impl.persistence.entity.TaskEntityManager;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import javax.annotation.Resource;
+import java.util.*;
+import java.util.function.Consumer;
+import java.util.function.Function;
+
+import static cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants.TASK_ASSIGN_SCRIPT_NOT_EXISTS;
+import static cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants.TASK_CREATE_FAIL_NO_CANDIDATE_USER;
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.*;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
+import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString;
 
 /**
  * 自定义的流程任务的 assignee 负责人的分配
  *
  * @author 芋道源码
  */
+@Slf4j
 public class BpmUserTaskActivitiBehavior extends UserTaskActivityBehavior {
 
     @Setter
     private BpmTaskAssignRuleService bpmTaskRuleService;
     @Setter
     private SysPermissionService permissionService;
+    @Setter
+    private SysDeptService deptService;
+    @Setter
+    private BpmUserGroupService userGroupService;
+    @Resource
+    private SysUserService userService;
+    /**
+     * 任务分配脚本
+     */
+    private Map<Long, BpmTaskAssignScript> scriptMap = Collections.emptyMap();
 
     public BpmUserTaskActivitiBehavior(UserTask userTask) {
         super(userTask);
+    }
+
+    public void setScripts(List<BpmTaskAssignScript> scripts) {
+        this.scriptMap = convertMap(scripts, script -> script.getEnum().getId());
     }
 
     @Override
@@ -51,7 +81,7 @@ public class BpmUserTaskActivitiBehavior extends UserTaskActivityBehavior {
         // 设置候选人们
         candidateUserIds.remove(assigneeUserId); // 已经成为负责人了，就不要在扮演候选人了
         if (CollUtil.isNotEmpty(candidateUserIds)) {
-            task.addCandidateUsers(CollectionUtils.convertSet(candidateUserIds, String::valueOf));
+            task.addCandidateUsers(convertSet(candidateUserIds, String::valueOf));
         }
     }
 
@@ -80,20 +110,23 @@ public class BpmUserTaskActivitiBehavior extends UserTaskActivityBehavior {
         if (Objects.equals(BpmTaskAssignRuleTypeEnum.ROLE.getType(), rule.getType())) {
             assigneeUserIds = calculateTaskCandidateUsersByRole(task, rule);
         } else if (Objects.equals(BpmTaskAssignRuleTypeEnum.DEPT_MEMBER.getType(), rule.getType())) {
-            assigneeUserIds = calculateTaskCandidateUsersByDept(task, rule);
+            assigneeUserIds = calculateTaskCandidateUsersByMember(task, rule);
         } else if (Objects.equals(BpmTaskAssignRuleTypeEnum.DEPT_LEADER.getType(), rule.getType())) {
-            assigneeUserIds = calculateTaskCandidateUsersByDept(task, rule);
-        } else if (Objects.equals(BpmTaskAssignRuleTypeEnum.USER.getType(), rule.getType())) {
+            assigneeUserIds = calculateTaskCandidateUsersByDeptLeader(task, rule);
+        }  else if (Objects.equals(BpmTaskAssignRuleTypeEnum.USER.getType(), rule.getType())) {
             assigneeUserIds = calculateTaskCandidateUsersByUser(task, rule);
         } else if (Objects.equals(BpmTaskAssignRuleTypeEnum.USER_GROUP.getType(), rule.getType())) {
-            assigneeUserIds = calculateTaskCandidateUsersByUser(task, rule);
+            assigneeUserIds = calculateTaskCandidateUsersByUserGroup(task, rule);
+        } else if (Objects.equals(BpmTaskAssignRuleTypeEnum.SCRIPT.getType(), rule.getType())) {
+            assigneeUserIds = calculateTaskCandidateUsersByScript(task, rule);
         }
 
         // TODO 芋艿：统一过滤掉被禁用的用户
         // 如果候选人为空，抛出异常 TODO 芋艿：没候选人的策略选择。1 - 挂起；2 - 直接结束；3 - 强制一个兜底人
         if (CollUtil.isEmpty(assigneeUserIds)) {
-            throw new ActivitiException(StrUtil.format("流程任务({}/{}/{}) 任务规则({}) 找不到候选人",
-                    task.getId(), task.getProcessDefinitionId(), task.getTaskDefinitionKey()));
+            log.error("[calculateTaskCandidateUsers][流程任务({}/{}/{}) 任务规则({}) 找不到候选人]",
+                    task.getId(), task.getProcessDefinitionId(), task.getTaskDefinitionKey(), toJsonString(rule));
+            throw exception(TASK_CREATE_FAIL_NO_CANDIDATE_USER);
         }
         return assigneeUserIds;
     }
@@ -102,12 +135,14 @@ public class BpmUserTaskActivitiBehavior extends UserTaskActivityBehavior {
         return permissionService.getUserRoleIdListByRoleIds(rule.getOptions());
     }
 
-    private Set<Long> calculateTaskCandidateUsersByDept(TaskEntity task, BpmTaskAssignRuleDO rule) {
-        throw new UnsupportedOperationException("暂不支持该任务规则");
+    private Set<Long> calculateTaskCandidateUsersByMember(TaskEntity task, BpmTaskAssignRuleDO rule) {
+        List<SysUserDO> users = userService.getUsersByPostIds(rule.getOptions());
+        return convertSet(users, SysUserDO::getId);
     }
 
     private Set<Long> calculateTaskCandidateUsersByDeptLeader(TaskEntity task, BpmTaskAssignRuleDO rule) {
-        throw new UnsupportedOperationException("暂不支持该任务规则");
+        List<SysDeptDO> depts = deptService.getDepts(rule.getOptions());
+        return convertSet(depts, SysDeptDO::getLeaderUserId);
     }
 
     private Set<Long> calculateTaskCandidateUsersByUser(TaskEntity task, BpmTaskAssignRuleDO rule) {
@@ -115,11 +150,26 @@ public class BpmUserTaskActivitiBehavior extends UserTaskActivityBehavior {
     }
 
     private Set<Long> calculateTaskCandidateUsersByUserGroup(TaskEntity task, BpmTaskAssignRuleDO rule) {
-        throw new UnsupportedOperationException("暂不支持该任务规则");
+        List<BpmUserGroupDO> userGroups = userGroupService.getUserGroupList(rule.getOptions());
+        Set<Long> userIds = new HashSet<>();
+        userGroups.forEach(bpmUserGroupDO -> userIds.addAll(bpmUserGroupDO.getMemberUserIds()));
+        return userIds;
     }
 
     private Set<Long> calculateTaskCandidateUsersByScript(TaskEntity task, BpmTaskAssignRuleDO rule) {
-        throw new UnsupportedOperationException("暂不支持该任务规则");
+        // 获得对应的脚本
+        List<BpmTaskAssignScript> scripts = new ArrayList<>(rule.getOptions().size());
+        rule.getOptions().forEach(id -> {
+            BpmTaskAssignScript script = scriptMap.get(id);
+            if (script == null) {
+                throw exception(TASK_ASSIGN_SCRIPT_NOT_EXISTS, id);
+            }
+            scripts.add(script);
+        });
+        // 逐个计算任务
+        Set<Long> userIds = new HashSet<>();
+        scripts.forEach(script -> CollUtil.addAll(userIds, script.calculateTaskCandidateUsers(task)));
+        return userIds;
     }
 
 }

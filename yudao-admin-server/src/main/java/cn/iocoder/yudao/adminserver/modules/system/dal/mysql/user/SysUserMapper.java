@@ -68,5 +68,9 @@ public interface SysUserMapper extends BaseMapperX<SysUserDO> {
         return selectList("status", status);
     }
 
+    default List<SysUserDO> selectListByDeptIds(Collection<Integer> deptIds) {
+        return selectList("dept_id", deptIds);
+    }
+
 }
 

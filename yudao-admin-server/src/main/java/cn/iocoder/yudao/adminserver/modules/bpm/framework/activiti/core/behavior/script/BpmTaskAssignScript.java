@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.framework.activiti.core.behavior.script;
 
+import cn.iocoder.yudao.adminserver.modules.bpm.enums.definition.BpmTaskRuleScriptEnum;
 import org.activiti.engine.impl.persistence.entity.TaskEntity;
 
 import java.util.List;
@@ -22,5 +23,12 @@ public interface BpmTaskAssignScript {
      * @return 候选人用户的编号数组
      */
     List<Long> calculateTaskCandidateUsers(TaskEntity task);
+
+    /**
+     * 获得枚举值
+     *
+     * @return 枚举值
+     */
+    BpmTaskRuleScriptEnum getEnum();
 
 }

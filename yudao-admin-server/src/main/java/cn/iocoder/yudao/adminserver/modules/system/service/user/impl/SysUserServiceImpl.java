@@ -390,6 +390,26 @@ public class SysUserServiceImpl implements SysUserService {
     }
 
     @Override
+    public List<SysUserDO> getUsersByPostIds(Collection<Long> postIds) {
+        if (CollUtil.isEmpty(postIds)) {
+            return Collections.emptyList();
+        }
+        // 过滤不符合条件的
+        // TODO 芋艿：暂时只能内存过滤。解决方案：1、新建一个关联表；2、基于 where + 函数；3、json 字段，适合 mysql 8+ 版本
+        List<SysUserDO> users = userMapper.selectList();
+        users.removeIf(user -> !CollUtil.containsAny(user.getPostIds(), postIds));
+        return users;
+    }
+
+    @Override
+    public List<SysUserDO> getUsersByDeptIds(Collection<Integer> deptIds) {
+        if (CollUtil.isEmpty(deptIds)) {
+            return Collections.emptyList();
+        }
+        return userMapper.selectListByDeptIds(deptIds);
+    }
+
+    @Override
     public void validUsers(Set<Long> ids) {
         if (CollUtil.isEmpty(ids)) {
             return;

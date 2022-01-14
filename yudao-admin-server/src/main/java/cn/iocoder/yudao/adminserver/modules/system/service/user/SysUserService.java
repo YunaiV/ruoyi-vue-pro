@@ -175,6 +175,22 @@ public interface SysUserService {
     List<SysUserDO> getUsersByStatus(Integer status);
 
     /**
+     * 获得指定岗位的用户数组
+     *
+     * @param postIds 岗位数组
+     * @return 用户数组
+     */
+    List<SysUserDO> getUsersByPostIds(Collection<Long> postIds);
+
+    /**
+     * 获得指定部门的用户数组
+     *
+     * @param deptIds 部门数组
+     * @return 用户数组
+     */
+    List<SysUserDO> getUsersByDeptIds(Collection<Integer> deptIds);
+
+    /**
      * 校验用户们是否有效。如下情况，视为无效：
      * 1. 用户编号不存在
      * 2. 用户被禁用

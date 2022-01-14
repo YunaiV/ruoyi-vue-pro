@@ -85,6 +85,14 @@ public interface SysDeptService {
     SysDeptDO getDept(Long id);
 
     /**
+     * 获得部门信息数组
+     *
+     * @param ids 部门编号数组
+     * @return 部门信息数组
+     */
+    List<SysDeptDO> getDepts(Collection<Long> ids);
+
+    /**
      * 获得所有子部门，从缓存中
      *
      * @param parentId 部门编号

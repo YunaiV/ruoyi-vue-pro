@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.adminserver.modules.system.service.dept.impl;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.permission.SysRoleDO;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
@@ -231,6 +230,11 @@ public class SysDeptServiceImpl implements SysDeptService {
     @Override
     public SysDeptDO getDept(Long id) {
         return deptMapper.selectById(id);
+    }
+
+    @Override
+    public List<SysDeptDO> getDepts(Collection<Long> ids) {
+        return deptMapper.selectBatchIds(ids);
     }
 
     private void checkCreateOrUpdate(Long id, Long parentId, String name) {
