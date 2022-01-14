@@ -200,61 +200,7 @@
     </el-dialog>
 
     <!-- ========== 流程任务分配规则 ========== -->
-    <!-- 列表弹窗 -->
-    <el-dialog title="任务分配规则" :visible.sync="taskAssignRule.listOpen" width="800px" append-to-body>
-      <el-table v-loading="taskAssignRule.loading" :data="taskAssignRule.list">
-        <el-table-column label="任务名" align="center" prop="taskDefinitionName" width="120" fixed />
-        <el-table-column label="任务标识" align="center" prop="taskDefinitionKey" width="120" show-tooltip-when-overflow />
-        <el-table-column label="规则类型" align="center" prop="type" width="120">
-          <template slot-scope="scope">
-            <span>{{ getDictDataLabel(DICT_TYPE.BPM_TASK_ASSIGN_RULE_TYPE, scope.row.type) }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column label="规则范围" align="center" prop="options" width="300px">
-          <template slot-scope="scope">
-            <el-tag size="medium" v-if="scope.row.options" v-for="option in scope.row.options">
-              {{ getAssignRuleOptionName(scope.row.type, option) }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column label="操作" align="center" width="80" fixed="right">
-          <template slot-scope="scope">
-            <!-- TODO 权限 -->
-            <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdateTaskAssignRule(scope.row)"
-                       v-hasPermi="['bpm:model:update']">修改</el-button>
-          </template>
-        </el-table-column>
-      </el-table>
-    </el-dialog>
-    <!-- 添加/修改弹窗 -->
-    <el-dialog title="修改任务规则" :visible.sync="taskAssignRule.open" width="500px" append-to-body>
-      <el-form ref="taskAssignRuleForm" :model="taskAssignRule.form" :rules="taskAssignRule.rules" label-width="110px">
-        <el-form-item label="任务名称" prop="taskDefinitionName">
-          <el-input v-model="taskAssignRule.form.taskDefinitionName" disabled />
-        </el-form-item>
-        <el-form-item label="任务标识" prop="taskDefinitionKey">
-          <el-input v-model="taskAssignRule.form.taskDefinitionKey" disabled />
-        </el-form-item>
-        <el-form-item label="规则类型" prop="type">
-          <el-select v-model="taskAssignRule.form.type" clearable style="width: 100%">
-            <el-option v-for="dict in taskAssignRuleDictDatas" :key="parseInt(dict.value)" :label="dict.label" :value="parseInt(dict.value)"/>
-          </el-select>
-        </el-form-item>
-        <el-form-item v-if="taskAssignRule.form.type === 10" label="指定角色" prop="roleIds">
-          <el-select v-model="taskAssignRule.form.roleIds" multiple clearable style="width: 100%">
-            <el-option v-for="item in taskAssignRule.roleOptions" :key="parseInt(item.id)" :label="item.name" :value="parseInt(item.id)" />
-          </el-select>
-        </el-form-item>
-        <el-form-item v-if="taskAssignRule.form.type === 20 || taskAssignRule.form.type === 21" label="指定部门" prop="deptIds">
-          <treeselect v-model="taskAssignRule.form.deptIds" :options="taskAssignRule.deptTreeOptions" multiple flat :defaultExpandLevel="3"
-                      placeholder="请选择指定部门" :normalizer="normalizer"/>
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="submitAssignRuleForm">确 定</el-button>
-        <el-button @click="cancelAssignRuleForm">取 消</el-button>
-      </div>
-    </el-dialog>
+    <taskAssignRuleDialog ref="taskAssignRuleDialog" />
   </div>
 </template>
 
@@ -273,9 +219,7 @@ import {getForm, getSimpleForms} from "@/api/bpm/form";
 import {decodeFields} from "@/utils/formGenerator";
 import Parser from '@/components/parser/Parser'
 import {getBaseHeader} from "@/utils/request";
-import {createTaskAssignRule, getTaskAssignRuleList, updateTaskAssignRule} from "@/api/bpm/taskAssignRule";
-import {listSimpleRoles} from "@/api/system/role";
-import {listSimpleDepts} from "@/api/system/dept";
+import taskAssignRuleDialog from "../taskAssignRule/taskAssignRuleDialog";
 
 import Treeselect from "@riophae/vue-treeselect";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
@@ -284,7 +228,8 @@ export default {
   name: "model",
   components: {
     Parser,
-    Treeselect
+    Treeselect,
+    taskAssignRuleDialog
   },
   data() {
     return {
@@ -327,25 +272,6 @@ export default {
         formId: [{ required: true, message: "业务表单不能为空", trigger: "blur" }],
         formCustomCreatePath: [{ required: true, message: "表单提交路由不能为空", trigger: "blur" }],
         formCustomViewPath: [{ required: true, message: "表单查看路由不能为空", trigger: "blur" }],
-      },
-
-      // 任务分配规则表单
-      taskAssignRule: {
-        row: undefined, // 选中的流程模型
-        list: [], // 选中流程模型的任务分配规则们
-        listOpen: false, // 列表是否打开
-        loading: false, // 加载中
-        open: false, // 是否打开
-        form: {}, // 表单
-        rules: { // 表单校验规则
-          type: [{ required: true, message: "规则类型不能为空", trigger: "change" }],
-          roleIds: [{required: true, message: "指定角色不能为空", trigger: "change" }],
-          deptIds: [{required: true, message: "指定部门不能为空", trigger: "change" }],
-        },
-        // 各种下拉框
-        roleOptions: [],
-        deptOptions: [],
-        deptTreeOptions: [],
       },
 
       // 流程导入参数
@@ -600,125 +526,10 @@ export default {
         this.$refs.upload.submit();
       })
     },
-    // ========== ==========
-    doGetTaskAssignRuleList() {
-      this.taskAssignRule.loading = true;
-      getTaskAssignRuleList({
-        modelId: this.taskAssignRule.row.id
-      }).then(response => {
-        this.taskAssignRule.loading = false;
-        this.taskAssignRule.list = response.data;
-      })
-    },
     /** 处理任务分配规则列表的按钮操作 */
     handleAssignRule(row) {
-      this.taskAssignRule.row = row;
-      this.taskAssignRule.listOpen = true;
-      this.doGetTaskAssignRuleList();
-      // 获得角色列表
-      this.taskAssignRule.roleOptions = [];
-      listSimpleRoles().then(response => {
-        this.taskAssignRule.roleOptions.push(...response.data);
-      });
-      // 获得部门列表
-      this.taskAssignRule.deptOptions = [];
-      this.taskAssignRule.deptTreeOptions = [];
-      listSimpleDepts().then(response => {
-        // 处理 roleOptions 参数
-        this.taskAssignRule.deptOptions.push(...response.data);
-        this.taskAssignRule.deptTreeOptions.push(...this.handleTree(response.data, "id"));
-      });
+      this.$refs['taskAssignRuleDialog'].initModel(row.id);
     },
-    /** 处理修改任务分配规则的按钮操作 */
-    handleUpdateTaskAssignRule(row) {
-      // 先重置标识
-      this.resetAssignRuleForm();
-      // 设置表单
-      this.taskAssignRule.form = {
-        ...row,
-        options: [],
-        roleIds: [],
-        deptIds: [],
-      };
-      // 将 options 赋值到对应的 roleIds 等选项
-      if (row.type === 10) {
-        this.taskAssignRule.form.roleIds.push(...row.options);
-      } else if (row.type === 20 || row.type === 21) {
-        this.taskAssignRule.form.deptIds.push(...row.options);
-      }
-      this.taskAssignRule.open = true;
-    },
-    /** 提交任务分配规则的表单 */
-    submitAssignRuleForm() {
-      this.$refs["taskAssignRuleForm"].validate(valid => {
-        if (valid) {
-          // 构建表单
-          let form = {
-            ...this.taskAssignRule.form,
-            taskDefinitionName: undefined,
-          };
-          // 将 roleIds 等选项赋值到 options 中
-          if (form.type === 10) {
-            form.options = form.roleIds;
-          } else if (form.type === 20 || form.type === 21) {
-            form.options = form.deptIds;
-          }
-          form.roleIds = undefined;
-          form.deptIds = undefined;
-          // 新增
-          if (!form.id) {
-            form.modelId = this.taskAssignRule.row.id // 模型编号
-            createTaskAssignRule(form).then(response => {
-              this.msgSuccess("修改成功");
-              this.taskAssignRule.open = false;
-              this.doGetTaskAssignRuleList();
-            });
-            // 修改
-          } else {
-            form.taskDefinitionKey = undefined; // 无法修改
-            updateTaskAssignRule(form).then(response => {
-              this.msgSuccess("修改成功");
-              this.taskAssignRule.open = false;
-              this.doGetTaskAssignRuleList();
-            });
-          }
-        }
-      });
-    },
-    /** 取消任务分配规则的表单 */
-    cancelAssignRuleForm() {
-      this.taskAssignRule.open = false;
-      this.resetAssignRuleForm();
-    },
-    /** 表单重置 */
-    resetAssignRuleForm() {
-      this.taskAssignRule.form = {};
-      this.resetForm("taskAssignRuleForm");
-    },
-    getAssignRuleOptionName(type, option) {
-      if (type === 10) {
-        for (const roleOption of this.taskAssignRule.roleOptions) {
-          if (roleOption.id === option) {
-            return roleOption.name;
-          }
-        }
-      } else if (type === 20 || type === 21) {
-        for (const deptOption of this.taskAssignRule.deptOptions) {
-          if (deptOption.id === option) {
-            return deptOption.name;
-          }
-        }
-      }
-      return '未知(' + option + ')';
-    },
-    // 格式化部门的下拉框
-    normalizer(node) {
-      return {
-        id: node.id,
-        label: node.name,
-        children: node.children
-      }
-    }
   }
 };
 </script>
