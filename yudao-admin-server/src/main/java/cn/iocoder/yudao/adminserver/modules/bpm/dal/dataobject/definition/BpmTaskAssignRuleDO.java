@@ -74,7 +74,7 @@ public class BpmTaskAssignRuleDO extends BaseDO {
      * 根据 type 不同，对应的值是不同的：
      *
      * 1. {@link BpmTaskAssignRuleTypeEnum#ROLE} 时：角色编号
-     * 2. {@link BpmTaskAssignRuleTypeEnum#DEPT} 时：部门编号
+     * 2. {@link BpmTaskAssignRuleTypeEnum#DEPT_MEMBER} 时：部门编号
      * 3. {@link BpmTaskAssignRuleTypeEnum#DEPT_LEADER} 时：部门编号
      * 4. {@link BpmTaskAssignRuleTypeEnum#USER} 时：用户编号
      * 5. {@link BpmTaskAssignRuleTypeEnum#USER_GROUP} 时：用户组编号

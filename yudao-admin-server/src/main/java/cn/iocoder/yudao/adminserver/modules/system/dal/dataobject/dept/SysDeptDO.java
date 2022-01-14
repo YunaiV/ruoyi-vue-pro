@@ -12,6 +12,7 @@ import lombok.EqualsAndHashCode;
  * 部门表
  *
  * @author ruoyi
+ * @author 芋道源码
  */
 @TableName("sys_dept")
 @Data
