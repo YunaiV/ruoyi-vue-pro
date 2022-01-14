@@ -40,6 +40,7 @@ export const DICT_TYPE = {
   BPM_TASK_ASSIGN_RULE_TYPE: 'bpm_task_assign_rule_type',
   BPM_PROCESS_INSTANCE_STATUS: 'bpm_process_instance_status',
   BPM_PROCESS_INSTANCE_RESULT: 'bpm_process_instance_result',
+  BPM_TASK_ASSIGN_SCRIPT: 'bpm_task_assign_script',
   OA_LEAVE_STATUS: 'flow_status', // todo 芋艿：可以删除
   OA_LEAVE_TYPE: 'oa_leave_type'
 }
@@ -51,6 +52,10 @@ export const DICT_TYPE = {
  * @returns {*|Array} 数据字典数组
  */
 export function getDictDatas(dictType) {
+  // if (dictType === 'bpm_task_assign_script') {
+  //   console.log(store.getters.dict_datas[dictType]);
+  //   debugger
+  // }
   return store.getters.dict_datas[dictType] || []
 }
 

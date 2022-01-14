@@ -7,6 +7,8 @@ import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.QueryWrapperX;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+
 /**
  * 用户组 Mapper
  *
@@ -21,6 +23,10 @@ public interface BpmUserGroupMapper extends BaseMapperX<BpmUserGroupDO> {
                 .eqIfPresent("status", reqVO.getStatus())
                 .betweenIfPresent("create_time", reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
                 .orderByDesc("id"));
+    }
+
+    default List<BpmUserGroupDO> selectListByStatus(Integer status) {
+        return selectList("status", status);
     }
 
 }

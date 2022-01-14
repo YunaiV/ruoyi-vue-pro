@@ -37,7 +37,7 @@
         </el-form-item>
         <el-form-item label="规则类型" prop="type">
           <el-select v-model="form.type" clearable style="width: 100%">
-            <el-option v-for="dict in taskAssignRuleDictDatas" :key="parseInt(dict.value)" :label="dict.label" :value="parseInt(dict.value)"/>
+            <el-option v-for="dict in taskAssignRuleTypeDictDatas" :key="parseInt(dict.value)" :label="dict.label" :value="parseInt(dict.value)"/>
           </el-select>
         </el-form-item>
         <el-form-item v-if="form.type === 10" label="指定角色" prop="roleIds">
@@ -48,6 +48,27 @@
         <el-form-item v-if="form.type === 20 || form.type === 21" label="指定部门" prop="deptIds">
           <treeselect v-model="form.deptIds" :options="deptTreeOptions" multiple flat :defaultExpandLevel="3"
                       placeholder="请选择指定部门" :normalizer="normalizer"/>
+        </el-form-item>
+        <el-form-item v-if="form.type === 22" label="指定岗位" prop="postIds">
+          <el-select v-model="form.postIds" multiple clearable style="width: 100%">
+            <el-option v-for="item in postOptions" :key="parseInt(item.id)" :label="item.name" :value="parseInt(item.id)" />
+          </el-select>
+        </el-form-item>
+        <el-form-item v-if="form.type === 30" label="指定用户" prop="userIds">
+          <el-select v-model="form.userIds" multiple clearable style="width: 100%">
+            <el-option v-for="item in userOptions" :key="parseInt(item.id)" :label="item.nickname" :value="parseInt(item.id)" />
+          </el-select>
+        </el-form-item>
+        <el-form-item v-if="form.type === 40" label="指定用户组" prop="userGroupIds">
+          <el-select v-model="form.userGroupIds" multiple clearable style="width: 100%">
+            <el-option v-for="item in userGroupOptions" :key="parseInt(item.id)" :label="item.name" :value="parseInt(item.id)" />
+          </el-select>
+        </el-form-item>
+        <el-form-item v-if="form.type === 50" label="指定脚本" prop="scripts">
+          <el-select v-model="form.scripts" multiple clearable style="width: 100%">
+            <el-option v-for="dict in taskAssignScriptDictDatas" :key="parseInt(dict.value)"
+                       :label="dict.label" :value="parseInt(dict.value)"/>
+          </el-select>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -66,6 +87,9 @@ import {listSimpleDepts} from "@/api/system/dept";
 
 import Treeselect from "@riophae/vue-treeselect";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
+import {listSimplePosts} from "@/api/system/post";
+import {listSimpleUsers} from "@/api/system/user";
+import {listSimpleUserGroups} from "@/api/bpm/userGroup";
 
 export default {
   name: "taskAssignRuleDialog",
@@ -89,16 +113,24 @@ export default {
         type: [{ required: true, message: "规则类型不能为空", trigger: "change" }],
         roleIds: [{required: true, message: "指定角色不能为空", trigger: "change" }],
         deptIds: [{required: true, message: "指定部门不能为空", trigger: "change" }],
+        postIds: [{required: true, message: "指定岗位不能为空", trigger: "change"}],
+        userIds: [{required: true, message: "指定用户不能为空", trigger: "change"}],
+        userGroupIds: [{required: true, message: "指定用户组不能为空", trigger: "change"}],
+        scripts: [{required: true, message: "指定脚本不能为空", trigger: "change"}],
       },
 
       // 各种下拉框
       roleOptions: [],
       deptOptions: [],
       deptTreeOptions: [],
+      postOptions: [],
+      userOptions: [],
+      userGroupOptions: [],
 
       // 数据字典
       modelFormTypeDictDatas: getDictDatas(DICT_TYPE.BPM_MODEL_FORM_TYPE),
-      taskAssignRuleDictDatas: getDictDatas(DICT_TYPE.BPM_TASK_ASSIGN_RULE_TYPE),
+      taskAssignRuleTypeDictDatas: getDictDatas(DICT_TYPE.BPM_TASK_ASSIGN_RULE_TYPE),
+      taskAssignScriptDictDatas: getDictDatas(DICT_TYPE.BPM_TASK_ASSIGN_SCRIPT),
     };
   },
   methods: {
@@ -132,9 +164,23 @@ export default {
       this.deptOptions = [];
       this.deptTreeOptions = [];
       listSimpleDepts().then(response => {
-        // 处理 roleOptions 参数
         this.deptOptions.push(...response.data);
         this.deptTreeOptions.push(...this.handleTree(response.data, "id"));
+      });
+      // 获得岗位列表
+      this.postOptions = [];
+      listSimplePosts().then(response => {
+        this.postOptions.push(...response.data);
+      });
+      // 获得用户列表
+      this.userOptions = [];
+      listSimpleUsers().then(response => {
+        this.userOptions.push(...response.data);
+      });
+      // 获得用户组列表
+      this.userGroupOptions = [];
+      listSimpleUserGroups().then(response => {
+        this.userGroupOptions.push(...response.data);
       });
     },
     /** 获得任务分配规则列表 */
@@ -157,12 +203,24 @@ export default {
         options: [],
         roleIds: [],
         deptIds: [],
+        postIds: [],
+        userIds: [],
+        userGroupIds: [],
+        scripts: [],
       };
       // 将 options 赋值到对应的 roleIds 等选项
       if (row.type === 10) {
         this.form.roleIds.push(...row.options);
       } else if (row.type === 20 || row.type === 21) {
         this.form.deptIds.push(...row.options);
+      } else if (row.type === 22) {
+        this.form.postIds.push(...row.options);
+      } else if (row.type === 30) {
+        this.form.userIds.push(...row.options);
+      } else if (row.type === 40) {
+        this.form.userGroupIds.push(...row.options);
+      } else if (row.type === 50) {
+        this.form.scripts.push(...row.options);
       }
       this.open = true;
     },
@@ -180,9 +238,21 @@ export default {
             form.options = form.roleIds;
           } else if (form.type === 20 || form.type === 21) {
             form.options = form.deptIds;
+          } else if (form.type === 22) {
+            form.options = form.postIds;
+          } else if (form.type === 30) {
+            form.options = form.userIds;
+          } else if (form.type === 40) {
+            form.options = form.userGroupIds;
+          } else if (form.type === 50) {
+            form.options = form.scripts;
           }
           form.roleIds = undefined;
           form.deptIds = undefined;
+          form.postIds = undefined;
+          form.userIds = undefined;
+          form.userGroupIds = undefined;
+          form.scripts = undefined;
           // 新增
           if (!form.id) {
             form.modelId = this.modelId; // 模型编号
@@ -224,6 +294,31 @@ export default {
         for (const deptOption of this.deptOptions) {
           if (deptOption.id === option) {
             return deptOption.name;
+          }
+        }
+      } else if (type === 22) {
+        for (const postOption of this.postOptions) {
+          if (postOption.id === option) {
+            return postOption.name;
+          }
+        }
+      } else if (type === 30) {
+        for (const userOption of this.userOptions) {
+          if (userOption.id === option) {
+            return userOption.nickname;
+          }
+        }
+      } else if (type === 40) {
+        for (const userGroupOption of this.userGroupOptions) {
+          if (userGroupOption.id === option) {
+            return userGroupOption.name;
+          }
+        }
+      } else if (type === 50) {
+        option = option + ''; // 转换成 string
+        for (const dictData of this.taskAssignScriptDictDatas) {
+          if (dictData.value === option) {
+            return dictData.label;
           }
         }
       }

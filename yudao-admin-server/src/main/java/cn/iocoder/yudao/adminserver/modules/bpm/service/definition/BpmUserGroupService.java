@@ -55,11 +55,28 @@ public interface BpmUserGroupService {
     List<BpmUserGroupDO> getUserGroupList(Collection<Long> ids);
 
     /**
+     * 获得指定状态的用户组列表
+     *
+     * @param status 状态
+     * @return 用户组列表
+     */
+    List<BpmUserGroupDO> getUserGroupListByStatus(Integer status);
+
+    /**
      * 获得用户组分页
      *
      * @param pageReqVO 分页查询
      * @return 用户组分页
      */
     PageResult<BpmUserGroupDO> getUserGroupPage(BpmUserGroupPageReqVO pageReqVO);
+
+    /**
+     * 校验用户组们是否有效。如下情况，视为无效：
+     * 1. 用户组编号不存在
+     * 2. 用户组被禁用
+     *
+     * @param ids 用户组编号数组
+     */
+    void validUserGroups(Set<Long> ids);
 
 }

@@ -22,4 +22,7 @@ public interface SysDictTypeConstants {
     String SMS_SEND_STATUS = "sys_sms_send_status"; // 短信发送状态
     String SMS_RECEIVE_STATUS = "sys_sms_receive_status"; // 短信接收状态
 
+    String BPM_TASK_ASSIGN_RULE_TYPE = "bpm_task_assign_rule_type"; // 任务分配规则类型
+    String BPM_TASK_ASSIGN_SCRIPT = "bpm_task_assign_script"; // 任务分配自定义脚本
+
 }

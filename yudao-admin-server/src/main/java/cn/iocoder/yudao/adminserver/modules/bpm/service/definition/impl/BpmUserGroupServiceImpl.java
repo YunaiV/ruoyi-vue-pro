@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.service.definition.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.group.BpmUserGroupCreateReqVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.group.BpmUserGroupPageReqVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.group.BpmUserGroupUpdateReqVO;
@@ -7,15 +8,23 @@ import cn.iocoder.yudao.adminserver.modules.bpm.convert.definition.BpmUserGroupC
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.definition.BpmUserGroupDO;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.mysql.definition.BpmUserGroupMapper;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmUserGroupService;
+import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.user.SysUserDO;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+import static cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants.USER_GROUP_IS_DISABLE;
 import static cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants.USER_GROUP_NOT_EXISTS;
+import static cn.iocoder.yudao.adminserver.modules.system.enums.SysErrorCodeConstants.USER_IS_DISABLE;
+import static cn.iocoder.yudao.adminserver.modules.system.enums.SysErrorCodeConstants.USER_NOT_EXISTS;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 
 /**
@@ -73,8 +82,33 @@ public class BpmUserGroupServiceImpl implements BpmUserGroupService {
     }
 
     @Override
+    public List<BpmUserGroupDO> getUserGroupListByStatus(Integer status) {
+        return userGroupMapper.selectListByStatus(status);
+    }
+
+    @Override
     public PageResult<BpmUserGroupDO> getUserGroupPage(BpmUserGroupPageReqVO pageReqVO) {
         return userGroupMapper.selectPage(pageReqVO);
+    }
+
+    @Override
+    public void validUserGroups(Set<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return;
+        }
+        // 获得用户组信息
+        List<BpmUserGroupDO> userGroups = userGroupMapper.selectBatchIds(ids);
+        Map<Long, BpmUserGroupDO> userGroupMap = CollectionUtils.convertMap(userGroups, BpmUserGroupDO::getId);
+        // 校验
+        ids.forEach(id -> {
+            BpmUserGroupDO userGroup = userGroupMap.get(id);
+            if (userGroup == null) {
+                throw exception(USER_GROUP_NOT_EXISTS);
+            }
+            if (!CommonStatusEnum.ENABLE.getStatus().equals(userGroup.getStatus())) {
+                throw exception(USER_GROUP_IS_DISABLE, userGroup.getName());
+            }
+        });
     }
 
 }

@@ -9,6 +9,7 @@ import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.definition.BpmUse
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.Named;
 import org.mapstruct.factory.Mappers;
 
 /**
@@ -31,4 +32,6 @@ public interface BpmUserGroupConvert {
 
     PageResult<BpmUserGroupRespVO> convertPage(PageResult<BpmUserGroupDO> page);
 
+    @Named("convertList2")
+    List<BpmUserGroupRespVO> convertList2(List<BpmUserGroupDO> list);
 }

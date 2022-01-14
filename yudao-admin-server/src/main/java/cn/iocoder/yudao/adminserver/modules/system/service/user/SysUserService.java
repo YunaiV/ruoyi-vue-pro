@@ -9,10 +9,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 
 import java.io.InputStream;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 后台用户 Service 接口
@@ -176,5 +173,14 @@ public interface SysUserService {
      * @return 用户们
      */
     List<SysUserDO> getUsersByStatus(Integer status);
+
+    /**
+     * 校验用户们是否有效。如下情况，视为无效：
+     * 1. 用户编号不存在
+     * 2. 用户被禁用
+     *
+     * @param ids 用户编号数组
+     */
+    void validUsers(Set<Long> ids);
 
 }

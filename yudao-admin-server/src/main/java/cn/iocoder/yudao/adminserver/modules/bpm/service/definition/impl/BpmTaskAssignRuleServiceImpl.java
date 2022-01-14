@@ -12,9 +12,15 @@ import cn.iocoder.yudao.adminserver.modules.bpm.enums.definition.BpmTaskAssignRu
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmModelService;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmProcessDefinitionService;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmTaskAssignRuleService;
+import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmUserGroupService;
+import cn.iocoder.yudao.adminserver.modules.system.enums.SysDictTypeConstants;
 import cn.iocoder.yudao.adminserver.modules.system.service.dept.SysDeptService;
+import cn.iocoder.yudao.adminserver.modules.system.service.dept.SysPostService;
+import cn.iocoder.yudao.adminserver.modules.system.service.dict.SysDictDataService;
 import cn.iocoder.yudao.adminserver.modules.system.service.permission.SysRoleService;
+import cn.iocoder.yudao.adminserver.modules.system.service.user.SysUserService;
 import cn.iocoder.yudao.framework.activiti.core.util.ActivitiUtils;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.activiti.bpmn.model.BpmnModel;
@@ -30,6 +36,7 @@ import java.util.Objects;
 import java.util.Set;
 
 import static cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants.*;
+import static cn.iocoder.yudao.adminserver.modules.system.enums.SysDictTypeConstants.BPM_TASK_ASSIGN_RULE_TYPE;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 
 /**
@@ -53,6 +60,14 @@ public class BpmTaskAssignRuleServiceImpl implements BpmTaskAssignRuleService {
     private SysRoleService roleService;
     @Resource
     private SysDeptService deptService;
+    @Resource
+    private SysPostService postService;
+    @Resource
+    private SysUserService userService;
+    @Resource
+    private BpmUserGroupService userGroupService;
+    @Resource
+    private SysDictDataService dictDataService;
 
     @Override
     public List<BpmTaskAssignRuleDO> getTaskAssignRuleListByProcessDefinitionId(String processDefinitionId,
@@ -146,8 +161,18 @@ public class BpmTaskAssignRuleServiceImpl implements BpmTaskAssignRuleService {
         } else if (ObjectUtils.equalsAny(BpmTaskAssignRuleTypeEnum.DEPT_MEMBER.getType(),
                 BpmTaskAssignRuleTypeEnum.DEPT_LEADER.getType())) {
             deptService.validDepts(options);
+        } else if (Objects.equals(type, BpmTaskAssignRuleTypeEnum.POST.getType())) {
+            postService.validPosts(options);
+        } else if (Objects.equals(type, BpmTaskAssignRuleTypeEnum.USER.getType())) {
+            userService.validUsers(options);
+        } else if (Objects.equals(type, BpmTaskAssignRuleTypeEnum.USER_GROUP.getType())) {
+            userGroupService.validUserGroups(options);
+        } else if (Objects.equals(type, BpmTaskAssignRuleTypeEnum.SCRIPT.getType())) {
+            dictDataService.validDictDatas(SysDictTypeConstants.BPM_TASK_ASSIGN_SCRIPT,
+                    CollectionUtils.convertSet(options, String::valueOf));
+        } else {
+            throw new IllegalArgumentException(StrUtil.format("未知的规则类型({})", type));
         }
-        // TODO 其它的
     }
 
 }

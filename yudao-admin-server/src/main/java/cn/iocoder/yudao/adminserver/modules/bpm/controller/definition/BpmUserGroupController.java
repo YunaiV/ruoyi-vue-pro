@@ -7,6 +7,10 @@ import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.group.B
 import cn.iocoder.yudao.adminserver.modules.bpm.convert.definition.BpmUserGroupConvert;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.definition.BpmUserGroupDO;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmUserGroupService;
+import cn.iocoder.yudao.adminserver.modules.system.controller.user.vo.user.SysUserSimpleRespVO;
+import cn.iocoder.yudao.adminserver.modules.system.convert.user.SysUserConvert;
+import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.user.SysUserDO;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import io.swagger.annotations.Api;
@@ -18,6 +22,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
+
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
@@ -69,6 +75,15 @@ public class BpmUserGroupController {
     public CommonResult<PageResult<BpmUserGroupRespVO>> getUserGroupPage(@Valid BpmUserGroupPageReqVO pageVO) {
         PageResult<BpmUserGroupDO> pageResult = userGroupService.getUserGroupPage(pageVO);
         return success(BpmUserGroupConvert.INSTANCE.convertPage(pageResult));
+    }
+
+    @GetMapping("/list-all-simple")
+    @ApiOperation(value = "获取用户组精简信息列表", notes = "只包含被开启的用户组，主要用于前端的下拉选项")
+    public CommonResult<List<BpmUserGroupRespVO>> getSimpleUserGroups() {
+        // 获用户门列表，只要开启状态的
+        List<BpmUserGroupDO> list = userGroupService.getUserGroupListByStatus(CommonStatusEnum.ENABLE.getStatus());
+        // 排序后，返回给前端
+        return success(BpmUserGroupConvert.INSTANCE.convertList2(list));
     }
 
 }

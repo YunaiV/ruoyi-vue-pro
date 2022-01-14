@@ -42,3 +42,11 @@ export function getUserGroupPage(query) {
     params: query
   })
 }
+
+// 获取用户组精简信息列表
+export function listSimpleUserGroups() {
+  return request({
+    url: '/bpm/user-group/list-all-simple',
+    method: 'get'
+  })
+}
