@@ -2,12 +2,14 @@ package cn.iocoder.yudao.adminserver.modules.bpm.framework.activiti.config;
 
 import cn.iocoder.yudao.adminserver.modules.bpm.framework.activiti.core.behavior.BpmActivityBehaviorFactory;
 import cn.iocoder.yudao.adminserver.modules.bpm.framework.activiti.core.behavior.script.BpmTaskAssignScript;
+import cn.iocoder.yudao.adminserver.modules.bpm.framework.activiti.core.identity.EmptyUserGroupManager;
 import cn.iocoder.yudao.adminserver.modules.bpm.framework.activiti.core.listener.BpmTackActivitiEventListener;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmTaskAssignRuleService;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmUserGroupService;
 import cn.iocoder.yudao.adminserver.modules.system.service.dept.SysDeptService;
 import cn.iocoder.yudao.adminserver.modules.system.service.permission.SysPermissionService;
 import cn.iocoder.yudao.adminserver.modules.system.service.user.SysUserService;
+import org.activiti.api.runtime.shared.identity.UserGroupManager;
 import org.activiti.spring.boot.ProcessEngineConfigurationConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,7 +26,7 @@ import static org.activiti.spring.boot.ProcessEngineAutoConfiguration.BEHAVIOR_F
 public class BpmActivitiConfiguration {
 
     /**
-     * BPM 模块的 ProcessEngineConfigurationConfigurer 实现类，主要设置各种监听器
+     * BPM 模块的 ProcessEngineConfigurationConfigurer 实现类，主要设置各种监听器、用户组管理
      */
     @Bean
     public ProcessEngineConfigurationConfigurer bpmProcessEngineConfigurationConfigurer(
@@ -32,6 +34,8 @@ public class BpmActivitiConfiguration {
         return configuration -> {
             // 注册监听器，例如说 BpmActivitiEventListener
             configuration.setEventListeners(Collections.singletonList(taskActivitiEventListener));
+            // 用户组
+            configuration.setUserGroupManager(new EmptyUserGroupManager());
         };
     }
 

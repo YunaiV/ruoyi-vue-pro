@@ -98,11 +98,8 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     public PageResult<BpmTaskTodoPageItemRespVO> getTodoTaskPage(Long userId, BpmTaskTodoPageReqVO pageVO) {
         // 查询待办任务
         TaskQuery taskQuery = taskService.createTaskQuery()
-//                .or()
-//                .taskAssignee(String.valueOf(userId)) // 分配给自己
-//                .taskCandidateOrAssigned(String.valueOf(userId))
+                .taskAssignee(String.valueOf(userId)) // 分配给自己
                 .taskCandidateUser(String.valueOf(userId))
-//                .endOr()
                 .orderByTaskCreateTime().desc(); // 创建时间倒序
         if (StrUtil.isNotBlank(pageVO.getName())) {
             taskQuery.taskNameLike("%" + pageVO.getName() + "%");
