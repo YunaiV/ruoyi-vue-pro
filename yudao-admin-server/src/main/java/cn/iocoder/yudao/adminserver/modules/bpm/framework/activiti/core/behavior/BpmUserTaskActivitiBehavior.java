@@ -37,6 +37,15 @@ import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString
 
 /**
  * 自定义的流程任务的 assignee 负责人的分配
+ * 第一步，获得对应的分配规则；
+ * 第二步，根据分配规则，计算出分配任务的候选人。如果找不到，则直接报业务异常，不继续执行后续的流程；
+ * 第三步，情况一，只有一个候选人，则选择一个作为 assignee 负责人，所有人作为 candidateUsers 候选人；
+ *        情况二，不设置负责人，则所有人作为 candidateUsers 候选人；这样，后续他们可以在【待办任务】列表，进行【签收】动作，然后进行任务的审批。
+ *
+ * 如果计算出来的负责人是一个，则直接设置为该任务的 assignee 负责人；
+ *      如果是多个，则直接设置为该任务的 assignee 负责人，直接他们所有人为该任务的 candidateUsers 候选人；
+ * 注意，两者是互斥的。只要任务设置了 assignee，即使设置其他人为 candidateUsers，使用 TaskQuery 的 taskCandidateUser 条件，一样无法查询到任务。
+ *      原因是，WHERE 条件在过滤任务时，会额外增加一个 RES.ASSIGNEE_ is null ！！！
  *
  * @author 芋道源码
  */
@@ -70,11 +79,12 @@ public class BpmUserTaskActivitiBehavior extends UserTaskActivityBehavior {
     protected void handleAssignments(TaskEntityManager taskEntityManager,
                                      String assignee, String owner, List<String> candidateUsers, List<String> candidateGroups,
                                      TaskEntity task, ExpressionManager expressionManager, DelegateExecution execution) {
-        // 获得任务的规则
+        // 第一步，获得任务的规则
         BpmTaskAssignRuleDO rule = getTaskRule(task);
-        // 获得任务的候选用户们
+        // 第二步，获得任务的候选用户们
         Set<Long> candidateUserIds = calculateTaskCandidateUsers(task, rule);
-        // 设置负责人
+        // 情况一，只有一个 candidateUserIds，则设置负责人
+        if (CollU)
         Long assigneeUserId = chooseTaskAssignee(candidateUserIds);
         taskEntityManager.changeTaskAssignee(task, String.valueOf(assigneeUserId));
         // 设置候选人们
