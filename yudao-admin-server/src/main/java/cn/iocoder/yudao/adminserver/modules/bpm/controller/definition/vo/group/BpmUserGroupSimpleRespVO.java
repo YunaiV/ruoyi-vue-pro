@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.rule;
+package cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.group;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;

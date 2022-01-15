@@ -1,11 +1,8 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.model;
 
-import cn.iocoder.yudao.adminserver.modules.bpm.enums.definition.BpmModelFormTypeEnum;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
 
 import javax.validation.constraints.NotEmpty;
 
