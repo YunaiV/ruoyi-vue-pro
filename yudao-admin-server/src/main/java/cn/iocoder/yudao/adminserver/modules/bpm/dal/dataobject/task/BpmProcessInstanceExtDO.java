@@ -3,7 +3,9 @@ package cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.task;
 import cn.iocoder.yudao.adminserver.modules.bpm.enums.task.BpmProcessInstanceResultEnum;
 import cn.iocoder.yudao.adminserver.modules.bpm.enums.task.BpmProcessInstanceStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -12,6 +14,7 @@ import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
 
 import java.util.Date;
+import java.util.Map;
 
 /**
  * Bpm 流程实例的拓展表
@@ -77,5 +80,11 @@ public class BpmProcessInstanceExtDO extends BaseDO {
      * 冗余 {@link HistoricProcessInstance#getEndTime()}
      */
     private Date endTime;
+
+    /**
+     * 表单值
+     */
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private Map<String, Object> formVariables;
 
 }

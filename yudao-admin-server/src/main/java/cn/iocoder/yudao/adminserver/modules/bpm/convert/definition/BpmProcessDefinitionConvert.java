@@ -11,6 +11,7 @@ import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 import org.mapstruct.Named;
 import org.mapstruct.factory.Mappers;
 
@@ -38,19 +39,17 @@ public interface BpmProcessDefinitionConvert {
     }
 
     default BpmProcessDefinitionPageItemRespVO convert(ProcessDefinition bean, Deployment deployment,
-                                                       BpmProcessDefinitionExtDO processDefinitionDO, BpmFormDO form) {
+                                                       BpmProcessDefinitionExtDO processDefinitionExtDO, BpmFormDO form) {
         BpmProcessDefinitionPageItemRespVO respVO = convert(bean);
         respVO.setSuspensionState(bean.isSuspended() ? SuspensionState.SUSPENDED.getStateCode() : SuspensionState.ACTIVE.getStateCode());
         if (deployment != null) {
             respVO.setDeploymentTime(deployment.getDeploymentTime());
         }
         if (form != null) {
-            respVO.setFormId(form.getId());
             respVO.setFormName(form.getName());
         }
-        if (processDefinitionDO != null) {
-            respVO.setDescription(processDefinitionDO.getDescription());
-        }
+        // 复制通用属性
+        copyTo(processDefinitionExtDO, respVO);
         return respVO;
     }
 
@@ -63,9 +62,8 @@ public interface BpmProcessDefinitionConvert {
         return CollectionUtils.convertList(list, processDefinition -> {
             BpmProcessDefinitionRespVO respVO = convert3(processDefinition);
             BpmProcessDefinitionExtDO processDefinitionExtDO = processDefinitionDOMap.get(processDefinition.getId());
-            if (processDefinitionExtDO != null) {
-                respVO.setFormId(processDefinitionExtDO.getFormId());
-            }
+            // 复制通用属性
+            copyTo(processDefinitionExtDO, respVO);
             return respVO;
         });
     }
@@ -78,5 +76,8 @@ public interface BpmProcessDefinitionConvert {
         return suspended ? SuspensionState.SUSPENDED.getStateCode() :
                 SuspensionState.ACTIVE.getStateCode();
     }
+
+    @Mapping(source = "from.id", target = "to.id", ignore = true)
+    void copyTo(BpmProcessDefinitionExtDO from, @MappingTarget BpmProcessDefinitionRespVO to);
 
 }

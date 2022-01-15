@@ -83,7 +83,7 @@ public interface BpmModelConvert {
 
     void copyTo(BpmModelMetaInfoRespDTO from, @MappingTarget BpmModelBaseVO to);
 
-    default BpmDefinitionCreateReqDTO convert2(Model model) {
+    default BpmDefinitionCreateReqDTO convert2(Model model, BpmFormDO form) {
         BpmDefinitionCreateReqDTO createReqDTO = new BpmDefinitionCreateReqDTO();
         createReqDTO.setModelId(model.getId());
         createReqDTO.setName(model.getName());
@@ -92,6 +92,11 @@ public interface BpmModelConvert {
         BpmModelMetaInfoRespDTO metaInfo = JsonUtils.parseObject(model.getMetaInfo(), BpmModelMetaInfoRespDTO.class);
         // metaInfo
         copyTo(metaInfo, createReqDTO);
+        // form
+        if (form != null) {
+            createReqDTO.setFormConf(form.getConf());
+            createReqDTO.setFormFields(form.getFields());
+        }
         return createReqDTO;
     }
 

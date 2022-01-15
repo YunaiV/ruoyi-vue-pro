@@ -50,10 +50,13 @@
           <span>{{ getDictDataLabel(DICT_TYPE.BPM_MODEL_CATEGORY, scope.row.category) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="表单信息" align="center" prop="formId">
+      <el-table-column label="表单信息" align="center" prop="formType" width="200">
         <template slot-scope="scope">
           <el-button v-if="scope.row.formId" type="text" @click="handleFormDetail(scope.row)">
             <span>{{ scope.row.formName }}</span>
+          </el-button>
+          <el-button v-else-if="scope.row.formCustomCreatePath" type="text" @click="handleFormDetail(scope.row)">
+            <span>{{ scope.row.formCustomCreatePath }}</span>
           </el-button>
           <label v-else>暂无表单</label>
         </template>
@@ -450,16 +453,22 @@ export default {
     },
     /** 流程表单的详情按钮操作 */
     handleFormDetail(row) {
-      getForm(row.formId).then(response => {
-        // 设置值
-        const data = response.data
-        this.detailForm = {
-          ...JSON.parse(data.conf),
-          fields: decodeFields(data.fields)
-        }
-        // 弹窗打开
-        this.detailOpen = true
-      })
+      // 流程表单
+      if (row.formId) {
+        getForm(row.formId).then(response => {
+          // 设置值
+          const data = response.data
+          this.detailForm = {
+            ...JSON.parse(data.conf),
+            fields: decodeFields(data.fields)
+          }
+          // 弹窗打开
+          this.detailOpen = true
+        })
+        // 业务表单
+      } else if (row.formCustomCreatePath) {
+        this.$router.push({ path: row.formCustomCreatePath});
+      }
     },
     /** 流程图的详情按钮操作 */
     handleBpmnDetail(row) {

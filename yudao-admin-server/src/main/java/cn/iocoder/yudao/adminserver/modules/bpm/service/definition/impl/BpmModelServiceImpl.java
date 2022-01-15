@@ -7,6 +7,7 @@ import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.model.*
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.rule.BpmTaskAssignRuleRespVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.convert.definition.BpmModelConvert;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.definition.BpmFormDO;
+import cn.iocoder.yudao.adminserver.modules.bpm.enums.definition.BpmModelFormTypeEnum;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmProcessDefinitionService;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmTaskAssignRuleService;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.dto.BpmDefinitionCreateReqDTO;
@@ -36,10 +37,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
 
 import static cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants.*;
@@ -177,15 +175,13 @@ public class BpmModelServiceImpl implements BpmModelService {
         }
         // TODO 芋艿：校验流程图的有效性；例如说，是否有开始的元素，是否有结束的元素；
         // 校验表单已配
-        BpmModelMetaInfoRespDTO metaInfo = JsonUtils.parseObject(model.getMetaInfo(), BpmModelMetaInfoRespDTO.class);
-        if (metaInfo == null || metaInfo.getFormType() == null) {
-            throw exception(MODEL_DEPLOY_FAIL_FORM_NOT_CONFIG);
-        }
+        // 校验表单存在
+        BpmFormDO form = checkFormConfig(model);
         // 校验任务分配规则已配置
         checkTaskAssignRuleAllConfig(id);
 
         // 创建流程定义
-        BpmDefinitionCreateReqDTO definitionCreateReqDTO = BpmModelConvert.INSTANCE.convert2(model)
+        BpmDefinitionCreateReqDTO definitionCreateReqDTO = BpmModelConvert.INSTANCE.convert2(model, form)
                 .setBpmnXml(StrUtil.utf8Str(bpmnBytes));
         String definitionId = processDefinitionService.createProcessDefinition(definitionCreateReqDTO);
 
@@ -219,6 +215,28 @@ public class BpmModelServiceImpl implements BpmModelService {
                 throw exception(MODEL_DEPLOY_FAIL_TASK_ASSIGN_RULE_NOT_CONFIG, rule.getTaskDefinitionName());
             }
         });
+    }
+
+    /**
+     * 校验流程表单已配置
+     *
+     * @param model 流程模型
+     * @return 流程表单
+     */
+    private BpmFormDO checkFormConfig(Model model) {
+        BpmModelMetaInfoRespDTO metaInfo = JsonUtils.parseObject(model.getMetaInfo(), BpmModelMetaInfoRespDTO.class);
+        if (metaInfo == null || metaInfo.getFormType() == null) {
+            throw exception(MODEL_DEPLOY_FAIL_FORM_NOT_CONFIG);
+        }
+        // 校验表单存在
+        if (Objects.equals(metaInfo.getFormType(), BpmModelFormTypeEnum.NORMAL.getType())) {
+            BpmFormDO form = formService.getForm(metaInfo.getFormId());
+            if (form == null) {
+                throw exception(FORM_NOT_EXISTS);
+            }
+            return form;
+        }
+        return null;
     }
 
     @Override

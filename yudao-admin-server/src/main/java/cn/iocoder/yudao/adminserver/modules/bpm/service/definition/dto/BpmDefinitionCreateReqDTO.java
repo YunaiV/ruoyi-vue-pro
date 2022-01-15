@@ -1,10 +1,18 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.service.definition.dto;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.definition.BpmFormDO;
 import cn.iocoder.yudao.adminserver.modules.bpm.enums.definition.BpmModelFormTypeEnum;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.Data;
 
+import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * 流程定义创建 Request DTO
@@ -58,6 +66,16 @@ public class BpmDefinitionCreateReqDTO {
      */
     private Long formId;
     /**
+     * 表单的配置
+     * 在表单类型为 {@link BpmModelFormTypeEnum#NORMAL} 时
+     */
+    private String formConf;
+    /**
+     * 表单项的数组
+     * 在表单类型为 {@link BpmModelFormTypeEnum#NORMAL} 时
+     */
+    private List<String> formFields;
+    /**
      * 自定义表单的提交路径，使用 Vue 的路由地址
      * 在表单类型为 {@link BpmModelFormTypeEnum#CUSTOM} 时
      */
@@ -68,6 +86,22 @@ public class BpmDefinitionCreateReqDTO {
      */
     private String formCustomViewPath;
 
+    @AssertTrue(message = "流程表单信息不全")
+    public boolean isNormalFormTypeValid() {
+        // 如果非业务表单，则直接通过
+        if (!Objects.equals(formType, BpmModelFormTypeEnum.NORMAL.getType())) {
+            return true;
+        }
+        return formId != null && StrUtil.isNotEmpty(formConf) && CollUtil.isNotEmpty(formFields);
+    }
 
+    @AssertTrue(message = "业务表单信息不全")
+    public boolean isNormalCustomTypeValid() {
+        // 如果非业务表单，则直接通过
+        if (!Objects.equals(formType, BpmModelFormTypeEnum.CUSTOM.getType())) {
+            return true;
+        }
+        return StrUtil.isNotEmpty(formCustomCreatePath) && StrUtil.isNotEmpty(formCustomViewPath);
+    }
 
 }

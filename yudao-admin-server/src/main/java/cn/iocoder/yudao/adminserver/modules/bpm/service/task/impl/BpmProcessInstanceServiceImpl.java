@@ -86,9 +86,9 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         // 设置流程名字
         runtimeService.setProcessInstanceName(instance.getId(), definition.getName());
 
-        // TODO 芋艿：临时使用, 保证分配
-//        List<Task> tasks = taskService.getTasksByProcessInstanceId(instance.getId());
-//        tasks.forEach(task -> taskService.updateTaskAssign(task.getId(), userId));
+        // 补全流程实例的拓展表
+        processInstanceExtMapper.updateByProcessInstanceId(new BpmProcessInstanceExtDO().setProcessInstanceId(instance.getId())
+                .setFormVariables(createReqVO.getVariables()));
 
         // 添加初始的评论 TODO 芋艿：在思考下
 //        Task task = taskService.createTaskQuery().processInstanceId(instance.getId()).singleResult();
@@ -98,9 +98,6 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
 //            String type = "normal";
 //            taskService.addComment(task.getId(), instance.getProcessInstanceId(), type,
 //                    String.format("%s 发起流程申请", user.getNickname()));
-//            // TODO 芋艿：应该不用下面两个步骤
-////           taskService.setAssignee(task.getId(), String.valueOf(userId));
-////            taskService.complete(task.getId(), variables);
 //        }
         return instance.getId();
     }

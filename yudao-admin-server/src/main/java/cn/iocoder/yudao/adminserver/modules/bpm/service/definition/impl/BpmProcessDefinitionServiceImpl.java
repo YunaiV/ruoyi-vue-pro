@@ -34,7 +34,8 @@ import java.util.*;
 import static cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants.PROCESS_DEFINITION_KEY_NOT_MATCH;
 import static cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants.PROCESS_DEFINITION_NAME_NOT_MATCH;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
+import static java.util.Collections.emptyList;
 
 /**
  * 流程定义实现
@@ -70,22 +71,22 @@ public class BpmProcessDefinitionServiceImpl implements BpmProcessDefinitionServ
         List<ProcessDefinition> processDefinitions = definitionQuery.orderByProcessDefinitionVersion().desc()
                 .listPage(PageUtils.getStart(pageVO), pageVO.getPageSize());
         if (CollUtil.isEmpty(processDefinitions)) {
-            return new PageResult<>(Collections.emptyList(), definitionQuery.count());
+            return new PageResult<>(emptyList(), definitionQuery.count());
         }
 
         // 获得 Deployment Map
         Set<String> deploymentIds = new HashSet<>();
-        processDefinitions.forEach(definition -> CollectionUtils.addIfNotNull(deploymentIds, definition.getDeploymentId()));
+        processDefinitions.forEach(definition -> addIfNotNull(deploymentIds, definition.getDeploymentId()));
         Map<String, Deployment> deploymentMap = getDeploymentMap(deploymentIds);
 
         // 获得 BpmProcessDefinitionDO Map
         List<BpmProcessDefinitionExtDO> processDefinitionDOs = processDefinitionMapper.selectListByProcessDefinitionIds(
                 convertList(processDefinitions, ProcessDefinition::getId));
-        Map<String, BpmProcessDefinitionExtDO> processDefinitionDOMap = CollectionUtils.convertMap(processDefinitionDOs,
+        Map<String, BpmProcessDefinitionExtDO> processDefinitionDOMap = convertMap(processDefinitionDOs,
                 BpmProcessDefinitionExtDO::getProcessDefinitionId);
 
         // 获得 Form Map
-        Set<Long> formIds = CollectionUtils.convertSet(processDefinitionDOs, BpmProcessDefinitionExtDO::getFormId);
+        Set<Long> formIds = convertSet(processDefinitionDOs, BpmProcessDefinitionExtDO::getFormId);
         Map<Long, BpmFormDO> formMap = bpmFormService.getFormMap(formIds);
 
         // 拼接结果
@@ -109,7 +110,7 @@ public class BpmProcessDefinitionServiceImpl implements BpmProcessDefinitionServ
         // 获得 BpmProcessDefinitionDO Map
         List<BpmProcessDefinitionExtDO> processDefinitionDOs = processDefinitionMapper.selectListByProcessDefinitionIds(
                 convertList(processDefinitions, ProcessDefinition::getId));
-        Map<String, BpmProcessDefinitionExtDO> processDefinitionDOMap = CollectionUtils.convertMap(processDefinitionDOs,
+        Map<String, BpmProcessDefinitionExtDO> processDefinitionDOMap = convertMap(processDefinitionDOs,
                 BpmProcessDefinitionExtDO::getProcessDefinitionId);
         // 执行查询，并返回
         return BpmProcessDefinitionConvert.INSTANCE.convertList3(processDefinitions, processDefinitionDOMap);
@@ -152,11 +153,11 @@ public class BpmProcessDefinitionServiceImpl implements BpmProcessDefinitionServ
     @Override
     public List<Deployment> getDeployments(Set<String> ids) {
         if (CollUtil.isEmpty(ids)) {
-            return Collections.emptyList();
+            return emptyList();
         }
         List<Deployment> list = new ArrayList<>(ids.size());
         for (String id : ids) {
-            CollectionUtils.addIfNotNull(list, getDeployment(id));
+            addIfNotNull(list, getDeployment(id));
         }
         return list;
     }
@@ -169,7 +170,7 @@ public class BpmProcessDefinitionServiceImpl implements BpmProcessDefinitionServ
     @Override
     public List<ProcessDefinition> getProcessDefinitionListByDeploymentIds(Set<String> deploymentIds) {
         if (CollUtil.isEmpty(deploymentIds)) {
-            return Collections.emptyList();
+            return emptyList();
         }
         return repositoryService.createProcessDefinitionQuery().deploymentIds(deploymentIds).list();
     }

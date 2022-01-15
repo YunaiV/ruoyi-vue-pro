@@ -32,6 +32,8 @@ public class BpmProcessDefinitionController {
     @Resource
     private BpmProcessDefinitionService bpmDefinitionService;
 
+    // TODO 芋艿：权限相关
+
     @GetMapping ("/page")
     @ApiOperation(value = "获得流程定义分页")
     @PreAuthorize("@ss.hasPermission('bpm:model:query')") // 暂时使用 model 的权限标识

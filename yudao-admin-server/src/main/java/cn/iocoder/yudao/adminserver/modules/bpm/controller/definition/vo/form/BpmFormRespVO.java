@@ -18,6 +18,7 @@ public class BpmFormRespVO extends BpmFormBaseVO {
 
     @ApiModelProperty(value = "表单编号", required = true, example = "1024")
     private Long id;
+
     @ApiModelProperty(value = "表单的配置", required = true, notes = "JSON 字符串")
     @NotNull(message = "表单的配置不能为空")
     private String conf;
