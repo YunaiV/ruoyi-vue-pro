@@ -188,7 +188,7 @@ public interface SysUserService {
      * @param deptIds 部门数组
      * @return 用户数组
      */
-    List<SysUserDO> getUsersByDeptIds(Collection<Integer> deptIds);
+    List<SysUserDO> getUsersByDeptIds(Collection<Long> deptIds);
 
     /**
      * 校验用户们是否有效。如下情况，视为无效：

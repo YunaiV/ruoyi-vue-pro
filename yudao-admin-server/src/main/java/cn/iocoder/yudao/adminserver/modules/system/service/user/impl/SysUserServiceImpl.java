@@ -402,7 +402,7 @@ public class SysUserServiceImpl implements SysUserService {
     }
 
     @Override
-    public List<SysUserDO> getUsersByDeptIds(Collection<Integer> deptIds) {
+    public List<SysUserDO> getUsersByDeptIds(Collection<Long> deptIds) {
         if (CollUtil.isEmpty(deptIds)) {
             return Collections.emptyList();
         }

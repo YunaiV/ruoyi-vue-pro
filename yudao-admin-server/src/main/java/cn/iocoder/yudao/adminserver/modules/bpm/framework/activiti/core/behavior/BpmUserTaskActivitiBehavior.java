@@ -139,7 +139,7 @@ public class BpmUserTaskActivitiBehavior extends UserTaskActivityBehavior {
     }
 
     private Set<Long> calculateTaskCandidateUsersByDeptMember(TaskEntity task, BpmTaskAssignRuleDO rule) {
-        List<SysUserDO> users = userService.getUsersByPostIds(rule.getOptions());
+        List<SysUserDO> users = userService.getUsersByDeptIds(rule.getOptions());
         return convertSet(users, SysUserDO::getId);
     }
 

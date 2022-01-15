@@ -129,6 +129,11 @@
         <el-form-item label="流程名称" prop="name">
           <el-input v-model="form.name" placeholder="请输入流程名称" :disabled="form.id" clearable />
         </el-form-item>
+        <el-form-item v-if="form.id" label="流程分类" prop="category">
+          <el-select v-model="form.category" placeholder="请选择流程分类" clearable style="width: 100%">
+            <el-option v-for="dict in categoryDictDatas" :key="dict.value" :label="dict.label" :value="dict.value"/>
+          </el-select>
+        </el-form-item>
         <el-form-item label="流程描述" prop="description">
           <el-input type="textarea" v-model="form.description" clearable />
         </el-form-item>
@@ -270,6 +275,7 @@ export default {
         name: [{ required: true, message: "流程名称不能为空", trigger: "blur" }],
         formType: [{ required: true, message: "流程名称不能为空", trigger: "blur" }],
         formId: [{ required: true, message: "业务表单不能为空", trigger: "blur" }],
+        category: [{ required: true, message: "流程分类不能为空", trigger: "blur" }],
         formCustomCreatePath: [{ required: true, message: "表单提交路由不能为空", trigger: "blur" }],
         formCustomViewPath: [{ required: true, message: "表单查看路由不能为空", trigger: "blur" }],
       },
@@ -331,6 +337,7 @@ export default {
         key: undefined,
         name: undefined,
         description: undefined,
+        category: undefined,
         formType: undefined,
         formId: undefined,
         formCustomCreatePath: undefined,

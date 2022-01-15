@@ -20,6 +20,7 @@ import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.ArrayUtils;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.common.util.collection.SetUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import org.junit.jupiter.api.Test;
 import org.mockito.stubbing.Answer;
@@ -29,17 +30,19 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.annotation.Resource;
 import java.io.ByteArrayInputStream;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
 
 import static cn.hutool.core.util.RandomUtil.randomBytes;
 import static cn.hutool.core.util.RandomUtil.randomEle;
 import static cn.iocoder.yudao.adminserver.modules.system.enums.SysErrorCodeConstants.*;
+import static cn.iocoder.yudao.framework.common.util.collection.SetUtils.asSet;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildTime;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
+import static java.util.Collections.singleton;
+import static java.util.Collections.singletonList;
 import static org.assertj.core.util.Lists.newArrayList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -575,6 +578,23 @@ public class SysUserServiceImplTest extends BaseDbUnitTest {
                 USER_PASSWORD_FAILED);
         // 校验调用
         verify(passwordEncoder, times(1)).matches(eq(oldPassword), eq(user.getPassword()));
+    }
+
+    @Test
+    public void testUsersByPostIds() {
+        // 准备参数
+        Collection<Long> postIds = asSet(10L, 20L);
+        // mock 方法
+        SysUserDO user1 = randomSysUserDO(o -> o.setPostIds(asSet(10L, 30L)));
+        userMapper.insert(user1);
+        SysUserDO user2 = randomSysUserDO(o -> o.setPostIds(singleton(100L)));
+        userMapper.insert(user2);
+
+        // 调用
+        List<SysUserDO> result = userService.getUsersByPostIds(postIds);
+        // 断言
+        assertEquals(1, result.size());
+        assertEquals(user1, result.get(0));
     }
 
     // ========== 随机对象 ==========
