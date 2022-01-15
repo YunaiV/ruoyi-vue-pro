@@ -25,8 +25,9 @@
     <el-table v-loading="loading" :data="deptList" row-key="id" default-expand-all
               :tree-props="{children: 'children', hasChildren: 'hasChildren'}">
       <el-table-column prop="name" label="部门名称" width="260"></el-table-column>
+      <el-table-column prop="status" label="负责人" :formatter="userNicknameFormat" width="120"/>
       <el-table-column prop="sort" label="排序" width="200"></el-table-column>
-      <el-table-column prop="status" label="状态" :formatter="statusFormat" width="100"></el-table-column>
+      <el-table-column prop="status" label="状态" :formatter="statusFormat" width="100"/>
       <el-table-column label="创建时间" align="center" prop="createTime" width="200">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
@@ -64,8 +65,10 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="负责人" prop="leader">
-              <el-input v-model="form.leader" placeholder="请输入负责人" maxlength="20" />
+            <el-form-item label="负责人" prop="leaderUserId">
+              <el-select v-model="form.leaderUserId" placeholder="请输入负责人" clearable style="width: 100%">
+                <el-option v-for="item in users" :key="parseInt(item.id)" :label="item.nickname" :value="parseInt(item.id)" />
+              </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="12">
@@ -103,6 +106,7 @@ import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 
 import {SysCommonStatusEnum} from '@/utils/constants'
 import { getDictDataLabel, getDictDatas, DICT_TYPE } from '@/utils/dict'
+import {listSimpleUsers} from "@/api/system/user";
 
 export default {
   name: "Dept",
@@ -117,6 +121,8 @@ export default {
       deptList: [],
       // 部门树选项
       deptOptions: [],
+      // 用户下拉列表
+      users: [],
       // 弹出层标题
       title: "",
       // 是否显示弹出层
@@ -168,6 +174,10 @@ export default {
   },
   created() {
     this.getList();
+    // 获得用户列表
+    listSimpleUsers().then(response => {
+      this.users = response.data;
+    });
   },
   methods: {
     /** 查询部门列表 */
@@ -193,6 +203,18 @@ export default {
     statusFormat(row, column) {
       return getDictDataLabel(DICT_TYPE.SYS_COMMON_STATUS, row.status)
     },
+    // 用户昵称展示
+    userNicknameFormat(row, column) {
+      if (!row.leaderUserId) {
+        return '未设置';
+      }
+      for (const user of this.users) {
+        if (row.leaderUserId === user.id) {
+          return user.nickname;
+        }
+      }
+      return '未知【' + row.leaderUserId + '】';
+    },
     // 取消按钮
     cancel() {
       this.open = false;
@@ -205,7 +227,7 @@ export default {
         parentId: undefined,
         name: undefined,
         sort: undefined,
-        leader: undefined,
+        leaderUserId: undefined,
         phone: undefined,
         email: undefined,
         status: SysCommonStatusEnum.ENABLE,

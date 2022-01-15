@@ -97,7 +97,7 @@ public class SysRoleController {
     @OperateLog(type = EXPORT)
     @PreAuthorize("@ss.hasPermission('system:role:export')")
     public void export(HttpServletResponse response, @Validated SysRoleExportReqVO reqVO) throws IOException {
-        List<SysRoleDO> list = roleService.getRoles(reqVO);
+        List<SysRoleDO> list = roleService.getRoleList(reqVO);
         List<SysRoleExcelVO> data = SysRoleConvert.INSTANCE.convertList03(list);
         // 输出
         ExcelUtils.write(response, "角色数据.xls", "角色列表", SysRoleExcelVO.class, data);

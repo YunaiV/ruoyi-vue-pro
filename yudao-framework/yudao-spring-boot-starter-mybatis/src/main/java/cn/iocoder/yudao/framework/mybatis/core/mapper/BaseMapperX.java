@@ -49,4 +49,9 @@ public interface BaseMapperX<T> extends BaseMapper<T> {
         return selectList(new QueryWrapper<T>().in(field, values));
     }
 
+    default void insertBatch(Collection<T> entities) {
+        // TODO 芋艿：修改成支持批量的
+        entities.forEach(this::insert);
+    }
+
 }

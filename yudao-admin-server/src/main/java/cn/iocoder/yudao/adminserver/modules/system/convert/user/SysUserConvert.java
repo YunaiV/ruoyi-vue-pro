@@ -45,4 +45,5 @@ public interface SysUserConvert {
 
     List<SysUserProfileRespVO.SocialUser> convertList03(List<SysSocialUserDO> list);
 
+    List<SysUserSimpleRespVO> convertList04(List<SysUserDO> list);
 }

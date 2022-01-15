@@ -2,17 +2,17 @@ package cn.iocoder.yudao.adminserver.modules.bpm.service.definition.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.BpmProcessDefinitionListReqVO;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.BpmProcessDefinitionPageItemRespVO;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.BpmProcessDefinitionPageReqVO;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.BpmProcessDefinitionRespVO;
-import cn.iocoder.yudao.adminserver.modules.bpm.convert.definition.BpmDefinitionConvert;
+import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.process.BpmProcessDefinitionListReqVO;
+import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.process.BpmProcessDefinitionPageItemRespVO;
+import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.process.BpmProcessDefinitionPageReqVO;
+import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.process.BpmProcessDefinitionRespVO;
+import cn.iocoder.yudao.adminserver.modules.bpm.convert.definition.BpmProcessDefinitionConvert;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.definition.BpmProcessDefinitionExtDO;
-import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.form.BpmFormDO;
+import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.definition.BpmFormDO;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.mysql.definition.BpmProcessDefinitionExtMapper;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmProcessDefinitionService;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.dto.BpmDefinitionCreateReqDTO;
-import cn.iocoder.yudao.adminserver.modules.bpm.service.form.BpmFormService;
+import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmFormService;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.object.PageUtils;
@@ -90,7 +90,7 @@ public class BpmProcessDefinitionServiceImpl implements BpmProcessDefinitionServ
 
         // 拼接结果
         long definitionCount = definitionQuery.count();
-        return new PageResult<>(BpmDefinitionConvert.INSTANCE.convertList(processDefinitions, deploymentMap,
+        return new PageResult<>(BpmProcessDefinitionConvert.INSTANCE.convertList(processDefinitions, deploymentMap,
                 processDefinitionDOMap, formMap), definitionCount);
     }
 
@@ -112,7 +112,7 @@ public class BpmProcessDefinitionServiceImpl implements BpmProcessDefinitionServ
         Map<String, BpmProcessDefinitionExtDO> processDefinitionDOMap = CollectionUtils.convertMap(processDefinitionDOs,
                 BpmProcessDefinitionExtDO::getProcessDefinitionId);
         // 执行查询，并返回
-        return BpmDefinitionConvert.INSTANCE.convertList3(processDefinitions, processDefinitionDOMap);
+        return BpmProcessDefinitionConvert.INSTANCE.convertList3(processDefinitions, processDefinitionDOMap);
     }
 
     @Override
@@ -121,6 +121,7 @@ public class BpmProcessDefinitionServiceImpl implements BpmProcessDefinitionServ
         if (bpmnModel == null) {
             return null;
         }
+        // TODO 芋艿：重构到 activi util 里
         byte[] bpmnBytes = BPMN_XML_CONVERTER.convertToXML(bpmnModel);
         return StrUtil.utf8Str(bpmnBytes);
     }
@@ -179,7 +180,7 @@ public class BpmProcessDefinitionServiceImpl implements BpmProcessDefinitionServ
         // 创建 Deployment 部署
         Deployment deploy = repositoryService.createDeployment()
                 .key(createReqDTO.getKey()).name(createReqDTO.getName()).category(createReqDTO.getCategory())
-                .addString(createReqDTO.getName() + BPMN_FILE_SUFFIX, createReqDTO.getBpmnXml())
+                .addString(createReqDTO.getKey() + BPMN_FILE_SUFFIX, createReqDTO.getBpmnXml())
                 .deploy();
 
         // 设置 ProcessDefinition 的 category 分类
@@ -196,7 +197,7 @@ public class BpmProcessDefinitionServiceImpl implements BpmProcessDefinitionServ
         }
 
         // 插入拓展表
-        BpmProcessDefinitionExtDO definitionDO = BpmDefinitionConvert.INSTANCE.convert2(createReqDTO)
+        BpmProcessDefinitionExtDO definitionDO = BpmProcessDefinitionConvert.INSTANCE.convert2(createReqDTO)
                 .setProcessDefinitionId(definition.getId());
         processDefinitionMapper.insert(definitionDO);
         return definition.getId();
@@ -206,12 +207,14 @@ public class BpmProcessDefinitionServiceImpl implements BpmProcessDefinitionServ
     public void updateProcessDefinitionState(String id, Integer state) {
         // 激活
         if (Objects.equals(SuspensionState.ACTIVE.getStateCode(), state)) {
-            repositoryService.activateProcessDefinitionById(id, true, null);
+            repositoryService.activateProcessDefinitionById(id, false, null);
             return;
         }
         // 挂起
         if (Objects.equals(SuspensionState.SUSPENDED.getStateCode(), state)) {
-            repositoryService.suspendProcessDefinitionById(id, true, null);
+            // suspendProcessInstances = false，进行中的任务，不进行挂起。
+            // 原因：只要新的流程不允许发起即可，老流程继续可以执行。
+            repositoryService.suspendProcessDefinitionById(id, false, null);
             return;
         }
         log.error("[updateProcessDefinitionState][流程定义({}) 修改未知状态({})]", id, state);

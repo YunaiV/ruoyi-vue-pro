@@ -85,6 +85,14 @@ public interface SysDeptService {
     SysDeptDO getDept(Long id);
 
     /**
+     * 获得部门信息数组
+     *
+     * @param ids 部门编号数组
+     * @return 部门信息数组
+     */
+    List<SysDeptDO> getDepts(Collection<Long> ids);
+
+    /**
      * 获得所有子部门，从缓存中
      *
      * @param parentId 部门编号
@@ -92,5 +100,14 @@ public interface SysDeptService {
      * @return 子部门列表
      */
     List<SysDeptDO> getDeptsByParentIdFromCache(Long parentId, boolean recursive);
+
+    /**
+     * 校验部门们是否有效。如下情况，视为无效：
+     * 1. 部门编号不存在
+     * 2. 部门被禁用
+     *
+     * @param ids 角色编号数组
+     */
+    void validDepts(Collection<Long> ids);
 
 }

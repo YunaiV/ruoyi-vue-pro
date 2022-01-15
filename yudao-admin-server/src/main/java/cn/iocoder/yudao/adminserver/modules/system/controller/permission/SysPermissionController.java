@@ -59,7 +59,7 @@ public class SysPermissionController {
     @GetMapping("/list-user-roles")
 //    @RequiresPermissions("system:permission:assign-user-role")
     public CommonResult<Set<Long>> listAdminRoles(@RequestParam("userId") Long userId) {
-        return success(permissionService.listUserRoleIs(userId));
+        return success(permissionService.getUserRoleIdListByUserId(userId));
     }
 
     @ApiOperation("赋予用户角色")

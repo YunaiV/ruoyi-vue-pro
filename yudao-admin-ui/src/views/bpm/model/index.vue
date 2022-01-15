@@ -26,11 +26,11 @@
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
         <el-button type="primary" icon="el-icon-plus" size="mini" @click="handleAdd"
-                   v-hasPermi="['bpm:model:create']">新建流程模型</el-button>
+                   v-hasPermi="['bpm:model:create']">新建流程</el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button type="info" icon="el-icon-upload2" size="mini" @click="handleImport"
-                   v-hasPermi="['bpm:model:import']">导入流程模型</el-button>
+                   v-hasPermi="['bpm:model:import']">导入流程</el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
@@ -82,10 +82,15 @@
           </template>
         </el-table-column>
       </el-table-column>
-      <el-table-column label="操作" align="center" width="300">
+      <el-table-column label="操作" align="center" width="450" fixed="right">
         <template slot-scope="scope">
-          <el-button size="mini" type="text" icon="el-icon-setting" @click="handleUpdate(scope.row)"
+          <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
+                     v-hasPermi="['bpm:model:update']">修改流程</el-button>
+          <el-button size="mini" type="text" icon="el-icon-setting" @click="handleDesign(scope.row)"
                      v-hasPermi="['bpm:model:update']">设计流程</el-button>
+          <!-- TODO 权限 -->
+          <el-button size="mini" type="text" icon="el-icon-s-custom" @click="handleAssignRule(scope.row)"
+                     v-hasPermi="['bpm:model:update']">分配规则</el-button>
           <el-button size="mini" type="text" icon="el-icon-thumb" @click="handleDeploy(scope.row)"
                      v-hasPermi="['bpm:model:deploy']">发布流程</el-button>
           <el-button size="mini" type="text" icon="el-icon-ice-cream-round" @click="handleDefinitionList(scope.row)"
@@ -109,50 +114,83 @@
       <my-process-viewer key="designer" v-model="bpmnXML" v-bind="bpmnControlForm" />
     </el-dialog>
 
+    <!-- 对话框(添加 / 修改) -->
+    <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
+      <el-form ref="form" :model="form" :rules="rules" label-width="110px">
+        <el-form-item label="流程标识" prop="key">
+          <el-input v-model="form.key" placeholder="请输入流标标识" style="width: 330px;" :disabled="form.id" />
+          <el-tooltip v-if="!form.id" class="item" effect="light" content="新建后，流程标识不可修改！" placement="top">
+            <i style="padding-left: 5px;" class="el-icon-question" />
+          </el-tooltip>
+          <el-tooltip v-else class="item" effect="light" content="流程标识不可修改！" placement="top">
+            <i style="padding-left: 5px;" class="el-icon-question" />
+          </el-tooltip>
+        </el-form-item>
+        <el-form-item label="流程名称" prop="name">
+          <el-input v-model="form.name" placeholder="请输入流程名称" :disabled="form.id" clearable />
+        </el-form-item>
+        <el-form-item v-if="form.id" label="流程分类" prop="category">
+          <el-select v-model="form.category" placeholder="请选择流程分类" clearable style="width: 100%">
+            <el-option v-for="dict in categoryDictDatas" :key="dict.value" :label="dict.label" :value="dict.value"/>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="流程描述" prop="description">
+          <el-input type="textarea" v-model="form.description" clearable />
+        </el-form-item>
+        <div v-if="form.id">
+          <el-form-item label="表单类型" prop="formType">
+            <el-radio-group v-model="form.formType">
+              <el-radio v-for="dict in modelFormTypeDictDatas" :key="parseInt(dict.value)" :label="parseInt(dict.value)">
+                {{dict.label}}
+              </el-radio>
+            </el-radio-group>
+          </el-form-item>
+          <el-form-item v-if="form.formType === 10" label="流程表单" prop="formId">
+            <el-select v-model="form.formId" clearable style="width: 100%">
+              <el-option v-for="form in forms" :key="form.id" :label="form.name" :value="form.id"/>
+            </el-select>
+          </el-form-item>
+          <el-form-item v-if="form.formType === 20" label="表单提交路由" prop="formCustomCreatePath" >
+            <el-input v-model="form.formCustomCreatePath" placeholder="请输入表单提交路由" style="width: 330px;" />
+            <el-tooltip class="item" effect="light" content="自定义表单的提交路径，使用 Vue 的路由地址，例如说：bpm/oa/leave/create" placement="top">
+              <i style="padding-left: 5px;" class="el-icon-question" />
+            </el-tooltip>
+          </el-form-item>
+          <el-form-item v-if="form.formType === 20" label="表单查看路由" prop="formCustomViewPath">
+            <el-input v-model="form.formCustomViewPath" placeholder="请输入表单查看路由" style="width: 330px;" />
+            <el-tooltip class="item" effect="light" content="自定义表单的查看路径，使用 Vue 的路由地址，例如说：bpm/oa/leave/view" placement="top">
+              <i style="padding-left: 5px;" class="el-icon-question" />
+            </el-tooltip>
+          </el-form-item>
+        </div>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="submitForm">确 定</el-button>
+        <el-button @click="cancel">取 消</el-button>
+      </div>
+    </el-dialog>
+
     <!-- 用户导入对话框 -->
-    <el-dialog title="导入流程模型" :visible.sync="upload.open" width="400px" append-to-body>
-      <el-upload
-        ref="upload"
-        :limit="1"
-        accept=".bpmn, .xml"
-        :headers="upload.headers"
-        :action="upload.url"
-        :disabled="upload.isUploading"
-        :on-progress="handleFileUploadProgress"
-        :on-success="handleFileSuccess"
-        :auto-upload="false"
-        name="bpmnFile"
-        :data="upload.form"
-        drag
-      >
+    <el-dialog title="导入流程" :visible.sync="upload.open" width="400px" append-to-body>
+      <el-upload ref="upload" :limit="1" accept=".bpmn, .xml" :headers="upload.headers" :action="upload.url"
+        :disabled="upload.isUploading" :on-progress="handleFileUploadProgress" :on-success="handleFileSuccess"
+        :auto-upload="false" name="bpmnFile" :data="upload.form" drag>
         <i class="el-icon-upload"></i>
         <div class="el-upload__text">
           将文件拖到此处，或
           <em>点击上传</em>
         </div>
         <div class="el-upload__tip" style="color:red" slot="tip">提示：仅允许导入“bpm”或“xml”格式文件！</div>
-
-        <!--        <div class="el-upload__tip" slot="tip">-->
-<!--          流程名称：<el-input v-model="upload.name"/>-->
-<!--          流程分类：<el-input v-model="upload.category"/>-->
-<!--        </div>-->
         <div class="el-upload__tip" slot="tip">
           <el-form ref="uploadForm" size="mini" label-width="90px" :model="upload.form" :rules="upload.rules" @submit.native.prevent>
             <el-form-item label="流程标识" prop="key">
-              <el-input v-model="upload.form.key" placeholder="请输入流标标识" />
+              <el-input v-model="upload.form.key" placeholder="请输入流标标识" style="width: 250px;" />
+              <el-tooltip class="item" effect="light" content="新建后，流程标识不可修改！" placement="top">
+                <i style="padding-left: 5px;" class="el-icon-question" />
+              </el-tooltip>
             </el-form-item>
             <el-form-item label="流程名称" prop="name">
               <el-input v-model="upload.form.name" placeholder="请输入流程名称" clearable />
-            </el-form-item>
-            <el-form-item label="流程分类" prop="category">
-              <el-select v-model="upload.form.category" placeholder="请选择流程分类" clearable style="width: 100%">
-                <el-option v-for="dict in categoryDictDatas" :key="dict.value" :label="dict.label" :value="dict.value"/>
-              </el-select>
-            </el-form-item>
-            <el-form-item label="流程表单" prop="formId">
-              <el-select v-model="upload.form.formId" placeholder="请选择流程表单，非必选哟！" clearable style="width: 100%">
-                <el-option v-for="form in forms" :key="form.id" :label="form.name" :value="form.id"/>
-              </el-select>
             </el-form-item>
             <el-form-item label="流程描述" prop="description">
               <el-input type="textarea" v-model="upload.form.description" clearable />
@@ -165,23 +203,38 @@
         <el-button @click="uploadClose">取 消</el-button>
       </div>
     </el-dialog>
+
+    <!-- ========== 流程任务分配规则 ========== -->
+    <taskAssignRuleDialog ref="taskAssignRuleDialog" />
   </div>
 </template>
 
 <script>
-import {deleteModel, deployModel, getModelPage, getModel, updateModelState} from "@/api/bpm/model";
+import {
+  deleteModel,
+  deployModel,
+  getModelPage,
+  getModel,
+  updateModelState,
+  createModel,
+  updateModel
+} from "@/api/bpm/model";
 import {DICT_TYPE, getDictDatas} from "@/utils/dict";
 import {getForm, getSimpleForms} from "@/api/bpm/form";
 import {decodeFields} from "@/utils/formGenerator";
 import Parser from '@/components/parser/Parser'
-import {getToken} from "@/utils/auth";
 import {getBaseHeader} from "@/utils/request";
-import {addUser, updateUser} from "@/api/system/user";
+import taskAssignRuleDialog from "../taskAssignRule/taskAssignRuleDialog";
+
+import Treeselect from "@riophae/vue-treeselect";
+import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 
 export default {
   name: "model",
   components: {
-    Parser
+    Parser,
+    Treeselect,
+    taskAssignRuleDialog
   },
   data() {
     return {
@@ -212,6 +265,21 @@ export default {
         fields: []
       },
 
+      // 流程表单
+      title: "",
+      open: false,
+      form: {},
+      // 表单校验
+      rules: {
+        key: [{ required: true, message: "流程标识不能为空", trigger: "blur" }],
+        name: [{ required: true, message: "流程名称不能为空", trigger: "blur" }],
+        formType: [{ required: true, message: "流程名称不能为空", trigger: "blur" }],
+        formId: [{ required: true, message: "业务表单不能为空", trigger: "blur" }],
+        category: [{ required: true, message: "流程分类不能为空", trigger: "blur" }],
+        formCustomCreatePath: [{ required: true, message: "表单提交路由不能为空", trigger: "blur" }],
+        formCustomViewPath: [{ required: true, message: "表单查看路由不能为空", trigger: "blur" }],
+      },
+
       // 流程导入参数
       upload: {
         // 是否显示弹出层（用户导入）
@@ -228,7 +296,6 @@ export default {
         rules: {
           key: [{ required: true, message: "流程标识不能为空", trigger: "blur" }],
           name: [{ required: true, message: "流程名称不能为空", trigger: "blur" }],
-          category: [{ required: true, message: "流程分类不能为空", trigger: "blur" }],
         },
       },
       // 流程表单的下拉框的数据
@@ -236,6 +303,8 @@ export default {
 
       // 数据字典
       categoryDictDatas: getDictDatas(DICT_TYPE.BPM_MODEL_CATEGORY),
+      modelFormTypeDictDatas: getDictDatas(DICT_TYPE.BPM_MODEL_FORM_TYPE),
+      taskAssignRuleDictDatas: getDictDatas(DICT_TYPE.BPM_TASK_ASSIGN_RULE_TYPE),
     };
   },
   created() {
@@ -256,10 +325,25 @@ export default {
         }
       );
     },
+    /** 取消按钮 */
+    cancel() {
+      this.open = false;
+      this.reset();
+    },
     // 表单重置
     reset() {
-      this.bpmnData = {}
-      this.bpmnXML = ""
+      this.form = {
+        id: undefined,
+        key: undefined,
+        name: undefined,
+        description: undefined,
+        category: undefined,
+        formType: undefined,
+        formId: undefined,
+        formCustomCreatePath: undefined,
+        formCustomViewPath: undefined
+      };
+      this.resetForm("form");
     },
     /** 搜索按钮操作 */
     handleQuery() {
@@ -274,17 +358,66 @@ export default {
     },
     /** 新增按钮操作 */
     handleAdd() {
-      this.$router.push({
-        path:"/bpm/manager/model/edit"
-      });
+      this.reset();
+      this.title = "新建模型";
+      this.open = true;
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
+      this.reset();
+      this.title = "修改模型";
+      this.open = true;
+      // 设置 form
+      this.form = {
+        ...row
+      };
+      // 触发一次校验
+      // this.$refs["form"].validate();
+    },
+    /** 设计按钮操作 */
+    handleDesign(row) {
       this.$router.push({
-        path:"/bpm/manager/model/edit",
+        path:"/bpm/manager/model/design",
         query:{
           modelId: row.id
         }
+      });
+    },
+    /** 提交按钮 */
+    submitForm() {
+      this.$refs["form"].validate(valid => {
+        if (!valid) {
+          return;
+        }
+        // 更新
+        if (this.form.id) {
+          updateModel({
+            ...this.form,
+            formId: this.form.formType === 10 ? this.form.formId : undefined,
+            formCustomCreatePath: this.form.formType === 20 ? this.form.formCustomCreatePath : undefined,
+            formCustomViewPath: this.form.formType === 20 ? this.form.formCustomViewPath : undefined,
+          }).then(response => {
+            this.msgSuccess("修改模型成功");
+            this.open = false;
+            this.getList();
+          });
+          return;
+        }
+        // 创建
+        createModel(this.form).then(response => {
+          this.open = false;
+          this.getList();
+          this.$alert('<strong>新建模型成功！</strong>后续需要执行如下 4 个步骤：' +
+            '<div>1. 点击【修改流程】按钮，配置流程的分类、表单信息</div>' +
+            '<div>2. 点击【设计流程】按钮，绘制流程图</div>' +
+            '<div>3. 点击【分配规则】按钮，设置每个用户任务的审批人</div>' +
+            '<div>4. 点击【发布流程】按钮，完成流程的最终发布</div>' +
+            '另外，每次流程修改后，都需要点击【发布流程】按钮，才能正式生效！！！',
+            '重要提示', {
+              dangerouslyUseHTMLString: true,
+              type: 'success'
+            });
+        });
       });
     },
     /** 删除按钮操作 */
@@ -378,7 +511,7 @@ export default {
       // 重置表单
       this.uploadClose();
       // 提示，并刷新
-      this.msgSuccess("上传成功！请点击【设计流程】按钮，进行编辑保存后，才可以进行【发布流程】");
+      this.msgSuccess("导入流程成功！请点击【设计流程】按钮，进行编辑保存后，才可以进行【发布流程】");
       this.getList();
     },
     uploadClose() {
@@ -399,6 +532,10 @@ export default {
         }
         this.$refs.upload.submit();
       })
+    },
+    /** 处理任务分配规则列表的按钮操作 */
+    handleAssignRule(row) {
+      this.$refs['taskAssignRuleDialog'].initModel(row.id);
     },
   }
 };

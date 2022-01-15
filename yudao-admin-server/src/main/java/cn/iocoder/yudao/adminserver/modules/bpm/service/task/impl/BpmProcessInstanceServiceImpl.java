@@ -87,8 +87,8 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         runtimeService.setProcessInstanceName(instance.getId(), definition.getName());
 
         // TODO 芋艿：临时使用, 保证分配
-        List<Task> tasks = taskService.getTasksByProcessInstanceId(instance.getId());
-        tasks.forEach(task -> taskService.updateTaskAssign(task.getId(), userId));
+//        List<Task> tasks = taskService.getTasksByProcessInstanceId(instance.getId());
+//        tasks.forEach(task -> taskService.updateTaskAssign(task.getId(), userId));
 
         // 添加初始的评论 TODO 芋艿：在思考下
 //        Task task = taskService.createTaskQuery().processInstanceId(instance.getId()).singleResult();

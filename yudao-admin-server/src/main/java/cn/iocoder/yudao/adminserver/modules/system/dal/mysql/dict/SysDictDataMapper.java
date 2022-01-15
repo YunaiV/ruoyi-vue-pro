@@ -9,6 +9,7 @@ import cn.iocoder.yudao.framework.mybatis.core.query.QueryWrapperX;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -18,6 +19,11 @@ public interface SysDictDataMapper extends BaseMapperX<SysDictDataDO> {
     default SysDictDataDO selectByDictTypeAndValue(String dictType, String value) {
         return selectOne(new QueryWrapper<SysDictDataDO>().eq("dict_type", dictType)
                 .eq("value", value));
+    }
+
+    default List<SysDictDataDO> selectByDictTypeAndValues(String dictType, Collection<String> values) {
+        return selectList(new QueryWrapper<SysDictDataDO>().eq("dict_type", dictType)
+                .in("value", values));
     }
 
     default int selectCountByDictType(String dictType) {

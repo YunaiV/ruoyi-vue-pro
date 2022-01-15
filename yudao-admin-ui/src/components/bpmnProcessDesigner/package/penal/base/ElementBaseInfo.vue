@@ -9,19 +9,6 @@
         <el-form-item label="流程名称" prop="name">
           <el-input v-model="model.name" placeholder="请输入流程名称" clearable @change="handleNameUpdate" />
         </el-form-item>
-        <el-form-item label="流程分类" prop="category">
-          <el-select v-model="model.category" placeholder="请选择流程分类" clearable style="width: 100%">
-            <el-option v-for="dict in categoryDictDatas" :key="dict.value" :label="dict.label" :value="dict.value"/>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="流程表单" prop="formId">
-          <el-select v-model="model.formId" placeholder="请选择流程表单，非必选哟！" clearable style="width: 100%">
-            <el-option v-for="form in forms" :key="form.id" :label="form.name" :value="form.id"/>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="流程描述" prop="description">
-          <el-input type="textarea" v-model="model.description" clearable @change="handleDescriptionUpdate" />
-        </el-form-item>
       </div>
       <div v-else>
         <el-form-item label="ID">
@@ -35,9 +22,6 @@
   </div>
 </template>
 <script>
-import {DICT_TYPE, getDictDatas} from "@/utils/dict";
-import {getSimpleForms} from "@/api/bpm/form";
-import {getModel} from "@/api/bpm/model";
 
 export default {
   name: "ElementBaseInfo",
@@ -54,10 +38,7 @@ export default {
       rules: {
         key: [{ required: true, message: "流程标识不能为空", trigger: "blur" }],
         name: [{ required: true, message: "流程名称不能为空", trigger: "blur" }],
-        category: [{ required: true, message: "流程分类不能为空", trigger: "blur" }],
       },
-      // 数据字典
-      categoryDictDatas: getDictDatas(DICT_TYPE.BPM_MODEL_CATEGORY),
     };
   },
   watch: {
@@ -77,10 +58,6 @@ export default {
     // }
   },
   created() {
-    // 获得流程表单的下拉框的数据
-    getSimpleForms().then(response => {
-      this.forms = response.data
-    })
     // 针对上传的 bpmn 流程图时，需要延迟 1 秒的时间，保证 key 和 name 的更新
     setTimeout(() => {
       this.handleKeyUpdate(this.model.key)

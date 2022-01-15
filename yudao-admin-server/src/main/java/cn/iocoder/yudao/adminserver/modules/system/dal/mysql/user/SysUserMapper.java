@@ -55,13 +55,21 @@ public interface SysUserMapper extends BaseMapperX<SysUserDO> {
         return selectList(new QueryWrapperX<SysUserDO>().like("username", username));
     }
 
-
+    // TODO 芋艿：可废弃该方法
     default List<SysUserDO> selectListByDepartIdAndPostId(Long departId, Long postId) {
         return selectList(new QueryWrapperX<SysUserDO>()
                 .eq("status", CommonStatusEnum.ENABLE.getStatus())
                 .eq("dept_id", departId)
                 // TODO @jason: 封装一个 StringUtils .toString 。如果空的时候，设置为 null。会更简洁
                 .likeIfPresent("post_ids", Optional.ofNullable(postId).map(t -> String.valueOf(postId)).orElse("")));
+    }
+
+    default List<SysUserDO> selectListByStatus(Integer status) {
+        return selectList("status", status);
+    }
+
+    default List<SysUserDO> selectListByDeptIds(Collection<Long> deptIds) {
+        return selectList("dept_id", deptIds);
     }
 
 }

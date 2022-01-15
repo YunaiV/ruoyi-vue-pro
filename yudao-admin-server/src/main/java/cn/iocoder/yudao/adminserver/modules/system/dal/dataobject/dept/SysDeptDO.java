@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.dept;
 
+import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.user.SysUserDO;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.tenant.core.db.TenantBaseDO;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -11,6 +12,7 @@ import lombok.EqualsAndHashCode;
  * 部门表
  *
  * @author ruoyi
+ * @author 芋道源码
  */
 @TableName("sys_dept")
 @Data
@@ -38,8 +40,10 @@ public class SysDeptDO extends TenantBaseDO {
     private Integer sort;
     /**
      * 负责人
+     *
+     * 关联 {@link SysUserDO#getId()}
      */
-    private String leader;
+    private Long leaderUserId;
     /**
      * 联系电话
      */
