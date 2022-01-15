@@ -27,11 +27,9 @@ spring:
     # 3. create_drop: 启动时自动创建表，关闭时自动删除表
     # 4. drop_create: 启动时，删除旧表，再创建新表
     database-schema-update: false # 设置为 false，可通过 sql/activiti.sql 初始化
-    # activiti7 默认不生成历史信息表，需手动设置开启
-    db-history-used: true
-    check-process-definitions: true
-    # full：保存历史数据的最高级别，可保存全部流程相关细节，包括流程流转各节点参数
-    history-level: full
+    db-history-used: true # activiti7 默认不生成历史信息表，需手动设置开启
+    check-process-definitions: false # 设置为 false，禁用 /resources/processes 自动部署 BPMN XML 流程
+    history-level: full # full：保存历史数据的最高级别，可保存全部流程相关细节，包括流程流转各节点参数
 
 # MyBatis Plus 的配置项
 mybatis-plus:
