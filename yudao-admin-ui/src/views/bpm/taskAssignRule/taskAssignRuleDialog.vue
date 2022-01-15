@@ -10,14 +10,14 @@
             <span>{{ getDictDataLabel(DICT_TYPE.BPM_TASK_ASSIGN_RULE_TYPE, scope.row.type) }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="规则范围" align="center" prop="options" width="300px">
+        <el-table-column label="规则范围" align="center" prop="options" width="440px">
           <template slot-scope="scope">
             <el-tag size="medium" v-if="scope.row.options" v-for="option in scope.row.options">
               {{ getAssignRuleOptionName(scope.row.type, option) }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="操作" align="center" width="80" fixed="right">
+        <el-table-column v-if="modelId" label="操作" align="center" width="80" fixed="right">
           <template slot-scope="scope">
             <!-- TODO 权限 -->
             <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdateTaskAssignRule(scope.row)"
@@ -188,6 +188,7 @@ export default {
       this.loading = true;
       getTaskAssignRuleList({
         modelId: this.modelId,
+        processDefinitionId: this.processDefinitionId,
       }).then(response => {
         this.loading = false;
         this.list = response.data;

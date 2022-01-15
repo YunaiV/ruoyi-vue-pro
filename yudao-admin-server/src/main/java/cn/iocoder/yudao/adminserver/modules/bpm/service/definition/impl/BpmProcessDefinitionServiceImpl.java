@@ -67,7 +67,7 @@ public class BpmProcessDefinitionServiceImpl implements BpmProcessDefinitionServ
             definitionQuery.processDefinitionKey(pageVO.getKey());
         }
         // 执行查询
-        List<ProcessDefinition> processDefinitions = definitionQuery.orderByProcessDefinitionId().desc()
+        List<ProcessDefinition> processDefinitions = definitionQuery.orderByProcessDefinitionVersion().desc()
                 .listPage(PageUtils.getStart(pageVO), pageVO.getPageSize());
         if (CollUtil.isEmpty(processDefinitions)) {
             return new PageResult<>(Collections.emptyList(), definitionQuery.count());

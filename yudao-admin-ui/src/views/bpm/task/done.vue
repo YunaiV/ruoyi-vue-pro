@@ -87,7 +87,7 @@ export default {
       showSearch: true,
       // 总条数
       total: 0,
-      // 待办任务列表
+      // 已办任务列表
       list: [],
       // 查询参数
       dateRangeCreateTime: [],

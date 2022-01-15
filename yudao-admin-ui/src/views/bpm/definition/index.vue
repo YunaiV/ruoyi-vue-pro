@@ -41,6 +41,13 @@
         </template>
       </el-table-column>
       <el-table-column label="定义描述" align="center" prop="description" width="300" show-overflow-tooltip />
+      <el-table-column label="操作" align="center" width="150" fixed="right">
+        <template slot-scope="scope">
+          <!-- TODO 权限 -->
+          <el-button size="mini" type="text" icon="el-icon-s-custom" @click="handleAssignRule(scope.row)"
+                     v-hasPermi="['bpm:model:update']">分配规则</el-button>
+        </template>
+      </el-table-column>
     </el-table>
 
     <!-- 流程表单配置详情 -->
@@ -56,6 +63,9 @@
     <!-- 分页组件 -->
     <pagination v-show="total>0" :total="total" :page.sync="queryParams.pageNo" :limit.sync="queryParams.pageSize"
                 @pagination="getList"/>
+
+    <!-- ========== 流程任务分配规则 ========== -->
+    <taskAssignRuleDialog ref="taskAssignRuleDialog" />
   </div>
 </template>
 
@@ -65,11 +75,13 @@ import {DICT_TYPE, getDictDatas} from "@/utils/dict";
 import {getForm} from "@/api/bpm/form";
 import {decodeFields} from "@/utils/formGenerator";
 import Parser from '@/components/parser/Parser'
+import taskAssignRuleDialog from "../taskAssignRule/taskAssignRuleDialog";
 
 export default {
   name: "processDefinition",
   components: {
-    Parser
+    Parser,
+    taskAssignRuleDialog
   },
   data() {
     return {
@@ -140,6 +152,10 @@ export default {
         // 弹窗打开
         this.showBpmnOpen = true
       })
+    },
+    /** 处理任务分配规则列表的按钮操作 */
+    handleAssignRule(row) {
+      this.$refs['taskAssignRuleDialog'].initProcessDefinition(row.id);
     },
   }
 };

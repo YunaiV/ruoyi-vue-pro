@@ -52,6 +52,7 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
  * 主要进行 Activiti {@link Model} 的维护
  *
  * @author yunlongn
+ * @author 芋道源码
  */
 @Service
 @Validated
@@ -189,12 +190,7 @@ public class BpmModelServiceImpl implements BpmModelService {
         String definitionId = processDefinitionService.createProcessDefinition(definitionCreateReqDTO);
 
         // 将老的流程定义进行挂起。也就是说，只有最新部署的流程定义，才可以发起任务。
-        if (StrUtil.isNotEmpty(model.getDeploymentId())) {
-            ProcessDefinition oldDefinition = processDefinitionService.getProcessDefinitionByDeploymentId(model.getDeploymentId());
-            if (oldDefinition != null) {
-                processDefinitionService.updateProcessDefinitionState(oldDefinition.getId(), SuspensionState.SUSPENDED.getStateCode());
-            }
-        }
+        updateProcessDefinitionSuspended(model.getDeploymentId());
 
         // 更新 model 的 deploymentId，进行关联
         ProcessDefinition definition = processDefinitionService.getProcessDefinition(definitionId);
@@ -226,6 +222,7 @@ public class BpmModelServiceImpl implements BpmModelService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void deleteModel(String id) {
         // 校验流程模型存在
         Model model = repositoryService.getModel(id);
@@ -234,6 +231,19 @@ public class BpmModelServiceImpl implements BpmModelService {
         }
         // 执行删除
         repositoryService.deleteModel(id);
+        // 禁用流程实例
+        updateProcessDefinitionSuspended(model.getDeploymentId());
+    }
+
+    private void updateProcessDefinitionSuspended(String deploymentId) {
+        if (StrUtil.isEmpty(deploymentId)) {
+            return;
+        }
+        ProcessDefinition oldDefinition = processDefinitionService.getProcessDefinitionByDeploymentId(deploymentId);
+        if (oldDefinition == null) {
+            return;
+        }
+        processDefinitionService.updateProcessDefinitionState(oldDefinition.getId(), SuspensionState.SUSPENDED.getStateCode());
     }
 
     @Override
@@ -270,12 +280,6 @@ public class BpmModelServiceImpl implements BpmModelService {
         if (!ValidationUtils.isXmlNCName(key)) {
             throw exception(MODEL_KEY_VALID);
         }
-    }
-
-    public static void main(String[] args) {
-        // 创建转换对象
-        BpmnXMLConverter converter = new BpmnXMLConverter();
-        BpmnModel bpmnModel = converter.convertToBpmnModel(new StringStreamSource(""), true, true);
     }
 
 }
