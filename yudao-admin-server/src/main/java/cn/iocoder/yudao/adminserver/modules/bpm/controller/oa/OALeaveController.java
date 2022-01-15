@@ -61,7 +61,7 @@ public class OALeaveController {
 
     @DeleteMapping("/delete")
     @ApiOperation("删除请假申请")
-    @ApiImplicitParam(name = "id", value = "编号", required = true)
+    @ApiImplicitParam(name = "id", value = "编号", required = true, dataTypeClass = Long.class)
     @PreAuthorize("@ss.hasPermission('oa:leave:delete')")
     public CommonResult<Boolean> deleteLeave(@RequestParam("id") Long id) {
         leaveService.deleteLeave(id);

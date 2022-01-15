@@ -53,7 +53,7 @@ public class BpmUserGroupController {
 
     @DeleteMapping("/delete")
     @ApiOperation("删除用户组")
-    @ApiImplicitParam(name = "id", value = "编号", required = true)
+    @ApiImplicitParam(name = "id", value = "编号", required = true, dataTypeClass = Long.class)
     @PreAuthorize("@ss.hasPermission('bpm:user-group:delete')")
     public CommonResult<Boolean> deleteUserGroup(@RequestParam("id") Long id) {
         userGroupService.deleteUserGroup(id);

@@ -54,7 +54,7 @@ public class InfFileController {
 
     @DeleteMapping("/delete")
     @ApiOperation("删除文件")
-    @ApiImplicitParam(name = "id", value = "编号", required = true)
+    @ApiImplicitParam(name = "id", value = "编号", required = true, dataTypeClass = String.class)
     @PreAuthorize("@ss.hasPermission('infra:file:delete')")
     public CommonResult<Boolean> deleteFile(@RequestParam("id") String id) {
         fileCoreService.deleteFile(id);

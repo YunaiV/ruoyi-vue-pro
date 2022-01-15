@@ -22,10 +22,10 @@ spring:
 
   # 工作流 Activiti 配置
   activiti:
-    # 1.false: 默认值，activiti启动时，对比数据库表中保存的版本，如果不匹配。将抛出异常
-    # 2.true: 启动时会对数据库中所有表进行更新操作，如果表存在，不做处理，反之，自动创建表
-    # 3.create_drop: 启动时自动创建表，关闭时自动删除表
-    # 4.drop_create: 启动时，删除旧表，再创建新表
+    # 1. false: 默认值，activiti启动时，对比数据库表中保存的版本，如果不匹配。将抛出异常
+    # 2. true: 启动时会对数据库中所有表进行更新操作，如果表存在，不做处理，反之，自动创建表
+    # 3. create_drop: 启动时自动创建表，关闭时自动删除表
+    # 4. drop_create: 启动时，删除旧表，再创建新表
     database-schema-update: false # 设置为 false，可通过 sql/activiti.sql 初始化
     # activiti7 默认不生成历史信息表，需手动设置开启
     db-history-used: true
