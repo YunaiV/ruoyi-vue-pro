@@ -1,14 +1,19 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.framework.activiti.config;
 
 import cn.iocoder.yudao.adminserver.modules.bpm.framework.activiti.core.behavior.BpmActivityBehaviorFactory;
+import cn.iocoder.yudao.adminserver.modules.bpm.framework.activiti.core.behavior.script.BpmTaskAssignScript;
 import cn.iocoder.yudao.adminserver.modules.bpm.framework.activiti.core.listener.BpmTackActivitiEventListener;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmTaskAssignRuleService;
+import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmUserGroupService;
+import cn.iocoder.yudao.adminserver.modules.system.service.dept.SysDeptService;
 import cn.iocoder.yudao.adminserver.modules.system.service.permission.SysPermissionService;
+import cn.iocoder.yudao.adminserver.modules.system.service.user.SysUserService;
 import org.activiti.spring.boot.ProcessEngineConfigurationConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.Collections;
+import java.util.List;
 
 import static org.activiti.spring.boot.ProcessEngineAutoConfiguration.BEHAVIOR_FACTORY_MAPPING_CONFIGURER;
 
@@ -47,10 +52,18 @@ public class BpmActivitiConfiguration {
 
     @Bean
     public BpmActivityBehaviorFactory bpmActivityBehaviorFactory(BpmTaskAssignRuleService taskRuleService,
-                                                                 SysPermissionService permissionService) {
+                                                                 SysPermissionService permissionService,
+                                                                 SysDeptService deptService,
+                                                                 BpmUserGroupService userGroupService,
+                                                                 SysUserService userService,
+                                                                 List<BpmTaskAssignScript> scripts) {
         BpmActivityBehaviorFactory bpmActivityBehaviorFactory = new BpmActivityBehaviorFactory();
         bpmActivityBehaviorFactory.setBpmTaskRuleService(taskRuleService);
         bpmActivityBehaviorFactory.setPermissionService(permissionService);
+        bpmActivityBehaviorFactory.setDeptService(deptService);
+        bpmActivityBehaviorFactory.setUserGroupService(userGroupService);
+        bpmActivityBehaviorFactory.setUserService(userService);
+        bpmActivityBehaviorFactory.setScripts(scripts);
         return bpmActivityBehaviorFactory;
     }
 

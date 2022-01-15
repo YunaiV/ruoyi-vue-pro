@@ -14,6 +14,8 @@ import cn.iocoder.yudao.adminserver.modules.system.service.dept.SysDeptService;
 import cn.iocoder.yudao.adminserver.modules.system.service.permission.SysPermissionService;
 import cn.iocoder.yudao.adminserver.modules.system.service.user.SysUserService;
 import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.user.SysUserDO;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import com.google.common.annotations.VisibleForTesting;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.activiti.bpmn.model.UserTask;
@@ -24,10 +26,7 @@ import org.activiti.engine.impl.el.ExpressionManager;
 import org.activiti.engine.impl.persistence.entity.TaskEntity;
 import org.activiti.engine.impl.persistence.entity.TaskEntityManager;
 
-import javax.annotation.Resource;
 import java.util.*;
-import java.util.function.Consumer;
-import java.util.function.Function;
 
 import static cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants.TASK_ASSIGN_SCRIPT_NOT_EXISTS;
 import static cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants.TASK_CREATE_FAIL_NO_CANDIDATE_USER;
@@ -52,7 +51,7 @@ public class BpmUserTaskActivitiBehavior extends UserTaskActivityBehavior {
     private SysDeptService deptService;
     @Setter
     private BpmUserGroupService userGroupService;
-    @Resource
+    @Setter
     private SysUserService userService;
     /**
      * 任务分配脚本
@@ -105,15 +104,18 @@ public class BpmUserTaskActivitiBehavior extends UserTaskActivityBehavior {
         return CollUtil.get(candidateUserIds, index);
     }
 
-    private Set<Long> calculateTaskCandidateUsers(TaskEntity task, BpmTaskAssignRuleDO rule) {
+    @VisibleForTesting
+    Set<Long> calculateTaskCandidateUsers(TaskEntity task, BpmTaskAssignRuleDO rule) {
         Set<Long> assigneeUserIds = null;
         if (Objects.equals(BpmTaskAssignRuleTypeEnum.ROLE.getType(), rule.getType())) {
             assigneeUserIds = calculateTaskCandidateUsersByRole(task, rule);
         } else if (Objects.equals(BpmTaskAssignRuleTypeEnum.DEPT_MEMBER.getType(), rule.getType())) {
-            assigneeUserIds = calculateTaskCandidateUsersByMember(task, rule);
+            assigneeUserIds = calculateTaskCandidateUsersByDeptMember(task, rule);
         } else if (Objects.equals(BpmTaskAssignRuleTypeEnum.DEPT_LEADER.getType(), rule.getType())) {
             assigneeUserIds = calculateTaskCandidateUsersByDeptLeader(task, rule);
-        }  else if (Objects.equals(BpmTaskAssignRuleTypeEnum.USER.getType(), rule.getType())) {
+        } else if (Objects.equals(BpmTaskAssignRuleTypeEnum.POST.getType(), rule.getType())) {
+            assigneeUserIds = calculateTaskCandidateUsersByPost(task, rule);
+        } else if (Objects.equals(BpmTaskAssignRuleTypeEnum.USER.getType(), rule.getType())) {
             assigneeUserIds = calculateTaskCandidateUsersByUser(task, rule);
         } else if (Objects.equals(BpmTaskAssignRuleTypeEnum.USER_GROUP.getType(), rule.getType())) {
             assigneeUserIds = calculateTaskCandidateUsersByUserGroup(task, rule);
@@ -121,7 +123,8 @@ public class BpmUserTaskActivitiBehavior extends UserTaskActivityBehavior {
             assigneeUserIds = calculateTaskCandidateUsersByScript(task, rule);
         }
 
-        // TODO 芋艿：统一过滤掉被禁用的用户
+        // 移除被禁用的用户
+        removeDisableUsers(assigneeUserIds);
         // 如果候选人为空，抛出异常 TODO 芋艿：没候选人的策略选择。1 - 挂起；2 - 直接结束；3 - 强制一个兜底人
         if (CollUtil.isEmpty(assigneeUserIds)) {
             log.error("[calculateTaskCandidateUsers][流程任务({}/{}/{}) 任务规则({}) 找不到候选人]",
@@ -135,7 +138,7 @@ public class BpmUserTaskActivitiBehavior extends UserTaskActivityBehavior {
         return permissionService.getUserRoleIdListByRoleIds(rule.getOptions());
     }
 
-    private Set<Long> calculateTaskCandidateUsersByMember(TaskEntity task, BpmTaskAssignRuleDO rule) {
+    private Set<Long> calculateTaskCandidateUsersByDeptMember(TaskEntity task, BpmTaskAssignRuleDO rule) {
         List<SysUserDO> users = userService.getUsersByPostIds(rule.getOptions());
         return convertSet(users, SysUserDO::getId);
     }
@@ -143,6 +146,11 @@ public class BpmUserTaskActivitiBehavior extends UserTaskActivityBehavior {
     private Set<Long> calculateTaskCandidateUsersByDeptLeader(TaskEntity task, BpmTaskAssignRuleDO rule) {
         List<SysDeptDO> depts = deptService.getDepts(rule.getOptions());
         return convertSet(depts, SysDeptDO::getLeaderUserId);
+    }
+
+    private Set<Long> calculateTaskCandidateUsersByPost(TaskEntity task, BpmTaskAssignRuleDO rule) {
+        List<SysUserDO> users = userService.getUsersByPostIds(rule.getOptions());
+        return convertSet(users, SysUserDO::getId);
     }
 
     private Set<Long> calculateTaskCandidateUsersByUser(TaskEntity task, BpmTaskAssignRuleDO rule) {
@@ -170,6 +178,18 @@ public class BpmUserTaskActivitiBehavior extends UserTaskActivityBehavior {
         Set<Long> userIds = new HashSet<>();
         scripts.forEach(script -> CollUtil.addAll(userIds, script.calculateTaskCandidateUsers(task)));
         return userIds;
+    }
+
+    @VisibleForTesting
+    void removeDisableUsers(Set<Long> assigneeUserIds) {
+        if (CollUtil.isEmpty(assigneeUserIds)) {
+            return;
+        }
+        Map<Long, SysUserDO> userMap = userService.getUserMap(assigneeUserIds);
+        assigneeUserIds.removeIf(id -> {
+            SysUserDO user = userMap.get(id);
+            return user == null || !CommonStatusEnum.ENABLE.getStatus().equals(user.getStatus());
+        });
     }
 
 }

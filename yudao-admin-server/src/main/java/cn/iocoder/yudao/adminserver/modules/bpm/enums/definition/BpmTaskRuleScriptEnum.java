@@ -11,9 +11,10 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
-public class BpmTaskRuleScriptEnum {
+public enum BpmTaskRuleScriptEnum {
 
-    ;
+    ONE(1L, ""),
+    TWO(2L, "");
 
     /**
      * 脚本编号
