@@ -1,21 +1,19 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.convert.task;
 
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.task.vo.task.BpmTaskDonePageItemRespVO;
+import cn.iocoder.yudao.adminserver.modules.bpm.controller.task.vo.task.BpmTaskRespVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.task.vo.task.BpmTaskTodoPageItemRespVO;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.task.vo.task.TaskStepVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.task.BpmTaskExtDO;
+import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.dept.SysDeptDO;
 import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.user.SysUserDO;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
-import org.activiti.engine.history.HistoricActivityInstance;
+import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.impl.persistence.entity.SuspensionState;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.Mappings;
-import org.mapstruct.Named;
+import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
@@ -30,12 +28,6 @@ import java.util.Map;
 public interface BpmTaskConvert {
 
     BpmTaskConvert INSTANCE = Mappers.getMapper(BpmTaskConvert.class);
-
-    @Mappings(value = {
-            @Mapping(source = "activityName", target = "stepName"),
-            @Mapping(source = "assignee", target = "assignee")
-    })
-    TaskStepVO convert(HistoricActivityInstance instance);
 
     default List<BpmTaskTodoPageItemRespVO> convertList(List<Task> tasks, Map<String, ProcessInstance> processInstanceMap,
                                                         Map<Long, SysUserDO> userMap) {
@@ -89,9 +81,9 @@ public interface BpmTaskConvert {
             @Mapping(source = "processInstance.name", target = "processInstance.name"),
             @Mapping(source = "processInstance.startUserId", target = "processInstance.startUserId"),
             @Mapping(source = "processInstance.processDefinitionId", target = "processInstance.processDefinitionId"),
-            @Mapping(source = "user.nickname", target = "processInstance.startUserNickname")
+            @Mapping(source = "startUser.nickname", target = "processInstance.startUserNickname")
     })
-    BpmTaskDonePageItemRespVO convert(HistoricTaskInstance task, BpmTaskExtDO taskExtDO, HistoricProcessInstance processInstance, SysUserDO user);
+    BpmTaskDonePageItemRespVO convert(HistoricTaskInstance task, BpmTaskExtDO taskExtDO, HistoricProcessInstance processInstance, SysUserDO startUser);
 
     @Mappings({
             @Mapping(source = "id", target = "taskId"),
@@ -99,5 +91,41 @@ public interface BpmTaskConvert {
             @Mapping(source = "createdDate", target = "createTime")
     })
     BpmTaskExtDO convert(org.activiti.api.task.model.Task bean);
+
+    default List<BpmTaskRespVO> convertList3(List<HistoricTaskInstance> tasks, Map<String, BpmTaskExtDO> bpmTaskExtDOMap,
+                                             HistoricProcessInstance processInstance, Map<Long, SysUserDO> userMap,
+                                             Map<Long, SysDeptDO> deptMap) {
+        return CollectionUtils.convertList(tasks, task -> {
+            BpmTaskRespVO respVO = convert3(task);
+            BpmTaskExtDO taskExtDO = bpmTaskExtDOMap.get(task.getId());
+            copyTo3(taskExtDO, respVO);
+            if (processInstance != null) {
+                SysUserDO startUser = userMap.get(NumberUtils.parseLong(processInstance.getStartUserId()));
+                respVO.setProcessInstance(convert(processInstance, startUser));
+            }
+            SysUserDO assignUser = userMap.get(NumberUtils.parseLong(task.getAssignee()));
+            if (assignUser != null) {
+                respVO.setAssigneeUser(convert3(assignUser));
+                SysDeptDO dept = deptMap.get(assignUser.getDeptId());
+                if (dept != null) {
+                    respVO.getAssigneeUser().setDeptName(dept.getName());
+                }
+            }
+            return respVO;
+        });
+    }
+
+    BpmTaskRespVO convert3(HistoricTaskInstance bean);
+    BpmTaskRespVO.User convert3(SysUserDO bean);
+    void copyTo3(BpmTaskExtDO from, @MappingTarget BpmTaskRespVO to);
+
+    @Mappings({
+            @Mapping(source = "processInstance.id", target = "id"),
+            @Mapping(source = "processInstance.name", target = "name"),
+            @Mapping(source = "processInstance.startUserId", target = "startUserId"),
+            @Mapping(source = "processInstance.processDefinitionId", target = "processDefinitionId"),
+            @Mapping(source = "startUser.nickname", target = "startUserNickname")
+    })
+    BpmTaskTodoPageItemRespVO.ProcessInstance convert(HistoricProcessInstance processInstance, SysUserDO startUser);
 
 }

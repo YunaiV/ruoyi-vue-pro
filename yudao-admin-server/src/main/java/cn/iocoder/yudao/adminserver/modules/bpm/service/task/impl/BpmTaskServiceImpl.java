@@ -2,6 +2,7 @@ package cn.iocoder.yudao.adminserver.modules.bpm.service.task.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.IoUtil;
+import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.task.vo.task.*;
 import cn.iocoder.yudao.adminserver.modules.bpm.convert.task.BpmTaskConvert;
@@ -10,10 +11,13 @@ import cn.iocoder.yudao.adminserver.modules.bpm.dal.mysql.task.BpmTaskExtMapper;
 import cn.iocoder.yudao.adminserver.modules.bpm.enums.task.BpmProcessInstanceResultEnum;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.task.BpmProcessInstanceService;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.task.BpmTaskService;
+import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.dept.SysDeptDO;
+import cn.iocoder.yudao.adminserver.modules.system.service.dept.SysDeptService;
 import cn.iocoder.yudao.adminserver.modules.system.service.user.SysUserService;
 import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.user.SysUserDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.framework.common.util.object.PageUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.activiti.bpmn.constants.BpmnXMLConstants;
@@ -44,6 +48,7 @@ import javax.validation.Valid;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+import java.util.function.Function;
 
 import static cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants.*;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -75,6 +80,8 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     @Resource
     private SysUserService userService;
     @Resource
+    private SysDeptService deptService;
+    @Resource
     @Lazy // 解决循环依赖
     private BpmProcessInstanceService processInstanceService;
 
@@ -91,13 +98,25 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         // 获得任务列表
         List<HistoricTaskInstance> tasks = historyService.createHistoricTaskInstanceQuery()
                 .processInstanceId(processInstanceId)
-                .orderByTaskCreateTime().list();
+                .orderByTaskCreateTime().desc().list();
         if (CollUtil.isEmpty(tasks)) {
             return Collections.emptyList();
         }
 
+        // 获得 TaskExtDO Map
+        List<BpmTaskExtDO> bpmTaskExtDOs = taskExtMapper.selectListByTaskIds(convertSet(tasks, HistoricTaskInstance::getId));
+        Map<String, BpmTaskExtDO> bpmTaskExtDOMap = convertMap(bpmTaskExtDOs, BpmTaskExtDO::getTaskId);
+        // 获得 ProcessInstance Map
+        HistoricProcessInstance processInstance = processInstanceService.getHistoricProcessInstance(processInstanceId);
+        // 获得 User Map
+        Set<Long> userIds = convertSet(tasks, task -> NumberUtils.parseLong(task.getAssignee()));
+        userIds.add(NumberUtils.parseLong(processInstance.getStartUserId()));
+        Map<Long, SysUserDO> userMap = userService.getUserMap(userIds);
+        // 获得 Dept Map
+        Map<Long, SysDeptDO> deptMap = deptService.getDeptMap(convertSet(userMap.values(), SysUserDO::getDeptId));
+
         // 拼接数据
-        return null;
+        return BpmTaskConvert.INSTANCE.convertList3(tasks, bpmTaskExtDOMap, processInstance, userMap, deptMap);
     }
 
     @Override
@@ -113,7 +132,6 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         // 查询待办任务
         TaskQuery taskQuery = taskService.createTaskQuery()
                 .taskAssignee(String.valueOf(userId)) // 分配给自己
-                .taskCandidateUser(String.valueOf(userId))
                 .orderByTaskCreateTime().desc(); // 创建时间倒序
         if (StrUtil.isNotBlank(pageVO.getName())) {
             taskQuery.taskNameLike("%" + pageVO.getName() + "%");
@@ -230,48 +248,6 @@ public class BpmTaskServiceImpl implements BpmTaskService {
 
         // TODO 芋艿：添加评论
 //        taskService.addComment(task.getId(), task.getProcessInstanceId(), reqVO.getComment());
-    }
-
-    private List<TaskStepVO> getTaskSteps(String processInstanceId) {
-        // 获得已完成的活动
-        List<HistoricActivityInstance> finished = historyService.createHistoricActivityInstanceQuery()
-                .processInstanceId(processInstanceId)
-                .activityType("userTask")
-                .finished()
-                .orderByHistoricActivityInstanceStartTime().asc().list();
-        // 获得对应的步骤
-        List<TaskStepVO> steps = new ArrayList<>();
-        finished.forEach(instance -> {
-            TaskStepVO stepVO = BpmTaskConvert.INSTANCE.convert(instance);
-            stepVO.setStatus(1); // TODO @jason：1 这个 magic number 要枚举起来。
-            // TODO @jason：可以考虑把 comments 读取后，在统一调用 convert 拼接。另外 Comment 是废弃的类，有没其它可以使用的哈？
-            List<Comment> comments = taskService.getTaskComments(instance.getTaskId());
-            if (!CollUtil.isEmpty(comments)) {
-                stepVO.setComment(Optional.ofNullable(comments.get(0)).map(Comment::getFullMessage).orElse(""));
-            }
-            steps.add(stepVO);
-        });
-
-        // 获得未完成的活动
-        List<HistoricActivityInstance> unfinished = historyService
-                .createHistoricActivityInstanceQuery()
-                .processInstanceId(processInstanceId)
-                .activityType("userTask")
-                .unfinished().list();
-        // 获得对应的步骤
-        for (HistoricActivityInstance instance : unfinished) {
-            TaskStepVO stepVO = BpmTaskConvert.INSTANCE.convert(instance);
-            stepVO.setComment("");
-            stepVO.setStatus(0);
-            steps.add(stepVO);
-        }
-        return steps;
-    }
-
-
-    @Override
-    public List<TaskStepVO> getHistorySteps(String processInstanceId) {
-        return getTaskSteps(processInstanceId);
     }
 
     @Override

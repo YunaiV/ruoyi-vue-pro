@@ -57,10 +57,10 @@ public class BpmTaskController {
     }
 
     @GetMapping("/list-by-process-instance-id")
-    @ApiOperation(value = "获得指定流程实例的任务列表", notes = "包括完成的、未完成的")
+    @ApiOperation(value = "获得指定流程实例的任务列表", notes = "包括完成的、未完成的") // TODO 芋艿：注解
     public CommonResult<List<BpmTaskRespVO>> getTaskListByProcessInstanceId(
             @RequestParam("processInstanceId") String processInstanceId) {
-        return success(taskService.getTaskSteps(taskQuery));
+        return success(taskService.getTaskListByProcessInstanceId(processInstanceId));
     }
 
     /**
