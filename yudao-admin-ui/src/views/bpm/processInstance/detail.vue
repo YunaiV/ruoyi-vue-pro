@@ -1,6 +1,29 @@
 <template>
   <div class="app-container">
-    <!-- TODO 审批信息 -->
+    <!-- 审批信息 -->
+    <el-card class="box-card" v-loading="processInstanceLoading">
+      <div slot="header" class="clearfix">
+        <span class="el-icon-picture-outline">审批任务【TODO】</span>
+      </div>
+      <el-col :span="16" :offset="6" >
+        <el-form ref="form" :model="form" :rules="rules" label-width="80px">
+          <el-row>
+            <el-col :span="12">
+              <el-form-item label="审批建议" prop="comment">
+                <el-input type="textarea" v-model="form.comment" placeholder="请输入审批建议" />
+              </el-form-item>
+            </el-col>
+          </el-row>
+        </el-form>
+        <div style="margin-left: 10%; margin-bottom: 20px; font-size: 14px;">
+          <el-button  icon="el-icon-edit-outline" type="success" size="mini" @click="handleComplete">通过</el-button>
+          <el-button  icon="el-icon-circle-close" type="danger" size="mini" @click="handleReject">不通过</el-button>
+          <el-button  icon="el-icon-edit-outline" type="primary" size="mini" @click="handleAssign">转办</el-button>
+          <el-button  icon="el-icon-edit-outline" type="info" size="mini" @click="handleDelegate">委派</el-button>
+          <el-button  icon="el-icon-refresh-left" type="warning" size="mini" @click="handleReturn">退回</el-button>
+        </div>
+      </el-col>
+    </el-card>
     <!-- 申请信息 -->
     <el-card class="box-card" v-loading="processInstanceLoading">
       <div slot="header" class="clearfix">
@@ -92,6 +115,12 @@ export default {
       historicTasksLoad: true,
       historicTasks: [],
 
+      // 审批表单
+      form: {},
+      rules: {
+        comment: [{ required: true, message: "审批建议不能为空", trigger: "blur" }],
+      },
+
       // 数据字典
       categoryDictDatas: getDictDatas(DICT_TYPE.BPM_MODEL_CATEGORY),
     };
@@ -174,8 +203,6 @@ export default {
           ...JSON.parse(row.formConf),
           fields: decodeFields(row.formFields)
         }
-
-
       } else if (row.formCustomCreatePath) {
         this.$router.push({ path: row.formCustomCreatePath});
         // 这里暂时无需加载流程图，因为跳出到另外个 Tab；

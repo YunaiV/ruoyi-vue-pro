@@ -21,7 +21,7 @@
       <el-table-column label="任务编号" align="center" prop="id" width="320" fixed />
       <el-table-column label="任务名称" align="center" prop="name" width="200" />
       <el-table-column label="所属流程" align="center" prop="processInstance.name" width="200" />
-      <el-table-column label="流程发起人" align="center" prop="processInstance.startUserNickname" />
+      <el-table-column label="流程发起人" align="center" prop="processInstance.startUserNickname" width="120" />
       <el-table-column label="结果" align="center" prop="result">
         <template slot-scope="scope">
           <span>
