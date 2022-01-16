@@ -129,7 +129,7 @@ import {
 import {deleteErrorCode} from "@/api/system/errorCode";
 
 export default {
-  name: "ProcessInstanceExt",
+  name: "ProcessInstance",
   components: {
   },
   data() {

@@ -60,9 +60,9 @@ import {decodeFields} from "@/utils/formGenerator";
 import Parser from '@/components/parser/Parser'
 import {createProcessInstance, getMyProcessInstancePage} from "@/api/bpm/processInstance";
 
-// 流程实例的发起
+// 流程实例的详情页，可用于审批
 export default {
-  name: "ProcessInstanceCreate",
+  name: "ProcessInstanceDetail",
   components: {
     Parser
   },
