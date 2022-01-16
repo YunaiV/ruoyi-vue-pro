@@ -2,7 +2,6 @@ package cn.iocoder.yudao.adminserver.modules.bpm.service.task.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.IoUtil;
-import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.task.vo.task.*;
 import cn.iocoder.yudao.adminserver.modules.bpm.convert.task.BpmTaskConvert;
@@ -34,7 +33,6 @@ import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.history.HistoricTaskInstanceQuery;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.task.Comment;
 import org.activiti.engine.task.Task;
 import org.activiti.engine.task.TaskQuery;
 import org.activiti.image.ProcessDiagramGenerator;
@@ -48,7 +46,6 @@ import javax.validation.Valid;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
-import java.util.function.Function;
 
 import static cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants.*;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -155,7 +152,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         Map<Long, SysUserDO> userMap = userService.getUserMap(
                 convertSet(processInstanceMap.values(), instance -> Long.valueOf(instance.getStartUserId())));
         // 拼接结果
-        return new PageResult<>(BpmTaskConvert.INSTANCE.convertList(tasks, processInstanceMap, userMap),
+        return new PageResult<>(BpmTaskConvert.INSTANCE.convertList1(tasks, processInstanceMap, userMap),
                 taskQuery.count());
     }
 
