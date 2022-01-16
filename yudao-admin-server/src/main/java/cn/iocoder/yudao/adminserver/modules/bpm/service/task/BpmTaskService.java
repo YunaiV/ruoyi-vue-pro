@@ -18,12 +18,20 @@ import java.util.Map;
 public interface BpmTaskService {
 
     /**
-     * 获得流程任务列表
+     * 获得指定流程实例的 Running 进行中的流程任务列表
      *
      * @param processInstanceId 流程实例的编号
      * @return 流程任务列表
      */
-    List<Task> getTasksByProcessInstanceId(String processInstanceId);
+    List<Task> getRunningTaskListByProcessInstanceId(String processInstanceId);
+
+    /**
+     * 获得指令流程实例的流程任务列表，包括所有状态的
+     *
+     * @param processInstanceId 流程实例的编号
+     * @return 流程任务列表
+     */
+    List<BpmTaskRespVO> getTaskListByProcessInstanceId(String processInstanceId);
 
     /**
      * 获得流程任务列表
@@ -83,20 +91,6 @@ public interface BpmTaskService {
      * @param reqVO 不通过请求
      */
     void rejectTask(@Valid BpmTaskRejectReqVO reqVO);
-
-    /**
-     * 根据任务id, 查询已经完成的用户任务，未完成的用户任务
-     * @param taskQuery 查询参数  一般 taskId
-     */
-    @Deprecated
-    TaskHandleVO getTaskSteps(TaskQueryReqVO taskQuery);
-
-    /**
-     * 根据流程实例id, 查询历史用户任务，包括已完成，未完成
-     * @param processInstanceId 流程实例id
-     */
-    @Deprecated
-    List<TaskStepVO> getHistorySteps(String processInstanceId);
 
     /**
      * 返回高亮的流转进程

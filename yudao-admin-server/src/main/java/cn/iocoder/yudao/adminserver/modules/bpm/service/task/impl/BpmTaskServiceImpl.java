@@ -82,8 +82,22 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     private BpmTaskExtMapper taskExtMapper;
 
     @Override
-    public List<Task> getTasksByProcessInstanceId(String processInstanceId) {
+    public List<Task> getRunningTaskListByProcessInstanceId(String processInstanceId) {
         return taskService.createTaskQuery().processInstanceId(processInstanceId).list();
+    }
+
+    @Override
+    public List<BpmTaskRespVO> getTaskListByProcessInstanceId(String processInstanceId) {
+        // 获得任务列表
+        List<HistoricTaskInstance> tasks = historyService.createHistoricTaskInstanceQuery()
+                .processInstanceId(processInstanceId)
+                .orderByTaskCreateTime().list();
+        if (CollUtil.isEmpty(tasks)) {
+            return Collections.emptyList();
+        }
+
+        // 拼接数据
+        return null;
     }
 
     @Override
@@ -216,16 +230,6 @@ public class BpmTaskServiceImpl implements BpmTaskService {
 
         // TODO 芋艿：添加评论
 //        taskService.addComment(task.getId(), task.getProcessInstanceId(), reqVO.getComment());
-    }
-
-    @Override
-    public TaskHandleVO getTaskSteps(TaskQueryReqVO taskQuery) {
-//        TaskHandleVO handleVO = new TaskHandleVO();
-//        final Task task = taskRuntime.task(taskQuery.getTaskId());
-//        List<TaskStepVO> steps = getTaskSteps(task.getProcessInstanceId());
-//        handleVO.setHistoryTask(steps);
-//        return handleVO;
-        return null;
     }
 
     private List<TaskStepVO> getTaskSteps(String processInstanceId) {

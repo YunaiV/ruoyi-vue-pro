@@ -56,14 +56,11 @@ public class BpmTaskController {
         return success(true);
     }
 
-    @PostMapping("/task-steps")
-    public CommonResult<TaskHandleVO> getTaskSteps(@RequestBody TaskQueryReqVO taskQuery) {
+    @GetMapping("/list-by-process-instance-id")
+    @ApiOperation(value = "获得指定流程实例的任务列表", notes = "包括完成的、未完成的")
+    public CommonResult<List<BpmTaskRespVO>> getTaskListByProcessInstanceId(
+            @RequestParam("processInstanceId") String processInstanceId) {
         return success(taskService.getTaskSteps(taskQuery));
-    }
-
-    @GetMapping("/process/history-steps")
-    public CommonResult<List<TaskStepVO>> getHistorySteps(@RequestParam("id") String processInstanceId) {
-        return success(taskService.getHistorySteps(processInstanceId));
     }
 
     /**
