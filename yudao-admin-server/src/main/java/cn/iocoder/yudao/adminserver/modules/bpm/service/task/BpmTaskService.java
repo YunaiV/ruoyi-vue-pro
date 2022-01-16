@@ -31,7 +31,7 @@ public interface BpmTaskService {
      * @param processInstanceId 流程实例的编号
      * @return 流程任务列表
      */
-    List<BpmTaskRespVO> getTaskListByProcessInstanceId(String processInstanceId);
+    List<BpmTaskRespVO> getHistoricTaskListByProcessInstanceId(String processInstanceId);
 
     /**
      * 获得流程任务列表

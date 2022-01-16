@@ -27,7 +27,7 @@ export function cancelProcessInstance(id, reason) {
   })
 }
 
-export function getMyProcessInstance(id) {
+export function getProcessInstance(id) {
   return request({
     url: '/bpm/process-instance/get?id=' + id,
     method: 'get',

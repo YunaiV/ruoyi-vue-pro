@@ -40,3 +40,9 @@ export function rejectTask(data) {
   })
 }
 
+export function getHistoricTaskListByProcessInstanceId(processInstanceId) {
+  return request({
+    url: '/bpm/task/historic-list-by-process-instance-id?processInstanceId=' + processInstanceId,
+    method: 'get',
+  })
+}

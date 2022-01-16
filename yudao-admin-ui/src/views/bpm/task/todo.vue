@@ -36,7 +36,7 @@
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <!-- TODO 权限、颜色 -->
-          <el-button size="mini" type="text" icon="el-icon-edit">审批</el-button>
+          <el-button size="mini" type="text" icon="el-icon-edit" @click="handleAudit(scope.row)">审批</el-button>
           <el-button size="mini" type="text" icon="el-icon-edit" @click="audit(scope.row, true)">通过</el-button>
           <el-button size="mini" type="text" icon="el-icon-edit"  @click="audit(scope.row, false)">不通过</el-button>
           <el-button size="mini" type="text" icon="el-icon-edit" v-if="scope.row.suspensionState === 2">激活</el-button>
@@ -103,6 +103,10 @@ export default {
       this.dateRangeCreateTime = [];
       this.resetForm("queryForm");
       this.handleQuery();
+    },
+    /** 处理审批按钮 */
+    handleAudit(row) {
+      this.$router.push({ path: "/bpm/process-instance/detail", query: { id: row.processInstance.id}});
     },
     audit(row, pass) {
       if (pass) {

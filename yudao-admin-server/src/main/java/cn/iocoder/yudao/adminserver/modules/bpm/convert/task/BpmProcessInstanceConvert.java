@@ -64,6 +64,7 @@ public interface BpmProcessInstanceConvert {
 
     @Mappings({
             @Mapping(source = "id", target = "processInstanceId"),
+            @Mapping(source = "id", target = "id", ignore = true),
             @Mapping(source = "startDate", target = "createTime"),
             @Mapping(source = "initiator", target = "startUserId"),
             @Mapping(source = "status", target = "status", ignore = true)

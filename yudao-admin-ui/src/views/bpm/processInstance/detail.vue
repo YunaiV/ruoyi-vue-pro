@@ -1,54 +1,25 @@
 <template>
   <div class="app-container">
-    <!-- 第一步，通过流程定义的列表，选择对应的流程 -->
-    <div v-if="!selectProcessInstance">
-      <el-table v-loading="loading" :data="list">
-        <el-table-column label="流程名称" align="center" prop="name" width="200">
-          <template slot-scope="scope">
-            <el-button type="text" @click="handleBpmnDetail(scope.row)">
-              <span>{{ scope.row.name }}</span>
-            </el-button>
-          </template>
-        </el-table-column>
-        <el-table-column label="流程分类" align="center" prop="category" width="100">
-          <template slot-scope="scope">
-            <span>{{ getDictDataLabel(DICT_TYPE.BPM_MODEL_CATEGORY, scope.row.category) }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column label="流程版本" align="center" prop="processDefinition.version" width="80">
-          <template slot-scope="scope">
-            <el-tag size="medium" v-if="scope.row">v{{ scope.row.version }}</el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column label="流程描述" align="center" prop="description" width="300" show-overflow-tooltip />
-        <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
-          <template slot-scope="scope">
-            <el-button type="text" size="small" icon="el-icon-plus" @click="handleSelect(scope.row)">选择</el-button>
-          </template>
-        </el-table-column>
-      </el-table>
-    </div>
-    <!-- 第二步，填写表单，进行流程的提交 -->
-    <div v-else>
-      <el-card class="box-card" >
-        <div slot="header" class="clearfix">
-          <span class="el-icon-document">申请信息【{{ selectProcessInstance.name }}】</span>
-          <el-button style="float: right;" type="primary" @click="selectProcessInstance = undefined">选择其它流程</el-button>
+    <!-- TODO 审批信息 -->
+    <!-- 申请信息 -->
+    <el-card class="box-card" v-loading="processInstanceLoading">
+      <div slot="header" class="clearfix">
+        <span class="el-icon-document">申请信息【{{ processInstance.name }}】</span>
+      </div>
+      <el-col :span="16" :offset="6">
+        <div>
+          <parser :key="new Date().getTime()" :form-conf="detailForm" @submit="submitForm" />
         </div>
-        <el-col :span="16" :offset="6">
-          <div>
-            <parser :key="new Date().getTime()" :form-conf="detailForm" @submit="submitForm" />
-          </div>
-        </el-col>
-      </el-card>
-      <el-card class="box-card">
-        <div slot="header" class="clearfix">
-          <span class="el-icon-picture-outline">流程图</span>
-        </div>
-        <my-process-viewer key="designer" v-model="bpmnXML" v-bind="bpmnControlForm" />
-      </el-card>
-    </div>
-
+      </el-col>
+    </el-card>
+    <!-- TODO 审批记录 -->
+    <!-- TODO 流程图 -->
+    <el-card class="box-card" v-loading="processInstanceLoading">
+      <div slot="header" class="clearfix">
+        <span class="el-icon-picture-outline">流程图</span>
+      </div>
+      <my-process-viewer key="designer" v-model="bpmnXML" v-bind="bpmnControlForm" />
+    </el-card>
   </div>
 </template>
 
@@ -58,7 +29,8 @@ import {DICT_TYPE, getDictDatas} from "@/utils/dict";
 import {getForm} from "@/api/bpm/form";
 import {decodeFields} from "@/utils/formGenerator";
 import Parser from '@/components/parser/Parser'
-import {createProcessInstance, getMyProcessInstancePage} from "@/api/bpm/processInstance";
+import {createProcessInstance, getMyProcessInstancePage, getProcessInstance} from "@/api/bpm/processInstance";
+import {getHistoricTaskListByProcessInstanceId} from "@/api/bpm/task";
 
 // 流程实例的详情页，可用于审批
 export default {
@@ -69,11 +41,10 @@ export default {
   data() {
     return {
       // 遮罩层
-      loading: true,
-      // 总条数
-      total: 0,
-      // 表格数据
-      list: [],
+      processInstanceLoading: true,
+      // 流程实例
+      id: undefined, // 流程实例的编号
+      processInstance: {},
 
       // 流程表单详情
       detailForm: {
@@ -86,27 +57,65 @@ export default {
         prefix: "activiti"
       },
 
-      // 流程表单
-      selectProcessInstance: undefined, // 选择的流程实例
+      // 审批记录
+      historicTasksLoad: true,
+      historicTasks: [],
 
       // 数据字典
       categoryDictDatas: getDictDatas(DICT_TYPE.BPM_MODEL_CATEGORY),
     };
   },
   created() {
-    this.getList();
+    this.id = this.$route.query.id;
+    if (!this.id) {
+      this.$message.error('未传递 id 参数，无法查看流程信息');
+      return;
+    }
+    this.getDetail();
   },
   methods: {
-    /** 查询流程定义列表 */
-    getList() {
-      this.loading = true;
-      getProcessDefinitionList({
-        suspensionState: 1
-      }).then(response => {
-          this.list = response.data
-          this.loading = false
+    /** 获得流程实例 */
+    getDetail() {
+      // 获得流程实例相关
+      this.processInstanceLoading = true;
+      getProcessInstance(this.id).then(response => {
+        if (!response.data) {
+          this.$message.error('查询不到流程信息！');
+          return;
         }
-      );
+        // 设置流程信息
+        this.processInstance = response.data;
+
+        // 设置表单信息
+        this.detailForm = {
+          ...JSON.parse(this.processInstance.processDefinition.formConf),
+          disabled: true, // 表单禁用
+          formBtns: false, // 按钮隐藏
+          fields: decodeFields(this.processInstance.processDefinition.formFields)
+        }
+        // 设置表单的值
+        this.detailForm.fields.forEach(item => {
+          const val = this.processInstance.formVariables[item.__vModel__]
+          if (val) {
+            item.__config__.defaultValue = val
+          }
+        })
+
+        // 加载流程图
+        getProcessDefinitionBpmnXML(this.processInstance.processDefinition.id).then(response => {
+          this.bpmnXML = response.data
+        })
+
+        // 取消加载中
+        this.processInstanceLoading = false;
+      });
+
+      // 获得流程任务列表（审批记录）
+      this.historicTasksLoad = true;
+      getHistoricTaskListByProcessInstanceId(this.id).then(response => {
+        this.historicTasks = response.data;
+        this.historicTasksLoad = true;
+      });
     },
     /** 处理选择流程的按钮操作 **/
     handleSelect(row) {
@@ -121,10 +130,7 @@ export default {
           fields: decodeFields(row.formFields)
         }
 
-        // 加载流程图
-        getProcessDefinitionBpmnXML(row.id).then(response => {
-          this.bpmnXML = response.data
-        })
+
       } else if (row.formCustomCreatePath) {
         this.$router.push({ path: row.formCustomCreatePath});
         // 这里暂时无需加载流程图，因为跳出到另外个 Tab；

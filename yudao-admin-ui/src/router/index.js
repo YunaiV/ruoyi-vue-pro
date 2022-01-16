@@ -198,6 +198,12 @@ export const constantRoutes = [
         component: (resolve) => require(['@/views/bpm/processInstance/create'], resolve),
         name: '发起流程',
         meta: { title: '发起流程' }
+      },
+      {
+        path: 'process-instance/detail',
+        component: (resolve) => require(['@/views/bpm/processInstance/detail'], resolve),
+        name: '流程详情',
+        meta: { title: '流程详情' }
       }
     ]
   },
