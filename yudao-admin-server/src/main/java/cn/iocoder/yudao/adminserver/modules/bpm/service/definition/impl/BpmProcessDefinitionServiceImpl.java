@@ -13,6 +13,7 @@ import cn.iocoder.yudao.adminserver.modules.bpm.dal.mysql.definition.BpmProcessD
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmProcessDefinitionService;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.dto.BpmDefinitionCreateReqDTO;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmFormService;
+import cn.iocoder.yudao.framework.activiti.core.util.ActivitiUtils;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.object.PageUtils;
@@ -50,8 +51,6 @@ import static java.util.Collections.emptyList;
 public class BpmProcessDefinitionServiceImpl implements BpmProcessDefinitionService {
 
     private static final String BPMN_FILE_SUFFIX = ".bpmn";
-
-    private static final BpmnXMLConverter BPMN_XML_CONVERTER = new BpmnXMLConverter();
 
     @Resource
     private RepositoryService repositoryService;
@@ -122,9 +121,7 @@ public class BpmProcessDefinitionServiceImpl implements BpmProcessDefinitionServ
         if (bpmnModel == null) {
             return null;
         }
-        // TODO 芋艿：重构到 activi util 里
-        byte[] bpmnBytes = BPMN_XML_CONVERTER.convertToXML(bpmnModel);
-        return StrUtil.utf8Str(bpmnBytes);
+        return ActivitiUtils.getBpmnXml(bpmnModel);
     }
 
     @Override
@@ -140,6 +137,11 @@ public class BpmProcessDefinitionServiceImpl implements BpmProcessDefinitionServ
     @Override
     public ProcessDefinition getProcessDefinition2(String id) {
         return repositoryService.createProcessDefinitionQuery().processDefinitionId(id).singleResult();
+    }
+
+    @Override
+    public BpmProcessDefinitionExtDO getProcessDefinitionExt(String id) {
+        return processDefinitionMapper.selectByProcessDefinitionId(id);
     }
 
     @Override

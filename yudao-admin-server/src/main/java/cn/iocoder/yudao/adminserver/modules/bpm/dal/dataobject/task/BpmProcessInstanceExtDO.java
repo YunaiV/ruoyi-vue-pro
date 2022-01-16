@@ -4,6 +4,7 @@ import cn.iocoder.yudao.adminserver.modules.bpm.enums.task.BpmProcessInstanceRes
 import cn.iocoder.yudao.adminserver.modules.bpm.enums.task.BpmProcessInstanceStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.Data;
@@ -31,6 +32,11 @@ import java.util.Map;
 //@AllArgsConstructor
 public class BpmProcessInstanceExtDO extends BaseDO {
 
+    /**
+     * 编号，自增
+     */
+    @TableId
+    private Long id;
     /**
      * 发起流程的用户编号
      *
@@ -82,7 +88,7 @@ public class BpmProcessInstanceExtDO extends BaseDO {
     private Date endTime;
 
     /**
-     * 表单值
+     * 提交的表单值
      */
     @TableField(typeHandler = JacksonTypeHandler.class)
     private Map<String, Object> formVariables;

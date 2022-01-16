@@ -1,13 +1,11 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.controller.task;
 
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.task.vo.instance.BpmProcessInstanceCancelReqVO;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.task.vo.instance.BpmProcessInstanceCreateReqVO;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.task.vo.instance.BpmProcessInstanceMyPageReqVO;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.task.vo.instance.BpmProcessInstancePageItemRespVO;
+import cn.iocoder.yudao.adminserver.modules.bpm.controller.task.vo.instance.*;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.task.BpmProcessInstanceService;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -47,6 +45,13 @@ public class BpmProcessInstanceController {
     public CommonResult<PageResult<BpmProcessInstancePageItemRespVO>> getMyProcessInstancePage(
             @Valid BpmProcessInstanceMyPageReqVO pageReqVO) {
         return success(processInstanceService.getMyProcessInstancePage(getLoginUserId(), pageReqVO));
+    }
+
+    @GetMapping("/get")
+    @ApiOperation(value = "获得指定流程实例", notes = "在【流程详细】界面中，进行调用")
+    @ApiImplicitParam(name = "id", value = "流程实例的编号", required = true, dataTypeClass = String.class)
+    public CommonResult<BpmProcessInstanceRespVO> getProcessInstance(@RequestParam("id") String id) {
+        return success(processInstanceService.getProcessInstanceVO(id));
     }
 
 }

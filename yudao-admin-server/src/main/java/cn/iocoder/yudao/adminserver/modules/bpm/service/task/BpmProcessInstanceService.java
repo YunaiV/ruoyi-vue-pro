@@ -1,9 +1,6 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.service.task;
 
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.task.vo.instance.BpmProcessInstanceCancelReqVO;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.task.vo.instance.BpmProcessInstanceCreateReqVO;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.task.vo.instance.BpmProcessInstanceMyPageReqVO;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.task.vo.instance.BpmProcessInstancePageItemRespVO;
+import cn.iocoder.yudao.adminserver.modules.bpm.controller.task.vo.instance.*;
 import cn.iocoder.yudao.adminserver.modules.bpm.enums.task.BpmProcessInstanceDeleteReasonEnum;
 import cn.iocoder.yudao.adminserver.modules.bpm.enums.task.BpmProcessInstanceResultEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -67,6 +64,14 @@ public interface BpmProcessInstanceService {
      */
     PageResult<BpmProcessInstancePageItemRespVO> getMyProcessInstancePage(Long userId,
                                                                           @Valid BpmProcessInstanceMyPageReqVO pageReqVO);
+
+    /**
+     * 获得流程实例 VO 信息
+     *
+     * @param id 流程实例的编号
+     * @return 流程实例
+     */
+    BpmProcessInstanceRespVO getProcessInstanceVO(String id);
 
     /**
      * 获得流程实例

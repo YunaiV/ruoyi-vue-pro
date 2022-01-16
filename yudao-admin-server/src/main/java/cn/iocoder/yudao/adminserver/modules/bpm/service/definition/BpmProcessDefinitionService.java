@@ -4,6 +4,7 @@ import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.process
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.process.BpmProcessDefinitionPageItemRespVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.process.BpmProcessDefinitionPageReqVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.process.BpmProcessDefinitionRespVO;
+import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.definition.BpmProcessDefinitionExtDO;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.dto.BpmDefinitionCreateReqDTO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
@@ -73,6 +74,14 @@ public interface BpmProcessDefinitionService {
      * @return 流程定义
      */
     ProcessDefinition getProcessDefinition2(String id);
+
+    /**
+     * 获得编号对应的 BpmProcessDefinitionExtDO
+     *
+     * @param id 编号
+     * @return 流程定义拓展
+     */
+    BpmProcessDefinitionExtDO getProcessDefinitionExt(String id);
 
     /**
      * 获得 id 对应的 Deployment

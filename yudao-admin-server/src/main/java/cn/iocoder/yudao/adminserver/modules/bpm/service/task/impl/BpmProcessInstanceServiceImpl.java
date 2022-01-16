@@ -1,11 +1,12 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.service.task.impl;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.task.vo.instance.BpmProcessInstanceCancelReqVO;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.task.vo.instance.BpmProcessInstanceCreateReqVO;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.task.vo.instance.BpmProcessInstanceMyPageReqVO;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.task.vo.instance.BpmProcessInstancePageItemRespVO;
+import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.NumberUtil;
+import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.adminserver.modules.bpm.controller.task.vo.instance.*;
 import cn.iocoder.yudao.adminserver.modules.bpm.convert.task.BpmProcessInstanceConvert;
+import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.definition.BpmProcessDefinitionExtDO;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.task.BpmProcessInstanceExtDO;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.mysql.task.BpmProcessInstanceExtMapper;
 import cn.iocoder.yudao.adminserver.modules.bpm.enums.task.BpmProcessInstanceDeleteReasonEnum;
@@ -14,8 +15,12 @@ import cn.iocoder.yudao.adminserver.modules.bpm.enums.task.BpmProcessInstanceSta
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmProcessDefinitionService;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.task.BpmProcessInstanceService;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.task.BpmTaskService;
+import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.dept.SysDeptDO;
+import cn.iocoder.yudao.adminserver.modules.system.service.dept.SysDeptService;
 import cn.iocoder.yudao.adminserver.modules.system.service.user.SysUserService;
+import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.user.SysUserDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.RuntimeService;
@@ -23,6 +28,7 @@ import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
+import org.mapstruct.ap.shaded.freemarker.template.utility.StringUtil;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -59,6 +65,8 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
 
     @Resource
     private SysUserService userService;
+    @Resource
+    private SysDeptService deptService;
     @Resource
     @Lazy // 解决循环依赖
     private BpmTaskService taskService;
@@ -150,6 +158,37 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         Map<String, List<Task>> taskMap = taskService.getTaskMapByProcessInstanceIds(processInstanceIds);
         // 转换返回
         return BpmProcessInstanceConvert.INSTANCE.convertPage(pageResult, taskMap);
+    }
+
+    @Override
+    public BpmProcessInstanceRespVO getProcessInstanceVO(String id) {
+        // 获得流程实例
+        HistoricProcessInstance processInstance = getHistoricProcessInstance(id);
+        if (processInstance == null) {
+            return null;
+        }
+        BpmProcessInstanceExtDO processInstanceExt = processInstanceExtMapper.selectByProcessInstanceId(id);
+        Assert.notNull(processInstanceExt, "流程实例拓展({}) 不存在", id);
+
+        // 获得流程定义
+        ProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(
+                processInstance.getProcessDefinitionId());
+        Assert.notNull(processDefinition, "流程定义({}) 不存在", processInstance.getProcessDefinitionId());
+        BpmProcessDefinitionExtDO processDefinitionExt = processDefinitionService.getProcessDefinitionExt(
+                processInstance.getProcessDefinitionId());
+        Assert.notNull(processDefinitionExt, "流程定义拓展({}) 不存在", id);
+        String bpmnXml = processDefinitionService.getProcessDefinitionBpmnXML(processInstance.getProcessDefinitionId());
+
+        // 获得 User
+        SysUserDO startUser = userService.getUser(NumberUtils.parseLong(processInstance.getStartUserId()));
+        SysDeptDO dept = null;
+        if (startUser != null) {
+            dept = deptService.getDept(startUser.getDeptId());
+        }
+
+        // 拼接结果
+        return BpmProcessInstanceConvert.INSTANCE.convert2(processInstance, processInstanceExt,
+                processDefinition, processDefinitionExt, bpmnXml, startUser, dept);
     }
 
     @Override
