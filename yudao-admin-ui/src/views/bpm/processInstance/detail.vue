@@ -1,26 +1,29 @@
 <template>
   <div class="app-container">
     <!-- 审批信息 -->
-    <el-card class="box-card" v-loading="processInstanceLoading">
+    <el-card class="box-card" v-loading="processInstanceLoading" v-for="(item, index) in tasks" :key="index">
       <div slot="header" class="clearfix">
-        <span class="el-icon-picture-outline">审批任务【TODO】</span>
+        <span class="el-icon-picture-outline">审批任务【{{ item.name }}】</span>
       </div>
       <el-col :span="16" :offset="6" >
-        <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-          <el-row>
-            <el-col :span="12">
-              <el-form-item label="审批建议" prop="comment">
-                <el-input type="textarea" v-model="form.comment" placeholder="请输入审批建议" />
-              </el-form-item>
-            </el-col>
-          </el-row>
+        <el-form :ref="'form' + index" :model="auditForms[index]" :rules="auditRule" label-width="100px">
+          <el-form-item label="流程名" v-if="processInstance && processInstance.name">
+            {{ processInstance.name }}
+          </el-form-item>
+          <el-form-item label="流程发起人" v-if="processInstance && processInstance.startUser">
+            {{ processInstance.startUser.nickname }}
+            <el-tag type="info" size="mini">{{ processInstance.startUser.deptName }}</el-tag>
+          </el-form-item>
+          <el-form-item label="审批建议" prop="comment">
+            <el-input type="textarea" v-model="auditForms[index].comment" placeholder="请输入审批建议" />
+          </el-form-item>
         </el-form>
         <div style="margin-left: 10%; margin-bottom: 20px; font-size: 14px;">
-          <el-button  icon="el-icon-edit-outline" type="success" size="mini" @click="handleComplete">通过</el-button>
-          <el-button  icon="el-icon-circle-close" type="danger" size="mini" @click="handleReject">不通过</el-button>
-          <el-button  icon="el-icon-edit-outline" type="primary" size="mini" @click="handleAssign">转办</el-button>
-          <el-button  icon="el-icon-edit-outline" type="info" size="mini" @click="handleDelegate">委派</el-button>
-          <el-button  icon="el-icon-refresh-left" type="warning" size="mini" @click="handleReturn">退回</el-button>
+          <el-button  icon="el-icon-edit-outline" type="success" size="mini" @click="handleAudit(item, true)">通过</el-button>
+          <el-button  icon="el-icon-circle-close" type="danger" size="mini" @click="handleAudit(item, false)">不通过</el-button>
+<!--          <el-button  icon="el-icon-edit-outline" type="primary" size="mini" @click="handleAssign">转办</el-button>-->
+          <el-button icon="el-icon-edit-outline" type="primary" size="mini" @click="handleDelegate(item)">委派</el-button>
+          <el-button icon="el-icon-refresh-left" type="warning" size="mini" @click="handleBack(item)">退回</el-button>
         </div>
       </el-col>
     </el-card>
@@ -43,8 +46,7 @@
         <div class="block">
           <el-timeline>
             <el-timeline-item v-for="(item, index) in historicTasks" :key="index"
-                              :icon="getTimelineItemIcon(item)"
-                              :type="getTimelineItemType(item)">
+                              :icon="getTimelineItemIcon(item)" :type="getTimelineItemType(item)">
               <p style="font-weight: 700">任务：{{ item.name }}</p>
               <el-card :body-style="{ padding: '10px' }">
                 <label v-if="item.assigneeUser" style="font-weight: normal; margin-right: 30px;">
@@ -83,7 +85,7 @@ import {getForm} from "@/api/bpm/form";
 import {decodeFields} from "@/utils/formGenerator";
 import Parser from '@/components/parser/Parser'
 import {createProcessInstance, getMyProcessInstancePage, getProcessInstance} from "@/api/bpm/processInstance";
-import {getHistoricTaskListByProcessInstanceId} from "@/api/bpm/task";
+import {approveTask, getHistoricTaskListByProcessInstanceId, rejectTask} from "@/api/bpm/task";
 import {getDate} from "@/utils/dateUtils";
 
 // 流程实例的详情页，可用于审批
@@ -116,8 +118,9 @@ export default {
       historicTasks: [],
 
       // 审批表单
-      form: {},
-      rules: {
+      tasks: [],
+      auditForms: [],
+      auditRule: {
         comment: [{ required: true, message: "审批建议不能为空", trigger: "blur" }],
       },
 
@@ -172,7 +175,10 @@ export default {
 
       // 获得流程任务列表（审批记录）
       this.historicTasksLoad = true;
+      this.tasks = [];
+      this.auditForms = [];
       getHistoricTaskListByProcessInstanceId(this.id).then(response => {
+        // 审批记录
         this.historicTasks = response.data;
         // 排序，将未完成的排在前面，已完成的排在后面；
         this.historicTasks.sort((a, b) => {
@@ -188,6 +194,19 @@ export default {
             return b.createTime - a.createTime;
           }
         });
+
+        // 需要审核的记录
+        this.historicTasks.forEach(task => {
+          if (task.result !== 1) { // 只有待处理才需要
+            return;
+          }
+          this.tasks.push({...task});
+          this.auditForms.push({
+            comment: ''
+          })
+        });
+
+        // 取消加载中
         this.historicTasksLoad = false;
       });
     },
@@ -266,6 +285,38 @@ export default {
       }
       return '';
     },
+    /** 处理审批通过和不通过的操作 */
+    handleAudit(task, pass) {
+      const index = this.tasks.indexOf(task);
+      this.$refs['form' + index][0].validate(valid => {
+        if (!valid) {
+          return;
+        }
+        const data = {
+          id: task.id,
+          comment: this.auditForms[index].comment
+        }
+        if (pass) {
+          approveTask(data).then(response => {
+            this.msgSuccess("审批通过成功！");
+            this.getDetail(); // 获得最新详情
+          });
+        } else {
+          rejectTask(data).then(response => {
+            this.msgSuccess("审批不通过成功！");
+            this.getDetail(); // 获得最新详情
+          });
+        }
+      })
+    },
+    /** 处理审批退回的操作 */
+    handleDelegate(task) {
+      this.msgError("暂不支持【委派】功能，可以使用【转派】替代！");
+    },
+    /** 处理审批退回的操作 */
+    handleBack(task) {
+      this.msgError("暂不支持【退回】功能！");
+    }
   }
 };
 </script>
