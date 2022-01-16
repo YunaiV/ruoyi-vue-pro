@@ -12,7 +12,37 @@
         </div>
       </el-col>
     </el-card>
-    <!-- TODO 审批记录 -->
+    <el-card class="box-card" v-loading="historicTasksLoad">
+      <div slot="header" class="clearfix">
+        <span class="el-icon-picture-outline">审批记录</span>
+      </div>
+      <el-col :span="16" :offset="4" >
+        <div class="block">
+          <el-timeline>
+            <el-timeline-item v-for="(item, index) in historicTasks" :key="index"
+                              :icon="getTimelineItemIcon(item)"
+                              :type="getTimelineItemType(item)">
+              <p style="font-weight: 700">任务：{{ item.name }}</p>
+              <el-card :body-style="{ padding: '10px' }">
+                <label v-if="item.assigneeUser" style="font-weight: normal; margin-right: 30px;">
+                  审批人：{{ item.assigneeUser.nickname }}
+                  <el-tag type="info" size="mini">{{ item.assigneeUser.deptName }}</el-tag>
+                </label>
+                <label style="font-weight: normal">创建时间：</label>
+                <label style="color:#8a909c; font-weight: normal">{{ parseTime(item.createTime) }}</label>
+                <label v-if="item.endTime" style="margin-left: 30px;font-weight: normal">审批时间：</label>
+                <label v-if="item.endTime" style="color:#8a909c;font-weight: normal"> {{ parseTime(item.endTime) }}</label>
+                <label v-if="item.durationInMillis" style="margin-left: 30px;font-weight: normal">耗时：</label>
+                <label v-if="item.durationInMillis" style="color:#8a909c;font-weight: normal"> {{ getDateStar(item.durationInMillis) }} </label>
+                <p v-if="item.comment">
+                  <el-tag :type="getTimelineItemType(item)">{{ item.comment }}</el-tag>
+                </p>
+              </el-card>
+            </el-timeline-item>
+          </el-timeline>
+        </div>
+      </el-col>
+    </el-card>
     <!-- TODO 流程图 -->
     <el-card class="box-card" v-loading="processInstanceLoading">
       <div slot="header" class="clearfix">
@@ -31,6 +61,7 @@ import {decodeFields} from "@/utils/formGenerator";
 import Parser from '@/components/parser/Parser'
 import {createProcessInstance, getMyProcessInstancePage, getProcessInstance} from "@/api/bpm/processInstance";
 import {getHistoricTaskListByProcessInstanceId} from "@/api/bpm/task";
+import {getDate} from "@/utils/dateUtils";
 
 // 流程实例的详情页，可用于审批
 export default {
@@ -114,7 +145,21 @@ export default {
       this.historicTasksLoad = true;
       getHistoricTaskListByProcessInstanceId(this.id).then(response => {
         this.historicTasks = response.data;
-        this.historicTasksLoad = true;
+        // 排序，将未完成的排在前面，已完成的排在后面；
+        this.historicTasks.sort((a, b) => {
+          // 有已完成的情况，按照完成时间倒序
+          if (a.endTime && b.endTime) {
+            return b.endTime - a.endTime;
+          } else if (a.endTime) {
+            return 1;
+          } else if (b.endTime) {
+            return -1;
+            // 都是未完成，按照创建时间倒序
+          } else {
+            return b.createTime - a.createTime;
+          }
+        });
+        this.historicTasksLoad = false;
       });
     },
     /** 处理选择流程的按钮操作 **/
@@ -160,6 +205,39 @@ export default {
         conf.disabled = false; // 表单开启
         conf.formBtns = true; // 按钮展示
       })
+    },
+    getDateStar(ms) {
+      return getDate(ms);
+    },
+    getTimelineItemIcon(item) {
+      if (item.result === 1) {
+        return 'el-icon-time';
+      }
+      if (item.result === 2) {
+        return 'el-icon-check';
+      }
+      if (item.result === 3) {
+        return 'el-icon-close';
+      }
+      if (item.result === 4) {
+        return 'el-icon-remove-outline';
+      }
+      return '';
+    },
+    getTimelineItemType(item) {
+      if (item.result === 1) {
+        return 'primary';
+      }
+      if (item.result === 2) {
+        return 'success';
+      }
+      if (item.result === 3) {
+        return 'danger';
+      }
+      if (item.result === 4) {
+        return 'info';
+      }
+      return '';
     },
   }
 };

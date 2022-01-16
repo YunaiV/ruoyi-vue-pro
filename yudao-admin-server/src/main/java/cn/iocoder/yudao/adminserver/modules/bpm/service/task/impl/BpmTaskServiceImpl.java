@@ -95,7 +95,8 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         // 获得任务列表
         List<HistoricTaskInstance> tasks = historyService.createHistoricTaskInstanceQuery()
                 .processInstanceId(processInstanceId)
-                .orderByTaskCreateTime().desc().list();
+                .orderByHistoricTaskInstanceStartTime().desc() // 创建时间倒序
+                .list();
         if (CollUtil.isEmpty(tasks)) {
             return Collections.emptyList();
         }
@@ -401,7 +402,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     @Override
     public void updateTaskExtComplete(org.activiti.api.task.model.Task task) {
         BpmTaskExtDO taskExtDO = BpmTaskConvert.INSTANCE.convert(task)
-                .setEndTime(task.getCompletedDate())
+                .setEndTime(new Date()) // 此时不能使用 task 的 completeData，因为还是空的。
                 .setResult(BpmProcessInstanceResultEnum.APPROVE.getResult());
         taskExtMapper.updateByTaskId(taskExtDO);
     }
