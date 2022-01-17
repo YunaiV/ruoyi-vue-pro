@@ -14,6 +14,7 @@ import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.dept.SysDeptDO
 import cn.iocoder.yudao.adminserver.modules.system.service.dept.SysDeptService;
 import cn.iocoder.yudao.adminserver.modules.system.service.user.SysUserService;
 import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.user.SysUserDO;
+import cn.iocoder.yudao.framework.activiti.core.util.ActivitiUtils;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
@@ -200,11 +201,14 @@ public class BpmTaskServiceImpl implements BpmTaskService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void approveTask(BpmTaskApproveReqVO reqVO) {
+    public void approveTask(Long userId, BpmTaskApproveReqVO reqVO) {
         // 校验任务存在
         Task task = getTask(reqVO.getId());
         if (task == null) {
             throw exception(TASK_COMPLETE_FAIL_NOT_EXISTS);
+        }
+        if (!ActivitiUtils.equals(task.getAssignee(), userId)) {
+            throw exception(TASK_COMPLETE_FAIL_ASSIGN_NOT_SELF);
         }
         // 校验流程实例存在
         ProcessInstance instance = processInstanceService.getProcessInstance(task.getProcessInstanceId());
@@ -224,11 +228,14 @@ public class BpmTaskServiceImpl implements BpmTaskService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void rejectTask(@Valid BpmTaskRejectReqVO reqVO) {
+    public void rejectTask(Long userId, @Valid BpmTaskRejectReqVO reqVO) {
         // 校验任务存在
         Task task = getTask(reqVO.getId());
         if (task == null) {
             throw exception(TASK_COMPLETE_FAIL_NOT_EXISTS);
+        }
+        if (!ActivitiUtils.equals(task.getAssignee(), userId)) {
+            throw exception(TASK_COMPLETE_FAIL_ASSIGN_NOT_SELF);
         }
         // 校验流程实例存在
         ProcessInstance instance = processInstanceService.getProcessInstance(task.getProcessInstanceId());

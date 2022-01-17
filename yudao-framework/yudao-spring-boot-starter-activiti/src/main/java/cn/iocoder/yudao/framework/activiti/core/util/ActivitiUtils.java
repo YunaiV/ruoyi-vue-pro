@@ -2,6 +2,7 @@ package cn.iocoder.yudao.framework.activiti.core.util;
 
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import com.alibaba.ttl.TransmittableThreadLocal;
 import org.activiti.bpmn.converter.BpmnXMLConverter;
 import org.activiti.bpmn.model.BpmnModel;
@@ -13,6 +14,7 @@ import org.activiti.engine.impl.util.io.BytesStreamSource;
 import javax.xml.bind.Element;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 /**
@@ -43,6 +45,10 @@ public class ActivitiUtils {
 
     public static void clearAuthenticatedUserId() {
         Authentication.setAuthenticatedUserId(null);
+    }
+
+    public static boolean equals(String userIdStr, Long userId) {
+        return Objects.equals(userId, NumberUtils.parseLong(userIdStr));
     }
 
     // ========== BPMN XML 相关 ==========

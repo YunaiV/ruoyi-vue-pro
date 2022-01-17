@@ -60,7 +60,7 @@
       <el-table-column label="操作" align="center" fixed="right" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <!-- TODO 权限、颜色 -->
-          <el-button size="mini" type="text" icon="el-icon-edit">详情</el-button>
+          <el-button size="mini" type="text" icon="el-icon-edit" @click="handleAudit(scope.row)">详情</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -127,7 +127,11 @@ export default {
     },
     getDateStar(ms) {
       return getDate(ms);
-    }
+    },
+    /** 处理审批按钮 */
+    handleAudit(row) {
+      this.$router.push({ path: "/bpm/process-instance/detail", query: { id: row.processInstance.id}});
+    },
   }
 };
 </script>

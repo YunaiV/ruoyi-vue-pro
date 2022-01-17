@@ -42,6 +42,7 @@ public interface BpmErrorCodeConstants {
 
     // ========== 流程任务 1-009-005-000 ==========
     ErrorCode TASK_COMPLETE_FAIL_NOT_EXISTS = new ErrorCode(1009004000, "审批任务失败，原因：该任务不处于未审批");
+    ErrorCode TASK_COMPLETE_FAIL_ASSIGN_NOT_SELF = new ErrorCode(1009004001, "审批任务失败，原因：该任务的审批人不是你");
 
     // ========== 流程任务分配规则 1-009-006-000 ==========
     ErrorCode TASK_ASSIGN_RULE_EXISTS = new ErrorCode(1009006000, "流程({}) 的任务({}) 已经存在分配规则");

@@ -21,7 +21,6 @@ public interface BpmTaskService {
      * 获得指定流程实例的 Running 进行中的流程任务列表
      *
      * @param processInstanceId 流程实例的编号
-     * @return 流程任务列表
      */
     List<Task> getRunningTaskListByProcessInstanceId(String processInstanceId);
 
@@ -81,16 +80,18 @@ public interface BpmTaskService {
     /**
      * 通过任务
      *
+     * @param userId 用户编号
      * @param reqVO 通过请求
      */
-    void approveTask(@Valid BpmTaskApproveReqVO reqVO);
+    void approveTask(Long userId, @Valid BpmTaskApproveReqVO reqVO);
 
     /**
      * 不通过任务
      *
+     * @param userId 用户编号
      * @param reqVO 不通过请求
      */
-    void rejectTask(@Valid BpmTaskRejectReqVO reqVO);
+    void rejectTask(Long userId, @Valid BpmTaskRejectReqVO reqVO);
 
     /**
      * 返回高亮的流转进程

@@ -106,6 +106,7 @@
           <!-- TODO 芋艿：权限 -->
           <el-button type="text" size="small" icon="el-icon-delete" v-if="scope.row.result === 1"
                      @click="handleCancel(scope.row)">取消</el-button>
+          <el-button size="mini" type="text" icon="el-icon-edit" @click="handleDetail(scope.row)">详情</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -203,6 +204,10 @@ export default {
         this.getList();
         this.msgSuccess("取消成功");
       })
+    },
+    /** 处理详情按钮 */
+    handleDetail(row) {
+      this.$router.push({ path: "/bpm/process-instance/detail", query: { id: row.id}});
     },
   }
 };

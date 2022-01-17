@@ -46,14 +46,14 @@ public class BpmTaskController {
     @PutMapping("/approve")
     @ApiOperation("通过任务")
     public CommonResult<Boolean> approveTask(@Valid @RequestBody BpmTaskApproveReqVO reqVO) {
-        taskService.approveTask(reqVO);
+        taskService.approveTask(getLoginUserId(), reqVO);
         return success(true);
     }
 
     @PutMapping("/reject")
     @ApiOperation("不通过任务")
     public CommonResult<Boolean> rejectTask(@Valid @RequestBody BpmTaskRejectReqVO reqVO) {
-        taskService.rejectTask(reqVO);
+        taskService.rejectTask(getLoginUserId(), reqVO);
         return success(true);
     }
 

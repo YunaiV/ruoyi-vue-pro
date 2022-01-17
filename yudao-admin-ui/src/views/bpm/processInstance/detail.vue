@@ -21,7 +21,7 @@
         <div style="margin-left: 10%; margin-bottom: 20px; font-size: 14px;">
           <el-button  icon="el-icon-edit-outline" type="success" size="mini" @click="handleAudit(item, true)">通过</el-button>
           <el-button  icon="el-icon-circle-close" type="danger" size="mini" @click="handleAudit(item, false)">不通过</el-button>
-<!--          <el-button  icon="el-icon-edit-outline" type="primary" size="mini" @click="handleAssign">转办</el-button>-->
+          <!--          <el-button  icon="el-icon-edit-outline" type="primary" size="mini" @click="handleAssign">转办</el-button>-->
           <el-button icon="el-icon-edit-outline" type="primary" size="mini" @click="handleDelegate(item)">委派</el-button>
           <el-button icon="el-icon-refresh-left" type="warning" size="mini" @click="handleBack(item)">退回</el-button>
         </div>
@@ -81,7 +81,7 @@
 <script>
 import {getProcessDefinitionBpmnXML, getProcessDefinitionList} from "@/api/bpm/definition";
 import {DICT_TYPE, getDictDatas} from "@/utils/dict";
-import {getForm} from "@/api/bpm/form";
+import store from "@/store";
 import {decodeFields} from "@/utils/formGenerator";
 import Parser from '@/components/parser/Parser'
 import {createProcessInstance, getMyProcessInstancePage, getProcessInstance} from "@/api/bpm/processInstance";
@@ -196,8 +196,12 @@ export default {
         });
 
         // 需要审核的记录
+        const userId = store.getters.userId;
         this.historicTasks.forEach(task => {
           if (task.result !== 1) { // 只有待处理才需要
+            return;
+          }
+          if (!task.assigneeUser || task.assigneeUser.id !== userId) { // 自己不是处理人
             return;
           }
           this.tasks.push({...task});
