@@ -195,7 +195,22 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     }
 
     @Override
-    public void updateTaskAssign(String id, Long userId) {
+    public void updateTaskAssignee(Long userId, BpmTaskUpdateAssigneeReqVO reqVO) {
+        // 校验任务存在
+        Task task = getTask(reqVO.getId());
+        if (task == null) {
+            throw exception(TASK_COMPLETE_FAIL_NOT_EXISTS);
+        }
+        if (!ActivitiUtils.equals(task.getAssignee(), userId)) {
+            throw exception(TASK_COMPLETE_FAIL_ASSIGN_NOT_SELF);
+        }
+
+        // 更新负责人
+        updateTaskAssignee(task.getId(), reqVO.getAssigneeUserId());
+    }
+
+    @Override
+    public void updateTaskAssignee(String id, Long userId) {
         taskService.setAssignee(id, String.valueOf(userId));
     }
 

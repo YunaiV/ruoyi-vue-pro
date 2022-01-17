@@ -40,6 +40,14 @@ export function rejectTask(data) {
   })
 }
 
+export function updateTaskAssignee(data) {
+  return request({
+    url: '/bpm/task/update-assignee',
+    method: 'PUT',
+    data: data
+  })
+}
+
 export function getHistoricTaskListByProcessInstanceId(processInstanceId) {
   return request({
     url: '/bpm/task/historic-list-by-process-instance-id?processInstanceId=' + processInstanceId,

@@ -21,7 +21,7 @@
         <div style="margin-left: 10%; margin-bottom: 20px; font-size: 14px;">
           <el-button  icon="el-icon-edit-outline" type="success" size="mini" @click="handleAudit(item, true)">通过</el-button>
           <el-button  icon="el-icon-circle-close" type="danger" size="mini" @click="handleAudit(item, false)">不通过</el-button>
-          <!--          <el-button  icon="el-icon-edit-outline" type="primary" size="mini" @click="handleAssign">转办</el-button>-->
+          <el-button  icon="el-icon-edit-outline" type="primary" size="mini" @click="handleUpdateAssignee(item)">转办</el-button>
           <el-button icon="el-icon-edit-outline" type="primary" size="mini" @click="handleDelegate(item)">委派</el-button>
           <el-button icon="el-icon-refresh-left" type="warning" size="mini" @click="handleBack(item)">退回</el-button>
         </div>
@@ -75,18 +75,34 @@
       </div>
       <my-process-viewer key="designer" v-model="bpmnXML" v-bind="bpmnControlForm" />
     </el-card>
+
+    <!-- 对话框(转派审批人) -->
+    <el-dialog title="转派审批人" :visible.sync="updateAssignee.open" width="500px" append-to-body>
+      <el-form ref="updateAssigneeForm" :model="updateAssignee.form" :rules="updateAssignee.rules" label-width="110px">
+        <el-form-item label="新审批人" prop="assigneeUserId">
+          <el-select v-model="updateAssignee.form.assigneeUserId" clearable style="width: 100%">
+            <el-option v-for="item in userOptions" :key="parseInt(item.id)" :label="item.nickname" :value="parseInt(item.id)" />
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="submitUpdateAssigneeForm">确 定</el-button>
+        <el-button @click="cancelUpdateAssigneeForm">取 消</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import {getProcessDefinitionBpmnXML, getProcessDefinitionList} from "@/api/bpm/definition";
+import {getProcessDefinitionBpmnXML} from "@/api/bpm/definition";
 import {DICT_TYPE, getDictDatas} from "@/utils/dict";
 import store from "@/store";
 import {decodeFields} from "@/utils/formGenerator";
 import Parser from '@/components/parser/Parser'
-import {createProcessInstance, getMyProcessInstancePage, getProcessInstance} from "@/api/bpm/processInstance";
-import {approveTask, getHistoricTaskListByProcessInstanceId, rejectTask} from "@/api/bpm/task";
+import {createProcessInstance, getProcessInstance} from "@/api/bpm/processInstance";
+import {approveTask, getHistoricTaskListByProcessInstanceId, rejectTask, updateTaskAssignee} from "@/api/bpm/task";
 import {getDate} from "@/utils/dateUtils";
+import {listSimpleUsers} from "@/api/system/user";
 
 // 流程实例的详情页，可用于审批
 export default {
@@ -124,6 +140,18 @@ export default {
         comment: [{ required: true, message: "审批建议不能为空", trigger: "blur" }],
       },
 
+      // 转派审批人
+      userOptions: [],
+      updateAssignee: {
+        open: false,
+        form: {
+          assigneeUserId: undefined,
+        },
+        rules: {
+          assigneeUserId: [{ required: true, message: "新审批人不能为空", trigger: "change" }],
+        }
+      },
+
       // 数据字典
       categoryDictDatas: getDictDatas(DICT_TYPE.BPM_MODEL_CATEGORY),
     };
@@ -135,6 +163,12 @@ export default {
       return;
     }
     this.getDetail();
+
+    // 获得用户列表
+    this.userOptions = [];
+    listSimpleUsers().then(response => {
+      this.userOptions.push(...response.data);
+    });
   },
   methods: {
     /** 获得流程实例 */
@@ -311,7 +345,41 @@ export default {
             this.getDetail(); // 获得最新详情
           });
         }
-      })
+      });
+    },
+    /** 处理转派审批人 */
+    handleUpdateAssignee(task) {
+      // 设置表单
+      this.resetUpdateAssigneeForm();
+      this.updateAssignee.form.id = task.id;
+      // 设置为打开
+      this.updateAssignee.open = true;
+    },
+    /** 提交转派审批人 */
+    submitUpdateAssigneeForm() {
+      this.$refs['updateAssigneeForm'].validate(valid => {
+        if (!valid) {
+          return;
+        }
+        updateTaskAssignee(this.updateAssignee.form).then(response => {
+          this.msgSuccess("转派任务成功！");
+          this.updateAssignee.open = false;
+          this.getDetail(); // 获得最新详情
+        });
+      });
+    },
+    /** 取消转派审批人 */
+    cancelUpdateAssigneeForm() {
+      this.updateAssignee.open = false;
+      this.resetUpdateAssigneeForm();
+    },
+    /** 重置转派审批人 */
+    resetUpdateAssigneeForm() {
+      this.updateAssignee.form = {
+        id: undefined,
+        assigneeUserId: undefined,
+      };
+      this.resetForm("updateAssigneeForm");
     },
     /** 处理审批退回的操作 */
     handleDelegate(task) {
