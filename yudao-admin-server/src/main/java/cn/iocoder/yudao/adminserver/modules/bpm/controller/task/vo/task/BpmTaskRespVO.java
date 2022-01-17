@@ -14,6 +14,9 @@ import java.util.List;
 @ToString(callSuper = true)
 public class BpmTaskRespVO extends BpmTaskDonePageItemRespVO {
 
+    @ApiModelProperty(value = "任务定义的标识", required = true, example = "user-001")
+    private String definitionKey;
+
     /**
      * 审核的用户信息
      */

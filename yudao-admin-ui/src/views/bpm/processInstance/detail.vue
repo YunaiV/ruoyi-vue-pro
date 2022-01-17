@@ -73,7 +73,7 @@
       <div slot="header" class="clearfix">
         <span class="el-icon-picture-outline">流程图</span>
       </div>
-      <my-process-viewer key="designer" v-model="bpmnXML" v-bind="bpmnControlForm" />
+      <my-process-viewer key="designer" v-model="bpmnXML" v-bind="bpmnControlForm" :taskData="historicTasks" />
     </el-card>
 
     <!-- 对话框(转派审批人) -->

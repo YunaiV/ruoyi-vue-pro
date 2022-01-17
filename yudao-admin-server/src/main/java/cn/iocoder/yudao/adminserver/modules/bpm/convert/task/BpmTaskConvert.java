@@ -99,6 +99,7 @@ public interface BpmTaskConvert {
         });
     }
 
+    @Mapping(source = "taskDefinitionKey", target = "definitionKey")
     BpmTaskRespVO convert3(HistoricTaskInstance bean);
     BpmTaskRespVO.User convert3(SysUserDO bean);
 
