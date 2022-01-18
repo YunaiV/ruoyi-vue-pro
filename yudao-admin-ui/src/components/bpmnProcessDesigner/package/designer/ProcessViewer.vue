@@ -1,7 +1,7 @@
 <template>
   <div class="my-process-designer">
     <div class="my-process-designer__container">
-      <div class="my-process-designer__canvas" ref="canvas"></div>
+      <div class="my-process-designer__canvas" ref="bpmn-canvas"></div>
     </div>
   </div>
 </template>
@@ -56,7 +56,7 @@ export default {
     initBpmnModeler() {
       if (this.bpmnModeler) return;
       this.bpmnModeler = new BpmnViewer({
-        container: this.$refs["canvas"],
+        container: this.$refs["bpmn-canvas"],
         bpmnRenderer: {
         }
       })
@@ -88,54 +88,68 @@ export default {
       if (!this.bpmnModeler.getDefinitions().rootElements[0].flowElements) {
         return;
       }
+      // 参考自 https://gitee.com/tony2y/RuoYi-flowable/blob/master/ruoyi-ui/src/components/Process/index.vue#L222 实现
       let canvas = this.bpmnModeler.get('canvas');
-      this.bpmnModeler.getDefinitions().rootElements[0].flowElements.forEach(n => {
+      this.bpmnModeler.getDefinitions().rootElements[0].flowElements?.forEach(n => {
+        let completeTask = this.tasks.find(m => m.definitionKey === n.id)
+        let todoTask = this.tasks.find(m => !m.endTime)
+        let endTask = this.tasks[this.tasks.length - 1]
         if (n.$type === 'bpmn:UserTask') {
-          let completeTask = this.tasks.find(m => m.definitionKey === n.id)
-          let todoTask = this.tasks.find(m => !m.endTime)
-          let endTask = this.tasks[this.tasks.length - 1]
           if (completeTask) {
             canvas.addMarker(n.id, completeTask.endTime ? 'highlight' : 'highlight-todo');
-            console.log(n.id + ' : ' + (completeTask.endTime ? 'highlight' : 'highlight-todo'));
-            // n.outgoing.forEach(nn => {
-            //   let targetTask = this.tasks.find(m => m.definitionKey === nn.targetRef.id)
-            //   if (targetTask) {
-            //     canvas.addMarker(nn.id, targetTask.endTime ? 'highlight' : 'highlight-todo');
-            //   } else if (nn.targetRef.$type === 'bpmn:ExclusiveGateway') {
-            //     // canvas.addMarker(nn.id, 'highlight');
-            //     canvas.addMarker(nn.id, completeTask.endTime ? 'highlight' : 'highlight-todo');
-            //     canvas.addMarker(nn.targetRef.id, completeTask.endTime ? 'highlight' : 'highlight-todo');
-            //   } else if (nn.targetRef.$type === 'bpmn:EndEvent') {
-            //     if (!todoTask && endTask.definitionKey === n.id) {
-            //       canvas.addMarker(nn.id, 'highlight');
-            //       canvas.addMarker(nn.targetRef.id, 'highlight');
-            //     }
-            //     if (!completeTask.endTime) {
-            //       canvas.addMarker(nn.id, 'highlight-todo');
-            //       canvas.addMarker(nn.targetRef.id, 'highlight-todo');
-            //     }
-            //   }
-            // });
+            // console.log(n.id + ' : ' + (completeTask.endTime ? 'highlight' : 'highlight-todo'));
+            n.outgoing?.forEach(nn => {
+              let targetTask = this.tasks.find(m => m.definitionKey === nn.targetRef.id)
+              if (targetTask) {
+                canvas.addMarker(nn.id, targetTask.endTime ? 'highlight' : 'highlight-todo');
+              } else if (nn.targetRef.$type === 'bpmn:ExclusiveGateway') {
+                // canvas.addMarker(nn.id, 'highlight');
+                canvas.addMarker(nn.id, completeTask.endTime ? 'highlight' : 'highlight-todo');
+                canvas.addMarker(nn.targetRef.id, completeTask.endTime ? 'highlight' : 'highlight-todo');
+              } else if (nn.targetRef.$type === 'bpmn:EndEvent') {
+                if (!todoTask && endTask.definitionKey === n.id) {
+                  canvas.addMarker(nn.id, 'highlight');
+                  canvas.addMarker(nn.targetRef.id, 'highlight');
+                }
+                if (!completeTask.endTime) {
+                  canvas.addMarker(nn.id, 'highlight-todo');
+                  canvas.addMarker(nn.targetRef.id, 'highlight-todo');
+                }
+              }
+            });
           }
         } else if (n.$type === 'bpmn:ExclusiveGateway') {
-          // n.outgoing.forEach(nn => {
-          //   let targetTask = this.tasks.find(m => m.definitionKey === nn.targetRef.id)
-          //   if (targetTask) {
-          //     canvas.addMarker(nn.id, targetTask.endTime ? 'highlight' : 'highlight-todo');
-          //   }
-          // })
-        }
-        if (n.$type === 'bpmn:StartEvent') {
-          canvas.addMarker(n.id, 'highlight-todo');
-
-          // n.outgoing.forEach(nn => {
-          //   let completeTask = this.tasks.find(m => m.definitionKey === nn.targetRef.id)
-          //   if (completeTask) {
-          //     canvas.addMarker(nn.id, 'highlight');
-          //     canvas.addMarker(n.id, 'highlight');
-          //     return
-          //   }
-          // });
+          n.outgoing?.forEach(nn => {
+            let targetTask = this.tasks.find(m => m.definitionKey === nn.targetRef.id)
+            if (targetTask) {
+              canvas.addMarker(nn.id, targetTask.endTime ? 'highlight' : 'highlight-todo');
+            }
+          })
+        } else if (n.$type === 'bpmn:ParallelGateway') {
+          if (completeTask) {
+            canvas.addMarker(n.id, completeTask.endTime ? 'highlight' : 'highlight-todo')
+            n.outgoing?.forEach(nn => {
+              const targetTask = this.taskList.find(m => m.definitionKey === nn.targetRef.id)
+              if (targetTask) {
+                canvas.addMarker(nn.id, targetTask.endTime ? 'highlight' : 'highlight-todo')
+                canvas.addMarker(nn.targetRef.id, targetTask.endTime ? 'highlight' : 'highlight-todo')
+              }
+            })
+          }
+        } else if (n.$type === 'bpmn:StartEvent') {
+          n.outgoing?.forEach(nn => {
+            let completeTask = this.tasks.find(m => m.definitionKey === nn.targetRef.id)
+            if (completeTask) {
+              canvas.addMarker(nn.id, 'highlight');
+              canvas.addMarker(n.id, 'highlight');
+              return
+            }
+          });
+        } else if (n.$type === 'bpmn:EndEvent') {
+          if (endTask.definitionKey === n.id && endTask.endTime) {
+            canvas.addMarker(n.id, 'highlight')
+            return
+          }
         }
       })
     }
@@ -144,24 +158,39 @@ export default {
 </script>
 
 <style>
-.containers {
-  position: absolute;
-  background-color: #ffffff;
-  top:0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+
+.highlight.djs-shape .djs-visual > :nth-child(1) {
+  fill: green !important;
+  stroke: green !important;
+  fill-opacity: 0.2 !important;
 }
-.canvas {
-  width: 100%;
-  height: 100%;
+.highlight.djs-shape .djs-visual > :nth-child(2) {
+  fill: green !important;
+}
+.highlight.djs-shape .djs-visual > path {
+  fill: green !important;
+  fill-opacity: 0.2 !important;
+  stroke: green !important;
+}
+.highlight.djs-connection > .djs-visual > path {
+  stroke: green !important;
 }
 
-/*/deep/.highlight-todo {*/
-/*  background-color: red;*/
-/*  fill: green !important;*/
-/*  stroke: green !important;*/
-/*}*/
+.highlight-todo.djs-connection > .djs-visual > path {
+  stroke: orange !important;
+  stroke-dasharray: 4px !important;
+  fill-opacity: 0.2 !important;
+}
+.highlight-todo.djs-shape .djs-visual > :nth-child(1) {
+  fill: orange !important;
+  stroke: orange !important;
+  stroke-dasharray: 4px !important;
+  fill-opacity: 0.2 !important;
+}
+
+.highlight:not(.djs-connection) .djs-visual > :nth-child(1) {
+  fill: green !important; /* color elements as green */
+}
 
 /deep/.highlight.djs-shape .djs-visual > :nth-child(1) {
   fill: green !important;
@@ -191,10 +220,5 @@ export default {
   stroke-dasharray: 4px !important;
   fill-opacity: 0.2 !important;
 }
-/deep/.overlays-div {
-  font-size: 10px;
-  color: red;
-  width: 100px;
-  top: -20px !important;
-}
+
 </style>
