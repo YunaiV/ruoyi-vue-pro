@@ -20,7 +20,7 @@ import java.util.List;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils.getLoginUserId;
 
-@Api(tags = "流程任务")
+@Api(tags = "流程任务实例")
 @RestController
 @RequestMapping("/bpm/task")
 @Validated
@@ -70,16 +70,6 @@ public class BpmTaskController {
     public CommonResult<List<BpmTaskRespVO>> getTaskListByProcessInstanceId(
             @RequestParam("processInstanceId") String processInstanceId) {
         return success(taskService.getTaskListByProcessInstanceId(processInstanceId));
-    }
-
-    /**
-     * 返回高亮的流转图SVG
-     * @param processInstanceId 流程Id
-     */
-    @GetMapping("/process/highlight-img")
-    public void getHighlightImg(@RequestParam String processInstanceId, HttpServletResponse response) throws IOException {
-        FileResp fileResp = taskService.getHighlightImg(processInstanceId);
-        ServletUtils.writeAttachment(response, fileResp.getFileName(), fileResp.getFileByte());
     }
 
 }

@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 流程任务 Service 接口
+ * 流程任务实例 Service 接口
  *
  * @author jason
  * @author 芋道源码
@@ -31,6 +31,14 @@ public interface BpmTaskService {
      * @return 流程任务列表
      */
     List<BpmTaskRespVO> getTaskListByProcessInstanceId(String processInstanceId);
+
+    /**
+     * 获得流程任务列表
+     *
+     * @param processInstanceId 流程实例的编号
+     * @return 流程任务列表
+     */
+    List<Task> getTasksByProcessInstanceId(String processInstanceId);
 
     /**
      * 获得流程任务列表
@@ -100,13 +108,6 @@ public interface BpmTaskService {
      * @param reqVO 不通过请求
      */
     void rejectTask(Long userId, @Valid BpmTaskRejectReqVO reqVO);
-
-    /**
-     * 返回高亮的流转进程
-     * @param processInstanceId 实例Id
-     * @return {@link FileResp} 返回文件
-     */
-    FileResp getHighlightImg(String processInstanceId);
 
     // ========== Task 拓展表相关 ==========
 
