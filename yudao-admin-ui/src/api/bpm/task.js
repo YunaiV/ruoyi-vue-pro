@@ -48,9 +48,9 @@ export function updateTaskAssignee(data) {
   })
 }
 
-export function getHistoricTaskListByProcessInstanceId(processInstanceId) {
+export function getTaskListByProcessInstanceId(processInstanceId) {
   return request({
-    url: '/bpm/task/historic-list-by-process-instance-id?processInstanceId=' + processInstanceId,
+    url: '/bpm/task/list-by-process-instance-id?processInstanceId=' + processInstanceId,
     method: 'get',
   })
 }

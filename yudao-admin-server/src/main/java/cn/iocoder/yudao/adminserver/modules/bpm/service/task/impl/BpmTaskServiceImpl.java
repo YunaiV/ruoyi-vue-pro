@@ -92,7 +92,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     }
 
     @Override
-    public List<BpmTaskRespVO> getHistoricTaskListByProcessInstanceId(String processInstanceId) {
+    public List<BpmTaskRespVO> getTaskListByProcessInstanceId(String processInstanceId) {
         // 获得任务列表
         List<HistoricTaskInstance> tasks = historyService.createHistoricTaskInstanceQuery()
                 .processInstanceId(processInstanceId)

@@ -64,12 +64,12 @@ public class BpmTaskController {
         return success(true);
     }
 
-    @GetMapping("/historic-list-by-process-instance-id")
+    @GetMapping("/list-by-process-instance-id")
     @ApiOperation(value = "获得指定流程实例的任务列表", notes = "包括完成的、未完成的")
     @ApiImplicitParam(name = "processInstanceId", value = "流程实例的编号", required = true, dataTypeClass = String.class)
-    public CommonResult<List<BpmTaskRespVO>> getHistoricTaskListByProcessInstanceId(
+    public CommonResult<List<BpmTaskRespVO>> getTaskListByProcessInstanceId(
             @RequestParam("processInstanceId") String processInstanceId) {
-        return success(taskService.getHistoricTaskListByProcessInstanceId(processInstanceId));
+        return success(taskService.getTaskListByProcessInstanceId(processInstanceId));
     }
 
     /**

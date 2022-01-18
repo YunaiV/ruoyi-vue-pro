@@ -94,7 +94,7 @@ export default {
         let completeTask = this.tasks.find(m => m.definitionKey === n.id)
         let todoTask = this.tasks.find(m => !m.endTime)
         let endTask = this.tasks[this.tasks.length - 1]
-        if (n.$type === 'bpmn:UserTask') {
+        if (n.$type === 'bpmn:UserTask') { // 用户任务
           if (completeTask) {
             canvas.addMarker(n.id, completeTask.endTime ? 'highlight' : 'highlight-todo');
             // console.log(n.id + ' : ' + (completeTask.endTime ? 'highlight' : 'highlight-todo'));
@@ -118,14 +118,14 @@ export default {
               }
             });
           }
-        } else if (n.$type === 'bpmn:ExclusiveGateway') {
+        } else if (n.$type === 'bpmn:ExclusiveGateway') { // 排它网关
           n.outgoing?.forEach(nn => {
             let targetTask = this.tasks.find(m => m.definitionKey === nn.targetRef.id)
             if (targetTask) {
               canvas.addMarker(nn.id, targetTask.endTime ? 'highlight' : 'highlight-todo');
             }
           })
-        } else if (n.$type === 'bpmn:ParallelGateway') {
+        } else if (n.$type === 'bpmn:ParallelGateway') { // 并行网关
           if (completeTask) {
             canvas.addMarker(n.id, completeTask.endTime ? 'highlight' : 'highlight-todo')
             n.outgoing?.forEach(nn => {
@@ -136,7 +136,7 @@ export default {
               }
             })
           }
-        } else if (n.$type === 'bpmn:StartEvent') {
+        } else if (n.$type === 'bpmn:StartEvent') { // 开始节点
           n.outgoing?.forEach(nn => {
             let completeTask = this.tasks.find(m => m.definitionKey === nn.targetRef.id)
             if (completeTask) {
@@ -145,7 +145,7 @@ export default {
               return
             }
           });
-        } else if (n.$type === 'bpmn:EndEvent') {
+        } else if (n.$type === 'bpmn:EndEvent') { // 结束节点
           if (endTask.definitionKey === n.id && endTask.endTime) {
             canvas.addMarker(n.id, 'highlight')
             return

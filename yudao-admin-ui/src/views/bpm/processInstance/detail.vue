@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <!-- 审批信息 -->
-    <el-card class="box-card" v-loading="processInstanceLoading" v-for="(item, index) in tasks" :key="index">
+    <el-card class="box-card" v-loading="processInstanceLoading" v-for="(item, index) in runningTasks" :key="index">
       <div slot="header" class="clearfix">
         <span class="el-icon-picture-outline">审批任务【{{ item.name }}】</span>
       </div>
@@ -38,14 +38,14 @@
         </div>
       </el-col>
     </el-card>
-    <el-card class="box-card" v-loading="historicTasksLoad">
+    <el-card class="box-card" v-loading="tasksLoad">
       <div slot="header" class="clearfix">
         <span class="el-icon-picture-outline">审批记录</span>
       </div>
       <el-col :span="16" :offset="4" >
         <div class="block">
           <el-timeline>
-            <el-timeline-item v-for="(item, index) in historicTasks" :key="index"
+            <el-timeline-item v-for="(item, index) in tasks" :key="index"
                               :icon="getTimelineItemIcon(item)" :type="getTimelineItemType(item)">
               <p style="font-weight: 700">任务：{{ item.name }}</p>
               <el-card :body-style="{ padding: '10px' }">
@@ -73,7 +73,7 @@
       <div slot="header" class="clearfix">
         <span class="el-icon-picture-outline">流程图</span>
       </div>
-      <my-process-viewer key="designer" v-model="bpmnXML" v-bind="bpmnControlForm" :taskData="historicTasks" />
+      <my-process-viewer key="designer" v-model="bpmnXML" v-bind="bpmnControlForm" :taskData="tasks" />
     </el-card>
 
     <!-- 对话框(转派审批人) -->
@@ -100,7 +100,7 @@ import store from "@/store";
 import {decodeFields} from "@/utils/formGenerator";
 import Parser from '@/components/parser/Parser'
 import {createProcessInstance, getProcessInstance} from "@/api/bpm/processInstance";
-import {approveTask, getHistoricTaskListByProcessInstanceId, rejectTask, updateTaskAssignee} from "@/api/bpm/task";
+import {approveTask, getTaskListByProcessInstanceId, rejectTask, updateTaskAssignee} from "@/api/bpm/task";
 import {getDate} from "@/utils/dateUtils";
 import {listSimpleUsers} from "@/api/system/user";
 
@@ -130,11 +130,11 @@ export default {
       },
 
       // 审批记录
-      historicTasksLoad: true,
-      historicTasks: [],
+      tasksLoad: true,
+      tasks: [],
 
       // 审批表单
-      tasks: [],
+      runningTasks: [],
       auditForms: [],
       auditRule: {
         comment: [{ required: true, message: "审批建议不能为空", trigger: "blur" }],
@@ -208,14 +208,14 @@ export default {
       });
 
       // 获得流程任务列表（审批记录）
-      this.historicTasksLoad = true;
-      this.tasks = [];
+      this.tasksLoad = true;
+      this.runningTasks = [];
       this.auditForms = [];
-      getHistoricTaskListByProcessInstanceId(this.id).then(response => {
+      getTaskListByProcessInstanceId(this.id).then(response => {
         // 审批记录
-        this.historicTasks = response.data;
+        this.tasks = response.data;
         // 排序，将未完成的排在前面，已完成的排在后面；
-        this.historicTasks.sort((a, b) => {
+        this.tasks.sort((a, b) => {
           // 有已完成的情况，按照完成时间倒序
           if (a.endTime && b.endTime) {
             return b.endTime - a.endTime;
@@ -231,21 +231,21 @@ export default {
 
         // 需要审核的记录
         const userId = store.getters.userId;
-        this.historicTasks.forEach(task => {
+        this.tasks.forEach(task => {
           if (task.result !== 1) { // 只有待处理才需要
             return;
           }
           if (!task.assigneeUser || task.assigneeUser.id !== userId) { // 自己不是处理人
             return;
           }
-          this.tasks.push({...task});
+          this.runningTasks.push({...task});
           this.auditForms.push({
             comment: ''
           })
         });
 
         // 取消加载中
-        this.historicTasksLoad = false;
+        this.tasksLoad = false;
       });
     },
     /** 处理选择流程的按钮操作 **/
@@ -325,7 +325,7 @@ export default {
     },
     /** 处理审批通过和不通过的操作 */
     handleAudit(task, pass) {
-      const index = this.tasks.indexOf(task);
+      const index = this.runningTasks.indexOf(task);
       this.$refs['form' + index][0].validate(valid => {
         if (!valid) {
           return;
