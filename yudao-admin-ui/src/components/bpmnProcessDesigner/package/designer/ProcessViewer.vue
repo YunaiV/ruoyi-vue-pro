@@ -82,55 +82,63 @@ export default {
     },
     /* 高亮流程图 */
     async highlightDiagram() {
-      // let tasks = this.tasks.filter(task => {
-      //   if (task.type !== 'sequenceFlow') { // 去除连线元素
-      //     return true;
-      //   }
-      // });
-      let tasks = this.tasks;
-      if (tasks.length === 0) {
+      let activityList = this.tasks;
+      if (activityList.length === 0) {
         return;
       }
       // 参考自 https://gitee.com/tony2y/RuoYi-flowable/blob/master/ruoyi-ui/src/components/Process/index.vue#L222 实现
+      // 再次基础上，增加不同审批结果的颜色等等
       let canvas = this.bpmnModeler.get('canvas');
+      let todoActivity = activityList.find(m => !m.endTime) // 找到待办的任务
+      let endActivity = activityList[activityList.length - 1] // 找到结束任务
       this.bpmnModeler.getDefinitions().rootElements[0].flowElements?.forEach(n => {
-        let completeTask = tasks.find(m => m.key === n.id)
-        let todoTask = tasks.find(m => !m.endTime)
-        let endTask = tasks[tasks.length - 1]
+        let activity = activityList.find(m => m.key === n.id) // 找到对应的活动
         if (n.$type === 'bpmn:UserTask') { // 用户任务
-          if (completeTask) {
-            canvas.addMarker(n.id, completeTask.endTime ? 'highlight' : 'highlight-todo');
-            // console.log(n.id + ' : ' + (completeTask.endTime ? 'highlight' : 'highlight-todo'));
-            n.outgoing?.forEach(nn => {
-              let targetTask = tasks.find(m => m.key === nn.targetRef.id)
-              if (targetTask) {
-                canvas.addMarker(nn.id, targetTask.endTime ? 'highlight' : 'highlight-todo');
-              } else if (nn.targetRef.$type === 'bpmn:ExclusiveGateway') {
-                // canvas.addMarker(nn.id, 'highlight');
-                canvas.addMarker(nn.id, completeTask.endTime ? 'highlight' : 'highlight-todo');
-                canvas.addMarker(nn.targetRef.id, completeTask.endTime ? 'highlight' : 'highlight-todo');
-              } else if (nn.targetRef.$type === 'bpmn:EndEvent') {
-                if (!todoTask && endTask.key === n.id) {
-                  canvas.addMarker(nn.id, 'highlight');
-                  canvas.addMarker(nn.targetRef.id, 'highlight');
-                }
-                if (!completeTask.endTime) {
-                  canvas.addMarker(nn.id, 'highlight-todo');
-                  canvas.addMarker(nn.targetRef.id, 'highlight-todo');
-                }
-              }
-            });
+          if (!activity) {
+            return;
           }
+          if (activity.task) {
+            const result = activity.task.result;
+            if (result === 1) {
+              canvas.addMarker(n.id, 'highlight-todo');
+            } else if (result === 2) {
+              canvas.addMarker(n.id, 'highlight');
+            } else if (result === 3) {
+              canvas.addMarker(n.id, 'highlight-reject');
+            } else if (result === 4) {
+              canvas.addMarker(n.id, 'highlight-cancel');
+            }
+          }
+
+          n.outgoing?.forEach(nn => {
+            let targetTask = activityList.find(m => m.key === nn.targetRef.id)
+            if (targetTask) {
+              canvas.addMarker(nn.id, targetTask.endTime ? 'highlight' : 'highlight-todo');
+            } else if (nn.targetRef.$type === 'bpmn:ExclusiveGateway') {
+              // canvas.addMarker(nn.id, 'highlight');
+              canvas.addMarker(nn.id, activity.endTime ? 'highlight' : 'highlight-todo');
+              canvas.addMarker(nn.targetRef.id, activity.endTime ? 'highlight' : 'highlight-todo');
+            } else if (nn.targetRef.$type === 'bpmn:EndEvent') {
+              if (!todoActivity && endActivity.key === n.id) {
+                canvas.addMarker(nn.id, 'highlight');
+                canvas.addMarker(nn.targetRef.id, 'highlight');
+              }
+              if (!activity.endTime) {
+                canvas.addMarker(nn.id, 'highlight-todo');
+                canvas.addMarker(nn.targetRef.id, 'highlight-todo');
+              }
+            }
+          });
         } else if (n.$type === 'bpmn:ExclusiveGateway') { // 排它网关
           n.outgoing?.forEach(nn => {
-            let targetTask = tasks.find(m => m.key === nn.targetRef.id)
+            let targetTask = activityList.find(m => m.key === nn.targetRef.id)
             if (targetTask) {
               canvas.addMarker(nn.id, targetTask.endTime ? 'highlight' : 'highlight-todo');
             }
           })
         } else if (n.$type === 'bpmn:ParallelGateway') { // 并行网关
-          if (completeTask) {
-            canvas.addMarker(n.id, completeTask.endTime ? 'highlight' : 'highlight-todo')
+          if (activity) {
+            canvas.addMarker(n.id, activity.endTime ? 'highlight' : 'highlight-todo')
             n.outgoing?.forEach(nn => {
               const targetTask = this.taskList.find(m => m.key === nn.targetRef.id)
               if (targetTask) {
@@ -140,18 +148,21 @@ export default {
             })
           }
         } else if (n.$type === 'bpmn:StartEvent') { // 开始节点
-          n.outgoing?.forEach(nn => {
-            let completeTask = tasks.find(m => m.key === nn.targetRef.id)
-            if (completeTask) {
+          n.outgoing?.forEach(nn => { // outgoing 例如说【bpmn:SequenceFlow】连线
+            let fromTask = activityList.find(m => m.key === nn.targetRef.id)
+            if (fromTask) {
               canvas.addMarker(nn.id, 'highlight');
               canvas.addMarker(n.id, 'highlight');
-              return
             }
           });
         } else if (n.$type === 'bpmn:EndEvent') { // 结束节点
-          if (endTask.key === n.id && endTask.endTime) {
-            canvas.addMarker(n.id, 'highlight')
-            return
+          if (endActivity.key !== n.id) { // 保证 endActivity 就是 EndEvent
+            return;
+          }
+          // 在并行网关后，跟着多个任务，如果其中一个任务完成，endActivity 的 endTime 就会存在值
+          // 所以，通过 todoActivity 在做一次判断
+          if (endActivity.endTime && !todoActivity) {
+            canvas.addMarker(n.id, 'highlight');
           }
         }
       })
@@ -162,6 +173,7 @@ export default {
 
 <style>
 
+/** 通过 */
 .highlight.djs-shape .djs-visual > :nth-child(1) {
   fill: green !important;
   stroke: green !important;
@@ -177,18 +189,6 @@ export default {
 }
 .highlight.djs-connection > .djs-visual > path {
   stroke: green !important;
-}
-
-.highlight-todo.djs-connection > .djs-visual > path {
-  stroke: orange !important;
-  stroke-dasharray: 4px !important;
-  fill-opacity: 0.2 !important;
-}
-.highlight-todo.djs-shape .djs-visual > :nth-child(1) {
-  fill: orange !important;
-  stroke: orange !important;
-  stroke-dasharray: 4px !important;
-  fill-opacity: 0.2 !important;
 }
 
 .highlight:not(.djs-connection) .djs-visual > :nth-child(1) {
@@ -211,6 +211,20 @@ export default {
 /deep/.highlight.djs-connection > .djs-visual > path {
   stroke: green !important;
 }
+
+/** 处理中 */
+.highlight-todo.djs-connection > .djs-visual > path {
+  stroke: orange !important;
+  stroke-dasharray: 4px !important;
+  fill-opacity: 0.2 !important;
+}
+.highlight-todo.djs-shape .djs-visual > :nth-child(1) {
+  fill: orange !important;
+  stroke: orange !important;
+  stroke-dasharray: 4px !important;
+  fill-opacity: 0.2 !important;
+}
+
 /deep/.highlight-todo.djs-connection > .djs-visual > path {
   stroke: orange !important;
   stroke-dasharray: 4px !important;
@@ -224,4 +238,81 @@ export default {
   fill-opacity: 0.2 !important;
 }
 
+/** 不通过 */
+.highlight-reject.djs-shape .djs-visual > :nth-child(1) {
+  fill: red !important;
+  stroke: red !important;
+  fill-opacity: 0.2 !important;
+}
+.highlight-reject.djs-shape .djs-visual > :nth-child(2) {
+  fill: red !important;
+}
+.highlight-reject.djs-shape .djs-visual > path {
+  fill: red !important;
+  fill-opacity: 0.2 !important;
+  stroke: red !important;
+}
+.highlight-reject.djs-connection > .djs-visual > path {
+  stroke: red !important;
+}
+
+.highlight-reject:not(.djs-connection) .djs-visual > :nth-child(1) {
+  fill: red !important; /* color elements as green */
+}
+
+/deep/.highlight-reject.djs-shape .djs-visual > :nth-child(1) {
+  fill: red !important;
+  stroke: red !important;
+  fill-opacity: 0.2 !important;
+}
+/deep/.highlight-reject.djs-shape .djs-visual > :nth-child(2) {
+  fill: red !important;
+}
+/deep/.highlight-reject.djs-shape .djs-visual > path {
+  fill: red !important;
+  fill-opacity: 0.2 !important;
+  stroke: red !important;
+}
+/deep/.highlight-reject.djs-connection > .djs-visual > path {
+  stroke: red !important;
+}
+
+/** 已取消 */
+.highlight-cancel.djs-shape .djs-visual > :nth-child(1) {
+  fill: grey !important;
+  stroke: grey !important;
+  fill-opacity: 0.2 !important;
+}
+.highlight-cancel.djs-shape .djs-visual > :nth-child(2) {
+  fill: grey !important;
+}
+.highlight-cancel.djs-shape .djs-visual > path {
+  fill: grey !important;
+  fill-opacity: 0.2 !important;
+  stroke: grey !important;
+}
+.highlight-cancel.djs-connection > .djs-visual > path {
+  stroke: grey !important;
+}
+
+.highlight-cancel:not(.djs-connection) .djs-visual > :nth-child(1) {
+  fill: grey !important; /* color elements as green */
+}
+
+/deep/.highlight-cancel.djs-shape .djs-visual > :nth-child(1) {
+  fill: grey !important;
+  stroke: grey !important;
+  fill-opacity: 0.2 !important;
+}
+/deep/.highlight-cancel.djs-shape .djs-visual > :nth-child(2) {
+  fill: grey !important;
+}
+/deep/.highlight-cancel.djs-shape .djs-visual > path {
+  fill: grey !important;
+  fill-opacity: 0.2 !important;
+  stroke: grey !important;
+}
+/deep/.highlight-cancel.djs-connection > .djs-visual > path {
+  stroke: grey !important;
+}
 </style>

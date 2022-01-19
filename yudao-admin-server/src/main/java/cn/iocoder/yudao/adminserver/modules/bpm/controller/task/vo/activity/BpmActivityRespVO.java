@@ -20,4 +20,20 @@ public class BpmActivityRespVO {
     @ApiModelProperty(value = "流程活动的结束时间", required = true)
     private Date endTime;
 
+    /**
+     * 关联的流程任务，只有 UserTask 类型才有
+     */
+    private Task task;
+
+    @ApiModel(value = "流程任务")
+    @Data
+    public static class Task {
+
+        @ApiModelProperty(value = "关联的流程任务的编号", required = true, example = "2048")
+        private String id;
+        @ApiModelProperty(value = "关联的流程任务的结果", required = true, example = "2", notes = "参见 bpm_process_instance_result 枚举")
+        private Integer result;
+
+    }
+
 }

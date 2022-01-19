@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.service.task;
 
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.task.vo.task.*;
+import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.task.BpmTaskExtDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import org.activiti.engine.task.Task;
@@ -138,5 +139,13 @@ public interface BpmTaskService {
      * @param task 任务实体
      */
     void updateTaskExtComplete(org.activiti.api.task.model.Task task);
+
+    /**
+     * 获得流程实例对应的 Task 拓展列表
+     *
+     * @param processInstanceId 流程实例的编号
+     * @return Task 拓展列表
+     */
+    List<BpmTaskExtDO> getTaskExtListByProcessInstanceId(String processInstanceId);
 
 }

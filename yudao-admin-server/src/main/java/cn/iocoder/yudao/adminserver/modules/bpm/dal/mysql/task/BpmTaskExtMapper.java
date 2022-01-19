@@ -19,4 +19,7 @@ public interface BpmTaskExtMapper extends BaseMapperX<BpmTaskExtDO> {
         return selectList("task_id", taskIds);
     }
 
+    default List<BpmTaskExtDO> selectListByProcessInstanceId(String processInstanceId) {
+        return selectList("process_instance_id", processInstanceId);
+    }
 }

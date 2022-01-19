@@ -4,6 +4,7 @@ import cn.hutool.core.io.IoUtil;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.task.vo.activity.BpmActivityRespVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.convert.task.BpmActivityConvert;
 import cn.iocoder.yudao.adminserver.modules.bpm.convert.task.BpmTaskConvert;
+import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.task.BpmTaskExtDO;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmProcessDefinitionService;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.task.BpmActivityService;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.task.BpmProcessInstanceService;
@@ -25,9 +26,11 @@ import javax.annotation.Resource;
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import static cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants.*;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 
 /**
  * BPM 活动实例 Service 实现类
@@ -57,7 +60,10 @@ public class BpmActivityServiceImpl implements BpmActivityService {
     public List<BpmActivityRespVO> getActivityListByProcessInstanceId(String processInstanceId) {
         List<HistoricActivityInstance> activityList = historyService.createHistoricActivityInstanceQuery()
                 .processInstanceId(processInstanceId).list();
-        return BpmActivityConvert.INSTANCE.convertList(activityList);
+        // 拼接数据
+        List<BpmTaskExtDO> taskExts = taskService.getTaskExtListByProcessInstanceId(processInstanceId);
+        Map<String, BpmTaskExtDO> taskExtMap = convertMap(taskExts, BpmTaskExtDO::getTaskId);
+        return BpmActivityConvert.INSTANCE.convertList(activityList, taskExtMap);
     }
 
     @Override
