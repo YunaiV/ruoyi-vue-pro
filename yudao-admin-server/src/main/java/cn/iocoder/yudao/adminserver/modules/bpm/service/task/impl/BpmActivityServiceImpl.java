@@ -1,6 +1,9 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.service.task.impl;
 
 import cn.hutool.core.io.IoUtil;
+import cn.iocoder.yudao.adminserver.modules.bpm.controller.task.vo.activity.BpmActivityRespVO;
+import cn.iocoder.yudao.adminserver.modules.bpm.convert.task.BpmActivityConvert;
+import cn.iocoder.yudao.adminserver.modules.bpm.convert.task.BpmTaskConvert;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmProcessDefinitionService;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.task.BpmActivityService;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.task.BpmProcessInstanceService;
@@ -11,6 +14,7 @@ import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
+import org.activiti.engine.history.HistoricActivityInstance;
 import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.task.Task;
 import org.activiti.image.ProcessDiagramGenerator;
@@ -22,8 +26,7 @@ import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
 
-import static cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants.PROCESS_DEFINITION_BPMN_MODEL_NOT_EXISTS;
-import static cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants.PROCESS_INSTANCE_NOT_EXISTS;
+import static cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants.*;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 
 /**
@@ -40,6 +43,8 @@ public class BpmActivityServiceImpl implements BpmActivityService {
 
     @Resource
     private ProcessDiagramGenerator processDiagramGenerator;
+    @Resource
+    private HistoryService historyService;
 
     @Resource
     private BpmProcessInstanceService processInstanceService;
@@ -47,6 +52,13 @@ public class BpmActivityServiceImpl implements BpmActivityService {
     private BpmProcessDefinitionService processDefinitionService;
     @Resource
     private BpmTaskService taskService;
+
+    @Override
+    public List<BpmActivityRespVO> getActivityListByProcessInstanceId(String processInstanceId) {
+        List<HistoricActivityInstance> activityList = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(processInstanceId).list();
+        return BpmActivityConvert.INSTANCE.convertList(activityList);
+    }
 
     @Override
     public byte[] generateHighlightDiagram(String processInstanceId) {

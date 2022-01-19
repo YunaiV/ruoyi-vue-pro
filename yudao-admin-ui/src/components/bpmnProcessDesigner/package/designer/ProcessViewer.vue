@@ -82,24 +82,27 @@ export default {
     },
     /* 高亮流程图 */
     async highlightDiagram() {
-      if (this.tasks.length === 0) {
-        return;
-      }
-      if (!this.bpmnModeler.getDefinitions().rootElements[0].flowElements) {
+      // let tasks = this.tasks.filter(task => {
+      //   if (task.type !== 'sequenceFlow') { // 去除连线元素
+      //     return true;
+      //   }
+      // });
+      let tasks = this.tasks;
+      if (tasks.length === 0) {
         return;
       }
       // 参考自 https://gitee.com/tony2y/RuoYi-flowable/blob/master/ruoyi-ui/src/components/Process/index.vue#L222 实现
       let canvas = this.bpmnModeler.get('canvas');
       this.bpmnModeler.getDefinitions().rootElements[0].flowElements?.forEach(n => {
-        let completeTask = this.tasks.find(m => m.definitionKey === n.id)
-        let todoTask = this.tasks.find(m => !m.endTime)
-        let endTask = this.tasks[this.tasks.length - 1]
+        let completeTask = tasks.find(m => m.key === n.id)
+        let todoTask = tasks.find(m => !m.endTime)
+        let endTask = tasks[tasks.length - 1]
         if (n.$type === 'bpmn:UserTask') { // 用户任务
           if (completeTask) {
             canvas.addMarker(n.id, completeTask.endTime ? 'highlight' : 'highlight-todo');
             // console.log(n.id + ' : ' + (completeTask.endTime ? 'highlight' : 'highlight-todo'));
             n.outgoing?.forEach(nn => {
-              let targetTask = this.tasks.find(m => m.definitionKey === nn.targetRef.id)
+              let targetTask = tasks.find(m => m.key === nn.targetRef.id)
               if (targetTask) {
                 canvas.addMarker(nn.id, targetTask.endTime ? 'highlight' : 'highlight-todo');
               } else if (nn.targetRef.$type === 'bpmn:ExclusiveGateway') {
@@ -107,7 +110,7 @@ export default {
                 canvas.addMarker(nn.id, completeTask.endTime ? 'highlight' : 'highlight-todo');
                 canvas.addMarker(nn.targetRef.id, completeTask.endTime ? 'highlight' : 'highlight-todo');
               } else if (nn.targetRef.$type === 'bpmn:EndEvent') {
-                if (!todoTask && endTask.definitionKey === n.id) {
+                if (!todoTask && endTask.key === n.id) {
                   canvas.addMarker(nn.id, 'highlight');
                   canvas.addMarker(nn.targetRef.id, 'highlight');
                 }
@@ -120,7 +123,7 @@ export default {
           }
         } else if (n.$type === 'bpmn:ExclusiveGateway') { // 排它网关
           n.outgoing?.forEach(nn => {
-            let targetTask = this.tasks.find(m => m.definitionKey === nn.targetRef.id)
+            let targetTask = tasks.find(m => m.key === nn.targetRef.id)
             if (targetTask) {
               canvas.addMarker(nn.id, targetTask.endTime ? 'highlight' : 'highlight-todo');
             }
@@ -129,7 +132,7 @@ export default {
           if (completeTask) {
             canvas.addMarker(n.id, completeTask.endTime ? 'highlight' : 'highlight-todo')
             n.outgoing?.forEach(nn => {
-              const targetTask = this.taskList.find(m => m.definitionKey === nn.targetRef.id)
+              const targetTask = this.taskList.find(m => m.key === nn.targetRef.id)
               if (targetTask) {
                 canvas.addMarker(nn.id, targetTask.endTime ? 'highlight' : 'highlight-todo')
                 canvas.addMarker(nn.targetRef.id, targetTask.endTime ? 'highlight' : 'highlight-todo')
@@ -138,7 +141,7 @@ export default {
           }
         } else if (n.$type === 'bpmn:StartEvent') { // 开始节点
           n.outgoing?.forEach(nn => {
-            let completeTask = this.tasks.find(m => m.definitionKey === nn.targetRef.id)
+            let completeTask = tasks.find(m => m.key === nn.targetRef.id)
             if (completeTask) {
               canvas.addMarker(nn.id, 'highlight');
               canvas.addMarker(n.id, 'highlight');
@@ -146,7 +149,7 @@ export default {
             }
           });
         } else if (n.$type === 'bpmn:EndEvent') { // 结束节点
-          if (endTask.definitionKey === n.id && endTask.endTime) {
+          if (endTask.key === n.id && endTask.endTime) {
             canvas.addMarker(n.id, 'highlight')
             return
           }

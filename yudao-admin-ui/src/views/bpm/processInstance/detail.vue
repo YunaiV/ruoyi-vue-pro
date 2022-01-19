@@ -73,7 +73,7 @@
       <div slot="header" class="clearfix">
         <span class="el-icon-picture-outline">流程图</span>
       </div>
-      <my-process-viewer key="designer" v-model="bpmnXML" v-bind="bpmnControlForm" :taskData="tasks" />
+      <my-process-viewer key="designer" v-model="bpmnXML" v-bind="bpmnControlForm" :taskData="activityList" />
     </el-card>
 
     <!-- 对话框(转派审批人) -->
@@ -103,6 +103,7 @@ import {createProcessInstance, getProcessInstance} from "@/api/bpm/processInstan
 import {approveTask, getTaskListByProcessInstanceId, rejectTask, updateTaskAssignee} from "@/api/bpm/task";
 import {getDate} from "@/utils/dateUtils";
 import {listSimpleUsers} from "@/api/system/user";
+import {getActivityList} from "@/api/bpm/activity";
 
 // 流程实例的详情页，可用于审批
 export default {
@@ -128,6 +129,7 @@ export default {
       bpmnControlForm: {
         prefix: "activiti"
       },
+      activityList: [],
 
       // 审批记录
       tasksLoad: true,
@@ -196,12 +198,18 @@ export default {
           if (val) {
             item.__config__.defaultValue = val
           }
-        })
+        });
 
         // 加载流程图
         getProcessDefinitionBpmnXML(this.processInstance.processDefinition.id).then(response => {
           this.bpmnXML = response.data
-        })
+        });
+        // 加载活动列表
+        getActivityList({
+          processInstanceId: this.processInstance.id
+        }).then(response => {
+          this.activityList = response.data;
+        });
 
         // 取消加载中
         this.processInstanceLoading = false;
