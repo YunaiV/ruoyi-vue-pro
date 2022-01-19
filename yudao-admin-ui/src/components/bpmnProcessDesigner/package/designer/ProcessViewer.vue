@@ -14,25 +14,34 @@ export default {
   name: "MyProcessViewer",
   componentName: "MyProcessViewer",
   props: {
-    value: String, // xml 字符串
-    prefix: {
+    value: {  // BPMN XML 字符串
       type: String,
-      default: "camunda"
     },
-    taskData: {
+    prefix: { // 使用哪个引擎
+      type: String,
+      default: "camunda",
+    },
+    activityData: { // 活动的数据。传递时，可高亮流程
       type: Array,
-      default: () => []
+      default: () => [],
+    },
+    processInstanceData: { // 流程实例的数据。传递时，可展示流程发起人等信息
+      type: Object,
+    },
+    taskData: { // 任务实例的数据。传递时，可展示 UserTask 审核相关的信息
+      type: Array,
+      default: () => [],
     }
   },
   data() {
     return {
       xml: '',
-      tasks: [],
+      activityList: [],
     };
   },
   mounted() {
     this.xml = this.value;
-    this.tasks = this.taskData;
+    this.activityList = this.activityData;
     // 初始化
     this.initBpmnModeler();
     this.createNewDiagram(this.xml);
@@ -49,8 +58,8 @@ export default {
       this.xml = newValue;
       this.createNewDiagram(this.xml);
     },
-    taskData: function (newTaskData) {
-      this.tasks = newTaskData;
+    activityData: function (newActivityData) {
+      this.activityList = newActivityData;
       this.createNewDiagram(this.xml);
     }
   },
@@ -83,8 +92,9 @@ export default {
       }
     },
     /* 高亮流程图 */
+    // TODO 芋艿：如果多个 endActivity 的话，目前的逻辑可能有一定的问题。https://www.jdon.com/workflow/multi-events.html
     async highlightDiagram() {
-      let activityList = this.tasks;
+      let activityList = this.activityList;
       if (activityList.length === 0) {
         return;
       }
@@ -99,6 +109,7 @@ export default {
           if (!activity) {
             return;
           }
+          // TODO 芋艿：
           if (activity.task) {
             const result = activity.task.result;
             if (result === 1) {
@@ -111,16 +122,17 @@ export default {
               canvas.addMarker(n.id, 'highlight-cancel');
             }
           }
-
           n.outgoing?.forEach(nn => {
-            let targetTask = activityList.find(m => m.key === nn.targetRef.id)
-            if (targetTask) {
-              canvas.addMarker(nn.id, targetTask.endTime ? 'highlight' : 'highlight-todo');
+            let targetActivity = activityList.find(m => m.key === nn.targetRef.id)
+            if (targetActivity) {
+              debugger
+              canvas.addMarker(nn.id, targetActivity.endTime ? 'highlight' : 'highlight-todo');
             } else if (nn.targetRef.$type === 'bpmn:ExclusiveGateway') {
-              // canvas.addMarker(nn.id, 'highlight');
+              debugger
               canvas.addMarker(nn.id, activity.endTime ? 'highlight' : 'highlight-todo');
               canvas.addMarker(nn.targetRef.id, activity.endTime ? 'highlight' : 'highlight-todo');
             } else if (nn.targetRef.$type === 'bpmn:EndEvent') {
+              debugger
               if (!todoActivity && endActivity.key === n.id) {
                 canvas.addMarker(nn.id, 'highlight');
                 canvas.addMarker(nn.targetRef.id, 'highlight');
@@ -133,28 +145,33 @@ export default {
           });
         } else if (n.$type === 'bpmn:ExclusiveGateway') { // 排它网关
           n.outgoing?.forEach(nn => {
-            let targetTask = activityList.find(m => m.key === nn.targetRef.id)
+            let targetTask = activityList.find(m => m.key === nn.targetRef.id);
             if (targetTask) {
               canvas.addMarker(nn.id, targetTask.endTime ? 'highlight' : 'highlight-todo');
             }
           })
         } else if (n.$type === 'bpmn:ParallelGateway') { // 并行网关
-          if (activity) {
-            canvas.addMarker(n.id, activity.endTime ? 'highlight' : 'highlight-todo')
-            n.outgoing?.forEach(nn => {
-              const targetTask = activityList.find(m => m.key === nn.targetRef.id)
-              if (targetTask) {
-                canvas.addMarker(nn.id, targetTask.endTime ? 'highlight' : 'highlight-todo')
-                canvas.addMarker(nn.targetRef.id, targetTask.endTime ? 'highlight' : 'highlight-todo')
-              }
-            })
+          if (!activity) {
+            return
           }
+          // 设置【bpmn:ParallelGateway】并行网关的高亮
+          canvas.addMarker(n.id, this.getActivityHighlightCss(activity));
+          n.outgoing?.forEach(nn => {
+            // 获得连线是否有指向目标。如果有，则进行高亮
+            const targetActivity = activityList.find(m => m.key === nn.targetRef.id)
+            if (targetActivity) {
+              canvas.addMarker(nn.id, this.getActivityHighlightCss(targetActivity)); // 高亮【bpmn:SequenceFlow】连线
+              // 高亮【...】目标。其中 ... 可以是 bpm:UserTask、也可以是其它的。当然，如果是 bpm:UserTask 的话，其实不做高亮也没问题，因为上面有逻辑做了这块。
+              canvas.addMarker(nn.targetRef.id, this.getActivityHighlightCss(targetActivity));
+            }
+          })
         } else if (n.$type === 'bpmn:StartEvent') { // 开始节点
           n.outgoing?.forEach(nn => { // outgoing 例如说【bpmn:SequenceFlow】连线
-            let fromTask = activityList.find(m => m.key === nn.targetRef.id)
-            if (fromTask) {
-              canvas.addMarker(nn.id, 'highlight');
-              canvas.addMarker(n.id, 'highlight');
+            // 获得连线是否有指向目标。如果有，则进行高亮
+            let targetActivity = activityList.find(m => m.key === nn.targetRef.id);
+            if (targetActivity) {
+              canvas.addMarker(nn.id, 'highlight'); // 高亮【bpmn:SequenceFlow】连线
+              canvas.addMarker(n.id, 'highlight'); // 高亮【bpmn:StartEvent】开始节点（自己）
             }
           });
         } else if (n.$type === 'bpmn:EndEvent') { // 结束节点
@@ -169,10 +186,19 @@ export default {
         }
       })
     },
+    getActivityHighlightCss(activity) {
+      return activity.endTime ? 'highlight' : 'highlight-todo';
+    },
+    getTaskHighlightCss(task) {
+      if (!task) {
+        return '';
+      }
+      return '';
+    },
     initModelListeners() {
       const EventBus = this.bpmnModeler.get("eventBus");
       const that = this;
-      // 注册需要的监听事件, 将. 替换为 - , 避免解析异常
+      // 注册需要的监听事件
       EventBus.on('element.hover', function(eventObj) {
         let element = eventObj ? eventObj.element : null;
         that.elementHover(element);
@@ -208,6 +234,32 @@ export default {
 </script>
 
 <style>
+
+/** 处理中 */
+.highlight-todo.djs-connection > .djs-visual > path {
+  stroke: orange !important;
+  stroke-dasharray: 4px !important;
+  fill-opacity: 0.2 !important;
+}
+.highlight-todo.djs-shape .djs-visual > :nth-child(1) {
+  fill: orange !important;
+  stroke: orange !important;
+  stroke-dasharray: 4px !important;
+  fill-opacity: 0.2 !important;
+}
+
+/deep/.highlight-todo.djs-connection > .djs-visual > path {
+  stroke: orange !important;
+  stroke-dasharray: 4px !important;
+  fill-opacity: 0.2 !important;
+  marker-end: url(#sequenceflow-end-_E7DFDF-_E7DFDF-803g1kf6zwzmcig1y2ulm5egr);
+}
+/deep/.highlight-todo.djs-shape .djs-visual > :nth-child(1) {
+  fill: orange !important;
+  stroke: orange !important;
+  stroke-dasharray: 4px !important;
+  fill-opacity: 0.2 !important;
+}
 
 /** 通过 */
 .highlight.djs-shape .djs-visual > :nth-child(1) {
@@ -246,32 +298,6 @@ export default {
 }
 /deep/.highlight.djs-connection > .djs-visual > path {
   stroke: green !important;
-}
-
-/** 处理中 */
-.highlight-todo.djs-connection > .djs-visual > path {
-  stroke: orange !important;
-  stroke-dasharray: 4px !important;
-  fill-opacity: 0.2 !important;
-}
-.highlight-todo.djs-shape .djs-visual > :nth-child(1) {
-  fill: orange !important;
-  stroke: orange !important;
-  stroke-dasharray: 4px !important;
-  fill-opacity: 0.2 !important;
-}
-
-/deep/.highlight-todo.djs-connection > .djs-visual > path {
-  stroke: orange !important;
-  stroke-dasharray: 4px !important;
-  fill-opacity: 0.2 !important;
-  marker-end: url(#sequenceflow-end-_E7DFDF-_E7DFDF-803g1kf6zwzmcig1y2ulm5egr);
-}
-/deep/.highlight-todo.djs-shape .djs-visual > :nth-child(1) {
-  fill: orange !important;
-  stroke: orange !important;
-  stroke-dasharray: 4px !important;
-  fill-opacity: 0.2 !important;
 }
 
 /** 不通过 */
