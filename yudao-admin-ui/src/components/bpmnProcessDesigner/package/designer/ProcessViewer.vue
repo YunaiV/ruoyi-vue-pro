@@ -41,6 +41,8 @@ export default {
       this.$emit("destroy", this.bpmnModeler);
       this.bpmnModeler = null;
     });
+    // 初始模型的监听器
+    this.initModelListeners();
   },
   watch: {
     value: function (newValue) { // 在 xmlString 发生变化时，重新创建，从而绘制流程图
@@ -140,7 +142,7 @@ export default {
           if (activity) {
             canvas.addMarker(n.id, activity.endTime ? 'highlight' : 'highlight-todo')
             n.outgoing?.forEach(nn => {
-              const targetTask = this.taskList.find(m => m.key === nn.targetRef.id)
+              const targetTask = activityList.find(m => m.key === nn.targetRef.id)
               if (targetTask) {
                 canvas.addMarker(nn.id, targetTask.endTime ? 'highlight' : 'highlight-todo')
                 canvas.addMarker(nn.targetRef.id, targetTask.endTime ? 'highlight' : 'highlight-todo')
@@ -166,7 +168,41 @@ export default {
           }
         }
       })
-    }
+    },
+    initModelListeners() {
+      const EventBus = this.bpmnModeler.get("eventBus");
+      const that = this;
+      // 注册需要的监听事件, 将. 替换为 - , 避免解析异常
+      EventBus.on('element.hover', function(eventObj) {
+        let element = eventObj ? eventObj.element : null;
+        that.elementHover(element);
+      });
+      EventBus.on('element.out', function(eventObj) {
+        let element = eventObj ? eventObj.element : null;
+        that.elementOut(element);
+      });
+    },
+    // 流程图的元素被 hover
+    elementHover(element) {
+      this.element = element;
+      !this.elementOverlayIds && (this.elementOverlayIds = {});
+      !this.overlays && (this.overlays = this.bpmnModeler.get("overlays"));
+      // 展示信息
+      if (!this.elementOverlayIds[element.id] && element.type !== "bpmn:Process") {
+        this.elementOverlayIds[element.id] = this.overlays.add(element, {
+          position: { left: 0, bottom: 0 },
+          html: `<div class="element-overlays">
+            <p>Elemet id: ${element.id}</p>
+            <p>Elemet type: ${element.type}</p>
+          </div>`
+        });
+      }
+    },
+    // 流程图的元素被 out
+    elementOut(element) {
+      this.overlays.remove({ element });
+      this.elementOverlayIds[element.id] = null;
+    },
   }
 };
 </script>

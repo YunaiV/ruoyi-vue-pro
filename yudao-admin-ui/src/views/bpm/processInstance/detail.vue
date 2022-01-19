@@ -68,7 +68,8 @@
         </div>
       </el-col>
     </el-card>
-    <!-- TODO 流程图 -->
+
+    <!-- 高亮流程图 -->
     <el-card class="box-card" v-loading="processInstanceLoading">
       <div slot="header" class="clearfix">
         <span class="el-icon-picture-outline">流程图</span>
