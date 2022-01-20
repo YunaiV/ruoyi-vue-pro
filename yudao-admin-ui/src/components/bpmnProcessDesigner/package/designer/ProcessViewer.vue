@@ -117,7 +117,7 @@ export default {
       // 再次基础上，增加不同审批结果的颜色等等
       let canvas = this.bpmnModeler.get('canvas');
       let todoActivity = activityList.find(m => !m.endTime) // 找到待办的任务
-      let endActivity = activityList[activityList.length - 1] // 找到结束任务
+      let endActivity = activityList[activityList.length - 1] // 获得最后一个任务
       // debugger
       console.log(this.bpmnModeler.getDefinitions().rootElements[0].flowElements);
       this.bpmnModeler.getDefinitions().rootElements[0].flowElements?.forEach(n => {
@@ -129,23 +129,27 @@ export default {
           // 处理用户任务的高亮
           const task = this.taskList.find(m => m.id === activity.taskId); // 找到活动对应的 taskId
           if (task) {
-            canvas.addMarker(n.id, this.getTaskHighlightCss(task));
+            canvas.addMarker(n.id, this.getResultCss(task.result));
+            // 如果非通过，就不走后面的线条了
+            if (task.result !== 2) {
+              return;
+            }
           }
 
           // 处理 outgoing 出线
           const outgoing = this.getActivityOutgoing(activity);
           outgoing?.forEach(nn => {
-            debugger
+            // debugger
             let targetActivity = activityList.find(m => m.key === nn.targetRef.id)
             if (targetActivity) {
-              debugger
+              // debugger
               canvas.addMarker(nn.id, targetActivity.endTime ? 'highlight' : 'highlight-todo');
             } else if (nn.targetRef.$type === 'bpmn:ExclusiveGateway') {
-              debugger
+              // debugger
               canvas.addMarker(nn.id, activity.endTime ? 'highlight' : 'highlight-todo');
               canvas.addMarker(nn.targetRef.id, activity.endTime ? 'highlight' : 'highlight-todo');
             } else if (nn.targetRef.$type === 'bpmn:EndEvent') {
-              debugger
+              // debugger
               if (!todoActivity && endActivity.key === n.id) {
                 canvas.addMarker(nn.id, 'highlight');
                 canvas.addMarker(nn.targetRef.id, 'highlight');
@@ -188,22 +192,17 @@ export default {
             }
           });
         } else if (n.$type === 'bpmn:EndEvent') { // 结束节点
-          if (endActivity.key !== n.id) { // 保证 endActivity 就是 EndEvent
+          if (!this.processInstance || this.processInstance.result === 1) {
             return;
           }
-          // 在并行网关后，跟着多个任务，如果其中一个任务完成，endActivity 的 endTime 就会存在值
-          // 所以，通过 todoActivity 在做一次判断
-          if (endActivity.endTime && !todoActivity) {
-            canvas.addMarker(n.id, 'highlight');
-          }
+          canvas.addMarker(n.id, this.getResultCss(this.processInstance.result));
         }
       })
     },
     getActivityHighlightCss(activity) {
       return activity.endTime ? 'highlight' : 'highlight-todo';
     },
-    getTaskHighlightCss(task) {
-      const result = task.result;
+    getResultCss(result) {
       if (result === 1) {
         return 'highlight-todo';
       } else if (result === 2) {
@@ -253,12 +252,43 @@ export default {
       !this.overlays && (this.overlays = this.bpmnModeler.get("overlays"));
       // 展示信息
       if (!this.elementOverlayIds[element.id] && element.type !== "bpmn:Process") {
-        this.elementOverlayIds[element.id] = this.overlays.add(element, {
-          position: { left: 0, bottom: 0 },
-          html: `<div class="element-overlays">
+        let html = `<div class="element-overlays">
             <p>Elemet id: ${element.id}</p>
             <p>Elemet type: ${element.type}</p>
-          </div>`
+          </div>`; // 默认值
+        if (element.type === 'bpmn:StartEvent' && this.processInstance) {
+          html = `<p>发起人：${this.processInstance.startUser.nickname}</p>
+                  <p>部门：${this.processInstance.startUser.deptName}</p>
+                  <p>创建时间：${this.parseTime(this.processInstance.createTime)}`;
+        } else if (element.type === 'bpmn:UserTask') {
+          // debugger
+          const activity = this.activityList.find(m => m.key === element.id);
+          if (!activity) {
+            return;
+          }
+          let task = this.taskList.find(m => m.id === activity.taskId); // 找到活动对应的 taskId
+          if (!task) {
+            return;
+          }
+          html = `<p>审批人：${task.assigneeUser.nickname}</p>
+                  <p>部门：${task.assigneeUser.deptName}</p>
+                  <p>结果：${this.getDictDataLabel(this.DICT_TYPE.BPM_PROCESS_INSTANCE_RESULT, task.result)}</p>
+                  <p>创建时间：${this.parseTime(task.createTime)}</p>`;
+          if (task.endTime) {
+            html += `<p>结束时间：${this.parseTime(task.endTime)}</p>`
+          }
+          if (task.comment) {
+            html += `<p>审批建议：${task.comment}</p>`
+          }
+        } else if (element.type === 'bpmn:EndEvent' && this.processInstance) {
+          html = `<p>结果：${this.getDictDataLabel(this.DICT_TYPE.BPM_PROCESS_INSTANCE_RESULT, this.processInstance.result)}</p>`;
+          if (this.processInstance.endTime) {
+            html += `<p>结束时间：${this.parseTime(this.processInstance.endTime)}</p>`
+          }
+        }
+        this.elementOverlayIds[element.id] = this.overlays.add(element, {
+          position: { left: 0, bottom: 0 },
+          html: `<div class="element-overlays">${html}</div>`
         });
       }
     },
@@ -275,26 +305,26 @@ export default {
 
 /** 处理中 */
 .highlight-todo.djs-connection > .djs-visual > path {
-  stroke: orange !important;
+  stroke: #1890ff !important;
   stroke-dasharray: 4px !important;
   fill-opacity: 0.2 !important;
 }
 .highlight-todo.djs-shape .djs-visual > :nth-child(1) {
-  fill: orange !important;
-  stroke: orange !important;
+  fill: #1890ff !important;
+  stroke: #1890ff !important;
   stroke-dasharray: 4px !important;
   fill-opacity: 0.2 !important;
 }
 
 /deep/.highlight-todo.djs-connection > .djs-visual > path {
-  stroke: orange !important;
+  stroke: #1890ff !important;
   stroke-dasharray: 4px !important;
   fill-opacity: 0.2 !important;
   marker-end: url(#sequenceflow-end-_E7DFDF-_E7DFDF-803g1kf6zwzmcig1y2ulm5egr);
 }
 /deep/.highlight-todo.djs-shape .djs-visual > :nth-child(1) {
-  fill: orange !important;
-  stroke: orange !important;
+  fill: #1890ff !important;
+  stroke: #1890ff !important;
   stroke-dasharray: 4px !important;
   fill-opacity: 0.2 !important;
 }
@@ -414,5 +444,14 @@ export default {
 }
 /deep/.highlight-cancel.djs-connection > .djs-visual > path {
   stroke: grey !important;
+}
+
+.element-overlays {
+  box-sizing: border-box;
+  padding: 8px;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 4px;
+  color: #fafafa;
+  width: 200px;
 }
 </style>
