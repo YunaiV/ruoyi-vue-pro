@@ -104,11 +104,6 @@ export default {
     /* 高亮流程图 */
     // TODO 芋艿：如果多个 endActivity 的话，目前的逻辑可能有一定的问题。https://www.jdon.com/workflow/multi-events.html
     async highlightDiagram() {
-      // let activityList = this.activityList.filter(task => {
-      //   if (task.type !== 'sequenceFlow') { // 去除连线元素
-      //     return true;
-      //   }
-      // });
       const activityList = this.activityList;
       if (activityList.length === 0) {
         return;
@@ -141,15 +136,13 @@ export default {
           outgoing?.forEach(nn => {
             // debugger
             let targetActivity = activityList.find(m => m.key === nn.targetRef.id)
+            // 如果目标活动存在，则根据该活动是否结束，进行【bpmn:SequenceFlow】连线的高亮设置
             if (targetActivity) {
-              // debugger
               canvas.addMarker(nn.id, targetActivity.endTime ? 'highlight' : 'highlight-todo');
-            } else if (nn.targetRef.$type === 'bpmn:ExclusiveGateway') {
-              // debugger
+            } else if (nn.targetRef.$type === 'bpmn:ExclusiveGateway') { // TODO 芋艿：这个流程，暂时没走到过
               canvas.addMarker(nn.id, activity.endTime ? 'highlight' : 'highlight-todo');
               canvas.addMarker(nn.targetRef.id, activity.endTime ? 'highlight' : 'highlight-todo');
-            } else if (nn.targetRef.$type === 'bpmn:EndEvent') {
-              // debugger
+            } else if (nn.targetRef.$type === 'bpmn:EndEvent') { // TODO 芋艿：这个流程，暂时没走到过
               if (!todoActivity && endActivity.key === n.id) {
                 canvas.addMarker(nn.id, 'highlight');
                 canvas.addMarker(nn.targetRef.id, 'highlight');
