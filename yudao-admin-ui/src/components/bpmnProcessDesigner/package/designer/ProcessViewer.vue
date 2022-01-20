@@ -37,6 +37,8 @@ export default {
     return {
       xml: '',
       activityList: [],
+      processInstance: undefined,
+      taskList: [],
     };
   },
   mounted() {
@@ -60,6 +62,14 @@ export default {
     },
     activityData: function (newActivityData) {
       this.activityList = newActivityData;
+      this.createNewDiagram(this.xml);
+    },
+    processInstanceData: function (newProcessInstanceData) {
+      this.processInstance = newProcessInstanceData;
+      this.createNewDiagram(this.xml);
+    },
+    taskData: function (newTaskListData) {
+      this.taskList = newTaskListData;
       this.createNewDiagram(this.xml);
     }
   },
@@ -94,6 +104,11 @@ export default {
     /* 高亮流程图 */
     // TODO 芋艿：如果多个 endActivity 的话，目前的逻辑可能有一定的问题。https://www.jdon.com/workflow/multi-events.html
     async highlightDiagram() {
+      // let activityList = this.activityList.filter(task => {
+      //   if (task.type !== 'sequenceFlow') { // 去除连线元素
+      //     return true;
+      //   }
+      // });
       let activityList = this.activityList;
       if (activityList.length === 0) {
         return;
@@ -109,20 +124,15 @@ export default {
           if (!activity) {
             return;
           }
-          // TODO 芋艿：
-          if (activity.task) {
-            const result = activity.task.result;
-            if (result === 1) {
-              canvas.addMarker(n.id, 'highlight-todo');
-            } else if (result === 2) {
-              canvas.addMarker(n.id, 'highlight');
-            } else if (result === 3) {
-              canvas.addMarker(n.id, 'highlight-reject');
-            } else if (result === 4) {
-              canvas.addMarker(n.id, 'highlight-cancel');
-            }
+          // 处理用户任务的高亮
+          const task = this.taskList.find(m => m.id === activity.taskId); // 找到活动对应的 taskId
+          if (task) {
+            canvas.addMarker(n.id, this.getTaskHighlightCss(task));
           }
+
+          debugger
           n.outgoing?.forEach(nn => {
+            debugger
             let targetActivity = activityList.find(m => m.key === nn.targetRef.id)
             if (targetActivity) {
               debugger
@@ -190,8 +200,15 @@ export default {
       return activity.endTime ? 'highlight' : 'highlight-todo';
     },
     getTaskHighlightCss(task) {
-      if (!task) {
-        return '';
+      const result = task.result;
+      if (result === 1) {
+        return 'highlight-todo';
+      } else if (result === 2) {
+        return 'highlight';
+      } else if (result === 3) {
+        return 'highlight-reject';
+      } else if (result === 4) {
+        return 'highlight-cancel';
       }
       return '';
     },
