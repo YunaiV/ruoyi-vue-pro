@@ -109,7 +109,7 @@ export default {
       //     return true;
       //   }
       // });
-      let activityList = this.activityList;
+      const activityList = this.activityList;
       if (activityList.length === 0) {
         return;
       }
@@ -118,6 +118,8 @@ export default {
       let canvas = this.bpmnModeler.get('canvas');
       let todoActivity = activityList.find(m => !m.endTime) // 找到待办的任务
       let endActivity = activityList[activityList.length - 1] // 找到结束任务
+      // debugger
+      console.log(this.bpmnModeler.getDefinitions().rootElements[0].flowElements);
       this.bpmnModeler.getDefinitions().rootElements[0].flowElements?.forEach(n => {
         let activity = activityList.find(m => m.key === n.id) // 找到对应的活动
         if (n.$type === 'bpmn:UserTask') { // 用户任务
@@ -130,8 +132,9 @@ export default {
             canvas.addMarker(n.id, this.getTaskHighlightCss(task));
           }
 
-          debugger
-          n.outgoing?.forEach(nn => {
+          // 处理 outgoing 出线
+          const outgoing = this.getActivityOutgoing(activity);
+          outgoing?.forEach(nn => {
             debugger
             let targetActivity = activityList.find(m => m.key === nn.targetRef.id)
             if (targetActivity) {
@@ -211,6 +214,24 @@ export default {
         return 'highlight-cancel';
       }
       return '';
+    },
+    getActivityOutgoing(activity) {
+      // 如果有 outgoing，则直接使用它
+      if (activity.outgoing && activity.outgoing.length > 0) {
+        return activity.outgoing;
+      }
+      // 如果没有，则遍历获得起点为它的【bpmn:SequenceFlow】节点们。原因是：bpmn-js 的 UserTask 拿不到 outgoing
+      const flowElements = this.bpmnModeler.getDefinitions().rootElements[0].flowElements;
+      const outgoing = [];
+      flowElements.forEach(item => {
+        if (item.$type !== 'bpmn:SequenceFlow') {
+          return;
+        }
+        if (item.sourceRef.id === activity.key) {
+          outgoing.push(item);
+        }
+      });
+      return outgoing;
     },
     initModelListeners() {
       const EventBus = this.bpmnModeler.get("eventBus");

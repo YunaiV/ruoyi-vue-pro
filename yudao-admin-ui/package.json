@@ -85,7 +85,7 @@
     "@vue/compiler-sfc": "^3.0.1",
     "@vue/eslint-config-prettier": "^5.0.0",
     "axios": "^0.21.1",
-    "bpmn-js": "^8.8.3",
+    "bpmn-js": "8.9.0",
     "bpmn-js-properties-panel": "^0.37.2",
     "camunda-bpmn-moddle": "^4.4.1",
     "compression-webpack-plugin": "^6.1.1",
