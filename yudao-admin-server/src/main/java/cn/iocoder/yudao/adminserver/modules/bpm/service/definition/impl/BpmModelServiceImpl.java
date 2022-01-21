@@ -10,7 +10,7 @@ import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.definition.BpmFor
 import cn.iocoder.yudao.adminserver.modules.bpm.enums.definition.BpmModelFormTypeEnum;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmProcessDefinitionService;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmTaskAssignRuleService;
-import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.dto.BpmDefinitionCreateReqDTO;
+import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.dto.BpmProcessDefinitionCreateReqDTO;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmFormService;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmModelService;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.dto.BpmModelMetaInfoRespDTO;
@@ -21,11 +21,9 @@ import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.object.PageUtils;
 import cn.iocoder.yudao.framework.common.util.validation.ValidationUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.activiti.bpmn.converter.BpmnXMLConverter;
 import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.impl.persistence.entity.SuspensionState;
-import org.activiti.engine.impl.util.io.StringStreamSource;
 import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.Model;
 import org.activiti.engine.repository.ModelQuery;
@@ -38,7 +36,6 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import java.util.*;
-import java.util.function.Consumer;
 
 import static cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants.*;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -175,14 +172,19 @@ public class BpmModelServiceImpl implements BpmModelService {
         }
         // TODO 芋艿：校验流程图的有效性；例如说，是否有开始的元素，是否有结束的元素；
         // 校验表单已配
-        // 校验表单存在
         BpmFormDO form = checkFormConfig(model);
         // 校验任务分配规则已配置
         checkTaskAssignRuleAllConfig(id);
 
+        // 校验模型是否发生修改。如果未修改，则不允许创建
+        BpmProcessDefinitionCreateReqDTO definitionCreateReqDTO = BpmModelConvert.INSTANCE.convert2(model, form).setBpmnBytes(bpmnBytes);
+        if (processDefinitionService.isProcessDefinitionEquals(definitionCreateReqDTO)) { // 流程定义的信息相等
+            ProcessDefinition oldProcessInstance = processDefinitionService.getProcessDefinitionByDeploymentId(model.getDeploymentId());
+            if (oldProcessInstance != null && taskAssignRuleService.isTaskAssignRulesEquals(model.getId(), oldProcessInstance.getId())) {
+                throw exception(MODEL_DEPLOY_FAIL_TASK_INFO_EQUALS);
+            }
+        }
         // 创建流程定义
-        BpmDefinitionCreateReqDTO definitionCreateReqDTO = BpmModelConvert.INSTANCE.convert2(model, form)
-                .setBpmnXml(StrUtil.utf8Str(bpmnBytes));
         String definitionId = processDefinitionService.createProcessDefinition(definitionCreateReqDTO);
 
         // 将老的流程定义进行挂起。也就是说，只有最新部署的流程定义，才可以发起任务。

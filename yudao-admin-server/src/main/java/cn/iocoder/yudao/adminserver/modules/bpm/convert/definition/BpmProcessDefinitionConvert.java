@@ -4,7 +4,7 @@ import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.process
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.process.BpmProcessDefinitionRespVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.definition.BpmProcessDefinitionExtDO;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.definition.BpmFormDO;
-import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.dto.BpmDefinitionCreateReqDTO;
+import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.dto.BpmProcessDefinitionCreateReqDTO;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import org.activiti.engine.impl.persistence.entity.SuspensionState;
 import org.activiti.engine.repository.Deployment;
@@ -55,7 +55,7 @@ public interface BpmProcessDefinitionConvert {
 
     BpmProcessDefinitionPageItemRespVO convert(ProcessDefinition bean);
 
-    BpmProcessDefinitionExtDO convert2(BpmDefinitionCreateReqDTO bean);
+    BpmProcessDefinitionExtDO convert2(BpmProcessDefinitionCreateReqDTO bean);
 
     default List<BpmProcessDefinitionRespVO> convertList3(List<ProcessDefinition> list,
                                                           Map<String, BpmProcessDefinitionExtDO> processDefinitionDOMap) {

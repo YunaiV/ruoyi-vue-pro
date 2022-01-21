@@ -5,7 +5,7 @@ import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.process
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.process.BpmProcessDefinitionPageReqVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.process.BpmProcessDefinitionRespVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.definition.BpmProcessDefinitionExtDO;
-import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.dto.BpmDefinitionCreateReqDTO;
+import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.dto.BpmProcessDefinitionCreateReqDTO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import org.activiti.bpmn.model.BpmnModel;
@@ -126,12 +126,20 @@ public interface BpmProcessDefinitionService {
     List<ProcessDefinition> getProcessDefinitionListByDeploymentIds(Set<String> deploymentIds);
 
     /**
+     * 获得需要创建的流程定义，是否和当前激活的流程定义相等
+     *
+     * @param createReqDTO 创建信息
+     * @return 是否相等
+     */
+    boolean isProcessDefinitionEquals(@Valid BpmProcessDefinitionCreateReqDTO createReqDTO);
+
+    /**
      * 创建流程定义
      *
      * @param createReqDTO 创建信息
      * @return 流程编号
      */
-    String createProcessDefinition(@Valid BpmDefinitionCreateReqDTO createReqDTO);
+    String createProcessDefinition(@Valid BpmProcessDefinitionCreateReqDTO createReqDTO);
 
     /**
      * 更新流程定义的挂起状态

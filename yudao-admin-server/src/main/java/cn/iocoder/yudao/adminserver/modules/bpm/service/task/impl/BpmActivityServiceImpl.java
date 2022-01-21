@@ -60,10 +60,7 @@ public class BpmActivityServiceImpl implements BpmActivityService {
     public List<BpmActivityRespVO> getActivityListByProcessInstanceId(String processInstanceId) {
         List<HistoricActivityInstance> activityList = historyService.createHistoricActivityInstanceQuery()
                 .processInstanceId(processInstanceId).list();
-        // 拼接数据
-        List<BpmTaskExtDO> taskExts = taskService.getTaskExtListByProcessInstanceId(processInstanceId);
-        Map<String, BpmTaskExtDO> taskExtMap = convertMap(taskExts, BpmTaskExtDO::getTaskId);
-        return BpmActivityConvert.INSTANCE.convertList(activityList, taskExtMap);
+        return BpmActivityConvert.INSTANCE.convertList(activityList);
     }
 
     @Override

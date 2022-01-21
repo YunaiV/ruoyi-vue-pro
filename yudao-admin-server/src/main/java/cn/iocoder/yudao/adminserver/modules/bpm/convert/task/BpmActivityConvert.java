@@ -22,16 +22,7 @@ public interface BpmActivityConvert {
 
     BpmActivityConvert INSTANCE = Mappers.getMapper(BpmActivityConvert.class);
 
-    default List<BpmActivityRespVO> convertList(List<HistoricActivityInstance> list, Map<String, BpmTaskExtDO> taskExtMap) {
-        return CollectionUtils.convertList(list, bean -> {
-            BpmActivityRespVO respVO = convert(bean);
-            BpmTaskExtDO taskExt = taskExtMap.get(bean.getTaskId());
-            if (taskExt != null) {
-                respVO.setTask(new BpmActivityRespVO.Task().setId(taskExt.getTaskId()).setResult(taskExt.getResult()));
-            }
-            return respVO;
-        });
-    }
+    List<BpmActivityRespVO> convertList(List<HistoricActivityInstance> list);
 
     @Mappings({
             @Mapping(source = "activityId", target = "key"),

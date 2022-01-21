@@ -28,6 +28,7 @@ public interface BpmErrorCodeConstants {
     ErrorCode MODEL_DEPLOY_FAIL_FORM_NOT_CONFIG = new ErrorCode(1009002003, "部署流程失败，原因：流程表单未配置，请点击【修改流程】按钮进行配置");
     ErrorCode MODEL_DEPLOY_FAIL_TASK_ASSIGN_RULE_NOT_CONFIG = new ErrorCode(1009002004, "部署流程失败，" +
             "原因：用户任务({})未配置分配规则，请点击【修改流程】按钮进行配置");
+    ErrorCode MODEL_DEPLOY_FAIL_TASK_INFO_EQUALS = new ErrorCode(1009003005, "流程定义部署失败，原因：信息未发生变化");
 
     // ========== 流程定义 1-009-003-000 ==========
     ErrorCode PROCESS_DEFINITION_KEY_NOT_MATCH = new ErrorCode(1009003000, "流程定义的标识期望是({})，当前是({})，请修改 BPMN 流程图");

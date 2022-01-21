@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.framework.activiti.core.util;
 
+import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
@@ -13,6 +15,7 @@ import org.activiti.engine.impl.util.io.BytesStreamSource;
 
 import javax.xml.bind.Element;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -88,8 +91,20 @@ public class ActivitiUtils {
         if (model == null) {
             return null;
         }
+        return StrUtil.utf8Str(getBpmnBytes(model));
+    }
+
+    public static byte[] getBpmnBytes(BpmnModel model) {
+        if (model == null) {
+            return new byte[0];
+        }
         BpmnXMLConverter converter = new BpmnXMLConverter();
-        return StrUtil.utf8Str(converter.convertToXML(model));
+        return converter.convertToXML(model);
+    }
+
+    public static boolean equals(BpmnModel oldModel, BpmnModel newModel) {
+        // 由于 BpmnModel 未提供 equals 方法，所以只能转成字节数组，进行比较
+        return Arrays.equals(getBpmnBytes(oldModel), getBpmnBytes(newModel));
     }
 
 }

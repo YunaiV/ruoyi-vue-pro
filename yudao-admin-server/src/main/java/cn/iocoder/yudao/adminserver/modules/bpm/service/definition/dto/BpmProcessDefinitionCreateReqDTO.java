@@ -18,7 +18,7 @@ import java.util.Objects;
  * 流程定义创建 Request DTO
  */
 @Data
-public class BpmDefinitionCreateReqDTO {
+public class BpmProcessDefinitionCreateReqDTO {
 
     // ========== 模型相关 ==========
 
@@ -51,7 +51,7 @@ public class BpmDefinitionCreateReqDTO {
      * BPMN XML
      */
     @NotEmpty(message = "BPMN XML 不能为空")
-    private String bpmnXml;
+    private byte[] bpmnBytes;
 
     // ========== 表单相关 ==========
 
