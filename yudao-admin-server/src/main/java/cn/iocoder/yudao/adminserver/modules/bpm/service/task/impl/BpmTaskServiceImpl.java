@@ -1,12 +1,15 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.service.task.impl;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.task.vo.task.*;
+import cn.iocoder.yudao.adminserver.modules.bpm.convert.message.BpmMessageConvert;
 import cn.iocoder.yudao.adminserver.modules.bpm.convert.task.BpmTaskConvert;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.task.BpmTaskExtDO;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.mysql.task.BpmTaskExtMapper;
 import cn.iocoder.yudao.adminserver.modules.bpm.enums.task.BpmProcessInstanceResultEnum;
+import cn.iocoder.yudao.adminserver.modules.bpm.service.message.BpmMessageService;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.task.BpmProcessInstanceService;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.task.BpmTaskService;
 import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.dept.SysDeptDO;
@@ -29,10 +32,13 @@ import org.activiti.engine.task.TaskQuery;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 import static cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants.*;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -61,6 +67,8 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     @Resource
     @Lazy // 解决循环依赖
     private BpmProcessInstanceService processInstanceService;
+    @Resource
+    private BpmMessageService messageService;
 
     @Resource
     private BpmTaskExtMapper taskExtMapper;
@@ -275,6 +283,21 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     public void updateTaskExt(org.activiti.api.task.model.Task task) {
         BpmTaskExtDO taskExtDO = BpmTaskConvert.INSTANCE.convert(task);
         taskExtMapper.updateByTaskId(taskExtDO);
+    }
+
+    @Override
+    public void updateTaskExtAssign(org.activiti.api.task.model.Task task) {
+        // 更新
+        updateTaskExt(task);
+        // 发送通知。由于 Activiti 操作是在事务提交时，批量执行操作，所以直接查询会无法查询到 ProcessInstance，所以这里是通过监听事务的提交来实现。
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+                ProcessInstance processInstance = processInstanceService.getProcessInstance(task.getProcessInstanceId());
+                SysUserDO startUser = userService.getUser(Long.valueOf(processInstance.getStartUserId()));
+                messageService.sendMessageWhenTaskAssigned(BpmMessageConvert.INSTANCE.convert(processInstance, startUser, task));
+            }
+        });
     }
 
     @Override

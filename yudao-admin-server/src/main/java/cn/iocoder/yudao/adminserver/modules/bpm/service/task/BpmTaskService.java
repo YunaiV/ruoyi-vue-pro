@@ -127,6 +127,13 @@ public interface BpmTaskService {
     void updateTaskExt(org.activiti.api.task.model.Task task);
 
     /**
+     * 更新 Task 拓展记录，并发送通知
+     *
+     * @param task 任务实体
+     */
+    void updateTaskExtAssign(org.activiti.api.task.model.Task task);
+
+    /**
      * 更新 Task 拓展记录为取消
      *
      * @param task 任务实体
@@ -147,5 +154,6 @@ public interface BpmTaskService {
      * @return Task 拓展列表
      */
     List<BpmTaskExtDO> getTaskExtListByProcessInstanceId(String processInstanceId);
+
 
 }

@@ -53,6 +53,12 @@ public class BpmTaskEventListener<T extends RuntimeEvent<?, ?>>
             return;
         }
 
+        // 审核人修改时，进行拓展表，并额外发送通知
+        if (event.getEventType() == TaskRuntimeEvent.TaskEvents.TASK_ASSIGNED) {
+            taskService.updateTaskExtAssign(event.getEntity());
+            return;
+        }
+
         // 其它事件，进行更新拓展表
         taskService.updateTaskExt(event.getEntity());
     }
