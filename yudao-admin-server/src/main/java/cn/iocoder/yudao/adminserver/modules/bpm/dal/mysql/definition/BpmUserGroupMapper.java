@@ -4,7 +4,7 @@ import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.group.B
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.definition.BpmUserGroupDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
-import cn.iocoder.yudao.framework.mybatis.core.query.QueryWrapperX;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -18,15 +18,15 @@ import java.util.List;
 public interface BpmUserGroupMapper extends BaseMapperX<BpmUserGroupDO> {
 
     default PageResult<BpmUserGroupDO> selectPage(BpmUserGroupPageReqVO reqVO) {
-        return selectPage(reqVO, new QueryWrapperX<BpmUserGroupDO>()
-                .likeIfPresent("name", reqVO.getName())
-                .eqIfPresent("status", reqVO.getStatus())
-                .betweenIfPresent("create_time", reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
-                .orderByDesc("id"));
+        return selectPage(reqVO, new LambdaQueryWrapperX<BpmUserGroupDO>()
+                .likeIfPresent(BpmUserGroupDO::getName, reqVO.getName())
+                .eqIfPresent(BpmUserGroupDO::getStatus, reqVO.getStatus())
+                .betweenIfPresent(BpmUserGroupDO::getCreateTime, reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
+                .orderByDesc(BpmUserGroupDO::getId));
     }
 
     default List<BpmUserGroupDO> selectListByStatus(Integer status) {
-        return selectList("status", status);
+        return selectList(BpmUserGroupDO::getStatus, status);
     }
 
 }

@@ -13,7 +13,7 @@ import org.apache.ibatis.annotations.Mapper;
 public interface MbrUserMapper extends BaseMapperX<MbrUserDO> {
 
     default MbrUserDO selectByMobile(String mobile) {
-        return selectOne("mobile", mobile);
+        return selectOne(MbrUserDO::getMobile, mobile);
     }
 
 }
