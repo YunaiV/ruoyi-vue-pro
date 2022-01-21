@@ -9,7 +9,7 @@ import org.apache.ibatis.annotations.Mapper;
 public interface InfFileCoreMapper extends BaseMapperX<InfFileDO> {
 
     default Integer selectCountById(String id) {
-        return selectCount("id", id);
+        return selectCount(InfFileDO::getId, id);
     }
 
     /**
