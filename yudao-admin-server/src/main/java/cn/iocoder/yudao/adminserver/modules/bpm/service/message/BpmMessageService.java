@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.service.message;
 
+import cn.iocoder.yudao.adminserver.modules.bpm.service.message.dto.BpmMessageSendWhenProcessInstanceApproveReqDTO;
+import cn.iocoder.yudao.adminserver.modules.bpm.service.message.dto.BpmMessageSendWhenProcessInstanceRejectReqDTO;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.message.dto.BpmMessageSendWhenTaskCreatedReqDTO;
 
 import javax.validation.Valid;
@@ -13,6 +15,26 @@ import javax.validation.Valid;
  */
 public interface BpmMessageService {
 
+    /**
+     * 发送流程实例被通过的消息
+     *
+     * @param reqDTO 发送信息
+     */
+    void sendMessageWhenProcessInstanceApprove(@Valid BpmMessageSendWhenProcessInstanceApproveReqDTO reqDTO);
+
+
+    /**
+     * 发送流程实例被不通过的消息
+     *
+     * @param reqDTO 发送信息
+     */
+    void sendMessageWhenProcessInstanceReject(@Valid BpmMessageSendWhenProcessInstanceRejectReqDTO reqDTO);
+
+    /**
+     * 发送任务被分配的消息
+     *
+     * @param reqDTO 发送信息
+     */
     void sendMessageWhenTaskAssigned(@Valid BpmMessageSendWhenTaskCreatedReqDTO reqDTO);
 
 }

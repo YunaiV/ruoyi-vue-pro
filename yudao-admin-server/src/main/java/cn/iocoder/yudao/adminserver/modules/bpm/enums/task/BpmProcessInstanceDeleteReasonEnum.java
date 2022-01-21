@@ -12,7 +12,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum BpmProcessInstanceDeleteReasonEnum {
 
-    REJECT_TASK("驳回任务");
+    REJECT_TASK("不通过任务，原因：{}");
 
     private final String reason;
 

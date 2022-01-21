@@ -6,7 +6,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 /**
- * BPM 发送任务创建的 Request DTO
+ * BPM 发送任务被分配 Request DTO
  */
 @Data
 public class BpmMessageSendWhenTaskCreatedReqDTO {

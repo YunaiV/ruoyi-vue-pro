@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.service.task.impl;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.task.vo.task.*;
 import cn.iocoder.yudao.adminserver.modules.bpm.convert.message.BpmMessageConvert;
@@ -38,7 +37,6 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 import static cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants.*;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -254,8 +252,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         }
 
         // 更新流程实例为不通过
-        processInstanceService.updateProcessInstanceResult(instance.getProcessInstanceId(),
-                BpmProcessInstanceResultEnum.REJECT.getResult());
+        processInstanceService.updateProcessInstanceExtReject(instance.getProcessInstanceId(), reqVO.getComment());
 
         // 更新任务拓展表为不通过
         taskExtMapper.updateByTaskId(new BpmTaskExtDO().setTaskId(task.getId())

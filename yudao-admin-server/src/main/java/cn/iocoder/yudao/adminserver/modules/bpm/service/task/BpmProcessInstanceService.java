@@ -47,15 +47,6 @@ public interface BpmProcessInstanceService {
     void deleteProcessInstance(String id, String reason);
 
     /**
-     * 更新流程实例的结果
-     * 1. 如果更新为已拒绝时，会进行任务的删除
-     *
-     * @param id 流程编号
-     * @param result 结果，{@link BpmProcessInstanceResultEnum}
-     */
-    void updateProcessInstanceResult(String id, Integer result);
-
-    /**
      * 获得流程实例的分页
      *
      * @param userId 用户编号
@@ -152,5 +143,13 @@ public interface BpmProcessInstanceService {
      * @param instance 流程任务
      */
     void updateProcessInstanceExtComplete(org.activiti.api.process.model.ProcessInstance instance);
+
+    /**
+     * 更新 ProcessInstance 拓展记录为不通过
+     *
+     * @param id 流程编号
+     * @param comment 理由。例如说，审批不通过时，需要传递该值
+     */
+    void updateProcessInstanceExtReject(String id, String comment);
 
 }

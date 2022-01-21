@@ -13,6 +13,8 @@ import lombok.Getter;
 @Getter
 public enum BpmMessageEnum {
 
+    PROCESS_INSTANCE_APPROVE("bpm_process_instance_approve"), // 流程任务被审批通过时，发送给申请人
+    PROCESS_INSTANCE_REJECT("bpm_process_instance_reject"), // 流程任务被审批不通过时，发送给申请人
     TASK_ASSIGNED("bpm_task_assigned"); // 任务被分配时，发送给审批人
 
     /**
