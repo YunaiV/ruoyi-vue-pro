@@ -14,5 +14,5 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class OALeaveCreateReqVO extends BpmOALeaveBaseVO {
+public class BpmOALeaveCreateReqVO extends BpmOALeaveBaseVO {
 }

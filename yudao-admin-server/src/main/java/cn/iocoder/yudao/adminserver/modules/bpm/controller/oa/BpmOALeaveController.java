@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.controller.oa;
 
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.oa.vo.OALeaveCreateReqVO;
+import cn.iocoder.yudao.adminserver.modules.bpm.controller.oa.vo.BpmOALeaveCreateReqVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.oa.vo.OALeavePageReqVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.oa.vo.OALeaveRespVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.convert.oa.OALeaveConvert;
@@ -39,7 +39,7 @@ public class BpmOALeaveController {
 
     @PostMapping("/create")
     @ApiOperation("创建请求申请")
-    public CommonResult<Long> createLeave(@Valid @RequestBody OALeaveCreateReqVO createReqVO) {
+    public CommonResult<Long> createLeave(@Valid @RequestBody BpmOALeaveCreateReqVO createReqVO) {
         return success(leaveService.createLeave(getLoginUserId(), createReqVO));
     }
 

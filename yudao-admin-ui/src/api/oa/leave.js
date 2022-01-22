@@ -3,7 +3,7 @@ import request from '@/utils/request'
 // 创建请假申请
 export function createLeave(data) {
   return request({
-    url: '/oa/leave/create',
+    url: '/bpm/oa/leave/create',
     method: 'post',
     data: data
   })
@@ -20,7 +20,7 @@ export function deleteLeave(id) {
 // 获得请假申请
 export function getLeave(id) {
   return request({
-    url: '/oa/leave/get?id=' + id,
+    url: '/bpm/oa/leave/get?id=' + id,
     method: 'get'
   })
 }
@@ -31,20 +31,5 @@ export function getLeavePage(query) {
     url: '/bpm/oa/leave/page',
     method: 'get',
     params: query
-  })
-}
-
-export function createFormKeyLeave(data) {
-  return request({
-    url: '/oa/leave/form-key/create',
-    method: 'post',
-    data: data
-  })
-}
-
-export function getLeaveApplyMembers() {
-  return request({
-    url: '/oa/leave/getLeaveApplyMembers',
-    method: 'get'
   })
 }

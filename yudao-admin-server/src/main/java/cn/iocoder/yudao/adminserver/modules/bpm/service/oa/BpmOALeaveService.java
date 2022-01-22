@@ -6,8 +6,6 @@ import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.leave.OALeaveDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 
 import javax.validation.Valid;
-import java.util.Collection;
-import java.util.List;
 
 /**
  * 请假申请 Service 接口
@@ -24,7 +22,7 @@ public interface BpmOALeaveService {
      * @param createReqVO 创建信息
      * @return 编号
      */
-    Long createLeave(Long userId, @Valid OALeaveCreateReqVO createReqVO);
+    Long createLeave(Long userId, @Valid BpmOALeaveCreateReqVO createReqVO);
 
     /**
      * 删除请假申请

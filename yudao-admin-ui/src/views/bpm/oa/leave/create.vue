@@ -8,38 +8,26 @@
         <el-form-item label="结束时间" prop="endTime">
           <el-date-picker clearable size="small" v-model="form.endTime" type="date" value-format="timestamp" placeholder="选择结束时间" />
         </el-form-item>
-        <el-form-item label="请假类型" prop="leaveType">
-          <el-select v-model="form.leaveType" placeholder="请选择">
-            <el-option
-              v-for="dict in leaveTypeDictData"
-              :key="parseInt(dict.value)"
-              :label="dict.label"
-              :value="parseInt(dict.value)"
-            />
+        <el-form-item label="请假类型" prop="type">
+          <el-select v-model="form.type" placeholder="请选择">
+            <el-option v-for="dict in typeDictData" :key="parseInt(dict.value)" :label="dict.label" :value="parseInt(dict.value)"/>
           </el-select>
         </el-form-item>
         <el-form-item label="原因" prop="reason">
           <el-col :span="10">
-            <el-input
-              type="textarea"
-              :rows="3"
-              v-model="form.reason"
-              placeholder="请输入原因" />
+            <el-input type="textarea" :rows="3" v-model="form.reason" placeholder="请输入原因" />
           </el-col>
         </el-form-item>
-        <el-form-item label="申请时间" prop="applyTime">
-          <el-date-picker clearable size="small" v-model="form.applyTime" type="date" value-format="timestamp" placeholder="选择申请时间" />
-        </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="submitForm">确 定</el-button>
+          <el-button type="primary" @click="submitForm">提 交</el-button>
         </el-form-item>
       </el-form>
   </div>
 </template>
 
 <script>
-import { createFormKeyLeave} from "@/api/oa/leave"
-import { getDictDataLabel, getDictDatas, DICT_TYPE } from '@/utils/dict'
+import { createLeave} from "@/api/oa/leave"
+import { getDictDatas, DICT_TYPE } from '@/utils/dict'
 export default {
   name: "LeaveCreate",
   components: {
@@ -48,31 +36,23 @@ export default {
     return {
       // 表单参数
       form: {
-        processKey: 'leave-update',
-        taskVariables:{
-          hr: "",
-          pm: "",
-          bm: ""
-        }
+        startTime: undefined,
+        endTime: undefined,
+        type: undefined,
+        reason: undefined,
       },
       // 表单校验
       rules: {
         startTime: [{ required: true, message: "开始时间不能为空", trigger: "blur" }],
         endTime: [{ required: true, message: "结束时间不能为空", trigger: "blur" }],
-        applyTime: [{ required: true, message: "申请时间不能为空", trigger: "blur" }],
+        type: [{ required: true, message: "请假类型不能为空", trigger: "change" }],
+        reason: [{ required: true, message: "请假原因不能为空", trigger: "change" }],
       },
 
-      statusFormat(row, column) {
-        return getDictDataLabel(DICT_TYPE.OA_LEAVE_STATUS, row.status)
-      },
-      leaveTypeDictData: getDictDatas(DICT_TYPE.BPM_OA_LEAVE_TYPE),
-      leaveStatusData: getDictDatas(DICT_TYPE.OA_LEAVE_STATUS)
+      typeDictData: getDictDatas(DICT_TYPE.BPM_OA_LEAVE_TYPE),
     };
   },
   created() {
-    this.form.taskVariables.hr = this.$route.query.hr;
-    this.form.taskVariables.pm = this.$route.query.pm;
-    this.form.taskVariables.bm = this.$route.query.bm;
   },
   methods: {
     /** 提交按钮 */
@@ -83,13 +63,10 @@ export default {
         }
 
         // 添加的提交
-        createFormKeyLeave(this.form).then(response => {
-          this.msgSuccess("新增成功");
-          this.$store.dispatch('tagsView/delView', this.$route).then(({ visitedViews }) => {
-            //if (this.isActive(this.$route)) {
-            this.$router.push({path: '/oa/todo'})
-            //}
-          })
+        createLeave(this.form).then(response => {
+          this.msgSuccess("发起成功");
+          this.$store.dispatch("tagsView/delView", this.$route);
+          this.$router.push({ path: "/bpm/oa/leave"});
         });
       });
     }

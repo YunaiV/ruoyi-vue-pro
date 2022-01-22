@@ -123,16 +123,21 @@ export const constantRoutes = [
     ]
   },
   {
-    path: '/flow',
+    path: '/bpm',
     component: Layout,
     hidden: true,
     redirect: 'noredirect',
     children: [
       {
-        path: 'leave/apply',
+        path: 'oa/leave/create',
         component: (resolve) => require(['@/views/bpm/oa/leave/create'], resolve),
-        name: '请假表单-申请',
-        meta: { title: '请假表单-申请', icon: 'form' }
+        name: '发起 OA 请假',
+        meta: { title: '发起 OA 请假', icon: 'form' }
+      }, {
+        path: 'oa/leave/detail',
+        component: (resolve) => require(['@/views/bpm/oa/leave/detail'], resolve),
+        name: '查看 OA 请假',
+        meta: { title: '查看 OA 请假', icon: 'view' }
       }
     ]
   },

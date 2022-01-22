@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.convert.oa;
 
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.oa.vo.OALeaveCreateReqVO;
+import cn.iocoder.yudao.adminserver.modules.bpm.controller.oa.vo.BpmOALeaveCreateReqVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.oa.vo.OALeaveRespVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.leave.OALeaveDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -19,7 +19,7 @@ public interface OALeaveConvert {
 
     OALeaveConvert INSTANCE = Mappers.getMapper(OALeaveConvert.class);
 
-    OALeaveDO convert(OALeaveCreateReqVO bean);
+    OALeaveDO convert(BpmOALeaveCreateReqVO bean);
 
     OALeaveRespVO convert(OALeaveDO bean);
 

@@ -44,7 +44,7 @@ public class OALeaveServiceImpl implements BpmOALeaveService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Long createLeave(Long userId, OALeaveCreateReqVO createReqVO) {
+    public Long createLeave(Long userId, BpmOALeaveCreateReqVO createReqVO) {
         // TODO 芋道源码
         // 校验是否超过请假天数的上限；
         long day = DateUtil.betweenDay(createReqVO.getStartTime(), createReqVO.getEndTime(), false);
