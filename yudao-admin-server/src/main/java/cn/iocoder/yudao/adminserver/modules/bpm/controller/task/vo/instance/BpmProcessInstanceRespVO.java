@@ -36,6 +36,9 @@ public class BpmProcessInstanceRespVO {
     @ApiModelProperty(value = "提交的表单值", required = true)
     private Map<String, Object> formVariables;
 
+    @ApiModelProperty(value = "业务的唯一标识", example = "1", notes = "例如说，请假申请的编号")
+    private String businessKey;
+
     /**
      * 发起流程的用户
      */

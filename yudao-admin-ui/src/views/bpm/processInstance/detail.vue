@@ -32,11 +32,18 @@
       <div slot="header" class="clearfix">
         <span class="el-icon-document">申请信息【{{ processInstance.name }}】</span>
       </div>
-      <el-col :span="16" :offset="6">
-        <div>
+      <el-col v-if="this.processInstance.processDefinition && this.processInstance.processDefinition.formType === 10"
+              :span="16" :offset="6">
+        <div >
           <parser :key="new Date().getTime()" :form-conf="detailForm" @submit="submitForm" />
         </div>
       </el-col>
+      <div v-if="this.processInstance.processDefinition && this.processInstance.processDefinition.formType === 20">
+        <router-link :to="this.processInstance.processDefinition.formCustomViewPath + '?id='
+                          + this.processInstance.businessKey">
+          <el-button type="primary">点击查看</el-button>
+        </router-link>
+      </div>
     </el-card>
     <el-card class="box-card" v-loading="tasksLoad">
       <div slot="header" class="clearfix">
@@ -188,19 +195,21 @@ export default {
         this.processInstance = response.data;
 
         // 设置表单信息
-        this.detailForm = {
-          ...JSON.parse(this.processInstance.processDefinition.formConf),
-          disabled: true, // 表单禁用
-          formBtns: false, // 按钮隐藏
-          fields: decodeFields(this.processInstance.processDefinition.formFields)
-        }
-        // 设置表单的值
-        this.detailForm.fields.forEach(item => {
-          const val = this.processInstance.formVariables[item.__vModel__]
-          if (val) {
-            item.__config__.defaultValue = val
+        if (this.processInstance.processDefinition.formType === 10) {
+          this.detailForm = {
+            ...JSON.parse(this.processInstance.processDefinition.formConf),
+            disabled: true, // 表单禁用
+            formBtns: false, // 按钮隐藏
+            fields: decodeFields(this.processInstance.processDefinition.formFields)
           }
-        });
+          // 设置表单的值
+          this.detailForm.fields.forEach(item => {
+            const val = this.processInstance.formVariables[item.__vModel__]
+            if (val) {
+              item.__config__.defaultValue = val
+            }
+          });
+        }
 
         // 加载流程图
         getProcessDefinitionBpmnXML(this.processInstance.processDefinition.id).then(response => {
