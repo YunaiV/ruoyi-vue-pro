@@ -1,16 +1,21 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.leave;
 
+import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.user.SysUserDO;
 import lombok.*;
 import java.util.*;
 import com.baomidou.mybatisplus.annotation.*;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import org.activiti.engine.runtime.ProcessInstance;
 
 /**
- * 请假申请 DO
+ * OA 请假申请 DO
  *
- * @author 芋艿
+ * {@link #day} 请假天数，目前先简单做。一般是分成请假上午和下午，可以是 1 整天，可以是 0.5 半天
+ *
+ * @author jason
+ * @author 芋道源码
  */
-@TableName("oa_leave")
+@TableName("bpm_oa_leave")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
@@ -25,17 +30,20 @@ public class OALeaveDO extends BaseDO {
     @TableId
     private Long id;
     /**
-     * 流程id
+     * 申请人的用户编号
+     *
+     * 关联 {@link SysUserDO#getId()}
      */
-    private String processInstanceId;
+    private Long userId;
     /**
-     * 状态
+     * 请假类型
      */
-    private Integer status;
+    @TableField("`type`")
+    private String type;
     /**
-     * 申请人id
+     * 原因
      */
-    private String userId;
+    private String reason;
     /**
      * 开始时间
      */
@@ -45,16 +53,22 @@ public class OALeaveDO extends BaseDO {
      */
     private Date endTime;
     /**
-     * 请假类型
+     * 请假天数
      */
-    private String leaveType;
+    private Long day;
     /**
-     * 原因
+     * 请假的结果
+     *
+     * 枚举 {@link cn.iocoder.yudao.adminserver.modules.bpm.enums.task.BpmProcessInstanceResultEnum}
+     * 考虑到简单，所以直接复用了 BpmProcessInstanceResultEnum 枚举，也可以自己定义一个枚举哈
      */
-    private String reason;
+    private Integer result;
+
     /**
-     * 申请时间
+     * 对应的流程编号
+     *
+     * 关联 {@link ProcessInstance#getId()}
      */
-    private Date applyTime;
+    private String processInstanceId;
 
 }

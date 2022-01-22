@@ -14,43 +14,21 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @ToString(callSuper = true)
 public class OALeavePageReqVO extends PageParam {
 
-    @ApiModelProperty(value = "流程id")
-    private String processInstanceId;
+    @ApiModelProperty(value = "状态", example = "1", notes = "参见 bpm_process_instance_result 枚举")
+    private Integer result;
 
-    @ApiModelProperty(value = "状态")
-    private Integer status;
+    @ApiModelProperty(value = "请假类型", example = "1", notes = "参见 bpm_oa_type")
+    private Integer type;
 
-    @ApiModelProperty(value = "申请人id")
-    private String userId;
-
-    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    @ApiModelProperty(value = "开始开始时间")
-    private Date beginStartTime;
-
-    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    @ApiModelProperty(value = "结束开始时间")
-    private Date endStartTime;
-
-    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    @ApiModelProperty(value = "开始结束时间")
-    private Date beginEndTime;
-
-    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    @ApiModelProperty(value = "结束结束时间")
-    private Date endEndTime;
-
-    @ApiModelProperty(value = "请假类型")
-    private String leaveType;
-
-    @ApiModelProperty(value = "原因")
+    @ApiModelProperty(value = "原因", example = "阅读芋道源码", notes = "模糊匹配")
     private String reason;
 
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     @ApiModelProperty(value = "开始申请时间")
-    private Date beginApplyTime;
+    private Date beginCreateTime;
 
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     @ApiModelProperty(value = "结束申请时间")
-    private Date endApplyTime;
+    private Date endCreateTime;
 
 }

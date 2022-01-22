@@ -3,6 +3,7 @@ package cn.iocoder.yudao.adminserver.modules.bpm.service.task;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.task.vo.instance.*;
 import cn.iocoder.yudao.adminserver.modules.bpm.enums.task.BpmProcessInstanceDeleteReasonEnum;
 import cn.iocoder.yudao.adminserver.modules.bpm.enums.task.BpmProcessInstanceResultEnum;
+import cn.iocoder.yudao.adminserver.modules.bpm.service.task.dto.BpmProcessInstanceCreateReqDTO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import org.activiti.engine.history.HistoricProcessInstance;
@@ -21,13 +22,22 @@ import java.util.Set;
 public interface BpmProcessInstanceService {
 
     /**
-     * 创建流程实例
+     * 创建流程实例（提供给前端）
      *
      * @param userId 用户编号
      * @param createReqVO 创建信息
      * @return 实例的编号
      */
     String createProcessInstance(Long userId, @Valid BpmProcessInstanceCreateReqVO createReqVO);
+
+    /**
+     * 创建流程实例（提供给内部）
+     *
+     * @param userId 用户编号
+     * @param createReqDTO 创建信息
+     * @return 实例的编号
+     */
+    String createProcessInstance(Long userId, @Valid BpmProcessInstanceCreateReqDTO createReqDTO);
 
     /**
      * 取消流程实例

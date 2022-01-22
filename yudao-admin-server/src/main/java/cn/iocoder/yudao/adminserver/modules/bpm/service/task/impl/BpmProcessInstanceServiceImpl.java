@@ -16,6 +16,7 @@ import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmProcessDef
 import cn.iocoder.yudao.adminserver.modules.bpm.service.message.BpmMessageService;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.task.BpmProcessInstanceService;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.task.BpmTaskService;
+import cn.iocoder.yudao.adminserver.modules.bpm.service.task.dto.BpmProcessInstanceCreateReqDTO;
 import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.dept.SysDeptDO;
 import cn.iocoder.yudao.adminserver.modules.system.service.dept.SysDeptService;
 import cn.iocoder.yudao.adminserver.modules.system.service.user.SysUserService;
@@ -81,8 +82,23 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public String createProcessInstance(Long userId, BpmProcessInstanceCreateReqVO createReqVO) {
-        // 校验流程定义
+        // 获得流程定义
         ProcessDefinition definition = processDefinitionService.getProcessDefinition(createReqVO.getProcessDefinitionId());
+        // 发起流程
+        return createProcessInstance0(userId, definition, createReqVO.getVariables(), null);
+    }
+
+    @Override
+    public String createProcessInstance(Long userId, BpmProcessInstanceCreateReqDTO createReqDTO) {
+        // 获得流程定义
+        ProcessDefinition definition = processDefinitionService.getActiveProcessDefinition(createReqDTO.getProcessDefinitionKey());
+        // 发起流程
+        return createProcessInstance0(userId, definition, createReqDTO.getVariables(), createReqDTO.getBusinessKey());
+    }
+
+    private String createProcessInstance0(Long userId, ProcessDefinition definition,
+                                          Map<String, Object> variables, String businessKey) {
+        // 校验流程定义
         if (definition == null) {
             throw exception(PROCESS_DEFINITION_NOT_EXISTS);
         }
@@ -91,14 +107,13 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         }
 
         // 创建流程实例
-        Map<String, Object> variables = createReqVO.getVariables();
-        ProcessInstance instance = runtimeService.startProcessInstanceById(createReqVO.getProcessDefinitionId(), variables);
+        ProcessInstance instance = runtimeService.startProcessInstanceById(definition.getId(), businessKey, variables);
         // 设置流程名字
         runtimeService.setProcessInstanceName(instance.getId(), definition.getName());
 
         // 补全流程实例的拓展表
         processInstanceExtMapper.updateByProcessInstanceId(new BpmProcessInstanceExtDO().setProcessInstanceId(instance.getId())
-                .setFormVariables(createReqVO.getVariables()));
+                .setFormVariables(variables));
 
         // 添加初始的评论 TODO 芋艿：在思考下
 //        Task task = taskService.createTaskQuery().processInstanceId(instance.getId()).singleResult();

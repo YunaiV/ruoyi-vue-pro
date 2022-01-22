@@ -42,6 +42,7 @@ import static java.util.Collections.emptyList;
  *
  * @author yunlongn
  * @author ZJQ
+ * @author 芋道源码
  */
 @Service
 @Validated
@@ -137,14 +138,9 @@ public class BpmProcessDefinitionServiceImpl implements BpmProcessDefinitionServ
         return repositoryService.createProcessDefinitionQuery().processDefinitionId(id).singleResult();
     }
 
-    /**
-     * 获得流程定义标识对应的激活的流程定义
-     *
-     * @param processDefinitionKey 流程定义的标识
-     * @return 流程定义
-     */
-    private ProcessDefinition getActiveProcessDefinition(String processDefinitionKey) {
-        return repositoryService.createProcessDefinitionQuery().processDefinitionKey(processDefinitionKey).active().singleResult();
+    @Override
+    public ProcessDefinition getActiveProcessDefinition(String key) {
+        return repositoryService.createProcessDefinitionQuery().processDefinitionKey(key).active().singleResult();
     }
 
     @Override

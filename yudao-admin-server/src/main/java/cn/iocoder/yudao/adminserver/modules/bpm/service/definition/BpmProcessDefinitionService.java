@@ -22,6 +22,7 @@ import java.util.Set;
  *
  * @author yunlong.li
  * @author ZJQ
+ * @author 芋道源码
  */
 public interface BpmProcessDefinitionService {
 
@@ -74,6 +75,14 @@ public interface BpmProcessDefinitionService {
      * @return 流程定义
      */
     ProcessDefinition getProcessDefinition2(String id);
+
+    /**
+     * 获得流程定义标识对应的激活的流程定义
+     *
+     * @param key 流程定义的标识
+     * @return 流程定义
+     */
+    ProcessDefinition getActiveProcessDefinition(String key);
 
     /**
      * 获得编号对应的 BpmProcessDefinitionExtDO

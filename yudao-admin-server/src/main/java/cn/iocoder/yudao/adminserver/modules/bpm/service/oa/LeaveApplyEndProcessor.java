@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.service.oa;
 
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.leave.OALeaveDO;
-import cn.iocoder.yudao.adminserver.modules.bpm.dal.mysql.oa.OALeaveMapper;
+import cn.iocoder.yudao.adminserver.modules.bpm.dal.mysql.oa.BpmOALeaveMapper;
 import cn.iocoder.yudao.adminserver.modules.bpm.enums.task.BpmProcessInstanceResultEnum;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.ExecutionListener;
@@ -19,7 +19,7 @@ import java.util.Objects;
 public class LeaveApplyEndProcessor implements ExecutionListener {
 
     @Resource
-    private OALeaveMapper leaveMapper;
+    private BpmOALeaveMapper leaveMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -29,9 +29,9 @@ public class LeaveApplyEndProcessor implements ExecutionListener {
         OALeaveDO updateDo = new OALeaveDO();
         updateDo.setId(Long.valueOf(businessKey));
         if (Objects.equals(approved, true)) {
-            updateDo.setStatus(BpmProcessInstanceResultEnum.APPROVE.getResult());
+            updateDo.setResult(BpmProcessInstanceResultEnum.APPROVE.getResult());
         } else {
-            updateDo.setStatus(BpmProcessInstanceResultEnum.REJECT.getResult());
+            updateDo.setResult(BpmProcessInstanceResultEnum.REJECT.getResult());
         }
 
         leaveMapper.updateById(updateDo);
