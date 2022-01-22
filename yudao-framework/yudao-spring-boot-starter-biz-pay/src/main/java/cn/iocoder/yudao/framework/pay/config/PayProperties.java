@@ -6,8 +6,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import java.time.Duration;
 
 @ConfigurationProperties(prefix = "yudao.pay")
 @Validated
@@ -25,8 +23,16 @@ public class PayProperties {
      * 退款回调地址
      * 注意点，同 {@link #payNotifyUrl} 属性
      */
-    @NotNull(message = "短信发送频率不能为空")
+    @NotEmpty(message = "退款回调地址不能为空")
     @URL(message = "退款回调地址的格式必须是 URL")
     private String refundNotifyUrl;
+
+
+    /**
+     * 支付完成的返回地址
+     */
+    @URL(message = "支付返回的地址的格式必须是 URL")
+    @NotEmpty(message = "支付返回的地址不能为空")
+    private String payReturnUrl;
 
 }

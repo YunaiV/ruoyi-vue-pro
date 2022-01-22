@@ -158,8 +158,9 @@ yudao:
       - ${management.endpoints.web.base-path}/** # 不处理 Actuator 的请求
   demo: false # 关闭演示模式
   pay:
-    pay-notify-url: http://niubi.natapp1.cc/api/pay/order/notify
-    refund-notify-url: http://niubi.natapp1.cc/api/pay/refund/notify
+    pay-notify-url: http://jg6rde.natappfree.cc/api/pay/order/notify
+    refund-notify-url: http://jg6rde.natappfree.cc/api/pay/refund/notify
+    pay-return-url: http://jg6rde.natappfree.cc/api/pay/order/return
 
 justauth:
   enabled: true

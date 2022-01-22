@@ -183,6 +183,7 @@ yudao:
       - ${management.endpoints.web.base-path}/** # 不处理 Actuator 的请求
   pay:
     pay-notify-url: http://niubi.natapp1.cc/api/pay/order/notify
+    pay-return-url: http://niubi.natapp1.cc/api/pay/order/return
     refund-notify-url: http://niubi.natapp1.cc/api/pay/refund/notify
   demo: false # 关闭演示模式
 

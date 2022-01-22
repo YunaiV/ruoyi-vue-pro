@@ -46,6 +46,10 @@ public class PayChannelDO extends BaseDO {
      * 渠道费率，单位：百分比
      */
     private Double feeRate;
+    /**
+     * 备注
+     */
+    private String remark;
 
     /**
      * 商户编号

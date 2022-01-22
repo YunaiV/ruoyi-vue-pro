@@ -11,7 +11,7 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
-public enum PayOrderRefundStatusEnum implements IntArrayValuable {
+public enum PayRefundTypeEnum implements IntArrayValuable {
 
     NO(0, "未退款"),
     SOME(10, "部分退款"),

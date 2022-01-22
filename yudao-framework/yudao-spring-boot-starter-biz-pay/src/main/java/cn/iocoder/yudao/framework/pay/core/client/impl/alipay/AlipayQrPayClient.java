@@ -1,18 +1,12 @@
 package cn.iocoder.yudao.framework.pay.core.client.impl.alipay;
 
-import cn.hutool.core.bean.BeanUtil;
 import cn.iocoder.yudao.framework.pay.core.client.PayCommonResult;
-import cn.iocoder.yudao.framework.pay.core.client.dto.PayOrderNotifyRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.PayOrderUnifiedReqDTO;
-import cn.iocoder.yudao.framework.pay.core.client.impl.AbstractPayClient;
 import cn.iocoder.yudao.framework.pay.core.enums.PayChannelEnum;
 import com.alipay.api.AlipayApiException;
-import com.alipay.api.AlipayConfig;
-import com.alipay.api.DefaultAlipayClient;
 import com.alipay.api.domain.AlipayTradePrecreateModel;
 import com.alipay.api.request.AlipayTradePrecreateRequest;
 import com.alipay.api.response.AlipayTradePrecreateResponse;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString;
@@ -24,21 +18,10 @@ import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString
  * @author 芋道源码
  */
 @Slf4j
-public class AlipayQrPayClient extends AbstractPayClient<AlipayPayClientConfig> {
-
-    private DefaultAlipayClient client;
+public class AlipayQrPayClient extends AbstractAlipayClient {
 
     public AlipayQrPayClient(Long channelId, AlipayPayClientConfig config) {
         super(channelId, PayChannelEnum.ALIPAY_QR.getCode(), config, new AlipayPayCodeMapping());
-    }
-
-    @Override
-    @SneakyThrows
-    protected void doInit() {
-        AlipayConfig alipayConfig = new AlipayConfig();
-        BeanUtil.copyProperties(config, alipayConfig, false);
-        // 真实客户端
-        this.client = new DefaultAlipayClient(alipayConfig);
     }
 
     @Override
@@ -53,7 +36,8 @@ public class AlipayQrPayClient extends AbstractPayClient<AlipayPayClientConfig> 
         // 构建 AlipayTradePrecreateRequest
         AlipayTradePrecreateRequest request = new AlipayTradePrecreateRequest();
         request.setBizModel(model);
-
+        request.setNotifyUrl(reqDTO.getNotifyUrl());
+        request.setReturnUrl(reqDTO.getReturnUrl());
         // 执行请求
         AlipayTradePrecreateResponse response;
         try {
@@ -64,11 +48,5 @@ public class AlipayQrPayClient extends AbstractPayClient<AlipayPayClientConfig> 
         }
         // TODO 芋艿：sub Code 需要测试下各种失败的情况
         return PayCommonResult.build(response.getCode(), response.getMsg(), response, codeMapping);
-    }
-
-    @Override
-    public PayOrderNotifyRespDTO parseOrderNotify(String data) throws Exception {
-        // TODO 芋艿：待完成
-        return null;
     }
 }

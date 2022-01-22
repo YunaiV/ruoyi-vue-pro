@@ -1,9 +1,9 @@
 package cn.iocoder.yudao.coreservice.modules.pay.service.order;
 
 import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.order.PayOrderDO;
-import cn.iocoder.yudao.coreservice.modules.pay.service.order.dto.PayOrderCreateReqDTO;
-import cn.iocoder.yudao.coreservice.modules.pay.service.order.dto.PayOrderSubmitReqDTO;
-import cn.iocoder.yudao.coreservice.modules.pay.service.order.dto.PayOrderSubmitRespDTO;
+
+import cn.iocoder.yudao.coreservice.modules.pay.service.order.dto.*;
+import cn.iocoder.yudao.framework.pay.core.client.dto.PayNotifyDataDTO;
 
 import javax.validation.Valid;
 
@@ -43,9 +43,8 @@ public interface PayOrderCoreService {
     * 通知支付单成功
     *
     * @param channelId 渠道编号
-    * @param channelCode 渠道编码
     * @param notifyData 通知数据
     */
-   void notifyPayOrder(Long channelId, String channelCode, String notifyData) throws Exception;
+   void notifyPayOrder(Long channelId,  PayNotifyDataDTO notifyData) throws Exception;
 
 }

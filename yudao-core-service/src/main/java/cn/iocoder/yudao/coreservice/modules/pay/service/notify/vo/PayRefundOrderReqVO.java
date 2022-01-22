@@ -17,12 +17,15 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 public class PayRefundOrderReqVO {
 
-    @ApiModelProperty(value = "商户订单编号", required = true, example = "10")
-    @NotEmpty(message = "商户订单号不能为空")
+    @ApiModelProperty(value = "商户退款单编号", required = true, example = "10")
+    @NotEmpty(message = "商户退款单编号不能为空")
     private String merchantOrderId;
 
     @ApiModelProperty(value = "支付退款编号", required = true, example = "20")
     @NotNull(message = "支付退款编号不能为空")
     private Long payRefundId;
+
+    @ApiModelProperty(value = "退款状态(成功，失败)", required = true, example = "10")
+    private Integer status;
 
 }

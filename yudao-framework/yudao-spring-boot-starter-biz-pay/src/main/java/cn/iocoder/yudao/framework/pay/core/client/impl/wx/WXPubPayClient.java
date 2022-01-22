@@ -8,8 +8,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.io.FileUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.pay.core.client.PayCommonResult;
-import cn.iocoder.yudao.framework.pay.core.client.dto.PayOrderNotifyRespDTO;
-import cn.iocoder.yudao.framework.pay.core.client.dto.PayOrderUnifiedReqDTO;
+import cn.iocoder.yudao.framework.pay.core.client.dto.*;
 import cn.iocoder.yudao.framework.pay.core.client.impl.AbstractPayClient;
 import cn.iocoder.yudao.framework.pay.core.enums.PayChannelEnum;
 import com.github.binarywang.wxpay.bean.notify.WxPayOrderNotifyResult;
@@ -91,6 +90,7 @@ public class WXPubPayClient extends AbstractPayClient<WXPayClientConfig> {
         return PayCommonResult.build(CODE_SUCCESS, MESSAGE_SUCCESS, response, codeMapping);
     }
 
+
     private WxPayMpOrderResult unifiedOrderV2(PayOrderUnifiedReqDTO reqDTO) throws WxPayException {
         // 构建 WxPayUnifiedOrderRequest 对象
         WxPayUnifiedOrderRequest request = WxPayUnifiedOrderRequest.newBuilder()
@@ -131,14 +131,27 @@ public class WXPubPayClient extends AbstractPayClient<WXPayClientConfig> {
     }
 
     @Override
-    public PayOrderNotifyRespDTO parseOrderNotify(String data) throws WxPayException {
-        WxPayOrderNotifyResult notifyResult = client.parseOrderNotifyResult(data);
+    public PayOrderNotifyRespDTO parseOrderNotify(PayNotifyDataDTO data) throws WxPayException {
+        WxPayOrderNotifyResult notifyResult = client.parseOrderNotifyResult(data.getBody());
         Assert.isTrue(Objects.equals(notifyResult.getResultCode(), "SUCCESS"), "支付结果非 SUCCESS");
         // 转换结果
         return PayOrderNotifyRespDTO.builder().orderExtensionNo(notifyResult.getOutTradeNo())
                 .channelOrderNo(notifyResult.getTransactionId()).channelUserId(notifyResult.getOpenid())
                 .successTime(DateUtil.parse(notifyResult.getTimeEnd(), "yyyyMMddHHmmss"))
-                .data(data).build();
+                .data(data.getBody()).build();
+    }
+
+    @Override
+    public PayRefundNotifyDTO parseRefundNotify(PayNotifyDataDTO notifyData) {
+        //TODO 需要实现
+        throw new UnsupportedOperationException("需要实现");
+    }
+
+
+    @Override
+    protected PayCommonResult<PayRefundUnifiedRespDTO> doUnifiedRefund(PayRefundUnifiedReqDTO reqDTO) throws Throwable {
+        //TODO 需要实现
+        throw new UnsupportedOperationException();
     }
 
 }
