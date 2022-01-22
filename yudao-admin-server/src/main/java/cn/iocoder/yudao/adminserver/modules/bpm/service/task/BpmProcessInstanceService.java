@@ -152,7 +152,6 @@ public interface BpmProcessInstanceService {
      * 更新 ProcessInstance 拓展记录为完成
      *
      * @param instance 流程任务
-     * @param reason 原因
      */
     void updateProcessInstanceExtComplete(org.activiti.api.process.model.ProcessInstance instance);
 

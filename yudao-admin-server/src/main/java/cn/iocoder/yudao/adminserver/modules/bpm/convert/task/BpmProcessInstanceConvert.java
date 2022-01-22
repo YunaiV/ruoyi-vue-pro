@@ -5,6 +5,7 @@ import cn.iocoder.yudao.adminserver.modules.bpm.controller.task.vo.instance.BpmP
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.task.vo.task.BpmTaskRespVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.definition.BpmProcessDefinitionExtDO;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.task.BpmProcessInstanceExtDO;
+import cn.iocoder.yudao.adminserver.modules.bpm.framework.activiti.core.event.BpmProcessInstanceResultEvent;
 import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.dept.SysDeptDO;
 import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.user.SysUserDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -97,5 +98,23 @@ public interface BpmProcessInstanceConvert {
     @Mapping(source = "from.id", target = "to.id", ignore = true)
     void copyTo(BpmProcessDefinitionExtDO from, @MappingTarget BpmProcessInstanceRespVO.ProcessDefinition to);
     BpmProcessInstanceRespVO.User convert2(SysUserDO bean);
+
+    default BpmProcessInstanceResultEvent convert(Object source, ProcessInstance instance, Integer result) {
+        BpmProcessInstanceResultEvent event = new BpmProcessInstanceResultEvent(source);
+        event.setId(instance.getId());
+        event.setProcessDefinitionKey(instance.getProcessDefinitionKey());
+        event.setBusinessKey(instance.getBusinessKey());
+        event.setResult(result);
+        return event;
+    }
+
+    default BpmProcessInstanceResultEvent convert(Object source, HistoricProcessInstance instance, Integer result) {
+        BpmProcessInstanceResultEvent event = new BpmProcessInstanceResultEvent(source);
+        event.setId(instance.getId());
+        event.setProcessDefinitionKey(instance.getProcessDefinitionKey());
+        event.setBusinessKey(instance.getBusinessKey());
+        event.setResult(result);
+        return event;
+    }
 
 }

@@ -25,6 +25,14 @@ public interface BpmOALeaveService {
     Long createLeave(Long userId, @Valid BpmOALeaveCreateReqVO createReqVO);
 
     /**
+     * 更新请假申请的状态
+     *
+     * @param id 编号
+     * @param result 结果
+     */
+    void updateLeaveResult(Long id, Integer result);
+
+    /**
      * 删除请假申请
      *
      * @param id 编号

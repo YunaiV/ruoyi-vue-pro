@@ -2,6 +2,7 @@ package cn.iocoder.yudao.adminserver.modules.bpm.framework.activiti.config;
 
 import cn.iocoder.yudao.adminserver.modules.bpm.framework.activiti.core.behavior.BpmActivityBehaviorFactory;
 import cn.iocoder.yudao.adminserver.modules.bpm.framework.activiti.core.behavior.script.BpmTaskAssignScript;
+import cn.iocoder.yudao.adminserver.modules.bpm.framework.activiti.core.event.BpmProcessInstanceResultEventPublisher;
 import cn.iocoder.yudao.adminserver.modules.bpm.framework.activiti.core.identity.EmptyUserGroupManager;
 import cn.iocoder.yudao.adminserver.modules.bpm.framework.activiti.core.listener.BpmTackActivitiEventListener;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmTaskAssignRuleService;
@@ -11,6 +12,7 @@ import cn.iocoder.yudao.adminserver.modules.system.service.permission.SysPermiss
 import cn.iocoder.yudao.adminserver.modules.system.service.user.SysUserService;
 import org.activiti.api.runtime.shared.identity.UserGroupManager;
 import org.activiti.spring.boot.ProcessEngineConfigurationConfigurer;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -69,6 +71,11 @@ public class BpmActivitiConfiguration {
         bpmActivityBehaviorFactory.setUserService(userService);
         bpmActivityBehaviorFactory.setScripts(scripts);
         return bpmActivityBehaviorFactory;
+    }
+
+    @Bean
+    public BpmProcessInstanceResultEventPublisher processInstanceResultEventPublisher(ApplicationEventPublisher publisher) {
+        return new BpmProcessInstanceResultEventPublisher(publisher);
     }
 
 }

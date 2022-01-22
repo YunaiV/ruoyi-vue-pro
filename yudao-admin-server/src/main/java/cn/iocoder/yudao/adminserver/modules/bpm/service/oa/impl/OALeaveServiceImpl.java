@@ -34,7 +34,7 @@ public class OALeaveServiceImpl implements BpmOALeaveService {
     /**
      * OA 请假对应的流程定义 KEY
      */
-    private static final String PROCESS_KEY = "oa_leave";
+    public static final String PROCESS_KEY = "oa_leave";
 
     @Resource
     private BpmOALeaveMapper leaveMapper;
@@ -45,14 +45,8 @@ public class OALeaveServiceImpl implements BpmOALeaveService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Long createLeave(Long userId, BpmOALeaveCreateReqVO createReqVO) {
-        // TODO 芋道源码
-        // 校验是否超过请假天数的上限；
-        long day = DateUtil.betweenDay(createReqVO.getStartTime(), createReqVO.getEndTime(), false);
-        if (day <= 0) {
-            throw ServiceExceptionUtil.exception(OA_DAY_LEAVE_ERROR);
-        }
-
         // 插入 OA 请假单
+        long day = DateUtil.betweenDay(createReqVO.getStartTime(), createReqVO.getEndTime(), false);
         OALeaveDO leave = OALeaveConvert.INSTANCE.convert(createReqVO).setUserId(userId).setDay(day)
                 .setResult(BpmProcessInstanceResultEnum.PROCESS.getResult());
         leaveMapper.insert(leave);
@@ -67,6 +61,11 @@ public class OALeaveServiceImpl implements BpmOALeaveService {
         // 将工作流的编号，更新到 OA 请假单中
         leaveMapper.updateById(new OALeaveDO().setId(leave.getId()).setProcessInstanceId(processInstanceId));
         return leave.getId();
+    }
+
+    @Override
+    public void updateLeaveResult(Long id, Integer result) {
+        leaveMapper.updateById(new OALeaveDO().setId(id).setResult(result));
     }
 
     @Override
