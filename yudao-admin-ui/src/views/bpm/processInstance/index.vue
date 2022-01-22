@@ -192,7 +192,7 @@ export default {
     /** 取消按钮操作 */
     handleCancel(row) {
       const id = row.id;
-      this.$prompt('请输出取消原因？', "取消流程", {
+      this.$prompt('请输入取消原因？', "取消流程", {
         type: 'warning',
         confirmButtonText: "确定",
         cancelButtonText: "取消",

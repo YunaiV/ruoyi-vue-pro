@@ -22,7 +22,7 @@ import org.activiti.engine.runtime.ProcessInstance;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class OALeaveDO extends BaseDO {
+public class BpmOALeaveDO extends BaseDO {
 
     /**
      * 请假表单主键

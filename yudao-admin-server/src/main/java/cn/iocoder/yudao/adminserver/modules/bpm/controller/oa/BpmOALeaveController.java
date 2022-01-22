@@ -1,10 +1,10 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.controller.oa;
 
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.oa.vo.BpmOALeaveCreateReqVO;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.oa.vo.OALeavePageReqVO;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.oa.vo.OALeaveRespVO;
-import cn.iocoder.yudao.adminserver.modules.bpm.convert.oa.OALeaveConvert;
-import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.leave.OALeaveDO;
+import cn.iocoder.yudao.adminserver.modules.bpm.controller.oa.vo.BpmOALeavePageReqVO;
+import cn.iocoder.yudao.adminserver.modules.bpm.controller.oa.vo.BpmOALeaveRespVO;
+import cn.iocoder.yudao.adminserver.modules.bpm.convert.oa.BpmOALeaveConvert;
+import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.leave.BpmOALeaveDO;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.oa.BpmOALeaveService;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -43,27 +43,19 @@ public class BpmOALeaveController {
         return success(leaveService.createLeave(getLoginUserId(), createReqVO));
     }
 
-    @DeleteMapping("/cancel")
-    @ApiOperation("取消请假申请")
-    @ApiImplicitParam(name = "id", value = "编号", required = true, dataTypeClass = Long.class)
-    public CommonResult<Boolean> cancelLeave(@RequestParam("id") Long id) {
-        leaveService.cancelLeave(id);
-        return success(true);
-    }
-
     @GetMapping("/get")
     @ApiOperation("获得请假申请")
     @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
-    public CommonResult<OALeaveRespVO> getLeave(@RequestParam("id") Long id) {
-        OALeaveDO leave = leaveService.getLeave(id);
-        return success(OALeaveConvert.INSTANCE.convert(leave));
+    public CommonResult<BpmOALeaveRespVO> getLeave(@RequestParam("id") Long id) {
+        BpmOALeaveDO leave = leaveService.getLeave(id);
+        return success(BpmOALeaveConvert.INSTANCE.convert(leave));
     }
 
     @GetMapping("/page")
     @ApiOperation("获得请假申请分页")
-    public CommonResult<PageResult<OALeaveRespVO>> getLeavePage(@Valid OALeavePageReqVO pageVO) {
-        PageResult<OALeaveDO> pageResult = leaveService.getLeavePage(getLoginUserId(), pageVO);
-        return success(OALeaveConvert.INSTANCE.convertPage(pageResult));
+    public CommonResult<PageResult<BpmOALeaveRespVO>> getLeavePage(@Valid BpmOALeavePageReqVO pageVO) {
+        PageResult<BpmOALeaveDO> pageResult = leaveService.getLeavePage(getLoginUserId(), pageVO);
+        return success(BpmOALeaveConvert.INSTANCE.convertPage(pageResult));
     }
 
 }

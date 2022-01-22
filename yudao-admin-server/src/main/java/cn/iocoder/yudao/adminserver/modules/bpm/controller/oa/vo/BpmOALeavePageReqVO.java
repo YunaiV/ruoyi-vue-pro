@@ -12,7 +12,7 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class OALeavePageReqVO extends PageParam {
+public class BpmOALeavePageReqVO extends PageParam {
 
     @ApiModelProperty(value = "状态", example = "1", notes = "参见 bpm_process_instance_result 枚举")
     private Integer result;

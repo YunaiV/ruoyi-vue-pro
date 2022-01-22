@@ -2,14 +2,13 @@ package cn.iocoder.yudao.adminserver.modules.bpm.service.oa.impl;
 
 import cn.hutool.core.date.DateUtil;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.oa.vo.*;
-import cn.iocoder.yudao.adminserver.modules.bpm.convert.oa.OALeaveConvert;
-import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.leave.OALeaveDO;
+import cn.iocoder.yudao.adminserver.modules.bpm.convert.oa.BpmOALeaveConvert;
+import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.leave.BpmOALeaveDO;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.mysql.oa.BpmOALeaveMapper;
 import cn.iocoder.yudao.adminserver.modules.bpm.enums.task.BpmProcessInstanceResultEnum;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.oa.BpmOALeaveService;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.task.BpmProcessInstanceService;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.task.dto.BpmProcessInstanceCreateReqDTO;
-import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,7 +28,7 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
  */
 @Service
 @Validated
-public class OALeaveServiceImpl implements BpmOALeaveService {
+public class BpmOALeaveServiceImpl implements BpmOALeaveService {
 
     /**
      * OA 请假对应的流程定义 KEY
@@ -47,7 +46,7 @@ public class OALeaveServiceImpl implements BpmOALeaveService {
     public Long createLeave(Long userId, BpmOALeaveCreateReqVO createReqVO) {
         // 插入 OA 请假单
         long day = DateUtil.betweenDay(createReqVO.getStartTime(), createReqVO.getEndTime(), false);
-        OALeaveDO leave = OALeaveConvert.INSTANCE.convert(createReqVO).setUserId(userId).setDay(day)
+        BpmOALeaveDO leave = BpmOALeaveConvert.INSTANCE.convert(createReqVO).setUserId(userId).setDay(day)
                 .setResult(BpmProcessInstanceResultEnum.PROCESS.getResult());
         leaveMapper.insert(leave);
 
@@ -59,22 +58,13 @@ public class OALeaveServiceImpl implements BpmOALeaveService {
                         .setVariables(processInstanceVariables).setBusinessKey(String.valueOf(leave.getId())));
 
         // 将工作流的编号，更新到 OA 请假单中
-        leaveMapper.updateById(new OALeaveDO().setId(leave.getId()).setProcessInstanceId(processInstanceId));
+        leaveMapper.updateById(new BpmOALeaveDO().setId(leave.getId()).setProcessInstanceId(processInstanceId));
         return leave.getId();
     }
 
     @Override
     public void updateLeaveResult(Long id, Integer result) {
-        leaveMapper.updateById(new OALeaveDO().setId(id).setResult(result));
-    }
-
-    @Override
-    public void cancelLeave(Long id) {
-        // TODO 需要重新实现
-        // 校验存在
-        this.validateLeaveExists(id);
-        // 删除
-        leaveMapper.deleteById(id);
+        leaveMapper.updateById(new BpmOALeaveDO().setId(id).setResult(result));
     }
 
     private void validateLeaveExists(Long id) {
@@ -84,12 +74,12 @@ public class OALeaveServiceImpl implements BpmOALeaveService {
     }
 
     @Override
-    public OALeaveDO getLeave(Long id) {
+    public BpmOALeaveDO getLeave(Long id) {
         return leaveMapper.selectById(id);
     }
 
     @Override
-    public PageResult<OALeaveDO> getLeavePage(Long userId, OALeavePageReqVO pageReqVO) {
+    public PageResult<BpmOALeaveDO> getLeavePage(Long userId, BpmOALeavePageReqVO pageReqVO) {
         return leaveMapper.selectPage(userId, pageReqVO);
     }
 

@@ -13,7 +13,7 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class OALeaveRespVO extends BpmOALeaveBaseVO {
+public class BpmOALeaveRespVO extends BpmOALeaveBaseVO {
 
     @ApiModelProperty(value = "请假表单主键", required = true, example = "1024")
     private Long id;

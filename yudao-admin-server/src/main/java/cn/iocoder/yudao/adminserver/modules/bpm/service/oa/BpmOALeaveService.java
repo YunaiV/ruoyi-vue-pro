@@ -2,7 +2,7 @@ package cn.iocoder.yudao.adminserver.modules.bpm.service.oa;
 
 
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.oa.vo.*;
-import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.leave.OALeaveDO;
+import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.leave.BpmOALeaveDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 
 import javax.validation.Valid;
@@ -33,19 +33,12 @@ public interface BpmOALeaveService {
     void updateLeaveResult(Long id, Integer result);
 
     /**
-     * 删除请假申请
-     *
-     * @param id 编号
-     */
-    void cancelLeave(Long id);
-
-    /**
      * 获得请假申请
      *
      * @param id 编号
      * @return 请假申请
      */
-    OALeaveDO getLeave(Long id);
+    BpmOALeaveDO getLeave(Long id);
 
     /**
      * 获得请假申请分页
@@ -54,6 +47,6 @@ public interface BpmOALeaveService {
      * @param pageReqVO 分页查询
      * @return 请假申请分页
      */
-    PageResult<OALeaveDO> getLeavePage(Long userId, OALeavePageReqVO pageReqVO);
+    PageResult<BpmOALeaveDO> getLeavePage(Long userId, BpmOALeavePageReqVO pageReqVO);
 
 }

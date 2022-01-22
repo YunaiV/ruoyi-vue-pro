@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.dal.mysql.oa;
 
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.oa.vo.OALeavePageReqVO;
-import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.leave.OALeaveDO;
+import cn.iocoder.yudao.adminserver.modules.bpm.controller.oa.vo.BpmOALeavePageReqVO;
+import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.leave.BpmOALeaveDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
@@ -14,16 +14,16 @@ import org.apache.ibatis.annotations.Mapper;
  * @author 芋道源码
  */
 @Mapper
-public interface BpmOALeaveMapper extends BaseMapperX<OALeaveDO> {
+public interface BpmOALeaveMapper extends BaseMapperX<BpmOALeaveDO> {
 
-    default PageResult<OALeaveDO> selectPage(Long userId, OALeavePageReqVO reqVO) {
-        return selectPage(reqVO, new LambdaQueryWrapperX<OALeaveDO>()
-                .eqIfPresent(OALeaveDO::getUserId, userId)
-                .eqIfPresent(OALeaveDO::getResult, reqVO.getResult())
-                .eqIfPresent(OALeaveDO::getType, reqVO.getType())
-                .likeIfPresent(OALeaveDO::getReason, reqVO.getReason())
-                .betweenIfPresent(OALeaveDO::getCreateTime, reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
-                .orderByDesc(OALeaveDO::getId));
+    default PageResult<BpmOALeaveDO> selectPage(Long userId, BpmOALeavePageReqVO reqVO) {
+        return selectPage(reqVO, new LambdaQueryWrapperX<BpmOALeaveDO>()
+                .eqIfPresent(BpmOALeaveDO::getUserId, userId)
+                .eqIfPresent(BpmOALeaveDO::getResult, reqVO.getResult())
+                .eqIfPresent(BpmOALeaveDO::getType, reqVO.getType())
+                .likeIfPresent(BpmOALeaveDO::getReason, reqVO.getReason())
+                .betweenIfPresent(BpmOALeaveDO::getCreateTime, reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
+                .orderByDesc(BpmOALeaveDO::getId));
     }
 
 }

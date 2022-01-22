@@ -26,8 +26,9 @@
 </template>
 
 <script>
-import { createLeave} from "@/api/oa/leave"
+import { createLeave}  from "@/api/bpm/leave"
 import { getDictDatas, DICT_TYPE } from '@/utils/dict'
+
 export default {
   name: "LeaveCreate",
   components: {

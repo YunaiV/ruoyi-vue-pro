@@ -255,7 +255,8 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         }
 
         // 需要主动查询，因为 instance 只有 id 属性
-        ProcessInstance processInstance = getProcessInstance(instance.getId());
+        // 另外，此时如果去查询 ProcessInstance 的话，字段是不全的，所以去查询了 HistoricProcessInstance
+        HistoricProcessInstance processInstance = getHistoricProcessInstance(instance.getId());
         // 更新拓展表
         BpmProcessInstanceExtDO instanceExtDO = BpmProcessInstanceConvert.INSTANCE.convert(instance)
                 .setEndTime(new Date()) // 由于 ProcessInstance 里没有办法拿到 endTime，所以这里设置

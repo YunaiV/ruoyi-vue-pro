@@ -3,7 +3,7 @@ package cn.iocoder.yudao.adminserver.modules.bpm.service.oa.listener;
 import cn.iocoder.yudao.adminserver.modules.bpm.framework.activiti.core.event.BpmProcessInstanceResultEvent;
 import cn.iocoder.yudao.adminserver.modules.bpm.framework.activiti.core.event.BpmProcessInstanceResultEventListener;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.oa.BpmOALeaveService;
-import cn.iocoder.yudao.adminserver.modules.bpm.service.oa.impl.OALeaveServiceImpl;
+import cn.iocoder.yudao.adminserver.modules.bpm.service.oa.impl.BpmOALeaveServiceImpl;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -21,7 +21,7 @@ public class BpmOALeaveResultListener extends BpmProcessInstanceResultEventListe
 
     @Override
     protected String getProcessDefinitionKey() {
-        return OALeaveServiceImpl.PROCESS_KEY;
+        return BpmOALeaveServiceImpl.PROCESS_KEY;
     }
 
     @Override

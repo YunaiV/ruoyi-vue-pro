@@ -56,8 +56,10 @@
           <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="200">
         <template slot-scope="scope">
+          <el-button size="mini" type="text" icon="el-icon-delete" @click="handleCancel(scope.row)"
+                     v-if="scope.row.result === 1">取消请假</el-button>
           <el-button size="mini" type="text" icon="el-icon-view" @click="handleDetail(scope.row)">详情</el-button>
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleProcessDetail(scope.row)">审批进度</el-button>
         </template>
@@ -71,8 +73,9 @@
 </template>
 
 <script>
-import { createLeave, getLeaveApplyMembers, getLeave, getLeavePage} from "@/api/oa/leave"
+import { getLeavePage } from "@/api/bpm/leave"
 import { getDictDataLabel, getDictDatas, DICT_TYPE } from '@/utils/dict'
+import {cancelProcessInstance} from "@/api/bpm/processInstance";
 
 export default {
   name: "Leave",
@@ -88,20 +91,14 @@ export default {
       total: 0,
       // 请假申请列表
       list: [],
-      // 弹出层标题
-      title: "",
-      // 是否显示弹出层
-      open: false,
       //审批进度弹出层
       dateRangeCreateTime: [],
       // 查询参数
       queryParams: {
         pageNo: 1,
         pageSize: 10,
-        processInstanceId: null,
-        status: null,
-        userId: null,
-        leaveType: null,
+        result: null,
+        type: null,
         reason: null,
       },
 
@@ -148,6 +145,22 @@ export default {
     /** 查看审批进度的操作 */
     handleProcessDetail(row) {
       this.$router.push({ path: "/bpm/process-instance/detail", query: { id: row.processInstanceId}});
+    },
+    /** 取消请假 */
+    handleCancel(row) {
+      const id = row.processInstanceId;
+      this.$prompt('请输入取消原因？', "取消流程", {
+        type: 'warning',
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        inputPattern: /^[\s\S]*.*[^\s][\s\S]*$/, // 判断非空，且非空格
+        inputErrorMessage: "取消原因不能为空",
+      }).then(({ value }) => {
+        return cancelProcessInstance(id, value);
+      }).then(() => {
+        this.getList();
+        this.msgSuccess("取消成功");
+      })
     },
     resultFormat(row, column) {
       return getDictDataLabel(DICT_TYPE.BPM_PROCESS_INSTANCE_RESULT, row.result)

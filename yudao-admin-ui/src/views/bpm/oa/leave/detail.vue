@@ -11,7 +11,7 @@
 </template>
 
 <script>
-import { getLeave} from "@/api/oa/leave"
+import { getLeave}  from "@/api/bpm/leave"
 import {getDictDatas, DICT_TYPE, getDictDataLabel} from '@/utils/dict'
 export default {
   name: "LeaveDetail",
