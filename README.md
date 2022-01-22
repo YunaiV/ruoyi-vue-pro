@@ -167,10 +167,10 @@
 | 模块 | biu |  biu | biu |
 | --- | --- | --- | --- |
 | 流程模型 | ![流程模型-列表](https://static.iocoder.cn/images/ruoyi-vue-pro/流程模型-列表.jpg) | ![流程模型-设计](https://static.iocoder.cn/images/ruoyi-vue-pro/流程模型-设计.jpg) | ![流程模型-定义](https://static.iocoder.cn/images/ruoyi-vue-pro/流程模型-定义.jpg) |
-| 表单 & 分组 | ![流程表单](https://static.iocoder.cn/images/ruoyi-vue-pro/流程表单.jpg) | ![流程分组](https://static.iocoder.cn/images/ruoyi-vue-pro/流程分组.jpg) | - |
+| 表单 & 分组 | ![流程表单](https://static.iocoder.cn/images/ruoyi-vue-pro/流程表单.jpg) | ![用户分组](https://static.iocoder.cn/images/ruoyi-vue-pro/用户分组.jpg) | - |
 | 我的流程 | ![我的流程-列表](https://static.iocoder.cn/images/ruoyi-vue-pro/我的流程-列表.jpg) | ![我的流程-发起](https://static.iocoder.cn/images/ruoyi-vue-pro/我的流程-发起.jpg) | ![我的流程-详情](https://static.iocoder.cn/images/ruoyi-vue-pro/我的流程-详情.jpg) |
 | 待办 & 已办 | ![任务列表-审批](https://static.iocoder.cn/images/ruoyi-vue-pro/任务列表-审批.jpg) | ![任务列表-待办](https://static.iocoder.cn/images/ruoyi-vue-pro/任务列表-待办.jpg) | ![任务列表-已办](https://static.iocoder.cn/images/ruoyi-vue-pro/任务列表-已办.jpg) |
-| OA 请假 | ![OA审批-列表](https://static.iocoder.cn/images/ruoyi-vue-pro/OA审批-列表.jpg) | ![OA审批-发起](https://static.iocoder.cn/images/ruoyi-vue-pro/OA审批-发起.jpg) | ![OA审批-详情](https://static.iocoder.cn/images/ruoyi-vue-pro/OA审批-详情.jpg) |
+| OA 请假 | ![OA请假-列表](https://static.iocoder.cn/images/ruoyi-vue-pro/OA请假-列表.jpg) | ![OA请假-发起](https://static.iocoder.cn/images/ruoyi-vue-pro/OA请假-发起.jpg) | ![OA请假-详情](https://static.iocoder.cn/images/ruoyi-vue-pro/OA请假-详情.jpg) |
 
 ### 基础设施
 
