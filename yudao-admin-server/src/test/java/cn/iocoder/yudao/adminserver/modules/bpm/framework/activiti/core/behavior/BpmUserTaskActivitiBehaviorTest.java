@@ -31,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
-class BpmUserTaskActivitiBehaviorTest extends BaseMockitoUnitTest {
+public class BpmUserTaskActivitiBehaviorTest extends BaseMockitoUnitTest {
 
     @InjectMocks
     private BpmUserTaskActivitiBehavior behavior;
