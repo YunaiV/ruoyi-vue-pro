@@ -154,12 +154,32 @@ export default {
             }
           });
         } else if (n.$type === 'bpmn:ExclusiveGateway') { // 排它网关
+          if (!activity) {
+            return
+          }
+          // 设置【bpmn:ExclusiveGateway】排它网关的高亮
+          canvas.addMarker(n.id, this.getActivityHighlightCss(activity));
+          // 查找需要高亮的连线
+          let matchNN = undefined;
+          let matchActivity = undefined;
           n.outgoing?.forEach(nn => {
-            let targetTask = activityList.find(m => m.key === nn.targetRef.id);
-            if (targetTask) {
-              canvas.addMarker(nn.id, targetTask.endTime ? 'highlight' : 'highlight-todo');
+            let targetActivity = activityList.find(m => m.key === nn.targetRef.id);
+            if (!targetActivity) {
+              return;
+            }
+            // 特殊判断 endEvent 类型的原因，ExclusiveGateway 可能后续连有 2 个路径：
+            //  1. 一个是 UserTask => EndEvent
+            //  2. 一个是 EndEvent
+            // 在选择路径 1 时，其实 EndEvent 可能也存在，导致 1 和 2 都高亮，显然是不正确的。
+            // 所以，在 matchActivity 为 EndEvent 时，需要进行覆盖~~
+            if (!matchActivity || matchActivity.type === 'endEvent') {
+              matchNN = nn;
+              matchActivity = targetActivity;
             }
           })
+          if (matchNN && matchActivity) {
+            canvas.addMarker(matchNN.id, this.getActivityHighlightCss(matchActivity));
+          }
         } else if (n.$type === 'bpmn:ParallelGateway') { // 并行网关
           if (!activity) {
             return
