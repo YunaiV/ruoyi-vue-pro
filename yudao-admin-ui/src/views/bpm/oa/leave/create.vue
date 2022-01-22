@@ -41,7 +41,7 @@
 import { createFormKeyLeave} from "@/api/oa/leave"
 import { getDictDataLabel, getDictDatas, DICT_TYPE } from '@/utils/dict'
 export default {
-  name: "ApplyLeave",
+  name: "LeaveCreate",
   components: {
   },
   data() {
@@ -65,7 +65,7 @@ export default {
       statusFormat(row, column) {
         return getDictDataLabel(DICT_TYPE.OA_LEAVE_STATUS, row.status)
       },
-      leaveTypeDictData: getDictDatas(DICT_TYPE.OA_LEAVE_TYPE),
+      leaveTypeDictData: getDictDatas(DICT_TYPE.BPM_OA_LEAVE_TYPE),
       leaveStatusData: getDictDatas(DICT_TYPE.OA_LEAVE_STATUS)
     };
   },

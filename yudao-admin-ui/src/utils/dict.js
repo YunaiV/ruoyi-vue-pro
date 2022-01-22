@@ -42,7 +42,7 @@ export const DICT_TYPE = {
   BPM_PROCESS_INSTANCE_RESULT: 'bpm_process_instance_result',
   BPM_TASK_ASSIGN_SCRIPT: 'bpm_task_assign_script',
   OA_LEAVE_STATUS: 'flow_status', // todo 芋艿：可以删除
-  OA_LEAVE_TYPE: 'oa_leave_type'
+  BPM_OA_LEAVE_TYPE: 'bpm_oa_leave_type'
 }
 
 /**

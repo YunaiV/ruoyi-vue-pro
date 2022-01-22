@@ -13,36 +13,21 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 * 如果子 VO 存在差异的字段，请不要添加到这里，影响 Swagger 文档生成
 */
 @Data
-public class OALeaveBaseVO {
+public class BpmOALeaveBaseVO {
 
-    @ApiModelProperty(value = "流程id")
-    private String processInstanceId;
-
-    @ApiModelProperty(value = "状态", required = true)
-    private Integer status;
-
-    @ApiModelProperty(value = "申请人id", required = true)
-    private String userId;
-
-    @ApiModelProperty(value = "开始时间", required = true)
+    @ApiModelProperty(value = "请假的开始时间", required = true)
     @NotNull(message = "开始时间不能为空")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private Date startTime;
-
-    @ApiModelProperty(value = "结束时间", required = true)
+    @ApiModelProperty(value = "请假的结束时间", required = true)
     @NotNull(message = "结束时间不能为空")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private Date endTime;
 
-    @ApiModelProperty(value = "请假类型")
-    private String leaveType;
+    @ApiModelProperty(value = "请假类型", required = true, example = "1", notes = "参见 bpm_oa_type 枚举")
+    private Integer type;
 
-    @ApiModelProperty(value = "原因")
+    @ApiModelProperty(value = "原因", required = true, example = "阅读芋道源码")
     private String reason;
-
-    @ApiModelProperty(value = "申请时间", required = true)
-    @NotNull(message = "申请时间不能为空")
-    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    private Date applyTime;
 
 }

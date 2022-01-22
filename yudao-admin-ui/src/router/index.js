@@ -130,23 +130,9 @@ export const constantRoutes = [
     children: [
       {
         path: 'leave/apply',
-        component: (resolve) => require(['@/views/oa/leave/apply/index'], resolve),
+        component: (resolve) => require(['@/views/bpm/oa/leave/create'], resolve),
         name: '请假表单-申请',
         meta: { title: '请假表单-申请', icon: 'form' }
-      }
-    ]
-  },
-  {
-    path: '/flow',
-    component: Layout,
-    hidden: true,
-    redirect: 'noredirect',
-    children: [
-      {
-        path: 'leave/approve',
-        component: (resolve) => require(['@/views/oa/leave/approve/index'], resolve),
-        name: '请假表单-审批',
-        meta: { title: '请假表单-审批', icon: 'form' }
       }
     ]
   },

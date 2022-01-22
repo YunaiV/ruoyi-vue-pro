@@ -18,7 +18,7 @@ public interface BpmOALeaveMapper extends BaseMapperX<OALeaveDO> {
 
     default PageResult<OALeaveDO> selectPage(Long userId, OALeavePageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<OALeaveDO>()
-                .eqIfPresent(OALeaveDO::getId, userId)
+                .eqIfPresent(OALeaveDO::getUserId, userId)
                 .eqIfPresent(OALeaveDO::getResult, reqVO.getResult())
                 .eqIfPresent(OALeaveDO::getType, reqVO.getType())
                 .likeIfPresent(OALeaveDO::getReason, reqVO.getReason())

@@ -9,15 +9,6 @@ export function createLeave(data) {
   })
 }
 
-// 更新请假申请
-export function updateLeave(data) {
-  return request({
-    url: '/oa/leave/update',
-    method: 'put',
-    data: data
-  })
-}
-
 // 删除请假申请
 export function deleteLeave(id) {
   return request({
@@ -37,7 +28,7 @@ export function getLeave(id) {
 // 获得请假申请分页
 export function getLeavePage(query) {
   return request({
-    url: '/oa/leave/page',
+    url: '/bpm/oa/leave/page',
     method: 'get',
     params: query
   })
@@ -55,15 +46,5 @@ export function getLeaveApplyMembers() {
   return request({
     url: '/oa/leave/getLeaveApplyMembers',
     method: 'get'
-  })
-}
-
-// 导出请假申请 Excel
-export function exportLeaveExcel(query) {
-  return request({
-    url: '/oa/leave/export-excel',
-    method: 'get',
-    params: query,
-    responseType: 'blob'
   })
 }

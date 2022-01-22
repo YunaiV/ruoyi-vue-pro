@@ -3,43 +3,23 @@
 
     <!-- 搜索工作栏 -->
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="流程id" prop="processInstanceId">
-        <el-input v-model="queryParams.processInstanceId" placeholder="请输入流程id" clearable size="small" @keyup.enter.native="handleQuery"/>
-      </el-form-item>
-      <el-form-item label="状态" prop="status">
-        <el-select v-model="queryParams.status" placeholder="请选择状态">
-          <el-option
-            v-for="dict in leaveStatusData"
-            :key="parseInt(dict.value)"
-            :label="dict.label"
-            :value="parseInt(dict.value)"
-          />
+      <el-form-item label="请假类型" prop="type">
+        <el-select v-model="queryParams.type" placeholder="请选择请假类型" clearable>
+          <el-option v-for="dict in leaveTypeDictData" :key="dict.value" :label="dict.label" :value="dict.value" />
         </el-select>
       </el-form-item>
-      <el-form-item label="开始时间">
-        <el-date-picker v-model="dateRangeStartTime" size="small" style="width: 240px" value-format="yyyy-MM-dd"
+      <el-form-item label="申请时间">
+        <el-date-picker v-model="dateRangeCreateTime" size="small" style="width: 240px" value-format="yyyy-MM-dd"
                         type="daterange" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" />
       </el-form-item>
-      <el-form-item label="结束时间">
-        <el-date-picker v-model="dateRangeEndTime" size="small" style="width: 240px" value-format="yyyy-MM-dd"
-                        type="daterange" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" />
-      </el-form-item>
-      <el-form-item label="请假类型" prop="leaveType">
-        <el-select v-model="queryParams.leaveType" placeholder="请选择请假类型">
-          <el-option
-            v-for="dict in leaveTypeDictData"
-            :key="dict.value"
-            :label="dict.label"
-            :value="dict.value"
-          />
+      <el-form-item label="结果" prop="result">
+        <el-select v-model="queryParams.result" placeholder="请选择流结果" clearable size="small">
+          <el-option v-for="dict in this.getDictDatas(DICT_TYPE.BPM_PROCESS_INSTANCE_RESULT)"
+                     :key="dict.value" :label="dict.label" :value="dict.value"/>
         </el-select>
       </el-form-item>
       <el-form-item label="原因" prop="reason">
         <el-input v-model="queryParams.reason" placeholder="请输入原因" clearable size="small" @keyup.enter.native="handleQuery"/>
-      </el-form-item>
-      <el-form-item label="申请时间">
-        <el-date-picker v-model="dateRangeApplyTime" size="small" style="width: 240px" value-format="yyyy-MM-dd"
-                        type="daterange" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" />
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
@@ -57,9 +37,8 @@
 
     <!-- 列表 -->
     <el-table v-loading="loading" :data="list">
-      <el-table-column label="请假表单主键" align="center" prop="id" />
-      <el-table-column label="状态" align="center" prop="status" :formatter="statusFormat" />
-      <el-table-column label="申请人id" align="center" prop="userId" />
+      <el-table-column label="申请编号" align="center" prop="id" />
+      <el-table-column label="状态" align="center" prop="result" :formatter="resultFormat" />
       <el-table-column label="开始时间" align="center" prop="startTime" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.startTime) }}</span>
@@ -70,17 +49,17 @@
           <span>{{ parseTime(scope.row.endTime) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="请假类型" align="center" prop="leaveType" :formatter="leaveTypeFormat" />
+      <el-table-column label="请假类型" align="center" prop="type" :formatter="typeFormat" />
       <el-table-column label="原因" align="center" prop="reason" />
       <el-table-column label="申请时间" align="center" prop="applyTime" width="180">
         <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.applyTime) }}</span>
+          <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-          <el-button size="mini" type="text" icon="el-icon-edit" @click="handleStep(scope.row)">审批进度</el-button>
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleDetail(scope.row)">详情</el-button>
+          <el-button size="mini" type="text" icon="el-icon-edit" @click="handleProcessDetail(scope.row)">审批进度</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -129,7 +108,7 @@
       <el-form-item label="开始时间" >{{ parseTime(form.startTime) }}</el-form-item>
       <el-form-item label="结束时间" prop="endTime">{{ parseTime(form.endTime) }}</el-form-item>
       <el-form-item label="请假类型" prop="leaveType">
-        {{ getDictDataLabel(DICT_TYPE.OA_LEAVE_TYPE, form.leaveType) }}
+        {{ getDictDataLabel(DICT_TYPE.BPM_OA_LEAVE_TYPE, form.leaveType) }}
       </el-form-item>
       <el-form-item label="原因" prop="reason">{{form.reason}}</el-form-item>
       <el-form-item label="申请时间" prop="applyTime">{{ parseTime(form.applyTime) }}</el-form-item>
@@ -140,27 +119,13 @@
       </div>
     </el-dialog>
 
-    <el-dialog :title="title" :visible.sync="dialogStepsVisible" width="750px" append-to-body>
-      <el-steps :active="stepActive" finish-status="success" >
-        <el-step :title="stepTitle(item)" :description="stepAssignee(item.assignee)" icon="el-icon-edit"  v-for="(item) in handleTask.historyTask"></el-step>
-      </el-steps>
-      <br/>
-      <div v-html="svgUrl"></div>
-      <el-steps direction="vertical" :active="stepActive">
-        <el-step :title="stepTitle(item)" :description="stepDes(item)" v-for="(item) in handleTask.historyTask"></el-step>
-      </el-steps>
-      <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="dialogStepsVisible = false">确 定</el-button>
-        <el-button @click="dialogStepsVisible = false">取 消</el-button>
-      </div>
-    </el-dialog>
   </div>
 </template>
 
 <script>
-import { createLeave, updateLeave, getLeaveApplyMembers, getLeave, getLeavePage, exportLeaveExcel } from "@/api/oa/leave"
+import { createLeave, getLeaveApplyMembers, getLeave, getLeavePage} from "@/api/oa/leave"
 import { getDictDataLabel, getDictDatas, DICT_TYPE } from '@/utils/dict'
-import { processHistorySteps,getHighlightImg } from '@/api/oa/todo'
+
 export default {
   name: "Leave",
   components: {
@@ -179,13 +144,8 @@ export default {
       title: "",
       // 是否显示弹出层
       open: false,
-      //进度弹出层
-      dialogDetailVisible: false,
       //审批进度弹出层
-      dialogStepsVisible: false,
-      dateRangeStartTime: [],
-      dateRangeEndTime: [],
-      dateRangeApplyTime: [],
+      dateRangeCreateTime: [],
       // 查询参数
       queryParams: {
         pageNo: 1,
@@ -198,78 +158,19 @@ export default {
       },
       // 表单参数
       form: {},
-      svgUrl: "",
-      handleTask: {
-        historyTask:[],
-        taskVariable: "",
-        formObject: {}
-      },
-      steps:[{
-        stepName:"步骤一"
-      }],
       // 表单校验
       rules: {
         startTime: [{ required: true, message: "开始时间不能为空", trigger: "blur" }],
         endTime: [{ required: true, message: "结束时间不能为空", trigger: "blur" }],
-        applyTime: [{ required: true, message: "申请时间不能为空", trigger: "blur" }],
       },
-      statusFormat(row, column) {
-        return getDictDataLabel(DICT_TYPE.OA_LEAVE_STATUS, row.status)
-      },
-      leaveTypeFormat(row, column) {
-        return getDictDataLabel(DICT_TYPE.OA_LEAVE_TYPE, row.leaveType)
-      },
-      leaveTypeDictData: getDictDatas(DICT_TYPE.OA_LEAVE_TYPE),
-      leaveStatusData: getDictDatas(DICT_TYPE.OA_LEAVE_STATUS)
+      leaveTypeDictData: getDictDatas(DICT_TYPE.BPM_OA_LEAVE_TYPE),
+      leaveResultData: getDictDatas(DICT_TYPE.BPM_PROCESS_INSTANCE_RESULT),
+
+      dialogDetailVisible: false, // TODO 芋艿：后面挪到详情页
     };
   },
   created() {
     this.getList();
-  },
-  computed: {
-    stepActive: function () {
-      let idx = 0;
-      for (let i = 0; i < this.handleTask.historyTask.length; i++) {
-        if (this.handleTask.historyTask[i].status === 1) {
-          idx = idx + 1;
-        } else {
-          break;
-        }
-      }
-      return idx;
-    },
-    stepTitle() {
-      return function (item) {
-        let name = item.stepName;
-        if (item.status === 1) {
-          name += '(已完成)'
-        }
-        if (item.status === 0) {
-          name += '(进行中)'
-        }
-        return name;
-      }
-    },
-    stepDes() {
-      return function (item) {
-        let desc = "";
-        if (item.status === 1) {
-          desc += "审批人：[" + item.assignee + "]    审批意见: [" + item.comment + "]   审批时间: " + this.parseTime(item.endTime);
-        }
-        return desc;
-      }
-    },
-    stepAssignee() {
-      return function (assignee) {
-        let desc = "";
-        if(assignee){
-          desc += "办理人：[" + assignee + "]";
-        }else{
-          desc += "办理人未签收";
-        }
-        return desc;
-      }
-    }
   },
   methods: {
     /** 查询列表 */
@@ -277,9 +178,7 @@ export default {
       this.loading = true;
       // 处理查询参数
       let params = {...this.queryParams};
-      this.addBeginAndEndTime(params, this.dateRangeStartTime, 'startTime');
-      this.addBeginAndEndTime(params, this.dateRangeEndTime, 'endTime');
-      this.addBeginAndEndTime(params, this.dateRangeApplyTime, 'applyTime');
+      this.addBeginAndEndTime(params, this.dateRangeCreateTime, 'createTime');
       // 执行查询
       getLeavePage(params).then(response => {
         this.list = response.data.list;
@@ -296,7 +195,6 @@ export default {
     reset() {
       this.form = {
         id: undefined,
-        processInstanceId: undefined,
         status: undefined,
         userId: undefined,
         startTime: undefined,
@@ -316,7 +214,7 @@ export default {
     resetQuery() {
       this.dateRangeStartTime = [];
       this.dateRangeEndTime = [];
-      this.dateRangeApplyTime = [];
+      this.dateRangeCreateTime = [];
       this.resetForm("queryForm");
       this.handleQuery();
     },
@@ -344,19 +242,14 @@ export default {
         this.title = "请假详情";
       });
     },
+    /** 查看审批进度的操作 */
+    handleProcessDetail(row) {
+      this.$router.push({ path: "/bpm/process-instance/detail", query: { id: row.processInstanceId}});
+    },
     /** 提交按钮 */
     submitForm() {
       this.$refs["form"].validate(valid => {
         if (!valid) {
-          return;
-        }
-        // 修改的提交
-        if (this.form.id != null) {
-          updateLeave(this.form).then(response => {
-            this.msgSuccess("修改成功");
-            this.open = false;
-            this.getList();
-          });
           return;
         }
         // 添加的提交
@@ -367,39 +260,12 @@ export default {
         });
       });
     },
-    /** 审批进度 */
-    handleStep(row) {
-      const that = this;
-      const id = row.processInstanceId;
-      processHistorySteps(id).then(response => {
-        this.handleTask.historyTask = response.data;
-        this.dialogStepsVisible = true
-        this.title = "审批进度";
-        getHighlightImg(row.processInstanceId).then(response => {
-          that.svgUrl = response
-        })
-      });
+    resultFormat(row, column) {
+      return getDictDataLabel(DICT_TYPE.BPM_PROCESS_INSTANCE_RESULT, row.result)
     },
-    /** 导出按钮操作 */
-    handleExport() {
-      // 处理查询参数
-      let params = {...this.queryParams};
-      params.pageNo = undefined;
-      params.pageSize = undefined;
-      this.addBeginAndEndTime(params, this.dateRangeStartTime, 'startTime');
-      this.addBeginAndEndTime(params, this.dateRangeEndTime, 'endTime');
-      this.addBeginAndEndTime(params, this.dateRangeApplyTime, 'applyTime');
-      // 执行导出
-      this.$confirm('是否确认导出所有请假申请数据项?', "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(function() {
-          return exportLeaveExcel(params);
-        }).then(response => {
-          this.downloadExcel(response, '请假申请.xls');
-        })
-    }
+    typeFormat(row, column) {
+      return getDictDataLabel(DICT_TYPE.BPM_OA_LEAVE_TYPE, row.type)
+    },
   }
 };
 </script>
