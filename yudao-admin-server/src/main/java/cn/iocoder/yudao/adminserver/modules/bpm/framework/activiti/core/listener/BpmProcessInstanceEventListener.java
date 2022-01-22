@@ -5,6 +5,7 @@ import cn.iocoder.yudao.adminserver.modules.bpm.service.task.BpmProcessInstanceS
 import org.activiti.api.model.shared.event.RuntimeEvent;
 import org.activiti.api.process.model.ProcessInstance;
 import org.activiti.api.process.model.events.ProcessRuntimeEvent;
+import org.activiti.api.process.runtime.events.ProcessCancelledEvent;
 import org.activiti.api.process.runtime.events.listener.ProcessEventListener;
 import org.activiti.api.process.runtime.events.listener.ProcessRuntimeEventListener;
 import org.activiti.api.task.model.events.TaskRuntimeEvent;
@@ -42,7 +43,8 @@ public class BpmProcessInstanceEventListener<T extends RuntimeEvent<?, ?>>
         }
         // 取消时，更新拓展表为取消
         if (event.getEventType() == ProcessRuntimeEvent.ProcessEvents.PROCESS_CANCELLED) {
-            processInstanceService.updateProcessInstanceExtCancel(event.getEntity());
+            processInstanceService.updateProcessInstanceExtCancel(event.getEntity(),
+                    ((ProcessCancelledEvent) event).getCause());
             return;
         }
         // 完成时，更新拓展表为已完成

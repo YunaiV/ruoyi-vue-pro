@@ -241,7 +241,13 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
     }
 
     @Override
-    public void updateProcessInstanceExtCancel(org.activiti.api.process.model.ProcessInstance instance) {
+    public void updateProcessInstanceExtCancel(org.activiti.api.process.model.ProcessInstance instance, String reason) {
+        // 判断是否为 Reject 不通过。如果是，则不进行更新
+        if (BpmProcessInstanceDeleteReasonEnum.isRejectReason(reason)) {
+            return;
+        }
+
+        // 更新拓展表
         BpmProcessInstanceExtDO instanceExtDO = BpmProcessInstanceConvert.INSTANCE.convert(instance)
                 .setEndTime(new Date()) // 由于 ProcessInstance 里没有办法拿到 endTime，所以这里设置
                 .setStatus(BpmProcessInstanceStatusEnum.FINISH.getStatus())
@@ -265,7 +271,7 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
     public void updateProcessInstanceExtReject(String id, String comment) {
         ProcessInstance processInstance = getProcessInstance(id);
         // 删除流程实例，以实现驳回任务时，取消整个审批流程
-        deleteProcessInstance(id, StrUtil.format(BpmProcessInstanceDeleteReasonEnum.REJECT_TASK.getReason(), comment));
+        deleteProcessInstance(id, StrUtil.format(BpmProcessInstanceDeleteReasonEnum.REJECT_TASK.format(comment)));
 
         // 更新 status + result
         // 注意，不能和上面的逻辑更换位置。因为 deleteProcessInstance 会触发流程的取消，进而调用 updateProcessInstanceExtCancel 方法，
