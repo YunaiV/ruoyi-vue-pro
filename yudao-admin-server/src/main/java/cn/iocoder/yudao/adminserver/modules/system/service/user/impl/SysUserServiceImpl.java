@@ -165,13 +165,26 @@ public class SysUserServiceImpl implements SysUserService {
     }
 
     @Override
+    public SysUserDO getUser(Long id) {
+        return userMapper.selectById(id);
+    }
+
+    @Override
     public List<SysUserDO> getUsers(SysUserExportReqVO reqVO) {
         return userMapper.selectList(reqVO, this.getDeptCondition(reqVO.getDeptId()));
     }
 
     @Override
     public List<SysUserDO> getUsers(Collection<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return Collections.emptyList();
+        }
         return userMapper.selectBatchIds(ids);
+    }
+
+    @Override
+    public Map<Long, SysUserDO> getUserMap(Collection<Long> ids) {
+        return SysUserService.super.getUserMap(ids);
     }
 
     @Override
@@ -369,6 +382,51 @@ public class SysUserServiceImpl implements SysUserService {
             respVO.getUpdateUsernames().add(importUser.getUsername());
         });
         return respVO;
+    }
+
+    @Override
+    public List<SysUserDO> getUsersByStatus(Integer status) {
+        return userMapper.selectListByStatus(status);
+    }
+
+    @Override
+    public List<SysUserDO> getUsersByPostIds(Collection<Long> postIds) {
+        if (CollUtil.isEmpty(postIds)) {
+            return Collections.emptyList();
+        }
+        // 过滤不符合条件的
+        // TODO 芋艿：暂时只能内存过滤。解决方案：1、新建一个关联表；2、基于 where + 函数；3、json 字段，适合 mysql 8+ 版本
+        List<SysUserDO> users = userMapper.selectList();
+        users.removeIf(user -> !CollUtil.containsAny(user.getPostIds(), postIds));
+        return users;
+    }
+
+    @Override
+    public List<SysUserDO> getUsersByDeptIds(Collection<Long> deptIds) {
+        if (CollUtil.isEmpty(deptIds)) {
+            return Collections.emptyList();
+        }
+        return userMapper.selectListByDeptIds(deptIds);
+    }
+
+    @Override
+    public void validUsers(Set<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return;
+        }
+        // 获得岗位信息
+        List<SysUserDO> users = userMapper.selectBatchIds(ids);
+        Map<Long, SysUserDO> userMap = CollectionUtils.convertMap(users, SysUserDO::getId);
+        // 校验
+        ids.forEach(id -> {
+            SysUserDO user = userMap.get(id);
+            if (user == null) {
+                throw exception(USER_NOT_EXISTS);
+            }
+            if (!CommonStatusEnum.ENABLE.getStatus().equals(user.getStatus())) {
+                throw exception(USER_IS_DISABLE, user.getNickname());
+            }
+        });
     }
 
 }

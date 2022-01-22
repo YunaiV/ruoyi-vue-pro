@@ -1,7 +1,10 @@
 package cn.iocoder.yudao.adminserver.modules.system.controller.user;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.iocoder.yudao.adminserver.modules.system.controller.dept.vo.dept.SysDeptListReqVO;
+import cn.iocoder.yudao.adminserver.modules.system.controller.dept.vo.dept.SysDeptSimpleRespVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.user.vo.user.*;
+import cn.iocoder.yudao.adminserver.modules.system.convert.dept.SysDeptConvert;
 import cn.iocoder.yudao.adminserver.modules.system.convert.user.SysUserConvert;
 import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.dept.SysDeptDO;
 import cn.iocoder.yudao.adminserver.modules.system.service.dept.SysDeptService;
@@ -32,6 +35,8 @@ import java.io.IOException;
 import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 
 @Api(tags = "用户")
@@ -99,7 +104,7 @@ public class SysUserController {
         }
 
         // 获得拼接需要的数据
-        Collection<Long> deptIds = CollectionUtils.convertList(pageResult.getList(), SysUserDO::getDeptId);
+        Collection<Long> deptIds = convertList(pageResult.getList(), SysUserDO::getDeptId);
         Map<Long, SysDeptDO> deptMap = deptService.getDeptMap(deptIds);
         // 拼接结果返回
         List<SysUserPageItemRespVO> userList = new ArrayList<>(pageResult.getList().size());
@@ -109,6 +114,15 @@ public class SysUserController {
             userList.add(respVO);
         });
         return success(new PageResult<>(userList, pageResult.getTotal()));
+    }
+
+    @GetMapping("/list-all-simple")
+    @ApiOperation(value = "获取用户精简信息列表", notes = "只包含被开启的用户，主要用于前端的下拉选项")
+    public CommonResult<List<SysUserSimpleRespVO>> getSimpleUsers() {
+        // 获用户门列表，只要开启状态的
+        List<SysUserDO> list = userService.getUsersByStatus(CommonStatusEnum.ENABLE.getStatus());
+        // 排序后，返回给前端
+        return success(SysUserConvert.INSTANCE.convertList04(list));
     }
 
     @GetMapping("/get")
@@ -129,15 +143,19 @@ public class SysUserController {
         List<SysUserDO> users = userService.getUsers(reqVO);
 
         // 获得拼接需要的数据
-        Collection<Long> deptIds = CollectionUtils.convertList(users, SysUserDO::getDeptId);
+        Collection<Long> deptIds = convertList(users, SysUserDO::getDeptId);
         Map<Long, SysDeptDO> deptMap = deptService.getDeptMap(deptIds);
+        Map<Long, SysUserDO> deptLeaderUserMap = userService.getUserMap(convertSet(deptMap.values(), SysDeptDO::getLeaderUserId));
         // 拼接数据
         List<SysUserExcelVO> excelUsers = new ArrayList<>(users.size());
         users.forEach(user -> {
             SysUserExcelVO excelVO = SysUserConvert.INSTANCE.convert02(user);
+            // 设置部门
             MapUtils.findAndThen(deptMap, user.getDeptId(), dept -> {
                 excelVO.setDeptName(dept.getName());
-                excelVO.setDeptLeader(dept.getLeader());
+                // 设置部门负责人的名字
+                MapUtils.findAndThen(deptLeaderUserMap, dept.getLeaderUserId(),
+                        deptLeaderUser -> excelVO.setDeptLeaderNickname(deptLeaderUser.getNickname()));
             });
             excelUsers.add(excelVO);
         });

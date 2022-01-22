@@ -1,11 +1,9 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-
-Vue.use(Router)
-
 /* Layout */
 import Layout from '@/layout'
-import ParentView from '@/components/ParentView';
+
+Vue.use(Router)
 
 /**
  * Note: 路由配置项
@@ -62,135 +60,104 @@ export const constantRoutes = [
     path: '',
     component: Layout,
     redirect: 'index',
-    children: [
-      {
+    children: [{
         path: 'index',
         component: (resolve) => require(['@/views/index'], resolve),
         name: '首页',
-        meta: { title: '首页', icon: 'dashboard', noCache: true, affix: true }
+        meta: {title: '首页', icon: 'dashboard', noCache: true, affix: true}
       }
     ]
-  },
-  {
+  }, {
     path: '/user',
     component: Layout,
     hidden: true,
     redirect: 'noredirect',
-    children: [
-      {
+    children: [{
         path: 'profile',
         component: (resolve) => require(['@/views/system/user/profile/index'], resolve),
         name: 'Profile',
-        meta: { title: '个人中心', icon: 'user' }
+        meta: {title: '个人中心', icon: 'user'}
       }
     ]
-  },
-  {
+  }, {
     path: '/dict',
     component: Layout,
     hidden: true,
-    children: [
-      {
+    children: [{
         path: 'type/data/:dictId(\\d+)',
         component: (resolve) => require(['@/views/system/dict/data'], resolve),
         name: 'Data',
-        meta: { title: '字典数据', icon: '' }
+        meta: {title: '字典数据', icon: ''}
       }
     ]
-  },
-  {
+  }, {
     path: '/job',
     component: Layout,
     hidden: true,
-    children: [
-      {
+    children: [{
         path: 'log',
         component: (resolve) => require(['@/views/infra/job/log'], resolve),
         name: 'JobLog',
-        meta: { title: '调度日志' }
+        meta: {title: '调度日志'}
       }
     ]
-  },
-  {
+  }, {
     path: '/codegen',
     component: Layout,
     hidden: true,
-    children: [
-      {
+    children: [{
         path: 'edit/:tableId(\\d+)',
         component: (resolve) => require(['@/views/tool/codegen/editTable'], resolve),
         name: 'GenEdit',
-        meta: { title: '修改生成配置' }
+        meta: {title: '修改生成配置'}
       }
     ]
-  },
-  {
-    path: '/flow',
+  }, {
+    path: '/bpm',
     component: Layout,
     hidden: true,
     redirect: 'noredirect',
-    children: [
-      {
-        path: 'leave/apply',
-        component: (resolve) => require(['@/views/oa/leave/apply/index'], resolve),
-        name: '请假表单',
-        meta: { title: '请假表单', icon: 'form' }
+    children: [{
+        path: 'oa/leave/create',
+        component: (resolve) => require(['@/views/bpm/oa/leave/create'], resolve),
+        name: '发起 OA 请假',
+        meta: {title: '发起 OA 请假', icon: 'form'}
+      }, {
+        path: 'oa/leave/detail',
+        component: (resolve) => require(['@/views/bpm/oa/leave/detail'], resolve),
+        name: '查看 OA 请假',
+        meta: {title: '查看 OA 请假', icon: 'view'}
       }
     ]
-  },
-  {
-    path: '/flow',
+  }, {
+    path: '/bpm',
     component: Layout,
     hidden: true,
-    redirect: 'noredirect',
-    children: [
-      {
-        path: 'leave/approve-leader',
-        component: (resolve) => require(['@/views/oa/leave/approve-leader/index'], resolve),
-        name: '请假表单-部门领导审批',
-        meta: { title: '请假表单-部门领导审批', icon: 'form' }
-      }
-    ]
-  },
-  {
-    path: '/flow',
-    component: Layout,
-    hidden: true,
-    redirect: 'noredirect',
-    children: [
-      {
-        path: 'leave/approve-hr',
-        component: (resolve) => require(['@/views/oa/leave/approve-hr/index'], resolve),
-        name: '请假表单-人事审批',
-        meta: { title: '请假表单-人事审批', icon: 'form' }
-      }
-    ]
-  },
-  {
-    path: '/flow',
-    component: Layout,
-    hidden: true,
-    redirect: 'noredirect',
-    children: [
-      {
-        path: 'leave/confirm',
-        component: (resolve) => require(['@/views/oa/leave/confirm/index'], resolve),
-        name: '请假表单-确认',
-        meta: { title: '请假表单-确认', icon: 'form' }
-      }
-    ]
-  },
-  {
-    path: '/flow',
-    component: Layout,
-    hidden: true,
-    redirect: 'noredirect',
-    children: [
-      {
-        path: 'leave/modify',
-        component: (resolve) => require(['@/views/oa/leave/modify/index'], resolve),
-        name: '请假表单-修改',
-        meta: { title: '请假表单-修改', icon: 'form' }
+    children: [{
+        path: 'manager/form/edit',
+        component: (resolve) => require(['@/views/bpm/form/formEditor'], resolve),
+        name: '流程表单-编辑',
+        meta: {title: '流程表单-编辑'}
+      }, {
+        path: 'manager/definition',
+        component: (resolve) => require(['@/views/bpm/definition/index'], resolve),
+        name: '流程定义',
+        meta: {title: '流程定义'}
+      }, {
+        path: 'manager/model/design',
+        component: (resolve) => require(['@/views/bpm/model/modelEditor'], resolve),
+        name: '设计流程',
+        meta: {title: '设计流程'}
+      }, {
+        path: 'process-instance/create',
+        component: (resolve) => require(['@/views/bpm/processInstance/create'], resolve),
+        name: '发起流程',
+        meta: {title: '发起流程'}
+      }, {
+        path: 'process-instance/detail',
+        component: (resolve) => require(['@/views/bpm/processInstance/detail'], resolve),
+        name: '流程详情',
+        meta: {title: '流程详情'}
       }
     ]
   }
@@ -199,6 +166,6 @@ export const constantRoutes = [
 export default new Router({
   base: process.env.VUE_APP_APP_NAME ? process.env.VUE_APP_APP_NAME : "/",
   mode: 'history', // 去掉url中的#
-  scrollBehavior: () => ({ y: 0 }),
+  scrollBehavior: () => ({y: 0}),
   routes: constantRoutes
 })

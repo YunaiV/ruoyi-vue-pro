@@ -50,14 +50,14 @@ public class CollectionUtils {
         if (CollUtil.isEmpty(from)) {
             return new ArrayList<>();
         }
-        return from.stream().map(func).collect(Collectors.toList());
+        return from.stream().map(func).filter(Objects::nonNull).collect(Collectors.toList());
     }
 
     public static <T, U> Set<U> convertSet(Collection<T> from, Function<T, U> func) {
         if (CollUtil.isEmpty(from)) {
             return new HashSet<>();
         }
-        return from.stream().map(func).collect(Collectors.toSet());
+        return from.stream().map(func).filter(Objects::nonNull).collect(Collectors.toSet());
     }
 
     public static <T, K> Map<K, T> convertMap(Collection<T> from, Function<T, K> keyFunc) {

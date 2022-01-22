@@ -44,7 +44,7 @@ public class SysSmsChannelController {
 
     @DeleteMapping("/delete")
     @ApiOperation("删除短信渠道")
-    @ApiImplicitParam(name = "id", value = "编号", required = true)
+    @ApiImplicitParam(name = "id", value = "编号", required = true, dataTypeClass = Long.class)
     @PreAuthorize("@ss.hasPermission('system:sms-channel:delete')")
     public CommonResult<Boolean> deleteSmsChannel(@RequestParam("id") Long id) {
         smsChannelService.deleteSmsChannel(id);

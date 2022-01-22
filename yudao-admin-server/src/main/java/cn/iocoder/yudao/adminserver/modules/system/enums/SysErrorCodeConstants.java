@@ -31,6 +31,7 @@ public interface SysErrorCodeConstants {
     ErrorCode ROLE_NAME_DUPLICATE = new ErrorCode(1002003001, "已经存在名为【{}】的角色");
     ErrorCode ROLE_CODE_DUPLICATE = new ErrorCode(1002003002, "已经存在编码为【{}】的角色");
     ErrorCode ROLE_CAN_NOT_UPDATE_SYSTEM_TYPE_ROLE = new ErrorCode(1002003004, "不能操作类型为系统内置的角色");
+    ErrorCode ROLE_IS_DISABLE = new ErrorCode(1002003004, "名字为【{}】的角色已被禁用");
 
     // ========== 用户模块 1002004000 ==========
     ErrorCode USER_USERNAME_EXISTS = new ErrorCode(1002004000, "用户账号已经存在");
@@ -39,6 +40,7 @@ public interface SysErrorCodeConstants {
     ErrorCode USER_NOT_EXISTS = new ErrorCode(1002004003, "用户不存在");
     ErrorCode USER_IMPORT_LIST_IS_EMPTY = new ErrorCode(1002004004, "导入用户数据不能为空！");
     ErrorCode USER_PASSWORD_FAILED = new ErrorCode(1002004005, "用户密码校验失败");
+    ErrorCode USER_IS_DISABLE = new ErrorCode(1002003004, "名字为【{}】的用户已被禁用");
 
     // ========== 部门模块 1002005000 ==========
     ErrorCode DEPT_NAME_DUPLICATE = new ErrorCode(1002004001, "已经存在该名字的部门");
@@ -65,7 +67,7 @@ public interface SysErrorCodeConstants {
 
     // ========== 字典数据 1002007000 ==========
     ErrorCode DICT_DATA_NOT_EXISTS = new ErrorCode(1002007001, "当前字典数据不存在");
-    ErrorCode DICT_DATA_NOT_ENABLE = new ErrorCode(1002007002, "字典数据不处于开启状态，不允许选择");
+    ErrorCode DICT_DATA_NOT_ENABLE = new ErrorCode(1002007002, "字典数据({})不处于开启状态，不允许选择");
     ErrorCode DICT_DATA_VALUE_DUPLICATE = new ErrorCode(1002007003, "已经存在该值的字典数据");
 
     // ========== 通知公告 1002008000 ==========

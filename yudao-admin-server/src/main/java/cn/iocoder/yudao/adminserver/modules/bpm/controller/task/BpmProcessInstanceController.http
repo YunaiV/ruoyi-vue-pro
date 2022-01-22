@@ -1,0 +1,29 @@
+### 请求 /bpm/process-instance/create 接口 => 成功
+POST {{baseUrl}}/bpm/process-instance/create
+Content-Type: application/json
+tenant-id: 1
+Authorization: Bearer {{token}}
+
+{
+  "processDefinitionId": "gateway_test:2:00e52d8e-701b-11ec-aca9-a2380e71991a",
+  "variables": {
+    "a": 1,
+    "b": "2"
+  }
+}
+
+### 请求 /bpm/process-instance/cancel 接口 => 成功
+DELETE {{baseUrl}}/bpm/process-instance/cancel
+Content-Type: application/json
+tenant-id: 1
+Authorization: Bearer {{token}}
+
+{
+  "id": "b9220387-7088-11ec-bcae-a2380e71991a",
+  "reason": "我就取消"
+}
+
+### 请求 /bpm/process-instance/get 接口 => 成功
+GET {{baseUrl}}/bpm/process-instance/get?id=537cceb3-768c-11ec-afcd-a2380e71991a
+tenant-id: 1
+Authorization: Bearer {{token}}

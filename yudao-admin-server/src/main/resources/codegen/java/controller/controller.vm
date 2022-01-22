@@ -54,7 +54,7 @@ public class ${table.className}Controller {
 
     @DeleteMapping("/delete")
     @ApiOperation("删除${table.classComment}")
-    @ApiImplicitParam(name = "id", value = "编号", required = true)
+    @ApiImplicitParam(name = "id", value = "编号", required = true, dataTypeClass = ${primaryColumn.javaType}.class)
     @PreAuthorize("@ss.hasPermission('${permissionPrefix}:delete')")
     public CommonResult<Boolean> delete${simpleClassName}(@RequestParam("id") ${primaryColumn.javaType} id) {
         ${classNameVar}Service.delete${simpleClassName}(id);

@@ -11,7 +11,7 @@ import java.util.Date;
 public interface PayChannelCoreMapper extends BaseMapperX<PayChannelDO> {
 
     default PayChannelDO selectByAppIdAndCode(Long appId, String code) {
-        return selectOne("app_id", appId, "code", code);
+        return selectOne(PayChannelDO::getAppId, appId, PayChannelDO::getCode, code);
     }
 
     @Select("SELECT id FROM pay_channel WHERE update_time > #{maxUpdateTime} LIMIT 1")

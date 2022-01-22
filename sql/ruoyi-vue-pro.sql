@@ -11,11 +11,689 @@
  Target Server Version : 80026
  File Encoding         : 65001
 
- Date: 25/12/2021 19:32:21
+ Date: 23/01/2022 01:39:15
 */
 
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
+
+-- ----------------------------
+-- Table structure for bpm_form
+-- ----------------------------
+DROP TABLE IF EXISTS `bpm_form`;
+CREATE TABLE `bpm_form` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号',
+  `name` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '表单名',
+  `status` tinyint NOT NULL COMMENT '开启状态',
+  `conf` varchar(1000) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '表单的配置',
+  `fields` varchar(5000) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '表单项的数组',
+  `remark` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '备注',
+  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='工作流的表单定义';
+
+-- ----------------------------
+-- Records of bpm_form
+-- ----------------------------
+BEGIN;
+INSERT INTO `bpm_form` VALUES (7, '啊1', 1, '{\"formRef\":\"elForm\",\"formModel\":\"formData\",\"size\":\"medium\",\"labelPosition\":\"right\",\"labelWidth\":100,\"formRules\":\"rules\",\"gutter\":15,\"disabled\":false,\"span\":24,\"formBtns\":true}', '[\"{\\\"label\\\":\\\"密码\\\",\\\"tag\\\":\\\"el-input\\\",\\\"tagIcon\\\":\\\"password\\\",\\\"placeholder\\\":\\\"请输入密码\\\",\\\"span\\\":24,\\\"show-password\\\":true,\\\"labelWidth\\\":null,\\\"style\\\":{\\\"width\\\":\\\"100%\\\"},\\\"clearable\\\":true,\\\"prepend\\\":\\\"\\\",\\\"append\\\":\\\"\\\",\\\"prefix-icon\\\":\\\"\\\",\\\"suffix-icon\\\":\\\"\\\",\\\"maxlength\\\":null,\\\"show-word-limit\\\":false,\\\"readonly\\\":false,\\\"disabled\\\":false,\\\"required\\\":true,\\\"regList\\\":[],\\\"changeTag\\\":true,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/input\\\",\\\"formId\\\":102,\\\"renderKey\\\":1640930414772,\\\"layout\\\":\\\"colFormItem\\\",\\\"vModel\\\":\\\"field102\\\",\\\"defaultValue\\\":\\\"admin123\\\"}\",\"{\\\"label\\\":\\\"级联选择\\\",\\\"tag\\\":\\\"el-cascader\\\",\\\"tagIcon\\\":\\\"cascader\\\",\\\"placeholder\\\":\\\"请选择级联选择级联选择级联选择\\\",\\\"defaultValue\\\":[],\\\"span\\\":24,\\\"labelWidth\\\":null,\\\"style\\\":{\\\"width\\\":\\\"100%\\\"},\\\"props\\\":{\\\"props\\\":{\\\"multiple\\\":false}},\\\"show-all-levels\\\":true,\\\"disabled\\\":false,\\\"clearable\\\":true,\\\"filterable\\\":false,\\\"required\\\":true,\\\"options\\\":[{\\\"id\\\":1,\\\"value\\\":1,\\\"label\\\":\\\"选项1\\\",\\\"children\\\":[{\\\"id\\\":2,\\\"value\\\":2,\\\"label\\\":\\\"选项1-1\\\"}]}],\\\"dataType\\\":\\\"dynamic\\\",\\\"labelKey\\\":\\\"label\\\",\\\"valueKey\\\":\\\"value\\\",\\\"childrenKey\\\":\\\"children\\\",\\\"separator\\\":\\\"/\\\",\\\"regList\\\":[],\\\"changeTag\\\":true,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/cascader\\\",\\\"formId\\\":101,\\\"renderKey\\\":1640960350991,\\\"layout\\\":\\\"colFormItem\\\",\\\"vModel\\\":\\\"field101\\\"}\",\"{\\\"label\\\":\\\"生活\\\",\\\"tag\\\":\\\"el-input\\\",\\\"tagIcon\\\":\\\"input\\\",\\\"placeholder\\\":\\\"请输入生活生活生活\\\",\\\"span\\\":24,\\\"labelWidth\\\":null,\\\"style\\\":{\\\"width\\\":\\\"100%\\\"},\\\"clearable\\\":true,\\\"prepend\\\":\\\"\\\",\\\"append\\\":\\\"\\\",\\\"prefix-icon\\\":\\\"\\\",\\\"suffix-icon\\\":\\\"\\\",\\\"maxlength\\\":null,\\\"show-word-limit\\\":false,\\\"readonly\\\":false,\\\"disabled\\\":false,\\\"required\\\":true,\\\"regList\\\":[],\\\"changeTag\\\":true,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/input\\\",\\\"formId\\\":101,\\\"renderKey\\\":1640930388977,\\\"layout\\\":\\\"colFormItem\\\",\\\"vModel\\\":\\\"field101\\\",\\\"defaultValue\\\":\\\"admin\\\"}\"]', '哈哈哈哈biu', '1', '2021-12-31 10:10:13', '1', '2021-12-31 14:27:22', b'1');
+INSERT INTO `bpm_form` VALUES (8, '啊哈哈', 0, '{\"formRef\":\"elForm\",\"formModel\":\"formData\",\"size\":\"medium\",\"labelPosition\":\"right\",\"labelWidth\":100,\"formRules\":\"rules\",\"gutter\":15,\"disabled\":false,\"span\":24,\"formBtns\":true}', '[]', '哈哈哈哈', '1', '2021-12-31 10:17:26', '1', '2021-12-31 14:27:20', b'1');
+INSERT INTO `bpm_form` VALUES (9, '新增', 0, '{\"formRef\":\"elForm\",\"formModel\":\"formData\",\"size\":\"medium\",\"labelPosition\":\"right\",\"labelWidth\":100,\"formRules\":\"rules\",\"gutter\":15,\"disabled\":false,\"span\":24,\"formBtns\":true}', '[\"{\\\"label\\\":\\\"单行文本\\\",\\\"tag\\\":\\\"el-input\\\",\\\"tagIcon\\\":\\\"input\\\",\\\"placeholder\\\":\\\"请输入单行文本\\\",\\\"span\\\":24,\\\"labelWidth\\\":null,\\\"style\\\":{\\\"width\\\":\\\"100%\\\"},\\\"clearable\\\":true,\\\"prepend\\\":\\\"\\\",\\\"append\\\":\\\"\\\",\\\"prefix-icon\\\":\\\"\\\",\\\"suffix-icon\\\":\\\"\\\",\\\"maxlength\\\":null,\\\"show-word-limit\\\":false,\\\"readonly\\\":false,\\\"disabled\\\":false,\\\"required\\\":true,\\\"regList\\\":[],\\\"changeTag\\\":true,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/input\\\",\\\"formId\\\":101,\\\"renderKey\\\":1640959561705,\\\"layout\\\":\\\"colFormItem\\\",\\\"vModel\\\":\\\"field101\\\"}\",\"{\\\"label\\\":\\\"单选框组\\\",\\\"tag\\\":\\\"el-radio-group\\\",\\\"tagIcon\\\":\\\"radio\\\",\\\"span\\\":24,\\\"labelWidth\\\":null,\\\"style\\\":{},\\\"optionType\\\":\\\"default\\\",\\\"border\\\":false,\\\"size\\\":\\\"medium\\\",\\\"disabled\\\":false,\\\"required\\\":true,\\\"options\\\":[{\\\"label\\\":\\\"选项一\\\",\\\"value\\\":1},{\\\"label\\\":\\\"选项二\\\",\\\"value\\\":2}],\\\"regList\\\":[],\\\"changeTag\\\":true,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/radio\\\",\\\"formId\\\":102,\\\"renderKey\\\":1640959563240,\\\"layout\\\":\\\"colFormItem\\\",\\\"vModel\\\":\\\"field102\\\"}\"]', '哈哈哈', '1', '2021-12-31 22:06:11', '1', '2021-12-31 14:27:19', b'1');
+INSERT INTO `bpm_form` VALUES (10, '11333', 1, '{\"formRef\":\"elForm\",\"formModel\":\"formData\",\"size\":\"medium\",\"labelPosition\":\"left\",\"labelWidth\":100,\"formRules\":\"rules\",\"gutter\":15,\"disabled\":false,\"span\":24,\"formBtns\":true}', '[\"{\\\"label\\\":\\\"多行文本\\\",\\\"tag\\\":\\\"el-input\\\",\\\"tagIcon\\\":\\\"textarea\\\",\\\"type\\\":\\\"textarea\\\",\\\"placeholder\\\":\\\"请输入多行文本多行文本多行文本\\\",\\\"span\\\":24,\\\"labelWidth\\\":null,\\\"autosize\\\":{\\\"minRows\\\":4,\\\"maxRows\\\":4},\\\"style\\\":{\\\"width\\\":\\\"100%\\\"},\\\"maxlength\\\":null,\\\"show-word-limit\\\":false,\\\"readonly\\\":false,\\\"disabled\\\":false,\\\"required\\\":true,\\\"regList\\\":[],\\\"changeTag\\\":true,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/input\\\",\\\"formId\\\":101,\\\"renderKey\\\":1640959720587,\\\"layout\\\":\\\"colFormItem\\\",\\\"vModel\\\":\\\"field101\\\",\\\"defaultValue\\\":\\\"1111\\\"}\",\"{\\\"label\\\":\\\"滑块\\\",\\\"tag\\\":\\\"el-slider\\\",\\\"tagIcon\\\":\\\"slider\\\",\\\"defaultValue\\\":0,\\\"span\\\":24,\\\"labelWidth\\\":null,\\\"disabled\\\":false,\\\"required\\\":true,\\\"min\\\":0,\\\"max\\\":100,\\\"step\\\":1,\\\"show-stops\\\":false,\\\"range\\\":false,\\\"regList\\\":[],\\\"changeTag\\\":true,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/slider\\\",\\\"formId\\\":101,\\\"renderKey\\\":1640959732257,\\\"layout\\\":\\\"colFormItem\\\",\\\"vModel\\\":\\\"field101\\\"}\"]', '222211', '1', '2021-12-31 22:08:45', '1', '2021-12-31 14:27:17', b'1');
+INSERT INTO `bpm_form` VALUES (11, 'biubiu', 0, '{\"formRef\":\"elForm\",\"formModel\":\"formData\",\"size\":\"medium\",\"labelPosition\":\"right\",\"labelWidth\":100,\"formRules\":\"rules\",\"gutter\":15,\"disabled\":false,\"span\":24,\"formBtns\":true}', '[\"{\\\"__config__\\\":{\\\"label\\\":\\\"单行文本\\\",\\\"labelWidth\\\":null,\\\"showLabel\\\":true,\\\"changeTag\\\":true,\\\"tag\\\":\\\"el-input\\\",\\\"tagIcon\\\":\\\"input\\\",\\\"required\\\":true,\\\"layout\\\":\\\"colFormItem\\\",\\\"span\\\":24,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/input\\\",\\\"regList\\\":[],\\\"formId\\\":121,\\\"renderKey\\\":\\\"1211641657675668\\\"},\\\"__slot__\\\":{\\\"prepend\\\":\\\"\\\",\\\"append\\\":\\\"\\\"},\\\"placeholder\\\":\\\"请输入单行文本\\\",\\\"style\\\":{\\\"width\\\":\\\"100%\\\"},\\\"clearable\\\":true,\\\"prefix-icon\\\":\\\"\\\",\\\"suffix-icon\\\":\\\"\\\",\\\"maxlength\\\":null,\\\"show-word-limit\\\":false,\\\"readonly\\\":false,\\\"disabled\\\":false,\\\"__vModel__\\\":\\\"field121\\\"}\",\"{\\\"__config__\\\":{\\\"label\\\":\\\"多选框组\\\",\\\"tag\\\":\\\"el-checkbox-group\\\",\\\"tagIcon\\\":\\\"checkbox\\\",\\\"defaultValue\\\":[],\\\"span\\\":24,\\\"showLabel\\\":true,\\\"labelWidth\\\":null,\\\"layout\\\":\\\"colFormItem\\\",\\\"optionType\\\":\\\"default\\\",\\\"required\\\":true,\\\"regList\\\":[],\\\"changeTag\\\":true,\\\"border\\\":false,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/checkbox\\\",\\\"formId\\\":122,\\\"renderKey\\\":\\\"1221641097529857\\\"},\\\"__slot__\\\":{\\\"options\\\":[{\\\"label\\\":\\\"选项一\\\",\\\"value\\\":1},{\\\"label\\\":\\\"选项二\\\",\\\"value\\\":2}]},\\\"style\\\":{},\\\"size\\\":\\\"medium\\\",\\\"disabled\\\":false,\\\"__vModel__\\\":\\\"field122\\\"}\"]', '嘿嘿', '1', '2022-01-02 12:25:55', '1', '2022-01-09 00:01:19', b'0');
+COMMIT;
+
+-- ----------------------------
+-- Table structure for bpm_oa_leave
+-- ----------------------------
+DROP TABLE IF EXISTS `bpm_oa_leave`;
+CREATE TABLE `bpm_oa_leave` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '请假表单主键',
+  `user_id` bigint NOT NULL COMMENT '申请人的用户编号',
+  `type` tinyint NOT NULL COMMENT '请假类型',
+  `reason` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '请假原因',
+  `start_time` datetime NOT NULL COMMENT '开始时间',
+  `end_time` datetime NOT NULL COMMENT '结束时间',
+  `day` tinyint NOT NULL COMMENT '请假天数',
+  `result` tinyint NOT NULL COMMENT '请假结果',
+  `process_instance_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '流程实例的编号',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='OA 请假申请表';
+
+-- ----------------------------
+-- Records of bpm_oa_leave
+-- ----------------------------
+BEGIN;
+INSERT INTO `bpm_oa_leave` VALUES (3, 1, 1, '我要请假啦啦啦！', '2022-03-01 08:00:00', '2022-03-03 08:00:00', 2, 1, 'a6a007dd-7b6d-11ec-b781-acde48001122', '1', '2022-01-22 18:25:42', '1', '2022-01-22 18:25:42', b'0');
+INSERT INTO `bpm_oa_leave` VALUES (4, 1, 1, '我要请假啦啦啦！', '2022-03-01 08:00:00', '2022-03-03 08:00:00', 2, 1, '28a5d744-7b75-11ec-a3c8-acde48001122', '1', '2022-01-22 19:19:26', '1', '2022-01-22 19:19:27', b'0');
+INSERT INTO `bpm_oa_leave` VALUES (5, 1, 1, '我要请假啦啦啦！', '2022-03-01 08:00:00', '2022-03-05 08:00:00', 4, 1, '75d43fd1-7b7f-11ec-a3c8-acde48001122', '1', '2022-01-22 20:33:11', '1', '2022-01-22 20:33:11', b'0');
+INSERT INTO `bpm_oa_leave` VALUES (6, 1, 1, '我要请假啦啦啦！', '2022-03-01 08:00:00', '2022-03-05 08:00:00', 4, 1, '9ac0eab4-7b7f-11ec-a3c8-acde48001122', '1', '2022-01-22 20:34:13', '1', '2022-01-22 20:34:13', b'0');
+INSERT INTO `bpm_oa_leave` VALUES (7, 1, 1, 'EEE', '2022-01-11 00:00:00', '2022-01-27 00:00:00', 16, 1, '7250cfdf-7b88-11ec-8ef0-acde48001122', '1', '2022-01-22 21:37:31', '1', '2022-01-22 21:37:31', b'0');
+INSERT INTO `bpm_oa_leave` VALUES (8, 1, 1, 'EEE', '2022-01-02 00:00:00', '2022-01-23 00:00:00', 21, 1, '0699ab3c-7b8a-11ec-8ef0-acde48001122', '1', '2022-01-22 21:48:49', '1', '2022-01-22 21:48:49', b'0');
+INSERT INTO `bpm_oa_leave` VALUES (9, 1, 1, 'EEE', '2022-01-01 00:00:00', '2022-01-29 00:00:00', 28, 1, 'ea957056-7b8d-11ec-b8e2-acde48001122', '1', '2022-01-22 22:16:40', '1', '2022-01-22 22:16:40', b'0');
+INSERT INTO `bpm_oa_leave` VALUES (10, 1, 1, 'EEE', '2022-01-13 00:00:00', '2022-01-25 00:00:00', 12, 1, '7e093de8-7b8e-11ec-b8e2-acde48001122', '1', '2022-01-22 22:20:47', '1', '2022-01-22 22:20:47', b'0');
+INSERT INTO `bpm_oa_leave` VALUES (11, 1, 1, 'AAA', '2022-01-03 00:00:00', '2022-01-21 00:00:00', 18, 1, '5354233a-7b91-11ec-8473-acde48001122', '1', '2022-01-22 22:41:04', '1', '2022-01-22 22:41:04', b'0');
+INSERT INTO `bpm_oa_leave` VALUES (12, 1, 1, 'EEEEE', '2021-12-27 00:00:00', '2022-01-27 00:00:00', 31, 1, '68ce0834-7b91-11ec-8473-acde48001122', '1', '2022-01-22 22:41:40', '1', '2022-01-22 22:41:40', b'0');
+INSERT INTO `bpm_oa_leave` VALUES (13, 1, 1, 'aaa', '2022-01-10 00:00:00', '2022-01-28 00:00:00', 18, 1, 'bb23c2b4-7b91-11ec-8473-acde48001122', '1', '2022-01-22 22:43:58', '1', '2022-01-22 22:43:58', b'0');
+INSERT INTO `bpm_oa_leave` VALUES (14, 1, 1, 'eee', '2021-12-27 00:00:00', '2022-01-28 00:00:00', 32, 3, '8884f3e7-7b99-11ec-ba5c-acde48001122', '1', '2022-01-22 23:39:49', '1', '2022-01-22 23:40:09', b'0');
+INSERT INTO `bpm_oa_leave` VALUES (15, 1, 1, 'EEE', '2022-01-20 00:00:00', '2022-01-19 00:00:00', 1, 1, 'a59a5391-7b99-11ec-ba5c-acde48001122', '1', '2022-01-22 23:40:38', '1', '2022-01-22 23:40:38', b'0');
+INSERT INTO `bpm_oa_leave` VALUES (16, 1, 3, 'EEE', '2022-01-04 00:00:00', '2022-01-13 00:00:00', 9, 3, '03c6c157-7b9a-11ec-a290-acde48001122', '1', '2022-01-22 23:43:16', '1', '2022-01-22 23:43:42', b'0');
+INSERT INTO `bpm_oa_leave` VALUES (17, 1, 2, 'EEE', '2022-01-22 00:00:00', '2022-01-22 00:00:00', 0, 1, '331bc281-7b9a-11ec-a290-acde48001122', '1', '2022-01-22 23:44:35', '1', '2022-01-22 23:44:36', b'0');
+INSERT INTO `bpm_oa_leave` VALUES (18, 1, 2, 'EEE', '2022-01-11 00:00:00', '2022-01-11 00:00:00', 0, 1, '52ffd28e-7b9a-11ec-a290-acde48001122', '1', '2022-01-22 23:45:29', '1', '2022-01-22 23:45:29', b'0');
+INSERT INTO `bpm_oa_leave` VALUES (19, 1, 2, 'eee', '2022-01-22 00:00:00', '2022-01-22 00:00:00', 0, 1, '67c2eaab-7b9a-11ec-a290-acde48001122', '1', '2022-01-22 23:46:04', '1', '2022-01-22 23:46:04', b'0');
+INSERT INTO `bpm_oa_leave` VALUES (20, 1, 1, 'EEE', '2022-01-04 00:00:00', '2022-01-04 00:00:00', 0, 1, '819442e8-7b9a-11ec-a290-acde48001122', '1', '2022-01-22 23:46:47', '1', '2022-01-22 23:46:47', b'0');
+INSERT INTO `bpm_oa_leave` VALUES (21, 1, 1, 'EEE', '2022-01-22 00:00:00', '2022-01-23 00:00:00', 1, 1, 'ec45f38f-7b9a-11ec-b03b-acde48001122', '1', '2022-01-22 23:49:46', '1', '2022-01-22 23:49:46', b'0');
+INSERT INTO `bpm_oa_leave` VALUES (22, 1, 1, 'eee', '2022-01-22 00:00:00', '2022-01-22 00:00:00', 0, 2, '2152467e-7b9b-11ec-9a1b-acde48001122', '1', '2022-01-22 23:51:15', '1', '2022-01-22 23:51:24', b'0');
+INSERT INTO `bpm_oa_leave` VALUES (23, 1, 2, 'eee', '2022-01-03 00:00:00', '2022-01-26 00:00:00', 23, 1, '7317cec6-7b9b-11ec-b5b7-acde48001122', '1', '2022-01-22 23:53:32', '1', '2022-01-22 23:53:33', b'0');
+INSERT INTO `bpm_oa_leave` VALUES (24, 1, 2, 'eee', '2022-01-03 00:00:00', '2022-01-26 00:00:00', 23, 4, '7470a810-7b9b-11ec-b5b7-acde48001122', '1', '2022-01-22 23:53:35', '1', '2022-01-23 00:08:41', b'0');
+INSERT INTO `bpm_oa_leave` VALUES (25, 1, 1, 'EE', '2021-12-27 00:00:00', '2022-01-19 00:00:00', 23, 1, '3ad174fb-7b9d-11ec-8404-acde48001122', '1', '2022-01-23 00:06:17', '1', '2022-01-23 00:06:17', b'0');
+COMMIT;
+
+-- ----------------------------
+-- Table structure for bpm_process_definition_ext
+-- ----------------------------
+DROP TABLE IF EXISTS `bpm_process_definition_ext`;
+CREATE TABLE `bpm_process_definition_ext` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号',
+  `process_definition_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '流程定义的编号',
+  `model_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '流程模型的编号',
+  `description` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '描述',
+  `form_type` tinyint NOT NULL COMMENT '表单类型',
+  `form_id` bigint DEFAULT NULL COMMENT '表单编号',
+  `form_conf` varchar(1000) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '表单的配置',
+  `form_fields` varchar(5000) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '表单项的数组',
+  `form_custom_create_path` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '自定义表单的提交路径',
+  `form_custom_view_path` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '自定义表单的查看路径',
+  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=94 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Bpm 流程定义的拓展表\n';
+
+-- ----------------------------
+-- Records of bpm_process_definition_ext
+-- ----------------------------
+BEGIN;
+INSERT INTO `bpm_process_definition_ext` VALUES (12, 'process1641042089407:5:6d9a655c-6b0b-11ec-bfb7-cacd34981f8e', '', '', 1, 11, NULL, NULL, NULL, NULL, '1', '2022-01-01 22:02:17', '1', '2022-01-15 17:06:33', b'0');
+INSERT INTO `bpm_process_definition_ext` VALUES (13, 'Process_1641152976334:1:2db33c43-6c05-11ec-9fce-cacd34981f8e', '', NULL, 1, 11, NULL, NULL, NULL, NULL, '1', '2022-01-03 03:50:04', '1', '2022-01-15 17:06:33', b'0');
+INSERT INTO `bpm_process_definition_ext` VALUES (14, 'Process_1641152976334:2:52a4a536-6c09-11ec-b333-cacd34981f8e', '', NULL, 1, 11, NULL, NULL, NULL, NULL, '1', '2022-01-03 04:19:44', '1', '2022-01-15 17:06:33', b'0');
+INSERT INTO `bpm_process_definition_ext` VALUES (15, 'Process_1641152976334:3:54f1a279-6c09-11ec-b333-cacd34981f8e', '', NULL, 1, 11, NULL, NULL, NULL, NULL, '1', '2022-01-03 04:19:48', '1', '2022-01-15 17:06:33', b'0');
+INSERT INTO `bpm_process_definition_ext` VALUES (16, 'Process_1641152976334:4:59fc120c-6c09-11ec-b333-cacd34981f8e', '', NULL, 1, 11, NULL, NULL, NULL, NULL, '1', '2022-01-03 04:19:56', '1', '2022-01-15 17:06:33', b'0');
+INSERT INTO `bpm_process_definition_ext` VALUES (17, 'Process_1641152976334:5:67c5bbcf-6c09-11ec-b333-cacd34981f8e', '', NULL, 1, 11, NULL, NULL, NULL, NULL, '1', '2022-01-03 04:20:19', '1', '2022-01-15 17:06:33', b'0');
+INSERT INTO `bpm_process_definition_ext` VALUES (18, 'Process_1641152976334:6:741521a2-6c09-11ec-b333-cacd34981f8e', '', NULL, 1, 11, NULL, NULL, NULL, NULL, '1', '2022-01-03 04:20:40', '1', '2022-01-15 17:06:33', b'0');
+INSERT INTO `bpm_process_definition_ext` VALUES (19, 'Process_1641152976334:7:a80332e5-6c09-11ec-b333-cacd34981f8e', '', NULL, 1, 11, NULL, NULL, NULL, NULL, '1', '2022-01-03 04:22:07', '1', '2022-01-15 17:06:33', b'0');
+INSERT INTO `bpm_process_definition_ext` VALUES (20, 'Process_1641152976334:8:7b70fa71-6c14-11ec-8928-cacd34981f8e', '', NULL, 1, 11, NULL, NULL, NULL, NULL, '1', '2022-01-03 05:40:27', '1', '2022-01-15 17:06:33', b'0');
+INSERT INTO `bpm_process_definition_ext` VALUES (21, 'baba:1:506515c9-6c2e-11ec-9fc8-cacd34981f8e', '', NULL, 1, NULL, NULL, NULL, NULL, NULL, '1', '2022-01-03 08:44:46', '1', '2022-01-15 17:06:33', b'0');
+INSERT INTO `bpm_process_definition_ext` VALUES (22, 'Process_1641152976334:9:c4b8386c-6c30-11ec-9fc8-cacd34981f8e', '', NULL, 1, 11, NULL, NULL, NULL, NULL, '1', '2022-01-03 09:02:06', '1', '2022-01-15 17:06:33', b'0');
+INSERT INTO `bpm_process_definition_ext` VALUES (23, 'Process_1641152976334:10:dd62eaef-6c30-11ec-9fc8-cacd34981f8e', '', NULL, 1, 11, NULL, NULL, NULL, NULL, '1', '2022-01-03 09:04:00', '1', '2022-01-15 17:06:33', b'0');
+INSERT INTO `bpm_process_definition_ext` VALUES (24, 'Process_1641152976334:11:1a212652-6c31-11ec-9fc8-cacd34981f8e', '', NULL, 1, 11, NULL, NULL, NULL, NULL, '1', '2022-01-03 09:04:32', '1', '2022-01-15 17:06:33', b'0');
+INSERT INTO `bpm_process_definition_ext` VALUES (25, 'baba:2:42165635-6c31-11ec-9fc8-cacd34981f8e', '', NULL, 1, NULL, NULL, NULL, NULL, NULL, '1', '2022-01-03 09:05:36', '1', '2022-01-15 17:06:33', b'0');
+INSERT INTO `bpm_process_definition_ext` VALUES (26, 'baba:3:3b6ff69d-6c41-11ec-a218-cacd34981f8e', '', NULL, 1, 11, NULL, NULL, NULL, NULL, '1', '2022-01-03 10:59:57', '1', '2022-01-15 17:06:33', b'0');
+INSERT INTO `bpm_process_definition_ext` VALUES (27, 'baba:4:76cf8c60-6c41-11ec-a218-cacd34981f8e', '', '我是描述丫丫啊', 1, 11, NULL, NULL, NULL, NULL, '1', '2022-01-03 11:01:36', '1', '2022-01-15 17:06:33', b'0');
+INSERT INTO `bpm_process_definition_ext` VALUES (28, 'baba:5:52d3b4c3-6c42-11ec-a218-cacd34981f8e', '', '我是描述丫丫啊', 1, 11, NULL, NULL, NULL, NULL, '1', '2022-01-03 11:07:46', '1', '2022-01-15 17:06:33', b'0');
+INSERT INTO `bpm_process_definition_ext` VALUES (29, 'baba:6:2f739ca9-6c4d-11ec-86db-cacd34981f8e', '', '我是描述丫丫啊', 1, 11, NULL, NULL, NULL, NULL, '1', '2022-01-03 12:25:31', '1', '2022-01-15 17:06:33', b'0');
+INSERT INTO `bpm_process_definition_ext` VALUES (30, 'tt:1:f1062230-6c7f-11ec-88b1-cacd34981f8e', '', NULL, 1, NULL, NULL, NULL, NULL, NULL, '1', '2022-01-03 18:28:50', '1', '2022-01-15 17:06:33', b'0');
+INSERT INTO `bpm_process_definition_ext` VALUES (31, 'qqw:1:897c7005-6c80-11ec-88b1-cacd34981f8e', '', '11', 1, 11, NULL, NULL, NULL, NULL, '1', '2022-01-03 18:33:06', '1', '2022-01-15 17:06:33', b'0');
+INSERT INTO `bpm_process_definition_ext` VALUES (32, 'leave:7:20ada39c-6c95-11ec-88b1-cacd34981f8e', '', NULL, 1, NULL, NULL, NULL, NULL, NULL, '1', '2022-01-03 21:00:30', '1', '2022-01-15 17:06:33', b'0');
+INSERT INTO `bpm_process_definition_ext` VALUES (33, 'gateway_test:1:bf30c38f-7019-11ec-bc41-a2380e71991a', '', NULL, 1, 11, NULL, NULL, NULL, NULL, '1', '2022-01-08 08:27:23', '1', '2022-01-15 17:06:33', b'0');
+INSERT INTO `bpm_process_definition_ext` VALUES (34, 'gateway_test:2:00e52d8e-701b-11ec-aca9-a2380e71991a', '', NULL, 1, 11, NULL, NULL, NULL, NULL, '1', '2022-01-08 08:36:22', '1', '2022-01-15 17:06:33', b'0');
+INSERT INTO `bpm_process_definition_ext` VALUES (35, 'gateway_test:3:43f8ca4f-709c-11ec-9ce9-a2380e71991a', '', NULL, 1, 11, NULL, NULL, NULL, NULL, '1', '2022-01-09 00:01:40', '1', '2022-01-15 17:06:33', b'0');
+INSERT INTO `bpm_process_definition_ext` VALUES (36, 'gateway_test:4:2e50e9a4-7136-11ec-93f6-a2380e71991a', '', NULL, 1, 11, NULL, NULL, NULL, NULL, '1', '2022-01-09 18:23:26', '1', '2022-01-15 17:06:33', b'0');
+INSERT INTO `bpm_process_definition_ext` VALUES (37, 'AA:1:e1e1a8d3-7208-11ec-8954-a2380e71991a', '', NULL, 1, 11, NULL, NULL, NULL, NULL, '1', '2022-01-10 19:31:42', '1', '2022-01-15 17:06:33', b'0');
+INSERT INTO `bpm_process_definition_ext` VALUES (38, 'AA:2:0d01d9e6-7209-11ec-8954-a2380e71991a', '', NULL, 1, 11, NULL, NULL, NULL, NULL, '1', '2022-01-10 19:32:54', '1', '2022-01-15 17:06:33', b'0');
+INSERT INTO `bpm_process_definition_ext` VALUES (39, 'AA:3:83a1ac25-720b-11ec-95cb-a2380e71991a', '', NULL, 1, 11, NULL, NULL, NULL, NULL, '1', '2022-01-10 19:50:32', '1', '2022-01-15 17:06:33', b'0');
+INSERT INTO `bpm_process_definition_ext` VALUES (40, 'leave:8:462de361-7282-11ec-8908-a2380e71991a', '0c1ee1f8-6c95-11ec-88b1-cacd34981f8e', NULL, 1, NULL, NULL, NULL, NULL, NULL, '1', '2022-01-11 10:00:39', '1', '2022-01-15 17:06:33', b'0');
+INSERT INTO `bpm_process_definition_ext` VALUES (41, 'leave:9:59689ba0-7284-11ec-965c-a2380e71991a', '0c1ee1f8-6c95-11ec-88b1-cacd34981f8e', NULL, 1, 11, NULL, NULL, NULL, NULL, '1', '2022-01-11 10:15:30', '1', '2022-01-15 17:06:33', b'0');
+INSERT INTO `bpm_process_definition_ext` VALUES (42, 'leave:10:d7fb3bb3-7473-11ec-a434-a2380e71991a', '0c1ee1f8-6c95-11ec-88b1-cacd34981f8e', NULL, 1, 11, NULL, NULL, NULL, NULL, '103', '2022-01-13 21:22:24', '103', '2022-01-15 17:06:33', b'0');
+INSERT INTO `bpm_process_definition_ext` VALUES (43, 'leave:11:5ddc9eb0-7483-11ec-b390-a2380e71991a', '0c1ee1f8-6c95-11ec-88b1-cacd34981f8e', 'AAA', 1, 11, NULL, NULL, NULL, NULL, '103', '2022-01-13 23:13:31', '103', '2022-01-15 17:06:33', b'0');
+INSERT INTO `bpm_process_definition_ext` VALUES (44, 'test:1:913d7930-75b8-11ec-b607-a2380e71991a', '1f98df4c-75b7-11ec-b607-a2380e71991a', NULL, 1, 11, NULL, NULL, NULL, NULL, '103', '2022-01-15 12:06:51', '103', '2022-01-15 17:06:33', b'0');
+INSERT INTO `bpm_process_definition_ext` VALUES (45, 'test:2:0f0e3986-75ba-11ec-a317-a2380e71991a', '1f98df4c-75b7-11ec-b607-a2380e71991a', NULL, 1, 11, NULL, NULL, NULL, NULL, '103', '2022-01-15 12:17:32', '103', '2022-01-15 17:06:33', b'0');
+INSERT INTO `bpm_process_definition_ext` VALUES (46, 'test:3:8e4df3a5-75bb-11ec-a317-a2380e71991a', '1f98df4c-75b7-11ec-b607-a2380e71991a', NULL, 1, 11, NULL, NULL, NULL, NULL, '103', '2022-01-15 12:28:15', '103', '2022-01-15 17:06:33', b'0');
+INSERT INTO `bpm_process_definition_ext` VALUES (47, 'test:4:b86e7d03-75bd-11ec-bf54-a2380e71991a', '1f98df4c-75b7-11ec-b607-a2380e71991a', NULL, 1, 11, NULL, NULL, NULL, NULL, '103', '2022-01-15 12:43:45', '103', '2022-01-15 17:06:33', b'0');
+INSERT INTO `bpm_process_definition_ext` VALUES (48, 'test:5:d64bc095-75bd-11ec-bf54-a2380e71991a', '1f98df4c-75b7-11ec-b607-a2380e71991a', NULL, 1, 11, NULL, NULL, NULL, NULL, '103', '2022-01-15 12:44:35', '103', '2022-01-15 17:06:33', b'0');
+INSERT INTO `bpm_process_definition_ext` VALUES (49, 'test:6:ebac9f59-75bd-11ec-bf54-a2380e71991a', '1f98df4c-75b7-11ec-b607-a2380e71991a', NULL, 1, 11, NULL, NULL, NULL, NULL, '103', '2022-01-15 12:45:11', '103', '2022-01-15 17:06:33', b'0');
+INSERT INTO `bpm_process_definition_ext` VALUES (50, 'test:7:fc60e5fc-75bd-11ec-bf54-a2380e71991a', '1f98df4c-75b7-11ec-b607-a2380e71991a', NULL, 1, 11, NULL, NULL, NULL, NULL, '103', '2022-01-15 12:45:39', '103', '2022-01-15 17:06:33', b'0');
+INSERT INTO `bpm_process_definition_ext` VALUES (51, 'test:8:12e0a13e-75be-11ec-bf54-a2380e71991a', '1f98df4c-75b7-11ec-b607-a2380e71991a', NULL, 1, 11, NULL, NULL, NULL, NULL, '103', '2022-01-15 12:46:16', '103', '2022-01-15 17:06:33', b'0');
+INSERT INTO `bpm_process_definition_ext` VALUES (53, 'test:9:e2658d43-7606-11ec-8cd2-a2380e71991a', 'a4ef4c7f-7606-11ec-8cd2-a2380e71991a', '滔博牛皮', 1, 11, NULL, NULL, NULL, NULL, '103', '2022-01-15 21:27:28', '103', '2022-01-15 17:06:33', b'0');
+INSERT INTO `bpm_process_definition_ext` VALUES (54, 'test:10:f3aa05e6-7606-11ec-8cd2-a2380e71991a', 'a4ef4c7f-7606-11ec-8cd2-a2380e71991a', '滔博牛皮', 1, 11, NULL, NULL, NULL, NULL, '103', '2022-01-15 21:27:57', '103', '2022-01-15 17:06:33', b'0');
+INSERT INTO `bpm_process_definition_ext` VALUES (55, 'test_001:1:c5772412-760b-11ec-9367-a2380e71991a', 'a3d5105e-760b-11ec-9367-a2380e71991a', NULL, 1, 11, NULL, NULL, NULL, NULL, '1', '2022-01-15 22:02:27', '1', '2022-01-15 17:06:33', b'0');
+INSERT INTO `bpm_process_definition_ext` VALUES (56, 'test:11:536ecba7-761a-11ec-a5c5-a2380e71991a', 'a4ef4c7f-7606-11ec-8cd2-a2380e71991a', '滔博牛皮', 1, 11, NULL, NULL, NULL, NULL, '1', '2022-01-15 23:46:38', '1', '2022-01-15 17:06:33', b'0');
+INSERT INTO `bpm_process_definition_ext` VALUES (57, 'test:12:5c91d0ba-761a-11ec-a5c5-a2380e71991a', 'a4ef4c7f-7606-11ec-8cd2-a2380e71991a', '滔博牛皮', 1, 11, NULL, NULL, NULL, NULL, '1', '2022-01-15 23:46:54', '1', '2022-01-15 17:06:33', b'0');
+INSERT INTO `bpm_process_definition_ext` VALUES (58, 'test:13:651e140d-761a-11ec-a5c5-a2380e71991a', 'a4ef4c7f-7606-11ec-8cd2-a2380e71991a', '滔博牛皮', 1, 11, NULL, NULL, NULL, NULL, '1', '2022-01-15 23:47:08', '1', '2022-01-15 17:06:33', b'0');
+INSERT INTO `bpm_process_definition_ext` VALUES (59, 'test:14:c1f049a4-761a-11ec-ba93-a2380e71991a', 'a4ef4c7f-7606-11ec-8cd2-a2380e71991a', '滔博牛皮', 1, 11, NULL, NULL, NULL, NULL, '1', '2022-01-15 23:49:44', '1', '2022-01-15 17:06:33', b'0');
+INSERT INTO `bpm_process_definition_ext` VALUES (60, 'test:15:5304ca92-761b-11ec-b05a-a2380e71991a', 'a4ef4c7f-7606-11ec-8cd2-a2380e71991a', '滔博牛皮', 1, 11, NULL, NULL, NULL, NULL, '1', '2022-01-15 23:53:47', '1', '2022-01-15 17:06:33', b'0');
+INSERT INTO `bpm_process_definition_ext` VALUES (61, 'oa_leave:1:482ec033-762a-11ec-8477-a2380e71991a', 'e4a1a1ef-7628-11ec-8477-a2380e71991a', 'OA 请假的示例', 20, NULL, NULL, NULL, '/bpm/oa/flow', '/oa/oa/leave', '1', '2022-01-16 01:40:51', '1', '2022-01-16 01:40:51', b'0');
+INSERT INTO `bpm_process_definition_ext` VALUES (62, 'test:16:d83ee859-762d-11ec-9125-a2380e71991a', 'a4ef4c7f-7606-11ec-8cd2-a2380e71991a', '滔博牛皮', 10, 11, '{\"formRef\":\"elForm\",\"formModel\":\"formData\",\"size\":\"medium\",\"labelPosition\":\"right\",\"labelWidth\":100,\"formRules\":\"rules\",\"gutter\":15,\"disabled\":false,\"span\":24,\"formBtns\":true}', '[\"{\\\"__config__\\\":{\\\"label\\\":\\\"单行文本\\\",\\\"labelWidth\\\":null,\\\"showLabel\\\":true,\\\"changeTag\\\":true,\\\"tag\\\":\\\"el-input\\\",\\\"tagIcon\\\":\\\"input\\\",\\\"required\\\":true,\\\"layout\\\":\\\"colFormItem\\\",\\\"span\\\":24,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/input\\\",\\\"regList\\\":[],\\\"formId\\\":121,\\\"renderKey\\\":\\\"1211641657675668\\\"},\\\"__slot__\\\":{\\\"prepend\\\":\\\"\\\",\\\"append\\\":\\\"\\\"},\\\"placeholder\\\":\\\"请输入单行文本\\\",\\\"style\\\":{\\\"width\\\":\\\"100%\\\"},\\\"clearable\\\":true,\\\"prefix-icon\\\":\\\"\\\",\\\"suffix-icon\\\":\\\"\\\",\\\"maxlength\\\":null,\\\"show-word-limit\\\":false,\\\"readonly\\\":false,\\\"disabled\\\":false,\\\"__vModel__\\\":\\\"field121\\\"}\",\"{\\\"__config__\\\":{\\\"label\\\":\\\"多选框组\\\",\\\"tag\\\":\\\"el-checkbox-group\\\",\\\"tagIcon\\\":\\\"checkbox\\\",\\\"defaultValue\\\":[],\\\"span\\\":24,\\\"showLabel\\\":true,\\\"labelWidth\\\":null,\\\"layout\\\":\\\"colFormItem\\\",\\\"optionType\\\":\\\"default\\\",\\\"required\\\":true,\\\"regList\\\":[],\\\"changeTag\\\":true,\\\"border\\\":false,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/checkbox\\\",\\\"formId\\\":122,\\\"renderKey\\\":\\\"1221641097529857\\\"},\\\"__slot__\\\":{\\\"options\\\":[{\\\"label\\\":\\\"选项一\\\",\\\"value\\\":1},{\\\"label\\\":\\\"选项二\\\",\\\"value\\\":2}]},\\\"style\\\":{},\\\"size\\\":\\\"medium\\\",\\\"disabled\\\":false,\\\"__vModel__\\\":\\\"field122\\\"}\"]', NULL, NULL, '1', '2022-01-16 02:06:22', '1', '2022-01-16 02:06:22', b'0');
+INSERT INTO `bpm_process_definition_ext` VALUES (63, 'test:17:04259e68-762e-11ec-9ab0-a2380e71991a', 'a4ef4c7f-7606-11ec-8cd2-a2380e71991a', '滔博牛皮', 10, 11, '{\"formRef\":\"elForm\",\"formModel\":\"formData\",\"size\":\"medium\",\"labelPosition\":\"right\",\"labelWidth\":100,\"formRules\":\"rules\",\"gutter\":15,\"disabled\":false,\"span\":24,\"formBtns\":true}', '[\"{\\\"__config__\\\":{\\\"label\\\":\\\"单行文本\\\",\\\"labelWidth\\\":null,\\\"showLabel\\\":true,\\\"changeTag\\\":true,\\\"tag\\\":\\\"el-input\\\",\\\"tagIcon\\\":\\\"input\\\",\\\"required\\\":true,\\\"layout\\\":\\\"colFormItem\\\",\\\"span\\\":24,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/input\\\",\\\"regList\\\":[],\\\"formId\\\":121,\\\"renderKey\\\":\\\"1211641657675668\\\"},\\\"__slot__\\\":{\\\"prepend\\\":\\\"\\\",\\\"append\\\":\\\"\\\"},\\\"placeholder\\\":\\\"请输入单行文本\\\",\\\"style\\\":{\\\"width\\\":\\\"100%\\\"},\\\"clearable\\\":true,\\\"prefix-icon\\\":\\\"\\\",\\\"suffix-icon\\\":\\\"\\\",\\\"maxlength\\\":null,\\\"show-word-limit\\\":false,\\\"readonly\\\":false,\\\"disabled\\\":false,\\\"__vModel__\\\":\\\"field121\\\"}\",\"{\\\"__config__\\\":{\\\"label\\\":\\\"多选框组\\\",\\\"tag\\\":\\\"el-checkbox-group\\\",\\\"tagIcon\\\":\\\"checkbox\\\",\\\"defaultValue\\\":[],\\\"span\\\":24,\\\"showLabel\\\":true,\\\"labelWidth\\\":null,\\\"layout\\\":\\\"colFormItem\\\",\\\"optionType\\\":\\\"default\\\",\\\"required\\\":true,\\\"regList\\\":[],\\\"changeTag\\\":true,\\\"border\\\":false,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/checkbox\\\",\\\"formId\\\":122,\\\"renderKey\\\":\\\"1221641097529857\\\"},\\\"__slot__\\\":{\\\"options\\\":[{\\\"label\\\":\\\"选项一\\\",\\\"value\\\":1},{\\\"label\\\":\\\"选项二\\\",\\\"value\\\":2}]},\\\"style\\\":{},\\\"size\\\":\\\"medium\\\",\\\"disabled\\\":false,\\\"__vModel__\\\":\\\"field122\\\"}\"]', NULL, NULL, '1', '2022-01-16 02:07:35', '1', '2022-01-16 02:07:35', b'0');
+INSERT INTO `bpm_process_definition_ext` VALUES (64, 'test:18:1bb307b1-7633-11ec-957a-a2380e71991a', 'a4ef4c7f-7606-11ec-8cd2-a2380e71991a', '滔博牛皮', 10, 11, '{\"formRef\":\"elForm\",\"formModel\":\"formData\",\"size\":\"medium\",\"labelPosition\":\"right\",\"labelWidth\":100,\"formRules\":\"rules\",\"gutter\":15,\"disabled\":false,\"span\":24,\"formBtns\":true}', '[\"{\\\"__config__\\\":{\\\"label\\\":\\\"单行文本\\\",\\\"labelWidth\\\":null,\\\"showLabel\\\":true,\\\"changeTag\\\":true,\\\"tag\\\":\\\"el-input\\\",\\\"tagIcon\\\":\\\"input\\\",\\\"required\\\":true,\\\"layout\\\":\\\"colFormItem\\\",\\\"span\\\":24,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/input\\\",\\\"regList\\\":[],\\\"formId\\\":121,\\\"renderKey\\\":\\\"1211641657675668\\\"},\\\"__slot__\\\":{\\\"prepend\\\":\\\"\\\",\\\"append\\\":\\\"\\\"},\\\"placeholder\\\":\\\"请输入单行文本\\\",\\\"style\\\":{\\\"width\\\":\\\"100%\\\"},\\\"clearable\\\":true,\\\"prefix-icon\\\":\\\"\\\",\\\"suffix-icon\\\":\\\"\\\",\\\"maxlength\\\":null,\\\"show-word-limit\\\":false,\\\"readonly\\\":false,\\\"disabled\\\":false,\\\"__vModel__\\\":\\\"field121\\\"}\",\"{\\\"__config__\\\":{\\\"label\\\":\\\"多选框组\\\",\\\"tag\\\":\\\"el-checkbox-group\\\",\\\"tagIcon\\\":\\\"checkbox\\\",\\\"defaultValue\\\":[],\\\"span\\\":24,\\\"showLabel\\\":true,\\\"labelWidth\\\":null,\\\"layout\\\":\\\"colFormItem\\\",\\\"optionType\\\":\\\"default\\\",\\\"required\\\":true,\\\"regList\\\":[],\\\"changeTag\\\":true,\\\"border\\\":false,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/checkbox\\\",\\\"formId\\\":122,\\\"renderKey\\\":\\\"1221641097529857\\\"},\\\"__slot__\\\":{\\\"options\\\":[{\\\"label\\\":\\\"选项一\\\",\\\"value\\\":1},{\\\"label\\\":\\\"选项二\\\",\\\"value\\\":2}]},\\\"style\\\":{},\\\"size\\\":\\\"medium\\\",\\\"disabled\\\":false,\\\"__vModel__\\\":\\\"field122\\\"}\"]', NULL, NULL, '1', '2022-01-16 02:44:02', '1', '2022-01-16 02:44:02', b'0');
+INSERT INTO `bpm_process_definition_ext` VALUES (65, 'self:1:17c042ff-7680-11ec-bc82-a2380e71991a', '024b400b-7680-11ec-bc82-a2380e71991a', NULL, 10, 11, '{\"formRef\":\"elForm\",\"formModel\":\"formData\",\"size\":\"medium\",\"labelPosition\":\"right\",\"labelWidth\":100,\"formRules\":\"rules\",\"gutter\":15,\"disabled\":false,\"span\":24,\"formBtns\":true}', '[\"{\\\"__config__\\\":{\\\"label\\\":\\\"单行文本\\\",\\\"labelWidth\\\":null,\\\"showLabel\\\":true,\\\"changeTag\\\":true,\\\"tag\\\":\\\"el-input\\\",\\\"tagIcon\\\":\\\"input\\\",\\\"required\\\":true,\\\"layout\\\":\\\"colFormItem\\\",\\\"span\\\":24,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/input\\\",\\\"regList\\\":[],\\\"formId\\\":121,\\\"renderKey\\\":\\\"1211641657675668\\\"},\\\"__slot__\\\":{\\\"prepend\\\":\\\"\\\",\\\"append\\\":\\\"\\\"},\\\"placeholder\\\":\\\"请输入单行文本\\\",\\\"style\\\":{\\\"width\\\":\\\"100%\\\"},\\\"clearable\\\":true,\\\"prefix-icon\\\":\\\"\\\",\\\"suffix-icon\\\":\\\"\\\",\\\"maxlength\\\":null,\\\"show-word-limit\\\":false,\\\"readonly\\\":false,\\\"disabled\\\":false,\\\"__vModel__\\\":\\\"field121\\\"}\",\"{\\\"__config__\\\":{\\\"label\\\":\\\"多选框组\\\",\\\"tag\\\":\\\"el-checkbox-group\\\",\\\"tagIcon\\\":\\\"checkbox\\\",\\\"defaultValue\\\":[],\\\"span\\\":24,\\\"showLabel\\\":true,\\\"labelWidth\\\":null,\\\"layout\\\":\\\"colFormItem\\\",\\\"optionType\\\":\\\"default\\\",\\\"required\\\":true,\\\"regList\\\":[],\\\"changeTag\\\":true,\\\"border\\\":false,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/checkbox\\\",\\\"formId\\\":122,\\\"renderKey\\\":\\\"1221641097529857\\\"},\\\"__slot__\\\":{\\\"options\\\":[{\\\"label\\\":\\\"选项一\\\",\\\"value\\\":1},{\\\"label\\\":\\\"选项二\\\",\\\"value\\\":2}]},\\\"style\\\":{},\\\"size\\\":\\\"medium\\\",\\\"disabled\\\":false,\\\"__vModel__\\\":\\\"field122\\\"}\"]', NULL, NULL, '1', '2022-01-16 11:55:07', '1', '2022-01-16 11:55:07', b'0');
+INSERT INTO `bpm_process_definition_ext` VALUES (66, 'test:19:a401b61a-768b-11ec-afcd-a2380e71991a', 'a4ef4c7f-7606-11ec-8cd2-a2380e71991a', '滔博牛皮', 10, 11, '{\"formRef\":\"elForm\",\"formModel\":\"formData\",\"size\":\"medium\",\"labelPosition\":\"right\",\"labelWidth\":100,\"formRules\":\"rules\",\"gutter\":15,\"disabled\":false,\"span\":24,\"formBtns\":true}', '[\"{\\\"__config__\\\":{\\\"label\\\":\\\"单行文本\\\",\\\"labelWidth\\\":null,\\\"showLabel\\\":true,\\\"changeTag\\\":true,\\\"tag\\\":\\\"el-input\\\",\\\"tagIcon\\\":\\\"input\\\",\\\"required\\\":true,\\\"layout\\\":\\\"colFormItem\\\",\\\"span\\\":24,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/input\\\",\\\"regList\\\":[],\\\"formId\\\":121,\\\"renderKey\\\":\\\"1211641657675668\\\"},\\\"__slot__\\\":{\\\"prepend\\\":\\\"\\\",\\\"append\\\":\\\"\\\"},\\\"placeholder\\\":\\\"请输入单行文本\\\",\\\"style\\\":{\\\"width\\\":\\\"100%\\\"},\\\"clearable\\\":true,\\\"prefix-icon\\\":\\\"\\\",\\\"suffix-icon\\\":\\\"\\\",\\\"maxlength\\\":null,\\\"show-word-limit\\\":false,\\\"readonly\\\":false,\\\"disabled\\\":false,\\\"__vModel__\\\":\\\"field121\\\"}\",\"{\\\"__config__\\\":{\\\"label\\\":\\\"多选框组\\\",\\\"tag\\\":\\\"el-checkbox-group\\\",\\\"tagIcon\\\":\\\"checkbox\\\",\\\"defaultValue\\\":[],\\\"span\\\":24,\\\"showLabel\\\":true,\\\"labelWidth\\\":null,\\\"layout\\\":\\\"colFormItem\\\",\\\"optionType\\\":\\\"default\\\",\\\"required\\\":true,\\\"regList\\\":[],\\\"changeTag\\\":true,\\\"border\\\":false,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/checkbox\\\",\\\"formId\\\":122,\\\"renderKey\\\":\\\"1221641097529857\\\"},\\\"__slot__\\\":{\\\"options\\\":[{\\\"label\\\":\\\"选项一\\\",\\\"value\\\":1},{\\\"label\\\":\\\"选项二\\\",\\\"value\\\":2}]},\\\"style\\\":{},\\\"size\\\":\\\"medium\\\",\\\"disabled\\\":false,\\\"__vModel__\\\":\\\"field122\\\"}\"]', NULL, NULL, '1', '2022-01-16 13:17:47', '1', '2022-01-16 13:17:47', b'0');
+INSERT INTO `bpm_process_definition_ext` VALUES (67, 'test_001:2:c680200d-768b-11ec-afcd-a2380e71991a', 'a3d5105e-760b-11ec-9367-a2380e71991a', NULL, 10, 11, '{\"formRef\":\"elForm\",\"formModel\":\"formData\",\"size\":\"medium\",\"labelPosition\":\"right\",\"labelWidth\":100,\"formRules\":\"rules\",\"gutter\":15,\"disabled\":false,\"span\":24,\"formBtns\":true}', '[\"{\\\"__config__\\\":{\\\"label\\\":\\\"单行文本\\\",\\\"labelWidth\\\":null,\\\"showLabel\\\":true,\\\"changeTag\\\":true,\\\"tag\\\":\\\"el-input\\\",\\\"tagIcon\\\":\\\"input\\\",\\\"required\\\":true,\\\"layout\\\":\\\"colFormItem\\\",\\\"span\\\":24,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/input\\\",\\\"regList\\\":[],\\\"formId\\\":121,\\\"renderKey\\\":\\\"1211641657675668\\\"},\\\"__slot__\\\":{\\\"prepend\\\":\\\"\\\",\\\"append\\\":\\\"\\\"},\\\"placeholder\\\":\\\"请输入单行文本\\\",\\\"style\\\":{\\\"width\\\":\\\"100%\\\"},\\\"clearable\\\":true,\\\"prefix-icon\\\":\\\"\\\",\\\"suffix-icon\\\":\\\"\\\",\\\"maxlength\\\":null,\\\"show-word-limit\\\":false,\\\"readonly\\\":false,\\\"disabled\\\":false,\\\"__vModel__\\\":\\\"field121\\\"}\",\"{\\\"__config__\\\":{\\\"label\\\":\\\"多选框组\\\",\\\"tag\\\":\\\"el-checkbox-group\\\",\\\"tagIcon\\\":\\\"checkbox\\\",\\\"defaultValue\\\":[],\\\"span\\\":24,\\\"showLabel\\\":true,\\\"labelWidth\\\":null,\\\"layout\\\":\\\"colFormItem\\\",\\\"optionType\\\":\\\"default\\\",\\\"required\\\":true,\\\"regList\\\":[],\\\"changeTag\\\":true,\\\"border\\\":false,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/checkbox\\\",\\\"formId\\\":122,\\\"renderKey\\\":\\\"1221641097529857\\\"},\\\"__slot__\\\":{\\\"options\\\":[{\\\"label\\\":\\\"选项一\\\",\\\"value\\\":1},{\\\"label\\\":\\\"选项二\\\",\\\"value\\\":2}]},\\\"style\\\":{},\\\"size\\\":\\\"medium\\\",\\\"disabled\\\":false,\\\"__vModel__\\\":\\\"field122\\\"}\"]', NULL, NULL, '1', '2022-01-16 13:18:44', '1', '2022-01-16 13:18:44', b'0');
+INSERT INTO `bpm_process_definition_ext` VALUES (68, 'test_001:3:4e8e99b2-768c-11ec-afcd-a2380e71991a', 'a3d5105e-760b-11ec-9367-a2380e71991a', NULL, 10, 11, '{\"formRef\":\"elForm\",\"formModel\":\"formData\",\"size\":\"medium\",\"labelPosition\":\"right\",\"labelWidth\":100,\"formRules\":\"rules\",\"gutter\":15,\"disabled\":false,\"span\":24,\"formBtns\":true}', '[\"{\\\"__config__\\\":{\\\"label\\\":\\\"单行文本\\\",\\\"labelWidth\\\":null,\\\"showLabel\\\":true,\\\"changeTag\\\":true,\\\"tag\\\":\\\"el-input\\\",\\\"tagIcon\\\":\\\"input\\\",\\\"required\\\":true,\\\"layout\\\":\\\"colFormItem\\\",\\\"span\\\":24,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/input\\\",\\\"regList\\\":[],\\\"formId\\\":121,\\\"renderKey\\\":\\\"1211641657675668\\\"},\\\"__slot__\\\":{\\\"prepend\\\":\\\"\\\",\\\"append\\\":\\\"\\\"},\\\"placeholder\\\":\\\"请输入单行文本\\\",\\\"style\\\":{\\\"width\\\":\\\"100%\\\"},\\\"clearable\\\":true,\\\"prefix-icon\\\":\\\"\\\",\\\"suffix-icon\\\":\\\"\\\",\\\"maxlength\\\":null,\\\"show-word-limit\\\":false,\\\"readonly\\\":false,\\\"disabled\\\":false,\\\"__vModel__\\\":\\\"field121\\\"}\",\"{\\\"__config__\\\":{\\\"label\\\":\\\"多选框组\\\",\\\"tag\\\":\\\"el-checkbox-group\\\",\\\"tagIcon\\\":\\\"checkbox\\\",\\\"defaultValue\\\":[],\\\"span\\\":24,\\\"showLabel\\\":true,\\\"labelWidth\\\":null,\\\"layout\\\":\\\"colFormItem\\\",\\\"optionType\\\":\\\"default\\\",\\\"required\\\":true,\\\"regList\\\":[],\\\"changeTag\\\":true,\\\"border\\\":false,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/checkbox\\\",\\\"formId\\\":122,\\\"renderKey\\\":\\\"1221641097529857\\\"},\\\"__slot__\\\":{\\\"options\\\":[{\\\"label\\\":\\\"选项一\\\",\\\"value\\\":1},{\\\"label\\\":\\\"选项二\\\",\\\"value\\\":2}]},\\\"style\\\":{},\\\"size\\\":\\\"medium\\\",\\\"disabled\\\":false,\\\"__vModel__\\\":\\\"field122\\\"}\"]', NULL, NULL, '1', '2022-01-16 13:22:33', '1', '2022-01-16 13:22:33', b'0');
+INSERT INTO `bpm_process_definition_ext` VALUES (69, 'self:2:3a5a065e-76b1-11ec-9c66-a2380e71991a', '024b400b-7680-11ec-bc82-a2380e71991a', NULL, 10, 11, '{\"formRef\":\"elForm\",\"formModel\":\"formData\",\"size\":\"medium\",\"labelPosition\":\"right\",\"labelWidth\":100,\"formRules\":\"rules\",\"gutter\":15,\"disabled\":false,\"span\":24,\"formBtns\":true}', '[\"{\\\"__config__\\\":{\\\"label\\\":\\\"单行文本\\\",\\\"labelWidth\\\":null,\\\"showLabel\\\":true,\\\"changeTag\\\":true,\\\"tag\\\":\\\"el-input\\\",\\\"tagIcon\\\":\\\"input\\\",\\\"required\\\":true,\\\"layout\\\":\\\"colFormItem\\\",\\\"span\\\":24,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/input\\\",\\\"regList\\\":[],\\\"formId\\\":121,\\\"renderKey\\\":\\\"1211641657675668\\\"},\\\"__slot__\\\":{\\\"prepend\\\":\\\"\\\",\\\"append\\\":\\\"\\\"},\\\"placeholder\\\":\\\"请输入单行文本\\\",\\\"style\\\":{\\\"width\\\":\\\"100%\\\"},\\\"clearable\\\":true,\\\"prefix-icon\\\":\\\"\\\",\\\"suffix-icon\\\":\\\"\\\",\\\"maxlength\\\":null,\\\"show-word-limit\\\":false,\\\"readonly\\\":false,\\\"disabled\\\":false,\\\"__vModel__\\\":\\\"field121\\\"}\",\"{\\\"__config__\\\":{\\\"label\\\":\\\"多选框组\\\",\\\"tag\\\":\\\"el-checkbox-group\\\",\\\"tagIcon\\\":\\\"checkbox\\\",\\\"defaultValue\\\":[],\\\"span\\\":24,\\\"showLabel\\\":true,\\\"labelWidth\\\":null,\\\"layout\\\":\\\"colFormItem\\\",\\\"optionType\\\":\\\"default\\\",\\\"required\\\":true,\\\"regList\\\":[],\\\"changeTag\\\":true,\\\"border\\\":false,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/checkbox\\\",\\\"formId\\\":122,\\\"renderKey\\\":\\\"1221641097529857\\\"},\\\"__slot__\\\":{\\\"options\\\":[{\\\"label\\\":\\\"选项一\\\",\\\"value\\\":1},{\\\"label\\\":\\\"选项二\\\",\\\"value\\\":2}]},\\\"style\\\":{},\\\"size\\\":\\\"medium\\\",\\\"disabled\\\":false,\\\"__vModel__\\\":\\\"field122\\\"}\"]', NULL, NULL, '1', '2022-01-16 17:46:50', '1', '2022-01-16 17:46:50', b'0');
+INSERT INTO `bpm_process_definition_ext` VALUES (70, 'oa_leave:2:3c1f0ef1-76b1-11ec-9c66-a2380e71991a', 'e4a1a1ef-7628-11ec-8477-a2380e71991a', 'OA 请假的示例', 20, NULL, NULL, NULL, '/bpm/oa/flow', '/oa/oa/leave', '1', '2022-01-16 17:46:53', '1', '2022-01-16 17:46:53', b'0');
+INSERT INTO `bpm_process_definition_ext` VALUES (71, 'test_001:4:3dbe6714-76b1-11ec-9c66-a2380e71991a', 'a3d5105e-760b-11ec-9367-a2380e71991a', NULL, 10, 11, '{\"formRef\":\"elForm\",\"formModel\":\"formData\",\"size\":\"medium\",\"labelPosition\":\"right\",\"labelWidth\":100,\"formRules\":\"rules\",\"gutter\":15,\"disabled\":false,\"span\":24,\"formBtns\":true}', '[\"{\\\"__config__\\\":{\\\"label\\\":\\\"单行文本\\\",\\\"labelWidth\\\":null,\\\"showLabel\\\":true,\\\"changeTag\\\":true,\\\"tag\\\":\\\"el-input\\\",\\\"tagIcon\\\":\\\"input\\\",\\\"required\\\":true,\\\"layout\\\":\\\"colFormItem\\\",\\\"span\\\":24,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/input\\\",\\\"regList\\\":[],\\\"formId\\\":121,\\\"renderKey\\\":\\\"1211641657675668\\\"},\\\"__slot__\\\":{\\\"prepend\\\":\\\"\\\",\\\"append\\\":\\\"\\\"},\\\"placeholder\\\":\\\"请输入单行文本\\\",\\\"style\\\":{\\\"width\\\":\\\"100%\\\"},\\\"clearable\\\":true,\\\"prefix-icon\\\":\\\"\\\",\\\"suffix-icon\\\":\\\"\\\",\\\"maxlength\\\":null,\\\"show-word-limit\\\":false,\\\"readonly\\\":false,\\\"disabled\\\":false,\\\"__vModel__\\\":\\\"field121\\\"}\",\"{\\\"__config__\\\":{\\\"label\\\":\\\"多选框组\\\",\\\"tag\\\":\\\"el-checkbox-group\\\",\\\"tagIcon\\\":\\\"checkbox\\\",\\\"defaultValue\\\":[],\\\"span\\\":24,\\\"showLabel\\\":true,\\\"labelWidth\\\":null,\\\"layout\\\":\\\"colFormItem\\\",\\\"optionType\\\":\\\"default\\\",\\\"required\\\":true,\\\"regList\\\":[],\\\"changeTag\\\":true,\\\"border\\\":false,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/checkbox\\\",\\\"formId\\\":122,\\\"renderKey\\\":\\\"1221641097529857\\\"},\\\"__slot__\\\":{\\\"options\\\":[{\\\"label\\\":\\\"选项一\\\",\\\"value\\\":1},{\\\"label\\\":\\\"选项二\\\",\\\"value\\\":2}]},\\\"style\\\":{},\\\"size\\\":\\\"medium\\\",\\\"disabled\\\":false,\\\"__vModel__\\\":\\\"field122\\\"}\"]', NULL, NULL, '1', '2022-01-16 17:46:56', '1', '2022-01-16 17:46:56', b'0');
+INSERT INTO `bpm_process_definition_ext` VALUES (72, 'test:20:3f1c2257-76b1-11ec-9c66-a2380e71991a', 'a4ef4c7f-7606-11ec-8cd2-a2380e71991a', '滔博牛皮', 10, 11, '{\"formRef\":\"elForm\",\"formModel\":\"formData\",\"size\":\"medium\",\"labelPosition\":\"right\",\"labelWidth\":100,\"formRules\":\"rules\",\"gutter\":15,\"disabled\":false,\"span\":24,\"formBtns\":true}', '[\"{\\\"__config__\\\":{\\\"label\\\":\\\"单行文本\\\",\\\"labelWidth\\\":null,\\\"showLabel\\\":true,\\\"changeTag\\\":true,\\\"tag\\\":\\\"el-input\\\",\\\"tagIcon\\\":\\\"input\\\",\\\"required\\\":true,\\\"layout\\\":\\\"colFormItem\\\",\\\"span\\\":24,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/input\\\",\\\"regList\\\":[],\\\"formId\\\":121,\\\"renderKey\\\":\\\"1211641657675668\\\"},\\\"__slot__\\\":{\\\"prepend\\\":\\\"\\\",\\\"append\\\":\\\"\\\"},\\\"placeholder\\\":\\\"请输入单行文本\\\",\\\"style\\\":{\\\"width\\\":\\\"100%\\\"},\\\"clearable\\\":true,\\\"prefix-icon\\\":\\\"\\\",\\\"suffix-icon\\\":\\\"\\\",\\\"maxlength\\\":null,\\\"show-word-limit\\\":false,\\\"readonly\\\":false,\\\"disabled\\\":false,\\\"__vModel__\\\":\\\"field121\\\"}\",\"{\\\"__config__\\\":{\\\"label\\\":\\\"多选框组\\\",\\\"tag\\\":\\\"el-checkbox-group\\\",\\\"tagIcon\\\":\\\"checkbox\\\",\\\"defaultValue\\\":[],\\\"span\\\":24,\\\"showLabel\\\":true,\\\"labelWidth\\\":null,\\\"layout\\\":\\\"colFormItem\\\",\\\"optionType\\\":\\\"default\\\",\\\"required\\\":true,\\\"regList\\\":[],\\\"changeTag\\\":true,\\\"border\\\":false,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/checkbox\\\",\\\"formId\\\":122,\\\"renderKey\\\":\\\"1221641097529857\\\"},\\\"__slot__\\\":{\\\"options\\\":[{\\\"label\\\":\\\"选项一\\\",\\\"value\\\":1},{\\\"label\\\":\\\"选项二\\\",\\\"value\\\":2}]},\\\"style\\\":{},\\\"size\\\":\\\"medium\\\",\\\"disabled\\\":false,\\\"__vModel__\\\":\\\"field122\\\"}\"]', NULL, NULL, '1', '2022-01-16 17:46:58', '1', '2022-01-16 17:46:58', b'0');
+INSERT INTO `bpm_process_definition_ext` VALUES (73, 'eee:1:89b300ac-79af-11ec-abb0-a2380e71991a', '02b756a8-79af-11ec-abb0-a2380e71991a', NULL, 10, 11, '{\"formRef\":\"elForm\",\"formModel\":\"formData\",\"size\":\"medium\",\"labelPosition\":\"right\",\"labelWidth\":100,\"formRules\":\"rules\",\"gutter\":15,\"disabled\":false,\"span\":24,\"formBtns\":true}', '[\"{\\\"__config__\\\":{\\\"label\\\":\\\"单行文本\\\",\\\"labelWidth\\\":null,\\\"showLabel\\\":true,\\\"changeTag\\\":true,\\\"tag\\\":\\\"el-input\\\",\\\"tagIcon\\\":\\\"input\\\",\\\"required\\\":true,\\\"layout\\\":\\\"colFormItem\\\",\\\"span\\\":24,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/input\\\",\\\"regList\\\":[],\\\"formId\\\":121,\\\"renderKey\\\":\\\"1211641657675668\\\"},\\\"__slot__\\\":{\\\"prepend\\\":\\\"\\\",\\\"append\\\":\\\"\\\"},\\\"placeholder\\\":\\\"请输入单行文本\\\",\\\"style\\\":{\\\"width\\\":\\\"100%\\\"},\\\"clearable\\\":true,\\\"prefix-icon\\\":\\\"\\\",\\\"suffix-icon\\\":\\\"\\\",\\\"maxlength\\\":null,\\\"show-word-limit\\\":false,\\\"readonly\\\":false,\\\"disabled\\\":false,\\\"__vModel__\\\":\\\"field121\\\"}\",\"{\\\"__config__\\\":{\\\"label\\\":\\\"多选框组\\\",\\\"tag\\\":\\\"el-checkbox-group\\\",\\\"tagIcon\\\":\\\"checkbox\\\",\\\"defaultValue\\\":[],\\\"span\\\":24,\\\"showLabel\\\":true,\\\"labelWidth\\\":null,\\\"layout\\\":\\\"colFormItem\\\",\\\"optionType\\\":\\\"default\\\",\\\"required\\\":true,\\\"regList\\\":[],\\\"changeTag\\\":true,\\\"border\\\":false,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/checkbox\\\",\\\"formId\\\":122,\\\"renderKey\\\":\\\"1221641097529857\\\"},\\\"__slot__\\\":{\\\"options\\\":[{\\\"label\\\":\\\"选项一\\\",\\\"value\\\":1},{\\\"label\\\":\\\"选项二\\\",\\\"value\\\":2}]},\\\"style\\\":{},\\\"size\\\":\\\"medium\\\",\\\"disabled\\\":false,\\\"__vModel__\\\":\\\"field122\\\"}\"]', NULL, NULL, '1', '2022-01-20 13:12:18', '1', '2022-01-20 13:12:18', b'0');
+INSERT INTO `bpm_process_definition_ext` VALUES (74, 'test:21:c2cd44b0-79b0-11ec-b2b8-a2380e71991a', 'a4ef4c7f-7606-11ec-8cd2-a2380e71991a', '滔博牛皮', 10, 11, '{\"formRef\":\"elForm\",\"formModel\":\"formData\",\"size\":\"medium\",\"labelPosition\":\"right\",\"labelWidth\":100,\"formRules\":\"rules\",\"gutter\":15,\"disabled\":false,\"span\":24,\"formBtns\":true}', '[\"{\\\"__config__\\\":{\\\"label\\\":\\\"单行文本\\\",\\\"labelWidth\\\":null,\\\"showLabel\\\":true,\\\"changeTag\\\":true,\\\"tag\\\":\\\"el-input\\\",\\\"tagIcon\\\":\\\"input\\\",\\\"required\\\":true,\\\"layout\\\":\\\"colFormItem\\\",\\\"span\\\":24,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/input\\\",\\\"regList\\\":[],\\\"formId\\\":121,\\\"renderKey\\\":\\\"1211641657675668\\\"},\\\"__slot__\\\":{\\\"prepend\\\":\\\"\\\",\\\"append\\\":\\\"\\\"},\\\"placeholder\\\":\\\"请输入单行文本\\\",\\\"style\\\":{\\\"width\\\":\\\"100%\\\"},\\\"clearable\\\":true,\\\"prefix-icon\\\":\\\"\\\",\\\"suffix-icon\\\":\\\"\\\",\\\"maxlength\\\":null,\\\"show-word-limit\\\":false,\\\"readonly\\\":false,\\\"disabled\\\":false,\\\"__vModel__\\\":\\\"field121\\\"}\",\"{\\\"__config__\\\":{\\\"label\\\":\\\"多选框组\\\",\\\"tag\\\":\\\"el-checkbox-group\\\",\\\"tagIcon\\\":\\\"checkbox\\\",\\\"defaultValue\\\":[],\\\"span\\\":24,\\\"showLabel\\\":true,\\\"labelWidth\\\":null,\\\"layout\\\":\\\"colFormItem\\\",\\\"optionType\\\":\\\"default\\\",\\\"required\\\":true,\\\"regList\\\":[],\\\"changeTag\\\":true,\\\"border\\\":false,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/checkbox\\\",\\\"formId\\\":122,\\\"renderKey\\\":\\\"1221641097529857\\\"},\\\"__slot__\\\":{\\\"options\\\":[{\\\"label\\\":\\\"选项一\\\",\\\"value\\\":1},{\\\"label\\\":\\\"选项二\\\",\\\"value\\\":2}]},\\\"style\\\":{},\\\"size\\\":\\\"medium\\\",\\\"disabled\\\":false,\\\"__vModel__\\\":\\\"field122\\\"}\"]', NULL, NULL, '1', '2022-01-20 13:21:03', '1', '2022-01-20 13:21:03', b'0');
+INSERT INTO `bpm_process_definition_ext` VALUES (75, 'eee:2:8a7b5672-7ade-11ec-a777-a2380e71991a', '02b756a8-79af-11ec-abb0-a2380e71991a', NULL, 10, 11, '{\"formRef\":\"elForm\",\"formModel\":\"formData\",\"size\":\"medium\",\"labelPosition\":\"right\",\"labelWidth\":100,\"formRules\":\"rules\",\"gutter\":15,\"disabled\":false,\"span\":24,\"formBtns\":true}', '[\"{\\\"__config__\\\":{\\\"label\\\":\\\"单行文本\\\",\\\"labelWidth\\\":null,\\\"showLabel\\\":true,\\\"changeTag\\\":true,\\\"tag\\\":\\\"el-input\\\",\\\"tagIcon\\\":\\\"input\\\",\\\"required\\\":true,\\\"layout\\\":\\\"colFormItem\\\",\\\"span\\\":24,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/input\\\",\\\"regList\\\":[],\\\"formId\\\":121,\\\"renderKey\\\":\\\"1211641657675668\\\"},\\\"__slot__\\\":{\\\"prepend\\\":\\\"\\\",\\\"append\\\":\\\"\\\"},\\\"placeholder\\\":\\\"请输入单行文本\\\",\\\"style\\\":{\\\"width\\\":\\\"100%\\\"},\\\"clearable\\\":true,\\\"prefix-icon\\\":\\\"\\\",\\\"suffix-icon\\\":\\\"\\\",\\\"maxlength\\\":null,\\\"show-word-limit\\\":false,\\\"readonly\\\":false,\\\"disabled\\\":false,\\\"__vModel__\\\":\\\"field121\\\"}\",\"{\\\"__config__\\\":{\\\"label\\\":\\\"多选框组\\\",\\\"tag\\\":\\\"el-checkbox-group\\\",\\\"tagIcon\\\":\\\"checkbox\\\",\\\"defaultValue\\\":[],\\\"span\\\":24,\\\"showLabel\\\":true,\\\"labelWidth\\\":null,\\\"layout\\\":\\\"colFormItem\\\",\\\"optionType\\\":\\\"default\\\",\\\"required\\\":true,\\\"regList\\\":[],\\\"changeTag\\\":true,\\\"border\\\":false,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/checkbox\\\",\\\"formId\\\":122,\\\"renderKey\\\":\\\"1221641097529857\\\"},\\\"__slot__\\\":{\\\"options\\\":[{\\\"label\\\":\\\"选项一\\\",\\\"value\\\":1},{\\\"label\\\":\\\"选项二\\\",\\\"value\\\":2}]},\\\"style\\\":{},\\\"size\\\":\\\"medium\\\",\\\"disabled\\\":false,\\\"__vModel__\\\":\\\"field122\\\"}\"]', NULL, NULL, '1', '2022-01-22 01:21:17', '1', '2022-01-22 01:21:17', b'0');
+INSERT INTO `bpm_process_definition_ext` VALUES (76, 'eee:3:8db9dfa5-7ade-11ec-a777-a2380e71991a', '02b756a8-79af-11ec-abb0-a2380e71991a', NULL, 10, 11, '{\"formRef\":\"elForm\",\"formModel\":\"formData\",\"size\":\"medium\",\"labelPosition\":\"right\",\"labelWidth\":100,\"formRules\":\"rules\",\"gutter\":15,\"disabled\":false,\"span\":24,\"formBtns\":true}', '[\"{\\\"__config__\\\":{\\\"label\\\":\\\"单行文本\\\",\\\"labelWidth\\\":null,\\\"showLabel\\\":true,\\\"changeTag\\\":true,\\\"tag\\\":\\\"el-input\\\",\\\"tagIcon\\\":\\\"input\\\",\\\"required\\\":true,\\\"layout\\\":\\\"colFormItem\\\",\\\"span\\\":24,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/input\\\",\\\"regList\\\":[],\\\"formId\\\":121,\\\"renderKey\\\":\\\"1211641657675668\\\"},\\\"__slot__\\\":{\\\"prepend\\\":\\\"\\\",\\\"append\\\":\\\"\\\"},\\\"placeholder\\\":\\\"请输入单行文本\\\",\\\"style\\\":{\\\"width\\\":\\\"100%\\\"},\\\"clearable\\\":true,\\\"prefix-icon\\\":\\\"\\\",\\\"suffix-icon\\\":\\\"\\\",\\\"maxlength\\\":null,\\\"show-word-limit\\\":false,\\\"readonly\\\":false,\\\"disabled\\\":false,\\\"__vModel__\\\":\\\"field121\\\"}\",\"{\\\"__config__\\\":{\\\"label\\\":\\\"多选框组\\\",\\\"tag\\\":\\\"el-checkbox-group\\\",\\\"tagIcon\\\":\\\"checkbox\\\",\\\"defaultValue\\\":[],\\\"span\\\":24,\\\"showLabel\\\":true,\\\"labelWidth\\\":null,\\\"layout\\\":\\\"colFormItem\\\",\\\"optionType\\\":\\\"default\\\",\\\"required\\\":true,\\\"regList\\\":[],\\\"changeTag\\\":true,\\\"border\\\":false,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/checkbox\\\",\\\"formId\\\":122,\\\"renderKey\\\":\\\"1221641097529857\\\"},\\\"__slot__\\\":{\\\"options\\\":[{\\\"label\\\":\\\"选项一\\\",\\\"value\\\":1},{\\\"label\\\":\\\"选项二\\\",\\\"value\\\":2}]},\\\"style\\\":{},\\\"size\\\":\\\"medium\\\",\\\"disabled\\\":false,\\\"__vModel__\\\":\\\"field122\\\"}\"]', NULL, NULL, '1', '2022-01-22 01:21:22', '1', '2022-01-22 01:21:22', b'0');
+INSERT INTO `bpm_process_definition_ext` VALUES (77, 'eee:4:a63e1e68-7ade-11ec-a777-a2380e71991a', '02b756a8-79af-11ec-abb0-a2380e71991a', 'AAA', 10, 11, '{\"formRef\":\"elForm\",\"formModel\":\"formData\",\"size\":\"medium\",\"labelPosition\":\"right\",\"labelWidth\":100,\"formRules\":\"rules\",\"gutter\":15,\"disabled\":false,\"span\":24,\"formBtns\":true}', '[\"{\\\"__config__\\\":{\\\"label\\\":\\\"单行文本\\\",\\\"labelWidth\\\":null,\\\"showLabel\\\":true,\\\"changeTag\\\":true,\\\"tag\\\":\\\"el-input\\\",\\\"tagIcon\\\":\\\"input\\\",\\\"required\\\":true,\\\"layout\\\":\\\"colFormItem\\\",\\\"span\\\":24,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/input\\\",\\\"regList\\\":[],\\\"formId\\\":121,\\\"renderKey\\\":\\\"1211641657675668\\\"},\\\"__slot__\\\":{\\\"prepend\\\":\\\"\\\",\\\"append\\\":\\\"\\\"},\\\"placeholder\\\":\\\"请输入单行文本\\\",\\\"style\\\":{\\\"width\\\":\\\"100%\\\"},\\\"clearable\\\":true,\\\"prefix-icon\\\":\\\"\\\",\\\"suffix-icon\\\":\\\"\\\",\\\"maxlength\\\":null,\\\"show-word-limit\\\":false,\\\"readonly\\\":false,\\\"disabled\\\":false,\\\"__vModel__\\\":\\\"field121\\\"}\",\"{\\\"__config__\\\":{\\\"label\\\":\\\"多选框组\\\",\\\"tag\\\":\\\"el-checkbox-group\\\",\\\"tagIcon\\\":\\\"checkbox\\\",\\\"defaultValue\\\":[],\\\"span\\\":24,\\\"showLabel\\\":true,\\\"labelWidth\\\":null,\\\"layout\\\":\\\"colFormItem\\\",\\\"optionType\\\":\\\"default\\\",\\\"required\\\":true,\\\"regList\\\":[],\\\"changeTag\\\":true,\\\"border\\\":false,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/checkbox\\\",\\\"formId\\\":122,\\\"renderKey\\\":\\\"1221641097529857\\\"},\\\"__slot__\\\":{\\\"options\\\":[{\\\"label\\\":\\\"选项一\\\",\\\"value\\\":1},{\\\"label\\\":\\\"选项二\\\",\\\"value\\\":2}]},\\\"style\\\":{},\\\"size\\\":\\\"medium\\\",\\\"disabled\\\":false,\\\"__vModel__\\\":\\\"field122\\\"}\"]', NULL, NULL, '1', '2022-01-22 01:22:03', '1', '2022-01-22 01:22:03', b'0');
+INSERT INTO `bpm_process_definition_ext` VALUES (78, 'eee:5:33f2d275-7adf-11ec-93fe-a2380e71991a', '02b756a8-79af-11ec-abb0-a2380e71991a', 'AAA', 10, 11, '{\"formRef\":\"elForm\",\"formModel\":\"formData\",\"size\":\"medium\",\"labelPosition\":\"right\",\"labelWidth\":100,\"formRules\":\"rules\",\"gutter\":15,\"disabled\":false,\"span\":24,\"formBtns\":true}', '[\"{\\\"__config__\\\":{\\\"label\\\":\\\"单行文本\\\",\\\"labelWidth\\\":null,\\\"showLabel\\\":true,\\\"changeTag\\\":true,\\\"tag\\\":\\\"el-input\\\",\\\"tagIcon\\\":\\\"input\\\",\\\"required\\\":true,\\\"layout\\\":\\\"colFormItem\\\",\\\"span\\\":24,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/input\\\",\\\"regList\\\":[],\\\"formId\\\":121,\\\"renderKey\\\":\\\"1211641657675668\\\"},\\\"__slot__\\\":{\\\"prepend\\\":\\\"\\\",\\\"append\\\":\\\"\\\"},\\\"placeholder\\\":\\\"请输入单行文本\\\",\\\"style\\\":{\\\"width\\\":\\\"100%\\\"},\\\"clearable\\\":true,\\\"prefix-icon\\\":\\\"\\\",\\\"suffix-icon\\\":\\\"\\\",\\\"maxlength\\\":null,\\\"show-word-limit\\\":false,\\\"readonly\\\":false,\\\"disabled\\\":false,\\\"__vModel__\\\":\\\"field121\\\"}\",\"{\\\"__config__\\\":{\\\"label\\\":\\\"多选框组\\\",\\\"tag\\\":\\\"el-checkbox-group\\\",\\\"tagIcon\\\":\\\"checkbox\\\",\\\"defaultValue\\\":[],\\\"span\\\":24,\\\"showLabel\\\":true,\\\"labelWidth\\\":null,\\\"layout\\\":\\\"colFormItem\\\",\\\"optionType\\\":\\\"default\\\",\\\"required\\\":true,\\\"regList\\\":[],\\\"changeTag\\\":true,\\\"border\\\":false,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/checkbox\\\",\\\"formId\\\":122,\\\"renderKey\\\":\\\"1221641097529857\\\"},\\\"__slot__\\\":{\\\"options\\\":[{\\\"label\\\":\\\"选项一\\\",\\\"value\\\":1},{\\\"label\\\":\\\"选项二\\\",\\\"value\\\":2}]},\\\"style\\\":{},\\\"size\\\":\\\"medium\\\",\\\"disabled\\\":false,\\\"__vModel__\\\":\\\"field122\\\"}\"]', NULL, NULL, '1', '2022-01-22 01:26:01', '1', '2022-01-22 01:26:01', b'0');
+INSERT INTO `bpm_process_definition_ext` VALUES (79, 'eee:6:365e0618-7adf-11ec-93fe-a2380e71991a', '02b756a8-79af-11ec-abb0-a2380e71991a', 'AAA', 10, 11, '{\"formRef\":\"elForm\",\"formModel\":\"formData\",\"size\":\"medium\",\"labelPosition\":\"right\",\"labelWidth\":100,\"formRules\":\"rules\",\"gutter\":15,\"disabled\":false,\"span\":24,\"formBtns\":true}', '[\"{\\\"__config__\\\":{\\\"label\\\":\\\"单行文本\\\",\\\"labelWidth\\\":null,\\\"showLabel\\\":true,\\\"changeTag\\\":true,\\\"tag\\\":\\\"el-input\\\",\\\"tagIcon\\\":\\\"input\\\",\\\"required\\\":true,\\\"layout\\\":\\\"colFormItem\\\",\\\"span\\\":24,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/input\\\",\\\"regList\\\":[],\\\"formId\\\":121,\\\"renderKey\\\":\\\"1211641657675668\\\"},\\\"__slot__\\\":{\\\"prepend\\\":\\\"\\\",\\\"append\\\":\\\"\\\"},\\\"placeholder\\\":\\\"请输入单行文本\\\",\\\"style\\\":{\\\"width\\\":\\\"100%\\\"},\\\"clearable\\\":true,\\\"prefix-icon\\\":\\\"\\\",\\\"suffix-icon\\\":\\\"\\\",\\\"maxlength\\\":null,\\\"show-word-limit\\\":false,\\\"readonly\\\":false,\\\"disabled\\\":false,\\\"__vModel__\\\":\\\"field121\\\"}\",\"{\\\"__config__\\\":{\\\"label\\\":\\\"多选框组\\\",\\\"tag\\\":\\\"el-checkbox-group\\\",\\\"tagIcon\\\":\\\"checkbox\\\",\\\"defaultValue\\\":[],\\\"span\\\":24,\\\"showLabel\\\":true,\\\"labelWidth\\\":null,\\\"layout\\\":\\\"colFormItem\\\",\\\"optionType\\\":\\\"default\\\",\\\"required\\\":true,\\\"regList\\\":[],\\\"changeTag\\\":true,\\\"border\\\":false,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/checkbox\\\",\\\"formId\\\":122,\\\"renderKey\\\":\\\"1221641097529857\\\"},\\\"__slot__\\\":{\\\"options\\\":[{\\\"label\\\":\\\"选项一\\\",\\\"value\\\":1},{\\\"label\\\":\\\"选项二\\\",\\\"value\\\":2}]},\\\"style\\\":{},\\\"size\\\":\\\"medium\\\",\\\"disabled\\\":false,\\\"__vModel__\\\":\\\"field122\\\"}\"]', NULL, NULL, '1', '2022-01-22 01:26:05', '1', '2022-01-22 01:26:05', b'0');
+INSERT INTO `bpm_process_definition_ext` VALUES (80, 'eee:7:3c5b3a1b-7adf-11ec-93fe-a2380e71991a', '02b756a8-79af-11ec-abb0-a2380e71991a', 'AAA', 10, 11, '{\"formRef\":\"elForm\",\"formModel\":\"formData\",\"size\":\"medium\",\"labelPosition\":\"right\",\"labelWidth\":100,\"formRules\":\"rules\",\"gutter\":15,\"disabled\":false,\"span\":24,\"formBtns\":true}', '[\"{\\\"__config__\\\":{\\\"label\\\":\\\"单行文本\\\",\\\"labelWidth\\\":null,\\\"showLabel\\\":true,\\\"changeTag\\\":true,\\\"tag\\\":\\\"el-input\\\",\\\"tagIcon\\\":\\\"input\\\",\\\"required\\\":true,\\\"layout\\\":\\\"colFormItem\\\",\\\"span\\\":24,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/input\\\",\\\"regList\\\":[],\\\"formId\\\":121,\\\"renderKey\\\":\\\"1211641657675668\\\"},\\\"__slot__\\\":{\\\"prepend\\\":\\\"\\\",\\\"append\\\":\\\"\\\"},\\\"placeholder\\\":\\\"请输入单行文本\\\",\\\"style\\\":{\\\"width\\\":\\\"100%\\\"},\\\"clearable\\\":true,\\\"prefix-icon\\\":\\\"\\\",\\\"suffix-icon\\\":\\\"\\\",\\\"maxlength\\\":null,\\\"show-word-limit\\\":false,\\\"readonly\\\":false,\\\"disabled\\\":false,\\\"__vModel__\\\":\\\"field121\\\"}\",\"{\\\"__config__\\\":{\\\"label\\\":\\\"多选框组\\\",\\\"tag\\\":\\\"el-checkbox-group\\\",\\\"tagIcon\\\":\\\"checkbox\\\",\\\"defaultValue\\\":[],\\\"span\\\":24,\\\"showLabel\\\":true,\\\"labelWidth\\\":null,\\\"layout\\\":\\\"colFormItem\\\",\\\"optionType\\\":\\\"default\\\",\\\"required\\\":true,\\\"regList\\\":[],\\\"changeTag\\\":true,\\\"border\\\":false,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/checkbox\\\",\\\"formId\\\":122,\\\"renderKey\\\":\\\"1221641097529857\\\"},\\\"__slot__\\\":{\\\"options\\\":[{\\\"label\\\":\\\"选项一\\\",\\\"value\\\":1},{\\\"label\\\":\\\"选项二\\\",\\\"value\\\":2}]},\\\"style\\\":{},\\\"size\\\":\\\"medium\\\",\\\"disabled\\\":false,\\\"__vModel__\\\":\\\"field122\\\"}\"]', NULL, NULL, '1', '2022-01-22 01:26:15', '1', '2022-01-22 01:26:15', b'0');
+INSERT INTO `bpm_process_definition_ext` VALUES (81, 'eee:8:3da2872e-7adf-11ec-93fe-a2380e71991a', '02b756a8-79af-11ec-abb0-a2380e71991a', 'AAA', 10, 11, '{\"formRef\":\"elForm\",\"formModel\":\"formData\",\"size\":\"medium\",\"labelPosition\":\"right\",\"labelWidth\":100,\"formRules\":\"rules\",\"gutter\":15,\"disabled\":false,\"span\":24,\"formBtns\":true}', '[\"{\\\"__config__\\\":{\\\"label\\\":\\\"单行文本\\\",\\\"labelWidth\\\":null,\\\"showLabel\\\":true,\\\"changeTag\\\":true,\\\"tag\\\":\\\"el-input\\\",\\\"tagIcon\\\":\\\"input\\\",\\\"required\\\":true,\\\"layout\\\":\\\"colFormItem\\\",\\\"span\\\":24,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/input\\\",\\\"regList\\\":[],\\\"formId\\\":121,\\\"renderKey\\\":\\\"1211641657675668\\\"},\\\"__slot__\\\":{\\\"prepend\\\":\\\"\\\",\\\"append\\\":\\\"\\\"},\\\"placeholder\\\":\\\"请输入单行文本\\\",\\\"style\\\":{\\\"width\\\":\\\"100%\\\"},\\\"clearable\\\":true,\\\"prefix-icon\\\":\\\"\\\",\\\"suffix-icon\\\":\\\"\\\",\\\"maxlength\\\":null,\\\"show-word-limit\\\":false,\\\"readonly\\\":false,\\\"disabled\\\":false,\\\"__vModel__\\\":\\\"field121\\\"}\",\"{\\\"__config__\\\":{\\\"label\\\":\\\"多选框组\\\",\\\"tag\\\":\\\"el-checkbox-group\\\",\\\"tagIcon\\\":\\\"checkbox\\\",\\\"defaultValue\\\":[],\\\"span\\\":24,\\\"showLabel\\\":true,\\\"labelWidth\\\":null,\\\"layout\\\":\\\"colFormItem\\\",\\\"optionType\\\":\\\"default\\\",\\\"required\\\":true,\\\"regList\\\":[],\\\"changeTag\\\":true,\\\"border\\\":false,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/checkbox\\\",\\\"formId\\\":122,\\\"renderKey\\\":\\\"1221641097529857\\\"},\\\"__slot__\\\":{\\\"options\\\":[{\\\"label\\\":\\\"选项一\\\",\\\"value\\\":1},{\\\"label\\\":\\\"选项二\\\",\\\"value\\\":2}]},\\\"style\\\":{},\\\"size\\\":\\\"medium\\\",\\\"disabled\\\":false,\\\"__vModel__\\\":\\\"field122\\\"}\"]', NULL, NULL, '1', '2022-01-22 01:26:17', '1', '2022-01-22 01:26:17', b'0');
+INSERT INTO `bpm_process_definition_ext` VALUES (82, 'eee:9:3f0f84b1-7adf-11ec-93fe-a2380e71991a', '02b756a8-79af-11ec-abb0-a2380e71991a', 'AAA', 10, 11, '{\"formRef\":\"elForm\",\"formModel\":\"formData\",\"size\":\"medium\",\"labelPosition\":\"right\",\"labelWidth\":100,\"formRules\":\"rules\",\"gutter\":15,\"disabled\":false,\"span\":24,\"formBtns\":true}', '[\"{\\\"__config__\\\":{\\\"label\\\":\\\"单行文本\\\",\\\"labelWidth\\\":null,\\\"showLabel\\\":true,\\\"changeTag\\\":true,\\\"tag\\\":\\\"el-input\\\",\\\"tagIcon\\\":\\\"input\\\",\\\"required\\\":true,\\\"layout\\\":\\\"colFormItem\\\",\\\"span\\\":24,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/input\\\",\\\"regList\\\":[],\\\"formId\\\":121,\\\"renderKey\\\":\\\"1211641657675668\\\"},\\\"__slot__\\\":{\\\"prepend\\\":\\\"\\\",\\\"append\\\":\\\"\\\"},\\\"placeholder\\\":\\\"请输入单行文本\\\",\\\"style\\\":{\\\"width\\\":\\\"100%\\\"},\\\"clearable\\\":true,\\\"prefix-icon\\\":\\\"\\\",\\\"suffix-icon\\\":\\\"\\\",\\\"maxlength\\\":null,\\\"show-word-limit\\\":false,\\\"readonly\\\":false,\\\"disabled\\\":false,\\\"__vModel__\\\":\\\"field121\\\"}\",\"{\\\"__config__\\\":{\\\"label\\\":\\\"多选框组\\\",\\\"tag\\\":\\\"el-checkbox-group\\\",\\\"tagIcon\\\":\\\"checkbox\\\",\\\"defaultValue\\\":[],\\\"span\\\":24,\\\"showLabel\\\":true,\\\"labelWidth\\\":null,\\\"layout\\\":\\\"colFormItem\\\",\\\"optionType\\\":\\\"default\\\",\\\"required\\\":true,\\\"regList\\\":[],\\\"changeTag\\\":true,\\\"border\\\":false,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/checkbox\\\",\\\"formId\\\":122,\\\"renderKey\\\":\\\"1221641097529857\\\"},\\\"__slot__\\\":{\\\"options\\\":[{\\\"label\\\":\\\"选项一\\\",\\\"value\\\":1},{\\\"label\\\":\\\"选项二\\\",\\\"value\\\":2}]},\\\"style\\\":{},\\\"size\\\":\\\"medium\\\",\\\"disabled\\\":false,\\\"__vModel__\\\":\\\"field122\\\"}\"]', NULL, NULL, '1', '2022-01-22 01:26:20', '1', '2022-01-22 01:26:20', b'0');
+INSERT INTO `bpm_process_definition_ext` VALUES (83, 'eee:10:479efc54-7adf-11ec-93fe-a2380e71991a', '02b756a8-79af-11ec-abb0-a2380e71991a', 'AAA', 10, 11, '{\"formRef\":\"elForm\",\"formModel\":\"formData\",\"size\":\"medium\",\"labelPosition\":\"right\",\"labelWidth\":100,\"formRules\":\"rules\",\"gutter\":15,\"disabled\":false,\"span\":24,\"formBtns\":true}', '[\"{\\\"__config__\\\":{\\\"label\\\":\\\"单行文本\\\",\\\"labelWidth\\\":null,\\\"showLabel\\\":true,\\\"changeTag\\\":true,\\\"tag\\\":\\\"el-input\\\",\\\"tagIcon\\\":\\\"input\\\",\\\"required\\\":true,\\\"layout\\\":\\\"colFormItem\\\",\\\"span\\\":24,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/input\\\",\\\"regList\\\":[],\\\"formId\\\":121,\\\"renderKey\\\":\\\"1211641657675668\\\"},\\\"__slot__\\\":{\\\"prepend\\\":\\\"\\\",\\\"append\\\":\\\"\\\"},\\\"placeholder\\\":\\\"请输入单行文本\\\",\\\"style\\\":{\\\"width\\\":\\\"100%\\\"},\\\"clearable\\\":true,\\\"prefix-icon\\\":\\\"\\\",\\\"suffix-icon\\\":\\\"\\\",\\\"maxlength\\\":null,\\\"show-word-limit\\\":false,\\\"readonly\\\":false,\\\"disabled\\\":false,\\\"__vModel__\\\":\\\"field121\\\"}\",\"{\\\"__config__\\\":{\\\"label\\\":\\\"多选框组\\\",\\\"tag\\\":\\\"el-checkbox-group\\\",\\\"tagIcon\\\":\\\"checkbox\\\",\\\"defaultValue\\\":[],\\\"span\\\":24,\\\"showLabel\\\":true,\\\"labelWidth\\\":null,\\\"layout\\\":\\\"colFormItem\\\",\\\"optionType\\\":\\\"default\\\",\\\"required\\\":true,\\\"regList\\\":[],\\\"changeTag\\\":true,\\\"border\\\":false,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/checkbox\\\",\\\"formId\\\":122,\\\"renderKey\\\":\\\"1221641097529857\\\"},\\\"__slot__\\\":{\\\"options\\\":[{\\\"label\\\":\\\"选项一\\\",\\\"value\\\":1},{\\\"label\\\":\\\"选项二\\\",\\\"value\\\":2}]},\\\"style\\\":{},\\\"size\\\":\\\"medium\\\",\\\"disabled\\\":false,\\\"__vModel__\\\":\\\"field122\\\"}\"]', NULL, NULL, '1', '2022-01-22 01:26:34', '1', '2022-01-22 01:26:34', b'0');
+INSERT INTO `bpm_process_definition_ext` VALUES (84, 'eee:11:38c6faaa-7ae0-11ec-9d9d-a2380e71991a', '02b756a8-79af-11ec-abb0-a2380e71991a', 'AAA', 10, 11, '{\"formRef\":\"elForm\",\"formModel\":\"formData\",\"size\":\"medium\",\"labelPosition\":\"right\",\"labelWidth\":100,\"formRules\":\"rules\",\"gutter\":15,\"disabled\":false,\"span\":24,\"formBtns\":true}', '[\"{\\\"__config__\\\":{\\\"label\\\":\\\"单行文本\\\",\\\"labelWidth\\\":null,\\\"showLabel\\\":true,\\\"changeTag\\\":true,\\\"tag\\\":\\\"el-input\\\",\\\"tagIcon\\\":\\\"input\\\",\\\"required\\\":true,\\\"layout\\\":\\\"colFormItem\\\",\\\"span\\\":24,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/input\\\",\\\"regList\\\":[],\\\"formId\\\":121,\\\"renderKey\\\":\\\"1211641657675668\\\"},\\\"__slot__\\\":{\\\"prepend\\\":\\\"\\\",\\\"append\\\":\\\"\\\"},\\\"placeholder\\\":\\\"请输入单行文本\\\",\\\"style\\\":{\\\"width\\\":\\\"100%\\\"},\\\"clearable\\\":true,\\\"prefix-icon\\\":\\\"\\\",\\\"suffix-icon\\\":\\\"\\\",\\\"maxlength\\\":null,\\\"show-word-limit\\\":false,\\\"readonly\\\":false,\\\"disabled\\\":false,\\\"__vModel__\\\":\\\"field121\\\"}\",\"{\\\"__config__\\\":{\\\"label\\\":\\\"多选框组\\\",\\\"tag\\\":\\\"el-checkbox-group\\\",\\\"tagIcon\\\":\\\"checkbox\\\",\\\"defaultValue\\\":[],\\\"span\\\":24,\\\"showLabel\\\":true,\\\"labelWidth\\\":null,\\\"layout\\\":\\\"colFormItem\\\",\\\"optionType\\\":\\\"default\\\",\\\"required\\\":true,\\\"regList\\\":[],\\\"changeTag\\\":true,\\\"border\\\":false,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/checkbox\\\",\\\"formId\\\":122,\\\"renderKey\\\":\\\"1221641097529857\\\"},\\\"__slot__\\\":{\\\"options\\\":[{\\\"label\\\":\\\"选项一\\\",\\\"value\\\":1},{\\\"label\\\":\\\"选项二\\\",\\\"value\\\":2}]},\\\"style\\\":{},\\\"size\\\":\\\"medium\\\",\\\"disabled\\\":false,\\\"__vModel__\\\":\\\"field122\\\"}\"]', NULL, NULL, '1', '2022-01-22 01:33:19', '1', '2022-01-22 01:33:19', b'0');
+INSERT INTO `bpm_process_definition_ext` VALUES (85, 'eee:12:c9c8ddcd-7ae0-11ec-9d9d-a2380e71991a', '02b756a8-79af-11ec-abb0-a2380e71991a', 'AAA', 10, 11, '{\"formRef\":\"elForm\",\"formModel\":\"formData\",\"size\":\"medium\",\"labelPosition\":\"right\",\"labelWidth\":100,\"formRules\":\"rules\",\"gutter\":15,\"disabled\":false,\"span\":24,\"formBtns\":true}', '[\"{\\\"__config__\\\":{\\\"label\\\":\\\"单行文本\\\",\\\"labelWidth\\\":null,\\\"showLabel\\\":true,\\\"changeTag\\\":true,\\\"tag\\\":\\\"el-input\\\",\\\"tagIcon\\\":\\\"input\\\",\\\"required\\\":true,\\\"layout\\\":\\\"colFormItem\\\",\\\"span\\\":24,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/input\\\",\\\"regList\\\":[],\\\"formId\\\":121,\\\"renderKey\\\":\\\"1211641657675668\\\"},\\\"__slot__\\\":{\\\"prepend\\\":\\\"\\\",\\\"append\\\":\\\"\\\"},\\\"placeholder\\\":\\\"请输入单行文本\\\",\\\"style\\\":{\\\"width\\\":\\\"100%\\\"},\\\"clearable\\\":true,\\\"prefix-icon\\\":\\\"\\\",\\\"suffix-icon\\\":\\\"\\\",\\\"maxlength\\\":null,\\\"show-word-limit\\\":false,\\\"readonly\\\":false,\\\"disabled\\\":false,\\\"__vModel__\\\":\\\"field121\\\"}\",\"{\\\"__config__\\\":{\\\"label\\\":\\\"多选框组\\\",\\\"tag\\\":\\\"el-checkbox-group\\\",\\\"tagIcon\\\":\\\"checkbox\\\",\\\"defaultValue\\\":[],\\\"span\\\":24,\\\"showLabel\\\":true,\\\"labelWidth\\\":null,\\\"layout\\\":\\\"colFormItem\\\",\\\"optionType\\\":\\\"default\\\",\\\"required\\\":true,\\\"regList\\\":[],\\\"changeTag\\\":true,\\\"border\\\":false,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/checkbox\\\",\\\"formId\\\":122,\\\"renderKey\\\":\\\"1221641097529857\\\"},\\\"__slot__\\\":{\\\"options\\\":[{\\\"label\\\":\\\"选项一\\\",\\\"value\\\":1},{\\\"label\\\":\\\"选项二\\\",\\\"value\\\":2}]},\\\"style\\\":{},\\\"size\\\":\\\"medium\\\",\\\"disabled\\\":false,\\\"__vModel__\\\":\\\"field122\\\"}\"]', NULL, NULL, '1', '2022-01-22 01:37:22', '1', '2022-01-22 01:37:22', b'0');
+INSERT INTO `bpm_process_definition_ext` VALUES (86, 'eee:13:f1aca890-7ae0-11ec-9d9d-a2380e71991a', '02b756a8-79af-11ec-abb0-a2380e71991a', 'AAA', 10, 11, '{\"formRef\":\"elForm\",\"formModel\":\"formData\",\"size\":\"medium\",\"labelPosition\":\"right\",\"labelWidth\":100,\"formRules\":\"rules\",\"gutter\":15,\"disabled\":false,\"span\":24,\"formBtns\":true}', '[\"{\\\"__config__\\\":{\\\"label\\\":\\\"单行文本\\\",\\\"labelWidth\\\":null,\\\"showLabel\\\":true,\\\"changeTag\\\":true,\\\"tag\\\":\\\"el-input\\\",\\\"tagIcon\\\":\\\"input\\\",\\\"required\\\":true,\\\"layout\\\":\\\"colFormItem\\\",\\\"span\\\":24,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/input\\\",\\\"regList\\\":[],\\\"formId\\\":121,\\\"renderKey\\\":\\\"1211641657675668\\\"},\\\"__slot__\\\":{\\\"prepend\\\":\\\"\\\",\\\"append\\\":\\\"\\\"},\\\"placeholder\\\":\\\"请输入单行文本\\\",\\\"style\\\":{\\\"width\\\":\\\"100%\\\"},\\\"clearable\\\":true,\\\"prefix-icon\\\":\\\"\\\",\\\"suffix-icon\\\":\\\"\\\",\\\"maxlength\\\":null,\\\"show-word-limit\\\":false,\\\"readonly\\\":false,\\\"disabled\\\":false,\\\"__vModel__\\\":\\\"field121\\\"}\",\"{\\\"__config__\\\":{\\\"label\\\":\\\"多选框组\\\",\\\"tag\\\":\\\"el-checkbox-group\\\",\\\"tagIcon\\\":\\\"checkbox\\\",\\\"defaultValue\\\":[],\\\"span\\\":24,\\\"showLabel\\\":true,\\\"labelWidth\\\":null,\\\"layout\\\":\\\"colFormItem\\\",\\\"optionType\\\":\\\"default\\\",\\\"required\\\":true,\\\"regList\\\":[],\\\"changeTag\\\":true,\\\"border\\\":false,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/checkbox\\\",\\\"formId\\\":122,\\\"renderKey\\\":\\\"1221641097529857\\\"},\\\"__slot__\\\":{\\\"options\\\":[{\\\"label\\\":\\\"选项一\\\",\\\"value\\\":1},{\\\"label\\\":\\\"选项二\\\",\\\"value\\\":2}]},\\\"style\\\":{},\\\"size\\\":\\\"medium\\\",\\\"disabled\\\":false,\\\"__vModel__\\\":\\\"field122\\\"}\"]', NULL, NULL, '1', '2022-01-22 01:38:29', '1', '2022-01-22 01:38:29', b'0');
+INSERT INTO `bpm_process_definition_ext` VALUES (87, 'eee:14:27a560fb-7ae2-11ec-9d9a-a2380e71991a', '02b756a8-79af-11ec-abb0-a2380e71991a', 'AAA', 10, 11, '{\"formRef\":\"elForm\",\"formModel\":\"formData\",\"size\":\"medium\",\"labelPosition\":\"right\",\"labelWidth\":100,\"formRules\":\"rules\",\"gutter\":15,\"disabled\":false,\"span\":24,\"formBtns\":true}', '[\"{\\\"__config__\\\":{\\\"label\\\":\\\"单行文本\\\",\\\"labelWidth\\\":null,\\\"showLabel\\\":true,\\\"changeTag\\\":true,\\\"tag\\\":\\\"el-input\\\",\\\"tagIcon\\\":\\\"input\\\",\\\"required\\\":true,\\\"layout\\\":\\\"colFormItem\\\",\\\"span\\\":24,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/input\\\",\\\"regList\\\":[],\\\"formId\\\":121,\\\"renderKey\\\":\\\"1211641657675668\\\"},\\\"__slot__\\\":{\\\"prepend\\\":\\\"\\\",\\\"append\\\":\\\"\\\"},\\\"placeholder\\\":\\\"请输入单行文本\\\",\\\"style\\\":{\\\"width\\\":\\\"100%\\\"},\\\"clearable\\\":true,\\\"prefix-icon\\\":\\\"\\\",\\\"suffix-icon\\\":\\\"\\\",\\\"maxlength\\\":null,\\\"show-word-limit\\\":false,\\\"readonly\\\":false,\\\"disabled\\\":false,\\\"__vModel__\\\":\\\"field121\\\"}\",\"{\\\"__config__\\\":{\\\"label\\\":\\\"多选框组\\\",\\\"tag\\\":\\\"el-checkbox-group\\\",\\\"tagIcon\\\":\\\"checkbox\\\",\\\"defaultValue\\\":[],\\\"span\\\":24,\\\"showLabel\\\":true,\\\"labelWidth\\\":null,\\\"layout\\\":\\\"colFormItem\\\",\\\"optionType\\\":\\\"default\\\",\\\"required\\\":true,\\\"regList\\\":[],\\\"changeTag\\\":true,\\\"border\\\":false,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/checkbox\\\",\\\"formId\\\":122,\\\"renderKey\\\":\\\"1221641097529857\\\"},\\\"__slot__\\\":{\\\"options\\\":[{\\\"label\\\":\\\"选项一\\\",\\\"value\\\":1},{\\\"label\\\":\\\"选项二\\\",\\\"value\\\":2}]},\\\"style\\\":{},\\\"size\\\":\\\"medium\\\",\\\"disabled\\\":false,\\\"__vModel__\\\":\\\"field122\\\"}\"]', NULL, NULL, '1', '2022-01-22 01:47:09', '1', '2022-01-22 01:47:09', b'0');
+INSERT INTO `bpm_process_definition_ext` VALUES (88, 'eee:15:c1906d85-7ae5-11ec-a69c-a2380e71991a', '02b756a8-79af-11ec-abb0-a2380e71991a', 'AAA', 10, 11, '{\"formRef\":\"elForm\",\"formModel\":\"formData\",\"size\":\"medium\",\"labelPosition\":\"right\",\"labelWidth\":100,\"formRules\":\"rules\",\"gutter\":15,\"disabled\":false,\"span\":24,\"formBtns\":true}', '[\"{\\\"__config__\\\":{\\\"label\\\":\\\"单行文本\\\",\\\"labelWidth\\\":null,\\\"showLabel\\\":true,\\\"changeTag\\\":true,\\\"tag\\\":\\\"el-input\\\",\\\"tagIcon\\\":\\\"input\\\",\\\"required\\\":true,\\\"layout\\\":\\\"colFormItem\\\",\\\"span\\\":24,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/input\\\",\\\"regList\\\":[],\\\"formId\\\":121,\\\"renderKey\\\":\\\"1211641657675668\\\"},\\\"__slot__\\\":{\\\"prepend\\\":\\\"\\\",\\\"append\\\":\\\"\\\"},\\\"placeholder\\\":\\\"请输入单行文本\\\",\\\"style\\\":{\\\"width\\\":\\\"100%\\\"},\\\"clearable\\\":true,\\\"prefix-icon\\\":\\\"\\\",\\\"suffix-icon\\\":\\\"\\\",\\\"maxlength\\\":null,\\\"show-word-limit\\\":false,\\\"readonly\\\":false,\\\"disabled\\\":false,\\\"__vModel__\\\":\\\"field121\\\"}\",\"{\\\"__config__\\\":{\\\"label\\\":\\\"多选框组\\\",\\\"tag\\\":\\\"el-checkbox-group\\\",\\\"tagIcon\\\":\\\"checkbox\\\",\\\"defaultValue\\\":[],\\\"span\\\":24,\\\"showLabel\\\":true,\\\"labelWidth\\\":null,\\\"layout\\\":\\\"colFormItem\\\",\\\"optionType\\\":\\\"default\\\",\\\"required\\\":true,\\\"regList\\\":[],\\\"changeTag\\\":true,\\\"border\\\":false,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/checkbox\\\",\\\"formId\\\":122,\\\"renderKey\\\":\\\"1221641097529857\\\"},\\\"__slot__\\\":{\\\"options\\\":[{\\\"label\\\":\\\"选项一\\\",\\\"value\\\":1},{\\\"label\\\":\\\"选项二\\\",\\\"value\\\":2}]},\\\"style\\\":{},\\\"size\\\":\\\"medium\\\",\\\"disabled\\\":false,\\\"__vModel__\\\":\\\"field122\\\"}\"]', NULL, NULL, '1', '2022-01-22 02:12:56', '1', '2022-01-22 02:12:56', b'0');
+INSERT INTO `bpm_process_definition_ext` VALUES (89, 'eee:16:c325da98-7ae5-11ec-a69c-a2380e71991a', '02b756a8-79af-11ec-abb0-a2380e71991a', 'AAA', 10, 11, '{\"formRef\":\"elForm\",\"formModel\":\"formData\",\"size\":\"medium\",\"labelPosition\":\"right\",\"labelWidth\":100,\"formRules\":\"rules\",\"gutter\":15,\"disabled\":false,\"span\":24,\"formBtns\":true}', '[\"{\\\"__config__\\\":{\\\"label\\\":\\\"单行文本\\\",\\\"labelWidth\\\":null,\\\"showLabel\\\":true,\\\"changeTag\\\":true,\\\"tag\\\":\\\"el-input\\\",\\\"tagIcon\\\":\\\"input\\\",\\\"required\\\":true,\\\"layout\\\":\\\"colFormItem\\\",\\\"span\\\":24,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/input\\\",\\\"regList\\\":[],\\\"formId\\\":121,\\\"renderKey\\\":\\\"1211641657675668\\\"},\\\"__slot__\\\":{\\\"prepend\\\":\\\"\\\",\\\"append\\\":\\\"\\\"},\\\"placeholder\\\":\\\"请输入单行文本\\\",\\\"style\\\":{\\\"width\\\":\\\"100%\\\"},\\\"clearable\\\":true,\\\"prefix-icon\\\":\\\"\\\",\\\"suffix-icon\\\":\\\"\\\",\\\"maxlength\\\":null,\\\"show-word-limit\\\":false,\\\"readonly\\\":false,\\\"disabled\\\":false,\\\"__vModel__\\\":\\\"field121\\\"}\",\"{\\\"__config__\\\":{\\\"label\\\":\\\"多选框组\\\",\\\"tag\\\":\\\"el-checkbox-group\\\",\\\"tagIcon\\\":\\\"checkbox\\\",\\\"defaultValue\\\":[],\\\"span\\\":24,\\\"showLabel\\\":true,\\\"labelWidth\\\":null,\\\"layout\\\":\\\"colFormItem\\\",\\\"optionType\\\":\\\"default\\\",\\\"required\\\":true,\\\"regList\\\":[],\\\"changeTag\\\":true,\\\"border\\\":false,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/checkbox\\\",\\\"formId\\\":122,\\\"renderKey\\\":\\\"1221641097529857\\\"},\\\"__slot__\\\":{\\\"options\\\":[{\\\"label\\\":\\\"选项一\\\",\\\"value\\\":1},{\\\"label\\\":\\\"选项二\\\",\\\"value\\\":2}]},\\\"style\\\":{},\\\"size\\\":\\\"medium\\\",\\\"disabled\\\":false,\\\"__vModel__\\\":\\\"field122\\\"}\"]', NULL, NULL, '1', '2022-01-22 02:12:58', '1', '2022-01-22 02:12:58', b'0');
+INSERT INTO `bpm_process_definition_ext` VALUES (90, 'eee:17:f3aad03b-7ae5-11ec-a69c-a2380e71991a', '02b756a8-79af-11ec-abb0-a2380e71991a', 'AAA', 10, 11, '{\"formRef\":\"elForm\",\"formModel\":\"formData\",\"size\":\"medium\",\"labelPosition\":\"right\",\"labelWidth\":100,\"formRules\":\"rules\",\"gutter\":15,\"disabled\":false,\"span\":24,\"formBtns\":true}', '[\"{\\\"__config__\\\":{\\\"label\\\":\\\"单行文本\\\",\\\"labelWidth\\\":null,\\\"showLabel\\\":true,\\\"changeTag\\\":true,\\\"tag\\\":\\\"el-input\\\",\\\"tagIcon\\\":\\\"input\\\",\\\"required\\\":true,\\\"layout\\\":\\\"colFormItem\\\",\\\"span\\\":24,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/input\\\",\\\"regList\\\":[],\\\"formId\\\":121,\\\"renderKey\\\":\\\"1211641657675668\\\"},\\\"__slot__\\\":{\\\"prepend\\\":\\\"\\\",\\\"append\\\":\\\"\\\"},\\\"placeholder\\\":\\\"请输入单行文本\\\",\\\"style\\\":{\\\"width\\\":\\\"100%\\\"},\\\"clearable\\\":true,\\\"prefix-icon\\\":\\\"\\\",\\\"suffix-icon\\\":\\\"\\\",\\\"maxlength\\\":null,\\\"show-word-limit\\\":false,\\\"readonly\\\":false,\\\"disabled\\\":false,\\\"__vModel__\\\":\\\"field121\\\"}\",\"{\\\"__config__\\\":{\\\"label\\\":\\\"多选框组\\\",\\\"tag\\\":\\\"el-checkbox-group\\\",\\\"tagIcon\\\":\\\"checkbox\\\",\\\"defaultValue\\\":[],\\\"span\\\":24,\\\"showLabel\\\":true,\\\"labelWidth\\\":null,\\\"layout\\\":\\\"colFormItem\\\",\\\"optionType\\\":\\\"default\\\",\\\"required\\\":true,\\\"regList\\\":[],\\\"changeTag\\\":true,\\\"border\\\":false,\\\"document\\\":\\\"https://element.eleme.cn/#/zh-CN/component/checkbox\\\",\\\"formId\\\":122,\\\"renderKey\\\":\\\"1221641097529857\\\"},\\\"__slot__\\\":{\\\"options\\\":[{\\\"label\\\":\\\"选项一\\\",\\\"value\\\":1},{\\\"label\\\":\\\"选项二\\\",\\\"value\\\":2}]},\\\"style\\\":{},\\\"size\\\":\\\"medium\\\",\\\"disabled\\\":false,\\\"__vModel__\\\":\\\"field122\\\"}\"]', NULL, NULL, '1', '2022-01-22 02:14:20', '1', '2022-01-22 02:14:20', b'0');
+INSERT INTO `bpm_process_definition_ext` VALUES (91, 'oa_leave:3:1fad3d93-7b75-11ec-a3c8-acde48001122', 'e4a1a1ef-7628-11ec-8477-a2380e71991a', 'OA 请假的示例', 20, NULL, NULL, NULL, '/bpm/oa/flow', '/oa/oa/leave', '1', '2022-01-22 19:19:11', '1', '2022-01-22 19:19:11', b'0');
+INSERT INTO `bpm_process_definition_ext` VALUES (92, 'oa_leave:4:991f2193-7b7f-11ec-a3c8-acde48001122', 'e4a1a1ef-7628-11ec-8477-a2380e71991a', 'OA 请假的示例', 20, NULL, NULL, NULL, '/bpm/oa/flow', '/oa/oa/leave', '1', '2022-01-22 20:34:10', '1', '2022-01-22 20:34:10', b'0');
+INSERT INTO `bpm_process_definition_ext` VALUES (93, 'oa_leave:5:004b710b-7b8a-11ec-8ef0-acde48001122', 'e4a1a1ef-7628-11ec-8477-a2380e71991a', 'OA 请假的示例', 20, NULL, NULL, NULL, '/bpm/oa/leave/create', '/bpm/oa/leave/detail', '1', '2022-01-22 21:48:38', '1', '2022-01-22 21:48:38', b'0');
+COMMIT;
+
+-- ----------------------------
+-- Table structure for bpm_process_instance_ext
+-- ----------------------------
+DROP TABLE IF EXISTS `bpm_process_instance_ext`;
+CREATE TABLE `bpm_process_instance_ext` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号',
+  `start_user_id` bigint NOT NULL COMMENT '发起流程的用户编号',
+  `name` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '流程实例的名字',
+  `process_instance_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '流程实例的编号',
+  `process_definition_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '流程定义的编号',
+  `category` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '流程分类',
+  `status` tinyint NOT NULL COMMENT '流程实例的状态',
+  `result` tinyint NOT NULL COMMENT '流程实例的结果',
+  `end_time` datetime DEFAULT NULL COMMENT '结束时间',
+  `form_variables` varchar(5000) DEFAULT NULL COMMENT '表单值',
+  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=194 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='工作流的流程实例的拓展';
+
+-- ----------------------------
+-- Records of bpm_process_instance_ext
+-- ----------------------------
+BEGIN;
+INSERT INTO `bpm_process_instance_ext` VALUES (51, 1, '笑死', 'd7bcdeb9-7134-11ec-99e4-a2380e71991a', 'gateway_test:3:43f8ca4f-709c-11ec-9ce9-a2380e71991a', '1', 1, 4, '2022-01-09 18:18:36', NULL, '1', '2022-01-09 18:13:51', '1', '2022-01-09 10:24:35', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (52, 1, '笑死', '944619dd-7135-11ec-93f6-a2380e71991a', 'gateway_test:3:43f8ca4f-709c-11ec-9ce9-a2380e71991a', '2', 2, 3, '2022-01-09 18:35:50', NULL, '1', '2022-01-09 18:19:08', '1', '2022-01-09 18:35:50', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (53, 1, '业务流程_1641152976334', 'dc524fb5-7135-11ec-93f6-a2380e71991a', 'Process_1641152976334:10:dd62eaef-6c30-11ec-9fc8-cacd34981f8e', '1', 2, 3, '2022-01-09 18:35:49', NULL, '1', '2022-01-09 18:21:09', '1', '2022-01-09 18:35:49', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (54, 1, '背背', 'e4e745a4-7135-11ec-93f6-a2380e71991a', 'qqw:1:897c7005-6c80-11ec-88b1-cacd34981f8e', '2', 2, 3, '2022-01-09 18:35:49', NULL, '1', '2022-01-09 18:21:23', '1', '2022-01-09 18:35:49', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (55, 1, '背背', 'ea2ff6c3-7135-11ec-93f6-a2380e71991a', 'qqw:1:897c7005-6c80-11ec-88b1-cacd34981f8e', '1', 2, 3, '2022-01-09 18:35:48', NULL, '1', '2022-01-09 18:21:32', '1', '2022-01-09 18:35:48', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (56, 1, '笑死', '47a87df5-7136-11ec-93f6-a2380e71991a', 'gateway_test:4:2e50e9a4-7136-11ec-93f6-a2380e71991a', 'http://activiti.org/bpmn', 2, 3, '2022-01-09 18:35:46', NULL, '1', '2022-01-09 18:24:09', '1', '2022-01-09 18:35:46', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (58, 1, '业务流程_1641152976334', 'af747f00-7137-11ec-bf24-a2380e71991a', 'Process_1641152976334:10:dd62eaef-6c30-11ec-9fc8-cacd34981f8e', 'http://activiti.org/bpmn', 1, 2, '2022-01-09 18:34:35', NULL, '1', '2022-01-09 18:34:12', '1', '2022-01-09 18:34:35', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (59, 1, '笑死', 'f17cf222-7137-11ec-bf24-a2380e71991a', 'gateway_test:4:2e50e9a4-7136-11ec-93f6-a2380e71991a', 'http://activiti.org/bpmn', 1, 2, '2022-01-09 18:36:16', NULL, '1', '2022-01-09 18:36:03', '1', '2022-01-09 18:36:16', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (60, 1, '笑死', '2592fce0-7138-11ec-bf24-a2380e71991a', 'gateway_test:4:2e50e9a4-7136-11ec-93f6-a2380e71991a', 'http://activiti.org/bpmn', 2, 3, '2022-01-09 18:37:37', NULL, '1', '2022-01-09 18:37:30', '1', '2022-01-09 18:37:37', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (61, 1, '业务流程_1641152976334', '34b09dfb-7138-11ec-bf24-a2380e71991a', 'Process_1641152976334:10:dd62eaef-6c30-11ec-9fc8-cacd34981f8e', 'http://activiti.org/bpmn', 2, 2, '2022-01-09 18:38:02', NULL, '1', '2022-01-09 18:37:56', '1', '2022-01-09 18:38:02', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (63, 1, '笑死', '9ea14ead-714b-11ec-af9b-a2380e71991a', 'gateway_test:4:2e50e9a4-7136-11ec-93f6-a2380e71991a', 'http://activiti.org/bpmn', 2, 3, '2022-01-09 22:08:12', NULL, '1', '2022-01-09 20:56:54', '1', '2022-01-09 22:08:12', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (64, 1, '业务流程_1641152976334', '1179546c-714c-11ec-943f-a2380e71991a', 'Process_1641152976334:10:dd62eaef-6c30-11ec-9fc8-cacd34981f8e', '1', 2, 2, '2022-01-09 22:08:11', NULL, '1', '2022-01-09 21:00:07', '1', '2022-01-09 22:08:11', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (65, 1, '业务流程_1641152976334', 'be323fbb-714c-11ec-943f-a2380e71991a', 'Process_1641152976334:10:dd62eaef-6c30-11ec-9fc8-cacd34981f8e', '1', 2, 3, '2022-01-09 22:08:10', NULL, '1', '2022-01-09 21:04:56', '1', '2022-01-09 22:08:10', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (66, 1, '业务流程_1641152976334', '09da6c8e-714e-11ec-922e-a2380e71991a', 'Process_1641152976334:10:dd62eaef-6c30-11ec-9fc8-cacd34981f8e', '1', 2, 2, '2022-01-09 22:08:09', NULL, '1', '2022-01-09 21:14:13', '1', '2022-01-09 22:08:09', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (67, 1, '业务流程_1641152976334', '66f0f91f-7155-11ec-b613-a2380e71991a', 'Process_1641152976334:10:dd62eaef-6c30-11ec-9fc8-cacd34981f8e', '1', 2, 2, '2022-01-09 22:07:03', NULL, '1', '2022-01-09 22:06:55', '1', '2022-01-09 22:07:03', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (68, 1, '业务流程_1641152976334', 'b86d4397-7155-11ec-b613-a2380e71991a', 'Process_1641152976334:10:dd62eaef-6c30-11ec-9fc8-cacd34981f8e', '1', 2, 3, '2022-01-09 22:10:02', NULL, '1', '2022-01-09 22:09:12', '1', '2022-01-09 22:10:02', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (69, 1, '业务流程_1641152976334', 'dcaa4d86-7155-11ec-b613-a2380e71991a', 'Process_1641152976334:10:dd62eaef-6c30-11ec-9fc8-cacd34981f8e', '1', 2, 2, '2022-01-09 22:10:19', NULL, '1', '2022-01-09 22:10:13', '1', '2022-01-09 22:10:19', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (70, 1, '业务流程_1641152976334', '4b1c61a8-7156-11ec-b613-a2380e71991a', 'Process_1641152976334:10:dd62eaef-6c30-11ec-9fc8-cacd34981f8e', '1', 2, 2, '2022-01-09 22:14:38', NULL, '1', '2022-01-09 22:13:18', '1', '2022-01-09 22:14:38', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (71, 1, '业务流程_1641152976334', '36e36bdd-7157-11ec-8642-a2380e71991a', 'Process_1641152976334:10:dd62eaef-6c30-11ec-9fc8-cacd34981f8e', '1', 2, 2, '2022-01-09 22:20:16', NULL, '1', '2022-01-09 22:19:54', '1', '2022-01-09 22:20:16', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (72, 1, '业务流程_1641152976334', '7917733d-7207-11ec-af01-a2380e71991a', 'Process_1641152976334:10:dd62eaef-6c30-11ec-9fc8-cacd34981f8e', '1', 2, 2, '2022-01-10 19:48:34', NULL, '1', '2022-01-10 19:21:36', '1', '2022-01-10 19:48:34', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (73, 1, '业务流程_1641152976334', 'd14992df-7207-11ec-a1b3-a2380e71991a', 'Process_1641152976334:10:dd62eaef-6c30-11ec-9fc8-cacd34981f8e', '1', 2, 4, '2022-01-15 21:59:21', NULL, '1', '2022-01-10 19:24:04', '1', '2022-01-15 21:59:21', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (74, 1, '业务流程_1641152976334', '37056d50-7208-11ec-a594-a2380e71991a', 'Process_1641152976334:10:dd62eaef-6c30-11ec-9fc8-cacd34981f8e', '1', 2, 4, '2022-01-15 21:59:23', NULL, '1', '2022-01-10 19:26:55', '1', '2022-01-15 21:59:23', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (75, 1, '笑死', '90b5effe-7208-11ec-a594-a2380e71991a', 'gateway_test:4:2e50e9a4-7136-11ec-93f6-a2380e71991a', '2', 2, 4, '2022-01-15 21:59:26', NULL, '1', '2022-01-10 19:29:25', '1', '2022-01-15 21:59:26', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (76, 1, '测试任务', '12ac8117-7209-11ec-8954-a2380e71991a', 'AA:2:0d01d9e6-7209-11ec-8954-a2380e71991a', '2', 2, 4, '2022-01-15 21:59:33', NULL, '1', '2022-01-10 19:33:04', '1', '2022-01-15 21:59:33', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (77, 1, '测试任务', '712ac2f9-720a-11ec-883f-a2380e71991a', 'AA:2:0d01d9e6-7209-11ec-8954-a2380e71991a', '2', 2, 4, '2022-01-15 21:59:29', NULL, '1', '2022-01-10 19:42:52', '1', '2022-01-15 21:59:29', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (78, 1, '测试任务', '926ee336-720b-11ec-95cb-a2380e71991a', 'AA:3:83a1ac25-720b-11ec-95cb-a2380e71991a', '2', 2, 4, '2022-01-15 21:59:36', NULL, '1', '2022-01-10 19:50:57', '1', '2022-01-15 21:59:36', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (79, 1, '测试任务', 'a89534d8-720b-11ec-95cb-a2380e71991a', 'AA:3:83a1ac25-720b-11ec-95cb-a2380e71991a', '2', 2, 4, '2022-01-15 21:59:38', NULL, '1', '2022-01-10 19:51:34', '1', '2022-01-15 21:59:38', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (80, 1, '测试任务', '6acb0a6b-720f-11ec-b740-a2380e71991a', 'AA:3:83a1ac25-720b-11ec-95cb-a2380e71991a', '2', 2, 4, '2022-01-15 21:59:41', NULL, '1', '2022-01-10 20:18:28', '1', '2022-01-15 21:59:41', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (81, 1, '笑死', 'dcc756b9-720f-11ec-b740-a2380e71991a', 'gateway_test:4:2e50e9a4-7136-11ec-93f6-a2380e71991a', '2', 2, 4, '2022-01-15 21:59:43', NULL, '1', '2022-01-10 20:21:40', '1', '2022-01-15 21:59:43', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (82, 1, '测试任务', '2597c8a7-7210-11ec-8e38-a2380e71991a', 'AA:3:83a1ac25-720b-11ec-95cb-a2380e71991a', '2', 2, 2, '2022-01-10 20:23:55', NULL, '1', '2022-01-10 20:23:42', '1', '2022-01-10 20:23:55', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (83, 1, '测试任务', '46b12370-7210-11ec-8e38-a2380e71991a', 'AA:3:83a1ac25-720b-11ec-95cb-a2380e71991a', '2', 2, 2, '2022-01-10 20:25:14', NULL, '1', '2022-01-10 20:24:37', '1', '2022-01-10 20:25:14', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (84, 1, '测试任务', '40416229-7211-11ec-8e38-a2380e71991a', 'AA:3:83a1ac25-720b-11ec-95cb-a2380e71991a', '2', 2, 4, '2022-01-15 21:59:15', NULL, '1', '2022-01-10 20:31:36', '1', '2022-01-15 21:59:15', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (85, 1, '测试任务', '84285947-7211-11ec-8e38-a2380e71991a', 'AA:3:83a1ac25-720b-11ec-95cb-a2380e71991a', '2', 2, 4, '2022-01-15 21:59:12', NULL, '1', '2022-01-10 20:33:30', '1', '2022-01-15 21:59:12', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (92, 1, '请假', 'e93a3338-729d-11ec-abc7-a2380e71991a', 'leave:9:59689ba0-7284-11ec-965c-a2380e71991a', '2', 2, 4, '2022-01-15 21:59:10', NULL, '1', '2022-01-11 13:18:29', '1', '2022-01-15 21:59:10', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (93, 1, '请假', '37c2e026-729e-11ec-abc7-a2380e71991a', 'leave:9:59689ba0-7284-11ec-965c-a2380e71991a', '2', 2, 4, '2022-01-15 21:59:07', NULL, '1', '2022-01-11 13:20:41', '1', '2022-01-15 21:59:07', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (94, 1, '请假', '613e8904-729e-11ec-abc7-a2380e71991a', 'leave:9:59689ba0-7284-11ec-965c-a2380e71991a', '2', 2, 3, '2022-01-15 21:58:22', NULL, '1', '2022-01-11 13:21:50', '103', '2022-01-15 21:58:22', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (98, 103, '请假', 'fcdfddae-7483-11ec-8645-a2380e71991a', 'leave:11:5ddc9eb0-7483-11ec-b390-a2380e71991a', '2', 2, 4, '2022-01-13 23:20:27', NULL, '103', '2022-01-13 23:17:57', '103', '2022-01-13 23:20:27', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (99, 103, '请假', '265fa43c-7484-11ec-8645-a2380e71991a', 'leave:11:5ddc9eb0-7483-11ec-b390-a2380e71991a', '2', 2, 4, '2022-01-13 23:20:22', NULL, '103', '2022-01-13 23:19:07', '103', '2022-01-13 23:20:22', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (103, 103, '测试流程', '078f63f1-75b9-11ec-b607-a2380e71991a', 'test:1:913d7930-75b8-11ec-b607-a2380e71991a', '1', 2, 4, '2022-01-15 12:10:18', NULL, '103', '2022-01-15 12:10:10', '103', '2022-01-15 12:10:18', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (117, 103, '测试流程', 'a4f215b0-75bd-11ec-bf54-a2380e71991a', 'test:3:8e4df3a5-75bb-11ec-a317-a2380e71991a', '1', 2, 4, '2022-01-15 21:58:18', NULL, '103', '2022-01-15 12:43:12', '103', '2022-01-15 21:58:18', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (118, 103, '测试流程', 'c2c10164-75bd-11ec-bf54-a2380e71991a', 'test:4:b86e7d03-75bd-11ec-bf54-a2380e71991a', '1', 2, 4, '2022-01-15 21:58:15', NULL, '103', '2022-01-15 12:44:02', '103', '2022-01-15 21:58:15', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (119, 103, '测试流程', 'dce61ef6-75bd-11ec-bf54-a2380e71991a', 'test:5:d64bc095-75bd-11ec-bf54-a2380e71991a', '1', 2, 4, '2022-01-15 21:58:12', NULL, '103', '2022-01-15 12:44:46', '103', '2022-01-15 21:58:12', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (120, 103, '测试流程', 'f19a6a0a-75bd-11ec-bf54-a2380e71991a', 'test:6:ebac9f59-75bd-11ec-bf54-a2380e71991a', '1', 2, 4, '2022-01-15 21:58:10', NULL, '103', '2022-01-15 12:45:20', '103', '2022-01-15 21:58:10', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (121, 103, '测试流程', '027ff9dd-75be-11ec-bf54-a2380e71991a', 'test:7:fc60e5fc-75bd-11ec-bf54-a2380e71991a', '1', 2, 4, '2022-01-15 21:58:07', NULL, '103', '2022-01-15 12:45:49', '103', '2022-01-15 21:58:07', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (123, 103, '滔博', '10008257-7607-11ec-8cd2-a2380e71991a', 'test:10:f3aa05e6-7606-11ec-8cd2-a2380e71991a', '1', 2, 4, '2022-01-15 21:58:05', NULL, '103', '2022-01-15 21:28:45', '103', '2022-01-15 21:58:05', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (124, 1, '测试多审批人', 'caf40483-760b-11ec-9367-a2380e71991a', 'test_001:1:c5772412-760b-11ec-9367-a2380e71991a', '1', 2, 3, '2022-01-15 22:28:57', NULL, '1', '2022-01-15 22:02:36', '103', '2022-01-15 22:28:57', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (125, 1, '测试多审批人', '9091b32c-760e-11ec-a415-a2380e71991a', 'test_001:1:c5772412-760b-11ec-9367-a2380e71991a', '1', 2, 3, '2022-01-15 22:28:51', NULL, '1', '2022-01-15 22:22:27', '1', '2022-01-15 22:28:52', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (128, 1, '测试多审批人', '6325c778-760f-11ec-ad1b-a2380e71991a', 'test_001:1:c5772412-760b-11ec-9367-a2380e71991a', '1', 2, 3, '2022-01-15 22:28:56', NULL, '1', '2022-01-15 22:28:20', '103', '2022-01-15 22:28:57', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (129, 1, '测试多审批人', '873817e8-760f-11ec-ad1b-a2380e71991a', 'test_001:1:c5772412-760b-11ec-9367-a2380e71991a', '1', 2, 3, '2022-01-15 22:31:04', NULL, '1', '2022-01-15 22:29:21', '103', '2022-01-15 22:31:05', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (130, 1, '测试多审批人', '0c843d9b-7610-11ec-9266-a2380e71991a', 'test_001:1:c5772412-760b-11ec-9367-a2380e71991a', '1', 2, 3, '2022-01-15 23:01:43', NULL, '1', '2022-01-15 22:33:04', '103', '2022-01-15 23:01:43', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (131, 1, '测试多审批人', '5822c2eb-7610-11ec-9266-a2380e71991a', 'test_001:1:c5772412-760b-11ec-9367-a2380e71991a', '1', 2, 3, '2022-01-15 23:01:42', NULL, '1', '2022-01-15 22:35:11', '103', '2022-01-15 23:01:42', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (132, 1, '测试多审批人', '59b537cc-7612-11ec-8063-a2380e71991a', 'test_001:1:c5772412-760b-11ec-9367-a2380e71991a', '1', 2, 3, '2022-01-15 23:01:41', NULL, '1', '2022-01-15 22:49:33', '103', '2022-01-15 23:01:41', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (133, 1, '测试多审批人', '1a0bb164-7614-11ec-87b4-a2380e71991a', 'test_001:1:c5772412-760b-11ec-9367-a2380e71991a', '1', 2, 4, '2022-01-15 23:54:05', NULL, '1', '2022-01-15 23:02:05', '1', '2022-01-15 23:54:05', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (134, 1, '测试多审批人', '46a21254-7615-11ec-87b4-a2380e71991a', 'test_001:1:c5772412-760b-11ec-9367-a2380e71991a', '1', 2, 4, '2022-01-15 23:54:02', NULL, '1', '2022-01-15 23:10:29', '1', '2022-01-15 23:54:02', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (135, 1, '测试多审批人', '57ce3983-761b-11ec-b05a-a2380e71991a', 'test_001:1:c5772412-760b-11ec-9367-a2380e71991a', '1', 2, 4, '2022-01-15 23:54:00', NULL, '1', '2022-01-15 23:53:55', '1', '2022-01-15 23:54:00', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (136, 1, '滔博', '8a2ee6c9-7630-11ec-a535-a2380e71991a', 'test:17:04259e68-762e-11ec-9ab0-a2380e71991a', '1', 2, 4, '2022-01-16 22:58:25', '{\"field121\":\"AA\",\"field122\":[1]}', '1', '2022-01-16 02:25:39', '1', '2022-01-16 22:58:25', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (137, 1, '滔博', 'e05c44cd-767f-11ec-bc82-a2380e71991a', 'test:18:1bb307b1-7633-11ec-957a-a2380e71991a', '1', 2, 4, '2022-01-16 22:58:23', '{\"field121\":\"AAA\",\"field122\":[1]}', '1', '2022-01-16 11:53:34', '1', '2022-01-16 22:58:23', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (138, 1, '自己审批', '1d249260-7680-11ec-bc82-a2380e71991a', 'self:1:17c042ff-7680-11ec-bc82-a2380e71991a', '1', 2, 2, '2022-01-16 22:58:04', '{\"field121\":\"AAA\",\"field122\":[1]}', '1', '2022-01-16 11:55:16', '1', '2022-01-16 22:58:04', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (139, 1, '测试多审批人', '70ca71a9-768b-11ec-afcd-a2380e71991a', 'test_001:1:c5772412-760b-11ec-9367-a2380e71991a', '1', 2, 4, '2022-01-16 22:58:20', '{\"field121\":\"EEE\",\"field122\":[1]}', '1', '2022-01-16 13:16:21', '1', '2022-01-16 22:58:20', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (140, 1, '测试多审批人', 'cdbd4e1e-768b-11ec-afcd-a2380e71991a', 'test_001:2:c680200d-768b-11ec-afcd-a2380e71991a', '1', 2, 2, '2022-01-16 13:21:42', '{\"field121\":\"eee\",\"field122\":[1]}', '1', '2022-01-16 13:18:57', '1', '2022-01-16 13:21:42', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (141, 1, '测试多审批人', '537cceb3-768c-11ec-afcd-a2380e71991a', 'test_001:3:4e8e99b2-768c-11ec-afcd-a2380e71991a', '1', 2, 2, '2022-01-16 22:58:03', '{\"field121\":\"EEE\",\"field122\":[1]}', '1', '2022-01-16 13:22:41', '1', '2022-01-16 22:58:03', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (142, 1, '测试多审批人', '4b4c16ac-76d2-11ec-9423-a2380e71991a', 'test_001:4:3dbe6714-76b1-11ec-9c66-a2380e71991a', '1', 2, 2, '2022-01-16 22:57:44', '{\"field121\":\"AAA\",\"field122\":[1]}', '1', '2022-01-16 21:43:32', '1', '2022-01-16 22:57:44', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (143, 1, '测试多审批人', 'db3f3c84-76dc-11ec-95f2-a2380e71991a', 'test_001:4:3dbe6714-76b1-11ec-9c66-a2380e71991a', '1', 2, 2, '2022-01-16 23:12:55', '{\"field121\":\"AEEE\",\"field122\":[1,2]}', '1', '2022-01-16 22:59:08', '1', '2022-01-16 23:12:55', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (144, 1, '测试多审批人', 'cfe3c1d0-76de-11ec-95f2-a2380e71991a', 'test_001:4:3dbe6714-76b1-11ec-9c66-a2380e71991a', '1', 2, 2, '2022-01-17 00:51:07', '{\"field121\":\"AAA\",\"field122\":[1]}', '1', '2022-01-16 23:13:08', '1', '2022-01-17 00:51:07', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (145, 1, '测试多审批人', '1642e0b9-76e6-11ec-95f2-a2380e71991a', 'test_001:4:3dbe6714-76b1-11ec-9c66-a2380e71991a', '1', 2, 2, '2022-01-17 00:35:32', '{\"field121\":\"EEE\",\"field122\":[1]}', '1', '2022-01-17 00:05:13', '1', '2022-01-17 00:35:32', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (146, 1, '测试多审批人', '8bb14c95-76ea-11ec-95f2-a2380e71991a', 'test_001:4:3dbe6714-76b1-11ec-9c66-a2380e71991a', '1', 2, 3, '2022-01-17 00:37:21', '{\"field121\":\"EEE\",\"field122\":[1]}', '1', '2022-01-17 00:37:08', '1', '2022-01-17 00:37:21', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (147, 1, '测试多审批人', '29288241-76ed-11ec-95f2-a2380e71991a', 'test_001:4:3dbe6714-76b1-11ec-9c66-a2380e71991a', '1', 2, 2, '2022-01-17 12:49:45', '{\"field121\":\"AAA\",\"field122\":[1]}', '1', '2022-01-17 00:55:51', '1', '2022-01-17 12:49:45', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (148, 1, '测试多审批人', 'ce5e126f-77aa-11ec-9be9-a2380e71991a', 'test_001:4:3dbe6714-76b1-11ec-9c66-a2380e71991a', '1', 2, 2, '2022-01-17 23:51:26', '{\"field121\":\"AAAA\",\"field122\":[1]}', '1', '2022-01-17 23:33:23', '103', '2022-01-17 23:51:26', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (149, 1, '测试多审批人', 'd1e75899-77b8-11ec-bc1a-a2380e71991a', 'test_001:4:3dbe6714-76b1-11ec-9c66-a2380e71991a', '1', 2, 2, '2022-01-19 08:45:38', '{\"field121\":\"AAA\",\"field122\":[1]}', '1', '2022-01-18 01:13:42', '1', '2022-01-19 08:45:38', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (150, 1, '滔博', 'f3191202-77f2-11ec-bc1a-a2380e71991a', 'test:20:3f1c2257-76b1-11ec-9c66-a2380e71991a', '1', 1, 1, NULL, '{\"field121\":\"AAA\",\"field122\":[1]}', '1', '2022-01-18 08:09:49', '1', '2022-01-18 08:09:49', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (151, 1, '滔博', '342453f2-78c1-11ec-9b4d-a2380e71991a', 'test:20:3f1c2257-76b1-11ec-9c66-a2380e71991a', '1', 1, 1, NULL, '{\"field121\":\"EEE\",\"field122\":[1]}', '1', '2022-01-19 08:46:14', '1', '2022-01-19 08:46:14', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (152, 1, '测试多审批人', 'b2b9b949-78c1-11ec-9b4d-a2380e71991a', 'test_001:4:3dbe6714-76b1-11ec-9c66-a2380e71991a', '1', 2, 3, '2022-01-19 09:13:19', '{\"field121\":\"EEE\",\"field122\":[1]}', '1', '2022-01-19 08:49:46', '1', '2022-01-19 09:13:19', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (153, 1, '测试多审批人', '0ef30262-78c5-11ec-9b4d-a2380e71991a', 'test_001:4:3dbe6714-76b1-11ec-9c66-a2380e71991a', '1', 2, 2, '2022-01-19 09:14:22', '{\"field121\":\"AAAA\",\"field122\":[2]}', '1', '2022-01-19 09:13:50', '1', '2022-01-19 09:14:22', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (154, 1, '测试多审批人', '7d80f10e-78c7-11ec-9b4d-a2380e71991a', 'test_001:4:3dbe6714-76b1-11ec-9c66-a2380e71991a', '1', 2, 2, '2022-01-19 09:31:27', '{\"field121\":\"aaaa\",\"field122\":[1]}', '1', '2022-01-19 09:31:14', '1', '2022-01-19 09:31:27', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (155, 1, '测试多审批人', '079d97ba-78cd-11ec-a731-a2380e71991a', 'test_001:4:3dbe6714-76b1-11ec-9c66-a2380e71991a', '1', 2, 3, '2022-01-19 10:11:03', '{\"field121\":\"AAAA\",\"field122\":[1]}', '1', '2022-01-19 10:10:53', '1', '2022-01-19 10:11:03', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (156, 1, 'eeee', '92904a2d-79af-11ec-abb0-a2380e71991a', 'eee:1:89b300ac-79af-11ec-abb0-a2380e71991a', '1', 2, 2, '2022-01-20 13:12:51', '{\"field121\":\"eeee\",\"field122\":[1]}', '1', '2022-01-20 13:12:33', '1', '2022-01-20 13:12:51', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (157, 1, '滔博', 'cabc84b1-79b0-11ec-b2b8-a2380e71991a', 'test:21:c2cd44b0-79b0-11ec-b2b8-a2380e71991a', '1', 2, 2, '2022-01-20 13:21:30', '{\"field121\":\"AAA\",\"field122\":[1]}', '1', '2022-01-20 13:21:16', '1', '2022-01-20 13:21:30', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (158, 1, '自己审批', 'b7f3b79b-7a14-11ec-8762-a2380e71991a', 'self:2:3a5a065e-76b1-11ec-9c66-a2380e71991a', '1', 2, 3, '2022-01-21 01:16:42', '{\"field121\":\"aaa\",\"field122\":[1]}', '1', '2022-01-21 01:16:35', '1', '2022-01-21 01:16:42', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (159, 1, '滔博', 'd9ee295b-7ac6-11ec-a040-a2380e71991a', 'test:21:c2cd44b0-79b0-11ec-b2b8-a2380e71991a', '1', 1, 1, NULL, '{\"field121\":\"AAA\",\"field122\":[1]}', '1', '2022-01-21 22:31:42', '1', '2022-01-21 22:31:42', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (160, 1, '测试多审批人', 'ed4a3769-7ac6-11ec-a040-a2380e71991a', 'test_001:4:3dbe6714-76b1-11ec-9c66-a2380e71991a', '1', 1, 1, NULL, '{\"field121\":\"AAA\",\"field122\":[1]}', '1', '2022-01-21 22:32:14', '1', '2022-01-21 22:34:55', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (161, 1, '滔博', '54aa251f-7ac7-11ec-a040-a2380e71991a', 'test:21:c2cd44b0-79b0-11ec-b2b8-a2380e71991a', '1', 1, 1, NULL, '{\"field121\":\"AAA\",\"field122\":[1]}', '1', '2022-01-21 22:35:08', '1', '2022-01-21 22:36:21', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (162, 1, '滔博', 'bd7dc717-7ac7-11ec-9948-a2380e71991a', 'test:21:c2cd44b0-79b0-11ec-b2b8-a2380e71991a', '1', 1, 1, NULL, '{\"field121\":\"AAA\",\"field122\":[1]}', '1', '2022-01-21 22:38:04', '1', '2022-01-21 22:38:04', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (163, 1, '测试多审批人', '37d7a55c-7ac8-11ec-a9e2-a2380e71991a', 'test_001:4:3dbe6714-76b1-11ec-9c66-a2380e71991a', '1', 1, 1, NULL, '{\"field121\":\"AAA\",\"field122\":[1]}', '1', '2022-01-21 22:41:29', '1', '2022-01-21 22:41:30', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (164, 1, '测试多审批人', '580a98c2-7ac8-11ec-a9e2-a2380e71991a', 'test_001:4:3dbe6714-76b1-11ec-9c66-a2380e71991a', '1', 1, 1, NULL, '{\"field121\":\"AAA\",\"field122\":[1]}', '1', '2022-01-21 22:42:23', '1', '2022-01-21 22:42:23', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (165, 1, '测试多审批人', '8f021988-7ac8-11ec-a9e2-a2380e71991a', 'test_001:4:3dbe6714-76b1-11ec-9c66-a2380e71991a', '1', 1, 1, NULL, '{\"field121\":\"AAA\",\"field122\":[1]}', '1', '2022-01-21 22:43:55', '1', '2022-01-21 22:44:34', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (166, 1, '测试多审批人', '23615875-7ac9-11ec-aa06-a2380e71991a', 'test_001:4:3dbe6714-76b1-11ec-9c66-a2380e71991a', '1', 2, 2, '2022-01-22 00:20:51', '{\"field121\":\"AAA\",\"field122\":[1]}', '1', '2022-01-21 22:48:04', '1', '2022-01-22 00:20:51', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (167, 1, '自己审批', '34f51703-7ad6-11ec-abe9-a2380e71991a', 'self:2:3a5a065e-76b1-11ec-9c66-a2380e71991a', '1', 2, 2, '2022-01-22 00:22:02', '{\"field121\":\"AAA\",\"field122\":[1]}', '1', '2022-01-22 00:21:37', '1', '2022-01-22 00:22:02', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (168, 1, '自己审批', 'a413bed4-7ad6-11ec-abe9-a2380e71991a', 'self:2:3a5a065e-76b1-11ec-9c66-a2380e71991a', '1', 2, 4, '2022-01-22 00:24:48', '{\"field121\":\"AAA\",\"field122\":[1]}', '1', '2022-01-22 00:24:44', '1', '2022-01-22 00:24:48', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (169, 1, '滔博', 'c00d2732-7ad6-11ec-abe9-a2380e71991a', 'test:21:c2cd44b0-79b0-11ec-b2b8-a2380e71991a', '1', 2, 3, '2022-01-22 00:30:01', '{\"field121\":\"AA\",\"field122\":[1]}', '1', '2022-01-22 00:25:31', '1', '2022-01-22 00:30:01', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (170, 1, 'OA 请假', 'a6a007dd-7b6d-11ec-b781-acde48001122', 'oa_leave:2:3c1f0ef1-76b1-11ec-9c66-a2380e71991a', '2', 1, 1, NULL, '{\"day\":2}', '1', '2022-01-22 18:25:42', '1', '2022-01-22 18:25:42', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (171, 1, 'OA 请假', '28a5d744-7b75-11ec-a3c8-acde48001122', 'oa_leave:3:1fad3d93-7b75-11ec-a3c8-acde48001122', '2', 2, 2, '2022-01-22 20:31:52', '{\"day\":2}', '1', '2022-01-22 19:19:26', '1', '2022-01-22 20:31:52', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (172, 1, 'OA 请假', '75d43fd1-7b7f-11ec-a3c8-acde48001122', 'oa_leave:3:1fad3d93-7b75-11ec-a3c8-acde48001122', '2', 1, 1, NULL, '{\"day\":4}', '1', '2022-01-22 20:33:11', '1', '2022-01-22 20:33:11', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (173, 1, 'OA 请假', '9ac0eab4-7b7f-11ec-a3c8-acde48001122', 'oa_leave:4:991f2193-7b7f-11ec-a3c8-acde48001122', '2', 2, 2, '2022-01-22 20:34:33', '{\"day\":4}', '1', '2022-01-22 20:34:13', '1', '2022-01-22 20:34:33', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (174, 1, 'OA 请假', '7250cfdf-7b88-11ec-8ef0-acde48001122', 'oa_leave:4:991f2193-7b7f-11ec-a3c8-acde48001122', '2', 1, 1, NULL, '{\"day\":16}', '1', '2022-01-22 21:37:31', '1', '2022-01-22 21:37:31', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (175, 1, 'OA 请假', '0699ab3c-7b8a-11ec-8ef0-acde48001122', 'oa_leave:5:004b710b-7b8a-11ec-8ef0-acde48001122', '2', 1, 1, NULL, '{\"day\":21}', '1', '2022-01-22 21:48:49', '1', '2022-01-22 21:48:49', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (176, 1, 'OA 请假', 'ea957056-7b8d-11ec-b8e2-acde48001122', 'oa_leave:5:004b710b-7b8a-11ec-8ef0-acde48001122', '2', 2, 2, '2022-01-22 22:17:00', '{\"day\":28}', '1', '2022-01-22 22:16:40', '1', '2022-01-22 22:17:00', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (177, 1, 'OA 请假', '7e093de8-7b8e-11ec-b8e2-acde48001122', 'oa_leave:5:004b710b-7b8a-11ec-8ef0-acde48001122', '2', 2, 3, '2022-01-22 22:23:25', '{\"day\":12}', '1', '2022-01-22 22:20:47', '1', '2022-01-22 22:23:25', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (178, 1, 'OA 请假', '5354233a-7b91-11ec-8473-acde48001122', 'oa_leave:5:004b710b-7b8a-11ec-8ef0-acde48001122', '2', 2, 3, '2022-01-22 22:41:09', '{\"day\":18}', '1', '2022-01-22 22:41:04', '1', '2022-01-22 22:41:09', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (179, 1, 'OA 请假', '68ce0834-7b91-11ec-8473-acde48001122', 'oa_leave:5:004b710b-7b8a-11ec-8ef0-acde48001122', '2', 2, 3, '2022-01-22 22:43:14', '{\"day\":31}', '1', '2022-01-22 22:41:40', '1', '2022-01-22 22:43:14', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (180, 1, 'OA 请假', 'bb23c2b4-7b91-11ec-8473-acde48001122', 'oa_leave:5:004b710b-7b8a-11ec-8ef0-acde48001122', '2', 2, 3, NULL, '{\"day\":18}', '1', '2022-01-22 22:43:58', '1', '2022-01-22 22:44:11', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (181, 1, '自己审批', '49d3df58-7b98-11ec-b5ee-acde48001122', 'self:2:3a5a065e-76b1-11ec-9c66-a2380e71991a', '1', 2, 4, '2022-01-22 23:39:17', '{\"field121\":\"AAA\",\"field122\":[1]}', '1', '2022-01-22 23:30:55', '1', '2022-01-22 23:39:17', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (182, 1, 'OA 请假', '8884f3e7-7b99-11ec-ba5c-acde48001122', 'oa_leave:5:004b710b-7b8a-11ec-8ef0-acde48001122', '2', 2, 3, NULL, '{\"day\":32}', '1', '2022-01-22 23:39:49', '1', '2022-01-22 23:39:59', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (183, 1, 'OA 请假', 'a59a5391-7b99-11ec-ba5c-acde48001122', 'oa_leave:5:004b710b-7b8a-11ec-8ef0-acde48001122', '2', 2, 2, '2022-01-22 23:40:52', '{\"day\":1}', '1', '2022-01-22 23:40:38', '1', '2022-01-22 23:40:52', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (184, 1, 'OA 请假', '03c6c157-7b9a-11ec-a290-acde48001122', 'oa_leave:5:004b710b-7b8a-11ec-8ef0-acde48001122', '2', 2, 3, NULL, '{\"day\":9}', '1', '2022-01-22 23:43:16', '1', '2022-01-22 23:43:29', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (185, 1, 'OA 请假', '331bc281-7b9a-11ec-a290-acde48001122', 'oa_leave:5:004b710b-7b8a-11ec-8ef0-acde48001122', '2', 2, 2, '2022-01-22 23:44:42', '{\"day\":0}', '1', '2022-01-22 23:44:35', '1', '2022-01-22 23:44:42', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (186, 1, 'OA 请假', '52ffd28e-7b9a-11ec-a290-acde48001122', 'oa_leave:5:004b710b-7b8a-11ec-8ef0-acde48001122', '2', 2, 2, '2022-01-22 23:45:37', '{\"day\":0}', '1', '2022-01-22 23:45:29', '1', '2022-01-22 23:45:37', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (187, 1, 'OA 请假', '67c2eaab-7b9a-11ec-a290-acde48001122', 'oa_leave:5:004b710b-7b8a-11ec-8ef0-acde48001122', '2', 2, 2, '2022-01-22 23:46:09', '{\"day\":0}', '1', '2022-01-22 23:46:04', '1', '2022-01-22 23:46:09', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (188, 1, 'OA 请假', '819442e8-7b9a-11ec-a290-acde48001122', 'oa_leave:5:004b710b-7b8a-11ec-8ef0-acde48001122', '2', 2, 2, '2022-01-22 23:46:53', '{\"day\":0}', '1', '2022-01-22 23:46:47', '1', '2022-01-22 23:46:53', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (189, 1, 'OA 请假', 'ec45f38f-7b9a-11ec-b03b-acde48001122', 'oa_leave:5:004b710b-7b8a-11ec-8ef0-acde48001122', '2', 2, 2, '2022-01-22 23:49:51', '{\"day\":1}', '1', '2022-01-22 23:49:46', '1', '2022-01-22 23:49:51', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (190, 1, 'OA 请假', '2152467e-7b9b-11ec-9a1b-acde48001122', 'oa_leave:5:004b710b-7b8a-11ec-8ef0-acde48001122', '2', 2, 2, '2022-01-22 23:51:20', '{\"day\":0}', '1', '2022-01-22 23:51:15', '1', '2022-01-22 23:51:20', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (191, 1, 'OA 请假', '7317cec6-7b9b-11ec-b5b7-acde48001122', 'oa_leave:5:004b710b-7b8a-11ec-8ef0-acde48001122', '2', 1, 1, NULL, '{\"day\":23}', '1', '2022-01-22 23:53:32', '1', '2022-01-22 23:53:33', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (192, 1, 'OA 请假', '7470a810-7b9b-11ec-b5b7-acde48001122', 'oa_leave:5:004b710b-7b8a-11ec-8ef0-acde48001122', '2', 2, 4, '2022-01-23 00:08:41', '{\"day\":23}', '1', '2022-01-22 23:53:35', '1', '2022-01-23 00:08:41', b'0');
+INSERT INTO `bpm_process_instance_ext` VALUES (193, 1, 'OA 请假', '3ad174fb-7b9d-11ec-8404-acde48001122', 'oa_leave:5:004b710b-7b8a-11ec-8ef0-acde48001122', '2', 2, 4, '2022-01-23 00:07:03', '{\"day\":23}', '1', '2022-01-23 00:06:17', '1', '2022-01-23 00:07:03', b'0');
+COMMIT;
+
+-- ----------------------------
+-- Table structure for bpm_task_assign_rule
+-- ----------------------------
+DROP TABLE IF EXISTS `bpm_task_assign_rule`;
+CREATE TABLE `bpm_task_assign_rule` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号',
+  `model_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '流程模型的编号',
+  `process_definition_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '流程定义的编号',
+  `task_definition_key` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '流程任务定义的 key',
+  `type` tinyint NOT NULL COMMENT '规则类型',
+  `options` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '规则值，JSON 数组',
+  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=181 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Bpm 任务规则表';
+
+-- ----------------------------
+-- Records of bpm_task_assign_rule
+-- ----------------------------
+BEGIN;
+INSERT INTO `bpm_task_assign_rule` VALUES (40, '0c1ee1f8-6c95-11ec-88b1-cacd34981f8e', 'leave:9:59689ba0-7284-11ec-965c-a2380e71991a', 'task1', 30, '[\"1\", \"103\"]', '', '2022-01-11 02:02:17', '', '2022-01-11 05:19:59', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (41, '0c1ee1f8-6c95-11ec-88b1-cacd34981f8e', '', 'task2', 50, '[1]', '103', '2022-01-13 13:07:05', '103', '2022-01-15 00:31:12', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (42, '0c1ee1f8-6c95-11ec-88b1-cacd34981f8e', '', 'task1', 10, '[1,2]', '103', '2022-01-13 20:41:28', '103', '2022-01-13 21:22:18', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (43, '0c1ee1f8-6c95-11ec-88b1-cacd34981f8e', 'leave:11:5ddc9eb0-7483-11ec-b390-a2380e71991a', 'task1', 10, '[1,2]', '103', '2022-01-13 23:13:31', '103', '2022-01-13 23:13:31', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (44, '0c1ee1f8-6c95-11ec-88b1-cacd34981f8e', 'leave:11:5ddc9eb0-7483-11ec-b390-a2380e71991a', 'task2', 10, '[1]', '103', '2022-01-13 23:13:31', '103', '2022-01-13 23:13:31', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (45, '1f98df4c-75b7-11ec-b607-a2380e71991a', '', 'task', 50, '[1]', '103', '2022-01-15 11:57:38', '103', '2022-01-15 12:46:13', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (46, '1f98df4c-75b7-11ec-b607-a2380e71991a', 'test:1:913d7930-75b8-11ec-b607-a2380e71991a', 'task', 10, '[1]', '103', '2022-01-15 12:06:51', '103', '2022-01-15 12:06:51', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (47, '1f98df4c-75b7-11ec-b607-a2380e71991a', 'test:2:0f0e3986-75ba-11ec-a317-a2380e71991a', 'task', 20, '[109]', '103', '2022-01-15 12:17:32', '103', '2022-01-15 12:17:32', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (48, '1f98df4c-75b7-11ec-b607-a2380e71991a', 'test:3:8e4df3a5-75bb-11ec-a317-a2380e71991a', 'task', 20, '[103,109]', '103', '2022-01-15 12:28:15', '103', '2022-01-15 12:28:15', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (49, '1f98df4c-75b7-11ec-b607-a2380e71991a', 'test:4:b86e7d03-75bd-11ec-bf54-a2380e71991a', 'task', 21, '[103,109]', '103', '2022-01-15 12:43:45', '103', '2022-01-15 12:43:45', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (50, '1f98df4c-75b7-11ec-b607-a2380e71991a', 'test:5:d64bc095-75bd-11ec-bf54-a2380e71991a', 'task', 22, '[1,2,3,4]', '103', '2022-01-15 12:44:35', '103', '2022-01-15 12:44:35', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (51, '1f98df4c-75b7-11ec-b607-a2380e71991a', 'test:6:ebac9f59-75bd-11ec-bf54-a2380e71991a', 'task', 30, '[1,103]', '103', '2022-01-15 12:45:11', '103', '2022-01-15 12:45:11', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (52, '1f98df4c-75b7-11ec-b607-a2380e71991a', 'test:7:fc60e5fc-75bd-11ec-bf54-a2380e71991a', 'task', 40, '[110]', '103', '2022-01-15 12:45:39', '103', '2022-01-15 12:45:39', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (53, '1f98df4c-75b7-11ec-b607-a2380e71991a', 'test:8:12e0a13e-75be-11ec-bf54-a2380e71991a', 'task', 50, '[1]', '103', '2022-01-15 12:46:16', '103', '2022-01-15 12:46:16', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (54, 'a4ef4c7f-7606-11ec-8cd2-a2380e71991a', '', 'Activity_05kt1hf', 50, '[10]', '103', '2022-01-15 21:27:10', '103', '2022-01-15 21:27:10', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (55, 'a4ef4c7f-7606-11ec-8cd2-a2380e71991a', '', 'Activity_10tl4d8', 50, '[10]', '103', '2022-01-15 21:27:18', '1', '2022-01-20 13:20:44', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (56, 'a4ef4c7f-7606-11ec-8cd2-a2380e71991a', '', 'Activity_00wash3', 50, '[10]', '103', '2022-01-15 21:27:26', '1', '2022-01-20 13:20:55', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (57, 'a4ef4c7f-7606-11ec-8cd2-a2380e71991a', 'test:9:e2658d43-7606-11ec-8cd2-a2380e71991a', 'Activity_05kt1hf', 50, '[10]', '103', '2022-01-15 21:27:28', '103', '2022-01-15 21:27:28', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (58, 'a4ef4c7f-7606-11ec-8cd2-a2380e71991a', 'test:9:e2658d43-7606-11ec-8cd2-a2380e71991a', 'Activity_10tl4d8', 50, '[20]', '103', '2022-01-15 21:27:28', '103', '2022-01-15 21:27:28', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (59, 'a4ef4c7f-7606-11ec-8cd2-a2380e71991a', 'test:9:e2658d43-7606-11ec-8cd2-a2380e71991a', 'Activity_00wash3', 50, '[21]', '103', '2022-01-15 21:27:28', '103', '2022-01-15 21:27:28', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (60, 'a4ef4c7f-7606-11ec-8cd2-a2380e71991a', 'test:10:f3aa05e6-7606-11ec-8cd2-a2380e71991a', 'Activity_05kt1hf', 50, '[10]', '103', '2022-01-15 21:27:57', '103', '2022-01-15 21:27:57', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (61, 'a4ef4c7f-7606-11ec-8cd2-a2380e71991a', 'test:10:f3aa05e6-7606-11ec-8cd2-a2380e71991a', 'Activity_10tl4d8', 50, '[20]', '103', '2022-01-15 21:27:57', '103', '2022-01-15 21:27:57', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (62, 'a4ef4c7f-7606-11ec-8cd2-a2380e71991a', 'test:10:f3aa05e6-7606-11ec-8cd2-a2380e71991a', 'Activity_00wash3', 50, '[21]', '103', '2022-01-15 21:27:57', '103', '2022-01-15 21:27:57', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (63, 'a3d5105e-760b-11ec-9367-a2380e71991a', '', 'Activity_1avi0yr', 30, '[1,103]', '1', '2022-01-15 22:02:24', '1', '2022-01-15 22:02:24', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (64, 'a3d5105e-760b-11ec-9367-a2380e71991a', 'test_001:1:c5772412-760b-11ec-9367-a2380e71991a', 'Activity_1avi0yr', 30, '[1,103]', '1', '2022-01-15 22:02:27', '1', '2022-01-15 22:02:27', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (65, 'a4ef4c7f-7606-11ec-8cd2-a2380e71991a', 'test:11:536ecba7-761a-11ec-a5c5-a2380e71991a', 'Activity_05kt1hf', 50, '[10]', '1', '2022-01-15 23:46:38', '1', '2022-01-15 23:46:38', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (66, 'a4ef4c7f-7606-11ec-8cd2-a2380e71991a', 'test:11:536ecba7-761a-11ec-a5c5-a2380e71991a', 'Activity_10tl4d8', 50, '[20]', '1', '2022-01-15 23:46:38', '1', '2022-01-15 23:46:38', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (67, 'a4ef4c7f-7606-11ec-8cd2-a2380e71991a', 'test:11:536ecba7-761a-11ec-a5c5-a2380e71991a', 'Activity_00wash3', 50, '[21]', '1', '2022-01-15 23:46:38', '1', '2022-01-15 23:46:38', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (68, 'a4ef4c7f-7606-11ec-8cd2-a2380e71991a', 'test:12:5c91d0ba-761a-11ec-a5c5-a2380e71991a', 'Activity_05kt1hf', 50, '[10]', '1', '2022-01-15 23:46:54', '1', '2022-01-15 23:46:54', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (69, 'a4ef4c7f-7606-11ec-8cd2-a2380e71991a', 'test:12:5c91d0ba-761a-11ec-a5c5-a2380e71991a', 'Activity_10tl4d8', 50, '[20]', '1', '2022-01-15 23:46:54', '1', '2022-01-15 23:46:54', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (70, 'a4ef4c7f-7606-11ec-8cd2-a2380e71991a', 'test:12:5c91d0ba-761a-11ec-a5c5-a2380e71991a', 'Activity_00wash3', 50, '[21]', '1', '2022-01-15 23:46:54', '1', '2022-01-15 23:46:54', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (71, 'a4ef4c7f-7606-11ec-8cd2-a2380e71991a', 'test:13:651e140d-761a-11ec-a5c5-a2380e71991a', 'Activity_05kt1hf', 50, '[10]', '1', '2022-01-15 23:47:08', '1', '2022-01-15 23:47:08', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (72, 'a4ef4c7f-7606-11ec-8cd2-a2380e71991a', 'test:13:651e140d-761a-11ec-a5c5-a2380e71991a', 'Activity_10tl4d8', 50, '[20]', '1', '2022-01-15 23:47:08', '1', '2022-01-15 23:47:08', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (73, 'a4ef4c7f-7606-11ec-8cd2-a2380e71991a', 'test:13:651e140d-761a-11ec-a5c5-a2380e71991a', 'Activity_00wash3', 50, '[21]', '1', '2022-01-15 23:47:08', '1', '2022-01-15 23:47:08', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (74, 'a4ef4c7f-7606-11ec-8cd2-a2380e71991a', 'test:14:c1f049a4-761a-11ec-ba93-a2380e71991a', 'Activity_05kt1hf', 50, '[10]', '1', '2022-01-15 23:49:44', '1', '2022-01-15 23:49:44', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (75, 'a4ef4c7f-7606-11ec-8cd2-a2380e71991a', 'test:14:c1f049a4-761a-11ec-ba93-a2380e71991a', 'Activity_10tl4d8', 50, '[20]', '1', '2022-01-15 23:49:44', '1', '2022-01-15 23:49:44', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (76, 'a4ef4c7f-7606-11ec-8cd2-a2380e71991a', 'test:14:c1f049a4-761a-11ec-ba93-a2380e71991a', 'Activity_00wash3', 50, '[21]', '1', '2022-01-15 23:49:44', '1', '2022-01-15 23:49:44', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (77, 'a4ef4c7f-7606-11ec-8cd2-a2380e71991a', 'test:15:5304ca92-761b-11ec-b05a-a2380e71991a', 'Activity_05kt1hf', 50, '[10]', '1', '2022-01-15 23:53:47', '1', '2022-01-15 23:53:47', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (78, 'a4ef4c7f-7606-11ec-8cd2-a2380e71991a', 'test:15:5304ca92-761b-11ec-b05a-a2380e71991a', 'Activity_10tl4d8', 50, '[20]', '1', '2022-01-15 23:53:47', '1', '2022-01-15 23:53:47', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (79, 'a4ef4c7f-7606-11ec-8cd2-a2380e71991a', 'test:15:5304ca92-761b-11ec-b05a-a2380e71991a', 'Activity_00wash3', 50, '[21]', '1', '2022-01-15 23:53:47', '1', '2022-01-15 23:53:47', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (80, 'e4a1a1ef-7628-11ec-8477-a2380e71991a', '', 'task-01', 50, '[10]', '1', '2022-01-16 01:40:26', '1', '2022-01-16 01:40:26', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (81, 'e4a1a1ef-7628-11ec-8477-a2380e71991a', '', 'task-22', 50, '[20]', '1', '2022-01-16 01:40:32', '1', '2022-01-16 01:40:32', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (82, 'e4a1a1ef-7628-11ec-8477-a2380e71991a', '', 'task-23', 50, '[21]', '1', '2022-01-16 01:40:39', '1', '2022-01-16 01:40:39', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (83, 'e4a1a1ef-7628-11ec-8477-a2380e71991a', '', 'task-21', 30, '[1]', '1', '2022-01-16 01:40:48', '1', '2022-01-22 20:34:03', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (84, 'e4a1a1ef-7628-11ec-8477-a2380e71991a', 'oa_leave:1:482ec033-762a-11ec-8477-a2380e71991a', 'task-01', 50, '[10]', '1', '2022-01-16 01:40:51', '1', '2022-01-16 01:40:51', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (85, 'e4a1a1ef-7628-11ec-8477-a2380e71991a', 'oa_leave:1:482ec033-762a-11ec-8477-a2380e71991a', 'task-22', 50, '[20]', '1', '2022-01-16 01:40:51', '1', '2022-01-16 01:40:51', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (86, 'e4a1a1ef-7628-11ec-8477-a2380e71991a', 'oa_leave:1:482ec033-762a-11ec-8477-a2380e71991a', 'task-23', 50, '[21]', '1', '2022-01-16 01:40:51', '1', '2022-01-16 01:40:51', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (87, 'e4a1a1ef-7628-11ec-8477-a2380e71991a', 'oa_leave:1:482ec033-762a-11ec-8477-a2380e71991a', 'task-21', 20, '[100]', '1', '2022-01-16 01:40:51', '1', '2022-01-16 01:40:51', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (88, 'a4ef4c7f-7606-11ec-8cd2-a2380e71991a', 'test:16:d83ee859-762d-11ec-9125-a2380e71991a', 'Activity_05kt1hf', 50, '[10]', '1', '2022-01-16 02:06:22', '1', '2022-01-16 02:06:22', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (89, 'a4ef4c7f-7606-11ec-8cd2-a2380e71991a', 'test:16:d83ee859-762d-11ec-9125-a2380e71991a', 'Activity_10tl4d8', 50, '[20]', '1', '2022-01-16 02:06:22', '1', '2022-01-16 02:06:22', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (90, 'a4ef4c7f-7606-11ec-8cd2-a2380e71991a', 'test:16:d83ee859-762d-11ec-9125-a2380e71991a', 'Activity_00wash3', 50, '[21]', '1', '2022-01-16 02:06:22', '1', '2022-01-16 02:06:22', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (91, 'a4ef4c7f-7606-11ec-8cd2-a2380e71991a', 'test:17:04259e68-762e-11ec-9ab0-a2380e71991a', 'Activity_05kt1hf', 50, '[10]', '1', '2022-01-16 02:07:35', '1', '2022-01-16 02:07:35', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (92, 'a4ef4c7f-7606-11ec-8cd2-a2380e71991a', 'test:17:04259e68-762e-11ec-9ab0-a2380e71991a', 'Activity_10tl4d8', 50, '[20]', '1', '2022-01-16 02:07:35', '1', '2022-01-16 02:07:35', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (93, 'a4ef4c7f-7606-11ec-8cd2-a2380e71991a', 'test:17:04259e68-762e-11ec-9ab0-a2380e71991a', 'Activity_00wash3', 50, '[21]', '1', '2022-01-16 02:07:35', '1', '2022-01-16 02:07:35', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (94, 'a4ef4c7f-7606-11ec-8cd2-a2380e71991a', 'test:18:1bb307b1-7633-11ec-957a-a2380e71991a', 'Activity_05kt1hf', 50, '[10]', '1', '2022-01-16 02:44:02', '1', '2022-01-16 02:44:02', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (95, 'a4ef4c7f-7606-11ec-8cd2-a2380e71991a', 'test:18:1bb307b1-7633-11ec-957a-a2380e71991a', 'Activity_10tl4d8', 50, '[20]', '1', '2022-01-16 02:44:02', '1', '2022-01-16 02:44:02', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (96, 'a4ef4c7f-7606-11ec-8cd2-a2380e71991a', 'test:18:1bb307b1-7633-11ec-957a-a2380e71991a', 'Activity_00wash3', 50, '[21]', '1', '2022-01-16 02:44:02', '1', '2022-01-16 02:44:02', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (97, '024b400b-7680-11ec-bc82-a2380e71991a', '', 'Activity_04asu4q', 50, '[10]', '1', '2022-01-16 11:55:04', '1', '2022-01-16 11:55:04', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (98, '024b400b-7680-11ec-bc82-a2380e71991a', 'self:1:17c042ff-7680-11ec-bc82-a2380e71991a', 'Activity_04asu4q', 50, '[10]', '1', '2022-01-16 11:55:07', '1', '2022-01-16 11:55:07', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (99, 'a4ef4c7f-7606-11ec-8cd2-a2380e71991a', 'test:19:a401b61a-768b-11ec-afcd-a2380e71991a', 'Activity_05kt1hf', 50, '[10]', '1', '2022-01-16 13:17:47', '1', '2022-01-16 13:17:47', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (100, 'a4ef4c7f-7606-11ec-8cd2-a2380e71991a', 'test:19:a401b61a-768b-11ec-afcd-a2380e71991a', 'Activity_10tl4d8', 50, '[20]', '1', '2022-01-16 13:17:47', '1', '2022-01-16 13:17:47', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (101, 'a4ef4c7f-7606-11ec-8cd2-a2380e71991a', 'test:19:a401b61a-768b-11ec-afcd-a2380e71991a', 'Activity_00wash3', 50, '[21]', '1', '2022-01-16 13:17:47', '1', '2022-01-16 13:17:47', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (102, 'a3d5105e-760b-11ec-9367-a2380e71991a', '', 'Activity_0wdgatv', 50, '[10]', '1', '2022-01-16 13:18:29', '1', '2022-01-16 13:18:29', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (103, 'a3d5105e-760b-11ec-9367-a2380e71991a', '', 'Activity_1y4q91p', 30, '[1]', '1', '2022-01-16 13:18:41', '1', '2022-01-16 13:18:41', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (104, 'a3d5105e-760b-11ec-9367-a2380e71991a', 'test_001:2:c680200d-768b-11ec-afcd-a2380e71991a', 'Activity_0wdgatv', 50, '[10]', '1', '2022-01-16 13:18:45', '1', '2022-01-16 13:18:45', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (105, 'a3d5105e-760b-11ec-9367-a2380e71991a', 'test_001:2:c680200d-768b-11ec-afcd-a2380e71991a', 'Activity_1y4q91p', 30, '[1]', '1', '2022-01-16 13:18:45', '1', '2022-01-16 13:18:45', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (106, 'a3d5105e-760b-11ec-9367-a2380e71991a', 'test_001:3:4e8e99b2-768c-11ec-afcd-a2380e71991a', 'Activity_0wdgatv', 50, '[10]', '1', '2022-01-16 13:22:33', '1', '2022-01-16 13:22:33', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (107, 'a3d5105e-760b-11ec-9367-a2380e71991a', 'test_001:3:4e8e99b2-768c-11ec-afcd-a2380e71991a', 'Activity_1y4q91p', 30, '[1]', '1', '2022-01-16 13:22:33', '1', '2022-01-16 13:22:33', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (108, '024b400b-7680-11ec-bc82-a2380e71991a', 'self:2:3a5a065e-76b1-11ec-9c66-a2380e71991a', 'Activity_04asu4q', 50, '[10]', '1', '2022-01-16 17:46:50', '1', '2022-01-16 17:46:50', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (109, 'e4a1a1ef-7628-11ec-8477-a2380e71991a', 'oa_leave:2:3c1f0ef1-76b1-11ec-9c66-a2380e71991a', 'task-01', 50, '[10]', '1', '2022-01-16 17:46:53', '1', '2022-01-16 17:46:53', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (110, 'e4a1a1ef-7628-11ec-8477-a2380e71991a', 'oa_leave:2:3c1f0ef1-76b1-11ec-9c66-a2380e71991a', 'task-22', 50, '[20]', '1', '2022-01-16 17:46:53', '1', '2022-01-16 17:46:53', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (111, 'e4a1a1ef-7628-11ec-8477-a2380e71991a', 'oa_leave:2:3c1f0ef1-76b1-11ec-9c66-a2380e71991a', 'task-23', 50, '[21]', '1', '2022-01-16 17:46:53', '1', '2022-01-16 17:46:53', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (112, 'e4a1a1ef-7628-11ec-8477-a2380e71991a', 'oa_leave:2:3c1f0ef1-76b1-11ec-9c66-a2380e71991a', 'task-21', 20, '[100]', '1', '2022-01-16 17:46:53', '1', '2022-01-16 17:46:53', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (113, 'a3d5105e-760b-11ec-9367-a2380e71991a', 'test_001:4:3dbe6714-76b1-11ec-9c66-a2380e71991a', 'Activity_0wdgatv', 50, '[10]', '1', '2022-01-16 17:46:56', '1', '2022-01-16 17:46:56', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (114, 'a3d5105e-760b-11ec-9367-a2380e71991a', 'test_001:4:3dbe6714-76b1-11ec-9c66-a2380e71991a', 'Activity_1y4q91p', 30, '[1]', '1', '2022-01-16 17:46:56', '1', '2022-01-16 17:46:56', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (115, 'a4ef4c7f-7606-11ec-8cd2-a2380e71991a', 'test:20:3f1c2257-76b1-11ec-9c66-a2380e71991a', 'Activity_05kt1hf', 50, '[10]', '1', '2022-01-16 17:46:58', '1', '2022-01-16 17:46:58', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (116, 'a4ef4c7f-7606-11ec-8cd2-a2380e71991a', 'test:20:3f1c2257-76b1-11ec-9c66-a2380e71991a', 'Activity_10tl4d8', 50, '[20]', '1', '2022-01-16 17:46:58', '1', '2022-01-16 17:46:58', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (117, 'a4ef4c7f-7606-11ec-8cd2-a2380e71991a', 'test:20:3f1c2257-76b1-11ec-9c66-a2380e71991a', 'Activity_00wash3', 50, '[21]', '1', '2022-01-16 17:46:58', '1', '2022-01-16 17:46:58', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (118, '02b756a8-79af-11ec-abb0-a2380e71991a', '', 'Activity_1gndzgr', 50, '[10]', '1', '2022-01-20 13:09:15', '1', '2022-01-20 13:09:15', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (119, '02b756a8-79af-11ec-abb0-a2380e71991a', '', 'Activity_078i5dd', 50, '[10]', '1', '2022-01-20 13:12:08', '1', '2022-01-20 13:12:08', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (120, '02b756a8-79af-11ec-abb0-a2380e71991a', '', 'Activity_0dlqjcv', 50, '[10]', '1', '2022-01-20 13:12:15', '1', '2022-01-20 13:12:15', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (121, '02b756a8-79af-11ec-abb0-a2380e71991a', 'eee:1:89b300ac-79af-11ec-abb0-a2380e71991a', 'Activity_1gndzgr', 50, '[10]', '1', '2022-01-20 13:12:18', '1', '2022-01-20 13:12:18', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (122, '02b756a8-79af-11ec-abb0-a2380e71991a', 'eee:1:89b300ac-79af-11ec-abb0-a2380e71991a', 'Activity_078i5dd', 50, '[10]', '1', '2022-01-20 13:12:18', '1', '2022-01-20 13:12:18', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (123, '02b756a8-79af-11ec-abb0-a2380e71991a', 'eee:1:89b300ac-79af-11ec-abb0-a2380e71991a', 'Activity_0dlqjcv', 50, '[10]', '1', '2022-01-20 13:12:18', '1', '2022-01-20 13:12:18', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (124, 'a4ef4c7f-7606-11ec-8cd2-a2380e71991a', 'test:21:c2cd44b0-79b0-11ec-b2b8-a2380e71991a', 'Activity_05kt1hf', 50, '[10]', '1', '2022-01-20 13:21:03', '1', '2022-01-20 13:21:03', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (125, 'a4ef4c7f-7606-11ec-8cd2-a2380e71991a', 'test:21:c2cd44b0-79b0-11ec-b2b8-a2380e71991a', 'Activity_10tl4d8', 50, '[10]', '1', '2022-01-20 13:21:03', '1', '2022-01-20 13:21:03', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (126, 'a4ef4c7f-7606-11ec-8cd2-a2380e71991a', 'test:21:c2cd44b0-79b0-11ec-b2b8-a2380e71991a', 'Activity_00wash3', 50, '[10]', '1', '2022-01-20 13:21:03', '1', '2022-01-20 13:21:03', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (127, '02b756a8-79af-11ec-abb0-a2380e71991a', 'eee:2:8a7b5672-7ade-11ec-a777-a2380e71991a', 'Activity_1gndzgr', 50, '[10]', '1', '2022-01-22 01:21:17', '1', '2022-01-22 01:21:17', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (128, '02b756a8-79af-11ec-abb0-a2380e71991a', 'eee:2:8a7b5672-7ade-11ec-a777-a2380e71991a', 'Activity_078i5dd', 50, '[10]', '1', '2022-01-22 01:21:17', '1', '2022-01-22 01:21:17', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (129, '02b756a8-79af-11ec-abb0-a2380e71991a', 'eee:2:8a7b5672-7ade-11ec-a777-a2380e71991a', 'Activity_0dlqjcv', 50, '[10]', '1', '2022-01-22 01:21:17', '1', '2022-01-22 01:21:17', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (130, '02b756a8-79af-11ec-abb0-a2380e71991a', 'eee:3:8db9dfa5-7ade-11ec-a777-a2380e71991a', 'Activity_1gndzgr', 50, '[10]', '1', '2022-01-22 01:21:22', '1', '2022-01-22 01:21:22', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (131, '02b756a8-79af-11ec-abb0-a2380e71991a', 'eee:3:8db9dfa5-7ade-11ec-a777-a2380e71991a', 'Activity_078i5dd', 50, '[10]', '1', '2022-01-22 01:21:22', '1', '2022-01-22 01:21:22', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (132, '02b756a8-79af-11ec-abb0-a2380e71991a', 'eee:3:8db9dfa5-7ade-11ec-a777-a2380e71991a', 'Activity_0dlqjcv', 50, '[10]', '1', '2022-01-22 01:21:22', '1', '2022-01-22 01:21:22', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (133, '02b756a8-79af-11ec-abb0-a2380e71991a', 'eee:4:a63e1e68-7ade-11ec-a777-a2380e71991a', 'Activity_1gndzgr', 50, '[10]', '1', '2022-01-22 01:22:03', '1', '2022-01-22 01:22:03', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (134, '02b756a8-79af-11ec-abb0-a2380e71991a', 'eee:4:a63e1e68-7ade-11ec-a777-a2380e71991a', 'Activity_078i5dd', 50, '[10]', '1', '2022-01-22 01:22:03', '1', '2022-01-22 01:22:03', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (135, '02b756a8-79af-11ec-abb0-a2380e71991a', 'eee:4:a63e1e68-7ade-11ec-a777-a2380e71991a', 'Activity_0dlqjcv', 50, '[10]', '1', '2022-01-22 01:22:03', '1', '2022-01-22 01:22:03', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (136, '02b756a8-79af-11ec-abb0-a2380e71991a', 'eee:5:33f2d275-7adf-11ec-93fe-a2380e71991a', 'Activity_1gndzgr', 50, '[10]', '1', '2022-01-22 01:26:01', '1', '2022-01-22 01:26:01', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (137, '02b756a8-79af-11ec-abb0-a2380e71991a', 'eee:5:33f2d275-7adf-11ec-93fe-a2380e71991a', 'Activity_078i5dd', 50, '[10]', '1', '2022-01-22 01:26:01', '1', '2022-01-22 01:26:01', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (138, '02b756a8-79af-11ec-abb0-a2380e71991a', 'eee:5:33f2d275-7adf-11ec-93fe-a2380e71991a', 'Activity_0dlqjcv', 50, '[10]', '1', '2022-01-22 01:26:01', '1', '2022-01-22 01:26:01', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (139, '02b756a8-79af-11ec-abb0-a2380e71991a', 'eee:6:365e0618-7adf-11ec-93fe-a2380e71991a', 'Activity_1gndzgr', 50, '[10]', '1', '2022-01-22 01:26:05', '1', '2022-01-22 01:26:05', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (140, '02b756a8-79af-11ec-abb0-a2380e71991a', 'eee:6:365e0618-7adf-11ec-93fe-a2380e71991a', 'Activity_078i5dd', 50, '[10]', '1', '2022-01-22 01:26:05', '1', '2022-01-22 01:26:05', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (141, '02b756a8-79af-11ec-abb0-a2380e71991a', 'eee:6:365e0618-7adf-11ec-93fe-a2380e71991a', 'Activity_0dlqjcv', 50, '[10]', '1', '2022-01-22 01:26:05', '1', '2022-01-22 01:26:05', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (142, '02b756a8-79af-11ec-abb0-a2380e71991a', 'eee:7:3c5b3a1b-7adf-11ec-93fe-a2380e71991a', 'Activity_1gndzgr', 50, '[10]', '1', '2022-01-22 01:26:15', '1', '2022-01-22 01:26:15', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (143, '02b756a8-79af-11ec-abb0-a2380e71991a', 'eee:7:3c5b3a1b-7adf-11ec-93fe-a2380e71991a', 'Activity_078i5dd', 50, '[10]', '1', '2022-01-22 01:26:15', '1', '2022-01-22 01:26:15', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (144, '02b756a8-79af-11ec-abb0-a2380e71991a', 'eee:7:3c5b3a1b-7adf-11ec-93fe-a2380e71991a', 'Activity_0dlqjcv', 50, '[10]', '1', '2022-01-22 01:26:15', '1', '2022-01-22 01:26:15', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (145, '02b756a8-79af-11ec-abb0-a2380e71991a', 'eee:8:3da2872e-7adf-11ec-93fe-a2380e71991a', 'Activity_1gndzgr', 50, '[10]', '1', '2022-01-22 01:26:17', '1', '2022-01-22 01:26:17', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (146, '02b756a8-79af-11ec-abb0-a2380e71991a', 'eee:8:3da2872e-7adf-11ec-93fe-a2380e71991a', 'Activity_078i5dd', 50, '[10]', '1', '2022-01-22 01:26:17', '1', '2022-01-22 01:26:17', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (147, '02b756a8-79af-11ec-abb0-a2380e71991a', 'eee:8:3da2872e-7adf-11ec-93fe-a2380e71991a', 'Activity_0dlqjcv', 50, '[10]', '1', '2022-01-22 01:26:17', '1', '2022-01-22 01:26:17', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (148, '02b756a8-79af-11ec-abb0-a2380e71991a', 'eee:9:3f0f84b1-7adf-11ec-93fe-a2380e71991a', 'Activity_1gndzgr', 50, '[10]', '1', '2022-01-22 01:26:20', '1', '2022-01-22 01:26:20', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (149, '02b756a8-79af-11ec-abb0-a2380e71991a', 'eee:9:3f0f84b1-7adf-11ec-93fe-a2380e71991a', 'Activity_078i5dd', 50, '[10]', '1', '2022-01-22 01:26:20', '1', '2022-01-22 01:26:20', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (150, '02b756a8-79af-11ec-abb0-a2380e71991a', 'eee:9:3f0f84b1-7adf-11ec-93fe-a2380e71991a', 'Activity_0dlqjcv', 50, '[10]', '1', '2022-01-22 01:26:20', '1', '2022-01-22 01:26:20', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (151, '02b756a8-79af-11ec-abb0-a2380e71991a', 'eee:10:479efc54-7adf-11ec-93fe-a2380e71991a', 'Activity_1gndzgr', 50, '[10]', '1', '2022-01-22 01:26:34', '1', '2022-01-22 01:26:34', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (152, '02b756a8-79af-11ec-abb0-a2380e71991a', 'eee:10:479efc54-7adf-11ec-93fe-a2380e71991a', 'Activity_078i5dd', 50, '[10]', '1', '2022-01-22 01:26:34', '1', '2022-01-22 01:26:34', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (153, '02b756a8-79af-11ec-abb0-a2380e71991a', 'eee:10:479efc54-7adf-11ec-93fe-a2380e71991a', 'Activity_0dlqjcv', 50, '[10]', '1', '2022-01-22 01:26:34', '1', '2022-01-22 01:26:34', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (154, '02b756a8-79af-11ec-abb0-a2380e71991a', 'eee:11:38c6faaa-7ae0-11ec-9d9d-a2380e71991a', 'Activity_1gndzgr', 50, '[10]', '1', '2022-01-22 01:33:19', '1', '2022-01-22 01:33:19', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (155, '02b756a8-79af-11ec-abb0-a2380e71991a', 'eee:11:38c6faaa-7ae0-11ec-9d9d-a2380e71991a', 'Activity_078i5dd', 50, '[10]', '1', '2022-01-22 01:33:19', '1', '2022-01-22 01:33:19', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (156, '02b756a8-79af-11ec-abb0-a2380e71991a', 'eee:11:38c6faaa-7ae0-11ec-9d9d-a2380e71991a', 'Activity_0dlqjcv', 50, '[10]', '1', '2022-01-22 01:33:19', '1', '2022-01-22 01:33:19', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (157, '02b756a8-79af-11ec-abb0-a2380e71991a', 'eee:12:c9c8ddcd-7ae0-11ec-9d9d-a2380e71991a', 'Activity_1gndzgr', 50, '[10]', '1', '2022-01-22 01:37:22', '1', '2022-01-22 01:37:22', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (158, '02b756a8-79af-11ec-abb0-a2380e71991a', 'eee:12:c9c8ddcd-7ae0-11ec-9d9d-a2380e71991a', 'Activity_078i5dd', 50, '[10]', '1', '2022-01-22 01:37:22', '1', '2022-01-22 01:37:22', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (159, '02b756a8-79af-11ec-abb0-a2380e71991a', 'eee:12:c9c8ddcd-7ae0-11ec-9d9d-a2380e71991a', 'Activity_0dlqjcv', 50, '[10]', '1', '2022-01-22 01:37:22', '1', '2022-01-22 01:37:22', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (160, '02b756a8-79af-11ec-abb0-a2380e71991a', 'eee:13:f1aca890-7ae0-11ec-9d9d-a2380e71991a', 'Activity_1gndzgr', 50, '[10]', '1', '2022-01-22 01:38:29', '1', '2022-01-22 01:38:29', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (161, '02b756a8-79af-11ec-abb0-a2380e71991a', 'eee:13:f1aca890-7ae0-11ec-9d9d-a2380e71991a', 'Activity_078i5dd', 50, '[10]', '1', '2022-01-22 01:38:29', '1', '2022-01-22 01:38:29', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (162, '02b756a8-79af-11ec-abb0-a2380e71991a', 'eee:13:f1aca890-7ae0-11ec-9d9d-a2380e71991a', 'Activity_0dlqjcv', 50, '[10]', '1', '2022-01-22 01:38:29', '1', '2022-01-22 01:38:29', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (163, '02b756a8-79af-11ec-abb0-a2380e71991a', 'eee:14:27a560fb-7ae2-11ec-9d9a-a2380e71991a', 'Activity_1gndzgr', 50, '[10]', '1', '2022-01-22 01:47:09', '1', '2022-01-22 01:47:09', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (164, '02b756a8-79af-11ec-abb0-a2380e71991a', 'eee:14:27a560fb-7ae2-11ec-9d9a-a2380e71991a', 'Activity_078i5dd', 50, '[10]', '1', '2022-01-22 01:47:09', '1', '2022-01-22 01:47:09', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (165, '02b756a8-79af-11ec-abb0-a2380e71991a', 'eee:14:27a560fb-7ae2-11ec-9d9a-a2380e71991a', 'Activity_0dlqjcv', 50, '[10]', '1', '2022-01-22 01:47:09', '1', '2022-01-22 01:47:09', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (166, '02b756a8-79af-11ec-abb0-a2380e71991a', 'eee:15:c1906d85-7ae5-11ec-a69c-a2380e71991a', 'Activity_1gndzgr', 50, '[10]', '1', '2022-01-22 02:12:56', '1', '2022-01-22 02:12:56', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (167, '02b756a8-79af-11ec-abb0-a2380e71991a', 'eee:15:c1906d85-7ae5-11ec-a69c-a2380e71991a', 'Activity_078i5dd', 50, '[10]', '1', '2022-01-22 02:12:56', '1', '2022-01-22 02:12:56', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (168, '02b756a8-79af-11ec-abb0-a2380e71991a', 'eee:15:c1906d85-7ae5-11ec-a69c-a2380e71991a', 'Activity_0dlqjcv', 50, '[10]', '1', '2022-01-22 02:12:56', '1', '2022-01-22 02:12:56', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (169, '02b756a8-79af-11ec-abb0-a2380e71991a', 'eee:16:c325da98-7ae5-11ec-a69c-a2380e71991a', 'Activity_1gndzgr', 50, '[10]', '1', '2022-01-22 02:12:58', '1', '2022-01-22 02:12:58', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (170, '02b756a8-79af-11ec-abb0-a2380e71991a', 'eee:16:c325da98-7ae5-11ec-a69c-a2380e71991a', 'Activity_078i5dd', 50, '[10]', '1', '2022-01-22 02:12:58', '1', '2022-01-22 02:12:58', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (171, '02b756a8-79af-11ec-abb0-a2380e71991a', 'eee:16:c325da98-7ae5-11ec-a69c-a2380e71991a', 'Activity_0dlqjcv', 50, '[10]', '1', '2022-01-22 02:12:58', '1', '2022-01-22 02:12:58', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (172, '02b756a8-79af-11ec-abb0-a2380e71991a', 'eee:17:f3aad03b-7ae5-11ec-a69c-a2380e71991a', 'Activity_1gndzgr', 50, '[10]', '1', '2022-01-22 02:14:20', '1', '2022-01-22 02:14:20', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (173, '02b756a8-79af-11ec-abb0-a2380e71991a', 'eee:17:f3aad03b-7ae5-11ec-a69c-a2380e71991a', 'Activity_078i5dd', 50, '[10]', '1', '2022-01-22 02:14:20', '1', '2022-01-22 02:14:20', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (174, '02b756a8-79af-11ec-abb0-a2380e71991a', 'eee:17:f3aad03b-7ae5-11ec-a69c-a2380e71991a', 'Activity_0dlqjcv', 50, '[10]', '1', '2022-01-22 02:14:20', '1', '2022-01-22 02:14:20', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (175, 'e4a1a1ef-7628-11ec-8477-a2380e71991a', 'oa_leave:3:1fad3d93-7b75-11ec-a3c8-acde48001122', 'task-01', 50, '[10]', '1', '2022-01-22 19:19:12', '1', '2022-01-22 19:19:12', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (176, 'e4a1a1ef-7628-11ec-8477-a2380e71991a', 'oa_leave:3:1fad3d93-7b75-11ec-a3c8-acde48001122', 'task-21', 20, '[100]', '1', '2022-01-22 19:19:12', '1', '2022-01-22 19:19:12', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (177, 'e4a1a1ef-7628-11ec-8477-a2380e71991a', 'oa_leave:4:991f2193-7b7f-11ec-a3c8-acde48001122', 'task-01', 50, '[10]', '1', '2022-01-22 20:34:10', '1', '2022-01-22 20:34:10', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (178, 'e4a1a1ef-7628-11ec-8477-a2380e71991a', 'oa_leave:4:991f2193-7b7f-11ec-a3c8-acde48001122', 'task-21', 30, '[1]', '1', '2022-01-22 20:34:10', '1', '2022-01-22 20:34:10', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (179, 'e4a1a1ef-7628-11ec-8477-a2380e71991a', 'oa_leave:5:004b710b-7b8a-11ec-8ef0-acde48001122', 'task-01', 50, '[10]', '1', '2022-01-22 21:48:38', '1', '2022-01-22 21:48:38', b'0');
+INSERT INTO `bpm_task_assign_rule` VALUES (180, 'e4a1a1ef-7628-11ec-8477-a2380e71991a', 'oa_leave:5:004b710b-7b8a-11ec-8ef0-acde48001122', 'task-21', 30, '[1]', '1', '2022-01-22 21:48:38', '1', '2022-01-22 21:48:38', b'0');
+COMMIT;
+
+-- ----------------------------
+-- Table structure for bpm_task_ext
+-- ----------------------------
+DROP TABLE IF EXISTS `bpm_task_ext`;
+CREATE TABLE `bpm_task_ext` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号',
+  `assignee_user_id` bigint DEFAULT NULL COMMENT '任务的审批人',
+  `name` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '任务的名字',
+  `task_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '任务的编号',
+  `result` tinyint NOT NULL COMMENT '任务的结果',
+  `comment` varchar(255) DEFAULT NULL COMMENT '审批建议',
+  `end_time` datetime DEFAULT NULL COMMENT '任务的结束时间',
+  `process_instance_id` varchar(64) NOT NULL COMMENT '流程实例的编号',
+  `process_definition_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '流程定义的编号',
+  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=205 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='工作流的流程任务的拓展表';
+
+-- ----------------------------
+-- Records of bpm_task_ext
+-- ----------------------------
+BEGIN;
+INSERT INTO `bpm_task_ext` VALUES (79, 1, NULL, '36ea97d6-7157-11ec-8642-a2380e71991a', 2, '通过', NULL, '36e36bdd-7157-11ec-8642-a2380e71991a', 'Process_1641152976334:10:dd62eaef-6c30-11ec-9fc8-cacd34981f8e', '1', '2022-01-09 22:19:54', '1', '2022-01-09 22:20:16', b'0');
+INSERT INTO `bpm_task_ext` VALUES (80, 1, NULL, '791e01f6-7207-11ec-af01-a2380e71991a', 2, '通过', NULL, '7917733d-7207-11ec-af01-a2380e71991a', 'Process_1641152976334:10:dd62eaef-6c30-11ec-9fc8-cacd34981f8e', '1', '2022-01-10 19:21:36', '1', '2022-01-10 19:48:34', b'0');
+INSERT INTO `bpm_task_ext` VALUES (81, NULL, NULL, 'd15049a8-7207-11ec-a1b3-a2380e71991a', 4, NULL, '2022-01-15 21:59:21', 'd14992df-7207-11ec-a1b3-a2380e71991a', 'Process_1641152976334:10:dd62eaef-6c30-11ec-9fc8-cacd34981f8e', '1', '2022-01-10 19:24:04', '1', '2022-01-15 21:59:21', b'0');
+INSERT INTO `bpm_task_ext` VALUES (82, NULL, NULL, '370c4b29-7208-11ec-a594-a2380e71991a', 4, NULL, '2022-01-15 21:59:23', '37056d50-7208-11ec-a594-a2380e71991a', 'Process_1641152976334:10:dd62eaef-6c30-11ec-9fc8-cacd34981f8e', '1', '2022-01-10 19:26:55', '1', '2022-01-15 21:59:23', b'0');
+INSERT INTO `bpm_task_ext` VALUES (83, NULL, '任务二', '90cbe90b-7208-11ec-a594-a2380e71991a', 4, NULL, '2022-01-15 21:59:26', '90b5effe-7208-11ec-a594-a2380e71991a', 'gateway_test:4:2e50e9a4-7136-11ec-93f6-a2380e71991a', '1', '2022-01-10 19:29:26', '1', '2022-01-15 21:59:26', b'0');
+INSERT INTO `bpm_task_ext` VALUES (84, NULL, '任务一', '90cbe909-7208-11ec-a594-a2380e71991a', 4, NULL, '2022-01-15 21:59:26', '90b5effe-7208-11ec-a594-a2380e71991a', 'gateway_test:4:2e50e9a4-7136-11ec-93f6-a2380e71991a', '1', '2022-01-10 19:29:26', '1', '2022-01-15 21:59:26', b'0');
+INSERT INTO `bpm_task_ext` VALUES (85, 1, '审批任务一', '842b1870-7211-11ec-8e38-a2380e71991a', 4, NULL, '2022-01-15 21:59:12', '84285947-7211-11ec-8e38-a2380e71991a', 'AA:3:83a1ac25-720b-11ec-95cb-a2380e71991a', '1', '2022-01-10 20:33:30', '1', '2022-01-15 21:59:12', b'0');
+INSERT INTO `bpm_task_ext` VALUES (86, 1, '一级审批', 'e9444561-729d-11ec-abc7-a2380e71991a', 4, NULL, '2022-01-15 21:59:10', 'e93a3338-729d-11ec-abc7-a2380e71991a', 'leave:9:59689ba0-7284-11ec-965c-a2380e71991a', '1', '2022-01-11 13:18:29', '1', '2022-01-15 21:59:10', b'0');
+INSERT INTO `bpm_task_ext` VALUES (87, 1, '一级审批', '37c5ed6f-729e-11ec-abc7-a2380e71991a', 4, NULL, '2022-01-15 21:59:07', '37c2e026-729e-11ec-abc7-a2380e71991a', 'leave:9:59689ba0-7284-11ec-965c-a2380e71991a', '1', '2022-01-11 13:20:41', '1', '2022-01-15 21:59:07', b'0');
+INSERT INTO `bpm_task_ext` VALUES (88, 103, '一级审批', '61416f3d-729e-11ec-abc7-a2380e71991a', 3, '不通过', '2022-01-15 21:58:22', '613e8904-729e-11ec-abc7-a2380e71991a', 'leave:9:59689ba0-7284-11ec-965c-a2380e71991a', '1', '2022-01-11 13:21:50', '103', '2022-01-15 21:58:22', b'0');
+INSERT INTO `bpm_task_ext` VALUES (89, 2, '一级审批', 'fcea15e7-7483-11ec-8645-a2380e71991a', 4, NULL, '2022-01-13 23:20:26', 'fcdfddae-7483-11ec-8645-a2380e71991a', 'leave:11:5ddc9eb0-7483-11ec-b390-a2380e71991a', '103', '2022-01-13 23:17:57', '103', '2022-01-13 23:20:27', b'0');
+INSERT INTO `bpm_task_ext` VALUES (90, 2, '一级审批', '42f302b6-7484-11ec-8645-a2380e71991a', 4, NULL, '2022-01-13 23:20:22', '265fa43c-7484-11ec-8645-a2380e71991a', 'leave:11:5ddc9eb0-7483-11ec-b390-a2380e71991a', '103', '2022-01-13 23:19:55', '103', '2022-01-13 23:20:22', b'0');
+INSERT INTO `bpm_task_ext` VALUES (91, 1, '一级审批', '476773e2-7484-11ec-8645-a2380e71991a', 3, '不通过', '2022-01-15 21:59:57', '2cb112bf-7484-11ec-8645-a2380e71991a', 'leave:11:5ddc9eb0-7483-11ec-b390-a2380e71991a', '103', '2022-01-13 23:20:02', '1', '2022-01-15 21:59:57', b'0');
+INSERT INTO `bpm_task_ext` VALUES (92, 2, '一级审批', '4767c205-7484-11ec-8645-a2380e71991a', 1, NULL, NULL, '38d522d3-7484-11ec-8645-a2380e71991a', 'leave:11:5ddc9eb0-7483-11ec-b390-a2380e71991a', '103', '2022-01-13 23:20:02', '103', '2022-01-13 23:20:03', b'0');
+INSERT INTO `bpm_task_ext` VALUES (93, 1, '一级审批', '477e7e66-7484-11ec-8645-a2380e71991a', 3, '不通过', '2022-01-15 21:59:56', '475d139b-7484-11ec-8645-a2380e71991a', 'leave:11:5ddc9eb0-7483-11ec-b390-a2380e71991a', '103', '2022-01-13 23:20:03', '1', '2022-01-15 21:59:56', b'0');
+INSERT INTO `bpm_task_ext` VALUES (94, 1, '任务一', '0799c43a-75b9-11ec-b607-a2380e71991a', 4, NULL, '2022-01-15 12:10:18', '078f63f1-75b9-11ec-b607-a2380e71991a', 'test:1:913d7930-75b8-11ec-b607-a2380e71991a', '103', '2022-01-15 12:10:10', '103', '2022-01-15 12:10:18', b'0');
+INSERT INTO `bpm_task_ext` VALUES (95, 1, '任务一', 'a4fdfc99-75bd-11ec-bf54-a2380e71991a', 4, NULL, '2022-01-15 21:58:18', 'a4f215b0-75bd-11ec-bf54-a2380e71991a', 'test:3:8e4df3a5-75bb-11ec-a317-a2380e71991a', '103', '2022-01-15 12:43:12', '103', '2022-01-15 21:58:18', b'0');
+INSERT INTO `bpm_task_ext` VALUES (96, 104, '任务一', 'c2c3c08d-75bd-11ec-bf54-a2380e71991a', 4, NULL, '2022-01-15 21:58:15', 'c2c10164-75bd-11ec-bf54-a2380e71991a', 'test:4:b86e7d03-75bd-11ec-bf54-a2380e71991a', '103', '2022-01-15 12:44:02', '103', '2022-01-15 21:58:15', b'0');
+INSERT INTO `bpm_task_ext` VALUES (97, 105, '任务一', 'dcea64bf-75bd-11ec-bf54-a2380e71991a', 4, NULL, '2022-01-15 21:58:12', 'dce61ef6-75bd-11ec-bf54-a2380e71991a', 'test:5:d64bc095-75bd-11ec-bf54-a2380e71991a', '103', '2022-01-15 12:44:46', '103', '2022-01-15 21:58:12', b'0');
+INSERT INTO `bpm_task_ext` VALUES (98, 103, '任务一', 'f19d7753-75bd-11ec-bf54-a2380e71991a', 4, NULL, '2022-01-15 21:58:10', 'f19a6a0a-75bd-11ec-bf54-a2380e71991a', 'test:6:ebac9f59-75bd-11ec-bf54-a2380e71991a', '103', '2022-01-15 12:45:20', '103', '2022-01-15 21:58:10', b'0');
+INSERT INTO `bpm_task_ext` VALUES (99, 1, '任务一', '02832d36-75be-11ec-bf54-a2380e71991a', 4, NULL, '2022-01-15 21:58:07', '027ff9dd-75be-11ec-bf54-a2380e71991a', 'test:7:fc60e5fc-75bd-11ec-bf54-a2380e71991a', '103', '2022-01-15 12:45:49', '103', '2022-01-15 21:58:07', b'0');
+INSERT INTO `bpm_task_ext` VALUES (100, 103, '任务一', '100e3e00-7607-11ec-8cd2-a2380e71991a', 2, '通过', NULL, '10008257-7607-11ec-8cd2-a2380e71991a', 'test:10:f3aa05e6-7606-11ec-8cd2-a2380e71991a', '103', '2022-01-15 21:28:45', '103', '2022-01-15 21:32:59', b'0');
+INSERT INTO `bpm_task_ext` VALUES (101, 103, '任务二', 'a0e12108-7607-11ec-8cd2-a2380e71991a', 2, '通过', NULL, '10008257-7607-11ec-8cd2-a2380e71991a', 'test:10:f3aa05e6-7606-11ec-8cd2-a2380e71991a', '103', '2022-01-15 21:32:48', '103', '2022-01-15 21:33:15', b'0');
+INSERT INTO `bpm_task_ext` VALUES (102, 104, '任务三', 'ae546d70-7607-11ec-8cd2-a2380e71991a', 4, NULL, '2022-01-15 21:58:05', '10008257-7607-11ec-8cd2-a2380e71991a', 'test:10:f3aa05e6-7606-11ec-8cd2-a2380e71991a', '103', '2022-01-15 21:33:10', '103', '2022-01-15 21:58:05', b'0');
+INSERT INTO `bpm_task_ext` VALUES (103, 103, '我哎审批', 'cafed9fc-760b-11ec-9367-a2380e71991a', 3, '不通过', '2022-01-15 22:28:57', 'caf40483-760b-11ec-9367-a2380e71991a', 'test_001:1:c5772412-760b-11ec-9367-a2380e71991a', '1', '2022-01-15 22:02:36', '103', '2022-01-15 22:28:57', b'0');
+INSERT INTO `bpm_task_ext` VALUES (104, 1, '我哎审批', '90a11c85-760e-11ec-a415-a2380e71991a', 3, '不通过', '2022-01-15 22:28:51', '9091b32c-760e-11ec-a415-a2380e71991a', 'test_001:1:c5772412-760b-11ec-9367-a2380e71991a', '1', '2022-01-15 22:22:27', '1', '2022-01-15 22:28:52', b'0');
+INSERT INTO `bpm_task_ext` VALUES (106, 103, '我哎审批', '6338b341-760f-11ec-ad1b-a2380e71991a', 3, '不通过', '2022-01-15 22:28:56', '6325c778-760f-11ec-ad1b-a2380e71991a', 'test_001:1:c5772412-760b-11ec-9367-a2380e71991a', '1', '2022-01-15 22:28:20', '103', '2022-01-15 22:28:57', b'0');
+INSERT INTO `bpm_task_ext` VALUES (107, 103, '我哎审批', '873c5db1-760f-11ec-ad1b-a2380e71991a', 3, '不通过', '2022-01-15 22:31:04', '873817e8-760f-11ec-ad1b-a2380e71991a', 'test_001:1:c5772412-760b-11ec-9367-a2380e71991a', '1', '2022-01-15 22:29:21', '103', '2022-01-15 22:31:05', b'0');
+INSERT INTO `bpm_task_ext` VALUES (108, 103, '我哎审批', '0c93a6f4-7610-11ec-9266-a2380e71991a', 3, '不通过', '2022-01-15 23:01:43', '0c843d9b-7610-11ec-9266-a2380e71991a', 'test_001:1:c5772412-760b-11ec-9367-a2380e71991a', '1', '2022-01-15 22:33:04', '103', '2022-01-15 23:01:43', b'0');
+INSERT INTO `bpm_task_ext` VALUES (109, 103, '我哎审批', '5825f744-7610-11ec-9266-a2380e71991a', 3, '不通过', '2022-01-15 23:01:42', '5822c2eb-7610-11ec-9266-a2380e71991a', 'test_001:1:c5772412-760b-11ec-9367-a2380e71991a', '1', '2022-01-15 22:35:11', '103', '2022-01-15 23:01:42', b'0');
+INSERT INTO `bpm_task_ext` VALUES (110, 103, '我哎审批', '59c4c835-7612-11ec-8063-a2380e71991a', 3, '不通过', '2022-01-15 23:01:41', '59b537cc-7612-11ec-8063-a2380e71991a', 'test_001:1:c5772412-760b-11ec-9367-a2380e71991a', '1', '2022-01-15 22:49:33', '103', '2022-01-15 23:01:41', b'0');
+INSERT INTO `bpm_task_ext` VALUES (111, 1, '我哎审批', '1a14b21d-7614-11ec-87b4-a2380e71991a', 4, NULL, '2022-01-15 23:54:05', '1a0bb164-7614-11ec-87b4-a2380e71991a', 'test_001:1:c5772412-760b-11ec-9367-a2380e71991a', '1', '2022-01-15 23:02:05', '1', '2022-01-15 23:54:05', b'0');
+INSERT INTO `bpm_task_ext` VALUES (112, 1, '我哎审批', '46a4f88d-7615-11ec-87b4-a2380e71991a', 4, NULL, '2022-01-15 23:54:02', '46a21254-7615-11ec-87b4-a2380e71991a', 'test_001:1:c5772412-760b-11ec-9367-a2380e71991a', '1', '2022-01-15 23:10:29', '1', '2022-01-15 23:54:02', b'0');
+INSERT INTO `bpm_task_ext` VALUES (113, 103, '我哎审批', '57d90efc-761b-11ec-b05a-a2380e71991a', 4, NULL, '2022-01-15 23:54:00', '57ce3983-761b-11ec-b05a-a2380e71991a', 'test_001:1:c5772412-760b-11ec-9367-a2380e71991a', '1', '2022-01-15 23:53:55', '1', '2022-01-15 23:54:00', b'0');
+INSERT INTO `bpm_task_ext` VALUES (114, 1, '任务一', '8a3a3172-7630-11ec-a535-a2380e71991a', 2, '通过', NULL, '8a2ee6c9-7630-11ec-a535-a2380e71991a', 'test:17:04259e68-762e-11ec-9ab0-a2380e71991a', '1', '2022-01-16 02:25:39', '1', '2022-01-16 22:58:07', b'0');
+INSERT INTO `bpm_task_ext` VALUES (115, 1, '任务一', 'e06804a6-767f-11ec-bc82-a2380e71991a', 2, '通过', NULL, 'e05c44cd-767f-11ec-bc82-a2380e71991a', 'test:18:1bb307b1-7633-11ec-957a-a2380e71991a', '1', '2022-01-16 11:53:34', '1', '2022-01-16 22:58:06', b'0');
+INSERT INTO `bpm_task_ext` VALUES (116, 1, '哈哈哈哈', '1d275189-7680-11ec-bc82-a2380e71991a', 2, '通过', NULL, '1d249260-7680-11ec-bc82-a2380e71991a', 'self:1:17c042ff-7680-11ec-bc82-a2380e71991a', '1', '2022-01-16 11:55:16', '1', '2022-01-16 22:58:04', b'0');
+INSERT INTO `bpm_task_ext` VALUES (117, 103, '我哎审批', '70d54722-768b-11ec-afcd-a2380e71991a', 4, NULL, '2022-01-16 22:58:20', '70ca71a9-768b-11ec-afcd-a2380e71991a', 'test_001:1:c5772412-760b-11ec-9367-a2380e71991a', '1', '2022-01-16 13:16:21', '1', '2022-01-16 22:58:20', b'0');
+INSERT INTO `bpm_task_ext` VALUES (118, 1, '1.1', 'cdc05b68-768b-11ec-afcd-a2380e71991a', 2, '通过', NULL, 'cdbd4e1e-768b-11ec-afcd-a2380e71991a', 'test_001:2:c680200d-768b-11ec-afcd-a2380e71991a', '1', '2022-01-16 13:18:57', '1', '2022-01-16 13:21:42', b'0');
+INSERT INTO `bpm_task_ext` VALUES (119, 1, '1.2', '53892ad4-768c-11ec-afcd-a2380e71991a', 2, '通过', NULL, '537cceb3-768c-11ec-afcd-a2380e71991a', 'test_001:3:4e8e99b2-768c-11ec-afcd-a2380e71991a', '1', '2022-01-16 13:22:41', '1', '2022-01-16 22:58:01', b'0');
+INSERT INTO `bpm_task_ext` VALUES (120, 1, '1.1', '5380ed6e-768c-11ec-afcd-a2380e71991a', 2, '通过', NULL, '537cceb3-768c-11ec-afcd-a2380e71991a', 'test_001:3:4e8e99b2-768c-11ec-afcd-a2380e71991a', '1', '2022-01-16 13:22:41', '1', '2022-01-16 22:58:03', b'0');
+INSERT INTO `bpm_task_ext` VALUES (121, 1, '1.2', '363e7d39-76d1-11ec-9c66-a2380e71991a', 2, '通过', NULL, '362b9168-76d1-11ec-9c66-a2380e71991a', 'test_001:4:3dbe6714-76b1-11ec-9c66-a2380e71991a', '1', '2022-01-16 21:35:47', '1', '2022-01-16 22:57:55', b'0');
+INSERT INTO `bpm_task_ext` VALUES (122, 1, '1.1', '3634b933-76d1-11ec-9c66-a2380e71991a', 2, '通过', NULL, '362b9168-76d1-11ec-9c66-a2380e71991a', 'test_001:4:3dbe6714-76b1-11ec-9c66-a2380e71991a', '1', '2022-01-16 21:35:47', '1', '2022-01-16 22:57:58', b'0');
+INSERT INTO `bpm_task_ext` VALUES (123, 1, '1.2', 'c88367bf-76d1-11ec-9c66-a2380e71991a', 2, '通过', NULL, 'c1ca84ce-76d1-11ec-9c66-a2380e71991a', 'test_001:4:3dbe6714-76b1-11ec-9c66-a2380e71991a', '1', '2022-01-16 21:39:53', '1', '2022-01-16 22:57:48', b'0');
+INSERT INTO `bpm_task_ext` VALUES (124, 1, '1.1', 'c87c3bc9-76d1-11ec-9c66-a2380e71991a', 2, '通过', NULL, 'c1ca84ce-76d1-11ec-9c66-a2380e71991a', 'test_001:4:3dbe6714-76b1-11ec-9c66-a2380e71991a', '1', '2022-01-16 21:39:53', '1', '2022-01-16 22:57:53', b'0');
+INSERT INTO `bpm_task_ext` VALUES (125, 1, '1.2', '4da1ed9d-76d2-11ec-9423-a2380e71991a', 2, '通过', NULL, '4b4c16ac-76d2-11ec-9423-a2380e71991a', 'test_001:4:3dbe6714-76b1-11ec-9c66-a2380e71991a', '1', '2022-01-16 21:43:36', '1', '2022-01-16 22:57:31', b'0');
+INSERT INTO `bpm_task_ext` VALUES (126, 1, '1.1', '4d91c0f7-76d2-11ec-9423-a2380e71991a', 2, '通过', NULL, '4b4c16ac-76d2-11ec-9423-a2380e71991a', 'test_001:4:3dbe6714-76b1-11ec-9c66-a2380e71991a', '1', '2022-01-16 21:43:36', '1', '2022-01-16 22:57:44', b'0');
+INSERT INTO `bpm_task_ext` VALUES (127, 104, '任务二', 'b5cb3a35-76dc-11ec-95f2-a2380e71991a', 4, NULL, '2022-01-16 22:58:23', 'e05c44cd-767f-11ec-bc82-a2380e71991a', 'test:18:1bb307b1-7633-11ec-957a-a2380e71991a', '1', '2022-01-16 22:58:06', '1', '2022-01-16 22:58:23', b'0');
+INSERT INTO `bpm_task_ext` VALUES (128, 104, '任务二', 'b6a45c2e-76dc-11ec-95f2-a2380e71991a', 4, NULL, '2022-01-16 22:58:25', '8a2ee6c9-7630-11ec-a535-a2380e71991a', 'test:17:04259e68-762e-11ec-9ab0-a2380e71991a', '1', '2022-01-16 22:58:07', '1', '2022-01-16 22:58:25', b'0');
+INSERT INTO `bpm_task_ext` VALUES (129, 1, '1.2', 'ddef8f85-76dc-11ec-95f2-a2380e71991a', 2, '通过', NULL, 'db3f3c84-76dc-11ec-95f2-a2380e71991a', 'test_001:4:3dbe6714-76b1-11ec-9c66-a2380e71991a', '1', '2022-01-16 22:59:13', '1', '2022-01-16 22:59:31', b'0');
+INSERT INTO `bpm_task_ext` VALUES (130, 1, '1.1', 'dde35a7f-76dc-11ec-95f2-a2380e71991a', 2, '通过', NULL, 'db3f3c84-76dc-11ec-95f2-a2380e71991a', 'test_001:4:3dbe6714-76b1-11ec-9c66-a2380e71991a', '1', '2022-01-16 22:59:13', '1', '2022-01-16 23:12:55', b'0');
+INSERT INTO `bpm_task_ext` VALUES (131, 1, '1.2', 'cff54e11-76de-11ec-95f2-a2380e71991a', 2, '通过', '2022-01-16 23:13:15', 'cfe3c1d0-76de-11ec-95f2-a2380e71991a', 'test_001:4:3dbe6714-76b1-11ec-9c66-a2380e71991a', '1', '2022-01-16 23:13:09', '1', '2022-01-16 23:13:15', b'0');
+INSERT INTO `bpm_task_ext` VALUES (132, 1, '1.1', 'cfea789b-76de-11ec-95f2-a2380e71991a', 2, 'EEE', '2022-01-17 00:51:06', 'cfe3c1d0-76de-11ec-95f2-a2380e71991a', 'test_001:4:3dbe6714-76b1-11ec-9c66-a2380e71991a', '1', '2022-01-16 23:13:08', '1', '2022-01-17 00:51:07', b'0');
+INSERT INTO `bpm_task_ext` VALUES (133, 1, '1.2', '164c2f9a-76e6-11ec-95f2-a2380e71991a', 2, 'A', '2022-01-17 00:35:25', '1642e0b9-76e6-11ec-95f2-a2380e71991a', 'test_001:4:3dbe6714-76b1-11ec-9c66-a2380e71991a', '1', '2022-01-17 00:05:13', '1', '2022-01-17 00:35:26', b'0');
+INSERT INTO `bpm_task_ext` VALUES (134, 1, '1.1', '1645ee04-76e6-11ec-95f2-a2380e71991a', 2, 'BBB', '2022-01-17 00:35:32', '1642e0b9-76e6-11ec-95f2-a2380e71991a', 'test_001:4:3dbe6714-76b1-11ec-9c66-a2380e71991a', '1', '2022-01-17 00:05:13', '1', '2022-01-17 00:35:32', b'0');
+INSERT INTO `bpm_task_ext` VALUES (135, 1, '1.2', '8bbac286-76ea-11ec-95f2-a2380e71991a', 2, 'AAAA', '2022-01-17 00:37:19', '8bb14c95-76ea-11ec-95f2-a2380e71991a', 'test_001:4:3dbe6714-76b1-11ec-9c66-a2380e71991a', '1', '2022-01-17 00:37:08', '1', '2022-01-17 00:37:19', b'0');
+INSERT INTO `bpm_task_ext` VALUES (136, 1, '1.1', '8bb40bc0-76ea-11ec-95f2-a2380e71991a', 3, 'BBB', '2022-01-17 00:37:21', '8bb14c95-76ea-11ec-95f2-a2380e71991a', 'test_001:4:3dbe6714-76b1-11ec-9c66-a2380e71991a', '1', '2022-01-17 00:37:08', '1', '2022-01-17 00:37:21', b'0');
+INSERT INTO `bpm_task_ext` VALUES (137, 1, '1.2', '2937eba2-76ed-11ec-95f2-a2380e71991a', 2, '1111', '2022-01-17 00:57:01', '29288241-76ed-11ec-95f2-a2380e71991a', 'test_001:4:3dbe6714-76b1-11ec-9c66-a2380e71991a', '1', '2022-01-17 00:55:51', '103', '2022-01-17 00:57:01', b'0');
+INSERT INTO `bpm_task_ext` VALUES (138, 1, '1.1', '292cef1c-76ed-11ec-95f2-a2380e71991a', 2, 'aaaa', '2022-01-17 12:49:45', '29288241-76ed-11ec-95f2-a2380e71991a', 'test_001:4:3dbe6714-76b1-11ec-9c66-a2380e71991a', '1', '2022-01-17 00:55:51', '1', '2022-01-17 12:49:45', b'0');
+INSERT INTO `bpm_task_ext` VALUES (139, 103, '1.2', 'ce91ccb0-77aa-11ec-9be9-a2380e71991a', 2, 'AAA', '2022-01-17 23:51:24', 'ce5e126f-77aa-11ec-9be9-a2380e71991a', 'test_001:4:3dbe6714-76b1-11ec-9c66-a2380e71991a', '1', '2022-01-17 23:33:24', '103', '2022-01-17 23:51:24', b'0');
+INSERT INTO `bpm_task_ext` VALUES (140, 103, '1.1', 'ce773fca-77aa-11ec-9be9-a2380e71991a', 2, 'BBB', '2022-01-17 23:51:26', 'ce5e126f-77aa-11ec-9be9-a2380e71991a', 'test_001:4:3dbe6714-76b1-11ec-9c66-a2380e71991a', '1', '2022-01-17 23:33:23', '103', '2022-01-17 23:51:26', b'0');
+INSERT INTO `bpm_task_ext` VALUES (141, 1, '1.2', 'd201e58a-77b8-11ec-bc1a-a2380e71991a', 2, 'AAA', '2022-01-18 01:13:50', 'd1e75899-77b8-11ec-bc1a-a2380e71991a', 'test_001:4:3dbe6714-76b1-11ec-9c66-a2380e71991a', '1', '2022-01-18 01:13:42', '1', '2022-01-18 01:13:50', b'0');
+INSERT INTO `bpm_task_ext` VALUES (142, 1, '1.1', 'd1f625b4-77b8-11ec-bc1a-a2380e71991a', 2, 'AAA', '2022-01-19 08:45:37', 'd1e75899-77b8-11ec-bc1a-a2380e71991a', 'test_001:4:3dbe6714-76b1-11ec-9c66-a2380e71991a', '1', '2022-01-18 01:13:42', '1', '2022-01-19 08:45:38', b'0');
+INSERT INTO `bpm_task_ext` VALUES (143, 1, '任务一', 'f31c6d6b-77f2-11ec-bc1a-a2380e71991a', 2, 'AAA', '2022-01-18 08:10:09', 'f3191202-77f2-11ec-bc1a-a2380e71991a', 'test:20:3f1c2257-76b1-11ec-9c66-a2380e71991a', '1', '2022-01-18 08:09:49', '1', '2022-01-18 08:10:09', b'0');
+INSERT INTO `bpm_task_ext` VALUES (144, 104, '任务二', 'ff5f7733-77f2-11ec-bc1a-a2380e71991a', 1, NULL, NULL, 'f3191202-77f2-11ec-bc1a-a2380e71991a', 'test:20:3f1c2257-76b1-11ec-9c66-a2380e71991a', '1', '2022-01-18 08:10:09', '1', '2022-01-18 08:10:09', b'0');
+INSERT INTO `bpm_task_ext` VALUES (145, 1, '任务一', '342d7bbb-78c1-11ec-9b4d-a2380e71991a', 2, '恩恩', '2022-01-19 08:46:24', '342453f2-78c1-11ec-9b4d-a2380e71991a', 'test:20:3f1c2257-76b1-11ec-9c66-a2380e71991a', '1', '2022-01-19 08:46:14', '1', '2022-01-19 08:46:24', b'0');
+INSERT INTO `bpm_task_ext` VALUES (146, 104, '任务二', '39d64e33-78c1-11ec-9b4d-a2380e71991a', 1, NULL, NULL, '342453f2-78c1-11ec-9b4d-a2380e71991a', 'test:20:3f1c2257-76b1-11ec-9c66-a2380e71991a', '1', '2022-01-19 08:46:24', '1', '2022-01-19 08:46:24', b'0');
+INSERT INTO `bpm_task_ext` VALUES (147, 1, '1.2', 'b2c79c0a-78c1-11ec-9b4d-a2380e71991a', 2, 'A', '2022-01-19 08:49:59', 'b2b9b949-78c1-11ec-9b4d-a2380e71991a', 'test_001:4:3dbe6714-76b1-11ec-9c66-a2380e71991a', '1', '2022-01-19 08:49:47', '1', '2022-01-19 08:49:59', b'0');
+INSERT INTO `bpm_task_ext` VALUES (148, 1, '1.1', 'b2be4d34-78c1-11ec-9b4d-a2380e71991a', 3, 'EEE', '2022-01-19 09:13:18', 'b2b9b949-78c1-11ec-9b4d-a2380e71991a', 'test_001:4:3dbe6714-76b1-11ec-9c66-a2380e71991a', '1', '2022-01-19 08:49:46', '1', '2022-01-19 09:13:19', b'0');
+INSERT INTO `bpm_task_ext` VALUES (149, 1, '1.2', '0efced83-78c5-11ec-9b4d-a2380e71991a', 2, 'EEE', '2022-01-19 09:14:15', '0ef30262-78c5-11ec-9b4d-a2380e71991a', 'test_001:4:3dbe6714-76b1-11ec-9c66-a2380e71991a', '1', '2022-01-19 09:13:50', '1', '2022-01-19 09:14:15', b'0');
+INSERT INTO `bpm_task_ext` VALUES (150, 1, '1.1', '0ef636bd-78c5-11ec-9b4d-a2380e71991a', 2, 'EEE', '2022-01-19 09:14:21', '0ef30262-78c5-11ec-9b4d-a2380e71991a', 'test_001:4:3dbe6714-76b1-11ec-9c66-a2380e71991a', '1', '2022-01-19 09:13:50', '1', '2022-01-19 09:14:22', b'0');
+INSERT INTO `bpm_task_ext` VALUES (151, 1, '1.2', '7d8b2a4f-78c7-11ec-9b4d-a2380e71991a', 2, 'bbb', '2022-01-19 09:31:27', '7d80f10e-78c7-11ec-9b4d-a2380e71991a', 'test_001:4:3dbe6714-76b1-11ec-9c66-a2380e71991a', '1', '2022-01-19 09:31:14', '1', '2022-01-19 09:31:28', b'0');
+INSERT INTO `bpm_task_ext` VALUES (152, 1, '1.1', '7d847389-78c7-11ec-9b4d-a2380e71991a', 2, 'aaaa', '2022-01-19 09:31:24', '7d80f10e-78c7-11ec-9b4d-a2380e71991a', 'test_001:4:3dbe6714-76b1-11ec-9c66-a2380e71991a', '1', '2022-01-19 09:31:14', '1', '2022-01-19 09:31:24', b'0');
+INSERT INTO `bpm_task_ext` VALUES (153, 1, '1.2', '07b342ab-78cd-11ec-a731-a2380e71991a', 4, NULL, '2022-01-19 10:11:03', '079d97ba-78cd-11ec-a731-a2380e71991a', 'test_001:4:3dbe6714-76b1-11ec-9c66-a2380e71991a', '1', '2022-01-19 10:10:53', '1', '2022-01-19 10:11:03', b'0');
+INSERT INTO `bpm_task_ext` VALUES (154, 1, '1.1', '07a86d35-78cd-11ec-a731-a2380e71991a', 3, 'BBB', '2022-01-19 10:11:03', '079d97ba-78cd-11ec-a731-a2380e71991a', 'test_001:4:3dbe6714-76b1-11ec-9c66-a2380e71991a', '1', '2022-01-19 10:10:53', '1', '2022-01-19 10:11:03', b'0');
+INSERT INTO `bpm_task_ext` VALUES (155, 1, '申请', '929c0a06-79af-11ec-abb0-a2380e71991a', 2, 'eee', '2022-01-20 13:12:39', '92904a2d-79af-11ec-abb0-a2380e71991a', 'eee:1:89b300ac-79af-11ec-abb0-a2380e71991a', '1', '2022-01-20 13:12:33', '1', '2022-01-20 13:12:39', b'0');
+INSERT INTO `bpm_task_ext` VALUES (156, 1, '部门33审批', '9658eb06-79af-11ec-abb0-a2380e71991a', 2, 'qqq', '2022-01-20 13:12:46', '92904a2d-79af-11ec-abb0-a2380e71991a', 'eee:1:89b300ac-79af-11ec-abb0-a2380e71991a', '1', '2022-01-20 13:12:39', '1', '2022-01-20 13:12:47', b'0');
+INSERT INTO `bpm_task_ext` VALUES (157, 1, '人事审批', '96519800-79af-11ec-abb0-a2380e71991a', 2, 'wwww', '2022-01-20 13:12:51', '92904a2d-79af-11ec-abb0-a2380e71991a', 'eee:1:89b300ac-79af-11ec-abb0-a2380e71991a', '1', '2022-01-20 13:12:39', '1', '2022-01-20 13:12:51', b'0');
+INSERT INTO `bpm_task_ext` VALUES (158, 1, '任务一', 'cac7f66a-79b0-11ec-b2b8-a2380e71991a', 2, 'EEE', '2022-01-20 13:21:22', 'cabc84b1-79b0-11ec-b2b8-a2380e71991a', 'test:21:c2cd44b0-79b0-11ec-b2b8-a2380e71991a', '1', '2022-01-20 13:21:16', '1', '2022-01-20 13:21:23', b'0');
+INSERT INTO `bpm_task_ext` VALUES (159, 1, '任务二', 'ce4cd772-79b0-11ec-b2b8-a2380e71991a', 2, 'ZZZ', '2022-01-20 13:21:26', 'cabc84b1-79b0-11ec-b2b8-a2380e71991a', 'test:21:c2cd44b0-79b0-11ec-b2b8-a2380e71991a', '1', '2022-01-20 13:21:22', '1', '2022-01-20 13:21:26', b'0');
+INSERT INTO `bpm_task_ext` VALUES (160, 1, '任务三', 'd080805a-79b0-11ec-b2b8-a2380e71991a', 2, 'WWW', '2022-01-20 13:21:30', 'cabc84b1-79b0-11ec-b2b8-a2380e71991a', 'test:21:c2cd44b0-79b0-11ec-b2b8-a2380e71991a', '1', '2022-01-20 13:21:26', '1', '2022-01-20 13:21:30', b'0');
+INSERT INTO `bpm_task_ext` VALUES (161, 1, '哈哈哈哈', 'b7ff7774-7a14-11ec-8762-a2380e71991a', 3, 'eee', '2022-01-21 01:16:42', 'b7f3b79b-7a14-11ec-8762-a2380e71991a', 'self:2:3a5a065e-76b1-11ec-9c66-a2380e71991a', '1', '2022-01-21 01:16:35', '1', '2022-01-21 01:16:42', b'0');
+INSERT INTO `bpm_task_ext` VALUES (162, 1, '任务一', 'd9fa3754-7ac6-11ec-a040-a2380e71991a', 1, NULL, NULL, 'd9ee295b-7ac6-11ec-a040-a2380e71991a', 'test:21:c2cd44b0-79b0-11ec-b2b8-a2380e71991a', '1', '2022-01-21 22:31:42', '1', '2022-01-21 22:31:42', b'0');
+INSERT INTO `bpm_task_ext` VALUES (163, 1, '1.2', 'ed555b0a-7ac6-11ec-a040-a2380e71991a', 1, NULL, NULL, 'ed4a3769-7ac6-11ec-a040-a2380e71991a', 'test_001:4:3dbe6714-76b1-11ec-9c66-a2380e71991a', '1', '2022-01-21 22:32:15', '1', '2022-01-21 22:34:54', b'0');
+INSERT INTO `bpm_task_ext` VALUES (164, 1, '1.1', 'ed4ef264-7ac6-11ec-a040-a2380e71991a', 1, NULL, NULL, 'ed4a3769-7ac6-11ec-a040-a2380e71991a', 'test_001:4:3dbe6714-76b1-11ec-9c66-a2380e71991a', '1', '2022-01-21 22:32:15', '1', '2022-01-21 22:34:55', b'0');
+INSERT INTO `bpm_task_ext` VALUES (165, 1, '任务一', '54ad8088-7ac7-11ec-a040-a2380e71991a', 1, NULL, NULL, '54aa251f-7ac7-11ec-a040-a2380e71991a', 'test:21:c2cd44b0-79b0-11ec-b2b8-a2380e71991a', '1', '2022-01-21 22:35:08', '1', '2022-01-21 22:36:20', b'0');
+INSERT INTO `bpm_task_ext` VALUES (166, 1, '任务一', 'bd97b7c0-7ac7-11ec-9948-a2380e71991a', 1, NULL, NULL, 'bd7dc717-7ac7-11ec-9948-a2380e71991a', 'test:21:c2cd44b0-79b0-11ec-b2b8-a2380e71991a', '1', '2022-01-21 22:38:04', '1', '2022-01-21 22:38:04', b'0');
+INSERT INTO `bpm_task_ext` VALUES (167, 1, '1.2', '381aa1dd-7ac8-11ec-a9e2-a2380e71991a', 1, NULL, NULL, '37d7a55c-7ac8-11ec-a9e2-a2380e71991a', 'test_001:4:3dbe6714-76b1-11ec-9c66-a2380e71991a', '1', '2022-01-21 22:41:29', '1', '2022-01-21 22:41:30', b'0');
+INSERT INTO `bpm_task_ext` VALUES (168, 1, '1.1', '37f95e37-7ac8-11ec-a9e2-a2380e71991a', 1, NULL, NULL, '37d7a55c-7ac8-11ec-a9e2-a2380e71991a', 'test_001:4:3dbe6714-76b1-11ec-9c66-a2380e71991a', '1', '2022-01-21 22:41:29', '1', '2022-01-21 22:41:30', b'0');
+INSERT INTO `bpm_task_ext` VALUES (169, 1, '1.2', '58154733-7ac8-11ec-a9e2-a2380e71991a', 1, NULL, NULL, '580a98c2-7ac8-11ec-a9e2-a2380e71991a', 'test_001:4:3dbe6714-76b1-11ec-9c66-a2380e71991a', '1', '2022-01-21 22:42:23', '1', '2022-01-21 22:42:23', b'0');
+INSERT INTO `bpm_task_ext` VALUES (170, 1, '1.1', '580e1b3d-7ac8-11ec-a9e2-a2380e71991a', 1, NULL, NULL, '580a98c2-7ac8-11ec-a9e2-a2380e71991a', 'test_001:4:3dbe6714-76b1-11ec-9c66-a2380e71991a', '1', '2022-01-21 22:42:23', '1', '2022-01-21 22:42:23', b'0');
+INSERT INTO `bpm_task_ext` VALUES (171, 1, '1.2', '8f0d1619-7ac8-11ec-a9e2-a2380e71991a', 1, NULL, NULL, '8f021988-7ac8-11ec-a9e2-a2380e71991a', 'test_001:4:3dbe6714-76b1-11ec-9c66-a2380e71991a', '1', '2022-01-21 22:43:55', '1', '2022-01-21 22:43:55', b'0');
+INSERT INTO `bpm_task_ext` VALUES (172, 1, '1.1', '8f059c03-7ac8-11ec-a9e2-a2380e71991a', 1, NULL, NULL, '8f021988-7ac8-11ec-a9e2-a2380e71991a', 'test_001:4:3dbe6714-76b1-11ec-9c66-a2380e71991a', '1', '2022-01-21 22:43:55', '1', '2022-01-21 22:43:55', b'0');
+INSERT INTO `bpm_task_ext` VALUES (173, 1, '1.2', '2377edc6-7ac9-11ec-aa06-a2380e71991a', 2, 'A', '2022-01-22 00:20:48', '23615875-7ac9-11ec-aa06-a2380e71991a', 'test_001:4:3dbe6714-76b1-11ec-9c66-a2380e71991a', '1', '2022-01-21 22:48:04', '1', '2022-01-22 00:20:48', b'0');
+INSERT INTO `bpm_task_ext` VALUES (174, 1, '1.1', '236c5500-7ac9-11ec-aa06-a2380e71991a', 2, 'A', '2022-01-22 00:20:51', '23615875-7ac9-11ec-aa06-a2380e71991a', 'test_001:4:3dbe6714-76b1-11ec-9c66-a2380e71991a', '1', '2022-01-21 22:48:04', '1', '2022-01-22 00:20:52', b'0');
+INSERT INTO `bpm_task_ext` VALUES (175, 1, '哈哈哈哈', '34fb7fac-7ad6-11ec-abe9-a2380e71991a', 2, 'AAA', '2022-01-22 00:22:02', '34f51703-7ad6-11ec-abe9-a2380e71991a', 'self:2:3a5a065e-76b1-11ec-9c66-a2380e71991a', '1', '2022-01-22 00:21:37', '1', '2022-01-22 00:22:11', b'0');
+INSERT INTO `bpm_task_ext` VALUES (176, 1, '哈哈哈哈', 'a4178f6d-7ad6-11ec-abe9-a2380e71991a', 4, NULL, '2022-01-22 00:24:48', 'a413bed4-7ad6-11ec-abe9-a2380e71991a', 'self:2:3a5a065e-76b1-11ec-9c66-a2380e71991a', '1', '2022-01-22 00:24:44', '1', '2022-01-22 00:24:48', b'0');
+INSERT INTO `bpm_task_ext` VALUES (177, 1, '任务一', 'c010347b-7ad6-11ec-abe9-a2380e71991a', 3, 'EEE', '2022-01-22 00:30:01', 'c00d2732-7ad6-11ec-abe9-a2380e71991a', 'test:21:c2cd44b0-79b0-11ec-b2b8-a2380e71991a', '1', '2022-01-22 00:25:31', '1', '2022-01-22 00:30:23', b'0');
+INSERT INTO `bpm_task_ext` VALUES (178, 1, '一级审批', 'a6aba0a4-7b6d-11ec-b781-acde48001122', 1, NULL, NULL, 'a6a007dd-7b6d-11ec-b781-acde48001122', 'oa_leave:2:3c1f0ef1-76b1-11ec-9c66-a2380e71991a', '1', '2022-01-22 18:25:42', '1', '2022-01-22 18:25:42', b'0');
+INSERT INTO `bpm_task_ext` VALUES (179, 1, '一级审批', '28aed7fb-7b75-11ec-a3c8-acde48001122', 2, 'EEE', '2022-01-22 20:31:52', '28a5d744-7b75-11ec-a3c8-acde48001122', 'oa_leave:3:1fad3d93-7b75-11ec-a3c8-acde48001122', '1', '2022-01-22 19:19:27', '1', '2022-01-22 20:31:53', b'0');
+INSERT INTO `bpm_task_ext` VALUES (180, 1, '一级审批', '75d72608-7b7f-11ec-a3c8-acde48001122', 1, NULL, NULL, '75d43fd1-7b7f-11ec-a3c8-acde48001122', 'oa_leave:3:1fad3d93-7b75-11ec-a3c8-acde48001122', '1', '2022-01-22 20:33:11', '1', '2022-01-22 20:33:11', b'0');
+INSERT INTO `bpm_task_ext` VALUES (181, 1, '一级审批', '9ac3d0eb-7b7f-11ec-a3c8-acde48001122', 2, 'EEE', '2022-01-22 20:34:25', '9ac0eab4-7b7f-11ec-a3c8-acde48001122', 'oa_leave:4:991f2193-7b7f-11ec-a3c8-acde48001122', '1', '2022-01-22 20:34:13', '1', '2022-01-22 20:34:26', b'0');
+INSERT INTO `bpm_task_ext` VALUES (182, 1, '二级审批', 'a23fb5b1-7b7f-11ec-a3c8-acde48001122', 2, 'CCC', '2022-01-22 20:34:33', '9ac0eab4-7b7f-11ec-a3c8-acde48001122', 'oa_leave:4:991f2193-7b7f-11ec-a3c8-acde48001122', '1', '2022-01-22 20:34:25', '1', '2022-01-22 20:34:34', b'0');
+INSERT INTO `bpm_task_ext` VALUES (183, 1, '一级审批', '725a1eb6-7b88-11ec-8ef0-acde48001122', 1, NULL, NULL, '7250cfdf-7b88-11ec-8ef0-acde48001122', 'oa_leave:4:991f2193-7b7f-11ec-a3c8-acde48001122', '1', '2022-01-22 21:37:31', '1', '2022-01-22 21:37:31', b'0');
+INSERT INTO `bpm_task_ext` VALUES (184, 1, '一级审批', '069c6a63-7b8a-11ec-8ef0-acde48001122', 1, NULL, NULL, '0699ab3c-7b8a-11ec-8ef0-acde48001122', 'oa_leave:5:004b710b-7b8a-11ec-8ef0-acde48001122', '1', '2022-01-22 21:48:49', '1', '2022-01-22 21:48:49', b'0');
+INSERT INTO `bpm_task_ext` VALUES (185, 1, '一级审批', 'eaa01ebd-7b8d-11ec-b8e2-acde48001122', 2, 'AAA', '2022-01-22 22:16:53', 'ea957056-7b8d-11ec-b8e2-acde48001122', 'oa_leave:5:004b710b-7b8a-11ec-8ef0-acde48001122', '1', '2022-01-22 22:16:40', '1', '2022-01-22 22:16:53', b'0');
+INSERT INTO `bpm_task_ext` VALUES (186, 1, '二级审批', 'f24cfe93-7b8d-11ec-b8e2-acde48001122', 2, 'EEE', '2022-01-22 22:16:56', 'ea957056-7b8d-11ec-b8e2-acde48001122', 'oa_leave:5:004b710b-7b8a-11ec-8ef0-acde48001122', '1', '2022-01-22 22:16:53', '1', '2022-01-22 22:17:00', b'0');
+INSERT INTO `bpm_task_ext` VALUES (187, 1, '一级审批', '7e0bd5ff-7b8e-11ec-b8e2-acde48001122', 3, 'EEE', '2022-01-22 22:21:14', '7e093de8-7b8e-11ec-b8e2-acde48001122', 'oa_leave:5:004b710b-7b8a-11ec-8ef0-acde48001122', '1', '2022-01-22 22:20:47', '1', '2022-01-22 22:23:25', b'0');
+INSERT INTO `bpm_task_ext` VALUES (188, 1, '一级审批', '535dc031-7b91-11ec-8473-acde48001122', 3, 'EEE', '2022-01-22 22:41:09', '5354233a-7b91-11ec-8473-acde48001122', 'oa_leave:5:004b710b-7b8a-11ec-8ef0-acde48001122', '1', '2022-01-22 22:41:04', '1', '2022-01-22 22:41:15', b'0');
+INSERT INTO `bpm_task_ext` VALUES (189, 1, '一级审批', '68d13c8b-7b91-11ec-8473-acde48001122', 2, '1111', '2022-01-22 22:41:46', '68ce0834-7b91-11ec-8473-acde48001122', 'oa_leave:5:004b710b-7b8a-11ec-8ef0-acde48001122', '1', '2022-01-22 22:41:40', '1', '2022-01-22 22:41:46', b'0');
+INSERT INTO `bpm_task_ext` VALUES (190, 1, '二级审批', '6c5ad881-7b91-11ec-8473-acde48001122', 3, 'EEE', '2022-01-22 22:41:57', '68ce0834-7b91-11ec-8473-acde48001122', 'oa_leave:5:004b710b-7b8a-11ec-8ef0-acde48001122', '1', '2022-01-22 22:41:46', '1', '2022-01-22 22:43:14', b'0');
+INSERT INTO `bpm_task_ext` VALUES (191, 1, '一级审批', 'bb265acb-7b91-11ec-8473-acde48001122', 3, 'eeee', '2022-01-22 22:44:07', 'bb23c2b4-7b91-11ec-8473-acde48001122', 'oa_leave:5:004b710b-7b8a-11ec-8ef0-acde48001122', '1', '2022-01-22 22:43:58', '1', '2022-01-22 22:44:11', b'0');
+INSERT INTO `bpm_task_ext` VALUES (192, 1, '哈哈哈哈', '49dd7c51-7b98-11ec-b5ee-acde48001122', 4, NULL, '2022-01-22 23:39:10', '49d3df58-7b98-11ec-b5ee-acde48001122', 'self:2:3a5a065e-76b1-11ec-9c66-a2380e71991a', '1', '2022-01-22 23:30:55', '1', '2022-01-22 23:39:10', b'0');
+INSERT INTO `bpm_task_ext` VALUES (193, 1, '一级审批', '888c6dfe-7b99-11ec-ba5c-acde48001122', 3, 'eee', '2022-01-22 23:39:59', '8884f3e7-7b99-11ec-ba5c-acde48001122', 'oa_leave:5:004b710b-7b8a-11ec-8ef0-acde48001122', '1', '2022-01-22 23:39:49', '1', '2022-01-22 23:40:09', b'0');
+INSERT INTO `bpm_task_ext` VALUES (194, 1, '一级审批', 'a59c9d88-7b99-11ec-ba5c-acde48001122', 2, 'AAAA', '2022-01-22 23:40:49', 'a59a5391-7b99-11ec-ba5c-acde48001122', 'oa_leave:5:004b710b-7b8a-11ec-8ef0-acde48001122', '1', '2022-01-22 23:40:38', '1', '2022-01-22 23:40:56', b'0');
+INSERT INTO `bpm_task_ext` VALUES (195, 1, '一级审批', '03d1219e-7b9a-11ec-a290-acde48001122', 3, 'BBB', '2022-01-22 23:43:29', '03c6c157-7b9a-11ec-a290-acde48001122', 'oa_leave:5:004b710b-7b8a-11ec-8ef0-acde48001122', '1', '2022-01-22 23:43:16', '1', '2022-01-22 23:43:42', b'0');
+INSERT INTO `bpm_task_ext` VALUES (196, 1, '一级审批', '331e3388-7b9a-11ec-a290-acde48001122', 2, 'EEE', '2022-01-22 23:44:40', '331bc281-7b9a-11ec-a290-acde48001122', 'oa_leave:5:004b710b-7b8a-11ec-8ef0-acde48001122', '1', '2022-01-22 23:44:35', '1', '2022-01-22 23:44:47', b'0');
+INSERT INTO `bpm_task_ext` VALUES (197, 1, '一级审批', '53026aa5-7b9a-11ec-a290-acde48001122', 2, 'AAA', '2022-01-22 23:45:37', '52ffd28e-7b9a-11ec-a290-acde48001122', 'oa_leave:5:004b710b-7b8a-11ec-8ef0-acde48001122', '1', '2022-01-22 23:45:29', '1', '2022-01-22 23:45:40', b'0');
+INSERT INTO `bpm_task_ext` VALUES (198, 1, '一级审批', '67c534a2-7b9a-11ec-a290-acde48001122', 2, 'EEEE', '2022-01-22 23:46:09', '67c2eaab-7b9a-11ec-a290-acde48001122', 'oa_leave:5:004b710b-7b8a-11ec-8ef0-acde48001122', '1', '2022-01-22 23:46:04', '1', '2022-01-22 23:46:22', b'0');
+INSERT INTO `bpm_task_ext` VALUES (199, 1, '一级审批', '8196daff-7b9a-11ec-a290-acde48001122', 2, 'eee', '2022-01-22 23:46:53', '819442e8-7b9a-11ec-a290-acde48001122', 'oa_leave:5:004b710b-7b8a-11ec-8ef0-acde48001122', '1', '2022-01-22 23:46:47', '1', '2022-01-22 23:48:24', b'0');
+INSERT INTO `bpm_task_ext` VALUES (200, 1, '一级审批', 'ec507ae6-7b9a-11ec-b03b-acde48001122', 2, 'AAA', '2022-01-22 23:49:51', 'ec45f38f-7b9a-11ec-b03b-acde48001122', 'oa_leave:5:004b710b-7b8a-11ec-8ef0-acde48001122', '1', '2022-01-22 23:49:46', '1', '2022-01-22 23:49:59', b'0');
+INSERT INTO `bpm_task_ext` VALUES (201, 1, '一级审批', '215cf4e5-7b9b-11ec-9a1b-acde48001122', 2, 'aaa', '2022-01-22 23:51:20', '2152467e-7b9b-11ec-9a1b-acde48001122', 'oa_leave:5:004b710b-7b8a-11ec-8ef0-acde48001122', '1', '2022-01-22 23:51:15', '1', '2022-01-22 23:51:24', b'0');
+INSERT INTO `bpm_task_ext` VALUES (202, 1, '一级审批', '73211d9d-7b9b-11ec-b5b7-acde48001122', 1, NULL, NULL, '7317cec6-7b9b-11ec-b5b7-acde48001122', 'oa_leave:5:004b710b-7b8a-11ec-8ef0-acde48001122', '1', '2022-01-22 23:53:32', '1', '2022-01-22 23:53:32', b'0');
+INSERT INTO `bpm_task_ext` VALUES (203, 1, '一级审批', '74736737-7b9b-11ec-b5b7-acde48001122', 4, NULL, '2022-01-23 00:08:41', '7470a810-7b9b-11ec-b5b7-acde48001122', 'oa_leave:5:004b710b-7b8a-11ec-8ef0-acde48001122', '1', '2022-01-22 23:53:35', '1', '2022-01-23 00:08:41', b'0');
+INSERT INTO `bpm_task_ext` VALUES (204, 1, '一级审批', '3adac3d2-7b9d-11ec-8404-acde48001122', 4, NULL, '2022-01-23 00:07:03', '3ad174fb-7b9d-11ec-8404-acde48001122', 'oa_leave:5:004b710b-7b8a-11ec-8ef0-acde48001122', '1', '2022-01-23 00:06:17', '1', '2022-01-23 00:07:03', b'0');
+COMMIT;
+
+-- ----------------------------
+-- Table structure for bpm_user_group
+-- ----------------------------
+DROP TABLE IF EXISTS `bpm_user_group`;
+CREATE TABLE `bpm_user_group` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号',
+  `name` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '组名',
+  `description` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '描述',
+  `member_user_ids` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '0' COMMENT '成员编号数组',
+  `status` tinyint NOT NULL COMMENT '状态（0正常 1停用）',
+  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  `tenant_id` bigint NOT NULL DEFAULT '0' COMMENT '租户编号',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=111 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用户组';
+
+-- ----------------------------
+-- Records of bpm_user_group
+-- ----------------------------
+BEGIN;
+INSERT INTO `bpm_user_group` VALUES (110, '测试组', '哈哈哈哈', '[1]', 0, '1', '2022-01-14 13:54:13', '1', '2022-01-14 22:24:10', b'0', 0);
+COMMIT;
 
 -- ----------------------------
 -- Table structure for inf_api_access_log
@@ -23,28 +701,28 @@ SET FOREIGN_KEY_CHECKS = 0;
 DROP TABLE IF EXISTS `inf_api_access_log`;
 CREATE TABLE `inf_api_access_log` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '日志主键',
-  `trace_id` varchar(64) COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '链路追踪编号',
+  `trace_id` varchar(64) NOT NULL DEFAULT '' COMMENT '链路追踪编号',
   `user_id` bigint NOT NULL DEFAULT '0' COMMENT '用户编号',
   `user_type` tinyint NOT NULL DEFAULT '0' COMMENT '用户类型',
-  `application_name` varchar(50) COLLATE utf8mb4_general_ci NOT NULL COMMENT '应用名',
-  `request_method` varchar(16) COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '请求方法名',
-  `request_url` varchar(255) COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '请求地址',
-  `request_params` varchar(8000) COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '请求参数',
-  `user_ip` varchar(50) COLLATE utf8mb4_general_ci NOT NULL COMMENT '用户 IP',
-  `user_agent` varchar(512) COLLATE utf8mb4_general_ci NOT NULL COMMENT '浏览器 UA',
+  `application_name` varchar(50) NOT NULL COMMENT '应用名',
+  `request_method` varchar(16) NOT NULL DEFAULT '' COMMENT '请求方法名',
+  `request_url` varchar(255) NOT NULL DEFAULT '' COMMENT '请求地址',
+  `request_params` varchar(8000) NOT NULL DEFAULT '' COMMENT '请求参数',
+  `user_ip` varchar(50) NOT NULL COMMENT '用户 IP',
+  `user_agent` varchar(512) NOT NULL COMMENT '浏览器 UA',
   `begin_time` datetime NOT NULL COMMENT '开始请求时间',
   `end_time` datetime NOT NULL COMMENT '结束请求时间',
   `duration` int NOT NULL COMMENT '执行时长',
   `result_code` int NOT NULL DEFAULT '0' COMMENT '结果码',
-  `result_msg` varchar(512) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '结果提示',
-  `creator` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
+  `result_msg` varchar(512) DEFAULT '' COMMENT '结果提示',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `updater` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   `tenant_id` bigint NOT NULL DEFAULT '0' COMMENT '租户编号',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=4238 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='API 访问日志表';
+) ENGINE=InnoDB AUTO_INCREMENT=22788 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='API 访问日志表';
 
 -- ----------------------------
 -- Records of inf_api_access_log
@@ -58,35 +736,35 @@ COMMIT;
 DROP TABLE IF EXISTS `inf_api_error_log`;
 CREATE TABLE `inf_api_error_log` (
   `id` int NOT NULL AUTO_INCREMENT COMMENT '编号',
-  `trace_id` varchar(64) COLLATE utf8mb4_general_ci NOT NULL COMMENT '链路追踪编号\n     *\n     * 一般来说，通过链路追踪编号，可以将访问日志，错误日志，链路追踪日志，logger 打印日志等，结合在一起，从而进行排错。',
+  `trace_id` varchar(64) NOT NULL COMMENT '链路追踪编号\n     *\n     * 一般来说，通过链路追踪编号，可以将访问日志，错误日志，链路追踪日志，logger 打印日志等，结合在一起，从而进行排错。',
   `user_id` int NOT NULL DEFAULT '0' COMMENT '用户编号',
   `user_type` tinyint NOT NULL DEFAULT '0' COMMENT '用户类型',
-  `application_name` varchar(50) COLLATE utf8mb4_general_ci NOT NULL COMMENT '应用名\n     *\n     * 目前读取 spring.application.name',
-  `request_method` varchar(16) COLLATE utf8mb4_general_ci NOT NULL COMMENT '请求方法名',
-  `request_url` varchar(255) COLLATE utf8mb4_general_ci NOT NULL COMMENT '请求地址',
-  `request_params` varchar(8000) COLLATE utf8mb4_general_ci NOT NULL COMMENT '请求参数',
-  `user_ip` varchar(50) COLLATE utf8mb4_general_ci NOT NULL COMMENT '用户 IP',
-  `user_agent` varchar(512) COLLATE utf8mb4_general_ci NOT NULL COMMENT '浏览器 UA',
+  `application_name` varchar(50) NOT NULL COMMENT '应用名\n     *\n     * 目前读取 spring.application.name',
+  `request_method` varchar(16) NOT NULL COMMENT '请求方法名',
+  `request_url` varchar(255) NOT NULL COMMENT '请求地址',
+  `request_params` varchar(8000) NOT NULL COMMENT '请求参数',
+  `user_ip` varchar(50) NOT NULL COMMENT '用户 IP',
+  `user_agent` varchar(512) NOT NULL COMMENT '浏览器 UA',
   `exception_time` datetime NOT NULL COMMENT '异常发生时间',
-  `exception_name` varchar(128) COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '异常名\n     *\n     * {@link Throwable#getClass()} 的类全名',
-  `exception_message` text COLLATE utf8mb4_general_ci NOT NULL COMMENT '异常导致的消息\n     *\n     * {@link cn.iocoder.common.framework.util.ExceptionUtil#getMessage(Throwable)}',
-  `exception_root_cause_message` text COLLATE utf8mb4_general_ci NOT NULL COMMENT '异常导致的根消息\n     *\n     * {@link cn.iocoder.common.framework.util.ExceptionUtil#getRootCauseMessage(Throwable)}',
-  `exception_stack_trace` text COLLATE utf8mb4_general_ci NOT NULL COMMENT '异常的栈轨迹\n     *\n     * {@link cn.iocoder.common.framework.util.ExceptionUtil#getServiceException(Exception)}',
-  `exception_class_name` varchar(512) COLLATE utf8mb4_general_ci NOT NULL COMMENT '异常发生的类全名\n     *\n     * {@link StackTraceElement#getClassName()}',
-  `exception_file_name` varchar(512) COLLATE utf8mb4_general_ci NOT NULL COMMENT '异常发生的类文件\n     *\n     * {@link StackTraceElement#getFileName()}',
-  `exception_method_name` varchar(512) COLLATE utf8mb4_general_ci NOT NULL COMMENT '异常发生的方法名\n     *\n     * {@link StackTraceElement#getMethodName()}',
+  `exception_name` varchar(128) NOT NULL DEFAULT '' COMMENT '异常名\n     *\n     * {@link Throwable#getClass()} 的类全名',
+  `exception_message` text NOT NULL COMMENT '异常导致的消息\n     *\n     * {@link cn.iocoder.common.framework.util.ExceptionUtil#getMessage(Throwable)}',
+  `exception_root_cause_message` text NOT NULL COMMENT '异常导致的根消息\n     *\n     * {@link cn.iocoder.common.framework.util.ExceptionUtil#getRootCauseMessage(Throwable)}',
+  `exception_stack_trace` text NOT NULL COMMENT '异常的栈轨迹\n     *\n     * {@link cn.iocoder.common.framework.util.ExceptionUtil#getServiceException(Exception)}',
+  `exception_class_name` varchar(512) NOT NULL COMMENT '异常发生的类全名\n     *\n     * {@link StackTraceElement#getClassName()}',
+  `exception_file_name` varchar(512) NOT NULL COMMENT '异常发生的类文件\n     *\n     * {@link StackTraceElement#getFileName()}',
+  `exception_method_name` varchar(512) NOT NULL COMMENT '异常发生的方法名\n     *\n     * {@link StackTraceElement#getMethodName()}',
   `exception_line_number` int NOT NULL COMMENT '异常发生的方法所在行\n     *\n     * {@link StackTraceElement#getLineNumber()}',
   `process_status` tinyint NOT NULL COMMENT '处理状态',
   `process_time` datetime DEFAULT NULL COMMENT '处理时间',
   `process_user_id` int DEFAULT '0' COMMENT '处理用户编号',
-  `creator` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `updater` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   `tenant_id` bigint NOT NULL DEFAULT '0' COMMENT '租户编号',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=88 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='系统异常日志';
+) ENGINE=InnoDB AUTO_INCREMENT=230 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='系统异常日志';
 
 -- ----------------------------
 -- Records of inf_api_error_log
@@ -100,20 +778,20 @@ COMMIT;
 DROP TABLE IF EXISTS `inf_config`;
 CREATE TABLE `inf_config` (
   `id` int NOT NULL AUTO_INCREMENT COMMENT '参数主键',
-  `group` varchar(50) COLLATE utf8mb4_general_ci NOT NULL COMMENT '参数分组',
+  `group` varchar(50) NOT NULL COMMENT '参数分组',
   `type` tinyint NOT NULL COMMENT '参数类型',
-  `name` varchar(100) COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '参数名称',
-  `key` varchar(100) COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '参数键名',
-  `value` varchar(500) COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '参数键值',
+  `name` varchar(100) NOT NULL DEFAULT '' COMMENT '参数名称',
+  `key` varchar(100) NOT NULL DEFAULT '' COMMENT '参数键名',
+  `value` varchar(500) NOT NULL DEFAULT '' COMMENT '参数键值',
   `sensitive` bit(1) NOT NULL COMMENT '是否敏感',
-  `remark` varchar(500) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '备注',
-  `creator` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
+  `remark` varchar(500) DEFAULT NULL COMMENT '备注',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `updater` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='参数配置表';
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='参数配置表';
 
 -- ----------------------------
 -- Records of inf_config
@@ -131,17 +809,17 @@ COMMIT;
 -- ----------------------------
 DROP TABLE IF EXISTS `inf_file`;
 CREATE TABLE `inf_file` (
-  `id` varchar(188) COLLATE utf8mb4_general_ci NOT NULL COMMENT '文件路径',
-  `type` varchar(63) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '文件类型',
+  `id` varchar(188) NOT NULL COMMENT '文件路径',
+  `type` varchar(63) DEFAULT NULL COMMENT '文件类型',
   `content` mediumblob NOT NULL COMMENT '文件内容',
-  `creator` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `updater` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   `tenant_id` bigint NOT NULL DEFAULT '0' COMMENT '租户编号',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='文件表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='文件表';
 
 -- ----------------------------
 -- Records of inf_file
@@ -164,21 +842,21 @@ COMMIT;
 DROP TABLE IF EXISTS `inf_job`;
 CREATE TABLE `inf_job` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '任务编号',
-  `name` varchar(32) COLLATE utf8mb4_general_ci NOT NULL COMMENT '任务名称',
+  `name` varchar(32) NOT NULL COMMENT '任务名称',
   `status` tinyint NOT NULL COMMENT '任务状态',
-  `handler_name` varchar(64) COLLATE utf8mb4_general_ci NOT NULL COMMENT '处理器的名字',
-  `handler_param` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '处理器的参数',
-  `cron_expression` varchar(32) COLLATE utf8mb4_general_ci NOT NULL COMMENT 'CRON 表达式',
+  `handler_name` varchar(64) NOT NULL COMMENT '处理器的名字',
+  `handler_param` varchar(255) DEFAULT NULL COMMENT '处理器的参数',
+  `cron_expression` varchar(32) NOT NULL COMMENT 'CRON 表达式',
   `retry_count` int NOT NULL DEFAULT '0' COMMENT '重试次数',
   `retry_interval` int NOT NULL DEFAULT '0' COMMENT '重试间隔',
   `monitor_timeout` int NOT NULL DEFAULT '0' COMMENT '监控超时时间',
-  `creator` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `updater` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='定时任务表';
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='定时任务表';
 
 -- ----------------------------
 -- Records of inf_job
@@ -197,21 +875,21 @@ DROP TABLE IF EXISTS `inf_job_log`;
 CREATE TABLE `inf_job_log` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '日志编号',
   `job_id` bigint NOT NULL COMMENT '任务编号',
-  `handler_name` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '处理器的名字',
-  `handler_param` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '处理器的参数',
+  `handler_name` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '处理器的名字',
+  `handler_param` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '处理器的参数',
   `execute_index` tinyint NOT NULL DEFAULT '1' COMMENT '第几次执行',
   `begin_time` datetime NOT NULL COMMENT '开始执行时间',
   `end_time` datetime DEFAULT NULL COMMENT '结束执行时间',
   `duration` int DEFAULT NULL COMMENT '执行时长',
   `status` tinyint NOT NULL COMMENT '任务状态',
-  `result` varchar(4000) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '结果数据',
-  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
+  `result` varchar(4000) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '结果数据',
+  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '创建者',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
+  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '更新者',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=25274 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='定时任务日志表';
+) ENGINE=InnoDB AUTO_INCREMENT=25274 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='定时任务日志表';
 
 -- ----------------------------
 -- Records of inf_job_log
@@ -225,23 +903,23 @@ COMMIT;
 DROP TABLE IF EXISTS `mbr_user`;
 CREATE TABLE `mbr_user` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号',
-  `nickname` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL DEFAULT '' COMMENT '用户昵称',
-  `avatar` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL DEFAULT '' COMMENT '头像',
+  `nickname` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '用户昵称',
+  `avatar` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '头像',
   `status` tinyint NOT NULL COMMENT '状态',
-  `mobile` varchar(11) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT '手机号',
-  `password` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL DEFAULT '' COMMENT '密码',
-  `register_ip` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT '注册 IP',
-  `login_ip` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '最后登录IP',
+  `mobile` varchar(11) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '手机号',
+  `password` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '密码',
+  `register_ip` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '注册 IP',
+  `login_ip` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '最后登录IP',
   `login_date` datetime DEFAULT NULL COMMENT '最后登录时间',
-  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT '' COMMENT '创建者',
+  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT '' COMMENT '更新者',
+  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   `tenant_id` bigint NOT NULL DEFAULT '0' COMMENT '租户编号',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE KEY `uk_mobile` (`mobile`) USING BTREE COMMENT '手机号'
-) ENGINE=InnoDB AUTO_INCREMENT=247 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin COMMENT='用户';
+) ENGINE=InnoDB AUTO_INCREMENT=247 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='用户';
 
 -- ----------------------------
 -- Records of mbr_user
@@ -252,54 +930,24 @@ INSERT INTO `mbr_user` VALUES (246, '', '', 0, '15601691301', '$2a$10$KLvmwoU.bv
 COMMIT;
 
 -- ----------------------------
--- Table structure for oa_leave
--- ----------------------------
-DROP TABLE IF EXISTS `oa_leave`;
-CREATE TABLE `oa_leave` (
-  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '请假表单主键',
-  `process_instance_id` varchar(64) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '流程id',
-  `status` tinyint NOT NULL COMMENT '状态',
-  `user_id` varchar(20) COLLATE utf8mb4_general_ci NOT NULL COMMENT '申请人id',
-  `start_time` datetime NOT NULL COMMENT '开始时间',
-  `end_time` datetime NOT NULL COMMENT '结束时间',
-  `leave_type` varchar(20) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '请假类型',
-  `reason` varchar(2000) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '原因',
-  `apply_time` datetime NOT NULL COMMENT '申请时间',
-  `creator` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
-  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `updater` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
-  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='请假申请表';
-
--- ----------------------------
--- Records of oa_leave
--- ----------------------------
-BEGIN;
-INSERT INTO `oa_leave` VALUES (1, '659d1c4f-3943-11ec-854f-3e6e3d9df205', 2, 'admin', '2021-10-01 00:00:00', '2021-10-30 00:00:00', '1', NULL, '2021-10-12 00:00:00', '1', '2021-10-30 13:36:57', '1', '2021-10-30 13:41:53', b'0');
-INSERT INTO `oa_leave` VALUES (2, '7c1c8f91-3961-11ec-8eff-3e6e3d9df205', 1, 'admin', '2021-10-01 00:00:00', '2021-10-30 00:00:00', '2', NULL, '2021-10-18 00:00:00', '1', '2021-10-30 17:12:20', '1', '2021-10-30 17:12:20', b'0');
-COMMIT;
-
--- ----------------------------
 -- Table structure for pay_app
 -- ----------------------------
 DROP TABLE IF EXISTS `pay_app`;
 CREATE TABLE `pay_app` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '应用编号',
-  `name` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '应用名',
+  `name` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '应用名',
   `status` tinyint NOT NULL COMMENT '开启状态',
-  `remark` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '备注',
-  `pay_notify_url` varchar(1024) COLLATE utf8mb4_general_ci NOT NULL COMMENT '支付结果的回调地址',
-  `refund_notify_url` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '退款结果的回调地址',
+  `remark` varchar(255) DEFAULT NULL COMMENT '备注',
+  `pay_notify_url` varchar(1024) NOT NULL COMMENT '支付结果的回调地址',
+  `refund_notify_url` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '退款结果的回调地址',
   `merchant_id` bigint NOT NULL COMMENT '商户编号',
-  `creator` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `updater` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='支付应用信息';
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='支付应用信息';
 
 -- ----------------------------
 -- Records of pay_app
@@ -314,20 +962,20 @@ COMMIT;
 DROP TABLE IF EXISTS `pay_channel`;
 CREATE TABLE `pay_channel` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '商户编号',
-  `code` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '渠道编码',
+  `code` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '渠道编码',
   `status` tinyint NOT NULL COMMENT '开启状态',
-  `remark` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '备注',
+  `remark` varchar(255) DEFAULT NULL COMMENT '备注',
   `fee_rate` double NOT NULL DEFAULT '0' COMMENT '渠道费率，单位：百分比',
   `merchant_id` bigint NOT NULL COMMENT '商户编号',
   `app_id` bigint NOT NULL COMMENT '应用编号',
-  `config` varchar(4096) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '支付渠道配置',
-  `creator` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
+  `config` varchar(4096) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '支付渠道配置',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `updater` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='支付渠道\n';
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='支付渠道\n';
 
 -- ----------------------------
 -- Records of pay_channel
@@ -348,18 +996,18 @@ COMMIT;
 DROP TABLE IF EXISTS `pay_merchant`;
 CREATE TABLE `pay_merchant` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '商户编号',
-  `no` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '商户号',
-  `name` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '商户全称',
-  `short_name` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '商户简称',
+  `no` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '商户号',
+  `name` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '商户全称',
+  `short_name` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '商户简称',
   `status` tinyint NOT NULL COMMENT '开启状态',
-  `remark` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '备注',
-  `creator` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
+  `remark` varchar(255) DEFAULT NULL COMMENT '备注',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `updater` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='支付商户信息';
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='支付商户信息';
 
 -- ----------------------------
 -- Records of pay_merchant
@@ -376,15 +1024,15 @@ CREATE TABLE `pay_notify_log` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '日志编号',
   `task_id` bigint NOT NULL COMMENT '通知任务编号',
   `notify_times` tinyint NOT NULL COMMENT '第几次被通知',
-  `response` varchar(2048) COLLATE utf8mb4_general_ci NOT NULL COMMENT '请求参数',
+  `response` varchar(2048) NOT NULL COMMENT '请求参数',
   `status` tinyint NOT NULL COMMENT '通知状态',
-  `creator` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `updater` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=363051 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='支付通知 App 的日志';
+) ENGINE=InnoDB AUTO_INCREMENT=363051 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='支付通知 App 的日志';
 
 -- ----------------------------
 -- Records of pay_notify_log
@@ -403,19 +1051,19 @@ CREATE TABLE `pay_notify_task` (
   `type` tinyint NOT NULL COMMENT '通知类型',
   `data_id` bigint NOT NULL COMMENT '数据编号',
   `status` tinyint NOT NULL COMMENT '通知状态',
-  `merchant_order_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '商户订单编号',
+  `merchant_order_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '商户订单编号',
   `next_notify_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '下一次通知时间',
   `last_execute_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '最后一次执行时间',
   `notify_times` tinyint NOT NULL COMMENT '当前通知次数',
   `max_notify_times` tinyint NOT NULL COMMENT '最大可通知次数',
-  `notify_url` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '异步通知地址',
-  `creator` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
+  `notify_url` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '异步通知地址',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `updater` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=112 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='商户支付、退款等的通知\n';
+) ENGINE=InnoDB AUTO_INCREMENT=112 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='商户支付、退款等的通知\n';
 
 -- ----------------------------
 -- Records of pay_notify_task
@@ -448,17 +1096,17 @@ CREATE TABLE `pay_order` (
   `merchant_id` bigint NOT NULL COMMENT '商户编号',
   `app_id` bigint NOT NULL COMMENT '应用编号',
   `channel_id` bigint DEFAULT NULL COMMENT '渠道编号',
-  `channel_code` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '渠道编码',
-  `merchant_order_id` varchar(64) COLLATE utf8mb4_general_ci NOT NULL COMMENT '商户订单编号',
-  `subject` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '商品标题',
-  `body` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '商品描述',
-  `notify_url` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '异步通知地址',
+  `channel_code` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '渠道编码',
+  `merchant_order_id` varchar(64) NOT NULL COMMENT '商户订单编号',
+  `subject` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '商品标题',
+  `body` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '商品描述',
+  `notify_url` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '异步通知地址',
   `notify_status` tinyint NOT NULL COMMENT '通知商户支付结果的回调状态',
   `amount` bigint NOT NULL COMMENT '支付金额，单位：分',
   `channel_fee_rate` double DEFAULT '0' COMMENT '渠道手续费，单位：百分比',
   `channel_fee_amount` bigint DEFAULT '0' COMMENT '渠道手续金额，单位：分',
   `status` tinyint NOT NULL COMMENT '支付状态',
-  `user_ip` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '用户 IP',
+  `user_ip` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '用户 IP',
   `expire_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '订单失效时间',
   `success_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '订单支付成功时间',
   `notify_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '订单支付通知时间',
@@ -466,15 +1114,15 @@ CREATE TABLE `pay_order` (
   `refund_status` tinyint NOT NULL COMMENT '退款状态',
   `refund_times` tinyint NOT NULL COMMENT '退款次数',
   `refund_amount` bigint NOT NULL COMMENT '退款总金额，单位：分',
-  `channel_user_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '渠道用户编号',
-  `channel_order_no` varchar(64) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '渠道订单号',
-  `creator` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
+  `channel_user_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '渠道用户编号',
+  `channel_order_no` varchar(64) DEFAULT NULL COMMENT '渠道订单号',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `updater` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=122 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='支付订单\n';
+) ENGINE=InnoDB AUTO_INCREMENT=122 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='支付订单\n';
 
 -- ----------------------------
 -- Records of pay_order
@@ -600,21 +1248,21 @@ COMMIT;
 DROP TABLE IF EXISTS `pay_order_extension`;
 CREATE TABLE `pay_order_extension` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '支付订单编号',
-  `no` varchar(64) COLLATE utf8mb4_general_ci NOT NULL COMMENT '支付订单号',
+  `no` varchar(64) NOT NULL COMMENT '支付订单号',
   `order_id` bigint NOT NULL COMMENT '支付订单编号',
   `channel_id` bigint NOT NULL COMMENT '渠道编号',
-  `channel_code` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '渠道编码',
-  `user_ip` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '用户 IP',
+  `channel_code` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '渠道编码',
+  `user_ip` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '用户 IP',
   `status` tinyint NOT NULL COMMENT '支付状态',
-  `channel_extras` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '支付渠道的额外参数',
-  `channel_notify_data` varchar(2048) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '支付渠道异步通知的内容',
-  `creator` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
+  `channel_extras` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '支付渠道的额外参数',
+  `channel_notify_data` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '支付渠道异步通知的内容',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `updater` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=101 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='支付订单\n';
+) ENGINE=InnoDB AUTO_INCREMENT=101 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='支付订单\n';
 
 -- ----------------------------
 -- Records of pay_order_extension
@@ -723,24 +1371,24 @@ CREATE TABLE `pay_refund` (
   `merchant_id` bigint NOT NULL COMMENT '商户编号',
   `app_id` bigint NOT NULL COMMENT '应用编号',
   `channel_id` bigint NOT NULL COMMENT '渠道编号',
-  `channel_code` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '渠道编码',
+  `channel_code` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '渠道编码',
   `order_id` bigint NOT NULL COMMENT '支付订单编号 pay_order 表id',
   `trade_no` varchar(64) NOT NULL COMMENT '交易订单号 pay_extension 表no 字段',
   `merchant_order_id` varchar(64) NOT NULL COMMENT '商户订单编号（商户系统生成）',
   `merchant_refund_no` varchar(64) NOT NULL COMMENT '商户退款订单号（商户系统生成）',
-  `notify_url` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '异步通知商户地址',
+  `notify_url` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '异步通知商户地址',
   `notify_status` tinyint NOT NULL COMMENT '通知商户退款结果的回调状态',
   `status` tinyint NOT NULL COMMENT '退款状态',
   `type` tinyint NOT NULL COMMENT '退款类型(部分退款，全部退款)',
   `pay_amount` bigint NOT NULL COMMENT '支付金额,单位分',
   `refund_amount` bigint NOT NULL COMMENT '退款金额,单位分',
   `reason` varchar(256) NOT NULL COMMENT '退款原因',
-  `user_ip` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '用户 IP',
+  `user_ip` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '用户 IP',
   `channel_order_no` varchar(64) NOT NULL COMMENT '渠道订单号，pay_order 中的channel_order_no 对应',
   `channel_refund_no` varchar(64) DEFAULT NULL COMMENT '渠道退款单号，渠道返回',
   `channel_error_code` varchar(128) DEFAULT NULL COMMENT '渠道调用报错时，错误码',
   `channel_error_msg` varchar(256) DEFAULT NULL COMMENT '渠道调用报错时，错误信息',
-  `channel_extras` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '支付渠道的额外参数',
+  `channel_extras` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '支付渠道的额外参数',
   `expire_time` datetime DEFAULT NULL COMMENT '退款失效时间',
   `success_time` datetime DEFAULT NULL COMMENT '退款成功时间',
   `notify_time` datetime DEFAULT NULL COMMENT '退款通知时间',
@@ -750,7 +1398,7 @@ CREATE TABLE `pay_refund` (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='退款订单';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='退款订单';
 
 -- ----------------------------
 -- Records of pay_refund
@@ -764,36 +1412,36 @@ COMMIT;
 DROP TABLE IF EXISTS `sys_dept`;
 CREATE TABLE `sys_dept` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '部门id',
-  `name` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '部门名称',
+  `name` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '部门名称',
   `parent_id` bigint NOT NULL DEFAULT '0' COMMENT '父部门id',
   `sort` int NOT NULL DEFAULT '0' COMMENT '显示顺序',
-  `leader` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '负责人',
-  `phone` varchar(11) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '联系电话',
-  `email` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '邮箱',
+  `leader_user_id` bigint DEFAULT NULL COMMENT '负责人',
+  `phone` varchar(11) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '联系电话',
+  `email` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '邮箱',
   `status` tinyint NOT NULL COMMENT '部门状态（0正常 1停用）',
-  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
+  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '创建者',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
+  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '更新者',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   `tenant_id` bigint NOT NULL DEFAULT '0' COMMENT '租户编号',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=110 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='部门表';
+) ENGINE=InnoDB AUTO_INCREMENT=110 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='部门表';
 
 -- ----------------------------
 -- Records of sys_dept
 -- ----------------------------
 BEGIN;
-INSERT INTO `sys_dept` VALUES (100, '芋道源码', 0, 0, '若依', '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '', '2021-12-15 05:01:45', b'0', 1);
-INSERT INTO `sys_dept` VALUES (101, '深圳总公司', 100, 1, '若依', '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '1', '2021-12-15 05:01:44', b'0', 1);
-INSERT INTO `sys_dept` VALUES (102, '长沙分公司', 100, 2, '若依', '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '', '2021-12-15 05:01:40', b'0', 1);
-INSERT INTO `sys_dept` VALUES (103, '研发部门', 101, 1, '若依', '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '', '2021-12-15 05:01:41', b'0', 1);
-INSERT INTO `sys_dept` VALUES (104, '市场部门', 101, 2, '若依', '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '', '2021-12-15 05:01:38', b'0', 1);
-INSERT INTO `sys_dept` VALUES (105, '测试部门', 101, 3, '若依', '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '', '2021-12-15 05:01:37', b'0', 1);
-INSERT INTO `sys_dept` VALUES (106, '财务部门', 101, 4, '若依', '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '', '2021-12-15 05:01:35', b'0', 1);
-INSERT INTO `sys_dept` VALUES (107, '运维部门', 101, 5, '若依', '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '', '2021-12-15 05:01:33', b'0', 1);
-INSERT INTO `sys_dept` VALUES (108, '市场部门', 102, 1, '若依', '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '', '2021-12-15 05:01:31', b'0', 1);
-INSERT INTO `sys_dept` VALUES (109, '财务部门', 102, 2, '若依', '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '', '2021-12-15 05:01:29', b'0', 1);
+INSERT INTO `sys_dept` VALUES (100, '芋道源码', 0, 0, 1, '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '103', '2022-01-14 01:04:05', b'0', 1);
+INSERT INTO `sys_dept` VALUES (101, '深圳总公司', 100, 1, 104, '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '103', '2022-01-15 21:32:28', b'0', 1);
+INSERT INTO `sys_dept` VALUES (102, '长沙分公司', 100, 2, NULL, '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '', '2021-12-15 05:01:40', b'0', 1);
+INSERT INTO `sys_dept` VALUES (103, '研发部门', 101, 1, 104, '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '103', '2022-01-14 01:04:14', b'0', 1);
+INSERT INTO `sys_dept` VALUES (104, '市场部门', 101, 2, NULL, '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '', '2021-12-15 05:01:38', b'0', 1);
+INSERT INTO `sys_dept` VALUES (105, '测试部门', 101, 3, NULL, '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '', '2021-12-15 05:01:37', b'0', 1);
+INSERT INTO `sys_dept` VALUES (106, '财务部门', 101, 4, 103, '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '103', '2022-01-15 21:32:22', b'0', 1);
+INSERT INTO `sys_dept` VALUES (107, '运维部门', 101, 5, NULL, '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '', '2021-12-15 05:01:33', b'0', 1);
+INSERT INTO `sys_dept` VALUES (108, '市场部门', 102, 1, NULL, '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '', '2021-12-15 05:01:31', b'0', 1);
+INSERT INTO `sys_dept` VALUES (109, '财务部门', 102, 2, NULL, '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '', '2021-12-15 05:01:29', b'0', 1);
 COMMIT;
 
 -- ----------------------------
@@ -803,18 +1451,18 @@ DROP TABLE IF EXISTS `sys_dict_data`;
 CREATE TABLE `sys_dict_data` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '字典编码',
   `sort` int NOT NULL DEFAULT '0' COMMENT '字典排序',
-  `label` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '字典标签',
-  `value` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '字典键值',
-  `dict_type` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '字典类型',
+  `label` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '字典标签',
+  `value` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '字典键值',
+  `dict_type` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '字典类型',
   `status` tinyint NOT NULL DEFAULT '0' COMMENT '状态（0正常 1停用）',
-  `remark` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '备注',
-  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
+  `remark` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '备注',
+  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '创建者',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
+  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '更新者',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=1125 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='字典数据表';
+) ENGINE=InnoDB AUTO_INCREMENT=1145 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='字典数据表';
 
 -- ----------------------------
 -- Records of sys_dict_data
@@ -895,18 +1543,12 @@ INSERT INTO `sys_dict_data` VALUES (82, 102, 'Mock 登录', '102', 'sys_login_ty
 INSERT INTO `sys_dict_data` VALUES (83, 200, '主动登出', '200', 'sys_login_type', 0, '主动登出', '1', '2021-10-06 00:52:58', '1', '2021-10-06 00:52:58', b'0');
 INSERT INTO `sys_dict_data` VALUES (84, 201, '超时登出', '201', 'sys_login_type', 0, '超时登出', '1', '2021-10-06 00:53:17', '1', '2021-10-06 00:53:17', b'0');
 INSERT INTO `sys_dict_data` VALUES (85, 202, '强制登出', '202', 'sys_login_type', 0, '强制退出', '1', '2021-10-06 00:53:41', '1', '2021-10-06 00:53:41', b'0');
-INSERT INTO `sys_dict_data` VALUES (86, 0, '病假', '1', 'oa_leave_type', 0, NULL, '1', '2021-09-21 22:35:28', '1', '2021-09-21 14:59:27', b'0');
-INSERT INTO `sys_dict_data` VALUES (87, 1, '事假', '2', 'oa_leave_type', 0, NULL, '1', '2021-09-21 22:36:11', '1', '2021-09-21 14:59:27', b'0');
-INSERT INTO `sys_dict_data` VALUES (88, 2, '婚假', '3', 'oa_leave_type', 0, NULL, '1', '2021-09-21 22:36:38', '1', '2021-09-21 14:59:27', b'0');
-INSERT INTO `sys_dict_data` VALUES (89, 0, '处理中', '1', 'oa_leave_status', 0, NULL, '1', '2021-09-21 22:46:46', '1', '2021-10-12 22:12:20', b'0');
-INSERT INTO `sys_dict_data` VALUES (90, 1, '流程结束', '2', 'oa_leave_status', 0, NULL, '1', '2021-09-21 22:47:03', '1', '2021-10-12 22:12:58', b'0');
+INSERT INTO `sys_dict_data` VALUES (86, 0, '病假', '1', 'bpm_oa_leave_type', 0, NULL, '1', '2021-09-21 22:35:28', '1', '2022-01-22 10:42:08', b'0');
+INSERT INTO `sys_dict_data` VALUES (87, 1, '事假', '2', 'bpm_oa_leave_type', 0, NULL, '1', '2021-09-21 22:36:11', '1', '2022-01-22 10:42:11', b'0');
+INSERT INTO `sys_dict_data` VALUES (88, 2, '婚假', '3', 'bpm_oa_leave_type', 0, NULL, '1', '2021-09-21 22:36:38', '1', '2022-01-22 10:42:16', b'0');
+INSERT INTO `sys_dict_data` VALUES (89, 0, '处理中', '1', 'oa_leave_status', 0, NULL, '1', '2021-09-21 22:46:46', '1', '2022-01-22 10:40:38', b'1');
+INSERT INTO `sys_dict_data` VALUES (90, 1, '流程结束', '2', 'oa_leave_status', 0, NULL, '1', '2021-09-21 22:47:03', '1', '2022-01-22 10:40:37', b'1');
 INSERT INTO `sys_dict_data` VALUES (91, 2, '完成', '3', 'oa_leave_status', 0, NULL, '1', '2021-09-21 22:47:25', '1', '2021-10-12 14:13:06', b'1');
-INSERT INTO `sys_dict_data` VALUES (92, 1, '启用', '0', 'pay_merchant_status', 0, '商户启用', '1', '2021-11-03 11:30:52', '1', '2021-11-03 11:31:15', b'0');
-INSERT INTO `sys_dict_data` VALUES (93, 2, '停用', '1', 'pay_merchant_status', 0, '商户停用', '1', '2021-11-03 11:31:05', '1', '2021-11-03 11:31:05', b'0');
-INSERT INTO `sys_dict_data` VALUES (94, 1, '开启', '0', 'pay_app_status', 0, NULL, '1', '2021-11-06 19:42:10', '1', '2021-11-06 19:42:10', b'0');
-INSERT INTO `sys_dict_data` VALUES (95, 2, '关闭', '1', 'pay_app_status', 0, NULL, '1', '2021-11-06 19:42:17', '1', '2021-11-06 19:42:17', b'0');
-INSERT INTO `sys_dict_data` VALUES (96, 1, '开启', '0', 'pay_channel_status', 0, '开启', '1', '2021-11-08 16:47:45', '1', '2021-11-08 16:47:45', b'0');
-INSERT INTO `sys_dict_data` VALUES (97, 2, '关闭', '1', 'pay_channel_status', 0, '关闭', '1', '2021-11-08 16:47:52', '1', '2021-11-08 16:47:52', b'0');
 INSERT INTO `sys_dict_data` VALUES (98, 1, 'v2', 'v2', 'pay_channel_wechat_version', 0, 'v2版本', '1', '2021-11-08 17:00:58', '1', '2021-11-08 17:00:58', b'0');
 INSERT INTO `sys_dict_data` VALUES (99, 2, 'v3', 'v3', 'pay_channel_wechat_version', 0, 'v3版本', '1', '2021-11-08 17:01:07', '1', '2021-11-08 17:01:07', b'0');
 INSERT INTO `sys_dict_data` VALUES (108, 1, 'RSA2', 'RSA2', 'pay_channel_alipay_sign_type', 0, 'RSA2', '1', '2021-11-18 15:39:29', '1', '2021-11-18 15:39:29', b'0');
@@ -938,6 +1580,26 @@ INSERT INTO `sys_dict_data` VALUES (1121, 5, '退款中, 系统查询结果', '4
 INSERT INTO `sys_dict_data` VALUES (1122, 6, '状态未知，需要重试', '5', 'pay_refund_order_status', 0, '状态未知，需要重试', '1', '2021-12-10 16:46:03', '1', '2021-12-10 16:46:03', b'0');
 INSERT INTO `sys_dict_data` VALUES (1123, 7, '状态未知，系统查询结果', '6', 'pay_refund_order_status', 0, '状态未知，系统查询结果', '1', '2021-12-10 16:46:13', '1', '2021-12-10 16:46:13', b'0');
 INSERT INTO `sys_dict_data` VALUES (1124, 8, '退款关闭', '99', 'pay_refund_order_status', 0, '退款关闭', '1', '2021-12-10 16:46:26', '1', '2021-12-10 16:46:26', b'0');
+INSERT INTO `sys_dict_data` VALUES (1125, 0, '默认', '1', 'bpm_model_category', 0, '流程分类 - 默认', '1', '2022-01-02 08:41:11', '1', '2022-01-02 08:41:11', b'0');
+INSERT INTO `sys_dict_data` VALUES (1126, 0, 'OA', '2', 'bpm_model_category', 0, '流程分类 - OA', '1', '2022-01-02 08:41:22', '1', '2022-01-02 08:41:22', b'0');
+INSERT INTO `sys_dict_data` VALUES (1127, 0, '进行中', '1', 'bpm_process_instance_status', 0, '流程实例的状态 - 进行中', '1', '2022-01-07 23:47:22', '1', '2022-01-09 08:59:34', b'0');
+INSERT INTO `sys_dict_data` VALUES (1128, 2, '已完成', '2', 'bpm_process_instance_status', 0, '流程实例的状态 - 已完成', '1', '2022-01-07 23:47:49', '1', '2022-01-07 23:47:49', b'0');
+INSERT INTO `sys_dict_data` VALUES (1129, 1, '处理中', '1', 'bpm_process_instance_result', 0, '流程实例的结果 - 处理中', '1', '2022-01-07 23:48:32', '1', '2022-01-07 23:48:32', b'0');
+INSERT INTO `sys_dict_data` VALUES (1130, 2, '通过', '2', 'bpm_process_instance_result', 0, '流程实例的结果 - 通过', '1', '2022-01-07 23:48:45', '1', '2022-01-07 23:48:45', b'0');
+INSERT INTO `sys_dict_data` VALUES (1131, 3, '不通过', '3', 'bpm_process_instance_result', 0, '流程实例的结果 - 不通过', '1', '2022-01-07 23:48:55', '1', '2022-01-07 23:48:55', b'0');
+INSERT INTO `sys_dict_data` VALUES (1132, 4, '已取消', '4', 'bpm_process_instance_result', 0, '流程实例的结果 - 撤销', '1', '2022-01-07 23:49:06', '1', '2022-01-08 13:21:14', b'0');
+INSERT INTO `sys_dict_data` VALUES (1133, 10, '流程表单', '10', 'bpm_model_form_type', 0, '流程的表单类型 - 流程表单', '103', '2022-01-11 23:51:30', '103', '2022-01-11 23:51:30', b'0');
+INSERT INTO `sys_dict_data` VALUES (1134, 20, '业务表单', '20', 'bpm_model_form_type', 0, '流程的表单类型 - 业务表单', '103', '2022-01-11 23:51:47', '103', '2022-01-11 23:51:47', b'0');
+INSERT INTO `sys_dict_data` VALUES (1135, 10, '角色', '10', 'bpm_task_assign_rule_type', 0, '任务分配规则的类型 - 角色', '103', '2022-01-12 23:21:22', '103', '2022-01-12 15:46:30', b'0');
+INSERT INTO `sys_dict_data` VALUES (1136, 20, '部门的成员', '20', 'bpm_task_assign_rule_type', 0, '任务分配规则的类型 - 部门的成员', '103', '2022-01-12 23:21:47', '103', '2022-01-12 15:46:26', b'0');
+INSERT INTO `sys_dict_data` VALUES (1137, 21, '部门的负责人', '21', 'bpm_task_assign_rule_type', 0, '任务分配规则的类型 - 部门的负责人', '103', '2022-01-12 23:33:36', '103', '2022-01-12 15:46:24', b'0');
+INSERT INTO `sys_dict_data` VALUES (1138, 30, '用户', '30', 'bpm_task_assign_rule_type', 0, '任务分配规则的类型 - 用户', '103', '2022-01-12 23:34:02', '103', '2022-01-12 15:46:22', b'0');
+INSERT INTO `sys_dict_data` VALUES (1139, 40, '用户组', '40', 'bpm_task_assign_rule_type', 0, '任务分配规则的类型 - 用户组', '103', '2022-01-12 23:34:21', '103', '2022-01-12 15:46:21', b'0');
+INSERT INTO `sys_dict_data` VALUES (1140, 50, '自定义脚本', '50', 'bpm_task_assign_rule_type', 0, '任务分配规则的类型 - 自定义脚本', '103', '2022-01-12 23:34:43', '103', '2022-01-12 15:46:19', b'0');
+INSERT INTO `sys_dict_data` VALUES (1141, 22, '岗位', '22', 'bpm_task_assign_rule_type', 0, '任务分配规则的类型 - 岗位', '103', '2022-01-14 18:41:55', '103', '2022-01-14 18:42:31', b'0');
+INSERT INTO `sys_dict_data` VALUES (1142, 10, '流程发起人', '10', 'bpm_task_assign_script', 0, '任务分配自定义脚本 - 流程发起人', '103', '2022-01-15 00:10:57', '103', '2022-01-15 21:24:10', b'0');
+INSERT INTO `sys_dict_data` VALUES (1143, 20, '流程发起人的一级领导', '20', 'bpm_task_assign_script', 0, '任务分配自定义脚本 - 流程发起人的一级领导', '103', '2022-01-15 21:24:31', '103', '2022-01-15 21:24:31', b'0');
+INSERT INTO `sys_dict_data` VALUES (1144, 21, '流程发起人的二级领导', '21', 'bpm_task_assign_script', 0, '任务分配自定义脚本 - 流程发起人的二级领导', '103', '2022-01-15 21:24:46', '103', '2022-01-15 21:24:57', b'0');
 COMMIT;
 
 -- ----------------------------
@@ -946,18 +1608,18 @@ COMMIT;
 DROP TABLE IF EXISTS `sys_dict_type`;
 CREATE TABLE `sys_dict_type` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '字典主键',
-  `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '字典名称',
-  `type` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '字典类型',
+  `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '字典名称',
+  `type` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '字典类型',
   `status` tinyint NOT NULL DEFAULT '0' COMMENT '状态（0正常 1停用）',
-  `remark` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '备注',
-  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
+  `remark` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '备注',
+  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '创建者',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
+  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '更新者',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE KEY `dict_type` (`type`)
-) ENGINE=InnoDB AUTO_INCREMENT=137 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='字典类型表';
+) ENGINE=InnoDB AUTO_INCREMENT=144 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='字典类型表';
 
 -- ----------------------------
 -- Records of sys_dict_type
@@ -986,11 +1648,8 @@ INSERT INTO `sys_dict_type` VALUES (113, '短信发送状态', 'sys_sms_send_sta
 INSERT INTO `sys_dict_type` VALUES (114, '短信接收状态', 'sys_sms_receive_status', 0, NULL, '1', '2021-04-11 20:27:14', '1', '2021-04-11 20:27:14', b'0');
 INSERT INTO `sys_dict_type` VALUES (115, '错误码的类型', 'sys_error_code_type', 0, NULL, '1', '2021-04-21 00:06:30', '1', '2021-04-13 22:07:12', b'0');
 INSERT INTO `sys_dict_type` VALUES (116, '登陆日志的类型', 'sys_login_type', 0, '登陆日志的类型', '1', '2021-10-06 00:50:46', '1', '2021-10-06 00:50:46', b'0');
-INSERT INTO `sys_dict_type` VALUES (117, '请假类型', 'oa_leave_type', 0, NULL, '1', '2021-09-21 22:34:33', '1', '2021-09-21 15:00:38', b'0');
-INSERT INTO `sys_dict_type` VALUES (118, '请假流程状态', 'oa_leave_status', 0, NULL, '1', '2021-09-21 22:46:04', '1', '2021-09-21 15:00:38', b'0');
-INSERT INTO `sys_dict_type` VALUES (119, '商户状态', 'pay_merchant_status', 0, '商户的启用于停用状态', '1', '2021-11-03 11:29:04', '1', '2021-11-03 11:29:04', b'0');
-INSERT INTO `sys_dict_type` VALUES (120, '支付应用状态', 'pay_app_status', 0, '支付应用的启停状态', '1', '2021-11-06 19:41:50', '1', '2021-11-06 19:41:50', b'0');
-INSERT INTO `sys_dict_type` VALUES (121, '支付渠道状态', 'pay_channel_status', 0, '支付渠道的启停状态', '1', '2021-11-08 16:47:21', '1', '2021-11-08 16:47:21', b'0');
+INSERT INTO `sys_dict_type` VALUES (117, 'OA 请假类型', 'bpm_oa_leave_type', 0, NULL, '1', '2021-09-21 22:34:33', '1', '2022-01-22 10:41:37', b'0');
+INSERT INTO `sys_dict_type` VALUES (118, '请假流程状态', 'oa_leave_status', 0, NULL, '1', '2021-09-21 22:46:04', '1', '2022-01-22 10:40:46', b'1');
 INSERT INTO `sys_dict_type` VALUES (122, '支付渠道微信版本', 'pay_channel_wechat_version', 0, '支付渠道微信版本', '1', '2021-11-08 17:00:26', '1', '2021-11-08 17:00:26', b'0');
 INSERT INTO `sys_dict_type` VALUES (127, '支付渠道支付宝算法类型', 'pay_channel_alipay_sign_type', 0, '支付渠道支付宝算法类型', '1', '2021-11-18 15:39:09', '1', '2021-11-18 15:39:09', b'0');
 INSERT INTO `sys_dict_type` VALUES (128, '支付渠道支付宝公钥类型', 'pay_channel_alipay_mode', 0, '支付渠道支付宝公钥类型', '1', '2021-11-18 15:44:28', '1', '2021-11-18 15:44:28', b'0');
@@ -1001,6 +1660,13 @@ INSERT INTO `sys_dict_type` VALUES (132, '支付订单状态', 'pay_order_status
 INSERT INTO `sys_dict_type` VALUES (133, '支付订单退款状态', 'pay_order_refund_status', 0, '支付订单退款状态', '1', '2021-12-03 11:27:31', '1', '2021-12-03 11:27:31', b'0');
 INSERT INTO `sys_dict_type` VALUES (134, '退款订单状态', 'pay_refund_order_status', 0, '退款订单状态', '1', '2021-12-10 16:42:50', '1', '2021-12-10 16:42:50', b'0');
 INSERT INTO `sys_dict_type` VALUES (135, '退款订单类别', 'pay_refund_order_type', 0, '退款订单类别', '1', '2021-12-10 17:14:53', '1', '2021-12-10 17:14:53', b'0');
+INSERT INTO `sys_dict_type` VALUES (137, '流程分类', '流程分类', 0, '流程分类', '1', '2022-01-02 08:40:17', '1', '2022-01-02 00:40:34', b'1');
+INSERT INTO `sys_dict_type` VALUES (138, '流程分类', 'bpm_model_category', 0, '流程分类', '1', '2022-01-02 08:40:45', '1', '2022-01-02 08:40:45', b'0');
+INSERT INTO `sys_dict_type` VALUES (139, '流程实例的状态', 'bpm_process_instance_status', 0, '流程实例的状态', '1', '2022-01-07 23:46:42', '1', '2022-01-07 23:46:42', b'0');
+INSERT INTO `sys_dict_type` VALUES (140, '流程实例的结果', 'bpm_process_instance_result', 0, '流程实例的结果', '1', '2022-01-07 23:48:10', '1', '2022-01-07 23:48:10', b'0');
+INSERT INTO `sys_dict_type` VALUES (141, '流程的表单类型', 'bpm_model_form_type', 0, '流程的表单类型', '103', '2022-01-11 23:50:45', '103', '2022-01-11 23:50:45', b'0');
+INSERT INTO `sys_dict_type` VALUES (142, '任务分配规则的类型', 'bpm_task_assign_rule_type', 0, '任务分配规则的类型', '103', '2022-01-12 23:21:04', '103', '2022-01-12 15:46:10', b'0');
+INSERT INTO `sys_dict_type` VALUES (143, '任务分配自定义脚本', 'bpm_task_assign_script', 0, '任务分配自定义脚本', '103', '2022-01-15 00:10:35', '103', '2022-01-15 00:10:35', b'0');
 COMMIT;
 
 -- ----------------------------
@@ -1010,103 +1676,124 @@ DROP TABLE IF EXISTS `sys_error_code`;
 CREATE TABLE `sys_error_code` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '错误码编号',
   `type` tinyint NOT NULL DEFAULT '0' COMMENT '错误码类型',
-  `application_name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '应用名',
+  `application_name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '应用名',
   `code` int NOT NULL DEFAULT '0' COMMENT '错误码编码',
-  `message` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '错误码错误提示',
-  `memo` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '备注',
-  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
+  `message` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '错误码错误提示',
+  `memo` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '备注',
+  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '创建者',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
+  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '更新者',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=4020 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='错误码表';
+) ENGINE=InnoDB AUTO_INCREMENT=4696 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='错误码表';
 
 -- ----------------------------
 -- Records of sys_error_code
 -- ----------------------------
 BEGIN;
-INSERT INTO `sys_error_code` VALUES (3939, 2, 'dashboard', 1001000001, '参数配置不存在', 'ceshi', NULL, '2021-04-20 23:52:56', '1', '2021-04-21 23:44:15', b'0');
-INSERT INTO `sys_error_code` VALUES (3940, 1, 'dashboard', 1001000002, '参数配置 key 重复', '', NULL, '2021-04-20 23:52:56', NULL, '2021-04-20 23:52:56', b'0');
-INSERT INTO `sys_error_code` VALUES (3941, 1, 'dashboard', 1001000003, '不能删除类型为系统内置的参数配置', '', NULL, '2021-04-20 23:52:56', NULL, '2021-04-20 23:52:56', b'0');
-INSERT INTO `sys_error_code` VALUES (3942, 1, 'dashboard', 1001000004, '不允许获取敏感配置到前端', '', NULL, '2021-04-20 23:52:56', NULL, '2021-04-20 23:52:56', b'0');
-INSERT INTO `sys_error_code` VALUES (3943, 1, 'dashboard', 1001001000, '定时任务不存在', '', NULL, '2021-04-20 23:52:56', NULL, '2021-04-20 23:52:56', b'0');
-INSERT INTO `sys_error_code` VALUES (3944, 1, 'dashboard', 1001001001, '定时任务的处理器已经存在', '', NULL, '2021-04-20 23:52:56', NULL, '2021-04-20 23:52:56', b'0');
-INSERT INTO `sys_error_code` VALUES (3945, 1, 'dashboard', 1001001002, '只允许修改为开启或者关闭状态', '', NULL, '2021-04-20 23:52:56', NULL, '2021-04-20 23:52:56', b'0');
-INSERT INTO `sys_error_code` VALUES (3946, 1, 'dashboard', 1001001003, '定时任务已经处于该状态，无需修改', '', NULL, '2021-04-20 23:52:56', NULL, '2021-04-20 23:52:56', b'0');
-INSERT INTO `sys_error_code` VALUES (3947, 1, 'dashboard', 1001001004, '只有开启状态的任务，才可以修改', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3948, 1, 'dashboard', 1001001005, 'CRON 表达式不正确', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3949, 2, 'dashboard', 1001002000, 'API 错误日志不存在', '', NULL, '2021-04-20 23:52:57', '1', '2021-04-13 21:55:55', b'1');
-INSERT INTO `sys_error_code` VALUES (3950, 1, 'dashboard', 1001002001, 'API 错误日志已处理', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3951, 1, 'dashboard', 1001003000, '文件不存在', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3952, 1, 'dashboard', 1002000000, '登录失败，账号密码不正确', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3953, 1, 'dashboard', 1002000001, '登录失败，账号被禁用', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3954, 1, 'dashboard', 1002000002, '登录失败', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3955, 1, 'dashboard', 1002000003, '验证码不存在', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3956, 1, 'dashboard', 1002000004, '验证码不正确', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3957, 1, 'dashboard', 1002001000, 'Token 已经过期', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3958, 1, 'dashboard', 1002001001, 'Token 解析失败', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3959, 1, 'dashboard', 1002002000, '已经存在该名字的菜单', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3960, 1, 'dashboard', 1002002001, '父菜单不存在', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3961, 1, 'dashboard', 1002002002, '不能设置自己为父菜单', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3962, 1, 'dashboard', 1002002003, '菜单不存在', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3963, 1, 'dashboard', 1002002004, '存在子菜单，无法删除', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3964, 1, 'dashboard', 1002002005, '父菜单的类型必须是目录或者菜单', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3965, 1, 'dashboard', 1002003000, '角色不存在', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3966, 1, 'dashboard', 1002003001, '已经存在名为【{}】的角色', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3967, 1, 'dashboard', 1002003002, '已经存在编码为【{}】的角色', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3968, 1, 'dashboard', 1002003004, '不能操作类型为系统内置的角色', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3969, 1, 'dashboard', 1002004000, '用户账号已经存在', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3970, 1, 'dashboard', 1002004001, '已经存在该名字的部门', '', NULL, '2021-04-20 23:52:57', NULL, '2021-05-02 23:18:32', b'0');
-INSERT INTO `sys_error_code` VALUES (3971, 1, 'dashboard', 1002004002, '父级部门不存在', '', NULL, '2021-04-20 23:52:57', NULL, '2021-05-02 23:18:32', b'0');
-INSERT INTO `sys_error_code` VALUES (3972, 1, 'dashboard', 1002004003, '用户不存在', '', NULL, '2021-04-20 23:52:57', NULL, '2021-05-02 23:18:32', b'0');
-INSERT INTO `sys_error_code` VALUES (3973, 1, 'dashboard', 1002004004, '存在子部门，无法删除', '', NULL, '2021-04-20 23:52:57', NULL, '2021-05-02 23:18:32', b'0');
-INSERT INTO `sys_error_code` VALUES (3974, 1, 'dashboard', 1002004005, '不能设置自己为父部门', '', NULL, '2021-04-20 23:52:57', NULL, '2021-05-02 23:18:32', b'0');
-INSERT INTO `sys_error_code` VALUES (3975, 1, 'dashboard', 1002004001, '已经存在该名字的部门', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3976, 1, 'dashboard', 1002004002, '父级部门不存在', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3977, 1, 'dashboard', 1002004003, '当前部门不存在', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3978, 1, 'dashboard', 1002004004, '存在子部门，无法删除', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3979, 1, 'dashboard', 1002004005, '不能设置自己为父部门', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3980, 1, 'dashboard', 1002004006, '部门中存在员工，无法删除', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3981, 1, 'dashboard', 1002004007, '部门不处于开启状态，不允许选择', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3982, 1, 'dashboard', 1002004008, '不能设置自己的子部门为父部门', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3983, 1, 'dashboard', 1002005001, '已经存在该标识的岗位', '', NULL, '2021-04-20 23:52:57', NULL, '2021-05-02 23:18:32', b'0');
-INSERT INTO `sys_error_code` VALUES (3984, 1, 'dashboard', 1002005002, '岗位({}) 不处于开启状态，不允许选择', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3985, 1, 'dashboard', 1002005001, '已经存在该名字的岗位', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3986, 1, 'dashboard', 1002005001, '已经存在该标识的岗位', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3987, 1, 'dashboard', 1002006001, '当前字典类型不存在', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3988, 1, 'dashboard', 1002006002, '字典类型不处于开启状态，不允许选择', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3989, 1, 'dashboard', 1002006003, '已经存在该名字的字典类型', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3990, 1, 'dashboard', 1002006004, '无法删除，该字典类型还有字典数据', '', NULL, '2021-04-20 23:52:57', NULL, '2021-05-02 23:18:32', b'0');
-INSERT INTO `sys_error_code` VALUES (3991, 1, 'dashboard', 1002006004, '无法删除，该字典类型还有字典数据', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3992, 1, 'dashboard', 1002007001, '当前字典数据不存在', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3993, 1, 'dashboard', 1002007002, '字典数据不处于开启状态，不允许选择', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3994, 1, 'dashboard', 1002007003, '已经存在该值的字典数据', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3995, 1, 'dashboard', 1002008001, '当前通知公告不存在', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3996, 1, 'dashboard', 1002009001, '文件路径已经存在', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-21 00:03:20', b'0');
-INSERT INTO `sys_error_code` VALUES (3997, 1, 'dashboard', 1002009002, '文件上传失败', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3998, 1, 'dashboard', 1002009003, '文件为空', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (3999, 1, 'dashboard', 1002011000, '短信模板不存在', '', NULL, '2021-04-20 23:52:57', NULL, '2021-05-02 23:18:32', b'0');
-INSERT INTO `sys_error_code` VALUES (4000, 1, 'dashboard', 1002011001, '已经存在编码为【{}】的短信模板', '', NULL, '2021-04-20 23:52:57', NULL, '2021-05-02 23:18:32', b'0');
-INSERT INTO `sys_error_code` VALUES (4001, 2, 'dashboard', 1002011002, '无法删除，该短信渠道还有短信模板', '', NULL, '2021-04-20 23:52:57', '1', '2021-04-22 00:06:52', b'0');
-INSERT INTO `sys_error_code` VALUES (4002, 1, 'dashboard', 1002011000, '短信模板不存在', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (4003, 1, 'dashboard', 1002011001, '已经存在编码为【{}】的短信模板', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (4004, 1, 'dashboard', 1002012000, '手机号不存在', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (4005, 1, 'dashboard', 1002012001, '模板参数({})缺失', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (4006, 1, 'dashboard', 1002009000, '错误码不存在', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (4007, 1, 'dashboard', 1002009001, '已经存在编码为【{}}】的错误码', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (4008, 1, 'dashboard', 1002004003, '不能修改类型为系统内置的错误码', '', NULL, '2021-04-20 23:52:57', NULL, '2021-04-20 23:52:57', b'0');
-INSERT INTO `sys_error_code` VALUES (4009, 1, 'dashboard', 1001004000, '错误码不存在', '', NULL, '2021-04-21 00:38:01', NULL, '2021-04-21 00:38:01', b'0');
-INSERT INTO `sys_error_code` VALUES (4010, 1, 'dashboard', 1001004001, '已经存在编码为【{}】的错误码', '', NULL, '2021-04-21 00:38:01', NULL, '2021-04-21 23:48:44', b'0');
-INSERT INTO `sys_error_code` VALUES (4011, 1, 'dashboard', 1001004002, '不能修改类型为系统内置的错误码', '', NULL, '2021-04-21 00:38:01', NULL, '2021-04-21 00:38:01', b'0');
-INSERT INTO `sys_error_code` VALUES (4012, 2, 'dashboard', 1201002000, '啦啦啦啦', 'biubiub', '1', '2021-04-21 23:46:02', '1', '2021-04-21 23:46:02', b'0');
-INSERT INTO `sys_error_code` VALUES (4013, 1, 'dashboard', 1001002000, 'API 错误日志不存在', '', NULL, '2021-04-21 23:48:44', NULL, '2021-04-21 23:48:44', b'0');
-INSERT INTO `sys_error_code` VALUES (4014, 1, 'dashboard', 1002013000, '错误码不存在', '', NULL, '2021-04-22 00:04:06', NULL, '2021-04-22 00:04:06', b'0');
-INSERT INTO `sys_error_code` VALUES (4015, 1, 'dashboard', 1002013001, '已经存在编码为【{}】的错误码', '', NULL, '2021-04-22 00:04:06', NULL, '2021-04-22 00:04:06', b'0');
-INSERT INTO `sys_error_code` VALUES (4016, 1, 'yudao-admin-server', 1002000005, '未绑定账号，需要进行绑定', '', NULL, '2021-10-02 22:14:57', NULL, '2021-10-02 22:14:57', b'0');
-INSERT INTO `sys_error_code` VALUES (4017, 1, 'yudao-admin-server', 1002000006, 'Token 已经过期', '', NULL, '2021-10-02 22:14:57', NULL, '2021-10-10 22:47:27', b'0');
-INSERT INTO `sys_error_code` VALUES (4018, 1, 'yudao-admin-server', 1002014000, '社交授权失败，原因是：{}', '', NULL, '2021-10-05 23:23:10', NULL, '2021-10-05 23:23:10', b'0');
-INSERT INTO `sys_error_code` VALUES (4019, 1, 'yudao-admin-server', 1002014001, '社交解绑失败，非当前用户绑定', '', NULL, '2021-10-06 09:31:54', NULL, '2021-10-06 09:31:54', b'0');
+INSERT INTO `sys_error_code` VALUES (4594, 1, 'yudao-admin-server', 1001000001, '参数配置不存在', '', NULL, '2022-01-23 01:38:31', NULL, '2022-01-23 01:38:31', b'0');
+INSERT INTO `sys_error_code` VALUES (4595, 1, 'yudao-admin-server', 1001000002, '参数配置 key 重复', '', NULL, '2022-01-23 01:38:31', NULL, '2022-01-23 01:38:31', b'0');
+INSERT INTO `sys_error_code` VALUES (4596, 1, 'yudao-admin-server', 1001000003, '不能删除类型为系统内置的参数配置', '', NULL, '2022-01-23 01:38:31', NULL, '2022-01-23 01:38:31', b'0');
+INSERT INTO `sys_error_code` VALUES (4597, 1, 'yudao-admin-server', 1001000004, '不允许获取敏感配置到前端', '', NULL, '2022-01-23 01:38:31', NULL, '2022-01-23 01:38:31', b'0');
+INSERT INTO `sys_error_code` VALUES (4598, 1, 'yudao-admin-server', 1001001000, '定时任务不存在', '', NULL, '2022-01-23 01:38:31', NULL, '2022-01-23 01:38:31', b'0');
+INSERT INTO `sys_error_code` VALUES (4599, 1, 'yudao-admin-server', 1001001001, '定时任务的处理器已经存在', '', NULL, '2022-01-23 01:38:31', NULL, '2022-01-23 01:38:31', b'0');
+INSERT INTO `sys_error_code` VALUES (4600, 1, 'yudao-admin-server', 1001001002, '只允许修改为开启或者关闭状态', '', NULL, '2022-01-23 01:38:31', NULL, '2022-01-23 01:38:31', b'0');
+INSERT INTO `sys_error_code` VALUES (4601, 1, 'yudao-admin-server', 1001001003, '定时任务已经处于该状态，无需修改', '', NULL, '2022-01-23 01:38:31', NULL, '2022-01-23 01:38:31', b'0');
+INSERT INTO `sys_error_code` VALUES (4602, 1, 'yudao-admin-server', 1001001004, '只有开启状态的任务，才可以修改', '', NULL, '2022-01-23 01:38:31', NULL, '2022-01-23 01:38:31', b'0');
+INSERT INTO `sys_error_code` VALUES (4603, 1, 'yudao-admin-server', 1001001005, 'CRON 表达式不正确', '', NULL, '2022-01-23 01:38:31', NULL, '2022-01-23 01:38:31', b'0');
+INSERT INTO `sys_error_code` VALUES (4604, 1, 'yudao-admin-server', 1001002000, 'API 错误日志不存在', '', NULL, '2022-01-23 01:38:31', NULL, '2022-01-23 01:38:31', b'0');
+INSERT INTO `sys_error_code` VALUES (4605, 1, 'yudao-admin-server', 1001002001, 'API 错误日志已处理', '', NULL, '2022-01-23 01:38:31', NULL, '2022-01-23 01:38:31', b'0');
+INSERT INTO `sys_error_code` VALUES (4606, 1, 'yudao-admin-server', 1002000000, '登录失败，账号密码不正确', '', NULL, '2022-01-23 01:38:31', NULL, '2022-01-23 01:38:31', b'0');
+INSERT INTO `sys_error_code` VALUES (4607, 1, 'yudao-admin-server', 1002000001, '登录失败，账号被禁用', '', NULL, '2022-01-23 01:38:31', NULL, '2022-01-23 01:38:31', b'0');
+INSERT INTO `sys_error_code` VALUES (4608, 1, 'yudao-admin-server', 1002000002, '登录失败', '', NULL, '2022-01-23 01:38:31', NULL, '2022-01-23 01:38:31', b'0');
+INSERT INTO `sys_error_code` VALUES (4609, 1, 'yudao-admin-server', 1002000003, '验证码不存在', '', NULL, '2022-01-23 01:38:31', NULL, '2022-01-23 01:38:31', b'0');
+INSERT INTO `sys_error_code` VALUES (4610, 1, 'yudao-admin-server', 1002000004, '验证码不正确', '', NULL, '2022-01-23 01:38:31', NULL, '2022-01-23 01:38:31', b'0');
+INSERT INTO `sys_error_code` VALUES (4611, 1, 'yudao-admin-server', 1002000005, '未绑定账号，需要进行绑定', '', NULL, '2022-01-23 01:38:31', NULL, '2022-01-23 01:38:31', b'0');
+INSERT INTO `sys_error_code` VALUES (4612, 1, 'yudao-admin-server', 1002000006, 'Token 已经过期', '', NULL, '2022-01-23 01:38:31', NULL, '2022-01-23 01:38:31', b'0');
+INSERT INTO `sys_error_code` VALUES (4613, 1, 'yudao-admin-server', 1002002000, '已经存在该名字的菜单', '', NULL, '2022-01-23 01:38:31', NULL, '2022-01-23 01:38:31', b'0');
+INSERT INTO `sys_error_code` VALUES (4614, 1, 'yudao-admin-server', 1002002001, '父菜单不存在', '', NULL, '2022-01-23 01:38:31', NULL, '2022-01-23 01:38:31', b'0');
+INSERT INTO `sys_error_code` VALUES (4615, 1, 'yudao-admin-server', 1002002002, '不能设置自己为父菜单', '', NULL, '2022-01-23 01:38:31', NULL, '2022-01-23 01:38:31', b'0');
+INSERT INTO `sys_error_code` VALUES (4616, 1, 'yudao-admin-server', 1002002003, '菜单不存在', '', NULL, '2022-01-23 01:38:32', NULL, '2022-01-23 01:38:32', b'0');
+INSERT INTO `sys_error_code` VALUES (4617, 1, 'yudao-admin-server', 1002002004, '存在子菜单，无法删除', '', NULL, '2022-01-23 01:38:32', NULL, '2022-01-23 01:38:32', b'0');
+INSERT INTO `sys_error_code` VALUES (4618, 1, 'yudao-admin-server', 1002002005, '父菜单的类型必须是目录或者菜单', '', NULL, '2022-01-23 01:38:32', NULL, '2022-01-23 01:38:32', b'0');
+INSERT INTO `sys_error_code` VALUES (4619, 1, 'yudao-admin-server', 1002003000, '角色不存在', '', NULL, '2022-01-23 01:38:32', NULL, '2022-01-23 01:38:32', b'0');
+INSERT INTO `sys_error_code` VALUES (4620, 1, 'yudao-admin-server', 1002003001, '已经存在名为【{}】的角色', '', NULL, '2022-01-23 01:38:32', NULL, '2022-01-23 01:38:32', b'0');
+INSERT INTO `sys_error_code` VALUES (4621, 1, 'yudao-admin-server', 1002003002, '已经存在编码为【{}】的角色', '', NULL, '2022-01-23 01:38:32', NULL, '2022-01-23 01:38:32', b'0');
+INSERT INTO `sys_error_code` VALUES (4622, 1, 'yudao-admin-server', 1002003004, '不能操作类型为系统内置的角色', '', NULL, '2022-01-23 01:38:32', NULL, '2022-01-23 01:38:32', b'0');
+INSERT INTO `sys_error_code` VALUES (4623, 1, 'yudao-admin-server', 1002003004, '名字为【{}】的角色已被禁用', '', NULL, '2022-01-23 01:38:32', NULL, '2022-01-23 01:38:32', b'0');
+INSERT INTO `sys_error_code` VALUES (4624, 1, 'yudao-admin-server', 1002004000, '用户账号已经存在', '', NULL, '2022-01-23 01:38:32', NULL, '2022-01-23 01:38:32', b'0');
+INSERT INTO `sys_error_code` VALUES (4625, 1, 'yudao-admin-server', 1002004001, '手机号已经存在', '', NULL, '2022-01-23 01:38:32', NULL, '2022-01-23 01:38:32', b'0');
+INSERT INTO `sys_error_code` VALUES (4626, 1, 'yudao-admin-server', 1002004002, '邮箱已经存在', '', NULL, '2022-01-23 01:38:32', NULL, '2022-01-23 01:38:32', b'0');
+INSERT INTO `sys_error_code` VALUES (4627, 1, 'yudao-admin-server', 1002004003, '用户不存在', '', NULL, '2022-01-23 01:38:32', NULL, '2022-01-23 01:38:32', b'0');
+INSERT INTO `sys_error_code` VALUES (4628, 1, 'yudao-admin-server', 1002004004, '导入用户数据不能为空！', '', NULL, '2022-01-23 01:38:32', NULL, '2022-01-23 01:38:32', b'0');
+INSERT INTO `sys_error_code` VALUES (4629, 1, 'yudao-admin-server', 1002004005, '用户密码校验失败', '', NULL, '2022-01-23 01:38:32', NULL, '2022-01-23 01:38:32', b'0');
+INSERT INTO `sys_error_code` VALUES (4630, 1, 'yudao-admin-server', 1002003004, '名字为【{}】的用户已被禁用', '', NULL, '2022-01-23 01:38:32', NULL, '2022-01-23 01:38:32', b'0');
+INSERT INTO `sys_error_code` VALUES (4631, 1, 'yudao-admin-server', 1002004001, '已经存在该名字的部门', '', NULL, '2022-01-23 01:38:32', NULL, '2022-01-23 01:38:32', b'0');
+INSERT INTO `sys_error_code` VALUES (4632, 1, 'yudao-admin-server', 1002004002, '父级部门不存在', '', NULL, '2022-01-23 01:38:32', NULL, '2022-01-23 01:38:32', b'0');
+INSERT INTO `sys_error_code` VALUES (4633, 1, 'yudao-admin-server', 1002004003, '当前部门不存在', '', NULL, '2022-01-23 01:38:32', NULL, '2022-01-23 01:38:32', b'0');
+INSERT INTO `sys_error_code` VALUES (4634, 1, 'yudao-admin-server', 1002004004, '存在子部门，无法删除', '', NULL, '2022-01-23 01:38:32', NULL, '2022-01-23 01:38:32', b'0');
+INSERT INTO `sys_error_code` VALUES (4635, 1, 'yudao-admin-server', 1002004005, '不能设置自己为父部门', '', NULL, '2022-01-23 01:38:32', NULL, '2022-01-23 01:38:32', b'0');
+INSERT INTO `sys_error_code` VALUES (4636, 1, 'yudao-admin-server', 1002004006, '部门中存在员工，无法删除', '', NULL, '2022-01-23 01:38:32', NULL, '2022-01-23 01:38:32', b'0');
+INSERT INTO `sys_error_code` VALUES (4637, 1, 'yudao-admin-server', 1002004007, '部门不处于开启状态，不允许选择', '', NULL, '2022-01-23 01:38:32', NULL, '2022-01-23 01:38:32', b'0');
+INSERT INTO `sys_error_code` VALUES (4638, 1, 'yudao-admin-server', 1002004008, '不能设置自己的子部门为父部门', '', NULL, '2022-01-23 01:38:32', NULL, '2022-01-23 01:38:32', b'0');
+INSERT INTO `sys_error_code` VALUES (4639, 1, 'yudao-admin-server', 1002005001, '当前岗位不存在', '', NULL, '2022-01-23 01:38:32', NULL, '2022-01-23 01:38:32', b'0');
+INSERT INTO `sys_error_code` VALUES (4640, 1, 'yudao-admin-server', 1002005002, '岗位({}) 不处于开启状态，不允许选择', '', NULL, '2022-01-23 01:38:32', NULL, '2022-01-23 01:38:32', b'0');
+INSERT INTO `sys_error_code` VALUES (4641, 1, 'yudao-admin-server', 1002005001, '已经存在该名字的岗位', '', NULL, '2022-01-23 01:38:32', NULL, '2022-01-23 01:38:32', b'0');
+INSERT INTO `sys_error_code` VALUES (4642, 1, 'yudao-admin-server', 1002005001, '已经存在该标识的岗位', '', NULL, '2022-01-23 01:38:32', NULL, '2022-01-23 01:38:32', b'0');
+INSERT INTO `sys_error_code` VALUES (4643, 1, 'yudao-admin-server', 1002006001, '当前字典类型不存在', '', NULL, '2022-01-23 01:38:32', NULL, '2022-01-23 01:38:32', b'0');
+INSERT INTO `sys_error_code` VALUES (4644, 1, 'yudao-admin-server', 1002006002, '字典类型不处于开启状态，不允许选择', '', NULL, '2022-01-23 01:38:32', NULL, '2022-01-23 01:38:32', b'0');
+INSERT INTO `sys_error_code` VALUES (4645, 1, 'yudao-admin-server', 1002006003, '已经存在该名字的字典类型', '', NULL, '2022-01-23 01:38:32', NULL, '2022-01-23 01:38:32', b'0');
+INSERT INTO `sys_error_code` VALUES (4646, 1, 'yudao-admin-server', 1002006004, '已经存在该类型的字典类型', '', NULL, '2022-01-23 01:38:32', NULL, '2022-01-23 01:38:32', b'0');
+INSERT INTO `sys_error_code` VALUES (4647, 1, 'yudao-admin-server', 1002006004, '无法删除，该字典类型还有字典数据', '', NULL, '2022-01-23 01:38:32', NULL, '2022-01-23 01:38:32', b'0');
+INSERT INTO `sys_error_code` VALUES (4648, 1, 'yudao-admin-server', 1002007001, '当前字典数据不存在', '', NULL, '2022-01-23 01:38:32', NULL, '2022-01-23 01:38:32', b'0');
+INSERT INTO `sys_error_code` VALUES (4649, 1, 'yudao-admin-server', 1002007002, '字典数据({})不处于开启状态，不允许选择', '', NULL, '2022-01-23 01:38:32', NULL, '2022-01-23 01:38:32', b'0');
+INSERT INTO `sys_error_code` VALUES (4650, 1, 'yudao-admin-server', 1002007003, '已经存在该值的字典数据', '', NULL, '2022-01-23 01:38:32', NULL, '2022-01-23 01:38:32', b'0');
+INSERT INTO `sys_error_code` VALUES (4651, 1, 'yudao-admin-server', 1002008001, '当前通知公告不存在', '', NULL, '2022-01-23 01:38:32', NULL, '2022-01-23 01:38:32', b'0');
+INSERT INTO `sys_error_code` VALUES (4652, 1, 'yudao-admin-server', 1002009001, '文件路径已经存在', '', NULL, '2022-01-23 01:38:32', NULL, '2022-01-23 01:38:32', b'0');
+INSERT INTO `sys_error_code` VALUES (4653, 1, 'yudao-admin-server', 1002009002, '文件上传失败', '', NULL, '2022-01-23 01:38:32', NULL, '2022-01-23 01:38:32', b'0');
+INSERT INTO `sys_error_code` VALUES (4654, 1, 'yudao-admin-server', 1002009003, '文件为空', '', NULL, '2022-01-23 01:38:32', NULL, '2022-01-23 01:38:32', b'0');
+INSERT INTO `sys_error_code` VALUES (4655, 1, 'yudao-admin-server', 1002011000, '短信渠道不存在', '', NULL, '2022-01-23 01:38:32', NULL, '2022-01-23 01:38:32', b'0');
+INSERT INTO `sys_error_code` VALUES (4656, 1, 'yudao-admin-server', 1002011001, '短信渠道不处于开启状态，不允许选择', '', NULL, '2022-01-23 01:38:32', NULL, '2022-01-23 01:38:32', b'0');
+INSERT INTO `sys_error_code` VALUES (4657, 1, 'yudao-admin-server', 1002011002, '无法删除，该短信渠道还有短信模板', '', NULL, '2022-01-23 01:38:32', NULL, '2022-01-23 01:38:32', b'0');
+INSERT INTO `sys_error_code` VALUES (4658, 1, 'yudao-admin-server', 1002011000, '短信模板不存在', '', NULL, '2022-01-23 01:38:32', NULL, '2022-01-23 01:38:32', b'0');
+INSERT INTO `sys_error_code` VALUES (4659, 1, 'yudao-admin-server', 1002011001, '已经存在编码为【{}】的短信模板', '', NULL, '2022-01-23 01:38:32', NULL, '2022-01-23 01:38:32', b'0');
+INSERT INTO `sys_error_code` VALUES (4660, 1, 'yudao-admin-server', 1002012000, '租户不存在', '', NULL, '2022-01-23 01:38:32', NULL, '2022-01-23 01:38:32', b'0');
+INSERT INTO `sys_error_code` VALUES (4661, 1, 'yudao-admin-server', 1002013000, '错误码不存在', '', NULL, '2022-01-23 01:38:32', NULL, '2022-01-23 01:38:32', b'0');
+INSERT INTO `sys_error_code` VALUES (4662, 1, 'yudao-admin-server', 1002013001, '已经存在编码为【{}】的错误码', '', NULL, '2022-01-23 01:38:32', NULL, '2022-01-23 01:38:32', b'0');
+INSERT INTO `sys_error_code` VALUES (4663, 1, 'yudao-admin-server', 1009000002, '获取高亮流程图异常', '', NULL, '2022-01-23 01:38:32', NULL, '2022-01-23 01:38:32', b'0');
+INSERT INTO `sys_error_code` VALUES (4664, 1, 'yudao-admin-server', 1009001001, '请假申请不存在', '', NULL, '2022-01-23 01:38:32', NULL, '2022-01-23 01:38:32', b'0');
+INSERT INTO `sys_error_code` VALUES (4665, 1, 'yudao-admin-server', 1009001002, '项目经理岗位未设置', '', NULL, '2022-01-23 01:38:32', NULL, '2022-01-23 01:38:32', b'0');
+INSERT INTO `sys_error_code` VALUES (4666, 1, 'yudao-admin-server', 1009001009, '部门的项目经理不存在', '', NULL, '2022-01-23 01:38:32', NULL, '2022-01-23 01:38:32', b'0');
+INSERT INTO `sys_error_code` VALUES (4667, 1, 'yudao-admin-server', 1009001004, '部门经理岗位未设置', '', NULL, '2022-01-23 01:38:32', NULL, '2022-01-23 01:38:32', b'0');
+INSERT INTO `sys_error_code` VALUES (4668, 1, 'yudao-admin-server', 1009001005, '部门的部门经理不存在', '', NULL, '2022-01-23 01:38:32', NULL, '2022-01-23 01:38:32', b'0');
+INSERT INTO `sys_error_code` VALUES (4669, 1, 'yudao-admin-server', 1009001006, 'HR岗位未设置', '', NULL, '2022-01-23 01:38:32', NULL, '2022-01-23 01:38:32', b'0');
+INSERT INTO `sys_error_code` VALUES (4670, 1, 'yudao-admin-server', 1009001007, '请假天数必须>=1', '', NULL, '2022-01-23 01:38:32', NULL, '2022-01-23 01:38:32', b'0');
+INSERT INTO `sys_error_code` VALUES (4671, 1, 'yudao-admin-server', 1009002000, '已经存在流程标识为【{}】的流程', '', NULL, '2022-01-23 01:38:32', NULL, '2022-01-23 01:38:32', b'0');
+INSERT INTO `sys_error_code` VALUES (4672, 1, 'yudao-admin-server', 1009002001, '流程模型不存在', '', NULL, '2022-01-23 01:38:32', NULL, '2022-01-23 01:38:32', b'0');
+INSERT INTO `sys_error_code` VALUES (4673, 1, 'yudao-admin-server', 1009002002, '流程标识格式不正确，需要以字母或下划线开头，后接任意字母、数字、中划线、下划线、句点！', '', NULL, '2022-01-23 01:38:32', NULL, '2022-01-23 01:38:32', b'0');
+INSERT INTO `sys_error_code` VALUES (4674, 1, 'yudao-admin-server', 1009002003, '部署流程失败，原因：流程表单未配置，请点击【修改流程】按钮进行配置', '', NULL, '2022-01-23 01:38:32', NULL, '2022-01-23 01:38:32', b'0');
+INSERT INTO `sys_error_code` VALUES (4675, 1, 'yudao-admin-server', 1009002004, '部署流程失败，原因：用户任务({})未配置分配规则，请点击【修改流程】按钮进行配置', '', NULL, '2022-01-23 01:38:32', NULL, '2022-01-23 01:38:32', b'0');
+INSERT INTO `sys_error_code` VALUES (4676, 1, 'yudao-admin-server', 1009003005, '流程定义部署失败，原因：信息未发生变化', '', NULL, '2022-01-23 01:38:32', NULL, '2022-01-23 01:38:32', b'0');
+INSERT INTO `sys_error_code` VALUES (4677, 1, 'yudao-admin-server', 1009003000, '流程定义的标识期望是({})，当前是({})，请修改 BPMN 流程图', '', NULL, '2022-01-23 01:38:32', NULL, '2022-01-23 01:38:32', b'0');
+INSERT INTO `sys_error_code` VALUES (4678, 1, 'yudao-admin-server', 1009003001, '流程定义的名字期望是({})，当前是({})，请修改 BPMN 流程图', '', NULL, '2022-01-23 01:38:32', NULL, '2022-01-23 01:38:32', b'0');
+INSERT INTO `sys_error_code` VALUES (4679, 1, 'yudao-admin-server', 1009003002, '流程定义不存在', '', NULL, '2022-01-23 01:38:32', NULL, '2022-01-23 01:38:32', b'0');
+INSERT INTO `sys_error_code` VALUES (4680, 1, 'yudao-admin-server', 1009003003, '流程定义处于挂起状态', '', NULL, '2022-01-23 01:38:32', NULL, '2022-01-23 01:38:32', b'0');
+INSERT INTO `sys_error_code` VALUES (4681, 1, 'yudao-admin-server', 1009003004, '流程定义的模型不存在', '', NULL, '2022-01-23 01:38:32', NULL, '2022-01-23 01:38:32', b'0');
+INSERT INTO `sys_error_code` VALUES (4682, 1, 'yudao-admin-server', 1009004000, '流程实例不存在', '', NULL, '2022-01-23 01:38:32', NULL, '2022-01-23 01:38:32', b'0');
+INSERT INTO `sys_error_code` VALUES (4683, 1, 'yudao-admin-server', 1009004001, '流程取消失败，流程不处于运行中', '', NULL, '2022-01-23 01:38:32', NULL, '2022-01-23 01:38:32', b'0');
+INSERT INTO `sys_error_code` VALUES (4684, 1, 'yudao-admin-server', 1009004002, '流程取消失败，该流程不是你发起的', '', NULL, '2022-01-23 01:38:32', NULL, '2022-01-23 01:38:32', b'0');
+INSERT INTO `sys_error_code` VALUES (4685, 1, 'yudao-admin-server', 1009004000, '审批任务失败，原因：该任务不处于未审批', '', NULL, '2022-01-23 01:38:32', NULL, '2022-01-23 01:38:32', b'0');
+INSERT INTO `sys_error_code` VALUES (4686, 1, 'yudao-admin-server', 1009004001, '审批任务失败，原因：该任务的审批人不是你', '', NULL, '2022-01-23 01:38:32', NULL, '2022-01-23 01:38:32', b'0');
+INSERT INTO `sys_error_code` VALUES (4687, 1, 'yudao-admin-server', 1009006000, '流程({}) 的任务({}) 已经存在分配规则', '', NULL, '2022-01-23 01:38:32', NULL, '2022-01-23 01:38:32', b'0');
+INSERT INTO `sys_error_code` VALUES (4688, 1, 'yudao-admin-server', 1009006001, '流程任务分配规则不存在', '', NULL, '2022-01-23 01:38:32', NULL, '2022-01-23 01:38:32', b'0');
+INSERT INTO `sys_error_code` VALUES (4689, 1, 'yudao-admin-server', 1009006002, '只有流程模型的任务分配规则，才允许被修改', '', NULL, '2022-01-23 01:38:32', NULL, '2022-01-23 01:38:32', b'0');
+INSERT INTO `sys_error_code` VALUES (4690, 1, 'yudao-admin-server', 1009006003, '操作失败，原因：找不到任务的审批人！', '', NULL, '2022-01-23 01:38:32', NULL, '2022-01-23 01:38:32', b'0');
+INSERT INTO `sys_error_code` VALUES (4691, 1, 'yudao-admin-server', 1009006004, '操作失败，原因：任务分配脚本({}) 不存在', '', NULL, '2022-01-23 01:38:32', NULL, '2022-01-23 01:38:32', b'0');
+INSERT INTO `sys_error_code` VALUES (4692, 1, 'yudao-admin-server', 1009010000, '动态表单不存在', '', NULL, '2022-01-23 01:38:32', NULL, '2022-01-23 01:38:32', b'0');
+INSERT INTO `sys_error_code` VALUES (4693, 1, 'yudao-admin-server', 1009010000, '表单项({}) 和 ({}) 使用了相同的字段名({})', '', NULL, '2022-01-23 01:38:32', NULL, '2022-01-23 01:38:32', b'0');
+INSERT INTO `sys_error_code` VALUES (4694, 1, 'yudao-admin-server', 1009011000, '用户组不存在', '', NULL, '2022-01-23 01:38:32', NULL, '2022-01-23 01:38:32', b'0');
+INSERT INTO `sys_error_code` VALUES (4695, 1, 'yudao-admin-server', 1009011001, '名字为【{}】的用户组已被禁用', '', NULL, '2022-01-23 01:38:32', NULL, '2022-01-23 01:38:32', b'0');
 COMMIT;
 
 -- ----------------------------
@@ -1116,21 +1803,21 @@ DROP TABLE IF EXISTS `sys_login_log`;
 CREATE TABLE `sys_login_log` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '访问ID',
   `log_type` bigint NOT NULL COMMENT '日志类型',
-  `trace_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '链路追踪编号',
+  `trace_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '链路追踪编号',
   `user_id` bigint NOT NULL DEFAULT '0' COMMENT '用户编号',
   `user_type` tinyint NOT NULL DEFAULT '0' COMMENT '用户类型',
-  `username` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '用户账号',
+  `username` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '用户账号',
   `result` tinyint NOT NULL COMMENT '登陆结果',
-  `user_ip` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '用户 IP',
-  `user_agent` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '浏览器 UA',
-  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
+  `user_ip` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '用户 IP',
+  `user_agent` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '浏览器 UA',
+  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '创建者',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
+  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '更新者',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   `tenant_id` bigint NOT NULL DEFAULT '0' COMMENT '租户编号',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=494 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='系统访问记录';
+) ENGINE=InnoDB AUTO_INCREMENT=764 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='系统访问记录';
 
 -- ----------------------------
 -- Records of sys_login_log
@@ -1144,23 +1831,23 @@ COMMIT;
 DROP TABLE IF EXISTS `sys_menu`;
 CREATE TABLE `sys_menu` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '菜单ID',
-  `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '菜单名称',
-  `permission` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '权限标识',
+  `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '菜单名称',
+  `permission` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '权限标识',
   `menu_type` tinyint NOT NULL COMMENT '菜单类型（M目录 C菜单 F按钮）',
   `sort` int NOT NULL DEFAULT '0' COMMENT '显示顺序',
   `parent_id` bigint NOT NULL DEFAULT '0' COMMENT '父菜单ID',
-  `path` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '路由地址',
-  `icon` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '#' COMMENT '菜单图标',
-  `component` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '组件路径',
+  `path` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '路由地址',
+  `icon` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '#' COMMENT '菜单图标',
+  `component` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '组件路径',
   `status` tinyint NOT NULL DEFAULT '0' COMMENT '菜单状态（0正常 1停用）',
-  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
+  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '创建者',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
+  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '更新者',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   `tenant_id` bigint NOT NULL DEFAULT '0' COMMENT '租户编号',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=1185 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='菜单权限表';
+) ENGINE=InnoDB AUTO_INCREMENT=1223 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='菜单权限表';
 
 -- ----------------------------
 -- Records of sys_menu
@@ -1170,7 +1857,7 @@ INSERT INTO `sys_menu` VALUES (1, '系统管理', '', 1, 10, 0, '/system', 'syst
 INSERT INTO `sys_menu` VALUES (2, '基础设施', '', 1, 20, 0, '/infra', 'monitor', NULL, 0, 'admin', '2021-01-05 17:03:48', '1', '2021-12-25 16:43:18', b'0', 0);
 INSERT INTO `sys_menu` VALUES (3, '研发工具', '', 1, 30, 0, '/tool', 'tool', NULL, 0, 'admin', '2021-01-05 17:03:48', '1', '2021-12-25 16:43:13', b'0', 0);
 INSERT INTO `sys_menu` VALUES (4, '若依官网', '', 1, 4, 0, 'http://ruoyi.vip', 'guide', NULL, 0, 'admin', '2021-01-05 17:03:48', '', '2021-01-20 21:54:28', b'1', 0);
-INSERT INTO `sys_menu` VALUES (5, 'OA 办公', '', 1, 40, 0, '/oa', 'people', NULL, 0, 'admin', '2021-09-20 16:26:19', '1', '2021-12-25 16:43:22', b'0', 0);
+INSERT INTO `sys_menu` VALUES (5, 'OA 示例', '', 1, 40, 1185, 'oa', 'people', NULL, 0, 'admin', '2021-09-20 16:26:19', '1', '2022-01-22 18:32:50', b'0', 0);
 INSERT INTO `sys_menu` VALUES (100, '用户管理', 'system:user:list', 2, 1, 1, 'user', 'user', 'system/user/index', 0, 'admin', '2021-01-05 17:03:48', '', '2021-01-05 22:36:45', b'0', 0);
 INSERT INTO `sys_menu` VALUES (101, '角色管理', '', 2, 2, 1, 'role', 'peoples', 'system/role/index', 0, 'admin', '2021-01-05 17:03:48', '1', '2021-03-14 22:04:49', b'0', 0);
 INSERT INTO `sys_menu` VALUES (102, '菜单管理', '', 2, 3, 1, 'menu', 'tree-table', 'system/menu/index', 0, 'admin', '2021-01-05 17:03:48', '1', '2021-03-14 22:04:28', b'0', 0);
@@ -1300,14 +1987,14 @@ INSERT INTO `sys_menu` VALUES (1114, '错误码删除', 'system:error-code:delet
 INSERT INTO `sys_menu` VALUES (1115, '错误码导出', 'system:error-code:export', 3, 5, 1110, '', '', '', 0, '', '2021-04-13 21:46:42', '', '2021-04-13 22:09:55', b'0', 0);
 INSERT INTO `sys_menu` VALUES (1116, '日志中心', '', 2, 8, 2, 'log-center', 'log', 'infra/skywalking/log', 0, '1', '2021-04-26 22:35:45', '1', '2021-04-26 22:37:25', b'0', 0);
 INSERT INTO `sys_menu` VALUES (1117, '支付管理', '', 1, 11, 0, '/pay', 'money', NULL, 0, '1', '2021-12-25 16:43:41', '1', '2021-12-25 16:46:40', b'0', 0);
-INSERT INTO `sys_menu` VALUES (1118, '请假查询', '', 2, 0, 5, 'oa/leave', 'user', 'oa/leave/index', 0, '', '2021-09-20 08:51:03', '1', '2021-10-12 22:19:02', b'0', 0);
-INSERT INTO `sys_menu` VALUES (1119, '请假申请查询', 'oa:leave:query', 3, 1, 1118, '', '', '', 0, '', '2021-09-20 08:51:03', '', '2021-09-20 08:51:03', b'0', 0);
-INSERT INTO `sys_menu` VALUES (1120, '请假申请创建', 'oa:leave:create', 3, 2, 1118, '', '', '', 0, '', '2021-09-20 08:51:03', '', '2021-09-20 08:51:03', b'0', 0);
-INSERT INTO `sys_menu` VALUES (1121, '请假申请更新', 'oa:leave:update', 3, 3, 1118, '', '', '', 0, '', '2021-09-20 08:51:03', '', '2021-09-20 08:51:03', b'0', 0);
-INSERT INTO `sys_menu` VALUES (1122, '请假申请删除', 'oa:leave:delete', 3, 4, 1118, '', '', '', 0, '', '2021-09-20 08:51:03', '', '2021-09-20 08:51:03', b'0', 0);
-INSERT INTO `sys_menu` VALUES (1123, '请假申请导出', 'oa:leave:export', 3, 5, 1118, '', '', '', 0, '', '2021-09-20 08:51:03', '', '2021-09-20 08:51:03', b'0', 0);
-INSERT INTO `sys_menu` VALUES (1124, '待办任务', '', 2, 2, 5, 'todo', 'edit', 'oa/todo/index', 0, '1', '2021-09-20 22:10:09', '1', '2021-09-21 23:17:12', b'0', 0);
-INSERT INTO `sys_menu` VALUES (1125, '流程申请', '', 2, 3, 5, 'flow', 'form', 'oa/flow/index', 0, '1', '2021-10-23 22:10:09', '1', '2021-10-23 23:17:12', b'0', 0);
+INSERT INTO `sys_menu` VALUES (1118, '请假查询', '', 2, 0, 5, 'leave', 'user', 'bpm/oa/leave/index', 0, '', '2021-09-20 08:51:03', '1', '2022-01-22 21:36:06', b'0', 0);
+INSERT INTO `sys_menu` VALUES (1119, '请假申请查询', 'bpm:oa-leave:query', 3, 1, 1118, '', '', '', 0, '', '2021-09-20 08:51:03', '1', '2022-01-23 00:14:20', b'0', 0);
+INSERT INTO `sys_menu` VALUES (1120, '请假申请创建', 'bpm:oa-leave:create', 3, 2, 1118, '', '', '', 0, '', '2021-09-20 08:51:03', '1', '2022-01-23 00:14:49', b'0', 0);
+INSERT INTO `sys_menu` VALUES (1121, '请假申请更新', 'oa:leave:update', 3, 3, 1118, '', '', '', 0, '', '2021-09-20 08:51:03', '', '2022-01-22 16:14:26', b'1', 0);
+INSERT INTO `sys_menu` VALUES (1122, '请假申请删除', 'oa:leave:delete', 3, 4, 1118, '', '', '', 0, '', '2021-09-20 08:51:03', '', '2022-01-22 16:14:28', b'1', 0);
+INSERT INTO `sys_menu` VALUES (1123, '请假申请导出', 'oa:leave:export', 3, 5, 1118, '', '', '', 0, '', '2021-09-20 08:51:03', '', '2022-01-22 16:14:30', b'1', 0);
+INSERT INTO `sys_menu` VALUES (1124, '待办任务', '', 2, 2, 5, 'todo', 'edit', 'oa/todo/index', 0, '1', '2021-09-20 22:10:09', '1', '2022-01-22 10:33:01', b'1', 0);
+INSERT INTO `sys_menu` VALUES (1125, '流程申请', '', 2, 3, 5, 'flow', 'form', 'oa/flow/index', 0, '1', '2021-10-23 22:10:09', '1', '2022-01-22 10:33:03', b'1', 0);
 INSERT INTO `sys_menu` VALUES (1126, '应用信息', '', 2, 1, 1117, 'app', 'table', 'pay/app/index', 0, '', '2021-11-10 01:13:30', '1', '2021-12-25 16:56:41', b'0', 0);
 INSERT INTO `sys_menu` VALUES (1127, '支付应用信息查询', 'pay:app:query', 3, 1, 1126, '', '', '', 0, '', '2021-11-10 01:13:31', '', '2021-11-10 01:13:31', b'0', 0);
 INSERT INTO `sys_menu` VALUES (1128, '支付应用信息创建', 'pay:app:create', 3, 2, 1126, '', '', '', 0, '', '2021-11-10 01:13:31', '', '2021-11-10 01:13:31', b'0', 0);
@@ -1356,6 +2043,44 @@ INSERT INTO `sys_menu` VALUES (1181, '支付商户信息创建', 'pay:merchant:c
 INSERT INTO `sys_menu` VALUES (1182, '支付商户信息更新', 'pay:merchant:update', 3, 3, 1179, '', '', '', 0, '', '2021-12-25 09:01:44', '', '2021-12-25 09:01:44', b'0', 0);
 INSERT INTO `sys_menu` VALUES (1183, '支付商户信息删除', 'pay:merchant:delete', 3, 4, 1179, '', '', '', 0, '', '2021-12-25 09:01:44', '', '2021-12-25 09:01:44', b'0', 0);
 INSERT INTO `sys_menu` VALUES (1184, '支付商户信息导出', 'pay:merchant:export', 3, 5, 1179, '', '', '', 0, '', '2021-12-25 09:01:44', '', '2021-12-25 09:01:44', b'0', 0);
+INSERT INTO `sys_menu` VALUES (1185, '工作流程', '', 1, 50, 0, '/bpm', 'tool', NULL, 0, '1', '2021-12-30 20:26:36', '103', '2022-01-14 18:44:00', b'0', 0);
+INSERT INTO `sys_menu` VALUES (1186, '流程管理', '', 1, 10, 1185, 'manager', 'nested', NULL, 0, '1', '2021-12-30 20:28:30', '1', '2021-12-30 20:28:57', b'0', 0);
+INSERT INTO `sys_menu` VALUES (1187, '流程表单', '', 2, 0, 1186, 'form', 'form', 'bpm/form/index', 0, '', '2021-12-30 12:38:22', '1', '2021-12-31 23:20:38', b'0', 0);
+INSERT INTO `sys_menu` VALUES (1188, '表单查询', 'bpm:form:query', 3, 1, 1187, '', '', '', 0, '', '2021-12-30 12:38:22', '1', '2022-01-03 18:59:53', b'0', 0);
+INSERT INTO `sys_menu` VALUES (1189, '表单创建', 'bpm:form:create', 3, 2, 1187, '', '', '', 0, '', '2021-12-30 12:38:22', '1', '2022-01-03 18:59:59', b'0', 0);
+INSERT INTO `sys_menu` VALUES (1190, '表单更新', 'bpm:form:update', 3, 3, 1187, '', '', '', 0, '', '2021-12-30 12:38:22', '1', '2022-01-03 19:00:21', b'0', 0);
+INSERT INTO `sys_menu` VALUES (1191, '表单删除', 'bpm:form:delete', 3, 4, 1187, '', '', '', 0, '', '2021-12-30 12:38:22', '1', '2022-01-03 19:00:26', b'0', 0);
+INSERT INTO `sys_menu` VALUES (1192, '表单导出', 'bpm:form:export', 3, 5, 1187, '', '', '', 0, '', '2021-12-30 12:38:22', '1', '2022-01-03 19:00:33', b'0', 0);
+INSERT INTO `sys_menu` VALUES (1193, '流程模型', '', 2, 5, 1186, 'model', 'guide', 'bpm/model/index', 0, '1', '2021-12-31 23:24:58', '103', '2022-01-14 10:14:38', b'0', 0);
+INSERT INTO `sys_menu` VALUES (1194, '模型查询', 'bpm:model:query', 3, 1, 1193, '', '', '', 0, '1', '2022-01-03 19:01:10', '1', '2022-01-03 19:01:10', b'0', 0);
+INSERT INTO `sys_menu` VALUES (1195, '模型创建', 'bpm:model:create', 3, 2, 1193, '', '', '', 0, '1', '2022-01-03 19:01:24', '1', '2022-01-03 19:02:02', b'0', 0);
+INSERT INTO `sys_menu` VALUES (1196, '模型导入', 'bpm:model:import', 3, 3, 1193, '', '', '', 0, '1', '2022-01-03 19:01:35', '1', '2022-01-03 19:02:11', b'0', 0);
+INSERT INTO `sys_menu` VALUES (1197, '模型更新', 'bpm:model:update', 3, 4, 1193, '', '', '', 0, '1', '2022-01-03 19:02:28', '1', '2022-01-03 19:02:28', b'0', 0);
+INSERT INTO `sys_menu` VALUES (1198, '模型删除', 'bpm:model:delete', 3, 5, 1193, '', '', '', 0, '1', '2022-01-03 19:02:43', '1', '2022-01-03 19:02:43', b'0', 0);
+INSERT INTO `sys_menu` VALUES (1199, '模型发布', 'bpm:model:deploy', 3, 6, 1193, '', '', '', 0, '1', '2022-01-03 19:03:24', '1', '2022-01-03 19:03:24', b'0', 0);
+INSERT INTO `sys_menu` VALUES (1200, '任务管理', '', 1, 20, 1185, 'task', 'cascader', NULL, 0, '1', '2022-01-07 23:51:48', '1', '2022-01-07 23:51:48', b'0', 0);
+INSERT INTO `sys_menu` VALUES (1201, '我的流程', '', 2, 0, 1200, 'my', 'people', 'bpm/processInstance/index', 0, '', '2022-01-07 15:53:44', '1', '2022-01-08 16:44:41', b'0', 0);
+INSERT INTO `sys_menu` VALUES (1202, '流程实例的查询', 'bpm:process-instance:query', 3, 1, 1201, '', '', '', 0, '', '2022-01-07 15:53:44', '1', '2022-01-07 23:56:29', b'0', 0);
+INSERT INTO `sys_menu` VALUES (1203, '工作流的流程实例的拓展创建', 'bpm:process-instance-ext:create', 3, 2, 1201, '', '', '', 0, '', '2022-01-07 15:53:44', '', '2022-01-07 15:56:08', b'1', 0);
+INSERT INTO `sys_menu` VALUES (1204, '工作流的流程实例的拓展更新', 'bpm:process-instance-ext:update', 3, 3, 1201, '', '', '', 0, '', '2022-01-07 15:53:44', '', '2022-01-07 15:56:00', b'1', 0);
+INSERT INTO `sys_menu` VALUES (1205, '工作流的流程实例的拓展删除', 'bpm:process-instance-ext:delete', 3, 4, 1201, '', '', '', 0, '', '2022-01-07 15:53:44', '', '2022-01-07 15:55:56', b'1', 0);
+INSERT INTO `sys_menu` VALUES (1206, '工作流的流程实例的拓展导出', 'bpm:process-instance-ext:export', 3, 5, 1201, '', '', '', 0, '', '2022-01-07 15:53:44', '', '2022-01-07 15:55:51', b'1', 0);
+INSERT INTO `sys_menu` VALUES (1207, '待办任务', '', 2, 10, 1200, 'todo', 'eye-open', 'bpm/task/todo', 0, '1', '2022-01-08 10:33:37', '1', '2022-01-08 10:33:48', b'0', 0);
+INSERT INTO `sys_menu` VALUES (1208, '已办任务', '', 2, 20, 1200, 'done', 'eye', 'bpm/task/done', 0, '1', '2022-01-08 10:34:13', '1', '2022-01-08 10:34:13', b'0', 0);
+INSERT INTO `sys_menu` VALUES (1209, '用户分组', '', 2, 2, 1186, 'user-group', 'people', 'bpm/group/index', 0, '', '2022-01-14 02:14:20', '103', '2022-01-14 10:15:43', b'0', 0);
+INSERT INTO `sys_menu` VALUES (1210, '用户组查询', 'bpm:user-group:query', 3, 1, 1209, '', '', '', 0, '', '2022-01-14 02:14:20', '', '2022-01-14 02:14:20', b'0', 0);
+INSERT INTO `sys_menu` VALUES (1211, '用户组创建', 'bpm:user-group:create', 3, 2, 1209, '', '', '', 0, '', '2022-01-14 02:14:20', '', '2022-01-14 02:14:20', b'0', 0);
+INSERT INTO `sys_menu` VALUES (1212, '用户组更新', 'bpm:user-group:update', 3, 3, 1209, '', '', '', 0, '', '2022-01-14 02:14:20', '', '2022-01-14 02:14:20', b'0', 0);
+INSERT INTO `sys_menu` VALUES (1213, '用户组删除', 'bpm:user-group:delete', 3, 4, 1209, '', '', '', 0, '', '2022-01-14 02:14:20', '', '2022-01-14 02:14:20', b'0', 0);
+INSERT INTO `sys_menu` VALUES (1214, '用户组导出', 'bpm:user-group:export', 3, 5, 1209, '', '', '', 0, '', '2022-01-14 02:14:20', '', '2022-01-14 02:14:58', b'1', 0);
+INSERT INTO `sys_menu` VALUES (1215, '流程定义查询', 'bpm:process-definition:query', 3, 10, 1193, '', '', '', 0, '1', '2022-01-23 00:21:43', '1', '2022-01-23 00:26:30', b'0', 0);
+INSERT INTO `sys_menu` VALUES (1216, '流程任务分配规则查询', 'bpm:task-assign-rule:query', 3, 20, 1193, '', '', '', 0, '1', '2022-01-23 00:26:53', '1', '2022-01-23 00:26:53', b'0', 0);
+INSERT INTO `sys_menu` VALUES (1217, '流程任务分配规则创建', 'bpm:task-assign-rule:create', 3, 21, 1193, '', '', '', 0, '1', '2022-01-23 00:28:15', '1', '2022-01-23 00:28:15', b'0', 0);
+INSERT INTO `sys_menu` VALUES (1218, '流程任务分配规则更新', 'bpm:task-assign-rule:update', 3, 22, 1193, '', '', '', 0, '1', '2022-01-23 00:28:41', '1', '2022-01-23 00:28:41', b'0', 0);
+INSERT INTO `sys_menu` VALUES (1219, '流程实例的创建', 'bpm:process-instance:create', 3, 2, 1201, '', '', '', 0, '1', '2022-01-23 00:36:15', '1', '2022-01-23 00:36:15', b'0', 0);
+INSERT INTO `sys_menu` VALUES (1220, '流程实例的取消', 'bpm:process-instance:cancel', 3, 3, 1201, '', '', '', 0, '1', '2022-01-23 00:36:33', '1', '2022-01-23 00:36:33', b'0', 0);
+INSERT INTO `sys_menu` VALUES (1221, '流程任务的查询', 'bpm:task:query', 3, 1, 1207, '', '', '', 0, '1', '2022-01-23 00:38:52', '1', '2022-01-23 00:38:52', b'0', 0);
+INSERT INTO `sys_menu` VALUES (1222, '流程任务的更新', 'bpm:task:update', 3, 2, 1207, '', '', '', 0, '1', '2022-01-23 00:39:24', '1', '2022-01-23 00:39:30', b'0', 0);
 COMMIT;
 
 -- ----------------------------
@@ -1364,18 +2089,18 @@ COMMIT;
 DROP TABLE IF EXISTS `sys_notice`;
 CREATE TABLE `sys_notice` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '公告ID',
-  `title` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '公告标题',
-  `content` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '公告内容',
+  `title` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '公告标题',
+  `content` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '公告内容',
   `notice_type` tinyint NOT NULL COMMENT '公告类型（1通知 2公告）',
   `status` tinyint NOT NULL DEFAULT '0' COMMENT '公告状态（0正常 1关闭）',
-  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
+  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '创建者',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
+  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '更新者',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   `tenant_id` bigint NOT NULL DEFAULT '0' COMMENT '租户编号',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='通知公告表';
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='通知公告表';
 
 -- ----------------------------
 -- Records of sys_notice
@@ -1392,32 +2117,32 @@ COMMIT;
 DROP TABLE IF EXISTS `sys_operate_log`;
 CREATE TABLE `sys_operate_log` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '日志主键',
-  `trace_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '链路追踪编号',
+  `trace_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '链路追踪编号',
   `user_id` bigint NOT NULL COMMENT '用户编号',
-  `module` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '模块标题',
-  `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '操作名',
+  `module` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '模块标题',
+  `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '操作名',
   `operate_type` bigint NOT NULL DEFAULT '0' COMMENT '操作分类',
-  `content` varchar(2000) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '操作内容',
-  `exts` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '拓展字段',
-  `request_method` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '请求方法名',
-  `request_url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '请求地址',
-  `user_ip` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '用户 IP',
-  `user_agent` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '浏览器 UA',
-  `java_method` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT 'Java 方法名',
-  `java_method_args` varchar(8000) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT 'Java 方法的参数',
+  `content` varchar(2000) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '操作内容',
+  `exts` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '拓展字段',
+  `request_method` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '请求方法名',
+  `request_url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '请求地址',
+  `user_ip` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '用户 IP',
+  `user_agent` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '浏览器 UA',
+  `java_method` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT 'Java 方法名',
+  `java_method_args` varchar(8000) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT 'Java 方法的参数',
   `start_time` datetime NOT NULL COMMENT '操作时间',
   `duration` int NOT NULL COMMENT '执行时长',
   `result_code` int NOT NULL DEFAULT '0' COMMENT '结果码',
-  `result_msg` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '结果提示',
-  `result_data` varchar(4000) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '结果数据',
-  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
+  `result_msg` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '结果提示',
+  `result_data` varchar(4000) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '结果数据',
+  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '创建者',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
+  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '更新者',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   `tenant_id` bigint NOT NULL DEFAULT '0' COMMENT '租户编号',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=129 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='操作日志记录';
+) ENGINE=InnoDB AUTO_INCREMENT=1099 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='操作日志记录';
 
 -- ----------------------------
 -- Records of sys_operate_log
@@ -1431,19 +2156,19 @@ COMMIT;
 DROP TABLE IF EXISTS `sys_post`;
 CREATE TABLE `sys_post` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '岗位ID',
-  `code` varchar(64) COLLATE utf8mb4_general_ci NOT NULL COMMENT '岗位编码',
-  `name` varchar(50) COLLATE utf8mb4_general_ci NOT NULL COMMENT '岗位名称',
+  `code` varchar(64) NOT NULL COMMENT '岗位编码',
+  `name` varchar(50) NOT NULL COMMENT '岗位名称',
   `sort` int NOT NULL COMMENT '显示顺序',
   `status` tinyint NOT NULL COMMENT '状态（0正常 1停用）',
-  `remark` varchar(500) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '备注',
-  `creator` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
+  `remark` varchar(500) DEFAULT NULL COMMENT '备注',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `updater` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   `tenant_id` bigint NOT NULL DEFAULT '0' COMMENT '租户编号',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='岗位信息表';
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='岗位信息表';
 
 -- ----------------------------
 -- Records of sys_post
@@ -1462,21 +2187,21 @@ COMMIT;
 DROP TABLE IF EXISTS `sys_role`;
 CREATE TABLE `sys_role` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '角色ID',
-  `name` varchar(30) COLLATE utf8mb4_general_ci NOT NULL COMMENT '角色名称',
-  `code` varchar(100) COLLATE utf8mb4_general_ci NOT NULL COMMENT '角色权限字符串',
+  `name` varchar(30) NOT NULL COMMENT '角色名称',
+  `code` varchar(100) NOT NULL COMMENT '角色权限字符串',
   `sort` int NOT NULL COMMENT '显示顺序',
   `data_scope` tinyint NOT NULL DEFAULT '1' COMMENT '数据范围（1：全部数据权限 2：自定数据权限 3：本部门数据权限 4：本部门及以下数据权限）',
-  `data_scope_dept_ids` varchar(500) COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '数据范围(指定部门数组)',
+  `data_scope_dept_ids` varchar(500) NOT NULL DEFAULT '' COMMENT '数据范围(指定部门数组)',
   `status` tinyint NOT NULL COMMENT '角色状态（0正常 1停用）',
   `type` tinyint NOT NULL COMMENT '角色类型',
-  `remark` varchar(500) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '备注',
-  `creator` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
+  `remark` varchar(500) DEFAULT NULL COMMENT '备注',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `updater` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=102 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='角色信息表';
+) ENGINE=InnoDB AUTO_INCREMENT=102 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='角色信息表';
 
 -- ----------------------------
 -- Records of sys_role
@@ -1495,13 +2220,13 @@ CREATE TABLE `sys_role_menu` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '自增编号',
   `role_id` bigint NOT NULL COMMENT '角色ID',
   `menu_id` bigint NOT NULL COMMENT '菜单ID',
-  `creator` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `updater` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=253 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='角色和菜单关联表';
+) ENGINE=InnoDB AUTO_INCREMENT=253 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='角色和菜单关联表';
 
 -- ----------------------------
 -- Records of sys_role_menu
@@ -1683,20 +2408,20 @@ COMMIT;
 DROP TABLE IF EXISTS `sys_sms_channel`;
 CREATE TABLE `sys_sms_channel` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号',
-  `signature` varchar(10) COLLATE utf8mb4_general_ci NOT NULL COMMENT '短信签名',
-  `code` varchar(63) COLLATE utf8mb4_general_ci NOT NULL COMMENT '渠道编码',
+  `signature` varchar(10) NOT NULL COMMENT '短信签名',
+  `code` varchar(63) NOT NULL COMMENT '渠道编码',
   `status` tinyint NOT NULL COMMENT '开启状态',
-  `remark` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '备注',
-  `api_key` varchar(128) COLLATE utf8mb4_general_ci NOT NULL COMMENT '短信 API 的账号',
-  `api_secret` varchar(128) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '短信 API 的秘钥',
-  `callback_url` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '短信发送回调 URL',
-  `creator` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
+  `remark` varchar(255) DEFAULT NULL COMMENT '备注',
+  `api_key` varchar(128) NOT NULL COMMENT '短信 API 的账号',
+  `api_secret` varchar(128) DEFAULT NULL COMMENT '短信 API 的秘钥',
+  `callback_url` varchar(255) DEFAULT NULL COMMENT '短信发送回调 URL',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `updater` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='短信渠道';
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='短信渠道';
 
 -- ----------------------------
 -- Records of sys_sms_channel
@@ -1714,22 +2439,22 @@ COMMIT;
 DROP TABLE IF EXISTS `sys_sms_code`;
 CREATE TABLE `sys_sms_code` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号',
-  `mobile` varchar(11) COLLATE utf8mb4_general_ci NOT NULL COMMENT '手机号',
-  `code` varchar(6) COLLATE utf8mb4_general_ci NOT NULL COMMENT '验证码',
-  `create_ip` varchar(15) COLLATE utf8mb4_general_ci NOT NULL COMMENT '创建 IP',
+  `mobile` varchar(11) NOT NULL COMMENT '手机号',
+  `code` varchar(6) NOT NULL COMMENT '验证码',
+  `create_ip` varchar(15) NOT NULL COMMENT '创建 IP',
   `scene` tinyint NOT NULL COMMENT '发送场景',
   `today_index` tinyint NOT NULL COMMENT '今日发送的第几条',
   `used` tinyint NOT NULL COMMENT '是否使用',
   `used_time` datetime DEFAULT NULL COMMENT '使用时间',
-  `used_ip` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '使用 IP',
-  `creator` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
+  `used_ip` varchar(255) DEFAULT NULL COMMENT '使用 IP',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `updater` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE,
   KEY `idx_mobile` (`mobile`) USING BTREE COMMENT '手机号'
-) ENGINE=InnoDB AUTO_INCREMENT=462 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='手机验证码';
+) ENGINE=InnoDB AUTO_INCREMENT=462 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='手机验证码';
 
 -- ----------------------------
 -- Records of sys_sms_code
@@ -1761,35 +2486,35 @@ DROP TABLE IF EXISTS `sys_sms_log`;
 CREATE TABLE `sys_sms_log` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号',
   `channel_id` bigint NOT NULL COMMENT '短信渠道编号',
-  `channel_code` varchar(63) COLLATE utf8mb4_general_ci NOT NULL COMMENT '短信渠道编码',
+  `channel_code` varchar(63) NOT NULL COMMENT '短信渠道编码',
   `template_id` bigint NOT NULL COMMENT '模板编号',
-  `template_code` varchar(63) COLLATE utf8mb4_general_ci NOT NULL COMMENT '模板编码',
+  `template_code` varchar(63) NOT NULL COMMENT '模板编码',
   `template_type` tinyint NOT NULL COMMENT '短信类型',
-  `template_content` varchar(255) COLLATE utf8mb4_general_ci NOT NULL COMMENT '短信内容',
-  `template_params` varchar(255) COLLATE utf8mb4_general_ci NOT NULL COMMENT '短信参数',
-  `api_template_id` varchar(63) COLLATE utf8mb4_general_ci NOT NULL COMMENT '短信 API 的模板编号',
-  `mobile` varchar(11) COLLATE utf8mb4_general_ci NOT NULL COMMENT '手机号',
+  `template_content` varchar(255) NOT NULL COMMENT '短信内容',
+  `template_params` varchar(255) NOT NULL COMMENT '短信参数',
+  `api_template_id` varchar(63) NOT NULL COMMENT '短信 API 的模板编号',
+  `mobile` varchar(11) NOT NULL COMMENT '手机号',
   `user_id` bigint DEFAULT NULL COMMENT '用户编号',
   `user_type` tinyint DEFAULT NULL COMMENT '用户类型',
   `send_status` tinyint NOT NULL DEFAULT '0' COMMENT '发送状态',
   `send_time` datetime DEFAULT NULL COMMENT '发送时间',
   `send_code` int DEFAULT NULL COMMENT '发送结果的编码',
-  `send_msg` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '发送结果的提示',
-  `api_send_code` varchar(63) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '短信 API 发送结果的编码',
-  `api_send_msg` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '短信 API 发送失败的提示',
-  `api_request_id` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '短信 API 发送返回的唯一请求 ID',
-  `api_serial_no` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '短信 API 发送返回的序号',
+  `send_msg` varchar(255) DEFAULT NULL COMMENT '发送结果的提示',
+  `api_send_code` varchar(63) DEFAULT NULL COMMENT '短信 API 发送结果的编码',
+  `api_send_msg` varchar(255) DEFAULT NULL COMMENT '短信 API 发送失败的提示',
+  `api_request_id` varchar(255) DEFAULT NULL COMMENT '短信 API 发送返回的唯一请求 ID',
+  `api_serial_no` varchar(255) DEFAULT NULL COMMENT '短信 API 发送返回的序号',
   `receive_status` tinyint NOT NULL DEFAULT '0' COMMENT '接收状态',
   `receive_time` datetime DEFAULT NULL COMMENT '接收时间',
-  `api_receive_code` varchar(63) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT 'API 接收结果的编码',
-  `api_receive_msg` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT 'API 接收结果的说明',
-  `creator` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
+  `api_receive_code` varchar(63) DEFAULT NULL COMMENT 'API 接收结果的编码',
+  `api_receive_msg` varchar(255) DEFAULT NULL COMMENT 'API 接收结果的说明',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `updater` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=33 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='短信日志';
+) ENGINE=InnoDB AUTO_INCREMENT=116 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='短信日志';
 
 -- ----------------------------
 -- Records of sys_sms_log
@@ -1805,21 +2530,21 @@ CREATE TABLE `sys_sms_template` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号',
   `type` tinyint NOT NULL COMMENT '短信签名',
   `status` tinyint NOT NULL COMMENT '开启状态',
-  `code` varchar(63) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '模板编码',
-  `name` varchar(63) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '模板名称',
-  `content` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '模板内容',
-  `params` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '参数数组',
-  `remark` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '备注',
-  `api_template_id` varchar(63) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '短信 API 的模板编号',
+  `code` varchar(63) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '模板编码',
+  `name` varchar(63) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '模板名称',
+  `content` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '模板内容',
+  `params` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '参数数组',
+  `remark` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '备注',
+  `api_template_id` varchar(63) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '短信 API 的模板编号',
   `channel_id` bigint NOT NULL COMMENT '短信渠道编号',
-  `channel_code` varchar(63) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '短信渠道编码',
-  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
+  `channel_code` varchar(63) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '短信渠道编码',
+  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '创建者',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
+  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '更新者',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='短信模板';
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='短信模板';
 
 -- ----------------------------
 -- Records of sys_sms_template
@@ -1832,6 +2557,9 @@ INSERT INTO `sys_sms_template` VALUES (5, 3, 0, 'test-ooxx', '测试模板', 'bi
 INSERT INTO `sys_sms_template` VALUES (6, 3, 0, 'test-01', '测试模板', '哈哈哈 {name}', '[\"name\"]', 'f哈哈哈', '4383920', 1, 'YUN_PIAN', '1', '2021-04-10 01:07:21', '1', '2021-04-10 01:22:05', b'0');
 INSERT INTO `sys_sms_template` VALUES (7, 3, 0, 'test-04', '测试下', '老鸡{name}，牛逼{code}', '[\"name\",\"code\"]', NULL, 'suibian', 4, 'DEBUG_DING_TALK', '1', '2021-04-13 00:29:53', '1', '2021-04-14 00:30:38', b'0');
 INSERT INTO `sys_sms_template` VALUES (8, 1, 0, 'user-sms-login', '前台用户短信登录', '您的验证码是{code}', '[\"code\"]', NULL, '4372216', 1, 'YUN_PIAN', '1', '2021-10-11 08:10:00', '1', '2021-10-11 08:10:00', b'0');
+INSERT INTO `sys_sms_template` VALUES (9, 2, 0, 'bpm_task_assigned', '【工作流】任务被分配', '您收到了一条新的待办任务：{processInstanceName}-{taskName}，申请人：{startUserNickname}，处理链接：{detailUrl}', '[\"processInstanceName\",\"taskName\",\"startUserNickname\",\"detailUrl\"]', NULL, 'suibian', 4, 'DEBUG_DING_TALK', '1', '2022-01-21 22:31:19', '1', '2022-01-22 00:03:36', b'0');
+INSERT INTO `sys_sms_template` VALUES (10, 2, 0, 'bpm_process_instance_reject', '【工作流】流程被不通过', '您的流程被审批不通过：{processInstanceName}，原因：{comment}，查看链接：{detailUrl}', '[\"processInstanceName\",\"comment\",\"detailUrl\"]', NULL, 'suibian', 4, 'DEBUG_DING_TALK', '1', '2022-01-22 00:03:31', '1', '2022-01-22 00:24:31', b'0');
+INSERT INTO `sys_sms_template` VALUES (11, 2, 0, 'bpm_process_instance_approve', '【工作流】流程被通过', '您的流程被审批通过：{processInstanceName}，查看链接：{detailUrl}', '[\"processInstanceName\",\"detailUrl\"]', NULL, 'suibian', 4, 'DEBUG_DING_TALK', '1', '2022-01-22 00:04:31', '1', '2022-01-22 00:24:23', b'0');
 COMMIT;
 
 -- ----------------------------
@@ -1872,17 +2600,17 @@ COMMIT;
 DROP TABLE IF EXISTS `sys_tenant`;
 CREATE TABLE `sys_tenant` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '租户编号',
-  `name` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '租户名',
-  `contact_name` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '联系人',
-  `contact_mobile` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '联系手机',
+  `name` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '租户名',
+  `contact_name` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '联系人',
+  `contact_mobile` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '联系手机',
   `status` tinyint NOT NULL DEFAULT '0' COMMENT '租户状态（0正常 1停用）',
-  `creator` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `updater` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=109 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='租户表';
+) ENGINE=InnoDB AUTO_INCREMENT=109 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='租户表';
 
 -- ----------------------------
 -- Records of sys_tenant
@@ -1899,36 +2627,36 @@ COMMIT;
 DROP TABLE IF EXISTS `sys_user`;
 CREATE TABLE `sys_user` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '用户ID',
-  `username` varchar(30) COLLATE utf8mb4_general_ci NOT NULL COMMENT '用户账号',
-  `password` varchar(100) COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '密码',
-  `nickname` varchar(30) COLLATE utf8mb4_general_ci NOT NULL COMMENT '用户昵称',
-  `remark` varchar(500) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '备注',
+  `username` varchar(30) NOT NULL COMMENT '用户账号',
+  `password` varchar(100) NOT NULL DEFAULT '' COMMENT '密码',
+  `nickname` varchar(30) NOT NULL COMMENT '用户昵称',
+  `remark` varchar(500) DEFAULT NULL COMMENT '备注',
   `dept_id` bigint DEFAULT NULL COMMENT '部门ID',
-  `post_ids` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '岗位编号数组',
-  `email` varchar(50) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '用户邮箱',
-  `mobile` varchar(11) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '手机号码',
+  `post_ids` varchar(255) DEFAULT NULL COMMENT '岗位编号数组',
+  `email` varchar(50) DEFAULT '' COMMENT '用户邮箱',
+  `mobile` varchar(11) DEFAULT '' COMMENT '手机号码',
   `sex` tinyint DEFAULT '0' COMMENT '用户性别',
-  `avatar` varchar(100) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '头像地址',
+  `avatar` varchar(100) DEFAULT '' COMMENT '头像地址',
   `status` tinyint NOT NULL DEFAULT '0' COMMENT '帐号状态（0正常 1停用）',
-  `login_ip` varchar(50) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '最后登录IP',
+  `login_ip` varchar(50) DEFAULT '' COMMENT '最后登录IP',
   `login_date` datetime DEFAULT NULL COMMENT '最后登录时间',
-  `creator` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `updater` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   `tenant_id` bigint NOT NULL DEFAULT '0' COMMENT '租户编号',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=107 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='用户信息表';
+) ENGINE=InnoDB AUTO_INCREMENT=107 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用户信息表';
 
 -- ----------------------------
 -- Records of sys_user
 -- ----------------------------
 BEGIN;
-INSERT INTO `sys_user` VALUES (1, 'admin', '$2a$10$0acJOIk2D25/oC87nyclE..0lzeu9DtQ/n3geP4fkun/zIVRhHJIO', '芋道源码', '管理员', 103, '[1]', 'aoteman@126.com', '15612345678', 1, 'http://127.0.0.1:48080/api/infra/file/get/7e7ed694-2242-46cf-9ac9-0709debcc22f', 0, '127.0.0.1', '2021-12-25 19:15:06', 'admin', '2021-01-05 17:03:47', NULL, '2021-12-25 19:15:06', b'0', 1);
+INSERT INTO `sys_user` VALUES (1, 'admin', '$2a$10$0acJOIk2D25/oC87nyclE..0lzeu9DtQ/n3geP4fkun/zIVRhHJIO', '芋道源码', '管理员', 103, '[1]', 'aoteman@126.com', '15612345678', 1, 'http://127.0.0.1:48080/api/infra/file/get/7e7ed694-2242-46cf-9ac9-0709debcc22f', 0, '127.0.0.1', '2022-01-22 23:30:35', 'admin', '2021-01-05 17:03:47', NULL, '2022-01-22 23:30:35', b'0', 1);
 INSERT INTO `sys_user` VALUES (2, 'ry', '$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', '若依', '测试员', 103, '[2]', 'ry@qq.com', '15666666666', 1, '', 0, '127.0.0.1', '2021-01-05 17:03:47', 'admin', '2021-01-05 17:03:47', '', '2021-12-13 01:26:34', b'1', 1);
 INSERT INTO `sys_user` VALUES (100, 'yudao', '$2a$10$11U48RhyJ5pSBYWSn12AD./ld671.ycSzJHbyrtpeoMeYiw31eo8a', '芋道', '不要吓我', 104, '[1]', 'yudao@iocoder.cn', '15601691300', 1, '', 1, '', NULL, '', '2021-01-07 09:07:17', '104', '2021-12-16 09:26:10', b'0', 1);
-INSERT INTO `sys_user` VALUES (103, 'yuanma', '', '源码', NULL, 106, NULL, 'yuanma@iocoder.cn', '15601701300', 0, '', 0, '', NULL, '', '2021-01-13 23:50:35', '104', '2021-12-16 09:26:05', b'0', 1);
+INSERT INTO `sys_user` VALUES (103, 'yuanma', '$2a$10$wWoPT7sqriM2O1YXRL.je.GiL538OR6ZTN8aQZr9JAGdnpCH2tpYe', '源码', NULL, 106, NULL, 'yuanma@iocoder.cn', '15601701300', 0, '', 0, '127.0.0.1', '2022-01-18 00:33:40', '', '2021-01-13 23:50:35', NULL, '2022-01-18 00:33:40', b'0', 1);
 INSERT INTO `sys_user` VALUES (104, 'test', '$2a$10$CkyM2xvzUhSWsh.JqGcSju.KjlPsaX1A76wO8O/mYtkpQvcp2jWTW', '测试号', NULL, 107, '[]', '', '15601691200', 1, '', 0, '127.0.0.1', '2021-12-16 09:27:08', '', '2021-01-21 02:13:53', NULL, '2021-12-16 09:27:08', b'0', 1);
 INSERT INTO `sys_user` VALUES (105, 'hradmin', '$2a$10$JEhJOL25X1eMnFfR3PILo.MoAljf29YukpL2w6H9GvVGjmqOCuh.O', 'hr-mgr', 'hr 管理员', 109, '[3]', '', '18818260000', 1, '', 0, '127.0.0.1', '2021-10-30 21:19:36', '1', '2021-09-25 16:50:41', '1', '2021-12-16 09:26:41', b'0', 1);
 INSERT INTO `sys_user` VALUES (106, 'zhijiantianya', '$2a$10$Y0hSfV2udA8quqMeWukhTuHEoKpQ5tDhclG8WUWSOH7o/MGw185Ti', '芋道源码', '', NULL, NULL, '', '', 3, 'https://portrait.gitee.com/uploads/avatars/user/0/176_zhijiantianya_1578913741.png', 0, '', NULL, NULL, '2021-09-28 09:40:59', NULL, '2021-12-15 14:44:47', b'1', 1);
@@ -1942,14 +2670,14 @@ CREATE TABLE `sys_user_role` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '自增编号',
   `user_id` bigint NOT NULL COMMENT '用户ID',
   `role_id` bigint NOT NULL COMMENT '角色ID',
-  `creator` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
   `create_time` datetime DEFAULT NULL COMMENT '创建时间',
-  `updater` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
   `update_time` datetime DEFAULT NULL COMMENT '更新时间',
   `deleted` bit(1) DEFAULT b'0' COMMENT '是否删除',
   `tenant_id` bigint NOT NULL DEFAULT '0' COMMENT '租户编号',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='用户和角色关联表';
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用户和角色关联表';
 
 -- ----------------------------
 -- Records of sys_user_role
@@ -1964,6 +2692,7 @@ INSERT INTO `sys_user_role` VALUES (6, 100, 2, '', NULL, '', NULL, b'0', 0);
 INSERT INTO `sys_user_role` VALUES (7, 104, 101, '', NULL, '', NULL, b'0', 0);
 INSERT INTO `sys_user_role` VALUES (8, 106, 1, NULL, '2021-09-28 09:40:59', NULL, '2021-09-28 09:40:59', b'1', 0);
 INSERT INTO `sys_user_role` VALUES (9, 105, 1, '1', '2021-10-30 13:40:48', '1', '2021-10-30 13:40:48', b'0', 0);
+INSERT INTO `sys_user_role` VALUES (10, 103, 1, '1', '2022-01-11 13:19:45', '1', '2022-01-11 13:19:45', b'0', 0);
 COMMIT;
 
 -- ----------------------------
@@ -1971,40 +2700,175 @@ COMMIT;
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_user_session`;
 CREATE TABLE `sys_user_session` (
-  `id` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '会话编号',
+  `id` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '会话编号',
   `user_id` bigint NOT NULL COMMENT '用户编号',
   `user_type` tinyint NOT NULL DEFAULT '0' COMMENT '用户类型',
   `session_timeout` datetime NOT NULL COMMENT '会话超时时间',
-  `username` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '用户账号',
-  `user_ip` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '用户 IP',
-  `user_agent` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '浏览器 UA',
-  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
+  `username` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '用户账号',
+  `user_ip` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '用户 IP',
+  `user_agent` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '浏览器 UA',
+  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '创建者',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
+  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '更新者',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   `tenant_id` bigint NOT NULL DEFAULT '0' COMMENT '租户编号',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='用户在线 Session';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用户在线 Session';
 
 -- ----------------------------
 -- Records of sys_user_session
 -- ----------------------------
 BEGIN;
 INSERT INTO `sys_user_session` VALUES ('0180929bb4b244b891253885e86ad9d1', 1, 2, '2021-12-16 09:37:48', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2021-12-16 09:07:48', NULL, '2021-12-16 09:07:48', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('01b7469337864db7a9b65747f38fa928', 1, 2, '2021-12-31 14:29:42', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2021-12-31 13:49:05', NULL, '2021-12-31 13:59:42', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('01f68d27b18b414ebfa7f417ffbbe185', 103, 2, '2022-01-15 21:53:10', 'yuanma', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-15 21:23:10', NULL, '2022-01-15 13:31:15', b'1', 1);
+INSERT INTO `sys_user_session` VALUES ('04abd513bbee4a51973780f93cca16c2', 1, 2, '2022-01-03 05:59:14', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2022-01-03 05:29:14', NULL, '2022-01-03 05:29:14', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('04b9f6b2480c48deb3ea9d67c3db8cfe', 1, 2, '2022-01-16 02:47:08', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-16 01:37:56', NULL, '2022-01-16 02:17:08', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('0558f1e97ff044609ccb7c6e7ead6a6b', 1, 2, '2022-01-19 14:07:46', 'admin', '127.0.0.1', '', NULL, '2022-01-19 12:38:45', NULL, '2022-01-19 13:37:46', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('07b0c58cd92449319522a998cf883a37', 1, 2, '2022-01-08 11:07:28', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-08 10:37:28', NULL, '2022-01-08 10:37:28', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('0806e3aa2c0b446eb9b3496d9b63e51f', 103, 2, '2022-01-13 21:51:47', 'yuanma', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-13 21:21:47', NULL, '2022-01-13 21:21:47', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('09c26e452a6c44129a2d495478b40d27', 1, 2, '2022-01-02 13:25:15', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2022-01-02 12:06:51', NULL, '2022-01-02 12:55:15', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('0b03400e80544594b7e766d48b9d8aed', 1, 2, '2022-01-17 02:44:00', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-17 02:14:00', NULL, '2022-01-17 02:14:00', b'0', 1);
 INSERT INTO `sys_user_session` VALUES ('0b8545465544481da4d162a3a74a552e', 1, 2, '2021-12-15 23:48:37', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2021-12-15 22:44:07', NULL, '2021-12-15 23:18:37', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('0bf9cd592168451aad7b546ff085df58', 1, 2, '2022-01-03 00:00:30', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2022-01-02 23:30:30', NULL, '2022-01-02 15:39:40', b'1', 1);
+INSERT INTO `sys_user_session` VALUES ('0c5e3db754714de38ed163c3ef53fb19', 1, 2, '2022-01-17 01:20:21', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-16 21:33:06', NULL, '2022-01-17 00:50:21', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('0c8f02172a894f11a3d054a5811e1c5b', 1, 2, '2022-01-03 09:25:54', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2022-01-03 08:32:07', NULL, '2022-01-03 01:17:42', b'1', 1);
+INSERT INTO `sys_user_session` VALUES ('0fef9f0bc17047008bef199f1682dce0', 1, 2, '2022-01-21 23:22:20', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-21 22:29:19', NULL, '2022-01-21 22:52:20', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('1645cee3484248929f406fccf8772e67', 1, 2, '2022-01-18 08:43:25', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-18 08:01:22', NULL, '2022-01-18 08:13:25', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('166cea69fca846c985c62dd365994561', 1, 2, '2022-01-03 11:36:12', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2022-01-03 09:17:50', NULL, '2022-01-03 11:06:12', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('1893bfb924174e3c82f02f18be0606fd', 1, 2, '2022-01-04 00:05:19', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2022-01-03 23:35:19', NULL, '2022-01-03 23:35:19', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('1995595036aa4652bb887c43cfd35ba8', 1, 2, '2022-01-01 00:18:24', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2021-12-31 22:57:57', NULL, '2021-12-31 23:48:24', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('19fdd80f6ba3491b8a5cd934694a2ddc', 103, 2, '2022-01-11 22:40:28', 'yuanma', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-11 22:10:28', NULL, '2022-01-11 22:10:28', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('1b6154299e1a470ebf80d2eaef72b0e2', 1, 2, '2022-01-02 11:59:52', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2022-01-02 09:30:29', NULL, '2022-01-02 11:29:52', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('1b7c79d9d8b04b4fb826564fce41f77c', 1, 2, '2022-01-03 22:42:07', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2022-01-03 22:12:07', NULL, '2022-01-03 22:12:07', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('1b848d99cde6448097dcedc83fda4c0a', 1, 2, '2021-12-31 10:45:09', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2021-12-31 08:35:36', NULL, '2021-12-31 10:15:09', b'0', 1);
 INSERT INTO `sys_user_session` VALUES ('1bc6ad0827fe48099bcbdb9a206818ac', 104, 2, '2021-12-15 23:48:59', 'test', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2021-12-15 23:18:59', NULL, '2021-12-15 23:18:59', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('1bfa6a2ed10741fbb03996a48656f0d2', 1, 2, '2022-01-14 10:48:14', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-14 10:18:14', NULL, '2022-01-14 10:18:14', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('2150cb32189f4ccdba60a7209dac1e0d', 1, 2, '2022-01-15 22:49:10', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-15 22:19:10', NULL, '2022-01-15 14:20:19', b'1', 1);
+INSERT INTO `sys_user_session` VALUES ('234b1084a5574ffc920669d4d230a18b', 1, 2, '2022-01-19 00:08:56', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-18 23:38:56', NULL, '2022-01-18 23:38:56', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('251bab4618b644faa2c54083ac8b1902', 1, 2, '2022-01-08 01:34:39', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-08 00:37:26', NULL, '2022-01-07 17:10:10', b'1', 1);
+INSERT INTO `sys_user_session` VALUES ('27052d883f1047e68b0841429d234b6b', 1, 2, '2022-01-08 10:25:42', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-08 09:55:42', NULL, '2022-01-08 09:55:42', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('27d8ed14a6394e1f8be6fad865d8355a', 1, 2, '2022-01-11 12:58:28', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-11 12:28:28', NULL, '2022-01-11 12:28:28', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('28d90f7da308407296fface4ca68d732', 1, 2, '2022-01-01 21:54:30', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2022-01-01 21:01:18', NULL, '2022-01-01 21:24:30', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('291f36ffc1da483981845efd20e8eae4', 1, 2, '2022-01-08 00:23:49', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-07 23:42:43', NULL, '2022-01-07 23:53:49', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('2b49a2e3f5494cebb4a3f19080853355', 103, 2, '2022-01-17 01:26:54', 'yuanma', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-17 00:56:54', NULL, '2022-01-17 00:56:54', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('2d920ad234a442cd98f5f517d50d6b60', 1, 2, '2022-01-02 16:47:41', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2022-01-02 14:34:30', NULL, '2022-01-02 16:17:41', b'0', 1);
 INSERT INTO `sys_user_session` VALUES ('2ec1ca2d0053415599fa18e6bddf710e', 104, 2, '2021-12-16 10:08:04', 'test', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2021-12-16 09:27:08', NULL, '2021-12-16 09:38:04', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('303e29836f3540c79188c835466318b2', 1, 2, '2022-01-19 10:40:31', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-19 08:35:23', NULL, '2022-01-19 10:10:31', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('32a043324c7541d191cdf6a8b667ad6c', 103, 2, '2022-01-15 22:44:58', 'yuanma', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-15 22:00:56', NULL, '2022-01-15 14:19:00', b'1', 1);
+INSERT INTO `sys_user_session` VALUES ('32c405074a3b462681bca9afd26fdfe9', 103, 2, '2022-01-13 13:43:30', 'yuanma', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-13 13:03:29', NULL, '2022-01-13 13:13:30', b'0', 1);
 INSERT INTO `sys_user_session` VALUES ('345ad9af8d0c46c8ad285b57cabfd060', 1, 2, '2021-12-25 19:57:51', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2021-12-25 19:15:06', NULL, '2021-12-25 19:27:51', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('355c57509a5643519107ec132bd85ba6', 103, 2, '2022-01-14 00:49:12', 'yuanma', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-13 23:12:26', NULL, '2022-01-14 00:19:12', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('367c9c23eb4e4539be4ecc737af8fbf6', 103, 2, '2022-01-14 20:39:07', 'yuanma', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-14 18:39:31', NULL, '2022-01-14 20:09:07', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('374d99e8a41b464c98f73ddbc5aa4d29', 1, 2, '2022-01-03 04:04:14', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2022-01-02 23:39:46', NULL, '2022-01-03 03:34:14', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('39647615e860424ebcc9b3f598f135be', 103, 2, '2022-01-18 01:03:40', 'yuanma', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-18 00:33:40', NULL, '2022-01-17 16:33:44', b'1', 1);
+INSERT INTO `sys_user_session` VALUES ('3cc54b8687504a388b5b8c7457d16382', 1, 2, '2022-01-10 21:01:18', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-10 20:18:15', NULL, '2022-01-10 20:31:18', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('3d9a4ffee19c47dfbc3c807adccf4c23', 1, 2, '2022-01-20 01:43:32', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-20 00:32:48', NULL, '2022-01-20 01:13:32', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('3ec1ce407e8a4accab0b51e756ab74be', 1, 2, '2022-01-20 14:01:25', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-20 12:46:56', NULL, '2022-01-20 13:31:25', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('42c1711b9b6448c18b0cd621b20bd9e2', 1, 2, '2022-01-16 00:23:32', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-15 23:53:32', NULL, '2022-01-15 23:53:32', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('439e30be513e42c094a0a0296b761cc5', 1, 2, '2022-01-13 01:24:38', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-13 00:33:14', NULL, '2022-01-13 00:54:38', b'0', 1);
 INSERT INTO `sys_user_session` VALUES ('47949a90a88d4c49823d70995d980ee9', 1, 2, '2021-12-16 10:04:30', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2021-12-16 09:20:41', NULL, '2021-12-16 09:34:30', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('488438fbac1e490aba5fadbc5aef18c8', 1, 2, '2022-01-09 00:45:11', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-08 23:07:53', NULL, '2022-01-09 00:15:11', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('495da339c78846609991d9bc66e17dcf', 1, 2, '2021-12-31 22:54:24', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2021-12-31 21:47:55', NULL, '2021-12-31 22:24:24', b'0', 1);
 INSERT INTO `sys_user_session` VALUES ('4e00d142b22e4826938de31c221b6b32', 104, 2, '2021-12-16 09:54:24', 'test', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2021-12-16 09:24:24', NULL, '2021-12-16 01:27:04', b'1', 1);
+INSERT INTO `sys_user_session` VALUES ('4f18d2a257bb45148f64b5dd8a895fad', 1, 2, '2022-01-08 23:37:52', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-08 23:07:52', NULL, '2022-01-08 23:07:52', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('51b1fc7d18264e7e97b1992b4994551a', 1, 2, '2022-01-22 20:11:04', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-22 18:37:19', NULL, '2022-01-22 19:41:04', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('55d703899dc74e6881e2a52d11e155dc', 1, 2, '2022-01-16 19:10:11', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-16 17:38:41', NULL, '2022-01-16 18:40:11', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('569063f65eb24fcc92df57779ea671d5', 1, 2, '2022-01-14 23:10:22', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-14 22:23:55', NULL, '2022-01-14 22:40:22', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('5921e2838860430b80d02c2dc5bc9b14', 1, 2, '2022-01-01 18:38:17', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2022-01-01 17:19:06', NULL, '2022-01-01 18:08:17', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('5c8b305b180648c4919384c2204262f1', 1, 2, '2022-01-18 00:20:50', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-17 23:50:50', NULL, '2022-01-17 15:50:58', b'1', 1);
+INSERT INTO `sys_user_session` VALUES ('5cb75ff3873b4ee99c54ca8126b6a239', 103, 2, '2022-01-18 00:21:08', 'yuanma', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-17 23:51:08', NULL, '2022-01-17 23:51:08', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('5d65f92a84b5497787686e513289372f', 1, 2, '2022-01-16 00:16:18', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-15 23:46:18', NULL, '2022-01-15 15:47:33', b'1', 1);
+INSERT INTO `sys_user_session` VALUES ('5e8984281b354935b422c95a06ac9ff8', 1, 2, '2022-01-20 14:21:17', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-20 13:31:17', NULL, '2022-01-20 13:51:17', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('604d98299b7243ddafa3ee0350f6edce', 1, 2, '2022-01-22 01:00:30', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-22 00:00:28', NULL, '2022-01-22 00:30:30', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('63d50b8b7e4448f98bd4ab2c084ac18f', 103, 2, '2022-01-17 13:18:45', 'yuanma', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-17 12:48:45', NULL, '2022-01-17 12:48:45', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('63ea8e8249cb4089b4b0d10256f39ba4', 1, 2, '2022-01-11 13:52:44', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-11 13:22:44', NULL, '2022-01-11 05:23:14', b'1', 1);
 INSERT INTO `sys_user_session` VALUES ('64f51e60527349d6b4a0a74f3d8eca97', 104, 2, '2021-12-16 07:37:54', 'test', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2021-12-16 07:07:54', NULL, '2021-12-16 07:07:54', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('6b7d55bad59e401cb1f8d6c418bf552e', 103, 2, '2022-01-14 10:43:59', 'yuanma', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-14 09:49:52', NULL, '2022-01-14 10:13:59', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('6d554dd8e0724ff9907bc1186119280c', 1, 2, '2022-01-23 01:22:38', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-22 23:30:35', NULL, '2022-01-23 00:52:38', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('6f0e4f523b13484c94d0dfe49d505d41', 103, 2, '2022-01-13 10:46:00', 'yuanma', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-13 09:51:45', NULL, '2022-01-13 10:16:00', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('725e3f1407844ffebbaf02ba0673e0a4', 103, 2, '2022-01-16 12:23:58', 'yuanma', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-16 11:53:58', NULL, '2022-01-16 11:53:58', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('729362aa59ed43cf9606a163883f2f2a', 103, 2, '2022-01-15 22:27:50', 'yuanma', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-15 21:32:02', NULL, '2022-01-15 13:58:33', b'1', 1);
+INSERT INTO `sys_user_session` VALUES ('79924bcc8d594452a8ee8406d312b2c2', 1, 2, '2022-01-01 23:37:34', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2022-01-01 22:02:06', NULL, '2022-01-01 23:07:34', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('7aa8d8f930f34aba857c14db311a9a02', 1, 2, '2022-01-11 10:44:50', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-11 09:58:54', NULL, '2022-01-11 10:14:50', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('7b60ae1b30734903a34b9c7f8723d5e2', 103, 2, '2022-01-14 01:33:42', 'yuanma', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-14 00:51:03', NULL, '2022-01-14 01:03:42', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('7bc4dca653954475b05cf233c08f783e', 103, 2, '2022-01-15 13:23:54', 'yuanma', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-15 11:56:10', NULL, '2022-01-15 12:53:54', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('7d55dfdc996d4d24a0c4c6aad6065ca4', 103, 2, '2022-01-12 01:00:08', 'yuanma', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-11 23:33:26', NULL, '2022-01-12 00:30:08', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('83c9839e34454f0eba630f29002d0ee3', 1, 2, '2022-01-09 23:00:41', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-09 20:59:49', NULL, '2022-01-09 22:30:41', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('845e9e7778a64200a87993db0fe6872d', 1, 2, '2022-01-21 00:12:44', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-20 23:42:44', NULL, '2022-01-20 23:42:44', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('84cc13aee41d473c987c1c0381cc05b1', 1, 2, '2022-01-09 02:01:10', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-09 01:03:29', NULL, '2022-01-09 01:31:10', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('882e89a623154797ac2a213c78da1f69', 1, 2, '2022-01-18 00:13:23', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-17 23:33:03', NULL, '2022-01-17 23:43:23', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('89bd23481c9a4b598ebea524679441b3', 103, 2, '2022-01-15 00:57:03', 'yuanma', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-14 23:51:41', NULL, '2022-01-15 00:27:03', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('89cc980ca0d941109b3933c82d01d9c3', 103, 2, '2022-01-15 22:30:17', 'yuanma', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-15 22:00:17', NULL, '2022-01-15 14:00:35', b'1', 1);
+INSERT INTO `sys_user_session` VALUES ('8c49cc6f52154dca9da6a2632985aa35', 1, 2, '2022-01-08 09:05:55', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-08 07:10:02', NULL, '2022-01-08 08:35:55', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('8e9599699f5141d2b041b855c7b34181', 1, 2, '2022-01-16 13:45:56', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-16 13:15:56', NULL, '2022-01-16 13:15:56', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('9122b55409a94388a7b277ad808a127c', 1, 2, '2022-01-01 17:18:53', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2022-01-01 16:20:04', NULL, '2022-01-01 16:48:53', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('91b94971b7f044c8b68420e6ef7377af', 1, 2, '2022-01-02 17:32:50', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2022-01-02 17:02:50', NULL, '2022-01-02 17:02:50', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('93ada27b50d24c1a9b476c7fd4fef2ce', 1, 2, '2022-01-11 13:49:11', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-11 13:09:10', NULL, '2022-01-11 05:22:27', b'1', 1);
+INSERT INTO `sys_user_session` VALUES ('93caa65dbd9d480299850552067a031a', 1, 2, '2022-01-15 22:01:33', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-15 21:31:33', NULL, '2022-01-15 13:31:53', b'1', 1);
 INSERT INTO `sys_user_session` VALUES ('945e4bb19f4d4c28ba7135218ee3abe3', 1, 2, '2021-12-16 08:28:54', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2021-12-16 07:42:25', NULL, '2021-12-16 07:58:54', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('9526809b303f489b8aab0c05e6b483dd', 1, 2, '2022-01-01 00:51:19', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2022-01-01 00:21:19', NULL, '2022-01-01 00:21:19', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('9655c170353849dfadfdc810c6c5ca61', 1, 2, '2022-01-03 12:50:55', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2022-01-03 11:56:55', NULL, '2022-01-03 12:20:55', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('9a84339c3c594140b0c3a9bfe95f7919', 1, 2, '2022-01-18 01:03:28', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-18 00:33:28', NULL, '2022-01-18 00:33:28', b'0', 1);
 INSERT INTO `sys_user_session` VALUES ('9ee1349d7d3043759cb742a0fa5a3163', 1, 2, '2021-12-25 19:08:33', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2021-12-25 18:38:33', NULL, '2021-12-25 18:38:33', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('9f3266f59b8746c3bfe143361d86f6e8', 1, 2, '2022-01-08 22:31:37', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-08 22:01:37', NULL, '2022-01-08 22:01:37', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('a09624232ed94b44a846023790e6282f', 1, 2, '2022-01-09 13:45:26', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-09 12:59:15', NULL, '2022-01-09 13:15:26', b'0', 1);
 INSERT INTO `sys_user_session` VALUES ('a155e6dfe4b74fbaa69fcca239facc40', 1, 2, '2021-12-16 07:37:39', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2021-12-16 07:07:39', NULL, '2021-12-16 07:07:39', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('a17d02a7c4264f7489728f510e40e823', 1, 2, '2022-01-17 13:18:31', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-17 12:48:31', NULL, '2022-01-17 04:48:37', b'1', 1);
+INSERT INTO `sys_user_session` VALUES ('a30e807e5db640feb92bb1eeb4ae89d0', 1, 2, '2022-01-16 12:23:10', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-16 11:53:10', NULL, '2022-01-16 11:53:10', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('a4688af426e342a69c814d07bb8f7d3b', 1, 2, '2022-01-08 17:21:11', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-08 16:25:34', NULL, '2022-01-08 16:51:11', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('a49e304816e0477998592c76caa9546d', 1, 2, '2022-01-16 01:20:18', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-16 00:30:18', NULL, '2022-01-16 00:50:18', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('a55b31ff9e6a41fcb931d2244b4240a8', 1, 2, '2021-12-30 22:32:56', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2021-12-30 20:04:02', NULL, '2021-12-30 22:02:56', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('a88e404ba71e41b0a16c75a8ce44bb9d', 1, 2, '2022-01-09 11:57:51', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-09 11:27:51', NULL, '2022-01-09 11:27:51', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('a9b27f95517d4ef9ae15c68bd4365d1b', 103, 2, '2022-01-11 20:37:20', 'yuanma', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-11 19:35:41', NULL, '2022-01-11 20:07:20', b'0', 1);
 INSERT INTO `sys_user_session` VALUES ('ab449ce8f2ea456591d23515c188c242', 1, 2, '2021-12-25 17:55:45', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2021-12-25 16:42:42', NULL, '2021-12-25 17:25:45', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('ac730d1c96be41e5821a6de24b23bf7b', 103, 2, '2022-01-11 20:05:41', 'yuanma', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-11 19:35:41', NULL, '2022-01-11 19:35:41', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('ac88c6d1cb184979a015e9a8b50e21f0', 1, 2, '2022-01-03 04:59:36', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2022-01-03 03:39:08', NULL, '2022-01-03 04:29:36', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('ae2a8c4a7df64271b0e7a2b702c378f8', 1, 2, '2022-01-18 02:18:53', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-18 00:58:20', NULL, '2022-01-18 01:48:53', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('b12325b8930245c09b75aa100dc1124d', 1, 2, '2022-01-01 09:12:53', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2022-01-01 08:09:05', NULL, '2022-01-01 08:42:53', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('b523e3add6e74587b247b467de677325', 1, 2, '2022-01-18 01:15:31', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-18 00:33:47', NULL, '2022-01-18 00:45:31', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('b6a02289210b4861b71a363b11b6b919', 1, 2, '2022-01-09 11:23:22', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-09 10:39:49', NULL, '2022-01-09 10:53:22', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('b883ba1582f54826b42fa073276c85cb', 1, 2, '2022-01-08 01:40:34', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-08 01:10:34', NULL, '2022-01-08 01:10:34', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('ba1658c24b78442fb39062e31d902a5f', 1, 2, '2022-01-10 20:12:44', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-10 19:21:24', NULL, '2022-01-10 19:42:44', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('bb14f39f65ca41cc8ef915ad7f0c25d6', 1, 2, '2022-01-09 09:40:48', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-09 08:48:56', NULL, '2022-01-09 09:10:48', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('bd2b51a53b8d4046b024f43406985caf', 103, 2, '2022-01-15 23:31:38', 'yuanma', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-15 22:20:30', NULL, '2022-01-15 23:01:38', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('bd52c43710274cd8bd888b1737cd939d', 1, 2, '2022-01-22 23:09:46', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-22 20:45:15', NULL, '2022-01-22 22:39:46', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('bd655254904748f79c0ad47dfb49d457', 1, 2, '2022-01-01 08:05:32', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2022-01-01 07:35:32', NULL, '2022-01-01 07:35:32', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('be98e2f02a444a4092d1cea3dc6e3073', 1, 2, '2022-01-17 13:34:51', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-17 12:26:04', NULL, '2022-01-17 13:04:51', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('c09baa895d79468db63417f60c65573c', 1, 2, '2022-01-01 11:33:44', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2022-01-01 10:13:48', NULL, '2022-01-01 11:03:44', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('c1797274297f4cd7b859c6c482d06005', 1, 2, '2022-01-09 10:26:00', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-09 09:44:24', NULL, '2022-01-09 09:56:00', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('c7c4d30623c84d3e88aab2f0b742e7c3', 1, 2, '2022-01-21 01:14:47', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-21 00:24:00', NULL, '2022-01-20 16:54:39', b'1', 1);
+INSERT INTO `sys_user_session` VALUES ('c7fc3e37d927405ebbe66df3dd5fd77e', 103, 2, '2022-01-13 01:01:29', 'yuanma', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-12 22:57:04', NULL, '2022-01-13 00:31:29', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('cbd09ba52ccc47b2a639a6e28e92894f', 103, 2, '2022-01-12 01:34:01', 'yuanma', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-12 01:04:01', NULL, '2022-01-12 01:04:01', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('ccc85a8ee5a7407c97012b755cde979e', 1, 2, '2022-01-16 18:08:41', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-16 17:38:41', NULL, '2022-01-16 17:38:41', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('d229b8f8ef4d4df4afd05209acc87446', 1, 2, '2022-01-08 11:02:36', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-08 10:32:36', NULL, '2022-01-08 02:37:12', b'1', 1);
+INSERT INTO `sys_user_session` VALUES ('d46d26f08f624eb28eb665b6515587bd', 1, 2, '2022-01-16 00:19:32', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-15 23:49:32', NULL, '2022-01-15 23:49:32', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('d4aeab42d1934197865ce72ffe244009', 1, 2, '2022-01-16 03:11:56', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-16 02:41:56', NULL, '2022-01-16 02:41:56', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('d8550bde3c8b43a194e592b49c856c71', 1, 2, '2022-01-09 21:26:38', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-09 19:38:12', NULL, '2022-01-09 20:56:38', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('d8ebbe89793f4a829a108c4f1badbb11', 103, 2, '2022-01-13 21:18:56', 'yuanma', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-13 20:38:43', NULL, '2022-01-13 20:48:56', b'0', 1);
 INSERT INTO `sys_user_session` VALUES ('da04f99dc14a4f28a8a77178861cb3ed', 104, 2, '2021-12-15 23:37:58', 'test', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2021-12-15 22:47:31', NULL, '2021-12-15 15:11:55', b'1', 1);
+INSERT INTO `sys_user_session` VALUES ('daec82cc885849a7bbab76eb9f0a4b32', 1, 2, '2022-01-15 23:31:35', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-15 22:00:43', NULL, '2022-01-15 23:01:35', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('dbaaa89e1659488c9693317454fe6ae2', 1, 2, '2022-01-14 22:53:55', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-14 22:23:55', NULL, '2022-01-14 22:23:55', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('dbe0f27930244ae38e0322226d6ecdbb', 1, 2, '2022-01-21 01:46:31', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-21 00:54:45', NULL, '2022-01-21 01:16:31', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('dd2e53ccf8c44b3e8556571687d4825d', 103, 2, '2022-01-12 01:34:01', 'yuanma', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-12 01:04:01', NULL, '2022-01-12 01:04:01', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('ddb9d3c65ee14c4a8ff1a3cf0e10e69a', 1, 2, '2022-01-19 00:52:57', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-19 00:22:57', NULL, '2022-01-19 00:22:57', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('ddd32e0a43d644ca95ba10e4e5b19416', 1, 2, '2022-01-03 19:28:22', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2022-01-03 17:22:27', NULL, '2022-01-03 18:58:22', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('df12a50eb8814317bb8e1003e098cbe7', 1, 2, '2022-01-09 19:04:00', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-09 16:26:16', NULL, '2022-01-09 18:34:00', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('e198f4f04da243d5b80caa0c8336d6a0', 103, 2, '2022-01-14 19:09:16', 'yuanma', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-14 18:39:16', NULL, '2022-01-14 10:39:24', b'1', 1);
+INSERT INTO `sys_user_session` VALUES ('e290aebda5f34c379d0cf3e013cbcc8b', 1, 2, '2022-01-02 09:27:23', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2022-01-02 08:32:23', NULL, '2022-01-02 08:57:23', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('e2efa96cacbb47b580096193244a3739', 1, 2, '2022-01-14 14:24:13', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-14 13:44:04', NULL, '2022-01-14 13:54:13', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('e3c0319f639a481999bac6fa250af552', 1, 2, '2022-01-03 16:56:06', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2022-01-03 16:14:34', NULL, '2022-01-03 16:26:06', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('e42efabb61af4f5eaeea3b84693871da', 1, 2, '2022-01-15 22:28:55', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-15 21:58:55', NULL, '2022-01-15 14:00:08', b'1', 1);
+INSERT INTO `sys_user_session` VALUES ('e75c264df71342a59a85a6512a5a1fb7', 1, 2, '2022-01-22 19:18:46', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-22 18:30:58', NULL, '2022-01-22 18:48:46', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('f10cabf849b245ebbaa5284b540c0bb2', 103, 2, '2022-01-11 21:51:14', 'yuanma', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-11 20:54:19', NULL, '2022-01-11 21:21:14', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('f49ade9038d24a73832e64efcc30b205', 103, 2, '2022-01-11 13:53:26', 'yuanma', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-11 13:23:26', NULL, '2022-01-11 13:23:26', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('f562fd12a7bb41f19ca1bf4aa5e3c9d1', 1, 2, '2022-01-22 02:42:51', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-22 01:20:59', NULL, '2022-01-22 02:12:51', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('f76c8610a7e5461aac8972e21f14e734', 1, 2, '2022-01-22 21:52:44', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-22 20:29:53', NULL, '2022-01-22 21:22:44', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('f974a40ea70941cdb9e04cb63bf5e557', 1, 2, '2022-01-16 02:00:25', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36', NULL, '2022-01-16 01:30:25', NULL, '2022-01-16 01:30:25', b'0', 1);
+INSERT INTO `sys_user_session` VALUES ('f9f257cf09e640f2904696f2de35d3f6', 1, 2, '2022-01-03 21:42:44', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2022-01-03 20:59:23', NULL, '2022-01-03 21:12:44', b'0', 1);
 INSERT INTO `sys_user_session` VALUES ('fe82f6ecb17449b595c7d6bd4bc1d371', 1, 2, '2021-12-15 23:16:49', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2021-12-15 22:46:49', NULL, '2021-12-15 14:46:53', b'1', 1);
+INSERT INTO `sys_user_session` VALUES ('ffeae9ee4b8649b6b9ececaa502a934d', 1, 2, '2022-01-01 19:56:49', 'admin', '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36', NULL, '2022-01-01 18:47:31', NULL, '2022-01-01 19:26:49', b'0', 1);
 COMMIT;
 
 -- ----------------------------
@@ -2014,48 +2878,48 @@ DROP TABLE IF EXISTS `tool_codegen_column`;
 CREATE TABLE `tool_codegen_column` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号',
   `table_id` bigint NOT NULL COMMENT '表编号',
-  `column_name` varchar(200) COLLATE utf8mb4_general_ci NOT NULL COMMENT '字段名',
-  `column_type` varchar(100) COLLATE utf8mb4_general_ci NOT NULL COMMENT '字段类型',
-  `column_comment` varchar(500) COLLATE utf8mb4_general_ci NOT NULL COMMENT '字段描述',
+  `column_name` varchar(200) NOT NULL COMMENT '字段名',
+  `column_type` varchar(100) NOT NULL COMMENT '字段类型',
+  `column_comment` varchar(500) NOT NULL COMMENT '字段描述',
   `nullable` bit(1) NOT NULL COMMENT '是否允许为空',
   `primary_key` bit(1) NOT NULL COMMENT '是否主键',
-  `auto_Increment` char(1) COLLATE utf8mb4_general_ci NOT NULL COMMENT '是否自增',
+  `auto_Increment` char(1) NOT NULL COMMENT '是否自增',
   `ordinal_position` int NOT NULL COMMENT '排序',
-  `java_type` varchar(32) COLLATE utf8mb4_general_ci NOT NULL COMMENT 'Java 属性类型',
-  `java_field` varchar(64) COLLATE utf8mb4_general_ci NOT NULL COMMENT 'Java 属性名',
-  `dict_type` varchar(200) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '字典类型',
-  `example` varchar(64) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '数据示例',
+  `java_type` varchar(32) NOT NULL COMMENT 'Java 属性类型',
+  `java_field` varchar(64) NOT NULL COMMENT 'Java 属性名',
+  `dict_type` varchar(200) DEFAULT '' COMMENT '字典类型',
+  `example` varchar(64) DEFAULT NULL COMMENT '数据示例',
   `create_operation` bit(1) NOT NULL COMMENT '是否为 Create 创建操作的字段',
   `update_operation` bit(1) NOT NULL COMMENT '是否为 Update 更新操作的字段',
   `list_operation` bit(1) NOT NULL COMMENT '是否为 List 查询操作的字段',
-  `list_operation_condition` varchar(32) COLLATE utf8mb4_general_ci NOT NULL DEFAULT '=' COMMENT 'List 查询操作的条件类型',
+  `list_operation_condition` varchar(32) NOT NULL DEFAULT '=' COMMENT 'List 查询操作的条件类型',
   `list_operation_result` bit(1) NOT NULL COMMENT '是否为 List 查询操作的返回字段',
-  `html_type` varchar(32) COLLATE utf8mb4_general_ci NOT NULL COMMENT '显示类型',
-  `creator` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
+  `html_type` varchar(32) NOT NULL COMMENT '显示类型',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `updater` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=479 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='代码生成表字段定义';
+) ENGINE=InnoDB AUTO_INCREMENT=513 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='代码生成表字段定义';
 
 -- ----------------------------
 -- Records of tool_codegen_column
 -- ----------------------------
 BEGIN;
-INSERT INTO `tool_codegen_column` VALUES (243, 21, 'id', 'int(5)', '参数主键', b'0', b'1', '1', 1, 'Integer', 'id', '', NULL, b'0', b'1', b'0', '=', b'1', 'input', '', '2021-02-06 19:51:35', '', '2021-02-06 19:51:35', b'0');
-INSERT INTO `tool_codegen_column` VALUES (244, 21, 'group', 'varchar(50)', '参数分组', b'0', b'0', '0', 2, 'String', 'group', '', NULL, b'1', b'1', b'0', '=', b'1', 'input', '', '2021-02-06 19:51:35', '', '2021-03-06 02:20:02', b'0');
-INSERT INTO `tool_codegen_column` VALUES (245, 21, 'type', 'tinyint(4)', '参数类型', b'0', b'0', '0', 3, 'Integer', 'type', '', NULL, b'1', b'1', b'1', '=', b'1', 'select', '', '2021-02-06 19:51:35', '', '2021-02-06 19:51:35', b'0');
-INSERT INTO `tool_codegen_column` VALUES (246, 21, 'name', 'varchar(100)', '参数名称', b'0', b'0', '0', 4, 'String', 'name', '', NULL, b'1', b'1', b'1', 'LIKE', b'1', 'input', '', '2021-02-06 19:51:35', '', '2021-02-06 19:51:35', b'0');
-INSERT INTO `tool_codegen_column` VALUES (247, 21, 'key', 'varchar(100)', '参数键名', b'0', b'0', '0', 5, 'String', 'key', '', NULL, b'1', b'1', b'1', '=', b'1', 'input', '', '2021-02-06 19:51:35', '', '2021-02-06 19:51:35', b'0');
-INSERT INTO `tool_codegen_column` VALUES (248, 21, 'value', 'varchar(500)', '参数键值', b'0', b'0', '0', 6, 'String', 'value', '', NULL, b'1', b'1', b'0', '=', b'1', 'input', '', '2021-02-06 19:51:35', '', '2021-03-06 02:20:02', b'0');
-INSERT INTO `tool_codegen_column` VALUES (249, 21, 'sensitive', 'bit(1)', '是否敏感', b'0', b'0', '0', 7, 'Boolean', 'sensitive', '', NULL, b'1', b'1', b'0', '=', b'1', 'radio', '', '2021-02-06 19:51:35', '', '2021-03-06 02:20:02', b'0');
-INSERT INTO `tool_codegen_column` VALUES (250, 21, 'remark', 'varchar(500)', '备注', b'1', b'0', '0', 8, 'String', 'remark', '', NULL, b'1', b'1', b'0', '=', b'1', 'input', '', '2021-02-06 19:51:35', '', '2021-03-06 02:20:02', b'0');
-INSERT INTO `tool_codegen_column` VALUES (251, 21, 'creator', 'varchar(64)', '创建者', b'1', b'0', '0', 9, 'String', 'createBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-02-06 19:51:35', '', '2021-02-06 19:51:35', b'0');
-INSERT INTO `tool_codegen_column` VALUES (252, 21, 'create_time', 'datetime', '创建时间', b'0', b'0', '0', 10, 'Date', 'createTime', '', NULL, b'0', b'0', b'1', 'BETWEEN', b'1', 'datetime', '', '2021-02-06 19:51:35', '', '2021-02-06 19:51:35', b'0');
-INSERT INTO `tool_codegen_column` VALUES (253, 21, 'updater', 'varchar(64)', '更新者', b'1', b'0', '0', 11, 'String', 'updateBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-02-06 19:51:35', '', '2021-02-06 19:51:35', b'0');
-INSERT INTO `tool_codegen_column` VALUES (254, 21, 'update_time', 'datetime', '更新时间', b'0', b'0', '0', 12, 'Date', 'updateTime', '', NULL, b'0', b'0', b'0', 'BETWEEN', b'0', 'datetime', '', '2021-02-06 19:51:35', '', '2021-02-06 19:51:35', b'0');
-INSERT INTO `tool_codegen_column` VALUES (255, 21, 'deleted', 'bit(1)', '是否删除', b'0', b'0', '0', 13, 'Boolean', 'deleted', '', NULL, b'0', b'0', b'0', '=', b'0', 'radio', '', '2021-02-06 19:51:35', '', '2021-02-06 19:51:35', b'0');
+INSERT INTO `tool_codegen_column` VALUES (243, 21, 'id', 'int(5)', '参数主键', b'0', b'1', '1', 1, 'Integer', 'id', '', NULL, b'0', b'1', b'0', '=', b'1', 'input', '', '2021-02-06 19:51:35', '1', '2021-12-31 22:06:46', b'0');
+INSERT INTO `tool_codegen_column` VALUES (244, 21, 'group', 'varchar(50)', '参数分组', b'0', b'0', '0', 2, 'String', 'group', '', NULL, b'1', b'1', b'0', '=', b'1', 'input', '', '2021-02-06 19:51:35', '1', '2021-12-31 22:06:46', b'0');
+INSERT INTO `tool_codegen_column` VALUES (245, 21, 'type', 'tinyint(4)', '参数类型', b'0', b'0', '0', 3, 'Integer', 'type', '', NULL, b'1', b'1', b'1', '=', b'1', 'select', '', '2021-02-06 19:51:35', '1', '2021-12-31 22:06:46', b'0');
+INSERT INTO `tool_codegen_column` VALUES (246, 21, 'name', 'varchar(100)', '参数名称', b'0', b'0', '0', 4, 'String', 'name', '', NULL, b'1', b'1', b'1', 'LIKE', b'1', 'input', '', '2021-02-06 19:51:35', '1', '2021-12-31 22:06:46', b'0');
+INSERT INTO `tool_codegen_column` VALUES (247, 21, 'key', 'varchar(100)', '参数键名', b'0', b'0', '0', 5, 'String', 'key', '', NULL, b'1', b'1', b'1', '=', b'1', 'input', '', '2021-02-06 19:51:35', '1', '2021-12-31 22:06:46', b'0');
+INSERT INTO `tool_codegen_column` VALUES (248, 21, 'value', 'varchar(500)', '参数键值', b'0', b'0', '0', 6, 'String', 'value', '', NULL, b'1', b'1', b'0', '=', b'1', 'input', '', '2021-02-06 19:51:35', '1', '2021-12-31 22:06:46', b'0');
+INSERT INTO `tool_codegen_column` VALUES (249, 21, 'sensitive', 'bit(1)', '是否敏感', b'0', b'0', '0', 7, 'Boolean', 'sensitive', '', NULL, b'1', b'1', b'0', '=', b'1', 'radio', '', '2021-02-06 19:51:35', '1', '2021-12-31 22:06:46', b'0');
+INSERT INTO `tool_codegen_column` VALUES (250, 21, 'remark', 'varchar(500)', '备注', b'1', b'0', '0', 8, 'String', 'remark', '', NULL, b'1', b'1', b'0', '=', b'1', 'input', '', '2021-02-06 19:51:35', '1', '2021-12-31 22:06:46', b'0');
+INSERT INTO `tool_codegen_column` VALUES (251, 21, 'creator', 'varchar(64)', '创建者', b'1', b'0', '0', 9, 'String', 'createBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-02-06 19:51:35', '1', '2021-12-31 22:06:46', b'0');
+INSERT INTO `tool_codegen_column` VALUES (252, 21, 'create_time', 'datetime', '创建时间', b'0', b'0', '0', 10, 'Date', 'createTime', '', NULL, b'0', b'0', b'1', 'BETWEEN', b'1', 'datetime', '', '2021-02-06 19:51:35', '1', '2021-12-31 22:06:46', b'0');
+INSERT INTO `tool_codegen_column` VALUES (253, 21, 'updater', 'varchar(64)', '更新者', b'1', b'0', '0', 11, 'String', 'updateBy', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '', '2021-02-06 19:51:35', '1', '2021-12-31 22:06:46', b'0');
+INSERT INTO `tool_codegen_column` VALUES (254, 21, 'update_time', 'datetime', '更新时间', b'0', b'0', '0', 12, 'Date', 'updateTime', '', NULL, b'0', b'0', b'0', 'BETWEEN', b'0', 'datetime', '', '2021-02-06 19:51:35', '1', '2021-12-31 22:06:46', b'0');
+INSERT INTO `tool_codegen_column` VALUES (255, 21, 'deleted', 'bit(1)', '是否删除', b'0', b'0', '0', 13, 'Boolean', 'deleted', '', NULL, b'0', b'0', b'0', '=', b'0', 'radio', '', '2021-02-06 19:51:35', '1', '2021-12-31 22:06:46', b'0');
 INSERT INTO `tool_codegen_column` VALUES (269, 24, 'id', 'bigint(20)', '任务编号', b'0', b'1', '1', 1, 'Long', 'id', '', '1024', b'0', b'1', b'0', '=', b'1', 'input', '', '2021-02-07 06:39:34', '', '2021-02-07 06:44:19', b'0');
 INSERT INTO `tool_codegen_column` VALUES (270, 24, 'name', 'varchar(32)', '任务名称', b'0', b'0', '0', 2, 'String', 'name', '', '测试任务', b'1', b'1', b'1', 'LIKE', b'1', 'input', '', '2021-02-07 06:39:34', '', '2021-02-07 06:44:19', b'0');
 INSERT INTO `tool_codegen_column` VALUES (271, 24, 'status', 'tinyint(4)', '任务状态', b'0', b'0', '0', 3, 'Integer', 'status', 'inf_job_status', '1', b'0', b'0', b'1', '=', b'1', 'radio', '', '2021-02-07 06:39:34', '', '2021-02-07 07:55:17', b'0');
@@ -2255,6 +3119,40 @@ INSERT INTO `tool_codegen_column` VALUES (475, 39, 'create_time', 'datetime', '�
 INSERT INTO `tool_codegen_column` VALUES (476, 39, 'updater', 'varchar(64)', '更新者', b'1', b'0', '0', 8, 'String', 'updater', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '1', '2021-12-14 09:51:12', '1', '2021-12-14 10:02:12', b'0');
 INSERT INTO `tool_codegen_column` VALUES (477, 39, 'update_time', 'datetime', '更新时间', b'0', b'0', '0', 9, 'Date', 'updateTime', '', NULL, b'0', b'0', b'0', 'BETWEEN', b'0', 'datetime', '1', '2021-12-14 09:51:12', '1', '2021-12-14 10:02:12', b'0');
 INSERT INTO `tool_codegen_column` VALUES (478, 39, 'deleted', 'bit(1)', '是否删除', b'0', b'0', '0', 10, 'Boolean', 'deleted', '', NULL, b'0', b'0', b'0', '=', b'0', 'radio', '1', '2021-12-14 09:51:12', '1', '2021-12-14 10:02:12', b'0');
+INSERT INTO `tool_codegen_column` VALUES (479, 40, 'id', 'bigint', '编号', b'0', b'1', '1', 1, 'Long', 'id', '', NULL, b'0', b'1', b'0', '=', b'1', 'input', '1', '2021-12-30 20:33:27', '1', '2021-12-30 20:37:58', b'0');
+INSERT INTO `tool_codegen_column` VALUES (480, 40, 'name', 'varchar(64)', '表单名', b'0', b'0', '0', 2, 'String', 'name', '', NULL, b'1', b'1', b'1', 'LIKE', b'1', 'input', '1', '2021-12-30 20:33:27', '1', '2021-12-30 20:37:58', b'0');
+INSERT INTO `tool_codegen_column` VALUES (481, 40, 'status', 'tinyint', '开启状态', b'0', b'0', '0', 3, 'Integer', 'status', 'sys_common_status', NULL, b'1', b'1', b'0', '=', b'1', 'radio', '1', '2021-12-30 20:33:27', '1', '2021-12-30 20:37:58', b'0');
+INSERT INTO `tool_codegen_column` VALUES (482, 40, 'fields', 'varchar(1024)', '表单配置', b'0', b'0', '0', 4, 'String', 'fields', '', NULL, b'1', b'1', b'0', '=', b'1', 'input', '1', '2021-12-30 20:33:27', '1', '2021-12-30 20:37:58', b'0');
+INSERT INTO `tool_codegen_column` VALUES (483, 40, 'remark', 'varchar(255)', '备注', b'1', b'0', '0', 5, 'String', 'remark', '', NULL, b'1', b'1', b'0', '=', b'1', 'input', '1', '2021-12-30 20:33:27', '1', '2021-12-30 20:37:58', b'0');
+INSERT INTO `tool_codegen_column` VALUES (484, 40, 'creator', 'varchar(64)', '创建者', b'1', b'0', '0', 6, 'String', 'creator', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '1', '2021-12-30 20:33:27', '1', '2021-12-30 20:37:58', b'0');
+INSERT INTO `tool_codegen_column` VALUES (485, 40, 'create_time', 'datetime', '创建时间', b'0', b'0', '0', 7, 'Date', 'createTime', '', NULL, b'0', b'0', b'0', 'BETWEEN', b'1', 'datetime', '1', '2021-12-30 20:33:27', '1', '2021-12-30 20:37:58', b'0');
+INSERT INTO `tool_codegen_column` VALUES (486, 40, 'updater', 'varchar(64)', '更新者', b'1', b'0', '0', 8, 'String', 'updater', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '1', '2021-12-30 20:33:27', '1', '2021-12-30 20:37:58', b'0');
+INSERT INTO `tool_codegen_column` VALUES (487, 40, 'update_time', 'datetime', '更新时间', b'0', b'0', '0', 9, 'Date', 'updateTime', '', NULL, b'0', b'0', b'0', 'BETWEEN', b'0', 'datetime', '1', '2021-12-30 20:33:27', '1', '2021-12-30 20:37:58', b'0');
+INSERT INTO `tool_codegen_column` VALUES (488, 40, 'deleted', 'bit(1)', '是否删除', b'0', b'0', '0', 10, 'Boolean', 'deleted', '', NULL, b'0', b'0', b'0', '=', b'0', 'radio', '1', '2021-12-30 20:33:27', '1', '2021-12-30 20:37:58', b'0');
+INSERT INTO `tool_codegen_column` VALUES (489, 41, 'id', 'bigint', '编号', b'0', b'1', '1', 1, 'Long', 'id', '', NULL, b'0', b'1', b'0', '=', b'1', 'input', '1', '2022-01-07 23:44:13', '1', '2022-01-07 23:52:21', b'0');
+INSERT INTO `tool_codegen_column` VALUES (490, 41, 'user_id', 'bigint', '发起流程的用户编号', b'0', b'0', '0', 2, 'Long', 'userId', '', NULL, b'1', b'1', b'0', '=', b'0', 'input', '1', '2022-01-07 23:44:13', '1', '2022-01-07 23:52:21', b'0');
+INSERT INTO `tool_codegen_column` VALUES (491, 41, 'name', 'varchar(64)', '流程实例的名字', b'0', b'0', '0', 3, 'String', 'name', '', NULL, b'1', b'1', b'1', 'LIKE', b'1', 'input', '1', '2022-01-07 23:44:13', '1', '2022-01-07 23:52:21', b'0');
+INSERT INTO `tool_codegen_column` VALUES (492, 41, 'process_instance_id', 'varchar(64)', '流程实例的编号', b'0', b'0', '0', 4, 'String', 'processInstanceId', '', NULL, b'1', b'1', b'0', '=', b'1', 'input', '1', '2022-01-07 23:44:13', '1', '2022-01-07 23:52:21', b'0');
+INSERT INTO `tool_codegen_column` VALUES (493, 41, 'process_definition_id', 'varchar(64)', '流程定义的编号', b'0', b'0', '0', 5, 'String', 'processDefinitionId', '', NULL, b'1', b'1', b'1', '=', b'1', 'input', '1', '2022-01-07 23:44:13', '1', '2022-01-07 23:52:21', b'0');
+INSERT INTO `tool_codegen_column` VALUES (494, 41, 'category', 'varchar(64)', '流程分类', b'0', b'0', '0', 6, 'String', 'category', 'bpm_model_category', NULL, b'1', b'1', b'1', '=', b'1', 'select', '1', '2022-01-07 23:44:13', '1', '2022-01-07 23:52:21', b'0');
+INSERT INTO `tool_codegen_column` VALUES (495, 41, 'status', 'tinyint', '流程实例的名字', b'0', b'0', '0', 7, 'Integer', 'status', 'bpm_process_instance_status', NULL, b'1', b'1', b'1', '=', b'1', 'select', '1', '2022-01-07 23:44:13', '1', '2022-01-07 23:52:21', b'0');
+INSERT INTO `tool_codegen_column` VALUES (496, 41, 'result', 'tinyint', '流程实例的结果', b'0', b'0', '0', 8, 'Integer', 'result', 'bpm_process_instance_result', NULL, b'1', b'1', b'1', '=', b'1', 'select', '1', '2022-01-07 23:44:13', '1', '2022-01-07 23:52:21', b'0');
+INSERT INTO `tool_codegen_column` VALUES (497, 41, 'creator', 'varchar(64)', '创建者', b'1', b'0', '0', 9, 'String', 'creator', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '1', '2022-01-07 23:44:13', '1', '2022-01-07 23:52:21', b'0');
+INSERT INTO `tool_codegen_column` VALUES (498, 41, 'create_time', 'datetime', '创建时间', b'0', b'0', '0', 10, 'Date', 'createTime', '', NULL, b'0', b'0', b'1', 'BETWEEN', b'1', 'datetime', '1', '2022-01-07 23:44:13', '1', '2022-01-07 23:52:21', b'0');
+INSERT INTO `tool_codegen_column` VALUES (499, 41, 'updater', 'varchar(64)', '更新者', b'1', b'0', '0', 11, 'String', 'updater', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '1', '2022-01-07 23:44:13', '1', '2022-01-07 23:52:21', b'0');
+INSERT INTO `tool_codegen_column` VALUES (500, 41, 'update_time', 'datetime', '更新时间', b'0', b'0', '0', 12, 'Date', 'updateTime', '', NULL, b'0', b'0', b'0', 'BETWEEN', b'0', 'datetime', '1', '2022-01-07 23:44:13', '1', '2022-01-07 23:52:21', b'0');
+INSERT INTO `tool_codegen_column` VALUES (501, 41, 'deleted', 'bit(1)', '是否删除', b'0', b'0', '0', 13, 'Boolean', 'deleted', '', NULL, b'0', b'0', b'0', '=', b'0', 'radio', '1', '2022-01-07 23:44:13', '1', '2022-01-07 23:52:21', b'0');
+INSERT INTO `tool_codegen_column` VALUES (502, 42, 'id', 'bigint', '编号', b'0', b'1', '1', 1, 'Long', 'id', '', '1024', b'0', b'1', b'0', '=', b'1', 'input', '103', '2022-01-14 09:51:58', '103', '2022-01-14 09:55:18', b'0');
+INSERT INTO `tool_codegen_column` VALUES (503, 42, 'name', 'varchar(30)', '组名', b'0', b'0', '0', 2, 'String', 'name', '', '芋道', b'1', b'1', b'1', 'LIKE', b'1', 'input', '103', '2022-01-14 09:51:58', '103', '2022-01-14 09:55:18', b'0');
+INSERT INTO `tool_codegen_column` VALUES (504, 42, 'description', 'varchar(255)', '描述', b'0', b'0', '0', 3, 'String', 'description', '', '芋道源码', b'1', b'1', b'0', '=', b'1', 'input', '103', '2022-01-14 09:51:58', '103', '2022-01-14 09:55:18', b'0');
+INSERT INTO `tool_codegen_column` VALUES (505, 42, 'member_user_ids', 'varchar(1024)', '成员编号数组', b'0', b'0', '0', 4, 'String', 'memberUserIds', '', '1,2,3', b'1', b'1', b'0', '=', b'1', 'select', '103', '2022-01-14 09:51:58', '103', '2022-01-14 09:55:18', b'0');
+INSERT INTO `tool_codegen_column` VALUES (506, 42, 'status', 'tinyint', '状态', b'0', b'0', '0', 5, 'Integer', 'status', 'sys_common_status', '1', b'1', b'1', b'1', '=', b'1', 'radio', '103', '2022-01-14 09:51:58', '103', '2022-01-14 09:55:18', b'0');
+INSERT INTO `tool_codegen_column` VALUES (507, 42, 'creator', 'varchar(64)', '创建者', b'1', b'0', '0', 6, 'String', 'creator', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '103', '2022-01-14 09:51:58', '103', '2022-01-14 09:55:18', b'0');
+INSERT INTO `tool_codegen_column` VALUES (508, 42, 'create_time', 'datetime', '创建时间', b'0', b'0', '0', 7, 'Date', 'createTime', '', NULL, b'0', b'0', b'1', 'BETWEEN', b'1', 'datetime', '103', '2022-01-14 09:51:58', '103', '2022-01-14 09:55:18', b'0');
+INSERT INTO `tool_codegen_column` VALUES (509, 42, 'updater', 'varchar(64)', '更新者', b'1', b'0', '0', 8, 'String', 'updater', '', NULL, b'0', b'0', b'0', '=', b'0', 'input', '103', '2022-01-14 09:51:58', '103', '2022-01-14 09:55:18', b'0');
+INSERT INTO `tool_codegen_column` VALUES (510, 42, 'update_time', 'datetime', '更新时间', b'0', b'0', '0', 9, 'Date', 'updateTime', '', NULL, b'0', b'0', b'0', 'BETWEEN', b'0', 'datetime', '103', '2022-01-14 09:51:58', '103', '2022-01-14 09:55:18', b'0');
+INSERT INTO `tool_codegen_column` VALUES (511, 42, 'deleted', 'bit(1)', '是否删除', b'0', b'0', '0', 10, 'Boolean', 'deleted', '', NULL, b'0', b'0', b'0', '=', b'0', 'radio', '103', '2022-01-14 09:51:58', '103', '2022-01-14 09:55:18', b'0');
+INSERT INTO `tool_codegen_column` VALUES (512, 42, 'tenant_id', 'bigint', '租户编号', b'0', b'0', '0', 11, 'Long', 'tenantId', '', NULL, b'1', b'1', b'1', '=', b'1', 'input', '103', '2022-01-14 09:51:58', '103', '2022-01-14 09:55:18', b'0');
 COMMIT;
 
 -- ----------------------------
@@ -2264,29 +3162,29 @@ DROP TABLE IF EXISTS `tool_codegen_table`;
 CREATE TABLE `tool_codegen_table` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号',
   `import_type` tinyint NOT NULL DEFAULT '1' COMMENT '导入类型',
-  `table_name` varchar(200) COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '表名称',
-  `table_comment` varchar(500) COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '表描述',
-  `remark` varchar(500) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '备注',
-  `module_name` varchar(30) COLLATE utf8mb4_general_ci NOT NULL COMMENT '模块名',
-  `business_name` varchar(30) COLLATE utf8mb4_general_ci NOT NULL COMMENT '业务名',
-  `class_name` varchar(100) COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '类名称',
-  `class_comment` varchar(50) COLLATE utf8mb4_general_ci NOT NULL COMMENT '类描述',
-  `author` varchar(50) COLLATE utf8mb4_general_ci NOT NULL COMMENT '作者',
+  `table_name` varchar(200) NOT NULL DEFAULT '' COMMENT '表名称',
+  `table_comment` varchar(500) NOT NULL DEFAULT '' COMMENT '表描述',
+  `remark` varchar(500) DEFAULT NULL COMMENT '备注',
+  `module_name` varchar(30) NOT NULL COMMENT '模块名',
+  `business_name` varchar(30) NOT NULL COMMENT '业务名',
+  `class_name` varchar(100) NOT NULL DEFAULT '' COMMENT '类名称',
+  `class_comment` varchar(50) NOT NULL COMMENT '类描述',
+  `author` varchar(50) NOT NULL COMMENT '作者',
   `template_type` tinyint NOT NULL DEFAULT '1' COMMENT '模板类型',
   `parent_menu_id` bigint DEFAULT NULL COMMENT '父菜单编号',
-  `creator` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `updater` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=40 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='代码生成表定义';
+) ENGINE=InnoDB AUTO_INCREMENT=43 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='代码生成表定义';
 
 -- ----------------------------
 -- Records of tool_codegen_table
 -- ----------------------------
 BEGIN;
-INSERT INTO `tool_codegen_table` VALUES (21, 1, 'inf_config', '参数配置表', NULL, 'infra', 'config', 'InfConfig', '参数配置', '芋艿', 1, NULL, '', '2021-02-06 19:51:35', '', '2021-02-06 19:51:35', b'0');
+INSERT INTO `tool_codegen_table` VALUES (21, 1, 'inf_config', '参数配置表', NULL, 'infra', 'config', 'InfConfig', '参数配置', '芋艿', 1, NULL, '', '2021-02-06 19:51:35', '1', '2021-12-31 22:06:46', b'0');
 INSERT INTO `tool_codegen_table` VALUES (22, 2, 'sys_file', '文件表\n', NULL, 'system', 'file', 'SysFile', '文件', '芋艿', 1, NULL, '', '2021-02-06 20:28:34', '', '2021-02-06 20:28:34', b'0');
 INSERT INTO `tool_codegen_table` VALUES (24, 1, 'inf_job', '定时任务表', NULL, 'infra', 'job', 'InfJob', '定时任务', '芋道源码', 1, NULL, '', '2021-02-07 06:39:34', '', '2021-02-07 06:46:56', b'0');
 INSERT INTO `tool_codegen_table` VALUES (25, 1, 'inf_job_log', '定时任务日志表', NULL, 'infra', 'jobLog', 'InfJobLog', '定时任务', '芋艿', 1, NULL, '', '2021-02-08 04:58:41', '', '2021-02-08 10:09:52', b'0');
@@ -2301,6 +3199,9 @@ INSERT INTO `tool_codegen_table` VALUES (36, 1, 'sys_sms_log', '短信日志', N
 INSERT INTO `tool_codegen_table` VALUES (37, 1, 'inf_error_code', '错误码表', NULL, 'infra', 'errorcode', 'InfErrorCode', '错误码', '芋道源码', 1, 2, '1', '2021-04-20 15:27:45', '1', '2021-04-21 00:55:37', b'0');
 INSERT INTO `tool_codegen_table` VALUES (38, 1, 'tool_test_demo', '字典类型表', NULL, 'tool', 'test', 'ToolTestDemo', '字典类型', '芋艿', 1, NULL, '1', '2021-04-26 12:25:51', '1', '2021-05-03 00:45:45', b'0');
 INSERT INTO `tool_codegen_table` VALUES (39, 1, 'sys_tenant', '租户表', NULL, 'system', 'tenant', 'SysTenant', '租户', '芋道源码', 1, 1, '1', '2021-12-05 01:04:21', '1', '2021-12-14 10:02:12', b'0');
+INSERT INTO `tool_codegen_table` VALUES (40, 1, 'bpm_form', '工作流的表单定义', NULL, 'bpm', 'form', 'BpmForm', '工作流的', '芋道源码', 1, 1186, '1', '2021-12-30 12:32:54', '1', '2021-12-30 20:37:58', b'0');
+INSERT INTO `tool_codegen_table` VALUES (41, 1, 'bpm_process_instance_ext', '流程实例', NULL, 'bpm', 'processInstanceExt', 'BpmProcessInstanceExt', '工作流的流程实例的拓展', '芋道源码', 1, 1200, '1', '2022-01-07 15:31:41', '1', '2022-01-07 23:52:21', b'0');
+INSERT INTO `tool_codegen_table` VALUES (42, 1, 'bpm_user_group', '用户组', NULL, 'bpm', 'userGroup', 'BpmUserGroup', '用户组', '芋道源码', 1, 1186, '103', '2022-01-14 01:48:03', '103', '2022-01-14 09:55:18', b'0');
 COMMIT;
 
 -- ----------------------------
@@ -2309,18 +3210,18 @@ COMMIT;
 DROP TABLE IF EXISTS `tool_test_demo`;
 CREATE TABLE `tool_test_demo` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号',
-  `name` varchar(100) COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '名字',
+  `name` varchar(100) NOT NULL DEFAULT '' COMMENT '名字',
   `status` tinyint NOT NULL DEFAULT '0' COMMENT '状态',
   `type` tinyint NOT NULL COMMENT '类型',
   `category` tinyint NOT NULL COMMENT '分类',
-  `remark` varchar(500) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '备注',
-  `creator` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
+  `remark` varchar(500) DEFAULT NULL COMMENT '备注',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `updater` varchar(64) COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=108 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='字典类型表';
+) ENGINE=InnoDB AUTO_INCREMENT=108 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='字典类型表';
 
 -- ----------------------------
 -- Records of tool_test_demo

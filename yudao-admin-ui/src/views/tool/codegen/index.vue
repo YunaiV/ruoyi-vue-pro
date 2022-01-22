@@ -125,8 +125,6 @@ import importTable from "./importTable";
 // 代码高亮插件
 import hljs from "highlight.js/lib/highlight";
 import "highlight.js/styles/github-gist.css";
-import {SysCommonStatusEnum} from "@/utils/constants";
-import {createTestDemo, updateTestDemo} from "@/api/tool/testDemo";
 hljs.registerLanguage("java", require("highlight.js/lib/languages/java"));
 hljs.registerLanguage("xml", require("highlight.js/lib/languages/xml"));
 hljs.registerLanguage("html", require("highlight.js/lib/languages/xml"));

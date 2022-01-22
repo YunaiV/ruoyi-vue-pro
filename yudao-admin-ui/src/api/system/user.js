@@ -10,6 +10,14 @@ export function listUser(query) {
   })
 }
 
+// 获取用户精简信息列表
+export function listSimpleUsers() {
+  return request({
+    url: '/system/user/list-all-simple',
+    method: 'get'
+  })
+}
+
 // 查询用户详细
 export function getUser(userId) {
   return request({

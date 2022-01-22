@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.adminserver.modules.system.service.dict.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.adminserver.modules.system.controller.dict.vo.data.SysDictDataCreateReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.dict.vo.data.SysDictDataExportReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.dict.vo.data.SysDictDataPageReqVO;
@@ -11,16 +12,16 @@ import cn.iocoder.yudao.adminserver.modules.system.mq.producer.dict.SysDictDataP
 import cn.iocoder.yudao.adminserver.modules.system.service.dict.SysDictDataService;
 import cn.iocoder.yudao.adminserver.modules.system.service.dict.SysDictTypeService;
 import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.dict.SysDictDataDO;
+import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.user.SysUserDO;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import com.google.common.annotations.VisibleForTesting;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import static cn.iocoder.yudao.adminserver.modules.system.enums.SysErrorCodeConstants.*;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -131,6 +132,26 @@ public class SysDictDataServiceImpl implements SysDictDataService {
     @Override
     public int countByDictType(String dictType) {
         return dictDataMapper.selectCountByDictType(dictType);
+    }
+
+    @Override
+    public void validDictDatas(String dictType, Collection<String> values) {
+        if (CollUtil.isEmpty(values)) {
+            return;
+        }
+        // 获得字典数据信息
+        List<SysDictDataDO> dictDatas = dictDataMapper.selectByDictTypeAndValues(dictType, values);
+        Map<String, SysDictDataDO> dictDataMap = CollectionUtils.convertMap(dictDatas, SysDictDataDO::getValue);
+        // 校验
+        values.forEach(value -> {
+            SysDictDataDO dictData = dictDataMap.get(value);
+            if (dictData == null) {
+                throw exception(DICT_DATA_NOT_EXISTS);
+            }
+            if (!CommonStatusEnum.ENABLE.getStatus().equals(dictData.getStatus())) {
+                throw exception(DICT_DATA_NOT_ENABLE, dictData.getLabel());
+            }
+        });
     }
 
     private void checkCreateOrUpdate(Long id, String value, String dictType) {

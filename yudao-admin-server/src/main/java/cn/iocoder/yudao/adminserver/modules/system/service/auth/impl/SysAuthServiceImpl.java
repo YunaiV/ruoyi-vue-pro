@@ -325,7 +325,6 @@ public class SysAuthServiceImpl implements SysAuthService {
         // 补全字段
         loginUser.setDeptId(user.getDeptId());
         loginUser.setRoleIds(this.getUserRoleIds(loginUser.getId()));
-        loginUser.setGroups(this.getUserPosts(user.getPostIds()));
         return loginUser;
     }
 

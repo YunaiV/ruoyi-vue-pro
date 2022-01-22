@@ -1,0 +1,4 @@
+### 请求 /bpm/process-definition/list 接口 => 成功
+GET {{baseUrl}}/bpm/process-definition/list?suspensionState=1
+tenant-id: 1
+Authorization: Bearer {{token}}

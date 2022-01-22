@@ -20,30 +20,26 @@ spring:
       write-durations-as-timestamps: true # 设置 Duration 的格式，使用时间戳
       fail-on-empty-beans: false # 允许序列化无属性的 Bean
 
+  # 工作流 Activiti 配置
+  activiti:
+    # 1. false: 默认值，activiti启动时，对比数据库表中保存的版本，如果不匹配。将抛出异常
+    # 2. true: 启动时会对数据库中所有表进行更新操作，如果表存在，不做处理，反之，自动创建表
+    # 3. create_drop: 启动时自动创建表，关闭时自动删除表
+    # 4. drop_create: 启动时，删除旧表，再创建新表
+    database-schema-update: false # 设置为 false，可通过 sql/activiti.sql 初始化
+    db-history-used: true # activiti7 默认不生成历史信息表，需手动设置开启
+    check-process-definitions: false # 设置为 false，禁用 /resources/processes 自动部署 BPMN XML 流程
+    history-level: full # full：保存历史数据的最高级别，可保存全部流程相关细节，包括流程流转各节点参数
+
 # MyBatis Plus 的配置项
 mybatis-plus:
-#  在 mybatis-config/mybatis-config.xml 中设置 TODO jason：看看有没其它解决方案
-#  configuration:
-#    map-underscore-to-camel-case: true # 虽然默认为 true ，但是还是显示去指定下。
-#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl # 打印日志
+  configuration:
+    map-underscore-to-camel-case: true # 虽然默认为 true ，但是还是显示去指定下。
   global-config:
     db-config:
       id-type: AUTO # 自增 ID
       logic-delete-value: 1 # 逻辑已删除值(默认为 1)
       logic-not-delete-value: 0 # 逻辑未删除值(默认为 0)
-  mapper-locations: classpath*:mapper/*.xml
-  config-location: classpath:mybatis-config/mybatis-config.xml
-  configuration-properties: # TODO jason：这些配置的作用，要注释下哈
-    prefix: ""
-    wildcardEscapeClause: ""
-    limitBefore: ""
-    limitAfter: "LIMIT #{maxResults} OFFSET #{firstResult}"
-    limitBetween: ""
-    limitOuterJoinBetween: ""
-    limitBeforeNativeQuery: ""
-    orderBy: "order by ${orderByColumns}"
-    blobType: "BLOB"
-    boolValue: "TRUE"
   type-aliases-package: ${yudao.info.base-package}.modules.*.dal.dataobject, ${yudao.core-service.base-package}.modules.*.dal.dataobject
 
 --- #################### 芋道相关配置 ####################
@@ -73,6 +69,10 @@ yudao:
     constants-class-list:
       - cn.iocoder.yudao.adminserver.modules.infra.enums.InfErrorCodeConstants
       - cn.iocoder.yudao.adminserver.modules.system.enums.SysErrorCodeConstants
+      - cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants
   tenant: # 多租户相关配置项
     tables: # 配置需要开启多租户的表；如果实体已经继承 TenantBaseDO 类，则无需重复配置
+  url:
+    admin-ui: http://dashboard.yudao.iocoder.cn # Admin 管理后台 UI 的地址
+
 debug: false
