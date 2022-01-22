@@ -19,9 +19,8 @@
         </el-table-column>
         <el-table-column v-if="modelId" label="操作" align="center" width="80" fixed="right">
           <template slot-scope="scope">
-            <!-- TODO 权限 -->
             <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdateTaskAssignRule(scope.row)"
-                       v-hasPermi="['bpm:model:update']">修改</el-button>
+                       v-hasPermi="['bpm:task-assign-rule:update']">修改</el-button>
           </template>
         </el-table-column>
       </el-table>

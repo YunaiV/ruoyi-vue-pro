@@ -11,6 +11,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,15 +36,15 @@ public class BpmOALeaveController {
     @Resource
     private BpmOALeaveService leaveService;
 
-    // TODO @芋艿：权限
-
     @PostMapping("/create")
+    @PreAuthorize("@ss.hasPermission('bpm:oa-leave:create')")
     @ApiOperation("创建请求申请")
     public CommonResult<Long> createLeave(@Valid @RequestBody BpmOALeaveCreateReqVO createReqVO) {
         return success(leaveService.createLeave(getLoginUserId(), createReqVO));
     }
 
     @GetMapping("/get")
+    @PreAuthorize("@ss.hasPermission('bpm:oa-leave:query')")
     @ApiOperation("获得请假申请")
     @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
     public CommonResult<BpmOALeaveRespVO> getLeave(@RequestParam("id") Long id) {
@@ -52,6 +53,7 @@ public class BpmOALeaveController {
     }
 
     @GetMapping("/page")
+    @PreAuthorize("@ss.hasPermission('bpm:oa-leave:query')")
     @ApiOperation("获得请假申请分页")
     public CommonResult<PageResult<BpmOALeaveRespVO>> getLeavePage(@Valid BpmOALeavePageReqVO pageVO) {
         PageResult<BpmOALeaveDO> pageResult = leaveService.getLeavePage(getLoginUserId(), pageVO);

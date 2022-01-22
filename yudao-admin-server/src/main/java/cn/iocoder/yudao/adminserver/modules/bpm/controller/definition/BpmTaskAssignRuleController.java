@@ -6,6 +6,10 @@ import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.rule.Bp
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmTaskAssignRuleService;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,6 +29,12 @@ public class BpmTaskAssignRuleController {
     private BpmTaskAssignRuleService taskAssignRuleService;
 
     @GetMapping("/list")
+    @ApiOperation(value = "获得任务分配规则列表")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "modelId", value = "模型编号", example = "1024", dataTypeClass = String.class),
+            @ApiImplicitParam(name = "processDefinitionId", value = "刘晨定义的编号", example = "2048", dataTypeClass = String.class)
+    })
+    @PreAuthorize("@ss.hasPermission('bpm:task-assign-rule:query')")
     public CommonResult<List<BpmTaskAssignRuleRespVO>> getTaskAssignRuleList(
             @RequestParam(value = "modelId", required = false) String modelId,
             @RequestParam(value = "processDefinitionId", required = false) String processDefinitionId) {
@@ -32,11 +42,15 @@ public class BpmTaskAssignRuleController {
     }
 
     @PostMapping("/create")
+    @ApiOperation(value = "创建任务分配规则")
+    @PreAuthorize("@ss.hasPermission('bpm:task-assign-rule:create')")
     public CommonResult<Long> createTaskAssignRule(@Valid @RequestBody BpmTaskAssignRuleCreateReqVO reqVO) {
         return success(taskAssignRuleService.createTaskAssignRule(reqVO));
     }
 
     @PutMapping("/update")
+    @ApiOperation(value = "更新任务分配规则")
+    @PreAuthorize("@ss.hasPermission('bpm:task-assign-rule:update')")
     public CommonResult<Boolean> updateTaskAssignRule(@Valid @RequestBody BpmTaskAssignRuleUpdateReqVO reqVO) {
         taskAssignRuleService.updateTaskAssignRule(reqVO);
         return success(true);

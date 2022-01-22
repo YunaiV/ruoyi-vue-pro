@@ -56,11 +56,10 @@
           <span>{{ getDateStar(scope.row.durationInMillis) }}</span>
         </template>
       </el-table-column>
-      <!-- TODO 耗时 -->
       <el-table-column label="操作" align="center" fixed="right" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-          <!-- TODO 权限、颜色 -->
-          <el-button size="mini" type="text" icon="el-icon-edit" @click="handleAudit(scope.row)">详情</el-button>
+          <el-button size="mini" type="text" icon="el-icon-edit" @click="handleAudit(scope.row)"
+                     v-hasPermi="['bpm:task:query']">详情</el-button>
         </template>
       </el-table-column>
     </el-table>

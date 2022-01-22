@@ -91,13 +91,12 @@
                      v-hasPermi="['bpm:model:update']">修改流程</el-button>
           <el-button size="mini" type="text" icon="el-icon-setting" @click="handleDesign(scope.row)"
                      v-hasPermi="['bpm:model:update']">设计流程</el-button>
-          <!-- TODO 权限 -->
           <el-button size="mini" type="text" icon="el-icon-s-custom" @click="handleAssignRule(scope.row)"
-                     v-hasPermi="['bpm:model:update']">分配规则</el-button>
+                     v-hasPermi="['bpm:task-assign-rule:query']">分配规则</el-button>
           <el-button size="mini" type="text" icon="el-icon-thumb" @click="handleDeploy(scope.row)"
                      v-hasPermi="['bpm:model:deploy']">发布流程</el-button>
           <el-button size="mini" type="text" icon="el-icon-ice-cream-round" @click="handleDefinitionList(scope.row)"
-                     v-hasPermi="['bpm:model:query']">流程定义</el-button>
+                     v-hasPermi="['bpm:process-definition:query']">流程定义</el-button>
           <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)"
                      v-hasPermi="['bpm:model:delete']">删除</el-button>
         </template>

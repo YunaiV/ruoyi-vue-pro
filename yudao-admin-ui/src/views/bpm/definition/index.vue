@@ -46,9 +46,8 @@
       <el-table-column label="定义描述" align="center" prop="description" width="300" show-overflow-tooltip />
       <el-table-column label="操作" align="center" width="150" fixed="right">
         <template slot-scope="scope">
-          <!-- TODO 权限 -->
           <el-button size="mini" type="text" icon="el-icon-s-custom" @click="handleAssignRule(scope.row)"
-                     v-hasPermi="['bpm:model:update']">分配规则</el-button>
+                     v-hasPermi="['bpm:task-assign-rule:update']">分配规则</el-button>
         </template>
       </el-table-column>
     </el-table>

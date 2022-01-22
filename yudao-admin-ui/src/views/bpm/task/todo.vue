@@ -38,10 +38,12 @@
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-          <!-- TODO 权限、颜色 -->
-          <el-button size="mini" type="text" icon="el-icon-edit" @click="handleAudit(scope.row)">审批</el-button>
-          <el-button size="mini" type="text" icon="el-icon-edit" v-if="scope.row.suspensionState === 2">激活</el-button>
-          <el-button size="mini" type="text" icon="el-icon-edit" v-if="scope.row.suspensionState === 1">挂起</el-button>
+          <el-button size="mini" type="text" icon="el-icon-edit" @click="handleAudit(scope.row)"
+                     v-hasPermi="['bpm:task:update']">审批</el-button>
+          <el-button size="mini" type="text" icon="el-icon-edit" v-if="scope.row.suspensionState === 2"
+                     v-hasPermi="['bpm:task:update']">激活</el-button>
+          <el-button size="mini" type="text" icon="el-icon-edit" v-if="scope.row.suspensionState === 1"
+                     v-hasPermi="['bpm:task:update']">挂起</el-button>
         </template>
       </el-table-column>
     </el-table>
