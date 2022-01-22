@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.service.task;
 
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.task.vo.task.*;
+import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.task.BpmTaskExtDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import org.activiti.engine.task.Task;
@@ -10,12 +11,27 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 流程任务 Service 接口
+ * 流程任务实例 Service 接口
  *
  * @author jason
  * @author 芋道源码
  */
 public interface BpmTaskService {
+
+    /**
+     * 获得指定流程实例的 Running 进行中的流程任务列表
+     *
+     * @param processInstanceId 流程实例的编号
+     */
+    List<Task> getRunningTaskListByProcessInstanceId(String processInstanceId);
+
+    /**
+     * 获得指令流程实例的流程任务列表，包括所有状态的
+     *
+     * @param processInstanceId 流程实例的编号
+     * @return 流程任务列表
+     */
+    List<BpmTaskRespVO> getTaskListByProcessInstanceId(String processInstanceId);
 
     /**
      * 获得流程任务列表
@@ -65,45 +81,34 @@ public interface BpmTaskService {
     /**
      * 将流程任务分配给指定用户
      *
+     * @param userId 用户编号
+     * @param reqVO 分配请求
+     */
+    void updateTaskAssignee(Long userId, BpmTaskUpdateAssigneeReqVO reqVO);
+
+    /**
+     * 将流程任务分配给指定用户
+     *
      * @param id 流程任务编号
      * @param userId 用户编号
      */
-    void updateTaskAssign(String id, Long userId);
+    void updateTaskAssignee(String id, Long userId);
 
     /**
      * 通过任务
      *
+     * @param userId 用户编号
      * @param reqVO 通过请求
      */
-    void approveTask(@Valid BpmTaskApproveReqVO reqVO);
+    void approveTask(Long userId, @Valid BpmTaskApproveReqVO reqVO);
 
     /**
      * 不通过任务
      *
+     * @param userId 用户编号
      * @param reqVO 不通过请求
      */
-    void rejectTask(@Valid BpmTaskRejectReqVO reqVO);
-
-    /**
-     * 根据任务id, 查询已经完成的用户任务，未完成的用户任务
-     * @param taskQuery 查询参数  一般 taskId
-     */
-    @Deprecated
-    TaskHandleVO getTaskSteps(TaskQueryReqVO taskQuery);
-
-    /**
-     * 根据流程实例id, 查询历史用户任务，包括已完成，未完成
-     * @param processInstanceId 流程实例id
-     */
-    @Deprecated
-    List<TaskStepVO> getHistorySteps(String processInstanceId);
-
-    /**
-     * 返回高亮的流转进程
-     * @param processInstanceId 实例Id
-     * @return {@link FileResp} 返回文件
-     */
-    FileResp getHighlightImg(String processInstanceId);
+    void rejectTask(Long userId, @Valid BpmTaskRejectReqVO reqVO);
 
     // ========== Task 拓展表相关 ==========
 
@@ -122,6 +127,13 @@ public interface BpmTaskService {
     void updateTaskExt(org.activiti.api.task.model.Task task);
 
     /**
+     * 更新 Task 拓展记录，并发送通知
+     *
+     * @param task 任务实体
+     */
+    void updateTaskExtAssign(org.activiti.api.task.model.Task task);
+
+    /**
      * 更新 Task 拓展记录为取消
      *
      * @param task 任务实体
@@ -134,5 +146,14 @@ public interface BpmTaskService {
      * @param task 任务实体
      */
     void updateTaskExtComplete(org.activiti.api.task.model.Task task);
+
+    /**
+     * 获得流程实例对应的 Task 拓展列表
+     *
+     * @param processInstanceId 流程实例的编号
+     * @return Task 拓展列表
+     */
+    List<BpmTaskExtDO> getTaskExtListByProcessInstanceId(String processInstanceId);
+
 
 }

@@ -32,7 +32,7 @@
     <div v-else>
       <el-card class="box-card" >
         <div slot="header" class="clearfix">
-          <span class="el-icon-document">{{ selectProcessInstance.name }}</span>
+          <span class="el-icon-document">申请信息【{{ selectProcessInstance.name }}】</span>
           <el-button style="float: right;" type="primary" @click="selectProcessInstance = undefined">选择其它流程</el-button>
         </div>
         <el-col :span="16" :offset="6">
@@ -58,10 +58,11 @@ import {DICT_TYPE, getDictDatas} from "@/utils/dict";
 import {getForm} from "@/api/bpm/form";
 import {decodeFields} from "@/utils/formGenerator";
 import Parser from '@/components/parser/Parser'
-import {createProcessInstance} from "@/api/bpm/processInstance";
+import {createProcessInstance, getMyProcessInstancePage} from "@/api/bpm/processInstance";
 
+// 流程实例的发起
 export default {
-  name: "processDefinition",
+  name: "ProcessInstanceCreate",
   components: {
     Parser
   },
@@ -69,8 +70,6 @@ export default {
     return {
       // 遮罩层
       loading: true,
-      // 总条数
-      total: 0,
       // 表格数据
       list: [],
 
@@ -109,28 +108,25 @@ export default {
     },
     /** 处理选择流程的按钮操作 **/
     handleSelect(row) {
-      // 如果无表单，则无法发起流程
-      if (!row.formId) {
-        this.$message.error('该流程未绑定表单，无法发起流程！请重新选择你要发起的流程');
-        return;
-      }
       // 设置选择的流程
       this.selectProcessInstance = row;
 
-      // 加载对应的表单
-      getForm(row.formId).then(response => {
-        // 设置值
-        const data = response.data
+      // 流程表单
+      if (row.formId) {
+        // 设置对应的表单
         this.detailForm = {
-          ...JSON.parse(data.conf),
-          fields: decodeFields(data.fields)
+          ...JSON.parse(row.formConf),
+          fields: decodeFields(row.formFields)
         }
-      });
 
-      // 加载流程图
-      getProcessDefinitionBpmnXML(row.id).then(response => {
-        this.bpmnXML = response.data
-      })
+        // 加载流程图
+        getProcessDefinitionBpmnXML(row.id).then(response => {
+          this.bpmnXML = response.data
+        })
+      } else if (row.formCustomCreatePath) {
+        this.$router.push({ path: row.formCustomCreatePath});
+        // 这里暂时无需加载流程图，因为跳出到另外个 Tab；
+      }
     },
     /** 提交按钮 */
     submitForm(params) {

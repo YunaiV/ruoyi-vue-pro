@@ -45,7 +45,7 @@ public class BpmFormController {
 
     @DeleteMapping("/delete")
     @ApiOperation("删除动态表单")
-    @ApiImplicitParam(name = "id", value = "编号", required = true)
+    @ApiImplicitParam(name = "id", value = "编号", required = true, dataTypeClass = Long.class)
     @PreAuthorize("@ss.hasPermission('bpm:form:delete')")
     public CommonResult<Boolean> deleteForm(@RequestParam("id") Long id) {
         formService.deleteForm(id);

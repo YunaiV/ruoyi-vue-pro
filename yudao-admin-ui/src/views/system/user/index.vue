@@ -72,7 +72,7 @@
           <el-table-column label="操作" align="center" width="160" class-name="small-padding fixed-width">
             <template slot-scope="scope">
               <el-button size="large" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
-                         v-hasPermi="['system:role:update']">修改</el-button>
+                         v-hasPermi="['system:user:update']">修改</el-button>
               <el-dropdown  @command="(command) => handleCommand(command, scope.$index, scope.row)">
                     <span class="el-dropdown-link">
                       更多操作<i class="el-icon-arrow-down el-icon--right"></i>

@@ -1,6 +1,9 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.service.definition.impl;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.rule.BpmTaskAssignRuleCreateReqVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.rule.BpmTaskAssignRuleRespVO;
@@ -30,10 +33,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 import static cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants.*;
 import static cn.iocoder.yudao.adminserver.modules.system.enums.SysDictTypeConstants.BPM_TASK_ASSIGN_RULE_TYPE;
@@ -140,6 +140,31 @@ public class BpmTaskAssignRuleServiceImpl implements BpmTaskAssignRuleService {
 
         // 执行更新
         taskRuleMapper.updateById(BpmTaskAssignRuleConvert.INSTANCE.convert(reqVO));
+    }
+
+    @Override
+    public boolean isTaskAssignRulesEquals(String modelId, String processDefinitionId) {
+        // 调用 VO 接口的原因是，过滤掉流程模型不需要的规则，保持和 copyTaskAssignRules 方法的一致性
+        List<BpmTaskAssignRuleRespVO> modelRules = getTaskAssignRuleList(modelId, null);
+        List<BpmTaskAssignRuleRespVO> processInstanceRules = getTaskAssignRuleList(null, processDefinitionId);
+        if (modelRules.size() != processInstanceRules.size()) {
+            return false;
+        }
+
+        // 遍历，匹配对应的规则
+        Map<String, BpmTaskAssignRuleRespVO> processInstanceRuleMap = CollectionUtils.convertMap(processInstanceRules,
+                BpmTaskAssignRuleRespVO::getTaskDefinitionKey);
+        for (BpmTaskAssignRuleRespVO modelRule : modelRules) {
+            BpmTaskAssignRuleRespVO processInstanceRule = processInstanceRuleMap.get(modelRule.getTaskDefinitionKey());
+            if (processInstanceRule == null) {
+                return false;
+            }
+            if (!ObjectUtil.equals(modelRule.getType(), processInstanceRule.getType())
+                || !ObjectUtil.equal(modelRule.getOptions(), processInstanceRule.getOptions())) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override

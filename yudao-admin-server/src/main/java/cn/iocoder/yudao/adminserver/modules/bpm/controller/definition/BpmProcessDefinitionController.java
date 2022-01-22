@@ -34,7 +34,7 @@ public class BpmProcessDefinitionController {
 
     @GetMapping ("/page")
     @ApiOperation(value = "获得流程定义分页")
-    @PreAuthorize("@ss.hasPermission('bpm:model:query')") // 暂时使用 model 的权限标识
+    @PreAuthorize("@ss.hasPermission('bpm:process-definition:query')")
     public CommonResult<PageResult<BpmProcessDefinitionPageItemRespVO>> getProcessDefinitionPage(
             BpmProcessDefinitionPageReqVO pageReqVO) {
         return success(bpmDefinitionService.getProcessDefinitionPage(pageReqVO));
@@ -42,6 +42,7 @@ public class BpmProcessDefinitionController {
 
     @GetMapping ("/list")
     @ApiOperation(value = "获得流程定义列表")
+    @PreAuthorize("@ss.hasPermission('bpm:process-definition:query')")
     public CommonResult<List<BpmProcessDefinitionRespVO>> getProcessDefinitionList(
             BpmProcessDefinitionListReqVO listReqVO) {
         return success(bpmDefinitionService.getProcessDefinitionList(listReqVO));
@@ -50,7 +51,7 @@ public class BpmProcessDefinitionController {
     @GetMapping ("/get-bpmn-xml")
     @ApiOperation(value = "获得流程定义的 BPMN XML")
     @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = String.class)
-    @PreAuthorize("@ss.hasPermission('bpm:model:query')") // 暂时使用 model 的权限标识
+    @PreAuthorize("@ss.hasPermission('bpm:process-definition:query')")
     public CommonResult<String> getProcessDefinitionBpmnXML(@RequestParam("id") String id) {
         String bpmnXML = bpmDefinitionService.getProcessDefinitionBpmnXML(id);
         return success(bpmnXML);

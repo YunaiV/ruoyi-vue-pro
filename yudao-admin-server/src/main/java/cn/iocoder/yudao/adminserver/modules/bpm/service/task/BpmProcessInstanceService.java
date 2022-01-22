@@ -1,11 +1,9 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.service.task;
 
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.task.vo.instance.BpmProcessInstanceCancelReqVO;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.task.vo.instance.BpmProcessInstanceCreateReqVO;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.task.vo.instance.BpmProcessInstanceMyPageReqVO;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.task.vo.instance.BpmProcessInstancePageItemRespVO;
+import cn.iocoder.yudao.adminserver.modules.bpm.controller.task.vo.instance.*;
 import cn.iocoder.yudao.adminserver.modules.bpm.enums.task.BpmProcessInstanceDeleteReasonEnum;
 import cn.iocoder.yudao.adminserver.modules.bpm.enums.task.BpmProcessInstanceResultEnum;
+import cn.iocoder.yudao.adminserver.modules.bpm.service.task.dto.BpmProcessInstanceCreateReqDTO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import org.activiti.engine.history.HistoricProcessInstance;
@@ -24,13 +22,22 @@ import java.util.Set;
 public interface BpmProcessInstanceService {
 
     /**
-     * 创建流程实例
+     * 创建流程实例（提供给前端）
      *
      * @param userId 用户编号
      * @param createReqVO 创建信息
      * @return 实例的编号
      */
     String createProcessInstance(Long userId, @Valid BpmProcessInstanceCreateReqVO createReqVO);
+
+    /**
+     * 创建流程实例（提供给内部）
+     *
+     * @param userId 用户编号
+     * @param createReqDTO 创建信息
+     * @return 实例的编号
+     */
+    String createProcessInstance(Long userId, @Valid BpmProcessInstanceCreateReqDTO createReqDTO);
 
     /**
      * 取消流程实例
@@ -50,15 +57,6 @@ public interface BpmProcessInstanceService {
     void deleteProcessInstance(String id, String reason);
 
     /**
-     * 更新流程实例的结果
-     * 1. 如果更新为已拒绝时，会进行任务的删除
-     *
-     * @param id 流程编号
-     * @param result 结果，{@link BpmProcessInstanceResultEnum}
-     */
-    void updateProcessInstanceResult(String id, Integer result);
-
-    /**
      * 获得流程实例的分页
      *
      * @param userId 用户编号
@@ -67,6 +65,14 @@ public interface BpmProcessInstanceService {
      */
     PageResult<BpmProcessInstancePageItemRespVO> getMyProcessInstancePage(Long userId,
                                                                           @Valid BpmProcessInstanceMyPageReqVO pageReqVO);
+
+    /**
+     * 获得流程实例 VO 信息
+     *
+     * @param id 流程实例的编号
+     * @return 流程实例
+     */
+    BpmProcessInstanceRespVO getProcessInstanceVO(String id);
 
     /**
      * 获得流程实例
@@ -138,8 +144,9 @@ public interface BpmProcessInstanceService {
      * 更新 ProcessInstance 拓展记录为取消
      *
      * @param instance 流程任务
+     * @param reason 取消原因
      */
-    void updateProcessInstanceExtCancel(org.activiti.api.process.model.ProcessInstance instance);
+    void updateProcessInstanceExtCancel(org.activiti.api.process.model.ProcessInstance instance, String reason);
 
     /**
      * 更新 ProcessInstance 拓展记录为完成
@@ -147,5 +154,13 @@ public interface BpmProcessInstanceService {
      * @param instance 流程任务
      */
     void updateProcessInstanceExtComplete(org.activiti.api.process.model.ProcessInstance instance);
+
+    /**
+     * 更新 ProcessInstance 拓展记录为不通过
+     *
+     * @param id 流程编号
+     * @param comment 理由。例如说，审批不通过时，需要传递该值
+     */
+    void updateProcessInstanceExtReject(String id, String comment);
 
 }

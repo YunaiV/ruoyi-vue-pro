@@ -1,23 +1,23 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.service.definition.impl;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.process.BpmProcessDefinitionListReqVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.process.BpmProcessDefinitionPageItemRespVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.process.BpmProcessDefinitionPageReqVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.process.BpmProcessDefinitionRespVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.convert.definition.BpmProcessDefinitionConvert;
-import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.definition.BpmProcessDefinitionExtDO;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.definition.BpmFormDO;
+import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.definition.BpmProcessDefinitionExtDO;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.mysql.definition.BpmProcessDefinitionExtMapper;
-import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmProcessDefinitionService;
-import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.dto.BpmDefinitionCreateReqDTO;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmFormService;
+import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmProcessDefinitionService;
+import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.dto.BpmProcessDefinitionCreateReqDTO;
+import cn.iocoder.yudao.framework.activiti.core.util.ActivitiUtils;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.object.PageUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.activiti.bpmn.converter.BpmnXMLConverter;
 import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.impl.persistence.entity.SuspensionState;
@@ -31,10 +31,10 @@ import org.springframework.validation.annotation.Validated;
 import javax.annotation.Resource;
 import java.util.*;
 
-import static cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants.PROCESS_DEFINITION_KEY_NOT_MATCH;
-import static cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants.PROCESS_DEFINITION_NAME_NOT_MATCH;
+import static cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants.*;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
+import static java.util.Collections.emptyList;
 
 /**
  * 流程定义实现
@@ -42,6 +42,7 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
  *
  * @author yunlongn
  * @author ZJQ
+ * @author 芋道源码
  */
 @Service
 @Validated
@@ -49,8 +50,6 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 public class BpmProcessDefinitionServiceImpl implements BpmProcessDefinitionService {
 
     private static final String BPMN_FILE_SUFFIX = ".bpmn";
-
-    private static final BpmnXMLConverter BPMN_XML_CONVERTER = new BpmnXMLConverter();
 
     @Resource
     private RepositoryService repositoryService;
@@ -67,25 +66,25 @@ public class BpmProcessDefinitionServiceImpl implements BpmProcessDefinitionServ
             definitionQuery.processDefinitionKey(pageVO.getKey());
         }
         // 执行查询
-        List<ProcessDefinition> processDefinitions = definitionQuery.orderByProcessDefinitionId().desc()
+        List<ProcessDefinition> processDefinitions = definitionQuery.orderByProcessDefinitionVersion().desc()
                 .listPage(PageUtils.getStart(pageVO), pageVO.getPageSize());
         if (CollUtil.isEmpty(processDefinitions)) {
-            return new PageResult<>(Collections.emptyList(), definitionQuery.count());
+            return new PageResult<>(emptyList(), definitionQuery.count());
         }
 
         // 获得 Deployment Map
         Set<String> deploymentIds = new HashSet<>();
-        processDefinitions.forEach(definition -> CollectionUtils.addIfNotNull(deploymentIds, definition.getDeploymentId()));
+        processDefinitions.forEach(definition -> addIfNotNull(deploymentIds, definition.getDeploymentId()));
         Map<String, Deployment> deploymentMap = getDeploymentMap(deploymentIds);
 
         // 获得 BpmProcessDefinitionDO Map
         List<BpmProcessDefinitionExtDO> processDefinitionDOs = processDefinitionMapper.selectListByProcessDefinitionIds(
                 convertList(processDefinitions, ProcessDefinition::getId));
-        Map<String, BpmProcessDefinitionExtDO> processDefinitionDOMap = CollectionUtils.convertMap(processDefinitionDOs,
+        Map<String, BpmProcessDefinitionExtDO> processDefinitionDOMap = convertMap(processDefinitionDOs,
                 BpmProcessDefinitionExtDO::getProcessDefinitionId);
 
         // 获得 Form Map
-        Set<Long> formIds = CollectionUtils.convertSet(processDefinitionDOs, BpmProcessDefinitionExtDO::getFormId);
+        Set<Long> formIds = convertSet(processDefinitionDOs, BpmProcessDefinitionExtDO::getFormId);
         Map<Long, BpmFormDO> formMap = bpmFormService.getFormMap(formIds);
 
         // 拼接结果
@@ -109,7 +108,7 @@ public class BpmProcessDefinitionServiceImpl implements BpmProcessDefinitionServ
         // 获得 BpmProcessDefinitionDO Map
         List<BpmProcessDefinitionExtDO> processDefinitionDOs = processDefinitionMapper.selectListByProcessDefinitionIds(
                 convertList(processDefinitions, ProcessDefinition::getId));
-        Map<String, BpmProcessDefinitionExtDO> processDefinitionDOMap = CollectionUtils.convertMap(processDefinitionDOs,
+        Map<String, BpmProcessDefinitionExtDO> processDefinitionDOMap = convertMap(processDefinitionDOs,
                 BpmProcessDefinitionExtDO::getProcessDefinitionId);
         // 执行查询，并返回
         return BpmProcessDefinitionConvert.INSTANCE.convertList3(processDefinitions, processDefinitionDOMap);
@@ -121,9 +120,7 @@ public class BpmProcessDefinitionServiceImpl implements BpmProcessDefinitionServ
         if (bpmnModel == null) {
             return null;
         }
-        // TODO 芋艿：重构到 activi util 里
-        byte[] bpmnBytes = BPMN_XML_CONVERTER.convertToXML(bpmnModel);
-        return StrUtil.utf8Str(bpmnBytes);
+        return ActivitiUtils.getBpmnXml(bpmnModel);
     }
 
     @Override
@@ -142,6 +139,16 @@ public class BpmProcessDefinitionServiceImpl implements BpmProcessDefinitionServ
     }
 
     @Override
+    public ProcessDefinition getActiveProcessDefinition(String key) {
+        return repositoryService.createProcessDefinitionQuery().processDefinitionKey(key).active().singleResult();
+    }
+
+    @Override
+    public BpmProcessDefinitionExtDO getProcessDefinitionExt(String id) {
+        return processDefinitionMapper.selectByProcessDefinitionId(id);
+    }
+
+    @Override
     public Deployment getDeployment(String id) {
         if (StrUtil.isEmpty(id)) {
             return null;
@@ -152,35 +159,70 @@ public class BpmProcessDefinitionServiceImpl implements BpmProcessDefinitionServ
     @Override
     public List<Deployment> getDeployments(Set<String> ids) {
         if (CollUtil.isEmpty(ids)) {
-            return Collections.emptyList();
+            return emptyList();
         }
         List<Deployment> list = new ArrayList<>(ids.size());
         for (String id : ids) {
-            CollectionUtils.addIfNotNull(list, getDeployment(id));
+            addIfNotNull(list, getDeployment(id));
         }
         return list;
     }
 
     @Override
     public ProcessDefinition getProcessDefinitionByDeploymentId(String deploymentId) {
+        if (StrUtil.isEmpty(deploymentId)) {
+            return null;
+        }
         return repositoryService.createProcessDefinitionQuery().deploymentId(deploymentId).singleResult();
     }
 
     @Override
     public List<ProcessDefinition> getProcessDefinitionListByDeploymentIds(Set<String> deploymentIds) {
         if (CollUtil.isEmpty(deploymentIds)) {
-            return Collections.emptyList();
+            return emptyList();
         }
         return repositoryService.createProcessDefinitionQuery().deploymentIds(deploymentIds).list();
     }
 
     @Override
+    public boolean isProcessDefinitionEquals(BpmProcessDefinitionCreateReqDTO createReqDTO) {
+        // 校验 name、description 是否更新
+        ProcessDefinition oldProcessDefinition = getActiveProcessDefinition(createReqDTO.getKey());
+        if (oldProcessDefinition == null) {
+            return false;
+        }
+        BpmProcessDefinitionExtDO oldProcessDefinitionExt = getProcessDefinitionExt(oldProcessDefinition.getId());
+        if (!StrUtil.equals(createReqDTO.getName(), oldProcessDefinition.getName())
+                || !StrUtil.equals(createReqDTO.getDescription(), oldProcessDefinitionExt.getDescription())
+                || !StrUtil.equals(createReqDTO.getCategory(), oldProcessDefinition.getCategory())) {
+            return false;
+        }
+        // 校验 form 信息是否更新
+        if (!ObjectUtil.equal(createReqDTO.getFormType(), oldProcessDefinitionExt.getFormType())
+                || !ObjectUtil.equal(createReqDTO.getFormId(), oldProcessDefinitionExt.getFormId())
+                || !ObjectUtil.equal(createReqDTO.getFormConf(), oldProcessDefinitionExt.getFormConf())
+                || !ObjectUtil.equal(createReqDTO.getFormFields(), oldProcessDefinitionExt.getFormFields())
+                || !ObjectUtil.equal(createReqDTO.getFormCustomCreatePath(), oldProcessDefinitionExt.getFormCustomCreatePath())
+                || !ObjectUtil.equal(createReqDTO.getFormCustomViewPath(), oldProcessDefinitionExt.getFormCustomViewPath())) {
+            return false;
+        }
+        // 校验 BPMN XML 信息
+        BpmnModel newModel = ActivitiUtils.buildBpmnModel(createReqDTO.getBpmnBytes());
+        BpmnModel oldModel = getBpmnModel(oldProcessDefinition.getId());
+        if (!ActivitiUtils.equals(oldModel, newModel)) {
+            return false;
+        }
+        // 最终发现都一致，则返回 true
+        return true;
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class) // 因为进行多个 activiti 操作，所以开启事务
-    public String createProcessDefinition(BpmDefinitionCreateReqDTO createReqDTO) {
+    public String createProcessDefinition(BpmProcessDefinitionCreateReqDTO createReqDTO) {
         // 创建 Deployment 部署
         Deployment deploy = repositoryService.createDeployment()
                 .key(createReqDTO.getKey()).name(createReqDTO.getName()).category(createReqDTO.getCategory())
-                .addString(createReqDTO.getKey() + BPMN_FILE_SUFFIX, createReqDTO.getBpmnXml())
+                .addBytes(createReqDTO.getKey() + BPMN_FILE_SUFFIX, createReqDTO.getBpmnBytes())
                 .deploy();
 
         // 设置 ProcessDefinition 的 category 分类

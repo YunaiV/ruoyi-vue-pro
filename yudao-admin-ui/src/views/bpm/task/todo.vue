@@ -35,12 +35,8 @@
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-          <!-- TODO 权限、颜色 -->
-          <el-button size="mini" type="text" icon="el-icon-edit">审批</el-button>
-          <el-button size="mini" type="text" icon="el-icon-edit" @click="audit(scope.row, true)">通过</el-button>
-          <el-button size="mini" type="text" icon="el-icon-edit"  @click="audit(scope.row, false)">不通过</el-button>
-          <el-button size="mini" type="text" icon="el-icon-edit" v-if="scope.row.suspensionState === 2">激活</el-button>
-          <el-button size="mini" type="text" icon="el-icon-edit" v-if="scope.row.suspensionState === 1">挂起</el-button>
+          <el-button size="mini" type="text" icon="el-icon-edit" @click="handleAudit(scope.row)"
+                     v-hasPermi="['bpm:task:update']">审批</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -52,7 +48,8 @@
 </template>
 
 <script>
-import {approveTask, getTodoTaskPage, rejectTask} from '@/api/bpm/task'
+import {getTodoTaskPage} from '@/api/bpm/task'
+import {listSimpleUsers} from "@/api/system/user";
 
 export default {
   name: "Todo",
@@ -104,19 +101,10 @@ export default {
       this.resetForm("queryForm");
       this.handleQuery();
     },
-    audit(row, pass) {
-      if (pass) {
-        approveTask({
-          id: row.id,
-          comment: '通过'
-        })
-      } else {
-        rejectTask({
-          id: row.id,
-          comment: '不通过'
-        })
-      }
-    }
+    /** 处理审批按钮 */
+    handleAudit(row) {
+      this.$router.push({ path: "/bpm/process-instance/detail", query: { id: row.processInstance.id}});
+    },
   }
 };
 </script>

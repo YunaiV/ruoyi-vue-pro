@@ -4,6 +4,7 @@ import cn.iocoder.yudao.adminserver.modules.bpm.enums.definition.BpmTaskRuleScri
 import org.activiti.engine.impl.persistence.entity.TaskEntity;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Bpm 任务分配的自定义 Script 脚本
@@ -22,7 +23,7 @@ public interface BpmTaskAssignScript {
      * @param task 任务
      * @return 候选人用户的编号数组
      */
-    List<Long> calculateTaskCandidateUsers(TaskEntity task);
+    Set<Long> calculateTaskCandidateUsers(TaskEntity task);
 
     /**
      * 获得枚举值

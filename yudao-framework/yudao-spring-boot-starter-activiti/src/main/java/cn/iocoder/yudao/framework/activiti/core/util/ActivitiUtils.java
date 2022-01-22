@@ -1,6 +1,10 @@
 package cn.iocoder.yudao.framework.activiti.core.util;
 
+import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.ReflectUtil;
+import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import com.alibaba.ttl.TransmittableThreadLocal;
 import org.activiti.bpmn.converter.BpmnXMLConverter;
 import org.activiti.bpmn.model.BpmnModel;
@@ -11,7 +15,9 @@ import org.activiti.engine.impl.util.io.BytesStreamSource;
 
 import javax.xml.bind.Element;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 /**
@@ -44,8 +50,11 @@ public class ActivitiUtils {
         Authentication.setAuthenticatedUserId(null);
     }
 
-    // ========== BPMN XML 相关 ==========
+    public static boolean equals(String userIdStr, Long userId) {
+        return Objects.equals(userId, NumberUtils.parseLong(userIdStr));
+    }
 
+    // ========== BPMN XML 相关 ==========
 
     /**
      * 构建对应的 BPMN Model
@@ -59,6 +68,13 @@ public class ActivitiUtils {
         return converter.convertToBpmnModel(new BytesStreamSource(bpmnBytes), true, true);
     }
 
+    /**
+     * 获得 BPMN 流程中，指定的元素们
+     *
+     * @param model
+     * @param clazz 指定元素。例如说，{@link org.activiti.bpmn.model.UserTask}、{@link org.activiti.bpmn.model.Gateway} 等等
+     * @return 元素们
+     */
     public static <T extends FlowElement> List<T> getBpmnModelElements(BpmnModel model, Class<T> clazz) {
         List<T> result = new ArrayList<>();
         model.getProcesses().forEach(process -> {
@@ -69,6 +85,26 @@ public class ActivitiUtils {
             });
         });
         return result;
+    }
+
+    public static String getBpmnXml(BpmnModel model) {
+        if (model == null) {
+            return null;
+        }
+        return StrUtil.utf8Str(getBpmnBytes(model));
+    }
+
+    public static byte[] getBpmnBytes(BpmnModel model) {
+        if (model == null) {
+            return new byte[0];
+        }
+        BpmnXMLConverter converter = new BpmnXMLConverter();
+        return converter.convertToXML(model);
+    }
+
+    public static boolean equals(BpmnModel oldModel, BpmnModel newModel) {
+        // 由于 BpmnModel 未提供 equals 方法，所以只能转成字节数组，进行比较
+        return Arrays.equals(getBpmnBytes(oldModel), getBpmnBytes(newModel));
     }
 
 }

@@ -50,10 +50,13 @@
           <span>{{ getDictDataLabel(DICT_TYPE.BPM_MODEL_CATEGORY, scope.row.category) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="表单信息" align="center" prop="formId">
+      <el-table-column label="表单信息" align="center" prop="formType" width="200">
         <template slot-scope="scope">
           <el-button v-if="scope.row.formId" type="text" @click="handleFormDetail(scope.row)">
             <span>{{ scope.row.formName }}</span>
+          </el-button>
+          <el-button v-else-if="scope.row.formCustomCreatePath" type="text" @click="handleFormDetail(scope.row)">
+            <span>{{ scope.row.formCustomCreatePath }}</span>
           </el-button>
           <label v-else>暂无表单</label>
         </template>
@@ -88,13 +91,12 @@
                      v-hasPermi="['bpm:model:update']">修改流程</el-button>
           <el-button size="mini" type="text" icon="el-icon-setting" @click="handleDesign(scope.row)"
                      v-hasPermi="['bpm:model:update']">设计流程</el-button>
-          <!-- TODO 权限 -->
           <el-button size="mini" type="text" icon="el-icon-s-custom" @click="handleAssignRule(scope.row)"
-                     v-hasPermi="['bpm:model:update']">分配规则</el-button>
+                     v-hasPermi="['bpm:task-assign-rule:query']">分配规则</el-button>
           <el-button size="mini" type="text" icon="el-icon-thumb" @click="handleDeploy(scope.row)"
                      v-hasPermi="['bpm:model:deploy']">发布流程</el-button>
           <el-button size="mini" type="text" icon="el-icon-ice-cream-round" @click="handleDefinitionList(scope.row)"
-                     v-hasPermi="['bpm:model:query']">流程定义</el-button>
+                     v-hasPermi="['bpm:process-definition:query']">流程定义</el-button>
           <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)"
                      v-hasPermi="['bpm:model:delete']">删除</el-button>
         </template>
@@ -450,16 +452,22 @@ export default {
     },
     /** 流程表单的详情按钮操作 */
     handleFormDetail(row) {
-      getForm(row.formId).then(response => {
-        // 设置值
-        const data = response.data
-        this.detailForm = {
-          ...JSON.parse(data.conf),
-          fields: decodeFields(data.fields)
-        }
-        // 弹窗打开
-        this.detailOpen = true
-      })
+      // 流程表单
+      if (row.formId) {
+        getForm(row.formId).then(response => {
+          // 设置值
+          const data = response.data
+          this.detailForm = {
+            ...JSON.parse(data.conf),
+            fields: decodeFields(data.fields)
+          }
+          // 弹窗打开
+          this.detailOpen = true
+        })
+        // 业务表单
+      } else if (row.formCustomCreatePath) {
+        this.$router.push({ path: row.formCustomCreatePath});
+      }
     },
     /** 流程图的详情按钮操作 */
     handleBpmnDetail(row) {

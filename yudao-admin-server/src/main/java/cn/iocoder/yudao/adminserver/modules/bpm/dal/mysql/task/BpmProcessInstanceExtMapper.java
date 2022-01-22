@@ -23,6 +23,10 @@ public interface BpmProcessInstanceExtMapper extends BaseMapperX<BpmProcessInsta
                 .orderByDesc("id"));
     }
 
+    default BpmProcessInstanceExtDO selectByProcessInstanceId(String processDefinitionId) {
+        return selectOne("process_instance_id", processDefinitionId);
+    }
+
     default void updateByProcessInstanceId(BpmProcessInstanceExtDO updateObj) {
         update(updateObj, new QueryWrapper<BpmProcessInstanceExtDO>()
                 .eq("process_instance_id", updateObj.getProcessInstanceId()));

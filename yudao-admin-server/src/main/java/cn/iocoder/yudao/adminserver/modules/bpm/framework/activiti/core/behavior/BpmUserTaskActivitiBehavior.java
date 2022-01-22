@@ -37,6 +37,9 @@ import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString
 
 /**
  * 自定义的流程任务的 assignee 负责人的分配
+ * 第一步，获得对应的分配规则；
+ * 第二步，根据分配规则，计算出分配任务的候选人。如果找不到，则直接报业务异常，不继续执行后续的流程；
+ * 第三步，随机选择一个候选人，则选择作为 assignee 负责人。
  *
  * @author 芋道源码
  */
@@ -70,18 +73,13 @@ public class BpmUserTaskActivitiBehavior extends UserTaskActivityBehavior {
     protected void handleAssignments(TaskEntityManager taskEntityManager,
                                      String assignee, String owner, List<String> candidateUsers, List<String> candidateGroups,
                                      TaskEntity task, ExpressionManager expressionManager, DelegateExecution execution) {
-        // 获得任务的规则
+        // 第一步，获得任务的规则
         BpmTaskAssignRuleDO rule = getTaskRule(task);
-        // 获得任务的候选用户们
+        // 第二步，获得任务的候选用户们
         Set<Long> candidateUserIds = calculateTaskCandidateUsers(task, rule);
-        // 设置负责人
+        // 第三步，设置一个作为负责人
         Long assigneeUserId = chooseTaskAssignee(candidateUserIds);
         taskEntityManager.changeTaskAssignee(task, String.valueOf(assigneeUserId));
-        // 设置候选人们
-        candidateUserIds.remove(assigneeUserId); // 已经成为负责人了，就不要在扮演候选人了
-        if (CollUtil.isNotEmpty(candidateUserIds)) {
-            task.addCandidateUsers(convertSet(candidateUserIds, String::valueOf));
-        }
     }
 
     private BpmTaskAssignRuleDO getTaskRule(TaskEntity task) {

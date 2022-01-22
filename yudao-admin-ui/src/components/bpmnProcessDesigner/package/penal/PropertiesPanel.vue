@@ -16,7 +16,9 @@
       </el-collapse-item>
       <el-collapse-item name="condition" v-if="formVisible" key="form">
         <div slot="title" class="panel-tab__title"><i class="el-icon-s-order"></i>表单</div>
-        <element-form :id="elementId" :type="elementType" />
+<!--        <element-form :id="elementId" :type="elementType" />-->
+        友情提示：使用 <router-link target="_blank" :to="{path:'/bpm/manager/form'}"><el-link type="danger">流程表单</el-link> </router-link>
+        替代，提供更好的表单设计功能
       </el-collapse-item>
       <el-collapse-item name="task" v-if="elementType.indexOf('Task') !== -1" key="task">
         <div slot="title" class="panel-tab__title"><i class="el-icon-s-claim"></i>任务</div>

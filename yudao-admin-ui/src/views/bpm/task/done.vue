@@ -21,7 +21,7 @@
       <el-table-column label="任务编号" align="center" prop="id" width="320" fixed />
       <el-table-column label="任务名称" align="center" prop="name" width="200" />
       <el-table-column label="所属流程" align="center" prop="processInstance.name" width="200" />
-      <el-table-column label="流程发起人" align="center" prop="processInstance.startUserNickname" />
+      <el-table-column label="流程发起人" align="center" prop="processInstance.startUserNickname" width="120" />
       <el-table-column label="结果" align="center" prop="result">
         <template slot-scope="scope">
           <span>
@@ -56,11 +56,10 @@
           <span>{{ getDateStar(scope.row.durationInMillis) }}</span>
         </template>
       </el-table-column>
-      <!-- TODO 耗时 -->
       <el-table-column label="操作" align="center" fixed="right" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-          <!-- TODO 权限、颜色 -->
-          <el-button size="mini" type="text" icon="el-icon-edit">详情</el-button>
+          <el-button size="mini" type="text" icon="el-icon-edit" @click="handleAudit(scope.row)"
+                     v-hasPermi="['bpm:task:query']">详情</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -87,7 +86,7 @@ export default {
       showSearch: true,
       // 总条数
       total: 0,
-      // 待办任务列表
+      // 已办任务列表
       list: [],
       // 查询参数
       dateRangeCreateTime: [],
@@ -127,7 +126,11 @@ export default {
     },
     getDateStar(ms) {
       return getDate(ms);
-    }
+    },
+    /** 处理审批按钮 */
+    handleAudit(row) {
+      this.$router.push({ path: "/bpm/process-instance/detail", query: { id: row.processInstance.id}});
+    },
   }
 };
 </script>

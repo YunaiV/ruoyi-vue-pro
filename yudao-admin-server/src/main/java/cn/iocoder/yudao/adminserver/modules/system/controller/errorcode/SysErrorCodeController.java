@@ -50,7 +50,7 @@ public class SysErrorCodeController {
 
     @DeleteMapping("/delete")
     @ApiOperation("删除错误码")
-    @ApiImplicitParam(name = "id", value = "编号", required = true)
+    @ApiImplicitParam(name = "id", value = "编号", required = true, dataTypeClass = Long.class)
     @PreAuthorize("@ss.hasPermission('system:error-code:delete')")
     public CommonResult<Boolean> deleteErrorCode(@RequestParam("id") Long id) {
         errorCodeService.deleteErrorCode(id);

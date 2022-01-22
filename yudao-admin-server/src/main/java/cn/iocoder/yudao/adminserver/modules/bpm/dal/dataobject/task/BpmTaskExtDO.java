@@ -46,6 +46,12 @@ public class BpmTaskExtDO extends BaseDO {
      * 关联 {@link Task#getId()}
      */
     private String taskId;
+//    /**
+//     * 任务的标识
+//     *
+//     * 关联 {@link Task#getTaskDefinitionKey()}
+//     */
+//    private String definitionKey;
     /**
      * 任务的结果
      *

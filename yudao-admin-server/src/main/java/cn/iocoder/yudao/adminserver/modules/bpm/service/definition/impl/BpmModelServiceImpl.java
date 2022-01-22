@@ -7,9 +7,10 @@ import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.model.*
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.rule.BpmTaskAssignRuleRespVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.convert.definition.BpmModelConvert;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.definition.BpmFormDO;
+import cn.iocoder.yudao.adminserver.modules.bpm.enums.definition.BpmModelFormTypeEnum;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmProcessDefinitionService;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmTaskAssignRuleService;
-import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.dto.BpmDefinitionCreateReqDTO;
+import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.dto.BpmProcessDefinitionCreateReqDTO;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmFormService;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmModelService;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.dto.BpmModelMetaInfoRespDTO;
@@ -20,11 +21,9 @@ import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.object.PageUtils;
 import cn.iocoder.yudao.framework.common.util.validation.ValidationUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.activiti.bpmn.converter.BpmnXMLConverter;
 import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.impl.persistence.entity.SuspensionState;
-import org.activiti.engine.impl.util.io.StringStreamSource;
 import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.Model;
 import org.activiti.engine.repository.ModelQuery;
@@ -36,11 +35,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.Consumer;
+import java.util.*;
 
 import static cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants.*;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -52,6 +47,7 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
  * 主要进行 Activiti {@link Model} 的维护
  *
  * @author yunlongn
+ * @author 芋道源码
  */
 @Service
 @Validated
@@ -176,25 +172,23 @@ public class BpmModelServiceImpl implements BpmModelService {
         }
         // TODO 芋艿：校验流程图的有效性；例如说，是否有开始的元素，是否有结束的元素；
         // 校验表单已配
-        BpmModelMetaInfoRespDTO metaInfo = JsonUtils.parseObject(model.getMetaInfo(), BpmModelMetaInfoRespDTO.class);
-        if (metaInfo == null || metaInfo.getFormType() == null) {
-            throw exception(MODEL_DEPLOY_FAIL_FORM_NOT_CONFIG);
-        }
+        BpmFormDO form = checkFormConfig(model);
         // 校验任务分配规则已配置
         checkTaskAssignRuleAllConfig(id);
 
+        // 校验模型是否发生修改。如果未修改，则不允许创建
+        BpmProcessDefinitionCreateReqDTO definitionCreateReqDTO = BpmModelConvert.INSTANCE.convert2(model, form).setBpmnBytes(bpmnBytes);
+        if (processDefinitionService.isProcessDefinitionEquals(definitionCreateReqDTO)) { // 流程定义的信息相等
+            ProcessDefinition oldProcessInstance = processDefinitionService.getProcessDefinitionByDeploymentId(model.getDeploymentId());
+            if (oldProcessInstance != null && taskAssignRuleService.isTaskAssignRulesEquals(model.getId(), oldProcessInstance.getId())) {
+                throw exception(MODEL_DEPLOY_FAIL_TASK_INFO_EQUALS);
+            }
+        }
         // 创建流程定义
-        BpmDefinitionCreateReqDTO definitionCreateReqDTO = BpmModelConvert.INSTANCE.convert2(model)
-                .setBpmnXml(StrUtil.utf8Str(bpmnBytes));
         String definitionId = processDefinitionService.createProcessDefinition(definitionCreateReqDTO);
 
         // 将老的流程定义进行挂起。也就是说，只有最新部署的流程定义，才可以发起任务。
-        if (StrUtil.isNotEmpty(model.getDeploymentId())) {
-            ProcessDefinition oldDefinition = processDefinitionService.getProcessDefinitionByDeploymentId(model.getDeploymentId());
-            if (oldDefinition != null) {
-                processDefinitionService.updateProcessDefinitionState(oldDefinition.getId(), SuspensionState.SUSPENDED.getStateCode());
-            }
-        }
+        updateProcessDefinitionSuspended(model.getDeploymentId());
 
         // 更新 model 的 deploymentId，进行关联
         ProcessDefinition definition = processDefinitionService.getProcessDefinition(definitionId);
@@ -225,7 +219,30 @@ public class BpmModelServiceImpl implements BpmModelService {
         });
     }
 
+    /**
+     * 校验流程表单已配置
+     *
+     * @param model 流程模型
+     * @return 流程表单
+     */
+    private BpmFormDO checkFormConfig(Model model) {
+        BpmModelMetaInfoRespDTO metaInfo = JsonUtils.parseObject(model.getMetaInfo(), BpmModelMetaInfoRespDTO.class);
+        if (metaInfo == null || metaInfo.getFormType() == null) {
+            throw exception(MODEL_DEPLOY_FAIL_FORM_NOT_CONFIG);
+        }
+        // 校验表单存在
+        if (Objects.equals(metaInfo.getFormType(), BpmModelFormTypeEnum.NORMAL.getType())) {
+            BpmFormDO form = formService.getForm(metaInfo.getFormId());
+            if (form == null) {
+                throw exception(FORM_NOT_EXISTS);
+            }
+            return form;
+        }
+        return null;
+    }
+
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void deleteModel(String id) {
         // 校验流程模型存在
         Model model = repositoryService.getModel(id);
@@ -234,6 +251,19 @@ public class BpmModelServiceImpl implements BpmModelService {
         }
         // 执行删除
         repositoryService.deleteModel(id);
+        // 禁用流程实例
+        updateProcessDefinitionSuspended(model.getDeploymentId());
+    }
+
+    private void updateProcessDefinitionSuspended(String deploymentId) {
+        if (StrUtil.isEmpty(deploymentId)) {
+            return;
+        }
+        ProcessDefinition oldDefinition = processDefinitionService.getProcessDefinitionByDeploymentId(deploymentId);
+        if (oldDefinition == null) {
+            return;
+        }
+        processDefinitionService.updateProcessDefinitionState(oldDefinition.getId(), SuspensionState.SUSPENDED.getStateCode());
     }
 
     @Override
@@ -270,12 +300,6 @@ public class BpmModelServiceImpl implements BpmModelService {
         if (!ValidationUtils.isXmlNCName(key)) {
             throw exception(MODEL_KEY_VALID);
         }
-    }
-
-    public static void main(String[] args) {
-        // 创建转换对象
-        BpmnXMLConverter converter = new BpmnXMLConverter();
-        BpmnModel bpmnModel = converter.convertToBpmnModel(new StringStreamSource(""), true, true);
     }
 
 }

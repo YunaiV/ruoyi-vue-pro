@@ -3,7 +3,7 @@ package cn.iocoder.yudao.adminserver.modules.bpm.convert.definition;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.model.*;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.definition.BpmFormDO;
-import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.dto.BpmDefinitionCreateReqDTO;
+import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.dto.BpmProcessDefinitionCreateReqDTO;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.dto.BpmModelMetaInfoRespDTO;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
@@ -83,8 +83,8 @@ public interface BpmModelConvert {
 
     void copyTo(BpmModelMetaInfoRespDTO from, @MappingTarget BpmModelBaseVO to);
 
-    default BpmDefinitionCreateReqDTO convert2(Model model) {
-        BpmDefinitionCreateReqDTO createReqDTO = new BpmDefinitionCreateReqDTO();
+    default BpmProcessDefinitionCreateReqDTO convert2(Model model, BpmFormDO form) {
+        BpmProcessDefinitionCreateReqDTO createReqDTO = new BpmProcessDefinitionCreateReqDTO();
         createReqDTO.setModelId(model.getId());
         createReqDTO.setName(model.getName());
         createReqDTO.setKey(model.getKey());
@@ -92,10 +92,15 @@ public interface BpmModelConvert {
         BpmModelMetaInfoRespDTO metaInfo = JsonUtils.parseObject(model.getMetaInfo(), BpmModelMetaInfoRespDTO.class);
         // metaInfo
         copyTo(metaInfo, createReqDTO);
+        // form
+        if (form != null) {
+            createReqDTO.setFormConf(form.getConf());
+            createReqDTO.setFormFields(form.getFields());
+        }
         return createReqDTO;
     }
 
-    void copyTo(BpmModelMetaInfoRespDTO from, @MappingTarget BpmDefinitionCreateReqDTO to);
+    void copyTo(BpmModelMetaInfoRespDTO from, @MappingTarget BpmProcessDefinitionCreateReqDTO to);
 
     default void copy(Model model, BpmModelCreateReqVO bean) {
         model.setName(bean.getName());

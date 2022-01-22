@@ -4,13 +4,14 @@ import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.process
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.process.BpmProcessDefinitionRespVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.definition.BpmProcessDefinitionExtDO;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.definition.BpmFormDO;
-import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.dto.BpmDefinitionCreateReqDTO;
+import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.dto.BpmProcessDefinitionCreateReqDTO;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import org.activiti.engine.impl.persistence.entity.SuspensionState;
 import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 import org.mapstruct.Named;
 import org.mapstruct.factory.Mappers;
 
@@ -38,34 +39,31 @@ public interface BpmProcessDefinitionConvert {
     }
 
     default BpmProcessDefinitionPageItemRespVO convert(ProcessDefinition bean, Deployment deployment,
-                                                       BpmProcessDefinitionExtDO processDefinitionDO, BpmFormDO form) {
+                                                       BpmProcessDefinitionExtDO processDefinitionExtDO, BpmFormDO form) {
         BpmProcessDefinitionPageItemRespVO respVO = convert(bean);
         respVO.setSuspensionState(bean.isSuspended() ? SuspensionState.SUSPENDED.getStateCode() : SuspensionState.ACTIVE.getStateCode());
         if (deployment != null) {
             respVO.setDeploymentTime(deployment.getDeploymentTime());
         }
         if (form != null) {
-            respVO.setFormId(form.getId());
             respVO.setFormName(form.getName());
         }
-        if (processDefinitionDO != null) {
-            respVO.setDescription(processDefinitionDO.getDescription());
-        }
+        // 复制通用属性
+        copyTo(processDefinitionExtDO, respVO);
         return respVO;
     }
 
     BpmProcessDefinitionPageItemRespVO convert(ProcessDefinition bean);
 
-    BpmProcessDefinitionExtDO convert2(BpmDefinitionCreateReqDTO bean);
+    BpmProcessDefinitionExtDO convert2(BpmProcessDefinitionCreateReqDTO bean);
 
     default List<BpmProcessDefinitionRespVO> convertList3(List<ProcessDefinition> list,
                                                           Map<String, BpmProcessDefinitionExtDO> processDefinitionDOMap) {
         return CollectionUtils.convertList(list, processDefinition -> {
             BpmProcessDefinitionRespVO respVO = convert3(processDefinition);
             BpmProcessDefinitionExtDO processDefinitionExtDO = processDefinitionDOMap.get(processDefinition.getId());
-            if (processDefinitionExtDO != null) {
-                respVO.setFormId(processDefinitionExtDO.getFormId());
-            }
+            // 复制通用属性
+            copyTo(processDefinitionExtDO, respVO);
             return respVO;
         });
     }
@@ -78,5 +76,8 @@ public interface BpmProcessDefinitionConvert {
         return suspended ? SuspensionState.SUSPENDED.getStateCode() :
                 SuspensionState.ACTIVE.getStateCode();
     }
+
+    @Mapping(source = "from.id", target = "to.id", ignore = true)
+    void copyTo(BpmProcessDefinitionExtDO from, @MappingTarget BpmProcessDefinitionRespVO to);
 
 }
