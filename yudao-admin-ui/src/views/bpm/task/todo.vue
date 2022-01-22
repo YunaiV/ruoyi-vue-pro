@@ -3,9 +3,6 @@
 
     <!-- 搜索工作栏 -->
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="流程发起人">
-        321321321
-      </el-form-item>
       <el-form-item label="流程名" prop="name">
         <el-input v-model="queryParams.name" placeholder="请输入流程名" clearable size="small" @keyup.enter.native="handleQuery"/>
       </el-form-item>
@@ -40,10 +37,6 @@
         <template slot-scope="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleAudit(scope.row)"
                      v-hasPermi="['bpm:task:update']">审批</el-button>
-          <el-button size="mini" type="text" icon="el-icon-edit" v-if="scope.row.suspensionState === 2"
-                     v-hasPermi="['bpm:task:update']">激活</el-button>
-          <el-button size="mini" type="text" icon="el-icon-edit" v-if="scope.row.suspensionState === 1"
-                     v-hasPermi="['bpm:task:update']">挂起</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -55,7 +48,8 @@
 </template>
 
 <script>
-import {approveTask, getTodoTaskPage, rejectTask} from '@/api/bpm/task'
+import {getTodoTaskPage} from '@/api/bpm/task'
+import {listSimpleUsers} from "@/api/system/user";
 
 export default {
   name: "Todo",
