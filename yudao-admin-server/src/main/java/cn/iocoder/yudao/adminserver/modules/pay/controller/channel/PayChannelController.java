@@ -57,7 +57,7 @@ public class PayChannelController {
 
     @DeleteMapping("/delete")
     @ApiOperation("删除支付渠道 ")
-    @ApiImplicitParam(name = "id", value = "编号", required = true)
+    @ApiImplicitParam(name = "id", value = "编号", required = true, dataTypeClass = Long.class)
     @PreAuthorize("@ss.hasPermission('pay:channel:delete')")
     public CommonResult<Boolean> deleteChannel(@RequestParam("id") Long id) {
         channelService.deleteChannel(id);

@@ -71,7 +71,7 @@ public class PayAppController {
 
     @DeleteMapping("/delete")
     @ApiOperation("删除支付应用信息")
-    @ApiImplicitParam(name = "id", value = "编号", required = true)
+    @ApiImplicitParam(name = "id", value = "编号", required = true, dataTypeClass = Long.class)
     @PreAuthorize("@ss.hasPermission('pay:app:delete')")
     public CommonResult<Boolean> deleteApp(@RequestParam("id") Long id) {
         appService.deleteApp(id);

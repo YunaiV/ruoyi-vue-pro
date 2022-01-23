@@ -109,7 +109,7 @@
           </el-popover>
         </template>
       </el-table-column>
-      <el-table-column label="支付订单" align="left" width="250">
+      <el-table-column label="支付订单" align="left" width="280">
         <template v-slot="scope">
           <p class="order-font"><el-tag size="mini">商户</el-tag> {{scope.row.merchantOrderId}}</p>
           <p class="order-font"><el-tag size="mini" type="warning">支付</el-tag> {{scope.row.channelOrderNo}}</p>
