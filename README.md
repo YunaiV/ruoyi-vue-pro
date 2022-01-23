@@ -193,7 +193,7 @@ ps：核心功能已经实现，正在对接微信小程序中...
 | 模块 | biu |  biu | biu |
 | --- | --- | --- | --- |
 | 商家 & 应用 | ![商户信息](https://static.iocoder.cn/images/ruoyi-vue-pro/商户信息.jpg) | ![应用信息-列表](https://static.iocoder.cn/images/ruoyi-vue-pro/应用信息-列表.jpg) | ![应用信息-编辑](https://static.iocoder.cn/images/ruoyi-vue-pro/应用信息-编辑.jpg) |
-| 支付 & 退款 | ![支付订单](https://static.iocoder.cn/images/ruoyi-vue-pro/支付订单jpg) | ![退款订单](https://static.iocoder.cn/images/ruoyi-vue-pro/退款订单jpg) | --- |
+| 支付 & 退款 | ![支付订单](https://static.iocoder.cn/images/ruoyi-vue-pro/支付订单.jpg) | ![退款订单](https://static.iocoder.cn/images/ruoyi-vue-pro/退款订单.jpg) | --- |
 
 ### 基础设施
 
