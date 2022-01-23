@@ -1,17 +1,29 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.service.definition;
 
+import cn.hutool.core.util.RandomUtil;
 import cn.iocoder.yudao.adminserver.BaseDbUnitTest;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.form.BpmFormCreateReqVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.form.BpmFormPageReqVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.form.BpmFormUpdateReqVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.definition.BpmFormDO;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.mysql.definition.BpmFormMapper;
+import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.dto.BpmFormFieldRespDTO;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.impl.BpmFormServiceImpl;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants.FORM_NOT_EXISTS;
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
@@ -38,7 +50,10 @@ public class BpmFormServiceTest extends BaseDbUnitTest {
     @Test
     public void testCreateForm_success() {
         // 准备参数
-        BpmFormCreateReqVO reqVO = randomPojo(BpmFormCreateReqVO.class);
+        BpmFormCreateReqVO reqVO = randomPojo(BpmFormCreateReqVO.class, o -> {
+            o.setConf("{}");
+            o.setFields(randomFields());
+        });
 
         // 调用
         Long formId = formService.createForm(reqVO);
@@ -52,11 +67,16 @@ public class BpmFormServiceTest extends BaseDbUnitTest {
     @Test
     public void testUpdateForm_success() {
         // mock 数据
-        BpmFormDO dbForm = randomPojo(BpmFormDO.class);
+        BpmFormDO dbForm = randomPojo(BpmFormDO.class, o -> {
+            o.setConf("{}");
+            o.setFields(randomFields());
+        });
         formMapper.insert(dbForm);// @Sql: 先插入出一条存在的数据
         // 准备参数
         BpmFormUpdateReqVO reqVO = randomPojo(BpmFormUpdateReqVO.class, o -> {
             o.setId(dbForm.getId()); // 设置更新的 ID
+            o.setConf("{'yudao': 'yuanma'}");
+            o.setFields(randomFields());
         });
 
         // 调用
@@ -69,7 +89,10 @@ public class BpmFormServiceTest extends BaseDbUnitTest {
     @Test
     public void testUpdateForm_notExists() {
         // 准备参数
-        BpmFormUpdateReqVO reqVO = randomPojo(BpmFormUpdateReqVO.class);
+        BpmFormUpdateReqVO reqVO = randomPojo(BpmFormUpdateReqVO.class, o -> {
+            o.setConf("{'yudao': 'yuanma'}");
+            o.setFields(randomFields());
+        });
 
         // 调用, 并断言异常
         assertServiceException(() -> formService.updateForm(reqVO), FORM_NOT_EXISTS);
@@ -117,6 +140,13 @@ public class BpmFormServiceTest extends BaseDbUnitTest {
         assertEquals(1, pageResult.getTotal());
         assertEquals(1, pageResult.getList().size());
         assertPojoEquals(dbForm, pageResult.getList().get(0));
+    }
+
+    private List<String> randomFields() {
+        int size = RandomUtil.randomInt(1, 3);
+        return Stream.iterate(0, i -> i).limit(size)
+                .map(i -> JsonUtils.toJsonString(randomPojo(BpmFormFieldRespDTO.class)))
+                .collect(Collectors.toList());
     }
 
 }

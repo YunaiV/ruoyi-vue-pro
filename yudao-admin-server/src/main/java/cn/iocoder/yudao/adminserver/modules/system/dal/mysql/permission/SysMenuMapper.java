@@ -24,7 +24,7 @@ public interface SysMenuMapper extends BaseMapperX<SysMenuDO> {
     }
 
     default List<SysMenuDO> selectList(SysMenuListReqVO reqVO) {
-        return selectList(new LambdaQueryWrapperX<SysMenuDO>().likeIfPresent(SysMenuDO::getParentId, reqVO.getName())
+        return selectList(new LambdaQueryWrapperX<SysMenuDO>().likeIfPresent(SysMenuDO::getName, reqVO.getName())
                 .eqIfPresent(SysMenuDO::getStatus, reqVO.getStatus()));
     }
 
