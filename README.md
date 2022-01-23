@@ -10,6 +10,7 @@
 * 支持加载动态权限菜单，多方式轻松权限控制，本地缓存提升性能。
 * 工作流使用 Activiti ，支持动态表单、在线设计流程、多种任务分配方式。
 * 高效率开发，使用代码生成器可以一键生成前后端代码 + 单元测试 + Swagger 接口文档。
+* 集成微信小程序、微信公众号、企业微信等多种第三方授权登录，集成支付宝、微信等多种支付方式。
 
 ## 在线体验
 
@@ -69,7 +70,14 @@
 
 ### 支付系统
 
-正在测试中，核心功能已经开发完毕。
+|  | 功能 | 描述 |
+| --- | --- | --- |
+| 🚀 | 商户信息 | 管理商户信息，支持 Saas 场景下的多商户功能 |
+| 🚀 | 应用信息 | 配置商户的应用信息，对接支付宝、微信等多个支付渠道 |
+| 🚀 | 支付订单 | 查看用户在支付宝、微信等的【支付】订单 |
+| 🚀 | 退款订单 | 查看用户在支付宝、微信等的【退款】订单 |
+
+ps：核心功能已经实现，正在对接微信小程序中...
 
 ### 基础设施
 
@@ -171,6 +179,13 @@
 | 我的流程 | ![我的流程-列表](https://static.iocoder.cn/images/ruoyi-vue-pro/我的流程-列表.jpg) | ![我的流程-发起](https://static.iocoder.cn/images/ruoyi-vue-pro/我的流程-发起.jpg) | ![我的流程-详情](https://static.iocoder.cn/images/ruoyi-vue-pro/我的流程-详情.jpg) |
 | 待办 & 已办 | ![任务列表-审批](https://static.iocoder.cn/images/ruoyi-vue-pro/任务列表-审批.jpg) | ![任务列表-待办](https://static.iocoder.cn/images/ruoyi-vue-pro/任务列表-待办.jpg) | ![任务列表-已办](https://static.iocoder.cn/images/ruoyi-vue-pro/任务列表-已办.jpg) |
 | OA 请假 | ![OA请假-列表](https://static.iocoder.cn/images/ruoyi-vue-pro/OA请假-列表.jpg) | ![OA请假-发起](https://static.iocoder.cn/images/ruoyi-vue-pro/OA请假-发起.jpg) | ![OA请假-详情](https://static.iocoder.cn/images/ruoyi-vue-pro/OA请假-详情.jpg) |
+
+### 支付系统
+
+| 模块 | biu |  biu | biu |
+| --- | --- | --- | --- |
+| 商家 & 应用 | ![商户信息](https://static.iocoder.cn/images/ruoyi-vue-pro/商户信息.jpg) | ![应用信息-列表](https://static.iocoder.cn/images/ruoyi-vue-pro/应用信息-列表.jpg) | ![应用信息-编辑](https://static.iocoder.cn/images/ruoyi-vue-pro/应用信息-编辑.jpg) |
+| 支付 & 退款 | ![支付订单](https://static.iocoder.cn/images/ruoyi-vue-pro/支付订单jpg) | ![退款订单](https://static.iocoder.cn/images/ruoyi-vue-pro/退款订单jpg) | --- |
 
 ### 基础设施
 

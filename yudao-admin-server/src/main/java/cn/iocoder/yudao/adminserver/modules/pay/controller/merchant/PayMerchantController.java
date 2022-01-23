@@ -59,7 +59,7 @@ public class PayMerchantController {
 
     @DeleteMapping("/delete")
     @ApiOperation("删除支付商户信息")
-    @ApiImplicitParam(name = "id", value = "编号", required = true)
+    @ApiImplicitParam(name = "id", value = "编号", required = true, dataTypeClass = Long.class)
     @PreAuthorize("@ss.hasPermission('pay:merchant:delete')")
     public CommonResult<Boolean> deleteMerchant(@RequestParam("id") Long id) {
         merchantService.deleteMerchant(id);
