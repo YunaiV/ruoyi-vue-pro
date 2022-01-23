@@ -41,6 +41,8 @@
         <podam.version>7.2.6.RELEASE</podam.version>
         <jedis-mock.version>0.1.16</jedis-mock.version>
         <mockito-inline.version>3.6.28</mockito-inline.version>
+        <!-- Bpm 工作流相关 -->
+        <activiti.version>7.1.0.M6</activiti.version>
         <!-- 工具类相关 -->
         <lombok.version>1.18.20</lombok.version>
         <mapstruct.version>1.4.1.Final</mapstruct.version>
@@ -363,6 +365,36 @@
                 <groupId>uk.co.jemos.podam</groupId> <!-- 单元测试，随机生成 POJO 类 -->
                 <artifactId>podam</artifactId>
                 <version>${podam.version}</version>
+            </dependency>
+
+            <!-- 工作流相关 -->
+            <dependency>
+                <groupId>org.activiti</groupId>
+                <artifactId>activiti-spring-boot-starter</artifactId>
+                <version>${activiti.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>de.odysseus.juel</groupId>
+                        <artifactId>juel-api</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>de.odysseus.juel</groupId>
+                        <artifactId>juel-spi</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.mybatis</groupId>
+                        <artifactId>mybatis</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>el-api</artifactId>
+                        <groupId>javax.el</groupId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.activiti</groupId>
+                <artifactId>activiti-image-generator</artifactId>
+                <version>${activiti.version}</version>
             </dependency>
 
             <!-- 工具类相关 -->
