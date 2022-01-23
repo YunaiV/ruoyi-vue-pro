@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.service.definition;
 
+import cn.hutool.core.date.DateUtil;
 import cn.iocoder.yudao.adminserver.BaseDbUnitTest;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.group.BpmUserGroupCreateReqVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.group.BpmUserGroupPageReqVO;
@@ -7,7 +8,9 @@ import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.group.B
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.definition.BpmUserGroupDO;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.mysql.definition.BpmUserGroupMapper;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.impl.BpmUserGroupServiceImpl;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
@@ -98,27 +101,27 @@ public class BpmUserGroupServiceTest extends BaseDbUnitTest {
         assertServiceException(() -> userGroupService.deleteUserGroup(id), USER_GROUP_NOT_EXISTS);
     }
 
-    @Test // TODO 请修改 null 为需要的值
+    @Test
     public void testGetUserGroupPage() {
        // mock 数据
        BpmUserGroupDO dbUserGroup = randomPojo(BpmUserGroupDO.class, o -> { // 等会查询到
-           o.setName(null);
-           o.setStatus(null);
-           o.setCreateTime(null);
+           o.setName("芋道源码");
+           o.setStatus(CommonStatusEnum.ENABLE.getStatus());
+           o.setCreateTime(DateUtils.buildTime(2021, 11, 11));
        });
        userGroupMapper.insert(dbUserGroup);
        // 测试 name 不匹配
-       userGroupMapper.insert(cloneIgnoreId(dbUserGroup, o -> o.setName(null)));
+       userGroupMapper.insert(cloneIgnoreId(dbUserGroup, o -> o.setName("芋道")));
        // 测试 status 不匹配
-       userGroupMapper.insert(cloneIgnoreId(dbUserGroup, o -> o.setStatus(null)));
+       userGroupMapper.insert(cloneIgnoreId(dbUserGroup, o -> o.setStatus(CommonStatusEnum.DISABLE.getStatus())));
        // 测试 createTime 不匹配
-       userGroupMapper.insert(cloneIgnoreId(dbUserGroup, o -> o.setCreateTime(null)));
+       userGroupMapper.insert(cloneIgnoreId(dbUserGroup, o -> o.setCreateTime(DateUtils.buildTime(2021, 12, 12))));
        // 准备参数
        BpmUserGroupPageReqVO reqVO = new BpmUserGroupPageReqVO();
-       reqVO.setName(null);
-       reqVO.setStatus(null);
-       reqVO.setBeginCreateTime(null);
-       reqVO.setEndCreateTime(null);
+       reqVO.setName("源码");
+       reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
+       reqVO.setBeginCreateTime(DateUtils.buildTime(2021, 11, 10));
+       reqVO.setEndCreateTime(DateUtils.buildTime(2021, 11, 12));
 
        // 调用
        PageResult<BpmUserGroupDO> pageResult = userGroupService.getUserGroupPage(reqVO);

@@ -23,7 +23,7 @@ public interface SysDeptMapper extends BaseMapperX<SysDeptDO> {
 
     default SysDeptDO selectByParentIdAndName(Long parentId, String name) {
         return selectOne(new LambdaQueryWrapper<SysDeptDO>().eq(SysDeptDO::getParentId, parentId)
-                .eq(SysDeptDO::getParentId, name));
+                .eq(SysDeptDO::getName, name));
     }
 
     default Integer selectCountByParentId(Long parentId) {

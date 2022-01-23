@@ -70,7 +70,7 @@ public class RandomUtils {
     }
 
     public static <T> Set<T> randomSet(Class<T> clazz) {
-        return Stream.iterate(0, i -> i).limit(RandomUtil.randomInt(0, RANDOM_DATE_MAX))
+        return Stream.iterate(0, i -> i).limit(RandomUtil.randomInt(1, RANDOM_COLLECTION_LENGTH))
                 .map(i -> randomPojo(clazz)).collect(Collectors.toSet());
     }
 

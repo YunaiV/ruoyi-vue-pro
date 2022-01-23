@@ -15,22 +15,6 @@
     <description>Activiti 拓展</description>
     <url>https://github.com/YunaiV/ruoyi-vue-pro</url>
 
-
-    <properties>
-        <activiti.version>7.1.0.M6</activiti.version>
-    </properties>
-    <!-- TODO @jason：后续弄到 yudao-dependencies 里 -->
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.activiti.dependencies</groupId>
-                <artifactId>activiti-dependencies</artifactId>
-                <version>${activiti.version}</version>
-                <scope>import</scope>
-                <type>pom</type>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
     <dependencies>
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
@@ -43,42 +27,20 @@
             <artifactId>yudao-spring-boot-starter-security</artifactId>
         </dependency>
 
-
-
+        <!-- DB 相关 -->
         <dependency>
-            <groupId>org.mybatis</groupId>
-            <artifactId>mybatis</artifactId>
-            <optional>true</optional>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-spring-boot-starter-mybatis</artifactId>
         </dependency>
 
-        <!--使用mybatis plus需排除掉mybatis-->
+        <!-- 工作流相关 -->
         <dependency>
             <groupId>org.activiti</groupId>
             <artifactId>activiti-spring-boot-starter</artifactId>
-            <version>${activiti.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>de.odysseus.juel</groupId>
-                    <artifactId>juel-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>de.odysseus.juel</groupId>
-                    <artifactId>juel-spi</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.mybatis</groupId>
-                    <artifactId>mybatis</artifactId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>el-api</artifactId>
-                    <groupId>javax.el</groupId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.activiti</groupId>
             <artifactId>activiti-image-generator</artifactId>
-            <version>${activiti.version}</version>
         </dependency>
 
     </dependencies>

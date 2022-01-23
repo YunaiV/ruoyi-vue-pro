@@ -172,7 +172,6 @@ class SysDeptServiceTest extends BaseDbUnitTest {
             });
         // 调用, 并断言异常
         assertServiceException(() -> deptService.updateDept(reqVO), DEPT_NAME_DUPLICATE);
-
     }
 
     @Test

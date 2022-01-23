@@ -17,6 +17,7 @@ import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
 import org.activiti.engine.impl.persistence.entity.TaskEntity;
+import org.activiti.engine.impl.persistence.entity.TaskEntityImpl;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -70,7 +71,7 @@ public class BpmUserTaskActivitiBehaviorTest extends BaseMockitoUnitTest {
         // mock 方法
         List<SysUserDO> users = CollectionUtils.convertList(asSet(11L, 22L),
                 id -> new SysUserDO().setId(id));
-        when(userService.getUsersByPostIds(eq(rule.getOptions()))).thenReturn(users);
+        when(userService.getUsersByDeptIds(eq(rule.getOptions()))).thenReturn(users);
         mockGetUserMap(asSet(11L, 22L));
 
         // 调用
@@ -185,10 +186,11 @@ public class BpmUserTaskActivitiBehaviorTest extends BaseMockitoUnitTest {
 
     @Test
     public void testRemoveDisableUsers() {
-        // 准备参数
+        // 准备参数. 1L 可以找到；2L 是禁用的；3L 找不到
         Set<Long> assigneeUserIds = asSet(1L, 2L, 3L);
         // mock 方法
-        SysUserDO user1 = randomPojo(SysUserDO.class, o -> o.setId(1L));
+        SysUserDO user1 = randomPojo(SysUserDO.class, o -> o.setId(1L)
+                .setStatus(CommonStatusEnum.ENABLE.getStatus()));
         SysUserDO user2 = randomPojo(SysUserDO.class, o -> o.setId(2L)
                 .setStatus(CommonStatusEnum.DISABLE.getStatus()));
         Map<Long, SysUserDO> userMap = MapUtil.builder(user1.getId(), user1)
