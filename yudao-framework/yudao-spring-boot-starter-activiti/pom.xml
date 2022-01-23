@@ -43,12 +43,10 @@
             <artifactId>yudao-spring-boot-starter-security</artifactId>
         </dependency>
 
-
-
+        <!-- DB 相关 -->
         <dependency>
-            <groupId>org.mybatis</groupId>
-            <artifactId>mybatis</artifactId>
-            <optional>true</optional>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-spring-boot-starter-mybatis</artifactId>
         </dependency>
 
         <!--使用mybatis plus需排除掉mybatis-->
