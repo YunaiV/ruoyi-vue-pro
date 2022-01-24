@@ -258,6 +258,7 @@ public class ToolCodegenServiceImpl implements ToolCodegenService {
         List<ToolSchemaTableDO> tables = schemaTableMapper.selectList(codegenProperties.getDbSchemas(), tableName, tableComment);
         // TODO 强制移除 Quartz 的表，未来做成可配置
         tables.removeIf(table -> table.getTableName().startsWith("QRTZ_"));
+        tables.removeIf(table -> table.getTableName().startsWith("ACT_"));
         return tables;
     }
 

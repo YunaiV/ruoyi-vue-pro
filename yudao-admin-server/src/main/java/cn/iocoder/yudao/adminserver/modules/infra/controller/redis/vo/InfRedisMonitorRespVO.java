@@ -37,7 +37,7 @@ public class InfRedisMonitorRespVO {
         private Integer calls;
 
         @ApiModelProperty(value = "消耗 CPU 秒数", required = true, example = "666")
-        private Integer usec;
+        private Long usec;
 
     }
 

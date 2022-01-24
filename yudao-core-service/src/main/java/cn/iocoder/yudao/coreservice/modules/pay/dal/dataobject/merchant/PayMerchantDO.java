@@ -2,6 +2,8 @@ package cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.merchant;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
@@ -29,6 +31,7 @@ public class PayMerchantDO extends BaseDO {
     /**
      * 商户号
      * 例如说，M233666999
+     * 只有新增时插入，不允许修改
      */
     private String no;
     /**

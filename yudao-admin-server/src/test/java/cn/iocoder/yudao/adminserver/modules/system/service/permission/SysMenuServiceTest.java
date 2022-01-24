@@ -28,7 +28,7 @@ import static cn.iocoder.yudao.adminserver.modules.system.enums.SysErrorCodeCons
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
 
 @Import(SysMenuServiceImpl.class)
@@ -146,12 +146,12 @@ public class SysMenuServiceTest extends BaseDbUnitTest {
         SysMenuDO sonMenuDO = initParentAndSonMenuDO();
         Long sonId = sonMenuDO.getId();
 
-        //调用
+        // 调用
         sysMenuService.deleteMenu(sonId);
 
-        //断言
+        // 断言
         SysMenuDO menuDO = menuMapper.selectById(sonId);
-        Assert.isNull(menuDO);
+        assertNull(menuDO);
         verify(sysPermissionService).processMenuDeleted(sonId);
         verify(sysMenuProducer).sendMenuRefreshMessage();
     }
@@ -182,18 +182,18 @@ public class SysMenuServiceTest extends BaseDbUnitTest {
         menuMapper.insert(sonMenu);
         idMenuMap.put(sonMenu.getId(), sonMenu);
 
-        //调用
+        // 调用
         List<SysMenuDO> menuDOS = sysMenuService.getMenus();
 
-        //断言
-        Assert.isTrue(menuDOS.size() == idMenuMap.size());
+        // 断言
+        assertEquals(menuDOS.size(), idMenuMap.size());
         menuDOS.forEach(m -> assertPojoEquals(idMenuMap.get(m.getId()), m));
     }
 
     @Test
     public void testGetMenusReqVo_success() {
         Map<Long, SysMenuDO> idMenuMap = new HashMap<>();
-        //用于验证可以模糊搜索名称包含"name"，状态为1的menu
+        // 用于验证可以模糊搜索名称包含"name"，状态为1的menu
         SysMenuDO menu = createMenuDO(MenuTypeEnum.MENU, "name2", 0L, 1);
         menuMapper.insert(menu);
         idMenuMap.put(menu.getId(), menu);
@@ -206,32 +206,32 @@ public class SysMenuServiceTest extends BaseDbUnitTest {
         menuMapper.insert(menu);
         idMenuMap.put(menu.getId(), menu);
 
-        //以下是不符合搜索条件的的menu
+        // 以下是不符合搜索条件的的menu
         menu = createMenuDO(MenuTypeEnum.MENU, "xxxxxx", 0L, 1);
         menuMapper.insert(menu);
         menu = createMenuDO(MenuTypeEnum.MENU, "name", 0L, 2);
         menuMapper.insert(menu);
 
-        //调用
+        // 调用
         SysMenuListReqVO reqVO = new SysMenuListReqVO();
         reqVO.setStatus(1);
         reqVO.setName("name");
         List<SysMenuDO> menuDOS = sysMenuService.getMenus(reqVO);
 
-        //断言
-        Assert.isTrue(menuDOS.size() == idMenuMap.size());
+        // 断言
+        assertEquals(menuDOS.size(), idMenuMap.size());
         menuDOS.forEach(m -> assertPojoEquals(idMenuMap.get(m.getId()), m));
     }
 
     @Test
     public void testListMenusFromCache_success() throws Exception {
         Map<Long, SysMenuDO> mockCacheMap = new HashMap<>();
-        //获取代理对象
+        // 获取代理对象
         SysMenuServiceImpl target = (SysMenuServiceImpl) SpringAopUtils.getTarget(sysMenuService);
         BeanUtil.setFieldValue(target, "menuCache", mockCacheMap);
 
         Map<Long, SysMenuDO> idMenuMap = new HashMap<>();
-        //用于验证搜索类型为MENU,状态为1的menu
+        // 用于验证搜索类型为MENU,状态为1的menu
         SysMenuDO menuDO = createMenuDO(1L, MenuTypeEnum.MENU, "name", 0L, 1);
         mockCacheMap.put(menuDO.getId(), menuDO);
         idMenuMap.put(menuDO.getId(), menuDO);
@@ -240,7 +240,7 @@ public class SysMenuServiceTest extends BaseDbUnitTest {
         mockCacheMap.put(menuDO.getId(), menuDO);
         idMenuMap.put(menuDO.getId(), menuDO);
 
-        //以下是不符合搜索条件的menu
+        // 以下是不符合搜索条件的menu
         menuDO = createMenuDO(3L, MenuTypeEnum.BUTTON, "name", 0L, 1);
         mockCacheMap.put(menuDO.getId(), menuDO);
         menuDO = createMenuDO(4L, MenuTypeEnum.MENU, "name", 0L, 2);
@@ -248,24 +248,24 @@ public class SysMenuServiceTest extends BaseDbUnitTest {
 
         List<SysMenuDO> menuDOS = sysMenuService.listMenusFromCache(Collections.singletonList(MenuTypeEnum.MENU.getType()),
                 Collections.singletonList(CommonStatusEnum.DISABLE.getStatus()));
-        Assert.isTrue(menuDOS.size() == idMenuMap.size());
+        assertEquals(menuDOS.size(), idMenuMap.size());
         menuDOS.forEach(m -> assertPojoEquals(idMenuMap.get(m.getId()), m));
     }
 
     @Test
     public void testListMenusFromCache2_success() throws Exception {
         Map<Long, SysMenuDO> mockCacheMap = new HashMap<>();
-        //获取代理对象
+        // 获取代理对象
         SysMenuServiceImpl target = (SysMenuServiceImpl) SpringAopUtils.getTarget(sysMenuService);
         BeanUtil.setFieldValue(target, "menuCache", mockCacheMap);
 
         Map<Long, SysMenuDO> idMenuMap = new HashMap<>();
-        //验证搜索id为1, 类型为MENU, 状态为1 的menu
+        // 验证搜索id为1, 类型为MENU, 状态为1 的menu
         SysMenuDO menuDO = createMenuDO(1L, MenuTypeEnum.MENU, "name", 0L, 1);
         mockCacheMap.put(menuDO.getId(), menuDO);
         idMenuMap.put(menuDO.getId(), menuDO);
 
-        //以下是不符合搜索条件的menu
+        // 以下是不符合搜索条件的menu
         menuDO = createMenuDO(2L, MenuTypeEnum.MENU, "name", 0L, 1);
         mockCacheMap.put(menuDO.getId(), menuDO);
         menuDO = createMenuDO(3L, MenuTypeEnum.BUTTON, "name", 0L, 1);
@@ -275,7 +275,7 @@ public class SysMenuServiceTest extends BaseDbUnitTest {
 
         List<SysMenuDO> menuDOS = sysMenuService.listMenusFromCache(Collections.singletonList(1L),
                 Collections.singletonList(MenuTypeEnum.MENU.getType()), Collections.singletonList(1));
-        Assert.isTrue(menuDOS.size() == idMenuMap.size());
+        assertEquals(menuDOS.size(), idMenuMap.size());
         menuDOS.forEach(menu -> assertPojoEquals(idMenuMap.get(menu.getId()), menu));
     }
 

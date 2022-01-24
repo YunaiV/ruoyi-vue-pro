@@ -23,7 +23,7 @@ public interface RedisConvert {
             respVO.getCommandStats().add(InfRedisMonitorRespVO.CommandStat.builder()
                     .command(StrUtil.subAfter((String) key, "cmdstat_", false))
                     .calls(Integer.valueOf(StrUtil.subBetween((String) value, "calls=", ",")))
-                    .usec(Integer.valueOf(StrUtil.subBetween((String) value, "usec=", ",")))
+                    .usec(Long.valueOf(StrUtil.subBetween((String) value, "usec=", ",")))
                     .build());
         });
         return respVO;

@@ -47,6 +47,6 @@ public class SysUserExcelVO {
     private String deptName;
 
     @ExcelProperty("部门负责人")
-    private String deptLeader;
+    private String deptLeaderNickname;
 
 }

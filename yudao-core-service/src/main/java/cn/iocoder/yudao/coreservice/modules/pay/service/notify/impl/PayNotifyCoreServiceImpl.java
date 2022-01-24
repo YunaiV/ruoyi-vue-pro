@@ -5,8 +5,10 @@ import cn.hutool.http.HttpUtil;
 import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.notify.PayNotifyLogDO;
 import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.notify.PayNotifyTaskDO;
 import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.order.PayOrderDO;
+import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.order.PayRefundDO;
 import cn.iocoder.yudao.coreservice.modules.pay.dal.mysql.notify.PayNotifyLogCoreMapper;
 import cn.iocoder.yudao.coreservice.modules.pay.dal.mysql.notify.PayNotifyTaskCoreMapper;
+import cn.iocoder.yudao.coreservice.modules.pay.dal.mysql.order.PayRefundCoreMapper;
 import cn.iocoder.yudao.coreservice.modules.pay.dal.redis.notify.PayNotifyLockCoreRedisDAO;
 import cn.iocoder.yudao.coreservice.modules.pay.enums.notify.PayNotifyStatusEnum;
 import cn.iocoder.yudao.coreservice.modules.pay.enums.notify.PayNotifyTypeEnum;
@@ -73,6 +75,9 @@ public class PayNotifyCoreServiceImpl implements PayNotifyCoreService {
     private PayNotifyLockCoreRedisDAO payNotifyLockCoreRedisDAO;
 
     @Resource
+    private PayRefundCoreMapper payRefundCoreMapper;
+
+    @Resource
     @Lazy // 循环依赖（自己依赖自己），避免报错
     private PayNotifyCoreServiceImpl self;
 
@@ -89,7 +94,9 @@ public class PayNotifyCoreServiceImpl implements PayNotifyCoreService {
                     setMerchantOrderId(order.getMerchantOrderId()).setNotifyUrl(order.getNotifyUrl());
         } else if (Objects.equals(task.getType(), PayNotifyTypeEnum.REFUND.getType())) {
             // TODO 芋艿，需要实现下哈
-            throw new UnsupportedOperationException("需要实现");
+            PayRefundDO refundDO = payRefundCoreMapper.selectById(task.getDataId());
+            task.setMerchantId(refundDO.getMerchantId()).setAppId(refundDO.getAppId())
+                    .setMerchantOrderId(refundDO.getMerchantOrderId()).setNotifyUrl(refundDO.getNotifyUrl());
         }
 
         // 执行插入

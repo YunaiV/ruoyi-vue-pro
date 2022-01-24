@@ -9,10 +9,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 
 import java.io.InputStream;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 后台用户 Service 接口
@@ -108,6 +105,14 @@ public interface SysUserService {
     PageResult<SysUserDO> getUserPage(SysUserPageReqVO reqVO);
 
     /**
+     * 获得用户
+     *
+     * @param id 用户编号
+     * @return 用户
+     */
+    SysUserDO getUser(Long id);
+
+    /**
      * 获得用户列表
      *
      * @param reqVO 列表请求
@@ -160,5 +165,38 @@ public interface SysUserService {
      * @return 导入结果
      */
     SysUserImportRespVO importUsers(List<SysUserImportExcelVO> importUsers, boolean isUpdateSupport);
+
+    /**
+     * 获得指定状态的用户们
+     *
+     * @param status 状态
+     * @return 用户们
+     */
+    List<SysUserDO> getUsersByStatus(Integer status);
+
+    /**
+     * 获得指定岗位的用户数组
+     *
+     * @param postIds 岗位数组
+     * @return 用户数组
+     */
+    List<SysUserDO> getUsersByPostIds(Collection<Long> postIds);
+
+    /**
+     * 获得指定部门的用户数组
+     *
+     * @param deptIds 部门数组
+     * @return 用户数组
+     */
+    List<SysUserDO> getUsersByDeptIds(Collection<Long> deptIds);
+
+    /**
+     * 校验用户们是否有效。如下情况，视为无效：
+     * 1. 用户编号不存在
+     * 2. 用户被禁用
+     *
+     * @param ids 用户编号数组
+     */
+    void validUsers(Set<Long> ids);
 
 }

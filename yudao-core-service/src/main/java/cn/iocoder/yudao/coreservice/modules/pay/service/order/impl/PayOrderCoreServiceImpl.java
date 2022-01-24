@@ -2,7 +2,6 @@ package cn.iocoder.yudao.coreservice.modules.pay.service.order.impl;
 
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.RandomUtil;
-import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.coreservice.modules.pay.convert.order.PayOrderCoreConvert;
 import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.merchant.PayAppDO;
 import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.merchant.PayChannelDO;
@@ -26,6 +25,7 @@ import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.pay.config.PayProperties;
 import cn.iocoder.yudao.framework.pay.core.client.PayClient;
 import cn.iocoder.yudao.framework.pay.core.client.PayClientFactory;
+import cn.iocoder.yudao.framework.pay.core.client.dto.PayNotifyDataDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.PayOrderNotifyRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.PayOrderUnifiedReqDTO;
 import lombok.extern.slf4j.Slf4j;
@@ -96,6 +96,7 @@ public class PayOrderCoreServiceImpl implements PayOrderCoreService {
         // 订单相关字段
         order.setStatus(PayOrderStatusEnum.WAITING.getStatus());
         // 退款相关字段
+        // todo @芋艿 创建支付的订单的退款状态枚举是不是有问题，应该是 PayRefundTypeEnum 吧 您这填写的是 PayOrderNotifyStatusEnum 回调状态枚举
         order.setRefundStatus(PayOrderNotifyStatusEnum.NO.getStatus())
                 .setRefundTimes(0).setRefundAmount(0L);
         payOrderCoreMapper.insert(order);
@@ -135,9 +136,11 @@ public class PayOrderCoreServiceImpl implements PayOrderCoreService {
         // 调用三方接口
         PayOrderUnifiedReqDTO unifiedOrderReqDTO = PayOrderCoreConvert.INSTANCE.convert2(reqDTO);
         // 商户相关字段
+        //TODO jason @芋艿 是否加一个属性  如tradeNo 支付订单号， 用这个merchantOrderId让人迷糊
         unifiedOrderReqDTO.setMerchantOrderId(orderExtension.getNo()) // 注意，此处使用的是 PayOrderExtensionDO.no 属性！
                 .setSubject(order.getSubject()).setBody(order.getBody())
-                .setNotifyUrl(genChannelPayNotifyUrl(channel));
+                .setNotifyUrl(genChannelPayNotifyUrl(channel))
+                .setReturnUrl(genChannelReturnUrl(channel));
         // 订单相关字段
         unifiedOrderReqDTO.setAmount(order.getAmount()).setExpireTime(order.getExpireTime());
         CommonResult<?> unifiedOrderResult = client.unifiedOrder(unifiedOrderReqDTO);
@@ -150,15 +153,23 @@ public class PayOrderCoreServiceImpl implements PayOrderCoreService {
     }
 
     /**
+     * 根据支付渠道的编码，生成支付渠道的返回地址
+     * @param channel 支付渠道
+     * @return 支付成功返回的地址。 配置地址 + "/" + channel id
+     */
+    private String genChannelReturnUrl(PayChannelDO channel) {
+        return payProperties.getPayReturnUrl() + "/" + channel.getId();
+    }
+
+    /**
      * 根据支付渠道的编码，生成支付渠道的回调地址
      *
      * @param channel 支付渠道
-     * @return 支付渠道的回调地址
+     * @return 支付渠道的回调地址  配置地址 + "/" + channel id
      */
     private String genChannelPayNotifyUrl(PayChannelDO channel) {
-        // _ 转化为 - 的原因，是因为 URL 我们统一采用中划线的原则
-        return payProperties.getPayNotifyUrl() + "/" + StrUtil.replace(channel.getCode(), "_", "-")
-                + "/" + channel.getId();
+        //去掉channel code, 似乎没啥用， 用统一的回调地址
+        return payProperties.getPayNotifyUrl() + "/" + channel.getId();
     }
 
     private String generateOrderExtensionNo() {
@@ -181,9 +192,9 @@ public class PayOrderCoreServiceImpl implements PayOrderCoreService {
 
     @Override
     @Transactional
-    public void notifyPayOrder(Long channelId, String channelCode, String notifyData) throws Exception {
+    public void notifyPayOrder(Long channelId,  PayNotifyDataDTO notifyData) throws Exception {
         // TODO 芋艿，记录回调日志
-        log.info("[notifyPayOrder][channelId({}) 回调数据({})]", channelId, notifyData);
+        log.info("[notifyPayOrder][channelId({}) 回调数据({})]", channelId, notifyData.getBody());
 
         // 校验支付渠道是否有效
         PayChannelDO channel = payChannelCoreService.validPayChannel(channelId);
@@ -193,6 +204,7 @@ public class PayOrderCoreServiceImpl implements PayOrderCoreService {
             log.error("[notifyPayOrder][渠道编号({}) 找不到对应的支付客户端]", channel.getId());
             throw exception(PAY_CHANNEL_CLIENT_NOT_FOUND);
         }
+
         // 解析支付结果
         PayOrderNotifyRespDTO notifyRespDTO = client.parseOrderNotify(notifyData);
 
@@ -207,9 +219,10 @@ public class PayOrderCoreServiceImpl implements PayOrderCoreService {
             throw exception(PAY_ORDER_EXTENSION_STATUS_IS_NOT_WAITING);
         }
         // 1.2 更新 PayOrderExtensionDO
+        //TODO 支付宝交易超时 TRADE_FINISHED 需要更新交易关闭
         int updateCounts = payOrderExtensionCoreMapper.updateByIdAndStatus(orderExtension.getId(),
                 PayOrderStatusEnum.WAITING.getStatus(), PayOrderExtensionDO.builder().id(orderExtension.getId())
-                        .status(PayOrderStatusEnum.SUCCESS.getStatus()).channelNotifyData(notifyData).build());
+                        .status(PayOrderStatusEnum.SUCCESS.getStatus()).channelNotifyData(notifyData.getBody()).build());
         if (updateCounts == 0) { // 校验状态，必须是待支付
             throw exception(PAY_ORDER_EXTENSION_STATUS_IS_NOT_WAITING);
         }
@@ -225,7 +238,7 @@ public class PayOrderCoreServiceImpl implements PayOrderCoreService {
         }
         // 2.2 更新 PayOrderDO
         updateCounts = payOrderCoreMapper.updateByIdAndStatus(order.getId(), PayOrderStatusEnum.WAITING.getStatus(),
-                PayOrderDO.builder().status(PayOrderStatusEnum.SUCCESS.getStatus()).channelId(channelId).channelCode(channelCode)
+                PayOrderDO.builder().status(PayOrderStatusEnum.SUCCESS.getStatus()).channelId(channelId).channelCode(channel.getCode())
                         .successTime(notifyRespDTO.getSuccessTime()).successExtensionId(orderExtension.getId())
                         .channelOrderNo(notifyRespDTO.getChannelOrderNo()).channelUserId(notifyRespDTO.getChannelUserId())
                         .notifyTime(new Date()).build());

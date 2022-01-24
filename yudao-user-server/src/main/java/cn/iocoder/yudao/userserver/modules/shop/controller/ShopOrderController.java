@@ -1,8 +1,10 @@
 package cn.iocoder.yudao.userserver.modules.shop.controller;
 
 import cn.iocoder.yudao.coreservice.modules.pay.service.notify.vo.PayNotifyOrderReqVO;
+import cn.iocoder.yudao.coreservice.modules.pay.service.notify.vo.PayRefundOrderReqVO;
 import cn.iocoder.yudao.coreservice.modules.pay.service.order.PayOrderCoreService;
 import cn.iocoder.yudao.coreservice.modules.pay.service.order.dto.PayOrderCreateReqDTO;
+import cn.iocoder.yudao.coreservice.modules.pay.util.PaySeqUtils;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.userserver.modules.shop.controller.vo.ShopOrderCreateRespVO;
@@ -43,10 +45,10 @@ public class ShopOrderController {
         PayOrderCreateReqDTO reqDTO = new PayOrderCreateReqDTO();
         reqDTO.setAppId(6L);
         reqDTO.setUserIp(getClientIP());
-        reqDTO.setMerchantOrderId(String.valueOf(System.currentTimeMillis()));
+        reqDTO.setMerchantOrderId(PaySeqUtils.genMerchantOrderNo());
         reqDTO.setSubject("标题：" + shopOrderId);
         reqDTO.setBody("内容：" + shopOrderId);
-        reqDTO.setAmount(1); // 单位：分
+        reqDTO.setAmount(200); // 单位：分
         reqDTO.setExpireTime(DateUtils.addTime(Duration.ofDays(1)));
         Long payOrderId = payOrderCoreService.createPayOrder(reqDTO);
 
@@ -59,6 +61,13 @@ public class ShopOrderController {
     @ApiOperation("支付回调")
     public CommonResult<Boolean> payNotify(@RequestBody @Valid PayNotifyOrderReqVO reqVO) {
         log.info("[payNotify][回调成功]");
+        return success(true);
+    }
+
+    @PostMapping("/refund-notify")
+    @ApiOperation("退款回调")
+    public CommonResult<Boolean> refundNotify(@RequestBody @Valid PayRefundOrderReqVO reqVO) {
+        log.info("[refundNotify][回调成功]");
         return success(true);
     }
 

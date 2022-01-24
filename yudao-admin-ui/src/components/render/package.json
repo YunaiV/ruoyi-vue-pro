@@ -1,0 +1,19 @@
+{
+  "name": "form-gen-render",
+  "version": "1.0.4",
+  "description": "表单核心render",
+  "main": "lib/form-gen-render.umd.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JakHuang/form-generator.git"
+  },
+  "author": "jakhuang",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/JakHuang/form-generator/issues"
+  },
+  "homepage": "https://github.com/JakHuang/form-generator#readme"
+}

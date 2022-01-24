@@ -3,6 +3,7 @@ package cn.iocoder.yudao.adminserver.modules.system.service.dept.impl;
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.dept.vo.dept.SysDeptCreateReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.dept.vo.dept.SysDeptListReqVO;
@@ -26,6 +27,7 @@ import javax.annotation.Resource;
 import java.util.*;
 
 import static cn.iocoder.yudao.adminserver.modules.system.enums.SysErrorCodeConstants.*;
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 
 /**
  * 部门 Service 实现类
@@ -180,6 +182,26 @@ public class SysDeptServiceImpl implements SysDeptService {
         return result;
     }
 
+    @Override
+    public void validDepts(Collection<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return;
+        }
+        // 获得科室信息
+        List<SysDeptDO> depts = deptMapper.selectBatchIds(ids);
+        Map<Long, SysDeptDO> deptMap = CollectionUtils.convertMap(depts, SysDeptDO::getId);
+        // 校验
+        ids.forEach(id -> {
+            SysDeptDO dept = deptMap.get(id);
+            if (dept == null) {
+                throw exception(DEPT_NOT_FOUND);
+            }
+            if (!CommonStatusEnum.ENABLE.getStatus().equals(dept.getStatus())) {
+                throw exception(DEPT_NOT_ENABLE, dept.getName());
+            }
+        });
+    }
+
     /**
      * 递归获取所有的子部门，添加到 result 结果
      *
@@ -208,6 +230,11 @@ public class SysDeptServiceImpl implements SysDeptService {
     @Override
     public SysDeptDO getDept(Long id) {
         return deptMapper.selectById(id);
+    }
+
+    @Override
+    public List<SysDeptDO> getDepts(Collection<Long> ids) {
+        return deptMapper.selectBatchIds(ids);
     }
 
     private void checkCreateOrUpdate(Long id, Long parentId, String name) {

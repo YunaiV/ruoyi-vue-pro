@@ -31,6 +31,14 @@ public class RandomUtils {
         // 字符串
         PODAM_FACTORY.getStrategy().addOrReplaceTypeManufacturer(String.class,
                 (dataProviderStrategy, attributeMetadata, map) -> randomString());
+        // Integer
+        PODAM_FACTORY.getStrategy().addOrReplaceTypeManufacturer(Integer.class, (dataProviderStrategy, attributeMetadata, map) -> {
+            // 如果是 status 的字段，返回 0 或 1
+            if (attributeMetadata.getAttributeName().equals("status")) {
+                return RandomUtil.randomEle(CommonStatusEnum.values()).getStatus();
+            }
+            return RandomUtil.randomInt();
+        });
         // Boolean
         PODAM_FACTORY.getStrategy().addOrReplaceTypeManufacturer(Boolean.class, (dataProviderStrategy, attributeMetadata, map) -> {
             // 如果是 deleted 的字段，返回非删除
@@ -62,7 +70,7 @@ public class RandomUtils {
     }
 
     public static <T> Set<T> randomSet(Class<T> clazz) {
-        return Stream.iterate(0, i -> i).limit(RandomUtil.randomInt(0, RANDOM_DATE_MAX))
+        return Stream.iterate(0, i -> i).limit(RandomUtil.randomInt(1, RANDOM_COLLECTION_LENGTH))
                 .map(i -> randomPojo(clazz)).collect(Collectors.toSet());
     }
 

@@ -216,8 +216,20 @@ public class SysPermissionServiceImpl implements SysPermissionService {
     }
 
     @Override
-    public Set<Long> listUserRoleIs(Long userId) {
+    public Set<Long> getUserRoleIdListByUserId(Long userId) {
         return CollectionUtils.convertSet(userRoleMapper.selectListByUserId(userId),
+                SysUserRoleDO::getRoleId);
+    }
+
+    @Override
+    public Set<Long> getUserRoleIdListByRoleId(Long roleId) {
+        return CollectionUtils.convertSet(userRoleMapper.selectListByRoleId(roleId),
+                SysUserRoleDO::getRoleId);
+    }
+
+    @Override
+    public Set<Long> getUserRoleIdListByRoleIds(Collection<Long> roleIds) {
+        return CollectionUtils.convertSet(userRoleMapper.selectListByRoleIds(roleIds),
                 SysUserRoleDO::getRoleId);
     }
 

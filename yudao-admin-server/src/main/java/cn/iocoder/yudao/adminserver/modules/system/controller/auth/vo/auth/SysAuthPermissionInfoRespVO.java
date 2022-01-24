@@ -32,6 +32,9 @@ public class SysAuthPermissionInfoRespVO {
     @Builder
     public static class UserVO {
 
+        @ApiModelProperty(value = "用户编号", required = true, example = "1024")
+        private Long id;
+
         @ApiModelProperty(value = "用户昵称", required = true, example = "芋道源码")
         private String nickname;
 

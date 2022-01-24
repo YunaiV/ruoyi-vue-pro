@@ -161,6 +161,18 @@ spring:
 logging:
   file:
     name: ${user.home}/logs/${spring.application.name}.log # 日志文件名，全路径
+  level:
+    # 配置自己写的 MyBatis Mapper 打印日志
+    cn.iocoder.yudao.adminserver.modules.bpm.dal.mysql: debug
+    cn.iocoder.yudao.adminserver.modules.infra.dal.mysql: debug
+    cn.iocoder.yudao.adminserver.modules.pay.dal.mysql: debug
+    cn.iocoder.yudao.adminserver.modules.system.dal.mysql: debug
+    cn.iocoder.yudao.adminserver.modules.tool.dal.mysql: debug
+    cn.iocoder.yudao.coreservice.modules.bpm.dal.mysql: debug
+    cn.iocoder.yudao.coreservice.modules.infra.dal.mysql: debug
+    cn.iocoder.yudao.coreservice.modules.pay.dal.mysql: debug
+    cn.iocoder.yudao.coreservice.modules.system.dal.mysql: debug
+    cn.iocoder.yudao.coreservice.modules.tool.dal.mysql: debug
 
 --- #################### 芋道相关配置 ####################
 
@@ -184,6 +196,7 @@ yudao:
       - ${management.endpoints.web.base-path}/** # 不处理 Actuator 的请求
   pay:
     pay-notify-url: http://niubi.natapp1.cc/api/pay/order/notify
+    pay-return-url: http://niubi.natapp1.cc/api/pay/order/return
     refund-notify-url: http://niubi.natapp1.cc/api/pay/refund/notify
   demo: false # 关闭演示模式
 
@@ -207,3 +220,4 @@ justauth:
     type: REDIS
     prefix: 'social_auth_state:' # 缓存前缀，目前只对 Redis 缓存生效，默认 JUSTAUTH::STATE::
     timeout: 24h # 超时时长，目前只对 Redis 缓存生效，默认 3 分钟
+

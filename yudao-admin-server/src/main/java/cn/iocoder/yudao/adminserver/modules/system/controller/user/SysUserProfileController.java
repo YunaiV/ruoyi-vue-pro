@@ -65,7 +65,7 @@ public class SysUserProfileController {
         SysUserDO user = userCoreService.getUser(getLoginUserId());
         SysUserProfileRespVO resp = SysUserConvert.INSTANCE.convert03(user);
         // 获得用户角色
-        List<SysRoleDO> userRoles = roleService.getRolesFromCache(permissionService.listUserRoleIs(user.getId()));
+        List<SysRoleDO> userRoles = roleService.getRolesFromCache(permissionService.getUserRoleIdListByUserId(user.getId()));
         resp.setRoles(SysUserConvert.INSTANCE.convertList(userRoles));
         // 获得部门信息
         if (user.getDeptId() != null) {

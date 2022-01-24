@@ -65,11 +65,6 @@ public class LoginUser implements UserDetails {
      * 所属岗位
      */
     private Set<Long> postIds;
-    /**
-     * group  目前指岗位代替
-     */
-    // TODO jason：这个字段，改成 postCodes 明确更好哈
-    private List<String> groups;
 
     // ========== 上下文 ==========
     /**
@@ -100,10 +95,7 @@ public class LoginUser implements UserDetails {
     @Override
     @JsonIgnore// 避免序列化
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        List<GrantedAuthority> list = new ArrayList<>(1);
-        // TODO @芋艿：看看有没更优化的方案
-        list.add(new SimpleGrantedAuthority("ROLE_ACTIVITI_USER"));
-        return list;
+        return new HashSet<>();
     }
 
     @Override

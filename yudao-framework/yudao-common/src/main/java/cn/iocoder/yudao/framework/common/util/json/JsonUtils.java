@@ -4,6 +4,7 @@ import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
@@ -38,6 +39,14 @@ public class JsonUtils {
     public static String toJsonString(Object object) {
         try {
             return objectMapper.writeValueAsString(object);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static byte[] toJsonByte(Object object) {
+        try {
+            return objectMapper.writeValueAsBytes(object);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
@@ -79,6 +88,23 @@ public class JsonUtils {
         }
         try {
             return objectMapper.readValue(text, objectMapper.getTypeFactory().constructCollectionType(List.class, clazz));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    // TODO @Li：和上面的风格保持一致哈。parseTree
+    public static JsonNode readTree(String text) {
+        try {
+            return objectMapper.readTree(text);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static JsonNode readTree(byte[] text) {
+        try {
+            return objectMapper.readTree(text);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
