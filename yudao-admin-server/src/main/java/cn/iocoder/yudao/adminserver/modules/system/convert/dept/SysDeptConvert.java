@@ -4,7 +4,7 @@ import cn.iocoder.yudao.adminserver.modules.system.controller.dept.vo.dept.SysDe
 import cn.iocoder.yudao.adminserver.modules.system.controller.dept.vo.dept.SysDeptRespVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.dept.vo.dept.SysDeptSimpleRespVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.dept.vo.dept.SysDeptUpdateReqVO;
-import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.dept.SysDeptDO;
+import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.dept.SysDeptDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 

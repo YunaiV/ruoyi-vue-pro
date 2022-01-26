@@ -5,7 +5,7 @@ import cn.iocoder.yudao.adminserver.modules.system.controller.permission.vo.role
 import cn.iocoder.yudao.adminserver.modules.system.controller.permission.vo.role.SysRoleExportReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.permission.vo.role.SysRolePageReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.permission.vo.role.SysRoleUpdateReqVO;
-import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.permission.SysRoleDO;
+import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.permission.SysRoleDO;
 import org.springframework.lang.Nullable;
 
 import java.util.Collection;
@@ -129,13 +129,6 @@ public interface SysRoleService {
      */
     List<SysRoleDO> getRoleList(SysRoleExportReqVO reqVO);
 
-    /**
-     * 校验角色们是否有效。如下情况，视为无效：
-     * 1. 角色编号不存在
-     * 2. 角色被禁用
-     *
-     * @param ids 角色编号数组
-     */
-    void validRoles(Collection<Long> ids);
+
 
 }

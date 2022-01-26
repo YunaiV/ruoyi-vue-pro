@@ -7,7 +7,7 @@ import cn.iocoder.yudao.adminserver.modules.system.controller.dept.vo.post.SysPo
 import cn.iocoder.yudao.adminserver.modules.system.controller.dept.vo.post.SysPostExportReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.dept.vo.post.SysPostPageReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.dept.vo.post.SysPostUpdateReqVO;
-import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.dept.SysPostDO;
+import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.dept.SysPostDO;
 import cn.iocoder.yudao.adminserver.modules.system.dal.mysql.dept.SysPostMapper;
 import cn.iocoder.yudao.adminserver.modules.system.service.dept.impl.SysPostServiceImpl;
 import cn.iocoder.yudao.framework.common.util.collection.ArrayUtils;

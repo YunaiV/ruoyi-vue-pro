@@ -6,7 +6,7 @@ import cn.iocoder.yudao.adminserver.modules.system.controller.auth.vo.auth.SysAu
 import cn.iocoder.yudao.adminserver.modules.system.controller.auth.vo.auth.SysAuthSocialLogin2ReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.auth.vo.auth.SysAuthSocialLoginReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.convert.auth.SysAuthConvert;
-import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.dept.SysPostDO;
+import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.dept.SysPostDO;
 import cn.iocoder.yudao.adminserver.modules.system.enums.logger.SysLoginLogTypeEnum;
 import cn.iocoder.yudao.adminserver.modules.system.enums.logger.SysLoginResultEnum;
 import cn.iocoder.yudao.adminserver.modules.system.service.auth.SysAuthService;

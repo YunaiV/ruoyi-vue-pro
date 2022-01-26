@@ -6,7 +6,7 @@ import cn.iocoder.yudao.adminserver.modules.system.controller.dept.vo.post.SysPo
 import cn.iocoder.yudao.adminserver.modules.system.controller.dept.vo.post.SysPostExportReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.dept.vo.post.SysPostPageReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.dept.vo.post.SysPostUpdateReqVO;
-import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.dept.SysPostDO;
+import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.dept.SysPostDO;
 import org.springframework.lang.Nullable;
 
 import java.util.Collection;
@@ -85,14 +85,5 @@ public interface SysPostService {
      * @return 岗位信息
      */
     SysPostDO getPost(Long id);
-
-    /**
-     * 校验岗位们是否有效。如下情况，视为无效：
-     * 1. 岗位编号不存在
-     * 2. 岗位被禁用
-     *
-     * @param ids 岗位编号数组
-     */
-    void validPosts(Collection<Long> ids);
 
 }

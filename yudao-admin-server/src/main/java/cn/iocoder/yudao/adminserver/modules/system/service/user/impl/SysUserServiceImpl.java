@@ -8,8 +8,8 @@ import cn.iocoder.yudao.adminserver.modules.system.controller.user.vo.profile.Sy
 import cn.iocoder.yudao.adminserver.modules.system.controller.user.vo.profile.SysUserProfileUpdateReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.user.vo.user.*;
 import cn.iocoder.yudao.adminserver.modules.system.convert.user.SysUserConvert;
-import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.dept.SysDeptDO;
-import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.dept.SysPostDO;
+import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.dept.SysDeptDO;
+import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.dept.SysPostDO;
 import cn.iocoder.yudao.adminserver.modules.system.dal.mysql.user.SysUserMapper;
 import cn.iocoder.yudao.adminserver.modules.system.service.dept.SysDeptService;
 import cn.iocoder.yudao.adminserver.modules.system.service.dept.SysPostService;
@@ -17,6 +17,7 @@ import cn.iocoder.yudao.adminserver.modules.system.service.permission.SysPermiss
 import cn.iocoder.yudao.adminserver.modules.system.service.user.SysUserService;
 import cn.iocoder.yudao.coreservice.modules.infra.service.file.InfFileCoreService;
 import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.user.SysUserDO;
+import cn.iocoder.yudao.coreservice.modules.system.service.dept.SysDeptCoreService;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -52,6 +53,9 @@ public class SysUserServiceImpl implements SysUserService {
 
     @Resource
     private SysDeptService deptService;
+
+    @Resource
+    private SysDeptCoreService deptCoreService;
     @Resource
     private SysPostService postService;
     @Resource
@@ -174,18 +178,6 @@ public class SysUserServiceImpl implements SysUserService {
         return userMapper.selectList(reqVO, this.getDeptCondition(reqVO.getDeptId()));
     }
 
-    @Override
-    public List<SysUserDO> getUsers(Collection<Long> ids) {
-        if (CollUtil.isEmpty(ids)) {
-            return Collections.emptyList();
-        }
-        return userMapper.selectBatchIds(ids);
-    }
-
-    @Override
-    public Map<Long, SysUserDO> getUserMap(Collection<Long> ids) {
-        return SysUserService.super.getUserMap(ids);
-    }
 
     @Override
     public List<SysUserDO> getUsersByNickname(String nickname) {
@@ -299,7 +291,7 @@ public class SysUserServiceImpl implements SysUserService {
         if (deptId == null) { // 允许不选择
             return;
         }
-        SysDeptDO dept = deptService.getDept(deptId);
+        SysDeptDO dept = deptCoreService.getDept(deptId);
         if (dept == null) {
             throw exception(DEPT_NOT_FOUND);
         }
@@ -387,46 +379,6 @@ public class SysUserServiceImpl implements SysUserService {
     @Override
     public List<SysUserDO> getUsersByStatus(Integer status) {
         return userMapper.selectListByStatus(status);
-    }
-
-    @Override
-    public List<SysUserDO> getUsersByPostIds(Collection<Long> postIds) {
-        if (CollUtil.isEmpty(postIds)) {
-            return Collections.emptyList();
-        }
-        // 过滤不符合条件的
-        // TODO 芋艿：暂时只能内存过滤。解决方案：1、新建一个关联表；2、基于 where + 函数；3、json 字段，适合 mysql 8+ 版本
-        List<SysUserDO> users = userMapper.selectList();
-        users.removeIf(user -> !CollUtil.containsAny(user.getPostIds(), postIds));
-        return users;
-    }
-
-    @Override
-    public List<SysUserDO> getUsersByDeptIds(Collection<Long> deptIds) {
-        if (CollUtil.isEmpty(deptIds)) {
-            return Collections.emptyList();
-        }
-        return userMapper.selectListByDeptIds(deptIds);
-    }
-
-    @Override
-    public void validUsers(Set<Long> ids) {
-        if (CollUtil.isEmpty(ids)) {
-            return;
-        }
-        // 获得岗位信息
-        List<SysUserDO> users = userMapper.selectBatchIds(ids);
-        Map<Long, SysUserDO> userMap = CollectionUtils.convertMap(users, SysUserDO::getId);
-        // 校验
-        ids.forEach(id -> {
-            SysUserDO user = userMap.get(id);
-            if (user == null) {
-                throw exception(USER_NOT_EXISTS);
-            }
-            if (!CommonStatusEnum.ENABLE.getStatus().equals(user.getStatus())) {
-                throw exception(USER_IS_DISABLE, user.getNickname());
-            }
-        });
     }
 
 }

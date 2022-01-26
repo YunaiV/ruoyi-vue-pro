@@ -5,8 +5,11 @@ import cn.iocoder.yudao.coreservice.modules.system.convert.dict.SysDictDataCoreC
 import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.dict.SysDictDataDO;
 import cn.iocoder.yudao.coreservice.modules.system.dal.mysql.dict.SysDictDataCoreMapper;
 import cn.iocoder.yudao.coreservice.modules.system.service.dict.SysDictDataCoreService;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.dict.core.dto.DictDataRespDTO;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableTable;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -14,9 +17,11 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+
+import static cn.iocoder.yudao.coreservice.modules.system.enums.SysErrorCodeConstants.DICT_DATA_NOT_ENABLE;
+import static cn.iocoder.yudao.coreservice.modules.system.enums.SysErrorCodeConstants.DICT_DATA_NOT_EXISTS;
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 
 /**
  * 字典数据 Service 实现类
@@ -117,6 +122,24 @@ public class SysDictDataCoreServiceImpl implements SysDictDataCoreService {
     @Override
     public List<DictDataRespDTO> listDictDatasFromCache(String type) {
         return SysDictDataCoreConvert.INSTANCE.convertList03(labelDictDataCache.row(type).values());
+    }
+
+    @Override
+    public void validDictDatas(String dictType, Collection<String> values) {
+        if (CollUtil.isEmpty(values)) {
+            return;
+        }
+        ImmutableMap<String, SysDictDataDO> dictDataMap = valueDictDataCache.row(dictType);
+        // 校验
+        values.forEach(value -> {
+            SysDictDataDO dictData = dictDataMap.get(value);
+            if (dictData == null) {
+                throw exception(DICT_DATA_NOT_EXISTS);
+            }
+            if (!CommonStatusEnum.ENABLE.getStatus().equals(dictData.getStatus())) {
+                throw exception(DICT_DATA_NOT_ENABLE, dictData.getLabel());
+            }
+        });
     }
 
 }

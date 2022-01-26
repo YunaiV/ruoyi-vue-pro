@@ -3,7 +3,7 @@ package cn.iocoder.yudao.adminserver.modules.system.controller.sms.vo.log;
 import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
 import cn.iocoder.yudao.framework.excel.core.convert.DictConvert;
 import cn.iocoder.yudao.framework.excel.core.convert.JsonConvert;
-import cn.iocoder.yudao.adminserver.modules.system.enums.SysDictTypeConstants;
+import cn.iocoder.yudao.coreservice.modules.system.enums.SysDictTypeConstants;
 import com.alibaba.excel.annotation.ExcelProperty;
 import lombok.Data;
 

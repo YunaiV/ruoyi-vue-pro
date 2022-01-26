@@ -2,7 +2,7 @@ package cn.iocoder.yudao.adminserver.modules.system.convert.dept;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.adminserver.modules.system.controller.dept.vo.post.*;
-import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.dept.SysPostDO;
+import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.dept.SysPostDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 

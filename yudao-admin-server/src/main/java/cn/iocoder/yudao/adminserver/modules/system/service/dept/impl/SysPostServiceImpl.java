@@ -1,8 +1,5 @@
 package cn.iocoder.yudao.adminserver.modules.system.service.dept.impl;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.dept.SysDeptDO;
-import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.adminserver.modules.system.controller.dept.vo.post.SysPostCreateReqVO;
@@ -11,16 +8,14 @@ import cn.iocoder.yudao.adminserver.modules.system.controller.dept.vo.post.SysPo
 import cn.iocoder.yudao.adminserver.modules.system.controller.dept.vo.post.SysPostUpdateReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.convert.dept.SysPostConvert;
 import cn.iocoder.yudao.adminserver.modules.system.dal.mysql.dept.SysPostMapper;
-import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.dept.SysPostDO;
+import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.dept.SysPostDO;
 import cn.iocoder.yudao.adminserver.modules.system.service.dept.SysPostService;
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 import static cn.iocoder.yudao.adminserver.modules.system.enums.SysErrorCodeConstants.*;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -82,26 +77,6 @@ public class SysPostServiceImpl implements SysPostService {
     @Override
     public SysPostDO getPost(Long id) {
         return postMapper.selectById(id);
-    }
-
-    @Override
-    public void validPosts(Collection<Long> ids) {
-        if (CollUtil.isEmpty(ids)) {
-            return;
-        }
-        // 获得岗位信息
-        List<SysPostDO> posts = postMapper.selectBatchIds(ids);
-        Map<Long, SysPostDO> postMap = CollectionUtils.convertMap(posts, SysPostDO::getId);
-        // 校验
-        ids.forEach(id -> {
-            SysPostDO post = postMap.get(id);
-            if (post == null) {
-                throw exception(POST_NOT_FOUND);
-            }
-            if (!CommonStatusEnum.ENABLE.getStatus().equals(post.getStatus())) {
-                throw exception(POST_NOT_ENABLE, post.getName());
-            }
-        });
     }
 
     private void checkCreateOrUpdate(Long id, String name, String code) {

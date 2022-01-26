@@ -3,11 +3,11 @@ package cn.iocoder.yudao.adminserver.modules.system.service.permission.impl;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ArrayUtil;
-import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.dept.SysDeptDO;
+import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.dept.SysDeptDO;
 import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.permission.SysMenuDO;
-import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.permission.SysRoleDO;
+import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.permission.SysRoleDO;
 import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.permission.SysRoleMenuDO;
-import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.permission.SysUserRoleDO;
+import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.permission.SysUserRoleDO;
 import cn.iocoder.yudao.adminserver.modules.system.dal.mysql.permission.SysRoleMenuMapper;
 import cn.iocoder.yudao.adminserver.modules.system.dal.mysql.permission.SysUserRoleMapper;
 import cn.iocoder.yudao.adminserver.modules.system.mq.producer.permission.SysPermissionProducer;
@@ -227,11 +227,7 @@ public class SysPermissionServiceImpl implements SysPermissionService {
                 SysUserRoleDO::getRoleId);
     }
 
-    @Override
-    public Set<Long> getUserRoleIdListByRoleIds(Collection<Long> roleIds) {
-        return CollectionUtils.convertSet(userRoleMapper.selectListByRoleIds(roleIds),
-                SysUserRoleDO::getRoleId);
-    }
+
 
     @Override
     public void assignUserRole(Long userId, Set<Long> roleIds) {

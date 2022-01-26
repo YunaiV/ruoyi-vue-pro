@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.adminserver.modules.pay.controller.order.vo.refund.vo;
 
-import cn.iocoder.yudao.adminserver.modules.system.enums.SysDictTypeConstants;
+import cn.iocoder.yudao.coreservice.modules.system.enums.SysDictTypeConstants;
 import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
 import cn.iocoder.yudao.framework.excel.core.convert.DictConvert;
 import com.alibaba.excel.annotation.ExcelProperty;

@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.adminserver.modules.system.dal.mysql.permission;
 
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
-import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.permission.SysUserRoleDO;
+import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.permission.SysUserRoleDO;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -20,9 +20,6 @@ public interface SysUserRoleMapper extends BaseMapperX<SysUserRoleDO> {
         return selectList(new QueryWrapper<SysUserRoleDO>().eq("role_id", roleId));
     }
 
-    default List<SysUserRoleDO> selectListByRoleIds(Collection<Long> roleIds) {
-        return selectList("role_id", roleIds);
-    }
 
     default void insertList(Long userId, Collection<Long> roleIds) {
         List<SysUserRoleDO> list = roleIds.stream().map(roleId -> {

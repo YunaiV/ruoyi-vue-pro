@@ -44,9 +44,10 @@
             <artifactId>yudao-spring-boot-starter-biz-data-permission</artifactId>
         </dependency>
 
+        <!-- 默认引入bpm-activiti. 可以替换为bpm-flowable -->
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
-            <artifactId>yudao-spring-boot-starter-activiti</artifactId>
+            <artifactId>yudao-module-bpm-activiti</artifactId>
         </dependency>
 
         <!-- Web 相关 -->

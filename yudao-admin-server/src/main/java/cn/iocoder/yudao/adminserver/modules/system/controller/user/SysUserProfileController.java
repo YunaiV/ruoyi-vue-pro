@@ -5,16 +5,16 @@ import cn.iocoder.yudao.adminserver.modules.system.controller.user.vo.profile.Sy
 import cn.iocoder.yudao.adminserver.modules.system.controller.user.vo.profile.SysUserProfileUpdatePasswordReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.user.vo.profile.SysUserProfileUpdateReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.convert.user.SysUserConvert;
-import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.dept.SysDeptDO;
-import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.dept.SysPostDO;
-import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.permission.SysRoleDO;
-import cn.iocoder.yudao.adminserver.modules.system.service.dept.SysDeptService;
 import cn.iocoder.yudao.adminserver.modules.system.service.dept.SysPostService;
 import cn.iocoder.yudao.adminserver.modules.system.service.permission.SysPermissionService;
 import cn.iocoder.yudao.adminserver.modules.system.service.permission.SysRoleService;
 import cn.iocoder.yudao.adminserver.modules.system.service.user.SysUserService;
+import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.dept.SysDeptDO;
+import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.dept.SysPostDO;
+import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.permission.SysRoleDO;
 import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.social.SysSocialUserDO;
 import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.user.SysUserDO;
+import cn.iocoder.yudao.coreservice.modules.system.service.dept.SysDeptCoreService;
 import cn.iocoder.yudao.coreservice.modules.system.service.social.SysSocialCoreService;
 import cn.iocoder.yudao.coreservice.modules.system.service.user.SysUserCoreService;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
@@ -48,7 +48,8 @@ public class SysUserProfileController {
     @Resource
     private SysUserCoreService userCoreService;
     @Resource
-    private SysDeptService deptService;
+    private SysDeptCoreService deptCoreService;
+
     @Resource
     private SysPostService postService;
     @Resource
@@ -69,7 +70,7 @@ public class SysUserProfileController {
         resp.setRoles(SysUserConvert.INSTANCE.convertList(userRoles));
         // 获得部门信息
         if (user.getDeptId() != null) {
-            SysDeptDO dept = deptService.getDept(user.getDeptId());
+            SysDeptDO dept = deptCoreService.getDept(user.getDeptId());
             resp.setDept(SysUserConvert.INSTANCE.convert02(dept));
         }
         // 获得岗位信息

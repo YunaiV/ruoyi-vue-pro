@@ -3,7 +3,7 @@ package cn.iocoder.yudao.adminserver.modules.system.convert.auth;
 import cn.iocoder.yudao.adminserver.modules.system.controller.auth.vo.auth.SysAuthMenuRespVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.auth.vo.auth.SysAuthPermissionInfoRespVO;
 import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.permission.SysMenuDO;
-import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.permission.SysRoleDO;
+import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.permission.SysRoleDO;
 import cn.iocoder.yudao.adminserver.modules.system.enums.permission.MenuIdEnum;
 import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.user.SysUserDO;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;

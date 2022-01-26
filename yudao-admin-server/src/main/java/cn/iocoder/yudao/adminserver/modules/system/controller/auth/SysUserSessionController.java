@@ -3,13 +3,15 @@ package cn.iocoder.yudao.adminserver.modules.system.controller.auth;
 import cn.iocoder.yudao.adminserver.modules.system.controller.auth.vo.session.SysUserSessionPageItemRespVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.auth.vo.session.SysUserSessionPageReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.convert.auth.SysUserSessionConvert;
-import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.dept.SysDeptDO;
+import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.dept.SysDeptDO;
 import cn.iocoder.yudao.adminserver.modules.system.service.auth.SysUserSessionService;
 import cn.iocoder.yudao.adminserver.modules.system.service.dept.SysDeptService;
 import cn.iocoder.yudao.adminserver.modules.system.service.user.SysUserService;
 import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.auth.SysUserSessionDO;
 import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.user.SysUserDO;
 import cn.iocoder.yudao.coreservice.modules.system.service.auth.SysUserSessionCoreService;
+import cn.iocoder.yudao.coreservice.modules.system.service.dept.SysDeptCoreService;
+import cn.iocoder.yudao.coreservice.modules.system.service.user.SysUserCoreService;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
@@ -38,9 +40,10 @@ public class SysUserSessionController {
     @Resource
     private SysUserSessionCoreService userSessionCoreService;
     @Resource
-    private SysUserService userService;
+    private SysUserCoreService userCoreService;
+
     @Resource
-    private SysDeptService deptService;
+    private SysDeptCoreService deptCoreService;
 
     @GetMapping("/page")
     @ApiOperation("获得 Session 分页列表")
@@ -50,9 +53,9 @@ public class SysUserSessionController {
         PageResult<SysUserSessionDO> pageResult = userSessionService.getUserSessionPage(reqVO);
 
         // 获得拼接需要的数据
-        Map<Long, SysUserDO> userMap = userService.getUserMap(
+        Map<Long, SysUserDO> userMap = userCoreService.getUserMap(
                 convertList(pageResult.getList(), SysUserSessionDO::getUserId));
-        Map<Long, SysDeptDO> deptMap = deptService.getDeptMap(
+        Map<Long, SysDeptDO> deptMap = deptCoreService.getDeptMap(
                 convertList(userMap.values(), SysUserDO::getDeptId));
         // 拼接结果返回
         List<SysUserSessionPageItemRespVO> sessionList = new ArrayList<>(pageResult.getList().size());

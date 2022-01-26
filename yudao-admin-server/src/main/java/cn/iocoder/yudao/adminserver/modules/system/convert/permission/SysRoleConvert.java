@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.adminserver.modules.system.convert.permission;
 
 import cn.iocoder.yudao.adminserver.modules.system.controller.permission.vo.role.*;
-import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.permission.SysRoleDO;
+import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.permission.SysRoleDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 

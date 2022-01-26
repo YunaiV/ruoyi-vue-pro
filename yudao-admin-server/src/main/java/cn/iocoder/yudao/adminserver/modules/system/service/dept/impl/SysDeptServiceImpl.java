@@ -10,7 +10,7 @@ import cn.iocoder.yudao.adminserver.modules.system.controller.dept.vo.dept.SysDe
 import cn.iocoder.yudao.adminserver.modules.system.controller.dept.vo.dept.SysDeptUpdateReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.convert.dept.SysDeptConvert;
 import cn.iocoder.yudao.adminserver.modules.system.dal.mysql.dept.SysDeptMapper;
-import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.dept.SysDeptDO;
+import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.dept.SysDeptDO;
 import cn.iocoder.yudao.adminserver.modules.system.enums.dept.DeptIdEnum;
 import cn.iocoder.yudao.adminserver.modules.system.mq.producer.dept.SysDeptProducer;
 import cn.iocoder.yudao.adminserver.modules.system.service.dept.SysDeptService;
@@ -160,11 +160,6 @@ public class SysDeptServiceImpl implements SysDeptService {
     }
 
     @Override
-    public List<SysDeptDO> getSimpleDepts(Collection<Long> ids) {
-        return deptMapper.selectBatchIds(ids);
-    }
-
-    @Override
     public List<SysDeptDO> getSimpleDepts(SysDeptListReqVO reqVO) {
         return deptMapper.selectList(reqVO);
     }
@@ -180,26 +175,6 @@ public class SysDeptServiceImpl implements SysDeptService {
                 recursive ? Integer.MAX_VALUE : 1, // 如果递归获取，则无限；否则，只递归 1 次
                 parentDeptCache);
         return result;
-    }
-
-    @Override
-    public void validDepts(Collection<Long> ids) {
-        if (CollUtil.isEmpty(ids)) {
-            return;
-        }
-        // 获得科室信息
-        List<SysDeptDO> depts = deptMapper.selectBatchIds(ids);
-        Map<Long, SysDeptDO> deptMap = CollectionUtils.convertMap(depts, SysDeptDO::getId);
-        // 校验
-        ids.forEach(id -> {
-            SysDeptDO dept = deptMap.get(id);
-            if (dept == null) {
-                throw exception(DEPT_NOT_FOUND);
-            }
-            if (!CommonStatusEnum.ENABLE.getStatus().equals(dept.getStatus())) {
-                throw exception(DEPT_NOT_ENABLE, dept.getName());
-            }
-        });
     }
 
     /**
@@ -225,16 +200,6 @@ public class SysDeptServiceImpl implements SysDeptService {
         // 继续递归
         depts.forEach(dept -> getDeptsByParentIdFromCache(result, dept.getId(),
                 recursiveCount - 1, parentDeptMap));
-    }
-
-    @Override
-    public SysDeptDO getDept(Long id) {
-        return deptMapper.selectById(id);
-    }
-
-    @Override
-    public List<SysDeptDO> getDepts(Collection<Long> ids) {
-        return deptMapper.selectBatchIds(ids);
     }
 
     private void checkCreateOrUpdate(Long id, Long parentId, String name) {

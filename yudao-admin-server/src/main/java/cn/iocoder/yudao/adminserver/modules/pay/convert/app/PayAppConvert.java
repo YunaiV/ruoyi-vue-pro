@@ -2,8 +2,6 @@ package cn.iocoder.yudao.adminserver.modules.pay.convert.app;
 
 import java.util.*;
 
-import cn.iocoder.yudao.adminserver.modules.system.controller.user.vo.user.SysUserPageItemRespVO;
-import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.dept.SysDeptDO;
 import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.merchant.PayAppDO;
 import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.merchant.PayMerchantDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;

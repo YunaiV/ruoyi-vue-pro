@@ -3,9 +3,7 @@ package cn.iocoder.yudao.adminserver.modules.system.service.permission.impl;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
-import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.permission.vo.role.SysRoleCreateReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.permission.vo.role.SysRoleExportReqVO;
@@ -13,7 +11,7 @@ import cn.iocoder.yudao.adminserver.modules.system.controller.permission.vo.role
 import cn.iocoder.yudao.adminserver.modules.system.controller.permission.vo.role.SysRoleUpdateReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.convert.permission.SysRoleConvert;
 import cn.iocoder.yudao.adminserver.modules.system.dal.mysql.permission.SysRoleMapper;
-import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.permission.SysRoleDO;
+import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.permission.SysRoleDO;
 import cn.iocoder.yudao.adminserver.modules.system.enums.permission.RoleCodeEnum;
 import cn.iocoder.yudao.adminserver.modules.system.enums.permission.SysRoleTypeEnum;
 import cn.iocoder.yudao.adminserver.modules.system.mq.producer.permission.SysRoleProducer;
@@ -34,7 +32,6 @@ import org.springframework.util.StringUtils;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.adminserver.modules.system.enums.SysErrorCodeConstants.*;
@@ -239,26 +236,6 @@ public class SysRoleServiceImpl implements SysRoleService {
     @Override
     public List<SysRoleDO> getRoleList(SysRoleExportReqVO reqVO) {
         return roleMapper.listRoles(reqVO);
-    }
-
-    @Override
-    public void validRoles(Collection<Long> ids) {
-        if (CollUtil.isEmpty(ids)) {
-            return;
-        }
-        // 获得角色信息
-        List<SysRoleDO> roles = roleMapper.selectBatchIds(ids);
-        Map<Long, SysRoleDO> roleMap = CollectionUtils.convertMap(roles, SysRoleDO::getId);
-        // 校验
-        ids.forEach(id -> {
-            SysRoleDO role = roleMap.get(id);
-            if (role == null) {
-                throw exception(ROLE_NOT_EXISTS);
-            }
-            if (!CommonStatusEnum.ENABLE.getStatus().equals(role.getStatus())) {
-                throw exception(ROLE_IS_DISABLE, role.getName());
-            }
-        });
     }
 
     /**

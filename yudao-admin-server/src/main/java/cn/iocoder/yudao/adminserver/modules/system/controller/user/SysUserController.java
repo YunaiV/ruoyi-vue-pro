@@ -1,21 +1,17 @@
 package cn.iocoder.yudao.adminserver.modules.system.controller.user;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.iocoder.yudao.adminserver.modules.system.controller.dept.vo.dept.SysDeptListReqVO;
-import cn.iocoder.yudao.adminserver.modules.system.controller.dept.vo.dept.SysDeptSimpleRespVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.user.vo.user.*;
-import cn.iocoder.yudao.adminserver.modules.system.convert.dept.SysDeptConvert;
 import cn.iocoder.yudao.adminserver.modules.system.convert.user.SysUserConvert;
-import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.dept.SysDeptDO;
-import cn.iocoder.yudao.adminserver.modules.system.service.dept.SysDeptService;
+import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.dept.SysDeptDO;
 import cn.iocoder.yudao.adminserver.modules.system.service.user.SysUserService;
 import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.user.SysUserDO;
 import cn.iocoder.yudao.coreservice.modules.system.enums.common.SysSexEnum;
+import cn.iocoder.yudao.coreservice.modules.system.service.dept.SysDeptCoreService;
 import cn.iocoder.yudao.coreservice.modules.system.service.user.SysUserCoreService;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
@@ -50,7 +46,7 @@ public class SysUserController {
     @Resource
     private SysUserCoreService userCoreService;
     @Resource
-    private SysDeptService deptService;
+    private SysDeptCoreService deptCoreService;
 
     @PostMapping("/create")
     @ApiOperation("新增用户")
@@ -105,7 +101,7 @@ public class SysUserController {
 
         // 获得拼接需要的数据
         Collection<Long> deptIds = convertList(pageResult.getList(), SysUserDO::getDeptId);
-        Map<Long, SysDeptDO> deptMap = deptService.getDeptMap(deptIds);
+        Map<Long, SysDeptDO> deptMap = deptCoreService.getDeptMap(deptIds);
         // 拼接结果返回
         List<SysUserPageItemRespVO> userList = new ArrayList<>(pageResult.getList().size());
         pageResult.getList().forEach(user -> {
@@ -144,8 +140,8 @@ public class SysUserController {
 
         // 获得拼接需要的数据
         Collection<Long> deptIds = convertList(users, SysUserDO::getDeptId);
-        Map<Long, SysDeptDO> deptMap = deptService.getDeptMap(deptIds);
-        Map<Long, SysUserDO> deptLeaderUserMap = userService.getUserMap(convertSet(deptMap.values(), SysDeptDO::getLeaderUserId));
+        Map<Long, SysDeptDO> deptMap = deptCoreService.getDeptMap(deptIds);
+        Map<Long, SysUserDO> deptLeaderUserMap = userCoreService.getUserMap(convertSet(deptMap.values(), SysDeptDO::getLeaderUserId));
         // 拼接数据
         List<SysUserExcelVO> excelUsers = new ArrayList<>(users.size());
         users.forEach(user -> {

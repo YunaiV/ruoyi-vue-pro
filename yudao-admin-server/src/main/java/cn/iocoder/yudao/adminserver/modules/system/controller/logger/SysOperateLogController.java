@@ -9,6 +9,7 @@ import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.logger.SysOper
 import cn.iocoder.yudao.adminserver.modules.system.service.logger.SysOperateLogService;
 import cn.iocoder.yudao.adminserver.modules.system.service.user.SysUserService;
 import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.user.SysUserDO;
+import cn.iocoder.yudao.coreservice.modules.system.service.user.SysUserCoreService;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
@@ -44,7 +45,7 @@ public class SysOperateLogController {
     @Resource
     private SysOperateLogService operateLogService;
     @Resource
-    private SysUserService userService;
+    private SysUserCoreService userCoreService;
 
     @GetMapping("/page")
     @ApiOperation("查看操作日志分页列表")
@@ -54,7 +55,7 @@ public class SysOperateLogController {
 
         // 获得拼接需要的数据
         Collection<Long> userIds = CollectionUtils.convertList(pageResult.getList(), SysOperateLogDO::getUserId);
-        Map<Long, SysUserDO> userMap = userService.getUserMap(userIds);
+        Map<Long, SysUserDO> userMap = userCoreService.getUserMap(userIds);
         // 拼接数据
         List<SysOperateLogRespVO> list = new ArrayList<>(pageResult.getList().size());
         pageResult.getList().forEach(operateLog -> {
@@ -75,7 +76,7 @@ public class SysOperateLogController {
 
         // 获得拼接需要的数据
         Collection<Long> userIds = CollectionUtils.convertList(list, SysOperateLogDO::getUserId);
-        Map<Long, SysUserDO> userMap = userService.getUserMap(userIds);
+        Map<Long, SysUserDO> userMap = userCoreService.getUserMap(userIds);
         // 拼接数据
         List<SysOperateLogExcelVO> excelDataList = SysOperateLogConvert.INSTANCE.convertList(list, userMap);
         // 输出

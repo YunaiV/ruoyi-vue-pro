@@ -6,8 +6,8 @@ import cn.iocoder.yudao.adminserver.BaseDbUnitTest;
 import cn.iocoder.yudao.adminserver.modules.system.controller.user.vo.profile.SysUserProfileUpdatePasswordReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.user.vo.profile.SysUserProfileUpdateReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.user.vo.user.*;
-import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.dept.SysDeptDO;
-import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.dept.SysPostDO;
+import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.dept.SysDeptDO;
+import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.dept.SysPostDO;
 import cn.iocoder.yudao.adminserver.modules.system.dal.mysql.user.SysUserMapper;
 import cn.iocoder.yudao.adminserver.modules.system.service.dept.SysDeptService;
 import cn.iocoder.yudao.adminserver.modules.system.service.dept.SysPostService;
@@ -16,11 +16,11 @@ import cn.iocoder.yudao.adminserver.modules.system.service.user.impl.SysUserServ
 import cn.iocoder.yudao.coreservice.modules.infra.service.file.InfFileCoreService;
 import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.user.SysUserDO;
 import cn.iocoder.yudao.coreservice.modules.system.enums.common.SysSexEnum;
+import cn.iocoder.yudao.coreservice.modules.system.service.dept.SysDeptCoreService;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.ArrayUtils;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
-import cn.iocoder.yudao.framework.common.util.collection.SetUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import org.junit.jupiter.api.Test;
 import org.mockito.stubbing.Answer;
@@ -42,7 +42,6 @@ import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEq
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
 import static java.util.Collections.singleton;
-import static java.util.Collections.singletonList;
 import static org.assertj.core.util.Lists.newArrayList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -65,6 +64,9 @@ public class SysUserServiceImplTest extends BaseDbUnitTest {
 
     @MockBean
     private SysDeptService deptService;
+
+    @MockBean
+    private SysDeptCoreService deptCoreService;
     @MockBean
     private SysPostService postService;
     @MockBean
@@ -86,7 +88,7 @@ public class SysUserServiceImplTest extends BaseDbUnitTest {
             o.setId(reqVO.getDeptId());
             o.setStatus(CommonStatusEnum.ENABLE.getStatus());
         });
-        when(deptService.getDept(eq(dept.getId()))).thenReturn(dept);
+        when(deptCoreService.getDept(eq(dept.getId()))).thenReturn(dept);
         // mock postService 的方法
         List<SysPostDO> posts = CollectionUtils.convertList(reqVO.getPostIds(), postId ->
                 randomPojo(SysPostDO.class, o -> {
@@ -122,7 +124,7 @@ public class SysUserServiceImplTest extends BaseDbUnitTest {
             o.setId(reqVO.getDeptId());
             o.setStatus(CommonStatusEnum.ENABLE.getStatus());
         });
-        when(deptService.getDept(eq(dept.getId()))).thenReturn(dept);
+        when(deptCoreService.getDept(eq(dept.getId()))).thenReturn(dept);
         // mock postService 的方法
         List<SysPostDO> posts = CollectionUtils.convertList(reqVO.getPostIds(), postId ->
                 randomPojo(SysPostDO.class, o -> {
@@ -357,7 +359,7 @@ public class SysUserServiceImplTest extends BaseDbUnitTest {
             o.setId(importUser.getDeptId());
             o.setStatus(CommonStatusEnum.ENABLE.getStatus());
         });
-        when(deptService.getDept(eq(dept.getId()))).thenReturn(dept);
+        when(deptCoreService.getDept(eq(dept.getId()))).thenReturn(dept);
         // mock passwordEncoder 的方法
         when(passwordEncoder.encode(eq("yudaoyuanma"))).thenReturn("java");
 
@@ -391,7 +393,7 @@ public class SysUserServiceImplTest extends BaseDbUnitTest {
             o.setId(importUser.getDeptId());
             o.setStatus(CommonStatusEnum.ENABLE.getStatus());
         });
-        when(deptService.getDept(eq(dept.getId()))).thenReturn(dept);
+        when(deptCoreService.getDept(eq(dept.getId()))).thenReturn(dept);
 
         // 调用
         SysUserImportRespVO respVO = userService.importUsers(newArrayList(importUser), false);
@@ -421,7 +423,7 @@ public class SysUserServiceImplTest extends BaseDbUnitTest {
             o.setId(importUser.getDeptId());
             o.setStatus(CommonStatusEnum.ENABLE.getStatus());
         });
-        when(deptService.getDept(eq(dept.getId()))).thenReturn(dept);
+        when(deptCoreService.getDept(eq(dept.getId()))).thenReturn(dept);
 
         // 调用
         SysUserImportRespVO respVO = userService.importUsers(newArrayList(importUser), true);
@@ -528,7 +530,7 @@ public class SysUserServiceImplTest extends BaseDbUnitTest {
             o.setId(deptId);
             o.setStatus(CommonStatusEnum.DISABLE.getStatus());
         });
-        when(deptService.getDept(eq(dept.getId()))).thenReturn(dept);
+        when(deptCoreService.getDept(eq(dept.getId()))).thenReturn(dept);
 
         // 调用，校验异常
         assertServiceException(() -> userService.checkDeptEnable(deptId),
@@ -580,22 +582,22 @@ public class SysUserServiceImplTest extends BaseDbUnitTest {
         verify(passwordEncoder, times(1)).matches(eq(oldPassword), eq(user.getPassword()));
     }
 
-    @Test
-    public void testUsersByPostIds() {
-        // 准备参数
-        Collection<Long> postIds = asSet(10L, 20L);
-        // mock 方法
-        SysUserDO user1 = randomSysUserDO(o -> o.setPostIds(asSet(10L, 30L)));
-        userMapper.insert(user1);
-        SysUserDO user2 = randomSysUserDO(o -> o.setPostIds(singleton(100L)));
-        userMapper.insert(user2);
-
-        // 调用
-        List<SysUserDO> result = userService.getUsersByPostIds(postIds);
-        // 断言
-        assertEquals(1, result.size());
-        assertEquals(user1, result.get(0));
-    }
+//    @Test //TODO jason 已经移到userCoreService.getUsersByPostIds
+//    public void testUsersByPostIds() {
+//        // 准备参数
+//        Collection<Long> postIds = asSet(10L, 20L);
+//        // mock 方法
+//        SysUserDO user1 = randomSysUserDO(o -> o.setPostIds(asSet(10L, 30L)));
+//        userMapper.insert(user1);
+//        SysUserDO user2 = randomSysUserDO(o -> o.setPostIds(singleton(100L)));
+//        userMapper.insert(user2);
+//
+//        // 调用
+//        List<SysUserDO> result = userService.getUsersByPostIds(postIds);
+//        // 断言
+//        assertEquals(1, result.size());
+//        assertEquals(user1, result.get(0));
+//    }
 
     // ========== 随机对象 ==========
 

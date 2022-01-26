@@ -134,25 +134,6 @@ public class SysDictDataServiceImpl implements SysDictDataService {
         return dictDataMapper.selectCountByDictType(dictType);
     }
 
-    @Override
-    public void validDictDatas(String dictType, Collection<String> values) {
-        if (CollUtil.isEmpty(values)) {
-            return;
-        }
-        // 获得字典数据信息
-        List<SysDictDataDO> dictDatas = dictDataMapper.selectByDictTypeAndValues(dictType, values);
-        Map<String, SysDictDataDO> dictDataMap = CollectionUtils.convertMap(dictDatas, SysDictDataDO::getValue);
-        // 校验
-        values.forEach(value -> {
-            SysDictDataDO dictData = dictDataMap.get(value);
-            if (dictData == null) {
-                throw exception(DICT_DATA_NOT_EXISTS);
-            }
-            if (!CommonStatusEnum.ENABLE.getStatus().equals(dictData.getStatus())) {
-                throw exception(DICT_DATA_NOT_ENABLE, dictData.getLabel());
-            }
-        });
-    }
 
     private void checkCreateOrUpdate(Long id, String value, String dictType) {
         // 校验自己存在

@@ -8,7 +8,7 @@ import cn.iocoder.yudao.framework.security.core.enums.DataScopeEnum;
 import cn.iocoder.yudao.adminserver.modules.system.controller.permission.vo.role.SysRoleCreateReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.permission.vo.role.SysRolePageReqVO;
 import cn.iocoder.yudao.adminserver.modules.system.controller.permission.vo.role.SysRoleUpdateReqVO;
-import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.permission.SysRoleDO;
+import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.permission.SysRoleDO;
 import cn.iocoder.yudao.adminserver.modules.system.dal.mysql.permission.SysRoleMapper;
 import cn.iocoder.yudao.adminserver.modules.system.enums.permission.SysRoleTypeEnum;
 import cn.iocoder.yudao.adminserver.modules.system.mq.producer.permission.SysRoleProducer;

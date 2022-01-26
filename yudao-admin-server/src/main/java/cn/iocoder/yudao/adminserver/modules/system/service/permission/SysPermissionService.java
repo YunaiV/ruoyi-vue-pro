@@ -78,14 +78,6 @@ public interface SysPermissionService extends SecurityPermissionFrameworkService
     Set<Long> getUserRoleIdListByRoleId(Long roleId);
 
     /**
-     * 获得拥有多个角色的用户编号集合
-     *
-     * @param roleIds 角色编号集合
-     * @return 用户编号集合
-     */
-    Set<Long> getUserRoleIdListByRoleIds(Collection<Long> roleIds);
-
-    /**
      * 设置用户角色
      *
      * @param userId 角色编号

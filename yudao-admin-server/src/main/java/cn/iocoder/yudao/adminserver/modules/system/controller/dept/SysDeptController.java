@@ -1,10 +1,11 @@
 package cn.iocoder.yudao.adminserver.modules.system.controller.dept;
 
+import cn.iocoder.yudao.coreservice.modules.system.service.dept.SysDeptCoreService;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.adminserver.modules.system.controller.dept.vo.dept.*;
 import cn.iocoder.yudao.adminserver.modules.system.convert.dept.SysDeptConvert;
-import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.dept.SysDeptDO;
+import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.dept.SysDeptDO;
 import cn.iocoder.yudao.adminserver.modules.system.service.dept.SysDeptService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -28,6 +29,9 @@ public class SysDeptController {
 
     @Resource
     private SysDeptService deptService;
+
+    @Resource
+    private SysDeptCoreService deptCoreService;
 
     @PostMapping("create")
     @ApiOperation("创建部门")
@@ -80,7 +84,7 @@ public class SysDeptController {
     @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
     @PreAuthorize("@ss.hasPermission('system:dept:query')")
     public CommonResult<SysDeptRespVO> getDept(@RequestParam("id") Long id) {
-        return success(SysDeptConvert.INSTANCE.convert(deptService.getDept(id)));
+        return success(SysDeptConvert.INSTANCE.convert(deptCoreService.getDept(id)));
     }
 
 }
