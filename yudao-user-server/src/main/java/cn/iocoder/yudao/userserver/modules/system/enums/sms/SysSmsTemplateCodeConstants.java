@@ -12,4 +12,14 @@ public interface SysSmsTemplateCodeConstants {
      */
     String USER_SMS_LOGIN = "user-sms-login";
 
+    /**
+     * 用户忘记密码
+     */
+    String USER_SMS_RESET_PASSWORD = "user-sms-reset-password";
+
+    /**
+     * 用户更新手机号
+     */
+    String USER_SMS_UPDATE_MOBILE = "user-sms-update-mobile";
+
 }

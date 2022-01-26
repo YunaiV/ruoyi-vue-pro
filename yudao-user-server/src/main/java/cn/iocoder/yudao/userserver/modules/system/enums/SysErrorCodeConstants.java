@@ -24,9 +24,9 @@ public interface SysErrorCodeConstants {
     ErrorCode USER_SMS_CODE_EXCEED_SEND_MAXIMUM_QUANTITY_PER_DAY = new ErrorCode(1005001004, "超过每日短信发送数量");
     ErrorCode USER_SMS_CODE_SEND_TOO_FAST = new ErrorCode(1005001005, "短信发送过于频率");
     ErrorCode USER_SMS_CODE_IS_EXISTS = new ErrorCode(1005001006, "手机号已被使用");
+    ErrorCode USER_SMS_CODE_IS_UNUSED = new ErrorCode(1005001006, "验证码未被使用");
 
     // ========== 用户模块 1005002000 ==========
     ErrorCode USER_NOT_EXISTS = new ErrorCode(1005002001, "用户不存在");
-    ErrorCode USER_CODE_FAILED = new ErrorCode(1005002002, "验证码不匹配");
     ErrorCode USER_PASSWORD_FAILED = new ErrorCode(1005002003, "密码校验失败");
 }

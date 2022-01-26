@@ -23,7 +23,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.annotation.Resource;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 import static cn.hutool.core.util.RandomUtil.randomEle;
@@ -99,17 +98,15 @@ public class SysAuthServiceTest extends BaseDbAndRedisUnitTest {
         // 随机验证码
         String code = randomNumbers(4);
 
-        MbrAuthResetPasswordReqVO reqVO = MbrAuthResetPasswordReqVO.builder()
-                .password(password)
-                .code(code)
-                .build();
-        // 放入code+手机号
-        stringRedisTemplate.opsForValue().set(code,userDO.getMobile(),10, TimeUnit.MINUTES);
-
         // mock
         when(passwordEncoder.encode(password)).thenReturn(password);
 
         // 更新用户密码
+        MbrAuthResetPasswordReqVO reqVO = new MbrAuthResetPasswordReqVO();
+        reqVO.setMobile(userDO.getMobile());
+        reqVO.setPassword(password);
+        reqVO.setCode(code);
+
         authService.resetPassword(reqVO);
         assertEquals(mbrUserMapper.selectById(userDO.getId()).getPassword(),password);
     }

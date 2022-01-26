@@ -35,9 +35,6 @@ public class SysUserProfileController {
     @Resource
     private MbrUserService userService;
 
-    @Resource
-    private SysSmsCodeService smsCodeService;
-
     @PutMapping("/update-nickname")
     @ApiOperation("修改用户昵称")
     @PreAuthenticated
@@ -68,10 +65,6 @@ public class SysUserProfileController {
     @ApiOperation(value = "修改用户手机")
     @PreAuthenticated
     public CommonResult<Boolean> updateMobile(@RequestBody @Valid MbrUserUpdateMobileReqVO reqVO) {
-        // 校验验证码
-        // TODO @宋天：统一到 userService.updateMobile 方法里
-        smsCodeService.useSmsCode(reqVO.getMobile(),SysSmsSceneEnum.CHANGE_MOBILE_BY_SMS.getScene(), reqVO.getCode(),getClientIP());
-
         userService.updateMobile(getLoginUserId(), reqVO);
         return success(true);
     }

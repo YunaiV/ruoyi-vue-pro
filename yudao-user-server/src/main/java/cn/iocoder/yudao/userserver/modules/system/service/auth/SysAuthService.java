@@ -68,18 +68,11 @@ public interface SysAuthService extends SecurityAuthFrameworkService {
      * @param userId 用户id
      * @param userReqVO 用户请求实体类
      */
-    void updatePassword(Long userId, @Valid MbrAuthUpdatePasswordReqVO userReqVO);
+    void updatePassword(Long userId,MbrAuthUpdatePasswordReqVO userReqVO);
 
     /**
      * 忘记密码
      * @param userReqVO 用户请求实体类
      */
     void resetPassword(MbrAuthResetPasswordReqVO userReqVO);
-
-    /**
-     * 检测手机与验证码是否匹配
-     * @param phone 手机号
-     * @param code 验证码
-     */
-    void checkIfMobileMatchCodeAndDeleteCode(String phone,String code);
 }

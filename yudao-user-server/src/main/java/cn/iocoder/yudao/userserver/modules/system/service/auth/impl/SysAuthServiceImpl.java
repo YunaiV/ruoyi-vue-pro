@@ -40,7 +40,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import javax.validation.Valid;
 import java.util.List;
 import java.util.Objects;
 
@@ -285,46 +284,30 @@ public class SysAuthServiceImpl implements SysAuthService {
     }
 
     @Override
-    public void updatePassword(Long userId, @Valid MbrAuthUpdatePasswordReqVO reqVO) {
+    public void updatePassword(Long userId,MbrAuthUpdatePasswordReqVO reqVO) {
         // 检验旧密码
         MbrUserDO userDO = checkOldPassword(userId, reqVO.getOldPassword());
 
         // 更新用户密码
-        // TODO @宋天：不要更新整个对象哈
-        userDO.setPassword(passwordEncoder.encode(reqVO.getPassword()));
-        userMapper.updateById(userDO);
+        MbrUserDO mbrUserDO = MbrUserDO.builder().build();
+        mbrUserDO.setId(userDO.getId());
+        mbrUserDO.setPassword(passwordEncoder.encode(reqVO.getPassword()));
+        userMapper.updateById(mbrUserDO);
     }
 
     @Override
     public void resetPassword(MbrAuthResetPasswordReqVO reqVO) {
-        // 根据验证码取出手机号，并查询用户
-        String mobile = stringRedisTemplate.opsForValue().get(reqVO.getCode());
-        MbrUserDO userDO = userMapper.selectByMobile(mobile);
-        if (userDO == null){
-            throw exception(USER_NOT_EXISTS);
-        }
-        // TODO @芋艿 这一步没必要检验验证码与手机是否匹配，因为是根据验证码去redis中查找手机号，然后根据手机号查询用户
-        //  也就是说 即便黑客以其他方式将验证码发送到自己手机上，最终还是会根据手机号查询用户然后进行重置密码的操作，不存在安全问题
+        // 检验用户是否存在
+        MbrUserDO userDO = checkUserIfExists(reqVO.getMobile());
 
-        // TODO @宋天：这块微信在讨论下哈~~~
-
-        // 校验验证码
-        smsCodeService.useSmsCode(userDO.getMobile(), SysSmsSceneEnum.FORGET_MOBILE_BY_SMS.getScene(), reqVO.getCode(),getClientIP());
+        // 使用验证码
+        smsCodeService.useSmsCode(reqVO.getMobile(),SysSmsSceneEnum.FORGET_MOBILE_BY_SMS.getScene(),reqVO.getCode(),getClientIP());
 
         // 更新密码
-        userDO.setPassword(passwordEncoder.encode(reqVO.getPassword()));
-        userMapper.updateById(userDO);
-    }
-
-    @Override
-    public void checkIfMobileMatchCodeAndDeleteCode(String phone, String code) {
-        // 检验用户手机与验证码是否匹配
-        String mobile = stringRedisTemplate.opsForValue().get(code);
-        if (!phone.equals(mobile)){
-            throw exception(USER_CODE_FAILED);
-        }
-        // 销毁redis中此验证码
-        stringRedisTemplate.delete(code);
+        MbrUserDO mbrUserDO = MbrUserDO.builder().build();
+        mbrUserDO.setId(userDO.getId());
+        mbrUserDO.setPassword(passwordEncoder.encode(reqVO.getPassword()));
+        userMapper.updateById(mbrUserDO);
     }
 
     /**
@@ -346,6 +329,15 @@ public class SysAuthServiceImpl implements SysAuthService {
         }
         return user;
     }
+
+    public MbrUserDO checkUserIfExists(String mobile) {
+        MbrUserDO user = userMapper.selectByMobile(mobile);
+        if (user == null) {
+            throw exception(USER_NOT_EXISTS);
+        }
+        return user;
+    }
+
 
     private void createLogoutLog(Long userId, String username) {
         SysLoginLogCreateReqDTO reqDTO = new SysLoginLogCreateReqDTO();
