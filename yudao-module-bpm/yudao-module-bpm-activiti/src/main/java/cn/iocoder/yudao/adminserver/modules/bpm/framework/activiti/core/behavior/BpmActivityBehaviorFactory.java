@@ -2,7 +2,7 @@ package cn.iocoder.yudao.adminserver.modules.bpm.framework.activiti.core.behavio
 
 import cn.iocoder.yudao.adminserver.modules.bpm.framework.activiti.core.behavior.script.BpmTaskAssignScript;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmTaskAssignRuleService;
-import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmUserGroupService;
+import cn.iocoder.yudao.coreservice.modules.bpm.api.group.BpmUserGroupServiceApi;
 import cn.iocoder.yudao.coreservice.modules.system.service.dept.SysDeptCoreService;
 import cn.iocoder.yudao.coreservice.modules.system.service.permission.SysPermissionCoreService;
 import cn.iocoder.yudao.coreservice.modules.system.service.user.SysUserCoreService;
@@ -34,7 +34,7 @@ public class BpmActivityBehaviorFactory extends DefaultActivityBehaviorFactory {
     @Setter
     private SysDeptCoreService deptCoreService;
     @Setter
-    private BpmUserGroupService userGroupService;
+    private BpmUserGroupServiceApi userGroupServiceApi;
     @Setter
     private SysUserCoreService userCoreService;
     @Setter
@@ -46,7 +46,7 @@ public class BpmActivityBehaviorFactory extends DefaultActivityBehaviorFactory {
         userTaskActivityBehavior.setBpmTaskRuleService(bpmTaskRuleService);
         userTaskActivityBehavior.setPermissionCoreService(permissionCoreService);
         userTaskActivityBehavior.setDeptCoreService(deptCoreService);
-        userTaskActivityBehavior.setUserGroupService(userGroupService);
+        userTaskActivityBehavior.setUserGroupServiceApi(userGroupServiceApi);
         userTaskActivityBehavior.setSysUserCoreService(userCoreService);
         userTaskActivityBehavior.setScripts(scripts);
         return userTaskActivityBehavior;

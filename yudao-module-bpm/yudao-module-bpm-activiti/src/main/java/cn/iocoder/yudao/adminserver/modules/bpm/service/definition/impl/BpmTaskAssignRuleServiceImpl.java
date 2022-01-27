@@ -1,8 +1,6 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.service.definition.impl;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.collection.ListUtil;
-import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.rule.BpmTaskAssignRuleCreateReqVO;
@@ -15,8 +13,7 @@ import cn.iocoder.yudao.adminserver.modules.bpm.enums.definition.BpmTaskAssignRu
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmModelService;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmProcessDefinitionService;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmTaskAssignRuleService;
-import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmUserGroupService;
-
+import cn.iocoder.yudao.coreservice.modules.bpm.api.group.BpmUserGroupServiceApi;
 import cn.iocoder.yudao.coreservice.modules.system.enums.SysDictTypeConstants;
 import cn.iocoder.yudao.coreservice.modules.system.service.dept.SysDeptCoreService;
 import cn.iocoder.yudao.coreservice.modules.system.service.dept.SysPostCoreService;
@@ -65,7 +62,7 @@ public class BpmTaskAssignRuleServiceImpl implements BpmTaskAssignRuleService {
     @Resource
     private SysUserCoreService userCoreService;
     @Resource
-    private BpmUserGroupService userGroupService;
+    private BpmUserGroupServiceApi userGroupServiceApi;
     @Resource
     private SysDictDataCoreService dictDataCoreService;
 
@@ -191,7 +188,7 @@ public class BpmTaskAssignRuleServiceImpl implements BpmTaskAssignRuleService {
         } else if (Objects.equals(type, BpmTaskAssignRuleTypeEnum.USER.getType())) {
             userCoreService.validUsers(options);
         } else if (Objects.equals(type, BpmTaskAssignRuleTypeEnum.USER_GROUP.getType())) {
-            userGroupService.validUserGroups(options);
+            userGroupServiceApi.validUserGroups(options);
         } else if (Objects.equals(type, BpmTaskAssignRuleTypeEnum.SCRIPT.getType())) {
             dictDataCoreService.validDictDatas(SysDictTypeConstants.BPM_TASK_ASSIGN_SCRIPT,
                     CollectionUtils.convertSet(options, String::valueOf));

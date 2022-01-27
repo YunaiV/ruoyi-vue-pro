@@ -410,7 +410,12 @@
             </dependency>
             <dependency>
                 <groupId>cn.iocoder.boot</groupId>
-                <artifactId>yudao-module-bpm-core-service</artifactId>
+                <artifactId>yudao-module-bpm-core-service-impl</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.iocoder.boot</groupId>
+                <artifactId>yudao-module-bpm-core-service-api</artifactId>
                 <version>${revision}</version>
             </dependency>
             <dependency>

@@ -9,6 +9,7 @@ import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.definition.BpmUse
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.mysql.definition.BpmUserGroupMapper;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmUserGroupService;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import org.springframework.stereotype.Service;
@@ -64,7 +65,7 @@ public class BpmUserGroupServiceImpl implements BpmUserGroupService {
 
     private void validateUserGroupExists(Long id) {
         if (userGroupMapper.selectById(id) == null) {
-            throw exception(USER_GROUP_NOT_EXISTS);
+            throw ServiceExceptionUtil.exception(USER_GROUP_NOT_EXISTS);
         }
     }
 
@@ -73,10 +74,6 @@ public class BpmUserGroupServiceImpl implements BpmUserGroupService {
         return userGroupMapper.selectById(id);
     }
 
-    @Override
-    public List<BpmUserGroupDO> getUserGroupList(Collection<Long> ids) {
-        return userGroupMapper.selectBatchIds(ids);
-    }
 
     @Override
     public List<BpmUserGroupDO> getUserGroupListByStatus(Integer status) {
@@ -86,26 +83,6 @@ public class BpmUserGroupServiceImpl implements BpmUserGroupService {
     @Override
     public PageResult<BpmUserGroupDO> getUserGroupPage(BpmUserGroupPageReqVO pageReqVO) {
         return userGroupMapper.selectPage(pageReqVO);
-    }
-
-    @Override
-    public void validUserGroups(Set<Long> ids) {
-        if (CollUtil.isEmpty(ids)) {
-            return;
-        }
-        // 获得用户组信息
-        List<BpmUserGroupDO> userGroups = userGroupMapper.selectBatchIds(ids);
-        Map<Long, BpmUserGroupDO> userGroupMap = CollectionUtils.convertMap(userGroups, BpmUserGroupDO::getId);
-        // 校验
-        ids.forEach(id -> {
-            BpmUserGroupDO userGroup = userGroupMap.get(id);
-            if (userGroup == null) {
-                throw exception(USER_GROUP_NOT_EXISTS);
-            }
-            if (!CommonStatusEnum.ENABLE.getStatus().equals(userGroup.getStatus())) {
-                throw exception(USER_GROUP_IS_DISABLE, userGroup.getName());
-            }
-        });
     }
 
 }

@@ -2,12 +2,12 @@ package cn.iocoder.yudao.adminserver.modules.bpm.framework.activiti.core.behavio
 
 import cn.hutool.core.map.MapUtil;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.definition.BpmTaskAssignRuleDO;
-import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.definition.BpmUserGroupDO;
 import cn.iocoder.yudao.adminserver.modules.bpm.enums.definition.BpmTaskAssignRuleTypeEnum;
 import cn.iocoder.yudao.adminserver.modules.bpm.enums.definition.BpmTaskRuleScriptEnum;
 import cn.iocoder.yudao.adminserver.modules.bpm.framework.activiti.core.behavior.script.BpmTaskAssignScript;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmTaskAssignRuleService;
-import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmUserGroupService;
+import cn.iocoder.yudao.coreservice.modules.bpm.api.group.BpmUserGroupServiceApi;
+import cn.iocoder.yudao.coreservice.modules.bpm.api.group.dto.BpmUserGroupDTO;
 import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.dept.SysDeptDO;
 import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.user.SysUserDO;
 import cn.iocoder.yudao.coreservice.modules.system.service.dept.SysDeptCoreService;
@@ -44,7 +44,7 @@ public class BpmUserTaskActivitiBehaviorTest extends BaseMockitoUnitTest {
     @Mock
     private SysDeptCoreService deptCoreService;
     @Mock
-    private BpmUserGroupService userGroupService;
+    private BpmUserGroupServiceApi userGroupServiceApi;
     @Mock
     private SysUserCoreService userCoreService;
 
@@ -135,9 +135,9 @@ public class BpmUserTaskActivitiBehaviorTest extends BaseMockitoUnitTest {
         BpmTaskAssignRuleDO rule = new BpmTaskAssignRuleDO().setOptions(asSet(1L, 2L))
                 .setType(BpmTaskAssignRuleTypeEnum.USER_GROUP.getType());
         // mock 方法
-        BpmUserGroupDO userGroup1 = randomPojo(BpmUserGroupDO.class, o -> o.setMemberUserIds(asSet(11L, 12L)));
-        BpmUserGroupDO userGroup2 = randomPojo(BpmUserGroupDO.class, o -> o.setMemberUserIds(asSet(21L, 22L)));
-        when(userGroupService.getUserGroupList(eq(rule.getOptions()))).thenReturn(Arrays.asList(userGroup1, userGroup2));
+        BpmUserGroupDTO userGroup1 = randomPojo(BpmUserGroupDTO.class, o -> o.setMemberUserIds(asSet(11L, 12L)));
+        BpmUserGroupDTO userGroup2 = randomPojo(BpmUserGroupDTO.class, o -> o.setMemberUserIds(asSet(21L, 22L)));
+        when(userGroupServiceApi.getUserGroupList(eq(rule.getOptions()))).thenReturn(Arrays.asList(userGroup1, userGroup2));
         mockGetUserMap(asSet(11L, 12L, 21L, 22L));
 
         // 调用

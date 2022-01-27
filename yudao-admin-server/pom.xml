@@ -49,7 +49,10 @@
             <groupId>cn.iocoder.boot</groupId>
             <artifactId>yudao-module-bpm-activiti</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-module-bpm-core-service-impl</artifactId>
+        </dependency>
         <!-- Web 相关 -->
         <dependency>
             <groupId>cn.iocoder.boot</groupId>

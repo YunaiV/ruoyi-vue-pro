@@ -4,11 +4,11 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.definition.BpmTaskAssignRuleDO;
-import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.definition.BpmUserGroupDO;
 import cn.iocoder.yudao.adminserver.modules.bpm.enums.definition.BpmTaskAssignRuleTypeEnum;
 import cn.iocoder.yudao.adminserver.modules.bpm.framework.activiti.core.behavior.script.BpmTaskAssignScript;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmTaskAssignRuleService;
-import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmUserGroupService;
+import cn.iocoder.yudao.coreservice.modules.bpm.api.group.BpmUserGroupServiceApi;
+import cn.iocoder.yudao.coreservice.modules.bpm.api.group.dto.BpmUserGroupDTO;
 import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.dept.SysDeptDO;
 import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.user.SysUserDO;
 import cn.iocoder.yudao.coreservice.modules.system.service.dept.SysDeptCoreService;
@@ -30,7 +30,7 @@ import java.util.*;
 
 import static cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants.TASK_ASSIGN_SCRIPT_NOT_EXISTS;
 import static cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants.TASK_CREATE_FAIL_NO_CANDIDATE_USER;
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.*;
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString;
@@ -53,7 +53,7 @@ public class BpmUserTaskActivitiBehavior extends UserTaskActivityBehavior {
     @Setter
     private SysDeptCoreService deptCoreService;
     @Setter
-    private BpmUserGroupService userGroupService;
+    private BpmUserGroupServiceApi userGroupServiceApi;
     @Setter
     private SysUserCoreService sysUserCoreService;
     /**
@@ -156,7 +156,7 @@ public class BpmUserTaskActivitiBehavior extends UserTaskActivityBehavior {
     }
 
     private Set<Long> calculateTaskCandidateUsersByUserGroup(TaskEntity task, BpmTaskAssignRuleDO rule) {
-        List<BpmUserGroupDO> userGroups = userGroupService.getUserGroupList(rule.getOptions());
+        List<BpmUserGroupDTO> userGroups = userGroupServiceApi.getUserGroupList(rule.getOptions());
         Set<Long> userIds = new HashSet<>();
         userGroups.forEach(bpmUserGroupDO -> userIds.addAll(bpmUserGroupDO.getMemberUserIds()));
         return userIds;
