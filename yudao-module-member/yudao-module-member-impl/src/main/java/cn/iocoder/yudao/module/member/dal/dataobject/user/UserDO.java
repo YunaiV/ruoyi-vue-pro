@@ -10,19 +10,19 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import java.util.Date;
 
 /**
- * 会员中心的用户 DO
+ * 会员用户 DO
  *
  * uk_mobile 索引：基于 {@link #mobile} 字段
  *
  * @author 芋道源码
  */
-@TableName(value = "member_user", autoResultMap = true)
+@TableName(value = "mbr_user", autoResultMap = true)
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class MemberUserDO extends TenantBaseDO {
+public class UserDO extends TenantBaseDO {
 
     /**
      * 用户ID

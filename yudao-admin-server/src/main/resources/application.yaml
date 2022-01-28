@@ -48,11 +48,17 @@ yudao:
   info:
     version: 1.0.0
     base-package: cn.iocoder.yudao.adminserver
+    member-package: cn.iocoder.yudao.module.member
   core-service:
     base-package: cn.iocoder.yudao.coreservice
   web:
-    api-prefix: /api
-    controller-package: ${yudao.info.base-package}
+    admin-api:
+      prefix: /api
+      controller: ${yudao.info.base-package}
+    app-api:
+      prefix: /app-api
+      controller: cn.iocoder.yudao.module.member.controller.app
+
   swagger:
     title: 管理后台
     description: 提供管理员管理的所有功能
@@ -72,7 +78,13 @@ yudao:
       - cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants
   tenant: # 多租户相关配置项
     tables: # 配置需要开启多租户的表；如果实体已经继承 TenantBaseDO 类，则无需重复配置
-  url:
+  url: ## TODO 芋艿：迁移到 web 配置项下，
     admin-ui: http://dashboard.yudao.iocoder.cn # Admin 管理后台 UI 的地址
+  sms-code: # 短信验证码相关的配置项
+    expire-times: 10m
+    send-frequency: 1m
+    send-maximum-quantity-per-day: 10
+    begin-code: 9999 # 这里配置 9999 的原因是，测试方便。
+    end-code: 9999 # 这里配置 9999 的原因是，测试方便。
 
 debug: false

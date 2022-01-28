@@ -11,6 +11,7 @@ import org.hibernate.validator.constraints.Length;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 
+// TODO 芋艿：code review 相关逻辑
 @ApiModel("APP 端 - 修改密码 Request VO")
 @Data
 @NoArgsConstructor

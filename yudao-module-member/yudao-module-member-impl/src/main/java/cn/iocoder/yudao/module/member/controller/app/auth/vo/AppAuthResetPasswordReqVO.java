@@ -13,6 +13,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
 
+// TODO 芋艿：code review 相关逻辑
 @ApiModel("APP 端 - 重置密码 Request VO")
 @Data
 @NoArgsConstructor

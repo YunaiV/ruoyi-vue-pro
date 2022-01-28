@@ -1,13 +1,13 @@
 package cn.iocoder.yudao.module.member.api.user;
 
-import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
+import cn.iocoder.yudao.module.member.api.user.dto.UserRespDTO;
 
 /**
  * 会员用户的 API 接口
  *
  * @author 芋道源码
  */
-public interface MemberUserApi {
+public interface UserApi {
 
     /**
      * 获得会员用户信息
@@ -15,6 +15,6 @@ public interface MemberUserApi {
      * @param id 用户编号
      * @return 用户信息
      */
-    MemberUserRespDTO getMemberUser(Long id);
+    UserRespDTO getUser(Long id);
 
 }

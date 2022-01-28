@@ -5,8 +5,8 @@ import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.module.member.controller.app.auth.vo.*;
-import cn.iocoder.yudao.userserver.modules.system.service.auth.SysAuthService;
-import cn.iocoder.yudao.userserver.modules.system.service.sms.SysSmsCodeService;
+import cn.iocoder.yudao.module.member.service.auth.AuthService;
+import cn.iocoder.yudao.module.member.service.sms.SysSmsCodeService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -31,7 +31,8 @@ import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUti
 public class AppAuthController {
 
     @Resource
-    private SysAuthService authService;
+    private AuthService authService;
+
     @Resource
     private SysSmsCodeService smsCodeService;
     @Resource
@@ -55,7 +56,7 @@ public class AppAuthController {
 
     @PostMapping("/send-sms-code")
     @ApiOperation(value = "发送手机验证码")
-    public CommonResult<Boolean> sendSmsCode(@RequestBody @Valid SysAuthSendSmsReqVO reqVO) {
+    public CommonResult<Boolean> sendSmsCode(@RequestBody @Valid AppAuthSendSmsReqVO reqVO) {
         smsCodeService.sendSmsCode(reqVO.getMobile(), reqVO.getScene(), getClientIP());
         return success(true);
     }

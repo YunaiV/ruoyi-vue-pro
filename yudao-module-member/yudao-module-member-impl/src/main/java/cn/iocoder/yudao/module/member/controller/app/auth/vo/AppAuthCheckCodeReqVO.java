@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.member.controller.app.auth.vo;
 
 import cn.iocoder.yudao.framework.common.validation.InEnum;
 import cn.iocoder.yudao.framework.common.validation.Mobile;
-import cn.iocoder.yudao.userserver.modules.system.enums.sms.SysSmsSceneEnum;
+import cn.iocoder.yudao.module.member.enums.sms.SysSmsSceneEnum;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -15,6 +15,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
+// TODO 芋艿：code review 相关逻辑
 @ApiModel("APP 端 - 校验验证码 Request VO")
 @Data
 @NoArgsConstructor
@@ -37,4 +38,5 @@ public class AppAuthCheckCodeReqVO {
     @NotNull(message = "发送场景不能为空")
     @InEnum(SysSmsSceneEnum.class)
     private Integer scene;
+
 }

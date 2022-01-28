@@ -7,6 +7,9 @@ import cn.iocoder.yudao.framework.security.core.handler.AccessDeniedHandlerImpl;
 import cn.iocoder.yudao.framework.security.core.handler.AuthenticationEntryPointImpl;
 import cn.iocoder.yudao.framework.security.core.handler.LogoutSuccessHandlerImpl;
 import cn.iocoder.yudao.framework.security.core.service.SecurityAuthFrameworkService;
+import cn.iocoder.yudao.framework.security.core.service.SecurityAuthService;
+import cn.iocoder.yudao.framework.security.core.service.SecurityAuthServiceImpl;
+import cn.iocoder.yudao.framework.web.config.WebProperties;
 import cn.iocoder.yudao.framework.web.core.handler.GlobalExceptionHandler;
 import org.springframework.beans.factory.config.MethodInvokingFactoryBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -20,6 +23,7 @@ import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * Spring Security 自动配置类，主要用于相关组件的配置
@@ -29,7 +33,7 @@ import javax.annotation.Resource;
  *
  * @author 芋道源码
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @EnableConfigurationProperties(SecurityProperties.class)
 public class YudaoSecurityAutoConfiguration {
 
@@ -64,8 +68,8 @@ public class YudaoSecurityAutoConfiguration {
      * 退出处理类 Bean
      */
     @Bean
-    public LogoutSuccessHandler logoutSuccessHandler(SecurityAuthFrameworkService securityFrameworkService) {
-        return new LogoutSuccessHandlerImpl(securityProperties, securityFrameworkService);
+    public LogoutSuccessHandler logoutSuccessHandler(SecurityAuthService securityAuthService) {
+        return new LogoutSuccessHandlerImpl(securityProperties, securityAuthService);
     }
 
     /**
@@ -83,9 +87,18 @@ public class YudaoSecurityAutoConfiguration {
      * Token 认证过滤器 Bean
      */
     @Bean
-    public JWTAuthenticationTokenFilter authenticationTokenFilter(SecurityAuthFrameworkService securityFrameworkService,
+    public JWTAuthenticationTokenFilter authenticationTokenFilter(SecurityAuthService securityAuthService,
                                                                   GlobalExceptionHandler globalExceptionHandler) {
-        return new JWTAuthenticationTokenFilter(securityProperties, securityFrameworkService, globalExceptionHandler);
+        return new JWTAuthenticationTokenFilter(securityProperties, securityAuthService, globalExceptionHandler);
+    }
+
+    /**
+     * 安全认证的 Service Bean
+     */
+    @Bean
+    public SecurityAuthService securityAuthService(List<SecurityAuthFrameworkService> securityFrameworkServices,
+                                                   WebProperties webProperties) {
+        return new SecurityAuthServiceImpl(securityFrameworkServices, webProperties);
     }
 
     /**

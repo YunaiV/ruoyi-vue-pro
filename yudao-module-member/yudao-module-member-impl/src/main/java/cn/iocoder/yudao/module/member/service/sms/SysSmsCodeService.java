@@ -2,8 +2,8 @@ package cn.iocoder.yudao.module.member.service.sms;
 
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.validation.Mobile;
-import cn.iocoder.yudao.userserver.modules.system.dal.dataobject.sms.SysSmsCodeDO;
-import cn.iocoder.yudao.userserver.modules.system.enums.sms.SysSmsSceneEnum;
+import cn.iocoder.yudao.module.member.dal.dataobject.sms.SysSmsCodeDO;
+import cn.iocoder.yudao.module.member.enums.sms.SysSmsSceneEnum;
 
 /**
  * 短信验证码 Service 接口
@@ -39,7 +39,6 @@ public interface SysSmsCodeService {
      * @param userId 用户id
      */
     void sendSmsCodeLogin(Long userId);
-
 
     /**
      * 检查验证码是否有效

@@ -7,7 +7,7 @@ import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
  *
  * @author 芋道源码
  */
-public class MemberUserRespDTO {
+public class UserRespDTO {
 
     /**
      * 用户ID

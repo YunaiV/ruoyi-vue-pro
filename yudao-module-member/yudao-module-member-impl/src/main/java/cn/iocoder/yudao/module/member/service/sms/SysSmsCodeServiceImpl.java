@@ -1,15 +1,14 @@
 package cn.iocoder.yudao.module.member.service.sms;
 
 import cn.hutool.core.map.MapUtil;
-import cn.iocoder.yudao.coreservice.modules.member.dal.dataobject.user.MbrUserDO;
 import cn.iocoder.yudao.coreservice.modules.system.service.sms.SysSmsCoreService;
 import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
-import cn.iocoder.yudao.userserver.modules.member.service.user.MbrUserService;
-import cn.iocoder.yudao.userserver.modules.system.dal.dataobject.sms.SysSmsCodeDO;
-import cn.iocoder.yudao.userserver.modules.system.dal.mysql.sms.SysSmsCodeMapper;
-import cn.iocoder.yudao.userserver.modules.system.enums.sms.SysSmsSceneEnum;
-import cn.iocoder.yudao.userserver.modules.system.framework.sms.SmsCodeProperties;
-import cn.iocoder.yudao.userserver.modules.system.service.sms.SysSmsCodeService;
+import cn.iocoder.yudao.module.member.dal.dataobject.sms.SysSmsCodeDO;
+import cn.iocoder.yudao.module.member.dal.dataobject.user.UserDO;
+import cn.iocoder.yudao.module.member.dal.mysql.sms.SysSmsCodeMapper;
+import cn.iocoder.yudao.module.member.enums.sms.SysSmsSceneEnum;
+import cn.iocoder.yudao.module.member.framework.sms.SmsCodeProperties;
+import cn.iocoder.yudao.module.member.service.user.UserService;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -17,9 +16,8 @@ import javax.annotation.Resource;
 import java.util.Date;
 
 import static cn.hutool.core.util.RandomUtil.randomInt;
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getClientIP;
-import static cn.iocoder.yudao.userserver.modules.system.enums.SysErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.member.enums.SysErrorCodeConstants.*;
 
 /**
  * 短信验证码 Service 实现类
@@ -37,7 +35,7 @@ public class SysSmsCodeServiceImpl implements SysSmsCodeService {
     private SysSmsCodeMapper smsCodeMapper;
 
     @Resource
-    private MbrUserService mbrUserService;
+    private UserService userService;
 
     @Resource
     private SysSmsCoreService smsCoreService;
@@ -62,9 +60,9 @@ public class SysSmsCodeServiceImpl implements SysSmsCodeService {
 
     public void checkMobileIsRegister(String mobile, Integer scene) {
         // 检测手机号是否已被使用
-        MbrUserDO userByMobile = mbrUserService.getUserByMobile(mobile);
-        if (userByMobile != null){
-            throw ServiceExceptionUtil.exception(SysErrorCodeConstants.USER_SMS_CODE_IS_EXISTS);
+        UserDO user = userService.getUserByMobile(mobile);
+        if (user != null) {
+            throw ServiceExceptionUtil.exception(USER_SMS_CODE_IS_EXISTS);
         }
 
         // 发送短信
@@ -76,11 +74,11 @@ public class SysSmsCodeServiceImpl implements SysSmsCodeService {
         SysSmsCodeDO lastSmsCode = smsCodeMapper.selectLastByMobile(mobile, null,null);
         if (lastSmsCode != null) {
             if (lastSmsCode.getTodayIndex() >= smsCodeProperties.getSendMaximumQuantityPerDay()) { // 超过当天发送的上限。
-                throw ServiceExceptionUtil.exception(SysErrorCodeConstants.USER_SMS_CODE_EXCEED_SEND_MAXIMUM_QUANTITY_PER_DAY);
+                throw ServiceExceptionUtil.exception(USER_SMS_CODE_EXCEED_SEND_MAXIMUM_QUANTITY_PER_DAY);
             }
             if (System.currentTimeMillis() - lastSmsCode.getCreateTime().getTime()
                     < smsCodeProperties.getSendFrequency().toMillis()) { // 发送过于频繁
-                throw ServiceExceptionUtil.exception(SysErrorCodeConstants.USER_SMS_CODE_SEND_TOO_FAST);
+                throw ServiceExceptionUtil.exception(USER_SMS_CODE_SEND_TOO_FAST);
             }
             // TODO 芋艿：提升，每个 IP 每天可发送数量
             // TODO 芋艿：提升，每个 IP 每小时可发送数量
@@ -97,13 +95,12 @@ public class SysSmsCodeServiceImpl implements SysSmsCodeService {
 
     @Override
     public void useSmsCode(String mobile, Integer scene, String code, String usedIp) {
-
         // 检测验证码是否有效
         SysSmsCodeDO lastSmsCode = this.checkCodeIsExpired(mobile, code, scene);
 
         // 判断验证码是否已被使用
         if (Boolean.TRUE.equals(lastSmsCode.getUsed())) {
-            throw ServiceExceptionUtil.exception(SysErrorCodeConstants.USER_SMS_CODE_USED);
+            throw ServiceExceptionUtil.exception(USER_SMS_CODE_USED);
         }
 
         // 使用验证码
@@ -113,9 +110,9 @@ public class SysSmsCodeServiceImpl implements SysSmsCodeService {
 
     @Override
     public void sendSmsCodeLogin(Long userId) {
-        MbrUserDO user = mbrUserService.getUser(userId);
+        UserDO user = userService.getUser(userId);
         if (user == null){
-            throw ServiceExceptionUtil.exception(SysErrorCodeConstants.USER_NOT_EXISTS);
+            throw ServiceExceptionUtil.exception(USER_NOT_EXISTS);
         }
         // 发送验证码
         this.sendSmsCode(user.getMobile(),SysSmsSceneEnum.CHANGE_MOBILE_BY_SMS.getScene(), getClientIP());
@@ -128,15 +125,13 @@ public class SysSmsCodeServiceImpl implements SysSmsCodeService {
 
         // 若验证码不存在，抛出异常
         if (lastSmsCode == null) {
-            throw ServiceExceptionUtil.exception(SysErrorCodeConstants.USER_SMS_CODE_NOT_FOUND);
+            throw ServiceExceptionUtil.exception(USER_SMS_CODE_NOT_FOUND);
         }
         if (System.currentTimeMillis() - lastSmsCode.getCreateTime().getTime()
                 >= smsCodeProperties.getExpireTimes().toMillis()) { // 验证码已过期
-            throw ServiceExceptionUtil.exception(SysErrorCodeConstants.USER_SMS_CODE_EXPIRED);
+            throw ServiceExceptionUtil.exception(USER_SMS_CODE_EXPIRED);
         }
-
         return lastSmsCode;
-
     }
 
 }

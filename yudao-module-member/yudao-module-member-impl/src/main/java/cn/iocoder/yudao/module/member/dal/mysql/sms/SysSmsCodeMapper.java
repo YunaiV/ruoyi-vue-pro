@@ -3,10 +3,9 @@ package cn.iocoder.yudao.module.member.dal.mysql.sms;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.QueryWrapperX;
 import cn.iocoder.yudao.module.member.dal.dataobject.sms.SysSmsCodeDO;
-import cn.iocoder.yudao.userserver.modules.system.dal.dataobject.sms.SysSmsCodeDO;
 import org.apache.ibatis.annotations.Mapper;
 
-// TODO @芋艿：
+// TODO @芋艿：拿到 system 模块下
 @Mapper
 public interface SysSmsCodeMapper extends BaseMapperX<SysSmsCodeDO> {
 

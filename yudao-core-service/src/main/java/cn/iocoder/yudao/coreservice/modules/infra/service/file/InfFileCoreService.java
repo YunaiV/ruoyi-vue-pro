@@ -9,7 +9,6 @@ import cn.iocoder.yudao.coreservice.modules.infra.dal.dataobject.file.InfFileDO;
  */
 public interface InfFileCoreService {
 
-
     /**
      * 保存文件，并返回文件的访问路径
      *
