@@ -14,7 +14,6 @@
         <module>yudao-user-server</module>
         <module>yudao-core-service</module>
         <module>yudao-module-member</module>
-        <module>yudao-server</module>
     </modules>
 
     <name>${artifactId}</name>

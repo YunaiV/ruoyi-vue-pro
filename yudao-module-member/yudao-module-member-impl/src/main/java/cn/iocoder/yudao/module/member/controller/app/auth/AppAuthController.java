@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.member.controller.app.auth;
 import cn.iocoder.yudao.coreservice.modules.system.service.social.SysSocialCoreService;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.module.member.controller.app.auth.vo.*;
 import cn.iocoder.yudao.module.member.service.auth.AuthService;
@@ -40,6 +41,7 @@ public class AppAuthController {
 
     @PostMapping("/login")
     @ApiOperation("使用手机 + 密码登录")
+    @OperateLog(enable = false) // 避免 Post 请求被记录操作日志
     public CommonResult<AppAuthLoginRespVO> login(@RequestBody @Valid AppAuthLoginReqVO reqVO) {
         String token = authService.login(reqVO, getClientIP(), getUserAgent());
         // 返回结果
@@ -48,6 +50,7 @@ public class AppAuthController {
 
     @PostMapping("/sms-login")
     @ApiOperation("使用手机 + 验证码登录")
+    @OperateLog(enable = false) // 避免 Post 请求被记录操作日志
     public CommonResult<AppAuthLoginRespVO> smsLogin(@RequestBody @Valid AppAuthSmsLoginReqVO reqVO) {
         String token = authService.smsLogin(reqVO, getClientIP(), getUserAgent());
         // 返回结果
@@ -56,12 +59,13 @@ public class AppAuthController {
 
     @PostMapping("/send-sms-code")
     @ApiOperation(value = "发送手机验证码")
+    @OperateLog(enable = false) // 避免 Post 请求被记录操作日志
     public CommonResult<Boolean> sendSmsCode(@RequestBody @Valid AppAuthSendSmsReqVO reqVO) {
         smsCodeService.sendSmsCode(reqVO.getMobile(), reqVO.getScene(), getClientIP());
         return success(true);
     }
 
-    @GetMapping("/send-sms-code-login")
+    @GetMapping("/send-sms-code-login") // TODO 芋艿：post 比较合理
     @ApiOperation(value = "向已登录用户发送验证码",notes = "修改手机时验证原手机号使用")
     public CommonResult<Boolean> sendSmsCodeLogin() {
         smsCodeService.sendSmsCodeLogin(getLoginUserId());
@@ -71,6 +75,7 @@ public class AppAuthController {
     @PostMapping("/reset-password")
     @ApiOperation(value = "重置密码", notes = "用户忘记密码时使用")
     @PreAuthenticated
+    @OperateLog(enable = false) // 避免 Post 请求被记录操作日志
     public CommonResult<Boolean> resetPassword(@RequestBody @Valid AppAuthResetPasswordReqVO reqVO) {
         authService.resetPassword(reqVO);
         return success(true);
@@ -106,6 +111,7 @@ public class AppAuthController {
 
     @PostMapping("/social-login2")
     @ApiOperation("社交登录，使用 手机号 + 手机验证码")
+    @OperateLog(enable = false) // 避免 Post 请求被记录操作日志
     public CommonResult<AppAuthLoginRespVO> socialLogin2(@RequestBody @Valid AppAuthSocialLogin2ReqVO reqVO) {
         String token = authService.socialLogin2(reqVO, getClientIP(), getUserAgent());
         return success(AppAuthLoginRespVO.builder().token(token).build());
@@ -113,6 +119,7 @@ public class AppAuthController {
 
     @PostMapping("/social-bind")
     @ApiOperation("社交绑定，使用 code 授权码")
+    @PreAuthenticated
     public CommonResult<Boolean> socialBind(@RequestBody @Valid AppAuthSocialBindReqVO reqVO) {
         authService.socialBind(getLoginUserId(), reqVO);
         return CommonResult.success(true);
@@ -120,6 +127,7 @@ public class AppAuthController {
 
     @DeleteMapping("/social-unbind")
     @ApiOperation("取消社交绑定")
+    @PreAuthenticated
     public CommonResult<Boolean> socialUnbind(@RequestBody AppAuthSocialUnbindReqVO reqVO) {
         socialService.unbindSocialUser(getLoginUserId(), reqVO.getType(), reqVO.getUnionId(), UserTypeEnum.MEMBER);
         return CommonResult.success(true);

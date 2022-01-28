@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.framework.security.config;
 
+import cn.iocoder.yudao.framework.security.core.authentication.MultiUserDetailsAuthenticationProvider;
 import cn.iocoder.yudao.framework.security.core.filter.JWTAuthenticationTokenFilter;
 import cn.iocoder.yudao.framework.security.core.service.SecurityAuthFrameworkService;
 import cn.iocoder.yudao.framework.web.config.WebProperties;
@@ -35,16 +36,8 @@ public class YudaoWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdap
     @Resource
     private WebProperties webProperties;
 
-    /**
-     * 自定义用户【认证】逻辑
-     */
     @Resource
-    private SecurityAuthFrameworkService userDetailsService;
-    /**
-     * Spring Security 加密器
-     */
-    @Resource
-    private PasswordEncoder passwordEncoder;
+    private MultiUserDetailsAuthenticationProvider authenticationProvider;
     /**
      * 认证失败处理类 Bean
      */
@@ -91,8 +84,7 @@ public class YudaoWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdap
      */
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth
-                .userDetailsService(userDetailsService).passwordEncoder(passwordEncoder);
+        auth.authenticationProvider(authenticationProvider);
     }
 
     /**

@@ -55,6 +55,11 @@ public class WebFrameworkUtils {
         return (Integer) request.getAttribute(REQUEST_ATTRIBUTE_LOGIN_USER_TYPE);
     }
 
+    public static Integer getLoginUserType() {
+        HttpServletRequest request = getRequest();
+        return getLoginUserType(request);
+    }
+
     public static Long getLoginUserId() {
         HttpServletRequest request = getRequest();
         return getLoginUserId(request);

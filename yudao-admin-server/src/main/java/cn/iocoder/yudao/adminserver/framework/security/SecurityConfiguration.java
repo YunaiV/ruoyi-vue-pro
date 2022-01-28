@@ -33,7 +33,7 @@ public class SecurityConfiguration {
             registry.antMatchers(buildAdminApi("/system/sms/callback/**")).anonymous();
 
             // 设置 App API 无需认证
-            registry.antMatchers(buildAppApi("/**"));
+            registry.antMatchers(buildAppApi("/**")).permitAll();
         };
     }
 

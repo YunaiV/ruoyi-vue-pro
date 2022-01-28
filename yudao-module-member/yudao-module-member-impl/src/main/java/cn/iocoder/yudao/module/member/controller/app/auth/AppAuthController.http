@@ -1,6 +1,7 @@
 ### 请求 /login 接口 => 成功
-POST {{userServerUrl}}/login
+POST {{userApi}}/login
 Content-Type: application/json
+tenant-id: {{userTenentId}}
 
 {
   "mobile": "15601691300",

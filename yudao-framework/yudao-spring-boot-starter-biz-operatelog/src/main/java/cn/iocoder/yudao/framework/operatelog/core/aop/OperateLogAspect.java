@@ -149,6 +149,7 @@ public class OperateLogAspect {
 
     private static void fillUserFields(OperateLogCreateReqDTO operateLogDTO) {
         operateLogDTO.setUserId(WebFrameworkUtils.getLoginUserId());
+        operateLogDTO.setUserType(WebFrameworkUtils.getLoginUserType());
     }
 
     private static void fillModuleFields(OperateLogCreateReqDTO operateLogDTO,

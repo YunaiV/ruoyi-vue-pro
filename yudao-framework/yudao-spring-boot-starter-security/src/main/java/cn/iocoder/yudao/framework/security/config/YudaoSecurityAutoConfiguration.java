@@ -1,14 +1,13 @@
 package cn.iocoder.yudao.framework.security.config;
 
 import cn.iocoder.yudao.framework.security.core.aop.PreAuthenticatedAspect;
+import cn.iocoder.yudao.framework.security.core.authentication.MultiUserDetailsAuthenticationProvider;
 import cn.iocoder.yudao.framework.security.core.context.TransmittableThreadLocalSecurityContextHolderStrategy;
 import cn.iocoder.yudao.framework.security.core.filter.JWTAuthenticationTokenFilter;
 import cn.iocoder.yudao.framework.security.core.handler.AccessDeniedHandlerImpl;
 import cn.iocoder.yudao.framework.security.core.handler.AuthenticationEntryPointImpl;
 import cn.iocoder.yudao.framework.security.core.handler.LogoutSuccessHandlerImpl;
 import cn.iocoder.yudao.framework.security.core.service.SecurityAuthFrameworkService;
-import cn.iocoder.yudao.framework.security.core.service.SecurityAuthService;
-import cn.iocoder.yudao.framework.security.core.service.SecurityAuthServiceImpl;
 import cn.iocoder.yudao.framework.web.config.WebProperties;
 import cn.iocoder.yudao.framework.web.core.handler.GlobalExceptionHandler;
 import org.springframework.beans.factory.config.MethodInvokingFactoryBean;
@@ -68,8 +67,8 @@ public class YudaoSecurityAutoConfiguration {
      * 退出处理类 Bean
      */
     @Bean
-    public LogoutSuccessHandler logoutSuccessHandler(SecurityAuthService securityAuthService) {
-        return new LogoutSuccessHandlerImpl(securityProperties, securityAuthService);
+    public LogoutSuccessHandler logoutSuccessHandler(MultiUserDetailsAuthenticationProvider authenticationProvider) {
+        return new LogoutSuccessHandlerImpl(securityProperties, authenticationProvider);
     }
 
     /**
@@ -87,18 +86,19 @@ public class YudaoSecurityAutoConfiguration {
      * Token 认证过滤器 Bean
      */
     @Bean
-    public JWTAuthenticationTokenFilter authenticationTokenFilter(SecurityAuthService securityAuthService,
+    public JWTAuthenticationTokenFilter authenticationTokenFilter(MultiUserDetailsAuthenticationProvider authenticationProvider,
                                                                   GlobalExceptionHandler globalExceptionHandler) {
-        return new JWTAuthenticationTokenFilter(securityProperties, securityAuthService, globalExceptionHandler);
+        return new JWTAuthenticationTokenFilter(securityProperties, authenticationProvider, globalExceptionHandler);
     }
 
     /**
-     * 安全认证的 Service Bean
+     * 身份验证的 Provider Bean，通过它实现账号 + 密码的认证
      */
     @Bean
-    public SecurityAuthService securityAuthService(List<SecurityAuthFrameworkService> securityFrameworkServices,
-                                                   WebProperties webProperties) {
-        return new SecurityAuthServiceImpl(securityFrameworkServices, webProperties);
+    public MultiUserDetailsAuthenticationProvider authenticationProvider(
+            List<SecurityAuthFrameworkService> securityFrameworkServices,
+            WebProperties webProperties, PasswordEncoder passwordEncoder) {
+        return new MultiUserDetailsAuthenticationProvider(securityFrameworkServices, webProperties, passwordEncoder);
     }
 
     /**

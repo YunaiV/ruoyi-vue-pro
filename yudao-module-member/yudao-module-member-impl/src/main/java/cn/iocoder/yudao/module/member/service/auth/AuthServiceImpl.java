@@ -14,6 +14,7 @@ import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.util.monitor.TracerUtils;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
+import cn.iocoder.yudao.framework.security.core.authentication.MultiUsernamePasswordAuthenticationToken;
 import cn.iocoder.yudao.module.member.controller.app.auth.vo.*;
 import cn.iocoder.yudao.module.member.convert.auth.AuthConvert;
 import cn.iocoder.yudao.module.member.dal.dataobject.user.UserDO;
@@ -176,7 +177,8 @@ public class AuthServiceImpl implements AuthService {
         try {
             // 调用 Spring Security 的 AuthenticationManager#authenticate(...) 方法，使用账号密码进行认证
             // 在其内部，会调用到 loadUserByUsername 方法，获取 User 信息
-            authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+            authentication = authenticationManager.authenticate(new MultiUsernamePasswordAuthenticationToken(
+                    username, password, getUserType()));
         } catch (BadCredentialsException badCredentialsException) {
             this.createLoginLog(username, logTypeEnum, SysLoginResultEnum.BAD_CREDENTIALS);
             throw exception(AUTH_LOGIN_BAD_CREDENTIALS);

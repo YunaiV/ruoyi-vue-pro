@@ -5,10 +5,10 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.framework.security.config.SecurityProperties;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
-import cn.iocoder.yudao.framework.security.core.service.SecurityAuthService;
+import cn.iocoder.yudao.framework.security.core.authentication.MultiUserDetailsAuthenticationProvider;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.framework.web.core.handler.GlobalExceptionHandler;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -23,12 +23,12 @@ import java.io.IOException;
  *
  * @author 芋道源码
  */
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class JWTAuthenticationTokenFilter extends OncePerRequestFilter {
 
     private final SecurityProperties securityProperties;
 
-    private final SecurityAuthService authService;
+    private final MultiUserDetailsAuthenticationProvider authenticationProvider;
 
     private final GlobalExceptionHandler globalExceptionHandler;
 
@@ -40,7 +40,7 @@ public class JWTAuthenticationTokenFilter extends OncePerRequestFilter {
         if (StrUtil.isNotEmpty(token)) {
             try {
                 // 验证 token 有效性
-                LoginUser loginUser = authService.verifyTokenAndRefresh(request, token);
+                LoginUser loginUser = authenticationProvider.verifyTokenAndRefresh(request, token);
                 // 模拟 Login 功能，方便日常开发调试
                 if (loginUser == null) {
                     loginUser = this.mockLoginUser(request, token);
@@ -78,7 +78,7 @@ public class JWTAuthenticationTokenFilter extends OncePerRequestFilter {
             return null;
         }
         Long userId = Long.valueOf(token.substring(securityProperties.getMockSecret().length()));
-        return authService.mockLogin(request, userId);
+        return authenticationProvider.mockLogin(request, userId);
     }
 
 }
