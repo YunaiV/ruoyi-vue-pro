@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.userserver.modules.weixin.controller.mp;
+package cn.iocoder.yudao.module.member.controller.app.weixin;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import io.swagger.annotations.Api;
@@ -19,10 +19,10 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
 @Api(tags = "微信公众号")
 @RestController
-@RequestMapping("/wx/mp")
+@RequestMapping("/member/wx-mp")
 @Validated
 @Slf4j
-public class WxMpController {
+public class AppWxMpController {
 
     @Resource
     private WxMpService mpService;

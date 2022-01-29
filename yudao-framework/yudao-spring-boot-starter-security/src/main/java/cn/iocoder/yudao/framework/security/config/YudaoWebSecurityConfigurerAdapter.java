@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.framework.security.config;
 
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.security.core.authentication.MultiUserDetailsAuthenticationProvider;
 import cn.iocoder.yudao.framework.security.core.filter.JWTAuthenticationTokenFilter;
 import cn.iocoder.yudao.framework.security.core.service.SecurityAuthFrameworkService;
@@ -21,8 +22,10 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * 自定义的 Spring Security 配置适配器实现
@@ -106,6 +109,7 @@ public class YudaoWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdap
      */
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
+        // 登出
         httpSecurity
                 // 开启跨域
                 .cors().and()
@@ -117,7 +121,9 @@ public class YudaoWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdap
                 // 一堆自定义的 Spring Security 处理器
                 .exceptionHandling().authenticationEntryPoint(authenticationEntryPoint)
                     .accessDeniedHandler(accessDeniedHandler).and()
-                .logout().logoutUrl(buildAdminApi("/logout")).logoutSuccessHandler(logoutSuccessHandler); // 登出
+                // 登出地址的配置
+                .logout().logoutSuccessHandler(logoutSuccessHandler).logoutRequestMatcher(request -> // 匹配多种用户类型的登出
+                        StrUtil.equalsAny(request.getRequestURI(), buildAdminApi("/logout"), buildAppApi("/member/logout")));
 
         // 设置每个请求的权限 ①：全局共享规则
         httpSecurity.authorizeRequests()

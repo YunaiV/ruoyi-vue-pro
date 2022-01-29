@@ -4,6 +4,6 @@
  * 2. redis：Redis 的 CRUD 操作
  * 3. mysql：MySQL 的 CRUD 操作
  *
- * 其中，MySQL 的表以 mbr_ 作为前缀
+ * 其中，MySQL 的表以 member_ 作为前缀
  */
 package cn.iocoder.yudao.module.member.dal;

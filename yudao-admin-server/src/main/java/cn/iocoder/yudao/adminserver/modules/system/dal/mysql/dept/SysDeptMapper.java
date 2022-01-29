@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.adminserver.modules.system.controller.dept.vo.dept.SysDeptListReqVO;
 import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.dept.SysDeptDO;
+import com.baomidou.mybatisplus.annotation.InterceptorIgnore;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -28,6 +29,7 @@ public interface SysDeptMapper extends BaseMapperX<SysDeptDO> {
         return selectCount(SysDeptDO::getParentId, parentId);
     }
 
+    @InterceptorIgnore(tenantLine = "on") // 该方法忽略多租户。原因：该方法被异步 task 调用，此时获取不到租户编号
     default boolean selectExistsByUpdateTimeAfter(Date maxUpdateTime) {
         return selectOne(new LambdaQueryWrapper<SysDeptDO>().select(SysDeptDO::getId)
                 .gt(SysDeptDO::getUpdateTime, maxUpdateTime).last(SqlConstants.LIMIT1)) != null;

@@ -37,8 +37,6 @@ mybatis-plus:
   mapper-locations: classpath*:mapper/*.xml
   type-aliases-package: ${yudao.info.base-package}.modules.*.dal.dataobject, ${yudao.core-service.base-package}.modules.*.dal.dataobject
 
-
-
 --- #################### 芋道相关配置 ####################
 
 yudao:
@@ -66,6 +64,5 @@ yudao:
     constants-class-list:
       - cn.iocoder.yudao.userserver.modules.member.enums.MbrErrorCodeConstants
       - cn.iocoder.yudao.userserver.modules.system.enums.SysErrorCodeConstants
-
 
 debug: false

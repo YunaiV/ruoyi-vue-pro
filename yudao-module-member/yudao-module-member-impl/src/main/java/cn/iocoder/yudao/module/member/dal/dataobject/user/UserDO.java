@@ -16,7 +16,7 @@ import java.util.Date;
  *
  * @author 芋道源码
  */
-@TableName(value = "mbr_user", autoResultMap = true)
+@TableName(value = "member_user", autoResultMap = true)
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Builder

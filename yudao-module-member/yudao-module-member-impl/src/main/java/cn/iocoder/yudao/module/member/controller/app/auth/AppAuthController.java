@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
+import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.member.controller.app.auth.vo.*;
 import cn.iocoder.yudao.module.member.service.auth.AuthService;
 import cn.iocoder.yudao.module.member.service.sms.SysSmsCodeService;
@@ -13,6 +14,7 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,7 +28,7 @@ import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUti
 
 @Api(tags = "APP 端 - 认证")
 @RestController
-@RequestMapping("/")
+@RequestMapping("/member/")
 @Validated
 @Slf4j
 public class AppAuthController {
@@ -38,6 +40,9 @@ public class AppAuthController {
     private SysSmsCodeService smsCodeService;
     @Resource
     private SysSocialCoreService socialService;
+
+    @Resource
+    private LogoutSuccessHandler logoutSuccessHandler;
 
     @PostMapping("/login")
     @ApiOperation("使用手机 + 密码登录")
