@@ -26,6 +26,7 @@ import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.util.monitor.TracerUtils;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
+import cn.iocoder.yudao.framework.security.core.authentication.MultiUsernamePasswordAuthenticationToken;
 import lombok.extern.slf4j.Slf4j;
 import me.zhyd.oauth.model.AuthUser;
 import org.springframework.context.annotation.Lazy;
@@ -60,8 +61,6 @@ import static java.util.Collections.singleton;
 @Slf4j
 public class SysAuthServiceImpl implements SysAuthService {
 
-    private static final UserTypeEnum USER_TYPE_ENUM = UserTypeEnum.ADMIN;
-
     @Resource
     @Lazy // 延迟加载，因为存在相互依赖的问题
     private AuthenticationManager authenticationManager;
@@ -82,7 +81,6 @@ public class SysAuthServiceImpl implements SysAuthService {
     private SysPostService postService;
     @Resource
     private SysSocialCoreService socialService;
-
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -157,7 +155,8 @@ public class SysAuthServiceImpl implements SysAuthService {
         try {
             // 调用 Spring Security 的 AuthenticationManager#authenticate(...) 方法，使用账号密码进行认证
             // 在其内部，会调用到 loadUserByUsername 方法，获取 User 信息
-            authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+            authentication = authenticationManager.authenticate(new MultiUsernamePasswordAuthenticationToken(
+                    username, password, getUserType()));
            //  org.activiti.engine.impl.identity.Authentication.setAuthenticatedUserId(username);
         } catch (BadCredentialsException badCredentialsException) {
             this.createLoginLog(username, logTypeEnum, SysLoginResultEnum.BAD_CREDENTIALS);
@@ -216,7 +215,7 @@ public class SysAuthServiceImpl implements SysAuthService {
 
         // 如果未绑定 SysSocialUserDO 用户，则无法自动登录，进行报错
         String unionId = socialService.getAuthUserUnionId(authUser);
-        List<SysSocialUserDO> socialUsers = socialService.getAllSocialUserList(reqVO.getType(), unionId, USER_TYPE_ENUM);
+        List<SysSocialUserDO> socialUsers = socialService.getAllSocialUserList(reqVO.getType(), unionId, getUserType());
         if (CollUtil.isEmpty(socialUsers)) {
             throw exception(AUTH_THIRD_LOGIN_NOT_BIND);
         }
@@ -232,7 +231,7 @@ public class SysAuthServiceImpl implements SysAuthService {
         LoginUser loginUser = this.buildLoginUser(user);
 
         // 绑定社交用户（更新）
-        socialService.bindSocialUser(loginUser.getId(), reqVO.getType(), authUser, USER_TYPE_ENUM);
+        socialService.bindSocialUser(loginUser.getId(), reqVO.getType(), authUser, getUserType());
 
         // 缓存登录用户到 Redis 中，返回 sessionId 编号
         return userSessionCoreService.createUserSession(loginUser, userIp, userAgent);
@@ -248,7 +247,7 @@ public class SysAuthServiceImpl implements SysAuthService {
         LoginUser loginUser = this.login0(reqVO.getUsername(), reqVO.getPassword());
 
         // 绑定社交用户（新增）
-        socialService.bindSocialUser(loginUser.getId(), reqVO.getType(), authUser, USER_TYPE_ENUM);
+        socialService.bindSocialUser(loginUser.getId(), reqVO.getType(), authUser, getUserType());
 
         // 缓存登录用户到 Redis 中，返回 sessionId 编号
         return userSessionCoreService.createUserSession(loginUser, userIp, userAgent);
@@ -261,7 +260,7 @@ public class SysAuthServiceImpl implements SysAuthService {
         Assert.notNull(authUser, "授权用户不为空");
 
         // 绑定社交用户（新增）
-        socialService.bindSocialUser(userId, reqVO.getType(), authUser, USER_TYPE_ENUM);
+        socialService.bindSocialUser(userId, reqVO.getType(), authUser, getUserType());
     }
 
     @Override
@@ -277,12 +276,17 @@ public class SysAuthServiceImpl implements SysAuthService {
         this.createLogoutLog(loginUser.getId(), loginUser.getUsername());
     }
 
+    @Override
+    public UserTypeEnum getUserType() {
+        return UserTypeEnum.ADMIN;
+    }
+
     private void createLogoutLog(Long userId, String username) {
         SysLoginLogCreateReqDTO reqDTO = new SysLoginLogCreateReqDTO();
         reqDTO.setLogType(SysLoginLogTypeEnum.LOGOUT_SELF.getType());
         reqDTO.setTraceId(TracerUtils.getTraceId());
         reqDTO.setUserId(userId);
-        reqDTO.setUserType(USER_TYPE_ENUM.getValue());
+        reqDTO.setUserType(getUserType().getValue());
         reqDTO.setUsername(username);
         reqDTO.setUserAgent(ServletUtils.getUserAgent());
         reqDTO.setUserIp(ServletUtils.getClientIP());

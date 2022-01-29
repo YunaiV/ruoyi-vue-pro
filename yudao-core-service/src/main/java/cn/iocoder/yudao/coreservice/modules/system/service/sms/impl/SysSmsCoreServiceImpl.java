@@ -2,8 +2,6 @@ package cn.iocoder.yudao.coreservice.modules.system.service.sms.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.coreservice.modules.member.dal.dataobject.user.MbrUserDO;
-import cn.iocoder.yudao.coreservice.modules.member.service.user.MbrUserCoreService;
 import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.sms.SysSmsTemplateDO;
 import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.user.SysUserDO;
 import cn.iocoder.yudao.coreservice.modules.system.mq.message.sms.SysSmsSendMessage;
@@ -43,8 +41,6 @@ public class SysSmsCoreServiceImpl implements SysSmsCoreService {
     @Resource
     private SysUserCoreService sysUserCoreService;
     @Resource
-    private MbrUserCoreService mbrUserCoreService;
-    @Resource
     private SysSmsTemplateCoreService smsTemplateCoreService;
     @Resource
     private SysSmsLogCoreService smsLogCoreService;
@@ -72,10 +68,11 @@ public class SysSmsCoreServiceImpl implements SysSmsCoreService {
     public Long sendSingleSmsToMember(String mobile, Long userId, String templateCode, Map<String, Object> templateParams) {
         // 如果 mobile 为空，则加载用户编号对应的手机号
         if (StrUtil.isEmpty(mobile)) {
-            MbrUserDO user = mbrUserCoreService.getUser(userId);
-            if (user != null) {
-                mobile = user.getMobile();
-            }
+//            MbrUserDO user = mbrUserCoreService.getUser(userId);
+//            if (user != null) {
+//                mobile = user.getMobile();
+//            }
+            // TODO 芋艿：重构
         }
         // 执行发送
         return this.sendSingleSms(mobile, userId, UserTypeEnum.MEMBER.getValue(), templateCode, templateParams);

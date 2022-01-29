@@ -1,0 +1,32 @@
+### 请求 /login 接口 => 成功
+POST {{userApi}}/login
+Content-Type: application/json
+tenant-id: {{userTenentId}}
+
+{
+  "mobile": "15601691300",
+  "password": "admin123"
+}
+
+### 请求 /send-sms-code 接口 => 成功
+POST {{userServerUrl}}/send-sms-code
+Content-Type: application/json
+
+{
+  "mobile": "15601691399",
+  "scene": 1
+}
+
+### 请求 /sms-login 接口 => 成功
+POST {{userServerUrl}}/sms-login
+Content-Type: application/json
+
+{
+  "mobile": "15601691301",
+  "code": 9999
+}
+
+### 请求 /logout 接口 => 成功
+POST {{userServerUrl}}/logout
+Content-Type: application/json
+Authorization: Bearer c1b76bdaf2c146c581caa4d7fd81ee66

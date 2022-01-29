@@ -10,10 +10,17 @@ import cn.iocoder.yudao.coreservice.modules.bpm.api.group.BpmUserGroupServiceApi
 import cn.iocoder.yudao.coreservice.modules.system.service.dept.SysDeptCoreService;
 import cn.iocoder.yudao.coreservice.modules.system.service.permission.SysPermissionCoreService;
 import cn.iocoder.yudao.coreservice.modules.system.service.user.SysUserCoreService;
+import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmUserGroupService;
+import cn.iocoder.yudao.adminserver.modules.system.service.dept.SysDeptService;
+import cn.iocoder.yudao.adminserver.modules.system.service.permission.SysPermissionService;
+import cn.iocoder.yudao.adminserver.modules.system.service.user.SysUserService;
+import org.activiti.api.runtime.shared.identity.UserGroupManager;
+import org.activiti.core.common.spring.identity.ActivitiUserGroupManagerImpl;
 import org.activiti.spring.boot.ProcessEngineConfigurationConfigurer;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.core.userdetails.UserDetailsService;
 
 import java.util.Collections;
 import java.util.List;
@@ -27,7 +34,15 @@ import static org.activiti.spring.boot.ProcessEngineAutoConfiguration.BEHAVIOR_F
 public class BpmActivitiConfiguration {
 
     /**
-     * BPM 模块的 ProcessEngineConfigurationConfigurer 实现类，主要设置各种监听器、用户组管理
+     * 空用户组的 Bean
+     */
+    @Bean
+    public UserGroupManager userGroupManager() {
+        return new EmptyUserGroupManager();
+    }
+
+    /**
+     * BPM 模块的 ProcessEngineConfigurationConfigurer 实现类，主要设置各种监听器
      */
     @Bean
     public ProcessEngineConfigurationConfigurer bpmProcessEngineConfigurationConfigurer(
@@ -35,8 +50,6 @@ public class BpmActivitiConfiguration {
         return configuration -> {
             // 注册监听器，例如说 BpmActivitiEventListener
             configuration.setEventListeners(Collections.singletonList(taskActivitiEventListener));
-            // 用户组
-            configuration.setUserGroupManager(new EmptyUserGroupManager());
         };
     }
 

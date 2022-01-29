@@ -38,10 +38,19 @@ public class YudaoWebAutoConfiguration implements WebMvcConfigurer {
 
     @Override
     public void configurePathMatch(PathMatchConfigurer configurer) {
-        // 设置 API 前缀，仅仅匹配 controller 包下的
-        configurer.addPathPrefix(webProperties.getApiPrefix(), clazz ->
-                clazz.isAnnotationPresent(RestController.class)
-                && clazz.getPackage().getName().startsWith(webProperties.getControllerPackage())); // 仅仅匹配 controller 包
+        configurePathMatch(configurer, webProperties.getAdminApi());
+        configurePathMatch(configurer, webProperties.getAppApi());
+    }
+
+    /**
+     * 设置 API 前缀，仅仅匹配 controller 包下的
+     *
+     * @param configurer 配置
+     * @param api API 配置
+     */
+    private void configurePathMatch(PathMatchConfigurer configurer, WebProperties.Api api) {
+        configurer.addPathPrefix(api.getPrefix(), clazz -> clazz.isAnnotationPresent(RestController.class)
+                && clazz.getPackage().getName().startsWith(api.getController())); // 仅仅匹配 controller 包
     }
 
     @Bean
