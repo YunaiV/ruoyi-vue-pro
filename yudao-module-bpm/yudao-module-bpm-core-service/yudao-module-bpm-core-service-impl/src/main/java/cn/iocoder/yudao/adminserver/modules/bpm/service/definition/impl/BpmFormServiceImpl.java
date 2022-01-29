@@ -7,8 +7,10 @@ import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.form.Bp
 import cn.iocoder.yudao.adminserver.modules.bpm.convert.definition.BpmFormConvert;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.definition.BpmFormDO;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.mysql.definition.BpmFormMapper;
+import cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmFormService;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.dto.BpmFormFieldRespDTO;
+import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import org.springframework.stereotype.Service;
@@ -19,10 +21,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants.FORM_FIELD_REPEAT;
-import static cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants.FORM_NOT_EXISTS;
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 
 /**
  * 动态表单 Service 实现类
@@ -66,7 +64,7 @@ public class BpmFormServiceImpl implements BpmFormService {
 
     private void validateFormExists(Long id) {
         if (formMapper.selectById(id) == null) {
-            throw exception(FORM_NOT_EXISTS);
+            throw ServiceExceptionUtil.exception(BpmErrorCodeConstants.FORM_NOT_EXISTS);
         }
     }
 
@@ -106,7 +104,7 @@ public class BpmFormServiceImpl implements BpmFormService {
                 continue;
             }
             // 如果存在，则报错
-            throw exception(FORM_FIELD_REPEAT, oldLabel, fieldDTO.getLabel(), fieldDTO.getVModel());
+            throw ServiceExceptionUtil.exception(BpmErrorCodeConstants.FORM_FIELD_REPEAT, oldLabel, fieldDTO.getLabel(), fieldDTO.getVModel());
         }
     }
 
