@@ -2,7 +2,7 @@ package cn.iocoder.yudao.adminserver.framework.quartz.core;
 
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.adminserver.BaseDbUnitTest;
-import cn.iocoder.yudao.adminserver.modules.system.job.auth.SysUserSessionTimeoutJob;
+import cn.iocoder.yudao.module.system.job.auth.SysUserSessionTimeoutJob;
 import cn.iocoder.yudao.framework.quartz.core.scheduler.SchedulerManager;
 import org.junit.jupiter.api.Test;
 import org.quartz.SchedulerException;

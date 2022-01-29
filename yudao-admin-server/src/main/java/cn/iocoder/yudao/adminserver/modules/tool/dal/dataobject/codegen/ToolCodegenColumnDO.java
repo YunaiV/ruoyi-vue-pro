@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.adminserver.modules.tool.dal.dataobject.codegen;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.dict.SysDictTypeDO;
 import cn.iocoder.yudao.adminserver.modules.tool.enums.codegen.ToolCodegenColumnHtmlTypeEnum;
 import cn.iocoder.yudao.adminserver.modules.tool.enums.codegen.ToolCodegenColumnListConditionEnum;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -80,7 +79,7 @@ public class ToolCodegenColumnDO extends BaseDO {
     /**
      * 字典类型
      *
-     * 关联 {@link SysDictTypeDO#getType()}
+     * 关联 DictTypeDO 的 type 属性
      */
     private String dictType;
     /**

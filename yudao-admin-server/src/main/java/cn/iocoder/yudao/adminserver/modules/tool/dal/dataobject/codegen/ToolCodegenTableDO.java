@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.adminserver.modules.tool.dal.dataobject.codegen;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.yudao.adminserver.modules.system.dal.dataobject.permission.SysMenuDO;
 import cn.iocoder.yudao.adminserver.modules.tool.enums.codegen.ToolCodegenTemplateTypeEnum;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
@@ -89,7 +88,7 @@ public class ToolCodegenTableDO extends BaseDO {
     /**
      * 父菜单编号
      *
-     * 关联 {@link SysMenuDO#getId()}
+     * 关联 MenuDO 的 id 属性
      */
     private Long parentMenuId;
 

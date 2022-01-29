@@ -1,1 +1,1 @@
-package cn.iocoder.yudao.adminserver.modules.system.service;
+package cn.iocoder.yudao.module.system.service;

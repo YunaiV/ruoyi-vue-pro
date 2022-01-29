@@ -49,6 +49,7 @@ yudao:
     version: 1.0.0
     base-package: cn.iocoder.yudao.adminserver
     member-package: cn.iocoder.yudao.module.member
+    system-package: cn.iocoder.yudao.module.system
   core-service:
     base-package: cn.iocoder.yudao.coreservice
   web:
@@ -74,7 +75,7 @@ yudao:
   error-code: # 错误码相关配置项
     constants-class-list:
       - cn.iocoder.yudao.adminserver.modules.infra.enums.InfErrorCodeConstants
-      - cn.iocoder.yudao.adminserver.modules.system.enums.SysErrorCodeConstants
+      - cn.iocoder.yudao.module.system.enums.SysErrorCodeConstants
       - cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants
   tenant: # 多租户相关配置项
     tables: # 配置需要开启多租户的表；如果实体已经继承 TenantBaseDO 类，则无需重复配置

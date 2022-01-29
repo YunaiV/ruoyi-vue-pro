@@ -1,14 +1,14 @@
-package cn.iocoder.yudao.adminserver.modules.system.service.sms;
+package cn.iocoder.yudao.module.system.service.sms;
 
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.thread.ThreadUtil;
 import cn.iocoder.yudao.adminserver.BaseDbAndRedisIntegrationTest;
-import cn.iocoder.yudao.adminserver.modules.system.mq.consumer.sms.SysSmsSendConsumer;
-import cn.iocoder.yudao.adminserver.modules.system.mq.producer.sms.SysSmsProducer;
-import cn.iocoder.yudao.adminserver.modules.system.service.sms.impl.SysSmsChannelServiceImpl;
-import cn.iocoder.yudao.adminserver.modules.system.service.sms.impl.SysSmsLogServiceImpl;
-import cn.iocoder.yudao.adminserver.modules.system.service.sms.impl.SysSmsTemplateServiceImpl;
-import cn.iocoder.yudao.adminserver.modules.system.service.user.SysUserService;
+import cn.iocoder.yudao.module.system.mq.consumer.sms.SysSmsSendConsumer;
+import cn.iocoder.yudao.module.system.mq.producer.sms.SysSmsProducer;
+import cn.iocoder.yudao.module.system.service.sms.impl.SysSmsChannelServiceImpl;
+import cn.iocoder.yudao.module.system.service.sms.impl.SysSmsLogServiceImpl;
+import cn.iocoder.yudao.module.system.service.sms.impl.SysSmsTemplateServiceImpl;
+import cn.iocoder.yudao.module.system.service.user.SysUserService;
 import cn.iocoder.yudao.coreservice.modules.system.service.sms.impl.SysSmsCoreServiceImpl;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.sms.config.YudaoSmsAutoConfiguration;
