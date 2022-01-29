@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.system.dal.mysql.dept;
 import cn.iocoder.yudao.framework.mybatis.core.enums.SqlConstants;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
-import cn.iocoder.yudao.module.system.controller.dept.vo.dept.SysDeptListReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptListReqVO;
 import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.dept.SysDeptDO;
 import com.baomidou.mybatisplus.annotation.InterceptorIgnore;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -15,7 +15,7 @@ import java.util.List;
 @Mapper
 public interface SysDeptMapper extends BaseMapperX<SysDeptDO> {
 
-    default List<SysDeptDO> selectList(SysDeptListReqVO reqVO) {
+    default List<SysDeptDO> selectList(DeptListReqVO reqVO) {
         return selectList(new LambdaQueryWrapperX<SysDeptDO>().likeIfPresent(SysDeptDO::getName, reqVO.getName())
                 .eqIfPresent(SysDeptDO::getStatus, reqVO.getStatus()));
     }

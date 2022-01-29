@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.system.dal.mysql.user;
 
-import cn.iocoder.yudao.module.system.controller.user.vo.user.SysUserExportReqVO;
-import cn.iocoder.yudao.module.system.controller.user.vo.user.SysUserPageReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.user.vo.user.UserExportReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.user.vo.user.UserPageReqVO;
 import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.user.SysUserDO;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -30,7 +30,7 @@ public interface SysUserMapper extends BaseMapperX<SysUserDO> {
         return selectOne(new LambdaQueryWrapper<SysUserDO>().eq(SysUserDO::getMobile, mobile));
     }
 
-    default PageResult<SysUserDO> selectPage(SysUserPageReqVO reqVO, Collection<Long> deptIds) {
+    default PageResult<SysUserDO> selectPage(UserPageReqVO reqVO, Collection<Long> deptIds) {
         return selectPage(reqVO, new LambdaQueryWrapperX<SysUserDO>()
                 .likeIfPresent(SysUserDO::getUsername, reqVO.getUsername())
                 .likeIfPresent(SysUserDO::getMobile, reqVO.getMobile())
@@ -39,7 +39,7 @@ public interface SysUserMapper extends BaseMapperX<SysUserDO> {
                 .inIfPresent(SysUserDO::getDeptId, deptIds));
     }
 
-    default List<SysUserDO> selectList(SysUserExportReqVO reqVO, Collection<Long> deptIds) {
+    default List<SysUserDO> selectList(UserExportReqVO reqVO, Collection<Long> deptIds) {
         return selectList(new LambdaQueryWrapperX<SysUserDO>()
                 .likeIfPresent(SysUserDO::getUsername, reqVO.getUsername())
                 .likeIfPresent(SysUserDO::getMobile, reqVO.getMobile())

@@ -12,7 +12,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 
 // TODO 芋艿：code review 相关逻辑
-@ApiModel("APP 端 - 修改密码 Request VO")
+@ApiModel("用户 APP - 修改密码 Request VO")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

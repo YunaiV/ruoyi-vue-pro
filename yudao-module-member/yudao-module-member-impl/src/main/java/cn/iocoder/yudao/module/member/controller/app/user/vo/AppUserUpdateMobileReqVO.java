@@ -13,7 +13,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
 
-@ApiModel("APP 端 - 修改手机 Request VO")
+@ApiModel("用户 APP - 修改手机 Request VO")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

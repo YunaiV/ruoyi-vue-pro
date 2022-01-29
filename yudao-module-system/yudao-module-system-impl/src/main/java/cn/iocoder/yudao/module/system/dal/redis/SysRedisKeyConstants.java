@@ -14,6 +14,5 @@ public interface SysRedisKeyConstants {
     RedisKeyDefine CAPTCHA_CODE = new RedisKeyDefine("验证码的缓存",
             "captcha_code:%s", // 参数为 uuid
             STRING, String.class, RedisKeyDefine.TimeoutTypeEnum.DYNAMIC);
-
-
+    
 }

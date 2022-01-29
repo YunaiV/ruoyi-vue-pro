@@ -14,6 +14,7 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -26,23 +27,21 @@ import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getCli
 import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getUserAgent;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
-@Api(tags = "APP 端 - 认证")
+@Api(tags = "用户 APP - 认证")
 @RestController
 @RequestMapping("/member/")
 @Validated
 @Slf4j
 public class AppAuthController {
 
-    @Resource
+    @Autowired
+    @SuppressWarnings("SpringJavaAutowiredFieldsWarningInspection") // AuthService 存在重名
     private AuthService authService;
 
     @Resource
     private SysSmsCodeService smsCodeService;
     @Resource
     private SysSocialCoreService socialService;
-
-    @Resource
-    private LogoutSuccessHandler logoutSuccessHandler;
 
     @PostMapping("/login")
     @ApiOperation("使用手机 + 密码登录")

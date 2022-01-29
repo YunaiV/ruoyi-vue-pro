@@ -51,7 +51,7 @@ import static cn.iocoder.yudao.module.member.enums.SysErrorCodeConstants.*;
  *
  * @author 芋道源码
  */
-@Service
+@Service("memberAuthService")
 @Slf4j
 public class AuthServiceImpl implements AuthService {
 

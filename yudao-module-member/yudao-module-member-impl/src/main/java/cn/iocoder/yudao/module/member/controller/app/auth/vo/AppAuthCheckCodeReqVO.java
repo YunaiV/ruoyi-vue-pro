@@ -16,7 +16,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
 // TODO 芋艿：code review 相关逻辑
-@ApiModel("APP 端 - 校验验证码 Request VO")
+@ApiModel("用户 APP - 校验验证码 Request VO")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

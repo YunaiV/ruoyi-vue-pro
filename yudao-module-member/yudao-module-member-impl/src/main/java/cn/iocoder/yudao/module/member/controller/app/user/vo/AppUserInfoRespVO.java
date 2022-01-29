@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@ApiModel("APP 端 - 用户个人信息 Response VO")
+@ApiModel("用户 APP - 用户个人信息 Response VO")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

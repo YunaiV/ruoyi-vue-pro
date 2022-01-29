@@ -14,7 +14,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
-@ApiModel("APP 端 - 社交登录 Request VO，使用 code 授权码 + 账号密码")
+@ApiModel("用户 APP - 社交登录 Request VO，使用 code 授权码 + 账号密码")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

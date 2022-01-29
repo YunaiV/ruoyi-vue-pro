@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.system.dal.mysql.permission;
 
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
-import cn.iocoder.yudao.module.system.dal.dataobject.permission.SysRoleMenuDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.permission.RoleMenuDO;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
@@ -12,15 +12,15 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Mapper
-public interface SysRoleMenuMapper extends BaseMapperX<SysRoleMenuDO> {
+public interface SysRoleMenuMapper extends BaseMapperX<RoleMenuDO> {
 
-    default List<SysRoleMenuDO> selectListByRoleId(Long roleId) {
-        return selectList(new QueryWrapper<SysRoleMenuDO>().eq("role_id", roleId));
+    default List<RoleMenuDO> selectListByRoleId(Long roleId) {
+        return selectList(new QueryWrapper<RoleMenuDO>().eq("role_id", roleId));
     }
 
     default void insertList(Long roleId, Collection<Long> menuIds) {
-        List<SysRoleMenuDO> list = menuIds.stream().map(menuId -> {
-            SysRoleMenuDO entity = new SysRoleMenuDO();
+        List<RoleMenuDO> list = menuIds.stream().map(menuId -> {
+            RoleMenuDO entity = new RoleMenuDO();
             entity.setRoleId(roleId);
             entity.setMenuId(menuId);
             return entity;
@@ -30,16 +30,16 @@ public interface SysRoleMenuMapper extends BaseMapperX<SysRoleMenuDO> {
     }
 
     default void deleteListByRoleIdAndMenuIds(Long roleId, Collection<Long> menuIds) {
-        delete(new QueryWrapper<SysRoleMenuDO>().eq("role_id", roleId)
+        delete(new QueryWrapper<RoleMenuDO>().eq("role_id", roleId)
                 .in("menu_id", menuIds));
     }
 
     default void deleteListByMenuId(Long menuId) {
-        delete(new QueryWrapper<SysRoleMenuDO>().eq("menu_id", menuId));
+        delete(new QueryWrapper<RoleMenuDO>().eq("menu_id", menuId));
     }
 
     default void deleteListByRoleId(Long roleId) {
-        delete(new QueryWrapper<SysRoleMenuDO>().eq("role_id", roleId));
+        delete(new QueryWrapper<RoleMenuDO>().eq("role_id", roleId));
     }
 
     @Select("SELECT id FROM sys_role_menu WHERE update_time > #{maxUpdateTime} LIMIT 1")

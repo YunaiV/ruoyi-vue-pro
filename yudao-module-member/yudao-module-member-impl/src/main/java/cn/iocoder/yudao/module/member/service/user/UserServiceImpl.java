@@ -32,7 +32,7 @@ import static cn.iocoder.yudao.module.member.enums.MemberErrorCodeConstants.USER
  *
  * @author 芋道源码
  */
-@Service
+@Service("memberUserService")
 @Valid
 @Slf4j
 public class UserServiceImpl implements UserService {

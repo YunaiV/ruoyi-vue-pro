@@ -7,7 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@ApiModel("APP 端 - 手机密码登录 Response VO")
+@ApiModel("用户 APP - 手机密码登录 Response VO")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

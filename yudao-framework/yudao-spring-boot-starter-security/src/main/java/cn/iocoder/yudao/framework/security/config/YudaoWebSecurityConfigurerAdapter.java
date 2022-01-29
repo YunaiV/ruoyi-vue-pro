@@ -123,12 +123,13 @@ public class YudaoWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdap
                     .accessDeniedHandler(accessDeniedHandler).and()
                 // 登出地址的配置
                 .logout().logoutSuccessHandler(logoutSuccessHandler).logoutRequestMatcher(request -> // 匹配多种用户类型的登出
-                        StrUtil.equalsAny(request.getRequestURI(), buildAdminApi("/logout"), buildAppApi("/member/logout")));
+                        StrUtil.equalsAny(request.getRequestURI(), buildAdminApi("/system/logout"),
+                                                                   buildAppApi("/member/logout")));
 
         // 设置每个请求的权限 ①：全局共享规则
         httpSecurity.authorizeRequests()
                     // 登录的接口，可匿名访问
-                    .antMatchers(buildAdminApi("/login")).anonymous()
+                    .antMatchers(buildAdminApi("/system/login"), buildAdminApi("/member/login")).anonymous()
                     // 静态资源，可匿名访问
                     .antMatchers(HttpMethod.GET, "/*.html", "/**/*.html", "/**/*.css", "/**/*.js").permitAll()
                     // 文件的获取接口，可匿名访问

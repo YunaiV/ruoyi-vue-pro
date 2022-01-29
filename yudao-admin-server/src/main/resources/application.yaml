@@ -54,11 +54,11 @@ yudao:
     base-package: cn.iocoder.yudao.coreservice
   web:
     admin-api:
-      prefix: /api
-      controller: ${yudao.info.base-package}
+      prefix: /admin-api
+      controller: cn.iocoder.yudao.module.system.controller.admin # TODO 芋艿：需要改造
     app-api:
       prefix: /app-api
-      controller: cn.iocoder.yudao.module.member.controller.app
+      controller: cn.iocoder.yudao.module.member.controller.app # TODO 芋艿：需要改造
 
   swagger:
     title: 管理后台

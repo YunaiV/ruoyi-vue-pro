@@ -23,7 +23,7 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 import static cn.iocoder.yudao.module.member.enums.MemberErrorCodeConstants.FILE_IS_EMPTY;
 
-@Api(tags = "APP 端 - 用户个人中心")
+@Api(tags = "用户 APP - 用户个人中心")
 @RestController
 @RequestMapping("/member/user")
 @Validated

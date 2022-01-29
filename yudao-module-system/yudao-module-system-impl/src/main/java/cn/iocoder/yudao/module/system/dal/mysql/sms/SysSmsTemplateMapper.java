@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.system.dal.mysql.sms;
 
-import cn.iocoder.yudao.module.system.controller.sms.vo.template.SysSmsTemplateExportReqVO;
-import cn.iocoder.yudao.module.system.controller.sms.vo.template.SysSmsTemplatePageReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.sms.vo.template.SmsTemplateExportReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.sms.vo.template.SmsTemplatePageReqVO;
 import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.sms.SysSmsTemplateDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
@@ -18,7 +18,7 @@ public interface SysSmsTemplateMapper extends BaseMapperX<SysSmsTemplateDO> {
     }
 
     // TODO 这种参数都一样的得想办法封装一下
-    default PageResult<SysSmsTemplateDO> selectPage(SysSmsTemplatePageReqVO reqVO) {
+    default PageResult<SysSmsTemplateDO> selectPage(SmsTemplatePageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<SysSmsTemplateDO>()
                 .eqIfPresent(SysSmsTemplateDO::getType, reqVO.getType())
                 .eqIfPresent(SysSmsTemplateDO::getStatus, reqVO.getStatus())
@@ -30,7 +30,7 @@ public interface SysSmsTemplateMapper extends BaseMapperX<SysSmsTemplateDO> {
                 .orderByDesc(SysSmsTemplateDO::getId));
     }
 
-    default List<SysSmsTemplateDO> selectList(SysSmsTemplateExportReqVO reqVO) {
+    default List<SysSmsTemplateDO> selectList(SmsTemplateExportReqVO reqVO) {
         return selectList(new LambdaQueryWrapperX<SysSmsTemplateDO>()
                 .eqIfPresent(SysSmsTemplateDO::getType, reqVO.getType())
                 .eqIfPresent(SysSmsTemplateDO::getStatus, reqVO.getStatus())

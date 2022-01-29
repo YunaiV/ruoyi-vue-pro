@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
+// TODO 芋艿：貌似放的位置有问题
 /**
  * 错误码配置类
  */

@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.system.dal.mysql.permission;
 
 import cn.iocoder.yudao.framework.mybatis.core.enums.SqlConstants;
-import cn.iocoder.yudao.module.system.controller.permission.vo.menu.SysMenuListReqVO;
-import cn.iocoder.yudao.module.system.dal.dataobject.permission.SysMenuDO;
+import cn.iocoder.yudao.module.system.controller.admin.permission.vo.menu.MenuListReqVO;
+import cn.iocoder.yudao.module.system.dal.dataobject.permission.MenuDO;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -12,25 +12,25 @@ import java.util.Date;
 import java.util.List;
 
 @Mapper
-public interface SysMenuMapper extends BaseMapperX<SysMenuDO> {
+public interface SysMenuMapper extends BaseMapperX<MenuDO> {
 
-    default SysMenuDO selectByParentIdAndName(Long parentId, String name) {
-        return selectOne(new LambdaQueryWrapper<SysMenuDO>().eq(SysMenuDO::getParentId, parentId)
-                .eq(SysMenuDO::getName, name));
+    default MenuDO selectByParentIdAndName(Long parentId, String name) {
+        return selectOne(new LambdaQueryWrapper<MenuDO>().eq(MenuDO::getParentId, parentId)
+                .eq(MenuDO::getName, name));
     }
 
     default Integer selectCountByParentId(Long parentId) {
-        return selectCount(SysMenuDO::getParentId, parentId);
+        return selectCount(MenuDO::getParentId, parentId);
     }
 
-    default List<SysMenuDO> selectList(SysMenuListReqVO reqVO) {
-        return selectList(new LambdaQueryWrapperX<SysMenuDO>().likeIfPresent(SysMenuDO::getName, reqVO.getName())
-                .eqIfPresent(SysMenuDO::getStatus, reqVO.getStatus()));
+    default List<MenuDO> selectList(MenuListReqVO reqVO) {
+        return selectList(new LambdaQueryWrapperX<MenuDO>().likeIfPresent(MenuDO::getName, reqVO.getName())
+                .eqIfPresent(MenuDO::getStatus, reqVO.getStatus()));
     }
 
     default boolean selectExistsByUpdateTimeAfter(Date maxUpdateTime) {
-        return selectOne(new LambdaQueryWrapper<SysMenuDO>().select(SysMenuDO::getId)
-                .gt(SysMenuDO::getUpdateTime, maxUpdateTime).last(SqlConstants.LIMIT1)) != null;
+        return selectOne(new LambdaQueryWrapper<MenuDO>().select(MenuDO::getId)
+                .gt(MenuDO::getUpdateTime, maxUpdateTime).last(SqlConstants.LIMIT1)) != null;
     }
 
 }

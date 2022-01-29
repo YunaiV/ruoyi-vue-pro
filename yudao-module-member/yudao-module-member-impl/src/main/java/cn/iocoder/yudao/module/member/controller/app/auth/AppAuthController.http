@@ -1,7 +1,7 @@
 ### 请求 /login 接口 => 成功
-POST {{userApi}}/member/login
+POST {{appApi}}/member/login
 Content-Type: application/json
-tenant-id: {{userTenentId}}
+tenant-id: {{appTenentId}}
 
 {
   "mobile": "15601691300",
@@ -9,9 +9,9 @@ tenant-id: {{userTenentId}}
 }
 
 ### 请求 /send-sms-code 接口 => 成功
-POST {{userApi}}/member/send-sms-code
+POST {{appApi}}/member/send-sms-code
 Content-Type: application/json
-tenant-id: {{userTenentId}}
+tenant-id: {{appTenentId}}
 
 {
   "mobile": "15601691399",
@@ -19,9 +19,9 @@ tenant-id: {{userTenentId}}
 }
 
 ### 请求 /sms-login 接口 => 成功
-POST {{userApi}}/member/sms-login
+POST {{appApi}}/member/sms-login
 Content-Type: application/json
-tenant-id: {{userTenentId}}
+tenant-id: {{appTenentId}}
 
 {
   "mobile": "15601691301",
@@ -29,7 +29,7 @@ tenant-id: {{userTenentId}}
 }
 
 ### 请求 /logout 接口 => 成功
-POST {{userApi}}/member/logout
+POST {{appApi}}/member/logout
 Content-Type: application/json
 Authorization: Bearer c1b76bdaf2c146c581caa4d7fd81ee66
-tenant-id: {{userTenentId}}
+tenant-id: {{appTenentId}}

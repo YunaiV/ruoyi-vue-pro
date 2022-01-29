@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.system.dal.mysql.auth;
 
-import cn.iocoder.yudao.module.system.controller.auth.vo.session.SysUserSessionPageReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.auth.vo.session.UserSessionPageReqVO;
 import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.auth.SysUserSessionDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
@@ -14,7 +14,7 @@ import java.util.List;
 @Mapper
 public interface SysUserSessionMapper extends BaseMapperX<SysUserSessionDO> {
 
-    default PageResult<SysUserSessionDO> selectPage(SysUserSessionPageReqVO reqVO, Collection<Long> userIds) {
+    default PageResult<SysUserSessionDO> selectPage(UserSessionPageReqVO reqVO, Collection<Long> userIds) {
         return selectPage(reqVO, new QueryWrapperX<SysUserSessionDO>()
                 .inIfPresent("user_id", userIds)
                 .likeIfPresent("user_ip", reqVO.getUserIp()));

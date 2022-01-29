@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.system.dal.mysql.sms;
 
-import cn.iocoder.yudao.module.system.controller.sms.vo.channel.SysSmsChannelPageReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.sms.vo.channel.SmsChannelPageReqVO;
 import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.sms.SysSmsChannelDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
@@ -13,7 +13,7 @@ import java.util.Date;
 @Mapper
 public interface SysSmsChannelMapper extends BaseMapperX<SysSmsChannelDO> {
 
-    default PageResult<SysSmsChannelDO> selectPage(SysSmsChannelPageReqVO reqVO) {
+    default PageResult<SysSmsChannelDO> selectPage(SmsChannelPageReqVO reqVO) {
         return selectPage(reqVO, new QueryWrapperX<SysSmsChannelDO>()
                 .likeIfPresent("signature", reqVO.getSignature())
                 .eqIfPresent("status", reqVO.getStatus())

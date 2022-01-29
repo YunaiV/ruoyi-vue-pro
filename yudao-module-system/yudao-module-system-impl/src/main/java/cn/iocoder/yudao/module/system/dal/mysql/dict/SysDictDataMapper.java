@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.system.dal.mysql.dict;
 
 import cn.iocoder.yudao.framework.mybatis.core.enums.SqlConstants;
-import cn.iocoder.yudao.module.system.controller.dict.vo.data.SysDictDataExportReqVO;
-import cn.iocoder.yudao.module.system.controller.dict.vo.data.SysDictDataPageReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.dict.vo.data.DictDataExportReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.dict.vo.data.DictDataPageReqVO;
 import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.dict.SysDictDataDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
@@ -32,7 +32,7 @@ public interface SysDictDataMapper extends BaseMapperX<SysDictDataDO> {
         return selectCount(SysDictDataDO::getDictType, dictType);
     }
 
-    default PageResult<SysDictDataDO> selectPage(SysDictDataPageReqVO reqVO) {
+    default PageResult<SysDictDataDO> selectPage(DictDataPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<SysDictDataDO>()
                 .likeIfPresent(SysDictDataDO::getLabel, reqVO.getLabel())
                 .likeIfPresent(SysDictDataDO::getDictType, reqVO.getDictType())
@@ -40,7 +40,7 @@ public interface SysDictDataMapper extends BaseMapperX<SysDictDataDO> {
                 .orderByAsc(Arrays.asList(SysDictDataDO::getDictType, SysDictDataDO::getSort)));
     }
 
-    default List<SysDictDataDO> selectList(SysDictDataExportReqVO reqVO) {
+    default List<SysDictDataDO> selectList(DictDataExportReqVO reqVO) {
         return selectList(new LambdaQueryWrapperX<SysDictDataDO>().likeIfPresent(SysDictDataDO::getLabel, reqVO.getLabel())
                 .likeIfPresent(SysDictDataDO::getDictType, reqVO.getDictType())
                 .eqIfPresent(SysDictDataDO::getStatus, reqVO.getStatus()));

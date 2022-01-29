@@ -12,7 +12,7 @@ import org.hibernate.validator.constraints.Length;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
 
-@ApiModel("APP 端 - 手机 + 验证码登录 Request VO")
+@ApiModel("用户 APP - 手机 + 验证码登录 Request VO")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

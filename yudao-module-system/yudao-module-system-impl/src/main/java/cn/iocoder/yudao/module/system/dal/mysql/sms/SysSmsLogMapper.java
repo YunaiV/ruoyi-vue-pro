@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.system.dal.mysql.sms;
 
-import cn.iocoder.yudao.module.system.controller.sms.vo.log.SysSmsLogExportReqVO;
-import cn.iocoder.yudao.module.system.controller.sms.vo.log.SysSmsLogPageReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.sms.vo.log.SmsLogExportReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.sms.vo.log.SmsLogPageReqVO;
 import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.sms.SysSmsLogDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
@@ -13,7 +13,7 @@ import java.util.List;
 @Mapper
 public interface SysSmsLogMapper extends BaseMapperX<SysSmsLogDO> {
 
-    default PageResult<SysSmsLogDO> selectPage(SysSmsLogPageReqVO reqVO) {
+    default PageResult<SysSmsLogDO> selectPage(SmsLogPageReqVO reqVO) {
         return selectPage(reqVO, new QueryWrapperX<SysSmsLogDO>()
                 .eqIfPresent("channel_id", reqVO.getChannelId())
                 .eqIfPresent("template_id", reqVO.getTemplateId())
@@ -25,7 +25,7 @@ public interface SysSmsLogMapper extends BaseMapperX<SysSmsLogDO> {
                 .orderByDesc("id"));
     }
 
-    default List<SysSmsLogDO> selectList(SysSmsLogExportReqVO reqVO) {
+    default List<SysSmsLogDO> selectList(SmsLogExportReqVO reqVO) {
         return selectList(new QueryWrapperX<SysSmsLogDO>()
                 .eqIfPresent("channel_id", reqVO.getChannelId())
                 .eqIfPresent("template_id", reqVO.getTemplateId())

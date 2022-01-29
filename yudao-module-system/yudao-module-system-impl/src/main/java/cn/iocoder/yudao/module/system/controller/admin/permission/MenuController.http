@@ -1,0 +1,4 @@
+### 请求 /menu/list 接口 => 成功
+GET {{baseUrl}}/system/menu/list
+Authorization: Bearer {{token}}
+tenant-id: {{adminTenentId}}

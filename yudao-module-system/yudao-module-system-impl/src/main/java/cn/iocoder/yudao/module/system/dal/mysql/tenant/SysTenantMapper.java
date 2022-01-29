@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.system.dal.mysql.tenant;
 
-import cn.iocoder.yudao.module.system.controller.tenant.vo.SysTenantExportReqVO;
-import cn.iocoder.yudao.module.system.controller.tenant.vo.SysTenantPageReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.TenantExportReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.TenantPageReqVO;
 import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.tenant.SysTenantDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
@@ -18,7 +18,7 @@ import java.util.List;
 @Mapper
 public interface SysTenantMapper extends BaseMapperX<SysTenantDO> {
 
-    default PageResult<SysTenantDO> selectPage(SysTenantPageReqVO reqVO) {
+    default PageResult<SysTenantDO> selectPage(TenantPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<SysTenantDO>()
                 .likeIfPresent(SysTenantDO::getName, reqVO.getName())
                 .likeIfPresent(SysTenantDO::getContactName, reqVO.getContactName())
@@ -28,7 +28,7 @@ public interface SysTenantMapper extends BaseMapperX<SysTenantDO> {
                 .orderByDesc(SysTenantDO::getId));
     }
 
-    default List<SysTenantDO> selectList(SysTenantExportReqVO reqVO) {
+    default List<SysTenantDO> selectList(TenantExportReqVO reqVO) {
         return selectList(new LambdaQueryWrapperX<SysTenantDO>()
                 .likeIfPresent(SysTenantDO::getName, reqVO.getName())
                 .likeIfPresent(SysTenantDO::getContactName, reqVO.getContactName())

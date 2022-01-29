@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
-@ApiModel("APP 端 - 社交登录 Request VO，使用 code 授权码")
+@ApiModel("用户 APP - 社交登录 Request VO，使用 code 授权码")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

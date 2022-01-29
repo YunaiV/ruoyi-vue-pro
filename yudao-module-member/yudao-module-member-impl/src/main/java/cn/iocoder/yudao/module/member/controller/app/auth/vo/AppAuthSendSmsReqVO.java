@@ -10,7 +10,7 @@ import lombok.experimental.Accessors;
 
 import javax.validation.constraints.NotNull;
 
-@ApiModel("APP 端 - 发送手机验证码 Response VO")
+@ApiModel("用户 APP - 发送手机验证码 Response VO")
 @Data
 @Accessors(chain = true)
 public class AppAuthSendSmsReqVO {

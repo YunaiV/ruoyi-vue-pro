@@ -1,0 +1,31 @@
+package cn.iocoder.yudao.module.system.service.logger;
+
+import cn.iocoder.yudao.module.system.controller.admin.logger.vo.loginlog.LoginLogExportReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.logger.vo.loginlog.LoginLogPageReqVO;
+import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.logger.SysLoginLogDO;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+
+import java.util.List;
+
+/**
+ * 登录日志 Service 接口
+ */
+public interface LoginLogService {
+
+    /**
+     * 获得登录日志分页
+     *
+     * @param reqVO 分页条件
+     * @return 登录日志分页
+     */
+    PageResult<SysLoginLogDO> getLoginLogPage(LoginLogPageReqVO reqVO);
+
+    /**
+     * 获得登录日志列表
+     *
+     * @param reqVO 列表条件
+     * @return 登录日志列表
+     */
+    List<SysLoginLogDO> getLoginLogList(LoginLogExportReqVO reqVO);
+
+}

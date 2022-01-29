@@ -3,38 +3,38 @@ package cn.iocoder.yudao.module.system.dal.mysql.dict;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.QueryWrapperX;
-import cn.iocoder.yudao.module.system.controller.dict.vo.type.SysDictTypeExportReqVO;
-import cn.iocoder.yudao.module.system.controller.dict.vo.type.SysDictTypePageReqVO;
-import cn.iocoder.yudao.module.system.dal.dataobject.dict.SysDictTypeDO;
+import cn.iocoder.yudao.module.system.controller.admin.dict.vo.type.DictTypeExportReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.dict.vo.type.DictTypePageReqVO;
+import cn.iocoder.yudao.module.system.dal.dataobject.dict.DictTypeDO;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
 
 @Mapper
-public interface SysDictTypeMapper extends BaseMapperX<SysDictTypeDO> {
+public interface SysDictTypeMapper extends BaseMapperX<DictTypeDO> {
 
-    default PageResult<SysDictTypeDO> selectPage(SysDictTypePageReqVO reqVO) {
-        return selectPage(reqVO, new QueryWrapperX<SysDictTypeDO>()
+    default PageResult<DictTypeDO> selectPage(DictTypePageReqVO reqVO) {
+        return selectPage(reqVO, new QueryWrapperX<DictTypeDO>()
                 .likeIfPresent("name", reqVO.getName())
                 .likeIfPresent("`type`", reqVO.getType())
                 .eqIfPresent("status", reqVO.getStatus())
                 .betweenIfPresent("create_time", reqVO.getBeginCreateTime(), reqVO.getEndCreateTime()));
     }
 
-    default List<SysDictTypeDO> selectList(SysDictTypeExportReqVO reqVO) {
-        return selectList(new QueryWrapperX<SysDictTypeDO>()
+    default List<DictTypeDO> selectList(DictTypeExportReqVO reqVO) {
+        return selectList(new QueryWrapperX<DictTypeDO>()
                 .likeIfPresent("name", reqVO.getName())
                 .likeIfPresent("`type`", reqVO.getType())
                 .eqIfPresent("status", reqVO.getStatus())
                 .betweenIfPresent("create_time", reqVO.getBeginCreateTime(), reqVO.getEndCreateTime()));
     }
 
-    default SysDictTypeDO selectByType(String type) {
-        return selectOne(new QueryWrapperX<SysDictTypeDO>().eq("`type`", type));
+    default DictTypeDO selectByType(String type) {
+        return selectOne(new QueryWrapperX<DictTypeDO>().eq("`type`", type));
     }
 
-    default SysDictTypeDO selectByName(String name) {
-        return selectOne(new QueryWrapperX<SysDictTypeDO>().eq("name", name));
+    default DictTypeDO selectByName(String name) {
+        return selectOne(new QueryWrapperX<DictTypeDO>().eq("name", name));
     }
 
 }
