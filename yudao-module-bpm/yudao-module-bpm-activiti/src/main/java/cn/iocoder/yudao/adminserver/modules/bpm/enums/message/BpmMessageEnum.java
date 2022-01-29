@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.enums.message;
 
-import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.sms.SysSmsTemplateDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.sms.SysSmsTemplateDO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

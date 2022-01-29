@@ -7,7 +7,7 @@ import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.system.controller.admin.permission.vo.role.*;
 import cn.iocoder.yudao.module.system.convert.permission.RoleConvert;
-import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.permission.SysRoleDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.permission.SysRoleDO;
 import cn.iocoder.yudao.module.system.service.permission.RoleService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;

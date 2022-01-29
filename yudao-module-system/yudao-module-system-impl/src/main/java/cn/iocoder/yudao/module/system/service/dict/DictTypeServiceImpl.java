@@ -54,7 +54,7 @@ public class DictTypeServiceImpl implements DictTypeService {
     @Override
     public Long createDictType(DictTypeCreateReqVO reqVO) {
         // 校验正确性
-        this.checkCreateOrUpdate(null, reqVO.getName(), reqVO.getType());
+        checkCreateOrUpdate(null, reqVO.getName(), reqVO.getType());
         // 插入字典类型
         DictTypeDO dictType = DictTypeConvert.INSTANCE.convert(reqVO);
         dictTypeMapper.insert(dictType);
@@ -64,7 +64,7 @@ public class DictTypeServiceImpl implements DictTypeService {
     @Override
     public void updateDictType(DictTypeUpdateReqVO reqVO) {
         // 校验正确性
-        this.checkCreateOrUpdate(reqVO.getId(), reqVO.getName(), null);
+        checkCreateOrUpdate(reqVO.getId(), reqVO.getName(), null);
         // 更新字典类型
         DictTypeDO updateObj = DictTypeConvert.INSTANCE.convert(reqVO);
         dictTypeMapper.updateById(updateObj);
@@ -73,7 +73,7 @@ public class DictTypeServiceImpl implements DictTypeService {
     @Override
     public void deleteDictType(Long id) {
         // 校验是否存在
-        DictTypeDO dictType = this.checkDictTypeExists(id);
+        DictTypeDO dictType = checkDictTypeExists(id);
         // 校验是否有字典数据
         if (dictDataService.countByDictType(dictType.getType()) > 0) {
             throw exception(DICT_TYPE_HAS_CHILDREN);

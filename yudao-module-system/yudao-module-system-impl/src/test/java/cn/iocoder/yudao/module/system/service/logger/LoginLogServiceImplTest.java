@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.system.service.logger;
 
 import cn.hutool.core.util.RandomUtil;
-import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.logger.SysLoginLogDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.logger.SysLoginLogDO;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.monitor.TracerUtils;
@@ -12,6 +12,9 @@ import cn.iocoder.yudao.module.system.enums.logger.LoginLogTypeEnum;
 import cn.iocoder.yudao.module.system.enums.logger.LoginResultEnum;
 import cn.iocoder.yudao.framework.test.core.util.RandomUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
+import cn.iocoder.yudao.module.system.enums.logger.SysLoginLogTypeEnum;
+import cn.iocoder.yudao.module.system.enums.logger.SysLoginResultEnum;
+import cn.iocoder.yudao.module.system.service.logger.dto.LoginLogCreateReqDTO;
 import cn.iocoder.yudao.module.system.test.BaseDbUnitTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
@@ -19,6 +22,7 @@ import org.springframework.context.annotation.Import;
 import javax.annotation.Resource;
 import java.util.List;
 
+import static cn.hutool.core.util.RandomUtil.randomEle;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildTime;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -27,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class LoginLogServiceImplTest extends BaseDbUnitTest {
 
     @Resource
-    private LoginLogServiceImpl sysLoginLogService;
+    private LoginLogServiceImpl loginLogService;
 
     @Resource
     private LoginLogMapper loginLogMapper;
@@ -68,7 +72,7 @@ public class LoginLogServiceImplTest extends BaseDbUnitTest {
         reqVO.setEndTime(buildTime(2021, 3, 7));
 
         // 调用service方法
-        PageResult<SysLoginLogDO> pageResult = sysLoginLogService.getLoginLogPage(reqVO);
+        PageResult<SysLoginLogDO> pageResult = loginLogService.getLoginLogPage(reqVO);
 
         // 断言，只查到了一条符合条件的
         assertEquals(1, pageResult.getTotal());
@@ -114,10 +118,28 @@ public class LoginLogServiceImplTest extends BaseDbUnitTest {
 
 
         // 调用service方法
-        List<SysLoginLogDO> loginLogList = sysLoginLogService.getLoginLogList(reqVO);
+        List<SysLoginLogDO> loginLogList = loginLogService.getLoginLogList(reqVO);
 
         // 断言
         assertEquals(1, loginLogList.size());
         assertPojoEquals(loginLogDO, loginLogList.get(0));
     }
+
+    @Test
+    public void testCreateLoginLog() {
+        LoginLogCreateReqDTO reqDTO = RandomUtils.randomPojo(LoginLogCreateReqDTO.class, vo -> {
+            // 指定随机的范围,避免超出范围入库失败
+            vo.setUserType(randomEle(UserTypeEnum.values()).getValue());
+            vo.setLogType(randomEle(SysLoginLogTypeEnum.values()).getType());
+            vo.setResult(randomEle(SysLoginResultEnum.values()).getResult());
+            vo.setTraceId(TracerUtils.getTraceId());
+        });
+
+        // 调用
+        loginLogService.createLoginLog(reqDTO);
+        // 断言，忽略基本字段
+        SysLoginLogDO sysLoginLogDO = loginLogMapper.selectOne(null);
+        assertPojoEquals(reqDTO, sysLoginLogDO);
+    }
+
 }

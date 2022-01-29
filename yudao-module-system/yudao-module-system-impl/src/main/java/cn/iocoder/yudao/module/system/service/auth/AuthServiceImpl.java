@@ -1,33 +1,30 @@
 package cn.iocoder.yudao.module.system.service.auth;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.iocoder.yudao.module.system.controller.admin.auth.vo.auth.AuthLoginReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.auth.vo.auth.AuthSocialBindReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.auth.vo.auth.AuthSocialLogin2ReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.auth.vo.auth.AuthSocialLoginReqVO;
-import cn.iocoder.yudao.module.system.convert.auth.AuthConvert;
-import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.dept.SysPostDO;
-import cn.iocoder.yudao.module.system.enums.logger.LoginLogTypeEnum;
-import cn.iocoder.yudao.module.system.enums.logger.LoginResultEnum;
-import cn.iocoder.yudao.module.system.service.common.CaptchaService;
-import cn.iocoder.yudao.module.system.service.dept.PostService;
-import cn.iocoder.yudao.module.system.service.permission.PermissionService;
-import cn.iocoder.yudao.module.system.service.user.UserService;
-import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.social.SysSocialUserDO;
-import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.user.SysUserDO;
-import cn.iocoder.yudao.coreservice.modules.system.service.auth.SysUserSessionCoreService;
-import cn.iocoder.yudao.coreservice.modules.system.service.logger.SysLoginLogCoreService;
-import cn.iocoder.yudao.coreservice.modules.system.service.logger.dto.SysLoginLogCreateReqDTO;
-import cn.iocoder.yudao.coreservice.modules.system.service.social.SysSocialCoreService;
-import cn.iocoder.yudao.coreservice.modules.system.service.user.SysUserCoreService;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.util.monitor.TracerUtils;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.security.core.authentication.MultiUsernamePasswordAuthenticationToken;
+import cn.iocoder.yudao.module.system.controller.admin.auth.vo.auth.AuthLoginReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.auth.vo.auth.AuthSocialBindReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.auth.vo.auth.AuthSocialLogin2ReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.auth.vo.auth.AuthSocialLoginReqVO;
+import cn.iocoder.yudao.module.system.convert.auth.AuthConvert;
+import cn.iocoder.yudao.module.system.dal.dataobject.social.SysSocialUserDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.user.UserDO;
+import cn.iocoder.yudao.module.system.enums.logger.LoginLogTypeEnum;
+import cn.iocoder.yudao.module.system.enums.logger.LoginResultEnum;
+import cn.iocoder.yudao.module.system.service.common.CaptchaService;
+import cn.iocoder.yudao.module.system.service.logger.LoginLogService;
+import cn.iocoder.yudao.module.system.service.logger.dto.LoginLogCreateReqDTO;
+import cn.iocoder.yudao.module.system.service.permission.PermissionService;
+import cn.iocoder.yudao.module.system.service.social.SocialUserService;
+import cn.iocoder.yudao.module.system.service.user.UserService;
 import lombok.extern.slf4j.Slf4j;
 import me.zhyd.oauth.model.AuthUser;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -40,14 +37,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import javax.annotation.Resource;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
+import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
 import static java.util.Collections.singleton;
 
 /**
@@ -63,27 +58,24 @@ public class AuthServiceImpl implements AuthService {
     @Lazy // 延迟加载，因为存在相互依赖的问题
     private AuthenticationManager authenticationManager;
 
-    @Resource
+    @Autowired
+    @SuppressWarnings("SpringJavaAutowiredFieldsWarningInspection") // UserService 存在重名
     private UserService userService;
-    @Resource
-    private SysUserCoreService userCoreService;
     @Resource
     private PermissionService permissionService;
     @Resource
     private CaptchaService captchaService;
     @Resource
-    private SysLoginLogCoreService loginLogCoreService;
+    private LoginLogService loginLogService;
     @Resource
-    private SysUserSessionCoreService userSessionCoreService;
+    private UserSessionService userSessionService;
     @Resource
-    private PostService postService;
-    @Resource
-    private SysSocialCoreService socialService;
+    private SocialUserService socialService;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         // 获取 username 对应的 SysUserDO
-        SysUserDO user = userService.getUserByUsername(username);
+        UserDO user = userService.getUserByUsername(username);
         if (user == null) {
             throw new UsernameNotFoundException(username);
         }
@@ -94,7 +86,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public LoginUser mockLogin(Long userId) {
         // 获取用户编号对应的 SysUserDO
-        SysUserDO user = userCoreService.getUser(userId);
+        UserDO user = userService.getUser(userId);
         if (user == null) {
             throw new UsernameNotFoundException(String.valueOf(userId));
         }
@@ -113,14 +105,7 @@ public class AuthServiceImpl implements AuthService {
         LoginUser loginUser = this.login0(reqVO.getUsername(), reqVO.getPassword());
 
         // 缓存登陆用户到 Redis 中，返回 sessionId 编号
-        return userSessionCoreService.createUserSession(loginUser, userIp, userAgent);
-    }
-
-    private List<String> getUserPosts(Set<Long> postIds) {
-        if (CollUtil.isEmpty(postIds)) {
-            return Collections.emptyList();
-        }
-        return convertList(postService.getPosts(postIds), SysPostDO::getCode);
+        return userSessionService.createUserSession(loginUser, userIp, userAgent);
     }
 
     private void verifyCaptcha(String username, String captchaUUID, String captchaCode) {
@@ -175,9 +160,9 @@ public class AuthServiceImpl implements AuthService {
 
     private void createLoginLog(String username, LoginLogTypeEnum logTypeEnum, LoginResultEnum loginResult) {
         // 获得用户
-        SysUserDO user = userService.getUserByUsername(username);
+        UserDO user = userService.getUserByUsername(username);
         // 插入登录日志
-        SysLoginLogCreateReqDTO reqDTO = new SysLoginLogCreateReqDTO();
+        LoginLogCreateReqDTO reqDTO = new LoginLogCreateReqDTO();
         reqDTO.setLogType(logTypeEnum.getType());
         reqDTO.setTraceId(TracerUtils.getTraceId());
         if (user != null) {
@@ -188,7 +173,7 @@ public class AuthServiceImpl implements AuthService {
         reqDTO.setUserAgent(ServletUtils.getUserAgent());
         reqDTO.setUserIp(ServletUtils.getClientIP());
         reqDTO.setResult(loginResult.getResult());
-        loginLogCoreService.createLoginLog(reqDTO);
+        loginLogService.createLoginLog(reqDTO);
         // 更新最后登录时间
         if (user != null && Objects.equals(LoginResultEnum.SUCCESS.getResult(), loginResult.getResult())) {
             userService.updateUserLogin(user.getId(), ServletUtils.getClientIP());
@@ -219,7 +204,7 @@ public class AuthServiceImpl implements AuthService {
         }
 
         // 自动登录
-        SysUserDO user = userCoreService.getUser(socialUsers.get(0).getUserId());
+        UserDO user = userService.getUser(socialUsers.get(0).getUserId());
         if (user == null) {
             throw exception(USER_NOT_EXISTS);
         }
@@ -232,7 +217,7 @@ public class AuthServiceImpl implements AuthService {
         socialService.bindSocialUser(loginUser.getId(), reqVO.getType(), authUser, getUserType());
 
         // 缓存登录用户到 Redis 中，返回 sessionId 编号
-        return userSessionCoreService.createUserSession(loginUser, userIp, userAgent);
+        return userSessionService.createUserSession(loginUser, userIp, userAgent);
     }
 
     @Override
@@ -248,7 +233,7 @@ public class AuthServiceImpl implements AuthService {
         socialService.bindSocialUser(loginUser.getId(), reqVO.getType(), authUser, getUserType());
 
         // 缓存登录用户到 Redis 中，返回 sessionId 编号
-        return userSessionCoreService.createUserSession(loginUser, userIp, userAgent);
+        return userSessionService.createUserSession(loginUser, userIp, userAgent);
     }
 
     @Override
@@ -264,12 +249,12 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public void logout(String token) {
         // 查询用户信息
-        LoginUser loginUser = userSessionCoreService.getLoginUser(token);
+        LoginUser loginUser = userSessionService.getLoginUser(token);
         if (loginUser == null) {
             return;
         }
         // 删除 session
-        userSessionCoreService.deleteUserSession(token);
+        userSessionService.deleteUserSession(token);
         // 记录登出日志
         this.createLogoutLog(loginUser.getId(), loginUser.getUsername());
     }
@@ -280,7 +265,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     private void createLogoutLog(Long userId, String username) {
-        SysLoginLogCreateReqDTO reqDTO = new SysLoginLogCreateReqDTO();
+        LoginLogCreateReqDTO reqDTO = new LoginLogCreateReqDTO();
         reqDTO.setLogType(LoginLogTypeEnum.LOGOUT_SELF.getType());
         reqDTO.setTraceId(TracerUtils.getTraceId());
         reqDTO.setUserId(userId);
@@ -289,13 +274,13 @@ public class AuthServiceImpl implements AuthService {
         reqDTO.setUserAgent(ServletUtils.getUserAgent());
         reqDTO.setUserIp(ServletUtils.getClientIP());
         reqDTO.setResult(LoginResultEnum.SUCCESS.getResult());
-        loginLogCoreService.createLoginLog(reqDTO);
+        loginLogService.createLoginLog(reqDTO);
     }
 
     @Override
     public LoginUser verifyTokenAndRefresh(String token) {
         // 获得 LoginUser
-        LoginUser loginUser = userSessionCoreService.getLoginUser(token);
+        LoginUser loginUser = userSessionService.getLoginUser(token);
         if (loginUser == null) {
             return null;
         }
@@ -306,23 +291,23 @@ public class AuthServiceImpl implements AuthService {
     private LoginUser refreshLoginUserCache(String token, LoginUser loginUser) {
         // 每 1/3 的 Session 超时时间，刷新 LoginUser 缓存
         if (System.currentTimeMillis() - loginUser.getUpdateTime().getTime() <
-                userSessionCoreService.getSessionTimeoutMillis() / 3) {
+                userSessionService.getSessionTimeoutMillis() / 3) {
             return loginUser;
         }
 
         // 重新加载 SysUserDO 信息
-        SysUserDO user = userCoreService.getUser(loginUser.getId());
+        UserDO user = userService.getUser(loginUser.getId());
         if (user == null || CommonStatusEnum.DISABLE.getStatus().equals(user.getStatus())) {
             throw exception(AUTH_TOKEN_EXPIRED); // 校验 token 时，用户被禁用的情况下，也认为 token 过期，方便前端跳转到登录界面
         }
 
         // 刷新 LoginUser 缓存
         LoginUser newLoginUser= this.buildLoginUser(user);
-        userSessionCoreService.refreshUserSession(token, newLoginUser);
+        userSessionService.refreshUserSession(token, newLoginUser);
         return newLoginUser;
     }
 
-    private LoginUser buildLoginUser(SysUserDO user) {
+    private LoginUser buildLoginUser(UserDO user) {
         LoginUser loginUser = AuthConvert.INSTANCE.convert(user);
         // 补全字段
         loginUser.setDeptId(user.getDeptId());

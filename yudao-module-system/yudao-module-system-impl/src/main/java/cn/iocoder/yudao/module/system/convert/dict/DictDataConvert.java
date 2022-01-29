@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.system.convert.dict;
 
 import cn.iocoder.yudao.module.system.controller.admin.dict.vo.data.*;
-import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.dict.SysDictDataDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.dict.SysDictDataDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.dict.core.dto.DictDataRespDTO;
 import org.mapstruct.Mapper;

@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.io.ByteArrayInputStream;
 
-import static cn.iocoder.yudao.coreservice.modules.system.enums.SysErrorCodeConstants.*;
+import static cn.iocoder.yudao.coreservice.modules.infra.enums.SysErrorCodeConstants.*;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 
 /**

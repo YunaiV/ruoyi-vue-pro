@@ -4,7 +4,7 @@ import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptCreateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptListReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptUpdateReqVO;
-import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.dept.SysDeptDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.dept.SysDeptDO;
 import cn.iocoder.yudao.module.system.dal.mysql.dept.SysDeptMapper;
 import cn.iocoder.yudao.module.system.enums.dept.DeptIdEnum;
 import cn.iocoder.yudao.module.system.mq.producer.dept.DeptProducer;

@@ -6,7 +6,7 @@ import cn.iocoder.yudao.module.system.controller.admin.dept.vo.post.PostCreateRe
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.post.PostExportReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.post.PostPageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.post.PostUpdateReqVO;
-import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.dept.SysPostDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.dept.SysPostDO;
 import org.springframework.lang.Nullable;
 
 import java.util.Collection;

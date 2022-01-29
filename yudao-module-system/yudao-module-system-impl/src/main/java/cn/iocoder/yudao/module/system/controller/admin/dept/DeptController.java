@@ -1,11 +1,11 @@
 package cn.iocoder.yudao.module.system.controller.admin.dept;
 
-import cn.iocoder.yudao.coreservice.modules.system.service.dept.SysDeptCoreService;
+import cn.iocoder.yudao.module.system.service.dept.SysDeptCoreService;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.*;
 import cn.iocoder.yudao.module.system.convert.dept.DeptConvert;
-import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.dept.SysDeptDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.dept.SysDeptDO;
 import cn.iocoder.yudao.module.system.service.dept.DeptService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;

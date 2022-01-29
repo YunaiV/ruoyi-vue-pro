@@ -1,10 +1,10 @@
 package cn.iocoder.yudao.module.system.service.permission;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.dept.SysDeptDO;
-import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.permission.SysRoleDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.dept.SysDeptDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.permission.SysRoleDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.RoleMenuDO;
-import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.permission.SysUserRoleDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.permission.SysUserRoleDO;
 import cn.iocoder.yudao.module.system.dal.mysql.permission.SysRoleMenuMapper;
 import cn.iocoder.yudao.module.system.dal.mysql.permission.SysUserRoleMapper;
 import cn.iocoder.yudao.module.system.mq.producer.permission.PermissionProducer;

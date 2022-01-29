@@ -9,7 +9,7 @@ import cn.iocoder.yudao.module.system.service.sms.impl.SysSmsChannelServiceImpl;
 import cn.iocoder.yudao.module.system.service.sms.impl.SysSmsLogServiceImpl;
 import cn.iocoder.yudao.module.system.service.sms.impl.SysSmsTemplateServiceImpl;
 import cn.iocoder.yudao.module.system.service.user.SysUserService;
-import cn.iocoder.yudao.coreservice.modules.system.service.sms.impl.SysSmsCoreServiceImpl;
+import cn.iocoder.yudao.module.system.service.sms.impl.SysSmsCoreServiceImpl;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.sms.config.YudaoSmsAutoConfiguration;
 import org.junit.jupiter.api.Test;

@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.system.controller.admin.tenant;
 import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.*;
 import cn.iocoder.yudao.module.system.convert.tenant.TenantConvert;
 import cn.iocoder.yudao.module.system.service.tenant.TenantService;
-import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.tenant.SysTenantDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.tenant.SysTenantDO;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;

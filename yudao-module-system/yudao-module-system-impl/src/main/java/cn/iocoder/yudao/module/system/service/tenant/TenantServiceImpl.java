@@ -6,7 +6,7 @@ import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.TenantPageReqVO
 import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.TenantUpdateReqVO;
 import cn.iocoder.yudao.module.system.convert.tenant.TenantConvert;
 import cn.iocoder.yudao.module.system.dal.mysql.tenant.SysTenantMapper;
-import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.tenant.SysTenantDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.tenant.SysTenantDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;

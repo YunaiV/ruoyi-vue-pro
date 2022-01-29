@@ -7,7 +7,7 @@ import cn.iocoder.yudao.module.system.controller.admin.sms.vo.channel.SmsChannel
 import cn.iocoder.yudao.module.system.convert.sms.SmsChannelConvert;
 import cn.iocoder.yudao.module.system.dal.mysql.sms.SysSmsChannelMapper;
 import cn.iocoder.yudao.module.system.mq.producer.sms.SmsProducer;
-import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.sms.SysSmsChannelDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.sms.SysSmsChannelDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.framework.sms.core.client.SmsClientFactory;

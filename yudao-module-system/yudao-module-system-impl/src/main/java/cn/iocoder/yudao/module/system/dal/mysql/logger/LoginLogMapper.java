@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.system.dal.mysql.logger;
 
-import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.logger.SysLoginLogDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.logger.SysLoginLogDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.QueryWrapperX;

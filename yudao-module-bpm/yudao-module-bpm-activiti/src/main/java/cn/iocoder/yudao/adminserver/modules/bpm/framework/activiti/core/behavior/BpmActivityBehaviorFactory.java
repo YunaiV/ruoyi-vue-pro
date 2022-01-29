@@ -3,9 +3,9 @@ package cn.iocoder.yudao.adminserver.modules.bpm.framework.activiti.core.behavio
 import cn.iocoder.yudao.adminserver.modules.bpm.framework.activiti.core.behavior.script.BpmTaskAssignScript;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmTaskAssignRuleService;
 import cn.iocoder.yudao.coreservice.modules.bpm.api.group.BpmUserGroupServiceApi;
-import cn.iocoder.yudao.coreservice.modules.system.service.dept.SysDeptCoreService;
-import cn.iocoder.yudao.coreservice.modules.system.service.permission.SysPermissionCoreService;
-import cn.iocoder.yudao.coreservice.modules.system.service.user.SysUserCoreService;
+import cn.iocoder.yudao.module.system.service.dept.SysDeptCoreService;
+import cn.iocoder.yudao.module.system.service.permission.SysPermissionCoreService;
+import cn.iocoder.yudao.module.system.service.user.SysUserCoreService;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Setter;

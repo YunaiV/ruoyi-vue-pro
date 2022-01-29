@@ -6,8 +6,8 @@ import cn.iocoder.yudao.module.system.controller.admin.logger.vo.operatelog.Oper
 import cn.iocoder.yudao.module.system.dal.dataobject.logger.OperateLogDO;
 import cn.iocoder.yudao.module.system.dal.mysql.logger.OperateLogMapper;
 import cn.iocoder.yudao.module.system.service.user.UserService;
-import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.user.SysUserDO;
-import cn.iocoder.yudao.coreservice.modules.system.enums.common.SysSexEnum;
+import cn.iocoder.yudao.module.system.dal.dataobject.user.UserDO;
+import cn.iocoder.yudao.module.system.enums.common.SysSexEnum;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -66,7 +66,7 @@ public class OperateLogServiceImplTest extends BaseDbUnitTest {
     public void testGetOperateLogPage() {
         // 构造测试数据
         // 先构造用户
-        SysUserDO user = RandomUtils.randomPojo(SysUserDO.class, o -> {
+        UserDO user = RandomUtils.randomPojo(UserDO.class, o -> {
             o.setNickname("wangkai");
             o.setSex(SysSexEnum.MALE.getSex());
             o.setStatus(CommonStatusEnum.ENABLE.getStatus());
@@ -117,7 +117,7 @@ public class OperateLogServiceImplTest extends BaseDbUnitTest {
     public void testGetOperateLogs() {
         // 构造测试数据
         // 先构造用户
-        SysUserDO user = RandomUtils.randomPojo(SysUserDO.class, o -> {
+        UserDO user = RandomUtils.randomPojo(UserDO.class, o -> {
             o.setNickname("wangkai");
             o.setSex(SysSexEnum.MALE.getSex());
             o.setStatus(CommonStatusEnum.ENABLE.getStatus());

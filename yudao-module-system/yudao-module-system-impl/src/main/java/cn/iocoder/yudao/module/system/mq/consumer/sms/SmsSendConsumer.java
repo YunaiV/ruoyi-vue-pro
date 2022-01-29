@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.system.mq.consumer.sms;
 
-import cn.iocoder.yudao.coreservice.modules.system.mq.message.sms.SysSmsSendMessage;
-import cn.iocoder.yudao.coreservice.modules.system.service.sms.SysSmsCoreService;
+import cn.iocoder.yudao.module.system.mq.message.sms.SmsSendMessage;
+import cn.iocoder.yudao.module.system.service.sms.SysSmsSendService;
 import cn.iocoder.yudao.framework.mq.core.stream.AbstractStreamMessageListener;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -9,20 +9,20 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 
 /**
- * 针对 {@link SysSmsSendMessage} 的消费者
+ * 针对 {@link SmsSendMessage} 的消费者
  *
  * @author zzf
  * @date 2021/3/9 16:35
  */
 @Component
 @Slf4j
-public class SmsSendConsumer extends AbstractStreamMessageListener<SysSmsSendMessage> {
+public class SmsSendConsumer extends AbstractStreamMessageListener<SmsSendMessage> {
 
     @Resource
-    private SysSmsCoreService smsCoreService;
+    private SysSmsSendService smsCoreService;
 
     @Override
-    public void onMessage(SysSmsSendMessage message) {
+    public void onMessage(SmsSendMessage message) {
         log.info("[onMessage][消息内容({})]", message);
         smsCoreService.doSendSms(message);
     }

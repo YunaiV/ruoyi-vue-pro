@@ -5,7 +5,7 @@ import cn.iocoder.yudao.adminserver.BaseRedisIntegrationTest;
 import cn.iocoder.yudao.module.system.mq.consumer.mail.SysMailSendConsumer;
 import cn.iocoder.yudao.module.system.mq.consumer.sms.SysSmsSendConsumer;
 import cn.iocoder.yudao.module.system.mq.message.mail.SysMailSendMessage;
-import cn.iocoder.yudao.coreservice.modules.system.mq.message.sms.SysSmsSendMessage;
+import cn.iocoder.yudao.module.system.mq.message.sms.SysSmsSendMessage;
 import cn.iocoder.yudao.framework.mq.core.util.RedisMessageUtils;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;

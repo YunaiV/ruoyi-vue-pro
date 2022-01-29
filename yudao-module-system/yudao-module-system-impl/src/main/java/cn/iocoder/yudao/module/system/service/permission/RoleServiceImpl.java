@@ -11,7 +11,7 @@ import cn.iocoder.yudao.module.system.controller.admin.permission.vo.role.RolePa
 import cn.iocoder.yudao.module.system.controller.admin.permission.vo.role.RoleUpdateReqVO;
 import cn.iocoder.yudao.module.system.convert.permission.RoleConvert;
 import cn.iocoder.yudao.module.system.dal.mysql.permission.SysRoleMapper;
-import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.permission.SysRoleDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.permission.SysRoleDO;
 import cn.iocoder.yudao.module.system.enums.permission.RoleCodeEnum;
 import cn.iocoder.yudao.module.system.enums.permission.RoleTypeEnum;
 import cn.iocoder.yudao.module.system.mq.producer.permission.RoleProducer;

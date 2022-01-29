@@ -3,12 +3,11 @@ package cn.iocoder.yudao.module.system.controller.admin.user;
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.module.system.controller.admin.user.vo.user.*;
 import cn.iocoder.yudao.module.system.convert.user.UserConvert;
-import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.dept.SysDeptDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.dept.SysDeptDO;
 import cn.iocoder.yudao.module.system.service.user.UserService;
-import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.user.SysUserDO;
-import cn.iocoder.yudao.coreservice.modules.system.enums.common.SysSexEnum;
-import cn.iocoder.yudao.coreservice.modules.system.service.dept.SysDeptCoreService;
-import cn.iocoder.yudao.coreservice.modules.system.service.user.SysUserCoreService;
+import cn.iocoder.yudao.module.system.dal.dataobject.user.UserDO;
+import cn.iocoder.yudao.module.system.enums.common.SysSexEnum;
+import cn.iocoder.yudao.module.system.service.dept.SysDeptCoreService;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -19,6 +18,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -41,10 +41,9 @@ import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.E
 @Validated
 public class UserController {
 
-    @Resource
+    @Autowired
+    @SuppressWarnings("SpringJavaAutowiredFieldsWarningInspection") // UserService 存在重名
     private UserService userService;
-    @Resource
-    private SysUserCoreService userCoreService;
     @Resource
     private SysDeptCoreService deptCoreService;
 
@@ -94,13 +93,13 @@ public class UserController {
     @PreAuthorize("@ss.hasPermission('system:user:list')")
     public CommonResult<PageResult<UserPageItemRespVO>> getUserPage(@Valid UserPageReqVO reqVO) {
         // 获得用户分页列表
-        PageResult<SysUserDO> pageResult = userService.getUserPage(reqVO);
+        PageResult<UserDO> pageResult = userService.getUserPage(reqVO);
         if (CollUtil.isEmpty(pageResult.getList())) {
             return success(new PageResult<>(pageResult.getTotal())); // 返回空
         }
 
         // 获得拼接需要的数据
-        Collection<Long> deptIds = convertList(pageResult.getList(), SysUserDO::getDeptId);
+        Collection<Long> deptIds = convertList(pageResult.getList(), UserDO::getDeptId);
         Map<Long, SysDeptDO> deptMap = deptCoreService.getDeptMap(deptIds);
         // 拼接结果返回
         List<UserPageItemRespVO> userList = new ArrayList<>(pageResult.getList().size());
@@ -116,7 +115,7 @@ public class UserController {
     @ApiOperation(value = "获取用户精简信息列表", notes = "只包含被开启的用户，主要用于前端的下拉选项")
     public CommonResult<List<UserSimpleRespVO>> getSimpleUsers() {
         // 获用户门列表，只要开启状态的
-        List<SysUserDO> list = userService.getUsersByStatus(CommonStatusEnum.ENABLE.getStatus());
+        List<UserDO> list = userService.getUsersByStatus(CommonStatusEnum.ENABLE.getStatus());
         // 排序后，返回给前端
         return success(UserConvert.INSTANCE.convertList04(list));
     }
@@ -126,7 +125,7 @@ public class UserController {
     @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
     @PreAuthorize("@ss.hasPermission('system:user:query')")
     public CommonResult<UserRespVO> getInfo(@RequestParam("id") Long id) {
-        return success(UserConvert.INSTANCE.convert(userCoreService.getUser(id)));
+        return success(UserConvert.INSTANCE.convert(userService.getUser(id)));
     }
 
     @GetMapping("/export")
@@ -136,12 +135,13 @@ public class UserController {
     public void exportUsers(@Validated UserExportReqVO reqVO,
                             HttpServletResponse response) throws IOException {
         // 获得用户列表
-        List<SysUserDO> users = userService.getUsers(reqVO);
+        List<UserDO> users = userService.getUsers(reqVO);
 
         // 获得拼接需要的数据
-        Collection<Long> deptIds = convertList(users, SysUserDO::getDeptId);
+        Collection<Long> deptIds = convertList(users, UserDO::getDeptId);
         Map<Long, SysDeptDO> deptMap = deptCoreService.getDeptMap(deptIds);
-        Map<Long, SysUserDO> deptLeaderUserMap = userCoreService.getUserMap(convertSet(deptMap.values(), SysDeptDO::getLeaderUserId));
+        Map<Long, UserDO> deptLeaderUserMap = userService.getUserMap(
+                convertSet(deptMap.values(), SysDeptDO::getLeaderUserId));
         // 拼接数据
         List<UserExcelVO> excelUsers = new ArrayList<>(users.size());
         users.forEach(user -> {

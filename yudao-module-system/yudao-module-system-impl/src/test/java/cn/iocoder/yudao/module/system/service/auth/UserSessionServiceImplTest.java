@@ -1,14 +1,16 @@
 package cn.iocoder.yudao.module.system.service.auth;
 
 import cn.hutool.core.date.DateUtil;
+import cn.iocoder.yudao.framework.security.config.SecurityProperties;
+import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.module.system.controller.admin.auth.vo.session.UserSessionPageReqVO;
 import cn.iocoder.yudao.module.system.dal.mysql.auth.SysUserSessionMapper;
+import cn.iocoder.yudao.module.system.service.logger.LoginLogService;
 import cn.iocoder.yudao.module.system.service.user.UserService;
-import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.auth.SysUserSessionDO;
-import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.user.SysUserDO;
-import cn.iocoder.yudao.coreservice.modules.system.dal.redis.auth.SysLoginUserCoreRedisDAO;
-import cn.iocoder.yudao.coreservice.modules.system.enums.common.SysSexEnum;
-import cn.iocoder.yudao.coreservice.modules.system.service.logger.SysLoginLogCoreService;
+import cn.iocoder.yudao.module.system.dal.dataobject.auth.SysUserSessionDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.user.UserDO;
+import cn.iocoder.yudao.module.system.dal.redis.auth.LoginUserRedisDAO;
+import cn.iocoder.yudao.module.system.enums.common.SysSexEnum;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -19,17 +21,19 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
+import java.time.Duration;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static cn.hutool.core.util.RandomUtil.randomEle;
+import static cn.iocoder.yudao.framework.common.util.date.DateUtils.addTime;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
-import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
-import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomString;
+import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
 import static java.util.Collections.singletonList;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
@@ -38,7 +42,7 @@ import static org.mockito.Mockito.when;
  *
  * @author Lyon
  */
-@Import({UserSessionServiceImpl.class})
+@Import({UserSessionServiceImpl.class, LoginUserRedisDAO.class})
 public class UserSessionServiceImplTest extends BaseDbAndRedisUnitTest {
 
     @Resource
@@ -50,14 +54,17 @@ public class UserSessionServiceImplTest extends BaseDbAndRedisUnitTest {
     @MockBean
     private UserService userService;
     @MockBean
-    private SysLoginLogCoreService loginLogCoreService;
+    private LoginLogService loginLogService;
     @MockBean
-    private SysLoginUserCoreRedisDAO loginUserCoreRedisDAO;
+    private LoginUserRedisDAO loginUserRedisDAO;
+
+    @MockBean
+    private SecurityProperties securityProperties;
 
     @Test
     public void testGetUserSessionPage_success() {
         // mock 数据
-        SysUserDO dbUser = randomPojo(SysUserDO.class, o -> {
+        UserDO dbUser = randomPojo(UserDO.class, o -> {
             o.setSex(randomEle(SysSexEnum.values()).getSex());
             o.setStatus(CommonStatusEnum.ENABLE.getStatus());
         });
@@ -122,6 +129,91 @@ public class UserSessionServiceImplTest extends BaseDbAndRedisUnitTest {
         List<SysUserSessionDO> userSessionDOS = userSessionMapper.selectList();
         assertEquals(expectedTotal, userSessionDOS.size());
         assertPojoEquals(sessionDO, userSessionDOS.get(0), "updateTime");
+    }
+
+    @Test
+    public void testCreateUserSession_success() {
+        // 准备参数
+        String userIp = randomString();
+        String userAgent = randomString();
+        LoginUser loginUser = randomPojo(LoginUser.class, o -> {
+            o.setUserType(randomEle(UserTypeEnum.values()).getValue());
+            o.setTenantId(0L); // 租户设置为 0，因为暂未启用多租户组件
+        });
+        // mock 方法
+        when(securityProperties.getSessionTimeout()).thenReturn(Duration.ofDays(1));
+
+        // 调用
+        String sessionId = userSessionService.createUserSession(loginUser, userIp, userAgent);
+        // 校验 SysUserSessionDO 记录
+        SysUserSessionDO userSessionDO = userSessionMapper.selectById(sessionId);
+        assertPojoEquals(loginUser, userSessionDO, "id", "updateTime");
+        assertEquals(sessionId, userSessionDO.getId());
+        assertEquals(userIp, userSessionDO.getUserIp());
+        assertEquals(userAgent, userSessionDO.getUserAgent());
+        // 校验 LoginUser 缓存
+        LoginUser redisLoginUser = loginUserRedisDAO.get(sessionId);
+        assertPojoEquals(loginUser, redisLoginUser, "username", "password");
+    }
+
+    @Test
+    public void testCreateRefreshUserSession_success() {
+        // 准备参数
+        String sessionId = randomString();
+        String userIp = randomString();
+        String userAgent = randomString();
+        long timeLong = randomLongId();
+        String userName = randomString();
+        Date date = randomDate();
+        LoginUser loginUser = randomPojo(LoginUser.class, o -> o.setUserType(randomEle(UserTypeEnum.values()).getValue()));
+        // mock 方法
+        when(securityProperties.getSessionTimeout()).thenReturn(Duration.ofDays(1));
+        // mock 数据
+        loginUser.setUpdateTime(date);
+        loginUserRedisDAO.set(sessionId, loginUser);
+        SysUserSessionDO userSession = SysUserSessionDO.builder().id(sessionId)
+                .userId(loginUser.getId()).userType(loginUser.getUserType())
+                .userIp(userIp).userAgent(userAgent).username(userName)
+                .sessionTimeout(addTime(Duration.ofMillis(timeLong)))
+                .build();
+        userSessionMapper.insert(userSession);
+
+        // 调用
+        userSessionService.refreshUserSession(sessionId, loginUser);
+        // 校验 LoginUser 缓存
+        LoginUser redisLoginUser = loginUserRedisDAO.get(sessionId);
+        assertNotEquals(redisLoginUser.getUpdateTime(), date);
+        // 校验 SysUserSessionDO 记录
+        SysUserSessionDO updateDO = userSessionMapper.selectById(sessionId);
+        assertEquals(updateDO.getUsername(), loginUser.getUsername());
+        assertNotEquals(updateDO.getUpdateTime(), userSession.getUpdateTime());
+        assertNotEquals(updateDO.getSessionTimeout(), addTime(Duration.ofMillis(timeLong)));
+    }
+
+    @Test
+    public void testDeleteUserSession_success() {
+        // 准备参数
+        String sessionId = randomString();
+        String userIp = randomString();
+        String userAgent = randomString();
+        Long timeLong = randomLongId();
+        LoginUser loginUser = randomPojo(LoginUser.class, o -> o.setUserType(randomEle(UserTypeEnum.values()).getValue()));
+        // mock 存入 Redis
+        when(securityProperties.getSessionTimeout()).thenReturn(Duration.ofDays(1));
+        // mock 数据
+        loginUserRedisDAO.set(sessionId, loginUser);
+        SysUserSessionDO userSession = SysUserSessionDO.builder().id(sessionId)
+                .userId(loginUser.getId()).userType(loginUser.getUserType())
+                .userIp(userIp).userAgent(userAgent).username(loginUser.getUsername())
+                .sessionTimeout(addTime(Duration.ofMillis(timeLong)))
+                .build();
+        userSessionMapper.insert(userSession);
+
+        // 调用
+        userSessionService.deleteUserSession(sessionId);
+        // 校验数据不存在了
+        assertNull(loginUserRedisDAO.get(sessionId));
+        assertNull(userSessionMapper.selectById(sessionId));
     }
 
 }

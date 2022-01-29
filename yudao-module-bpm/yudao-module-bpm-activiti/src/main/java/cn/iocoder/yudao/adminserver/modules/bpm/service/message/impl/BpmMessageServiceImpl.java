@@ -5,7 +5,7 @@ import cn.iocoder.yudao.adminserver.modules.bpm.service.message.BpmMessageServic
 import cn.iocoder.yudao.adminserver.modules.bpm.service.message.dto.BpmMessageSendWhenProcessInstanceApproveReqDTO;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.message.dto.BpmMessageSendWhenProcessInstanceRejectReqDTO;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.message.dto.BpmMessageSendWhenTaskCreatedReqDTO;
-import cn.iocoder.yudao.coreservice.modules.system.service.sms.SysSmsCoreService;
+import cn.iocoder.yudao.module.system.service.sms.SysSmsCoreService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;

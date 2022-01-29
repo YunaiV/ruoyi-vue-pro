@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.adminserver.modules.pay.controller.order.vo.order;
 
-import cn.iocoder.yudao.coreservice.modules.system.enums.SysDictTypeConstants;
+import cn.iocoder.yudao.module.system.enums.DictTypeConstants;
 import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
 import cn.iocoder.yudao.framework.excel.core.convert.DictConvert;
 import com.alibaba.excel.annotation.ExcelProperty;
@@ -46,11 +46,11 @@ public class PayOrderExcelVO {
     @ExcelProperty("渠道手续费，单位：百分比")
     private String channelFeeRate;
 
-    @DictFormat(SysDictTypeConstants.PAY_ORDER_STATUS)
+    @DictFormat(DictTypeConstants.PAY_ORDER_STATUS)
     @ExcelProperty(value = "支付状态", converter = DictConvert.class)
     private Integer status;
 
-    @DictFormat(SysDictTypeConstants.PAY_ORDER_NOTIFY_STATUS)
+    @DictFormat(DictTypeConstants.PAY_ORDER_NOTIFY_STATUS)
     @ExcelProperty(value = "通知商户支付结果的回调状态", converter = DictConvert.class)
     private Integer notifyStatus;
 
@@ -75,7 +75,7 @@ public class PayOrderExcelVO {
     @ExcelProperty("用户 IP")
     private String userIp;
 
-    @DictFormat(SysDictTypeConstants.PAY_ORDER_REFUND_STATUS)
+    @DictFormat(DictTypeConstants.PAY_ORDER_REFUND_STATUS)
     @ExcelProperty(value = "退款状态", converter = DictConvert.class)
     private Integer refundStatus;
 

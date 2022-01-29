@@ -3,8 +3,8 @@ package cn.iocoder.yudao.module.system.controller.admin.sms;
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.template.*;
 import cn.iocoder.yudao.module.system.convert.sms.SmsTemplateConvert;
 import cn.iocoder.yudao.module.system.service.sms.SmsTemplateService;
-import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.sms.SysSmsTemplateDO;
-import cn.iocoder.yudao.coreservice.modules.system.service.sms.SysSmsCoreService;
+import cn.iocoder.yudao.module.system.dal.dataobject.sms.SysSmsTemplateDO;
+import cn.iocoder.yudao.module.system.service.sms.SysSmsSendService;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
@@ -32,7 +32,7 @@ public class SmsTemplateController {
     @Resource
     private SmsTemplateService smsTemplateService;
     @Resource
-    private SysSmsCoreService smsCoreService;
+    private SysSmsSendService smsCoreService;
 
     @PostMapping("/create")
     @ApiOperation("创建短信模板")

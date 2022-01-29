@@ -1,10 +1,12 @@
 package cn.iocoder.yudao.module.system.service.user;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.system.controller.admin.user.vo.profile.UserProfileUpdatePasswordReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.user.vo.profile.UserProfileUpdateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.user.vo.user.*;
-import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.user.SysUserDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.system.dal.dataobject.user.UserDO;
 
 import java.io.InputStream;
 import java.util.*;
@@ -92,7 +94,7 @@ public interface UserService {
      * @param username 用户名
      * @return 用户对象信息
      */
-    SysUserDO getUserByUsername(String username);
+    UserDO getUserByUsername(String username);
 
     /**
      * 获得用户分页列表
@@ -100,15 +102,61 @@ public interface UserService {
      * @param reqVO 分页条件
      * @return 分页列表
      */
-    PageResult<SysUserDO> getUserPage(UserPageReqVO reqVO);
+    PageResult<UserDO> getUserPage(UserPageReqVO reqVO);
 
     /**
-     * 获得用户
+     * 通过用户 ID 查询用户
      *
-     * @param id 用户编号
-     * @return 用户
+     * @param id 用户ID
+     * @return 用户对象信息
      */
-    SysUserDO getUser(Long id);
+    UserDO getUser(Long id);
+
+    /**
+     * 获得指定部门的用户数组
+     *
+     * @param deptIds 部门数组
+     * @return 用户数组
+     */
+    List<UserDO> getUsersByDeptIds(Collection<Long> deptIds);
+
+    /**
+     * 获得指定岗位的用户数组
+     *
+     * @param postIds 岗位数组
+     * @return 用户数组
+     */
+    List<UserDO> getUsersByPostIds(Collection<Long> postIds);
+
+    /**
+     * 获得用户列表
+     *
+     * @param ids 用户编号数组
+     * @return 用户列表
+     */
+    List<UserDO> getUsers(Collection<Long> ids);
+
+    /**
+     * 校验用户们是否有效。如下情况，视为无效：
+     * 1. 用户编号不存在
+     * 2. 用户被禁用
+     *
+     * @param ids 用户编号数组
+     */
+    void validUsers(Set<Long> ids);
+
+    /**
+     * 获得用户 Map
+     *
+     * @param ids 用户编号数组
+     * @return 用户 Map
+     */
+    default Map<Long, UserDO> getUserMap(Collection<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return new HashMap<>();
+        }
+        return CollectionUtils.convertMap(getUsers(ids), UserDO::getId);
+    }
 
     /**
      * 获得用户列表
@@ -116,9 +164,7 @@ public interface UserService {
      * @param reqVO 列表请求
      * @return 用户列表
      */
-    List<SysUserDO> getUsers(UserExportReqVO reqVO);
-
-
+    List<UserDO> getUsers(UserExportReqVO reqVO);
 
     /**
      * 获得用户列表，基于昵称模糊匹配
@@ -126,7 +172,7 @@ public interface UserService {
      * @param nickname 昵称
      * @return 用户列表
      */
-    List<SysUserDO> getUsersByNickname(String nickname);
+    List<UserDO> getUsersByNickname(String nickname);
 
     /**
      * 获得用户列表，基于用户账号模糊匹配
@@ -134,7 +180,7 @@ public interface UserService {
      * @param username 用户账号
      * @return 用户列表
      */
-    List<SysUserDO> getUsersByUsername(String username);
+    List<UserDO> getUsersByUsername(String username);
 
     /**
      * 批量导入用户
@@ -151,6 +197,6 @@ public interface UserService {
      * @param status 状态
      * @return 用户们
      */
-    List<SysUserDO> getUsersByStatus(Integer status);
+    List<UserDO> getUsersByStatus(Integer status);
 
 }

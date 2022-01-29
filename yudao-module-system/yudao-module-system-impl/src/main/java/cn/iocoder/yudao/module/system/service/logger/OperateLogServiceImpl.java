@@ -8,7 +8,7 @@ import cn.iocoder.yudao.module.system.convert.logger.OperateLogConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.logger.OperateLogDO;
 import cn.iocoder.yudao.module.system.dal.mysql.logger.OperateLogMapper;
 import cn.iocoder.yudao.module.system.service.user.UserService;
-import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.user.SysUserDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.user.UserDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.string.StrUtils;
 import cn.iocoder.yudao.framework.operatelog.core.dto.OperateLogCreateReqDTO;
@@ -58,7 +58,7 @@ public class OperateLogServiceImpl implements OperateLogService {
         // 处理基于用户昵称的查询
         Collection<Long> userIds = null;
         if (StrUtil.isNotEmpty(reqVO.getUserNickname())) {
-            userIds = convertSet(userService.getUsersByNickname(reqVO.getUserNickname()), SysUserDO::getId);
+            userIds = convertSet(userService.getUsersByNickname(reqVO.getUserNickname()), UserDO::getId);
             if (CollUtil.isEmpty(userIds)) {
                 return PageResult.empty();
             }
@@ -72,7 +72,7 @@ public class OperateLogServiceImpl implements OperateLogService {
         // 处理基于用户昵称的查询
         Collection<Long> userIds = null;
         if (StrUtil.isNotEmpty(reqVO.getUserNickname())) {
-            userIds = convertSet(userService.getUsersByNickname(reqVO.getUserNickname()), SysUserDO::getId);
+            userIds = convertSet(userService.getUsersByNickname(reqVO.getUserNickname()), UserDO::getId);
             if (CollUtil.isEmpty(userIds)) {
                 return Collections.emptyList();
             }

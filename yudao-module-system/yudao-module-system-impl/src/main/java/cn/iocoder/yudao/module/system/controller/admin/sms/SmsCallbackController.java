@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.system.controller.admin.sms;
 
 import cn.hutool.core.util.URLUtil;
 import cn.hutool.extra.servlet.ServletUtil;
-import cn.iocoder.yudao.coreservice.modules.system.service.sms.SysSmsCoreService;
+import cn.iocoder.yudao.module.system.service.sms.SysSmsSendService;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.framework.sms.core.enums.SmsChannelEnum;
@@ -25,7 +25,7 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 public class SmsCallbackController {
 
     @Resource
-    private SysSmsCoreService smsCoreService;
+    private SysSmsSendService smsCoreService;
 
     @PostMapping("/sms/yunpian")
     @ApiOperation(value = "云片短信的回调", notes = "参见 https://www.yunpian.com/official/document/sms/zh_cn/domestic_push_report 文档")

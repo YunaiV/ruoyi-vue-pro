@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.member.service.sms;
 
 import cn.hutool.core.map.MapUtil;
-import cn.iocoder.yudao.coreservice.modules.system.service.sms.SysSmsCoreService;
+import cn.iocoder.yudao.module.system.service.sms.SysSmsCoreService;
 import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.module.member.dal.dataobject.sms.SysSmsCodeDO;
 import cn.iocoder.yudao.module.member.dal.dataobject.user.UserDO;

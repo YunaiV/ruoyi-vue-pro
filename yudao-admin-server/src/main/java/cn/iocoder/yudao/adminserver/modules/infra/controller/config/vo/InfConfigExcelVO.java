@@ -2,7 +2,7 @@ package cn.iocoder.yudao.adminserver.modules.infra.controller.config.vo;
 
 import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
 import cn.iocoder.yudao.framework.excel.core.convert.DictConvert;
-import cn.iocoder.yudao.coreservice.modules.system.enums.SysDictTypeConstants;
+import cn.iocoder.yudao.module.system.enums.DictTypeConstants;
 import com.alibaba.excel.annotation.ExcelProperty;
 import lombok.Data;
 
@@ -30,11 +30,11 @@ public class InfConfigExcelVO {
     private String value;
 
     @ExcelProperty(value = "参数类型", converter = DictConvert.class)
-    @DictFormat(SysDictTypeConstants.CONFIG_TYPE)
+    @DictFormat(DictTypeConstants.CONFIG_TYPE)
     private Integer type;
 
     @ExcelProperty(value = "是否敏感", converter = DictConvert.class)
-    @DictFormat(SysDictTypeConstants.BOOLEAN_STRING)
+    @DictFormat(DictTypeConstants.BOOLEAN_STRING)
     private Boolean sensitive;
 
     @ExcelProperty("备注")

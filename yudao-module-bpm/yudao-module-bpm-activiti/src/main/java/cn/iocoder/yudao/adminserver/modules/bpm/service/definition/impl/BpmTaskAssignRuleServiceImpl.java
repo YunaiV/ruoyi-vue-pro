@@ -14,12 +14,12 @@ import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmModelServi
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmProcessDefinitionService;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmTaskAssignRuleService;
 import cn.iocoder.yudao.coreservice.modules.bpm.api.group.BpmUserGroupServiceApi;
-import cn.iocoder.yudao.coreservice.modules.system.enums.SysDictTypeConstants;
-import cn.iocoder.yudao.coreservice.modules.system.service.dept.SysDeptCoreService;
-import cn.iocoder.yudao.coreservice.modules.system.service.dept.SysPostCoreService;
-import cn.iocoder.yudao.coreservice.modules.system.service.dict.SysDictDataCoreService;
-import cn.iocoder.yudao.coreservice.modules.system.service.permission.SysRoleCoreService;
-import cn.iocoder.yudao.coreservice.modules.system.service.user.SysUserCoreService;
+import cn.iocoder.yudao.module.system.enums.SysDictTypeConstants;
+import cn.iocoder.yudao.module.system.service.dept.SysDeptCoreService;
+import cn.iocoder.yudao.module.system.service.dept.SysPostCoreService;
+import cn.iocoder.yudao.module.system.service.dict.DictDataCoreService;
+import cn.iocoder.yudao.module.system.service.permission.SysRoleCoreService;
+import cn.iocoder.yudao.module.system.service.user.SysUserCoreService;
 import cn.iocoder.yudao.framework.activiti.core.util.ActivitiUtils;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
@@ -64,7 +64,7 @@ public class BpmTaskAssignRuleServiceImpl implements BpmTaskAssignRuleService {
     @Resource
     private BpmUserGroupServiceApi userGroupServiceApi;
     @Resource
-    private SysDictDataCoreService dictDataCoreService;
+    private DictDataCoreService dictDataCoreService;
 
     @Override
     public List<BpmTaskAssignRuleDO> getTaskAssignRuleListByProcessDefinitionId(String processDefinitionId,

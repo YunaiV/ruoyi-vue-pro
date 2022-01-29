@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.system.convert.sms;
 
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.log.SmsLogExcelVO;
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.log.SysSmsLogRespVO;
-import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.sms.SysSmsLogDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.sms.SysSmsLogDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;

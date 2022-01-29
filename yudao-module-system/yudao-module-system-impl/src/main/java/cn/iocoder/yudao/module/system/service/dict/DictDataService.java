@@ -1,12 +1,14 @@
 package cn.iocoder.yudao.module.system.service.dict;
 
-import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.dict.SysDictDataDO;
+import cn.iocoder.yudao.framework.dict.core.service.DictDataFrameworkService;
+import cn.iocoder.yudao.module.system.dal.dataobject.dict.SysDictDataDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.system.controller.admin.dict.vo.data.DictDataCreateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.dict.vo.data.DictDataExportReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.dict.vo.data.DictDataPageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.dict.vo.data.DictDataUpdateReqVO;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -14,7 +16,12 @@ import java.util.List;
  *
  * @author ruoyi
  */
-public interface DictDataService {
+public interface DictDataService extends DictDataFrameworkService {
+
+    /**
+     * 初始化字典数据的本地缓存
+     */
+    void initLocalCache();
 
     /**
      * 创建字典数据
@@ -76,5 +83,15 @@ public interface DictDataService {
      * @return 数据数量
      */
     int countByDictType(String dictType);
+
+    /**
+     * 校验字典数据们是否有效。如下情况，视为无效：
+     * 1. 字典数据不存在
+     * 2. 字典数据被禁用
+     *
+     * @param dictType 字典类型
+     * @param values 字典数据值的数组
+     */
+    void validDictDatas(String dictType, Collection<String> values);
 
 }

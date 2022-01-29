@@ -2,8 +2,9 @@ package cn.iocoder.yudao.module.system.service.logger;
 
 import cn.iocoder.yudao.module.system.controller.admin.logger.vo.loginlog.LoginLogExportReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.logger.vo.loginlog.LoginLogPageReqVO;
-import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.logger.SysLoginLogDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.logger.SysLoginLogDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.system.service.logger.dto.LoginLogCreateReqDTO;
 
 import java.util.List;
 
@@ -27,5 +28,12 @@ public interface LoginLogService {
      * @return 登录日志列表
      */
     List<SysLoginLogDO> getLoginLogList(LoginLogExportReqVO reqVO);
+
+    /**
+     * 创建登录日志
+     *
+     * @param reqDTO 日志信息
+     */
+    void createLoginLog(LoginLogCreateReqDTO reqDTO);
 
 }

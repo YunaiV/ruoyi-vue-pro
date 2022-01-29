@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.system.service.dept;
 
-import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.dept.SysPostDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.dept.SysPostDO;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.ArrayUtils;

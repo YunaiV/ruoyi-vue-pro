@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.system.dal.mysql.sms;
 
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.channel.SmsChannelPageReqVO;
-import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.sms.SysSmsChannelDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.sms.SysSmsChannelDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.QueryWrapperX;

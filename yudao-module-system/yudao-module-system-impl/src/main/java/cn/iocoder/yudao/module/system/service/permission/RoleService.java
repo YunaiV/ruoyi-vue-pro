@@ -5,7 +5,7 @@ import cn.iocoder.yudao.module.system.controller.admin.permission.vo.role.RoleCr
 import cn.iocoder.yudao.module.system.controller.admin.permission.vo.role.RoleExportReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.permission.vo.role.RolePageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.permission.vo.role.RoleUpdateReqVO;
-import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.permission.SysRoleDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.permission.SysRoleDO;
 import org.springframework.lang.Nullable;
 
 import java.util.Collection;

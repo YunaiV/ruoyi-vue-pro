@@ -8,7 +8,7 @@ import cn.iocoder.yudao.module.system.controller.admin.dept.vo.post.PostPageReqV
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.post.PostUpdateReqVO;
 import cn.iocoder.yudao.module.system.convert.dept.PostConvert;
 import cn.iocoder.yudao.module.system.dal.mysql.dept.SysPostMapper;
-import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.dept.SysPostDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.dept.SysPostDO;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 

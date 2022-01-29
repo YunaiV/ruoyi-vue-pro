@@ -2,9 +2,12 @@ package cn.iocoder.yudao.module.system.service.logger;
 
 import cn.iocoder.yudao.module.system.controller.admin.logger.vo.loginlog.LoginLogExportReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.logger.vo.loginlog.LoginLogPageReqVO;
+import cn.iocoder.yudao.module.system.convert.logger.SysLoginLogCoreConvert;
 import cn.iocoder.yudao.module.system.dal.mysql.logger.LoginLogMapper;
-import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.logger.SysLoginLogDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.logger.SysLoginLogDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.system.dal.mysql.logger.SysLoginLogCoreMapper;
+import cn.iocoder.yudao.module.system.service.logger.dto.LoginLogCreateReqDTO;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -27,6 +30,13 @@ public class LoginLogServiceImpl implements LoginLogService {
     @Override
     public List<SysLoginLogDO> getLoginLogList(LoginLogExportReqVO reqVO) {
         return loginLogMapper.selectList(reqVO);
+    }
+
+    @Override
+    public void createLoginLog(LoginLogCreateReqDTO reqDTO) {
+        SysLoginLogDO loginLog = SysLoginLogCoreConvert.INSTANCE.convert(reqDTO);
+        // 插入
+        loginLogMapper.insert(loginLog);
     }
 
 }

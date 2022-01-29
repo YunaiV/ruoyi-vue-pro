@@ -1,9 +1,9 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.framework.activiti.core.behavior.script.impl;
 
-import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.dept.SysDeptDO;
-import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.user.SysUserDO;
-import cn.iocoder.yudao.coreservice.modules.system.service.dept.SysDeptCoreService;
-import cn.iocoder.yudao.coreservice.modules.system.service.user.SysUserCoreService;
+import cn.iocoder.yudao.module.system.dal.dataobject.dept.SysDeptDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.user.SysUserDO;
+import cn.iocoder.yudao.module.system.service.dept.SysDeptCoreService;
+import cn.iocoder.yudao.module.system.service.user.SysUserCoreService;
 import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntityImpl;
 import org.activiti.engine.impl.persistence.entity.TaskEntity;

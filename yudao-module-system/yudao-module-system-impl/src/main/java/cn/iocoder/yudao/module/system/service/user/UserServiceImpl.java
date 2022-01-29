@@ -4,23 +4,23 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.module.system.controller.admin.user.vo.profile.UserProfileUpdatePasswordReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.user.vo.profile.UserProfileUpdateReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.user.vo.user.*;
-import cn.iocoder.yudao.module.system.convert.user.UserConvert;
-import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.dept.SysDeptDO;
-import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.dept.SysPostDO;
-import cn.iocoder.yudao.module.system.dal.mysql.user.SysUserMapper;
-import cn.iocoder.yudao.module.system.service.dept.DeptService;
-import cn.iocoder.yudao.module.system.service.dept.PostService;
-import cn.iocoder.yudao.module.system.service.permission.PermissionService;
 import cn.iocoder.yudao.coreservice.modules.infra.service.file.InfFileCoreService;
-import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.user.SysUserDO;
-import cn.iocoder.yudao.coreservice.modules.system.service.dept.SysDeptCoreService;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.module.system.controller.admin.user.vo.profile.UserProfileUpdatePasswordReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.user.vo.profile.UserProfileUpdateReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.user.vo.user.*;
+import cn.iocoder.yudao.module.system.convert.user.UserConvert;
+import cn.iocoder.yudao.module.system.dal.dataobject.dept.SysDeptDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.dept.SysPostDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.user.UserDO;
+import cn.iocoder.yudao.module.system.dal.mysql.user.UserMapper;
+import cn.iocoder.yudao.module.system.service.dept.DeptService;
+import cn.iocoder.yudao.module.system.service.dept.PostService;
+import cn.iocoder.yudao.module.system.service.dept.SysDeptCoreService;
+import cn.iocoder.yudao.module.system.service.permission.PermissionService;
 import com.google.common.annotations.VisibleForTesting;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,8 +32,10 @@ import javax.annotation.Resource;
 import java.io.InputStream;
 import java.util.*;
 
-import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.system.enums.SysErrorCodeConstants.USER_IS_DISABLE;
+import static cn.iocoder.yudao.module.system.enums.SysErrorCodeConstants.USER_NOT_EXISTS;
 
 /**
  * 管理员用户 Service 实现类
@@ -48,7 +50,7 @@ public class UserServiceImpl implements UserService {
     private String userInitPassword;
 
     @Resource(name = "sysUserMapper") // userMapper 存在重名
-    private SysUserMapper userMapper;
+    private UserMapper userMapper;
 
     @Resource
     private DeptService deptService;
@@ -70,7 +72,7 @@ public class UserServiceImpl implements UserService {
         this.checkCreateOrUpdate(null, reqVO.getUsername(), reqVO.getMobile(), reqVO.getEmail(),
             reqVO.getDeptId(), reqVO.getPostIds());
         // 插入用户
-        SysUserDO user = UserConvert.INSTANCE.convert(reqVO);
+        UserDO user = UserConvert.INSTANCE.convert(reqVO);
         user.setStatus(CommonStatusEnum.ENABLE.getStatus()); // 默认开启
         user.setPassword(passwordEncoder.encode(reqVO.getPassword())); // 加密密码
         userMapper.insert(user);
@@ -83,13 +85,13 @@ public class UserServiceImpl implements UserService {
         this.checkCreateOrUpdate(reqVO.getId(), reqVO.getUsername(), reqVO.getMobile(), reqVO.getEmail(),
             reqVO.getDeptId(), reqVO.getPostIds());
         // 更新用户
-        SysUserDO updateObj = UserConvert.INSTANCE.convert(reqVO);
+        UserDO updateObj = UserConvert.INSTANCE.convert(reqVO);
         userMapper.updateById(updateObj);
     }
 
     @Override
     public void updateUserLogin(Long id, String loginIp) {
-        userMapper.updateById(new SysUserDO().setId(id).setLoginIp(loginIp).setLoginDate(new Date()));
+        userMapper.updateById(new UserDO().setId(id).setLoginIp(loginIp).setLoginDate(new Date()));
     }
 
     @Override
@@ -107,7 +109,7 @@ public class UserServiceImpl implements UserService {
         // 校验旧密码密码
         this.checkOldPassword(id, reqVO.getOldPassword());
         // 执行更新
-        SysUserDO updateObj = new SysUserDO().setId(id);
+        UserDO updateObj = new UserDO().setId(id);
         updateObj.setPassword(passwordEncoder.encode(reqVO.getNewPassword())); // 加密密码
         userMapper.updateById(updateObj);
     }
@@ -118,7 +120,7 @@ public class UserServiceImpl implements UserService {
         // 存储文件
         String avatar = fileService.createFile(IdUtil.fastUUID(), IoUtil.readBytes(avatarFile));
         // 更新路径
-        SysUserDO sysUserDO = new SysUserDO();
+        UserDO sysUserDO = new UserDO();
         sysUserDO.setId(id);
         sysUserDO.setAvatar(avatar);
         userMapper.updateById(sysUserDO);
@@ -130,7 +132,7 @@ public class UserServiceImpl implements UserService {
         // 校验用户存在
         this.checkUserExists(id);
         // 更新密码
-        SysUserDO updateObj = new SysUserDO();
+        UserDO updateObj = new UserDO();
         updateObj.setId(id);
         updateObj.setPassword(passwordEncoder.encode(password)); // 加密密码
         userMapper.updateById(updateObj);
@@ -141,7 +143,7 @@ public class UserServiceImpl implements UserService {
         // 校验用户存在
         this.checkUserExists(id);
         // 更新状态
-        SysUserDO updateObj = new SysUserDO();
+        UserDO updateObj = new UserDO();
         updateObj.setId(id);
         updateObj.setStatus(status);
         userMapper.updateById(updateObj);
@@ -158,33 +160,80 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public SysUserDO getUserByUsername(String username) {
+    public UserDO getUserByUsername(String username) {
         return userMapper.selectByUsername(username);
     }
 
     @Override
-    public PageResult<SysUserDO> getUserPage(UserPageReqVO reqVO) {
+    public PageResult<UserDO> getUserPage(UserPageReqVO reqVO) {
         return userMapper.selectPage(reqVO, this.getDeptCondition(reqVO.getDeptId()));
     }
 
     @Override
-    public SysUserDO getUser(Long id) {
+    public UserDO getUser(Long id) {
         return userMapper.selectById(id);
     }
 
     @Override
-    public List<SysUserDO> getUsers(UserExportReqVO reqVO) {
+    public List<UserDO> getUsersByDeptIds(Collection<Long> deptIds) {
+        if (CollUtil.isEmpty(deptIds)) {
+            return Collections.emptyList();
+        }
+        return userMapper.selectListByDeptIds(deptIds);
+    }
+
+    @Override
+    public List<UserDO> getUsersByPostIds(Collection<Long> postIds) {
+        if (CollUtil.isEmpty(postIds)) {
+            return Collections.emptyList();
+        }
+        // 过滤不符合条件的
+        // TODO 芋艿：暂时只能内存过滤。解决方案：1、新建一个关联表；2、基于 where + 函数；3、json 字段，适合 mysql 8+ 版本
+        List<UserDO> users = userMapper.selectList();
+        users.removeIf(user -> !CollUtil.containsAny(user.getPostIds(), postIds));
+        return users;
+    }
+
+    @Override
+    public List<UserDO> getUsers(Collection<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return Collections.emptyList();
+        }
+        return userMapper.selectBatchIds(ids);
+    }
+
+    @Override
+    public void validUsers(Set<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return;
+        }
+        // 获得岗位信息
+        List<UserDO> users = userMapper.selectBatchIds(ids);
+        Map<Long, UserDO> userMap = CollectionUtils.convertMap(users, UserDO::getId);
+        // 校验
+        ids.forEach(id -> {
+            UserDO user = userMap.get(id);
+            if (user == null) {
+                throw exception(USER_NOT_EXISTS);
+            }
+            if (!CommonStatusEnum.ENABLE.getStatus().equals(user.getStatus())) {
+                throw exception(USER_IS_DISABLE, user.getNickname());
+            }
+        });
+    }
+
+    @Override
+    public List<UserDO> getUsers(UserExportReqVO reqVO) {
         return userMapper.selectList(reqVO, this.getDeptCondition(reqVO.getDeptId()));
     }
 
-
     @Override
-    public List<SysUserDO> getUsersByNickname(String nickname) {
+    public List<UserDO> getUsersByNickname(String nickname) {
         return userMapper.selectListByNickname(nickname);
     }
 
     @Override
-    public List<SysUserDO> getUsersByUsername(String username) {
+    public List<UserDO> getUsersByUsername(String username) {
         return userMapper.selectListByUsername(username);
     }
 
@@ -225,7 +274,7 @@ public class UserServiceImpl implements UserService {
         if (id == null) {
             return;
         }
-        SysUserDO user = userMapper.selectById(id);
+        UserDO user = userMapper.selectById(id);
         if (user == null) {
             throw exception(USER_NOT_EXISTS);
         }
@@ -236,7 +285,7 @@ public class UserServiceImpl implements UserService {
         if (StrUtil.isBlank(username)) {
             return;
         }
-        SysUserDO user = userMapper.selectByUsername(username);
+        UserDO user = userMapper.selectByUsername(username);
         if (user == null) {
             return;
         }
@@ -254,7 +303,7 @@ public class UserServiceImpl implements UserService {
         if (StrUtil.isBlank(email)) {
             return;
         }
-        SysUserDO user = userMapper.selectByEmail(email);
+        UserDO user = userMapper.selectByEmail(email);
         if (user == null) {
             return;
         }
@@ -272,7 +321,7 @@ public class UserServiceImpl implements UserService {
         if (StrUtil.isBlank(mobile)) {
             return;
         }
-        SysUserDO user = userMapper.selectByMobile(mobile);
+        UserDO user = userMapper.selectByMobile(mobile);
         if (user == null) {
             return;
         }
@@ -328,7 +377,7 @@ public class UserServiceImpl implements UserService {
      */
     @VisibleForTesting
     public void checkOldPassword(Long id, String oldPassword) {
-        SysUserDO user = userMapper.selectById(id);
+        UserDO user = userMapper.selectById(id);
         if (user == null) {
             throw exception(USER_NOT_EXISTS);
         }
@@ -355,7 +404,7 @@ public class UserServiceImpl implements UserService {
                 return;
             }
             // 判断如果不存在，在进行插入
-            SysUserDO existUser = userMapper.selectByUsername(importUser.getUsername());
+            UserDO existUser = userMapper.selectByUsername(importUser.getUsername());
             if (existUser == null) {
                 userMapper.insert(UserConvert.INSTANCE.convert(importUser)
                     .setPassword(passwordEncoder.encode(userInitPassword))); // 设置默认密码
@@ -367,7 +416,7 @@ public class UserServiceImpl implements UserService {
                 respVO.getFailureUsernames().put(importUser.getUsername(), USER_USERNAME_EXISTS.getMsg());
                 return;
             }
-            SysUserDO updateUser = UserConvert.INSTANCE.convert(importUser);
+            UserDO updateUser = UserConvert.INSTANCE.convert(importUser);
             updateUser.setId(existUser.getId());
             userMapper.updateById(updateUser);
             respVO.getUpdateUsernames().add(importUser.getUsername());
@@ -376,7 +425,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<SysUserDO> getUsersByStatus(Integer status) {
+    public List<UserDO> getUsersByStatus(Integer status) {
         return userMapper.selectListByStatus(status);
     }
 

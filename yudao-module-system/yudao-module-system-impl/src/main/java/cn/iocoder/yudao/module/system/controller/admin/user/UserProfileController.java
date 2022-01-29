@@ -9,20 +9,20 @@ import cn.iocoder.yudao.module.system.service.dept.PostService;
 import cn.iocoder.yudao.module.system.service.permission.PermissionService;
 import cn.iocoder.yudao.module.system.service.permission.RoleService;
 import cn.iocoder.yudao.module.system.service.user.UserService;
-import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.dept.SysDeptDO;
-import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.dept.SysPostDO;
-import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.permission.SysRoleDO;
-import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.social.SysSocialUserDO;
-import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.user.SysUserDO;
-import cn.iocoder.yudao.coreservice.modules.system.service.dept.SysDeptCoreService;
-import cn.iocoder.yudao.coreservice.modules.system.service.social.SysSocialCoreService;
-import cn.iocoder.yudao.coreservice.modules.system.service.user.SysUserCoreService;
+import cn.iocoder.yudao.module.system.dal.dataobject.dept.SysDeptDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.dept.SysPostDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.permission.SysRoleDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.social.SysSocialUserDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.user.UserDO;
+import cn.iocoder.yudao.module.system.service.dept.SysDeptCoreService;
+import cn.iocoder.yudao.module.system.service.social.SocialUserService;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -43,10 +43,9 @@ import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUti
 @Slf4j
 public class UserProfileController {
 
-    @Resource
+    @Autowired
+    @SuppressWarnings("SpringJavaAutowiredFieldsWarningInspection") // UserService 存在重名
     private UserService userService;
-    @Resource
-    private SysUserCoreService userCoreService;
     @Resource
     private SysDeptCoreService deptCoreService;
 
@@ -57,13 +56,13 @@ public class UserProfileController {
     @Resource
     private RoleService roleService;
     @Resource
-    private SysSocialCoreService socialService;
+    private SocialUserService socialService;
 
     @GetMapping("/get")
     @ApiOperation("获得登录用户信息")
     public CommonResult<UserProfileRespVO> profile() {
         // 获得用户基本信息
-        SysUserDO user = userCoreService.getUser(getLoginUserId());
+        UserDO user = userService.getUser(getLoginUserId());
         UserProfileRespVO resp = UserConvert.INSTANCE.convert03(user);
         // 获得用户角色
         List<SysRoleDO> userRoles = roleService.getRolesFromCache(permissionService.getUserRoleIdListByUserId(user.getId()));

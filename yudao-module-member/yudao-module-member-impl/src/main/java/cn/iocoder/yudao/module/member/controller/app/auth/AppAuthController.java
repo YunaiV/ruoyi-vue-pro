@@ -1,11 +1,9 @@
 package cn.iocoder.yudao.module.member.controller.app.auth;
 
-import cn.iocoder.yudao.coreservice.modules.system.service.social.SysSocialCoreService;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
-import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.member.controller.app.auth.vo.*;
 import cn.iocoder.yudao.module.member.service.auth.AuthService;
 import cn.iocoder.yudao.module.member.service.sms.SysSmsCodeService;
@@ -15,7 +13,6 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 

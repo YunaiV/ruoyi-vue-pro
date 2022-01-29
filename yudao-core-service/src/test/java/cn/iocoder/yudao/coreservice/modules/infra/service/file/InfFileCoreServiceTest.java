@@ -12,8 +12,7 @@ import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
 
-import static cn.iocoder.yudao.coreservice.modules.system.enums.SysErrorCodeConstants.FILE_NOT_EXISTS;
-import static cn.iocoder.yudao.coreservice.modules.system.enums.SysErrorCodeConstants.FILE_PATH_EXISTS;
+import static cn.iocoder.yudao.coreservice.modules.infra.enums.SysErrorCodeConstants.*;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomString;

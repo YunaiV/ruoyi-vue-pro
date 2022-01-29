@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.system.service.dict;
 
-import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.dict.SysDictDataDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.dict.SysDictDataDO;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.system.controller.admin.dict.vo.data.DictDataCreateReqVO;
@@ -13,14 +13,17 @@ import cn.iocoder.yudao.module.system.mq.producer.dict.DictDataProducer;
 import cn.iocoder.yudao.framework.common.util.collection.ArrayUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.module.system.test.BaseDbUnitTest;
+import com.google.common.collect.ImmutableTable;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.List;
 import java.util.function.Consumer;
 
+import static cn.hutool.core.bean.BeanUtil.getFieldValue;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
@@ -41,6 +44,37 @@ public class DictDataServiceTest extends BaseDbUnitTest {
     private DictTypeService dictTypeService;
     @MockBean
     private DictDataProducer dictDataProducer;
+
+    /**
+     * 测试加载到新的字典数据的情况
+     */
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testInitLocalCache() {
+        // mock 数据
+        SysDictDataDO dictData01 = randomDictDataDO();
+        dictDataMapper.insert(dictData01);
+        SysDictDataDO dictData02 = randomDictDataDO();
+        dictDataMapper.insert(dictData02);
+
+        // 调用
+        dictDataService.initLocalCache();
+        // 断言 labelDictDataCache 缓存
+        ImmutableTable<String, String, SysDictDataDO> labelDictDataCache =
+                (ImmutableTable<String, String, SysDictDataDO>) getFieldValue(dictDataService, "labelDictDataCache");
+        assertEquals(2, labelDictDataCache.size());
+        assertPojoEquals(dictData01, labelDictDataCache.get(dictData01.getDictType(), dictData01.getLabel()));
+        assertPojoEquals(dictData02, labelDictDataCache.get(dictData02.getDictType(), dictData02.getLabel()));
+        // 断言 valueDictDataCache 缓存
+        ImmutableTable<String, String, SysDictDataDO> valueDictDataCache =
+                (ImmutableTable<String, String, SysDictDataDO>) getFieldValue(dictDataService, "valueDictDataCache");
+        assertEquals(2, valueDictDataCache.size());
+        assertPojoEquals(dictData01, valueDictDataCache.get(dictData01.getDictType(), dictData01.getValue()));
+        assertPojoEquals(dictData02, valueDictDataCache.get(dictData02.getDictType(), dictData02.getValue()));
+        // 断言 maxUpdateTime 缓存
+        Date maxUpdateTime = (Date) getFieldValue(dictDataService, "maxUpdateTime");
+        assertEquals(ObjectUtils.max(dictData01.getUpdateTime(), dictData02.getUpdateTime()), maxUpdateTime);
+    }
 
     @Test
     public void testGetDictDataPage() {

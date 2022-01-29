@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.system.controller.admin.dict;
 
-import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.dict.SysDictDataDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.dict.SysDictDataDO;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;

@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.system.controller.admin.user.vo.user;
 
 import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
 import cn.iocoder.yudao.framework.excel.core.convert.DictConvert;
-import cn.iocoder.yudao.coreservice.modules.system.enums.SysDictTypeConstants;
+import cn.iocoder.yudao.module.system.enums.DictTypeConstants;
 import com.alibaba.excel.annotation.ExcelProperty;
 import lombok.Data;
 
@@ -30,11 +30,11 @@ public class UserExcelVO {
     private String mobile;
 
     @ExcelProperty(value = "用户性别", converter = DictConvert.class)
-    @DictFormat(SysDictTypeConstants.USER_SEX)
+    @DictFormat(DictTypeConstants.USER_SEX)
     private Integer sex;
 
     @ExcelProperty(value = "帐号状态", converter = DictConvert.class)
-    @DictFormat(SysDictTypeConstants.COMMON_STATUS)
+    @DictFormat(DictTypeConstants.COMMON_STATUS)
     private Integer status;
 
     @ExcelProperty("最后登录IP")

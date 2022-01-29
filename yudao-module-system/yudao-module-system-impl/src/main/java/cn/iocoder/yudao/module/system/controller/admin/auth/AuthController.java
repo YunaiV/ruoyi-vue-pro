@@ -3,19 +3,19 @@ package cn.iocoder.yudao.module.system.controller.admin.auth;
 import cn.iocoder.yudao.module.system.controller.admin.auth.vo.auth.*;
 import cn.iocoder.yudao.module.system.convert.auth.AuthConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.MenuDO;
-import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.permission.SysRoleDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.permission.SysRoleDO;
 import cn.iocoder.yudao.module.system.enums.permission.MenuTypeEnum;
 import cn.iocoder.yudao.module.system.service.auth.AuthService;
 import cn.iocoder.yudao.module.system.service.permission.PermissionService;
 import cn.iocoder.yudao.module.system.service.permission.RoleService;
-import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.user.SysUserDO;
-import cn.iocoder.yudao.coreservice.modules.system.service.social.SysSocialCoreService;
-import cn.iocoder.yudao.coreservice.modules.system.service.user.SysUserCoreService;
+import cn.iocoder.yudao.module.system.dal.dataobject.user.UserDO;
+import cn.iocoder.yudao.module.system.service.social.SocialUserService;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.collection.SetUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
+import cn.iocoder.yudao.module.system.service.user.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -45,14 +45,15 @@ public class AuthController {
     @Autowired
     @SuppressWarnings("SpringJavaAutowiredFieldsWarningInspection") // AuthService 存在重名
     private AuthService authService;
-    @Resource
-    private SysUserCoreService userCoreService;
+    @Autowired
+    @SuppressWarnings("SpringJavaAutowiredFieldsWarningInspection") // UserService 存在重名
+    private UserService userService;
     @Resource
     private RoleService roleService;
     @Resource
     private PermissionService permissionService;
     @Resource
-    private SysSocialCoreService socialCoreService;
+    private SocialUserService socialCoreService;
 
     @PostMapping("/login")
     @ApiOperation("使用账号密码登录")
@@ -67,7 +68,7 @@ public class AuthController {
     @ApiOperation("获取登录用户的权限信息")
     public CommonResult<AuthPermissionInfoRespVO> getPermissionInfo() {
         // 获得用户信息
-        SysUserDO user = userCoreService.getUser(getLoginUserId());
+        UserDO user = userService.getUser(getLoginUserId());
         if (user == null) {
             return null;
         }

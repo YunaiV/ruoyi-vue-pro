@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.member.service.auth;
 
-import cn.iocoder.yudao.coreservice.modules.system.service.auth.SysUserSessionCoreService;
-import cn.iocoder.yudao.coreservice.modules.system.service.logger.SysLoginLogCoreService;
-import cn.iocoder.yudao.coreservice.modules.system.service.social.SysSocialCoreService;
+import cn.iocoder.yudao.module.system.service.auth.SysUserSessionCoreService;
+import cn.iocoder.yudao.module.system.service.logger.SysLoginLogCoreService;
+import cn.iocoder.yudao.module.system.service.social.SysSocialCoreService;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.util.collection.ArrayUtils;
 import cn.iocoder.yudao.framework.redis.config.YudaoRedisAutoConfiguration;

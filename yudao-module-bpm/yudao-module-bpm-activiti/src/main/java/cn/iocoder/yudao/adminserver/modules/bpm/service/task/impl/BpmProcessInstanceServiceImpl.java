@@ -18,10 +18,10 @@ import cn.iocoder.yudao.adminserver.modules.bpm.service.message.BpmMessageServic
 import cn.iocoder.yudao.adminserver.modules.bpm.service.task.BpmProcessInstanceService;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.task.BpmTaskService;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.task.dto.BpmProcessInstanceCreateReqDTO;
-import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.dept.SysDeptDO;
-import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.user.SysUserDO;
-import cn.iocoder.yudao.coreservice.modules.system.service.dept.SysDeptCoreService;
-import cn.iocoder.yudao.coreservice.modules.system.service.user.SysUserCoreService;
+import cn.iocoder.yudao.module.system.dal.dataobject.dept.SysDeptDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.user.SysUserDO;
+import cn.iocoder.yudao.module.system.service.dept.SysDeptCoreService;
+import cn.iocoder.yudao.module.system.service.user.SysUserCoreService;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import lombok.extern.slf4j.Slf4j;

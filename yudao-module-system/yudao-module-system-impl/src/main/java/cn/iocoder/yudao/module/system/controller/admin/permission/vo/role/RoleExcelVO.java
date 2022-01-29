@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.system.controller.admin.permission.vo.role;
 
 import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
 import cn.iocoder.yudao.framework.excel.core.convert.DictConvert;
-import cn.iocoder.yudao.coreservice.modules.system.enums.SysDictTypeConstants;
+import cn.iocoder.yudao.module.system.enums.DictTypeConstants;
 import com.alibaba.excel.annotation.ExcelProperty;
 import lombok.Data;
 
@@ -28,7 +28,7 @@ public class RoleExcelVO {
     private Integer dataScope;
 
     @ExcelProperty(value = "角色状态", converter = DictConvert.class)
-    @DictFormat(SysDictTypeConstants.COMMON_STATUS)
+    @DictFormat(DictTypeConstants.COMMON_STATUS)
     private String status;
 
 }

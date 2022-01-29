@@ -4,7 +4,7 @@ import cn.iocoder.yudao.module.system.controller.admin.sms.vo.channel.SmsChannel
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.channel.SmsChannelRespVO;
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.channel.SmsChannelSimpleRespVO;
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.channel.SmsChannelUpdateReqVO;
-import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.sms.SysSmsChannelDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.sms.SysSmsChannelDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.sms.core.property.SmsChannelProperties;
 import org.mapstruct.Mapper;

@@ -4,8 +4,8 @@ import cn.iocoder.yudao.adminserver.modules.bpm.controller.task.vo.task.BpmTaskD
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.task.vo.task.BpmTaskRespVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.task.vo.task.BpmTaskTodoPageItemRespVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.task.BpmTaskExtDO;
-import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.dept.SysDeptDO;
-import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.user.SysUserDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.dept.SysDeptDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.user.SysUserDO;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import org.activiti.engine.history.HistoricProcessInstance;

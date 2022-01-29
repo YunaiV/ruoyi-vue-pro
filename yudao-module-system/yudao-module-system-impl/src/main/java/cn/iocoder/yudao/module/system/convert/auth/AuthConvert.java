@@ -3,9 +3,9 @@ package cn.iocoder.yudao.module.system.convert.auth;
 import cn.iocoder.yudao.module.system.controller.admin.auth.vo.auth.AuthMenuRespVO;
 import cn.iocoder.yudao.module.system.controller.admin.auth.vo.auth.AuthPermissionInfoRespVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.MenuDO;
-import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.permission.SysRoleDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.permission.SysRoleDO;
 import cn.iocoder.yudao.module.system.enums.permission.MenuIdEnum;
-import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.user.SysUserDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.user.UserDO;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
@@ -22,14 +22,14 @@ public interface AuthConvert {
     AuthConvert INSTANCE = Mappers.getMapper(AuthConvert.class);
 
     @Mapping(source = "updateTime", target = "updateTime", ignore = true) // 字段相同，但是含义不同，忽略
-    LoginUser convert0(SysUserDO bean);
+    LoginUser convert0(UserDO bean);
 
-    default LoginUser convert(SysUserDO bean) {
+    default LoginUser convert(UserDO bean) {
         // 目的，为了设置 UserTypeEnum.ADMIN.getValue()
         return convert0(bean).setUserType(UserTypeEnum.ADMIN.getValue());
     }
 
-    default AuthPermissionInfoRespVO convert(SysUserDO user, List<SysRoleDO> roleList, List<MenuDO> menuList) {
+    default AuthPermissionInfoRespVO convert(UserDO user, List<SysRoleDO> roleList, List<MenuDO> menuList) {
         return AuthPermissionInfoRespVO.builder()
             .user(AuthPermissionInfoRespVO.UserVO.builder().id(user.getId()).nickname(user.getNickname()).avatar(user.getAvatar()).build())
             .roles(CollectionUtils.convertSet(roleList, SysRoleDO::getCode))

@@ -7,16 +7,17 @@ import cn.iocoder.yudao.module.system.controller.admin.logger.vo.operatelog.Oper
 import cn.iocoder.yudao.module.system.convert.logger.OperateLogConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.logger.OperateLogDO;
 import cn.iocoder.yudao.module.system.service.logger.OperateLogService;
-import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.user.SysUserDO;
-import cn.iocoder.yudao.coreservice.modules.system.service.user.SysUserCoreService;
+import cn.iocoder.yudao.module.system.dal.dataobject.user.UserDO;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
+import cn.iocoder.yudao.module.system.service.user.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -43,8 +44,9 @@ public class OperateLogController {
 
     @Resource
     private OperateLogService operateLogService;
-    @Resource
-    private SysUserCoreService userCoreService;
+    @Autowired
+    @SuppressWarnings("SpringJavaAutowiredFieldsWarningInspection") // UserService 存在重名
+    private UserService userService;
 
     @GetMapping("/page")
     @ApiOperation("查看操作日志分页列表")
@@ -54,7 +56,7 @@ public class OperateLogController {
 
         // 获得拼接需要的数据
         Collection<Long> userIds = CollectionUtils.convertList(pageResult.getList(), OperateLogDO::getUserId);
-        Map<Long, SysUserDO> userMap = userCoreService.getUserMap(userIds);
+        Map<Long, UserDO> userMap = userService.getUserMap(userIds);
         // 拼接数据
         List<OperateLogRespVO> list = new ArrayList<>(pageResult.getList().size());
         pageResult.getList().forEach(operateLog -> {
@@ -75,7 +77,7 @@ public class OperateLogController {
 
         // 获得拼接需要的数据
         Collection<Long> userIds = CollectionUtils.convertList(list, OperateLogDO::getUserId);
-        Map<Long, SysUserDO> userMap = userCoreService.getUserMap(userIds);
+        Map<Long, UserDO> userMap = userService.getUserMap(userIds);
         // 拼接数据
         List<OperateLogExcelVO> excelDataList = OperateLogConvert.INSTANCE.convertList(list, userMap);
         // 输出

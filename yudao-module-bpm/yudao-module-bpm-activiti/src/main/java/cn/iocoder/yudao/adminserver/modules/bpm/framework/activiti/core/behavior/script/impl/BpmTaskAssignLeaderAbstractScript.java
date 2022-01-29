@@ -2,17 +2,16 @@ package cn.iocoder.yudao.adminserver.modules.bpm.framework.activiti.core.behavio
 
 import cn.iocoder.yudao.adminserver.modules.bpm.framework.activiti.core.behavior.script.BpmTaskAssignScript;
 
-import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.dept.SysDeptDO;
-import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.user.SysUserDO;
-import cn.iocoder.yudao.coreservice.modules.system.service.dept.SysDeptCoreService;
-import cn.iocoder.yudao.coreservice.modules.system.service.user.SysUserCoreService;
+import cn.iocoder.yudao.module.system.dal.dataobject.dept.SysDeptDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.user.SysUserDO;
+import cn.iocoder.yudao.module.system.service.dept.SysDeptCoreService;
+import cn.iocoder.yudao.module.system.service.user.SysUserCoreService;
 import org.activiti.engine.impl.persistence.entity.TaskEntity;
 import org.springframework.util.Assert;
 
 import javax.annotation.Resource;
 import java.util.Set;
 
-import static cn.iocoder.yudao.framework.common.util.collection.SetUtils.asSet;
 import static java.util.Collections.emptySet;
 
 /**

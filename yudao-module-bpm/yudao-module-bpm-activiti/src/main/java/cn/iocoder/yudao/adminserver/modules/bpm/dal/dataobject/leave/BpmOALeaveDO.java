@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.leave;
 
-import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.user.SysUserDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.user.SysUserDO;
 import lombok.*;
 import java.util.*;
 import com.baomidou.mybatisplus.annotation.*;

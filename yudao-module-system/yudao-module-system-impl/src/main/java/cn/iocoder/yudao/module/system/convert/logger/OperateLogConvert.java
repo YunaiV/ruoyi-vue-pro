@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.system.convert.logger;
 import cn.iocoder.yudao.module.system.controller.admin.logger.vo.operatelog.OperateLogExcelVO;
 import cn.iocoder.yudao.module.system.controller.admin.logger.vo.operatelog.OperateLogRespVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.logger.OperateLogDO;
-import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.user.SysUserDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.user.UserDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.operatelog.core.dto.OperateLogCreateReqDTO;
@@ -27,7 +27,7 @@ public interface OperateLogConvert {
 
     OperateLogRespVO convert(OperateLogDO bean);
 
-    default List<OperateLogExcelVO> convertList(List<OperateLogDO> list, Map<Long, SysUserDO> userMap) {
+    default List<OperateLogExcelVO> convertList(List<OperateLogDO> list, Map<Long, UserDO> userMap) {
         return list.stream().map(operateLog -> {
             OperateLogExcelVO excelVO = convert02(operateLog);
             MapUtils.findAndThen(userMap, operateLog.getId(), user -> excelVO.setUserNickname(user.getNickname()));

@@ -3,7 +3,7 @@ package cn.iocoder.yudao.adminserver.modules.infra.controller.logger.vo.apierror
 import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
 import cn.iocoder.yudao.framework.excel.core.convert.DictConvert;
 import cn.iocoder.yudao.adminserver.modules.infra.enums.InfDictTypeConstants;
-import cn.iocoder.yudao.coreservice.modules.system.enums.SysDictTypeConstants;
+import cn.iocoder.yudao.module.system.enums.DictTypeConstants;
 import com.alibaba.excel.annotation.ExcelProperty;
 import lombok.Data;
 
@@ -27,7 +27,7 @@ public class InfApiErrorLogExcelVO {
     private Integer userId;
 
     @ExcelProperty(value = "用户类型", converter = DictConvert.class)
-    @DictFormat(SysDictTypeConstants.USER_TYPE)
+    @DictFormat(DictTypeConstants.USER_TYPE)
     private Integer userType;
 
     @ExcelProperty("应用名")

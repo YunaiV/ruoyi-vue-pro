@@ -7,7 +7,7 @@ import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.post.*;
 import cn.iocoder.yudao.module.system.convert.dept.PostConvert;
-import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.dept.SysPostDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.dept.SysPostDO;
 import cn.iocoder.yudao.module.system.service.dept.PostService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;

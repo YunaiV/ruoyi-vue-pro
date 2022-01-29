@@ -6,7 +6,7 @@ import cn.iocoder.yudao.module.system.controller.admin.sms.vo.log.SmsLogPageReqV
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.log.SysSmsLogRespVO;
 import cn.iocoder.yudao.module.system.convert.sms.SmsLogConvert;
 import cn.iocoder.yudao.module.system.service.sms.SmsLogService;
-import cn.iocoder.yudao.coreservice.modules.system.dal.dataobject.sms.SysSmsLogDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.sms.SysSmsLogDO;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
