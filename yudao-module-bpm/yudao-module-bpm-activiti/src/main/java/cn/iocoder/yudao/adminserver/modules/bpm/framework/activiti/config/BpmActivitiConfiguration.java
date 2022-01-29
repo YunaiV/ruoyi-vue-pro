@@ -10,17 +10,11 @@ import cn.iocoder.yudao.coreservice.modules.bpm.api.group.BpmUserGroupServiceApi
 import cn.iocoder.yudao.coreservice.modules.system.service.dept.SysDeptCoreService;
 import cn.iocoder.yudao.coreservice.modules.system.service.permission.SysPermissionCoreService;
 import cn.iocoder.yudao.coreservice.modules.system.service.user.SysUserCoreService;
-import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmUserGroupService;
-import cn.iocoder.yudao.adminserver.modules.system.service.dept.SysDeptService;
-import cn.iocoder.yudao.adminserver.modules.system.service.permission.SysPermissionService;
-import cn.iocoder.yudao.adminserver.modules.system.service.user.SysUserService;
 import org.activiti.api.runtime.shared.identity.UserGroupManager;
-import org.activiti.core.common.spring.identity.ActivitiUserGroupManagerImpl;
 import org.activiti.spring.boot.ProcessEngineConfigurationConfigurer;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.core.userdetails.UserDetailsService;
 
 import java.util.Collections;
 import java.util.List;
