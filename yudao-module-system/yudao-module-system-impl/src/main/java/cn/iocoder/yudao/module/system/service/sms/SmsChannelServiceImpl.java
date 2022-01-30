@@ -5,7 +5,7 @@ import cn.iocoder.yudao.module.system.controller.admin.sms.vo.channel.SmsChannel
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.channel.SmsChannelPageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.channel.SmsChannelUpdateReqVO;
 import cn.iocoder.yudao.module.system.convert.sms.SmsChannelConvert;
-import cn.iocoder.yudao.module.system.dal.mysql.sms.SysSmsChannelMapper;
+import cn.iocoder.yudao.module.system.dal.mysql.sms.SmsChannelMapper;
 import cn.iocoder.yudao.module.system.mq.producer.sms.SmsProducer;
 import cn.iocoder.yudao.module.system.dal.dataobject.sms.SysSmsChannelDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -52,7 +52,7 @@ public class SmsChannelServiceImpl implements SmsChannelService {
     private SmsClientFactory smsClientFactory;
 
     @Resource
-    private SysSmsChannelMapper smsChannelMapper;
+    private SmsChannelMapper smsChannelMapper;
 
     @Resource
     private SmsTemplateService smsTemplateService;

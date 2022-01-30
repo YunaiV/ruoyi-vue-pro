@@ -7,7 +7,7 @@ import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.system.controller.admin.permission.vo.role.*;
 import cn.iocoder.yudao.module.system.convert.permission.RoleConvert;
-import cn.iocoder.yudao.module.system.dal.dataobject.permission.SysRoleDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.permission.RoleDO;
 import cn.iocoder.yudao.module.system.service.permission.RoleService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -72,14 +72,14 @@ public class RoleController {
     @ApiOperation("获得角色信息")
     @PreAuthorize("@ss.hasPermission('system:role:query')")
     public CommonResult<RoleRespVO> getRole(@RequestParam("id") Long id) {
-        SysRoleDO role = roleService.getRole(id);
+        RoleDO role = roleService.getRole(id);
         return success(RoleConvert.INSTANCE.convert(role));
     }
 
     @GetMapping("/page")
     @ApiOperation("获得角色分页")
     @PreAuthorize("@ss.hasPermission('system:role:query')")
-    public CommonResult<PageResult<SysRoleDO>> getRolePage(RolePageReqVO reqVO) {
+    public CommonResult<PageResult<RoleDO>> getRolePage(RolePageReqVO reqVO) {
         return success(roleService.getRolePage(reqVO));
     }
 
@@ -87,9 +87,9 @@ public class RoleController {
     @ApiOperation(value = "获取角色精简信息列表", notes = "只包含被开启的角色，主要用于前端的下拉选项")
     public CommonResult<List<RoleSimpleRespVO>> getSimpleRoles() {
         // 获得角色列表，只要开启状态的
-        List<SysRoleDO> list = roleService.getRoles(Collections.singleton(CommonStatusEnum.ENABLE.getStatus()));
+        List<RoleDO> list = roleService.getRoles(Collections.singleton(CommonStatusEnum.ENABLE.getStatus()));
         // 排序后，返回个诶前端
-        list.sort(Comparator.comparing(SysRoleDO::getSort));
+        list.sort(Comparator.comparing(RoleDO::getSort));
         return success(RoleConvert.INSTANCE.convertList02(list));
     }
 
@@ -97,7 +97,7 @@ public class RoleController {
     @OperateLog(type = EXPORT)
     @PreAuthorize("@ss.hasPermission('system:role:export')")
     public void export(HttpServletResponse response, @Validated RoleExportReqVO reqVO) throws IOException {
-        List<SysRoleDO> list = roleService.getRoleList(reqVO);
+        List<RoleDO> list = roleService.getRoleList(reqVO);
         List<RoleExcelVO> data = RoleConvert.INSTANCE.convertList03(list);
         // 输出
         ExcelUtils.write(response, "角色数据.xls", "角色列表", RoleExcelVO.class, data);

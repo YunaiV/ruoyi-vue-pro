@@ -3,13 +3,14 @@ package cn.iocoder.yudao.module.system.service.dept;
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptCreateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptListReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptUpdateReqVO;
 import cn.iocoder.yudao.module.system.convert.dept.DeptConvert;
-import cn.iocoder.yudao.module.system.dal.mysql.dept.SysDeptMapper;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.SysDeptDO;
+import cn.iocoder.yudao.module.system.dal.mysql.dept.SysDeptMapper;
 import cn.iocoder.yudao.module.system.enums.dept.DeptIdEnum;
 import cn.iocoder.yudao.module.system.mq.producer.dept.DeptProducer;
 import com.google.common.collect.ImmutableMap;
@@ -24,8 +25,8 @@ import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.util.*;
 
-import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
 
 /**
  * 部门 Service 实现类
@@ -255,6 +256,41 @@ public class DeptServiceImpl implements DeptService {
         if (!menu.getId().equals(id)) {
             throw ServiceExceptionUtil.exception(DEPT_NAME_DUPLICATE);
         }
+    }
+
+    @Override
+    public List<SysDeptDO> getDepts(Collection<Long> ids) {
+        return deptMapper.selectBatchIds(ids);
+    }
+
+    @Override
+    public SysDeptDO getDept(Long id) {
+        return deptMapper.selectById(id);
+    }
+
+    @Override
+    public void validDepts(Collection<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return;
+        }
+        // 获得科室信息
+        List<SysDeptDO> depts = deptMapper.selectBatchIds(ids);
+        Map<Long, SysDeptDO> deptMap = CollectionUtils.convertMap(depts, SysDeptDO::getId);
+        // 校验
+        ids.forEach(id -> {
+            SysDeptDO dept = deptMap.get(id);
+            if (dept == null) {
+                throw exception(DEPT_NOT_FOUND);
+            }
+            if (!CommonStatusEnum.ENABLE.getStatus().equals(dept.getStatus())) {
+                throw exception(DEPT_NOT_ENABLE, dept.getName());
+            }
+        });
+    }
+
+    @Override
+    public List<SysDeptDO> getSimpleDepts(Collection<Long> ids) {
+        return deptMapper.selectBatchIds(ids);
     }
 
 }

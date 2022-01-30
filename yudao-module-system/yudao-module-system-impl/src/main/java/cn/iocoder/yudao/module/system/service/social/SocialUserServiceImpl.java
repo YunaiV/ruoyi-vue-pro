@@ -1,13 +1,12 @@
 package cn.iocoder.yudao.module.system.service.social;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.common.util.http.HttpUtils;
 import cn.iocoder.yudao.module.system.dal.dataobject.social.SysSocialUserDO;
 import cn.iocoder.yudao.module.system.dal.mysql.social.SysSocialUserMapper;
 import cn.iocoder.yudao.module.system.dal.redis.social.SocialAuthUserRedisDAO;
 import cn.iocoder.yudao.module.system.enums.social.SocialTypeEnum;
-import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
-import cn.iocoder.yudao.framework.common.util.http.HttpUtils;
 import com.google.common.annotations.VisibleForTesting;
 import com.xkcoding.justauth.AuthRequestFactory;
 import lombok.extern.slf4j.Slf4j;
@@ -24,10 +23,10 @@ import javax.annotation.Resource;
 import java.util.List;
 import java.util.Objects;
 
-import static cn.iocoder.yudao.module.system.enums.SysErrorCodeConstants.SOCIAL_AUTH_FAILURE;
-import static cn.iocoder.yudao.module.system.enums.SysErrorCodeConstants.SOCIAL_UNBIND_NOT_SELF;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString;
+import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.SOCIAL_USER_AUTH_FAILURE;
+import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.SOCIAL_USER_UNBIND_NOT_SELF;
 
 /**
  * 社交用户 Service 实现类
@@ -74,25 +73,25 @@ public class SocialUserServiceImpl implements SocialUserService {
     }
 
     @Override
-    public List<SysSocialUserDO> getAllSocialUserList(Integer type, String unionId,UserTypeEnum userTypeEnum) {
+    public List<SysSocialUserDO> getAllSocialUserList(Integer type, String unionId, Integer userType) {
         List<Integer> types = SocialTypeEnum.getRelationTypes(type);
-        return socialUserMapper.selectListByTypeAndUnionId(userTypeEnum.getValue(), types, unionId);
+        return socialUserMapper.selectListByTypeAndUnionId(userType, types, unionId);
     }
 
     @Override
-    public List<SysSocialUserDO> getSocialUserList(Long userId,UserTypeEnum userTypeEnum) {
-        return socialUserMapper.selectListByUserId(userTypeEnum.getValue(), userId);
+    public List<SysSocialUserDO> getSocialUserList(Long userId, Integer userType) {
+        return socialUserMapper.selectListByUserId(userType, userId);
     }
 
     @Override
-    @Transactional
-    public void bindSocialUser(Long userId, Integer type, AuthUser authUser, UserTypeEnum userTypeEnum) {
+    @Transactional(rollbackFor = Exception.class)
+    public void bindSocialUser(Long userId, Integer userType, Integer type, AuthUser authUser) {
         // 获得 unionId 对应的 SysSocialUserDO 列表
         String unionId = getAuthUserUnionId(authUser);
-        List<SysSocialUserDO> socialUsers = this.getAllSocialUserList(type, unionId, userTypeEnum);
+        List<SysSocialUserDO> socialUsers = this.getAllSocialUserList(type, unionId, userType);
 
         // 逻辑一：如果 userId 之前绑定过该 type 的其它账号，需要进行解绑
-        this.unbindOldSocialUser(userId, type, unionId, userTypeEnum);
+        this.unbindOldSocialUser(userId, userType, type, unionId);
 
         // 逻辑二：如果 socialUsers 指定的 userId 改变，需要进行更新
         // 例如说，一个微信 unionId 对应了多个社交账号，结果其中有个关联了新的 userId，则其它也要跟着修改
@@ -111,7 +110,7 @@ public class SocialUserServiceImpl implements SocialUserService {
                 .nickname(authUser.getNickname()).avatar(authUser.getAvatar()).rawUserInfo(toJsonString(authUser.getRawUserInfo()))
                 .build();
         if (socialUser == null) {
-            saveSocialUser.setUserId(userId).setUserType(userTypeEnum.getValue())
+            saveSocialUser.setUserId(userId).setUserType(userType)
                     .setType(type).setOpenid(authUser.getUuid()).setUnionId(unionId);
             socialUserMapper.insert(saveSocialUser);
         } else {
@@ -121,16 +120,16 @@ public class SocialUserServiceImpl implements SocialUserService {
     }
 
     @Override
-    public void unbindSocialUser(Long userId, Integer type, String unionId, UserTypeEnum userTypeEnum) {
+    public void unbindSocialUser(Long userId, Integer userType, Integer type, String unionId) {
         // 获得 unionId 对应的所有 SysSocialUserDO 社交用户
-        List<SysSocialUserDO> socialUsers = this.getAllSocialUserList(type, unionId, userTypeEnum);
+        List<SysSocialUserDO> socialUsers = this.getAllSocialUserList(type, unionId, userType);
         if (CollUtil.isEmpty(socialUsers)) {
             return;
         }
         // 校验，是否解绑的是非自己的
         socialUsers.forEach(socialUser -> {
             if (!Objects.equals(socialUser.getUserId(), userId)) {
-                throw exception(SOCIAL_UNBIND_NOT_SELF);
+                throw exception(SOCIAL_USER_UNBIND_NOT_SELF);
             }
         });
 
@@ -139,10 +138,9 @@ public class SocialUserServiceImpl implements SocialUserService {
     }
 
     @VisibleForTesting
-    public void unbindOldSocialUser(Long userId, Integer type, String newUnionId, UserTypeEnum userTypeEnum) {
+    public void unbindOldSocialUser(Long userId, Integer userType, Integer type, String newUnionId) {
         List<Integer> types = SocialTypeEnum.getRelationTypes(type);
-        List<SysSocialUserDO> oldSocialUsers = socialUserMapper.selectListByTypeAndUserId(
-                userTypeEnum.getValue(), types, userId);
+        List<SysSocialUserDO> oldSocialUsers = socialUserMapper.selectListByTypeAndUserId(userType, types, userId);
         // 如果新老的 unionId 是一致的，说明无需解绑
         if (CollUtil.isEmpty(oldSocialUsers) || Objects.equals(newUnionId, oldSocialUsers.get(0).getUnionId())) {
             return;
@@ -165,7 +163,7 @@ public class SocialUserServiceImpl implements SocialUserService {
         log.info("[getAuthUser0][请求社交平台 type({}) request({}) response({})]", type, toJsonString(authCallback),
                 toJsonString(authResponse));
         if (!authResponse.ok()) {
-            throw exception(SOCIAL_AUTH_FAILURE, authResponse.getMsg());
+            throw exception(SOCIAL_USER_AUTH_FAILURE, authResponse.getMsg());
         }
         return (AuthUser) authResponse.getData();
     }

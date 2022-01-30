@@ -1,27 +1,26 @@
 package cn.iocoder.yudao.module.system.controller.admin.auth;
 
-import cn.iocoder.yudao.module.system.controller.admin.auth.vo.auth.*;
-import cn.iocoder.yudao.module.system.convert.auth.AuthConvert;
-import cn.iocoder.yudao.module.system.dal.dataobject.permission.MenuDO;
-import cn.iocoder.yudao.module.system.dal.dataobject.permission.SysRoleDO;
-import cn.iocoder.yudao.module.system.enums.permission.MenuTypeEnum;
-import cn.iocoder.yudao.module.system.service.auth.AuthService;
-import cn.iocoder.yudao.module.system.service.permission.PermissionService;
-import cn.iocoder.yudao.module.system.service.permission.RoleService;
-import cn.iocoder.yudao.module.system.dal.dataobject.user.UserDO;
-import cn.iocoder.yudao.module.system.service.social.SocialUserService;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.collection.SetUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
-import cn.iocoder.yudao.module.system.service.user.UserService;
+import cn.iocoder.yudao.module.system.controller.admin.auth.vo.auth.*;
+import cn.iocoder.yudao.module.system.convert.auth.AuthConvert;
+import cn.iocoder.yudao.module.system.dal.dataobject.permission.MenuDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.permission.RoleDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
+import cn.iocoder.yudao.module.system.enums.permission.MenuTypeEnum;
+import cn.iocoder.yudao.module.system.service.auth.AdminAuthService;
+import cn.iocoder.yudao.module.system.service.permission.PermissionService;
+import cn.iocoder.yudao.module.system.service.permission.RoleService;
+import cn.iocoder.yudao.module.system.service.social.SocialUserService;
+import cn.iocoder.yudao.module.system.service.user.AdminUserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -42,12 +41,10 @@ import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUti
 @Slf4j
 public class AuthController {
 
-    @Autowired
-    @SuppressWarnings("SpringJavaAutowiredFieldsWarningInspection") // AuthService 存在重名
-    private AuthService authService;
-    @Autowired
-    @SuppressWarnings("SpringJavaAutowiredFieldsWarningInspection") // UserService 存在重名
-    private UserService userService;
+    @Resource
+    private AdminAuthService authService;
+    @Resource
+    private AdminUserService userService;
     @Resource
     private RoleService roleService;
     @Resource
@@ -68,12 +65,12 @@ public class AuthController {
     @ApiOperation("获取登录用户的权限信息")
     public CommonResult<AuthPermissionInfoRespVO> getPermissionInfo() {
         // 获得用户信息
-        UserDO user = userService.getUser(getLoginUserId());
+        AdminUserDO user = userService.getUser(getLoginUserId());
         if (user == null) {
             return null;
         }
         // 获得角色列表
-        List<SysRoleDO> roleList = roleService.getRolesFromCache(getLoginUserRoleIds());
+        List<RoleDO> roleList = roleService.getRolesFromCache(getLoginUserRoleIds());
         // 获得菜单列表
         List<MenuDO> menuList = permissionService.getRoleMenusFromCache(
                 getLoginUserRoleIds(), // 注意，基于登录的角色，因为后续的权限判断也是基于它
@@ -136,7 +133,7 @@ public class AuthController {
     @DeleteMapping("/social-unbind")
     @ApiOperation("取消社交绑定")
     public CommonResult<Boolean> socialUnbind(@RequestBody AuthSocialUnbindReqVO reqVO) {
-        socialCoreService.unbindSocialUser(getLoginUserId(), reqVO.getType(), reqVO.getUnionId(), UserTypeEnum.ADMIN);
+        socialCoreService.unbindSocialUser(getLoginUserId(), UserTypeEnum.ADMIN.getValue(), reqVO.getType(), reqVO.getUnionId());
         return CommonResult.success(true);
     }
 

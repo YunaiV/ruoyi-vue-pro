@@ -4,7 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.channel.SmsChannelCreateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.channel.SmsChannelPageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.channel.SmsChannelUpdateReqVO;
-import cn.iocoder.yudao.module.system.dal.mysql.sms.SysSmsChannelMapper;
+import cn.iocoder.yudao.module.system.dal.mysql.sms.SmsChannelMapper;
 import cn.iocoder.yudao.module.system.mq.producer.sms.SmsProducer;
 import cn.iocoder.yudao.module.system.dal.dataobject.sms.SysSmsChannelDO;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
@@ -39,7 +39,7 @@ public class SmsChannelServiceTest extends BaseDbUnitTest {
     private SmsChannelServiceImpl smsChannelService;
 
     @Resource
-    private SysSmsChannelMapper smsChannelMapper;
+    private SmsChannelMapper smsChannelMapper;
 
     @MockBean
     private SmsClientFactory smsClientFactory;

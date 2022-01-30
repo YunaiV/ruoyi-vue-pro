@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.member.service.auth;
 
+import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
 import cn.iocoder.yudao.module.system.service.auth.SysUserSessionCoreService;
 import cn.iocoder.yudao.module.system.service.logger.SysLoginLogCoreService;
 import cn.iocoder.yudao.module.system.service.social.SysSocialCoreService;
@@ -8,10 +9,9 @@ import cn.iocoder.yudao.framework.common.util.collection.ArrayUtils;
 import cn.iocoder.yudao.framework.redis.config.YudaoRedisAutoConfiguration;
 import cn.iocoder.yudao.module.member.controller.app.auth.vo.AppAuthResetPasswordReqVO;
 import cn.iocoder.yudao.module.member.controller.app.auth.vo.AppAuthUpdatePasswordReqVO;
-import cn.iocoder.yudao.module.member.dal.dataobject.user.UserDO;
-import cn.iocoder.yudao.module.member.dal.mysql.user.UserMapper;
+import cn.iocoder.yudao.module.member.dal.mysql.user.MemberUserMapper;
 import cn.iocoder.yudao.module.member.service.sms.SysSmsCodeService;
-import cn.iocoder.yudao.module.member.service.user.UserService;
+import cn.iocoder.yudao.module.member.service.user.MemberUserService;
 import cn.iocoder.yudao.module.member.test.BaseDbAndRedisUnitTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -32,17 +32,17 @@ import static org.mockito.Mockito.when;
 
 // TODO @芋艿：单测的 review，等逻辑都达成一致后
 /**
- * {@link AuthService} 的单元测试类
+ * {@link MemberAuthService} 的单元测试类
  *
  * @author 宋天
  */
-@Import({AuthServiceImpl.class, YudaoRedisAutoConfiguration.class})
+@Import({MemberAuthServiceImpl.class, YudaoRedisAutoConfiguration.class})
 public class SysAuthServiceTest extends BaseDbAndRedisUnitTest {
 
     @MockBean
     private AuthenticationManager authenticationManager;
     @MockBean
-    private UserService userService;
+    private MemberUserService userService;
     @MockBean
     private SysSmsCodeService smsCodeService;
     @MockBean
@@ -56,14 +56,14 @@ public class SysAuthServiceTest extends BaseDbAndRedisUnitTest {
     @MockBean
     private PasswordEncoder passwordEncoder;
     @Resource
-    private UserMapper mbrUserMapper;
+    private MemberUserMapper mbrUserMapper;
     @Resource
-    private AuthServiceImpl authService;
+    private MemberAuthServiceImpl authService;
 
     @Test
     public void testUpdatePassword_success(){
         // 准备参数
-        UserDO userDO = randomUserDO();
+        MemberUserDO userDO = randomUserDO();
         mbrUserMapper.insert(userDO);
 
         // 新密码
@@ -88,7 +88,7 @@ public class SysAuthServiceTest extends BaseDbAndRedisUnitTest {
     @Test
     public void testResetPassword_success(){
         // 准备参数
-        UserDO userDO = randomUserDO();
+        MemberUserDO userDO = randomUserDO();
         mbrUserMapper.insert(userDO);
 
         // 随机密码
@@ -113,12 +113,12 @@ public class SysAuthServiceTest extends BaseDbAndRedisUnitTest {
     // ========== 随机对象 ==========
 
     @SafeVarargs
-    private static UserDO randomUserDO(Consumer<UserDO>... consumers) {
-        Consumer<UserDO> consumer = (o) -> {
+    private static MemberUserDO randomUserDO(Consumer<MemberUserDO>... consumers) {
+        Consumer<MemberUserDO> consumer = (o) -> {
             o.setStatus(randomEle(CommonStatusEnum.values()).getStatus()); // 保证 status 的范围
             o.setPassword(randomString());
         };
-        return randomPojo(UserDO.class, ArrayUtils.append(consumer, consumers));
+        return randomPojo(MemberUserDO.class, ArrayUtils.append(consumer, consumers));
     }
 
 

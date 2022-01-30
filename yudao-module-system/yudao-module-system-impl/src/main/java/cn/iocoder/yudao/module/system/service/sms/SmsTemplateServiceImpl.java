@@ -9,7 +9,7 @@ import cn.iocoder.yudao.module.system.controller.admin.sms.vo.template.SmsTempla
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.template.SmsTemplatePageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.template.SmsTemplateUpdateReqVO;
 import cn.iocoder.yudao.module.system.convert.sms.SmsTemplateConvert;
-import cn.iocoder.yudao.module.system.dal.mysql.sms.SysSmsTemplateMapper;
+import cn.iocoder.yudao.module.system.dal.mysql.sms.SmsTemplateMapper;
 import cn.iocoder.yudao.module.system.mq.producer.sms.SmsProducer;
 import cn.iocoder.yudao.module.system.dal.dataobject.sms.SysSmsChannelDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.sms.SysSmsTemplateDO;
@@ -56,7 +56,7 @@ public class SmsTemplateServiceImpl implements SmsTemplateService {
     private static final Pattern PATTERN_PARAMS = Pattern.compile("\\{(.*?)}");
 
     @Resource
-    private SysSmsTemplateMapper smsTemplateMapper;
+    private SmsTemplateMapper smsTemplateMapper;
 
     @Resource
     private SmsChannelService smsChannelService;

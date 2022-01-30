@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.system.dal.dataobject.dept;
 
-import cn.iocoder.yudao.module.system.dal.dataobject.user.UserDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.tenant.core.db.TenantBaseDO;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -41,7 +41,7 @@ public class SysDeptDO extends TenantBaseDO {
     /**
      * 负责人
      *
-     * 关联 {@link UserDO#getId()}
+     * 关联 {@link AdminUserDO#getId()}
      */
     private Long leaderUserId;
     /**

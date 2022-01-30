@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.system.controller.admin.dept;
 
-import cn.iocoder.yudao.module.system.service.dept.SysDeptCoreService;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.*;
@@ -29,9 +28,6 @@ public class DeptController {
 
     @Resource
     private DeptService deptService;
-
-    @Resource
-    private SysDeptCoreService deptCoreService;
 
     @PostMapping("create")
     @ApiOperation("创建部门")
@@ -84,7 +80,7 @@ public class DeptController {
     @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
     @PreAuthorize("@ss.hasPermission('system:dept:query')")
     public CommonResult<DeptRespVO> getDept(@RequestParam("id") Long id) {
-        return success(DeptConvert.INSTANCE.convert(deptCoreService.getDept(id)));
+        return success(DeptConvert.INSTANCE.convert(deptService.getDept(id)));
     }
 
 }

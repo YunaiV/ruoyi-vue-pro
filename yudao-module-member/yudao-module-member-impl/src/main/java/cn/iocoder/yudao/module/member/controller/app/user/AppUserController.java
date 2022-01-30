@@ -5,8 +5,8 @@ import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.module.member.controller.app.user.vo.AppUserInfoRespVO;
 import cn.iocoder.yudao.module.member.controller.app.user.vo.AppUserUpdateMobileReqVO;
 import cn.iocoder.yudao.module.member.convert.user.UserConvert;
-import cn.iocoder.yudao.module.member.dal.dataobject.user.UserDO;
-import cn.iocoder.yudao.module.member.service.user.UserService;
+import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
+import cn.iocoder.yudao.module.member.service.user.MemberUserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +21,7 @@ import java.io.IOException;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.*;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
-import static cn.iocoder.yudao.module.member.enums.MemberErrorCodeConstants.FILE_IS_EMPTY;
+import static cn.iocoder.yudao.module.member.enums.ErrorCodeConstants.FILE_IS_EMPTY;
 
 @Api(tags = "用户 APP - 用户个人中心")
 @RestController
@@ -31,7 +31,7 @@ import static cn.iocoder.yudao.module.member.enums.MemberErrorCodeConstants.FILE
 public class AppUserController {
 
     @Resource
-    private UserService userService;
+    private MemberUserService userService;
 
     @PutMapping("/update-nickname")
     @ApiOperation("修改用户昵称")
@@ -56,7 +56,7 @@ public class AppUserController {
     @ApiOperation("获得基本信息")
     @PreAuthenticated
     public CommonResult<AppUserInfoRespVO> getUserInfo() {
-        UserDO user = userService.getUser(getLoginUserId());
+        MemberUserDO user = userService.getUser(getLoginUserId());
         return success(UserConvert.INSTANCE.convert(user));
     }
 

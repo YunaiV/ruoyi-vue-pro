@@ -23,9 +23,9 @@ import java.util.List;
 import java.util.Map;
 
 import static cn.hutool.core.util.RandomUtil.randomEle;
-import static cn.iocoder.yudao.module.system.enums.SysErrorCodeConstants.*;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
+import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -33,7 +33,7 @@ import static org.mockito.Mockito.*;
 public class SysSmsSendServiceTest extends BaseMockitoUnitTest {
 
     @InjectMocks
-    private SysSmsSendServiceImpl smsService;
+    private SmsSendServiceImpl smsService;
 
     @Mock
     private SmsTemplateService smsTemplateService;

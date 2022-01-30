@@ -1,10 +1,9 @@
 package cn.iocoder.yudao.module.system.service.social;
 
 import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.module.system.dal.dataobject.social.SysSocialUserDO;
 import cn.iocoder.yudao.module.system.enums.social.SocialTypeEnum;
-import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
-import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import me.zhyd.oauth.model.AuthUser;
 
 import javax.validation.constraints.NotNull;
@@ -38,6 +37,12 @@ public interface SocialUserService {
     @NotNull
     AuthUser getAuthUser(Integer type, String code, String state);
 
+    /**
+     * 获得社交用户的 unionId 编号
+     *
+     * @param authUser 社交用户
+     * @return unionId 编号
+     */
     default String getAuthUserUnionId(AuthUser authUser) {
         return StrUtil.blankToDefault(authUser.getToken().getUnionId(), authUser.getUuid());
     }
@@ -48,38 +53,37 @@ public interface SocialUserService {
      *
      * @param type 社交平台的类型 {@link SocialTypeEnum}
      * @param unionId 社交平台的 unionId
+     * @param userType 全局用户类型
      * @return 社交用户列表
-     * @param userTypeEnum 全局用户类型
      */
-    List<SysSocialUserDO> getAllSocialUserList(Integer type, String unionId, UserTypeEnum userTypeEnum);
+    List<SysSocialUserDO> getAllSocialUserList(Integer type, String unionId, Integer userType);
 
     /**
      * 获得指定用户的社交用户列表
      *
      * @param userId 用户编号
+     * @param userType 用户类型
      * @return 社交用户列表
-     * @param userTypeEnum 全局用户类型
      */
-    List<SysSocialUserDO> getSocialUserList(Long userId, UserTypeEnum userTypeEnum);
+    List<SysSocialUserDO> getSocialUserList(Long userId, Integer userType);
 
     /**
      * 绑定社交用户
-     *
-     * @param userId 用户编号
+     *  @param userId 用户编号
+     * @param userType 用户类型
      * @param type 社交平台的类型 {@link SocialTypeEnum}
      * @param authUser 授权用户
-     * @param userTypeEnum 全局用户类型
      */
-    void bindSocialUser(Long userId, Integer type, AuthUser authUser, UserTypeEnum userTypeEnum);
+    void bindSocialUser(Long userId, Integer userType, Integer type, AuthUser authUser);
 
     /**
      * 取消绑定社交用户
      *
      * @param userId 用户编号
+     * @param userType 全局用户类型
      * @param type 社交平台的类型 {@link SocialTypeEnum}
      * @param unionId 社交平台的 unionId
-     * @param userTypeEnum 全局用户类型
      */
-    void unbindSocialUser(Long userId, Integer type, String unionId, UserTypeEnum userTypeEnum);
+    void unbindSocialUser(Long userId, Integer userType, Integer type, String unionId);
 
 }

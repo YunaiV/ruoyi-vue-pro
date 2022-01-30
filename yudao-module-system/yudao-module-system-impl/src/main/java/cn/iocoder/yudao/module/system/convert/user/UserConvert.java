@@ -6,9 +6,9 @@ import cn.iocoder.yudao.module.system.controller.admin.user.vo.profile.UserProfi
 import cn.iocoder.yudao.module.system.controller.admin.user.vo.user.*;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.SysDeptDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.SysPostDO;
-import cn.iocoder.yudao.module.system.dal.dataobject.permission.SysRoleDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.permission.RoleDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.social.SysSocialUserDO;
-import cn.iocoder.yudao.module.system.dal.dataobject.user.UserDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
@@ -19,31 +19,31 @@ public interface UserConvert {
 
     UserConvert INSTANCE = Mappers.getMapper(UserConvert.class);
 
-    UserPageItemRespVO convert(UserDO bean);
+    UserPageItemRespVO convert(AdminUserDO bean);
 
     UserPageItemRespVO.Dept convert(SysDeptDO bean);
 
-    UserDO convert(UserCreateReqVO bean);
+    AdminUserDO convert(UserCreateReqVO bean);
 
-    UserDO convert(UserUpdateReqVO bean);
+    AdminUserDO convert(UserUpdateReqVO bean);
 
-    UserExcelVO convert02(UserDO bean);
+    UserExcelVO convert02(AdminUserDO bean);
 
-    UserDO convert(UserImportExcelVO bean);
+    AdminUserDO convert(UserImportExcelVO bean);
 
-    UserProfileRespVO convert03(UserDO bean);
+    UserProfileRespVO convert03(AdminUserDO bean);
 
-    List<UserProfileRespVO.Role> convertList(List<SysRoleDO> list);
+    List<UserProfileRespVO.Role> convertList(List<RoleDO> list);
 
     UserProfileRespVO.Dept convert02(SysDeptDO bean);
 
-    UserDO convert(UserProfileUpdateReqVO bean);
+    AdminUserDO convert(UserProfileUpdateReqVO bean);
 
-    UserDO convert(UserProfileUpdatePasswordReqVO bean);
+    AdminUserDO convert(UserProfileUpdatePasswordReqVO bean);
 
     List<UserProfileRespVO.Post> convertList02(List<SysPostDO> list);
 
     List<UserProfileRespVO.SocialUser> convertList03(List<SysSocialUserDO> list);
 
-    List<UserSimpleRespVO> convertList04(List<UserDO> list);
+    List<UserSimpleRespVO> convertList04(List<AdminUserDO> list);
 }

@@ -4,7 +4,7 @@ import cn.iocoder.yudao.module.system.controller.admin.sms.vo.template.SmsTempla
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.template.SmsTemplateExportReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.template.SmsTemplatePageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.template.SmsTemplateUpdateReqVO;
-import cn.iocoder.yudao.module.system.dal.mysql.sms.SysSmsTemplateMapper;
+import cn.iocoder.yudao.module.system.dal.mysql.sms.SmsTemplateMapper;
 import cn.iocoder.yudao.module.system.mq.producer.sms.SmsProducer;
 import cn.iocoder.yudao.module.system.dal.dataobject.sms.SysSmsChannelDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.sms.SysSmsTemplateDO;
@@ -49,7 +49,7 @@ public class SmsTemplateServiceTest extends BaseDbUnitTest {
     private SmsTemplateServiceImpl smsTemplateService;
 
     @Resource
-    private SysSmsTemplateMapper smsTemplateMapper;
+    private SmsTemplateMapper smsTemplateMapper;
 
     @MockBean
     private SmsChannelService smsChannelService;

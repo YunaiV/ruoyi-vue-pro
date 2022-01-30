@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.system.service.dept;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.post.PostCreateReqVO;
@@ -7,17 +9,19 @@ import cn.iocoder.yudao.module.system.controller.admin.dept.vo.post.PostExportRe
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.post.PostPageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.post.PostUpdateReqVO;
 import cn.iocoder.yudao.module.system.convert.dept.PostConvert;
-import cn.iocoder.yudao.module.system.dal.mysql.dept.SysPostMapper;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.SysPostDO;
+import cn.iocoder.yudao.module.system.dal.mysql.dept.SysPostMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
-import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
+import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
 
 /**
  * 岗位 Service 实现类
@@ -125,4 +129,23 @@ public class PostServiceImpl implements PostService {
         }
     }
 
+    @Override
+    public void validPosts(Collection<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return;
+        }
+        // 获得岗位信息
+        List<SysPostDO> posts = postMapper.selectBatchIds(ids);
+        Map<Long, SysPostDO> postMap = convertMap(posts, SysPostDO::getId);
+        // 校验
+        ids.forEach(id -> {
+            SysPostDO post = postMap.get(id);
+            if (post == null) {
+                throw exception(POST_NOT_FOUND);
+            }
+            if (!CommonStatusEnum.ENABLE.getStatus().equals(post.getStatus())) {
+                throw exception(POST_NOT_ENABLE, post.getName());
+            }
+        });
+    }
 }

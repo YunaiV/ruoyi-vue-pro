@@ -4,8 +4,9 @@ import cn.iocoder.yudao.module.system.controller.admin.logger.vo.loginlog.LoginL
 import cn.iocoder.yudao.module.system.controller.admin.logger.vo.loginlog.LoginLogPageReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.logger.SysLoginLogDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.system.service.logger.dto.LoginLogCreateReqDTO;
+import cn.iocoder.yudao.module.system.api.logger.dto.LoginLogCreateReqDTO;
 
+import javax.validation.Valid;
 import java.util.List;
 
 /**
@@ -34,6 +35,6 @@ public interface LoginLogService {
      *
      * @param reqDTO 日志信息
      */
-    void createLoginLog(LoginLogCreateReqDTO reqDTO);
+    void createLoginLog(@Valid LoginLogCreateReqDTO reqDTO);
 
 }

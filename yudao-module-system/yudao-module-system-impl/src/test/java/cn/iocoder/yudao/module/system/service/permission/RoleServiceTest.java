@@ -7,8 +7,8 @@ import cn.iocoder.yudao.framework.security.core.enums.DataScopeEnum;
 import cn.iocoder.yudao.module.system.controller.admin.permission.vo.role.RoleCreateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.permission.vo.role.RolePageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.permission.vo.role.RoleUpdateReqVO;
-import cn.iocoder.yudao.module.system.dal.dataobject.permission.SysRoleDO;
-import cn.iocoder.yudao.module.system.dal.mysql.permission.SysRoleMapper;
+import cn.iocoder.yudao.module.system.dal.dataobject.permission.RoleDO;
+import cn.iocoder.yudao.module.system.dal.mysql.permission.RoleMapper;
 import cn.iocoder.yudao.module.system.enums.permission.RoleTypeEnum;
 import cn.iocoder.yudao.module.system.mq.producer.permission.RoleProducer;
 import cn.iocoder.yudao.framework.common.util.spring.SpringAopUtils;
@@ -36,7 +36,7 @@ public class RoleServiceTest extends BaseDbUnitTest {
     private RoleServiceImpl sysRoleService;
 
     @Resource
-    private SysRoleMapper roleMapper;
+    private RoleMapper roleMapper;
 
     @MockBean
     private PermissionService sysPermissionService;
@@ -46,9 +46,9 @@ public class RoleServiceTest extends BaseDbUnitTest {
 
     @Test
     public void testInitLocalCache_success() throws Exception {
-        SysRoleDO roleDO1 = createRoleDO("role1", RoleTypeEnum.CUSTOM, DataScopeEnum.ALL);
+        RoleDO roleDO1 = createRoleDO("role1", RoleTypeEnum.CUSTOM, DataScopeEnum.ALL);
         roleMapper.insert(roleDO1);
-        SysRoleDO roleDO2 = createRoleDO("role2", RoleTypeEnum.CUSTOM, DataScopeEnum.ALL);
+        RoleDO roleDO2 = createRoleDO("role2", RoleTypeEnum.CUSTOM, DataScopeEnum.ALL);
         roleMapper.insert(roleDO2);
 
         //调用
@@ -58,7 +58,7 @@ public class RoleServiceTest extends BaseDbUnitTest {
         //获取代理对象
         RoleServiceImpl target = (RoleServiceImpl) SpringAopUtils.getTarget(sysRoleService);
 
-        Map<Long, SysRoleDO> roleCache = (Map<Long, SysRoleDO>) BeanUtil.getFieldValue(target, "roleCache");
+        Map<Long, RoleDO> roleCache = (Map<Long, RoleDO>) BeanUtil.getFieldValue(target, "roleCache");
         assertPojoEquals(roleDO1, roleCache.get(roleDO1.getId()));
         assertPojoEquals(roleDO2, roleCache.get(roleDO2.getId()));
 
@@ -79,7 +79,7 @@ public class RoleServiceTest extends BaseDbUnitTest {
 
         //断言
         assertNotNull(roleId);
-        SysRoleDO roleDO = roleMapper.selectById(roleId);
+        RoleDO roleDO = roleMapper.selectById(roleId);
         assertPojoEquals(reqVO, roleDO);
 
         verify(sysRoleProducer).sendRoleRefreshMessage();
@@ -87,7 +87,7 @@ public class RoleServiceTest extends BaseDbUnitTest {
 
     @Test
     public void testUpdateRole_success() {
-        SysRoleDO roleDO = createRoleDO("role_name", RoleTypeEnum.CUSTOM, DataScopeEnum.ALL);
+        RoleDO roleDO = createRoleDO("role_name", RoleTypeEnum.CUSTOM, DataScopeEnum.ALL);
         roleMapper.insert(roleDO);
         Long roleId = roleDO.getId();
 
@@ -102,7 +102,7 @@ public class RoleServiceTest extends BaseDbUnitTest {
         sysRoleService.updateRole(reqVO);
 
         //断言
-        SysRoleDO newRoleDO = roleMapper.selectById(roleId);
+        RoleDO newRoleDO = roleMapper.selectById(roleId);
         assertPojoEquals(reqVO, newRoleDO);
 
         verify(sysRoleProducer).sendRoleRefreshMessage();
@@ -110,7 +110,7 @@ public class RoleServiceTest extends BaseDbUnitTest {
 
     @Test
     public void testUpdateRoleStatus_success() {
-        SysRoleDO roleDO = createRoleDO("role_name", RoleTypeEnum.CUSTOM, DataScopeEnum.ALL, CommonStatusEnum.ENABLE.getStatus());
+        RoleDO roleDO = createRoleDO("role_name", RoleTypeEnum.CUSTOM, DataScopeEnum.ALL, CommonStatusEnum.ENABLE.getStatus());
         roleMapper.insert(roleDO);
         Long roleId = roleDO.getId();
 
@@ -118,7 +118,7 @@ public class RoleServiceTest extends BaseDbUnitTest {
         sysRoleService.updateRoleStatus(roleId, CommonStatusEnum.DISABLE.getStatus());
 
         //断言
-        SysRoleDO newRoleDO = roleMapper.selectById(roleId);
+        RoleDO newRoleDO = roleMapper.selectById(roleId);
         assertEquals(CommonStatusEnum.DISABLE.getStatus(), newRoleDO.getStatus());
 
         verify(sysRoleProducer).sendRoleRefreshMessage();
@@ -126,7 +126,7 @@ public class RoleServiceTest extends BaseDbUnitTest {
 
     @Test
     public void testUpdateRoleDataScope_success() {
-        SysRoleDO roleDO = createRoleDO("role_name", RoleTypeEnum.CUSTOM, DataScopeEnum.ALL);
+        RoleDO roleDO = createRoleDO("role_name", RoleTypeEnum.CUSTOM, DataScopeEnum.ALL);
         roleMapper.insert(roleDO);
         Long roleId = roleDO.getId();
 
@@ -135,7 +135,7 @@ public class RoleServiceTest extends BaseDbUnitTest {
         sysRoleService.updateRoleDataScope(roleId, DataScopeEnum.DEPT_CUSTOM.getScope(), deptIdSet);
 
         //断言
-        SysRoleDO newRoleDO = roleMapper.selectById(roleId);
+        RoleDO newRoleDO = roleMapper.selectById(roleId);
         assertEquals(DataScopeEnum.DEPT_CUSTOM.getScope(), newRoleDO.getDataScope());
 
         Set<Long> newDeptIdSet = newRoleDO.getDataScopeDeptIds();
@@ -147,7 +147,7 @@ public class RoleServiceTest extends BaseDbUnitTest {
 
     @Test
     public void testDeleteRole_success() {
-        SysRoleDO roleDO = createRoleDO("role_name", RoleTypeEnum.CUSTOM, DataScopeEnum.ALL);
+        RoleDO roleDO = createRoleDO("role_name", RoleTypeEnum.CUSTOM, DataScopeEnum.ALL);
         roleMapper.insert(roleDO);
         Long roleId = roleDO.getId();
 
@@ -155,7 +155,7 @@ public class RoleServiceTest extends BaseDbUnitTest {
         sysRoleService.deleteRole(roleId);
 
         //断言
-        SysRoleDO newRoleDO = roleMapper.selectById(roleId);
+        RoleDO newRoleDO = roleMapper.selectById(roleId);
         assertNull(newRoleDO);
 
         verify(sysRoleProducer).sendRoleRefreshMessage();
@@ -163,22 +163,22 @@ public class RoleServiceTest extends BaseDbUnitTest {
 
     @Test
     public void testGetRoles_success() {
-        Map<Long, SysRoleDO> idRoleMap = new HashMap<>();
+        Map<Long, RoleDO> idRoleMap = new HashMap<>();
         // 验证查询状态为1的角色
-        SysRoleDO roleDO1 = createRoleDO("role1", RoleTypeEnum.CUSTOM, DataScopeEnum.ALL, 1);
+        RoleDO roleDO1 = createRoleDO("role1", RoleTypeEnum.CUSTOM, DataScopeEnum.ALL, 1);
         roleMapper.insert(roleDO1);
         idRoleMap.put(roleDO1.getId(), roleDO1);
 
-        SysRoleDO roleDO2 = createRoleDO("role2", RoleTypeEnum.CUSTOM, DataScopeEnum.ALL, 1);
+        RoleDO roleDO2 = createRoleDO("role2", RoleTypeEnum.CUSTOM, DataScopeEnum.ALL, 1);
         roleMapper.insert(roleDO2);
         idRoleMap.put(roleDO2.getId(), roleDO2);
 
         // 以下是排除的角色
-        SysRoleDO roleDO3 = createRoleDO("role3", RoleTypeEnum.CUSTOM, DataScopeEnum.ALL, 2);
+        RoleDO roleDO3 = createRoleDO("role3", RoleTypeEnum.CUSTOM, DataScopeEnum.ALL, 2);
         roleMapper.insert(roleDO3);
 
         //调用
-        List<SysRoleDO> roles = sysRoleService.getRoles(Arrays.asList(1));
+        List<RoleDO> roles = sysRoleService.getRoles(Arrays.asList(1));
 
         //断言
         assertEquals(2, roles.size());
@@ -188,10 +188,10 @@ public class RoleServiceTest extends BaseDbUnitTest {
 
     @Test
     public void testGetRolePage_success() {
-        Map<Long, SysRoleDO> idRoleMap = new HashMap<>();
+        Map<Long, RoleDO> idRoleMap = new HashMap<>();
         // 验证名称包含"role", 状态为1,code为"code"的角色
         // 第一页
-        SysRoleDO roleDO = createRoleDO("role1", RoleTypeEnum.CUSTOM, DataScopeEnum.ALL, 1, "code");
+        RoleDO roleDO = createRoleDO("role1", RoleTypeEnum.CUSTOM, DataScopeEnum.ALL, 1, "code");
         roleMapper.insert(roleDO);
         idRoleMap.put(roleDO.getId(), roleDO);
         // 第二页
@@ -214,7 +214,7 @@ public class RoleServiceTest extends BaseDbUnitTest {
             o.setBeginTime(null);
             o.setEndTime(null);
         });
-        PageResult<SysRoleDO> result = sysRoleService.getRolePage(reqVO);
+        PageResult<RoleDO> result = sysRoleService.getRolePage(reqVO);
         assertEquals(2, result.getTotal());
         result.getList().stream().forEach(r -> assertPojoEquals(idRoleMap.get(r.getId()), r));
     }
@@ -226,7 +226,7 @@ public class RoleServiceTest extends BaseDbUnitTest {
 
     @Test
     public void testCheckDuplicateRole_nameDuplicate() {
-        SysRoleDO roleDO = createRoleDO("role_name", RoleTypeEnum.CUSTOM, DataScopeEnum.ALL);
+        RoleDO roleDO = createRoleDO("role_name", RoleTypeEnum.CUSTOM, DataScopeEnum.ALL);
         roleMapper.insert(roleDO);
 
         String duplicateName = "role_name";
@@ -236,7 +236,7 @@ public class RoleServiceTest extends BaseDbUnitTest {
 
     @Test
     public void testCheckDuplicateRole_codeDuplicate() {
-        SysRoleDO roleDO = randomPojo(SysRoleDO.class, o -> {
+        RoleDO roleDO = randomPojo(RoleDO.class, o -> {
             o.setName("role_999");
             o.setCode("code");
             o.setType(RoleTypeEnum.CUSTOM.getType());
@@ -253,7 +253,7 @@ public class RoleServiceTest extends BaseDbUnitTest {
 
     @Test
     public void testCheckUpdateRole_success() {
-        SysRoleDO roleDO = createRoleDO("role_name", RoleTypeEnum.CUSTOM, DataScopeEnum.ALL);
+        RoleDO roleDO = createRoleDO("role_name", RoleTypeEnum.CUSTOM, DataScopeEnum.ALL);
         roleMapper.insert(roleDO);
         Long roleId = roleDO.getId();
 
@@ -267,27 +267,27 @@ public class RoleServiceTest extends BaseDbUnitTest {
 
     @Test
     public void testCheckUpdateRole_systemRoleCanNotBeUpdate() {
-        SysRoleDO roleDO = createRoleDO("role_name", RoleTypeEnum.SYSTEM, DataScopeEnum.ALL);
+        RoleDO roleDO = createRoleDO("role_name", RoleTypeEnum.SYSTEM, DataScopeEnum.ALL);
         roleMapper.insert(roleDO);
         Long roleId = roleDO.getId();
 
         assertServiceException(() -> sysRoleService.checkUpdateRole(roleId), ROLE_CAN_NOT_UPDATE_SYSTEM_TYPE_ROLE);
     }
 
-    private SysRoleDO createRoleDO(String name, RoleTypeEnum typeEnum, DataScopeEnum scopeEnum, Integer status) {
+    private RoleDO createRoleDO(String name, RoleTypeEnum typeEnum, DataScopeEnum scopeEnum, Integer status) {
         return createRoleDO( name, typeEnum, scopeEnum, status, randomString());
     }
 
-    private SysRoleDO createRoleDO(String name, RoleTypeEnum typeEnum, DataScopeEnum scopeEnum, Integer status, String code) {
+    private RoleDO createRoleDO(String name, RoleTypeEnum typeEnum, DataScopeEnum scopeEnum, Integer status, String code) {
         return createRoleDO(null, name, typeEnum, scopeEnum, status, code);
     }
 
-    private SysRoleDO createRoleDO(String name, RoleTypeEnum typeEnum, DataScopeEnum scopeEnum) {
+    private RoleDO createRoleDO(String name, RoleTypeEnum typeEnum, DataScopeEnum scopeEnum) {
         return createRoleDO(null, name, typeEnum, scopeEnum, randomCommonStatus(), randomString());
     }
 
-    private SysRoleDO createRoleDO(Long id, String name, RoleTypeEnum typeEnum, DataScopeEnum scopeEnum, Integer status, String code) {
-        SysRoleDO roleDO = randomPojo(SysRoleDO.class, o -> {
+    private RoleDO createRoleDO(Long id, String name, RoleTypeEnum typeEnum, DataScopeEnum scopeEnum, Integer status, String code) {
+        RoleDO roleDO = randomPojo(RoleDO.class, o -> {
             o.setId(id);
             o.setName(name);
             o.setType(typeEnum.getType());

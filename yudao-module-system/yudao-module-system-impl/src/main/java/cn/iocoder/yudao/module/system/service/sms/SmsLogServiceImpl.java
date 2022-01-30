@@ -4,7 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.log.SmsLogExportReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.log.SmsLogPageReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.sms.SysSmsTemplateDO;
-import cn.iocoder.yudao.module.system.dal.mysql.sms.SysSmsLogMapper;
+import cn.iocoder.yudao.module.system.dal.mysql.sms.SmsLogMapper;
 import cn.iocoder.yudao.module.system.dal.dataobject.sms.SysSmsLogDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.system.enums.sms.SysSmsReceiveStatusEnum;
@@ -28,7 +28,7 @@ import java.util.Objects;
 public class SmsLogServiceImpl implements SmsLogService {
 
     @Resource
-    private SysSmsLogMapper smsLogMapper;
+    private SmsLogMapper smsLogMapper;
 
     @Override
     public Long createSmsLog(String mobile, Long userId, Integer userType, Boolean isSend,
@@ -41,7 +41,8 @@ public class SmsLogServiceImpl implements SmsLogService {
         logBuilder.mobile(mobile).userId(userId).userType(userType);
         // 设置模板相关字段
         logBuilder.templateId(template.getId()).templateCode(template.getCode()).templateType(template.getType());
-        logBuilder.templateContent(templateContent).templateParams(templateParams).apiTemplateId(template.getApiTemplateId());
+        logBuilder.templateContent(templateContent).templateParams(templateParams)
+                .apiTemplateId(template.getApiTemplateId());
         // 设置渠道相关字段
         logBuilder.channelId(template.getChannelId()).channelCode(template.getChannelCode());
         // 设置接收相关字段

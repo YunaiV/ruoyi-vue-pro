@@ -6,15 +6,15 @@ import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.security.config.SecurityProperties;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.module.system.controller.admin.auth.vo.session.UserSessionPageReqVO;
+import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
 import cn.iocoder.yudao.module.system.dal.mysql.auth.SysUserSessionMapper;
 import cn.iocoder.yudao.module.system.enums.logger.LoginLogTypeEnum;
 import cn.iocoder.yudao.module.system.enums.logger.LoginResultEnum;
 import cn.iocoder.yudao.module.system.service.logger.LoginLogService;
-import cn.iocoder.yudao.module.system.service.user.UserService;
+import cn.iocoder.yudao.module.system.service.user.AdminUserService;
 import cn.iocoder.yudao.module.system.dal.dataobject.auth.SysUserSessionDO;
-import cn.iocoder.yudao.module.system.dal.dataobject.user.UserDO;
 import cn.iocoder.yudao.module.system.dal.redis.auth.LoginUserRedisDAO;
-import cn.iocoder.yudao.module.system.service.logger.dto.LoginLogCreateReqDTO;
+import cn.iocoder.yudao.module.system.api.logger.dto.LoginLogCreateReqDTO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.monitor.TracerUtils;
 import com.google.common.collect.Lists;
@@ -42,7 +42,7 @@ public class UserSessionServiceImpl implements UserSessionService {
     private SysUserSessionMapper userSessionMapper;
 
     @Resource
-    private UserService userService;
+    private AdminUserService userService;
     @Resource
     private LoginLogService loginLogService;
 
@@ -57,7 +57,7 @@ public class UserSessionServiceImpl implements UserSessionService {
         // 处理基于用户昵称的查询
         Collection<Long> userIds = null;
         if (StrUtil.isNotEmpty(reqVO.getUsername())) {
-            userIds = convertSet(userService.getUsersByUsername(reqVO.getUsername()), UserDO::getId);
+            userIds = convertSet(userService.getUsersByUsername(reqVO.getUsername()), AdminUserDO::getId);
             if (CollUtil.isEmpty(userIds)) {
                 return PageResult.empty();
             }

@@ -1,12 +1,14 @@
 package cn.iocoder.yudao.module.member.api.user.dto;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import lombok.Data;
 
 /**
  * 用户信息 Response DTO
  *
  * @author 芋道源码
  */
+@Data
 public class UserRespDTO {
 
     /**

@@ -4,9 +4,9 @@ import cn.hutool.core.map.MapUtil;
 import cn.iocoder.yudao.module.system.controller.admin.logger.vo.operatelog.OperateLogExportReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.logger.vo.operatelog.OperateLogPageReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.logger.OperateLogDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
 import cn.iocoder.yudao.module.system.dal.mysql.logger.OperateLogMapper;
-import cn.iocoder.yudao.module.system.service.user.UserService;
-import cn.iocoder.yudao.module.system.dal.dataobject.user.UserDO;
+import cn.iocoder.yudao.module.system.service.user.AdminUserService;
 import cn.iocoder.yudao.module.system.enums.common.SysSexEnum;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants;
@@ -43,7 +43,7 @@ public class OperateLogServiceImplTest extends BaseDbUnitTest {
     private OperateLogMapper operateLogMapper;
 
     @MockBean
-    private UserService userService;
+    private AdminUserService userService;
 
     @Test
     public void testCreateOperateLogAsync() throws InterruptedException, ExecutionException {
@@ -66,7 +66,7 @@ public class OperateLogServiceImplTest extends BaseDbUnitTest {
     public void testGetOperateLogPage() {
         // 构造测试数据
         // 先构造用户
-        UserDO user = RandomUtils.randomPojo(UserDO.class, o -> {
+        AdminUserDO user = RandomUtils.randomPojo(AdminUserDO.class, o -> {
             o.setNickname("wangkai");
             o.setSex(SysSexEnum.MALE.getSex());
             o.setStatus(CommonStatusEnum.ENABLE.getStatus());
@@ -117,7 +117,7 @@ public class OperateLogServiceImplTest extends BaseDbUnitTest {
     public void testGetOperateLogs() {
         // 构造测试数据
         // 先构造用户
-        UserDO user = RandomUtils.randomPojo(UserDO.class, o -> {
+        AdminUserDO user = RandomUtils.randomPojo(AdminUserDO.class, o -> {
             o.setNickname("wangkai");
             o.setSex(SysSexEnum.MALE.getSex());
             o.setStatus(CommonStatusEnum.ENABLE.getStatus());

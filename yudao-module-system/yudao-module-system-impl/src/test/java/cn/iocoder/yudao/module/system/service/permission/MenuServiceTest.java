@@ -7,7 +7,7 @@ import cn.iocoder.yudao.module.system.controller.admin.permission.vo.menu.MenuCr
 import cn.iocoder.yudao.module.system.controller.admin.permission.vo.menu.MenuListReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.permission.vo.menu.MenuUpdateReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.MenuDO;
-import cn.iocoder.yudao.module.system.dal.mysql.permission.SysMenuMapper;
+import cn.iocoder.yudao.module.system.dal.mysql.permission.MenuMapper;
 import cn.iocoder.yudao.module.system.enums.permission.MenuTypeEnum;
 import cn.iocoder.yudao.module.system.mq.producer.permission.MenuProducer;
 import cn.iocoder.yudao.framework.common.util.spring.SpringAopUtils;
@@ -41,7 +41,7 @@ public class MenuServiceTest extends BaseDbUnitTest {
     private MenuProducer sysMenuProducer;
 
     @Resource
-    private SysMenuMapper menuMapper;
+    private MenuMapper menuMapper;
 
     @Test
     public void testInitLocalCache_success() throws Exception {

@@ -5,7 +5,7 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.log.SmsLogExportReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.log.SmsLogPageReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.sms.SysSmsTemplateDO;
-import cn.iocoder.yudao.module.system.dal.mysql.sms.SysSmsLogMapper;
+import cn.iocoder.yudao.module.system.dal.mysql.sms.SmsLogMapper;
 import cn.iocoder.yudao.module.system.dal.dataobject.sms.SysSmsLogDO;
 import cn.iocoder.yudao.module.system.enums.sms.SysSmsReceiveStatusEnum;
 import cn.iocoder.yudao.module.system.enums.sms.SysSmsSendStatusEnum;
@@ -39,7 +39,7 @@ public class SmsLogServiceTest extends BaseDbUnitTest {
     private SmsLogServiceImpl smsLogService;
 
     @Resource
-    private SysSmsLogMapper smsLogMapper;
+    private SmsLogMapper smsLogMapper;
 
     @Test
     public void testGetSmsLogPage() {

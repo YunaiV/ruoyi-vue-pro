@@ -2,8 +2,8 @@ package cn.iocoder.yudao.module.system.dal.dataobject.logger;
 
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.yudao.module.system.enums.logger.SysLoginLogTypeEnum;
-import cn.iocoder.yudao.module.system.enums.logger.SysLoginResultEnum;
+import cn.iocoder.yudao.module.system.enums.logger.LoginLogTypeEnum;
+import cn.iocoder.yudao.module.system.enums.logger.LoginResultEnum;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -29,7 +29,7 @@ public class SysLoginLogDO extends BaseDO {
     /**
      * 日志类型
      *
-     * 枚举 {@link SysLoginLogTypeEnum}
+     * 枚举 {@link LoginLogTypeEnum}
      */
     private Integer logType;
     /**
@@ -55,7 +55,7 @@ public class SysLoginLogDO extends BaseDO {
     /**
      * 登录结果
      *
-     * 枚举 {@link SysLoginResultEnum}
+     * 枚举 {@link LoginResultEnum}
      */
     private Integer result;
     /**

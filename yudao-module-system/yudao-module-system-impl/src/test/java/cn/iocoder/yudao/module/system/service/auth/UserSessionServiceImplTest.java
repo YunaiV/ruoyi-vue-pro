@@ -4,11 +4,11 @@ import cn.hutool.core.date.DateUtil;
 import cn.iocoder.yudao.framework.security.config.SecurityProperties;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.module.system.controller.admin.auth.vo.session.UserSessionPageReqVO;
+import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
 import cn.iocoder.yudao.module.system.dal.mysql.auth.SysUserSessionMapper;
 import cn.iocoder.yudao.module.system.service.logger.LoginLogService;
-import cn.iocoder.yudao.module.system.service.user.UserService;
+import cn.iocoder.yudao.module.system.service.user.AdminUserService;
 import cn.iocoder.yudao.module.system.dal.dataobject.auth.SysUserSessionDO;
-import cn.iocoder.yudao.module.system.dal.dataobject.user.UserDO;
 import cn.iocoder.yudao.module.system.dal.redis.auth.LoginUserRedisDAO;
 import cn.iocoder.yudao.module.system.enums.common.SysSexEnum;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
@@ -52,7 +52,7 @@ public class UserSessionServiceImplTest extends BaseDbAndRedisUnitTest {
     private SysUserSessionMapper userSessionMapper;
 
     @MockBean
-    private UserService userService;
+    private AdminUserService userService;
     @MockBean
     private LoginLogService loginLogService;
     @MockBean
@@ -64,7 +64,7 @@ public class UserSessionServiceImplTest extends BaseDbAndRedisUnitTest {
     @Test
     public void testGetUserSessionPage_success() {
         // mock 数据
-        UserDO dbUser = randomPojo(UserDO.class, o -> {
+        AdminUserDO dbUser = randomPojo(AdminUserDO.class, o -> {
             o.setSex(randomEle(SysSexEnum.values()).getSex());
             o.setStatus(CommonStatusEnum.ENABLE.getStatus());
         });

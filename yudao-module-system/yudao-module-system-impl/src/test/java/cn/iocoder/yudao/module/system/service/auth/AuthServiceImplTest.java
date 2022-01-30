@@ -1,14 +1,14 @@
 package cn.iocoder.yudao.module.system.service.auth;
 
 import cn.iocoder.yudao.module.system.controller.admin.auth.vo.auth.AuthLoginReqVO;
+import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
 import cn.iocoder.yudao.module.system.enums.logger.LoginLogTypeEnum;
 import cn.iocoder.yudao.module.system.enums.logger.LoginResultEnum;
 import cn.iocoder.yudao.module.system.service.common.CaptchaService;
 import cn.iocoder.yudao.module.system.service.dept.PostService;
 import cn.iocoder.yudao.module.system.service.logger.LoginLogService;
 import cn.iocoder.yudao.module.system.service.permission.PermissionService;
-import cn.iocoder.yudao.module.system.service.user.UserService;
-import cn.iocoder.yudao.module.system.dal.dataobject.user.UserDO;
+import cn.iocoder.yudao.module.system.service.user.AdminUserService;
 import cn.iocoder.yudao.module.system.service.social.SocialUserService;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
@@ -37,14 +37,14 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
-@Import(AuthServiceImpl.class)
+@Import(AdminAuthServiceImpl.class)
 public class AuthServiceImplTest extends BaseDbUnitTest {
 
     @Resource
-    private AuthServiceImpl authService;
+    private AdminAuthServiceImpl authService;
 
     @MockBean
-    private UserService userService;
+    private AdminUserService userService;
     @MockBean
     private PermissionService permissionService;
     @MockBean
@@ -72,7 +72,7 @@ public class AuthServiceImplTest extends BaseDbUnitTest {
         // 准备参数
         String username = randomString();
         // mock 方法
-        UserDO user = randomPojo(UserDO.class, o -> o.setUsername(username));
+        AdminUserDO user = randomPojo(AdminUserDO.class, o -> o.setUsername(username));
         when(userService.getUserByUsername(eq(username))).thenReturn(user);
 
         // 调用
@@ -98,7 +98,7 @@ public class AuthServiceImplTest extends BaseDbUnitTest {
         // 准备参数
         Long userId = randomLongId();
         // mock 方法 01
-        UserDO user = randomPojo(UserDO.class, o -> o.setId(userId));
+        AdminUserDO user = randomPojo(AdminUserDO.class, o -> o.setId(userId));
         when(userService.getUser(eq(userId))).thenReturn(user);
         // mock 方法 02
         Set<Long> roleIds = randomSet(Long.class);

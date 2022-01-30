@@ -8,7 +8,7 @@ import cn.iocoder.yudao.module.system.controller.admin.permission.vo.menu.MenuLi
 import cn.iocoder.yudao.module.system.controller.admin.permission.vo.menu.MenuUpdateReqVO;
 import cn.iocoder.yudao.module.system.convert.permission.MenuConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.MenuDO;
-import cn.iocoder.yudao.module.system.dal.mysql.permission.SysMenuMapper;
+import cn.iocoder.yudao.module.system.dal.mysql.permission.MenuMapper;
 import cn.iocoder.yudao.module.system.enums.permission.MenuIdEnum;
 import cn.iocoder.yudao.module.system.enums.permission.MenuTypeEnum;
 import cn.iocoder.yudao.module.system.mq.producer.permission.MenuProducer;
@@ -67,7 +67,7 @@ public class MenuServiceImpl implements MenuService {
     private volatile Date maxUpdateTime;
 
     @Resource
-    private SysMenuMapper menuMapper;
+    private MenuMapper menuMapper;
     @Resource
     private PermissionService permissionService;
 

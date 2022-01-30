@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.system.dal.dataobject.social;
 
-import cn.iocoder.yudao.module.system.dal.dataobject.user.UserDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -9,7 +9,7 @@ import lombok.*;
 
 /**
  * 社交用户
- * 通过 {@link SysSocialUserDO#getUserId()} 关联到对应的 {@link UserDO}
+ * 通过 {@link SysSocialUserDO#getUserId()} 关联到对应的 {@link AdminUserDO}
  *
  * @author weir
  */

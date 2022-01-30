@@ -4,7 +4,7 @@ import cn.iocoder.yudao.module.system.controller.admin.sms.vo.template.*;
 import cn.iocoder.yudao.module.system.convert.sms.SmsTemplateConvert;
 import cn.iocoder.yudao.module.system.service.sms.SmsTemplateService;
 import cn.iocoder.yudao.module.system.dal.dataobject.sms.SysSmsTemplateDO;
-import cn.iocoder.yudao.module.system.service.sms.SysSmsSendService;
+import cn.iocoder.yudao.module.system.service.sms.SmsSendService;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
@@ -32,7 +32,7 @@ public class SmsTemplateController {
     @Resource
     private SmsTemplateService smsTemplateService;
     @Resource
-    private SysSmsSendService smsCoreService;
+    private SmsSendService smsCoreService;
 
     @PostMapping("/create")
     @ApiOperation("创建短信模板")
@@ -91,7 +91,7 @@ public class SmsTemplateController {
     @ApiOperation("发送短信")
     @PreAuthorize("@ss.hasPermission('system:sms-template:send-sms')")
     public CommonResult<Long> sendSms(@Valid @RequestBody SmsTemplateSendReqVO sendReqVO) {
-        return success(smsCoreService.sendSingleSms(sendReqVO.getMobile(), null, null,
+        return success(smsCoreService.sendSingleSmsToAdmin(sendReqVO.getMobile(), null,
                 sendReqVO.getTemplateCode(), sendReqVO.getTemplateParams()));
     }
 

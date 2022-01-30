@@ -2,11 +2,11 @@ package cn.iocoder.yudao.module.system.service.permission;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.SysDeptDO;
-import cn.iocoder.yudao.module.system.dal.dataobject.permission.SysRoleDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.permission.RoleDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.RoleMenuDO;
-import cn.iocoder.yudao.module.system.dal.dataobject.permission.SysUserRoleDO;
-import cn.iocoder.yudao.module.system.dal.mysql.permission.SysRoleMenuMapper;
-import cn.iocoder.yudao.module.system.dal.mysql.permission.SysUserRoleMapper;
+import cn.iocoder.yudao.module.system.dal.dataobject.permission.UserRoleDO;
+import cn.iocoder.yudao.module.system.dal.mysql.permission.RoleMenuMapper;
+import cn.iocoder.yudao.module.system.dal.mysql.permission.UserRoleMapper;
 import cn.iocoder.yudao.module.system.mq.producer.permission.PermissionProducer;
 import cn.iocoder.yudao.module.system.service.dept.DeptService;
 import cn.iocoder.yudao.framework.datapermission.core.dept.service.dto.DeptDataPermissionRespDTO;
@@ -37,9 +37,9 @@ public class PermissionServiceTest extends BaseDbUnitTest {
     private PermissionServiceImpl permissionService;
 
     @Resource
-    private SysRoleMenuMapper roleMenuMapper;
+    private RoleMenuMapper roleMenuMapper;
     @Resource
-    private SysUserRoleMapper userRoleMapper;
+    private UserRoleMapper userRoleMapper;
 
     @MockBean
     private RoleService roleService;
@@ -56,9 +56,9 @@ public class PermissionServiceTest extends BaseDbUnitTest {
         // 准备参数
         Long roleId = randomLongId();
         // mock 数据 UserRole
-        SysUserRoleDO userRoleDO01 = randomPojo(SysUserRoleDO.class, o -> o.setRoleId(roleId)); // 被删除
+        UserRoleDO userRoleDO01 = randomPojo(UserRoleDO.class, o -> o.setRoleId(roleId)); // 被删除
         userRoleMapper.insert(userRoleDO01);
-        SysUserRoleDO userRoleDO02 = randomPojo(SysUserRoleDO.class); // 不被删除
+        UserRoleDO userRoleDO02 = randomPojo(UserRoleDO.class); // 不被删除
         userRoleMapper.insert(userRoleDO02);
         // mock 数据 RoleMenu
         RoleMenuDO roleMenuDO01 = randomPojo(RoleMenuDO.class, o -> o.setRoleId(roleId)); // 被删除
@@ -73,7 +73,7 @@ public class PermissionServiceTest extends BaseDbUnitTest {
         assertEquals(1, dbRoleMenus.size());
         assertPojoEquals(dbRoleMenus.get(0), roleMenuDO02);
         // 断言数据 UserRoleDO
-        List<SysUserRoleDO> dbUserRoles = userRoleMapper.selectList();
+        List<UserRoleDO> dbUserRoles = userRoleMapper.selectList();
         assertEquals(1, dbUserRoles.size());
         assertPojoEquals(dbUserRoles.get(0), userRoleDO02);
         // 断言调用
@@ -105,15 +105,15 @@ public class PermissionServiceTest extends BaseDbUnitTest {
         // 准备参数
         Long userId = randomLongId();
         // mock 数据
-        SysUserRoleDO userRoleDO01 = randomPojo(SysUserRoleDO.class, o -> o.setUserId(userId)); // 被删除
+        UserRoleDO userRoleDO01 = randomPojo(UserRoleDO.class, o -> o.setUserId(userId)); // 被删除
         userRoleMapper.insert(userRoleDO01);
-        SysUserRoleDO userRoleDO02 = randomPojo(SysUserRoleDO.class); // 不被删除
+        UserRoleDO userRoleDO02 = randomPojo(UserRoleDO.class); // 不被删除
         userRoleMapper.insert(userRoleDO02);
 
         // 调用
         permissionService.processUserDeleted(userId);
         // 断言数据
-        List<SysUserRoleDO> dbUserRoles = userRoleMapper.selectList();
+        List<UserRoleDO> dbUserRoles = userRoleMapper.selectList();
         assertEquals(1, dbUserRoles.size());
         assertPojoEquals(dbUserRoles.get(0), userRoleDO02);
     }
@@ -137,7 +137,7 @@ public class PermissionServiceTest extends BaseDbUnitTest {
         // 准备参数
         LoginUser loginUser = randomPojo(LoginUser.class);
         // mock 方法
-        SysRoleDO roleDO = randomPojo(SysRoleDO.class, o -> o.setDataScope(DataScopeEnum.ALL.getScope()));
+        RoleDO roleDO = randomPojo(RoleDO.class, o -> o.setDataScope(DataScopeEnum.ALL.getScope()));
         when(roleService.getRolesFromCache(same(loginUser.getRoleIds()))).thenReturn(singletonList(roleDO));
 
         // 调用
@@ -154,7 +154,7 @@ public class PermissionServiceTest extends BaseDbUnitTest {
         // 准备参数
         LoginUser loginUser = randomPojo(LoginUser.class);
         // mock 方法
-        SysRoleDO roleDO = randomPojo(SysRoleDO.class, o -> o.setDataScope(DataScopeEnum.DEPT_CUSTOM.getScope()));
+        RoleDO roleDO = randomPojo(RoleDO.class, o -> o.setDataScope(DataScopeEnum.DEPT_CUSTOM.getScope()));
         when(roleService.getRolesFromCache(same(loginUser.getRoleIds()))).thenReturn(singletonList(roleDO));
 
         // 调用
@@ -173,7 +173,7 @@ public class PermissionServiceTest extends BaseDbUnitTest {
         // 准备参数
         LoginUser loginUser = randomPojo(LoginUser.class);
         // mock 方法
-        SysRoleDO roleDO = randomPojo(SysRoleDO.class, o -> o.setDataScope(DataScopeEnum.DEPT_ONLY.getScope()));
+        RoleDO roleDO = randomPojo(RoleDO.class, o -> o.setDataScope(DataScopeEnum.DEPT_ONLY.getScope()));
         when(roleService.getRolesFromCache(same(loginUser.getRoleIds()))).thenReturn(singletonList(roleDO));
 
         // 调用
@@ -191,7 +191,7 @@ public class PermissionServiceTest extends BaseDbUnitTest {
         // 准备参数
         LoginUser loginUser = randomPojo(LoginUser.class);
         // mock 方法（角色）
-        SysRoleDO roleDO = randomPojo(SysRoleDO.class, o -> o.setDataScope(DataScopeEnum.DEPT_AND_CHILD.getScope()));
+        RoleDO roleDO = randomPojo(RoleDO.class, o -> o.setDataScope(DataScopeEnum.DEPT_AND_CHILD.getScope()));
         when(roleService.getRolesFromCache(same(loginUser.getRoleIds()))).thenReturn(singletonList(roleDO));
         // mock 方法（部门）
         SysDeptDO deptDO = randomPojo(SysDeptDO.class);
@@ -213,7 +213,7 @@ public class PermissionServiceTest extends BaseDbUnitTest {
         // 准备参数
         LoginUser loginUser = randomPojo(LoginUser.class);
         // mock 方法
-        SysRoleDO roleDO = randomPojo(SysRoleDO.class, o -> o.setDataScope(DataScopeEnum.SELF.getScope()));
+        RoleDO roleDO = randomPojo(RoleDO.class, o -> o.setDataScope(DataScopeEnum.SELF.getScope()));
         when(roleService.getRolesFromCache(same(loginUser.getRoleIds()))).thenReturn(singletonList(roleDO));
 
         // 调用

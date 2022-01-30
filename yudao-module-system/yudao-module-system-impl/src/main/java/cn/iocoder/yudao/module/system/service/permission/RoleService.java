@@ -5,7 +5,7 @@ import cn.iocoder.yudao.module.system.controller.admin.permission.vo.role.RoleCr
 import cn.iocoder.yudao.module.system.controller.admin.permission.vo.role.RoleExportReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.permission.vo.role.RolePageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.permission.vo.role.RoleUpdateReqVO;
-import cn.iocoder.yudao.module.system.dal.dataobject.permission.SysRoleDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.permission.RoleDO;
 import org.springframework.lang.Nullable;
 
 import java.util.Collection;
@@ -69,7 +69,7 @@ public interface RoleService {
      * @param id 角色编号
      * @return 角色
      */
-    SysRoleDO getRoleFromCache(Long id);
+    RoleDO getRoleFromCache(Long id);
 
     /**
      * 获得角色列表
@@ -77,7 +77,7 @@ public interface RoleService {
      * @param statuses 筛选的状态。允许空，空时不筛选
      * @return 角色列表
      */
-    List<SysRoleDO> getRoles(@Nullable Collection<Integer> statuses);
+    List<RoleDO> getRoles(@Nullable Collection<Integer> statuses);
 
     /**
      * 获得角色数组，从缓存中
@@ -85,7 +85,7 @@ public interface RoleService {
      * @param ids 角色编号数组
      * @return 角色数组
      */
-    List<SysRoleDO> getRolesFromCache(Collection<Long> ids);
+    List<RoleDO> getRolesFromCache(Collection<Long> ids);
 
     /**
      * 判断角色数组中，是否有管理员
@@ -93,7 +93,7 @@ public interface RoleService {
      * @param roleList 角色数组
      * @return 是否有管理员
      */
-    boolean hasAnyAdmin(Collection<SysRoleDO> roleList);
+    boolean hasAnyAdmin(Collection<RoleDO> roleList);
 
     /**
      * 判断角色编号数组中，是否有管理员
@@ -111,7 +111,7 @@ public interface RoleService {
      * @param id 角色编号
      * @return 角色
      */
-    SysRoleDO getRole(Long id);
+    RoleDO getRole(Long id);
 
     /**
      * 获得角色分页
@@ -119,7 +119,7 @@ public interface RoleService {
      * @param reqVO 角色分页查询
      * @return 角色分页结果
      */
-    PageResult<SysRoleDO> getRolePage(RolePageReqVO reqVO);
+    PageResult<RoleDO> getRolePage(RolePageReqVO reqVO);
 
     /**
      * 获得角色列表
@@ -127,8 +127,15 @@ public interface RoleService {
      * @param reqVO 列表查询
      * @return 角色列表
      */
-    List<SysRoleDO> getRoleList(RoleExportReqVO reqVO);
+    List<RoleDO> getRoleList(RoleExportReqVO reqVO);
 
-
+    /**
+     * 校验角色们是否有效。如下情况，视为无效：
+     * 1. 角色编号不存在
+     * 2. 角色被禁用
+     *
+     * @param ids 角色编号数组
+     */
+    void validRoles(Collection<Long> ids);
 
 }

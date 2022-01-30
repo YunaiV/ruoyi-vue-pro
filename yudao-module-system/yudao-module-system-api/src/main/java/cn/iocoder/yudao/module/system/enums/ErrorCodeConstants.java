@@ -87,12 +87,31 @@ public interface ErrorCodeConstants {
     ErrorCode SMS_TEMPLATE_NOT_EXISTS = new ErrorCode(1002011000, "短信模板不存在");
     ErrorCode SMS_TEMPLATE_CODE_DUPLICATE = new ErrorCode(1002011001, "已经存在编码为【{}】的短信模板");
 
-    // ========== 租户模块 1002012000 ==========
-    ErrorCode TENANT_NOT_EXISTS = new ErrorCode(1002012000, "租户不存在");
+    // ========== 短信发送 1002012000 ==========
+    ErrorCode SMS_SEND_MOBILE_NOT_EXISTS = new ErrorCode(1002012000, "手机号不存在");
+    ErrorCode SMS_SEND_MOBILE_TEMPLATE_PARAM_MISS = new ErrorCode(1002012001, "模板参数({})缺失");
+    ErrorCode SMS_SEND_TEMPLATE_NOT_EXISTS = new ErrorCode(1002012002, "短信模板不存在");
 
-    // ========== 错误码模块 1002013000 ==========
-    ErrorCode ERROR_CODE_NOT_EXISTS = new ErrorCode(1002013000, "错误码不存在");
-    ErrorCode ERROR_CODE_DUPLICATE = new ErrorCode(1002013001, "已经存在编码为【{}】的错误码");
+    // ========== 短信验证码 1002013000 ==========
+    ErrorCode SMS_CODE_NOT_FOUND = new ErrorCode(1002013000, "验证码不存在");
+    ErrorCode SMS_CODE_EXPIRED = new ErrorCode(1002013001, "验证码已过期");
+    ErrorCode SMS_CODE_USED = new ErrorCode(1002013002, "验证码已使用");
+    ErrorCode SMS_CODE_NOT_CORRECT = new ErrorCode(1002013004, "验证码不正确");
+    ErrorCode SMS_CODE_EXCEED_SEND_MAXIMUM_QUANTITY_PER_DAY = new ErrorCode(1002013005, "超过每日短信发送数量");
+    ErrorCode SMS_CODE_SEND_TOO_FAST = new ErrorCode(1002013006, "短信发送过于频率");
+    ErrorCode SMS_CODE_IS_EXISTS = new ErrorCode(1002013007, "手机号已被使用");
+    ErrorCode SMS_CODE_IS_UNUSED = new ErrorCode(1002013008, "验证码未被使用");
 
+    // ========== 租户模块 1002014000 ==========
+    ErrorCode TENANT_NOT_EXISTS = new ErrorCode(1002014000, "租户不存在");
+
+    // ========== 错误码模块 1002015000 ==========
+    ErrorCode ERROR_CODE_NOT_EXISTS = new ErrorCode(1002015000, "错误码不存在");
+    ErrorCode ERROR_CODE_DUPLICATE = new ErrorCode(1002015001, "已经存在编码为【{}】的错误码");
+
+    // ========== 社交用户 1002015000 ==========
+    ErrorCode SOCIAL_USER_AUTH_FAILURE = new ErrorCode(1002015000, "社交授权失败，原因是：{}");
+    ErrorCode SOCIAL_USER_UNBIND_NOT_SELF = new ErrorCode(1002015001, "社交解绑失败，非当前用户绑定");
+    ErrorCode SOCIAL_USER_NOT_FOUND = new ErrorCode(1002015001, "社交授权失败，找不到对应的用户");
 
 }

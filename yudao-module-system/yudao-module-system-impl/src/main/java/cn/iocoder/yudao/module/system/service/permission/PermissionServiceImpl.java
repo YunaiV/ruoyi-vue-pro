@@ -5,11 +5,11 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.SysDeptDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.MenuDO;
-import cn.iocoder.yudao.module.system.dal.dataobject.permission.SysRoleDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.permission.RoleDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.RoleMenuDO;
-import cn.iocoder.yudao.module.system.dal.dataobject.permission.SysUserRoleDO;
-import cn.iocoder.yudao.module.system.dal.mysql.permission.SysRoleMenuMapper;
-import cn.iocoder.yudao.module.system.dal.mysql.permission.SysUserRoleMapper;
+import cn.iocoder.yudao.module.system.dal.dataobject.permission.UserRoleDO;
+import cn.iocoder.yudao.module.system.dal.mysql.permission.RoleMenuMapper;
+import cn.iocoder.yudao.module.system.dal.mysql.permission.UserRoleMapper;
 import cn.iocoder.yudao.module.system.mq.producer.permission.PermissionProducer;
 import cn.iocoder.yudao.module.system.service.dept.DeptService;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
@@ -75,9 +75,9 @@ public class PermissionServiceImpl implements PermissionService {
     private volatile Date maxUpdateTime;
 
     @Resource
-    private SysRoleMenuMapper roleMenuMapper;
+    private RoleMenuMapper roleMenuMapper;
     @Resource
-    private SysUserRoleMapper userRoleMapper;
+    private UserRoleMapper userRoleMapper;
 
     @Resource
     private RoleService roleService;
@@ -150,7 +150,7 @@ public class PermissionServiceImpl implements PermissionService {
             return Collections.emptyList();
         }
         // 判断角色是否包含管理员
-        List<SysRoleDO> roleList = roleService.getRolesFromCache(roleIds);
+        List<RoleDO> roleList = roleService.getRolesFromCache(roleIds);
         boolean hasAdmin = roleService.hasAnyAdmin(roleList);
         // 获得角色拥有的菜单关联
         if (hasAdmin) { // 管理员，获取到全部
@@ -162,21 +162,21 @@ public class PermissionServiceImpl implements PermissionService {
 
     @Override
     public Set<Long> getUserRoleIds(Long userId, Collection<Integer> roleStatuses) {
-        List<SysUserRoleDO> userRoleList = userRoleMapper.selectListByUserId(userId);
+        List<UserRoleDO> userRoleList = userRoleMapper.selectListByUserId(userId);
         // 过滤角色状态
         if (CollectionUtil.isNotEmpty(roleStatuses)) {
             userRoleList.removeIf(userRoleDO -> {
-                SysRoleDO role = roleService.getRoleFromCache(userRoleDO.getRoleId());
+                RoleDO role = roleService.getRoleFromCache(userRoleDO.getRoleId());
                 return role == null || !roleStatuses.contains(role.getStatus());
             });
         }
-        return CollectionUtils.convertSet(userRoleList, SysUserRoleDO::getRoleId);
+        return CollectionUtils.convertSet(userRoleList, UserRoleDO::getRoleId);
     }
 
     @Override
     public Set<Long> listRoleMenuIds(Long roleId) {
         // 如果是管理员的情况下，获取全部菜单编号
-        SysRoleDO role = roleService.getRole(roleId);
+        RoleDO role = roleService.getRole(roleId);
         if (roleService.hasAnyAdmin(Collections.singletonList(role))) {
             return CollectionUtils.convertSet(menuService.getMenus(), MenuDO::getId);
         }
@@ -215,13 +215,13 @@ public class PermissionServiceImpl implements PermissionService {
     @Override
     public Set<Long> getUserRoleIdListByUserId(Long userId) {
         return CollectionUtils.convertSet(userRoleMapper.selectListByUserId(userId),
-                SysUserRoleDO::getRoleId);
+                UserRoleDO::getRoleId);
     }
 
     @Override
     public Set<Long> getUserRoleIdListByRoleId(Long roleId) {
         return CollectionUtils.convertSet(userRoleMapper.selectListByRoleId(roleId),
-                SysUserRoleDO::getRoleId);
+                UserRoleDO::getRoleId);
     }
 
 
@@ -230,7 +230,7 @@ public class PermissionServiceImpl implements PermissionService {
     public void assignUserRole(Long userId, Set<Long> roleIds) {
         // 获得角色拥有角色编号
         Set<Long> dbRoleIds = CollectionUtils.convertSet(userRoleMapper.selectListByUserId(userId),
-                SysUserRoleDO::getRoleId);
+                UserRoleDO::getRoleId);
         // 计算新增和删除的角色编号
         Collection<Long> createRoleIds = CollUtil.subtract(roleIds, dbRoleIds);
         Collection<Long> deleteMenuIds = CollUtil.subtract(dbRoleIds, roleIds);
@@ -343,7 +343,7 @@ public class PermissionServiceImpl implements PermissionService {
             return true;
         }
         Set<String> userRoles = CollectionUtils.convertSet(roleService.getRolesFromCache(roleIds),
-                SysRoleDO::getCode);
+                RoleDO::getCode);
         return CollUtil.containsAny(userRoles, Sets.newHashSet(roles));
     }
 
@@ -357,8 +357,8 @@ public class PermissionServiceImpl implements PermissionService {
 
         // 创建 DeptDataPermissionRespDTO 对象
         result = new DeptDataPermissionRespDTO();
-        List<SysRoleDO> roles = roleService.getRolesFromCache(loginUser.getRoleIds());
-        for (SysRoleDO role : roles) {
+        List<RoleDO> roles = roleService.getRolesFromCache(loginUser.getRoleIds());
+        for (RoleDO role : roles) {
             // 为空时，跳过
             if (role.getDataScope() == null) {
                 continue;
@@ -399,6 +399,12 @@ public class PermissionServiceImpl implements PermissionService {
         // 添加到缓存，并返回
         loginUser.setContext(CONTEXT_KEY, result);
         return result;
+    }
+
+    @Override
+    public Set<Long> getUserRoleIdListByRoleIds(Collection<Long> roleIds) {
+        return CollectionUtils.convertSet(userRoleMapper.selectListByRoleIds(roleIds),
+                UserRoleDO::getRoleId);
     }
 
 }
