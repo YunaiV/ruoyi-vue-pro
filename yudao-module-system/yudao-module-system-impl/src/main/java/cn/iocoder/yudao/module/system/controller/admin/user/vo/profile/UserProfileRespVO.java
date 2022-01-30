@@ -22,7 +22,7 @@ public class UserProfileRespVO extends UserBaseVO {
     @ApiModelProperty(value = "用户编号", required = true, example = "1")
     private Long id;
 
-    @ApiModelProperty(value = "状态", required = true, example = "1", notes = "参见 SysCommonStatusEnum 枚举类")
+    @ApiModelProperty(value = "状态", required = true, example = "1", notes = "参见 CommonStatusEnum 枚举类")
     private Integer status;
 
     @ApiModelProperty(value = "最后登录 IP", required = true, example = "192.168.1.1")
@@ -93,7 +93,7 @@ public class UserProfileRespVO extends UserBaseVO {
     @Data
     public static class SocialUser {
 
-        @ApiModelProperty(value = "社交平台的类型", required = true, example = "10", notes = "参见 SysSocialTypeEnum 枚举类")
+        @ApiModelProperty(value = "社交平台的类型", required = true, example = "10", notes = "参见 SocialTypeEnum 枚举类")
         private Integer type;
 
         @ApiModelProperty(value = "社交的全局编号", required = true, example = "IPRmJ0wvBptiPIlGEZiPewGwiEiE")

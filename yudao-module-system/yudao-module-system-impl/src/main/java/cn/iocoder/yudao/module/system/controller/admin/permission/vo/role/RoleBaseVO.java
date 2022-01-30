@@ -28,7 +28,7 @@ public class RoleBaseVO {
     @NotNull(message = "显示顺序不能为空")
     private Integer sort;
 
-    @ApiModelProperty(value = "角色类型", required = true, example = "1", notes = "见 SysRoleTypeEnum 枚举")
+    @ApiModelProperty(value = "角色类型", required = true, example = "1", notes = "见 RoleTypeEnum 枚举")
     private Integer type;
 
     @ApiModelProperty(value = "备注", example = "我是一个角色")

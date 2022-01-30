@@ -6,7 +6,7 @@ import cn.iocoder.yudao.module.system.controller.admin.notice.vo.NoticeCreateReq
 import cn.iocoder.yudao.module.system.controller.admin.notice.vo.NoticePageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.notice.vo.NoticeUpdateReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.notice.NoticeDO;
-import cn.iocoder.yudao.module.system.dal.mysql.notice.SysNoticeMapper;
+import cn.iocoder.yudao.module.system.dal.mysql.notice.NoticeMapper;
 import cn.iocoder.yudao.module.system.enums.notice.NoticeTypeEnum;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.module.system.test.BaseDbUnitTest;
@@ -32,7 +32,7 @@ class NoticeServiceImplTest extends BaseDbUnitTest {
     private NoticeServiceImpl sysNoticeService;
 
     @Resource
-    private SysNoticeMapper sysNoticeMapper;
+    private NoticeMapper sysNoticeMapper;
 
     @Test
     public void testPageNotices_success() {
@@ -66,7 +66,7 @@ class NoticeServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testGetNotice_success() {
         // 插入前置数据
-        NoticeDO dbNotice = randomSysNoticeDO();
+        NoticeDO dbNotice = randomNoticeDO();
         sysNoticeMapper.insert(dbNotice);
 
         // 查询
@@ -80,7 +80,7 @@ class NoticeServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testCreateNotice_success() {
         // 准备参数
-        NoticeCreateReqVO reqVO = randomSysNoticeCreateReqVO();
+        NoticeCreateReqVO reqVO = randomNoticeCreateReqVO();
 
         // 校验插入是否成功
         Long noticeId = sysNoticeService.createNotice(reqVO);
@@ -94,11 +94,11 @@ class NoticeServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testUpdateNotice_success() {
         // 插入前置数据
-        NoticeDO dbNoticeDO = randomSysNoticeDO();
+        NoticeDO dbNoticeDO = randomNoticeDO();
         sysNoticeMapper.insert(dbNoticeDO);
 
         // 准备更新参数
-        NoticeUpdateReqVO reqVO = randomSysNoticeUpdateReqVO(o -> o.setId(dbNoticeDO.getId()));
+        NoticeUpdateReqVO reqVO = randomNoticeUpdateReqVO(o -> o.setId(dbNoticeDO.getId()));
 
         // 更新
         sysNoticeService.updateNotice(reqVO);
@@ -111,7 +111,7 @@ class NoticeServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testDeleteNotice_success() {
         // 插入前置数据
-        NoticeDO dbNotice = randomSysNoticeDO();
+        NoticeDO dbNotice = randomNoticeDO();
         sysNoticeMapper.insert(dbNotice);
 
         // 删除
@@ -124,7 +124,7 @@ class NoticeServiceImplTest extends BaseDbUnitTest {
     @Test
     public void checkNoticeExists_success() {
         // 插入前置数据
-        NoticeDO dbNotice = randomSysNoticeDO();
+        NoticeDO dbNotice = randomNoticeDO();
         sysNoticeMapper.insert(dbNotice);
 
         // 成功调用
@@ -137,7 +137,7 @@ class NoticeServiceImplTest extends BaseDbUnitTest {
     }
 
     @SafeVarargs
-    private static NoticeDO randomSysNoticeDO(Consumer<NoticeDO>... consumers) {
+    private static NoticeDO randomNoticeDO(Consumer<NoticeDO>... consumers) {
         NoticeDO notice = randomPojo(NoticeDO.class, consumers);
         notice.setType(randomEle(NoticeTypeEnum.values()).getType());
         notice.setStatus(CommonStatusEnum.ENABLE.getStatus());
@@ -145,14 +145,14 @@ class NoticeServiceImplTest extends BaseDbUnitTest {
     }
 
     @SafeVarargs
-    private static NoticeUpdateReqVO randomSysNoticeUpdateReqVO(Consumer<NoticeUpdateReqVO>... consumers) {
+    private static NoticeUpdateReqVO randomNoticeUpdateReqVO(Consumer<NoticeUpdateReqVO>... consumers) {
         NoticeUpdateReqVO reqVO = randomPojo(NoticeUpdateReqVO.class, consumers);
         reqVO.setType(randomEle(NoticeTypeEnum.values()).getType());
         reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
         return reqVO;
     }
 
-    private static NoticeCreateReqVO randomSysNoticeCreateReqVO() {
+    private static NoticeCreateReqVO randomNoticeCreateReqVO() {
         NoticeCreateReqVO reqVO = randomPojo(NoticeCreateReqVO.class);
         reqVO.setType(randomEle(NoticeTypeEnum.values()).getType());
         reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());

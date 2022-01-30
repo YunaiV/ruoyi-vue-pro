@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.system.service.dept;
 
-import cn.iocoder.yudao.module.system.dal.dataobject.dept.SysPostDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.dept.PostDO;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.ArrayUtils;
@@ -9,7 +9,7 @@ import cn.iocoder.yudao.module.system.controller.admin.dept.vo.post.PostCreateRe
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.post.PostExportReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.post.PostPageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.post.PostUpdateReqVO;
-import cn.iocoder.yudao.module.system.dal.mysql.dept.SysPostMapper;
+import cn.iocoder.yudao.module.system.dal.mysql.dept.PostMapper;
 import cn.iocoder.yudao.module.system.test.BaseDbUnitTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
@@ -32,12 +32,12 @@ public class PostServiceTest extends BaseDbUnitTest {
     @Resource
     private PostServiceImpl postService;
     @Resource
-    private SysPostMapper postMapper;
+    private PostMapper postMapper;
 
     @Test
     void testPagePosts() {
         // mock 数据
-        SysPostDO postDO = randomPojo(SysPostDO.class, o -> {
+        PostDO postDO = randomPojo(PostDO.class, o -> {
             o.setName("码仔");
             o.setStatus(CommonStatusEnum.ENABLE.getStatus());
         });
@@ -53,7 +53,7 @@ public class PostServiceTest extends BaseDbUnitTest {
         reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
 
         // 调用
-        PageResult<SysPostDO> pageResult = postService.getPostPage(reqVO);
+        PageResult<PostDO> pageResult = postService.getPostPage(reqVO);
 
         // 断言
         assertEquals(1, pageResult.getTotal());
@@ -64,7 +64,7 @@ public class PostServiceTest extends BaseDbUnitTest {
     @Test
     void testListPosts() {
         // mock 数据
-        SysPostDO postDO = randomPojo(SysPostDO.class, o -> {
+        PostDO postDO = randomPojo(PostDO.class, o -> {
             o.setName("码仔");
             o.setStatus(CommonStatusEnum.ENABLE.getStatus());
         });
@@ -79,7 +79,7 @@ public class PostServiceTest extends BaseDbUnitTest {
         reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
 
         // 调用
-        List<SysPostDO> list = postService.getPosts(reqVO);
+        List<PostDO> list = postService.getPosts(reqVO);
         // 断言
         assertEquals(1, list.size());
         assertPojoEquals(postDO, list.get(0));
@@ -88,12 +88,12 @@ public class PostServiceTest extends BaseDbUnitTest {
     @Test
     void testGetPost() {
         // mock 数据
-        SysPostDO dbPostDO = randomPostDO();
+        PostDO dbPostDO = randomPostDO();
         postMapper.insert(dbPostDO);
         // 准备参数
         Long id = dbPostDO.getId();
         // 调用
-        SysPostDO post = postService.getPost(id);
+        PostDO post = postService.getPost(id);
         // 断言
         assertNotNull(post);
         assertPojoEquals(dbPostDO, post);
@@ -109,14 +109,14 @@ public class PostServiceTest extends BaseDbUnitTest {
         // 断言
         assertNotNull(postId);
         // 校验记录的属性是否正确
-        SysPostDO post = postMapper.selectById(postId);
+        PostDO post = postMapper.selectById(postId);
         assertPojoEquals(reqVO, post);
     }
 
     @Test
     void testUpdatePost_success() {
         // mock 数据
-        SysPostDO postDO = randomPostDO();
+        PostDO postDO = randomPostDO();
         postMapper.insert(postDO);// @Sql: 先插入出一条存在的数据
         // 准备参数
         PostUpdateReqVO reqVO = randomPojo(PostUpdateReqVO.class,
@@ -128,14 +128,14 @@ public class PostServiceTest extends BaseDbUnitTest {
         // 调用
         postService.updatePost(reqVO);
         // 校验是否更新正确
-        SysPostDO post = postMapper.selectById(reqVO.getId());// 获取最新的
+        PostDO post = postMapper.selectById(reqVO.getId());// 获取最新的
         assertPojoEquals(reqVO, post);
     }
 
     @Test
     void testDeletePost_success() {
         // mock 数据
-        SysPostDO postDO = randomPostDO();
+        PostDO postDO = randomPostDO();
         postMapper.insert(postDO);
         // 准备参数
         Long id = postDO.getId();
@@ -155,7 +155,7 @@ public class PostServiceTest extends BaseDbUnitTest {
     @Test
     void testCheckPost_nameDuplicateForCreate() {
         // mock 数据
-        SysPostDO postDO = randomPostDO();
+        PostDO postDO = randomPostDO();
         postMapper.insert(postDO);// @Sql: 先插入出一条存在的数据
         // 准备参数
         PostCreateReqVO reqVO = randomPojo(PostCreateReqVO.class,
@@ -167,10 +167,10 @@ public class PostServiceTest extends BaseDbUnitTest {
     @Test
     void testCheckPost_codeDuplicateForUpdate() {
         // mock 数据
-        SysPostDO postDO = randomPostDO();
+        PostDO postDO = randomPostDO();
         postMapper.insert(postDO);
         // mock 数据 稍后模拟重复它的 code
-        SysPostDO codePostDO = randomPostDO();
+        PostDO codePostDO = randomPostDO();
         postMapper.insert(codePostDO);
         // 准备参数
         PostUpdateReqVO reqVO = randomPojo(PostUpdateReqVO.class,
@@ -185,10 +185,10 @@ public class PostServiceTest extends BaseDbUnitTest {
     }
 
     @SafeVarargs
-    private static SysPostDO randomPostDO(Consumer<SysPostDO>... consumers) {
-        Consumer<SysPostDO> consumer = (o) -> {
+    private static PostDO randomPostDO(Consumer<PostDO>... consumers) {
+        Consumer<PostDO> consumer = (o) -> {
             o.setStatus(randomEle(CommonStatusEnum.values()).getStatus()); // 保证 status 的范围
         };
-        return randomPojo(SysPostDO.class, ArrayUtils.append(consumer, consumers));
+        return randomPojo(PostDO.class, ArrayUtils.append(consumer, consumers));
     }
 }

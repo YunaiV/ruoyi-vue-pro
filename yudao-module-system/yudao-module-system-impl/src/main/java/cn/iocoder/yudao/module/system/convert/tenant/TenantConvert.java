@@ -4,7 +4,7 @@ import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.TenantCreateReq
 import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.TenantExcelVO;
 import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.TenantRespVO;
 import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.TenantUpdateReqVO;
-import cn.iocoder.yudao.module.system.dal.dataobject.tenant.SysTenantDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.tenant.TenantDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
@@ -21,16 +21,16 @@ public interface TenantConvert {
 
     TenantConvert INSTANCE = Mappers.getMapper(TenantConvert.class);
 
-    SysTenantDO convert(TenantCreateReqVO bean);
+    TenantDO convert(TenantCreateReqVO bean);
 
-    SysTenantDO convert(TenantUpdateReqVO bean);
+    TenantDO convert(TenantUpdateReqVO bean);
 
-    TenantRespVO convert(SysTenantDO bean);
+    TenantRespVO convert(TenantDO bean);
 
-    List<TenantRespVO> convertList(List<SysTenantDO> list);
+    List<TenantRespVO> convertList(List<TenantDO> list);
 
-    PageResult<TenantRespVO> convertPage(PageResult<SysTenantDO> page);
+    PageResult<TenantRespVO> convertPage(PageResult<TenantDO> page);
 
-    List<TenantExcelVO> convertList02(List<SysTenantDO> list);
+    List<TenantExcelVO> convertList02(List<TenantDO> list);
 
 }

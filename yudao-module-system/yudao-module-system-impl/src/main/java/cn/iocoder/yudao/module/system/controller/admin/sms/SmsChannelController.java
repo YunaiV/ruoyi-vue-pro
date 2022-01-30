@@ -2,8 +2,8 @@ package cn.iocoder.yudao.module.system.controller.admin.sms;
 
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.channel.*;
 import cn.iocoder.yudao.module.system.convert.sms.SmsChannelConvert;
+import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsChannelDO;
 import cn.iocoder.yudao.module.system.service.sms.SmsChannelService;
-import cn.iocoder.yudao.module.system.dal.dataobject.sms.SysSmsChannelDO;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import io.swagger.annotations.Api;
@@ -56,7 +56,7 @@ public class SmsChannelController {
     @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
     @PreAuthorize("@ss.hasPermission('system:sms-channel:query')")
     public CommonResult<SmsChannelRespVO> getSmsChannel(@RequestParam("id") Long id) {
-        SysSmsChannelDO smsChannel = smsChannelService.getSmsChannel(id);
+        SmsChannelDO smsChannel = smsChannelService.getSmsChannel(id);
         return success(SmsChannelConvert.INSTANCE.convert(smsChannel));
     }
 
@@ -64,16 +64,16 @@ public class SmsChannelController {
     @ApiOperation("获得短信渠道分页")
     @PreAuthorize("@ss.hasPermission('system:sms-channel:query')")
     public CommonResult<PageResult<SmsChannelRespVO>> getSmsChannelPage(@Valid SmsChannelPageReqVO pageVO) {
-        PageResult<SysSmsChannelDO> pageResult = smsChannelService.getSmsChannelPage(pageVO);
+        PageResult<SmsChannelDO> pageResult = smsChannelService.getSmsChannelPage(pageVO);
         return success(SmsChannelConvert.INSTANCE.convertPage(pageResult));
     }
 
     @GetMapping("/list-all-simple")
     @ApiOperation(value = "获得短信渠道精简列表", notes = "包含被禁用的短信渠道")
     public CommonResult<List<SmsChannelSimpleRespVO>> getSimpleSmsChannels() {
-        List<SysSmsChannelDO> list = smsChannelService.getSmsChannelList();
+        List<SmsChannelDO> list = smsChannelService.getSmsChannelList();
         // 排序后，返回给前端
-        list.sort(Comparator.comparing(SysSmsChannelDO::getId));
+        list.sort(Comparator.comparing(SmsChannelDO::getId));
         return success(SmsChannelConvert.INSTANCE.convertList03(list));
     }
 

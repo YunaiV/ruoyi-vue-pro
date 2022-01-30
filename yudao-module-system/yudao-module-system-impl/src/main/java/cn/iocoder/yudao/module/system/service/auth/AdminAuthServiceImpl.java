@@ -12,7 +12,7 @@ import cn.iocoder.yudao.module.system.controller.admin.auth.vo.auth.AuthSocialBi
 import cn.iocoder.yudao.module.system.controller.admin.auth.vo.auth.AuthSocialLogin2ReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.auth.vo.auth.AuthSocialLoginReqVO;
 import cn.iocoder.yudao.module.system.convert.auth.AuthConvert;
-import cn.iocoder.yudao.module.system.dal.dataobject.social.SysSocialUserDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.social.SocialUserDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
 import cn.iocoder.yudao.module.system.enums.logger.LoginLogTypeEnum;
 import cn.iocoder.yudao.module.system.enums.logger.LoginResultEnum;
@@ -74,7 +74,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        // 获取 username 对应的 SysUserDO
+        // 获取 username 对应的 AdminUserDO
         AdminUserDO user = userService.getUserByUsername(username);
         if (user == null) {
             throw new UsernameNotFoundException(username);
@@ -85,7 +85,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
 
     @Override
     public LoginUser mockLogin(Long userId) {
-        // 获取用户编号对应的 SysUserDO
+        // 获取用户编号对应的 AdminUserDO
         AdminUserDO user = userService.getUser(userId);
         if (user == null) {
             throw new UsernameNotFoundException(String.valueOf(userId));
@@ -196,9 +196,9 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         AuthUser authUser = socialService.getAuthUser(reqVO.getType(), reqVO.getCode(), reqVO.getState());
         Assert.notNull(authUser, "授权用户不为空");
 
-        // 如果未绑定 SysSocialUserDO 用户，则无法自动登录，进行报错
+        // 如果未绑定 SocialUserDO 用户，则无法自动登录，进行报错
         String unionId = socialService.getAuthUserUnionId(authUser);
-        List<SysSocialUserDO> socialUsers = socialService.getAllSocialUserList(reqVO.getType(), unionId, getUserType().getValue());
+        List<SocialUserDO> socialUsers = socialService.getAllSocialUserList(reqVO.getType(), unionId, getUserType().getValue());
         if (CollUtil.isEmpty(socialUsers)) {
             throw exception(AUTH_THIRD_LOGIN_NOT_BIND);
         }
@@ -295,7 +295,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
             return loginUser;
         }
 
-        // 重新加载 SysUserDO 信息
+        // 重新加载 AdminUserDO 信息
         AdminUserDO user = userService.getUser(loginUser.getId());
         if (user == null || CommonStatusEnum.DISABLE.getStatus().equals(user.getStatus())) {
             throw exception(AUTH_TOKEN_EXPIRED); // 校验 token 时，用户被禁用的情况下，也认为 token 过期，方便前端跳转到登录界面

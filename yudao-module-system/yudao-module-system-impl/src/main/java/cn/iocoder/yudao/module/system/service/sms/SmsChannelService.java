@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.system.service.sms;
 
-import cn.iocoder.yudao.module.system.dal.dataobject.sms.SysSmsChannelDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsChannelDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.channel.SmsChannelCreateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.channel.SmsChannelPageReqVO;
@@ -51,7 +51,7 @@ public interface SmsChannelService {
      * @param id 编号
      * @return 短信渠道
      */
-    SysSmsChannelDO getSmsChannel(Long id);
+    SmsChannelDO getSmsChannel(Long id);
 
     /**
      * 获得短信渠道列表
@@ -59,14 +59,14 @@ public interface SmsChannelService {
      * @param ids 编号
      * @return 短信渠道列表
      */
-    List<SysSmsChannelDO> getSmsChannelList(Collection<Long> ids);
+    List<SmsChannelDO> getSmsChannelList(Collection<Long> ids);
 
     /**
      * 获得所有短信渠道列表
      *
      * @return 短信渠道列表
      */
-    List<SysSmsChannelDO> getSmsChannelList();
+    List<SmsChannelDO> getSmsChannelList();
 
     /**
      * 获得短信渠道分页
@@ -74,6 +74,6 @@ public interface SmsChannelService {
      * @param pageReqVO 分页查询
      * @return 短信渠道分页
      */
-    PageResult<SysSmsChannelDO> getSmsChannelPage(SmsChannelPageReqVO pageReqVO);
+    PageResult<SmsChannelDO> getSmsChannelPage(SmsChannelPageReqVO pageReqVO);
 
 }

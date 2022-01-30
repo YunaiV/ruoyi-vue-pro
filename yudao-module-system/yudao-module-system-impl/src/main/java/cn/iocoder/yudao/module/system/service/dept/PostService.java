@@ -6,7 +6,7 @@ import cn.iocoder.yudao.module.system.controller.admin.dept.vo.post.PostCreateRe
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.post.PostExportReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.post.PostPageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.post.PostUpdateReqVO;
-import cn.iocoder.yudao.module.system.dal.dataobject.dept.SysPostDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.dept.PostDO;
 import org.springframework.lang.Nullable;
 
 import java.util.Collection;
@@ -49,7 +49,7 @@ public interface PostService {
      * @param ids 岗位编号数组。如果为空，不进行筛选
      * @return 部门列表
      */
-    default List<SysPostDO> getPosts(@Nullable Collection<Long> ids) {
+    default List<PostDO> getPosts(@Nullable Collection<Long> ids) {
         return getPosts(ids, asSet(CommonStatusEnum.ENABLE.getStatus(), CommonStatusEnum.DISABLE.getStatus()));
     }
 
@@ -60,7 +60,7 @@ public interface PostService {
      * @param statuses 状态数组。如果为空，不进行筛选
      * @return 部门列表
      */
-    List<SysPostDO> getPosts(@Nullable Collection<Long> ids, @Nullable Collection<Integer> statuses);
+    List<PostDO> getPosts(@Nullable Collection<Long> ids, @Nullable Collection<Integer> statuses);
 
     /**
      * 获得岗位分页列表
@@ -68,7 +68,7 @@ public interface PostService {
      * @param reqVO 分页条件
      * @return 部门分页列表
      */
-    PageResult<SysPostDO> getPostPage(PostPageReqVO reqVO);
+    PageResult<PostDO> getPostPage(PostPageReqVO reqVO);
 
     /**
      * 获得岗位列表
@@ -76,7 +76,7 @@ public interface PostService {
      * @param reqVO 查询条件
      * @return 部门列表
      */
-    List<SysPostDO> getPosts(PostExportReqVO reqVO);
+    List<PostDO> getPosts(PostExportReqVO reqVO);
 
     /**
      * 获得岗位信息
@@ -84,7 +84,7 @@ public interface PostService {
      * @param id 岗位编号
      * @return 岗位信息
      */
-    SysPostDO getPost(Long id);
+    PostDO getPost(Long id);
 
     /**
      * 校验岗位们是否有效。如下情况，视为无效：

@@ -56,7 +56,7 @@ public class MenuServiceImpl implements MenuService {
     /**
      * 权限与菜单缓存
      * key：权限 {@link MenuDO#getPermission()}
-     * value：SysMenuDO 数组，因为一个权限可能对应多个 SysMenuDO 对象
+     * value：MenuDO 数组，因为一个权限可能对应多个 MenuDO 对象
      *
      * 这里声明 volatile 修饰的原因是，每次刷新时，直接修改指向
      */

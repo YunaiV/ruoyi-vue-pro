@@ -20,7 +20,7 @@ public class OperateLogPageReqVO extends PageParam {
     @ApiModelProperty(value = "用户昵称", example = "芋道", notes = "模拟匹配")
     private String userNickname;
 
-    @ApiModelProperty(value = "操作分类", example = "1", notes = "参见 SysOperateLogTypeEnum 枚举类")
+    @ApiModelProperty(value = "操作分类", example = "1", notes = "参见 OperateLogTypeEnum 枚举类")
     private Integer type;
 
     @ApiModelProperty(value = "操作状态", example = "true")

@@ -34,7 +34,7 @@ public class AppAuthCheckCodeReqVO {
     @Pattern(regexp = "^[0-9]+$", message = "手机验证码必须都是数字")
     private String code;
 
-    @ApiModelProperty(value = "发送场景", example = "1", notes = "对应 MbrSmsSceneEnum 枚举")
+    @ApiModelProperty(value = "发送场景", example = "1", notes = "对应 SmsSceneEnum 枚举")
     @NotNull(message = "发送场景不能为空")
     @InEnum(SmsSceneEnum.class)
     private Integer scene;

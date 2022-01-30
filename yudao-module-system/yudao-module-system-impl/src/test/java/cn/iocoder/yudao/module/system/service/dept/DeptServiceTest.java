@@ -4,8 +4,8 @@ import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptCreateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptListReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptUpdateReqVO;
-import cn.iocoder.yudao.module.system.dal.dataobject.dept.SysDeptDO;
-import cn.iocoder.yudao.module.system.dal.mysql.dept.SysDeptMapper;
+import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
+import cn.iocoder.yudao.module.system.dal.mysql.dept.DeptMapper;
 import cn.iocoder.yudao.module.system.enums.dept.DeptIdEnum;
 import cn.iocoder.yudao.module.system.mq.producer.dept.DeptProducer;
 import cn.iocoder.yudao.framework.common.util.collection.ArrayUtils;
@@ -43,7 +43,7 @@ public class DeptServiceTest extends BaseDbUnitTest {
     @Resource
     private DeptServiceImpl deptService;
     @Resource
-    private SysDeptMapper deptMapper;
+    private DeptMapper deptMapper;
     @MockBean
     private DeptProducer deptProducer;
 
@@ -51,20 +51,20 @@ public class DeptServiceTest extends BaseDbUnitTest {
     @SuppressWarnings("unchecked")
     void testInitLocalCache() {
         // mock 数据
-        SysDeptDO deptDO1 = randomDeptDO();
+        DeptDO deptDO1 = randomDeptDO();
         deptMapper.insert(deptDO1);
-        SysDeptDO deptDO2 = randomDeptDO();
+        DeptDO deptDO2 = randomDeptDO();
         deptMapper.insert(deptDO2);
 
         // 调用
         deptService.initLocalCache();
         // 断言 deptCache 缓存
-        Map<Long, SysDeptDO> deptCache = (Map<Long, SysDeptDO>) getFieldValue(deptService, "deptCache");
+        Map<Long, DeptDO> deptCache = (Map<Long, DeptDO>) getFieldValue(deptService, "deptCache");
         assertEquals(2, deptCache.size());
         assertPojoEquals(deptDO1, deptCache.get(deptDO1.getId()));
         assertPojoEquals(deptDO2, deptCache.get(deptDO2.getId()));
         // 断言 parentDeptCache 缓存
-        Multimap<Long, SysDeptDO> parentDeptCache = (Multimap<Long, SysDeptDO>) getFieldValue(deptService, "parentDeptCache");
+        Multimap<Long, DeptDO> parentDeptCache = (Multimap<Long, DeptDO>) getFieldValue(deptService, "parentDeptCache");
         assertEquals(2, parentDeptCache.size());
         assertPojoEquals(deptDO1, parentDeptCache.get(deptDO1.getParentId()));
         assertPojoEquals(deptDO2, parentDeptCache.get(deptDO2.getParentId()));
@@ -76,7 +76,7 @@ public class DeptServiceTest extends BaseDbUnitTest {
     @Test
     void testListDepts() {
         // mock 数据
-        SysDeptDO dept = randomPojo(SysDeptDO.class, o -> { // 等会查询到
+        DeptDO dept = randomPojo(DeptDO.class, o -> { // 等会查询到
             o.setName("开发部");
             o.setStatus(CommonStatusEnum.ENABLE.getStatus());
         });
@@ -90,7 +90,7 @@ public class DeptServiceTest extends BaseDbUnitTest {
         reqVO.setName("开");
         reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
         // 调用
-        List<SysDeptDO> sysDeptDOS = deptService.getSimpleDepts(reqVO);
+        List<DeptDO> sysDeptDOS = deptService.getSimpleDepts(reqVO);
         // 断言
         assertEquals(1, sysDeptDOS.size());
         assertPojoEquals(dept, sysDeptDOS.get(0));
@@ -109,7 +109,7 @@ public class DeptServiceTest extends BaseDbUnitTest {
         // 断言
         assertNotNull(deptId);
         // 校验记录的属性是否正确
-        SysDeptDO deptDO = deptMapper.selectById(deptId);
+        DeptDO deptDO = deptMapper.selectById(deptId);
         assertPojoEquals(reqVO, deptDO);
         // 校验调用
         verify(deptProducer, times(1)).sendDeptRefreshMessage();
@@ -118,7 +118,7 @@ public class DeptServiceTest extends BaseDbUnitTest {
     @Test
     void testUpdateDept_success() {
         // mock 数据
-        SysDeptDO dbDeptDO = randomPojo(SysDeptDO.class, o -> o.setStatus(randomCommonStatus()));
+        DeptDO dbDeptDO = randomPojo(DeptDO.class, o -> o.setStatus(randomCommonStatus()));
         deptMapper.insert(dbDeptDO);// @Sql: 先插入出一条存在的数据
         // 准备参数
         DeptUpdateReqVO reqVO = randomPojo(DeptUpdateReqVO.class, o -> {
@@ -130,14 +130,14 @@ public class DeptServiceTest extends BaseDbUnitTest {
         // 调用
         deptService.updateDept(reqVO);
         // 校验是否更新正确
-        SysDeptDO deptDO = deptMapper.selectById(reqVO.getId()); // 获取最新的
+        DeptDO deptDO = deptMapper.selectById(reqVO.getId()); // 获取最新的
         assertPojoEquals(reqVO, deptDO);
     }
 
     @Test
     void testDeleteDept_success() {
         // mock 数据
-        SysDeptDO dbDeptDO = randomPojo(SysDeptDO.class, o -> o.setStatus(randomCommonStatus()));
+        DeptDO dbDeptDO = randomPojo(DeptDO.class, o -> o.setStatus(randomCommonStatus()));
         deptMapper.insert(dbDeptDO);// @Sql: 先插入出一条存在的数据
         // 准备参数
         Long id = dbDeptDO.getId();
@@ -150,12 +150,12 @@ public class DeptServiceTest extends BaseDbUnitTest {
     @Test
     void testCheckDept_nameDuplicateForUpdate() {
         // mock 数据
-        SysDeptDO deptDO = randomDeptDO();
+        DeptDO deptDO = randomDeptDO();
         // 设置根节点部门
         deptDO.setParentId(DeptIdEnum.ROOT.getId());
         deptMapper.insert(deptDO);
         // mock 数据 稍后模拟重复它的 name
-        SysDeptDO nameDeptDO = randomDeptDO();
+        DeptDO nameDeptDO = randomDeptDO();
         // 设置根节点部门
         nameDeptDO.setParentId(DeptIdEnum.ROOT.getId());
         deptMapper.insert(nameDeptDO);
@@ -192,10 +192,10 @@ public class DeptServiceTest extends BaseDbUnitTest {
     @Test
     void testCheckDept_exitsChildrenForDelete() {
         // mock 数据
-        SysDeptDO parentDept = randomPojo(SysDeptDO.class, o -> o.setStatus(randomCommonStatus()));
+        DeptDO parentDept = randomPojo(DeptDO.class, o -> o.setStatus(randomCommonStatus()));
         deptMapper.insert(parentDept);// @Sql: 先插入出一条存在的数据
         // 准备参数
-        SysDeptDO childrenDeptDO = randomPojo(SysDeptDO.class, o -> {
+        DeptDO childrenDeptDO = randomPojo(DeptDO.class, o -> {
             o.setParentId(parentDept.getId());
             o.setStatus(randomCommonStatus());
         });
@@ -208,7 +208,7 @@ public class DeptServiceTest extends BaseDbUnitTest {
     @Test
     void testCheckDept_parentErrorForUpdate() {
         // mock 数据
-        SysDeptDO dbDeptDO = randomPojo(SysDeptDO.class, o -> o.setStatus(randomCommonStatus()));
+        DeptDO dbDeptDO = randomPojo(DeptDO.class, o -> o.setStatus(randomCommonStatus()));
         deptMapper.insert(dbDeptDO);
         // 准备参数
         DeptUpdateReqVO reqVO = randomPojo(DeptUpdateReqVO.class,
@@ -225,7 +225,7 @@ public class DeptServiceTest extends BaseDbUnitTest {
     @Test
     void testCheckDept_notEnableForCreate() {
         // mock 数据
-        SysDeptDO deptDO = randomPojo(SysDeptDO.class, o -> o.setStatus(CommonStatusEnum.DISABLE.getStatus()));
+        DeptDO deptDO = randomPojo(DeptDO.class, o -> o.setStatus(CommonStatusEnum.DISABLE.getStatus()));
         deptMapper.insert(deptDO);
         // 准备参数
         DeptCreateReqVO reqVO = randomPojo(DeptCreateReqVO.class,
@@ -240,9 +240,9 @@ public class DeptServiceTest extends BaseDbUnitTest {
     @Test
     void testCheckDept_parentIsChildForUpdate() {
         // mock 数据
-        SysDeptDO parentDept = randomPojo(SysDeptDO.class, o -> o.setStatus(CommonStatusEnum.ENABLE.getStatus()));
+        DeptDO parentDept = randomPojo(DeptDO.class, o -> o.setStatus(CommonStatusEnum.ENABLE.getStatus()));
         deptMapper.insert(parentDept);
-        SysDeptDO childDept = randomPojo(SysDeptDO.class, o -> {
+        DeptDO childDept = randomPojo(DeptDO.class, o -> {
             o.setStatus(CommonStatusEnum.ENABLE.getStatus());
             o.setParentId(parentDept.getId());
         });
@@ -262,11 +262,11 @@ public class DeptServiceTest extends BaseDbUnitTest {
     }
 
     @SafeVarargs
-    private static SysDeptDO randomDeptDO(Consumer<SysDeptDO>... consumers) {
-        Consumer<SysDeptDO> consumer = (o) -> {
+    private static DeptDO randomDeptDO(Consumer<DeptDO>... consumers) {
+        Consumer<DeptDO> consumer = (o) -> {
             o.setStatus(randomEle(CommonStatusEnum.values()).getStatus()); // 保证 status 的范围
         };
-        return randomPojo(SysDeptDO.class, ArrayUtils.append(consumer, consumers));
+        return randomPojo(DeptDO.class, ArrayUtils.append(consumer, consumers));
     }
 
 }

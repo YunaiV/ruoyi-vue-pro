@@ -4,8 +4,8 @@ import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.TenantCreateReq
 import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.TenantExportReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.TenantPageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.TenantUpdateReqVO;
-import cn.iocoder.yudao.module.system.dal.mysql.tenant.SysTenantMapper;
-import cn.iocoder.yudao.module.system.dal.dataobject.tenant.SysTenantDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.tenant.TenantDO;
+import cn.iocoder.yudao.module.system.dal.mysql.tenant.TenantMapper;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.system.test.BaseDbUnitTest;
@@ -30,7 +30,7 @@ public class TenantServiceTest extends BaseDbUnitTest {
     private TenantServiceImpl tenantService;
 
     @Resource
-    private SysTenantMapper tenantMapper;
+    private TenantMapper tenantMapper;
 
     @Test
     public void testCreateTenant_success() {
@@ -42,14 +42,14 @@ public class TenantServiceTest extends BaseDbUnitTest {
         // 断言
         assertNotNull(tenantId);
         // 校验记录的属性是否正确
-        SysTenantDO tenant = tenantMapper.selectById(tenantId);
+        TenantDO tenant = tenantMapper.selectById(tenantId);
         assertPojoEquals(reqVO, tenant);
     }
 
     @Test
     public void testUpdateTenant_success() {
         // mock 数据
-        SysTenantDO dbTenant = randomPojo(SysTenantDO.class, o -> o.setStatus(randomCommonStatus()));
+        TenantDO dbTenant = randomPojo(TenantDO.class, o -> o.setStatus(randomCommonStatus()));
         tenantMapper.insert(dbTenant);// @Sql: 先插入出一条存在的数据
         // 准备参数
         TenantUpdateReqVO reqVO = randomPojo(TenantUpdateReqVO.class, o -> {
@@ -60,7 +60,7 @@ public class TenantServiceTest extends BaseDbUnitTest {
         // 调用
         tenantService.updateTenant(reqVO);
         // 校验是否更新正确
-        SysTenantDO tenant = tenantMapper.selectById(reqVO.getId()); // 获取最新的
+        TenantDO tenant = tenantMapper.selectById(reqVO.getId()); // 获取最新的
         assertPojoEquals(reqVO, tenant);
     }
 
@@ -76,7 +76,7 @@ public class TenantServiceTest extends BaseDbUnitTest {
     @Test
     public void testDeleteTenant_success() {
         // mock 数据
-        SysTenantDO dbTenant = randomPojo(SysTenantDO.class,
+        TenantDO dbTenant = randomPojo(TenantDO.class,
                 o -> o.setStatus(randomCommonStatus()));
         tenantMapper.insert(dbTenant);// @Sql: 先插入出一条存在的数据
         // 准备参数
@@ -100,7 +100,7 @@ public class TenantServiceTest extends BaseDbUnitTest {
     @Test
     public void testGetTenantPage() {
         // mock 数据
-        SysTenantDO dbTenant = randomPojo(SysTenantDO.class, o -> { // 等会查询到
+        TenantDO dbTenant = randomPojo(TenantDO.class, o -> { // 等会查询到
             o.setName("芋道源码");
             o.setContactName("芋艿");
             o.setContactMobile("15601691300");
@@ -128,7 +128,7 @@ public class TenantServiceTest extends BaseDbUnitTest {
         reqVO.setEndCreateTime(buildTime(2020, 12, 24));
 
         // 调用
-        PageResult<SysTenantDO> pageResult = tenantService.getTenantPage(reqVO);
+        PageResult<TenantDO> pageResult = tenantService.getTenantPage(reqVO);
         // 断言
         assertEquals(1, pageResult.getTotal());
         assertEquals(1, pageResult.getList().size());
@@ -138,7 +138,7 @@ public class TenantServiceTest extends BaseDbUnitTest {
     @Test
     public void testGetTenantList() {
         // mock 数据
-        SysTenantDO dbTenant = randomPojo(SysTenantDO.class, o -> { // 等会查询到
+        TenantDO dbTenant = randomPojo(TenantDO.class, o -> { // 等会查询到
             o.setName("芋道源码");
             o.setContactName("芋艿");
             o.setContactMobile("15601691300");
@@ -166,7 +166,7 @@ public class TenantServiceTest extends BaseDbUnitTest {
         reqVO.setEndCreateTime(buildTime(2020, 12, 24));
 
         // 调用
-        List<SysTenantDO> list = tenantService.getTenantList(reqVO);
+        List<TenantDO> list = tenantService.getTenantList(reqVO);
         // 断言
         assertEquals(1, list.size());
         assertPojoEquals(dbTenant, list.get(0));

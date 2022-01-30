@@ -7,7 +7,7 @@ import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.post.*;
 import cn.iocoder.yudao.module.system.convert.dept.PostConvert;
-import cn.iocoder.yudao.module.system.dal.dataobject.dept.SysPostDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.dept.PostDO;
 import cn.iocoder.yudao.module.system.service.dept.PostService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -72,9 +72,9 @@ public class PostController {
     @ApiOperation(value = "获取岗位精简信息列表", notes = "只包含被开启的岗位，主要用于前端的下拉选项")
     public CommonResult<List<PostSimpleRespVO>> getSimplePosts() {
         // 获得岗位列表，只要开启状态的
-        List<SysPostDO> list = postService.getPosts(null, Collections.singleton(CommonStatusEnum.ENABLE.getStatus()));
+        List<PostDO> list = postService.getPosts(null, Collections.singleton(CommonStatusEnum.ENABLE.getStatus()));
         // 排序后，返回给前端
-        list.sort(Comparator.comparing(SysPostDO::getSort));
+        list.sort(Comparator.comparing(PostDO::getSort));
         return success(PostConvert.INSTANCE.convertList02(list));
     }
 
@@ -90,7 +90,7 @@ public class PostController {
     @PreAuthorize("@ss.hasPermission('system:post:export')")
     @OperateLog(type = EXPORT)
     public void export(HttpServletResponse response, @Validated PostExportReqVO reqVO) throws IOException {
-        List<SysPostDO> posts = postService.getPosts(reqVO);
+        List<PostDO> posts = postService.getPosts(reqVO);
         List<PostExcelVO> data = PostConvert.INSTANCE.convertList03(posts);
         // 输出
         ExcelUtils.write(response, "岗位数据.xls", "岗位列表", PostExcelVO.class, data);

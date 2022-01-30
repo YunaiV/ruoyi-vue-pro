@@ -3,11 +3,11 @@ package cn.iocoder.yudao.module.system.controller.admin.user;
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.module.system.controller.admin.user.vo.user.*;
 import cn.iocoder.yudao.module.system.convert.user.UserConvert;
-import cn.iocoder.yudao.module.system.dal.dataobject.dept.SysDeptDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
 import cn.iocoder.yudao.module.system.service.dept.DeptService;
 import cn.iocoder.yudao.module.system.service.user.AdminUserService;
-import cn.iocoder.yudao.module.system.enums.common.SysSexEnum;
+import cn.iocoder.yudao.module.system.enums.common.SexEnum;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -98,7 +98,7 @@ public class UserController {
 
         // 获得拼接需要的数据
         Collection<Long> deptIds = convertList(pageResult.getList(), AdminUserDO::getDeptId);
-        Map<Long, SysDeptDO> deptMap = deptService.getDeptMap(deptIds);
+        Map<Long, DeptDO> deptMap = deptService.getDeptMap(deptIds);
         // 拼接结果返回
         List<UserPageItemRespVO> userList = new ArrayList<>(pageResult.getList().size());
         pageResult.getList().forEach(user -> {
@@ -137,9 +137,9 @@ public class UserController {
 
         // 获得拼接需要的数据
         Collection<Long> deptIds = convertList(users, AdminUserDO::getDeptId);
-        Map<Long, SysDeptDO> deptMap = deptService.getDeptMap(deptIds);
+        Map<Long, DeptDO> deptMap = deptService.getDeptMap(deptIds);
         Map<Long, AdminUserDO> deptLeaderUserMap = userService.getUserMap(
-                convertSet(deptMap.values(), SysDeptDO::getLeaderUserId));
+                convertSet(deptMap.values(), DeptDO::getLeaderUserId));
         // 拼接数据
         List<UserExcelVO> excelUsers = new ArrayList<>(users.size());
         users.forEach(user -> {
@@ -164,9 +164,9 @@ public class UserController {
         // 手动创建导出 demo
         List<UserImportExcelVO> list = Arrays.asList(
                 UserImportExcelVO.builder().username("yudao").deptId(1L).email("yudao@iocoder.cn").mobile("15601691300")
-                        .nickname("芋道").status(CommonStatusEnum.ENABLE.getStatus()).sex(SysSexEnum.MALE.getSex()).build(),
+                        .nickname("芋道").status(CommonStatusEnum.ENABLE.getStatus()).sex(SexEnum.MALE.getSex()).build(),
                 UserImportExcelVO.builder().username("yuanma").deptId(2L).email("yuanma@iocoder.cn").mobile("15601701300")
-                        .nickname("源码").status(CommonStatusEnum.DISABLE.getStatus()).sex(SysSexEnum.FEMALE.getSex()).build()
+                        .nickname("源码").status(CommonStatusEnum.DISABLE.getStatus()).sex(SexEnum.FEMALE.getSex()).build()
         );
 
         // 输出

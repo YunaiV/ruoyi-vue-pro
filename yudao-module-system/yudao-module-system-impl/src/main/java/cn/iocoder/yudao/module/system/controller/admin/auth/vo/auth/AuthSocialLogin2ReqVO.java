@@ -21,7 +21,7 @@ import javax.validation.constraints.Pattern;
 @Builder
 public class AuthSocialLogin2ReqVO {
 
-    @ApiModelProperty(value = "社交平台的类型", required = true, example = "10", notes = "参见 SysUserSocialTypeEnum 枚举值")
+    @ApiModelProperty(value = "社交平台的类型", required = true, example = "10", notes = "参见 UserSocialTypeEnum 枚举值")
     @InEnum(SocialTypeEnum.class)
     @NotNull(message = "社交平台的类型不能为空")
     private Integer type;

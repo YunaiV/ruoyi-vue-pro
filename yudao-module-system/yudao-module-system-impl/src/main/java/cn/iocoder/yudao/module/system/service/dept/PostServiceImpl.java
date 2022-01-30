@@ -9,8 +9,8 @@ import cn.iocoder.yudao.module.system.controller.admin.dept.vo.post.PostExportRe
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.post.PostPageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.post.PostUpdateReqVO;
 import cn.iocoder.yudao.module.system.convert.dept.PostConvert;
-import cn.iocoder.yudao.module.system.dal.dataobject.dept.SysPostDO;
-import cn.iocoder.yudao.module.system.dal.mysql.dept.SysPostMapper;
+import cn.iocoder.yudao.module.system.dal.dataobject.dept.PostDO;
+import cn.iocoder.yudao.module.system.dal.mysql.dept.PostMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -33,14 +33,14 @@ import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
 public class PostServiceImpl implements PostService {
 
     @Resource
-    private SysPostMapper postMapper;
+    private PostMapper postMapper;
 
     @Override
     public Long createPost(PostCreateReqVO reqVO) {
         // 校验正确性
         this.checkCreateOrUpdate(null, reqVO.getName(), reqVO.getCode());
         // 插入岗位
-        SysPostDO post = PostConvert.INSTANCE.convert(reqVO);
+        PostDO post = PostConvert.INSTANCE.convert(reqVO);
         postMapper.insert(post);
         return post.getId();
     }
@@ -50,7 +50,7 @@ public class PostServiceImpl implements PostService {
         // 校验正确性
         this.checkCreateOrUpdate(reqVO.getId(), reqVO.getName(), reqVO.getCode());
         // 更新岗位
-        SysPostDO updateObj = PostConvert.INSTANCE.convert(reqVO);
+        PostDO updateObj = PostConvert.INSTANCE.convert(reqVO);
         postMapper.updateById(updateObj);
     }
 
@@ -63,22 +63,22 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public List<SysPostDO> getPosts(Collection<Long> ids, Collection<Integer> statuses) {
+    public List<PostDO> getPosts(Collection<Long> ids, Collection<Integer> statuses) {
         return postMapper.selectList(ids, statuses);
     }
 
     @Override
-    public PageResult<SysPostDO> getPostPage(PostPageReqVO reqVO) {
+    public PageResult<PostDO> getPostPage(PostPageReqVO reqVO) {
         return postMapper.selectPage(reqVO);
     }
 
     @Override
-    public List<SysPostDO> getPosts(PostExportReqVO reqVO) {
+    public List<PostDO> getPosts(PostExportReqVO reqVO) {
         return postMapper.selectList(reqVO);
     }
 
     @Override
-    public SysPostDO getPost(Long id) {
+    public PostDO getPost(Long id) {
         return postMapper.selectById(id);
     }
 
@@ -92,7 +92,7 @@ public class PostServiceImpl implements PostService {
     }
 
     private void checkPostNameUnique(Long id, String name) {
-        SysPostDO post = postMapper.selectByName(name);
+        PostDO post = postMapper.selectByName(name);
         if (post == null) {
             return;
         }
@@ -106,7 +106,7 @@ public class PostServiceImpl implements PostService {
     }
 
     private void checkPostCodeUnique(Long id, String code) {
-        SysPostDO post = postMapper.selectByCode(code);
+        PostDO post = postMapper.selectByCode(code);
         if (post == null) {
             return;
         }
@@ -123,7 +123,7 @@ public class PostServiceImpl implements PostService {
         if (id == null) {
             return;
         }
-        SysPostDO post = postMapper.selectById(id);
+        PostDO post = postMapper.selectById(id);
         if (post == null) {
             throw ServiceExceptionUtil.exception(POST_NOT_FOUND);
         }
@@ -135,11 +135,11 @@ public class PostServiceImpl implements PostService {
             return;
         }
         // 获得岗位信息
-        List<SysPostDO> posts = postMapper.selectBatchIds(ids);
-        Map<Long, SysPostDO> postMap = convertMap(posts, SysPostDO::getId);
+        List<PostDO> posts = postMapper.selectBatchIds(ids);
+        Map<Long, PostDO> postMap = convertMap(posts, PostDO::getId);
         // 校验
         ids.forEach(id -> {
-            SysPostDO post = postMap.get(id);
+            PostDO post = postMap.get(id);
             if (post == null) {
                 throw exception(POST_NOT_FOUND);
             }

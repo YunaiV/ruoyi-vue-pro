@@ -12,7 +12,7 @@ import javax.validation.constraints.NotNull;
 @Data
 public class SmsTemplateBaseVO {
 
-    @ApiModelProperty(value = "短信类型", required = true, example = "1", notes = "参见 SysSmsTemplateTypeEnum 枚举类")
+    @ApiModelProperty(value = "短信类型", required = true, example = "1", notes = "参见 SmsTemplateTypeEnum 枚举类")
     @NotNull(message = "短信类型不能为空")
     private Integer type;
 

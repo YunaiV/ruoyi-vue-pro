@@ -25,7 +25,7 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 public class SmsCallbackController {
 
     @Resource
-    private SmsSendService smsCoreService;
+    private SmsSendService smsSendService;
 
     @PostMapping("/sms/yunpian")
     @ApiOperation(value = "云片短信的回调", notes = "参见 https://www.yunpian.com/official/document/sms/zh_cn/domestic_push_report 文档")
@@ -33,7 +33,7 @@ public class SmsCallbackController {
     @OperateLog(enable = false)
     public String receiveYunpianSmsStatus(@RequestParam("sms_status") String smsStatus) throws Throwable {
         String text = URLUtil.decode(smsStatus); // decode 解码参数，因为它被 encode
-        smsCoreService.receiveSmsStatus(SmsChannelEnum.YUN_PIAN.getCode(), text);
+        smsSendService.receiveSmsStatus(SmsChannelEnum.YUN_PIAN.getCode(), text);
         return "SUCCESS"; // 约定返回 SUCCESS 为成功
     }
 
@@ -42,7 +42,7 @@ public class SmsCallbackController {
     @OperateLog(enable = false)
     public CommonResult<Boolean> receiveAliyunSmsStatus(HttpServletRequest request) throws Throwable {
         String text = ServletUtil.getBody(request);
-        smsCoreService.receiveSmsStatus(SmsChannelEnum.ALIYUN.getCode(), text);
+        smsSendService.receiveSmsStatus(SmsChannelEnum.ALIYUN.getCode(), text);
         return success(true);
     }
 

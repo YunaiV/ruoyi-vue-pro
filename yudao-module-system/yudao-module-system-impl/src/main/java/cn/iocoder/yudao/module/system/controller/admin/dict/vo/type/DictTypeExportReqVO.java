@@ -19,7 +19,7 @@ public class DictTypeExportReqVO {
     @ApiModelProperty(value = "字典类型", example = "sys_common_sex", notes = "模糊匹配")
     private String type;
 
-    @ApiModelProperty(value = "展示状态", example = "1", notes = "参见 SysCommonStatusEnum 枚举类")
+    @ApiModelProperty(value = "展示状态", example = "1", notes = "参见 CommonStatusEnum 枚举类")
     private Integer status;
 
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)

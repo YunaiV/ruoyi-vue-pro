@@ -18,7 +18,7 @@ public class DictDataExportReqVO {
     @Size(max = 100, message = "字典类型类型长度不能超过100个字符")
     private String dictType;
 
-    @ApiModelProperty(value = "展示状态", example = "1", notes = "参见 SysCommonStatusEnum 枚举类")
+    @ApiModelProperty(value = "展示状态", example = "1", notes = "参见 CommonStatusEnum 枚举类")
     private Integer status;
 
 }

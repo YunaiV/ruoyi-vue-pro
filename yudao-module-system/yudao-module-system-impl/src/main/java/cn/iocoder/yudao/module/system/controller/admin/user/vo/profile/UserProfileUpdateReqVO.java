@@ -25,7 +25,7 @@ public class UserProfileUpdateReqVO {
     @Length(min = 11, max = 11, message = "手机号长度必须 11 位")
     private String mobile;
 
-    @ApiModelProperty(value = "用户性别", example = "1", notes = "参见 SysSexEnum 枚举类")
+    @ApiModelProperty(value = "用户性别", example = "1", notes = "参见 SexEnum 枚举类")
     private Integer sex;
 
 }

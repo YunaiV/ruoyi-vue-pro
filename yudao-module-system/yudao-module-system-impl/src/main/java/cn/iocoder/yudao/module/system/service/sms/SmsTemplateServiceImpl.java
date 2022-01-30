@@ -9,10 +9,10 @@ import cn.iocoder.yudao.module.system.controller.admin.sms.vo.template.SmsTempla
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.template.SmsTemplatePageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.template.SmsTemplateUpdateReqVO;
 import cn.iocoder.yudao.module.system.convert.sms.SmsTemplateConvert;
+import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsTemplateDO;
 import cn.iocoder.yudao.module.system.dal.mysql.sms.SmsTemplateMapper;
 import cn.iocoder.yudao.module.system.mq.producer.sms.SmsProducer;
-import cn.iocoder.yudao.module.system.dal.dataobject.sms.SysSmsChannelDO;
-import cn.iocoder.yudao.module.system.dal.dataobject.sms.SysSmsTemplateDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsChannelDO;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.sms.core.client.SmsClient;
@@ -69,11 +69,11 @@ public class SmsTemplateServiceImpl implements SmsTemplateService {
 
     /**
      * 短信模板缓存
-     * key：短信模板编码 {@link SysSmsTemplateDO#getCode()}
+     * key：短信模板编码 {@link SmsTemplateDO#getCode()}
      *
      * 这里声明 volatile 修饰的原因是，每次刷新时，直接修改指向
      */
-    private volatile Map<String, SysSmsTemplateDO> smsTemplateCache;
+    private volatile Map<String, SmsTemplateDO> smsTemplateCache;
     /**
      * 缓存短信模板的最大更新时间，用于后续的增量轮询，判断是否有更新
      */
@@ -83,13 +83,13 @@ public class SmsTemplateServiceImpl implements SmsTemplateService {
     @PostConstruct
     public void initLocalCache() {
         // 获取短信模板列表，如果有更新
-        List<SysSmsTemplateDO> smsTemplateList = this.loadSmsTemplateIfUpdate(maxUpdateTime);
+        List<SmsTemplateDO> smsTemplateList = this.loadSmsTemplateIfUpdate(maxUpdateTime);
         if (CollUtil.isEmpty(smsTemplateList)) {
             return;
         }
 
         // 写入缓存
-        ImmutableMap.Builder<String, SysSmsTemplateDO> builder = ImmutableMap.builder();
+        ImmutableMap.Builder<String, SmsTemplateDO> builder = ImmutableMap.builder();
         smsTemplateList.forEach(sysSmsTemplateDO -> builder.put(sysSmsTemplateDO.getCode(), sysSmsTemplateDO));
         smsTemplateCache = builder.build();
         assert smsTemplateList.size() > 0; // 断言，避免告警
@@ -104,7 +104,7 @@ public class SmsTemplateServiceImpl implements SmsTemplateService {
      * @param maxUpdateTime 当前短信模板的最大更新时间
      * @return 短信模板列表
      */
-    private List<SysSmsTemplateDO> loadSmsTemplateIfUpdate(Date maxUpdateTime) {
+    private List<SmsTemplateDO> loadSmsTemplateIfUpdate(Date maxUpdateTime) {
         // 第一步，判断是否要更新。
         if (maxUpdateTime == null) { // 如果更新时间为空，说明 DB 一定有新数据
             log.info("[loadSmsTemplateIfUpdate][首次加载全量短信模板]");
@@ -124,7 +124,7 @@ public class SmsTemplateServiceImpl implements SmsTemplateService {
     }
 
     @Override
-    public SysSmsTemplateDO getSmsTemplateByCodeFromCache(String code) {
+    public SmsTemplateDO getSmsTemplateByCodeFromCache(String code) {
         return smsTemplateCache.get(code);
     }
 
@@ -134,7 +134,7 @@ public class SmsTemplateServiceImpl implements SmsTemplateService {
     }
 
     @Override
-    public SysSmsTemplateDO getSmsTemplateByCode(String code) {
+    public SmsTemplateDO getSmsTemplateByCode(String code) {
         return smsTemplateMapper.selectByCode(code);
     }
 
@@ -146,14 +146,14 @@ public class SmsTemplateServiceImpl implements SmsTemplateService {
     @Override
     public Long createSmsTemplate(SmsTemplateCreateReqVO createReqVO) {
         // 校验短信渠道
-        SysSmsChannelDO channelDO = checkSmsChannel(createReqVO.getChannelId());
+        SmsChannelDO channelDO = checkSmsChannel(createReqVO.getChannelId());
         // 校验短信编码是否重复
         checkSmsTemplateCodeDuplicate(null, createReqVO.getCode());
         // 校验短信模板
         checkApiTemplate(createReqVO.getChannelId(), createReqVO.getApiTemplateId());
 
         // 插入
-        SysSmsTemplateDO template = SmsTemplateConvert.INSTANCE.convert(createReqVO);
+        SmsTemplateDO template = SmsTemplateConvert.INSTANCE.convert(createReqVO);
         template.setParams(parseTemplateContentParams(template.getContent()));
         template.setChannelCode(channelDO.getCode());
         smsTemplateMapper.insert(template);
@@ -168,14 +168,14 @@ public class SmsTemplateServiceImpl implements SmsTemplateService {
         // 校验存在
         this.validateSmsTemplateExists(updateReqVO.getId());
         // 校验短信渠道
-        SysSmsChannelDO channelDO = checkSmsChannel(updateReqVO.getChannelId());
+        SmsChannelDO channelDO = checkSmsChannel(updateReqVO.getChannelId());
         // 校验短信编码是否重复
         checkSmsTemplateCodeDuplicate(updateReqVO.getId(), updateReqVO.getCode());
         // 校验短信模板
         checkApiTemplate(updateReqVO.getChannelId(), updateReqVO.getApiTemplateId());
 
         // 更新
-        SysSmsTemplateDO updateObj = SmsTemplateConvert.INSTANCE.convert(updateReqVO);
+        SmsTemplateDO updateObj = SmsTemplateConvert.INSTANCE.convert(updateReqVO);
         updateObj.setParams(parseTemplateContentParams(updateObj.getContent()));
         updateObj.setChannelCode(channelDO.getCode());
         smsTemplateMapper.updateById(updateObj);
@@ -200,22 +200,22 @@ public class SmsTemplateServiceImpl implements SmsTemplateService {
     }
 
     @Override
-    public SysSmsTemplateDO getSmsTemplate(Long id) {
+    public SmsTemplateDO getSmsTemplate(Long id) {
         return smsTemplateMapper.selectById(id);
     }
 
     @Override
-    public List<SysSmsTemplateDO> getSmsTemplateList(Collection<Long> ids) {
+    public List<SmsTemplateDO> getSmsTemplateList(Collection<Long> ids) {
         return smsTemplateMapper.selectBatchIds(ids);
     }
 
     @Override
-    public PageResult<SysSmsTemplateDO> getSmsTemplatePage(SmsTemplatePageReqVO pageReqVO) {
+    public PageResult<SmsTemplateDO> getSmsTemplatePage(SmsTemplatePageReqVO pageReqVO) {
         return smsTemplateMapper.selectPage(pageReqVO);
     }
 
     @Override
-    public List<SysSmsTemplateDO> getSmsTemplateList(SmsTemplateExportReqVO exportReqVO) {
+    public List<SmsTemplateDO> getSmsTemplateList(SmsTemplateExportReqVO exportReqVO) {
         return smsTemplateMapper.selectList(exportReqVO);
     }
 
@@ -225,8 +225,8 @@ public class SmsTemplateServiceImpl implements SmsTemplateService {
     }
 
     @VisibleForTesting
-    public SysSmsChannelDO checkSmsChannel(Long channelId) {
-        SysSmsChannelDO channelDO = smsChannelService.getSmsChannel(channelId);
+    public SmsChannelDO checkSmsChannel(Long channelId) {
+        SmsChannelDO channelDO = smsChannelService.getSmsChannel(channelId);
         if (channelDO == null) {
             throw exception(SMS_CHANNEL_NOT_EXISTS);
         }
@@ -238,7 +238,7 @@ public class SmsTemplateServiceImpl implements SmsTemplateService {
 
     @VisibleForTesting
     public void checkSmsTemplateCodeDuplicate(Long id, String code) {
-        SysSmsTemplateDO template = smsTemplateMapper.selectByCode(code);
+        SmsTemplateDO template = smsTemplateMapper.selectByCode(code);
         if (template == null) {
             return;
         }

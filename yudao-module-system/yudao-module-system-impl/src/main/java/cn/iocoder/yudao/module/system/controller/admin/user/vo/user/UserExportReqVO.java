@@ -11,7 +11,7 @@ import java.util.Date;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
-@ApiModel(value = "管理后台 - 用户导出 Request VO", description = "参数和 SysUserPageReqVO 是一致的")
+@ApiModel(value = "管理后台 - 用户导出 Request VO", description = "参数和 UserPageReqVO 是一致的")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -23,7 +23,7 @@ public class UserExportReqVO {
     @ApiModelProperty(value = "手机号码", example = "yudao", notes = "模糊匹配")
     private String mobile;
 
-    @ApiModelProperty(value = "展示状态", example = "1", notes = "参见 SysCommonStatusEnum 枚举类")
+    @ApiModelProperty(value = "展示状态", example = "1", notes = "参见 CommonStatusEnum 枚举类")
     private Integer status;
 
     @ApiModelProperty(value = "开始时间", example = "2020-10-24")

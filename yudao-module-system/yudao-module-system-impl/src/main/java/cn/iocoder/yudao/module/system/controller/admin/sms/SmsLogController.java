@@ -3,10 +3,10 @@ package cn.iocoder.yudao.module.system.controller.admin.sms;
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.log.SmsLogExcelVO;
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.log.SmsLogExportReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.log.SmsLogPageReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.sms.vo.log.SysSmsLogRespVO;
+import cn.iocoder.yudao.module.system.controller.admin.sms.vo.log.SmsLogRespVO;
 import cn.iocoder.yudao.module.system.convert.sms.SmsLogConvert;
+import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsLogDO;
 import cn.iocoder.yudao.module.system.service.sms.SmsLogService;
-import cn.iocoder.yudao.module.system.dal.dataobject.sms.SysSmsLogDO;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
@@ -40,8 +40,8 @@ public class SmsLogController {
     @GetMapping("/page")
     @ApiOperation("获得短信日志分页")
     @PreAuthorize("@ss.hasPermission('system:sms-log:query')")
-    public CommonResult<PageResult<SysSmsLogRespVO>> getSmsLogPage(@Valid SmsLogPageReqVO pageVO) {
-        PageResult<SysSmsLogDO> pageResult = smsLogService.getSmsLogPage(pageVO);
+    public CommonResult<PageResult<SmsLogRespVO>> getSmsLogPage(@Valid SmsLogPageReqVO pageVO) {
+        PageResult<SmsLogDO> pageResult = smsLogService.getSmsLogPage(pageVO);
         return success(SmsLogConvert.INSTANCE.convertPage(pageResult));
     }
 
@@ -51,7 +51,7 @@ public class SmsLogController {
     @OperateLog(type = EXPORT)
     public void exportSmsLogExcel(@Valid SmsLogExportReqVO exportReqVO,
                                   HttpServletResponse response) throws IOException {
-        List<SysSmsLogDO> list = smsLogService.getSmsLogList(exportReqVO);
+        List<SmsLogDO> list = smsLogService.getSmsLogList(exportReqVO);
         // 导出 Excel
         List<SmsLogExcelVO> datas = SmsLogConvert.INSTANCE.convertList02(list);
         ExcelUtils.write(response, "短信日志.xls", "数据", SmsLogExcelVO.class, datas);

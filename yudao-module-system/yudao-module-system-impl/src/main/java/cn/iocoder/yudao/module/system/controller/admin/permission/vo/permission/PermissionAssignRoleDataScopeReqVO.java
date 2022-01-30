@@ -16,7 +16,7 @@ public class PermissionAssignRoleDataScopeReqVO {
     @NotNull(message = "角色编号不能为空")
     private Long roleId;
 
-    @ApiModelProperty(value = "数据范围", required = true, example = "1", notes = "参见 SysDataScopeEnum 枚举类")
+    @ApiModelProperty(value = "数据范围", required = true, example = "1", notes = "参见 DataScopeEnum 枚举类")
     @NotNull(message = "数据范围不能为空")
 //    TODO 这里要多一个枚举校验
     private Integer dataScope;

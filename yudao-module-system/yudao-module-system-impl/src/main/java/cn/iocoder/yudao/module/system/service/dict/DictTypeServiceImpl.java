@@ -7,7 +7,7 @@ import cn.iocoder.yudao.module.system.controller.admin.dict.vo.type.DictTypePage
 import cn.iocoder.yudao.module.system.controller.admin.dict.vo.type.DictTypeUpdateReqVO;
 import cn.iocoder.yudao.module.system.convert.dict.DictTypeConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.dict.DictTypeDO;
-import cn.iocoder.yudao.module.system.dal.mysql.dict.SysDictTypeMapper;
+import cn.iocoder.yudao.module.system.dal.mysql.dict.DictTypeMapper;
 import com.google.common.annotations.VisibleForTesting;
 import org.springframework.stereotype.Service;
 
@@ -29,7 +29,7 @@ public class DictTypeServiceImpl implements DictTypeService {
     private DictDataService dictDataService;
 
     @Resource
-    private SysDictTypeMapper dictTypeMapper;
+    private DictTypeMapper dictTypeMapper;
 
     @Override
     public PageResult<DictTypeDO> getDictTypePage(DictTypePageReqVO reqVO) {

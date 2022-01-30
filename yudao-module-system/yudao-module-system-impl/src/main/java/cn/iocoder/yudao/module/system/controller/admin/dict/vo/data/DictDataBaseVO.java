@@ -33,9 +33,9 @@ public class DictDataBaseVO {
     @Size(max = 100, message = "字典类型长度不能超过100个字符")
     private String dictType;
 
-    @ApiModelProperty(value = "状态", required = true, example = "1", notes = "见 SysCommonStatusEnum 枚举")
+    @ApiModelProperty(value = "状态", required = true, example = "1", notes = "见 CommonStatusEnum 枚举")
     @NotNull(message = "状态不能为空")
-//    @InEnum(value = SysCommonStatusEnum.class, message = "修改状态必须是 {value}")
+//    @InEnum(value = CommonStatusEnum.class, message = "修改状态必须是 {value}")
     private Integer status;
 
     @ApiModelProperty(value = "备注", example = "我是一个角色")

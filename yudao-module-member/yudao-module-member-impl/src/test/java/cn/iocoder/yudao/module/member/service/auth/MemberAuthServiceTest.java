@@ -53,7 +53,7 @@ public class MemberAuthServiceTest extends BaseDbAndRedisUnitTest {
     @MockBean
     private PasswordEncoder passwordEncoder;
     @Resource
-    private MemberUserMapper mbrUserMapper;
+    private MemberUserMapper memberUserMapper;
     @Resource
     private MemberAuthServiceImpl authService;
 
@@ -61,7 +61,7 @@ public class MemberAuthServiceTest extends BaseDbAndRedisUnitTest {
     public void testUpdatePassword_success(){
         // 准备参数
         MemberUserDO userDO = randomUserDO();
-        mbrUserMapper.insert(userDO);
+        memberUserMapper.insert(userDO);
 
         // 新密码
         String newPassword = randomString();
@@ -79,14 +79,14 @@ public class MemberAuthServiceTest extends BaseDbAndRedisUnitTest {
 
         // 更新用户密码
         authService.updatePassword(userDO.getId(), reqVO);
-        assertEquals(mbrUserMapper.selectById(userDO.getId()).getPassword(),newPassword);
+        assertEquals(memberUserMapper.selectById(userDO.getId()).getPassword(),newPassword);
     }
 
     @Test
     public void testResetPassword_success(){
         // 准备参数
         MemberUserDO userDO = randomUserDO();
-        mbrUserMapper.insert(userDO);
+        memberUserMapper.insert(userDO);
 
         // 随机密码
         String password = randomNumbers(11);
@@ -103,7 +103,7 @@ public class MemberAuthServiceTest extends BaseDbAndRedisUnitTest {
         reqVO.setCode(code);
 
         authService.resetPassword(reqVO);
-        assertEquals(mbrUserMapper.selectById(userDO.getId()).getPassword(),password);
+        assertEquals(memberUserMapper.selectById(userDO.getId()).getPassword(),password);
     }
 
 

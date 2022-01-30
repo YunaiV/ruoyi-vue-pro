@@ -4,7 +4,7 @@ import cn.iocoder.yudao.module.system.controller.admin.sms.vo.template.SmsTempla
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.template.SmsTemplateExcelVO;
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.template.SmsTemplateRespVO;
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.template.SmsTemplateUpdateReqVO;
-import cn.iocoder.yudao.module.system.dal.dataobject.sms.SysSmsTemplateDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsTemplateDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
@@ -16,16 +16,16 @@ public interface SmsTemplateConvert {
 
     SmsTemplateConvert INSTANCE = Mappers.getMapper(SmsTemplateConvert.class);
 
-    SysSmsTemplateDO convert(SmsTemplateCreateReqVO bean);
+    SmsTemplateDO convert(SmsTemplateCreateReqVO bean);
 
-    SysSmsTemplateDO convert(SmsTemplateUpdateReqVO bean);
+    SmsTemplateDO convert(SmsTemplateUpdateReqVO bean);
 
-    SmsTemplateRespVO convert(SysSmsTemplateDO bean);
+    SmsTemplateRespVO convert(SmsTemplateDO bean);
 
-    List<SmsTemplateRespVO> convertList(List<SysSmsTemplateDO> list);
+    List<SmsTemplateRespVO> convertList(List<SmsTemplateDO> list);
 
-    PageResult<SmsTemplateRespVO> convertPage(PageResult<SysSmsTemplateDO> page);
+    PageResult<SmsTemplateRespVO> convertPage(PageResult<SmsTemplateDO> page);
 
-    List<SmsTemplateExcelVO> convertList02(List<SysSmsTemplateDO> list);
+    List<SmsTemplateExcelVO> convertList02(List<SmsTemplateDO> list);
 
 }

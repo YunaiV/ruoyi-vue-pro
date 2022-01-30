@@ -7,7 +7,7 @@ import cn.iocoder.yudao.module.system.dal.dataobject.logger.OperateLogDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
 import cn.iocoder.yudao.module.system.dal.mysql.logger.OperateLogMapper;
 import cn.iocoder.yudao.module.system.service.user.AdminUserService;
-import cn.iocoder.yudao.module.system.enums.common.SysSexEnum;
+import cn.iocoder.yudao.module.system.enums.common.SexEnum;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -68,7 +68,7 @@ public class OperateLogServiceImplTest extends BaseDbUnitTest {
         // 先构造用户
         AdminUserDO user = RandomUtils.randomPojo(AdminUserDO.class, o -> {
             o.setNickname("wangkai");
-            o.setSex(SysSexEnum.MALE.getSex());
+            o.setSex(SexEnum.MALE.getSex());
             o.setStatus(CommonStatusEnum.ENABLE.getStatus());
         });
         when(userService.getUsersByNickname("wangkai")).thenReturn(Collections.singletonList(user));
@@ -119,7 +119,7 @@ public class OperateLogServiceImplTest extends BaseDbUnitTest {
         // 先构造用户
         AdminUserDO user = RandomUtils.randomPojo(AdminUserDO.class, o -> {
             o.setNickname("wangkai");
-            o.setSex(SysSexEnum.MALE.getSex());
+            o.setSex(SexEnum.MALE.getSex());
             o.setStatus(CommonStatusEnum.ENABLE.getStatus());
         });
         when(userService.getUsersByNickname("wangkai")).thenReturn(Collections.singletonList(user));

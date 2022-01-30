@@ -26,7 +26,7 @@ public class UserPageReqVO extends PageParam {
     @ApiModelProperty(value = "手机号码", example = "yudao", notes = "模糊匹配")
     private String mobile;
 
-    @ApiModelProperty(value = "展示状态", example = "1", notes = "参见 SysCommonStatusEnum 枚举类")
+    @ApiModelProperty(value = "展示状态", example = "1", notes = "参见 CommonStatusEnum 枚举类")
     private Integer status;
 
     @ApiModelProperty(value = "开始时间", example = "2020-10-24")

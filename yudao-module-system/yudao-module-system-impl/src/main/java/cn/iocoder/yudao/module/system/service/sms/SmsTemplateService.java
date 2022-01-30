@@ -4,7 +4,7 @@ import cn.iocoder.yudao.module.system.controller.admin.sms.vo.template.SmsTempla
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.template.SmsTemplateExportReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.template.SmsTemplatePageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.template.SmsTemplateUpdateReqVO;
-import cn.iocoder.yudao.module.system.dal.dataobject.sms.SysSmsTemplateDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsTemplateDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 
 import javax.validation.Valid;
@@ -31,7 +31,7 @@ public interface SmsTemplateService {
      * @param code 模板编码
      * @return 短信模板
      */
-    SysSmsTemplateDO getSmsTemplateByCodeFromCache(String code);
+    SmsTemplateDO getSmsTemplateByCodeFromCache(String code);
 
     /**
      * 格式化短信内容
@@ -48,7 +48,7 @@ public interface SmsTemplateService {
      * @param code 模板编码
      * @return 短信模板
      */
-    SysSmsTemplateDO getSmsTemplateByCode(String code);
+    SmsTemplateDO getSmsTemplateByCode(String code);
 
     /**
      * 创建短信模板
@@ -78,7 +78,7 @@ public interface SmsTemplateService {
      * @param id 编号
      * @return 短信模板
      */
-    SysSmsTemplateDO getSmsTemplate(Long id);
+    SmsTemplateDO getSmsTemplate(Long id);
 
     /**
      * 获得短信模板列表
@@ -86,7 +86,7 @@ public interface SmsTemplateService {
      * @param ids 编号
      * @return 短信模板列表
      */
-    List<SysSmsTemplateDO> getSmsTemplateList(Collection<Long> ids);
+    List<SmsTemplateDO> getSmsTemplateList(Collection<Long> ids);
 
     /**
      * 获得短信模板分页
@@ -94,7 +94,7 @@ public interface SmsTemplateService {
      * @param pageReqVO 分页查询
      * @return 短信模板分页
      */
-    PageResult<SysSmsTemplateDO> getSmsTemplatePage(SmsTemplatePageReqVO pageReqVO);
+    PageResult<SmsTemplateDO> getSmsTemplatePage(SmsTemplatePageReqVO pageReqVO);
 
     /**
      * 获得短信模板列表, 用于 Excel 导出
@@ -102,7 +102,7 @@ public interface SmsTemplateService {
      * @param exportReqVO 查询条件
      * @return 短信模板分页
      */
-    List<SysSmsTemplateDO> getSmsTemplateList(SmsTemplateExportReqVO exportReqVO);
+    List<SmsTemplateDO> getSmsTemplateList(SmsTemplateExportReqVO exportReqVO);
 
     /**
      * 获得指定短信渠道下的短信模板数量

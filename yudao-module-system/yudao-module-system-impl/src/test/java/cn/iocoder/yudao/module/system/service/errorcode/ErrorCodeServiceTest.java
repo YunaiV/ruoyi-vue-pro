@@ -7,7 +7,7 @@ import cn.iocoder.yudao.module.system.controller.admin.errorcode.vo.ErrorCodeCre
 import cn.iocoder.yudao.module.system.controller.admin.errorcode.vo.ErrorCodeExportReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.errorcode.vo.ErrorCodePageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.errorcode.vo.ErrorCodeUpdateReqVO;
-import cn.iocoder.yudao.module.system.dal.mysql.errorcode.SysErrorCodeMapper;
+import cn.iocoder.yudao.module.system.dal.mysql.errorcode.ErrorCodeMapper;
 import cn.iocoder.yudao.module.system.enums.errorcode.ErrorCodeTypeEnum;
 import cn.iocoder.yudao.framework.common.util.collection.ArrayUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
@@ -36,7 +36,7 @@ public class ErrorCodeServiceTest extends BaseDbUnitTest {
     private ErrorCodeServiceImpl errorCodeService;
 
     @Resource
-    private SysErrorCodeMapper errorCodeMapper;
+    private ErrorCodeMapper errorCodeMapper;
 
     @Test
     public void testCreateErrorCode_success() {
@@ -200,7 +200,7 @@ public class ErrorCodeServiceTest extends BaseDbUnitTest {
     }
 
     /**
-     * 情况 2.1，错误码存在，但是是 SysErrorCodeTypeEnum.MANUAL_OPERATION 类型
+     * 情况 2.1，错误码存在，但是是 ErrorCodeTypeEnum.MANUAL_OPERATION 类型
      */
     @Test
     public void testAutoGenerateErrorCodes_021() {

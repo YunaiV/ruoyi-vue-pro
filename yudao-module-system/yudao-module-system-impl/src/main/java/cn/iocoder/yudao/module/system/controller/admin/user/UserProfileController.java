@@ -5,16 +5,16 @@ import cn.iocoder.yudao.module.system.controller.admin.user.vo.profile.UserProfi
 import cn.iocoder.yudao.module.system.controller.admin.user.vo.profile.UserProfileUpdatePasswordReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.user.vo.profile.UserProfileUpdateReqVO;
 import cn.iocoder.yudao.module.system.convert.user.UserConvert;
+import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.social.SocialUserDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
 import cn.iocoder.yudao.module.system.service.dept.DeptService;
 import cn.iocoder.yudao.module.system.service.dept.PostService;
 import cn.iocoder.yudao.module.system.service.permission.PermissionService;
 import cn.iocoder.yudao.module.system.service.permission.RoleService;
 import cn.iocoder.yudao.module.system.service.user.AdminUserService;
-import cn.iocoder.yudao.module.system.dal.dataobject.dept.SysDeptDO;
-import cn.iocoder.yudao.module.system.dal.dataobject.dept.SysPostDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.dept.PostDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.RoleDO;
-import cn.iocoder.yudao.module.system.dal.dataobject.social.SysSocialUserDO;
 import cn.iocoder.yudao.module.system.service.social.SocialUserService;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
@@ -67,16 +67,16 @@ public class UserProfileController {
         resp.setRoles(UserConvert.INSTANCE.convertList(userRoles));
         // 获得部门信息
         if (user.getDeptId() != null) {
-            SysDeptDO dept = deptService.getDept(user.getDeptId());
+            DeptDO dept = deptService.getDept(user.getDeptId());
             resp.setDept(UserConvert.INSTANCE.convert02(dept));
         }
         // 获得岗位信息
         if (CollUtil.isNotEmpty(user.getPostIds())) {
-            List<SysPostDO> posts = postService.getPosts(user.getPostIds());
+            List<PostDO> posts = postService.getPosts(user.getPostIds());
             resp.setPosts(UserConvert.INSTANCE.convertList02(posts));
         }
         // 获得社交用户信息
-        List<SysSocialUserDO> socialUsers = socialService.getSocialUserList(user.getId(), UserTypeEnum.ADMIN.getValue());
+        List<SocialUserDO> socialUsers = socialService.getSocialUserList(user.getId(), UserTypeEnum.ADMIN.getValue());
         resp.setSocialUsers(UserConvert.INSTANCE.convertList03(socialUsers));
         return success(resp);
     }

@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.system.service.social;
 
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
-import cn.iocoder.yudao.module.system.dal.dataobject.social.SysSocialUserDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.social.SocialUserDO;
 import cn.iocoder.yudao.module.system.enums.social.SocialTypeEnum;
 import me.zhyd.oauth.model.AuthUser;
 
@@ -56,7 +56,7 @@ public interface SocialUserService {
      * @param userType 全局用户类型
      * @return 社交用户列表
      */
-    List<SysSocialUserDO> getAllSocialUserList(Integer type, String unionId, Integer userType);
+    List<SocialUserDO> getAllSocialUserList(Integer type, String unionId, Integer userType);
 
     /**
      * 获得指定用户的社交用户列表
@@ -65,7 +65,7 @@ public interface SocialUserService {
      * @param userType 用户类型
      * @return 社交用户列表
      */
-    List<SysSocialUserDO> getSocialUserList(Long userId, Integer userType);
+    List<SocialUserDO> getSocialUserList(Long userId, Integer userType);
 
     /**
      * 绑定社交用户

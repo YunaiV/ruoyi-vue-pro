@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.system.service.dict;
 
-import cn.iocoder.yudao.module.system.dal.dataobject.dict.SysDictDataDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.dict.DictDataDO;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.system.controller.admin.dict.vo.data.DictDataCreateReqVO;
@@ -8,7 +8,7 @@ import cn.iocoder.yudao.module.system.controller.admin.dict.vo.data.DictDataExpo
 import cn.iocoder.yudao.module.system.controller.admin.dict.vo.data.DictDataPageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.dict.vo.data.DictDataUpdateReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.dict.DictTypeDO;
-import cn.iocoder.yudao.module.system.dal.mysql.dict.SysDictDataMapper;
+import cn.iocoder.yudao.module.system.dal.mysql.dict.DictDataMapper;
 import cn.iocoder.yudao.module.system.mq.producer.dict.DictDataProducer;
 import cn.iocoder.yudao.framework.common.util.collection.ArrayUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
@@ -39,7 +39,7 @@ public class DictDataServiceTest extends BaseDbUnitTest {
     private DictDataServiceImpl dictDataService;
 
     @Resource
-    private SysDictDataMapper dictDataMapper;
+    private DictDataMapper dictDataMapper;
     @MockBean
     private DictTypeService dictTypeService;
     @MockBean
@@ -52,22 +52,22 @@ public class DictDataServiceTest extends BaseDbUnitTest {
     @SuppressWarnings("unchecked")
     public void testInitLocalCache() {
         // mock 数据
-        SysDictDataDO dictData01 = randomDictDataDO();
+        DictDataDO dictData01 = randomDictDataDO();
         dictDataMapper.insert(dictData01);
-        SysDictDataDO dictData02 = randomDictDataDO();
+        DictDataDO dictData02 = randomDictDataDO();
         dictDataMapper.insert(dictData02);
 
         // 调用
         dictDataService.initLocalCache();
         // 断言 labelDictDataCache 缓存
-        ImmutableTable<String, String, SysDictDataDO> labelDictDataCache =
-                (ImmutableTable<String, String, SysDictDataDO>) getFieldValue(dictDataService, "labelDictDataCache");
+        ImmutableTable<String, String, DictDataDO> labelDictDataCache =
+                (ImmutableTable<String, String, DictDataDO>) getFieldValue(dictDataService, "labelDictDataCache");
         assertEquals(2, labelDictDataCache.size());
         assertPojoEquals(dictData01, labelDictDataCache.get(dictData01.getDictType(), dictData01.getLabel()));
         assertPojoEquals(dictData02, labelDictDataCache.get(dictData02.getDictType(), dictData02.getLabel()));
         // 断言 valueDictDataCache 缓存
-        ImmutableTable<String, String, SysDictDataDO> valueDictDataCache =
-                (ImmutableTable<String, String, SysDictDataDO>) getFieldValue(dictDataService, "valueDictDataCache");
+        ImmutableTable<String, String, DictDataDO> valueDictDataCache =
+                (ImmutableTable<String, String, DictDataDO>) getFieldValue(dictDataService, "valueDictDataCache");
         assertEquals(2, valueDictDataCache.size());
         assertPojoEquals(dictData01, valueDictDataCache.get(dictData01.getDictType(), dictData01.getValue()));
         assertPojoEquals(dictData02, valueDictDataCache.get(dictData02.getDictType(), dictData02.getValue()));
@@ -79,7 +79,7 @@ public class DictDataServiceTest extends BaseDbUnitTest {
     @Test
     public void testGetDictDataPage() {
         // mock 数据
-        SysDictDataDO dbDictData = randomPojo(SysDictDataDO.class, o -> { // 等会查询到
+        DictDataDO dbDictData = randomPojo(DictDataDO.class, o -> { // 等会查询到
             o.setLabel("芋艿");
             o.setDictType("yunai");
             o.setStatus(CommonStatusEnum.ENABLE.getStatus());
@@ -98,7 +98,7 @@ public class DictDataServiceTest extends BaseDbUnitTest {
         reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
 
         // 调用
-        PageResult<SysDictDataDO> pageResult = dictDataService.getDictDataPage(reqVO);
+        PageResult<DictDataDO> pageResult = dictDataService.getDictDataPage(reqVO);
         // 断言
         assertEquals(1, pageResult.getTotal());
         assertEquals(1, pageResult.getList().size());
@@ -108,7 +108,7 @@ public class DictDataServiceTest extends BaseDbUnitTest {
     @Test
     public void testGetDictDataList() {
         // mock 数据
-        SysDictDataDO dbDictData = randomPojo(SysDictDataDO.class, o -> { // 等会查询到
+        DictDataDO dbDictData = randomPojo(DictDataDO.class, o -> { // 等会查询到
             o.setLabel("芋艿");
             o.setDictType("yunai");
             o.setStatus(CommonStatusEnum.ENABLE.getStatus());
@@ -127,7 +127,7 @@ public class DictDataServiceTest extends BaseDbUnitTest {
         reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
 
         // 调用
-        List<SysDictDataDO> list = dictDataService.getDictDatas(reqVO);
+        List<DictDataDO> list = dictDataService.getDictDatas(reqVO);
         // 断言
         assertEquals(1, list.size());
         assertPojoEquals(dbDictData, list.get(0));
@@ -146,7 +146,7 @@ public class DictDataServiceTest extends BaseDbUnitTest {
         // 断言
         assertNotNull(dictDataId);
         // 校验记录的属性是否正确
-        SysDictDataDO dictData = dictDataMapper.selectById(dictDataId);
+        DictDataDO dictData = dictDataMapper.selectById(dictDataId);
         assertPojoEquals(reqVO, dictData);
         // 校验调用
         verify(dictDataProducer, times(1)).sendDictDataRefreshMessage();
@@ -155,7 +155,7 @@ public class DictDataServiceTest extends BaseDbUnitTest {
     @Test
     public void testUpdateDictData_success() {
         // mock 数据
-        SysDictDataDO dbDictData = randomDictDataDO();
+        DictDataDO dbDictData = randomDictDataDO();
         dictDataMapper.insert(dbDictData);// @Sql: 先插入出一条存在的数据
         // 准备参数
         DictDataUpdateReqVO reqVO = randomPojo(DictDataUpdateReqVO.class, o -> {
@@ -168,7 +168,7 @@ public class DictDataServiceTest extends BaseDbUnitTest {
         // 调用
         dictDataService.updateDictData(reqVO);
         // 校验是否更新正确
-        SysDictDataDO dictData = dictDataMapper.selectById(reqVO.getId()); // 获取最新的
+        DictDataDO dictData = dictDataMapper.selectById(reqVO.getId()); // 获取最新的
         assertPojoEquals(reqVO, dictData);
         // 校验调用
         verify(dictDataProducer, times(1)).sendDictDataRefreshMessage();
@@ -177,7 +177,7 @@ public class DictDataServiceTest extends BaseDbUnitTest {
     @Test
     public void testDeleteDictData_success() {
         // mock 数据
-        SysDictDataDO dbDictData = randomDictDataDO();
+        DictDataDO dbDictData = randomDictDataDO();
         dictDataMapper.insert(dbDictData);// @Sql: 先插入出一条存在的数据
         // 准备参数
         Long id = dbDictData.getId();
@@ -193,7 +193,7 @@ public class DictDataServiceTest extends BaseDbUnitTest {
     @Test
     public void testCheckDictDataExists_success() {
         // mock 数据
-        SysDictDataDO dbDictData = randomDictDataDO();
+        DictDataDO dbDictData = randomDictDataDO();
         dictDataMapper.insert(dbDictData);// @Sql: 先插入出一条存在的数据
 
         // 调用成功
@@ -273,18 +273,18 @@ public class DictDataServiceTest extends BaseDbUnitTest {
     // ========== 随机对象 ==========
 
     @SafeVarargs
-    private static SysDictDataDO randomDictDataDO(Consumer<SysDictDataDO>... consumers) {
-        Consumer<SysDictDataDO> consumer = (o) -> {
+    private static DictDataDO randomDictDataDO(Consumer<DictDataDO>... consumers) {
+        Consumer<DictDataDO> consumer = (o) -> {
             o.setStatus(randomCommonStatus()); // 保证 status 的范围
         };
-        return randomPojo(SysDictDataDO.class, ArrayUtils.append(consumer, consumers));
+        return randomPojo(DictDataDO.class, ArrayUtils.append(consumer, consumers));
     }
 
     /**
      * 生成一个有效的字典类型
      *
      * @param type 字典类型
-     * @return SysDictTypeDO 对象
+     * @return DictTypeDO 对象
      */
     private static DictTypeDO randomDictTypeDO(String type) {
         return randomPojo(DictTypeDO.class, o -> {

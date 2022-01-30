@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.system.dal.mysql.logger;
 
-import cn.iocoder.yudao.module.system.dal.dataobject.logger.SysLoginLogDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.logger.LoginLogDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.QueryWrapperX;
@@ -12,10 +12,10 @@ import org.apache.ibatis.annotations.Mapper;
 import java.util.List;
 
 @Mapper
-public interface LoginLogMapper extends BaseMapperX<SysLoginLogDO> {
+public interface LoginLogMapper extends BaseMapperX<LoginLogDO> {
 
-    default PageResult<SysLoginLogDO> selectPage(LoginLogPageReqVO reqVO) {
-        QueryWrapperX<SysLoginLogDO> query = new QueryWrapperX<SysLoginLogDO>()
+    default PageResult<LoginLogDO> selectPage(LoginLogPageReqVO reqVO) {
+        QueryWrapperX<LoginLogDO> query = new QueryWrapperX<LoginLogDO>()
                 .likeIfPresent("user_ip", reqVO.getUserIp())
                 .likeIfPresent("username", reqVO.getUsername())
                 .betweenIfPresent("create_time", reqVO.getBeginTime(), reqVO.getEndTime());
@@ -28,8 +28,8 @@ public interface LoginLogMapper extends BaseMapperX<SysLoginLogDO> {
         return selectPage(reqVO, query);
     }
 
-    default List<SysLoginLogDO> selectList(LoginLogExportReqVO reqVO) {
-        QueryWrapperX<SysLoginLogDO> query = new QueryWrapperX<SysLoginLogDO>()
+    default List<LoginLogDO> selectList(LoginLogExportReqVO reqVO) {
+        QueryWrapperX<LoginLogDO> query = new QueryWrapperX<LoginLogDO>()
                 .likeIfPresent("user_ip", reqVO.getUserIp())
                 .likeIfPresent("username", reqVO.getUsername())
                 .betweenIfPresent("create_time", reqVO.getBeginTime(), reqVO.getEndTime());

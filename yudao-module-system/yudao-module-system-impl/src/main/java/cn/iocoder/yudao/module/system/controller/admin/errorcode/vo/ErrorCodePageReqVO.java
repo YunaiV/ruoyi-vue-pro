@@ -18,7 +18,7 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @ToString(callSuper = true)
 public class ErrorCodePageReqVO extends PageParam {
 
-    @ApiModelProperty(value = "错误码类型", example = "1", notes = "参见 SysErrorCodeTypeEnum 枚举类")
+    @ApiModelProperty(value = "错误码类型", example = "1", notes = "参见 ErrorCodeTypeEnum 枚举类")
     private Integer type;
 
     @ApiModelProperty(value = "应用名", example = "dashboard")

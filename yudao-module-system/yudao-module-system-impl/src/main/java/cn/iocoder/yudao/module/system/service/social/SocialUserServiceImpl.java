@@ -3,8 +3,8 @@ package cn.iocoder.yudao.module.system.service.social;
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.http.HttpUtils;
-import cn.iocoder.yudao.module.system.dal.dataobject.social.SysSocialUserDO;
-import cn.iocoder.yudao.module.system.dal.mysql.social.SysSocialUserMapper;
+import cn.iocoder.yudao.module.system.dal.dataobject.social.SocialUserDO;
+import cn.iocoder.yudao.module.system.dal.mysql.social.SocialUserMapper;
 import cn.iocoder.yudao.module.system.dal.redis.social.SocialAuthUserRedisDAO;
 import cn.iocoder.yudao.module.system.enums.social.SocialTypeEnum;
 import com.google.common.annotations.VisibleForTesting;
@@ -45,7 +45,7 @@ public class SocialUserServiceImpl implements SocialUserService {
     private SocialAuthUserRedisDAO authSocialUserRedisDAO;
 
     @Resource
-    private SysSocialUserMapper socialUserMapper;
+    private SocialUserMapper socialUserMapper;
 
     @Override
     public String getAuthorizeUrl(Integer type, String redirectUri) {
@@ -73,22 +73,22 @@ public class SocialUserServiceImpl implements SocialUserService {
     }
 
     @Override
-    public List<SysSocialUserDO> getAllSocialUserList(Integer type, String unionId, Integer userType) {
+    public List<SocialUserDO> getAllSocialUserList(Integer type, String unionId, Integer userType) {
         List<Integer> types = SocialTypeEnum.getRelationTypes(type);
         return socialUserMapper.selectListByTypeAndUnionId(userType, types, unionId);
     }
 
     @Override
-    public List<SysSocialUserDO> getSocialUserList(Long userId, Integer userType) {
+    public List<SocialUserDO> getSocialUserList(Long userId, Integer userType) {
         return socialUserMapper.selectListByUserId(userType, userId);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void bindSocialUser(Long userId, Integer userType, Integer type, AuthUser authUser) {
-        // 获得 unionId 对应的 SysSocialUserDO 列表
+        // 获得 unionId 对应的 SocialUserDO 列表
         String unionId = getAuthUserUnionId(authUser);
-        List<SysSocialUserDO> socialUsers = this.getAllSocialUserList(type, unionId, userType);
+        List<SocialUserDO> socialUsers = this.getAllSocialUserList(type, unionId, userType);
 
         // 逻辑一：如果 userId 之前绑定过该 type 的其它账号，需要进行解绑
         this.unbindOldSocialUser(userId, userType, type, unionId);
@@ -100,12 +100,12 @@ public class SocialUserServiceImpl implements SocialUserService {
             if (Objects.equals(socialUser.getUserId(), userId)) {
                 return;
             }
-            socialUserMapper.updateById(new SysSocialUserDO().setId(socialUser.getId()).setUserId(userId));
+            socialUserMapper.updateById(new SocialUserDO().setId(socialUser.getId()).setUserId(userId));
         });
 
         // 逻辑三：如果 authUser 不存在于 socialUsers 中，则进行新增；否则，进行更新
-        SysSocialUserDO socialUser = CollUtil.findOneByField(socialUsers, "openid", authUser.getUuid());
-        SysSocialUserDO saveSocialUser = SysSocialUserDO.builder() // 新增和更新的通用属性
+        SocialUserDO socialUser = CollUtil.findOneByField(socialUsers, "openid", authUser.getUuid());
+        SocialUserDO saveSocialUser = SocialUserDO.builder() // 新增和更新的通用属性
                 .token(authUser.getToken().getAccessToken()).rawTokenInfo(toJsonString(authUser.getToken()))
                 .nickname(authUser.getNickname()).avatar(authUser.getAvatar()).rawUserInfo(toJsonString(authUser.getRawUserInfo()))
                 .build();
@@ -121,8 +121,8 @@ public class SocialUserServiceImpl implements SocialUserService {
 
     @Override
     public void unbindSocialUser(Long userId, Integer userType, Integer type, String unionId) {
-        // 获得 unionId 对应的所有 SysSocialUserDO 社交用户
-        List<SysSocialUserDO> socialUsers = this.getAllSocialUserList(type, unionId, userType);
+        // 获得 unionId 对应的所有 SocialUserDO 社交用户
+        List<SocialUserDO> socialUsers = this.getAllSocialUserList(type, unionId, userType);
         if (CollUtil.isEmpty(socialUsers)) {
             return;
         }
@@ -134,20 +134,20 @@ public class SocialUserServiceImpl implements SocialUserService {
         });
 
         // 解绑
-        socialUserMapper.deleteBatchIds(CollectionUtils.convertSet(socialUsers, SysSocialUserDO::getId));
+        socialUserMapper.deleteBatchIds(CollectionUtils.convertSet(socialUsers, SocialUserDO::getId));
     }
 
     @VisibleForTesting
     public void unbindOldSocialUser(Long userId, Integer userType, Integer type, String newUnionId) {
         List<Integer> types = SocialTypeEnum.getRelationTypes(type);
-        List<SysSocialUserDO> oldSocialUsers = socialUserMapper.selectListByTypeAndUserId(userType, types, userId);
+        List<SocialUserDO> oldSocialUsers = socialUserMapper.selectListByTypeAndUserId(userType, types, userId);
         // 如果新老的 unionId 是一致的，说明无需解绑
         if (CollUtil.isEmpty(oldSocialUsers) || Objects.equals(newUnionId, oldSocialUsers.get(0).getUnionId())) {
             return;
         }
 
         // 解绑
-        socialUserMapper.deleteBatchIds(CollectionUtils.convertSet(oldSocialUsers, SysSocialUserDO::getId));
+        socialUserMapper.deleteBatchIds(CollectionUtils.convertSet(oldSocialUsers, SocialUserDO::getId));
     }
 
     /**

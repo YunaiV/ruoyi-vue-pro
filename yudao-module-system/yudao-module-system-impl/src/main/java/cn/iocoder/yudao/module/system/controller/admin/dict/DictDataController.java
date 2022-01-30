@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.system.controller.admin.dict;
 
-import cn.iocoder.yudao.module.system.dal.dataobject.dict.SysDictDataDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.dict.DictDataDO;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
@@ -62,7 +62,7 @@ public class DictDataController {
     @ApiOperation(value = "获得全部字典数据列表", notes = "一般用于管理后台缓存字典数据在本地")
     // 无需添加权限认证，因为前端全局都需要
     public CommonResult<List<DictDataSimpleRespVO>> getSimpleDictDatas() {
-        List<SysDictDataDO> list = dictDataService.getDictDatas();
+        List<DictDataDO> list = dictDataService.getDictDatas();
         return success(DictDataConvert.INSTANCE.convertList(list));
     }
 
@@ -86,7 +86,7 @@ public class DictDataController {
     @PreAuthorize("@ss.hasPermission('system:dict:export')")
     @OperateLog(type = EXPORT)
     public void export(HttpServletResponse response, @Valid DictDataExportReqVO reqVO) throws IOException {
-        List<SysDictDataDO> list = dictDataService.getDictDatas(reqVO);
+        List<DictDataDO> list = dictDataService.getDictDatas(reqVO);
         List<DictDataExcelVO> data = DictDataConvert.INSTANCE.convertList02(list);
         // 输出
         ExcelUtils.write(response, "字典数据.xls", "数据列表", DictDataExcelVO.class, data);

@@ -19,7 +19,7 @@ public class AppAuthSendSmsReqVO {
     @Mobile
     private String mobile;
 
-    @ApiModelProperty(value = "发送场景", example = "1", notes = "对应 MbrSmsSceneEnum 枚举")
+    @ApiModelProperty(value = "发送场景", example = "1", notes = "对应 SmsSceneEnum 枚举")
     @NotNull(message = "发送场景不能为空")
     @InEnum(SmsSceneEnum.class)
     private Integer scene;

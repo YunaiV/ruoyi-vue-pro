@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.system.service.social;
 
-import cn.iocoder.yudao.module.system.dal.dataobject.social.SysSocialUserDO;
-import cn.iocoder.yudao.module.system.dal.mysql.social.SysSocialUserMapper;
+import cn.iocoder.yudao.module.system.dal.dataobject.social.SocialUserDO;
+import cn.iocoder.yudao.module.system.dal.mysql.social.SocialUserMapper;
 import cn.iocoder.yudao.module.system.dal.redis.social.SocialAuthUserRedisDAO;
 import cn.iocoder.yudao.module.system.enums.social.SocialTypeEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
@@ -29,13 +29,13 @@ public class SocialUserServiceTest extends BaseDbAndRedisUnitTest {
     private SocialUserServiceImpl socialService;
 
     @Resource
-    private SysSocialUserMapper socialUserMapper;
+    private SocialUserMapper socialUserMapper;
 
     @MockBean
     private AuthRequestFactory authRequestFactory;
 
     /**
-     * 情况一，创建 SysSocialUserDO 的情况
+     * 情况一，创建 SocialUserDO 的情况
      */
     @Test
     public void testBindSocialUser_create() {
@@ -49,18 +49,18 @@ public class SocialUserServiceTest extends BaseDbAndRedisUnitTest {
         // 调用
         socialService.bindSocialUser(userId, UserTypeEnum.ADMIN.getValue(), type, authUser);
         // 断言
-        List<SysSocialUserDO> socialUsers = socialUserMapper.selectList("user_id", userId);
+        List<SocialUserDO> socialUsers = socialUserMapper.selectList("user_id", userId);
         assertEquals(1, socialUsers.size());
         assertBindSocialUser(socialUsers.get(0), authUser, userId, type);
     }
 
     /**
-     * 情况二，更新 SysSocialUserDO 的情况
+     * 情况二，更新 SocialUserDO 的情况
      */
     @Test
     public void testBindSocialUser_update() {
         // mock 数据
-        SysSocialUserDO dbSocialUser = randomPojo(SysSocialUserDO.class, socialUserDO -> {
+        SocialUserDO dbSocialUser = randomPojo(SocialUserDO.class, socialUserDO -> {
             socialUserDO.setUserType(UserTypeEnum.ADMIN.getValue());
             socialUserDO.setType(randomEle(SocialTypeEnum.values()).getType());
         });
@@ -74,7 +74,7 @@ public class SocialUserServiceTest extends BaseDbAndRedisUnitTest {
         // 调用
         socialService.bindSocialUser(userId, UserTypeEnum.ADMIN.getValue(), type, authUser);
         // 断言
-        List<SysSocialUserDO> socialUsers = socialUserMapper.selectList("user_id", userId);
+        List<SocialUserDO> socialUsers = socialUserMapper.selectList("user_id", userId);
         assertEquals(1, socialUsers.size());
         assertBindSocialUser(socialUsers.get(0), authUser, userId, type);
     }
@@ -85,7 +85,7 @@ public class SocialUserServiceTest extends BaseDbAndRedisUnitTest {
     @Test
     public void testBindSocialUser_userId() {
         // mock 数据
-        SysSocialUserDO dbSocialUser = randomPojo(SysSocialUserDO.class, socialUserDO -> {
+        SocialUserDO dbSocialUser = randomPojo(SocialUserDO.class, socialUserDO -> {
             socialUserDO.setUserType(UserTypeEnum.ADMIN.getValue());
             socialUserDO.setType(randomEle(SocialTypeEnum.values()).getType());
         });
@@ -99,12 +99,12 @@ public class SocialUserServiceTest extends BaseDbAndRedisUnitTest {
         // 调用
         socialService.bindSocialUser(userId, UserTypeEnum.ADMIN.getValue(), type, authUser);
         // 断言
-        List<SysSocialUserDO> socialUsers = socialUserMapper.selectList("user_id", userId);
+        List<SocialUserDO> socialUsers = socialUserMapper.selectList("user_id", userId);
         assertEquals(1, socialUsers.size());
     }
 
-    private void assertBindSocialUser(SysSocialUserDO socialUser, AuthUser authUser, Long userId,
-                                             Integer type) {
+    private void assertBindSocialUser(SocialUserDO socialUser, AuthUser authUser, Long userId,
+                                      Integer type) {
         assertEquals(authUser.getToken().getAccessToken(), socialUser.getToken());
         assertEquals(toJsonString(authUser.getToken()), socialUser.getRawTokenInfo());
         assertEquals(authUser.getNickname(), socialUser.getNickname());
@@ -123,7 +123,7 @@ public class SocialUserServiceTest extends BaseDbAndRedisUnitTest {
     @Test
     public void testUnbindOldSocialUser_no() {
         // mock 数据
-        SysSocialUserDO oldSocialUser = randomPojo(SysSocialUserDO.class, socialUserDO -> {
+        SocialUserDO oldSocialUser = randomPojo(SocialUserDO.class, socialUserDO -> {
             socialUserDO.setUserType(UserTypeEnum.ADMIN.getValue());
             socialUserDO.setType(randomEle(SocialTypeEnum.values()).getType());
         });
@@ -146,7 +146,7 @@ public class SocialUserServiceTest extends BaseDbAndRedisUnitTest {
     @Test
     public void testUnbindOldSocialUser_yes() {
         // mock 数据
-        SysSocialUserDO oldSocialUser = randomPojo(SysSocialUserDO.class, socialUserDO -> {
+        SocialUserDO oldSocialUser = randomPojo(SocialUserDO.class, socialUserDO -> {
             socialUserDO.setUserType(UserTypeEnum.ADMIN.getValue());
             socialUserDO.setType(randomEle(SocialTypeEnum.values()).getType());
         });

@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.system.service.user;
 import cn.hutool.core.util.RandomUtil;
 import cn.iocoder.yudao.coreservice.modules.infra.service.file.InfFileCoreService;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.ArrayUtils;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
@@ -10,11 +11,11 @@ import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.module.system.controller.admin.user.vo.profile.UserProfileUpdatePasswordReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.user.vo.profile.UserProfileUpdateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.user.vo.user.*;
-import cn.iocoder.yudao.module.system.dal.dataobject.dept.SysDeptDO;
-import cn.iocoder.yudao.module.system.dal.dataobject.dept.SysPostDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.dept.PostDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
 import cn.iocoder.yudao.module.system.dal.mysql.user.AdminUserMapper;
-import cn.iocoder.yudao.module.system.enums.common.SysSexEnum;
+import cn.iocoder.yudao.module.system.enums.common.SexEnum;
 import cn.iocoder.yudao.module.system.service.dept.DeptService;
 import cn.iocoder.yudao.module.system.service.dept.PostService;
 import cn.iocoder.yudao.module.system.service.permission.PermissionService;
@@ -68,18 +69,18 @@ public class UserServiceImplTest extends BaseDbUnitTest {
     public void testCreatUser_success() {
         // 准备参数
         UserCreateReqVO reqVO = randomPojo(UserCreateReqVO.class, o -> {
-            o.setSex(RandomUtil.randomEle(SysSexEnum.values()).getSex());
+            o.setSex(RandomUtil.randomEle(SexEnum.values()).getSex());
             o.setMobile(randomString());
         });
         // mock deptService 的方法
-        SysDeptDO dept = randomPojo(SysDeptDO.class, o -> {
+        DeptDO dept = randomPojo(DeptDO.class, o -> {
             o.setId(reqVO.getDeptId());
             o.setStatus(CommonStatusEnum.ENABLE.getStatus());
         });
         when(deptService.getDept(eq(dept.getId()))).thenReturn(dept);
         // mock postService 的方法
-        List<SysPostDO> posts = CollectionUtils.convertList(reqVO.getPostIds(), postId ->
-                randomPojo(SysPostDO.class, o -> {
+        List<PostDO> posts = CollectionUtils.convertList(reqVO.getPostIds(), postId ->
+                randomPojo(PostDO.class, o -> {
                     o.setId(postId);
                     o.setStatus(CommonStatusEnum.ENABLE.getStatus());
                 }));
@@ -99,23 +100,23 @@ public class UserServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testUpdateUser_success() {
         // mock 数据
-        AdminUserDO dbUser = randomSysUserDO();
+        AdminUserDO dbUser = randomAdminUserDO();
         userMapper.insert(dbUser);
         // 准备参数
         UserUpdateReqVO reqVO = randomPojo(UserUpdateReqVO.class, o -> {
             o.setId(dbUser.getId());
-            o.setSex(RandomUtil.randomEle(SysSexEnum.values()).getSex());
+            o.setSex(RandomUtil.randomEle(SexEnum.values()).getSex());
             o.setMobile(randomString());
         });
         // mock deptService 的方法
-        SysDeptDO dept = randomPojo(SysDeptDO.class, o -> {
+        DeptDO dept = randomPojo(DeptDO.class, o -> {
             o.setId(reqVO.getDeptId());
             o.setStatus(CommonStatusEnum.ENABLE.getStatus());
         });
         when(deptService.getDept(eq(dept.getId()))).thenReturn(dept);
         // mock postService 的方法
-        List<SysPostDO> posts = CollectionUtils.convertList(reqVO.getPostIds(), postId ->
-                randomPojo(SysPostDO.class, o -> {
+        List<PostDO> posts = CollectionUtils.convertList(reqVO.getPostIds(), postId ->
+                randomPojo(PostDO.class, o -> {
                     o.setId(postId);
                     o.setStatus(CommonStatusEnum.ENABLE.getStatus());
                 }));
@@ -131,13 +132,13 @@ public class UserServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testUpdateUserProfile_success() {
         // mock 数据
-        AdminUserDO dbUser = randomSysUserDO();
+        AdminUserDO dbUser = randomAdminUserDO();
         userMapper.insert(dbUser);
         // 准备参数
         Long userId = dbUser.getId();
         UserProfileUpdateReqVO reqVO = randomPojo(UserProfileUpdateReqVO.class, o -> {
             o.setMobile(randomString());
-            o.setSex(RandomUtil.randomEle(SysSexEnum.values()).getSex());
+            o.setSex(RandomUtil.randomEle(SexEnum.values()).getSex());
         });
 
         // 调用
@@ -150,7 +151,7 @@ public class UserServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testUpdateUserPassword_success() {
         // mock 数据
-        AdminUserDO dbUser = randomSysUserDO(o -> o.setPassword("encode:yudao"));
+        AdminUserDO dbUser = randomAdminUserDO(o -> o.setPassword("encode:yudao"));
         userMapper.insert(dbUser);
         // 准备参数
         Long userId = dbUser.getId();
@@ -173,7 +174,7 @@ public class UserServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testUpdateUserAvatar_success() {
         // mock 数据
-        AdminUserDO dbUser = randomSysUserDO();
+        AdminUserDO dbUser = randomAdminUserDO();
         userMapper.insert(dbUser);
         // 准备参数
         Long userId = dbUser.getId();
@@ -193,7 +194,7 @@ public class UserServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testUpdateUserPassword02_success() {
         // mock 数据
-        AdminUserDO dbUser = randomSysUserDO();
+        AdminUserDO dbUser = randomAdminUserDO();
         userMapper.insert(dbUser);
         // 准备参数
         Long userId = dbUser.getId();
@@ -212,7 +213,7 @@ public class UserServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testUpdateUserStatus() {
         // mock 数据
-        AdminUserDO dbUser = randomSysUserDO();
+        AdminUserDO dbUser = randomAdminUserDO();
         userMapper.insert(dbUser);
         // 准备参数
         Long userId = dbUser.getId();
@@ -228,7 +229,7 @@ public class UserServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testDeleteUser_success(){
         // mock 数据
-        AdminUserDO dbUser = randomSysUserDO();
+        AdminUserDO dbUser = randomAdminUserDO();
         userMapper.insert(dbUser);
         // 准备参数
         Long userId = dbUser.getId();
@@ -254,7 +255,7 @@ public class UserServiceImplTest extends BaseDbUnitTest {
         reqVO.setEndTime(buildTime(2020, 12, 24));
         reqVO.setDeptId(1L); // 其中，1L 是 2L 的父部门
         // mock 方法
-        List<SysDeptDO> deptList = newArrayList(randomPojo(SysDeptDO.class, o -> o.setId(2L)));
+        List<DeptDO> deptList = newArrayList(randomPojo(DeptDO.class, o -> o.setId(2L)));
         when(deptService.getDeptsByParentIdFromCache(eq(reqVO.getDeptId()), eq(true))).thenReturn(deptList);
 
         // 调用
@@ -278,7 +279,7 @@ public class UserServiceImplTest extends BaseDbUnitTest {
         reqVO.setEndTime(buildTime(2020, 12, 24));
         reqVO.setDeptId(1L); // 其中，1L 是 2L 的父部门
         // mock 方法
-        List<SysDeptDO> deptList = newArrayList(randomPojo(SysDeptDO.class, o -> o.setId(2L)));
+        List<DeptDO> deptList = newArrayList(randomPojo(DeptDO.class, o -> o.setId(2L)));
         when(deptService.getDeptsByParentIdFromCache(eq(reqVO.getDeptId()), eq(true))).thenReturn(deptList);
 
         // 调用
@@ -293,7 +294,7 @@ public class UserServiceImplTest extends BaseDbUnitTest {
      */
     private AdminUserDO initGetUserPageData() {
         // mock 数据
-        AdminUserDO dbUser = randomSysUserDO(o -> { // 等会查询到
+        AdminUserDO dbUser = randomAdminUserDO(o -> { // 等会查询到
             o.setUsername("yudaoyuanma");
             o.setMobile("15601691300");
             o.setStatus(CommonStatusEnum.ENABLE.getStatus());
@@ -320,8 +321,10 @@ public class UserServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testImportUsers_01() {
         // 准备参数
-        UserImportExcelVO importUser = randomPojo(UserImportExcelVO.class);
-        // mock 方法
+        UserImportExcelVO importUser = randomPojo(UserImportExcelVO.class, o -> {
+        });
+        // mock 方法，模拟失败
+        doThrow(new ServiceException(DEPT_NOT_FOUND)).when(deptService).validDepts(any());
 
         // 调用
         UserImportRespVO respVO = userService.importUsers(newArrayList(importUser), true);
@@ -340,10 +343,10 @@ public class UserServiceImplTest extends BaseDbUnitTest {
         // 准备参数
         UserImportExcelVO importUser = randomPojo(UserImportExcelVO.class, o -> {
             o.setStatus(randomEle(CommonStatusEnum.values()).getStatus()); // 保证 status 的范围
-            o.setSex(randomEle(SysSexEnum.values()).getSex()); // 保证 sex 的范围
+            o.setSex(randomEle(SexEnum.values()).getSex()); // 保证 sex 的范围
         });
         // mock deptService 的方法
-        SysDeptDO dept = randomPojo(SysDeptDO.class, o -> {
+        DeptDO dept = randomPojo(DeptDO.class, o -> {
             o.setId(importUser.getDeptId());
             o.setStatus(CommonStatusEnum.ENABLE.getStatus());
         });
@@ -368,16 +371,16 @@ public class UserServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testImportUsers_03() {
         // mock 数据
-        AdminUserDO dbUser = randomSysUserDO();
+        AdminUserDO dbUser = randomAdminUserDO();
         userMapper.insert(dbUser);
         // 准备参数
         UserImportExcelVO importUser = randomPojo(UserImportExcelVO.class, o -> {
             o.setStatus(randomEle(CommonStatusEnum.values()).getStatus()); // 保证 status 的范围
-            o.setSex(randomEle(SysSexEnum.values()).getSex()); // 保证 sex 的范围
+            o.setSex(randomEle(SexEnum.values()).getSex()); // 保证 sex 的范围
             o.setUsername(dbUser.getUsername());
         });
         // mock deptService 的方法
-        SysDeptDO dept = randomPojo(SysDeptDO.class, o -> {
+        DeptDO dept = randomPojo(DeptDO.class, o -> {
             o.setId(importUser.getDeptId());
             o.setStatus(CommonStatusEnum.ENABLE.getStatus());
         });
@@ -398,16 +401,16 @@ public class UserServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testImportUsers_04() {
         // mock 数据
-        AdminUserDO dbUser = randomSysUserDO();
+        AdminUserDO dbUser = randomAdminUserDO();
         userMapper.insert(dbUser);
         // 准备参数
         UserImportExcelVO importUser = randomPojo(UserImportExcelVO.class, o -> {
             o.setStatus(randomEle(CommonStatusEnum.values()).getStatus()); // 保证 status 的范围
-            o.setSex(randomEle(SysSexEnum.values()).getSex()); // 保证 sex 的范围
+            o.setSex(randomEle(SexEnum.values()).getSex()); // 保证 sex 的范围
             o.setUsername(dbUser.getUsername());
         });
         // mock deptService 的方法
-        SysDeptDO dept = randomPojo(SysDeptDO.class, o -> {
+        DeptDO dept = randomPojo(DeptDO.class, o -> {
             o.setId(importUser.getDeptId());
             o.setStatus(CommonStatusEnum.ENABLE.getStatus());
         });
@@ -433,7 +436,7 @@ public class UserServiceImplTest extends BaseDbUnitTest {
         // 准备参数
         String username = randomString();
         // mock 数据
-        userMapper.insert(randomSysUserDO(o -> o.setUsername(username)));
+        userMapper.insert(randomAdminUserDO(o -> o.setUsername(username)));
 
         // 调用，校验异常
         assertServiceException(() -> userService.checkUsernameUnique(null, username),
@@ -446,7 +449,7 @@ public class UserServiceImplTest extends BaseDbUnitTest {
         Long id = randomLongId();
         String username = randomString();
         // mock 数据
-        userMapper.insert(randomSysUserDO(o -> o.setUsername(username)));
+        userMapper.insert(randomAdminUserDO(o -> o.setUsername(username)));
 
         // 调用，校验异常
         assertServiceException(() -> userService.checkUsernameUnique(id, username),
@@ -458,7 +461,7 @@ public class UserServiceImplTest extends BaseDbUnitTest {
         // 准备参数
         String email = randomString();
         // mock 数据
-        userMapper.insert(randomSysUserDO(o -> o.setEmail(email)));
+        userMapper.insert(randomAdminUserDO(o -> o.setEmail(email)));
 
         // 调用，校验异常
         assertServiceException(() -> userService.checkEmailUnique(null, email),
@@ -471,7 +474,7 @@ public class UserServiceImplTest extends BaseDbUnitTest {
         Long id = randomLongId();
         String email = randomString();
         // mock 数据
-        userMapper.insert(randomSysUserDO(o -> o.setEmail(email)));
+        userMapper.insert(randomAdminUserDO(o -> o.setEmail(email)));
 
         // 调用，校验异常
         assertServiceException(() -> userService.checkEmailUnique(id, email),
@@ -483,7 +486,7 @@ public class UserServiceImplTest extends BaseDbUnitTest {
         // 准备参数
         String mobile = randomString();
         // mock 数据
-        userMapper.insert(randomSysUserDO(o -> o.setMobile(mobile)));
+        userMapper.insert(randomAdminUserDO(o -> o.setMobile(mobile)));
 
         // 调用，校验异常
         assertServiceException(() -> userService.checkMobileUnique(null, mobile),
@@ -496,7 +499,7 @@ public class UserServiceImplTest extends BaseDbUnitTest {
         Long id = randomLongId();
         String mobile = randomString();
         // mock 数据
-        userMapper.insert(randomSysUserDO(o -> o.setMobile(mobile)));
+        userMapper.insert(randomAdminUserDO(o -> o.setMobile(mobile)));
 
         // 调用，校验异常
         assertServiceException(() -> userService.checkMobileUnique(id, mobile),
@@ -512,7 +515,7 @@ public class UserServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testCheckOldPassword_passwordFailed() {
         // mock 数据
-        AdminUserDO user = randomSysUserDO();
+        AdminUserDO user = randomAdminUserDO();
         userMapper.insert(user);
         // 准备参数
         Long id = user.getId();
@@ -530,13 +533,13 @@ public class UserServiceImplTest extends BaseDbUnitTest {
 //        // 准备参数
 //        Collection<Long> postIds = asSet(10L, 20L);
 //        // mock 方法
-//        SysUserDO user1 = randomSysUserDO(o -> o.setPostIds(asSet(10L, 30L)));
+//        AdminUserDO user1 = randomAdminUserDO(o -> o.setPostIds(asSet(10L, 30L)));
 //        userMapper.insert(user1);
-//        SysUserDO user2 = randomSysUserDO(o -> o.setPostIds(singleton(100L)));
+//        AdminUserDO user2 = randomAdminUserDO(o -> o.setPostIds(singleton(100L)));
 //        userMapper.insert(user2);
 //
 //        // 调用
-//        List<SysUserDO> result = userService.getUsersByPostIds(postIds);
+//        List<AdminUserDO> result = userService.getUsersByPostIds(postIds);
 //        // 断言
 //        assertEquals(1, result.size());
 //        assertEquals(user1, result.get(0));
@@ -545,10 +548,10 @@ public class UserServiceImplTest extends BaseDbUnitTest {
     // ========== 随机对象 ==========
 
     @SafeVarargs
-    private static AdminUserDO randomSysUserDO(Consumer<AdminUserDO>... consumers) {
+    private static AdminUserDO randomAdminUserDO(Consumer<AdminUserDO>... consumers) {
         Consumer<AdminUserDO> consumer = (o) -> {
             o.setStatus(randomEle(CommonStatusEnum.values()).getStatus()); // 保证 status 的范围
-            o.setSex(randomEle(SysSexEnum.values()).getSex()); // 保证 sex 的范围
+            o.setSex(randomEle(SexEnum.values()).getSex()); // 保证 sex 的范围
         };
         return randomPojo(AdminUserDO.class, ArrayUtils.append(consumer, consumers));
     }

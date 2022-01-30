@@ -4,7 +4,7 @@ import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptCreateRe
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptRespVO;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptSimpleRespVO;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptUpdateReqVO;
-import cn.iocoder.yudao.module.system.dal.dataobject.dept.SysDeptDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
@@ -15,14 +15,14 @@ public interface DeptConvert {
 
     DeptConvert INSTANCE = Mappers.getMapper(DeptConvert.class);
 
-    List<DeptRespVO> convertList(List<SysDeptDO> list);
+    List<DeptRespVO> convertList(List<DeptDO> list);
 
-    List<DeptSimpleRespVO> convertList02(List<SysDeptDO> list);
+    List<DeptSimpleRespVO> convertList02(List<DeptDO> list);
 
-    DeptRespVO convert(SysDeptDO bean);
+    DeptRespVO convert(DeptDO bean);
 
-    SysDeptDO convert(DeptCreateReqVO bean);
+    DeptDO convert(DeptCreateReqVO bean);
 
-    SysDeptDO convert(DeptUpdateReqVO bean);
+    DeptDO convert(DeptUpdateReqVO bean);
 
 }

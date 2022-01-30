@@ -10,7 +10,7 @@ import cn.iocoder.yudao.module.system.framework.errorcode.core.dto.ErrorCodeResp
 import cn.iocoder.yudao.module.system.convert.errorcode.ErrorCodeConvert;
 import cn.iocoder.yudao.module.system.controller.admin.errorcode.vo.ErrorCodeExportReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.errorcode.vo.ErrorCodePageReqVO;
-import cn.iocoder.yudao.module.system.dal.mysql.errorcode.SysErrorCodeMapper;
+import cn.iocoder.yudao.module.system.dal.mysql.errorcode.ErrorCodeMapper;
 import cn.iocoder.yudao.module.system.enums.errorcode.ErrorCodeTypeEnum;
 import com.google.common.annotations.VisibleForTesting;
 import lombok.extern.slf4j.Slf4j;
@@ -39,7 +39,7 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 public class ErrorCodeServiceImpl implements ErrorCodeService {
 
     @Resource
-    private SysErrorCodeMapper errorCodeMapper;
+    private ErrorCodeMapper errorCodeMapper;
 
     @Override
     public Long createErrorCode(ErrorCodeCreateReqVO createReqVO) {

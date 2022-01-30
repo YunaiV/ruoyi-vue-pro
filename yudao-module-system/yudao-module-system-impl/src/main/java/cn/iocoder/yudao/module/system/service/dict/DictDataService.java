@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.system.service.dict;
 
 import cn.iocoder.yudao.framework.dict.core.service.DictDataFrameworkService;
-import cn.iocoder.yudao.module.system.dal.dataobject.dict.SysDictDataDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.dict.DictDataDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.system.controller.admin.dict.vo.data.DictDataCreateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.dict.vo.data.DictDataExportReqVO;
@@ -50,7 +50,7 @@ public interface DictDataService extends DictDataFrameworkService {
      *
      * @return 字典数据全列表
      */
-    List<SysDictDataDO> getDictDatas();
+    List<DictDataDO> getDictDatas();
 
     /**
      * 获得字典数据分页列表
@@ -58,7 +58,7 @@ public interface DictDataService extends DictDataFrameworkService {
      * @param reqVO 分页请求
      * @return 字典数据分页列表
      */
-    PageResult<SysDictDataDO> getDictDataPage(DictDataPageReqVO reqVO);
+    PageResult<DictDataDO> getDictDataPage(DictDataPageReqVO reqVO);
 
     /**
      * 获得字典数据列表
@@ -66,7 +66,7 @@ public interface DictDataService extends DictDataFrameworkService {
      * @param reqVO 列表请求
      * @return 字典数据列表
      */
-    List<SysDictDataDO> getDictDatas(DictDataExportReqVO reqVO);
+    List<DictDataDO> getDictDatas(DictDataExportReqVO reqVO);
 
     /**
      * 获得字典数据详情
@@ -74,7 +74,7 @@ public interface DictDataService extends DictDataFrameworkService {
      * @param id 字典数据编号
      * @return 字典数据
      */
-    SysDictDataDO getDictData(Long id);
+    DictDataDO getDictData(Long id);
 
     /**
      * 获得指定字典类型的数据数量

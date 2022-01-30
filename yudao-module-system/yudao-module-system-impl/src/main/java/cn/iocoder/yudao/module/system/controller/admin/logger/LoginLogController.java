@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.system.controller.admin.logger;
 
-import cn.iocoder.yudao.module.system.dal.dataobject.logger.SysLoginLogDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.logger.LoginLogDO;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
@@ -40,7 +40,7 @@ public class LoginLogController {
     @ApiOperation("获得登录日志分页列表")
     @PreAuthorize("@ss.hasPermission('system:login-log:query')")
     public CommonResult<PageResult<LoginLogRespVO>> getLoginLogPage(@Valid LoginLogPageReqVO reqVO) {
-        PageResult<SysLoginLogDO> page = loginLogService.getLoginLogPage(reqVO);
+        PageResult<LoginLogDO> page = loginLogService.getLoginLogPage(reqVO);
         return CommonResult.success(LoginLogConvert.INSTANCE.convertPage(page));
     }
 
@@ -49,7 +49,7 @@ public class LoginLogController {
     @PreAuthorize("@ss.hasPermission('system:login-log:export')")
     @OperateLog(type = EXPORT)
     public void exportLoginLog(HttpServletResponse response, @Valid LoginLogExportReqVO reqVO) throws IOException {
-        List<SysLoginLogDO> list = loginLogService.getLoginLogList(reqVO);
+        List<LoginLogDO> list = loginLogService.getLoginLogList(reqVO);
         // 拼接数据
         List<LoginLogExcelVO> data = LoginLogConvert.INSTANCE.convertList(list);
         // 输出

@@ -281,9 +281,8 @@ public class MemberAuthServiceImpl implements MemberAuthService {
         MemberUserDO userDO = checkOldPassword(userId, reqVO.getOldPassword());
 
         // 更新用户密码
-        MemberUserDO mbrUserDO = MemberUserDO.builder().id(userDO.getId())
-                .password(passwordEncoder.encode(reqVO.getPassword())).build();
-        userMapper.updateById(mbrUserDO);
+        userMapper.updateById(MemberUserDO.builder().id(userDO.getId())
+                .password(passwordEncoder.encode(reqVO.getPassword())).build());
     }
 
     @Override
@@ -296,10 +295,8 @@ public class MemberAuthServiceImpl implements MemberAuthService {
                 getClientIP()));
 
         // 更新密码
-        MemberUserDO mbrUserDO = MemberUserDO.builder().build();
-        mbrUserDO.setId(userDO.getId());
-        mbrUserDO.setPassword(passwordEncoder.encode(reqVO.getPassword()));
-        userMapper.updateById(mbrUserDO);
+        userMapper.updateById(MemberUserDO.builder().id(userDO.getId())
+                .password(passwordEncoder.encode(reqVO.getPassword())).build());
     }
 
     @Override

@@ -10,10 +10,9 @@ import cn.iocoder.yudao.module.system.controller.admin.dict.vo.data.DictDataExpo
 import cn.iocoder.yudao.module.system.controller.admin.dict.vo.data.DictDataPageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.dict.vo.data.DictDataUpdateReqVO;
 import cn.iocoder.yudao.module.system.convert.dict.DictDataConvert;
-import cn.iocoder.yudao.module.system.convert.dict.SysDictDataCoreConvert;
+import cn.iocoder.yudao.module.system.dal.dataobject.dict.DictDataDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.dict.DictTypeDO;
-import cn.iocoder.yudao.module.system.dal.dataobject.dict.SysDictDataDO;
-import cn.iocoder.yudao.module.system.dal.mysql.dict.SysDictDataMapper;
+import cn.iocoder.yudao.module.system.dal.mysql.dict.DictDataMapper;
 import cn.iocoder.yudao.module.system.mq.producer.dict.DictDataProducer;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
@@ -44,9 +43,9 @@ public class DictDataServiceImpl implements DictDataService {
     /**
      * 排序 dictType > sort
      */
-    private static final Comparator<SysDictDataDO> COMPARATOR_TYPE_AND_SORT = Comparator
-            .comparing(SysDictDataDO::getDictType)
-            .thenComparingInt(SysDictDataDO::getSort);
+    private static final Comparator<DictDataDO> COMPARATOR_TYPE_AND_SORT = Comparator
+            .comparing(DictDataDO::getDictType)
+            .thenComparingInt(DictDataDO::getSort);
 
     /**
      * 定时执行 {@link #schedulePeriodicRefresh()} 的周期
@@ -58,7 +57,7 @@ public class DictDataServiceImpl implements DictDataService {
     private DictTypeService dictTypeService;
 
     @Resource
-    private SysDictDataMapper dictDataMapper;
+    private DictDataMapper dictDataMapper;
 
     @Resource
     private DictDataProducer dictDataProducer;
@@ -69,14 +68,14 @@ public class DictDataServiceImpl implements DictDataService {
      * key1：字典类型 dictType
      * key2：字典标签 label
      */
-    private ImmutableTable<String, String, SysDictDataDO> labelDictDataCache;
+    private ImmutableTable<String, String, DictDataDO> labelDictDataCache;
     /**
      * 字典数据缓存，第二个 key 使用 value
      *
      * key1：字典类型 dictType
      * key2：字典值 value
      */
-    private ImmutableTable<String, String, SysDictDataDO> valueDictDataCache;
+    private ImmutableTable<String, String, DictDataDO> valueDictDataCache;
     /**
      * 缓存字典数据的最大更新时间，用于后续的增量轮询，判断是否有更新
      */
@@ -86,14 +85,14 @@ public class DictDataServiceImpl implements DictDataService {
     @PostConstruct
     public synchronized void initLocalCache() {
         // 获取字典数据列表，如果有更新
-        List<SysDictDataDO> dataList = loadDictDataIfUpdate(maxUpdateTime);
+        List<DictDataDO> dataList = loadDictDataIfUpdate(maxUpdateTime);
         if (CollUtil.isEmpty(dataList)) {
             return;
         }
 
         // 构建缓存
-        ImmutableTable.Builder<String, String, SysDictDataDO> labelDictDataBuilder = ImmutableTable.builder();
-        ImmutableTable.Builder<String, String, SysDictDataDO> valueDictDataBuilder = ImmutableTable.builder();
+        ImmutableTable.Builder<String, String, DictDataDO> labelDictDataBuilder = ImmutableTable.builder();
+        ImmutableTable.Builder<String, String, DictDataDO> valueDictDataBuilder = ImmutableTable.builder();
         dataList.forEach(dictData -> {
             labelDictDataBuilder.put(dictData.getDictType(), dictData.getLabel(), dictData);
             valueDictDataBuilder.put(dictData.getDictType(), dictData.getValue(), dictData);
@@ -112,7 +111,7 @@ public class DictDataServiceImpl implements DictDataService {
      * @param maxUpdateTime 当前字典数据的最大更新时间
      * @return 字典数据列表
      */
-    private List<SysDictDataDO> loadDictDataIfUpdate(Date maxUpdateTime) {
+    private List<DictDataDO> loadDictDataIfUpdate(Date maxUpdateTime) {
         // 第一步，判断是否要更新。
         if (maxUpdateTime == null) { // 如果更新时间为空，说明 DB 一定有新数据
             log.info("[loadDictDataIfUpdate][首次加载全量字典数据]");
@@ -132,42 +131,42 @@ public class DictDataServiceImpl implements DictDataService {
     }
 
     @Override
-    public List<SysDictDataDO> getDictDatas() {
-        List<SysDictDataDO> list = dictDataMapper.selectList();
+    public List<DictDataDO> getDictDatas() {
+        List<DictDataDO> list = dictDataMapper.selectList();
         list.sort(COMPARATOR_TYPE_AND_SORT);
         return list;
     }
 
     @Override
-    public PageResult<SysDictDataDO> getDictDataPage(DictDataPageReqVO reqVO) {
+    public PageResult<DictDataDO> getDictDataPage(DictDataPageReqVO reqVO) {
         return dictDataMapper.selectPage(reqVO);
     }
 
     @Override
-    public List<SysDictDataDO> getDictDatas(DictDataExportReqVO reqVO) {
-        List<SysDictDataDO> list = dictDataMapper.selectList(reqVO);
+    public List<DictDataDO> getDictDatas(DictDataExportReqVO reqVO) {
+        List<DictDataDO> list = dictDataMapper.selectList(reqVO);
         list.sort(COMPARATOR_TYPE_AND_SORT);
         return list;
     }
 
     @Override
-    public SysDictDataDO getDictData(Long id) {
+    public DictDataDO getDictData(Long id) {
         return dictDataMapper.selectById(id);
     }
 
     @Override
     public DictDataRespDTO getDictDataFromCache(String type, String value) {
-        return SysDictDataCoreConvert.INSTANCE.convert02(valueDictDataCache.get(type, value));
+        return DictDataConvert.INSTANCE.convert02(valueDictDataCache.get(type, value));
     }
 
     @Override
     public DictDataRespDTO parseDictDataFromCache(String type, String label) {
-        return SysDictDataCoreConvert.INSTANCE.convert02(labelDictDataCache.get(type, label));
+        return DictDataConvert.INSTANCE.convert02(labelDictDataCache.get(type, label));
     }
 
     @Override
     public List<DictDataRespDTO> listDictDatasFromCache(String type) {
-        return SysDictDataCoreConvert.INSTANCE.convertList03(labelDictDataCache.row(type).values());
+        return DictDataConvert.INSTANCE.convertList03(labelDictDataCache.row(type).values());
     }
 
     @Override
@@ -176,7 +175,7 @@ public class DictDataServiceImpl implements DictDataService {
         checkCreateOrUpdate(null, reqVO.getValue(), reqVO.getDictType());
 
         // 插入字典类型
-        SysDictDataDO dictData = DictDataConvert.INSTANCE.convert(reqVO);
+        DictDataDO dictData = DictDataConvert.INSTANCE.convert(reqVO);
         dictDataMapper.insert(dictData);
 
         // 发送刷新消息
@@ -190,7 +189,7 @@ public class DictDataServiceImpl implements DictDataService {
         checkCreateOrUpdate(reqVO.getId(), reqVO.getValue(), reqVO.getDictType());
 
         // 更新字典类型
-        SysDictDataDO updateObj = DictDataConvert.INSTANCE.convert(reqVO);
+        DictDataDO updateObj = DictDataConvert.INSTANCE.convert(reqVO);
         dictDataMapper.updateById(updateObj);
 
         // 发送刷新消息
@@ -226,7 +225,7 @@ public class DictDataServiceImpl implements DictDataService {
 
     @VisibleForTesting
     public void checkDictDataValueUnique(Long id, String dictType, String value) {
-        SysDictDataDO dictData = dictDataMapper.selectByDictTypeAndValue(dictType, value);
+        DictDataDO dictData = dictDataMapper.selectByDictTypeAndValue(dictType, value);
         if (dictData == null) {
             return;
         }
@@ -244,7 +243,7 @@ public class DictDataServiceImpl implements DictDataService {
         if (id == null) {
             return;
         }
-        SysDictDataDO dictData = dictDataMapper.selectById(id);
+        DictDataDO dictData = dictDataMapper.selectById(id);
         if (dictData == null) {
             throw exception(DICT_DATA_NOT_EXISTS);
         }
@@ -266,10 +265,10 @@ public class DictDataServiceImpl implements DictDataService {
         if (CollUtil.isEmpty(values)) {
             return;
         }
-        ImmutableMap<String, SysDictDataDO> dictDataMap = valueDictDataCache.row(dictType);
+        ImmutableMap<String, DictDataDO> dictDataMap = valueDictDataCache.row(dictType);
         // 校验
         values.forEach(value -> {
-            SysDictDataDO dictData = dictDataMap.get(value);
+            DictDataDO dictData = dictDataMap.get(value);
             if (dictData == null) {
                 throw exception(DICT_DATA_NOT_EXISTS);
             }

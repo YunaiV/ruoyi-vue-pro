@@ -9,7 +9,7 @@ import java.util.Date;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
-@ApiModel(value = "管理后台 - 短信模板 Excel 导出 Request VO", description = "参数和 SysSmsTemplatePageReqVO 是一致的")
+@ApiModel(value = "管理后台 - 短信模板 Excel 导出 Request VO", description = "参数和 SmsTemplatePageReqVO 是一致的")
 @Data
 public class SmsTemplateExportReqVO {
 

@@ -3,9 +3,9 @@ package cn.iocoder.yudao.module.system.controller.admin.auth;
 import cn.iocoder.yudao.module.system.controller.admin.auth.vo.session.UserSessionPageItemRespVO;
 import cn.iocoder.yudao.module.system.controller.admin.auth.vo.session.UserSessionPageReqVO;
 import cn.iocoder.yudao.module.system.convert.auth.UserSessionConvert;
-import cn.iocoder.yudao.module.system.dal.dataobject.dept.SysDeptDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.auth.UserSessionDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
 import cn.iocoder.yudao.module.system.service.auth.UserSessionService;
-import cn.iocoder.yudao.module.system.dal.dataobject.auth.SysUserSessionDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -45,12 +45,12 @@ public class UserSessionController {
     @PreAuthorize("@ss.hasPermission('system:user-session:page')")
     public CommonResult<PageResult<UserSessionPageItemRespVO>> getUserSessionPage(@Validated UserSessionPageReqVO reqVO) {
         // 获得 Session 分页
-        PageResult<SysUserSessionDO> pageResult = userSessionService.getUserSessionPage(reqVO);
+        PageResult<UserSessionDO> pageResult = userSessionService.getUserSessionPage(reqVO);
 
         // 获得拼接需要的数据
         Map<Long, AdminUserDO> userMap = userService.getUserMap(
-                convertList(pageResult.getList(), SysUserSessionDO::getUserId));
-        Map<Long, SysDeptDO> deptMap = deptService.getDeptMap(
+                convertList(pageResult.getList(), UserSessionDO::getUserId));
+        Map<Long, DeptDO> deptMap = deptService.getDeptMap(
                 convertList(userMap.values(), AdminUserDO::getDeptId));
         // 拼接结果返回
         List<UserSessionPageItemRespVO> sessionList = new ArrayList<>(pageResult.getList().size());

@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.system.dal.dataobject.user;
 
-import cn.iocoder.yudao.module.system.enums.common.SysSexEnum;
+import cn.iocoder.yudao.module.system.enums.common.SexEnum;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.type.JsonLongSetTypeHandler;
 import cn.iocoder.yudao.framework.tenant.core.db.TenantBaseDO;
@@ -18,7 +18,7 @@ import java.util.Set;
  *
  * @author 芋道源码
  */
-@TableName(value = "sys_user", autoResultMap = true)
+@TableName(value = "system_user", autoResultMap = true)
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Builder
@@ -69,7 +69,7 @@ public class AdminUserDO extends TenantBaseDO {
     /**
      * 用户性别
      *
-     * 枚举类 {@link SysSexEnum}
+     * 枚举类 {@link SexEnum}
      */
     private Integer sex;
     /**

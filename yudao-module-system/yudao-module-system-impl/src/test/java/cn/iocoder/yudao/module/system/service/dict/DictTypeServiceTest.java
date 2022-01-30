@@ -7,7 +7,7 @@ import cn.iocoder.yudao.module.system.controller.admin.dict.vo.type.DictTypeUpda
 import cn.iocoder.yudao.module.system.controller.admin.dict.vo.type.DictTypeExportReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.dict.vo.type.DictTypePageReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.dict.DictTypeDO;
-import cn.iocoder.yudao.module.system.dal.mysql.dict.SysDictTypeMapper;
+import cn.iocoder.yudao.module.system.dal.mysql.dict.DictTypeMapper;
 import cn.iocoder.yudao.framework.common.util.collection.ArrayUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.module.system.test.BaseDbUnitTest;
@@ -36,7 +36,7 @@ public class DictTypeServiceTest extends BaseDbUnitTest {
     private DictTypeServiceImpl dictTypeService;
 
     @Resource
-    private SysDictTypeMapper dictTypeMapper;
+    private DictTypeMapper dictTypeMapper;
     @MockBean
     private DictDataService dictDataService;
 

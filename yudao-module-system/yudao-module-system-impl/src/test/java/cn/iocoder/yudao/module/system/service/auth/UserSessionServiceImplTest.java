@@ -5,12 +5,12 @@ import cn.iocoder.yudao.framework.security.config.SecurityProperties;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.module.system.controller.admin.auth.vo.session.UserSessionPageReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
-import cn.iocoder.yudao.module.system.dal.mysql.auth.SysUserSessionMapper;
+import cn.iocoder.yudao.module.system.dal.mysql.auth.UserSessionMapper;
 import cn.iocoder.yudao.module.system.service.logger.LoginLogService;
 import cn.iocoder.yudao.module.system.service.user.AdminUserService;
-import cn.iocoder.yudao.module.system.dal.dataobject.auth.SysUserSessionDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.auth.UserSessionDO;
 import cn.iocoder.yudao.module.system.dal.redis.auth.LoginUserRedisDAO;
-import cn.iocoder.yudao.module.system.enums.common.SysSexEnum;
+import cn.iocoder.yudao.module.system.enums.common.SexEnum;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -49,13 +49,13 @@ public class UserSessionServiceImplTest extends BaseDbAndRedisUnitTest {
     private UserSessionServiceImpl userSessionService;
 
     @Resource
-    private SysUserSessionMapper userSessionMapper;
+    private UserSessionMapper userSessionMapper;
 
     @MockBean
     private AdminUserService userService;
     @MockBean
     private LoginLogService loginLogService;
-    @MockBean
+    @Resource
     private LoginUserRedisDAO loginUserRedisDAO;
 
     @MockBean
@@ -65,13 +65,13 @@ public class UserSessionServiceImplTest extends BaseDbAndRedisUnitTest {
     public void testGetUserSessionPage_success() {
         // mock 数据
         AdminUserDO dbUser = randomPojo(AdminUserDO.class, o -> {
-            o.setSex(randomEle(SysSexEnum.values()).getSex());
+            o.setSex(randomEle(SexEnum.values()).getSex());
             o.setStatus(CommonStatusEnum.ENABLE.getStatus());
         });
         when(userService.getUsersByUsername(eq(dbUser.getUsername()))).thenReturn(singletonList(dbUser));
         // 插入可被查询到的数据
         String userIp = randomString();
-        SysUserSessionDO dbSession = randomPojo(SysUserSessionDO.class, o -> {
+        UserSessionDO dbSession = randomPojo(UserSessionDO.class, o -> {
             o.setUserId(dbUser.getId());
             o.setUserType(randomEle(UserTypeEnum.values()).getValue());
             o.setUserIp(userIp);
@@ -93,7 +93,7 @@ public class UserSessionServiceImplTest extends BaseDbAndRedisUnitTest {
         reqVO.setUserIp(userIp);
 
         // 调用
-        PageResult<SysUserSessionDO> pageResult = userSessionService.getUserSessionPage(reqVO);
+        PageResult<UserSessionDO> pageResult = userSessionService.getUserSessionPage(reqVO);
         // 断言
         assertEquals(1, pageResult.getTotal());
         assertEquals(1, pageResult.getList().size());
@@ -107,15 +107,15 @@ public class UserSessionServiceImplTest extends BaseDbAndRedisUnitTest {
         int expectedTimeoutCount = 120, expectedTotal = 1;
 
         // 准备数据
-        List<SysUserSessionDO> prepareData = Stream
+        List<UserSessionDO> prepareData = Stream
                 .iterate(0, i -> i)
                 .limit(expectedTimeoutCount)
-                .map(i -> randomPojo(SysUserSessionDO.class, o -> {
+                .map(i -> randomPojo(UserSessionDO.class, o -> {
                     o.setUserType(randomEle(UserTypeEnum.values()).getValue());
                     o.setSessionTimeout(DateUtil.offsetSecond(new Date(), -1));
                 }))
                 .collect(Collectors.toList());
-        SysUserSessionDO sessionDO = randomPojo(SysUserSessionDO.class, o -> {
+        UserSessionDO sessionDO = randomPojo(UserSessionDO.class, o -> {
             o.setUserType(randomEle(UserTypeEnum.values()).getValue());
             o.setSessionTimeout(DateUtil.offsetMinute(new Date(), 30));
         });
@@ -126,7 +126,7 @@ public class UserSessionServiceImplTest extends BaseDbAndRedisUnitTest {
         long actualTimeoutCount = userSessionService.clearSessionTimeout();
         // 校验
         assertEquals(expectedTimeoutCount, actualTimeoutCount);
-        List<SysUserSessionDO> userSessionDOS = userSessionMapper.selectList();
+        List<UserSessionDO> userSessionDOS = userSessionMapper.selectList();
         assertEquals(expectedTotal, userSessionDOS.size());
         assertPojoEquals(sessionDO, userSessionDOS.get(0), "updateTime");
     }
@@ -145,8 +145,8 @@ public class UserSessionServiceImplTest extends BaseDbAndRedisUnitTest {
 
         // 调用
         String sessionId = userSessionService.createUserSession(loginUser, userIp, userAgent);
-        // 校验 SysUserSessionDO 记录
-        SysUserSessionDO userSessionDO = userSessionMapper.selectById(sessionId);
+        // 校验 UserSessionDO 记录
+        UserSessionDO userSessionDO = userSessionMapper.selectById(sessionId);
         assertPojoEquals(loginUser, userSessionDO, "id", "updateTime");
         assertEquals(sessionId, userSessionDO.getId());
         assertEquals(userIp, userSessionDO.getUserIp());
@@ -171,7 +171,7 @@ public class UserSessionServiceImplTest extends BaseDbAndRedisUnitTest {
         // mock 数据
         loginUser.setUpdateTime(date);
         loginUserRedisDAO.set(sessionId, loginUser);
-        SysUserSessionDO userSession = SysUserSessionDO.builder().id(sessionId)
+        UserSessionDO userSession = UserSessionDO.builder().id(sessionId)
                 .userId(loginUser.getId()).userType(loginUser.getUserType())
                 .userIp(userIp).userAgent(userAgent).username(userName)
                 .sessionTimeout(addTime(Duration.ofMillis(timeLong)))
@@ -183,8 +183,8 @@ public class UserSessionServiceImplTest extends BaseDbAndRedisUnitTest {
         // 校验 LoginUser 缓存
         LoginUser redisLoginUser = loginUserRedisDAO.get(sessionId);
         assertNotEquals(redisLoginUser.getUpdateTime(), date);
-        // 校验 SysUserSessionDO 记录
-        SysUserSessionDO updateDO = userSessionMapper.selectById(sessionId);
+        // 校验 UserSessionDO 记录
+        UserSessionDO updateDO = userSessionMapper.selectById(sessionId);
         assertEquals(updateDO.getUsername(), loginUser.getUsername());
         assertNotEquals(updateDO.getUpdateTime(), userSession.getUpdateTime());
         assertNotEquals(updateDO.getSessionTimeout(), addTime(Duration.ofMillis(timeLong)));
@@ -202,7 +202,7 @@ public class UserSessionServiceImplTest extends BaseDbAndRedisUnitTest {
         when(securityProperties.getSessionTimeout()).thenReturn(Duration.ofDays(1));
         // mock 数据
         loginUserRedisDAO.set(sessionId, loginUser);
-        SysUserSessionDO userSession = SysUserSessionDO.builder().id(sessionId)
+        UserSessionDO userSession = UserSessionDO.builder().id(sessionId)
                 .userId(loginUser.getId()).userType(loginUser.getUserType())
                 .userIp(userIp).userAgent(userAgent).username(loginUser.getUsername())
                 .sessionTimeout(addTime(Duration.ofMillis(timeLong)))

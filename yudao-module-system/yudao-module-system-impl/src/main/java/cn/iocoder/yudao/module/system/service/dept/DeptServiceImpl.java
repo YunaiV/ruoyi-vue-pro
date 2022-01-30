@@ -9,8 +9,8 @@ import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptCreateRe
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptListReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptUpdateReqVO;
 import cn.iocoder.yudao.module.system.convert.dept.DeptConvert;
-import cn.iocoder.yudao.module.system.dal.dataobject.dept.SysDeptDO;
-import cn.iocoder.yudao.module.system.dal.mysql.dept.SysDeptMapper;
+import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
+import cn.iocoder.yudao.module.system.dal.mysql.dept.DeptMapper;
 import cn.iocoder.yudao.module.system.enums.dept.DeptIdEnum;
 import cn.iocoder.yudao.module.system.mq.producer.dept.DeptProducer;
 import com.google.common.collect.ImmutableMap;
@@ -46,27 +46,27 @@ public class DeptServiceImpl implements DeptService {
 
     /**
      * 部门缓存
-     * key：部门编号 {@link SysDeptDO#getId()}
+     * key：部门编号 {@link DeptDO#getId()}
      *
      * 这里声明 volatile 修饰的原因是，每次刷新时，直接修改指向
      */
     @SuppressWarnings("FieldCanBeLocal")
-    private volatile Map<Long, SysDeptDO> deptCache;
+    private volatile Map<Long, DeptDO> deptCache;
     /**
      * 父部门缓存
-     * key：部门编号 {@link SysDeptDO#getParentId()}
+     * key：部门编号 {@link DeptDO#getParentId()}
      * value: 直接子部门列表
      *
      * 这里声明 volatile 修饰的原因是，每次刷新时，直接修改指向
      */
-    private volatile Multimap<Long, SysDeptDO> parentDeptCache;
+    private volatile Multimap<Long, DeptDO> parentDeptCache;
     /**
      * 缓存部门的最大更新时间，用于后续的增量轮询，判断是否有更新
      */
     private volatile Date maxUpdateTime;
 
     @Resource
-    private SysDeptMapper deptMapper;
+    private DeptMapper deptMapper;
 
     @Resource
     private DeptProducer deptProducer;
@@ -75,14 +75,14 @@ public class DeptServiceImpl implements DeptService {
     @PostConstruct
     public synchronized void initLocalCache() {
         // 获取部门列表，如果有更新
-        List<SysDeptDO> deptList = this.loadDeptIfUpdate(maxUpdateTime);
+        List<DeptDO> deptList = this.loadDeptIfUpdate(maxUpdateTime);
         if (CollUtil.isEmpty(deptList)) {
             return;
         }
 
         // 构建缓存
-        ImmutableMap.Builder<Long, SysDeptDO> builder = ImmutableMap.builder();
-        ImmutableMultimap.Builder<Long, SysDeptDO> parentBuilder = ImmutableMultimap.builder();
+        ImmutableMap.Builder<Long, DeptDO> builder = ImmutableMap.builder();
+        ImmutableMultimap.Builder<Long, DeptDO> parentBuilder = ImmutableMultimap.builder();
         deptList.forEach(sysRoleDO -> {
             builder.put(sysRoleDO.getId(), sysRoleDO);
             parentBuilder.put(sysRoleDO.getParentId(), sysRoleDO);
@@ -107,7 +107,7 @@ public class DeptServiceImpl implements DeptService {
      * @param maxUpdateTime 当前部门的最大更新时间
      * @return 部门列表
      */
-    private List<SysDeptDO> loadDeptIfUpdate(Date maxUpdateTime) {
+    private List<DeptDO> loadDeptIfUpdate(Date maxUpdateTime) {
         // 第一步，判断是否要更新。
         if (maxUpdateTime == null) { // 如果更新时间为空，说明 DB 一定有新数据
             log.info("[loadMenuIfUpdate][首次加载全量部门]");
@@ -126,7 +126,7 @@ public class DeptServiceImpl implements DeptService {
         // 校验正确性
         checkCreateOrUpdate(null, reqVO.getParentId(), reqVO.getName());
         // 插入部门
-        SysDeptDO dept = DeptConvert.INSTANCE.convert(reqVO);
+        DeptDO dept = DeptConvert.INSTANCE.convert(reqVO);
         deptMapper.insert(dept);
         // 发送刷新消息
         deptProducer.sendDeptRefreshMessage();
@@ -138,7 +138,7 @@ public class DeptServiceImpl implements DeptService {
         // 校验正确性
         checkCreateOrUpdate(reqVO.getId(), reqVO.getParentId(), reqVO.getName());
         // 更新部门
-        SysDeptDO updateObj = DeptConvert.INSTANCE.convert(reqVO);
+        DeptDO updateObj = DeptConvert.INSTANCE.convert(reqVO);
         deptMapper.updateById(updateObj);
         // 发送刷新消息
         deptProducer.sendDeptRefreshMessage();
@@ -159,16 +159,16 @@ public class DeptServiceImpl implements DeptService {
     }
 
     @Override
-    public List<SysDeptDO> getSimpleDepts(DeptListReqVO reqVO) {
+    public List<DeptDO> getSimpleDepts(DeptListReqVO reqVO) {
         return deptMapper.selectList(reqVO);
     }
 
     @Override
-    public List<SysDeptDO> getDeptsByParentIdFromCache(Long parentId, boolean recursive) {
+    public List<DeptDO> getDeptsByParentIdFromCache(Long parentId, boolean recursive) {
         if (parentId == null) {
             return Collections.emptyList();
         }
-        List<SysDeptDO> result = new ArrayList<>(); // TODO 芋艿：待优化，新增缓存，避免每次遍历的计算
+        List<DeptDO> result = new ArrayList<>(); // TODO 芋艿：待优化，新增缓存，避免每次遍历的计算
         // 递归，简单粗暴
         this.getDeptsByParentIdFromCache(result, parentId,
                 recursive ? Integer.MAX_VALUE : 1, // 如果递归获取，则无限；否则，只递归 1 次
@@ -184,14 +184,14 @@ public class DeptServiceImpl implements DeptService {
      * @param recursiveCount 递归次数
      * @param parentDeptMap 父部门 Map，使用缓存，避免变化
      */
-    private void getDeptsByParentIdFromCache(List<SysDeptDO> result, Long parentId, int recursiveCount,
-                                             Multimap<Long, SysDeptDO> parentDeptMap) {
+    private void getDeptsByParentIdFromCache(List<DeptDO> result, Long parentId, int recursiveCount,
+                                             Multimap<Long, DeptDO> parentDeptMap) {
         // 递归次数为 0，结束！
         if (recursiveCount == 0) {
             return;
         }
         // 获得子部门
-        Collection<SysDeptDO> depts = parentDeptMap.get(parentId);
+        Collection<DeptDO> depts = parentDeptMap.get(parentId);
         if (CollUtil.isEmpty(depts)) {
             return;
         }
@@ -219,7 +219,7 @@ public class DeptServiceImpl implements DeptService {
             throw ServiceExceptionUtil.exception(DEPT_PARENT_ERROR);
         }
         // 父岗位不存在
-        SysDeptDO dept = deptMapper.selectById(parentId);
+        DeptDO dept = deptMapper.selectById(parentId);
         if (dept == null) {
             throw ServiceExceptionUtil.exception(DEPT_PARENT_NOT_EXITS);
         }
@@ -228,7 +228,7 @@ public class DeptServiceImpl implements DeptService {
             throw ServiceExceptionUtil.exception(DEPT_NOT_ENABLE);
         }
         // 父部门不能是原来的子部门
-        List<SysDeptDO> children = this.getDeptsByParentIdFromCache(id, true);
+        List<DeptDO> children = this.getDeptsByParentIdFromCache(id, true);
         if (children.stream().anyMatch(dept1 -> dept1.getId().equals(parentId))) {
             throw ServiceExceptionUtil.exception(DEPT_PARENT_IS_CHILD);
         }
@@ -238,14 +238,14 @@ public class DeptServiceImpl implements DeptService {
         if (id == null) {
             return;
         }
-        SysDeptDO dept = deptMapper.selectById(id);
+        DeptDO dept = deptMapper.selectById(id);
         if (dept == null) {
             throw ServiceExceptionUtil.exception(DEPT_NOT_FOUND);
         }
     }
 
     private void checkDeptNameUnique(Long id, Long parentId, String name) {
-        SysDeptDO menu = deptMapper.selectByParentIdAndName(parentId, name);
+        DeptDO menu = deptMapper.selectByParentIdAndName(parentId, name);
         if (menu == null) {
             return;
         }
@@ -259,12 +259,12 @@ public class DeptServiceImpl implements DeptService {
     }
 
     @Override
-    public List<SysDeptDO> getDepts(Collection<Long> ids) {
+    public List<DeptDO> getDepts(Collection<Long> ids) {
         return deptMapper.selectBatchIds(ids);
     }
 
     @Override
-    public SysDeptDO getDept(Long id) {
+    public DeptDO getDept(Long id) {
         return deptMapper.selectById(id);
     }
 
@@ -274,11 +274,11 @@ public class DeptServiceImpl implements DeptService {
             return;
         }
         // 获得科室信息
-        List<SysDeptDO> depts = deptMapper.selectBatchIds(ids);
-        Map<Long, SysDeptDO> deptMap = CollectionUtils.convertMap(depts, SysDeptDO::getId);
+        List<DeptDO> depts = deptMapper.selectBatchIds(ids);
+        Map<Long, DeptDO> deptMap = CollectionUtils.convertMap(depts, DeptDO::getId);
         // 校验
         ids.forEach(id -> {
-            SysDeptDO dept = deptMap.get(id);
+            DeptDO dept = deptMap.get(id);
             if (dept == null) {
                 throw exception(DEPT_NOT_FOUND);
             }
@@ -289,7 +289,7 @@ public class DeptServiceImpl implements DeptService {
     }
 
     @Override
-    public List<SysDeptDO> getSimpleDepts(Collection<Long> ids) {
+    public List<DeptDO> getSimpleDepts(Collection<Long> ids) {
         return deptMapper.selectBatchIds(ids);
     }
 

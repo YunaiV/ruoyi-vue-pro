@@ -5,7 +5,7 @@ import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptCreateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptListReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptUpdateReqVO;
-import cn.iocoder.yudao.module.system.dal.dataobject.dept.SysDeptDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -53,7 +53,7 @@ public interface DeptService {
      * @param reqVO 筛选条件请求 VO
      * @return 部门列表
      */
-    List<SysDeptDO> getSimpleDepts(DeptListReqVO reqVO);
+    List<DeptDO> getSimpleDepts(DeptListReqVO reqVO);
 
     /**
      * 获得所有子部门，从缓存中
@@ -62,7 +62,7 @@ public interface DeptService {
      * @param recursive 是否递归获取所有
      * @return 子部门列表
      */
-    List<SysDeptDO> getDeptsByParentIdFromCache(Long parentId, boolean recursive);
+    List<DeptDO> getDeptsByParentIdFromCache(Long parentId, boolean recursive);
 
     /**
      * 获得部门信息数组
@@ -70,7 +70,7 @@ public interface DeptService {
      * @param ids 部门编号数组
      * @return 部门信息数组
      */
-    List<SysDeptDO> getDepts(Collection<Long> ids);
+    List<DeptDO> getDepts(Collection<Long> ids);
 
     /**
      * 获得部门信息
@@ -78,7 +78,7 @@ public interface DeptService {
      * @param id 部门编号
      * @return 部门信息
      */
-    SysDeptDO getDept(Long id);
+    DeptDO getDept(Long id);
 
     /**
      * 校验部门们是否有效。如下情况，视为无效：
@@ -95,7 +95,7 @@ public interface DeptService {
      * @param ids 部门编号数组
      * @return 部门列表
      */
-    List<SysDeptDO> getSimpleDepts(Collection<Long> ids);
+    List<DeptDO> getSimpleDepts(Collection<Long> ids);
 
     /**
      * 获得指定编号的部门 Map
@@ -103,11 +103,11 @@ public interface DeptService {
      * @param ids 部门编号数组
      * @return 部门 Map
      */
-    default Map<Long, SysDeptDO> getDeptMap(Collection<Long> ids) {
+    default Map<Long, DeptDO> getDeptMap(Collection<Long> ids) {
         if (CollUtil.isEmpty(ids)) {
             return Collections.emptyMap();
         }
-        List<SysDeptDO> list = getSimpleDepts(ids);
-        return CollectionUtils.convertMap(list, SysDeptDO::getId);
+        List<DeptDO> list = getSimpleDepts(ids);
+        return CollectionUtils.convertMap(list, DeptDO::getId);
     }
 }

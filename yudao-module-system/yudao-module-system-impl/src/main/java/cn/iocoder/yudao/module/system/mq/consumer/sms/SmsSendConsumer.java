@@ -19,12 +19,12 @@ import javax.annotation.Resource;
 public class SmsSendConsumer extends AbstractStreamMessageListener<SmsSendMessage> {
 
     @Resource
-    private SmsSendService smsCoreService;
+    private SmsSendService smsSendService;
 
     @Override
     public void onMessage(SmsSendMessage message) {
         log.info("[onMessage][消息内容({})]", message);
-        smsCoreService.doSendSms(message);
+        smsSendService.doSendSms(message);
     }
 
 }

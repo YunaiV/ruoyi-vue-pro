@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.system.service.permission;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.iocoder.yudao.module.system.dal.dataobject.dept.SysDeptDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.RoleDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.RoleMenuDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.UserRoleDO;
@@ -194,7 +194,7 @@ public class PermissionServiceTest extends BaseDbUnitTest {
         RoleDO roleDO = randomPojo(RoleDO.class, o -> o.setDataScope(DataScopeEnum.DEPT_AND_CHILD.getScope()));
         when(roleService.getRolesFromCache(same(loginUser.getRoleIds()))).thenReturn(singletonList(roleDO));
         // mock 方法（部门）
-        SysDeptDO deptDO = randomPojo(SysDeptDO.class);
+        DeptDO deptDO = randomPojo(DeptDO.class);
         when(deptService.getDeptsByParentIdFromCache(eq(loginUser.getDeptId()), eq(true)))
                 .thenReturn(singletonList(deptDO));
 

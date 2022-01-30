@@ -1,11 +1,12 @@
 package cn.iocoder.yudao.module.system.service.tenant;
 
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.tenant.core.service.TenantFrameworkService;
 import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.TenantCreateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.TenantExportReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.TenantPageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.TenantUpdateReqVO;
-import cn.iocoder.yudao.module.system.dal.dataobject.tenant.SysTenantDO;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.system.dal.dataobject.tenant.TenantDO;
 
 import javax.validation.Valid;
 import java.util.Collection;
@@ -16,7 +17,7 @@ import java.util.List;
  *
  * @author 芋道源码
  */
-public interface TenantService {
+public interface TenantService extends TenantFrameworkService {
 
     /**
      * 创建租户
@@ -46,7 +47,7 @@ public interface TenantService {
      * @param id 编号
      * @return 租户
      */
-    SysTenantDO getTenant(Long id);
+    TenantDO getTenant(Long id);
 
     /**
      * 获得租户列表
@@ -54,7 +55,7 @@ public interface TenantService {
      * @param ids 编号
      * @return 租户列表
      */
-    List<SysTenantDO> getTenantList(Collection<Long> ids);
+    List<TenantDO> getTenantList(Collection<Long> ids);
 
     /**
      * 获得租户分页
@@ -62,7 +63,7 @@ public interface TenantService {
      * @param pageReqVO 分页查询
      * @return 租户分页
      */
-    PageResult<SysTenantDO> getTenantPage(TenantPageReqVO pageReqVO);
+    PageResult<TenantDO> getTenantPage(TenantPageReqVO pageReqVO);
 
     /**
      * 获得租户列表, 用于 Excel 导出
@@ -70,7 +71,7 @@ public interface TenantService {
      * @param exportReqVO 查询条件
      * @return 租户列表
      */
-    List<SysTenantDO> getTenantList(TenantExportReqVO exportReqVO);
+    List<TenantDO> getTenantList(TenantExportReqVO exportReqVO);
 
     /**
      * 获得名字对应的租户
@@ -78,6 +79,6 @@ public interface TenantService {
      * @param name 组户名
      * @return 租户
      */
-    SysTenantDO getTenantByName(String name);
+    TenantDO getTenantByName(String name);
 
 }

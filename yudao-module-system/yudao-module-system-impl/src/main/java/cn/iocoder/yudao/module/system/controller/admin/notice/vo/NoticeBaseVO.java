@@ -26,7 +26,7 @@ public class NoticeBaseVO {
     @ApiModelProperty(value = "公告内容", required = true, example = "半生编码")
     private String content;
 
-    @ApiModelProperty(value = "状态", required = true, example = "1", notes = "参见 SysCommonStatusEnum 枚举类")
+    @ApiModelProperty(value = "状态", required = true, example = "1", notes = "参见 CommonStatusEnum 枚举类")
     private Integer status;
 
 }

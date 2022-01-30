@@ -15,7 +15,7 @@ import javax.validation.constraints.Size;
 @Data
 public class LoginLogBaseVO {
 
-    @ApiModelProperty(value = "日志类型", required = true, example = "1", notes = "参见 SysLoginLogTypeEnum 枚举类")
+    @ApiModelProperty(value = "日志类型", required = true, example = "1", notes = "参见 LoginLogTypeEnum 枚举类")
     @NotNull(message = "日志类型不能为空")
     private Integer logType;
 
@@ -28,7 +28,7 @@ public class LoginLogBaseVO {
     @Size(max = 30, message = "用户账号长度不能超过30个字符")
     private String username;
 
-    @ApiModelProperty(value = "登录结果", required = true, example = "1", notes = "参见 SysLoginResultEnum 枚举类")
+    @ApiModelProperty(value = "登录结果", required = true, example = "1", notes = "参见 LoginResultEnum 枚举类")
     @NotNull(message = "登录结果不能为空")
     private Integer result;
 

@@ -2,8 +2,8 @@ package cn.iocoder.yudao.module.system.controller.admin.sms;
 
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.template.*;
 import cn.iocoder.yudao.module.system.convert.sms.SmsTemplateConvert;
+import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsTemplateDO;
 import cn.iocoder.yudao.module.system.service.sms.SmsTemplateService;
-import cn.iocoder.yudao.module.system.dal.dataobject.sms.SysSmsTemplateDO;
 import cn.iocoder.yudao.module.system.service.sms.SmsSendService;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -32,7 +32,7 @@ public class SmsTemplateController {
     @Resource
     private SmsTemplateService smsTemplateService;
     @Resource
-    private SmsSendService smsCoreService;
+    private SmsSendService smsSendService;
 
     @PostMapping("/create")
     @ApiOperation("创建短信模板")
@@ -63,7 +63,7 @@ public class SmsTemplateController {
     @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
     @PreAuthorize("@ss.hasPermission('system:sms-template:query')")
     public CommonResult<SmsTemplateRespVO> getSmsTemplate(@RequestParam("id") Long id) {
-        SysSmsTemplateDO smsTemplate = smsTemplateService.getSmsTemplate(id);
+        SmsTemplateDO smsTemplate = smsTemplateService.getSmsTemplate(id);
         return success(SmsTemplateConvert.INSTANCE.convert(smsTemplate));
     }
 
@@ -71,7 +71,7 @@ public class SmsTemplateController {
     @ApiOperation("获得短信模板分页")
     @PreAuthorize("@ss.hasPermission('system:sms-template:query')")
     public CommonResult<PageResult<SmsTemplateRespVO>> getSmsTemplatePage(@Valid SmsTemplatePageReqVO pageVO) {
-        PageResult<SysSmsTemplateDO> pageResult = smsTemplateService.getSmsTemplatePage(pageVO);
+        PageResult<SmsTemplateDO> pageResult = smsTemplateService.getSmsTemplatePage(pageVO);
         return success(SmsTemplateConvert.INSTANCE.convertPage(pageResult));
     }
 
@@ -81,7 +81,7 @@ public class SmsTemplateController {
     @OperateLog(type = EXPORT)
     public void exportSmsTemplateExcel(@Valid SmsTemplateExportReqVO exportReqVO,
                                        HttpServletResponse response) throws IOException {
-        List<SysSmsTemplateDO> list = smsTemplateService.getSmsTemplateList(exportReqVO);
+        List<SmsTemplateDO> list = smsTemplateService.getSmsTemplateList(exportReqVO);
         // 导出 Excel
         List<SmsTemplateExcelVO> datas = SmsTemplateConvert.INSTANCE.convertList02(list);
         ExcelUtils.write(response, "短信模板.xls", "数据", SmsTemplateExcelVO.class, datas);
@@ -91,7 +91,7 @@ public class SmsTemplateController {
     @ApiOperation("发送短信")
     @PreAuthorize("@ss.hasPermission('system:sms-template:send-sms')")
     public CommonResult<Long> sendSms(@Valid @RequestBody SmsTemplateSendReqVO sendReqVO) {
-        return success(smsCoreService.sendSingleSmsToAdmin(sendReqVO.getMobile(), null,
+        return success(smsSendService.sendSingleSmsToAdmin(sendReqVO.getMobile(), null,
                 sendReqVO.getTemplateCode(), sendReqVO.getTemplateParams()));
     }
 

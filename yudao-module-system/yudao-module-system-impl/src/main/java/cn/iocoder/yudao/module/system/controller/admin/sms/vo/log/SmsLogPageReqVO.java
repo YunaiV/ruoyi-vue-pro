@@ -27,7 +27,7 @@ public class SmsLogPageReqVO extends PageParam {
     @ApiModelProperty(value = "手机号", example = "15601691300")
     private String mobile;
 
-    @ApiModelProperty(value = "发送状态", example = "1",  notes = "参见 SysSmsSendStatusEnum 枚举类")
+    @ApiModelProperty(value = "发送状态", example = "1",  notes = "参见 SmsSendStatusEnum 枚举类")
     private Integer sendStatus;
 
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
@@ -38,7 +38,7 @@ public class SmsLogPageReqVO extends PageParam {
     @ApiModelProperty(value = "结束发送时间")
     private Date endSendTime;
 
-    @ApiModelProperty(value = "接收状态", example = "0", notes = "参见 SysSmsReceiveStatusEnum 枚举类")
+    @ApiModelProperty(value = "接收状态", example = "0", notes = "参见 SmsReceiveStatusEnum 枚举类")
     private Integer receiveStatus;
 
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)

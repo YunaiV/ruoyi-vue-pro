@@ -23,7 +23,7 @@ public class MenuBaseVO {
     @Size(max = 100)
     private String permission;
 
-    @ApiModelProperty(value = "类型", required = true, example = "1", notes = "参见 SysMenuTypeEnum 枚举类")
+    @ApiModelProperty(value = "类型", required = true, example = "1", notes = "参见 MenuTypeEnum 枚举类")
     @NotNull(message = "菜单类型不能为空")
     private Integer type;
 
@@ -46,7 +46,7 @@ public class MenuBaseVO {
     @Size(max = 200, message = "组件路径不能超过255个字符")
     private String component;
 
-    @ApiModelProperty(value = "状态", required = true, example = "1", notes = "见 SysCommonStatusEnum 枚举")
+    @ApiModelProperty(value = "状态", required = true, example = "1", notes = "见 CommonStatusEnum 枚举")
     @NotNull(message = "状态不能为空")
     private Integer status;
 

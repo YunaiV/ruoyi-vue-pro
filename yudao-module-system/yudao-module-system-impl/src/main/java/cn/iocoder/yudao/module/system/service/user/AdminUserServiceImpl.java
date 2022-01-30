@@ -13,7 +13,7 @@ import cn.iocoder.yudao.module.system.controller.admin.user.vo.profile.UserProfi
 import cn.iocoder.yudao.module.system.controller.admin.user.vo.profile.UserProfileUpdateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.user.vo.user.*;
 import cn.iocoder.yudao.module.system.convert.user.UserConvert;
-import cn.iocoder.yudao.module.system.dal.dataobject.dept.SysDeptDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
 import cn.iocoder.yudao.module.system.dal.mysql.user.AdminUserMapper;
 import cn.iocoder.yudao.module.system.service.dept.DeptService;
@@ -241,7 +241,7 @@ public class AdminUserServiceImpl implements AdminUserService {
             return Collections.emptySet();
         }
         Set<Long> deptIds = CollectionUtils.convertSet(deptService.getDeptsByParentIdFromCache(
-            deptId, true), SysDeptDO::getId);
+            deptId, true), DeptDO::getId);
         deptIds.add(deptId); // 包括自身
         return deptIds;
     }

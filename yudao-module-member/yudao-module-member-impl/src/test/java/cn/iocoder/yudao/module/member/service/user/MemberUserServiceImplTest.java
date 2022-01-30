@@ -37,7 +37,7 @@ import static org.mockito.Mockito.*;
 public class MemberUserServiceImplTest extends BaseDbAndRedisUnitTest {
 
     @Resource
-    private MemberUserServiceImpl mbrUserService;
+    private MemberUserServiceImpl memberUserService;
 
     @Resource
     private StringRedisTemplate stringRedisTemplate;
@@ -67,9 +67,9 @@ public class MemberUserServiceImplTest extends BaseDbAndRedisUnitTest {
         String newNickName = randomString();
 
         // 调用接口修改昵称
-        mbrUserService.updateUserNickname(userDO.getId(),newNickName);
+        memberUserService.updateUserNickname(userDO.getId(),newNickName);
         // 查询新修改后的昵称
-        String nickname = mbrUserService.getUser(userDO.getId()).getNickname();
+        String nickname = memberUserService.getUser(userDO.getId()).getNickname();
         // 断言
         assertEquals(newNickName,nickname);
     }
@@ -88,7 +88,7 @@ public class MemberUserServiceImplTest extends BaseDbAndRedisUnitTest {
         String avatar = randomString();
         when(fileCoreService.createFile(anyString(), eq(avatarFileBytes))).thenReturn(avatar);
         // 调用
-        String str = mbrUserService.updateUserAvatar(userId, avatarFile);
+        String str = memberUserService.updateUserAvatar(userId, avatarFile);
         // 断言
         assertEquals(avatar, str);
     }
@@ -119,9 +119,9 @@ public class MemberUserServiceImplTest extends BaseDbAndRedisUnitTest {
         reqVO.setCode(newCode);
         reqVO.setOldMobile(oldMobile);
         reqVO.setOldCode(oldCode);
-        mbrUserService.updateUserMobile(userDO.getId(),reqVO);
+        memberUserService.updateUserMobile(userDO.getId(),reqVO);
 
-        assertEquals(mbrUserService.getUser(userDO.getId()).getMobile(),newMobile);
+        assertEquals(memberUserService.getUser(userDO.getId()).getMobile(),newMobile);
     }
 
     // ========== 随机对象 ==========

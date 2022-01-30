@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.system.service.auth;
 
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.module.system.controller.admin.auth.vo.session.UserSessionPageReqVO;
-import cn.iocoder.yudao.module.system.dal.dataobject.auth.SysUserSessionDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.auth.UserSessionDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 
 /**
@@ -18,7 +18,7 @@ public interface UserSessionService {
      * @param reqVO 分页条件
      * @return 份额与列表
      */
-    PageResult<SysUserSessionDO> getUserSessionPage(UserSessionPageReqVO reqVO);
+    PageResult<UserSessionDO> getUserSessionPage(UserSessionPageReqVO reqVO);
 
     /**
      * 移除超时的在线用户

@@ -17,7 +17,7 @@ public class ErrorCodeRespVO extends ErrorCodeBaseVO {
     @ApiModelProperty(value = "错误码编号", required = true, example = "1024")
     private Long id;
 
-    @ApiModelProperty(value = "错误码类型", required = true, example = "1", notes = "参见 SysErrorCodeTypeEnum 枚举类")
+    @ApiModelProperty(value = "错误码类型", required = true, example = "1", notes = "参见 ErrorCodeTypeEnum 枚举类")
     private Integer type;
 
     @ApiModelProperty(value = "创建时间", required = true)

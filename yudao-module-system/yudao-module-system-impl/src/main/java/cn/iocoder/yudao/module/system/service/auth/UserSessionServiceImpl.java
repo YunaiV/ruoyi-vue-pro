@@ -6,13 +6,13 @@ import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.security.config.SecurityProperties;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.module.system.controller.admin.auth.vo.session.UserSessionPageReqVO;
+import cn.iocoder.yudao.module.system.dal.dataobject.auth.UserSessionDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
-import cn.iocoder.yudao.module.system.dal.mysql.auth.SysUserSessionMapper;
+import cn.iocoder.yudao.module.system.dal.mysql.auth.UserSessionMapper;
 import cn.iocoder.yudao.module.system.enums.logger.LoginLogTypeEnum;
 import cn.iocoder.yudao.module.system.enums.logger.LoginResultEnum;
 import cn.iocoder.yudao.module.system.service.logger.LoginLogService;
 import cn.iocoder.yudao.module.system.service.user.AdminUserService;
-import cn.iocoder.yudao.module.system.dal.dataobject.auth.SysUserSessionDO;
 import cn.iocoder.yudao.module.system.dal.redis.auth.LoginUserRedisDAO;
 import cn.iocoder.yudao.module.system.api.logger.dto.LoginLogCreateReqDTO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -39,7 +39,7 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.addTime;
 public class UserSessionServiceImpl implements UserSessionService {
 
     @Resource
-    private SysUserSessionMapper userSessionMapper;
+    private UserSessionMapper userSessionMapper;
 
     @Resource
     private AdminUserService userService;
@@ -47,13 +47,13 @@ public class UserSessionServiceImpl implements UserSessionService {
     private LoginLogService loginLogService;
 
     @Resource
-    private LoginUserRedisDAO loginUserCoreRedisDAO;
+    private LoginUserRedisDAO loginUserRedisDAO;
 
     @Resource
     private SecurityProperties securityProperties;
 
     @Override
-    public PageResult<SysUserSessionDO> getUserSessionPage(UserSessionPageReqVO reqVO) {
+    public PageResult<UserSessionDO> getUserSessionPage(UserSessionPageReqVO reqVO) {
         // 处理基于用户昵称的查询
         Collection<Long> userIds = null;
         if (StrUtil.isNotEmpty(reqVO.getUsername())) {
@@ -69,11 +69,11 @@ public class UserSessionServiceImpl implements UserSessionService {
     @Override
     public long clearSessionTimeout() {
         // 获取db里已经超时的用户列表
-        List<SysUserSessionDO> sessionTimeoutDOS = userSessionMapper.selectListBySessionTimoutLt();
-        Map<String, SysUserSessionDO> timeoutSessionDOMap = sessionTimeoutDOS
+        List<UserSessionDO> sessionTimeoutDOS = userSessionMapper.selectListBySessionTimoutLt();
+        Map<String, UserSessionDO> timeoutSessionDOMap = sessionTimeoutDOS
                 .stream()
-                .filter(sessionDO -> loginUserCoreRedisDAO.get(sessionDO.getId()) == null)
-                .collect(Collectors.toMap(SysUserSessionDO::getId, o -> o));
+                .filter(sessionDO -> loginUserRedisDAO.get(sessionDO.getId()) == null)
+                .collect(Collectors.toMap(UserSessionDO::getId, o -> o));
         // 确认已经超时,按批次移出在线用户列表
         if (CollUtil.isNotEmpty(timeoutSessionDOMap)) {
             Lists.partition(new ArrayList<>(timeoutSessionDOMap.keySet()), 100)
@@ -84,8 +84,8 @@ public class UserSessionServiceImpl implements UserSessionService {
         return timeoutSessionDOMap.size();
     }
 
-    private void createTimeoutLogoutLog(Collection<SysUserSessionDO> timeoutSessionDOS) {
-        for (SysUserSessionDO timeoutSessionDO : timeoutSessionDOS) {
+    private void createTimeoutLogoutLog(Collection<UserSessionDO> timeoutSessionDOS) {
+        for (UserSessionDO timeoutSessionDO : timeoutSessionDOS) {
             LoginLogCreateReqDTO reqDTO = new LoginLogCreateReqDTO();
             reqDTO.setLogType(LoginLogTypeEnum.LOGOUT_TIMEOUT.getType());
             reqDTO.setTraceId(TracerUtils.getTraceId());
@@ -105,9 +105,9 @@ public class UserSessionServiceImpl implements UserSessionService {
         String sessionId = generateSessionId();
         // 写入 Redis 缓存
         loginUser.setUpdateTime(new Date());
-        loginUserCoreRedisDAO.set(sessionId, loginUser);
+        loginUserRedisDAO.set(sessionId, loginUser);
         // 写入 DB 中
-        SysUserSessionDO userSession = SysUserSessionDO.builder().id(sessionId)
+        UserSessionDO userSession = UserSessionDO.builder().id(sessionId)
                 .userId(loginUser.getId()).userType(loginUser.getUserType())
                 .userIp(userIp).userAgent(userAgent).username(loginUser.getUsername())
                 .sessionTimeout(addTime(Duration.ofMillis(getSessionTimeoutMillis())))
@@ -121,9 +121,9 @@ public class UserSessionServiceImpl implements UserSessionService {
     public void refreshUserSession(String sessionId, LoginUser loginUser) {
         // 写入 Redis 缓存
         loginUser.setUpdateTime(new Date());
-        loginUserCoreRedisDAO.set(sessionId, loginUser);
+        loginUserRedisDAO.set(sessionId, loginUser);
         // 更新 DB 中
-        SysUserSessionDO updateObj = SysUserSessionDO.builder().id(sessionId).build();
+        UserSessionDO updateObj = UserSessionDO.builder().id(sessionId).build();
         updateObj.setUsername(loginUser.getUsername());
         updateObj.setUpdateTime(new Date());
         updateObj.setSessionTimeout(addTime(Duration.ofMillis(getSessionTimeoutMillis())));
@@ -133,14 +133,14 @@ public class UserSessionServiceImpl implements UserSessionService {
     @Override
     public void deleteUserSession(String sessionId) {
         // 删除 Redis 缓存
-        loginUserCoreRedisDAO.delete(sessionId);
+        loginUserRedisDAO.delete(sessionId);
         // 删除 DB 记录
         userSessionMapper.deleteById(sessionId);
     }
 
     @Override
     public LoginUser getLoginUser(String sessionId) {
-        return loginUserCoreRedisDAO.get(sessionId);
+        return loginUserRedisDAO.get(sessionId);
     }
 
     @Override

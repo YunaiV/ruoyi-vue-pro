@@ -31,7 +31,7 @@ public class OperateLogBaseVO {
     @NotEmpty(message = "操作名")
     private String name;
 
-    @ApiModelProperty(value = "操作分类", required = true, example = "1", notes = "参见 SysOperateLogTypeEnum 枚举类")
+    @ApiModelProperty(value = "操作分类", required = true, example = "1", notes = "参见 OperateLogTypeEnum 枚举类")
     @NotNull(message = "操作分类不能为空")
     private Integer type;
 

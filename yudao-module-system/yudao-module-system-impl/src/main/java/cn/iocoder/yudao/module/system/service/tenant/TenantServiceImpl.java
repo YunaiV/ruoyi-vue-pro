@@ -1,13 +1,14 @@
 package cn.iocoder.yudao.module.system.service.tenant;
 
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.TenantCreateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.TenantExportReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.TenantPageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.TenantUpdateReqVO;
 import cn.iocoder.yudao.module.system.convert.tenant.TenantConvert;
-import cn.iocoder.yudao.module.system.dal.mysql.tenant.SysTenantMapper;
-import cn.iocoder.yudao.module.system.dal.dataobject.tenant.SysTenantDO;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.system.dal.dataobject.tenant.TenantDO;
+import cn.iocoder.yudao.module.system.dal.mysql.tenant.TenantMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -15,8 +16,8 @@ import javax.annotation.Resource;
 import java.util.Collection;
 import java.util.List;
 
-import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.TENANT_NOT_EXISTS;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.TENANT_NOT_EXISTS;
 
 /**
  * 租户 Service 实现类
@@ -28,12 +29,18 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 public class TenantServiceImpl implements TenantService {
 
     @Resource
-    private SysTenantMapper tenantMapper;
+    private TenantMapper tenantMapper;
+
+    @Override
+    public List<Long> getTenantIds() {
+        List<TenantDO> tenants = tenantMapper.selectList();
+        return CollectionUtils.convertList(tenants, TenantDO::getId);
+    }
 
     @Override
     public Long createTenant(TenantCreateReqVO createReqVO) {
         // 插入
-        SysTenantDO tenant = TenantConvert.INSTANCE.convert(createReqVO);
+        TenantDO tenant = TenantConvert.INSTANCE.convert(createReqVO);
         tenantMapper.insert(tenant);
         // 返回
         return tenant.getId();
@@ -44,7 +51,7 @@ public class TenantServiceImpl implements TenantService {
         // 校验存在
         this.validateTenantExists(updateReqVO.getId());
         // 更新
-        SysTenantDO updateObj = TenantConvert.INSTANCE.convert(updateReqVO);
+        TenantDO updateObj = TenantConvert.INSTANCE.convert(updateReqVO);
         tenantMapper.updateById(updateObj);
     }
 
@@ -63,27 +70,27 @@ public class TenantServiceImpl implements TenantService {
     }
 
     @Override
-    public SysTenantDO getTenant(Long id) {
+    public TenantDO getTenant(Long id) {
         return tenantMapper.selectById(id);
     }
 
     @Override
-    public List<SysTenantDO> getTenantList(Collection<Long> ids) {
+    public List<TenantDO> getTenantList(Collection<Long> ids) {
         return tenantMapper.selectBatchIds(ids);
     }
 
     @Override
-    public PageResult<SysTenantDO> getTenantPage(TenantPageReqVO pageReqVO) {
+    public PageResult<TenantDO> getTenantPage(TenantPageReqVO pageReqVO) {
         return tenantMapper.selectPage(pageReqVO);
     }
 
     @Override
-    public List<SysTenantDO> getTenantList(TenantExportReqVO exportReqVO) {
+    public List<TenantDO> getTenantList(TenantExportReqVO exportReqVO) {
         return tenantMapper.selectList(exportReqVO);
     }
 
     @Override
-    public SysTenantDO getTenantByName(String name) {
+    public TenantDO getTenantByName(String name) {
         return tenantMapper.selectByName(name);
     }
 

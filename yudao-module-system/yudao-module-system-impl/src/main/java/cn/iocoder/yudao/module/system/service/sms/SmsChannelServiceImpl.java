@@ -5,9 +5,9 @@ import cn.iocoder.yudao.module.system.controller.admin.sms.vo.channel.SmsChannel
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.channel.SmsChannelPageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.channel.SmsChannelUpdateReqVO;
 import cn.iocoder.yudao.module.system.convert.sms.SmsChannelConvert;
+import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsChannelDO;
 import cn.iocoder.yudao.module.system.dal.mysql.sms.SmsChannelMapper;
 import cn.iocoder.yudao.module.system.mq.producer.sms.SmsProducer;
-import cn.iocoder.yudao.module.system.dal.dataobject.sms.SysSmsChannelDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.framework.sms.core.client.SmsClientFactory;
@@ -64,7 +64,7 @@ public class SmsChannelServiceImpl implements SmsChannelService {
     @PostConstruct
     public void initSmsClients() {
         // 获取短信渠道，如果有更新
-        List<SysSmsChannelDO> smsChannels = this.loadSmsChannelIfUpdate(maxUpdateTime);
+        List<SmsChannelDO> smsChannels = this.loadSmsChannelIfUpdate(maxUpdateTime);
         if (CollUtil.isEmpty(smsChannels)) {
             return;
         }
@@ -91,7 +91,7 @@ public class SmsChannelServiceImpl implements SmsChannelService {
      * @param maxUpdateTime 当前短信渠道的最大更新时间
      * @return 短信渠道列表
      */
-    private List<SysSmsChannelDO> loadSmsChannelIfUpdate(Date maxUpdateTime) {
+    private List<SmsChannelDO> loadSmsChannelIfUpdate(Date maxUpdateTime) {
         // 第一步，判断是否要更新。
         if (maxUpdateTime == null) { // 如果更新时间为空，说明 DB 一定有新数据
             log.info("[loadSmsChannelIfUpdate][首次加载全量短信渠道]");
@@ -108,7 +108,7 @@ public class SmsChannelServiceImpl implements SmsChannelService {
     @Override
     public Long createSmsChannel(SmsChannelCreateReqVO createReqVO) {
         // 插入
-        SysSmsChannelDO smsChannel = SmsChannelConvert.INSTANCE.convert(createReqVO);
+        SmsChannelDO smsChannel = SmsChannelConvert.INSTANCE.convert(createReqVO);
         smsChannelMapper.insert(smsChannel);
         // 发送刷新消息
         smsProducer.sendSmsChannelRefreshMessage();
@@ -121,7 +121,7 @@ public class SmsChannelServiceImpl implements SmsChannelService {
         // 校验存在
         this.validateSmsChannelExists(updateReqVO.getId());
         // 更新
-        SysSmsChannelDO updateObj = SmsChannelConvert.INSTANCE.convert(updateReqVO);
+        SmsChannelDO updateObj = SmsChannelConvert.INSTANCE.convert(updateReqVO);
         smsChannelMapper.updateById(updateObj);
         // 发送刷新消息
         smsProducer.sendSmsChannelRefreshMessage();
@@ -148,22 +148,22 @@ public class SmsChannelServiceImpl implements SmsChannelService {
     }
 
     @Override
-    public SysSmsChannelDO getSmsChannel(Long id) {
+    public SmsChannelDO getSmsChannel(Long id) {
         return smsChannelMapper.selectById(id);
     }
 
     @Override
-    public List<SysSmsChannelDO> getSmsChannelList(Collection<Long> ids) {
+    public List<SmsChannelDO> getSmsChannelList(Collection<Long> ids) {
         return smsChannelMapper.selectBatchIds(ids);
     }
 
     @Override
-    public List<SysSmsChannelDO> getSmsChannelList() {
+    public List<SmsChannelDO> getSmsChannelList() {
         return smsChannelMapper.selectList();
     }
 
     @Override
-    public PageResult<SysSmsChannelDO> getSmsChannelPage(SmsChannelPageReqVO pageReqVO) {
+    public PageResult<SmsChannelDO> getSmsChannelPage(SmsChannelPageReqVO pageReqVO) {
         return smsChannelMapper.selectPage(pageReqVO);
     }
 

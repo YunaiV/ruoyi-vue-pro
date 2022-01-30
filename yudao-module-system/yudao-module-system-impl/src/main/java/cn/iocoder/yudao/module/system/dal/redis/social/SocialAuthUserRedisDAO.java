@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
 
-import static cn.iocoder.yudao.module.system.dal.redis.SysRedisKeyConstants.SOCIAL_AUTH_USER;
+import static cn.iocoder.yudao.module.system.dal.redis.RedisKeyConstants.SOCIAL_AUTH_USER;
 
 
 /**

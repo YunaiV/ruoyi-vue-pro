@@ -43,10 +43,10 @@ public class UserBaseVO {
     @Length(min = 11, max = 11, message = "手机号长度必须 11 位")
     private String mobile;
 
-    @ApiModelProperty(value = "用户性别", example = "1", notes = "参见 SysSexEnum 枚举类")
+    @ApiModelProperty(value = "用户性别", example = "1", notes = "参见 SexEnum 枚举类")
     private Integer sex;
 
-    @ApiModelProperty(value = "用户头像", example = "http://www.iocoder.cn/xxx.png")
+    @ApiModelProperty(value = "用户头像", example = "https://www.iocoder.cn/xxx.png")
     private String avatar;
 
 }

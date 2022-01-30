@@ -12,7 +12,7 @@ import cn.iocoder.yudao.framework.sms.core.client.dto.SmsReceiveRespDTO;
 import cn.iocoder.yudao.framework.sms.core.client.dto.SmsSendRespDTO;
 import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
 import cn.iocoder.yudao.module.member.api.user.dto.UserRespDTO;
-import cn.iocoder.yudao.module.system.dal.dataobject.sms.SysSmsTemplateDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsTemplateDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
 import cn.iocoder.yudao.module.system.mq.message.sms.SmsSendMessage;
 import cn.iocoder.yudao.module.system.mq.producer.sms.SmsProducer;
@@ -83,7 +83,7 @@ public class SmsSendServiceImpl implements SmsSendService {
     public Long sendSingleSms(String mobile, Long userId, Integer userType,
                               String templateCode, Map<String, Object> templateParams) {
         // 校验短信模板是否合法
-        SysSmsTemplateDO template = this.checkSmsTemplateValid(templateCode);
+        SmsTemplateDO template = this.checkSmsTemplateValid(templateCode);
         // 校验手机号码是否存在
         mobile = this.checkMobile(mobile);
         // 构建有序的模板参数。为什么放在这个位置，是提前保证模板参数的正确性，而不是到了插入发送日志
@@ -104,9 +104,9 @@ public class SmsSendServiceImpl implements SmsSendService {
 
 
     @VisibleForTesting
-    public SysSmsTemplateDO checkSmsTemplateValid(String templateCode) {
+    public SmsTemplateDO checkSmsTemplateValid(String templateCode) {
         // 获得短信模板。考虑到效率，从缓存中获取
-        SysSmsTemplateDO template = smsTemplateService.getSmsTemplateByCodeFromCache(templateCode);
+        SmsTemplateDO template = smsTemplateService.getSmsTemplateByCodeFromCache(templateCode);
         // 短信模板不存在
         if (template == null) {
             throw exception(SMS_SEND_TEMPLATE_NOT_EXISTS);
@@ -124,7 +124,7 @@ public class SmsSendServiceImpl implements SmsSendService {
      * @return 处理后的参数
      */
     @VisibleForTesting
-    public List<KeyValue<String, Object>> buildTemplateParams(SysSmsTemplateDO template, Map<String, Object> templateParams) {
+    public List<KeyValue<String, Object>> buildTemplateParams(SmsTemplateDO template, Map<String, Object> templateParams) {
         return template.getParams().stream().map(key -> {
             Object value = templateParams.get(key);
             if (value == null) {

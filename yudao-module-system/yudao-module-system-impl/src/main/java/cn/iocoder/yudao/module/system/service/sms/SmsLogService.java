@@ -2,9 +2,9 @@ package cn.iocoder.yudao.module.system.service.sms;
 
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.log.SmsLogExportReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.log.SmsLogPageReqVO;
-import cn.iocoder.yudao.module.system.dal.dataobject.sms.SysSmsLogDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsLogDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.system.dal.dataobject.sms.SysSmsTemplateDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsTemplateDO;
 
 import java.util.Date;
 import java.util.List;
@@ -31,7 +31,7 @@ public interface SmsLogService {
      * @return 发送日志编号
      */
     Long createSmsLog(String mobile, Long userId, Integer userType, Boolean isSend,
-                      SysSmsTemplateDO template, String templateContent, Map<String, Object> templateParams);
+                      SmsTemplateDO template, String templateContent, Map<String, Object> templateParams);
 
     /**
      * 更新日志的发送结果
@@ -64,7 +64,7 @@ public interface SmsLogService {
      * @param pageReqVO 分页查询
      * @return 短信日志分页
      */
-    PageResult<SysSmsLogDO> getSmsLogPage(SmsLogPageReqVO pageReqVO);
+    PageResult<SmsLogDO> getSmsLogPage(SmsLogPageReqVO pageReqVO);
 
     /**
      * 获得短信日志列表, 用于 Excel 导出
@@ -72,6 +72,6 @@ public interface SmsLogService {
      * @param exportReqVO 查询条件
      * @return 短信日志列表
      */
-    List<SysSmsLogDO> getSmsLogList(SmsLogExportReqVO exportReqVO);
+    List<SmsLogDO> getSmsLogList(SmsLogExportReqVO exportReqVO);
 
 }

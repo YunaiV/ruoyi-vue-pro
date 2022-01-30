@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.system.service.logger;
 
 import cn.iocoder.yudao.module.system.controller.admin.logger.vo.loginlog.LoginLogExportReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.logger.vo.loginlog.LoginLogPageReqVO;
-import cn.iocoder.yudao.module.system.dal.dataobject.logger.SysLoginLogDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.logger.LoginLogDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.system.api.logger.dto.LoginLogCreateReqDTO;
 
@@ -20,7 +20,7 @@ public interface LoginLogService {
      * @param reqVO 分页条件
      * @return 登录日志分页
      */
-    PageResult<SysLoginLogDO> getLoginLogPage(LoginLogPageReqVO reqVO);
+    PageResult<LoginLogDO> getLoginLogPage(LoginLogPageReqVO reqVO);
 
     /**
      * 获得登录日志列表
@@ -28,7 +28,7 @@ public interface LoginLogService {
      * @param reqVO 列表条件
      * @return 登录日志列表
      */
-    List<SysLoginLogDO> getLoginLogList(LoginLogExportReqVO reqVO);
+    List<LoginLogDO> getLoginLogList(LoginLogExportReqVO reqVO);
 
     /**
      * 创建登录日志
