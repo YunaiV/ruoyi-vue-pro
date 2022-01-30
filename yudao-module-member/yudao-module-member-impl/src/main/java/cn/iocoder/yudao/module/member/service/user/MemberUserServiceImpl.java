@@ -4,14 +4,12 @@ import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.iocoder.yudao.coreservice.modules.infra.service.file.InfFileCoreService;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
-import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.module.member.controller.app.user.vo.AppUserUpdateMobileReqVO;
-import cn.iocoder.yudao.module.member.dal.dataobject.sms.SmsCodeDO;
 import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
 import cn.iocoder.yudao.module.member.dal.mysql.user.MemberUserMapper;
-import cn.iocoder.yudao.module.member.enums.SysErrorCodeConstants;
+import cn.iocoder.yudao.module.system.api.sms.SmsCodeApi;
+import cn.iocoder.yudao.module.system.api.sms.dto.SmsCodeUseReqDTO;
 import cn.iocoder.yudao.module.system.enums.sms.SmsSceneEnum;
-import cn.iocoder.yudao.module.member.service.sms.SysSmsCodeService;
 import com.google.common.annotations.VisibleForTesting;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -43,7 +41,7 @@ public class MemberUserServiceImpl implements MemberUserService {
     @Resource
     private InfFileCoreService fileCoreService;
     @Resource
-    private SysSmsCodeService smsCodeService;
+    private SmsCodeApi smsCodeApi;
 
     @Resource
     private PasswordEncoder passwordEncoder;
@@ -111,22 +109,19 @@ public class MemberUserServiceImpl implements MemberUserService {
         return avatar;
     }
 
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateUserMobile(Long userId, AppUserUpdateMobileReqVO reqVO) {
         // 检测用户是否存在
         checkUserExists(userId);
+        // TODO 芋艿：oldMobile 应该不用传递
 
         // 校验旧手机和旧验证码
-        SmsCodeDO sysSmsCodeDO = smsCodeService.checkCodeIsExpired(reqVO.getOldMobile(), reqVO.getOldCode(),
-                SmsSceneEnum.MEMBER_UPDATE_MOBILE.getScene());
-        // 判断旧 code 是否未被使用，如果是，抛出异常
-        if (Boolean.FALSE.equals(sysSmsCodeDO.getUsed())){
-            throw ServiceExceptionUtil.exception(SysErrorCodeConstants.USER_SMS_CODE_IS_UNUSED);
-        }
-
+        smsCodeApi.useSmsCode(new SmsCodeUseReqDTO().setMobile(reqVO.getOldMobile()).setCode(reqVO.getOldCode())
+                .setScene(SmsSceneEnum.MEMBER_UPDATE_MOBILE.getScene()).setUsedIp(getClientIP()));
         // 使用新验证码
-        smsCodeService.useSmsCode(reqVO.getMobile(), SmsSceneEnum.MEMBER_UPDATE_MOBILE.getScene(),
-                reqVO.getCode(),getClientIP());
+        smsCodeApi.useSmsCode(new SmsCodeUseReqDTO().setMobile(reqVO.getMobile()).setCode(reqVO.getCode())
+                .setScene(SmsSceneEnum.MEMBER_UPDATE_MOBILE.getScene()).setUsedIp(getClientIP()));
 
         // 更新用户手机
         memberUserMapper.updateById(MemberUserDO.builder().id(userId).mobile(reqVO.getMobile()).build());

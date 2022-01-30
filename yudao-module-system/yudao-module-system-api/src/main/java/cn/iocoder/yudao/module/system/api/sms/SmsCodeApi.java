@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.system.service.sms;
+package cn.iocoder.yudao.module.system.api.sms;
 
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.module.system.api.sms.dto.SmsCodeCheckReqDTO;
@@ -8,11 +8,11 @@ import cn.iocoder.yudao.module.system.api.sms.dto.SmsCodeUseReqDTO;
 import javax.validation.Valid;
 
 /**
- * 短信验证码 Service 接口
+ * 短信验证码 API 接口
  *
  * @author 芋道源码
  */
-public interface SmsCodeService {
+public interface SmsCodeApi {
 
     /**
      * 创建短信验证码，并进行发送

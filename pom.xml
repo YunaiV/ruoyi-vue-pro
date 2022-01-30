@@ -14,9 +14,8 @@
         <module>yudao-user-server</module>
         <module>yudao-core-service</module>
         <module>yudao-module-member</module>
-        <module>yudao-module-bpm</module>
+<!--        <module>yudao-module-bpm</module>-->
         <module>yudao-module-system</module>
-        <module>yudao-module-system-api</module>
     </modules>
 
     <name>${artifactId}</name>

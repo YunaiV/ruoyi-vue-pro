@@ -4,6 +4,9 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;
 import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
+import cn.iocoder.yudao.module.system.api.sms.dto.SmsCodeCheckReqDTO;
+import cn.iocoder.yudao.module.system.api.sms.dto.SmsCodeSendReqDTO;
+import cn.iocoder.yudao.module.system.api.sms.dto.SmsCodeUseReqDTO;
 import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsCodeDO;
 import cn.iocoder.yudao.module.system.dal.mysql.sms.SmsCodeMapper;
 import cn.iocoder.yudao.module.system.enums.sms.SmsSceneEnum;
@@ -42,13 +45,13 @@ public class SmsCodeServiceImpl implements SmsCodeService {
     private SmsSendService smsSendService;
 
     @Override
-    public void sendSmsCode(String mobile, Integer scene, String createIp) {
-        SmsSceneEnum sceneEnum = SmsSceneEnum.getCodeByScene(scene);
-        Assert.notNull(sceneEnum, "验证码场景({}) 查找不到配置", scene);
+    public void sendSmsCode(SmsCodeSendReqDTO reqDTO) {
+        SmsSceneEnum sceneEnum = SmsSceneEnum.getCodeByScene(reqDTO.getScene());
+        Assert.notNull(sceneEnum, "验证码场景({}) 查找不到配置", reqDTO.getScene());
         // 创建验证码
-        String code = createSmsCode(mobile, scene, createIp);
+        String code = createSmsCode(reqDTO.getMobile(), reqDTO.getScene(), reqDTO.getCreateIp());
         // 发送验证码
-        smsSendService.sendSingleSms(mobile, null, null,
+        smsSendService.sendSingleSms(reqDTO.getMobile(), null, null,
                 sceneEnum.getTemplateCode(), MapUtil.of("code", code));
     }
 
@@ -77,17 +80,17 @@ public class SmsCodeServiceImpl implements SmsCodeService {
     }
 
     @Override
-    public void useSmsCode(String mobile, Integer scene, String code, String usedIp) {
+    public void useSmsCode(SmsCodeUseReqDTO reqDTO) {
         // 检测验证码是否有效
-        SmsCodeDO lastSmsCode = this.checkSmsCode0(mobile, code, scene);
+        SmsCodeDO lastSmsCode = this.checkSmsCode0(reqDTO.getMobile(), reqDTO.getCode(), reqDTO.getScene());
         // 使用验证码
         smsCodeMapper.updateById(SmsCodeDO.builder().id(lastSmsCode.getId())
-                .used(true).usedTime(new Date()).usedIp(usedIp).build());
+                .used(true).usedTime(new Date()).usedIp(reqDTO.getUsedIp()).build());
     }
 
     @Override
-    public void checkSmsCode(String mobile, String code, Integer scene) {
-        checkSmsCode0(mobile, code, scene);
+    public void checkSmsCode(SmsCodeCheckReqDTO reqDTO) {
+        checkSmsCode0(reqDTO.getMobile(), reqDTO.getCode(), reqDTO.getScene());
     }
 
     public SmsCodeDO checkSmsCode0(String mobile, String code, Integer scene) {

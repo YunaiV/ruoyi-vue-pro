@@ -15,6 +15,7 @@ import cn.iocoder.yudao.module.member.service.user.MemberUserService;
 import cn.iocoder.yudao.module.system.api.auth.UserSessionApi;
 import cn.iocoder.yudao.module.system.api.logger.LoginLogApi;
 import cn.iocoder.yudao.module.system.api.logger.dto.LoginLogCreateReqDTO;
+import cn.iocoder.yudao.module.system.api.sms.SmsCodeApi;
 import cn.iocoder.yudao.module.system.api.social.SocialUserApi;
 import cn.iocoder.yudao.module.system.enums.logger.LoginLogTypeEnum;
 import cn.iocoder.yudao.module.system.enums.logger.LoginResultEnum;
@@ -56,7 +57,7 @@ public class MemberAuthServiceImpl implements MemberAuthService {
     @Resource
     private MemberUserService userService;
     @Resource
-    private SysSmsCodeService smsCodeService;
+    private SmsCodeApi smsCodeApi;
     @Resource
     private LoginLogApi loginLogApi;
     @Resource
@@ -93,8 +94,7 @@ public class MemberAuthServiceImpl implements MemberAuthService {
     @Transactional
     public String smsLogin(AppAuthSmsLoginReqVO reqVO, String userIp, String userAgent) {
         // 校验验证码
-        smsCodeService.useSmsCode(reqVO.getMobile(), SmsSceneEnum.MEMBER_LOGIN.getScene(),
-                reqVO.getCode(), userIp);
+        smsCodeApi.useSmsCode(AuthConvert.INSTANCE.convert(reqVO, SmsSceneEnum.MEMBER_LOGIN.getScene(), userIp));
 
         // 获得获得注册用户
         MemberUserDO user = userService.createUserIfAbsent(reqVO.getMobile(), userIp);
@@ -292,8 +292,8 @@ public class MemberAuthServiceImpl implements MemberAuthService {
         MemberUserDO userDO = checkUserIfExists(reqVO.getMobile());
 
         // 使用验证码
-        smsCodeService.useSmsCode(reqVO.getMobile(), SmsSceneEnum.MEMBER_FORGET_PASSWORD.getScene(), reqVO.getCode(),
-                getClientIP());
+        smsCodeApi.useSmsCode(AuthConvert.INSTANCE.convert(reqVO, SmsSceneEnum.MEMBER_FORGET_PASSWORD,
+                getClientIP()));
 
         // 更新密码
         MemberUserDO mbrUserDO = MemberUserDO.builder().build();
@@ -304,7 +304,8 @@ public class MemberAuthServiceImpl implements MemberAuthService {
 
     @Override
     public void sendSmsCode(Long userId, AppAuthSendSmsReqVO reqVO) {
-        // TODO 芋艿：修改
+        // TODO 要根据不同的场景，校验是否有用户
+        smsCodeApi.sendSmsCode(AuthConvert.INSTANCE.convert(reqVO));
     }
 
     /**

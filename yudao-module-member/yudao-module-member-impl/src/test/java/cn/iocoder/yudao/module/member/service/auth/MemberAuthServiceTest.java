@@ -1,22 +1,21 @@
 package cn.iocoder.yudao.module.member.service.auth;
 
-import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
-import cn.iocoder.yudao.module.system.service.auth.SysUserSessionCoreService;
-import cn.iocoder.yudao.module.system.service.logger.SysLoginLogCoreService;
-import cn.iocoder.yudao.module.system.service.social.SysSocialCoreService;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.util.collection.ArrayUtils;
 import cn.iocoder.yudao.framework.redis.config.YudaoRedisAutoConfiguration;
 import cn.iocoder.yudao.module.member.controller.app.auth.vo.AppAuthResetPasswordReqVO;
 import cn.iocoder.yudao.module.member.controller.app.auth.vo.AppAuthUpdatePasswordReqVO;
+import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
 import cn.iocoder.yudao.module.member.dal.mysql.user.MemberUserMapper;
-import cn.iocoder.yudao.module.member.service.sms.SysSmsCodeService;
 import cn.iocoder.yudao.module.member.service.user.MemberUserService;
 import cn.iocoder.yudao.module.member.test.BaseDbAndRedisUnitTest;
+import cn.iocoder.yudao.module.system.api.auth.UserSessionApi;
+import cn.iocoder.yudao.module.system.api.logger.LoginLogApi;
+import cn.iocoder.yudao.module.system.api.sms.SmsCodeApi;
+import cn.iocoder.yudao.module.system.api.social.SocialUserApi;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -37,22 +36,20 @@ import static org.mockito.Mockito.when;
  * @author 宋天
  */
 @Import({MemberAuthServiceImpl.class, YudaoRedisAutoConfiguration.class})
-public class SysAuthServiceTest extends BaseDbAndRedisUnitTest {
+public class MemberAuthServiceTest extends BaseDbAndRedisUnitTest {
 
     @MockBean
     private AuthenticationManager authenticationManager;
     @MockBean
     private MemberUserService userService;
     @MockBean
-    private SysSmsCodeService smsCodeService;
+    private SmsCodeApi smsCodeApi;
     @MockBean
-    private SysLoginLogCoreService loginLogCoreService;
+    private LoginLogApi loginLogApi;
     @MockBean
-    private SysUserSessionCoreService userSessionCoreService;
+    private UserSessionApi userSessionApi;
     @MockBean
-    private SysSocialCoreService socialService;
-    @Resource
-    private StringRedisTemplate stringRedisTemplate;
+    private SocialUserApi socialUserApi;
     @MockBean
     private PasswordEncoder passwordEncoder;
     @Resource
