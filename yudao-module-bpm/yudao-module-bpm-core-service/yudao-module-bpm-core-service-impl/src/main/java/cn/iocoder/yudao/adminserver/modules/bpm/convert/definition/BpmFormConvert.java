@@ -5,6 +5,7 @@ import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.form.Bp
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.form.BpmFormSimpleRespVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.form.BpmFormUpdateReqVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.definition.BpmFormDO;
+import cn.iocoder.yudao.coreservice.modules.bpm.api.form.dto.BpmFormDTO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
@@ -26,6 +27,10 @@ public interface BpmFormConvert {
     BpmFormDO convert(BpmFormUpdateReqVO bean);
 
     BpmFormRespVO convert(BpmFormDO bean);
+
+    BpmFormDTO convert1(BpmFormDO bean);
+
+    List<BpmFormDTO> convertList(List<BpmFormDO> list);
 
     List<BpmFormSimpleRespVO> convertList2(List<BpmFormDO> list);
 

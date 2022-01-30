@@ -8,12 +8,12 @@ import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.process
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.process.BpmProcessDefinitionPageReqVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.process.BpmProcessDefinitionRespVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.convert.definition.BpmProcessDefinitionConvert;
-import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.definition.BpmFormDO;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.definition.BpmProcessDefinitionExtDO;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.mysql.definition.BpmProcessDefinitionExtMapper;
-import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmFormService;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmProcessDefinitionService;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.dto.BpmProcessDefinitionCreateReqDTO;
+import cn.iocoder.yudao.coreservice.modules.bpm.api.form.BpmFormServiceApi;
+import cn.iocoder.yudao.coreservice.modules.bpm.api.form.dto.BpmFormDTO;
 import cn.iocoder.yudao.framework.activiti.core.util.ActivitiUtils;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.PageUtils;
@@ -31,7 +31,8 @@ import org.springframework.validation.annotation.Validated;
 import javax.annotation.Resource;
 import java.util.*;
 
-import static cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants.*;
+import static cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants.PROCESS_DEFINITION_KEY_NOT_MATCH;
+import static cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants.PROCESS_DEFINITION_NAME_NOT_MATCH;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static java.util.Collections.emptyList;
@@ -54,7 +55,7 @@ public class BpmProcessDefinitionServiceImpl implements BpmProcessDefinitionServ
     @Resource
     private RepositoryService repositoryService;
     @Resource
-    private BpmFormService bpmFormService;
+    private BpmFormServiceApi bpmFormServiceApi;
 
     @Resource
     private BpmProcessDefinitionExtMapper processDefinitionMapper;
@@ -85,7 +86,7 @@ public class BpmProcessDefinitionServiceImpl implements BpmProcessDefinitionServ
 
         // 获得 Form Map
         Set<Long> formIds = convertSet(processDefinitionDOs, BpmProcessDefinitionExtDO::getFormId);
-        Map<Long, BpmFormDO> formMap = bpmFormService.getFormMap(formIds);
+        Map<Long, BpmFormDTO> formMap = bpmFormServiceApi.getFormMap(formIds);
 
         // 拼接结果
         long definitionCount = definitionQuery.count();

@@ -55,6 +55,4 @@ public interface BpmErrorCodeConstants {
 
     // ========== 动态表单模块 1-009-010-000 ==========
     ErrorCode FORM_NOT_EXISTS = new ErrorCode(1009010000, "动态表单不存在");
-    ErrorCode FORM_FIELD_REPEAT = new ErrorCode(1009010000, "表单项({}) 和 ({}) 使用了相同的字段名({})");
-
 }

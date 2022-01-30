@@ -6,14 +6,14 @@ import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.model.*;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.rule.BpmTaskAssignRuleRespVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.convert.definition.BpmModelConvert;
-import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.definition.BpmFormDO;
 import cn.iocoder.yudao.adminserver.modules.bpm.enums.definition.BpmModelFormTypeEnum;
+import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmModelService;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmProcessDefinitionService;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmTaskAssignRuleService;
-import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.dto.BpmProcessDefinitionCreateReqDTO;
-import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmFormService;
-import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmModelService;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.dto.BpmModelMetaInfoRespDTO;
+import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.dto.BpmProcessDefinitionCreateReqDTO;
+import cn.iocoder.yudao.coreservice.modules.bpm.api.form.BpmFormServiceApi;
+import cn.iocoder.yudao.coreservice.modules.bpm.api.form.dto.BpmFormDTO;
 import cn.iocoder.yudao.framework.activiti.core.util.ActivitiUtils;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
@@ -39,7 +39,6 @@ import java.util.*;
 
 import static cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants.*;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception0;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 
 /**
@@ -57,7 +56,7 @@ public class BpmModelServiceImpl implements BpmModelService {
     @Resource
     private RepositoryService repositoryService;
     @Resource
-    private BpmFormService formService;
+    private BpmFormServiceApi formServiceApi;
     @Resource
     private BpmProcessDefinitionService processDefinitionService;
     @Resource
@@ -85,7 +84,7 @@ public class BpmModelServiceImpl implements BpmModelService {
             BpmModelMetaInfoRespDTO metaInfo = JsonUtils.parseObject(model.getMetaInfo(), BpmModelMetaInfoRespDTO.class);
             return metaInfo != null ? metaInfo.getFormId() : null;
         });
-        Map<Long, BpmFormDO> formMap = formService.getFormMap(formIds);
+        Map<Long, BpmFormDTO> formMap = formServiceApi.getFormMap(formIds);
 
         // 获得 Deployment Map
         Set<String> deploymentIds = new HashSet<>();
@@ -172,7 +171,7 @@ public class BpmModelServiceImpl implements BpmModelService {
         }
         // TODO 芋艿：校验流程图的有效性；例如说，是否有开始的元素，是否有结束的元素；
         // 校验表单已配
-        BpmFormDO form = checkFormConfig(model);
+        BpmFormDTO form = checkFormConfig(model);
         // 校验任务分配规则已配置
         checkTaskAssignRuleAllConfig(id);
 
@@ -225,14 +224,14 @@ public class BpmModelServiceImpl implements BpmModelService {
      * @param model 流程模型
      * @return 流程表单
      */
-    private BpmFormDO checkFormConfig(Model model) {
+    private BpmFormDTO checkFormConfig(Model model) {
         BpmModelMetaInfoRespDTO metaInfo = JsonUtils.parseObject(model.getMetaInfo(), BpmModelMetaInfoRespDTO.class);
         if (metaInfo == null || metaInfo.getFormType() == null) {
             throw exception(MODEL_DEPLOY_FAIL_FORM_NOT_CONFIG);
         }
         // 校验表单存在
         if (Objects.equals(metaInfo.getFormType(), BpmModelFormTypeEnum.NORMAL.getType())) {
-            BpmFormDO form = formService.getForm(metaInfo.getFormId());
+            BpmFormDTO form = formServiceApi.getForm(metaInfo.getFormId());
             if (form == null) {
                 throw exception(FORM_NOT_EXISTS);
             }
