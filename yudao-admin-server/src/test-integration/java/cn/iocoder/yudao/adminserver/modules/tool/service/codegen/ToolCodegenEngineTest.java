@@ -1,11 +1,11 @@
-package cn.iocoder.yudao.adminserver.modules.tool.service.codegen;
+package cn.iocoder.yudao.module.tool.service.codegen;
 
 import cn.iocoder.yudao.adminserver.BaseDbUnitTest;
-import cn.iocoder.yudao.adminserver.modules.tool.dal.dataobject.codegen.ToolCodegenColumnDO;
-import cn.iocoder.yudao.adminserver.modules.tool.dal.dataobject.codegen.ToolCodegenTableDO;
-import cn.iocoder.yudao.adminserver.modules.tool.dal.mysql.codegen.ToolCodegenColumnMapper;
-import cn.iocoder.yudao.adminserver.modules.tool.dal.mysql.codegen.ToolCodegenTableMapper;
-import cn.iocoder.yudao.adminserver.modules.tool.service.codegen.impl.ToolCodegenEngine;
+import cn.iocoder.yudao.module.tool.dal.dataobject.codegen.ToolCodegenColumnDO;
+import cn.iocoder.yudao.module.tool.dal.dataobject.codegen.ToolCodegenTableDO;
+import cn.iocoder.yudao.module.tool.dal.mysql.codegen.ToolCodegenColumnMapper;
+import cn.iocoder.yudao.module.tool.dal.mysql.codegen.ToolCodegenTableMapper;
+import cn.iocoder.yudao.module.tool.service.codegen.impl.ToolCodegenEngine;
 import org.junit.jupiter.api.Test;
 
 import javax.annotation.Resource;

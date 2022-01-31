@@ -1,7 +1,7 @@
-package cn.iocoder.yudao.adminserver.modules.tool.dal.mysql.codegen;
+package cn.iocoder.yudao.module.tool.dal.mysql.codegen;
 
 import cn.iocoder.yudao.adminserver.BaseDbUnitTest;
-import cn.iocoder.yudao.adminserver.modules.tool.dal.dataobject.codegen.ToolSchemaColumnDO;
+import cn.iocoder.yudao.module.tool.dal.dataobject.codegen.ToolSchemaColumnDO;
 import org.junit.jupiter.api.Test;
 
 import javax.annotation.Resource;

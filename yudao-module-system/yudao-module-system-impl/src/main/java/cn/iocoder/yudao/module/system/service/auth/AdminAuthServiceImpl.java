@@ -137,7 +137,6 @@ public class AdminAuthServiceImpl implements AdminAuthService {
             // 在其内部，会调用到 loadUserByUsername 方法，获取 User 信息
             authentication = authenticationManager.authenticate(new MultiUsernamePasswordAuthenticationToken(
                     username, password, getUserType()));
-           //  org.activiti.engine.impl.identity.Authentication.setAuthenticatedUserId(username);
         } catch (BadCredentialsException badCredentialsException) {
             this.createLoginLog(username, logTypeEnum, LoginResultEnum.BAD_CREDENTIALS);
             throw exception(AUTH_LOGIN_BAD_CREDENTIALS);

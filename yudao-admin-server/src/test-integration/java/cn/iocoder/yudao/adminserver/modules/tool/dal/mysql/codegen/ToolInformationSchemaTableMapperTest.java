@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.adminserver.modules.tool.dal.mysql.codegen;
+package cn.iocoder.yudao.module.tool.dal.mysql.codegen;
 
 import cn.iocoder.yudao.adminserver.BaseDbUnitTest;
 

@@ -1,7 +1,7 @@
-package cn.iocoder.yudao.adminserver.modules.tool.service.codegen;
+package cn.iocoder.yudao.module.tool.service.codegen;
 
 import cn.iocoder.yudao.adminserver.BaseDbUnitTest;
-import cn.iocoder.yudao.adminserver.modules.tool.service.codegen.impl.ToolCodegenServiceImpl;
+import cn.iocoder.yudao.module.tool.service.codegen.impl.ToolCodegenServiceImpl;
 import org.junit.jupiter.api.Test;
 
 import javax.annotation.Resource;
