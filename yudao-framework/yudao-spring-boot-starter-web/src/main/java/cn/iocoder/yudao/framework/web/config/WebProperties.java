@@ -36,11 +36,9 @@ public class WebProperties {
         private String prefix;
 
         /**
-         * Controller 所在包
+         * Controller 所在包的 Ant 路径规则
          *
          * 主要目的是，给该 Controller 设置指定的 {@link #prefix}
-         *
-         * 因为我们有多个 modules 包里会包含 Controller，所以只需要写到 cn.iocoder.yudao 这样的层级
          */
         @NotEmpty(message = "Controller 所在包不能为空")
         private String controller;

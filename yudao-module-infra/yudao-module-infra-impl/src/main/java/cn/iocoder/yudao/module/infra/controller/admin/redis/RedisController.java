@@ -3,8 +3,8 @@ package cn.iocoder.yudao.module.infra.controller.admin.redis;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.redis.core.RedisKeyDefine;
 import cn.iocoder.yudao.framework.redis.core.RedisKeyRegistry;
-import cn.iocoder.yudao.module.infra.controller.admin.redis.vo.InfRedisKeyRespVO;
-import cn.iocoder.yudao.module.infra.controller.admin.redis.vo.InfRedisMonitorRespVO;
+import cn.iocoder.yudao.module.infra.controller.admin.redis.vo.RedisKeyRespVO;
+import cn.iocoder.yudao.module.infra.controller.admin.redis.vo.RedisMonitorRespVO;
 import cn.iocoder.yudao.module.infra.convert.redis.RedisConvert;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -22,7 +22,7 @@ import java.util.Properties;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
-@Api(tags = "Redis 监控")
+@Api(tags = "管理后台 - Redis 监控")
 @RestController
 @RequestMapping("/infra/redis")
 public class RedisController {
@@ -33,7 +33,7 @@ public class RedisController {
     @GetMapping("/get-monitor-info")
     @ApiOperation("获得 Redis 监控信息")
     @PreAuthorize("@ss.hasPermission('infra:redis:get-monitor-info')")
-    public CommonResult<InfRedisMonitorRespVO> getRedisMonitorInfo() {
+    public CommonResult<RedisMonitorRespVO> getRedisMonitorInfo() {
         // 获得 Redis 统计信息
         Properties info = stringRedisTemplate.execute((RedisCallback<Properties>) RedisServerCommands::info);
         Long dbSize = stringRedisTemplate.execute(RedisServerCommands::dbSize);
@@ -47,7 +47,7 @@ public class RedisController {
     @GetMapping("/get-key-list")
     @ApiOperation("获得 Redis Key 列表")
     @PreAuthorize("@ss.hasPermission('infra:redis:get-key-list')")
-    public CommonResult<List<InfRedisKeyRespVO>> getKeyList() {
+    public CommonResult<List<RedisKeyRespVO>> getKeyList() {
         List<RedisKeyDefine> keyDefines = RedisKeyRegistry.list();
         return success(RedisConvert.INSTANCE.convertList(keyDefines));
     }

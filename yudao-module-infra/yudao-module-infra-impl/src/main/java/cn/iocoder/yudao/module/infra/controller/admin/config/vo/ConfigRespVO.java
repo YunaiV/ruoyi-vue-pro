@@ -9,7 +9,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.util.Date;
 
-@ApiModel("参数配置信息 Response VO")
+@ApiModel("管理后台 - 参数配置信息 Response VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class ConfigRespVO extends ConfigBaseVO {

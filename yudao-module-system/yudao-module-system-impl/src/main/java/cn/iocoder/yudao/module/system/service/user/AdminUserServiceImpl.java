@@ -4,11 +4,11 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.coreservice.modules.infra.service.file.InfFileCoreService;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.module.infra.api.file.FileApi;
 import cn.iocoder.yudao.module.system.controller.admin.user.vo.profile.UserProfileUpdatePasswordReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.user.vo.profile.UserProfileUpdateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.user.vo.user.*;
@@ -56,8 +56,9 @@ public class AdminUserServiceImpl implements AdminUserService {
     private PermissionService permissionService;
     @Resource
     private PasswordEncoder passwordEncoder;
+
     @Resource
-    private InfFileCoreService fileService;
+    private FileApi fileApi;
 
     @Override
     public Long createUser(UserCreateReqVO reqVO) {
@@ -111,7 +112,7 @@ public class AdminUserServiceImpl implements AdminUserService {
     public String updateUserAvatar(Long id, InputStream avatarFile) {
         this.checkUserExists(id);
         // 存储文件
-        String avatar = fileService.createFile(IdUtil.fastUUID(), IoUtil.readBytes(avatarFile));
+        String avatar = fileApi.createFile(IoUtil.readBytes(avatarFile));
         // 更新路径
         AdminUserDO sysUserDO = new AdminUserDO();
         sysUserDO.setId(id);

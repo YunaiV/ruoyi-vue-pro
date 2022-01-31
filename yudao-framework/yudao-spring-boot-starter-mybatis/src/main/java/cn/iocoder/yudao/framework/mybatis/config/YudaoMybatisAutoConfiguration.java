@@ -16,7 +16,7 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 @MapperScan(value = {"${yudao.info.base-package}", "${yudao.core-service.base-package}",
-        "${yudao.info.member-package}", "${yudao.info.system-package}"},
+        "${yudao.info.base-package2}"},
         annotationClass = Mapper.class,
         lazyInitialization = "${mybatis.lazy-initialization:false}") // Mapper 懒加载，目前仅用于单元测试
 public class YudaoMybatisAutoConfiguration {

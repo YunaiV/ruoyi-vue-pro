@@ -8,7 +8,7 @@ import lombok.ToString;
 
 import javax.validation.constraints.NotNull;
 
-@ApiModel("参数配置创建 Request VO")
+@ApiModel("管理后台 - 参数配置创建 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)

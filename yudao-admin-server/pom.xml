@@ -99,12 +99,6 @@
             <artifactId>yudao-spring-boot-starter-redis</artifactId>
         </dependency>
 
-        <!-- Config 配置中心相关 -->
-        <dependency>
-            <groupId>cn.iocoder.boot</groupId>
-            <artifactId>yudao-spring-boot-starter-config</artifactId>
-        </dependency>
-
         <!-- Job 定时任务相关 -->
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
@@ -150,11 +144,6 @@
         <dependency>
             <groupId>org.apache.velocity</groupId>
             <artifactId>velocity-engine-core</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>cn.smallbun.screw</groupId>
-            <artifactId>screw-core</artifactId> <!-- 实现数据库文档 -->
         </dependency>
 
         <!-- 三方云服务相关 -->

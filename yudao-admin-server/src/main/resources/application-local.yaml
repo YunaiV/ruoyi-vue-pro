@@ -113,7 +113,7 @@ apollo:
     eagerLoad:
       enabled: true # 设置 Apollo 在日志初始化前生效，可以实现日志的动态级别配置
   jdbc: # 自定义的 JDBC 配置项，用于数据库的地址
-    dao: cn.iocoder.yudao.coreservice.modules.infra.dal.mysql.config.InfConfigCoreDAOImpl
+    dao: cn.iocoder.yudao.module.infra.dal.mysql.config.ConfigCoreDAOImpl
     url: ${spring.datasource.dynamic.datasource.master.url}
     username: ${spring.datasource.dynamic.datasource.master.username}
     password: ${spring.datasource.dynamic.datasource.master.password}

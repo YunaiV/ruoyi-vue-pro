@@ -2,8 +2,8 @@ package cn.iocoder.yudao.module.member.service.user;
 
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.IdUtil;
-import cn.iocoder.yudao.coreservice.modules.infra.service.file.InfFileCoreService;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.module.infra.api.file.FileApi;
 import cn.iocoder.yudao.module.member.controller.app.user.vo.AppUserUpdateMobileReqVO;
 import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
 import cn.iocoder.yudao.module.member.dal.mysql.user.MemberUserMapper;
@@ -39,7 +39,7 @@ public class MemberUserServiceImpl implements MemberUserService {
     private MemberUserMapper memberUserMapper;
 
     @Resource
-    private InfFileCoreService fileCoreService;
+    private FileApi fileApi;
     @Resource
     private SmsCodeApi smsCodeApi;
 
@@ -103,7 +103,7 @@ public class MemberUserServiceImpl implements MemberUserService {
     public String updateUserAvatar(Long userId, InputStream avatarFile) {
         this.checkUserExists(userId);
         // 创建文件
-        String avatar = fileCoreService.createFile(IdUtil.fastUUID(), IoUtil.readBytes(avatarFile));
+        String avatar = fileApi.createFile(IoUtil.readBytes(avatarFile));
         // 更新头像路径
         memberUserMapper.updateById(MemberUserDO.builder().id(userId).avatar(avatar).build());
         return avatar;

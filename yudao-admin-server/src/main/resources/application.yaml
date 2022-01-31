@@ -48,17 +48,16 @@ yudao:
   info:
     version: 1.0.0
     base-package: cn.iocoder.yudao.adminserver
-    member-package: cn.iocoder.yudao.module.member
-    system-package: cn.iocoder.yudao.module.system
+    base-package2: cn.iocoder.yudao.module
   core-service:
     base-package: cn.iocoder.yudao.coreservice
   web:
     admin-api:
       prefix: /admin-api
-      controller: cn.iocoder.yudao.module.system.controller.admin # TODO 芋艿：需要改造
+      controller: '**.controller.admin.**'
     app-api:
       prefix: /app-api
-      controller: cn.iocoder.yudao.module.member.controller.app # TODO 芋艿：需要改造
+      controller: '**.controller.app.**'
 
   swagger:
     title: 管理后台

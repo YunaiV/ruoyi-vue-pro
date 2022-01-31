@@ -1,10 +1,10 @@
 package cn.iocoder.yudao.module.member.service.user;
 
 import cn.hutool.core.util.RandomUtil;
-import cn.iocoder.yudao.coreservice.modules.infra.service.file.InfFileCoreService;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.util.collection.ArrayUtils;
 import cn.iocoder.yudao.framework.redis.config.YudaoRedisAutoConfiguration;
+import cn.iocoder.yudao.module.infra.api.file.FileApi;
 import cn.iocoder.yudao.module.member.controller.app.user.vo.AppUserUpdateMobileReqVO;
 import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
 import cn.iocoder.yudao.module.member.dal.mysql.user.MemberUserMapper;
@@ -49,13 +49,12 @@ public class MemberUserServiceImplTest extends BaseDbAndRedisUnitTest {
     private MemberAuthServiceImpl authService;
 
     @MockBean
-    private InfFileCoreService fileCoreService;
-
-    @MockBean
     private PasswordEncoder passwordEncoder;
 
     @MockBean
     private SmsCodeApi smsCodeApi;
+    @MockBean
+    private FileApi fileApi;
 
     @Test
     public void testUpdateNickName_success(){
@@ -86,7 +85,7 @@ public class MemberUserServiceImplTest extends BaseDbAndRedisUnitTest {
         ByteArrayInputStream avatarFile = new ByteArrayInputStream(avatarFileBytes);
         // mock 方法
         String avatar = randomString();
-        when(fileCoreService.createFile(anyString(), eq(avatarFileBytes))).thenReturn(avatar);
+        when(fileApi.createFile(eq(avatarFileBytes))).thenReturn(avatar);
         // 调用
         String str = memberUserService.updateUserAvatar(userId, avatarFile);
         // 断言

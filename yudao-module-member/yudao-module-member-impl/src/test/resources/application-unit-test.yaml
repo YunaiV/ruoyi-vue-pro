@@ -45,7 +45,6 @@ mybatis:
 yudao:
   info:
     base-package: cn.iocoder.yudao.module.member.dal.mysql
-    member-package: cn.iocoder.yudao.module.member # TODO 芋艿：要清理掉
-    system-package: cn.iocoder.yudao.module.system # TODO 芋艿：要清理掉
+    base-package2: cn.iocoder.yudao.module
   core-service:
     base-package: cn.iocoder.yudao.module.member.dal.mysql # TODO 芋艿：要清理掉

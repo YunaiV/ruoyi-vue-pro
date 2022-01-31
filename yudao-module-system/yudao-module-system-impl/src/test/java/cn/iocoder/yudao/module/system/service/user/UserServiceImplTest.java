@@ -1,13 +1,13 @@
 package cn.iocoder.yudao.module.system.service.user;
 
 import cn.hutool.core.util.RandomUtil;
-import cn.iocoder.yudao.coreservice.modules.infra.service.file.InfFileCoreService;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.ArrayUtils;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
+import cn.iocoder.yudao.module.infra.api.file.FileApi;
 import cn.iocoder.yudao.module.system.controller.admin.user.vo.profile.UserProfileUpdatePasswordReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.user.vo.profile.UserProfileUpdateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.user.vo.user.*;
@@ -63,7 +63,7 @@ public class UserServiceImplTest extends BaseDbUnitTest {
     @MockBean
     private PasswordEncoder passwordEncoder;
     @MockBean
-    private InfFileCoreService fileService;
+    private FileApi fileApi;
 
     @Test
     public void testCreatUser_success() {
@@ -182,7 +182,7 @@ public class UserServiceImplTest extends BaseDbUnitTest {
         ByteArrayInputStream avatarFile = new ByteArrayInputStream(avatarFileBytes);
         // mock 方法
         String avatar = randomString();
-        when(fileService.createFile(anyString(), eq(avatarFileBytes))).thenReturn(avatar);
+        when(fileApi.createFile(eq(avatarFileBytes))).thenReturn(avatar);
 
         // 调用
         userService.updateUserAvatar(userId, avatarFile);

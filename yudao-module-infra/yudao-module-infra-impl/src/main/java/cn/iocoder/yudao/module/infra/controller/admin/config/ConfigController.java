@@ -1,17 +1,15 @@
 package cn.iocoder.yudao.module.infra.controller.admin.config;
 
-import cn.iocoder.yudao.coreservice.modules.infra.dal.dataobject.config.InfConfigDO;
 import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
-import cn.iocoder.yudao.adminserver.modules.infra.controller.config.vo.*;
 import cn.iocoder.yudao.module.infra.controller.admin.config.vo.*;
-import cn.iocoder.yudao.module.infra.convert.config.InfConfigConvert;
-import cn.iocoder.yudao.module.infra.service.config.InfConfigService;
-import cn.iocoder.yudao.module.infra.controller.config.vo.*;
-import cn.iocoder.yudao.module.infra.enums.InfErrorCodeConstants;
+import cn.iocoder.yudao.module.infra.convert.config.ConfigConvert;
+import cn.iocoder.yudao.module.infra.dal.dataobject.config.ConfigDO;
+import cn.iocoder.yudao.module.infra.service.config.ConfigService;
+import cn.iocoder.yudao.module.infra.enums.ErrorCodeConstants;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
@@ -25,18 +23,17 @@ import javax.validation.Valid;
 import java.io.IOException;
 import java.util.List;
 
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 
-@Api(tags = "参数配置")
+@Api(tags = "管理后台 - 参数配置")
 @RestController
 @RequestMapping("/infra/config")
 @Validated
 public class ConfigController {
 
     @Resource
-    private InfConfigService configService;
+    private ConfigService configService;
 
     @PostMapping("/create")
     @ApiOperation("创建参数配置")
@@ -67,19 +64,19 @@ public class ConfigController {
     @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
     @PreAuthorize("@ss.hasPermission('infra:config:query')")
     public CommonResult<ConfigRespVO> getConfig(@RequestParam("id") Long id) {
-        return success(InfConfigConvert.INSTANCE.convert(configService.getConfig(id)));
+        return success(ConfigConvert.INSTANCE.convert(configService.getConfig(id)));
     }
 
     @GetMapping(value = "/get-value-by-key")
     @ApiOperation(value = "根据参数键名查询参数值", notes = "敏感配置，不允许返回给前端")
     @ApiImplicitParam(name = "key", value = "参数键", required = true, example = "yunai.biz.username", dataTypeClass = String.class)
     public CommonResult<String> getConfigKey(@RequestParam("key") String key) {
-        InfConfigDO config = configService.getConfigByKey(key);
+        ConfigDO config = configService.getConfigByKey(key);
         if (config == null) {
             return null;
         }
         if (config.getSensitive()) {
-            throw ServiceExceptionUtil.exception(InfErrorCodeConstants.CONFIG_GET_VALUE_ERROR_IF_SENSITIVE);
+            throw ServiceExceptionUtil.exception(ErrorCodeConstants.CONFIG_GET_VALUE_ERROR_IF_SENSITIVE);
         }
         return success(config.getValue());
     }
@@ -88,8 +85,8 @@ public class ConfigController {
     @ApiOperation("获取参数配置分页")
     @PreAuthorize("@ss.hasPermission('infra:config:query')")
     public CommonResult<PageResult<ConfigRespVO>> getConfigPage(@Valid ConfigPageReqVO reqVO) {
-        PageResult<InfConfigDO> page = configService.getConfigPage(reqVO);
-        return success(InfConfigConvert.INSTANCE.convertPage(page));
+        PageResult<ConfigDO> page = configService.getConfigPage(reqVO);
+        return success(ConfigConvert.INSTANCE.convertPage(page));
     }
 
     @GetMapping("/export")
@@ -98,9 +95,9 @@ public class ConfigController {
     @OperateLog(type = EXPORT)
     public void exportSysConfig(@Valid ConfigExportReqVO reqVO,
                                 HttpServletResponse response) throws IOException {
-        List<InfConfigDO> list = configService.getConfigList(reqVO);
+        List<ConfigDO> list = configService.getConfigList(reqVO);
         // 拼接数据
-        List<ConfigExcelVO> datas = InfConfigConvert.INSTANCE.convertList(list);
+        List<ConfigExcelVO> datas = ConfigConvert.INSTANCE.convertList(list);
         // 输出
         ExcelUtils.write(response, "参数配置.xls", "数据", ConfigExcelVO.class, datas);
     }
