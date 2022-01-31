@@ -17,10 +17,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum PayChannelEnum {
 
-    /**
-     * 公众号网页
-     */
-    WX_PUB("wx_pub", "微信 JSAPI 支付", WXPayClientConfig.class),
+    WX_PUB("wx_pub", "微信 JSAPI 支付", WXPayClientConfig.class), // 公众号网页
     WX_LITE("wx_lite", "微信小程序支付", WXPayClientConfig.class),
     WX_APP("wx_app", "微信 App 支付", WXPayClientConfig.class),
 
@@ -34,16 +31,16 @@ public enum PayChannelEnum {
      * <p>
      * 参考 https://www.pingxx.com/api/支付渠道属性值.html
      */
-    private String code;
+    private final String code;
     /**
      * 名字
      */
-    private String name;
+    private final String name;
 
     /**
      * 配置类
      */
-    private Class<? extends PayClientConfig> configClass;
+    private final Class<? extends PayClientConfig> configClass;
 
     /**
      * 微信支付
@@ -58,6 +55,6 @@ public enum PayChannelEnum {
     public static PayChannelEnum getByCode(String code) {
         return ArrayUtil.firstMatch(o -> o.getCode().equals(code), values());
     }
-    
+
 
 }

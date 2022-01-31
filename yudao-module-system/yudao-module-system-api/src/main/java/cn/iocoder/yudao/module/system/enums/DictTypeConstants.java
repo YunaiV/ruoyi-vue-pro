@@ -20,31 +20,6 @@ public interface DictTypeConstants {
     String SMS_SEND_STATUS = "sys_sms_send_status"; // 短信发送状态
     String SMS_RECEIVE_STATUS = "sys_sms_receive_status"; // 短信接收状态
 
-    /**
-     * 支付-订单-订单状态
-     */
-    String PAY_ORDER_STATUS = "pay_order_status";
-
-    /**
-     * 支付-订单-订单回调商户状态
-     */
-    String PAY_ORDER_NOTIFY_STATUS = "pay_order_notify_status";
-
-    /**
-     * 支付-订单-订单退款状态
-     */
-    String PAY_ORDER_REFUND_STATUS = "pay_order_refund_status";
-
-    /**
-     * 支付-退款订单-退款状态
-     */
-    String PAY_REFUND_ORDER_STATUS = "pay_refund_order_status";
-
-    /**
-     * 支付-退款订单-退款类别
-     */
-    String PAY_REFUND_ORDER_TYPE = "pay_refund_order_type";
-
     String BPM_TASK_ASSIGN_RULE_TYPE = "bpm_task_assign_rule_type"; // 任务分配规则类型
     String BPM_TASK_ASSIGN_SCRIPT = "bpm_task_assign_script"; // 任务分配自定义脚本
 
