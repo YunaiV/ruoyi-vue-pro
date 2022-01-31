@@ -4,6 +4,8 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.date.DateUtils;
+import cn.iocoder.yudao.framework.pay.config.PayProperties;
+import cn.iocoder.yudao.framework.pay.core.client.PayClientFactory;
 import cn.iocoder.yudao.framework.pay.core.enums.PayChannelEnum;
 import cn.iocoder.yudao.module.pay.controller.admin.order.vo.PayOrderExportReqVO;
 import cn.iocoder.yudao.module.pay.controller.admin.order.vo.PayOrderPageReqVO;
@@ -12,8 +14,12 @@ import cn.iocoder.yudao.module.pay.dal.mysql.order.PayOrderMapper;
 import cn.iocoder.yudao.module.pay.enums.order.PayOrderNotifyStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.refund.PayRefundTypeEnum;
+import cn.iocoder.yudao.module.pay.service.merchant.PayAppService;
+import cn.iocoder.yudao.module.pay.service.merchant.PayChannelService;
+import cn.iocoder.yudao.module.pay.service.notify.PayNotifyService;
 import cn.iocoder.yudao.module.pay.test.BaseDbUnitTest;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
@@ -30,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  *
  * @author 芋艿
  */
-@Import(PayOrderServiceImpl.class)
+@Import({PayOrderServiceImpl.class})
 public class PayOrderServiceTest extends BaseDbUnitTest {
 
     @Resource
@@ -38,6 +44,17 @@ public class PayOrderServiceTest extends BaseDbUnitTest {
 
     @Resource
     private PayOrderMapper orderMapper;
+
+    @MockBean
+    private PayClientFactory payClientFactory;
+    @MockBean
+    private PayProperties properties;
+    @MockBean
+    private PayAppService appService;
+    @MockBean
+    private PayChannelService channelService;
+    @MockBean
+    private PayNotifyService notifyService;
 
     public String generateNo() {
         return DateUtil.format(new Date(), "yyyyMMddHHmmss") + RandomUtil.randomInt(100000, 999999);

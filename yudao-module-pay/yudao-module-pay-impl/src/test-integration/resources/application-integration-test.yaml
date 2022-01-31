@@ -88,6 +88,7 @@ yudao:
   info:
     version: 1.0.0
     base-package: cn.iocoder.yudao.adminserver
+    base-package2: cn.iocoder.yudao.module
   core-service:
     base-package: cn.iocoder.yudao.coreservice
   pay:

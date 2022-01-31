@@ -1,12 +1,12 @@
-package cn.iocoder.yudao.coreservice.modules.pay.dal.mysql.merchant;
+package cn.iocoder.yudao.module.pay.dal.mysql.merchant;
 
 import cn.hutool.core.io.IoUtil;
-import cn.iocoder.yudao.coreservice.BaseDbAndRedisIntegrationTest;
-import cn.iocoder.yudao.coreservice.modules.pay.dal.dataobject.merchant.PayChannelDO;
+import cn.iocoder.yudao.module.pay.dal.dataobject.merchant.PayChannelDO;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.pay.core.client.impl.alipay.AlipayPayClientConfig;
 import cn.iocoder.yudao.framework.pay.core.client.impl.wx.WXPayClientConfig;
 import cn.iocoder.yudao.framework.pay.core.enums.PayChannelEnum;
+import cn.iocoder.yudao.module.pay.test.BaseDbIntegrationTest;
 import org.junit.jupiter.api.Test;
 
 import javax.annotation.Resource;
@@ -15,10 +15,10 @@ import java.io.FileNotFoundException;
 import java.util.List;
 
 @Resource
-public class PayChannelCoreMapperTest extends BaseDbAndRedisIntegrationTest {
+public class PayChannelMapperIntegrationTest extends BaseDbIntegrationTest {
 
     @Resource
-    private PayChannelCoreMapper payChannelCoreMapper;
+    private PayChannelMapper payChannelMapper;
 
     /**
      * 插入 {@link PayChannelEnum#WX_PUB} 初始配置
@@ -42,7 +42,7 @@ public class PayChannelCoreMapperTest extends BaseDbAndRedisIntegrationTest {
         config.setApiV3Key("joerVi8y5DJ3o4ttA0o1uH47Xz1u2Ase");
         payChannelDO.setConfig(config);
         // 执行插入
-        payChannelCoreMapper.insert(payChannelDO);
+        payChannelMapper.insert(payChannelDO);
     }
 
     // TODO @ouyang：Zfb 改成 AlipayQr
@@ -67,7 +67,7 @@ public class PayChannelCoreMapperTest extends BaseDbAndRedisIntegrationTest {
         // 创建客户端
         payChannelDO.setConfig(config);
         // 执行插入
-        payChannelCoreMapper.insert(payChannelDO);
+        payChannelMapper.insert(payChannelDO);
     }
 
     /**
@@ -75,7 +75,7 @@ public class PayChannelCoreMapperTest extends BaseDbAndRedisIntegrationTest {
      */
     @Test
     public void testSelectList() {
-        List<PayChannelDO> payChannels = payChannelCoreMapper.selectList();
+        List<PayChannelDO> payChannels = payChannelMapper.selectList();
         System.out.println(payChannels.size());
     }
 

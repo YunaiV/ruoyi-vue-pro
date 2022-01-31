@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.pay.service.refund;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.date.DateUtils;
+import cn.iocoder.yudao.framework.pay.core.client.PayClientFactory;
 import cn.iocoder.yudao.framework.pay.core.enums.PayChannelEnum;
 import cn.iocoder.yudao.module.pay.controller.admin.refund.vo.PayRefundExportReqVO;
 import cn.iocoder.yudao.module.pay.controller.admin.refund.vo.PayRefundPageReqVO;
@@ -10,8 +11,14 @@ import cn.iocoder.yudao.module.pay.dal.mysql.refund.PayRefundMapper;
 import cn.iocoder.yudao.module.pay.enums.order.PayOrderNotifyStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.refund.PayRefundStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.refund.PayRefundTypeEnum;
+import cn.iocoder.yudao.module.pay.service.merchant.PayAppService;
+import cn.iocoder.yudao.module.pay.service.merchant.PayChannelService;
+import cn.iocoder.yudao.module.pay.service.notify.PayNotifyService;
+import cn.iocoder.yudao.module.pay.service.order.PayOrderExtensionService;
+import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
 import cn.iocoder.yudao.module.pay.test.BaseDbUnitTest;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
@@ -22,12 +29,6 @@ import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEq
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-
-/**
- * {@link PayRefundServiceImpl} 的单元测试类
- *
- * @author aquan
- */
 @Import(PayRefundServiceImpl.class)
 public class PayRefundServiceTest extends BaseDbUnitTest {
 
@@ -37,6 +38,18 @@ public class PayRefundServiceTest extends BaseDbUnitTest {
     @Resource
     private PayRefundMapper refundMapper;
 
+    @MockBean
+    private PayClientFactory payClientFactory;
+    @MockBean
+    private PayOrderService orderService;
+    @MockBean
+    private PayOrderExtensionService orderExtensionService;
+    @MockBean
+    private PayAppService appService;
+    @MockBean
+    private PayChannelService channelService;
+    @MockBean
+    private PayNotifyService notifyService;
 
     @Test
     public void testGetRefundPage() {

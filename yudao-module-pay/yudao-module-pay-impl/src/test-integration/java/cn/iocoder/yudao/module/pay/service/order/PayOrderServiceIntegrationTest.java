@@ -1,11 +1,10 @@
-package cn.iocoder.yudao.coreservice.modules.pay.service.order;
+package cn.iocoder.yudao.module.pay.service.order;
 
-import cn.iocoder.yudao.coreservice.BaseDbIntegrationTest;
-import cn.iocoder.yudao.coreservice.modules.pay.service.merchant.impl.PayAppCoreServiceImpl;
-import cn.iocoder.yudao.coreservice.modules.pay.service.merchant.impl.PayChannelCoreServiceImpl;
-import cn.iocoder.yudao.coreservice.modules.pay.service.order.dto.PayOrderCreateReqDTO;
-import cn.iocoder.yudao.coreservice.modules.pay.service.order.dto.PayOrderSubmitReqDTO;
-import cn.iocoder.yudao.coreservice.modules.pay.service.order.impl.PayOrderCoreServiceImpl;
+import cn.iocoder.yudao.module.pay.service.merchant.PayAppServiceImpl;
+import cn.iocoder.yudao.module.pay.service.merchant.PayChannelServiceImpl;
+import cn.iocoder.yudao.module.pay.service.order.dto.PayOrderCreateReqDTO;
+import cn.iocoder.yudao.module.pay.service.order.dto.PayOrderSubmitReqDTO;
+import cn.iocoder.yudao.module.pay.test.BaseDbIntegrationTest;
 import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.framework.pay.config.YudaoPayAutoConfiguration;
 import cn.iocoder.yudao.framework.pay.core.enums.PayChannelEnum;
@@ -15,12 +14,12 @@ import org.springframework.context.annotation.Import;
 import javax.annotation.Resource;
 import java.time.Duration;
 
-@Import({PayOrderCoreServiceImpl.class, PayAppCoreServiceImpl.class,
-        PayChannelCoreServiceImpl.class, YudaoPayAutoConfiguration.class})
-public class PayOrderCoreServiceTest extends BaseDbIntegrationTest {
+@Import({PayOrderServiceImpl.class, PayAppServiceImpl.class,
+        PayChannelServiceImpl.class, YudaoPayAutoConfiguration.class})
+public class PayOrderServiceIntegrationTest extends BaseDbIntegrationTest {
 
     @Resource
-    private PayOrderCoreService payOrderCoreService;
+    private PayOrderService payOrderService;
 
     @Test
     public void testCreatePayOrder() {
@@ -34,7 +33,7 @@ public class PayOrderCoreServiceTest extends BaseDbIntegrationTest {
         reqDTO.setAmount(100);
         reqDTO.setExpireTime(DateUtils.addTime(Duration.ofDays(1)));
         // 发起请求
-        payOrderCoreService.createPayOrder(reqDTO);
+        payOrderService.createPayOrder(reqDTO);
     }
 
     @Test
@@ -46,7 +45,7 @@ public class PayOrderCoreServiceTest extends BaseDbIntegrationTest {
         reqDTO.setChannelCode(PayChannelEnum.WX_PUB.getCode());
         reqDTO.setUserIp("127.0.0.1");
         // 发起请求
-        payOrderCoreService.submitPayOrder(reqDTO);
+        payOrderService.submitPayOrder(reqDTO);
     }
 
 }

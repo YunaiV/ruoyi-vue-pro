@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.pay.service.merchant;
 
 import cn.hutool.core.util.RandomUtil;
+import cn.iocoder.yudao.framework.pay.core.client.PayClientFactory;
 import cn.iocoder.yudao.module.pay.controller.admin.merchant.vo.app.PayAppCreateReqVO;
 import cn.iocoder.yudao.module.pay.controller.admin.merchant.vo.app.PayAppExportReqVO;
 import cn.iocoder.yudao.module.pay.controller.admin.merchant.vo.app.PayAppPageReqVO;
@@ -30,11 +31,6 @@ import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
 import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * {@link PayAppServiceImpl} 的单元测试类
- *
- * @author 芋艿
- */
 @Import(PayAppServiceImpl.class)
 public class PayAppServiceTest extends BaseDbUnitTest {
 

@@ -10,9 +10,10 @@
     <modules>
         <module>yudao-dependencies</module>
         <module>yudao-framework</module>
+
         <module>yudao-admin-server</module>
         <module>yudao-user-server</module>
-        <module>yudao-core-service</module>
+
         <module>yudao-module-member</module>
 <!--        <module>yudao-module-bpm</module>-->
         <module>yudao-module-system</module>

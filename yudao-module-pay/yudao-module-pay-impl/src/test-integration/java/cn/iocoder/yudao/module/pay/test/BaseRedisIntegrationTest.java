@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.coreservice;
+package cn.iocoder.yudao.module.pay.test;
 
 import cn.iocoder.yudao.framework.redis.config.YudaoRedisAutoConfiguration;
 import org.redisson.spring.starter.RedissonAutoConfiguration;

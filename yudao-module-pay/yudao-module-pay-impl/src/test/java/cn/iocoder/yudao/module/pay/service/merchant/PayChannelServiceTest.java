@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.pay.service.merchant;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.pay.core.client.PayClientFactory;
 import cn.iocoder.yudao.framework.pay.core.client.impl.alipay.AlipayPayClientConfig;
 import cn.iocoder.yudao.framework.pay.core.client.impl.wx.WXPayClientConfig;
 import cn.iocoder.yudao.framework.pay.core.enums.PayChannelEnum;
@@ -14,9 +15,11 @@ import cn.iocoder.yudao.module.pay.dal.mysql.merchant.PayChannelMapper;
 import cn.iocoder.yudao.module.pay.test.BaseDbUnitTest;
 import com.alibaba.fastjson.JSON;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
+import javax.validation.Validator;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildTime;
@@ -36,6 +39,11 @@ public class PayChannelServiceTest extends BaseDbUnitTest {
 
     @Resource
     private PayChannelMapper channelMapper;
+
+    @MockBean
+    private PayClientFactory payClientFactory;
+    @MockBean
+    private Validator validator;
 
     @Test
     public void testCreateWechatVersion2Channel_success() {

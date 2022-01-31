@@ -48,7 +48,7 @@ yudao:
     base-package2: cn.iocoder.yudao.module
   core-service:
     base-package: cn.iocoder.yudao.module.member.dal.mysql # TODO 芋艿：要清理掉
-  pay:
-    pay-notify-url: http://niubi.natapp1.cc/api/pay/order/notify
-    pay-return-url: http://niubi.natapp1.cc/api/pay/order/return
-    refund-notify-url: http://niubi.natapp1.cc/api/pay/refund/notify
+  captcha:
+    timeout: 5m
+    width: 160
+    height: 60
