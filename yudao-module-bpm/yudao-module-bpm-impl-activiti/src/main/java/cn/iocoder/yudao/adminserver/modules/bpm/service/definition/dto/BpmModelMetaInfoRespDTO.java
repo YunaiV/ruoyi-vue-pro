@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.service.definition.dto;
 
-import cn.iocoder.yudao.adminserver.modules.bpm.enums.definition.BpmModelFormTypeEnum;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmModelFormTypeEnum;
 import lombok.Data;
 
 /**

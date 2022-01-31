@@ -6,7 +6,7 @@ import cn.iocoder.yudao.adminserver.modules.bpm.framework.activiti.core.event.Bp
 import cn.iocoder.yudao.adminserver.modules.bpm.framework.activiti.core.identity.EmptyUserGroupManager;
 import cn.iocoder.yudao.adminserver.modules.bpm.framework.activiti.core.listener.BpmTackActivitiEventListener;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmTaskAssignRuleService;
-import cn.iocoder.yudao.coreservice.modules.bpm.api.group.BpmUserGroupServiceApi;
+import cn.iocoder.yudao.module.bpm.api.group.BpmUserGroupServiceApi;
 import cn.iocoder.yudao.module.system.service.dept.SysDeptCoreService;
 import cn.iocoder.yudao.module.system.service.permission.SysPermissionCoreService;
 import cn.iocoder.yudao.module.system.service.user.SysUserCoreService;

@@ -2,7 +2,7 @@ package cn.iocoder.yudao.adminserver.modules.bpm.service.definition.dto;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.adminserver.modules.bpm.enums.definition.BpmModelFormTypeEnum;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmModelFormTypeEnum;
 import lombok.Data;
 
 import javax.validation.constraints.AssertTrue;

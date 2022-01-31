@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.convert.message;
 
-import cn.iocoder.yudao.adminserver.modules.bpm.service.message.dto.BpmMessageSendWhenProcessInstanceApproveReqDTO;
-import cn.iocoder.yudao.adminserver.modules.bpm.service.message.dto.BpmMessageSendWhenProcessInstanceRejectReqDTO;
-import cn.iocoder.yudao.adminserver.modules.bpm.service.message.dto.BpmMessageSendWhenTaskCreatedReqDTO;
+import cn.iocoder.yudao.module.bpm.service.message.dto.BpmMessageSendWhenProcessInstanceApproveReqDTO;
+import cn.iocoder.yudao.module.bpm.service.message.dto.BpmMessageSendWhenProcessInstanceRejectReqDTO;
+import cn.iocoder.yudao.module.bpm.service.message.dto.BpmMessageSendWhenTaskCreatedReqDTO;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.SysUserDO;
 import org.activiti.api.task.model.Task;
 import org.activiti.engine.runtime.ProcessInstance;

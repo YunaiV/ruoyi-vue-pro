@@ -3,8 +3,6 @@ package cn.iocoder.yudao.adminserver.modules.bpm.service.task.impl;
 import cn.hutool.core.io.IoUtil;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.task.vo.activity.BpmActivityRespVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.convert.task.BpmActivityConvert;
-import cn.iocoder.yudao.adminserver.modules.bpm.convert.task.BpmTaskConvert;
-import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.task.BpmTaskExtDO;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmProcessDefinitionService;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.task.BpmActivityService;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.task.BpmProcessInstanceService;
@@ -13,8 +11,6 @@ import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.engine.HistoryService;
-import org.activiti.engine.RepositoryService;
-import org.activiti.engine.RuntimeService;
 import org.activiti.engine.history.HistoricActivityInstance;
 import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.task.Task;
@@ -26,9 +22,7 @@ import javax.annotation.Resource;
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
-import static cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants.*;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 

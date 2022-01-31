@@ -3,9 +3,9 @@ package cn.iocoder.yudao.adminserver.modules.bpm.service.oa.impl;
 import cn.hutool.core.date.DateUtil;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.oa.vo.*;
 import cn.iocoder.yudao.adminserver.modules.bpm.convert.oa.BpmOALeaveConvert;
-import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.leave.BpmOALeaveDO;
+import cn.iocoder.yudao.module.bpm.dal.dataobject.oa.BpmOALeaveDO;
 import cn.iocoder.yudao.adminserver.modules.bpm.dal.mysql.oa.BpmOALeaveMapper;
-import cn.iocoder.yudao.adminserver.modules.bpm.enums.task.BpmProcessInstanceResultEnum;
+import cn.iocoder.yudao.module.bpm.enums.task.BpmProcessInstanceResultEnum;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.oa.BpmOALeaveService;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.task.BpmProcessInstanceService;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.task.dto.BpmProcessInstanceCreateReqDTO;
@@ -17,7 +17,6 @@ import org.springframework.validation.annotation.Validated;
 import javax.annotation.Resource;
 import java.util.*;
 
-import static cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants.*;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 
 /**

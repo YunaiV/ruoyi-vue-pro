@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.service.task;
 
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.task.vo.task.*;
-import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.task.BpmTaskExtDO;
+import cn.iocoder.yudao.module.bpm.dal.dataobject.task.BpmTaskExtDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import org.activiti.engine.task.Task;

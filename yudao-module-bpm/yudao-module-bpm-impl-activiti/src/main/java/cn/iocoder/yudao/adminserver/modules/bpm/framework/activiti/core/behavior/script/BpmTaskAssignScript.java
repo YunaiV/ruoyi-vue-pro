@@ -1,9 +1,8 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.framework.activiti.core.behavior.script;
 
-import cn.iocoder.yudao.adminserver.modules.bpm.enums.definition.BpmTaskRuleScriptEnum;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmTaskRuleScriptEnum;
 import org.activiti.engine.impl.persistence.entity.TaskEntity;
 
-import java.util.List;
 import java.util.Set;
 
 /**

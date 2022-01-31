@@ -4,7 +4,7 @@ import cn.iocoder.yudao.adminserver.modules.bpm.controller.oa.vo.BpmOALeaveCreat
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.oa.vo.BpmOALeavePageReqVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.oa.vo.BpmOALeaveRespVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.convert.oa.BpmOALeaveConvert;
-import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.leave.BpmOALeaveDO;
+import cn.iocoder.yudao.module.bpm.dal.dataobject.oa.BpmOALeaveDO;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.oa.BpmOALeaveService;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;

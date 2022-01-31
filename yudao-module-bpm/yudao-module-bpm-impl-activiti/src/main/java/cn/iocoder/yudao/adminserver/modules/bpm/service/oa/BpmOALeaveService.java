@@ -2,7 +2,7 @@ package cn.iocoder.yudao.adminserver.modules.bpm.service.oa;
 
 
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.oa.vo.*;
-import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.leave.BpmOALeaveDO;
+import cn.iocoder.yudao.module.bpm.dal.dataobject.oa.BpmOALeaveDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 
 import javax.validation.Valid;

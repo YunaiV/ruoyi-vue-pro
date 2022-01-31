@@ -1,10 +1,10 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.service.definition;
 
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.process.BpmProcessDefinitionListReqVO;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.process.BpmProcessDefinitionPageItemRespVO;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.process.BpmProcessDefinitionPageReqVO;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.process.BpmProcessDefinitionRespVO;
-import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.definition.BpmProcessDefinitionExtDO;
+import cn.iocoder.yudao.module.bpm.controller.definition.vo.process.BpmProcessDefinitionListReqVO;
+import cn.iocoder.yudao.module.bpm.controller.definition.vo.process.BpmProcessDefinitionPageItemRespVO;
+import cn.iocoder.yudao.module.bpm.controller.definition.vo.process.BpmProcessDefinitionPageReqVO;
+import cn.iocoder.yudao.module.bpm.controller.definition.vo.process.BpmProcessDefinitionRespVO;
+import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmProcessDefinitionExtDO;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.dto.BpmProcessDefinitionCreateReqDTO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;

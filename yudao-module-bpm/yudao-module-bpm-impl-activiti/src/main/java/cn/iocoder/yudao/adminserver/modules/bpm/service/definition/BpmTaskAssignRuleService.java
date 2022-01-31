@@ -1,10 +1,9 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.service.definition;
 
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.rule.BpmTaskAssignRuleCreateReqVO;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.rule.BpmTaskAssignRuleRespVO;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.rule.BpmTaskAssignRuleUpdateReqVO;
-import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.definition.BpmTaskAssignRuleDO;
-import org.activiti.engine.repository.ProcessDefinition;
+import cn.iocoder.yudao.module.bpm.controller.definition.vo.rule.BpmTaskAssignRuleCreateReqVO;
+import cn.iocoder.yudao.module.bpm.controller.definition.vo.rule.BpmTaskAssignRuleRespVO;
+import cn.iocoder.yudao.module.bpm.controller.definition.vo.rule.BpmTaskAssignRuleUpdateReqVO;
+import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmTaskAssignRuleDO;
 import org.springframework.lang.Nullable;
 
 import javax.validation.Valid;

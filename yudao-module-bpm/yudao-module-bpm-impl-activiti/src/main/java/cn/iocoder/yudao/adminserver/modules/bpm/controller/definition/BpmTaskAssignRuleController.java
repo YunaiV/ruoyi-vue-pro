@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.controller.definition;
 
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.rule.BpmTaskAssignRuleCreateReqVO;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.rule.BpmTaskAssignRuleRespVO;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.rule.BpmTaskAssignRuleUpdateReqVO;
+import cn.iocoder.yudao.module.bpm.controller.definition.vo.rule.BpmTaskAssignRuleCreateReqVO;
+import cn.iocoder.yudao.module.bpm.controller.definition.vo.rule.BpmTaskAssignRuleRespVO;
+import cn.iocoder.yudao.module.bpm.controller.definition.vo.rule.BpmTaskAssignRuleUpdateReqVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmTaskAssignRuleService;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import io.swagger.annotations.Api;

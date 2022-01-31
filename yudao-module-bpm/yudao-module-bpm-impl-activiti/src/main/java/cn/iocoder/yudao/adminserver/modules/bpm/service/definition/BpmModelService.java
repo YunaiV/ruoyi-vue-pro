@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.service.definition;
 
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.model.*;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.bpm.controller.definition.vo.model.*;
 import org.activiti.bpmn.model.BpmnModel;
 
 import javax.validation.Valid;

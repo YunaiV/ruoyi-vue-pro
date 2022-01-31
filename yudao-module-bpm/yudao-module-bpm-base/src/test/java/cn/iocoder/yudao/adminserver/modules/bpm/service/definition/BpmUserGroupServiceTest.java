@@ -1,24 +1,24 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.service.definition;
 
 import cn.iocoder.yudao.adminserver.BaseDbUnitTest;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.group.BpmUserGroupCreateReqVO;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.group.BpmUserGroupPageReqVO;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.group.BpmUserGroupUpdateReqVO;
-import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.definition.BpmUserGroupDO;
-import cn.iocoder.yudao.adminserver.modules.bpm.dal.mysql.definition.BpmUserGroupMapper;
-import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.impl.BpmUserGroupServiceImpl;
+import cn.iocoder.yudao.module.bpm.controller.definition.vo.group.BpmUserGroupCreateReqVO;
+import cn.iocoder.yudao.module.bpm.controller.definition.vo.group.BpmUserGroupPageReqVO;
+import cn.iocoder.yudao.module.bpm.controller.definition.vo.group.BpmUserGroupUpdateReqVO;
+import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmUserGroupDO;
+import cn.iocoder.yudao.module.bpm.dal.mysql.definition.BpmUserGroupMapper;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.framework.test.core.util.AssertUtils;
 import cn.iocoder.yudao.framework.test.core.util.RandomUtils;
+import cn.iocoder.yudao.module.bpm.service.definition.BpmUserGroupServiceImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
 
-import static cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants.USER_GROUP_NOT_EXISTS;
+import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.USER_GROUP_NOT_EXISTS;
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
 
 /**

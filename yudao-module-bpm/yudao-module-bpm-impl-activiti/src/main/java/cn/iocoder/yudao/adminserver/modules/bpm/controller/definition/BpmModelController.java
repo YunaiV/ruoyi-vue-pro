@@ -6,6 +6,7 @@ import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmModelServi
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.io.IoUtils;
+import cn.iocoder.yudao.module.bpm.controller.definition.vo.model.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;

@@ -1,13 +1,13 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.framework.activiti.core.behavior;
 
 import cn.hutool.core.map.MapUtil;
-import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.definition.BpmTaskAssignRuleDO;
-import cn.iocoder.yudao.adminserver.modules.bpm.enums.definition.BpmTaskAssignRuleTypeEnum;
-import cn.iocoder.yudao.adminserver.modules.bpm.enums.definition.BpmTaskRuleScriptEnum;
+import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmTaskAssignRuleDO;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmTaskAssignRuleTypeEnum;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmTaskRuleScriptEnum;
 import cn.iocoder.yudao.adminserver.modules.bpm.framework.activiti.core.behavior.script.BpmTaskAssignScript;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmTaskAssignRuleService;
-import cn.iocoder.yudao.coreservice.modules.bpm.api.group.BpmUserGroupServiceApi;
-import cn.iocoder.yudao.coreservice.modules.bpm.api.group.dto.BpmUserGroupDTO;
+import cn.iocoder.yudao.module.bpm.api.group.BpmUserGroupServiceApi;
+import cn.iocoder.yudao.module.bpm.api.group.dto.BpmUserGroupDTO;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.SysDeptDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.SysUserDO;
 import cn.iocoder.yudao.module.system.service.dept.SysDeptCoreService;

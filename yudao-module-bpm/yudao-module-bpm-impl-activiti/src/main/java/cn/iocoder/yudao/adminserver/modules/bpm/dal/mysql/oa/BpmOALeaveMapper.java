@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.dal.mysql.oa;
 
 import cn.iocoder.yudao.adminserver.modules.bpm.controller.oa.vo.BpmOALeavePageReqVO;
-import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.leave.BpmOALeaveDO;
+import cn.iocoder.yudao.module.bpm.dal.dataobject.oa.BpmOALeaveDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;

@@ -3,12 +3,12 @@ package cn.iocoder.yudao.adminserver.modules.bpm.framework.activiti.core.behavio
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.definition.BpmTaskAssignRuleDO;
-import cn.iocoder.yudao.adminserver.modules.bpm.enums.definition.BpmTaskAssignRuleTypeEnum;
+import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmTaskAssignRuleDO;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmTaskAssignRuleTypeEnum;
 import cn.iocoder.yudao.adminserver.modules.bpm.framework.activiti.core.behavior.script.BpmTaskAssignScript;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmTaskAssignRuleService;
-import cn.iocoder.yudao.coreservice.modules.bpm.api.group.BpmUserGroupServiceApi;
-import cn.iocoder.yudao.coreservice.modules.bpm.api.group.dto.BpmUserGroupDTO;
+import cn.iocoder.yudao.module.bpm.api.group.BpmUserGroupServiceApi;
+import cn.iocoder.yudao.module.bpm.api.group.dto.BpmUserGroupDTO;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.SysDeptDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.SysUserDO;
 import cn.iocoder.yudao.module.system.service.dept.SysDeptCoreService;
@@ -28,8 +28,8 @@ import org.activiti.engine.impl.persistence.entity.TaskEntityManager;
 
 import java.util.*;
 
-import static cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants.TASK_ASSIGN_SCRIPT_NOT_EXISTS;
-import static cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants.TASK_CREATE_FAIL_NO_CANDIDATE_USER;
+import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.TASK_ASSIGN_SCRIPT_NOT_EXISTS;
+import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.TASK_CREATE_FAIL_NO_CANDIDATE_USER;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;

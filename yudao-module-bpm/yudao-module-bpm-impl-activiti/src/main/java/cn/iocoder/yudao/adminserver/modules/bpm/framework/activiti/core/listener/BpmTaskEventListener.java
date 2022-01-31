@@ -1,13 +1,10 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.framework.activiti.core.listener;
 
-import cn.iocoder.yudao.adminserver.modules.bpm.dal.dataobject.task.BpmTaskExtDO;
+import cn.iocoder.yudao.module.bpm.dal.dataobject.task.BpmTaskExtDO;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.task.BpmTaskService;
 import org.activiti.api.model.shared.event.RuntimeEvent;
-import org.activiti.api.process.model.ProcessInstance;
-import org.activiti.api.process.model.events.ProcessRuntimeEvent;
 import org.activiti.api.task.model.Task;
 import org.activiti.api.task.model.events.TaskRuntimeEvent;
-import org.activiti.api.task.runtime.events.listener.TaskEventListener;
 import org.activiti.api.task.runtime.events.listener.TaskRuntimeEventListener;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;

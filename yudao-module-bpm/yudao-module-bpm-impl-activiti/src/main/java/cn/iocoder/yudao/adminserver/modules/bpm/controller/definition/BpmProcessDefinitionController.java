@@ -1,9 +1,9 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.controller.definition;
 
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.process.BpmProcessDefinitionListReqVO;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.process.BpmProcessDefinitionPageItemRespVO;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.process.BpmProcessDefinitionPageReqVO;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.definition.vo.process.BpmProcessDefinitionRespVO;
+import cn.iocoder.yudao.module.bpm.controller.definition.vo.process.BpmProcessDefinitionListReqVO;
+import cn.iocoder.yudao.module.bpm.controller.definition.vo.process.BpmProcessDefinitionPageItemRespVO;
+import cn.iocoder.yudao.module.bpm.controller.definition.vo.process.BpmProcessDefinitionPageReqVO;
+import cn.iocoder.yudao.module.bpm.controller.definition.vo.process.BpmProcessDefinitionRespVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmProcessDefinitionService;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
