@@ -3,22 +3,24 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>yudao-module-bpm-core-service</artifactId>
         <groupId>cn.iocoder.boot</groupId>
+        <artifactId>yudao-module-bpm</artifactId>
         <version>${revision}</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
+    <artifactId>yudao-module-bpm-api</artifactId>
+    <packaging>jar</packaging>
 
-    <artifactId>yudao-module-bpm-core-service-api</artifactId>
+    <name>${artifactId}</name>
+    <description>
+        bpm 模块 API，暴露给其它模块调用
+    </description>
 
     <dependencies>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-        </dependency>
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
             <artifactId>yudao-common</artifactId>
         </dependency>
     </dependencies>
+
 </project>

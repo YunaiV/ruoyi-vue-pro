@@ -3,26 +3,31 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>yudao-module-bpm</artifactId>
         <groupId>cn.iocoder.boot</groupId>
+        <artifactId>yudao-module-bpm</artifactId>
         <version>${revision}</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
+    <artifactId>yudao-module-bpm-impl-activiti</artifactId>
 
-    <artifactId>yudao-module-bpm-activiti</artifactId>
+    <name>${artifactId}</name>
+    <description>
+        bpm-activiti 模块，基于 Activiti 7 实现工作流
+    </description>
+
     <dependencies>
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-module-bpm-base</artifactId>
+            <version>${revision}</version>
+        </dependency>
+
+        <!-- 工作流相关 -->
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
             <artifactId>yudao-spring-boot-starter-activiti</artifactId>
         </dependency>
-        <dependency>
-            <groupId>cn.iocoder.boot</groupId>
-            <artifactId>yudao-core-service</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>cn.iocoder.boot</groupId>
-            <artifactId>yudao-module-bpm-core-service-api</artifactId>
-        </dependency>
+
         <!-- Test 测试相关 -->
         <dependency>
             <groupId>cn.iocoder.boot</groupId>

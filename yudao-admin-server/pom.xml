@@ -43,39 +43,26 @@
             <version>${revision}</version>
         </dependency>
 
-        <!-- 业务组件 -->
+<!--         默认引入bpm-activiti. 可以替换为bpm-flowable -->
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
-            <artifactId>yudao-core-service</artifactId>
+            <artifactId>yudao-module-bpm-activiti</artifactId>
+            <version>${revision}</version>
         </dependency>
 
-        <dependency>
-            <groupId>cn.iocoder.boot</groupId>
-            <artifactId>yudao-spring-boot-starter-biz-operatelog</artifactId>
-        </dependency>
+        <!-- 业务组件 -->
+
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
             <artifactId>yudao-spring-boot-starter-biz-dict</artifactId>
         </dependency>
-        <dependency>
-            <groupId>cn.iocoder.boot</groupId>
-            <artifactId>yudao-spring-boot-starter-biz-sms</artifactId>
-        </dependency>
+
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
             <artifactId>yudao-spring-boot-starter-biz-tenant</artifactId>
         </dependency>
 
-        <!-- 默认引入bpm-activiti. 可以替换为bpm-flowable -->
-        <!-- TODO 芋艿：临时注释，测试通过后，打开 -->
-<!--        <dependency>-->
-<!--            <groupId>cn.iocoder.boot</groupId>-->
-<!--            <artifactId>yudao-module-bpm-activiti</artifactId>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>cn.iocoder.boot</groupId>-->
-<!--            <artifactId>yudao-module-bpm-core-service-impl</artifactId>-->
-<!--        </dependency>-->
+
 
         <!-- spring boot 配置所需依赖 -->
         <dependency>

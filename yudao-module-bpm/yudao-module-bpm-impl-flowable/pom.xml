@@ -3,13 +3,20 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>yudao-module-bpm</artifactId>
         <groupId>cn.iocoder.boot</groupId>
+        <artifactId>yudao-module-bpm</artifactId>
         <version>${revision}</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>yudao-module-bpm-flowable</artifactId>
+    <artifactId>yudao-module-bpm-impl-flowable</artifactId>
+
+    <name>${artifactId}</name>
+    <description>
+        bpm-flowable 模块，基于 Flowable 6 实现工作流
+    </description>
+
     <dependencies>
+        <!-- 工作流相关 -->
         <dependency>
             <groupId>org.flowable</groupId>
             <artifactId>flowable-spring-boot-starter-basic</artifactId>

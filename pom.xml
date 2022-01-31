@@ -12,10 +12,10 @@
         <module>yudao-framework</module>
 
         <module>yudao-admin-server</module>
-        <module>yudao-user-server</module>
+<!--        <module>yudao-user-server</module>-->
 
         <module>yudao-module-member</module>
-<!--        <module>yudao-module-bpm</module>-->
+        <module>yudao-module-bpm</module>
         <module>yudao-module-system</module>
         <module>yudao-module-infra</module>
         <module>yudao-module-tool</module>

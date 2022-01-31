@@ -8,7 +8,10 @@
         <version>${revision}</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-
+    <modules>
+        <module>yudao-module-infra-api</module>
+        <module>yudao-module-infra-impl</module>
+    </modules>
     <artifactId>yudao-module-infra</artifactId>
     <packaging>pom</packaging>
 
@@ -17,10 +20,5 @@
         infra 包下，我们放基础设施的运维与管理，支撑上层的通用与核心业务。
         例如说：定时任务的管理、服务器的信息等等
     </description>
-    <modules>
-        <module>yudao-module-infra-api</module>
-        <module>yudao-module-infra-impl</module>
-    </modules>
-
 
 </project>
