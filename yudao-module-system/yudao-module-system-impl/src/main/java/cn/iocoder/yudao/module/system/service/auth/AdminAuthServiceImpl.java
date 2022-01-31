@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.system.service.auth;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.util.monitor.TracerUtils;
@@ -12,7 +11,6 @@ import cn.iocoder.yudao.module.system.controller.admin.auth.vo.auth.AuthSocialBi
 import cn.iocoder.yudao.module.system.controller.admin.auth.vo.auth.AuthSocialLogin2ReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.auth.vo.auth.AuthSocialLoginReqVO;
 import cn.iocoder.yudao.module.system.convert.auth.AuthConvert;
-import cn.iocoder.yudao.module.system.dal.dataobject.social.SocialUserDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
 import cn.iocoder.yudao.module.system.enums.logger.LoginLogTypeEnum;
 import cn.iocoder.yudao.module.system.enums.logger.LoginResultEnum;
@@ -37,7 +35,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import javax.annotation.Resource;
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -70,7 +67,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
     @Resource
     private UserSessionService userSessionService;
     @Resource
-    private SocialUserService socialService;
+    private SocialUserService socialUserService;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -192,19 +189,15 @@ public class AdminAuthServiceImpl implements AdminAuthService {
 
     @Override
     public String socialLogin(AuthSocialLoginReqVO reqVO, String userIp, String userAgent) {
-        // 使用 code 授权码，进行登录
-        AuthUser authUser = socialService.getAuthUser(reqVO.getType(), reqVO.getCode(), reqVO.getState());
-        Assert.notNull(authUser, "授权用户不为空");
-
-        // 如果未绑定 SocialUserDO 用户，则无法自动登录，进行报错
-        String unionId = socialService.getAuthUserUnionId(authUser);
-        List<SocialUserDO> socialUsers = socialService.getAllSocialUserList(reqVO.getType(), unionId, getUserType().getValue());
-        if (CollUtil.isEmpty(socialUsers)) {
+        // 使用 code 授权码，进行登录。然后，获得到绑定的用户编号
+        Long userId = socialUserService.getBindUserId(UserTypeEnum.MEMBER.getValue(), reqVO.getType(),
+                reqVO.getCode(), reqVO.getState());
+        if (userId == null) {
             throw exception(AUTH_THIRD_LOGIN_NOT_BIND);
         }
 
         // 自动登录
-        AdminUserDO user = userService.getUser(socialUsers.get(0).getUserId());
+        AdminUserDO user = userService.getUser(userId);
         if (user == null) {
             throw exception(USER_NOT_EXISTS);
         }
@@ -214,7 +207,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         LoginUser loginUser = this.buildLoginUser(user);
 
         // 绑定社交用户（更新）
-        socialService.bindSocialUser(loginUser.getId(), getUserType().getValue(), reqVO.getType(), authUser);
+        socialUserService.bindSocialUser(AuthConvert.INSTANCE.convert(loginUser.getId(), getUserType().getValue(), reqVO));
 
         // 缓存登录用户到 Redis 中，返回 sessionId 编号
         return userSessionService.createUserSession(loginUser, userIp, userAgent);
@@ -223,14 +216,14 @@ public class AdminAuthServiceImpl implements AdminAuthService {
     @Override
     public String socialLogin2(AuthSocialLogin2ReqVO reqVO, String userIp, String userAgent) {
         // 使用 code 授权码，进行登录
-        AuthUser authUser = socialService.getAuthUser(reqVO.getType(), reqVO.getCode(), reqVO.getState());
+        AuthUser authUser = socialUserService.getAuthUser(reqVO.getType(), reqVO.getCode(), reqVO.getState());
         Assert.notNull(authUser, "授权用户不为空");
 
         // 使用账号密码，进行登录。
         LoginUser loginUser = this.login0(reqVO.getUsername(), reqVO.getPassword());
 
         // 绑定社交用户（新增）
-        socialService.bindSocialUser(loginUser.getId(), getUserType().getValue(), reqVO.getType(), authUser);
+        socialUserService.bindSocialUser(AuthConvert.INSTANCE.convert(loginUser.getId(), getUserType().getValue(), reqVO));
 
         // 缓存登录用户到 Redis 中，返回 sessionId 编号
         return userSessionService.createUserSession(loginUser, userIp, userAgent);
@@ -238,12 +231,8 @@ public class AdminAuthServiceImpl implements AdminAuthService {
 
     @Override
     public void socialBind(Long userId, AuthSocialBindReqVO reqVO) {
-        // 使用 code 授权码，进行登录
-        AuthUser authUser = socialService.getAuthUser(reqVO.getType(), reqVO.getCode(), reqVO.getState());
-        Assert.notNull(authUser, "授权用户不为空");
-
         // 绑定社交用户（新增）
-        socialService.bindSocialUser(userId, getUserType().getValue(), reqVO.getType(), authUser);
+        socialUserService.bindSocialUser(AuthConvert.INSTANCE.convert(userId, getUserType().getValue(), reqVO));
     }
 
     @Override

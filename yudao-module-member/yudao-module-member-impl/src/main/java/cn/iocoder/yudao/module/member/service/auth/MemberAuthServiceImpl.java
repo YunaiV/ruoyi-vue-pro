@@ -152,6 +152,7 @@ public class MemberAuthServiceImpl implements MemberAuthService {
 
     @Override
     public void socialBind(Long userId, AppAuthSocialBindReqVO reqVO) {
+        // 绑定社交用户（新增）
         socialUserApi.bindSocialUser(AuthConvert.INSTANCE.convert(userId, getUserType().getValue(), reqVO));
     }
 

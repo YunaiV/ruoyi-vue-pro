@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.system.service.social;
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.http.HttpUtils;
+import cn.iocoder.yudao.module.system.api.social.dto.SocialUserBindReqDTO;
 import cn.iocoder.yudao.module.system.dal.dataobject.social.SocialUserDO;
 import cn.iocoder.yudao.module.system.dal.mysql.social.SocialUserMapper;
 import cn.iocoder.yudao.module.system.dal.redis.social.SocialAuthUserRedisDAO;
@@ -25,8 +26,7 @@ import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString;
-import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.SOCIAL_USER_AUTH_FAILURE;
-import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.SOCIAL_USER_UNBIND_NOT_SELF;
+import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
 
 /**
  * 社交用户 Service 实现类
@@ -72,8 +72,16 @@ public class SocialUserServiceImpl implements SocialUserService {
         return authUser;
     }
 
-    @Override
-    public List<SocialUserDO> getAllSocialUserList(Integer type, String unionId, Integer userType) {
+    /**
+     * 获得 unionId 对应的某个社交平台的“所有”社交用户
+     * 注意，这里的“所有”，指的是类似【微信】平台，包括了小程序、公众号、PC 网站，他们的 unionId 是一致的
+     *
+     * @param type 社交平台的类型 {@link SocialTypeEnum}
+     * @param unionId 社交平台的 unionId
+     * @param userType 全局用户类型
+     * @return 社交用户列表
+     */
+    private List<SocialUserDO> getAllSocialUserList(Integer type, String unionId, Integer userType) {
         List<Integer> types = SocialTypeEnum.getRelationTypes(type);
         return socialUserMapper.selectListByTypeAndUnionId(userType, types, unionId);
     }
@@ -84,8 +92,28 @@ public class SocialUserServiceImpl implements SocialUserService {
     }
 
     @Override
+    public void bindSocialUser(SocialUserBindReqDTO reqDTO) {
+        // 使用 code 授权
+        AuthUser authUser = getAuthUser(reqDTO.getType(), reqDTO.getCode(),
+                reqDTO.getState());
+        if (authUser == null) {
+            throw exception(SOCIAL_USER_NOT_FOUND);
+        }
+
+        // 绑定社交用户（新增）
+        bindSocialUser(reqDTO.getUserId(), reqDTO.getUserType(),
+                reqDTO.getType(), authUser);
+    }
+
+    /**
+     * 绑定社交用户
+     *  @param userId 用户编号
+     * @param userType 用户类型
+     * @param type 社交平台的类型 {@link SocialTypeEnum}
+     * @param authUser 授权用户
+     */
     @Transactional(rollbackFor = Exception.class)
-    public void bindSocialUser(Long userId, Integer userType, Integer type, AuthUser authUser) {
+    protected void bindSocialUser(Long userId, Integer userType, Integer type, AuthUser authUser) {
         // 获得 unionId 对应的 SocialUserDO 列表
         String unionId = getAuthUserUnionId(authUser);
         List<SocialUserDO> socialUsers = this.getAllSocialUserList(type, unionId, userType);
@@ -135,6 +163,30 @@ public class SocialUserServiceImpl implements SocialUserService {
 
         // 解绑
         socialUserMapper.deleteBatchIds(CollectionUtils.convertSet(socialUsers, SocialUserDO::getId));
+    }
+
+    @Override
+    public void checkSocialUser(Integer type, String code, String state) {
+        AuthUser authUser = getAuthUser(type, code, state);
+        if (authUser == null) {
+            throw exception(SOCIAL_USER_NOT_FOUND);
+        }
+    }
+
+    @Override
+    public Long getBindUserId(Integer userType, Integer type, String code, String state) {
+        AuthUser authUser = getAuthUser(type, code, state);
+        if (authUser == null) {
+            throw exception(SOCIAL_USER_NOT_FOUND);
+        }
+
+        // 如果未绑定 SocialUserDO 用户，则无法自动登录，进行报错
+        String unionId = getAuthUserUnionId(authUser);
+        List<SocialUserDO> socialUsers = getAllSocialUserList(type, unionId, userType);
+        if (CollUtil.isEmpty(socialUsers)) {
+            throw exception(AUTH_THIRD_LOGIN_NOT_BIND);
+        }
+        return socialUsers.get(0).getUserId();
     }
 
     @VisibleForTesting

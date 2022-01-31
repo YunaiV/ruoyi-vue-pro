@@ -26,10 +26,10 @@ public interface AuthConvert {
         return convert0(bean).setUserType(UserTypeEnum.MEMBER.getValue());
     }
 
-    SocialUserBindReqDTO convert(Long userId, Integer value, AppAuthSocialBindReqVO reqVO);
-    SocialUserBindReqDTO convert(Long userId, Integer value, AppAuthSocialLogin2ReqVO reqVO);
-    SocialUserBindReqDTO convert(Long userId, Integer value, AppAuthSocialLoginReqVO reqVO);
-    SocialUserUnbindReqDTO convert(Long userId, Integer value, AppAuthSocialUnbindReqVO reqVO);
+    SocialUserBindReqDTO convert(Long userId, Integer userType, AppAuthSocialBindReqVO reqVO);
+    SocialUserBindReqDTO convert(Long userId, Integer userType, AppAuthSocialLogin2ReqVO reqVO);
+    SocialUserBindReqDTO convert(Long userId, Integer userType, AppAuthSocialLoginReqVO reqVO);
+    SocialUserUnbindReqDTO convert(Long userId, Integer userType, AppAuthSocialUnbindReqVO reqVO);
 
     SmsCodeSendReqDTO convert(AppAuthSendSmsReqVO reqVO);
     SmsCodeUseReqDTO convert(AppAuthResetPasswordReqVO reqVO, SmsSceneEnum scene, String usedIp);
