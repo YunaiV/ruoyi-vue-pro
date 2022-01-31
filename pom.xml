@@ -16,6 +16,7 @@
         <module>yudao-module-member</module>
 <!--        <module>yudao-module-bpm</module>-->
         <module>yudao-module-system</module>
+        <module>yudao-module-infra</module>
     </modules>
 
     <name>${artifactId}</name>

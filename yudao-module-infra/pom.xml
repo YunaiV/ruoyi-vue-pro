@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <groupId>cn.iocoder.boot</groupId>
+        <artifactId>yudao</artifactId>
+        <version>${revision}</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>yudao-module-infra</artifactId>
+    <packaging>pom</packaging>
+
+    <name>${artifactId}</name>
+    <description>
+        infra 包下，我们放基础设施的运维与管理，支撑上层的通用与核心业务。
+        例如说：定时任务的管理、服务器的信息等等
+    </description>
+    <modules>
+        <module>yudao-module-infra-api</module>
+        <module>yudao-module-infra-impl</module>
+    </modules>
+
+
+</project>
