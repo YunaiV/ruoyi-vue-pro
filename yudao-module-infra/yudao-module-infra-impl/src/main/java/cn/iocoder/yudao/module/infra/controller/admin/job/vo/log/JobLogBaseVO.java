@@ -43,7 +43,7 @@ public class JobLogBaseVO {
     @ApiModelProperty(value = "执行时长", example = "123")
     private Integer duration;
 
-    @ApiModelProperty(value = "任务状态", required = true, example = "1", notes = "参见 InfJobLogStatusEnum 枚举")
+    @ApiModelProperty(value = "任务状态", required = true, example = "1", notes = "参见 JobLogStatusEnum 枚举")
     @NotNull(message = "任务状态不能为空")
     private Integer status;
 

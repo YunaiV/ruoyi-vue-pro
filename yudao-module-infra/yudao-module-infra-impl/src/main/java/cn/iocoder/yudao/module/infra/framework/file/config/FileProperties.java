@@ -12,7 +12,7 @@ import javax.validation.constraints.NotNull;
 public class FileProperties {
 
     /**
-     * 对应 InfFileController 的 getFile 方法
+     * 对应 FileController 的 getFile 方法
      */
     @NotNull(message = "基础文件路径不能为空")
     private String basePath;

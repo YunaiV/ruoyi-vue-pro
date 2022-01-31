@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.infra.dal.dataobject.config;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.module.infra.enums.config.ConfigTypeEnum;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -45,7 +46,7 @@ public class ConfigDO extends BaseDO {
     /**
      * 参数类型
      *
-     * 枚举 {@link InfConfigTypeEnum}
+     * 枚举 {@link ConfigTypeEnum}
      */
     @TableField("`type`")
     private Integer type;

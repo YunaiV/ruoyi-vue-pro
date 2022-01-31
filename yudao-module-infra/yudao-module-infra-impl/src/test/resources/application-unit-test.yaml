@@ -48,7 +48,3 @@ yudao:
     base-package2: cn.iocoder.yudao.module
   core-service:
     base-package: cn.iocoder.yudao.module.member.dal.mysql # TODO 芋艿：要清理掉
-  captcha:
-    timeout: 5m
-    width: 160
-    height: 60

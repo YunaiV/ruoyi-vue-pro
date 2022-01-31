@@ -9,7 +9,7 @@ import java.util.Date;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
-@ApiModel(value = "管理后台 - 定时任务 Excel 导出 Request VO", description = "参数和 InfJobLogPageReqVO 是一致的")
+@ApiModel(value = "管理后台 - 定时任务 Excel 导出 Request VO", description = "参数和 JobLogPageReqVO 是一致的")
 @Data
 public class JobLogExportReqVO {
 
@@ -27,7 +27,7 @@ public class JobLogExportReqVO {
     @ApiModelProperty(value = "结束执行时间")
     private Date endTime;
 
-    @ApiModelProperty(value = "任务状态", notes = "参见 InfJobLogStatusEnum 枚举")
+    @ApiModelProperty(value = "任务状态", notes = "参见 JobLogStatusEnum 枚举")
     private Integer status;
 
 }

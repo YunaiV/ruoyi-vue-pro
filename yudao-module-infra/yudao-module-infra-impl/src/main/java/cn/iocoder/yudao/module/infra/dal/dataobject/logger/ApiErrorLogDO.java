@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.infra.dal.dataobject.logger;
 
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.tenant.core.db.TenantBaseDO;
+import cn.iocoder.yudao.module.infra.enums.logger.ApiErrorLogProcessStatusEnum;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
@@ -136,7 +137,7 @@ public class ApiErrorLogDO extends TenantBaseDO {
     /**
      * 处理状态
      *
-     * 枚举 {@link InfApiErrorLogProcessStatusEnum}
+     * 枚举 {@link ApiErrorLogProcessStatusEnum}
      */
     private Integer processStatus;
     /**

@@ -12,15 +12,15 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * ConfigFrameworkDAO Core 实现类
+ * ConfigDAOImpl 实现类
  *
  * @author 芋道源码
  */
-public class ConfigCoreDAOImpl implements ConfigFrameworkDAO {
+public class ConfigDAOImpl implements ConfigFrameworkDAO {
 
     private final JdbcTemplate jdbcTemplate;
 
-    public ConfigCoreDAOImpl(String jdbcUrl, String username, String password) {
+    public ConfigDAOImpl(String jdbcUrl, String username, String password) {
         DataSource dataSource = new DriverManagerDataSource(jdbcUrl, username, password);
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }

@@ -16,7 +16,7 @@ public class JobPageReqVO extends PageParam {
     @ApiModelProperty(value = "任务名称", example = "测试任务", notes = "模糊匹配")
     private String name;
 
-    @ApiModelProperty(value = "任务状态", example = "1", notes = "参见 InfJobStatusEnum 枚举")
+    @ApiModelProperty(value = "任务状态", example = "1", notes = "参见 JobStatusEnum 枚举")
     private Integer status;
 
     @ApiModelProperty(value = "处理器的名字", example = "sysUserSessionTimeoutJob", notes = "模糊匹配")

@@ -32,7 +32,7 @@ public class JobLogPageReqVO extends PageParam {
     @ApiModelProperty(value = "结束执行时间")
     private Date endTime;
 
-    @ApiModelProperty(value = "任务状态", notes = "参见 InfJobLogStatusEnum 枚举")
+    @ApiModelProperty(value = "任务状态", notes = "参见 JobLogStatusEnum 枚举")
     private Integer status;
 
 }
