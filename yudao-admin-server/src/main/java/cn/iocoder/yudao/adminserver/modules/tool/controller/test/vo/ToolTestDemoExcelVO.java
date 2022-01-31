@@ -2,8 +2,7 @@ package cn.iocoder.yudao.adminserver.modules.tool.controller.test.vo;
 
 import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
 import cn.iocoder.yudao.framework.excel.core.convert.DictConvert;
-import cn.iocoder.yudao.adminserver.modules.infra.enums.InfDictTypeConstants;
-import cn.iocoder.yudao.module.system.enums.DictTypeConstants;
+import cn.iocoder.yudao.module.infra.enums.DictTypeConstants;
 import com.alibaba.excel.annotation.ExcelProperty;
 import lombok.Data;
 
@@ -24,15 +23,15 @@ public class ToolTestDemoExcelVO {
     private String name;
 
     @ExcelProperty(value = "状态", converter = DictConvert.class)
-    @DictFormat(DictTypeConstants.COMMON_STATUS)
+    @DictFormat(cn.iocoder.yudao.module.system.enums.DictTypeConstants.COMMON_STATUS)
     private Integer status;
 
     @ExcelProperty(value = "类型", converter = DictConvert.class)
-    @DictFormat(DictTypeConstants.OPERATE_TYPE)
+    @DictFormat(cn.iocoder.yudao.module.system.enums.DictTypeConstants.OPERATE_TYPE)
     private Integer type;
 
     @ExcelProperty(value = "分类", converter = DictConvert.class)
-    @DictFormat(InfDictTypeConstants.REDIS_TIMEOUT_TYPE)
+    @DictFormat(DictTypeConstants.REDIS_TIMEOUT_TYPE)
     private Integer category;
 
     @ExcelProperty("备注")
