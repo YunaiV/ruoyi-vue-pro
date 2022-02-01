@@ -18,6 +18,10 @@ const mutations = {
 const actions = {
   loadDictDatas({ commit }) {
     listSimpleDictDatas().then(response => {
+      // 如果未加载到数据，则直接返回
+      if (!response.data) {
+        return;
+      }
       // 设置数据
       const dictDataMap = {}
       response.data.forEach(dictData => {
