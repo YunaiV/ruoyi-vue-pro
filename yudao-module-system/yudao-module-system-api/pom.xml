@@ -28,6 +28,7 @@
             <artifactId>spring-boot-starter-validation</artifactId>
             <optional>true</optional>
         </dependency>
+
         <!-- 用户信息 -->
         <dependency>
             <groupId>cn.iocoder.boot</groupId>

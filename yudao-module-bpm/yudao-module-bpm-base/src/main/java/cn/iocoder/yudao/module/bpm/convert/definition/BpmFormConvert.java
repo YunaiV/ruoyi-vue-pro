@@ -1,9 +1,9 @@
 package cn.iocoder.yudao.module.bpm.convert.definition;
 
-import cn.iocoder.yudao.module.bpm.controller.definition.vo.form.BpmFormCreateReqVO;
-import cn.iocoder.yudao.module.bpm.controller.definition.vo.form.BpmFormRespVO;
-import cn.iocoder.yudao.module.bpm.controller.definition.vo.form.BpmFormSimpleRespVO;
-import cn.iocoder.yudao.module.bpm.controller.definition.vo.form.BpmFormUpdateReqVO;
+import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.form.BpmFormCreateReqVO;
+import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.form.BpmFormRespVO;
+import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.form.BpmFormSimpleRespVO;
+import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.form.BpmFormUpdateReqVO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmFormDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import org.mapstruct.Mapper;

@@ -1,9 +1,9 @@
 package cn.iocoder.yudao.module.bpm.service.definition;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.iocoder.yudao.module.bpm.controller.definition.vo.group.BpmUserGroupCreateReqVO;
-import cn.iocoder.yudao.module.bpm.controller.definition.vo.group.BpmUserGroupPageReqVO;
-import cn.iocoder.yudao.module.bpm.controller.definition.vo.group.BpmUserGroupUpdateReqVO;
+import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.group.BpmUserGroupCreateReqVO;
+import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.group.BpmUserGroupPageReqVO;
+import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.group.BpmUserGroupUpdateReqVO;
 import cn.iocoder.yudao.module.bpm.convert.definition.BpmUserGroupConvert;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmUserGroupDO;
 import cn.iocoder.yudao.module.bpm.dal.mysql.definition.BpmUserGroupMapper;

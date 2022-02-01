@@ -1,9 +1,9 @@
 package cn.iocoder.yudao.module.bpm.service.definition;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.iocoder.yudao.module.bpm.controller.definition.vo.form.BpmFormCreateReqVO;
-import cn.iocoder.yudao.module.bpm.controller.definition.vo.form.BpmFormPageReqVO;
-import cn.iocoder.yudao.module.bpm.controller.definition.vo.form.BpmFormUpdateReqVO;
+import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.form.BpmFormCreateReqVO;
+import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.form.BpmFormPageReqVO;
+import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.form.BpmFormUpdateReqVO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmFormDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;

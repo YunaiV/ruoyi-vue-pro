@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.bpm.dal.mysql.task;
 
-import cn.iocoder.yudao.module.bpm.controller.task.vo.instance.BpmProcessInstanceMyPageReqVO;
+import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstanceMyPageReqVO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.task.BpmProcessInstanceExtDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
