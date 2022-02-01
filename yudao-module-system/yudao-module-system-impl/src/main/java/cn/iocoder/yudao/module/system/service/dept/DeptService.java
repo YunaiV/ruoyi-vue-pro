@@ -46,7 +46,6 @@ public interface DeptService {
      */
     void deleteDept(Long id);
 
-
     /**
      * 筛选部门列表
      *

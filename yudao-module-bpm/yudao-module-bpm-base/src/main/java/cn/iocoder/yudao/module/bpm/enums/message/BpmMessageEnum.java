@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.bpm.enums.message;
 
-import cn.iocoder.yudao.module.system.dal.dataobject.sms.SysSmsTemplateDO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -20,9 +19,8 @@ public enum BpmMessageEnum {
     /**
      * 短信模板的标识
      *
-     * 关联 {@link SysSmsTemplateDO#getCode()}
+     * 关联 SmsTemplateDO 的 code 属性
      */
-    private final String smsCode;
-
+    private final String smsTemplateCode;
 
 }

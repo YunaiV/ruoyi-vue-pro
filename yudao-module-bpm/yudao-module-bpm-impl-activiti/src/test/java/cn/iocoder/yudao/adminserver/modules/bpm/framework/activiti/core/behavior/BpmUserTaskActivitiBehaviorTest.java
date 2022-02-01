@@ -1,21 +1,21 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.framework.activiti.core.behavior;
 
 import cn.hutool.core.map.MapUtil;
-import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmTaskAssignRuleDO;
-import cn.iocoder.yudao.module.bpm.enums.definition.BpmTaskAssignRuleTypeEnum;
-import cn.iocoder.yudao.module.bpm.enums.definition.BpmTaskRuleScriptEnum;
 import cn.iocoder.yudao.adminserver.modules.bpm.framework.activiti.core.behavior.script.BpmTaskAssignScript;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmTaskAssignRuleService;
-import cn.iocoder.yudao.module.bpm.api.group.BpmUserGroupServiceApi;
-import cn.iocoder.yudao.module.bpm.api.group.dto.BpmUserGroupDTO;
-import cn.iocoder.yudao.module.system.dal.dataobject.dept.SysDeptDO;
-import cn.iocoder.yudao.module.system.dal.dataobject.user.SysUserDO;
-import cn.iocoder.yudao.module.system.service.dept.SysDeptCoreService;
-import cn.iocoder.yudao.module.system.service.permission.SysPermissionCoreService;
-import cn.iocoder.yudao.module.system.service.user.SysUserCoreService;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
+import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmTaskAssignRuleDO;
+import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmUserGroupDO;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmTaskAssignRuleTypeEnum;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmTaskRuleScriptEnum;
+import cn.iocoder.yudao.module.bpm.service.definition.BpmUserGroupService;
+import cn.iocoder.yudao.module.system.api.dept.DeptApi;
+import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
+import cn.iocoder.yudao.module.system.api.permission.PermissionApi;
+import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
+import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import org.activiti.engine.impl.persistence.entity.TaskEntity;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -40,13 +40,14 @@ public class BpmUserTaskActivitiBehaviorTest extends BaseMockitoUnitTest {
     @Mock
     private BpmTaskAssignRuleService bpmTaskRuleService;
     @Mock
-    private SysPermissionCoreService permissionCoreService;
+    private BpmUserGroupService userGroupService;
+
     @Mock
-    private SysDeptCoreService deptCoreService;
+    private DeptApi deptApi;
     @Mock
-    private BpmUserGroupServiceApi userGroupServiceApi;
+    private AdminUserApi adminUserApi;
     @Mock
-    private SysUserCoreService userCoreService;
+    private PermissionApi permissionApi;
 
     @Test
     public void testCalculateTaskCandidateUsers_Role() {
@@ -54,7 +55,7 @@ public class BpmUserTaskActivitiBehaviorTest extends BaseMockitoUnitTest {
         BpmTaskAssignRuleDO rule = new BpmTaskAssignRuleDO().setOptions(asSet(1L, 2L))
                 .setType(BpmTaskAssignRuleTypeEnum.ROLE.getType());
         // mock 方法
-        when(permissionCoreService.getUserRoleIdListByRoleIds(eq(rule.getOptions())))
+        when(permissionApi.getUserRoleIdListByRoleIds(eq(rule.getOptions())))
                 .thenReturn(asSet(11L, 22L));
         mockGetUserMap(asSet(11L, 22L));
 
@@ -70,9 +71,9 @@ public class BpmUserTaskActivitiBehaviorTest extends BaseMockitoUnitTest {
         BpmTaskAssignRuleDO rule = new BpmTaskAssignRuleDO().setOptions(asSet(1L, 2L))
                 .setType(BpmTaskAssignRuleTypeEnum.DEPT_MEMBER.getType());
         // mock 方法
-        List<SysUserDO> users = CollectionUtils.convertList(asSet(11L, 22L),
-                id -> new SysUserDO().setId(id));
-        when(userCoreService.getUsersByDeptIds(eq(rule.getOptions()))).thenReturn(users);
+        List<AdminUserRespDTO> users = CollectionUtils.convertList(asSet(11L, 22L),
+                id -> new AdminUserRespDTO().setId(id));
+        when(adminUserApi.getUsersByDeptIds(eq(rule.getOptions()))).thenReturn(users);
         mockGetUserMap(asSet(11L, 22L));
 
         // 调用
@@ -87,9 +88,9 @@ public class BpmUserTaskActivitiBehaviorTest extends BaseMockitoUnitTest {
         BpmTaskAssignRuleDO rule = new BpmTaskAssignRuleDO().setOptions(asSet(1L, 2L))
                 .setType(BpmTaskAssignRuleTypeEnum.DEPT_LEADER.getType());
         // mock 方法
-        SysDeptDO dept1 = randomPojo(SysDeptDO.class, o -> o.setLeaderUserId(11L));
-        SysDeptDO dept2 = randomPojo(SysDeptDO.class, o -> o.setLeaderUserId(22L));
-        when(deptCoreService.getDepts(eq(rule.getOptions()))).thenReturn(Arrays.asList(dept1, dept2));
+        DeptRespDTO dept1 = randomPojo(DeptRespDTO.class, o -> o.setLeaderUserId(11L));
+        DeptRespDTO dept2 = randomPojo(DeptRespDTO.class, o -> o.setLeaderUserId(22L));
+        when(deptApi.getDepts(eq(rule.getOptions()))).thenReturn(Arrays.asList(dept1, dept2));
         mockGetUserMap(asSet(11L, 22L));
 
         // 调用
@@ -104,9 +105,9 @@ public class BpmUserTaskActivitiBehaviorTest extends BaseMockitoUnitTest {
         BpmTaskAssignRuleDO rule = new BpmTaskAssignRuleDO().setOptions(asSet(1L, 2L))
                 .setType(BpmTaskAssignRuleTypeEnum.POST.getType());
         // mock 方法
-        List<SysUserDO> users = CollectionUtils.convertList(asSet(11L, 22L),
-                id -> new SysUserDO().setId(id));
-        when(userCoreService.getUsersByPostIds(eq(rule.getOptions()))).thenReturn(users);
+        List<AdminUserRespDTO> users = CollectionUtils.convertList(asSet(11L, 22L),
+                id -> new AdminUserRespDTO().setId(id));
+        when(adminUserApi.getUsersByPostIds(eq(rule.getOptions()))).thenReturn(users);
         mockGetUserMap(asSet(11L, 22L));
 
         // 调用
@@ -135,9 +136,9 @@ public class BpmUserTaskActivitiBehaviorTest extends BaseMockitoUnitTest {
         BpmTaskAssignRuleDO rule = new BpmTaskAssignRuleDO().setOptions(asSet(1L, 2L))
                 .setType(BpmTaskAssignRuleTypeEnum.USER_GROUP.getType());
         // mock 方法
-        BpmUserGroupDTO userGroup1 = randomPojo(BpmUserGroupDTO.class, o -> o.setMemberUserIds(asSet(11L, 12L)));
-        BpmUserGroupDTO userGroup2 = randomPojo(BpmUserGroupDTO.class, o -> o.setMemberUserIds(asSet(21L, 22L)));
-        when(userGroupServiceApi.getUserGroupList(eq(rule.getOptions()))).thenReturn(Arrays.asList(userGroup1, userGroup2));
+        BpmUserGroupDO userGroup1 = randomPojo(BpmUserGroupDO.class, o -> o.setMemberUserIds(asSet(11L, 12L)));
+        BpmUserGroupDO userGroup2 = randomPojo(BpmUserGroupDO.class, o -> o.setMemberUserIds(asSet(21L, 22L)));
+        when(userGroupService.getUserGroupList(eq(rule.getOptions()))).thenReturn(Arrays.asList(userGroup1, userGroup2));
         mockGetUserMap(asSet(11L, 12L, 21L, 22L));
 
         // 调用
@@ -190,13 +191,13 @@ public class BpmUserTaskActivitiBehaviorTest extends BaseMockitoUnitTest {
         // 准备参数. 1L 可以找到；2L 是禁用的；3L 找不到
         Set<Long> assigneeUserIds = asSet(1L, 2L, 3L);
         // mock 方法
-        SysUserDO user1 = randomPojo(SysUserDO.class, o -> o.setId(1L)
+        AdminUserRespDTO user1 = randomPojo(AdminUserRespDTO.class, o -> o.setId(1L)
                 .setStatus(CommonStatusEnum.ENABLE.getStatus()));
-        SysUserDO user2 = randomPojo(SysUserDO.class, o -> o.setId(2L)
+        AdminUserRespDTO user2 = randomPojo(AdminUserRespDTO.class, o -> o.setId(2L)
                 .setStatus(CommonStatusEnum.DISABLE.getStatus()));
-        Map<Long, SysUserDO> userMap = MapUtil.builder(user1.getId(), user1)
+        Map<Long, AdminUserRespDTO> userMap = MapUtil.builder(user1.getId(), user1)
                 .put(user2.getId(), user2).build();
-        when(userCoreService.getUserMap(eq(assigneeUserIds))).thenReturn(userMap);
+        when(adminUserApi.getUserMap(eq(assigneeUserIds))).thenReturn(userMap);
 
         // 调用
         behavior.removeDisableUsers(assigneeUserIds);
@@ -205,9 +206,9 @@ public class BpmUserTaskActivitiBehaviorTest extends BaseMockitoUnitTest {
     }
 
     private void mockGetUserMap(Set<Long> assigneeUserIds) {
-        Map<Long, SysUserDO> userMap = CollectionUtils.convertMap(assigneeUserIds, id -> id,
-                id -> new SysUserDO().setId(id).setStatus(CommonStatusEnum.ENABLE.getStatus()));
-        when(userCoreService.getUserMap(eq(assigneeUserIds))).thenReturn(userMap);
+        Map<Long, AdminUserRespDTO> userMap = CollectionUtils.convertMap(assigneeUserIds, id -> id,
+                id -> new AdminUserRespDTO().setId(id).setStatus(CommonStatusEnum.ENABLE.getStatus()));
+        when(adminUserApi.getUserMap(eq(assigneeUserIds))).thenReturn(userMap);
     }
 
 }

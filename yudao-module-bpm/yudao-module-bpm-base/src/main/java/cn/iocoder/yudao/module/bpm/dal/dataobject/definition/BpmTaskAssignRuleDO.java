@@ -1,16 +1,13 @@
 package cn.iocoder.yudao.module.bpm.dal.dataobject.definition;
 
-import cn.iocoder.yudao.adminserver.modules.bpm.enums.definition.BpmTaskRuleScriptEnum;
-import cn.iocoder.yudao.adminserver.modules.bpm.enums.definition.BpmTaskAssignRuleTypeEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.framework.mybatis.core.type.JsonLongSetTypeHandler;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmTaskAssignRuleTypeEnum;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmTaskRuleScriptEnum;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
-import org.activiti.engine.repository.Model;
-import org.activiti.engine.repository.ProcessDefinition;
-import org.activiti.engine.task.Task;
 
 import java.util.Set;
 
@@ -46,19 +43,19 @@ public class BpmTaskAssignRuleDO extends BaseDO {
     /**
      * 流程模型编号
      *
-     * 关联 {@link Model#getId()}
+     * 关联 Model 的 id 属性
      */
     private String modelId;
     /**
      * 流程定义编号
      *
-     * 关联 {@link ProcessDefinition#getId()}
+     * 关联 ProcessDefinition 的 id 属性
      */
     private String processDefinitionId;
     /**
      * 流程任务的定义 Key
      *
-     * 关联 {@link Task#getTaskDefinitionKey()}
+     * 关联 Task 的 taskDefinitionKey 属性
      */
     private String taskDefinitionKey;
 

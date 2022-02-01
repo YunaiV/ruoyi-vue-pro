@@ -1,9 +1,9 @@
 package cn.iocoder.yudao.module.system.api.sms;
 
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
-import cn.iocoder.yudao.module.system.api.sms.dto.SmsCodeCheckReqDTO;
-import cn.iocoder.yudao.module.system.api.sms.dto.SmsCodeSendReqDTO;
-import cn.iocoder.yudao.module.system.api.sms.dto.SmsCodeUseReqDTO;
+import cn.iocoder.yudao.module.system.api.sms.dto.code.SmsCodeCheckReqDTO;
+import cn.iocoder.yudao.module.system.api.sms.dto.code.SmsCodeSendReqDTO;
+import cn.iocoder.yudao.module.system.api.sms.dto.code.SmsCodeUseReqDTO;
 
 import javax.validation.Valid;
 

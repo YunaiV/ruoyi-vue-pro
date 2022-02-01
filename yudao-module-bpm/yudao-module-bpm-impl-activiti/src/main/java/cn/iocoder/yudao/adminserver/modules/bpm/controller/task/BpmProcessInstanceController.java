@@ -1,9 +1,9 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.controller.task;
 
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.task.vo.instance.*;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.task.BpmProcessInstanceService;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.bpm.controller.task.vo.instance.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
@@ -25,7 +25,7 @@ public class BpmProcessInstanceController {
 
     @Resource
     private BpmProcessInstanceService processInstanceService;
-    
+
     @PostMapping("/create")
     @ApiOperation("新建流程实例")
     @PreAuthorize("@ss.hasPermission('bpm:process-instance:query')")

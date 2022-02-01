@@ -47,6 +47,14 @@ public interface BpmUserGroupService {
     BpmUserGroupDO getUserGroup(Long id);
 
     /**
+     * 获得用户组列表
+     *
+     * @param ids 编号
+     * @return 用户组列表
+     */
+    List<BpmUserGroupDO> getUserGroupList(Collection<Long> ids);
+
+    /**
      * 获得指定状态的用户组列表
      *
      * @param status 状态
@@ -70,4 +78,5 @@ public interface BpmUserGroupService {
      * @param ids 用户组编号数组
      */
     void validUserGroups(Set<Long> ids);
+
 }

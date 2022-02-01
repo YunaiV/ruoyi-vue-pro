@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.bpm.dal.dataobject.task;
 
-import cn.iocoder.yudao.adminserver.modules.bpm.enums.task.BpmProcessInstanceResultEnum;
-import cn.iocoder.yudao.adminserver.modules.bpm.enums.task.BpmProcessInstanceStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.module.bpm.enums.task.BpmProcessInstanceResultEnum;
+import cn.iocoder.yudao.module.bpm.enums.task.BpmProcessInstanceStatusEnum;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -10,16 +10,13 @@ import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import org.activiti.engine.history.HistoricProcessInstance;
-import org.activiti.engine.repository.ProcessDefinition;
-import org.activiti.engine.runtime.ProcessInstance;
 
 import java.util.Date;
 import java.util.Map;
 
 /**
  * Bpm 流程实例的拓展表
- * 主要解决 Activiti {@link ProcessInstance} 和 {@link HistoricProcessInstance} 不支持拓展字段，所以新建拓展表
+ * 主要解决 Activiti ProcessInstance 和 HistoricProcessInstance 不支持拓展字段，所以新建拓展表
  *
  * @author 芋道源码
  */
@@ -27,9 +24,6 @@ import java.util.Map;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-//@Builder
-//@NoArgsConstructor
-//@AllArgsConstructor
 public class BpmProcessInstanceExtDO extends BaseDO {
 
     /**
@@ -40,31 +34,31 @@ public class BpmProcessInstanceExtDO extends BaseDO {
     /**
      * 发起流程的用户编号
      *
-     * 冗余 {@link HistoricProcessInstance#getStartUserId()}
+     * 冗余 HistoricProcessInstance 的 startUserId 属性
      */
     private Long startUserId;
     /**
      * 流程实例的名字
      *
-     * 冗余 {@link ProcessInstance#getName()} 为了筛选
+     * 冗余 ProcessInstance 的 name 属性，用于筛选
      */
     private String name;
     /**
      * 流程实例的编号
      *
-     * 关联 {@link ProcessInstance#getId()}
+     * 关联 ProcessInstance 的 id 属性
      */
     private String processInstanceId;
     /**
      * 流程定义的编号
      *
-     * 关联 {@link ProcessDefinition#getId()}
+     * 关联 ProcessDefinition 的 id 属性
      */
     private String processDefinitionId;
     /**
      * 流程分类
      *
-     * 冗余 {@link ProcessDefinition#getCategory()}
+     * 冗余 ProcessDefinition 的 category 属性
      * 数据字典 bpm_model_category
      */
     private String category;
@@ -83,7 +77,7 @@ public class BpmProcessInstanceExtDO extends BaseDO {
     /**
      * 结束时间
      *
-     * 冗余 {@link HistoricProcessInstance#getEndTime()}
+     * 冗余 HistoricProcessInstance 的 endTime 属性
      */
     private Date endTime;
 

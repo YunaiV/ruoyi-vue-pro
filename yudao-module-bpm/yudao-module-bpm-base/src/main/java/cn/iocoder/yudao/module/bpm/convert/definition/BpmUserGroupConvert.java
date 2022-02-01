@@ -6,7 +6,6 @@ import cn.iocoder.yudao.module.bpm.controller.definition.vo.group.BpmUserGroupCr
 import cn.iocoder.yudao.module.bpm.controller.definition.vo.group.BpmUserGroupRespVO;
 import cn.iocoder.yudao.module.bpm.controller.definition.vo.group.BpmUserGroupUpdateReqVO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmUserGroupDO;
-import cn.iocoder.yudao.module.bpm.api.group.dto.BpmUserGroupDTO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 
 import org.mapstruct.Mapper;
@@ -36,5 +35,4 @@ public interface BpmUserGroupConvert {
     @Named("convertList2")
     List<BpmUserGroupRespVO> convertList2(List<BpmUserGroupDO> list);
 
-    List<BpmUserGroupDTO> convertList3(List<BpmUserGroupDO> list);
 }

@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.controller.oa;
 
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.oa.vo.BpmOALeaveCreateReqVO;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.oa.vo.BpmOALeavePageReqVO;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.oa.vo.BpmOALeaveRespVO;
+import cn.iocoder.yudao.module.bpm.controller.oa.vo.BpmOALeaveCreateReqVO;
+import cn.iocoder.yudao.module.bpm.controller.oa.vo.BpmOALeavePageReqVO;
+import cn.iocoder.yudao.module.bpm.controller.oa.vo.BpmOALeaveRespVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.convert.oa.BpmOALeaveConvert;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.oa.BpmOALeaveDO;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.oa.BpmOALeaveService;

@@ -3,7 +3,7 @@ package cn.iocoder.yudao.adminserver.modules.bpm.service.oa.listener;
 import cn.iocoder.yudao.adminserver.modules.bpm.framework.activiti.core.event.BpmProcessInstanceResultEvent;
 import cn.iocoder.yudao.adminserver.modules.bpm.framework.activiti.core.event.BpmProcessInstanceResultEventListener;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.oa.BpmOALeaveService;
-import cn.iocoder.yudao.adminserver.modules.bpm.service.oa.impl.BpmOALeaveServiceImpl;
+import cn.iocoder.yudao.adminserver.modules.bpm.service.oa.BpmOALeaveServiceImpl;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;

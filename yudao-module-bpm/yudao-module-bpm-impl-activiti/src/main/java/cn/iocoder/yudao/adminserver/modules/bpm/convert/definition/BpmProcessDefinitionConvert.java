@@ -2,9 +2,9 @@ package cn.iocoder.yudao.adminserver.modules.bpm.convert.definition;
 
 import cn.iocoder.yudao.module.bpm.controller.definition.vo.process.BpmProcessDefinitionPageItemRespVO;
 import cn.iocoder.yudao.module.bpm.controller.definition.vo.process.BpmProcessDefinitionRespVO;
+import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmFormDO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmProcessDefinitionExtDO;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.dto.BpmProcessDefinitionCreateReqDTO;
-import cn.iocoder.yudao.module.bpm.api.form.dto.BpmFormDTO;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import org.activiti.engine.impl.persistence.entity.SuspensionState;
 import org.activiti.engine.repository.Deployment;
@@ -29,17 +29,17 @@ public interface BpmProcessDefinitionConvert {
     BpmProcessDefinitionConvert INSTANCE = Mappers.getMapper(BpmProcessDefinitionConvert.class);
 
     default List<BpmProcessDefinitionPageItemRespVO> convertList(List<ProcessDefinition> list, Map<String, Deployment> deploymentMap,
-                                                                 Map<String, BpmProcessDefinitionExtDO> processDefinitionDOMap, Map<Long, BpmFormDTO> formMap) {
+                                                                 Map<String, BpmProcessDefinitionExtDO> processDefinitionDOMap, Map<Long, BpmFormDO> formMap) {
         return CollectionUtils.convertList(list, definition -> {
             Deployment deployment = definition.getDeploymentId() != null ? deploymentMap.get(definition.getDeploymentId()) : null;
             BpmProcessDefinitionExtDO definitionDO = processDefinitionDOMap.get(definition.getId());
-            BpmFormDTO form = definitionDO != null ? formMap.get(definitionDO.getFormId()) : null;
+            BpmFormDO form = definitionDO != null ? formMap.get(definitionDO.getFormId()) : null;
             return convert(definition, deployment, definitionDO, form);
         });
     }
 
     default BpmProcessDefinitionPageItemRespVO convert(ProcessDefinition bean, Deployment deployment,
-                                                       BpmProcessDefinitionExtDO processDefinitionExtDO, BpmFormDTO form) {
+                                                       BpmProcessDefinitionExtDO processDefinitionExtDO, BpmFormDO form) {
         BpmProcessDefinitionPageItemRespVO respVO = convert(bean);
         respVO.setSuspensionState(bean.isSuspended() ? SuspensionState.SUSPENDED.getStateCode() : SuspensionState.ACTIVE.getStateCode());
         if (deployment != null) {

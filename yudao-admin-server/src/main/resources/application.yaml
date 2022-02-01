@@ -58,7 +58,8 @@ yudao:
     app-api:
       prefix: /app-api
       controller: '**.controller.app.**'
-
+    admin-ui:
+      url: http://dashboard.yudao.iocoder.cn # Admin 管理后台 UI 的地址
   swagger:
     title: 管理后台
     description: 提供管理员管理的所有功能
@@ -78,8 +79,6 @@ yudao:
       - cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants
   tenant: # 多租户相关配置项
     tables: # 配置需要开启多租户的表；如果实体已经继承 TenantBaseDO 类，则无需重复配置
-  url: ## TODO 芋艿：迁移到 web 配置项下，
-    admin-ui: http://dashboard.yudao.iocoder.cn # Admin 管理后台 UI 的地址
   sms-code: # 短信验证码相关的配置项
     expire-times: 10m
     send-frequency: 1m

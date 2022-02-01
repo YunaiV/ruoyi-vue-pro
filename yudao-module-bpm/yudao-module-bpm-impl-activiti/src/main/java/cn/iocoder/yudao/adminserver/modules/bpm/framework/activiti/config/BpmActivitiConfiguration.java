@@ -6,13 +6,10 @@ import cn.iocoder.yudao.adminserver.modules.bpm.framework.activiti.core.event.Bp
 import cn.iocoder.yudao.adminserver.modules.bpm.framework.activiti.core.identity.EmptyUserGroupManager;
 import cn.iocoder.yudao.adminserver.modules.bpm.framework.activiti.core.listener.BpmTackActivitiEventListener;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmTaskAssignRuleService;
-import cn.iocoder.yudao.module.bpm.api.group.BpmUserGroupServiceApi;
-import cn.iocoder.yudao.module.system.service.dept.SysDeptCoreService;
-import cn.iocoder.yudao.module.system.service.permission.SysPermissionCoreService;
-import cn.iocoder.yudao.module.system.service.user.SysUserCoreService;
-import cn.iocoder.yudao.coreservice.modules.system.service.dept.SysDeptCoreService;
-import cn.iocoder.yudao.coreservice.modules.system.service.permission.SysPermissionCoreService;
-import cn.iocoder.yudao.coreservice.modules.system.service.user.SysUserCoreService;
+import cn.iocoder.yudao.module.bpm.service.definition.BpmUserGroupService;
+import cn.iocoder.yudao.module.system.api.dept.DeptApi;
+import cn.iocoder.yudao.module.system.api.permission.PermissionApi;
+import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import org.activiti.api.runtime.shared.identity.UserGroupManager;
 import org.activiti.spring.boot.ProcessEngineConfigurationConfigurer;
 import org.springframework.context.ApplicationEventPublisher;
@@ -67,17 +64,17 @@ public class BpmActivitiConfiguration {
 
     @Bean
     public BpmActivityBehaviorFactory bpmActivityBehaviorFactory(BpmTaskAssignRuleService taskRuleService,
-                                                                 SysPermissionCoreService permissionCoreService,
-                                                                 SysDeptCoreService deptCoreService,
-                                                                 BpmUserGroupServiceApi userGroupServiceApi,
-                                                                 SysUserCoreService userCoreService,
+                                                                 BpmUserGroupService userGroupService,
+                                                                 PermissionApi permissionApi,
+                                                                 DeptApi deptApi,
+                                                                 AdminUserApi adminUserApi,
                                                                  List<BpmTaskAssignScript> scripts) {
         BpmActivityBehaviorFactory bpmActivityBehaviorFactory = new BpmActivityBehaviorFactory();
         bpmActivityBehaviorFactory.setBpmTaskRuleService(taskRuleService);
-        bpmActivityBehaviorFactory.setPermissionCoreService(permissionCoreService);
-        bpmActivityBehaviorFactory.setDeptCoreService(deptCoreService);
-        bpmActivityBehaviorFactory.setUserGroupServiceApi(userGroupServiceApi);
-        bpmActivityBehaviorFactory.setUserCoreService(userCoreService);
+        bpmActivityBehaviorFactory.setUserGroupService(userGroupService);
+        bpmActivityBehaviorFactory.setAdminUserApi(adminUserApi);
+        bpmActivityBehaviorFactory.setPermissionApi(permissionApi);
+        bpmActivityBehaviorFactory.setDeptApi(deptApi);
         bpmActivityBehaviorFactory.setScripts(scripts);
         return bpmActivityBehaviorFactory;
     }

@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.system.convert.dept;
 
+import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptCreateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptRespVO;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptSimpleRespVO;
@@ -9,6 +10,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface DeptConvert {
@@ -24,5 +26,11 @@ public interface DeptConvert {
     DeptDO convert(DeptCreateReqVO bean);
 
     DeptDO convert(DeptUpdateReqVO bean);
+
+    List<DeptRespDTO> convertList03(List<DeptDO> list);
+
+    DeptRespDTO convert03(DeptDO bean);
+
+    Map<Long, DeptRespDTO> convertMap(Map<Long, DeptDO> map);
 
 }

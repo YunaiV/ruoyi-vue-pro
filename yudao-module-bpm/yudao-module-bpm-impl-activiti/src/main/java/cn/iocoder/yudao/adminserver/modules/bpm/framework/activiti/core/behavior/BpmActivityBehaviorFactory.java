@@ -2,10 +2,10 @@ package cn.iocoder.yudao.adminserver.modules.bpm.framework.activiti.core.behavio
 
 import cn.iocoder.yudao.adminserver.modules.bpm.framework.activiti.core.behavior.script.BpmTaskAssignScript;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmTaskAssignRuleService;
-import cn.iocoder.yudao.module.bpm.api.group.BpmUserGroupServiceApi;
-import cn.iocoder.yudao.module.system.service.dept.SysDeptCoreService;
-import cn.iocoder.yudao.module.system.service.permission.SysPermissionCoreService;
-import cn.iocoder.yudao.module.system.service.user.SysUserCoreService;
+import cn.iocoder.yudao.module.bpm.service.definition.BpmUserGroupService;
+import cn.iocoder.yudao.module.system.api.dept.DeptApi;
+import cn.iocoder.yudao.module.system.api.permission.PermissionApi;
+import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Setter;
@@ -30,13 +30,15 @@ public class BpmActivityBehaviorFactory extends DefaultActivityBehaviorFactory {
     @Setter
     private BpmTaskAssignRuleService bpmTaskRuleService;
     @Setter
-    private SysPermissionCoreService permissionCoreService;
+    private BpmUserGroupService userGroupService;
+
     @Setter
-    private SysDeptCoreService deptCoreService;
+    private PermissionApi permissionApi;
     @Setter
-    private BpmUserGroupServiceApi userGroupServiceApi;
+    private DeptApi deptApi;
     @Setter
-    private SysUserCoreService userCoreService;
+    private AdminUserApi adminUserApi;
+
     @Setter
     private List<BpmTaskAssignScript> scripts;
 
@@ -44,10 +46,10 @@ public class BpmActivityBehaviorFactory extends DefaultActivityBehaviorFactory {
     public UserTaskActivityBehavior createUserTaskActivityBehavior(UserTask userTask) {
         BpmUserTaskActivitiBehavior userTaskActivityBehavior = new BpmUserTaskActivitiBehavior(userTask);
         userTaskActivityBehavior.setBpmTaskRuleService(bpmTaskRuleService);
-        userTaskActivityBehavior.setPermissionCoreService(permissionCoreService);
-        userTaskActivityBehavior.setDeptCoreService(deptCoreService);
-        userTaskActivityBehavior.setUserGroupServiceApi(userGroupServiceApi);
-        userTaskActivityBehavior.setSysUserCoreService(userCoreService);
+        userTaskActivityBehavior.setPermissionApi(permissionApi);
+        userTaskActivityBehavior.setDeptApi(deptApi);
+        userTaskActivityBehavior.setUserGroupService(userGroupService);
+        userTaskActivityBehavior.setAdminUserApi(adminUserApi);
         userTaskActivityBehavior.setScripts(scripts);
         return userTaskActivityBehavior;
     }

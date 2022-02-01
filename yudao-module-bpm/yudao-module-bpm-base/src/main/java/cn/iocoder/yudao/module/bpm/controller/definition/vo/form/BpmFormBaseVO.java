@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.bpm.controller.definition.vo.form;
 
-import com.sun.istack.internal.NotNull;
 import lombok.*;
 import io.swagger.annotations.*;
 import javax.validation.constraints.*;

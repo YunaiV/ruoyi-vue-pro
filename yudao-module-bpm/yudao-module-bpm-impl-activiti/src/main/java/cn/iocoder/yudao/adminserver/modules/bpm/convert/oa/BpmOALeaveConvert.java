@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.convert.oa;
 
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.oa.vo.BpmOALeaveCreateReqVO;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.oa.vo.BpmOALeaveRespVO;
+import cn.iocoder.yudao.module.bpm.controller.oa.vo.BpmOALeaveCreateReqVO;
+import cn.iocoder.yudao.module.bpm.controller.oa.vo.BpmOALeaveRespVO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.oa.BpmOALeaveDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import org.mapstruct.Mapper;

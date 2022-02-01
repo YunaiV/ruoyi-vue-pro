@@ -3,18 +3,18 @@ package cn.iocoder.yudao.adminserver.modules.bpm.framework.activiti.core.behavio
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmTaskAssignRuleDO;
-import cn.iocoder.yudao.module.bpm.enums.definition.BpmTaskAssignRuleTypeEnum;
 import cn.iocoder.yudao.adminserver.modules.bpm.framework.activiti.core.behavior.script.BpmTaskAssignScript;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.definition.BpmTaskAssignRuleService;
-import cn.iocoder.yudao.module.bpm.api.group.BpmUserGroupServiceApi;
-import cn.iocoder.yudao.module.bpm.api.group.dto.BpmUserGroupDTO;
-import cn.iocoder.yudao.module.system.dal.dataobject.dept.SysDeptDO;
-import cn.iocoder.yudao.module.system.dal.dataobject.user.SysUserDO;
-import cn.iocoder.yudao.module.system.service.dept.SysDeptCoreService;
-import cn.iocoder.yudao.module.system.service.permission.SysPermissionCoreService;
-import cn.iocoder.yudao.module.system.service.user.SysUserCoreService;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmTaskAssignRuleDO;
+import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmUserGroupDO;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmTaskAssignRuleTypeEnum;
+import cn.iocoder.yudao.module.bpm.service.definition.BpmUserGroupService;
+import cn.iocoder.yudao.module.system.api.dept.DeptApi;
+import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
+import cn.iocoder.yudao.module.system.api.permission.PermissionApi;
+import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
+import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import com.google.common.annotations.VisibleForTesting;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -28,12 +28,12 @@ import org.activiti.engine.impl.persistence.entity.TaskEntityManager;
 
 import java.util.*;
 
-import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.TASK_ASSIGN_SCRIPT_NOT_EXISTS;
-import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.TASK_CREATE_FAIL_NO_CANDIDATE_USER;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString;
+import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.TASK_ASSIGN_SCRIPT_NOT_EXISTS;
+import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.TASK_CREATE_FAIL_NO_CANDIDATE_USER;
 
 /**
  * 自定义的流程任务的 assignee 负责人的分配
@@ -48,14 +48,17 @@ public class BpmUserTaskActivitiBehavior extends UserTaskActivityBehavior {
 
     @Setter
     private BpmTaskAssignRuleService bpmTaskRuleService;
+
     @Setter
-    private SysPermissionCoreService permissionCoreService;
+    private BpmUserGroupService userGroupService;
+
     @Setter
-    private SysDeptCoreService deptCoreService;
+    private DeptApi deptApi;
     @Setter
-    private BpmUserGroupServiceApi userGroupServiceApi;
+    private AdminUserApi adminUserApi;
     @Setter
-    private SysUserCoreService sysUserCoreService;
+    private PermissionApi permissionApi;
+
     /**
      * 任务分配脚本
      */
@@ -133,22 +136,22 @@ public class BpmUserTaskActivitiBehavior extends UserTaskActivityBehavior {
     }
 
     private Set<Long> calculateTaskCandidateUsersByRole(TaskEntity task, BpmTaskAssignRuleDO rule) {
-        return permissionCoreService.getUserRoleIdListByRoleIds(rule.getOptions());
+        return permissionApi.getUserRoleIdListByRoleIds(rule.getOptions());
     }
 
     private Set<Long> calculateTaskCandidateUsersByDeptMember(TaskEntity task, BpmTaskAssignRuleDO rule) {
-        List<SysUserDO> users = sysUserCoreService.getUsersByDeptIds(rule.getOptions());
-        return convertSet(users, SysUserDO::getId);
+        List<AdminUserRespDTO> users = adminUserApi.getUsersByDeptIds(rule.getOptions());
+        return convertSet(users, AdminUserRespDTO::getId);
     }
 
     private Set<Long> calculateTaskCandidateUsersByDeptLeader(TaskEntity task, BpmTaskAssignRuleDO rule) {
-        List<SysDeptDO> depts = deptCoreService.getDepts(rule.getOptions());
-        return convertSet(depts, SysDeptDO::getLeaderUserId);
+        List<DeptRespDTO> depts = deptApi.getDepts(rule.getOptions());
+        return convertSet(depts, DeptRespDTO::getLeaderUserId);
     }
 
     private Set<Long> calculateTaskCandidateUsersByPost(TaskEntity task, BpmTaskAssignRuleDO rule) {
-        List<SysUserDO> users = sysUserCoreService.getUsersByPostIds(rule.getOptions());
-        return convertSet(users, SysUserDO::getId);
+        List<AdminUserRespDTO> users = adminUserApi.getUsersByPostIds(rule.getOptions());
+        return convertSet(users, AdminUserRespDTO::getId);
     }
 
     private Set<Long> calculateTaskCandidateUsersByUser(TaskEntity task, BpmTaskAssignRuleDO rule) {
@@ -156,9 +159,9 @@ public class BpmUserTaskActivitiBehavior extends UserTaskActivityBehavior {
     }
 
     private Set<Long> calculateTaskCandidateUsersByUserGroup(TaskEntity task, BpmTaskAssignRuleDO rule) {
-        List<BpmUserGroupDTO> userGroups = userGroupServiceApi.getUserGroupList(rule.getOptions());
+        List<BpmUserGroupDO> userGroups = userGroupService.getUserGroupList(rule.getOptions());
         Set<Long> userIds = new HashSet<>();
-        userGroups.forEach(bpmUserGroupDO -> userIds.addAll(bpmUserGroupDO.getMemberUserIds()));
+        userGroups.forEach(group -> userIds.addAll(group.getMemberUserIds()));
         return userIds;
     }
 
@@ -183,9 +186,9 @@ public class BpmUserTaskActivitiBehavior extends UserTaskActivityBehavior {
         if (CollUtil.isEmpty(assigneeUserIds)) {
             return;
         }
-        Map<Long, SysUserDO> userMap = sysUserCoreService.getUserMap(assigneeUserIds);
+        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(assigneeUserIds);
         assigneeUserIds.removeIf(id -> {
-            SysUserDO user = userMap.get(id);
+            AdminUserRespDTO user = userMap.get(id);
             return user == null || !CommonStatusEnum.ENABLE.getStatus().equals(user.getStatus());
         });
     }

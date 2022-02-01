@@ -1,12 +1,12 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.convert.task;
 
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.task.vo.instance.BpmProcessInstancePageItemRespVO;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.task.vo.instance.BpmProcessInstanceRespVO;
+import cn.iocoder.yudao.module.bpm.controller.task.vo.instance.BpmProcessInstancePageItemRespVO;
+import cn.iocoder.yudao.module.bpm.controller.task.vo.instance.BpmProcessInstanceRespVO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmProcessDefinitionExtDO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.task.BpmProcessInstanceExtDO;
 import cn.iocoder.yudao.adminserver.modules.bpm.framework.activiti.core.event.BpmProcessInstanceResultEvent;
-import cn.iocoder.yudao.module.system.dal.dataobject.dept.SysDeptDO;
-import cn.iocoder.yudao.module.system.dal.dataobject.user.SysUserDO;
+import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
+import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.repository.ProcessDefinition;
@@ -71,7 +71,7 @@ public interface BpmProcessInstanceConvert {
 
     default BpmProcessInstanceRespVO convert2(HistoricProcessInstance processInstance, BpmProcessInstanceExtDO processInstanceExt,
                                               ProcessDefinition processDefinition, BpmProcessDefinitionExtDO processDefinitionExt,
-                                              String bpmnXml, SysUserDO startUser, SysDeptDO dept) {
+                                              String bpmnXml, AdminUserRespDTO startUser, DeptRespDTO dept) {
         BpmProcessInstanceRespVO respVO = convert2(processInstance);
         copyTo(processInstanceExt, respVO);
         // definition
@@ -94,7 +94,7 @@ public interface BpmProcessInstanceConvert {
     BpmProcessInstanceRespVO.ProcessDefinition convert2(ProcessDefinition bean);
     @Mapping(source = "from.id", target = "to.id", ignore = true)
     void copyTo(BpmProcessDefinitionExtDO from, @MappingTarget BpmProcessInstanceRespVO.ProcessDefinition to);
-    BpmProcessInstanceRespVO.User convert2(SysUserDO bean);
+    BpmProcessInstanceRespVO.User convert2(AdminUserRespDTO bean);
 
     default BpmProcessInstanceResultEvent convert(Object source, ProcessInstance instance, Integer result) {
         BpmProcessInstanceResultEvent event = new BpmProcessInstanceResultEvent(source);

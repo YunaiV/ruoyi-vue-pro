@@ -42,27 +42,12 @@
             <artifactId>yudao-module-pay-impl</artifactId>
             <version>${revision}</version>
         </dependency>
-
-<!--         默认引入bpm-activiti. 可以替换为bpm-flowable -->
+        <!-- 默认引入 bpm-activiti 实现，可以替换为 bpm-flowable 实现-->
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
-            <artifactId>yudao-module-bpm-activiti</artifactId>
+            <artifactId>yudao-module-bpm-impl-activiti</artifactId>
             <version>${revision}</version>
         </dependency>
-
-        <!-- 业务组件 -->
-
-        <dependency>
-            <groupId>cn.iocoder.boot</groupId>
-            <artifactId>yudao-spring-boot-starter-biz-dict</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>cn.iocoder.boot</groupId>
-            <artifactId>yudao-spring-boot-starter-biz-tenant</artifactId>
-        </dependency>
-
-
 
         <!-- spring boot 配置所需依赖 -->
         <dependency>
@@ -88,12 +73,6 @@
             <artifactId>spring-boot-admin-starter-server</artifactId> <!-- 实现 Spring Boot Admin Server 服务端 -->
         </dependency>
 
-        <!-- 三方云服务相关 -->
-
-        <dependency>
-            <groupId>com.xkcoding.justauth</groupId>
-            <artifactId>justauth-spring-boot-starter</artifactId>
-        </dependency>
     </dependencies>
 
     <build>

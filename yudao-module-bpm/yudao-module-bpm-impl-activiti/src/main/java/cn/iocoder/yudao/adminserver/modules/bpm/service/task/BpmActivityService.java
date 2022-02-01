@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.service.task;
 
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.task.vo.activity.BpmActivityRespVO;
+import cn.iocoder.yudao.module.bpm.controller.task.vo.activity.BpmActivityRespVO;
 
 import java.util.List;
 

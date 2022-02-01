@@ -3,7 +3,7 @@ package cn.iocoder.yudao.adminserver.modules.bpm.convert.message;
 import cn.iocoder.yudao.module.bpm.service.message.dto.BpmMessageSendWhenProcessInstanceApproveReqDTO;
 import cn.iocoder.yudao.module.bpm.service.message.dto.BpmMessageSendWhenProcessInstanceRejectReqDTO;
 import cn.iocoder.yudao.module.bpm.service.message.dto.BpmMessageSendWhenTaskCreatedReqDTO;
-import cn.iocoder.yudao.module.system.dal.dataobject.user.SysUserDO;
+import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import org.activiti.api.task.model.Task;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.mapstruct.Mapper;
@@ -17,7 +17,7 @@ public interface BpmMessageConvert {
 
     BpmMessageConvert INSTANCE = Mappers.getMapper(BpmMessageConvert.class);
 
-    default BpmMessageSendWhenTaskCreatedReqDTO convert(ProcessInstance processInstance, SysUserDO startUser, Task task) {
+    default BpmMessageSendWhenTaskCreatedReqDTO convert(ProcessInstance processInstance, AdminUserRespDTO startUser, Task task) {
         BpmMessageSendWhenTaskCreatedReqDTO reqDTO = new BpmMessageSendWhenTaskCreatedReqDTO();
         copyTo(processInstance, reqDTO);
         copyTo(startUser, reqDTO);
@@ -30,7 +30,7 @@ public interface BpmMessageConvert {
             @Mapping(source = "id", target = "startUserId"),
             @Mapping(source = "nickname", target = "startUserNickname")
     })
-    void copyTo(SysUserDO from, @MappingTarget BpmMessageSendWhenTaskCreatedReqDTO to);
+    void copyTo(AdminUserRespDTO from, @MappingTarget BpmMessageSendWhenTaskCreatedReqDTO to);
     @Mappings({
             @Mapping(source = "id", target = "taskId"),
             @Mapping(source = "name", target = "taskName"),

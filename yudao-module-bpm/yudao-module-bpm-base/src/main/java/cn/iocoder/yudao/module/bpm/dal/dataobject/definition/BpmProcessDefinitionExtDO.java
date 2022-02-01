@@ -1,15 +1,12 @@
 package cn.iocoder.yudao.module.bpm.dal.dataobject.definition;
 
-import cn.iocoder.yudao.adminserver.modules.bpm.enums.definition.BpmModelFormTypeEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmFormDO;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmModelFormTypeEnum;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.*;
-import org.activiti.engine.repository.Model;
-import org.activiti.engine.repository.ProcessDefinition;
 
 import java.util.List;
 
@@ -36,13 +33,13 @@ public class BpmProcessDefinitionExtDO extends BaseDO {
     /**
      * 流程定义的编号
      *
-     * 关联 {@link ProcessDefinition#getId()}
+     * 关联 ProcessDefinition 的 id 属性
      */
     private String processDefinitionId;
     /**
      * 流程模型的编号
      *
-     * 关联 {@link Model#getId()}
+     * 关联 Model 的 id 属性
      */
     private String modelId;
     /**

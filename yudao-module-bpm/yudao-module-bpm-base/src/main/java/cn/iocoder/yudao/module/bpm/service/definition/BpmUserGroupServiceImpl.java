@@ -15,12 +15,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.USER_GROUP_NOT_EXISTS;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.*;
 
 /**
  * 用户组 Service 实现类
@@ -69,6 +70,11 @@ public class BpmUserGroupServiceImpl implements BpmUserGroupService {
     @Override
     public BpmUserGroupDO getUserGroup(Long id) {
         return userGroupMapper.selectById(id);
+    }
+
+    @Override
+    public List<BpmUserGroupDO> getUserGroupList(Collection<Long> ids) {
+        return userGroupMapper.selectBatchIds(ids);
     }
 
 

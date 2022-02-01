@@ -1,21 +1,17 @@
 package cn.iocoder.yudao.module.bpm.dal.dataobject.task;
 
-import cn.iocoder.yudao.adminserver.modules.bpm.enums.task.BpmProcessInstanceResultEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.module.bpm.enums.task.BpmProcessInstanceResultEnum;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import org.activiti.engine.history.HistoricTaskInstance;
-import org.activiti.engine.repository.ProcessDefinition;
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.task.Task;
 
 import java.util.Date;
 
 /**
  * Bpm 流程任务的拓展表
- * 主要解决 Activiti {@link Task} 和 {@link HistoricTaskInstance} 不支持拓展字段，所以新建拓展表
+ * 主要解决 Activiti Task 和 HistoricTaskInstance 不支持拓展字段，所以新建拓展表
  *
  * @author 芋道源码
  */
@@ -23,27 +19,24 @@ import java.util.Date;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-//@Builder
-//@NoArgsConstructor
-//@AllArgsConstructor
 public class BpmTaskExtDO extends BaseDO {
 
     /**
      * 任务的审批人
      *
-     * 冗余 {@link Task#getAssignee()}
+     * 冗余 Task 的 assignee 属性
      */
     private Long assigneeUserId;
     /**
      * 任务的名字
      *
-     * 冗余 {@link Task#getName()} 为了筛选
+     * 冗余 Task 的 name 属性，为了筛选
      */
     private String name;
     /**
      * 任务的编号
      *
-     * 关联 {@link Task#getId()}
+     * 关联 Task 的 id 属性
      */
     private String taskId;
 //    /**
@@ -65,20 +58,20 @@ public class BpmTaskExtDO extends BaseDO {
     /**
      * 任务的结束时间
      *
-     * 冗余 {@link HistoricTaskInstance#getEndTime()}
+     * 冗余 HistoricTaskInstance 的 endTime  属性
      */
     private Date endTime;
 
     /**
      * 流程实例的编号
      *
-     * 关联 {@link ProcessInstance#getId()}
+     * 关联 ProcessInstance 的 id 属性
      */
     private String processInstanceId;
     /**
      * 流程定义的编号
      *
-     * 关联 {@link ProcessDefinition#getId()}
+     * 关联 ProcessDefinition 的 id 属性
      */
     private String processDefinitionId;
 

@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.adminserver.modules.bpm.controller.task;
 
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.adminserver.modules.bpm.controller.task.vo.activity.BpmActivityRespVO;
+import cn.iocoder.yudao.module.bpm.controller.task.vo.activity.BpmActivityRespVO;
 import cn.iocoder.yudao.adminserver.modules.bpm.service.task.BpmActivityService;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;

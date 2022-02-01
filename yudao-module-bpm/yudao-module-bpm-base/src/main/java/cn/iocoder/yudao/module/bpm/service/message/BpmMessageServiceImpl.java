@@ -1,13 +1,13 @@
 package cn.iocoder.yudao.module.bpm.service.message;
 
-import cn.iocoder.yudao.adminserver.modules.bpm.enums.message.BpmMessageEnum;
-import cn.iocoder.yudao.module.bpm.service.message.BpmMessageService;
+import cn.iocoder.yudao.framework.web.config.WebProperties;
+import cn.iocoder.yudao.module.bpm.convert.message.BpmMessageConvert;
+import cn.iocoder.yudao.module.bpm.enums.message.BpmMessageEnum;
 import cn.iocoder.yudao.module.bpm.service.message.dto.BpmMessageSendWhenProcessInstanceApproveReqDTO;
 import cn.iocoder.yudao.module.bpm.service.message.dto.BpmMessageSendWhenProcessInstanceRejectReqDTO;
 import cn.iocoder.yudao.module.bpm.service.message.dto.BpmMessageSendWhenTaskCreatedReqDTO;
-import cn.iocoder.yudao.module.system.service.sms.SysSmsCoreService;
+import cn.iocoder.yudao.module.system.api.sms.SmsSendApi;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -26,18 +26,18 @@ import java.util.Map;
 public class BpmMessageServiceImpl implements BpmMessageService {
 
     @Resource
-    private SysSmsCoreService smsCoreService;
+    private SmsSendApi smsSendApi;
 
-    @Value("${yudao.url.admin-ui}")
-    private String adminUiUrl;
+    @Resource
+    private WebProperties webProperties;
 
     @Override
     public void sendMessageWhenProcessInstanceApprove(BpmMessageSendWhenProcessInstanceApproveReqDTO reqDTO) {
         Map<String, Object> templateParams = new HashMap<>();
         templateParams.put("processInstanceName", reqDTO.getProcessInstanceName());
         templateParams.put("detailUrl", getProcessInstanceDetailUrl(reqDTO.getProcessInstanceId()));
-        smsCoreService.sendSingleSmsToAdmin(null, reqDTO.getStartUserId(),
-                BpmMessageEnum.PROCESS_INSTANCE_APPROVE.getSmsCode(), templateParams);
+        smsSendApi.sendSingleSmsToAdmin(BpmMessageConvert.INSTANCE.convert(reqDTO.getStartUserId(),
+                BpmMessageEnum.PROCESS_INSTANCE_APPROVE.getSmsTemplateCode(), templateParams));
     }
 
     @Override
@@ -46,8 +46,8 @@ public class BpmMessageServiceImpl implements BpmMessageService {
         templateParams.put("processInstanceName", reqDTO.getProcessInstanceName());
         templateParams.put("comment", reqDTO.getComment());
         templateParams.put("detailUrl", getProcessInstanceDetailUrl(reqDTO.getProcessInstanceId()));
-        smsCoreService.sendSingleSmsToAdmin(null, reqDTO.getStartUserId(),
-                BpmMessageEnum.PROCESS_INSTANCE_REJECT.getSmsCode(), templateParams);
+        smsSendApi.sendSingleSmsToAdmin(BpmMessageConvert.INSTANCE.convert(reqDTO.getStartUserId(),
+                BpmMessageEnum.PROCESS_INSTANCE_REJECT.getSmsTemplateCode(), templateParams));
     }
 
     @Override
@@ -57,12 +57,12 @@ public class BpmMessageServiceImpl implements BpmMessageService {
         templateParams.put("taskName", reqDTO.getTaskName());
         templateParams.put("startUserNickname", reqDTO.getStartUserNickname());
         templateParams.put("detailUrl", getProcessInstanceDetailUrl(reqDTO.getProcessInstanceId()));
-        smsCoreService.sendSingleSmsToAdmin(null, reqDTO.getAssigneeUserId(),
-                BpmMessageEnum.TASK_ASSIGNED.getSmsCode(), templateParams);
+        smsSendApi.sendSingleSmsToAdmin(BpmMessageConvert.INSTANCE.convert(reqDTO.getStartUserId(),
+                BpmMessageEnum.TASK_ASSIGNED.getSmsTemplateCode(), templateParams));
     }
 
     private String getProcessInstanceDetailUrl(String taskId) {
-        return adminUiUrl + "bpm/process-instance/detail?id=" + taskId;
+        return webProperties.getAdminUi().getUrl() + "/bpm/process-instance/detail?id=" + taskId;
     }
 
 }
