@@ -46,11 +46,11 @@ public class PayOrderExcelVO {
     @ExcelProperty("渠道手续费，单位：百分比")
     private String channelFeeRate;
 
-    @DictFormat(DictTypeConstants.PAY_ORDER_STATUS)
+    @DictFormat(DictTypeConstants.ORDER_STATUS)
     @ExcelProperty(value = "支付状态", converter = DictConvert.class)
     private Integer status;
 
-    @DictFormat(DictTypeConstants.PAY_ORDER_NOTIFY_STATUS)
+    @DictFormat(DictTypeConstants.ORDER_NOTIFY_STATUS)
     @ExcelProperty(value = "通知商户支付结果的回调状态", converter = DictConvert.class)
     private Integer notifyStatus;
 
@@ -75,7 +75,7 @@ public class PayOrderExcelVO {
     @ExcelProperty("用户 IP")
     private String userIp;
 
-    @DictFormat(DictTypeConstants.PAY_ORDER_REFUND_STATUS)
+    @DictFormat(DictTypeConstants.ORDER_REFUND_STATUS)
     @ExcelProperty(value = "退款状态", converter = DictConvert.class)
     private Integer refundStatus;
 

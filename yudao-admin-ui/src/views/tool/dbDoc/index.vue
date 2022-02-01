@@ -15,7 +15,7 @@
   </div>
 </template>
 <script>
-import { exportHtml, exportWord, exportMarkdown} from "@/api/infra/dbDoc";
+import { exportHtml, exportWord, exportMarkdown} from "@/api/tool/dbDoc";
 
 export default {
   name: "DBDoc",

@@ -13,7 +13,7 @@
       </el-form-item>
       <el-form-item label="任务状态" prop="status">
         <el-select v-model="queryParams.status" placeholder="请选择任务状态" clearable size="small">
-          <el-option v-for="dict in this.getDictDatas(DICT_TYPE.INF_JOB_LOG_STATUS)"
+          <el-option v-for="dict in this.getDictDatas(DICT_TYPE.INFRA_JOB_LOG_STATUS)"
                      :key="dict.value" :label="dict.label" :value="dict.value"/>
         </el-select>
       </el-form-item>
@@ -49,7 +49,7 @@
       </el-table-column>
       <el-table-column label="任务状态" align="center" prop="status">
         <template slot-scope="scope">
-          <span>{{ getDictDataLabel(DICT_TYPE.INF_JOB_LOG_STATUS, scope.row.status) }}</span>
+          <span>{{ getDictDataLabel(DICT_TYPE.INFRA_JOB_LOG_STATUS, scope.row.status) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
@@ -75,7 +75,7 @@
             <el-form-item label="第几次执行：">{{ form.executeIndex }}</el-form-item>
             <el-form-item label="执行时间：">{{ parseTime(form.beginTime) + ' ~ ' + parseTime(form.endTime) }}</el-form-item>
             <el-form-item label="执行时长：">{{ parseTime(form.duration) + ' 毫秒' }}</el-form-item>
-            <el-form-item label="任务状态：">{{ getDictDataLabel(DICT_TYPE.INF_JOB_LOG_STATUS, form.status) }}</el-form-item>
+            <el-form-item label="任务状态：">{{ getDictDataLabel(DICT_TYPE.INFRA_JOB_LOG_STATUS, form.status) }}</el-form-item>
             <el-form-item label="执行结果：">{{ form.result }}</el-form-item>
           </el-col>
         </el-row>

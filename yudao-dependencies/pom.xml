@@ -467,6 +467,12 @@
                 <groupId>cn.smallbun.screw</groupId>
                 <artifactId>screw-core</artifactId> <!-- 实现数据库文档 -->
                 <version>${screw.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.freemarker</groupId>
+                        <artifactId>freemarker</artifactId> <!-- 移除 Freemarker 依赖，采用 Velocity 作为模板引擎 -->
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <dependency>

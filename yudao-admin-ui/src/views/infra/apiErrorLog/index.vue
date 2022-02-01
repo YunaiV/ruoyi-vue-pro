@@ -24,7 +24,7 @@
       </el-form-item>
       <el-form-item label="处理状态" prop="processStatus">
         <el-select v-model="queryParams.processStatus" placeholder="请选择处理状态" clearable size="small">
-          <el-option v-for="dict in this.getDictDatas(DICT_TYPE.INF_API_ERROR_LOG_PROCESS_STATUS)"
+          <el-option v-for="dict in this.getDictDatas(DICT_TYPE.INFRA_API_ERROR_LOG_PROCESS_STATUS)"
                      :key="dict.value" :label="dict.label" :value="dict.value"/>
         </el-select>
       </el-form-item>
@@ -63,7 +63,7 @@
       <el-table-column label="异常名" align="center" prop="exceptionName" width="250" />
       <el-table-column label="处理状态" align="center" prop="processStatus">
         <template slot-scope="scope">
-          <span>{{ getDictDataLabel(DICT_TYPE.INF_API_ERROR_LOG_PROCESS_STATUS, scope.row.processStatus) }}</span>
+          <span>{{ getDictDataLabel(DICT_TYPE.INFRA_API_ERROR_LOG_PROCESS_STATUS, scope.row.processStatus) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
@@ -103,7 +103,7 @@
               <el-input type="textarea" :readonly="true" :autosize="{ maxRows: 20}" v-model="form.exceptionStackTrace"></el-input>
             </el-form-item>
             <el-form-item label="处理状态">
-              {{ getDictDataLabel(DICT_TYPE.INF_API_ERROR_LOG_PROCESS_STATUS, form.processStatus) }}
+              {{ getDictDataLabel(DICT_TYPE.INFRA_API_ERROR_LOG_PROCESS_STATUS, form.processStatus) }}
             </el-form-item>
             <el-form-item label="处理人">{{ form.processUserId }}</el-form-item>
             <el-form-item label="处理时间">{{ parseTime(form.processTime) }}</el-form-item>
@@ -120,7 +120,7 @@
 
 <script>
 import { updateApiErrorLogProcess, getApiErrorLogPage, exportApiErrorLogExcel } from "@/api/infra/apiErrorLog";
-import { InfApiErrorLogProcessStatusEnum } from '@/utils/constants'
+import { InfraApiErrorLogProcessStatusEnum } from '@/utils/constants'
 
 export default {
   name: "ApiErrorLog",
@@ -154,7 +154,7 @@ export default {
       // 表单参数
       form: {},
       // 枚举
-      InfApiErrorLogProcessStatusEnum: InfApiErrorLogProcessStatusEnum,
+      InfApiErrorLogProcessStatusEnum: InfraApiErrorLogProcessStatusEnum,
     };
   },
   created() {
@@ -202,7 +202,7 @@ export default {
     },
     /** 处理已处理 / 已忽略的操作 **/
     handleProcessClick(row, processStatus) {
-      const processStatusText = this.getDictDataLabel(this.DICT_TYPE.INF_API_ERROR_LOG_PROCESS_STATUS, processStatus)
+      const processStatusText = this.getDictDataLabel(this.DICT_TYPE.INFRA_API_ERROR_LOG_PROCESS_STATUS, processStatus)
       this.$confirm('确认标记为' + processStatusText, '提示', {
         type: 'warning',
         confirmButtonText: '确定',

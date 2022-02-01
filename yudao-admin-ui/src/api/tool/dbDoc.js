@@ -3,7 +3,7 @@ import request from "@/utils/request";
 
 export function exportHtml() {
   return request({
-    url: '/infra/db-doc/export-html',
+    url: '/tool/db-doc/export-html',
     method: 'get',
     responseType: 'blob'
   })
@@ -11,7 +11,7 @@ export function exportHtml() {
 
 export function exportWord() {
   return request({
-    url: '/infra/db-doc/export-word',
+    url: '/tool/db-doc/export-word',
     method: 'get',
     responseType: 'blob'
   })
@@ -19,7 +19,7 @@ export function exportWord() {
 
 export function exportMarkdown() {
   return request({
-    url: '/infra/db-doc/export-markdown',
+    url: '/tool/db-doc/export-markdown',
     method: 'get',
     responseType: 'blob'
   })

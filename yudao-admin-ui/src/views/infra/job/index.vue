@@ -6,7 +6,7 @@
       </el-form-item>
       <el-form-item label="任务状态" prop="status">
         <el-select v-model="queryParams.status" placeholder="请选择任务状态" clearable size="small">
-          <el-option v-for="dict in this.getDictDatas(DICT_TYPE.INF_JOB_STATUS)"
+          <el-option v-for="dict in this.getDictDatas(DICT_TYPE.INFRA_JOB_STATUS)"
                      :key="dict.value" :label="dict.label" :value="dict.value"/>
         </el-select>
       </el-form-item>
@@ -40,7 +40,7 @@
       <el-table-column label="任务名称" align="center" prop="name" />
       <el-table-column label="任务状态" align="center" prop="status">
         <template slot-scope="scope">
-          <span>{{ getDictDataLabel(DICT_TYPE.INF_JOB_STATUS, scope.row.status) }}</span>
+          <span>{{ getDictDataLabel(DICT_TYPE.INFRA_JOB_STATUS, scope.row.status) }}</span>
         </template>
       </el-table-column>>
       <el-table-column label="处理器的名字" align="center" prop="handlerName" />
@@ -107,7 +107,7 @@
           <el-col :span="24">
             <el-form-item label="任务编号：">{{ form.id }}</el-form-item>
             <el-form-item label="任务名称：">{{ form.name }}</el-form-item>
-            <el-form-item label="任务名称：">{{ getDictDataLabel(DICT_TYPE.INF_JOB_STATUS, form.status) }}</el-form-item>
+            <el-form-item label="任务名称：">{{ getDictDataLabel(DICT_TYPE.INFRA_JOB_STATUS, form.status) }}</el-form-item>
             <el-form-item label="处理器的名字：">{{ form.handlerName }}</el-form-item>
             <el-form-item label="处理器的参数：">{{ form.handlerParam }}</el-form-item>
             <el-form-item label="cron表达式：">{{ form.cronExpression }}</el-form-item>
@@ -128,7 +128,7 @@
 
 <script>
 import { listJob, getJob, delJob, addJob, updateJob, exportJob, runJob, updateJobStatus, getJobNextTimes } from "@/api/infra/job";
-import { InfJobStatusEnum } from "@/utils/constants";
+import { InfraJobStatusEnum } from "@/utils/constants";
 
 export default {
   name: "Job",
@@ -171,7 +171,7 @@ export default {
       nextTimes: [], // 后续执行时间
 
       // 枚举
-      InfJobStatusEnum: InfJobStatusEnum
+      InfJobStatusEnum: InfraJobStatusEnum
     };
   },
   created() {
@@ -306,7 +306,7 @@ export default {
     /** 更新状态操作 */
     handleChangeStatus(row, open) {
       const id = row.id;
-      let status = open ? InfJobStatusEnum.NORMAL : InfJobStatusEnum.STOP;
+      let status = open ? InfraJobStatusEnum.NORMAL : InfraJobStatusEnum.STOP;
       let statusStr = open ? '开启' : '关闭';
       this.$confirm('是否确认' + statusStr + '定时任务编号为"' + id + '"的数据项?', "警告", {
         confirmButtonText: "确定",

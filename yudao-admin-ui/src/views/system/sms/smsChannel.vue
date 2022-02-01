@@ -8,7 +8,7 @@
       </el-form-item>
       <el-form-item label="启用状态" prop="status">
         <el-select v-model="queryParams.status" placeholder="请选择启用状态" clearable size="small">
-          <el-option v-for="dict in this.getDictDatas(DICT_TYPE.SYS_COMMON_STATUS)"
+          <el-option v-for="dict in this.getDictDatas(DICT_TYPE.COMMON_STATUS)"
                      :key="dict.value" :label="dict.label" :value="dict.value"/>
         </el-select>
       </el-form-item>
@@ -41,12 +41,12 @@
       <el-table-column label="短信签名" align="center" prop="signature" />
       <el-table-column label="渠道编码" align="center" prop="code">
         <template slot-scope="scope">
-          <span>{{ getDictDataLabel(DICT_TYPE.SYS_SMS_CHANNEL_CODE, scope.row.code) }}</span>
+          <span>{{ getDictDataLabel(DICT_TYPE.SYSTEM_SMS_CHANNEL_CODE, scope.row.code) }}</span>
         </template>
       </el-table-column>>
       <el-table-column label="启用状态" align="center" prop="status">
         <template slot-scope="scope">
-          <span>{{ getDictDataLabel(DICT_TYPE.SYS_COMMON_STATUS, scope.row.status) }}</span>
+          <span>{{ getDictDataLabel(DICT_TYPE.COMMON_STATUS, scope.row.status) }}</span>
         </template>
       </el-table-column>>
       <el-table-column label="备注" align="center" prop="remark" />
@@ -82,7 +82,7 @@
         </el-form-item>
         <el-form-item label="启用状态">
           <el-radio-group v-model="form.status">
-            <el-radio v-for="dict in this.getDictDatas(DICT_TYPE.SYS_COMMON_STATUS)"
+            <el-radio v-for="dict in this.getDictDatas(DICT_TYPE.COMMON_STATUS)"
                       :key="dict.value" :label="parseInt(dict.value)">{{dict.label}}</el-radio>
           </el-radio-group>
         </el-form-item>
@@ -278,7 +278,7 @@ export default {
       </el-form-item>
       <el-form-item label="启用状态" prop="status">
         <el-select v-model="queryParams.status" placeholder="请选择启用状态" clearable size="small">
-          <el-option v-for="dict in this.getDictDatas(DICT_TYPE.SYS_COMMON_STATUS)"
+          <el-option v-for="dict in this.getDictDatas(DICT_TYPE.COMMON_STATUS)"
                      :key="dict.value" :label="dict.label" :value="dict.value"/>
         </el-select>
       </el-form-item>
@@ -311,12 +311,12 @@ export default {
       <el-table-column label="短信签名" align="center" prop="signature" />
       <el-table-column label="渠道编码" align="center" prop="code">
         <template slot-scope="scope">
-          <span>{{ getDictDataLabel(DICT_TYPE.SYS_SMS_CHANNEL_CODE, scope.row.code) }}</span>
+          <span>{{ getDictDataLabel(DICT_TYPE.SYSTEM_SMS_CHANNEL_CODE, scope.row.code) }}</span>
         </template>
       </el-table-column>>
       <el-table-column label="启用状态" align="center" prop="status">
         <template slot-scope="scope">
-          <span>{{ getDictDataLabel(DICT_TYPE.SYS_COMMON_STATUS, scope.row.status) }}</span>
+          <span>{{ getDictDataLabel(DICT_TYPE.COMMON_STATUS, scope.row.status) }}</span>
         </template>
       </el-table-column>>
       <el-table-column label="备注" align="center" prop="remark" />
@@ -346,13 +346,13 @@ export default {
         </el-form-item>
         <el-form-item label="渠道编码" prop="code">
           <el-select v-model="form.code" placeholder="请选择渠道编码" :disabled="form.id > 0">
-            <el-option v-for="dict in this.getDictDatas(DICT_TYPE.SYS_SMS_CHANNEL_CODE)"
+            <el-option v-for="dict in this.getDictDatas(DICT_TYPE.SYSTEM_SMS_CHANNEL_CODE)"
                        :key="dict.value" :label="dict.label" :value="dict.value" />
           </el-select>
         </el-form-item>
         <el-form-item label="启用状态">
           <el-radio-group v-model="form.status">
-            <el-radio v-for="dict in this.getDictDatas(DICT_TYPE.SYS_COMMON_STATUS)"
+            <el-radio v-for="dict in this.getDictDatas(DICT_TYPE.COMMON_STATUS)"
                       :key="dict.value" :label="parseInt(dict.value)">{{dict.label}}</el-radio>
           </el-radio-group>
         </el-form-item>

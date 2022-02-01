@@ -43,15 +43,15 @@ public class PayRefundExcelVO {
     @ExcelProperty("异步通知商户地址")
     private String notifyUrl;
 
-    @DictFormat(DictTypeConstants.PAY_ORDER_NOTIFY_STATUS)
+    @DictFormat(DictTypeConstants.ORDER_NOTIFY_STATUS)
     @ExcelProperty(value = "商户退款结果回调状态", converter = DictConvert.class)
     private Integer notifyStatus;
 
-    @DictFormat(DictTypeConstants.PAY_REFUND_ORDER_STATUS)
+    @DictFormat(DictTypeConstants.REFUND_ORDER_STATUS)
     @ExcelProperty(value = "退款状态", converter = DictConvert.class)
     private Integer status;
 
-    @DictFormat(DictTypeConstants.PAY_REFUND_ORDER_TYPE)
+    @DictFormat(DictTypeConstants.REFUND_ORDER_TYPE)
     @ExcelProperty(value = "退款类型", converter = DictConvert.class)
     private Integer type;
 

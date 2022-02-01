@@ -212,7 +212,7 @@
 <script>
 import {createApp, updateApp, changeAppStatus, deleteApp, getApp, getAppPage, exportAppExcel} from "@/api/pay/app";
 import {DICT_TYPE, getDictDatas} from "@/utils/dict";
-import {PayType, PayChannelEnum, SysCommonStatusEnum} from "@/utils/constants";
+import {PayType, PayChannelEnum, CommonStatusEnum} from "@/utils/constants";
 import {getMerchantListByName} from "@/api/pay/merchant";
 import wechatChannelForm from "@/views/pay/app/components/wechatChannelForm";
 import aliPayChannelForm from "@/views/pay/app/components/aliPayChannelForm";
@@ -260,8 +260,8 @@ export default {
         merchantId: [{required: true, message: "商户编号不能为空", trigger: "blur"}],
       },
       // 数据字典
-      statusDictDatas: getDictDatas(DICT_TYPE.SYS_COMMON_STATUS),
-      sysCommonStatusEnum: SysCommonStatusEnum,
+      statusDictDatas: getDictDatas(DICT_TYPE.COMMON_STATUS),
+      sysCommonStatusEnum: CommonStatusEnum,
       // 支付渠道枚举
       payChannelEnum: PayChannelEnum,
       // 支付类型
@@ -358,7 +358,7 @@ export default {
     },
     // 用户状态修改
     handleStatusChange(row) {
-      let text = row.status === SysCommonStatusEnum.ENABLE ? "启用" : "停用";
+      let text = row.status === CommonStatusEnum.ENABLE ? "启用" : "停用";
       this.$confirm('确认要"' + text + '""' + row.name + '"应用吗?', "警告", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
@@ -368,8 +368,8 @@ export default {
       }).then(() => {
         this.msgSuccess(text + "成功");
       }).catch(function () {
-        row.status = row.status === SysCommonStatusEnum.ENABLE ? SysCommonStatusEnum.DISABLE
-          : SysCommonStatusEnum.ENABLE;
+        row.status = row.status === CommonStatusEnum.ENABLE ? CommonStatusEnum.DISABLE
+          : CommonStatusEnum.ENABLE;
       });
     },
     /** 提交按钮 */

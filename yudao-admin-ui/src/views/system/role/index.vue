@@ -179,7 +179,7 @@ import {
 import {listSimpleMenus} from "@/api/system/menu";
 import {assignRoleMenu, listRoleMenus, assignRoleDataScope} from "@/api/system/permission";
 import {listSimpleDepts} from "@/api/system/dept";
-import {SysCommonStatusEnum, SysDataScopeEnum} from "@/utils/constants";
+import {CommonStatusEnum, SystemDataScopeEnum} from "@/utils/constants";
 import {DICT_TYPE, getDictDataLabel, getDictDatas} from "@/utils/dict";
 
 export default {
@@ -241,12 +241,12 @@ export default {
       },
 
       // 枚举
-      SysCommonStatusEnum: SysCommonStatusEnum,
-      SysDataScopeEnum: SysDataScopeEnum,
+      SysCommonStatusEnum: CommonStatusEnum,
+      SysDataScopeEnum: SystemDataScopeEnum,
       // 数据字典
-      roleTypeDictDatas: getDictDatas(DICT_TYPE.SYS_ROLE_TYPE),
-      statusDictDatas: getDictDatas(DICT_TYPE.SYS_COMMON_STATUS),
-      dataScopeDictDatas: getDictDatas(DICT_TYPE.SYS_DATA_SCOPE)
+      roleTypeDictDatas: getDictDatas(DICT_TYPE.SYSTEM_ROLE_TYPE),
+      statusDictDatas: getDictDatas(DICT_TYPE.COMMON_STATUS),
+      dataScopeDictDatas: getDictDatas(DICT_TYPE.SYSTEM_DATA_SCOPE)
     };
   },
   created() {
@@ -270,7 +270,7 @@ export default {
     // 角色状态修改
     handleStatusChange(row) {
       // 此时，row 已经变成目标状态了，所以可以直接提交请求和提示
-      let text = row.status === SysCommonStatusEnum.ENABLE ? "启用" : "停用";
+      let text = row.status === CommonStatusEnum.ENABLE ? "启用" : "停用";
       this.$confirm('确认要"' + text + '""' + row.name + '"角色吗?', "警告", {
           confirmButtonText: "确定",
           cancelButtonText: "取消",
@@ -281,13 +281,13 @@ export default {
           this.msgSuccess(text + "成功");
         }).catch(function() {
           // 异常时，需要将 row.status 状态重置回之前的
-          row.status = row.status === SysCommonStatusEnum.ENABLE ? SysCommonStatusEnum.DISABLE
-              : SysCommonStatusEnum.ENABLE;
+          row.status = row.status === CommonStatusEnum.ENABLE ? CommonStatusEnum.DISABLE
+              : CommonStatusEnum.ENABLE;
         });
     },
     // 角色类型字典翻译
     typeFormat(row, column) {
-      return getDictDataLabel(DICT_TYPE.SYS_ROLE_TYPE, row.type)
+      return getDictDataLabel(DICT_TYPE.SYSTEM_ROLE_TYPE, row.type)
     },
     // 取消按钮
     cancel() {
@@ -460,7 +460,7 @@ export default {
         assignRoleDataScope({
           roleId: this.form.id,
           dataScope: this.form.dataScope,
-          dataScopeDeptIds: this.form.dataScope !== SysDataScopeEnum.DEPT_CUSTOM ? [] :
+          dataScopeDeptIds: this.form.dataScope !== SystemDataScopeEnum.DEPT_CUSTOM ? [] :
               this.$refs.dept.getCheckedKeys()
         }).then(response => {
           this.msgSuccess("修改成功");

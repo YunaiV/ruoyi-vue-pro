@@ -114,7 +114,7 @@ import {
   exportMerchantExcel
 } from "@/api/pay/merchant";
 import {DICT_TYPE, getDictDatas} from "@/utils/dict";
-import {SysCommonStatusEnum} from "@/utils/constants";
+import {CommonStatusEnum} from "@/utils/constants";
 
 export default {
   name: "Merchant",
@@ -155,7 +155,7 @@ export default {
         status: [{ required: true, message: "开启状态不能为空", trigger: "blur" }],
       },
       // 商户状态数据字典
-      statusDictDatas: getDictDatas(DICT_TYPE.SYS_COMMON_STATUS)
+      statusDictDatas: getDictDatas(DICT_TYPE.COMMON_STATUS)
     };
   },
   created() {
@@ -222,7 +222,7 @@ export default {
     },
     // 用户状态修改
     handleStatusChange(row) {
-      let text = row.status === SysCommonStatusEnum.ENABLE ? "启用" : "停用";
+      let text = row.status === CommonStatusEnum.ENABLE ? "启用" : "停用";
       this.$confirm('确认要"' + text + '""' + row.name + '"商户吗?', "警告", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
@@ -232,8 +232,8 @@ export default {
       }).then(() => {
         this.msgSuccess(text + "成功");
       }).catch(function() {
-        row.status = row.status === SysCommonStatusEnum.ENABLE ? SysCommonStatusEnum.DISABLE
-          : SysCommonStatusEnum.ENABLE;
+        row.status = row.status === CommonStatusEnum.ENABLE ? CommonStatusEnum.DISABLE
+          : CommonStatusEnum.ENABLE;
       });
     },
     /** 提交按钮 */

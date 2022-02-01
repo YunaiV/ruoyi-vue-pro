@@ -74,9 +74,12 @@ yudao:
     db-schemas: ${spring.datasource.dynamic.datasource.master.name}
   error-code: # 错误码相关配置项
     constants-class-list:
-      - cn.iocoder.yudao.adminserver.modules.infra.enums.InfErrorCodeConstants
+      - cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants
+      - cn.iocoder.yudao.module.infra.enums.ErrorCodeConstants
+      - cn.iocoder.yudao.module.member.enums.ErrorCodeConstants
+      - cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants
       - cn.iocoder.yudao.module.system.enums.ErrorCodeConstants
-      - cn.iocoder.yudao.adminserver.modules.bpm.enums.BpmErrorCodeConstants
+      - cn.iocoder.yudao.module.tool.enums.ErrorCodeConstants
   tenant: # 多租户相关配置项
     tables: # 配置需要开启多租户的表；如果实体已经继承 TenantBaseDO 类，则无需重复配置
   sms-code: # 短信验证码相关的配置项

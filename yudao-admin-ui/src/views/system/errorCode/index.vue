@@ -5,7 +5,7 @@
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="100px">
       <el-form-item label="错误码类型" prop="type">
         <el-select v-model="queryParams.type" placeholder="请选择错误码类型" clearable size="small">
-          <el-option v-for="dict in this.getDictDatas(DICT_TYPE.SYS_ERROR_CODE_TYPE)"
+          <el-option v-for="dict in this.getDictDatas(DICT_TYPE.SYSTEM_ERROR_CODE_TYPE)"
                      :key="dict.value" :label="dict.label" :value="dict.value"/>
         </el-select>
       </el-form-item>
@@ -46,7 +46,7 @@
       <el-table-column label="编号" align="center" prop="id" />
       <el-table-column label="类型" align="center" prop="type" width="80">
         <template slot-scope="scope">
-          <span>{{ getDictDataLabel(DICT_TYPE.SYS_ERROR_CODE_TYPE, scope.row.type) }}</span>
+          <span>{{ getDictDataLabel(DICT_TYPE.SYSTEM_ERROR_CODE_TYPE, scope.row.type) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="应用名" align="center" prop="applicationName" width="200" />

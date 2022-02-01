@@ -11,7 +11,7 @@
       </el-form-item>
       <el-form-item label="类型" prop="type">
         <el-select v-model="queryParams.type" placeholder="操作类型" clearable size="small" style="width: 240px">
-          <el-option v-for="dict in this.getDictDatas(DICT_TYPE.SYS_OPERATE_TYPE)" :key="parseInt(dict.value)"
+          <el-option v-for="dict in this.getDictDatas(DICT_TYPE.SYSTEM_OPERATE_TYPE)" :key="parseInt(dict.value)"
                      :label="dict.label" :value="parseInt(dict.value)"/>
         </el-select>
       </el-form-item>
@@ -45,7 +45,7 @@
       <el-table-column label="操作名" align="center" prop="name" width="180" />
       <el-table-column label="操作类型" align="center" prop="type">
         <template slot-scope="scope">
-          <span>{{ getDictDataLabel(DICT_TYPE.SYS_OPERATE_TYPE, scope.row.type) }}</span>
+          <span>{{ getDictDataLabel(DICT_TYPE.SYSTEM_OPERATE_TYPE, scope.row.type) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作人" align="center" prop="userNickname" />
@@ -95,7 +95,7 @@
           </el-col>
           <el-col :span="24">
             <el-form-item label="操作信息：">
-              {{ form.module }} | {{ form.name }} | {{ getDictDataLabel(DICT_TYPE.SYS_OPERATE_TYPE, form.type) }}
+              {{ form.module }} | {{ form.name }} | {{ getDictDataLabel(DICT_TYPE.SYSTEM_OPERATE_TYPE, form.type) }}
               <br /> {{ form.content }}
               <br /> {{ form.exts }}
             </el-form-item>

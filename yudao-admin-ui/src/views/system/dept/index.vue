@@ -104,7 +104,7 @@ import { listDept, getDept, delDept, addDept, updateDept } from "@/api/system/de
 import Treeselect from "@riophae/vue-treeselect";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 
-import {SysCommonStatusEnum} from '@/utils/constants'
+import {CommonStatusEnum} from '@/utils/constants'
 import { getDictDataLabel, getDictDatas, DICT_TYPE } from '@/utils/dict'
 import {listSimpleUsers} from "@/api/system/user";
 
@@ -167,9 +167,9 @@ export default {
       },
 
       // 枚举
-      CommonStatusEnum: SysCommonStatusEnum,
+      CommonStatusEnum: CommonStatusEnum,
       // 数据字典
-      statusDictDatas: getDictDatas(DICT_TYPE.SYS_COMMON_STATUS)
+      statusDictDatas: getDictDatas(DICT_TYPE.COMMON_STATUS)
     };
   },
   created() {
@@ -201,7 +201,7 @@ export default {
     },
     // 字典状态字典翻译
     statusFormat(row, column) {
-      return getDictDataLabel(DICT_TYPE.SYS_COMMON_STATUS, row.status)
+      return getDictDataLabel(DICT_TYPE.COMMON_STATUS, row.status)
     },
     // 用户昵称展示
     userNicknameFormat(row, column) {
@@ -230,7 +230,7 @@ export default {
         leaderUserId: undefined,
         phone: undefined,
         email: undefined,
-        status: SysCommonStatusEnum.ENABLE,
+        status: CommonStatusEnum.ENABLE,
       };
       this.resetForm("form");
     },

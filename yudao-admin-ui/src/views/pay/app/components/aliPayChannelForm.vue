@@ -233,7 +233,7 @@ export default {
       },
       fileAccept: ".crt",
       // 渠道状态 数据字典
-      statusDictDatas: getDictDatas(DICT_TYPE.SYS_COMMON_STATUS),
+      statusDictDatas: getDictDatas(DICT_TYPE.COMMON_STATUS),
       // 支付宝加密方式
       aliPaySignTypeDatas: getDictDatas(DICT_TYPE.PAY_CHANNEL_ALIPAY_SIGN_TYPE),
       // 版本状态 数据字典

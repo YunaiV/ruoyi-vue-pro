@@ -110,7 +110,7 @@
           <el-col :span="12">
             <el-form-item label="菜单状态">
               <el-radio-group v-model="form.status">
-                <el-radio v-for="dict in this.getDictDatas(DICT_TYPE.SYS_COMMON_STATUS)"
+                <el-radio v-for="dict in this.getDictDatas(DICT_TYPE.COMMON_STATUS)"
                           :key="dict.value" :label="parseInt(dict.value)">{{dict.label}}</el-radio>
               </el-radio-group>
             </el-form-item>
@@ -131,7 +131,7 @@ import Treeselect from "@riophae/vue-treeselect";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 import IconSelect from "@/components/IconSelect";
 
-import { SysMenuTypeEnum, SysCommonStatusEnum } from '@/utils/constants'
+import { SystemMenuTypeEnum, CommonStatusEnum } from '@/utils/constants'
 import { getDictDataLabel, getDictDatas, DICT_TYPE } from '@/utils/dict'
 
 export default {
@@ -175,11 +175,11 @@ export default {
       },
 
       // 枚举
-      MenuTypeEnum: SysMenuTypeEnum,
-      CommonStatusEnum: SysCommonStatusEnum,
+      MenuTypeEnum: SystemMenuTypeEnum,
+      CommonStatusEnum: CommonStatusEnum,
       // 数据字典
-      menuTypeDictDatas: getDictDatas(DICT_TYPE.SYS_MENU_TYPE),
-      statusDictDatas: getDictDatas(DICT_TYPE.SYS_COMMON_STATUS)
+      menuTypeDictDatas: getDictDatas(DICT_TYPE.SYSTEM_MENU_TYPE),
+      statusDictDatas: getDictDatas(DICT_TYPE.COMMON_STATUS)
     };
   },
   created() {
@@ -220,7 +220,7 @@ export default {
     },
     // 菜单状态字典翻译
     statusFormat(row, column) {
-      return getDictDataLabel(DICT_TYPE.SYS_COMMON_STATUS, row.status)
+      return getDictDataLabel(DICT_TYPE.COMMON_STATUS, row.status)
     },
     // 取消按钮
     cancel() {
@@ -234,9 +234,9 @@ export default {
         parentId: 0,
         name: undefined,
         icon: undefined,
-        type: SysMenuTypeEnum.DIR,
+        type: SystemMenuTypeEnum.DIR,
         sort: undefined,
-        status: SysCommonStatusEnum.ENABLE
+        status: CommonStatusEnum.ENABLE
       };
       this.resetForm("form");
     },
@@ -276,8 +276,8 @@ export default {
       this.$refs["form"].validate(valid => {
         if (valid) {
           // 若权限类型为目录或者菜单时，进行 path 的校验，避免后续拼接出来的路由无法跳转
-          if (this.form.type === SysMenuTypeEnum.DIR
-            || this.form.type === SysMenuTypeEnum.MENU) {
+          if (this.form.type === SystemMenuTypeEnum.DIR
+            || this.form.type === SystemMenuTypeEnum.MENU) {
             // 如果是外链，则不进行校验
             const path = this.form.path
             if (path.indexOf('http://') === -1 || path.indexOf('https://') === -1) {

@@ -189,7 +189,7 @@ export default {
       },
       fileAccept: ".pem",
       // 渠道状态 数据字典
-      statusDictDatas: getDictDatas(DICT_TYPE.SYS_COMMON_STATUS),
+      statusDictDatas: getDictDatas(DICT_TYPE.COMMON_STATUS),
       versionDictDatas: getDictDatas(DICT_TYPE.PAY_CHANNEL_WECHAT_VERSION),
     }
   },

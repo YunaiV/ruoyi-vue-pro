@@ -263,8 +263,8 @@ import {getMerchantListByName} from "@/api/pay/merchant";
 import {getAppListByMerchantId} from "@/api/pay/app";
 import {DICT_TYPE, getDictDatas} from "@/utils/dict";
 import {
-  payOrderRefundStatusEnum,
-  payRefundStatusEnum
+  PayOrderRefundStatusEnum,
+  PayRefundStatusEnum
 } from "@/utils/constants";
 import {getNowDateTime} from "@/utils/ruoyi";
 
@@ -469,11 +469,11 @@ export default {
      */
     findByRefundTypeGetStyle(refundType) {
       switch (refundType) {
-        case payOrderRefundStatusEnum.NO.status:
+        case PayOrderRefundStatusEnum.NO.status:
           return "success";
-        case payOrderRefundStatusEnum.SOME.status:
+        case PayOrderRefundStatusEnum.SOME.status:
           return "warning";
-        case payOrderRefundStatusEnum.ALL.status:
+        case PayOrderRefundStatusEnum.ALL.status:
           return "danger";
       }
     },
@@ -483,17 +483,17 @@ export default {
      */
     findByRefundStatusGetStyle(refundStatus) {
       switch (refundStatus) {
-        case payRefundStatusEnum.CREATE.status:
+        case PayRefundStatusEnum.CREATE.status:
           return "info";
-        case payRefundStatusEnum.SUCCESS.status:
+        case PayRefundStatusEnum.SUCCESS.status:
           return "success";
-        case payRefundStatusEnum.FAILURE.status:
-        case payRefundStatusEnum.CLOSE.status:
+        case PayRefundStatusEnum.FAILURE.status:
+        case PayRefundStatusEnum.CLOSE.status:
           return "danger";
-        case payRefundStatusEnum.PROCESSING_NOTIFY.status:
-        case payRefundStatusEnum.PROCESSING_QUERY.status:
-        case payRefundStatusEnum.UNKNOWN_RETRY.status:
-        case payRefundStatusEnum.UNKNOWN_QUERY.status:
+        case PayRefundStatusEnum.PROCESSING_NOTIFY.status:
+        case PayRefundStatusEnum.PROCESSING_QUERY.status:
+        case PayRefundStatusEnum.UNKNOWN_RETRY.status:
+        case PayRefundStatusEnum.UNKNOWN_QUERY.status:
           return "warning";
       }
     },

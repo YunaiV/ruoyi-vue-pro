@@ -42,7 +42,7 @@
             </el-form-item>
             <el-form-item label="开启状态" prop="status">
               <el-radio-group v-model="form.status">
-                <el-radio v-for="dict in this.getDictDatas(DICT_TYPE.SYS_COMMON_STATUS)"
+                <el-radio v-for="dict in this.getDictDatas(DICT_TYPE.COMMON_STATUS)"
                           :key="dict.value" :label="parseInt(dict.value)">{{dict.label}}</el-radio>
               </el-radio-group>
             </el-form-item>
@@ -167,7 +167,7 @@ import {
   getDrawingList, saveDrawingList, getIdGlobal, saveIdGlobal, getFormConf
 } from '@/utils/db'
 import loadBeautifier from '@/utils/loadBeautifier'
-import {SysCommonStatusEnum} from "@/utils/constants";
+import {CommonStatusEnum} from "@/utils/constants";
 import {createForm, getForm, updateForm} from "@/api/bpm/form";
 import {decodeFields} from "@/utils/formGenerator";
 
@@ -232,7 +232,7 @@ export default {
 
       // 表单参数
       form: {
-        status: SysCommonStatusEnum.ENABLE,
+        status: CommonStatusEnum.ENABLE,
       },
       // 表单校验
       rules: {

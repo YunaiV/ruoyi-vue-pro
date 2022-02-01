@@ -249,7 +249,7 @@ import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 import {listSimpleDepts} from "@/api/system/dept";
 import {listSimplePosts} from "@/api/system/post";
 
-import {SysCommonStatusEnum} from "@/utils/constants";
+import {CommonStatusEnum} from "@/utils/constants";
 import {DICT_TYPE, getDictDatas} from "@/utils/dict";
 import {assignUserRole, listUserRoles} from "@/api/system/permission";
 import {listSimpleRoles} from "@/api/system/role";
@@ -347,10 +347,10 @@ export default {
       openRole: false,
 
       // 枚举
-      SysCommonStatusEnum: SysCommonStatusEnum,
+      SysCommonStatusEnum: CommonStatusEnum,
       // 数据字典
-      statusDictDatas: getDictDatas(DICT_TYPE.SYS_COMMON_STATUS),
-      sexDictDatas: getDictDatas(DICT_TYPE.SYS_USER_SEX),
+      statusDictDatas: getDictDatas(DICT_TYPE.COMMON_STATUS),
+      sexDictDatas: getDictDatas(DICT_TYPE.SYSTEM_USER_SEX),
     };
   },
   watch: {
@@ -424,7 +424,7 @@ export default {
     },
     // 用户状态修改
     handleStatusChange(row) {
-      let text = row.status === SysCommonStatusEnum.ENABLE ? "启用" : "停用";
+      let text = row.status === CommonStatusEnum.ENABLE ? "启用" : "停用";
       this.$confirm('确认要"' + text + '""' + row.username + '"用户吗?', "警告", {
           confirmButtonText: "确定",
           cancelButtonText: "取消",
@@ -434,8 +434,8 @@ export default {
         }).then(() => {
           this.msgSuccess(text + "成功");
         }).catch(function() {
-          row.status = row.status === SysCommonStatusEnum.ENABLE ? SysCommonStatusEnum.DISABLE
-              : SysCommonStatusEnum.ENABLE;
+          row.status = row.status === CommonStatusEnum.ENABLE ? CommonStatusEnum.DISABLE
+              : CommonStatusEnum.ENABLE;
         });
     },
     // 取消按钮

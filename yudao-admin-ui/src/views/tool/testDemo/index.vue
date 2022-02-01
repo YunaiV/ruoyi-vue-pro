@@ -8,19 +8,19 @@
       </el-form-item>
       <el-form-item label="状态" prop="status">
         <el-select v-model="queryParams.status" placeholder="请选择状态" clearable size="small">
-          <el-option v-for="dict in this.getDictDatas(DICT_TYPE.SYS_COMMON_STATUS)"
+          <el-option v-for="dict in this.getDictDatas(DICT_TYPE.COMMON_STATUS)"
                      :key="dict.value" :label="dict.label" :value="dict.value"/>
         </el-select>
       </el-form-item>
       <el-form-item label="类型" prop="type">
         <el-select v-model="queryParams.type" placeholder="请选择类型" clearable size="small">
-          <el-option v-for="dict in this.getDictDatas(DICT_TYPE.SYS_OPERATE_TYPE)"
+          <el-option v-for="dict in this.getDictDatas(DICT_TYPE.SYSTEM_OPERATE_TYPE)"
                      :key="dict.value" :label="dict.label" :value="dict.value"/>
         </el-select>
       </el-form-item>
       <el-form-item label="分类" prop="category">
         <el-select v-model="queryParams.category" placeholder="请选择分类" clearable size="small">
-          <el-option v-for="dict in this.getDictDatas(DICT_TYPE.INF_REDIS_TIMEOUT_TYPE)"
+          <el-option v-for="dict in this.getDictDatas(DICT_TYPE.INFRA_REDIS_TIMEOUT_TYPE)"
                      :key="dict.value" :label="dict.label" :value="dict.value"/>
         </el-select>
       </el-form-item>
@@ -61,17 +61,17 @@
       <el-table-column label="名字" align="center" prop="name" />
       <el-table-column label="状态" align="center" prop="status">
         <template slot-scope="scope">
-          <span>{{ getDictDataLabel(DICT_TYPE.SYS_COMMON_STATUS, scope.row.status) }}</span>
+          <span>{{ getDictDataLabel(DICT_TYPE.COMMON_STATUS, scope.row.status) }}</span>
         </template>
       </el-table-column>>
       <el-table-column label="类型" align="center" prop="type">
         <template slot-scope="scope">
-          <span>{{ getDictDataLabel(DICT_TYPE.SYS_OPERATE_TYPE, scope.row.type) }}</span>
+          <span>{{ getDictDataLabel(DICT_TYPE.SYSTEM_OPERATE_TYPE, scope.row.type) }}</span>
         </template>
       </el-table-column>>
       <el-table-column label="分类" align="center" prop="category">
         <template slot-scope="scope">
-          <span>{{ getDictDataLabel(DICT_TYPE.INF_REDIS_TIMEOUT_TYPE, scope.row.category) }}</span>
+          <span>{{ getDictDataLabel(DICT_TYPE.INFRA_REDIS_TIMEOUT_TYPE, scope.row.category) }}</span>
         </template>
       </el-table-column>>
       <el-table-column label="备注" align="center" prop="remark" />
@@ -101,19 +101,19 @@
         </el-form-item>
         <el-form-item label="状态">
           <el-radio-group v-model="form.status">
-            <el-radio v-for="dict in this.getDictDatas(DICT_TYPE.SYS_COMMON_STATUS)"
+            <el-radio v-for="dict in this.getDictDatas(DICT_TYPE.COMMON_STATUS)"
                       :key="dict.value" :label="parseInt(dict.value)">{{dict.label}}</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="类型" prop="type">
           <el-select v-model="form.type" placeholder="请选择类型">
-            <el-option v-for="dict in this.getDictDatas(DICT_TYPE.SYS_OPERATE_TYPE)"
+            <el-option v-for="dict in this.getDictDatas(DICT_TYPE.SYSTEM_OPERATE_TYPE)"
                        :key="dict.value" :label="dict.label" :value="parseInt(dict.value)" />
           </el-select>
         </el-form-item>
         <el-form-item label="分类">
           <el-radio-group v-model="form.category">
-            <el-radio v-for="dict in this.getDictDatas(DICT_TYPE.INF_REDIS_TIMEOUT_TYPE)"
+            <el-radio v-for="dict in this.getDictDatas(DICT_TYPE.INFRA_REDIS_TIMEOUT_TYPE)"
                       :key="dict.value" :label="parseInt(dict.value)">{{dict.label}}</el-radio>
           </el-radio-group>
         </el-form-item>

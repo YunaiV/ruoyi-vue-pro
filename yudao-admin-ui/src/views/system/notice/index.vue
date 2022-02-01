@@ -100,7 +100,7 @@
 import { listNotice, getNotice, delNotice, addNotice, updateNotice } from "@/api/system/notice";
 import Editor from '@/components/Editor';
 
-import {SysCommonStatusEnum} from '@/utils/constants'
+import {CommonStatusEnum} from '@/utils/constants'
 import { getDictDataLabel, getDictDatas, DICT_TYPE } from '@/utils/dict'
 
 export default {
@@ -143,10 +143,10 @@ export default {
       },
 
       // 枚举
-      CommonStatusEnum: SysCommonStatusEnum,
+      CommonStatusEnum: CommonStatusEnum,
       // 数据字典
-      noticeTypeDictDatas: getDictDatas(DICT_TYPE.SYS_NOTICE_TYPE),
-      statusDictDatas: getDictDatas(DICT_TYPE.SYS_COMMON_STATUS)
+      noticeTypeDictDatas: getDictDatas(DICT_TYPE.SYSTEM_NOTICE_TYPE),
+      statusDictDatas: getDictDatas(DICT_TYPE.COMMON_STATUS)
     };
   },
   created() {
@@ -164,11 +164,11 @@ export default {
     },
     // 公告状态字典翻译
     statusFormat(row, column) {
-      return getDictDataLabel(DICT_TYPE.SYS_COMMON_STATUS, row.status)
+      return getDictDataLabel(DICT_TYPE.COMMON_STATUS, row.status)
     },
     // 公告状态字典翻译
     typeFormat(row, column) {
-      return getDictDataLabel(DICT_TYPE.SYS_NOTICE_TYPE, row.type)
+      return getDictDataLabel(DICT_TYPE.SYSTEM_NOTICE_TYPE, row.type)
     },
     // 取消按钮
     cancel() {
@@ -182,7 +182,7 @@ export default {
         title: undefined,
         type: undefined,
         content: undefined,
-        status: SysCommonStatusEnum.ENABLE
+        status: CommonStatusEnum.ENABLE
       };
       this.resetForm("form");
     },

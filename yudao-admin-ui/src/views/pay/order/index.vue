@@ -249,7 +249,7 @@ import {getOrder, getOrderPage, exportOrderExcel} from "@/api/pay/order";
 import {getMerchantListByName} from "@/api/pay/merchant";
 import {getAppListByMerchantId} from "@/api/pay/app";
 import {DICT_TYPE, getDictDatas} from "@/utils/dict";
-import {payOrderNotifyStatusEnum, payOrderRefundStatusEnum, payOrderStatusEnum} from "@/utils/constants";
+import {PayOrderNotifyStatusEnum, PayOrderRefundStatusEnum, PayOrderStatusEnum} from "@/utils/constants";
 import { getNowDateTime} from "@/utils/ruoyi";
 
 const defaultOrderDetail = {
@@ -417,36 +417,36 @@ export default {
           this.orderDetail.payOrderExtension = Object.assign(defaultOrderDetail.payOrderExtension, {});
         }
         switch (this.orderDetail.status) {
-          case payOrderStatusEnum.WAITING.status:
+          case PayOrderStatusEnum.WAITING.status:
             this.statusType = "info";
             break;
-          case payOrderStatusEnum.SUCCESS.status:
+          case PayOrderStatusEnum.SUCCESS.status:
             this.statusType = "success";
             break;
-          case payOrderStatusEnum.CLOSED.status:
+          case PayOrderStatusEnum.CLOSED.status:
             this.statusType = "danger";
             break;
         }
         switch (this.orderDetail.notifyStatus) {
-          case payOrderNotifyStatusEnum.NO.status:
+          case PayOrderNotifyStatusEnum.NO.status:
             this.notifyStatusType = "info";
             break;
-          case payOrderNotifyStatusEnum.SUCCESS.status:
+          case PayOrderNotifyStatusEnum.SUCCESS.status:
             this.notifyStatusType = "success";
             break;
-          case payOrderNotifyStatusEnum.FAILURE.status:
+          case PayOrderNotifyStatusEnum.FAILURE.status:
             this.notifyStatusType = "danger";
             break;
         }
 
         switch (this.orderDetail.refundStatus) {
-          case payOrderRefundStatusEnum.NO.status:
+          case PayOrderRefundStatusEnum.NO.status:
             this.refundStatusType = "success";
             break;
-          case payOrderRefundStatusEnum.SOME.status:
+          case PayOrderRefundStatusEnum.SOME.status:
             this.refundStatusType = "warning";
             break;
-          case payOrderRefundStatusEnum.ALL.status:
+          case PayOrderRefundStatusEnum.ALL.status:
             this.refundStatusType = "danger";
             break;
         }

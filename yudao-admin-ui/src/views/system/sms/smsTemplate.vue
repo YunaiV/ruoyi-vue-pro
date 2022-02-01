@@ -5,13 +5,13 @@
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="150px">
       <el-form-item label="短信类型" prop="type">
         <el-select v-model="queryParams.type" placeholder="请选择短信类型" clearable size="small">
-          <el-option v-for="dict in this.getDictDatas(DICT_TYPE.SYS_SMS_TEMPLATE_TYPE)"
+          <el-option v-for="dict in this.getDictDatas(DICT_TYPE.SYSTEM_SMS_TEMPLATE_TYPE)"
                      :key="dict.value" :label="dict.label" :value="dict.value"/>
         </el-select>
       </el-form-item>
       <el-form-item label="开启状态" prop="status">
         <el-select v-model="queryParams.status" placeholder="请选择开启状态" clearable size="small">
-          <el-option v-for="dict in this.getDictDatas(DICT_TYPE.SYS_COMMON_STATUS)"
+          <el-option v-for="dict in this.getDictDatas(DICT_TYPE.COMMON_STATUS)"
                      :key="dict.value" :label="dict.label" :value="dict.value"/>
         </el-select>
       </el-form-item>
@@ -25,7 +25,7 @@
         <el-select v-model="queryParams.channelId" placeholder="请选择短信渠道" clearable size="small">
           <el-option v-for="channel in channelOptions"
                      :key="channel.id" :value="channel.id"
-                     :label="channel.signature + '【' + getDictDataLabel(DICT_TYPE.SYS_SMS_CHANNEL_CODE, channel.code) + '】'" />
+                     :label="channel.signature + '【' + getDictDataLabel(DICT_TYPE.SYSTEM_SMS_CHANNEL_CODE, channel.code) + '】'" />
         </el-select>
       </el-form-item>
       <el-form-item label="创建时间">
@@ -58,12 +58,12 @@
       <el-table-column label="模板内容" align="center" prop="content" width="300" />
       <el-table-column label="短信类型" align="center" prop="type">
         <template slot-scope="scope">
-          <span>{{ getDictDataLabel(DICT_TYPE.SYS_SMS_TEMPLATE_TYPE, scope.row.type) }}</span>
+          <span>{{ getDictDataLabel(DICT_TYPE.SYSTEM_SMS_TEMPLATE_TYPE, scope.row.type) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="开启状态" align="center" prop="status">
         <template slot-scope="scope">
-          <span>{{ getDictDataLabel(DICT_TYPE.SYS_COMMON_STATUS, scope.row.status) }}</span>
+          <span>{{ getDictDataLabel(DICT_TYPE.COMMON_STATUS, scope.row.status) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="备注" align="center" prop="remark" />
@@ -71,7 +71,7 @@
       <el-table-column label="短信渠道" align="center" width="120">
         <template slot-scope="scope">
           <div>{{ formatChannelSignature(scope.row.channelId) }}</div>
-          <div>【{{ getDictDataLabel(DICT_TYPE.SYS_SMS_CHANNEL_CODE, scope.row.channelCode) }}】</div>
+          <div>【{{ getDictDataLabel(DICT_TYPE.SYSTEM_SMS_CHANNEL_CODE, scope.row.channelCode) }}】</div>
         </template>
       </el-table-column>
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
@@ -101,12 +101,12 @@
           <el-select v-model="form.channelId" placeholder="请选择短信渠道编号">
             <el-option v-for="channel in channelOptions"
                        :key="channel.id" :value="channel.id"
-                       :label="channel.signature + '【' + getDictDataLabel(DICT_TYPE.SYS_SMS_CHANNEL_CODE, channel.code) + '】'" />
+                       :label="channel.signature + '【' + getDictDataLabel(DICT_TYPE.SYSTEM_SMS_CHANNEL_CODE, channel.code) + '】'" />
           </el-select>
         </el-form-item>
         <el-form-item label="短信类型" prop="type">
           <el-select v-model="form.type" placeholder="请选择短信类型">
-            <el-option v-for="dict in this.getDictDatas(DICT_TYPE.SYS_SMS_TEMPLATE_TYPE)"
+            <el-option v-for="dict in this.getDictDatas(DICT_TYPE.SYSTEM_SMS_TEMPLATE_TYPE)"
                        :key="dict.value" :label="dict.label" :value="parseInt(dict.value)" />
           </el-select>
         </el-form-item>
@@ -121,7 +121,7 @@
         </el-form-item>
         <el-form-item label="开启状态" prop="status">
           <el-radio-group v-model="form.status">
-            <el-radio v-for="dict in this.getDictDatas(DICT_TYPE.SYS_COMMON_STATUS)"
+            <el-radio v-for="dict in this.getDictDatas(DICT_TYPE.COMMON_STATUS)"
                       :key="dict.value" :label="parseInt(dict.value)">{{dict.label}}</el-radio>
           </el-radio-group>
         </el-form-item>

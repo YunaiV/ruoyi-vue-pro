@@ -12,7 +12,7 @@
       <el-form-item label="系统内置" prop="type">
         <el-select v-model="queryParams.type" placeholder="系统内置" clearable size="small">
           <el-option
-              v-for="dict in this.getDictDatas(DICT_TYPE.SYS_CONFIG_TYPE)"
+              v-for="dict in this.getDictDatas(DICT_TYPE.INFRA_CONFIG_TYPE)"
               :key="parseInt(dict.value)"
               :label="dict.label"
               :value="parseInt(dict.value)"
@@ -67,7 +67,7 @@
       <el-table-column label="参数键值" align="center" prop="value" />
       <el-table-column label="系统内置" align="center" prop="type">
         <template slot-scope="scope">
-          <span>{{ getDictDataLabel(DICT_TYPE.SYS_CONFIG_TYPE, scope.row.type) }}</span>
+          <span>{{ getDictDataLabel(DICT_TYPE.INFRA_CONFIG_TYPE, scope.row.type) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="是否敏感" align="center" prop="sensitive">

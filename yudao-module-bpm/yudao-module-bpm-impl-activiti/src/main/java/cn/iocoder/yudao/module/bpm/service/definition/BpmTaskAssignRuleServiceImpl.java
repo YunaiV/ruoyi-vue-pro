@@ -9,6 +9,7 @@ import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.rule.BpmTaskAs
 import cn.iocoder.yudao.module.bpm.convert.definition.BpmTaskAssignRuleConvert;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmTaskAssignRuleDO;
 import cn.iocoder.yudao.module.bpm.dal.mysql.definition.BpmTaskAssignRuleMapper;
+import cn.iocoder.yudao.module.bpm.enums.DictTypeConstants;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmTaskAssignRuleTypeEnum;
 import cn.iocoder.yudao.framework.activiti.core.util.ActivitiUtils;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
@@ -18,7 +19,6 @@ import cn.iocoder.yudao.module.system.api.dept.PostApi;
 import cn.iocoder.yudao.module.system.api.dict.DictDataApi;
 import cn.iocoder.yudao.module.system.api.permission.RoleApi;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
-import cn.iocoder.yudao.module.system.enums.DictTypeConstants;
 import lombok.extern.slf4j.Slf4j;
 import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.bpmn.model.UserTask;
@@ -186,7 +186,7 @@ public class BpmTaskAssignRuleServiceImpl implements BpmTaskAssignRuleService {
         } else if (Objects.equals(type, BpmTaskAssignRuleTypeEnum.USER_GROUP.getType())) {
             userGroupService.validUserGroups(options);
         } else if (Objects.equals(type, BpmTaskAssignRuleTypeEnum.SCRIPT.getType())) {
-            dictDataApi.validDictDatas(DictTypeConstants.BPM_TASK_ASSIGN_SCRIPT,
+            dictDataApi.validDictDatas(DictTypeConstants.TASK_ASSIGN_SCRIPT,
                     CollectionUtils.convertSet(options, String::valueOf));
         } else {
             throw new IllegalArgumentException(StrUtil.format("未知的规则类型({})", type));

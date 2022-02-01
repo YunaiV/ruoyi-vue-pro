@@ -93,7 +93,7 @@
 <script>
 import { listType, getType, delType, addType, updateType, exportType } from "@/api/system/dict/type";
 
-import { SysCommonStatusEnum } from '@/utils/constants'
+import { CommonStatusEnum } from '@/utils/constants'
 import { getDictDataLabel, getDictDatas, DICT_TYPE } from '@/utils/dict'
 
 export default {
@@ -137,9 +137,9 @@ export default {
       },
 
       // 枚举
-      CommonStatusEnum: SysCommonStatusEnum,
+      CommonStatusEnum: CommonStatusEnum,
       // 数据字典
-      statusDictDatas: getDictDatas(DICT_TYPE.SYS_COMMON_STATUS)
+      statusDictDatas: getDictDatas(DICT_TYPE.COMMON_STATUS)
     };
   },
   created() {
@@ -161,7 +161,7 @@ export default {
     },
     // 字典状态字典翻译
     statusFormat(row, column) {
-      return getDictDataLabel(DICT_TYPE.SYS_COMMON_STATUS, row.status)
+      return getDictDataLabel(DICT_TYPE.COMMON_STATUS, row.status)
     },
     // 取消按钮
     cancel() {
@@ -174,7 +174,7 @@ export default {
         id: undefined,
         name: undefined,
         type: undefined,
-        status: SysCommonStatusEnum.ENABLE,
+        status: CommonStatusEnum.ENABLE,
         remark: undefined
       };
       this.resetForm("form");

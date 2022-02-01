@@ -74,7 +74,7 @@
       <el-table-column prop="valueType" label="Value 类型" />
       <el-table-column prop="timeoutType" label="超时时间" width="150">
         <template slot-scope="scope">
-          {{ getDictDataLabel(DICT_TYPE.INF_REDIS_TIMEOUT_TYPE, scope.row.timeoutType) }}
+          {{ getDictDataLabel(DICT_TYPE.INFRA_REDIS_TIMEOUT_TYPE, scope.row.timeoutType) }}
           <span v-if="scope.row.timeout > 0">({{ scope.row.timeout / 1000 }} 秒)</span>
         </template>
       </el-table-column>

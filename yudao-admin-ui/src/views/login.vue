@@ -54,7 +54,7 @@ import { getCodeImg,socialAuthRedirect } from "@/api/login";
 import { getTenantIdByName } from "@/api/system/tenant";
 import Cookies from "js-cookie";
 import { encrypt, decrypt } from '@/utils/jsencrypt'
-import {InfApiErrorLogProcessStatusEnum, SysUserSocialTypeEnum} from "@/utils/constants";
+import {InfraApiErrorLogProcessStatusEnum, SystemUserSocialTypeEnum} from "@/utils/constants";
 
 export default {
   name: "Login",
@@ -100,7 +100,7 @@ export default {
       loading: false,
       redirect: undefined,
       // 枚举
-      SysUserSocialTypeEnum: SysUserSocialTypeEnum,
+      SysUserSocialTypeEnum: SystemUserSocialTypeEnum,
     };
   },
   // watch: {

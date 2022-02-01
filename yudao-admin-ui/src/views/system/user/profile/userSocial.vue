@@ -22,7 +22,7 @@
 
 <script>
 
-import {SysUserSocialTypeEnum} from "@/utils/constants";
+import {SystemUserSocialTypeEnum} from "@/utils/constants";
 import {socialAuthRedirect, socialBind, socialUnbind} from "@/api/login";
 
 export default {
@@ -44,8 +44,8 @@ export default {
   computed: {
     socialUsers (){
       const socialUsers = [];
-      for (const i in SysUserSocialTypeEnum) {
-        const socialUser = {...SysUserSocialTypeEnum[i]};
+      for (const i in SystemUserSocialTypeEnum) {
+        const socialUser = {...SystemUserSocialTypeEnum[i]};
         socialUsers.push(socialUser);
         if (this.user.socialUsers) {
           for (const j in this.user.socialUsers) {

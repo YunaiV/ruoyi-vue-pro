@@ -27,7 +27,7 @@
       <el-table-column label="表单名" align="center" prop="name" />
       <el-table-column label="开启状态" align="center" prop="status">
         <template slot-scope="scope">
-          <span>{{ getDictDataLabel(DICT_TYPE.SYS_COMMON_STATUS, scope.row.status) }}</span>
+          <span>{{ getDictDataLabel(DICT_TYPE.COMMON_STATUS, scope.row.status) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="备注" align="center" prop="remark" />

@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.infra.controller.admin.doc;
+package cn.iocoder.yudao.module.tool.controller.admin.doc;
 
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.IdUtil;
@@ -25,11 +25,12 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collections;
 
 @Api(tags = "管理后台 - 数据库文档")
 @RestController
-@RequestMapping("/infra/db-doc")
+@RequestMapping("/tool/db-doc")
 public class DbDocController {
 
     @Resource
@@ -43,7 +44,8 @@ public class DbDocController {
 
     @GetMapping("/export-html")
     @ApiOperation("导出 html 格式的数据文档")
-    @ApiImplicitParam(name = "deleteFile", value = "是否删除在服务器本地生成的数据库文档", example = "true", dataTypeClass = Boolean.class)
+    @ApiImplicitParam(name = "deleteFile", value = "是否删除在服务器本地生成的数据库文档", example = "true",
+            dataTypeClass = Boolean.class)
     public void exportHtml(@RequestParam(defaultValue = "true") Boolean deleteFile,
                            HttpServletResponse response) throws IOException {
         doExportFile(EngineFileType.HTML, deleteFile, response);
@@ -51,7 +53,8 @@ public class DbDocController {
 
     @GetMapping("/export-word")
     @ApiOperation("导出 word 格式的数据文档")
-    @ApiImplicitParam(name = "deleteFile", value = "是否删除在服务器本地生成的数据库文档", example = "true", dataTypeClass = Boolean.class)
+    @ApiImplicitParam(name = "deleteFile", value = "是否删除在服务器本地生成的数据库文档", example = "true",
+            dataTypeClass = Boolean.class)
     public void exportWord(@RequestParam(defaultValue = "true") Boolean deleteFile,
                            HttpServletResponse response) throws IOException {
         doExportFile(EngineFileType.WORD, deleteFile, response);
@@ -59,7 +62,8 @@ public class DbDocController {
 
     @GetMapping("/export-markdown")
     @ApiOperation("导出 markdown 格式的数据文档")
-    @ApiImplicitParam(name = "deleteFile", value = "是否删除在服务器本地生成的数据库文档", example = "true", dataTypeClass = Boolean.class)
+    @ApiImplicitParam(name = "deleteFile", value = "是否删除在服务器本地生成的数据库文档", example = "true",
+            dataTypeClass = Boolean.class)
     public void exportMarkdown(@RequestParam(defaultValue = "true") Boolean deleteFile,
                                HttpServletResponse response) throws IOException {
         doExportFile(EngineFileType.MD, deleteFile, response);
@@ -136,7 +140,7 @@ public class DbDocController {
                 .fileOutputDir(FILE_OUTPUT_DIR) // 生成文件路径
                 .openOutputDir(false) // 打开目录
                 .fileType(fileOutputType) // 文件类型
-                .produceType(EngineTemplateType.freemarker) // 文件类型
+                .produceType(EngineTemplateType.velocity) // 文件类型
                 .fileName(docFileName) // 自定义文件名称
                 .build();
     }
@@ -147,7 +151,7 @@ public class DbDocController {
      */
     private static ProcessConfig buildProcessConfig() {
         return ProcessConfig.builder()
-                .ignoreTablePrefix(Collections.singletonList("QRTZ_")) // 忽略表前缀
+                .ignoreTablePrefix(Arrays.asList("QRTZ_", "ACT_")) // 忽略表前缀
                 .build();
     }
 

@@ -7,7 +7,7 @@
 /**
  * 全局通用状态枚举
  */
-export const SysCommonStatusEnum = {
+export const CommonStatusEnum = {
   ENABLE: 0, // 开启
   DISABLE: 1 // 禁用
 }
@@ -15,7 +15,7 @@ export const SysCommonStatusEnum = {
 /**
  * 菜单的类型枚举
  */
-export const SysMenuTypeEnum = {
+export const SystemMenuTypeEnum = {
   DIR: 1, // 目录
   MENU: 2, // 菜单
   BUTTON: 3 // 按钮
@@ -24,7 +24,7 @@ export const SysMenuTypeEnum = {
 /**
  * 角色的类型枚举
  */
-export const SysRoleTypeEnum = {
+export const SystemRoleTypeEnum = {
   SYSTEM: 1, // 内置角色
   CUSTOM: 2 // 自定义角色
 }
@@ -32,7 +32,7 @@ export const SysRoleTypeEnum = {
 /**
  * 数据权限的范围枚举
  */
-export const SysDataScopeEnum = {
+export const SystemDataScopeEnum = {
   ALL: 1, // 全部数据权限
   DEPT_CUSTOM: 2, // 指定部门数据权限
   DEPT_ONLY: 3, // 部门数据权限
@@ -52,7 +52,7 @@ export const ToolCodegenTemplateTypeEnum = {
 /**
  * 任务状态的枚举
  */
-export const InfJobStatusEnum = {
+export const InfraJobStatusEnum = {
   INIT: 0, // 初始化中
   NORMAL: 1, // 运行中
   STOP: 2, // 暂停运行
@@ -61,7 +61,7 @@ export const InfJobStatusEnum = {
 /**
  * API 异常数据的处理状态
  */
-export const InfApiErrorLogProcessStatusEnum = {
+export const InfraApiErrorLogProcessStatusEnum = {
   INIT: 0, // 未处理
   DONE: 1, // 已处理
   IGNORE: 2, // 已忽略
@@ -70,7 +70,7 @@ export const InfApiErrorLogProcessStatusEnum = {
 /**
  * 用户的社交平台的类型枚举
  */
-export const SysUserSocialTypeEnum = {
+export const SystemUserSocialTypeEnum = {
   // GITEE: {
   //   title: "码云",
   //   type: 10,
@@ -136,7 +136,7 @@ export const PayType = {
 /**
  * 支付订单状态枚举
  */
-export const payOrderStatusEnum = {
+export const PayOrderStatusEnum = {
   WAITING: {
     status: 0,
     name: '未支付'
@@ -154,7 +154,7 @@ export const payOrderStatusEnum = {
 /**
  * 支付订单回调状态枚举
  */
-export const payOrderNotifyStatusEnum = {
+export const PayOrderNotifyStatusEnum = {
   NO: {
     status: 0,
     name: '未通知'
@@ -172,7 +172,7 @@ export const payOrderNotifyStatusEnum = {
 /**
  * 支付订单退款状态枚举
  */
-export const payOrderRefundStatusEnum = {
+export const PayOrderRefundStatusEnum = {
   NO: {
     status: 0,
     name: '未退款'
@@ -190,7 +190,7 @@ export const payOrderRefundStatusEnum = {
 /**
  * 支付退款订单状态枚举
  */
-export const payRefundStatusEnum = {
+export const PayRefundStatusEnum = {
   CREATE:{
     status:0,
     name: '退款订单生成'

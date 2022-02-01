@@ -87,7 +87,7 @@
 <script>
 import { listPost, getPost, delPost, addPost, updatePost, exportPost } from "@/api/system/post";
 
-import {SysCommonStatusEnum} from '@/utils/constants'
+import {CommonStatusEnum} from '@/utils/constants'
 import { getDictDataLabel, getDictDatas, DICT_TYPE } from '@/utils/dict'
 
 export default {
@@ -132,9 +132,9 @@ export default {
       },
 
       // 枚举
-      CommonStatusEnum: SysCommonStatusEnum,
+      CommonStatusEnum: CommonStatusEnum,
       // 数据字典
-      statusDictDatas: getDictDatas(DICT_TYPE.SYS_COMMON_STATUS)
+      statusDictDatas: getDictDatas(DICT_TYPE.COMMON_STATUS)
     };
   },
   created() {
@@ -152,7 +152,7 @@ export default {
     },
     // 岗位状态字典翻译
     statusFormat(row, column) {
-      return getDictDataLabel(DICT_TYPE.SYS_COMMON_STATUS, row.status)
+      return getDictDataLabel(DICT_TYPE.COMMON_STATUS, row.status)
     },
     // 取消按钮
     cancel() {
@@ -166,7 +166,7 @@ export default {
         code: undefined,
         name: undefined,
         sort: 0,
-        status: SysCommonStatusEnum.ENABLE,
+        status: CommonStatusEnum.ENABLE,
         remark: undefined
       };
       this.resetForm("form");
