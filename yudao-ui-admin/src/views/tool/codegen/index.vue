@@ -3,34 +3,16 @@
     <!-- 操作工作栏 -->
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
       <el-form-item label="表名称" prop="tableName">
-        <el-input
-          v-model="queryParams.tableName"
-          placeholder="请输入表名称"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
+        <el-input v-model="queryParams.tableName" placeholder="请输入表名称" clearable size="small"
+                  @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item label="表描述" prop="tableComment">
-        <el-input
-          v-model="queryParams.tableComment"
-          placeholder="请输入表描述"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
+        <el-input v-model="queryParams.tableComment" placeholder="请输入表描述" clearable size="small"
+                  @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item label="创建时间">
-        <el-date-picker
-          v-model="dateRange"
-          size="small"
-          style="width: 240px"
-          value-format="yyyy-MM-dd"
-          type="daterange"
-          range-separator="-"
-          start-placeholder="开始日期"
-          end-placeholder="结束日期"
-        ></el-date-picker>
+        <el-date-picker v-model="dateRange" size="small" style="width: 240px" value-format="yyyy-MM-dd" type="daterange"
+                        range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期"/>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
@@ -79,11 +61,11 @@
     <!-- 预览界面 -->
     <el-dialog :title="preview.title" :visible.sync="preview.open" width="90%" top="5vh" append-to-body>
       <el-row>
-        <el-col :span="7">
+        <el-col :span="9">
           <el-tree :data="preview.fileTree" :expand-on-click-node="false" default-expand-all highlight-current
                    @node-click="handleNodeClick"/>
         </el-col>
-        <el-col :span="17">
+        <el-col :span="15">
           <el-tabs v-model="preview.activeName">
             <el-tab-pane v-for="item in preview.data" :label="item.filePath.substring(item.filePath.lastIndexOf('/') + 1)"
                          :name="item.filePath" :key="item.filePath">
@@ -252,7 +234,6 @@ export default {
       previewCodegen(row.id).then(response => {
         this.preview.data = response.data;
         let files = this.handleFiles(response.data);
-        // console.log(files)
         this.preview.fileTree = this.handleTree(files, "id", "parentId", "children",
             "/"); // "/" 为根节点
         // console.log(this.preview.fileTree)

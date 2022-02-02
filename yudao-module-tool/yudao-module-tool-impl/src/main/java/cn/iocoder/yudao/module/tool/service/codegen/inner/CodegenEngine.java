@@ -1,6 +1,8 @@
 package cn.iocoder.yudao.module.tool.service.codegen.inner;
 
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.template.TemplateConfig;
 import cn.hutool.extra.template.TemplateEngine;
@@ -10,6 +12,7 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.framework.tenant.core.db.TenantBaseDO;
 import cn.iocoder.yudao.module.tool.enums.codegen.CodegenSceneEnum;
 import cn.iocoder.yudao.module.tool.framework.codegen.config.CodegenProperties;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
@@ -121,7 +124,6 @@ public class CodegenEngine {
         globalBindingMap.put("DictFormatClassName", DictFormat.class.getName());
         // DO 类，独有字段
         globalBindingMap.put("baseDOFields", CodegenBuilder.BASE_DO_FIELDS);
-        globalBindingMap.put("BaseDOClassName", BaseDO.class.getName());
         globalBindingMap.put("QueryWrapperClassName", LambdaQueryWrapperX.class.getName());
         globalBindingMap.put("BaseMapperClassName", BaseMapperX.class.getName());
         // Util 工具类
@@ -141,6 +143,7 @@ public class CodegenEngine {
         bindingMap.put("columns", columns);
         bindingMap.put("primaryColumn", CollectionUtils.findFirst(columns, CodegenColumnDO::getPrimaryKey)); // 主键字段
         bindingMap.put("sceneEnum", CodegenSceneEnum.valueOf(table.getScene()));
+
         // className 相关
         // 去掉指定前缀，将 TestDictType 转换成 DictType. 因为在 create 等方法后，不需要带上 Test 前缀
         String simpleClassName = removePrefix(table.getClassName(), upperFirst(table.getModuleName()));
@@ -152,6 +155,15 @@ public class CodegenEngine {
         bindingMap.put("simpleClassName_strikeCase", simpleClassNameStrikeCase);
         // permission 前缀
         bindingMap.put("permissionPrefix", table.getModuleName() + ":" + simpleClassNameStrikeCase);
+
+        // 如果多租户，则进行覆盖 DB 独有字段
+        if (CollectionUtils.findFirst(columns, column -> column.getColumnName().equals(CodegenBuilder.TENANT_ID_FIELD)) != null) {
+            globalBindingMap.put("BaseDOClassName", TenantBaseDO.class.getName());
+            globalBindingMap.put("BaseDOClassName_simple", TenantBaseDO.class.getSimpleName());
+        } else {
+            globalBindingMap.put("BaseDOClassName", BaseDO.class.getName());
+            globalBindingMap.put("BaseDOClassName_simple", BaseDO.class.getSimpleName());
+        }
 
         // 执行生成
         final Map<String, String> result = Maps.newLinkedHashMapWithExpectedSize(TEMPLATES.size()); // 有序

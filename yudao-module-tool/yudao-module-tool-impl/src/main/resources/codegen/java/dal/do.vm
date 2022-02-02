@@ -17,7 +17,7 @@ import ${BaseDOClassName};
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ${table.className}DO extends BaseDO {
+public class ${table.className}DO extends ${BaseDOClassName_simple} {
 
 #foreach ($column in $columns)
 #if (!${baseDOFields.contains(${column.javaField})})##排除 BaseDO 的字段
