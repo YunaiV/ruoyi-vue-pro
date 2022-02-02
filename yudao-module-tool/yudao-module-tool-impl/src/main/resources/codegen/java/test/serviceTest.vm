@@ -5,9 +5,9 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 
 import javax.annotation.Resource;
 
-import ${basePackage}.BaseDbUnitTest;
-import ${basePackage}.module.${table.moduleName}.service.${table.businessName}.impl.${table.className}ServiceImpl;
-import ${basePackage}.module.${table.moduleName}.controller.${table.businessName}.vo.*;
+import ${basePackage}.module.${table.moduleName}.test.BaseDbUnitTest;## 每个项目，默认有一个基础 DB Test 基类
+
+import ${basePackage}.module.${table.moduleName}.controller.${sceneEnum.basePackage}.${table.businessName}.vo.*;
 import ${basePackage}.module.${table.moduleName}.dal.dataobject.${table.businessName}.${table.className}DO;
 import ${basePackage}.module.${table.moduleName}.dal.mysql.${table.businessName}.${table.className}Mapper;
 import ${PageResultClassName};
@@ -45,7 +45,7 @@ import static org.mockito.Mockito.*;
        #end
        #end
        // 准备参数
-       ${table.className}${VO} reqVO = new ${table.className}${VO}();
+       ${sceneEnum.prefixClass}${table.className}${VO} reqVO = new ${sceneEnum.prefixClass}${table.className}${VO}();
        #foreach ($column in $columns)
        #if (${column.listOperation})
        #set ($JavaField = $column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})##首字母大写
@@ -64,7 +64,7 @@ import static org.mockito.Mockito.*;
 * @author ${table.author}
 */
 @Import(${table.className}ServiceImpl.class)
-public class ${table.className}ServiceTest extends BaseDbUnitTest {
+public class ${table.className}ServiceImplTest extends BaseDbUnitTest {
 
     @Resource
     private ${table.className}ServiceImpl ${classNameVar}Service;
@@ -75,7 +75,7 @@ public class ${table.className}ServiceTest extends BaseDbUnitTest {
     @Test
     public void testCreate${simpleClassName}_success() {
         // 准备参数
-        ${table.className}CreateReqVO reqVO = randomPojo(${table.className}CreateReqVO.class);
+        ${sceneEnum.prefixClass}${table.className}CreateReqVO reqVO = randomPojo(${sceneEnum.prefixClass}${table.className}CreateReqVO.class);
 
         // 调用
         ${primaryColumn.javaType} ${classNameVar}Id = ${classNameVar}Service.create${simpleClassName}(reqVO);
@@ -92,7 +92,7 @@ public class ${table.className}ServiceTest extends BaseDbUnitTest {
         ${table.className}DO db${simpleClassName} = randomPojo(${table.className}DO.class);
         ${classNameVar}Mapper.insert(db${simpleClassName});// @Sql: 先插入出一条存在的数据
         // 准备参数
-        ${table.className}UpdateReqVO reqVO = randomPojo(${table.className}UpdateReqVO.class, o -> {
+        ${sceneEnum.prefixClass}${table.className}UpdateReqVO reqVO = randomPojo(${sceneEnum.prefixClass}${table.className}UpdateReqVO.class, o -> {
             o.setId(db${simpleClassName}.getId()); // 设置更新的 ID
         });
 
@@ -106,7 +106,7 @@ public class ${table.className}ServiceTest extends BaseDbUnitTest {
     @Test
     public void testUpdate${simpleClassName}_notExists() {
         // 准备参数
-        ${table.className}UpdateReqVO reqVO = randomPojo(${table.className}UpdateReqVO.class);
+        ${sceneEnum.prefixClass}${table.className}UpdateReqVO reqVO = randomPojo(${sceneEnum.prefixClass}${table.className}UpdateReqVO.class);
 
         // 调用, 并断言异常
         assertServiceException(() -> ${classNameVar}Service.update${simpleClassName}(reqVO), ${simpleClassName_underlineCase.toUpperCase()}_NOT_EXISTS);

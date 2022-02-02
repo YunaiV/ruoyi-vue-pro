@@ -7,7 +7,7 @@ import ${QueryWrapperClassName};
 import ${BaseMapperClassName};
 import ${basePackage}.module.${table.moduleName}.dal.dataobject.${table.businessName}.${table.className}DO;
 import org.apache.ibatis.annotations.Mapper;
-import ${basePackage}.module.${table.moduleName}.controller.${table.businessName}.vo.*;
+import ${basePackage}.module.${table.moduleName}.controller.${sceneEnum.basePackage}.${table.businessName}.vo.*;
 
 ## 字段模板
 #macro(listCondition)
@@ -15,28 +15,28 @@ import ${basePackage}.module.${table.moduleName}.controller.${table.businessName
 #if (${column.listOperation})
 #set ($JavaField = $column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})##首字母大写
 #if (${column.listOperationCondition} == "=")##情况一，= 的时候
-                .eqIfPresent("${column.columnName}", reqVO.get${JavaField}())
+                .eqIfPresent(${table.className}DO::get${JavaField}, reqVO.get${JavaField}())
 #end
 #if (${column.listOperationCondition} == "!=")##情况二，!= 的时候
-                .neIfPresent("${column.columnName}", reqVO.get${JavaField}())
+                .neIfPresent(${table.className}DO::get${JavaField}, reqVO.get${JavaField}())
 #end
 #if (${column.listOperationCondition} == ">")##情况三，> 的时候
-                .gtIfPresent("${column.columnName}", reqVO.get${JavaField}())
+                .gtIfPresent(${table.className}DO::get${JavaField}, reqVO.get${JavaField}())
 #end
 #if (${column.listOperationCondition} == ">=")##情况四，>= 的时候
-                .geIfPresent("${column.columnName}", reqVO.get${JavaField}())
+                .geIfPresent(${table.className}DO::get${JavaField}, reqVO.get${JavaField}())
 #end
 #if (${column.listOperationCondition} == "<")##情况五，< 的时候
-                .ltIfPresent("${column.columnName}", reqVO.get${JavaField}())
+                .ltIfPresent(${table.className}DO::get${JavaField}, reqVO.get${JavaField}())
 #end
 #if (${column.listOperationCondition} == "<=")##情况五，<= 的时候
-                .leIfPresent("${column.columnName}", reqVO.get${JavaField}())
+                .leIfPresent(${table.className}DO::get${JavaField}, reqVO.get${JavaField}())
 #end
 #if (${column.listOperationCondition} == "LIKE")##情况七，Like 的时候
-                .likeIfPresent("${column.columnName}", reqVO.get${JavaField}())
+                .likeIfPresent(${table.className}DO::get${JavaField}, reqVO.get${JavaField}())
 #end
 #if (${column.listOperationCondition} == "BETWEEN")##情况八，Between 的时候
-                .betweenIfPresent("${column.columnName}", reqVO.getBegin${JavaField}(), reqVO.getEnd${JavaField}())
+                .betweenIfPresent(${table.className}DO::get${JavaField}, reqVO.getBegin${JavaField}(), reqVO.getEnd${JavaField}())
 #end
 #end
 #end
@@ -49,18 +49,18 @@ import ${basePackage}.module.${table.moduleName}.controller.${table.businessName
 @Mapper
 public interface ${table.className}Mapper extends BaseMapperX<${table.className}DO> {
 
-    default PageResult<${table.className}DO> selectPage(${table.className}PageReqVO reqVO) {
-        return selectPage(reqVO, new QueryWrapperX<${table.className}DO>()
+    default PageResult<${table.className}DO> selectPage(${sceneEnum.prefixClass}${table.className}PageReqVO reqVO) {
+        return selectPage(reqVO, new LambdaQueryWrapperX<${table.className}DO>()
 			#listCondition()
-                .orderByDesc("id")## 大多数情况下，id 倒序
-        );
+                .orderByDesc(${table.className}DO::getId));## 大多数情况下，id 倒序
+
     }
 
-    default List<${table.className}DO> selectList(${table.className}ExportReqVO reqVO) {
-        return selectList(new QueryWrapperX<${table.className}DO>()
+    default List<${table.className}DO> selectList(${sceneEnum.prefixClass}${table.className}ExportReqVO reqVO) {
+        return selectList(new LambdaQueryWrapperX<${table.className}DO>()
 			#listCondition()
-                .orderByDesc("id")## 大多数情况下，id 倒序
-        );
+                .orderByDesc(${table.className}DO::getId));## 大多数情况下，id 倒序
+
     }
 
 }

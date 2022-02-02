@@ -1,4 +1,4 @@
-package ${basePackage}.module.${table.moduleName}.controller.${table.businessName}.vo;
+package ${basePackage}.module.${table.moduleName}.controller.${sceneEnum.basePackage}.${table.businessName}.vo;
 
 import lombok.*;
 import java.util.*;
@@ -20,7 +20,7 @@ import static ${DateUtilsClassName}.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 * 如果子 VO 存在差异的字段，请不要添加到这里，影响 Swagger 文档生成
 */
 @Data
-public class ${table.className}BaseVO {
+public class ${sceneEnum.prefixClass}${table.className}BaseVO {
 
 #foreach ($column in $columns)
 #if (${column.createOperation} && ${column.updateOperation} && ${column.listOperationResult})##通用操作

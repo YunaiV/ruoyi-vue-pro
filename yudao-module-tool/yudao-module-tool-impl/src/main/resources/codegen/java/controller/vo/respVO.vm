@@ -1,14 +1,14 @@
-package ${basePackage}.module.${table.moduleName}.controller.${table.businessName}.vo;
+package ${basePackage}.module.${table.moduleName}.controller.${sceneEnum.basePackage}.${table.businessName}.vo;
 
 import lombok.*;
 import java.util.*;
 import io.swagger.annotations.*;
 
-@ApiModel("${table.classComment} Response VO")
+@ApiModel("${sceneEnum.name} - ${table.classComment} Response VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class ${table.className}RespVO extends ${table.className}BaseVO {
+public class ${sceneEnum.prefixClass}${table.className}RespVO extends ${sceneEnum.prefixClass}${table.className}BaseVO {
 
 #foreach ($column in $columns)
 #if (${column.listOperationResult} && (!${column.createOperation} || !${column.updateOperation}))##不是通用字段

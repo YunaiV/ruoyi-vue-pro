@@ -1,15 +1,11 @@
 package cn.iocoder.yudao.module.tool.service.test;
 
-import cn.iocoder.yudao.module.tool.controller.admin.test.vo.TestDemoCreateReqVO;
-import cn.iocoder.yudao.module.tool.controller.admin.test.vo.TestDemoExportReqVO;
-import cn.iocoder.yudao.module.tool.controller.admin.test.vo.TestDemoPageReqVO;
-import cn.iocoder.yudao.module.tool.controller.admin.test.vo.TestDemoUpdateReqVO;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.*;
-
+import cn.iocoder.yudao.module.tool.controller.app.test.vo.*;
 import cn.iocoder.yudao.module.tool.dal.dataobject.test.TestDemoDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 
@@ -20,9 +16,9 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 import static cn.iocoder.yudao.module.tool.enums.ErrorCodeConstants.*;
 
 /**
- * 测试示例 Service 实现类
+ * 字典类型 Service 实现类
  *
- * @author 芋艿
+ * @author 芋道源码
  */
 @Service
 @Validated
@@ -32,7 +28,7 @@ public class TestDemoServiceImpl implements TestDemoService {
     private TestDemoMapper testDemoMapper;
 
     @Override
-    public Long createTestDemo(TestDemoCreateReqVO createReqVO) {
+    public Long createTestDemo(AppTestDemoCreateReqVO createReqVO) {
         // 插入
         TestDemoDO testDemo = TestDemoConvert.INSTANCE.convert(createReqVO);
         testDemoMapper.insert(testDemo);
@@ -41,7 +37,7 @@ public class TestDemoServiceImpl implements TestDemoService {
     }
 
     @Override
-    public void updateTestDemo(TestDemoUpdateReqVO updateReqVO) {
+    public void updateTestDemo(AppTestDemoUpdateReqVO updateReqVO) {
         // 校验存在
         this.validateTestDemoExists(updateReqVO.getId());
         // 更新
@@ -74,12 +70,12 @@ public class TestDemoServiceImpl implements TestDemoService {
     }
 
     @Override
-    public PageResult<TestDemoDO> getTestDemoPage(TestDemoPageReqVO pageReqVO) {
+    public PageResult<TestDemoDO> getTestDemoPage(AppTestDemoPageReqVO pageReqVO) {
         return testDemoMapper.selectPage(pageReqVO);
     }
 
     @Override
-    public List<TestDemoDO> getTestDemoList(TestDemoExportReqVO exportReqVO) {
+    public List<TestDemoDO> getTestDemoList(AppTestDemoExportReqVO exportReqVO) {
         return testDemoMapper.selectList(exportReqVO);
     }
 

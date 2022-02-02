@@ -1,7 +1,10 @@
 package cn.iocoder.yudao.module.tool.enums.codegen;
 
+import cn.hutool.core.util.ArrayUtil;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+
+import static cn.hutool.core.util.ArrayUtil.*;
 
 /**
  * 代码生成的场景枚举
@@ -12,8 +15,8 @@ import lombok.Getter;
 @Getter
 public enum CodegenSceneEnum {
 
-    ADMIN(1, "管理后台", "admin"),
-    APP(2, "用户 APP", "app");
+    ADMIN(1, "管理后台", "admin", ""),
+    APP(2, "用户 APP", "app", "App");
 
     /**
      * 场景
@@ -27,5 +30,13 @@ public enum CodegenSceneEnum {
      * 基础包名
      */
     private final String basePackage;
+    /**
+     * Controller 和 VO 类的前缀
+     */
+    private final String prefixClass;
+
+    public static CodegenSceneEnum valueOf(Integer scene) {
+        return firstMatch(sceneEnum -> sceneEnum.getScene().equals(scene), values());
+    }
 
 }

@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.tool.controller.admin.test.vo;
+package cn.iocoder.yudao.module.tool.controller.app.test.vo;
 
 import lombok.*;
 import java.util.*;
@@ -8,11 +8,11 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
-@ApiModel("管理后台 - 字典类型分页 Request VO")
+@ApiModel("用户 APP - 字典类型分页 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class TestDemoPageReqVO extends PageParam {
+public class AppTestDemoPageReqVO extends PageParam {
 
     @ApiModelProperty(value = "名字")
     private String name;

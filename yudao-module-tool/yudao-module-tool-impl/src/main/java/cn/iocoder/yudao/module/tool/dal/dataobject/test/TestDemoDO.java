@@ -1,13 +1,14 @@
 package cn.iocoder.yudao.module.tool.dal.dataobject.test;
 
 import lombok.*;
+import java.util.*;
 import com.baomidou.mybatisplus.annotation.*;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 
 /**
- * 测试示例 DO
+ * 字典类型 DO
  *
- * @author 芋艿
+ * @author 芋道源码
  */
 @TableName("tool_test_demo")
 @Data

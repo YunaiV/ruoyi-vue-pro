@@ -5,13 +5,12 @@ import javax.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.*;
-import ${basePackage}.module.${table.moduleName}.controller.${table.businessName}.vo.*;
+import ${basePackage}.module.${table.moduleName}.controller.${sceneEnum.basePackage}.${table.businessName}.vo.*;
 import ${basePackage}.module.${table.moduleName}.dal.dataobject.${table.businessName}.${table.className}DO;
 import ${PageResultClassName};
 
 import ${basePackage}.module.${table.moduleName}.convert.${table.businessName}.${table.className}Convert;
 import ${basePackage}.module.${table.moduleName}.dal.mysql.${table.businessName}.${table.className}Mapper;
-import ${basePackage}.module.${table.moduleName}.service.${table.businessName}.${table.className}Service;
 
 import static ${ServiceExceptionUtilClassName}.exception;
 import static ${basePackage}.module.${table.moduleName}.enums.ErrorCodeConstants.*;
@@ -29,7 +28,7 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
     private ${table.className}Mapper ${classNameVar}Mapper;
 
     @Override
-    public ${primaryColumn.javaType} create${simpleClassName}(${table.className}CreateReqVO createReqVO) {
+    public ${primaryColumn.javaType} create${simpleClassName}(${sceneEnum.prefixClass}${table.className}CreateReqVO createReqVO) {
         // 插入
         ${table.className}DO ${classNameVar} = ${table.className}Convert.INSTANCE.convert(createReqVO);
         ${classNameVar}Mapper.insert(${classNameVar});
@@ -38,7 +37,7 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
     }
 
     @Override
-    public void update${simpleClassName}(${table.className}UpdateReqVO updateReqVO) {
+    public void update${simpleClassName}(${sceneEnum.prefixClass}${table.className}UpdateReqVO updateReqVO) {
         // 校验存在
         this.validate${simpleClassName}Exists(updateReqVO.getId());
         // 更新
@@ -71,12 +70,12 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
     }
 
     @Override
-    public PageResult<${table.className}DO> get${simpleClassName}Page(${table.className}PageReqVO pageReqVO) {
+    public PageResult<${table.className}DO> get${simpleClassName}Page(${sceneEnum.prefixClass}${table.className}PageReqVO pageReqVO) {
         return ${classNameVar}Mapper.selectPage(pageReqVO);
     }
 
     @Override
-    public List<${table.className}DO> get${simpleClassName}List(${table.className}ExportReqVO exportReqVO) {
+    public List<${table.className}DO> get${simpleClassName}List(${sceneEnum.prefixClass}${table.className}ExportReqVO exportReqVO) {
         return ${classNameVar}Mapper.selectList(exportReqVO);
     }
 

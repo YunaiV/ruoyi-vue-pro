@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.tool.controller.admin.test.vo;
+package cn.iocoder.yudao.module.tool.controller.app.test.vo;
 
 import lombok.*;
 import java.util.*;
@@ -10,7 +10,7 @@ import javax.validation.constraints.*;
 * 如果子 VO 存在差异的字段，请不要添加到这里，影响 Swagger 文档生成
 */
 @Data
-public class TestDemoBaseVO {
+public class AppTestDemoBaseVO {
 
     @ApiModelProperty(value = "名字", required = true)
     @NotNull(message = "名字不能为空")

@@ -1,4 +1,4 @@
-package ${basePackage}.module.${table.moduleName}.controller.${table.businessName}.vo;
+package ${basePackage}.module.${table.moduleName}.controller.${sceneEnum.basePackage}.${table.businessName}.vo;
 
 import lombok.*;
 import java.util.*;
@@ -15,11 +15,11 @@ import static ${DateUtilsClassName}.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 #end
 #end
 
-@ApiModel("${table.classComment}更新 Request VO")
+@ApiModel("${sceneEnum.name} - ${table.classComment}更新 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class ${table.className}UpdateReqVO extends ${table.className}BaseVO {
+public class ${sceneEnum.prefixClass}${table.className}UpdateReqVO extends ${sceneEnum.prefixClass}${table.className}BaseVO {
 
 #foreach ($column in $columns)
 #if (${column.updateOperation} && (!${column.createOperation} || !${column.listOperationResult}))##不是通用字段

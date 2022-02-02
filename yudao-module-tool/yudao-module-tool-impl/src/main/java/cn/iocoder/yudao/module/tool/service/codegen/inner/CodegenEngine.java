@@ -9,6 +9,8 @@ import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.module.tool.enums.codegen.CodegenSceneEnum;
 import cn.iocoder.yudao.module.tool.framework.codegen.config.CodegenProperties;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
@@ -54,22 +56,14 @@ public class CodegenEngine {
      */
     private static final Map<String, String> TEMPLATES = MapUtil.<String, String>builder(new LinkedHashMap<>()) // 有序
             // Java module-impl Main
-            .put(javaTemplatePath("controller/vo/baseVO"),
-                    javaModuleImplMainFilePath("controller/${table.businessName}/vo/${table.className}BaseVO"))
-            .put(javaTemplatePath("controller/vo/createReqVO"),
-                    javaModuleImplMainFilePath("controller/${table.businessName}/vo/${table.className}CreateReqVO"))
-            .put(javaTemplatePath("controller/vo/pageReqVO"),
-                    javaModuleImplMainFilePath("controller/${table.businessName}/vo/${table.className}PageReqVO"))
-            .put(javaTemplatePath("controller/vo/respVO"),
-                    javaModuleImplMainFilePath("controller/${table.businessName}/vo/${table.className}RespVO"))
-            .put(javaTemplatePath("controller/vo/updateReqVO"),
-                    javaModuleImplMainFilePath("controller/${table.businessName}/vo/${table.className}UpdateReqVO"))
-            .put(javaTemplatePath("controller/vo/exportReqVO"),
-                    javaModuleImplMainFilePath("controller/${table.businessName}/vo/${table.className}ExportReqVO"))
-            .put(javaTemplatePath("controller/vo/excelVO"),
-                    javaModuleImplMainFilePath("controller/${table.businessName}/vo/${table.className}ExcelVO"))
-            .put(javaTemplatePath("controller/controller"),
-                    javaModuleImplMainFilePath("controller/${table.businessName}/${table.className}Controller"))
+            .put(javaTemplatePath("controller/vo/baseVO"), javaModuleImplVOFilePath("BaseVO"))
+            .put(javaTemplatePath("controller/vo/createReqVO"), javaModuleImplVOFilePath("CreateReqVO"))
+            .put(javaTemplatePath("controller/vo/pageReqVO"), javaModuleImplVOFilePath("PageReqVO"))
+            .put(javaTemplatePath("controller/vo/respVO"), javaModuleImplVOFilePath("RespVO"))
+            .put(javaTemplatePath("controller/vo/updateReqVO"), javaModuleImplVOFilePath("UpdateReqVO"))
+            .put(javaTemplatePath("controller/vo/exportReqVO"), javaModuleImplVOFilePath("ExportReqVO"))
+            .put(javaTemplatePath("controller/vo/excelVO"), javaModuleImplVOFilePath("ExcelVO"))
+            .put(javaTemplatePath("controller/controller"), javaModuleImplControllerFilePath())
             .put(javaTemplatePath("convert/convert"),
                     javaModuleImplMainFilePath("convert/${table.businessName}/${table.className}Convert"))
             .put(javaTemplatePath("dal/do"),
@@ -84,8 +78,7 @@ public class CodegenEngine {
             .put(javaTemplatePath("test/serviceTest"),
                     javaModuleImplTestFilePath("service/${table.businessName}/${table.className}ServiceTest"))
             // Java module-api Main
-            .put(javaTemplatePath("enums/errorcode"),
-                    javaModuleApiMainFilePath("enums/ErrorCodeConstants"))
+            .put(javaTemplatePath("enums/errorcode"), javaModuleApiMainFilePath("enums/ErrorCodeConstants"))
             // Vue
             .put(vueTemplatePath("views/index.vue"),
                     vueFilePath("views/${table.moduleName}/${classNameVar}/index.vue"))
@@ -94,9 +87,6 @@ public class CodegenEngine {
             // SQL
             .put("codegen/sql/sql.vm", "sql/sql.sql")
             .build();
-
-    @Resource
-    private CodegenBuilder codegenBuilder;
 
     @Resource
     private CodegenProperties codegenProperties;
@@ -121,8 +111,7 @@ public class CodegenEngine {
     private void initGlobalBindingMap() {
         // 全局配置
         globalBindingMap.put("basePackage", codegenProperties.getBasePackage());
-        globalBindingMap.put("baseFrameworkPackage", StrUtil.subBefore(codegenProperties.getBasePackage(),
-                '.', true) + '.' + "framework"); // 用于后续获取测试类的 package 地址
+        globalBindingMap.put("baseFrameworkPackage", codegenProperties.getBasePackage() + '.' + "framework"); // 用于后续获取测试类的 package 地址
         // 全局 Java Bean
         globalBindingMap.put("CommonResultClassName", CommonResult.class.getName());
         globalBindingMap.put("PageResultClassName", PageResult.class.getName());
@@ -132,7 +121,7 @@ public class CodegenEngine {
         // DO 类，独有字段
         globalBindingMap.put("baseDOFields", CodegenBuilder.BASE_DO_FIELDS);
         globalBindingMap.put("BaseDOClassName", BaseDO.class.getName());
-        globalBindingMap.put("QueryWrapperClassName", QueryWrapperX.class.getName());
+        globalBindingMap.put("QueryWrapperClassName", LambdaQueryWrapperX.class.getName());
         globalBindingMap.put("BaseMapperClassName", BaseMapperX.class.getName());
         // Util 工具类
         globalBindingMap.put("ServiceExceptionUtilClassName", ServiceExceptionUtil.class.getName());
@@ -150,13 +139,15 @@ public class CodegenEngine {
         bindingMap.put("table", table);
         bindingMap.put("columns", columns);
         bindingMap.put("primaryColumn", CollectionUtils.findFirst(columns, CodegenColumnDO::getPrimaryKey)); // 主键字段
+        bindingMap.put("sceneEnum", CodegenSceneEnum.valueOf(table.getScene()));
         // className 相关
-        // 去掉指定前缀  将 TestDictType 转换成 DictType. 因为在 create 等方法后，不需要带上 Test 前缀
+        // 去掉指定前缀，将 TestDictType 转换成 DictType. 因为在 create 等方法后，不需要带上 Test 前缀
         String simpleClassName = removePrefix(table.getClassName(), upperFirst(table.getModuleName()));
         bindingMap.put("simpleClassName", simpleClassName);
         bindingMap.put("simpleClassName_underlineCase", toUnderlineCase(simpleClassName)); // 将 DictType 转换成 dict_type
         bindingMap.put("classNameVar", lowerFirst(simpleClassName)); // 将 DictType 转换成 dictType，用于变量
-        String simpleClassNameStrikeCase = toSymbolCase(simpleClassName, '-'); // 将 DictType 转换成 dict-type
+        // 将 DictType 转换成 dict-type
+        String simpleClassNameStrikeCase = toSymbolCase(simpleClassName, '-');
         bindingMap.put("simpleClassName_strikeCase", simpleClassNameStrikeCase);
         // permission 前缀
         bindingMap.put("permissionPrefix", table.getModuleName() + ":" + simpleClassNameStrikeCase);
@@ -176,7 +167,10 @@ public class CodegenEngine {
                 getStr(bindingMap, "basePackage").replaceAll("\\.", "/"));
         filePath = StrUtil.replace(filePath, "${classNameVar}",
                 getStr(bindingMap, "classNameVar"));
-
+        // sceneEnum 包含的字段
+        CodegenSceneEnum sceneEnum = (CodegenSceneEnum) bindingMap.get("sceneEnum");
+        filePath = StrUtil.replace(filePath, "${sceneEnum.prefixClass}", sceneEnum.getPrefixClass());
+        filePath = StrUtil.replace(filePath, "${sceneEnum.basePackage}", sceneEnum.getBasePackage());
         // table 包含的字段
         CodegenTableDO table = (CodegenTableDO) bindingMap.get("table");
         filePath = StrUtil.replace(filePath, "${table.moduleName}", table.getModuleName());
@@ -189,13 +183,22 @@ public class CodegenEngine {
         return "codegen/java/" + path + ".vm";
     }
 
+    private static String javaModuleImplVOFilePath(String path) {
+        return javaModuleFilePath("controller/${sceneEnum.basePackage}/${table.businessName}/" +
+                "vo/${sceneEnum.prefixClass}${table.className}" + path, "impl", "main");
+    }
+
+    private static String javaModuleImplControllerFilePath() {
+        return javaModuleFilePath("controller/${sceneEnum.basePackage}/${table.businessName}/" +
+                "${sceneEnum.prefixClass}${table.className}Controller", "impl", "main");
+    }
+
     private static String javaModuleImplMainFilePath(String path) {
         return javaModuleFilePath(path, "impl", "main");
     }
 
     private static String javaModuleApiMainFilePath(String path) {
         return javaModuleFilePath(path, "api", "main");
-
     }
 
     private static String javaModuleImplTestFilePath(String path) {

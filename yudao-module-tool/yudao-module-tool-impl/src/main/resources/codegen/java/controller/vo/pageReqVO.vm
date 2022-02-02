@@ -1,4 +1,4 @@
-package ${basePackage}.module.${table.moduleName}.controller.${table.businessName}.vo;
+package ${basePackage}.module.${table.moduleName}.controller.${sceneEnum.basePackage}.${table.businessName}.vo;
 
 import lombok.*;
 import java.util.*;
@@ -22,11 +22,11 @@ import static ${DateUtilsClassName}.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
     private ${column.javaType}#if ("$!prefix" != "") ${prefix}${JavaField}#else ${column.javaField}#end;
 #end
 
-@ApiModel("${table.classComment}分页 Request VO")
+@ApiModel("${sceneEnum.name} - ${table.classComment}分页 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class ${table.className}PageReqVO extends PageParam {
+public class ${sceneEnum.prefixClass}${table.className}PageReqVO extends PageParam {
 
 #foreach ($column in $columns)
 #set ($JavaField = $column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})##首字母大写

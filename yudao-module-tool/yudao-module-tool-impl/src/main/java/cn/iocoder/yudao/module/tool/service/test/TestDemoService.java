@@ -2,18 +2,14 @@ package cn.iocoder.yudao.module.tool.service.test;
 
 import java.util.*;
 import javax.validation.*;
-
-import cn.iocoder.yudao.module.tool.controller.admin.test.vo.TestDemoCreateReqVO;
-import cn.iocoder.yudao.module.tool.controller.admin.test.vo.TestDemoExportReqVO;
-import cn.iocoder.yudao.module.tool.controller.admin.test.vo.TestDemoPageReqVO;
-import cn.iocoder.yudao.module.tool.controller.admin.test.vo.TestDemoUpdateReqVO;
+import cn.iocoder.yudao.module.tool.controller.app.test.vo.*;
 import cn.iocoder.yudao.module.tool.dal.dataobject.test.TestDemoDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 
 /**
- * 测试示例 Service 接口
+ * 字典类型 Service 接口
  *
- * @author 芋艿
+ * @author 芋道源码
  */
 public interface TestDemoService {
 
@@ -23,14 +19,14 @@ public interface TestDemoService {
      * @param createReqVO 创建信息
      * @return 编号
      */
-    Long createTestDemo(@Valid TestDemoCreateReqVO createReqVO);
+    Long createTestDemo(@Valid AppTestDemoCreateReqVO createReqVO);
 
     /**
      * 更新字典类型
      *
      * @param updateReqVO 更新信息
      */
-    void updateTestDemo(@Valid TestDemoUpdateReqVO updateReqVO);
+    void updateTestDemo(@Valid AppTestDemoUpdateReqVO updateReqVO);
 
     /**
      * 删除字典类型
@@ -61,7 +57,7 @@ public interface TestDemoService {
      * @param pageReqVO 分页查询
      * @return 字典类型分页
      */
-    PageResult<TestDemoDO> getTestDemoPage(TestDemoPageReqVO pageReqVO);
+    PageResult<TestDemoDO> getTestDemoPage(AppTestDemoPageReqVO pageReqVO);
 
     /**
      * 获得字典类型列表, 用于 Excel 导出
@@ -69,6 +65,6 @@ public interface TestDemoService {
      * @param exportReqVO 查询条件
      * @return 字典类型列表
      */
-    List<TestDemoDO> getTestDemoList(TestDemoExportReqVO exportReqVO);
+    List<TestDemoDO> getTestDemoList(AppTestDemoExportReqVO exportReqVO);
 
 }

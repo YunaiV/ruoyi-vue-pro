@@ -1,4 +1,4 @@
-package ${basePackage}.module.${table.moduleName}.controller.${table.businessName}.vo;
+package ${basePackage}.module.${table.moduleName}.controller.${sceneEnum.basePackage}.${table.businessName}.vo;
 
 import lombok.*;
 import java.util.*;
@@ -20,7 +20,7 @@ import ${DictConvertClassName};
  * @author ${table.author}
  */
 @Data
-public class ${table.className}ExcelVO {
+public class ${sceneEnum.prefixClass}${table.className}ExcelVO {
 
 #foreach ($column in $columns)
     #if (${column.listOperationResult})##返回字段

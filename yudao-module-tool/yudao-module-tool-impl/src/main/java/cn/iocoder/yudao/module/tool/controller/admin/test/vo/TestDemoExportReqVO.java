@@ -1,11 +1,10 @@
 package cn.iocoder.yudao.module.tool.controller.admin.test.vo;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
+import lombok.*;
+import java.util.*;
+import io.swagger.annotations.*;
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import org.springframework.format.annotation.DateTimeFormat;
-
-import java.util.Date;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
@@ -13,19 +12,19 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @Data
 public class TestDemoExportReqVO {
 
-    @ApiModelProperty(value = "名字", example = "芋道")
+    @ApiModelProperty(value = "名字")
     private String name;
 
-    @ApiModelProperty(value = "状态", example = "1")
+    @ApiModelProperty(value = "状态")
     private Integer status;
 
-    @ApiModelProperty(value = "类型", example = "2")
+    @ApiModelProperty(value = "类型")
     private Integer type;
 
-    @ApiModelProperty(value = "分类", example = "3")
+    @ApiModelProperty(value = "分类")
     private Integer category;
 
-    @ApiModelProperty(value = "备注", example = "我是备注")
+    @ApiModelProperty(value = "备注")
     private String remark;
 
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
