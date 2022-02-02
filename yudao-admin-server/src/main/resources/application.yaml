@@ -40,17 +40,14 @@ mybatis-plus:
       id-type: AUTO # 自增 ID
       logic-delete-value: 1 # 逻辑已删除值(默认为 1)
       logic-not-delete-value: 0 # 逻辑未删除值(默认为 0)
-  type-aliases-package: ${yudao.info.base-package}.modules.*.dal.dataobject, ${yudao.core-service.base-package}.modules.*.dal.dataobject
+  type-aliases-package: ${yudao.info.base-package}.module.*.dal.dataobject
 
 --- #################### 芋道相关配置 ####################
 
 yudao:
   info:
     version: 1.0.0
-    base-package: cn.iocoder.yudao.adminserver
-    base-package2: cn.iocoder.yudao.module
-  core-service:
-    base-package: cn.iocoder.yudao.coreservice
+    base-package: cn.iocoder.yudao
   web:
     admin-api:
       prefix: /admin-api

@@ -28,18 +28,6 @@ import static cn.hutool.core.text.CharSequenceUtil.*;
 public class CodegenBuilder {
 
     /**
-     * Module 名字的映射 TODO 后续梳理到配置类
-     *
-     * key：模块的完整名
-     * value：模块的缩写名
-     */
-    private static final Map<String, String> moduleNames = MapUtil.<String, String>builder()
-            .put("system", "sys")
-            .put("infra", "inf")
-            .put("tool", "tool")
-            .build();
-
-    /**
      * 字段名与 {@link CodegenColumnListConditionEnum} 的默认映射
      * 注意，字段的匹配以后缀的方式
      */
@@ -125,8 +113,10 @@ public class CodegenBuilder {
      * @param table 表定义
      */
     private void initTableDefault(CodegenTableDO table) {
-        table.setModuleName(getFullModuleName(StrUtil.subBefore(table.getTableName(),
-                '_', false))); // 第一个 _ 前缀的前面，作为 module 名字
+        // 以 system_dept 举例子。moduleName 为 system、businessName 为 dept、className 为 SystemDept
+        // 如果不希望 System 前缀，则可以手动在【代码生成 - 修改生成配置 - 基本信息】，将实体类名称改为 Dept 即可
+        table.setModuleName(StrUtil.subBefore(table.getTableName(),
+                '_', false)); // 第一个 _ 前缀的前面，作为 module 名字
         table.setBusinessName(toCamelCase(subAfter(table.getTableName(),
                 '_', false))); // 第一步，第一个 _ 前缀的后面，作为 module 名字; 第二步，可能存在多个 _ 的情况，转换成驼峰
         table.setClassName(upperFirst(toCamelCase(table.getTableName()))); // 驼峰 + 首字母大写
@@ -206,29 +196,6 @@ public class CodegenBuilder {
         if (column.getHtmlType() == null) {
             column.setHtmlType(CodegenColumnHtmlTypeEnum.INPUT.getType());
         }
-    }
-
-    /**
-     * 获得模块的缩略名
-     *
-     * @param fullModuleName 模块的完整名
-     * @return 缩略名
-     */
-    public String getSimpleModuleName(String fullModuleName) {
-        return moduleNames.getOrDefault(fullModuleName, fullModuleName);
-    }
-
-    /**
-     * 获得模块的完整名
-     *
-     * @param shortModuleName 模块的缩略名
-     * @return 完整名
-     */
-    public String getFullModuleName(String shortModuleName) {
-        return moduleNames.entrySet().stream()
-                .filter(entry -> entry.getValue().equals(shortModuleName)) // 匹配
-                .findFirst().map(Map.Entry::getKey) // 返回 key
-                .orElse(shortModuleName); // 兜底返回 shortModuleName
     }
 
 }

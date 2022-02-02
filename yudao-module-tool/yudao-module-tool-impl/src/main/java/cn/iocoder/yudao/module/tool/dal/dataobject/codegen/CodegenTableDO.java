@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.tool.dal.dataobject.codegen;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.module.tool.enums.codegen.CodegenSceneEnum;
 import cn.iocoder.yudao.module.tool.enums.codegen.CodegenTemplateTypeEnum;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
@@ -29,6 +30,12 @@ public class CodegenTableDO extends BaseDO {
      * 枚举 {@link CodegenTemplateTypeEnum}
      */
     private Integer importType;
+    /**
+     * 生成场景
+     *
+     * 枚举 {@link CodegenSceneEnum}
+     */
+    private Integer scene;
 
     // ========== 表相关字段 ==========
 

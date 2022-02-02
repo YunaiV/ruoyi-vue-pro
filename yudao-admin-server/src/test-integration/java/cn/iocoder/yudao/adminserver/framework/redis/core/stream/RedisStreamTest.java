@@ -1,7 +1,7 @@
-package cn.iocoder.yudao.adminserver.framework.redis.core.stream;
+package cn.iocoder.yudao.server.framework.redis.core.stream;
 
 import cn.hutool.core.thread.ThreadUtil;
-import cn.iocoder.yudao.adminserver.BaseRedisIntegrationTest;
+import cn.iocoder.yudao.server.BaseRedisIntegrationTest;
 import cn.iocoder.yudao.module.system.mq.consumer.mail.SysMailSendConsumer;
 import cn.iocoder.yudao.module.system.mq.consumer.sms.SysSmsSendConsumer;
 import cn.iocoder.yudao.module.system.mq.message.mail.SysMailSendMessage;

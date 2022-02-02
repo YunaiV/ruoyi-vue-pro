@@ -33,6 +33,7 @@ export const DICT_TYPE = {
 
   // ========== TOOL 模块 ==========
   TOOL_CODEGEN_TEMPLATE_TYPE: 'tool_codegen_template_type',
+  TOOL_CODEGEN_SCENE: 'tool_codegen_scene',
 
   // ========== BPM 模块 ==========
   BPM_MODEL_CATEGORY: 'bpm_model_category',

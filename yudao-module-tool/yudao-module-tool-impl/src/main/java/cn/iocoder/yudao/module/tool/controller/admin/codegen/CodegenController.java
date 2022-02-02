@@ -4,6 +4,7 @@ import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.ZipUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.tool.controller.admin.codegen.vo.CodegenDetailRespVO;
 import cn.iocoder.yudao.module.tool.controller.admin.codegen.vo.CodegenPreviewRespVO;
 import cn.iocoder.yudao.module.tool.controller.admin.codegen.vo.CodegenUpdateReqVO;
@@ -36,6 +37,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
 @Api(tags = "管理后台 - 代码生成器")
 @RestController
@@ -88,7 +90,7 @@ public class CodegenController {
     @PostMapping("/create-list-from-db")
     @PreAuthorize("@ss.hasPermission('tool:codegen:create')")
     public CommonResult<List<Long>> createCodegenListFromDB(@RequestParam("tableNames") List<String> tableNames) {
-        return success(codegenService.createCodegenListFromDB(tableNames));
+        return success(codegenService.createCodegenListFromDB(getLoginUserId(), tableNames));
     }
 
     @ApiOperation("基于 SQL 建表语句，创建代码生成器的表和字段定义")
@@ -96,7 +98,7 @@ public class CodegenController {
     @PostMapping("/create-list-from-sql")
     @PreAuthorize("@ss.hasPermission('tool:codegen:create')")
     public CommonResult<Long> createCodegenListFromSQL(@RequestParam("sql") String sql) {
-        return success(codegenService.createCodegenListFromSQL(sql));
+        return success(codegenService.createCodegenListFromSQL(getLoginUserId(), sql));
     }
 
     @ApiOperation("更新数据库的表和字段定义")

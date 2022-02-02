@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.adminserver;
+package cn.iocoder.yudao.server;
 
 import cn.iocoder.yudao.framework.redis.config.YudaoRedisAutoConfiguration;
 import org.redisson.spring.starter.RedissonAutoConfiguration;

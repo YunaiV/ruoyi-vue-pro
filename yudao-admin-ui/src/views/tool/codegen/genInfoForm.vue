@@ -2,15 +2,20 @@
   <el-form ref="genInfoForm" :model="info" :rules="rules" label-width="150px">
     <el-row>
       <el-col :span="12">
-        <el-form-item prop="tplCategory">
+        <el-form-item prop="templateType">
           <span slot="label">生成模板</span>
           <el-select v-model="info.templateType" @change="tplSelectChange">
-            <el-option
-                v-for="dict in this.getDictDatas(DICT_TYPE.TOOL_CODEGEN_TEMPLATE_TYPE)"
-                :key="parseInt(dict.value)"
-                :label="dict.label"
-                :value="parseInt(dict.value)"
-            />
+            <el-option v-for="dict in this.getDictDatas(DICT_TYPE.TOOL_CODEGEN_TEMPLATE_TYPE)"
+                :key="parseInt(dict.value)" :label="dict.label" :value="parseInt(dict.value)"/>
+          </el-select>
+        </el-form-item>
+      </el-col>
+      <el-col :span="12">
+        <el-form-item prop="scene">
+          <span slot="label">生成模板</span>
+          <el-select v-model="info.scene">
+            <el-option v-for="dict in this.getDictDatas(DICT_TYPE.TOOL_CODEGEN_SCENE)"
+                       :key="parseInt(dict.value)" :label="dict.label" :value="parseInt(dict.value)"/>
           </el-select>
         </el-form-item>
       </el-col>
@@ -248,6 +253,9 @@ export default {
       rules: {
         templateType: [
           { required: true, message: "请选择生成模板", trigger: "blur" }
+        ],
+        scene: [
+          { required: true, message: "请选择生成场景", trigger: "blur" }
         ],
         // packageName: [
         //   { required: true, message: "请输入生成包路径", trigger: "blur" }

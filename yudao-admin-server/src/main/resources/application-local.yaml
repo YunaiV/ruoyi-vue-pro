@@ -163,16 +163,11 @@ logging:
     name: ${user.home}/logs/${spring.application.name}.log # 日志文件名，全路径
   level:
     # 配置自己写的 MyBatis Mapper 打印日志
-    cn.iocoder.yudao.adminserver.modules.bpm.dal.mysql: debug
-    cn.iocoder.yudao.adminserver.modules.infra.dal.mysql: debug
-    cn.iocoder.yudao.adminserver.modules.pay.dal.mysql: debug
-    cn.iocoder.yudao.adminserver.modules.system.dal.mysql: debug
-    cn.iocoder.yudao.adminserver.modules.tool.dal.mysql: debug
-    cn.iocoder.yudao.coreservice.modules.bpm.dal.mysql: debug
-    cn.iocoder.yudao.coreservice.modules.infra.dal.mysql: debug
-    cn.iocoder.yudao.coreservice.modules.pay.dal.mysql: debug
-    cn.iocoder.yudao.coreservice.modules.system.dal.mysql: debug
-    cn.iocoder.yudao.coreservice.modules.tool.dal.mysql: debug
+    cn.iocoder.yudao.module.bpm.dal.mysql: debug
+    cn.iocoder.yudao.module.infra.dal.mysql: debug
+    cn.iocoder.yudao.module.pay.dal.mysql: debug
+    cn.iocoder.yudao.module.system.dal.mysql: debug
+    cn.iocoder.yudao.module.tool.dal.mysql: debug
 
 --- #################### 微信公众号相关配置 ####################
 wx: # 参见 https://github.com/Wechat-Group/WxJava/blob/develop/spring-boot-starters/wx-java-mp-spring-boot-starter/README.md 文档

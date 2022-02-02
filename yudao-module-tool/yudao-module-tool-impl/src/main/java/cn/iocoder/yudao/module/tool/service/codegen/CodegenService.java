@@ -20,26 +20,29 @@ public interface CodegenService {
     /**
      * 基于 SQL 建表语句，创建代码生成器的表定义
      *
+     * @param userId 用户编号
      * @param sql SQL 建表语句
      * @return 创建的表定义的编号
      */
-    Long createCodegenListFromSQL(String sql);
+    Long createCodegenListFromSQL(Long userId, String sql);
 
     /**
      * 基于数据库的表结构，创建代码生成器的表定义
      *
+     * @param userId 用户编号
      * @param tableName 表名称
      * @return 创建的表定义的编号
      */
-    Long createCodegen(String tableName);
+    Long createCodegen(Long userId, String tableName);
 
     /**
-     * 基于 {@link #createCodegen(String)} 的批量创建
+     * 基于 {@link #createCodegen(Long, String)} 的批量创建
      *
+     * @param userId 用户编号
      * @param tableNames 表名称数组
      * @return 创建的表定义的编号数组
      */
-    List<Long> createCodegenListFromDB(List<String> tableNames);
+    List<Long> createCodegenListFromDB(Long userId, List<String> tableNames);
 
     /**
      * 更新数据库的表和字段定义

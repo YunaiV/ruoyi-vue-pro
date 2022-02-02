@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.tool.service.codegen;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.tool.framework.codegen.config.CodegenProperties;
 import cn.iocoder.yudao.module.tool.controller.admin.codegen.vo.CodegenUpdateReqVO;
 import cn.iocoder.yudao.module.tool.controller.admin.codegen.vo.table.CodegenTablePageReqVO;
@@ -51,6 +52,9 @@ public class CodegenServiceImpl implements CodegenService {
     private CodegenColumnMapper codegenColumnMapper;
 
     @Resource
+    private AdminUserApi userApi;
+
+    @Resource
     private CodegenBuilder codegenBuilder;
     @Resource
     private CodegenEngine codegenEngine;
@@ -58,7 +62,7 @@ public class CodegenServiceImpl implements CodegenService {
     @Resource
     private CodegenProperties codegenProperties;
 
-    private Long createCodegen0(CodegenImportTypeEnum importType,
+    private Long createCodegen0(Long userId, CodegenImportTypeEnum importType,
                                 SchemaTableDO schemaTable, List<SchemaColumnDO> schemaColumns) {
         // 校验导入的表和字段非空
         if (schemaTable == null) {
@@ -75,6 +79,7 @@ public class CodegenServiceImpl implements CodegenService {
         // 构建 CodegenTableDO 对象，插入到 DB 中
         CodegenTableDO table = codegenBuilder.buildTable(schemaTable);
         table.setImportType(importType.getType());
+        table.setAuthor(userApi.getUser(userId).getNickname());
         codegenTableMapper.insert(table);
         // 构建 CodegenColumnDO 数组，插入到 DB 中
         List<CodegenColumnDO> columns = codegenBuilder.buildColumns(schemaColumns);
@@ -86,7 +91,7 @@ public class CodegenServiceImpl implements CodegenService {
     }
 
     @Override
-    public Long createCodegenListFromSQL(String sql) {
+    public Long createCodegenListFromSQL(Long userId, String sql) {
         // 从 SQL 中，获得数据库表结构
         SchemaTableDO schemaTable;
         List<SchemaColumnDO> schemaColumns;
@@ -98,26 +103,26 @@ public class CodegenServiceImpl implements CodegenService {
             throw exception(CODEGEN_PARSE_SQL_ERROR);
         }
         // 导入
-        return this.createCodegen0(CodegenImportTypeEnum.SQL, schemaTable, schemaColumns);
+        return this.createCodegen0(userId, CodegenImportTypeEnum.SQL, schemaTable, schemaColumns);
     }
 
     @Override
-    public Long createCodegen(String tableName) {
+    public Long createCodegen(Long userId, String tableName) {
         // 获取当前schema
         String tableSchema = codegenProperties.getDbSchemas().iterator().next();
         // 从数据库中，获得数据库表结构
         SchemaTableDO schemaTable = schemaTableMapper.selectByTableSchemaAndTableName(tableSchema, tableName);
         List<SchemaColumnDO> schemaColumns = schemaColumnMapper.selectListByTableName(tableSchema, tableName);
         // 导入
-        return this.createCodegen0(CodegenImportTypeEnum.DB, schemaTable, schemaColumns);
+        return this.createCodegen0(userId, CodegenImportTypeEnum.DB, schemaTable, schemaColumns);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public List<Long> createCodegenListFromDB(List<String> tableNames) {
+    public List<Long> createCodegenListFromDB(Long userId, List<String> tableNames) {
         List<Long> ids = new ArrayList<>(tableNames.size());
         // 遍历添加。虽然效率会低一点，但是没必要做成完全批量，因为不会这么大量
-        tableNames.forEach(tableName -> ids.add(createCodegen(tableName)));
+        tableNames.forEach(tableName -> ids.add(createCodegen(userId, tableName)));
         return ids;
     }
 

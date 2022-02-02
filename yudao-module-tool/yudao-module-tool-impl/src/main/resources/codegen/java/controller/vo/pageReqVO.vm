@@ -1,0 +1,44 @@
+package ${basePackage}.module.${table.moduleName}.controller.${table.businessName}.vo;
+
+import lombok.*;
+import java.util.*;
+import io.swagger.annotations.*;
+import ${PageParamClassName};
+## 处理 Date 字段的引入
+#foreach ($column in $columns)
+#if (${column.listOperation} && ${column.javaType} == "Date")## 时间类型
+import org.springframework.format.annotation.DateTimeFormat;
+
+import static ${DateUtilsClassName}.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
+#break
+#end
+#end
+## 字段模板
+#macro(columnTpl $prefix $prefixStr)
+#if (${column.javaType} == "Date")## 时间类型
+    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
+#end
+    @ApiModelProperty(value = "${prefixStr}${column.columnComment}"#if ("$!column.example" != ""), example = "${column.example}"#end)
+    private ${column.javaType}#if ("$!prefix" != "") ${prefix}${JavaField}#else ${column.javaField}#end;
+#end
+
+@ApiModel("${table.classComment}分页 Request VO")
+@Data
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
+public class ${table.className}PageReqVO extends PageParam {
+
+#foreach ($column in $columns)
+#set ($JavaField = $column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})##首字母大写
+#if (${column.listOperation})##查询操作
+#if (${column.listOperationCondition} == "BETWEEN")## 情况一，Between 的时候
+    #columnTpl('begin', '开始')
+
+    #columnTpl('end', '结束')
+#else##情况二，非 Between 的时间
+    #columnTpl('', '')
+#end
+
+#end
+#end
+}

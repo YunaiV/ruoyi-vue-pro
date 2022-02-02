@@ -1,0 +1,102 @@
+package ${basePackage}.module.${table.moduleName}.controller.${table.businessName};
+
+import org.springframework.web.bind.annotation.*;
+import javax.annotation.Resource;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.security.access.prepost.PreAuthorize;
+
+import io.swagger.annotations.*;
+
+import javax.validation.constraints.*;
+import javax.validation.*;
+import javax.servlet.http.*;
+import java.util.*;
+import java.io.IOException;
+
+import ${PageResultClassName};
+import ${CommonResultClassName};
+import static ${CommonResultClassName}.success;
+
+import ${ExcelUtilsClassName};
+
+import ${OperateLogClassName};
+import static ${OperateTypeEnumClassName}.*;
+
+import ${basePackage}.module.${table.moduleName}.controller.${table.businessName}.vo.*;
+import ${basePackage}.module.${table.moduleName}.dal.dataobject.${table.businessName}.${table.className}DO;
+import ${basePackage}.module.${table.moduleName}.convert.${table.businessName}.${table.className}Convert;
+import ${basePackage}.module.${table.moduleName}.service.${table.businessName}.${table.className}Service;
+
+@Api(tags = "${table.classComment}")
+@RestController
+##二级的 businessName 暂时不算在 HTTP 路径上，可以根据需要写
+@RequestMapping("/${table.moduleName}/${simpleClassName_strikeCase}")
+@Validated
+public class ${table.className}Controller {
+
+    @Resource
+    private ${table.className}Service ${classNameVar}Service;
+
+    @PostMapping("/create")
+    @ApiOperation("创建${table.classComment}")
+    @PreAuthorize("@ss.hasPermission('${permissionPrefix}:create')")
+    public CommonResult<${primaryColumn.javaType}> create${simpleClassName}(@Valid @RequestBody ${table.className}CreateReqVO createReqVO) {
+        return success(${classNameVar}Service.create${simpleClassName}(createReqVO));
+    }
+
+    @PutMapping("/update")
+    @ApiOperation("更新${table.classComment}")
+    @PreAuthorize("@ss.hasPermission('${permissionPrefix}:update')")
+    public CommonResult<Boolean> update${simpleClassName}(@Valid @RequestBody ${table.className}UpdateReqVO updateReqVO) {
+        ${classNameVar}Service.update${simpleClassName}(updateReqVO);
+        return success(true);
+    }
+
+    @DeleteMapping("/delete")
+    @ApiOperation("删除${table.classComment}")
+    @ApiImplicitParam(name = "id", value = "编号", required = true, dataTypeClass = ${primaryColumn.javaType}.class)
+    @PreAuthorize("@ss.hasPermission('${permissionPrefix}:delete')")
+    public CommonResult<Boolean> delete${simpleClassName}(@RequestParam("id") ${primaryColumn.javaType} id) {
+        ${classNameVar}Service.delete${simpleClassName}(id);
+        return success(true);
+    }
+
+    @GetMapping("/get")
+    @ApiOperation("获得${table.classComment}")
+    @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = ${primaryColumn.javaType}.class)
+    @PreAuthorize("@ss.hasPermission('${permissionPrefix}:query')")
+    public CommonResult<${table.className}RespVO> get${simpleClassName}(@RequestParam("id") ${primaryColumn.javaType} id) {
+        ${table.className}DO ${classNameVar} = ${classNameVar}Service.get${simpleClassName}(id);
+        return success(${table.className}Convert.INSTANCE.convert(${classNameVar}));
+    }
+
+    @GetMapping("/list")
+    @ApiOperation("获得${table.classComment}列表")
+    @ApiImplicitParam(name = "ids", value = "编号列表", required = true, example = "1024,2048", dataTypeClass = List.class)
+    @PreAuthorize("@ss.hasPermission('${permissionPrefix}:query')")
+    public CommonResult<List<${table.className}RespVO>> get${simpleClassName}List(@RequestParam("ids") Collection<${primaryColumn.javaType}> ids) {
+        List<${table.className}DO> list = ${classNameVar}Service.get${simpleClassName}List(ids);
+        return success(${table.className}Convert.INSTANCE.convertList(list));
+    }
+
+    @GetMapping("/page")
+    @ApiOperation("获得${table.classComment}分页")
+    @PreAuthorize("@ss.hasPermission('${permissionPrefix}:query')")
+    public CommonResult<PageResult<${table.className}RespVO>> get${simpleClassName}Page(@Valid ${table.className}PageReqVO pageVO) {
+        PageResult<${table.className}DO> pageResult = ${classNameVar}Service.get${simpleClassName}Page(pageVO);
+        return success(${table.className}Convert.INSTANCE.convertPage(pageResult));
+    }
+
+    @GetMapping("/export-excel")
+    @ApiOperation("导出${table.classComment} Excel")
+    @PreAuthorize("@ss.hasPermission('${permissionPrefix}:export')")
+    @OperateLog(type = EXPORT)
+    public void export${simpleClassName}Excel(@Valid ${table.className}ExportReqVO exportReqVO,
+              HttpServletResponse response) throws IOException {
+        List<${table.className}DO> list = ${classNameVar}Service.get${simpleClassName}List(exportReqVO);
+        // 导出 Excel
+        List<${table.className}ExcelVO> datas = ${table.className}Convert.INSTANCE.convertList02(list);
+        ExcelUtils.write(response, "${table.classComment}.xls", "数据", ${table.className}ExcelVO.class, datas);
+    }
+
+}

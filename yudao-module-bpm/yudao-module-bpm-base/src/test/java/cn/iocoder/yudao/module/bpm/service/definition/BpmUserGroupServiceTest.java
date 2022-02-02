@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.bpm.service.definition;
 
-import cn.iocoder.yudao.adminserver.BaseDbUnitTest;
+import cn.iocoder.yudao.server.BaseDbUnitTest;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.group.BpmUserGroupCreateReqVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.group.BpmUserGroupPageReqVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.group.BpmUserGroupUpdateReqVO;

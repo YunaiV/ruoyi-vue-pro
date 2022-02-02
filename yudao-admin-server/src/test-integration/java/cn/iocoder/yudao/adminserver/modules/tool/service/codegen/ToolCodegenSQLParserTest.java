@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.tool.service.codegen;
 
-import cn.iocoder.yudao.adminserver.BaseDbUnitTest;
+import cn.iocoder.yudao.server.BaseDbUnitTest;
 import cn.iocoder.yudao.module.tool.service.codegen.impl.ToolCodegenSQLParser;
 import org.junit.jupiter.api.Test;
 

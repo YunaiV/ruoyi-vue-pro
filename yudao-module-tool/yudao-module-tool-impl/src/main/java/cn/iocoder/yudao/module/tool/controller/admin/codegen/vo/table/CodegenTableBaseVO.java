@@ -16,6 +16,10 @@ public class CodegenTableBaseVO {
     @NotNull(message = "导入类型不能为空")
     private Integer importType;
 
+    @ApiModelProperty(value = "生成场景", required = true, example = "1", notes = "参见 CodegenSceneEnum 枚举")
+    @NotNull(message = "导入类型不能为空")
+    private Integer scene;
+
     @ApiModelProperty(value = "表名称", required = true, example = "yudao")
     @NotNull(message = "表名称不能为空")
     private String tableName;

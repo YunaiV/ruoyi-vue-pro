@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.tool.dal.mysql.codegen;
 
-import cn.iocoder.yudao.adminserver.BaseDbUnitTest;
+import cn.iocoder.yudao.server.BaseDbUnitTest;
 
 import javax.annotation.Resource;
 
