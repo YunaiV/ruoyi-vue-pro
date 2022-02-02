@@ -86,6 +86,7 @@ public class CodegenEngine {
                     vueFilePath("api/${table.moduleName}/${classNameVar}.js"))
             // SQL
             .put("codegen/sql/sql.vm", "sql/sql.sql")
+            .put("codegen/sql/h2.vm", "sql/h2.sql")
             .build();
 
     @Resource
