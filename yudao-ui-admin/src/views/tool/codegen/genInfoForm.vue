@@ -12,7 +12,7 @@
       </el-col>
       <el-col :span="12">
         <el-form-item prop="scene">
-          <span slot="label">生成模板</span>
+          <span slot="label">生成场景</span>
           <el-select v-model="info.scene">
             <el-option v-for="dict in this.getDictDatas(DICT_TYPE.TOOL_CODEGEN_SCENE)"
                        :key="parseInt(dict.value)" :label="dict.label" :value="parseInt(dict.value)"/>

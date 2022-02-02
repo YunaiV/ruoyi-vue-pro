@@ -5,10 +5,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SuppressWarnings("SpringComponentScan") // 忽略 IDEA 无法识别 ${yudao.info.base-package}
 @SpringBootApplication(scanBasePackages = {"${yudao.info.base-package}.server", "${yudao.info.base-package}.module"})
-public class AdminServerApplication {
+public class YudaoServerApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(AdminServerApplication.class, args);
+        SpringApplication.run(YudaoServerApplication.class, args);
     }
 
 }

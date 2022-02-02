@@ -9,10 +9,10 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>yudao-admin-server</artifactId>
+    <artifactId>yudao-server</artifactId>
     <packaging>jar</packaging>
 
-    <name>yudao-admin-server</name>
+    <name>${artifactId}</name>
     <description>
         后端 Server 的主项目，通过引入需要 yudao-module-xxx 的依赖，
         从而实现提供 RESTful API 给 yudao-ui-admin、yudao-ui-user 等前端项目。

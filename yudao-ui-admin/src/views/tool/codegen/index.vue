@@ -78,10 +78,9 @@
 
     <!-- 预览界面 -->
     <el-dialog :title="preview.title" :visible.sync="preview.open" width="90%" top="5vh" append-to-body>
-
       <el-row>
         <el-col :span="7">
-          <el-tree :data="preview.fileTree" :expand-on-click-node="false" default-expand-all
+          <el-tree :data="preview.fileTree" :expand-on-click-node="false" default-expand-all highlight-current
                    @node-click="handleNodeClick"/>
         </el-col>
         <el-col :span="17">
@@ -253,10 +252,10 @@ export default {
       previewCodegen(row.id).then(response => {
         this.preview.data = response.data;
         let files = this.handleFiles(response.data);
-        console.log(files)
+        // console.log(files)
         this.preview.fileTree = this.handleTree(files, "id", "parentId", "children",
             "/"); // "/" 为根节点
-        console.log(this.preview.fileTree)
+        // console.log(this.preview.fileTree)
         this.preview.activeName = response.data[0].filePath;
         this.preview.open = true;
       });

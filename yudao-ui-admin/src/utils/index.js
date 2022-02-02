@@ -273,7 +273,7 @@ export function debounce(func, wait, immediate) {
 // }
 
 // 深拷贝对象
-// 【add by 芋道源码】https://github.com/JakHuang/form-generator/blob/dev/src/utils/index.js#L107
+// add by 芋道源码 https://github.com/JakHuang/form-generator/blob/dev/src/utils/index.js#L107
 export function deepClone(obj) {
   const _toString = Object.prototype.toString
 
