@@ -8,21 +8,16 @@
       </el-form-item>
       <el-form-item label="状态" prop="status">
         <el-select v-model="queryParams.status" placeholder="请选择状态" clearable size="small">
-          <el-option v-for="dict in this.getDictDatas(DICT_TYPE.COMMON_STATUS)"
-                     :key="dict.value" :label="dict.label" :value="dict.value"/>
+          <el-option label="请选择字典生成" value="" />
         </el-select>
       </el-form-item>
       <el-form-item label="类型" prop="type">
         <el-select v-model="queryParams.type" placeholder="请选择类型" clearable size="small">
-          <el-option v-for="dict in this.getDictDatas(DICT_TYPE.SYSTEM_OPERATE_TYPE)"
-                     :key="dict.value" :label="dict.label" :value="dict.value"/>
+          <el-option label="请选择字典生成" value="" />
         </el-select>
       </el-form-item>
       <el-form-item label="分类" prop="category">
-        <el-select v-model="queryParams.category" placeholder="请选择分类" clearable size="small">
-          <el-option v-for="dict in this.getDictDatas(DICT_TYPE.INFRA_REDIS_TIMEOUT_TYPE)"
-                     :key="dict.value" :label="dict.label" :value="dict.value"/>
-        </el-select>
+        <el-input v-model="queryParams.category" placeholder="请输入分类" clearable size="small" @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item label="备注" prop="remark">
         <el-input v-model="queryParams.remark" placeholder="请输入备注" clearable size="small" @keyup.enter.native="handleQuery"/>
@@ -30,11 +25,6 @@
       <el-form-item label="创建时间">
         <el-date-picker v-model="dateRangeCreateTime" size="small" style="width: 240px" value-format="yyyy-MM-dd"
                         type="daterange" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" />
-      </el-form-item>
-      <el-form-item label="是否删除" prop="deleted">
-        <el-select v-model="queryParams.deleted" placeholder="请选择是否删除" clearable size="small">
-          <el-option label="请选择字典生成" value="" />
-        </el-select>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
@@ -59,25 +49,13 @@
     <el-table v-loading="loading" :data="list">
       <el-table-column label="编号" align="center" prop="id" />
       <el-table-column label="名字" align="center" prop="name" />
-      <el-table-column label="状态" align="center" prop="status">
-        <template slot-scope="scope">
-          <span>{{ getDictDataLabel(DICT_TYPE.COMMON_STATUS, scope.row.status) }}</span>
-        </template>
-      </el-table-column>>
-      <el-table-column label="类型" align="center" prop="type">
-        <template slot-scope="scope">
-          <span>{{ getDictDataLabel(DICT_TYPE.SYSTEM_OPERATE_TYPE, scope.row.type) }}</span>
-        </template>
-      </el-table-column>>
-      <el-table-column label="分类" align="center" prop="category">
-        <template slot-scope="scope">
-          <span>{{ getDictDataLabel(DICT_TYPE.INFRA_REDIS_TIMEOUT_TYPE, scope.row.category) }}</span>
-        </template>
-      </el-table-column>>
+      <el-table-column label="状态" align="center" prop="status" />
+      <el-table-column label="类型" align="center" prop="type" />
+      <el-table-column label="分类" align="center" prop="category" />
       <el-table-column label="备注" align="center" prop="remark" />
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
         <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.createTime, '{y}-{m}-{d}') }}</span>
+          <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
@@ -99,23 +77,18 @@
         <el-form-item label="名字" prop="name">
           <el-input v-model="form.name" placeholder="请输入名字" />
         </el-form-item>
-        <el-form-item label="状态">
+        <el-form-item label="状态" prop="status">
           <el-radio-group v-model="form.status">
-            <el-radio v-for="dict in this.getDictDatas(DICT_TYPE.COMMON_STATUS)"
-                      :key="dict.value" :label="parseInt(dict.value)">{{dict.label}}</el-radio>
+            <el-radio label="1">请选择字典生成</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="类型" prop="type">
           <el-select v-model="form.type" placeholder="请选择类型">
-            <el-option v-for="dict in this.getDictDatas(DICT_TYPE.SYSTEM_OPERATE_TYPE)"
-                       :key="dict.value" :label="dict.label" :value="parseInt(dict.value)" />
+            <el-option label="请选择字典生成" value="" />
           </el-select>
         </el-form-item>
-        <el-form-item label="分类">
-          <el-radio-group v-model="form.category">
-            <el-radio v-for="dict in this.getDictDatas(DICT_TYPE.INFRA_REDIS_TIMEOUT_TYPE)"
-                      :key="dict.value" :label="parseInt(dict.value)">{{dict.label}}</el-radio>
-          </el-radio-group>
+        <el-form-item label="分类" prop="category">
+          <el-input v-model="form.category" placeholder="请输入分类" />
         </el-form-item>
         <el-form-item label="备注" prop="remark">
           <el-input v-model="form.remark" placeholder="请输入备注" />
@@ -144,7 +117,7 @@ export default {
       showSearch: true,
       // 总条数
       total: 0,
-      // 测试示例列表
+      // 字典类型列表
       list: [],
       // 弹出层标题
       title: "",
@@ -160,7 +133,6 @@ export default {
         type: null,
         category: null,
         remark: null,
-        deleted: null,
       },
       // 表单参数
       form: {},
@@ -180,6 +152,7 @@ export default {
     /** 查询列表 */
     getList() {
       this.loading = true;
+      // 处理查询参数
       let params = {...this.queryParams};
       this.addBeginAndEndTime(params, this.dateRangeCreateTime, 'createTime');
       // 执行查询
@@ -189,12 +162,12 @@ export default {
         this.loading = false;
       });
     },
-    // 取消按钮
+    /** 取消按钮 */
     cancel() {
       this.open = false;
       this.reset();
     },
-    // 表单重置
+    /** 表单重置 */
     reset() {
       this.form = {
         id: undefined,
@@ -203,11 +176,6 @@ export default {
         type: undefined,
         category: undefined,
         remark: undefined,
-        createBy: undefined,
-        createTime: undefined,
-        updateBy: undefined,
-        updateTime: undefined,
-        deleted: undefined,
       };
       this.resetForm("form");
     },
@@ -226,7 +194,7 @@ export default {
     handleAdd() {
       this.reset();
       this.open = true;
-      this.title = "添加测试示例";
+      this.title = "添加字典类型";
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
@@ -235,7 +203,7 @@ export default {
       getTestDemo(id).then(response => {
         this.form = response.data;
         this.open = true;
-        this.title = "修改测试示例";
+        this.title = "修改字典类型";
       });
     },
     /** 提交按钮 */
@@ -264,30 +232,34 @@ export default {
     /** 删除按钮操作 */
     handleDelete(row) {
       const id = row.id;
-      this.$confirm('是否确认删除测试示例编号为"' + id + '"的数据项?', "警告", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      }).then(function() {
-        return deleteTestDemo(id);
-      }).then(() => {
-        this.getList();
-        this.msgSuccess("删除成功");
-      })
+      this.$confirm('是否确认删除字典类型编号为"' + id + '"的数据项?', "警告", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning"
+        }).then(function() {
+          return deleteTestDemo(id);
+        }).then(() => {
+          this.getList();
+          this.msgSuccess("删除成功");
+        })
     },
     /** 导出按钮操作 */
     handleExport() {
+      // 处理查询参数
       let params = {...this.queryParams};
+      params.pageNo = undefined;
+      params.pageSize = undefined;
       this.addBeginAndEndTime(params, this.dateRangeCreateTime, 'createTime');
-      this.$confirm('是否确认导出所有测试示例数据项?', "警告", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      }).then(function() {
-        return exportTestDemoExcel(params);
-      }).then(response => {
-        this.downloadExcel(response, '测试示例.xls');
-      })
+      // 执行导出
+      this.$confirm('是否确认导出所有字典类型数据项?', "警告", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning"
+        }).then(function() {
+          return exportTestDemoExcel(params);
+        }).then(response => {
+          this.downloadExcel(response, '字典类型.xls');
+        })
     }
   }
 };

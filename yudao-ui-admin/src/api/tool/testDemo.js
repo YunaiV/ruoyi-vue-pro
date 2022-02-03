@@ -18,7 +18,6 @@ export function updateTestDemo(data) {
   })
 }
 
-
 // 删除字典类型
 export function deleteTestDemo(id) {
   return request({

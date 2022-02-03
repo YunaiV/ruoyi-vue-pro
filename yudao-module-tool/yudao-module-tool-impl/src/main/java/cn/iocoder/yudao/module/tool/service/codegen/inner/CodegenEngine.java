@@ -79,9 +79,9 @@ public class CodegenEngine {
                     javaModuleImplMainFilePath("service/${table.businessName}/${table.className}Service"))
             // Java module-impl Test
             .put(javaTemplatePath("test/serviceTest"),
-                    javaModuleImplTestFilePath("service/${table.businessName}/${table.className}ServiceTest"))
+                    javaModuleImplTestFilePath("service/${table.businessName}/${table.className}ServiceImplTest"))
             // Java module-api Main
-            .put(javaTemplatePath("enums/errorcode"), javaModuleApiMainFilePath("enums/ErrorCodeConstants"))
+            .put(javaTemplatePath("enums/errorcode"), javaModuleApiMainFilePath("enums/ErrorCodeConstants_手动操作"))
             // Vue
             .put(vueTemplatePath("views/index.vue"),
                     vueFilePath("views/${table.moduleName}/${classNameVar}/index.vue"))
@@ -158,11 +158,11 @@ public class CodegenEngine {
 
         // 如果多租户，则进行覆盖 DB 独有字段
         if (CollectionUtils.findFirst(columns, column -> column.getColumnName().equals(CodegenBuilder.TENANT_ID_FIELD)) != null) {
-            globalBindingMap.put("BaseDOClassName", TenantBaseDO.class.getName());
-            globalBindingMap.put("BaseDOClassName_simple", TenantBaseDO.class.getSimpleName());
+            bindingMap.put("BaseDOClassName", TenantBaseDO.class.getName());
+            bindingMap.put("BaseDOClassName_simple", TenantBaseDO.class.getSimpleName());
         } else {
-            globalBindingMap.put("BaseDOClassName", BaseDO.class.getName());
-            globalBindingMap.put("BaseDOClassName_simple", BaseDO.class.getSimpleName());
+            bindingMap.put("BaseDOClassName", BaseDO.class.getName());
+            bindingMap.put("BaseDOClassName_simple", BaseDO.class.getSimpleName());
         }
 
         // 执行生成
