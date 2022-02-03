@@ -17,8 +17,8 @@
 </div>
 </body>
 <script>
-    // let server = 'http://127.0.0.1:28080';
-    let server = 'http://192.168.1.2:28080';
+    // let server = 'http://127.0.0.1:48080';
+    let server = 'http://192.168.1.2:48080';
 
     let type = 31; //登录类型 微信公众号
 
@@ -38,7 +38,7 @@
 
         // 调用授权登录接口
         $.ajax({
-            url: server + "/api/social-login2",
+            url: server + "/app-api/social-login2",
             method: 'POST',
             data: JSON.stringify(data),
             contentType: "application/json;charset=utf-8",
@@ -60,7 +60,7 @@
             'scene': 1 // 手机号登陆 类型
         }
         $.ajax({
-            url: server + "/api/send-sms-code",
+            url: server + "/app-api/send-sms-code",
             method: 'POST',
             data: JSON.stringify(data),
             contentType: "application/json;charset=utf-8",

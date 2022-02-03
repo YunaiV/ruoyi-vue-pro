@@ -23,7 +23,6 @@ public class LoginLogCreateReqDTO {
     /**
      * 链路追踪编号
      */
-    @NotEmpty(message = "链路追踪编号不能为空")
     private String traceId;
 
     /**

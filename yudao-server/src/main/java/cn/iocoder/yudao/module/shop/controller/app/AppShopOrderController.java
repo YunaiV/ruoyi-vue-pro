@@ -1,13 +1,13 @@
-package cn.iocoder.yudao.userserver.modules.shop.controller;
+package cn.iocoder.yudao.module.shop.controller.app;
 
-import cn.iocoder.yudao.coreservice.modules.pay.service.notify.vo.PayNotifyOrderReqVO;
-import cn.iocoder.yudao.coreservice.modules.pay.service.notify.vo.PayRefundOrderReqVO;
-import cn.iocoder.yudao.coreservice.modules.pay.service.order.PayOrderCoreService;
-import cn.iocoder.yudao.coreservice.modules.pay.service.order.dto.PayOrderCreateReqDTO;
-import cn.iocoder.yudao.coreservice.modules.pay.util.PaySeqUtils;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.date.DateUtils;
-import cn.iocoder.yudao.userserver.modules.shop.controller.vo.ShopOrderCreateRespVO;
+import cn.iocoder.yudao.module.pay.service.notify.vo.PayNotifyOrderReqVO;
+import cn.iocoder.yudao.module.pay.service.notify.vo.PayRefundOrderReqVO;
+import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
+import cn.iocoder.yudao.module.pay.service.order.dto.PayOrderCreateReqDTO;
+import cn.iocoder.yudao.module.pay.util.PaySeqUtils;
+import cn.iocoder.yudao.module.shop.controller.app.vo.AppShopOrderCreateRespVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -24,20 +24,20 @@ import java.time.Duration;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getClientIP;
 
-@Api(tags = "商城订单")
+@Api(tags = "用户 APP - 商城订单")
 @RestController
 @RequestMapping("/shop/order")
 @Validated
 @Slf4j
-public class ShopOrderController {
+public class AppShopOrderController {
 
     @Resource
-    private PayOrderCoreService payOrderCoreService;
+    private PayOrderService payOrderService;
 
     @PostMapping("/create")
     @ApiOperation("创建商城订单")
 //    @PreAuthenticated // TODO 暂时不加登陆验证，前端暂时没做好
-    public CommonResult<ShopOrderCreateRespVO> create() {
+    public CommonResult<AppShopOrderCreateRespVO> create() {
         // 假装创建商城订单
         Long shopOrderId = System.currentTimeMillis();
 
@@ -50,10 +50,10 @@ public class ShopOrderController {
         reqDTO.setBody("内容：" + shopOrderId);
         reqDTO.setAmount(200); // 单位：分
         reqDTO.setExpireTime(DateUtils.addTime(Duration.ofDays(1)));
-        Long payOrderId = payOrderCoreService.createPayOrder(reqDTO);
+        Long payOrderId = payOrderService.createPayOrder(reqDTO);
 
         // 拼接返回
-        return success(ShopOrderCreateRespVO.builder().id(shopOrderId)
+        return success(AppShopOrderCreateRespVO.builder().id(shopOrderId)
                 .payOrderId(payOrderId).build());
     }
 

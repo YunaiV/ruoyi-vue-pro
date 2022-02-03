@@ -14,14 +14,14 @@
 </body>
 <script>
     // let server = 'http://127.0.0.1:28080';
-    let server = 'http://192.168.1.2:28080';
+    let server = 'http://192.168.1.2:48080';
 
 
     // 微信公众号
     $( "#wx_pub").on( "click", function() {
         // 获得授权链接
         $.ajax({
-            url: server + "/api/social-auth-redirect?type=31&redirectUri=" +
+            url: server + "/app-api/social-auth-redirect?type=31&redirectUri=" +
                 encodeURIComponent(server + '/static/social-login2.html'),  //重定向地址
             method: 'GET',
             success: function( result ) {

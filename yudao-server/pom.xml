@@ -67,17 +67,6 @@
             <artifactId>yudao-spring-boot-starter-protection</artifactId>
         </dependency>
 
-        <!-- 监控相关 -->
-        <dependency>
-            <groupId>cn.iocoder.boot</groupId>
-            <artifactId>yudao-spring-boot-starter-monitor</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>de.codecentric</groupId>
-            <artifactId>spring-boot-admin-starter-server</artifactId> <!-- 实现 Spring Boot Admin Server 服务端 -->
-        </dependency>
-
     </dependencies>
 
     <build>

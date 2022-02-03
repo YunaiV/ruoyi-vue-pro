@@ -164,7 +164,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         if (user != null) {
             reqDTO.setUserId(user.getId());
         }
-        reqDTO.setUserType(UserTypeEnum.ADMIN.getValue());
+        reqDTO.setUserType(getUserType().getValue());
         reqDTO.setUsername(username);
         reqDTO.setUserAgent(ServletUtils.getUserAgent());
         reqDTO.setUserIp(ServletUtils.getClientIP());

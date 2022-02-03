@@ -20,6 +20,10 @@ spring:
       write-durations-as-timestamps: true # 设置 Duration 的格式，使用时间戳
       fail-on-empty-beans: false # 允许序列化无属性的 Bean
 
+  # 静态资源
+  mvc:
+    static-path-pattern: /static/**
+
   # 工作流 Activiti 配置
   activiti:
     # 1. false: 默认值，activiti启动时，对比数据库表中保存的版本，如果不匹配。将抛出异常

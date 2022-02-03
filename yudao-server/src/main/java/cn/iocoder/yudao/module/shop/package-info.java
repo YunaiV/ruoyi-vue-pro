@@ -5,4 +5,5 @@
  *
  * 缩写：shop
  */
-package cn.iocoder.yudao.userserver.modules.shop;
+// TODO 芋艿：后续会迁移到 yudao-module-mall-trade 下
+package cn.iocoder.yudao.module.shop;

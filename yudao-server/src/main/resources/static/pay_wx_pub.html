@@ -16,7 +16,7 @@
 <script>
     let shopOrderId = undefined;
     let payOrderId = undefined;
-    // let server = 'http://127.0.0.1:28080';
+    // let server = 'http://127.0.0.1:48080';
     let server = 'http://niubi.natapp1.cc';
     // TODO openid
     let openid = "ockUAwIZ-0OeMZl9ogcZ4ILrGba0";
@@ -24,7 +24,7 @@
         // 获得 JsapiTicket
         // 参考 https://developers.weixin.qq.com/doc/offiaccount/OA_Web_Apps/JS-SDK.html 文档
         $.ajax({
-            url: server + "/api/wx/mp/create-jsapi-signature?url=" + document.location.href,
+            url: server + "/app-api/wx/mp/create-jsapi-signature?url=" + document.location.href,
             method: 'POST',
             success: function( result ) {
                 if (result.code !== 0) {
@@ -42,7 +42,7 @@
 
         // 自动发起商城订单编号
         $.ajax({
-            url: server + "/api/shop/order/create",
+            url: server + "/app-api/shop/order/create",
             method: 'POST',
             success: function( result ) {
                 if (result.code !== 0) {
@@ -78,7 +78,7 @@
         // 参考 https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=7_7&index=6 文档
         // 参考 https://segmentfault.com/a/1190000020704650 文档
         $.ajax({
-            url: server + "/api/pay/order/submit",
+            url: server + "/app-api/pay/order/submit",
             method: 'POST',
             dataType: "json",
             contentType: "application/json",

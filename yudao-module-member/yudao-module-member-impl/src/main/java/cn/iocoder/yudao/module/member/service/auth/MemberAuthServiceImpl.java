@@ -202,6 +202,7 @@ public class MemberAuthServiceImpl implements MemberAuthService {
         if (user != null) {
             reqDTO.setUserId(user.getId());
         }
+        reqDTO.setUserType(getUserType().getValue());
         reqDTO.setUsername(mobile);
         reqDTO.setUserAgent(ServletUtils.getUserAgent());
         reqDTO.setUserIp(getClientIP());

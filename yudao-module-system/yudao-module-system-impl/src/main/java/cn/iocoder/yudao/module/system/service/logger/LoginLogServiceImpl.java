@@ -8,6 +8,7 @@ import cn.iocoder.yudao.module.system.convert.logger.LoginLogConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.logger.LoginLogDO;
 import cn.iocoder.yudao.module.system.dal.mysql.logger.LoginLogMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -16,6 +17,7 @@ import java.util.List;
  * 登录日志 Service 实现
  */
 @Service
+@Validated
 public class LoginLogServiceImpl implements LoginLogService {
 
     @Resource
