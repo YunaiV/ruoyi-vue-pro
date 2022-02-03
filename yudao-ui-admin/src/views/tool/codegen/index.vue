@@ -61,11 +61,11 @@
     <!-- 预览界面 -->
     <el-dialog :title="preview.title" :visible.sync="preview.open" width="90%" top="5vh" append-to-body>
       <el-row>
-        <el-col :span="9">
+        <el-col :span="7">
           <el-tree :data="preview.fileTree" :expand-on-click-node="false" default-expand-all highlight-current
                    @node-click="handleNodeClick"/>
         </el-col>
-        <el-col :span="15">
+        <el-col :span="17">
           <el-tabs v-model="preview.activeName">
             <el-tab-pane v-for="item in preview.data" :label="item.filePath.substring(item.filePath.lastIndexOf('/') + 1)"
                          :name="item.filePath" :key="item.filePath">
@@ -257,10 +257,45 @@ export default {
       for (const data of datas) {
         let paths = data.filePath.split('/');
         let fullPath = ''; // 从头开始的路径，用于生成 id
+        // 特殊处理 java 文件
+        if (paths[paths.length - 1].indexOf('.java') >= 0) {
+          let newPaths = [];
+          for (let i = 0; i < paths.length; i++) {
+            let path = paths[i];
+            if (path !== 'java') {
+              newPaths.push(path);
+              continue;
+            }
+            newPaths.push(path);
+            // 特殊处理中间的 package，进行合并
+            let tmp = undefined;
+            while (i < paths.length) {
+              path = paths[i + 1];
+              if (path === 'controller'
+                || path === 'convert'
+                || path === 'dal'
+                || path === 'enums'
+                || path === 'service'
+                || path === 'vo' // 下面三个，主要是兜底。可能考虑到有人改了包结构
+                || path === 'mysql'
+                || path === 'dataobject') {
+                break;
+              }
+              tmp = tmp ? tmp + '.' + path : path;
+              i++;
+            }
+            if (tmp) {
+              newPaths.push(tmp);
+            }
+          }
+          paths = newPaths;
+        }
+        // 遍历每个 path， 拼接成树
         for (let i = 0; i < paths.length; i++) {
-          // 已经添加大奥 files 中，则跳过
+          // 已经添加到 files 中，则跳过
           let oldFullPath = fullPath;
-          fullPath = fullPath.length === 0 ? paths[i] : fullPath + '/' + paths[i];
+          // 下面的 replaceAll 的原因，是因为上面包处理了，导致和 tabs 不匹配，所以 replaceAll 下
+          fullPath = fullPath.length === 0 ? paths[i] : fullPath.replaceAll('.', '/') + '/' + paths[i];
           if (exists[fullPath]) {
             continue;
           }
@@ -276,7 +311,11 @@ export default {
       return files;
     },
     /** 节点单击事件 **/
-    handleNodeClick(data) {
+    handleNodeClick(data, node) {
+      if (node && !node.isLeaf) {
+        return false;
+      }
+      // 判断，如果非子节点，不允许选中
       this.preview.activeName = data.id;
     },
     /** 修改按钮操作 */

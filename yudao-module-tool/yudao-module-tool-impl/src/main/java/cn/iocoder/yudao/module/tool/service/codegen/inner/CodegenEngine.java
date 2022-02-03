@@ -229,7 +229,8 @@ public class CodegenEngine {
     }
 
     private static String vueFilePath(String path) {
-        return "vue/" + path;
+        return "yudao-ui-${sceneEnum.basePackage}/" + // 顶级目录
+                "src/" + path;
     }
 
 }
