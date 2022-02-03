@@ -89,7 +89,7 @@ public interface PayAppService {
      * @param merchantId 商户 ID
      * @return 支付应用信息列表
      */
-    List<PayAppDO> getListByMerchantId(String merchantId);
+    List<PayAppDO> getListByMerchantId(Long merchantId);
 
     /**
      * 获得指定编号的商户 Map

@@ -19,7 +19,7 @@ import java.io.IOException;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
-@Api(tags = "流程模型")
+@Api(tags = "管理后台 - 流程模型")
 @RestController
 @RequestMapping("/bpm/model")
 @Validated
@@ -30,7 +30,7 @@ public class BpmModelController {
 
     @GetMapping("/page")
     @ApiOperation(value = "获得模型分页")
-    public CommonResult<PageResult<BpmModelPageItemRespVO>> getModelPage(ModelPageReqVO pageVO) {
+    public CommonResult<PageResult<BpmModelPageItemRespVO>> getModelPage(BpmModelPageReqVO pageVO) {
         return success(bpmModelService.getModelPage(pageVO));
     }
 

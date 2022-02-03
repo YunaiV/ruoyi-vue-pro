@@ -6,7 +6,7 @@ import lombok.Data;
 
 import java.util.Date;
 
-@ApiModel("流程活动的 Response VO")
+@ApiModel("管理后台 - 流程活动的 Response VO")
 @Data
 public class BpmActivityRespVO {
 

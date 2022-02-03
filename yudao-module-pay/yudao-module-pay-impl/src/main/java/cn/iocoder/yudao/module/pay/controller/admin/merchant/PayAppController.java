@@ -155,7 +155,7 @@ public class PayAppController {
     @ApiOperation("根据商户 ID 查询支付应用信息")
     @ApiImplicitParam(name = "merchantId", value = "商户ID", required = true, example = "1", dataTypeClass = Long.class)
     @PreAuthorize("@ss.hasPermission('pay:merchant:query')")
-    public CommonResult<List<PayAppRespVO>> getMerchantListByName(@RequestParam String merchantId) {
+    public CommonResult<List<PayAppRespVO>> getMerchantListByName(@RequestParam Long merchantId) {
         List<PayAppDO> appListDO = appService.getListByMerchantId(merchantId);
         return success(PayAppConvert.INSTANCE.convertList(appListDO));
     }

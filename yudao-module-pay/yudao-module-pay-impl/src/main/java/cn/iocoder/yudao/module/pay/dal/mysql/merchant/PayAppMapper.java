@@ -39,7 +39,7 @@ public interface PayAppMapper extends BaseMapperX<PayAppDO> {
                 .orderByDesc("id"));
     }
 
-    default List<PayAppDO> getListByMerchantId(String merchantId) {
+    default List<PayAppDO> getListByMerchantId(Long merchantId) {
         return selectList(new LambdaQueryWrapper<PayAppDO>()
                 .select(PayAppDO::getId, PayAppDO::getName)
                 .eq(PayAppDO::getMerchantId, merchantId));

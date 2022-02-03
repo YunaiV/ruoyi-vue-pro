@@ -23,7 +23,7 @@ import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
-@Api(tags = "流程定义")
+@Api(tags = "管理后台 - 流程定义")
 @RestController
 @RequestMapping("/bpm/process-definition")
 @Validated

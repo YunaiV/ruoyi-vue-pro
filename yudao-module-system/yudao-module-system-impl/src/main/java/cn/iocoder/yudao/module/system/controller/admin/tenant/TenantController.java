@@ -34,7 +34,7 @@ public class TenantController {
 
     @GetMapping("/get-id-by-name")
     @ApiOperation(value = "使用租户名，获得租户编号", notes = "登录界面，根据用户的租户名，获得租户编号")
-    @ApiImplicitParam(name = "name", value = "租户名", required = true, example = "芋道源码", dataTypeClass = Long.class)
+    @ApiImplicitParam(name = "name", value = "租户名", required = true, example = "1024", dataTypeClass = Long.class)
     public CommonResult<Long> getTenantIdByName(@RequestParam("name") String name) {
         TenantDO tenantDO = tenantService.getTenantByName(name);
         return success(tenantDO != null ? tenantDO.getId() : null);
@@ -57,7 +57,7 @@ public class TenantController {
 
     @DeleteMapping("/delete")
     @ApiOperation("删除租户")
-    @ApiImplicitParam(name = "id", value = "编号", required = true, dataTypeClass = Long.class)
+    @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
     @PreAuthorize("@ss.hasPermission('system:tenant:delete')")
     public CommonResult<Boolean> deleteTenant(@RequestParam("id") Long id) {
         tenantService.deleteTenant(id);

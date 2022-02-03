@@ -6,7 +6,7 @@ import lombok.Data;
 
 import javax.validation.constraints.NotEmpty;
 
-@ApiModel("不通过流程任务的 Request VO")
+@ApiModel("管理后台 - 不通过流程任务的 Request VO")
 @Data
 public class BpmTaskRejectReqVO {
 

@@ -61,7 +61,7 @@ yudao:
     title: 管理后台
     description: 提供管理员管理的所有功能
     version: ${yudao.info.version}
-    base-package: ${yudao.info.base-package}.modules
+    base-package: ${yudao.info.base-package}
   captcha:
     timeout: 5m
     width: 160

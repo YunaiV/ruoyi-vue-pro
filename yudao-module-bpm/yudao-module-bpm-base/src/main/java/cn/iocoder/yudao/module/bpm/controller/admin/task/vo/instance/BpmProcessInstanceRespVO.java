@@ -8,7 +8,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-@ApiModel("流程实例的 Response VO")
+@ApiModel("管理后台 - 流程实例的 Response VO")
 @Data
 public class BpmProcessInstanceRespVO {
 

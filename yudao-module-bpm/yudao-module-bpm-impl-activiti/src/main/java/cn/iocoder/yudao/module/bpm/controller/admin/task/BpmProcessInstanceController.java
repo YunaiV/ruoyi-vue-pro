@@ -17,7 +17,7 @@ import javax.validation.Valid;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
-@Api(tags = "流程实例") // 流程实例，通过流程定义创建的一次“申请”
+@Api(tags = "管理后台 - 流程实例") // 流程实例，通过流程定义创建的一次“申请”
 @RestController
 @RequestMapping("/bpm/process-instance")
 @Validated

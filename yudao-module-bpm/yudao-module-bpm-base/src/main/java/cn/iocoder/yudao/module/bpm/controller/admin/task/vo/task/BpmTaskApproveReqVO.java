@@ -10,7 +10,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.Map;
 
-@ApiModel("通过流程任务的 Request VO")
+@ApiModel("管理后台 - 通过流程任务的 Request VO")
 @Data
 public class BpmTaskApproveReqVO {
 

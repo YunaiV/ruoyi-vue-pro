@@ -8,7 +8,7 @@ import lombok.ToString;
 
 import javax.validation.constraints.NotEmpty;
 
-@ApiModel("流程任务分配规则的创建 Request VO")
+@ApiModel("管理后台 - 流程任务分配规则的创建 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)

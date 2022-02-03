@@ -19,7 +19,7 @@ public interface BpmModelService {
      * @param pageVO 分页查询
      * @return 流程模型分页
      */
-    PageResult<BpmModelPageItemRespVO> getModelPage(ModelPageReqVO pageVO);
+    PageResult<BpmModelPageItemRespVO> getModelPage(BpmModelPageReqVO pageVO);
 
     /**
      * 获得流程模块

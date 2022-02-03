@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@ApiModel("用户组精简信息 Response VO")
+@ApiModel("管理后台 - 用户组精简信息 Response VO")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

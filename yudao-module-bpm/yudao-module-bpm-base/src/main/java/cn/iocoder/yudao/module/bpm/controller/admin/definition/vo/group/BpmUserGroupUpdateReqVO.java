@@ -4,7 +4,7 @@ import lombok.*;
 import io.swagger.annotations.*;
 import javax.validation.constraints.*;
 
-@ApiModel("用户组更新 Request VO")
+@ApiModel("管理后台 - 用户组更新 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)

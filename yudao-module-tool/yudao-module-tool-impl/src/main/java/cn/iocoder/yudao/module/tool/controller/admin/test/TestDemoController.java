@@ -51,7 +51,8 @@ public class TestDemoController {
     @DeleteMapping("/delete")
     @ApiOperation("删除字典类型")
     @ApiImplicitParam(name = "id", value = "编号", required = true, dataTypeClass = Long.class)
-    @PreAuthorize("@ss.hasPermission('tool:test-demo:delete')")    public CommonResult<Boolean> deleteTestDemo(@RequestParam("id") Long id) {
+    @PreAuthorize("@ss.hasPermission('tool:test-demo:delete')")
+    public CommonResult<Boolean> deleteTestDemo(@RequestParam("id") Long id) {
         testDemoService.deleteTestDemo(id);
         return success(true);
     }
@@ -68,7 +69,8 @@ public class TestDemoController {
     @GetMapping("/list")
     @ApiOperation("获得字典类型列表")
     @ApiImplicitParam(name = "ids", value = "编号列表", required = true, example = "1024,2048", dataTypeClass = List.class)
-    @PreAuthorize("@ss.hasPermission('tool:test-demo:query')")    public CommonResult<List<TestDemoRespVO>> getTestDemoList(@RequestParam("ids") Collection<Long> ids) {
+    @PreAuthorize("@ss.hasPermission('tool:test-demo:query')")
+    public CommonResult<List<TestDemoRespVO>> getTestDemoList(@RequestParam("ids") Collection<Long> ids) {
         List<TestDemoDO> list = testDemoService.getTestDemoList(ids);
         return success(TestDemoConvert.INSTANCE.convertList(list));
     }

@@ -8,11 +8,11 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 
-@ApiModel("流程模型分页 Request VO")
+@ApiModel("管理后台 - 流程模型分页 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class ModelPageReqVO extends PageParam {
+public class BpmModelPageReqVO extends PageParam {
 
     @ApiModelProperty(value = "标识", example = "process1641042089407", notes = "精准匹配")
     private String key;

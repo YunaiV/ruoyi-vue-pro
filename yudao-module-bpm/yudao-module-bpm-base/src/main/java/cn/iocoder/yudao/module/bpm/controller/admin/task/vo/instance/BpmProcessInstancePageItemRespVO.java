@@ -7,7 +7,7 @@ import lombok.Data;
 import java.util.Date;
 import java.util.List;
 
-@ApiModel("流程实例的分页 Item Response VO")
+@ApiModel("管理后台 - 流程实例的分页 Item Response VO")
 @Data
 public class BpmProcessInstancePageItemRespVO {
 

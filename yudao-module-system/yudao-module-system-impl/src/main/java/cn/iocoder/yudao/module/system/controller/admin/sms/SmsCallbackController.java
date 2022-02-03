@@ -29,7 +29,7 @@ public class SmsCallbackController {
 
     @PostMapping("/sms/yunpian")
     @ApiOperation(value = "云片短信的回调", notes = "参见 https://www.yunpian.com/official/document/sms/zh_cn/domestic_push_report 文档")
-    @ApiImplicitParam(name = "sms_status", value = "发送状态", required = true, example = "[{具体内容}]", dataTypeClass = Long.class)
+    @ApiImplicitParam(name = "sms_status", value = "发送状态", required = true, example = "[{具体内容}]", dataTypeClass = String.class)
     @OperateLog(enable = false)
     public String receiveYunpianSmsStatus(@RequestParam("sms_status") String smsStatus) throws Throwable {
         String text = URLUtil.decode(smsStatus); // decode 解码参数，因为它被 encode

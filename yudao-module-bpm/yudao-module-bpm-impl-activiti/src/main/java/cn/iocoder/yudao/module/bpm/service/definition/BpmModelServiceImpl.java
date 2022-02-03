@@ -60,7 +60,7 @@ public class BpmModelServiceImpl implements BpmModelService {
     private BpmTaskAssignRuleService taskAssignRuleService;
 
     @Override
-    public PageResult<BpmModelPageItemRespVO> getModelPage(ModelPageReqVO pageVO) {
+    public PageResult<BpmModelPageItemRespVO> getModelPage(BpmModelPageReqVO pageVO) {
         ModelQuery modelQuery = repositoryService.createModelQuery();
         if (StrUtil.isNotBlank(pageVO.getKey())) {
             modelQuery.modelKey(pageVO.getKey());

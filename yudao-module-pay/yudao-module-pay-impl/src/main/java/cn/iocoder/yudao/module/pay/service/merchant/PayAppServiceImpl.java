@@ -136,7 +136,7 @@ public class PayAppServiceImpl implements PayAppService {
     }
 
     @Override
-    public List<PayAppDO> getListByMerchantId(String merchantId) {
+    public List<PayAppDO> getListByMerchantId(Long merchantId) {
         return appMapper.getListByMerchantId(merchantId);
     }
 

@@ -6,7 +6,7 @@ import lombok.Data;
 
 import javax.validation.constraints.NotNull;
 
-@ApiModel("流程模型更新状态 Request VO")
+@ApiModel("管理后台 - 流程模型更新状态 Request VO")
 @Data
 public class BpmModelUpdateStateReqVO {
 

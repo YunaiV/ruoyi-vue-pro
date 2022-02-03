@@ -10,7 +10,7 @@ import net.bytebuddy.implementation.bind.annotation.Empty;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
-@ApiModel("流程任务的更新负责人的 Request VO")
+@ApiModel("管理后台 - 流程任务的更新负责人的 Request VO")
 @Data
 public class BpmTaskUpdateAssigneeReqVO {
 
