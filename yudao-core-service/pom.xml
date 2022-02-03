@@ -14,7 +14,7 @@
 
     <name>yudao-core-service</name>
     <description>
-        公共服务，通过 jar 包的方式，被 yudao-admin-server、yudao-user-service 使用。例如说：
+        公共服务，通过 jar 包的方式，被 yudao-admin-server、yudao-user-server 使用。例如说：
             1. 日志相关：访问日志、登录日志、异常日志等等
             2. 认证相关：在线 Session
             3. 短信相关：短信模板、短信日志
