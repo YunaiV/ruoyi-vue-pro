@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.bpm.service.definition;
 
 import cn.hutool.core.util.RandomUtil;
-import cn.iocoder.yudao.server.BaseDbUnitTest;
+import cn.iocoder.yudao.module.bpm.test.BaseDbUnitTest;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.form.BpmFormCreateReqVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.form.BpmFormPageReqVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.form.BpmFormUpdateReqVO;

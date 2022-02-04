@@ -13,7 +13,6 @@ spring:
     driver-class-name: org.h2.Driver
     username: sa
     password:
-    schema: classpath:sql/create_tables.sql # MySQL 转 H2 的语句，使用 https://www.jooq.org/translate/ 工具
     druid:
       async-init: true # 单元测试，异步初始化 Druid 连接池，提升启动速度
       initial-size: 1 # 单元测试，配置为 1，提升启动速度

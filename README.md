@@ -87,6 +87,11 @@ ps：核心功能已经实现，正在对接微信小程序中...
 * 2022 Q2 => 完成对 <https://github.com/YunaiV/onemall> 的迁移，作为 onemall 的 Spring Boot 单体版本。
 * 2022 Q4 => 完成对 <https://github.com/YunaiV/onemall>> 的重构，作为 onemall 的 Spring Cloud 微服务版本。
 
+### 会员中心
+
+正在开发中，大体计划如下：
+* 2021 Q1 =》完成对 <https://github.com/YunaiV/onemall> 的迁移 
+
 ### 基础设施
 
 |  | 功能 | 描述 |
@@ -118,43 +123,45 @@ ps：核心功能已经实现，正在对接微信小程序中...
 
 ## 技术栈
 
-| 项目 | 说明 |
-| --- | --- |
-| `yudao-dependencies` | Maven 依赖版本管理 |
-| `yudao-framework` | Java 框架拓展 |
-| `yudao-admin-server` | 管理后台的服务端 |
-| `yudao-admin-ui` | 管理后台的 UI 界面 |
-| `yudao-user-server` | 用户前台的服务端 |
-| `yudao-user-ui` | 用户前台的 UI 界面 |
-| `yudao-core-service` | 公共服务，提供共享逻辑 |
-
-> 友情提示：`yudao-admin-server` 和 `yudao-user-server` 会存在需要复用的逻辑，通过 `yudao-core-service` 实现。
+| 项目                    | 说明                 |
+|-----------------------|--------------------|
+| `yudao-dependencies`  | Maven 依赖版本管理       |
+| `yudao-framework`     | Java 框架拓展          |
+| `yudao-server`        | 管理后台 + 用户 APP 的服务端 |
+| `yudao-admin-ui`      | 管理后台的 UI 界面        |
+| `yudao-user-ui`       | 用户 APP 的 UI 界面     |
+| `yudao-module-system` | 系统功能的 Module 模块    |
+| `yudao-module-member` | 会员中心的 Module 模块    |
+| `yudao-module-infra`  | 基础设施的 Module 模块    |
+| `yudao-module-tool`   | 研发工具的 Module 模块    |
+| `yudao-module-bpm`    | 工作流程的 Module 模块    |
+| `yudao-module-pay`    | 支付系统的 Module 模块    |
 
 ### 后端
 
-| 框架 | 说明 |  版本 | 学习指南 |
-| --- | --- | --- | --- |
-| [Spring Boot](https://spring.io/projects/spring-boot) | 应用开发框架 | 2.4.12 | [文档](https://github.com/YunaiV/SpringBoot-Labs) |
-| [MySQL](https://www.mysql.com/cn/) | 数据库服务器 | 5.7 |  |
-| [Druid](https://github.com/alibaba/druid) | JDBC 连接池、监控组件 | 1.2.8 | [文档](http://www.iocoder.cn/Spring-Boot/datasource-pool/?yudao) |
-| [MyBatis Plus](https://mp.baomidou.com/) | MyBatis 增强工具包 | 3.4.3.4 | [文档](http://www.iocoder.cn/Spring-Boot/MyBatis/?yudao) |
-| [Dynamic Datasource](https://dynamic-datasource.com/) | 动态数据源 | 3.5.0 | [文档](http://www.iocoder.cn/Spring-Boot/datasource-pool/?yudao) |
-| [Redis](https://redis.io/) | key-value 数据库 | 5.0 |  |
-| [Redisson](https://github.com/redisson/redisson) | Redis 客户端 | 3.16.6 | [文档](http://www.iocoder.cn/Spring-Boot/Redis/?yudao) |
-| [Spring MVC](https://github.com/spring-projects/spring-framework/tree/master/spring-webmvc) | MVC 框架  | 5.3.13 | [文档](http://www.iocoder.cn/SpringMVC/MVC/?yudao) |
-| [Spring Security](https://github.com/spring-projects/spring-security) | Spring 安全框架 | 5.4.9 | [文档](http://www.iocoder.cn/Spring-Boot/Spring-Security/?yudao) |
-| [Hibernate Validator](https://github.com/hibernate/hibernate-validator) | 参数校验组件 | 6.1.7 | [文档](http://www.iocoder.cn/Spring-Boot/Validation/?yudao) |
+| 框架 | 说明 | 版本       | 学习指南 |
+| --- | --- |----------| --- |
+| [Spring Boot](https://spring.io/projects/spring-boot) | 应用开发框架 | 2.5.9    | [文档](https://github.com/YunaiV/SpringBoot-Labs) |
+| [MySQL](https://www.mysql.com/cn/) | 数据库服务器 | 5.7      |  |
+| [Druid](https://github.com/alibaba/druid) | JDBC 连接池、监控组件 | 1.2.8    | [文档](http://www.iocoder.cn/Spring-Boot/datasource-pool/?yudao) |
+| [MyBatis Plus](https://mp.baomidou.com/) | MyBatis 增强工具包 | 3.4.3.4  | [文档](http://www.iocoder.cn/Spring-Boot/MyBatis/?yudao) |
+| [Dynamic Datasource](https://dynamic-datasource.com/) | 动态数据源 | 3.5.0    | [文档](http://www.iocoder.cn/Spring-Boot/datasource-pool/?yudao) |
+| [Redis](https://redis.io/) | key-value 数据库 | 5.0      |  |
+| [Redisson](https://github.com/redisson/redisson) | Redis 客户端 | 3.16.6   | [文档](http://www.iocoder.cn/Spring-Boot/Redis/?yudao) |
+| [Spring MVC](https://github.com/spring-projects/spring-framework/tree/master/spring-webmvc) | MVC 框架  | 5.3.15   | [文档](http://www.iocoder.cn/SpringMVC/MVC/?yudao) |
+| [Spring Security](https://github.com/spring-projects/spring-security) | Spring 安全框架 | 5.5.4    | [文档](http://www.iocoder.cn/Spring-Boot/Spring-Security/?yudao) |
+| [Hibernate Validator](https://github.com/hibernate/hibernate-validator) | 参数校验组件 | 6.2.0    | [文档](http://www.iocoder.cn/Spring-Boot/Validation/?yudao) |
 | [Activiti](https://github.com/Activiti/Activiti) | 工作流引擎 | 7.1.0.M6 | [文档](TODO)  |
-| [Quartz](https://github.com/quartz-scheduler) | 任务调度组件 | 2.3.2 | [文档](http://www.iocoder.cn/Spring-Boot/Job/?yudao) |
-| [Knife4j](https://gitee.com/xiaoym/knife4j) | Swagger 增强 UI 实现 | 3.0.2 | [文档](http://www.iocoder.cn/Spring-Boot/Swagger/?yudao) |
-| [Resilience4j](https://github.com/resilience4j/resilience4j) | 服务保障组件 | 1.7.0 | [文档](http://www.iocoder.cn/Spring-Boot/Resilience4j/?yudao) |
-| [SkyWalking](https://skywalking.apache.org/) | 分布式应用追踪系统 | 8.5.0 | [文档](http://www.iocoder.cn/Spring-Boot/SkyWalking/?yudao) |
-| [Spring Boot Admin](https://github.com/codecentric/spring-boot-admin) | Spring Boot 监控平台 | 2.4.2 | [文档](http://www.iocoder.cn/Spring-Boot/Admin/?yudao) |
-| [Jackson](https://github.com/FasterXML/jackson) | JSON 工具库 | 2.11.4 |  |
-| [MapStruct](https://mapstruct.org/) | Java Bean 转换 | 1.4.1 | [文档](http://www.iocoder.cn/Spring-Boot/MapStruct/?yudao) |
-| [Lombok](https://projectlombok.org/) | 消除冗长的 Java 代码 | 1.16.14 | [文档](http://www.iocoder.cn/Spring-Boot/Lombok/?yudao) |
-| [JUnit](https://junit.org/junit5/) | Java 单元测试框架 | 5.7.1 | - |
-| [Mockito](https://github.com/mockito/mockito) | Java Mock 框架 | 3.6.28 | - |
+| [Quartz](https://github.com/quartz-scheduler) | 任务调度组件 | 2.3.2    | [文档](http://www.iocoder.cn/Spring-Boot/Job/?yudao) |
+| [Knife4j](https://gitee.com/xiaoym/knife4j) | Swagger 增强 UI 实现 | 3.0.2    | [文档](http://www.iocoder.cn/Spring-Boot/Swagger/?yudao) |
+| [Resilience4j](https://github.com/resilience4j/resilience4j) | 服务保障组件 | 1.7.0    | [文档](http://www.iocoder.cn/Spring-Boot/Resilience4j/?yudao) |
+| [SkyWalking](https://skywalking.apache.org/) | 分布式应用追踪系统 | 8.5.0    | [文档](http://www.iocoder.cn/Spring-Boot/SkyWalking/?yudao) |
+| [Spring Boot Admin](https://github.com/codecentric/spring-boot-admin) | Spring Boot 监控平台 | 2.4.2    | [文档](http://www.iocoder.cn/Spring-Boot/Admin/?yudao) |
+| [Jackson](https://github.com/FasterXML/jackson) | JSON 工具库 | 2.12.6   |  |
+| [MapStruct](https://mapstruct.org/) | Java Bean 转换 | 1.4.1    | [文档](http://www.iocoder.cn/Spring-Boot/MapStruct/?yudao) |
+| [Lombok](https://projectlombok.org/) | 消除冗长的 Java 代码 | 1.16.14  | [文档](http://www.iocoder.cn/Spring-Boot/Lombok/?yudao) |
+| [JUnit](https://junit.org/junit5/) | Java 单元测试框架 | 5.7.2    | - |
+| [Mockito](https://github.com/mockito/mockito) | Java Mock 框架 | 3.9.0    | - |
 
 ### 前端
 

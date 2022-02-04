@@ -16,7 +16,7 @@
     <properties>
         <revision>1.4.0-snapshot</revision>
         <!-- 统一依赖管理 -->
-        <spring.boot.version>2.4.12</spring.boot.version>
+        <spring.boot.version>2.5.9</spring.boot.version>
         <!-- Web 相关 -->
         <knife4j.version>3.0.2</knife4j.version>
         <swagger-annotations.version>1.5.22</swagger-annotations.version>
@@ -40,7 +40,7 @@
         <!-- Test 测试相关 -->
         <podam.version>7.2.6.RELEASE</podam.version>
         <jedis-mock.version>0.1.16</jedis-mock.version>
-        <mockito-inline.version>3.6.28</mockito-inline.version>
+        <mockito-inline.version>3.9.0</mockito-inline.version>
         <!-- Bpm 工作流相关 -->
         <activiti.version>7.1.0.M6</activiti.version>
         <flowable.version>6.7.0</flowable.version>

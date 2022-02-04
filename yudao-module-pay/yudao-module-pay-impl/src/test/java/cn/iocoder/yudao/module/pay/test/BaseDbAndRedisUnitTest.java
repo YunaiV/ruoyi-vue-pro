@@ -23,6 +23,7 @@ import org.springframework.test.context.jdbc.Sql;
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE, classes = BaseDbAndRedisUnitTest.Application.class)
 @ActiveProfiles("unit-test") // 设置使用 application-unit-test 配置文件
+@Sql(scripts = "/sql/create_tables.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD) // 每个单元测试结束前，创建表
 @Sql(scripts = "/sql/clean.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD) // 每个单元测试结束后，清理 DB
 public class BaseDbAndRedisUnitTest {
 
