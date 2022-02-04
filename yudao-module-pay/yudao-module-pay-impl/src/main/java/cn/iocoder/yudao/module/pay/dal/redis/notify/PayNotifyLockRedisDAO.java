@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import javax.annotation.Resource;
 import java.util.concurrent.TimeUnit;
 
-import static cn.iocoder.yudao.module.pay.dal.redis.PayRedisKeyCoreConstants.PAY_NOTIFY_LOCK;
+import static cn.iocoder.yudao.module.pay.dal.redis.RedisKeyConstants.PAY_NOTIFY_LOCK;
 
 /**
  * 支付通知的锁 Redis DAO

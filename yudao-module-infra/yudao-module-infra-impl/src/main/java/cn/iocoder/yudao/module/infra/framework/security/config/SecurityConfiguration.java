@@ -10,8 +10,8 @@ import org.springframework.security.config.annotation.web.configurers.Expression
 /**
  * Infra 模块的 Security 配置
  */
-@Configuration
-public class InfraSecurityConfiguration {
+@Configuration("infraSecurityConfiguration")
+public class SecurityConfiguration {
 
     @Value("${spring.boot.admin.context-path:''}")
     private String adminSeverContextPath;

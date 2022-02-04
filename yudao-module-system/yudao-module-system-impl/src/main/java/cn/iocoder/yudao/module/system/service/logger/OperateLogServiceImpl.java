@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import java.util.Collection;
@@ -28,6 +29,7 @@ import static cn.iocoder.yudao.module.system.dal.dataobject.logger.OperateLogDO.
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 
 @Service
+@Validated
 @Slf4j
 public class OperateLogServiceImpl implements OperateLogService {
 

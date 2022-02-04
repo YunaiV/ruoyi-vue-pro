@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.system.dal.dataobject.logger;
 
-import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
+import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum;
 import cn.iocoder.yudao.framework.tenant.core.db.TenantBaseDO;
@@ -48,9 +48,15 @@ public class OperateLogDO extends TenantBaseDO {
     /**
      * 用户编号
      *
-     * {@link AdminUserDO#getId()}
+     * 关联 MemberUserDO 的 id 属性，或者 AdminUserDO 的 id 属性
      */
     private Long userId;
+    /**
+     * 用户类型
+     *
+     * 关联 {@link  UserTypeEnum}
+     */
+    private Integer userType;
     /**
      * 操作模块
      */

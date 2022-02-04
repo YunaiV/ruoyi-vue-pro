@@ -9,8 +9,8 @@ import org.springframework.security.config.annotation.web.configurers.Expression
 /**
  * System 模块的 Security 配置
  */
-@Configuration
-public class SystemSecurityConfiguration {
+@Configuration("systemSecurityConfiguration")
+public class SecurityConfiguration {
 
     @Bean("systemAuthorizeRequestsCustomizer")
     public AuthorizeRequestsCustomizer authorizeRequestsCustomizer() {
