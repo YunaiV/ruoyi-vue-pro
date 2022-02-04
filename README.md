@@ -147,7 +147,7 @@ ps：核心功能已经实现，正在对接微信小程序中...
 | [MyBatis Plus](https://mp.baomidou.com/) | MyBatis 增强工具包 | 3.4.3.4  | [文档](http://www.iocoder.cn/Spring-Boot/MyBatis/?yudao) |
 | [Dynamic Datasource](https://dynamic-datasource.com/) | 动态数据源 | 3.5.0    | [文档](http://www.iocoder.cn/Spring-Boot/datasource-pool/?yudao) |
 | [Redis](https://redis.io/) | key-value 数据库 | 5.0      |  |
-| [Redisson](https://github.com/redisson/redisson) | Redis 客户端 | 3.16.6   | [文档](http://www.iocoder.cn/Spring-Boot/Redis/?yudao) |
+| [Redisson](https://github.com/redisson/redisson) | Redis 客户端 | 3.16.8   | [文档](http://www.iocoder.cn/Spring-Boot/Redis/?yudao) |
 | [Spring MVC](https://github.com/spring-projects/spring-framework/tree/master/spring-webmvc) | MVC 框架  | 5.3.15   | [文档](http://www.iocoder.cn/SpringMVC/MVC/?yudao) |
 | [Spring Security](https://github.com/spring-projects/spring-security) | Spring 安全框架 | 5.5.4    | [文档](http://www.iocoder.cn/Spring-Boot/Spring-Security/?yudao) |
 | [Hibernate Validator](https://github.com/hibernate/hibernate-validator) | 参数校验组件 | 6.2.0    | [文档](http://www.iocoder.cn/Spring-Boot/Validation/?yudao) |

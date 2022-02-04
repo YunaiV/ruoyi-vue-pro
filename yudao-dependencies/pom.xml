@@ -35,7 +35,7 @@
         <resilience4j.version>1.7.0</resilience4j.version>
         <!-- 监控相关 -->
         <skywalking.version>8.7.0</skywalking.version>
-        <spring-boot-admin.version>2.3.1</spring-boot-admin.version>
+        <spring-boot-admin.version>2.6.2</spring-boot-admin.version>
         <opentracing.version>0.31.0</opentracing.version>
         <!-- Test 测试相关 -->
         <podam.version>7.2.6.RELEASE</podam.version>
@@ -392,6 +392,12 @@
                 <artifactId>activiti-image-generator</artifactId>
                 <version>${activiti.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>cn.iocoder.boot</groupId>
+                <artifactId>yudao-spring-boot-starter-activiti</artifactId>
+                <version>${revision}</version>
+            </dependency>
             <!-- 工作流相关 flowable -->
             <dependency>
                 <groupId>org.flowable</groupId>
@@ -518,13 +524,6 @@
                 <version>${justauth.version}</version>
             </dependency>
 
-            <!-- activiti begin -->
-            <dependency>
-                <groupId>cn.iocoder.boot</groupId>
-                <artifactId>yudao-spring-boot-starter-activiti</artifactId>
-                <version>${revision}</version>
-            </dependency>
-            <!-- activiti end -->
         </dependencies>
     </dependencyManagement>
 
