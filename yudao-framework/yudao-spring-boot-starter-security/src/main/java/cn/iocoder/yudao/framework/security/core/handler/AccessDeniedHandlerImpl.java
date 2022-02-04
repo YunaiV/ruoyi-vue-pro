@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.FORBIDDEN;
 import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.UNAUTHORIZED;
 
 /**
@@ -36,7 +37,7 @@ public class AccessDeniedHandlerImpl implements AccessDeniedHandler {
         log.warn("[commence][访问 URL({}) 时，用户({}) 权限不够]", request.getRequestURI(),
                 SecurityFrameworkUtils.getLoginUserId(), e);
         // 返回 403
-        ServletUtils.writeJSON(response, CommonResult.error(UNAUTHORIZED));
+        ServletUtils.writeJSON(response, CommonResult.error(FORBIDDEN));
     }
 
 }
