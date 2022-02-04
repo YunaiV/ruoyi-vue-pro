@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.system.dal.mysql.permission;
 
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.RoleMenuDO;
+import com.baomidou.mybatisplus.annotation.InterceptorIgnore;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
@@ -43,6 +44,7 @@ public interface RoleMenuMapper extends BaseMapperX<RoleMenuDO> {
     }
 
     @Select("SELECT id FROM system_role_menu WHERE update_time > #{maxUpdateTime} LIMIT 1")
+    @InterceptorIgnore(tenantLine = "true") // 该方法忽略多租户。原因：该方法被异步 task 调用，此时获取不到租户编号
     Long selectExistsByUpdateTimeAfter(Date maxUpdateTime);
 
 }

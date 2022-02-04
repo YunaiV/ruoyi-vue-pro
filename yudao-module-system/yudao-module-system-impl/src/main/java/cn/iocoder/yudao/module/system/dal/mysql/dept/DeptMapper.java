@@ -29,7 +29,7 @@ public interface DeptMapper extends BaseMapperX<DeptDO> {
         return selectCount(DeptDO::getParentId, parentId);
     }
 
-    @InterceptorIgnore(tenantLine = "on") // 该方法忽略多租户。原因：该方法被异步 task 调用，此时获取不到租户编号
+    @InterceptorIgnore(tenantLine = "true") // 该方法忽略多租户。原因：该方法被异步 task 调用，此时获取不到租户编号
     default boolean selectExistsByUpdateTimeAfter(Date maxUpdateTime) {
         return selectOne(new LambdaQueryWrapper<DeptDO>().select(DeptDO::getId)
                 .gt(DeptDO::getUpdateTime, maxUpdateTime).last(SqlConstants.LIMIT1)) != null;

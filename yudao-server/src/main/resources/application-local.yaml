@@ -55,19 +55,6 @@ spring:
           username: root
           password: 123456
 
-  activiti:
-    #1.false:默认值，activiti启动时，对比数据库表中保存的版本，如果不匹配。将抛出异常
-    #2.true:启动时会对数据库中所有表进行更新操作，如果表存在，不做处理，反之，自动创建表
-    #3.create_drop:启动时自动创建表，关闭时自动删除表
-    #4.drop_create:启动时，删除旧表，再创建新表
-    database-schema-update: true
-    #activiti7默认不生成历史信息表，需手动设置开启
-    db-history-used: true
-    check-process-definitions: true
-    #full：保存历史数据的最高级别，可保存全部流程相关细节，包括流程流转各节点参数
-    history-level: full
-
-
   # Redis 配置。Redisson 默认的配置足够使用，一般不需要进行调优
   redis:
     host: 127.0.0.1 # 地址
