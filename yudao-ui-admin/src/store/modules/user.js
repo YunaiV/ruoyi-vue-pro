@@ -91,6 +91,20 @@ const user = {
     GetInfo({ commit, state }) {
       return new Promise((resolve, reject) => {
         getInfo(state.token).then(res => {
+          // 没有 data 数据，赋予个默认值
+          if (!res) {
+            res = {
+              data: {
+                roles: [],
+                user: {
+                  id: '',
+                  avatar: '',
+                  userName: ''
+                }
+              }
+            }
+          }
+
           res = res.data; // 读取 data 数据
           const user = res.user
           const avatar = user.avatar === "" ? require("@/assets/images/profile.jpg") : user.avatar;
