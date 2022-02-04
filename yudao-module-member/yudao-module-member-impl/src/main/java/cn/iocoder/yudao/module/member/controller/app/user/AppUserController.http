@@ -1,0 +1,14 @@
+### 请求 /member/user/profile/get 接口 => 没有权限
+GET {{appApi}}/member/user/get
+Authorization: Bearer test245
+tenant-id: {{appTenentId}}
+
+### 请求 /member/user/profile/revise-nickname 接口 成功
+PUT {{appApi}}/member/user/update-nickname?nickname=yunai222
+Authorization: Bearer test245
+tenant-id: {{appTenentId}}
+
+### 请求 /member/user/get-user-info 接口 成功
+GET {{appApi}}/member/user/get-user-info?id=245
+Authorization: Bearer test245
+tenant-id: {{appTenentId}}

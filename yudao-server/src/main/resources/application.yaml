@@ -1,0 +1,93 @@
+spring:
+  application:
+    name: yudao-admin-server
+
+  profiles:
+    active: local
+
+  # Servlet 配置
+  servlet:
+    # 文件上传相关配置项
+    multipart:
+      max-file-size: 16MB # 单个文件大小
+      max-request-size: 32MB # 设置总上传的文件大小
+
+  # Jackson 配置项
+  jackson:
+    serialization:
+      write-dates-as-timestamps: true # 设置 Date 的格式，使用时间戳
+      write-date-timestamps-as-nanoseconds: false # 设置不使用 nanoseconds 的格式。例如说 1611460870.401，而是直接 1611460870401
+      write-durations-as-timestamps: true # 设置 Duration 的格式，使用时间戳
+      fail-on-empty-beans: false # 允许序列化无属性的 Bean
+
+  # 静态资源
+  mvc:
+    static-path-pattern: /static/**
+
+  # 工作流 Activiti 配置
+  activiti:
+    # 1. false: 默认值，activiti启动时，对比数据库表中保存的版本，如果不匹配。将抛出异常
+    # 2. true: 启动时会对数据库中所有表进行更新操作，如果表存在，不做处理，反之，自动创建表
+    # 3. create_drop: 启动时自动创建表，关闭时自动删除表
+    # 4. drop_create: 启动时，删除旧表，再创建新表
+    database-schema-update: false # 设置为 false，可通过 sql/activiti.sql 初始化
+    db-history-used: true # activiti7 默认不生成历史信息表，需手动设置开启
+    check-process-definitions: false # 设置为 false，禁用 /resources/processes 自动部署 BPMN XML 流程
+    history-level: full # full：保存历史数据的最高级别，可保存全部流程相关细节，包括流程流转各节点参数
+
+# MyBatis Plus 的配置项
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true # 虽然默认为 true ，但是还是显示去指定下。
+  global-config:
+    db-config:
+      id-type: AUTO # 自增 ID
+      logic-delete-value: 1 # 逻辑已删除值(默认为 1)
+      logic-not-delete-value: 0 # 逻辑未删除值(默认为 0)
+  type-aliases-package: ${yudao.info.base-package}.module.*.dal.dataobject
+
+--- #################### 芋道相关配置 ####################
+
+yudao:
+  info:
+    version: 1.0.0
+    base-package: cn.iocoder.yudao
+  web:
+    admin-api:
+      prefix: /admin-api
+      controller: '**.controller.admin.**'
+    app-api:
+      prefix: /app-api
+      controller: '**.controller.app.**'
+    admin-ui:
+      url: http://dashboard.yudao.iocoder.cn # Admin 管理后台 UI 的地址
+  swagger:
+    title: 管理后台
+    description: 提供管理员管理的所有功能
+    version: ${yudao.info.version}
+    base-package: ${yudao.info.base-package}
+  captcha:
+    timeout: 5m
+    width: 160
+    height: 60
+  codegen:
+    base-package: ${yudao.info.base-package}
+    db-schemas: ${spring.datasource.dynamic.datasource.master.name}
+  error-code: # 错误码相关配置项
+    constants-class-list:
+      - cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants
+      - cn.iocoder.yudao.module.infra.enums.ErrorCodeConstants
+      - cn.iocoder.yudao.module.member.enums.ErrorCodeConstants
+      - cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants
+      - cn.iocoder.yudao.module.system.enums.ErrorCodeConstants
+      - cn.iocoder.yudao.module.tool.enums.ErrorCodeConstants
+  tenant: # 多租户相关配置项
+    tables: # 配置需要开启多租户的表；如果实体已经继承 TenantBaseDO 类，则无需重复配置
+  sms-code: # 短信验证码相关的配置项
+    expire-times: 10m
+    send-frequency: 1m
+    send-maximum-quantity-per-day: 10
+    begin-code: 9999 # 这里配置 9999 的原因是，测试方便。
+    end-code: 9999 # 这里配置 9999 的原因是，测试方便。
+
+debug: false

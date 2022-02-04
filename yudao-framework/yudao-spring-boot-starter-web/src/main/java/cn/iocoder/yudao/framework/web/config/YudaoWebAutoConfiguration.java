@@ -13,6 +13,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.util.PathMatcher;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.cors.CorsConfiguration;
@@ -38,10 +39,20 @@ public class YudaoWebAutoConfiguration implements WebMvcConfigurer {
 
     @Override
     public void configurePathMatch(PathMatchConfigurer configurer) {
-        // 设置 API 前缀，仅仅匹配 controller 包下的
-        configurer.addPathPrefix(webProperties.getApiPrefix(), clazz ->
-                clazz.isAnnotationPresent(RestController.class)
-                && clazz.getPackage().getName().startsWith(webProperties.getControllerPackage())); // 仅仅匹配 controller 包
+        configurePathMatch(configurer, webProperties.getAdminApi());
+        configurePathMatch(configurer, webProperties.getAppApi());
+    }
+
+    /**
+     * 设置 API 前缀，仅仅匹配 controller 包下的
+     *
+     * @param configurer 配置
+     * @param api API 配置
+     */
+    private void configurePathMatch(PathMatchConfigurer configurer, WebProperties.Api api) {
+        AntPathMatcher antPathMatcher = new AntPathMatcher(".");
+        configurer.addPathPrefix(api.getPrefix(), clazz -> clazz.isAnnotationPresent(RestController.class)
+                && antPathMatcher.match(api.getController(), clazz.getPackage().getName())); // 仅仅匹配 controller 包
     }
 
     @Bean

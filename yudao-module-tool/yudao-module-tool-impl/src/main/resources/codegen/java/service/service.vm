@@ -1,0 +1,70 @@
+package ${basePackage}.module.${table.moduleName}.service.${table.businessName};
+
+import java.util.*;
+import javax.validation.*;
+import ${basePackage}.module.${table.moduleName}.controller.${sceneEnum.basePackage}.${table.businessName}.vo.*;
+import ${basePackage}.module.${table.moduleName}.dal.dataobject.${table.businessName}.${table.className}DO;
+import ${PageResultClassName};
+
+/**
+ * ${table.classComment} Service 接口
+ *
+ * @author ${table.author}
+ */
+public interface ${table.className}Service {
+
+    /**
+     * 创建${table.classComment}
+     *
+     * @param createReqVO 创建信息
+     * @return 编号
+     */
+    ${primaryColumn.javaType} create${simpleClassName}(@Valid ${sceneEnum.prefixClass}${table.className}CreateReqVO createReqVO);
+
+    /**
+     * 更新${table.classComment}
+     *
+     * @param updateReqVO 更新信息
+     */
+    void update${simpleClassName}(@Valid ${sceneEnum.prefixClass}${table.className}UpdateReqVO updateReqVO);
+
+    /**
+     * 删除${table.classComment}
+     *
+     * @param id 编号
+     */
+    void delete${simpleClassName}(${primaryColumn.javaType} id);
+
+    /**
+     * 获得${table.classComment}
+     *
+     * @param id 编号
+     * @return ${table.classComment}
+     */
+    ${table.className}DO get${simpleClassName}(${primaryColumn.javaType} id);
+
+    /**
+     * 获得${table.classComment}列表
+     *
+     * @param ids 编号
+     * @return ${table.classComment}列表
+     */
+    List<${table.className}DO> get${simpleClassName}List(Collection<${primaryColumn.javaType}> ids);
+
+    /**
+     * 获得${table.classComment}分页
+     *
+     * @param pageReqVO 分页查询
+     * @return ${table.classComment}分页
+     */
+    PageResult<${table.className}DO> get${simpleClassName}Page(${sceneEnum.prefixClass}${table.className}PageReqVO pageReqVO);
+
+    /**
+     * 获得${table.classComment}列表, 用于 Excel 导出
+     *
+     * @param exportReqVO 查询条件
+     * @return ${table.classComment}列表
+     */
+    List<${table.className}DO> get${simpleClassName}List(${sceneEnum.prefixClass}${table.className}ExportReqVO exportReqVO);
+
+}

@@ -1,0 +1,34 @@
+package ${basePackage}.module.${table.moduleName}.convert.${table.businessName};
+
+import java.util.*;
+
+import ${PageResultClassName};
+
+import org.mapstruct.Mapper;
+import org.mapstruct.factory.Mappers;
+import ${basePackage}.module.${table.moduleName}.controller.${sceneEnum.basePackage}.${table.businessName}.vo.*;
+import ${basePackage}.module.${table.moduleName}.dal.dataobject.${table.businessName}.${table.className}DO;
+
+/**
+ * ${table.classComment} Convert
+ *
+ * @author ${table.author}
+ */
+@Mapper
+public interface ${table.className}Convert {
+
+    ${table.className}Convert INSTANCE = Mappers.getMapper(${table.className}Convert.class);
+
+    ${table.className}DO convert(${sceneEnum.prefixClass}${table.className}CreateReqVO bean);
+
+    ${table.className}DO convert(${sceneEnum.prefixClass}${table.className}UpdateReqVO bean);
+
+    ${sceneEnum.prefixClass}${table.className}RespVO convert(${table.className}DO bean);
+
+    List<${sceneEnum.prefixClass}${table.className}RespVO> convertList(List<${table.className}DO> list);
+
+    PageResult<${sceneEnum.prefixClass}${table.className}RespVO> convertPage(PageResult<${table.className}DO> page);
+
+    List<${sceneEnum.prefixClass}${table.className}ExcelVO> convertList02(List<${table.className}DO> list);
+
+}

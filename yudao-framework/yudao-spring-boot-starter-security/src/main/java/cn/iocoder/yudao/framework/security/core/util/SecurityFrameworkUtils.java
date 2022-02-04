@@ -42,17 +42,26 @@ public class SecurityFrameworkUtils {
     }
 
     /**
+     * 获得当前认证信息
+     *
+     * @return 认证信息
+     */
+    public static Authentication getAuthentication() {
+        SecurityContext context = SecurityContextHolder.getContext();
+        if (context == null) {
+            return null;
+        }
+        return context.getAuthentication();
+    }
+
+    /**
      * 获取当前用户
      *
      * @return 当前用户
      */
     @Nullable
     public static LoginUser getLoginUser() {
-        SecurityContext context = SecurityContextHolder.getContext();
-        if (context == null) {
-            return null;
-        }
-        Authentication authentication = context.getAuthentication();
+        Authentication authentication = getAuthentication();
         if (authentication == null) {
             return null;
         }
@@ -88,16 +97,22 @@ public class SecurityFrameworkUtils {
      * @param request 请求
      */
     public static void setLoginUser(LoginUser loginUser, HttpServletRequest request) {
-        // 创建 UsernamePasswordAuthenticationToken 对象
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                loginUser, null, loginUser.getAuthorities());
-        authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-        // 设置到上下文
-        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+        // 创建 Authentication，并设置到上下文
+        Authentication authentication = buildAuthentication(loginUser, request);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
         // 额外设置到 request 中，用于 ApiAccessLogFilter 可以获取到用户编号；
         // 原因是，Spring Security 的 Filter 在 ApiAccessLogFilter 后面，在它记录访问日志时，线上上下文已经没有用户编号等信息
         WebFrameworkUtils.setLoginUserId(request, loginUser.getId());
         WebFrameworkUtils.setLoginUserType(request, loginUser.getUserType());
+    }
+
+    private static Authentication buildAuthentication(LoginUser loginUser, HttpServletRequest request) {
+        // 创建 UsernamePasswordAuthenticationToken 对象
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                loginUser, null, loginUser.getAuthorities());
+        authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+        return authenticationToken;
     }
 
 }

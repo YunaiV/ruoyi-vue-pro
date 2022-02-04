@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>yudao</artifactId>
+        <groupId>cn.iocoder.boot</groupId>
+        <version>${revision}</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <modules>
+        <module>yudao-module-bpm-api</module>
+        <module>yudao-module-bpm-base</module>
+        <module>yudao-module-bpm-impl-flowable</module>
+        <module>yudao-module-bpm-impl-activiti</module>
+    </modules>
+    <artifactId>yudao-module-bpm</artifactId>
+    <packaging>pom</packaging>
+
+    <name>${artifactId}</name>
+    <description>
+        bpm 包下，业务流程管理（Business Process Management），我们放工作流的功能。
+        例如说：流程定义、表单配置、审核中心（我的申请、我的待办、我的已办）等等
+        bpm 解释：https://baike.baidu.com/item/BPM/1933
+
+        目前提供两套实现方案：
+            1. 基于 Activiti 7 实现的 yudao-module-bpm-impl-activiti
+            2. 基于 Flowable 6 实现的 yudao-module-bpm-impl-flowable
+        两套实现会存在共享的逻辑，所以会继承 yudao-module-impl-base
+    </description>
+
+</project>

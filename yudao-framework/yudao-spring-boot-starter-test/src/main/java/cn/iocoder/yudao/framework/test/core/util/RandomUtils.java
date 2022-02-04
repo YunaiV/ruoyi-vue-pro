@@ -3,6 +3,7 @@ package cn.iocoder.yudao.framework.test.core.util;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.util.collection.SetUtils;
 import uk.co.jemos.podam.api.PodamFactory;
 import uk.co.jemos.podam.api.PodamFactoryImpl;
 
@@ -21,6 +22,9 @@ public class RandomUtils {
 
     private static final int RANDOM_STRING_LENGTH = 10;
 
+    private static final Set<String> TINYINT_FIELDS = SetUtils.asSet("type", "category");
+    private static final int TINYINT_MAX = 127;
+
     private static final int RANDOM_DATE_MAX = 30;
 
     private static final int RANDOM_COLLECTION_LENGTH = 5;
@@ -36,6 +40,10 @@ public class RandomUtils {
             // 如果是 status 的字段，返回 0 或 1
             if (attributeMetadata.getAttributeName().equals("status")) {
                 return RandomUtil.randomEle(CommonStatusEnum.values()).getStatus();
+            }
+            // 针对部分字段，使用 tinyint 范围
+            if (TINYINT_FIELDS.contains(attributeMetadata.getAttributeName())) {
+                return RandomUtil.randomInt(1, TINYINT_MAX + 1);
             }
             return RandomUtil.randomInt();
         });

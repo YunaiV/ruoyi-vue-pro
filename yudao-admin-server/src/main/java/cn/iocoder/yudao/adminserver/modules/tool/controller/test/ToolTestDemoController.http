@@ -1,7 +1,0 @@
-### 请求 /tool/test-demo/get 接口 => 成功
-GET {{baseUrl}}/tool/test-demo/get?id=1
-Authorization: Bearer {{token}}
-
-### 请求 /tool/test-demo/list 接口 => 成功
-GET {{baseUrl}}/tool/test-demo/list?ids=1
-Authorization: Bearer {{token}}

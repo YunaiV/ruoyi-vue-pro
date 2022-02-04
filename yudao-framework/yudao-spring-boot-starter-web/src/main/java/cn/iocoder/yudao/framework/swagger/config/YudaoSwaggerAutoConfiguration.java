@@ -8,6 +8,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
+import springfox.documentation.RequestHandler;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.service.ApiInfo;
@@ -23,6 +24,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Predicate;
 
 import static springfox.documentation.builders.RequestHandlerSelectors.basePackage;
 
@@ -56,6 +58,7 @@ public class YudaoSwaggerAutoConfiguration {
                 // 设置扫描指定 package 包下的
                 .select()
                 .apis(basePackage(properties.getBasePackage()))
+//                .apis(basePackage("cn.iocoder.yudao.module.infra")) // 可用于 swagger 无法展示时使用
                 .paths(PathSelectors.any())
                 .build()
                 .securitySchemes(securitySchemes())

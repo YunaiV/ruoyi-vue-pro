@@ -1,0 +1,30 @@
+package ${basePackage}.module.${table.moduleName}.controller.${sceneEnum.basePackage}.${table.businessName}.vo;
+
+import lombok.*;
+import java.util.*;
+import io.swagger.annotations.*;
+import javax.validation.constraints.*;
+## 处理 Date 字段的引入
+#foreach ($column in $columns)
+#if (${column.createOperation} && (!${column.updateOperation} || !${column.listOperationResult})
+    && ${column.javaType} == "Date")## 时间类型
+import org.springframework.format.annotation.DateTimeFormat;
+
+import static ${DateUtilsClassName}.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
+#break
+#end
+#end
+
+@ApiModel("${sceneEnum.name} - ${table.classComment}创建 Request VO")
+@Data
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
+public class ${sceneEnum.prefixClass}${table.className}CreateReqVO extends ${sceneEnum.prefixClass}${table.className}BaseVO {
+
+#foreach ($column in $columns)
+#if (${column.createOperation} && (!${column.updateOperation} || !${column.listOperationResult}))##不是通用字段
+    #parse("codegen/java/controller/vo/_column.vm")
+
+#end
+#end
+}
