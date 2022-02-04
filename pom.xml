@@ -61,7 +61,7 @@
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>${maven-surefire-plugin.version}</version>
                 </plugin>
-                <!-- TODO 看看咋放到 bom 里 -->
+                <!-- maven-compiler-plugin 插件，解决 Lombok + MapStruct 组合 -->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>

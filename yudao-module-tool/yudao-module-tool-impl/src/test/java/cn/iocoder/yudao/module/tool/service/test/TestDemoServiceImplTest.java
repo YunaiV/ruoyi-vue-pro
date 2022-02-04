@@ -1,34 +1,34 @@
 package cn.iocoder.yudao.module.tool.service.test;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
-
-import javax.annotation.Resource;
-
-import cn.iocoder.yudao.module.tool.test.BaseDbUnitTest;
-import cn.iocoder.yudao.module.tool.controller.admin.test.vo.*;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.date.DateUtils;
+import cn.iocoder.yudao.module.tool.controller.admin.test.vo.TestDemoCreateReqVO;
+import cn.iocoder.yudao.module.tool.controller.admin.test.vo.TestDemoExportReqVO;
+import cn.iocoder.yudao.module.tool.controller.admin.test.vo.TestDemoPageReqVO;
+import cn.iocoder.yudao.module.tool.controller.admin.test.vo.TestDemoUpdateReqVO;
 import cn.iocoder.yudao.module.tool.dal.dataobject.test.TestDemoDO;
 import cn.iocoder.yudao.module.tool.dal.mysql.test.TestDemoMapper;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.tool.test.BaseDbUnitTest;
+import org.junit.jupiter.api.Test;
+import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
-import org.springframework.context.annotation.Import;
-import java.util.*;
+import java.util.List;
 
-import static cn.hutool.core.util.RandomUtil.*;
-import static cn.iocoder.yudao.module.tool.enums.ErrorCodeConstants.*;
-import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.*;
-import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
-import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.*;
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.*;
+import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
+import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
+import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
+import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomLongId;
+import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
+import static cn.iocoder.yudao.module.tool.enums.ErrorCodeConstants.TEST_DEMO_NOT_EXISTS;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 /**
-* {@link TestDemoServiceImpl} 的单元测试类
-*
-* @author 芋道源码
-*/
+ * {@link TestDemoServiceImpl} 的单元测试类
+ *
+ * @author 芋道源码
+ */
 @Import(TestDemoServiceImpl.class)
 public class TestDemoServiceImplTest extends BaseDbUnitTest {
 
@@ -88,8 +88,8 @@ public class TestDemoServiceImplTest extends BaseDbUnitTest {
 
         // 调用
         testDemoService.deleteTestDemo(id);
-       // 校验数据不存在了
-       assertNull(testDemoMapper.selectById(id));
+        // 校验数据不存在了
+        assertNull(testDemoMapper.selectById(id));
     }
 
     @Test
@@ -101,87 +101,87 @@ public class TestDemoServiceImplTest extends BaseDbUnitTest {
         assertServiceException(() -> testDemoService.deleteTestDemo(id), TEST_DEMO_NOT_EXISTS);
     }
 
-    @Test // TODO 请修改 null 为需要的值
+    @Test
     public void testGetTestDemoPage() {
-       // mock 数据
-       TestDemoDO dbTestDemo = randomPojo(TestDemoDO.class, o -> { // 等会查询到
-           o.setName(null);
-           o.setStatus(null);
-           o.setType(null);
-           o.setCategory(null);
-           o.setRemark(null);
-           o.setCreateTime(null);
-       });
-       testDemoMapper.insert(dbTestDemo);
-       // 测试 name 不匹配
-       testDemoMapper.insert(cloneIgnoreId(dbTestDemo, o -> o.setName(null)));
-       // 测试 status 不匹配
-       testDemoMapper.insert(cloneIgnoreId(dbTestDemo, o -> o.setStatus(null)));
-       // 测试 type 不匹配
-       testDemoMapper.insert(cloneIgnoreId(dbTestDemo, o -> o.setType(null)));
-       // 测试 category 不匹配
-       testDemoMapper.insert(cloneIgnoreId(dbTestDemo, o -> o.setCategory(null)));
-       // 测试 remark 不匹配
-       testDemoMapper.insert(cloneIgnoreId(dbTestDemo, o -> o.setRemark(null)));
-       // 测试 createTime 不匹配
-       testDemoMapper.insert(cloneIgnoreId(dbTestDemo, o -> o.setCreateTime(null)));
-       // 准备参数
-       TestDemoPageReqVO reqVO = new TestDemoPageReqVO();
-       reqVO.setName(null);
-       reqVO.setStatus(null);
-       reqVO.setType(null);
-       reqVO.setCategory(null);
-       reqVO.setRemark(null);
-       reqVO.setBeginCreateTime(null);
-       reqVO.setEndCreateTime(null);
+        // mock 数据
+        TestDemoDO dbTestDemo = randomPojo(TestDemoDO.class, o -> { // 等会查询到
+            o.setName("芋道源码");
+            o.setStatus(CommonStatusEnum.ENABLE.getStatus());
+            o.setType(1);
+            o.setCategory(2);
+            o.setRemark("哈哈哈");
+            o.setCreateTime(DateUtils.buildTime(2021, 11, 11));
+        });
+        testDemoMapper.insert(dbTestDemo);
+        // 测试 name 不匹配
+        testDemoMapper.insert(cloneIgnoreId(dbTestDemo, o -> o.setName("不匹配")));
+        // 测试 status 不匹配
+        testDemoMapper.insert(cloneIgnoreId(dbTestDemo, o -> o.setStatus(CommonStatusEnum.DISABLE.getStatus())));
+        // 测试 type 不匹配
+        testDemoMapper.insert(cloneIgnoreId(dbTestDemo, o -> o.setType(2)));
+        // 测试 category 不匹配
+        testDemoMapper.insert(cloneIgnoreId(dbTestDemo, o -> o.setCategory(1)));
+        // 测试 remark 不匹配
+        testDemoMapper.insert(cloneIgnoreId(dbTestDemo, o -> o.setRemark("呵呵呵")));
+        // 测试 createTime 不匹配
+        testDemoMapper.insert(cloneIgnoreId(dbTestDemo, o -> o.setCreateTime(DateUtils.buildTime(2021, 12, 12))));
+        // 准备参数
+        TestDemoPageReqVO reqVO = new TestDemoPageReqVO();
+        reqVO.setName("芋道");
+        reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
+        reqVO.setType(1);
+        reqVO.setCategory(2);
+        reqVO.setRemark("哈哈哈");
+        reqVO.setBeginCreateTime(DateUtils.buildTime(2021, 11, 10));
+        reqVO.setEndCreateTime(DateUtils.buildTime(2021, 11, 12));
 
-       // 调用
-       PageResult<TestDemoDO> pageResult = testDemoService.getTestDemoPage(reqVO);
-       // 断言
-       assertEquals(1, pageResult.getTotal());
-       assertEquals(1, pageResult.getList().size());
-       assertPojoEquals(dbTestDemo, pageResult.getList().get(0));
+        // 调用
+        PageResult<TestDemoDO> pageResult = testDemoService.getTestDemoPage(reqVO);
+        // 断言
+        assertEquals(1, pageResult.getTotal());
+        assertEquals(1, pageResult.getList().size());
+        assertPojoEquals(dbTestDemo, pageResult.getList().get(0));
     }
 
-    @Test // TODO 请修改 null 为需要的值
+    @Test
     public void testGetTestDemoList() {
-       // mock 数据
-       TestDemoDO dbTestDemo = randomPojo(TestDemoDO.class, o -> { // 等会查询到
-           o.setName(null);
-           o.setStatus(null);
-           o.setType(null);
-           o.setCategory(null);
-           o.setRemark(null);
-           o.setCreateTime(null);
-       });
-       testDemoMapper.insert(dbTestDemo);
-       // 测试 name 不匹配
-       testDemoMapper.insert(cloneIgnoreId(dbTestDemo, o -> o.setName(null)));
-       // 测试 status 不匹配
-       testDemoMapper.insert(cloneIgnoreId(dbTestDemo, o -> o.setStatus(null)));
-       // 测试 type 不匹配
-       testDemoMapper.insert(cloneIgnoreId(dbTestDemo, o -> o.setType(null)));
-       // 测试 category 不匹配
-       testDemoMapper.insert(cloneIgnoreId(dbTestDemo, o -> o.setCategory(null)));
-       // 测试 remark 不匹配
-       testDemoMapper.insert(cloneIgnoreId(dbTestDemo, o -> o.setRemark(null)));
-       // 测试 createTime 不匹配
-       testDemoMapper.insert(cloneIgnoreId(dbTestDemo, o -> o.setCreateTime(null)));
-       // 准备参数
-       TestDemoExportReqVO reqVO = new TestDemoExportReqVO();
-       reqVO.setName(null);
-       reqVO.setStatus(null);
-       reqVO.setType(null);
-       reqVO.setCategory(null);
-       reqVO.setRemark(null);
-       reqVO.setBeginCreateTime(null);
-       reqVO.setEndCreateTime(null);
+        // mock 数据
+        TestDemoDO dbTestDemo = randomPojo(TestDemoDO.class, o -> { // 等会查询到
+            o.setName("芋道源码");
+            o.setStatus(CommonStatusEnum.ENABLE.getStatus());
+            o.setType(1);
+            o.setCategory(2);
+            o.setRemark("哈哈哈");
+            o.setCreateTime(DateUtils.buildTime(2021, 11, 11));
+        });
+        testDemoMapper.insert(dbTestDemo);
+        // 测试 name 不匹配
+        testDemoMapper.insert(cloneIgnoreId(dbTestDemo, o -> o.setName("不匹配")));
+        // 测试 status 不匹配
+        testDemoMapper.insert(cloneIgnoreId(dbTestDemo, o -> o.setStatus(CommonStatusEnum.DISABLE.getStatus())));
+        // 测试 type 不匹配
+        testDemoMapper.insert(cloneIgnoreId(dbTestDemo, o -> o.setType(2)));
+        // 测试 category 不匹配
+        testDemoMapper.insert(cloneIgnoreId(dbTestDemo, o -> o.setCategory(1)));
+        // 测试 remark 不匹配
+        testDemoMapper.insert(cloneIgnoreId(dbTestDemo, o -> o.setRemark("呵呵呵")));
+        // 测试 createTime 不匹配
+        testDemoMapper.insert(cloneIgnoreId(dbTestDemo, o -> o.setCreateTime(DateUtils.buildTime(2021, 12, 12))));
+        // 准备参数
+        TestDemoExportReqVO reqVO = new TestDemoExportReqVO();
+        reqVO.setName("芋道");
+        reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
+        reqVO.setType(1);
+        reqVO.setCategory(2);
+        reqVO.setRemark("哈哈哈");
+        reqVO.setBeginCreateTime(DateUtils.buildTime(2021, 11, 10));
+        reqVO.setEndCreateTime(DateUtils.buildTime(2021, 11, 12));
 
-       // 调用
-       List<TestDemoDO> list = testDemoService.getTestDemoList(reqVO);
-       // 断言
-       assertEquals(1, list.size());
-       assertPojoEquals(dbTestDemo, list.get(0));
+        // 调用
+        List<TestDemoDO> list = testDemoService.getTestDemoList(reqVO);
+        // 断言
+        assertEquals(1, list.size());
+        assertPojoEquals(dbTestDemo, list.get(0));
     }
 
 }
