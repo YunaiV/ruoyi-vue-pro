@@ -304,7 +304,7 @@ public class MemberAuthServiceImpl implements MemberAuthService {
     @Override
     public void sendSmsCode(Long userId, AppAuthSendSmsReqVO reqVO) {
         // TODO 要根据不同的场景，校验是否有用户
-        smsCodeApi.sendSmsCode(AuthConvert.INSTANCE.convert(reqVO));
+        smsCodeApi.sendSmsCode(AuthConvert.INSTANCE.convert(reqVO).setCreateIp(getClientIP()));
     }
 
     /**

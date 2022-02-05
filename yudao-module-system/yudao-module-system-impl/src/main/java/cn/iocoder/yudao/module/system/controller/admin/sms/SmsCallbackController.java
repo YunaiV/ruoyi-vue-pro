@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
+// TODO 芋艿：这块的接口命名，在纠结下
 @Api(tags = "管理后台 - 短信回调")
 @RestController
 @RequestMapping("/system/sms/callback")

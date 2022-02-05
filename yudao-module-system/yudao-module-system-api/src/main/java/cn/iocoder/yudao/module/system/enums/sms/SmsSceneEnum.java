@@ -43,7 +43,8 @@ public enum SmsSceneEnum implements IntArrayValuable {
     }
 
     public static SmsSceneEnum getCodeByScene(Integer scene) {
-        return ArrayUtil.firstMatch(sceneEnum -> sceneEnum.getScene().equals(scene));
+        return ArrayUtil.firstMatch(sceneEnum -> sceneEnum.getScene().equals(scene),
+                values());
     }
 
 }
