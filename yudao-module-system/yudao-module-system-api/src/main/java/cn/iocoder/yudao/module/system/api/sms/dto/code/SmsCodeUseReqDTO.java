@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.system.enums.sms.SmsSceneEnum;
 import lombok.Data;
 
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 /**
  * 短信验证码的使用 Request DTO
@@ -24,7 +25,7 @@ public class SmsCodeUseReqDTO {
     /**
      * 发送场景
      */
-    @NotEmpty(message = "发送场景不能为空")
+    @NotNull(message = "发送场景不能为空")
     @InEnum(SmsSceneEnum.class)
     private Integer scene;
     /**
