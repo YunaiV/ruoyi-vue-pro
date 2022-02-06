@@ -27,13 +27,13 @@ public class ConfigDAOImpl implements ConfigFrameworkDAO {
 
     @Override
     public boolean selectExistsByUpdateTimeAfter(Date maxUpdateTime) {
-        return jdbcTemplate.query("SELECT id FROM inf_config WHERE update_time > ? LIMIT 1",
+        return jdbcTemplate.query("SELECT id FROM infra_config WHERE update_time > ? LIMIT 1",
                 ResultSet::next, maxUpdateTime);
     }
 
     @Override
     public List<ConfigRespDTO> selectList() {
-        return jdbcTemplate.query("SELECT `key`, `value`, update_time, deleted FROM inf_config", new BeanPropertyRowMapper<>(ConfigRespDTO.class));
+        return jdbcTemplate.query("SELECT `key`, `value`, update_time, deleted FROM infra_config", new BeanPropertyRowMapper<>(ConfigRespDTO.class));
     }
 
 }
