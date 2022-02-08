@@ -5,8 +5,8 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.object.PageUtils;
-import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.BpmModelPageItemRespVO;
-import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.BpmModelPageReqVO;
+import cn.iocoder.yudao.framework.common.util.validation.ValidationUtils;
+import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.*;
 import cn.iocoder.yudao.module.bpm.convert.definition.ModelConvert;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmFormDO;
 import cn.iocoder.yudao.module.bpm.service.definition.dto.ModelMetaInfoRespDTO;
@@ -17,21 +17,27 @@ import org.flowable.engine.repository.Model;
 import org.flowable.engine.repository.ModelQuery;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
+import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.*;
+
 /**
  * Flowable流程模型实现
  * 主要进行 Flowable {@link Model} 的维护
  *
  * @author yunlongn
  * @author 芋道源码
+ * @author jason
  */
 @Service
 @Validated
@@ -79,5 +85,71 @@ public class FlowableModelServiceImpl implements FlowableModelService {
         // 拼接结果
         long modelCount = modelQuery.count();
         return new PageResult<>(ModelConvert.INSTANCE.convertList(models, formMap, deploymentMap, processDefinitionMap), modelCount);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public String createModel(@Valid BpmModelCreateReqVO createReqVO, String bpmnXml) {
+        checkKeyNCName(createReqVO.getKey());
+        // 校验流程标识已经存在
+        Model keyModel = this.getModelByKey(createReqVO.getKey());
+        if (keyModel != null) {
+            throw exception(MODEL_KEY_EXISTS, createReqVO.getKey());
+        }
+
+        // 创建流程定义
+        Model model = repositoryService.newModel();
+        ModelConvert.INSTANCE.copy(model, createReqVO);
+        // 保存流程定义
+        repositoryService.saveModel(model);
+        // 保存 BPMN XML
+        saveModelBpmnXml(model, bpmnXml);
+        return model.getId();
+    }
+
+    @Override
+    public BpmModelRespVO getModel(String id) {
+        Model model = repositoryService.getModel(id);
+        if (model == null) {
+            return null;
+        }
+        BpmModelRespVO modelRespVO = ModelConvert.INSTANCE.convert(model);
+        // 拼接 bpmn XML
+        byte[] bpmnBytes = repositoryService.getModelEditorSource(id);
+        modelRespVO.setBpmnXml(StrUtil.utf8Str(bpmnBytes));
+        return modelRespVO;
+    }
+
+    @Override
+    public void updateModel(@Valid BpmModelUpdateReqVO updateReqVO) {
+        // 校验流程模型存在
+        Model model = repositoryService.getModel(updateReqVO.getId());
+        if (model == null) {
+            throw exception(MODEL_NOT_EXISTS);
+        }
+
+        // 修改流程定义
+        ModelConvert.INSTANCE.copy(model, updateReqVO);
+        // 更新模型
+        repositoryService.saveModel(model);
+        // 更新 BPMN XML
+        saveModelBpmnXml(model, updateReqVO.getBpmnXml());
+    }
+
+    private Model getModelByKey(String key) {
+        return repositoryService.createModelQuery().modelKey(key).singleResult();
+    }
+
+    private void checkKeyNCName(String key) {
+        if (!ValidationUtils.isXmlNCName(key)) {
+            throw exception(MODEL_KEY_VALID);
+        }
+    }
+
+    private void saveModelBpmnXml(Model model, String bpmnXml) {
+        if (StrUtil.isEmpty(bpmnXml)) {
+            return;
+        }
+        repositoryService.addModelEditorSource(model.getId(), StrUtil.utf8Bytes(bpmnXml));
     }
 }

@@ -13,29 +13,6 @@ import javax.validation.Valid;
  */
 public interface BpmModelService extends BpmModelCommonService {
 
-    /**
-     * 获得流程模块
-     *
-     * @param id 编号
-     * @return 流程模型
-     */
-    BpmModelRespVO getModel(String id);
-
-    /**
-     * 创建流程模型
-     *
-     * @param modelVO 创建信息
-     * @param bpmnXml BPMN XML
-     * @return 创建的流程模型的编号
-     */
-    String createModel(@Valid BpmModelCreateReqVO modelVO, String bpmnXml);
-
-    /**
-     * 修改流程模型
-     *
-     * @param updateReqVO 更新信息
-     */
-    void updateModel(@Valid BpmModelUpdateReqVO updateReqVO);
 
     /**
      * 将流程模型，部署成一个流程定义
