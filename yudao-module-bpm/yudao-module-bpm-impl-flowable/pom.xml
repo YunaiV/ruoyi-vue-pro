@@ -16,6 +16,11 @@
     </description>
 
     <dependencies>
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-module-bpm-base</artifactId>
+            <version>${revision}</version>
+        </dependency>
         <!-- 工作流相关 -->
         <dependency>
             <groupId>org.flowable</groupId>

@@ -11,15 +11,7 @@ import javax.validation.Valid;
  *
  * @author yunlongn
  */
-public interface BpmModelService {
-
-    /**
-     * 获得流程模型分页
-     *
-     * @param pageVO 分页查询
-     * @return 流程模型分页
-     */
-    PageResult<BpmModelPageItemRespVO> getModelPage(BpmModelPageReqVO pageVO);
+public interface BpmModelService extends BpmModelCommonService {
 
     /**
      * 获得流程模块
