@@ -7,6 +7,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import lombok.SneakyThrows;
+import lombok.experimental.UtilityClass;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -17,6 +19,7 @@ import java.util.List;
  *
  * @author 芋道源码
  */
+@UtilityClass
 public class JsonUtils {
 
     private static ObjectMapper objectMapper = new ObjectMapper();
@@ -36,78 +39,57 @@ public class JsonUtils {
         JsonUtils.objectMapper = objectMapper;
     }
 
+    @SneakyThrows
     public static String toJsonString(Object object) {
-        try {
-            return objectMapper.writeValueAsString(object);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+        return objectMapper.writeValueAsString(object);
     }
 
+    @SneakyThrows
     public static byte[] toJsonByte(Object object) {
-        try {
-            return objectMapper.writeValueAsBytes(object);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+        return objectMapper.writeValueAsBytes(object);
     }
 
+    @SneakyThrows
     public static <T> T parseObject(String text, Class<T> clazz) {
         if (StrUtil.isEmpty(text)) {
             return null;
         }
-        try {
-            return objectMapper.readValue(text, clazz);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+
+        return objectMapper.readValue(text, clazz);
     }
 
+    @SneakyThrows
     public static <T> T parseObject(byte[] bytes, Class<T> clazz) {
         if (ArrayUtil.isEmpty(bytes)) {
             return null;
         }
-        try {
-            return objectMapper.readValue(bytes, clazz);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+
+        return objectMapper.readValue(bytes, clazz);
     }
 
+    @SneakyThrows
     public static <T> T parseObject(String text, TypeReference<T> typeReference) {
-        try {
-            return objectMapper.readValue(text, typeReference);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        return objectMapper.readValue(text, typeReference);
     }
 
+    @SneakyThrows
     public static <T> List<T> parseArray(String text, Class<T> clazz) {
         if (StrUtil.isEmpty(text)) {
             return new ArrayList<>();
         }
-        try {
-            return objectMapper.readValue(text, objectMapper.getTypeFactory().constructCollectionType(List.class, clazz));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+
+        return objectMapper.readValue(text, objectMapper.getTypeFactory().constructCollectionType(List.class, clazz));
     }
 
     // TODO @Li：和上面的风格保持一致哈。parseTree
+    @SneakyThrows
     public static JsonNode readTree(String text) {
-        try {
-            return objectMapper.readTree(text);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        return objectMapper.readTree(text);
     }
 
+    @SneakyThrows
     public static JsonNode readTree(byte[] text) {
-        try {
-            return objectMapper.readTree(text);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        return objectMapper.readTree(text);
     }
 
 }
