@@ -67,4 +67,13 @@ public class FlowableModelController {
         String bpmnXml = IoUtils.readUtf8(importReqVO.getBpmnFile().getInputStream(), false);
         return success(modelService.createModel(createReqVO, bpmnXml));
     }
+
+    @PostMapping("/deploy")
+    @ApiOperation(value = "部署模型")
+    @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = String.class)
+    @PreAuthorize("@ss.hasPermission('bpm:model:deploy')")
+    public CommonResult<Boolean> deployModel(@RequestParam("id") String id) {
+        modelService.deployModel(id);
+        return success(true);
+    }
 }

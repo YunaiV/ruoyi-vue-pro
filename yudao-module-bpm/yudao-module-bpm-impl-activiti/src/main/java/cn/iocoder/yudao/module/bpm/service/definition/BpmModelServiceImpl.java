@@ -6,16 +6,14 @@ import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.*;
 import cn.iocoder.yudao.module.bpm.convert.definition.BpmModelConvert;
 import cn.iocoder.yudao.module.bpm.service.definition.dto.BpmModelMetaInfoRespDTO;
-import cn.iocoder.yudao.module.bpm.service.definition.dto.BpmProcessDefinitionCreateReqDTO;
 import cn.iocoder.yudao.framework.activiti.core.util.ActivitiUtils;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.object.PageUtils;
-import cn.iocoder.yudao.framework.common.util.validation.ValidationUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.rule.BpmTaskAssignRuleRespVO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmFormDO;
-import cn.iocoder.yudao.module.bpm.enums.definition.BpmModelFormTypeEnum;
+import cn.iocoder.yudao.module.bpm.service.definition.dto.BpmProcessDefinitionCreateReqDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.engine.RepositoryService;
@@ -47,17 +45,21 @@ import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.*;
 @Service
 @Validated
 @Slf4j
-public class BpmModelServiceImpl implements BpmModelService {
+public class BpmModelServiceImpl extends BpmAbstractModelService implements BpmModelService {
 
     @Resource
     private RepositoryService repositoryService;
-    @Resource
-    private BpmFormService bpmFormService;
+
     @Resource
     private BpmProcessDefinitionService processDefinitionService;
     @Resource
     @Lazy // 解决循环依赖
     private BpmTaskAssignRuleService taskAssignRuleService;
+
+
+    public BpmModelServiceImpl(BpmFormService bpmFormService) {
+        super(bpmFormService);
+    }
 
     @Override
     public PageResult<BpmModelPageItemRespVO> getModelPage(BpmModelPageReqVO pageVO) {
@@ -167,7 +169,7 @@ public class BpmModelServiceImpl implements BpmModelService {
         }
         // TODO 芋艿：校验流程图的有效性；例如说，是否有开始的元素，是否有结束的元素；
         // 校验表单已配
-        BpmFormDO form = checkFormConfig(model);
+        BpmFormDO form = checkFormConfig(model.getMetaInfo());
         // 校验任务分配规则已配置
         checkTaskAssignRuleAllConfig(id);
 
@@ -212,28 +214,6 @@ public class BpmModelServiceImpl implements BpmModelService {
                 throw exception(MODEL_DEPLOY_FAIL_TASK_ASSIGN_RULE_NOT_CONFIG, rule.getTaskDefinitionName());
             }
         });
-    }
-
-    /**
-     * 校验流程表单已配置
-     *
-     * @param model 流程模型
-     * @return 流程表单
-     */
-    private BpmFormDO checkFormConfig(Model model) {
-        BpmModelMetaInfoRespDTO metaInfo = JsonUtils.parseObject(model.getMetaInfo(), BpmModelMetaInfoRespDTO.class);
-        if (metaInfo == null || metaInfo.getFormType() == null) {
-            throw exception(MODEL_DEPLOY_FAIL_FORM_NOT_CONFIG);
-        }
-        // 校验表单存在
-        if (Objects.equals(metaInfo.getFormType(), BpmModelFormTypeEnum.NORMAL.getType())) {
-            BpmFormDO form = bpmFormService.getForm(metaInfo.getFormId());
-            if (form == null) {
-                throw exception(FORM_NOT_EXISTS);
-            }
-            return form;
-        }
-        return null;
     }
 
     @Override
@@ -289,12 +269,6 @@ public class BpmModelServiceImpl implements BpmModelService {
 
     private Model getModelByKey(String key) {
         return repositoryService.createModelQuery().modelKey(key).singleResult();
-    }
-
-    private void checkKeyNCName(String key) {
-        if (!ValidationUtils.isXmlNCName(key)) {
-            throw exception(MODEL_KEY_VALID);
-        }
     }
 
 }

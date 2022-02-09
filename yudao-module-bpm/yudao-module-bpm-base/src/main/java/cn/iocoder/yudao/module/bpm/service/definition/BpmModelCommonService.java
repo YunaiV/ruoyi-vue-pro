@@ -44,4 +44,26 @@ public interface BpmModelCommonService {
      * @param updateReqVO 更新信息
      */
     void updateModel(@Valid BpmModelUpdateReqVO updateReqVO);
+
+    /**
+     * 将流程模型，部署成一个流程定义
+     *
+     * @param id 编号
+     */
+    void deployModel(String id);
+
+    /**
+     * 删除模型
+     *
+     * @param id 编号
+     */
+    void deleteModel(String id);
+
+    /**
+     * 修改模型的状态，实际更新的部署的流程定义的状态
+     *
+     * @param id 编号
+     * @param state 状态
+     */
+    void updateModelState(String id, Integer state);
 }

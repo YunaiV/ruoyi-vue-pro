@@ -5,7 +5,8 @@ import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.*;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmFormDO;
-import cn.iocoder.yudao.module.bpm.service.definition.dto.ModelMetaInfoRespDTO;
+import cn.iocoder.yudao.module.bpm.service.definition.dto.BpmModelMetaInfoRespDTO;
+import cn.iocoder.yudao.module.bpm.service.definition.dto.BpmProcessDefinitionCreateReqDTO;
 import org.flowable.common.engine.impl.db.SuspensionState;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.Model;
@@ -32,7 +33,7 @@ public interface ModelConvert {
                                                      Map<String, Deployment> deploymentMap,
                                                      Map<String, ProcessDefinition> processDefinitionMap) {
         return CollectionUtils.convertList(list, model -> {
-            ModelMetaInfoRespDTO metaInfo = JsonUtils.parseObject(model.getMetaInfo(), ModelMetaInfoRespDTO.class);
+            BpmModelMetaInfoRespDTO metaInfo = JsonUtils.parseObject(model.getMetaInfo(), BpmModelMetaInfoRespDTO.class);
             BpmFormDO form = metaInfo != null ? formMap.get(metaInfo.getFormId()) : null;
             Deployment deployment = model.getDeploymentId() != null ? deploymentMap.get(model.getDeploymentId()) : null;
             ProcessDefinition processDefinition = model.getDeploymentId() != null ? processDefinitionMap.get(model.getDeploymentId()) : null;
@@ -75,12 +76,32 @@ public interface ModelConvert {
         to.setKey(model.getKey());
         to.setCategory(model.getCategory());
         // metaInfo
-        ModelMetaInfoRespDTO metaInfo = JsonUtils.parseObject(model.getMetaInfo(), ModelMetaInfoRespDTO.class);
+        BpmModelMetaInfoRespDTO metaInfo = JsonUtils.parseObject(model.getMetaInfo(), BpmModelMetaInfoRespDTO.class);
         copyTo(metaInfo, to);
     }
+
     BpmModelCreateReqVO convert(BpmModeImportReqVO bean);
 
-    void copyTo(ModelMetaInfoRespDTO from, @MappingTarget BpmModelBaseVO to);
+    default BpmProcessDefinitionCreateReqDTO convert2(Model model, BpmFormDO form) {
+        BpmProcessDefinitionCreateReqDTO createReqDTO = new BpmProcessDefinitionCreateReqDTO();
+        createReqDTO.setModelId(model.getId());
+        createReqDTO.setName(model.getName());
+        createReqDTO.setKey(model.getKey());
+        createReqDTO.setCategory(model.getCategory());
+        BpmModelMetaInfoRespDTO metaInfo = JsonUtils.parseObject(model.getMetaInfo(), BpmModelMetaInfoRespDTO.class);
+        // metaInfo
+        copyTo(metaInfo, createReqDTO);
+        // form
+        if (form != null) {
+            createReqDTO.setFormConf(form.getConf());
+            createReqDTO.setFormFields(form.getFields());
+        }
+        return createReqDTO;
+    }
+
+    void copyTo(BpmModelMetaInfoRespDTO from, @MappingTarget BpmProcessDefinitionCreateReqDTO to);
+
+    void copyTo(BpmModelMetaInfoRespDTO from, @MappingTarget BpmModelBaseVO to);
 
     BpmModelPageItemRespVO.ProcessDefinition convert(ProcessDefinition bean);
 
@@ -94,15 +115,15 @@ public interface ModelConvert {
     default void copy(Model model, BpmModelUpdateReqVO bean) {
         model.setName(bean.getName());
         model.setCategory(bean.getCategory());
-        model.setMetaInfo(buildMetaInfoStr(JsonUtils.parseObject(model.getMetaInfo(), ModelMetaInfoRespDTO.class),
+        model.setMetaInfo(buildMetaInfoStr(JsonUtils.parseObject(model.getMetaInfo(), BpmModelMetaInfoRespDTO.class),
                 bean.getDescription(), bean.getFormType(), bean.getFormId(),
                 bean.getFormCustomCreatePath(), bean.getFormCustomViewPath()));
     }
 
-    default String buildMetaInfoStr(ModelMetaInfoRespDTO metaInfo, String description, Integer formType,
+    default String buildMetaInfoStr(BpmModelMetaInfoRespDTO metaInfo, String description, Integer formType,
                                     Long formId, String formCustomCreatePath, String formCustomViewPath) {
         if (metaInfo == null) {
-            metaInfo = new ModelMetaInfoRespDTO();
+            metaInfo = new BpmModelMetaInfoRespDTO();
         }
         // 只有非空，才进行设置，避免更新时的覆盖
         if (StrUtil.isNotEmpty(description)) {

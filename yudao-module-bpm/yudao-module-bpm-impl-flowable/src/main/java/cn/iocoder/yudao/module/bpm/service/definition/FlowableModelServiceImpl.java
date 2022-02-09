@@ -5,12 +5,13 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.object.PageUtils;
-import cn.iocoder.yudao.framework.common.util.validation.ValidationUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.*;
 import cn.iocoder.yudao.module.bpm.convert.definition.ModelConvert;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmFormDO;
-import cn.iocoder.yudao.module.bpm.service.definition.dto.ModelMetaInfoRespDTO;
+import cn.iocoder.yudao.module.bpm.service.definition.dto.BpmModelMetaInfoRespDTO;
+import cn.iocoder.yudao.module.bpm.service.definition.dto.BpmProcessDefinitionCreateReqDTO;
 import lombok.extern.slf4j.Slf4j;
+import org.flowable.common.engine.impl.db.SuspensionState;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.Model;
@@ -18,14 +19,12 @@ import org.flowable.engine.repository.ModelQuery;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
@@ -42,14 +41,16 @@ import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.*;
 @Service
 @Validated
 @Slf4j
-public class FlowableModelServiceImpl implements FlowableModelService {
+public class FlowableModelServiceImpl extends BpmAbstractModelService implements FlowableModelService {
 
     @Resource
     private RepositoryService repositoryService;
     @Resource
-    private BpmFormService bpmFormService;
-    @Resource
     private FlowableProcessDefinitionService processDefinitionService;
+
+    public FlowableModelServiceImpl(BpmFormService bpmFormService){
+        super(bpmFormService);
+    }
 
     @Override
     public PageResult<BpmModelPageItemRespVO> getModelPage(BpmModelPageReqVO pageVO) {
@@ -69,7 +70,7 @@ public class FlowableModelServiceImpl implements FlowableModelService {
 
         // 获得 Form Map
         Set<Long> formIds = CollectionUtils.convertSet(models, model -> {
-            ModelMetaInfoRespDTO metaInfo = JsonUtils.parseObject(model.getMetaInfo(), ModelMetaInfoRespDTO.class);
+            BpmModelMetaInfoRespDTO metaInfo = JsonUtils.parseObject(model.getMetaInfo(), BpmModelMetaInfoRespDTO.class);
             return metaInfo != null ? metaInfo.getFormId() : null;
         });
         Map<Long, BpmFormDO> formMap = bpmFormService.getFormMap(formIds);
@@ -136,20 +137,79 @@ public class FlowableModelServiceImpl implements FlowableModelService {
         saveModelBpmnXml(model, updateReqVO.getBpmnXml());
     }
 
+    @Override
+    public void deployModel(String id) {
+        // 校验流程模型存在
+        Model model = repositoryService.getModel(id);
+        if (ObjectUtils.isEmpty(model)) {
+            throw exception(MODEL_NOT_EXISTS);
+        }
+        // 校验流程图
+        byte[] bpmnBytes = repositoryService.getModelEditorSource(model.getId());
+        if (bpmnBytes == null) {
+            throw exception(MODEL_NOT_EXISTS);
+        }
+        // TODO 芋艿：校验流程图的有效性；例如说，是否有开始的元素，是否有结束的元素；
+        // 校验表单已配
+        BpmFormDO form = checkFormConfig(model.getMetaInfo());
+        //TODO 校验任务分配规则已配置
+        //checkTaskAssignRuleAllConfig(id);
+
+        BpmProcessDefinitionCreateReqDTO definitionCreateReqDTO = ModelConvert.INSTANCE.convert2(model, form).setBpmnBytes(bpmnBytes);
+        // TODO 校验模型是否发生修改。如果未修改，则不允许创建
+//        if (processDefinitionService.isProcessDefinitionEquals(definitionCreateReqDTO)) { // 流程定义的信息相等
+//            ProcessDefinition oldProcessInstance = processDefinitionService.getProcessDefinitionByDeploymentId(model.getDeploymentId());
+//            if (oldProcessInstance != null && taskAssignRuleService.isTaskAssignRulesEquals(model.getId(), oldProcessInstance.getId())) {
+//                throw exception(MODEL_DEPLOY_FAIL_TASK_INFO_EQUALS);
+//            }
+//        }
+        // 创建流程定义
+        String definitionId = processDefinitionService.createProcessDefinition(definitionCreateReqDTO);
+
+        // 将老的流程定义进行挂起。也就是说，只有最新部署的流程定义，才可以发起任务。
+        updateProcessDefinitionSuspended(model.getDeploymentId());
+
+        // 更新 model 的 deploymentId，进行关联
+        ProcessDefinition definition = processDefinitionService.getProcessDefinition(definitionId);
+        model.setDeploymentId(definition.getDeploymentId());
+        repositoryService.saveModel(model);
+
+        //TODO 复制任务分配规则
+        //taskAssignRuleService.copyTaskAssignRules(id, definition.getId());
+    }
+
+    @Override
+    public void deleteModel(String id) {
+
+    }
+
+    @Override
+    public void updateModelState(String id, Integer state) {
+
+    }
+
+
+
     private Model getModelByKey(String key) {
         return repositoryService.createModelQuery().modelKey(key).singleResult();
     }
 
-    private void checkKeyNCName(String key) {
-        if (!ValidationUtils.isXmlNCName(key)) {
-            throw exception(MODEL_KEY_VALID);
-        }
-    }
 
     private void saveModelBpmnXml(Model model, String bpmnXml) {
         if (StrUtil.isEmpty(bpmnXml)) {
             return;
         }
         repositoryService.addModelEditorSource(model.getId(), StrUtil.utf8Bytes(bpmnXml));
+    }
+
+    private void updateProcessDefinitionSuspended(String deploymentId) {
+        if (StrUtil.isEmpty(deploymentId)) {
+            return;
+        }
+        ProcessDefinition oldDefinition = processDefinitionService.getProcessDefinitionByDeploymentId(deploymentId);
+        if (oldDefinition == null) {
+            return;
+        }
+        processDefinitionService.updateProcessDefinitionState(oldDefinition.getId(), SuspensionState.SUSPENDED.getStateCode());
     }
 }
