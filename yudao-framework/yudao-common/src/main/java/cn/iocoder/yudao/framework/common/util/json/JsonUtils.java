@@ -2,13 +2,13 @@ package cn.iocoder.yudao.framework.common.util.json;
 
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -20,6 +20,7 @@ import java.util.List;
  * @author 芋道源码
  */
 @UtilityClass
+@Slf4j
 public class JsonUtils {
 
     private static ObjectMapper objectMapper = new ObjectMapper();
@@ -49,47 +50,72 @@ public class JsonUtils {
         return objectMapper.writeValueAsBytes(object);
     }
 
-    @SneakyThrows
+
     public static <T> T parseObject(String text, Class<T> clazz) {
         if (StrUtil.isEmpty(text)) {
             return null;
         }
 
-        return objectMapper.readValue(text, clazz);
+        try {
+            return objectMapper.readValue(text, clazz);
+        } catch (IOException e) {
+            log.error("json parse err,json:{}", text, e);
+            throw new RuntimeException(e);
+        }
     }
 
-    @SneakyThrows
     public static <T> T parseObject(byte[] bytes, Class<T> clazz) {
         if (ArrayUtil.isEmpty(bytes)) {
             return null;
         }
 
-        return objectMapper.readValue(bytes, clazz);
+        try {
+            return objectMapper.readValue(bytes, clazz);
+        } catch (IOException e) {
+            log.error("json parse err,json:{}", bytes, e);
+            throw new RuntimeException(e);
+        }
     }
 
-    @SneakyThrows
     public static <T> T parseObject(String text, TypeReference<T> typeReference) {
-        return objectMapper.readValue(text, typeReference);
+        try {
+            return objectMapper.readValue(text, typeReference);
+        } catch (IOException e) {
+            log.error("json parse err,json:{}", text, e);
+            throw new RuntimeException(e);
+        }
     }
 
-    @SneakyThrows
     public static <T> List<T> parseArray(String text, Class<T> clazz) {
         if (StrUtil.isEmpty(text)) {
             return new ArrayList<>();
         }
 
-        return objectMapper.readValue(text, objectMapper.getTypeFactory().constructCollectionType(List.class, clazz));
+        try {
+            return objectMapper.readValue(text, objectMapper.getTypeFactory().constructCollectionType(List.class, clazz));
+        } catch (IOException e) {
+            log.error("json parse err,json:{}", text, e);
+            throw new RuntimeException(e);
+        }
     }
 
     // TODO @Li：和上面的风格保持一致哈。parseTree
-    @SneakyThrows
     public static JsonNode readTree(String text) {
-        return objectMapper.readTree(text);
+        try {
+            return objectMapper.readTree(text);
+        } catch (IOException e) {
+            log.error("json parse err,json:{}", text, e);
+            throw new RuntimeException(e);
+        }
     }
 
-    @SneakyThrows
     public static JsonNode readTree(byte[] text) {
-        return objectMapper.readTree(text);
+        try {
+            return objectMapper.readTree(text);
+        } catch (IOException e) {
+            log.error("json parse err,json:{}", text, e);
+            throw new RuntimeException(e);
+        }
     }
 
 }
