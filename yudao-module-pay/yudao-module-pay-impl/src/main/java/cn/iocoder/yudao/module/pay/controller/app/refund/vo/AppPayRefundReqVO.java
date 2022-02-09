@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 @ApiModel("用户 APP - 退款订单 Req VO")
 @Data
@@ -15,11 +16,11 @@ import javax.validation.constraints.NotEmpty;
 public class AppPayRefundReqVO {
 
     @ApiModelProperty(value = "支付订单编号自增", required = true, example = "10")
-    @NotEmpty(message = "支付订单编号自增")
+    @NotNull(message = "支付订单编号自增")
     private Long payOrderId;
 
     @ApiModelProperty(value = "退款金额", required = true, example = "1")
-    @NotEmpty(message = "退款金额")
+    @NotNull(message = "退款金额")
     private Long amount;
 
     @ApiModelProperty(value = "退款原因", required = true, example = "不喜欢")
