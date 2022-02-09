@@ -73,7 +73,8 @@ public interface BpmTaskConvert {
     @Mappings({
             @Mapping(source = "id", target = "taskId"),
             @Mapping(source = "assignee", target = "assigneeUserId"),
-            @Mapping(source = "createdDate", target = "createTime")
+            @Mapping(source = "createdDate", target = "createTime"),
+            @Mapping(target = "id", ignore = true)
     })
     BpmTaskExtDO convert(org.activiti.api.task.model.Task bean);
 
@@ -104,6 +105,7 @@ public interface BpmTaskConvert {
     BpmTaskRespVO convert3(HistoricTaskInstance bean);
     BpmTaskRespVO.User convert3(AdminUserRespDTO bean);
 
+    @Mapping(target = "id", ignore = true)
     void copyTo(BpmTaskExtDO from, @MappingTarget BpmTaskDonePageItemRespVO to);
 
     @Mappings({
