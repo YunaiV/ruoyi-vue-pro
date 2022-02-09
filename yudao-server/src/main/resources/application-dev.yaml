@@ -174,7 +174,7 @@ yudao:
     mock-enable: true
     mock-secret: test
   file:
-    base-path: http://api-dashboard.yudao.iocoder.cn${yudao.web.api-prefix}/infra/file/get/
+    base-path: http://api-dashboard.yudao.iocoder.cn${yudao.web.admin-api.prefix}/infra/file/get/
   xss:
     enable: false
     exclude-urls: # 如下两个 url，仅仅是为了演示，去掉配置也没关系
