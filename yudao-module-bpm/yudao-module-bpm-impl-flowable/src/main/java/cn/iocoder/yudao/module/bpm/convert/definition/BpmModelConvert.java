@@ -25,9 +25,9 @@ import java.util.Objects;
  * @author yunlongn
  */
 @Mapper
-public interface ModelConvert {
+public interface BpmModelConvert {
 
-    ModelConvert INSTANCE = Mappers.getMapper(ModelConvert.class);
+    BpmModelConvert INSTANCE = Mappers.getMapper(BpmModelConvert.class);
 
     default List<BpmModelPageItemRespVO> convertList(List<Model> list, Map<Long, BpmFormDO> formMap,
                                                      Map<String, Deployment> deploymentMap,

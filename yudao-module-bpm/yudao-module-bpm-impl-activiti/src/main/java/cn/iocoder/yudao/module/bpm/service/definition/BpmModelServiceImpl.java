@@ -52,13 +52,9 @@ public class BpmModelServiceImpl extends BpmAbstractModelService implements BpmM
 
     @Resource
     private BpmProcessDefinitionService processDefinitionService;
-    @Resource
-    @Lazy // 解决循环依赖
-    private BpmTaskAssignRuleService taskAssignRuleService;
 
-
-    public BpmModelServiceImpl(BpmFormService bpmFormService) {
-        super(bpmFormService);
+    public BpmModelServiceImpl(BpmFormService bpmFormService,BpmTaskAssignRuleService taskAssignRuleService) {
+        super(bpmFormService, taskAssignRuleService);
     }
 
     @Override
@@ -194,26 +190,6 @@ public class BpmModelServiceImpl extends BpmAbstractModelService implements BpmM
 
         // 复制任务分配规则
         taskAssignRuleService.copyTaskAssignRules(id, definition.getId());
-    }
-
-    /**
-     * 校验流程模型的任务分配规则全部都配置了
-     * 目的：如果有规则未配置，会导致流程任务找不到负责人，进而流程无法进行下去！
-     *
-     * @param id 流程模型编号
-     */
-    private void checkTaskAssignRuleAllConfig(String id) {
-        // 一个用户任务都没配置，所以无需配置规则
-        List<BpmTaskAssignRuleRespVO> taskAssignRules = taskAssignRuleService.getTaskAssignRuleList(id, null);
-        if (CollUtil.isEmpty(taskAssignRules)) {
-            return;
-        }
-        // 校验未配置规则的任务
-        taskAssignRules.forEach(rule -> {
-            if (CollUtil.isEmpty(rule.getOptions())) {
-                throw exception(MODEL_DEPLOY_FAIL_TASK_ASSIGN_RULE_NOT_CONFIG, rule.getTaskDefinitionName());
-            }
-        });
     }
 
     @Override

@@ -4,8 +4,8 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.io.IoUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.*;
-import cn.iocoder.yudao.module.bpm.convert.definition.ModelConvert;
-import cn.iocoder.yudao.module.bpm.service.definition.FlowableModelService;
+import cn.iocoder.yudao.module.bpm.convert.definition.BpmModelConvert;
+import cn.iocoder.yudao.module.bpm.service.definition.BpmModelService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
@@ -24,10 +24,10 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 @RestController
 @RequestMapping("/bpm/model")
 @Validated
-public class FlowableModelController {
+public class BpmModelController {
 
     @Resource
-    private FlowableModelService modelService;
+    private BpmModelService modelService;
 
     @GetMapping("/page")
     @ApiOperation(value = "获得模型分页")
@@ -62,7 +62,7 @@ public class FlowableModelController {
     @PostMapping("/import")
     @ApiOperation(value = "导入模型")
     public CommonResult<String> importModel(@Valid BpmModeImportReqVO importReqVO) throws IOException {
-        BpmModelCreateReqVO createReqVO = ModelConvert.INSTANCE.convert(importReqVO);
+        BpmModelCreateReqVO createReqVO = BpmModelConvert.INSTANCE.convert(importReqVO);
         // 读取文件
         String bpmnXml = IoUtils.readUtf8(importReqVO.getBpmnFile().getInputStream(), false);
         return success(modelService.createModel(createReqVO, bpmnXml));
@@ -74,6 +74,23 @@ public class FlowableModelController {
     @PreAuthorize("@ss.hasPermission('bpm:model:deploy')")
     public CommonResult<Boolean> deployModel(@RequestParam("id") String id) {
         modelService.deployModel(id);
+        return success(true);
+    }
+
+    @PutMapping("/update-state")
+    @ApiOperation(value = "修改模型的状态", notes = "实际更新的部署的流程定义的状态")
+    @PreAuthorize("@ss.hasPermission('bpm:model:update')")
+    public CommonResult<Boolean> updateModelState(@Valid @RequestBody BpmModelUpdateStateReqVO reqVO) {
+        modelService.updateModelState(reqVO.getId(), reqVO.getState());
+        return success(true);
+    }
+
+    @DeleteMapping("/delete")
+    @ApiOperation("删除模型")
+    @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = String.class)
+    @PreAuthorize("@ss.hasPermission('bpm:model:delete')")
+    public CommonResult<Boolean> deleteModel(@RequestParam("id") String id) {
+        modelService.deleteModel(id);
         return success(true);
     }
 }

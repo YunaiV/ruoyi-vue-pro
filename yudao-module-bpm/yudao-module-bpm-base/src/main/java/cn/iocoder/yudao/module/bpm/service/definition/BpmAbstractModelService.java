@@ -1,11 +1,14 @@
 package cn.iocoder.yudao.module.bpm.service.definition;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.validation.ValidationUtils;
+import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.rule.BpmTaskAssignRuleRespVO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmFormDO;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmModelFormTypeEnum;
 import cn.iocoder.yudao.module.bpm.service.definition.dto.BpmModelMetaInfoRespDTO;
 
+import java.util.List;
 import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -21,8 +24,11 @@ public abstract class BpmAbstractModelService {
 
     protected final BpmFormService bpmFormService;
 
-    public BpmAbstractModelService(BpmFormService bpmFormService) {
+    protected final BpmTaskAssignRuleService taskAssignRuleService;
+
+    public BpmAbstractModelService(BpmFormService bpmFormService,BpmTaskAssignRuleService taskAssignRuleService) {
         this.bpmFormService = bpmFormService;
+        this.taskAssignRuleService = taskAssignRuleService;
     }
 
     /**
@@ -45,6 +51,26 @@ public abstract class BpmAbstractModelService {
             return form;
         }
         return null;
+    }
+
+    /**
+     * 校验流程模型的任务分配规则全部都配置了
+     * 目的：如果有规则未配置，会导致流程任务找不到负责人，进而流程无法进行下去！
+     *
+     * @param id 流程模型编号
+     */
+    protected void checkTaskAssignRuleAllConfig(String id) {
+        // 一个用户任务都没配置，所以无需配置规则
+        List<BpmTaskAssignRuleRespVO> taskAssignRules = taskAssignRuleService.getTaskAssignRuleList(id, null);
+        if (CollUtil.isEmpty(taskAssignRules)) {
+            return;
+        }
+        // 校验未配置规则的任务
+        taskAssignRules.forEach(rule -> {
+            if (CollUtil.isEmpty(rule.getOptions())) {
+                throw exception(MODEL_DEPLOY_FAIL_TASK_ASSIGN_RULE_NOT_CONFIG, rule.getTaskDefinitionName());
+            }
+        });
     }
 
 

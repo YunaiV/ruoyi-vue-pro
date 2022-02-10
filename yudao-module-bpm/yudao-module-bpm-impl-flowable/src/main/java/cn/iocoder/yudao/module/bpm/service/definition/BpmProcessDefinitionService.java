@@ -1,11 +1,10 @@
 package cn.iocoder.yudao.module.bpm.service.definition;
 
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
-import cn.iocoder.yudao.module.bpm.service.definition.dto.BpmProcessDefinitionCreateReqDTO;
+import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
 
-import javax.validation.Valid;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -16,7 +15,7 @@ import java.util.Set;
  * @author ZJQ
  * @author 芋道源码
  */
-public interface FlowableProcessDefinitionService {
+public interface BpmProcessDefinitionService extends BpmProcessDefinitionCommonService {
 
     /**
      * 获得编号对应的 ProcessDefinition
@@ -41,6 +40,14 @@ public interface FlowableProcessDefinitionService {
      * @return 流程定义的数组
      */
     List<ProcessDefinition> getProcessDefinitionListByDeploymentIds(Set<String> deploymentIds);
+
+    /**
+     * 获得流程定义标识对应的激活的流程定义
+     *
+     * @param key 流程定义的标识
+     * @return 流程定义
+     */
+    ProcessDefinition getActiveProcessDefinition(String key);
 
     /**
      * 获得 ids 对应的 Deployment Map
@@ -69,18 +76,10 @@ public interface FlowableProcessDefinitionService {
     Deployment getDeployment(String id);
 
     /**
-     * 创建流程定义
+     * 获得 Bpmn 模型
      *
-     * @param createReqDTO 创建信息
-     * @return 流程编号
+     * @param processDefinitionId 流程定义的编号
+     * @return Bpmn 模型
      */
-    String createProcessDefinition(@Valid BpmProcessDefinitionCreateReqDTO createReqDTO);
-
-    /**
-     * 更新流程定义状态
-     *
-     * @param id 流程定义的编号
-     * @param state 状态
-     */
-    void updateProcessDefinitionState(String id, Integer state);
+    BpmnModel getBpmnModel(String processDefinitionId);
 }
