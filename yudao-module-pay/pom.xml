@@ -15,7 +15,7 @@
         <module>yudao-module-pay-impl</module>
     </modules>
 
-    <name>${artifactId}</name>
+    <name>${project.artifactId}</name>
     <description>
         pay 模块，我们放支付业务，提供业务的支付能力。
         例如说：商户、应用、支付、退款等等

@@ -11,7 +11,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>yudao-spring-boot-starter-biz-social</artifactId>
-    <name>${artifactId}</name>
+    <name>${project.artifactId}</name>
 
     <dependencies>
         <dependency>

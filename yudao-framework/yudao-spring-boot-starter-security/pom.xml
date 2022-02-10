@@ -11,7 +11,7 @@
     <artifactId>yudao-spring-boot-starter-security</artifactId>
     <packaging>jar</packaging>
 
-    <name>${artifactId}</name>
+    <name>${project.artifactId}</name>
     <description>用户的认证、权限的校验</description>
     <url>https://github.com/YunaiV/ruoyi-vue-pro</url>
 

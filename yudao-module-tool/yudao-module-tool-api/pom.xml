@@ -11,7 +11,7 @@
     <artifactId>yudao-module-tool-api</artifactId>
     <packaging>jar</packaging>
 
-    <name>${artifactId}</name>
+    <name>${project.artifactId}</name>
     <description>
         tool 模块 API，暴露给其它模块调用
     </description>

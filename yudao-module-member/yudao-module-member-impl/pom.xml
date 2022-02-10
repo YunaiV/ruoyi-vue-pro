@@ -11,7 +11,7 @@
     <artifactId>yudao-module-member-impl</artifactId>
     <packaging>jar</packaging>
 
-    <name>${artifactId}</name>
+    <name>${project.artifactId}</name>
     <description>
         member 模块，我们放会员业务。
         例如说：会员中心等等

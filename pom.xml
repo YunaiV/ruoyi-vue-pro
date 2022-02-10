@@ -21,7 +21,7 @@
         <module>yudao-module-pay</module>
     </modules>
 
-    <name>${artifactId}</name>
+    <name>${project.artifactId}</name>
     <description>芋道项目基础脚手架</description>
     <url>https://github.com/YunaiV/ruoyi-vue-pro</url>
 

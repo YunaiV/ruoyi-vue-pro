@@ -11,7 +11,7 @@
     <artifactId>yudao-spring-boot-starter-biz-weixin</artifactId>
     <packaging>jar</packaging>
 
-    <name>${artifactId}</name>
+    <name>${project.artifactId}</name>
     <description>微信拓展
         1. 基于 weixin-java-mp 库，对接微信公众号平台。目前主要解决微信公众号的支付场景。
     </description>

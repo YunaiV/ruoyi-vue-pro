@@ -12,7 +12,7 @@
     <artifactId>yudao-spring-boot-starter-extension</artifactId>
     <packaging>jar</packaging>
 
-    <name>${artifactId}</name>
+    <name>${project.artifactId}</name>
     <description>扩展点组件</description>
     <url>https://github.com/YunaiV/ruoyi-vue-pro</url>
 

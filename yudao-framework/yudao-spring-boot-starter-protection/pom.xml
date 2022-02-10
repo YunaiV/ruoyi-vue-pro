@@ -11,7 +11,7 @@
     <artifactId>yudao-spring-boot-starter-protection</artifactId>
     <packaging>jar</packaging>
 
-    <name>${artifactId}</name>
+    <name>${project.artifactId}</name>
     <description>服务保证，提供分布式锁、幂等、限流、熔断等等功能</description>
     <url>https://github.com/YunaiV/ruoyi-vue-pro</url>
 

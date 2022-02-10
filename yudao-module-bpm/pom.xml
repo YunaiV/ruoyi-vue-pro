@@ -17,7 +17,7 @@
     <artifactId>yudao-module-bpm</artifactId>
     <packaging>pom</packaging>
 
-    <name>${artifactId}</name>
+    <name>${project.artifactId}</name>
     <description>
         bpm 包下，业务流程管理（Business Process Management），我们放工作流的功能。
         例如说：流程定义、表单配置、审核中心（我的申请、我的待办、我的已办）等等
