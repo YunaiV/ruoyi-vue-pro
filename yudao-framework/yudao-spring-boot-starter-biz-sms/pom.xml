@@ -11,7 +11,7 @@
     <artifactId>yudao-spring-boot-starter-biz-sms</artifactId>
     <packaging>jar</packaging>
 
-    <name>${artifactId}</name>
+    <name>${project.artifactId}</name>
     <description>短信拓展，支持阿里云、云片</description>
     <url>https://github.com/YunaiV/ruoyi-vue-pro</url>
 

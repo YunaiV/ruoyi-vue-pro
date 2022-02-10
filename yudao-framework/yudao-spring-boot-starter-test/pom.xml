@@ -11,7 +11,7 @@
     <artifactId>yudao-spring-boot-starter-test</artifactId>
     <packaging>jar</packaging>
 
-    <name>${artifactId}</name>
+    <name>${project.artifactId}</name>
     <description>测试组件，用于单元测试、集成测试</description>
     <url>https://github.com/YunaiV/ruoyi-vue-pro</url>
 

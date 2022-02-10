@@ -11,7 +11,7 @@
     <artifactId>yudao-common</artifactId>
     <packaging>jar</packaging>
 
-    <name>${artifactId}</name>
+    <name>${project.artifactId}</name>
     <description>定义基础 pojo 类、枚举、工具类等等</description>
     <url>https://github.com/YunaiV/ruoyi-vue-pro</url>
 
@@ -87,11 +87,6 @@
         <dependency>
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct-processor</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>cn.hutool</groupId>
-            <artifactId>hutool-all</artifactId>
         </dependency>
 
         <dependency>
