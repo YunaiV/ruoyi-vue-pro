@@ -3,8 +3,10 @@ package cn.iocoder.yudao.module.bpm.service.definition;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.framework.common.util.validation.ValidationUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.*;
 import cn.iocoder.yudao.module.bpm.convert.definition.BpmModelConvert;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmModelFormTypeEnum;
 import cn.iocoder.yudao.module.bpm.service.definition.dto.BpmModelMetaInfoRespDTO;
 import cn.iocoder.yudao.framework.activiti.core.util.ActivitiUtils;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -45,17 +47,16 @@ import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.*;
 @Service
 @Validated
 @Slf4j
-public class BpmModelServiceImpl extends BpmAbstractModelService implements BpmModelService {
+public class BpmModelServiceImpl  implements BpmModelService {
 
     @Resource
     private RepositoryService repositoryService;
-
     @Resource
     private BpmProcessDefinitionService processDefinitionService;
-
-    public BpmModelServiceImpl(BpmFormService bpmFormService,BpmTaskAssignRuleService taskAssignRuleService) {
-        super(bpmFormService, taskAssignRuleService);
-    }
+    @Resource
+    private BpmFormService bpmFormService;
+    @Resource
+    private BpmTaskAssignRuleService taskAssignRuleService;
 
     @Override
     public PageResult<BpmModelPageItemRespVO> getModelPage(BpmModelPageReqVO pageVO) {
@@ -167,7 +168,7 @@ public class BpmModelServiceImpl extends BpmAbstractModelService implements BpmM
         // 校验表单已配
         BpmFormDO form = checkFormConfig(model.getMetaInfo());
         // 校验任务分配规则已配置
-        checkTaskAssignRuleAllConfig(id);
+        taskAssignRuleService.checkTaskAssignRuleAllConfig(id);
 
         // 校验模型是否发生修改。如果未修改，则不允许创建
         BpmProcessDefinitionCreateReqDTO definitionCreateReqDTO = BpmModelConvert.INSTANCE.convert2(model, form).setBpmnBytes(bpmnBytes);
@@ -245,6 +246,34 @@ public class BpmModelServiceImpl extends BpmAbstractModelService implements BpmM
 
     private Model getModelByKey(String key) {
         return repositoryService.createModelQuery().modelKey(key).singleResult();
+    }
+
+    private void checkKeyNCName(String key) {
+        if (!ValidationUtils.isXmlNCName(key)) {
+            throw exception(MODEL_KEY_VALID);
+        }
+    }
+
+    /**
+     * 校验流程表单已配置
+     *
+     * @param metaInfoStr 流程模型 metaInfo 字段
+     * @return 流程表单
+     */
+    private BpmFormDO checkFormConfig(String  metaInfoStr) {
+        BpmModelMetaInfoRespDTO metaInfo = JsonUtils.parseObject(metaInfoStr, BpmModelMetaInfoRespDTO.class);
+        if (metaInfo == null || metaInfo.getFormType() == null) {
+            throw exception(MODEL_DEPLOY_FAIL_FORM_NOT_CONFIG);
+        }
+        // 校验表单存在
+        if (Objects.equals(metaInfo.getFormType(), BpmModelFormTypeEnum.NORMAL.getType())) {
+            BpmFormDO form = bpmFormService.getForm(metaInfo.getFormId());
+            if (form == null) {
+                throw exception(FORM_NOT_EXISTS);
+            }
+            return form;
+        }
+        return null;
     }
 
 }

@@ -1,7 +1,9 @@
 package cn.iocoder.yudao.module.bpm.convert.definition;
 
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.rule.BpmTaskAssignRuleCreateReqVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.rule.BpmTaskAssignRuleRespVO;
+import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.rule.BpmTaskAssignRuleUpdateReqVO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmTaskAssignRuleDO;
 import org.flowable.bpmn.model.UserTask;
 import org.mapstruct.Mapper;
@@ -29,4 +31,10 @@ public interface BpmTaskAssignRuleConvert {
     }
 
     BpmTaskAssignRuleRespVO convert(BpmTaskAssignRuleDO bean);
+
+    BpmTaskAssignRuleDO convert(BpmTaskAssignRuleCreateReqVO bean);
+
+    BpmTaskAssignRuleDO convert(BpmTaskAssignRuleUpdateReqVO bean);
+
+    List<BpmTaskAssignRuleDO> convertList2(List<BpmTaskAssignRuleRespVO> list);
 }

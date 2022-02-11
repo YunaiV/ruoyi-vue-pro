@@ -6,9 +6,11 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.object.PageUtils;
+import cn.iocoder.yudao.framework.common.util.validation.ValidationUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.*;
 import cn.iocoder.yudao.module.bpm.convert.definition.BpmModelConvert;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmFormDO;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmModelFormTypeEnum;
 import cn.iocoder.yudao.module.bpm.service.definition.dto.BpmModelMetaInfoRespDTO;
 import cn.iocoder.yudao.module.bpm.service.definition.dto.BpmProcessDefinitionCreateReqDTO;
 import lombok.extern.slf4j.Slf4j;
@@ -45,16 +47,16 @@ import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.*;
 @Service
 @Validated
 @Slf4j
-public class BpmModelServiceImpl extends BpmAbstractModelService implements BpmModelService {
+public class BpmModelServiceImpl implements BpmModelService {
 
     @Resource
     private RepositoryService repositoryService;
     @Resource
     private BpmProcessDefinitionService processDefinitionService;
-
-    public BpmModelServiceImpl(BpmFormService bpmFormService, BpmTaskAssignRuleService taskAssignRuleService){
-        super(bpmFormService, taskAssignRuleService);
-    }
+    @Resource
+    private BpmFormService bpmFormService;
+    @Resource
+    private BpmTaskAssignRuleService taskAssignRuleService;
 
     @Override
     public PageResult<BpmModelPageItemRespVO> getModelPage(BpmModelPageReqVO pageVO) {
@@ -161,7 +163,7 @@ public class BpmModelServiceImpl extends BpmAbstractModelService implements BpmM
         // 校验表单已配
         BpmFormDO form = checkFormConfig(model.getMetaInfo());
         //校验任务分配规则已配置
-        checkTaskAssignRuleAllConfig(id);
+        taskAssignRuleService.checkTaskAssignRuleAllConfig(id);
 
         BpmProcessDefinitionCreateReqDTO definitionCreateReqDTO = BpmModelConvert.INSTANCE.convert2(model, form).setBpmnBytes(bpmnBytes);
         //校验模型是否发生修改。如果未修改，则不允许创建
@@ -182,8 +184,8 @@ public class BpmModelServiceImpl extends BpmAbstractModelService implements BpmM
         model.setDeploymentId(definition.getDeploymentId());
         repositoryService.saveModel(model);
 
-        //TODO 复制任务分配规则
-        //taskAssignRuleService.copyTaskAssignRules(id, definition.getId());
+        //复制任务分配规则
+        taskAssignRuleService.copyTaskAssignRules(id, definition.getId());
     }
 
 
@@ -218,6 +220,44 @@ public class BpmModelServiceImpl extends BpmAbstractModelService implements BpmM
         processDefinitionService.updateProcessDefinitionState(definition.getId(), state);
     }
 
+    @Override
+    public BpmnModel getBpmnModel(String id) {
+        byte[] bpmnBytes = repositoryService.getModelEditorSource(id);
+        if (ArrayUtil.isEmpty(bpmnBytes)) {
+            return null;
+        }
+        BpmnXMLConverter converter = new BpmnXMLConverter();
+        return converter.convertToBpmnModel(new BytesStreamSource(bpmnBytes), true, true);
+    }
+
+    private void checkKeyNCName(String key) {
+        if (!ValidationUtils.isXmlNCName(key)) {
+            throw exception(MODEL_KEY_VALID);
+        }
+    }
+
+    /**
+     * 校验流程表单已配置
+     *
+     * @param metaInfoStr 流程模型 metaInfo 字段
+     * @return 流程表单
+     */
+    private BpmFormDO checkFormConfig(String  metaInfoStr) {
+        BpmModelMetaInfoRespDTO metaInfo = JsonUtils.parseObject(metaInfoStr, BpmModelMetaInfoRespDTO.class);
+        if (metaInfo == null || metaInfo.getFormType() == null) {
+            throw exception(MODEL_DEPLOY_FAIL_FORM_NOT_CONFIG);
+        }
+        // 校验表单存在
+        if (Objects.equals(metaInfo.getFormType(), BpmModelFormTypeEnum.NORMAL.getType())) {
+            BpmFormDO form = bpmFormService.getForm(metaInfo.getFormId());
+            if (form == null) {
+                throw exception(FORM_NOT_EXISTS);
+            }
+            return form;
+        }
+        return null;
+    }
+
     private void saveModelBpmnXml(Model model, String bpmnXml) {
         if (StrUtil.isEmpty(bpmnXml)) {
             return;
@@ -240,13 +280,5 @@ public class BpmModelServiceImpl extends BpmAbstractModelService implements BpmM
         processDefinitionService.updateProcessDefinitionState(oldDefinition.getId(), SuspensionState.SUSPENDED.getStateCode());
     }
 
-    @Override
-    public BpmnModel getBpmnModel(String id) {
-        byte[] bpmnBytes = repositoryService.getModelEditorSource(id);
-        if (ArrayUtil.isEmpty(bpmnBytes)) {
-            return null;
-        }
-        BpmnXMLConverter converter = new BpmnXMLConverter();
-        return converter.convertToBpmnModel(new BytesStreamSource(bpmnBytes), true, true);
-    }
+
 }

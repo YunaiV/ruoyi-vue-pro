@@ -173,6 +173,21 @@ public class BpmTaskAssignRuleServiceImpl implements BpmTaskAssignRuleService {
         taskRuleMapper.insertBatch(newRules);
     }
 
+    @Override
+    public void checkTaskAssignRuleAllConfig(String id) {
+        // 一个用户任务都没配置，所以无需配置规则
+        List<BpmTaskAssignRuleRespVO> taskAssignRules = getTaskAssignRuleList(id, null);
+        if (CollUtil.isEmpty(taskAssignRules)) {
+            return;
+        }
+        // 校验未配置规则的任务
+        taskAssignRules.forEach(rule -> {
+            if (CollUtil.isEmpty(rule.getOptions())) {
+                throw exception(MODEL_DEPLOY_FAIL_TASK_ASSIGN_RULE_NOT_CONFIG, rule.getTaskDefinitionName());
+            }
+        });
+    }
+
     private void validTaskAssignRuleOptions(Integer type, Set<Long> options) {
         if (Objects.equals(type, BpmTaskAssignRuleTypeEnum.ROLE.getType())) {
             roleApi.validRoles(options);

@@ -88,4 +88,12 @@ public interface BpmFormService {
      */
     PageResult<BpmFormDO> getFormPage(BpmFormPageReqVO pageReqVO);
 
+    /**
+     * 校验流程表单已配置
+     *
+     * @param configStr  configStr 字段
+     * @return 流程表单
+     */
+    BpmFormDO checkFormConfig(String  configStr);
+
 }
