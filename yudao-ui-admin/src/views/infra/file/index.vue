@@ -169,7 +169,7 @@ export default {
     handleFileUploadProgress(event, file, fileList) {
       this.upload.isUploading = true; // 禁止修改
     },
-    /** 发起文件上窜 */
+    /** 发起文件上传 */
     submitFileForm() {
       this.$refs.upload.submit();
     },
