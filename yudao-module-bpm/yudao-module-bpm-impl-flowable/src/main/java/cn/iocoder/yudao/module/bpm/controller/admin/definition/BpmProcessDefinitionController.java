@@ -2,8 +2,10 @@ package cn.iocoder.yudao.module.bpm.controller.admin.definition;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.process.BpmProcessDefinitionListReqVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.process.BpmProcessDefinitionPageItemRespVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.process.BpmProcessDefinitionPageReqVO;
+import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.process.BpmProcessDefinitionRespVO;
 import cn.iocoder.yudao.module.bpm.service.definition.BpmProcessDefinitionService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -16,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
@@ -34,6 +38,14 @@ public class BpmProcessDefinitionController {
     public CommonResult<PageResult<BpmProcessDefinitionPageItemRespVO>> getProcessDefinitionPage(
             BpmProcessDefinitionPageReqVO pageReqVO) {
         return success(bpmDefinitionService.getProcessDefinitionPage(pageReqVO));
+    }
+
+    @GetMapping ("/list")
+    @ApiOperation(value = "获得流程定义列表")
+    @PreAuthorize("@ss.hasPermission('bpm:process-definition:query')")
+    public CommonResult<List<BpmProcessDefinitionRespVO>> getProcessDefinitionList(
+            BpmProcessDefinitionListReqVO listReqVO) {
+        return success(bpmDefinitionService.getProcessDefinitionList(listReqVO));
     }
 
     @GetMapping ("/get-bpmn-xml")

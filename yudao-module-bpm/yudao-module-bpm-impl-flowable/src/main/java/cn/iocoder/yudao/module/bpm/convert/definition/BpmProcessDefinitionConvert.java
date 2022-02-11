@@ -12,6 +12,7 @@ import org.flowable.engine.repository.ProcessDefinition;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
+import org.mapstruct.Named;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
@@ -39,6 +40,26 @@ public interface BpmProcessDefinitionConvert {
             BpmFormDO form = definitionDO != null ? formMap.get(definitionDO.getFormId()) : null;
             return convert(definition, deployment, definitionDO, form);
         });
+    }
+
+    default List<BpmProcessDefinitionRespVO> convertList3(List<ProcessDefinition> list,
+                                                          Map<String, BpmProcessDefinitionExtDO> processDefinitionDOMap) {
+        return CollectionUtils.convertList(list, processDefinition -> {
+            BpmProcessDefinitionRespVO respVO = convert3(processDefinition);
+            BpmProcessDefinitionExtDO processDefinitionExtDO = processDefinitionDOMap.get(processDefinition.getId());
+            // 复制通用属性
+            copyTo(processDefinitionExtDO, respVO);
+            return respVO;
+        });
+    }
+
+    @Mapping(source = "suspended", target = "suspensionState", qualifiedByName = "convertSuspendedToSuspensionState")
+    BpmProcessDefinitionRespVO convert3(ProcessDefinition bean);
+
+    @Named("convertSuspendedToSuspensionState")
+    default Integer convertSuspendedToSuspensionState(boolean suspended) {
+        return suspended ? SuspensionState.SUSPENDED.getStateCode() :
+                SuspensionState.ACTIVE.getStateCode();
     }
 
     default BpmProcessDefinitionPageItemRespVO convert(ProcessDefinition bean, Deployment deployment,
