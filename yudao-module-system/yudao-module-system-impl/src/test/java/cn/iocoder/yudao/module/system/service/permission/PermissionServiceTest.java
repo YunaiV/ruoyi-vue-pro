@@ -203,8 +203,9 @@ public class PermissionServiceTest extends BaseDbUnitTest {
         // 断言
         assertFalse(result.getAll());
         assertFalse(result.getSelf());
-        assertEquals(1, result.getDeptIds().size());
+        assertEquals(2, result.getDeptIds().size());
         assertTrue(CollUtil.contains(result.getDeptIds(), deptDO.getId()));
+        assertTrue(CollUtil.contains(result.getDeptIds(), loginUser.getDeptId()));
         assertSame(result, loginUser.getContext(PermissionServiceImpl.CONTEXT_KEY, DeptDataPermissionRespDTO.class));
     }
 

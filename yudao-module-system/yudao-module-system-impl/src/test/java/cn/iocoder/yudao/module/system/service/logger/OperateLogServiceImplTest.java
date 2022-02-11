@@ -1,14 +1,8 @@
 package cn.iocoder.yudao.module.system.service.logger;
 
 import cn.hutool.core.map.MapUtil;
-import cn.iocoder.yudao.module.system.controller.admin.logger.vo.operatelog.OperateLogExportReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.logger.vo.operatelog.OperateLogPageReqVO;
-import cn.iocoder.yudao.module.system.dal.dataobject.logger.OperateLogDO;
-import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
-import cn.iocoder.yudao.module.system.dal.mysql.logger.OperateLogMapper;
-import cn.iocoder.yudao.module.system.service.user.AdminUserService;
-import cn.iocoder.yudao.module.system.enums.common.SexEnum;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.monitor.TracerUtils;
@@ -16,6 +10,13 @@ import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.operatelog.core.dto.OperateLogCreateReqDTO;
 import cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum;
 import cn.iocoder.yudao.framework.test.core.util.RandomUtils;
+import cn.iocoder.yudao.module.system.controller.admin.logger.vo.operatelog.OperateLogExportReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.logger.vo.operatelog.OperateLogPageReqVO;
+import cn.iocoder.yudao.module.system.dal.dataobject.logger.OperateLogDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
+import cn.iocoder.yudao.module.system.dal.mysql.logger.OperateLogMapper;
+import cn.iocoder.yudao.module.system.enums.common.SexEnum;
+import cn.iocoder.yudao.module.system.service.user.AdminUserService;
 import cn.iocoder.yudao.module.system.test.BaseDbUnitTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -27,6 +28,8 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import static cn.hutool.core.util.RandomUtil.randomEle;
+import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.BAD_REQUEST;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildTime;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomLongId;
@@ -51,6 +54,7 @@ public class OperateLogServiceImplTest extends BaseDbUnitTest {
         OperateLogCreateReqDTO reqVO = RandomUtils.randomPojo(OperateLogCreateReqDTO.class, o -> {
             o.setTraceId(traceId);
             o.setUserId(randomLongId());
+            o.setUserType(randomEle(UserTypeEnum.values()).getValue());
             o.setExts(MapUtil.<String, Object>builder("orderId", randomLongId()).build());
         });
 
@@ -76,6 +80,7 @@ public class OperateLogServiceImplTest extends BaseDbUnitTest {
         // 构造操作日志
         OperateLogDO sysOperateLogDO = RandomUtils.randomPojo(OperateLogDO.class, o -> {
             o.setUserId(userId);
+            o.setUserType(randomEle(UserTypeEnum.values()).getValue());
             o.setModule("order");
             o.setType(OperateTypeEnum.CREATE.getType());
             o.setStartTime(buildTime(2021, 3, 6));
@@ -94,7 +99,7 @@ public class OperateLogServiceImplTest extends BaseDbUnitTest {
         // createTime 不同
         operateLogMapper.insert(ObjectUtils.cloneIgnoreId(sysOperateLogDO, logDO -> logDO.setStartTime(buildTime(2021, 2, 6))));
         // resultCode 不同
-        operateLogMapper.insert(ObjectUtils.cloneIgnoreId(sysOperateLogDO, logDO -> logDO.setResultCode(GlobalErrorCodeConstants.BAD_REQUEST.getCode())));
+        operateLogMapper.insert(ObjectUtils.cloneIgnoreId(sysOperateLogDO, logDO -> logDO.setResultCode(BAD_REQUEST.getCode())));
 
         // 构造调用参数
         OperateLogPageReqVO reqVO = new OperateLogPageReqVO();
@@ -127,6 +132,7 @@ public class OperateLogServiceImplTest extends BaseDbUnitTest {
         // 构造操作日志
         OperateLogDO sysOperateLogDO = RandomUtils.randomPojo(OperateLogDO.class, o -> {
             o.setUserId(userId);
+            o.setUserType(randomEle(UserTypeEnum.values()).getValue());
             o.setModule("order");
             o.setType(OperateTypeEnum.CREATE.getType());
             o.setStartTime(buildTime(2021, 3, 6));
@@ -145,7 +151,7 @@ public class OperateLogServiceImplTest extends BaseDbUnitTest {
         // createTime 不同
         operateLogMapper.insert(ObjectUtils.cloneIgnoreId(sysOperateLogDO, logDO -> logDO.setStartTime(buildTime(2021, 2, 6))));
         // resultCode 不同
-        operateLogMapper.insert(ObjectUtils.cloneIgnoreId(sysOperateLogDO, logDO -> logDO.setResultCode(GlobalErrorCodeConstants.BAD_REQUEST.getCode())));
+        operateLogMapper.insert(ObjectUtils.cloneIgnoreId(sysOperateLogDO, logDO -> logDO.setResultCode(BAD_REQUEST.getCode())));
 
         // 构造调用参数
         OperateLogExportReqVO reqVO = new OperateLogExportReqVO();
