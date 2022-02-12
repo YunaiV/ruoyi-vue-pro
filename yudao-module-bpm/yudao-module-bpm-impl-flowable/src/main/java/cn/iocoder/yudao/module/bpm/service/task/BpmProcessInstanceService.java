@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessI
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstanceMyPageReqVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstancePageItemRespVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstanceRespVO;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEntityEvent;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.runtime.ProcessInstance;
 
@@ -73,4 +74,11 @@ public interface BpmProcessInstanceService {
      * @return 历史的流程实例
      */
     HistoricProcessInstance getHistoricProcessInstance(String id);
+
+    /**
+     * 创建 ProcessInstance 拓展记录
+     *
+     * @param instance 流程任务
+     */
+    void createProcessInstanceExt(ProcessInstance instance);
 }

@@ -90,6 +90,16 @@ public interface BpmProcessDefinitionService {
     ProcessDefinition getProcessDefinition(String id);
 
     /**
+     * 获得编号对应的 ProcessDefinition
+     *
+     * 相比 {@link #getProcessDefinition(String)} 方法，category 的取值是正确
+     *
+     * @param id 编号
+     * @return 流程定义
+     */
+    ProcessDefinition getProcessDefinition2(String id);
+
+    /**
      * 获得 deploymentId 对应的 ProcessDefinition
      *
      * @param deploymentId 部署编号

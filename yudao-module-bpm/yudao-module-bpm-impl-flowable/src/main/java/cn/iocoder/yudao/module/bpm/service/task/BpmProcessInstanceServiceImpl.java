@@ -12,6 +12,8 @@ import cn.iocoder.yudao.module.bpm.convert.task.BpmProcessInstanceConvert;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmProcessDefinitionExtDO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.task.BpmProcessInstanceExtDO;
 import cn.iocoder.yudao.module.bpm.dal.mysql.task.BpmProcessInstanceExtMapper;
+import cn.iocoder.yudao.module.bpm.enums.task.BpmProcessInstanceResultEnum;
+import cn.iocoder.yudao.module.bpm.enums.task.BpmProcessInstanceStatusEnum;
 import cn.iocoder.yudao.module.bpm.service.definition.BpmProcessDefinitionService;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
@@ -32,6 +34,7 @@ import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -140,6 +143,23 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
     @Override
     public HistoricProcessInstance getHistoricProcessInstance(String id) {
         return historyService.createHistoricProcessInstanceQuery().processInstanceId(id).singleResult();
+    }
+
+    @Override
+    public void createProcessInstanceExt(ProcessInstance instance) {
+        // 获得流程定义
+        ProcessDefinition definition = processDefinitionService.getProcessDefinition2(instance.getProcessDefinitionId());
+        // 插入 BpmProcessInstanceExtDO 对象
+        BpmProcessInstanceExtDO instanceExtDO = new BpmProcessInstanceExtDO()
+                .setProcessInstanceId(instance.getId())
+                .setProcessDefinitionId(definition.getId())
+                .setName(instance.getProcessDefinitionName())
+                .setStartUserId(Long.valueOf(instance.getStartUserId()))
+                .setCategory(definition.getCategory())
+                .setStatus(BpmProcessInstanceStatusEnum.RUNNING.getStatus())
+                .setResult(BpmProcessInstanceResultEnum.PROCESS.getResult());
+
+        processInstanceExtMapper.insert(instanceExtDO);
     }
 
     private String createProcessInstance0(Long userId, ProcessDefinition definition,
