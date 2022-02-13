@@ -37,6 +37,9 @@ public interface BpmProcessInstanceConvert {
 
     List<BpmProcessInstancePageItemRespVO> convertList(List<BpmProcessInstanceExtDO> list);
 
+    @Mapping(source = "processInstanceId", target = "id")
+    BpmProcessInstancePageItemRespVO convert(BpmProcessInstanceExtDO bean);
+
     List<BpmProcessInstancePageItemRespVO.Task> convertList2(List<Task> tasks);
 
     default BpmProcessInstanceRespVO convert2(HistoricProcessInstance processInstance, BpmProcessInstanceExtDO processInstanceExt,

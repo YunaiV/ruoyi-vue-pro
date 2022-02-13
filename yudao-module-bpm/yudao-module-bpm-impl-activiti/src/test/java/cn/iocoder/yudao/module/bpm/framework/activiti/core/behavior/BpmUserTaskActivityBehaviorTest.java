@@ -33,10 +33,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
-public class BpmUserTaskActivitiBehaviorTest extends BaseMockitoUnitTest {
+public class BpmUserTaskActivityBehaviorTest extends BaseMockitoUnitTest {
 
     @InjectMocks
-    private BpmUserTaskActivitiBehavior behavior;
+    private BpmUserTaskActivityBehavior behavior;
     @Mock
     private BpmTaskAssignRuleService bpmTaskRuleService;
     @Mock

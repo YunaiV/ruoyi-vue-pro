@@ -62,6 +62,45 @@ public interface BpmTaskConvert {
     })
     BpmTaskTodoPageItemRespVO.ProcessInstance convert(ProcessInstance processInstance, AdminUserRespDTO startUser);
 
+    default List<BpmTaskRespVO> convertList3(List<HistoricTaskInstance> tasks, Map<String, BpmTaskExtDO> bpmTaskExtDOMap,
+                                             HistoricProcessInstance processInstance, Map<Long, AdminUserRespDTO> userMap,
+                                             Map<Long, DeptRespDTO> deptMap) {
+        return CollectionUtils.convertList(tasks, task -> {
+            BpmTaskRespVO respVO = convert3(task);
+            BpmTaskExtDO taskExtDO = bpmTaskExtDOMap.get(task.getId());
+            copyTo(taskExtDO, respVO);
+            if (processInstance != null) {
+                AdminUserRespDTO startUser = userMap.get(NumberUtils.parseLong(processInstance.getStartUserId()));
+                respVO.setProcessInstance(convert(processInstance, startUser));
+            }
+            AdminUserRespDTO assignUser = userMap.get(NumberUtils.parseLong(task.getAssignee()));
+            if (assignUser != null) {
+                respVO.setAssigneeUser(convert3(assignUser));
+                DeptRespDTO dept = deptMap.get(assignUser.getDeptId());
+                if (dept != null) {
+                    respVO.getAssigneeUser().setDeptName(dept.getName());
+                }
+            }
+            return respVO;
+        });
+    }
+
+    @Mapping(source = "taskDefinitionKey", target = "definitionKey")
+    BpmTaskRespVO convert3(HistoricTaskInstance bean);
+
+    BpmTaskRespVO.User convert3(AdminUserRespDTO bean);
+
+    void copyTo(BpmTaskExtDO from, @MappingTarget BpmTaskDonePageItemRespVO to);
+
+    @Mappings({
+            @Mapping(source = "processInstance.id", target = "id"),
+            @Mapping(source = "processInstance.name", target = "name"),
+            @Mapping(source = "processInstance.startUserId", target = "startUserId"),
+            @Mapping(source = "processInstance.processDefinitionId", target = "processDefinitionId"),
+            @Mapping(source = "startUser.nickname", target = "startUserNickname")
+    })
+    BpmTaskTodoPageItemRespVO.ProcessInstance convert(HistoricProcessInstance processInstance, AdminUserRespDTO startUser);
+
 
 }
 

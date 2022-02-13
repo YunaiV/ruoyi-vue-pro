@@ -1,14 +1,13 @@
-package cn.iocoder.yudao.module.bpm.framework.activiti.core.behavior;
+package cn.iocoder.yudao.module.bpm.framework.flowable.core.behavior;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.module.bpm.framework.activiti.core.behavior.script.BpmTaskAssignScript;
-import cn.iocoder.yudao.module.bpm.service.definition.BpmTaskAssignRuleService;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmTaskAssignRuleDO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmUserGroupDO;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmTaskAssignRuleTypeEnum;
+import cn.iocoder.yudao.module.bpm.service.definition.BpmTaskAssignRuleService;
 import cn.iocoder.yudao.module.bpm.service.definition.BpmUserGroupService;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
@@ -18,21 +17,21 @@ import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import com.google.common.annotations.VisibleForTesting;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.activiti.bpmn.model.UserTask;
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.delegate.DelegateExecution;
-import org.activiti.engine.impl.bpmn.behavior.UserTaskActivityBehavior;
-import org.activiti.engine.impl.el.ExpressionManager;
-import org.activiti.engine.impl.persistence.entity.TaskEntity;
-import org.activiti.engine.impl.persistence.entity.TaskEntityManager;
+import org.flowable.bpmn.model.UserTask;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.el.ExpressionManager;
+import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.impl.bpmn.behavior.UserTaskActivityBehavior;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.util.TaskHelper;
+import org.flowable.task.service.TaskService;
+import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString;
-import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.TASK_ASSIGN_SCRIPT_NOT_EXISTS;
 import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.TASK_CREATE_FAIL_NO_CANDIDATE_USER;
 
 /**
@@ -44,14 +43,12 @@ import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.TASK_CREATE_F
  * @author 芋道源码
  */
 @Slf4j
-public class BpmUserTaskActivitiBehavior extends UserTaskActivityBehavior {
+public class BpmUserTaskActivityBehavior extends UserTaskActivityBehavior {
 
     @Setter
     private BpmTaskAssignRuleService bpmTaskRuleService;
-
     @Setter
     private BpmUserGroupService userGroupService;
-
     @Setter
     private DeptApi deptApi;
     @Setter
@@ -59,50 +56,33 @@ public class BpmUserTaskActivitiBehavior extends UserTaskActivityBehavior {
     @Setter
     private PermissionApi permissionApi;
 
-    /**
-     * 任务分配脚本
-     */
-    private Map<Long, BpmTaskAssignScript> scriptMap = Collections.emptyMap();
-
-    public BpmUserTaskActivitiBehavior(UserTask userTask) {
+    public BpmUserTaskActivityBehavior(UserTask userTask) {
         super(userTask);
     }
 
-    public void setScripts(List<BpmTaskAssignScript> scripts) {
-        this.scriptMap = convertMap(scripts, script -> script.getEnum().getId());
-    }
-
     @Override
-    protected void handleAssignments(TaskEntityManager taskEntityManager,
-                                     String assignee, String owner, List<String> candidateUsers, List<String> candidateGroups,
-                                     TaskEntity task, ExpressionManager expressionManager, DelegateExecution execution) {
+    protected void handleAssignments(TaskService taskService, String assignee, String owner, List<String> candidateUsers, List<String> candidateGroups, TaskEntity task, ExpressionManager expressionManager, DelegateExecution execution, ProcessEngineConfigurationImpl processEngineConfiguration) {
         // 第一步，获得任务的规则
         BpmTaskAssignRuleDO rule = getTaskRule(task);
         // 第二步，获得任务的候选用户们
         Set<Long> candidateUserIds = calculateTaskCandidateUsers(task, rule);
         // 第三步，设置一个作为负责人
         Long assigneeUserId = chooseTaskAssignee(candidateUserIds);
-        taskEntityManager.changeTaskAssignee(task, String.valueOf(assigneeUserId));
+        TaskHelper.changeTaskAssignee(task, String.valueOf(assigneeUserId));
     }
 
     private BpmTaskAssignRuleDO getTaskRule(TaskEntity task) {
         List<BpmTaskAssignRuleDO> taskRules = bpmTaskRuleService.getTaskAssignRuleListByProcessDefinitionId(task.getProcessDefinitionId(),
                 task.getTaskDefinitionKey());
         if (CollUtil.isEmpty(taskRules)) {
-            throw new ActivitiException(StrUtil.format("流程任务({}/{}/{}) 找不到符合的任务规则",
+            throw new FlowableException(StrUtil.format("流程任务({}/{}/{}) 找不到符合的任务规则",
                     task.getId(), task.getProcessDefinitionId(), task.getTaskDefinitionKey()));
         }
         if (taskRules.size() > 1) {
-            throw new ActivitiException(StrUtil.format("流程任务({}/{}/{}) 找到过多任务规则({})",
+            throw new FlowableException(StrUtil.format("流程任务({}/{}/{}) 找到过多任务规则({})",
                     task.getId(), task.getProcessDefinitionId(), task.getTaskDefinitionKey(), taskRules.size()));
         }
         return taskRules.get(0);
-    }
-
-    private Long chooseTaskAssignee(Set<Long> candidateUserIds) {
-        // TODO 芋艿：未来可以优化下，改成轮询的策略
-        int index = RandomUtil.randomInt(candidateUserIds.size());
-        return CollUtil.get(candidateUserIds, index);
     }
 
     @VisibleForTesting
@@ -120,9 +100,10 @@ public class BpmUserTaskActivitiBehavior extends UserTaskActivityBehavior {
             assigneeUserIds = calculateTaskCandidateUsersByUser(task, rule);
         } else if (Objects.equals(BpmTaskAssignRuleTypeEnum.USER_GROUP.getType(), rule.getType())) {
             assigneeUserIds = calculateTaskCandidateUsersByUserGroup(task, rule);
-        } else if (Objects.equals(BpmTaskAssignRuleTypeEnum.SCRIPT.getType(), rule.getType())) {
-            assigneeUserIds = calculateTaskCandidateUsersByScript(task, rule);
         }
+//        else if (Objects.equals(BpmTaskAssignRuleTypeEnum.SCRIPT.getType(), rule.getType())) {
+//            assigneeUserIds = calculateTaskCandidateUsersByScript(task, rule);
+//        }
 
         // 移除被禁用的用户
         removeDisableUsers(assigneeUserIds);
@@ -165,20 +146,10 @@ public class BpmUserTaskActivitiBehavior extends UserTaskActivityBehavior {
         return userIds;
     }
 
-    private Set<Long> calculateTaskCandidateUsersByScript(TaskEntity task, BpmTaskAssignRuleDO rule) {
-        // 获得对应的脚本
-        List<BpmTaskAssignScript> scripts = new ArrayList<>(rule.getOptions().size());
-        rule.getOptions().forEach(id -> {
-            BpmTaskAssignScript script = scriptMap.get(id);
-            if (script == null) {
-                throw exception(TASK_ASSIGN_SCRIPT_NOT_EXISTS, id);
-            }
-            scripts.add(script);
-        });
-        // 逐个计算任务
-        Set<Long> userIds = new HashSet<>();
-        scripts.forEach(script -> CollUtil.addAll(userIds, script.calculateTaskCandidateUsers(task)));
-        return userIds;
+    private Long chooseTaskAssignee(Set<Long> candidateUserIds) {
+        // TODO 芋艿：未来可以优化下，改成轮询的策略
+        int index = RandomUtil.randomInt(candidateUserIds.size());
+        return CollUtil.get(candidateUserIds, index);
     }
 
     @VisibleForTesting
@@ -192,5 +163,4 @@ public class BpmUserTaskActivitiBehavior extends UserTaskActivityBehavior {
             return user == null || !CommonStatusEnum.ENABLE.getStatus().equals(user.getStatus());
         });
     }
-
 }

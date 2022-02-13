@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.bpm.service.task;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.BpmTaskRespVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.BpmTaskTodoPageItemRespVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.BpmTaskTodoPageReqVO;
 import org.flowable.task.api.Task;
@@ -44,4 +45,12 @@ public interface BpmTaskService {
      * @return 流程任务列表
      */
     List<Task> getTasksByProcessInstanceIds(List<String> processInstanceIds);
+
+    /**
+     * 获得指令流程实例的流程任务列表，包括所有状态的
+     *
+     * @param processInstanceId 流程实例的编号
+     * @return 流程任务列表
+     */
+    List<BpmTaskRespVO> getTaskListByProcessInstanceId(String processInstanceId);
 }

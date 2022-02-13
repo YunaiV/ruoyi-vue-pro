@@ -1,6 +1,5 @@
-package cn.iocoder.yudao.module.bpm.framework.activiti.core.behavior;
+package cn.iocoder.yudao.module.bpm.framework.flowable.core.behavior;
 
-import cn.iocoder.yudao.module.bpm.framework.activiti.core.behavior.script.BpmTaskAssignScript;
 import cn.iocoder.yudao.module.bpm.service.definition.BpmTaskAssignRuleService;
 import cn.iocoder.yudao.module.bpm.service.definition.BpmUserGroupService;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
@@ -10,11 +9,9 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Setter;
 import lombok.ToString;
-import org.activiti.bpmn.model.UserTask;
-import org.activiti.engine.impl.bpmn.behavior.UserTaskActivityBehavior;
-import org.activiti.engine.impl.bpmn.parser.factory.DefaultActivityBehaviorFactory;
-
-import java.util.List;
+import org.flowable.bpmn.model.UserTask;
+import org.flowable.engine.impl.bpmn.behavior.UserTaskActivityBehavior;
+import org.flowable.engine.impl.bpmn.parser.factory.DefaultActivityBehaviorFactory;
 
 /**
  * 自定义的 ActivityBehaviorFactory 实现类，目的如下：
@@ -39,9 +36,6 @@ public class BpmActivityBehaviorFactory extends DefaultActivityBehaviorFactory {
     @Setter
     private AdminUserApi adminUserApi;
 
-    @Setter
-    private List<BpmTaskAssignScript> scripts;
-
     @Override
     public UserTaskActivityBehavior createUserTaskActivityBehavior(UserTask userTask) {
         BpmUserTaskActivityBehavior userTaskActivityBehavior = new BpmUserTaskActivityBehavior(userTask);
@@ -50,12 +44,8 @@ public class BpmActivityBehaviorFactory extends DefaultActivityBehaviorFactory {
         userTaskActivityBehavior.setDeptApi(deptApi);
         userTaskActivityBehavior.setUserGroupService(userGroupService);
         userTaskActivityBehavior.setAdminUserApi(adminUserApi);
-        userTaskActivityBehavior.setScripts(scripts);
+        //TODO
+        //userTaskActivityBehavior.setScripts(scripts);
         return userTaskActivityBehavior;
     }
-
-    // TODO 芋艿：并行任务 ParallelMultiInstanceBehavior
-
-    // TODO 芋艿：并行任务 SequentialMultiInstanceBehavior
-
 }

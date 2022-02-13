@@ -47,6 +47,7 @@ public class BpmTaskAssignRuleServiceImpl implements BpmTaskAssignRuleService{
     @Lazy // 解决循环依赖
     private BpmModelService modelService;
     @Resource
+    @Lazy // 解决循环依赖
     private BpmProcessDefinitionService processDefinitionService;
     @Resource
     private BpmUserGroupService userGroupService;
