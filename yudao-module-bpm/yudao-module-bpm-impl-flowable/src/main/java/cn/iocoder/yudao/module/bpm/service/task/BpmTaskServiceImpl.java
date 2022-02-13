@@ -11,6 +11,7 @@ import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.BpmTaskTodoPage
 import cn.iocoder.yudao.module.bpm.convert.task.BpmTaskConvert;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.task.BpmTaskExtDO;
 import cn.iocoder.yudao.module.bpm.dal.mysql.task.BpmTaskExtMapper;
+import cn.iocoder.yudao.module.bpm.enums.task.BpmProcessInstanceResultEnum;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
@@ -123,5 +124,17 @@ public class BpmTaskServiceImpl implements BpmTaskService{
 
         // 拼接数据
         return BpmTaskConvert.INSTANCE.convertList3(tasks, bpmTaskExtDOMap, processInstance, userMap, deptMap);
+    }
+
+    @Override
+    public void createTaskExt(Task task) {
+        BpmTaskExtDO taskExtDO = new BpmTaskExtDO()
+                .setTaskId(task.getId())
+                .setAssigneeUserId(task.getAssignee() == null ? null : Long.valueOf(task.getAssignee()))
+                .setProcessDefinitionId(task.getProcessDefinitionId())
+                .setProcessInstanceId(task.getProcessInstanceId())
+                .setName(task.getName())
+                .setResult(BpmProcessInstanceResultEnum.PROCESS.getResult());
+        taskExtMapper.insert(taskExtDO);
     }
 }

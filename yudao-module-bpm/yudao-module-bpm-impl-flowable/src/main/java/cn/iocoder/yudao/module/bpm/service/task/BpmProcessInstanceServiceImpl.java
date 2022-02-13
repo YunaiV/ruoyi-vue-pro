@@ -76,7 +76,7 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
     private DeptApi deptApi;
     @Override
     public List<ProcessInstance> getProcessInstances(Set<String> ids) {
-        return runtimeService.createProcessInstanceQuery().processDefinitionIds(ids).list();
+        return runtimeService.createProcessInstanceQuery().processInstanceIds(ids).list();
     }
 
     @Override

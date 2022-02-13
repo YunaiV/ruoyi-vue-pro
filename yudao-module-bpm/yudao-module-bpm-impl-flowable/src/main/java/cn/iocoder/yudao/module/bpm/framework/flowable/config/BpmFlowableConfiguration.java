@@ -11,10 +11,12 @@ import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.flowable.spring.boot.EngineConfigurationConfigurer;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 /**
  * BPM 模块的 Flowable 配置类
@@ -26,14 +28,17 @@ public class BpmFlowableConfiguration {
 
     /**
      * 将自定义 listener 加入全局listener
-     * @param processInstanceListener 自定义监听 {@link ProcessInstance}
+     * @param  listeners 自定义 listener
      */
     @Bean
-    public EngineConfigurationConfigurer<SpringProcessEngineConfiguration> addCustomerListenerConfigurer (BpmProcessInstanceEventListener processInstanceListener,
+    public EngineConfigurationConfigurer<SpringProcessEngineConfiguration> addCustomerListenerConfigurer (ObjectProvider<FlowableEventListener> listeners,
                                                                                                           BpmActivityBehaviorFactory bpmActivityBehaviorFactory) {
         return engineConfiguration -> {
-            List<FlowableEventListener> eventListeners = new ArrayList<>();
-            eventListeners.add(processInstanceListener);
+             List<FlowableEventListener> eventListeners = new ArrayList<>();
+            Iterator<FlowableEventListener> iterator = listeners.iterator();
+            while (iterator.hasNext()) {
+                eventListeners.add(iterator.next());
+            }
             engineConfiguration.setEventListeners(eventListeners);
             engineConfiguration.setActivityBehaviorFactory(bpmActivityBehaviorFactory);
         };

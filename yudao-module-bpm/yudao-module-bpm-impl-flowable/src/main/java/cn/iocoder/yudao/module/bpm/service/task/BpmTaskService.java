@@ -53,4 +53,12 @@ public interface BpmTaskService {
      * @return 流程任务列表
      */
     List<BpmTaskRespVO> getTaskListByProcessInstanceId(String processInstanceId);
+
+    /**
+     * 创建 Task 拓展记录
+     *
+     * @param task 任务实体
+     */
+    void createTaskExt(Task task);
+
 }
