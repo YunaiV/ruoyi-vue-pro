@@ -2,11 +2,9 @@ package cn.iocoder.yudao.module.bpm.service.task;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
-import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstanceCreateReqVO;
-import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstanceMyPageReqVO;
-import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstancePageItemRespVO;
-import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstanceRespVO;
+import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.*;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEntityEvent;
+import org.flowable.engine.delegate.event.FlowableCancelledEvent;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.runtime.ProcessInstance;
 
@@ -21,6 +19,14 @@ import java.util.Set;
  * @author 芋道源码
  */
 public interface BpmProcessInstanceService {
+
+    /**
+     * 获得流程实例
+     *
+     * @param id 流程实例的编号
+     * @return 流程实例
+     */
+    ProcessInstance getProcessInstance(String id);
 
     /**
      * 获得流程实例列表
@@ -68,6 +74,14 @@ public interface BpmProcessInstanceService {
     BpmProcessInstanceRespVO getProcessInstanceVO(String id);
 
     /**
+     * 取消流程实例
+     *
+     * @param userId 用户编号
+     * @param cancelReqVO 取消信息
+     */
+    void cancelProcessInstance(Long userId, @Valid BpmProcessInstanceCancelReqVO cancelReqVO);
+
+    /**
      * 获得历史的流程实例
      *
      * @param id 流程实例的编号
@@ -81,4 +95,20 @@ public interface BpmProcessInstanceService {
      * @param instance 流程任务
      */
     void createProcessInstanceExt(ProcessInstance instance);
+
+    /**
+     * 更新 ProcessInstance 拓展记录为取消
+     *
+     * @param event 流程取消事件
+     */
+    void updateProcessInstanceExtCancel(FlowableCancelledEvent event);
+
+    /**
+     * 更新 ProcessInstance 拓展记录为完成
+     *
+     * @param instance 流程任务
+     */
+    void updateProcessInstanceExtComplete(ProcessInstance instance);
+
+
 }

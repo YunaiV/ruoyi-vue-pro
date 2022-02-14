@@ -61,4 +61,11 @@ public interface BpmTaskService {
      */
     void createTaskExt(Task task);
 
+    /**
+     * 更新 Task 拓展记录为完成
+     *
+     * @param task 任务实体
+     */
+    void updateTaskExtComplete(Task task);
+
 }

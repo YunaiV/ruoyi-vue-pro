@@ -101,7 +101,17 @@ public interface BpmTaskConvert {
     })
     BpmTaskTodoPageItemRespVO.ProcessInstance convert(HistoricProcessInstance processInstance, AdminUserRespDTO startUser);
 
-
+    default BpmTaskExtDO convert2TaskExt(Task task){
+        Long assigneeUserId = task.getAssignee() == null ? null : Long.valueOf(task.getAssignee());
+        BpmTaskExtDO taskExtDO = new BpmTaskExtDO()
+                .setTaskId(task.getId())
+                .setAssigneeUserId(assigneeUserId)
+                .setName(task.getName())
+                .setProcessDefinitionId(task.getProcessDefinitionId())
+                .setProcessInstanceId(task.getProcessInstanceId());
+        taskExtDO.setCreateTime(task.getCreateTime());
+        return taskExtDO;
+    }
 }
 
 

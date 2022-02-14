@@ -27,10 +27,7 @@ import org.flowable.task.api.history.HistoricTaskInstance;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
@@ -128,13 +125,16 @@ public class BpmTaskServiceImpl implements BpmTaskService{
 
     @Override
     public void createTaskExt(Task task) {
-        BpmTaskExtDO taskExtDO = new BpmTaskExtDO()
-                .setTaskId(task.getId())
-                .setAssigneeUserId(task.getAssignee() == null ? null : Long.valueOf(task.getAssignee()))
-                .setProcessDefinitionId(task.getProcessDefinitionId())
-                .setProcessInstanceId(task.getProcessInstanceId())
-                .setName(task.getName())
+        BpmTaskExtDO taskExtDO = BpmTaskConvert.INSTANCE.convert2TaskExt(task)
                 .setResult(BpmProcessInstanceResultEnum.PROCESS.getResult());
         taskExtMapper.insert(taskExtDO);
+    }
+
+    @Override
+    public void updateTaskExtComplete(Task task) {
+        BpmTaskExtDO taskExtDO = BpmTaskConvert.INSTANCE.convert2TaskExt(task)
+                .setEndTime(new Date()) // 此时不能使用 task 的 completeData，因为还是空的。
+                .setResult(BpmProcessInstanceResultEnum.APPROVE.getResult());
+        taskExtMapper.updateByTaskId(taskExtDO);
     }
 }

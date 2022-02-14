@@ -2,10 +2,7 @@ package cn.iocoder.yudao.module.bpm.controller.admin.task;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstanceCreateReqVO;
-import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstanceMyPageReqVO;
-import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstancePageItemRespVO;
-import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstanceRespVO;
+import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.*;
 import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -49,5 +46,13 @@ public class BpmProcessInstanceController {
     @PreAuthorize("@ss.hasPermission('bpm:process-instance:query')")
     public CommonResult<BpmProcessInstanceRespVO> getProcessInstance(@RequestParam("id") String id) {
         return success(processInstanceService.getProcessInstanceVO(id));
+    }
+
+    @DeleteMapping("/cancel")
+    @ApiOperation(value = "取消流程实例", notes = "撤回发起的流程")
+    @PreAuthorize("@ss.hasPermission('bpm:process-instance:cancel')")
+    public CommonResult<Boolean> cancelProcessInstance(@Valid @RequestBody BpmProcessInstanceCancelReqVO cancelReqVO) {
+        processInstanceService.cancelProcessInstance(getLoginUserId(), cancelReqVO);
+        return success(true);
     }
 }

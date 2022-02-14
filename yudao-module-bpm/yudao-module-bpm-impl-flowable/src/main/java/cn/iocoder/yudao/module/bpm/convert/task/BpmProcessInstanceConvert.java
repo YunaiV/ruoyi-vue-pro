@@ -5,18 +5,23 @@ import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessI
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstanceRespVO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmProcessDefinitionExtDO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.task.BpmProcessInstanceExtDO;
+import cn.iocoder.yudao.module.bpm.framework.bpm.core.event.BpmProcessInstanceResultEvent;
+import cn.iocoder.yudao.module.bpm.service.message.dto.BpmMessageSendWhenProcessInstanceApproveReqDTO;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.task.api.Task;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
+import org.mapstruct.Mappings;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * 流程实例 Convert
@@ -73,7 +78,22 @@ public interface BpmProcessInstanceConvert {
 
     BpmProcessInstanceRespVO.User convert2(AdminUserRespDTO bean);
 
+    default BpmProcessInstanceResultEvent convert(Object source, HistoricProcessInstance instance, Integer result) {
+        BpmProcessInstanceResultEvent event = new BpmProcessInstanceResultEvent(source);
+        event.setId(instance.getId());
+        event.setProcessDefinitionKey(instance.getProcessDefinitionKey());
+        event.setBusinessKey(instance.getBusinessKey());
+        event.setResult(result);
+        return event;
+    }
 
-
+    default BpmMessageSendWhenProcessInstanceApproveReqDTO convert2ApprovedReq(ProcessInstance instance){
+        Long startUserId = instance.getStartUserId() == null ? null : Long.valueOf(instance.getStartUserId());
+        BpmMessageSendWhenProcessInstanceApproveReqDTO reqDTO = new BpmMessageSendWhenProcessInstanceApproveReqDTO()
+                .setStartUserId(startUserId)
+                .setProcessInstanceId(instance.getId())
+                .setProcessInstanceName(instance.getName());
+        return reqDTO;
+    }
 
 }

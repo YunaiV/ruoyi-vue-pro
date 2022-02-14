@@ -28,8 +28,8 @@ public class BpmProcessInstanceEventListener extends AbstractFlowableEngineEvent
 
     public static final Set<FlowableEngineEventType> PROCESS_INSTANCE_EVENTS = ImmutableSet.<FlowableEngineEventType>builder()
                      .add(FlowableEngineEventType.PROCESS_CREATED)
-                     .add(FlowableEngineEventType.PROCESS_STARTED)
                      .add(FlowableEngineEventType.PROCESS_CANCELLED)
+                     .add(FlowableEngineEventType.PROCESS_COMPLETED)
                      .build();
 
     public BpmProcessInstanceEventListener(){
@@ -42,13 +42,12 @@ public class BpmProcessInstanceEventListener extends AbstractFlowableEngineEvent
     }
 
     @Override
-    protected void processStarted(FlowableProcessStartedEvent event) {
-        super.processStarted(event);
+    protected void processCancelled(FlowableCancelledEvent event) {
+        processInstanceService.updateProcessInstanceExtCancel(event);
     }
 
-
     @Override
-    protected void processCancelled(FlowableCancelledEvent event) {
-        super.processCancelled(event);
+    protected void processCompleted(FlowableEngineEntityEvent event) {
+        processInstanceService.updateProcessInstanceExtComplete((ProcessInstance)event.getEntity());
     }
 }
