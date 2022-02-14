@@ -1,12 +1,14 @@
 package cn.iocoder.yudao.module.bpm.convert.task;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstancePageItemRespVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstanceRespVO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmProcessDefinitionExtDO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.task.BpmProcessInstanceExtDO;
 import cn.iocoder.yudao.module.bpm.framework.bpm.core.event.BpmProcessInstanceResultEvent;
 import cn.iocoder.yudao.module.bpm.service.message.dto.BpmMessageSendWhenProcessInstanceApproveReqDTO;
+import cn.iocoder.yudao.module.bpm.service.message.dto.BpmMessageSendWhenProcessInstanceRejectReqDTO;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import org.flowable.engine.history.HistoricProcessInstance;
@@ -87,13 +89,28 @@ public interface BpmProcessInstanceConvert {
         return event;
     }
 
+    default BpmProcessInstanceResultEvent convert(Object source, ProcessInstance instance, Integer result) {
+        BpmProcessInstanceResultEvent event = new BpmProcessInstanceResultEvent(source);
+        event.setId(instance.getId());
+        event.setProcessDefinitionKey(instance.getProcessDefinitionKey());
+        event.setBusinessKey(instance.getBusinessKey());
+        event.setResult(result);
+        return event;
+    }
+
     default BpmMessageSendWhenProcessInstanceApproveReqDTO convert2ApprovedReq(ProcessInstance instance){
-        Long startUserId = instance.getStartUserId() == null ? null : Long.valueOf(instance.getStartUserId());
-        BpmMessageSendWhenProcessInstanceApproveReqDTO reqDTO = new BpmMessageSendWhenProcessInstanceApproveReqDTO()
-                .setStartUserId(startUserId)
+        return  new BpmMessageSendWhenProcessInstanceApproveReqDTO()
+                .setStartUserId(NumberUtils.parseLong(instance.getStartUserId()))
                 .setProcessInstanceId(instance.getId())
                 .setProcessInstanceName(instance.getName());
-        return reqDTO;
+    }
+
+    default BpmMessageSendWhenProcessInstanceRejectReqDTO convert2RejectReq(ProcessInstance instance, String comment) {
+        return new BpmMessageSendWhenProcessInstanceRejectReqDTO()
+            .setProcessInstanceName(instance.getName())
+            .setProcessInstanceId(instance.getId())
+            .setComment(comment)
+            .setStartUserId(NumberUtils.parseLong(instance.getStartUserId()));
     }
 
 }

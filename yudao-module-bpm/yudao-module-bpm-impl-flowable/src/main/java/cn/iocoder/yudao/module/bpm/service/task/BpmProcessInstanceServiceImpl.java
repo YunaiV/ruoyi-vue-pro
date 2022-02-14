@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.bpm.service.task;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.*;
@@ -29,6 +30,7 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.task.api.Task;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
@@ -155,7 +157,7 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
 
         // 通过删除流程实例，实现流程实例的取消,
         // 删除流程实例，正则执行任务ACT_RU_TASK. 任务会被删除。通过历史表查询
-        runtimeService.deleteProcessInstance(cancelReqVO.getId(),
+        deleteProcessInstance(cancelReqVO.getId(),
                 BpmProcessInstanceDeleteReasonEnum.CANCEL_TASK.format(cancelReqVO.getReason()));
     }
 
@@ -230,6 +232,33 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         // 发送流程实例的状态事件
         processInstanceResultEventPublisher.sendProcessInstanceResultEvent(
                 BpmProcessInstanceConvert.INSTANCE.convert(this, processInstance, instanceExtDO.getResult()));
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void updateProcessInstanceExtReject(String id, String comment) {
+        // 需要主动查询，因为 instance 只有 id 属性
+        ProcessInstance processInstance = getProcessInstance(id);
+        // 删除流程实例，以实现驳回任务时，取消整个审批流程
+        deleteProcessInstance(id, StrUtil.format(BpmProcessInstanceDeleteReasonEnum.REJECT_TASK.format(comment)));
+
+        // 更新 status + result
+        // 注意，不能和上面的逻辑更换位置。因为 deleteProcessInstance 会触发流程的取消，进而调用 updateProcessInstanceExtCancel 方法，
+        // 设置 result 为 BpmProcessInstanceStatusEnum.CANCEL，显然和 result 不一定是一致的
+        BpmProcessInstanceExtDO instanceExtDO = new BpmProcessInstanceExtDO().setProcessInstanceId(id)
+                .setStatus(BpmProcessInstanceStatusEnum.FINISH.getStatus())
+                .setResult(BpmProcessInstanceResultEnum.REJECT.getResult());
+        processInstanceExtMapper.updateByProcessInstanceId(instanceExtDO);
+
+        // 发送流程被不通过的消息
+        messageService.sendMessageWhenProcessInstanceReject(BpmProcessInstanceConvert.INSTANCE.convert2RejectReq(processInstance, comment));
+
+        // 发送流程实例的状态事件
+        processInstanceResultEventPublisher.sendProcessInstanceResultEvent(
+                BpmProcessInstanceConvert.INSTANCE.convert(this, processInstance, instanceExtDO.getResult()));
+    }
+
+    private void deleteProcessInstance(String id, String reason) {
+        runtimeService.deleteProcessInstance(id, reason);
     }
 
     private String createProcessInstance0(Long userId, ProcessDefinition definition,

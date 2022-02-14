@@ -2,12 +2,11 @@ package cn.iocoder.yudao.module.bpm.service.task;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
-import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.BpmTaskRespVO;
-import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.BpmTaskTodoPageItemRespVO;
-import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.BpmTaskTodoPageReqVO;
+import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.*;
 import org.flowable.task.api.Task;
 
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Map;
 
@@ -53,6 +52,22 @@ public interface BpmTaskService {
      * @return 流程任务列表
      */
     List<BpmTaskRespVO> getTaskListByProcessInstanceId(String processInstanceId);
+
+    /**
+     * 通过任务
+     *
+     * @param userId 用户编号
+     * @param reqVO 通过请求
+     */
+    void approveTask(Long userId, @Valid BpmTaskApproveReqVO reqVO);
+
+    /**
+     * 不通过任务
+     *
+     * @param userId 用户编号
+     * @param reqVO 不通过请求
+     */
+    void rejectTask(Long userId, @Valid BpmTaskRejectReqVO reqVO);
 
     /**
      * 创建 Task 拓展记录

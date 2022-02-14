@@ -5,9 +5,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.framework.common.util.object.PageUtils;
-import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.BpmTaskRespVO;
-import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.BpmTaskTodoPageItemRespVO;
-import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.BpmTaskTodoPageReqVO;
+import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.*;
 import cn.iocoder.yudao.module.bpm.convert.task.BpmTaskConvert;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.task.BpmTaskExtDO;
 import cn.iocoder.yudao.module.bpm.dal.mysql.task.BpmTaskExtMapper;
@@ -27,16 +25,19 @@ import org.flowable.task.api.history.HistoricTaskInstance;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
 import java.util.*;
 
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
+import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.*;
 
 /**
  * 流程任务实例 Service 实现类
  *
- * @author jason
  * @author 芋道源码
+ * @author jason
  */
 @Slf4j
 @Service
@@ -124,6 +125,41 @@ public class BpmTaskServiceImpl implements BpmTaskService{
     }
 
     @Override
+    public void approveTask(Long userId, @Valid BpmTaskApproveReqVO reqVO) {
+        // 校验任务存在
+        Task task = checkTask(userId, reqVO.getId());
+        // 校验流程实例存在
+        ProcessInstance instance = processInstanceService.getProcessInstance(task.getProcessInstanceId());
+        if (instance == null) {
+            throw exception(PROCESS_INSTANCE_NOT_EXISTS);
+        }
+
+        // 完成任务，审批通过
+        taskService.complete(task.getId(), instance.getProcessVariables());
+        // 更新任务拓展表为通过
+        taskExtMapper.updateByTaskId(new BpmTaskExtDO().setTaskId(task.getId())
+                .setResult(BpmProcessInstanceResultEnum.APPROVE.getResult()).setComment(reqVO.getComment()));
+    }
+
+    @Override
+    public void rejectTask(Long userId, @Valid BpmTaskRejectReqVO reqVO) {
+        Task task = checkTask(userId, reqVO.getId());
+        // 校验流程实例存在
+        ProcessInstance instance = processInstanceService.getProcessInstance(task.getProcessInstanceId());
+        if (instance == null) {
+            throw exception(PROCESS_INSTANCE_NOT_EXISTS);
+        }
+
+        // 更新流程实例为不通过
+        processInstanceService.updateProcessInstanceExtReject(instance.getProcessInstanceId(), reqVO.getComment());
+
+        // 更新任务拓展表为不通过
+        taskExtMapper.updateByTaskId(new BpmTaskExtDO().setTaskId(task.getId())
+                .setResult(BpmProcessInstanceResultEnum.REJECT.getResult()).setComment(reqVO.getComment()));
+    }
+
+
+    @Override
     public void createTaskExt(Task task) {
         BpmTaskExtDO taskExtDO = BpmTaskConvert.INSTANCE.convert2TaskExt(task)
                 .setResult(BpmProcessInstanceResultEnum.PROCESS.getResult());
@@ -133,8 +169,27 @@ public class BpmTaskServiceImpl implements BpmTaskService{
     @Override
     public void updateTaskExtComplete(Task task) {
         BpmTaskExtDO taskExtDO = BpmTaskConvert.INSTANCE.convert2TaskExt(task)
-                .setEndTime(new Date()) // 此时不能使用 task 的 completeData，因为还是空的。
-                .setResult(BpmProcessInstanceResultEnum.APPROVE.getResult());
+                .setEndTime(new Date());
         taskExtMapper.updateByTaskId(taskExtDO);
+    }
+
+    /**
+     * 校验任务是否存在， 并且是否是分配给自己的任务
+     * @param userId 用户 id
+     * @param taskId task id
+     */
+    private Task checkTask(Long userId, String taskId) {
+        Task task = getTask(taskId);
+        if (task == null) {
+            throw exception(TASK_COMPLETE_FAIL_NOT_EXISTS);
+        }
+        if (!Objects.equals(userId, NumberUtils.parseLong(task.getAssignee()))) {
+            throw exception(TASK_COMPLETE_FAIL_ASSIGN_NOT_SELF);
+        }
+        return task;
+    }
+
+    private Task getTask(String id) {
+        return taskService.createTaskQuery().taskId(id).singleResult();
     }
 }
