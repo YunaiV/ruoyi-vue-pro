@@ -72,8 +72,11 @@ Vue.prototype.msgInfo = function (msg) {
 // 全局组件挂载
 Vue.component('Pagination', Pagination)
 Vue.component('RightToolbar', RightToolbar)
+// 头部标签插件
+import VueMeta from 'vue-meta'
 
 Vue.use(permission)
+Vue.use(VueMeta)
 // Vue.use(hljs.vuePlugin);
 
 // bpmnProcessDesigner 需要引入

@@ -38,6 +38,11 @@
         </div>
       </div>
 
+      <div class="drawer-item">
+        <span>动态标题</span>
+        <el-switch v-model="dynamicTitle" class="drawer-switch" />
+      </div>
+
       <el-divider/>
 
       <h3 class="drawer-title">系统布局配置</h3>
@@ -129,6 +134,17 @@ export default {
         })
       }
     },
+    dynamicTitle: {
+      get() {
+        return this.$store.state.settings.dynamicTitle
+      },
+      set(val) {
+        this.$store.dispatch('settings/changeSetting', {
+          key: 'dynamicTitle',
+          value: val
+        })
+      }
+    },
   },
   methods: {
     themeChange(val) {
@@ -160,6 +176,7 @@ export default {
             "tagsView":${this.tagsView},
             "fixedHeader":${this.fixedHeader},
             "sidebarLogo":${this.sidebarLogo},
+            "dynamicTitle":${this.dynamicTitle},
             "sideTheme":"${this.sideTheme}",
             "theme":"${this.theme}"
           }`
