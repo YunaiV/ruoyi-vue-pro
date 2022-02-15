@@ -324,7 +324,7 @@ export default {
       }).then(() => {
         this.getList();
         this.msgSuccess("删除成功");
-      })
+      }).catch(() => {});
     },
     /** 导出按钮操作 */
     handleExport() {
@@ -344,7 +344,7 @@ export default {
       }).then(response => {
         this.downloadExcel(response, '短信模板.xls');
         this.exportLoading = false;
-      })
+      }).catch(() => {});
     },
     /** 发送短息按钮 */
     handleSendSms(row) {

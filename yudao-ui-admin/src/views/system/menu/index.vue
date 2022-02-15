@@ -320,7 +320,7 @@ export default {
         }).then(() => {
           this.getList();
           this.msgSuccess("删除成功");
-        })
+      }).catch(() => {});
     }
   }
 };

@@ -218,8 +218,7 @@ export default {
             '提示',
             {
               type: 'warning'
-            }
-          )
+            }).catch(() => {});
           return
         }
         if (astBody[0].type === 'ExportDefaultDeclaration') {

@@ -224,7 +224,7 @@ export default {
         }).then(response => {
           this.downloadExcel(response, '操作日志.xls');
           this.exportLoading = false;
-      })
+      }).catch(() => {});
     }
   }
 };

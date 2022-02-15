@@ -430,7 +430,7 @@ export default {
         return exportAppExcel(params);
       }).then(response => {
         this.downloadExcel(response, '支付应用信息.xls');
-      })
+      }).catch(() => {});
     },
     /**
      * 根据商户名称模糊匹配商户信息

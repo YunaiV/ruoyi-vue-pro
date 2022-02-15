@@ -92,7 +92,7 @@ export default {
         }).then(() => {
           this.getList();
           this.msgSuccess("强退成功");
-        })
+      }).catch(() => {});
     }
   }
 };

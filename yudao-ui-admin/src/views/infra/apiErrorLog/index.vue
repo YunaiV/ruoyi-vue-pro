@@ -214,7 +214,7 @@ export default {
           this.msgSuccess("修改成功");
           this.getList();
         });
-      })
+      }).catch(() => {});
     },
     /** 导出按钮操作 */
     handleExport() {
@@ -234,7 +234,7 @@ export default {
       }).then(response => {
         this.downloadExcel(response, 'API 错误日志.xls');
         this.exportLoading = false;
-      })
+      }).catch(() => {});
     }
   }
 };

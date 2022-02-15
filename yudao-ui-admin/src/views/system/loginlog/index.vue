@@ -137,7 +137,7 @@ export default {
         }).then(response => {
           this.downloadExcel(response, '登录日志.xls');
           this.exportLoading = false;
-      })
+      }).catch(() => {});
     }
   }
 };

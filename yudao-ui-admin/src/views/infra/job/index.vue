@@ -229,7 +229,7 @@ export default {
           return runJob(row.id);
         }).then(() => {
           this.msgSuccess("执行成功");
-        })
+      }).catch(() => {});
     },
     /** 任务详细信息 */
     handleView(row) {
@@ -303,7 +303,7 @@ export default {
         }).then(() => {
           this.getList();
           this.msgSuccess("删除成功");
-        })
+      }).catch(() => {});
     },
     /** 更新状态操作 */
     handleChangeStatus(row, open) {
@@ -319,7 +319,7 @@ export default {
       }).then(() => {
         this.getList();
         this.msgSuccess(statusStr + "成功");
-      })
+      }).catch(() => {});
     },
     /** 导出按钮操作 */
     handleExport() {
@@ -334,7 +334,7 @@ export default {
         }).then(response => {
           this.downloadExcel(response, '定时任务.xls');
           this.exportLoading = false;
-        })
+      }).catch(() => {});
     }
   }
 };

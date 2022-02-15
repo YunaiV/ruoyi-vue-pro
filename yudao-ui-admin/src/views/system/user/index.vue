@@ -589,7 +589,7 @@ export default {
         }).then(() => {
           this.getList();
           this.msgSuccess("删除成功");
-        })
+      }).catch(() => {});
     },
     /** 导出按钮操作 */
     handleExport() {
@@ -607,7 +607,7 @@ export default {
         }).then(response => {
           this.downloadExcel(response, '用户数据.xls');
           this.exportLoading = false;
-      })
+      }).catch(() => {});
     },
     /** 导入按钮操作 */
     handleImport() {

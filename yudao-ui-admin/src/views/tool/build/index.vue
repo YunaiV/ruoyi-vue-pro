@@ -381,8 +381,7 @@ export default {
         () => {
           this.drawingList = []
           this.idGlobal = 100
-        }
-      )
+        }).catch(() => {});
     },
     drawingItemCopy(item, list) {
       let clone = deepClone(item)

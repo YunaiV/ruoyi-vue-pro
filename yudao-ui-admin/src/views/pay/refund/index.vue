@@ -442,7 +442,7 @@ export default {
         return exportRefundExcel(params);
       }).then(response => {
         this.downloadExcel(response, '退款订单.xls');
-      })
+      }).catch(() => {});
     },
     /**
      * 根据商户名称模糊匹配商户信息

@@ -212,7 +212,7 @@ export default {
       }).then(response => {
         this.downloadExcel(response, 'API 访问日志.xls');
         this.exportLoading = false;
-      })
+      }).catch(() => {});
     }
   }
 };

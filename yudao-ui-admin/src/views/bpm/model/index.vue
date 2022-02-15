@@ -434,7 +434,7 @@ export default {
           that.getList();
           that.msgSuccess("删除成功");
         })
-      })
+      }).catch(() => {});
     },
     /** 部署按钮操作 */
     handleDeploy(row) {
@@ -448,7 +448,7 @@ export default {
           that.getList();
           that.msgSuccess("部署成功");
         })
-      })
+      }).catch(() => {});
     },
     /** 流程表单的详情按钮操作 */
     handleFormDetail(row) {
@@ -500,7 +500,7 @@ export default {
       }).then(() => {
         this.getList();
         this.msgSuccess(statusState + "成功");
-      })
+      }).catch(() => {});
     },
     /** 导入按钮操作 */
     handleImport() {

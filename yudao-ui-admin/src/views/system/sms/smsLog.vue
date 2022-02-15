@@ -283,7 +283,7 @@ export default {
       }).then(response => {
         this.downloadExcel(response, '短信日志.xls');
         this.exportLoading = false;
-      })
+      }).catch(() => {});
     },
     /** 详细按钮操作 */
     handleView(row) {

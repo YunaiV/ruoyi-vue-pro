@@ -239,7 +239,7 @@ export default {
       }).then(() => {
         this.getList();
         this.msgSuccess("删除成功");
-      })
+      }).catch(() => {});
     },
     getUserNickname(userId) {
       for (const user of this.users) {

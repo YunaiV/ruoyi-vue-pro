@@ -173,7 +173,7 @@ export default {
       }).then(response => {
         this.downloadExcel(response, '定时任务日志.xls');
         this.exportLoading = false;
-      })
+      }).catch(() => {});
     }
   }
 };
