@@ -176,6 +176,12 @@
   color: #FFFFFF;
 }
 
+/* submenu item */
+.el-menu--horizontal > .el-submenu .el-submenu__title {
+	height: 50px !important;
+	line-height: 50px !important;
+}
+
 /* text color */
 .text-navy {
 	color: #1ab394;
