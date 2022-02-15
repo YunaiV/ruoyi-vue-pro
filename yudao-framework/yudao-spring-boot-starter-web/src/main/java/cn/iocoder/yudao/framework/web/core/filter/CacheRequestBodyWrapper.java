@@ -46,16 +46,21 @@ public class CacheRequestBodyWrapper extends HttpServletRequestWrapper {
 
             @Override
             public boolean isFinished() {
-                return true;
+                return false;
             }
 
             @Override
             public boolean isReady() {
-                return true;
+                return false;
             }
 
             @Override
             public void setReadListener(ReadListener readListener) {}
+
+            @Override
+            public int available() {
+                return body.length;
+            }
 
         };
     }
