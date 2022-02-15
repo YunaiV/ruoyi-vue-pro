@@ -54,12 +54,12 @@
         </el-row>
 
         <el-table v-loading="loading" :data="userList">
-          <el-table-column label="用户编号" align="center" prop="id" v-if="columns[0].visible" />
-          <el-table-column label="用户名称" align="center" prop="username" v-if="columns[1].visible" :show-overflow-tooltip="true" />
-          <el-table-column label="用户昵称" align="center" prop="nickname" v-if="columns[2].visible" :show-overflow-tooltip="true" />
-          <el-table-column label="部门" align="center" prop="dept.name" v-if="columns[3].visible" :show-overflow-tooltip="true" />
-          <el-table-column label="手机号码" align="center" prop="mobile" v-if="columns[4].visible" width="120" />
-          <el-table-column label="状态" v-if="columns[5].visible" align="center">
+          <el-table-column label="用户编号" align="center" key="id" prop="id" v-if="columns[0].visible" />
+          <el-table-column label="用户名称" align="center" key="username" prop="username" v-if="columns[1].visible" :show-overflow-tooltip="true" />
+          <el-table-column label="用户昵称" align="center" key="nickname" prop="nickname" v-if="columns[2].visible" :show-overflow-tooltip="true" />
+          <el-table-column label="部门" align="center" key="deptName" prop="dept.name" v-if="columns[3].visible" :show-overflow-tooltip="true" />
+          <el-table-column label="手机号码" align="center" key="mobile" prop="mobile" v-if="columns[4].visible" width="120" />
+          <el-table-column label="状态" key="status" v-if="columns[5].visible" align="center">
             <template slot-scope="scope">
               <el-switch v-model="scope.row.status" :active-value="0" :inactive-value="1" @change="handleStatusChange(scope.row)" />
             </template>
