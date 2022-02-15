@@ -62,6 +62,10 @@
         <el-switch v-model="sidebarLogo" class="drawer-switch" />
       </div>
 
+      <el-divider/>
+
+      <el-button size="small" type="primary" plain icon="el-icon-document-add" @click="saveSetting">保存配置</el-button>
+      <el-button size="small" plain icon="el-icon-refresh" @click="resetSetting">重置配置</el-button>
     </div>
   </div>
 </template>
@@ -72,14 +76,13 @@ import ThemePicker from '@/components/ThemePicker'
 export default {
   components: { ThemePicker },
   data() {
-    return {}
+    return {
+      sideTheme: this.$store.state.settings.sideTheme
+    };
   },
   computed: {
     theme() {
       return this.$store.state.settings.theme
-    },
-    sideTheme() {
-      return this.$store.state.settings.sideTheme
     },
     fixedHeader: {
       get() {
@@ -141,6 +144,38 @@ export default {
         key: 'sideTheme',
         value: val
       })
+      this.sideTheme = val;
+    },
+    saveSetting() {
+      const loading = this.$loading({
+        lock: true,
+        fullscreen: false,
+        text: "正在保存到本地，请稍后...",
+        spinner: "el-icon-loading",
+        background: "rgba(0, 0, 0, 0.7)"
+      });
+      localStorage.setItem(
+        "layout-setting",
+        `{
+            "topNav":${this.topNav},
+            "tagsView":${this.tagsView},
+            "fixedHeader":${this.fixedHeader},
+            "sidebarLogo":${this.sidebarLogo},
+            "sideTheme":"${this.sideTheme}"
+          }`
+      );
+      setTimeout(loading.close(), 1000)
+    },
+    resetSetting() {
+      this.$loading({
+        lock: true,
+        fullscreen: false,
+        text: "正在清除设置缓存并刷新，请稍后...",
+        spinner: "el-icon-loading",
+        background: "rgba(0, 0, 0, 0.7)"
+      });
+      localStorage.removeItem("layout-setting")
+      setTimeout("window.location.reload()", 1000)
     }
   }
 }

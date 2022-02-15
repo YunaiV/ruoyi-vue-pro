@@ -30,6 +30,9 @@
 <script>
 import { constantRoutes } from "@/router";
 
+// 不需要激活的路由
+const noactiveList = ["/user/profile", "/dict/type", "/gen/edit", "/job/log"];
+
 export default {
   data() {
     return {
@@ -42,10 +45,13 @@ export default {
   computed: {
     // 顶部显示菜单
     topMenus() {
-      return this.routers.map((menu) => ({
-        ...menu,
-        children: undefined,
-      }));
+      let topMenus = [];
+      this.routers.map((menu) => {
+        if (menu.hidden === false) {
+          topMenus.push(menu);
+        }
+      });
+      return topMenus;
     },
     // 所有的路由信息
     routers() {
@@ -69,6 +75,12 @@ export default {
     activeMenu() {
       const path = this.$route.path;
       let activePath = this.routers[0].path;
+      var noactive = noactiveList.some(function (item) {
+        return path.indexOf(item) !== -1;
+      });
+      if (noactive) {
+        return;
+      }
       if (path.lastIndexOf("/") > 0) {
         const tmpPath = path.substring(1, path.length);
         activePath = "/" + tmpPath.substring(0, tmpPath.indexOf("/"));
@@ -89,7 +101,7 @@ export default {
   methods: {
     // 根据宽度计算设置显示栏数
     setVisibleNumber() {
-      const width = document.body.getBoundingClientRect().width - 200;
+      const width = document.body.getBoundingClientRect().width - 380;
       const elWidth = this.$el.getBoundingClientRect().width;
       const menuItemNodes = this.$el.children;
       const menuWidth = Array.from(menuItemNodes).map(
@@ -119,7 +131,7 @@ export default {
         });
       }
       this.$store.commit("SET_SIDEBAR_ROUTERS", routes);
-    },
+    }
   },
 };
 </script>
