@@ -5,7 +5,7 @@
     @select="handleSelect"
   >
     <template v-for="(item, index) in topMenus">
-      <el-menu-item :index="item.path" :key="index" v-if="index < visibleNumber"
+      <el-menu-item :style="{'--theme': theme}" :index="item.path" :key="index" v-if="index < visibleNumber"
       ><svg-icon :icon-class="item.meta.icon" />
         {{ item.meta.title }}</el-menu-item
       >
@@ -42,6 +42,9 @@ export default {
     };
   },
   computed: {
+    theme() {
+      return this.$store.state.settings.theme;
+    },
     // 顶部显示菜单
     topMenus() {
       let topMenus = [];
@@ -149,7 +152,7 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .el-menu--horizontal > .el-menu-item {
   float: left;
   height: 50px;
@@ -162,7 +165,13 @@ export default {
 }
 
 .el-menu--horizontal > .el-menu-item.is-active {
-  border-bottom: 3px solid #409eff;
+  border-bottom: 3px solid #{'var(--theme)'};
   color: #303133;
+}
+
+/* submenu item */
+.el-menu--horizontal > .el-submenu .el-submenu__title {
+  height: 50px !important;
+  line-height: 50px !important;
 }
 </style>

@@ -5,7 +5,7 @@ const { sideTheme, showSettings, topNav, tagsView, fixedHeader, sidebarLogo } = 
 
 const storageSetting = JSON.parse(localStorage.getItem('layout-setting')) || ''
 const state = {
-  theme: variables.theme,
+  theme: storageSetting.theme || variables.theme,
   sideTheme: storageSetting.sideTheme || sideTheme,
   showSettings: showSettings,
   topNav:  storageSetting.topNav === undefined ? topNav : storageSetting.topNav,
