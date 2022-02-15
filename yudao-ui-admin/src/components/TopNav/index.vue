@@ -47,7 +47,7 @@ export default {
     topMenus() {
       let topMenus = [];
       this.routers.map((menu) => {
-        if (menu.hidden === false) {
+        if (menu.hidden !== true) {
           topMenus.push(menu);
         }
       });
@@ -95,21 +95,20 @@ export default {
       return activePath;
     },
   },
+  beforeMount() {
+    window.addEventListener('resize', this.setVisibleNumber)
+  },
+  beforeDestroy() {
+    window.removeEventListener('resize', this.setVisibleNumber)
+  },
   mounted() {
     this.setVisibleNumber();
   },
   methods: {
     // 根据宽度计算设置显示栏数
     setVisibleNumber() {
-      const width = document.body.getBoundingClientRect().width - 380;
-      const elWidth = this.$el.getBoundingClientRect().width;
-      const menuItemNodes = this.$el.children;
-      const menuWidth = Array.from(menuItemNodes).map(
-        (i) => i.getBoundingClientRect().width
-      );
-      this.visibleNumber = (
-        parseInt(width - elWidth) / parseInt(menuWidth)
-      ).toFixed(0);
+      const width = document.body.getBoundingClientRect().width / 3;
+      this.visibleNumber = parseInt(width / 85);
     },
     // 菜单选择事件
     handleSelect(key, keyPath) {

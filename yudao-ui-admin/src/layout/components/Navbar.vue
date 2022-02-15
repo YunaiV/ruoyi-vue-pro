@@ -3,7 +3,7 @@
     <hamburger id="hamburger-container" :is-active="sidebar.opened" class="hamburger-container" @toggleClick="toggleSideBar" />
 
     <breadcrumb id="breadcrumb-container" class="breadcrumb-container" v-if="!topNav"/>
-    <top-nav id="topmenu-container" class="breadcrumb-container" v-if="topNav"/>
+    <top-nav id="topmenu-container" class="topmenu-container" v-if="topNav"/>
 
     <div class="right-menu">
       <template v-if="device!=='mobile'">
@@ -133,6 +133,11 @@ export default {
 
   .breadcrumb-container {
     float: left;
+  }
+
+  .topmenu-container {
+    position: absolute;
+    left: 50px;
   }
 
   .errLog-container {
