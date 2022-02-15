@@ -1,26 +1,15 @@
 <template>
-  <div v-loading="loading" :style="'height:'+ height">
-    <iframe :src="src" frameborder="no" style="width: 100%;height: 100%" scrolling="auto" />
-  </div>
+  <i-frame :src="url" />
 </template>
 <script>
+import iFrame from "@/components/iFrame/index";
 export default {
-  name: "SkyWalking",
+  name: "Druid",
+  components: { iFrame },
   data() {
     return {
-      src: "http://skywalking.shop.iocoder.cn/trace", // TODO 芋艿，后续改成配置读取
-      height: document.documentElement.clientHeight - 94.5 + "px;",
-      loading: true
+      url: "http://skywalking.shop.iocoder.cn/trace", // TODO 芋艿，后续改成配置读取
     };
   },
-  mounted: function() {
-    setTimeout(() => {
-      this.loading = false;
-    }, 230);
-    const that = this;
-    window.onresize = function temp() {
-      that.height = document.documentElement.clientHeight - 94.5 + "px;";
-    };
-  }
 };
 </script>

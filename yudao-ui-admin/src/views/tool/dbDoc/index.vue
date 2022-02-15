@@ -10,15 +10,17 @@
 
     <!-- 展示文档 -->
     <div v-loading="loading" :style="'height:'+ height">
-      <iframe :src="src" frameborder="no" style="width: 100%;height: 100%" scrolling="auto" />
+      <i-frame :src="src" />
     </div>
   </div>
 </template>
 <script>
 import { exportHtml, exportWord, exportMarkdown} from "@/api/tool/dbDoc";
+import iFrame from "@/components/iFrame/index";
 
 export default {
   name: "DBDoc",
+  components: { iFrame },
   data() {
     return {
       height: document.documentElement.clientHeight - 94.5 + "px;",
