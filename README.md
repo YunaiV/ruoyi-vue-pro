@@ -1,4 +1,4 @@
-## 平台简介
+## 🐯 平台简介
 
 **芋道**，一套**全部开源**的**企业级**的快速开发平台，毫无保留给个人及企业免费使用。
 
@@ -13,7 +13,13 @@
 * 集成微信小程序、微信公众号、企业微信、钉钉等三方登陆，集成支付宝、微信等支付与退款。
 * 集成阿里云、腾讯云、云片等短信渠道，集成阿里云、腾讯云、七牛云等云存储服务。
 
-## 在线体验
+|  项目名 | 说明   | 传说门  |
+|  ----  | ----  | ----  |
+| `ruoyi-vue-pro` | Spring Boot 版本  | **[Gitee](https://gitee.com/zhijiantianya/ruoyi-vue-pro)** &nbsp;&nbsp;&nbsp; [Github](https://github.com/YunaiV/ruoyi-vue-pro) |
+| `ruoyi-vue-cloud` | Spring Cloud 版本 | **[Gitee](https://gitee.com/zhijiantianya/ruoyi-vue-cloud)** &nbsp;&nbsp;&nbsp; [Github](https://github.com/YunaiV/onemall) |
+| `Spring-Boot-Labs` | Spring Boot & Cloud 入门 | **[Gitee](https://gitee.com/zhijiantianya/SpringBoot-Labs)** &nbsp;&nbsp;&nbsp; [Github](https://github.com/YunaiV/SpringBoot-Labs) |
+
+## 🐶 在线体验
 
 演示地址：<http://dashboard.yudao.iocoder.cn>
 * 账号密码：admin/admin123
@@ -23,7 +29,7 @@
 
 > 未来会补充文档和视频，方便胖友冲冲冲！
 
-## 内置功能
+## 🐼 内置功能
 
 分成多种内置功能：
 * 系统功能
@@ -121,7 +127,7 @@ ps：核心功能已经实现，正在对接微信小程序中...
 | 🚀 | 数据库文档 | 基于 Screw 自动生成数据库文档，支持导出 Word、HTML、MD 格式 |
 |  | 表单构建 | 拖动表单元素生成相应的 HTML 代码，支持导出 JSON、Vue 文件  |
 
-## 技术栈
+## 🐨 技术栈
 
 | 项目                    | 说明                 |
 |-----------------------|--------------------|
@@ -170,7 +176,7 @@ ps：核心功能已经实现，正在对接微信小程序中...
 | [Vue](https://cn.vuejs.org/index.html) | JavaScript 框架 | 2.6.12 |
 | [Vue Element Admin](https://ant.design/docs/react/introduce-cn) | 后台前端解决方案 | - |
 
-## 演示图
+## 🐷 演示图
 
 ### 系统功能
 
