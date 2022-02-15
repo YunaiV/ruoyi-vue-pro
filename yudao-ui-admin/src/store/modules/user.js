@@ -90,7 +90,7 @@ const user = {
     // 获取用户信息
     GetInfo({ commit, state }) {
       return new Promise((resolve, reject) => {
-        getInfo(state.token).then(res => {
+        getInfo().then(res => {
           // 没有 data 数据，赋予个默认值
           if (!res) {
             res = {
