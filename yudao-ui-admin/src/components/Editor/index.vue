@@ -3,14 +3,13 @@
     <el-upload
       :action="uploadUrl"
       :on-success="handleUploadSuccess"
-      :before-upload="handleBeforeUpload"
       :on-error="handleUploadError"
       name="file"
       :show-file-list="false"
       :headers="headers"
-      style="display: none;"
-      ref='upload'
-      v-if='this.uploadUrl'
+      style="display: none"
+      ref="upload"
+      v-if="this.uploadUrl"
     >
     </el-upload>
     <div class="editor" ref="editor" :style="styles"></div>
@@ -22,6 +21,7 @@ import Quill from "quill";
 import "quill/dist/quill.core.css";
 import "quill/dist/quill.snow.css";
 import "quill/dist/quill.bubble.css";
+import { getToken } from "@/utils/auth";
 
 export default {
   name: "Editor",
@@ -49,11 +49,14 @@ export default {
     /* 上传地址 */
     uploadUrl: {
       type: String,
-      default: '',
+      default: "",
     }
   },
   data() {
     return {
+      headers: {
+        Authorization: "Bearer " + getToken()
+      },
       Quill: null,
       currentValue: "",
       options: {
@@ -72,7 +75,7 @@ export default {
             [{ color: [] }, { background: [] }],             // 字体颜色、字体背景颜色
             [{ align: [] }],                                 // 对齐方式
             ["clean"],                                       // 清除文本格式
-            ["link", "image", "video"]                       // 链接、图片、视频
+            ["link", "image"]                                // 链接、图片
           ],
         },
         placeholder: "请输入内容",
@@ -115,23 +118,23 @@ export default {
     init() {
       const editor = this.$refs.editor;
       this.Quill = new Quill(editor, this.options);
-      // 如果设置了上传地址则自定义图片和视频的上传事件
+      // 如果设置了上传地址则自定义图片上传事件
       if (this.uploadUrl) {
-        let toolbar = this.Quill.getModule('toolbar');
-        toolbar.addHandler('image', (value) => {
-          this.uploadType = 'image';
+        let toolbar = this.Quill.getModule("toolbar");
+        toolbar.addHandler("image", (value) => {
+          this.uploadType = "image";
           if (value) {
             this.$refs.upload.$children[0].$refs.input.click();
           } else {
-            this.quill.format('image', false);
+            this.quill.format("image", false);
           }
         });
-        toolbar.addHandler('video', (value) => {
-          this.uploadType = 'video';
+        toolbar.addHandler("video", (value) => {
+          this.uploadType = "video";
           if (value) {
             this.$refs.upload.$children[0].$refs.input.click();
           } else {
-            this.quill.format('video', false);
+            this.quill.format("video", false);
           }
         });
       }
@@ -154,13 +157,31 @@ export default {
         this.$emit("on-editor-change", eventName, ...args);
       });
     },
+    handleUploadSuccess(res, file) {
+      // 获取富文本组件实例
+      let quill = this.Quill;
+      // 如果上传成功
+      if (res.code == 200) {
+        // 获取光标所在位置
+        let length = quill.getSelection().index;
+        // 插入图片  res.url为服务器返回的图片地址
+        quill.insertEmbed(length, "image", res.url);
+        // 调整光标到最后
+        quill.setSelection(length + 1);
+      } else {
+        this.$message.error("图片插入失败");
+      }
+    },
+    handleUploadError() {
+      this.$message.error("图片插入失败");
+    },
   },
 };
 </script>
 
 <style>
 .editor, .ql-toolbar {
-  white-space: pre-wrap!important;
+  white-space: pre-wrap !important;
   line-height: normal !important;
 }
 .quill-img {
