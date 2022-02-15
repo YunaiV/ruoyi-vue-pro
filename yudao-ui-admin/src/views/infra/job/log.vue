@@ -54,7 +54,7 @@
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-          <el-button size="mini" type="text" icon="el-icon-view" @click="handleView(scope.row)"
+          <el-button size="mini" type="text" icon="el-icon-view" @click="handleView(scope.row)" :loading="exportLoading"
                      v-hasPermi="['infra:job:query']">详细</el-button>
         </template>
       </el-table-column>
@@ -96,6 +96,8 @@ export default {
     return {
       // 遮罩层
       loading: true,
+      // 导出遮罩层
+      exportLoading: false,
       // 显示搜索条件
       showSearch: true,
       // 总条数
@@ -165,10 +167,12 @@ export default {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning"
-      }).then(function() {
+      }).then(() => {
+        this.exportLoading = true;
         return exportJobLogExcel(params);
       }).then(response => {
         this.downloadExcel(response, '定时任务日志.xls');
+        this.exportLoading = false;
       })
     }
   }

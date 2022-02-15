@@ -24,7 +24,7 @@
                    v-hasPermi="['system:post:create']">新增</el-button>
       </el-col>
       <el-col :span="1.5">
-        <el-button type="warning" icon="el-icon-download" size="mini" @click="handleExport"
+        <el-button type="warning" icon="el-icon-download" size="mini" @click="handleExport" :loading="exportLoading"
                    v-hasPermi="['system:post:export']">导出</el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
@@ -96,6 +96,8 @@ export default {
     return {
       // 遮罩层
       loading: true,
+      // 导出遮罩层
+      exportLoading: false,
       // 显示搜索条件
       showSearch: true,
       // 总条数
@@ -238,11 +240,13 @@ export default {
           confirmButtonText: "确定",
           cancelButtonText: "取消",
           type: "warning"
-        }).then(function() {
+        }).then(() => {
+          this.exportLoading = true;
           return exportPost(queryParams);
         }).then(response => {
-        this.downloadExcel(response, '岗位数据.xls');
-        })
+          this.downloadExcel(response, '岗位数据.xls');
+          this.exportLoading = false;
+      })
     }
   }
 };
