@@ -21,6 +21,7 @@
       <li @click="refreshSelectedTag(selectedTag)">刷新页面</li>
       <li v-if="!isAffix(selectedTag)" @click="closeSelectedTag(selectedTag)">关闭当前</li>
       <li @click="closeOthersTags">关闭其他</li>
+      <li v-if="!isLastView()" @click="closeRightTags">关闭右侧</li>
       <li @click="closeAllTags(selectedTag)">关闭所有</li>
     </ul>
   </div>
@@ -82,6 +83,13 @@ export default {
     },
     isAffix(tag) {
       return tag.meta && tag.meta.affix
+    },
+    isLastView() {
+      try {
+        return this.selectedTag.fullPath === this.visitedViews[this.visitedViews.length - 1].fullPath
+      } catch (err) {
+        return false
+      }
     },
     filterAffixTags(routes, basePath = '/') {
       let tags = []
@@ -149,6 +157,13 @@ export default {
       this.$store.dispatch('tagsView/delView', view).then(({ visitedViews }) => {
         if (this.isActive(view)) {
           this.toLastView(visitedViews, view)
+        }
+      })
+    },
+    closeRightTags() {
+      this.$store.dispatch('tagsView/delRightTags', this.selectedTag).then(visitedViews => {
+        if (!visitedViews.find(i => i.fullPath === this.$route.fullPath)) {
+          this.toLastView(visitedViews)
         }
       })
     },

@@ -62,6 +62,23 @@ const mutations = {
         break
       }
     }
+  },
+
+  DEL_RIGHT_VIEWS: (state, view) => {
+    const index = state.visitedViews.findIndex(v => v.path === view.path)
+    if (index === -1) {
+      return
+    }
+    state.visitedViews = state.visitedViews.filter((item, idx) => {
+      if (idx <= index || (item.meta && item.meta.affix)) {
+        return true
+      }
+      const i = state.cachedViews.indexOf(item.name)
+      if (i > -1) {
+        state.cachedViews.splice(i, 1)
+      }
+      return false
+    })
   }
 }
 
@@ -148,6 +165,13 @@ const actions = {
 
   updateVisitedView({ commit }, view) {
     commit('UPDATE_VISITED_VIEW', view)
+  },
+
+  delRightTags({ commit }, view) {
+    return new Promise(resolve => {
+      commit('DEL_RIGHT_VIEWS', view)
+      resolve([...state.visitedViews])
+    })
   }
 }
 
