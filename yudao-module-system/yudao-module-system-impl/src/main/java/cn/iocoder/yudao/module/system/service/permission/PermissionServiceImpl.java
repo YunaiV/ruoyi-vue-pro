@@ -406,7 +406,7 @@ public class PermissionServiceImpl implements PermissionService {
     @Override
     public Set<Long> getUserRoleIdListByRoleIds(Collection<Long> roleIds) {
         return CollectionUtils.convertSet(userRoleMapper.selectListByRoleIds(roleIds),
-                UserRoleDO::getRoleId);
+                UserRoleDO::getUserId);
     }
 
 }
