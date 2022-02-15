@@ -37,7 +37,13 @@
       <el-table-column label="字典标签" align="center" prop="label" />
       <el-table-column label="字典键值" align="center" prop="value" />
       <el-table-column label="字典排序" align="center" prop="sort" />
-      <el-table-column label="状态" align="center" prop="status" :formatter="statusFormat" />
+      <el-table-column label="状态" align="center" prop="status">
+        <template slot-scope="scope">
+          <dict-tag :type="DICT_TYPE.COMMON_STATUS" :value="scope.row.status"/>
+        </template>
+      </el-table-column>
+      <el-table-column label="颜色类型" align="center" prop="colorType" />
+      <el-table-column label="CSS Class" align="center" prop="cssClass" />
       <el-table-column label="备注" align="center" prop="remark" :show-overflow-tooltip="true" />
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
         <template slot-scope="scope">
@@ -59,7 +65,7 @@
 
     <!-- 添加或修改参数配置对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
-      <el-form ref="form" :model="form" :rules="rules" label-width="80px">
+      <el-form ref="form" :model="form" :rules="rules" label-width="90px">
         <el-form-item label="字典类型">
           <el-input v-model="form.dictType" :disabled="true" />
         </el-form-item>
@@ -76,6 +82,14 @@
           <el-radio-group v-model="form.status">
             <el-radio v-for="dict in statusDictDatas" :key="parseInt(dict.value)" :label="parseInt(dict.value)">{{dict.label}}</el-radio>
           </el-radio-group>
+        </el-form-item>
+        <el-form-item label="颜色类型" prop="colorType">
+          <el-select v-model="form.colorType">
+            <el-option v-for="item in colorTypeOptions" :key="item.value" :label="item.label + '(' + item.value + ')'" :value="item.value" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="CSS Class" prop="cssClass">
+          <el-input v-model="form.cssClass" placeholder="请输入 CSS Class" />
         </el-form-item>
         <el-form-item label="备注" prop="remark">
           <el-input v-model="form.remark" type="textarea" placeholder="请输入内容"></el-input>
@@ -142,6 +156,27 @@ export default {
           { required: true, message: "数据顺序不能为空", trigger: "blur" }
         ]
       },
+      // 数据标签回显样式
+      colorTypeOptions: [{
+          value: "default",
+          label: "默认"
+        }, {
+          value: "primary",
+          label: "主要"
+        }, {
+          value: "success",
+          label: "成功"
+        }, {
+          value: "info",
+          label: "信息"
+        }, {
+          value: "warning",
+          label: "警告"
+        }, {
+          value: "danger",
+          label: "危险"
+        }
+      ],
 
       // 枚举
       CommonStatusEnum: CommonStatusEnum,
@@ -178,10 +213,6 @@ export default {
         this.loading = false;
       });
     },
-    // 数据状态字典翻译
-    statusFormat(row, column) {
-      return getDictDataLabel(DICT_TYPE.COMMON_STATUS, row.status)
-    },
     // 取消按钮
     cancel() {
       this.open = false;
@@ -195,6 +226,8 @@ export default {
         value: undefined,
         sort: 0,
         status: CommonStatusEnum.ENABLE,
+        colorType: 'default',
+        cssClass: undefined,
         remark: undefined
       };
       this.resetForm("form");

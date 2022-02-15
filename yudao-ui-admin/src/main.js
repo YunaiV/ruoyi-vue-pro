@@ -36,7 +36,7 @@ import RightToolbar from "@/components/RightToolbar"
 // 代码高亮插件
 // import hljs from 'highlight.js'
 // import 'highlight.js/styles/github-gist.css'
-import {DICT_TYPE, getDictDataLabel, getDictDatas} from "@/utils/dict";
+import {DICT_TYPE, getDictDataLabel, getDictDatas, getDictDatas2} from "@/utils/dict";
 
 // 全局方法挂载
 Vue.prototype.getDicts = getDicts
@@ -47,6 +47,7 @@ Vue.prototype.addDateRange = addDateRange
 Vue.prototype.addBeginAndEndTime = addBeginAndEndTime
 Vue.prototype.selectDictLabel = selectDictLabel
 Vue.prototype.getDictDatas = getDictDatas
+Vue.prototype.getDictDatas2 = getDictDatas2
 Vue.prototype.getDictDataLabel = getDictDataLabel
 Vue.prototype.DICT_TYPE = DICT_TYPE
 Vue.prototype.download = download
@@ -70,8 +71,11 @@ Vue.prototype.msgInfo = function (msg) {
 }
 
 // 全局组件挂载
+Vue.component('DictTag', DictTag)
 Vue.component('Pagination', Pagination)
 Vue.component('RightToolbar', RightToolbar)
+// 字典标签组件
+import DictTag from '@/components/DictTag'
 // 头部标签插件
 import VueMeta from 'vue-meta'
 

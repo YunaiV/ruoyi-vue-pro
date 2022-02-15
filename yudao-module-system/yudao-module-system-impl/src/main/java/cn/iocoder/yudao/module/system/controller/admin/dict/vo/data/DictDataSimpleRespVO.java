@@ -17,4 +17,9 @@ public class DictDataSimpleRespVO {
     @ApiModelProperty(value = "字典标签", required = true, example = "男")
     private String label;
 
+    @ApiModelProperty(value = "颜色类型", example = "default", notes = "default、primary、success、info、warning、danger")
+    private String colorType;
+    @ApiModelProperty(value = "css 样式", example = "btn-visible")
+    private String cssClass;
+
 }

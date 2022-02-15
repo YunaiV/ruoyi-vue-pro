@@ -47,6 +47,16 @@ public class DictDataDO extends BaseDO {
      */
     private Integer status;
     /**
+     * 颜色类型
+     *
+     * 对应到 element-ui 为 default、primary、success、info、warning、danger
+     */
+    private String colorType;
+    /**
+     * css 样式
+     */
+    private String cssClass;
+    /**
      * 备注
      */
     private String remark;

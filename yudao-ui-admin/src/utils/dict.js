@@ -68,10 +68,37 @@ export function getDictDatas(dictType) {
   //   console.log(store.getters.dict_datas[dictType]);
   //   debugger
   // }
+  // debugger
   return store.getters.dict_datas[dictType] || []
 }
 
-export function getDictDataLabel(dictType, value) {
+/**
+ * 获取 dictType 对应的数据字典数组
+ *
+ * @param dictType 数据类型
+ * @param values 数组、单个元素
+ * @returns {*|Array} 数据字典数组
+ */
+export function getDictDatas2(dictType, values) {
+  if (values === undefined) {
+    return [];
+  }
+  // 如果是单个元素，则转换成数组
+  if (!Array.isArray(values)) {
+    values = [this.value];
+  }
+  // 获得字典数据
+  const results = [];
+  for (const value of values) {
+    const dict = getDictData(dictType, value);
+    if (dict) {
+      results.push(dict);
+    }
+  }
+  return results;
+}
+
+export function getDictData(dictType, value) {
   // 获取 dictType 对应的数据字典数组
   const dictDatas = getDictDatas(dictType)
   if (!dictDatas || dictDatas.length === 0) {
@@ -81,8 +108,14 @@ export function getDictDataLabel(dictType, value) {
   value = value + '' // 强制转换成字符串，因为 DictData 小类数值，是字符串
   for (const dictData of dictDatas) {
     if (dictData.value === value) {
-      return dictData.label
+      return dictData;
     }
   }
-  return ''
+  return undefined
 }
+
+export function getDictDataLabel(dictType, value) {
+  const dict = getDictData(dictType, value);
+  return dict ? dict.label : '';
+}
+
