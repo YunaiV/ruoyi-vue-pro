@@ -1,5 +1,20 @@
 <template>
-  <div class="editor" ref="editor" :style="styles"></div>
+  <div>
+    <el-upload
+      :action="uploadUrl"
+      :on-success="handleUploadSuccess"
+      :before-upload="handleBeforeUpload"
+      :on-error="handleUploadError"
+      name="file"
+      :show-file-list="false"
+      :headers="headers"
+      style="display: none;"
+      ref='upload'
+      v-if='this.uploadUrl'
+    >
+    </el-upload>
+    <div class="editor" ref="editor" :style="styles"></div>
+  </div>
 </template>
 
 <script>
@@ -30,6 +45,11 @@ export default {
     readOnly: {
       type: Boolean,
       default: false,
+    },
+    /* 上传地址 */
+    uploadUrl: {
+      type: String,
+      default: '',
     }
   },
   data() {
@@ -95,6 +115,26 @@ export default {
     init() {
       const editor = this.$refs.editor;
       this.Quill = new Quill(editor, this.options);
+      // 如果设置了上传地址则自定义图片和视频的上传事件
+      if (this.uploadUrl) {
+        let toolbar = this.Quill.getModule('toolbar');
+        toolbar.addHandler('image', (value) => {
+          this.uploadType = 'image';
+          if (value) {
+            this.$refs.upload.$children[0].$refs.input.click();
+          } else {
+            this.quill.format('image', false);
+          }
+        });
+        toolbar.addHandler('video', (value) => {
+          this.uploadType = 'video';
+          if (value) {
+            this.$refs.upload.$children[0].$refs.input.click();
+          } else {
+            this.quill.format('video', false);
+          }
+        });
+      }
       this.Quill.pasteHTML(this.currentValue);
       this.Quill.on("text-change", (delta, oldDelta, source) => {
         const html = this.$refs.editor.children[0].innerHTML;
