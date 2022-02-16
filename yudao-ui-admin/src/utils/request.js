@@ -73,7 +73,7 @@ service.interceptors.response.use(res => {
           location.href = '/index';
         })
       }).catch(() => {});
-      return Promise.reject()
+      return Promise.reject('令牌验证失败')
     } else if (code === 500) {
       Message({
         message: msg,
