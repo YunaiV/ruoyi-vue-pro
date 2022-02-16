@@ -163,13 +163,14 @@ export default {
         return "";
       }
     },
-    // 对象转成分隔字符串
-    listToString(list) {
-      let files = "";
-      for (let key in list) {
-        files += list[key].url + ",";
+    // 对象转成指定字符串分隔
+    listToString(list, separator) {
+      let strs = "";
+      separator = separator || ",";
+      for (let i in list) {
+        strs += list[i].url + separator;
       }
-      return files.substr(0, files.length - 1);
+      return strs != '' ? strs.substr(0, strs.length - 1) : '';
     }
   }
 };
