@@ -48,20 +48,27 @@
       <el-table-column label="CRON 表达式" align="center" prop="cronExpression" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-          <el-button size="mini" type="text" icon="el-icon-view" @click="handleView(scope.row)"
-                     v-hasPermi="['infra:job:query']">详细</el-button>
-          <el-button size="mini" icon="el-icon-s-operation" @click="handleJobLog(scope.row)"
-                     v-hasPermi="['infra:job:query']">执行日志</el-button>
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
                      v-hasPermi="['infra:job:update']">修改</el-button>
           <el-button size="mini" type="text" icon="el-icon-check" @click="handleChangeStatus(scope.row, true)"
                      v-if="scope.row.status === InfJobStatusEnum.STOP" v-hasPermi="['infra:job:update']">开启</el-button>
           <el-button size="mini" type="text" icon="el-icon-close" @click="handleChangeStatus(scope.row, false)"
                      v-if="scope.row.status === InfJobStatusEnum.NORMAL" v-hasPermi="['infra:job:update']">暂停</el-button>
-          <el-button size="mini" type="text" icon="el-icon-caret-right" @click="handleRun(scope.row)"
-                     v-hasPermi="['infra:job:trigger']">执行一次</el-button>
           <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)"
                      v-hasPermi="['infra:job:delete']">删除</el-button>
+          <el-dropdown size="mini" @command="(command) => handleCommand(command, scope.row)">
+            <span class="el-dropdown-link">
+              <i class="el-icon-d-arrow-right el-icon--right"></i>更多
+            </span>
+            <el-dropdown-menu slot="dropdown">
+              <el-dropdown-item command="handleRun" icon="el-icon-caret-right"
+                                v-hasPermi="['infra:job:trigger']">执行一次</el-dropdown-item>
+              <el-dropdown-item command="handleView" icon="el-icon-view"
+                                v-hasPermi="['infra:job:query']">任务详细</el-dropdown-item>
+              <el-dropdown-item command="handleJobLog" icon="el-icon-s-operation"
+                                v-hasPermi="['infra:job:query']">调度日志</el-dropdown-item>
+            </el-dropdown-menu>
+          </el-dropdown>
         </template>
       </el-table-column>
     </el-table>
@@ -322,6 +329,22 @@ export default {
         this.getList();
         this.msgSuccess(statusStr + "成功");
       }).catch(() => {});
+    },
+    // 更多操作触发
+    handleCommand(command, row) {
+      switch (command) {
+        case "handleRun":
+          this.handleRun(row);
+          break;
+        case "handleView":
+          this.handleView(row);
+          break;
+        case "handleJobLog":
+          this.handleJobLog(row);
+          break;
+        default:
+          break;
+      }
     },
     /** 导出按钮操作 */
     handleExport() {

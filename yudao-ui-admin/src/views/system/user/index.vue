@@ -71,12 +71,12 @@
           </el-table-column>
           <el-table-column label="操作" align="center" width="160" class-name="small-padding fixed-width">
             <template slot-scope="scope">
-              <el-button size="large" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
+              <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
                          v-hasPermi="['system:user:update']">修改</el-button>
               <el-dropdown  @command="(command) => handleCommand(command, scope.$index, scope.row)">
-                    <span class="el-dropdown-link">
-                      更多操作<i class="el-icon-arrow-down el-icon--right"></i>
-                    </span>
+                <span class="el-dropdown-link">
+                  <i class="el-icon-d-arrow-right el-icon--right"></i>更多
+                </span>
                 <el-dropdown-menu slot="dropdown">
                   <el-dropdown-item command="handleDelete" v-if="scope.row.id !== 1" size="mini" type="text" icon="el-icon-delete"
                                     v-hasPermi="['system:user:delete']">删除</el-dropdown-item>
@@ -657,13 +657,3 @@ export default {
   }
 };
 </script>
-<style>
-  .el-dropdown-link {
-    cursor: pointer;
-    color: #1890ff;
-    margin-left: 5px;
-  }
-  .el-icon-arrow-down {
-    font-size: 14px;
-  }
-</style>

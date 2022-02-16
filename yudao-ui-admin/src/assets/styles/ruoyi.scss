@@ -37,7 +37,7 @@
 .mb10 {
   margin-bottom: 10px;
 }
-.ml0 {
+.ml10 {
   margin-left: 10px;
 }
 .mt20 {
@@ -49,12 +49,26 @@
 .mb20 {
   margin-bottom: 20px;
 }
-.m20 {
+.ml20 {
   margin-left: 20px;
 }
 
-.el-dialog:not(.is-fullscreen){
+.h1, .h2, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6 {
+  font-family: inherit;
+  font-weight: 500;
+  line-height: 1.1;
+  color: inherit;
+}
+
+.el-dialog:not(.is-fullscreen) {
   margin-top: 6vh !important;
+}
+
+.el-dialog__wrapper.scrollbar .el-dialog .el-dialog__body {
+  overflow: auto;
+  overflow-x: hidden;
+  max-height: 70vh;
+  padding: 10px 20px 0;
 }
 
 .el-table {
@@ -118,6 +132,17 @@
   padding-left: 0;
   padding-right: 0;
   width: inherit;
+}
+
+/** 表格更多操作下拉样式 */
+.el-table .el-dropdown-link {
+  cursor: pointer;
+  color: #409EFF;
+  margin-left: 5px;
+}
+
+.el-table .el-dropdown, .el-icon-arrow-down {
+  font-size: 12px;
 }
 
 .el-tree-node__content > .el-checkbox {
