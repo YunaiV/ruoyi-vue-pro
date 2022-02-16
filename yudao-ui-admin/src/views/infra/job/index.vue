@@ -56,7 +56,8 @@
                      v-if="scope.row.status === InfJobStatusEnum.NORMAL" v-hasPermi="['infra:job:update']">暂停</el-button>
           <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)"
                      v-hasPermi="['infra:job:delete']">删除</el-button>
-          <el-dropdown size="mini" @command="(command) => handleCommand(command, scope.row)">
+          <el-dropdown size="mini" @command="(command) => handleCommand(command, scope.row)"
+                       v-hasPermi="['infra:job:trigger', 'infra:job:query']">
             <span class="el-dropdown-link">
               <i class="el-icon-d-arrow-right el-icon--right"></i>更多
             </span>

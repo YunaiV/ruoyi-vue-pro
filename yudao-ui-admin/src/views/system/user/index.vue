@@ -73,7 +73,8 @@
             <template slot-scope="scope">
               <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
                          v-hasPermi="['system:user:update']">修改</el-button>
-              <el-dropdown  @command="(command) => handleCommand(command, scope.$index, scope.row)">
+              <el-dropdown  @command="(command) => handleCommand(command, scope.$index, scope.row)"
+                            v-hasPermi="['system:user:delete', 'system:user:update-password', 'system:permission:assign-user-role']">
                 <span class="el-dropdown-link">
                   <i class="el-icon-d-arrow-right el-icon--right"></i>更多
                 </span>
