@@ -132,7 +132,7 @@
           </el-col>
           <el-col :span="12">
             <el-form-item v-if="form.id === undefined" label="用户密码" prop="password">
-              <el-input v-model="form.password" placeholder="请输入用户密码" type="password" />
+              <el-input v-model="form.password" placeholder="请输入用户密码" type="password" show-password />
             </el-form-item>
           </el-col>
         </el-row>
