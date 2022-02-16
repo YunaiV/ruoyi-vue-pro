@@ -40,7 +40,7 @@
       <el-table-column label="任务名称" align="center" prop="name" />
       <el-table-column label="任务状态" align="center" prop="status">
         <template slot-scope="scope">
-          <span>{{ getDictDataLabel(DICT_TYPE.INFRA_JOB_STATUS, scope.row.status) }}</span>
+          <dict-tag :type="DICT_TYPE.INFRA_JOB_STATUS" :value="scope.row.status" />
         </template>
       </el-table-column>>
       <el-table-column label="处理器的名字" align="center" prop="handlerName" />
@@ -107,7 +107,9 @@
           <el-col :span="24">
             <el-form-item label="任务编号：">{{ form.id }}</el-form-item>
             <el-form-item label="任务名称：">{{ form.name }}</el-form-item>
-            <el-form-item label="任务名称：">{{ getDictDataLabel(DICT_TYPE.INFRA_JOB_STATUS, form.status) }}</el-form-item>
+            <el-form-item label="任务名称：">
+              <dict-tag :type="DICT_TYPE.INFRA_JOB_STATUS" :value="form.status" />
+            </el-form-item>
             <el-form-item label="处理器的名字：">{{ form.handlerName }}</el-form-item>
             <el-form-item label="处理器的参数：">{{ form.handlerParam }}</el-form-item>
             <el-form-item label="cron表达式：">{{ form.cronExpression }}</el-form-item>

@@ -35,7 +35,7 @@
 
     <el-table v-loading="loading" :data="list">
       <el-table-column label="访问编号" align="center" prop="id" />
-      <el-table-column label="日志类型" align="center" prop="logType">
+      <el-table-column label="日志类型" align="center" prop="logType" width="120">
         <template slot-scope="scope">
           <dict-tag :type="DICT_TYPE.SYSTEM_LOGIN_TYPE" :value="scope.row.logType" />
         </template>

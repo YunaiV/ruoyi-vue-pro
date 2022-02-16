@@ -145,23 +145,17 @@
       </el-table-column>
       <el-table-column label="退款类型" align="center" prop="type" width="80">
         <template v-slot="scope">
-          <el-tag :type="findByRefundTypeGetStyle(scope.row.type)">
-            {{ getDictDataLabel(DICT_TYPE.PAY_ORDER_REFUND_STATUS, scope.row.type) }}
-          </el-tag>
+          <dict-tag :type="DICT_TYPE.PAY_REFUND_ORDER_TYPE" :value="scope.row.type" />
         </template>
       </el-table-column>
       <el-table-column label="退款状态" align="center" prop="status">
         <template v-slot="scope">
-          <el-tag :type="findByRefundStatusGetStyle(scope.row.status)">
-            {{ getDictDataLabel(DICT_TYPE.PAY_REFUND_ORDER_STATUS, scope.row.status) }}
-          </el-tag>
+          <dict-tag :type="DICT_TYPE.PAY_REFUND_ORDER_STATUS" :value="scope.row.status" />
         </template>
       </el-table-column>
       <el-table-column label="回调状态" align="center" prop="notifyStatus">
         <template v-slot="scope">
-          <el-tag :type="findByRefundStatusGetStyle(scope.row.notifyStatus)">
-            {{ getDictDataLabel(DICT_TYPE.PAY_ORDER_NOTIFY_STATUS, scope.row.notifyStatus) }}
-          </el-tag>
+          <dict-tag :type="DICT_TYPE.PAY_ORDER_NOTIFY_STATUS" :value="scope.row.notifyStatus" />
         </template>
       </el-table-column>
       <el-table-column label="退款原因" align="center" prop="reason" width="140" :show-overflow-tooltip="true"/>
@@ -211,14 +205,12 @@
           <el-tag class="tag-purple" size="mini">{{ parseFloat(refundDetail.refundAmount / 100).toFixed(2) }}</el-tag>
         </el-descriptions-item>
         <el-descriptions-item label="退款类型">
-          <el-tag size="mini" :type="findByRefundTypeGetStyle(refundDetail.type)">
-            {{ getDictDataLabel(DICT_TYPE.PAY_ORDER_REFUND_STATUS, refundDetail.type) }}
-          </el-tag>
+          <template v-slot="scope">
+            <dict-tag :type="DICT_TYPE.PAY_REFUND_ORDER_TYPE" :value="refundDetail.type" />
+          </template>
         </el-descriptions-item>
         <el-descriptions-item label="退款状态">
-          <el-tag size="mini" :type="findByRefundStatusGetStyle(refundDetail.status)">
-            {{ getDictDataLabel(DICT_TYPE.PAY_REFUND_ORDER_STATUS, refundDetail.status) }}
-          </el-tag>
+          <dict-tag :type="DICT_TYPE.PAY_REFUND_ORDER_STATUS" :value="refundDetail.status" />
         </el-descriptions-item>
         <el-descriptions-item label="创建时间">{{ parseTime(refundDetail.createTime) }}</el-descriptions-item>
         <el-descriptions-item label="退款成功时间">{{ parseTime(refundDetail.successTime) }}</el-descriptions-item>
@@ -235,9 +227,7 @@
         </el-descriptions-item>
         <el-descriptions-item label="回调地址">{{ refundDetail.notifyUrl }}</el-descriptions-item>
         <el-descriptions-item label="回调状态">
-          <el-tag size="mini" :type="findByRefundStatusGetStyle(refundDetail.notifyStatus)">
-            {{ getDictDataLabel(DICT_TYPE.PAY_ORDER_NOTIFY_STATUS, refundDetail.notifyStatus) }}
-          </el-tag>
+          <dict-tag :type="DICT_TYPE.PAY_ORDER_NOTIFY_STATUS" :value="refundDetail.notifyStatus" />
         </el-descriptions-item>
         <el-descriptions-item label="回调时间">{{ parseTime(refundDetail.notifyTime) }}</el-descriptions-item>
       </el-descriptions>

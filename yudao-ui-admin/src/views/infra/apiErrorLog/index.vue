@@ -49,7 +49,7 @@
       <el-table-column label="用户编号" align="center" prop="userId" />
       <el-table-column label="用户类型" align="center" prop="userType">
         <template slot-scope="scope">
-          <span>{{ getDictDataLabel(DICT_TYPE.USER_TYPE, scope.row.userType) }}</span>
+          <dict-tag :type="DICT_TYPE.USER_TYPE" :value="scope.row.userType"/>
         </template>
       </el-table-column>>
       <el-table-column label="应用名" align="center" prop="applicationName" />

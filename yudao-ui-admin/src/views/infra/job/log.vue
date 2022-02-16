@@ -49,7 +49,7 @@
       </el-table-column>
       <el-table-column label="任务状态" align="center" prop="status">
         <template slot-scope="scope">
-          <span>{{ getDictDataLabel(DICT_TYPE.INFRA_JOB_LOG_STATUS, scope.row.status) }}</span>
+          <dict-tag :type="DICT_TYPE.INFRA_JOB_LOG_STATUS" :value="scope.row.status" />
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
@@ -75,7 +75,9 @@
             <el-form-item label="第几次执行：">{{ form.executeIndex }}</el-form-item>
             <el-form-item label="执行时间：">{{ parseTime(form.beginTime) + ' ~ ' + parseTime(form.endTime) }}</el-form-item>
             <el-form-item label="执行时长：">{{ parseTime(form.duration) + ' 毫秒' }}</el-form-item>
-            <el-form-item label="任务状态：">{{ getDictDataLabel(DICT_TYPE.INFRA_JOB_LOG_STATUS, form.status) }}</el-form-item>
+            <el-form-item label="任务状态：">
+              <dict-tag :type="DICT_TYPE.INFRA_JOB_LOG_STATUS" :value="form.status" />
+            </el-form-item>
             <el-form-item label="执行结果：">{{ form.result }}</el-form-item>
           </el-col>
         </el-row>

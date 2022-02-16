@@ -46,11 +46,11 @@
       <el-table-column label="编号" align="center" prop="id" />
       <el-table-column label="类型" align="center" prop="type" width="80">
         <template slot-scope="scope">
-          <span>{{ getDictDataLabel(DICT_TYPE.SYSTEM_ERROR_CODE_TYPE, scope.row.type) }}</span>
+          <dict-tag :type="DICT_TYPE.SYSTEM_ERROR_CODE_TYPE" :value="scope.row.type" />
         </template>
       </el-table-column>
       <el-table-column label="应用名" align="center" prop="applicationName" width="200" />
-      <el-table-column label="错误码编码" align="center" prop="code" width="100" />
+      <el-table-column label="错误码编码" align="center" prop="code" width="120" />
       <el-table-column label="错误码提示" align="center" prop="message" width="300" />
       <el-table-column label="备注" align="center" prop="memo" width="200" />
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">

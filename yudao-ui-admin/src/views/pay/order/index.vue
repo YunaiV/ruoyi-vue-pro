@@ -135,8 +135,9 @@
       </el-table-column>
       <el-table-column label="支付状态" align="center" prop="status">
         <template slot-scope="scope">
-          <span>{{ getDictDataLabel(DICT_TYPE.PAY_ORDER_STATUS, scope.row.status) }}</span>
+          <dict-tag :type="DICT_TYPE.PAY_ORDER_STATUS" :value="scope.row.status" />
         </template>
+
       </el-table-column>
 <!--      <el-table-column label="退款状态" align="center" prop="refundStatus">-->
 <!--        <template slot-scope="scope">-->
@@ -145,7 +146,7 @@
 <!--      </el-table-column>-->
       <el-table-column label="回调状态" align="center" prop="notifyStatus" width="100">
         <template slot-scope="scope">
-          <span>{{ getDictDataLabel(DICT_TYPE.PAY_ORDER_NOTIFY_STATUS, scope.row.notifyStatus) }}</span>
+          <dict-tag :type="DICT_TYPE.PAY_ORDER_NOTIFY_STATUS" :value="scope.row.notifyStatus" />
         </template>
       </el-table-column>
       <el-table-column label="创建时间" align="center" prop="createTime" width="100">
@@ -200,14 +201,10 @@
           {{ parseFloat(orderDetail.channelFeeRate / 100, 2) }}%
         </el-descriptions-item>
         <el-descriptions-item label="支付状态">
-          <el-tag :type="statusType" size="small">
-            {{ getDictDataLabel(DICT_TYPE.PAY_ORDER_STATUS, orderDetail.status) }}
-          </el-tag>
+          <dict-tag :type="DICT_TYPE.PAY_ORDER_STATUS" :value="orderDetail.status" />
         </el-descriptions-item>
         <el-descriptions-item label="回调状态">
-          <el-tag :type="notifyStatusType" size="small">
-            {{ getDictDataLabel(DICT_TYPE.PAY_ORDER_NOTIFY_STATUS, orderDetail.notifyStatus) }}
-          </el-tag>
+          <dict-tag :type="DICT_TYPE.PAY_ORDER_NOTIFY_STATUS" :value="orderDetail.notifyStatus" />
         </el-descriptions-item>
         <el-descriptions-item label="回调地址">{{ orderDetail.notifyUrl }}</el-descriptions-item>
         <el-descriptions-item label="创建时间">{{ parseTime(orderDetail.createTime) }}</el-descriptions-item>
@@ -220,9 +217,7 @@
         <el-descriptions-item label="支付渠道">{{ orderDetail.channelCodeName }}</el-descriptions-item>
         <el-descriptions-item label="支付IP">{{ orderDetail.userIp }}</el-descriptions-item>
         <el-descriptions-item label="退款状态">
-          <el-tag :type="refundStatusType" size="small">
-            {{ getDictDataLabel(DICT_TYPE.PAY_ORDER_REFUND_STATUS, orderDetail.refundStatus) }}
-          </el-tag>
+          <dict-tag :type="DICT_TYPE.PAY_ORDER_REFUND_STATUS" :value="orderDetail.refundStatus" />
         </el-descriptions-item>
         <el-descriptions-item label="退款次数">{{ orderDetail.refundTimes }}</el-descriptions-item>
         <el-descriptions-item label="退款金额">
@@ -341,12 +336,6 @@ export default {
       // 订单退款状态字典数据集合
       payOrderRefundDictDatum: getDictDatas(DICT_TYPE.PAY_ORDER_REFUND_STATUS),
       orderDetail: JSON.parse(JSON.stringify(defaultOrderDetail)),
-      // el-tag订单状态type值
-      statusType: '',
-      // el-tag订单回调通知状态type值
-      notifyStatusType: '',
-      // el-tag订单退款状态type值
-      refundStatusType: '',
     };
   },
   created() {
@@ -415,40 +404,6 @@ export default {
         this.orderDetail = response.data;
         if (response.data.payOrderExtension === null) {
           this.orderDetail.payOrderExtension = Object.assign(defaultOrderDetail.payOrderExtension, {});
-        }
-        switch (this.orderDetail.status) {
-          case PayOrderStatusEnum.WAITING.status:
-            this.statusType = "info";
-            break;
-          case PayOrderStatusEnum.SUCCESS.status:
-            this.statusType = "success";
-            break;
-          case PayOrderStatusEnum.CLOSED.status:
-            this.statusType = "danger";
-            break;
-        }
-        switch (this.orderDetail.notifyStatus) {
-          case PayOrderNotifyStatusEnum.NO.status:
-            this.notifyStatusType = "info";
-            break;
-          case PayOrderNotifyStatusEnum.SUCCESS.status:
-            this.notifyStatusType = "success";
-            break;
-          case PayOrderNotifyStatusEnum.FAILURE.status:
-            this.notifyStatusType = "danger";
-            break;
-        }
-
-        switch (this.orderDetail.refundStatus) {
-          case PayOrderRefundStatusEnum.NO.status:
-            this.refundStatusType = "success";
-            break;
-          case PayOrderRefundStatusEnum.SOME.status:
-            this.refundStatusType = "warning";
-            break;
-          case PayOrderRefundStatusEnum.ALL.status:
-            this.refundStatusType = "danger";
-            break;
         }
         this.open = true;
       });

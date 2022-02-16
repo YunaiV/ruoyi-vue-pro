@@ -57,7 +57,7 @@
       <el-table-column label="参数键值" align="center" prop="value" />
       <el-table-column label="系统内置" align="center" prop="type">
         <template slot-scope="scope">
-          <span>{{ getDictDataLabel(DICT_TYPE.INFRA_CONFIG_TYPE, scope.row.type) }}</span>
+          <dict-tag :type="DICT_TYPE.INFRA_CONFIG_TYPE" :value="scope.row.type" />
         </template>
       </el-table-column>
       <el-table-column label="是否敏感" align="center" prop="sensitive">
