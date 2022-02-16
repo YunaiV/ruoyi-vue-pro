@@ -63,7 +63,7 @@
       <el-table-column label="异常名" align="center" prop="exceptionName" width="250" />
       <el-table-column label="处理状态" align="center" prop="processStatus">
         <template slot-scope="scope">
-          <span>{{ getDictDataLabel(DICT_TYPE.INFRA_API_ERROR_LOG_PROCESS_STATUS, scope.row.processStatus) }}</span>
+          <dict-tag :type="DICT_TYPE.INFRA_API_ERROR_LOG_PROCESS_STATUS" :value="scope.row.processStatus" />
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
@@ -93,7 +93,7 @@
             <el-form-item label="链路追踪：">{{ form.traceId }}</el-form-item>
             <el-form-item label="应用名：">{{ form.applicationName }}</el-form-item>
             <el-form-item label="用户信息：">
-              {{ form.userId }} | {{ getDictDataLabel(DICT_TYPE.USER_TYPE, form.userType) }} | {{ form.userIp }} | {{ form.userAgent}}
+              {{ form.userId }} <dict-tag :type="DICT_TYPE.USER_TYPE" :value="form.userType" /> | {{ form.userIp }} | {{ form.userAgent}}
             </el-form-item>
             <el-form-item label="请求信息：">{{ form.requestMethod }} | {{ form.requestUrl }} </el-form-item>
             <el-form-item label="请求参数：">{{ form.requestParams }}</el-form-item>
@@ -103,7 +103,7 @@
               <el-input type="textarea" :readonly="true" :autosize="{ maxRows: 20}" v-model="form.exceptionStackTrace"></el-input>
             </el-form-item>
             <el-form-item label="处理状态">
-              {{ getDictDataLabel(DICT_TYPE.INFRA_API_ERROR_LOG_PROCESS_STATUS, form.processStatus) }}
+              <dict-tag :type="DICT_TYPE.INFRA_API_ERROR_LOG_PROCESS_STATUS" :value="form.processStatus" />
             </el-form-item>
             <el-form-item label="处理人">{{ form.processUserId }}</el-form-item>
             <el-form-item label="处理时间">{{ parseTime(form.processTime) }}</el-form-item>

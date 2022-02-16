@@ -172,18 +172,9 @@
 
     <!-- 用户导入对话框 -->
     <el-dialog :title="upload.title" :visible.sync="upload.open" width="400px" append-to-body>
-      <el-upload
-        ref="upload"
-        :limit="1"
-        accept=".xlsx, .xls"
-        :headers="upload.headers"
-        :action="upload.url + '?updateSupport=' + upload.updateSupport"
-        :disabled="upload.isUploading"
-        :on-progress="handleFileUploadProgress"
-        :on-success="handleFileSuccess"
-        :auto-upload="false"
-        drag
-      >
+      <el-upload ref="upload" :limit="1" accept=".xlsx, .xls" :headers="upload.headers"
+        :action="upload.url + '?updateSupport=' + upload.updateSupport" :disabled="upload.isUploading"
+        :on-progress="handleFileUploadProgress" :on-success="handleFileSuccess" :auto-upload="false" drag>
         <i class="el-icon-upload"></i>
         <div class="el-upload__text">
           将文件拖到此处，或
@@ -253,6 +244,7 @@ import {CommonStatusEnum} from "@/utils/constants";
 import {DICT_TYPE, getDictDatas} from "@/utils/dict";
 import {assignUserRole, listUserRoles} from "@/api/system/permission";
 import {listSimpleRoles} from "@/api/system/role";
+import {getBaseHeader} from "@/utils/request";
 
 export default {
   name: "User",
@@ -306,9 +298,9 @@ export default {
         // 是否更新已经存在的用户数据
         updateSupport: 0,
         // 设置上传的请求头部
-        headers: { Authorization: "Bearer " + getToken() },
+        headers: getBaseHeader(),
         // 上传的地址
-        url: process.env.VUE_APP_BASE_API + '/api/' + "/system/user/import"
+        url: process.env.VUE_APP_BASE_API + '/admin-api/' + "/system/user/import"
       },
       // 查询参数
       queryParams: {
@@ -626,6 +618,10 @@ export default {
     },
     // 文件上传成功处理
     handleFileSuccess(response, file, fileList) {
+      if (response.code !== 0) {
+        this.msgError(response.msg)
+        return;
+      }
       this.upload.open = false;
       this.upload.isUploading = false;
       this.$refs.upload.clearFiles();

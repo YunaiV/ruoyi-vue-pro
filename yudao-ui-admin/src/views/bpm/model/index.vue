@@ -47,7 +47,7 @@
       </el-table-column>
       <el-table-column label="流程分类" align="center" prop="category" width="100">
         <template slot-scope="scope">
-          <span>{{ getDictDataLabel(DICT_TYPE.BPM_MODEL_CATEGORY, scope.row.category) }}</span>
+          <dict-tag :type="DICT_TYPE.BPM_MODEL_CATEGORY" :value="scope.row.category" />
         </template>
       </el-table-column>
       <el-table-column label="表单信息" align="center" prop="formType" width="200">
@@ -291,7 +291,7 @@ export default {
         // 设置上传的请求头部
         headers: getBaseHeader(),
         // 上传的地址
-        url: process.env.VUE_APP_BASE_API + '/api/' + "/bpm/model/import",
+        url: process.env.VUE_APP_BASE_API + '/admin-api/' + "/bpm/model/import",
         // 表单
         form: {},
         // 校验规则

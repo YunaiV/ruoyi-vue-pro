@@ -84,7 +84,7 @@
 
 <script>
 import { getLeavePage } from "@/api/bpm/leave"
-import { getDictDataLabel, getDictDatas, DICT_TYPE } from '@/utils/dict'
+import { getDictDatas, DICT_TYPE } from '@/utils/dict'
 import {cancelProcessInstance} from "@/api/bpm/processInstance";
 
 export default {
@@ -171,13 +171,7 @@ export default {
         this.getList();
         this.msgSuccess("取消成功");
       })
-    },
-    resultFormat(row, column) {
-      return getDictDataLabel(DICT_TYPE.BPM_PROCESS_INSTANCE_RESULT, row.result)
-    },
-    typeFormat(row, column) {
-      return getDictDataLabel(DICT_TYPE.BPM_OA_LEAVE_TYPE, row.type)
-    },
+    }
   }
 };
 </script>

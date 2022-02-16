@@ -12,7 +12,7 @@
         </el-table-column>
         <el-table-column label="流程分类" align="center" prop="category" width="100">
           <template slot-scope="scope">
-            <span>{{ getDictDataLabel(DICT_TYPE.BPM_MODEL_CATEGORY, scope.row.category) }}</span>
+            <dict-tag :type="DICT_TYPE.BPM_MODEL_CATEGORY" :value="scope.row.category" />
           </template>
         </el-table-column>
         <el-table-column label="流程版本" align="center" prop="processDefinition.version" width="80">
