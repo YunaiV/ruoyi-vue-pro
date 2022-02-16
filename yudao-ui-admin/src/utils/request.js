@@ -73,6 +73,7 @@ service.interceptors.response.use(res => {
           location.href = '/index';
         })
       }).catch(() => {});
+      return Promise.reject('error')
     } else if (code === 500) {
       Message({
         message: msg,
