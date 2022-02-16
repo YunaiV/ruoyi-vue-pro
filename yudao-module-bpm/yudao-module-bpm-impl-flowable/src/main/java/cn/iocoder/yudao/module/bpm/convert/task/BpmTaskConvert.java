@@ -53,6 +53,24 @@ public interface BpmTaskConvert {
                 SuspensionState.ACTIVE.getStateCode();
     }
 
+    default List<BpmTaskDonePageItemRespVO> convertList2(List<HistoricTaskInstance> tasks, Map<String, BpmTaskExtDO> bpmTaskExtDOMap,
+                                                         Map<String, HistoricProcessInstance> historicProcessInstanceMap,
+                                                         Map<Long, AdminUserRespDTO> userMap) {
+        return CollectionUtils.convertList(tasks, task -> {
+            BpmTaskDonePageItemRespVO respVO = convert2(task);
+            BpmTaskExtDO taskExtDO = bpmTaskExtDOMap.get(task.getId());
+            copyTo(taskExtDO, respVO);
+            HistoricProcessInstance processInstance = historicProcessInstanceMap.get(task.getProcessInstanceId());
+            if (processInstance != null) {
+                AdminUserRespDTO startUser = userMap.get(NumberUtils.parseLong(processInstance.getStartUserId()));
+                respVO.setProcessInstance(convert(processInstance, startUser));
+            }
+            return respVO;
+        });
+    }
+
+    BpmTaskDonePageItemRespVO convert2(HistoricTaskInstance bean);
+
     @Mappings({
             @Mapping(source = "processInstance.id", target = "id"),
             @Mapping(source = "processInstance.name", target = "name"),
@@ -110,6 +128,18 @@ public interface BpmTaskConvert {
                 .setProcessInstanceId(task.getProcessInstanceId());
         taskExtDO.setCreateTime(task.getCreateTime());
         return taskExtDO;
+    }
+
+    default BpmMessageSendWhenTaskCreatedReqDTO convert(ProcessInstance processInstance, AdminUserRespDTO startUser, Task task) {
+        BpmMessageSendWhenTaskCreatedReqDTO reqDTO = new BpmMessageSendWhenTaskCreatedReqDTO();
+        reqDTO.setProcessInstanceId(processInstance.getProcessInstanceId())
+                .setProcessInstanceName(processInstance.getName())
+                .setStartUserId(startUser.getId())
+                .setStartUserNickname(startUser.getNickname())
+                .setTaskId(task.getId())
+                .setTaskName(task.getName())
+                .setAssigneeUserId(NumberUtils.parseLong(task.getAssignee()));
+        return reqDTO;
     }
 }
 

@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.bpm.service.task;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.module.bpm.api.task.dto.BpmProcessInstanceCreateReqDTO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.*;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEntityEvent;
 import org.flowable.engine.delegate.event.FlowableCancelledEvent;
@@ -55,7 +56,6 @@ public interface BpmProcessInstanceService {
      */
     PageResult<BpmProcessInstancePageItemRespVO> getMyProcessInstancePage(Long userId,
                                                                           @Valid BpmProcessInstanceMyPageReqVO pageReqVO);
-
     /**
      * 创建流程实例（提供给前端）
      *
@@ -64,6 +64,15 @@ public interface BpmProcessInstanceService {
      * @return 实例的编号
      */
     String createProcessInstance(Long userId, @Valid BpmProcessInstanceCreateReqVO createReqVO);
+
+    /**
+     * 创建流程实例（提供给内部）
+     *
+     * @param userId 用户编号
+     * @param createReqDTO 创建信息
+     * @return 实例的编号
+     */
+    String createProcessInstance(Long userId, @Valid BpmProcessInstanceCreateReqDTO createReqDTO);
 
     /**
      * 获得流程实例 VO 信息
@@ -88,6 +97,24 @@ public interface BpmProcessInstanceService {
      * @return 历史的流程实例
      */
     HistoricProcessInstance getHistoricProcessInstance(String id);
+
+    /**
+     * 获得历史的流程实例列表
+     *
+     * @param ids 流程实例的编号集合
+     * @return 历史的流程实例列表
+     */
+    List<HistoricProcessInstance> getHistoricProcessInstances(Set<String> ids);
+
+    /**
+     * 获得历史的流程实例 Map
+     *
+     * @param ids 流程实例的编号集合
+     * @return 历史的流程实例列表 Map
+     */
+    default Map<String, HistoricProcessInstance> getHistoricProcessInstanceMap(Set<String> ids) {
+        return CollectionUtils.convertMap(getHistoricProcessInstances(ids), HistoricProcessInstance::getId);
+    }
 
     /**
      * 创建 ProcessInstance 拓展记录

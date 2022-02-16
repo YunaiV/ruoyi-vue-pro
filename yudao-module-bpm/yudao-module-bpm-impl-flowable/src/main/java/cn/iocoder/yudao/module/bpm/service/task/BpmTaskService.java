@@ -25,6 +25,14 @@ public interface BpmTaskService {
      * @return 流程任务分页
      */
     PageResult<BpmTaskTodoPageItemRespVO> getTodoTaskPage(Long userId, BpmTaskTodoPageReqVO pageReqVO);
+    /**
+     * 获得已办的流程任务分页
+     *
+     * @param userId 用户编号
+     * @param pageReqVO 分页请求
+     * @return 流程任务分页
+     */
+    PageResult<BpmTaskDonePageItemRespVO> getDoneTaskPage(Long userId, BpmTaskDonePageReqVO pageReqVO);
 
     /**
      * 获得流程任务 Map
@@ -70,6 +78,22 @@ public interface BpmTaskService {
     void rejectTask(Long userId, @Valid BpmTaskRejectReqVO reqVO);
 
     /**
+     * 将流程任务分配给指定用户
+     *
+     * @param userId 用户编号
+     * @param reqVO 分配请求
+     */
+    void updateTaskAssignee(Long userId, BpmTaskUpdateAssigneeReqVO reqVO);
+
+    /**
+     * 将流程任务分配给指定用户
+     *
+     * @param id 流程任务编号
+     * @param userId 用户编号
+     */
+    void updateTaskAssignee(String id, Long userId);
+
+    /**
      * 创建 Task 拓展记录
      *
      * @param task 任务实体
@@ -82,5 +106,12 @@ public interface BpmTaskService {
      * @param task 任务实体
      */
     void updateTaskExtComplete(Task task);
+
+    /**
+     * 更新 Task 拓展记录，并发送通知
+     *
+     * @param task 任务实体
+     */
+    void updateTaskExtAssign(Task task);
 
 }

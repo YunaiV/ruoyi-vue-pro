@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.bpm.api.task;
 
 import cn.iocoder.yudao.module.bpm.api.task.dto.BpmProcessInstanceCreateReqDTO;
+import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceService;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -14,11 +15,13 @@ import javax.validation.Valid;
  */
 @Service
 @Validated
-public class FlowableProcessInstanceApiImpl implements BpmProcessInstanceApi {
+public class BpmProcessInstanceApiImpl implements BpmProcessInstanceApi {
+
+    @Resource
+    private BpmProcessInstanceService processInstanceService;
 
     @Override
     public String createProcessInstance(Long userId, @Valid BpmProcessInstanceCreateReqDTO reqDTO) {
-        //TODO
-        return null;
+        return processInstanceService.createProcessInstance(userId, reqDTO);
     }
 }

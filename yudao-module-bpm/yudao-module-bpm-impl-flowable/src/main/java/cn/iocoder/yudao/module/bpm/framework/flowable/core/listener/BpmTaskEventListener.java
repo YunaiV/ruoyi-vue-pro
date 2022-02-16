@@ -44,4 +44,9 @@ public class BpmTaskEventListener extends AbstractFlowableEngineEventListener {
     protected void taskCompleted(FlowableEngineEntityEvent event) {
         taskService.updateTaskExtComplete((Task)event.getEntity());
     }
+
+    @Override
+    protected void taskAssigned(FlowableEngineEntityEvent event) {
+        taskService.updateTaskExtAssign((Task)event.getEntity());
+    }
 }

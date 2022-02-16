@@ -5,6 +5,7 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
+import cn.iocoder.yudao.module.bpm.api.task.dto.BpmProcessInstanceCreateReqDTO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.*;
 import cn.iocoder.yudao.module.bpm.convert.task.BpmProcessInstanceConvert;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmProcessDefinitionExtDO;
@@ -113,6 +114,14 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
     }
 
     @Override
+    public String createProcessInstance(Long userId, @Valid BpmProcessInstanceCreateReqDTO createReqDTO) {
+        // 获得流程定义
+        ProcessDefinition definition = processDefinitionService.getActiveProcessDefinition(createReqDTO.getProcessDefinitionKey());
+        // 发起流程
+        return createProcessInstance0(userId, definition, createReqDTO.getVariables(), createReqDTO.getBusinessKey());
+    }
+
+    @Override
     public BpmProcessInstanceRespVO getProcessInstanceVO(String id) {
         // 获得流程实例
         HistoricProcessInstance processInstance = getHistoricProcessInstance(id);
@@ -170,6 +179,11 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
     @Override
     public HistoricProcessInstance getHistoricProcessInstance(String id) {
         return historyService.createHistoricProcessInstanceQuery().processInstanceId(id).singleResult();
+    }
+
+    @Override
+    public List<HistoricProcessInstance> getHistoricProcessInstances(Set<String> ids) {
+        return historyService.createHistoricProcessInstanceQuery().processInstanceIds(ids).list();
     }
 
     @Override
