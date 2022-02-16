@@ -12,7 +12,7 @@
     </template>
 
     <!-- 顶部菜单超出数量折叠 -->
-    <el-submenu index="more" v-if="topMenus.length > visibleNumber">
+    <el-submenu :style="{'--theme': theme}" index="more" v-if="topMenus.length > visibleNumber">
       <template slot="title">更多菜单</template>
       <template v-for="(item, index) in topMenus">
         <el-menu-item
@@ -169,25 +169,27 @@ export default {
 </script>
 
 <style lang="scss">
-.el-menu--horizontal > .el-menu-item {
+.topmenu-container.el-menu--horizontal > .el-menu-item {
   float: left;
-  height: 50px;
-  line-height: 50px;
-  margin: 0;
-  border-bottom: 3px solid transparent;
-  color: #999093;
-  padding: 0 5px;
-  margin: 0 10px;
+  height: 50px !important;
+  line-height: 50px !important;
+  color: #999093 !important;
+  padding: 0 5px !important;
+  margin: 0 10px !important;
 }
 
-.el-menu--horizontal > .el-menu-item.is-active {
-  border-bottom: 3px solid #{'var(--theme)'};
+.topmenu-container.el-menu--horizontal > .el-menu-item.is-active, .el-menu--horizontal > .el-submenu.is-active .el-submenu__title {
+  border-bottom: 2px solid #{'var(--theme)'} !important;
   color: #303133;
 }
 
 /* submenu item */
-.el-menu--horizontal > .el-submenu .el-submenu__title {
+.topmenu-container.el-menu--horizontal > .el-submenu .el-submenu__title {
+  float: left;
   height: 50px !important;
   line-height: 50px !important;
+  color: #999093 !important;
+  padding: 0 5px !important;
+  margin: 0 10px !important;
 }
 </style>
