@@ -4,7 +4,9 @@
       :action="uploadFileUrl"
       :before-upload="handleBeforeUpload"
       :file-list="fileList"
+      :limit="limit"
       :on-error="handleUploadError"
+      :on-exceed="handleExceed"
       :on-success="handleUploadSuccess"
       :show-file-list="false"
       :headers="headers"
@@ -44,6 +46,11 @@ export default {
   props: {
     // 值
     value: [String, Object, Array],
+    // 数量限制
+    limit: {
+      type: Number,
+      default: 5,
+    },
     // 大小限制(MB)
     fileSize: {
       type: Number,
@@ -128,6 +135,10 @@ export default {
         }
       }
       return true;
+    },
+    // 文件个数超出
+    handleExceed() {
+      this.$message.error(`上传文件数量不能超过 ${this.limit} 个!`);
     },
     // 上传失败
     handleUploadError(err) {
