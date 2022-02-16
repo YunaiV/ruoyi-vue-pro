@@ -27,6 +27,7 @@ public interface PayClientConfig {
      */
     Set<ConstraintViolation<PayClientConfig>> verifyParam(Validator validator);
 
+    // TODO @aquan：貌似抽象一个 validation group 就好了！
     /**
      * 参数校验
      *

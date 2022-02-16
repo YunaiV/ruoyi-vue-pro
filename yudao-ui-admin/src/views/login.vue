@@ -17,7 +17,7 @@
           <svg-icon slot="prefix" icon-class="password" class="el-input__icon input-icon" />
         </el-input>
       </el-form-item>
-      <el-form-item prop="code">
+      <el-form-item prop="code" v-if="captchaEnable">
         <el-input v-model="loginForm.code" auto-complete="off" placeholder="验证码" style="width: 63%" @keyup.enter.native="handleLogin">
           <svg-icon slot="prefix" icon-class="validCode" class="el-input__icon input-icon" />
         </el-input>
@@ -61,6 +61,7 @@ export default {
   data() {
     return {
       codeUrl: "",
+      captchaEnable: true,
       loginForm: {
         username: "admin",
         password: "admin123",
@@ -119,10 +120,18 @@ export default {
   },
   methods: {
     getCode() {
+      // 只有开启的状态，才加载验证码。默认开启
+      if (!this.captchaEnable) {
+        return;
+      }
+      // 请求远程，获得验证码
       getCodeImg().then(res => {
         res = res.data;
-        this.codeUrl = "data:image/gif;base64," + res.img;
-        this.loginForm.uuid = res.uuid;
+        this.captchaEnable = res.enable;
+        if (this.captchaEnable) {
+          this.codeUrl = "data:image/gif;base64," + res.img;
+          this.loginForm.uuid = res.uuid;
+        }
       });
     },
     getCookie() {

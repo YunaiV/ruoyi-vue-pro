@@ -29,12 +29,17 @@ public class AuthLoginReqVO {
     @Length(min = 4, max = 16, message = "密码长度为 4-16 位")
     private String password;
 
-    @ApiModelProperty(value = "验证码", required = true, example = "1024")
-    @NotEmpty(message = "验证码不能为空")
+    @ApiModelProperty(value = "验证码", required = true, example = "1024", notes = "验证码开启时，需要传递")
+    @NotEmpty(message = "验证码不能为空", groups = CodeEnableGroup.class)
     private String code;
 
-    @ApiModelProperty(value = "验证码的唯一标识", required = true, example = "9b2ffbc1-7425-4155-9894-9d5c08541d62")
-    @NotEmpty(message = "唯一标识不能为空")
+    @ApiModelProperty(value = "验证码的唯一标识", required = true, example = "9b2ffbc1-7425-4155-9894-9d5c08541d62", notes = "验证码开启时，需要传递")
+    @NotEmpty(message = "唯一标识不能为空", groups = CodeEnableGroup.class)
     private String uuid;
+
+    /**
+     * 开启验证码的 Group
+     */
+    public interface CodeEnableGroup {}
 
 }

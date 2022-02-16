@@ -4,8 +4,10 @@ import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.util.monitor.TracerUtils;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
+import cn.iocoder.yudao.framework.common.util.validation.ValidationUtils;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.security.core.authentication.MultiUsernamePasswordAuthenticationToken;
+import cn.iocoder.yudao.module.system.api.logger.dto.LoginLogCreateReqDTO;
 import cn.iocoder.yudao.module.system.controller.admin.auth.vo.auth.AuthLoginReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.auth.vo.auth.AuthSocialBindReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.auth.vo.auth.AuthSocialLogin2ReqVO;
@@ -16,7 +18,6 @@ import cn.iocoder.yudao.module.system.enums.logger.LoginLogTypeEnum;
 import cn.iocoder.yudao.module.system.enums.logger.LoginResultEnum;
 import cn.iocoder.yudao.module.system.service.common.CaptchaService;
 import cn.iocoder.yudao.module.system.service.logger.LoginLogService;
-import cn.iocoder.yudao.module.system.api.logger.dto.LoginLogCreateReqDTO;
 import cn.iocoder.yudao.module.system.service.permission.PermissionService;
 import cn.iocoder.yudao.module.system.service.social.SocialUserService;
 import cn.iocoder.yudao.module.system.service.user.AdminUserService;
@@ -35,6 +36,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import javax.annotation.Resource;
+import javax.validation.Validator;
 import java.util.Objects;
 import java.util.Set;
 
@@ -69,6 +71,9 @@ public class AdminAuthServiceImpl implements AdminAuthService {
     @Resource
     private SocialUserService socialUserService;
 
+    @Resource
+    private Validator validator;
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         // 获取 username 对应的 AdminUserDO
@@ -96,7 +101,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
     @Override
     public String login(AuthLoginReqVO reqVO, String userIp, String userAgent) {
         // 判断验证码是否正确
-        this.verifyCaptcha(reqVO.getUsername(), reqVO.getUuid(), reqVO.getCode());
+        this.verifyCaptcha(reqVO);
 
         // 使用账号密码，进行登录
         LoginUser loginUser = this.login0(reqVO.getUsername(), reqVO.getPassword());
@@ -105,27 +110,29 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         return userSessionService.createUserSession(loginUser, userIp, userAgent);
     }
 
-    private void verifyCaptcha(String username, String captchaUUID, String captchaCode) {
+    private void verifyCaptcha(AuthLoginReqVO reqVO) {
         // 如果验证码关闭，则不进行校验
         if (!captchaService.isCaptchaEnable()) {
             return;
         }
+        // 校验验证码
+        ValidationUtils.validate(validator, reqVO, AuthLoginReqVO.CodeEnableGroup.class);
         // 验证码不存在
         final LoginLogTypeEnum logTypeEnum = LoginLogTypeEnum.LOGIN_USERNAME;
-        String code = captchaService.getCaptchaCode(captchaUUID);
+        String code = captchaService.getCaptchaCode(reqVO.getUuid());
         if (code == null) {
             // 创建登录失败日志（验证码不存在）
-            this.createLoginLog(username, logTypeEnum, LoginResultEnum.CAPTCHA_NOT_FOUND);
+            this.createLoginLog(reqVO.getUsername(), logTypeEnum, LoginResultEnum.CAPTCHA_NOT_FOUND);
             throw exception(AUTH_LOGIN_CAPTCHA_NOT_FOUND);
         }
         // 验证码不正确
-        if (!code.equals(captchaCode)) {
+        if (!code.equals(reqVO.getCode())) {
             // 创建登录失败日志（验证码不正确)
-            this.createLoginLog(username, logTypeEnum, LoginResultEnum.CAPTCHA_CODE_ERROR);
+            this.createLoginLog(reqVO.getUsername(), logTypeEnum, LoginResultEnum.CAPTCHA_CODE_ERROR);
             throw exception(AUTH_LOGIN_CAPTCHA_CODE_ERROR);
         }
         // 正确，所以要删除下验证码
-        captchaService.deleteCaptchaCode(captchaUUID);
+        captchaService.deleteCaptchaCode(reqVO.getUuid());
     }
 
     private LoginUser login0(String username, String password) {
