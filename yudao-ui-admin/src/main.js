@@ -10,7 +10,7 @@ import '@/assets/styles/ruoyi.scss' // ruoyi css
 import App from './App'
 import store from './store'
 import router from './router'
-import permission from './directive/permission'
+import directive from './directive' // directive
 
 import './assets/icons' // icon
 import './permission' // permission control
@@ -79,7 +79,7 @@ import DictTag from '@/components/DictTag'
 // 头部标签插件
 import VueMeta from 'vue-meta'
 
-Vue.use(permission)
+Vue.use(directive)
 Vue.use(VueMeta)
 // Vue.use(hljs.vuePlugin);
 

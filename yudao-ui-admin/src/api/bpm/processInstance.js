@@ -33,18 +33,3 @@ export function getProcessInstance(id) {
     method: 'get',
   })
 }
-
-export class createProcessInstanceExt {
-}
-
-export class exportProcessInstanceExtExcel {
-}
-
-export class getProcessInstanceExtPage {
-}
-
-export class deleteProcessInstanceExt {
-}
-
-export class deleteProcessInstanceExt {
-}
