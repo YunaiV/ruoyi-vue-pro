@@ -116,7 +116,7 @@ export default {
   methods: {
     // 删除图片
     handleRemove(file, fileList) {
-      const findex = this.fileList.indexOf(file.name);
+      const findex = this.fileList.map(f => f.name).indexOf(file.name);
       this.fileList.splice(findex, 1);
       this.$emit("input", this.listToString(this.fileList));
     },
