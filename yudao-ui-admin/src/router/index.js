@@ -20,6 +20,7 @@ Vue.use(Router)
     title: 'title'               // 设置该路由在侧边栏和面包屑中展示的名字
     icon: 'svg-name'             // 设置该路由的图标，对应路径src/assets/icons/svg
     breadcrumb: false            // 如果设置为false，则不会在breadcrumb面包屑中显示
+    activeMenu: '/system/user'   // 当路由设置了该属性，则会高亮相对应的侧边栏。
   }
  */
 
@@ -87,7 +88,7 @@ export const constantRoutes = [
         path: 'type/data/:dictId(\\d+)',
         component: (resolve) => require(['@/views/system/dict/data'], resolve),
         name: 'Data',
-        meta: {title: '字典数据', icon: ''}
+        meta: {title: '字典数据', icon: '', activeMenu: '/system/dict'}
       }
     ]
   }, {
@@ -98,7 +99,7 @@ export const constantRoutes = [
         path: 'log',
         component: (resolve) => require(['@/views/infra/job/log'], resolve),
         name: 'JobLog',
-        meta: {title: '调度日志'}
+        meta: {title: '调度日志', activeMenu: '/infra/job'}
       }
     ]
   }, {
@@ -109,7 +110,7 @@ export const constantRoutes = [
         path: 'edit/:tableId(\\d+)',
         component: (resolve) => require(['@/views/tool/codegen/editTable'], resolve),
         name: 'GenEdit',
-        meta: {title: '修改生成配置'}
+        meta: {title: '修改生成配置', activeMenu: '/tool/codegen'}
       }
     ]
   }, {
@@ -121,12 +122,12 @@ export const constantRoutes = [
         path: 'oa/leave/create',
         component: (resolve) => require(['@/views/bpm/oa/leave/create'], resolve),
         name: '发起 OA 请假',
-        meta: {title: '发起 OA 请假', icon: 'form'}
+        meta: {title: '发起 OA 请假', icon: 'form', activeMenu: '/bpm/oa/leave'}
       }, {
         path: 'oa/leave/detail',
         component: (resolve) => require(['@/views/bpm/oa/leave/detail'], resolve),
         name: '查看 OA 请假',
-        meta: {title: '查看 OA 请假', icon: 'view'}
+        meta: {title: '查看 OA 请假', icon: 'view', activeMenu: '/bpm/oa/leave'}
       }
     ]
   }, {
@@ -137,27 +138,27 @@ export const constantRoutes = [
         path: 'manager/form/edit',
         component: (resolve) => require(['@/views/bpm/form/formEditor'], resolve),
         name: '流程表单-编辑',
-        meta: {title: '流程表单-编辑'}
+        meta: {title: '流程表单-编辑', activeMenu: '/bpm/manager/form'}
       }, {
         path: 'manager/definition',
         component: (resolve) => require(['@/views/bpm/definition/index'], resolve),
         name: '流程定义',
-        meta: {title: '流程定义'}
+        meta: {title: '流程定义', activeMenu: '/bpm/manager/model'}
       }, {
         path: 'manager/model/design',
         component: (resolve) => require(['@/views/bpm/model/modelEditor'], resolve),
         name: '设计流程',
-        meta: {title: '设计流程'}
+        meta: {title: '设计流程', activeMenu: '/bpm/manager/model'}
       }, {
         path: 'process-instance/create',
         component: (resolve) => require(['@/views/bpm/processInstance/create'], resolve),
         name: '发起流程',
-        meta: {title: '发起流程'}
+        meta: {title: '发起流程', activeMenu: '/bpm/task/my'}
       }, {
         path: 'process-instance/detail',
         component: (resolve) => require(['@/views/bpm/processInstance/detail'], resolve),
         name: '流程详情',
-        meta: {title: '流程详情'}
+        meta: {title: '流程详情', activeMenu: '/bpm/task/my'}
       }
     ]
   }
