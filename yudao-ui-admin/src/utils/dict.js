@@ -95,6 +95,7 @@ export function getDictDatas2(dictType, values) {
       results.push(dict);
     }
   }
+  // debugger
   return results;
 }
 
@@ -119,3 +120,5 @@ export function getDictDataLabel(dictType, value) {
   return dict ? dict.label : '';
 }
 
+export class getDictDataL {
+}

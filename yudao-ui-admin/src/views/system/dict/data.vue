@@ -108,7 +108,7 @@ import { listData, getData, delData, addData, updateData, exportData } from "@/a
 import { listAllSimple, getType } from "@/api/system/dict/type";
 
 import { CommonStatusEnum } from '@/utils/constants'
-import { getDictDataLabel, getDictDatas, DICT_TYPE } from '@/utils/dict'
+import { getDictDatas, DICT_TYPE } from '@/utils/dict'
 
 export default {
   name: "Data",

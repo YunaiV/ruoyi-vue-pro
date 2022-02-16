@@ -45,7 +45,7 @@
       <el-table-column label="操作名" align="center" prop="name" width="180" />
       <el-table-column label="操作类型" align="center" prop="type">
         <template slot-scope="scope">
-          <span>{{ getDictDataLabel(DICT_TYPE.SYSTEM_OPERATE_TYPE, scope.row.type) }}</span>
+          <dict-tag :type="DICT_TYPE.SYSTEM_OPERATE_TYPE" :value="scope.row.type"/>
         </template>
       </el-table-column>
       <el-table-column label="操作人" align="center" prop="userNickname" />
@@ -72,13 +72,8 @@
       </el-table-column>
     </el-table>
 
-    <pagination
-      v-show="total>0"
-      :total="total"
-      :page.sync="queryParams.pageNo"
-      :limit.sync="queryParams.pageSize"
-      @pagination="getList"
-    />
+    <pagination v-show="total>0" :total="total" :page.sync="queryParams.pageNo" :limit.sync="queryParams.pageSize"
+                @pagination="getList" />
 
     <!-- 操作日志详细 -->
     <el-dialog title="访问日志详细" :visible.sync="open" width="700px" append-to-body>
@@ -95,7 +90,8 @@
           </el-col>
           <el-col :span="24">
             <el-form-item label="操作信息：">
-              {{ form.module }} | {{ form.name }} | {{ getDictDataLabel(DICT_TYPE.SYSTEM_OPERATE_TYPE, form.type) }}
+              {{ form.module }} | {{ form.name }}
+              <dict-tag :type="DICT_TYPE.SYSTEM_OPERATE_TYPE" :value="form.type"/>
               <br /> {{ form.content }}
               <br /> {{ form.exts }}
             </el-form-item>
@@ -183,14 +179,6 @@ export default {
           this.loading = false;
         }
       );
-    },
-    // 操作日志状态字典翻译
-    statusFormat(row, column) {
-      return this.selectDictLabel(this.statusOptions, row.status);
-    },
-    // 操作日志类型字典翻译
-    typeFormat(row, column) {
-      return this.selectDictLabel(this.typeOptions, row.businessType);
     },
     /** 搜索按钮操作 */
     handleQuery() {

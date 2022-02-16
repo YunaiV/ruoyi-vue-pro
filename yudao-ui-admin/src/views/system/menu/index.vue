@@ -34,7 +34,11 @@
       <el-table-column prop="sort" label="排序" width="60"></el-table-column>
       <el-table-column prop="permission" label="权限标识" :show-overflow-tooltip="true"></el-table-column>
       <el-table-column prop="component" label="组件路径" :show-overflow-tooltip="true"></el-table-column>
-      <el-table-column prop="status" label="状态" :formatter="statusFormat" width="80"></el-table-column>
+      <el-table-column prop="status" label="状态" width="80">
+        <template slot-scope="scope">
+          <dict-tag :type="DICT_TYPE.COMMON_STATUS" :value="scope.row.status"/>
+        </template>
+      </el-table-column>
       <el-table-column label="创建时间" align="center" prop="createTime">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
@@ -132,7 +136,7 @@ import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 import IconSelect from "@/components/IconSelect";
 
 import { SystemMenuTypeEnum, CommonStatusEnum } from '@/utils/constants'
-import { getDictDataLabel, getDictDatas, DICT_TYPE } from '@/utils/dict'
+import { getDictDatas, DICT_TYPE } from '@/utils/dict'
 
 export default {
   name: "Menu",
@@ -217,10 +221,6 @@ export default {
         menu.children = this.handleTree(response.data, "id");
         this.menuOptions.push(menu);
       });
-    },
-    // 菜单状态字典翻译
-    statusFormat(row, column) {
-      return getDictDataLabel(DICT_TYPE.COMMON_STATUS, row.status)
     },
     // 取消按钮
     cancel() {

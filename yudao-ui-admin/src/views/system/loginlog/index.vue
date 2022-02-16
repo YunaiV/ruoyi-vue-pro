@@ -37,7 +37,7 @@
       <el-table-column label="访问编号" align="center" prop="id" />
       <el-table-column label="日志类型" align="center" prop="logType">
         <template slot-scope="scope">
-          <span>{{ getDictDataLabel(DICT_TYPE.SYSTEM_LOGIN_TYPE, scope.row.logType) }}</span>
+          <dict-tag :type="DICT_TYPE.SYSTEM_LOGIN_TYPE" :value="scope.row.logType" />
         </template>
       </el-table-column>
       <el-table-column label="用户名称" align="center" prop="username" />
@@ -45,8 +45,7 @@
       <el-table-column label="userAgent" align="center" prop="userAgent" width="400" :show-overflow-tooltip="true" />
       <el-table-column label="结果" align="center" prop="status">
         <template slot-scope="scope">
-          <span v-if="scope.row.result === 0">成功</span>
-          <span v-if="scope.row.result > 0">失败：{{ getDictDataLabel(DICT_TYPE.SYSTEM_LOGIN_RESULT, scope.row.result) }} </span>
+          <dict-tag :type="DICT_TYPE.SYSTEM_LOGIN_RESULT" :value="scope.row.result" />
         </template>
       </el-table-column>
       <el-table-column label="登录日期" align="center" prop="loginTime" width="180">
@@ -108,10 +107,6 @@ export default {
           this.loading = false;
         }
       );
-    },
-    // 登录状态字典翻译
-    statusFormat(row, column) {
-      return this.selectDictLabel(this.statusOptions, row.status);
     },
     /** 搜索按钮操作 */
     handleQuery() {

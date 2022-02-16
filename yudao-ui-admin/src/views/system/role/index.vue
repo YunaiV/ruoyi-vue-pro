@@ -40,7 +40,11 @@
       <el-table-column label="角色编号" prop="id" width="120" />
       <el-table-column label="角色名称" prop="name" :show-overflow-tooltip="true" width="150" />
       <el-table-column label="角色标识" prop="code" :show-overflow-tooltip="true" width="150" />
-      <el-table-column label="角色类型" prop="type" :formatter="typeFormat" width="80"></el-table-column>
+      <el-table-column label="角色类型" prop="type" width="80">
+        <template slot-scope="scope">
+          <dict-tag :type="DICT_TYPE.SYSTEM_ROLE_TYPE" :value="scope.row.type"/>
+        </template>
+      </el-table-column>
       <el-table-column label="显示顺序" prop="sort" width="100" />
       <el-table-column label="状态" align="center" width="100">
         <template slot-scope="scope">
@@ -180,7 +184,7 @@ import {listSimpleMenus} from "@/api/system/menu";
 import {assignRoleMenu, listRoleMenus, assignRoleDataScope} from "@/api/system/permission";
 import {listSimpleDepts} from "@/api/system/dept";
 import {CommonStatusEnum, SystemDataScopeEnum} from "@/utils/constants";
-import {DICT_TYPE, getDictDataLabel, getDictDatas} from "@/utils/dict";
+import {DICT_TYPE, getDictDatas} from "@/utils/dict";
 
 export default {
   name: "Role",
@@ -286,10 +290,6 @@ export default {
           row.status = row.status === CommonStatusEnum.ENABLE ? CommonStatusEnum.DISABLE
               : CommonStatusEnum.ENABLE;
         });
-    },
-    // 角色类型字典翻译
-    typeFormat(row, column) {
-      return getDictDataLabel(DICT_TYPE.SYSTEM_ROLE_TYPE, row.type)
     },
     // 取消按钮
     cancel() {

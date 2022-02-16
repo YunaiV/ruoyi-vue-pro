@@ -4,7 +4,9 @@
       <el-form ref="form" :model="form" :rules="rules" label-width="100px">
         <el-form-item label="开始时间：" prop="startTime"> {{parseTime(form.startTime, '{y}-{m}-{d}')}} </el-form-item>
         <el-form-item label="结束时间：" prop="endTime"> {{parseTime(form.endTime, '{y}-{m}-{d}')}} </el-form-item>
-        <el-form-item label="请假类型：" prop="type">{{ typeFormat(form) }}</el-form-item>
+        <el-form-item label="请假类型：" prop="type">
+          <dict-tag :type="DICT_TYPE.BPM_OA_LEAVE_TYPE" :value="form.type"/>
+        </el-form-item>
         <el-form-item label="原因：" prop="reason"> {{ form.reason }}</el-form-item>
       </el-form>
   </div>
@@ -12,7 +14,7 @@
 
 <script>
 import { getLeave}  from "@/api/bpm/leave"
-import {getDictDatas, DICT_TYPE, getDictDataLabel} from '@/utils/dict'
+import {getDictDatas, DICT_TYPE} from '@/utils/dict'
 export default {
   name: "LeaveDetail",
   components: {
@@ -46,9 +48,6 @@ export default {
         this.form = response.data;
       });
     },
-    typeFormat(row) {
-      return getDictDataLabel(DICT_TYPE.BPM_OA_LEAVE_TYPE, row.type)
-    }
   }
 };
 </script>

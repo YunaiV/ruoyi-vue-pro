@@ -35,7 +35,11 @@
       <el-table-column label="岗位编码" align="center" prop="code" />
       <el-table-column label="岗位名称" align="center" prop="name" />
       <el-table-column label="岗位排序" align="center" prop="sort" />
-      <el-table-column label="状态" align="center" prop="status" :formatter="statusFormat" />
+      <el-table-column label="状态" align="center" prop="status">
+        <template slot-scope="scope">
+          <dict-tag :type="DICT_TYPE.COMMON_STATUS" :value="scope.row.status"/>
+        </template>
+      </el-table-column>
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
@@ -88,7 +92,7 @@
 import { listPost, getPost, delPost, addPost, updatePost, exportPost } from "@/api/system/post";
 
 import {CommonStatusEnum} from '@/utils/constants'
-import { getDictDataLabel, getDictDatas, DICT_TYPE } from '@/utils/dict'
+import { getDictDatas, DICT_TYPE } from '@/utils/dict'
 
 export default {
   name: "Post",
@@ -151,10 +155,6 @@ export default {
         this.total = response.data.total;
         this.loading = false;
       });
-    },
-    // 岗位状态字典翻译
-    statusFormat(row, column) {
-      return getDictDataLabel(DICT_TYPE.COMMON_STATUS, row.status)
     },
     // 取消按钮
     cancel() {

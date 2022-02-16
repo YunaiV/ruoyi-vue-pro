@@ -24,20 +24,7 @@
       <el-table-column label="流程发起人" align="center" prop="processInstance.startUserNickname" width="120" />
       <el-table-column label="结果" align="center" prop="result">
         <template slot-scope="scope">
-          <span>
-            <el-tag type="primary" v-if="scope.row.result === 1"> <!-- 进行中 -->
-              {{ getDictDataLabel(DICT_TYPE.BPM_PROCESS_INSTANCE_RESULT, scope.row.result) }}
-            </el-tag>
-             <el-tag type="success" v-if="scope.row.result === 2"> <!-- 通过 -->
-              {{ getDictDataLabel(DICT_TYPE.BPM_PROCESS_INSTANCE_RESULT, scope.row.result) }}
-            </el-tag>
-             <el-tag type="danger" v-if="scope.row.result === 3"> <!-- 不通过 -->
-              {{ getDictDataLabel(DICT_TYPE.BPM_PROCESS_INSTANCE_RESULT, scope.row.result) }}
-            </el-tag>
-             <el-tag type="info" v-if="scope.row.result === 4"> <!-- 撤回 -->
-              {{ getDictDataLabel(DICT_TYPE.BPM_PROCESS_INSTANCE_RESULT, scope.row.result) }}
-            </el-tag>
-          </span>
+          <dict-tag :type="DICT_TYPE.COMMON_STATUS" :value="scope.row.result"/>
         </template>
       </el-table-column>
       <el-table-column label="审批意见" align="center" prop="comment" width="200" />

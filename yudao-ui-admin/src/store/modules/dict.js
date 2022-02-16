@@ -33,7 +33,9 @@ const actions = {
         // 处理 dictValue 层级
         dictDataMap[dictData.dictType].push({
           value: dictData.value,
-          label: dictData.label
+          label: dictData.label,
+          colorType: dictData.colorType,
+          cssClass: dictData.cssClass,
         })
       })
       // 存储到 Store 中

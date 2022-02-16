@@ -39,7 +39,11 @@
     <!-- 列表 -->
     <el-table v-loading="loading" :data="list">
       <el-table-column label="申请编号" align="center" prop="id" />
-      <el-table-column label="状态" align="center" prop="result" :formatter="resultFormat" />
+      <el-table-column label="状态" align="center" prop="result">
+        <template slot-scope="scope">
+          <dict-tag :type="DICT_TYPE.BPM_PROCESS_INSTANCE_RESULT" :value="scope.row.result"/>
+        </template>
+      </el-table-column>
       <el-table-column label="开始时间" align="center" prop="startTime" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.startTime) }}</span>
@@ -50,7 +54,11 @@
           <span>{{ parseTime(scope.row.endTime) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="请假类型" align="center" prop="type" :formatter="typeFormat" />
+      <el-table-column label="请假类型" align="center" prop="type">
+        <template slot-scope="scope">
+          <dict-tag :type="DICT_TYPE.BPM_OA_LEAVE_TYPE" :value="scope.row.type"/>
+        </template>
+      </el-table-column>
       <el-table-column label="原因" align="center" prop="reason" />
       <el-table-column label="申请时间" align="center" prop="applyTime" width="180">
         <template slot-scope="scope">

@@ -58,12 +58,12 @@
       <el-table-column label="模板内容" align="center" prop="content" width="300" />
       <el-table-column label="短信类型" align="center" prop="type">
         <template slot-scope="scope">
-          <span>{{ getDictDataLabel(DICT_TYPE.SYSTEM_SMS_TEMPLATE_TYPE, scope.row.type) }}</span>
+          <dict-tag :type="DICT_TYPE.SYSTEM_SMS_TEMPLATE_TYPE" :value="scope.row.type"/>
         </template>
       </el-table-column>
       <el-table-column label="开启状态" align="center" prop="status">
         <template slot-scope="scope">
-          <span>{{ getDictDataLabel(DICT_TYPE.COMMON_STATUS, scope.row.status) }}</span>
+          <dict-tag :type="DICT_TYPE.COMMON_STATUS" :value="scope.row.status"/>
         </template>
       </el-table-column>
       <el-table-column label="备注" align="center" prop="remark" />
@@ -71,7 +71,7 @@
       <el-table-column label="短信渠道" align="center" width="120">
         <template slot-scope="scope">
           <div>{{ formatChannelSignature(scope.row.channelId) }}</div>
-          <div>【{{ getDictDataLabel(DICT_TYPE.SYSTEM_SMS_CHANNEL_CODE, scope.row.channelCode) }}】</div>
+          <dict-tag :type="DICT_TYPE.SYSTEM_SMS_CHANNEL_CODE" :value="scope.row.channelCode"/>
         </template>
       </el-table-column>
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">

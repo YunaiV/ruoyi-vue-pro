@@ -25,9 +25,13 @@
     <el-table v-loading="loading" :data="deptList" row-key="id" default-expand-all
               :tree-props="{children: 'children', hasChildren: 'hasChildren'}">
       <el-table-column prop="name" label="部门名称" width="260"></el-table-column>
-      <el-table-column prop="status" label="负责人" :formatter="userNicknameFormat" width="120"/>
+      <el-table-column prop="leader" label="负责人" :formatter="userNicknameFormat" width="120"/>
       <el-table-column prop="sort" label="排序" width="200"></el-table-column>
-      <el-table-column prop="status" label="状态" :formatter="statusFormat" width="100"/>
+      <el-table-column prop="status" label="状态" width="100">
+        <template slot-scope="scope">
+          <dict-tag :type="DICT_TYPE.COMMON_STATUS" :value="scope.row.status"/>
+        </template>
+      </el-table-column>
       <el-table-column label="创建时间" align="center" prop="createTime" width="200">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
@@ -105,7 +109,7 @@ import Treeselect from "@riophae/vue-treeselect";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 
 import {CommonStatusEnum} from '@/utils/constants'
-import { getDictDataLabel, getDictDatas, DICT_TYPE } from '@/utils/dict'
+import { getDictDatas, DICT_TYPE } from '@/utils/dict'
 import {listSimpleUsers} from "@/api/system/user";
 
 export default {
@@ -198,10 +202,6 @@ export default {
         label: node.name,
         children: node.children
       };
-    },
-    // 字典状态字典翻译
-    statusFormat(row, column) {
-      return getDictDataLabel(DICT_TYPE.COMMON_STATUS, row.status)
     },
     // 用户昵称展示
     userNicknameFormat(row, column) {

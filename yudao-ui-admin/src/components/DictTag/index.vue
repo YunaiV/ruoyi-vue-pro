@@ -1,15 +1,15 @@
 <template>
-  <div>
+  <span>
     <template v-for="(dict, index) in this.getDictDatas2(type, value)">
       <!-- 默认样式 -->
-      <span v-if="dict.colorType === 'default' || dict.colorType === '' || dict.color === undefined" :key="dict.value" :index="index"
+      <span v-if="dict.colorType === 'default' || dict.colorType === '' || dict.colorType === undefined" :key="dict.value" :index="index"
             :class="dict.cssClass">{{ dict.label }}</span>
       <!-- Tag 样式 -->
       <el-tag v-else :key="dict.value" :index="index" :type="dict.colorType" :class="dict.cssClass">
         {{ dict.label }}
       </el-tag>
     </template>
-  </div>
+  </span>
 </template>
 
 <script>
