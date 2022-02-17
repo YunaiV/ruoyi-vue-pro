@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.bpm.framework.flowable.core.behavior;
 
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.behavior.script.BpmTaskAssignScript;
 import cn.iocoder.yudao.module.bpm.service.definition.BpmTaskAssignRuleService;
 import cn.iocoder.yudao.module.bpm.service.definition.BpmUserGroupService;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
@@ -12,6 +13,8 @@ import lombok.ToString;
 import org.flowable.bpmn.model.UserTask;
 import org.flowable.engine.impl.bpmn.behavior.UserTaskActivityBehavior;
 import org.flowable.engine.impl.bpmn.parser.factory.DefaultActivityBehaviorFactory;
+
+import java.util.List;
 
 /**
  * 自定义的 ActivityBehaviorFactory 实现类，目的如下：
@@ -35,6 +38,8 @@ public class BpmActivityBehaviorFactory extends DefaultActivityBehaviorFactory {
     private DeptApi deptApi;
     @Setter
     private AdminUserApi adminUserApi;
+    @Setter
+    private List<BpmTaskAssignScript> scripts;
 
     @Override
     public UserTaskActivityBehavior createUserTaskActivityBehavior(UserTask userTask) {
@@ -44,8 +49,7 @@ public class BpmActivityBehaviorFactory extends DefaultActivityBehaviorFactory {
         userTaskActivityBehavior.setDeptApi(deptApi);
         userTaskActivityBehavior.setUserGroupService(userGroupService);
         userTaskActivityBehavior.setAdminUserApi(adminUserApi);
-        //TODO
-        //userTaskActivityBehavior.setScripts(scripts);
+        userTaskActivityBehavior.setScripts(scripts);
         return userTaskActivityBehavior;
     }
 }

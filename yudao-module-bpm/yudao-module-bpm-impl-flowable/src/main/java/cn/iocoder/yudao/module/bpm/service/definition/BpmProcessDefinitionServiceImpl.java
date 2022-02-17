@@ -5,6 +5,7 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.PageUtils;
+import cn.iocoder.yudao.framework.flowable.core.util.FlowableUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.process.BpmProcessDefinitionListReqVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.process.BpmProcessDefinitionPageItemRespVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.process.BpmProcessDefinitionPageReqVO;
@@ -198,7 +199,7 @@ public class BpmProcessDefinitionServiceImpl implements BpmProcessDefinitionServ
         BpmnModel newModel = buildBpmnModel(createReqDTO.getBpmnBytes());
         BpmnModel oldModel = getBpmnModel(oldProcessDefinition.getId());
         //TODO  貌似 flowable 不修改这个也不同。需要看看。 sourceSystemId 不同
-        if (equals(oldModel, newModel)) {
+        if (FlowableUtils.equals(oldModel, newModel)) {
             return false;
         }
         // 最终发现都一致，则返回 true
@@ -216,19 +217,8 @@ public class BpmProcessDefinitionServiceImpl implements BpmProcessDefinitionServ
         BpmnXMLConverter converter = new BpmnXMLConverter();
         return converter.convertToBpmnModel(new BytesStreamSource(bpmnBytes), true, true);
     }
-    //TODO 移出去
-    public  boolean equals(BpmnModel oldModel, BpmnModel newModel) {
-        // 由于 BpmnModel 未提供 equals 方法，所以只能转成字节数组，进行比较
-        return Arrays.equals(getBpmnBytes(oldModel), getBpmnBytes(newModel));
-    }
-    //TODO 移出去
-    public  byte[] getBpmnBytes(BpmnModel model) {
-        if (model == null) {
-            return new byte[0];
-        }
-        BpmnXMLConverter converter = new BpmnXMLConverter();
-        return converter.convertToXML(model);
-    }
+
+
 
     @Override
     public BpmProcessDefinitionExtDO getProcessDefinitionExt(String id) {

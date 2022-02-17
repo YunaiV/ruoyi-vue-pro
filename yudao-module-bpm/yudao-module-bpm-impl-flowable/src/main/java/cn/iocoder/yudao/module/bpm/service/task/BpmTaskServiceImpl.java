@@ -25,6 +25,7 @@ import org.flowable.task.api.TaskQuery;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.api.history.HistoricTaskInstanceQuery;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
@@ -167,6 +168,7 @@ public class BpmTaskServiceImpl implements BpmTaskService{
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void approveTask(Long userId, @Valid BpmTaskApproveReqVO reqVO) {
         // 校验任务存在
         Task task = checkTask(userId, reqVO.getId());
@@ -184,6 +186,7 @@ public class BpmTaskServiceImpl implements BpmTaskService{
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void rejectTask(Long userId, @Valid BpmTaskRejectReqVO reqVO) {
         Task task = checkTask(userId, reqVO.getId());
         // 校验流程实例存在
@@ -234,16 +237,15 @@ public class BpmTaskServiceImpl implements BpmTaskService{
                 .setAssigneeUserId(NumberUtils.parseLong(task.getAssignee()))
                 .setTaskId(task.getId());
         taskExtMapper.updateByTaskId(taskExtDO);
-        //TODO  创建任务时候 也会调用 updateTaskExtAssign， processInstance 名称为空 校验不通过
         // 发送通知。在事务提交时，批量执行操作，所以直接查询会无法查询到 ProcessInstance，所以这里是通过监听事务的提交来实现。
-//        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
-//            @Override
-//            public void afterCommit() {
-//                ProcessInstance processInstance = processInstanceService.getProcessInstance(task.getProcessInstanceId());
-//                AdminUserRespDTO startUser = adminUserApi.getUser(Long.valueOf(processInstance.getStartUserId()));
-//                messageService.sendMessageWhenTaskAssigned(BpmTaskConvert.INSTANCE.convert(processInstance, startUser, task));
-//            }
-//        });
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+                ProcessInstance processInstance = processInstanceService.getProcessInstance(task.getProcessInstanceId());
+                AdminUserRespDTO startUser = adminUserApi.getUser(Long.valueOf(processInstance.getStartUserId()));
+                messageService.sendMessageWhenTaskAssigned(BpmTaskConvert.INSTANCE.convert(processInstance, startUser, task));
+            }
+        });
     }
 
     /**

@@ -7,6 +7,7 @@ import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmTaskAssignRuleDO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmUserGroupDO;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmTaskAssignRuleTypeEnum;
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.behavior.script.BpmTaskAssignScript;
 import cn.iocoder.yudao.module.bpm.service.definition.BpmTaskAssignRuleService;
 import cn.iocoder.yudao.module.bpm.service.definition.BpmUserGroupService;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
@@ -30,8 +31,10 @@ import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString;
+import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.TASK_ASSIGN_SCRIPT_NOT_EXISTS;
 import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.TASK_CREATE_FAIL_NO_CANDIDATE_USER;
 
 /**
@@ -56,8 +59,16 @@ public class BpmUserTaskActivityBehavior extends UserTaskActivityBehavior {
     @Setter
     private PermissionApi permissionApi;
 
+    /**
+     * 任务分配脚本
+     */
+    private Map<Long, BpmTaskAssignScript> scriptMap = Collections.emptyMap();
+
     public BpmUserTaskActivityBehavior(UserTask userTask) {
         super(userTask);
+    }
+    public void setScripts(List<BpmTaskAssignScript> scripts) {
+        this.scriptMap = convertMap(scripts, script -> script.getEnum().getId());
     }
 
     @Override
@@ -100,10 +111,9 @@ public class BpmUserTaskActivityBehavior extends UserTaskActivityBehavior {
             assigneeUserIds = calculateTaskCandidateUsersByUser(task, rule);
         } else if (Objects.equals(BpmTaskAssignRuleTypeEnum.USER_GROUP.getType(), rule.getType())) {
             assigneeUserIds = calculateTaskCandidateUsersByUserGroup(task, rule);
+        } else if (Objects.equals(BpmTaskAssignRuleTypeEnum.SCRIPT.getType(), rule.getType())) {
+            assigneeUserIds = calculateTaskCandidateUsersByScript(task, rule);
         }
-//        else if (Objects.equals(BpmTaskAssignRuleTypeEnum.SCRIPT.getType(), rule.getType())) {
-//            assigneeUserIds = calculateTaskCandidateUsersByScript(task, rule);
-//        }
 
         // 移除被禁用的用户
         removeDisableUsers(assigneeUserIds);
@@ -143,6 +153,22 @@ public class BpmUserTaskActivityBehavior extends UserTaskActivityBehavior {
         List<BpmUserGroupDO> userGroups = userGroupService.getUserGroupList(rule.getOptions());
         Set<Long> userIds = new HashSet<>();
         userGroups.forEach(group -> userIds.addAll(group.getMemberUserIds()));
+        return userIds;
+    }
+
+    private Set<Long> calculateTaskCandidateUsersByScript(TaskEntity task, BpmTaskAssignRuleDO rule) {
+        // 获得对应的脚本
+        List<BpmTaskAssignScript> scripts = new ArrayList<>(rule.getOptions().size());
+        rule.getOptions().forEach(id -> {
+            BpmTaskAssignScript script = scriptMap.get(id);
+            if (script == null) {
+                throw exception(TASK_ASSIGN_SCRIPT_NOT_EXISTS, id);
+            }
+            scripts.add(script);
+        });
+        // 逐个计算任务
+        Set<Long> userIds = new HashSet<>();
+        scripts.forEach(script -> CollUtil.addAll(userIds, script.calculateTaskCandidateUsers(task)));
         return userIds;
     }
 

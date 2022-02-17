@@ -5,6 +5,7 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
+import cn.iocoder.yudao.framework.flowable.core.util.FlowableUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.rule.BpmTaskAssignRuleCreateReqVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.rule.BpmTaskAssignRuleRespVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.rule.BpmTaskAssignRuleUpdateReqVO;
@@ -87,35 +88,13 @@ public class BpmTaskAssignRuleServiceImpl implements BpmTaskAssignRuleService{
         if (model == null) {
             return Collections.emptyList();
         }
-
         // 获得用户任务，只有用户任务才可以设置分配规则
-        List<UserTask> userTasks = getBpmnModelElements(model, UserTask.class);
+        List<UserTask> userTasks = FlowableUtils.getBpmnModelElements(model, UserTask.class);
         if (CollUtil.isEmpty(userTasks)) {
             return Collections.emptyList();
         }
-
         // 转换数据
         return BpmTaskAssignRuleConvert.INSTANCE.convertList(userTasks, rules);
-    }
-
-    /**
-     * TODO 需要移出去
-     * 获得 BPMN 流程中，指定的元素们
-     *
-     * @param model
-     * @param clazz 指定元素。例如说，{@link org.flowable.bpmn.model.UserTask}、{@link org.flowable.bpmn.model.Gateway} 等等
-     * @return 元素们
-     */
-    public static <T extends FlowElement> List<T> getBpmnModelElements(BpmnModel model, Class<T> clazz) {
-        List<T> result = new ArrayList<>();
-        model.getProcesses().forEach(process -> {
-            process.getFlowElements().forEach(flowElement -> {
-                if (flowElement.getClass().isAssignableFrom(clazz)) {
-                    result.add((T) flowElement);
-                }
-            });
-        });
-        return result;
     }
 
     @Override

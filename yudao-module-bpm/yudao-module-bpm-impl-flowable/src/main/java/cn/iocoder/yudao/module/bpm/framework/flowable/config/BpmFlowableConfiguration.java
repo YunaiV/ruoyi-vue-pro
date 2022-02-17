@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.bpm.framework.flowable.config;
 
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.behavior.BpmActivityBehaviorFactory;
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.behavior.script.BpmTaskAssignScript;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.listener.BpmProcessInstanceEventListener;
 import cn.iocoder.yudao.module.bpm.service.definition.BpmTaskAssignRuleService;
 import cn.iocoder.yudao.module.bpm.service.definition.BpmUserGroupService;
@@ -27,8 +28,9 @@ import java.util.List;
 public class BpmFlowableConfiguration {
 
     /**
-     * 将自定义 listener 加入全局listener
+     * Flowable engines 自定义的配置
      * @param  listeners 自定义 listener
+     * @param  bpmActivityBehaviorFactory 自定义的 ActivityBehaviorFactory 实现
      */
     @Bean
     public EngineConfigurationConfigurer<SpringProcessEngineConfiguration> addCustomerListenerConfigurer (ObjectProvider<FlowableEventListener> listeners,
@@ -51,14 +53,15 @@ public class BpmFlowableConfiguration {
                                                                  BpmUserGroupService userGroupService,
                                                                  PermissionApi permissionApi,
                                                                  DeptApi deptApi,
-                                                                 AdminUserApi adminUserApi) {
+                                                                 AdminUserApi adminUserApi,
+                                                                 List<BpmTaskAssignScript> scripts) {
         BpmActivityBehaviorFactory bpmActivityBehaviorFactory = new BpmActivityBehaviorFactory();
         bpmActivityBehaviorFactory.setBpmTaskRuleService(taskRuleService);
         bpmActivityBehaviorFactory.setUserGroupService(userGroupService);
         bpmActivityBehaviorFactory.setAdminUserApi(adminUserApi);
         bpmActivityBehaviorFactory.setPermissionApi(permissionApi);
         bpmActivityBehaviorFactory.setDeptApi(deptApi);
-//        bpmActivityBehaviorFactory.setScripts(scripts);
+        bpmActivityBehaviorFactory.setScripts(scripts);
         return bpmActivityBehaviorFactory;
     }
 }
