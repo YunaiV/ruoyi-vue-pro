@@ -31,13 +31,24 @@ export default {
       immediate: true
     },
     async theme(val) {
+      await this.setTheme(val)
+    }
+  },
+  created() {
+    if(this.defaultTheme !== ORIGINAL_THEME) {
+      this.setTheme(this.defaultTheme)
+    }
+  },
+
+  methods: {
+    async setTheme(val) {
       const oldVal = this.chalk ? this.theme : ORIGINAL_THEME
       if (typeof val !== 'string') return
       const themeCluster = this.getThemeCluster(val.replace('#', ''))
       const originalCluster = this.getThemeCluster(oldVal.replace('#', ''))
 
       const $message = this.$message({
-        message: '  Compiling the theme',
+        message: '  正在切换主题，请稍后...',
         customClass: 'theme-message',
         type: 'success',
         duration: 0,
@@ -82,10 +93,9 @@ export default {
       this.$emit('change', val)
 
       $message.close()
-    }
-  },
 
-  methods: {
+    },
+
     updateStyle(style, oldCluster, newCluster) {
       let newStyle = style
       oldCluster.forEach((color, index) => {
