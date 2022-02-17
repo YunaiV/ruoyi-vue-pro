@@ -4,6 +4,8 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.datapermission.core.annotation.DataPermission;
+import cn.iocoder.yudao.framework.datapermission.core.dept.rule.DeptDataPermissionRule;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmTaskAssignRuleDO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmUserGroupDO;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmTaskAssignRuleTypeEnum;
@@ -183,6 +185,7 @@ public class BpmUserTaskActivityBehavior extends UserTaskActivityBehavior {
         if (CollUtil.isEmpty(assigneeUserIds)) {
             return;
         }
+        //TODO 芋艿 这里有数据权限的问题。默认会加上数据权限 dept_id IN (deptId). 导致查询不到数据
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(assigneeUserIds);
         assigneeUserIds.removeIf(id -> {
             AdminUserRespDTO user = userMap.get(id);

@@ -27,6 +27,10 @@
             <artifactId>yudao-spring-boot-starter-flowable</artifactId>
         </dependency>
         <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-spring-boot-starter-biz-data-permission</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.flowable</groupId>
             <artifactId>flowable-spring-boot-starter-actuator</artifactId>
         </dependency>
