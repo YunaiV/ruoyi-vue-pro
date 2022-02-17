@@ -420,7 +420,7 @@ export function titleCase(str) {
 
 // 下划转驼峰
 export function camelCase(str) {
-  return str.replace(/-[a-z]/g, str1 => str1.substr(-1).toUpperCase())
+  return str.replace(/_[a-z]/g, str1 => str1.substr(-1).toUpperCase())
 }
 
 export function isNumberStr(str) {
