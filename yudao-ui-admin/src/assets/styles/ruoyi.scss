@@ -37,7 +37,7 @@
 .mb10 {
   margin-bottom: 10px;
 }
-.ml10 {
+.ml0 {
   margin-left: 10px;
 }
 .mt20 {
@@ -49,7 +49,7 @@
 .mb20 {
   margin-bottom: 20px;
 }
-.ml20 {
+.m20 {
   margin-left: 20px;
 }
 
@@ -64,7 +64,7 @@
   margin-top: 6vh !important;
 }
 
-.el-dialog__wrapper.scrollbar .el-dialog .el-dialog__body {
+.el-dialog .el-dialog__body {
   overflow: auto;
   overflow-x: hidden;
   max-height: 70vh;
@@ -137,7 +137,7 @@
 /** 表格更多操作下拉样式 */
 .el-table .el-dropdown-link {
   cursor: pointer;
-  color: #409EFF;
+  color: #1890ff;
   margin-left: 5px;
 }
 

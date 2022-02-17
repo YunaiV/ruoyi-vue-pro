@@ -90,7 +90,14 @@
           <el-input v-model="form.handlerParam" placeholder="请输入处理器的参数" />
         </el-form-item>
         <el-form-item label="CRON 表达式" prop="cronExpression">
-          <el-input v-model="form.cronExpression" placeholder="请输入CRON 表达式" />
+          <el-input v-model="form.cronExpression" placeholder="请输入CRON 表达式">
+            <template slot="append">
+              <el-button type="primary" @click="handleShowCron">
+                生成表达式
+                <i class="el-icon-time el-icon--right"></i>
+              </el-button>
+            </template>
+          </el-input>
         </el-form-item>
         <el-form-item label="重试次数" prop="retryCount">
           <el-input v-model="form.retryCount" placeholder="请输入重试次数。设置为 0 时，不进行重试" />
@@ -108,7 +115,11 @@
       </div>
     </el-dialog>
 
-    <!-- 任务日志详细 -->
+    <el-dialog title="Cron表达式生成器" :visible.sync="openCron" >
+      <crontab @hide="openCron=false" @fill="crontabFill" :expression="expression"></crontab>
+    </el-dialog>
+
+    <!-- 任务详细 -->
     <el-dialog title="任务详细" :visible.sync="openView" width="700px" append-to-body>
       <el-form ref="form" :model="form" label-width="200px" size="mini">
         <el-row>
@@ -132,15 +143,16 @@
         <el-button @click="openView = false">关 闭</el-button>
       </div>
     </el-dialog>
-
   </div>
 </template>
 
 <script>
 import { listJob, getJob, delJob, addJob, updateJob, exportJob, runJob, updateJobStatus, getJobNextTimes } from "@/api/infra/job";
 import { InfraJobStatusEnum } from "@/utils/constants";
+import Crontab from '@/components/Crontab'
 
 export default {
+  components: { Crontab },
   name: "Job",
   data() {
     return {
@@ -160,6 +172,10 @@ export default {
       open: false,
       // 是否显示详细弹出层
       openView: false,
+      // 是否显示Cron表达式弹出层
+      openCron: false,
+      // 传入的表达式
+      expression: "",
       // 状态字典
       statusOptions: [],
       // 查询参数
@@ -251,6 +267,15 @@ export default {
       getJobNextTimes(row.id).then(response => {
         this.nextTimes = response.data;
       });
+    },
+    /** cron表达式按钮操作 */
+    handleShowCron() {
+      this.expression = this.form.cronExpression;
+      this.openCron = true;
+    },
+    /** 确定后回传值 */
+    crontabFill(value) {
+      this.form.cronExpression = value;
     },
     /** 任务日志列表查询 */
     handleJobLog(row) {
