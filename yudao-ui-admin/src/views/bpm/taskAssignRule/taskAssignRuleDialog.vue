@@ -257,7 +257,7 @@ export default {
           if (!form.id) {
             form.modelId = this.modelId; // 模型编号
             createTaskAssignRule(form).then(response => {
-              this.msgSuccess("修改成功");
+              this.$modal.msgSuccess("修改成功");
               this.open = false;
               this.getList();
             });
@@ -265,7 +265,7 @@ export default {
           } else {
             form.taskDefinitionKey = undefined; // 无法修改
             updateTaskAssignRule(form).then(response => {
-              this.msgSuccess("修改成功");
+              this.$modal.msgSuccess("修改成功");
               this.open = false;
               this.getList();
             });

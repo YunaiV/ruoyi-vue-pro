@@ -202,11 +202,7 @@ export default {
       params.pageSize = undefined;
       this.addBeginAndEndTime(params, this.dateRangeBeginTime, 'beginTime');
       // 执行导出
-      this.$confirm('是否确认导出所有API 访问日志数据项?', "警告", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      }).then(() => {
+      this.$modal.confirm('是否确认导出所有API 访问日志数据项?').then(() => {
         this.exportLoading = true;
         return exportApiAccessLogExcel(params);
       }).then(response => {

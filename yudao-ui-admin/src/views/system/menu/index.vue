@@ -298,10 +298,10 @@ export default {
             if (path.indexOf('http://') === -1 || path.indexOf('https://') === -1) {
               // 父权限为根节点，path 必须以 / 开头
               if (this.form.parentId === 0 && path.charAt(0) !== '/') {
-                this.msgSuccess('前端必须以 / 开头')
+                this.$modal.msgSuccess('前端必须以 / 开头')
                 return
               } else if (this.form.parentId !== 0 && path.charAt(0) === '/') {
-                this.msgSuccess('前端不能以 / 开头')
+                this.$modal.msgSuccess('前端不能以 / 开头')
                 return
               }
             }
@@ -310,13 +310,13 @@ export default {
           // 提交
           if (this.form.id !== undefined) {
             updateMenu(this.form).then(response => {
-              this.msgSuccess("修改成功");
+              this.$modal.msgSuccess("修改成功");
               this.open = false;
               this.getList();
             });
           } else {
             addMenu(this.form).then(response => {
-              this.msgSuccess("新增成功");
+              this.$modal.msgSuccess("新增成功");
               this.open = false;
               this.getList();
             });
@@ -326,15 +326,11 @@ export default {
     },
     /** 删除按钮操作 */
     handleDelete(row) {
-      this.$confirm('是否确认删除名称为"' + row.name + '"的数据项?', "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(function() {
+      this.$modal.confirm('是否确认删除名称为"' + row.name + '"的数据项?').then(function() {
           return delMenu(row.id);
         }).then(() => {
           this.getList();
-          this.msgSuccess("删除成功");
+          this.$modal.msgSuccess("删除成功");
       }).catch(() => {});
     }
   }

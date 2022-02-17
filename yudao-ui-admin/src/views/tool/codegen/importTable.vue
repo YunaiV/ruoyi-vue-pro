@@ -96,7 +96,7 @@ export default {
     /** 导入按钮操作 */
     handleImportTable() {
       createCodegenListFromDB(this.tables.join(",")).then(res => {
-        this.msgSuccess("导入成功");
+        this.$modal.msgSuccess("导入成功");
         this.visible = false;
         this.$emit("ok");
       });

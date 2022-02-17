@@ -202,11 +202,7 @@ export default {
         this.dateRange[0] ? this.dateRange[0] + ' 00:00:00' : undefined,
         this.dateRange[1] ? this.dateRange[1] + ' 23:59:59' : undefined,
       ])
-      this.$confirm('是否确认导出所有操作日志数据项?', "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(() => {
+      this.$modal.confirm('是否确认导出所有操作日志数据项?').then(() => {
           this.exportLoading = true;
           return exportOperateLog(queryParams);
         }).then(response => {

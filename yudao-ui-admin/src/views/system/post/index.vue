@@ -205,13 +205,13 @@ export default {
         if (valid) {
           if (this.form.id !== undefined) {
             updatePost(this.form).then(response => {
-              this.msgSuccess("修改成功");
+              this.$modal.msgSuccess("修改成功");
               this.open = false;
               this.getList();
             });
           } else {
             addPost(this.form).then(response => {
-              this.msgSuccess("新增成功");
+              this.$modal.msgSuccess("新增成功");
               this.open = false;
               this.getList();
             });
@@ -222,25 +222,17 @@ export default {
     /** 删除按钮操作 */
     handleDelete(row) {
       const ids = row.id;
-      this.$confirm('是否确认删除岗位编号为"' + ids + '"的数据项?', "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(function() {
+      this.$modal.confirm('是否确认删除岗位编号为"' + ids + '"的数据项?').then(function() {
           return delPost(ids);
         }).then(() => {
           this.getList();
-          this.msgSuccess("删除成功");
+          this.$modal.msgSuccess("删除成功");
       }).catch(() => {});
     },
     /** 导出按钮操作 */
     handleExport() {
       const queryParams = this.queryParams;
-      this.$confirm('是否确认导出所有岗位数据项?', "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(() => {
+      this.$modal.confirm('是否确认导出所有岗位数据项?').then(() => {
           this.exportLoading = true;
           return exportPost(queryParams);
         }).then(response => {

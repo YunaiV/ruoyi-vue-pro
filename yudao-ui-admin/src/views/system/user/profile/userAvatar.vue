@@ -110,7 +110,7 @@ export default {
     // 上传预处理
     beforeUpload(file) {
       if (file.type.indexOf("image/") == -1) {
-        this.msgError("文件格式错误，请上传图片类型,如：JPG，PNG后缀的文件。");
+        this.$modal.msgError("文件格式错误，请上传图片类型,如：JPG，PNG后缀的文件。");
       } else {
         const reader = new FileReader();
         reader.readAsDataURL(file);
@@ -128,7 +128,7 @@ export default {
           this.open = false;
           // this.options.img = process.env.VUE_APP_BASE_API + response.imgUrl;
           store.commit('SET_AVATAR', resp.data);
-          this.msgSuccess("修改成功");
+          this.$modal.msgSuccess("修改成功");
           this.visible = false;
         });
       });

@@ -298,7 +298,7 @@ export default {
         if (this.transferParam.edit) {
           updateChannel(data).then(response => {
             if (response.code === 0) {
-              this.msgSuccess("修改成功");
+              this.$modal.msgSuccess("修改成功");
               this.close();
             }
 
@@ -307,7 +307,7 @@ export default {
 
           createChannel(data).then(response => {
             if (response.code === 0) {
-              this.msgSuccess("新增成功");
+              this.$modal.msgSuccess("新增成功");
               this.$parent.refreshTable();
               this.close();
             }

@@ -92,8 +92,6 @@ export default {
   name: "Server",
   data() {
     return {
-      // 加载层信息
-      loading: [],
       // 统计命令信息
       commandstats: null,
       // 使用内存
@@ -115,7 +113,7 @@ export default {
       // 查询 Redis 监控信息
       getCache().then((response) => {
         this.cache = response.data;
-        this.loading.close();
+        this.$modal.closeLoading();
 
         this.commandstats = echarts.init(this.$refs.commandstats, "macarons");
         const commandStats = [];
@@ -176,12 +174,7 @@ export default {
     },
     // 打开加载层
     openLoading() {
-      this.loading = this.$loading({
-        lock: true,
-        text: "拼命读取中",
-        spinner: "el-icon-loading",
-        background: "rgba(0, 0, 0, 0.7)",
-      });
+      this.$modal.loading("正在加载缓存监控数据，请稍后！");
     },
   },
 };

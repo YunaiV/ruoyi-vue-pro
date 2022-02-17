@@ -429,14 +429,10 @@ export default {
     // 用户状态修改
     handleStatusChange(row) {
       let text = row.status === CommonStatusEnum.ENABLE ? "启用" : "停用";
-      this.$confirm('确认要"' + text + '""' + row.username + '"用户吗?', "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(function() {
+      this.$modal.confirm('确认要"' + text + '""' + row.username + '"用户吗?').then(function() {
           return changeUserStatus(row.id, row.status);
         }).then(() => {
-          this.msgSuccess(text + "成功");
+          this.$modal.msgSuccess(text + "成功");
         }).catch(function() {
           row.status = row.status === CommonStatusEnum.ENABLE ? CommonStatusEnum.DISABLE
               : CommonStatusEnum.ENABLE;
@@ -510,7 +506,7 @@ export default {
         cancelButtonText: "取消"
       }).then(({ value }) => {
           resetUserPwd(row.id, value).then(response => {
-            this.msgSuccess("修改成功，新密码是：" + value);
+            this.$modal.msgSuccess("修改成功，新密码是：" + value);
           });
         }).catch(() => {});
     },
@@ -542,13 +538,13 @@ export default {
         if (valid) {
           if (this.form.id !== undefined) {
             updateUser(this.form).then(response => {
-              this.msgSuccess("修改成功");
+              this.$modal.msgSuccess("修改成功");
               this.open = false;
               this.getList();
             });
           } else {
             addUser(this.form).then(response => {
-              this.msgSuccess("新增成功");
+              this.$modal.msgSuccess("新增成功");
               this.open = false;
               this.getList();
             });
@@ -563,7 +559,7 @@ export default {
           userId: this.form.id,
           roleIds: this.form.roleIds,
         }).then(response => {
-          this.msgSuccess("分配角色成功");
+          this.$modal.msgSuccess("分配角色成功");
           this.openRole = false;
           this.getList();
         });
@@ -572,15 +568,11 @@ export default {
     /** 删除按钮操作 */
     handleDelete(row) {
       const ids = row.id || this.ids;
-      this.$confirm('是否确认删除用户编号为"' + ids + '"的数据项?', "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(function() {
+      this.$modal.confirm('是否确认删除用户编号为"' + ids + '"的数据项?').then(function() {
           return delUser(ids);
         }).then(() => {
           this.getList();
-          this.msgSuccess("删除成功");
+          this.$modal.msgSuccess("删除成功");
       }).catch(() => {});
     },
     /** 导出按钮操作 */
@@ -589,11 +581,7 @@ export default {
         this.dateRange[0] ? this.dateRange[0] + ' 00:00:00' : undefined,
         this.dateRange[1] ? this.dateRange[1] + ' 23:59:59' : undefined,
       ]);
-      this.$confirm('是否确认导出所有用户数据项?', "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(() => {
+      this.$modal.confirm('是否确认导出所有用户数据项?').then(() => {
           this.exportLoading = true;
           return exportUser(queryParams);
         }).then(response => {
@@ -619,7 +607,7 @@ export default {
     // 文件上传成功处理
     handleFileSuccess(response, file, fileList) {
       if (response.code !== 0) {
-        this.msgError(response.msg)
+        this.$modal.msgError(response.msg)
         return;
       }
       this.upload.open = false;

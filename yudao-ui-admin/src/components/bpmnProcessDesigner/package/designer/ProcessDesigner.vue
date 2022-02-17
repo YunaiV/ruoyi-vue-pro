@@ -464,7 +464,7 @@ export default {
       const { err, xml } = await this.bpmnModeler.saveXML();
       // 读取异常时抛出异常
       if (err) {
-        this.msgError('保存模型失败，请重试！')
+        this.$modal.msgError('保存模型失败，请重试！')
         return
       }
       // 触发 save 事件

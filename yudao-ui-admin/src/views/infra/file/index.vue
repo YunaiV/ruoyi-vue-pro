@@ -180,21 +180,17 @@ export default {
       this.upload.isUploading = false;
       this.$refs.upload.clearFiles();
       // 提示成功，并刷新
-      this.msgSuccess("上传成功");
+      this.$modal.msgSuccess("上传成功");
       this.getList();
     },
     /** 删除按钮操作 */
     handleDelete(row) {
       const id = row.id;
-      this.$confirm('是否确认删除文件编号为"' + id + '"的数据项?', "警告", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      }).then(function() {
+      this.$modal.confirm('是否确认删除文件编号为"' + id + '"的数据项?').then(function() {
         return deleteFile(id);
       }).then(() => {
         this.getList();
-        this.msgSuccess("删除成功");
+        this.$modal.msgSuccess("删除成功");
       }).catch(() => {});
     },
   }

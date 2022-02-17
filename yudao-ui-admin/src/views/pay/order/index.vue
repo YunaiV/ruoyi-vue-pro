@@ -420,11 +420,7 @@ export default {
       this.addBeginAndEndTime(params, this.dateRangeNotifyTime, 'notifyTime');
       this.addDateRange(params, this.dateRangeCreateTime, 'CreateTime');
       // 执行导出
-      this.$confirm('是否确认导出所有支付订单数据项?', "警告", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      }).then(function () {
+      this.$modal.confirm('是否确认导出所有支付订单数据项?').then(function () {
         return exportOrderExcel(params);
       }).then(response => {
         this.downloadExcel(response, '支付订单.xls');

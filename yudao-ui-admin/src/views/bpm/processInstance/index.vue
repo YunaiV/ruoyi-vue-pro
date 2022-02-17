@@ -174,7 +174,7 @@ export default {
         return cancelProcessInstance(id, value);
       }).then(() => {
         this.getList();
-        this.msgSuccess("取消成功");
+        this.$modal.msgSuccess("取消成功");
       })
     },
     /** 处理详情按钮 */

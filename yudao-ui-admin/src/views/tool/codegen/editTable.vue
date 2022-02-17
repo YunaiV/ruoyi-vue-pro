@@ -194,11 +194,11 @@ export default {
             parentMenuId: genTable.parentMenuId
           };
           updateCodegen(genTable).then(res => {
-            this.msgSuccess("修改成功！");
+            this.$modal.msgSuccess("修改成功！");
             this.close();
           });
         } else {
-          this.msgError("表单校验未通过，请重新检查提交内容");
+          this.$modal.msgError("表单校验未通过，请重新检查提交内容");
         }
       });
     },

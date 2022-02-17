@@ -359,14 +359,10 @@ export default {
     // 用户状态修改
     handleStatusChange(row) {
       let text = row.status === CommonStatusEnum.ENABLE ? "启用" : "停用";
-      this.$confirm('确认要"' + text + '""' + row.name + '"应用吗?', "警告", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      }).then(function () {
+      this.$modal.confirm('确认要"' + text + '""' + row.name + '"应用吗?').then(function () {
         return changeAppStatus(row.id, row.status);
       }).then(() => {
-        this.msgSuccess(text + "成功");
+        this.$modal.msgSuccess(text + "成功");
       }).catch(function () {
         row.status = row.status === CommonStatusEnum.ENABLE ? CommonStatusEnum.DISABLE
           : CommonStatusEnum.ENABLE;
@@ -381,7 +377,7 @@ export default {
         // 修改的提交
         if (this.form.id != null) {
           updateApp(this.form).then(response => {
-            this.msgSuccess("修改成功");
+            this.$modal.msgSuccess("修改成功");
             this.open = false;
             this.getList();
           });
@@ -389,7 +385,7 @@ export default {
         }
         // 添加的提交
         createApp(this.form).then(response => {
-          this.msgSuccess("新增成功");
+          this.$modal.msgSuccess("新增成功");
           this.open = false;
           this.getList();
         });
@@ -398,15 +394,11 @@ export default {
     /** 删除按钮操作 */
     handleDelete(row) {
       const id = row.id;
-      this.$confirm('是否确认删除支付应用信息编号为"' + id + '"的数据项?', "警告", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      }).then(function () {
+      this.$modal.confirm('是否确认删除支付应用信息编号为"' + id + '"的数据项?').then(function () {
         return deleteApp(id);
       }).then(() => {
         this.getList();
-        this.msgSuccess("删除成功");
+        this.$modal.msgSuccess("删除成功");
       }).catch(() => {
         this.$message({
           type: 'info',
@@ -422,11 +414,7 @@ export default {
       params.pageSize = undefined;
       this.addBeginAndEndTime(params, this.dateRangeCreateTime, 'createTime');
       // 执行导出
-      this.$confirm('是否确认导出所有支付应用信息数据项?', "警告", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      }).then(function () {
+      this.$modal.confirm('是否确认导出所有支付应用信息数据项?').then(function () {
         return exportAppExcel(params);
       }).then(response => {
         this.downloadExcel(response, '支付应用信息.xls');

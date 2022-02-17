@@ -300,7 +300,7 @@ export default {
         processDefinitionId: this.selectProcessInstance.id,
         variables: variables
       }).then(response => {
-        this.msgSuccess("发起流程成功");
+        this.$modal.msgSuccess("发起流程成功");
         // 关闭当前窗口
         this.$store.dispatch("tagsView/delView", this.$route);
         this.$router.go(-1);
@@ -355,12 +355,12 @@ export default {
         }
         if (pass) {
           approveTask(data).then(response => {
-            this.msgSuccess("审批通过成功！");
+            this.$modal.msgSuccess("审批通过成功！");
             this.getDetail(); // 获得最新详情
           });
         } else {
           rejectTask(data).then(response => {
-            this.msgSuccess("审批不通过成功！");
+            this.$modal.msgSuccess("审批不通过成功！");
             this.getDetail(); // 获得最新详情
           });
         }
@@ -381,7 +381,7 @@ export default {
           return;
         }
         updateTaskAssignee(this.updateAssignee.form).then(response => {
-          this.msgSuccess("转派任务成功！");
+          this.$modal.msgSuccess("转派任务成功！");
           this.updateAssignee.open = false;
           this.getDetail(); // 获得最新详情
         });
@@ -402,11 +402,11 @@ export default {
     },
     /** 处理审批退回的操作 */
     handleDelegate(task) {
-      this.msgError("暂不支持【委派】功能，可以使用【转派】替代！");
+      this.$modal.msgError("暂不支持【委派】功能，可以使用【转派】替代！");
     },
     /** 处理审批退回的操作 */
     handleBack(task) {
-      this.msgError("暂不支持【退回】功能！");
+      this.$modal.msgError("暂不支持【退回】功能！");
     }
   }
 };

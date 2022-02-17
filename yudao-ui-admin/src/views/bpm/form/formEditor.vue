@@ -435,14 +435,14 @@ export default {
         // 修改的提交
         if (this.form.id != null) {
           updateForm(form).then(response => {
-            this.msgSuccess("修改成功");
+            this.$modal.msgSuccess("修改成功");
             this.close()
           });
           return;
         }
         // 添加的提交
         createForm(form).then(response => {
-          this.msgSuccess("新增成功");
+          this.$modal.msgSuccess("新增成功");
           this.close()
         });
       });

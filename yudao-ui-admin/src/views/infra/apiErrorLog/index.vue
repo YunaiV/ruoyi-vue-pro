@@ -205,13 +205,9 @@ export default {
     /** 处理已处理 / 已忽略的操作 **/
     handleProcessClick(row, processStatus) {
       const processStatusText = this.getDictDataLabel(this.DICT_TYPE.INFRA_API_ERROR_LOG_PROCESS_STATUS, processStatus)
-      this.$confirm('确认标记为' + processStatusText, '提示', {
-        type: 'warning',
-        confirmButtonText: '确定',
-        cancelButtonText: '取消'
-      }).then(() => {
+      this.$modal.confirm('确认标记为' + processStatusText).then(() => {
         updateApiErrorLogProcess(row.id, processStatus).then(() => {
-          this.msgSuccess("修改成功");
+          this.$modal.msgSuccess("修改成功");
           this.getList();
         });
       }).catch(() => {});
@@ -224,11 +220,7 @@ export default {
       params.pageSize = undefined;
       this.addBeginAndEndTime(params, this.dateRangeExceptionTime, 'exceptionTime');
       // 执行导出
-      this.$confirm('是否确认导出所有API 错误日志数据项?', "警告", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      }).then(() => {
+      this.$modal.confirm('是否确认导出所有API 错误日志数据项?').then(() => {
         this.exportLoading = true;
         return exportApiErrorLogExcel(params);
       }).then(response => {

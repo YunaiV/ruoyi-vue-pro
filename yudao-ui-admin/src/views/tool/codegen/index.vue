@@ -205,14 +205,10 @@ export default {
       }
       // 基于 DB 同步
       const tableName = row.tableName;
-      this.$confirm('确认要强制同步"' + tableName + '"表结构吗？', "警告", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      }).then(function() {
+      this.$modal.confirm('确认要强制同步"' + tableName + '"表结构吗？').then(function() {
           return syncCodegenFromDB(row.id);
       }).then(() => {
-          this.msgSuccess("同步成功");
+          this.$modal.msgSuccess("同步成功");
       }).catch(() => {});
     },
     /** 打开导入表弹窗 */
@@ -326,15 +322,11 @@ export default {
     /** 删除按钮操作 */
     handleDelete(row) {
       const tableIds = row.id;
-      this.$confirm('是否确认删除表名称为"' + row.tableName + '"的数据项?', "警告", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      }).then(function() {
+      this.$modal.confirm('是否确认删除表名称为"' + row.tableName + '"的数据项?').then(function() {
           return deleteCodegen(tableIds);
       }).then(() => {
           this.getList();
-          this.msgSuccess("删除成功");
+          this.$modal.msgSuccess("删除成功");
       }).catch(() => {});
     },
     // 取消按钮
@@ -360,7 +352,7 @@ export default {
         let form = this.importSQL.form;
         if (form.tableId != null) {
           syncCodegenFromSQL(form.tableId, form.sql).then(response => {
-            this.msgSuccess("同步成功");
+            this.$modal.msgSuccess("同步成功");
             this.importSQL.open = false;
             this.getList();
           });
@@ -368,7 +360,7 @@ export default {
         }
         // 添加的提交
         createCodegenListFromSQL(form).then(response => {
-          this.msgSuccess("导入成功");
+          this.$modal.msgSuccess("导入成功");
           this.importSQL.open = false;
           this.getList();
         });
