@@ -69,6 +69,7 @@
           <el-tabs v-model="preview.activeName">
             <el-tab-pane v-for="item in preview.data" :label="item.filePath.substring(item.filePath.lastIndexOf('/') + 1)"
                          :name="item.filePath" :key="item.filePath">
+              <el-link :underline="false" icon="el-icon-document-copy" v-clipboard:copy="item.code" v-clipboard:success="clipboardSuccess" style="float:right">复制</el-link>
               <pre><code class="hljs" v-html="highlightedCode(item)"></code></pre>
             </el-tab-pane>
           </el-tabs>
@@ -244,6 +245,10 @@ export default {
       var language = item.filePath.substring(item.filePath.lastIndexOf(".") + 1);
       const result = hljs.highlight(language, item.code || "", true);
       return result.value || '&nbsp;';
+    },
+    /** 复制代码成功 */
+    clipboardSuccess(){
+      this.$modal.msgSuccess("复制成功");
     },
     /** 生成 files 目录 **/
     handleFiles(datas) {
