@@ -347,7 +347,7 @@ export default {
         // 修改的提交
         if (this.form.${primaryColumn.javaField} != null) {
           update${simpleClassName}(this.form).then(response => {
-            this.$modal.msgSuccess("修改成功");
+            this.#[[$modal]]#.msgSuccess("修改成功");
             this.open = false;
             this.getList();
           });
@@ -355,7 +355,7 @@ export default {
         }
         // 添加的提交
         create${simpleClassName}(this.form).then(response => {
-          this.$modal.msgSuccess("新增成功");
+          this.#[[$modal]]#.msgSuccess("新增成功");
           this.open = false;
           this.getList();
         });
@@ -364,11 +364,11 @@ export default {
     /** 删除按钮操作 */
     handleDelete(row) {
       const ${primaryColumn.javaField} = row.${primaryColumn.javaField};
-      this.$model.confirm('是否确认删除${table.classComment}编号为"' + ${primaryColumn.javaField} + '"的数据项?').then(function() {
+      this.#[[$modal]]#.confirm('是否确认删除${table.classComment}编号为"' + ${primaryColumn.javaField} + '"的数据项?').then(function() {
           return delete${simpleClassName}(${primaryColumn.javaField});
         }).then(() => {
           this.getList();
-          this.$modal.msgSuccess("删除成功");
+          this.#[[$modal]]#.msgSuccess("删除成功");
         }).catch(() => {});
     },
     /** 导出按钮操作 */
@@ -386,7 +386,7 @@ export default {
       #end
       #end
       // 执行导出
-      this.$model.confirm('是否确认导出所有${table.classComment}数据项?').then(() => {
+      this.#[[$modal]]#.confirm('是否确认导出所有${table.classComment}数据项?').then(() => {
           this.exportLoading = true;
           return export${simpleClassName}Excel(params);
         }).then(response => {
