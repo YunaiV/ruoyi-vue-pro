@@ -39,7 +39,7 @@
   "dependencies": {
     "@riophae/vue-treeselect": "0.4.0",
     "axios": "0.24.0",
-    "clipboard": "2.0.6",
+    "clipboard": "2.0.8",
     "core-js": "3.19.1",
     "echarts": "4.9.0",
     "element-ui": "^2.15.6",
