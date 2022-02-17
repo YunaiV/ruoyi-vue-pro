@@ -1,5 +1,10 @@
 <template>
-  <el-image :src="`${realSrc}`" fit="cover" :style="`width:${realWidth};height:${realHeight};`" :preview-src-list="[`${realSrc}`]">
+  <el-image
+    :src="`${realSrc}`"
+    fit="cover"
+    :style="`width:${realWidth};height:${realHeight};`"
+    :preview-src-list="realSrcList"
+  >
     <div slot="error" class="image-slot">
       <i class="el-icon-picture-outline"></i>
     </div>
@@ -7,10 +12,10 @@
 </template>
 
 <script>
-import { isExternal } from '@/utils/validate'
+import { isExternal } from "@/utils/validate";
 
 export default {
-  name: 'ImagePreview',
+  name: "ImagePreview",
   props: {
     src: {
       type: String,
@@ -18,28 +23,40 @@ export default {
     },
     width: {
       type: [Number, String],
-      default: ''
+      default: ""
     },
     height: {
       type: [Number, String],
-      default: ''
+      default: ""
     }
   },
   computed: {
     realSrc() {
-      if (isExternal(this.src)) {
-        return this.src
+      let real_src = this.src.split(",")[0];
+      if (isExternal(real_src)) {
+        return real_src;
       }
-      return process.env.VUE_APP_BASE_API + this.src
+      return process.env.VUE_APP_BASE_API + real_src;
+    },
+    realSrcList() {
+      let real_src_list = this.src.split(",");
+      let srcList = [];
+      real_src_list.forEach(item => {
+        if (isExternal(item)) {
+          return srcList.push(item);
+        }
+        return srcList.push(process.env.VUE_APP_BASE_API + item);
+      });
+      return srcList;
     },
     realWidth() {
-      return typeof this.width == 'string' ? this.width : `${this.width}px`
+      return typeof this.width == "string" ? this.width : `${this.width}px`;
     },
     realHeight() {
-      return typeof this.height == 'string' ? this.height : `${this.height}px`
+      return typeof this.height == "string" ? this.height : `${this.height}px`;
     }
-  }
-}
+  },
+};
 </script>
 
 <style lang="scss" scoped>
