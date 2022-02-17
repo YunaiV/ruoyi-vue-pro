@@ -48,3 +48,4 @@ yudao:
     timeout: 5m
     width: 160
     height: 60
+    enable: true

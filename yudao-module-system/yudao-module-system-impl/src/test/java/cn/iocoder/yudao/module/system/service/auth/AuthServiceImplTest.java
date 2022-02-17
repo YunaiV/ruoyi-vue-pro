@@ -27,6 +27,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import javax.annotation.Resource;
+import javax.validation.Validator;
 import java.util.Set;
 
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
@@ -61,6 +62,9 @@ public class AuthServiceImplTest extends BaseDbUnitTest {
     private SocialUserService socialService;
     @MockBean
     private PostService postService;
+
+    @MockBean
+    private Validator validator;
 
     @BeforeEach
     public void setUp() {

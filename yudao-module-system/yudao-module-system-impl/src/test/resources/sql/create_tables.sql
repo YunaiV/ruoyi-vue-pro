@@ -23,6 +23,8 @@ CREATE TABLE IF NOT EXISTS "system_dict_data" (
     "value" varchar(100) NOT NULL DEFAULT '',
     "dict_type" varchar(100) NOT NULL DEFAULT '',
     "status" tinyint NOT NULL DEFAULT '0',
+    "color_type" varchar(100) NOT NULL DEFAULT '',
+    "css_class" varchar(100) NOT NULL DEFAULT '',
     "remark" varchar(500) DEFAULT NULL,
     "creator" varchar(64) DEFAULT '',
     "create_time" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
