@@ -2,7 +2,6 @@
  * v-dialogDrag 弹窗拖拽
  * Copyright (c) 2019 ruoyi
  */
-
 export default {
   bind(el, binding, vnode, oldVnode) {
     const value = binding.value
