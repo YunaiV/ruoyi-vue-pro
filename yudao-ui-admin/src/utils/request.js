@@ -5,6 +5,9 @@ import { getToken } from '@/utils/auth'
 import errorCode from '@/utils/errorCode'
 import Cookies from "js-cookie";
 
+// 是否显示重新登录
+let isReloginShow;
+
 axios.defaults.headers['Content-Type'] = 'application/json;charset=utf-8'
 // 创建axios实例
 const service = axios.create({
@@ -60,19 +63,25 @@ service.interceptors.response.use(res => {
     // 获取错误信息
     const msg = errorCode[code] || res.data.msg || errorCode['default']
     if (code === 401) {
-      MessageBox.confirm('登录状态已过期，您可以继续留在该页面，或者重新登录', '系统提示', {
-          confirmButtonText: '重新登录',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }
-      ).then(() => {
-        store.dispatch('LogOut').then(() => {
-          // if (location.pathname !== '/login') { // 避免重复跳转
-          //
-          // }
-          location.href = '/index';
-        })
-      }).catch(() => {});
+      if (!isReloginShow) {
+        isReloginShow = true;
+        MessageBox.confirm('登录状态已过期，您可以继续留在该页面，或者重新登录', '系统提示', {
+            confirmButtonText: '重新登录',
+            cancelButtonText: '取消',
+            type: 'warning'
+          }
+        ).then(() => {
+          isReloginShow = false;
+          store.dispatch('LogOut').then(() => {
+            // 如果是登录页面不需要重新加载
+            if (window.location.hash.indexOf("#/login") !== 0) {
+              location.href = '/index';
+            }
+          })
+        }).catch(() => {
+          isReloginShow = false;
+        });
+      }
       return Promise.reject('无效的会话，或者会话已过期，请重新登录。')
     } else if (code === 500) {
       Message({
