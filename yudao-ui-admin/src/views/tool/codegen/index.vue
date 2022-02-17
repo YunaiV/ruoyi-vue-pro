@@ -59,7 +59,7 @@
     <pagination v-show="total>0" :total="total" :page.sync="queryParams.pageNo" :limit.sync="queryParams.pageSize" @pagination="getList"/>
 
     <!-- 预览界面 -->
-    <el-dialog :title="preview.title" :visible.sync="preview.open" width="90%" top="5vh" append-to-body>
+    <el-dialog :title="preview.title" :visible.sync="preview.open" width="90%" top="5vh" append-to-body class="scrollbar">
       <el-row>
         <el-col :span="7">
           <el-tree :data="preview.fileTree" :expand-on-click-node="false" default-expand-all highlight-current

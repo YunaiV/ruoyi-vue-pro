@@ -64,7 +64,7 @@
   margin-top: 6vh !important;
 }
 
-.el-dialog .el-dialog__body {
+.el-dialog__wrapper.scrollbar .el-dialog .el-dialog__body {
   overflow: auto;
   overflow-x: hidden;
   max-height: 70vh;
@@ -137,7 +137,7 @@
 /** 表格更多操作下拉样式 */
 .el-table .el-dropdown-link {
   cursor: pointer;
-  color: #1890ff;
+  color: #409EFF;
   margin-left: 5px;
 }
 

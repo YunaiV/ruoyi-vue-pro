@@ -115,7 +115,7 @@
       </div>
     </el-dialog>
 
-    <el-dialog title="Cron表达式生成器" :visible.sync="openCron" >
+    <el-dialog title="Cron表达式生成器" :visible.sync="openCron" append-to-body class="scrollbar">
       <crontab @hide="openCron=false" @fill="crontabFill" :expression="expression"></crontab>
     </el-dialog>
 
