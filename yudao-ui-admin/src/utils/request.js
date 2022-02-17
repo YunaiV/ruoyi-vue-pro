@@ -73,7 +73,7 @@ service.interceptors.response.use(res => {
           location.href = '/index';
         })
       }).catch(() => {});
-      return Promise.reject('令牌验证失败')
+      return Promise.reject('无效的会话，或者会话已过期，请重新登录。')
     } else if (code === 500) {
       Message({
         message: msg,
