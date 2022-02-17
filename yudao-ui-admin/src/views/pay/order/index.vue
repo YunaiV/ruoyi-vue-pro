@@ -423,7 +423,7 @@ export default {
       this.$modal.confirm('是否确认导出所有支付订单数据项?').then(function () {
         return exportOrderExcel(params);
       }).then(response => {
-        this.downloadExcel(response, '支付订单.xls');
+        this.$download.excel(response, '支付订单.xls');
       }).catch(() => {});
     },
     /**

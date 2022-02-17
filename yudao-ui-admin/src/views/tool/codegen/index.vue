@@ -192,7 +192,7 @@ export default {
     /** 生成代码操作 */
     handleGenTable(row) {
       downloadCodegen(row.id).then(response => {
-        this.downloadZip(response, 'codegen-' + row.tableName + '.zip');
+        this.$download.zip(response, 'codegen-' + row.tableName + '.zip');
       })
     },
     /** 同步数据库操作 */

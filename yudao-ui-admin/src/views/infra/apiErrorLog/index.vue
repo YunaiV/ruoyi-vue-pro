@@ -224,7 +224,7 @@ export default {
         this.exportLoading = true;
         return exportApiErrorLogExcel(params);
       }).then(response => {
-        this.downloadExcel(response, 'API 错误日志.xls');
+        this.$download.excel(response, 'API 错误日志.xls');
         this.exportLoading = false;
       }).catch(() => {});
     }

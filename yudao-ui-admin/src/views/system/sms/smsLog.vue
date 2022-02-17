@@ -282,7 +282,7 @@ export default {
         this.exportLoading = true;
         return exportSmsLogExcel(params);
       }).then(response => {
-        this.downloadExcel(response, '短信日志.xls');
+        this.$download.excel(response, '短信日志.xls');
         this.exportLoading = false;
       }).catch(() => {});
     },

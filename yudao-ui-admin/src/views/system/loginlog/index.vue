@@ -126,7 +126,7 @@ export default {
           this.exportLoading = true;
           return exportLoginLog(queryParams);
         }).then(response => {
-          this.downloadExcel(response, '登录日志.xls');
+          this.$download.excel(response, '登录日志.xls');
           this.exportLoading = false;
       }).catch(() => {});
     }

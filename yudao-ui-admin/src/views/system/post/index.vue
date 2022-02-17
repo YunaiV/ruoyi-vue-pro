@@ -236,7 +236,7 @@ export default {
           this.exportLoading = true;
           return exportPost(queryParams);
         }).then(response => {
-          this.downloadExcel(response, '岗位数据.xls');
+          this.$download.excel(response, '岗位数据.xls');
           this.exportLoading = false;
       }).catch(() => {});
     }

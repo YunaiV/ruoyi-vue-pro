@@ -367,7 +367,7 @@ export default {
           this.exportLoading = true;
           return exportJob(queryParams);
         }).then(response => {
-          this.downloadExcel(response, '定时任务.xls');
+          this.$download.excel(response, '定时任务.xls');
           this.exportLoading = false;
       }).catch(() => {});
     }

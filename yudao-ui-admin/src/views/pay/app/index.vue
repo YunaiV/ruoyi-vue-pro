@@ -417,7 +417,7 @@ export default {
       this.$modal.confirm('是否确认导出所有支付应用信息数据项?').then(function () {
         return exportAppExcel(params);
       }).then(response => {
-        this.downloadExcel(response, '支付应用信息.xls');
+        this.$download.excel(response, '支付应用信息.xls');
       }).catch(() => {});
     },
     /**

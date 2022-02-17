@@ -279,7 +279,7 @@ export default {
           this.exportLoading = true;
           return exportMerchantExcel(params);
         }).then(response => {
-          this.downloadExcel(response, '支付商户信息.xls');
+          this.$download.excel(response, '支付商户信息.xls');
           this.exportLoading = false;
       }).catch(() => {});
     }

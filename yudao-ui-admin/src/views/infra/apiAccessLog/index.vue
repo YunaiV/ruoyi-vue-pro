@@ -206,7 +206,7 @@ export default {
         this.exportLoading = true;
         return exportApiAccessLogExcel(params);
       }).then(response => {
-        this.downloadExcel(response, 'API 访问日志.xls');
+        this.$download.excel(response, 'API 访问日志.xls');
         this.exportLoading = false;
       }).catch(() => {});
     }

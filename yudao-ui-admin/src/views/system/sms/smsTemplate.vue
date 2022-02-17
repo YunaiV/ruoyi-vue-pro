@@ -334,7 +334,7 @@ export default {
         this.exportLoading = true;
         return exportSmsTemplateExcel(params);
       }).then(response => {
-        this.downloadExcel(response, '短信模板.xls');
+        this.$download.excel(response, '短信模板.xls');
         this.exportLoading = false;
       }).catch(() => {});
     },

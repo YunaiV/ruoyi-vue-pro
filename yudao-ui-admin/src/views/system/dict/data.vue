@@ -297,7 +297,7 @@ export default {
           this.exportLoading = true;
           return exportData(queryParams);
         }).then(response => {
-          this.downloadExcel(response, '字典数据.xls');
+          this.$download.excel(response, '字典数据.xls');
           this.exportLoading = false;
       }).catch(() => {});
     }

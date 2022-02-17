@@ -390,7 +390,7 @@ export default {
           this.exportLoading = true;
           return export${simpleClassName}Excel(params);
         }).then(response => {
-          this.downloadExcel(response, '${table.classComment}.xls');
+          this.$download.excel(response, '${table.classComment}.xls');
           this.exportLoading = false;
         }).catch(() => {});
     }

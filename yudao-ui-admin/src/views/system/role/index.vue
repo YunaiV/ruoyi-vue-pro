@@ -497,7 +497,7 @@ export default {
           this.exportLoading = true;
           return exportRole(queryParams);
         }).then(response => {
-          this.downloadExcel(response, '角色数据.xls');
+          this.$download.excel(response, '角色数据.xls');
           this.exportLoading = false;
       }).catch(() => {});
     }

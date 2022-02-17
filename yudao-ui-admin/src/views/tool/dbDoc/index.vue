@@ -48,19 +48,19 @@ export default {
     /** 处理导出 HTML */
     handleExportHtml() {
       exportHtml().then(response => {
-        this.downloadHtml(response, '数据库文档.html');
+        this.$download.html(response, '数据库文档.html');
       })
     },
     /** 处理导出 Word */
     handleExportWord() {
       exportWord().then(response => {
-        this.downloadWord(response, '数据库文档.doc');
+        this.$download.word(response, '数据库文档.doc');
       })
     },
     /** 处理导出 Markdown */
     handleExportMarkdown() {
       exportMarkdown().then(response => {
-        this.downloadMarkdown(response, '数据库文档.md');
+        this.$download.markdown(response, '数据库文档.md');
       })
     }
   }

@@ -206,7 +206,7 @@ export default {
           this.exportLoading = true;
           return exportOperateLog(queryParams);
         }).then(response => {
-          this.downloadExcel(response, '操作日志.xls');
+          this.$download.excel(response, '操作日志.xls');
           this.exportLoading = false;
       }).catch(() => {});
     }

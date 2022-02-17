@@ -253,7 +253,7 @@ export default {
           this.exportLoading = true;
           return exportTestDemoExcel(params);
         }).then(response => {
-          this.downloadExcel(response, '字典类型.xls');
+          this.$download.excel(response, '字典类型.xls');
           this.exportLoading = false;
       }).catch(() => {});
     }

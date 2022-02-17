@@ -243,7 +243,7 @@ export default {
         this.exportLoading = true;
         return exportErrorCodeExcel(params);
       }).then(response => {
-        this.downloadExcel(response, '错误码.xls');
+        this.$download.excel(response, '错误码.xls');
         this.exportLoading = false;
       }).catch(() => {});
     }

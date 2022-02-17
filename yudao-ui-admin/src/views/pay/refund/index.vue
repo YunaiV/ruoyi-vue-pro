@@ -427,7 +427,7 @@ export default {
       this.$modal.confirm('是否确认导出所有退款订单数据项?').then(function () {
         return exportRefundExcel(params);
       }).then(response => {
-        this.downloadExcel(response, '退款订单.xls');
+        this.$download.excel(response, '退款订单.xls');
       }).catch(() => {});
     },
     /**

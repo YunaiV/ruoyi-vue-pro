@@ -585,7 +585,7 @@ export default {
           this.exportLoading = true;
           return exportUser(queryParams);
         }).then(response => {
-          this.downloadExcel(response, '用户数据.xls');
+          this.$download.excel(response, '用户数据.xls');
           this.exportLoading = false;
       }).catch(() => {});
     },
@@ -597,7 +597,7 @@ export default {
     /** 下载模板操作 */
     importTemplate() {
       importTemplate().then(response => {
-        this.downloadExcel(response, '用户导入模板.xls');
+        this.$download.excel(response, '用户导入模板.xls');
       });
     },
     // 文件上传中处理

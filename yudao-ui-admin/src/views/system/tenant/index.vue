@@ -246,7 +246,7 @@ export default {
           this.exportLoading = true;
           return exportTenantExcel(params);
         }).then(response => {
-          this.downloadExcel(response, '租户.xls');
+          this.$download.excel(response, '租户.xls');
           this.exportLoading = false;
       }).catch(() => {});
     }

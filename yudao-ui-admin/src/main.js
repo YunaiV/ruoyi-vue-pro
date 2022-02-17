@@ -17,19 +17,7 @@ import './assets/icons' // icon
 import './permission' // permission control
 import { getDicts } from "@/api/system/dict/data";
 import { getConfigKey } from "@/api/infra/config";
-import {
-  parseTime,
-  resetForm,
-  addDateRange,
-  addBeginAndEndTime,
-  download,
-  handleTree,
-  downloadExcel,
-  downloadWord,
-  downloadZip,
-  downloadHtml,
-  downloadMarkdown,
-} from "@/utils/ruoyi";
+import { parseTime, resetForm, addDateRange, addBeginAndEndTime, handleTree} from "@/utils/ruoyi";
 import Pagination from "@/components/Pagination";
 // 自定义表格工具扩展
 import RightToolbar from "@/components/RightToolbar"
@@ -49,12 +37,6 @@ Vue.prototype.getDictDatas = getDictDatas
 Vue.prototype.getDictDatas2 = getDictDatas2
 Vue.prototype.getDictDataLabel = getDictDataLabel
 Vue.prototype.DICT_TYPE = DICT_TYPE
-Vue.prototype.download = download
-Vue.prototype.downloadExcel = downloadExcel
-Vue.prototype.downloadWord = downloadWord
-Vue.prototype.downloadHtml = downloadHtml
-Vue.prototype.downloadMarkdown = downloadMarkdown
-Vue.prototype.downloadZip = downloadZip
 Vue.prototype.handleTree = handleTree
 
 // 全局组件挂载

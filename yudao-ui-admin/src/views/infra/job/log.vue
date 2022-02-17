@@ -169,7 +169,7 @@ export default {
         this.exportLoading = true;
         return exportJobLogExcel(params);
       }).then(response => {
-        this.downloadExcel(response, '定时任务日志.xls');
+        this.$download.excel(response, '定时任务日志.xls');
         this.exportLoading = false;
       }).catch(() => {});
     }

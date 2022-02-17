@@ -268,7 +268,7 @@ export default {
           this.exportLoading = true;
           return exportConfig(queryParams);
         }).then(response => {
-          this.downloadExcel(response, '参数配置.xls');
+          this.$download.excel(response, '参数配置.xls');
           this.exportLoading = false;
       }).catch(() => {});
     },
