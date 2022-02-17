@@ -100,18 +100,6 @@ export function addBeginAndEndTime(params, dateRange, propName) {
   return params;
 }
 
-// 回显数据字典 原若依所保留，请使用 dict.js 中的新方法
-export function selectDictLabel(datas, value) {
-  var actions = [];
-  Object.keys(datas).some((key) => {
-    if (datas[key].dictValue == ('' + value)) {
-      actions.push(datas[key].dictLabel);
-      return true;
-    }
-  })
-  return actions.join('');
-}
-
 // 通用下载方法
 export function download(fileName) {
   window.location.href = baseURL + "/common/download?fileName=" + encodeURI(fileName) + "&delete=" + true;

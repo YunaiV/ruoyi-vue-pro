@@ -21,7 +21,6 @@ import {
   resetForm,
   addDateRange,
   addBeginAndEndTime,
-  selectDictLabel,
   download,
   handleTree,
   downloadExcel,
@@ -45,7 +44,6 @@ Vue.prototype.parseTime = parseTime
 Vue.prototype.resetForm = resetForm
 Vue.prototype.addDateRange = addDateRange
 Vue.prototype.addBeginAndEndTime = addBeginAndEndTime
-Vue.prototype.selectDictLabel = selectDictLabel
 Vue.prototype.getDictDatas = getDictDatas
 Vue.prototype.getDictDatas2 = getDictDatas2
 Vue.prototype.getDictDataLabel = getDictDataLabel

@@ -3,15 +3,15 @@
   .main-container {
     min-height: 100%;
     transition: margin-left .28s;
-    margin-left: $sideBarWidth;
+    margin-left: $base-sidebar-width;
     position: relative;
   }
 
   .sidebar-container {
     -webkit-transition: width .28s;
     transition: width 0.28s;
-    width: $sideBarWidth !important;
-    background-color: $menuBg;
+    width: $base-sidebar-width !important;
+    background-color: $base-menu-background;
     height: 100%;
     position: fixed;
     font-size: 0px;
@@ -81,12 +81,12 @@
     }
 
     & .theme-dark .is-active > .el-submenu__title {
-      color: $subMenuActiveText !important;
+      color: $base-menu-color-active !important;
     }
 
     & .nest-menu .el-submenu>.el-submenu__title,
     & .el-submenu .el-menu-item {
-      min-width: $sideBarWidth !important;
+      min-width: $base-sidebar-width !important;
 
       &:hover {
         background-color: rgba(0, 0, 0, 0.06) !important;
@@ -95,10 +95,10 @@
 
     & .theme-dark .nest-menu .el-submenu>.el-submenu__title,
     & .theme-dark .el-submenu .el-menu-item {
-      background-color: $subMenuBg !important;
+      background-color: $base-sub-menu-background !important;
 
       &:hover {
-        background-color: $subMenuHover !important;
+        background-color: $base-sub-menu-hover !important;
       }
     }
   }
@@ -154,7 +154,7 @@
   }
 
   .el-menu--collapse .el-menu .el-submenu {
-    min-width: $sideBarWidth !important;
+    min-width: $base-sidebar-width !important;
   }
 
   // mobile responsive
@@ -165,14 +165,14 @@
 
     .sidebar-container {
       transition: transform .28s;
-      width: $sideBarWidth !important;
+      width: $base-sidebar-width !important;
     }
 
     &.hideSidebar {
       .sidebar-container {
         pointer-events: none;
         transition-duration: 0.3s;
-        transform: translate3d(-$sideBarWidth, 0, 0);
+        transform: translate3d(-$base-sidebar-width, 0, 0);
       }
     }
   }
