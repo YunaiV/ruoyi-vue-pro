@@ -117,8 +117,10 @@ export default {
     // 删除图片
     handleRemove(file, fileList) {
       const findex = this.fileList.map(f => f.name).indexOf(file.name);
-      this.fileList.splice(findex, 1);
-      this.$emit("input", this.listToString(this.fileList));
+      if(findex > -1) {
+        this.fileList.splice(findex, 1);
+        this.$emit("input", this.listToString(this.fileList));
+      }
     },
     // 上传成功回调
     handleUploadSuccess(res) {
@@ -184,7 +186,7 @@ export default {
       let strs = "";
       separator = separator || ",";
       for (let i in list) {
-        strs += list[i].url + separator;
+        strs += list[i].url.replace(this.baseUrl, "") + separator;
       }
       return strs != '' ? strs.substr(0, strs.length - 1) : '';
     }
