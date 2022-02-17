@@ -1,9 +1,3 @@
-import { saveAs } from 'file-saver'
-import axios from 'axios'
-import { getToken } from '@/utils/auth'
-
-const baseURL = process.env.VUE_APP_BASE_API
-
 export default {
   // 下载 Excel 方法
   excel(data, fileName) {
@@ -33,6 +27,7 @@ export default {
   download0(data, fileName, mineType) {
     // 创建 blob
     let blob = new Blob([data], {type: mineType});
+    debugger
     // 创建 href 超链接，点击进行下载
     window.URL = window.URL || window.webkitURL;
     let href = URL.createObjectURL(blob);
@@ -42,6 +37,6 @@ export default {
     downA.click();
     // 销毁超连接
     window.URL.revokeObjectURL(href);
-  }
+  },
 
 }

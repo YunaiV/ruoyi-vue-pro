@@ -38,7 +38,7 @@
   },
   "dependencies": {
     "@riophae/vue-treeselect": "0.4.0",
-    "axios": "0.21.0",
+    "axios": "0.24.0",
     "clipboard": "2.0.6",
     "core-js": "3.19.1",
     "echarts": "4.9.0",
@@ -85,7 +85,6 @@
     "vue2-ace-editor": "^0.0.15",
     "@vue/compiler-sfc": "^3.0.1",
     "@vue/eslint-config-prettier": "^5.0.0",
-    "axios": "^0.21.1",
     "bpmn-js": "8.9.0",
     "bpmn-js-properties-panel": "0.46.0",
     "compression-webpack-plugin": "^6.1.1",
