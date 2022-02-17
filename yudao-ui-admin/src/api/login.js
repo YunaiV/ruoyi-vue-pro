@@ -35,7 +35,8 @@ export function logout() {
 export function getCodeImg() {
   return request({
     url: '/system/captcha/get-image',
-    method: 'get'
+    method: 'get',
+    timeout: 20000
   })
 }
 
