@@ -211,8 +211,10 @@ export default {
     },
     /** 关闭按钮 */
     close() {
-      this.$store.dispatch("tagsView/delView", this.$route);
-      this.$router.push({ path: "/tool/codegen", query: { t: Date.now()}})
+      this.$tab.closeOpenPage({
+        path: "/tool/codegen",
+        query: { t: Date.now(), pageNum: this.$route.query.pageNum } }
+      );
     }
   },
   mounted() {

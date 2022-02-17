@@ -449,8 +449,7 @@ export default {
     },
     /** 关闭按钮 */
     close() {
-      this.$store.dispatch("tagsView/delView", this.$route);
-      this.$router.push({ path: "/bpm/manager/form", query: { t: Date.now()}})
+      this.$tab.closeOpenPage({ path: "/bpm/manager/form" });
     },
     encodeFields() {
       const fields = []

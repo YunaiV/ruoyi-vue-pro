@@ -111,8 +111,7 @@ export default {
     },
     /** 关闭按钮 */
     close() {
-      this.$store.dispatch("tagsView/delView", this.$route);
-      this.$router.push({ path: "/bpm/manager/model", query: { t: Date.now()}})
+      this.$tab.closeOpenPage({ path: "/bpm/manager/model" });
     },
   }
 };

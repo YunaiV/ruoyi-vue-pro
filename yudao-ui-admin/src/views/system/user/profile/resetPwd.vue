@@ -64,8 +64,7 @@ export default {
       });
     },
     close() {
-      this.$store.dispatch("tagsView/delView", this.$route);
-      this.$router.push({ path: "/index" });
+      this.$tab.closePage();
     }
   }
 };
