@@ -61,6 +61,7 @@ public class BpmModelController {
 
     @PostMapping("/import")
     @ApiOperation(value = "导入模型")
+    @PreAuthorize("@ss.hasPermission('bpm:model:import')")
     public CommonResult<String> importModel(@Valid BpmModeImportReqVO importReqVO) throws IOException {
         BpmModelCreateReqVO createReqVO = BpmModelConvert.INSTANCE.convert(importReqVO);
         // 读取文件

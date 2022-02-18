@@ -108,6 +108,7 @@ public interface BpmTaskConvert {
 
     BpmTaskRespVO.User convert3(AdminUserRespDTO bean);
 
+    @Mapping(target = "id", ignore = true)
     void copyTo(BpmTaskExtDO from, @MappingTarget BpmTaskDonePageItemRespVO to);
 
     @Mappings({
