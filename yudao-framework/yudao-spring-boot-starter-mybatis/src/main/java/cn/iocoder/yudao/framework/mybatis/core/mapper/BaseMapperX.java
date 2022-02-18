@@ -43,12 +43,12 @@ public interface BaseMapperX<T> extends BaseMapper<T> {
         return selectOne(new LambdaQueryWrapper<T>().eq(field1, value1).eq(field2, value2));
     }
 
-    default Integer selectCount(String field, Object value) {
-        return selectCount(new QueryWrapper<T>().eq(field, value)).intValue();
+    default Long selectCount(String field, Object value) {
+        return selectCount(new QueryWrapper<T>().eq(field, value));
     }
 
-    default Integer selectCount(SFunction<T, ?> field, Object value) {
-        return selectCount(new LambdaQueryWrapper<T>().eq(field, value)).intValue();
+    default Long selectCount(SFunction<T, ?> field, Object value) {
+        return selectCount(new LambdaQueryWrapper<T>().eq(field, value));
     }
 
     default List<T> selectList() {
@@ -74,6 +74,10 @@ public interface BaseMapperX<T> extends BaseMapper<T> {
     default void insertBatch(Collection<T> entities) {
         // TODO 芋艿：修改成支持批量的
         entities.forEach(this::insert);
+    }
+
+    default Boolean exists(SFunction<T, ?> field, Object value) {
+        return selectCount(field, value) > 0;
     }
 
 }

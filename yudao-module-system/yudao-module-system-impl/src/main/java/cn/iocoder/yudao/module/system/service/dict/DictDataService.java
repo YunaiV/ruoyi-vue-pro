@@ -82,7 +82,7 @@ public interface DictDataService extends DictDataFrameworkService {
      * @param dictType 字典类型
      * @return 数据数量
      */
-    int countByDictType(String dictType);
+    long countByDictType(String dictType);
 
     /**
      * 校验字典数据们是否有效。如下情况，视为无效：

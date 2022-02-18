@@ -220,7 +220,7 @@ public class SmsTemplateServiceImpl implements SmsTemplateService {
     }
 
     @Override
-    public Integer countByChannelId(Long channelId) {
+    public Long countByChannelId(Long channelId) {
         return smsTemplateMapper.selectCountByChannelId(channelId);
     }
 

@@ -25,7 +25,7 @@ public interface DeptMapper extends BaseMapperX<DeptDO> {
                 .eq(DeptDO::getName, name));
     }
 
-    default Integer selectCountByParentId(Long parentId) {
+    default Long selectCountByParentId(Long parentId) {
         return selectCount(DeptDO::getParentId, parentId);
     }
 

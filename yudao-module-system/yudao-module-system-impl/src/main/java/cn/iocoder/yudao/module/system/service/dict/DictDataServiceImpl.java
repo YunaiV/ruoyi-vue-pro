@@ -209,7 +209,7 @@ public class DictDataServiceImpl implements DictDataService {
     }
 
     @Override
-    public int countByDictType(String dictType) {
+    public long countByDictType(String dictType) {
         return dictDataMapper.selectCountByDictType(dictType);
     }
 

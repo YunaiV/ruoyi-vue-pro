@@ -24,7 +24,7 @@ public interface FileMapper extends BaseMapperX<FileDO> {
                 .orderByDesc("create_time"));
     }
 
-    default Integer selectCountById(String id) {
+    default Long selectCountById(String id) {
         return selectCount(FileDO::getId, id);
     }
 
