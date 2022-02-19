@@ -23,6 +23,7 @@ public class TenantProperties {
 //     * 是否开启
 //     */
 //    private Boolean enable = ENABLE_DEFAULT;
+
     /**
      * 需要多租户的表
      *
