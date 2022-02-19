@@ -2,6 +2,7 @@ package cn.iocoder.yudao.framework.tenant.config;
 
 import cn.iocoder.yudao.framework.common.enums.WebFilterOrderEnum;
 import cn.iocoder.yudao.framework.tenant.core.web.TenantContextWebFilter;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,6 +13,8 @@ import org.springframework.context.annotation.Configuration;
  * @author 芋道源码
  */
 @Configuration
+// 允许使用 yudao.tenant.enable=false 禁用多租户
+@ConditionalOnProperty(prefix = "yudao.tenant", value = "enable", matchIfMissing = true)
 public class YudaoTenantWebAutoConfiguration {
 
     @Bean

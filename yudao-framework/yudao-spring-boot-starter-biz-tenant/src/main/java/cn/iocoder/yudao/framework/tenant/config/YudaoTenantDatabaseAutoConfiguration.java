@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.mybatis.core.util.MyBatisUtils;
 import cn.iocoder.yudao.framework.tenant.core.db.TenantDatabaseInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.TenantLineInnerInterceptor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,6 +15,8 @@ import org.springframework.context.annotation.Configuration;
  * @author 芋道源码
  */
 @Configuration
+// 允许使用 yudao.tenant.enable=false 禁用多租户
+@ConditionalOnProperty(prefix = "yudao.tenant", value = "enable", matchIfMissing = true)
 @EnableConfigurationProperties(TenantProperties.class)
 public class YudaoTenantDatabaseAutoConfiguration {
 

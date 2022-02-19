@@ -4,7 +4,6 @@ import cn.hutool.core.io.IoUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
-import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
 import cn.iocoder.yudao.module.infra.controller.admin.file.vo.FilePageReqVO;
 import cn.iocoder.yudao.module.infra.controller.admin.file.vo.FileRespVO;
 import cn.iocoder.yudao.module.infra.convert.file.FileConvert;
@@ -62,7 +61,6 @@ public class FileController {
     @ApiOperation("下载文件")
     @ApiImplicitParam(name = "path", value = "文件附件", required = true, dataTypeClass = MultipartFile.class)
     public void getFile(HttpServletResponse response, @PathVariable("path") String path) throws IOException {
-        TenantContextHolder.setNullTenantId();
         FileDO file = fileService.getFile(path);
         if (file == null) {
             log.warn("[getFile][path({}) 文件不存在]", path);

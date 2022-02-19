@@ -33,7 +33,7 @@ public class TenantContextHolder {
     public static Long getRequiredTenantId() {
         Long tenantId = getTenantId();
         if (tenantId == null) {
-            throw new NullPointerException("TenantContextHolder 不存在租户编号");
+            throw new NullPointerException("TenantContextHolder 不存在租户编号"); // TODO 芋艿：增加文档链接
         }
         return tenantId;
     }

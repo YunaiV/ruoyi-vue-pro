@@ -14,22 +14,28 @@ import java.util.Set;
 @Data
 public class TenantProperties {
 
-//    /**
-//     * 租户是否开启
-//     */
-//    private static final Boolean ENABLE_DEFAULT = true;
-//
-//    /**
-//     * 是否开启
-//     */
-//    private Boolean enable = ENABLE_DEFAULT;
+    /**
+     * 租户是否开启
+     */
+    private static final Boolean ENABLE_DEFAULT = true;
 
     /**
-     * 需要多租户的表
-     *
-     * 由于多租户并不作为 yudao 项目的重点功能，更多是扩展性的功能，所以采用正向配置需要多租户的表。
-     * 如果需要，你可以改成 ignoreTables 来取消部分不需要的表
+     * 是否开启
      */
-    private Set<String> tables;
+    private Boolean enable = ENABLE_DEFAULT;
+
+    /**
+     * 需要忽略多租户的请求
+     *
+     * 默认情况下，每个请求需要带上 tenant-id 的请求头。但是，部分请求是无需带上的，例如说短信回调、支付回调等 Open API！
+     */
+    private Set<String> ignoreUrls;
+
+    /**
+     * 需要忽略多租户的表
+     *
+     * 即默认所有表都开启多租户的功能，所以记得添加对应的 tenant_id 字段哟
+     */
+    private Set<String> ignoreTables;
 
 }

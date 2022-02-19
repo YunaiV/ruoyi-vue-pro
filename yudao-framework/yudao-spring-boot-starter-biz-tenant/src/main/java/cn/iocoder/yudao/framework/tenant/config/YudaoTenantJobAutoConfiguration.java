@@ -7,6 +7,7 @@ import cn.iocoder.yudao.framework.tenant.core.job.TenantJobHandlerDecorator;
 import cn.iocoder.yudao.framework.tenant.core.service.TenantFrameworkService;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -16,6 +17,8 @@ import org.springframework.context.annotation.Configuration;
  * @author 芋道源码
  */
 @Configuration
+// 允许使用 yudao.tenant.enable=false 禁用多租户
+@ConditionalOnProperty(prefix = "yudao.tenant", value = "enable", matchIfMissing = true)
 public class YudaoTenantJobAutoConfiguration {
 
     @Bean

@@ -146,7 +146,7 @@ public class PermissionServiceImpl implements PermissionService {
     public List<MenuDO> getRoleMenusFromCache(Collection<Long> roleIds, Collection<Integer> menuTypes,
                                               Collection<Integer> menusStatuses) {
         // 任一一个参数为空时，不返回任何菜单
-        if (CollectionUtils.isAnyEmpty(roleIds, menusStatuses, menusStatuses)) {
+        if (CollectionUtils.isAnyEmpty(roleIds, menuTypes, menusStatuses)) {
             return Collections.emptyList();
         }
         // 判断角色是否包含管理员
