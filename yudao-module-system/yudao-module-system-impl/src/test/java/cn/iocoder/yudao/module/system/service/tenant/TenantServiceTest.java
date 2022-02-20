@@ -1,9 +1,9 @@
 package cn.iocoder.yudao.module.system.service.tenant;
 
-import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.TenantCreateReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.TenantExportReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.TenantPageReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.TenantUpdateReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantCreateReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantExportReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantPageReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantUpdateReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.tenant.TenantDO;
 import cn.iocoder.yudao.module.system.dal.mysql.tenant.TenantMapper;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;

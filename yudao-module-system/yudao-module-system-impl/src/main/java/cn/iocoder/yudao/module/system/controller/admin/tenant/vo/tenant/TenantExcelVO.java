@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.system.controller.admin.tenant.vo;
+package cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant;
 
 import lombok.*;
 import java.util.*;

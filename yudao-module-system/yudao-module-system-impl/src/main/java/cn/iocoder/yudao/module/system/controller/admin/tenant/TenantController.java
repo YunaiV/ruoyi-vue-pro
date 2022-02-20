@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.system.controller.admin.tenant;
 
-import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.*;
+import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.*;
 import cn.iocoder.yudao.module.system.convert.tenant.TenantConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.tenant.TenantDO;
 import cn.iocoder.yudao.module.system.service.tenant.TenantService;

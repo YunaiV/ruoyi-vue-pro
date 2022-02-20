@@ -2,10 +2,10 @@ package cn.iocoder.yudao.module.system.service.tenant;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
-import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.TenantCreateReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.TenantExportReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.TenantPageReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.TenantUpdateReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantCreateReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantExportReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantPageReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantUpdateReqVO;
 import cn.iocoder.yudao.module.system.convert.tenant.TenantConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.tenant.TenantDO;
 import cn.iocoder.yudao.module.system.dal.mysql.tenant.TenantMapper;
@@ -92,6 +92,11 @@ public class TenantServiceImpl implements TenantService {
     @Override
     public TenantDO getTenantByName(String name) {
         return tenantMapper.selectByName(name);
+    }
+
+    @Override
+    public Integer getTenantCountByPackageId(Long packageId) {
+        return tenantMapper.selectCountByPackageId(packageId);
     }
 
 }

@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.system.dal.mysql.tenant;
 
-import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.TenantExportReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.TenantPageReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantExportReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantPageReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.tenant.TenantDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
@@ -41,4 +41,9 @@ public interface TenantMapper extends BaseMapperX<TenantDO> {
     default TenantDO selectByName(String name) {
         return selectOne(TenantDO::getName, name);
     }
+
+    default Integer selectCountByPackageId(Long packageId) {
+        return selectCount("package_id", packageId);
+    }
+
 }

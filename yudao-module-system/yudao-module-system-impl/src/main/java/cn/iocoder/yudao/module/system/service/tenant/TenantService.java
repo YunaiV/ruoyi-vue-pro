@@ -2,10 +2,10 @@ package cn.iocoder.yudao.module.system.service.tenant;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.tenant.core.service.TenantFrameworkService;
-import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.TenantCreateReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.TenantExportReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.TenantPageReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.TenantUpdateReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantCreateReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantExportReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantPageReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantUpdateReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.tenant.TenantDO;
 
 import javax.validation.Valid;
@@ -80,5 +80,13 @@ public interface TenantService extends TenantFrameworkService {
      * @return 租户
      */
     TenantDO getTenantByName(String name);
+
+    /**
+     * 获得使用指定套餐的租户数量
+     *
+     * @param packageId 租户套餐编号
+     * @return 租户数量
+     */
+    Integer getTenantCountByPackageId(Long packageId);
 
 }

@@ -1,22 +1,17 @@
-package cn.iocoder.yudao.module.system.controller.admin.tenant.vo;
+package cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant;
 
-import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
-@ApiModel("管理后台 - 租户分页 Request VO")
+@ApiModel(value = "管理后台 - 租户 Excel 导出 Request VO", description = "参数和 TenantPageReqVO 是一致的")
 @Data
-@EqualsAndHashCode(callSuper = true)
-@ToString(callSuper = true)
-public class TenantPageReqVO extends PageParam {
+public class TenantExportReqVO {
 
     @ApiModelProperty(value = "租户名", example = "芋道")
     private String name;

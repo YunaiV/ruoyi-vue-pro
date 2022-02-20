@@ -102,16 +102,20 @@ public interface ErrorCodeConstants {
     ErrorCode SMS_CODE_IS_EXISTS = new ErrorCode(1002013007, "手机号已被使用");
     ErrorCode SMS_CODE_IS_UNUSED = new ErrorCode(1002013008, "验证码未被使用");
 
-    // ========== 租户模块 1002014000 ==========
+    // ========== 租户信息 1002014000 ==========
     ErrorCode TENANT_NOT_EXISTS = new ErrorCode(1002014000, "租户不存在");
 
-    // ========== 错误码模块 1002015000 ==========
-    ErrorCode ERROR_CODE_NOT_EXISTS = new ErrorCode(1002015000, "错误码不存在");
-    ErrorCode ERROR_CODE_DUPLICATE = new ErrorCode(1002015001, "已经存在编码为【{}】的错误码");
+    // ========== 租户套餐 1002015000 ==========
+    ErrorCode TENANT_PACKAGE_NOT_EXISTS = new ErrorCode(1002015000, "租户套餐不存在");
+    ErrorCode TENANT_PACKAGE_USED = new ErrorCode(1002015001, "租户正在使用该套餐，请给租户重新设置套餐后再尝试删除");
 
-    // ========== 社交用户 1002015000 ==========
-    ErrorCode SOCIAL_USER_AUTH_FAILURE = new ErrorCode(1002015000, "社交授权失败，原因是：{}");
-    ErrorCode SOCIAL_USER_UNBIND_NOT_SELF = new ErrorCode(1002015001, "社交解绑失败，非当前用户绑定");
-    ErrorCode SOCIAL_USER_NOT_FOUND = new ErrorCode(1002015001, "社交授权失败，找不到对应的用户");
+    // ========== 错误码模块 1002016000 ==========
+    ErrorCode ERROR_CODE_NOT_EXISTS = new ErrorCode(1002016000, "错误码不存在");
+    ErrorCode ERROR_CODE_DUPLICATE = new ErrorCode(1002016001, "已经存在编码为【{}】的错误码");
+
+    // ========== 社交用户 1002017000 ==========
+    ErrorCode SOCIAL_USER_AUTH_FAILURE = new ErrorCode(1002017000, "社交授权失败，原因是：{}");
+    ErrorCode SOCIAL_USER_UNBIND_NOT_SELF = new ErrorCode(1002017001, "社交解绑失败，非当前用户绑定");
+    ErrorCode SOCIAL_USER_NOT_FOUND = new ErrorCode(1002017001, "社交授权失败，找不到对应的用户");
 
 }
