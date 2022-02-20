@@ -1,11 +1,9 @@
 package cn.iocoder.yudao.module.system.controller.admin.tenant;
 
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.packages.TenantPackageCreateReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.packages.TenantPackagePageReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.packages.TenantPackageRespVO;
-import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.packages.TenantPackageUpdateReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.packages.*;
 import cn.iocoder.yudao.module.system.convert.tenant.TenantPackageConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.tenant.TenantPackageDO;
 import cn.iocoder.yudao.module.system.service.tenant.TenantPackageService;
@@ -80,6 +78,14 @@ public class TenantPackageController {
     public CommonResult<PageResult<TenantPackageRespVO>> getTenantPackagePage(@Valid TenantPackagePageReqVO pageVO) {
         PageResult<TenantPackageDO> pageResult = tenantPackageService.getTenantPackagePage(pageVO);
         return success(TenantPackageConvert.INSTANCE.convertPage(pageResult));
+    }
+
+    @GetMapping("/get-simple-list")
+    @ApiOperation(value = "获取租户套餐精简信息列表", notes = "只包含被开启的租户套餐，主要用于前端的下拉选项")
+    public CommonResult<List<TenantPackageSimpleRespVO>> getTenantPackageList() {
+        // 获得角色列表，只要开启状态的
+        List<TenantPackageDO> list = tenantPackageService.getTenantPackageListByStatus(CommonStatusEnum.ENABLE.getStatus());
+        return success(TenantPackageConvert.INSTANCE.convertList02(list));
     }
 
 }

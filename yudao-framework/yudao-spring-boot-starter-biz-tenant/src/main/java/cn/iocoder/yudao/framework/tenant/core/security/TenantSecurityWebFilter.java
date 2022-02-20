@@ -8,8 +8,10 @@ import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.framework.tenant.config.TenantProperties;
 import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
+import cn.iocoder.yudao.framework.tenant.core.service.TenantFrameworkService;
 import cn.iocoder.yudao.framework.web.config.WebProperties;
 import cn.iocoder.yudao.framework.web.core.filter.ApiRequestFilter;
+import cn.iocoder.yudao.framework.web.core.handler.GlobalExceptionHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.AntPathMatcher;
 
@@ -24,6 +26,7 @@ import java.util.Objects;
  * 多租户 Security Web 过滤器
  * 1. 如果是登陆的用户，校验是否有权限访问该租户，避免越权问题。
  * 2. 如果请求未带租户的编号，检查是否是忽略的 URL，否则也不允许访问。
+ * 3. 校验租户是合法，例如说被禁用、到期
  *
  * 校验用户访问的租户，是否是其所在的租户，
  *
@@ -33,13 +36,21 @@ import java.util.Objects;
 public class TenantSecurityWebFilter extends ApiRequestFilter {
 
     private final TenantProperties tenantProperties;
+
     private final AntPathMatcher pathMatcher;
 
+    private final GlobalExceptionHandler globalExceptionHandler;
+    private final TenantFrameworkService tenantFrameworkService;
+
     public TenantSecurityWebFilter(TenantProperties tenantProperties,
-                                   WebProperties webProperties) {
+                                   WebProperties webProperties,
+                                   GlobalExceptionHandler globalExceptionHandler,
+                                   TenantFrameworkService tenantFrameworkService) {
         super(webProperties);
         this.tenantProperties = tenantProperties;
         this.pathMatcher = new AntPathMatcher();
+        this.globalExceptionHandler = globalExceptionHandler;
+        this.tenantFrameworkService = tenantFrameworkService;
     }
 
     @Override
@@ -70,6 +81,17 @@ public class TenantSecurityWebFilter extends ApiRequestFilter {
             ServletUtils.writeJSON(response, CommonResult.error(GlobalErrorCodeConstants.BAD_REQUEST.getCode(),
                     "租户的请求未传递，请进行排查"));
             return;
+        }
+
+        // 3. 校验租户是合法，例如说被禁用、到期
+        if (tenantId != null) {
+            try {
+                tenantFrameworkService.validTenant(tenantId);
+            } catch (Throwable ex) {
+                CommonResult<?> result = globalExceptionHandler.allExceptionHandler(request, ex);
+                ServletUtils.writeJSON(response, result);
+                return;
+            }
         }
 
         // 继续过滤

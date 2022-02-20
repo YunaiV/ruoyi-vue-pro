@@ -72,10 +72,9 @@ public class RoleServiceTest extends BaseDbUnitTest {
             o.setCode("role_code");
             o.setName("role_name");
             o.setRemark("remark");
-            o.setType(RoleTypeEnum.CUSTOM.getType());
             o.setSort(1);
         });
-        Long roleId = sysRoleService.createRole(reqVO);
+        Long roleId = sysRoleService.createRole(reqVO, null);
 
         //断言
         assertNotNull(roleId);
@@ -96,7 +95,6 @@ public class RoleServiceTest extends BaseDbUnitTest {
             o.setId(roleId);
             o.setCode("role_code");
             o.setName("update_name");
-            o.setType(RoleTypeEnum.SYSTEM.getType());
             o.setSort(999);
         });
         sysRoleService.updateRole(reqVO);

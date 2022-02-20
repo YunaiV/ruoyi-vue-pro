@@ -7,6 +7,8 @@ import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.packages.Tenant
 import cn.iocoder.yudao.module.system.dal.dataobject.tenant.TenantPackageDO;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+
 /**
  * 租户套餐 Mapper
  *
@@ -24,4 +26,7 @@ public interface TenantPackageMapper extends BaseMapperX<TenantPackageDO> {
                 .orderByDesc(TenantPackageDO::getId));
     }
 
+    default List<TenantPackageDO> selectListByStatus(Integer status) {
+        return selectList(TenantPackageDO::getStatus, status);
+    }
 }

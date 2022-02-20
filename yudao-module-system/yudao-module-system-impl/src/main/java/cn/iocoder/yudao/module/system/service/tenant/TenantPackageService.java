@@ -63,4 +63,20 @@ public interface TenantPackageService {
      */
     PageResult<TenantPackageDO> getTenantPackagePage(TenantPackagePageReqVO pageReqVO);
 
+    /**
+     * 校验租户套餐
+     *
+     * @param id 编号
+     * @return 租户套餐
+     */
+    TenantPackageDO validTenantPackage(Long id);
+
+    /**
+     * 获得指定状态的租户套餐列表
+     *
+     * @param status 状态
+     * @return 租户套餐
+     */
+    List<TenantPackageDO> getTenantPackageListByStatus(Integer status);
+
 }

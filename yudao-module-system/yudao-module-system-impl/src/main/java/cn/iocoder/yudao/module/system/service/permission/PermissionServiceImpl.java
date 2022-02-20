@@ -224,8 +224,6 @@ public class PermissionServiceImpl implements PermissionService {
                 UserRoleDO::getRoleId);
     }
 
-
-
     @Override
     public void assignUserRole(Long userId, Set<Long> roleIds) {
         // 获得角色拥有角色编号

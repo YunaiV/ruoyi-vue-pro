@@ -43,12 +43,10 @@ export function getTenantPackagePage(query) {
   })
 }
 
-// 导出租户套餐 Excel
-export function exportTenantPackageExcel(query) {
+// 获取租户套餐精简信息列表
+export function getTenantPackageList() {
   return request({
-    url: '/system/tenant-package/export-excel',
-    method: 'get',
-    params: query,
-    responseType: 'blob'
+    url: '/system/tenant-package/get-simple-list',
+    method: 'get'
   })
 }

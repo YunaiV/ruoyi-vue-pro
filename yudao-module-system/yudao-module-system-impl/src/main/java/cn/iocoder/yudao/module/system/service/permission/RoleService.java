@@ -8,6 +8,7 @@ import cn.iocoder.yudao.module.system.controller.admin.permission.vo.role.RoleUp
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.RoleDO;
 import org.springframework.lang.Nullable;
 
+import javax.validation.Valid;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -28,16 +29,17 @@ public interface RoleService {
      * 创建角色
      *
      * @param reqVO 创建角色信息
+     * @param type 角色类型
      * @return 角色编号
      */
-    Long createRole(RoleCreateReqVO reqVO);
+    Long createRole(@Valid RoleCreateReqVO reqVO, Integer type);
 
     /**
      * 更新角色
      *
      * @param reqVO 更新角色信息
      */
-    void updateRole(RoleUpdateReqVO reqVO);
+    void updateRole(@Valid RoleUpdateReqVO reqVO);
 
     /**
      * 删除角色

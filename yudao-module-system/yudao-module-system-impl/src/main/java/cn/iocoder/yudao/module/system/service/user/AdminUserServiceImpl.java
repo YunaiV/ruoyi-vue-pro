@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.system.service.user;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.IoUtil;
-import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
@@ -258,7 +257,7 @@ public class AdminUserServiceImpl implements AdminUserService {
         // 校验邮箱唯一
         this.checkEmailUnique(id, email);
         // 校验部门处于开启状态
-        deptService.validDepts(Collections.singleton(deptId));
+        deptService.validDepts(CollectionUtils.singleton(deptId));
         // 校验岗位处于开启状态
         postService.validPosts(postIds);
     }

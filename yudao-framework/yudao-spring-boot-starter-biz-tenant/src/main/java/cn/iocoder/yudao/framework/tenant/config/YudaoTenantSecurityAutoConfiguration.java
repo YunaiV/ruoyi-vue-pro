@@ -2,7 +2,9 @@ package cn.iocoder.yudao.framework.tenant.config;
 
 import cn.iocoder.yudao.framework.common.enums.WebFilterOrderEnum;
 import cn.iocoder.yudao.framework.tenant.core.security.TenantSecurityWebFilter;
+import cn.iocoder.yudao.framework.tenant.core.service.TenantFrameworkService;
 import cn.iocoder.yudao.framework.web.config.WebProperties;
+import cn.iocoder.yudao.framework.web.core.handler.GlobalExceptionHandler;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -22,9 +24,12 @@ public class YudaoTenantSecurityAutoConfiguration {
 
     @Bean
     public FilterRegistrationBean<TenantSecurityWebFilter> tenantSecurityWebFilter(TenantProperties tenantProperties,
-                                                                                   WebProperties webProperties) {
+                                                                                   WebProperties webProperties,
+                                                                                   GlobalExceptionHandler globalExceptionHandler,
+                                                                                   TenantFrameworkService tenantFrameworkService) {
         FilterRegistrationBean<TenantSecurityWebFilter> registrationBean = new FilterRegistrationBean<>();
-        registrationBean.setFilter(new TenantSecurityWebFilter(tenantProperties, webProperties));
+        registrationBean.setFilter(new TenantSecurityWebFilter(tenantProperties, webProperties,
+                globalExceptionHandler, tenantFrameworkService));
         registrationBean.setOrder(WebFilterOrderEnum.TENANT_SECURITY_FILTER);
         return registrationBean;
     }

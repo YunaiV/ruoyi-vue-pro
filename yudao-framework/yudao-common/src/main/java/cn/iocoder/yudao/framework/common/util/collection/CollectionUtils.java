@@ -147,4 +147,7 @@ public class CollectionUtils {
         coll.add(item);
     }
 
+    public static <T> Collection<T> singleton(T deptId) {
+        return deptId == null ? Collections.emptyList() : Collections.singleton(deptId);
+    }
 }

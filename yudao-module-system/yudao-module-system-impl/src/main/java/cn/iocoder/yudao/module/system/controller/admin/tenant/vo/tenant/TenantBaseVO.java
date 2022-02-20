@@ -2,7 +2,10 @@ package cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant;
 
 import lombok.*;
 import io.swagger.annotations.*;
+import org.hibernate.validator.constraints.URL;
+
 import javax.validation.constraints.*;
+import java.util.Date;
 
 /**
 * 租户 Base VO，提供给添加、修改、详细的子 VO 使用
@@ -22,8 +25,24 @@ public class TenantBaseVO {
     @ApiModelProperty(value = "联系手机", example = "15601691300")
     private String contactMobile;
 
-    @ApiModelProperty(value = "租户状态（0正常 1停用）", required = true, example = "1")
-    @NotNull(message = "租户状态（0正常 1停用）不能为空")
+    @ApiModelProperty(value = "租户状态", required = true, example = "1")
+    @NotNull(message = "租户状态")
     private Integer status;
+
+    @ApiModelProperty(value = "绑定域名", example = "https://www.iocoder.cn")
+    @URL(message = "绑定域名的地址非 URL 格式")
+    private String domain;
+
+    @ApiModelProperty(value = "租户套餐编号", required = true, example = "1024")
+    @NotNull(message = "租户套餐编号不能为空")
+    private Long packageId;
+
+    @ApiModelProperty(value = "过期时间", required = true)
+    @NotNull(message = "过期时间不能为空")
+    private Date expireTime;
+
+    @ApiModelProperty(value = "账号数量", required = true, example = "1024")
+    @NotNull(message = "账号数量不能为空")
+    private Integer accountCount;
 
 }

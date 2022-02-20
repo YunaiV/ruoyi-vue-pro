@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.system.service.tenant;
 
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.packages.TenantPackageCreateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.packages.TenantPackagePageReqVO;
@@ -7,6 +8,7 @@ import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.packages.Tenant
 import cn.iocoder.yudao.module.system.convert.tenant.TenantPackageConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.tenant.TenantPackageDO;
 import cn.iocoder.yudao.module.system.dal.mysql.tenant.TenantPackageMapper;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -15,8 +17,7 @@ import java.util.Collection;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.TENANT_PACKAGE_NOT_EXISTS;
-import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.TENANT_PACKAGE_USED;
+import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
 
 /**
  * 租户套餐 Service 实现类
@@ -31,6 +32,7 @@ public class TenantPackageServiceImpl implements TenantPackageService {
     private TenantPackageMapper tenantPackageMapper;
 
     @Resource
+    @Lazy // 避免循环依赖的报错
     private TenantService tenantService;
 
     @Override
@@ -86,6 +88,23 @@ public class TenantPackageServiceImpl implements TenantPackageService {
     @Override
     public PageResult<TenantPackageDO> getTenantPackagePage(TenantPackagePageReqVO pageReqVO) {
         return tenantPackageMapper.selectPage(pageReqVO);
+    }
+
+    @Override
+    public TenantPackageDO validTenantPackage(Long id) {
+        TenantPackageDO tenantPackage = tenantPackageMapper.selectById(id);
+        if (tenantPackage == null) {
+            throw exception(TENANT_PACKAGE_NOT_EXISTS);
+        }
+        if (tenantPackage.getStatus().equals(CommonStatusEnum.DISABLE.getStatus())) {
+            throw exception(TENANT_PACKAGE_DISABLE, tenantPackage.getName());
+        }
+        return tenantPackage;
+    }
+
+    @Override
+    public List<TenantPackageDO> getTenantPackageListByStatus(Integer status) {
+        return tenantPackageMapper.selectListByStatus(status);
     }
 
 }

@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.system.service.permission;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
@@ -120,12 +121,12 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public Long createRole(RoleCreateReqVO reqVO) {
+    public Long createRole(RoleCreateReqVO reqVO, Integer type) {
         // 校验角色
         checkDuplicateRole(reqVO.getName(), reqVO.getCode(), null);
         // 插入到数据库
         RoleDO role = RoleConvert.INSTANCE.convert(reqVO);
-        role.setType(RoleTypeEnum.CUSTOM.getType());
+        role.setType(ObjectUtil.defaultIfNull(type, RoleTypeEnum.CUSTOM.getType()));
         role.setStatus(CommonStatusEnum.ENABLE.getStatus());
         role.setDataScope(DataScopeEnum.ALL.getScope()); // 默认可查看所有数据。原因是，可能一些项目不需要项目权限
         roleMapper.insert(role);
