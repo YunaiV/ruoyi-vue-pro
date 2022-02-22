@@ -1,6 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  cn.iocoder.yudao.framework.tenant.config.YudaoTenantDatabaseAutoConfiguration,\
-  cn.iocoder.yudao.framework.tenant.config.YudaoTenantWebAutoConfiguration,\
-  cn.iocoder.yudao.framework.tenant.config.YudaoTenantJobAutoConfiguration,\
-  cn.iocoder.yudao.framework.tenant.config.YudaoTenantMQAutoConfiguration,\
-  cn.iocoder.yudao.framework.tenant.config.YudaoTenantSecurityAutoConfiguration
+  cn.iocoder.yudao.framework.tenant.config.YudaoTenantAutoConfiguration

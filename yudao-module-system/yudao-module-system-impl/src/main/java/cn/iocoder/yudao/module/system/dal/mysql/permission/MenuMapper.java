@@ -1,11 +1,10 @@
 package cn.iocoder.yudao.module.system.dal.mysql.permission;
 
 import cn.iocoder.yudao.framework.mybatis.core.enums.SqlConstants;
-import cn.iocoder.yudao.module.system.controller.admin.permission.vo.menu.MenuListReqVO;
-import cn.iocoder.yudao.module.system.dal.dataobject.permission.MenuDO;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
-import com.baomidou.mybatisplus.annotation.InterceptorIgnore;
+import cn.iocoder.yudao.module.system.controller.admin.permission.vo.menu.MenuListReqVO;
+import cn.iocoder.yudao.module.system.dal.dataobject.permission.MenuDO;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -29,7 +28,6 @@ public interface MenuMapper extends BaseMapperX<MenuDO> {
                 .eqIfPresent(MenuDO::getStatus, reqVO.getStatus()));
     }
 
-    @InterceptorIgnore(tenantLine = "true") // 该方法忽略多租户。原因：该方法被异步 task 调用，此时获取不到租户编号
     default boolean selectExistsByUpdateTimeAfter(Date maxUpdateTime) {
         return selectOne(new LambdaQueryWrapper<MenuDO>().select(MenuDO::getId)
                 .gt(MenuDO::getUpdateTime, maxUpdateTime).last(SqlConstants.LIMIT1)) != null;

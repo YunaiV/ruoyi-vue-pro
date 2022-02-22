@@ -6,7 +6,7 @@ import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
 import com.baomidou.mybatisplus.extension.plugins.handler.TenantLineHandler;
 import lombok.AllArgsConstructor;
 import net.sf.jsqlparser.expression.Expression;
-import net.sf.jsqlparser.expression.StringValue;
+import net.sf.jsqlparser.expression.LongValue;
 
 /**
  * 基于 MyBatis Plus 多租户的功能，实现 DB 层面的多租户的功能
@@ -20,12 +20,13 @@ public class TenantDatabaseInterceptor implements TenantLineHandler {
 
     @Override
     public Expression getTenantId() {
-        return new StringValue(TenantContextHolder.getRequiredTenantId().toString());
+        return new LongValue( TenantContextHolder.getRequiredTenantId());
     }
 
     @Override
     public boolean ignoreTable(String tableName) {
-        return CollUtil.contains(properties.getIgnoreTables(), tableName);
+        return TenantContextHolder.isIgnore() // 情况一，全局忽略多租户
+            || CollUtil.contains(properties.getIgnoreTables(), tableName); // 情况二，忽略多租户的表
     }
 
 }
