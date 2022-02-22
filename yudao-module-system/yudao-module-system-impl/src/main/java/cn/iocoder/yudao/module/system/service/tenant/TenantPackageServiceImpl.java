@@ -1,15 +1,18 @@
 package cn.iocoder.yudao.module.system.service.tenant;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.packages.TenantPackageCreateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.packages.TenantPackagePageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.packages.TenantPackageUpdateReqVO;
 import cn.iocoder.yudao.module.system.convert.tenant.TenantPackageConvert;
+import cn.iocoder.yudao.module.system.dal.dataobject.tenant.TenantDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.tenant.TenantPackageDO;
 import cn.iocoder.yudao.module.system.dal.mysql.tenant.TenantPackageMapper;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
@@ -45,12 +48,18 @@ public class TenantPackageServiceImpl implements TenantPackageService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void updateTenantPackage(TenantPackageUpdateReqVO updateReqVO) {
         // 校验存在
-        this.validateTenantPackageExists(updateReqVO.getId());
+        TenantPackageDO tenantPackage = validateTenantPackageExists(updateReqVO.getId());
         // 更新
         TenantPackageDO updateObj = TenantPackageConvert.INSTANCE.convert(updateReqVO);
         tenantPackageMapper.updateById(updateObj);
+        // 如果菜单发生变化，则修改每个租户的菜单
+        if (!CollUtil.isEqualList(tenantPackage.getMenuIds(), updateReqVO.getMenuIds())) {
+            List<TenantDO> tenants = tenantService.getTenantListByPackageId(tenantPackage.getId());
+            tenants.forEach(tenant -> tenantService.updateTenantRoleMenu(tenant.getId(), updateReqVO.getMenuIds()));
+        }
     }
 
     @Override
@@ -63,10 +72,12 @@ public class TenantPackageServiceImpl implements TenantPackageService {
         tenantPackageMapper.deleteById(id);
     }
 
-    private void validateTenantPackageExists(Long id) {
-        if (tenantPackageMapper.selectById(id) == null) {
+    private TenantPackageDO validateTenantPackageExists(Long id) {
+        TenantPackageDO tenantPackage = tenantPackageMapper.selectById(id);
+        if (tenantPackage == null) {
             throw exception(TENANT_PACKAGE_NOT_EXISTS);
         }
+        return tenantPackage;
     }
 
     private void validateTenantUsed(Long id) {

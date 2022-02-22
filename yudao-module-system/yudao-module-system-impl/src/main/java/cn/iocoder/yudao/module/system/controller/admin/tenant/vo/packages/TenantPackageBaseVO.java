@@ -4,7 +4,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
-import java.util.List;
+import java.util.Set;
 
 /**
 * 租户套餐 Base VO，提供给添加、修改、详细的子 VO 使用
@@ -26,6 +26,6 @@ public class TenantPackageBaseVO {
 
     @ApiModelProperty(value = "关联的菜单编号", required = true)
     @NotNull(message = "关联的菜单编号不能为空")
-    private List<Long> menuIds;
+    private Set<Long> menuIds;
 
 }

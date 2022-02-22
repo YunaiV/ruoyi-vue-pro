@@ -37,7 +37,7 @@ public class PermissionController {
     @GetMapping("/list-role-resources")
 //    @RequiresPermissions("system:permission:assign-role-menu")
     public CommonResult<Set<Long>> listRoleMenus(Long roleId) {
-        return success(permissionService.listRoleMenuIds(roleId));
+        return success(permissionService.getRoleMenuIds(roleId));
     }
 
     @PostMapping("/assign-role-menu")

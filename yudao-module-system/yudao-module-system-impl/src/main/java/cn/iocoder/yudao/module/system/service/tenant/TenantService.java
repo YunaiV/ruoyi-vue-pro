@@ -11,6 +11,7 @@ import cn.iocoder.yudao.module.system.dal.dataobject.tenant.TenantDO;
 import javax.validation.Valid;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 /**
  * 租户 Service 接口
@@ -18,6 +19,11 @@ import java.util.List;
  * @author 芋道源码
  */
 public interface TenantService extends TenantFrameworkService {
+
+    /**
+     * 初始化租户的本地缓存
+     */
+    void initLocalCache();
 
     /**
      * 创建租户
@@ -33,6 +39,14 @@ public interface TenantService extends TenantFrameworkService {
      * @param updateReqVO 更新信息
      */
     void updateTenant(@Valid TenantUpdateReqVO updateReqVO);
+
+    /**
+     * 更新租户的角色菜单
+     *
+     * @param tenantId 租户编号
+     * @param menuIds 菜单编号数组
+     */
+    void updateTenantRoleMenu(Long tenantId, Set<Long> menuIds);
 
     /**
      * 删除租户
@@ -88,5 +102,13 @@ public interface TenantService extends TenantFrameworkService {
      * @return 租户数量
      */
     Integer getTenantCountByPackageId(Long packageId);
+
+    /**
+     * 获得使用指定套餐的租户数组
+     *
+     * @param packageId 租户套餐编号
+     * @return 租户数组
+     */
+    List<TenantDO> getTenantListByPackageId(Long packageId);
 
 }

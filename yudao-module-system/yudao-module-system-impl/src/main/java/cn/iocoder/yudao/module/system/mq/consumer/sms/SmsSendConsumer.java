@@ -12,7 +12,6 @@ import javax.annotation.Resource;
  * 针对 {@link SmsSendMessage} 的消费者
  *
  * @author zzf
- * @date 2021/3/9 16:35
  */
 @Component
 @Slf4j

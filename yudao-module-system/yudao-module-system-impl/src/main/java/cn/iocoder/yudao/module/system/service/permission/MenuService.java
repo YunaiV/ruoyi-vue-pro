@@ -66,7 +66,7 @@ public interface MenuService {
      * @param menusStatuses 菜单状态数组
      * @return 菜单列表
      */
-    List<MenuDO> listMenusFromCache(Collection<Integer> menuTypes, Collection<Integer> menusStatuses);
+    List<MenuDO> getMenuListFromCache(Collection<Integer> menuTypes, Collection<Integer> menusStatuses);
 
     /**
      * 获得指定编号的菜单数组，从缓存中
@@ -78,8 +78,8 @@ public interface MenuService {
      * @param menusStatuses 菜单状态数组
      * @return 菜单数组
      */
-    List<MenuDO> listMenusFromCache(Collection<Long> menuIds, Collection<Integer> menuTypes,
-                                    Collection<Integer> menusStatuses);
+    List<MenuDO> getMenuListFromCache(Collection<Long> menuIds, Collection<Integer> menuTypes,
+                                      Collection<Integer> menusStatuses);
 
     /**
      * 获得权限对应的菜单数组

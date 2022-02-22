@@ -6,15 +6,16 @@ import cn.hutool.json.JSONUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.pay.core.client.PayClientConfig;
 import cn.iocoder.yudao.framework.pay.core.client.PayClientFactory;
+import cn.iocoder.yudao.framework.pay.core.enums.PayChannelEnum;
+import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnore;
 import cn.iocoder.yudao.module.pay.controller.admin.merchant.vo.channel.PayChannelCreateReqVO;
 import cn.iocoder.yudao.module.pay.controller.admin.merchant.vo.channel.PayChannelExportReqVO;
 import cn.iocoder.yudao.module.pay.controller.admin.merchant.vo.channel.PayChannelPageReqVO;
 import cn.iocoder.yudao.module.pay.controller.admin.merchant.vo.channel.PayChannelUpdateReqVO;
 import cn.iocoder.yudao.module.pay.convert.channel.PayChannelConvert;
-import cn.iocoder.yudao.framework.pay.core.client.PayClientConfig;
-import cn.iocoder.yudao.framework.pay.core.enums.PayChannelEnum;
 import cn.iocoder.yudao.module.pay.dal.dataobject.merchant.PayChannelDO;
 import cn.iocoder.yudao.module.pay.dal.mysql.merchant.PayChannelMapper;
 import cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants;
@@ -27,12 +28,12 @@ import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.validation.Validator;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.CHANNEL_EXIST_SAME_CHANNEL_ERROR;
+import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.CHANNEL_NOT_EXISTS;
 
 /**
  * 支付渠道 Service 实现类
@@ -66,9 +67,10 @@ public class PayChannelServiceImpl implements PayChannelService {
 
     @Override
     @PostConstruct
+    @TenantIgnore // 忽略自动化租户，全局初始化本地缓存
     public void initPayClients() {
         // 获取支付渠道，如果有更新
-        List<PayChannelDO> payChannels = this.loadPayChannelIfUpdate(maxUpdateTime);
+        List<PayChannelDO> payChannels = loadPayChannelIfUpdate(maxUpdateTime);
         if (CollUtil.isEmpty(payChannels)) {
             return;
         }
@@ -78,8 +80,7 @@ public class PayChannelServiceImpl implements PayChannelService {
                 payChannel.getCode(), payChannel.getConfig()));
 
         // 写入缓存
-        assert payChannels.size() > 0; // 断言，避免告警
-        maxUpdateTime = payChannels.stream().max(Comparator.comparing(BaseDO::getUpdateTime)).get().getUpdateTime();
+        maxUpdateTime = CollectionUtils.getMaxValue(payChannels, PayChannelDO::getUpdateTime);
         log.info("[initPayClients][初始化 PayChannel 数量为 {}]", payChannels.size());
     }
 

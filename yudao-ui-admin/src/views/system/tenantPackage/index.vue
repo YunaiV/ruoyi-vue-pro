@@ -200,6 +200,8 @@ export default {
       this.reset();
       this.open = true;
       this.title = "添加租户套餐";
+      // 设置为非严格，继续使用半选中
+      this.menuCheckStrictly = false;
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
@@ -222,12 +224,6 @@ export default {
     /** 获得菜单 */
     getMenus() {
       listSimpleMenus().then(response => {
-        // 移除 BUTTON 类型，暂支只需要发 DIR、MENU 类型
-        for (let i = response.data.length -1; i >= 0 ; i--) {
-          if (response.data[i].type === SystemMenuTypeEnum.BUTTON) {
-            response.data.splice(i, 1);
-          }
-        }
         // 处理 menuOptions 参数
         this.menuOptions = [];
         // 只需要配置

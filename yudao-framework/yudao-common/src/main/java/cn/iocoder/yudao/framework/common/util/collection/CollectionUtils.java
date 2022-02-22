@@ -2,6 +2,7 @@ package cn.iocoder.yudao.framework.common.util.collection;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
+import com.google.common.collect.ImmutableMap;
 
 import java.util.*;
 import java.util.function.BinaryOperator;
@@ -125,6 +126,15 @@ public class CollectionUtils {
         return from.stream().collect(Collectors.groupingBy(keyFunc, Collectors.mapping(valueFunc, Collectors.toSet())));
     }
 
+    public static <T, K> Map<K, T> convertImmutableMap(Collection<T> from, Function<T, K> keyFunc) {
+        if (CollUtil.isEmpty(from)) {
+            return Collections.emptyMap();
+        }
+        ImmutableMap.Builder<K, T> builder = ImmutableMap.builder();
+        from.forEach(item -> builder.put(keyFunc.apply(item), item));
+        return builder.build();
+    }
+
     public static boolean containsAny(Collection<?> source, Collection<?> candidates) {
         return org.springframework.util.CollectionUtils.containsAny(source, candidates);
     }
@@ -138,6 +148,15 @@ public class CollectionUtils {
             return null;
         }
         return from.stream().filter(predicate).findFirst().orElse(null);
+    }
+
+    public static <T, V extends Comparable<? super V>> V getMaxValue(List<T> from, Function<T, V> valueFunc) {
+        if (CollUtil.isEmpty(from)) {
+            return null;
+        }
+        assert from.size() > 0; // 断言，避免告警
+        T t = from.stream().max(Comparator.comparing(valueFunc)).get();
+        return valueFunc.apply(t);
     }
 
     public static <T> void addIfNotNull(Collection<T> coll, T item) {

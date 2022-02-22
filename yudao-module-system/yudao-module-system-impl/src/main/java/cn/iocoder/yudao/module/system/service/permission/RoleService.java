@@ -90,12 +90,12 @@ public interface RoleService {
     List<RoleDO> getRolesFromCache(Collection<Long> ids);
 
     /**
-     * 判断角色数组中，是否有管理员
+     * 判断角色数组中，是否有超级管理员
      *
      * @param roleList 角色数组
      * @return 是否有管理员
      */
-    boolean hasAnyAdmin(Collection<RoleDO> roleList);
+    boolean hasAnySuperAdmin(Collection<RoleDO> roleList);
 
     /**
      * 判断角色编号数组中，是否有管理员
@@ -103,8 +103,8 @@ public interface RoleService {
      * @param ids 角色编号数组
      * @return 是否有管理员
      */
-    default boolean hasAnyAdmin(Set<Long> ids) {
-        return hasAnyAdmin(getRolesFromCache(ids));
+    default boolean hasAnySuperAdmin(Set<Long> ids) {
+        return hasAnySuperAdmin(getRolesFromCache(ids));
     }
 
     /**

@@ -243,7 +243,7 @@ public class MenuServiceTest extends BaseDbUnitTest {
         menuDO = createMenuDO(4L, MenuTypeEnum.MENU, "name", 0L, 2);
         mockCacheMap.put(menuDO.getId(), menuDO);
 
-        List<MenuDO> menuDOS = sysMenuService.listMenusFromCache(Collections.singletonList(MenuTypeEnum.MENU.getType()),
+        List<MenuDO> menuDOS = sysMenuService.getMenuListFromCache(Collections.singletonList(MenuTypeEnum.MENU.getType()),
                 Collections.singletonList(CommonStatusEnum.DISABLE.getStatus()));
         assertEquals(menuDOS.size(), idMenuMap.size());
         menuDOS.forEach(m -> assertPojoEquals(idMenuMap.get(m.getId()), m));
@@ -270,7 +270,7 @@ public class MenuServiceTest extends BaseDbUnitTest {
         menuDO = createMenuDO(4L, MenuTypeEnum.MENU, "name", 0L, 2);
         mockCacheMap.put(menuDO.getId(), menuDO);
 
-        List<MenuDO> menuDOS = sysMenuService.listMenusFromCache(Collections.singletonList(1L),
+        List<MenuDO> menuDOS = sysMenuService.getMenuListFromCache(Collections.singletonList(1L),
                 Collections.singletonList(MenuTypeEnum.MENU.getType()), Collections.singletonList(1));
         assertEquals(menuDOS.size(), idMenuMap.size());
         menuDOS.forEach(menu -> assertPojoEquals(idMenuMap.get(menu.getId()), menu));

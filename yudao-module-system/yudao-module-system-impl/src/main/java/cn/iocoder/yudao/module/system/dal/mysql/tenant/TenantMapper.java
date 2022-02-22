@@ -7,7 +7,9 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Select;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -43,7 +45,14 @@ public interface TenantMapper extends BaseMapperX<TenantDO> {
     }
 
     default Integer selectCountByPackageId(Long packageId) {
-        return selectCount("package_id", packageId);
+        return selectCount(TenantDO::getPackageId, packageId);
     }
+
+    default List<TenantDO> selectListByPackageId(Long packageId) {
+        return selectList(TenantDO::getPackageId, packageId);
+    }
+
+    @Select("SELECT id FROM system_tenant WHERE update_time > #{maxUpdateTime} LIMIT 1")
+    Long selectExistsByUpdateTimeAfter(Date maxUpdateTime);
 
 }

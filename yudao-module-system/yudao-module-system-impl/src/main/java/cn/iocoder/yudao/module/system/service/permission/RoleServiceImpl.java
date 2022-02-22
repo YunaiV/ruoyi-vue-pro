@@ -6,8 +6,8 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
-import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.framework.security.core.enums.DataScopeEnum;
+import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnore;
 import cn.iocoder.yudao.module.system.controller.admin.permission.vo.role.RoleCreateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.permission.vo.role.RoleExportReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.permission.vo.role.RolePageReqVO;
@@ -19,7 +19,6 @@ import cn.iocoder.yudao.module.system.enums.permission.RoleCodeEnum;
 import cn.iocoder.yudao.module.system.enums.permission.RoleTypeEnum;
 import cn.iocoder.yudao.module.system.mq.producer.permission.RoleProducer;
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.ImmutableMap;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.Nullable;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -78,19 +77,17 @@ public class RoleServiceImpl implements RoleService {
      */
     @Override
     @PostConstruct
+    @TenantIgnore // 忽略自动多租户，全局初始化缓存
     public void initLocalCache() {
         // 获取角色列表，如果有更新
-        List<RoleDO> roleList = this.loadRoleIfUpdate(maxUpdateTime);
+        List<RoleDO> roleList = loadRoleIfUpdate(maxUpdateTime);
         if (CollUtil.isEmpty(roleList)) {
             return;
         }
 
         // 写入缓存
-        ImmutableMap.Builder<Long, RoleDO> builder = ImmutableMap.builder();
-        roleList.forEach(sysRoleDO -> builder.put(sysRoleDO.getId(), sysRoleDO));
-        roleCache = builder.build();
-        assert roleList.size() > 0; // 断言，避免告警
-        maxUpdateTime = roleList.stream().max(Comparator.comparing(BaseDO::getUpdateTime)).get().getUpdateTime();
+        roleCache = CollectionUtils.convertMap(roleList, RoleDO::getId);
+        maxUpdateTime = CollectionUtils.getMaxValue(roleList, RoleDO::getUpdateTime);
         log.info("[initLocalCache][初始化 Role 数量为 {}]", roleList.size());
     }
 
@@ -216,11 +213,11 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public boolean hasAnyAdmin(Collection<RoleDO> roleList) {
+    public boolean hasAnySuperAdmin(Collection<RoleDO> roleList) {
         if (CollectionUtil.isEmpty(roleList)) {
             return false;
         }
-        return roleList.stream().anyMatch(roleDO -> RoleCodeEnum.ADMIN.getKey().equals(roleDO.getCode()));
+        return roleList.stream().anyMatch(roleDO -> RoleCodeEnum.SUPER_ADMIN.getCode().equals(roleDO.getCode()));
     }
 
     @Override
