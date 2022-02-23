@@ -17,6 +17,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -71,6 +72,10 @@ public class DeptServiceImpl implements DeptService {
     @Resource
     private DeptProducer deptProducer;
 
+    @Resource
+    @Lazy // 注入自己，所以延迟加载
+    private DeptService self;
+
     @Override
     @PostConstruct
     @TenantIgnore // 初始化缓存，无需租户过滤
@@ -97,7 +102,7 @@ public class DeptServiceImpl implements DeptService {
 
     @Scheduled(fixedDelay = SCHEDULER_PERIOD, initialDelay = SCHEDULER_PERIOD)
     public void schedulePeriodicRefresh() {
-        initLocalCache();
+        self.initLocalCache();
     }
 
     /**
@@ -124,6 +129,9 @@ public class DeptServiceImpl implements DeptService {
     @Override
     public Long createDept(DeptCreateReqVO reqVO) {
         // 校验正确性
+        if (reqVO.getParentId() == null) {
+            reqVO.setParentId(DeptIdEnum.ROOT.getId());
+        }
         checkCreateOrUpdate(null, reqVO.getParentId(), reqVO.getName());
         // 插入部门
         DeptDO dept = DeptConvert.INSTANCE.convert(reqVO);
@@ -136,6 +144,9 @@ public class DeptServiceImpl implements DeptService {
     @Override
     public void updateDept(DeptUpdateReqVO reqVO) {
         // 校验正确性
+        if (reqVO.getParentId() == null) {
+            reqVO.setParentId(DeptIdEnum.ROOT.getId());
+        }
         checkCreateOrUpdate(reqVO.getId(), reqVO.getParentId(), reqVO.getName());
         // 更新部门
         DeptDO updateObj = DeptConvert.INSTANCE.convert(reqVO);

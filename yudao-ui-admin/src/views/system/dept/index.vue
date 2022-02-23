@@ -57,7 +57,7 @@
     <el-dialog :title="title" :visible.sync="open" width="600px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-row>
-          <el-col :span="24" v-if="form.parentId !== 0">
+          <el-col :span="24">
             <el-form-item label="上级部门" prop="parentId">
               <treeselect v-model="form.parentId" :options="deptOptions" :normalizer="normalizer" placeholder="选择上级部门" />
             </el-form-item>
@@ -152,9 +152,6 @@ export default {
       form: {},
       // 表单校验
       rules: {
-        parentId: [
-          { required: true, message: "上级部门不能为空", trigger: "blur" }
-        ],
         name: [
           { required: true, message: "部门名称不能为空", trigger: "blur" }
         ],
@@ -278,6 +275,9 @@ export default {
       this.reset();
       getDept(row.id).then(response => {
         this.form = response.data;
+        if (this.form.parentId === 0) { // 无父部门时，标记为 undefined，避免展示为 Unknown
+          this.form.parentId = undefined;
+        }
         this.open = true;
         this.title = "修改部门";
       });

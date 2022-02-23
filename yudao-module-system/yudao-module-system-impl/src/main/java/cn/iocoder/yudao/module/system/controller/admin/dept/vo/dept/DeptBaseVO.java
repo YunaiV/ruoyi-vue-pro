@@ -20,8 +20,7 @@ public class DeptBaseVO {
     @Size(max = 30, message = "部门名称长度不能超过30个字符")
     private String name;
 
-    @ApiModelProperty(value = "父菜单 ID", required = true, example = "1024")
-    @NotNull(message = "父菜单 ID 不能为空")
+    @ApiModelProperty(value = "父菜单 ID", example = "1024")
     private Long parentId;
 
     @ApiModelProperty(value = "显示顺序不能为空", required = true, example = "1024")
