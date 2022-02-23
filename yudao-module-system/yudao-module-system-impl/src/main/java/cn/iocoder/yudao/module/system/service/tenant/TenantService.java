@@ -1,12 +1,14 @@
 package cn.iocoder.yudao.module.system.service.tenant;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
 import cn.iocoder.yudao.framework.tenant.core.service.TenantFrameworkService;
 import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantCreateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantExportReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantPageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantUpdateReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.tenant.TenantDO;
+import cn.iocoder.yudao.module.system.service.tenant.handler.TenantMenuHandler;
 
 import javax.validation.Valid;
 import java.util.Collection;
@@ -110,5 +112,13 @@ public interface TenantService extends TenantFrameworkService {
      * @return 租户数组
      */
     List<TenantDO> getTenantListByPackageId(Long packageId);
+
+    /**
+     * 进行租户的菜单处理逻辑
+     * 其中，租户编号从 {@link TenantContextHolder} 上下文中获取
+     *
+     * @param handler 处理器
+     */
+    void handleTenantMenu(TenantMenuHandler handler);
 
 }

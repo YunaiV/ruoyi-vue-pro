@@ -7,6 +7,8 @@ import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.date.DateUtils;
+import cn.iocoder.yudao.framework.tenant.config.TenantProperties;
+import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
 import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
 import cn.iocoder.yudao.module.system.controller.admin.permission.vo.role.RoleCreateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantCreateReqVO;
@@ -23,6 +25,7 @@ import cn.iocoder.yudao.module.system.enums.permission.RoleTypeEnum;
 import cn.iocoder.yudao.module.system.mq.producer.tenant.TenantProducer;
 import cn.iocoder.yudao.module.system.service.permission.PermissionService;
 import cn.iocoder.yudao.module.system.service.permission.RoleService;
+import cn.iocoder.yudao.module.system.service.tenant.handler.TenantMenuHandler;
 import cn.iocoder.yudao.module.system.service.user.AdminUserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -66,6 +69,9 @@ public class TenantServiceImpl implements TenantService {
      * 缓存角色的最大更新时间，用于后续的增量轮询，判断是否有更新
      */
     private volatile Date maxUpdateTime;
+
+    @Resource
+    private TenantProperties tenantProperties;
 
     @Resource
     private TenantMapper tenantMapper;
@@ -290,6 +296,19 @@ public class TenantServiceImpl implements TenantService {
     @Override
     public List<TenantDO> getTenantListByPackageId(Long packageId) {
         return tenantMapper.selectListByPackageId(packageId);
+    }
+
+    @Override
+    public void handleTenantMenu(TenantMenuHandler handler) {
+        // 如果禁用，则不执行逻辑
+        if (Boolean.FALSE.equals(tenantProperties.getEnable())) {
+            return;
+        }
+        // 获得租户，然后获得菜单
+        TenantDO tenant = getTenant(TenantContextHolder.getRequiredTenantId());
+        TenantPackageDO tenantPackage = tenantPackageService.getTenantPackage(tenant.getPackageId());
+        // 执行处理器
+        handler.handle(tenantPackage.getMenuIds());
     }
 
 }
