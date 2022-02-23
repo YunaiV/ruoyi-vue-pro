@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.system.enums.permission;
 
+import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -22,5 +23,9 @@ public enum RoleCodeEnum {
      * 名字
      */
     private final String name;
+
+    public static boolean isSuperAdmin(String code) {
+        return ObjectUtils.equalsAny(code, SUPER_ADMIN.getCode());
+    }
 
 }

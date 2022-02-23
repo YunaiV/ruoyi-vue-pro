@@ -31,7 +31,8 @@ public interface ErrorCodeConstants {
     ErrorCode ROLE_NAME_DUPLICATE = new ErrorCode(1002003001, "已经存在名为【{}】的角色");
     ErrorCode ROLE_CODE_DUPLICATE = new ErrorCode(1002003002, "已经存在编码为【{}】的角色");
     ErrorCode ROLE_CAN_NOT_UPDATE_SYSTEM_TYPE_ROLE = new ErrorCode(1002003004, "不能操作类型为系统内置的角色");
-    ErrorCode ROLE_IS_DISABLE = new ErrorCode(1002003004, "名字为【{}】的角色已被禁用");
+    ErrorCode ROLE_IS_DISABLE = new ErrorCode(1002003005, "名字为【{}】的角色已被禁用");
+    ErrorCode ROLE_ADMIN_CODE_ERROR = new ErrorCode(1002003006, "编码【{}】不能使用");
 
     // ========== 用户模块 1002004000 ==========
     ErrorCode USER_USERNAME_EXISTS = new ErrorCode(1002004000, "用户账号已经存在");

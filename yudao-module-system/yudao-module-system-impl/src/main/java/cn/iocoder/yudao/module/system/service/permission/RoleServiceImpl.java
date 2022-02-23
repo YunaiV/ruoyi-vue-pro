@@ -136,7 +136,7 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public void updateRole(RoleUpdateReqVO reqVO) {
         // 校验是否可以更新
-        this.checkUpdateRole(reqVO.getId());
+        checkUpdateRole(reqVO.getId());
         // 校验角色的唯一字段是否重复
         checkDuplicateRole(reqVO.getName(), reqVO.getCode(), reqVO.getId());
         // 更新到数据库
@@ -149,7 +149,7 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public void updateRoleStatus(Long id, Integer status) {
         // 校验是否可以更新
-        this.checkUpdateRole(id);
+        checkUpdateRole(id);
         // 更新状态
         RoleDO updateObject = new RoleDO();
         updateObject.setId(id);
@@ -217,7 +217,7 @@ public class RoleServiceImpl implements RoleService {
         if (CollectionUtil.isEmpty(roleList)) {
             return false;
         }
-        return roleList.stream().anyMatch(roleDO -> RoleCodeEnum.SUPER_ADMIN.getCode().equals(roleDO.getCode()));
+        return roleList.stream().anyMatch(role -> RoleCodeEnum.isSuperAdmin(role.getCode()));
     }
 
     @Override
@@ -247,6 +247,10 @@ public class RoleServiceImpl implements RoleService {
      */
     @VisibleForTesting
     public void checkDuplicateRole(String name, String code, Long id) {
+        // 0. 超级管理员，不允许创建
+        if (RoleCodeEnum.isSuperAdmin(code)) {
+            throw exception(ROLE_ADMIN_CODE_ERROR, code);
+        }
         // 1. 该 name 名字被其它角色所使用
         RoleDO role = roleMapper.selectByName(name);
         if (role != null && !role.getId().equals(id)) {
