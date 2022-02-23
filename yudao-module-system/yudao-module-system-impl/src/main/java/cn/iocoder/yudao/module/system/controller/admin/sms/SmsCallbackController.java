@@ -19,7 +19,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
-// TODO 芋艿：这块的接口命名，在纠结下
 @Api(tags = "管理后台 - 短信回调")
 @RestController
 @RequestMapping("/system/sms/callback")
@@ -28,7 +27,7 @@ public class SmsCallbackController {
     @Resource
     private SmsSendService smsSendService;
 
-    @PostMapping("/sms/yunpian")
+    @PostMapping("/yunpian")
     @ApiOperation(value = "云片短信的回调", notes = "参见 https://www.yunpian.com/official/document/sms/zh_cn/domestic_push_report 文档")
     @ApiImplicitParam(name = "sms_status", value = "发送状态", required = true, example = "[{具体内容}]", dataTypeClass = String.class)
     @OperateLog(enable = false)
@@ -38,7 +37,7 @@ public class SmsCallbackController {
         return "SUCCESS"; // 约定返回 SUCCESS 为成功
     }
 
-    @PostMapping("/sms/aliyun")
+    @PostMapping("/aliyun")
     @ApiOperation(value = "阿里云短信的回调", notes = "参见 https://help.aliyun.com/document_detail/120998.html 文档")
     @OperateLog(enable = false)
     public CommonResult<Boolean> receiveAliyunSmsStatus(HttpServletRequest request) throws Throwable {

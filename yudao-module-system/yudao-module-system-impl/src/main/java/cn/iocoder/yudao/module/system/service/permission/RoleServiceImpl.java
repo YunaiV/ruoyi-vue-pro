@@ -20,6 +20,7 @@ import cn.iocoder.yudao.module.system.enums.permission.RoleTypeEnum;
 import cn.iocoder.yudao.module.system.mq.producer.permission.RoleProducer;
 import com.google.common.annotations.VisibleForTesting;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.lang.Nullable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -72,6 +73,10 @@ public class RoleServiceImpl implements RoleService {
     @Resource
     private RoleProducer roleProducer;
 
+    @Resource
+    @Lazy // 注入自己，所以延迟加载
+    private RoleService self;
+
     /**
      * 初始化 {@link #roleCache} 缓存
      */
@@ -93,7 +98,7 @@ public class RoleServiceImpl implements RoleService {
 
     @Scheduled(fixedDelay = SCHEDULER_PERIOD, initialDelay = SCHEDULER_PERIOD)
     public void schedulePeriodicRefresh() {
-        initLocalCache();
+       self.initLocalCache();
     }
 
     /**

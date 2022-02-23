@@ -24,6 +24,7 @@ import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -90,6 +91,10 @@ public class PermissionServiceImpl implements PermissionService {
     @Resource
     private PermissionProducer permissionProducer;
 
+    @Resource
+    @Lazy // 注入自己，所以延迟加载
+    private PermissionService self;
+
     /**
      * 初始化 {@link #roleMenuCache} 和 {@link #menuRoleCache} 缓存
      */
@@ -118,7 +123,7 @@ public class PermissionServiceImpl implements PermissionService {
 
     @Scheduled(fixedDelay = SCHEDULER_PERIOD, initialDelay = SCHEDULER_PERIOD)
     public void schedulePeriodicRefresh() {
-        initLocalCache();
+        self.initLocalCache();
     }
 
     /**

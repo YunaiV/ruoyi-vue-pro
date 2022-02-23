@@ -20,6 +20,7 @@ import cn.iocoder.yudao.module.pay.dal.dataobject.merchant.PayChannelDO;
 import cn.iocoder.yudao.module.pay.dal.mysql.merchant.PayChannelMapper;
 import cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -65,6 +66,10 @@ public class PayChannelServiceImpl implements PayChannelService {
     @Resource
     private Validator validator;
 
+    @Resource
+    @Lazy // 注入自己，所以延迟加载
+    private PayChannelService self;
+
     @Override
     @PostConstruct
     @TenantIgnore // 忽略自动化租户，全局初始化本地缓存
@@ -86,7 +91,7 @@ public class PayChannelServiceImpl implements PayChannelService {
 
     @Scheduled(fixedDelay = SCHEDULER_PERIOD, initialDelay = SCHEDULER_PERIOD)
     public void schedulePeriodicRefresh() {
-        initPayClients();
+        self.initPayClients();
     }
 
     /**

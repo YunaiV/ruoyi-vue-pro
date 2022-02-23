@@ -7,7 +7,6 @@ import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.packages.Tenant
 import cn.iocoder.yudao.module.system.dal.dataobject.tenant.TenantPackageDO;
 
 import javax.validation.Valid;
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -46,14 +45,6 @@ public interface TenantPackageService {
      * @return 租户套餐
      */
     TenantPackageDO getTenantPackage(Long id);
-
-    /**
-     * 获得租户套餐列表
-     *
-     * @param ids 编号
-     * @return 租户套餐列表
-     */
-    List<TenantPackageDO> getTenantPackageList(Collection<Long> ids);
 
     /**
      * 获得租户套餐分页

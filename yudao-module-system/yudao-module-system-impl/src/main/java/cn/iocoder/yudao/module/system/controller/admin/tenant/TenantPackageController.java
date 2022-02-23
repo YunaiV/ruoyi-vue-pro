@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
-import java.util.Collection;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -61,15 +60,6 @@ public class TenantPackageController {
     public CommonResult<TenantPackageRespVO> getTenantPackage(@RequestParam("id") Long id) {
         TenantPackageDO tenantPackage = tenantPackageService.getTenantPackage(id);
         return success(TenantPackageConvert.INSTANCE.convert(tenantPackage));
-    }
-
-    @GetMapping("/list")
-    @ApiOperation("获得租户套餐列表")
-    @ApiImplicitParam(name = "ids", value = "编号列表", required = true, example = "1024,2048", dataTypeClass = List.class)
-    @PreAuthorize("@ss.hasPermission('system:tenant-package:query')")
-    public CommonResult<List<TenantPackageRespVO>> getTenantPackageList(@RequestParam("ids") Collection<Long> ids) {
-        List<TenantPackageDO> list = tenantPackageService.getTenantPackageList(ids);
-        return success(TenantPackageConvert.INSTANCE.convertList(list));
     }
 
     @GetMapping("/page")

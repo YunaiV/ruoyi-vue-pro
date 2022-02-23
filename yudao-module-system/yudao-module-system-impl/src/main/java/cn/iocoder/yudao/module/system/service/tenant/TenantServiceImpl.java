@@ -16,6 +16,7 @@ import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantEx
 import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantPageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantUpdateReqVO;
 import cn.iocoder.yudao.module.system.convert.tenant.TenantConvert;
+import cn.iocoder.yudao.module.system.dal.dataobject.permission.MenuDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.RoleDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.tenant.TenantDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.tenant.TenantPackageDO;
@@ -23,6 +24,7 @@ import cn.iocoder.yudao.module.system.dal.mysql.tenant.TenantMapper;
 import cn.iocoder.yudao.module.system.enums.permission.RoleCodeEnum;
 import cn.iocoder.yudao.module.system.enums.permission.RoleTypeEnum;
 import cn.iocoder.yudao.module.system.mq.producer.tenant.TenantProducer;
+import cn.iocoder.yudao.module.system.service.permission.MenuService;
 import cn.iocoder.yudao.module.system.service.permission.PermissionService;
 import cn.iocoder.yudao.module.system.service.permission.RoleService;
 import cn.iocoder.yudao.module.system.service.tenant.handler.TenantInfoHandler;
@@ -85,6 +87,8 @@ public class TenantServiceImpl implements TenantService {
     private AdminUserService userService;
     @Resource
     private RoleService roleService;
+    @Resource
+    private MenuService menuService;
     @Resource
     private PermissionService permissionService;
 
@@ -205,7 +209,7 @@ public class TenantServiceImpl implements TenantService {
     @Transactional(rollbackFor = Exception.class)
     public void updateTenant(TenantUpdateReqVO updateReqVO) {
         // 校验存在
-        TenantDO tenant = validateTenantExists(updateReqVO.getId());
+        TenantDO tenant = checkUpdateTenant(updateReqVO.getId());
         // 校验套餐被禁用
         TenantPackageDO tenantPackage = tenantPackageService.validTenantPackage(updateReqVO.getPackageId());
 
@@ -253,15 +257,19 @@ public class TenantServiceImpl implements TenantService {
     @Override
     public void deleteTenant(Long id) {
         // 校验存在
-        validateTenantExists(id);
+        checkUpdateTenant(id);
         // 删除
         tenantMapper.deleteById(id);
     }
 
-    private TenantDO validateTenantExists(Long id) {
+    private TenantDO checkUpdateTenant(Long id) {
         TenantDO tenant = tenantMapper.selectById(id);
         if (tenant == null) {
             throw exception(TENANT_NOT_EXISTS);
+        }
+        // 内置租户，不允许删除
+        if (isSystemTenant(tenant)) {
+            throw exception(TENANT_CAN_NOT_UPDATE_SYSTEM);
         }
         return tenant;
     }
@@ -321,9 +329,18 @@ public class TenantServiceImpl implements TenantService {
         }
         // 获得租户，然后获得菜单
         TenantDO tenant = getTenant(TenantContextHolder.getRequiredTenantId());
-        TenantPackageDO tenantPackage = tenantPackageService.getTenantPackage(tenant.getPackageId());
+        Set<Long> menuIds;
+        if (isSystemTenant(tenant)) { // 系统租户，菜单是全量的
+            menuIds = CollectionUtils.convertSet(menuService.getMenus(), MenuDO::getId);
+        } else {
+            menuIds = tenantPackageService.getTenantPackage(tenant.getPackageId()).getMenuIds();
+        }
         // 执行处理器
-        handler.handle(tenantPackage.getMenuIds());
+        handler.handle(menuIds);
+    }
+
+    private static boolean isSystemTenant(TenantDO tenant) {
+        return Objects.equals(tenant.getPackageId(), TenantDO.PACKAGE_ID_SYSTEM);
     }
 
 }

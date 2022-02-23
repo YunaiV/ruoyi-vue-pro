@@ -43,7 +43,8 @@
       <el-table-column label="租户名" align="center" prop="name" />
       <el-table-column label="租户套餐" align="center" prop="packageId">
         <template slot-scope="scope">
-          <el-tag> {{getPackageName(scope.row.packageId)}} </el-tag>
+          <el-tag v-if="scope.row.packageId === 0" type="danger">系统租户</el-tag>
+          <el-tag v-else> {{getPackageName(scope.row.packageId)}} </el-tag>
         </template>
       </el-table-column>
       <el-table-column label="联系人" align="center" prop="contactName" />

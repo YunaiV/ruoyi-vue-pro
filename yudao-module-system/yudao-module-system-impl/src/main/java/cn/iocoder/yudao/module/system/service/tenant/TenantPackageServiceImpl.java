@@ -16,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
-import java.util.Collection;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -89,11 +88,6 @@ public class TenantPackageServiceImpl implements TenantPackageService {
     @Override
     public TenantPackageDO getTenantPackage(Long id) {
         return tenantPackageMapper.selectById(id);
-    }
-
-    @Override
-    public List<TenantPackageDO> getTenantPackageList(Collection<Long> ids) {
-        return tenantPackageMapper.selectBatchIds(ids);
     }
 
     @Override

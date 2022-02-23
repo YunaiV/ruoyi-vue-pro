@@ -108,6 +108,7 @@ public interface ErrorCodeConstants {
     ErrorCode TENANT_NOT_EXISTS = new ErrorCode(1002014000, "租户不存在");
     ErrorCode TENANT_DISABLE = new ErrorCode(1002014001, "名字为【{}】的租户已被禁用");
     ErrorCode TENANT_EXPIRE = new ErrorCode(1002014002, "名字为【{}】的租户已过期");
+    ErrorCode TENANT_CAN_NOT_UPDATE_SYSTEM = new ErrorCode(1002014003, "系统租户不能进行修改、删除等操作！");
 
     // ========== 租户套餐 1002015000 ==========
     ErrorCode TENANT_PACKAGE_NOT_EXISTS = new ErrorCode(1002015000, "租户套餐不存在");
