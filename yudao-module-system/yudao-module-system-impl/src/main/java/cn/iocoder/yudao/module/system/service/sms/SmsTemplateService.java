@@ -110,6 +110,6 @@ public interface SmsTemplateService {
      * @param channelId 短信渠道编号
      * @return 数量
      */
-    Integer countByChannelId(Long channelId);
+    Long countByChannelId(Long channelId);
 
 }

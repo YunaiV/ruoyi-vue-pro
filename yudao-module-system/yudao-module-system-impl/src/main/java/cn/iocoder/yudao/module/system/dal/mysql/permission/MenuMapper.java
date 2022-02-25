@@ -20,7 +20,7 @@ public interface MenuMapper extends BaseMapperX<MenuDO> {
                 .eq(MenuDO::getName, name));
     }
 
-    default Integer selectCountByParentId(Long parentId) {
+    default Long selectCountByParentId(Long parentId) {
         return selectCount(MenuDO::getParentId, parentId);
     }
 
