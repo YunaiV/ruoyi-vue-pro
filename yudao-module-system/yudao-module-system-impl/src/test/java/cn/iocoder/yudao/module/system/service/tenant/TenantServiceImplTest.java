@@ -1,36 +1,63 @@
 package cn.iocoder.yudao.module.system.service.tenant;
 
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.tenant.config.TenantProperties;
 import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantCreateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantExportReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantPageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantUpdateReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.tenant.TenantDO;
 import cn.iocoder.yudao.module.system.dal.mysql.tenant.TenantMapper;
-import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.system.mq.producer.tenant.TenantProducer;
+import cn.iocoder.yudao.module.system.service.permission.MenuService;
+import cn.iocoder.yudao.module.system.service.permission.PermissionService;
+import cn.iocoder.yudao.module.system.service.permission.RoleService;
+import cn.iocoder.yudao.module.system.service.user.AdminUserService;
 import cn.iocoder.yudao.module.system.test.BaseDbUnitTest;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
 import java.util.List;
 
-import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.TENANT_NOT_EXISTS;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildTime;
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
+import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.TENANT_NOT_EXISTS;
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * {@link TenantServiceImpl} 的单元测试类
+ *
+ * @author 芋道源码
+ */
 @Import(TenantServiceImpl.class)
-public class TenantServiceTest extends BaseDbUnitTest {
+public class TenantServiceImplTest extends BaseDbUnitTest {
 
     @Resource
     private TenantServiceImpl tenantService;
 
     @Resource
     private TenantMapper tenantMapper;
+
+    @MockBean
+    private TenantProperties tenantProperties;
+    @MockBean
+    private TenantPackageService tenantPackageService;
+    @MockBean
+    private AdminUserService userService;
+    @MockBean
+    private RoleService roleService;
+    @MockBean
+    private MenuService menuService;
+    @MockBean
+    private PermissionService permissionService;
+    @MockBean
+    private TenantProducer tenantProducer;
 
     @Test
     public void testCreateTenant_success() {

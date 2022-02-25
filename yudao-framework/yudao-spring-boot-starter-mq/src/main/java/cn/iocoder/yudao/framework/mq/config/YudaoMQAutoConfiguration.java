@@ -1,6 +1,9 @@
 package cn.iocoder.yudao.framework.mq.config;
 
+import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.system.SystemUtil;
+import cn.iocoder.yudao.framework.common.enums.DocumentEnum;
 import cn.iocoder.yudao.framework.mq.core.RedisMQTemplate;
 import cn.iocoder.yudao.framework.mq.core.interceptor.RedisMessageInterceptor;
 import cn.iocoder.yudao.framework.mq.core.pubsub.AbstractChannelMessageListener;
@@ -10,10 +13,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.connection.RedisServerCommands;
 import org.springframework.data.redis.connection.stream.Consumer;
 import org.springframework.data.redis.connection.stream.ObjectRecord;
 import org.springframework.data.redis.connection.stream.ReadOffset;
 import org.springframework.data.redis.connection.stream.StreamOffset;
+import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
@@ -22,6 +27,7 @@ import org.springframework.data.redis.stream.DefaultStreamMessageListenerContain
 import org.springframework.data.redis.stream.StreamMessageListenerContainer;
 
 import java.util.List;
+import java.util.Properties;
 
 /**
  * 消息队列配置类
@@ -73,6 +79,7 @@ public class YudaoMQAutoConfiguration {
     public StreamMessageListenerContainer<String, ObjectRecord<String, String>> redisStreamMessageListenerContainer(
             RedisMQTemplate redisMQTemplate, List<AbstractStreamMessageListener<?>> listeners) {
         RedisTemplate<String, ?> redisTemplate = redisMQTemplate.getRedisTemplate();
+        checkRedisVersion(redisTemplate);
         // 第一步，创建 StreamMessageListenerContainer 容器
         // 创建 options 配置
         StreamMessageListenerContainer.StreamMessageListenerContainerOptions<String, ObjectRecord<String, String>> containerOptions =
@@ -116,6 +123,21 @@ public class YudaoMQAutoConfiguration {
      */
     private static String buildConsumerName() {
         return String.format("%s@%d", SystemUtil.getHostInfo().getAddress(), SystemUtil.getCurrentPID());
+    }
+
+    /**
+     * 校验 Redis 版本号，是否满足最低的版本号要求！
+     */
+    private static void checkRedisVersion(RedisTemplate<String, ?> redisTemplate) {
+        // 获得 Redis 版本
+        Properties info = redisTemplate.execute((RedisCallback<Properties>) RedisServerCommands::info);
+        String version = MapUtil.getStr(info, "redis_version");
+        // 校验最低版本必须大于等于 5.0.0
+        int majorVersion = Integer.parseInt(StrUtil.subBefore(version, '.', false));
+        if (majorVersion < 7) {
+            throw new IllegalStateException(StrUtil.format("您当前的 Redis 版本为 {}，小于最低要求的 5.0.0 版本！" +
+                    "请参考 {} 文档进行安装。", version, DocumentEnum.REDIS_INSTALL.getUrl()));
+        }
     }
 
 }

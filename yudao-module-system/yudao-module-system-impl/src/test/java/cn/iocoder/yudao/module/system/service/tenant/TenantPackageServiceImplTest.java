@@ -1,24 +1,32 @@
 package cn.iocoder.yudao.module.system.service.tenant;
 
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.packages.TenantPackageCreateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.packages.TenantPackagePageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.packages.TenantPackageUpdateReqVO;
+import cn.iocoder.yudao.module.system.dal.dataobject.tenant.TenantDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.tenant.TenantPackageDO;
 import cn.iocoder.yudao.module.system.dal.mysql.tenant.TenantPackageMapper;
 import cn.iocoder.yudao.module.system.test.BaseDbUnitTest;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
 
+import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildTime;
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomLongId;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
-import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.TENANT_PACKAGE_NOT_EXISTS;
+import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
+import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
 * {@link TenantPackageServiceImpl} 的单元测试类
@@ -33,6 +41,9 @@ public class TenantPackageServiceImplTest extends BaseDbUnitTest {
 
     @Resource
     private TenantPackageMapper tenantPackageMapper;
+
+    @MockBean
+    private TenantService tenantService;
 
     @Test
     public void testCreateTenantPackage_success() {
@@ -57,12 +68,21 @@ public class TenantPackageServiceImplTest extends BaseDbUnitTest {
         TenantPackageUpdateReqVO reqVO = randomPojo(TenantPackageUpdateReqVO.class, o -> {
             o.setId(dbTenantPackage.getId()); // 设置更新的 ID
         });
+        // mock 方法
+        Long tenantId01 = randomLongId();
+        Long tenantId02 = randomLongId();
+        when(tenantService.getTenantListByPackageId(eq(reqVO.getId()))).thenReturn(
+                asList(randomPojo(TenantDO.class, o -> o.setId(tenantId01)),
+                        randomPojo(TenantDO.class, o -> o.setId(tenantId02))));
 
         // 调用
         tenantPackageService.updateTenantPackage(reqVO);
         // 校验是否更新正确
         TenantPackageDO tenantPackage = tenantPackageMapper.selectById(reqVO.getId()); // 获取最新的
         assertPojoEquals(reqVO, tenantPackage);
+        // 校验调用租户的菜单
+        verify(tenantService).updateTenantRoleMenu(eq(tenantId01), eq(reqVO.getMenuIds()));
+        verify(tenantService).updateTenantRoleMenu(eq(tenantId02), eq(reqVO.getMenuIds()));
     }
 
     @Test
@@ -81,6 +101,8 @@ public class TenantPackageServiceImplTest extends BaseDbUnitTest {
         tenantPackageMapper.insert(dbTenantPackage);// @Sql: 先插入出一条存在的数据
         // 准备参数
         Long id = dbTenantPackage.getId();
+        // mock 租户未使用该套餐
+        when(tenantService.getTenantCountByPackageId(eq(id))).thenReturn(0);
 
         // 调用
         tenantPackageService.deleteTenantPackage(id);
@@ -97,31 +119,45 @@ public class TenantPackageServiceImplTest extends BaseDbUnitTest {
         assertServiceException(() -> tenantPackageService.deleteTenantPackage(id), TENANT_PACKAGE_NOT_EXISTS);
     }
 
-    @Test // TODO 请修改 null 为需要的值
+    @Test
+    public void testDeleteTenantPackage_used() {
+        // mock 数据
+        TenantPackageDO dbTenantPackage = randomPojo(TenantPackageDO.class);
+        tenantPackageMapper.insert(dbTenantPackage);// @Sql: 先插入出一条存在的数据
+        // 准备参数
+        Long id = dbTenantPackage.getId();
+        // mock 租户在使用该套餐
+        when(tenantService.getTenantCountByPackageId(eq(id))).thenReturn(1);
+
+        // 调用, 并断言异常
+        assertServiceException(() -> tenantPackageService.deleteTenantPackage(id), TENANT_PACKAGE_USED);
+    }
+
+    @Test
     public void testGetTenantPackagePage() {
        // mock 数据
        TenantPackageDO dbTenantPackage = randomPojo(TenantPackageDO.class, o -> { // 等会查询到
-           o.setName(null);
-           o.setStatus(null);
-           o.setRemark(null);
-           o.setCreateTime(null);
+           o.setName("芋道源码");
+           o.setStatus(CommonStatusEnum.ENABLE.getStatus());
+           o.setRemark("源码解析");
+           o.setCreateTime(buildTime(2022, 10, 10));
        });
        tenantPackageMapper.insert(dbTenantPackage);
        // 测试 name 不匹配
-       tenantPackageMapper.insert(cloneIgnoreId(dbTenantPackage, o -> o.setName(null)));
+       tenantPackageMapper.insert(cloneIgnoreId(dbTenantPackage, o -> o.setName("源码")));
        // 测试 status 不匹配
-       tenantPackageMapper.insert(cloneIgnoreId(dbTenantPackage, o -> o.setStatus(null)));
+       tenantPackageMapper.insert(cloneIgnoreId(dbTenantPackage, o -> o.setStatus(CommonStatusEnum.DISABLE.getStatus())));
        // 测试 remark 不匹配
-       tenantPackageMapper.insert(cloneIgnoreId(dbTenantPackage, o -> o.setRemark(null)));
+       tenantPackageMapper.insert(cloneIgnoreId(dbTenantPackage, o -> o.setRemark("解析")));
        // 测试 createTime 不匹配
-       tenantPackageMapper.insert(cloneIgnoreId(dbTenantPackage, o -> o.setCreateTime(null)));
+       tenantPackageMapper.insert(cloneIgnoreId(dbTenantPackage, o -> o.setCreateTime(buildTime(2022, 11, 11))));
        // 准备参数
        TenantPackagePageReqVO reqVO = new TenantPackagePageReqVO();
-       reqVO.setName(null);
-       reqVO.setStatus(null);
-       reqVO.setRemark(null);
-       reqVO.setBeginCreateTime(null);
-       reqVO.setEndCreateTime(null);
+       reqVO.setName("芋道");
+       reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
+       reqVO.setRemark("源码");
+       reqVO.setBeginCreateTime(buildTime(2022, 10, 9));
+       reqVO.setEndCreateTime(buildTime(2022, 10, 11));
 
        // 调用
        PageResult<TenantPackageDO> pageResult = tenantPackageService.getTenantPackagePage(reqVO);
@@ -131,4 +167,37 @@ public class TenantPackageServiceImplTest extends BaseDbUnitTest {
        assertPojoEquals(dbTenantPackage, pageResult.getList().get(0));
     }
 
+    @Test
+    public void testValidTenantPackage_success() {
+        // mock 数据
+        TenantPackageDO dbTenantPackage = randomPojo(TenantPackageDO.class,
+                o -> o.setStatus(CommonStatusEnum.ENABLE.getStatus()));
+        tenantPackageMapper.insert(dbTenantPackage);// @Sql: 先插入出一条存在的数据
+
+        // 调用
+        TenantPackageDO result = tenantPackageService.validTenantPackage(dbTenantPackage.getId());
+        // 断言
+        assertPojoEquals(dbTenantPackage, result);
+    }
+
+    @Test
+    public void testValidTenantPackage_notExists() {
+        // 准备参数
+        Long id = randomLongId();
+
+        // 调用, 并断言异常
+        assertServiceException(() -> tenantPackageService.validTenantPackage(id), TENANT_PACKAGE_NOT_EXISTS);
+    }
+
+    @Test
+    public void testValidTenantPackage_disable() {
+        // mock 数据
+        TenantPackageDO dbTenantPackage = randomPojo(TenantPackageDO.class,
+                o -> o.setStatus(CommonStatusEnum.DISABLE.getStatus()));
+        tenantPackageMapper.insert(dbTenantPackage);// @Sql: 先插入出一条存在的数据
+
+        // 调用, 并断言异常
+        assertServiceException(() -> tenantPackageService.validTenantPackage(dbTenantPackage.getId()),
+                TENANT_PACKAGE_DISABLE, dbTenantPackage.getName());
+    }
 }
