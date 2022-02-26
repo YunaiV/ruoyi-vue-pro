@@ -46,7 +46,7 @@ public interface SmsTemplateMapper extends BaseMapperX<SmsTemplateDO> {
                 .orderByDesc(SmsTemplateDO::getId));
     }
 
-    default Integer selectCountByChannelId(Long channelId) {
+    default Long selectCountByChannelId(Long channelId) {
         return selectCount(SmsTemplateDO::getChannelId, channelId);
     }
 

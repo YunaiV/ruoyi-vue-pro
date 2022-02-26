@@ -167,6 +167,7 @@ public class MenuServiceImpl implements MenuService {
      * @param menuId 菜单编号
      */
     @Transactional(rollbackFor = Exception.class)
+    @Override
     public void deleteMenu(Long menuId) {
         // 校验是否还有子菜单
         if (menuMapper.selectCountByParentId(menuId) > 0) {

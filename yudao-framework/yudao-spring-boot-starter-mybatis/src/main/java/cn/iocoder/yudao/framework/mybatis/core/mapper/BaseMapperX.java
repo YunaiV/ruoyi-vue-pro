@@ -47,12 +47,12 @@ public interface BaseMapperX<T> extends BaseMapper<T> {
         return selectCount(new QueryWrapper<T>());
     }
 
-    default Integer selectCount(String field, Object value) {
-        return selectCount(new QueryWrapper<T>().eq(field, value)).intValue();
+    default Long selectCount(String field, Object value) {
+        return selectCount(new QueryWrapper<T>().eq(field, value));
     }
 
-    default Integer selectCount(SFunction<T, ?> field, Object value) {
-        return selectCount(new LambdaQueryWrapper<T>().eq(field, value)).intValue();
+    default Long selectCount(SFunction<T, ?> field, Object value) {
+        return selectCount(new LambdaQueryWrapper<T>().eq(field, value));
     }
 
     default List<T> selectList() {
