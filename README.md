@@ -151,16 +151,16 @@ ps：核心功能已经实现，正在对接微信小程序中...
 
 | 框架 | 说明 | 版本       | 学习指南 |
 | --- | --- |----------| --- |
-| [Spring Boot](https://spring.io/projects/spring-boot) | 应用开发框架 | 2.5.9    | [文档](https://github.com/YunaiV/SpringBoot-Labs) |
+| [Spring Boot](https://spring.io/projects/spring-boot) | 应用开发框架 | 2.5.10    | [文档](https://github.com/YunaiV/SpringBoot-Labs) |
 | [MySQL](https://www.mysql.com/cn/) | 数据库服务器 | 5.7      |  |
 | [Druid](https://github.com/alibaba/druid) | JDBC 连接池、监控组件 | 1.2.8    | [文档](http://www.iocoder.cn/Spring-Boot/datasource-pool/?yudao) |
-| [MyBatis Plus](https://mp.baomidou.com/) | MyBatis 增强工具包 | 3.4.3.4  | [文档](http://www.iocoder.cn/Spring-Boot/MyBatis/?yudao) |
+| [MyBatis Plus](https://mp.baomidou.com/) | MyBatis 增强工具包 | 3.5.1  | [文档](http://www.iocoder.cn/Spring-Boot/MyBatis/?yudao) |
 | [Dynamic Datasource](https://dynamic-datasource.com/) | 动态数据源 | 3.5.0    | [文档](http://www.iocoder.cn/Spring-Boot/datasource-pool/?yudao) |
 | [Redis](https://redis.io/) | key-value 数据库 | 5.0      |  |
 | [Redisson](https://github.com/redisson/redisson) | Redis 客户端 | 3.16.8   | [文档](http://www.iocoder.cn/Spring-Boot/Redis/?yudao) |
-| [Spring MVC](https://github.com/spring-projects/spring-framework/tree/master/spring-webmvc) | MVC 框架  | 5.3.15   | [文档](http://www.iocoder.cn/SpringMVC/MVC/?yudao) |
-| [Spring Security](https://github.com/spring-projects/spring-security) | Spring 安全框架 | 5.5.4    | [文档](http://www.iocoder.cn/Spring-Boot/Spring-Security/?yudao) |
-| [Hibernate Validator](https://github.com/hibernate/hibernate-validator) | 参数校验组件 | 6.2.0    | [文档](http://www.iocoder.cn/Spring-Boot/Validation/?yudao) |
+| [Spring MVC](https://github.com/spring-projects/spring-framework/tree/master/spring-webmvc) | MVC 框架  | 5.3.16   | [文档](http://www.iocoder.cn/SpringMVC/MVC/?yudao) |
+| [Spring Security](https://github.com/spring-projects/spring-security) | Spring 安全框架 | 5.5.5    | [文档](http://www.iocoder.cn/Spring-Boot/Spring-Security/?yudao) |
+| [Hibernate Validator](https://github.com/hibernate/hibernate-validator) | 参数校验组件 | 6.2.2    | [文档](http://www.iocoder.cn/Spring-Boot/Validation/?yudao) |
 | [Activiti](https://github.com/Activiti/Activiti) | 工作流引擎 | 7.1.0.M6 | [文档](TODO)  |
 | [Quartz](https://github.com/quartz-scheduler) | 任务调度组件 | 2.3.2    | [文档](http://www.iocoder.cn/Spring-Boot/Job/?yudao) |
 | [Knife4j](https://gitee.com/xiaoym/knife4j) | Swagger 增强 UI 实现 | 3.0.2    | [文档](http://www.iocoder.cn/Spring-Boot/Swagger/?yudao) |
