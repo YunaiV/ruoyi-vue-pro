@@ -19,12 +19,12 @@ import javax.annotation.Resource;
 public class UserSessionTimeoutJob implements JobHandler {
 
     @Resource
-    private UserSessionService sysUserSessionService;
+    private UserSessionService userSessionService;
 
     @Override
     public String execute(String param) throws Exception {
         // 执行过期
-        Long timeoutCount = sysUserSessionService.clearSessionTimeout();
+        Long timeoutCount = userSessionService.clearSessionTimeout();
         // 返回结果，记录每次的超时数量
         return String.format("移除在线会话数量为 %s 个", timeoutCount);
     }

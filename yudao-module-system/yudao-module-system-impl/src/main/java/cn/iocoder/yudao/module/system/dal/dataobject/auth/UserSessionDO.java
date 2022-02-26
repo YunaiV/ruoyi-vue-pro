@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.system.dal.dataobject.auth;
 
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
+import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
-import cn.iocoder.yudao.framework.tenant.core.db.TenantBaseDO;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -25,7 +25,7 @@ import java.util.Date;
 @Data
 @Builder
 @EqualsAndHashCode(callSuper = true)
-public class UserSessionDO extends TenantBaseDO {
+public class UserSessionDO extends BaseDO {
 
     /**
      * 会话编号, 即 sessionId

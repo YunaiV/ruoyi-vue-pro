@@ -21,7 +21,7 @@ import java.io.IOException;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.*;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
-import static cn.iocoder.yudao.module.member.enums.ErrorCodeConstants.FILE_IS_EMPTY;
+import static cn.iocoder.yudao.module.infra.enums.ErrorCodeConstants.FILE_IS_EMPTY;
 
 @Api(tags = "用户 APP - 用户个人中心")
 @RestController

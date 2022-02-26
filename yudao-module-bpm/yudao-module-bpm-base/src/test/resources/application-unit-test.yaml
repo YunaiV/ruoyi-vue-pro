@@ -16,6 +16,9 @@ spring:
     druid:
       async-init: true # 单元测试，异步初始化 Druid 连接池，提升启动速度
       initial-size: 1 # 单元测试，配置为 1，提升启动速度
+  sql:
+    init:
+      schema-locations: classpath:/sql/create_tables.sql
 
 mybatis:
   lazy-initialization: true # 单元测试，设置 MyBatis Mapper 延迟加载，加速每个单元测试

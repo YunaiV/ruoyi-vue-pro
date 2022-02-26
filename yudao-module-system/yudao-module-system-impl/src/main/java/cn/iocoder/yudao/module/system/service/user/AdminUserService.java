@@ -8,6 +8,7 @@ import cn.iocoder.yudao.module.system.controller.admin.user.vo.user.*;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
 
+import javax.validation.Valid;
 import java.io.InputStream;
 import java.util.*;
 
@@ -24,14 +25,14 @@ public interface AdminUserService {
      * @param reqVO 用户信息
      * @return 用户编号
      */
-    Long createUser(UserCreateReqVO reqVO);
+    Long createUser(@Valid UserCreateReqVO reqVO);
 
     /**
      * 修改用户
      *
      * @param reqVO 用户信息
      */
-    void updateUser(UserUpdateReqVO reqVO);
+    void updateUser(@Valid UserUpdateReqVO reqVO);
 
     /**
      * 更新用户的最后登陆信息
@@ -47,7 +48,7 @@ public interface AdminUserService {
      * @param id 用户编号
      * @param reqVO 用户个人信息
      */
-    void updateUserProfile(Long id, UserProfileUpdateReqVO reqVO);
+    void updateUserProfile(Long id, @Valid UserProfileUpdateReqVO reqVO);
 
     /**
      * 修改用户个人密码
@@ -55,7 +56,7 @@ public interface AdminUserService {
      * @param id 用户编号
      * @param reqVO 更新用户个人密码
      */
-    void updateUserPassword(Long id, UserProfileUpdatePasswordReqVO reqVO);
+    void updateUserPassword(Long id, @Valid UserProfileUpdatePasswordReqVO reqVO);
 
     /**
      * 更新用户头像

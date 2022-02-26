@@ -40,6 +40,7 @@ public class ${sceneEnum.prefixClass}${table.className}Controller {
     @PostMapping("/create")
     @ApiOperation("创建${table.classComment}")
 #if ($sceneEnum.scene == 1)    @PreAuthorize("@ss.hasPermission('${permissionPrefix}:create')")#end
+
     public CommonResult<${primaryColumn.javaType}> create${simpleClassName}(@Valid @RequestBody ${sceneEnum.prefixClass}${table.className}CreateReqVO createReqVO) {
         return success(${classNameVar}Service.create${simpleClassName}(createReqVO));
     }
@@ -47,6 +48,7 @@ public class ${sceneEnum.prefixClass}${table.className}Controller {
     @PutMapping("/update")
     @ApiOperation("更新${table.classComment}")
 #if ($sceneEnum.scene == 1)    @PreAuthorize("@ss.hasPermission('${permissionPrefix}:update')")#end
+
     public CommonResult<Boolean> update${simpleClassName}(@Valid @RequestBody ${sceneEnum.prefixClass}${table.className}UpdateReqVO updateReqVO) {
         ${classNameVar}Service.update${simpleClassName}(updateReqVO);
         return success(true);
@@ -56,6 +58,7 @@ public class ${sceneEnum.prefixClass}${table.className}Controller {
     @ApiOperation("删除${table.classComment}")
     @ApiImplicitParam(name = "id", value = "编号", required = true, dataTypeClass = ${primaryColumn.javaType}.class)
 #if ($sceneEnum.scene == 1)    @PreAuthorize("@ss.hasPermission('${permissionPrefix}:delete')")#end
+
     public CommonResult<Boolean> delete${simpleClassName}(@RequestParam("id") ${primaryColumn.javaType} id) {
         ${classNameVar}Service.delete${simpleClassName}(id);
         return success(true);
@@ -64,7 +67,8 @@ public class ${sceneEnum.prefixClass}${table.className}Controller {
     @GetMapping("/get")
     @ApiOperation("获得${table.classComment}")
     @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = ${primaryColumn.javaType}.class)
-    @PreAuthorize("@ss.hasPermission('${permissionPrefix}:query')")
+#if ($sceneEnum.scene == 1)    @PreAuthorize("@ss.hasPermission('${permissionPrefix}:query')")#end
+
     public CommonResult<${sceneEnum.prefixClass}${table.className}RespVO> get${simpleClassName}(@RequestParam("id") ${primaryColumn.javaType} id) {
         ${table.className}DO ${classNameVar} = ${classNameVar}Service.get${simpleClassName}(id);
         return success(${table.className}Convert.INSTANCE.convert(${classNameVar}));
@@ -74,6 +78,7 @@ public class ${sceneEnum.prefixClass}${table.className}Controller {
     @ApiOperation("获得${table.classComment}列表")
     @ApiImplicitParam(name = "ids", value = "编号列表", required = true, example = "1024,2048", dataTypeClass = List.class)
 #if ($sceneEnum.scene == 1)    @PreAuthorize("@ss.hasPermission('${permissionPrefix}:query')")#end
+
     public CommonResult<List<${sceneEnum.prefixClass}${table.className}RespVO>> get${simpleClassName}List(@RequestParam("ids") Collection<${primaryColumn.javaType}> ids) {
         List<${table.className}DO> list = ${classNameVar}Service.get${simpleClassName}List(ids);
         return success(${table.className}Convert.INSTANCE.convertList(list));
@@ -82,6 +87,7 @@ public class ${sceneEnum.prefixClass}${table.className}Controller {
     @GetMapping("/page")
     @ApiOperation("获得${table.classComment}分页")
 #if ($sceneEnum.scene == 1)    @PreAuthorize("@ss.hasPermission('${permissionPrefix}:query')")#end
+
     public CommonResult<PageResult<${sceneEnum.prefixClass}${table.className}RespVO>> get${simpleClassName}Page(@Valid ${sceneEnum.prefixClass}${table.className}PageReqVO pageVO) {
         PageResult<${table.className}DO> pageResult = ${classNameVar}Service.get${simpleClassName}Page(pageVO);
         return success(${table.className}Convert.INSTANCE.convertPage(pageResult));
@@ -90,6 +96,7 @@ public class ${sceneEnum.prefixClass}${table.className}Controller {
     @GetMapping("/export-excel")
     @ApiOperation("导出${table.classComment} Excel")
 #if ($sceneEnum.scene == 1)    @PreAuthorize("@ss.hasPermission('${permissionPrefix}:export')")#end
+
     @OperateLog(type = EXPORT)
     public void export${simpleClassName}Excel(@Valid ${sceneEnum.prefixClass}${table.className}ExportReqVO exportReqVO,
               HttpServletResponse response) throws IOException {

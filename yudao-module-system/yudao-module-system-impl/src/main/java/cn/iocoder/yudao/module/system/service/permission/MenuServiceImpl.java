@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.system.service.permission;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
-import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.system.controller.admin.permission.vo.menu.MenuCreateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.permission.vo.menu.MenuListReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.permission.vo.menu.MenuUpdateReqVO;
@@ -12,12 +12,13 @@ import cn.iocoder.yudao.module.system.dal.mysql.permission.MenuMapper;
 import cn.iocoder.yudao.module.system.enums.permission.MenuIdEnum;
 import cn.iocoder.yudao.module.system.enums.permission.MenuTypeEnum;
 import cn.iocoder.yudao.module.system.mq.producer.permission.MenuProducer;
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.module.system.service.tenant.TenantService;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -70,6 +71,9 @@ public class MenuServiceImpl implements MenuService {
     private MenuMapper menuMapper;
     @Resource
     private PermissionService permissionService;
+    @Resource
+    @Lazy // 延迟，避免循环依赖报错
+    private TenantService tenantService;
 
     @Resource
     private MenuProducer menuProducer;
@@ -95,8 +99,7 @@ public class MenuServiceImpl implements MenuService {
         });
         menuCache = menuCacheBuilder.build();
         permissionMenuCache = permMenuCacheBuilder.build();
-        assert menuList.size() > 0; // 断言，避免告警
-        maxUpdateTime = menuList.stream().max(Comparator.comparing(BaseDO::getUpdateTime)).get().getUpdateTime();
+        maxUpdateTime = CollectionUtils.getMaxValue(menuList, MenuDO::getUpdateTime);
         log.info("[initLocalCache][缓存菜单，数量为:{}]", menuList.size());
     }
 
@@ -166,6 +169,7 @@ public class MenuServiceImpl implements MenuService {
      * @param menuId 菜单编号
      */
     @Transactional(rollbackFor = Exception.class)
+    @Override
     public void deleteMenu(Long menuId) {
         // 校验是否还有子菜单
         if (menuMapper.selectCountByParentId(menuId) > 0) {
@@ -196,12 +200,20 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
+    public List<MenuDO> getTenantMenus(MenuListReqVO reqVO) {
+        List<MenuDO> menus = getMenus(reqVO);
+        // 开启多租户的情况下，需要过滤掉未开通的菜单
+        tenantService.handleTenantMenu(menuIds -> menus.removeIf(menu -> !CollUtil.contains(menuIds, menu.getId())));
+        return menus;
+    }
+
+    @Override
     public List<MenuDO> getMenus(MenuListReqVO reqVO) {
         return menuMapper.selectList(reqVO);
     }
 
     @Override
-    public List<MenuDO> listMenusFromCache(Collection<Integer> menuTypes, Collection<Integer> menusStatuses) {
+    public List<MenuDO> getMenuListFromCache(Collection<Integer> menuTypes, Collection<Integer> menusStatuses) {
         // 任一一个参数为空，则返回空
         if (CollectionUtils.isAnyEmpty(menuTypes, menusStatuses)) {
             return Collections.emptyList();
@@ -213,8 +225,8 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
-    public List<MenuDO> listMenusFromCache(Collection<Long> menuIds, Collection<Integer> menuTypes,
-                                           Collection<Integer> menusStatuses) {
+    public List<MenuDO> getMenuListFromCache(Collection<Long> menuIds, Collection<Integer> menuTypes,
+                                             Collection<Integer> menusStatuses) {
         // 任一一个参数为空，则返回空
         if (CollectionUtils.isAnyEmpty(menuIds, menuTypes, menusStatuses)) {
             return Collections.emptyList();

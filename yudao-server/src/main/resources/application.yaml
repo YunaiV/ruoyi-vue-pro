@@ -78,7 +78,32 @@ yudao:
       - cn.iocoder.yudao.module.system.enums.ErrorCodeConstants
       - cn.iocoder.yudao.module.tool.enums.ErrorCodeConstants
   tenant: # 多租户相关配置项
-    tables: # 配置需要开启多租户的表；如果实体已经继承 TenantBaseDO 类，则无需重复配置
+    enable: true
+    ignore-urls:
+      - /admin-api/system/tenant/get-id-by-name
+      - /admin-api/system/captcha/get-image
+      - /admin-api/infra/file/get/*
+      - /admin-api/system/sms/callback/*
+    ignore-tables:
+      - infra_config
+      - infra_file
+      - infra_job
+      - infra_job_log
+      - infra_job_log
+      - system_tenant
+      - system_tenant_package
+      - system_dict_data
+      - system_dict_type
+      - system_error_code
+      - system_menu
+      - system_sms_channel
+      - system_sms_template
+      - system_sms_log
+      - tool_codegen_column
+      - tool_codegen_table
+      - tool_test_demo
+      - tables
+      - columns
   sms-code: # 短信验证码相关的配置项
     expire-times: 10m
     send-frequency: 1m

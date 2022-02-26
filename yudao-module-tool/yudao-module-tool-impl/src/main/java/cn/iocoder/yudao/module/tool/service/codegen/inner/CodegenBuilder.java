@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.tool.service.codegen.inner;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.framework.tenant.core.db.TenantBaseDO;
+import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.tool.convert.codegen.CodegenConvert;
 import cn.iocoder.yudao.module.tool.dal.dataobject.codegen.CodegenColumnDO;
 import cn.iocoder.yudao.module.tool.dal.dataobject.codegen.CodegenTableDO;
@@ -60,7 +60,7 @@ public class CodegenBuilder {
      */
     public static final String TENANT_ID_FIELD = "tenant_id";
     /**
-     * {@link TenantBaseDO} 的字段
+     * {@link cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO} 的字段
      */
     public static final Set<String> BASE_DO_FIELDS = new HashSet<>();
     /**
@@ -96,7 +96,8 @@ public class CodegenBuilder {
             .build();
 
     static {
-        Arrays.stream(ReflectUtil.getFields(TenantBaseDO.class)).forEach(field -> BASE_DO_FIELDS.add(field.getName()));
+        Arrays.stream(ReflectUtil.getFields(BaseDO.class)).forEach(field -> BASE_DO_FIELDS.add(field.getName()));
+        BASE_DO_FIELDS.add(TENANT_ID_FIELD);
         // 处理 OPERATION 相关的字段
         CREATE_OPERATION_EXCLUDE_COLUMN.addAll(BASE_DO_FIELDS);
         UPDATE_OPERATION_EXCLUDE_COLUMN.addAll(BASE_DO_FIELDS);

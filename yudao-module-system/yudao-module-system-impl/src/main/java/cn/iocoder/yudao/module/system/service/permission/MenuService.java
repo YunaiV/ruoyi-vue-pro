@@ -50,6 +50,15 @@ public interface MenuService {
     List<MenuDO> getMenus();
 
     /**
+     * 基于租户，筛选菜单列表
+     * 注意，如果是系统租户，返回的还是全菜单
+     *
+     * @param reqVO 筛选条件请求 VO
+     * @return 菜单列表
+     */
+    List<MenuDO> getTenantMenus(MenuListReqVO reqVO);
+
+    /**
      * 筛选菜单列表
      *
      * @param reqVO 筛选条件请求 VO
@@ -66,7 +75,7 @@ public interface MenuService {
      * @param menusStatuses 菜单状态数组
      * @return 菜单列表
      */
-    List<MenuDO> listMenusFromCache(Collection<Integer> menuTypes, Collection<Integer> menusStatuses);
+    List<MenuDO> getMenuListFromCache(Collection<Integer> menuTypes, Collection<Integer> menusStatuses);
 
     /**
      * 获得指定编号的菜单数组，从缓存中
@@ -78,8 +87,8 @@ public interface MenuService {
      * @param menusStatuses 菜单状态数组
      * @return 菜单数组
      */
-    List<MenuDO> listMenusFromCache(Collection<Long> menuIds, Collection<Integer> menuTypes,
-                                    Collection<Integer> menusStatuses);
+    List<MenuDO> getMenuListFromCache(Collection<Long> menuIds, Collection<Integer> menuTypes,
+                                      Collection<Integer> menusStatuses);
 
     /**
      * 获得权限对应的菜单数组

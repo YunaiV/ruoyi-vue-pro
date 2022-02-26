@@ -16,3 +16,4 @@ DELETE FROM "system_sms_log";
 DELETE FROM "system_error_code";
 DELETE FROM "system_social_user";
 DELETE FROM "system_tenant";
+DELETE FROM "system_tenant_package";

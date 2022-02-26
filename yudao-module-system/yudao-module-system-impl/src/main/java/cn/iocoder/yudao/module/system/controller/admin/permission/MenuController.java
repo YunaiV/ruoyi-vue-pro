@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.system.controller.admin.permission.vo.menu.*;
 import cn.iocoder.yudao.module.system.convert.permission.MenuConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.MenuDO;
 import cn.iocoder.yudao.module.system.service.permission.MenuService;
+import cn.iocoder.yudao.module.system.service.tenant.TenantService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
@@ -28,6 +29,8 @@ public class MenuController {
 
     @Resource
     private MenuService menuService;
+    @Resource
+    private TenantService tenantService;
 
     @PostMapping("/create")
     @ApiOperation("创建菜单")
@@ -55,7 +58,7 @@ public class MenuController {
     }
 
     @GetMapping("/list")
-    @ApiOperation("获取菜单列表")
+    @ApiOperation(value = "获取菜单列表", notes = "用于【菜单管理】界面")
     @PreAuthorize("@ss.hasPermission('system:menu:query')")
     public CommonResult<List<MenuRespVO>> getMenus(MenuListReqVO reqVO) {
         List<MenuDO> list = menuService.getMenus(reqVO);
@@ -64,13 +67,14 @@ public class MenuController {
     }
 
     @GetMapping("/list-all-simple")
-    @ApiOperation(value = "获取菜单精简信息列表", notes = "只包含被开启的菜单，主要用于前端的下拉选项")
+    @ApiOperation(value = "获取菜单精简信息列表", notes = "只包含被开启的菜单，用于【角色分配菜单】功能的选项。" +
+            "在多租户的场景下，会只返回租户所在套餐有的菜单")
     public CommonResult<List<MenuSimpleRespVO>> getSimpleMenus() {
         // 获得菜单列表，只要开启状态的
         MenuListReqVO reqVO = new MenuListReqVO();
         reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
-        List<MenuDO> list = menuService.getMenus(reqVO);
-        // 排序后，返回个诶前端
+        List<MenuDO> list = menuService.getTenantMenus(reqVO);
+        // 排序后，返回给前端
         list.sort(Comparator.comparing(MenuDO::getSort));
         return success(MenuConvert.INSTANCE.convertList02(list));
     }

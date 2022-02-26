@@ -13,9 +13,6 @@ public interface ErrorCodeConstants {
     ErrorCode USER_NOT_EXISTS = new ErrorCode(1004001000, "用户不存在");
     ErrorCode USER_PASSWORD_FAILED = new ErrorCode(1004001001, "密码校验失败");
 
-    // ========== 文件相关 1004002000 ===========
-    // TODO 芋艿：可以删除
-    ErrorCode FILE_IS_EMPTY = new ErrorCode(1004002000, "文件为空");
 
     // ========== AUTH 模块 1004003000 ==========
     ErrorCode AUTH_LOGIN_BAD_CREDENTIALS = new ErrorCode(1004003000, "登录失败，账号密码不正确");

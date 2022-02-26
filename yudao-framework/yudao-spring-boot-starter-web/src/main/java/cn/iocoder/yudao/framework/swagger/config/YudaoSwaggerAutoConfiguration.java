@@ -8,15 +8,11 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
-import springfox.documentation.RequestHandler;
 import springfox.documentation.builders.ApiInfoBuilder;
+import springfox.documentation.builders.ExampleBuilder;
 import springfox.documentation.builders.PathSelectors;
-import springfox.documentation.service.ApiInfo;
-import springfox.documentation.service.ApiKey;
-import springfox.documentation.service.AuthorizationScope;
-import springfox.documentation.service.Contact;
-import springfox.documentation.service.SecurityReference;
-import springfox.documentation.service.SecurityScheme;
+import springfox.documentation.builders.RequestParameterBuilder;
+import springfox.documentation.service.*;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spi.service.contexts.SecurityContext;
 import springfox.documentation.spring.web.plugins.Docket;
@@ -24,7 +20,6 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.function.Predicate;
 
 import static springfox.documentation.builders.RequestHandlerSelectors.basePackage;
 
@@ -37,8 +32,8 @@ import static springfox.documentation.builders.RequestHandlerSelectors.basePacka
 @EnableSwagger2
 @EnableKnife4j
 @ConditionalOnClass({Docket.class, ApiInfoBuilder.class})
-@ConditionalOnProperty(prefix = "yudao.swagger", value = "enable", matchIfMissing = true)
 // 允许使用 swagger.enable=false 禁用 Swagger
+@ConditionalOnProperty(prefix = "yudao.swagger", value = "enable", matchIfMissing = true)
 @EnableConfigurationProperties(SwaggerProperties.class)
 public class YudaoSwaggerAutoConfiguration {
 
@@ -62,8 +57,11 @@ public class YudaoSwaggerAutoConfiguration {
                 .paths(PathSelectors.any())
                 .build()
                 .securitySchemes(securitySchemes())
+                .globalRequestParameters(globalRequestParameters())
                 .securityContexts(securityContexts());
     }
+
+    // ========== apiInfo ==========
 
     /**
      * API 摘要信息
@@ -76,6 +74,8 @@ public class YudaoSwaggerAutoConfiguration {
                 .version(properties.getVersion())
                 .build();
     }
+
+    // ========== securitySchemes ==========
 
     /**
      * 安全模式，这里配置通过请求头 Authorization 传递 token 参数
@@ -103,6 +103,14 @@ public class YudaoSwaggerAutoConfiguration {
 
     private static AuthorizationScope[] authorizationScopes() {
         return new AuthorizationScope[]{new AuthorizationScope("global", "accessEverything")};
+    }
+
+    // ========== globalRequestParameters ==========
+
+    private static List<RequestParameter> globalRequestParameters() {
+        RequestParameterBuilder tenantParameter = new RequestParameterBuilder().name("tenant-id").description("租户编号")
+                .in(ParameterType.HEADER).example(new ExampleBuilder().value(1L).build());
+        return Collections.singletonList(tenantParameter.build());
     }
 
 }

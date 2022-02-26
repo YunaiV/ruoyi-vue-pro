@@ -74,7 +74,7 @@
 #elseif("" != $column.dictType)## 数据字典
       <el-table-column label="${comment}" align="center" prop="${javaField}">
         <template slot-scope="scope">
-          <dict-type :type="DICT_TYPE.$dictType.toUpperCase()" :value="scope.row.${column.javaField}" />
+          <dict-tag :type="DICT_TYPE.$dictType.toUpperCase()" :value="scope.row.${column.javaField}" />
         </template>
       </el-table-column>
 #else

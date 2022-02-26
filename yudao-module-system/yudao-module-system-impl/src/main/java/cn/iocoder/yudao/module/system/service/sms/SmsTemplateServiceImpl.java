@@ -3,24 +3,23 @@ package cn.iocoder.yudao.module.system.service.sms;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ReUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.sms.core.client.SmsClient;
+import cn.iocoder.yudao.framework.sms.core.client.SmsClientFactory;
+import cn.iocoder.yudao.framework.sms.core.client.SmsCommonResult;
+import cn.iocoder.yudao.framework.sms.core.client.dto.SmsTemplateRespDTO;
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.template.SmsTemplateCreateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.template.SmsTemplateExportReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.template.SmsTemplatePageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.template.SmsTemplateUpdateReqVO;
 import cn.iocoder.yudao.module.system.convert.sms.SmsTemplateConvert;
+import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsChannelDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsTemplateDO;
 import cn.iocoder.yudao.module.system.dal.mysql.sms.SmsTemplateMapper;
 import cn.iocoder.yudao.module.system.mq.producer.sms.SmsProducer;
-import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsChannelDO;
-import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.sms.core.client.SmsClient;
-import cn.iocoder.yudao.framework.sms.core.client.SmsClientFactory;
-import cn.iocoder.yudao.framework.sms.core.client.SmsCommonResult;
-import cn.iocoder.yudao.framework.sms.core.client.dto.SmsTemplateRespDTO;
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.ImmutableMap;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -31,8 +30,8 @@ import javax.annotation.Resource;
 import java.util.*;
 import java.util.regex.Pattern;
 
-import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
 
 /**
  * 短信模板 Service 实现类
@@ -89,11 +88,8 @@ public class SmsTemplateServiceImpl implements SmsTemplateService {
         }
 
         // 写入缓存
-        ImmutableMap.Builder<String, SmsTemplateDO> builder = ImmutableMap.builder();
-        smsTemplateList.forEach(sysSmsTemplateDO -> builder.put(sysSmsTemplateDO.getCode(), sysSmsTemplateDO));
-        smsTemplateCache = builder.build();
-        assert smsTemplateList.size() > 0; // 断言，避免告警
-        maxUpdateTime = smsTemplateList.stream().max(Comparator.comparing(BaseDO::getUpdateTime)).get().getUpdateTime();
+        smsTemplateCache = CollectionUtils.convertMap(smsTemplateList, SmsTemplateDO::getCode);
+        maxUpdateTime = CollectionUtils.getMaxValue(smsTemplateList, SmsTemplateDO::getUpdateTime);
         log.info("[initLocalCache][初始化 SmsTemplate 数量为 {}]", smsTemplateList.size());
     }
 
@@ -220,7 +216,7 @@ public class SmsTemplateServiceImpl implements SmsTemplateService {
     }
 
     @Override
-    public Integer countByChannelId(Long channelId) {
+    public Long countByChannelId(Long channelId) {
         return smsTemplateMapper.selectCountByChannelId(channelId);
     }
 

@@ -43,8 +43,8 @@ public interface ErrorCodeConstants {
     ErrorCode PROCESS_INSTANCE_CANCEL_FAIL_NOT_SELF = new ErrorCode(1009004002, "流程取消失败，该流程不是你发起的");
 
     // ========== 流程任务 1-009-005-000 ==========
-    ErrorCode TASK_COMPLETE_FAIL_NOT_EXISTS = new ErrorCode(1009004000, "审批任务失败，原因：该任务不处于未审批");
-    ErrorCode TASK_COMPLETE_FAIL_ASSIGN_NOT_SELF = new ErrorCode(1009004001, "审批任务失败，原因：该任务的审批人不是你");
+    ErrorCode TASK_COMPLETE_FAIL_NOT_EXISTS = new ErrorCode(1009005000, "审批任务失败，原因：该任务不处于未审批");
+    ErrorCode TASK_COMPLETE_FAIL_ASSIGN_NOT_SELF = new ErrorCode(1009005001, "审批任务失败，原因：该任务的审批人不是你");
 
     // ========== 流程任务分配规则 1-009-006-000 ==========
     ErrorCode TASK_ASSIGN_RULE_EXISTS = new ErrorCode(1009006000, "流程({}) 的任务({}) 已经存在分配规则");
@@ -55,7 +55,7 @@ public interface ErrorCodeConstants {
 
     // ========== 动态表单模块 1-009-010-000 ==========
     ErrorCode FORM_NOT_EXISTS = new ErrorCode(1009010000, "动态表单不存在");
-    ErrorCode FORM_FIELD_REPEAT = new ErrorCode(1009010000, "表单项({}) 和 ({}) 使用了相同的字段名({})");
+    ErrorCode FORM_FIELD_REPEAT = new ErrorCode(1009010001, "表单项({}) 和 ({}) 使用了相同的字段名({})");
 
     // ========== 用户组模块 1-009-011-000 ==========
     ErrorCode USER_GROUP_NOT_EXISTS = new ErrorCode(1009011000, "用户组不存在");

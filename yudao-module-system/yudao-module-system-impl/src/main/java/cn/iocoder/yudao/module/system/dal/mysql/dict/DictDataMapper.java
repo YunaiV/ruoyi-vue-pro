@@ -28,7 +28,7 @@ public interface DictDataMapper extends BaseMapperX<DictDataDO> {
                 .in(DictDataDO::getValue, values));
     }
 
-    default int selectCountByDictType(String dictType) {
+    default long selectCountByDictType(String dictType) {
         return selectCount(DictDataDO::getDictType, dictType);
     }
 

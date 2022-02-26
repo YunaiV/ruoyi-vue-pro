@@ -8,6 +8,7 @@ import cn.iocoder.yudao.module.system.controller.admin.permission.vo.role.RoleUp
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.RoleDO;
 import org.springframework.lang.Nullable;
 
+import javax.validation.Valid;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -28,16 +29,17 @@ public interface RoleService {
      * 创建角色
      *
      * @param reqVO 创建角色信息
+     * @param type 角色类型
      * @return 角色编号
      */
-    Long createRole(RoleCreateReqVO reqVO);
+    Long createRole(@Valid RoleCreateReqVO reqVO, Integer type);
 
     /**
      * 更新角色
      *
      * @param reqVO 更新角色信息
      */
-    void updateRole(RoleUpdateReqVO reqVO);
+    void updateRole(@Valid RoleUpdateReqVO reqVO);
 
     /**
      * 删除角色
@@ -88,12 +90,12 @@ public interface RoleService {
     List<RoleDO> getRolesFromCache(Collection<Long> ids);
 
     /**
-     * 判断角色数组中，是否有管理员
+     * 判断角色数组中，是否有超级管理员
      *
      * @param roleList 角色数组
      * @return 是否有管理员
      */
-    boolean hasAnyAdmin(Collection<RoleDO> roleList);
+    boolean hasAnySuperAdmin(Collection<RoleDO> roleList);
 
     /**
      * 判断角色编号数组中，是否有管理员
@@ -101,8 +103,8 @@ public interface RoleService {
      * @param ids 角色编号数组
      * @return 是否有管理员
      */
-    default boolean hasAnyAdmin(Set<Long> ids) {
-        return hasAnyAdmin(getRolesFromCache(ids));
+    default boolean hasAnySuperAdmin(Set<Long> ids) {
+        return hasAnySuperAdmin(getRolesFromCache(ids));
     }
 
     /**

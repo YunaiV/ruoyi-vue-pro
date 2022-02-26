@@ -170,3 +170,17 @@ export function getNowDateTime(timeStr) {
   let seconds = now.getSeconds().toString().padStart(2, "0") // 得到秒;
   return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 }
+
+/**
+ * 获得租户功能是否开启
+ */
+export function getTenantEnable() {
+  console.log("enable: " + process.env.VUE_APP_TENANT_ENABLE)
+  if (process.env.VUE_APP_TENANT_ENABLE === "true") {
+    return true;
+  }
+  if (process.env.VUE_APP_TENANT_ENABLE === "false") {
+    return false;
+  }
+  return process.env.VUE_APP_TENANT_ENABLE || true;
+}
