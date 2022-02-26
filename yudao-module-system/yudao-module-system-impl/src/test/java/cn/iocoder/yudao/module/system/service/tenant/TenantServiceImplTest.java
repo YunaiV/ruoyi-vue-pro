@@ -431,7 +431,7 @@ public class TenantServiceImplTest extends BaseDbUnitTest {
         tenantMapper.insert(dbTenant2);// @Sql: 先插入出一条存在的数据
 
         // 调用
-        Integer count = tenantService.getTenantCountByPackageId(1L);
+        Long count = tenantService.getTenantCountByPackageId(1L);
         assertEquals(1, count);
     }
 

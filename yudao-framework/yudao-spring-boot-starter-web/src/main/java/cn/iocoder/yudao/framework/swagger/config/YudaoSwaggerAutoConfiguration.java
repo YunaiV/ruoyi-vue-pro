@@ -9,7 +9,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import springfox.documentation.builders.ApiInfoBuilder;
+import springfox.documentation.builders.ExampleBuilder;
 import springfox.documentation.builders.PathSelectors;
+import springfox.documentation.builders.RequestParameterBuilder;
 import springfox.documentation.service.*;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spi.service.contexts.SecurityContext;
@@ -55,8 +57,11 @@ public class YudaoSwaggerAutoConfiguration {
                 .paths(PathSelectors.any())
                 .build()
                 .securitySchemes(securitySchemes())
+                .globalRequestParameters(globalRequestParameters())
                 .securityContexts(securityContexts());
     }
+
+    // ========== apiInfo ==========
 
     /**
      * API 摘要信息
@@ -69,6 +74,8 @@ public class YudaoSwaggerAutoConfiguration {
                 .version(properties.getVersion())
                 .build();
     }
+
+    // ========== securitySchemes ==========
 
     /**
      * 安全模式，这里配置通过请求头 Authorization 传递 token 参数
@@ -96,6 +103,14 @@ public class YudaoSwaggerAutoConfiguration {
 
     private static AuthorizationScope[] authorizationScopes() {
         return new AuthorizationScope[]{new AuthorizationScope("global", "accessEverything")};
+    }
+
+    // ========== globalRequestParameters ==========
+
+    private static List<RequestParameter> globalRequestParameters() {
+        RequestParameterBuilder tenantParameter = new RequestParameterBuilder().name("tenant-id").description("租户编号")
+                .in(ParameterType.HEADER).example(new ExampleBuilder().value(1L).build());
+        return Collections.singletonList(tenantParameter.build());
     }
 
 }

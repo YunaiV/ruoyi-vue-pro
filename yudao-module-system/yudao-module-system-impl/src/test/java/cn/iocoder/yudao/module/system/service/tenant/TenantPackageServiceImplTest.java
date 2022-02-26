@@ -102,7 +102,7 @@ public class TenantPackageServiceImplTest extends BaseDbUnitTest {
         // 准备参数
         Long id = dbTenantPackage.getId();
         // mock 租户未使用该套餐
-        when(tenantService.getTenantCountByPackageId(eq(id))).thenReturn(0);
+        when(tenantService.getTenantCountByPackageId(eq(id))).thenReturn(0L);
 
         // 调用
         tenantPackageService.deleteTenantPackage(id);
@@ -127,7 +127,7 @@ public class TenantPackageServiceImplTest extends BaseDbUnitTest {
         // 准备参数
         Long id = dbTenantPackage.getId();
         // mock 租户在使用该套餐
-        when(tenantService.getTenantCountByPackageId(eq(id))).thenReturn(1);
+        when(tenantService.getTenantCountByPackageId(eq(id))).thenReturn(1L);
 
         // 调用, 并断言异常
         assertServiceException(() -> tenantPackageService.deleteTenantPackage(id), TENANT_PACKAGE_USED);

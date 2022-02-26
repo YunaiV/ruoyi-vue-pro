@@ -44,7 +44,7 @@ public interface TenantMapper extends BaseMapperX<TenantDO> {
         return selectOne(TenantDO::getName, name);
     }
 
-    default Integer selectCountByPackageId(Long packageId) {
+    default Long selectCountByPackageId(Long packageId) {
         return selectCount(TenantDO::getPackageId, packageId);
     }
 

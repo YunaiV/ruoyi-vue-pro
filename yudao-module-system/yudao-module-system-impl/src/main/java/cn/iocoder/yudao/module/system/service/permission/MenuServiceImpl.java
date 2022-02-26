@@ -18,6 +18,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -71,6 +72,7 @@ public class MenuServiceImpl implements MenuService {
     @Resource
     private PermissionService permissionService;
     @Resource
+    @Lazy // 延迟，避免循环依赖报错
     private TenantService tenantService;
 
     @Resource

@@ -95,7 +95,7 @@ public interface TenantService extends TenantFrameworkService {
      * @param packageId 租户套餐编号
      * @return 租户数量
      */
-    Integer getTenantCountByPackageId(Long packageId);
+    Long getTenantCountByPackageId(Long packageId);
 
     /**
      * 获得使用指定套餐的租户数组

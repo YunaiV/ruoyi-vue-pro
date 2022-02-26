@@ -301,7 +301,7 @@ public class TenantServiceImpl implements TenantService {
     }
 
     @Override
-    public Integer getTenantCountByPackageId(Long packageId) {
+    public Long getTenantCountByPackageId(Long packageId) {
         return tenantMapper.selectCountByPackageId(packageId);
     }
 
