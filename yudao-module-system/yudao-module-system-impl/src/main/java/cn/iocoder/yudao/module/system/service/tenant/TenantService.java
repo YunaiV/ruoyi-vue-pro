@@ -12,7 +12,6 @@ import cn.iocoder.yudao.module.system.service.tenant.handler.TenantInfoHandler;
 import cn.iocoder.yudao.module.system.service.tenant.handler.TenantMenuHandler;
 
 import javax.validation.Valid;
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -65,14 +64,6 @@ public interface TenantService extends TenantFrameworkService {
      * @return 租户
      */
     TenantDO getTenant(Long id);
-
-    /**
-     * 获得租户列表
-     *
-     * @param ids 编号
-     * @return 租户列表
-     */
-    List<TenantDO> getTenantList(Collection<Long> ids);
 
     /**
      * 获得租户分页

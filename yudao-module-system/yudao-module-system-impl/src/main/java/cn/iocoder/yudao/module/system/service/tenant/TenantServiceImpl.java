@@ -30,6 +30,7 @@ import cn.iocoder.yudao.module.system.service.permission.RoleService;
 import cn.iocoder.yudao.module.system.service.tenant.handler.TenantInfoHandler;
 import cn.iocoder.yudao.module.system.service.tenant.handler.TenantMenuHandler;
 import cn.iocoder.yudao.module.system.service.user.AdminUserService;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -44,7 +45,10 @@ import javax.annotation.Resource;
 import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertImmutableMap;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.getMaxValue;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
+import static java.util.Collections.singleton;
 
 /**
  * 租户 Service 实现类
@@ -68,10 +72,12 @@ public class TenantServiceImpl implements TenantService {
      *
      * 这里声明 volatile 修饰的原因是，每次刷新时，直接修改指向
      */
+    @Getter
     private volatile Map<Long, TenantDO> tenantCache;
     /**
      * 缓存角色的最大更新时间，用于后续的增量轮询，判断是否有更新
      */
+    @Getter
     private volatile Date maxUpdateTime;
 
     @Resource
@@ -108,8 +114,8 @@ public class TenantServiceImpl implements TenantService {
         }
 
         // 写入缓存
-        tenantCache = CollectionUtils.convertImmutableMap(tenantList, TenantDO::getId);
-        maxUpdateTime = CollectionUtils.getMaxValue(tenantList, TenantDO::getUpdateTime);
+        tenantCache = convertImmutableMap(tenantList, TenantDO::getId);
+        maxUpdateTime = getMaxValue(tenantList, TenantDO::getUpdateTime);
         log.info("[initLocalCache][初始化 Tenant 数量为 {}]", tenantList.size());
     }
 
@@ -190,7 +196,7 @@ public class TenantServiceImpl implements TenantService {
         // 创建用户
         Long userId = userService.createUser(TenantConvert.INSTANCE.convert02(createReqVO));
         // 分配角色
-        permissionService.assignUserRole(userId, Collections.singleton(roleId));
+        permissionService.assignUserRole(userId, singleton(roleId));
         return userId;
     }
 
@@ -277,11 +283,6 @@ public class TenantServiceImpl implements TenantService {
     @Override
     public TenantDO getTenant(Long id) {
         return tenantMapper.selectById(id);
-    }
-
-    @Override
-    public List<TenantDO> getTenantList(Collection<Long> ids) {
-        return tenantMapper.selectBatchIds(ids);
     }
 
     @Override
