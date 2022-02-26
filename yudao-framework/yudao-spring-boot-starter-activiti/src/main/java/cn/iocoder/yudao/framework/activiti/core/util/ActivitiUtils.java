@@ -26,7 +26,7 @@ import java.util.function.Consumer;
  * @author 芋道源码
  */
 public class ActivitiUtils {
-
+git
     static {
         setAuthenticationThreadLocal();
     }
