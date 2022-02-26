@@ -44,7 +44,7 @@ jobs:
         run: node --version && yarn --version && yarn install
 
       - name: Build
-        run: yarn run build:prod
+        run: yarn build:prod
   
       # 查看 workflow 的文档来获取更多信息
       # @see https://github.com/crazy-max/ghaction-github-pages
