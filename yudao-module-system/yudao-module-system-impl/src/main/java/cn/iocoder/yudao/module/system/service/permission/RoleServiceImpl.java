@@ -19,6 +19,7 @@ import cn.iocoder.yudao.module.system.enums.permission.RoleCodeEnum;
 import cn.iocoder.yudao.module.system.enums.permission.RoleTypeEnum;
 import cn.iocoder.yudao.module.system.mq.producer.permission.RoleProducer;
 import com.google.common.annotations.VisibleForTesting;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.lang.Nullable;
@@ -58,10 +59,12 @@ public class RoleServiceImpl implements RoleService {
      *
      * 这里声明 volatile 修饰的原因是，每次刷新时，直接修改指向
      */
+    @Getter
     private volatile Map<Long, RoleDO> roleCache;
     /**
      * 缓存角色的最大更新时间，用于后续的增量轮询，判断是否有更新
      */
+    @Getter
     private volatile Date maxUpdateTime;
 
     @Resource
@@ -144,6 +147,7 @@ public class RoleServiceImpl implements RoleService {
         checkUpdateRole(reqVO.getId());
         // 校验角色的唯一字段是否重复
         checkDuplicateRole(reqVO.getName(), reqVO.getCode(), reqVO.getId());
+
         // 更新到数据库
         RoleDO updateObject = RoleConvert.INSTANCE.convert(reqVO);
         roleMapper.updateById(updateObject);

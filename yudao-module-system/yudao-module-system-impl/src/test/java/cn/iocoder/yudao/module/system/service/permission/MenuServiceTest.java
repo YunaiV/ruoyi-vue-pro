@@ -3,6 +3,8 @@ package cn.iocoder.yudao.module.system.service.permission;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
+import cn.iocoder.yudao.framework.common.util.spring.SpringAopUtils;
 import cn.iocoder.yudao.module.system.controller.admin.permission.vo.menu.MenuCreateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.permission.vo.menu.MenuListReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.permission.vo.menu.MenuUpdateReqVO;
@@ -10,8 +12,7 @@ import cn.iocoder.yudao.module.system.dal.dataobject.permission.MenuDO;
 import cn.iocoder.yudao.module.system.dal.mysql.permission.MenuMapper;
 import cn.iocoder.yudao.module.system.enums.permission.MenuTypeEnum;
 import cn.iocoder.yudao.module.system.mq.producer.permission.MenuProducer;
-import cn.iocoder.yudao.framework.common.util.spring.SpringAopUtils;
-import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
+import cn.iocoder.yudao.module.system.service.tenant.TenantService;
 import cn.iocoder.yudao.module.system.test.BaseDbUnitTest;
 import com.google.common.collect.Multimap;
 import org.junit.jupiter.api.Test;
@@ -21,27 +22,32 @@ import org.springframework.context.annotation.Import;
 import javax.annotation.Resource;
 import java.util.*;
 
-import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.framework.common.util.collection.SetUtils.asSet;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
+import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 
+// TODO @芋艿：单测的代码质量可以提升下
 @Import(MenuServiceImpl.class)
 public class MenuServiceTest extends BaseDbUnitTest {
 
     @Resource
-    private MenuServiceImpl sysMenuService;
-
-    @MockBean
-    private PermissionService sysPermissionService;
-
-    @MockBean
-    private MenuProducer sysMenuProducer;
+    private MenuServiceImpl menuService;
 
     @Resource
     private MenuMapper menuMapper;
+
+    @MockBean
+    private PermissionService permissionService;
+    @MockBean
+    private MenuProducer menuProducer;
+    @MockBean
+    private TenantService tenantService;
 
     @Test
     public void testInitLocalCache_success() throws Exception {
@@ -51,10 +57,10 @@ public class MenuServiceTest extends BaseDbUnitTest {
         menuMapper.insert(menuDO2);
 
         // 调用
-        sysMenuService.initLocalCache();
+        menuService.initLocalCache();
 
         // 获取代理对象
-        MenuServiceImpl target = (MenuServiceImpl) SpringAopUtils.getTarget(sysMenuService);
+        MenuServiceImpl target = (MenuServiceImpl) SpringAopUtils.getTarget(menuService);
 
         Map<Long, MenuDO> menuCache =
                 (Map<Long, MenuDO>) BeanUtil.getFieldValue(target, "menuCache");
@@ -86,7 +92,7 @@ public class MenuServiceTest extends BaseDbUnitTest {
             o.setType(MenuTypeEnum.MENU.getType());
             o.setStatus(randomCommonStatus());
         });
-        Long menuId = sysMenuService.createMenu(vo);
+        Long menuId = menuService.createMenu(vo);
 
         //断言
         assertNotNull(menuId);
@@ -94,7 +100,7 @@ public class MenuServiceTest extends BaseDbUnitTest {
         MenuDO ret = menuMapper.selectById(menuId);
         assertPojoEquals(vo, ret);
         // 校验调用
-        verify(sysMenuProducer).sendMenuRefreshMessage();
+        verify(menuProducer).sendMenuRefreshMessage();
     }
 
     @Test
@@ -112,14 +118,14 @@ public class MenuServiceTest extends BaseDbUnitTest {
             o.setStatus(randomCommonStatus());
             o.setName("pppppp"); //修改名字
         });
-        sysMenuService.updateMenu(vo);
+        menuService.updateMenu(vo);
 
         //断言
         // 校验记录的属性是否正确
         MenuDO ret = menuMapper.selectById(sonId);
         assertPojoEquals(vo, ret);
         // 校验调用
-        verify(sysMenuProducer).sendMenuRefreshMessage();
+        verify(menuProducer).sendMenuRefreshMessage();
     }
 
     @Test
@@ -135,7 +141,7 @@ public class MenuServiceTest extends BaseDbUnitTest {
             o.setStatus(randomCommonStatus());
         });
         //断言
-        assertServiceException(() -> sysMenuService.updateMenu(vo), MENU_NOT_EXISTS);
+        assertServiceException(() -> menuService.updateMenu(vo), MENU_NOT_EXISTS);
     }
 
     @Test
@@ -144,20 +150,20 @@ public class MenuServiceTest extends BaseDbUnitTest {
         Long sonId = sonMenuDO.getId();
 
         // 调用
-        sysMenuService.deleteMenu(sonId);
+        menuService.deleteMenu(sonId);
 
         // 断言
         MenuDO menuDO = menuMapper.selectById(sonId);
         assertNull(menuDO);
-        verify(sysPermissionService).processMenuDeleted(sonId);
-        verify(sysMenuProducer).sendMenuRefreshMessage();
+        verify(permissionService).processMenuDeleted(sonId);
+        verify(menuProducer).sendMenuRefreshMessage();
     }
 
     @Test
     public void testDeleteMenu_menuNotExist() {
         Long sonId = 99999L;
 
-        assertServiceException(() -> sysMenuService.deleteMenu(sonId), MENU_NOT_EXISTS);
+        assertServiceException(() -> menuService.deleteMenu(sonId), MENU_NOT_EXISTS);
     }
 
     @Test
@@ -165,26 +171,50 @@ public class MenuServiceTest extends BaseDbUnitTest {
         MenuDO sonMenu = initParentAndSonMenuDO();
         Long parentId = sonMenu.getParentId();
 
-        assertServiceException(() -> sysMenuService.deleteMenu(parentId), MENU_EXISTS_CHILDREN);
+        assertServiceException(() -> menuService.deleteMenu(parentId), MENU_EXISTS_CHILDREN);
     }
 
     @Test
-    public void testGetMenus_success() {
-        Map<Long, MenuDO> idMenuMap = new HashMap<>();
-        MenuDO menuDO = createMenuDO(MenuTypeEnum.MENU, "parent", 0L);
-        menuMapper.insert(menuDO);
-        idMenuMap.put(menuDO.getId(), menuDO);
-
-        MenuDO sonMenu = createMenuDO(MenuTypeEnum.MENU, "son", menuDO.getId());
-        menuMapper.insert(sonMenu);
-        idMenuMap.put(sonMenu.getId(), sonMenu);
+    public void testGetMenus() {
+        // mock 数据
+        MenuDO menu100 = randomPojo(MenuDO.class, o -> o.setId(100L).setStatus(CommonStatusEnum.ENABLE.getStatus()));
+        menuMapper.insert(menu100);
+        MenuDO menu101 = randomPojo(MenuDO.class, o -> o.setId(101L).setStatus(CommonStatusEnum.DISABLE.getStatus()));
+        menuMapper.insert(menu101);
+        // 准备参数
+        MenuListReqVO reqVO = new MenuListReqVO().setStatus(CommonStatusEnum.ENABLE.getStatus());
 
         // 调用
-        List<MenuDO> menuDOS = sysMenuService.getMenus();
-
+        List<MenuDO> result = menuService.getMenus(reqVO);
         // 断言
-        assertEquals(menuDOS.size(), idMenuMap.size());
-        menuDOS.forEach(m -> assertPojoEquals(idMenuMap.get(m.getId()), m));
+        assertEquals(1, result.size());
+        assertPojoEquals(menu100, result.get(0));
+    }
+
+    @Test
+    public void testTenantMenus() {
+        // mock 数据
+        MenuDO menu100 = randomPojo(MenuDO.class, o -> o.setId(100L).setStatus(CommonStatusEnum.ENABLE.getStatus()));
+        menuMapper.insert(menu100);
+        MenuDO menu101 = randomPojo(MenuDO.class, o -> o.setId(101L).setStatus(CommonStatusEnum.DISABLE.getStatus()));
+        menuMapper.insert(menu101);
+        MenuDO menu102 = randomPojo(MenuDO.class, o -> o.setId(102L).setStatus(CommonStatusEnum.ENABLE.getStatus()));
+        menuMapper.insert(menu102);
+        // mock 过滤菜单
+        // mock 账户额度充足
+        Set<Long> menuIds = asSet(100L, 101L);
+        doNothing().when(tenantService).handleTenantMenu(argThat(handler -> {
+            handler.handle(menuIds);
+            return true;
+        }));
+        // 准备参数
+        MenuListReqVO reqVO = new MenuListReqVO().setStatus(CommonStatusEnum.ENABLE.getStatus());
+
+        // 调用
+        List<MenuDO> result = menuService.getTenantMenus(reqVO);
+        // 断言
+        assertEquals(1, result.size());
+        assertPojoEquals(menu100, result.get(0));
     }
 
     @Test
@@ -213,7 +243,7 @@ public class MenuServiceTest extends BaseDbUnitTest {
         MenuListReqVO reqVO = new MenuListReqVO();
         reqVO.setStatus(1);
         reqVO.setName("name");
-        List<MenuDO> menuDOS = sysMenuService.getMenus(reqVO);
+        List<MenuDO> menuDOS = menuService.getMenus(reqVO);
 
         // 断言
         assertEquals(menuDOS.size(), idMenuMap.size());
@@ -224,7 +254,7 @@ public class MenuServiceTest extends BaseDbUnitTest {
     public void testListMenusFromCache_success() throws Exception {
         Map<Long, MenuDO> mockCacheMap = new HashMap<>();
         // 获取代理对象
-        MenuServiceImpl target = (MenuServiceImpl) SpringAopUtils.getTarget(sysMenuService);
+        MenuServiceImpl target = (MenuServiceImpl) SpringAopUtils.getTarget(menuService);
         BeanUtil.setFieldValue(target, "menuCache", mockCacheMap);
 
         Map<Long, MenuDO> idMenuMap = new HashMap<>();
@@ -243,7 +273,7 @@ public class MenuServiceTest extends BaseDbUnitTest {
         menuDO = createMenuDO(4L, MenuTypeEnum.MENU, "name", 0L, 2);
         mockCacheMap.put(menuDO.getId(), menuDO);
 
-        List<MenuDO> menuDOS = sysMenuService.getMenuListFromCache(Collections.singletonList(MenuTypeEnum.MENU.getType()),
+        List<MenuDO> menuDOS = menuService.getMenuListFromCache(Collections.singletonList(MenuTypeEnum.MENU.getType()),
                 Collections.singletonList(CommonStatusEnum.DISABLE.getStatus()));
         assertEquals(menuDOS.size(), idMenuMap.size());
         menuDOS.forEach(m -> assertPojoEquals(idMenuMap.get(m.getId()), m));
@@ -253,7 +283,7 @@ public class MenuServiceTest extends BaseDbUnitTest {
     public void testListMenusFromCache2_success() throws Exception {
         Map<Long, MenuDO> mockCacheMap = new HashMap<>();
         // 获取代理对象
-        MenuServiceImpl target = (MenuServiceImpl) SpringAopUtils.getTarget(sysMenuService);
+        MenuServiceImpl target = (MenuServiceImpl) SpringAopUtils.getTarget(menuService);
         BeanUtil.setFieldValue(target, "menuCache", mockCacheMap);
 
         Map<Long, MenuDO> idMenuMap = new HashMap<>();
@@ -270,7 +300,7 @@ public class MenuServiceTest extends BaseDbUnitTest {
         menuDO = createMenuDO(4L, MenuTypeEnum.MENU, "name", 0L, 2);
         mockCacheMap.put(menuDO.getId(), menuDO);
 
-        List<MenuDO> menuDOS = sysMenuService.getMenuListFromCache(Collections.singletonList(1L),
+        List<MenuDO> menuDOS = menuService.getMenuListFromCache(Collections.singletonList(1L),
                 Collections.singletonList(MenuTypeEnum.MENU.getType()), Collections.singletonList(1));
         assertEquals(menuDOS.size(), idMenuMap.size());
         menuDOS.forEach(menu -> assertPojoEquals(idMenuMap.get(menu.getId()), menu));
@@ -282,17 +312,17 @@ public class MenuServiceTest extends BaseDbUnitTest {
         menuMapper.insert(menuDO);
         Long parentId = menuDO.getId();
 
-        sysMenuService.checkParentResource(parentId, null);
+        menuService.checkParentResource(parentId, null);
     }
 
     @Test
     public void testCheckParentResource_canNotSetSelfToBeParent() {
-        assertServiceException(() -> sysMenuService.checkParentResource(1L, 1L), MENU_PARENT_ERROR);
+        assertServiceException(() -> menuService.checkParentResource(1L, 1L), MENU_PARENT_ERROR);
     }
 
     @Test
     public void testCheckParentResource_parentNotExist() {
-        assertServiceException(() -> sysMenuService.checkParentResource(randomLongId(), null), MENU_PARENT_NOT_EXISTS);
+        assertServiceException(() -> menuService.checkParentResource(randomLongId(), null), MENU_PARENT_NOT_EXISTS);
     }
 
     @Test
@@ -301,7 +331,7 @@ public class MenuServiceTest extends BaseDbUnitTest {
         menuMapper.insert(menuDO);
         Long parentId = menuDO.getId();
 
-        assertServiceException(() -> sysMenuService.checkParentResource(parentId, null), MENU_PARENT_NOT_DIR_OR_MENU);
+        assertServiceException(() -> menuService.checkParentResource(parentId, null), MENU_PARENT_NOT_DIR_OR_MENU);
     }
 
     @Test
@@ -312,7 +342,7 @@ public class MenuServiceTest extends BaseDbUnitTest {
         Long otherSonMenuId = randomLongId();
         String otherSonMenuName = randomString();
 
-        sysMenuService.checkResource(parentId, otherSonMenuName, otherSonMenuId);
+        menuService.checkResource(parentId, otherSonMenuName, otherSonMenuId);
     }
 
     @Test
@@ -323,7 +353,7 @@ public class MenuServiceTest extends BaseDbUnitTest {
         Long otherSonMenuId=randomLongId();
         String otherSonMenuName=sonMenu.getName(); //相同名称
 
-        assertServiceException(() -> sysMenuService.checkResource(parentId, otherSonMenuName, otherSonMenuId), MENU_NAME_DUPLICATE);
+        assertServiceException(() -> menuService.checkResource(parentId, otherSonMenuName, otherSonMenuId), MENU_NAME_DUPLICATE);
     }
 
     /**

@@ -49,6 +49,7 @@ CREATE TABLE IF NOT EXISTS "system_role" (
     "updater" varchar(64) DEFAULT '',
     "update_time" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "deleted" bit NOT NULL DEFAULT FALSE,
+    "tenant_id" bigint not null default  '0',
     PRIMARY KEY ("id")
 ) COMMENT '角色信息表';
 
@@ -61,6 +62,7 @@ CREATE TABLE IF NOT EXISTS "system_role_menu" (
     "updater" varchar(64) DEFAULT '',
     "update_time" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "deleted" bit NOT NULL DEFAULT FALSE,
+    "tenant_id" bigint not null default  '0',
     PRIMARY KEY ("id")
 ) COMMENT '角色和菜单关联表';
 
@@ -92,7 +94,8 @@ CREATE TABLE IF NOT EXISTS "system_user_role" (
      "updater" varchar(64) DEFAULT '',
      "update_time" timestamp DEFAULT NULL,
      "deleted" bit DEFAULT FALSE,
-     PRIMARY KEY ("id")
+    "tenant_id" bigint not null default  '0',
+    PRIMARY KEY ("id")
 ) COMMENT '用户和角色关联表';
 
 CREATE TABLE IF NOT EXISTS "system_dict_type" (

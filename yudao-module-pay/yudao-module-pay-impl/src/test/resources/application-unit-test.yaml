@@ -16,6 +16,9 @@ spring:
     druid:
       async-init: true # 单元测试，异步初始化 Druid 连接池，提升启动速度
       initial-size: 1 # 单元测试，配置为 1，提升启动速度
+  sql:
+    init:
+      schema-locations: classpath:/sql/create_tables.sql
 
   # Redis 配置。Redisson 默认的配置足够使用，一般不需要进行调优
   redis:

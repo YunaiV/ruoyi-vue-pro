@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.system.controller.admin.permission;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.system.controller.admin.permission.vo.menu.*;
@@ -74,12 +73,9 @@ public class MenuController {
         // 获得菜单列表，只要开启状态的
         MenuListReqVO reqVO = new MenuListReqVO();
         reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
-        List<MenuDO> list = menuService.getMenus(reqVO);
+        List<MenuDO> list = menuService.getTenantMenus(reqVO);
         // 排序后，返回给前端
         list.sort(Comparator.comparing(MenuDO::getSort));
-
-        // 开启多租户的情况下，需要过滤掉未开通的菜单
-        tenantService.handleTenantMenu(menuIds -> list.removeIf(menu -> !CollUtil.contains(menuIds, menu.getId())));
         return success(MenuConvert.INSTANCE.convertList02(list));
     }
 
