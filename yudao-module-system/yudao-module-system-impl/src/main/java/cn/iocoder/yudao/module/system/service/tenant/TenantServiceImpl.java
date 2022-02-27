@@ -32,6 +32,7 @@ import cn.iocoder.yudao.module.system.service.tenant.handler.TenantMenuHandler;
 import cn.iocoder.yudao.module.system.service.user.AdminUserService;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -80,7 +81,7 @@ public class TenantServiceImpl implements TenantService {
     @Getter
     private volatile Date maxUpdateTime;
 
-    @Resource
+    @Autowired(required = false) // 由于 yudao.tenant.enable 配置项，可以关闭多租户的功能，所以这里只能不强制注入
     private TenantProperties tenantProperties;
 
     @Resource
@@ -313,7 +314,7 @@ public class TenantServiceImpl implements TenantService {
     @Override
     public void handleTenantInfo(TenantInfoHandler handler) {
         // 如果禁用，则不执行逻辑
-        if (Boolean.FALSE.equals(tenantProperties.getEnable())) {
+        if (isTenantDisable()) {
             return;
         }
         // 获得租户
@@ -325,7 +326,7 @@ public class TenantServiceImpl implements TenantService {
     @Override
     public void handleTenantMenu(TenantMenuHandler handler) {
         // 如果禁用，则不执行逻辑
-        if (Boolean.FALSE.equals(tenantProperties.getEnable())) {
+        if (isTenantDisable()) {
             return;
         }
         // 获得租户，然后获得菜单
@@ -342,6 +343,10 @@ public class TenantServiceImpl implements TenantService {
 
     private static boolean isSystemTenant(TenantDO tenant) {
         return Objects.equals(tenant.getPackageId(), TenantDO.PACKAGE_ID_SYSTEM);
+    }
+
+    private boolean isTenantDisable() {
+        return tenantProperties == null || Boolean.FALSE.equals(tenantProperties.getEnable());
     }
 
 }
