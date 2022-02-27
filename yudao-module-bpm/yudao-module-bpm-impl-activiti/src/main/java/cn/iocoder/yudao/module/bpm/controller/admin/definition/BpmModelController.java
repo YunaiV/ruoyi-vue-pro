@@ -93,5 +93,4 @@ public class BpmModelController {
         bpmModelService.updateModelState(reqVO.getId(), reqVO.getState());
         return success(true);
     }
-
 }
