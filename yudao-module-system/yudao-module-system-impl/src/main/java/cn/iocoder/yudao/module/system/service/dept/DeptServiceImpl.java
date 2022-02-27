@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.datapermission.core.annotation.DataPermission;
 import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnore;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptCreateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptListReqVO;
@@ -304,4 +305,10 @@ public class DeptServiceImpl implements DeptService {
         return deptMapper.selectBatchIds(ids);
     }
 
+    // 关闭数据权限校验，此接口仅用于查询用户自身部门信息，不要对外开放
+    @Override
+    @DataPermission(enable = false)
+    public DeptDO getSelfDept(Long id) {
+        return deptMapper.selectById(id);
+    }
 }

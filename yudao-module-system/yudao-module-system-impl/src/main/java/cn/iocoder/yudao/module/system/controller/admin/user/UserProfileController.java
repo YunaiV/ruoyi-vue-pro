@@ -67,7 +67,8 @@ public class UserProfileController {
         resp.setRoles(UserConvert.INSTANCE.convertList(userRoles));
         // 获得部门信息
         if (user.getDeptId() != null) {
-            DeptDO dept = deptService.getDept(user.getDeptId());
+            // 使用不被数据权限拦截的部门查询方式，确保查到自己的部门名称
+            DeptDO dept = deptService.getSelfDept(user.getDeptId());
             resp.setDept(UserConvert.INSTANCE.convert02(dept));
         }
         // 获得岗位信息

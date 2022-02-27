@@ -109,4 +109,11 @@ public interface DeptService {
         List<DeptDO> list = getSimpleDepts(ids);
         return CollectionUtils.convertMap(list, DeptDO::getId);
     }
+    
+    /**
+     * 获得自身的部门信息, 仅对登录用户有效，仅供内部使用
+     * 不会受到数据权限拦截
+     * @return 部门信息
+     */
+    DeptDO getSelfDept(Long id);
 }
