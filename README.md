@@ -189,11 +189,11 @@ ps：核心功能已经实现，正在对接微信小程序中...
 
 ### 系统功能
 
-| 模块 | biu |  biu | biu |
-| --- | --- | --- | --- |
-| 登录 & 首页 | ![登录](https://static.iocoder.cn/images/ruoyi-vue-pro/登录.jpg) | ![首页](https://static.iocoder.cn/images/ruoyi-vue-pro/首页.jpg) | ![个人中心](https://static.iocoder.cn/images/ruoyi-vue-pro/个人中心.jpg) |
+| 模块 | biu | biu                                                              | biu |
+| --- | --- |------------------------------------------------------------------| --- |
+| 登录 & 首页 | ![登录](https://static.iocoder.cn/images/ruoyi-vue-pro/登录.jpg) | ![首页](https://static.iocoder.cn/images/ruoyi-vue-pro/首页.jpg)     | ![个人中心](https://static.iocoder.cn/images/ruoyi-vue-pro/个人中心.jpg) |
 | 用户 | ![用户管理](https://static.iocoder.cn/images/ruoyi-vue-pro/用户管理.jpg) | ![在线用户](https://static.iocoder.cn/images/ruoyi-vue-pro/在线用户.jpg) | - |
-| 租户 & 套餐 | ![租户管理](https://static.iocoder.cn/images/ruoyi-vue-pro/租户管理.jpg) | ![租户套餐](https://static.iocoder.cn/images/ruoyi-vue-pro/租户套餐.jpg)  | - |
+| 租户 & 套餐 | ![租户管理](https://static.iocoder.cn/images/ruoyi-vue-pro/租户管理.jpg) | ![租户套餐](https://static.iocoder.cn/images/ruoyi-vue-pro/租户套餐.png) | - |
 | 部门 & 岗位 | ![部门管理](https://static.iocoder.cn/images/ruoyi-vue-pro/部门管理.jpg) | ![岗位管理](https://static.iocoder.cn/images/ruoyi-vue-pro/岗位管理.jpg) | - |
 | 菜单 & 角色 | ![菜单管理](https://static.iocoder.cn/images/ruoyi-vue-pro/菜单管理.jpg) | ![角色管理](https://static.iocoder.cn/images/ruoyi-vue-pro/角色管理.jpg) | - |
 | 审计日志 | ![操作日志](https://static.iocoder.cn/images/ruoyi-vue-pro/操作日志.jpg) | ![登录日志](https://static.iocoder.cn/images/ruoyi-vue-pro/登录日志.jpg) | - |
