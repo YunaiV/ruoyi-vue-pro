@@ -17,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.sf.jsqlparser.expression.Alias;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.LongValue;
+import net.sf.jsqlparser.expression.NullValue;
 import net.sf.jsqlparser.expression.operators.conditional.OrExpression;
 import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
 import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
@@ -110,10 +111,12 @@ public class DeptDataPermissionRule implements DataPermissionRule {
         Expression deptExpression = this.buildDeptExpression(tableName,tableAlias, deptDataPermission.getDeptIds());
         Expression userExpression = this.buildUserExpression(tableName, tableAlias, deptDataPermission.getSelf(), loginUser.getId());
         if (deptExpression == null && userExpression == null) {
-            log.error("[getExpression][LoginUser({}) Table({}/{}) DeptDataPermission({}) 构建的条件为空]",
+            // TODO 芋艿：获得不到条件的时候，暂时不抛出异常，而是不返回数据
+            log.warn("[getExpression][LoginUser({}) Table({}/{}) DeptDataPermission({}) 构建的条件为空]",
                     JsonUtils.toJsonString(loginUser), tableName, tableAlias, JsonUtils.toJsonString(deptDataPermission));
-            throw new NullPointerException(String.format("LoginUser(%d) Table(%s/%s) 构建的条件为空",
-                    loginUser.getId(), tableName, tableAlias.getName()));
+//            throw new NullPointerException(String.format("LoginUser(%d) Table(%s/%s) 构建的条件为空",
+//                    loginUser.getId(), tableName, tableAlias.getName()));
+            return new NullValue();
         }
         if (deptExpression == null) {
             return userExpression;
