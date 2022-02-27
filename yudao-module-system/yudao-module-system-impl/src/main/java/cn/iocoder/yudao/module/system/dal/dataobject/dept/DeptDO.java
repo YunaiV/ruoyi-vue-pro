@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.system.dal.dataobject.dept;
 
-import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
-import cn.iocoder.yudao.framework.tenant.core.db.TenantBaseDO;
+import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
@@ -17,7 +17,7 @@ import lombok.EqualsAndHashCode;
 @TableName("system_dept")
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class DeptDO extends TenantBaseDO {
+public class DeptDO extends BaseDO {
 
     /**
      * 部门ID

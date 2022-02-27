@@ -1,16 +1,19 @@
 package cn.iocoder.yudao.module.system.service.tenant;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
 import cn.iocoder.yudao.framework.tenant.core.service.TenantFrameworkService;
-import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.TenantCreateReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.TenantExportReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.TenantPageReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.TenantUpdateReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantCreateReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantExportReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantPageReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantUpdateReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.tenant.TenantDO;
+import cn.iocoder.yudao.module.system.service.tenant.handler.TenantInfoHandler;
+import cn.iocoder.yudao.module.system.service.tenant.handler.TenantMenuHandler;
 
 import javax.validation.Valid;
-import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 /**
  * 租户 Service 接口
@@ -18,6 +21,11 @@ import java.util.List;
  * @author 芋道源码
  */
 public interface TenantService extends TenantFrameworkService {
+
+    /**
+     * 初始化租户的本地缓存
+     */
+    void initLocalCache();
 
     /**
      * 创建租户
@@ -35,6 +43,14 @@ public interface TenantService extends TenantFrameworkService {
     void updateTenant(@Valid TenantUpdateReqVO updateReqVO);
 
     /**
+     * 更新租户的角色菜单
+     *
+     * @param tenantId 租户编号
+     * @param menuIds 菜单编号数组
+     */
+    void updateTenantRoleMenu(Long tenantId, Set<Long> menuIds);
+
+    /**
      * 删除租户
      *
      * @param id 编号
@@ -48,14 +64,6 @@ public interface TenantService extends TenantFrameworkService {
      * @return 租户
      */
     TenantDO getTenant(Long id);
-
-    /**
-     * 获得租户列表
-     *
-     * @param ids 编号
-     * @return 租户列表
-     */
-    List<TenantDO> getTenantList(Collection<Long> ids);
 
     /**
      * 获得租户分页
@@ -81,4 +89,35 @@ public interface TenantService extends TenantFrameworkService {
      */
     TenantDO getTenantByName(String name);
 
+    /**
+     * 获得使用指定套餐的租户数量
+     *
+     * @param packageId 租户套餐编号
+     * @return 租户数量
+     */
+    Long getTenantCountByPackageId(Long packageId);
+
+    /**
+     * 获得使用指定套餐的租户数组
+     *
+     * @param packageId 租户套餐编号
+     * @return 租户数组
+     */
+    List<TenantDO> getTenantListByPackageId(Long packageId);
+
+    /**
+     * 进行租户的信息处理逻辑
+     * 其中，租户编号从 {@link TenantContextHolder} 上下文中获取
+     *
+     * @param handler 处理器
+     */
+    void handleTenantInfo(TenantInfoHandler handler);
+
+    /**
+     * 进行租户的菜单处理逻辑
+     * 其中，租户编号从 {@link TenantContextHolder} 上下文中获取
+     *
+     * @param handler 处理器
+     */
+    void handleTenantMenu(TenantMenuHandler handler);
 }

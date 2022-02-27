@@ -2,11 +2,12 @@ package cn.iocoder.yudao.module.system.service.permission;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
-import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.framework.security.core.enums.DataScopeEnum;
+import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnore;
 import cn.iocoder.yudao.module.system.controller.admin.permission.vo.role.RoleCreateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.permission.vo.role.RoleExportReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.permission.vo.role.RolePageReqVO;
@@ -18,8 +19,9 @@ import cn.iocoder.yudao.module.system.enums.permission.RoleCodeEnum;
 import cn.iocoder.yudao.module.system.enums.permission.RoleTypeEnum;
 import cn.iocoder.yudao.module.system.mq.producer.permission.RoleProducer;
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.ImmutableMap;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.lang.Nullable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -57,10 +59,12 @@ public class RoleServiceImpl implements RoleService {
      *
      * 这里声明 volatile 修饰的原因是，每次刷新时，直接修改指向
      */
+    @Getter
     private volatile Map<Long, RoleDO> roleCache;
     /**
      * 缓存角色的最大更新时间，用于后续的增量轮询，判断是否有更新
      */
+    @Getter
     private volatile Date maxUpdateTime;
 
     @Resource
@@ -72,30 +76,32 @@ public class RoleServiceImpl implements RoleService {
     @Resource
     private RoleProducer roleProducer;
 
+    @Resource
+    @Lazy // 注入自己，所以延迟加载
+    private RoleService self;
+
     /**
      * 初始化 {@link #roleCache} 缓存
      */
     @Override
     @PostConstruct
+    @TenantIgnore // 忽略自动多租户，全局初始化缓存
     public void initLocalCache() {
         // 获取角色列表，如果有更新
-        List<RoleDO> roleList = this.loadRoleIfUpdate(maxUpdateTime);
+        List<RoleDO> roleList = loadRoleIfUpdate(maxUpdateTime);
         if (CollUtil.isEmpty(roleList)) {
             return;
         }
 
         // 写入缓存
-        ImmutableMap.Builder<Long, RoleDO> builder = ImmutableMap.builder();
-        roleList.forEach(sysRoleDO -> builder.put(sysRoleDO.getId(), sysRoleDO));
-        roleCache = builder.build();
-        assert roleList.size() > 0; // 断言，避免告警
-        maxUpdateTime = roleList.stream().max(Comparator.comparing(BaseDO::getUpdateTime)).get().getUpdateTime();
+        roleCache = CollectionUtils.convertMap(roleList, RoleDO::getId);
+        maxUpdateTime = CollectionUtils.getMaxValue(roleList, RoleDO::getUpdateTime);
         log.info("[initLocalCache][初始化 Role 数量为 {}]", roleList.size());
     }
 
     @Scheduled(fixedDelay = SCHEDULER_PERIOD, initialDelay = SCHEDULER_PERIOD)
     public void schedulePeriodicRefresh() {
-        initLocalCache();
+       self.initLocalCache();
     }
 
     /**
@@ -120,12 +126,12 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public Long createRole(RoleCreateReqVO reqVO) {
+    public Long createRole(RoleCreateReqVO reqVO, Integer type) {
         // 校验角色
         checkDuplicateRole(reqVO.getName(), reqVO.getCode(), null);
         // 插入到数据库
         RoleDO role = RoleConvert.INSTANCE.convert(reqVO);
-        role.setType(RoleTypeEnum.CUSTOM.getType());
+        role.setType(ObjectUtil.defaultIfNull(type, RoleTypeEnum.CUSTOM.getType()));
         role.setStatus(CommonStatusEnum.ENABLE.getStatus());
         role.setDataScope(DataScopeEnum.ALL.getScope()); // 默认可查看所有数据。原因是，可能一些项目不需要项目权限
         roleMapper.insert(role);
@@ -138,9 +144,10 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public void updateRole(RoleUpdateReqVO reqVO) {
         // 校验是否可以更新
-        this.checkUpdateRole(reqVO.getId());
+        checkUpdateRole(reqVO.getId());
         // 校验角色的唯一字段是否重复
         checkDuplicateRole(reqVO.getName(), reqVO.getCode(), reqVO.getId());
+
         // 更新到数据库
         RoleDO updateObject = RoleConvert.INSTANCE.convert(reqVO);
         roleMapper.updateById(updateObject);
@@ -151,7 +158,7 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public void updateRoleStatus(Long id, Integer status) {
         // 校验是否可以更新
-        this.checkUpdateRole(id);
+        checkUpdateRole(id);
         // 更新状态
         RoleDO updateObject = new RoleDO();
         updateObject.setId(id);
@@ -215,11 +222,11 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public boolean hasAnyAdmin(Collection<RoleDO> roleList) {
+    public boolean hasAnySuperAdmin(Collection<RoleDO> roleList) {
         if (CollectionUtil.isEmpty(roleList)) {
             return false;
         }
-        return roleList.stream().anyMatch(roleDO -> RoleCodeEnum.ADMIN.getKey().equals(roleDO.getCode()));
+        return roleList.stream().anyMatch(role -> RoleCodeEnum.isSuperAdmin(role.getCode()));
     }
 
     @Override
@@ -249,6 +256,10 @@ public class RoleServiceImpl implements RoleService {
      */
     @VisibleForTesting
     public void checkDuplicateRole(String name, String code, Long id) {
+        // 0. 超级管理员，不允许创建
+        if (RoleCodeEnum.isSuperAdmin(code)) {
+            throw exception(ROLE_ADMIN_CODE_ERROR, code);
+        }
         // 1. 该 name 名字被其它角色所使用
         RoleDO role = roleMapper.selectByName(name);
         if (role != null && !role.getId().equals(id)) {

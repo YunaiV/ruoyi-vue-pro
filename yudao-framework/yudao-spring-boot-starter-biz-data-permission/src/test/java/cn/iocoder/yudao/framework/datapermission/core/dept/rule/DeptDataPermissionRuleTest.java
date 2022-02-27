@@ -18,6 +18,7 @@ import org.mockito.MockedStatic;
 
 import java.util.Map;
 
+import static cn.iocoder.yudao.framework.datapermission.core.dept.rule.DeptDataPermissionRule.EXPRESSION_NULL;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomString;
 import static org.junit.jupiter.api.Assertions.*;
@@ -137,10 +138,9 @@ class DeptDataPermissionRuleTest extends BaseMockitoUnitTest {
             when(deptDataPermissionFrameworkService.getDeptDataPermission(same(loginUser))).thenReturn(deptDataPermission);
 
             // 调用
-            NullPointerException exception = assertThrows(NullPointerException.class,
-                    () -> rule.getExpression(tableName, tableAlias));
+            Expression expression = rule.getExpression(tableName, tableAlias);
             // 断言
-            assertEquals("LoginUser(1) Table(t_user/u) 构建的条件为空", exception.getMessage());
+            assertSame(EXPRESSION_NULL, expression);
         }
     }
 

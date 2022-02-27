@@ -147,7 +147,7 @@ public class SmsChannelServiceTest extends BaseDbUnitTest {
         // 准备参数
         Long id = dbSmsChannel.getId();
         // mock 方法
-        when(smsTemplateService.countByChannelId(eq(id))).thenReturn(10);
+        when(smsTemplateService.countByChannelId(eq(id))).thenReturn(10L);
 
         // 调用, 并断言异常
         assertServiceException(() -> smsChannelService.deleteSmsChannel(id), SMS_CHANNEL_HAS_CHILDREN);

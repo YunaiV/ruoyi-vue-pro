@@ -33,8 +33,8 @@ public interface PermissionService extends SecurityPermissionFrameworkService, D
      * @param menusStatuses 菜单状态数组
      * @return 菜单列表
      */
-    List<MenuDO> getRoleMenusFromCache(Collection<Long> roleIds, Collection<Integer> menuTypes,
-                                       Collection<Integer> menusStatuses);
+    List<MenuDO> getRoleMenuListFromCache(Collection<Long> roleIds, Collection<Integer> menuTypes,
+                                          Collection<Integer> menusStatuses);
 
     /**
      * 获得用户拥有的角色编号集合
@@ -51,7 +51,7 @@ public interface PermissionService extends SecurityPermissionFrameworkService, D
      * @param roleId 角色编号
      * @return 菜单编号集合
      */
-    Set<Long> listRoleMenuIds(Long roleId);
+    Set<Long> getRoleMenuIds(Long roleId);
 
     /**
      * 设置角色菜单

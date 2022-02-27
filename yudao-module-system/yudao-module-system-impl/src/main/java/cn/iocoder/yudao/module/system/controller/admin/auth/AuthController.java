@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.collection.SetUtils;
+import cn.iocoder.yudao.framework.datapermission.core.annotation.DataPermission;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.system.controller.admin.auth.vo.auth.*;
 import cn.iocoder.yudao.module.system.convert.auth.AuthConvert;
@@ -63,6 +64,7 @@ public class AuthController {
 
     @GetMapping("/get-permission-info")
     @ApiOperation("获取登录用户的权限信息")
+    @DataPermission(enable = false) // 标记不使用数据权限，避免【SELF】权限范围报错
     public CommonResult<AuthPermissionInfoRespVO> getPermissionInfo() {
         // 获得用户信息
         AdminUserDO user = userService.getUser(getLoginUserId());
@@ -72,7 +74,7 @@ public class AuthController {
         // 获得角色列表
         List<RoleDO> roleList = roleService.getRolesFromCache(getLoginUserRoleIds());
         // 获得菜单列表
-        List<MenuDO> menuList = permissionService.getRoleMenusFromCache(
+        List<MenuDO> menuList = permissionService.getRoleMenuListFromCache(
                 getLoginUserRoleIds(), // 注意，基于登录的角色，因为后续的权限判断也是基于它
                 SetUtils.asSet(MenuTypeEnum.DIR.getType(), MenuTypeEnum.MENU.getType(), MenuTypeEnum.BUTTON.getType()),
                 SetUtils.asSet(CommonStatusEnum.ENABLE.getStatus()));
@@ -84,7 +86,7 @@ public class AuthController {
     @ApiOperation("获得登录用户的菜单列表")
     public CommonResult<List<AuthMenuRespVO>> getMenus() {
         // 获得用户拥有的菜单列表
-        List<MenuDO> menuList = permissionService.getRoleMenusFromCache(
+        List<MenuDO> menuList = permissionService.getRoleMenuListFromCache(
                 getLoginUserRoleIds(), // 注意，基于登录的角色，因为后续的权限判断也是基于它
                 SetUtils.asSet(MenuTypeEnum.DIR.getType(), MenuTypeEnum.MENU.getType()), // 只要目录和菜单类型
                 SetUtils.asSet(CommonStatusEnum.ENABLE.getStatus())); // 只要开启的

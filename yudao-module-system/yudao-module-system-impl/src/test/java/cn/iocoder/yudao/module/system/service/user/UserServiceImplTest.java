@@ -13,12 +13,14 @@ import cn.iocoder.yudao.module.system.controller.admin.user.vo.profile.UserProfi
 import cn.iocoder.yudao.module.system.controller.admin.user.vo.user.*;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.PostDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.tenant.TenantDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
 import cn.iocoder.yudao.module.system.dal.mysql.user.AdminUserMapper;
 import cn.iocoder.yudao.module.system.enums.common.SexEnum;
 import cn.iocoder.yudao.module.system.service.dept.DeptService;
 import cn.iocoder.yudao.module.system.service.dept.PostService;
 import cn.iocoder.yudao.module.system.service.permission.PermissionService;
+import cn.iocoder.yudao.module.system.service.tenant.TenantService;
 import cn.iocoder.yudao.module.system.test.BaseDbUnitTest;
 import org.junit.jupiter.api.Test;
 import org.mockito.stubbing.Answer;
@@ -55,13 +57,14 @@ public class UserServiceImplTest extends BaseDbUnitTest {
 
     @MockBean
     private DeptService deptService;
-
     @MockBean
     private PostService postService;
     @MockBean
     private PermissionService permissionService;
     @MockBean
     private PasswordEncoder passwordEncoder;
+    @MockBean
+    private TenantService tenantService;
     @MockBean
     private FileApi fileApi;
 
@@ -72,6 +75,12 @@ public class UserServiceImplTest extends BaseDbUnitTest {
             o.setSex(RandomUtil.randomEle(SexEnum.values()).getSex());
             o.setMobile(randomString());
         });
+        // mock 账户额度充足
+        TenantDO tenant = randomPojo(TenantDO.class, o -> o.setAccountCount(1));
+        doNothing().when(tenantService).handleTenantInfo(argThat(handler -> {
+            handler.handle(tenant);
+            return true;
+        }));
         // mock deptService 的方法
         DeptDO dept = randomPojo(DeptDO.class, o -> {
             o.setId(reqVO.getDeptId());
@@ -95,6 +104,21 @@ public class UserServiceImplTest extends BaseDbUnitTest {
         assertPojoEquals(reqVO, user, "password");
         assertEquals("yudaoyuanma", user.getPassword());
         assertEquals(CommonStatusEnum.ENABLE.getStatus(), user.getStatus());
+    }
+
+    @Test
+    public void testCreatUser_max() {
+        // 准备参数
+        UserCreateReqVO reqVO = randomPojo(UserCreateReqVO.class);
+        // mock 账户额度不足
+        TenantDO tenant = randomPojo(TenantDO.class, o -> o.setAccountCount(-1));
+        doNothing().when(tenantService).handleTenantInfo(argThat(handler -> {
+            handler.handle(tenant);
+            return true;
+        }));
+
+        // 调用，并断言异常
+        assertServiceException(() -> userService.createUser(reqVO), USER_COUNT_MAX, -1);
     }
 
     @Test

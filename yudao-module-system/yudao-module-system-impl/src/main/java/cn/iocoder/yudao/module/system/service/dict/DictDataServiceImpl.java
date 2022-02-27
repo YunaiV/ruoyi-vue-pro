@@ -3,8 +3,8 @@ package cn.iocoder.yudao.module.system.service.dict;
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.dict.core.dto.DictDataRespDTO;
-import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.system.controller.admin.dict.vo.data.DictDataCreateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.dict.vo.data.DictDataExportReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.dict.vo.data.DictDataPageReqVO;
@@ -99,8 +99,7 @@ public class DictDataServiceImpl implements DictDataService {
         });
         labelDictDataCache = labelDictDataBuilder.build();
         valueDictDataCache = valueDictDataBuilder.build();
-        assert dataList.size() > 0; // 断言，避免告警
-        maxUpdateTime = dataList.stream().max(Comparator.comparing(BaseDO::getUpdateTime)).get().getUpdateTime();
+        maxUpdateTime = CollectionUtils.getMaxValue(dataList, DictDataDO::getUpdateTime);
         log.info("[initLocalCache][缓存字典数据，数量为:{}]", dataList.size());
     }
 
@@ -209,7 +208,7 @@ public class DictDataServiceImpl implements DictDataService {
     }
 
     @Override
-    public int countByDictType(String dictType) {
+    public long countByDictType(String dictType) {
         return dictDataMapper.selectCountByDictType(dictType);
     }
 

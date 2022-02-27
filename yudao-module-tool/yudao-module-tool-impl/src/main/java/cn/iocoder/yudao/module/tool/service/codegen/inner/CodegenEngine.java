@@ -1,8 +1,6 @@
 package cn.iocoder.yudao.module.tool.service.codegen.inner;
 
-import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.map.MapUtil;
-import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.template.TemplateConfig;
 import cn.hutool.extra.template.TemplateEngine;
@@ -11,23 +9,21 @@ import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
-import cn.iocoder.yudao.framework.tenant.core.db.TenantBaseDO;
-import cn.iocoder.yudao.module.tool.enums.codegen.CodegenSceneEnum;
-import cn.iocoder.yudao.module.tool.framework.codegen.config.CodegenProperties;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
 import cn.iocoder.yudao.framework.excel.core.convert.DictConvert;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
-import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
-import cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
-import cn.iocoder.yudao.framework.mybatis.core.query.QueryWrapperX;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
+import cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum;
 import cn.iocoder.yudao.module.tool.dal.dataobject.codegen.CodegenColumnDO;
 import cn.iocoder.yudao.module.tool.dal.dataobject.codegen.CodegenTableDO;
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
-import cn.iocoder.yudao.framework.common.util.date.DateUtils;
+import cn.iocoder.yudao.module.tool.enums.codegen.CodegenSceneEnum;
+import cn.iocoder.yudao.module.tool.framework.codegen.config.CodegenProperties;
 import com.google.common.collect.Maps;
 import org.springframework.stereotype.Component;
 
@@ -115,7 +111,8 @@ public class CodegenEngine {
     private void initGlobalBindingMap() {
         // 全局配置
         globalBindingMap.put("basePackage", codegenProperties.getBasePackage());
-        globalBindingMap.put("baseFrameworkPackage", codegenProperties.getBasePackage() + '.' + "framework"); // 用于后续获取测试类的 package 地址
+        globalBindingMap.put("baseFrameworkPackage", codegenProperties.getBasePackage()
+                + '.' + "framework"); // 用于后续获取测试类的 package 地址
         // 全局 Java Bean
         globalBindingMap.put("CommonResultClassName", CommonResult.class.getName());
         globalBindingMap.put("PageResultClassName", PageResult.class.getName());
@@ -123,6 +120,7 @@ public class CodegenEngine {
         globalBindingMap.put("PageParamClassName", PageParam.class.getName());
         globalBindingMap.put("DictFormatClassName", DictFormat.class.getName());
         // DO 类，独有字段
+        globalBindingMap.put("BaseDOClassName", BaseDO.class.getName());
         globalBindingMap.put("baseDOFields", CodegenBuilder.BASE_DO_FIELDS);
         globalBindingMap.put("QueryWrapperClassName", LambdaQueryWrapperX.class.getName());
         globalBindingMap.put("BaseMapperClassName", BaseMapperX.class.getName());
@@ -155,15 +153,6 @@ public class CodegenEngine {
         bindingMap.put("simpleClassName_strikeCase", simpleClassNameStrikeCase);
         // permission 前缀
         bindingMap.put("permissionPrefix", table.getModuleName() + ":" + simpleClassNameStrikeCase);
-
-        // 如果多租户，则进行覆盖 DB 独有字段
-        if (CollectionUtils.findFirst(columns, column -> column.getColumnName().equals(CodegenBuilder.TENANT_ID_FIELD)) != null) {
-            bindingMap.put("BaseDOClassName", TenantBaseDO.class.getName());
-            bindingMap.put("BaseDOClassName_simple", TenantBaseDO.class.getSimpleName());
-        } else {
-            bindingMap.put("BaseDOClassName", BaseDO.class.getName());
-            bindingMap.put("BaseDOClassName_simple", BaseDO.class.getSimpleName());
-        }
 
         // 执行生成
         final Map<String, String> result = Maps.newLinkedHashMapWithExpectedSize(TEMPLATES.size()); // 有序

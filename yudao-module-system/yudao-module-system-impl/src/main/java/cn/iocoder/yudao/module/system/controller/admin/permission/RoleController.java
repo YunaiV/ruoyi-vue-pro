@@ -40,7 +40,7 @@ public class RoleController {
     @ApiOperation("创建角色")
     @PreAuthorize("@ss.hasPermission('system:role:create')")
     public CommonResult<Long> createRole(@Valid @RequestBody RoleCreateReqVO reqVO) {
-        return success(roleService.createRole(reqVO));
+        return success(roleService.createRole(reqVO, null));
     }
 
     @PutMapping("/update")
@@ -88,7 +88,7 @@ public class RoleController {
     public CommonResult<List<RoleSimpleRespVO>> getSimpleRoles() {
         // 获得角色列表，只要开启状态的
         List<RoleDO> list = roleService.getRoles(Collections.singleton(CommonStatusEnum.ENABLE.getStatus()));
-        // 排序后，返回个诶前端
+        // 排序后，返回给前端
         list.sort(Comparator.comparing(RoleDO::getSort));
         return success(RoleConvert.INSTANCE.convertList02(list));
     }

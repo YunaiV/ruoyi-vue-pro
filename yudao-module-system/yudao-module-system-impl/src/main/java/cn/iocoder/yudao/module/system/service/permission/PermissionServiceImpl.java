@@ -3,6 +3,14 @@ package cn.iocoder.yudao.module.system.service.permission;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ArrayUtil;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
+import cn.iocoder.yudao.framework.datapermission.core.dept.service.dto.DeptDataPermissionRespDTO;
+import cn.iocoder.yudao.framework.security.core.LoginUser;
+import cn.iocoder.yudao.framework.security.core.enums.DataScopeEnum;
+import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
+import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnore;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.MenuDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.RoleDO;
@@ -12,17 +20,11 @@ import cn.iocoder.yudao.module.system.dal.mysql.permission.RoleMenuMapper;
 import cn.iocoder.yudao.module.system.dal.mysql.permission.UserRoleMapper;
 import cn.iocoder.yudao.module.system.mq.producer.permission.PermissionProducer;
 import cn.iocoder.yudao.module.system.service.dept.DeptService;
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
-import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
-import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
-import cn.iocoder.yudao.framework.datapermission.core.dept.service.dto.DeptDataPermissionRespDTO;
-import cn.iocoder.yudao.framework.security.core.LoginUser;
-import cn.iocoder.yudao.framework.security.core.enums.DataScopeEnum;
-import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -89,15 +91,19 @@ public class PermissionServiceImpl implements PermissionService {
     @Resource
     private PermissionProducer permissionProducer;
 
+    @Resource
+    @Lazy // 注入自己，所以延迟加载
+    private PermissionService self;
+
     /**
      * 初始化 {@link #roleMenuCache} 和 {@link #menuRoleCache} 缓存
      */
     @Override
     @PostConstruct
+    @TenantIgnore // 初始化缓存，无需租户过滤
     public void initLocalCache() {
-        Date now = new Date();
         // 获取角色与菜单的关联列表，如果有更新
-        List<RoleMenuDO> roleMenuList = this.loadRoleMenuIfUpdate(maxUpdateTime);
+        List<RoleMenuDO> roleMenuList = loadRoleMenuIfUpdate(maxUpdateTime);
         if (CollUtil.isEmpty(roleMenuList)) {
             return;
         }
@@ -111,14 +117,13 @@ public class PermissionServiceImpl implements PermissionService {
         });
         roleMenuCache = roleMenuCacheBuilder.build();
         menuRoleCache = menuRoleCacheBuilder.build();
-        assert roleMenuList.size() > 0; // 断言，避免告警
-        maxUpdateTime = now;
+        maxUpdateTime = CollectionUtils.getMaxValue(roleMenuList, RoleMenuDO::getUpdateTime);
         log.info("[initLocalCache][初始化角色与菜单的关联数量为 {}]", roleMenuList.size());
     }
 
     @Scheduled(fixedDelay = SCHEDULER_PERIOD, initialDelay = SCHEDULER_PERIOD)
     public void schedulePeriodicRefresh() {
-        initLocalCache();
+        self.initLocalCache();
     }
 
     /**
@@ -128,7 +133,7 @@ public class PermissionServiceImpl implements PermissionService {
      * @param maxUpdateTime 当前角色与菜单的关联的最大更新时间
      * @return 角色与菜单的关联列表
      */
-    private List<RoleMenuDO> loadRoleMenuIfUpdate(Date maxUpdateTime) {
+    protected List<RoleMenuDO> loadRoleMenuIfUpdate(Date maxUpdateTime) {
         // 第一步，判断是否要更新。
         if (maxUpdateTime == null) { // 如果更新时间为空，说明 DB 一定有新数据
             log.info("[loadRoleMenuIfUpdate][首次加载全量角色与菜单的关联]");
@@ -143,21 +148,22 @@ public class PermissionServiceImpl implements PermissionService {
     }
 
     @Override
-    public List<MenuDO> getRoleMenusFromCache(Collection<Long> roleIds, Collection<Integer> menuTypes,
-                                              Collection<Integer> menusStatuses) {
+    public List<MenuDO> getRoleMenuListFromCache(Collection<Long> roleIds, Collection<Integer> menuTypes,
+                                                 Collection<Integer> menusStatuses) {
         // 任一一个参数为空时，不返回任何菜单
-        if (CollectionUtils.isAnyEmpty(roleIds, menusStatuses, menusStatuses)) {
+        if (CollectionUtils.isAnyEmpty(roleIds, menuTypes, menusStatuses)) {
             return Collections.emptyList();
         }
-        // 判断角色是否包含管理员
+
+        // 判断角色是否包含超级管理员。如果是超级管理员，获取到全部
         List<RoleDO> roleList = roleService.getRolesFromCache(roleIds);
-        boolean hasAdmin = roleService.hasAnyAdmin(roleList);
-        // 获得角色拥有的菜单关联
-        if (hasAdmin) { // 管理员，获取到全部
-            return menuService.listMenusFromCache(menuTypes, menusStatuses);
+        if (roleService.hasAnySuperAdmin(roleList)) {
+            return menuService.getMenuListFromCache(menuTypes, menusStatuses);
         }
+
+        // 获得角色拥有的菜单关联
         List<Long> menuIds = MapUtils.getList(roleMenuCache, roleIds);
-        return menuService.listMenusFromCache(menuIds, menuTypes, menusStatuses);
+        return menuService.getMenuListFromCache(menuIds, menuTypes, menusStatuses);
     }
 
     @Override
@@ -174,10 +180,10 @@ public class PermissionServiceImpl implements PermissionService {
     }
 
     @Override
-    public Set<Long> listRoleMenuIds(Long roleId) {
+    public Set<Long> getRoleMenuIds(Long roleId) {
         // 如果是管理员的情况下，获取全部菜单编号
         RoleDO role = roleService.getRole(roleId);
-        if (roleService.hasAnyAdmin(Collections.singletonList(role))) {
+        if (roleService.hasAnySuperAdmin(Collections.singletonList(role))) {
             return CollectionUtils.convertSet(menuService.getMenus(), MenuDO::getId);
         }
         // 如果是非管理员的情况下，获得拥有的菜单编号
@@ -223,8 +229,6 @@ public class PermissionServiceImpl implements PermissionService {
         return CollectionUtils.convertSet(userRoleMapper.selectListByRoleId(roleId),
                 UserRoleDO::getRoleId);
     }
-
-
 
     @Override
     public void assignUserRole(Long userId, Set<Long> roleIds) {
@@ -304,7 +308,7 @@ public class PermissionServiceImpl implements PermissionService {
             return false;
         }
         // 判断是否是超管。如果是，当然符合条件
-        if (roleService.hasAnyAdmin(roleIds)) {
+        if (roleService.hasAnySuperAdmin(roleIds)) {
             return true;
         }
 
@@ -339,7 +343,7 @@ public class PermissionServiceImpl implements PermissionService {
             return false;
         }
         // 判断是否是超管。如果是，当然符合条件
-        if (roleService.hasAnyAdmin(roleIds)) {
+        if (roleService.hasAnySuperAdmin(roleIds)) {
             return true;
         }
         Set<String> userRoles = CollectionUtils.convertSet(roleService.getRolesFromCache(roleIds),

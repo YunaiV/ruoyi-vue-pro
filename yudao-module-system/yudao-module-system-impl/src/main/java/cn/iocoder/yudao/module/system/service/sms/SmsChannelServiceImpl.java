@@ -1,6 +1,10 @@
 package cn.iocoder.yudao.module.system.service.sms;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.sms.core.client.SmsClientFactory;
+import cn.iocoder.yudao.framework.sms.core.property.SmsChannelProperties;
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.channel.SmsChannelCreateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.channel.SmsChannelPageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.channel.SmsChannelUpdateReqVO;
@@ -8,10 +12,6 @@ import cn.iocoder.yudao.module.system.convert.sms.SmsChannelConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsChannelDO;
 import cn.iocoder.yudao.module.system.dal.mysql.sms.SmsChannelMapper;
 import cn.iocoder.yudao.module.system.mq.producer.sms.SmsProducer;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.yudao.framework.sms.core.client.SmsClientFactory;
-import cn.iocoder.yudao.framework.sms.core.property.SmsChannelProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -19,13 +19,12 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.SMS_CHANNEL_HAS_CHILDREN;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.SMS_CHANNEL_NOT_EXISTS;
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 
 /**
  * 短信渠道Service实现类
@@ -74,8 +73,7 @@ public class SmsChannelServiceImpl implements SmsChannelService {
         propertiesList.forEach(properties -> smsClientFactory.createOrUpdateSmsClient(properties));
 
         // 写入缓存
-        assert smsChannels.size() > 0; // 断言，避免告警
-        maxUpdateTime = smsChannels.stream().max(Comparator.comparing(BaseDO::getUpdateTime)).get().getUpdateTime();
+        maxUpdateTime = CollectionUtils.getMaxValue(smsChannels, SmsChannelDO::getUpdateTime);
         log.info("[initSmsClients][初始化 SmsChannel 数量为 {}]", smsChannels.size());
     }
 

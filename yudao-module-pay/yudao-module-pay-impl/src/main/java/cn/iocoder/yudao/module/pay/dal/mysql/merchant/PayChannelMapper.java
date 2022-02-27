@@ -1,12 +1,11 @@
 package cn.iocoder.yudao.module.pay.dal.mysql.merchant;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.QueryWrapperX;
 import cn.iocoder.yudao.module.pay.controller.admin.merchant.vo.channel.PayChannelExportReqVO;
 import cn.iocoder.yudao.module.pay.controller.admin.merchant.vo.channel.PayChannelPageReqVO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.merchant.PayChannelDO;
-import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
-import com.baomidou.mybatisplus.annotation.InterceptorIgnore;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
@@ -23,7 +22,6 @@ public interface PayChannelMapper extends BaseMapperX<PayChannelDO> {
     }
 
     @Select("SELECT id FROM pay_channel WHERE update_time > #{maxUpdateTime} LIMIT 1")
-    @InterceptorIgnore(tenantLine = "true") // 该方法忽略多租户。原因：该方法被异步 task 调用，此时获取不到租户编号
     Long selectExistsByUpdateTimeAfter(Date maxUpdateTime);
 
     default PageResult<PayChannelDO> selectPage(PayChannelPageReqVO reqVO) {

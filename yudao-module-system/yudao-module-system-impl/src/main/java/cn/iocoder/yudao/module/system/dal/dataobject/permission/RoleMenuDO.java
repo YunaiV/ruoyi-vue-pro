@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.system.dal.dataobject.permission;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.framework.tenant.core.db.TenantBaseDO;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
@@ -14,7 +15,7 @@ import lombok.EqualsAndHashCode;
 @TableName("system_role_menu")
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class RoleMenuDO extends BaseDO {
+public class RoleMenuDO extends TenantBaseDO {
 
     /**
      * 自增主键

@@ -4,6 +4,7 @@ import store from '@/store'
 import { getToken } from '@/utils/auth'
 import errorCode from '@/utils/errorCode'
 import Cookies from "js-cookie";
+import {getTenantEnable} from "@/utils/ruoyi";
 
 // 是否显示重新登录
 let isReloginShow;
@@ -24,9 +25,11 @@ service.interceptors.request.use(config => {
     config.headers['Authorization'] = 'Bearer ' + getToken() // 让每个请求携带自定义token 请根据实际情况自行修改
   }
   // 设置租户
-  const tenantId = Cookies.get('tenantId');
-  if (tenantId) {
-    config.headers['tenant-id'] = tenantId;
+  if (getTenantEnable()) {
+    const tenantId = Cookies.get('tenantId');
+    if (tenantId) {
+      config.headers['tenant-id'] = tenantId;
+    }
   }
   // get请求映射params参数
   if (config.method === 'get' && config.params) {

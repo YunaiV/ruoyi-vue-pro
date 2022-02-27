@@ -13,7 +13,6 @@ import org.activiti.bpmn.model.Process;
 import org.activiti.engine.impl.identity.Authentication;
 import org.activiti.engine.impl.util.io.BytesStreamSource;
 
-import javax.xml.bind.Element;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

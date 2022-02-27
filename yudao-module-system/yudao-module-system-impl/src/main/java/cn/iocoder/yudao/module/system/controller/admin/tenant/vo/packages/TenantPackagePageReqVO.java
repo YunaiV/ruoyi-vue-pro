@@ -1,29 +1,31 @@
-package cn.iocoder.yudao.module.system.controller.admin.tenant.vo;
+package cn.iocoder.yudao.module.system.controller.admin.tenant.vo.packages;
 
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
-@ApiModel(value = "管理后台 - 租户 Excel 导出 Request VO", description = "参数和 TenantPageReqVO 是一致的")
+@ApiModel("管理后台 - 租户套餐分页 Request VO")
 @Data
-public class TenantExportReqVO {
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
+public class TenantPackagePageReqVO extends PageParam {
 
-    @ApiModelProperty(value = "租户名", example = "芋道")
+    @ApiModelProperty(value = "套餐名", example = "VIP")
     private String name;
 
-    @ApiModelProperty(value = "联系人", example = "芋艿")
-    private String contactName;
-
-    @ApiModelProperty(value = "联系手机", example = "15601691300")
-    private String contactMobile;
-
-    @ApiModelProperty(value = "租户状态（0正常 1停用）", example = "1")
+    @ApiModelProperty(value = "状态", example = "1")
     private Integer status;
+
+    @ApiModelProperty(value = "备注", example = "好")
+    private String remark;
 
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     @ApiModelProperty(value = "开始创建时间")

@@ -4,7 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
-import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnore;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptCreateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptListReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptUpdateReqVO;
@@ -17,6 +17,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -71,11 +72,16 @@ public class DeptServiceImpl implements DeptService {
     @Resource
     private DeptProducer deptProducer;
 
+    @Resource
+    @Lazy // 注入自己，所以延迟加载
+    private DeptService self;
+
     @Override
     @PostConstruct
+    @TenantIgnore // 初始化缓存，无需租户过滤
     public synchronized void initLocalCache() {
         // 获取部门列表，如果有更新
-        List<DeptDO> deptList = this.loadDeptIfUpdate(maxUpdateTime);
+        List<DeptDO> deptList = loadDeptIfUpdate(maxUpdateTime);
         if (CollUtil.isEmpty(deptList)) {
             return;
         }
@@ -90,14 +96,13 @@ public class DeptServiceImpl implements DeptService {
         // 设置缓存
         deptCache = builder.build();
         parentDeptCache = parentBuilder.build();
-        assert deptList.size() > 0; // 断言，避免告警
-        maxUpdateTime = deptList.stream().max(Comparator.comparing(BaseDO::getUpdateTime)).get().getUpdateTime();
+        maxUpdateTime = CollectionUtils.getMaxValue(deptList, DeptDO::getUpdateTime);
         log.info("[initLocalCache][初始化 Dept 数量为 {}]", deptList.size());
     }
 
     @Scheduled(fixedDelay = SCHEDULER_PERIOD, initialDelay = SCHEDULER_PERIOD)
     public void schedulePeriodicRefresh() {
-        initLocalCache();
+        self.initLocalCache();
     }
 
     /**
@@ -107,7 +112,7 @@ public class DeptServiceImpl implements DeptService {
      * @param maxUpdateTime 当前部门的最大更新时间
      * @return 部门列表
      */
-    private List<DeptDO> loadDeptIfUpdate(Date maxUpdateTime) {
+    protected List<DeptDO> loadDeptIfUpdate(Date maxUpdateTime) {
         // 第一步，判断是否要更新。
         if (maxUpdateTime == null) { // 如果更新时间为空，说明 DB 一定有新数据
             log.info("[loadMenuIfUpdate][首次加载全量部门]");
@@ -118,12 +123,15 @@ public class DeptServiceImpl implements DeptService {
             log.info("[loadMenuIfUpdate][增量加载全量部门]");
         }
         // 第二步，如果有更新，则从数据库加载所有部门
-        return deptMapper.selectListIgnoreTenant();
+        return deptMapper.selectList();
     }
 
     @Override
     public Long createDept(DeptCreateReqVO reqVO) {
         // 校验正确性
+        if (reqVO.getParentId() == null) {
+            reqVO.setParentId(DeptIdEnum.ROOT.getId());
+        }
         checkCreateOrUpdate(null, reqVO.getParentId(), reqVO.getName());
         // 插入部门
         DeptDO dept = DeptConvert.INSTANCE.convert(reqVO);
@@ -136,6 +144,9 @@ public class DeptServiceImpl implements DeptService {
     @Override
     public void updateDept(DeptUpdateReqVO reqVO) {
         // 校验正确性
+        if (reqVO.getParentId() == null) {
+            reqVO.setParentId(DeptIdEnum.ROOT.getId());
+        }
         checkCreateOrUpdate(reqVO.getId(), reqVO.getParentId(), reqVO.getName());
         // 更新部门
         DeptDO updateObj = DeptConvert.INSTANCE.convert(reqVO);

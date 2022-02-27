@@ -1,13 +1,13 @@
 package cn.iocoder.yudao.module.system.controller.admin.tenant;
 
-import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.*;
-import cn.iocoder.yudao.module.system.convert.tenant.TenantConvert;
-import cn.iocoder.yudao.module.system.dal.dataobject.tenant.TenantDO;
-import cn.iocoder.yudao.module.system.service.tenant.TenantService;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
+import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.*;
+import cn.iocoder.yudao.module.system.convert.tenant.TenantConvert;
+import cn.iocoder.yudao.module.system.dal.dataobject.tenant.TenantDO;
+import cn.iocoder.yudao.module.system.service.tenant.TenantService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
@@ -18,7 +18,6 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -71,15 +70,6 @@ public class TenantController {
     public CommonResult<TenantRespVO> getTenant(@RequestParam("id") Long id) {
         TenantDO tenant = tenantService.getTenant(id);
         return success(TenantConvert.INSTANCE.convert(tenant));
-    }
-
-    @GetMapping("/list")
-    @ApiOperation("获得租户列表")
-    @ApiImplicitParam(name = "ids", value = "编号列表", required = true, example = "1024,2048", dataTypeClass = List.class)
-    @PreAuthorize("@ss.hasPermission('system:tenant:query')")
-    public CommonResult<List<TenantRespVO>> getTenantList(@RequestParam("ids") Collection<Long> ids) {
-        List<TenantDO> list = tenantService.getTenantList(ids);
-        return success(TenantConvert.INSTANCE.convertList(list));
     }
 
     @GetMapping("/page")

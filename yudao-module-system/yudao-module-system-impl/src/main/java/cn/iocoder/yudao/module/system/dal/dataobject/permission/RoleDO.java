@@ -1,9 +1,10 @@
 package cn.iocoder.yudao.module.system.dal.dataobject.permission;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
-import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.framework.mybatis.core.type.JsonLongSetTypeHandler;
 import cn.iocoder.yudao.framework.security.core.enums.DataScopeEnum;
+import cn.iocoder.yudao.framework.tenant.core.db.TenantBaseDO;
+import cn.iocoder.yudao.module.system.enums.permission.RoleTypeEnum;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -20,7 +21,7 @@ import java.util.Set;
 @TableName(value = "system_role", autoResultMap = true)
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class RoleDO extends BaseDO {
+public class RoleDO extends TenantBaseDO {
 
     /**
      * 角色ID
@@ -50,7 +51,7 @@ public class RoleDO extends BaseDO {
     /**
      * 角色类型
      *
-     * 枚举
+     * 枚举 {@link RoleTypeEnum}
      */
     private Integer type;
     /**

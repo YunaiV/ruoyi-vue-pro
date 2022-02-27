@@ -47,7 +47,6 @@ public class PermissionServiceTest extends BaseDbUnitTest {
     private MenuService menuService;
     @MockBean
     private DeptService deptService;
-
     @MockBean
     private PermissionProducer permissionProducer;
 

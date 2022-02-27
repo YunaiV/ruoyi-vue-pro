@@ -9,12 +9,15 @@ import com.alibaba.ttl.TransmittableThreadLocal;
  */
 public class TenantContextHolder {
 
+    /**
+     * 当前租户编号
+     */
     private static final ThreadLocal<Long> TENANT_ID = new TransmittableThreadLocal<>();
 
     /**
-     * 租户编号 - 空
+     * 是否忽略租户
      */
-    private static final Long TENANT_ID_NULL = 0L;
+    private static final ThreadLocal<Boolean> IGNORE = new TransmittableThreadLocal<>();
 
     /**
      * 获得租户编号。
@@ -33,26 +36,31 @@ public class TenantContextHolder {
     public static Long getRequiredTenantId() {
         Long tenantId = getTenantId();
         if (tenantId == null) {
-            throw new NullPointerException("TenantContextHolder 不存在租户编号");
+            throw new NullPointerException("TenantContextHolder 不存在租户编号"); // TODO 芋艿：增加文档链接
         }
         return tenantId;
-    }
-
-    /**
-     * 在一些前端场景下，可能无法请求带上租户。例如说，<img /> 方式获取图片等
-     * 此时，暂时的解决方案，是在该接口的 Controller 方法上，调用该方法
-     * TODO 芋艿：思考有没更合适的方案，目标是去掉该方法
-     */
-    public static void setNullTenantId() {
-        TENANT_ID.set(TENANT_ID_NULL);
     }
 
     public static void setTenantId(Long tenantId) {
         TENANT_ID.set(tenantId);
     }
 
+    public static void setIgnore(Boolean ignore) {
+        IGNORE.set(ignore);
+    }
+
+    /**
+     * 当前是否忽略租户
+     *
+     * @return 是否忽略
+     */
+    public static boolean isIgnore() {
+        return Boolean.TRUE.equals(IGNORE.get());
+    }
+
     public static void clear() {
         TENANT_ID.remove();
+        IGNORE.remove();
     }
 
 }

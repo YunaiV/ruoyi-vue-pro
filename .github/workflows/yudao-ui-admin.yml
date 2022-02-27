@@ -37,14 +37,14 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node_version }}
-          cache: "pnpm"
-          cache-dependency-path: yudao-ui-admin/pnpm-lock.yaml
+          cache: "yarn"
+          cache-dependency-path: yudao-ui-admin/yarn.lock
 
       - name: Install deps
-        run: pnpm install
+        run: node --version && yarn --version && yarn install
 
       - name: Build
-        run: pnpm run build:prod
+        run: yarn build:prod
   
       # 查看 workflow 的文档来获取更多信息
       # @see https://github.com/crazy-max/ghaction-github-pages

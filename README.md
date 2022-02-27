@@ -1,3 +1,10 @@
+**严肃声明：现在、未来都不会有商业版本，所有功能全部开源！**
+
+**拒绝虚假开源，售卖商业版，程序员不骗程序员！！**
+
+**「我喜欢写代码，乐此不疲」**  
+**「我喜欢做开源，以此为乐」**
+
 ## 🐯 平台简介
 
 **芋道**，一套**全部开源**的**企业级**的快速开发平台，毫无保留给个人及企业免费使用。
@@ -8,6 +15,7 @@
 * 后端采用 Spring Boot、MySQL + MyBatis Plus、Redis + Redisson。
 * 权限认证使用 Spring Security & Token & Redis，支持多终端、多种用户的认证系统。
 * 支持加载动态权限菜单，按钮级别权限控制，本地缓存提升性能。
+* 支持 SaaS 多租户系统，可自定义每个租户的权限，提供透明化的多租户底层封装。
 * 工作流使用 Activiti ，支持动态表单、在线设计流程、多种任务分配方式。
 * 高效率开发，使用代码生成器可以一键生成前后端代码 + 单元测试 + Swagger 接口文档 + Validator 参数校验。
 * 集成微信小程序、微信公众号、企业微信、钉钉等三方登陆，集成支付宝、微信等支付与退款。
@@ -57,6 +65,7 @@
 |  | 部门管理 | 配置系统组织机构（公司、部门、小组），树结构展现支持数据权限 |
 |  | 岗位管理 | 配置系统用户所属担任职务 |
 | 🚀 | 租户管理 | 配置系统租户，支持 SaaS 场景下的多租户功能 |
+| 🚀 | 租户套餐 | 配置租户套餐，自定每个租户的菜单、操作、按钮的权限 |
 |  | 字典管理 | 对系统中经常使用的一些较为固定的数据进行维护 |
 | 🚀 | 短信管理 | 短信渠道、短息模板、短信日志，对接阿里云、云片等主流短信平台 |
 | 🚀 | 操作日志 | 系统正常操作日志记录和查询，集成 Swagger 生成日志内容 |
@@ -147,16 +156,16 @@ ps：核心功能已经实现，正在对接微信小程序中...
 
 | 框架 | 说明 | 版本       | 学习指南 |
 | --- | --- |----------| --- |
-| [Spring Boot](https://spring.io/projects/spring-boot) | 应用开发框架 | 2.5.9    | [文档](https://github.com/YunaiV/SpringBoot-Labs) |
+| [Spring Boot](https://spring.io/projects/spring-boot) | 应用开发框架 | 2.5.10    | [文档](https://github.com/YunaiV/SpringBoot-Labs) |
 | [MySQL](https://www.mysql.com/cn/) | 数据库服务器 | 5.7      |  |
 | [Druid](https://github.com/alibaba/druid) | JDBC 连接池、监控组件 | 1.2.8    | [文档](http://www.iocoder.cn/Spring-Boot/datasource-pool/?yudao) |
-| [MyBatis Plus](https://mp.baomidou.com/) | MyBatis 增强工具包 | 3.4.3.4  | [文档](http://www.iocoder.cn/Spring-Boot/MyBatis/?yudao) |
+| [MyBatis Plus](https://mp.baomidou.com/) | MyBatis 增强工具包 | 3.5.1  | [文档](http://www.iocoder.cn/Spring-Boot/MyBatis/?yudao) |
 | [Dynamic Datasource](https://dynamic-datasource.com/) | 动态数据源 | 3.5.0    | [文档](http://www.iocoder.cn/Spring-Boot/datasource-pool/?yudao) |
 | [Redis](https://redis.io/) | key-value 数据库 | 5.0      |  |
 | [Redisson](https://github.com/redisson/redisson) | Redis 客户端 | 3.16.8   | [文档](http://www.iocoder.cn/Spring-Boot/Redis/?yudao) |
-| [Spring MVC](https://github.com/spring-projects/spring-framework/tree/master/spring-webmvc) | MVC 框架  | 5.3.15   | [文档](http://www.iocoder.cn/SpringMVC/MVC/?yudao) |
-| [Spring Security](https://github.com/spring-projects/spring-security) | Spring 安全框架 | 5.5.4    | [文档](http://www.iocoder.cn/Spring-Boot/Spring-Security/?yudao) |
-| [Hibernate Validator](https://github.com/hibernate/hibernate-validator) | 参数校验组件 | 6.2.0    | [文档](http://www.iocoder.cn/Spring-Boot/Validation/?yudao) |
+| [Spring MVC](https://github.com/spring-projects/spring-framework/tree/master/spring-webmvc) | MVC 框架  | 5.3.16   | [文档](http://www.iocoder.cn/SpringMVC/MVC/?yudao) |
+| [Spring Security](https://github.com/spring-projects/spring-security) | Spring 安全框架 | 5.5.5    | [文档](http://www.iocoder.cn/Spring-Boot/Spring-Security/?yudao) |
+| [Hibernate Validator](https://github.com/hibernate/hibernate-validator) | 参数校验组件 | 6.2.2    | [文档](http://www.iocoder.cn/Spring-Boot/Validation/?yudao) |
 | [Activiti](https://github.com/Activiti/Activiti) | 工作流引擎 | 7.1.0.M6 | [文档](TODO)  |
 | [Quartz](https://github.com/quartz-scheduler) | 任务调度组件 | 2.3.2    | [文档](http://www.iocoder.cn/Spring-Boot/Job/?yudao) |
 | [Knife4j](https://gitee.com/xiaoym/knife4j) | Swagger 增强 UI 实现 | 3.0.2    | [文档](http://www.iocoder.cn/Spring-Boot/Swagger/?yudao) |
@@ -180,10 +189,11 @@ ps：核心功能已经实现，正在对接微信小程序中...
 
 ### 系统功能
 
-| 模块 | biu |  biu | biu |
-| --- | --- | --- | --- |
-| 登录 & 首页 | ![登录](https://static.iocoder.cn/images/ruoyi-vue-pro/登录.jpg) | ![首页](https://static.iocoder.cn/images/ruoyi-vue-pro/首页.jpg) | ![个人中心](https://static.iocoder.cn/images/ruoyi-vue-pro/个人中心.jpg) |
-| 用户 & 租户 | ![用户管理](https://static.iocoder.cn/images/ruoyi-vue-pro/用户管理.jpg) | ![在线用户](https://static.iocoder.cn/images/ruoyi-vue-pro/在线用户.jpg) | ![用户管理](https://static.iocoder.cn/images/ruoyi-vue-pro/租户管理.jpg) |
+| 模块 | biu | biu                                                              | biu |
+| --- | --- |------------------------------------------------------------------| --- |
+| 登录 & 首页 | ![登录](https://static.iocoder.cn/images/ruoyi-vue-pro/登录.jpg) | ![首页](https://static.iocoder.cn/images/ruoyi-vue-pro/首页.jpg)     | ![个人中心](https://static.iocoder.cn/images/ruoyi-vue-pro/个人中心.jpg) |
+| 用户 | ![用户管理](https://static.iocoder.cn/images/ruoyi-vue-pro/用户管理.jpg) | ![在线用户](https://static.iocoder.cn/images/ruoyi-vue-pro/在线用户.jpg) | - |
+| 租户 & 套餐 | ![租户管理](https://static.iocoder.cn/images/ruoyi-vue-pro/租户管理.jpg) | ![租户套餐](https://static.iocoder.cn/images/ruoyi-vue-pro/租户套餐.png) | - |
 | 部门 & 岗位 | ![部门管理](https://static.iocoder.cn/images/ruoyi-vue-pro/部门管理.jpg) | ![岗位管理](https://static.iocoder.cn/images/ruoyi-vue-pro/岗位管理.jpg) | - |
 | 菜单 & 角色 | ![菜单管理](https://static.iocoder.cn/images/ruoyi-vue-pro/菜单管理.jpg) | ![角色管理](https://static.iocoder.cn/images/ruoyi-vue-pro/角色管理.jpg) | - |
 | 审计日志 | ![操作日志](https://static.iocoder.cn/images/ruoyi-vue-pro/操作日志.jpg) | ![登录日志](https://static.iocoder.cn/images/ruoyi-vue-pro/登录日志.jpg) | - |
