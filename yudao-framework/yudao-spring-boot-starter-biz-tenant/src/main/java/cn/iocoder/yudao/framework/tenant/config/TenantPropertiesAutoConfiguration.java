@@ -7,6 +7,6 @@ import javax.annotation.Resource;
 
 @Configuration
 @EnableConfigurationProperties(TenantProperties.class)
-public class YudaoTenantAutoConfigurationOnDisable {
+public class TenantPropertiesAutoConfiguration {
 
 }
