@@ -13,6 +13,7 @@ import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.jsqlparser.expression.Alias;
 import net.sf.jsqlparser.expression.Expression;
@@ -51,6 +52,8 @@ public class DeptDataPermissionRule implements DataPermissionRule {
 
     private static final String DEPT_COLUMN_NAME = "dept_id";
     private static final String USER_COLUMN_NAME = "user_id";
+
+    static final Expression EXPRESSION_NULL = new NullValue();
 
     private final DeptDataPermissionFrameworkService deptDataPermissionService;
 
@@ -116,7 +119,7 @@ public class DeptDataPermissionRule implements DataPermissionRule {
                     JsonUtils.toJsonString(loginUser), tableName, tableAlias, JsonUtils.toJsonString(deptDataPermission));
 //            throw new NullPointerException(String.format("LoginUser(%d) Table(%s/%s) 构建的条件为空",
 //                    loginUser.getId(), tableName, tableAlias.getName()));
-            return new NullValue();
+            return EXPRESSION_NULL;
         }
         if (deptExpression == null) {
             return userExpression;

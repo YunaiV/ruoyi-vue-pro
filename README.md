@@ -2,7 +2,8 @@
 
 **拒绝虚假开源，售卖商业版，程序员不骗程序员！！**
 
-**「永远年轻，永远热泪盈眶」**
+**「我喜欢写代码，乐此不疲」**  
+**「我喜欢做开源，以此为乐」**
 
 ## 🐯 平台简介
 
@@ -14,6 +15,7 @@
 * 后端采用 Spring Boot、MySQL + MyBatis Plus、Redis + Redisson。
 * 权限认证使用 Spring Security & Token & Redis，支持多终端、多种用户的认证系统。
 * 支持加载动态权限菜单，按钮级别权限控制，本地缓存提升性能。
+* 支持 SaaS 多租户系统，可自定义每个租户的权限，提供透明化的多租户底层封装。
 * 工作流使用 Activiti ，支持动态表单、在线设计流程、多种任务分配方式。
 * 高效率开发，使用代码生成器可以一键生成前后端代码 + 单元测试 + Swagger 接口文档 + Validator 参数校验。
 * 集成微信小程序、微信公众号、企业微信、钉钉等三方登陆，集成支付宝、微信等支付与退款。
@@ -63,6 +65,7 @@
 |  | 部门管理 | 配置系统组织机构（公司、部门、小组），树结构展现支持数据权限 |
 |  | 岗位管理 | 配置系统用户所属担任职务 |
 | 🚀 | 租户管理 | 配置系统租户，支持 SaaS 场景下的多租户功能 |
+| 🚀 | 租户套餐 | 配置租户套餐，自定每个租户的菜单、操作、按钮的权限 |
 |  | 字典管理 | 对系统中经常使用的一些较为固定的数据进行维护 |
 | 🚀 | 短信管理 | 短信渠道、短息模板、短信日志，对接阿里云、云片等主流短信平台 |
 | 🚀 | 操作日志 | 系统正常操作日志记录和查询，集成 Swagger 生成日志内容 |
@@ -189,7 +192,8 @@ ps：核心功能已经实现，正在对接微信小程序中...
 | 模块 | biu |  biu | biu |
 | --- | --- | --- | --- |
 | 登录 & 首页 | ![登录](https://static.iocoder.cn/images/ruoyi-vue-pro/登录.jpg) | ![首页](https://static.iocoder.cn/images/ruoyi-vue-pro/首页.jpg) | ![个人中心](https://static.iocoder.cn/images/ruoyi-vue-pro/个人中心.jpg) |
-| 用户 & 租户 | ![用户管理](https://static.iocoder.cn/images/ruoyi-vue-pro/用户管理.jpg) | ![在线用户](https://static.iocoder.cn/images/ruoyi-vue-pro/在线用户.jpg) | ![用户管理](https://static.iocoder.cn/images/ruoyi-vue-pro/租户管理.jpg) |
+| 用户 | ![用户管理](https://static.iocoder.cn/images/ruoyi-vue-pro/用户管理.jpg) | ![在线用户](https://static.iocoder.cn/images/ruoyi-vue-pro/在线用户.jpg) | - |
+| 租户 & 套餐 | ![租户管理](https://static.iocoder.cn/images/ruoyi-vue-pro/租户管理.jpg) | ![租户套餐](https://static.iocoder.cn/images/ruoyi-vue-pro/租户套餐.jpg)  | - |
 | 部门 & 岗位 | ![部门管理](https://static.iocoder.cn/images/ruoyi-vue-pro/部门管理.jpg) | ![岗位管理](https://static.iocoder.cn/images/ruoyi-vue-pro/岗位管理.jpg) | - |
 | 菜单 & 角色 | ![菜单管理](https://static.iocoder.cn/images/ruoyi-vue-pro/菜单管理.jpg) | ![角色管理](https://static.iocoder.cn/images/ruoyi-vue-pro/角色管理.jpg) | - |
 | 审计日志 | ![操作日志](https://static.iocoder.cn/images/ruoyi-vue-pro/操作日志.jpg) | ![登录日志](https://static.iocoder.cn/images/ruoyi-vue-pro/登录日志.jpg) | - |
