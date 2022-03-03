@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.framework.security.core.enums;
+package cn.iocoder.yudao.module.system.enums.permission;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
