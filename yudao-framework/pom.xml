@@ -35,12 +35,13 @@
         <module>yudao-spring-boot-starter-biz-social</module>
         <module>yudao-spring-boot-starter-biz-tenant</module>
         <module>yudao-spring-boot-starter-biz-data-permission</module>
+        <module>yudao-spring-boot-starter-flowable</module>
     </modules>
 
     <artifactId>yudao-framework</artifactId>
     <description>
         该包是技术组件，每个子包，代表一个组件。每个组件包括两部分：
-            1. core 包：是该组件的核心分装
+            1. core 包：是该组件的核心封装
             2. config 包：是该组件基于 Spring 的配置
 
         技术组件，也分成两类：

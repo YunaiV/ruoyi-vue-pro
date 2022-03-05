@@ -37,7 +37,7 @@ public class BpmTaskController {
     @GetMapping("done-page")
     @ApiOperation("获取 Done 已办任务分页")
     @PreAuthorize("@ss.hasPermission('bpm:task:query')")
-    public CommonResult<PageResult<BpmTaskDonePageItemRespVO>> getTodoTaskPage(@Valid BpmTaskDonePageReqVO pageVO) {
+    public CommonResult<PageResult<BpmTaskDonePageItemRespVO>> getDoneTaskPage(@Valid BpmTaskDonePageReqVO pageVO) {
         return success(taskService.getDoneTaskPage(getLoginUserId(), pageVO));
     }
 

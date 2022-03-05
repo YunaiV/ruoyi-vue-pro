@@ -44,7 +44,7 @@ public class BpmActivityBehaviorFactory extends DefaultActivityBehaviorFactory {
 
     @Override
     public UserTaskActivityBehavior createUserTaskActivityBehavior(UserTask userTask) {
-        BpmUserTaskActivitiBehavior userTaskActivityBehavior = new BpmUserTaskActivitiBehavior(userTask);
+        BpmUserTaskActivityBehavior userTaskActivityBehavior = new BpmUserTaskActivityBehavior(userTask);
         userTaskActivityBehavior.setBpmTaskRuleService(bpmTaskRuleService);
         userTaskActivityBehavior.setPermissionApi(permissionApi);
         userTaskActivityBehavior.setDeptApi(deptApi);

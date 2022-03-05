@@ -5,9 +5,9 @@ import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.process.BpmPro
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.process.BpmProcessDefinitionPageReqVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.process.BpmProcessDefinitionRespVO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmProcessDefinitionExtDO;
-import cn.iocoder.yudao.module.bpm.service.definition.dto.BpmProcessDefinitionCreateReqDTO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.module.bpm.service.definition.dto.BpmProcessDefinitionCreateReqDTO;
 import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.ProcessDefinition;
@@ -35,12 +35,20 @@ public interface BpmProcessDefinitionService {
     PageResult<BpmProcessDefinitionPageItemRespVO> getProcessDefinitionPage(BpmProcessDefinitionPageReqVO pageReqVO);
 
     /**
-     * 获得流程定义列表
+     * 创建流程定义
      *
-     * @param listReqVO 列表入参
-     * @return 流程定义列表
+     * @param createReqDTO 创建信息
+     * @return 流程编号
      */
-    List<BpmProcessDefinitionRespVO> getProcessDefinitionList(BpmProcessDefinitionListReqVO listReqVO);
+    String createProcessDefinition(@Valid BpmProcessDefinitionCreateReqDTO createReqDTO);
+
+    /**
+     * 更新流程定义状态
+     *
+     * @param id 流程定义的编号
+     * @param state 状态
+     */
+    void updateProcessDefinitionState(String id, Integer state);
 
     /**
      * 获得流程定义对应的 BPMN XML
@@ -49,6 +57,30 @@ public interface BpmProcessDefinitionService {
      * @return BPMN XML
      */
     String getProcessDefinitionBpmnXML(String id);
+
+    /**
+     * 获得需要创建的流程定义，是否和当前激活的流程定义相等
+     *
+     * @param createReqDTO 创建信息
+     * @return 是否相等
+     */
+    boolean isProcessDefinitionEquals(@Valid BpmProcessDefinitionCreateReqDTO createReqDTO);
+
+    /**
+     * 获得编号对应的 BpmProcessDefinitionExtDO
+     *
+     * @param id 编号
+     * @return 流程定义拓展
+     */
+    BpmProcessDefinitionExtDO getProcessDefinitionExt(String id);
+
+    /**
+     * 获得流程定义列表
+     *
+     * @param listReqVO 列表入参
+     * @return 流程定义列表
+     */
+    List<BpmProcessDefinitionRespVO> getProcessDefinitionList(BpmProcessDefinitionListReqVO listReqVO);
 
     /**
      * 获得 Bpmn 模型
@@ -83,14 +115,6 @@ public interface BpmProcessDefinitionService {
      * @return 流程定义
      */
     ProcessDefinition getActiveProcessDefinition(String key);
-
-    /**
-     * 获得编号对应的 BpmProcessDefinitionExtDO
-     *
-     * @param id 编号
-     * @return 流程定义拓展
-     */
-    BpmProcessDefinitionExtDO getProcessDefinitionExt(String id);
 
     /**
      * 获得 id 对应的 Deployment
@@ -133,29 +157,5 @@ public interface BpmProcessDefinitionService {
      * @return 流程定义的数组
      */
     List<ProcessDefinition> getProcessDefinitionListByDeploymentIds(Set<String> deploymentIds);
-
-    /**
-     * 获得需要创建的流程定义，是否和当前激活的流程定义相等
-     *
-     * @param createReqDTO 创建信息
-     * @return 是否相等
-     */
-    boolean isProcessDefinitionEquals(@Valid BpmProcessDefinitionCreateReqDTO createReqDTO);
-
-    /**
-     * 创建流程定义
-     *
-     * @param createReqDTO 创建信息
-     * @return 流程编号
-     */
-    String createProcessDefinition(@Valid BpmProcessDefinitionCreateReqDTO createReqDTO);
-
-    /**
-     * 更新流程定义的挂起状态
-     *
-     * @param id 流程定义的编号
-     * @param state 挂起状态 {@link org.activiti.engine.impl.persistence.entity.SuspensionState}
-     */
-    void updateProcessDefinitionState(String id, Integer state);
 
 }

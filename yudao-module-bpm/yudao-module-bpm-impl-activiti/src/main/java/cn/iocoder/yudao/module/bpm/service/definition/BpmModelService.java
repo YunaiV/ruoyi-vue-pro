@@ -12,7 +12,6 @@ import javax.validation.Valid;
  * @author yunlongn
  */
 public interface BpmModelService {
-
     /**
      * 获得流程模型分页
      *
@@ -22,14 +21,6 @@ public interface BpmModelService {
     PageResult<BpmModelPageItemRespVO> getModelPage(BpmModelPageReqVO pageVO);
 
     /**
-     * 获得流程模块
-     *
-     * @param id 编号
-     * @return 流程模型
-     */
-    BpmModelRespVO getModel(String id);
-
-    /**
      * 创建流程模型
      *
      * @param modelVO 创建信息
@@ -37,6 +28,14 @@ public interface BpmModelService {
      * @return 创建的流程模型的编号
      */
     String createModel(@Valid BpmModelCreateReqVO modelVO, String bpmnXml);
+
+    /**
+     * 获得流程模块
+     *
+     * @param id 编号
+     * @return 流程模型
+     */
+    BpmModelRespVO getModel(String id);
 
     /**
      * 修改流程模型
@@ -63,7 +62,7 @@ public interface BpmModelService {
      * 修改模型的状态，实际更新的部署的流程定义的状态
      *
      * @param id 编号
-     * @param state 状态 {@link org.activiti.engine.impl.persistence.entity.SuspensionState}
+     * @param state 状态
      */
     void updateModelState(String id, Integer state);
 

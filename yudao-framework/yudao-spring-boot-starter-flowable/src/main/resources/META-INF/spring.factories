@@ -1,0 +1,2 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  cn.iocoder.yudao.framework.flowable.config.YudaoFlowableConfiguration

@@ -8,7 +8,7 @@ import org.springframework.validation.annotation.Validated;
 import javax.annotation.Resource;
 
 /**
- * 流程实例 Api 实现类
+ * Activiti 流程实例 Api 实现类
  *
  * @author 芋道源码
  */

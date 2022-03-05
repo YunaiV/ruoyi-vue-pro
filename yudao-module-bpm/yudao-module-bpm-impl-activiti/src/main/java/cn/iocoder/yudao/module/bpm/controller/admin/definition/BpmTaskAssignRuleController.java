@@ -1,10 +1,10 @@
 package cn.iocoder.yudao.module.bpm.controller.admin.definition;
 
+import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.rule.BpmTaskAssignRuleCreateReqVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.rule.BpmTaskAssignRuleRespVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.rule.BpmTaskAssignRuleUpdateReqVO;
 import cn.iocoder.yudao.module.bpm.service.definition.BpmTaskAssignRuleService;
-import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -32,7 +32,7 @@ public class BpmTaskAssignRuleController {
     @ApiOperation(value = "获得任务分配规则列表")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "modelId", value = "模型编号", example = "1024", dataTypeClass = String.class),
-            @ApiImplicitParam(name = "processDefinitionId", value = "刘晨定义的编号", example = "2048", dataTypeClass = String.class)
+            @ApiImplicitParam(name = "processDefinitionId", value = "流程定义的编号", example = "2048", dataTypeClass = String.class)
     })
     @PreAuthorize("@ss.hasPermission('bpm:task-assign-rule:query')")
     public CommonResult<List<BpmTaskAssignRuleRespVO>> getTaskAssignRuleList(

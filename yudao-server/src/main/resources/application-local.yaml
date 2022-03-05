@@ -43,13 +43,15 @@ spring:
       primary: master
       datasource:
         master:
-          name: ruoyi-vue-pro
+#          name: ruoyi-vue-pro俺吧
+          name: ruoyi-vue-pro-flowable
           url: jdbc:mysql://127.0.0.1:3306/${spring.datasource.dynamic.datasource.master.name}?useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=CTT
           driver-class-name: com.mysql.jdbc.Driver
           username: root
           password: 123456
         slave: # 模拟从库，可根据自己需要修改
-          name: ruoyi-vue-pro
+#          name: ruoyi-vue-pro
+          name: ruoyi-vue-pro-flowable
           url: jdbc:mysql://127.0.0.1:3306/${spring.datasource.dynamic.datasource.slave.name}?useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=CTT
           driver-class-name: com.mysql.jdbc.Driver
           username: root

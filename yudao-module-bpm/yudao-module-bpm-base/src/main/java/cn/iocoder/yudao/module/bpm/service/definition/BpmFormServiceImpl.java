@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.bpm.service.definition;
 
 import cn.hutool.core.lang.Assert;
+import cn.iocoder.yudao.framework.common.util.validation.ValidationUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.form.BpmFormCreateReqVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.form.BpmFormPageReqVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.form.BpmFormUpdateReqVO;
@@ -8,18 +9,20 @@ import cn.iocoder.yudao.module.bpm.convert.definition.BpmFormConvert;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmFormDO;
 import cn.iocoder.yudao.module.bpm.dal.mysql.definition.BpmFormMapper;
 import cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmModelFormTypeEnum;
 import cn.iocoder.yudao.module.bpm.service.definition.dto.BpmFormFieldRespDTO;
 import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
+import cn.iocoder.yudao.module.bpm.service.definition.dto.BpmModelMetaInfoRespDTO;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.*;
 
 /**
  * 动态表单 Service 实现类
@@ -87,6 +90,29 @@ public class BpmFormServiceImpl implements BpmFormService {
         return formMapper.selectPage(pageReqVO);
     }
 
+
+    @Override
+    public BpmFormDO checkFormConfig(String configStr) {
+        BpmModelMetaInfoRespDTO metaInfo = JsonUtils.parseObject(configStr, BpmModelMetaInfoRespDTO.class);
+        if (metaInfo == null || metaInfo.getFormType() == null) {
+            throw exception(MODEL_DEPLOY_FAIL_FORM_NOT_CONFIG);
+        }
+        // 校验表单存在
+        if (Objects.equals(metaInfo.getFormType(), BpmModelFormTypeEnum.NORMAL.getType())) {
+            BpmFormDO form = getForm(metaInfo.getFormId());
+            if (form == null) {
+                throw exception(FORM_NOT_EXISTS);
+            }
+            return form;
+        }
+        return null;
+    }
+
+    private void checkKeyNCName(String key) {
+        if (!ValidationUtils.isXmlNCName(key)) {
+            throw exception(MODEL_KEY_VALID);
+        }
+    }
     /**
      * 校验 Field，避免 field 重复
      *
