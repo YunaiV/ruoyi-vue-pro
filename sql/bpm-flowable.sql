@@ -11,7 +11,7 @@
  Target Server Version : 80026
  File Encoding         : 65001
 
- Date: 28/02/2022 00:57:25
+ Date: 06/03/2022 15:04:36
 */
 
 SET NAMES utf8mb4;
@@ -1322,6 +1322,194 @@ CREATE TABLE `ACT_RU_VARIABLE` (
 
 -- ----------------------------
 -- Records of ACT_RU_VARIABLE
+-- ----------------------------
+BEGIN;
+COMMIT;
+
+-- ----------------------------
+-- Table structure for FLW_CHANNEL_DEFINITION
+-- ----------------------------
+DROP TABLE IF EXISTS `FLW_CHANNEL_DEFINITION`;
+CREATE TABLE `FLW_CHANNEL_DEFINITION` (
+  `ID_` varchar(255) NOT NULL,
+  `NAME_` varchar(255) DEFAULT NULL,
+  `VERSION_` int DEFAULT NULL,
+  `KEY_` varchar(255) DEFAULT NULL,
+  `CATEGORY_` varchar(255) DEFAULT NULL,
+  `DEPLOYMENT_ID_` varchar(255) DEFAULT NULL,
+  `CREATE_TIME_` datetime(3) DEFAULT NULL,
+  `TENANT_ID_` varchar(255) DEFAULT NULL,
+  `RESOURCE_NAME_` varchar(255) DEFAULT NULL,
+  `DESCRIPTION_` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`ID_`),
+  UNIQUE KEY `ACT_IDX_CHANNEL_DEF_UNIQ` (`KEY_`,`VERSION_`,`TENANT_ID_`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- ----------------------------
+-- Records of FLW_CHANNEL_DEFINITION
+-- ----------------------------
+BEGIN;
+COMMIT;
+
+-- ----------------------------
+-- Table structure for FLW_EV_DATABASECHANGELOG
+-- ----------------------------
+DROP TABLE IF EXISTS `FLW_EV_DATABASECHANGELOG`;
+CREATE TABLE `FLW_EV_DATABASECHANGELOG` (
+  `ID` varchar(255) NOT NULL,
+  `AUTHOR` varchar(255) NOT NULL,
+  `FILENAME` varchar(255) NOT NULL,
+  `DATEEXECUTED` datetime NOT NULL,
+  `ORDEREXECUTED` int NOT NULL,
+  `EXECTYPE` varchar(10) NOT NULL,
+  `MD5SUM` varchar(35) DEFAULT NULL,
+  `DESCRIPTION` varchar(255) DEFAULT NULL,
+  `COMMENTS` varchar(255) DEFAULT NULL,
+  `TAG` varchar(255) DEFAULT NULL,
+  `LIQUIBASE` varchar(20) DEFAULT NULL,
+  `CONTEXTS` varchar(255) DEFAULT NULL,
+  `LABELS` varchar(255) DEFAULT NULL,
+  `DEPLOYMENT_ID` varchar(10) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- ----------------------------
+-- Records of FLW_EV_DATABASECHANGELOG
+-- ----------------------------
+BEGIN;
+INSERT INTO `FLW_EV_DATABASECHANGELOG` VALUES ('1', 'flowable', 'org/flowable/eventregistry/db/liquibase/flowable-eventregistry-db-changelog.xml', '2022-02-27 16:05:20', 1, 'EXECUTED', '8:1b0c48c9cf7945be799d868a2626d687', 'createTable tableName=FLW_EVENT_DEPLOYMENT; createTable tableName=FLW_EVENT_RESOURCE; createTable tableName=FLW_EVENT_DEFINITION; createIndex indexName=ACT_IDX_EVENT_DEF_UNIQ, tableName=FLW_EVENT_DEFINITION; createTable tableName=FLW_CHANNEL_DEFIN...', '', NULL, '4.3.5', NULL, NULL, '5977920063');
+COMMIT;
+
+-- ----------------------------
+-- Table structure for FLW_EV_DATABASECHANGELOGLOCK
+-- ----------------------------
+DROP TABLE IF EXISTS `FLW_EV_DATABASECHANGELOGLOCK`;
+CREATE TABLE `FLW_EV_DATABASECHANGELOGLOCK` (
+  `ID` int NOT NULL,
+  `LOCKED` bit(1) NOT NULL,
+  `LOCKGRANTED` datetime DEFAULT NULL,
+  `LOCKEDBY` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- ----------------------------
+-- Records of FLW_EV_DATABASECHANGELOGLOCK
+-- ----------------------------
+BEGIN;
+INSERT INTO `FLW_EV_DATABASECHANGELOGLOCK` VALUES (1, b'0', NULL, NULL);
+COMMIT;
+
+-- ----------------------------
+-- Table structure for FLW_EVENT_DEFINITION
+-- ----------------------------
+DROP TABLE IF EXISTS `FLW_EVENT_DEFINITION`;
+CREATE TABLE `FLW_EVENT_DEFINITION` (
+  `ID_` varchar(255) NOT NULL,
+  `NAME_` varchar(255) DEFAULT NULL,
+  `VERSION_` int DEFAULT NULL,
+  `KEY_` varchar(255) DEFAULT NULL,
+  `CATEGORY_` varchar(255) DEFAULT NULL,
+  `DEPLOYMENT_ID_` varchar(255) DEFAULT NULL,
+  `TENANT_ID_` varchar(255) DEFAULT NULL,
+  `RESOURCE_NAME_` varchar(255) DEFAULT NULL,
+  `DESCRIPTION_` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`ID_`),
+  UNIQUE KEY `ACT_IDX_EVENT_DEF_UNIQ` (`KEY_`,`VERSION_`,`TENANT_ID_`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- ----------------------------
+-- Records of FLW_EVENT_DEFINITION
+-- ----------------------------
+BEGIN;
+COMMIT;
+
+-- ----------------------------
+-- Table structure for FLW_EVENT_DEPLOYMENT
+-- ----------------------------
+DROP TABLE IF EXISTS `FLW_EVENT_DEPLOYMENT`;
+CREATE TABLE `FLW_EVENT_DEPLOYMENT` (
+  `ID_` varchar(255) NOT NULL,
+  `NAME_` varchar(255) DEFAULT NULL,
+  `CATEGORY_` varchar(255) DEFAULT NULL,
+  `DEPLOY_TIME_` datetime(3) DEFAULT NULL,
+  `TENANT_ID_` varchar(255) DEFAULT NULL,
+  `PARENT_DEPLOYMENT_ID_` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`ID_`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- ----------------------------
+-- Records of FLW_EVENT_DEPLOYMENT
+-- ----------------------------
+BEGIN;
+COMMIT;
+
+-- ----------------------------
+-- Table structure for FLW_EVENT_RESOURCE
+-- ----------------------------
+DROP TABLE IF EXISTS `FLW_EVENT_RESOURCE`;
+CREATE TABLE `FLW_EVENT_RESOURCE` (
+  `ID_` varchar(255) NOT NULL,
+  `NAME_` varchar(255) DEFAULT NULL,
+  `DEPLOYMENT_ID_` varchar(255) DEFAULT NULL,
+  `RESOURCE_BYTES_` longblob,
+  PRIMARY KEY (`ID_`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- ----------------------------
+-- Records of FLW_EVENT_RESOURCE
+-- ----------------------------
+BEGIN;
+COMMIT;
+
+-- ----------------------------
+-- Table structure for FLW_RU_BATCH
+-- ----------------------------
+DROP TABLE IF EXISTS `FLW_RU_BATCH`;
+CREATE TABLE `FLW_RU_BATCH` (
+  `ID_` varchar(64) COLLATE utf8_bin NOT NULL,
+  `REV_` int DEFAULT NULL,
+  `TYPE_` varchar(64) COLLATE utf8_bin NOT NULL,
+  `SEARCH_KEY_` varchar(255) COLLATE utf8_bin DEFAULT NULL,
+  `SEARCH_KEY2_` varchar(255) COLLATE utf8_bin DEFAULT NULL,
+  `CREATE_TIME_` datetime(3) NOT NULL,
+  `COMPLETE_TIME_` datetime(3) DEFAULT NULL,
+  `STATUS_` varchar(255) COLLATE utf8_bin DEFAULT NULL,
+  `BATCH_DOC_ID_` varchar(64) COLLATE utf8_bin DEFAULT NULL,
+  `TENANT_ID_` varchar(255) COLLATE utf8_bin DEFAULT '',
+  PRIMARY KEY (`ID_`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8_bin;
+
+-- ----------------------------
+-- Records of FLW_RU_BATCH
+-- ----------------------------
+BEGIN;
+COMMIT;
+
+-- ----------------------------
+-- Table structure for FLW_RU_BATCH_PART
+-- ----------------------------
+DROP TABLE IF EXISTS `FLW_RU_BATCH_PART`;
+CREATE TABLE `FLW_RU_BATCH_PART` (
+  `ID_` varchar(64) COLLATE utf8_bin NOT NULL,
+  `REV_` int DEFAULT NULL,
+  `BATCH_ID_` varchar(64) COLLATE utf8_bin DEFAULT NULL,
+  `TYPE_` varchar(64) COLLATE utf8_bin NOT NULL,
+  `SCOPE_ID_` varchar(64) COLLATE utf8_bin DEFAULT NULL,
+  `SUB_SCOPE_ID_` varchar(64) COLLATE utf8_bin DEFAULT NULL,
+  `SCOPE_TYPE_` varchar(64) COLLATE utf8_bin DEFAULT NULL,
+  `SEARCH_KEY_` varchar(255) COLLATE utf8_bin DEFAULT NULL,
+  `SEARCH_KEY2_` varchar(255) COLLATE utf8_bin DEFAULT NULL,
+  `CREATE_TIME_` datetime(3) NOT NULL,
+  `COMPLETE_TIME_` datetime(3) DEFAULT NULL,
+  `STATUS_` varchar(255) COLLATE utf8_bin DEFAULT NULL,
+  `RESULT_DOC_ID_` varchar(64) COLLATE utf8_bin DEFAULT NULL,
+  `TENANT_ID_` varchar(255) COLLATE utf8_bin DEFAULT '',
+  PRIMARY KEY (`ID_`),
+  KEY `FLW_IDX_BATCH_PART` (`BATCH_ID_`),
+  CONSTRAINT `FLW_FK_BATCH_PART_PARENT` FOREIGN KEY (`BATCH_ID_`) REFERENCES `FLW_RU_BATCH` (`ID_`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8_bin;
+
+-- ----------------------------
+-- Records of FLW_RU_BATCH_PART
 -- ----------------------------
 BEGIN;
 COMMIT;
