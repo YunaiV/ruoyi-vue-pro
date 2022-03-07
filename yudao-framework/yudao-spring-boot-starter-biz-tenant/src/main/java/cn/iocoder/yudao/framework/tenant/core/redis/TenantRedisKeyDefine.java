@@ -9,12 +9,12 @@ import java.time.Duration;
 /**
  * 多租户拓展的 RedisKeyDefine 实现类
  *
- * 由于 Redis 不同于 MySQL  有 column 字段，所以无法通过类似 WHERE tenant_id = ? 的方式过滤
+ * 由于 Redis 不同于 MySQL 有 column 字段，无法通过类似 WHERE tenant_id = ? 的方式过滤
  * 所以需要通过在 Redis Key 上增加后缀的方式，进行租户之间的隔离。具体的步骤是：
  * 1. 假设 Redis Key 是 user:%d，示例是 user:1；对应到多租户的 Redis Key 是 user:%d:%d，
  * 2. 在 Redis DAO 中，需要使用 {@link #formatKey(Object...)} 方法，进行 Redis Key 的格式化
  *
- * 注意，大多数情况下，并不用使用 TenantRedisKeyDefine 实现。主要的使用场景，是 Redis Key 可能存在冲突的情况。
+ * 注意，大多数情况下，并不用使用 TenantRedisKeyDefine 实现。主要的使用场景，还是 Redis Key 可能存在冲突的情况。
  * 例如说，租户 1 和 2 都有一个手机号作为 Key，则他们会存在冲突的问题
  *
  * @author 芋道源码

@@ -88,13 +88,13 @@ yudao:
       - cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants
       - cn.iocoder.yudao.module.system.enums.ErrorCodeConstants
       - cn.iocoder.yudao.module.tool.enums.ErrorCodeConstants
-  tenant: # 多租户相关配置项
+  : # 多租户相关配置项
     enable: true
     ignore-urls:
-      - /admin-api/system/tenant/get-id-by-name
-      - /admin-api/system/captcha/get-image
-      - /admin-api/infra/file/get/*
-      - /admin-api/system/sms/callback/*
+      - /admin-api/system/tenant/get-id-by-name # 基于名字获取租户，不许带租户编号
+      - /admin-api/system/captcha/get-image # 获取图片验证码，和租户无关
+      - /admin-api/infra/file/get/* # 获取图片，和租户无关
+      - /admin-api/system/sms/callback/* # 短信回调接口，无法带上租户编号
     ignore-tables:
       - infra_config
       - infra_file
