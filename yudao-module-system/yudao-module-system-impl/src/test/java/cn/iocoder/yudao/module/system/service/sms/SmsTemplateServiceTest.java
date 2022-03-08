@@ -201,7 +201,7 @@ public class SmsTemplateServiceTest extends BaseDbUnitTest {
        SmsTemplateDO dbSmsTemplate = randomPojo(SmsTemplateDO.class, o -> { // 等会查询到
            o.setType(SmsTemplateTypeEnum.PROMOTION.getType());
            o.setStatus(CommonStatusEnum.ENABLE.getStatus());
-           o.setCode("yudaoyuanma");
+           o.setCode("tudou");
            o.setContent("芋道源码");
            o.setApiTemplateId("yunai");
            o.setChannelId(1L);
@@ -226,7 +226,7 @@ public class SmsTemplateServiceTest extends BaseDbUnitTest {
        SmsTemplatePageReqVO reqVO = new SmsTemplatePageReqVO();
        reqVO.setType(SmsTemplateTypeEnum.PROMOTION.getType());
        reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
-       reqVO.setCode("yudao");
+       reqVO.setCode("tu");
        reqVO.setContent("芋道");
        reqVO.setApiTemplateId("yu");
        reqVO.setChannelId(1L);
@@ -247,7 +247,7 @@ public class SmsTemplateServiceTest extends BaseDbUnitTest {
         SmsTemplateDO dbSmsTemplate = randomPojo(SmsTemplateDO.class, o -> { // 等会查询到
             o.setType(SmsTemplateTypeEnum.PROMOTION.getType());
             o.setStatus(CommonStatusEnum.ENABLE.getStatus());
-            o.setCode("yudaoyuanma");
+            o.setCode("tudou");
             o.setContent("芋道源码");
             o.setApiTemplateId("yunai");
             o.setChannelId(1L);
@@ -272,7 +272,7 @@ public class SmsTemplateServiceTest extends BaseDbUnitTest {
         SmsTemplateExportReqVO reqVO = new SmsTemplateExportReqVO();
         reqVO.setType(SmsTemplateTypeEnum.PROMOTION.getType());
         reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
-        reqVO.setCode("yudao");
+        reqVO.setCode("tu");
         reqVO.setContent("芋道");
         reqVO.setApiTemplateId("yu");
         reqVO.setChannelId(1L);

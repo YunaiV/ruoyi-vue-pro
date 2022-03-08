@@ -38,7 +38,7 @@ public class FileServiceTest extends BaseDbUnitTest {
     public void testGetFilePage() {
         // mock 数据
         FileDO dbFile = randomPojo(FileDO.class, o -> { // 等会查询到
-            o.setId("yudao");
+            o.setId("yunai");
             o.setType("jpg");
             o.setCreateTime(buildTime(2021, 1, 15));
         });
@@ -47,17 +47,17 @@ public class FileServiceTest extends BaseDbUnitTest {
         fileMapper.insert(ObjectUtils.cloneIgnoreId(dbFile, o -> o.setId("tudou")));
         // 测试 type 不匹配
         fileMapper.insert(ObjectUtils.cloneIgnoreId(dbFile, o -> {
-            o.setId("yudao02");
+            o.setId("yunai02");
             o.setType("png");
         }));
         // 测试 createTime 不匹配
         fileMapper.insert(ObjectUtils.cloneIgnoreId(dbFile, o -> {
-            o.setId("yudao03");
+            o.setId("yunai03");
             o.setCreateTime(buildTime(2020, 1, 15));
         }));
         // 准备参数
         FilePageReqVO reqVO = new FilePageReqVO();
-        reqVO.setId("yudao");
+        reqVO.setId("yunai");
         reqVO.setType("jp");
         reqVO.setBeginCreateTime(buildTime(2021, 1, 10));
         reqVO.setEndCreateTime(buildTime(2021, 1, 20));
