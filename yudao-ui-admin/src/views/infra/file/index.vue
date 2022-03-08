@@ -110,7 +110,7 @@ export default {
         open: false, // 是否显示弹出层
         title: "", // 弹出层标题
         isUploading: false, // 是否禁用上传
-        url: process.env.VUE_APP_BASE_API + '/admin-api/infra/file/upload", // 请求地址
+        url: process.env.VUE_APP_BASE_API + "/admin-api/infra/file/upload", // 请求地址
         headers: { Authorization: "Bearer " + getToken() }, // 设置上传的请求头部
         data: {} // 上传的额外数据，用于文件名
       },
