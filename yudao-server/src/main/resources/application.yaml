@@ -88,7 +88,7 @@ yudao:
       - cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants
       - cn.iocoder.yudao.module.system.enums.ErrorCodeConstants
       - cn.iocoder.yudao.module.tool.enums.ErrorCodeConstants
-  : # 多租户相关配置项
+  tenant: # 多租户相关配置项
     enable: true
     ignore-urls:
       - /admin-api/system/tenant/get-id-by-name # 基于名字获取租户，不许带租户编号
