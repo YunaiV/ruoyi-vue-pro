@@ -168,7 +168,6 @@ wx: # 参见 https://github.com/Wechat-Group/WxJava/blob/develop/spring-boot-sta
 yudao:
   security:
     token-header: Authorization
-    token-secret: abcdefghijklmnopqrstuvwxyz
     token-timeout: 1d
     session-timeout: 30m
     mock-enable: true
