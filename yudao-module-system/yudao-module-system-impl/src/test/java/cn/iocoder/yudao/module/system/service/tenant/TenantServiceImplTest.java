@@ -176,7 +176,7 @@ public class TenantServiceImplTest extends BaseDbUnitTest {
         }), eq(RoleTypeEnum.SYSTEM.getType()))).thenReturn(200L);
         // mock 用户 300L
         when(userService.createUser(argThat(user -> {
-            assertEquals("yudao", user.getUsername());
+            assertEquals("yunai", user.getUsername());
             assertEquals("yuanma", user.getPassword());
             assertEquals("芋道", user.getNickname());
             assertEquals("15601691300", user.getMobile());
@@ -190,7 +190,7 @@ public class TenantServiceImplTest extends BaseDbUnitTest {
             o.setPackageId(100L);
             o.setStatus(randomCommonStatus());
             o.setDomain("https://www.iocoder.cn");
-            o.setUsername("yudao");
+            o.setUsername("yunai");
             o.setPassword("yuanma");
         });
 

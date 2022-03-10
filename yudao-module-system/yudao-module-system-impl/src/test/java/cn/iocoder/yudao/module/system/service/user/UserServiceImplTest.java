@@ -175,12 +175,12 @@ public class UserServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testUpdateUserPassword_success() {
         // mock 数据
-        AdminUserDO dbUser = randomAdminUserDO(o -> o.setPassword("encode:yudao"));
+        AdminUserDO dbUser = randomAdminUserDO(o -> o.setPassword("encode:tudou"));
         userMapper.insert(dbUser);
         // 准备参数
         Long userId = dbUser.getId();
         UserProfileUpdatePasswordReqVO reqVO = randomPojo(UserProfileUpdatePasswordReqVO.class, o -> {
-            o.setOldPassword("yudao");
+            o.setOldPassword("tudou");
             o.setNewPassword("yuanma");
         });
         // mock 方法
@@ -272,7 +272,7 @@ public class UserServiceImplTest extends BaseDbUnitTest {
         AdminUserDO dbUser = initGetUserPageData();
         // 准备参数
         UserPageReqVO reqVO = new UserPageReqVO();
-        reqVO.setUsername("yudao");
+        reqVO.setUsername("tu");
         reqVO.setMobile("1560");
         reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
         reqVO.setBeginTime(buildTime(2020, 12, 1));
@@ -296,7 +296,7 @@ public class UserServiceImplTest extends BaseDbUnitTest {
         AdminUserDO dbUser = initGetUserPageData();
         // 准备参数
         UserExportReqVO reqVO = new UserExportReqVO();
-        reqVO.setUsername("yudao");
+        reqVO.setUsername("tu");
         reqVO.setMobile("1560");
         reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
         reqVO.setBeginTime(buildTime(2020, 12, 1));
@@ -319,7 +319,7 @@ public class UserServiceImplTest extends BaseDbUnitTest {
     private AdminUserDO initGetUserPageData() {
         // mock 数据
         AdminUserDO dbUser = randomAdminUserDO(o -> { // 等会查询到
-            o.setUsername("yudaoyuanma");
+            o.setUsername("tudou");
             o.setMobile("15601691300");
             o.setStatus(CommonStatusEnum.ENABLE.getStatus());
             o.setCreateTime(buildTime(2020, 12, 12));
@@ -327,7 +327,7 @@ public class UserServiceImplTest extends BaseDbUnitTest {
         });
         userMapper.insert(dbUser);
         // 测试 username 不匹配
-        userMapper.insert(ObjectUtils.cloneIgnoreId(dbUser, o -> o.setUsername("yuanma")));
+        userMapper.insert(ObjectUtils.cloneIgnoreId(dbUser, o -> o.setUsername("dou")));
         // 测试 mobile 不匹配
         userMapper.insert(ObjectUtils.cloneIgnoreId(dbUser, o -> o.setMobile("18818260888")));
         // 测试 status 不匹配

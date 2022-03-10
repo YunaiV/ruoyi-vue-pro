@@ -92,9 +92,9 @@ public class ErrorCodeServiceTest extends BaseDbUnitTest {
        // 准备参数
        ErrorCodePageReqVO reqVO = new ErrorCodePageReqVO();
        reqVO.setType(ErrorCodeTypeEnum.AUTO_GENERATION.getType());
-       reqVO.setApplicationName("yudao");
+       reqVO.setApplicationName("tu");
        reqVO.setCode(1);
-       reqVO.setMessage("yu");
+       reqVO.setMessage("ma");
        reqVO.setBeginCreateTime(buildTime(2020, 11, 1));
        reqVO.setEndCreateTime(buildTime(2020, 11, 30));
 
@@ -112,16 +112,16 @@ public class ErrorCodeServiceTest extends BaseDbUnitTest {
     private ErrorCodeDO initGetErrorCodePage() {
         ErrorCodeDO dbErrorCode = randomInfErrorCodeDO(o -> { // 等会查询到
             o.setType(ErrorCodeTypeEnum.AUTO_GENERATION.getType());
-            o.setApplicationName("yudaoyuanma");
+            o.setApplicationName("tudou");
             o.setCode(1);
-            o.setMessage("yudao");
+            o.setMessage("yuanma");
             o.setCreateTime(buildTime(2020, 11, 11));
         });
         errorCodeMapper.insert(dbErrorCode);
         // 测试 type 不匹配
         errorCodeMapper.insert(ObjectUtils.cloneIgnoreId(dbErrorCode, o -> o.setType(ErrorCodeTypeEnum.MANUAL_OPERATION.getType())));
         // 测试 applicationName 不匹配
-        errorCodeMapper.insert(ObjectUtils.cloneIgnoreId(dbErrorCode, o -> o.setApplicationName("yunai")));
+        errorCodeMapper.insert(ObjectUtils.cloneIgnoreId(dbErrorCode, o -> o.setApplicationName("yuan")));
         // 测试 code 不匹配
         errorCodeMapper.insert(ObjectUtils.cloneIgnoreId(dbErrorCode, o -> o.setCode(2)));
         // 测试 message 不匹配
@@ -138,9 +138,9 @@ public class ErrorCodeServiceTest extends BaseDbUnitTest {
         // 准备参数
         ErrorCodeExportReqVO reqVO = new ErrorCodeExportReqVO();
         reqVO.setType(ErrorCodeTypeEnum.AUTO_GENERATION.getType());
-        reqVO.setApplicationName("yudao");
+        reqVO.setApplicationName("tu");
         reqVO.setCode(1);
-        reqVO.setMessage("yu");
+        reqVO.setMessage("ma");
         reqVO.setBeginCreateTime(buildTime(2020, 11, 1));
         reqVO.setEndCreateTime(buildTime(2020, 11, 30));
 
