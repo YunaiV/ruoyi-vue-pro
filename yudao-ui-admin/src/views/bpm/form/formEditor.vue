@@ -145,9 +145,9 @@ import { debounce } from 'throttle-debounce'
 import { saveAs } from 'file-saver'
 import ClipboardJS from 'clipboard'
 import render from '@/components/render/render'
-import FormDrawer from '@/views/tool/build/FormDrawer'
-import JsonDrawer from '@/views/tool/build/JsonDrawer'
-import RightPanel from '@/views/tool/build/RightPanel'
+import FormDrawer from '@/views/infra/build/FormDrawer'
+import JsonDrawer from '@/views/infra/build/JsonDrawer'
+import RightPanel from '@/views/infra/build/RightPanel'
 import {
   inputComponents, selectComponents, layoutComponents, formConf
 } from '@/components/generator/config'
@@ -161,8 +161,8 @@ import { makeUpJs } from '@/components/generator/js'
 import { makeUpCss } from '@/components/generator/css'
 import drawingDefalut from '@/components/generator/drawingDefalut'
 import logo from '@/assets/logo/logo.png'
-import CodeTypeDialog from '@/views/tool/build/CodeTypeDialog'
-import DraggableItem from '@/views/tool/build/DraggableItem'
+import CodeTypeDialog from '@/views/infra/build/CodeTypeDialog'
+import DraggableItem from '@/views/infra/build/DraggableItem'
 import {
   getDrawingList, saveDrawingList, getIdGlobal, saveIdGlobal, getFormConf
 } from '@/utils/db'

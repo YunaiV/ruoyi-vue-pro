@@ -30,10 +30,8 @@ export const DICT_TYPE = {
   INFRA_JOB_LOG_STATUS: 'infra_job_log_status',
   INFRA_API_ERROR_LOG_PROCESS_STATUS: 'infra_api_error_log_process_status',
   INFRA_CONFIG_TYPE: 'infra_config_type',
-
-  // ========== TOOL 模块 ==========
-  TOOL_CODEGEN_TEMPLATE_TYPE: 'tool_codegen_template_type',
-  TOOL_CODEGEN_SCENE: 'tool_codegen_scene',
+  INFRA_CODEGEN_TEMPLATE_TYPE: 'infra_codegen_template_type',
+  INFRA_CODEGEN_SCENE: 'infra_codegen_scene',
 
   // ========== BPM 模块 ==========
   BPM_MODEL_CATEGORY: 'bpm_model_category',
