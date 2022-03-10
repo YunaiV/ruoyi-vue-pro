@@ -7,3 +7,4 @@ DELETE FROM "infra_api_error_log";
 DELETE FROM "infra_api_access_log";
 DELETE FROM "infra_file";
 DELETE FROM "infra_api_error_log";
+DELETE FROM "infra_test_demo";

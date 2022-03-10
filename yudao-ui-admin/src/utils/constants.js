@@ -43,7 +43,7 @@ export const SystemDataScopeEnum = {
 /**
  * 代码生成模板类型
  */
-export const ToolCodegenTemplateTypeEnum = {
+export const InfraCodegenTemplateTypeEnum = {
   CRUD: 1, // 基础 CRUD
   TREE: 2, // 树形 CRUD
   SUB: 3, // 主子表 CRUD

@@ -87,7 +87,6 @@ yudao:
       - cn.iocoder.yudao.module.member.enums.ErrorCodeConstants
       - cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants
       - cn.iocoder.yudao.module.system.enums.ErrorCodeConstants
-      - cn.iocoder.yudao.module.tool.enums.ErrorCodeConstants
   tenant: # 多租户相关配置项
     enable: true
     ignore-urls:
@@ -96,11 +95,6 @@ yudao:
       - /admin-api/infra/file/get/* # 获取图片，和租户无关
       - /admin-api/system/sms/callback/* # 短信回调接口，无法带上租户编号
     ignore-tables:
-      - infra_config
-      - infra_file
-      - infra_job
-      - infra_job_log
-      - infra_job_log
       - system_tenant
       - system_tenant_package
       - system_dict_data
@@ -110,11 +104,16 @@ yudao:
       - system_sms_channel
       - system_sms_template
       - system_sms_log
-      - tool_codegen_column
-      - tool_codegen_table
-      - tool_test_demo
+      - infra_codegen_column
+      - infra_codegen_table
+      - infra_test_demo
       - tables
       - columns
+      - infra_config
+      - infra_file
+      - infra_job
+      - infra_job_log
+      - infra_job_log
   sms-code: # 短信验证码相关的配置项
     expire-times: 10m
     send-frequency: 1m

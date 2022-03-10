@@ -17,7 +17,6 @@
         <module>yudao-module-bpm</module>
         <module>yudao-module-system</module>
         <module>yudao-module-infra</module>
-        <module>yudao-module-tool</module>
         <module>yudao-module-pay</module>
     </modules>
 
