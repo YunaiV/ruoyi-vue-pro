@@ -66,7 +66,7 @@ public class JWTAuthenticationTokenFilter extends OncePerRequestFilter {
      * 注意，在线上环境下，一定要关闭该功能！！！
      *
      * @param request 请求
-     * @param token 模拟的 token，格式为 {@link SecurityProperties#getTokenSecret()} + 用户编号
+     * @param token 模拟的 token，格式为 {@link SecurityProperties#getMockSecret()} + 用户编号
      * @return 模拟的 LoginUser
      */
     private LoginUser mockLoginUser(HttpServletRequest request, String token) {

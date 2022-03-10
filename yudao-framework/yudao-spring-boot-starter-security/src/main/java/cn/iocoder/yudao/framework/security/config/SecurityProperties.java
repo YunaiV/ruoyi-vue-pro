@@ -4,7 +4,6 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
-import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.time.Duration;
@@ -24,11 +23,6 @@ public class SecurityProperties {
      */
     @NotNull(message = "Token 过期时间不能为空")
     private Duration tokenTimeout;
-    /**
-     * Token 秘钥
-     */
-    @NotEmpty(message = "Token 秘钥不能为空")
-    private String tokenSecret;
     /**
      * Session 过期时间
      *

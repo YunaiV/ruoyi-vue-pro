@@ -75,16 +75,16 @@ public class TenantSecurityWebFilter extends ApiRequestFilter {
             }
         }
 
-        // 2. 如果请求未带租户的编号，检查是否是忽略的 URL，否则也不允许访问。
-        if (tenantId == null && !isIgnoreUrl(request)) {
-            log.error("[doFilterInternal][URL({}/{}) 未传递租户编号]", request.getRequestURI(), request.getMethod());
-            ServletUtils.writeJSON(response, CommonResult.error(GlobalErrorCodeConstants.BAD_REQUEST.getCode(),
-                    "租户的请求未传递，请进行排查"));
-            return;
-        }
-
-        // 3. 校验租户是合法，例如说被禁用、到期
-        if (tenantId != null) {
+        //检查是否是忽略的 URL, 如果是则允许访问
+        if (!isIgnoreUrl(request)) {
+            // 2. 如果请求未带租户的编号，不允许访问。
+            if (tenantId == null) {
+                log.error("[doFilterInternal][URL({}/{}) 未传递租户编号]", request.getRequestURI(), request.getMethod());
+                ServletUtils.writeJSON(response, CommonResult.error(GlobalErrorCodeConstants.BAD_REQUEST.getCode(),
+                        "租户的请求未传递，请进行排查"));
+                return;
+            }
+            // 3. 校验租户是合法，例如说被禁用、到期
             try {
                 tenantFrameworkService.validTenant(tenantId);
             } catch (Throwable ex) {
