@@ -37,7 +37,7 @@ public class CodegenUpdateReqVO {
         @ApiModelProperty(value = "编号", required = true, example = "1")
         private Long id;
 
-        @AssertTrue(message = "生成失败，必须设置上级菜单")
+        @AssertTrue(message = "上级菜单不能为空")
         public boolean isParentMenuIdValid() {
             // 生成场景为管理后台时，必须设置上级菜单，不然生成的菜单 SQL 是无父级菜单的
             return ObjectUtil.notEqual(getScene(), CodegenSceneEnum.ADMIN.getScene())
