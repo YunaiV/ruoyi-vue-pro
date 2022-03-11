@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.infra.service.codegen;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.infra.controller.admin.codegen.vo.CodegenUpdateReqVO;
 import cn.iocoder.yudao.module.infra.controller.admin.codegen.vo.table.CodegenTablePageReqVO;
 import cn.iocoder.yudao.module.infra.convert.codegen.CodegenConvert;
@@ -14,21 +15,18 @@ import cn.iocoder.yudao.module.infra.dal.mysql.codegen.CodegenTableMapper;
 import cn.iocoder.yudao.module.infra.dal.mysql.codegen.SchemaColumnMapper;
 import cn.iocoder.yudao.module.infra.dal.mysql.codegen.SchemaTableMapper;
 import cn.iocoder.yudao.module.infra.enums.codegen.CodegenImportTypeEnum;
+import cn.iocoder.yudao.module.infra.enums.codegen.CodegenSceneEnum;
 import cn.iocoder.yudao.module.infra.framework.codegen.config.CodegenProperties;
 import cn.iocoder.yudao.module.infra.service.codegen.inner.CodegenBuilder;
 import cn.iocoder.yudao.module.infra.service.codegen.inner.CodegenEngine;
 import cn.iocoder.yudao.module.infra.service.codegen.inner.CodegenSQLParser;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import org.apache.commons.collections4.KeyValue;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -266,27 +264,8 @@ public class CodegenServiceImpl implements CodegenService {
         // TODO 强制移除 Quartz 的表，未来做成可配置
         tables.removeIf(table -> table.getTableName().startsWith("QRTZ_"));
         tables.removeIf(table -> table.getTableName().startsWith("ACT_"));
+        tables.removeIf(table -> table.getTableName().startsWith("FLW_"));
         return tables;
     }
-
-//    /**
-//     * 修改保存参数校验
-//     *
-//     * @param genTable 业务信息
-//     */
-//    @Override
-//    public void validateEdit(GenTable genTable) {
-//        if (GenConstants.TPL_TREE.equals(genTable.getTplCategory())) {
-//            String options = JSON.toJSONString(genTable.getParams());
-//            JSONObject paramsObj = JSONObject.parseObject(options);
-//            if (StringUtils.isEmpty(paramsObj.getString(GenConstants.TREE_CODE))) {
-//                throw new CustomException("树编码字段不能为空");
-//            } else if (StringUtils.isEmpty(paramsObj.getString(GenConstants.TREE_PARENT_CODE))) {
-//                throw new CustomException("树父编码字段不能为空");
-//            } else if (StringUtils.isEmpty(paramsObj.getString(GenConstants.TREE_NAME))) {
-//                throw new CustomException("树名称字段不能为空");
-//            }
-//        }
-//    }
 
 }
