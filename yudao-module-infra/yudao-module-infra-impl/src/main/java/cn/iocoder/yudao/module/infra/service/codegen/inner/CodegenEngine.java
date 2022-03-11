@@ -69,6 +69,7 @@ public class CodegenEngine {
                     javaModuleImplMainFilePath("dal/dataobject/${table.businessName}/${table.className}DO"))
             .put(javaTemplatePath("dal/mapper"),
                     javaModuleImplMainFilePath("dal/mysql/${table.businessName}/${table.className}Mapper"))
+            .put(javaTemplatePath("dal/mapper.xml"), mapperXmlFilePath())
             .put(javaTemplatePath("service/serviceImpl"),
                     javaModuleImplMainFilePath("service/${table.businessName}/${table.className}ServiceImpl"))
             .put(javaTemplatePath("service/service"),
@@ -211,6 +212,12 @@ public class CodegenEngine {
         return "yudao-module-${table.moduleName}/" + // 顶级模块
                 "yudao-module-${table.moduleName}-" + module + "/" + // 子模块
                 "src/" + src + "/java/${basePackage}/module/${table.moduleName}/" + path + ".java";
+    }
+
+    private static String mapperXmlFilePath() {
+        return "yudao-module-${table.moduleName}/" + // 顶级模块
+                "yudao-module-${table.moduleName}-impl/" + // 子模块
+                "src/resources/mapper/${table.businessName}/${table.className}Mapper.xml";
     }
 
     private static String vueTemplatePath(String path) {

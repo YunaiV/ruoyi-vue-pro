@@ -40,4 +40,6 @@ public interface TestDemoMapper extends BaseMapperX<TestDemoDO> {
                 .orderByDesc(TestDemoDO::getId));
     }
 
+    List<TestDemoDO> selectList2();
+
 }
