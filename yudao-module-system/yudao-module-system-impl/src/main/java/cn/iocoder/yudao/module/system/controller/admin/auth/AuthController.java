@@ -4,7 +4,6 @@ import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.collection.SetUtils;
-import cn.iocoder.yudao.framework.datapermission.core.annotation.DataPermission;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.system.controller.admin.auth.vo.auth.*;
 import cn.iocoder.yudao.module.system.convert.auth.AuthConvert;
@@ -64,7 +63,6 @@ public class AuthController {
 
     @GetMapping("/get-permission-info")
     @ApiOperation("获取登录用户的权限信息")
-    @DataPermission(enable = false) // 标记不使用数据权限，避免【SELF】权限范围报错
     public CommonResult<AuthPermissionInfoRespVO> getPermissionInfo() {
         // 获得用户信息
         AdminUserDO user = userService.getUser(getLoginUserId());

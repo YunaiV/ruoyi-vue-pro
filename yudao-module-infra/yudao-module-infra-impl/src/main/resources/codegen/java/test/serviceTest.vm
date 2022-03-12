@@ -1,5 +1,6 @@
 package ${basePackage}.module.${table.moduleName}.service.${table.businessName};
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
@@ -135,7 +136,8 @@ public class ${table.className}ServiceImplTest extends BaseDbUnitTest {
         assertServiceException(() -> ${classNameVar}Service.delete${simpleClassName}(id), ${simpleClassName_underlineCase.toUpperCase()}_NOT_EXISTS);
     }
 
-    @Test // TODO 请修改 null 为需要的值
+    @Test
+    @Disabled  // TODO 请修改 null 为需要的值，然后删除 @Disabled 注解
     public void testGet${simpleClassName}Page() {
        #getPageCondition("PageReqVO")
 
@@ -147,7 +149,8 @@ public class ${table.className}ServiceImplTest extends BaseDbUnitTest {
        assertPojoEquals(db${simpleClassName}, pageResult.getList().get(0));
     }
 
-    @Test // TODO 请修改 null 为需要的值
+    @Test
+    @Disabled  // TODO 请修改 null 为需要的值，然后删除 @Disabled 注解
     public void testGet${simpleClassName}List() {
        #getPageCondition("ExportReqVO")
 

@@ -51,6 +51,8 @@ public class CodegenBuilder {
                     .put("image", CodegenColumnHtmlTypeEnum.UPLOAD_IMAGE)
                     .put("file", CodegenColumnHtmlTypeEnum.UPLOAD_FILE)
                     .put("content", CodegenColumnHtmlTypeEnum.EDITOR)
+                    .put("description", CodegenColumnHtmlTypeEnum.EDITOR)
+                    .put("demo", CodegenColumnHtmlTypeEnum.EDITOR)
                     .put("time", CodegenColumnHtmlTypeEnum.DATETIME)
                     .put("date", CodegenColumnHtmlTypeEnum.DATETIME)
                     .build();
@@ -58,7 +60,7 @@ public class CodegenBuilder {
     /**
      * 多租户编号的字段名
      */
-    public static final String TENANT_ID_FIELD = "tenant_id";
+    public static final String TENANT_ID_FIELD = "tenantId";
     /**
      * {@link cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO} 的字段
      */
@@ -121,14 +123,13 @@ public class CodegenBuilder {
     private void initTableDefault(CodegenTableDO table) {
         // 以 system_dept 举例子。moduleName 为 system、businessName 为 dept、className 为 SystemDept
         // 如果不希望 System 前缀，则可以手动在【代码生成 - 修改生成配置 - 基本信息】，将实体类名称改为 Dept 即可
-        table.setModuleName(StrUtil.subBefore(table.getTableName(),
-                '_', false)); // 第一个 _ 前缀的前面，作为 module 名字
+        table.setModuleName(subBefore(table.getTableName(), '_', false)); // 第一个 _ 前缀的前面，作为 module 名字
         table.setBusinessName(toCamelCase(subAfter(table.getTableName(),
                 '_', false))); // 第一步，第一个 _ 前缀的后面，作为 module 名字; 第二步，可能存在多个 _ 的情况，转换成驼峰
-        table.setClassName(upperFirst(toCamelCase(table.getTableName()))); // 驼峰 + 首字母大写
+        table.setClassName(upperFirst(toCamelCase( // 驼峰 + 首字母大写
+                subAfter(table.getTableName(), '_', false)))); // 第一个 _ 前缀的前面，作为 class 名字
         table.setClassComment(subBefore(table.getTableComment(), // 去除结尾的表，作为类描述
                 '表', true));
-        table.setAuthor("芋艿"); // TODO 稍后改成创建人
         table.setTemplateType(CodegenTemplateTypeEnum.CRUD.getType());
     }
 
@@ -157,7 +158,7 @@ public class CodegenBuilder {
         column.setJavaField(toCamelCase(column.getColumnName()));
         // 处理 dictType 字段，暂无
         // 处理 javaType 字段
-        String dbType = StrUtil.subBefore(column.getColumnType(), '(', false);
+        String dbType = subBefore(column.getColumnType(), '(', false);
         javaTypeMappings.entrySet().stream()
                 .filter(entry -> entry.getValue().contains(dbType))
                 .findFirst().ifPresent(entry -> column.setJavaType(entry.getKey()));
