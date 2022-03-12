@@ -1,0 +1,27 @@
+<div class="control-group">
+	<label class="control-label" for="startDate">开始时间：</label>
+	<div class="controls">
+		<input type="text" id="startDate" name="startDate" value="${startDate}" class="datepicker" data-date-format="yyyy-mm-dd" required />
+	</div>
+</div>
+<div class="control-group">
+	<label class="control-label" for="endDate">结束时间：</label>
+	<div class="controls">
+		<input type="text" id="endDate" name="endDate" value="${endDate}" class="datepicker" data-date-format="yyyy-mm-dd" required />
+	</div>
+</div>
+<div class="control-group">
+	<label class="control-label" for="reason">请假原因：</label>
+	<div class="controls">
+		<textarea id="reason" name="reason" required>${reason}</textarea>
+	</div>
+</div>
+<div class="control-group">
+	<label class="control-label" for="reason">是否继续申请：</label>
+	<div class="controls">
+		<select id="reApply" name="reApply">
+			<option value='true'>重新申请</option>
+			<option value='false'>结束流程</option>
+		</select>
+	</div>
+</div>

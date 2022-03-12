@@ -1,0 +1,28 @@
+<div class="control-group">
+	<label class="control-label" for="startDate">申请人：</label>
+	<div class="controls">${applyUserId}</div>
+</div>
+<div class="control-group">
+	<label class="control-label" for="startDate">开始时间：</label>
+	<div class="controls">
+		<input type="text" id="startDate" name="startDate" value="${startDate}" readonly />
+	</div>
+</div>
+<div class="control-group">
+	<label class="control-label" for="endDate">结束时间：</label>
+	<div class="controls">
+		<input type="text" id="endDate" name="endDate" value="${endDate}" readonly />
+	</div>
+</div>
+<div class="control-group">
+	<label class="control-label" for="reason">请假原因：</label>
+	<div class="controls">
+		<textarea id="reason" name="reason" readonly>${reason}</textarea>
+	</div>
+</div>
+<div class="control-group">
+	<label class="control-label" for="reportBackDate">销假日期：</label>
+	<div class="controls">
+		<input type="text" id="reportBackDate" name="reportBackDate" class="datepicker" data-date-format="yyyy-mm-dd" required />
+	</div>
+</div>
