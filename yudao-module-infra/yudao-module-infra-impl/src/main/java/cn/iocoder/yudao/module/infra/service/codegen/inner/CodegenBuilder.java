@@ -51,6 +51,8 @@ public class CodegenBuilder {
                     .put("image", CodegenColumnHtmlTypeEnum.UPLOAD_IMAGE)
                     .put("file", CodegenColumnHtmlTypeEnum.UPLOAD_FILE)
                     .put("content", CodegenColumnHtmlTypeEnum.EDITOR)
+                    .put("description", CodegenColumnHtmlTypeEnum.EDITOR)
+                    .put("demo", CodegenColumnHtmlTypeEnum.EDITOR)
                     .put("time", CodegenColumnHtmlTypeEnum.DATETIME)
                     .put("date", CodegenColumnHtmlTypeEnum.DATETIME)
                     .build();
@@ -58,7 +60,7 @@ public class CodegenBuilder {
     /**
      * 多租户编号的字段名
      */
-    public static final String TENANT_ID_FIELD = "tenant_id";
+    public static final String TENANT_ID_FIELD = "tenantId";
     /**
      * {@link cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO} 的字段
      */
