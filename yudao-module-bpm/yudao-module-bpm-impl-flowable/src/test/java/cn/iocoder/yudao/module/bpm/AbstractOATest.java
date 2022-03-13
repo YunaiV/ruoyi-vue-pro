@@ -1,6 +1,9 @@
 package cn.iocoder.yudao.module.bpm;
 
 import org.flowable.engine.*;
+import org.flowable.engine.impl.ProcessEngineImpl;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.test.TestHelper;
 import org.flowable.engine.test.FlowableRule;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -14,11 +17,15 @@ import org.junit.Rule;
  */
 public abstract class AbstractOATest {
 
+    protected String configurationResource = "flowable.cfg.xml";
+
     /**
      * 专门用于测试套件
      */
     @Rule
     public FlowableRule activitiRule = new FlowableRule("flowable.cfg.xml");
+
+    protected ProcessEngineConfigurationImpl processEngineConfiguration;
 
     protected ProcessEngine processEngine;
     protected RepositoryService repositoryService;
@@ -45,19 +52,27 @@ public abstract class AbstractOATest {
         System.out.println("-------- 结束测试 --------");
     }
 
+    protected void initializeProcessEngine() {
+        processEngine = TestHelper.getProcessEngine(configurationResource);
+    }
+
     /**
      * 初始化变量
      */
     @Before
     public void setUp() throws Exception {
-        processEngine = activitiRule.getProcessEngine();
-        repositoryService = activitiRule.getRepositoryService();
-        runtimeService = activitiRule.getRuntimeService();
-        taskService = activitiRule.getTaskService();
-        historyService = activitiRule.getHistoryService();
-        identityService = activitiRule.getIdentityService();
-        managementService = activitiRule.getManagementService();
-        formService = activitiRule.getFormService();
+        if (processEngine == null) {
+            initializeProcessEngine();
+        }
+
+        processEngineConfiguration = ((ProcessEngineImpl) processEngine).getProcessEngineConfiguration();
+        repositoryService = processEngine.getRepositoryService();
+        runtimeService = processEngine.getRuntimeService();
+        taskService = processEngine.getTaskService();
+        historyService = processEngine.getHistoryService();
+        identityService = processEngine.getIdentityService();
+        managementService = processEngine.getManagementService();
+        formService = processEngine.getFormService();
     }
 
 }

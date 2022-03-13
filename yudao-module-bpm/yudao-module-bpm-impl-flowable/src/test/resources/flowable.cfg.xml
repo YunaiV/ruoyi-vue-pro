@@ -15,7 +15,7 @@
 		<!--HistoryLevel-->
 		<property name="history" value="full" />
 		<property name="databaseSchemaUpdate" value="true" />
-		<property name="flowable5CompatibilityEnabled" value="true" />
+		<property name="flowable5CompatibilityEnabled" value="false" />
 <!--		<property name="jobExecutorActivate" value="false" />-->
 	</bean>
 </beans>
