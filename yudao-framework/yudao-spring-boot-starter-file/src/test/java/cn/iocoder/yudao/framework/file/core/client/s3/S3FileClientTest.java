@@ -76,6 +76,15 @@ public class S3FileClientTest {
         byte[] content = ResourceUtil.readBytes("file/erweima.jpg");
         String fullPath = client.upload(content, path);
         System.out.println("访问地址：" + fullPath);
+        // 读取文件
+        if (false) {
+            byte[] bytes = client.getContent(path);
+            System.out.println("文件内容：" + bytes);
+        }
+        // 删除文件
+        if (false) {
+            client.delete(path);
+        }
     }
 
 }

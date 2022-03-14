@@ -7,6 +7,8 @@ import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.net.URI;
@@ -14,7 +16,7 @@ import java.net.URI;
 import static cn.iocoder.yudao.framework.file.core.client.impl.s3.S3FileClientConfig.ENDPOINT_QINIU;
 
 /**
- * 基于 S3 协议，实现 MinIO、阿里云、腾讯云、七牛云、华为云等云服务
+ * 基于 S3 协议的文件客户端，实现 MinIO、阿里云、腾讯云、七牛云、华为云等云服务
  *
  * S3 协议的客户端，采用亚马逊提供的 software.amazon.awssdk.s3 库
  *
@@ -84,12 +86,18 @@ public class S3FileClient extends AbstractFileClient<S3FileClientConfig> {
 
     @Override
     public void delete(String path) {
-
+        DeleteObjectRequest.Builder request = DeleteObjectRequest.builder()
+                .bucket(config.getBucket()) // bucket 必须传递
+                .key(path); // 相对路径作为 key
+        client.deleteObject(request.build());
     }
 
     @Override
     public byte[] getContent(String path) {
-        return new byte[0];
+        GetObjectRequest.Builder request = GetObjectRequest.builder()
+                .bucket(config.getBucket()) // bucket 必须传递
+                .key(path); // 相对路径作为 key
+        return client.getObjectAsBytes(request.build()).asByteArray();
     }
 
 }

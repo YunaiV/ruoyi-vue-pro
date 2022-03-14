@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.framework.file.core.client.impl;
 
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.file.core.client.FileClient;
 import cn.iocoder.yudao.framework.file.core.client.FileClientConfig;
 import lombok.extern.slf4j.Slf4j;
@@ -53,6 +54,18 @@ public abstract class AbstractFileClient<Config extends FileClientConfig> implem
     @Override
     public Long getId() {
         return id;
+    }
+
+    /**
+     * 格式化文件的 URL 访问地址
+     * 使用场景：local、ftp、db，通过 FileController 的 getFile 来获取文件内容
+     *
+     * @param domain 自定义域名
+     * @param path 文件路径
+     * @return URL 访问地址
+     */
+    protected String formatFileUrl(String domain, String path) {
+        return StrUtil.format("{}/system-api/{}/get/{}", domain, getId(), path);
     }
 
 }

@@ -57,10 +57,15 @@ public class FileController {
         return success(true);
     }
 
-    @GetMapping("/get/{path}")
+    @GetMapping("/{configId}/get/{path}")
     @ApiOperation("下载文件")
-    @ApiImplicitParam(name = "path", value = "文件附件", required = true, dataTypeClass = MultipartFile.class)
-    public void getFile(HttpServletResponse response, @PathVariable("path") String path) throws IOException {
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "configId", value = "配置编号",  required = true, dataTypeClass = String.class),
+            @ApiImplicitParam(name = "path", value = "文件路径", required = true, dataTypeClass = String.class)
+    })
+    public void getFile(HttpServletResponse response,
+                        @PathVariable("configId") String configId,
+                        @PathVariable("path") String path) throws IOException {
         FileDO file = fileService.getFile(path);
         if (file == null) {
             log.warn("[getFile][path({}) 文件不存在]", path);
