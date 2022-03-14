@@ -2,8 +2,6 @@ package cn.iocoder.yudao.framework.file.core.client.sftp;
 
 import cn.hutool.core.io.resource.ResourceUtil;
 import cn.hutool.core.util.IdUtil;
-import cn.iocoder.yudao.framework.file.core.client.impl.sftp.SftpFileClient;
-import cn.iocoder.yudao.framework.file.core.client.impl.sftp.SftpFileClientConfig;
 import org.junit.jupiter.api.Test;
 
 public class SftpFileClientTest {

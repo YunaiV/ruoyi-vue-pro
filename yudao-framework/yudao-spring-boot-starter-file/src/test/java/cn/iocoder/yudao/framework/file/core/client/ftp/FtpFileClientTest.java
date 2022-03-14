@@ -3,8 +3,6 @@ package cn.iocoder.yudao.framework.file.core.client.ftp;
 import cn.hutool.core.io.resource.ResourceUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.extra.ftp.FtpMode;
-import cn.iocoder.yudao.framework.file.core.client.impl.ftp.FtpFileClient;
-import cn.iocoder.yudao.framework.file.core.client.impl.ftp.FtpFileClientConfig;
 import org.junit.jupiter.api.Test;
 
 public class FtpFileClientTest {

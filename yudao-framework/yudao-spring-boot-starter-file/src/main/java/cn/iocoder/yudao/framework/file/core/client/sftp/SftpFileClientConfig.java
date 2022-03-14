@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.framework.file.core.client.impl.sftp;
+package cn.iocoder.yudao.framework.file.core.client.sftp;
 
 import cn.iocoder.yudao.framework.file.core.client.FileClientConfig;
 import lombok.Data;

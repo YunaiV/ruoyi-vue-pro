@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.framework.file.core.client.impl.local;
+package cn.iocoder.yudao.framework.file.core.client.local;
 
 import cn.iocoder.yudao.framework.file.core.client.FileClientConfig;
 import lombok.Data;

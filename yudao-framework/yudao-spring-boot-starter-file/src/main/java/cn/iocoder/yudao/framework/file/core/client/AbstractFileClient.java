@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.framework.file.core.client.impl;
+package cn.iocoder.yudao.framework.file.core.client;
 
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.file.core.client.FileClient;

@@ -1,7 +1,7 @@
-package cn.iocoder.yudao.framework.file.core.client.impl.s3;
+package cn.iocoder.yudao.framework.file.core.client.s3;
 
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.framework.file.core.client.impl.AbstractFileClient;
+import cn.iocoder.yudao.framework.file.core.client.AbstractFileClient;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.core.sync.RequestBody;
@@ -13,7 +13,7 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.net.URI;
 
-import static cn.iocoder.yudao.framework.file.core.client.impl.s3.S3FileClientConfig.ENDPOINT_QINIU;
+import static cn.iocoder.yudao.framework.file.core.client.s3.S3FileClientConfig.ENDPOINT_QINIU;
 
 /**
  * 基于 S3 协议的文件客户端，实现 MinIO、阿里云、腾讯云、七牛云、华为云等云服务

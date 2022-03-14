@@ -1,18 +1,22 @@
-package cn.iocoder.yudao.framework.file.core.client.impl.local;
+package cn.iocoder.yudao.framework.file.core.client.sftp;
 
 import cn.hutool.core.io.FileUtil;
-import cn.iocoder.yudao.framework.file.core.client.impl.AbstractFileClient;
+import cn.hutool.extra.ssh.Sftp;
+import cn.iocoder.yudao.framework.common.util.io.FileUtils;
+import cn.iocoder.yudao.framework.file.core.client.AbstractFileClient;
 
 import java.io.File;
 
 /**
- * 本地文件客户端
+ * Sftp 文件客户端
  *
  * @author 芋道源码
  */
-public class LocalFileClient extends AbstractFileClient<LocalFileClientConfig> {
+public class SftpFileClient extends AbstractFileClient<SftpFileClientConfig> {
 
-    public LocalFileClient(Long id, LocalFileClientConfig config) {
+    private Sftp sftp;
+
+    public SftpFileClient(Long id, SftpFileClientConfig config) {
         super(id, config);
     }
 
@@ -22,13 +26,16 @@ public class LocalFileClient extends AbstractFileClient<LocalFileClientConfig> {
         if (!config.getBasePath().endsWith(File.separator)) {
             config.setBasePath(config.getBasePath() + File.separator);
         }
+        // 初始化 Ftp 对象
+        this.sftp = new Sftp(config.getHost(), config.getPort(), config.getUsername(), config.getPassword());
     }
 
     @Override
     public String upload(byte[] content, String path) {
         // 执行写入
         String filePath = getFilePath(path);
-        FileUtil.writeBytes(content, filePath);
+        File file = FileUtils.createTempFile(content);
+        sftp.upload(filePath, file);
         // 拼接返回路径
         return super.formatFileUrl(config.getDomain(), path);
     }
@@ -36,13 +43,15 @@ public class LocalFileClient extends AbstractFileClient<LocalFileClientConfig> {
     @Override
     public void delete(String path) {
         String filePath = getFilePath(path);
-        FileUtil.del(filePath);
+        sftp.delFile(filePath);
     }
 
     @Override
     public byte[] getContent(String path) {
         String filePath = getFilePath(path);
-        return FileUtil.readBytes(filePath);
+        File destFile = FileUtils.createTempFile();
+        sftp.download(filePath, destFile);
+        return FileUtil.readBytes(destFile);
     }
 
     private String getFilePath(String path) {

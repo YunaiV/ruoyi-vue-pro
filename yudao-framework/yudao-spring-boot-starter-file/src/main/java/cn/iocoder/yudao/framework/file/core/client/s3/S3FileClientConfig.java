@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.framework.file.core.client.impl.s3;
+package cn.iocoder.yudao.framework.file.core.client.s3;
 
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.file.core.client.FileClientConfig;

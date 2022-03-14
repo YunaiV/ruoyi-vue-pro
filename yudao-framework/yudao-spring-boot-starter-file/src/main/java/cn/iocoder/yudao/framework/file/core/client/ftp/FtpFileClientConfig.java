@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.framework.file.core.client.impl.ftp;
+package cn.iocoder.yudao.framework.file.core.client.ftp;
 
 import cn.iocoder.yudao.framework.file.core.client.FileClientConfig;
 import lombok.Data;

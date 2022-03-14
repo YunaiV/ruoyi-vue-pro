@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.framework.file.core.client.impl.ftp;
+package cn.iocoder.yudao.framework.file.core.client.ftp;
 
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.CharsetUtil;
@@ -6,7 +6,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.ftp.Ftp;
 import cn.hutool.extra.ftp.FtpException;
 import cn.hutool.extra.ftp.FtpMode;
-import cn.iocoder.yudao.framework.file.core.client.impl.AbstractFileClient;
+import cn.iocoder.yudao.framework.file.core.client.AbstractFileClient;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

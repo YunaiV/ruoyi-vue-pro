@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.framework.file.core.client.impl.s3;
+package cn.iocoder.yudao.framework.file.core.client.s3;
 
 import software.amazon.awssdk.core.interceptor.Context;
 import software.amazon.awssdk.core.interceptor.ExecutionAttributes;

@@ -2,8 +2,6 @@ package cn.iocoder.yudao.framework.file.core.client.local;
 
 import cn.hutool.core.io.resource.ResourceUtil;
 import cn.hutool.core.util.IdUtil;
-import cn.iocoder.yudao.framework.file.core.client.impl.local.LocalFileClient;
-import cn.iocoder.yudao.framework.file.core.client.impl.local.LocalFileClientConfig;
 import org.junit.jupiter.api.Test;
 
 public class LocalFileClientTest {
