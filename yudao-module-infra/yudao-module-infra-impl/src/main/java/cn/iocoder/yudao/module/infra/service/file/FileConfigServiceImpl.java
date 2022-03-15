@@ -22,6 +22,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.PostConstruct;
@@ -33,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.infra.enums.ErrorCodeConstants.FILE_CONFIG_DELETE_FAIL_MASTER;
 import static cn.iocoder.yudao.module.infra.enums.ErrorCodeConstants.FILE_CONFIG_NOT_EXISTS;
 
 /**
@@ -151,13 +155,23 @@ public class FileConfigServiceImpl implements FileConfigService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void updateFileConfigMaster(Long id) {
         // 校验存在
         this.validateFileConfigExists(id);
+        // 更新其它为非 master
+        fileConfigMapper.updateBatch(new FileConfigDO().setMaster(false));
         // 更新
         fileConfigMapper.updateById(new FileConfigDO().setId(id).setMaster(true));
         // 发送刷新配置的消息
-        fileConfigProducer.sendFileConfigRefreshMessage();
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+
+            @Override
+            public void afterCommit() {
+                fileConfigProducer.sendFileConfigRefreshMessage();
+            }
+
+        });
     }
 
     private FileClientConfig parseClientConfig(Integer storage, Map<String, Object> config) {
@@ -174,7 +188,10 @@ public class FileConfigServiceImpl implements FileConfigService {
     @Override
     public void deleteFileConfig(Long id) {
         // 校验存在
-        this.validateFileConfigExists(id);
+        FileConfigDO config = this.validateFileConfigExists(id);
+        if (Boolean.TRUE.equals(config.getMaster())) {
+             throw exception(FILE_CONFIG_DELETE_FAIL_MASTER);
+        }
         // 删除
         fileConfigMapper.deleteById(id);
         // 发送刷新配置的消息

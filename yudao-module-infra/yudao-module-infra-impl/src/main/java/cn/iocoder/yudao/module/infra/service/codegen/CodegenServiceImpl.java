@@ -15,7 +15,6 @@ import cn.iocoder.yudao.module.infra.dal.mysql.codegen.CodegenTableMapper;
 import cn.iocoder.yudao.module.infra.dal.mysql.codegen.SchemaColumnMapper;
 import cn.iocoder.yudao.module.infra.dal.mysql.codegen.SchemaTableMapper;
 import cn.iocoder.yudao.module.infra.enums.codegen.CodegenImportTypeEnum;
-import cn.iocoder.yudao.module.infra.enums.codegen.CodegenSceneEnum;
 import cn.iocoder.yudao.module.infra.framework.codegen.config.CodegenProperties;
 import cn.iocoder.yudao.module.infra.service.codegen.inner.CodegenBuilder;
 import cn.iocoder.yudao.module.infra.service.codegen.inner.CodegenEngine;
@@ -26,7 +25,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -81,10 +83,7 @@ public class CodegenServiceImpl implements CodegenService {
         codegenTableMapper.insert(table);
         // 构建 CodegenColumnDO 数组，插入到 DB 中
         List<CodegenColumnDO> columns = codegenBuilder.buildColumns(schemaColumns);
-        columns.forEach(column -> {
-            column.setTableId(table.getId());
-            codegenColumnMapper.insert(column); // TODO 批量插入
-        });
+        codegenColumnMapper.insertBatch(columns);
         return table.getId();
     }
 
@@ -198,10 +197,7 @@ public class CodegenServiceImpl implements CodegenService {
 
         // 插入新增的字段
         List<CodegenColumnDO> columns = codegenBuilder.buildColumns(schemaColumns);
-        columns.forEach(column -> {
-            column.setTableId(tableId);
-            codegenColumnMapper.insert(column); // TODO 批量插入
-        });
+        codegenColumnMapper.insertBatch(columns);
         // 删除不存在的字段
         if (CollUtil.isNotEmpty(deleteColumnIds)) {
             codegenColumnMapper.deleteBatchIds(deleteColumnIds);

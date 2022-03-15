@@ -19,12 +19,16 @@ public class FileConfigRespVO extends FileConfigBaseVO {
     @ApiModelProperty(value = "编号", required = true, example = "1")
     private Long id;
 
-    @ApiModelProperty(value = "存储配置", required = true)
-    private FileClientConfig config;
+    @ApiModelProperty(value = "存储器", required = true, example = "1", notes = "参见 FileStorageEnum 枚举类")
+    @NotNull(message = "存储器不能为空")
+    private Integer storage;
 
     @ApiModelProperty(value = "是否为主配置", required = true, example = "true")
     @NotNull(message = "是否为主配置不能为空")
     private Boolean master;
+
+    @ApiModelProperty(value = "存储配置", required = true)
+    private FileClientConfig config;
 
     @ApiModelProperty(value = "创建时间", required = true)
     private Date createTime;

@@ -47,5 +47,6 @@ public interface ErrorCodeConstants {
 
     // ========== 文件配置 1001006000 ==========
     ErrorCode FILE_CONFIG_NOT_EXISTS = new ErrorCode(1001006000, "文件配置不存在");
+    ErrorCode FILE_CONFIG_DELETE_FAIL_MASTER = new ErrorCode(1001006001, "该文件配置不允许删除，原因：它是主配置，删除会导致无法上传文件");
 
 }
