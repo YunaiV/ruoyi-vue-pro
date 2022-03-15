@@ -2,6 +2,7 @@ package cn.iocoder.yudao.framework.file.core.client.s3;
 
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.file.core.client.FileClientConfig;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.hibernate.validator.constraints.URL;
 
@@ -70,11 +71,12 @@ public class S3FileClientConfig implements FileClientConfig {
     @NotNull(message = "accessSecret 不能为空")
     private String accessSecret;
 
-    @AssertTrue(message = "domain 不能为空")
     @SuppressWarnings("RedundantIfStatement")
+    @AssertTrue(message = "domain 不能为空")
+    @JsonIgnore
     public boolean isDomainValid() {
         // 如果是七牛，必须带有 domain
-        if (endpoint.contains(ENDPOINT_QINIU) && StrUtil.isEmpty(domain)) {
+        if (StrUtil.contains(endpoint, ENDPOINT_QINIU) && StrUtil.isEmpty(domain)) {
             return false;
         }
         return true;

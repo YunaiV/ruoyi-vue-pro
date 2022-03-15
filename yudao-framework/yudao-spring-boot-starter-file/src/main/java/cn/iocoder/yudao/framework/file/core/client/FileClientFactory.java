@@ -5,10 +5,10 @@ public interface FileClientFactory {
     /**
      * 获得文件客户端
      *
-     * @param channelId 渠道编号
+     * @param configId 配置编号
      * @return 文件客户端
      */
-    FileClient getFileClient(Long channelId);
+    FileClient getFileClient(Long configId);
 
     /**
      * 创建文件客户端
