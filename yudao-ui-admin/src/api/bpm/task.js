@@ -39,6 +39,13 @@ export function rejectTask(data) {
     data: data
   })
 }
+export function backTask(data) {
+  return request({
+    url: '/bpm/task/back',
+    method: 'PUT',
+    data: data
+  })
+}
 
 export function updateTaskAssignee(data) {
   return request({

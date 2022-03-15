@@ -88,6 +88,23 @@ public class LeaveFormKeyTest extends AbstractOATest {
     }
 
     /**
+     * 任意流程的跳转
+     */
+    @Test
+    public void taskJump(){
+        // 当前任务
+        String taskId="ddd";
+        Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
+        String assignee = "下一个自由跳转人";
+        taskService.setAssignee(taskId,assignee);
+        // 自由跳转
+        String taskDefKey="目标-任务名称";
+        //moveActivityIdTo的两个参数，源任务key,目标任务key
+        runtimeService.createChangeActivityStateBuilder().processInstanceId(task.getProcessInstanceId()).moveActivityIdTo(task.getTaskDefinitionKey(), taskDefKey).changeState();
+
+    }
+
+    /**
      * 领导驳回后申请人取消申请
      */
     @Test
