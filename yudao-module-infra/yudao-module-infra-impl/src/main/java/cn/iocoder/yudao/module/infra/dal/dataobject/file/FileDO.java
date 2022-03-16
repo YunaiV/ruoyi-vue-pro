@@ -1,9 +1,7 @@
 package cn.iocoder.yudao.module.infra.dal.dataobject.file;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
@@ -27,8 +25,7 @@ public class FileDO extends BaseDO {
     /**
      * 编号，数据库自增
      */
-    @TableId(type = IdType.INPUT)
-    private String id;
+    private Long id;
     /**
      * 配置编号
      *
@@ -40,6 +37,10 @@ public class FileDO extends BaseDO {
      */
     private String path;
     /**
+     * 访问地址
+     */
+    private String url;
+    /**
      * 文件类型
      *
      * 通过 {@link cn.hutool.core.io.FileTypeUtil#getType(InputStream)} 获取
@@ -47,17 +48,8 @@ public class FileDO extends BaseDO {
     @TableField(value = "`type`")
     private String type;
     /**
-     * 访问地址
-     */
-    private String url;
-    /**
      * 文件大小
      */
     private Integer size;
-    /**
-     * 文件内容
-     */
-    @Deprecated
-    private byte[] content;
 
 }

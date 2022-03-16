@@ -18,24 +18,31 @@ public class DBFileClient extends AbstractFileClient<DBFileClientConfig> {
 
     @Override
     protected void doInit() {
-        dao = SpringUtil.getBean(DBFileContentFrameworkDAO.class);
     }
 
     @Override
     public String upload(byte[] content, String path) {
-        dao.insert(getId(), path, content);
+        getDao().insert(getId(), path, content);
         // 拼接返回路径
         return super.formatFileUrl(config.getDomain(), path);
     }
 
     @Override
     public void delete(String path) {
-        dao.delete(getId(), path);
+        getDao().delete(getId(), path);
     }
 
     @Override
     public byte[] getContent(String path) {
-        return dao.selectContent(getId(), path);
+        return getDao().selectContent(getId(), path);
+    }
+
+    private DBFileContentFrameworkDAO getDao() {
+        // 延迟获取，因为 SpringUtil 初始化太慢
+        if (dao == null) {
+            dao = SpringUtil.getBean(DBFileContentFrameworkDAO.class);
+        }
+        return dao;
     }
 
 }

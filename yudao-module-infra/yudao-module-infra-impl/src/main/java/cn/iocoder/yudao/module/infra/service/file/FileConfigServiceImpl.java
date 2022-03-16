@@ -233,4 +233,9 @@ public class FileConfigServiceImpl implements FileConfigService {
         return fileClientFactory.getFileClient(id).upload(content, IdUtil.fastSimpleUUID() + ".jpg");
     }
 
+    @Override
+    public FileClient getFileClient(Long id) {
+        return fileClientFactory.getFileClient(id);
+    }
+
 }

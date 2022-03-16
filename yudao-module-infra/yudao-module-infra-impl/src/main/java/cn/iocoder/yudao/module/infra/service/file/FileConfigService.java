@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.infra.service.file;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.file.core.client.FileClient;
 import cn.iocoder.yudao.module.infra.controller.admin.file.vo.config.FileConfigCreateReqVO;
 import cn.iocoder.yudao.module.infra.controller.admin.file.vo.config.FileConfigPageReqVO;
 import cn.iocoder.yudao.module.infra.controller.admin.file.vo.config.FileConfigUpdateReqVO;
@@ -82,5 +83,20 @@ public interface FileConfigService {
      * @return 文件 URL
      */
     String testFileConfig(Long id);
+
+    /**
+     * 获得指定编号的文件客户端
+     *
+     * @param id 配置编号
+     * @return 文件客户端
+     */
+    FileClient getFileClient(Long id);
+
+    /**
+     * 获得 Master 文件客户端
+     *
+     * @return 文件客户端
+     */
+    FileClient getMasterFileClient();
 
 }

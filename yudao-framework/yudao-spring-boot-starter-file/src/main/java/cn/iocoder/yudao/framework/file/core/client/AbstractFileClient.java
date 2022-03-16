@@ -1,8 +1,6 @@
 package cn.iocoder.yudao.framework.file.core.client;
 
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.framework.file.core.client.FileClient;
-import cn.iocoder.yudao.framework.file.core.client.FileClientConfig;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -65,7 +63,7 @@ public abstract class AbstractFileClient<Config extends FileClientConfig> implem
      * @return URL 访问地址
      */
     protected String formatFileUrl(String domain, String path) {
-        return StrUtil.format("{}/system-api/{}/get/{}", domain, getId(), path);
+        return StrUtil.format("{}/admin-api/infra/file/{}/get/{}", domain, getId(), path);
     }
 
 }

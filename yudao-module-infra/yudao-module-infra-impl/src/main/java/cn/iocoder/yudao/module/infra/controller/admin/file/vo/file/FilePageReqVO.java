@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.infra.controller.admin.file.vo;
+package cn.iocoder.yudao.module.infra.controller.admin.file.vo.file;
 
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import io.swagger.annotations.ApiModel;
@@ -19,7 +19,7 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 public class FilePageReqVO extends PageParam {
 
     @ApiModelProperty(value = "文件路径", example = "yudao", notes = "模糊匹配")
-    private String id;
+    private String path;
 
     @ApiModelProperty(value = "文件类型", example = "jpg", notes = "模糊匹配")
     private String type;
