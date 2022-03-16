@@ -18,6 +18,7 @@ import cn.iocoder.yudao.module.infra.convert.file.FileConfigConvert;
 import cn.iocoder.yudao.module.infra.dal.dataobject.file.FileConfigDO;
 import cn.iocoder.yudao.module.infra.dal.mysql.file.FileConfigMapper;
 import cn.iocoder.yudao.module.infra.mq.producer.file.FileConfigProducer;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -58,6 +59,7 @@ public class FileConfigServiceImpl implements FileConfigService {
     /**
      * 缓存菜单的最大更新时间，用于后续的增量轮询，判断是否有更新
      */
+    @Getter
     private volatile Date maxUpdateTime;
 
     @Resource
@@ -65,6 +67,7 @@ public class FileConfigServiceImpl implements FileConfigService {
     /**
      * Master FileClient 对象，有且仅有一个，即 {@link FileConfigDO#getMaster()} 对应的
      */
+    @Getter
     private FileClient masterFileClient;
 
     @Resource
