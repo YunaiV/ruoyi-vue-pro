@@ -4,8 +4,8 @@ import cn.hutool.core.io.IoUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
-import cn.iocoder.yudao.module.infra.controller.admin.file.vo.FilePageReqVO;
-import cn.iocoder.yudao.module.infra.controller.admin.file.vo.FileRespVO;
+import cn.iocoder.yudao.module.infra.controller.admin.file.vo.file.FilePageReqVO;
+import cn.iocoder.yudao.module.infra.controller.admin.file.vo.file.FileRespVO;
 import cn.iocoder.yudao.module.infra.convert.file.FileConvert;
 import cn.iocoder.yudao.module.infra.dal.dataobject.file.FileDO;
 import cn.iocoder.yudao.module.infra.service.file.FileService;
@@ -50,24 +50,29 @@ public class FileController {
 
     @DeleteMapping("/delete")
     @ApiOperation("删除文件")
-    @ApiImplicitParam(name = "id", value = "编号", required = true, dataTypeClass = String.class)
+    @ApiImplicitParam(name = "id", value = "编号", required = true, dataTypeClass = Long.class)
     @PreAuthorize("@ss.hasPermission('infra:file:delete')")
-    public CommonResult<Boolean> deleteFile(@RequestParam("id") String id) {
+    public CommonResult<Boolean> deleteFile(@RequestParam("id") Long id) {
         fileService.deleteFile(id);
         return success(true);
     }
 
-    @GetMapping("/get/{path}")
+    @GetMapping("/{configId}/get/{path}")
     @ApiOperation("下载文件")
-    @ApiImplicitParam(name = "path", value = "文件附件", required = true, dataTypeClass = MultipartFile.class)
-    public void getFile(HttpServletResponse response, @PathVariable("path") String path) throws IOException {
-        FileDO file = fileService.getFile(path);
-        if (file == null) {
-            log.warn("[getFile][path({}) 文件不存在]", path);
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "configId", value = "配置编号",  required = true, dataTypeClass = Long.class),
+            @ApiImplicitParam(name = "path", value = "文件路径", required = true, dataTypeClass = String.class)
+    })
+    public void getFileContent(HttpServletResponse response,
+                               @PathVariable("configId") Long configId,
+                               @PathVariable("path") String path) throws IOException {
+        byte[] content = fileService.getFileContent(configId, path);
+        if (content == null) {
+            log.warn("[getFileContent][configId({}) path({}) 文件不存在]", configId, path);
             response.setStatus(HttpStatus.NOT_FOUND.value());
             return;
         }
-        ServletUtils.writeAttachment(response, path, file.getContent());
+        ServletUtils.writeAttachment(response, path, content);
     }
 
     @GetMapping("/page")

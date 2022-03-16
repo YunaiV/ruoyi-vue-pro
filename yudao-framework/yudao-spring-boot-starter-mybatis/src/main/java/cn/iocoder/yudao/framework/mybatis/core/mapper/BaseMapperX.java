@@ -80,4 +80,7 @@ public interface BaseMapperX<T> extends BaseMapper<T> {
         entities.forEach(this::insert);
     }
 
+    default void updateBatch(T update) {
+        update(update, new QueryWrapper<>());
+    }
 }
