@@ -6,11 +6,6 @@
       <el-form-item label="文件路径" prop="path">
         <el-input v-model="queryParams.path" placeholder="请输入文件路径" clearable size="small" @keyup.enter.native="handleQuery"/>
       </el-form-item>
-      <el-form-item label="文件类型" prop="type">
-        <el-select v-model="queryParams.type" placeholder="请选择文件类型" clearable size="small">
-          <el-option label="请选择字典生成" value="" />
-        </el-select>
-      </el-form-item>
       <el-form-item label="创建时间">
         <el-date-picker v-model="dateRangeCreateTime" size="small" style="width: 240px" value-format="yyyy-MM-dd"
                         type="daterange" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" />
