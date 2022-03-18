@@ -136,7 +136,12 @@ public class RoleServiceImpl implements RoleService {
         role.setDataScope(DataScopeEnum.ALL.getScope()); // 默认可查看所有数据。原因是，可能一些项目不需要项目权限
         roleMapper.insert(role);
         // 发送刷新消息
-        roleProducer.sendRoleRefreshMessage();
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+                roleProducer.sendRoleRefreshMessage();
+            }
+        });
         // 返回
         return role.getId();
     }
