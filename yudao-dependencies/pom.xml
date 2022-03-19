@@ -28,7 +28,7 @@
         <dynamic-datasource.version>3.5.0</dynamic-datasource.version>
         <redisson.version>3.16.6</redisson.version>
         <!-- Config 配置中心相关 -->
-        <apollo.version>1.7.0</apollo.version>
+        <apollo.version>1.9.2</apollo.version>
         <!-- Job 定时任务相关 -->
         <!-- 服务保障相关 -->
         <lock4j.version>2.2.0</lock4j.version>
@@ -52,6 +52,7 @@
         <velocity.version>2.2</velocity.version>
         <screw.version>1.0.5</screw.version>
         <guava.version>30.1.1-jre</guava.version>
+        <guice.version>5.1.0</guice.version>
         <transmittable-thread-local.version>2.12.2</transmittable-thread-local.version>
         <commons-net.version>3.8.0</commons-net.version>
         <jsch.version>0.1.55</jsch.version>
@@ -488,6 +489,12 @@
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
                 <version>${guava.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.google.inject</groupId>
+                <artifactId>guice</artifactId>
+                <version>${guice.version}</version>
             </dependency>
 
             <dependency>
