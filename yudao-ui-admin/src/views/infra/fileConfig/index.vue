@@ -1,6 +1,6 @@
 <template>
   <div class="app-container">
-
+    <doc-alert title="上传下载" url="https://doc.iocoder.cn/file/" />
     <!-- 搜索工作栏 -->
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
       <el-form-item label="配置名" prop="name">

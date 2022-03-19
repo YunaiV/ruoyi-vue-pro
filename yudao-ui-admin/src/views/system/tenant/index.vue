@@ -1,6 +1,6 @@
 <template>
   <div class="app-container">
-
+    <doc-alert title="SaaS 多租户" url="https://doc.iocoder.cn/saas-tenant/" />
     <!-- 搜索工作栏 -->
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
       <el-form-item label="租户名" prop="name">

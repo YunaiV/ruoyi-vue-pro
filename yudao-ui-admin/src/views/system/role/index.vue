@@ -1,5 +1,7 @@
 <template>
   <div class="app-container">
+    <doc-alert title="功能权限" url="https://doc.iocoder.cn/resource-permission" />
+    <doc-alert title="数据权限" url="https://doc.iocoder.cn/data-permission" />
     <el-form :model="queryParams" ref="queryForm" v-show="showSearch" :inline="true">
       <el-form-item label="角色名称" prop="name">
         <el-input v-model="queryParams.name" placeholder="请输入角色名称" clearable size="small" style="width: 240px"
