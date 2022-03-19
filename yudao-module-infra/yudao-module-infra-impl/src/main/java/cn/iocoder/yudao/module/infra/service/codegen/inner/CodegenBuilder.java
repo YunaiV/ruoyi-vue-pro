@@ -133,9 +133,12 @@ public class CodegenBuilder {
         table.setTemplateType(CodegenTemplateTypeEnum.CRUD.getType());
     }
 
-    public List<CodegenColumnDO> buildColumns(List<SchemaColumnDO> schemaColumns) {
+    public List<CodegenColumnDO> buildColumns(Long tableId, List<SchemaColumnDO> schemaColumns) {
         List<CodegenColumnDO> columns = CodegenConvert.INSTANCE.convertList(schemaColumns);
-        columns.forEach(this::initColumnDefault);
+        for (CodegenColumnDO column : columns) {
+            column.setTableId(tableId);
+            initColumnDefault(column);
+        }
         return columns;
     }
 

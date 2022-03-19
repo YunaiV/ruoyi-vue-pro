@@ -82,7 +82,7 @@ public class CodegenServiceImpl implements CodegenService {
         table.setAuthor(userApi.getUser(userId).getNickname());
         codegenTableMapper.insert(table);
         // 构建 CodegenColumnDO 数组，插入到 DB 中
-        List<CodegenColumnDO> columns = codegenBuilder.buildColumns(schemaColumns);
+        List<CodegenColumnDO> columns = codegenBuilder.buildColumns(table.getId(), schemaColumns);
         codegenColumnMapper.insertBatch(columns);
         return table.getId();
     }
@@ -196,7 +196,7 @@ public class CodegenServiceImpl implements CodegenService {
         }
 
         // 插入新增的字段
-        List<CodegenColumnDO> columns = codegenBuilder.buildColumns(schemaColumns);
+        List<CodegenColumnDO> columns = codegenBuilder.buildColumns(tableId, schemaColumns);
         codegenColumnMapper.insertBatch(columns);
         // 删除不存在的字段
         if (CollUtil.isNotEmpty(deleteColumnIds)) {
