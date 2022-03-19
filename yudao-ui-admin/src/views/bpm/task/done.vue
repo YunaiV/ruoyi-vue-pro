@@ -1,5 +1,6 @@
 <template>
   <div class="app-container">
+    <doc-alert title="工作流" url="https://doc.iocoder.cn/bpm" />
 
     <!-- 搜索工作栏 -->
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
@@ -24,7 +25,7 @@
       <el-table-column label="流程发起人" align="center" prop="processInstance.startUserNickname" width="120" />
       <el-table-column label="结果" align="center" prop="result">
         <template slot-scope="scope">
-          <dict-tag :type="DICT_TYPE.COMMON_STATUS" :value="scope.row.result"/>
+          <dict-tag :type="DICT_TYPE.BPM_PROCESS_INSTANCE_RESULT" :value="scope.row.result"/>
         </template>
       </el-table-column>
       <el-table-column label="审批意见" align="center" prop="comment" width="200" />

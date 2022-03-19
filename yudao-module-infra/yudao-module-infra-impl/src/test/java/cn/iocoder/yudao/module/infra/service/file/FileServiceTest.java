@@ -70,7 +70,7 @@ public class FileServiceTest extends BaseDbUnitTest {
     }
 
     @Test
-    public void testCreateFile_success() {
+    public void testCreateFile_success() throws Exception {
         // 准备参数
         String path = randomString();
         byte[] content = ResourceUtil.readBytes("file/erweima.jpg");
@@ -95,7 +95,7 @@ public class FileServiceTest extends BaseDbUnitTest {
     }
 
     @Test
-    public void testDeleteFile_success() {
+    public void testDeleteFile_success() throws Exception {
         // mock 数据
         FileDO dbFile = randomPojo(FileDO.class, o -> o.setConfigId(10L).setPath("tudou.jpg"));
         fileMapper.insert(dbFile);// @Sql: 先插入出一条存在的数据
@@ -123,7 +123,7 @@ public class FileServiceTest extends BaseDbUnitTest {
     }
 
     @Test
-    public void testGetFileContent() {
+    public void testGetFileContent() throws Exception {
         // 准备参数
         Long configId = 10L;
         String path = "tudou.jpg";

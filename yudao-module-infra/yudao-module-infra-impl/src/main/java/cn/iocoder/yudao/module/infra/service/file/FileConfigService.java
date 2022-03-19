@@ -82,7 +82,7 @@ public interface FileConfigService {
      * @param id 编号
      * @return 文件 URL
      */
-    String testFileConfig(Long id);
+    String testFileConfig(Long id) throws Exception;
 
     /**
      * 获得指定编号的文件客户端

@@ -20,15 +20,17 @@ public interface FileClient {
      * @param content 文件流
      * @param path 相对路径
      * @return 完整路径，即 HTTP 访问地址
+     * @throws Exception 上传文件时，抛出 Exception 异常
      */
-    String upload(byte[] content, String path);
+    String upload(byte[] content, String path) throws  Exception;
 
     /**
      * 删除文件
      *
      * @param path 相对路径
+     * @throws Exception 删除文件时，抛出 Exception 异常
      */
-    void delete(String path);
+    void delete(String path) throws Exception;
 
     /**
      * 获得文件的内容
@@ -36,6 +38,6 @@ public interface FileClient {
      * @param path 相对路径
      * @return 文件的内容
      */
-    byte[] getContent(String path);
+    byte[] getContent(String path) throws Exception;
 
 }

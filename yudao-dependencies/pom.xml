@@ -14,7 +14,7 @@
     <url>https://github.com/YunaiV/ruoyi-vue-pro</url>
 
     <properties>
-        <revision>1.6.0-snapshot</revision>
+        <revision>1.6.1-snapshot</revision>
         <!-- 统一依赖管理 -->
         <spring.boot.version>2.5.10</spring.boot.version>
         <!-- Web 相关 -->
@@ -28,7 +28,7 @@
         <dynamic-datasource.version>3.5.0</dynamic-datasource.version>
         <redisson.version>3.16.6</redisson.version>
         <!-- Config 配置中心相关 -->
-        <apollo.version>1.7.0</apollo.version>
+        <apollo.version>1.9.2</apollo.version>
         <!-- Job 定时任务相关 -->
         <!-- 服务保障相关 -->
         <lock4j.version>2.2.0</lock4j.version>
@@ -52,11 +52,12 @@
         <velocity.version>2.2</velocity.version>
         <screw.version>1.0.5</screw.version>
         <guava.version>30.1.1-jre</guava.version>
+        <guice.version>5.1.0</guice.version>
         <transmittable-thread-local.version>2.12.2</transmittable-thread-local.version>
         <commons-net.version>3.8.0</commons-net.version>
         <jsch.version>0.1.55</jsch.version>
         <!-- 三方云服务相关 -->
-        <s3.version>2.17.147</s3.version>
+        <minio.version>8.2.2</minio.version>
         <aliyun-java-sdk-core.version>4.5.25</aliyun-java-sdk-core.version>
         <aliyun-java-sdk-dysmsapi.version>2.1.0</aliyun-java-sdk-dysmsapi.version>
         <yunpian-java-sdk.version>1.2.7</yunpian-java-sdk.version>
@@ -491,6 +492,12 @@
             </dependency>
 
             <dependency>
+                <groupId>com.google.inject</groupId>
+                <artifactId>guice</artifactId>
+                <version>${guice.version}</version>
+            </dependency>
+
+            <dependency>
                 <groupId>com.alibaba</groupId>
                 <artifactId>transmittable-thread-local</artifactId> <!-- 解决 ThreadLocal 父子线程的传值问题 -->
                 <version>${transmittable-thread-local.version}</version>
@@ -514,9 +521,9 @@
                 <version>${revision}</version>
             </dependency>
             <dependency>
-                <groupId>software.amazon.awssdk</groupId>
-                <artifactId>s3</artifactId>
-                <version>${s3.version}</version>
+                <groupId>io.minio</groupId>
+                <artifactId>minio</artifactId>
+                <version>${minio.version}</version>
             </dependency>
 
             <!-- SMS SDK begin -->

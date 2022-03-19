@@ -1,15 +1,10 @@
 <template>
   <div class="app-container">
-
+    <doc-alert title="上传下载" url="https://doc.iocoder.cn/file/" />
     <!-- 搜索工作栏 -->
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
       <el-form-item label="文件路径" prop="path">
         <el-input v-model="queryParams.path" placeholder="请输入文件路径" clearable size="small" @keyup.enter.native="handleQuery"/>
-      </el-form-item>
-      <el-form-item label="文件类型" prop="type">
-        <el-select v-model="queryParams.type" placeholder="请选择文件类型" clearable size="small">
-          <el-option label="请选择字典生成" value="" />
-        </el-select>
       </el-form-item>
       <el-form-item label="创建时间">
         <el-date-picker v-model="dateRangeCreateTime" size="small" style="width: 240px" value-format="yyyy-MM-dd"

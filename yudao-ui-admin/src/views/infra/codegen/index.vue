@@ -1,5 +1,6 @@
 <template>
   <div class="app-container">
+    <doc-alert title="代码生成" url="https://doc.iocoder.cn/new-feature/" />
     <!-- 操作工作栏 -->
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
       <el-form-item label="表名称" prop="tableName">

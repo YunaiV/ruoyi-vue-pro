@@ -22,7 +22,6 @@ public interface BpmMessageService {
      */
     void sendMessageWhenProcessInstanceApprove(@Valid BpmMessageSendWhenProcessInstanceApproveReqDTO reqDTO);
 
-
     /**
      * 发送流程实例被不通过的消息
      *

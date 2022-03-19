@@ -1,6 +1,6 @@
 <template>
   <div class="app-container">
-
+    <doc-alert title="上传下载" url="https://doc.iocoder.cn/file/" />
     <!-- 搜索工作栏 -->
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
       <el-form-item label="配置名" prop="name">
@@ -51,7 +51,7 @@
           <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="240">
         <template slot-scope="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
                      v-hasPermi="['infra:file-config:update']">修改</el-button>
@@ -108,9 +108,6 @@
         <!-- S3 -->
         <el-form-item v-if="form.storage === 20" label="节点地址" prop="config.endpoint">
           <el-input v-model="form.config.endpoint" placeholder="请输入节点地址" />
-        </el-form-item>
-        <el-form-item v-if="form.storage === 20" label="区域" prop="config.region">
-          <el-input v-model="form.config.region" placeholder="请输入区域" />
         </el-form-item>
         <el-form-item v-if="form.storage === 20" label="存储 bucket" prop="config.bucket">
           <el-input v-model="form.config.bucket" placeholder="请输入 bucket" />
@@ -190,7 +187,6 @@ export default {
           password: [{ required: true, message: "密码不能为空", trigger: "blur" }],
           mode: [{ required: true, message: "连接模式不能为空", trigger: "change" }],
           endpoint: [{ required: true, message: "节点地址不能为空", trigger: "blur" }],
-          region: [{ required: true, message: "区域名不能为空", trigger: "blur" }],
           bucket: [{ required: true, message: "存储 bucket 不能为空", trigger: "blur" }],
           accessKey: [{ required: true, message: "accessKey 不能为空", trigger: "blur" }],
           accessSecret: [{ required: true, message: "accessSecret 不能为空", trigger: "blur" }],

@@ -225,7 +225,7 @@ public class FileConfigServiceImpl implements FileConfigService {
     }
 
     @Override
-    public String testFileConfig(Long id) {
+    public String testFileConfig(Long id) throws Exception {
         // 校验存在
         this.validateFileConfigExists(id);
         // 上传文件

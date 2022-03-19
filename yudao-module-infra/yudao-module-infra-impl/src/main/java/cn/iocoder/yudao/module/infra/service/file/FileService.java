@@ -26,14 +26,14 @@ public interface FileService {
      * @param content 文件内容
      * @return 文件路径
      */
-    String createFile(String path, byte[] content);
+    String createFile(String path, byte[] content) throws Exception;
 
     /**
      * 删除文件
      *
      * @param id 编号
      */
-    void deleteFile(Long id);
+    void deleteFile(Long id) throws Exception;
 
     /**
      * 获得文件内容
@@ -42,6 +42,6 @@ public interface FileService {
      * @param path 文件路径
      * @return 文件内容
      */
-    byte[] getFileContent(Long configId, String path);
+    byte[] getFileContent(Long configId, String path) throws Exception;
 
 }
