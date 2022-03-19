@@ -21,7 +21,6 @@ public class S3FileClientTest {
         config.setDomain(null);
         // 默认 9000 endpoint
         config.setEndpoint("http://127.0.0.1:9000");
-        config.setRegion("us-east-1");
 
         // 执行上传
         testExecuteUpload(config);

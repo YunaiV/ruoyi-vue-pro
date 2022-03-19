@@ -118,7 +118,7 @@ public class AdminUserServiceImpl implements AdminUserService {
     }
 
     @Override
-    public String updateUserAvatar(Long id, InputStream avatarFile) {
+    public String updateUserAvatar(Long id, InputStream avatarFile) throws Exception {
         this.checkUserExists(id);
         // 存储文件
         String avatar = fileApi.createFile(IoUtil.readBytes(avatarFile));

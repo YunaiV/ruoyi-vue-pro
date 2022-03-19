@@ -35,7 +35,7 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public String createFile(String path, byte[] content) {
+    public String createFile(String path, byte[] content) throws Exception {
         // 上传到文件存储器
         FileClient client = fileConfigService.getMasterFileClient();
         Assert.notNull(client, "客户端(master) 不能为空");
@@ -53,7 +53,7 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public void deleteFile(Long id) {
+    public void deleteFile(Long id) throws Exception {
         // 校验存在
         FileDO file = this.validateFileExists(id);
 
@@ -75,7 +75,7 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public byte[] getFileContent(Long configId, String path) {
+    public byte[] getFileContent(Long configId, String path) throws Exception {
         FileClient client = fileConfigService.getFileClient(configId);
         Assert.notNull(client, "客户端({}) 不能为空", configId);
         return client.getContent(path);

@@ -228,7 +228,7 @@ public class FileConfigServiceImplTest extends BaseDbUnitTest {
     }
 
     @Test
-    public void testFileConfig() {
+    public void testFileConfig() throws Exception {
         // mock 数据
         FileConfigDO dbFileConfig = randomFileConfigDO().setMaster(false);
         fileConfigMapper.insert(dbFileConfig);// @Sql: 先插入出一条存在的数据

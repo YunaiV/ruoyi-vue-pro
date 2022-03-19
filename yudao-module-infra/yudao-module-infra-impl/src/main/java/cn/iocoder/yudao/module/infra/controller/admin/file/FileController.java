@@ -23,7 +23,6 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.io.IOException;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
@@ -44,7 +43,7 @@ public class FileController {
             @ApiImplicitParam(name = "path", value = "文件路径", example = "yudaoyuanma.png", dataTypeClass = String.class)
     })
     public CommonResult<String> uploadFile(@RequestParam("file") MultipartFile file,
-                                           @RequestParam("path") String path) throws IOException {
+                                           @RequestParam("path") String path) throws Exception {
         return success(fileService.createFile(path, IoUtil.readBytes(file.getInputStream())));
     }
 
@@ -52,7 +51,7 @@ public class FileController {
     @ApiOperation("删除文件")
     @ApiImplicitParam(name = "id", value = "编号", required = true, dataTypeClass = Long.class)
     @PreAuthorize("@ss.hasPermission('infra:file:delete')")
-    public CommonResult<Boolean> deleteFile(@RequestParam("id") Long id) {
+    public CommonResult<Boolean> deleteFile(@RequestParam("id") Long id) throws Exception {
         fileService.deleteFile(id);
         return success(true);
     }
@@ -65,7 +64,7 @@ public class FileController {
     })
     public void getFileContent(HttpServletResponse response,
                                @PathVariable("configId") Long configId,
-                               @PathVariable("path") String path) throws IOException {
+                               @PathVariable("path") String path) throws Exception {
         byte[] content = fileService.getFileContent(configId, path);
         if (content == null) {
             log.warn("[getFileContent][configId({}) path({}) 文件不存在]", configId, path);

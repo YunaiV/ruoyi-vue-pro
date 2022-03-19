@@ -82,7 +82,7 @@ public class FileConfigController {
     @GetMapping("/test")
     @ApiOperation("测试文件配置是否正确")
     @PreAuthorize("@ss.hasPermission('infra:file-config:query')")
-    public CommonResult<String> testFileConfig(@RequestParam("id") Long id) {
+    public CommonResult<String> testFileConfig(@RequestParam("id") Long id) throws Exception {
         String url = fileConfigService.testFileConfig(id);
         return success(url);
     }

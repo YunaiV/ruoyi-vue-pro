@@ -41,12 +41,6 @@ public class S3FileClientConfig implements FileClientConfig {
     @URL(message = "domain 必须是 URL 格式")
     private String domain;
     /**
-     * 区域
-     */
-//    @NotNull(message = "region 不能为空")
-    @Deprecated
-    private String region;
-    /**
      * 存储 Bucket
      */
     @NotNull(message = "bucket 不能为空")
