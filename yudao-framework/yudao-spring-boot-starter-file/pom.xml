@@ -63,8 +63,8 @@
 
         <!-- 三方云服务相关 -->
         <dependency>
-            <groupId>software.amazon.awssdk</groupId>
-            <artifactId>s3</artifactId>
+            <groupId>io.minio</groupId>
+            <artifactId>minio</artifactId>
         </dependency>
 
         <!-- Test 测试相关 -->

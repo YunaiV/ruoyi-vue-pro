@@ -3,11 +3,13 @@ package cn.iocoder.yudao.framework.file.core.client.ftp;
 import cn.hutool.core.io.resource.ResourceUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.extra.ftp.FtpMode;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 public class FtpFileClientTest {
 
     @Test
+    @Disabled
     public void test() {
         // 创建客户端
         FtpFileClientConfig config = new FtpFileClientConfig();

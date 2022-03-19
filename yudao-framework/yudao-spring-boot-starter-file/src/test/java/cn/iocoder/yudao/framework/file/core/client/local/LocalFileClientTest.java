@@ -2,11 +2,13 @@ package cn.iocoder.yudao.framework.file.core.client.local;
 
 import cn.hutool.core.io.resource.ResourceUtil;
 import cn.hutool.core.util.IdUtil;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 public class LocalFileClientTest {
 
     @Test
+    @Disabled
     public void test() {
         // 创建客户端
         LocalFileClientConfig config = new LocalFileClientConfig();
