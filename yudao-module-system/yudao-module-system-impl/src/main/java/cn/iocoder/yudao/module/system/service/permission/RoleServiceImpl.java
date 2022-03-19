@@ -116,7 +116,7 @@ public class RoleServiceImpl implements RoleService {
         if (maxUpdateTime == null) { // 如果更新时间为空，说明 DB 一定有新数据
             log.info("[loadRoleIfUpdate][首次加载全量角色]");
         } else { // 判断数据库中是否有更新的角色
-            if (!roleMapper.selectExistsByUpdateTimeAfter(maxUpdateTime)) {
+            if (roleMapper.selectExistsByUpdateTimeAfter(maxUpdateTime) == null) {
                 return null;
             }
             log.info("[loadRoleIfUpdate][增量加载全量角色]");
