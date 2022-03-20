@@ -1,21 +1,21 @@
 <template>
   <div class="app-container">
-    <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="100px">
+    <el-form :model="queryParams" ref="queryForm" size="small" inline="true" v-show="showSearch" label-width="100px">
       <el-form-item label="任务名称" prop="name">
-        <el-input v-model="queryParams.name" placeholder="请输入任务名称" clearable size="small" @keyup.enter.native="handleQuery"/>
+        <el-input v-model="queryParams.name" placeholder="请输入任务名称" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item label="任务状态" prop="status">
-        <el-select v-model="queryParams.status" placeholder="请选择任务状态" clearable size="small">
+        <el-select v-model="queryParams.status" placeholder="请选择任务状态" clearable>
           <el-option v-for="dict in this.getDictDatas(DICT_TYPE.INFRA_JOB_STATUS)"
                      :key="dict.value" :label="dict.label" :value="dict.value"/>
         </el-select>
       </el-form-item>
       <el-form-item label="处理器的名字" prop="handlerName">
-        <el-input v-model="queryParams.handlerName" placeholder="请输入处理器的名字" clearable size="small" @keyup.enter.native="handleQuery"/>
+        <el-input v-model="queryParams.handlerName" placeholder="请输入处理器的名字" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
-        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
+        <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
+        <el-button icon="el-icon-refresh" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
 

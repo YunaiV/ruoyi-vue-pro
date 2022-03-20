@@ -2,53 +2,31 @@
   <div class="app-container">
 
     <!-- 搜索工作栏 -->
-    <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="120px">
+    <el-form :model="queryParams" ref="queryForm" size="small" inline="true" v-show="showSearch" label-width="120px">
       <el-form-item label="所属商户" prop="merchantId">
-        <el-select
-          v-model="queryParams.merchantId"
-          clearable
-          @clear="()=>{queryParams.merchantId = null}"
-          filterable
-          remote
-          reserve-keyword
-          placeholder="请选择所属商户"
-          @change="handleGetAppListByMerchantId"
-          :remote-method="handleGetMerchantListByName"
-          :loading="merchantLoading">
-          <el-option
-            v-for="item in merchantList"
-            :key="item.id"
-            :label="item.name"
-            :value="item.id">
-          </el-option>
+        <el-select v-model="queryParams.merchantId" clearable @clear="()=>{queryParams.merchantId = null}"
+          filterable remote reserve-keyword placeholder="请选择所属商户"  @change="handleGetAppListByMerchantId"
+          :remote-method="handleGetMerchantListByName" :loading="merchantLoading">
+          <el-option v-for="item in merchantList" :key="item.id" :label="item.name" :value="item.id"/>
         </el-select>
       </el-form-item>
       <el-form-item label="应用编号" prop="appId">
-        <el-select
-          clearable
-          v-model="queryParams.appId"
-          filterable
-          placeholder="请选择应用信息">
-          <el-option
-            v-for="item in appList"
-            :key="item.id"
-            :label="item.name"
-            :value="item.id">
-          </el-option>
+        <el-select clearable v-model="queryParams.appId" filterable placeholder="请选择应用信息">
+          <el-option v-for="item in appList" :key="item.id" :label="item.name" :value="item.id" />
         </el-select>
       </el-form-item>
       <el-form-item label="渠道编码" prop="channelCode">
         <el-select v-model="queryParams.channelCode" placeholder="请输入渠道编码" clearable
-                   size="small" @clear="()=>{queryParams.channelCode = null}">
+                   @clear="()=>{queryParams.channelCode = null}">
           <el-option v-for="dict in payChannelCodeDictDatum" :key="dict.value" :label="dict.label" :value="dict.value"/>
         </el-select>
       </el-form-item>
       <el-form-item label="商户订单编号" prop="merchantOrderId">
-        <el-input v-model="queryParams.merchantOrderId" placeholder="请输入商户订单编号" clearable size="small"
+        <el-input v-model="queryParams.merchantOrderId" placeholder="请输入商户订单编号" clearable
                   @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item label="渠道订单号" prop="channelOrderNo">
-        <el-input v-model="queryParams.channelOrderNo" placeholder="请输入渠道订单号" clearable size="small"
+        <el-input v-model="queryParams.channelOrderNo" placeholder="请输入渠道订单号" clearable
                   @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item label="支付状态" prop="status">
@@ -58,27 +36,27 @@
         </el-select>
       </el-form-item>
       <el-form-item label="退款状态" prop="refundStatus">
-        <el-select v-model="queryParams.refundStatus" placeholder="请选择退款状态" clearable size="small">
+        <el-select v-model="queryParams.refundStatus" placeholder="请选择退款状态" clearable>
           <el-option v-for="dict in payOrderRefundDictDatum" :key="parseInt(dict.value)"
                      :label="dict.label" :value="parseInt(dict.value)"/>
         </el-select>
       </el-form-item>
       <el-form-item label="回调商户状态" prop="notifyStatus">
-        <el-select v-model="queryParams.notifyStatus" placeholder="请选择订单回调商户状态" clearable size="small">
+        <el-select v-model="queryParams.notifyStatus" placeholder="请选择订单回调商户状态" clearable>
           <el-option v-for="dict in payOrderNotifyDictDatum" :key="parseInt(dict.value)"
                      :label="dict.label" :value="parseInt(dict.value)"/>
         </el-select>
       </el-form-item>
       <el-form-item label="创建时间">
         <el-date-picker
-          v-model="dateRangeCreateTime" size="small" style="width: 350px"
+          v-model="dateRangeCreateTime" style="width: 350px"
           value-format="yyyy-MM-dd HH:mm:ss" type="datetimerange"  range-separator="-"
           :default-time="['00:00:00','23:59:59']" start-placeholder="开始日期" end-placeholder="结束日期">
         </el-date-picker>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
-        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
+        <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
+        <el-button icon="el-icon-refresh" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
 
