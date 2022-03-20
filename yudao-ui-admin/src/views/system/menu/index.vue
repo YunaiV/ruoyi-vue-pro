@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <doc-alert title="功能权限" url="https://doc.iocoder.cn/resource-permission" />
-    <el-form :model="queryParams" ref="queryForm" size="small" inline="true" v-show="showSearch">
+    <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch">
       <el-form-item label="菜单名称" prop="name">
         <el-input v-model="queryParams.name" placeholder="请输入菜单名称" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>

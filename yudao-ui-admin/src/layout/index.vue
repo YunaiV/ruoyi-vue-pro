@@ -1,8 +1,8 @@
 <template>
   <div :class="classObj" class="app-wrapper" :style="{'--current-color': theme}">
     <div v-if="device==='mobile'&&sidebar.opened" class="drawer-bg" @click="handleClickOutside"/>
-    <sidebar class="sidebar-container"/>
-    <div :class="{hasTagsView:needTagsView}" class="main-container">
+    <sidebar v-if="!sidebar.hide" class="sidebar-container" />
+    <div :class="{hasTagsView:needTagsView,sidebarHide:sidebar.hide}" class="main-container">
       <div :class="{'fixed-header':fixedHeader}">
         <navbar />
         <tags-view v-if="needTagsView" />
@@ -98,7 +98,7 @@ export default {
 }
 
 .hideSidebar .fixed-header {
-  width: calc(100% - 54px)
+  width: calc(100% - 54px);
 }
 
 .mobile .fixed-header {

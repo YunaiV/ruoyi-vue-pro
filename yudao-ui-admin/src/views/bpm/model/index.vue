@@ -3,7 +3,7 @@
     <doc-alert title="工作流" url="https://doc.iocoder.cn/bpm" />
 
     <!-- 搜索工作栏 -->
-    <el-form :model="queryParams" ref="queryForm" size="small" inline="true" v-show="showSearch" label-width="68px">
+    <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
       <el-form-item label="流程标识" prop="key">
         <el-input v-model="queryParams.key" placeholder="请输入流程标识" clearable style="width: 240px;"
                   @keyup.enter.native="handleQuery"/>

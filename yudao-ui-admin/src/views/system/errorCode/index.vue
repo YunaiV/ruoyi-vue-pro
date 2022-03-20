@@ -2,7 +2,7 @@
   <div class="app-container">
 
     <!-- 搜索工作栏 -->
-    <el-form :model="queryParams" ref="queryForm" size="small" inline="true" v-show="showSearch" label-width="100px">
+    <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="100px">
       <el-form-item label="错误码类型" prop="type">
         <el-select v-model="queryParams.type" placeholder="请选择错误码类型" clearable>
           <el-option v-for="dict in this.getDictDatas(DICT_TYPE.SYSTEM_ERROR_CODE_TYPE)"

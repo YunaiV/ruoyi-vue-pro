@@ -2,7 +2,7 @@
   <div class="app-container">
 
     <!-- 搜索工作栏 -->
-    <el-form :model="queryParams" ref="queryForm" size="small" inline="true" v-show="showSearch" label-width="100px">
+    <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="100px">
       <el-form-item label="手机号" prop="mobile">
         <el-input v-model="queryParams.mobile" placeholder="请输入手机号" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>

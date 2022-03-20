@@ -2,7 +2,7 @@
   <div class="app-container">
 
     <!-- 搜索工作栏 -->
-    <el-form :model="queryParams" ref="queryForm" size="small" inline="true" v-show="showSearch" label-width="120px">
+    <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="120px">
       <el-form-item label="所属商户" prop="merchantId">
         <el-select v-model="queryParams.merchantId" clearable @clear="()=>{queryParams.merchantId = null}"
           filterable remote reserve-keyword placeholder="请选择所属商户" @change="handleGetAppListByMerchantId"

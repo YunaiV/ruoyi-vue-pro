@@ -2,7 +2,7 @@
   <div class="app-container">
 
     <!-- 搜索工作栏 -->
-    <el-form :model="queryParams" ref="queryForm" size="small" inline="true" v-show="showSearch" label-width="68px">
+    <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
       <el-form-item label="短信签名" prop="signature">
         <el-input v-model="queryParams.signature" placeholder="请输入短信签名" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>

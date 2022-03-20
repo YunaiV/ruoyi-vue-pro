@@ -3,7 +3,7 @@
     <doc-alert title="工作流" url="https://doc.iocoder.cn/bpm" />
 
     <!-- 搜索工作栏 -->
-    <el-form :model="queryParams" ref="queryForm" size="small" inline="true" v-show="showSearch" label-width="68px">
+    <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
       <el-form-item label="请假类型" prop="type">
         <el-select v-model="queryParams.type" placeholder="请选择请假类型" clearable>
           <el-option v-for="dict in leaveTypeDictData" :key="dict.value" :label="dict.label" :value="dict.value" />
