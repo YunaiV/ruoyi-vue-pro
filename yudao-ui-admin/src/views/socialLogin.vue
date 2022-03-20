@@ -28,7 +28,6 @@
 </template>
 
 <script>
-import { socialLogin } from "@/api/login";
 import Cookies from "js-cookie";
 import { encrypt, decrypt } from '@/utils/jsencrypt'
 

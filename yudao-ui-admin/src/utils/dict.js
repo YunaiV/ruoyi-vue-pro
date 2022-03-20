@@ -96,7 +96,7 @@ export function getDictDatas2(dictType, values) {
     }
   }
   // debugger
-  console.log(results);
+  // console.log(results);
   return results;
 }
 
