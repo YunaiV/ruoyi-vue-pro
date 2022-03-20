@@ -45,7 +45,8 @@ export default {
       if (!name) {
         return false
       }
-      return name.trim() === 'Index'
+      // return name.trim() === 'Index'
+      return name.trim() === '首页' // 修复 Index 重复的问题
     },
     handleLink(item) {
       const { redirect, path } = item
