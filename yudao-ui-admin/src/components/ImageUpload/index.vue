@@ -1,6 +1,7 @@
 <template>
   <div class="component-upload-image">
     <el-upload
+      multiple
       :action="uploadImgUrl"
       list-type="picture-card"
       :on-success="handleUploadSuccess"
@@ -70,6 +71,8 @@ export default {
   },
   data() {
     return {
+      number: 0,
+      uploadList: [],
       dialogImageUrl: "",
       dialogVisible: false,
       hideUpload: false,
@@ -124,9 +127,14 @@ export default {
     },
     // 上传成功回调
     handleUploadSuccess(res) {
-      this.fileList.push({ name: res.fileName, url: res.fileName });
-      this.$emit("input", this.listToString(this.fileList));
-      this.loading.close();
+      this.uploadList.push({ name: res.fileName, url: res.fileName });
+      if (this.uploadList.length === this.number) {
+        this.fileList = this.fileList.concat(this.uploadList);
+        this.uploadList = [];
+        this.number = 0;
+        this.$emit("input", this.listToString(this.fileList));
+        this.loading.close();
+      }
     },
     // 上传前loading加载
     handleBeforeUpload(file) {
@@ -163,6 +171,7 @@ export default {
         text: "上传中",
         background: "rgba(0, 0, 0, 0.7)",
       });
+      this.number++;
     },
     // 文件个数超出
     handleExceed() {
