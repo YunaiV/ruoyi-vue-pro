@@ -71,7 +71,7 @@
           <template slot-scope="scope">
             <el-button type="success" icon="el-icon-check" circle
                        v-if="judgeChannelExist(scope.row.channelCodes,payChannelEnum.ALIPAY_PC.code)"
-                       @click="handleUpdateChannel(scope.row,payChannelEnum.ALIPAY_APP.code,payType.ALIPAY)">
+                       @click="handleUpdateChannel(scope.row,payChannelEnum.ALIPAY_PC.code,payType.ALIPAY)">
             </el-button>
             <el-button v-else
                        type="danger" icon="el-icon-close" circle
@@ -83,7 +83,7 @@
           <template slot-scope="scope">
             <el-button type="success" icon="el-icon-check" circle
                        v-if="judgeChannelExist(scope.row.channelCodes,payChannelEnum.ALIPAY_WAP.code)"
-                       @click="handleUpdateChannel(scope.row,payChannelEnum.ALIPAY_APP.code,payType.ALIPAY)">
+                       @click="handleUpdateChannel(scope.row,payChannelEnum.ALIPAY_WAP.code,payType.ALIPAY)">
             </el-button>
             <el-button v-else
                        type="danger" icon="el-icon-close" circle
@@ -95,7 +95,7 @@
           <template slot-scope="scope">
             <el-button type="success" icon="el-icon-check" circle
                        v-if="judgeChannelExist(scope.row.channelCodes,payChannelEnum.ALIPAY_QR.code)"
-                       @click="handleUpdateChannel(scope.row,payChannelEnum.ALIPAY_APP.code,payType.ALIPAY)">
+                       @click="handleUpdateChannel(scope.row,payChannelEnum.ALIPAY_QR.code,payType.ALIPAY)">
             </el-button>
             <el-button v-else
                        type="danger" icon="el-icon-close" circle
@@ -109,7 +109,7 @@
           <template slot-scope="scope">
             <el-button type="success" icon="el-icon-check" circle
                        v-if="judgeChannelExist(scope.row.channelCodes,payChannelEnum.WX_LITE.code)"
-                       @click="handleUpdateChannel(scope.row,payChannelEnum.ALIPAY_APP.code,payType.WECHAT)">
+                       @click="handleUpdateChannel(scope.row,payChannelEnum.WX_LITE.code,payType.WECHAT)">
             </el-button>
             <el-button v-else
                        type="danger" icon="el-icon-close" circle
@@ -121,7 +121,7 @@
           <template slot-scope="scope">
             <el-button type="success" icon="el-icon-check" circle
                        v-if="judgeChannelExist(scope.row.channelCodes,payChannelEnum.WX_PUB.code)"
-                       @click="handleUpdateChannel(scope.row,payChannelEnum.ALIPAY_APP.code,payType.WECHAT)">
+                       @click="handleUpdateChannel(scope.row,payChannelEnum.WX_PUB.code,payType.WECHAT)">
             </el-button>
             <el-button v-else
                        type="danger" icon="el-icon-close" circle
@@ -133,7 +133,7 @@
           <template slot-scope="scope">
             <el-button type="success" icon="el-icon-check" circle
                        v-if="judgeChannelExist(scope.row.channelCodes,payChannelEnum.WX_APP.code)"
-                       @click="handleUpdateChannel(scope.row,payChannelEnum.ALIPAY_APP.code,payType.WECHAT)">
+                       @click="handleUpdateChannel(scope.row,payChannelEnum.WX_APP.code,payType.WECHAT)">
             </el-button>
             <el-button v-else
                        type="danger" icon="el-icon-close" circle
