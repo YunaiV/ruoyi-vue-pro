@@ -96,6 +96,8 @@ export default {
         }
         // 高亮流程图
         await this.highlightDiagram();
+        const canvas = this.bpmnModeler.get('canvas');
+        canvas.zoom("fit-viewport", "auto");
       } catch (e) {
         console.error(e);
         // console.error(`[Process Designer Warn]: ${e?.message || e}`);
