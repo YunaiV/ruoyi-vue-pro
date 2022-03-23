@@ -15,6 +15,18 @@ export function login(username, password, code, uuid) {
   })
 }
 
+// 注册方法 TODO 芋艿：暂时不支持
+export function register(data) {
+  return request({
+    url: '/register',
+    headers: {
+      isToken: false
+    },
+    method: 'post',
+    data: data
+  })
+}
+
 // 获取用户详细信息
 export function getInfo() {
   return request({

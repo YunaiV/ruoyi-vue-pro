@@ -2,6 +2,11 @@
   <div class="login">
     <el-form ref="loginRef" :model="loginForm" :rules="loginRules" class="login-form">
       <h3 class="title">芋道后台管理系统</h3>
+      <el-form-item prop="tenantName" v-if="tenantEnable">
+        <el-input v-model="loginForm.tenantName" type="text" auto-complete="off" placeholder="租户">
+          <template #prefix><svg-icon icon-class="tree" class="el-input__icon input-icon" /></template>
+        </el-input>
+      </el-form-item>
       <el-form-item prop="username">
         <el-input v-model="loginForm.username" type="text" size="large" auto-complete="off" placeholder="账号">
           <template #prefix><svg-icon icon-class="user" class="el-input__icon input-icon" /></template>
@@ -40,8 +45,10 @@
 
 <script setup>
 import { getCodeImg } from "@/api/login";
+import { getTenantIdByName } from "@/api/system/tenant";
 import Cookies from "js-cookie";
 import { encrypt, decrypt } from "@/utils/jsencrypt";
+import { getTenantEnable } from "@/utils/ruoyi";
 
 const store = useStore();
 const router = useRouter();
@@ -58,11 +65,32 @@ const loginForm = ref({
 const loginRules = {
   username: [{ required: true, trigger: "blur", message: "请输入您的账号" }],
   password: [{ required: true, trigger: "blur", message: "请输入您的密码" }],
-  code: [{ required: true, trigger: "change", message: "请输入验证码" }]
+  code: [{ required: true, trigger: "change", message: "请输入验证码" }],
+  tenantName: [
+    { required: true, trigger: "blur", message: "租户不能为空" },
+    {
+      validator: (rule, value, callback) => {
+        // debugger
+        getTenantIdByName(value).then(res => {
+          const tenantId = res.data;
+          if (tenantId && tenantId >= 0) {
+            // 设置租户
+            Cookies.set("tenantId", tenantId);
+            callback();
+          } else {
+            callback('租户不存在');
+          }
+        });
+      },
+      trigger: 'blur'
+    }
+  ],
 };
 
 const codeUrl = ref("");
 const loading = ref(false);
+// 租户开关
+const tenantEnable = ref(true);
 // 验证码开关
 const captchaEnable = ref(true);
 // 注册开关
@@ -129,7 +157,11 @@ function getCookie() {
   };
 }
 
+// 租户开关
+tenantEnable.value = getTenantEnable();
+// 获得验证码
 getCode();
+// 从 Cookie 中获得变量
 getCookie();
 </script>
 

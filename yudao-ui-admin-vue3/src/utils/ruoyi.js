@@ -252,14 +252,15 @@ export async function blobValidate(data) {
  * 获得租户功能是否开启
  */
 export function getTenantEnable() {
+  debugger
   // console.log("enable: " + import.meta.env.VUE_APP_TENANT_ENABLE)
-  if (import.meta.env.VUE_APP_TENANT_ENABLE === "true") {
+  if (import.meta.env.VITE_APP_TENANT_ENABLE === "true") {
     return true;
   }
-  if (import.meta.env.VUE_APP_TENANT_ENABLE === "false") {
+  if (import.meta.env.VITE_APP_TENANT_ENABLE === "false") {
     return false;
   }
-  return import.meta.env.VUE_APP_TENANT_ENABLE || true;
+  return import.meta.env.VITE_APP_TENANT_ENABLE || true;
 }
 
 /**

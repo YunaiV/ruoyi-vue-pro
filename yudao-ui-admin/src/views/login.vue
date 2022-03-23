@@ -3,7 +3,7 @@
     <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form">
       <h3 class="title">芋道后台管理系统</h3>
       <el-form-item prop="tenantName" v-if="tenantEnable">
-        <el-input v-model="loginForm.tenantName" type="text" auto-complete="off" placeholder='租户'>
+        <el-input v-model="loginForm.tenantName" type="text" auto-complete="off" placeholder="租户">
           <svg-icon slot="prefix" icon-class="tree" class="el-input__icon input-icon" />
         </el-input>
       </el-form-item>
@@ -119,7 +119,9 @@ export default {
     this.tenantEnable = getTenantEnable();
     // 重定向地址
     this.redirect = this.$route.query.redirect;
+    // 获得验证码
     this.getCode();
+    // 从 Cookie 中获得变量
     this.getCookie();
   },
   methods: {
