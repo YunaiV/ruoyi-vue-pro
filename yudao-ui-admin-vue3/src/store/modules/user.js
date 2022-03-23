@@ -1,10 +1,10 @@
-import { login, logout, getInfo } from '@/api/login'
+import {login, logout, getInfo, socialLogin, socialLogin2} from '@/api/login'
 import { getToken, setToken, removeToken } from '@/utils/auth'
-import defAva from '@/assets/images/profile.jpg'
 
 const user = {
   state: {
     token: getToken(),
+    id: 0, // 用户编号
     name: '',
     avatar: '',
     roles: [],
@@ -12,6 +12,9 @@ const user = {
   },
 
   mutations: {
+    SET_ID: (state, id) => {
+      state.id = id
+    },
     SET_TOKEN: (state, token) => {
       state.token = token
     },
@@ -38,6 +41,43 @@ const user = {
       const uuid = userInfo.uuid
       return new Promise((resolve, reject) => {
         login(username, password, code, uuid).then(res => {
+          res = res.data;
+          setToken(res.token)
+          commit('SET_TOKEN', res.token)
+          resolve()
+        }).catch(error => {
+          reject(error)
+        })
+      })
+    },
+
+    // 社交登录
+    SocialLogin({ commit }, userInfo) {
+      const code = userInfo.code
+      const state = userInfo.state
+      const type = userInfo.type
+      return new Promise((resolve, reject) => {
+        socialLogin(type, code, state).then(res => {
+          res = res.data;
+          setToken(res.token)
+          commit('SET_TOKEN', res.token)
+          resolve()
+        }).catch(error => {
+          reject(error)
+        })
+      })
+    },
+
+    // 社交登录
+    SocialLogin2({ commit }, userInfo) {
+      const code = userInfo.code
+      const state = userInfo.state
+      const type = userInfo.type
+      const username = userInfo.username.trim()
+      const password = userInfo.password
+      return new Promise((resolve, reject) => {
+        socialLogin2(type, code, state, username, password).then(res => {
+          res = res.data;
           setToken(res.token)
           commit('SET_TOKEN', res.token)
           resolve()
@@ -51,15 +91,30 @@ const user = {
     GetInfo({ commit, state }) {
       return new Promise((resolve, reject) => {
         getInfo().then(res => {
-          const user = res.user
-          const avatar = (user.avatar == "" || user.avatar == null) ? defAva : import.meta.env.VITE_APP_BASE_API + user.avatar;
+          // 没有 data 数据，赋予个默认值
+          if (!res) {
+            res = {
+              data: {
+                roles: [],
+                user: {
+                  id: '',
+                  avatar: '',
+                  userName: ''
+                }
+              }
+            }
+          }
 
+          res = res.data; // 读取 data 数据
+          const user = res.user
+          const avatar = user.avatar === "" ? require("@/assets/images/profile.jpg") : user.avatar;
           if (res.roles && res.roles.length > 0) { // 验证返回的roles是否是一个非空数组
             commit('SET_ROLES', res.roles)
             commit('SET_PERMISSIONS', res.permissions)
           } else {
             commit('SET_ROLES', ['ROLE_DEFAULT'])
           }
+          commit('SET_ID', user.id)
           commit('SET_NAME', user.userName)
           commit('SET_AVATAR', avatar)
           resolve(res)

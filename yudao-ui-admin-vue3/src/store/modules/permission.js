@@ -56,26 +56,45 @@ const permission = {
 // 遍历后台传来的路由字符串，转换为组件对象
 function filterAsyncRouter(asyncRouterMap, lastRouter = false, type = false) {
   return asyncRouterMap.filter(route => {
+    // 将 ruoyi 后端原有耦合前端的逻辑，迁移到此处
+    // 处理 meta 属性
+    route.meta = {
+      title: route.name,
+      icon: route.icon
+    }
+    // 处理 component 属性
+    if (route.children) { // 父节点
+      // debugger
+      if (route.parentId === 0) {
+        route.component = Layout
+      } else {
+        route.component = ParentView
+      }
+    } else { // 根节点
+      route.component = loadView(route.component)
+    }
+
+    // filterChildren
     if (type && route.children) {
       route.children = filterChildren(route.children)
     }
-    if (route.component) {
-      // Layout ParentView 组件特殊处理
-      if (route.component === 'Layout') {
-        route.component = Layout
-      } else if (route.component === 'ParentView') {
-        route.component = ParentView
-      } else if (route.component === 'InnerLink') {
-        route.component = InnerLink
-      } else {
-        route.component = loadView(route.component)
-      }
-    }
+    // TODO 芋艿：未来支持更多的类型
+    // if (route.component) {
+    //   // Layout ParentView 组件特殊处理
+    //   if (route.component === 'Layout') {
+    //     route.component = Layout
+    //   } else if (route.component === 'ParentView') {
+    //     route.component = ParentView
+    //   } else if (route.component === 'InnerLink') {
+    //     route.component = InnerLink
+    //   } else {
+    //     route.component = loadView(route.component)
+    //   }
+    // }
     if (route.children != null && route.children && route.children.length) {
       route.children = filterAsyncRouter(route.children, route, type)
     } else {
       delete route['children']
-      delete route['redirect']
     }
     return true
   })
