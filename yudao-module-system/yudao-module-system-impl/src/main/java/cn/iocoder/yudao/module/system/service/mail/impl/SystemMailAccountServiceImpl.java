@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.List;
 
+// TODO @ジョイイ：类注释，应该是 邮箱账号 Service 实现类
+
 /**
  * <p>
  *  服务实现类
@@ -22,24 +24,32 @@ import java.util.List;
  */
 @Service
 public class SystemMailAccountServiceImpl  implements SystemMailAccountService {
+    // TODO @ジョイイ： private
     @Resource
-    SystemMailAccountMapper systemMailAccountMapper;
+    SystemMailAccountMapper systemMailAccountMapper;  // TODO @ジョイイ： 变量，和方法要空一行
     @Override
     public Long create(SystemMailAccountBaseVO baseVO) {
+        // TODO @ジョイイ： username 要校验唯一
         SystemMailAccountDO systemMailAccountDO = SystemMailAccountConvert.INSTANCE.convert(baseVO);
         systemMailAccountMapper.insert(systemMailAccountDO);
         return systemMailAccountDO.getId();
     }
 
+    // TODO @ジョイイ： 不用返回值，void 即可
     @Override
     public String update(SystemMailAccountBaseVO baseVO) {
+        // TODO @ジョイイ： username 要校验唯一
+        // TODO @ジョイイ： 校验是否存在
         SystemMailAccountDO systemMailAccountDO = SystemMailAccountConvert.INSTANCE.convert(baseVO);
         systemMailAccountMapper.updateById(systemMailAccountDO);
         return null;
     }
 
+    // TODO @ジョイイ： 不用返回值，void 即可
+
     @Override
     public String delete(SystemMailAccountBaseVO baseVO) {
+        // TODO @ジョイイ： 校验是否存在
         SystemMailAccountDO systemMailAccountDO = SystemMailAccountConvert.INSTANCE.convert(baseVO);
         systemMailAccountMapper.deleteById(systemMailAccountDO);
         return null;

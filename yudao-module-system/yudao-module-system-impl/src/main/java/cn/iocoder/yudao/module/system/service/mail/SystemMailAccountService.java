@@ -7,6 +7,8 @@ import cn.iocoder.yudao.module.system.dal.dataobject.mail.SystemMailAccountDO;
 
 import java.util.List;
 
+// TODO @ジョイイ：类注释，应该是 邮箱账号 Service 接口
+
 /**
  * <p>
  *  服务类
