@@ -1,0 +1,42 @@
+{
+  "name": "ruoyi",
+  "version": "3.8.1",
+  "description": "芋道管理系统",
+  "author": "芋道",
+  "license": "MIT",
+  "scripts": {
+    "dev": "vite",
+	"build:prod": "vite build",
+    "build:stage": "vite build --mode staging",
+    "preview": "vite preview"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://gitee.com/y_project/RuoYi-Vue.git"
+  },
+  "dependencies": {
+    "@element-plus/icons-vue": "0.2.6",
+    "axios": "0.24.0",
+    "echarts": "5.2.2",
+    "element-plus": "2.0.1",
+    "file-saver": "2.0.5",
+    "fuse.js": "6.4.6",
+    "js-cookie": "3.0.1",
+    "jsencrypt": "3.2.1",
+    "nprogress": "0.2.0",
+    "vue": "3.2.26",
+    "vue-cropper": "1.0.2",
+    "vue-router": "4.0.12",
+    "vuex": "4.0.2"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "1.9.4",
+    "@vue/compiler-sfc": "3.2.22",
+    "sass": "1.45.0",
+    "unplugin-auto-import": "0.5.3",
+    "vite": "2.6.14",
+    "vite-plugin-compression": "0.3.6",
+    "vite-plugin-svg-icons": "1.0.5",
+    "vite-plugin-vue-setup-extend": "0.1.0"
+  }
+}
