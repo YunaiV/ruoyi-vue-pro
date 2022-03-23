@@ -392,16 +392,17 @@ export default {
         // 处理 menuOptions 参数
         this.menuOptions = [];
         this.menuOptions.push(...this.handleTree(response.data, "id"));
+        // 获取角色拥有的菜单权限
+        listRoleMenus(id).then(response => {
+          // 设置为严格，避免设置父节点自动选中子节点，解决半选中问题
+          this.form.menuCheckStrictly = true
+          // 设置选中
+          this.$refs.menu.setCheckedKeys(response.data);
+          // 设置为非严格，继续使用半选中
+          this.form.menuCheckStrictly = false
+        })
       });
-      // 获得角色拥有的菜单集合
-      listRoleMenus(id).then(response => {
-        // 设置为严格，避免设置父节点自动选中子节点，解决半选中问题
-        this.form.menuCheckStrictly = true
-        // 设置选中
-        this.$refs.menu.setCheckedKeys(response.data);
-        // 设置为非严格，继续使用半选中
-        this.form.menuCheckStrictly = false
-      })
+
     },
     /** 分配数据权限操作 */
     handleDataScope(row) {
