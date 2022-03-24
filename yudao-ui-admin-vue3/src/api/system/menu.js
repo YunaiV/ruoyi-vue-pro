@@ -9,26 +9,18 @@ export function listMenu(query) {
   })
 }
 
+// 查询菜单（精简)列表
+export function listSimpleMenus() {
+  return request({
+    url: '/system/menu/list-all-simple',
+    method: 'get'
+  })
+}
+
 // 查询菜单详细
-export function getMenu(menuId) {
+export function getMenu(id) {
   return request({
-    url: '/system/menu/' + menuId,
-    method: 'get'
-  })
-}
-
-// 查询菜单下拉树结构
-export function treeselect() {
-  return request({
-    url: '/system/menu/treeselect',
-    method: 'get'
-  })
-}
-
-// 根据角色ID查询菜单下拉树结构
-export function roleMenuTreeselect(roleId) {
-  return request({
-    url: '/system/menu/roleMenuTreeselect/' + roleId,
+    url: '/system/menu/get?id=' + id,
     method: 'get'
   })
 }
@@ -36,7 +28,7 @@ export function roleMenuTreeselect(roleId) {
 // 新增菜单
 export function addMenu(data) {
   return request({
-    url: '/system/menu',
+    url: '/system/menu/create',
     method: 'post',
     data: data
   })
@@ -45,16 +37,16 @@ export function addMenu(data) {
 // 修改菜单
 export function updateMenu(data) {
   return request({
-    url: '/system/menu',
+    url: '/system/menu/update',
     method: 'put',
     data: data
   })
 }
 
 // 删除菜单
-export function delMenu(menuId) {
+export function delMenu(id) {
   return request({
-    url: '/system/menu/' + menuId,
+    url: '/system/menu/delete?id=' + id,
     method: 'delete'
   })
 }

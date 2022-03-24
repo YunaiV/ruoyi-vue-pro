@@ -51,13 +51,13 @@ app.config.globalProperties.useDict = useDict // TODO 芋艿，需要删除
 app.config.globalProperties.download = download
 app.config.globalProperties.parseTime = parseTime
 app.config.globalProperties.resetForm = resetForm
-app.config.globalProperties.handleTree = handleTree
 app.config.globalProperties.addDateRange = addDateRange
 app.config.globalProperties.selectDictLabel = selectDictLabel
 app.config.globalProperties.getDictDatas = getDictDatas
 app.config.globalProperties.getDictDatas2 = getDictDatas2
 app.config.globalProperties.getDictDataLabel = getDictDataLabel
 app.config.globalProperties.DICT_TYPE = DICT_TYPE
+app.config.globalProperties.handleTree = handleTree
 
 // 全局组件挂载
 app.component('DictTag', DictTag)
