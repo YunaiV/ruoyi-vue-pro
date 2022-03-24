@@ -120,6 +120,3 @@ export function getDictDataLabel(dictType, value) {
   const dict = getDictData(dictType, value);
   return dict ? dict.label : '';
 }
-
-export class getDictDataL {
-}

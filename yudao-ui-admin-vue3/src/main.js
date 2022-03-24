@@ -24,8 +24,10 @@ import elementIcons from '@/components/SvgIcon/svgicon'
 
 import './permission' // permission control
 
-import { useDict } from '@/utils/dict'
+import { useDict } from '@/utils/dict'  // TODO 芋艿，需要删除
 import { parseTime, resetForm, addDateRange, handleTree, selectDictLabel } from '@/utils/ruoyi'
+import {DICT_TYPE, getDictDataLabel, getDictDatas, getDictDatas2} from "@/utils/dict";
+
 
 // 分页组件
 import Pagination from '@/components/Pagination'
@@ -45,13 +47,17 @@ import DictTag from '@/components/DictTag'
 const app = createApp(App)
 
 // 全局方法挂载
-app.config.globalProperties.useDict = useDict
+app.config.globalProperties.useDict = useDict // TODO 芋艿，需要删除
 app.config.globalProperties.download = download
 app.config.globalProperties.parseTime = parseTime
 app.config.globalProperties.resetForm = resetForm
 app.config.globalProperties.handleTree = handleTree
 app.config.globalProperties.addDateRange = addDateRange
 app.config.globalProperties.selectDictLabel = selectDictLabel
+app.config.globalProperties.getDictDatas = getDictDatas
+app.config.globalProperties.getDictDatas2 = getDictDatas2
+app.config.globalProperties.getDictDataLabel = getDictDataLabel
+app.config.globalProperties.DICT_TYPE = DICT_TYPE
 
 // 全局组件挂载
 app.component('DictTag', DictTag)

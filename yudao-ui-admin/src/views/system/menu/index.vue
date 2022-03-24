@@ -6,8 +6,9 @@
         <el-input v-model="queryParams.name" placeholder="请输入菜单名称" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item label="状态" prop="status">
-        <el-select v-model="queryParams.status" placeholder="菜单状态" clearable>
-          <el-option v-for="dict in statusDictDatas" :key="parseInt(dict.value)" :label="dict.label" :value="parseInt(dict.value)"/>
+        <el-select v-model="queryParams.status" placeholder="请选择菜单状态" clearable>
+          <el-option v-for="dict in this.getDictDatas(DICT_TYPE.COMMON_STATUS)"
+                     :key="dict.value" :label="dict.label" :value="dict.value"/>
         </el-select>
       </el-form-item>
       <el-form-item>
@@ -191,7 +192,6 @@ export default {
       CommonStatusEnum: CommonStatusEnum,
       // 数据字典
       menuTypeDictDatas: getDictDatas(DICT_TYPE.SYSTEM_MENU_TYPE),
-      statusDictDatas: getDictDatas(DICT_TYPE.COMMON_STATUS)
     };
   },
   created() {
