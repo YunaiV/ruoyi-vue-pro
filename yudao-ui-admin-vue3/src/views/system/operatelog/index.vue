@@ -80,45 +80,45 @@
 
     <!-- 操作日志详细 -->
     <el-dialog title="访问日志详细" v-model="open" width="700px" append-to-body>
-      <el-form ref="form" :model="form" label-width="100px" size="small">
+      <el-form ref="form" :model="formData" label-width="100px" size="small">
         <el-row>
           <el-col :span="24">
-            <el-form-item label="日志主键：">{{ form.id }}</el-form-item>
+            <el-form-item label="日志主键：">{{ formData.id }}</el-form-item>
           </el-col>
           <el-col :span="24">
-            <el-form-item label="链路追踪：">{{ form.traceId }}</el-form-item>
+            <el-form-item label="链路追踪：">{{ formData.traceId }}</el-form-item>
           </el-col>
           <el-col :span="24">
-            <el-form-item label="用户信息：">{{ form.userId }} | {{ form.userNickname }} | {{ form.userIp }} |
-              {{ form.userAgent }}
+            <el-form-item label="用户信息：">{{ formData.userId }} | {{ formData.userNickname }} | {{ formData.userIp }} |
+              {{ formData.userAgent }}
             </el-form-item>
           </el-col>
           <el-col :span="24">
             <el-form-item label="操作信息：">
-              {{ form.module }} | {{ form.name }}
-              <dict-tag :type="DICT_TYPE.SYSTEM_OPERATE_TYPE" :value="form.type"/>
-              <br/> {{ form.content }}
-              <br/> {{ form.exts }}
+              {{ formData.module }} | {{ formData.name }}
+              <dict-tag :type="DICT_TYPE.SYSTEM_OPERATE_TYPE" :value="formData.type"/>
+              <br/> {{ formData.content }}
+              <br/> {{ formData.exts }}
             </el-form-item>
           </el-col>
           <el-col :span="24">
-            <el-form-item label="请求信息：">{{ form.requestMethod }} | {{ form.requestUrl }}</el-form-item>
+            <el-form-item label="请求信息：">{{ formData.requestMethod }} | {{ formData.requestUrl }}</el-form-item>
           </el-col>
           <el-col :span="24">
-            <el-form-item label="方法名：">{{ form.javaMethod }}</el-form-item>
+            <el-form-item label="方法名：">{{ formData.javaMethod }}</el-form-item>
           </el-col>
           <el-col :span="24">
-            <el-form-item label="方法参数：">{{ form.javaMethodArgs }}</el-form-item>
+            <el-form-item label="方法参数：">{{ formData.javaMethodArgs }}</el-form-item>
           </el-col>
           <el-col :span="24">
             <el-form-item label="开始时间：">
-              {{ proxy.parseTime(form.startTime) }} | {{ form.duration }} ms
+              {{ proxy.parseTime(formData.startTime) }} | {{ formData.duration }} ms
             </el-form-item>
           </el-col>
           <el-col :span="12">
             <el-form-item label="操作结果：">
-              <div v-if="form.resultCode === 0">正常 | {{ form.resultData }}</div>
-              <div v-else-if="form.resultCode > 0">失败 | {{ form.resultCode }} || {{ form.resultMsg }}</div>
+              <div v-if="formData.resultCode === 0">正常 | {{ formData.resultData }}</div>
+              <div v-else-if="formData.resultCode > 0">失败 | {{ formData.resultCode }} || {{ formData.resultMsg }}</div>
             </el-form-item>
           </el-col>
         </el-row>
@@ -144,7 +144,7 @@ const open = ref(false);// 是否显示弹出层
 const dateRange = ref([]);// 日期范围
 const data = reactive({
   // 表单参数
-  form: {},
+  formData: {},
   // 查询参数
   queryParams: {
     pageNo: 1,
@@ -155,7 +155,7 @@ const data = reactive({
     status: undefined
   }
 });
-const {form, queryParams} = toRefs(data);
+const {formData, queryParams} = toRefs(data);
 
 /** 查询登录日志 */
 function getList() {
@@ -190,8 +190,7 @@ function resetQuery() {
 function handleView(row) {
 
   open.value = true;
-  form.value = row;
-  console.log(form.value);
+  formData.value = row;
 }
 
 /** 导出按钮操作 */
