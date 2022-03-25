@@ -196,7 +196,7 @@ public class UserServiceImplTest extends BaseDbUnitTest {
     }
 
     @Test
-    public void testUpdateUserAvatar_success() {
+    public void testUpdateUserAvatar_success() throws Exception {
         // mock 数据
         AdminUserDO dbUser = randomAdminUserDO();
         userMapper.insert(dbUser);

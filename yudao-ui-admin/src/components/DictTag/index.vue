@@ -17,7 +17,7 @@ export default {
   name: "DictTag",
   props: {
     type: String,
-    value: [Number, String, Array],
+    value: [Number, String, Boolean, Array],
   },
 };
 </script>

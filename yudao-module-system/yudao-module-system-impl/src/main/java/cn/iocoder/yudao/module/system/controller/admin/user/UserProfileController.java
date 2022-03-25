@@ -29,7 +29,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
-import java.io.IOException;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -99,7 +98,7 @@ public class UserProfileController {
 
     @PutMapping("/update-avatar")
     @ApiOperation("上传用户个人头像")
-    public CommonResult<String> updateUserAvatar(@RequestParam("avatarFile") MultipartFile file) throws IOException {
+    public CommonResult<String> updateUserAvatar(@RequestParam("avatarFile") MultipartFile file) throws Exception {
         if (file.isEmpty()) {
             throw ServiceExceptionUtil.exception(FILE_IS_EMPTY);
         }

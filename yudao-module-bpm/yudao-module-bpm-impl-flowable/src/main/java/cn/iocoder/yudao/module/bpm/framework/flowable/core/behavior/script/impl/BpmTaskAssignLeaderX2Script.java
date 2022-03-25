@@ -15,7 +15,6 @@ import java.util.Set;
 @Component
 public class BpmTaskAssignLeaderX2Script extends BpmTaskAssignLeaderAbstractScript {
 
-
     @Override
     @DataPermission(enable = false) // 不需要处理数据权限， 不然会有问题，查询不到数据
     public Set<Long> calculateTaskCandidateUsers(TaskEntity task) {

@@ -25,6 +25,7 @@ export const DICT_TYPE = {
   SYSTEM_ERROR_CODE_TYPE: 'system_error_code_type',
 
   // ========== INFRA 模块 ==========
+  INFRA_BOOLEAN_STRING: 'infra_boolean_string',
   INFRA_REDIS_TIMEOUT_TYPE: 'infra_redis_timeout_type',
   INFRA_JOB_STATUS: 'infra_job_status',
   INFRA_JOB_LOG_STATUS: 'infra_job_log_status',
@@ -32,6 +33,7 @@ export const DICT_TYPE = {
   INFRA_CONFIG_TYPE: 'infra_config_type',
   INFRA_CODEGEN_TEMPLATE_TYPE: 'infra_codegen_template_type',
   INFRA_CODEGEN_SCENE: 'infra_codegen_scene',
+  INFRA_FILE_STORAGE: 'infra_file_storage',
 
   // ========== BPM 模块 ==========
   BPM_MODEL_CATEGORY: 'bpm_model_category',
@@ -94,7 +96,7 @@ export function getDictDatas2(dictType, values) {
     }
   }
   // debugger
-  console.log(results);
+  // console.log(results);
   return results;
 }
 

@@ -1,18 +1,19 @@
 package cn.iocoder.yudao.module.infra.service.file;
 
 import cn.hutool.core.io.FileTypeUtil;
+import cn.hutool.core.lang.Assert;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.infra.controller.admin.file.vo.FilePageReqVO;
+import cn.iocoder.yudao.framework.file.core.client.FileClient;
+import cn.iocoder.yudao.module.infra.controller.admin.file.vo.file.FilePageReqVO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.file.FileDO;
 import cn.iocoder.yudao.module.infra.dal.mysql.file.FileMapper;
-import cn.iocoder.yudao.module.infra.framework.file.config.FileProperties;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.io.ByteArrayInputStream;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.infra.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.infra.enums.ErrorCodeConstants.FILE_NOT_EXISTS;
 
 /**
  * 文件 Service 实现类
@@ -23,10 +24,10 @@ import static cn.iocoder.yudao.module.infra.enums.ErrorCodeConstants.*;
 public class FileServiceImpl implements FileService {
 
     @Resource
-    private FileMapper fileMapper;
+    private FileConfigService fileConfigService;
 
     @Resource
-    private FileProperties fileProperties;
+    private FileMapper fileMapper;
 
     @Override
     public PageResult<FileDO> getFilePage(FilePageReqVO pageReqVO) {
@@ -34,37 +35,50 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public String createFile(String path, byte[] content) {
-        if (fileMapper.selectCountById(path) > 0) {
-            throw exception(FILE_PATH_EXISTS);
-        }
+    public String createFile(String path, byte[] content) throws Exception {
+        // 上传到文件存储器
+        FileClient client = fileConfigService.getMasterFileClient();
+        Assert.notNull(client, "客户端(master) 不能为空");
+        String url = client.upload(content, path);
+
         // 保存到数据库
         FileDO file = new FileDO();
-        file.setId(path);
+        file.setConfigId(client.getId());
+        file.setPath(path);
+        file.setUrl(url);
         file.setType(FileTypeUtil.getType(new ByteArrayInputStream(content)));
-        file.setContent(content);
+        file.setSize(content.length);
         fileMapper.insert(file);
-        // 拼接路径返回
-        return fileProperties.getBasePath() + path;
+        return url;
     }
 
     @Override
-    public void deleteFile(String id) {
+    public void deleteFile(Long id) throws Exception {
         // 校验存在
-        this.validateFileExists(id);
-        // 更新
+        FileDO file = this.validateFileExists(id);
+
+        // 从文件存储器中删除
+        FileClient client = fileConfigService.getFileClient(file.getConfigId());
+        Assert.notNull(client, "客户端({}) 不能为空", file.getConfigId());
+        client.delete(file.getPath());
+
+        // 删除记录
         fileMapper.deleteById(id);
     }
 
-    private void validateFileExists(String id) {
-        if (fileMapper.selectById(id) == null) {
+    private FileDO validateFileExists(Long id) {
+        FileDO fileDO = fileMapper.selectById(id);
+        if (fileDO == null) {
             throw exception(FILE_NOT_EXISTS);
         }
+        return fileDO;
     }
 
     @Override
-    public FileDO getFile(String path) {
-        return fileMapper.selectByPath(path);
+    public byte[] getFileContent(Long configId, String path) throws Exception {
+        FileClient client = fileConfigService.getFileClient(configId);
+        Assert.notNull(client, "客户端({}) 不能为空", configId);
+        return client.getContent(path);
     }
 
 }

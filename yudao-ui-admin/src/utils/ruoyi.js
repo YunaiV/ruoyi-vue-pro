@@ -175,7 +175,7 @@ export function getNowDateTime(timeStr) {
  * 获得租户功能是否开启
  */
 export function getTenantEnable() {
-  console.log("enable: " + process.env.VUE_APP_TENANT_ENABLE)
+  // console.log("enable: " + process.env.VUE_APP_TENANT_ENABLE)
   if (process.env.VUE_APP_TENANT_ENABLE === "true") {
     return true;
   }
@@ -183,4 +183,17 @@ export function getTenantEnable() {
     return false;
   }
   return process.env.VUE_APP_TENANT_ENABLE || true;
+}
+
+/**
+ * 获得文档是否开启
+ */
+export function getDocEnable() {
+  if (process.env.VUE_APP_DOC_ENABLE === "true") {
+    return true;
+  }
+  if (process.env.VUE_APP_DOC_ENABLE === "false") {
+    return false;
+  }
+  return process.env.VUE_APP_DOC_ENABLE || false;
 }

@@ -116,7 +116,7 @@ public class RoleServiceImpl implements RoleService {
         if (maxUpdateTime == null) { // 如果更新时间为空，说明 DB 一定有新数据
             log.info("[loadRoleIfUpdate][首次加载全量角色]");
         } else { // 判断数据库中是否有更新的角色
-            if (!roleMapper.selectExistsByUpdateTimeAfter(maxUpdateTime)) {
+            if (roleMapper.selectExistsByUpdateTimeAfter(maxUpdateTime) == null) {
                 return null;
             }
             log.info("[loadRoleIfUpdate][增量加载全量角色]");
@@ -126,6 +126,7 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
+    @Transactional
     public Long createRole(RoleCreateReqVO reqVO, Integer type) {
         // 校验角色
         checkDuplicateRole(reqVO.getName(), reqVO.getCode(), null);
@@ -136,7 +137,12 @@ public class RoleServiceImpl implements RoleService {
         role.setDataScope(DataScopeEnum.ALL.getScope()); // 默认可查看所有数据。原因是，可能一些项目不需要项目权限
         roleMapper.insert(role);
         // 发送刷新消息
-        roleProducer.sendRoleRefreshMessage();
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+                roleProducer.sendRoleRefreshMessage();
+            }
+        });
         // 返回
         return role.getId();
     }

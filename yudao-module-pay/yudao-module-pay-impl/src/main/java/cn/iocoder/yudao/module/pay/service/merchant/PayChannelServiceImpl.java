@@ -127,6 +127,7 @@ public class PayChannelServiceImpl implements PayChannelService {
         PayChannelDO channel = PayChannelConvert.INSTANCE.convert(reqVO);
         settingConfigAndCheckParam(channel, reqVO.getConfig());
         channelMapper.insert(channel);
+        // TODO 芋艿：缺少刷新本地缓存的机制
         return channel.getId();
     }
 
@@ -138,6 +139,7 @@ public class PayChannelServiceImpl implements PayChannelService {
         PayChannelDO channel = PayChannelConvert.INSTANCE.convert(updateReqVO);
         settingConfigAndCheckParam(channel, updateReqVO.getConfig());
         channelMapper.updateById(channel);
+        // TODO 芋艿：缺少刷新本地缓存的机制
     }
 
     @Override
@@ -146,6 +148,7 @@ public class PayChannelServiceImpl implements PayChannelService {
         this.validateChannelExists(id);
         // 删除
         channelMapper.deleteById(id);
+        // TODO 芋艿：缺少刷新本地缓存的机制
     }
 
     private void validateChannelExists(Long id) {
@@ -224,6 +227,7 @@ public class PayChannelServiceImpl implements PayChannelService {
         if (ObjectUtil.isNull(payClass)) {
             throw exception(CHANNEL_NOT_EXISTS);
         }
+        // TODO @芋艿：不要使用 hutool 的 json 工具，用项目的
         PayClientConfig config = JSONUtil.toBean(configStr, payClass);
 
         // 验证参数

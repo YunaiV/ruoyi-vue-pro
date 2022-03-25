@@ -7,6 +7,10 @@
     position: relative;
   }
 
+  .sidebarHide {
+    margin-left: 0!important;
+  }
+
   .sidebar-container {
     -webkit-transition: width .28s;
     transition: width 0.28s;

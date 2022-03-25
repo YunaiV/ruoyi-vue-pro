@@ -5,7 +5,6 @@ import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.datapermission.core.annotation.DataPermission;
-import cn.iocoder.yudao.framework.datapermission.core.dept.rule.DeptDataPermissionRule;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmTaskAssignRuleDO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmUserGroupDO;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmTaskAssignRuleTypeEnum;
@@ -69,11 +68,13 @@ public class BpmUserTaskActivityBehavior extends UserTaskActivityBehavior {
     public BpmUserTaskActivityBehavior(UserTask userTask) {
         super(userTask);
     }
+
     public void setScripts(List<BpmTaskAssignScript> scripts) {
         this.scriptMap = convertMap(scripts, script -> script.getEnum().getId());
     }
 
     @Override
+    @DataPermission(enable = false) // 不需要处理数据权限， 不然会有问题，查询不到数据
     protected void handleAssignments(TaskService taskService, String assignee, String owner, List<String> candidateUsers, List<String> candidateGroups, TaskEntity task, ExpressionManager expressionManager, DelegateExecution execution, ProcessEngineConfigurationImpl processEngineConfiguration) {
         // 第一步，获得任务的规则
         BpmTaskAssignRuleDO rule = getTaskRule(task);
@@ -98,7 +99,6 @@ public class BpmUserTaskActivityBehavior extends UserTaskActivityBehavior {
         return taskRules.get(0);
     }
 
-    @VisibleForTesting
     Set<Long> calculateTaskCandidateUsers(TaskEntity task, BpmTaskAssignRuleDO rule) {
         Set<Long> assigneeUserIds = null;
         if (Objects.equals(BpmTaskAssignRuleTypeEnum.ROLE.getType(), rule.getType())) {

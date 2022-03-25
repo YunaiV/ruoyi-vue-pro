@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.infra.api.file;
 
-import cn.iocoder.yudao.module.infra.api.file.FileApi;
 import cn.iocoder.yudao.module.infra.service.file.FileService;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -20,7 +19,7 @@ public class FileApiImpl implements FileApi {
     private FileService fileService;
 
     @Override
-    public String createFile(String path, byte[] content) {
+    public String createFile(String path, byte[] content) throws Exception {
         return fileService.createFile(path, content);
     }
 
