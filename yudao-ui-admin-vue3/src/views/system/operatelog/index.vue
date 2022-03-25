@@ -34,11 +34,11 @@
 
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
-        <el-button type="warning" icon="el-icon-download" size="mini" @click="handleExport" :loading="exportLoading"
+        <el-button type="warning" icon="el-icon-download" size="small" @click="handleExport" :loading="exportLoading"
                    v-hasPermi="['system:operate-log:export']">导出
         </el-button>
       </el-col>
-      <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
+      <right-toolbar v-model:showSearch="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
     <el-table v-loading="loading" :data="list">
@@ -68,19 +68,19 @@
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template #default="scope">
-          <el-button size="mini" type="text" icon="el-icon-view" @click="handleView(scope.row,scope.index)"
+          <el-button size="small" type="text" icon="el-icon-view" @click="handleView(scope.row)"
                      v-hasPermi="['system:operate-log:query']">详细
           </el-button>
         </template>
       </el-table-column>
     </el-table>
 
-    <pagination v-show="total>0" :total="total" :page.sync="queryParams.pageNo" :limit.sync="queryParams.pageSize"
+    <pagination v-show="total>0" :total="total" v-model:page="queryParams.pageNo" v-model:limit="queryParams.pageSize"
                 @pagination="getList"/>
 
     <!-- 操作日志详细 -->
     <el-dialog title="访问日志详细" v-model="open" width="700px" append-to-body>
-      <el-form ref="form" :model="form" label-width="100px" size="mini">
+      <el-form ref="form" :model="form" label-width="100px" size="small">
         <el-row>
           <el-col :span="24">
             <el-form-item label="日志主键：">{{ form.id }}</el-form-item>
@@ -112,7 +112,7 @@
           </el-col>
           <el-col :span="24">
             <el-form-item label="开始时间：">
-              {{ parseTime(form.startTime) }} | {{ form.duration }} ms
+              {{ proxy.parseTime(form.startTime) }} | {{ form.duration }} ms
             </el-form-item>
           </el-col>
           <el-col :span="12">
@@ -155,15 +155,17 @@ const data = reactive({
     status: undefined
   }
 });
-const {queryParams, form} = toRefs(data);
+const {form, queryParams} = toRefs(data);
 
 /** 查询登录日志 */
 function getList() {
   loading.value = true;
-  listOperateLog(proxy.addDateRange(queryParams, [
+
+  const qP = proxy.addDateRange(queryParams.value, [
     dateRange.value[0] ? dateRange.value[0] + ' 00:00:00' : undefined,
     dateRange.value[1] ? dateRange.value[1] + ' 23:59:59' : undefined,
-  ])).then(response => {
+  ])
+  listOperateLog(qP).then(response => {
         list.value = response.data.list;
         total.value = response.data.total;
         loading.value = false;
@@ -174,7 +176,7 @@ function getList() {
 /** 搜索按钮操作 */
 function handleQuery() {
   queryParams.value.pageNo = 1;
-  this.getList();
+  getList();
 }
 
 /** 重置按钮操作 */
@@ -186,19 +188,21 @@ function resetQuery() {
 
 /** 详细按钮操作 */
 function handleView(row) {
+
   open.value = true;
   form.value = row;
+  console.log(form.value);
 }
 
 /** 导出按钮操作 */
 function handleExport() {
-  const queryParams =proxy.addDateRange(queryParams.value, [
+  const qP = proxy.addDateRange(queryParams.value, [
     dateRange.value[0] ? dateRange.value[0] + ' 00:00:00' : undefined,
     dateRange.value[1] ? dateRange.value[1] + ' 23:59:59' : undefined,
   ])
   proxy.$modal.confirm('是否确认导出所有操作日志数据项?').then(() => {
     exportLoading.value = true;
-    return exportOperateLog(queryParams.value);
+    return exportOperateLog(qP);
   }).then(response => {
     proxy.$download.excel(response, '操作日志.xls');
     exportLoading.value = false;
