@@ -36,6 +36,9 @@ public class MailLogDO extends BaseDO implements Serializable {
     @TableField("from")
     private String from;
 
+    @TableField("temple_id")
+    private String templeId;
+
     @TableField("temple_code")
     private String templeCode;
 
@@ -52,7 +55,7 @@ public class MailLogDO extends BaseDO implements Serializable {
     private Timestamp sendTime;
 
     @TableField("sendStatus")
-    private String sendStatus;
+    private Boolean sendStatus;
 
     @TableField("sendResult")
     private String sendResult;
