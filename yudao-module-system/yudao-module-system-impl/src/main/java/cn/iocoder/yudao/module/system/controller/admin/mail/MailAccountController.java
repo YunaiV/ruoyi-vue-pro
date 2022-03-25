@@ -7,6 +7,7 @@ import cn.iocoder.yudao.module.system.controller.admin.mail.vo.account.MailAccou
 import cn.iocoder.yudao.module.system.controller.admin.mail.vo.account.MailAccountCreateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.mail.vo.account.MailAccountPageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.mail.vo.account.MailAccountUpdateReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.mail.vo.send.MailSendVO;
 import cn.iocoder.yudao.module.system.convert.mail.MailAccountConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.mail.MailAccountDO;
 import cn.iocoder.yudao.module.system.service.mail.MailAccountService;
@@ -80,5 +81,12 @@ public class MailAccountController {
         // 排序后，返回给前端
         list.sort(Comparator.comparing(MailAccountDO::getId));
         return success(MailAccountConvert.INSTANCE.convertList02(list));
+    }
+    @PostMapping("/send")
+    @ApiOperation("发送邮件")
+    @PreAuthorize("@ss.hasPermission('system:mail-account:send')")
+    public CommonResult<Boolean> sendMail(MailSendVO mailSendVO){
+        mailAccountService.sendMail(mailSendVO);
+        return success(true);
     }
 }

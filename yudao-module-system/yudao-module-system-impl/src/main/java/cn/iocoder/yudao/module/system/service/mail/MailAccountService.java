@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.system.controller.admin.mail.vo.account.MailAccountCreateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.mail.vo.account.MailAccountPageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.mail.vo.account.MailAccountUpdateReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.mail.vo.send.MailSendVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.mail.MailAccountDO;
 
 import java.util.List;
@@ -30,4 +31,6 @@ public interface MailAccountService {
     PageResult<MailAccountDO> getMailAccountPage(MailAccountPageReqVO pageReqVO);
 
     List<MailAccountDO> getMailAccountList();
+
+    void sendMail(MailSendVO mailSendVO);
 }

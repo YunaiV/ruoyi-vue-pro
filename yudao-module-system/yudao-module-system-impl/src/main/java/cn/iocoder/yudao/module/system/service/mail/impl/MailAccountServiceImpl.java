@@ -1,12 +1,17 @@
 package cn.iocoder.yudao.module.system.service.mail.impl;
 
+import cn.hutool.extra.mail.MailAccount;
+import cn.hutool.extra.mail.MailUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.system.controller.admin.mail.vo.account.MailAccountCreateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.mail.vo.account.MailAccountPageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.mail.vo.account.MailAccountUpdateReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.mail.vo.send.MailSendVO;
 import cn.iocoder.yudao.module.system.convert.mail.MailAccountConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.mail.MailAccountDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.mail.MailTemplateDO;
 import cn.iocoder.yudao.module.system.dal.mysql.mail.MailAccountMapper;
+import cn.iocoder.yudao.module.system.dal.mysql.mail.MailTemplateMapper;
 import cn.iocoder.yudao.module.system.service.mail.MailAccountService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.springframework.stereotype.Service;
@@ -34,6 +39,9 @@ public class MailAccountServiceImpl implements MailAccountService {
 
     @Resource
     private MailAccountMapper mailAccountMapper;
+
+    @Resource
+    private MailTemplateMapper mailTemplateMapper;
 
     @Override
     public Long create(MailAccountCreateReqVO createReqVO) {
@@ -79,6 +87,35 @@ public class MailAccountServiceImpl implements MailAccountService {
     @Override
     public List<MailAccountDO> getMailAccountList() {
         return mailAccountMapper.selectList();
+    }
+
+    @Override
+    public void sendMail(MailSendVO mailSendVO) {
+        // FIXME 查询模版信息 查询模版多条时 使用规则是什么
+        List<MailTemplateDO> mailTemplateDOList =  mailTemplateMapper.selectList(
+                "username",mailSendVO.getFrom()
+        );
+        //查询账号信息
+        MailAccountDO mailAccountDO = mailAccountMapper.selectOne(
+                "from",mailSendVO.getFrom()
+        );
+        // FIXME 模版和邮件内容合成方式未知
+        String content = mailSendVO.getContent();
+        String templateContent = "";
+        // 后续功能 TODO ：附件查询
+        //List<String> fileIds = mailSendVO.getFileIds();
+
+        //装载账号信息
+        MailAccount account = new MailAccount();
+        account.setHost(mailAccountDO.getHost());
+        account.setPort(mailAccountDO.getPort());
+        account.setAuth(true);
+        account.setFrom(mailAccountDO.getFrom());
+        account.setUser(mailAccountDO.getUsername());
+        account.setPass(mailAccountDO.getPassword());
+        account.setSslEnable(mailAccountDO.getSslEnable());
+        //发送
+        MailUtil.send(account , mailSendVO.getTos() , mailSendVO.getTitle() , mailSendVO.getContent() , false);
     }
 
     private void validateMailAccountExists(Long id) {

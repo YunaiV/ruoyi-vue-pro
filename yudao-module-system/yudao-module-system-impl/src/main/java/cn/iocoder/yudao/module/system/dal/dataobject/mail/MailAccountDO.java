@@ -16,7 +16,7 @@ import lombok.experimental.Accessors;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Accessors(chain = true)
-@ApiModel(value="MailAccount对象", description="")
+@ApiModel(value="MailAccount对象", description="邮箱账号")
 @TableName(value = "system_mail_account", autoResultMap = true)
 public class MailAccountDO extends BaseDO implements Serializable {
 
@@ -37,7 +37,7 @@ public class MailAccountDO extends BaseDO implements Serializable {
     private String host;
 
     @TableField("port")
-    private String port;
+    private Integer port;
 
     @TableField("sslEnable")
     private Boolean sslEnable;
