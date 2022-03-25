@@ -55,6 +55,7 @@ const router = useRouter();
 const { proxy } = getCurrentInstance();
 
 const loginForm = ref({
+ tenantName: "芋道源码",
   username: "admin",
   password: "admin123",
   rememberMe: false,
