@@ -19,6 +19,8 @@ import static org.junit.Assert.assertNotNull;
 /**
  * @author henryyan
  * testMultiInstanceForUserTask 会签
+ * cn.iocoder.yudao.module.bpm.framework.flowable.core.behavior.BpmUserTaskActivityBehavior#handleAssignments(org.flowable.task.service.TaskService, java.lang.String, java.lang.String, java.util.List, java.util.List, org.flowable.task.service.impl.persistence.entity.TaskEntity, org.flowable.common.engine.impl.el.ExpressionManager, org.flowable.engine.delegate.DelegateExecution, org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl)
+ * 执行了两次,任务分配到了同一个人
  */
 public class MultiInstancesTest extends AbstractOATest {
 
