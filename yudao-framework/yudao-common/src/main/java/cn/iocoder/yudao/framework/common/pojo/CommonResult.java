@@ -19,19 +19,19 @@ import java.util.Objects;
 public class CommonResult<T> implements Serializable {
 
     /**
-     * 错误码
-     *
-     * @see ErrorCode#getCode()
+     * 状态码
+     * 1. 成功时，状态码为 0
+     * 2. 失败时，对应业务的错误码 {@link  ErrorCode#getCode()}
      */
     private Integer code;
     /**
-     * 返回数据
+     * 数据。成功时，返回该字段。
      */
     private T data;
     /**
-     * 错误提示，用户可阅读
+     * 错误提示。失败时，返回该字段，用户可阅读
      *
-     * @see ErrorCode#getMsg() ()
+     * @see ErrorCode#getMsg()
      */
     private String msg;
 
