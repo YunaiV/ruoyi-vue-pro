@@ -24,13 +24,12 @@ import java.util.List;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
 
-@Api(tags = "管理后台 - 邮件模板")
+@Api(tags = "管理后台 - 邮件账号")
 @RestController
 @RequestMapping("/system/mail-account")
 public class MailAccountController {
     @Resource
     private MailAccountService mailAccountService;
-
 
     @PostMapping("/create")
     @ApiOperation("创建邮箱账号")
@@ -69,14 +68,14 @@ public class MailAccountController {
     @GetMapping("/page")
     @ApiOperation("获得邮箱账号分页")
     @PreAuthorize("@ss.hasPermission('system:mail-account:query')")
-    public CommonResult<PageResult<MailAccountBaseVO>> getSmsChannelPage(@Valid MailAccountPageReqVO pageReqVO) {
+    public CommonResult<PageResult<MailAccountBaseVO>> getMailAccountPage(@Valid MailAccountPageReqVO pageReqVO) {
         PageResult<MailAccountDO> pageResult = mailAccountService.getMailAccountPage(pageReqVO);
         return success(MailAccountConvert.INSTANCE.convertPage(pageResult));
     }
 
     @GetMapping("/list-all-simple")
     @ApiOperation(value = "获得邮箱账号精简列表")
-    public CommonResult<List<MailAccountBaseVO>> getSimpleSmsChannels() {
+    public CommonResult<List<MailAccountBaseVO>> getSimpleMailAccountList() {
         List<MailAccountDO> list = mailAccountService.getMailAccountList();
         // 排序后，返回给前端
         list.sort(Comparator.comparing(MailAccountDO::getId));

@@ -15,10 +15,10 @@ public class MailLogBaseVO {
     private String from;
 
     @ApiModelProperty(value = "模版编号" , required = false , example = "templeId")
-    private String templeId;
+    private String templateId;
 
     @ApiModelProperty(value = "模版code" , required = false , example = "templeCode")
-    private String templeCode;
+    private String templateCode;
 
     @ApiModelProperty(value = "标题" , required = false , example = "芋道源码")
     private String title;

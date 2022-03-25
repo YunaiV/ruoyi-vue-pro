@@ -8,16 +8,17 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.sql.Timestamp;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
+
 @Data
 public class MailLogPageReqVO extends PageParam {
     @ApiModelProperty(value = "邮箱" , required = false , example = "yudaoyuanma@123.com")
     private String from;
 
     @ApiModelProperty(value = "模版编号" , required = false , example = "templeId")
-    private String templeId;
+    private String templateId;
 
     @ApiModelProperty(value = "模版code" , required = false , example = "templeCode")
-    private String templeCode;
+    private String templateCode;
 
     @ApiModelProperty(value = "标题" , required = false , example = "芋道源码")
     private String title;

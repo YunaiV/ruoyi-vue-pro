@@ -13,7 +13,7 @@ import lombok.experimental.Accessors;
 
 /**
  * <p>
- * 邮箱账号
+ * 邮箱模版
  * </p>
  *
  * @author wangjingyi
@@ -22,8 +22,8 @@ import lombok.experimental.Accessors;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Accessors(chain = true)
-@ApiModel(value="SystemMailTemple对象", description="")
-public class MailTempleDO extends BaseDO implements Serializable {
+@ApiModel(value="SystemMailTemplate对象", description="")
+public class MailTemplateDO extends BaseDO implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @TableId

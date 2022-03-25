@@ -121,7 +121,10 @@ public interface ErrorCodeConstants {
 
     // ========== 邮箱账号 1002019000 ==========
     ErrorCode MAIL_ACCOUNT_NOT_EXISTS = new ErrorCode(1002019000, "邮箱账号不存在");
-    ErrorCode MAIL_ACCOUNT_EXISTS = new ErrorCode(1002019000, "邮箱账号存在");
+    ErrorCode MAIL_ACCOUNT_EXISTS = new ErrorCode(1002019001, "邮箱账号存在");
 
+    // ========== 邮箱账号 1002020000 ==========
+    ErrorCode MAIL_TEMPLATE_NOT_EXISTS = new ErrorCode(1002020000 , "邮箱模版不存在");
+    ErrorCode MAIL_TEMPLATE_EXISTS = new ErrorCode(1002020001, "邮箱账号存在");
 
 }

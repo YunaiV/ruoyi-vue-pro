@@ -6,15 +6,16 @@ import cn.iocoder.yudao.framework.mybatis.core.query.QueryWrapperX;
 import cn.iocoder.yudao.module.system.controller.admin.mail.vo.log.MailLogExportReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.mail.vo.log.MailLogPageReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.mail.MailLogDO;
+import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
-
+@Mapper
 public interface MailLogMapper extends BaseMapperX<MailLogDO> {
 
     default PageResult<MailLogDO> selectPage(MailLogPageReqVO pageVO){
         return selectPage(pageVO , new QueryWrapperX<MailLogDO>()
                 .eqIfPresent("from", pageVO.getFrom())
-                .eqIfPresent("templeCode", pageVO.getTempleCode())
+                .eqIfPresent("templeCode", pageVO.getTemplateCode())
                 .likeIfPresent("title" , pageVO.getTitle())
                 .likeIfPresent("content" , pageVO.getContent())
                 .eqIfPresent("to", pageVO.getTo())
@@ -28,7 +29,7 @@ public interface MailLogMapper extends BaseMapperX<MailLogDO> {
     default List<MailLogDO> selectList(MailLogExportReqVO exportReqVO){
         return selectList(new QueryWrapperX<MailLogDO>()
                 .eqIfPresent("from", exportReqVO.getFrom())
-                .eqIfPresent("templeCode", exportReqVO.getTempleCode())
+                .eqIfPresent("templeCode", exportReqVO.getTemplateCode())
                 .likeIfPresent("title" , exportReqVO.getTitle())
                 .likeIfPresent("content" , exportReqVO.getContent())
                 .eqIfPresent("to", exportReqVO.getTo())

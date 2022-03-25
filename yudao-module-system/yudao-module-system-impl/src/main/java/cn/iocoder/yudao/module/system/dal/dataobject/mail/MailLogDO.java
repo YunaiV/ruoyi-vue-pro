@@ -1,20 +1,18 @@
 package cn.iocoder.yudao.module.system.dal.dataobject.mail;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import com.baomidou.mybatisplus.annotation.IdType;
 import java.sql.Timestamp;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableField;
 import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 /**
  * <p>
- * 
+ * 邮箱日志
  * </p>
  *
  * @author wangjingyi
@@ -36,11 +34,11 @@ public class MailLogDO extends BaseDO implements Serializable {
     @TableField("from")
     private String from;
 
-    @TableField("temple_id")
-    private String templeId;
+    @TableField("template_id")
+    private String templateId;
 
-    @TableField("temple_code")
-    private String templeCode;
+    @TableField("template_code")
+    private String templateCode;
 
     @TableField("title")
     private String title;

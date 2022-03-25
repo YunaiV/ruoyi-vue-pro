@@ -1,12 +1,14 @@
 package cn.iocoder.yudao.module.system.controller.admin.mail.vo.log;
 
 import com.alibaba.excel.annotation.ExcelProperty;
+import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.sql.Timestamp;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
+@Data
 public class MailLogExcelVO {
 
     @ExcelProperty(value = "邮箱" )
