@@ -106,14 +106,8 @@ public class MailAccountServiceImpl implements MailAccountService {
         //List<String> fileIds = mailSendVO.getFileIds();
 
         //装载账号信息
-        MailAccount account = new MailAccount();
-        account.setHost(mailAccountDO.getHost());
-        account.setPort(mailAccountDO.getPort());
-        account.setAuth(true);
-        account.setFrom(mailAccountDO.getFrom());
-        account.setUser(mailAccountDO.getUsername());
-        account.setPass(mailAccountDO.getPassword());
-        account.setSslEnable(mailAccountDO.getSslEnable());
+        MailAccount account  = MailAccountConvert.INSTANCE.convertAccount(mailAccountDO);
+
         //发送
         MailUtil.send(account , mailSendVO.getTos() , mailSendVO.getTitle() , mailSendVO.getContent() , false);
     }
