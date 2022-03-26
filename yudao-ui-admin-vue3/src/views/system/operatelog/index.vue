@@ -1,12 +1,12 @@
 <template>
   <div class="app-container">
-    <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="系统模块" prop="title">
-        <el-input v-model="queryParams.title" placeholder="请输入系统模块" clearable style="width: 240px;"
+    <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
+      <el-form-item label="系统模块" prop="module">
+        <el-input v-model="queryParams.module" placeholder="请输入系统模块" clearable style="width: 240px;"
                   @keyup.enter.native="handleQuery"/>
       </el-form-item>
-      <el-form-item label="操作人员" prop="operName">
-        <el-input v-model="queryParams.operName" placeholder="请输入操作人员" clearable style="width: 240px;"
+      <el-form-item label="操作人员" prop="userNickname">
+        <el-input v-model="queryParams.userNickname" placeholder="请输入操作人员" clearable style="width: 240px;"
                   @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item label="类型" prop="type">
@@ -22,23 +22,23 @@
         </el-select>
       </el-form-item>
       <el-form-item label="操作时间">
-        <el-date-picker v-model="dateRange" style="width: 240px" value-format="yyyy-MM-dd"
+        <el-date-picker v-model="dateRange" style="width: 240px" value-format="YYYY-MM-DD"
                         type="daterange" range-separator="-" start-placeholder="开始日期"
                         end-placeholder="结束日期"></el-date-picker>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
-        <el-button icon="el-icon-refresh" @click="resetQuery">重置</el-button>
+        <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
+        <el-button icon="Refresh" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
 
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
-        <el-button type="warning" icon="el-icon-download" size="small" @click="handleExport" :loading="exportLoading"
+        <el-button type="warning" icon="Download" @click="handleExport" :loading="exportLoading"
                    v-hasPermi="['system:operate-log:export']">导出
         </el-button>
       </el-col>
-      <right-toolbar v-model:showSearch="showSearch" @queryTable="getList"></right-toolbar>
+      <right-toolbar v-model:showSearch="showSearch" @queryTable="getList" />
     </el-row>
 
     <el-table v-loading="loading" :data="list">
@@ -149,9 +149,9 @@ const data = reactive({
   queryParams: {
     pageNo: 1,
     pageSize: 10,
-    title: undefined,
-    operName: undefined,
-    businessType: undefined,
+    module: undefined,
+    userNickname: undefined,
+    type: undefined,
     status: undefined
   }
 });
@@ -160,12 +160,10 @@ const {formData, queryParams} = toRefs(data);
 /** 查询登录日志 */
 function getList() {
   loading.value = true;
-
-  const qP = proxy.addDateRange(queryParams.value, [
+  listOperateLog(proxy.addDateRange(queryParams.value, [
     dateRange.value[0] ? dateRange.value[0] + ' 00:00:00' : undefined,
     dateRange.value[1] ? dateRange.value[1] + ' 23:59:59' : undefined,
-  ])
-  listOperateLog(qP).then(response => {
+  ])).then(response => {
         list.value = response.data.list;
         total.value = response.data.total;
         loading.value = false;
@@ -195,13 +193,12 @@ function handleView(row) {
 
 /** 导出按钮操作 */
 function handleExport() {
-  const qP = proxy.addDateRange(queryParams.value, [
-    dateRange.value[0] ? dateRange.value[0] + ' 00:00:00' : undefined,
-    dateRange.value[1] ? dateRange.value[1] + ' 23:59:59' : undefined,
-  ])
   proxy.$modal.confirm('是否确认导出所有操作日志数据项?').then(() => {
     exportLoading.value = true;
-    return exportOperateLog(qP);
+    return exportOperateLog(proxy.addDateRange(queryParams.value, [
+      dateRange.value[0] ? dateRange.value[0] + ' 00:00:00' : undefined,
+      dateRange.value[1] ? dateRange.value[1] + ' 23:59:59' : undefined,
+    ]));
   }).then(response => {
     proxy.$download.excel(response, '操作日志.xls');
     exportLoading.value = false;
@@ -210,6 +207,5 @@ function handleExport() {
 }
 
 getList();
-
 </script>
 
