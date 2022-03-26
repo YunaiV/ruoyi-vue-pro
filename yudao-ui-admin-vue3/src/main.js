@@ -43,6 +43,8 @@ import ImagePreview from "@/components/ImagePreview"
 import TreeSelect from '@/components/TreeSelect'
 // 字典标签组件
 import DictTag from '@/components/DictTag'
+// 文档提示
+import DocAlert from '@/components/DocAlert'
 
 
 const app = createApp(App)
@@ -63,6 +65,7 @@ app.config.globalProperties.handleTree = handleTree
 
 // 全局组件挂载
 app.component('DictTag', DictTag)
+app.component('DocAlert', DocAlert)
 app.component('Pagination', Pagination)
 app.component('TreeSelect', TreeSelect)
 app.component('FileUpload', FileUpload)

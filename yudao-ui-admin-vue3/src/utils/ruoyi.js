@@ -295,11 +295,11 @@ export function getTenantEnable() {
  * 获得文档是否开启
  */
 export function getDocEnable() {
-  if (import.meta.env.VUE_APP_DOC_ENABLE === "true") {
+  if (import.meta.env.VITE_APP_DOC_ENABLE === "true") {
     return true;
   }
-  if (import.meta.env.VUE_APP_DOC_ENABLE === "false") {
+  if (import.meta.env.VITE_APP_DOC_ENABLE === "false") {
     return false;
   }
-  return import.meta.env.VUE_APP_DOC_ENABLE || false;
+  return import.meta.env.VITE_APP_DOC_ENABLE || false;
 }
