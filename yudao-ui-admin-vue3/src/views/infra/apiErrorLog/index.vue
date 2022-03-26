@@ -2,7 +2,7 @@
   <div class="app-container">
 
     <!-- 搜索工作栏 -->
-    <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
+    <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
       <el-form-item label="用户编号" prop="userId">
         <el-input v-model="queryParams.userId" placeholder="请输入用户编号" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
@@ -20,7 +20,7 @@
         <el-input v-model="queryParams.requestUrl" placeholder="请输入请求地址" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item label="异常时间">
-        <el-date-picker v-model="dateRange" style="width: 240px" value-format="yyyy-MM-dd"
+        <el-date-picker v-model="dateRange" style="width: 240px" value-format="YYYY-MM-DD"
                         type="daterange" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期"/>
       </el-form-item>
       <el-form-item label="处理状态" prop="processStatus">
@@ -30,20 +30,19 @@
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
-        <el-button icon="el-icon-refresh" @click="resetQuery">重置</el-button>
+        <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
+        <el-button icon="Refresh" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
 
     <!-- 操作工具栏 -->
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
-        <el-button type="warning" plain icon="el-icon-download" size="small" @click="handleExport"
-                   :loading="exportLoading"
+        <el-button type="warning" plain icon="Download" @click="handleExport" :loading="exportLoading"
                    v-hasPermi="['infra:api-error-log:export']">导出
         </el-button>
       </el-col>
-      <right-toolbar v-model:showSearch="showSearch" @queryTable="getList"></right-toolbar>
+      <right-toolbar v-model:showSearch="showSearch" @queryTable="getList" />
     </el-row>
 
     <!-- 列表 -->
@@ -55,7 +54,6 @@
           <dict-tag :type="DICT_TYPE.USER_TYPE" :value="scope.row.userType"/>
         </template>
       </el-table-column>
-      >
       <el-table-column label="应用名" align="center" prop="applicationName"/>
       <el-table-column label="请求方法名" align="center" prop="requestMethod"/>
       <el-table-column label="请求地址" align="center" prop="requestUrl" width="250"/>
@@ -72,15 +70,15 @@
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template #default="scope">
-          <el-button size="small" type="text" icon="el-icon-view" @click="handleView(scope.row,scope.index)"
+          <el-button size="small" type="text" icon="View" @click="handleView(scope.row,scope.index)"
                      v-hasPermi="['infra:api-access-log:query']">详细
           </el-button>
-          <el-button type="text" size="small" icon="el-icon-check"
+          <el-button type="text" size="small" icon="Check"
                      v-if="scope.row.processStatus === InfApiErrorLogProcessStatusEnum.INIT"
                      v-hasPermi="['infra:api-error-log:update-status']"
                      @click="handleProcessClick(scope.row, InfApiErrorLogProcessStatusEnum.DONE)">已处理
           </el-button>
-          <el-button type="text" size="small" icon="el-icon-check"
+          <el-button type="text" size="small" icon="Check"
                      v-if="scope.row.processStatus === InfApiErrorLogProcessStatusEnum.INIT"
                      v-hasPermi="['infra:api-error-log:update-status']"
                      @click="handleProcessClick(scope.row, InfApiErrorLogProcessStatusEnum.IGNORE)">已忽略
@@ -135,7 +133,6 @@ import {updateApiErrorLogProcess, getApiErrorLogPage, exportApiErrorLogExcel} fr
 import {InfraApiErrorLogProcessStatusEnum} from '@/utils/constants'
 const {proxy} = getCurrentInstance();
 
-
 const loading = ref(true);// 遮罩层
 const exportLoading = ref(false);// 导出遮罩层
 const showSearch = ref(true);// 显示搜索条件
@@ -162,25 +159,17 @@ const data = reactive({
 
 const {formData, queryParams} = toRefs(data);
 
-
 /** 查询列表 */
 function getList() {
-
-
   loading.value = true;
   // 处理查询参数
   let params = queryParams.value;
   proxy.addBeginAndEndTime(params, dateRange.value, 'exceptionTime');
   // 执行查询
   getApiErrorLogPage(params).then(response => {
-    //loading.vlaue = false;
     list.value = response.data.list;
     total.value = response.data.total;
-    //不知道什么原因，数据查询完成后会变成载入中状态，延迟赋值
-    setTimeout(function(){
-      loading.value=false;
-    },50)
-
+    loading.value = false;
   });
 }
 

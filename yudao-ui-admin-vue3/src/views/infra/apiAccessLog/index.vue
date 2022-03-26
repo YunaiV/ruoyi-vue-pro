@@ -194,7 +194,7 @@ function handleView(row) {
 /** 导出按钮操作 */
 function handleExport() {
   // 处理查询参数
-  let params = queryParams.value;
+  let params = {...queryParams.value};
   params.pageNo = undefined;
   params.pageSize = undefined;
   proxy.addBeginAndEndTime(params, dateRange.value, 'beginTime');
