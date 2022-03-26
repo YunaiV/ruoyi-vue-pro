@@ -204,7 +204,7 @@ function handleExport() {
     return exportApiAccessLogExcel(params);
   }).then(response => {
     proxy.$download.excel(response, 'API 访问日志.xls');
-    exportLoading.vlaue = false;
+    exportLoading.value = false;
   }).catch(() => {
   });
 }
