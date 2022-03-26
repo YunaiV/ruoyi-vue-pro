@@ -40,7 +40,7 @@
          <el-table-column prop="component" label="组件路径" :show-overflow-tooltip="true" />
          <el-table-column prop="status" label="状态" width="80">
             <template #default="scope">
-               <dict-tag :options="sys_normal_disable" :value="scope.row.status" />
+              <dict-tag :type="DICT_TYPE.COMMON_STATUS" :value="scope.row.status"/>
             </template>
          </el-table-column>
          <el-table-column label="创建时间" align="center" prop="createTime">
