@@ -1,8 +1,7 @@
 <template>
   <div class="app-container">
-
     <!-- 搜索工作栏 -->
-    <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
+    <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
       <el-form-item label="用户编号" prop="userId">
         <el-input v-model="queryParams.userId" placeholder="请输入用户编号" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
@@ -20,7 +19,7 @@
         <el-input v-model="queryParams.requestUrl" placeholder="请输入请求地址" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item label="请求时间">
-        <el-date-picker v-model="dateRange" style="width: 240px" value-format="yyyy-MM-dd"
+        <el-date-picker v-model="dateRange" style="width: 240px" value-format="YYYY-MM-DD"
                         type="daterange" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期"/>
       </el-form-item>
       <el-form-item label="执行时长" prop="duration">
@@ -30,20 +29,18 @@
         <el-input v-model="queryParams.resultCode" placeholder="请输入结果码" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
-        <el-button icon="el-icon-refresh" @click="resetQuery">重置</el-button>
+        <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
+        <el-button icon="Refresh" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
 
     <!-- 操作工具栏 -->
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
-        <el-button type="warning" plain icon="el-icon-download" size="small" :loading="exportLoading"
-                   @click="handleExport"
-                   v-hasPermi="['infra:api-access-log:export']">导出
-        </el-button>
+        <el-button type="warning" plain icon="Download" :loading="exportLoading" @click="handleExport"
+                   v-hasPermi="['infra:api-access-log:export']">导出</el-button>
       </el-col>
-      <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
+      <right-toolbar v-model:showSearch="showSearch" @queryTable="getList" />
     </el-row>
 
     <!-- 列表 -->
@@ -76,7 +73,7 @@
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template #default="scope">
-          <el-button size="small" type="text" icon="el-icon-view" @click="handleView(scope.row,scope.index)"
+          <el-button size="small" type="text" icon="View" @click="handleView(scope.row,scope.index)"
                      v-hasPermi="['infra:api-access-log:query']">详细
           </el-button>
         </template>
@@ -148,7 +145,6 @@ const data = reactive({
 });
 
 const {formData, queryParams} = toRefs(data);
-
 
 /** 查询列表 */
 function getList() {

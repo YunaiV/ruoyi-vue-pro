@@ -68,7 +68,7 @@
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template #default="scope">
-          <el-button size="small" type="text" icon="el-icon-view" @click="handleView(scope.row)"
+          <el-button size="small" type="text" icon="View" @click="handleView(scope.row)"
                      v-hasPermi="['system:operate-log:query']">详细
           </el-button>
         </template>
