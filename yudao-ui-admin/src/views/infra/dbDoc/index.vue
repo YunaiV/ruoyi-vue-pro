@@ -9,9 +9,7 @@
     </el-row>
 
     <!-- 展示文档 -->
-    <div v-loading="loading" :style="'height:'+ height">
-      <i-frame :src="src" />
-    </div>
+    <i-frame :src="src" />
   </div>
 </template>
 <script>
@@ -23,18 +21,8 @@ export default {
   components: { iFrame },
   data() {
     return {
-      height: document.documentElement.clientHeight - 94.5 + "px;",
       loading: true,
       src: undefined,
-    };
-  },
-  mounted: function() {
-    setTimeout(() => {
-      this.loading = false;
-    }, 230);
-    const that = this;
-    window.onresize = function temp() {
-      that.height = document.documentElement.clientHeight - 94.5 + "px;";
     };
   },
   created() {
