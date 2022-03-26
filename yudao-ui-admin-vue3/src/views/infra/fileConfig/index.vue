@@ -2,7 +2,7 @@
   <div class="app-container">
 <!--    <doc-alert title="上传下载" url="https://doc.iocoder.cn/file/" />-->
     <!-- 搜索工作栏 -->
-    <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
+    <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
       <el-form-item label="配置名" prop="name">
         <el-input v-model="queryParams.name" placeholder="请输入配置名" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
@@ -13,22 +13,22 @@
         </el-select>
       </el-form-item>
       <el-form-item label="创建时间">
-        <el-date-picker v-model="dateRangeCreateTime" style="width: 240px" value-format="yyyy-MM-dd"
+        <el-date-picker v-model="dateRangeCreateTime" style="width: 240px" value-format="YYYY-MM-DD"
                         type="daterange" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" />
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
-        <el-button icon="el-icon-refresh" @click="resetQuery">重置</el-button>
+        <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
+        <el-button icon="Refresh" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
 
     <!-- 操作工具栏 -->
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
-        <el-button type="primary" plain icon="el-icon-plus" size="small" @click="handleAdd"
+        <el-button type="primary" plain icon="Plus" @click="handleAdd"
                    v-hasPermi="['infra:file-config:create']">新增</el-button>
       </el-col>
-      <right-toolbar :showSearch="showSearch" @queryTable="getList"></right-toolbar>
+      <right-toolbar :showSearch="showSearch" @queryTable="getList"/>
     </el-row>
 
     <!-- 列表 -->
@@ -53,12 +53,12 @@
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="240">
         <template #default="scope">
-          <el-button size="small" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
+          <el-button size="small" type="text" icon="Edit" @click="handleUpdate(scope.row)"
                      v-hasPermi="['infra:file-config:update']">修改</el-button>
-          <el-button size="small" type="text" icon="el-icon-attract" @click="handleMaster(scope.row)"
+          <el-button size="small" type="text" icon="Check" @click="handleMaster(scope.row)"
                      :disabled="scope.row.master" v-hasPermi="['infra:file-config:update']">主配置</el-button>
-          <el-button size="small" type="text" icon="el-icon-share" @click="handleTest(scope.row)">测试</el-button>
-          <el-button size="small" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)"
+          <el-button size="small" type="text" icon="Share" @click="handleTest(scope.row)">测试</el-button>
+          <el-button size="small" type="text" icon="Delete" @click="handleDelete(scope.row)"
                      v-hasPermi="['infra:file-config:delete']">删除</el-button>
         </template>
       </el-table-column>
@@ -126,10 +126,12 @@
           <el-input v-model="formData.config.domain" placeholder="请输入自定义域名" />
         </el-form-item>
       </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="submitForm">确 定</el-button>
-        <el-button @click="cancel">取 消</el-button>
-      </div>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button type="primary" @click="submitForm">确 定</el-button>
+          <el-button @click="cancel">取 消</el-button>
+        </div>
+      </template>
     </el-dialog>
   </div>
 </template>
@@ -143,7 +145,6 @@ import {
   getFileConfigPage,
   testFileConfig, updateFileConfigMaster
 } from "@/api/infra/fileConfig";
-
 
 const {proxy} = getCurrentInstance();
 const title=ref("");
@@ -189,114 +190,121 @@ const data = reactive({
 
 const { queryParams,formData, rules} = toRefs(data);
 
+/** 查询列表 */
+function getList() {
+  loading.value = true;
+  // 处理查询参数
+  let params = {...queryParams.value};
+  proxy.addBeginAndEndTime(params, dateRange.value, 'createTime');
+  // 执行查询
+  getFileConfigPage(params).then(response => {
+    list.value  = response.data.list;
+    total.value  = response.data.total;
+    loading.value  = false;
+  });
+}
 
+/** 取消按钮 */
+function cancel() {
+  open.value  = false;
+  reset();
+}
 
+/** 表单重置 */
+function   reset() {
+  formData.value = {
+    id: undefined,
+    name: undefined,
+    storage: undefined,
+    remark: undefined,
+    config: {},
+  };
+  proxy.resetForm("form");
+}
 
-    /** 查询列表 */
-    function   getList() {
-      loading.value = true;
-      // 处理查询参数
-      let params = {...queryParams.value};
-      proxy.addBeginAndEndTime(params, dateRange.value, 'createTime');
-      // 执行查询
-      getFileConfigPage(params).then(response => {
-        list.value  = response.data.list;
-        total.value  = response.data.total;
-        loading.value  = false;
-      });
-    }
-    /** 取消按钮 */
-    function cancel() {
-      open.value  = false;
-      reset();
-    }
-    /** 表单重置 */
-    function   reset() {
-      formData.value = {
-        id: undefined,
-        name: undefined,
-        storage: undefined,
-        remark: undefined,
-        config: {},
-      };
-      proxy.resetForm("form");
-    }
-    /** 搜索按钮操作 */
-    function  handleQuery() {
-      queryParams.value.pageNo = 1;
-      getList();
-    }
-    /** 重置按钮操作 */
-    function   resetQuery() {
-      dateRange.vlaue = [];
-      proxy.resetForm("queryForm");
-      handleQuery();
-    }
-    /** 新增按钮操作 */
-    function handleAdd() {
-      reset();
-      open.value  = true;
-      title.value  = "添加文件配置";
-    }
-    /** 修改按钮操作 */
-    function  handleUpdate(row) {
-      reset();
-      const id = row.id;
+/** 搜索按钮操作 */
+function handleQuery() {
+  queryParams.value.pageNo = 1;
+  getList();
+}
 
-      getFileConfig(id).then(response => {
-        formData.value = response.data;
-        open.value  = true;
-        title.value  = "修改文件配置";
-      });
+/** 重置按钮操作 */
+function resetQuery() {
+  dateRange.vlaue = [];
+  proxy.resetForm("queryForm");
+  handleQuery();
+}
+
+/** 新增按钮操作 */
+function handleAdd() {
+  reset();
+  open.value  = true;
+  title.value  = "添加文件配置";
+}
+
+/** 修改按钮操作 */
+function handleUpdate(row) {
+  reset();
+  const id = row.id;
+
+  getFileConfig(id).then(response => {
+    formData.value = response.data;
+    open.value  = true;
+    title.value  = "修改文件配置";
+  });
+}
+
+/** 提交按钮 */
+function  submitForm() {
+  proxy.$refs["form"].validate(valid => {
+    if (!valid) {
+      return;
     }
-    /** 提交按钮 */
-    function  submitForm() {
-      proxy.$refs["form"].validate(valid => {
-        if (!valid) {
-          return;
-        }
-        // 修改的提交
-        if (formData.id != null) {
-          updateFileConfig(formData.value).then(response => {
-            proxy.$modal.msgSuccess("修改成功");
-            open.value  = false;
-            getList();
-          });
-          return;
-        }
-        // 添加的提交
-        createFileConfig(formData.value).then(response => {
-          proxy.$modal.msgSuccess("新增成功");
-          open.value  = false;
-          getList();
-        });
-      });
-    }
-    /** 删除按钮操作 */
-    function  handleDelete(row) {
-      const id = row.id;
-      proxy.$modal.confirm('是否确认删除文件配置编号为"' + id + '"的数据项?').then(function() {
-        return deleteFileConfig(id);
-      }).then(() => {
-        getList();
-        proxy.$modal.msgSuccess("删除成功");
-      }).catch(() => {});
-    }
-    /** 主配置按钮操作 */
-    function  handleMaster(row) {
-      const id = row.id;
-      proxy.$modal.confirm('是否确认修改配置编号为"' + id + '"的数据项为主配置?').then(function() {
-        return updateFileConfigMaster(id);
-      }).then(() => {
-        getList();
+    // 修改的提交
+    if (formData.id != null) {
+      updateFileConfig(formData.value).then(response => {
         proxy.$modal.msgSuccess("修改成功");
-      }).catch(() => {});
+        open.value  = false;
+        getList();
+      });
+      return;
     }
-    /** 测试按钮操作 */
-  function  handleTest(row) {
-      testFileConfig(row.id).then((response) => {
-        proxy.$modal.alert("测试通过，上传文件成功！访问地址：" + response.data);
-      }).catch(() => {});
-    }
+    // 添加的提交
+    createFileConfig(formData.value).then(response => {
+      proxy.$modal.msgSuccess("新增成功");
+      open.value  = false;
+      getList();
+    });
+  });
+}
+
+/** 删除按钮操作 */
+function  handleDelete(row) {
+  const id = row.id;
+  proxy.$modal.confirm('是否确认删除文件配置编号为"' + id + '"的数据项?').then(function() {
+    return deleteFileConfig(id);
+  }).then(() => {
+    getList();
+    proxy.$modal.msgSuccess("删除成功");
+  }).catch(() => {});
+}
+
+/** 主配置按钮操作 */
+function  handleMaster(row) {
+  const id = row.id;
+  proxy.$modal.confirm('是否确认修改配置编号为"' + id + '"的数据项为主配置?').then(function() {
+    return updateFileConfigMaster(id);
+  }).then(() => {
+    getList();
+    proxy.$modal.msgSuccess("修改成功");
+  }).catch(() => {});
+}
+
+/** 测试按钮操作 */
+function  handleTest(row) {
+  testFileConfig(row.id).then((response) => {
+    proxy.$modal.alert("测试通过，上传文件成功！访问地址：" + response.data);
+  }).catch(() => {});
+}
 getList();
 </script>

@@ -1,6 +1,6 @@
 <template>
   <div class="app-container">
-    <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
+    <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
       <el-form-item label="登录地址" prop="userIp">
         <el-input v-model="queryParams.userIp" placeholder="请输入登录地址" clearable style="width: 240px;"
                   @keyup.enter.native="handleQuery"/>
@@ -16,19 +16,19 @@
         </el-select>
       </el-form-item>
       <el-form-item label="登录时间">
-        <el-date-picker v-model="dateRange" style="width: 240px" value-format="yyyy-MM-dd"
+        <el-date-picker v-model="dateRange" style="width: 240px" value-format="YYY-MM-DD"
                         type="daterange" range-separator="-" start-placeholder="开始日期"
                         end-placeholder="结束日期"></el-date-picker>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
-        <el-button icon="el-icon-refresh" @click="resetQuery">重置</el-button>
+        <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
+        <el-button icon="Refresh" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
 
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
-        <el-button type="warning" icon="el-icon-download" size="mini" @click="handleExport" :loading="exportLoading"
+        <el-button type="warning" icon="Download" size="mini" @click="handleExport" :loading="exportLoading"
                    v-hasPermi="['system:login-log:export']">导出
         </el-button>
       </el-col>
@@ -118,10 +118,12 @@ function resetQuery() {
 
 /** 导出按钮操作 */
 function handleExport() {
-
   proxy.$modal.confirm('是否确认导出所有操作日志数据项?').then(() => {
     exportLoading.value = true;
-    return exportLoginLog(queryParams.value);
+    return exportLoginLog(proxy.addDateRange(queryParams.value, [
+      dateRange.value[0] ? dateRange.value[0] + ' 00:00:00' : undefined,
+      dateRange.value[1] ? dateRange.value[1] + ' 23:59:59' : undefined,
+    ]));
   }).then(response => {
     proxy.$download.excel(response, '登录日志.xls');
     exportLoading.value = false;
