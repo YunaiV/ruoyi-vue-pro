@@ -46,7 +46,6 @@ import DictTag from '@/components/DictTag'
 // 文档提示
 import DocAlert from '@/components/DocAlert'
 
-
 const app = createApp(App)
 
 // 全局方法挂载
@@ -78,6 +77,14 @@ app.use(store)
 app.use(plugins)
 app.use(elementIcons)
 app.component('svg-icon', SvgIcon)
+
+// 引入 VForm 组件，参考 https://www.vform666.com/document3.html 文档
+import axios from 'axios'
+import VForm3 from 'vform3-builds' // 引入 VForm3 库
+// import 'element-plus/dist/index.css'  // 引入 element-plus 样式
+import 'vform3-builds/dist/designer.style.css'  //引入 VForm3 样式
+app.use(VForm3)  // 全局注册 VForm(同时注册了 v-form-designer、v-form-render 等组件)
+window.axios = axios
 
 directive(app)
 

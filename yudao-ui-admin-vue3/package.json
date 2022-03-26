@@ -6,7 +6,7 @@
   "license": "MIT",
   "scripts": {
     "dev": "vite",
-	"build:prod": "vite build",
+    "build:prod": "vite build",
     "build:stage": "vite build --mode staging",
     "preview": "vite preview"
   },
@@ -24,6 +24,7 @@
     "js-cookie": "3.0.1",
     "jsencrypt": "3.2.1",
     "nprogress": "0.2.0",
+    "vform3-builds": "^3.0.6",
     "vue": "3.2.26",
     "vue-cropper": "1.0.2",
     "vue-router": "4.0.12",
