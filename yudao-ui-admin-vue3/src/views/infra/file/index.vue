@@ -2,26 +2,26 @@
   <div class="app-container">
 <!--    <doc-alert title="上传下载" url="https://doc.iocoder.cn/file/"/>-->
     <!-- 搜索工作栏 -->
-    <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
+    <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
       <el-form-item label="文件路径" prop="path">
         <el-input v-model="queryParams.path" placeholder="请输入文件路径" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item label="创建时间">
-        <el-date-picker v-model="dateRange" style="width: 240px" value-format="yyyy-MM-dd"
+        <el-date-picker v-model="dateRange" style="width: 240px" value-format="YYYY-MM-DD"
                         type="daterange" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期"/>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
-        <el-button icon="el-icon-refresh" @click="resetQuery">重置</el-button>
+        <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
+        <el-button icon="Refresh" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
 
     <!-- 操作工具栏 -->
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
-        <el-button type="primary" plain icon="el-icon-plus" size="small" @click="handleAdd">上传文件</el-button>
+        <el-button type="primary" plain icon="Plus" @click="handleAdd">上传文件</el-button>
       </el-col>
-      <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
+      <right-toolbar :showSearch.sync="showSearch" @queryTable="getList" />
     </el-row>
 
     <!-- 列表 -->
@@ -44,7 +44,7 @@
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="100">
         <template #default="scope">
-          <el-button size="small" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)"
+          <el-button size="small" type="text" icon="Delete" @click="handleDelete(scope.row)"
                      v-hasPermi="['infra:file:delete']">删除
           </el-button>
         </template>
@@ -61,16 +61,20 @@
                  :on-change="handleFileChange"
                  :on-progress="handleFileUploadProgress"
                  :on-success="handleFileSuccess">
-        <i class="el-icon-upload"></i>
+        <el-icon class="el-icon--upload"><upload-filled /></el-icon>
         <div class="el-upload__text">
           将文件拖到此处，或 <em>点击上传</em>
         </div>
-        <div class="el-upload__tip" style="color:red" slot="tip">提示：仅允许导入 jpg、png、gif 格式文件！</div>
+        <template #tip>
+          <div class="el-upload__tip" style="color:red" slot="tip">提示：仅允许导入 jpg、png、gif 格式文件！</div>
+        </template>
       </el-upload>
-      <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="submitFileForm">确 定</el-button>
-        <el-button @click="uploadData.open = false">取 消</el-button>
-      </div>
+      <template #footer>
+        <div slot="footer" class="dialog-footer">
+          <el-button type="primary" @click="submitFileForm">确 定</el-button>
+          <el-button @click="uploadData.open = false">取 消</el-button>
+        </div>
+      </template>
     </el-dialog>
 
   </div>
@@ -112,7 +116,6 @@ const data = reactive({
 });
 
 const {formData, queryParams, uploadData} = toRefs(data);
-
 
 /** 查询列表 */
 function getList() {
