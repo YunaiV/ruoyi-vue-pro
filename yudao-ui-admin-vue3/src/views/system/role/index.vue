@@ -267,7 +267,7 @@
 
 <script setup name="Role">
 import { addRole, changeRoleStatus, dataScope, delRole, getRole, listRole, updateRole } from "@/api/system/role";
-import { roleMenuTreeselect, treeselect as menuTreeselect } from "@/api/system/menu";
+import {   } from "@/api/system/menu";
 import { treeselect as deptTreeselect, roleDeptTreeselect } from "@/api/system/dept";
 
 const router = useRouter();
@@ -393,9 +393,9 @@ function handleAuthUser(row) {
 }
 /** 查询菜单树结构 */
 function getMenuTreeselect() {
-  menuTreeselect().then(response => {
-    menuOptions.value = response.data;
-  });
+  // menuTreeselect().then(response => {
+  //   menuOptions.value = response.data;
+  // });
 }
 /** 所有部门节点数据 */
 function getDeptAllCheckedKeys() {
@@ -460,10 +460,10 @@ function handleUpdate(row) {
 }
 /** 根据角色ID查询菜单树结构 */
 function getRoleMenuTreeselect(roleId) {
-  return roleMenuTreeselect(roleId).then(response => {
-    menuOptions.value = response.menus;
-    return response;
-  });
+  // return roleMenuTreeselect(roleId).then(response => {
+  //   menuOptions.value = response.menus;
+  //   return response;
+  // });
 }
 /** 根据角色ID查询部门树结构 */
 function getRoleDeptTreeselect(roleId) {

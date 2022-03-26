@@ -128,7 +128,7 @@
 
 <script setup name="GenEdit">
 import { getGenTable, updateGenTable } from "@/api/tool/gen";
-import { optionselect as getDictOptionselect } from "@/api/system/dict/type";
+import {  } from "@/api/system/dict/type";
 import basicInfoForm from "./basicInfoForm";
 import genInfoForm from "./genInfoForm";
 
@@ -190,9 +190,9 @@ function close() {
       tables.value = res.data.tables;
     });
     /** 查询字典下拉列表 */
-    getDictOptionselect().then(response => {
-      dictOptions.value = response.data;
-    });
+    // getDictOptionselect().then(response => {
+    //   dictOptions.value = response.data;
+    // });
   }
 })();
 </script>

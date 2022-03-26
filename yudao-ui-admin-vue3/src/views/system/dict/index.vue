@@ -182,7 +182,7 @@
 </template>
 
 <script setup name="Dict">
-import { listType, getType, delType, addType, updateType, refreshCache } from "@/api/system/dict/type";
+import { listType, getType, delType, addType, updateType } from "@/api/system/dict/type";
 
 const { proxy } = getCurrentInstance();
 const { sys_normal_disable } = proxy.useDict("sys_normal_disable");
@@ -311,9 +311,9 @@ function handleExport() {
 }
 /** 刷新缓存按钮操作 */
 function handleRefreshCache() {
-  refreshCache().then(() => {
-    proxy.$modal.msgSuccess("刷新成功");
-  });
+  // refreshCache().then(() => {
+  //   proxy.$modal.msgSuccess("刷新成功");
+  // });
 }
 
 getList();
