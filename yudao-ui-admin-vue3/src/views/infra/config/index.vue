@@ -1,6 +1,6 @@
 <template>
   <div class="app-container">
-    <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
+    <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
       <el-form-item label="参数名称" prop="name">
         <el-input v-model="queryParams.name" placeholder="请输入参数名称" clearable style="width: 240px"
                   @keyup.enter.native="handleQuery"/>
@@ -16,27 +16,27 @@
         </el-select>
       </el-form-item>
       <el-form-item label="创建时间">
-        <el-date-picker v-model="dateRange" style="width: 240px" value-format="yyyy-MM-dd" type="daterange"
+        <el-date-picker v-model="dateRange" style="width: 240px" value-format="YYYY-MM-DD" type="daterange"
                         range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期"/>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
-        <el-button icon="el-icon-refresh" @click="resetQuery">重置</el-button>
+        <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
+        <el-button icon="Refresh" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
 
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
-        <el-button type="primary" plain icon="el-icon-plus" size="small" @click="handleAdd"
+        <el-button type="primary" plain icon="Plus" @click="handleAdd"
                    v-hasPermi="['infra:config:create']">新增
         </el-button>
       </el-col>
       <el-col :span="1.5">
-        <el-button type="warning" icon="el-icon-download" size="small" @click="handleExport" v-model:loading="exportLoading"
+        <el-button type="warning" icon="Download" @click="handleExport" v-model:loading="exportLoading"
                    v-hasPermi="['infra:config:export']">导出
         </el-button>
       </el-col>
-      <right-toolbar v-model:showSearch="showSearch" @queryTable="getList"></right-toolbar>
+      <right-toolbar v-model:showSearch="showSearch" @queryTable="getList" />
     </el-row>
 
     <el-table v-loading="loading" :data="configList">
@@ -63,10 +63,10 @@
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template #default="scope">
-          <el-button size="small" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
+          <el-button size="small" type="text" icon="Edit" @click="handleUpdate(scope.row)"
                      v-hasPermi="['infra:config:update']">修改
           </el-button>
-          <el-button size="small" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)"
+          <el-button size="small" type="text" icon="Delete" @click="handleDelete(scope.row)"
                      v-hasPermi="['infra:config:delete']">删除
           </el-button>
         </template>
@@ -101,10 +101,12 @@
           <el-input v-model="formData.remark" type="textarea" placeholder="请输入内容"/>
         </el-form-item>
       </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="submitForm">确 定</el-button>
-        <el-button @click="cancel">取 消</el-button>
-      </div>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button type="primary" @click="submitForm">确 定</el-button>
+          <el-button @click="cancel">取 消</el-button>
+        </div>
+      </template>
     </el-dialog>
   </div>
 </template>
@@ -150,7 +152,6 @@ const data = reactive({
 });
 
 const {formData, queryParams, rules} = toRefs(data);
-
 
 /** 查询参数列表 */
 function getList() {
@@ -218,21 +219,24 @@ function handleUpdate(row) {
 /** 提交按钮 */
 function submitForm() {
   proxy.$refs["form"].validate(valid => {
-    if (valid) {
-      if (form.value.id !== undefined) {
-        updateConfig(form.value).then(response => {
-          proxy.$modal.msgSuccess("修改成功");
-          open.value = false;
-          getList();
-        });
-      } else {
-        addConfig(form).then(response => {
-          proxy.$modal.msgSuccess("新增成功");
-          open.value = false;
-          getList();
-        });
-      }
+    if (!valid) {
+      return;
     }
+    // 修改的提交
+    if (formData.value.id != null) {
+      updateConfig(formData.value).then(response => {
+        proxy.$modal.msgSuccess("修改成功");
+        open.value  = false;
+        getList();
+      });
+      return;
+    }
+    // 添加的提交
+    addConfig(formData.value).then(response => {
+      proxy.$modal.msgSuccess("新增成功");
+      open.value  = false;
+      getList();
+    });
   });
 }
 
@@ -250,13 +254,12 @@ function handleDelete(row) {
 
 /** 导出按钮操作 */
 function handleExport() {
-  const queryParams = addDateRange(queryParams.value, [
-    dateRange.value [0] ? dateRange.value [0] + ' 00:00:00' : undefined,
-    dateRange.value [1] ? dateRange.value [1] + ' 23:59:59' : undefined,
-  ]);
   proxy.$modal.confirm('是否确认导出所有参数数据项?').then(() => {
     exportLoading.value = true;
-    return exportConfig(queryParams);
+    return exportConfig(proxy.addDateRange(queryParams.value, [
+      dateRange.value [0] ? dateRange.value [0] + ' 00:00:00' : undefined,
+      dateRange.value [1] ? dateRange.value [1] + ' 23:59:59' : undefined,
+    ]));
   }).then(response => {
     proxy.$download.excel(response, '参数配置.xls');
     exportLoading.value = false;

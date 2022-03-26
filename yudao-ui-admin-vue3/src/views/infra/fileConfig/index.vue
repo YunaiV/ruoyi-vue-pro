@@ -188,7 +188,7 @@ const data = reactive({
   }
 });
 
-const { queryParams,formData, rules} = toRefs(data);
+const { queryParams, formData, rules} = toRefs(data);
 
 /** 查询列表 */
 function getList() {
@@ -261,7 +261,7 @@ function  submitForm() {
       return;
     }
     // 修改的提交
-    if (formData.id != null) {
+    if (formData.value.id != null) {
       updateFileConfig(formData.value).then(response => {
         proxy.$modal.msgSuccess("修改成功");
         open.value  = false;
