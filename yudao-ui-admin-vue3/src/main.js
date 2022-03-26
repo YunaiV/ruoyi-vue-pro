@@ -25,7 +25,7 @@ import elementIcons from '@/components/SvgIcon/svgicon'
 import './permission' // permission control
 
 import { useDict } from '@/utils/dict'  // TODO 芋艿，需要删除
-import { parseTime, resetForm, addDateRange, handleTree, selectDictLabel } from '@/utils/ruoyi'
+import { parseTime, resetForm, addDateRange, handleTree, selectDictLabel,addBeginAndEndTime} from '@/utils/ruoyi'
 import {DICT_TYPE, getDictDataLabel, getDictDatas, getDictDatas2} from "@/utils/dict";
 
 
@@ -44,6 +44,7 @@ import TreeSelect from '@/components/TreeSelect'
 // 字典标签组件
 import DictTag from '@/components/DictTag'
 
+
 const app = createApp(App)
 
 // 全局方法挂载
@@ -52,6 +53,7 @@ app.config.globalProperties.download = download
 app.config.globalProperties.parseTime = parseTime
 app.config.globalProperties.resetForm = resetForm
 app.config.globalProperties.addDateRange = addDateRange
+app.config.globalProperties.addBeginAndEndTime=addBeginAndEndTime
 app.config.globalProperties.selectDictLabel = selectDictLabel
 app.config.globalProperties.getDictDatas = getDictDatas
 app.config.globalProperties.getDictDatas2 = getDictDatas2

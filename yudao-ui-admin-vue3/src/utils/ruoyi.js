@@ -68,6 +68,35 @@ export function addDateRange(params, dateRange, propName) {
   return search;
 }
 
+
+/**
+ * 添加开始和结束时间到 params 参数中
+ *
+ * @param params 参数
+ * @param dateRange 时间范围。
+ *                大小为 2 的数组，每个时间为 yyyy-MM-dd 格式
+ * @param propName 加入的参数名，可以为空
+ */
+export function addBeginAndEndTime(params, dateRange, propName) {
+  // 必须传入参数
+  if (!dateRange) {
+    return params;
+  }
+  // 如果未传递 propName 属性，默认为 time
+  if (!propName) {
+    propName = 'Time';
+  } else {
+    propName = propName.charAt(0).toUpperCase() + propName.slice(1);
+  }
+  // 设置参数
+  if (dateRange[0]) {
+    params['begin' + propName] = dateRange[0] + ' 00:00:00';
+  }
+  if (dateRange[1]) {
+    params['end' + propName] = dateRange[1] + ' 23:59:59';
+  }
+  return params;
+}
 // 回显数据字典
 export function selectDictLabel(datas, value) {
   if (value === undefined) {
