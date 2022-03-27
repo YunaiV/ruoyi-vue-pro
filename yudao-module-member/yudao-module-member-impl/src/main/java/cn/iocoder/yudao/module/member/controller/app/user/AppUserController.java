@@ -16,9 +16,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
-import java.io.IOException;
 
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.*;
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 import static cn.iocoder.yudao.module.infra.enums.ErrorCodeConstants.FILE_IS_EMPTY;
@@ -44,7 +43,7 @@ public class AppUserController {
     @PutMapping("/update-avatar")
     @ApiOperation("修改用户头像")
     @PreAuthenticated
-    public CommonResult<String> updateUserAvatar(@RequestParam("avatarFile") MultipartFile file) throws IOException {
+    public CommonResult<String> updateUserAvatar(@RequestParam("avatarFile") MultipartFile file) throws Exception {
         if (file.isEmpty()) {
             throw exception(FILE_IS_EMPTY);
         }

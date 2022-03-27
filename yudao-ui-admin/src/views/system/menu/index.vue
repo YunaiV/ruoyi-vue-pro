@@ -1,17 +1,18 @@
 <template>
   <div class="app-container">
-    <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch">
+    <doc-alert title="功能权限" url="https://doc.iocoder.cn/resource-permission" />
+    <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch">
       <el-form-item label="菜单名称" prop="name">
-        <el-input v-model="queryParams.name" placeholder="请输入菜单名称" clearable size="small" @keyup.enter.native="handleQuery"/>
+        <el-input v-model="queryParams.name" placeholder="请输入菜单名称" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item label="状态" prop="status">
-        <el-select v-model="queryParams.status" placeholder="菜单状态" clearable size="small">
+        <el-select v-model="queryParams.status" placeholder="菜单状态" clearable>
           <el-option v-for="dict in statusDictDatas" :key="parseInt(dict.value)" :label="dict.label" :value="parseInt(dict.value)"/>
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
-        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
+        <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
+        <el-button icon="el-icon-refresh" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
 

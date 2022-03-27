@@ -116,7 +116,7 @@ ps：核心功能已经实现，正在对接微信小程序中...
 |     | 表单构建     | 拖动表单元素生成相应的 HTML 代码，支持导出 JSON、Vue 文件         |
 | 🚀  | 配置管理     | 对系统动态配置常用参数，支持 SpringBoot 加载                 |
 | ⭐️  | 定时任务     | 在线（添加、修改、删除)任务调度包含执行结果日志                     |
-| 🚀  | 文件服务     | 支持本地文件存储，同时支持兼容 Amazon S3 协议的云服务、开源组件        | 
+| 🚀  | 文件服务     | 支持将文件存储到 S3（MinIO、阿里云、腾讯云、七牛云）、本地、FTP、数据库等      | 
 | 🚀  | API 日志   | 包括 RESTful API 访问日志、异常日志两部分，方便排查 API 相关的问题   |
 |     | MySQL 监控 | 监视当前系统数据库连接池状态，可进行分析SQL找出系统性能瓶颈              |
 |     | Redis 监控 | 监控 Redis 数据库的使用情况，使用的 Redis Key 管理           |
@@ -218,7 +218,7 @@ ps：核心功能已经实现，正在对接微信小程序中...
 |---------------|----------------------------------------------------------------------|--------------------------------------------------------------------|------------------------------------------------------------------|
 | 代码生成          | ![代码生成](https://static.iocoder.cn/images/ruoyi-vue-pro/代码生成.jpg)     | ![生成效果](https://static.iocoder.cn/images/ruoyi-vue-pro/生成效果.jpg)   | -                                                                |
 | 文档            | ![系统接口](https://static.iocoder.cn/images/ruoyi-vue-pro/系统接口.jpg)     | ![数据库文档](https://static.iocoder.cn/images/ruoyi-vue-pro/数据库文档.jpg) | -                                                                |
-| 文件 & 配置       | ![文件管理](https://static.iocoder.cn/images/ruoyi-vue-pro/文件管理.jpg)     | ![配置管理](https://static.iocoder.cn/images/ruoyi-vue-pro/配置管理.jpg)   | -                                                                |
+| 文件 & 配置       | ![文件配置](https://static.iocoder.cn/images/ruoyi-vue-pro/文件配置.jpg) | ![文件管理](https://static.iocoder.cn/images/ruoyi-vue-pro/文件管理2.jpg)     | ![配置管理](https://static.iocoder.cn/images/ruoyi-vue-pro/配置管理.jpg)   |
 | 定时任务          | ![定时任务](https://static.iocoder.cn/images/ruoyi-vue-pro/定时任务.jpg)     | ![任务日志](https://static.iocoder.cn/images/ruoyi-vue-pro/任务日志.jpg)   | -                                                                |
 | API 日志        | ![访问日志](https://static.iocoder.cn/images/ruoyi-vue-pro/访问日志.jpg)     | ![错误日志](https://static.iocoder.cn/images/ruoyi-vue-pro/错误日志.jpg)   | -                                                                |
 | MySQL & Redis | ![MySQL](https://static.iocoder.cn/images/ruoyi-vue-pro/MySQL.jpg)   | ![Redis](https://static.iocoder.cn/images/ruoyi-vue-pro/Redis.jpg) | -                                                                |

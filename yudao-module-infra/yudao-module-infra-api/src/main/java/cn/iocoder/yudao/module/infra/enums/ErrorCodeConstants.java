@@ -42,8 +42,11 @@ public interface ErrorCodeConstants {
     ErrorCode CODEGEN_SYNC_COLUMNS_NULL = new ErrorCode(1003001006, "同步的字段不存在");
     ErrorCode CODEGEN_SYNC_NONE_CHANGE = new ErrorCode(1003001007, "同步失败，不存在改变");
 
-    // ========== 字典类型（测试） 1003000000 ==========
-    ErrorCode TEST_DEMO_NOT_EXISTS = new ErrorCode(1003000000, "测试示例不存在");
+    // ========== 字典类型（测试）1001005000 ==========
+    ErrorCode TEST_DEMO_NOT_EXISTS = new ErrorCode(1001005000, "测试示例不存在");
 
+    // ========== 文件配置 1001006000 ==========
+    ErrorCode FILE_CONFIG_NOT_EXISTS = new ErrorCode(1001006000, "文件配置不存在");
+    ErrorCode FILE_CONFIG_DELETE_FAIL_MASTER = new ErrorCode(1001006001, "该文件配置不允许删除，原因：它是主配置，删除会导致无法上传文件");
 
 }

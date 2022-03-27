@@ -39,8 +39,8 @@ public class ValidationUtils {
                 && PATTERN_XML_NCNAME.matcher(str).matches();
     }
 
-    public static void validate(Validator validator, Object reqVO, Class<?>... groups) {
-        Set<ConstraintViolation<Object>> constraintViolations = validator.validate(reqVO, groups);
+    public static void validate(Validator validator, Object object, Class<?>... groups) {
+        Set<ConstraintViolation<Object>> constraintViolations = validator.validate(object, groups);
         if (CollUtil.isNotEmpty(constraintViolations)) {
             throw new ConstraintViolationException(constraintViolations);
         }

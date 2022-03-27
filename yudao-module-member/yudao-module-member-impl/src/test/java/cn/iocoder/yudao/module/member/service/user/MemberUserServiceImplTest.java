@@ -74,7 +74,7 @@ public class MemberUserServiceImplTest extends BaseDbAndRedisUnitTest {
     }
 
     @Test
-    public void testUpdateAvatar_success(){
+    public void testUpdateAvatar_success() throws Exception {
         // mock 数据
         MemberUserDO dbUser = randomUserDO();
         userMapper.insert(dbUser);

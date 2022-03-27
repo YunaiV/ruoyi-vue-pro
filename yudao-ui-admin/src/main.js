@@ -15,6 +15,7 @@ import plugins from './plugins' // plugins
 
 import './assets/icons' // icon
 import './permission' // permission control
+import './tongji' // 百度统计
 import { getDicts } from "@/api/system/dict/data";
 import { getConfigKey } from "@/api/infra/config";
 import { parseTime, resetForm, addDateRange, addBeginAndEndTime, handleTree} from "@/utils/ruoyi";
@@ -41,10 +42,12 @@ Vue.prototype.handleTree = handleTree
 
 // 全局组件挂载
 Vue.component('DictTag', DictTag)
+Vue.component('DocAlert', DocAlert)
 Vue.component('Pagination', Pagination)
 Vue.component('RightToolbar', RightToolbar)
 // 字典标签组件
 import DictTag from '@/components/DictTag'
+import DocAlert from '@/components/DocAlert'
 // 头部标签插件
 import VueMeta from 'vue-meta'
 

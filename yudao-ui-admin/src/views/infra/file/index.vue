@@ -1,23 +1,18 @@
 <template>
   <div class="app-container">
-
+    <doc-alert title="上传下载" url="https://doc.iocoder.cn/file/" />
     <!-- 搜索工作栏 -->
-    <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="文件路径" prop="id">
-        <el-input v-model="queryParams.id" placeholder="请输入文件路径" clearable size="small" @keyup.enter.native="handleQuery"/>
-      </el-form-item>
-      <el-form-item label="文件类型" prop="type">
-        <el-select v-model="queryParams.type" placeholder="请选择文件类型" clearable size="small">
-          <el-option label="请选择字典生成" value="" />
-        </el-select>
+    <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
+      <el-form-item label="文件路径" prop="path">
+        <el-input v-model="queryParams.path" placeholder="请输入文件路径" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item label="创建时间">
-        <el-date-picker v-model="dateRangeCreateTime" size="small" style="width: 240px" value-format="yyyy-MM-dd"
+        <el-date-picker v-model="dateRangeCreateTime" style="width: 240px" value-format="yyyy-MM-dd"
                         type="daterange" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" />
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
-        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
+        <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
+        <el-button icon="el-icon-refresh" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
 
@@ -31,21 +26,23 @@
 
     <!-- 列表 -->
     <el-table v-loading="loading" :data="list">
-      <el-table-column label="文件路径" align="center" prop="id" width="300" />
+      <el-table-column label="文件名" align="center" prop="path" />
+      <el-table-column label="URL" align="center" prop="url" />
+      <el-table-column label="文件大小" align="center" prop="size" width="120" :formatter="sizeFormat" />
       <el-table-column label="文件类型" align="center" prop="type" width="80" />
-      <el-table-column label="文件内容" align="center" prop="content">
-        <template slot-scope="scope">
-          <img v-if="scope.row.type === 'jpg' || scope.row.type === 'png' || scope.row.type === 'gif'"
-               width="200px" :src="getFileUrl + scope.row.id">
-          <i v-else>非图片，无法预览</i>
-        </template>
-      </el-table-column>
-      <el-table-column label="创建时间" align="center" prop="createTime" width="180">
+<!--      <el-table-column label="文件内容" align="center" prop="content">-->
+<!--        <template slot-scope="scope">-->
+<!--          <img v-if="scope.row.type === 'jpg' || scope.row.type === 'png' || scope.row.type === 'gif'"-->
+<!--               width="200px" :src="getFileUrl + scope.row.id">-->
+<!--          <i v-else>非图片，无法预览</i>-->
+<!--        </template>-->
+<!--      </el-table-column>-->
+      <el-table-column label="上传时间" align="center" prop="createTime" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="100">
         <template slot-scope="scope">
           <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)"
                      v-hasPermi="['infra:file:delete']">删除</el-button>
@@ -102,7 +99,7 @@ export default {
       queryParams: {
         pageNo: 1,
         pageSize: 10,
-        id: null,
+        path: null,
         type: null,
       },
       // 用户导入参数
@@ -192,6 +189,15 @@ export default {
         this.getList();
         this.$modal.msgSuccess("删除成功");
       }).catch(() => {});
+    },
+    // 用户昵称展示
+    sizeFormat(row, column) {
+      const unitArr = ["Bytes","KB","MB","GB","TB","PB","EB","ZB","YB"];
+      const srcSize = parseFloat(row.size);
+      const index = Math.floor(Math.log(srcSize) / Math.log(1024));
+      let size =srcSize/Math.pow(1024,index);
+      size = size.toFixed(2);//保留的小数位数
+      return size + ' ' + unitArr[index];
     },
   }
 };

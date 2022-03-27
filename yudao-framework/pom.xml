@@ -16,6 +16,7 @@
         <module>yudao-spring-boot-starter-web</module>
         <module>yudao-spring-boot-starter-security</module>
 
+        <module>yudao-spring-boot-starter-file</module>
         <module>yudao-spring-boot-starter-monitor</module>
         <module>yudao-spring-boot-starter-protection</module>
         <module>yudao-spring-boot-starter-config</module>

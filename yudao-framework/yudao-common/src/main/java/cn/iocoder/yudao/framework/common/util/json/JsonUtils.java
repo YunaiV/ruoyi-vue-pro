@@ -2,6 +2,7 @@ package cn.iocoder.yudao.framework.common.util.json;
 
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONUtil;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -55,7 +56,6 @@ public class JsonUtils {
         if (StrUtil.isEmpty(text)) {
             return null;
         }
-
         try {
             return objectMapper.readValue(text, clazz);
         } catch (IOException e) {
@@ -64,11 +64,26 @@ public class JsonUtils {
         }
     }
 
+    /**
+     * 将字符串解析成指定类型的对象
+     * 使用 {@link #parseObject(String, Class)} 时，在@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS) 的场景下，
+     * 如果 text 没有 class 属性，则会报错。此时，使用这个方法，可以解决。
+     *
+     * @param text 字符串
+     * @param clazz 类型
+     * @return 对象
+     */
+    public static <T> T parseObject2(String text, Class<T> clazz) {
+        if (StrUtil.isEmpty(text)) {
+            return null;
+        }
+        return JSONUtil.toBean(text, clazz);
+    }
+
     public static <T> T parseObject(byte[] bytes, Class<T> clazz) {
         if (ArrayUtil.isEmpty(bytes)) {
             return null;
         }
-
         try {
             return objectMapper.readValue(bytes, clazz);
         } catch (IOException e) {
@@ -90,7 +105,6 @@ public class JsonUtils {
         if (StrUtil.isEmpty(text)) {
             return new ArrayList<>();
         }
-
         try {
             return objectMapper.readValue(text, objectMapper.getTypeFactory().constructCollectionType(List.class, clazz));
         } catch (IOException e) {

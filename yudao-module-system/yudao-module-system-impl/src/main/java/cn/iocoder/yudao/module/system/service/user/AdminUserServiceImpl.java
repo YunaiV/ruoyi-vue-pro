@@ -63,6 +63,7 @@ public class AdminUserServiceImpl implements AdminUserService {
     private FileApi fileApi;
 
     @Override
+
     public Long createUser(UserCreateReqVO reqVO) {
         // 校验账户配合
         tenantService.handleTenantInfo(tenant -> {
@@ -118,7 +119,7 @@ public class AdminUserServiceImpl implements AdminUserService {
     }
 
     @Override
-    public String updateUserAvatar(Long id, InputStream avatarFile) {
+    public String updateUserAvatar(Long id, InputStream avatarFile) throws Exception {
         this.checkUserExists(id);
         // 存储文件
         String avatar = fileApi.createFile(IoUtil.readBytes(avatarFile));

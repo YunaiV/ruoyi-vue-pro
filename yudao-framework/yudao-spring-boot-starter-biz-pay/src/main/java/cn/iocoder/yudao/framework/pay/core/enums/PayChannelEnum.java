@@ -56,5 +56,4 @@ public enum PayChannelEnum {
         return ArrayUtil.firstMatch(o -> o.getCode().equals(code), values());
     }
 
-
 }

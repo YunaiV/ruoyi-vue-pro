@@ -30,7 +30,7 @@ public interface OperateLogConvert {
     default List<OperateLogExcelVO> convertList(List<OperateLogDO> list, Map<Long, AdminUserDO> userMap) {
         return list.stream().map(operateLog -> {
             OperateLogExcelVO excelVO = convert02(operateLog);
-            MapUtils.findAndThen(userMap, operateLog.getId(), user -> excelVO.setUserNickname(user.getNickname()));
+            MapUtils.findAndThen(userMap, operateLog.getUserId(), user -> excelVO.setUserNickname(user.getNickname()));
             excelVO.setSuccessStr(SUCCESS.getCode().equals(operateLog.getResultCode()) ? "成功" : "失败");
             return excelVO;
         }).collect(Collectors.toList());

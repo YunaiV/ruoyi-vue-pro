@@ -100,7 +100,7 @@ public class MemberUserServiceImpl implements MemberUserService {
     }
 
     @Override
-    public String updateUserAvatar(Long userId, InputStream avatarFile) {
+    public String updateUserAvatar(Long userId, InputStream avatarFile) throws Exception {
         this.checkUserExists(userId);
         // 创建文件
         String avatar = fileApi.createFile(IoUtil.readBytes(avatarFile));

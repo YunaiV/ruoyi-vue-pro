@@ -1,24 +1,24 @@
 <template>
   <div class="app-container">
-    <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
+    <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
       <el-form-item label="字典名称" prop="name">
-        <el-input v-model="queryParams.name" placeholder="请输入字典名称" clearable size="small" style="width: 240px" @keyup.enter.native="handleQuery"/>
+        <el-input v-model="queryParams.name" placeholder="请输入字典名称" clearable style="width: 240px" @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item label="字典类型" prop="type">
-        <el-input v-model="queryParams.type" placeholder="请输入字典类型" clearable size="small" style="width: 240px" @keyup.enter.native="handleQuery"/>
+        <el-input v-model="queryParams.type" placeholder="请输入字典类型" clearable style="width: 240px" @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item label="状态" prop="status">
-        <el-select v-model="queryParams.status" placeholder="字典状态" clearable size="small" style="width: 240px">
+        <el-select v-model="queryParams.status" placeholder="字典状态" clearable style="width: 240px">
           <el-option v-for="dict in statusDictDatas" :key="parseInt(dict.value)" :label="dict.label" :value="parseInt(dict.value)"/>
         </el-select>
       </el-form-item>
       <el-form-item label="创建时间">
-        <el-date-picker v-model="dateRangeCreateTime" size="small" style="width: 240px" value-format="yyyy-MM-dd" type="daterange"
+        <el-date-picker v-model="dateRangeCreateTime" style="width: 240px" value-format="yyyy-MM-dd" type="daterange"
           range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期"></el-date-picker>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
-        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
+        <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
+        <el-button icon="el-icon-refresh" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
 

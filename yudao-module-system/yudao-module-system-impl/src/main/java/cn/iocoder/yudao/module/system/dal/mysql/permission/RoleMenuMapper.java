@@ -25,8 +25,7 @@ public interface RoleMenuMapper extends BaseMapperX<RoleMenuDO> {
             entity.setMenuId(menuId);
             return entity;
         }).collect(Collectors.toList());
-        // TODO 芋艿，mybatis plus 增加批量插入的功能
-        list.forEach(this::insert);
+        insertBatch(list);
     }
 
     default void deleteListByRoleIdAndMenuIds(Long roleId, Collection<Long> menuIds) {

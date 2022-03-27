@@ -36,7 +36,7 @@ public class SecurityConfiguration {
                 registry.antMatchers(adminSeverContextPath).anonymous()
                         .antMatchers(adminSeverContextPath + "/**").anonymous();
                 // 文件的获取接口，可匿名访问
-                registry.antMatchers(buildAdminApi("/infra/file/get/**"), buildAppApi("/infra/file/get/**")).anonymous();
+                registry.antMatchers(buildAdminApi("/infra/file/*/get/**"), buildAppApi("/infra/file/get/**")).permitAll();
             }
 
         };

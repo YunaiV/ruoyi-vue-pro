@@ -60,7 +60,7 @@ public interface MemberUserService {
      * @param inputStream 头像文件
      * @return 头像url
      */
-    String updateUserAvatar(Long userId, InputStream inputStream);
+    String updateUserAvatar(Long userId, InputStream inputStream) throws Exception;
 
     /**
      * 修改手机
