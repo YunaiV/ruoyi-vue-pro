@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.sms.core.client.SmsClient;
 import cn.iocoder.yudao.framework.sms.core.client.SmsClientFactory;
 import cn.iocoder.yudao.framework.sms.core.client.impl.aliyun.AliyunSmsClient;
 import cn.iocoder.yudao.framework.sms.core.client.impl.debug.DebugDingTalkSmsClient;
+import cn.iocoder.yudao.framework.sms.core.client.impl.tencent.TencentSmsClient;
 import cn.iocoder.yudao.framework.sms.core.client.impl.yunpian.YunpianSmsClient;
 import cn.iocoder.yudao.framework.sms.core.enums.SmsChannelEnum;
 import cn.iocoder.yudao.framework.sms.core.property.SmsChannelProperties;
@@ -44,7 +45,7 @@ public class SmsClientFactoryImpl implements SmsClientFactory {
         Arrays.stream(SmsChannelEnum.values()).forEach(channel -> {
             // 创建一个空的 SmsChannelProperties 对象
             SmsChannelProperties properties = new SmsChannelProperties().setCode(channel.getCode())
-                    .setApiKey("default").setApiSecret("default");
+                    .setApiKey("default default").setApiSecret("default");
             // 创建 Sms 客户端
             AbstractSmsClient smsClient = createSmsClient(properties);
             channelCodeClients.put(channel.getCode(), smsClient);
@@ -81,6 +82,7 @@ public class SmsClientFactoryImpl implements SmsClientFactory {
             case ALIYUN: return new AliyunSmsClient(properties);
             case YUN_PIAN: return new YunpianSmsClient(properties);
             case DEBUG_DING_TALK: return new DebugDingTalkSmsClient(properties);
+            case TENCENT: return new TencentSmsClient(properties);
         }
         // 创建失败，错误日志 + 抛出异常
         log.error("[createSmsClient][配置({}) 找不到合适的客户端实现]", properties);

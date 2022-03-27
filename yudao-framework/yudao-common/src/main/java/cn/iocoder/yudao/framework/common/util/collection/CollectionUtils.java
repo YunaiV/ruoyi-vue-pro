@@ -2,8 +2,12 @@ package cn.iocoder.yudao.framework.common.util.collection;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.ImmutableMap;
 
+import java.lang.reflect.Array;
+import java.lang.reflect.GenericArrayType;
+import java.lang.reflect.Type;
 import java.util.*;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
@@ -115,7 +119,7 @@ public class CollectionUtils {
             return new HashMap<>();
         }
         return from.stream()
-                   .collect(Collectors.groupingBy(keyFunc, Collectors.mapping(valueFunc, Collectors.toList())));
+                .collect(Collectors.groupingBy(keyFunc, Collectors.mapping(valueFunc, Collectors.toList())));
     }
 
     // 暂时没想好名字，先以 2 结尾噶
@@ -168,5 +172,22 @@ public class CollectionUtils {
 
     public static <T> Collection<T> singleton(T deptId) {
         return deptId == null ? Collections.emptyList() : Collections.singleton(deptId);
+    }
+
+    public static <T, V> V[] toArray(List<T> from, Function<T, V> mapper) {
+        return toArray(convertList(from, mapper));
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> T[] toArray(List<T> from) {
+        if (CollectionUtil.isEmpty(from)) {
+            return (T[]) (new Object[0]);
+        }
+        Class<T> clazz = (Class<T>) from.get(0).getClass();
+        T[] result = (T[]) Array.newInstance(clazz, from.size());
+        for (int i = 0; i < from.size(); i++) {
+            result[i] = from.get(i);
+        }
+        return result;
     }
 }

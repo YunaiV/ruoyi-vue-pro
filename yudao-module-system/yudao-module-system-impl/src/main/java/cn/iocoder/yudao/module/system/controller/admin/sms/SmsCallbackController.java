@@ -46,4 +46,13 @@ public class SmsCallbackController {
         return success(true);
     }
 
+    @PostMapping("/tencent")
+    @ApiOperation(value = "腾讯云短信的回调", notes = "参见 https://cloud.tencent.com/document/product/382/52077 文档")
+    @OperateLog(enable = false)
+    public CommonResult<Boolean> receiveTencentSmsStatus(HttpServletRequest request) throws Throwable {
+        String text = ServletUtil.getBody(request);
+        smsSendService.receiveSmsStatus(SmsChannelEnum.TENCENT.getCode(), text);
+        return success(true);
+    }
+
 }
