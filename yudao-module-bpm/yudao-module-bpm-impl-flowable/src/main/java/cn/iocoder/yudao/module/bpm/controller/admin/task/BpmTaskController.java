@@ -76,4 +76,13 @@ public class BpmTaskController {
         taskService.updateTaskAssignee(getLoginUserId(), reqVO);
         return success(true);
     }
+    @PutMapping("/back")
+    @ApiOperation(value = "回退")
+//    @PreAuthorize("@ss.hasPermission('bpm:task:back')")
+    public CommonResult<Boolean> backTask(@Valid @RequestBody BpmTaskUpdateAssigneeReqVO reqVO) {
+        //先硬编码到 回退到第一个审批节点
+        String destinationTaskDefKey = "task01";
+        taskService.backTask(reqVO.getId(),destinationTaskDefKey);
+        return success(true);
+    }
 }

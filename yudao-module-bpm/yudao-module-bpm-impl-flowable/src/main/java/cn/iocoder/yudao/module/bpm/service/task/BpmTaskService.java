@@ -76,6 +76,12 @@ public interface BpmTaskService {
      * @param reqVO 不通过请求
      */
     void rejectTask(Long userId, @Valid BpmTaskRejectReqVO reqVO);
+    /**
+     * 回退任务
+     *
+     * @param taskId 任务编号
+     */
+    void backTask(String taskId,String destinationTaskDefKey);
 
     /**
      * 将流程任务分配给指定用户

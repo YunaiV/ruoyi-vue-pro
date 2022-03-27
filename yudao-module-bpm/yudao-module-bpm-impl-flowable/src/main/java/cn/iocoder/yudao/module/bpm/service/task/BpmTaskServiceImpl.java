@@ -17,6 +17,7 @@ import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.flowable.engine.HistoryService;
+import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -50,6 +51,8 @@ public class BpmTaskServiceImpl implements BpmTaskService{
 
     @Resource
     private TaskService taskService;
+    @Resource
+    private RuntimeService runtimeService;
     @Resource
     private HistoryService historyService;
 
@@ -201,6 +204,16 @@ public class BpmTaskServiceImpl implements BpmTaskService{
         // 更新任务拓展表为不通过
         taskExtMapper.updateByTaskId(new BpmTaskExtDO().setTaskId(task.getId())
                 .setResult(BpmProcessInstanceResultEnum.REJECT.getResult()).setComment(reqVO.getComment()));
+    }
+
+    @Override
+    public void backTask(String taskId,String destinationTaskDefKey) {
+        Task currentTask = taskService.createTaskQuery().taskId(taskId).singleResult();
+
+        runtimeService.createChangeActivityStateBuilder()
+                .processInstanceId(currentTask.getProcessInstanceId())
+                .moveActivityIdTo(currentTask.getTaskDefinitionKey(), destinationTaskDefKey)
+                .changeState();
     }
 
     @Override

@@ -109,7 +109,7 @@ import store from "@/store";
 import {decodeFields} from "@/utils/formGenerator";
 import Parser from '@/components/parser/Parser'
 import {createProcessInstance, getProcessInstance} from "@/api/bpm/processInstance";
-import {approveTask, getTaskListByProcessInstanceId, rejectTask, updateTaskAssignee} from "@/api/bpm/task";
+import {approveTask, getTaskListByProcessInstanceId, rejectTask, updateTaskAssignee,backTask} from "@/api/bpm/task";
 import {getDate} from "@/utils/dateUtils";
 import {listSimpleUsers} from "@/api/system/user";
 import {getActivityList} from "@/api/bpm/activity";
@@ -406,7 +406,15 @@ export default {
     },
     /** 处理审批退回的操作 */
     handleBack(task) {
-      this.$modal.msgError("暂不支持【退回】功能！");
+      const data = {
+        id: task.id,
+        assigneeUserId: 1
+      }
+      // this.$modal.msgError("暂不支持【--退回】功能！");
+      backTask(data).then(response => {
+        this.$modal.msgSuccess("回退成功！");
+        this.getDetail(); // 获得最新详情
+      });
     }
   }
 };
