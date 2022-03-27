@@ -76,13 +76,21 @@ public class BpmUserTaskActivityBehavior extends UserTaskActivityBehavior {
     @Override
     @DataPermission(enable = false) // 不需要处理数据权限， 不然会有问题，查询不到数据
     protected void handleAssignments(TaskService taskService, String assignee, String owner, List<String> candidateUsers, List<String> candidateGroups, TaskEntity task, ExpressionManager expressionManager, DelegateExecution execution, ProcessEngineConfigurationImpl processEngineConfiguration) {
-        // 第一步，获得任务的规则
-        BpmTaskAssignRuleDO rule = getTaskRule(task);
-        // 第二步，获得任务的候选用户们
-        Set<Long> candidateUserIds = calculateTaskCandidateUsers(task, rule);
-        // 第三步，设置一个作为负责人
-        Long assigneeUserId = chooseTaskAssignee(candidateUserIds);
-        TaskHelper.changeTaskAssignee(task, String.valueOf(assigneeUserId));
+        boolean isMultiInstance = hasMultiInstanceCharacteristics();
+        if(isMultiInstance){
+            //多实例 会签/或签,执行多次每个人 待办人都在execution里面获取
+            Integer assigneeUserId = execution.getVariableLocal("user", Integer.class);
+            TaskHelper.changeTaskAssignee(task, String.valueOf(assigneeUserId));
+        }else {
+            // 第一步，获得任务的规则
+            BpmTaskAssignRuleDO rule = getTaskRule(task);
+            // 第二步，获得任务的候选用户们
+            Set<Long> candidateUserIds = calculateTaskCandidateUsers(task, rule);
+            // 第三步，设置一个作为负责人
+            Long assigneeUserId = chooseTaskAssignee(candidateUserIds);
+            TaskHelper.changeTaskAssignee(task, String.valueOf(assigneeUserId));
+        }
+
     }
 
     private BpmTaskAssignRuleDO getTaskRule(TaskEntity task) {
