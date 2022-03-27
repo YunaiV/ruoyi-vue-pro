@@ -5,7 +5,7 @@ import lombok.Data;
 
 import java.util.List;
 @Data
-public class MailSendVO {
+public class MailSendVO { // TODO @wangjingyi：1）参数校验；2）ReqVO
 
     @ApiModelProperty(value = "邮箱" , required = true , example = "yudaoyuanma@123.com")
     private String from;

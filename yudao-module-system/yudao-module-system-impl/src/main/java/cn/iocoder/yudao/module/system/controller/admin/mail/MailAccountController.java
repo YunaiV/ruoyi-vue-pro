@@ -30,7 +30,7 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 @RequestMapping("/system/mail-account")
 public class MailAccountController {
     @Resource
-    private MailAccountService mailAccountService;
+    private MailAccountService mailAccountService; // TODO @wangjingyi：属性和类名，中间要空一行
 
     @PostMapping("/create")
     @ApiOperation("创建邮箱账号")
@@ -50,7 +50,7 @@ public class MailAccountController {
 
     @DeleteMapping("/delete")
     @ApiOperation("删除邮箱账号")
-    @PreAuthorize("@ss.hasPermission('system:mail-account:delete')")
+    @PreAuthorize("@ss.hasPermission('system:mail-account:delete')") // TODO @wangjingyi：id 应该是 @RequestParam。另外，id 的 swagger 注解，要写下
     public CommonResult<Boolean> deleteMailAccount(@Valid @RequestBody Long id) {
         mailAccountService.delete(id);
         return success(true);
@@ -63,7 +63,7 @@ public class MailAccountController {
     public CommonResult<MailAccountBaseVO> getMailAccount(@RequestParam("id") Long id) {
         MailAccountDO mailAccountDO = mailAccountService.getMailAccount(id);
         return success(MailAccountConvert.INSTANCE.convert(mailAccountDO));
-    }
+    } // TODO wangjingyi：方法与方法之间，只空一行
 
 
     @GetMapping("/page")
@@ -82,7 +82,7 @@ public class MailAccountController {
         list.sort(Comparator.comparing(MailAccountDO::getId));
         return success(MailAccountConvert.INSTANCE.convertList02(list));
     }
-    @PostMapping("/send")
+    @PostMapping("/send") // TODO wangjingyi：方法与方法之间，空一行
     @ApiOperation("发送邮件")
     @PreAuthorize("@ss.hasPermission('system:mail-account:send')")
     public CommonResult<Boolean> sendMail(MailSendVO mailSendVO){

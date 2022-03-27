@@ -13,12 +13,12 @@ import java.util.List;
 /**
  * <p>
  *  邮箱账号 Service 接口
- * </p>
+ * </p>  // TODO wangjingyi：不用 <p></p> 标签；
  *
  * @author wangjingyi
  * @since 2022-03-21
  */
-public interface MailAccountService {
+public interface MailAccountService { // TODO wangjingyi：方法的注释
 
     Long create(MailAccountCreateReqVO createReqVO);
 

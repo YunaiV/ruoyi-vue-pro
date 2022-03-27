@@ -62,7 +62,7 @@ public class MailAccountServiceImpl implements MailAccountService {
         this.validateMailAccountOnly(map);
         MailAccountDO mailAccountDO = MailAccountConvert.INSTANCE.convert(updateReqVO);
         // 校验是否存在
-        this.validateMailAccountExists(mailAccountDO.getId());
+        this.validateMailAccountExists(mailAccountDO.getId()); // TODO wangjingyi：没有传递 id 噢
         mailAccountMapper.updateById(mailAccountDO);
     }
 
@@ -92,6 +92,7 @@ public class MailAccountServiceImpl implements MailAccountService {
     @Override
     public void sendMail(MailSendVO mailSendVO) {
         // FIXME 查询模版信息 查询模版多条时 使用规则是什么
+        // 回复：选择某一条模板，进行发送邮件。
         List<MailTemplateDO> mailTemplateDOList =  mailTemplateMapper.selectList(
                 "username",mailSendVO.getFrom()
         );
@@ -100,6 +101,7 @@ public class MailAccountServiceImpl implements MailAccountService {
                 "from",mailSendVO.getFrom()
         );
         // FIXME 模版和邮件内容合成方式未知
+        // 回复：参考短信的方式，通过 {name} {mobile} 这样的占位符。搜 formatSmsTemplateContent 方法
         String content = mailSendVO.getContent();
         String templateContent = "";
         // 后续功能 TODO ：附件查询
@@ -119,9 +121,10 @@ public class MailAccountServiceImpl implements MailAccountService {
     }
 
     private void validateMailAccountOnly(Map params){
+        // TODO wangjingyi：Service 里，不允许出现 MyBatis 操作。而是 Mapper 提供对应查询方法
         QueryWrapper queryWrapper = new QueryWrapper<MailAccountDO>();
         params.forEach((k , v)->{
-            queryWrapper.like(k , v);
+            queryWrapper.like(k , v); // TODO wangjingyi：账号，应该是 equlas，不能是 like
         });
         if (mailAccountMapper.selectOne(queryWrapper) != null) {
             throw exception(MAIL_ACCOUNT_EXISTS);
