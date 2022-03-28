@@ -30,6 +30,7 @@ import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.task.api.Task;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -294,7 +295,15 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         // 补全流程实例的拓展表
         //TODO startProcessInstance流程里面修改了 BpmProcessInstanceExt,没有提交，和下面的更新  锁持有冲突了，异步更新这个表
 //        processInstanceExtMapper.updateByProcessInstanceId(new BpmProcessInstanceExtDO().setProcessInstanceId(instance.getId()).setFormVariables(variables));
-
+        BpmProcessInstanceExtDO bpmProcessInstanceExtDO = new BpmProcessInstanceExtDO().setProcessInstanceId(instance.getId()).setFormVariables(variables);
+        asyncUpdateProcesInstance(bpmProcessInstanceExtDO);
         return instance.getId();
+    }
+
+    @Async
+    public void asyncUpdateProcesInstance(BpmProcessInstanceExtDO bpmProcessInstanceExtDO){
+        log.info("asyncUpdateProcesInstance ,cause MySQL Dead Lock");
+        processInstanceExtMapper.updateByProcessInstanceId(bpmProcessInstanceExtDO);
+
     }
 }
