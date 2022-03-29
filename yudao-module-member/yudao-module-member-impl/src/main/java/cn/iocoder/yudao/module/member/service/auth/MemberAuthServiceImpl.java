@@ -87,7 +87,7 @@ public class MemberAuthServiceImpl implements MemberAuthService {
         LoginUser loginUser = this.login0(reqVO.getMobile(), reqVO.getPassword());
 
         // 缓存登录用户到 Redis 中，返回 sessionId 编号
-        return userSessionApi.createUserSession(loginUser, userIp, userAgent);
+        return createUserSessionAfterLoginSuccess(loginUser, LoginLogTypeEnum.LOGIN_USERNAME, userIp, userAgent);
     }
 
     @Override
@@ -101,11 +101,10 @@ public class MemberAuthServiceImpl implements MemberAuthService {
         Assert.notNull(user, "获取用户失败，结果为空");
 
         // 执行登陆
-        this.createLoginLog(user.getMobile(), LoginLogTypeEnum.LOGIN_SMS, LoginResultEnum.SUCCESS);
         LoginUser loginUser = AuthConvert.INSTANCE.convert(user);
 
         // 缓存登录用户到 Redis 中，返回 sessionId 编号
-        return userSessionApi.createUserSession(loginUser, userIp, userAgent);
+        return createUserSessionAfterLoginSuccess(loginUser, LoginLogTypeEnum.LOGIN_SMS, userIp, userAgent);
     }
 
     @Override
@@ -122,7 +121,6 @@ public class MemberAuthServiceImpl implements MemberAuthService {
         if (user == null) {
             throw exception(USER_NOT_EXISTS);
         }
-        this.createLoginLog(user.getMobile(), LoginLogTypeEnum.LOGIN_SOCIAL, LoginResultEnum.SUCCESS);
 
         // 创建 LoginUser 对象
         LoginUser loginUser = AuthConvert.INSTANCE.convert(user);
@@ -131,7 +129,7 @@ public class MemberAuthServiceImpl implements MemberAuthService {
         socialUserApi.bindSocialUser(AuthConvert.INSTANCE.convert(loginUser.getId(), getUserType().getValue(), reqVO));
 
         // 缓存登录用户到 Redis 中，返回 sessionId 编号
-        return userSessionApi.createUserSession(loginUser, userIp, userAgent);
+        return createUserSessionAfterLoginSuccess(loginUser, LoginLogTypeEnum.LOGIN_SOCIAL, userIp, userAgent);
     }
 
     @Override
@@ -148,6 +146,13 @@ public class MemberAuthServiceImpl implements MemberAuthService {
         // 绑定社交用户（新增）
         socialUserApi.bindSocialUser(AuthConvert.INSTANCE.convert(loginUser.getId(), getUserType().getValue(), reqVO));
         return sessionId;
+    }
+
+    private String createUserSessionAfterLoginSuccess(LoginUser loginUser, LoginLogTypeEnum logType, String userIp, String userAgent) {
+        // 插入登陆日志
+        createLoginLog(loginUser.getUsername(), logType, LoginResultEnum.SUCCESS);
+        // 缓存登录用户到 Redis 中，返回 sessionId 编号
+        return userSessionApi.createUserSession(loginUser, userIp, userAgent);
     }
 
     @Override
@@ -186,9 +191,7 @@ public class MemberAuthServiceImpl implements MemberAuthService {
             this.createLoginLog(username, logType, LoginResultEnum.UNKNOWN_ERROR);
             throw exception(AUTH_LOGIN_FAIL_UNKNOWN);
         }
-        // 登录成功的日志
         Assert.notNull(authentication.getPrincipal(), "Principal 不会为空");
-        this.createLoginLog(username, logType, LoginResultEnum.SUCCESS);
         return (LoginUser) authentication.getPrincipal();
     }
 
