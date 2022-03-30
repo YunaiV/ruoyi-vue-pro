@@ -34,7 +34,7 @@ public class ProjectReactor {
         String groupIdNew = "cn.huwing.boot";
         String artifactIdNew = "zdm";
         String packageNameNew = "cn.huwing.zdm";
-        String titleNew = "欣辰装点猫管理系统";
+        String titleNew = "测试名管理系统";
         String projectBaseDirNew = projectBaseDir + "-new"; // 一键改名后，“新”项目所在的目录
         log.info("[main][新项目路径地址]projectBaseDirNew: " + projectBaseDirNew);
 
@@ -65,7 +65,8 @@ public class ProjectReactor {
                         && !file.getPath().contains("\\.git\\")
                         && !file.getPath().contains("\\.github\\")
                         && !file.getPath().contains("\\dist\\")
-                        && !file.getPath().contains(".iml"))
+                        && !file.getPath().contains(".iml")
+                        && !file.getPath().contains(".html.gz"))
                 .collect(Collectors.toList());
         return files;
     }
