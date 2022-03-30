@@ -40,7 +40,7 @@ public class ProjectReactor {
         // 获得需要复制的文件
         log.info("[main][开始获得需要重写的文件]");
         Collection<File> files = listFiles(projectBaseDir);
-        log.info("[main][需要重写的文件数量：{}，预计需要 5-10 秒]", files.size());
+        log.info("[main][需要重写的文件数量：{}，预计需要 30 秒]", files.size());
         // 写入文件
         files.forEach(file -> {
             String content = replaceFileContent(file, groupIdNew, artifactIdNew, packageNameNew, titleNew);
