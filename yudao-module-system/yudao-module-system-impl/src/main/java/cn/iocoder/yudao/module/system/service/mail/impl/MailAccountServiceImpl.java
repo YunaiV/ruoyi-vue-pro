@@ -33,6 +33,7 @@ import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.MAIL_ACCOU
  * @since 2022-03-21
  */
 @Service
+// TODO @wangjingyi：需要 @Validated 注解，开启参数校验
 public class MailAccountServiceImpl implements MailAccountService {
 
     @Resource
@@ -54,13 +55,13 @@ public class MailAccountServiceImpl implements MailAccountService {
 
     @Override
     public void update(MailAccountUpdateReqVO updateReqVO) {
-        // username 要校验唯一
+        // username 要校验唯一 TODO @wangjingyi：不要用 map 参数
         Map<String , String> map = new HashMap<>();
         map.put("username" , updateReqVO.getUsername());
-        this.validateMailAccountOnly(map);
+        this.validateMailAccountOnly(map); // TODO @wangjingyi：如果 username 是自己用呢，要排除下自己呀
         MailAccountDO mailAccountDO = MailAccountConvert.INSTANCE.convert(updateReqVO);
         // 校验是否存在
-        this.validateMailAccountExists(mailAccountDO.getId()); // TODO wangjingyi：没有传递 id 噢
+        this.validateMailAccountExists(mailAccountDO.getId());
         mailAccountMapper.updateById(mailAccountDO);
     }
 

@@ -28,7 +28,7 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 @RequestMapping("/system/mail-template")
 public class MailTemplateController {
     @Autowired
-    MailTemplateService mailTempleService;
+    MailTemplateService mailTempleService; // TODO @wangjingyi：private；和上面要空一行；
 
     @PostMapping("/create")
     @ApiOperation("创建邮箱模版")
@@ -61,7 +61,6 @@ public class MailTemplateController {
         MailTemplateDO mailTemplateDO = mailTempleService.getMailTemplate(id);
         return success(MailTemplateConvert.INSTANCE.convert(mailTemplateDO));
     }
-
 
     @GetMapping("/page")
     @ApiOperation("获得邮箱模版分页")

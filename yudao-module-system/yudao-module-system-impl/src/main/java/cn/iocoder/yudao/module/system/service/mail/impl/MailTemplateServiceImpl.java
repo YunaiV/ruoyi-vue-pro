@@ -6,7 +6,6 @@ import cn.iocoder.yudao.module.system.controller.admin.mail.vo.template.MailTemp
 import cn.iocoder.yudao.module.system.controller.admin.mail.vo.template.MailTemplatePageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.mail.vo.template.MailTemplateUpdateReqVO;
 import cn.iocoder.yudao.module.system.convert.mail.MailTemplateConvert;
-import cn.iocoder.yudao.module.system.dal.dataobject.mail.MailAccountDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.mail.MailTemplateDO;
 import cn.iocoder.yudao.module.system.dal.mysql.mail.MailTemplateMapper;
 import cn.iocoder.yudao.module.system.service.mail.MailTemplateService;
@@ -19,15 +18,17 @@ import java.util.List;
 import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.MAIL_TEMPLATE_EXISTS;
+import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.MAIL_TEMPLATE_NOT_EXISTS;
 
 /**
- *  邮箱模版 服务实现类
+ * 邮箱模版 服务实现类
  *
  * @author wangjingyi
  * @since 2022-03-21
  */
 @Service
+// TODO @wangjingyi：需要 @Validated 注解，开启参数校验
 public class MailTemplateServiceImpl implements MailTemplateService {
 
     @Resource
@@ -37,7 +38,7 @@ public class MailTemplateServiceImpl implements MailTemplateService {
     public Long create(MailTemplateCreateReqVO createReqVO) {
         // name 要校验唯一
         Map<String , String> map = new HashMap<>();
-        map.put("name" , createReqVO.getName());
+        map.put("name" , createReqVO.getName()); // TODO @wangjingyi：模板名重复没关系的；code 不能重复
         this.validateMailTemplateOnly(map);
         MailTemplateDO mailTemplateDO = MailTemplateConvert.INSTANCE.convert(createReqVO);
         mailTemplateMapper.insert(mailTemplateDO);
@@ -48,7 +49,7 @@ public class MailTemplateServiceImpl implements MailTemplateService {
     public void update(MailTemplateUpdateReqVO updateReqVO) {
         // username 要校验唯一
         Map<String , String> map = new HashMap<>();
-        map.put("username" , updateReqVO.getUsername());
+        map.put("username" , updateReqVO.getUsername());  // TODO @wangjingyi：模板名重复没关系的；code 不能重复
         this.validateMailTemplateOnly(map);
         MailTemplateDO mailTemplateDO = MailTemplateConvert.INSTANCE.convert(updateReqVO);
         // 校验是否存在

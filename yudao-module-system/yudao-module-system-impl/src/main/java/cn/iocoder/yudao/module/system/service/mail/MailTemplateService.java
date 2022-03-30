@@ -15,6 +15,9 @@ import java.util.List;
  * @since 2022-03-21
  */
 public interface MailTemplateService {
+
+    // TODO @wangjingyi：注释，完整；参数校验还是要做的；
+
     /**
      * 邮箱模版创建
      * @param createReqVO

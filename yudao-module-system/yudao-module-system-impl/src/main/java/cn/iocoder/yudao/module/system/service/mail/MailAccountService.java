@@ -11,14 +11,17 @@ import java.util.List;
 
 
 /**
- *  邮箱账号 Service 接口
+ * 邮箱账号 Service 接口
  *
  * @author wangjingyi
  * @since 2022-03-21
  */
 public interface MailAccountService {
+
+    // TODO @wangjingyi：注释，完整；参数校验还是要做的；
+
     /**
-     * 创建邮箱账号
+     * 创建邮箱账号 // TODO @wangjingyi：方法描述，和参数要空行
      * @param createReqVO
      * @return
      */
