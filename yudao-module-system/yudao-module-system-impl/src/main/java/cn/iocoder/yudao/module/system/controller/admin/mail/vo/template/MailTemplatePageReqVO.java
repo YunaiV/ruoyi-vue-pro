@@ -1,10 +1,16 @@
 package cn.iocoder.yudao.module.system.controller.admin.mail.vo.template;
 
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
+@ApiModel("管理后台 - 邮箱模版分页 Request VO")
 @Data
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
 public class MailTemplatePageReqVO extends PageParam {
     @ApiModelProperty("主键")
     private Long id;

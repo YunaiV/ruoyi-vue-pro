@@ -13,15 +13,14 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 /**
- * <p>
  *  邮箱日志实现类
- * </p>
  *
  * @author wangjingyi
  * @since 2022-03-21
  */
 @Service
 public class MailLogServiceImpl implements MailLogService {
+
     @Autowired
     MailLogMapper mailLogMapper;
 

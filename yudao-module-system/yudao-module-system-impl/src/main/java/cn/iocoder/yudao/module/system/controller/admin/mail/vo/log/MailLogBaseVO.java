@@ -2,13 +2,17 @@ package cn.iocoder.yudao.module.system.controller.admin.mail.vo.log;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.sql.Timestamp;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
+@ApiModel("管理后台 - 邮箱日志基类 Base VO")
+@Data
 public class MailLogBaseVO {
 
     @ApiModelProperty(value = "邮箱" , required = false , example = "yudaoyuanma@123.com")

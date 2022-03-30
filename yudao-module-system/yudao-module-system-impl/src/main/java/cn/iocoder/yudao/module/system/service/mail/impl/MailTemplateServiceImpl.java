@@ -22,15 +22,14 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
 
 /**
- * <p>
  *  邮箱模版 服务实现类
- * </p>
  *
  * @author wangjingyi
  * @since 2022-03-21
  */
 @Service
 public class MailTemplateServiceImpl implements MailTemplateService {
+
     @Resource
     private MailTemplateMapper mailTemplateMapper;
 
@@ -56,6 +55,7 @@ public class MailTemplateServiceImpl implements MailTemplateService {
         this.validateMailTemplateExists(mailTemplateDO.getId());
         mailTemplateMapper.updateById(mailTemplateDO);
     }
+
     @Override
     public void delete(Long id) {
         // 校验是否存在
