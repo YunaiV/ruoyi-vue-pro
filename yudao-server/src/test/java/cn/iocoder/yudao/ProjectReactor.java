@@ -31,7 +31,7 @@ public class ProjectReactor {
         String projectBaseDir = getProjectBaseDir();
 
         // ========== 配置，需要你手动修改 ==========
-        String groupIdNew = "cn.huwing.boot";
+        String groupIdNew = "cn.huwing.boot"; // TODO @seeker：这几个参数改回去原来的哈。
         String artifactIdNew = "zdm";
         String packageNameNew = "cn.huwing.zdm";
         String titleNew = "测试名管理系统";
@@ -47,8 +47,8 @@ public class ProjectReactor {
             String content = replaceFileContent(file, groupIdNew, artifactIdNew, packageNameNew, titleNew);
             writeFile(file, content, projectBaseDir, projectBaseDirNew, packageNameNew, artifactIdNew);
         });
-        long end = System.currentTimeMillis();
-        log.info("[main][重写完成]共耗时：" + (end - start) / 1000 + "秒");
+        long end = System.currentTimeMillis(); // TODO @seeker：直接减，不用增加变量
+        log.info("[main][重写完成]共耗时：" + (end - start) / 1000 + "秒"); // TODO @seeker：logger 不要拼接字符串，用占位符
     }
 
     private static String getProjectBaseDir() {
@@ -59,7 +59,7 @@ public class ProjectReactor {
         Collection<File> files = FileUtils.listFiles(new File(projectBaseDir), null, true);
         // 移除 IDEA  Git GitHub 自身的文件; Node 编译出来的文件
         files = files.stream()
-                .filter(file -> !file.getPath().contains("\\target\\")
+                .filter(file -> !file.getPath().contains("\\target\\") // TODO @seeker：使用 File.separator，也要考虑 mac
                         && !file.getPath().contains("\\node_modules\\")
                         && !file.getPath().contains("\\.idea\\")
                         && !file.getPath().contains("\\.git\\")
