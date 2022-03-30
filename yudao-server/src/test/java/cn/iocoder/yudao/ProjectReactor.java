@@ -64,7 +64,8 @@ public class ProjectReactor {
                         && !file.getPath().contains("\\.idea\\")
                         && !file.getPath().contains("\\.git\\")
                         && !file.getPath().contains("\\.github\\")
-                        && !file.getPath().contains("\\dist\\"))
+                        && !file.getPath().contains("\\dist\\")
+                        && !file.getPath().contains(".iml"))
                 .collect(Collectors.toList());
         return files;
     }
