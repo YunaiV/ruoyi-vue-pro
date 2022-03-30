@@ -7,7 +7,9 @@ import cn.iocoder.yudao.module.system.dal.dataobject.mail.MailAccountDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface MailAccountConvert {
@@ -31,4 +33,13 @@ public interface MailAccountConvert {
                 .setPass(mailAccountDO.getPassword())
                 .setSslEnable(mailAccountDO.getSslEnable());
     };
+
+    default Map<String, String> convertToMap(MailAccountDO mailAccountDO , String content) {
+        Map<String , String> map = new HashMap<>();
+        map.put("from" , mailAccountDO.getFrom());
+        map.put("username" , mailAccountDO.getUsername());
+        map.put("content" , content);
+        return map;
+    };
+
 }
