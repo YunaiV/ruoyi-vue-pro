@@ -61,5 +61,8 @@ public interface AdminUserMapper extends BaseMapperX<AdminUserDO> {
         return selectList(AdminUserDO::getDeptId, deptIds);
     }
 
+    default List<AdminUserDO> selectListByIds(List<Long> userIdList) {
+        return selectList(new LambdaQueryWrapperX<AdminUserDO>().in(AdminUserDO::getId, userIdList));
+    }
 }
 

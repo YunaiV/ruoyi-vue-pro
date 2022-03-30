@@ -2414,6 +2414,25 @@ CREATE TABLE `pay_refund` (
 BEGIN;
 COMMIT;
 
+
+-- ----------------------------
+-- Table structure for system_user_post
+-- ----------------------------
+DROP TABLE IF EXISTS `system_user_post`;
+CREATE TABLE `system_user_post` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `user_id` bigint NOT NULL DEFAULT '0' COMMENT '用户ID',
+  `post_id` bigint NOT NULL DEFAULT '0' COMMENT '岗位ID',
+  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  `tenant_id` bigint NOT NULL DEFAULT '0' COMMENT '租户编号',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=112 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='部门表';
+
+
 -- ----------------------------
 -- Table structure for system_dept
 -- ----------------------------

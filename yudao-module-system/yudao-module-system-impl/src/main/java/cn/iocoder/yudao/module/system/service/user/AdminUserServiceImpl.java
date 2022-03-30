@@ -13,12 +13,15 @@ import cn.iocoder.yudao.module.system.controller.admin.user.vo.profile.UserProfi
 import cn.iocoder.yudao.module.system.controller.admin.user.vo.user.*;
 import cn.iocoder.yudao.module.system.convert.user.UserConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.dept.UserPostDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
 import cn.iocoder.yudao.module.system.dal.mysql.user.AdminUserMapper;
 import cn.iocoder.yudao.module.system.service.dept.DeptService;
 import cn.iocoder.yudao.module.system.service.dept.PostService;
+import cn.iocoder.yudao.module.system.service.dept.UserPostService;
 import cn.iocoder.yudao.module.system.service.permission.PermissionService;
 import cn.iocoder.yudao.module.system.service.tenant.TenantService;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.google.common.annotations.VisibleForTesting;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.io.InputStream;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
@@ -60,10 +64,13 @@ public class AdminUserServiceImpl implements AdminUserService {
     private TenantService tenantService;
 
     @Resource
+    private UserPostService userPostService;
+
+    @Resource
     private FileApi fileApi;
 
     @Override
-
+    @Transactional(rollbackFor = Exception.class)
     public Long createUser(UserCreateReqVO reqVO) {
         // 校验账户配合
         tenantService.handleTenantInfo(tenant -> {
@@ -80,10 +87,22 @@ public class AdminUserServiceImpl implements AdminUserService {
         user.setStatus(CommonStatusEnum.ENABLE.getStatus()); // 默认开启
         user.setPassword(passwordEncoder.encode(reqVO.getPassword())); // 加密密码
         userMapper.insert(user);
+        Set<Long> postIds = user.getPostIds();
+        if (!org.springframework.util.CollectionUtils.isEmpty(postIds)) {
+            ArrayList<UserPostDO> userPostList = new ArrayList<>();
+            for (Long postId : postIds) {
+                UserPostDO entity = new UserPostDO();
+                entity.setUserId(entity.getUserId());
+                entity.setPostId(postId);
+                userPostList.add(entity);
+            }
+            userPostService.saveBatch(userPostList);
+        }
         return user.getId();
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void updateUser(UserUpdateReqVO reqVO) {
         // 校验正确性
         this.checkCreateOrUpdate(reqVO.getId(), reqVO.getUsername(), reqVO.getMobile(), reqVO.getEmail(),
@@ -91,6 +110,19 @@ public class AdminUserServiceImpl implements AdminUserService {
         // 更新用户
         AdminUserDO updateObj = UserConvert.INSTANCE.convert(reqVO);
         userMapper.updateById(updateObj);
+        Set<Long> postIds = updateObj.getPostIds();
+        if (!org.springframework.util.CollectionUtils.isEmpty(postIds)) {
+            for (Long postId : postIds) {
+                UserPostDO entity = new UserPostDO();
+                entity.setUserId(reqVO.getId());
+                entity.setPostId(postId);
+                userPostService.saveOrUpdate(entity,
+                        Wrappers.lambdaUpdate(UserPostDO.class)
+                                .eq(UserPostDO::getUserId, entity.getUserId())
+                                .eq(UserPostDO::getPostId, entity.getPostId())
+                );
+            }
+        }
     }
 
     @Override
@@ -154,6 +186,7 @@ public class AdminUserServiceImpl implements AdminUserService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void deleteUser(Long id) {
         // 校验用户存在
         this.checkUserExists(id);
@@ -161,6 +194,8 @@ public class AdminUserServiceImpl implements AdminUserService {
         userMapper.deleteById(id);
         // 删除用户关联数据
         permissionService.processUserDeleted(id);
+
+        userPostService.remove(Wrappers.lambdaUpdate(UserPostDO.class).eq(UserPostDO::getUserId, id));
     }
 
     @Override
@@ -191,11 +226,22 @@ public class AdminUserServiceImpl implements AdminUserService {
         if (CollUtil.isEmpty(postIds)) {
             return Collections.emptyList();
         }
-        // 过滤不符合条件的
-        // TODO 芋艿：暂时只能内存过滤。解决方案：1、新建一个关联表；2、基于 where + 函数；3、json 字段，适合 mysql 8+ 版本
-        List<AdminUserDO> users = userMapper.selectList();
-        users.removeIf(user -> !CollUtil.containsAny(user.getPostIds(), postIds));
-        return users;
+        List<Long> userIdList = userPostService
+                .lambdaQuery()
+                .in(UserPostDO::getPostId, postIds)
+                .list()
+                .stream()
+                .map(UserPostDO::getUserId)
+                .distinct()
+                .collect(Collectors.toList());
+        if (userIdList.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return userMapper
+                .selectListByIds(userIdList)
+                .stream()
+                .peek(user -> user.setPassword(null))
+                .collect(Collectors.toList());
     }
 
     @Override
