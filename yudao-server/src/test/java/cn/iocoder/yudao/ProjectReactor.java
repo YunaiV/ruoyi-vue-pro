@@ -24,7 +24,7 @@ public class ProjectReactor {
     private static final String GROUP_ID = "cn.iocoder.boot";
     private static final String ARTIFACT_ID = "yudao";
     private static final String PACKAGE_NAME = "cn.iocoder.yudao";
-    private static final String TITLE = "欣辰装点猫管理系统";
+    private static final String TITLE = "芋道管理系统";
 
     public static void main(String[] args) {
         long start = System.currentTimeMillis();
