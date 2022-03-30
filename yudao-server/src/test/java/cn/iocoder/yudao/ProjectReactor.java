@@ -8,10 +8,11 @@ import org.apache.commons.io.FileUtils;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
+import java.util.regex.Matcher;
 
 /**
  * 项目修改器，一键替换 Maven 的 groupId、artifactId，项目的 package 等
- *
+ * <p>
  * 通过修改 groupIdNew、artifactIdNew、projectBaseDirNew 三个变量
  *
  * @author 芋道源码
@@ -22,18 +23,19 @@ public class ProjectReactor {
     private static final String GROUP_ID = "cn.iocoder.boot";
     private static final String ARTIFACT_ID = "yudao";
     private static final String PACKAGE_NAME = "cn.iocoder.yudao";
-    private static final String TITLE = "芋道管理系统";
+    private static final String TITLE = "欣辰装点猫管理系统";
 
     public static void main(String[] args) {
+        long start = System.currentTimeMillis();
         String projectBaseDir = getProjectBaseDir();
 
         // ========== 配置，需要你手动修改 ==========
-        String groupIdNew = "cn.star.gg";
-        String artifactIdNew = "star";
-        String packageNameNew = "cn.start.pp";
-        String titleNew = "土豆管理系统";
+        String groupIdNew = "cn.huwing.boot";
+        String artifactIdNew = "zdm";
+        String packageNameNew = "cn.huwing.zdm";
+        String titleNew = "欣辰装点猫管理系统";
         String projectBaseDirNew = projectBaseDir + "-new"; // 一键改名后，“新”项目所在的目录
-        // ==========                  ==========
+        log.info("[main][新项目路径地址]projectBaseDirNew: " + projectBaseDirNew);
 
         // 获得需要复制的文件
         log.info("[main][开始获得需要重写的文件]");
@@ -44,13 +46,12 @@ public class ProjectReactor {
             String content = replaceFileContent(file, groupIdNew, artifactIdNew, packageNameNew, titleNew);
             writeFile(file, content, projectBaseDir, projectBaseDirNew, packageNameNew, artifactIdNew);
         });
-        log.info("[main][重写完成]");
+        long end = System.currentTimeMillis();
+        log.info("[main][重写完成]共耗时：" + (end - start) / 1000 + "秒");
     }
 
     private static String getProjectBaseDir() {
-        // noinspection ConstantConditions
-        return StrUtil.subBefore(ProjectReactor.class.getClassLoader().getResource("").getFile(),
-                "/yudao-server", false);
+        return StrUtil.subBefore(new File(ProjectReactor.class.getClassLoader().getResource(File.separator).getFile()).getPath(), "\\yudao-server", false);
     }
 
     private static Collection<File> listFiles(String projectBaseDir) {
@@ -59,6 +60,7 @@ public class ProjectReactor {
         files.removeIf(file -> file.getPath().contains("/node_modules/"));
         files.removeIf(file -> file.getPath().contains("/.idea/")); // 移除 IDEA 自身的文件
         files.removeIf(file -> file.getPath().contains("/.git/")); // 移除 Git 自身的文件
+        files.removeIf(file -> file.getPath().contains("/.github/")); // 移除 GitHub 自身的文件
         files.removeIf(file -> file.getPath().contains("/dist/")); // 移除 Node 编译出来的
         return files;
     }
@@ -77,11 +79,10 @@ public class ProjectReactor {
     private static void writeFile(File file, String fileContent, String projectBaseDir,
                                   String projectBaseDirNew, String packageNameNew, String artifactIdNew) {
         String newPath = file.getPath().replace(projectBaseDir, projectBaseDirNew) // 新目录
-                .replace(PACKAGE_NAME.replaceAll("\\.", File.separator),
-                        packageNameNew.replaceAll("\\.", File.separator))
+                .replace(PACKAGE_NAME.replaceAll("\\.", Matcher.quoteReplacement(File.separator)),
+                        packageNameNew.replaceAll("\\.", Matcher.quoteReplacement(File.separator)))
                 .replace(ARTIFACT_ID, artifactIdNew) //
                 .replaceAll(StrUtil.upperFirst(ARTIFACT_ID), StrUtil.upperFirst(artifactIdNew));
         FileUtil.writeUtf8String(fileContent, newPath);
     }
-
 }
