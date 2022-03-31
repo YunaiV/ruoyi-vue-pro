@@ -111,7 +111,7 @@ public class AdminUserServiceImpl implements AdminUserService {
             List<UserPostDO> userPostList = new ArrayList<>();
             for (Long postId : postIds) {
                 UserPostDO entity = new UserPostDO();
-                entity.setUserId(entity.getUserId());
+                entity.setUserId(user.getId());
                 entity.setPostId(postId);
                 userPostList.add(entity);
             }
