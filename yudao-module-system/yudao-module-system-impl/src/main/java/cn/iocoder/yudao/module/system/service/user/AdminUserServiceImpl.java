@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.system.service.user;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
@@ -10,15 +11,20 @@ import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.infra.api.file.FileApi;
 import cn.iocoder.yudao.module.system.controller.admin.user.vo.profile.UserProfileUpdatePasswordReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.user.vo.profile.UserProfileUpdateReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.user.vo.user.*;
+import cn.iocoder.yudao.module.system.controller.admin.user.vo.user.UserCreateReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.user.vo.user.UserExportReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.user.vo.user.UserImportExcelVO;
+import cn.iocoder.yudao.module.system.controller.admin.user.vo.user.UserImportRespVO;
+import cn.iocoder.yudao.module.system.controller.admin.user.vo.user.UserPageReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.user.vo.user.UserUpdateReqVO;
 import cn.iocoder.yudao.module.system.convert.user.UserConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.UserPostDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
+import cn.iocoder.yudao.module.system.dal.mysql.dept.UserPostMapper;
 import cn.iocoder.yudao.module.system.dal.mysql.user.AdminUserMapper;
 import cn.iocoder.yudao.module.system.service.dept.DeptService;
 import cn.iocoder.yudao.module.system.service.dept.PostService;
-import cn.iocoder.yudao.module.system.service.dept.UserPostService;
 import cn.iocoder.yudao.module.system.service.permission.PermissionService;
 import cn.iocoder.yudao.module.system.service.tenant.TenantService;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -31,15 +37,28 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.USER_COUNT_MAX;
+import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.USER_EMAIL_EXISTS;
+import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.USER_IMPORT_LIST_IS_EMPTY;
+import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.USER_IS_DISABLE;
+import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.USER_MOBILE_EXISTS;
+import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.USER_NOT_EXISTS;
+import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.USER_PASSWORD_FAILED;
+import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.USER_USERNAME_EXISTS;
 
 /**
  * 后台用户 Service 实现类
- *
  * @author 芋道源码
  */
 @Service("adminUserService")
@@ -64,7 +83,7 @@ public class AdminUserServiceImpl implements AdminUserService {
     private TenantService tenantService;
 
     @Resource
-    private UserPostService userPostService;
+    private UserPostMapper userPostMapper;
 
     @Resource
     private FileApi fileApi;
@@ -81,7 +100,7 @@ public class AdminUserServiceImpl implements AdminUserService {
         });
         // 校验正确性
         this.checkCreateOrUpdate(null, reqVO.getUsername(), reqVO.getMobile(), reqVO.getEmail(),
-            reqVO.getDeptId(), reqVO.getPostIds());
+                reqVO.getDeptId(), reqVO.getPostIds());
         // 插入用户
         AdminUserDO user = UserConvert.INSTANCE.convert(reqVO);
         user.setStatus(CommonStatusEnum.ENABLE.getStatus()); // 默认开启
@@ -89,14 +108,14 @@ public class AdminUserServiceImpl implements AdminUserService {
         userMapper.insert(user);
         Set<Long> postIds = user.getPostIds();
         if (!org.springframework.util.CollectionUtils.isEmpty(postIds)) {
-            ArrayList<UserPostDO> userPostList = new ArrayList<>();
+            List<UserPostDO> userPostList = new ArrayList<>();
             for (Long postId : postIds) {
                 UserPostDO entity = new UserPostDO();
                 entity.setUserId(entity.getUserId());
                 entity.setPostId(postId);
                 userPostList.add(entity);
             }
-            userPostService.saveBatch(userPostList);
+            userPostMapper.insertBatch(userPostList);
         }
         return user.getId();
     }
@@ -106,23 +125,25 @@ public class AdminUserServiceImpl implements AdminUserService {
     public void updateUser(UserUpdateReqVO reqVO) {
         // 校验正确性
         this.checkCreateOrUpdate(reqVO.getId(), reqVO.getUsername(), reqVO.getMobile(), reqVO.getEmail(),
-            reqVO.getDeptId(), reqVO.getPostIds());
+                reqVO.getDeptId(), reqVO.getPostIds());
         // 更新用户
         AdminUserDO updateObj = UserConvert.INSTANCE.convert(reqVO);
         userMapper.updateById(updateObj);
+        // 更新岗位
         Set<Long> postIds = updateObj.getPostIds();
-        if (!org.springframework.util.CollectionUtils.isEmpty(postIds)) {
-            for (Long postId : postIds) {
-                UserPostDO entity = new UserPostDO();
-                entity.setUserId(reqVO.getId());
-                entity.setPostId(postId);
-                userPostService.saveOrUpdate(entity,
-                        Wrappers.lambdaUpdate(UserPostDO.class)
-                                .eq(UserPostDO::getUserId, entity.getUserId())
-                                .eq(UserPostDO::getPostId, entity.getPostId())
-                );
-            }
+        Long userId = reqVO.getId();
+        List<Long> dbPostIds = userPostMapper.selectIdList(userId);
+        // 计算新增和删除的岗位编号
+        Collection<Long> createPostIds = CollUtil.subtract(postIds, dbPostIds);
+        Collection<Long> deletePostIds = CollUtil.subtract(dbPostIds, postIds);
+        // 执行新增和删除。对于已经授权的菜单，不用做任何处理
+        if (!CollectionUtil.isEmpty(createPostIds)) {
+            userPostMapper.insertList(userId, createPostIds);
         }
+        if (!CollectionUtil.isEmpty(deletePostIds)) {
+            userPostMapper.deleteByUserAndPost(userId, deletePostIds);
+        }
+
     }
 
     @Override
@@ -194,8 +215,8 @@ public class AdminUserServiceImpl implements AdminUserService {
         userMapper.deleteById(id);
         // 删除用户关联数据
         permissionService.processUserDeleted(id);
-
-        userPostService.remove(Wrappers.lambdaUpdate(UserPostDO.class).eq(UserPostDO::getUserId, id));
+        // 删除用户岗位
+        userPostMapper.delete(Wrappers.lambdaUpdate(UserPostDO.class).eq(UserPostDO::getUserId, id));
     }
 
     @Override
@@ -226,14 +247,7 @@ public class AdminUserServiceImpl implements AdminUserService {
         if (CollUtil.isEmpty(postIds)) {
             return Collections.emptyList();
         }
-        List<Long> userIdList = userPostService
-                .lambdaQuery()
-                .in(UserPostDO::getPostId, postIds)
-                .list()
-                .stream()
-                .map(UserPostDO::getUserId)
-                .distinct()
-                .collect(Collectors.toList());
+        List<Long> userIdList = userPostMapper.getUserIdByPostIds(postIds);
         if (userIdList.isEmpty()) {
             return Collections.emptyList();
         }
@@ -289,7 +303,6 @@ public class AdminUserServiceImpl implements AdminUserService {
 
     /**
      * 获得部门条件：查询指定部门的子部门编号们，包括自身
-     *
      * @param deptId 部门编号
      * @return 部门编号集合
      */
@@ -298,7 +311,7 @@ public class AdminUserServiceImpl implements AdminUserService {
             return Collections.emptySet();
         }
         Set<Long> deptIds = CollectionUtils.convertSet(deptService.getDeptsByParentIdFromCache(
-            deptId, true), DeptDO::getId);
+                deptId, true), DeptDO::getId);
         deptIds.add(deptId); // 包括自身
         return deptIds;
     }
@@ -386,7 +399,6 @@ public class AdminUserServiceImpl implements AdminUserService {
 
     /**
      * 校验旧密码
-     *
      * @param id          用户 id
      * @param oldPassword 旧密码
      */
@@ -408,12 +420,12 @@ public class AdminUserServiceImpl implements AdminUserService {
             throw exception(USER_IMPORT_LIST_IS_EMPTY);
         }
         UserImportRespVO respVO = UserImportRespVO.builder().createUsernames(new ArrayList<>())
-            .updateUsernames(new ArrayList<>()).failureUsernames(new LinkedHashMap<>()).build();
+                .updateUsernames(new ArrayList<>()).failureUsernames(new LinkedHashMap<>()).build();
         importUsers.forEach(importUser -> {
             // 校验，判断是否有不符合的原因
             try {
                 checkCreateOrUpdate(null, null, importUser.getMobile(), importUser.getEmail(),
-                    importUser.getDeptId(), null);
+                        importUser.getDeptId(), null);
             } catch (ServiceException ex) {
                 respVO.getFailureUsernames().put(importUser.getUsername(), ex.getMessage());
                 return;
@@ -422,7 +434,7 @@ public class AdminUserServiceImpl implements AdminUserService {
             AdminUserDO existUser = userMapper.selectByUsername(importUser.getUsername());
             if (existUser == null) {
                 userMapper.insert(UserConvert.INSTANCE.convert(importUser)
-                    .setPassword(passwordEncoder.encode(userInitPassword))); // 设置默认密码
+                        .setPassword(passwordEncoder.encode(userInitPassword))); // 设置默认密码
                 respVO.getCreateUsernames().add(importUser.getUsername());
                 return;
             }
