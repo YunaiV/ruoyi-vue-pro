@@ -22,4 +22,7 @@ public interface MailTemplateMapper extends BaseMapperX<MailTemplateDO> {
         );
     }
 
+    default MailTemplateDO selectOneByCode(String code){
+        return selectOne("code" , code);
+    };
 }

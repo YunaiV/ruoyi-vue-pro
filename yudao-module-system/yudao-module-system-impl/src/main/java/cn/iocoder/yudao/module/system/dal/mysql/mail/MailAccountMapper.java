@@ -22,12 +22,9 @@ public interface MailAccountMapper extends BaseMapperX<MailAccountDO> {
         );
     }
 
-    // TODO @wangjingyi：不要提供这样的泛的方法，而是明确的查询方法
-    default MailAccountDO selectByParams(Map params){
+    default MailAccountDO selectByUserName(String userName){
         QueryWrapperX queryWrapperX = new QueryWrapperX<MailAccountDO>();
-        params.forEach((k , v)->{
-            queryWrapperX.eqIfPresent((String) k, v);
-        });
-        return this.selecOne(queryWrapperX);
+        queryWrapperX.eqIfPresent("username", userName);
+        return this.selectOne(queryWrapperX);
     };
 }

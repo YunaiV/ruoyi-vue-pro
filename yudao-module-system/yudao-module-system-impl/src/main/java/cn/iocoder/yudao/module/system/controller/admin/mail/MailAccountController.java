@@ -52,7 +52,7 @@ public class MailAccountController {
     @ApiOperation("删除邮箱账号")
     @ApiImplicitParam(name = "id", value = "编号", required = true, dataTypeClass = Long.class)
     @PreAuthorize("@ss.hasPermission('system:mail-account:delete')")
-    public CommonResult<Boolean> deleteMailAccount(@Valid @RequestParam Long id) { // TODO @wangjingyi：不需要 @Valid 这里。了解下 Validator
+    public CommonResult<Boolean> deleteMailAccount(@RequestParam Long id) {
         mailAccountService.delete(id);
         return success(true);
     }
@@ -83,11 +83,4 @@ public class MailAccountController {
         return success(MailAccountConvert.INSTANCE.convertList02(list));
     }
 
-    @PostMapping("/send")
-    @ApiOperation("发送邮件")
-    @PreAuthorize("@ss.hasPermission('system:mail-account:send')")
-    public CommonResult<Boolean> sendMail(MailReqVO mailReqVO){ // TODO @wangjingyi：应该是测试短信模板，做到 MailTemplateController 里。参考下短信那的做法哈
-        mailAccountService.sendMail(mailReqVO);
-        return success(true);
-    }
 }

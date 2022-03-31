@@ -15,6 +15,7 @@ import cn.iocoder.yudao.module.system.dal.mysql.mail.MailAccountMapper;
 import cn.iocoder.yudao.module.system.dal.mysql.mail.MailTemplateMapper;
 import cn.iocoder.yudao.module.system.service.mail.MailAccountService;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import java.util.HashMap;
@@ -33,7 +34,7 @@ import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.MAIL_ACCOU
  * @since 2022-03-21
  */
 @Service
-// TODO @wangjingyi：需要 @Validated 注解，开启参数校验
+@Validated
 public class MailAccountServiceImpl implements MailAccountService {
 
     @Resource
@@ -45,9 +46,7 @@ public class MailAccountServiceImpl implements MailAccountService {
     @Override
     public Long create(MailAccountCreateReqVO createReqVO) {
         // username 要校验唯一
-        Map<String , String> map = new HashMap<>();
-        map.put("username" , createReqVO.getUsername());
-        this.validateMailAccountOnly(map);
+        this.validateMailAccountOnlyByUserName(createReqVO.getUsername());
         MailAccountDO mailAccountDO = MailAccountConvert.INSTANCE.convert(createReqVO);
         mailAccountMapper.insert(mailAccountDO);
         return mailAccountDO.getId();
@@ -55,10 +54,8 @@ public class MailAccountServiceImpl implements MailAccountService {
 
     @Override
     public void update(MailAccountUpdateReqVO updateReqVO) {
-        // username 要校验唯一 TODO @wangjingyi：不要用 map 参数
-        Map<String , String> map = new HashMap<>();
-        map.put("username" , updateReqVO.getUsername());
-        this.validateMailAccountOnly(map); // TODO @wangjingyi：如果 username 是自己用呢，要排除下自己呀
+        // username 要校验唯一
+        this.validateMailAccountOnlyByUserName(updateReqVO.getUsername());
         MailAccountDO mailAccountDO = MailAccountConvert.INSTANCE.convert(updateReqVO);
         // 校验是否存在
         this.validateMailAccountExists(mailAccountDO.getId());
@@ -87,35 +84,14 @@ public class MailAccountServiceImpl implements MailAccountService {
         return mailAccountMapper.selectList();
     }
 
-    @Override
-    public void sendMail(MailReqVO mailReqVO) {
-        MailTemplateDO mailTemplateDO =  mailTemplateMapper.selectById(mailReqVO.getTemplateId());
-        //查询账号信息
-        MailAccountDO mailAccountDO = mailAccountMapper.selectOne(
-                "from", mailReqVO.getFrom()
-        );
-        String content = mailReqVO.getContent();
-        Map<String , String> params = MailAccountConvert.INSTANCE.convertToMap(mailAccountDO , content);
-        content = StrUtil.format(mailTemplateDO.getContent(), params);
-
-        // 后续功能 TODO ：附件查询
-        //List<String> fileIds = mailSendVO.getFileIds();
-
-        //装载账号信息
-        MailAccount account  = MailAccountConvert.INSTANCE.convertAccount(mailAccountDO);
-
-        //发送
-        MailUtil.send(account , mailReqVO.getTos() , mailReqVO.getTitle() , content , false);
-    }
-
     private void validateMailAccountExists(Long id) {
         if (mailAccountMapper.selectById(id) == null) {
             throw exception(MAIL_ACCOUNT_NOT_EXISTS);
         }
     }
 
-    private void validateMailAccountOnly(Map params){
-        MailAccountDO mailAccountDO = mailAccountMapper.selectByParams(params);
+    private void validateMailAccountOnlyByUserName(String userName){
+        MailAccountDO mailAccountDO = mailAccountMapper.selectByUserName(userName);
         if (mailAccountDO != null) {
             throw exception(MAIL_ACCOUNT_EXISTS);
         }

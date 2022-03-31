@@ -9,6 +9,7 @@ import cn.iocoder.yudao.module.system.dal.mysql.mail.MailLogMapper;
 import cn.iocoder.yudao.module.system.service.mail.MailLogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
 
@@ -19,6 +20,7 @@ import java.util.List;
  * @since 2022-03-21
  */
 @Service
+@Validated
 public class MailLogServiceImpl implements MailLogService {
 
     @Autowired

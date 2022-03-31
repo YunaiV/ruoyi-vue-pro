@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.system.controller.admin.mail;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.system.controller.admin.mail.vo.send.MailReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.mail.vo.template.MailTemplateBaseVO;
 import cn.iocoder.yudao.module.system.controller.admin.mail.vo.template.MailTemplateCreateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.mail.vo.template.MailTemplatePageReqVO;
@@ -27,8 +28,9 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 @RestController
 @RequestMapping("/system/mail-template")
 public class MailTemplateController {
+
     @Autowired
-    MailTemplateService mailTempleService; // TODO @wangjingyi：private；和上面要空一行；
+    MailTemplateService mailTempleService;
 
     @PostMapping("/create")
     @ApiOperation("创建邮箱模版")
@@ -64,7 +66,7 @@ public class MailTemplateController {
 
     @GetMapping("/page")
     @ApiOperation("获得邮箱模版分页")
-    @PreAuthorize("@ss.hasPermission('system:mail-account:query')")
+    @PreAuthorize("@ss.hasPermission('system:mail-template:query')")
     public CommonResult<PageResult<MailTemplateBaseVO>> getMailTemplatePage(@Valid MailTemplatePageReqVO pageReqVO) {
         PageResult<MailTemplateDO> pageResult = mailTempleService.getMailTemplatePage(pageReqVO);
         return success(MailTemplateConvert.INSTANCE.convertPage(pageResult));
@@ -77,5 +79,13 @@ public class MailTemplateController {
         // 排序后，返回给前端
         list.sort(Comparator.comparing(MailTemplateDO::getId));
         return success(MailTemplateConvert.INSTANCE.convertList02(list));
+    }
+
+    @PostMapping("/send")
+    @ApiOperation("发送邮件")
+    @PreAuthorize("@ss.hasPermission('system:mail-template:send')")
+    public CommonResult<Boolean> sendMail(@Valid @RequestBody MailReqVO mailReqVO){
+        mailTempleService.sendMail(mailReqVO);
+        return success(true);
     }
 }

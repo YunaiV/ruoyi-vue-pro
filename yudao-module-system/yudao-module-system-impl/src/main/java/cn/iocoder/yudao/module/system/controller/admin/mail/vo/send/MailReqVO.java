@@ -9,7 +9,7 @@ import java.util.List;
 
 @ApiModel("管理后台 - 邮件发送 Req VO")
 @Data
-public class MailReqVO { // TODO @wangjingyi：1）参数校验；2）ReqVO
+public class MailReqVO {
 
     @ApiModelProperty(value = "邮箱" , required = true , example = "yudaoyuanma@123.com")
     @NotNull(message = "邮箱账号不能为空")

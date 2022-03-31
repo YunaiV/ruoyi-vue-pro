@@ -5,6 +5,8 @@ import java.sql.Timestamp;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableField;
 import java.io.Serializable;
+
+import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -18,44 +20,65 @@ import lombok.experimental.Accessors;
  * @author wangjingyi
  * @since 2022-03-21
  */
+@TableName(value = "system_mail_log", autoResultMap = true)
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Accessors(chain = true)
-@ApiModel(value="SystemMailLog对象", description="")
 public class MailLogDO extends BaseDO implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-    @TableId
+    /**
+     * 主键
+     */
     private Long id;
 
-    @TableField("account_code")
+    /**
+     * 邮箱账号编号
+     */
     private String accountCode;
 
-    @TableField("from")
+    /**
+     * 邮箱账号
+     */
     private String from;
 
-    @TableField("template_id")
+    /**
+     * 模版主键
+     */
     private String templateId;
 
-    @TableField("template_code")
+    /**
+     * 模版编号
+     */
     private String templateCode;
 
-    @TableField("title")
+    /**
+     * 标题
+     */
     private String title;
 
-    @TableField("content")
+    /**
+     * 内容
+     */
     private String content;
 
-    @TableField("to")
+    /**
+     * 收件人
+     */
     private String to;
 
-    @TableField("sendTime")
+    /**
+     * 发送时间
+     */
     private Timestamp sendTime;
 
-    @TableField("sendStatus")
+    /**
+     * 发送状态
+     */
     private Boolean sendStatus;
 
-    @TableField("sendResult")
+    /**
+     * 发送结果
+     */
     private String sendResult;
 
 

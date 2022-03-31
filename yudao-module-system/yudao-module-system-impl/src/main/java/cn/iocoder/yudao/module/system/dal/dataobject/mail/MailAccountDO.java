@@ -11,34 +11,45 @@ import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 
+@TableName(value = "system_mail_account", autoResultMap = true)
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Accessors(chain = true)
-@ApiModel(value="MailAccount对象", description="邮箱账号") // TODO @wangjingyi：不需要 swagger 注解
-@TableName(value = "system_mail_account", autoResultMap = true) // TODO @wangjingyi：这个放在最上面，关键字段
 public class MailAccountDO extends BaseDO implements Serializable {
 
-    // TODO @wangjingyi：每个字段的注释；字段名，如果一直，不用 @TableField
-
-    @TableId
+    /**
+     * 主键
+     */
     private Long id;
 
-    @TableField("from")
+    /**
+     * 邮箱
+     */
     private String from;
 
-    @TableField("username")
+    /**
+     * 用户名
+     */
     private String username;
 
-    @TableField("password")
+    /**
+     * 密码
+     */
     private String password;
 
-    @TableField("host")
+    /**
+     * 主机
+     */
     private String host;
 
-    @TableField("port")
+    /**
+     * 端口
+     */
     private Integer port;
 
-    @TableField("sslEnable")
+    /**
+     * 是否开启ssl
+     */
     private Boolean sslEnable;
 
 

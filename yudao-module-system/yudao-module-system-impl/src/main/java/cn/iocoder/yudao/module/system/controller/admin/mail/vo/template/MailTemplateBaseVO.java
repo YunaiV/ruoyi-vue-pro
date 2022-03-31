@@ -4,6 +4,8 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import javax.validation.constraints.NotNull;
+
 @ApiModel("管理后台 - 邮箱模版基类 Base VO")
 @Data
 public class MailTemplateBaseVO {
@@ -14,6 +16,7 @@ public class MailTemplateBaseVO {
     private String name;
 
     @ApiModelProperty("标识")
+    @NotNull(message = "邮箱模版code不能为空")
     private String code;
 
     @ApiModelProperty("发件人")

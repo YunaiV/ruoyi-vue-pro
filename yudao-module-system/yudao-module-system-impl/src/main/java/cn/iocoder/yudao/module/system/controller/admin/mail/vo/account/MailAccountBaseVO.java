@@ -3,6 +3,9 @@ package cn.iocoder.yudao.module.system.controller.admin.mail.vo.account;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+
+import javax.validation.constraints.NotNull;
+
 @ApiModel("管理后台 - 邮箱账号基类 Base VO")
 @Data
 public class MailAccountBaseVO {
@@ -11,6 +14,7 @@ public class MailAccountBaseVO {
     private String from;
 
     @ApiModelProperty(value = "用户名" , required = true , example = "yudao")
+    @NotNull(message = "用户名必填")
     private String username;
 
     @ApiModelProperty(value = "密码" , required = true , example = "123456")

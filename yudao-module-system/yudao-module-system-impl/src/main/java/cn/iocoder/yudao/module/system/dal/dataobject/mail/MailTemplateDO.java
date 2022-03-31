@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableField;
 import java.io.Serializable;
+
+import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -19,35 +21,50 @@ import lombok.experimental.Accessors;
  * @author wangjingyi
  * @since 2022-03-21
  */
+@TableName(value = "system_mail_template", autoResultMap = true)
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Accessors(chain = true)
-@ApiModel(value="SystemMailTemplate对象", description="")
 public class MailTemplateDO extends BaseDO implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-    @TableId
+    /**
+     * 主键
+     */
     private Long id;
 
-    @TableField("name")
+    /**
+     * 模版名称
+     */
     private String name;
 
-    @TableField("code")
+    /**
+     * 模版编号
+     */
     private String code;
 
-    @TableField("username")
+    /**
+     * 用户名
+     */
     private String username;
 
-    @TableField("title")
+    /**
+     * 标题
+     */
     private String title;
 
-    @TableField("content")
+    /**
+     * 内容
+     */
     private String content;
 
-    @TableField("status")
+    /**
+     * 状态
+     */
     private String status;
 
-    @TableField("remark")
+    /**
+     * 备注
+     */
     private String remark;
 
 

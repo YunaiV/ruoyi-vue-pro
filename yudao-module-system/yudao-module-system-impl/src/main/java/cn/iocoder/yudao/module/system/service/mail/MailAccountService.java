@@ -7,6 +7,7 @@ import cn.iocoder.yudao.module.system.controller.admin.mail.vo.account.MailAccou
 import cn.iocoder.yudao.module.system.controller.admin.mail.vo.send.MailReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.mail.MailAccountDO;
 
+import javax.validation.Valid;
 import java.util.List;
 
 
@@ -22,46 +23,47 @@ public interface MailAccountService {
 
     /**
      * 创建邮箱账号 // TODO @wangjingyi：方法描述，和参数要空行
-     * @param createReqVO
-     * @return
+     *
+     * @param createReqVO 邮箱账号信息
+     * @return 编号
      */
-    Long create(MailAccountCreateReqVO createReqVO);
+    Long create(@Valid MailAccountCreateReqVO createReqVO);
 
     /**
      * 修改邮箱账号
-     * @param updateReqVO
+     *
+     * @param updateReqVO 邮箱账号信息
      */
-    void update(MailAccountUpdateReqVO updateReqVO);
+    void update(@Valid MailAccountUpdateReqVO updateReqVO);
 
     /**
      * 删除邮箱账号
-     * @param id
+     *
+     * @param id 编号
      */
     void delete(Long id);
 
     /**
      * 获取邮箱账号信息
-     * @param id
-     * @return
+     *
+     * @param id 编号
+     * @return 邮箱账号信息
      */
     MailAccountDO getMailAccount(Long id);
 
     /**
      * 获取邮箱账号分页信息
-     * @param pageReqVO
-     * @return
+     *
+     * @param pageReqVO 邮箱账号分页参数
+     * @return 邮箱账号分页信息
      */
     PageResult<MailAccountDO> getMailAccountPage(MailAccountPageReqVO pageReqVO);
 
     /**
      * 获取邮箱数组信息
-     * @return
+     *
+     * @return 邮箱账号信息数组
      */
     List<MailAccountDO> getMailAccountList();
 
-    /**
-     * 发送邮件
-     * @param mailReqVO
-     */
-    void sendMail(MailReqVO mailReqVO);
 }

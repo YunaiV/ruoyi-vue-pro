@@ -28,6 +28,7 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 @RestController
 @RequestMapping("/system/mail-log")
 public class MailLogController {
+
     @Autowired
     private MailLogService mailLogService;
 
