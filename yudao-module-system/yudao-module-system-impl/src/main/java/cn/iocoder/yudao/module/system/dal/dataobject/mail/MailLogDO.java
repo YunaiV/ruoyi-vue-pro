@@ -1,21 +1,16 @@
 package cn.iocoder.yudao.module.system.dal.dataobject.mail;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import java.sql.Timestamp;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableField;
-import java.io.Serializable;
-
 import com.baomidou.mybatisplus.annotation.TableName;
-import io.swagger.annotations.ApiModel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.experimental.Accessors;
+
+import java.io.Serializable;
+import java.sql.Timestamp;
 
 /**
- * <p>
  * 邮箱日志
- * </p>
+ * 记录每一次邮件的发送
  *
  * @author wangjingyi
  * @since 2022-03-21
@@ -23,7 +18,6 @@ import lombok.experimental.Accessors;
 @TableName(value = "system_mail_log", autoResultMap = true)
 @Data
 @EqualsAndHashCode(callSuper = true)
-@Accessors(chain = true)
 public class MailLogDO extends BaseDO implements Serializable {
 
     /**
@@ -31,11 +25,13 @@ public class MailLogDO extends BaseDO implements Serializable {
      */
     private Long id;
 
+    // TODO @wangjingyi：accountId
     /**
      * 邮箱账号编号
      */
     private String accountCode;
 
+    // TODO @wangjingyi：如果是冗余字段，记得 @ 下；
     /**
      * 邮箱账号
      */
@@ -74,6 +70,7 @@ public class MailLogDO extends BaseDO implements Serializable {
     /**
      * 发送状态
      */
+    // TODO @wangjingyi：四个状态，参考短信模块
     private Boolean sendStatus;
 
     /**

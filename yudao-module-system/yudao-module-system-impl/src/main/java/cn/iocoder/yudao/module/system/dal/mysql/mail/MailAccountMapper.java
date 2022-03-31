@@ -7,8 +7,6 @@ import cn.iocoder.yudao.module.system.controller.admin.mail.vo.account.MailAccou
 import cn.iocoder.yudao.module.system.dal.dataobject.mail.MailAccountDO;
 import org.apache.ibatis.annotations.Mapper;
 
-import java.util.Map;
-
 @Mapper
 public interface MailAccountMapper extends BaseMapperX<MailAccountDO> {
 
@@ -23,7 +21,8 @@ public interface MailAccountMapper extends BaseMapperX<MailAccountDO> {
     }
 
     default MailAccountDO selectByUserName(String userName){
-        QueryWrapperX queryWrapperX = new QueryWrapperX<MailAccountDO>();
+        // TODO @wangjingyi：selectOne 有封装的方法；然后，编码一定要学会使用泛型呀。例如说 QueryWrapperX<MailAccountDO> queryWrapperX = new QueryWrapperX<>();
+        QueryWrapperX<MailAccountDO> queryWrapperX = new QueryWrapperX<>();
         queryWrapperX.eqIfPresent("username", userName);
         return this.selectOne(queryWrapperX);
     };

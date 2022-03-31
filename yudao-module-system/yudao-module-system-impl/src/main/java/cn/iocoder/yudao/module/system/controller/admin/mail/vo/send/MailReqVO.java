@@ -9,7 +9,7 @@ import java.util.List;
 
 @ApiModel("管理后台 - 邮件发送 Req VO")
 @Data
-public class MailReqVO {
+public class MailReqVO { // TODO @wangjingqi：1）, 不用空格；2）应该只要传递 templateCode、参数就好，title、from、content、附件应该都是参数里的
 
     @ApiModelProperty(value = "邮箱" , required = true , example = "yudaoyuanma@123.com")
     @NotNull(message = "邮箱账号不能为空")

@@ -15,15 +15,12 @@ import cn.iocoder.yudao.module.system.dal.dataobject.mail.MailAccountDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.mail.MailTemplateDO;
 import cn.iocoder.yudao.module.system.dal.mysql.mail.MailAccountMapper;
 import cn.iocoder.yudao.module.system.dal.mysql.mail.MailTemplateMapper;
-import cn.iocoder.yudao.module.system.service.mail.MailAccountService;
 import cn.iocoder.yudao.module.system.service.mail.MailTemplateService;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -58,7 +55,7 @@ public class MailTemplateServiceImpl implements MailTemplateService {
     @Override
     public void update(@Valid MailTemplateUpdateReqVO updateReqVO) {
         // code 要校验唯一
-        this.validateMailTemplateOnlyByCode(updateReqVO.getCode());
+        this.validateMailTemplateOnlyByCode(updateReqVO.getCode()); // TODO @wangjingyi：code 这样写，修改自己会有问题
         MailTemplateDO mailTemplateDO = MailTemplateConvert.INSTANCE.convert(updateReqVO);
         // 校验是否存在
         this.validateMailTemplateExists(mailTemplateDO.getId());
@@ -85,6 +82,7 @@ public class MailTemplateServiceImpl implements MailTemplateService {
 
     @Override
     public void sendMail(MailReqVO mailReqVO) {
+        // TODO @@wangjingyi：发送的时候，参考下短信；
         MailTemplateDO mailTemplateDO =  mailTemplateMapper.selectById(mailReqVO.getTemplateId());
         //查询账号信息
         MailAccountDO mailAccountDO = mailAccountMapper.selectOne(

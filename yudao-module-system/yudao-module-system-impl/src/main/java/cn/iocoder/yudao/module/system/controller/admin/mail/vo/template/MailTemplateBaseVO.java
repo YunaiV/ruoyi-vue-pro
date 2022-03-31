@@ -8,7 +8,7 @@ import javax.validation.constraints.NotNull;
 
 @ApiModel("管理后台 - 邮箱模版基类 Base VO")
 @Data
-public class MailTemplateBaseVO {
+public class MailTemplateBaseVO {  // TODO @wangjingqi：1）swagger 注解不完善；2）id、name、code、username、title、content、status 是不是要参数校验呀
     @ApiModelProperty("主键")
     private Long id;
 

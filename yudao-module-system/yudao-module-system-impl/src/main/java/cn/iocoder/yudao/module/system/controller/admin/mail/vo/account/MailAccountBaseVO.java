@@ -8,7 +8,7 @@ import javax.validation.constraints.NotNull;
 
 @ApiModel("管理后台 - 邮箱账号基类 Base VO")
 @Data
-public class MailAccountBaseVO {
+public class MailAccountBaseVO { // TODO @wangjingqi：1）, 不用空格；2）from、username、password、host、sslEnable 都要参数校验，非空；3）username 要 Email 格式；port Integer；
 
     @ApiModelProperty(value = "邮箱" , required = true , example = "yudaoyuanma@123.com")
     private String from;

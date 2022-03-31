@@ -20,6 +20,7 @@ public interface MailTemplateService {
 
     /**
      * 邮箱模版创建
+     *
      * @param createReqVO 邮箱信息
      * @return 编号
      */
@@ -27,12 +28,14 @@ public interface MailTemplateService {
 
     /**
      * 邮箱模版修改
+     *
      * @param updateReqVO 邮箱信息
      */
     void update(@Valid MailTemplateUpdateReqVO updateReqVO);
 
     /**
      * 邮箱模版删除
+     *
      * @param id 编号
      */
     void delete(Long id);

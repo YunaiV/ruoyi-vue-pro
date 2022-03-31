@@ -4,7 +4,6 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.system.controller.admin.mail.vo.account.MailAccountCreateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.mail.vo.account.MailAccountPageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.mail.vo.account.MailAccountUpdateReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.mail.vo.send.MailReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.mail.MailAccountDO;
 
 import javax.validation.Valid;
@@ -19,10 +18,8 @@ import java.util.List;
  */
 public interface MailAccountService {
 
-    // TODO @wangjingyi：注释，完整；参数校验还是要做的；
-
     /**
-     * 创建邮箱账号 // TODO @wangjingyi：方法描述，和参数要空行
+     * 创建邮箱账号
      *
      * @param createReqVO 邮箱账号信息
      * @return 编号

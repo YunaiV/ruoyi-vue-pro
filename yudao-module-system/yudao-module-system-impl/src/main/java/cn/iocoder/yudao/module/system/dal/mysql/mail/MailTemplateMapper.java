@@ -23,6 +23,7 @@ public interface MailTemplateMapper extends BaseMapperX<MailTemplateDO> {
     }
 
     default MailTemplateDO selectOneByCode(String code){
+        // TODO @wangjingyi：优先使用 lambada 查询
         return selectOne("code" , code);
     };
 }
