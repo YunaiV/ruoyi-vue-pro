@@ -8,7 +8,6 @@ import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.datapermission.core.dept.service.dto.DeptDataPermissionRespDTO;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
-import cn.iocoder.yudao.module.system.enums.permission.DataScopeEnum;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnore;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
@@ -16,8 +15,11 @@ import cn.iocoder.yudao.module.system.dal.dataobject.permission.MenuDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.RoleDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.RoleMenuDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.UserRoleDO;
+import cn.iocoder.yudao.module.system.dal.mysql.permission.RoleMenuBatchInsertMapper;
 import cn.iocoder.yudao.module.system.dal.mysql.permission.RoleMenuMapper;
+import cn.iocoder.yudao.module.system.dal.mysql.permission.UserRoleBatchInsertMapper;
 import cn.iocoder.yudao.module.system.dal.mysql.permission.UserRoleMapper;
+import cn.iocoder.yudao.module.system.enums.permission.DataScopeEnum;
 import cn.iocoder.yudao.module.system.mq.producer.permission.PermissionProducer;
 import cn.iocoder.yudao.module.system.service.dept.DeptService;
 import com.google.common.collect.ImmutableMultimap;
@@ -79,7 +81,11 @@ public class PermissionServiceImpl implements PermissionService {
     @Resource
     private RoleMenuMapper roleMenuMapper;
     @Resource
+    private RoleMenuBatchInsertMapper roleMenuBatchInsertMapper;
+    @Resource
     private UserRoleMapper userRoleMapper;
+    @Resource
+    private UserRoleBatchInsertMapper userRoleBatchInsertMapper;
 
     @Resource
     private RoleService roleService;
@@ -202,7 +208,12 @@ public class PermissionServiceImpl implements PermissionService {
         Collection<Long> deleteMenuIds = CollUtil.subtract(dbMenuIds, menuIds);
         // 执行新增和删除。对于已经授权的菜单，不用做任何处理
         if (!CollectionUtil.isEmpty(createMenuIds)) {
-            roleMenuMapper.insertList(roleId, createMenuIds);
+            roleMenuBatchInsertMapper.saveBatch(CollectionUtils.convertList(createMenuIds, menuId -> {
+                RoleMenuDO entity = new RoleMenuDO();
+                entity.setRoleId(roleId);
+                entity.setMenuId(menuId);
+                return entity;
+            }));
         }
         if (!CollectionUtil.isEmpty(deleteMenuIds)) {
             roleMenuMapper.deleteListByRoleIdAndMenuIds(roleId, deleteMenuIds);
@@ -240,7 +251,12 @@ public class PermissionServiceImpl implements PermissionService {
         Collection<Long> deleteMenuIds = CollUtil.subtract(dbRoleIds, roleIds);
         // 执行新增和删除。对于已经授权的角色，不用做任何处理
         if (!CollectionUtil.isEmpty(createRoleIds)) {
-            userRoleMapper.insertList(userId, createRoleIds);
+            userRoleBatchInsertMapper.saveBatch(CollectionUtils.convertList(createRoleIds, roleId -> {
+                UserRoleDO entity = new UserRoleDO();
+                entity.setUserId(userId);
+                entity.setRoleId(roleId);
+                return entity;
+            }));
         }
         if (!CollectionUtil.isEmpty(deleteMenuIds)) {
             userRoleMapper.deleteListByUserIdAndRoleIdIds(userId, deleteMenuIds);

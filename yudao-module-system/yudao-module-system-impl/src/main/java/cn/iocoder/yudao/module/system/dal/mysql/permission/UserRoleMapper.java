@@ -7,7 +7,6 @@ import org.apache.ibatis.annotations.Mapper;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Mapper
 public interface UserRoleMapper extends BaseMapperX<UserRoleDO> {
@@ -18,17 +17,6 @@ public interface UserRoleMapper extends BaseMapperX<UserRoleDO> {
 
     default List<UserRoleDO> selectListByRoleId(Long roleId) {
         return selectList(new QueryWrapper<UserRoleDO>().eq("role_id", roleId));
-    }
-
-
-    default void insertList(Long userId, Collection<Long> roleIds) {
-        List<UserRoleDO> list = roleIds.stream().map(roleId -> {
-            UserRoleDO entity = new UserRoleDO();
-            entity.setUserId(userId);
-            entity.setRoleId(roleId);
-            return entity;
-        }).collect(Collectors.toList());
-        insertBatch(list);
     }
 
     default void deleteListByUserIdAndRoleIdIds(Long userId, Collection<Long> roleIds) {

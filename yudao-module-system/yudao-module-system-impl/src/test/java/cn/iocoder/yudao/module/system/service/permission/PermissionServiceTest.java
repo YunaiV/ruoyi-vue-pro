@@ -5,7 +5,9 @@ import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.RoleDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.RoleMenuDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.UserRoleDO;
+import cn.iocoder.yudao.module.system.dal.mysql.permission.RoleMenuBatchInsertMapper;
 import cn.iocoder.yudao.module.system.dal.mysql.permission.RoleMenuMapper;
+import cn.iocoder.yudao.module.system.dal.mysql.permission.UserRoleBatchInsertMapper;
 import cn.iocoder.yudao.module.system.dal.mysql.permission.UserRoleMapper;
 import cn.iocoder.yudao.module.system.mq.producer.permission.PermissionProducer;
 import cn.iocoder.yudao.module.system.service.dept.DeptService;
@@ -30,7 +32,8 @@ import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@Import(PermissionServiceImpl.class)
+@Import({PermissionServiceImpl.class,
+        RoleMenuBatchInsertMapper.class, UserRoleBatchInsertMapper.class})
 public class PermissionServiceTest extends BaseDbUnitTest {
 
     @Resource
@@ -39,7 +42,11 @@ public class PermissionServiceTest extends BaseDbUnitTest {
     @Resource
     private RoleMenuMapper roleMenuMapper;
     @Resource
+    private RoleMenuBatchInsertMapper roleMenuBatchInsertMapper;
+    @Resource
     private UserRoleMapper userRoleMapper;
+    @Resource
+    private UserRoleBatchInsertMapper userRoleBatchInsertMapper;
 
     @MockBean
     private RoleService roleService;
