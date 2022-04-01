@@ -217,7 +217,7 @@ public class CodegenEngine {
     private static String mapperXmlFilePath() {
         return "yudao-module-${table.moduleName}/" + // 顶级模块
                 "yudao-module-${table.moduleName}-impl/" + // 子模块
-                "src/resources/mapper/${table.businessName}/${table.className}Mapper.xml";
+                "src/main/java/resources/mapper/${table.businessName}/${table.className}Mapper.xml";
     }
 
     private static String vueTemplatePath(String path) {
