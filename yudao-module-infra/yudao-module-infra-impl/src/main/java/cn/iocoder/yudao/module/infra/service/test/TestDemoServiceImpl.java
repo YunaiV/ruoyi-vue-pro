@@ -33,7 +33,6 @@ public class TestDemoServiceImpl implements TestDemoService {
     private TestDemoMapper testDemoMapper;
 
     @Override
-    @CacheEvict(value = "test", key = "#createReqVO.id")
     public Long createTestDemo(TestDemoCreateReqVO createReqVO) {
         // 插入
         TestDemoDO testDemo = TestDemoConvert.INSTANCE.convert(createReqVO);
@@ -53,7 +52,7 @@ public class TestDemoServiceImpl implements TestDemoService {
     }
 
     @Override
-    @CacheEvict(value = "test", key = "'test:' + #id")
+    @CacheEvict(value = "test", key = "#id")
     public void deleteTestDemo(Long id) {
         // 校验存在
         this.validateTestDemoExists(id);
