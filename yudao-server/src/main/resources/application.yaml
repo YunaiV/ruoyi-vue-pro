@@ -23,6 +23,8 @@ spring:
   # Cache 配置项
   cache:
     type: REDIS
+    redis:
+      time-to-live: 1h # 设置过期时间为 1 小时
 
   # 工作流 Activiti 配置
   activiti:
