@@ -6,7 +6,6 @@ import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.*;
@@ -61,10 +60,6 @@ public class LoginUser implements UserDetails {
      * 部门编号
      */
     private Long deptId;
-    /**
-     * 所属岗位
-     */
-    private Set<Long> postIds;
 
     // ========== 上下文 ==========
     /**
