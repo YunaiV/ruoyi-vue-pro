@@ -33,6 +33,6 @@ public interface AuthConvert {
 
     SmsCodeSendReqDTO convert(AppAuthSendSmsReqVO reqVO);
     SmsCodeUseReqDTO convert(AppAuthResetPasswordReqVO reqVO, SmsSceneEnum scene, String usedIp);
-    SmsCodeUseReqDTO convert(AppAuthSmsLoginReqVO reqVO, Integer scene, String userIp);
+    SmsCodeUseReqDTO convert(AppAuthSmsLoginReqVO reqVO, Integer scene, String usedIp);
 
 }
