@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.system.test;
+package cn.iocoder.yudao.framework.test.core.ut;
 
 import cn.iocoder.yudao.framework.datasource.config.YudaoDataSourceAutoConfiguration;
 import cn.iocoder.yudao.framework.mybatis.config.YudaoMybatisAutoConfiguration;

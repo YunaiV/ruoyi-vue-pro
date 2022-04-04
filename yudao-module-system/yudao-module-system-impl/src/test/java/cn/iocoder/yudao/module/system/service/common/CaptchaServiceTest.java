@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.system.service.common;
 import cn.iocoder.yudao.module.system.controller.admin.common.vo.CaptchaImageRespVO;
 import cn.iocoder.yudao.module.system.dal.redis.common.CaptchaRedisDAO;
 import cn.iocoder.yudao.module.system.framework.captcha.config.CaptchaProperties;
-import cn.iocoder.yudao.module.system.test.BaseRedisUnitTest;
+import cn.iocoder.yudao.framework.test.core.ut.BaseRedisUnitTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 

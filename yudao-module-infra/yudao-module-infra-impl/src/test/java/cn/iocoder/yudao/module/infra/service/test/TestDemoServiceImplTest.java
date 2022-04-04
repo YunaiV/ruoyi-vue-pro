@@ -3,13 +3,13 @@ package cn.iocoder.yudao.module.infra.service.test;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.date.DateUtils;
-import cn.iocoder.yudao.module.infra.controller.admin.test.vo.TestDemoExportReqVO;
-import cn.iocoder.yudao.module.infra.dal.dataobject.test.TestDemoDO;
+import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.infra.controller.admin.test.vo.TestDemoCreateReqVO;
+import cn.iocoder.yudao.module.infra.controller.admin.test.vo.TestDemoExportReqVO;
 import cn.iocoder.yudao.module.infra.controller.admin.test.vo.TestDemoPageReqVO;
 import cn.iocoder.yudao.module.infra.controller.admin.test.vo.TestDemoUpdateReqVO;
+import cn.iocoder.yudao.module.infra.dal.dataobject.test.TestDemoDO;
 import cn.iocoder.yudao.module.infra.dal.mysql.test.TestDemoMapper;
-import cn.iocoder.yudao.module.infra.test.BaseDbUnitTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 

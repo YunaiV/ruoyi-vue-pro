@@ -12,7 +12,7 @@ import cn.iocoder.yudao.module.system.dal.mysql.dict.DictDataMapper;
 import cn.iocoder.yudao.module.system.mq.producer.dict.DictDataProducer;
 import cn.iocoder.yudao.framework.common.util.collection.ArrayUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
-import cn.iocoder.yudao.module.system.test.BaseDbUnitTest;
+import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import com.google.common.collect.ImmutableTable;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;

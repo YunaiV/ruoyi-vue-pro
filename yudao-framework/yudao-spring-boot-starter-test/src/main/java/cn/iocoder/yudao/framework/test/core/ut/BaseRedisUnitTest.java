@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.pay.test;
+package cn.iocoder.yudao.framework.test.core.ut;
 
 import cn.iocoder.yudao.framework.redis.config.YudaoRedisAutoConfiguration;
 import cn.iocoder.yudao.framework.test.config.RedisTestConfiguration;
