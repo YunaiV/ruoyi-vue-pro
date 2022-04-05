@@ -2,12 +2,9 @@ package cn.iocoder.yudao.framework.common.util.collection;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.ImmutableMap;
 
 import java.lang.reflect.Array;
-import java.lang.reflect.GenericArrayType;
-import java.lang.reflect.Type;
 import java.util.*;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
@@ -174,6 +171,7 @@ public class CollectionUtils {
         return deptId == null ? Collections.emptyList() : Collections.singleton(deptId);
     }
 
+    // TODO @FinallySays：建议放在 ArrayUtils 里，和 hutool 对齐
     public static <T, V> V[] toArray(List<T> from, Function<T, V> mapper) {
         return toArray(convertList(from, mapper));
     }
