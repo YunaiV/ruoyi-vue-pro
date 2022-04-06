@@ -107,15 +107,14 @@ public class AdminUserServiceImpl implements AdminUserService {
         user.setPassword(passwordEncoder.encode(reqVO.getPassword())); // 加密密码
         userMapper.insert(user);
         Set<Long> postIds = user.getPostIds();
-        if (!org.springframework.util.CollectionUtils.isEmpty(postIds)) {
-            List<UserPostDO> userPostList = new ArrayList<>();
-            for (Long postId : postIds) {
+        if (CollectionUtil.isNotEmpty(postIds)) {
+            List<UserPostDO> insertUserPostList = CollectionUtils.convertList(postIds, postId -> {
                 UserPostDO entity = new UserPostDO();
                 entity.setUserId(user.getId());
                 entity.setPostId(postId);
-                userPostList.add(entity);
-            }
-            userPostMapper.insertBatch(userPostList);
+                return entity;
+            });
+            userPostMapper.insertBatch(insertUserPostList);
         }
         return user.getId();
     }
@@ -130,20 +129,40 @@ public class AdminUserServiceImpl implements AdminUserService {
         AdminUserDO updateObj = UserConvert.INSTANCE.convert(reqVO);
         userMapper.updateById(updateObj);
         // 更新岗位
+        updateUserPost(reqVO, updateObj);
+
+    }
+
+    private void updateUserPost(UserUpdateReqVO reqVO, AdminUserDO updateObj) {
         Set<Long> postIds = updateObj.getPostIds();
         Long userId = reqVO.getId();
-        List<Long> dbPostIds = userPostMapper.selectIdList(userId);
+        List<Long> dbPostIds = userPostMapper.selectIdList(userId)
+                .stream()
+                .map(UserPostDO::getPostId)
+                .collect(Collectors.toList());
         // 计算新增和删除的岗位编号
         Collection<Long> createPostIds = CollUtil.subtract(postIds, dbPostIds);
         Collection<Long> deletePostIds = CollUtil.subtract(dbPostIds, postIds);
         // 执行新增和删除。对于已经授权的菜单，不用做任何处理
         if (!CollectionUtil.isEmpty(createPostIds)) {
-            userPostMapper.insertList(userId, createPostIds);
+            List<UserPostDO> list = createUserPost(userId, createPostIds);
+            userPostMapper.insertBatch(list);
         }
         if (!CollectionUtil.isEmpty(deletePostIds)) {
-            userPostMapper.deleteByUserAndPost(userId, deletePostIds);
+            userPostMapper.deleteByUserIdAndPostId(userId, deletePostIds);
         }
+    }
 
+    private List<UserPostDO> createUserPost(Long userId, Collection<Long> createPostIds) {
+        return createPostIds
+                .stream()
+                .map(postId -> {
+                    UserPostDO entity = new UserPostDO();
+                    entity.setUserId(userId);
+                    entity.setPostId(postId);
+                    return entity;
+                })
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -216,7 +235,7 @@ public class AdminUserServiceImpl implements AdminUserService {
         // 删除用户关联数据
         permissionService.processUserDeleted(id);
         // 删除用户岗位
-        userPostMapper.delete(Wrappers.lambdaUpdate(UserPostDO.class).eq(UserPostDO::getUserId, id));
+        userPostMapper.deleteByUserId(id);
     }
 
     @Override
@@ -247,15 +266,15 @@ public class AdminUserServiceImpl implements AdminUserService {
         if (CollUtil.isEmpty(postIds)) {
             return Collections.emptyList();
         }
-        List<Long> userIdList = userPostMapper.getUserIdByPostIds(postIds);
+        List<Long> userIdList = userPostMapper.selectUserIdByPostIds(postIds)
+                .stream()
+                .map(UserPostDO::getUserId)
+                .distinct()
+                .collect(Collectors.toList());;
         if (userIdList.isEmpty()) {
             return Collections.emptyList();
         }
-        return userMapper
-                .selectListByIds(userIdList)
-                .stream()
-                .peek(user -> user.setPassword(null))
-                .collect(Collectors.toList());
+        return userMapper.selectBatchIds(userIdList);
     }
 
     @Override
