@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.core.KeyValue;
+import cn.iocoder.yudao.framework.common.util.collection.ArrayUtils;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.sms.core.client.SmsCommonResult;
@@ -22,10 +23,8 @@ import com.tencentcloudapi.sms.v20210111.SmsClient;
 import com.tencentcloudapi.sms.v20210111.models.*;
 import lombok.Data;
 
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -37,28 +36,24 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.TIME_ZONE_DE
  * <p>
  * 参见 https://cloud.tencent.com/document/product/382/52077
  *
- * @author : shiwp
+ * @author shiwp
  */
-// TODO @author 后面，空格即可
 public class TencentSmsClient extends AbstractSmsClient {
 
     private SmsClient client;
 
     public TencentSmsClient(SmsChannelProperties properties) {
-        // TODO @FinallySays：注释的时候，中英文之间要空格哈
-        // 腾讯云发放短信的时候需要额外的参数sdkAppId， 所以和secretId组合在一起放到apiKey字段中,格式为[secretId sdkAppId]，
-        // 这边需要做拆分重新封装到properties内
+        // 腾讯云发放短信的时候需要额外的参数 sdkAppId， 所以和 secretId 组合在一起放到 apiKey 字段中,格式为[secretId sdkAppId]，
+        // 这边需要做拆分重新封装到 properties 内
         super(TencentSmsChannelProperties.build(properties), new TencentSmsCodeMapping());
         Assert.notEmpty(properties.getApiSecret(), "apiSecret 不能为空");
     }
 
     @Override
     protected void doInit() {
-        // init或者refresh时需要重新封装properties
-        // TODO @FinallySays：是不是不用这个变量呀？p
-        final SmsChannelProperties p = properties;
-        properties = TencentSmsChannelProperties.build(p);
-        // 实例化一个认证对象，入参需要传入腾讯云账户密钥对secretId，secretKey。
+        // init 或者 refresh 时需要重新封装 properties
+        properties = TencentSmsChannelProperties.build(properties);
+        // 实例化一个认证对象，入参需要传入腾讯云账户密钥对 secretId，secretKey。
         Credential credential = new Credential(properties.getApiKey(), properties.getApiSecret());
         client = new SmsClient(credential, "ap-nanjing");
     }
@@ -68,8 +63,7 @@ public class TencentSmsClient extends AbstractSmsClient {
                                                         String mobile,
                                                         String apiTemplateId,
                                                         List<KeyValue<String, Object>> templateParams) throws Throwable {
-
-        return invoke(() -> buildSendSmsRequest(sendLogId, mobile, apiTemplateId, templateParams),  // TODO @FinallySays：上面不用空行
+        return invoke(() -> buildSendSmsRequest(sendLogId, mobile, apiTemplateId, templateParams),
                 this::doSendSms0,
                 response -> {
                     SendStatus sendStatus = response.getSendStatusSet()[0];
@@ -79,11 +73,11 @@ public class TencentSmsClient extends AbstractSmsClient {
     }
 
     /**
-     * 调用腾讯云SDK发送短信
+     * 调用腾讯云 SDK 发送短信
      *
      * @param request 发送短信请求
      * @return 发送短信响应
-     * @throws TencentCloudSDKException SDK用来封装发送短信失败
+     * @throws TencentCloudSDKException SDK 用来封装发送短信失败
      */
     private SendSmsResponse doSendSms0(SendSmsRequest request) throws TencentCloudSDKException {
         return client.SendSms(request);
@@ -104,10 +98,10 @@ public class TencentSmsClient extends AbstractSmsClient {
                                                List<KeyValue<String, Object>> templateParams) {
         SendSmsRequest request = new SendSmsRequest();
         request.setSmsSdkAppId(((TencentSmsChannelProperties) properties).getSdkAppId());
-        request.setPhoneNumberSet(CollectionUtils.toArray(Collections.singletonList(mobile)));
+        request.setPhoneNumberSet(new String[]{mobile});
         request.setSignName(properties.getSignature());
         request.setTemplateId(apiTemplateId);
-        request.setTemplateParamSet(CollectionUtils.toArray(templateParams, e -> String.valueOf(e.getValue())));
+        request.setTemplateParamSet(ArrayUtils.toArray(templateParams, e -> String.valueOf(e.getValue())));
         request.setSessionContext(JsonUtils.toJsonString(new SessionContext().setLogId(sendLogId)));
         return request;
     }
@@ -120,11 +114,11 @@ public class TencentSmsClient extends AbstractSmsClient {
             data.setErrorCode(status.getErrCode()).setErrorMsg(status.getDescription());
             data.setReceiveTime(status.getReceiveTime()).setSuccess("SUCCESS".equalsIgnoreCase(status.getStatus()));
             data.setMobile(status.getMobile()).setSerialNo(status.getSerialNo());
-            // TODO @FinallySays：建议直接判断是否为空，酱紫更易读一些
-            Optional.ofNullable(status.getSessionContext()).map(SessionContext::getLogId)
-                    .ifPresentOrElse(data::setLogId, () -> {
-                        throw new IllegalStateException(StrUtil.format("未回传logId，需联系腾讯云解决。"));
-                    });
+            SessionContext context;
+            Long logId;
+            Assert.notNull(context = status.getSessionContext(), "回执信息中未解析出 context，请联系腾讯云小助手");
+            Assert.notNull(logId = context.getLogId(), "回执信息中未解析出 logId，请联系腾讯云小助手");
+            data.setLogId(logId);
             return data;
         });
     }
@@ -146,7 +140,7 @@ public class TencentSmsClient extends AbstractSmsClient {
         }
         SmsTemplateAuditStatusEnum auditStatus;
         Assert.notNull(templateStatus.getStatusCode(),
-                StrUtil.format("短信模版审核状态为null，模版id{}", templateStatus.getTemplateId()));
+                StrUtil.format("短信模版审核状态为 null，模版 id{}", templateStatus.getTemplateId()));
         switch (templateStatus.getStatusCode().intValue()) {
             case -1:
                 auditStatus = SmsTemplateAuditStatusEnum.FAIL;
@@ -158,7 +152,7 @@ public class TencentSmsClient extends AbstractSmsClient {
                 auditStatus = SmsTemplateAuditStatusEnum.CHECKING;
                 break;
             default:
-                throw new IllegalStateException(StrUtil.format("不能解析短信模版审核状态{}，模版id{}",
+                throw new IllegalStateException(StrUtil.format("不能解析短信模版审核状态{}，模版 id{}",
                         templateStatus.getStatusCode(), templateStatus.getTemplateId()));
         }
         SmsTemplateRespDTO data = new SmsTemplateRespDTO();
@@ -169,24 +163,23 @@ public class TencentSmsClient extends AbstractSmsClient {
 
     /**
      * 封装查询模版审核状态请求
-     * @param apiTemplateId api的模版id
+     * @param apiTemplateId api 的模版 id
      * @return 查询模版审核状态请求
      */
     private DescribeSmsTemplateListRequest buildSmsTemplateStatusRequest(String apiTemplateId) {
         DescribeSmsTemplateListRequest request = new DescribeSmsTemplateListRequest();
-        // TODO TODO @FinallySays： new Long[]{Long.parseLong(apiTemplateId)} 就 ok 啦
-        request.setTemplateIdSet(CollectionUtils.toArray(Collections.singletonList(apiTemplateId), Long::parseLong));
-        // 地区
-        request.setInternational(0L); // TODO @FinallySays：0L 最好说明下哈；
+        request.setTemplateIdSet(new Long[]{Long.parseLong(apiTemplateId)});
+        // 地区 0：表示国内短信。1：表示国际/港澳台短信。
+        request.setInternational(0L);
         return request;
     }
 
     /**
-     * 调用腾讯云SDK查询短信模版状态
+     * 调用腾讯云 SDK 查询短信模版状态
      *
      * @param request 查询短信模版状态请求
      * @return 查询短信模版状态响应
-     * @throws TencentCloudSDKException SDK用来封装查询短信模版状态失败
+     * @throws TencentCloudSDKException SDK 用来封装查询短信模版状态失败
      */
     private DescribeSmsTemplateListResponse doGetSmsTemplate0(DescribeSmsTemplateListRequest request) throws TencentCloudSDKException {
         return client.DescribeSmsTemplateList(request);
@@ -285,13 +278,12 @@ public class TencentSmsClient extends AbstractSmsClient {
                 return (TencentSmsChannelProperties) properties;
             }
             TencentSmsChannelProperties result = BeanUtil.toBean(properties, TencentSmsChannelProperties.class);
-            // TODO @FinallySays：comb=》combine，不缩写好点哈
-            String combKey = properties.getApiKey();
-            Assert.notEmpty(combKey, "apiKey 不能为空");
-            String[] keys = combKey.trim().split(" ");
-            // TODO @FinallySays：建议写多个断言好点，嘿嘿。然后 Assert 支持占位符
-            Assert.isTrue(keys.length == 2 && StrUtil.isNotBlank(keys[0]) && StrUtil.isNotBlank(keys[1]),
-                    "腾讯云短信api配置格式错误，请配置为[secretId sdkAppId]");
+            String combineKey = properties.getApiKey();
+            Assert.notEmpty(combineKey, "apiKey 不能为空");
+            String[] keys = combineKey.trim().split(" ");
+            Assert.isTrue(keys.length == 2, "腾讯云短信 apiKey 配置格式错误，请配置为[secretId sdkAppId]");
+            Assert.notBlank(keys[0], "腾讯云短信 secretId 不能为空");
+            Assert.notBlank(keys[1], "腾讯云短信 sdkAppId 不能为空");
             result.setSdkAppId(keys[1]).setApiKey(keys[0]);
             return result;
         }

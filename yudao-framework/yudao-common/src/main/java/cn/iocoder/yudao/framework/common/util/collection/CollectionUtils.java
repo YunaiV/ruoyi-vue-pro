@@ -4,7 +4,6 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import com.google.common.collect.ImmutableMap;
 
-import java.lang.reflect.Array;
 import java.util.*;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
@@ -171,21 +170,4 @@ public class CollectionUtils {
         return deptId == null ? Collections.emptyList() : Collections.singleton(deptId);
     }
 
-    // TODO @FinallySays：建议放在 ArrayUtils 里，和 hutool 对齐
-    public static <T, V> V[] toArray(List<T> from, Function<T, V> mapper) {
-        return toArray(convertList(from, mapper));
-    }
-
-    @SuppressWarnings("unchecked")
-    public static <T> T[] toArray(List<T> from) {
-        if (CollectionUtil.isEmpty(from)) {
-            return (T[]) (new Object[0]);
-        }
-        Class<T> clazz = (Class<T>) from.get(0).getClass();
-        T[] result = (T[]) Array.newInstance(clazz, from.size());
-        for (int i = 0; i < from.size(); i++) {
-            result[i] = from.get(i);
-        }
-        return result;
-    }
 }

@@ -4,7 +4,7 @@ import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants;
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.common.util.collection.ArrayUtils;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
@@ -89,7 +89,7 @@ public class TencentSmsClientTest extends BaseMockitoUnitTest {
             assertEquals(mobile, request.getPhoneNumberSet()[0]);
             assertEquals(properties.getSignature(), request.getSignName());
             assertEquals(apiTemplateId, request.getTemplateId());
-            assertEquals(toJsonString(CollectionUtils.toArray(new ArrayList<>(MapUtils.convertMap(templateParams).values()), String::valueOf)), toJsonString(request.getTemplateParamSet()));
+            assertEquals(toJsonString(ArrayUtils.toArray(new ArrayList<>(MapUtils.convertMap(templateParams).values()), String::valueOf)), toJsonString(request.getTemplateParamSet()));
             assertEquals(sendLogId, ReflectUtil.getFieldValue(JsonUtils.parseObject(request.getSessionContext(), TencentSmsClient.SessionContext.class), "logId"));
             return true;
         }))).thenReturn(response);
