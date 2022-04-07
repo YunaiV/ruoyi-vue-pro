@@ -43,18 +43,19 @@ public class TencentSmsClient extends AbstractSmsClient {
     private SmsClient client;
 
     public TencentSmsClient(SmsChannelProperties properties) {
-        // 腾讯云发放短信的时候需要额外的参数 sdkAppId， 所以和 secretId 组合在一起放到 apiKey 字段中,格式为[secretId sdkAppId]，
-        // 这边需要做拆分重新封装到 properties 内
+        // 腾讯云发放短信的时候，需要额外的参数 sdkAppId。考虑到不破坏原有的 apiKey + apiSecret 的结构，所以将 secretId 拼接到 apiKey 字段中，格式为 "secretId sdkAppId"。
+        // 因此，这边需要使用 TencentSmsChannelProperties 做拆分，重新封装到 properties 内。
         super(TencentSmsChannelProperties.build(properties), new TencentSmsCodeMapping());
         Assert.notEmpty(properties.getApiSecret(), "apiSecret 不能为空");
     }
 
     @Override
     protected void doInit() {
-        // init 或者 refresh 时需要重新封装 properties
+        // init 或者 refresh 时，需要重新封装 properties
         properties = TencentSmsChannelProperties.build(properties);
-        // 实例化一个认证对象，入参需要传入腾讯云账户密钥对 secretId，secretKey。
+        // 实例化一个认证对象，入参需要传入腾讯云账户密钥对 secretId，secretKey
         Credential credential = new Credential(properties.getApiKey(), properties.getApiSecret());
+        // TODO @FinallySays：那把 ap-nanjing 枚举下到这个类的静态变量里哈。
         client = new SmsClient(credential, "ap-nanjing");
     }
 
@@ -170,6 +171,7 @@ public class TencentSmsClient extends AbstractSmsClient {
         DescribeSmsTemplateListRequest request = new DescribeSmsTemplateListRequest();
         request.setTemplateIdSet(new Long[]{Long.parseLong(apiTemplateId)});
         // 地区 0：表示国内短信。1：表示国际/港澳台短信。
+        // TODO @FinallySays：那把 0L 枚举下到这个类的静态变量里哈。
         request.setInternational(0L);
         return request;
     }
@@ -268,6 +270,7 @@ public class TencentSmsClient extends AbstractSmsClient {
         R apply(T t) throws TencentCloudSDKException;
     }
 
+    // TODO @FinallySays：要不单独一个类，不用作为内部类哈。这样，可能一看就知道，哟，腾讯短信是特殊的
     @Data
     private static class TencentSmsChannelProperties extends SmsChannelProperties {
 
@@ -281,7 +284,7 @@ public class TencentSmsClient extends AbstractSmsClient {
             String combineKey = properties.getApiKey();
             Assert.notEmpty(combineKey, "apiKey 不能为空");
             String[] keys = combineKey.trim().split(" ");
-            Assert.isTrue(keys.length == 2, "腾讯云短信 apiKey 配置格式错误，请配置为[secretId sdkAppId]");
+            Assert.isTrue(keys.length == 2, "腾讯云短信 apiKey 配置格式错误，请配置 为[secretId sdkAppId]");
             Assert.notBlank(keys[0], "腾讯云短信 secretId 不能为空");
             Assert.notBlank(keys[1], "腾讯云短信 sdkAppId 不能为空");
             result.setSdkAppId(keys[1]).setApiKey(keys[0]);

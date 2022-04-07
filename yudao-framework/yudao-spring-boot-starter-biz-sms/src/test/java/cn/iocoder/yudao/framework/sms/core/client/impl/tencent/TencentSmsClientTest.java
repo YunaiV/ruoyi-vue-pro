@@ -38,7 +38,7 @@ import static org.mockito.Mockito.when;
 /**
  * {@link TencentSmsClient} 的单元测试
  *
- * @author : shiwp
+ * @author shiwp
  */
 public class TencentSmsClientTest extends BaseMockitoUnitTest {
 
@@ -89,7 +89,8 @@ public class TencentSmsClientTest extends BaseMockitoUnitTest {
             assertEquals(mobile, request.getPhoneNumberSet()[0]);
             assertEquals(properties.getSignature(), request.getSignName());
             assertEquals(apiTemplateId, request.getTemplateId());
-            assertEquals(toJsonString(ArrayUtils.toArray(new ArrayList<>(MapUtils.convertMap(templateParams).values()), String::valueOf)), toJsonString(request.getTemplateParamSet()));
+            assertEquals(toJsonString(ArrayUtils.toArray(new ArrayList<>(MapUtils.convertMap(templateParams).values()), String::valueOf)),
+                    toJsonString(request.getTemplateParamSet()));
             assertEquals(sendLogId, ReflectUtil.getFieldValue(JsonUtils.parseObject(request.getSessionContext(), TencentSmsClient.SessionContext.class), "logId"));
             return true;
         }))).thenReturn(response);
@@ -173,6 +174,7 @@ public class TencentSmsClientTest extends BaseMockitoUnitTest {
         assertEquals(response.getDescribeTemplateStatusSet()[0].getReviewReply(), result.getData().getAuditReason());
     }
 
+    // TODO @FinallySays：这个单测，按道理说应该是写成 4 个方法，每个对应一种情况。
     @Test
     public void testConvertTemplateStatusDTO() {
         testTemplateStatus(SmsTemplateAuditStatusEnum.SUCCESS, 0L);
@@ -181,6 +183,7 @@ public class TencentSmsClientTest extends BaseMockitoUnitTest {
         DescribeTemplateListStatus templateStatus = new DescribeTemplateListStatus();
         templateStatus.setStatusCode(3L);
         Long templateId = randomLongId();
+        // 调用，并断言结果
         assertThrows(IllegalStateException.class, () -> smsClient.convertTemplateStatusDTO(templateStatus),
                 StrUtil.format("不能解析短信模版审核状态[3]，模版id[{}]", templateId));
     }
@@ -191,6 +194,5 @@ public class TencentSmsClientTest extends BaseMockitoUnitTest {
         SmsTemplateRespDTO result = smsClient.convertTemplateStatusDTO(templateStatus);
         assertEquals(expected.getStatus(), result.getAuditStatus());
     }
-
 
 }
