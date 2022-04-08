@@ -1,0 +1,22 @@
+GET http://localhost:81/dev-api/admin-api/system/sensitive-word/get-all-tags
+Accept: application/json
+Authorization: Bearer 385d533b781f44f6bb21ea08afeec47c
+
+
+
+###
+POST http://localhost:81/dev-api/admin-api/system/sensitive-word/create
+Content-Type: application/json
+Authorization: Bearer 1649ff1f8b9a4eeeb458fe93a71c78b5
+
+{
+  "name": "test",
+  "tags": [
+    "bbb,aaa"
+  ],
+  "description": "test",
+  "status": true
+}
+
+
+###
