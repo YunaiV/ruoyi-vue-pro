@@ -12,8 +12,7 @@ import java.util.List;
 public interface BpmProcessDefinitionExtMapper extends BaseMapperX<BpmProcessDefinitionExtDO> {
 
     default List<BpmProcessDefinitionExtDO> selectListByProcessDefinitionIds(Collection<String> processDefinitionIds) {
-        return selectList(new LambdaQueryWrapperX<BpmProcessDefinitionExtDO>()
-                .inIfPresent(BpmProcessDefinitionExtDO::getProcessDefinitionId,processDefinitionIds));
+        return selectList("process_definition_id", processDefinitionIds);
     }
 
     default BpmProcessDefinitionExtDO selectByProcessDefinitionId(String processDefinitionId) {

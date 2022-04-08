@@ -215,7 +215,7 @@ public class BpmModelServiceImpl  implements BpmModelService {
         if (oldDefinition == null) {
             return;
         }
-        if(oldDefinition.isSuspended()){
+        if(oldDefinition.isSuspended()) {
             return;
         }
         processDefinitionService.updateProcessDefinitionState(oldDefinition.getId(), SuspensionState.SUSPENDED.getStateCode());

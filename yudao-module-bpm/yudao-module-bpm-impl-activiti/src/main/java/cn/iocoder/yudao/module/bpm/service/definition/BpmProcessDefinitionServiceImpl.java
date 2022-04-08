@@ -103,6 +103,9 @@ public class BpmProcessDefinitionServiceImpl implements BpmProcessDefinitionServ
         }
         // 执行查询
         List<ProcessDefinition> processDefinitions = definitionQuery.list();
+        if (CollUtil.isEmpty(processDefinitions)) {
+            return Collections.emptyList();
+        }
 
         // 获得 BpmProcessDefinitionDO Map
         List<BpmProcessDefinitionExtDO> processDefinitionDOs = processDefinitionMapper.selectListByProcessDefinitionIds(
