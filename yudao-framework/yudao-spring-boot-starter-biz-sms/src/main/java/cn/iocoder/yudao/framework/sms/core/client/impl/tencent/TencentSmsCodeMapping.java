@@ -19,7 +19,7 @@ public class TencentSmsCodeMapping implements SmsCodeMapping {
     @Override
     public ErrorCode apply(String apiCode) {
         switch (apiCode) {
-            case "Ok": return GlobalErrorCodeConstants.SUCCESS;
+            case TencentSmsClient.API_SUCCESS_CODE: return GlobalErrorCodeConstants.SUCCESS;
             case "FailedOperation.ContainSensitiveWord": return SMS_SEND_CONTENT_INVALID;
             case "FailedOperation.JsonParseFail":
             case "MissingParameter.EmptyPhoneNumberSet":

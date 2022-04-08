@@ -20,7 +20,7 @@ public class TencentSmsCodeMappingTest extends BaseMockitoUnitTest {
 
     @Test
     public void testApply() {
-        assertEquals(GlobalErrorCodeConstants.SUCCESS, codeMapping.apply("Ok"));
+        assertEquals(GlobalErrorCodeConstants.SUCCESS, codeMapping.apply(TencentSmsClient.API_SUCCESS_CODE));
         assertEquals(SmsFrameworkErrorCodeConstants.SMS_SEND_CONTENT_INVALID, codeMapping.apply("FailedOperation.ContainSensitiveWord"));
         assertEquals(GlobalErrorCodeConstants.BAD_REQUEST, codeMapping.apply("FailedOperation.JsonParseFail"));
         assertEquals(GlobalErrorCodeConstants.BAD_REQUEST, codeMapping.apply("MissingParameter.EmptyPhoneNumberSet"));

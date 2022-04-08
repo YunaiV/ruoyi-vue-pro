@@ -65,6 +65,19 @@ public class TencentSmsClientTest extends BaseMockitoUnitTest {
     }
 
     @Test
+    public void testRefresh() {
+        // 准备参数
+        SmsChannelProperties p = new SmsChannelProperties()
+                .setApiKey(randomString() + " " + randomString()) // 随机一个 apiKey，避免构建报错
+                .setApiSecret(randomString()) // 随机一个 apiSecret，避免构建报错
+                .setSignature("芋道源码");
+        // 调用
+        smsClient.refresh(p);
+        // 断言
+        assertNotSame(client, ReflectUtil.getFieldValue(smsClient, "client"));
+    }
+
+    @Test
     public void testDoSendSms() throws Throwable {
         // 准备参数
         Long sendLogId = randomLongId();
@@ -81,7 +94,7 @@ public class TencentSmsClientTest extends BaseMockitoUnitTest {
             o.setSendStatusSet(sendStatuses);
             SendStatus sendStatus = new SendStatus();
             sendStatuses[0] = sendStatus;
-            sendStatus.setCode("Ok");
+            sendStatus.setCode(TencentSmsClient.API_SUCCESS_CODE);
             sendStatus.setMessage("send success");
             sendStatus.setSerialNo(serialNo);
         });
@@ -162,7 +175,7 @@ public class TencentSmsClientTest extends BaseMockitoUnitTest {
         // 调用
         SmsCommonResult<SmsTemplateRespDTO> result = smsClient.doGetSmsTemplate(apiTemplateId.toString());
         // 断言
-        assertEquals("Ok", result.getApiCode());
+        assertEquals(TencentSmsClient.API_SUCCESS_CODE, result.getApiCode());
         assertNull(result.getApiMsg());
         assertEquals(GlobalErrorCodeConstants.SUCCESS.getCode(), result.getCode());
         assertEquals(GlobalErrorCodeConstants.SUCCESS.getMsg(), result.getMsg());
@@ -174,12 +187,23 @@ public class TencentSmsClientTest extends BaseMockitoUnitTest {
         assertEquals(response.getDescribeTemplateStatusSet()[0].getReviewReply(), result.getData().getAuditReason());
     }
 
-    // TODO @FinallySays：这个单测，按道理说应该是写成 4 个方法，每个对应一种情况。
     @Test
-    public void testConvertTemplateStatusDTO() {
+    public void testConvertSuccessTemplateStatus() {
         testTemplateStatus(SmsTemplateAuditStatusEnum.SUCCESS, 0L);
+    }
+
+    @Test
+    public void testConvertCheckingTemplateStatus() {
         testTemplateStatus(SmsTemplateAuditStatusEnum.CHECKING, 1L);
+    }
+
+    @Test
+    public void testConvertFailTemplateStatus() {
         testTemplateStatus(SmsTemplateAuditStatusEnum.FAIL, -1L);
+    }
+
+    @Test
+    public void testConvertUnknownTemplateStatus() {
         DescribeTemplateListStatus templateStatus = new DescribeTemplateListStatus();
         templateStatus.setStatusCode(3L);
         Long templateId = randomLongId();

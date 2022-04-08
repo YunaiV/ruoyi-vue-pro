@@ -14,6 +14,7 @@ import cn.iocoder.yudao.framework.sms.core.client.dto.SmsTemplateRespDTO;
 import cn.iocoder.yudao.framework.sms.core.client.impl.AbstractSmsClient;
 import cn.iocoder.yudao.framework.sms.core.enums.SmsTemplateAuditStatusEnum;
 import cn.iocoder.yudao.framework.sms.core.property.SmsChannelProperties;
+import cn.iocoder.yudao.framework.sms.core.property.TencentSmsChannelProperties;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.annotations.VisibleForTesting;
@@ -42,21 +43,33 @@ public class TencentSmsClient extends AbstractSmsClient {
 
     private SmsClient client;
 
+    /**
+     * 调用成功 code
+     */
+    public static final String API_SUCCESS_CODE = "Ok";
+
+    /**
+     * REGION, 使用南京
+     */
+    private static final String ENDPOINT = "ap-nanjing";
+
+    /**
+     * 是否国际/港澳台短信：
+     * 0：表示国内短信。
+     * 1：表示国际/港澳台短信。
+     */
+    private static final long INTERNATIONAL = 0L;
+
     public TencentSmsClient(SmsChannelProperties properties) {
-        // 腾讯云发放短信的时候，需要额外的参数 sdkAppId。考虑到不破坏原有的 apiKey + apiSecret 的结构，所以将 secretId 拼接到 apiKey 字段中，格式为 "secretId sdkAppId"。
-        // 因此，这边需要使用 TencentSmsChannelProperties 做拆分，重新封装到 properties 内。
-        super(TencentSmsChannelProperties.build(properties), new TencentSmsCodeMapping());
+        super(properties, new TencentSmsCodeMapping());
         Assert.notEmpty(properties.getApiSecret(), "apiSecret 不能为空");
     }
 
     @Override
     protected void doInit() {
-        // init 或者 refresh 时，需要重新封装 properties
-        properties = TencentSmsChannelProperties.build(properties);
         // 实例化一个认证对象，入参需要传入腾讯云账户密钥对 secretId，secretKey
         Credential credential = new Credential(properties.getApiKey(), properties.getApiSecret());
-        // TODO @FinallySays：那把 ap-nanjing 枚举下到这个类的静态变量里哈。
-        client = new SmsClient(credential, "ap-nanjing");
+        client = new SmsClient(credential, ENDPOINT);
     }
 
     @Override
@@ -71,6 +84,20 @@ public class TencentSmsClient extends AbstractSmsClient {
                     return SmsCommonResult.build(sendStatus.getCode(), sendStatus.getMessage(), response.getRequestId(),
                             new SmsSendRespDTO().setSerialNo(sendStatus.getSerialNo()), codeMapping);
                 });
+    }
+
+
+    /**
+     * 腾讯云发放短信的时候，需要额外的参数 sdkAppId。
+     * 考虑到不破坏原有的 apiKey + apiSecret 的结构，所以将 secretId 拼接到 apiKey 字段中，格式为 "secretId sdkAppId"。
+     * 因此，这边需要使用 TencentSmsChannelProperties 做拆分，重新封装到 properties 内。
+     *
+     * @param properties 数据库中存储的短信渠道配置
+     * @return TencentSmsChannelProperties
+     */
+    @Override
+    protected SmsChannelProperties prepareProperties(SmsChannelProperties properties) {
+        return TencentSmsChannelProperties.build(properties);
     }
 
     /**
@@ -113,7 +140,7 @@ public class TencentSmsClient extends AbstractSmsClient {
         return CollectionUtils.convertList(callback, status -> {
             SmsReceiveRespDTO data = new SmsReceiveRespDTO();
             data.setErrorCode(status.getErrCode()).setErrorMsg(status.getDescription());
-            data.setReceiveTime(status.getReceiveTime()).setSuccess("SUCCESS".equalsIgnoreCase(status.getStatus()));
+            data.setReceiveTime(status.getReceiveTime()).setSuccess(SmsReceiveStatus.SUCCESS_CODE.equalsIgnoreCase(status.getStatus()));
             data.setMobile(status.getMobile()).setSerialNo(status.getSerialNo());
             SessionContext context;
             Long logId;
@@ -130,7 +157,7 @@ public class TencentSmsClient extends AbstractSmsClient {
                 this::doGetSmsTemplate0,
                 response -> {
                     SmsTemplateRespDTO data = convertTemplateStatusDTO(response.getDescribeTemplateStatusSet()[0]);
-                    return SmsCommonResult.build("Ok", null, response.getRequestId(), data, codeMapping);
+                    return SmsCommonResult.build(API_SUCCESS_CODE, null, response.getRequestId(), data, codeMapping);
                 });
     }
 
@@ -171,8 +198,7 @@ public class TencentSmsClient extends AbstractSmsClient {
         DescribeSmsTemplateListRequest request = new DescribeSmsTemplateListRequest();
         request.setTemplateIdSet(new Long[]{Long.parseLong(apiTemplateId)});
         // 地区 0：表示国内短信。1：表示国际/港澳台短信。
-        // TODO @FinallySays：那把 0L 枚举下到这个类的静态变量里哈。
-        request.setInternational(0L);
+        request.setInternational(INTERNATIONAL);
         return request;
     }
 
@@ -205,6 +231,11 @@ public class TencentSmsClient extends AbstractSmsClient {
 
     @Data
     private static class SmsReceiveStatus {
+
+        /**
+         * 短信接受成功 code
+         */
+        public static final String SUCCESS_CODE = "SUCCESS";
 
         /**
          * 用户实际接收到短信的时间
@@ -269,28 +300,5 @@ public class TencentSmsClient extends AbstractSmsClient {
     private interface SdkFunction<T, R> {
         R apply(T t) throws TencentCloudSDKException;
     }
-
-    // TODO @FinallySays：要不单独一个类，不用作为内部类哈。这样，可能一看就知道，哟，腾讯短信是特殊的
-    @Data
-    private static class TencentSmsChannelProperties extends SmsChannelProperties {
-
-        private String sdkAppId;
-
-        public static TencentSmsChannelProperties build(SmsChannelProperties properties) {
-            if (properties instanceof TencentSmsChannelProperties) {
-                return (TencentSmsChannelProperties) properties;
-            }
-            TencentSmsChannelProperties result = BeanUtil.toBean(properties, TencentSmsChannelProperties.class);
-            String combineKey = properties.getApiKey();
-            Assert.notEmpty(combineKey, "apiKey 不能为空");
-            String[] keys = combineKey.trim().split(" ");
-            Assert.isTrue(keys.length == 2, "腾讯云短信 apiKey 配置格式错误，请配置 为[secretId sdkAppId]");
-            Assert.notBlank(keys[0], "腾讯云短信 secretId 不能为空");
-            Assert.notBlank(keys[1], "腾讯云短信 sdkAppId 不能为空");
-            result.setSdkAppId(keys[1]).setApiKey(keys[0]);
-            return result;
-        }
-    }
-
 
 }
