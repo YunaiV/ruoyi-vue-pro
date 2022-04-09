@@ -1,16 +1,30 @@
 package cn.iocoder.yudao.module.system.api.sensitiveword;
 
 import java.util.List;
-import java.util.Set;
 
 /**
- * 大佬，别偷懒：代码千万行，注释第一行！
+ * 敏感词 API 接口
  *
- * @author: 永不言败 <向国足学习永不言败>
- * @since: 2022/3/23 17:00
- * @description:
- * @modification:
+ * @author 永不言败
  */
 public interface SensitiveWordApi {
+
+    /**
+     * 获得文本所包含的不合法的敏感词数组
+     *
+     * @param text 文本
+     * @param tags 标签数组
+     * @return 不合法的敏感词数组
+     */
+    List<String> validateText(String text, List<String> tags);
+
+    /**
+     * 判断文本是否包含敏感词
+     *
+     * @param text 文本
+     * @param tags 表述数组
+     * @return 是否包含
+     */
+    boolean isTextValid(String text, List<String> tags);
 
 }

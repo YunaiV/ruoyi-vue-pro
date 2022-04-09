@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.system.service.sensitiveword;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.system.controller.admin.sensitiveword.vo.SensitiveWordCreateReqVO;
@@ -11,9 +12,11 @@ import cn.iocoder.yudao.module.system.convert.sensitiveword.SensitiveWordConvert
 import cn.iocoder.yudao.module.system.dal.dataobject.sensitiveword.SensitiveWordDO;
 import cn.iocoder.yudao.module.system.dal.mysql.sensitiveword.SensitiveWordMapper;
 import cn.iocoder.yudao.module.system.mq.producer.sensitiveword.SensitiveWordProducer;
+import cn.iocoder.yudao.module.system.util.collection.SimpleTrie;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -23,7 +26,8 @@ import javax.annotation.Resource;
 import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.SENSITIVE_WORD_EXISTS;
+import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.SENSITIVE_WORD_NOT_EXISTS;
 
 /**
  * 敏感词 Service 实现类
@@ -71,9 +75,14 @@ public class SensitiveWordServiceImpl implements SensitiveWordService {
     @Resource
     private SensitiveWordProducer sensitiveWordProducer;
 
-    @Resource
-    @Lazy
-    private SensitiveWordService self;
+    /**
+     * 默认的敏感词的字典树，包含所有敏感词
+     */
+    private volatile SimpleTrie defaultSensitiveWordTrie = new SimpleTrie(Collections.emptySet());
+    /**
+     * 标签与敏感词的字段数的映射
+     */
+    private volatile Map<String, SimpleTrie> tagSensitiveWordTries = Collections.emptyMap();
 
     /**
      * 初始化 {@link #sensitiveWordCache} 缓存
@@ -91,15 +100,38 @@ public class SensitiveWordServiceImpl implements SensitiveWordService {
         Set<String> tags = new HashSet<>();
         sensitiveWordList.forEach(word -> tags.addAll(word.getTags()));
         sensitiveWordTagsCache = tags;
+        // 写入 defaultSensitiveWordTrie、tagSensitiveWordTries 缓存
+        initSensitiveWordTrie(sensitiveWordList);
         // 写入 sensitiveWordCache 缓存
         sensitiveWordCache = CollectionUtils.convertMap(sensitiveWordList, SensitiveWordDO::getId);
         maxUpdateTime = CollectionUtils.getMaxValue(sensitiveWordList, SensitiveWordDO::getUpdateTime);
         log.info("[initLocalCache][初始化 敏感词 数量为 {}]", sensitiveWordList.size());
     }
 
+    private void initSensitiveWordTrie(List<SensitiveWordDO> wordDOs) {
+        // 过滤禁用的敏感词
+        wordDOs = CollectionUtils.filterList(wordDOs, word -> word.getStatus().equals(CommonStatusEnum.ENABLE.getStatus()));
+
+        // 初始化默认的 defaultSensitiveWordTrie
+        this.defaultSensitiveWordTrie = new SimpleTrie(CollectionUtils.convertList(wordDOs, SensitiveWordDO::getName));
+
+        // 初始化 tagSensitiveWordTries
+        Multimap<String, String> tagWords = HashMultimap.create();
+        for (SensitiveWordDO word : wordDOs) {
+            if (CollUtil.isEmpty(word.getTags())) {
+                continue;
+            }
+            word.getTags().forEach(tag -> tagWords.put(tag, word.getName()));
+        }
+        // 添加到 tagSensitiveWordTries 中
+        Map<String, SimpleTrie> tagSensitiveWordTries = new HashMap<>();
+        tagWords.asMap().forEach((tag, words) -> tagSensitiveWordTries.put(tag, new SimpleTrie(words)));
+        this.tagSensitiveWordTries = tagSensitiveWordTries;
+    }
+
     @Scheduled(fixedDelay = SCHEDULER_PERIOD, initialDelay = SCHEDULER_PERIOD)
     public void schedulePeriodicRefresh() {
-        self.initLocalCache();
+        initLocalCache();
     }
 
     /**
@@ -201,6 +233,41 @@ public class SensitiveWordServiceImpl implements SensitiveWordService {
     @Override
     public Set<String> getSensitiveWordTags() {
         return sensitiveWordTagsCache;
+    }
+
+    @Override
+    public List<String> validateText(String text, List<String> tags) {
+        if (CollUtil.isEmpty(tags)) {
+            return defaultSensitiveWordTrie.validate(text);
+        }
+        // 有标签的情况
+        Set<String> result = new HashSet<>();
+        tags.forEach(tag -> {
+            SimpleTrie trie = tagSensitiveWordTries.get(tag);
+            if (trie == null) {
+                return;
+            }
+            result.addAll(trie.validate(text));
+        });
+        return new ArrayList<>(result);
+    }
+
+    @Override
+    public boolean isTextValid(String text, List<String> tags) {
+        if (CollUtil.isEmpty(tags)) {
+            return defaultSensitiveWordTrie.isValid(text);
+        }
+        // 有标签的情况
+        for (String tag : tags) {
+            SimpleTrie trie = tagSensitiveWordTries.get(tag);
+            if (trie == null) {
+                continue;
+            }
+            if (!trie.isValid(text)) {
+                return false;
+            }
+        }
+        return true;
     }
 
 }

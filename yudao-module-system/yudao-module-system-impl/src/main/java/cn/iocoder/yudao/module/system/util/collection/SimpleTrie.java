@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.system.util.collection;
 
+import cn.hutool.core.collection.CollUtil;
+
 import java.util.*;
 
 /**
@@ -27,10 +29,10 @@ public class SimpleTrie {
      *
      * @param strs 字符串数组
      */
-    public SimpleTrie(List<String> strs) {
+    public SimpleTrie(Collection<String> strs) {
         children = new HashMap<>();
         // 构建树
-        Collections.sort(strs); // 排序，优先使用较短的前缀
+        CollUtil.sort(strs, String::compareTo); // 排序，优先使用较短的前缀
         for (String str : strs) {
             Map<Character, Object> child = children;
             // 遍历每个字符

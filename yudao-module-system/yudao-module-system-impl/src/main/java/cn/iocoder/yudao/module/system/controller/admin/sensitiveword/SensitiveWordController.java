@@ -75,13 +75,6 @@ public class SensitiveWordController {
         return success(SensitiveWordConvert.INSTANCE.convertPage(pageResult));
     }
 
-    @GetMapping("/get-tags")
-    @ApiOperation("获取所有敏感词的标签数组")
-    @PreAuthorize("@ss.hasPermission('system:sensitive-word:query')")
-    public CommonResult<Set<String>> getSensitiveWordTags() throws IOException {
-        return success(sensitiveWordService.getSensitiveWordTags());
-    }
-
     @GetMapping("/export-excel")
     @ApiOperation("导出敏感词 Excel")
     @PreAuthorize("@ss.hasPermission('system:sensitive-word:export')")
@@ -94,11 +87,18 @@ public class SensitiveWordController {
         ExcelUtils.write(response, "敏感词.xls", "数据", SensitiveWordExcelVO.class, datas);
     }
 
-//    @GetMapping("/is-sensitive-word-by-text-and-tag")
-//    @ApiOperation("通过tag判断传入text是否含有敏感词")
-//    @PreAuthorize("@ss.hasPermission('system:sensitive-word:checkbytextandtag')")
-//    public CommonResult<Boolean> isSensitiveWordByTextAndTag(@NotBlank String text, @NotBlank String tag) throws IOException {
-//        return success(sensitiveWordApi.isSensitiveWordByTextAndTag(text,tag));
-//    }
+    @GetMapping("/get-tags")
+    @ApiOperation("获取所有敏感词的标签数组")
+    @PreAuthorize("@ss.hasPermission('system:sensitive-word:query')")
+    public CommonResult<Set<String>> getSensitiveWordTags() throws IOException {
+        return success(sensitiveWordService.getSensitiveWordTags());
+    }
+
+    @GetMapping("/validate-text")
+    @ApiOperation("获得文本所包含的不合法的敏感词数组")
+    public CommonResult<List<String>> validateText(@RequestParam("text") String text,
+                                                   @RequestParam(value = "tags", required = false) List<String> tags) {
+        return success(sensitiveWordService.validateText(text, tags));
+    }
 
 }

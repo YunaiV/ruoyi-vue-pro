@@ -57,7 +57,6 @@ function filterAsyncRouter(asyncRouterMap, lastRouter = false, type = false) {
     }
     // 处理 component 属性
     if (route.children) { // 父节点
-      // debugger
       if (route.parentId === 0) {
         route.component = Layout
       } else {
