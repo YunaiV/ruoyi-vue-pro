@@ -27,8 +27,8 @@
 
         <!-- Web 相关 -->
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-web</artifactId>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-spring-boot-starter-web</artifactId>
             <scope>provided</scope> <!-- 设置为 provided，只有 OncePerRequestFilter 使用到 -->
         </dependency>
 
