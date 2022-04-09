@@ -1,26 +1,24 @@
+import Vue from 'vue'
 import App from './App'
 
-// #ifndef VUE3
-import Vue from 'vue'
-Vue.config.productionTip = false
+// vuex
+import store from './store'
 
-//引入并使用uView的JS库
+Vue.config.productionTip = false
+Vue.prototype.$store = store
+
+// 引入全局uView
 import uView from '@/uni_modules/uview-ui'
-Vue.use(uView)
 
 App.mpType = 'app'
-const app = new Vue({
-    ...App
-})
-app.$mount()
-// #endif
+Vue.use(uView)
 
-// #ifdef VUE3
-import { createSSRApp } from 'vue'
-export function createApp() {
-  const app = createSSRApp(App)
-  return {
-    app
-  }
-}
-// #endif
+const app = new Vue({
+	store,
+	...App
+})
+
+// 引入请求封装
+require('./util/request/index')(app)
+
+app.$mount()

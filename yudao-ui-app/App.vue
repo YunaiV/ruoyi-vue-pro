@@ -15,11 +15,8 @@
 <style lang="scss">
   /* 引入uView基础样式 */
   @import "@/uni_modules/uview-ui/index.scss";
-	
-	/*每个页面公共css */
-  .container {
-    background-color: $uni-bg-color;
-    box-sizing: border-box;
-    height: 100%;
-  }
+
+  /*每个页面公共scss */
+  @import "app.scss";
+
 </style>

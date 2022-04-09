@@ -1,6 +1,6 @@
 <template>
 	<view class="container">
-
+个人资料
 	</view>
 </template>
 
@@ -21,5 +21,4 @@
 </script>
 
 <style lang="scss" scoped>
-
 </style>
