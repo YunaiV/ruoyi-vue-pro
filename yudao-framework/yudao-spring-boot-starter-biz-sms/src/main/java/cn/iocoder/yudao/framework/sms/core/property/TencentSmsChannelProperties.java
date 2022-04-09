@@ -11,7 +11,6 @@ import lombok.Data;
  * @author shiwp
  */
 @Data
-
 public class TencentSmsChannelProperties extends SmsChannelProperties {
 
     /**

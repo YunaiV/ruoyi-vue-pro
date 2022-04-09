@@ -41,15 +41,13 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.TIME_ZONE_DE
  */
 public class TencentSmsClient extends AbstractSmsClient {
 
-    private SmsClient client;
-
     /**
      * 调用成功 code
      */
     public static final String API_SUCCESS_CODE = "Ok";
 
     /**
-     * REGION, 使用南京
+     * REGION，使用南京
      */
     private static final String ENDPOINT = "ap-nanjing";
 
@@ -59,6 +57,8 @@ public class TencentSmsClient extends AbstractSmsClient {
      * 1：表示国际/港澳台短信。
      */
     private static final long INTERNATIONAL = 0L;
+
+    private SmsClient client;
 
     public TencentSmsClient(SmsChannelProperties properties) {
         super(properties, new TencentSmsCodeMapping());
