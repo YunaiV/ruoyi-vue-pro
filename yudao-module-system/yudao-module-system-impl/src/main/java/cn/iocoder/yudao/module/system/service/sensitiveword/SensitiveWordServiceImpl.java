@@ -46,15 +46,6 @@ public class SensitiveWordServiceImpl implements SensitiveWordService {
     private static final long SCHEDULER_PERIOD = 5 * 60 * 1000L;
 
     /**
-     * 敏感词缓存
-     * key：敏感词编号 {@link SensitiveWordDO#getId()}
-     * <p>
-     * 这里声明 volatile 修饰的原因是，每次刷新时，直接修改指向
-     */
-    @Getter
-    private volatile Map<Long, SensitiveWordDO> sensitiveWordCache = Collections.emptyMap();
-
-    /**
      * 敏感词标签缓存
      * key：敏感词编号 {@link SensitiveWordDO#getId()}
      * <p>
@@ -78,14 +69,16 @@ public class SensitiveWordServiceImpl implements SensitiveWordService {
     /**
      * 默认的敏感词的字典树，包含所有敏感词
      */
+    @Getter
     private volatile SimpleTrie defaultSensitiveWordTrie = new SimpleTrie(Collections.emptySet());
     /**
      * 标签与敏感词的字段数的映射
      */
+    @Getter
     private volatile Map<String, SimpleTrie> tagSensitiveWordTries = Collections.emptyMap();
 
     /**
-     * 初始化 {@link #sensitiveWordCache} 缓存
+     * 初始化缓存
      */
     @Override
     @PostConstruct
@@ -102,8 +95,7 @@ public class SensitiveWordServiceImpl implements SensitiveWordService {
         sensitiveWordTagsCache = tags;
         // 写入 defaultSensitiveWordTrie、tagSensitiveWordTries 缓存
         initSensitiveWordTrie(sensitiveWordList);
-        // 写入 sensitiveWordCache 缓存
-        sensitiveWordCache = CollectionUtils.convertMap(sensitiveWordList, SensitiveWordDO::getId);
+        // 写入 maxUpdateTime 最大更新时间
         maxUpdateTime = CollectionUtils.getMaxValue(sensitiveWordList, SensitiveWordDO::getUpdateTime);
         log.info("[initLocalCache][初始化 敏感词 数量为 {}]", sensitiveWordList.size());
     }
