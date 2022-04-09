@@ -2,43 +2,43 @@
   <div class="app-container">
 
     <!-- 搜索工作栏 -->
-    <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="100px">
+    <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="100px">
       <el-form-item label="手机号" prop="mobile">
-        <el-input v-model="queryParams.mobile" placeholder="请输入手机号" clearable size="small" @keyup.enter.native="handleQuery"/>
+        <el-input v-model="queryParams.mobile" placeholder="请输入手机号" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item label="短信渠道" prop="channelId">
-        <el-select v-model="queryParams.channelId" placeholder="请选择短信渠道" clearable size="small">
+        <el-select v-model="queryParams.channelId" placeholder="请选择短信渠道" clearable>
           <el-option v-for="channel in channelOptions"
                      :key="channel.id" :value="channel.id"
                      :label="channel.signature + '【' + getDictDataLabel(DICT_TYPE.SYSTEM_SMS_CHANNEL_CODE, channel.code) + '】'" />
         </el-select>
       </el-form-item>
       <el-form-item label="模板编号" prop="templateId">
-        <el-input v-model="queryParams.templateId" placeholder="请输入模板编号" clearable size="small" @keyup.enter.native="handleQuery"/>
+        <el-input v-model="queryParams.templateId" placeholder="请输入模板编号" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item label="发送状态" prop="sendStatus">
-        <el-select v-model="queryParams.sendStatus" placeholder="请选择发送状态" clearable size="small">
+        <el-select v-model="queryParams.sendStatus" placeholder="请选择发送状态" clearable>
           <el-option v-for="dict in this.getDictDatas(DICT_TYPE.SYSTEM_SMS_SEND_STATUS)"
                      :key="dict.value" :label="dict.label" :value="dict.value"/>
         </el-select>
       </el-form-item>
       <el-form-item label="发送时间">
-        <el-date-picker v-model="dateRangeSendTime" size="small" style="width: 240px" value-format="yyyy-MM-dd"
+        <el-date-picker v-model="dateRangeSendTime" style="width: 240px" value-format="yyyy-MM-dd"
                         type="daterange" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" />
       </el-form-item>
       <el-form-item label="接收状态" prop="receiveStatus">
-        <el-select v-model="queryParams.receiveStatus" placeholder="请选择接收状态" clearable size="small">
+        <el-select v-model="queryParams.receiveStatus" placeholder="请选择接收状态" clearable>
           <el-option v-for="dict in this.getDictDatas(DICT_TYPE.SYSTEM_SMS_RECEIVE_STATUS)"
                      :key="dict.value" :label="dict.label" :value="dict.value"/>
         </el-select>
       </el-form-item>
       <el-form-item label="接收时间">
-        <el-date-picker v-model="dateRangeReceiveTime" size="small" style="width: 240px" value-format="yyyy-MM-dd"
+        <el-date-picker v-model="dateRangeReceiveTime" style="width: 240px" value-format="yyyy-MM-dd"
                         type="daterange" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" />
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
-        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
+        <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
+        <el-button icon="el-icon-refresh" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
 

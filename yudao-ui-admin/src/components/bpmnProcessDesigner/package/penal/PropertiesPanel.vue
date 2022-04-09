@@ -163,7 +163,6 @@ export default {
     // 初始化数据
     initFormOnChanged(element) {
       let activatedElement = element;
-      // debugger
       if (!activatedElement) {
         activatedElement =
           window.bpmnInstances.elementRegistry.find(el => el.type === "bpmn:Process") ??

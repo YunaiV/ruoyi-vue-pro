@@ -5,7 +5,7 @@ import cn.iocoder.yudao.module.system.dal.mysql.social.SocialUserMapper;
 import cn.iocoder.yudao.module.system.dal.redis.social.SocialAuthUserRedisDAO;
 import cn.iocoder.yudao.module.system.enums.social.SocialTypeEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
-import cn.iocoder.yudao.module.system.test.BaseDbAndRedisUnitTest;
+import cn.iocoder.yudao.framework.test.core.ut.BaseDbAndRedisUnitTest;
 import com.xkcoding.justauth.AuthRequestFactory;
 import me.zhyd.oauth.model.AuthUser;
 import org.junit.jupiter.api.Test;

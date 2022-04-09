@@ -1,30 +1,26 @@
 package cn.iocoder.yudao.module.infra.service.job;
 
-import static cn.hutool.core.util.RandomUtil.randomEle;
-import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
-import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomLongId;
-import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
-import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomString;
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildTime;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.annotation.Resource;
-
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
+import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
+import cn.iocoder.yudao.module.infra.controller.admin.job.vo.log.JobLogExportReqVO;
+import cn.iocoder.yudao.module.infra.controller.admin.job.vo.log.JobLogPageReqVO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.job.JobLogDO;
-import cn.iocoder.yudao.module.infra.test.BaseDbUnitTest;
+import cn.iocoder.yudao.module.infra.dal.mysql.job.JobLogMapper;
+import cn.iocoder.yudao.module.infra.enums.job.JobLogStatusEnum;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.infra.controller.admin.job.vo.log.JobLogExportReqVO;
-import cn.iocoder.yudao.module.infra.controller.admin.job.vo.log.JobLogPageReqVO;
-import cn.iocoder.yudao.module.infra.dal.mysql.job.JobLogMapper;
-import cn.iocoder.yudao.module.infra.enums.job.JobLogStatusEnum;
-import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
+import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.List;
+
+import static cn.hutool.core.util.RandomUtil.randomEle;
+import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildTime;
+import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
+import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @Import(JobLogServiceImpl.class)
 public class JobLogServiceTest extends BaseDbUnitTest {

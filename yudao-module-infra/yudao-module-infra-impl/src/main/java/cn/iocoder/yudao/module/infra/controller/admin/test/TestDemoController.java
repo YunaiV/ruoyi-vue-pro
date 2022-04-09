@@ -1,30 +1,29 @@
 package cn.iocoder.yudao.module.infra.controller.admin.test;
 
+import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
+import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.infra.controller.admin.test.vo.*;
 import cn.iocoder.yudao.module.infra.convert.test.TestDemoConvert;
 import cn.iocoder.yudao.module.infra.dal.dataobject.test.TestDemoDO;
-import org.springframework.web.bind.annotation.*;
-import javax.annotation.Resource;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.security.access.prepost.PreAuthorize;
-import io.swagger.annotations.*;
-
-import javax.validation.*;
-import javax.servlet.http.*;
-import java.util.*;
-import java.io.IOException;
-
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-
-import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
-
-import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
-import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.*;
-
-import cn.iocoder.yudao.module.infra.controller.admin.test.vo.*;
 import cn.iocoder.yudao.module.infra.service.test.TestDemoService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiOperation;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.List;
+
+import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 
 @Api(tags = "管理后台 - 字典类型")
 @RestController
@@ -37,13 +36,15 @@ public class TestDemoController {
 
     @PostMapping("/create")
     @ApiOperation("创建字典类型")
-    @PreAuthorize("@ss.hasPermission('infra:test-demo:create')")    public CommonResult<Long> createTestDemo(@Valid @RequestBody TestDemoCreateReqVO createReqVO) {
+    @PreAuthorize("@ss.hasPermission('infra:test-demo:create')")
+    public CommonResult<Long> createTestDemo(@Valid @RequestBody TestDemoCreateReqVO createReqVO) {
         return success(testDemoService.createTestDemo(createReqVO));
     }
 
     @PutMapping("/update")
     @ApiOperation("更新字典类型")
-    @PreAuthorize("@ss.hasPermission('infra:test-demo:update')")    public CommonResult<Boolean> updateTestDemo(@Valid @RequestBody TestDemoUpdateReqVO updateReqVO) {
+    @PreAuthorize("@ss.hasPermission('infra:test-demo:update')")
+    public CommonResult<Boolean> updateTestDemo(@Valid @RequestBody TestDemoUpdateReqVO updateReqVO) {
         testDemoService.updateTestDemo(updateReqVO);
         return success(true);
     }

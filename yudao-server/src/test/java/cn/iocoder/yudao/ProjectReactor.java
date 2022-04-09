@@ -22,14 +22,17 @@ public class ProjectReactor {
     private static final String GROUP_ID = "cn.iocoder.boot";
     private static final String ARTIFACT_ID = "yudao";
     private static final String PACKAGE_NAME = "cn.iocoder.yudao";
+    private static final String TITLE = "芋道管理系统";
 
     public static void main(String[] args) {
         String projectBaseDir = getProjectBaseDir();
+
         // ========== 配置，需要你手动修改 ==========
         String groupIdNew = "cn.star.gg";
         String artifactIdNew = "star";
         String packageNameNew = "cn.start.pp";
-        String projectBaseDirNew = projectBaseDir + "-new";
+        String titleNew = "土豆管理系统";
+        String projectBaseDirNew = projectBaseDir + "-new"; // 一键改名后，“新”项目所在的目录
         // ==========                  ==========
 
         // 获得需要复制的文件
@@ -38,7 +41,7 @@ public class ProjectReactor {
         log.info("[main][需要重写的文件数量：{}，预计需要 5-10 秒]", files.size());
         // 写入文件
         files.forEach(file -> {
-            String content = replaceFileContent(file, groupIdNew, artifactIdNew, packageNameNew);
+            String content = replaceFileContent(file, groupIdNew, artifactIdNew, packageNameNew, titleNew);
             writeFile(file, content, projectBaseDir, projectBaseDirNew, packageNameNew, artifactIdNew);
         });
         log.info("[main][重写完成]");
@@ -61,18 +64,21 @@ public class ProjectReactor {
     }
 
     private static String replaceFileContent(File file, String groupIdNew,
-                                             String artifactIdNew, String packageNameNew) {
+                                             String artifactIdNew, String packageNameNew,
+                                             String titleNew) {
         return FileUtil.readString(file, StandardCharsets.UTF_8)
                 .replaceAll(GROUP_ID, groupIdNew)
                 .replaceAll(PACKAGE_NAME, packageNameNew)
                 .replaceAll(ARTIFACT_ID, artifactIdNew) // 必须放在最后替换，因为 ARTIFACT_ID 太短！
-                .replaceAll(StrUtil.upperFirst(ARTIFACT_ID), StrUtil.upperFirst(artifactIdNew));
+                .replaceAll(StrUtil.upperFirst(ARTIFACT_ID), StrUtil.upperFirst(artifactIdNew))
+                .replaceAll(TITLE, titleNew);
     }
 
     private static void writeFile(File file, String fileContent, String projectBaseDir,
                                   String projectBaseDirNew, String packageNameNew, String artifactIdNew) {
         String newPath = file.getPath().replace(projectBaseDir, projectBaseDirNew) // 新目录
-                .replace(PACKAGE_NAME.replaceAll("\\.", "/"), packageNameNew.replaceAll("\\.", "/"))
+                .replace(PACKAGE_NAME.replaceAll("\\.", File.separator),
+                        packageNameNew.replaceAll("\\.", File.separator))
                 .replace(ARTIFACT_ID, artifactIdNew) //
                 .replaceAll(StrUtil.upperFirst(ARTIFACT_ID), StrUtil.upperFirst(artifactIdNew));
         FileUtil.writeUtf8String(fileContent, newPath);

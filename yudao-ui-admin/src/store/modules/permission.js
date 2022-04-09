@@ -18,12 +18,7 @@ const permission = {
       state.defaultRoutes = constantRoutes.concat(routes)
     },
     SET_TOPBAR_ROUTES: (state, routes) => {
-      // 顶部导航菜单默认添加统计报表栏指向首页
-      const index = [{
-        path: 'index',
-        meta: { title: '统计报表', icon: 'dashboard'}
-      }]
-      state.topbarRouters = routes.concat(index);
+      state.topbarRouters = routes
     },
     SET_SIDEBAR_ROUTERS: (state, routes) => {
       state.sidebarRouters = routes
@@ -62,7 +57,6 @@ function filterAsyncRouter(asyncRouterMap, lastRouter = false, type = false) {
     }
     // 处理 component 属性
     if (route.children) { // 父节点
-      // debugger
       if (route.parentId === 0) {
         route.component = Layout
       } else {

@@ -8,6 +8,8 @@ import cn.iocoder.yudao.module.infra.controller.admin.test.vo.TestDemoUpdateReqV
 import cn.iocoder.yudao.module.infra.convert.test.TestDemoConvert;
 import cn.iocoder.yudao.module.infra.dal.dataobject.test.TestDemoDO;
 import cn.iocoder.yudao.module.infra.dal.mysql.test.TestDemoMapper;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -40,6 +42,7 @@ public class TestDemoServiceImpl implements TestDemoService {
     }
 
     @Override
+    @CacheEvict(value = "test", key = "#updateReqVO.id")
     public void updateTestDemo(TestDemoUpdateReqVO updateReqVO) {
         // 校验存在
         this.validateTestDemoExists(updateReqVO.getId());
@@ -49,6 +52,7 @@ public class TestDemoServiceImpl implements TestDemoService {
     }
 
     @Override
+    @CacheEvict(value = "test", key = "#id")
     public void deleteTestDemo(Long id) {
         // 校验存在
         this.validateTestDemoExists(id);
@@ -63,6 +67,7 @@ public class TestDemoServiceImpl implements TestDemoService {
     }
 
     @Override
+    @Cacheable(cacheNames = "test", key = "#id")
     public TestDemoDO getTestDemo(Long id) {
         return testDemoMapper.selectById(id);
     }

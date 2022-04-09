@@ -41,7 +41,7 @@ public class LoginUserRedisDAO {
     }
 
     private static String formatKey(String sessionId) {
-        return String.format(LOGIN_USER.getKeyTemplate(), sessionId);
+        return LOGIN_USER.formatKey(sessionId);
     }
 
 }

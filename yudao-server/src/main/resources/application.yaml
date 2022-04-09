@@ -20,6 +20,12 @@ spring:
       write-durations-as-timestamps: true # 设置 Duration 的格式，使用时间戳
       fail-on-empty-beans: false # 允许序列化无属性的 Bean
 
+  # Cache 配置项
+  cache:
+    type: REDIS
+    redis:
+      time-to-live: 1h # 设置过期时间为 1 小时
+
   # 工作流 Activiti 配置
   activiti:
     # 1. false: 默认值，activiti启动时，对比数据库表中保存的版本，如果不匹配。将抛出异常
@@ -104,6 +110,7 @@ yudao:
       - system_sms_channel
       - system_sms_template
       - system_sms_log
+      - system_sensitive_word
       - infra_codegen_column
       - infra_codegen_table
       - infra_test_demo

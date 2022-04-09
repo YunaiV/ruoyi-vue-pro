@@ -107,7 +107,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         LoginUser loginUser = this.login0(reqVO.getUsername(), reqVO.getPassword());
 
         // 缓存登陆用户到 Redis 中，返回 sessionId 编号
-        return userSessionService.createUserSession(loginUser, userIp, userAgent);
+        return createUserSessionAfterLoginSuccess(loginUser, LoginLogTypeEnum.LOGIN_USERNAME, userIp, userAgent);
     }
 
     private void verifyCaptcha(AuthLoginReqVO reqVO) {
@@ -155,9 +155,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
             this.createLoginLog(username, logTypeEnum, LoginResultEnum.UNKNOWN_ERROR);
             throw exception(AUTH_LOGIN_FAIL_UNKNOWN);
         }
-        // 登录成功的日志
         Assert.notNull(authentication.getPrincipal(), "Principal 不会为空");
-        this.createLoginLog(username, logTypeEnum, LoginResultEnum.SUCCESS);
         return (LoginUser) authentication.getPrincipal();
     }
 
@@ -207,7 +205,6 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         if (user == null) {
             throw exception(USER_NOT_EXISTS);
         }
-        this.createLoginLog(user.getUsername(), LoginLogTypeEnum.LOGIN_SOCIAL, LoginResultEnum.SUCCESS);
 
         // 创建 LoginUser 对象
         LoginUser loginUser = this.buildLoginUser(user);
@@ -216,7 +213,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         socialUserService.bindSocialUser(AuthConvert.INSTANCE.convert(loginUser.getId(), getUserType().getValue(), reqVO));
 
         // 缓存登录用户到 Redis 中，返回 sessionId 编号
-        return userSessionService.createUserSession(loginUser, userIp, userAgent);
+        return createUserSessionAfterLoginSuccess(loginUser, LoginLogTypeEnum.LOGIN_SOCIAL, userIp, userAgent);
     }
 
     @Override
@@ -231,6 +228,13 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         // 绑定社交用户（新增）
         socialUserService.bindSocialUser(AuthConvert.INSTANCE.convert(loginUser.getId(), getUserType().getValue(), reqVO));
 
+        // 缓存登录用户到 Redis 中，返回 sessionId 编号
+        return createUserSessionAfterLoginSuccess(loginUser, LoginLogTypeEnum.LOGIN_SOCIAL, userIp, userAgent);
+    }
+
+    private String createUserSessionAfterLoginSuccess(LoginUser loginUser, LoginLogTypeEnum logType, String userIp, String userAgent) {
+        // 插入登陆日志
+        createLoginLog(loginUser.getUsername(), logType, LoginResultEnum.SUCCESS);
         // 缓存登录用户到 Redis 中，返回 sessionId 编号
         return userSessionService.createUserSession(loginUser, userIp, userAgent);
     }

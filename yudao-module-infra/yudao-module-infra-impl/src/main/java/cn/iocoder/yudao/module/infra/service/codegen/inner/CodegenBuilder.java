@@ -160,8 +160,9 @@ public class CodegenBuilder {
         // 处理 javaField 字段
         column.setJavaField(toCamelCase(column.getColumnName()));
         // 处理 dictType 字段，暂无
-        // 处理 javaType 字段
-        String dbType = subBefore(column.getColumnType(), '(', false);
+        // 处理 javaType 字段(兼容无符号类型)
+        String dbType = replaceIgnoreCase(subBefore(column.getColumnType(), '(', false),
+                " UNSIGNED", "");
         javaTypeMappings.entrySet().stream()
                 .filter(entry -> entry.getValue().contains(dbType))
                 .findFirst().ifPresent(entry -> column.setJavaType(entry.getKey()));

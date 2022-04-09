@@ -6,7 +6,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 
 import javax.annotation.Resource;
 
-import ${basePackage}.module.${table.moduleName}.test.BaseDbUnitTest;## 每个项目，默认有一个基础 DB Test 基类
+import ${baseFrameworkPackage}.test.core.ut.BaseDbUnitTest;
 
 import ${basePackage}.module.${table.moduleName}.controller.${sceneEnum.basePackage}.${table.businessName}.vo.*;
 import ${basePackage}.module.${table.moduleName}.dal.dataobject.${table.businessName}.${table.className}DO;

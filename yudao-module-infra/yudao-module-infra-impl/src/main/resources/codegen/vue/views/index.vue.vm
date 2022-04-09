@@ -2,7 +2,7 @@
   <div class="app-container">
 
     <!-- 搜索工作栏 -->
-    <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
+    <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
 #foreach($column in $columns)
 #if ($column.listOperation)
     #set ($dictType=$column.dictType)
@@ -11,7 +11,7 @@
     #set ($comment=$column.columnComment)
 #if ($column.htmlType == "input")
       <el-form-item label="${comment}" prop="${javaField}">
-        <el-input v-model="queryParams.${javaField}" placeholder="请输入${comment}" clearable size="small" @keyup.enter.native="handleQuery"/>
+        <el-input v-model="queryParams.${javaField}" placeholder="请输入${comment}" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
 #elseif ($column.htmlType == "select" || $column.htmlType == "radio")
       <el-form-item label="${comment}" prop="${javaField}">
@@ -27,11 +27,11 @@
 #elseif($column.htmlType == "datetime")
     #if ($column.listOperationCondition != "BETWEEN")## 非范围
       <el-form-item label="${comment}" prop="${javaField}">
-        <el-date-picker clearable size="small" v-model="queryParams.${javaField}" type="date" value-format="yyyy-MM-dd" placeholder="选择${comment}" />
+        <el-date-picker clearable v-model="queryParams.${javaField}" type="date" value-format="yyyy-MM-dd" placeholder="选择${comment}" />
       </el-form-item>
     #else## 范围
       <el-form-item label="${comment}">
-        <el-date-picker v-model="dateRange${AttrName}" size="small" style="width: 240px" value-format="yyyy-MM-dd"
+        <el-date-picker v-model="dateRange${AttrName}" style="width: 240px" value-format="yyyy-MM-dd"
                         type="daterange" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" />
       </el-form-item>
     #end
@@ -39,8 +39,8 @@
 #end
 #end
       <el-form-item>
-        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
-        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
+        <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
+        <el-button icon="el-icon-refresh" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
 
@@ -160,7 +160,7 @@
         </el-form-item>
 #elseif($column.htmlType == "datetime")## 时间框
         <el-form-item label="${comment}" prop="${javaField}">
-          <el-date-picker clearable size="small" v-model="form.${javaField}" type="date" value-format="yyyy-MM-dd" placeholder="选择${comment}" />
+          <el-date-picker clearable v-model="form.${javaField}" type="date" value-format="yyyy-MM-dd" placeholder="选择${comment}" />
         </el-form-item>
 #elseif($column.htmlType == "textarea")## 文本框
         <el-form-item label="${comment}" prop="${javaField}">

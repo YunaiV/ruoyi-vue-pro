@@ -1,40 +1,36 @@
 package cn.iocoder.yudao.module.infra.service.job;
 
-import static cn.hutool.core.util.RandomUtil.randomEle;
-import static cn.iocoder.yudao.module.infra.enums.ErrorCodeConstants.*;
-import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
-import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
-import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
-import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomString;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.annotation.Resource;
-
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
+import cn.iocoder.yudao.framework.quartz.core.scheduler.SchedulerManager;
+import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.infra.controller.admin.job.vo.job.JobCreateReqVO;
+import cn.iocoder.yudao.module.infra.controller.admin.job.vo.job.JobExportReqVO;
+import cn.iocoder.yudao.module.infra.controller.admin.job.vo.job.JobPageReqVO;
 import cn.iocoder.yudao.module.infra.controller.admin.job.vo.job.JobUpdateReqVO;
 import cn.iocoder.yudao.module.infra.convert.job.JobConvert;
 import cn.iocoder.yudao.module.infra.dal.dataobject.job.JobDO;
-import cn.iocoder.yudao.module.infra.test.BaseDbUnitTest;
+import cn.iocoder.yudao.module.infra.dal.mysql.job.JobMapper;
+import cn.iocoder.yudao.module.infra.enums.job.JobStatusEnum;
 import org.junit.jupiter.api.Test;
 import org.quartz.SchedulerException;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.quartz.core.scheduler.SchedulerManager;
-import cn.iocoder.yudao.module.infra.controller.admin.job.vo.job.JobExportReqVO;
-import cn.iocoder.yudao.module.infra.controller.admin.job.vo.job.JobPageReqVO;
-import cn.iocoder.yudao.module.infra.dal.mysql.job.JobMapper;
-import cn.iocoder.yudao.module.infra.enums.job.JobStatusEnum;
-import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
+import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.List;
+
+import static cn.hutool.core.util.RandomUtil.randomEle;
+import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
+import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
+import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
+import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomString;
+import static cn.iocoder.yudao.module.infra.enums.ErrorCodeConstants.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 @Import(JobServiceImpl.class)
 public class JobServiceTest extends BaseDbUnitTest {

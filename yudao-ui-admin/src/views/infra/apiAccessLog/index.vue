@@ -2,35 +2,35 @@
   <div class="app-container">
 
     <!-- 搜索工作栏 -->
-    <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
+    <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
       <el-form-item label="用户编号" prop="userId">
-        <el-input v-model="queryParams.userId" placeholder="请输入用户编号" clearable size="small" @keyup.enter.native="handleQuery"/>
+        <el-input v-model="queryParams.userId" placeholder="请输入用户编号" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item label="用户类型" prop="userType">
-        <el-select v-model="queryParams.userType" placeholder="请选择用户类型" clearable size="small">
+        <el-select v-model="queryParams.userType" placeholder="请选择用户类型" clearable>
           <el-option v-for="dict in this.getDictDatas(DICT_TYPE.USER_TYPE)"
                      :key="dict.value" :label="dict.label" :value="dict.value"/>
         </el-select>
       </el-form-item>
       <el-form-item label="应用名" prop="applicationName">
-        <el-input v-model="queryParams.applicationName" placeholder="请输入应用名" clearable size="small" @keyup.enter.native="handleQuery"/>
+        <el-input v-model="queryParams.applicationName" placeholder="请输入应用名" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item label="请求地址" prop="requestUrl">
-        <el-input v-model="queryParams.requestUrl" placeholder="请输入请求地址" clearable size="small" @keyup.enter.native="handleQuery"/>
+        <el-input v-model="queryParams.requestUrl" placeholder="请输入请求地址" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item label="请求时间">
-        <el-date-picker v-model="dateRangeBeginTime" size="small" style="width: 240px" value-format="yyyy-MM-dd"
+        <el-date-picker v-model="dateRangeBeginTime" style="width: 240px" value-format="yyyy-MM-dd"
                         type="daterange" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" />
       </el-form-item>
       <el-form-item label="执行时长" prop="duration">
-        <el-input v-model="queryParams.duration" placeholder="请输入执行时长" clearable size="small" @keyup.enter.native="handleQuery"/>
+        <el-input v-model="queryParams.duration" placeholder="请输入执行时长" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item label="结果码" prop="resultCode">
-        <el-input v-model="queryParams.resultCode" placeholder="请输入结果码" clearable size="small" @keyup.enter.native="handleQuery"/>
+        <el-input v-model="queryParams.resultCode" placeholder="请输入结果码" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
-        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
+        <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
+        <el-button icon="el-icon-refresh" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
 

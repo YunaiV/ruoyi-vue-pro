@@ -126,6 +126,7 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
+    @Transactional
     public Long createRole(RoleCreateReqVO reqVO, Integer type) {
         // 校验角色
         checkDuplicateRole(reqVO.getName(), reqVO.getCode(), null);
