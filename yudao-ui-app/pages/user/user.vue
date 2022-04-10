@@ -65,6 +65,7 @@
 		},
 		methods: {
       handleUserInfoClick(){
+        // TODO 判断是否已经登录逻辑
         if (!uni.getStorageSync('token')) {
           uni.$u.route('/pages/login/login');
         } else {
