@@ -28,7 +28,7 @@ public class SmsChannelBaseVO {
     @NotNull(message = "短信 API 的账号不能为空")
     private String apiKey;
 
-    @ApiModelProperty(value = "短信 API 的秘钥", example = "yuanma")
+    @ApiModelProperty(value = "短信 API 的密钥", example = "yuanma")
     private String apiSecret;
 
     @ApiModelProperty(value = "短信发送回调 URL", example = "http://www.iocoder.cn")

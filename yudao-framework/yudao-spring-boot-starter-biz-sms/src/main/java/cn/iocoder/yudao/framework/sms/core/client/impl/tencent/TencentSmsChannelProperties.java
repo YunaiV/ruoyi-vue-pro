@@ -1,7 +1,8 @@
-package cn.iocoder.yudao.framework.sms.core.property;
+package cn.iocoder.yudao.framework.sms.core.client.impl.tencent;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
+import cn.iocoder.yudao.framework.sms.core.property.SmsChannelProperties;
 import lombok.Data;
 
 /**

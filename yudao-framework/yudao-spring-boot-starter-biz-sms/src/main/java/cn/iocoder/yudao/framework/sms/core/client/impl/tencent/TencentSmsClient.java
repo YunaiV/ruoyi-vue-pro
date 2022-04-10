@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.framework.sms.core.client.impl.tencent;
 
-import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.core.KeyValue;
@@ -14,7 +13,6 @@ import cn.iocoder.yudao.framework.sms.core.client.dto.SmsTemplateRespDTO;
 import cn.iocoder.yudao.framework.sms.core.client.impl.AbstractSmsClient;
 import cn.iocoder.yudao.framework.sms.core.enums.SmsTemplateAuditStatusEnum;
 import cn.iocoder.yudao.framework.sms.core.property.SmsChannelProperties;
-import cn.iocoder.yudao.framework.sms.core.property.TencentSmsChannelProperties;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.annotations.VisibleForTesting;
