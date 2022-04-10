@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.system.service.sms;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
@@ -10,16 +11,14 @@ import cn.iocoder.yudao.framework.sms.core.client.SmsClientFactory;
 import cn.iocoder.yudao.framework.sms.core.client.SmsCommonResult;
 import cn.iocoder.yudao.framework.sms.core.client.dto.SmsReceiveRespDTO;
 import cn.iocoder.yudao.framework.sms.core.client.dto.SmsSendRespDTO;
-import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
-import cn.iocoder.yudao.module.member.api.user.dto.UserRespDTO;
 import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsTemplateDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
 import cn.iocoder.yudao.module.system.mq.message.sms.SmsSendMessage;
 import cn.iocoder.yudao.module.system.mq.producer.sms.SmsProducer;
+import cn.iocoder.yudao.module.system.service.member.MemberService;
 import cn.iocoder.yudao.module.system.service.user.AdminUserService;
 import com.google.common.annotations.VisibleForTesting;
 import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -40,7 +39,7 @@ public class SmsSendServiceImpl implements SmsSendService {
     @Resource
     private AdminUserService adminUserService;
     @Resource
-    private MemberUserApi memberUserApi;
+    private MemberService memberService;
 
     @Resource
     private SmsTemplateService smsTemplateService;
@@ -70,10 +69,7 @@ public class SmsSendServiceImpl implements SmsSendService {
     public Long sendSingleSmsToMember(String mobile, Long userId, String templateCode, Map<String, Object> templateParams) {
         // 如果 mobile 为空，则加载用户编号对应的手机号
         if (StrUtil.isEmpty(mobile)) {
-            UserRespDTO user = memberUserApi.getUser(userId);
-            if (user != null) {
-                mobile = user.getMobile();
-            }
+            mobile = memberService.getMemberUserMobile(userId);
         }
         // 执行发送
         return this.sendSingleSms(mobile, userId, UserTypeEnum.MEMBER.getValue(), templateCode, templateParams);
@@ -146,7 +142,7 @@ public class SmsSendServiceImpl implements SmsSendService {
     public void doSendSms(SmsSendMessage message) {
         // 获得渠道对应的 SmsClient 客户端
         SmsClient smsClient = smsClientFactory.getSmsClient(message.getChannelId());
-        Assert.notNull(smsClient, String.format("短信客户端(%d) 不存在", message.getChannelId()));
+        Assert.notNull(smsClient, "短信客户端({}) 不存在", message.getChannelId());
         // 发送短信
         SmsCommonResult<SmsSendRespDTO> sendResult = smsClient.sendSms(message.getLogId(), message.getMobile(),
                 message.getApiTemplateId(), message.getTemplateParams());
@@ -159,7 +155,7 @@ public class SmsSendServiceImpl implements SmsSendService {
     public void receiveSmsStatus(String channelCode, String text) throws Throwable {
         // 获得渠道对应的 SmsClient 客户端
         SmsClient smsClient = smsClientFactory.getSmsClient(channelCode);
-        Assert.notNull(smsClient, String.format("短信客户端(%s) 不存在", channelCode));
+        Assert.notNull(smsClient, "短信客户端({}) 不存在", channelCode);
         // 解析内容
         List<SmsReceiveRespDTO> receiveResults = smsClient.parseSmsReceiveStatus(text);
         if (CollUtil.isEmpty(receiveResults)) {
