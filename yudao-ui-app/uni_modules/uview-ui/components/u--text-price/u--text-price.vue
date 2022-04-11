@@ -1,32 +1,39 @@
 <template>
   <view class="u-text-price-wrap">
-    <uvText
-        class="u-text-price-item"
+    <text
         v-for="(item,index) in textArray"
         :key="index"
-        :text="item"
-        :size="(index === 1 && integerSize) ? integerSize : size"
-        :color="color"
+        :style="{'font-size': (index === 1 ? integerSize : size) + 'px', 'color': color}"
     >
-    </uvText>
+      {{item}}
+    </text>
   </view>
 </template>
 
 <script>
 /**
- * 此组件存在只为简单的显示特定样式的价格数字
+ * 此组件存在只为简单的显示特定样式的(人名币)价格数字
  */
-import uvText from "../u-text/u-text.vue";
-import props from "../u-text/props.js";
 export default {
   name: "u--text-price",
-  mixins: [uni.$u.mpMixin, props, uni.$u.mixin],
   components: {
-    uvText,
   },
   props: {
+    text: {
+      type: String,
+      default: '0.00'
+    },
+    color: {
+      type: String,
+      default: '#333333'
+    },
+    //字体大小
+    size: {
+      type: [String, Number],
+      default: uni.$u.props.text.size
+    },
     //整形部分字体大小可单独定义
-    integerSize: {
+    intSize: {
       type: [String, Number],
       default: uni.$u.props.text.size
     }
@@ -42,18 +49,12 @@ export default {
         array.push('.' + arr[1]);
       }
       return array;
+    },
+    integerSize() {
+      return this.intSize ? this.intSize : this.size
     }
   }
 };
 </script>
 <style>
-.u-text-price-wrap {
-  display: flex;
-  flex-direction: row;
-  justify-content: left;
-}
-
-.u-text-price-item{
-  flex: 0;
-}
 </style>

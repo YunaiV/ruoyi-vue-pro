@@ -174,8 +174,8 @@ export default {
   justify-content: space-between;
   font-size: 12rpx;
 
-  color: #3c9cff;
-  text-decoration: #3c9cff;
+  color: $u-primary;
+  text-decoration: $u-primary;
 }
 
 

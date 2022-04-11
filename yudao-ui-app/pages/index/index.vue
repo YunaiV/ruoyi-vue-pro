@@ -15,14 +15,16 @@
       </view>
     </u-swiper>
 
+    <u-gap height="20px"></u-gap>
+
     <!--宫格菜单按钮-->
-    <view class="mt-40-r mb-30-r">
-      <u-grid :border="false" col="4"><u-grid-item v-for="(item,index) in menuList" :key="index">
-        <u-icon :name="item.icon" :size="40"></u-icon>
-        <text class="grid-title">{{item.title}}</text>
-      </u-grid-item>
-      </u-grid>
-    </view>
+    <u-grid :border="false" col="4"><u-grid-item v-for="(item,index) in menuList" :key="index">
+      <u-icon :name="item.icon" :size="40"></u-icon>
+      <text class="grid-title">{{item.title}}</text>
+    </u-grid-item>
+    </u-grid>
+
+    <u-gap height="15px"></u-gap>
 
     <!--消息滚动栏-->
     <u-notice-bar style="padding: 13px 12px" :text="noticeList" mode="link" direction="column" @click="click"></u-notice-bar>
@@ -37,14 +39,14 @@
         </view>
         <u-grid class="prod-grid" :border="false" col="3">
           <u-grid-item class="prod-item-box" v-for="(item,index) in productList" :key="index">
-            <view class="prod-item">
-              <u--image class="prod-image" width="230rpx" height="230rpx" :src="item"></u--image>
+            <view class="prod-item" @click="handleProdItemClick(item.id)">
+              <u--image class="prod-image" width="230rpx" height="230rpx" :src="item.image"></u--image>
               <view class="item-info">
                 <view class="info-text">
-                  <u--text :lines="2" size="14px" color="#333333" text="山不在高，有仙则名。水不在深，有龙则灵。斯是陋室，惟吾德馨。"></u--text>
+                  <u--text :lines="2" size="14px" color="#333333" :text="item.title"></u--text>
                 </view>
                 <view class="price-and-cart">
-                  <u--text-price color="red" size="12" integerSize="18" :text="233.33"></u--text-price>
+                  <u--text-price color="red" size="12" intSize="18" :text="item.price"></u--text-price>
                   <u-icon name="shopping-cart" color="#2979ff" size="28"></u-icon>
                 </view>
               </view>
@@ -62,15 +64,15 @@
         </view>
         <u-grid class="prod-grid" :border="false" col="2">
           <u-grid-item class="prod-item-box" v-for="(item,index) in productList" :key="index">
-            <view class="prod-item">
-              <u--image class="prod-image" width="345rpx" height="345rpx" :src="item"></u--image>
+            <view class="prod-item" @click="handleProdItemClick(item.id)">
+              <u--image class="prod-image" width="345rpx" height="345rpx" :src="item.image"></u--image>
               <view class="item-info">
                 <view class="info-text">
-                  <u--text :lines="1" size="14px" color="#333333" text="山不在高，有仙则名。水不在深，有龙则灵。斯是陋室，惟吾德馨。"></u--text>
-                  <u--text :lines="1" size="12px" color="#939393" text="斯是陋室，惟吾德馨。"></u--text>
+                  <u--text :lines="1" size="14px" color="#333333" :text="item.title"></u--text>
+                  <u--text :lines="1" size="12px" color="#939393" :text="item.desc"></u--text>
                 </view>
                 <view class="price-and-cart">
-                  <u--text-price color="red" size="12" integerSize="18" :text="233.33"></u--text-price>
+                  <u--text-price color="red" size="12" intSize="18" :text="item.price"></u--text-price>
                   <u-icon name="shopping-cart" color="#2979ff" size="28"></u-icon>
                 </view>
               </view>
@@ -89,15 +91,16 @@
 
         <u-list class="prod-list" @scrolltolower="scrolltolower">
           <u-list-item v-for="(item, index) in productList" :key="index">
-            <view class="prod-item">
-              <u--image class="prod-image" width="210rpx" height="210rpx" :src="item"></u--image>
+            <view class="prod-item" @click="handleProdItemClick(item.id)">
+              <u--image class="prod-image" width="210rpx" height="210rpx" :src="item.image"></u--image>
               <view class="item-info">
                 <view class="info-text">
-                  <u--text :lines="2" size="14px" color="#333333" text="山不在高，有仙则名。水不在深，有龙则灵。斯是陋室，惟吾德馨。"></u--text>
-                  <u--text :lines="1" size="12px" color="#939393" text="斯是陋室，惟吾德馨。"></u--text>
+                  <u--text :lines="1" size="14px" color="#333333" :text="item.title"></u--text>
+                  <u-gap height="2px"></u-gap>
+                  <u--text class="info-desc" :lines="2" size="12px" color="#939393" :text="item.desc"></u--text>
                 </view>
                 <view class="price-and-cart">
-                  <u--text-price color="red" size="12" integerSize="18" :text="233.33"></u--text-price>
+                  <u--text-price color="red" size="12" intSize="18" :text="item.price"></u--text-price>
                   <u-icon name="shopping-cart" color="#2979ff" size="28"></u-icon>
                 </view>
               </view>
@@ -138,11 +141,41 @@ export default {
         '一片冰心在玉壶'
       ],
       productList: [
-        'https://cdn.uviewui.com/uview/album/1.jpg',
-        'https://cdn.uviewui.com/uview/album/2.jpg',
-        'https://cdn.uviewui.com/uview/album/3.jpg',
-        'https://cdn.uviewui.com/uview/album/4.jpg',
-        'https://cdn.uviewui.com/uview/album/5.jpg',
+        {
+          id: 1,
+          image: 'https://cdn.uviewui.com/uview/album/1.jpg',
+          title: '山不在高，有仙则名。水不在深，有龙则灵。斯是陋室，惟吾德馨。',
+          desc: '山不在于高，有了神仙就会有名气。水不在于深，有了龙就会有灵气。这是简陋的房子，只是我品德好就感觉不到简陋了。',
+          price: '13.00'
+        },
+        {
+          id: 2,
+          image: 'https://cdn.uviewui.com/uview/album/2.jpg',
+          title: '商品222',
+          desc: '',
+          price: '23.00'
+        },
+        {
+          id: 3,
+          image: 'https://cdn.uviewui.com/uview/album/3.jpg',
+          title: '商品333',
+          desc: '商品描述信息2',
+          price: '33.00'
+        },
+        {
+          id: 4,
+          image: 'https://cdn.uviewui.com/uview/album/4.jpg',
+          title: '商品444',
+          desc: '商品描述信息4',
+          price: '43.00'
+        },
+        {
+          id: 5,
+          image: 'https://cdn.uviewui.com/uview/album/5.jpg',
+          title: '商品555',
+          desc: '商品描述信息5',
+          price: '53.00'
+        }
       ],
       status: 'nomore',
       loadingText: '努力加载中...',
@@ -174,6 +207,11 @@ export default {
     },
     handleSwiperClick(index){
       console.log('点击了图片索引值：',index)
+    },
+    handleProdItemClick(productId){
+      uni.$u.route('/pages/product/product', {
+        productId: productId
+      });
     }
   },
   computed: {
@@ -198,7 +236,7 @@ export default {
 <style lang="scss" scoped>
 
 .search-wrap {
-  background: #ffffff;
+  background: $custom-bg-color;
   padding: 20rpx;
 }
 
@@ -215,7 +253,7 @@ export default {
     transition: background-color 0.3s;
 
     &--active {
-      background-color: #ffffff;
+      background-color: $custom-bg-color;
     }
   }
 }
@@ -235,12 +273,12 @@ export default {
     padding: 10rpx 30rpx;
 
     .bloc-title {
-      color: #ffffff;
+      color: $custom-bg-color;
       font-size: 34rpx;
     }
     .see-more {
-      color: #ffffff;
-      background: #3c9cff;
+      color: $custom-bg-color;
+      background: $u-primary;
       padding: 0 30rpx;
       height: 50rpx;
       line-height: 50rpx;
@@ -279,7 +317,8 @@ export default {
         .item-info {
           padding: 15rpx;
           .info-text {
-            padding-bottom: 15rpx;
+            height: 70rpx;
+            padding-bottom: 10rpx;
           }
           .price-and-cart {
             display: flex;
@@ -300,7 +339,7 @@ export default {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    border-bottom: 1rpx solid #f3f3f3;
+    border-bottom: $custom-border-style;
 
     .prod-image {
       border-radius: 10rpx;
@@ -310,9 +349,11 @@ export default {
     }
 
     .item-info {
-      padding: 20rpx 30rpx;
+      width: 450rpx;
+      padding: 20rpx 30rpx 0 30rpx;
       .info-text {
-        padding-bottom: 15rpx;
+        height: 100rpx;
+        padding-bottom: 10rpx;
       }
       .price-and-cart {
         display: flex;
