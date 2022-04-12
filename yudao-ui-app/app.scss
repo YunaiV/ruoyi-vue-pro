@@ -1,0 +1,52 @@
+/* 页面公共scss */
+.container {
+	padding-top: var(--status-bar-height);//uni-app提供了状态栏高度的css变量--status-bar-height
+	background-color: $uni-bg-color;
+	box-sizing: border-box;
+	height: 100%;
+}
+
+/* 布局间距 */
+.m-0-r {
+	margin: 0rpx;
+}
+
+.mtb-0-r {
+	margin-top: 0rpx;
+	margin-bottom: 0rpx;
+}
+
+.no-mlt {
+	margin-left: 0rpx;
+	margin-right: 0rpx;
+}
+
+.mtb-30-r {
+	margin-top: 30rpx;
+	margin-bottom: 30rpx;
+}
+
+.mlr-30-r {
+	margin-left: 30rpx;
+	margin-right: 30rpx;
+}
+
+.mt-20-r {margin-top: 20rpx;}
+.mt-30-r {margin-top: 30rpx;}
+.mt-40-r {margin-top: 40rpx;}
+.mt-50-r {margin-top: 50rpx;}
+
+.mb-20-r {margin-bottom: 20rpx;}
+.mb-30-r {margin-bottom: 30rpx;}
+.mb-40-r {margin-bottom: 40rpx;}
+.mb-50-r {margin-bottom: 50rpx;}
+
+.ml-20-r {margin-left: 20rpx;}
+.ml-30-r {margin-left: 30rpx;}
+.ml-40-r {margin-left: 40rpx;}
+.ml-50-r {margin-left: 50rpx;}
+
+.mr-20-r {margin-right: 20rpx;}
+.mr-30-r {margin-right: 30rpx;}
+.mr-40-r {margin-right: 40rpx;}
+.mr-50-r {margin-right: 50rpx;}

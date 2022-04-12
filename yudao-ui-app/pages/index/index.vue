@@ -1,0 +1,325 @@
+<template>
+  <view class="container">
+    <!--搜索栏-->
+    <u-sticky style="top: 0" offset-top="0">
+      <view class="search-wrap">
+        <u-search placeholder="搜索" disabled height="32" :show-action="false" @click="handleSearchClick"></u-search>
+      </view>
+    </u-sticky>
+
+    <!--轮播图-->
+    <u-swiper :list="swiperList" previousMargin="20" nextMargin="20" circular height="200" @change="e => current = e.current" :autoplay="true" @click="handleSwiperClick">
+      <view slot="indicator" class="indicator">
+        <view class="indicator__dot" v-for="(item, index) in swiperList" :key="index" :class="[index === current && 'indicator__dot--active']">
+        </view>
+      </view>
+    </u-swiper>
+
+    <!--宫格菜单按钮-->
+    <view class="mt-40-r mb-30-r">
+      <u-grid :border="false" col="4"><u-grid-item v-for="(item,index) in menuList" :key="index">
+        <u-icon :name="item.icon" :size="40"></u-icon>
+        <text class="grid-title">{{item.title}}</text>
+      </u-grid-item>
+      </u-grid>
+    </view>
+
+    <!--消息滚动栏-->
+    <u-notice-bar style="padding: 13px 12px" :text="noticeList" mode="link" direction="column" @click="click"></u-notice-bar>
+
+    <!--商品展示栏-->
+    <view>
+      <u-gap height="180" bgColor="#398ade"></u-gap>
+      <view class="prod-block">
+        <view class="bloc-header">
+          <text class="bloc-title">每日上新</text>
+          <text class="see-more">查看更多</text>
+        </view>
+        <u-grid class="prod-grid" :border="false" col="3">
+          <u-grid-item class="prod-item-box" v-for="(item,index) in productList" :key="index">
+            <view class="prod-item">
+              <u--image class="prod-image" width="230rpx" height="230rpx" :src="item"></u--image>
+              <view class="item-info">
+                <view class="info-text">
+                  <u--text :lines="2" size="14px" color="#333333" text="山不在高，有仙则名。水不在深，有龙则灵。斯是陋室，惟吾德馨。"></u--text>
+                </view>
+                <view class="price-and-cart">
+                  <u--text-price color="red" size="12" integerSize="18" :text="233.33"></u--text-price>
+                  <u-icon name="shopping-cart" color="#2979ff" size="28"></u-icon>
+                </view>
+              </view>
+            </view>
+          </u-grid-item>
+        </u-grid>
+      </view>
+    </view>
+
+    <view>
+      <view class="prod-block half">
+        <view class="bloc-header">
+          <text class="bloc-title">商品热卖</text>
+          <text class="more">更多 &gt;</text>
+        </view>
+        <u-grid class="prod-grid" :border="false" col="2">
+          <u-grid-item class="prod-item-box" v-for="(item,index) in productList" :key="index">
+            <view class="prod-item">
+              <u--image class="prod-image" width="345rpx" height="345rpx" :src="item"></u--image>
+              <view class="item-info">
+                <view class="info-text">
+                  <u--text :lines="1" size="14px" color="#333333" text="山不在高，有仙则名。水不在深，有龙则灵。斯是陋室，惟吾德馨。"></u--text>
+                  <u--text :lines="1" size="12px" color="#939393" text="斯是陋室，惟吾德馨。"></u--text>
+                </view>
+                <view class="price-and-cart">
+                  <u--text-price color="red" size="12" integerSize="18" :text="233.33"></u--text-price>
+                  <u-icon name="shopping-cart" color="#2979ff" size="28"></u-icon>
+                </view>
+              </view>
+            </view>
+          </u-grid-item>
+        </u-grid>
+      </view>
+    </view>
+
+    <view>
+      <view class="prod-block list">
+        <view class="bloc-header">
+          <text class="bloc-title">更多宝贝</text>
+          <text></text>
+        </view>
+
+        <u-list class="prod-list" @scrolltolower="scrolltolower">
+          <u-list-item v-for="(item, index) in productList" :key="index">
+            <view class="prod-item">
+              <u--image class="prod-image" width="210rpx" height="210rpx" :src="item"></u--image>
+              <view class="item-info">
+                <view class="info-text">
+                  <u--text :lines="2" size="14px" color="#333333" text="山不在高，有仙则名。水不在深，有龙则灵。斯是陋室，惟吾德馨。"></u--text>
+                  <u--text :lines="1" size="12px" color="#939393" text="斯是陋室，惟吾德馨。"></u--text>
+                </view>
+                <view class="price-and-cart">
+                  <u--text-price color="red" size="12" integerSize="18" :text="233.33"></u--text-price>
+                  <u-icon name="shopping-cart" color="#2979ff" size="28"></u-icon>
+                </view>
+              </view>
+            </view>
+          </u-list-item>
+        </u-list>
+
+      </view>
+    </view>
+    <u-gap height="5px"></u-gap>
+    <!--加载更多-->
+    <u-loadmore fontSize="32rpx" :status="status" :loading-text="loadingText" :loadmore-text="loadmoreText" :nomore-text="nomoreText"/>
+
+    <u-gap height="10px"></u-gap>
+  </view>
+</template>
+
+<script>
+import {getBannerData,getNoticeData} from "../../common/api";
+
+export default {
+  components: {
+
+  },
+  data() {
+    return {
+      current: 0,
+      currentNum: 0,
+      bannerList: [
+        'https://cdn.uviewui.com/uview/swiper/swiper3.png',
+        'https://cdn.uviewui.com/uview/swiper/swiper2.png',
+        'https://cdn.uviewui.com/uview/swiper/swiper1.png',],
+      menuList: [{icon: 'gift', title: '热门推荐'}, {icon: 'star', title: '收藏转发'}, {icon: 'thumb-up', title: '点赞投币'}, {icon: 'heart', title: '感谢支持'}],
+      noticeList:[
+        '寒雨连江夜入吴',
+        '平明送客楚山孤',
+        '洛阳亲友如相问',
+        '一片冰心在玉壶'
+      ],
+      productList: [
+        'https://cdn.uviewui.com/uview/album/1.jpg',
+        'https://cdn.uviewui.com/uview/album/2.jpg',
+        'https://cdn.uviewui.com/uview/album/3.jpg',
+        'https://cdn.uviewui.com/uview/album/4.jpg',
+        'https://cdn.uviewui.com/uview/album/5.jpg',
+      ],
+      status: 'nomore',
+      loadingText: '努力加载中...',
+      loadmoreText: '轻轻上拉',
+      nomoreText: '实在没有了...'
+    }
+  },
+  onLoad() {
+    //this.loadBannerData();
+    //this.loadNoticeData();
+  },
+  methods: {
+    loadBannerData() {
+      getBannerData().then(res => {
+        this.bannerList = res.data;
+      }).catch(err => {
+        //console.log(err)
+      })
+    },
+    loadNoticeData() {
+      getNoticeData().then(res => {
+        this.noticeList = res.data;
+      }).catch(err => {
+        //console.log(err)
+      })
+    },
+    handleSearchClick(e) {
+      console.log('监听点击准备跳转页面')
+    },
+    handleSwiperClick(index){
+      console.log('点击了图片索引值：',index)
+    }
+  },
+  computed: {
+    swiperList(){
+      return this.bannerList.map(item => {
+        if (item){
+          return item;
+        }
+      })
+    },
+    noticeTextList() {
+      return this.noticeList.map(item => {
+        if (item.title){
+          return item.title;
+        }
+      })
+    }
+  }
+}
+</script>
+
+<style lang="scss" scoped>
+
+.search-wrap {
+  background: #ffffff;
+  padding: 20rpx;
+}
+
+.indicator {
+  @include flex(row);
+  justify-content: center;
+
+  &__dot {
+    height: 15rpx;
+    width: 15rpx;
+    border-radius: 100rpx;
+    background-color: rgba(255, 255, 255, 0.35);
+    margin: 0 10rpx;
+    transition: background-color 0.3s;
+
+    &--active {
+      background-color: #ffffff;
+    }
+  }
+}
+
+.grid-title {
+  line-height: 50rpx;
+  font-size: 26rpx;
+}
+
+.prod-block {
+  margin-top: -160px;
+  .bloc-header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10rpx 30rpx;
+
+    .bloc-title {
+      color: #ffffff;
+      font-size: 34rpx;
+    }
+    .see-more {
+      color: #ffffff;
+      background: #3c9cff;
+      padding: 0 30rpx;
+      height: 50rpx;
+      line-height: 50rpx;
+      border-radius: 50rpx;
+      font-size: 24rpx;
+    }
+  }
+
+  &.half, &.list {
+    margin-top: 0;
+    .bloc-header {
+      margin-top: 50rpx;
+      margin-bottom: 20rpx;
+      .bloc-title {
+        color: #333333;
+      }
+      .more {
+        font-size: 24rpx;
+      }
+    }
+  }
+
+  .prod-grid {
+    width: 730rpx;
+    margin: 0 auto;
+    .prod-item-box {
+      padding: 10rpx;
+      .prod-item {
+        background: #fff;
+        border-radius: 10rpx;
+        box-shadow: -1rpx 1rpx 2rpx #afd3f5, 1rpx 1rpx 0rpx #afd3f5;
+        justify-content: left;
+        /deep/ * {
+          border-radius: 10rpx 10rpx 0 0;
+        }
+        .item-info {
+          padding: 15rpx;
+          .info-text {
+            padding-bottom: 15rpx;
+          }
+          .price-and-cart {
+            display: flex;
+            justify-content: space-between;
+          }
+        }
+      }
+    }
+  }
+}
+
+.prod-list {
+  height: auto !important;
+
+  .prod-item {
+    padding: 20rpx;
+    background: #fff;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    border-bottom: 1rpx solid #f3f3f3;
+
+    .prod-image {
+      border-radius: 10rpx;
+      /deep/ * {
+        border-radius: 10rpx;
+      }
+    }
+
+    .item-info {
+      padding: 20rpx 30rpx;
+      .info-text {
+        padding-bottom: 15rpx;
+      }
+      .price-and-cart {
+        display: flex;
+        justify-content: space-between;
+      }
+    }
+  }
+}
+
+</style>
