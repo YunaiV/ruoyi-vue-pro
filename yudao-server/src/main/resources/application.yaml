@@ -1,6 +1,6 @@
 spring:
   application:
-    name: yudao-admin-server
+    name: yudao-server
 
   profiles:
     active: local
