@@ -13,7 +13,7 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 public class AppAddressExportReqVO {
 
     @ApiModelProperty(value = "用户编号")
-    private Integer userId;
+    private Long userId;
 
     @ApiModelProperty(value = "收件人名称")
     private String name;

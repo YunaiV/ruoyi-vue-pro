@@ -15,7 +15,7 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 public class AppAddressPageReqVO extends PageParam {
 
     @ApiModelProperty(value = "用户编号")
-    private Integer userId;
+    private Long userId;
 
     @ApiModelProperty(value = "收件人名称")
     private String name;

@@ -12,10 +12,6 @@ import javax.validation.constraints.*;
 @Data
 public class AppAddressBaseVO {
 
-    @ApiModelProperty(value = "用户编号", required = true)
-    @NotNull(message = "用户编号不能为空")
-    private Integer userId;
-
     @ApiModelProperty(value = "收件人名称", required = true)
     @NotNull(message = "收件人名称不能为空")
     private String name;

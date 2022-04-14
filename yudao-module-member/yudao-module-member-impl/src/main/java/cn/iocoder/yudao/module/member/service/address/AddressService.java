@@ -16,24 +16,28 @@ public interface AddressService {
     /**
      * 创建用户收件地址
      *
+     *
+     * @param userId 用户编号
      * @param createReqVO 创建信息
      * @return 编号
      */
-    Long createAddress(@Valid AppAddressCreateReqVO createReqVO);
+    Long createAddress(Long userId, @Valid AppAddressCreateReqVO createReqVO);
 
     /**
      * 更新用户收件地址
      *
+     * @param userId 用户编号
      * @param updateReqVO 更新信息
      */
-    void updateAddress(@Valid AppAddressUpdateReqVO updateReqVO);
+    void updateAddress(Long userId, @Valid AppAddressUpdateReqVO updateReqVO);
 
     /**
      * 删除用户收件地址
      *
+     * @param userId 用户编号
      * @param id 编号
      */
-    void deleteAddress(Long id);
+    void deleteAddress(Long userId, Long id);
 
     /**
      * 获得用户收件地址
@@ -46,10 +50,10 @@ public interface AddressService {
     /**
      * 获得用户收件地址列表
      *
-     * @param ids 编号
+     * @param userId 用户编号
      * @return 用户收件地址列表
      */
-    List<AddressDO> getAddressList(Collection<Long> ids);
+    List<AddressDO> getAddressList(Long userId);
 
     /**
      * 获得用户收件地址分页
@@ -67,4 +71,14 @@ public interface AddressService {
      */
     List<AddressDO> getAddressList(AppAddressExportReqVO exportReqVO);
 
+    /**
+     * 获得用户收件地址
+     *
+     * @param userId 用户编号
+     * @param id 编号
+     * @return 用户收件地址
+     */
+    AddressDO getAddress(Long userId, Long id);
+
+    AddressDO getDefaultUserAddress(Long userId);
 }

@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
 @Api(tags = "用户 APP - 用户收件地址")
 @RestController
@@ -35,14 +36,14 @@ public class AppAddressController {
     @ApiOperation("创建用户收件地址")
 
     public CommonResult<Long> createAddress(@Valid @RequestBody AppAddressCreateReqVO createReqVO) {
-        return success(addressService.createAddress(createReqVO));
+        return success(addressService.createAddress(getLoginUserId(), createReqVO));
     }
 
     @PutMapping("/update")
     @ApiOperation("更新用户收件地址")
 
     public CommonResult<Boolean> updateAddress(@Valid @RequestBody AppAddressUpdateReqVO updateReqVO) {
-        addressService.updateAddress(updateReqVO);
+        addressService.updateAddress(getLoginUserId(), updateReqVO);
         return success(true);
     }
 
@@ -51,7 +52,7 @@ public class AppAddressController {
     @ApiImplicitParam(name = "id", value = "编号", required = true, dataTypeClass = Long.class)
 
     public CommonResult<Boolean> deleteAddress(@RequestParam("id") Long id) {
-        addressService.deleteAddress(id);
+        addressService.deleteAddress(getLoginUserId(), id);
         return success(true);
     }
 
@@ -60,25 +61,24 @@ public class AppAddressController {
     @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
 
     public CommonResult<AppAddressRespVO> getAddress(@RequestParam("id") Long id) {
-        AddressDO address = addressService.getAddress(id);
+        AddressDO address = addressService.getAddress(getLoginUserId(), id);
+        return success(AddressConvert.INSTANCE.convert(address));
+    }
+
+    @GetMapping("/get-default")
+    @ApiOperation("获得默认的用户收件地址")
+
+    public CommonResult<AppAddressRespVO> getDefaultUserAddress() {
+        AddressDO address = addressService.getDefaultUserAddress(getLoginUserId());
         return success(AddressConvert.INSTANCE.convert(address));
     }
 
     @GetMapping("/list")
     @ApiOperation("获得用户收件地址列表")
-    @ApiImplicitParam(name = "ids", value = "编号列表", required = true, example = "1024,2048", dataTypeClass = List.class)
 
-    public CommonResult<List<AppAddressRespVO>> getAddressList(@RequestParam("ids") Collection<Long> ids) {
-        List<AddressDO> list = addressService.getAddressList(ids);
+    public CommonResult<List<AppAddressRespVO>> getAddressList() {
+        List<AddressDO> list = addressService.getAddressList(getLoginUserId());
         return success(AddressConvert.INSTANCE.convertList(list));
-    }
-
-    @GetMapping("/page")
-    @ApiOperation("获得用户收件地址分页")
-
-    public CommonResult<PageResult<AppAddressRespVO>> getAddressPage(@Valid AppAddressPageReqVO pageVO) {
-        PageResult<AddressDO> pageResult = addressService.getAddressPage(pageVO);
-        return success(AddressConvert.INSTANCE.convertPage(pageResult));
     }
 
 }

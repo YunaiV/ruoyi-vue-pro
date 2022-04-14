@@ -16,6 +16,7 @@ import javax.annotation.Resource;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
+import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomLongId;
@@ -43,7 +44,7 @@ public class AddressServiceImplTest extends BaseDbUnitTest {
         AppAddressCreateReqVO reqVO = randomPojo(AppAddressCreateReqVO.class);
 
         // 调用
-        Long addressId = addressService.createAddress(reqVO);
+        Long addressId = addressService.createAddress(getLoginUserId(), reqVO);
         // 断言
         assertNotNull(addressId);
         // 校验记录的属性是否正确
@@ -62,7 +63,7 @@ public class AddressServiceImplTest extends BaseDbUnitTest {
         });
 
         // 调用
-        addressService.updateAddress(reqVO);
+        addressService.updateAddress(getLoginUserId(), reqVO);
         // 校验是否更新正确
         AddressDO address = addressMapper.selectById(reqVO.getId()); // 获取最新的
         assertPojoEquals(reqVO, address);
@@ -74,7 +75,7 @@ public class AddressServiceImplTest extends BaseDbUnitTest {
         AppAddressUpdateReqVO reqVO = randomPojo(AppAddressUpdateReqVO.class);
 
         // 调用, 并断言异常
-        assertServiceException(() -> addressService.updateAddress(reqVO), ADDRESS_NOT_EXISTS);
+        assertServiceException(() -> addressService.updateAddress(getLoginUserId(), reqVO), ADDRESS_NOT_EXISTS);
     }
 
     @Test
@@ -86,7 +87,7 @@ public class AddressServiceImplTest extends BaseDbUnitTest {
         Long id = dbAddress.getId();
 
         // 调用
-        addressService.deleteAddress(id);
+        addressService.deleteAddress(getLoginUserId(), id);
        // 校验数据不存在了
        assertNull(addressMapper.selectById(id));
     }
@@ -97,7 +98,7 @@ public class AddressServiceImplTest extends BaseDbUnitTest {
         Long id = randomLongId();
 
         // 调用, 并断言异常
-        assertServiceException(() -> addressService.deleteAddress(id), ADDRESS_NOT_EXISTS);
+        assertServiceException(() -> addressService.deleteAddress(getLoginUserId(), id), ADDRESS_NOT_EXISTS);
     }
 
     @Test
