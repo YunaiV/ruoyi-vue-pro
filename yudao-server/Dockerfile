@@ -16,5 +16,4 @@ ENV TZ=Asia/Shanghai JAVA_OPTS="-Xms512m -Xmx512m"
 EXPOSE 48080
 
 ## 启动后端项目
-ENTRYPOINT java ${JAVA_OPTS} -Djava.security.egd=file:/dev/./urandom -jar app.jar
-
+CMD java ${JAVA_OPTS} -Djava.security.egd=file:/dev/./urandom -jar app.jar
