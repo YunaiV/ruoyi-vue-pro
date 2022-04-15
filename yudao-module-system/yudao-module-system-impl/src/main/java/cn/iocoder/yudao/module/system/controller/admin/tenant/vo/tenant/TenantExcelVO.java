@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant;
 
+import cn.iocoder.yudao.module.system.enums.DictTypeConstants;
 import lombok.*;
 import java.util.*;
 
@@ -28,8 +29,8 @@ public class TenantExcelVO {
     @ExcelProperty("联系手机")
     private String contactMobile;
 
-    @ExcelProperty(value = "租户状态（0正常 1停用）", converter = DictConvert.class)
-    @DictFormat("sys_common_status") // TODO 代码优化：建议设置到对应的 XXXDictTypeConstants 枚举类中
+    @ExcelProperty(value = "状态", converter = DictConvert.class)
+    @DictFormat(DictTypeConstants.COMMON_STATUS)
     private Integer status;
 
     @ExcelProperty("创建时间")

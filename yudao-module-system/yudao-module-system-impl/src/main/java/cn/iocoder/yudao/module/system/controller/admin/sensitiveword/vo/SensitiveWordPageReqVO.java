@@ -24,7 +24,7 @@ public class SensitiveWordPageReqVO extends PageParam {
     @ApiModelProperty(value = "标签", example = "短信,评论")
     private String tag;
 
-    @ApiModelProperty(value = "状态", example = "true-启用，true-禁用")
+    @ApiModelProperty(value = "状态", example = "1", notes = "参见 CommonStatusEnum 枚举类")
     private Integer status;
 
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
