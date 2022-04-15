@@ -34,14 +34,12 @@ public class AppAddressController {
 
     @PostMapping("/create")
     @ApiOperation("创建用户收件地址")
-
     public CommonResult<Long> createAddress(@Valid @RequestBody AppAddressCreateReqVO createReqVO) {
         return success(addressService.createAddress(getLoginUserId(), createReqVO));
     }
 
     @PutMapping("/update")
     @ApiOperation("更新用户收件地址")
-
     public CommonResult<Boolean> updateAddress(@Valid @RequestBody AppAddressUpdateReqVO updateReqVO) {
         addressService.updateAddress(getLoginUserId(), updateReqVO);
         return success(true);
@@ -50,7 +48,6 @@ public class AppAddressController {
     @DeleteMapping("/delete")
     @ApiOperation("删除用户收件地址")
     @ApiImplicitParam(name = "id", value = "编号", required = true, dataTypeClass = Long.class)
-
     public CommonResult<Boolean> deleteAddress(@RequestParam("id") Long id) {
         addressService.deleteAddress(getLoginUserId(), id);
         return success(true);
@@ -59,7 +56,6 @@ public class AppAddressController {
     @GetMapping("/get")
     @ApiOperation("获得用户收件地址")
     @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
-
     public CommonResult<AppAddressRespVO> getAddress(@RequestParam("id") Long id) {
         AddressDO address = addressService.getAddress(getLoginUserId(), id);
         return success(AddressConvert.INSTANCE.convert(address));
@@ -67,7 +63,6 @@ public class AppAddressController {
 
     @GetMapping("/get-default")
     @ApiOperation("获得默认的用户收件地址")
-
     public CommonResult<AppAddressRespVO> getDefaultUserAddress() {
         AddressDO address = addressService.getDefaultUserAddress(getLoginUserId());
         return success(AddressConvert.INSTANCE.convert(address));
@@ -75,7 +70,6 @@ public class AppAddressController {
 
     @GetMapping("/list")
     @ApiOperation("获得用户收件地址列表")
-
     public CommonResult<List<AppAddressRespVO>> getAddressList() {
         List<AddressDO> list = addressService.getAddressList(getLoginUserId());
         return success(AddressConvert.INSTANCE.convertList(list));

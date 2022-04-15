@@ -54,23 +54,7 @@ public interface AddressService {
      * @return 用户收件地址列表
      */
     List<AddressDO> getAddressList(Long userId);
-
-    /**
-     * 获得用户收件地址分页
-     *
-     * @param pageReqVO 分页查询
-     * @return 用户收件地址分页
-     */
-    PageResult<AddressDO> getAddressPage(AppAddressPageReqVO pageReqVO);
-
-    /**
-     * 获得用户收件地址列表, 用于 Excel 导出
-     *
-     * @param exportReqVO 查询条件
-     * @return 用户收件地址列表
-     */
-    List<AddressDO> getAddressList(AppAddressExportReqVO exportReqVO);
-
+    
     /**
      * 获得用户收件地址
      *

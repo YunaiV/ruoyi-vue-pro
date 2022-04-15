@@ -11,7 +11,7 @@ import lombok.Getter;
 public enum AddressTypeEnum {
 
     DEFAULT(1, "默认收件地址"),
-    NORMAL(2, "普通收件地址"), // 即非默认收件笛之爱
+    NORMAL(2, "普通收件地址"), // 即非默认收件地址
 
     ;
 

@@ -34,10 +34,11 @@ public class AddressServiceImpl implements AddressService {
     @Resource
     private AddressMapper addressMapper;
 
-    @Override
+    @Override // TODO @shuaidawang：事务要加下哈
     public Long createAddress(Long userId, AppAddressCreateReqVO createReqVO) {
         // 如果添加的是默认收件地址，则将原默认地址修改为非默认
         if (AddressTypeEnum.DEFAULT.getType().equals(createReqVO.getType())) {
+            // TODO @shuaidawang：查询到一个，然后进行 update
             List<AddressDO> addressDOs = selectListByUserIdAndType(userId, AddressTypeEnum.DEFAULT.getType());
             if (!CollectionUtils.isEmpty(addressDOs)) {
                 addressDOs.forEach(userAddressDO -> addressMapper.updateById(new AddressDO()
@@ -52,12 +53,13 @@ public class AddressServiceImpl implements AddressService {
         return address.getId();
     }
 
-    @Override
+    @Override // TODO @shuaidawang：事务要加下哈
     public void updateAddress(Long userId, AppAddressUpdateReqVO updateReqVO) {
-        // 校验存在,校验是否能够操作
+        // 校验存在,校验是否能够操作 TODO shuaidawang：改成基于 id + userId 查询，以前的做法不太好；
         check(userId, updateReqVO.getId());
         // 如果修改的是默认收件地址，则将原默认地址修改为非默认
         if (AddressTypeEnum.DEFAULT.getType().equals(updateReqVO.getType())) {
+            // TODO @shuaidawang：查询到一个，然后进行 update，需要排除自己哈
             List<AddressDO> addressDOs = selectListByUserIdAndType(
                     userId, AddressTypeEnum.DEFAULT.getType());
             if (!CollectionUtils.isEmpty(addressDOs)) {
@@ -68,13 +70,13 @@ public class AddressServiceImpl implements AddressService {
         }
         // 更新
         AddressDO updateObj = AddressConvert.INSTANCE.convert(updateReqVO);
-        updateObj.setUserId(userId);
+        updateObj.setUserId(userId); // TODO @shuaidawang：不用加 userId
         addressMapper.updateById(updateObj);
     }
 
     @Override
     public void deleteAddress(Long userId, Long id) {
-        // 校验存在,校验是否能够操作
+        // 校验存在,校验是否能够操作 TODO shuaidawang：改成基于 id + userId 查询，以前的做法不太好；
         check(userId, id);
         // 删除
         addressMapper.deleteById(id);
@@ -107,18 +109,8 @@ public class AddressServiceImpl implements AddressService {
     }
 
     @Override
-    public PageResult<AddressDO> getAddressPage(AppAddressPageReqVO pageReqVO) {
-        return addressMapper.selectPage(pageReqVO);
-    }
-
-    @Override
-    public List<AddressDO> getAddressList(AppAddressExportReqVO exportReqVO) {
-        return addressMapper.selectList(exportReqVO);
-    }
-
-    @Override
     public AddressDO getAddress(Long userId, Long id) {
-        AddressDO address = getAddress(id);
+        AddressDO address = getAddress(id); // TODO shuaidawang：改成基于 id + userId 查询，以前的做法不太好；
         check(userId, id);
         return address;
     }
@@ -130,10 +122,12 @@ public class AddressServiceImpl implements AddressService {
      */
     @Override
     public AddressDO getDefaultUserAddress(Long userId) {
+        // TODO @shuaidawang：查询，都抽到 mapper 中
         List<AddressDO> addressDOList = selectListByUserIdAndType(userId, AddressTypeEnum.DEFAULT.getType());
         return addressDOList.stream().findFirst().orElse(null);
     }
 
+    // TODO @shuaidawang：查询，都抽到 mapper 中
     /**
      * 根据类型获取地址列表
      * @param userId

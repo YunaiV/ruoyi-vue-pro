@@ -29,16 +29,4 @@ public interface AddressMapper extends BaseMapperX<AddressDO> {
                 .orderByDesc(AddressDO::getId));
     }
 
-    default List<AddressDO> selectList(AppAddressExportReqVO reqVO) {
-        return selectList(new LambdaQueryWrapperX<AddressDO>()
-                .eqIfPresent(AddressDO::getUserId, reqVO.getUserId())
-                .likeIfPresent(AddressDO::getName, reqVO.getName())
-                .eqIfPresent(AddressDO::getMobile, reqVO.getMobile())
-                .eqIfPresent(AddressDO::getAreaCode, reqVO.getAreaCode())
-                .eqIfPresent(AddressDO::getDetailAddress, reqVO.getDetailAddress())
-                .eqIfPresent(AddressDO::getType, reqVO.getType())
-                .betweenIfPresent(AddressDO::getCreateTime, reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
-                .orderByDesc(AddressDO::getId));
-    }
-
 }

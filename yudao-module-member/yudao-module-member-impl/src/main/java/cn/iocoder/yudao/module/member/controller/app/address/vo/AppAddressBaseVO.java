@@ -12,6 +12,8 @@ import javax.validation.constraints.*;
 @Data
 public class AppAddressBaseVO {
 
+    // TODO @shuaidawang：swagger 注解的 example；其它 VO 类也要补充下
+
     @ApiModelProperty(value = "收件人名称", required = true)
     @NotNull(message = "收件人名称不能为空")
     private String name;
@@ -28,7 +30,7 @@ public class AppAddressBaseVO {
     @NotNull(message = "收件详细地址不能为空")
     private String detailAddress;
 
-    @ApiModelProperty(value = "地址类型", required = true)
+    @ApiModelProperty(value = "地址类型", required = true) // TODO @shuaidawang：这个是枚举字段，最好说明下对应的枚举类
     @NotNull(message = "地址类型不能为空")
     private Integer type;
 

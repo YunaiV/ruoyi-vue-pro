@@ -46,9 +46,9 @@ public class AddressDO extends BaseDO {
      */
     private String detailAddress;
     /**
-     * 地址类型，主要分为默认地址，和普通地址
+     * 地址类型
      *
-     * 外键 {@link AddressTypeEnum}
+     * 枚举 {@link AddressTypeEnum}
      */
     private Integer type;
 
