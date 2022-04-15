@@ -27,7 +27,6 @@ import cn.iocoder.yudao.module.system.service.dept.DeptService;
 import cn.iocoder.yudao.module.system.service.dept.PostService;
 import cn.iocoder.yudao.module.system.service.permission.PermissionService;
 import cn.iocoder.yudao.module.system.service.tenant.TenantService;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.google.common.annotations.VisibleForTesting;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -266,7 +265,7 @@ public class AdminUserServiceImpl implements AdminUserService {
         if (CollUtil.isEmpty(postIds)) {
             return Collections.emptyList();
         }
-        List<Long> userIdList = userPostMapper.selectUserIdByPostIds(postIds)
+        List<Long> userIdList = userPostMapper.selectListByPostIds(postIds)
                 .stream()
                 .map(UserPostDO::getUserId)
                 .distinct()

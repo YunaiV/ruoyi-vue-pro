@@ -2430,8 +2430,10 @@ CREATE TABLE `system_user_post` (
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   `tenant_id` bigint NOT NULL DEFAULT '0' COMMENT '租户编号',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=112 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='部门表';
-
+) ENGINE=InnoDB AUTO_INCREMENT=112 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用户岗位表';
+insert into system_user_post (user_id, post_id, creator, create_time, updater, update_time, deleted, tenant_id) value (1,1,'admin',current_timestamp,'admin',current_timestamp,false,1);
+insert into system_user_post (user_id, post_id, creator, create_time, updater, update_time, deleted, tenant_id) value (100,1,'admin',current_timestamp,'admin',current_timestamp,false,1);
+insert into system_user_post (user_id, post_id, creator, create_time, updater, update_time, deleted, tenant_id) value (114,3,'admin',current_timestamp,'admin',current_timestamp,false,1);
 
 -- ----------------------------
 -- Table structure for system_dept

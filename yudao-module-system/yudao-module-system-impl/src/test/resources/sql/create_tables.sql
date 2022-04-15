@@ -156,7 +156,7 @@ CREATE TABLE IF NOT EXISTS `system_user_post`(
     "deleted"     bit       NOT NULL DEFAULT FALSE,
     "tenant_id"   bigint    not null default '0',
     PRIMARY KEY (`id`)
-) COMMENT ='部门表';
+) COMMENT ='用户岗位表';
 
 
 CREATE TABLE IF NOT EXISTS "system_notice" (
