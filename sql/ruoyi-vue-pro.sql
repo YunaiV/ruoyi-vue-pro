@@ -1924,6 +1924,28 @@ INSERT INTO `member_user` VALUES (246, '', '', 0, '15601691301', '$2a$10$KLvmwoU
 COMMIT;
 
 -- ----------------------------
+-- Table structure for member_address
+-- ----------------------------
+DROP TABLE IF EXISTS `member_address`;
+CREATE TABLE `member_address` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '收件地址编号',
+  `user_id` bigint NOT NULL COMMENT '用户编号',
+  `name` varchar(10) COLLATE utf8mb4_bin NOT NULL COMMENT '收件人名称',
+  `mobile` varchar(20) COLLATE utf8mb4_bin NOT NULL COMMENT '手机号',
+  `area_code` int(11) NOT NULL COMMENT '地区编码',
+  `detail_address` varchar(250) COLLATE utf8mb4_bin NOT NULL COMMENT '收件详细地址',
+  `type` tinyint(4) NOT NULL COMMENT '地址类型',
+  `creator` varchar(64) DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '删除状态',
+	`tenant_id` bigint(20) NOT NULL DEFAULT '0' COMMENT '租户编号',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `idx_userId` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin COMMENT='用户收件地址';
+
+-- ----------------------------
 -- Table structure for pay_app
 -- ----------------------------
 DROP TABLE IF EXISTS `pay_app`;
