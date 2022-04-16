@@ -1,6 +1,5 @@
 <template>
   <view class="container">
-
     <view class="unp-header">
       <view class="unp-logo">
         <u-avatar size="80" icon="github-circle-fill" fontSize="80"></u-avatar>
@@ -25,24 +24,15 @@
         </u-form-item>
 
         <view class="lk-group">
-        <!-- 占位 -->
+          <!-- 占位 -->
         </view>
 
-        <u-button
-            type="success"
-            text="注册账号"
-            customStyle="margin-top: 50px"
-            @click="handleSubmit"
-        ></u-button>
+        <u-button type="success" text="注册账号" customStyle="margin-top: 50px" @click="handleSubmit"></u-button>
 
         <u-gap height="20"></u-gap>
         <u-button type="info" text="返回" @click="navigateBack()"></u-button>
-
       </u--form>
-
-
     </view>
-
   </view>
 </template>
 
@@ -53,17 +43,17 @@ export default {
       inputType: 'password',
       formData: {
         username: '',
-        password: '',
+        password: ''
       },
       rules: {
-        'username': {
+        username: {
           type: 'string',
           max: 20,
           required: true,
           message: '请输入您的账号',
           trigger: ['blur', 'change']
         },
-        'password': {
+        password: {
           type: 'string',
           max: 20,
           required: true,
@@ -73,28 +63,27 @@ export default {
       }
     }
   },
-  onLoad() {
-
-  },
+  onLoad() {},
   methods: {
-    handleUsernameChange(e){
-      let str = uni.$u.trim(e, 'all');
+    handleUsernameChange(e) {
+      let str = uni.$u.trim(e, 'all')
       this.$nextTick(() => {
         this.formData.username = str
       })
     },
-    handlePasswordChange(e){
-      let str = uni.$u.trim(e, 'all');
+    handlePasswordChange(e) {
+      let str = uni.$u.trim(e, 'all')
       this.$nextTick(() => {
         this.formData.password = str
       })
     },
     handleSubmit() {
-      this.$refs.form.validate().then(res => {
-        uni.$u.toast('点击了注册账号')
-      }).catch(err => {
-
-      })
+      this.$refs.form
+        .validate()
+        .then(res => {
+          uni.$u.toast('点击了注册账号')
+        })
+        .catch(err => {})
     },
     navigateBack() {
       uni.navigateBack()
@@ -104,41 +93,28 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
 .unp-header {
   height: 400rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
   .unp-logo {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    @include flex-center;
   }
 }
 
 .unp-box {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  .unp-form{
+  @include flex-center;
+  .unp-form {
     width: 560rpx;
   }
 }
 
 .lk-group {
+  @include flex-space-between;
   height: 40rpx;
   margin-top: 40rpx;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
   font-size: 12rpx;
 
   color: $u-primary;
   text-decoration: $u-primary;
 }
-
-
 </style>

@@ -1,9 +1,9 @@
 <template>
-	<view class="container">
+  <view class="container">
     <view class="user-header">
       <view class="user-info" @click="handleUserInfoClick">
         <u-avatar size="80" :src="avatar"></u-avatar>
-        <text class="nick-name">{{nickName}}</text>
+        <text class="nick-name">{{ nickName }}</text>
       </view>
     </view>
 
@@ -19,10 +19,11 @@
       </view>
 
       <view class="order-status-box">
-        <u-grid :border="false" :col="orderStatusList.length"><u-grid-item v-for="(item,index) in orderStatusList" :key="index">
-          <u-icon :name="item.icon" :size="32"></u-icon>
-          <text class="grid-title">{{item.title}}</text>
-        </u-grid-item>
+        <u-grid :border="false" :col="orderStatusList.length"
+          ><u-grid-item v-for="(item, index) in orderStatusList" :key="index">
+            <u-icon :name="item.icon" :size="32"></u-icon>
+            <text class="grid-title">{{ item.title }}</text>
+          </u-grid-item>
         </u-grid>
       </view>
     </view>
@@ -30,10 +31,11 @@
     <u-gap height="10" bgColor="#f3f3f3"></u-gap>
 
     <view class="stat-box">
-      <u-grid :border="false" col="3"><u-grid-item v-for="(item,index) in statList" :key="index">
-        <text class="grid-value">{{item.value}}</text>
-        <text class="grid-title">{{item.title}}</text>
-      </u-grid-item>
+      <u-grid :border="false" col="3"
+        ><u-grid-item v-for="(item, index) in statList" :key="index">
+          <text class="grid-value">{{ item.value }}</text>
+          <text class="grid-title">{{ item.title }}</text>
+        </u-grid-item>
       </u-grid>
     </view>
 
@@ -47,47 +49,48 @@
     </u-cell-group>
 
     <u-button class="logout-btn" type="error" color="#ea322b" text="确定"></u-button>
-
-	</view>
+  </view>
 </template>
 
 <script>
-	export default {
-		data() {
-			return {
-        avatar:'',
-        nickName:'点击登录',
-        orderStatusList: [{icon: 'rmb-circle', title: '待支付'}, {icon: 'car', title: '代发货'}, {icon: 'order', title: '待收货'}, {icon: 'integral', title: '已完成'}],
-        statList: [{value: '2', title: '我的收藏'}, {value: '3', title: '我的消息'}, {value: '3', title: '我的足迹'}]
-			}
-		},
-		onLoad() {
-
-		},
-		methods: {
-      handleUserInfoClick(){
-        // TODO 判断是否已经登录逻辑
-        if (!uni.getStorageSync('token')) {
-          uni.$u.route('/pages/login/login');
-        } else {
-          uni.$u.route('/pages/profile/profile');
-        }
+export default {
+  data() {
+    return {
+      avatar: '',
+      nickName: '点击登录',
+      orderStatusList: [
+        { icon: 'rmb-circle', title: '待支付' },
+        { icon: 'car', title: '代发货' },
+        { icon: 'order', title: '待收货' },
+        { icon: 'integral', title: '已完成' }
+      ],
+      statList: [
+        { value: '2', title: '我的收藏' },
+        { value: '3', title: '我的消息' },
+        { value: '3', title: '我的足迹' }
+      ]
+    }
+  },
+  onLoad() {},
+  methods: {
+    handleUserInfoClick() {
+      // TODO 判断是否已经登录逻辑
+      if (!uni.getStorageSync('token')) {
+        uni.$u.route('/pages/login/login')
+      } else {
+        uni.$u.route('/pages/profile/profile')
       }
-		}
-	}
+    }
+  }
+}
 </script>
 
 <style lang="scss" scoped>
 .user-header {
+  @include flex-center(column);
   height: 280rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   .user-info {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    @include flex-center(column);
     .nick-name {
       margin-top: 20rpx;
       font-size: 32rpx;
@@ -97,10 +100,7 @@
 }
 
 .order-header {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
+  @include flex-space-between;
   padding: 20rpx 30rpx;
   border-bottom: $custom-border-style;
 
@@ -110,10 +110,7 @@
   }
   .see-all {
     height: 40rpx;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: right;
+    @include flex-right;
     color: #666666;
     font-size: 26rpx;
   }
@@ -151,5 +148,4 @@
   margin-top: 60rpx;
   width: 300rpx;
 }
-
 </style>

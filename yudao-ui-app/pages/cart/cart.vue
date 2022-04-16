@@ -1,24 +1,17 @@
 <template>
-	<view class="container">
-
-	</view>
+  <view class="container"> </view>
 </template>
 
 <script>
-	export default {
-		data() {
-			return {
-				title: ''
-			}
-		},
-		onLoad() {
-
-		},
-		methods: {
-
-		}
-	}
+export default {
+  data() {
+    return {
+      title: ''
+    }
+  },
+  onLoad() {},
+  methods: {}
+}
 </script>
 
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>

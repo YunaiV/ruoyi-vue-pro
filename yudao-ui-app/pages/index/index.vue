@@ -8,20 +8,20 @@
     </u-sticky>
 
     <!--轮播图-->
-    <u-swiper :list="swiperList" previousMargin="20" nextMargin="20" circular height="200" @change="e => current = e.current" :autoplay="true" @click="handleSwiperClick">
+    <u-swiper :list="swiperList" previousMargin="20" nextMargin="20" circular height="200" @change="e => (current = e.current)" :autoplay="true" @click="handleSwiperClick">
       <view slot="indicator" class="indicator">
-        <view class="indicator__dot" v-for="(item, index) in swiperList" :key="index" :class="[index === current && 'indicator__dot--active']">
-        </view>
+        <view class="indicator__dot" v-for="(item, index) in swiperList" :key="index" :class="[index === current && 'indicator__dot--active']"> </view>
       </view>
     </u-swiper>
 
     <u-gap height="20px"></u-gap>
 
     <!--宫格菜单按钮-->
-    <u-grid :border="false" col="4"><u-grid-item v-for="(item,index) in menuList" :key="index">
-      <u-icon :name="item.icon" :size="40"></u-icon>
-      <text class="grid-title">{{item.title}}</text>
-    </u-grid-item>
+    <u-grid :border="false" col="4"
+      ><u-grid-item v-for="(item, index) in menuList" :key="index">
+        <u-icon :name="item.icon" :size="40"></u-icon>
+        <text class="grid-title">{{ item.title }}</text>
+      </u-grid-item>
     </u-grid>
 
     <u-gap height="15px"></u-gap>
@@ -38,7 +38,7 @@
           <text class="see-more">查看更多</text>
         </view>
         <u-grid class="prod-grid" :border="false" col="3">
-          <u-grid-item class="prod-item-box" v-for="(item,index) in productList" :key="index">
+          <u-grid-item class="prod-item-box" v-for="(item, index) in productList" :key="item.id">
             <view class="prod-item" @click="handleProdItemClick(item.id)">
               <u--image class="prod-image" width="230rpx" height="230rpx" :src="item.image"></u--image>
               <view class="item-info">
@@ -46,7 +46,7 @@
                   <u--text :lines="2" size="14px" color="#333333" :text="item.title"></u--text>
                 </view>
                 <view class="price-and-cart">
-                  <u--text-price color="red" size="12" intSize="18" :text="item.price"></u--text-price>
+                  <custom-text-price color="red" size="12" intSize="18" :price="item.price"></custom-text-price>
                   <u-icon name="shopping-cart" color="#2979ff" size="28"></u-icon>
                 </view>
               </view>
@@ -63,7 +63,7 @@
           <text class="more">更多 &gt;</text>
         </view>
         <u-grid class="prod-grid" :border="false" col="2">
-          <u-grid-item class="prod-item-box" v-for="(item,index) in productList" :key="index">
+          <u-grid-item class="prod-item-box" v-for="(item, index) in productList" :key="item.id">
             <view class="prod-item" @click="handleProdItemClick(item.id)">
               <u--image class="prod-image" width="345rpx" height="345rpx" :src="item.image"></u--image>
               <view class="item-info">
@@ -72,7 +72,7 @@
                   <u--text :lines="1" size="12px" color="#939393" :text="item.desc"></u--text>
                 </view>
                 <view class="price-and-cart">
-                  <u--text-price color="red" size="12" intSize="18" :text="item.price"></u--text-price>
+                  <custom-text-price color="red" size="12" intSize="18" :price="item.price"></custom-text-price>
                   <u-icon name="shopping-cart" color="#2979ff" size="28"></u-icon>
                 </view>
               </view>
@@ -90,7 +90,7 @@
         </view>
 
         <u-list class="prod-list" @scrolltolower="scrolltolower">
-          <u-list-item v-for="(item, index) in productList" :key="index">
+          <u-list-item v-for="(item, index) in productList" :key="item.id">
             <view class="prod-item" @click="handleProdItemClick(item.id)">
               <u--image class="prod-image" width="210rpx" height="210rpx" :src="item.image"></u--image>
               <view class="item-info">
@@ -100,46 +100,40 @@
                   <u--text class="info-desc" :lines="2" size="12px" color="#939393" :text="item.desc"></u--text>
                 </view>
                 <view class="price-and-cart">
-                  <u--text-price color="red" size="12" intSize="18" :text="item.price"></u--text-price>
+                  <custom-text-price color="red" size="12" intSize="18" :price="item.price"></custom-text-price>
                   <u-icon name="shopping-cart" color="#2979ff" size="28"></u-icon>
                 </view>
               </view>
             </view>
           </u-list-item>
         </u-list>
-
       </view>
     </view>
     <u-gap height="5px"></u-gap>
     <!--加载更多-->
-    <u-loadmore fontSize="32rpx" :status="status" :loading-text="loadingText" :loadmore-text="loadmoreText" :nomore-text="nomoreText"/>
+    <u-loadmore fontSize="32rpx" :status="status" :loading-text="loadingText" :loadmore-text="loadmoreText" :nomore-text="nomoreText" />
 
     <u-gap height="10px"></u-gap>
   </view>
 </template>
 
 <script>
-import {getBannerData,getNoticeData} from "../../common/api";
+import { getBannerData, getNoticeData } from '../../common/api'
 
 export default {
-  components: {
-
-  },
+  components: {},
   data() {
     return {
       current: 0,
       currentNum: 0,
-      bannerList: [
-        'https://cdn.uviewui.com/uview/swiper/swiper3.png',
-        'https://cdn.uviewui.com/uview/swiper/swiper2.png',
-        'https://cdn.uviewui.com/uview/swiper/swiper1.png',],
-      menuList: [{icon: 'gift', title: '热门推荐'}, {icon: 'star', title: '收藏转发'}, {icon: 'thumb-up', title: '点赞投币'}, {icon: 'heart', title: '感谢支持'}],
-      noticeList:[
-        '寒雨连江夜入吴',
-        '平明送客楚山孤',
-        '洛阳亲友如相问',
-        '一片冰心在玉壶'
+      bannerList: ['https://cdn.uviewui.com/uview/swiper/swiper3.png', 'https://cdn.uviewui.com/uview/swiper/swiper2.png', 'https://cdn.uviewui.com/uview/swiper/swiper1.png'],
+      menuList: [
+        { icon: 'gift', title: '热门推荐' },
+        { icon: 'star', title: '收藏转发' },
+        { icon: 'thumb-up', title: '点赞投币' },
+        { icon: 'heart', title: '感谢支持' }
       ],
+      noticeList: ['寒雨连江夜入吴', '平明送客楚山孤', '洛阳亲友如相问', '一片冰心在玉壶'],
       productList: [
         {
           id: 1,
@@ -189,43 +183,47 @@ export default {
   },
   methods: {
     loadBannerData() {
-      getBannerData().then(res => {
-        this.bannerList = res.data;
-      }).catch(err => {
-        //console.log(err)
-      })
+      getBannerData()
+        .then(res => {
+          this.bannerList = res.data
+        })
+        .catch(err => {
+          //console.log(err)
+        })
     },
     loadNoticeData() {
-      getNoticeData().then(res => {
-        this.noticeList = res.data;
-      }).catch(err => {
-        //console.log(err)
-      })
+      getNoticeData()
+        .then(res => {
+          this.noticeList = res.data
+        })
+        .catch(err => {
+          //console.log(err)
+        })
     },
     handleSearchClick(e) {
       console.log('监听点击准备跳转页面')
     },
-    handleSwiperClick(index){
-      console.log('点击了图片索引值：',index)
+    handleSwiperClick(index) {
+      console.log('点击了图片索引值：', index)
     },
-    handleProdItemClick(productId){
+    handleProdItemClick(productId) {
       uni.$u.route('/pages/product/product', {
         productId: productId
-      });
+      })
     }
   },
   computed: {
-    swiperList(){
+    swiperList() {
       return this.bannerList.map(item => {
-        if (item){
-          return item;
+        if (item) {
+          return item
         }
       })
     },
     noticeTextList() {
       return this.noticeList.map(item => {
-        if (item.title){
-          return item.title;
+        if (item.title) {
+          return item.title
         }
       })
     }
@@ -234,7 +232,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
 .search-wrap {
   background: $custom-bg-color;
   padding: 20rpx;
@@ -266,10 +263,7 @@ export default {
 .prod-block {
   margin-top: -160px;
   .bloc-header {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
+    @include flex-space-between;
     padding: 10rpx 30rpx;
 
     .bloc-title {
@@ -287,7 +281,8 @@ export default {
     }
   }
 
-  &.half, &.list {
+  &.half,
+  &.list {
     margin-top: 0;
     .bloc-header {
       margin-top: 50rpx;
@@ -321,8 +316,7 @@ export default {
             padding-bottom: 10rpx;
           }
           .price-and-cart {
-            display: flex;
-            justify-content: space-between;
+            @include flex-space-between;
           }
         }
       }
@@ -336,9 +330,7 @@ export default {
   .prod-item {
     padding: 20rpx;
     background: #fff;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
+    @include flex-space-between;
     border-bottom: $custom-border-style;
 
     .prod-image {
@@ -356,11 +348,9 @@ export default {
         padding-bottom: 10rpx;
       }
       .price-and-cart {
-        display: flex;
-        justify-content: space-between;
+        @include flex-space-between;
       }
     }
   }
 }
-
 </style>

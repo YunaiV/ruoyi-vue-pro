@@ -22,3 +22,39 @@ $custom-bg-color: #ffffff;
 
 /* 边框样式 */
 $custom-border-style: 1rpx solid #f3f3f3;
+
+
+@mixin flex-left($direction: row) {
+  display: flex;
+  flex-direction: $direction;
+  align-items: center;
+  justify-content: left;
+}
+
+@mixin flex-right($direction: row) {
+  display: flex;
+  flex-direction: $direction;
+  align-items: center;
+  justify-content: right;
+}
+
+@mixin flex-center($direction: row) {
+  display: flex;
+  flex-direction: $direction;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin flex-space-between($direction: row) {
+  display: flex;
+  flex-direction: $direction;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@mixin flex-space-around($direction: row) {
+  display: flex;
+  flex-direction: $direction;
+  align-items: center;
+  justify-content: space-around;
+}
