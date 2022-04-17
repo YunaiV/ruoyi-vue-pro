@@ -8,7 +8,7 @@ export default {
   components: { iFrame },
   data() {
     return {
-      url: "http://skywalking.shop.iocoder.cn/trace", // TODO 芋艿，后续改成配置读取
+      url: "http://skywalking.shop.iocoder.cn", // TODO 芋艿，后续改成配置读取
     };
   },
 };
