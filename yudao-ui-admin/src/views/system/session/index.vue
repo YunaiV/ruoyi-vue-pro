@@ -1,5 +1,7 @@
 <template>
   <div class="app-container">
+    <doc-alert title="用户体系" url="https://doc.iocoder.cn/user-center/" />
+    <!-- 搜索工作栏 -->
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" label-width="68px">
       <el-form-item label="登录地址" prop="userIp">
         <el-input v-model="queryParams.userIp" placeholder="请输入登录地址" clearable @keyup.enter.native="handleQuery"/>

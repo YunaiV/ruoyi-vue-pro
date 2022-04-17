@@ -1,5 +1,7 @@
 <template>
   <div class="app-container">
+    <doc-alert title="Redis 缓存" url="https://doc.iocoder.cn/redis-cache/" />
+    <doc-alert title="本地缓存" url="https://doc.iocoder.cn/local-cache/" />
     <el-row>
       <el-col :span="24" class="card-box">
         <el-card>
