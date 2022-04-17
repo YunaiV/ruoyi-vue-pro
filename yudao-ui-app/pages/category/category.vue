@@ -17,25 +17,19 @@
         <view class="category-image">
           <u--image :showLoading="true" :src="categoryList[currentIndex].image" width="530rpx" height="160rpx" @click="click"></u--image>
         </view>
-        <view>
-          <u-list class="prod-list" @scrolltolower="scrolltolower">
-            <u-list-item v-for="(item, index) in productList" :key="item.id">
-              <view class="prod-item" @click="handleProdItemClick(item.id)">
-                <u--image class="prod-image" width="140rpx" height="140rpx" :src="item.image"></u--image>
-                <view class="item-info">
-                  <view class="info-text">
-                    <u--text :lines="1" size="14px" color="#333333" :text="item.title"></u--text>
-                    <u-gap height="2px"></u-gap>
-                    <u--text :lines="1" size="12px" color="#939393" :text="item.desc"></u--text>
-                  </view>
-                  <view class="price-and-cart">
-                    <custom-text-price color="red" size="12" intSize="18" :price="item.price"></custom-text-price>
-                    <u-icon name="shopping-cart" color="#2979ff" size="28"></u-icon>
-                  </view>
-                </view>
+        <view class="sub-category-box" v-for="(item, index) in categoryList[currentIndex].children" :key="item.id">
+          <view class="sub-category-header">
+            <view class="title">{{ item.title }}</view>
+            <view class="more">查看更多</view>
+          </view>
+          <u-grid class="sub-category-grid" col="3">
+            <u-grid-item v-for="(subItem, index) in item.category" :key="subItem.id">
+              <view class="sub-category-item">
+                <u-icon name="photo" :size="80"></u-icon>
+                <text class="sub-category-title">{{ subItem.title }}</text>
               </view>
-            </u-list-item>
-          </u-list>
+            </u-grid-item>
+          </u-grid>
         </view>
       </view>
     </view>
@@ -43,119 +37,85 @@
 </template>
 
 <script>
-import UText from '../../uni_modules/uview-ui/components/u-text/u-text'
 export default {
-  components: { UText },
   data() {
     return {
       currentIndex: 0,
-      categoryList: [
-        {
-          id: 1,
-          image: 'https://cdn.uviewui.com/uview/swiper/swiper1.png',
-          name: '关注'
-        },
-        {
-          id: 2,
-          image: 'https://cdn.uviewui.com/uview/swiper/swiper2.png',
-          name: '推荐'
-        },
-        {
-          id: 3,
-          image: 'https://cdn.uviewui.com/uview/swiper/swiper3.png',
-          name: '电影'
-        },
-        {
-          id: 4,
-          image: 'https://cdn.uviewui.com/uview/swiper/swiper1.png',
-          name: '科技'
-        },
-        {
-          id: 5,
-          image: 'https://cdn.uviewui.com/uview/swiper/swiper2.png',
-          name: '音乐'
-        },
-        {
-          id: 6,
-          image: 'https://cdn.uviewui.com/uview/swiper/swiper3.png',
-          name: '美食'
-        },
-        {
-          id: 7,
-          image: 'https://cdn.uviewui.com/uview/swiper/swiper1.png',
-          name: '文化'
-        },
-        {
-          id: 8,
-          image: 'https://cdn.uviewui.com/uview/swiper/swiper2.png',
-          name: '财经'
-        },
-        {
-          id: 9,
-          image: 'https://cdn.uviewui.com/uview/swiper/swiper3.png',
-          name: '手工'
-        }
-      ],
-      productList: [
-        {
-          id: 0,
-          image: 'https://cdn.uviewui.com/uview/album/1.jpg',
-          title: '山不在高，有仙则名。水不在深，有龙则灵。斯是陋室，惟吾德馨。',
-          desc: '山不在于高，有了神仙就会有名气。水不在于深，有了龙就会有灵气。这是简陋的房子，只是我品德好就感觉不到简陋了。',
-          price: '13.00'
-        },
-        {
-          id: 2,
-          image: 'https://cdn.uviewui.com/uview/album/2.jpg',
-          title: '商品222',
-          desc: '',
-          price: '23.00'
-        },
-        {
-          id: 3,
-          image: 'https://cdn.uviewui.com/uview/album/3.jpg',
-          title: '商品333',
-          desc: '商品描述信息2',
-          price: '33.00'
-        },
-        {
-          id: 4,
-          image: 'https://cdn.uviewui.com/uview/album/4.jpg',
-          title: '商品444',
-          desc: '商品描述信息4',
-          price: '43.00'
-        },
-        {
-          id: 5,
-          image: 'https://cdn.uviewui.com/uview/album/5.jpg',
-          title: '商品555',
-          desc: '商品描述信息5',
-          price: '53.00'
-        }
-      ]
+      categoryList: []
     }
   },
-  onLoad() {},
+  onLoad() {
+    for (let i = 0; i < 10; i++) {
+      this.categoryList.push({
+        id: i,
+        image: '',
+        name: '商品分类' + i,
+        children: [
+          {
+            id: 0,
+            title: '分类' + i + '-1',
+            category: [
+              {
+                id: 0,
+                image: '',
+                title: '分类' + i + '-1-1'
+              },
+              {
+                id: 2,
+                image: '',
+                title: '分类' + i + '-1-2'
+              },
+              {
+                id: 3,
+                image: '',
+                title: '分类' + i + '-1-3'
+              }
+            ]
+          },
+          {
+            id: 1,
+            title: '分类' + i + '-2',
+            category: [
+              {
+                id: 0,
+                image: '',
+                title: '分类' + i + '-2-1'
+              },
+              {
+                id: 2,
+                image: '',
+                title: '分类' + i + '-2-2'
+              },
+              {
+                id: 3,
+                image: '',
+                title: '分类' + i + '-2-3'
+              }
+            ]
+          }
+        ]
+      })
+    }
+  },
   methods: {
     handleSearchClick(e) {
-      console.log('监听点击准备跳转页面')
+      uni.$u.route('/pages/search/search')
     },
     handleCategoryClick(index) {
       if (this.currentIndex !== index) {
         this.currentIndex = index
-        // TODO 查询下分类商品
       }
-    },
-    handleProdItemClick(productId) {
-      uni.$u.route('/pages/product/product', {
-        productId: productId
-      })
     }
   }
 }
 </script>
 
 <style lang="scss" scoped>
+.container {
+  height: calc(100vh - 50px);
+  overflow: hidden;
+}
+
 .search-wrap {
   background: $custom-bg-color;
   padding: 20rpx;
@@ -181,37 +141,43 @@ export default {
     }
   }
   .box-right {
-    width: 550rpx;
-    padding-right: 20rpx;
+    width: 570rpx;
     .category-image {
       padding: 20rpx;
     }
 
-    .prod-list {
-      height: auto !important;
-
-      .prod-item {
-        padding: 10rpx 20rpx;
-        background: #fff;
+    .sub-category-box {
+      .sub-category-header {
         @include flex-space-between;
-        border-bottom: $custom-border-style;
+        padding: 20rpx;
 
-        .prod-image {
-          border-radius: 10rpx;
-          /deep/ * {
-            border-radius: 10rpx;
-          }
+        .title {
+          font-size: 28rpx;
+          font-weight: 700;
         }
+        .more {
+          font-size: 22rpx;
+          color: #939393;
+        }
+      }
 
-        .item-info {
-          width: 350rpx;
-          padding: 5rpx;
-          .info-text {
-            height: 70rpx;
-            padding-bottom: 10rpx;
+      .sub-category-grid {
+        padding: 0 15rpx;
+
+        .sub-category-item {
+          @include flex-center(column);
+          background: #fff;
+
+          .sub-category-image {
+            border-radius: 10rpx;
+            /deep/ * {
+              border-radius: 10rpx;
+            }
           }
-          .price-and-cart {
-            @include flex-space-between;
+
+          .sub-category-title {
+            margin: 15rpx 0;
+            font-size: 24rpx;
           }
         }
       }
