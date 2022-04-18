@@ -4,7 +4,7 @@ import store from '@/store'
 import { getToken } from '@/utils/auth'
 import errorCode from '@/utils/errorCode'
 import Cookies from "js-cookie";
-import {getTenantEnable} from "@/utils/ruoyi";
+import {getPath, getTenantEnable} from "@/utils/ruoyi";
 
 // 是否显示重新登录
 export let isRelogin = { show: false };
@@ -76,7 +76,7 @@ service.interceptors.response.use(res => {
         ).then(() => {
           isRelogin.show = false;
           store.dispatch('LogOut').then(() => {
-            location.href = '/index';
+            location.href = getPath('/index');
           })
         }).catch(() => {
           isRelogin.show = false;
