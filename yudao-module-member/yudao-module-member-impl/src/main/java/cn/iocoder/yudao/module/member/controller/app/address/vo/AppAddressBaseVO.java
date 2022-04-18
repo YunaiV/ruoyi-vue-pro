@@ -1,7 +1,8 @@
 package cn.iocoder.yudao.module.member.controller.app.address.vo;
 
+import cn.iocoder.yudao.framework.common.validation.InEnum;
+import cn.iocoder.yudao.module.member.enums.AddressTypeEnum;
 import lombok.*;
-import java.util.*;
 import io.swagger.annotations.*;
 import javax.validation.constraints.*;
 
@@ -11,8 +12,6 @@ import javax.validation.constraints.*;
 */
 @Data
 public class AppAddressBaseVO {
-
-    // TODO @shuaidawang：swagger 注解的 example；其它 VO 类也要补充下
 
     @ApiModelProperty(value = "收件人名称", required = true)
     @NotNull(message = "收件人名称不能为空")
@@ -30,8 +29,9 @@ public class AppAddressBaseVO {
     @NotNull(message = "收件详细地址不能为空")
     private String detailAddress;
 
-    @ApiModelProperty(value = "地址类型", required = true) // TODO @shuaidawang：这个是枚举字段，最好说明下对应的枚举类
+    @ApiModelProperty(value = "地址类型", required = true)
     @NotNull(message = "地址类型不能为空")
+    @InEnum(AddressTypeEnum.class)
     private Integer type;
 
 }

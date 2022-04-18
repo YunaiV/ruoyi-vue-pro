@@ -45,7 +45,7 @@ public interface AddressService {
      * @param id 编号
      * @return 用户收件地址
      */
-    AddressDO getAddress(Long id);
+    AddressDO getAddress(Long userId, Long id);
 
     /**
      * 获得用户收件地址列表
@@ -54,15 +54,6 @@ public interface AddressService {
      * @return 用户收件地址列表
      */
     List<AddressDO> getAddressList(Long userId);
-    
-    /**
-     * 获得用户收件地址
-     *
-     * @param userId 用户编号
-     * @param id 编号
-     * @return 用户收件地址
-     */
-    AddressDO getAddress(Long userId, Long id);
 
     AddressDO getDefaultUserAddress(Long userId);
 }
