@@ -19,7 +19,7 @@ public class NoticeBaseVO {
     @Size(max = 50, message = "公告标题不能超过50个字符")
     private String title;
 
-    @ApiModelProperty(value = "公告标题", required = true, example = "小博主")
+    @ApiModelProperty(value = "公告类型", required = true, example = "小博主")
     @NotNull(message = "公告类型不能为空")
     private Integer type;
 
