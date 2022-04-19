@@ -144,7 +144,7 @@
             <view class="evan-type-item" :class="{ active: currentEvanIndex === index }" v-for="(item, index) in evanTypeList" :key="item.id" @click="handleEvanTypeClick(index)"> {{ item.name }}({{ item.count }}) </view>
           </view>
           <view class="comment-empty" v-if="true">
-            <u-empty mode="comment" icon="/static/images/empty/comment.png"></u-empty>
+            <u-empty mode="comment" width="350rpx" height="350rpx" icon="/static/images/empty/comment.png"></u-empty>
           </view>
           <view v-else class="comment-list" style="min-height: 50px"> </view>
         </view>
@@ -169,7 +169,7 @@
           <u-button type="warning" shape="circle" size="small" text="加入购物车"></u-button>
         </view>
         <view class="btn-item-main">
-          <u-button type="error" shape="circle" size="small" text="立即购买"></u-button>
+          <u-button type="error" color="#ea322b" shape="circle" size="small" text="立即购买"></u-button>
         </view>
       </view>
     </view>
@@ -355,23 +355,23 @@ export default {
   height: 70rpx;
   .row-left {
     width: 70rpx;
-    font-size: 22rpx;
+    font-size: 24rpx;
     color: #939393;
   }
 
   .row-right {
     @include flex-space-between;
-    width: 620rpx;
+    flex: 1;
 
     .row-content {
-      width: 590rpx;
+      flex: 1;
 
       .delivery-box {
         @include flex-left;
         .delivery-item {
           margin-right: 20rpx;
           @include flex-left;
-          font-size: 14rpx;
+          font-size: 22rpx;
           .delivery-name {
             margin-left: 5rpx;
           }
@@ -382,7 +382,7 @@ export default {
         @include flex-left;
         .prom-item {
           @include flex-left;
-          font-size: 12rpx;
+          font-size: 22rpx;
           .prom-title {
             padding: 1rpx 10rpx;
             border: 1rpx solid red;
@@ -402,7 +402,7 @@ export default {
           @include flex-left;
           .coupon-item {
             @include flex-left;
-            font-size: 12rpx;
+            font-size: 22rpx;
             .coupon-desc {
               padding: 2rpx 15rpx;
               margin-right: 15rpx;
@@ -422,7 +422,7 @@ export default {
         @include flex-space-between;
         .sku-item {
           @include flex-left;
-          font-size: 12rpx;
+          font-size: 22rpx;
           .sku-desc {
             margin-left: 15rpx;
             font-weight: 700;
@@ -547,7 +547,7 @@ export default {
         border-radius: 8rpx;
         padding: 7rpx 12rpx;
         background: #f3f3f3;
-        font-size: 12rpx;
+        font-size: 22rpx;
         text-align: center;
         &.active {
           background: #ffffff;
@@ -559,6 +559,7 @@ export default {
     }
 
     .comment-empty {
+
     }
   }
 }
@@ -579,7 +580,7 @@ export default {
       width: 80rpx;
       @include flex-center(column);
       .btn-text {
-        font-size: 12rpx;
+        font-size: 18rpx;
         color: #666666;
       }
     }

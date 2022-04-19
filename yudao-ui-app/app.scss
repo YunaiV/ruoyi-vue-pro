@@ -1,6 +1,5 @@
 /* 页面公共scss */
 .container {
-	padding-top: var(--status-bar-height);//uni-app提供了状态栏高度的css变量--status-bar-height
 	background-color: $custom-bg-color;
 	box-sizing: border-box;
 	height: 100%;

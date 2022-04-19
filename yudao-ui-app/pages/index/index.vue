@@ -37,22 +37,20 @@
           <text class="bloc-title">每日上新</text>
           <text class="see-more">查看更多</text>
         </view>
-        <u-grid class="prod-grid" :border="false" col="3">
-          <u-grid-item class="prod-item-box" v-for="(item, index) in productList" :key="item.id">
-            <view class="prod-item" @click="handleProdItemClick(item.id)">
-              <u--image class="prod-image" width="230rpx" height="230rpx" :src="item.image"></u--image>
-              <view class="item-info">
-                <view class="info-text">
-                  <u--text :lines="2" size="14px" color="#333333" :text="item.title"></u--text>
-                </view>
-                <view class="price-and-cart">
-                  <custom-text-price color="red" size="12" intSize="18" :price="item.price"></custom-text-price>
-                  <u-icon name="shopping-cart" color="#2979ff" size="28"></u-icon>
-                </view>
+        <view class="prod-grid">
+          <view class="prod-item" v-for="(item, index) in productList" :key="item.id" @click="handleProdItemClick(item.id)">
+            <image class="prod-image" :src="item.image"></image>
+            <view class="item-info">
+              <view class="info-text">
+                <u--text :lines="2" size="14px" color="#333333" :text="item.title"></u--text>
+              </view>
+              <view class="price-and-cart">
+                <custom-text-price color="red" size="12" intSize="18" :price="item.price"></custom-text-price>
+                <u-icon name="shopping-cart" color="#2979ff" size="28"></u-icon>
               </view>
             </view>
-          </u-grid-item>
-        </u-grid>
+          </view>
+        </view>
       </view>
     </view>
 
@@ -62,23 +60,21 @@
           <text class="bloc-title">商品热卖</text>
           <text class="more">更多 &gt;</text>
         </view>
-        <u-grid class="prod-grid" :border="false" col="2">
-          <u-grid-item class="prod-item-box" v-for="(item, index) in productList" :key="item.id">
-            <view class="prod-item" @click="handleProdItemClick(item.id)">
-              <u--image class="prod-image" width="345rpx" height="345rpx" :src="item.image"></u--image>
-              <view class="item-info">
-                <view class="info-text">
-                  <u--text :lines="1" size="14px" color="#333333" :text="item.title"></u--text>
-                  <u--text :lines="1" size="12px" color="#939393" :text="item.desc"></u--text>
-                </view>
-                <view class="price-and-cart">
-                  <custom-text-price color="red" size="12" intSize="18" :price="item.price"></custom-text-price>
-                  <u-icon name="shopping-cart" color="#2979ff" size="28"></u-icon>
-                </view>
+        <view class="prod-grid half">
+          <view class="prod-item" v-for="(item, index) in productList" :key="item.id" @click="handleProdItemClick(item.id)">
+            <image class="prod-image" :src="item.image"></image>
+            <view class="item-info">
+              <view class="info-text">
+                <u--text :lines="1" size="14px" color="#333333" :text="item.title"></u--text>
+                <u--text :lines="1" size="12px" color="#939393" :text="item.desc"></u--text>
+              </view>
+              <view class="price-and-cart">
+                <custom-text-price color="red" size="12" intSize="18" :price="item.price"></custom-text-price>
+                <u-icon name="shopping-cart" color="#2979ff" size="28"></u-icon>
               </view>
             </view>
-          </u-grid-item>
-        </u-grid>
+          </view>
+        </view>
       </view>
     </view>
 
@@ -89,31 +85,26 @@
           <text></text>
         </view>
 
-        <u-list class="prod-list" @scrolltolower="scrolltolower">
-          <u-list-item v-for="(item, index) in productList" :key="item.id">
-            <view class="prod-item" @click="handleProdItemClick(item.id)">
-              <u--image class="prod-image" width="210rpx" height="210rpx" :src="item.image"></u--image>
-              <view class="item-info">
-                <view class="info-text">
-                  <u--text :lines="1" size="14px" color="#333333" :text="item.title"></u--text>
-                  <u-gap height="2px"></u-gap>
-                  <u--text class="info-desc" :lines="2" size="12px" color="#939393" :text="item.desc"></u--text>
-                </view>
-                <view class="price-and-cart">
-                  <custom-text-price color="red" size="12" intSize="18" :price="item.price"></custom-text-price>
-                  <u-icon name="shopping-cart" color="#2979ff" size="28"></u-icon>
-                </view>
+        <view class="prod-list" v-for="(item, index) in productList" :key="item.id">
+          <view class="prod-item" @click="handleProdItemClick(item.id)">
+            <image class="prod-image" :src="item.image"></image>
+            <view class="item-info">
+              <view class="info-text">
+                <u--text :lines="1" size="14px" color="#333333" :text="item.title"></u--text>
+                <u-gap height="2px"></u-gap>
+                <u--text class="info-desc" :lines="2" size="12px" color="#939393" :text="item.desc"></u--text>
+              </view>
+              <view class="price-and-cart">
+                <custom-text-price color="red" size="12" intSize="18" :price="item.price"></custom-text-price>
+                <u-icon name="shopping-cart" color="#2979ff" size="28"></u-icon>
               </view>
             </view>
-          </u-list-item>
-        </u-list>
+          </view>
+        </view>
       </view>
     </view>
-    <u-gap height="5px"></u-gap>
     <!--加载更多-->
-    <u-loadmore fontSize="32rpx" :status="status" :loading-text="loadingText" :loadmore-text="loadmoreText" :nomore-text="nomoreText" />
-
-    <u-gap height="10px"></u-gap>
+    <u-loadmore fontSize="28rpx" :status="status" :loading-text="loadingText" :loadmore-text="loadmoreText" :nomore-text="nomoreText" />
   </view>
 </template>
 
@@ -201,7 +192,7 @@ export default {
         })
     },
     handleSearchClick(e) {
-      console.log('监听点击准备跳转页面')
+      uni.$u.route('/pages/search/search')
     },
     handleSwiperClick(index) {
       console.log('点击了图片索引值：', index)
@@ -264,7 +255,7 @@ export default {
   margin-top: -160px;
   .bloc-header {
     @include flex-space-between;
-    padding: 10rpx 30rpx;
+    padding: 10rpx 20rpx;
 
     .bloc-title {
       color: $custom-bg-color;
@@ -299,25 +290,40 @@ export default {
   .prod-grid {
     width: 730rpx;
     margin: 0 auto;
-    .prod-item-box {
-      padding: 10rpx;
+    @include flex;
+    flex-wrap: wrap;
+    justify-content: left;
+
+    &.half {
       .prod-item {
-        background: #fff;
-        border-radius: 10rpx;
-        box-shadow: -1rpx 1rpx 2rpx #afd3f5, 1rpx 1rpx 0rpx #afd3f5;
-        justify-content: left;
-        /deep/ * {
-          border-radius: 10rpx 10rpx 0 0;
+        width: 346rpx;
+        margin: 10rpx;
+        .prod-image {
+          width: 346rpx;
+          height: 346rpx;
         }
-        .item-info {
-          padding: 15rpx;
-          .info-text {
-            height: 70rpx;
-            padding-bottom: 10rpx;
-          }
-          .price-and-cart {
-            @include flex-space-between;
-          }
+      }
+    }
+
+    .prod-item {
+      width: 224rpx;
+      margin: 10rpx;
+      background: #ffffff;
+      border-radius: 10rpx;
+      box-shadow: -1rpx 1rpx 2rpx #afd3f5, 1rpx 1rpx 0rpx #afd3f5;
+      .prod-image {
+        width: 224rpx;
+        height: 224rpx;
+        border-radius: 10rpx 10rpx 0 0;
+      }
+      .item-info {
+        padding: 15rpx;
+        .info-text {
+          height: 70rpx;
+          padding-bottom: 10rpx;
+        }
+        .price-and-cart {
+          @include flex-space-between;
         }
       }
     }
@@ -325,24 +331,21 @@ export default {
 }
 
 .prod-list {
-  height: auto !important;
 
   .prod-item {
-    padding: 20rpx;
-    background: #fff;
+    background: #ffffff;
     @include flex-space-between;
     border-bottom: $custom-border-style;
-
+    padding: 20rpx;
     .prod-image {
+      width: 200rpx;
+      height: 200rpx;
       border-radius: 10rpx;
-      /deep/ * {
-        border-radius: 10rpx;
-      }
     }
 
     .item-info {
-      width: 450rpx;
-      padding: 20rpx 30rpx 0 30rpx;
+      flex: 1;
+      padding: 20rpx 20rpx 0;
       .info-text {
         height: 100rpx;
         padding-bottom: 10rpx;

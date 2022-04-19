@@ -1,7 +1,7 @@
 <template>
   <view class="container">
     <view class="user-header">
-      <view class="user-info" @click="handleUserInfoClick">
+      <view class="user-info" @click="loginOrJump('/pages/profile/profile')">
         <u-avatar size="80" :src="avatar"></u-avatar>
         <text class="nick-name">{{ nickName }}</text>
       </view>
@@ -45,10 +45,13 @@
       <u-cell class="fun-item" :border="false" icon="gift" title="分销中心" isLink></u-cell>
       <u-cell class="fun-item" :border="false" icon="tags" title="领券中心" isLink></u-cell>
       <u-cell class="fun-item" :border="false" icon="coupon" title="我的优惠券" isLink></u-cell>
-      <u-cell class="fun-item" :border="false" icon="map" title="收获地址" isLink></u-cell>
+      <u-cell class="fun-item" :border="false" icon="map" title="收货地址"  @click="loginOrJump('/pages/address/list')" isLink></u-cell>
     </u-cell-group>
 
-    <u-button class="logout-btn" type="error" color="#ea322b" text="确定"></u-button>
+    <view class="logout-btn">
+      <u-button type="error" color="#ea322b" text="确定"></u-button>
+    </view>
+
   </view>
 </template>
 
@@ -65,20 +68,20 @@ export default {
         { icon: 'integral', title: '已完成' }
       ],
       statList: [
-        { value: '2', title: '我的收藏' },
-        { value: '3', title: '我的消息' },
-        { value: '3', title: '我的足迹' }
+        { value: '0', title: '我的收藏' },
+        { value: '0', title: '我的消息' },
+        { value: '0', title: '我的足迹' }
       ]
     }
   },
   onLoad() {},
   methods: {
-    handleUserInfoClick() {
+    loginOrJump(pageUrl){
       // TODO 判断是否已经登录逻辑
       if (!uni.getStorageSync('token')) {
         uni.$u.route('/pages/login/login')
       } else {
-        uni.$u.route('/pages/profile/profile')
+        uni.$u.route(pageUrl)
       }
     }
   }
@@ -145,7 +148,7 @@ export default {
 }
 
 .logout-btn {
-  margin-top: 60rpx;
-  width: 300rpx;
+  margin: 60rpx auto 0;
+  width: 400rpx;
 }
 </style>

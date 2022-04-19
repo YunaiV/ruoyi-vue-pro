@@ -5,25 +5,23 @@
     </view>
     <view class="category-box">
       <view class="box-left">
-        <u-list @scrolltolower="scrolltolower">
-          <u-list-item class="category-item" v-for="(item, index) in categoryList" :key="item.id">
+        <view>
+          <view class="category-item" v-for="(item, index) in categoryList" :key="item.id">
             <view class="item-title" :class="{ active: currentIndex === index }" @click="handleCategoryClick(index)">
               <text>{{ item.name }}</text>
             </view>
-          </u-list-item>
-        </u-list>
+          </view>
+        </view>
       </view>
       <view class="box-right">
-        <view class="category-image">
-          <u--image :showLoading="true" :src="categoryList[currentIndex].image" width="530rpx" height="160rpx" @click="click"></u--image>
-        </view>
+        <image class="category-image" :showLoading="true" :src="categoryList[currentIndex].image" width="530rpx" height="160rpx" @click="click"></image>
         <view class="sub-category-box" v-for="(item, index) in categoryList[currentIndex].children" :key="item.id">
           <view class="sub-category-header">
             <view class="title">{{ item.title }}</view>
             <view class="more">查看更多</view>
           </view>
           <u-grid class="sub-category-grid" col="3">
-            <u-grid-item v-for="(subItem, index) in item.category" :key="subItem.id">
+            <u-grid-item v-for="(subItem, subIndex) in item.category" :key="subItem.id">
               <view class="sub-category-item">
                 <u-icon name="photo" :size="80"></u-icon>
                 <text class="sub-category-title">{{ subItem.title }}</text>
@@ -48,7 +46,7 @@ export default {
     for (let i = 0; i < 10; i++) {
       this.categoryList.push({
         id: i,
-        image: '',
+        image: 'https://cdn.uviewui.com/uview/swiper/swiper1.png',
         name: '商品分类' + i,
         children: [
           {
@@ -111,10 +109,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.container {
-  height: calc(100vh - 50px);
-  overflow: hidden;
-}
 
 .search-wrap {
   background: $custom-bg-color;
@@ -124,7 +118,7 @@ export default {
 .category-box {
   display: flex;
   .box-left {
-    width: 180rpx;
+    width: 200rpx;
     padding-top: 20rpx;
     border-right: $custom-border-style;
     .category-item {
@@ -132,7 +126,7 @@ export default {
       padding: 20rpx 0;
       .item-title {
         padding-left: 30rpx;
-        font-size: 30rpx;
+        font-size: 28rpx;
         &.active {
           border-left: 6rpx solid $u-primary;
           font-weight: 700;
@@ -141,15 +135,17 @@ export default {
     }
   }
   .box-right {
-    width: 570rpx;
+    flex: 1;
     .category-image {
+      width: 510rpx;
+      height: 160rpx;
       padding: 20rpx;
     }
 
     .sub-category-box {
       .sub-category-header {
         @include flex-space-between;
-        padding: 20rpx;
+        padding: 30rpx 20rpx;
 
         .title {
           font-size: 28rpx;
@@ -167,13 +163,6 @@ export default {
         .sub-category-item {
           @include flex-center(column);
           background: #fff;
-
-          .sub-category-image {
-            border-radius: 10rpx;
-            /deep/ * {
-              border-radius: 10rpx;
-            }
-          }
 
           .sub-category-title {
             margin: 15rpx 0;

@@ -53,7 +53,31 @@
 			"style": {
 				"navigationBarTitleText": "商品详情"
 			}
-		}
+		},
+    {
+      "path": "pages/address/list",
+      "style": {
+        "navigationBarTitleText": "收货列表"
+      }
+    },
+    {
+      "path": "pages/search/search",
+      "style": {
+        "navigationBarTitleText": "商品搜索"
+      }
+    },
+    {
+      "path": "pages/address/add",
+      "style": {
+        "navigationBarTitleText": "新增地址"
+      }
+    },
+    {
+      "path": "pages/address/edit",
+      "style": {
+        "navigationBarTitleText": "修改地址"
+      }
+    }
 	],
 	"tabBar": {
 		"selectedColor": "#333333",
@@ -86,8 +110,7 @@
 		]
 	},
 	"globalStyle": {
-		"navigationStyle": "custom",//取消默认导航栏
-		"navigationBarTextStyle": "white",
+		"navigationBarTextStyle": "black",
 		"navigationBarTitleText": "yudao-ui-app",
 		"navigationBarBackgroundColor": "#F8F8F8",
 		"backgroundColor": "#FFFFFF"

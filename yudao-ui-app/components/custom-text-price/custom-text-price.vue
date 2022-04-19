@@ -1,5 +1,5 @@
 <template>
-  <view class="u-text-price-wrap">
+  <view>
     <text v-for="(item, index) in textArray" :key="index" :style="{ 'font-size': (index === 1 ? integerSize : size) + 'px', 'color': color }">
       {{ item }}
     </text>
@@ -8,7 +8,7 @@
 
 <script>
 /**
- * 此组件存在只为简单的显示特定样式的(人名币)价格数字
+ * 此组件简单的显示特定样式的(人名币)价格数字
  */
 export default {
   name: 'custom-text-price',
@@ -51,4 +51,4 @@ export default {
   }
 }
 </script>
-<style></style>
+<style scoped></style>

@@ -14,7 +14,7 @@
       <u-gap height="40"></u-gap>
 
       <!-- 登录表单 -->
-      <u--form class="unp-form" labelPosition="left" :model="formData" :rules="rules" ref="form">
+      <u--form labelPosition="left" :model="formData" :rules="rules" ref="form">
         <u-form-item label="手机号" prop="mobile" labelWidth="60" borderBottom ref="item-mobile">
           <u-input type="number" maxlength="11" v-model="formData.mobile" clearable placeholder="请填写手机号" border="none"></u-input>
         </u-form-item>
@@ -36,10 +36,12 @@
           <u-code ref="uCode" @change="codeChange" seconds="60" @start="codeDisabled = true" @end="codeDisabled = false"></u-code>
         </u-form-item>
 
-        <u-button type="primary" text="登录" customStyle="margin-top: 50px" @click="handleSubmit"></u-button>
+        <view class="btn-group">
+          <u-button type="primary" text="登录" customStyle="margin-top: 50px" @click="handleSubmit"></u-button>
 
-        <u-gap height="20"></u-gap>
-        <u-button type="info" text="返回" @click="navigateBack()"></u-button>
+          <u-gap height="20"></u-gap>
+          <u-button type="info" text="返回" @click="navigateBack()"></u-button>
+        </view>
       </u--form>
     </view>
   </view>
@@ -193,10 +195,12 @@ export default {
   .mode-section {
     width: 560rpx;
   }
-  .unp-form {
+  .btn-group {
     width: 560rpx;
   }
 }
+
+
 
 .lk-group {
   height: 40rpx;
