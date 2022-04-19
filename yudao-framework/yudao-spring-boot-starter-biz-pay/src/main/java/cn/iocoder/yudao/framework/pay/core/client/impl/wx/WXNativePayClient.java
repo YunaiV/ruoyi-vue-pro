@@ -38,14 +38,14 @@ public class WXNativePayClient extends AbstractPayClient<WXPayClientConfig> {
     private WxPayService client;
 
     public WXNativePayClient(Long channelId, WXPayClientConfig config) {
-        super(channelId, PayChannelEnum.WX_PUB.getCode(), config, new WXCodeMapping());
+        super(channelId, PayChannelEnum.WX_NATIVE.getCode(), config, new WXCodeMapping());
     }
 
     @Override
     protected void doInit() {
         WxPayConfig payConfig = new WxPayConfig();
         BeanUtil.copyProperties(config, payConfig, "keyContent");
-        payConfig.setTradeType(WxPayConstants.TradeType.JSAPI); // 设置使用 JS API 支付方式
+        payConfig.setTradeType(WxPayConstants.TradeType.NATIVE); // 设置使用 native 支付方式
 //        if (StrUtil.isNotEmpty(config.getKeyContent())) {
 //            payConfig.setKeyContent(config.getKeyContent().getBytes(StandardCharsets.UTF_8));
 //        }
@@ -97,7 +97,6 @@ public class WXNativePayClient extends AbstractPayClient<WXPayClientConfig> {
                 .totalFee(reqDTO.getAmount().intValue()) // 单位分
 //                .timeExpire(DateUtil.format(reqDTO.getExpireTime(), "yyyyMMddHHmmss"))
                 .spbillCreateIp(reqDTO.getUserIp())
-                .tradeType(WxPayConstants.TradeType.NATIVE)
                 .notifyUrl(reqDTO.getNotifyUrl())
                 .productId(trade_type)
                 .build();
