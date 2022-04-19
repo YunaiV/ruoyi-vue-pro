@@ -53,15 +53,13 @@ import { passwordLogin, sendSmsCode, smsLogin } from '../../common/api'
 export default {
   data() {
     return {
-      //租户ID
-      agent: 1,
       currentModeIndex: 0,
       loginModeList: ['密码登录', '验证码登录'],
       inputType: 'password',
       codeDisabled: false,
       codeTips: '',
       formData: {
-        mobile: '15601691234',
+        mobile: '',
         password: '',
         code: ''
       },
@@ -131,17 +129,17 @@ export default {
         })
 
         //scene:1登陆获取验证码场景
-        sendSmsCode({ agent: 1, mobile: mobile, scene: 1 })
+        sendSmsCode({ mobile: mobile, scene: 1 })
           .then(res => {
             //console.log(res)
             uni.hideLoading()
-            if (res.data.code === 0) {
+            if (res.code === 0) {
               // 这里此提示会被this.start()方法中的提示覆盖
               uni.$u.toast('验证码已发送')
               // 通知验证码组件内部开始倒计时
               this.$refs.uCode.start()
             } else {
-              uni.$u.toast(res.data.msg)
+              uni.$u.toast(res.msg)
             }
           })
           .catch(err => {
@@ -153,25 +151,29 @@ export default {
     },
     handleSubmit() {
       this.$refs.form.validate().then(res => {
-        uni.$u.toast('登录')
         if (this.currentModeIndex === 0) {
-          passwordLogin({ agent: 1, mobile: this.formData.mobile, password: this.formData.password })
-            .then(res => {
-              if (res.data.code === 0) {
-                uni.$u.toast('登录成功')
-                // TODO 登录成功，保存toke
-              } else {
-                uni.$u.toast(res.data.msg)
-                // TODO 登录失败
-              }
-            })
-            .catch(err => {
-              uni.$u.toast('服务器接口请求异常')
-            })
+          this.handleLoginPromise(passwordLogin({ mobile: this.formData.mobile, password: this.formData.password }))
         } else if (this.currentModeIndex === 1) {
-          smsLogin({ agent: 1, mobile: this.formData.mobile, code: this.formData.code })
+          this.handleLoginPromise(smsLogin({ mobile: this.formData.mobile, code: this.formData.code }))
         }
       })
+    },
+    handleLoginPromise(promise) {
+      promise
+        .then(res => {
+          if (res.code === 0) {
+            this.$store.commit('setToken', res.data)
+            uni.$u.toast('登录成功')
+            setTimeout(() => {
+              this.navigateBack()
+            }, 1000)
+          } else {
+            uni.$u.toast(res.msg)
+          }
+        })
+        .catch(err => {
+          uni.$u.toast('接口请求失败')
+        })
     },
     navigateBack() {
       uni.navigateBack()
@@ -199,8 +201,6 @@ export default {
     width: 560rpx;
   }
 }
-
-
 
 .lk-group {
   height: 40rpx;

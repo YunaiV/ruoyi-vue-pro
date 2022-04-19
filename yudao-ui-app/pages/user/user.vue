@@ -2,8 +2,8 @@
   <view class="container">
     <view class="user-header">
       <view class="user-info" @click="loginOrJump('/pages/profile/profile')">
-        <u-avatar size="80" :src="avatar"></u-avatar>
-        <text class="nick-name">{{ nickName }}</text>
+        <u-avatar size="80" :src="userInfo.avatar"></u-avatar>
+        <text class="nick-name">{{ hasLogin ? userInfo.nickname || '游客' : '点击登录' }}</text>
       </view>
     </view>
 
@@ -19,8 +19,8 @@
       </view>
 
       <view class="order-status-box">
-        <u-grid :border="false" :col="orderStatusList.length"
-          ><u-grid-item v-for="(item, index) in orderStatusList" :key="index">
+        <u-grid :border="false" :col="orderStatusList.length">
+          <u-grid-item v-for="(item, index) in orderStatusList" :key="index">
             <u-icon :name="item.icon" :size="32"></u-icon>
             <text class="grid-title">{{ item.title }}</text>
           </u-grid-item>
@@ -45,13 +45,12 @@
       <u-cell class="fun-item" :border="false" icon="gift" title="分销中心" isLink></u-cell>
       <u-cell class="fun-item" :border="false" icon="tags" title="领券中心" isLink></u-cell>
       <u-cell class="fun-item" :border="false" icon="coupon" title="我的优惠券" isLink></u-cell>
-      <u-cell class="fun-item" :border="false" icon="map" title="收货地址"  @click="loginOrJump('/pages/address/list')" isLink></u-cell>
+      <u-cell class="fun-item" :border="false" icon="map" title="收货地址" @click="loginOrJump('/pages/address/list')" isLink></u-cell>
     </u-cell-group>
 
-    <view class="logout-btn">
-      <u-button type="error" color="#ea322b" text="确定"></u-button>
+    <view v-if="hasLogin" class="logout-btn">
+      <u-button type="error" color="#ea322b" text="退出登录" @click="logout"></u-button>
     </view>
-
   </view>
 </template>
 
@@ -59,8 +58,6 @@
 export default {
   data() {
     return {
-      avatar: '',
-      nickName: '点击登录',
       orderStatusList: [
         { icon: 'rmb-circle', title: '待支付' },
         { icon: 'car', title: '代发货' },
@@ -76,13 +73,34 @@ export default {
   },
   onLoad() {},
   methods: {
-    loginOrJump(pageUrl){
-      // TODO 判断是否已经登录逻辑
-      if (!uni.getStorageSync('token')) {
+    loginOrJump(pageUrl) {
+      if (!this.hasLogin) {
         uni.$u.route('/pages/login/login')
       } else {
         uni.$u.route(pageUrl)
       }
+    },
+    logout() {
+      uni.showModal({
+        title: '提示',
+        content: '您确定要退出登录吗',
+        success: res => {
+          if (res.confirm) {
+            console.log('用户点击确定')
+            this.$store.commit('logout')
+          } else if (res.cancel) {
+            console.log('用户点击取消')
+          }
+        }
+      })
+    }
+  },
+  computed: {
+    userInfo() {
+      return this.$store.state.userInfo
+    },
+    hasLogin() {
+      return this.$store.getters.hasLogin
     }
   }
 }

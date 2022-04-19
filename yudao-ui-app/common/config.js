@@ -1,3 +1,8 @@
 module.exports = {
-    baseUrl: 'http://192.168.3.199:8086'
+  //后端接口地址
+  baseUrl: 'http://127.0.0.1:48080',
+  header: {
+    //租户ID
+    'tenant-id': 1
+  }
 }

@@ -1,14 +1,16 @@
 import Vue from 'vue'
 import App from './App'
 
+// 引入全局uView
+import uView from '@/uni_modules/uview-ui'
+
 // vuex
 import store from './store'
 
 Vue.config.productionTip = false
 Vue.prototype.$store = store
 
-// 引入全局uView
-import uView from '@/uni_modules/uview-ui'
+
 
 App.mpType = 'app'
 Vue.use(uView)

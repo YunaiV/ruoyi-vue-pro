@@ -4,7 +4,7 @@
       <u-empty mode="car" width="500rpx" height="500rpx" icon="/static/images/empty/cart.png"></u-empty>
     </view>
 
-    <view class="login-tips-box">
+    <view v-if="!hasLogin" class="login-tips-box">
       <view class="login-tips">
         <navigator url="/pages/login/login" open-type="navigate" hover-class="none">
           <text class="login-link">登录</text>
@@ -23,7 +23,12 @@ export default {
     }
   },
   onLoad() {},
-  methods: {}
+  methods: {},
+  computed: {
+    hasLogin() {
+      return this.$store.getters.hasLogin
+    }
+  }
 }
 </script>
 
