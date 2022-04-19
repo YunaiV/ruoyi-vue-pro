@@ -1,10 +1,7 @@
 package cn.iocoder.yudao.module.member.service.address;
 
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.member.controller.app.address.vo.AppAddressCreateReqVO;
-import cn.iocoder.yudao.module.member.controller.app.address.vo.AppAddressExportReqVO;
-import cn.iocoder.yudao.module.member.controller.app.address.vo.AppAddressPageReqVO;
 import cn.iocoder.yudao.module.member.controller.app.address.vo.AppAddressUpdateReqVO;
 import cn.iocoder.yudao.module.member.dal.dataobject.address.AddressDO;
 import cn.iocoder.yudao.module.member.dal.mysql.address.AddressMapper;
@@ -13,7 +10,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
-import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
@@ -129,23 +125,6 @@ public class AddressServiceImplTest extends BaseDbUnitTest {
        addressMapper.insert(cloneIgnoreId(dbAddress, o -> o.setType(null)));
        // 测试 createTime 不匹配
        addressMapper.insert(cloneIgnoreId(dbAddress, o -> o.setCreateTime(null)));
-       // 准备参数
-       AppAddressPageReqVO reqVO = new AppAddressPageReqVO();
-       reqVO.setUserId(null);
-       reqVO.setName(null);
-       reqVO.setMobile(null);
-       reqVO.setAreaCode(null);
-       reqVO.setDetailAddress(null);
-       reqVO.setType(null);
-       reqVO.setBeginCreateTime(null);
-       reqVO.setEndCreateTime(null);
-
-       // 调用
-       PageResult<AddressDO> pageResult = addressService.getAddressPage(reqVO);
-       // 断言
-       assertEquals(1, pageResult.getTotal());
-       assertEquals(1, pageResult.getList().size());
-       assertPojoEquals(dbAddress, pageResult.getList().get(0));
     }
 
     @Test
@@ -176,22 +155,6 @@ public class AddressServiceImplTest extends BaseDbUnitTest {
        addressMapper.insert(cloneIgnoreId(dbAddress, o -> o.setType(null)));
        // 测试 createTime 不匹配
        addressMapper.insert(cloneIgnoreId(dbAddress, o -> o.setCreateTime(null)));
-       // 准备参数
-       AppAddressExportReqVO reqVO = new AppAddressExportReqVO();
-       reqVO.setUserId(null);
-       reqVO.setName(null);
-       reqVO.setMobile(null);
-       reqVO.setAreaCode(null);
-       reqVO.setDetailAddress(null);
-       reqVO.setType(null);
-       reqVO.setBeginCreateTime(null);
-       reqVO.setEndCreateTime(null);
-
-       // 调用
-       List<AddressDO> list = addressService.getAddressList(reqVO);
-       // 断言
-       assertEquals(1, list.size());
-       assertPojoEquals(dbAddress, list.get(0));
     }
 
 }

@@ -1,13 +1,13 @@
 package cn.iocoder.yudao.module.member.dal.mysql.address;
 
-import java.util.*;
 
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
+import cn.iocoder.yudao.framework.mybatis.core.query.QueryWrapperX;
 import cn.iocoder.yudao.module.member.dal.dataobject.address.AddressDO;
+import cn.iocoder.yudao.module.member.enums.AddressTypeEnum;
 import org.apache.ibatis.annotations.Mapper;
-import cn.iocoder.yudao.module.member.controller.app.address.vo.*;
+
+import java.util.List;
 
 /**
  * 用户收件地址 Mapper
@@ -17,16 +17,48 @@ import cn.iocoder.yudao.module.member.controller.app.address.vo.*;
 @Mapper
 public interface AddressMapper extends BaseMapperX<AddressDO> {
 
-    default PageResult<AddressDO> selectPage(AppAddressPageReqVO reqVO) {
-        return selectPage(reqVO, new LambdaQueryWrapperX<AddressDO>()
-                .eqIfPresent(AddressDO::getUserId, reqVO.getUserId())
-                .likeIfPresent(AddressDO::getName, reqVO.getName())
-                .eqIfPresent(AddressDO::getMobile, reqVO.getMobile())
-                .eqIfPresent(AddressDO::getAreaCode, reqVO.getAreaCode())
-                .eqIfPresent(AddressDO::getDetailAddress, reqVO.getDetailAddress())
-                .eqIfPresent(AddressDO::getType, reqVO.getType())
-                .betweenIfPresent(AddressDO::getCreateTime, reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
-                .orderByDesc(AddressDO::getId));
+    /**
+     * 获取当前地址 根据id和userId
+     * @param userId
+     * @param id
+     * @return
+     */
+    default AddressDO getAddressByIdAndUserId(Long userId, Long id) {
+        QueryWrapperX<AddressDO> queryWrapperX = new QueryWrapperX<>();
+        queryWrapperX.eq("user_id", userId).eq("id", id);
+        return selectList(queryWrapperX).stream().findFirst().orElse(null);
+    }
+
+    /**
+     * 获取地址列表
+     * @param userId
+     * @param type
+     * @return
+     */
+    default List<AddressDO> selectListByUserIdAndType(Long userId, Integer type) {
+        QueryWrapperX<AddressDO> queryWrapperX = new QueryWrapperX<AddressDO>().eq("user_id", userId)
+                .eqIfPresent("type", type);
+        return selectList(queryWrapperX);
+    }
+
+    /**
+     * 获取默认地址
+     * @param userId
+     * @return
+     */
+    default AddressDO getDefaultUserAddress(Long userId) {
+        List<AddressDO> addressDOList = selectListByUserIdAndType(userId, AddressTypeEnum.DEFAULT.getType());
+        return addressDOList.stream().findFirst().orElse(null);
+    }
+
+    /**
+     * 获取默认地址
+     * @param id
+     * @param addressTypeEnum
+     * @return
+     */
+    default int updateTypeById(Long id, AddressTypeEnum addressTypeEnum) {
+       return updateById(new AddressDO().setId(id).setType(addressTypeEnum.getType()));
     }
 
 }
