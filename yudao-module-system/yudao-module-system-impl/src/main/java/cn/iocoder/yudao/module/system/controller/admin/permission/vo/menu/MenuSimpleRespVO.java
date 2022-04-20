@@ -24,7 +24,6 @@ public class MenuSimpleRespVO {
     private Long parentId;
 
     @ApiModelProperty(value = "类型", required = true, example = "1", notes = "参见 MenuTypeEnum 枚举类")
-    @NotNull(message = "菜单类型不能为空")
     private Integer type;
 
 }

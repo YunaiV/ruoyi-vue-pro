@@ -34,6 +34,12 @@ public class AuthMenuRespVO {
     @ApiModelProperty(value = "菜单图标", example = "/menu/list", notes = "仅菜单类型为菜单或者目录时，才需要传")
     private String icon;
 
+    @ApiModelProperty(value = "是否可见", required = true, example = "false")
+    private Boolean visible;
+
+    @ApiModelProperty(value = "是否缓存", required = true, example = "false")
+    private Boolean keepAlive;
+
     /**
      * 子路由
      */

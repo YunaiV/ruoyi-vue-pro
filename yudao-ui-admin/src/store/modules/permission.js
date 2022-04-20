@@ -53,8 +53,10 @@ function filterAsyncRouter(asyncRouterMap, lastRouter = false, type = false) {
     // 处理 meta 属性
     route.meta = {
       title: route.name,
-      icon: route.icon
+      icon: route.icon,
+      noCache: !route.keepAlive,
     }
+    route.hidden = !route.visible
     // 处理 component 属性
     if (route.children) { // 父节点
       if (route.parentId === 0) {
