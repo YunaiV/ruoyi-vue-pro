@@ -71,7 +71,9 @@ export default {
       ]
     }
   },
-  onLoad() {},
+  onLoad() {
+    this.$store.dispatch('obtainUserInfo')
+  },
   methods: {
     loginOrJump(pageUrl) {
       if (!this.hasLogin) {
@@ -87,7 +89,7 @@ export default {
         success: res => {
           if (res.confirm) {
             console.log('用户点击确定')
-            this.$store.commit('logout')
+            this.$store.dispatch('logout')
           } else if (res.cancel) {
             console.log('用户点击取消')
           }
