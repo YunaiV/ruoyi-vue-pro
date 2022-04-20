@@ -172,6 +172,7 @@
           <u-button type="error" color="#ea322b" shape="circle" size="small" text="立即购买"></u-button>
         </view>
       </view>
+      <u-safe-bottom customStyle="background: #ffffff"></u-safe-bottom>
     </view>
   </view>
 </template>
@@ -313,7 +314,11 @@ export default {
       // TODO 展示评论
     }
   },
-  computed: {}
+  computed: {
+    hasLogin() {
+      return this.$store.getters.hasLogin
+    }
+  }
 }
 </script>
 
@@ -505,7 +510,7 @@ export default {
     padding: 30rpx;
     .prom-item {
       @include flex-left;
-      font-size: 14rpx;
+      font-size: 22rpx;
       margin-bottom: 15rpx;
       .prom-title {
         padding: 1rpx 10rpx;
@@ -559,7 +564,7 @@ export default {
     }
 
     .comment-empty {
-
+      margin-bottom: 100rpx;
     }
   }
 }
