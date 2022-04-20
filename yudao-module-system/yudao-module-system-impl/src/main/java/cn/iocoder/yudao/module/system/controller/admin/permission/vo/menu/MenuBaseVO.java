@@ -50,4 +50,10 @@ public class MenuBaseVO {
     @NotNull(message = "状态不能为空")
     private Integer status;
 
+    @ApiModelProperty(value = "是否可见", example = "false")
+    private Boolean visible;
+
+    @ApiModelProperty(value = "是否缓存", example = "false")
+    private Boolean keepAlive;
+
 }
