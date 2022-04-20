@@ -57,13 +57,13 @@
     {
       "path": "pages/address/list",
       "style": {
-        "navigationBarTitleText": "收货列表"
+        "navigationBarTitleText": "收货地址"
       }
     },
     {
       "path": "pages/search/search",
       "style": {
-        "navigationBarTitleText": "商品搜索"
+        "navigationBarTitleText": "搜索"
       }
     },
     {

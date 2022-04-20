@@ -129,22 +129,13 @@ export default {
         })
 
         //scene:1登陆获取验证码场景
-        sendSmsCode({ mobile: mobile, scene: 1 })
-          .then(res => {
-            //console.log(res)
-            uni.hideLoading()
-            if (res.code === 0) {
-              // 这里此提示会被this.start()方法中的提示覆盖
-              uni.$u.toast('验证码已发送')
-              // 通知验证码组件内部开始倒计时
-              this.$refs.uCode.start()
-            } else {
-              uni.$u.toast(res.msg)
-            }
-          })
-          .catch(err => {
-            uni.$u.toast('服务器接口请求异常')
-          })
+        sendSmsCode({ mobile: mobile, scene: 1 }).then(res => {
+          //console.log(res)
+          uni.hideLoading()
+          uni.$u.toast('验证码已发送')
+          // 通知验证码组件内部开始倒计时
+          this.$refs.uCode.start()
+        })
       } else {
         uni.$u.toast('倒计时结束后再发送')
       }
@@ -159,21 +150,13 @@ export default {
       })
     },
     handleLoginPromise(promise) {
-      promise
-        .then(res => {
-          if (res.code === 0) {
-            this.$store.commit('setToken', res.data)
-            uni.$u.toast('登录成功')
-            setTimeout(() => {
-              this.navigateBack()
-            }, 1000)
-          } else {
-            uni.$u.toast(res.msg)
-          }
-        })
-        .catch(err => {
-          uni.$u.toast('接口请求失败')
-        })
+      promise.then(res => {
+        this.$store.commit('setToken', res.data)
+        uni.$u.toast('登录成功')
+        setTimeout(() => {
+          this.navigateBack()
+        }, 1000)
+      })
     },
     navigateBack() {
       uni.navigateBack()

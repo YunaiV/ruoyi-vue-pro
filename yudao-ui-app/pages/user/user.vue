@@ -72,7 +72,9 @@ export default {
     }
   },
   onLoad() {
-    this.$store.dispatch('obtainUserInfo')
+    if (this.hasLogin){
+      this.$store.dispatch('obtainUserInfo')
+    }
   },
   methods: {
     loginOrJump(pageUrl) {

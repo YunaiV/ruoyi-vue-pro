@@ -78,12 +78,9 @@ export default {
       })
     },
     handleSubmit() {
-      this.$refs.form
-        .validate()
-        .then(res => {
-          uni.$u.toast('点击了注册账号')
-        })
-        .catch(err => {})
+      this.$refs.form.validate().then(res => {
+        uni.$u.toast('点击了注册账号')
+      })
     },
     navigateBack() {
       uni.navigateBack()

@@ -121,7 +121,6 @@ export default {
         .then(res => {
           uni.$u.toast('点击了重置密码')
         })
-        .catch(err => {})
     },
     navigateBack() {
       uni.navigateBack()

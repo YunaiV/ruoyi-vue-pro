@@ -174,22 +174,14 @@ export default {
   },
   methods: {
     loadBannerData() {
-      getBannerData()
-        .then(res => {
-          this.bannerList = res.data
-        })
-        .catch(err => {
-          //console.log(err)
-        })
+      getBannerData().then(res => {
+        this.bannerList = res.data
+      })
     },
     loadNoticeData() {
-      getNoticeData()
-        .then(res => {
-          this.noticeList = res.data
-        })
-        .catch(err => {
-          //console.log(err)
-        })
+      getNoticeData().then(res => {
+        this.noticeList = res.data
+      })
     },
     handleSearchClick(e) {
       uni.$u.route('/pages/search/search')
@@ -331,7 +323,6 @@ export default {
 }
 
 .prod-list {
-
   .prod-item {
     background: #ffffff;
     @include flex-space-between;
