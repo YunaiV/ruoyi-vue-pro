@@ -11,6 +11,8 @@ import java.util.Collection;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 
+import static java.io.File.separator;
+
 /**
  * 项目修改器，一键替换 Maven 的 groupId、artifactId，项目的 package 等
  * <p>
@@ -39,9 +41,9 @@ public class ProjectReactor {
         log.info("[main][新项目路径地址]projectBaseDirNew: " + projectBaseDirNew);
 
         // 获得需要复制的文件
-        log.info("[main][开始获得需要重写的文件]");
+        log.info("[main][开始获得需要重写的文件，预计需要 10-20 秒]");
         Collection<File> files = listFiles(projectBaseDir);
-        log.info("[main][需要重写的文件数量：{}，预计需要 5-10 秒]", files.size());
+        log.info("[main][需要重写的文件数量：{}，预计需要 15-30 秒]", files.size());
         // 写入文件
         files.forEach(file -> {
             String content = replaceFileContent(file, groupIdNew, artifactIdNew, packageNameNew, titleNew);
@@ -51,19 +53,19 @@ public class ProjectReactor {
     }
 
     private static String getProjectBaseDir() {
-        return StrUtil.subBefore(new File(ProjectReactor.class.getClassLoader().getResource(File.separator).getFile()).getPath(), File.separator + "yudao-server", false);
+        return StrUtil.subBefore(ProjectReactor.class.getClassLoader().getResource("").getFile(),
+                separator + "yudao-server", false);
     }
 
     private static Collection<File> listFiles(String projectBaseDir) {
         Collection<File> files = FileUtils.listFiles(new File(projectBaseDir), null, true);
-        // 移除 IDEA  Git GitHub 自身的文件; Node 编译出来的文件
+        // 移除 IDEA、Git 自身的文件、Node 编译出来的文件
         files = files.stream()
-                .filter(file -> !file.getPath().contains(File.separator + "target" + File.separator)
-                        && !file.getPath().contains(File.separator + "node_modules" + File.separator)
-                        && !file.getPath().contains(File.separator + ".idea" + File.separator)
-                        && !file.getPath().contains(File.separator + ".git" + File.separator)
-                        && !file.getPath().contains(File.separator + ".github" + File.separator)
-                        && !file.getPath().contains(File.separator + "dist" + File.separator)
+                .filter(file -> !file.getPath().contains(separator + "target" + separator)
+                        && !file.getPath().contains(separator + "node_modules" + separator)
+                        && !file.getPath().contains(separator + ".idea" + separator)
+                        && !file.getPath().contains(separator + ".git" + separator)
+                        && !file.getPath().contains(separator + "dist" + separator)
                         && !file.getPath().contains(".iml")
                         && !file.getPath().contains(".html.gz"))
                 .collect(Collectors.toList());
@@ -84,8 +86,8 @@ public class ProjectReactor {
     private static void writeFile(File file, String fileContent, String projectBaseDir,
                                   String projectBaseDirNew, String packageNameNew, String artifactIdNew) {
         String newPath = file.getPath().replace(projectBaseDir, projectBaseDirNew) // 新目录
-                .replace(PACKAGE_NAME.replaceAll("\\.", Matcher.quoteReplacement(File.separator)),
-                        packageNameNew.replaceAll("\\.", Matcher.quoteReplacement(File.separator)))
+                .replace(PACKAGE_NAME.replaceAll("\\.", Matcher.quoteReplacement(separator)),
+                        packageNameNew.replaceAll("\\.", Matcher.quoteReplacement(separator)))
                 .replace(ARTIFACT_ID, artifactIdNew) //
                 .replaceAll(StrUtil.upperFirst(ARTIFACT_ID), StrUtil.upperFirst(artifactIdNew));
         FileUtil.writeUtf8String(fileContent, newPath);
