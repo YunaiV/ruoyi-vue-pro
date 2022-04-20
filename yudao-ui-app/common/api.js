@@ -1,3 +1,4 @@
+//请求工具参考https://ext.dcloud.net.cn/plugin?id=392
 const { http } = uni.$u
 
 /* login */
@@ -18,6 +19,11 @@ export const updateAvatar = filePath =>
     name: 'avatarFile',
     fileType: 'image',
     filePath: filePath
+  })
+//修改用户昵称
+export const updateNickname = params =>
+  http.put('/app-api/member/user/update-nickname', {}, {
+    params
   })
 
 /* index */

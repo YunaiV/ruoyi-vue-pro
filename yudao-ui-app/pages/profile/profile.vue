@@ -10,9 +10,33 @@
       </view>
       <view class="info-item">
         <view class="label">昵称：</view>
-        <view class="info">
+        <view v-if="!nameEditOn" class="info">
           <view class="value">{{ userInfo.nickname }}</view>
-          <u-icon class="btn" name="edit-pen"></u-icon>
+          <u-icon
+            class="btn"
+            name="edit-pen"
+            @click="
+              tempName = userInfo.nickname
+              nameEditOn = true
+            "
+          ></u-icon>
+        </view>
+        <view v-else class="name-edit">
+          <u--input maxlength="10" border="bottom" v-model="tempName"></u--input>
+          <view class="edit-btn-group">
+            <u-tag class="edit-btn" text="保存" plain size="mini" type="primary" @click="handleSaveBtnClick"></u-tag>
+            <u-tag
+              class="edit-btn"
+              text="取消"
+              plain
+              size="mini"
+              type="info"
+              @click="
+                tempName = ''
+                nameEditOn = false
+              "
+            ></u-tag>
+          </view>
         </view>
       </view>
       <view class="info-item">
@@ -27,7 +51,7 @@
 </template>
 
 <script>
-import { getUserInfo, updateAvatar } from '../../common/api'
+import { getUserInfo, updateAvatar, updateNickname } from '../../common/api'
 
 export default {
   data() {
@@ -37,7 +61,9 @@ export default {
         avatar: '',
         mobile: ''
       },
-      avatarFiles: []
+      avatarFiles: [],
+      nameEditOn: false,
+      tempName: ''
     }
   },
   onLoad() {
@@ -45,27 +71,26 @@ export default {
   },
   methods: {
     loadUserInfoData() {
-      getUserInfo()
-        .then(res => {
-          this.userInfo = res.data
-        })
-        .catch(err => {
-          //console.log(err)
-        })
+      getUserInfo().then(res => {
+        this.userInfo = res.data
+      })
     },
     handleAvatarClick() {
       uni.chooseImage({
         success: chooseImageRes => {
           const tempFilePaths = chooseImageRes.tempFilePaths
-          console.log(tempFilePaths)
-          updateAvatar(tempFilePaths[0])
-            .then(res => {
-              console.log(res)
-            })
-            .catch(err => {
-              //console.log(err)
-            })
+          updateAvatar(tempFilePaths[0]).then(res => {
+            this.userInfo.avatar = res.data
+            this.$store.commit('setUserInfo', this.userInfo)
+          })
         }
+      })
+    },
+    handleSaveBtnClick() {
+      updateNickname({ nickname: this.tempName }).then(res => {
+        this.nameEditOn = false;
+        this.userInfo.nickname = this.tempName
+        this.$store.commit('setUserInfo', this.userInfo)
       })
     }
   }
@@ -88,6 +113,15 @@ export default {
       }
       .btn {
         margin-left: 30rpx;
+      }
+    }
+    .name-edit {
+      @include flex-left;
+      .edit-btn-group {
+        @include flex;
+        .edit-btn {
+          margin-left: 20rpx;
+        }
       }
     }
   }
