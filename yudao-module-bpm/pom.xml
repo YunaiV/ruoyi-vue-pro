@@ -11,8 +11,8 @@
     <modules>
         <module>yudao-module-bpm-api</module>
         <module>yudao-module-bpm-base</module>
-        <module>yudao-module-bpm-impl-flowable</module>
-        <module>yudao-module-bpm-impl-activiti</module>
+        <module>yudao-module-bpm-biz-flowable</module>
+        <module>yudao-module-bpm-biz-activiti</module>
     </modules>
     <artifactId>yudao-module-bpm</artifactId>
     <packaging>pom</packaging>
@@ -24,9 +24,9 @@
         bpm 解释：https://baike.baidu.com/item/BPM/1933
 
         目前提供两套实现方案：
-            1. 基于 Activiti 7 实现的 yudao-module-bpm-impl-activiti
-            2. 基于 Flowable 6 实现的 yudao-module-bpm-impl-flowable
-        两套实现会存在共享的逻辑，所以会继承 yudao-module-impl-base
+            1. 基于 Activiti 7 实现的 yudao-module-bpm-biz-activiti
+            2. 基于 Flowable 6 实现的 yudao-module-bpm-biz-flowable
+        两套实现会存在共享的逻辑，所以会继承 yudao-module-bpm-base
     </description>
 
 </project>
