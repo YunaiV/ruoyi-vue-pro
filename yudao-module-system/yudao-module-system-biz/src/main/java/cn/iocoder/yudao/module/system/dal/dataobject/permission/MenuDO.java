@@ -72,5 +72,19 @@ public class MenuDO extends BaseDO {
      * 枚举 {@link CommonStatusEnum}
      */
     private Integer status;
+    /**
+     * 是否可见
+     *
+     * 只有菜单、目录使用
+     * 当设置为 true 时，该菜单不会展示在侧边栏，但是路由还是存在。例如说，一些独立的编辑页面 /edit/1024 等等
+     */
+    private Boolean visible;
+    /**
+     * 是否缓存
+     *
+     * 只有菜单、目录使用
+     * 是否使用 Vue 路由的 keep-alive 特性
+     */
+    private Boolean keepAlive;
 
 }
