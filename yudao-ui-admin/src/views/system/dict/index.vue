@@ -75,7 +75,7 @@
           <el-input v-model="form.name" placeholder="请输入字典名称" />
         </el-form-item>
         <el-form-item label="字典类型" prop="type">
-          <el-input :disabled="form.id !== null" v-model="form.type" placeholder="请输入字典类型" />
+          <el-input v-model="form.type" placeholder="请输入字典类型" />
         </el-form-item>
         <el-form-item label="状态" prop="status">
           <el-radio-group v-model="form.status">
