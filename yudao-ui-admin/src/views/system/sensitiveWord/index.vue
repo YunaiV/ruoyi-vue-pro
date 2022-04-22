@@ -53,12 +53,15 @@
       </el-table-column>
       <el-table-column label="描述" align="center" prop="description"/>
       <el-table-column label="标签" align="center" prop="tags">
-      </el-table-column>
-      <el-table-column label="创建时间" align="center" prop="createTime" width="180">
         <template slot-scope="scope">
           <el-tag :disable-transitions="true" v-for="(tag, index) in scope.row.tags" :index="index">
             {{ tag }}
           </el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column label="创建时间" align="center" prop="createTime" width="180">
+        <template slot-scope="scope">
+          <span>{{ parseTime(scope.row.createTime, '{y}-{m}-{d}') }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
@@ -324,3 +327,9 @@ export default {
   }
 };
 </script>
+
+<style rel="stylesheet/scss" lang="scss">
+  .el-tag+.el-tag {
+    margin-left: 10px;
+  }
+</style>
