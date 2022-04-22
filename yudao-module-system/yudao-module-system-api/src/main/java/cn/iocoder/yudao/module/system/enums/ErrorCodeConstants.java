@@ -119,4 +119,8 @@ public interface ErrorCodeConstants {
     ErrorCode SOCIAL_USER_UNBIND_NOT_SELF = new ErrorCode(1002018001, "社交解绑失败，非当前用户绑定");
     ErrorCode SOCIAL_USER_NOT_FOUND = new ErrorCode(1002018002, "社交授权失败，找不到对应的用户");
 
+    // ========== 系统铭感词 1002019000 =========
+    ErrorCode SENSITIVE_WORD_NOT_EXISTS = new ErrorCode(1002019000, "系统敏感词在所有标签中都不存在");
+    ErrorCode SENSITIVE_WORD_EXISTS = new ErrorCode(1002019001, "系统敏感词已在标签中存在");
+
 }

@@ -56,6 +56,7 @@ import SizeSelect from '@/components/SizeSelect'
 import Search from '@/components/HeaderSearch'
 import RuoYiGit from '@/components/RuoYi/Git'
 import RuoYiDoc from '@/components/RuoYi/Doc'
+import {getPath} from "@/utils/ruoyi";
 
 export default {
   components: {
@@ -98,7 +99,7 @@ export default {
     async logout() {
       this.$modal.confirm('确定注销并退出系统吗？', '提示').then(() => {
         this.$store.dispatch('LogOut').then(() => {
-          location.href = '/index';
+          location.href = getPath('/index');
         })
       }).catch(() => {});
     }

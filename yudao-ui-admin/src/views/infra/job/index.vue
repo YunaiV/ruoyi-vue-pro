@@ -1,5 +1,9 @@
 <template>
   <div class="app-container">
+    <doc-alert title="定时任务" url="https://doc.iocoder.cn/job/" />
+    <doc-alert title="异步任务" url="https://doc.iocoder.cn/async-task/" />
+    <doc-alert title="消息队列" url="https://doc.iocoder.cn/message-queue/" />
+    <!-- 搜索栏 -->
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="100px">
       <el-form-item label="任务名称" prop="name">
         <el-input v-model="queryParams.name" placeholder="请输入任务名称" clearable @keyup.enter.native="handleQuery"/>

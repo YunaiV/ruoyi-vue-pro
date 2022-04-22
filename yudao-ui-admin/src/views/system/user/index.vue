@@ -1,5 +1,8 @@
 <template>
   <div class="app-container">
+    <doc-alert title="用户体系" url="https://doc.iocoder.cn/user-center/" />
+    <doc-alert title="Excel 导入导出" url="https://doc.iocoder.cn/excel-import-and-export/" />
+    <!-- 搜索工作栏 -->
     <el-row :gutter="20">
       <!--部门数据-->
       <el-col :span="4" :xs="24">

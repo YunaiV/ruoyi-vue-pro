@@ -1,6 +1,6 @@
 spring:
   application:
-    name: yudao-admin-server
+    name: yudao-server
 
   profiles:
     active: local
@@ -110,6 +110,7 @@ yudao:
       - system_sms_channel
       - system_sms_template
       - system_sms_log
+      - system_sensitive_word
       - infra_codegen_column
       - infra_codegen_table
       - infra_test_demo
