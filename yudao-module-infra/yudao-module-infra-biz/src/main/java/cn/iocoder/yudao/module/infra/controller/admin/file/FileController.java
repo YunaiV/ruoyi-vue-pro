@@ -55,7 +55,7 @@ public class FileController {
             @ApiImplicitParam(name = "file", value = "文件附件", required = true, dataTypeClass = MultipartFile.class),
     })
     public CommonResult<String> uploadFile(@RequestParam("file") MultipartFile file) throws Exception {
-        String path = DateUtil.format(new Date(), "yyyy/MM/dd/") + file.getName();
+        String path = DateUtil.format(new Date(), "yyyy/MM/dd/") + file.getOriginalFilename();
         return success(fileService.createFile(path, IoUtil.readBytes(file.getInputStream())));
     }
 

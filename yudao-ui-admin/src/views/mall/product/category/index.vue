@@ -95,7 +95,7 @@
           </el-popover>
         </el-form-item>
         <el-form-item label="分类图片" prop="bannerUrl">
-          <el-input v-model="form.bannerUrl" placeholder="请输入分类图片"/>
+          <ImageUpload v-model="form.bannerUrl" />
         </el-form-item>
         <el-form-item label="分类排序" prop="sort">
           <el-input-number v-model="form.sort" controls-position="right" :min="0" />
