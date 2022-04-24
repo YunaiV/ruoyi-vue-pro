@@ -127,7 +127,7 @@ export default {
     },
     // 上传成功回调
     handleUploadSuccess(res) {
-      this.uploadList.push({ name: res.fileName, url: res.fileName });
+      this.uploadList.push({ name: res.data, url: res.data });
       if (this.uploadList.length === this.number) {
         this.fileList = this.fileList.concat(this.uploadList);
         this.uploadList = [];

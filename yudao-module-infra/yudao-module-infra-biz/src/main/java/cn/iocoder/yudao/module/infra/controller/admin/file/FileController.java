@@ -56,7 +56,8 @@ public class FileController {
     })
     public CommonResult<String> uploadFile(@RequestParam("file") MultipartFile file) throws Exception {
         String path = DateUtil.format(new Date(), "yyyy/MM/dd/") + file.getOriginalFilename();
-        return success(fileService.createFile(path, IoUtil.readBytes(file.getInputStream())));
+        String file1 = fileService.createFile(path, IoUtil.readBytes(file.getInputStream()));
+        return success(file1);
     }
 
     @DeleteMapping("/delete")
