@@ -48,7 +48,7 @@
       </el-table-column>
       <el-table-column label="分类图片" align="center" prop="bannerUrl">
         <template slot-scope="scope">
-          <img v-if="scope.row.bannerUrl" :src="scope.row.bannerUrl" alt="分类图片"/>
+          <img v-if="scope.row.bannerUrl" :src="scope.row.bannerUrl" alt="分类图片" class="img-height"/>
         </template>
       </el-table-column>
       <el-table-column label="分类排序" align="center" prop="sort"/>
@@ -95,7 +95,7 @@
           </el-popover>
         </el-form-item>
         <el-form-item label="分类图片" prop="bannerUrl">
-          <ImageUpload v-model="form.bannerUrl" />
+          <ImageUpload v-model="form.bannerUrl" :limit="1"/>
         </el-form-item>
         <el-form-item label="分类排序" prop="sort">
           <el-input-number v-model="form.sort" controls-position="right" :min="0" />
@@ -125,7 +125,6 @@ import {
   deleteCategory,
   exportCategoryExcel,
   getCategory,
-  getCategoryPage,
   listCategory,
   updateCategory
 } from "@/api/mall/product/category";
@@ -320,7 +319,7 @@ export default {
         this.exportLoading = true;
         return exportCategoryExcel(params);
       }).then(response => {
-        this.$download.excel(response, '${table.classComment}.xls');
+        this.$download.excel(response, '商品分类.xls');
         this.exportLoading = false;
       }).catch(() => {
       });
@@ -328,3 +327,10 @@ export default {
   }
 };
 </script>
+
+<style scoped lang="scss">
+//
+.img-height {
+  height: 150px;
+}
+</style>
