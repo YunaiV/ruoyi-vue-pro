@@ -12,10 +12,6 @@
                      :key="dict.value" :label="dict.label" :value="dict.value"/>
         </el-select>
       </el-form-item>
-      <el-form-item label="创建时间">
-        <el-date-picker v-model="dateRangeCreateTime" style="width: 240px" value-format="yyyy-MM-dd"
-                        type="daterange" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期"/>
-      </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" @click="resetQuery">重置</el-button>
@@ -30,6 +26,9 @@
         </el-button>
       </el-col>
       <el-col :span="1.5">
+        <el-button type="info" plain icon="el-icon-sort" size="mini" @click="toggleExpandAll">展开/折叠</el-button>
+      </el-col>
+      <el-col :span="1.5">
         <el-button type="warning" plain icon="el-icon-download" size="mini" @click="handleExport"
                    :loading="exportLoading"
                    v-hasPermi="['product:category:export']">导出
@@ -39,7 +38,8 @@
     </el-row>
 
     <!-- 列表 -->
-    <el-table v-loading="loading" :data="list">
+    <el-table v-if="refreshTable" v-loading="loading" :data="list"  row-key="id" :default-expand-all="isExpandAll"
+              :tree-props="{children: 'children', hasChildren: 'hasChildren'}">
       <el-table-column label="分类名称" align="center" prop="name"/>
       <el-table-column label="分类图标" align="center" prop="icon">
         <template slot-scope="scope">
@@ -73,9 +73,6 @@
         </template>
       </el-table-column>
     </el-table>
-    <!-- 分页组件 -->
-    <pagination v-show="total > 0" :total="total" :page.sync="queryParams.pageNo" :limit.sync="queryParams.pageSize"
-                @pagination="getList"/>
 
     <!-- 对话框(添加 / 修改) -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
@@ -161,7 +158,10 @@ export default {
       title: "",
       // 是否显示弹出层
       open: false,
-      dateRangeCreateTime: [],
+      // 是否展开，默认全部折叠
+      isExpandAll: false,
+      // 重新渲染表格状态
+      refreshTable: true,
       // 查询参数
       queryParams: {
         pageNo: 1,
@@ -190,11 +190,9 @@ export default {
       this.loading = true;
       // 处理查询参数
       let params = {...this.queryParams};
-      this.addBeginAndEndTime(params, this.dateRangeCreateTime, 'createTime');
       // 执行查询
-      getCategoryPage(params).then(response => {
-        this.list = response.data.list;
-        this.total = response.data.total;
+      listCategory(params).then(response => {
+        this.list = this.handleTree(response.data, "id", "pid");
         this.loading = false;
       });
     },
@@ -248,9 +246,16 @@ export default {
     },
     /** 重置按钮操作 */
     resetQuery() {
-      this.dateRangeCreateTime = [];
       this.resetForm("queryForm");
       this.handleQuery();
+    },
+    /** 展开/折叠操作 */
+    toggleExpandAll() {
+      this.refreshTable = false;
+      this.isExpandAll = !this.isExpandAll;
+      this.$nextTick(() => {
+        this.refreshTable = true;
+      });
     },
     /** 新增按钮操作 */
     handleAdd() {
@@ -310,7 +315,6 @@ export default {
       let params = {...this.queryParams};
       params.pageNo = undefined;
       params.pageSize = undefined;
-      this.addBeginAndEndTime(params, this.dateRangeCreateTime, 'createTime');
       // 执行导出
       this.$modal.confirm('是否确认导出所有商品分类数据项?').then(() => {
         this.exportLoading = true;

@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -78,8 +79,9 @@ public class CategoryController {
     @GetMapping("/listByQuery")
     @ApiOperation("获得商品分类列表")
     @PreAuthorize("@ss.hasPermission('product:category:query')")
-    public CommonResult<List<CategoryRespVO>> listByQuery() {
-        List<CategoryDO> list = categoryService.listByQuery();
+    public CommonResult<List<CategoryRespVO>> listByQuery(@Valid CategoryTreeListReqVO treeListReqVO) {
+        List<CategoryDO> list = categoryService.getCategoryTreeList(treeListReqVO);
+        list.sort(Comparator.comparing(CategoryDO::getSort));
         return success(CategoryConvert.INSTANCE.convertList(list));
     }
 

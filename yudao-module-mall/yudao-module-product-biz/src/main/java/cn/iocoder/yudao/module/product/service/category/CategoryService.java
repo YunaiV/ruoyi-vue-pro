@@ -1,10 +1,7 @@
 package cn.iocoder.yudao.module.product.service.category;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.product.controller.admin.category.vo.CategoryCreateReqVO;
-import cn.iocoder.yudao.module.product.controller.admin.category.vo.CategoryExportReqVO;
-import cn.iocoder.yudao.module.product.controller.admin.category.vo.CategoryPageReqVO;
-import cn.iocoder.yudao.module.product.controller.admin.category.vo.CategoryUpdateReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.category.vo.*;
 import cn.iocoder.yudao.module.product.dal.dataobject.category.CategoryDO;
 
 import javax.validation.Valid;
@@ -75,7 +72,8 @@ public interface CategoryService {
     /**
      * 获得商品分类列表
      *
+     * @param treeListReqVO 查询条件
      * @return 商品分类列表
      */
-    List<CategoryDO> listByQuery();
+    List<CategoryDO> getCategoryTreeList(CategoryTreeListReqVO treeListReqVO);
 }

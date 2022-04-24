@@ -1,10 +1,7 @@
 package cn.iocoder.yudao.module.product.service.category;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.product.controller.admin.category.vo.CategoryCreateReqVO;
-import cn.iocoder.yudao.module.product.controller.admin.category.vo.CategoryExportReqVO;
-import cn.iocoder.yudao.module.product.controller.admin.category.vo.CategoryPageReqVO;
-import cn.iocoder.yudao.module.product.controller.admin.category.vo.CategoryUpdateReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.category.vo.*;
 import cn.iocoder.yudao.module.product.convert.category.CategoryConvert;
 import cn.iocoder.yudao.module.product.dal.dataobject.category.CategoryDO;
 import cn.iocoder.yudao.module.product.dal.mysql.category.CategoryMapper;
@@ -83,8 +80,8 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public List<CategoryDO> listByQuery() {
-        return categoryMapper.selectList();
+    public List<CategoryDO> getCategoryTreeList(CategoryTreeListReqVO treeListReqVO) {
+        return categoryMapper.selectList(treeListReqVO);
     }
 
 }
