@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.system.dal.dataobject.social;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.module.system.enums.social.SocialTypeEnum;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
@@ -27,20 +28,9 @@ public class SocialUserDO extends BaseDO {
     @TableId
     private Long id;
     /**
-     * 关联的用户编号
-     */
-    private Long userId;
-    /**
-     * 用户类型
-     *
-     * 枚举 {@link UserTypeEnum}
-     */
-    private Integer userType;
-
-    /**
      * 社交平台的类型
      *
-     * 枚举 {@link UserTypeEnum}
+     * 枚举 {@link SocialTypeEnum}
      */
     private Integer type;
 
@@ -76,6 +66,15 @@ public class SocialUserDO extends BaseDO {
      * 原始用户数据，一般是 JSON 格式
      */
     private String rawUserInfo;
+
+    /**
+     * 最后一次的认证 code
+     */
+    private String code;
+    /**
+     * 最后一次的认证 state
+     */
+    private String state;
 
 }
 

@@ -219,8 +219,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
     @Override
     public String socialLogin2(AuthSocialLogin2ReqVO reqVO, String userIp, String userAgent) {
         // 使用 code 授权码，进行登录
-        AuthUser authUser = socialUserService.getAuthUser(reqVO.getType(), reqVO.getCode(), reqVO.getState());
-        Assert.notNull(authUser, "授权用户不为空");
+        socialUserService.authSocialUser(reqVO.getType(), reqVO.getCode(), reqVO.getState());
 
         // 使用账号密码，进行登录。
         LoginUser loginUser = this.login0(reqVO.getUsername(), reqVO.getPassword());
