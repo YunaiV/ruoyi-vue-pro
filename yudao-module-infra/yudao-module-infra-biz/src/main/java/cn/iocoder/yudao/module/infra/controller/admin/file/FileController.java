@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.infra.controller.admin.file;
 
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -23,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.util.Date;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
@@ -44,6 +46,16 @@ public class FileController {
     })
     public CommonResult<String> uploadFile(@RequestParam("file") MultipartFile file,
                                            @RequestParam("path") String path) throws Exception {
+        return success(fileService.createFile(path, IoUtil.readBytes(file.getInputStream())));
+    }
+
+    @PostMapping("/simple-upload")
+    @ApiOperation("简单上传文件")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "file", value = "文件附件", required = true, dataTypeClass = MultipartFile.class),
+    })
+    public CommonResult<String> uploadFile(@RequestParam("file") MultipartFile file) throws Exception {
+        String path = DateUtil.format(new Date(), "yyyy/MM/dd/") + file.getName();
         return success(fileService.createFile(path, IoUtil.readBytes(file.getInputStream())));
     }
 
