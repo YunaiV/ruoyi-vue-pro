@@ -115,7 +115,7 @@ public class CollectionUtils {
             return new HashMap<>();
         }
         return from.stream()
-                   .collect(Collectors.groupingBy(keyFunc, Collectors.mapping(valueFunc, Collectors.toList())));
+                .collect(Collectors.groupingBy(keyFunc, Collectors.mapping(valueFunc, Collectors.toList())));
     }
 
     // 暂时没想好名字，先以 2 结尾噶
@@ -169,4 +169,5 @@ public class CollectionUtils {
     public static <T> Collection<T> singleton(T deptId) {
         return deptId == null ? Collections.emptyList() : Collections.singleton(deptId);
     }
+
 }

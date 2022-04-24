@@ -1,5 +1,7 @@
 <template>
   <div class="app-container">
+    <doc-alert title="配置中心" url="https://doc.iocoder.cn/config-center/" />
+    <!-- 搜索工作栏 -->
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
       <el-form-item label="参数名称" prop="name">
         <el-input v-model="queryParams.name" placeholder="请输入参数名称" clearable style="width: 240px"

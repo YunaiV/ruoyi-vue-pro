@@ -44,7 +44,7 @@ public class FtpFileClient extends AbstractFileClient<FtpFileClientConfig> {
         String dir = StrUtil.removeSuffix(filePath, fileName);
         boolean success = ftp.upload(dir, fileName, new ByteArrayInputStream(content));
         if (!success) {
-            throw new FtpException(StrUtil.format("上海文件到目标目录 ({}) 失败", filePath));
+            throw new FtpException(StrUtil.format("上传文件到目标目录 ({}) 失败", filePath));
         }
         // 拼接返回路径
         return super.formatFileUrl(config.getDomain(), path);

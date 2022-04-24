@@ -84,7 +84,6 @@ export default {
           { required: true, trigger: "blur", message: "租户不能为空" },
           {
             validator: (rule, value, callback) => {
-              // debugger
               getTenantIdByName(value).then(res => {
                 const tenantId = res.data;
                 if (tenantId && tenantId >= 0) {

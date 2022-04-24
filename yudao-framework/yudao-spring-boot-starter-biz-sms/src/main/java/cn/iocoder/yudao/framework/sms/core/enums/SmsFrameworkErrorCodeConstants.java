@@ -26,6 +26,9 @@ public interface SmsFrameworkErrorCodeConstants {
 
     ErrorCode SMS_SEND_CONTENT_INVALID = new ErrorCode(2001000104, "短信内容有敏感词");
 
+    // 腾讯云：为避免骚扰用户，营销短信只允许在8点到22点发送。
+    ErrorCode SMS_SEND_MARKET_LIMIT_CONTROL = new ErrorCode(2001000105, "营销短信发送时间限制");
+
     // ========== 模板相关 2001000200 ==========
     ErrorCode SMS_TEMPLATE_INVALID = new ErrorCode(2001000200, "短信模板不合法"); // 包括短信模板不存在
     ErrorCode SMS_TEMPLATE_PARAM_ERROR = new ErrorCode(2001000201, "模板参数不正确");
@@ -41,6 +44,7 @@ public interface SmsFrameworkErrorCodeConstants {
     ErrorCode SMS_API_PARAM_ERROR = new ErrorCode(2001000900, "请求参数缺失");
     ErrorCode SMS_MOBILE_INVALID = new ErrorCode(2001000901, "手机格式不正确");
     ErrorCode SMS_MOBILE_BLACK = new ErrorCode(2001000902, "手机号在黑名单中");
+    ErrorCode SMS_APP_ID_INVALID = new ErrorCode(2001000903, "SdkAppId不合法");
 
     ErrorCode EXCEPTION = new ErrorCode(2001000999, "调用异常");
 

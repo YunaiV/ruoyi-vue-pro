@@ -1,6 +1,7 @@
 <template>
   <div class="app-container">
     <doc-alert title="代码生成" url="https://doc.iocoder.cn/new-feature/" />
+    <doc-alert title="单元测试" url="https://doc.iocoder.cn/unit-test/" />
     <!-- 操作工作栏 -->
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
       <el-form-item label="表名称" prop="tableName">
