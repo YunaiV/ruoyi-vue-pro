@@ -1,19 +1,22 @@
 package cn.iocoder.yudao.module.product.service.category;
 
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.product.controller.admin.category.vo.CategoryCreateReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.category.vo.CategoryExportReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.category.vo.CategoryPageReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.category.vo.CategoryUpdateReqVO;
+import cn.iocoder.yudao.module.product.convert.category.CategoryConvert;
+import cn.iocoder.yudao.module.product.dal.dataobject.category.CategoryDO;
+import cn.iocoder.yudao.module.product.dal.mysql.category.CategoryMapper;
 import org.springframework.stereotype.Service;
-import javax.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
 
-import java.util.*;
-import cn.iocoder.yudao.module.product.controller.admin.category.vo.*;
-import cn.iocoder.yudao.module.product.dal.dataobject.category.CategoryDO;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
-
-import cn.iocoder.yudao.module.product.convert.category.CategoryConvert;
-import cn.iocoder.yudao.module.product.dal.mysql.category.CategoryMapper;
+import javax.annotation.Resource;
+import java.util.Collection;
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.CATEGORY_NOT_EXISTS;
 
 /**
  * 商品分类 Service 实现类
@@ -77,6 +80,11 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public List<CategoryDO> getCategoryList(CategoryExportReqVO exportReqVO) {
         return categoryMapper.selectList(exportReqVO);
+    }
+
+    @Override
+    public List<CategoryDO> listByQuery() {
+        return categoryMapper.selectList();
     }
 
 }

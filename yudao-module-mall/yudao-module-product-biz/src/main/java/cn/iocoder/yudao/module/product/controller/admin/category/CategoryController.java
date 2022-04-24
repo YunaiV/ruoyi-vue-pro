@@ -1,30 +1,29 @@
 package cn.iocoder.yudao.module.product.controller.admin.category;
 
-import org.springframework.web.bind.annotation.*;
-import javax.annotation.Resource;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.security.access.prepost.PreAuthorize;
-import io.swagger.annotations.*;
-
-import javax.validation.constraints.*;
-import javax.validation.*;
-import javax.servlet.http.*;
-import java.util.*;
-import java.io.IOException;
-
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
-
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
-import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.*;
-
 import cn.iocoder.yudao.module.product.controller.admin.category.vo.*;
-import cn.iocoder.yudao.module.product.dal.dataobject.category.CategoryDO;
 import cn.iocoder.yudao.module.product.convert.category.CategoryConvert;
+import cn.iocoder.yudao.module.product.dal.dataobject.category.CategoryDO;
 import cn.iocoder.yudao.module.product.service.category.CategoryService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiOperation;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.List;
+
+import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 
 @Api(tags = "管理后台 - 商品分类")
 @RestController
@@ -68,12 +67,19 @@ public class CategoryController {
         return success(CategoryConvert.INSTANCE.convert(category));
     }
 
-    @GetMapping("/list")
+    @GetMapping("/listByIds")
     @ApiOperation("获得商品分类列表")
-    @ApiImplicitParam(name = "ids", value = "编号列表", required = true, example = "1024,2048", dataTypeClass = List.class)
     @PreAuthorize("@ss.hasPermission('product:category:query')")
     public CommonResult<List<CategoryRespVO>> getCategoryList(@RequestParam("ids") Collection<Long> ids) {
         List<CategoryDO> list = categoryService.getCategoryList(ids);
+        return success(CategoryConvert.INSTANCE.convertList(list));
+    }
+
+    @GetMapping("/listByQuery")
+    @ApiOperation("获得商品分类列表")
+    @PreAuthorize("@ss.hasPermission('product:category:query')")
+    public CommonResult<List<CategoryRespVO>> listByQuery() {
+        List<CategoryDO> list = categoryService.listByQuery();
         return success(CategoryConvert.INSTANCE.convertList(list));
     }
 

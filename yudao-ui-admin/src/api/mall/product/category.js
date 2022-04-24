@@ -34,6 +34,15 @@ export function getCategory(id) {
   })
 }
 
+// 获得商品分类
+export function listCategory(query) {
+  return request({
+    url: '/product/category/listByQuery',
+    method: 'get',
+    params: query
+  })
+}
+
 // 获得商品分类分页
 export function getCategoryPage(query) {
   return request({

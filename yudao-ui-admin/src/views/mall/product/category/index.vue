@@ -40,13 +40,18 @@
 
     <!-- 列表 -->
     <el-table v-loading="loading" :data="list">
-      <el-table-column label="分类编号" align="center" prop="id"/>
-      <el-table-column label="父分类编号" align="center" prop="pid"/>
       <el-table-column label="分类名称" align="center" prop="name"/>
-      <el-table-column label="分类图标" align="center" prop="icon"/>
-      <el-table-column label="分类图片" align="center" prop="bannerUrl"/>
+      <el-table-column label="分类图标" align="center" prop="icon">
+        <template slot-scope="scope">
+          <svg-icon :icon-class="scope.row.icon" />
+        </template>
+      </el-table-column>
+      <el-table-column label="分类图片" align="center" prop="bannerUrl">
+        <template slot-scope="scope">
+          <img v-if="scope.row.bannerUrl" :src="scope.row.bannerUrl" alt="分类图片"/>
+        </template>
+      </el-table-column>
       <el-table-column label="分类排序" align="center" prop="sort"/>
-      <el-table-column label="分类描述" align="center" prop="description"/>
       <el-table-column label="开启状态" align="center" prop="status">
         <template slot-scope="scope">
           <dict-tag :type="DICT_TYPE.COMMON_STATUS" :value="scope.row.status"/>
@@ -75,20 +80,28 @@
     <!-- 对话框(添加 / 修改) -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="父分类编号" prop="pid">
-          <el-input v-model="form.pid" placeholder="请输入父分类编号"/>
+        <el-form-item label="上级分类" prop="pid">
+          <Treeselect v-model="form.pid" :options="parentCategoryOptions" :normalizer="normalizer" :show-count="true"
+                      placeholder="上级分类"/>
         </el-form-item>
         <el-form-item label="分类名称" prop="name">
           <el-input v-model="form.name" placeholder="请输入分类名称"/>
         </el-form-item>
         <el-form-item label="分类图标" prop="icon">
-          <el-input v-model="form.icon" placeholder="请输入分类图标"/>
+          <el-popover placement="bottom-start" width="460" trigger="click" @show="$refs['iconSelect'].reset()">
+            <IconSelect ref="iconSelect" @selected="iconSelected"/>
+            <el-input slot="reference" v-model="form.icon" placeholder="点击选择分类图标" readonly>
+              <svg-icon v-if="form.icon" slot="prefix" :icon-class="form.icon" class="el-input__icon"
+                        style="height: 32px;width: 16px;"/>
+              <i v-else slot="prefix" class="el-icon-search el-input__icon"/>
+            </el-input>
+          </el-popover>
         </el-form-item>
         <el-form-item label="分类图片" prop="bannerUrl">
           <el-input v-model="form.bannerUrl" placeholder="请输入分类图片"/>
         </el-form-item>
         <el-form-item label="分类排序" prop="sort">
-          <el-input v-model="form.sort" placeholder="请输入分类排序"/>
+          <el-input-number v-model="form.sort" controls-position="right" :min="0" />
         </el-form-item>
         <el-form-item label="分类描述">
           <editor v-model="form.description" :min-height="192"/>
@@ -116,14 +129,19 @@ import {
   exportCategoryExcel,
   getCategory,
   getCategoryPage,
+  listCategory,
   updateCategory
 } from "@/api/mall/product/category";
 import Editor from '@/components/Editor';
+import Treeselect from "@riophae/vue-treeselect";
+import "@riophae/vue-treeselect/dist/vue-treeselect.css";
+import IconSelect from "@/components/IconSelect";
+import ImageUpload from '@/components/ImageUpload';
 
 export default {
   name: "Category",
   components: {
-    Editor,
+    Editor, Treeselect, IconSelect, ImageUpload
   },
   data() {
     return {
@@ -137,6 +155,8 @@ export default {
       total: 0,
       // 商品分类列表
       list: [],
+      // 商品分类树选项
+      parentCategoryOptions: [],
       // 弹出层标题
       title: "",
       // 是否显示弹出层
@@ -153,11 +173,10 @@ export default {
       form: {},
       // 表单校验
       rules: {
-        pid: [{required: true, message: "父分类编号不能为空", trigger: "blur"}],
+        pid: [{required: true, message: "请选择上级分类", trigger: "blur"}],
         name: [{required: true, message: "分类名称不能为空", trigger: "blur"}],
+        icon: [{required: true, message: "分类图标不能为空", trigger: "blur"}],
         bannerUrl: [{required: true, message: "分类图片不能为空", trigger: "blur"}],
-        sort: [{required: true, message: "分类排序不能为空", trigger: "blur"}],
-        description: [{required: true, message: "分类描述不能为空", trigger: "blur"}],
         status: [{required: true, message: "开启状态不能为空", trigger: "blur"}],
       }
     };
@@ -177,6 +196,30 @@ export default {
         this.list = response.data.list;
         this.total = response.data.total;
         this.loading = false;
+      });
+    },
+    // 选择图标
+    iconSelected(name) {
+      this.form.icon = name;
+    },
+    /** 转换菜单数据结构 */
+    normalizer(node) {
+      if (node.children && !node.children.length) {
+        delete node.children;
+      }
+      return {
+        id: node.id,
+        label: node.name,
+        children: node.children
+      };
+    },
+    /** 查询分类下拉树结构 */
+    getTreeselect() {
+      listCategory().then(response => {
+        this.parentCategoryOptions = [];
+        const menu = {id: 0, name: '主分类', children: []};
+        menu.children = this.handleTree(response.data, "id", "pid");
+        this.parentCategoryOptions.push(menu);
       });
     },
     /** 取消按钮 */
@@ -212,12 +255,14 @@ export default {
     /** 新增按钮操作 */
     handleAdd() {
       this.reset();
+      this.getTreeselect();
       this.open = true;
       this.title = "添加商品分类";
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
       this.reset();
+      this.getTreeselect();
       const id = row.id;
       getCategory(id).then(response => {
         this.form = response.data;

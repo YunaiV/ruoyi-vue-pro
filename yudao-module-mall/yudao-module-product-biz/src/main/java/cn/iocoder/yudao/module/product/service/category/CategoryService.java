@@ -1,10 +1,15 @@
 package cn.iocoder.yudao.module.product.service.category;
 
-import java.util.*;
-import javax.validation.*;
-import cn.iocoder.yudao.module.product.controller.admin.category.vo.*;
-import cn.iocoder.yudao.module.product.dal.dataobject.category.CategoryDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.product.controller.admin.category.vo.CategoryCreateReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.category.vo.CategoryExportReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.category.vo.CategoryPageReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.category.vo.CategoryUpdateReqVO;
+import cn.iocoder.yudao.module.product.dal.dataobject.category.CategoryDO;
+
+import javax.validation.Valid;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * 商品分类 Service 接口
@@ -67,4 +72,10 @@ public interface CategoryService {
      */
     List<CategoryDO> getCategoryList(CategoryExportReqVO exportReqVO);
 
+    /**
+     * 获得商品分类列表
+     *
+     * @return 商品分类列表
+     */
+    List<CategoryDO> listByQuery();
 }
