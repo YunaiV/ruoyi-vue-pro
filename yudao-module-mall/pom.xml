@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>yudao-module-market</artifactId>
+    <artifactId>yudao-module-mall</artifactId>
     <packaging>pom</packaging>
 
     <name>${project.artifactId}</name>
@@ -21,6 +21,8 @@
     <modules>
         <module>yudao-module-market-api</module>
         <module>yudao-module-market-biz</module>
+        <module>yudao-module-product-api</module>
+        <module>yudao-module-product-biz</module>
     </modules>
 
 </project>
