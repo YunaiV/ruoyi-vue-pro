@@ -93,7 +93,8 @@ export default {
           // 然后将数组转为对象数组
           this.fileList = list.map(item => {
             if (typeof item === "string") {
-              if (item.indexOf(this.baseUrl) === -1) {
+              // 不带有 http 的路径, 才拼接 baseUrl.
+              if (item.indexOf("http") === -1) {
                 item = { name: this.baseUrl + item, url: this.baseUrl + item };
               } else {
                 item = { name: item, url: item };
@@ -127,7 +128,7 @@ export default {
     },
     // 上传成功回调
     handleUploadSuccess(res) {
-      this.uploadList.push({ name: res.data, url: res.data });
+      this.uploadList.push({ name: res.data.fileName, url: res.data.fileUrl });
       if (this.uploadList.length === this.number) {
         this.fileList = this.fileList.concat(this.uploadList);
         this.uploadList = [];
