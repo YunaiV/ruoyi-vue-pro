@@ -1,16 +1,13 @@
 package cn.iocoder.yudao.module.system.service.social;
 
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
-import cn.iocoder.yudao.framework.test.core.util.AssertUtils;
-import cn.iocoder.yudao.framework.test.core.util.RandomUtils;
+import cn.iocoder.yudao.framework.test.core.ut.BaseDbAndRedisUnitTest;
 import cn.iocoder.yudao.module.system.api.social.dto.SocialUserBindReqDTO;
 import cn.iocoder.yudao.module.system.dal.dataobject.social.SocialUserBindDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.social.SocialUserDO;
 import cn.iocoder.yudao.module.system.dal.mysql.social.SocialUserBindMapper;
 import cn.iocoder.yudao.module.system.dal.mysql.social.SocialUserMapper;
-import cn.iocoder.yudao.framework.test.core.ut.BaseDbAndRedisUnitTest;
 import cn.iocoder.yudao.module.system.enums.social.SocialTypeEnum;
-import com.baomidou.mybatisplus.core.toolkit.PluginUtils;
 import com.xkcoding.justauth.AuthRequestFactory;
 import me.zhyd.oauth.enums.AuthResponseStatus;
 import me.zhyd.oauth.model.AuthCallback;
@@ -19,16 +16,15 @@ import me.zhyd.oauth.model.AuthUser;
 import me.zhyd.oauth.request.AuthRequest;
 import me.zhyd.oauth.utils.AuthStateUtils;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.function.Executable;
 import org.mockito.MockedStatic;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
-
 import java.util.List;
 
-import static cn.hutool.core.util.RandomUtil.*;
+import static cn.hutool.core.util.RandomUtil.randomLong;
+import static cn.hutool.core.util.RandomUtil.randomString;
 import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
@@ -157,24 +153,22 @@ public class SocialUserServiceTest extends BaseDbAndRedisUnitTest {
         assertEquals(toJsonString(authUser.getRawUserInfo()), socialUser.getRawUserInfo());
         assertEquals(type, socialUser.getType());
         assertEquals(authUser.getUuid(), socialUser.getOpenid());
-        assertEquals(authUser.getToken().getUnionId(), socialUser.getUnionId());
     }
 
     @Test
     public void testGetSocialUserList() {
         Long userId = 1L;
         Integer userType = UserTypeEnum.ADMIN.getValue();
-        // mock 获得绑定
-        socialUserBindMapper.insert(randomPojo(SocialUserBindDO.class) // 可被查询到
-                .setUserId(userId).setUserType(userType).setPlatform(SocialTypeEnum.GITEE.getPlatform())
-                .setUnionId("test_unionId"));
-        socialUserBindMapper.insert(randomPojo(SocialUserBindDO.class) // 不可被查询到
-                .setUserId(2L).setUserType(userType).setPlatform(SocialTypeEnum.DINGTALK.getPlatform()));
         // mock 获得社交用户
-        SocialUserDO socialUser = randomPojo(SocialUserDO.class).setType(SocialTypeEnum.GITEE.getType())
-                .setUnionId("test_unionId");
+        SocialUserDO socialUser = randomPojo(SocialUserDO.class).setType(SocialTypeEnum.GITEE.getType());
         socialUserMapper.insert(socialUser); // 可被查到
         socialUserMapper.insert(randomPojo(SocialUserDO.class)); // 不可被查到
+        // mock 获得绑定
+        socialUserBindMapper.insert(randomPojo(SocialUserBindDO.class) // 可被查询到
+                .setUserId(userId).setUserType(userType).setSocialType(SocialTypeEnum.GITEE.getType())
+                .setSocialUserId(socialUser.getId()));
+        socialUserBindMapper.insert(randomPojo(SocialUserBindDO.class) // 不可被查询到
+                .setUserId(2L).setUserType(userType).setSocialType(SocialTypeEnum.DINGTALK.getType()));
 
         // 调用
         List<SocialUserDO> result = socialUserService.getSocialUserList(userId, userType);
@@ -184,120 +178,79 @@ public class SocialUserServiceTest extends BaseDbAndRedisUnitTest {
     }
 
     @Test
-    public void testBindSocialUser_create() {
+    public void testBindSocialUser() {
         // 准备参数
         SocialUserBindReqDTO reqDTO = new SocialUserBindReqDTO()
                 .setUserId(1L).setUserType(UserTypeEnum.ADMIN.getValue())
                 .setType(SocialTypeEnum.GITEE.getType()).setCode("test_code").setState("test_state");
         // mock 数据：获得社交用户
         SocialUserDO socialUser = randomPojo(SocialUserDO.class).setType(reqDTO.getType())
-                .setCode(reqDTO.getCode()).setState(reqDTO.getState()).setUnionId("test_unionId");
+                .setCode(reqDTO.getCode()).setState(reqDTO.getState());
         socialUserMapper.insert(socialUser);
-        // mock 数据：解绑其它账号
+        // mock 数据：用户可能之前已经绑定过该社交类型
         socialUserBindMapper.insert(randomPojo(SocialUserBindDO.class).setUserId(1L).setUserType(UserTypeEnum.ADMIN.getValue())
-                .setPlatform(SocialTypeEnum.GITEE.getPlatform()).setUnionId("test_delete_unionId"));
+                .setSocialType(SocialTypeEnum.GITEE.getType()).setSocialUserId(-1L));
+        // mock 数据：社交用户可能之前绑定过别的用户
+        socialUserBindMapper.insert(randomPojo(SocialUserBindDO.class).setUserType(UserTypeEnum.ADMIN.getValue())
+                .setSocialType(SocialTypeEnum.GITEE.getType()).setSocialUserId(socialUser.getId()));
 
         // 调用
         socialUserService.bindSocialUser(reqDTO);
         // 断言
         List<SocialUserBindDO> socialUserBinds = socialUserBindMapper.selectList();
         assertEquals(1, socialUserBinds.size());
-
     }
-//
-//    /**
-//     * 情况二，更新 SocialUserDO 的情况
-//     */
-//    @Test
-//    public void testBindSocialUser_update() {
-//        // mock 数据
-//        SocialUserDO dbSocialUser = randomPojo(SocialUserDO.class, socialUserDO -> {
-//            socialUserDO.setUserType(UserTypeEnum.ADMIN.getValue());
-//            socialUserDO.setType(randomEle(SocialTypeEnum.values()).getType());
-//        });
-//        socialUserMapper.insert(dbSocialUser);
-//        // 准备参数
-//        Long userId = dbSocialUser.getUserId();
-//        Integer type = dbSocialUser.getType();
-//        AuthUser authUser = randomPojo(AuthUser.class);
-//        // mock 方法
-//
-//        // 调用
-//        socialService.bindSocialUser(userId, UserTypeEnum.ADMIN.getValue(), type, authUser);
-//        // 断言
-//        List<SocialUserDO> socialUsers = socialUserMapper.selectList("user_id", userId);
-//        assertEquals(1, socialUsers.size());
-//        assertBindSocialUser(socialUsers.get(0), authUser, userId, type);
-//    }
-//
-//    /**
-//     * 情况一和二都存在的，逻辑二的场景
-//     */
-//    @Test
-//    public void testBindSocialUser_userId() {
-//        // mock 数据
-//        SocialUserDO dbSocialUser = randomPojo(SocialUserDO.class, socialUserDO -> {
-//            socialUserDO.setUserType(UserTypeEnum.ADMIN.getValue());
-//            socialUserDO.setType(randomEle(SocialTypeEnum.values()).getType());
-//        });
-//        socialUserMapper.insert(dbSocialUser);
-//        // 准备参数
-//        Long userId = randomLongId();
-//        Integer type = dbSocialUser.getType();
-//        AuthUser authUser = randomPojo(AuthUser.class);
-//        // mock 方法
-//
-//        // 调用
-//        socialService.bindSocialUser(userId, UserTypeEnum.ADMIN.getValue(), type, authUser);
-//        // 断言
-//        List<SocialUserDO> socialUsers = socialUserMapper.selectList("user_id", userId);
-//        assertEquals(1, socialUsers.size());
-//    }
 
-//
-//    /**
-//     * 情况一，如果新老的 unionId 是一致的，无需解绑
-//     */
-//    @Test
-//    public void testUnbindOldSocialUser_no() {
-//        // mock 数据
-//        SocialUserDO oldSocialUser = randomPojo(SocialUserDO.class, socialUserDO -> {
-//            socialUserDO.setUserType(UserTypeEnum.ADMIN.getValue());
-//            socialUserDO.setType(randomEle(SocialTypeEnum.values()).getType());
-//        });
-//        socialUserMapper.insert(oldSocialUser);
-//        // 准备参数
-//        Long userId = oldSocialUser.getUserId();
-//        Integer type = oldSocialUser.getType();
-//        String newUnionId = oldSocialUser.getUnionId();
-//
-//        // 调用
-//        socialService.unbindOldSocialUser(userId, UserTypeEnum.ADMIN.getValue(), type, newUnionId);
-//        // 断言
-//        assertEquals(1L, socialUserMapper.selectCount(null).longValue());
-//    }
-//
-//
-//    /**
-//     * 情况二，如果新老的 unionId 不一致的，需解绑
-//     */
-//    @Test
-//    public void testUnbindOldSocialUser_yes() {
-//        // mock 数据
-//        SocialUserDO oldSocialUser = randomPojo(SocialUserDO.class, socialUserDO -> {
-//            socialUserDO.setUserType(UserTypeEnum.ADMIN.getValue());
-//            socialUserDO.setType(randomEle(SocialTypeEnum.values()).getType());
-//        });
-//        socialUserMapper.insert(oldSocialUser);
-//        // 准备参数
-//        Long userId = oldSocialUser.getUserId();
-//        Integer type = oldSocialUser.getType();
-//        String newUnionId = randomString(10);
-//
-//        // 调用
-//        socialService.unbindOldSocialUser(userId, UserTypeEnum.ADMIN.getValue(), type, newUnionId);
-//        // 断言
-//        assertEquals(0L, socialUserMapper.selectCount(null).longValue());
-//    }
+    @Test
+    public void testUnbindSocialUser_success() {
+        // 准备参数
+        Long userId = 1L;
+        Integer userType = UserTypeEnum.ADMIN.getValue();
+        Integer type = SocialTypeEnum.GITEE.getType();
+        String openid = "test_openid";
+        // mock 数据：社交用户
+        SocialUserDO socialUser = randomPojo(SocialUserDO.class).setType(type).setOpenid(openid);
+        socialUserMapper.insert(socialUser);
+        // mock 数据：社交绑定关系
+        SocialUserBindDO socialUserBind = randomPojo(SocialUserBindDO.class).setUserType(userType)
+                .setUserId(userId).setSocialType(type);
+        socialUserBindMapper.insert(socialUserBind);
+
+        // 调用
+        socialUserService.unbindSocialUser(userId, userType, type, openid);
+        // 断言
+        assertEquals(0, socialUserBindMapper.selectCount(null).intValue());
+    }
+
+    @Test
+    public void testUnbindSocialUser_notFound() {
+        // 调用，并断言
+        assertServiceException(
+                () -> socialUserService.unbindSocialUser(randomLong(), UserTypeEnum.ADMIN.getValue(),
+                        SocialTypeEnum.GITEE.getType(), "test_openid"),
+                SOCIAL_USER_NOT_FOUND);
+    }
+
+    @Test
+    public void testGetBindUserId() {
+        // 准备参数
+        Integer userType = UserTypeEnum.ADMIN.getValue();
+        Integer type = SocialTypeEnum.GITEE.getType();
+        String code = "tudou";
+        String state = "yuanma";
+        // mock 社交用户
+        SocialUserDO socialUser = randomPojo(SocialUserDO.class).setType(type).setCode(code).setState(state);
+        socialUserMapper.insert(socialUser);
+        // mock 社交用户的绑定
+        Long userId = randomLong();
+        SocialUserBindDO socialUserBind = randomPojo(SocialUserBindDO.class).setUserType(userType).setUserId(userId)
+                .setSocialType(type).setSocialUserId(socialUser.getId());
+        socialUserBindMapper.insert(socialUserBind);
+
+        // 调用
+        Long result = socialUserService.getBindUserId(userType, type, code, state);
+        // 断言
+        assertEquals(userId, result);
+    }
 
 }

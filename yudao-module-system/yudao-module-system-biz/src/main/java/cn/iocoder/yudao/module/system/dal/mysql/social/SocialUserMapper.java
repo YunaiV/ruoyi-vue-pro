@@ -22,13 +22,7 @@ public interface SocialUserMapper extends BaseMapperX<SocialUserDO> {
     default SocialUserDO selectByTypeAndOpenid(Integer type, String openid) {
         return selectOne(new LambdaQueryWrapper<SocialUserDO>()
                 .eq(SocialUserDO::getType, type)
-                .eq(SocialUserDO::getCode, openid));
-    }
-
-    default List<SocialUserDO> selectListByUnionIdAndType(Collection<String> unionIds, Collection<Integer> types) {
-        return selectList(new LambdaQueryWrapper<SocialUserDO>()
-                .in(SocialUserDO::getUnionId, unionIds)
-                .in(SocialUserDO::getType, types));
+                .eq(SocialUserDO::getOpenid, openid));
     }
 
 }

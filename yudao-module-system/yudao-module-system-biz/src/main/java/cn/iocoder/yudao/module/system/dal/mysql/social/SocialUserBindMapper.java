@@ -10,26 +10,23 @@ import java.util.List;
 @Mapper
 public interface SocialUserBindMapper extends BaseMapperX<SocialUserBindDO> {
 
-    default void deleteByUserTypeAndUserIdAndUnionId(Integer userType, Long userId, Integer platform) {
+    default void deleteByUserTypeAndUserIdAndSocialType(Integer userType, Long userId, Integer socialType) {
         delete(new LambdaQueryWrapperX<SocialUserBindDO>()
                 .eq(SocialUserBindDO::getUserType, userType)
                 .eq(SocialUserBindDO::getUserId, userId)
-                .eq(SocialUserBindDO::getPlatform, platform));
+                .eq(SocialUserBindDO::getSocialType, socialType));
     }
 
-    default void deleteByUserTypeAndPlatformAndUnionId(Integer userType, Integer platform, String unionId) {
+    default void deleteByUserTypeAndSocialUserId(Integer userType, Long socialUserId) {
         delete(new LambdaQueryWrapperX<SocialUserBindDO>()
                 .eq(SocialUserBindDO::getUserType, userType)
-                .eq(SocialUserBindDO::getPlatform, platform)
-                .eq(SocialUserBindDO::getUnionId, unionId));
+                .eq(SocialUserBindDO::getSocialUserId, socialUserId));
     }
 
-    default SocialUserBindDO selectByUserTypeAndPlatformAndUnionId(Integer userType,
-                                                                   Integer platform, String unionId) {
+    default SocialUserBindDO selectByUserTypeAndSocialUserId(Integer userType, Long socialUserId) {
         return selectOne(new LambdaQueryWrapperX<SocialUserBindDO>()
                 .eq(SocialUserBindDO::getUserType, userType)
-                .eq(SocialUserBindDO::getPlatform, platform)
-                .eq(SocialUserBindDO::getUnionId, unionId));
+                .eq(SocialUserBindDO::getSocialUserId, socialUserId));
     }
 
     default List<SocialUserBindDO> selectListByUserIdAndUserType(Long userId, Integer userType) {

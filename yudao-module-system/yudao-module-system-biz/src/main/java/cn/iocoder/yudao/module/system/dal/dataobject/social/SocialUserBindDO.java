@@ -22,6 +22,8 @@ public class SocialUserBindDO extends BaseDO {
 
     /**
      * 关联的用户编号
+     *
+     * 关联 UserDO 的编号
      */
     private Long userId;
     /**
@@ -32,14 +34,16 @@ public class SocialUserBindDO extends BaseDO {
     private Integer userType;
 
     /**
-     * 社交平台
+     * 社交平台的用户编号
      *
-     * 枚举 {@link SocialTypeEnum#getPlatform()}
+     * 关联 {@link SocialUserDO#getId()}
      */
-    private Integer platform;
+    private Long socialUserId;
     /**
-     * 社交的全局编号
+     * 社交平台的类型
+     *
+     * 冗余 {@link SocialUserDO#getType()}
      */
-    private String unionId;
+    private Integer socialType;
 
 }
