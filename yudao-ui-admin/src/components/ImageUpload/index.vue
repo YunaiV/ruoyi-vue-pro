@@ -76,8 +76,9 @@ export default {
       dialogImageUrl: "",
       dialogVisible: false,
       hideUpload: false,
+      // todo /infra/file/upload 返回的都是带 host 的可访问地址, baseUrl 有点没必要
       baseUrl: process.env.VUE_APP_BASE_API,
-      uploadImgUrl: process.env.VUE_APP_BASE_API + "/admin-api/infra/file/simple-upload", // 上传的图片服务器地址
+      uploadImgUrl: process.env.VUE_APP_BASE_API + "/admin-api/infra/file/upload", // 上传的图片服务器地址
       headers: {
         Authorization: "Bearer " + getToken(),
       },
@@ -187,7 +188,8 @@ export default {
       let strs = "";
       separator = separator || ",";
       for (let i in list) {
-        strs += list[i].url.replace(this.baseUrl, "") + separator;
+        // 由于 infra-file 返回带有 host , 不需要替换 baseUrl // .replace(this.baseUrl, "")
+        strs += list[i].url + separator;
       }
       return strs != '' ? strs.substr(0, strs.length - 1) : '';
     }
