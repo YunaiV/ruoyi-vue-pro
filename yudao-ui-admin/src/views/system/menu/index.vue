@@ -1,6 +1,8 @@
 <template>
   <div class="app-container">
     <doc-alert title="功能权限" url="https://doc.iocoder.cn/resource-permission" />
+    <doc-alert title="菜单路由" url="https://doc.iocoder.cn/vue2/route/" />
+    <!-- 搜索工作栏 -->
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch">
       <el-form-item label="菜单名称" prop="name">
         <el-input v-model="queryParams.name" placeholder="请输入菜单名称" clearable @keyup.enter.native="handleQuery"/>
@@ -187,6 +189,7 @@ import IconSelect from "@/components/IconSelect";
 
 import { SystemMenuTypeEnum, CommonStatusEnum } from '@/utils/constants'
 import { getDictDatas, DICT_TYPE } from '@/utils/dict'
+import {isExternal} from "@/utils/validate";
 
 export default {
   name: "Menu",
@@ -344,7 +347,7 @@ export default {
             || this.form.type === SystemMenuTypeEnum.MENU) {
             // 如果是外链，则不进行校验
             const path = this.form.path
-            if (path.indexOf('http://') === -1 || path.indexOf('https://') === -1) {
+            if (!isExternal(path)) {
               // 父权限为根节点，path 必须以 / 开头
               if (this.form.parentId === 0 && path.charAt(0) !== '/') {
                 this.$modal.msgSuccess('前端必须以 / 开头')
