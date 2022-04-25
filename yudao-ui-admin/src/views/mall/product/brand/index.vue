@@ -3,9 +3,6 @@
 
     <!-- 搜索工作栏 -->
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="分类编号" prop="categoryId">
-        <el-input v-model="queryParams.categoryId" placeholder="请输入分类编号" clearable @keyup.enter.native="handleQuery"/>
-      </el-form-item>
       <el-form-item label="品牌名称" prop="name">
         <el-input v-model="queryParams.name" placeholder="请输入品牌名称" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
@@ -43,10 +40,13 @@
 
     <!-- 列表 -->
     <el-table v-loading="loading" :data="list">
-      <el-table-column label="品牌编号" align="center" prop="id"/>
-      <el-table-column label="分类编号" align="center" prop="categoryId"/>
+      <el-table-column label="商品分类" align="center" prop="categoryId"/>
       <el-table-column label="品牌名称" align="center" prop="name"/>
-      <el-table-column label="品牌图片" align="center" prop="bannerUrl"/>
+      <el-table-column label="品牌图片" align="center" prop="bannerUrl">
+        <template slot-scope="scope">
+          <img v-if="scope.row.bannerUrl" :src="scope.row.bannerUrl" alt="分类图片" class="img-height"/>
+        </template>
+      </el-table-column>
       <el-table-column label="品牌排序" align="center" prop="sort"/>
       <el-table-column label="品牌描述" align="center" prop="description"/>
       <el-table-column label="状态" align="center" prop="status">
@@ -77,8 +77,9 @@
     <!-- 对话框(添加 / 修改) -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="分类编号" prop="categoryId">
-          <el-input v-model="form.categoryId" placeholder="请输入分类编号"/>
+        <el-form-item label="商品分类" prop="categoryId">
+          <Treeselect v-model="form.categoryId" :options="categoryOptions" :normalizer="normalizer" :show-count="true"
+                      placeholder="请选择商品分类"/>
         </el-form-item>
         <el-form-item label="品牌名称" prop="name">
           <el-input v-model="form.name" placeholder="请输入品牌名称"/>
@@ -93,10 +94,11 @@
           <el-input v-model="form.description" type="textarea" placeholder="请输入内容"/>
         </el-form-item>
         <el-form-item label="状态" prop="status">
-          <el-select v-model="form.status" placeholder="请选择状态">
-            <el-option v-for="dict in this.getDictDatas(DICT_TYPE.COMMON_STATUS)"
-                       :key="dict.value" :label="dict.label" :value="parseInt(dict.value)"/>
-          </el-select>
+          <el-radio-group v-model="form.status">
+            <el-radio v-for="dict in this.getDictDatas(DICT_TYPE.COMMON_STATUS)"
+                      :key="dict.value" :label="parseInt(dict.value)">{{ dict.label }}
+            </el-radio>
+          </el-radio-group>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -116,12 +118,15 @@ import {
   getBrandPage,
   updateBrand
 } from "@/api/mall/product/brand";
+import {listCategory} from "@/api/mall/product/category";
 import ImageUpload from '@/components/ImageUpload';
+import Treeselect from "@riophae/vue-treeselect";
+import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 
 export default {
   name: "Brand",
   components: {
-    ImageUpload,
+    ImageUpload, Treeselect,
   },
   data() {
     return {
@@ -148,6 +153,8 @@ export default {
         name: null,
         status: null,
       },
+      // 商品分类树选项
+      categoryOptions: [],
       // 表单参数
       form: {},
       // 表单校验
@@ -160,6 +167,7 @@ export default {
     };
   },
   created() {
+    this.getTreeselect();
     this.getList();
   },
   methods: {
@@ -174,6 +182,26 @@ export default {
         this.list = response.data.list;
         this.total = response.data.total;
         this.loading = false;
+      });
+    },
+    /** 转换菜单数据结构 */
+    normalizer(node) {
+      if (node.children && !node.children.length) {
+        delete node.children;
+      }
+      return {
+        id: node.id,
+        label: node.name,
+        children: node.children
+      };
+    },
+    /** 查询分类下拉树结构 */
+    getTreeselect() {
+      listCategory().then(response => {
+        this.categoryOptions = [];
+        const menu = {id: 0, name: '商品分类', children: []};
+        menu.children = this.handleTree(response.data, "id", "pid");
+        this.categoryOptions.push(menu);
       });
     },
     /** 取消按钮 */
@@ -208,12 +236,14 @@ export default {
     /** 新增按钮操作 */
     handleAdd() {
       this.reset();
+      this.getTreeselect();
       this.open = true;
       this.title = "添加品牌";
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
       this.reset();
+      this.getTreeselect();
       const id = row.id;
       getBrand(id).then(response => {
         this.form = response.data;
@@ -275,3 +305,10 @@ export default {
   }
 };
 </script>
+
+<style scoped lang="scss">
+//
+.img-height {
+  height: 150px;
+}
+</style>
