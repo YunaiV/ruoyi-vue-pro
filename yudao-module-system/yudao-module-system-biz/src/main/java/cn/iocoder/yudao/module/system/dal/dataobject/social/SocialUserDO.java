@@ -43,13 +43,6 @@ public class SocialUserDO extends BaseDO {
      */
     private String token;
     /**
-     * 社交的全局编号
-     *
-     * 例如说，微信平台的 https://developers.weixin.qq.com/miniprogram/dev/framework/open-ability/union-id.html
-     * 如果没有 unionId 的平台，直接使用 openid 作为该字段的值
-     */
-    private String unionId;
-    /**
      * 原始 Token 数据，一般是 JSON 格式
      */
     private String rawTokenInfo;

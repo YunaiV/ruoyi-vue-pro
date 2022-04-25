@@ -1,7 +1,9 @@
 package cn.iocoder.yudao.module.system.service.social;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.http.HttpUtils;
 import cn.iocoder.yudao.module.system.api.social.dto.SocialUserBindReqDTO;
 import cn.iocoder.yudao.module.system.dal.dataobject.social.SocialUserBindDO;
@@ -21,7 +23,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString;
@@ -64,20 +68,18 @@ public class SocialUserServiceImpl implements SocialUserService {
         }
 
         // 请求获取
-        AuthUser authUser = getAuthUser(type, buildAuthCallback(code, state));
-        if (authUser == null) {
-            throw exception(SOCIAL_USER_NOT_FOUND);
-        }
+        AuthUser authUser = getAuthUser(type, code, state);
+        Assert.notNull(authUser, "三方用户不能为空");
 
         // 保存到 DB 中
         socialUser = socialUserMapper.selectByTypeAndOpenid(type, authUser.getUuid());
         if (socialUser == null) {
             socialUser = new SocialUserDO();
         }
-        socialUser.setOpenid(authUser.getUuid()).setToken(authUser.getToken().getAccessToken()).setRawTokenInfo((toJsonString(authUser.getToken())))
+        socialUser.setType(type).setCode(code).setState(state) // 需要保存 code + state 字段，保证后续可查询
+                .setOpenid(authUser.getUuid()).setToken(authUser.getToken().getAccessToken()).setRawTokenInfo((toJsonString(authUser.getToken())))
                 .setUnionId(StrUtil.blankToDefault(authUser.getToken().getUnionId(), authUser.getUuid())) // unionId 识别多个用户
-                .setNickname(authUser.getNickname()).setAvatar(authUser.getAvatar()).setRawUserInfo(toJsonString(authUser.getRawUserInfo()))
-                .setCode(code).setState(state); // 需要保存 code + state 字段，保证后续可查询
+                .setNickname(authUser.getNickname()).setAvatar(authUser.getAvatar()).setRawUserInfo(toJsonString(authUser.getRawUserInfo()));
         if (socialUser.getId() == null) {
             socialUserMapper.insert(socialUser);
         } else {
@@ -88,7 +90,15 @@ public class SocialUserServiceImpl implements SocialUserService {
 
     @Override
     public List<SocialUserDO> getSocialUserList(Long userId, Integer userType) {
-        return socialUserMapper.selectListByUserId(userType, userId);
+        // 获得绑定
+        List<SocialUserBindDO> socialUserBinds = socialUserBindMapper.selectListByUserIdAndUserType(userId, userType);
+        if (CollUtil.isEmpty(socialUserBinds)) {
+            return Collections.emptyList();
+        }
+        // 获得社交用户
+        Set<Integer> platforms = CollectionUtils.convertSet(socialUserBinds, SocialUserBindDO::getPlatform);
+        return socialUserMapper.selectListByUnionIdAndType(CollectionUtils.convertSet(socialUserBinds, SocialUserBindDO::getUnionId),
+                SocialTypeEnum.getTypes(platforms));
     }
 
     @Override
@@ -98,13 +108,19 @@ public class SocialUserServiceImpl implements SocialUserService {
         SocialUserDO socialUser = authSocialUser(reqDTO.getType(), reqDTO.getCode(), reqDTO.getState());
         Assert.notNull(socialUser, "社交用户不能为空");
 
+        // 如果 unionId 之前被绑定过，需要进行解绑
+        Integer platform = SocialTypeEnum.valueOfType(socialUser.getType()).getPlatform();
+        socialUserBindMapper.deleteByUserTypeAndPlatformAndUnionId(reqDTO.getUserType(), platform,
+                socialUser.getUnionId());
+
         // 如果 userId 之前绑定过该 type 的其它账号，需要进行解绑
-        socialUserBindMapper.deleteByUserTypeAndUserIdAndPlatformAndUnionId(reqDTO.getUserType(), reqDTO.getUserId(),
-                SocialTypeEnum.valueOfType(socialUser.getType()).getPlatform(), socialUser.getUnionId());
+        socialUserBindMapper.deleteByUserTypeAndUserIdAndUnionId(reqDTO.getUserType(), reqDTO.getUserId(),
+                socialUser.getUnionId());
 
         // 绑定当前登录的社交用户
-        SocialUserBindDO socialUserBind = SocialUserBindDO.builder().userId(reqDTO.getUserId()).userType(reqDTO.getUserType())
-                .unionId(socialUser.getUnionId()).build();
+        SocialUserBindDO socialUserBind = SocialUserBindDO.builder()
+                .userId(reqDTO.getUserId()).userType(reqDTO.getUserType())
+                .platform(platform).unionId(socialUser.getUnionId()).build();
         socialUserBindMapper.insert(socialUserBind);
     }
 
@@ -140,22 +156,20 @@ public class SocialUserServiceImpl implements SocialUserService {
      * 请求社交平台，获得授权的用户
      *
      * @param type 社交平台的类型
-     * @param authCallback 授权回调
+     * @param code 授权码
+     * @param state 授权 state
      * @return 授权的用户
      */
-    private AuthUser getAuthUser(Integer type, AuthCallback authCallback) {
+    private AuthUser getAuthUser(Integer type, String code, String state) {
         AuthRequest authRequest = authRequestFactory.get(SocialTypeEnum.valueOfType(type).getSource());
+        AuthCallback authCallback = AuthCallback.builder().code(code).state(state).build();
         AuthResponse<?> authResponse = authRequest.login(authCallback);
-        log.info("[getAuthUser0][请求社交平台 type({}) request({}) response({})]", type, toJsonString(authCallback),
-                toJsonString(authResponse));
+        log.info("[getAuthUser][请求社交平台 type({}) request({}) response({})]", type,
+                toJsonString(authCallback), toJsonString(authResponse));
         if (!authResponse.ok()) {
             throw exception(SOCIAL_USER_AUTH_FAILURE, authResponse.getMsg());
         }
         return (AuthUser) authResponse.getData();
-    }
-
-    private static AuthCallback buildAuthCallback(String code, String state) {
-        return AuthCallback.builder().code(code).state(state).build();
     }
 
 }

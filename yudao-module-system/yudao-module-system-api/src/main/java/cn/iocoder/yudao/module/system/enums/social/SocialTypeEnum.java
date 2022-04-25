@@ -1,13 +1,14 @@
 package cn.iocoder.yudao.module.system.enums.social;
 
-import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.util.Arrays;
-import java.util.List;
+import java.util.Collection;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * 社交平台的类型枚举
@@ -75,6 +76,13 @@ public enum SocialTypeEnum implements IntArrayValuable {
 
     public static SocialTypeEnum valueOfType(Integer type) {
         return ArrayUtil.firstMatch(o -> o.getType().equals(type), values());
+    }
+
+    public static Set<Integer> getTypes(Collection<Integer> platforms) {
+        return Arrays.stream(values())
+                .filter(socialTypeEnum -> platforms.contains(socialTypeEnum.getPlatform()))
+                .map(SocialTypeEnum::getType)
+                .collect(Collectors.toSet());
     }
 
 }

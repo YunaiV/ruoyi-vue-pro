@@ -25,8 +25,10 @@ public interface SocialUserMapper extends BaseMapperX<SocialUserDO> {
                 .eq(SocialUserDO::getCode, openid));
     }
 
-    default List<SocialUserDO> selectListByUserId(Integer userType, Long userId) {
-        return selectList(new QueryWrapper<SocialUserDO>().eq("user_type", userType).eq("user_id", userId));
+    default List<SocialUserDO> selectListByUnionIdAndType(Collection<String> unionIds, Collection<Integer> types) {
+        return selectList(new LambdaQueryWrapper<SocialUserDO>()
+                .in(SocialUserDO::getUnionId, unionIds)
+                .in(SocialUserDO::getType, types));
     }
 
 }
