@@ -5,8 +5,8 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 @Data
-@ApiModel(value = "管理后台 - 简单上传文件 VO", description = "简单上传文件, 不需要 path")
-public class SimpleUploadRespVO {
+@ApiModel(value = "管理后台 - 上传文件 VO")
+public class UploadRespVO {
 
     @ApiModelProperty(value = "文件名", required = true, example = "yudao.jpg")
     private String fileName;

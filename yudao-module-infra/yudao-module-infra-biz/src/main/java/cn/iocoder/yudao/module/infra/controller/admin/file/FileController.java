@@ -3,12 +3,13 @@ package cn.iocoder.yudao.module.infra.controller.admin.file;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.module.infra.controller.admin.file.vo.file.FilePageReqVO;
 import cn.iocoder.yudao.module.infra.controller.admin.file.vo.file.FileRespVO;
-import cn.iocoder.yudao.module.infra.controller.admin.file.vo.file.SimpleUploadRespVO;
+import cn.iocoder.yudao.module.infra.controller.admin.file.vo.file.UploadRespVO;
 import cn.iocoder.yudao.module.infra.convert.file.FileConvert;
 import cn.iocoder.yudao.module.infra.dal.dataobject.file.FileDO;
 import cn.iocoder.yudao.module.infra.service.file.FileService;
@@ -45,24 +46,20 @@ public class FileController {
             @ApiImplicitParam(name = "file", value = "文件附件", required = true, dataTypeClass = MultipartFile.class),
             @ApiImplicitParam(name = "path", value = "文件路径", example = "yudaoyuanma.png", dataTypeClass = String.class)
     })
-    public CommonResult<String> uploadFile(@RequestParam("file") MultipartFile file,
-                                           @RequestParam("path") String path) throws Exception {
-        return success(fileService.createFile(path, IoUtil.readBytes(file.getInputStream())));
-    }
-
-    @PostMapping("/simple-upload")
-    @ApiOperation("简单上传文件")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "file", value = "文件附件", required = true, dataTypeClass = MultipartFile.class),
-    })
-    public CommonResult<SimpleUploadRespVO> uploadFile(@RequestParam("file") MultipartFile file) throws Exception {
-        SimpleUploadRespVO simpleUploadRespVO = new SimpleUploadRespVO();
-        simpleUploadRespVO.setFileName(file.getOriginalFilename());
-        // TODO 日期路径, 随机文件名
-        String path = IdUtil.fastSimpleUUID() + "." + FileUtil.extName(file.getOriginalFilename());
+    public CommonResult<UploadRespVO> uploadFile(@RequestParam("file") MultipartFile file,
+                                                 @RequestParam(value = "path", required = false) String path)
+            throws Exception {
+        // 如果路径没传, 系统生成随机路径
+        if (StrUtil.isBlank(path)) {
+            // TODO 生成带日期的路径, 目前 #getFileContent 不支持
+            path = IdUtil.fastSimpleUUID() + StrUtil.DOT + FileUtil.extName(file.getOriginalFilename());
+        }
         String fileUrl = fileService.createFile(path, IoUtil.readBytes(file.getInputStream()));
-        simpleUploadRespVO.setFileUrl(fileUrl);
-        return success(simpleUploadRespVO);
+        // 返回结果
+        UploadRespVO uploadRespVO = new UploadRespVO();
+        uploadRespVO.setFileName(file.getOriginalFilename());
+        uploadRespVO.setFileUrl(fileUrl);
+        return success(uploadRespVO);
     }
 
     @DeleteMapping("/delete")
