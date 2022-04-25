@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.product.dal.dataobject.category;
+package cn.iocoder.yudao.module.product.dal.dataobject.brand;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
@@ -7,50 +7,46 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
 /**
- * 商品分类 DO
+ * 品牌 DO
  *
  * @author 芋道源码
  */
-@TableName("product_category")
+@TableName("product_brand")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CategoryDO extends BaseDO {
+public class BrandDO extends BaseDO {
 
     /**
-     * 分类编号
+     * 品牌编号
      */
     @TableId
     private Long id;
     /**
-     * 父分类编号
+     * 分类编号
      */
-    private Long pid;
+    private Long categoryId;
     /**
-     * 分类名称
+     * 品牌名称
      */
     private String name;
     /**
-     * 分类图标
-     */
-    private String icon;
-    /**
-     * 分类图片
+     * 品牌图片
      */
     private String bannerUrl;
     /**
-     * 分类排序
+     * 品牌排序
      */
     private Integer sort;
     /**
-     * 分类描述
+     * 品牌描述
      */
     private String description;
     /**
-     * 开启状态
+     * 状态
      * <p>
      * 枚举 {@link CommonStatusEnum}
      */
