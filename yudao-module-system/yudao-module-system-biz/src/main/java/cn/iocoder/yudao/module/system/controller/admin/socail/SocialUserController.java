@@ -2,8 +2,8 @@ package cn.iocoder.yudao.module.system.controller.admin.socail;
 
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.module.system.controller.admin.auth.vo.auth.AuthSocialBindReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.auth.vo.auth.AuthSocialUnbindReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.socail.vo.SocialUserBindReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.socail.vo.SocialUserUnbindReqVO;
 import cn.iocoder.yudao.module.system.convert.social.SocialUserConvert;
 import cn.iocoder.yudao.module.system.service.social.SocialUserService;
 import io.swagger.annotations.Api;
@@ -27,15 +27,15 @@ public class SocialUserController {
 
     @PostMapping("/bind")
     @ApiOperation("社交绑定，使用 code 授权码")
-    public CommonResult<Boolean> socialBind(@RequestBody @Valid AuthSocialBindReqVO reqVO) {
+    public CommonResult<Boolean> socialBind(@RequestBody @Valid SocialUserBindReqVO reqVO) {
         socialUserService.bindSocialUser(SocialUserConvert.INSTANCE.convert(getLoginUserId(), UserTypeEnum.ADMIN.getValue(), reqVO));
         return CommonResult.success(true);
     }
 
     @DeleteMapping("/unbind")
     @ApiOperation("取消社交绑定")
-    public CommonResult<Boolean> socialUnbind(@RequestBody AuthSocialUnbindReqVO reqVO) {
-        socialUserService.unbindSocialUser(getLoginUserId(), UserTypeEnum.ADMIN.getValue(), reqVO.getType(), reqVO.getUnionId());
+    public CommonResult<Boolean> socialUnbind(@RequestBody SocialUserUnbindReqVO reqVO) {
+        socialUserService.unbindSocialUser(getLoginUserId(), UserTypeEnum.ADMIN.getValue(), reqVO.getType(), reqVO.getOpenid());
         return CommonResult.success(true);
     }
 

@@ -10,7 +10,6 @@ import cn.iocoder.yudao.framework.security.core.authentication.MultiUsernamePass
 import cn.iocoder.yudao.module.system.api.logger.dto.LoginLogCreateReqDTO;
 import cn.iocoder.yudao.module.system.controller.admin.auth.vo.auth.AuthLoginReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.auth.vo.auth.AuthSocialBindLoginReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.auth.vo.auth.AuthSocialBindReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.auth.vo.auth.AuthSocialQuickLoginReqVO;
 import cn.iocoder.yudao.module.system.convert.auth.AuthConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;

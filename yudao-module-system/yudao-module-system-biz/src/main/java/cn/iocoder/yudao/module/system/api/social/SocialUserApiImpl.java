@@ -37,11 +37,6 @@ public class SocialUserApiImpl implements SocialUserApi {
     }
 
     @Override
-    public void checkSocialUser(Integer type, String code, String state) {
-        socialUserService.authSocialUser(type, code, state);
-    }
-
-    @Override
     public Long getBindUserId(Integer userType, Integer type, String code, String state) {
        return socialUserService.getBindUserId(userType, type, code, state);
     }

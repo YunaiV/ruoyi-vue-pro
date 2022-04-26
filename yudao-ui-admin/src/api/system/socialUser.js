@@ -14,13 +14,13 @@ export function socialBind(type, code, state) {
 }
 
 // 取消社交绑定
-export function socialUnbind(type, unionId) {
+export function socialUnbind(type, openid) {
   return request({
     url: '/system/social-user/unbind',
     method: 'delete',
     data: {
       type,
-      unionId
+      openid
     }
   })
 }

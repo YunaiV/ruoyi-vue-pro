@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.member.controller.app.auth.vo;
+package cn.iocoder.yudao.module.member.controller.app.social.vo;
 
 import cn.iocoder.yudao.framework.common.validation.InEnum;
 import cn.iocoder.yudao.module.system.enums.social.SocialTypeEnum;
@@ -12,12 +12,12 @@ import lombok.NoArgsConstructor;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
-@ApiModel("用户 APP - 社交登录 Request VO，使用 code 授权码")
+@ApiModel("用户 APP - 社交绑定 Request VO，使用 code 授权码")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class AppAuthSocialLoginReqVO {
+public class AppSocialUserBindReqVO {
 
     @ApiModelProperty(value = "社交平台的类型", required = true, example = "10", notes = "参见 SysUserSocialTypeEnum 枚举值")
     @InEnum(SocialTypeEnum.class)
