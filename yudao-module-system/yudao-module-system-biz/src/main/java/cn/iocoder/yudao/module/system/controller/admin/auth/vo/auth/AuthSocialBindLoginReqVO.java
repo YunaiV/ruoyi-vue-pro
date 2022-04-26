@@ -14,12 +14,12 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
-@ApiModel("管理后台 - 社交登录 Request VO，使用 code 授权码 + 账号密码")
+@ApiModel("管理后台 - 社交绑定登录 Request VO，使用 code 授权码 + 账号密码")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class AuthSocialLogin2ReqVO {
+public class AuthSocialBindLoginReqVO {
 
     @ApiModelProperty(value = "社交平台的类型", required = true, example = "10", notes = "参见 UserSocialTypeEnum 枚举值")
     @InEnum(SocialTypeEnum.class)

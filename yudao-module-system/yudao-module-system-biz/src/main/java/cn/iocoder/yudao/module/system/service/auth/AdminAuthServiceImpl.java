@@ -9,9 +9,9 @@ import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.security.core.authentication.MultiUsernamePasswordAuthenticationToken;
 import cn.iocoder.yudao.module.system.api.logger.dto.LoginLogCreateReqDTO;
 import cn.iocoder.yudao.module.system.controller.admin.auth.vo.auth.AuthLoginReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.auth.vo.auth.AuthSocialBindLoginReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.auth.vo.auth.AuthSocialBindReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.auth.vo.auth.AuthSocialLogin2ReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.auth.vo.auth.AuthSocialLoginReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.auth.vo.auth.AuthSocialQuickLoginReqVO;
 import cn.iocoder.yudao.module.system.convert.auth.AuthConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
 import cn.iocoder.yudao.module.system.enums.logger.LoginLogTypeEnum;
@@ -22,7 +22,6 @@ import cn.iocoder.yudao.module.system.service.permission.PermissionService;
 import cn.iocoder.yudao.module.system.service.social.SocialUserService;
 import cn.iocoder.yudao.module.system.service.user.AdminUserService;
 import lombok.extern.slf4j.Slf4j;
-import me.zhyd.oauth.model.AuthUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -82,7 +81,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
             throw new UsernameNotFoundException(username);
         }
         // 创建 LoginUser 对象
-        return this.buildLoginUser(user);
+        return buildLoginUser(user);
     }
 
     @Override
@@ -92,19 +91,19 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         if (user == null) {
             throw new UsernameNotFoundException(String.valueOf(userId));
         }
-        this.createLoginLog(user.getUsername(), LoginLogTypeEnum.LOGIN_MOCK, LoginResultEnum.SUCCESS);
+        createLoginLog(user.getUsername(), LoginLogTypeEnum.LOGIN_MOCK, LoginResultEnum.SUCCESS);
 
         // 创建 LoginUser 对象
-        return this.buildLoginUser(user);
+        return buildLoginUser(user);
     }
 
     @Override
     public String login(AuthLoginReqVO reqVO, String userIp, String userAgent) {
         // 判断验证码是否正确
-        this.verifyCaptcha(reqVO);
+        verifyCaptcha(reqVO);
 
         // 使用账号密码，进行登录
-        LoginUser loginUser = this.login0(reqVO.getUsername(), reqVO.getPassword());
+        LoginUser loginUser = login0(reqVO.getUsername(), reqVO.getPassword());
 
         // 缓存登陆用户到 Redis 中，返回 sessionId 编号
         return createUserSessionAfterLoginSuccess(loginUser, LoginLogTypeEnum.LOGIN_USERNAME, userIp, userAgent);
@@ -192,7 +191,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
     }
 
     @Override
-    public String socialLogin(AuthSocialLoginReqVO reqVO, String userIp, String userAgent) {
+    public String socialLogin(AuthSocialQuickLoginReqVO reqVO, String userIp, String userAgent) {
         // 使用 code 授权码，进行登录。然后，获得到绑定的用户编号
         Long userId = socialUserService.getBindUserId(UserTypeEnum.ADMIN.getValue(), reqVO.getType(),
                 reqVO.getCode(), reqVO.getState());
@@ -207,24 +206,18 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         }
 
         // 创建 LoginUser 对象
-        LoginUser loginUser = this.buildLoginUser(user);
-
-        // 绑定社交用户（更新）
-        socialUserService.bindSocialUser(AuthConvert.INSTANCE.convert(loginUser.getId(), getUserType().getValue(), reqVO));
+        LoginUser loginUser = buildLoginUser(user);
 
         // 缓存登录用户到 Redis 中，返回 sessionId 编号
         return createUserSessionAfterLoginSuccess(loginUser, LoginLogTypeEnum.LOGIN_SOCIAL, userIp, userAgent);
     }
 
     @Override
-    public String socialLogin2(AuthSocialLogin2ReqVO reqVO, String userIp, String userAgent) {
-        // 使用 code 授权码，进行登录
-        socialUserService.authSocialUser(reqVO.getType(), reqVO.getCode(), reqVO.getState());
-
+    public String socialBindLogin(AuthSocialBindLoginReqVO reqVO, String userIp, String userAgent) {
         // 使用账号密码，进行登录。
-        LoginUser loginUser = this.login0(reqVO.getUsername(), reqVO.getPassword());
+        LoginUser loginUser = login0(reqVO.getUsername(), reqVO.getPassword());
 
-        // 绑定社交用户（新增）
+        // 绑定社交用户
         socialUserService.bindSocialUser(AuthConvert.INSTANCE.convert(loginUser.getId(), getUserType().getValue(), reqVO));
 
         // 缓存登录用户到 Redis 中，返回 sessionId 编号
@@ -236,12 +229,6 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         createLoginLog(loginUser.getUsername(), logType, LoginResultEnum.SUCCESS);
         // 缓存登录用户到 Redis 中，返回 sessionId 编号
         return userSessionService.createUserSession(loginUser, userIp, userAgent);
-    }
-
-    @Override
-    public void socialBind(Long userId, AuthSocialBindReqVO reqVO) {
-        // 绑定社交用户（新增）
-        socialUserService.bindSocialUser(AuthConvert.INSTANCE.convert(userId, getUserType().getValue(), reqVO));
     }
 
     @Override

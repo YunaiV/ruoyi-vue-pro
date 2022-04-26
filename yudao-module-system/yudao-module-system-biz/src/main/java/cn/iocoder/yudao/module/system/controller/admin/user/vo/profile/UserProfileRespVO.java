@@ -96,8 +96,8 @@ public class UserProfileRespVO extends UserBaseVO {
         @ApiModelProperty(value = "社交平台的类型", required = true, example = "10", notes = "参见 SocialTypeEnum 枚举类")
         private Integer type;
 
-        @ApiModelProperty(value = "社交的全局编号", required = true, example = "IPRmJ0wvBptiPIlGEZiPewGwiEiE")
-        private String unionId;
+        @ApiModelProperty(value = "社交用户的 openid", required = true, example = "IPRmJ0wvBptiPIlGEZiPewGwiEiE")
+        private String openid;
 
     }
 
