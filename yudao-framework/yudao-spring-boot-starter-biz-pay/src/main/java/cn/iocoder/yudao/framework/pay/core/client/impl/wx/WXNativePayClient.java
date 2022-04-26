@@ -28,11 +28,7 @@ import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString
 import static cn.iocoder.yudao.framework.pay.core.client.impl.wx.WXCodeMapping.CODE_SUCCESS;
 import static cn.iocoder.yudao.framework.pay.core.client.impl.wx.WXCodeMapping.MESSAGE_SUCCESS;
 
-/**
- * @Description:  Native支付
- * @author: zwy
- * @date: 2022年04月18日 17:00
- */
+
 @Slf4j
 public class WXNativePayClient extends AbstractPayClient<WXPayClientConfig> {
     private WxPayService client;
@@ -95,7 +91,7 @@ public class WXNativePayClient extends AbstractPayClient<WXPayClientConfig> {
                 .outTradeNo(reqDTO.getMerchantOrderId())
                 .body(reqDTO.getBody())
                 .totalFee(reqDTO.getAmount().intValue()) // 单位分
-//                .timeExpire(DateUtil.format(reqDTO.getExpireTime(), "yyyyMMddHHmmss"))
+                .timeExpire(DateUtil.format(reqDTO.getExpireTime(), "yyyy-MM-dd'T'HH:mm:ssXXX"))
                 .spbillCreateIp(reqDTO.getUserIp())
                 .notifyUrl(reqDTO.getNotifyUrl())
                 .productId(trade_type)
@@ -126,7 +122,7 @@ public class WXNativePayClient extends AbstractPayClient<WXPayClientConfig> {
         // 转换结果
         return PayOrderNotifyRespDTO.builder().orderExtensionNo(notifyResult.getOutTradeNo())
                 .channelOrderNo(notifyResult.getTransactionId()).channelUserId(notifyResult.getOpenid())
-                .successTime(DateUtil.parse(notifyResult.getTimeEnd(), "yyyyMMddHHmmss"))
+                .successTime(DateUtil.parse(notifyResult.getTimeEnd(), "yyyy-MM-dd'T'HH:mm:ssXXX"))
                 .data(data.getBody()).build();
     }
 
