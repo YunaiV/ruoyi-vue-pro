@@ -23,10 +23,6 @@ public interface RedisKeyConstants {
             "login_user:%s", // 参数为 sessionId
             STRING, LoginUser.class, RedisKeyDefine.TimeoutTypeEnum.DYNAMIC);
 
-    RedisKeyDefine SOCIAL_AUTH_USER = new RedisKeyDefine("社交登陆的授权用户",
-            "social_auth_user:%d:%s", // 参数为 type，code
-            STRING, AuthUser.class, Duration.ofDays(1));
-
     RedisKeyDefine SOCIAL_AUTH_STATE = new RedisKeyDefine("社交登陆的 state", // 注意，它是被 JustAuth 的 justauth.type.prefix 使用到
             "social_auth_state:%s", // 参数为 state
             STRING, String.class, Duration.ofHours(24)); // 值为 state

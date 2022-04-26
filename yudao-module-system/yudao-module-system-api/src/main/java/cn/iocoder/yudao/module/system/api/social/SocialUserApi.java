@@ -38,20 +38,9 @@ public interface SocialUserApi {
     void unbindSocialUser(@Valid SocialUserUnbindReqDTO reqDTO);
 
     /**
-     * 校验社交用户的认证信息是否正确
-     * 如果校验不通过，则抛出 {@link ServiceException} 业务异常
-     *
-     * @param type 社交平台的类型
-     * @param code 授权码
-     * @param state state
-     */
-    void checkSocialUser(Integer type, String code, String state);
-
-    /**
      * 获得社交用户的绑定用户编号
      * 注意，返回的是 MemberUser 或者 AdminUser 的 id 编号！
-     * 该方法会执行和 {@link #checkSocialUser(Integer, String, String)} 一样的逻辑。
-     * 所以在认证信息不正确的情况下，也会抛出 {@link ServiceException} 业务异常
+     * 在认证信息不正确的情况下，也会抛出 {@link ServiceException} 业务异常
      *
      * @param userType 用户类型
      * @param type 社交平台的类型

@@ -12,20 +12,24 @@ import lombok.NoArgsConstructor;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
-@ApiModel("用户 APP - 取消社交绑定 Request VO，使用 code 授权码")
+@ApiModel("用户 APP - 社交快捷登录 Request VO，使用 code 授权码")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class AppAuthSocialUnbindReqVO {
+public class AppAuthSocialQuickLoginReqVO {
 
     @ApiModelProperty(value = "社交平台的类型", required = true, example = "10", notes = "参见 SysUserSocialTypeEnum 枚举值")
     @InEnum(SocialTypeEnum.class)
     @NotNull(message = "社交平台的类型不能为空")
     private Integer type;
 
-    @ApiModelProperty(value = "社交的全局编号", required = true, example = "IPRmJ0wvBptiPIlGEZiPewGwiEiE")
-    @NotEmpty(message = "社交的全局编号不能为空")
-    private String unionId;
+    @ApiModelProperty(value = "授权码", required = true, example = "1024")
+    @NotEmpty(message = "授权码不能为空")
+    private String code;
+
+    @ApiModelProperty(value = "state", required = true, example = "9b2ffbc1-7425-4155-9894-9d5c08541d62")
+    @NotEmpty(message = "state 不能为空")
+    private String state;
 
 }

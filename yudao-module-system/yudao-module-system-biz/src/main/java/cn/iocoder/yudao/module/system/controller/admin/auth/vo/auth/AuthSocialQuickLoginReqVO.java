@@ -12,12 +12,12 @@ import lombok.NoArgsConstructor;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
-@ApiModel("管理后台 - 社交登录 Request VO，使用 code 授权码")
+@ApiModel("管理后台 - 社交快捷登录 Request VO，使用 code 授权码")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class AuthSocialLoginReqVO {
+public class AuthSocialQuickLoginReqVO {
 
     @ApiModelProperty(value = "社交平台的类型", required = true, example = "10", notes = "参见 UserSocialTypeEnum 枚举值")
     @InEnum(SocialTypeEnum.class)

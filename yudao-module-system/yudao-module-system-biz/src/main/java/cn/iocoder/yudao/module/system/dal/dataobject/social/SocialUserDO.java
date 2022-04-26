@@ -1,15 +1,13 @@
 package cn.iocoder.yudao.module.system.dal.dataobject.social;
 
-import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
-import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.module.system.enums.social.SocialTypeEnum;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
 /**
  * 社交用户
- * 通过 {@link SocialUserDO#getUserId()} 关联到对应的 {@link AdminUserDO}
  *
  * @author weir
  */
@@ -27,20 +25,9 @@ public class SocialUserDO extends BaseDO {
     @TableId
     private Long id;
     /**
-     * 关联的用户编号
-     */
-    private Long userId;
-    /**
-     * 用户类型
-     *
-     * 枚举 {@link UserTypeEnum}
-     */
-    private Integer userType;
-
-    /**
      * 社交平台的类型
      *
-     * 枚举 {@link UserTypeEnum}
+     * 枚举 {@link SocialTypeEnum}
      */
     private Integer type;
 
@@ -52,13 +39,6 @@ public class SocialUserDO extends BaseDO {
      * 社交 token
      */
     private String token;
-    /**
-     * 社交的全局编号
-     *
-     * 例如说，微信平台的 https://developers.weixin.qq.com/miniprogram/dev/framework/open-ability/union-id.html
-     * 如果没有 unionId 的平台，直接使用 openid 作为该字段的值
-     */
-    private String unionId;
     /**
      * 原始 Token 数据，一般是 JSON 格式
      */
@@ -76,6 +56,15 @@ public class SocialUserDO extends BaseDO {
      * 原始用户数据，一般是 JSON 格式
      */
     private String rawUserInfo;
+
+    /**
+     * 最后一次的认证 code
+     */
+    private String code;
+    /**
+     * 最后一次的认证 state
+     */
+    private String state;
 
 }
 

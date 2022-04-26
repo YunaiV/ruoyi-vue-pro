@@ -14,12 +14,12 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
-@ApiModel("用户 APP - 社交登录 Request VO，使用 code 授权码 + 账号密码")
+@ApiModel("用户 APP - 社交绑定登录 Request VO，使用 code 授权码 + 账号密码")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class AppAuthSocialLogin2ReqVO {
+public class AppAuthSocialBindLoginReqVO {
 
     @ApiModelProperty(value = "社交平台的类型", required = true, example = "10", notes = "参见 SysUserSocialTypeEnum 枚举值")
     @InEnum(SocialTypeEnum.class)
@@ -44,6 +44,5 @@ public class AppAuthSocialLogin2ReqVO {
     @Length(min = 4, max = 6, message = "手机验证码长度为 4-6 位")
     @Pattern(regexp = "^[0-9]+$", message = "手机验证码必须都是数字")
     private String smsCode;
-
 
 }

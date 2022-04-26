@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.system.controller.admin.auth.vo.auth;
+package cn.iocoder.yudao.module.system.controller.admin.socail.vo;
 
 import cn.iocoder.yudao.module.system.enums.social.SocialTypeEnum;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
@@ -17,7 +17,7 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class AuthSocialBindReqVO {
+public class SocialUserBindReqVO {
 
     @ApiModelProperty(value = "社交平台的类型", required = true, example = "10", notes = "参见 UserSocialTypeEnum 枚举值")
     @InEnum(SocialTypeEnum.class)

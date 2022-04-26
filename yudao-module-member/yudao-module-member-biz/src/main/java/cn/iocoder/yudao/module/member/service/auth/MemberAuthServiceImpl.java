@@ -8,6 +8,8 @@ import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.security.core.authentication.MultiUsernamePasswordAuthenticationToken;
 import cn.iocoder.yudao.module.member.controller.app.auth.vo.*;
+import cn.iocoder.yudao.module.member.controller.app.social.vo.AppSocialUserBindReqVO;
+import cn.iocoder.yudao.module.member.controller.app.social.vo.AppSocialUserUnbindReqVO;
 import cn.iocoder.yudao.module.member.convert.auth.AuthConvert;
 import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
 import cn.iocoder.yudao.module.member.dal.mysql.user.MemberUserMapper;
@@ -108,7 +110,7 @@ public class MemberAuthServiceImpl implements MemberAuthService {
     }
 
     @Override
-    public String socialLogin(AppAuthSocialLoginReqVO reqVO, String userIp, String userAgent) {
+    public String socialQuickLogin(AppAuthSocialQuickLoginReqVO reqVO, String userIp, String userAgent) {
         // 使用 code 授权码，进行登录。然后，获得到绑定的用户编号
         Long userId = socialUserApi.getBindUserId(UserTypeEnum.MEMBER.getValue(), reqVO.getType(),
                 reqVO.getCode(), reqVO.getState());
@@ -125,25 +127,19 @@ public class MemberAuthServiceImpl implements MemberAuthService {
         // 创建 LoginUser 对象
         LoginUser loginUser = AuthConvert.INSTANCE.convert(user);
 
-        // 绑定社交用户（更新）
-        socialUserApi.bindSocialUser(AuthConvert.INSTANCE.convert(loginUser.getId(), getUserType().getValue(), reqVO));
-
         // 缓存登录用户到 Redis 中，返回 sessionId 编号
         return createUserSessionAfterLoginSuccess(loginUser, LoginLogTypeEnum.LOGIN_SOCIAL, userIp, userAgent);
     }
 
     @Override
-    public String socialLogin2(AppAuthSocialLogin2ReqVO reqVO, String userIp, String userAgent) {
-        // 校验社交平台的认证信息是否正确
-        socialUserApi.checkSocialUser(reqVO.getType(), reqVO.getCode(), reqVO.getState());
-
+    public String socialBindLogin(AppAuthSocialBindLoginReqVO reqVO, String userIp, String userAgent) {
         // 使用手机号、手机验证码登录
         AppAuthSmsLoginReqVO loginReqVO = AppAuthSmsLoginReqVO.builder()
                 .mobile(reqVO.getMobile()).code(reqVO.getSmsCode()).build();
         String sessionId = this.smsLogin(loginReqVO, userIp, userAgent);
         LoginUser loginUser = userSessionApi.getLoginUser(sessionId);
 
-        // 绑定社交用户（新增）
+        // 绑定社交用户
         socialUserApi.bindSocialUser(AuthConvert.INSTANCE.convert(loginUser.getId(), getUserType().getValue(), reqVO));
         return sessionId;
     }
@@ -153,17 +149,6 @@ public class MemberAuthServiceImpl implements MemberAuthService {
         createLoginLog(loginUser.getUsername(), logType, LoginResultEnum.SUCCESS);
         // 缓存登录用户到 Redis 中，返回 sessionId 编号
         return userSessionApi.createUserSession(loginUser, userIp, userAgent);
-    }
-
-    @Override
-    public void socialBind(Long userId, AppAuthSocialBindReqVO reqVO) {
-        // 绑定社交用户（新增）
-        socialUserApi.bindSocialUser(AuthConvert.INSTANCE.convert(userId, getUserType().getValue(), reqVO));
-    }
-
-    @Override
-    public void unbindSocialUser(Long userId, AppAuthSocialUnbindReqVO reqVO) {
-        socialUserApi.unbindSocialUser(AuthConvert.INSTANCE.convert(userId, getUserType().getValue(), reqVO));
     }
 
     @Override
