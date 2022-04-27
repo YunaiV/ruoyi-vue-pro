@@ -1,6 +1,6 @@
 <template>
   <div class="app-container">
-
+    <doc-alert title="短信配置" url="https://doc.iocoder.cn/sms/" />
     <!-- 搜索工作栏 -->
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
       <el-form-item label="短信签名" prop="signature">
@@ -39,7 +39,7 @@
         <template slot-scope="scope">
           <dict-tag :type="DICT_TYPE.SYSTEM_SMS_CHANNEL_CODE" :value="scope.row.code"/>
         </template>
-      </el-table-column>>
+      </el-table-column>
       <el-table-column label="启用状态" align="center" prop="status">
         <template slot-scope="scope">
           <dict-tag :type="DICT_TYPE.COMMON_STATUS" :value="scope.row.status"/>
@@ -47,7 +47,7 @@
       </el-table-column>>
       <el-table-column label="备注" align="center" prop="remark" />
       <el-table-column label="短信 API 的账号" align="center" prop="apiKey" />
-      <el-table-column label="短信 API 的秘钥" align="center" prop="apiSecret" />
+      <el-table-column label="短信 API 的密钥" align="center" prop="apiSecret" />
       <el-table-column label="短信发送回调 URL" align="center" prop="callbackUrl" />
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
         <template slot-scope="scope">
@@ -68,13 +68,16 @@
                 @pagination="getList"/>
 
     <!-- 对话框(添加 / 修改) -->
-    <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
-      <el-form ref="form" :model="form" :rules="rules" label-width="80px">
+    <el-dialog :title="title" :visible.sync="open" width="600px" append-to-body>
+      <el-form ref="form" :model="form" :rules="rules" label-width="130px">
         <el-form-item label="短信签名" prop="signature">
           <el-input v-model="form.signature" placeholder="请输入短信签名" />
         </el-form-item>
         <el-form-item label="渠道编码" prop="code">
-          <el-input v-model="form.code" placeholder="请输入渠道编码" />
+          <el-select v-model="form.code" placeholder="请选择渠道编码" clearable>
+            <el-option v-for="dict in this.getDictDatas(DICT_TYPE.SYSTEM_SMS_CHANNEL_CODE)"
+                       :key="dict.value" :label="dict.label" :value="dict.value"/>
+          </el-select>
         </el-form-item>
         <el-form-item label="启用状态">
           <el-radio-group v-model="form.status">
@@ -88,8 +91,8 @@
         <el-form-item label="短信 API 的账号" prop="apiKey">
           <el-input v-model="form.apiKey" placeholder="请输入短信 API 的账号" />
         </el-form-item>
-        <el-form-item label="短信 API 的秘钥" prop="apiSecret">
-          <el-input v-model="form.apiSecret" placeholder="请输入短信 API 的秘钥" />
+        <el-form-item label="短信 API 的密钥" prop="apiSecret">
+          <el-input v-model="form.apiSecret" placeholder="请输入短信 API 的密钥" />
         </el-form-item>
         <el-form-item label="短信发送回调 URL" prop="callbackUrl">
           <el-input v-model="form.callbackUrl" placeholder="请输入短信发送回调 URL" />

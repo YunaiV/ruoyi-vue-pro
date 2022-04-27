@@ -44,14 +44,12 @@ spring:
       datasource:
         master:
           name: ruoyi-vue-pro
-#          name: ruoyi-vue-pro-flowable
           url: jdbc:mysql://127.0.0.1:3306/${spring.datasource.dynamic.datasource.master.name}?useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=CTT
           driver-class-name: com.mysql.jdbc.Driver
           username: root
           password: 123456
         slave: # 模拟从库，可根据自己需要修改
           name: ruoyi-vue-pro
-#          name: ruoyi-vue-pro-flowable
           url: jdbc:mysql://127.0.0.1:3306/${spring.datasource.dynamic.datasource.slave.name}?useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=CTT
           driver-class-name: com.mysql.jdbc.Driver
           username: root
@@ -198,10 +196,6 @@ yudao:
 justauth:
   enabled: true
   type:
-    GITEE: # Gitee
-      client-id: ee61f0374a4c6c404a8717094caa7a410d76950e45ff60348015830c519ba5c1
-      client-secret: 7c044a5671be3b051414db0cf2cec6ad702dd298d2416ba24ceaf608e6fa26f9
-      ignore-check-redirect-uri: true
     DINGTALK: # 钉钉
       client-id: dingvrnreaje3yqvzhxg
       client-secret: i8E6iZyDvZj51JIb0tYsYfVQYOks9Cq1lgryEjFRqC79P3iJcrxEwT6Qk2QvLrLI

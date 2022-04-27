@@ -71,12 +71,6 @@ export const InfraApiErrorLogProcessStatusEnum = {
  * 用户的社交平台的类型枚举
  */
 export const SystemUserSocialTypeEnum = {
-  // GITEE: {
-  //   title: "码云",
-  //   type: 10,
-  //   source: "gitee",
-  //   img: "https://cdn.jsdelivr.net/gh/justauth/justauth-oauth-logo@1.11/gitee.png",
-  // },
   DINGTALK: {
     title: "钉钉",
     type: 20,

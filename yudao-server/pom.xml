@@ -24,33 +24,33 @@
         <!-- TODO 芋艿：多模块 -->
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
-            <artifactId>yudao-module-member-impl</artifactId>
+            <artifactId>yudao-module-member-biz</artifactId>
             <version>${revision}</version>
         </dependency>
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
-            <artifactId>yudao-module-system-impl</artifactId>
+            <artifactId>yudao-module-system-biz</artifactId>
             <version>${revision}</version>
         </dependency>
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
-            <artifactId>yudao-module-infra-impl</artifactId>
+            <artifactId>yudao-module-infra-biz</artifactId>
             <version>${revision}</version>
         </dependency>
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
-            <artifactId>yudao-module-pay-impl</artifactId>
+            <artifactId>yudao-module-pay-biz</artifactId>
             <version>${revision}</version>
         </dependency>
-        <!-- 默认引入 yudao-module-bpm-impl-flowable 实现，可以替换为 yudao-module-bpm-impl-activiti 实现-->
+        <!-- 默认引入 yudao-module-bpm-biz-flowable 实现，可以替换为 yudao-module-bpm-biz-activiti 实现-->
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
-            <artifactId>yudao-module-bpm-impl-flowable</artifactId>
+            <artifactId>yudao-module-bpm-biz-flowable</artifactId>
             <version>${revision}</version>
         </dependency>
 <!--        <dependency>-->
 <!--            <groupId>cn.iocoder.boot</groupId>-->
-<!--            <artifactId>yudao-module-bpm-impl-activiti</artifactId>-->
+<!--            <artifactId>yudao-module-bpm-biz-activiti</artifactId>-->
 <!--            <version>${revision}</version>-->
 <!--        </dependency>-->
 
@@ -77,7 +77,7 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>2.5.10</version> <!-- 如果 spring.boot.version 版本修改，则这里也要跟着修改 -->
+                <version>2.5.12</version> <!-- 如果 spring.boot.version 版本修改，则这里也要跟着修改 -->
                 <configuration>
                     <fork>true</fork>
                 </configuration>

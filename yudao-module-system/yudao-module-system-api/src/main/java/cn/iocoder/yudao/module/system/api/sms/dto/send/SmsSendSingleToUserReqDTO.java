@@ -18,7 +18,6 @@ public class SmsSendSingleToUserReqDTO {
     /**
      * 用户编号
      */
-    @NotNull(message = "用户编号不能为空")
     private Long userId;
     /**
      * 手机号

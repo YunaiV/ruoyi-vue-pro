@@ -1,13 +1,15 @@
 {
   "name": "yudao-ui-admin",
-  "version": "1.6.1-snapshot",
+  "version": "1.6.2-snapshot",
   "description": "芋道管理系统",
   "author": "芋道",
   "license": "MIT",
   "scripts": {
-    "dev": "vue-cli-service serve",
-    "build:prod": "vue-cli-service build",
-    "build:stage": "vue-cli-service build --mode staging",
+    "local": "vue-cli-service serve --mode local",
+    "dev": "vue-cli-service serve --mode dev",
+    "build:prod": "vue-cli-service build --mode prod",
+    "build:stage": "vue-cli-service build --mode stage",
+    "build:dev": "vue-cli-service build --mode dev",
     "build:demo1024": "vue-cli-service build --mode demo1024",
     "preview": "node build/index.js --preview",
     "lint": "eslint --ext .js,.vue src"
