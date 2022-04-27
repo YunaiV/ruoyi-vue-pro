@@ -56,6 +56,7 @@ public abstract class AbstractAlipayClient extends AbstractPayClient<AlipayPayCl
     @Override
     public  PayOrderNotifyRespDTO parseOrderNotify(PayNotifyDataDTO data) throws Exception {
         Map<String, String> params = strToMap(data.getBody());
+
         return  PayOrderNotifyRespDTO.builder().orderExtensionNo(params.get("out_trade_no"))
                 .channelOrderNo(params.get("trade_no")).channelUserId(params.get("seller_id"))
                 .tradeStatus(params.get("trade_status"))
@@ -129,13 +130,6 @@ public abstract class AbstractAlipayClient extends AbstractPayClient<AlipayPayCl
         }
     }
 
-    /**
-     *
-     * 支付宝统一回调参数  str转map
-     *
-     * @param s 支付宝支付通知回调参数
-     * @return map 支付宝集合
-     */
     public static Map<String, String> strToMap(String s) {
         Map<String, String> stringStringMap = new HashMap<>();
         //调整时间格式
@@ -149,5 +143,4 @@ public abstract class AbstractAlipayClient extends AbstractPayClient<AlipayPayCl
         }
         return stringStringMap;
     }
-
 }
