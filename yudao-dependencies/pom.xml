@@ -45,6 +45,7 @@
         <activiti.version>7.1.0.M6</activiti.version>
         <flowable.version>6.7.0</flowable.version>
         <!-- 工具类相关 -->
+        <jasypt-spring-boot-starter.version>3.0.4</jasypt-spring-boot-starter.version>
         <lombok.version>1.18.20</lombok.version>
         <mapstruct.version>1.4.1.Final</mapstruct.version>
         <hutool.version>5.6.1</hutool.version>
@@ -426,6 +427,12 @@
                 <groupId>cn.iocoder.boot</groupId>
                 <artifactId>yudao-common</artifactId>
                 <version>${revision}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.github.ulisesbocchio</groupId>
+                <artifactId>jasypt-spring-boot-starter</artifactId> <!-- 加解密 -->
+                <version>${jasypt-spring-boot-starter.version}</version>
             </dependency>
 
             <dependency>

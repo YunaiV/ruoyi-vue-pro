@@ -4824,4 +4824,18 @@ INSERT INTO `system_user_session` VALUES ('fe11c39cfc2740a992063bf05bd170f3', 1,
 INSERT INTO `system_user_session` VALUES ('ffe28d833fea4e76a0b2b6bcde9236c2', 1, 2, '2022-04-03 22:03:16', 'admin', '0:0:0:0:0:0:0:1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.83 Safari/537.36', NULL, '2022-04-02 22:03:16', NULL, '2022-04-03 14:21:23', b'1', 1);
 COMMIT;
 
+CREATE TABLE `infra_data_source_config` (
+                                            `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键编号',
+                                            `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '参数名称',
+                                            `url` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '数据源连接',
+                                            `username` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '用户名',
+                                            `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '密码',
+                                            `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '创建者',
+                                            `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+                                            `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '更新者',
+                                            `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+                                            `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+                                            PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='数据源配置表';
+
 SET FOREIGN_KEY_CHECKS = 1;

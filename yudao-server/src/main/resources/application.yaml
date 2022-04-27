@@ -123,6 +123,7 @@ yudao:
       - infra_job
       - infra_job_log
       - infra_job_log
+      - infra_data_source_config
   sms-code: # 短信验证码相关的配置项
     expire-times: 10m
     send-frequency: 1m
