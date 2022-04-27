@@ -130,6 +130,15 @@ public abstract class AbstractAlipayClient extends AbstractPayClient<AlipayPayCl
         }
     }
 
+
+
+    /**
+     *
+     * 支付宝统一回调参数  str转map
+     *
+     * @param s 支付宝支付通知回调参数
+     * @return map 支付宝集合
+     */
     public static Map<String, String> strToMap(String s) {
         Map<String, String> stringStringMap = new HashMap<>();
         //调整时间格式
