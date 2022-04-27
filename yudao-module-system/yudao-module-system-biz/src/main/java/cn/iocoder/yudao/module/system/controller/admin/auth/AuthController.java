@@ -61,6 +61,26 @@ public class AuthController {
         return success(AuthLoginRespVO.builder().token(token).build());
     }
 
+    @PostMapping("/sms-login")
+    @ApiOperation("使用短信验证码登录")
+    @OperateLog(enable = false) // 避免 Post 请求被记录操作日志
+    public CommonResult<AuthLoginRespVO> smsLogin(@RequestBody @Valid AuthSmsLoginReqVO reqVO) {
+
+
+
+        String token = authService.smsLogin(reqVO, getClientIP(), getUserAgent());
+        // 返回结果
+        return success(AuthLoginRespVO.builder().token(token).build());
+    }
+
+    @PostMapping("/send-login-sms-code")
+    @ApiOperation(value = "发送手机验证码")
+    @OperateLog(enable = false) // 避免 Post 请求被记录操作日志
+    public CommonResult<Boolean> sendLoginSmsCode(@RequestBody @Valid AuthSmsSendReqVO reqVO) {
+        authService.sendSmsCode(getLoginUserId(), reqVO);
+        return success(true);
+    }
+
     @GetMapping("/get-permission-info")
     @ApiOperation("获取登录用户的权限信息")
     public CommonResult<AuthPermissionInfoRespVO> getPermissionInfo() {

@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.system.convert.auth;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
+import cn.iocoder.yudao.module.system.api.sms.dto.code.SmsCodeSendReqDTO;
 import cn.iocoder.yudao.module.system.api.social.dto.SocialUserBindReqDTO;
 import cn.iocoder.yudao.module.system.api.social.dto.SocialUserUnbindReqDTO;
 import cn.iocoder.yudao.module.system.controller.admin.auth.vo.auth.*;
@@ -76,5 +77,5 @@ public interface AuthConvert {
     SocialUserBindReqDTO convert(Long userId, Integer userType, AuthSocialLogin2ReqVO reqVO);
     SocialUserBindReqDTO convert(Long userId, Integer userType, AuthSocialLoginReqVO reqVO);
     SocialUserUnbindReqDTO convert(Long userId, Integer userType, AuthSocialUnbindReqVO reqVO);
-
+    SmsCodeSendReqDTO convert(AuthSmsSendReqVO reqVO);
 }

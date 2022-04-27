@@ -100,3 +100,30 @@ export function socialUnbind(type, unionId) {
     }
   })
 }
+
+// 获取登录验证码
+export function sendLoginSmsCode(mobile,scene,uuid,code) {
+  var datas = {
+    mobile
+    ,scene
+    ,uuid,
+    code
+  };
+  return request({
+    url: '/system/send-login-sms-code',
+    method: 'post',
+    data: datas
+  })
+}
+
+// 短信验证码登录
+export function smsLogin(mobile, code) {
+  return request({
+    url: '/system/sms-login',
+    method: 'post',
+    data: {
+      mobile,
+      code
+    }
+  })
+}

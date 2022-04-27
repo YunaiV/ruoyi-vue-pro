@@ -25,6 +25,23 @@ public interface AdminAuthService extends SecurityAuthFrameworkService {
     String login(@Valid AuthLoginReqVO reqVO, String userIp, String userAgent);
 
     /**
+     * 短信验证码发送
+     * @param userId
+     * @param reqVO
+     */
+    public void sendSmsCode(Long userId, AuthSmsSendReqVO reqVO);
+
+    /**
+     * 短信登录
+     *
+     * @param reqVO 登录信息
+     * @param userIp 用户 IP
+     * @param userAgent 用户 UA
+     * @return 身份令牌，使用 JWT 方式
+     */
+    String smsLogin(AuthSmsLoginReqVO reqVO, String userIp, String userAgent) ;
+
+    /**
      * 社交登录，使用 code 授权码
      *
      * @param reqVO 登录信息

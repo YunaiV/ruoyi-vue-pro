@@ -8,14 +8,14 @@ import cn.iocoder.yudao.framework.common.util.validation.ValidationUtils;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.security.core.authentication.MultiUsernamePasswordAuthenticationToken;
 import cn.iocoder.yudao.module.system.api.logger.dto.LoginLogCreateReqDTO;
-import cn.iocoder.yudao.module.system.controller.admin.auth.vo.auth.AuthLoginReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.auth.vo.auth.AuthSocialBindReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.auth.vo.auth.AuthSocialLogin2ReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.auth.vo.auth.AuthSocialLoginReqVO;
+import cn.iocoder.yudao.module.system.api.sms.SmsCodeApi;
+import cn.iocoder.yudao.module.system.api.sms.dto.code.SmsCodeUseReqDTO;
+import cn.iocoder.yudao.module.system.controller.admin.auth.vo.auth.*;
 import cn.iocoder.yudao.module.system.convert.auth.AuthConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
 import cn.iocoder.yudao.module.system.enums.logger.LoginLogTypeEnum;
 import cn.iocoder.yudao.module.system.enums.logger.LoginResultEnum;
+import cn.iocoder.yudao.module.system.enums.sms.SmsSceneEnum;
 import cn.iocoder.yudao.module.system.service.common.CaptchaService;
 import cn.iocoder.yudao.module.system.service.logger.LoginLogService;
 import cn.iocoder.yudao.module.system.service.permission.PermissionService;
@@ -41,6 +41,7 @@ import java.util.Objects;
 import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getClientIP;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
 import static java.util.Collections.singleton;
 
@@ -73,6 +74,10 @@ public class AdminAuthServiceImpl implements AdminAuthService {
 
     @Resource
     private Validator validator;
+
+    @Resource
+    private SmsCodeApi smsCodeApi;
+
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -108,6 +113,58 @@ public class AdminAuthServiceImpl implements AdminAuthService {
 
         // 缓存登陆用户到 Redis 中，返回 sessionId 编号
         return createUserSessionAfterLoginSuccess(loginUser, LoginLogTypeEnum.LOGIN_USERNAME, userIp, userAgent);
+    }
+
+    @Override
+    public void sendSmsCode(Long userId, AuthSmsSendReqVO reqVO) {
+
+        this.verifyCaptchaSmsSend(reqVO);
+        //登录场景，验证是否存在
+        if(reqVO.getScene().compareTo(SmsSceneEnum.ADMIN_MEMBER_LOGIN.getScene())==0) {
+            if (userService.getUserByMobile(reqVO.getMobile()) == null) {
+                throw  exception(USER_NOT_EXISTS);
+            }
+        }
+        // TODO 要根据不同的场景，校验是否有用户
+        smsCodeApi.sendSmsCode(AuthConvert.INSTANCE.convert(reqVO).setCreateIp(getClientIP()));
+    }
+
+
+    /**
+     * 短信登录
+     */
+    @Override
+    public String smsLogin(AuthSmsLoginReqVO reqVO, String userIp, String userAgent) {
+
+        /* 从 Member的AuhtConvert中拷贝出来的，没单独写类 */
+        if ( reqVO == null) {
+            return null;
+        }
+
+        SmsCodeUseReqDTO smsCodeUseReqDTO = new SmsCodeUseReqDTO();
+        smsCodeUseReqDTO.setMobile( reqVO.getMobile() );
+        smsCodeUseReqDTO.setCode( reqVO.getCode() );
+        smsCodeUseReqDTO.setScene( SmsSceneEnum.ADMIN_MEMBER_LOGIN.getScene() );
+        smsCodeUseReqDTO.setUsedIp(userIp);
+        smsCodeApi.useSmsCode(smsCodeUseReqDTO);
+
+        // 获得用户信息
+        AdminUserDO user = userService.getUserByMobile(reqVO.getMobile());
+
+
+        if(user==null)
+        {
+            throw  exception(USER_NOT_EXISTS);
+        }
+
+        cn.hutool.core.lang.Assert.notNull(user, "获取用户失败，结果为空");
+
+        // 执行登陆
+        this.createLoginLog(user.getMobile(),LoginLogTypeEnum.LOGIN_MOBILE, LoginResultEnum.SUCCESS);
+        LoginUser loginUser = buildLoginUser(user);
+
+        // 缓存登陆用户到 Redis 中，返回 sessionId 编号
+        return createUserSessionAfterLoginSuccess(loginUser, LoginLogTypeEnum.LOGIN_MOBILE, userIp, userAgent);
     }
 
     private void verifyCaptcha(AuthLoginReqVO reqVO) {
@@ -158,6 +215,33 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         Assert.notNull(authentication.getPrincipal(), "Principal 不会为空");
         return (LoginUser) authentication.getPrincipal();
     }
+
+    /**
+     * 验证验证码并发送短信
+     * @param reqVO
+     */
+    private void verifyCaptchaSmsSend(AuthSmsSendReqVO reqVO) {
+        // 如果验证码关闭，则不进行校验
+        if (!captchaService.isCaptchaEnable()) {
+            return;
+        }
+        // 校验验证码
+        ValidationUtils.validate(validator, reqVO, AuthLoginReqVO.CodeEnableGroup.class);
+        // 验证码不存在
+        final LoginLogTypeEnum logTypeEnum = LoginLogTypeEnum.LOGIN_USERNAME;
+        String code = captchaService.getCaptchaCode(reqVO.getUuid());
+        if (code == null) {
+            throw exception(AUTH_LOGIN_CAPTCHA_NOT_FOUND);
+        }
+        // 验证码不正确
+        if (!code.equals(reqVO.getCode())) {
+            // 创建登录失败日志（验证码不正确)
+            throw exception(AUTH_LOGIN_CAPTCHA_CODE_ERROR);
+        }
+        // 正确，所以要删除下验证码
+        captchaService.deleteCaptchaCode(reqVO.getUuid());
+    }
+
 
     private void createLoginLog(String username, LoginLogTypeEnum logTypeEnum, LoginResultEnum loginResult) {
         // 获得用户
