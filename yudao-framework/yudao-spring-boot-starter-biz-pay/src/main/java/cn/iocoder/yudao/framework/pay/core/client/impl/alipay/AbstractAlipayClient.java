@@ -18,6 +18,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString;
@@ -54,7 +55,7 @@ public abstract class AbstractAlipayClient extends AbstractPayClient<AlipayPayCl
      */
     @Override
     public  PayOrderNotifyRespDTO parseOrderNotify(PayNotifyDataDTO data) throws Exception {
-        Map<String, String> params = data.getParams();
+        Map<String, String> params = strToMap(data.getBody());
         return  PayOrderNotifyRespDTO.builder().orderExtensionNo(params.get("out_trade_no"))
                 .channelOrderNo(params.get("trade_no")).channelUserId(params.get("seller_id"))
                 .tradeStatus(params.get("trade_status"))
@@ -64,7 +65,7 @@ public abstract class AbstractAlipayClient extends AbstractPayClient<AlipayPayCl
 
     @Override
     public PayRefundNotifyDTO parseRefundNotify(PayNotifyDataDTO notifyData) {
-        Map<String, String> params = notifyData.getParams();
+        Map<String, String> params = strToMap(notifyData.getBody());
         PayRefundNotifyDTO notifyDTO = PayRefundNotifyDTO.builder().channelOrderNo(params.get("trade_no"))
                 .tradeNo(params.get("out_trade_no"))
                 .reqNo(params.get("out_biz_no"))
@@ -126,6 +127,27 @@ public abstract class AbstractAlipayClient extends AbstractPayClient<AlipayPayCl
             log.error("[doUnifiedRefund][request({}) 发起退款失败,网络读超时，退款状态未知]", toJsonString(reqDTO), e);
             return PayCommonResult.build(e.getErrCode(), e.getErrMsg(), null, codeMapping);
         }
+    }
+
+    /**
+     *
+     * 支付宝统一回调参数  str转map
+     *
+     * @param s 支付宝支付通知回调参数
+     * @return map 支付宝集合
+     */
+    public static Map<String, String> strToMap(String s) {
+        Map<String, String> stringStringMap = new HashMap<>();
+        //调整时间格式
+        String s3 = s.replaceAll("%3A", ":");
+        //获取map
+        String s4 = s3.replace("+", " ");
+        String[] split = s4.split("&");
+        for (String s1 : split) {
+            String[] split1 = s1.split("=");
+            stringStringMap.put(split1[0], split1[1]);
+        }
+        return stringStringMap;
     }
 
 }
