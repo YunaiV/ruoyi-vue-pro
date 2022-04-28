@@ -1,6 +1,5 @@
-package cn.iocoder.yudao.module.infra.dal.dataobject.codegen;
+package cn.iocoder.yudao.module.infra.dal.dataobject.db;
 
-import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Builder;
 import lombok.Data;
 
@@ -11,15 +10,10 @@ import java.util.Date;
  *
  * @author 芋道源码
  */
-@TableName(value = "information_schema.tables", autoResultMap = true)
 @Data
 @Builder
-public class SchemaTableDO {
+public class DatabaseTableDO {
 
-    /**
-     * 数据库
-     */
-    private String tableSchema;
     /**
      * 表名称
      */

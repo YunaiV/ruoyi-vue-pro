@@ -5,7 +5,7 @@ import cn.iocoder.yudao.module.infra.controller.admin.codegen.vo.CodegenUpdateRe
 import cn.iocoder.yudao.module.infra.controller.admin.codegen.vo.table.CodegenTablePageReqVO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.codegen.CodegenColumnDO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.codegen.CodegenTableDO;
-import cn.iocoder.yudao.module.infra.dal.dataobject.codegen.SchemaTableDO;
+import cn.iocoder.yudao.module.infra.dal.dataobject.db.DatabaseTableDO;
 
 import java.util.List;
 import java.util.Map;
@@ -119,6 +119,6 @@ public interface CodegenService {
      * @param tableComment 表描述
      * @return 表定义列表
      */
-    List<SchemaTableDO> getSchemaTableList(String tableName, String tableComment);
+    List<DatabaseTableDO> getSchemaTableList(String tableName, String tableComment);
 
 }

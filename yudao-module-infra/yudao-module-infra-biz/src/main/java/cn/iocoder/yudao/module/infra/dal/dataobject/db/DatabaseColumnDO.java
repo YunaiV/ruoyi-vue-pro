@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.infra.dal.dataobject.codegen;
+package cn.iocoder.yudao.module.infra.dal.dataobject.db;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -10,10 +10,9 @@ import lombok.Data;
  *
  * @author 芋道源码
  */
-@TableName(value = "information_schema.columns", autoResultMap = true)
 @Data
 @Builder
-public class SchemaColumnDO {
+public class DatabaseColumnDO {
 
     /**
      * 表名称
@@ -34,17 +33,14 @@ public class SchemaColumnDO {
     /**
      * 是否允许为空
      */
-    @TableField("case when is_nullable = 'yes' then '1' else '0' end")
     private Boolean nullable;
     /**
      * 是否主键
      */
-    @TableField("case when column_key = 'PRI' then '1' else '0' end")
     private Boolean primaryKey;
     /**
      * 是否自增
      */
-    @TableField("case when extra = 'auto_increment' then '1' else '0' end")
     private Boolean autoIncrement;
     /**
      * 排序字段

@@ -9,8 +9,8 @@ import cn.iocoder.yudao.module.infra.controller.admin.codegen.vo.table.CodegenTa
 import cn.iocoder.yudao.module.infra.controller.admin.codegen.vo.table.SchemaTableRespVO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.codegen.CodegenColumnDO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.codegen.CodegenTableDO;
-import cn.iocoder.yudao.module.infra.dal.dataobject.codegen.SchemaColumnDO;
-import cn.iocoder.yudao.module.infra.dal.dataobject.codegen.SchemaTableDO;
+import cn.iocoder.yudao.module.infra.dal.dataobject.db.DatabaseColumnDO;
+import cn.iocoder.yudao.module.infra.dal.dataobject.db.DatabaseTableDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
@@ -25,11 +25,11 @@ public interface CodegenConvert {
 
     // ========== InformationSchemaTableDO 和 InformationSchemaColumnDO 相关 ==========
 
-    CodegenTableDO convert(SchemaTableDO bean);
+    CodegenTableDO convert(DatabaseTableDO bean);
 
-    List<CodegenColumnDO> convertList(List<SchemaColumnDO> list);
+    List<CodegenColumnDO> convertList(List<DatabaseColumnDO> list);
 
-    CodegenTableRespVO convert(SchemaColumnDO bean);
+    CodegenTableRespVO convert(DatabaseColumnDO bean);
 
     // ========== CodegenTableDO 相关 ==========
 
@@ -47,7 +47,7 @@ public interface CodegenConvert {
 
     List<CodegenColumnDO> convertList03(List<CodegenUpdateReqVO.Column> columns);
 
-    List<SchemaTableRespVO> convertList04(List<SchemaTableDO> list);
+    List<SchemaTableRespVO> convertList04(List<DatabaseTableDO> list);
 
     // ========== 其它 ==========
 

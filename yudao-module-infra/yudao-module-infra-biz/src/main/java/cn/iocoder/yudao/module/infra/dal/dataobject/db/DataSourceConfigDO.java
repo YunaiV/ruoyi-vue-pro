@@ -14,6 +14,11 @@ import lombok.Data;
 public class DataSourceConfigDO extends BaseDO {
 
     /**
+     * 主键编号 - Master 数据源
+     */
+    public static final Long ID_MASTER = 0L;
+
+    /**
      * 主键编号
      */
     private Long id;

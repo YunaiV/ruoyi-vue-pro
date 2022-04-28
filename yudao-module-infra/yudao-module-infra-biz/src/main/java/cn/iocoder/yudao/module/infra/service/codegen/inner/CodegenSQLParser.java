@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.infra.service.codegen.inner;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.iocoder.yudao.module.infra.dal.dataobject.codegen.SchemaColumnDO;
-import cn.iocoder.yudao.module.infra.dal.dataobject.codegen.SchemaTableDO;
+import cn.iocoder.yudao.module.infra.dal.dataobject.db.DatabaseColumnDO;
+import cn.iocoder.yudao.module.infra.dal.dataobject.db.DatabaseTableDO;
 import com.alibaba.druid.DbType;
 import com.alibaba.druid.sql.ast.expr.SQLCharExpr;
 import com.alibaba.druid.sql.ast.statement.SQLColumnDefinition;
@@ -21,7 +21,7 @@ import java.util.Objects;
 import static com.alibaba.druid.sql.SQLUtils.normalize;
 
 /**
- * SQL 解析器，将创建表的 SQL，解析成 {@link SchemaTableDO} 和 {@link SchemaColumnDO} 对象，
+ * SQL 解析器，将创建表的 SQL，解析成 {@link DatabaseTableDO} 和 {@link DatabaseColumnDO} 对象，
  * 后续可以基于它们，生成代码~
  *
  * @author 芋道源码
@@ -29,18 +29,18 @@ import static com.alibaba.druid.sql.SQLUtils.normalize;
 public class CodegenSQLParser {
 
     /**
-     * 解析建表 SQL 语句，返回 {@link SchemaTableDO} 和 {@link SchemaColumnDO} 对象
+     * 解析建表 SQL 语句，返回 {@link DatabaseTableDO} 和 {@link DatabaseColumnDO} 对象
      *
      * @param sql 建表 SQL 语句
      * @return 解析结果
      */
-    public static KeyValue<SchemaTableDO, List<SchemaColumnDO>> parse(String sql) {
+    public static KeyValue<DatabaseTableDO, List<DatabaseColumnDO>> parse(String sql) {
         // 解析 SQL 成 Statement
         SQLCreateTableStatement statement = parseCreateSQL(sql);
         // 解析 Table 表
-        SchemaTableDO table = parseTable(statement);
+        DatabaseTableDO table = parseTable(statement);
         // 解析 Column 字段
-        List<SchemaColumnDO> columns = parseColumns(statement);
+        List<DatabaseColumnDO> columns = parseColumns(statement);
         columns.forEach(column -> column.setTableName(table.getTableName()));
         // 返回
         return new DefaultKeyValue<>(table, columns);
@@ -61,8 +61,8 @@ public class CodegenSQLParser {
         return (MySqlCreateTableStatement) repository.findTable(tableName).getStatement();
     }
 
-    private static SchemaTableDO parseTable(SQLCreateTableStatement statement) {
-        return SchemaTableDO.builder()
+    private static DatabaseTableDO parseTable(SQLCreateTableStatement statement) {
+        return DatabaseTableDO.builder()
                 .tableName(statement.getTableSource().getTableName(true))
                 .tableComment(getCommentText(statement))
                 .build();
@@ -75,13 +75,13 @@ public class CodegenSQLParser {
         return ((SQLCharExpr) statement.getComment()).getText();
     }
 
-    private static List<SchemaColumnDO> parseColumns(SQLCreateTableStatement statement) {
-        List<SchemaColumnDO> columns = new ArrayList<>();
+    private static List<DatabaseColumnDO> parseColumns(SQLCreateTableStatement statement) {
+        List<DatabaseColumnDO> columns = new ArrayList<>();
         statement.getTableElementList().forEach(element -> parseColumn(columns, element));
         return columns;
     }
 
-    private static void parseColumn(List<SchemaColumnDO> columns, SQLTableElement element) {
+    private static void parseColumn(List<DatabaseColumnDO> columns, SQLTableElement element) {
         // 处理主键
         if (element instanceof SQLPrimaryKey) {
             parsePrimaryKey(columns, (SQLPrimaryKey) element);
@@ -93,16 +93,16 @@ public class CodegenSQLParser {
         }
     }
 
-    private static void parsePrimaryKey(List<SchemaColumnDO> columns, SQLPrimaryKey primaryKey) {
+    private static void parsePrimaryKey(List<DatabaseColumnDO> columns, SQLPrimaryKey primaryKey) {
         String columnName = normalize(primaryKey.getColumns().get(0).toString()); // 暂时不考虑联合主键
         // 匹配 columns 主键字段，设置为 primary
         columns.stream().filter(column -> column.getColumnName().equals(columnName))
             .forEach(column -> column.setPrimaryKey(true));
     }
 
-    private static void parseColumnDefinition(List<SchemaColumnDO> columns, SQLColumnDefinition definition) {
+    private static void parseColumnDefinition(List<DatabaseColumnDO> columns, SQLColumnDefinition definition) {
         String text = definition.toString().toUpperCase();
-        columns.add(SchemaColumnDO.builder()
+        columns.add(DatabaseColumnDO.builder()
                 .columnName(normalize(definition.getColumnName()))
                 .columnType(definition.getDataType().toString())
                 .columnComment(Objects.isNull(definition.getComment()) ? ""

@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.infra.service.db;
 
-import cn.iocoder.yudao.framework.mybatis.core.util.DatabaseUtils;
+import cn.iocoder.yudao.framework.mybatis.core.util.JdbcUtils;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.infra.controller.admin.db.vo.DataSourceConfigCreateReqVO;
 import cn.iocoder.yudao.module.infra.controller.admin.db.vo.DataSourceConfigUpdateReqVO;
@@ -41,12 +41,12 @@ public class DataSourceConfigServiceImplTest extends BaseDbUnitTest {
 
     @Test
     public void testCreateDataSourceConfig_success() {
-        try (MockedStatic<DatabaseUtils> databaseUtilsMock = mockStatic(DatabaseUtils.class)) {
+        try (MockedStatic<JdbcUtils> databaseUtilsMock = mockStatic(JdbcUtils.class)) {
             // 准备参数
             DataSourceConfigCreateReqVO reqVO = randomPojo(DataSourceConfigCreateReqVO.class);
             // mock 方法
             when(stringEncryptor.encrypt(eq(reqVO.getPassword()))).thenReturn("123456");
-            databaseUtilsMock.when(() -> DatabaseUtils.isConnectionOK(eq(reqVO.getUrl()),
+            databaseUtilsMock.when(() -> JdbcUtils.isConnectionOK(eq(reqVO.getUrl()),
                     eq(reqVO.getUsername()), eq(reqVO.getPassword()))).thenReturn(true);
 
             // 调用
@@ -62,7 +62,7 @@ public class DataSourceConfigServiceImplTest extends BaseDbUnitTest {
 
     @Test
     public void testUpdateDataSourceConfig_success() {
-        try (MockedStatic<DatabaseUtils> databaseUtilsMock = mockStatic(DatabaseUtils.class)) {
+        try (MockedStatic<JdbcUtils> databaseUtilsMock = mockStatic(JdbcUtils.class)) {
             // mock 数据
             DataSourceConfigDO dbDataSourceConfig = randomPojo(DataSourceConfigDO.class);
             dataSourceConfigMapper.insert(dbDataSourceConfig);// @Sql: 先插入出一条存在的数据
@@ -72,7 +72,7 @@ public class DataSourceConfigServiceImplTest extends BaseDbUnitTest {
             });
             // mock 方法
             when(stringEncryptor.encrypt(eq(reqVO.getPassword()))).thenReturn("123456");
-            databaseUtilsMock.when(() -> DatabaseUtils.isConnectionOK(eq(reqVO.getUrl()),
+            databaseUtilsMock.when(() -> JdbcUtils.isConnectionOK(eq(reqVO.getUrl()),
                     eq(reqVO.getUsername()), eq(reqVO.getPassword()))).thenReturn(true);
 
             // 调用

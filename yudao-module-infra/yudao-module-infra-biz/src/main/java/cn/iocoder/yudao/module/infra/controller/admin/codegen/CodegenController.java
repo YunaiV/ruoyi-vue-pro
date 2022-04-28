@@ -13,7 +13,7 @@ import cn.iocoder.yudao.module.infra.controller.admin.codegen.vo.table.SchemaTab
 import cn.iocoder.yudao.module.infra.convert.codegen.CodegenConvert;
 import cn.iocoder.yudao.module.infra.dal.dataobject.codegen.CodegenColumnDO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.codegen.CodegenTableDO;
-import cn.iocoder.yudao.module.infra.dal.dataobject.codegen.SchemaTableDO;
+import cn.iocoder.yudao.module.infra.dal.dataobject.db.DatabaseTableDO;
 import cn.iocoder.yudao.module.infra.service.codegen.CodegenService;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
@@ -58,7 +58,7 @@ public class CodegenController {
             @RequestParam(value = "tableName", required = false) String tableName,
             @RequestParam(value = "tableComment", required = false) String tableComment) {
         // 获得数据库自带的表定义列表
-        List<SchemaTableDO> schemaTables = codegenService.getSchemaTableList(tableName, tableComment);
+        List<DatabaseTableDO> schemaTables = codegenService.getSchemaTableList(tableName, tableComment);
         // 移除在 Codegen 中，已经存在的
         Set<String> existsTables = CollectionUtils.convertSet(codegenService.getCodeGenTableList(), CodegenTableDO::getTableName);
         schemaTables.removeIf(table -> existsTables.contains(table.getTableName()));

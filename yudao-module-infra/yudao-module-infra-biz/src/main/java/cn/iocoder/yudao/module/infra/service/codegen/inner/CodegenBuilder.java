@@ -7,8 +7,8 @@ import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.infra.convert.codegen.CodegenConvert;
 import cn.iocoder.yudao.module.infra.dal.dataobject.codegen.CodegenColumnDO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.codegen.CodegenTableDO;
-import cn.iocoder.yudao.module.infra.dal.dataobject.codegen.SchemaColumnDO;
-import cn.iocoder.yudao.module.infra.dal.dataobject.codegen.SchemaTableDO;
+import cn.iocoder.yudao.module.infra.dal.dataobject.db.DatabaseColumnDO;
+import cn.iocoder.yudao.module.infra.dal.dataobject.db.DatabaseTableDO;
 import cn.iocoder.yudao.module.infra.enums.codegen.CodegenColumnHtmlTypeEnum;
 import cn.iocoder.yudao.module.infra.enums.codegen.CodegenColumnListConditionEnum;
 import cn.iocoder.yudao.module.infra.enums.codegen.CodegenTemplateTypeEnum;
@@ -22,8 +22,8 @@ import static cn.hutool.core.text.CharSequenceUtil.*;
 
 /**
  * 代码生成器的 Builder，负责：
- * 1. 将数据库的表 {@link SchemaTableDO} 定义，构建成 {@link CodegenTableDO}
- * 2. 将数据库的列 {@link SchemaColumnDO} 构定义，建成 {@link CodegenColumnDO}
+ * 1. 将数据库的表 {@link DatabaseTableDO} 定义，构建成 {@link CodegenTableDO}
+ * 2. 将数据库的列 {@link DatabaseColumnDO} 构定义，建成 {@link CodegenColumnDO}
  */
 @Component
 public class CodegenBuilder {
@@ -109,7 +109,7 @@ public class CodegenBuilder {
         LIST_OPERATION_RESULT_EXCLUDE_COLUMN.remove("createTime"); // 创建时间，还是需要返回的
     }
 
-    public CodegenTableDO buildTable(SchemaTableDO schemaTable) {
+    public CodegenTableDO buildTable(DatabaseTableDO schemaTable) {
         CodegenTableDO table = CodegenConvert.INSTANCE.convert(schemaTable);
         initTableDefault(table);
         return table;
@@ -133,7 +133,7 @@ public class CodegenBuilder {
         table.setTemplateType(CodegenTemplateTypeEnum.CRUD.getType());
     }
 
-    public List<CodegenColumnDO> buildColumns(Long tableId, List<SchemaColumnDO> schemaColumns) {
+    public List<CodegenColumnDO> buildColumns(Long tableId, List<DatabaseColumnDO> schemaColumns) {
         List<CodegenColumnDO> columns = CodegenConvert.INSTANCE.convertList(schemaColumns);
         for (CodegenColumnDO column : columns) {
             column.setTableId(tableId);

@@ -1,22 +1,21 @@
 package cn.iocoder.yudao.module.infra.service.db;
 
-import cn.hutool.db.DbUtil;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.mybatis.core.util.DatabaseUtils;
+import cn.iocoder.yudao.framework.mybatis.core.util.JdbcUtils;
 import cn.iocoder.yudao.module.infra.controller.admin.db.vo.DataSourceConfigCreateReqVO;
 import cn.iocoder.yudao.module.infra.controller.admin.db.vo.DataSourceConfigUpdateReqVO;
 import cn.iocoder.yudao.module.infra.convert.db.DataSourceConfigConvert;
 import cn.iocoder.yudao.module.infra.dal.dataobject.db.DataSourceConfigDO;
 import cn.iocoder.yudao.module.infra.dal.mysql.db.DataSourceConfigMapper;
-import com.baomidou.mybatisplus.extension.toolkit.JdbcUtils;
+import com.baomidou.dynamic.datasource.spring.boot.autoconfigure.DataSourceProperty;
+import com.baomidou.dynamic.datasource.spring.boot.autoconfigure.DynamicDataSourceProperties;
 import org.jasypt.encryption.StringEncryptor;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 
-import java.sql.Connection;
 import java.util.List;
+import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.infra.enums.ErrorCodeConstants.DATA_SOURCE_CONFIG_NOT_EXISTS;
@@ -36,6 +35,9 @@ public class DataSourceConfigServiceImpl implements DataSourceConfigService {
 
     @Resource
     private StringEncryptor stringEncryptor;
+
+    @Resource
+    private DynamicDataSourceProperties dynamicDataSourceProperties;
 
     @Override
     public Long createDataSourceConfig(DataSourceConfigCreateReqVO createReqVO) {
@@ -77,6 +79,11 @@ public class DataSourceConfigServiceImpl implements DataSourceConfigService {
 
     @Override
     public DataSourceConfigDO getDataSourceConfig(Long id) {
+        // 如果 id 为 0，默认为 master 的数据源
+        if (Objects.equals(id, DataSourceConfigDO.ID_MASTER)) {
+            return buildMasterDataSourceConfig();
+        }
+        // 从 DB 中读取
         DataSourceConfigDO dataSourceConfig = dataSourceConfigMapper.selectById(id);
         dataSourceConfig.setPassword(stringEncryptor.decrypt(dataSourceConfig.getPassword()));
         return dataSourceConfig;
@@ -84,14 +91,26 @@ public class DataSourceConfigServiceImpl implements DataSourceConfigService {
 
     @Override
     public List<DataSourceConfigDO> getDataSourceConfigList() {
-        return dataSourceConfigMapper.selectList();
+        List<DataSourceConfigDO> result = dataSourceConfigMapper.selectList();
+        // 补充 master 数据源
+        result.add(0, buildMasterDataSourceConfig());
+        return result;
     }
 
     private void checkConnectionOK(DataSourceConfigDO config) {
-        boolean success = DatabaseUtils.isConnectionOK(config.getUrl(), config.getUsername(), config.getPassword());
+        boolean success = JdbcUtils.isConnectionOK(config.getUrl(), config.getUsername(), config.getPassword());
         if (!success) {
             throw exception(DATA_SOURCE_CONFIG_NOT_OK);
         }
+    }
+
+    private DataSourceConfigDO buildMasterDataSourceConfig() {
+        String primary = dynamicDataSourceProperties.getPrimary();
+        DataSourceProperty dataSourceProperty = dynamicDataSourceProperties.getDatasource().get(primary);
+        return new DataSourceConfigDO().setId(DataSourceConfigDO.ID_MASTER).setName(primary)
+                .setUrl(dataSourceProperty.getUrl())
+                .setUsername(dataSourceProperty.getUsername())
+                .setPassword(dataSourceProperty.getPassword());
     }
 
 }

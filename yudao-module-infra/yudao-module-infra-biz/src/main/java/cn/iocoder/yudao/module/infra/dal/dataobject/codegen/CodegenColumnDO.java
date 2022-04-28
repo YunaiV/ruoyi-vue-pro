@@ -74,7 +74,6 @@ public class CodegenColumnDO extends BaseDO {
     /**
      * Java 属性名
      */
-//    @NotBlank(message = "Java属性不能为空")
     private String javaField;
     /**
      * 字典类型
