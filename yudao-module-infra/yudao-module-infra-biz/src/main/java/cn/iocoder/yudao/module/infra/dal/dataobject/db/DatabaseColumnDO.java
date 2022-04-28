@@ -25,6 +25,11 @@ public class DatabaseColumnDO {
     /**
      * 字段类型
      */
+    private String dataType;
+    /**
+     * 字段类型
+     */
+    @Deprecated
     private String columnType;
     /**
      * 字段描述

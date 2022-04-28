@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
-
 import java.util.List;
 import java.util.Objects;
 
@@ -85,7 +84,10 @@ public class DataSourceConfigServiceImpl implements DataSourceConfigService {
         }
         // 从 DB 中读取
         DataSourceConfigDO dataSourceConfig = dataSourceConfigMapper.selectById(id);
-        dataSourceConfig.setPassword(stringEncryptor.decrypt(dataSourceConfig.getPassword()));
+        try {
+            dataSourceConfig.setPassword(stringEncryptor.decrypt(dataSourceConfig.getPassword()));
+        } catch (Exception ignore) { // 解码失败，则不解码
+        }
         return dataSourceConfig;
     }
 

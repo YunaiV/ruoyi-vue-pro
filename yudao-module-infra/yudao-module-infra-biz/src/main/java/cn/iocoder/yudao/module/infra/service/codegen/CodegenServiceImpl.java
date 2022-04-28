@@ -101,8 +101,8 @@ public class CodegenServiceImpl implements CodegenService {
     @Override
     public Long createCodegen(Long userId, String tableName) {
         // 从数据库中，获得数据库表结构
-        DatabaseTableDO schemaTable = databaseTableService.getTable(0L, tableName);
-        List<DatabaseColumnDO> schemaColumns = databaseTableService.getColumnList(0L, tableName);
+        DatabaseTableDO schemaTable = databaseTableService.getTable(9L, tableName);
+        List<DatabaseColumnDO> schemaColumns = databaseTableService.getColumnList(9L, tableName);
         // 导入
         return this.createCodegen0(userId, CodegenImportTypeEnum.DB, schemaTable, schemaColumns);
     }
