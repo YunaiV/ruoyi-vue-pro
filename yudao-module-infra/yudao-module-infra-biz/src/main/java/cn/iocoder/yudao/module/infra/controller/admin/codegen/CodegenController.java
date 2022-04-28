@@ -50,15 +50,17 @@ public class CodegenController {
     @GetMapping("/db/table/list")
     @ApiOperation(value = "获得数据库自带的表定义列表", notes = "会过滤掉已经导入 Codegen 的表")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "tableName", value = "表名，模糊匹配", required = true, example = "yudao", dataTypeClass = String.class),
-            @ApiImplicitParam(name = "tableComment", value = "描述，模糊匹配", required = true, example = "芋道", dataTypeClass = String.class)
+            @ApiImplicitParam(name = "dataSourceConfigId", value = "数据源配置的编号", required = true, example = "1", dataTypeClass = Long.class),
+            @ApiImplicitParam(name = "tableName", value = "表名，模糊匹配", example = "yudao", dataTypeClass = String.class),
+            @ApiImplicitParam(name = "tableComment", value = "描述，模糊匹配", example = "芋道", dataTypeClass = String.class)
     })
     @PreAuthorize("@ss.hasPermission('infra:codegen:query')")
     public CommonResult<List<SchemaTableRespVO>> getSchemaTableList(
+            @RequestParam(value = "dataSourceConfigId") Long dataSourceConfigId,
             @RequestParam(value = "tableName", required = false) String tableName,
             @RequestParam(value = "tableComment", required = false) String tableComment) {
         // 获得数据库自带的表定义列表
-        List<DatabaseTableDO> schemaTables = codegenService.getSchemaTableList(tableName, tableComment);
+        List<DatabaseTableDO> schemaTables = codegenService.getSchemaTableList(dataSourceConfigId, tableName, tableComment);
         // 移除在 Codegen 中，已经存在的
         Set<String> existsTables = CollectionUtils.convertSet(codegenService.getCodeGenTableList(), CodegenTableDO::getTableName);
         schemaTables.removeIf(table -> existsTables.contains(table.getTableName()));

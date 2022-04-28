@@ -115,10 +115,12 @@ public interface CodegenService {
     /**
      * 获得数据库自带的表定义列表
      *
+     *
+     * @param dataSourceConfigId
      * @param tableName 表名称
      * @param tableComment 表描述
      * @return 表定义列表
      */
-    List<DatabaseTableDO> getSchemaTableList(String tableName, String tableComment);
+    List<DatabaseTableDO> getSchemaTableList(Long dataSourceConfigId, String tableName, String tableComment);
 
 }

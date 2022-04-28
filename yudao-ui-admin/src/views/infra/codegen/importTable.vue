@@ -1,24 +1,18 @@
 <template>
   <!-- 导入表 -->
   <el-dialog title="导入表" :visible.sync="visible" width="800px" top="5vh" append-to-body>
-    <el-form :model="queryParams" ref="queryForm" :inline="true">
+    <el-form :model="queryParams" ref="queryForm" size="small" :inline="true">
+      <el-form-item label="数据源" prop="dataSourceConfigId">
+        <el-select v-model="queryParams.dataSourceConfigId" placeholder="请选择数据源" clearable>
+          <el-option v-for="config in dataSourceConfigs"
+                     :key="config.id" :label="config.name" :value="config.id"/>
+        </el-select>
+      </el-form-item>
       <el-form-item label="表名称" prop="tableName">
-        <el-input
-          v-model="queryParams.tableName"
-          placeholder="请输入表名称"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
+        <el-input v-model="queryParams.tableName" placeholder="请输入表名称" clearable  @keyup.enter.native="handleQuery" />
       </el-form-item>
       <el-form-item label="表描述" prop="tableComment">
-        <el-input
-          v-model="queryParams.tableComment"
-          placeholder="请输入表描述"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
+        <el-input v-model="queryParams.tableComment" placeholder="请输入表描述" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
@@ -27,10 +21,9 @@
     </el-form>
     <el-row>
       <el-table @row-click="clickRow" ref="table" :data="dbTableList" @selection-change="handleSelectionChange" height="260px">
-        <el-table-column type="selection" width="55"></el-table-column>
-        <el-table-column prop="tableSchema" label="数据库" :show-overflow-tooltip="true"></el-table-column>
-        <el-table-column prop="tableName" label="表名称" :show-overflow-tooltip="true"></el-table-column>
-        <el-table-column prop="tableComment" label="表描述" :show-overflow-tooltip="true"></el-table-column>
+        <el-table-column type="selection" width="55" />
+        <el-table-column prop="tableName" label="表名称" :show-overflow-tooltip="true" />
+        <el-table-column prop="tableComment" label="表描述" :show-overflow-tooltip="true" />
         <el-table-column prop="createTime" label="创建时间">
           <template slot-scope="scope">
             <span>{{ parseTime(scope.row.createTime) }}</span>
@@ -47,6 +40,7 @@
 
 <script>
 import { getSchemaTableList, createCodegenListFromDB } from "@/api/infra/codegen";
+import {getDataSourceConfigList} from "@/api/infra/dataSourceConfig";
 export default {
   data() {
     return {
@@ -60,16 +54,25 @@ export default {
       dbTableList: [],
       // 查询参数
       queryParams: {
+        dataSourceConfigId: undefined,
         tableName: undefined,
-        tableComment: undefined
-      }
+        tableComment: undefined,
+      },
+      // 数据源列表
+      dataSourceConfigs: [],
     };
   },
   methods: {
     // 显示弹框
     show() {
-      this.getList();
       this.visible = true;
+      // 加载数据源
+      getDataSourceConfigList().then(response => {
+        this.dataSourceConfigs = response.data;
+        this.queryParams.dataSourceConfigId = this.dataSourceConfigs[0].id;
+        // 加载表列表
+        this.getList();
+      });
     },
     clickRow(row) {
       this.$refs.table.toggleRowSelection(row);
@@ -91,6 +94,7 @@ export default {
     /** 重置按钮操作 */
     resetQuery() {
       this.resetForm("queryForm");
+      this.queryParams.dataSourceConfigId = this.dataSourceConfigs[0].id;
       this.handleQuery();
     },
     /** 导入按钮操作 */

@@ -57,9 +57,6 @@ public class CodegenServiceImpl implements CodegenService {
     @Resource
     private CodegenEngine codegenEngine;
 
-    @Resource
-    private CodegenProperties codegenProperties;
-
     private Long createCodegen0(Long userId, CodegenImportTypeEnum importType,
                                 DatabaseTableDO schemaTable, List<DatabaseColumnDO> schemaColumns) {
         // 校验导入的表和字段非空
@@ -103,8 +100,6 @@ public class CodegenServiceImpl implements CodegenService {
 
     @Override
     public Long createCodegen(Long userId, String tableName) {
-        // 获取当前schema
-        String tableSchema = codegenProperties.getDbSchemas().iterator().next();
         // 从数据库中，获得数据库表结构
         DatabaseTableDO schemaTable = databaseTableService.getTable(0L, tableName);
         List<DatabaseColumnDO> schemaColumns = databaseTableService.getColumnList(0L, tableName);
@@ -252,8 +247,8 @@ public class CodegenServiceImpl implements CodegenService {
     }
 
     @Override
-    public List<DatabaseTableDO> getSchemaTableList(String tableName, String tableComment) {
-        List<DatabaseTableDO> tables = databaseTableService.getTableList(0L, tableName, tableComment);
+    public List<DatabaseTableDO> getSchemaTableList(Long dataSourceConfigId, String tableName, String tableComment) {
+        List<DatabaseTableDO> tables = databaseTableService.getTableList(dataSourceConfigId, tableName, tableComment);
         // TODO 强制移除 Quartz 的表，未来做成可配置
         tables.removeIf(table -> table.getTableName().startsWith("QRTZ_"));
         tables.removeIf(table -> table.getTableName().startsWith("ACT_"));
