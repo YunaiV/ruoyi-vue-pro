@@ -104,7 +104,7 @@ public class CodegenSQLParser {
         String text = definition.toString().toUpperCase();
         columns.add(DatabaseColumnDO.builder()
                 .columnName(normalize(definition.getColumnName()))
-                .columnType(definition.getDataType().toString())
+                .dataType(definition.getDataType().toString())
                 .columnComment(Objects.isNull(definition.getComment()) ? ""
                         : normalize(definition.getComment().toString()))
                 .nullable(!text.contains(" NOT NULL"))

@@ -41,7 +41,7 @@ public class CodegenColumnDO extends BaseDO {
     /**
      * 字段类型
      */
-    private String columnType;
+    private String dataType;
     /**
      * 字段描述
      */

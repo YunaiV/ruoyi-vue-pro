@@ -41,10 +41,10 @@ public class DatabaseTableMySQLDAOImpl implements DatabaseTableDAO {
     @Override
     public List<DatabaseColumnDO> selectColumnList(Connection connection, String tableName) {
         // 拼接 SQL
-        String sql = "SELECT table_name, column_name, column_type, column_comment, ordinal_position" +
+        String sql = "SELECT table_name, column_name, data_type, column_comment, ordinal_position," +
                 " (CASE WHEN is_nullable = 'yes' THEN '1' ELSE '0' END) AS nullable," +
                 " (CASE WHEN column_key = 'PRI' THEN '1' ELSE '0' END) AS primary_key," +
-                " (CASE WHEN extra = 'auto_increment' THEN '1' ELSE '0' END) AS auto_increment," +
+                " (CASE WHEN extra = 'auto_increment' THEN '1' ELSE '0' END) AS auto_increment" +
                 " FROM information_schema.COLUMNS" +
                 " WHERE table_schema = (SELECT DATABASE())" +
                 String.format(" AND table_name = '%s'", tableName);
@@ -52,7 +52,7 @@ public class DatabaseTableMySQLDAOImpl implements DatabaseTableDAO {
         return JdbcUtils.query(connection, sql, (rs, rowNum) -> DatabaseColumnDO.builder()
                 .tableName(rs.getString("table_name"))
                 .columnName(rs.getString("column_name"))
-                .columnType(rs.getString("column_type"))
+                .dataType(rs.getString("data_type"))
                 .columnComment(rs.getString("column_comment"))
                 .nullable(rs.getBoolean("nullable"))
                 .primaryKey(rs.getBoolean("primary_key"))

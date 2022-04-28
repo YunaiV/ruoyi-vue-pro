@@ -87,12 +87,15 @@ public class CodegenBuilder {
      */
     private static final Map<String, Set<String>> javaTypeMappings = MapUtil.<String, Set<String>>builder()
             .put(Boolean.class.getSimpleName(), Sets.newHashSet("bit"))
-            .put(Integer.class.getSimpleName(), Sets.newHashSet("tinyint", "smallint", "mediumint", "int"))
-            .put(Long.class.getSimpleName(), Collections.singleton("bigint"))
+            .put(Integer.class.getSimpleName(), Sets.newHashSet(
+                    "tinyint", "smallint", "mediumint", "int", "integer"))
+            .put(Long.class.getSimpleName(), Sets.newHashSet("bigint", "number"))
             .put(Double.class.getSimpleName(), Sets.newHashSet("float", "double"))
             .put(BigDecimal.class.getSimpleName(), Sets.newHashSet("decimal", "numeric"))
-            .put(String.class.getSimpleName(), Sets.newHashSet("tinytext", "text", "mediumtext", "longtext", // 长文本
-                    "char", "varchar", "nvarchar", "varchar2")) // 短文本
+            .put(String.class.getSimpleName(), Sets.newHashSet(
+                    "tinytext", "text", "mediumtext", "longtext", "nclob",  // 长文本
+                    "char", "varchar", "nvarchar", "varchar2", "nvarchar2",  // 短文本
+                    "json")) // 特殊文本
             .put(Date.class.getSimpleName(), Sets.newHashSet("datetime", "time", "date", "timestamp"))
             .put("byte[]", Sets.newHashSet("blob"))
             .build();
@@ -159,16 +162,14 @@ public class CodegenBuilder {
     private void processColumnJava(CodegenColumnDO column) {
         // 处理 javaField 字段
         column.setJavaField(toCamelCase(column.getColumnName()));
-        // 处理 dictType 字段，暂无
-        // 处理 javaType 字段(兼容无符号类型)
-        String dbType = replaceIgnoreCase(subBefore(column.getColumnType(), '(', false),
-                " UNSIGNED", "");
+        // 处理 dataType 字段
+        String dataType = column.getDataType().toLowerCase();
         javaTypeMappings.entrySet().stream()
-                .filter(entry -> entry.getValue().contains(dbType))
+                .filter(entry -> entry.getValue().contains(dataType))
                 .findFirst().ifPresent(entry -> column.setJavaType(entry.getKey()));
         if (column.getJavaType() == null) {
             throw new IllegalStateException(String.format("column(%s) 的数据库类型(%s) 找不到匹配的 Java 类型",
-                    column.getColumnName(), column.getColumnType()));
+                    column.getColumnName(), column.getJavaType()));
         }
     }
 
