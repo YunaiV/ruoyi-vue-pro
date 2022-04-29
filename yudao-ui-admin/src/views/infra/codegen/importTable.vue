@@ -8,11 +8,11 @@
                      :key="config.id" :label="config.name" :value="config.id"/>
         </el-select>
       </el-form-item>
-      <el-form-item label="表名称" prop="tableName">
-        <el-input v-model="queryParams.tableName" placeholder="请输入表名称" clearable  @keyup.enter.native="handleQuery" />
+      <el-form-item label="表名称" prop="name">
+        <el-input v-model="queryParams.name" placeholder="请输入表名称" clearable  @keyup.enter.native="handleQuery" />
       </el-form-item>
-      <el-form-item label="表描述" prop="tableComment">
-        <el-input v-model="queryParams.tableComment" placeholder="请输入表描述" clearable @keyup.enter.native="handleQuery"/>
+      <el-form-item label="表描述" prop="comment">
+        <el-input v-model="queryParams.comment" placeholder="请输入表描述" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
@@ -20,15 +20,11 @@
       </el-form-item>
     </el-form>
     <el-row>
-      <el-table @row-click="clickRow" ref="table" :data="dbTableList" @selection-change="handleSelectionChange" height="260px">
+      <el-table v-loading="loading" @row-click="clickRow" ref="table" :data="dbTableList"
+                @selection-change="handleSelectionChange" height="260px">
         <el-table-column type="selection" width="55" />
-        <el-table-column prop="tableName" label="表名称" :show-overflow-tooltip="true" />
-        <el-table-column prop="tableComment" label="表描述" :show-overflow-tooltip="true" />
-        <el-table-column prop="createTime" label="创建时间">
-          <template slot-scope="scope">
-            <span>{{ parseTime(scope.row.createTime) }}</span>
-          </template>
-        </el-table-column>
+        <el-table-column prop="name" label="表名称" :show-overflow-tooltip="true" />
+        <el-table-column prop="comment" label="表描述" :show-overflow-tooltip="true" />
       </el-table>
     </el-row>
     <div slot="footer" class="dialog-footer">
@@ -39,11 +35,13 @@
 </template>
 
 <script>
-import { getSchemaTableList, createCodegenListFromDB } from "@/api/infra/codegen";
+import { getSchemaTableList, createCodegenList } from "@/api/infra/codegen";
 import {getDataSourceConfigList} from "@/api/infra/dataSourceConfig";
 export default {
   data() {
     return {
+      // 遮罩层
+      loading: false,
       // 遮罩层
       visible: false,
       // 选中数组值
@@ -55,8 +53,8 @@ export default {
       // 查询参数
       queryParams: {
         dataSourceConfigId: undefined,
-        tableName: undefined,
-        tableComment: undefined,
+        name: undefined,
+        comment: undefined,
       },
       // 数据源列表
       dataSourceConfigs: [],
@@ -79,12 +77,15 @@ export default {
     },
     // 多选框选中数据
     handleSelectionChange(selection) {
-      this.tables = selection.map(item => item.tableName);
+      this.tables = selection.map(item => item.name);
     },
     // 查询表数据
     getList() {
+      this.loading = true;
       getSchemaTableList(this.queryParams).then(res => {
         this.dbTableList = res.data;
+      }).finally(() => {
+        this.loading = false;
       });
     },
     /** 搜索按钮操作 */
@@ -99,7 +100,10 @@ export default {
     },
     /** 导入按钮操作 */
     handleImportTable() {
-      createCodegenListFromDB(this.tables.join(",")).then(res => {
+      createCodegenList({
+        dataSourceConfigId: this.queryParams.dataSourceConfigId,
+        tableNames: this.tables
+      }).then(res => {
         this.$modal.msgSuccess("导入成功");
         this.visible = false;
         this.$emit("ok");

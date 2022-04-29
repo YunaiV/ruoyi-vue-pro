@@ -4,19 +4,18 @@ import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.ZipUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
+import cn.iocoder.yudao.module.infra.controller.admin.codegen.vo.CodegenCreateListReqVO;
 import cn.iocoder.yudao.module.infra.controller.admin.codegen.vo.CodegenDetailRespVO;
 import cn.iocoder.yudao.module.infra.controller.admin.codegen.vo.CodegenPreviewRespVO;
 import cn.iocoder.yudao.module.infra.controller.admin.codegen.vo.CodegenUpdateReqVO;
 import cn.iocoder.yudao.module.infra.controller.admin.codegen.vo.table.CodegenTablePageReqVO;
 import cn.iocoder.yudao.module.infra.controller.admin.codegen.vo.table.CodegenTableRespVO;
-import cn.iocoder.yudao.module.infra.controller.admin.codegen.vo.table.SchemaTableRespVO;
+import cn.iocoder.yudao.module.infra.controller.admin.codegen.vo.table.DatabaseTableRespVO;
 import cn.iocoder.yudao.module.infra.convert.codegen.CodegenConvert;
 import cn.iocoder.yudao.module.infra.dal.dataobject.codegen.CodegenColumnDO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.codegen.CodegenTableDO;
-import cn.iocoder.yudao.module.infra.dal.dataobject.db.DatabaseTableDO;
 import cn.iocoder.yudao.module.infra.service.codegen.CodegenService;
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
-import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -33,7 +32,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
@@ -51,20 +49,15 @@ public class CodegenController {
     @ApiOperation(value = "获得数据库自带的表定义列表", notes = "会过滤掉已经导入 Codegen 的表")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "dataSourceConfigId", value = "数据源配置的编号", required = true, example = "1", dataTypeClass = Long.class),
-            @ApiImplicitParam(name = "tableName", value = "表名，模糊匹配", example = "yudao", dataTypeClass = String.class),
-            @ApiImplicitParam(name = "tableComment", value = "描述，模糊匹配", example = "芋道", dataTypeClass = String.class)
+            @ApiImplicitParam(name = "name", value = "表名，模糊匹配", example = "yudao", dataTypeClass = String.class),
+            @ApiImplicitParam(name = "comment", value = "描述，模糊匹配", example = "芋道", dataTypeClass = String.class)
     })
     @PreAuthorize("@ss.hasPermission('infra:codegen:query')")
-    public CommonResult<List<SchemaTableRespVO>> getSchemaTableList(
+    public CommonResult<List<DatabaseTableRespVO>> getDatabaseTableList(
             @RequestParam(value = "dataSourceConfigId") Long dataSourceConfigId,
-            @RequestParam(value = "tableName", required = false) String tableName,
-            @RequestParam(value = "tableComment", required = false) String tableComment) {
-        // 获得数据库自带的表定义列表
-        List<DatabaseTableDO> schemaTables = codegenService.getSchemaTableList(dataSourceConfigId, tableName, tableComment);
-        // 移除在 Codegen 中，已经存在的
-        Set<String> existsTables = CollectionUtils.convertSet(codegenService.getCodeGenTableList(), CodegenTableDO::getTableName);
-        schemaTables.removeIf(table -> existsTables.contains(table.getTableName()));
-        return success(CodegenConvert.INSTANCE.convertList04(schemaTables));
+            @RequestParam(value = "name", required = false) String name,
+            @RequestParam(value = "comment", required = false) String comment) {
+        return success(codegenService.getDatabaseTableList(dataSourceConfigId, name, comment));
     }
 
     @GetMapping("/table/page")
@@ -87,19 +80,10 @@ public class CodegenController {
     }
 
     @ApiOperation("基于数据库的表结构，创建代码生成器的表和字段定义")
-    @ApiImplicitParam(name = "tableNames", value = "表名数组", required = true, example = "sys_user", dataTypeClass = List.class)
-    @PostMapping("/create-list-from-db")
+    @PostMapping("/create-list")
     @PreAuthorize("@ss.hasPermission('infra:codegen:create')")
-    public CommonResult<List<Long>> createCodegenListFromDB(@RequestParam("tableNames") List<String> tableNames) {
-        return success(codegenService.createCodegenListFromDB(getLoginUserId(), tableNames));
-    }
-
-    @ApiOperation("基于 SQL 建表语句，创建代码生成器的表和字段定义")
-    @ApiImplicitParam(name = "sql", value = "SQL 建表语句", required = true, example = "sql", dataTypeClass = String.class)
-    @PostMapping("/create-list-from-sql")
-    @PreAuthorize("@ss.hasPermission('infra:codegen:create')")
-    public CommonResult<Long> createCodegenListFromSQL(@RequestParam("sql") String sql) {
-        return success(codegenService.createCodegenListFromSQL(getLoginUserId(), sql));
+    public CommonResult<List<Long>> createCodegenList(@Valid @RequestBody CodegenCreateListReqVO reqVO) {
+        return success(codegenService.createCodegenList(getLoginUserId(), reqVO));
     }
 
     @ApiOperation("更新数据库的表和字段定义")
@@ -116,19 +100,6 @@ public class CodegenController {
     @PreAuthorize("@ss.hasPermission('infra:codegen:update')")
     public CommonResult<Boolean> syncCodegenFromDB(@RequestParam("tableId") Long tableId) {
         codegenService.syncCodegenFromDB(tableId);
-        return success(true);
-    }
-
-    @ApiOperation("基于 SQL 建表语句，同步数据库的表和字段定义")
-    @PutMapping("/sync-from-sql")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "tableId", value = "表编号", required = true, example = "1024", dataTypeClass = Long.class),
-            @ApiImplicitParam(name = "sql", value = "SQL 建表语句", required = true, example = "sql", dataTypeClass = String.class)
-    })
-    @PreAuthorize("@ss.hasPermission('infra:codegen:update')")
-    public CommonResult<Boolean> syncCodegenFromSQL(@RequestParam("tableId") Long tableId,
-                                                    @RequestParam("sql") String sql) {
-        codegenService.syncCodegenFromSQL(tableId, sql);
         return success(true);
     }
 

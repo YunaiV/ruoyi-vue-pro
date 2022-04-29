@@ -1,11 +1,12 @@
 package cn.iocoder.yudao.module.infra.service.codegen;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.infra.controller.admin.codegen.vo.CodegenCreateListReqVO;
 import cn.iocoder.yudao.module.infra.controller.admin.codegen.vo.CodegenUpdateReqVO;
 import cn.iocoder.yudao.module.infra.controller.admin.codegen.vo.table.CodegenTablePageReqVO;
+import cn.iocoder.yudao.module.infra.controller.admin.codegen.vo.table.DatabaseTableRespVO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.codegen.CodegenColumnDO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.codegen.CodegenTableDO;
-import cn.iocoder.yudao.module.infra.dal.dataobject.db.DatabaseTableDO;
 
 import java.util.List;
 import java.util.Map;
@@ -18,31 +19,13 @@ import java.util.Map;
 public interface CodegenService {
 
     /**
-     * 基于 SQL 建表语句，创建代码生成器的表定义
-     *
-     * @param userId 用户编号
-     * @param sql SQL 建表语句
-     * @return 创建的表定义的编号
-     */
-    Long createCodegenListFromSQL(Long userId, String sql);
-
-    /**
      * 基于数据库的表结构，创建代码生成器的表定义
      *
      * @param userId 用户编号
-     * @param tableName 表名称
-     * @return 创建的表定义的编号
-     */
-    Long createCodegen(Long userId, String tableName);
-
-    /**
-     * 基于 {@link #createCodegen(Long, String)} 的批量创建
-     *
-     * @param userId 用户编号
-     * @param tableNames 表名称数组
+     * @param reqVO 表信息
      * @return 创建的表定义的编号数组
      */
-    List<Long> createCodegenListFromDB(Long userId, List<String> tableNames);
+    List<Long> createCodegenList(Long userId, CodegenCreateListReqVO reqVO);
 
     /**
      * 更新数据库的表和字段定义
@@ -57,14 +40,6 @@ public interface CodegenService {
      * @param tableId 表编号
      */
     void syncCodegenFromDB(Long tableId);
-
-    /**
-     * 基于 SQL 建表语句，同步数据库的表和字段定义
-     *
-     * @param tableId 表编号
-     * @param sql SQL 建表语句
-     */
-    void syncCodegenFromSQL(Long tableId, String sql);
 
     /**
      * 删除数据库的表和字段定义
@@ -90,13 +65,6 @@ public interface CodegenService {
     CodegenTableDO getCodegenTablePage(Long id);
 
     /**
-     * 获得全部表定义
-     *
-     * @return 表定义数组
-     */
-    List<CodegenTableDO> getCodeGenTableList();
-
-    /**
      * 获得指定表的字段定义数组
      *
      * @param tableId 表编号
@@ -116,11 +84,11 @@ public interface CodegenService {
      * 获得数据库自带的表定义列表
      *
      *
-     * @param dataSourceConfigId
-     * @param tableName 表名称
-     * @param tableComment 表描述
+     * @param dataSourceConfigId 数据源的配置编号
+     * @param name 表名称
+     * @param comment 表描述
      * @return 表定义列表
      */
-    List<DatabaseTableDO> getSchemaTableList(Long dataSourceConfigId, String tableName, String tableComment);
+    List<DatabaseTableRespVO> getDatabaseTableList(Long dataSourceConfigId, String name, String comment);
 
 }
