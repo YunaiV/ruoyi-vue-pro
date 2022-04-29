@@ -11,6 +11,7 @@ import cn.iocoder.yudao.framework.pay.core.client.dto.*;
 import cn.iocoder.yudao.framework.pay.core.client.impl.AbstractPayClient;
 import cn.iocoder.yudao.framework.pay.core.enums.PayChannelEnum;
 import com.github.binarywang.wxpay.bean.notify.WxPayOrderNotifyResult;
+import com.github.binarywang.wxpay.bean.notify.WxPayOrderNotifyV3Result;
 import com.github.binarywang.wxpay.bean.order.WxPayNativeOrderResult;
 import com.github.binarywang.wxpay.bean.request.WxPayUnifiedOrderRequest;
 import com.github.binarywang.wxpay.bean.request.WxPayUnifiedOrderV3Request;
@@ -117,13 +118,46 @@ public class WXNativePayClient extends AbstractPayClient<WXPayClientConfig> {
 
     @Override
     public PayOrderNotifyRespDTO parseOrderNotify(PayNotifyDataDTO data) throws WxPayException {
+        log.info("微信支付回调data数据:{}", data.getBody());
+        // 微信支付 v2 回调结果处理
+        switch (config.getApiVersion()) {
+            case WXPayClientConfig.API_VERSION_V2:
+                return parseOrderNotifyV2(data);
+            case WXPayClientConfig.API_VERSION_V3:
+                return parseOrderNotifyV3(data);
+            default:
+                throw new IllegalArgumentException(String.format("未知的 API 版本(%s)", config.getApiVersion()));
+        }
+
+    }
+
+    private PayOrderNotifyRespDTO parseOrderNotifyV3(PayNotifyDataDTO data) throws WxPayException {
+        WxPayOrderNotifyV3Result wxPayOrderNotifyV3Result = client.parseOrderNotifyV3Result(data.getBody(), null);
+        WxPayOrderNotifyV3Result.DecryptNotifyResult result = wxPayOrderNotifyV3Result.getResult();
+        // 转换结果
+
+        return PayOrderNotifyRespDTO
+                .builder()
+                .orderExtensionNo(result.getOutTradeNo())
+                .channelOrderNo(result.getTradeState())
+                .successTime(DateUtil.parse(result.getSuccessTime(), "yyyy-MM-dd'T'HH:mm:ssXXX"))
+                .data(data.getBody())
+                .build();
+    }
+
+    private PayOrderNotifyRespDTO parseOrderNotifyV2(PayNotifyDataDTO data) throws WxPayException {
         WxPayOrderNotifyResult notifyResult = client.parseOrderNotifyResult(data.getBody());
         Assert.isTrue(Objects.equals(notifyResult.getResultCode(), "SUCCESS"), "支付结果非 SUCCESS");
         // 转换结果
-        return PayOrderNotifyRespDTO.builder().orderExtensionNo(notifyResult.getOutTradeNo())
-                .channelOrderNo(notifyResult.getTransactionId()).channelUserId(notifyResult.getOpenid())
-                .successTime(DateUtil.parse(notifyResult.getTimeEnd(), "yyyy-MM-dd'T'HH:mm:ssXXX"))
-                .data(data.getBody()).build();
+        return PayOrderNotifyRespDTO
+                .builder()
+                .orderExtensionNo(notifyResult.getOutTradeNo())
+                .channelOrderNo(notifyResult.getTransactionId())
+                .channelUserId(notifyResult.getOpenid())
+                .successTime(DateUtil.parse(notifyResult.getTimeEnd(), "yyyyMMddHHmmss"))
+                .data(data.getBody())
+                .build();
+
     }
 
     @Override
