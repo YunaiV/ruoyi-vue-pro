@@ -11,7 +11,7 @@
     <!-- 列表 -->
     <el-table v-loading="loading" :data="list">
       <el-table-column label="主键编号" align="center" prop="id" />
-      <el-table-column label="参数名称" align="center" prop="name" />
+      <el-table-column label="数据源名称" align="center" prop="name" />
       <el-table-column label="数据源连接" align="center" prop="url" />
       <el-table-column label="用户名" align="center" prop="username" />
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
@@ -32,7 +32,7 @@
     <!-- 对话框(添加 / 修改) -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="100px">
-        <el-form-item label="参数名称" prop="name">
+        <el-form-item label="数据源名称" prop="name">
           <el-input v-model="form.name" placeholder="请输入参数名称" />
         </el-form-item>
         <el-form-item label="数据源连接" prop="url">
@@ -76,7 +76,7 @@ export default {
       form: {},
       // 表单校验
       rules: {
-        name: [{ required: true, message: "参数名称不能为空", trigger: "blur" }],
+        name: [{ required: true, message: "数据源名称不能为空", trigger: "blur" }],
         url: [{ required: true, message: "数据源连接不能为空", trigger: "blur" }],
         username: [{ required: true, message: "用户名不能为空", trigger: "blur" }],
         password: [{ required: true, message: "密码不能为空", trigger: "blur" }],

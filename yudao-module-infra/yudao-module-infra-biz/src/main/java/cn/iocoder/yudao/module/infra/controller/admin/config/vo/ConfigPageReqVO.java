@@ -18,7 +18,7 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @ToString(callSuper = true)
 public class ConfigPageReqVO extends PageParam {
 
-    @ApiModelProperty(value = "参数名称", example = "模糊匹配")
+    @ApiModelProperty(value = "数据源名称", example = "模糊匹配")
     private String name;
 
     @ApiModelProperty(value = "参数键名", example = "yunai.db.username", notes = "模糊匹配")

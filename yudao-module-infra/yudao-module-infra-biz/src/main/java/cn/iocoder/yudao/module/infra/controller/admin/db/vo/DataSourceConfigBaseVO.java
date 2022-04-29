@@ -12,8 +12,8 @@ import javax.validation.constraints.*;
 @Data
 public class DataSourceConfigBaseVO {
 
-    @ApiModelProperty(value = "参数名称", required = true, example = "test")
-    @NotNull(message = "参数名称不能为空")
+    @ApiModelProperty(value = "数据源名称", required = true, example = "test")
+    @NotNull(message = "数据源名称不能为空")
     private String name;
 
     @ApiModelProperty(value = "数据源连接", required = true, example = "jdbc:mysql://127.0.0.1:3306/ruoyi-vue-pro")

@@ -7,23 +7,22 @@ import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.infra.convert.codegen.CodegenConvert;
 import cn.iocoder.yudao.module.infra.dal.dataobject.codegen.CodegenColumnDO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.codegen.CodegenTableDO;
-import cn.iocoder.yudao.module.infra.dal.dataobject.codegen.SchemaColumnDO;
-import cn.iocoder.yudao.module.infra.dal.dataobject.codegen.SchemaTableDO;
 import cn.iocoder.yudao.module.infra.enums.codegen.CodegenColumnHtmlTypeEnum;
 import cn.iocoder.yudao.module.infra.enums.codegen.CodegenColumnListConditionEnum;
 import cn.iocoder.yudao.module.infra.enums.codegen.CodegenTemplateTypeEnum;
+import com.baomidou.mybatisplus.generator.config.po.TableField;
+import com.baomidou.mybatisplus.generator.config.po.TableInfo;
 import com.google.common.collect.Sets;
 import org.springframework.stereotype.Component;
 
-import java.math.BigDecimal;
 import java.util.*;
 
 import static cn.hutool.core.text.CharSequenceUtil.*;
 
 /**
  * 代码生成器的 Builder，负责：
- * 1. 将数据库的表 {@link SchemaTableDO} 定义，构建成 {@link CodegenTableDO}
- * 2. 将数据库的列 {@link SchemaColumnDO} 构定义，建成 {@link CodegenColumnDO}
+ * 1. 将数据库的表 {@link TableInfo} 定义，构建成 {@link CodegenTableDO}
+ * 2. 将数据库的列 {@link TableField} 构定义，建成 {@link CodegenColumnDO}
  */
 @Component
 public class CodegenBuilder {
@@ -82,21 +81,6 @@ public class CodegenBuilder {
      */
     private static final Set<String> LIST_OPERATION_RESULT_EXCLUDE_COLUMN = Sets.newHashSet();
 
-    /**
-     * Java 类型与 MySQL 类型的映射关系
-     */
-    private static final Map<String, Set<String>> javaTypeMappings = MapUtil.<String, Set<String>>builder()
-            .put(Boolean.class.getSimpleName(), Sets.newHashSet("bit"))
-            .put(Integer.class.getSimpleName(), Sets.newHashSet("tinyint", "smallint", "mediumint", "int"))
-            .put(Long.class.getSimpleName(), Collections.singleton("bigint"))
-            .put(Double.class.getSimpleName(), Sets.newHashSet("float", "double"))
-            .put(BigDecimal.class.getSimpleName(), Sets.newHashSet("decimal", "numeric"))
-            .put(String.class.getSimpleName(), Sets.newHashSet("tinytext", "text", "mediumtext", "longtext", // 长文本
-                    "char", "varchar", "nvarchar", "varchar2")) // 短文本
-            .put(Date.class.getSimpleName(), Sets.newHashSet("datetime", "time", "date", "timestamp"))
-            .put("byte[]", Sets.newHashSet("blob"))
-            .build();
-
     static {
         Arrays.stream(ReflectUtil.getFields(BaseDO.class)).forEach(field -> BASE_DO_FIELDS.add(field.getName()));
         BASE_DO_FIELDS.add(TENANT_ID_FIELD);
@@ -109,8 +93,8 @@ public class CodegenBuilder {
         LIST_OPERATION_RESULT_EXCLUDE_COLUMN.remove("createTime"); // 创建时间，还是需要返回的
     }
 
-    public CodegenTableDO buildTable(SchemaTableDO schemaTable) {
-        CodegenTableDO table = CodegenConvert.INSTANCE.convert(schemaTable);
+    public CodegenTableDO buildTable(TableInfo tableInfo) {
+        CodegenTableDO table = CodegenConvert.INSTANCE.convert(tableInfo);
         initTableDefault(table);
         return table;
     }
@@ -133,43 +117,17 @@ public class CodegenBuilder {
         table.setTemplateType(CodegenTemplateTypeEnum.CRUD.getType());
     }
 
-    public List<CodegenColumnDO> buildColumns(Long tableId, List<SchemaColumnDO> schemaColumns) {
-        List<CodegenColumnDO> columns = CodegenConvert.INSTANCE.convertList(schemaColumns);
+    public List<CodegenColumnDO> buildColumns(Long tableId, List<TableField> tableFields) {
+        List<CodegenColumnDO> columns = CodegenConvert.INSTANCE.convertList(tableFields);
+        int index = 1;
         for (CodegenColumnDO column : columns) {
             column.setTableId(tableId);
-            initColumnDefault(column);
+            column.setOrdinalPosition(index++);
+            // 初始化 Column 列的默认字段
+            processColumnOperation(column); // 处理 CRUD 相关的字段的默认值
+            processColumnUI(column); // 处理 UI 相关的字段的默认值
         }
         return columns;
-    }
-
-    /**
-     * 初始化 Column 列的默认字段
-     *
-     * @param column 列定义
-     */
-    private void initColumnDefault(CodegenColumnDO column) {
-        // 处理 Java 相关的字段的默认值
-        processColumnJava(column);
-        // 处理 CRUD 相关的字段的默认值
-        processColumnOperation(column);
-        // 处理 UI 相关的字段的默认值
-        processColumnUI(column);
-    }
-
-    private void processColumnJava(CodegenColumnDO column) {
-        // 处理 javaField 字段
-        column.setJavaField(toCamelCase(column.getColumnName()));
-        // 处理 dictType 字段，暂无
-        // 处理 javaType 字段(兼容无符号类型)
-        String dbType = replaceIgnoreCase(subBefore(column.getColumnType(), '(', false),
-                " UNSIGNED", "");
-        javaTypeMappings.entrySet().stream()
-                .filter(entry -> entry.getValue().contains(dbType))
-                .findFirst().ifPresent(entry -> column.setJavaType(entry.getKey()));
-        if (column.getJavaType() == null) {
-            throw new IllegalStateException(String.format("column(%s) 的数据库类型(%s) 找不到匹配的 Java 类型",
-                    column.getColumnName(), column.getColumnType()));
-        }
     }
 
     private void processColumnOperation(CodegenColumnDO column) {
