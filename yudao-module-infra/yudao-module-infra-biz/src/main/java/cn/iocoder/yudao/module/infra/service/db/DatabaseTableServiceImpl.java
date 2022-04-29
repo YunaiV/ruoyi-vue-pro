@@ -8,11 +8,13 @@ import cn.iocoder.yudao.module.infra.dal.dataobject.db.DatabaseColumnDO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.db.DatabaseTableDO;
 import cn.iocoder.yudao.module.infra.dal.mysql.db.DatabaseTableDAO;
 import com.baomidou.mybatisplus.annotation.DbType;
+import com.baomidou.mybatisplus.generator.config.po.TableInfo;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.sql.Connection;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -49,8 +51,20 @@ public class DatabaseTableServiceImpl implements DatabaseTableService {
     @SneakyThrows
     public List<DatabaseColumnDO> getColumnList(Long dataSourceConfigId, String tableName) {
         try (Connection connection = getConnection(dataSourceConfigId)) {
-            return getDatabaseTableDAO(dataSourceConfigId).selectColumnList(connection, tableName);
+            List<DatabaseColumnDO> columns = getDatabaseTableDAO(dataSourceConfigId).selectColumnList(connection, tableName);
+            columns.sort(Comparator.comparing(DatabaseColumnDO::getOrdinalPosition));
+            return columns;
         }
+    }
+
+    @Override
+    public List<TableInfo> getTableList2(Long dataSourceConfigId, String tableNameLike, String tableCommentLike) {
+        return null;
+    }
+
+    @Override
+    public TableInfo getTable2(Long dataSourceConfigId, String tableName) {
+        return null;
     }
 
     private Connection getConnection(Long dataSourceConfigId) {
