@@ -20,6 +20,9 @@ public class DefaultDatabaseQueryTest {
 
         long time = System.currentTimeMillis();
         List<TableInfo> tableInfos = query.queryTables();
+        for (TableInfo tableInfo : tableInfos) {
+            System.out.println(String.format("CREATE SEQUENCE %s_seq MINVALUE 0;", tableInfo.getName()));
+        }
         System.out.println(tableInfos.size());
         System.out.println(System.currentTimeMillis() - time);
     }
