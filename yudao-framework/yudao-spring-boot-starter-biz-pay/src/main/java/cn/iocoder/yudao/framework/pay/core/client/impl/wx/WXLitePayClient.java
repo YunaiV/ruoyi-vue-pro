@@ -138,6 +138,14 @@ public class WXLitePayClient extends AbstractPayClient<WXPayClientConfig> {
         return openid;
     }
 
+    /**
+     *
+     * 微信支付回调 分v2 和v3 的处理方式
+     *
+     * @param data 通知结果
+     * @return 支付回调对象
+     * @throws WxPayException 微信异常类
+     */
     @Override
     public PayOrderNotifyRespDTO parseOrderNotify(PayNotifyDataDTO data) throws WxPayException {
         log.info("微信支付回调data数据:{}", data.getBody());
@@ -157,6 +165,7 @@ public class WXLitePayClient extends AbstractPayClient<WXPayClientConfig> {
         WxPayOrderNotifyV3Result wxPayOrderNotifyV3Result = client.parseOrderNotifyV3Result(data.getBody(), null);
         WxPayOrderNotifyV3Result.DecryptNotifyResult result = wxPayOrderNotifyV3Result.getResult();
         // 转换结果
+        Assert.isTrue(Objects.equals(wxPayOrderNotifyV3Result.getResult().getTradeState(), "SUCCESS"), "支付结果非 SUCCESS");
 
         return PayOrderNotifyRespDTO
                 .builder()

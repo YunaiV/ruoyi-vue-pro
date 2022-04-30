@@ -85,7 +85,7 @@ public class WXNativePayClient extends AbstractPayClient<WXPayClientConfig> {
 
     private WxPayNativeOrderResult unifiedOrderV2(PayOrderUnifiedReqDTO reqDTO) throws WxPayException {
         //前端
-        String trade_type = reqDTO.getChannelExtras().get("trade_type");
+        String tradeType = reqDTO.getChannelExtras().get("trade_type");
         // 构建 WxPayUnifiedOrderRequest 对象
         WxPayUnifiedOrderRequest request = WxPayUnifiedOrderRequest
                 .newBuilder()
@@ -95,7 +95,7 @@ public class WXNativePayClient extends AbstractPayClient<WXPayClientConfig> {
                 .timeExpire(DateUtil.format(reqDTO.getExpireTime(), "yyyy-MM-dd'T'HH:mm:ssXXX"))
                 .spbillCreateIp(reqDTO.getUserIp())
                 .notifyUrl(reqDTO.getNotifyUrl())
-                .productId(trade_type)
+                .productId(tradeType)
                 .build();
         // 执行请求
         return client.createOrder(request);
@@ -110,12 +110,20 @@ public class WXNativePayClient extends AbstractPayClient<WXPayClientConfig> {
         request.setSceneInfo(new WxPayUnifiedOrderV3Request.SceneInfo().setPayerClientIp(reqDTO.getUserIp()));
         request.setNotifyUrl(reqDTO.getNotifyUrl());
         // 执行请求
-//        log.info("支付字段request:{}",request.getTimeExpire());
+
 
         return client.createOrderV3(TradeTypeEnum.NATIVE, request);
     }
 
 
+    /**
+     *
+     * 微信支付回调 分v2 和v3 的处理方式
+     *
+     * @param data 通知结果
+     * @return 支付回调对象
+     * @throws WxPayException 微信异常类
+     */
     @Override
     public PayOrderNotifyRespDTO parseOrderNotify(PayNotifyDataDTO data) throws WxPayException {
         log.info("微信支付回调data数据:{}", data.getBody());
@@ -135,6 +143,7 @@ public class WXNativePayClient extends AbstractPayClient<WXPayClientConfig> {
         WxPayOrderNotifyV3Result wxPayOrderNotifyV3Result = client.parseOrderNotifyV3Result(data.getBody(), null);
         WxPayOrderNotifyV3Result.DecryptNotifyResult result = wxPayOrderNotifyV3Result.getResult();
         // 转换结果
+        Assert.isTrue(Objects.equals(wxPayOrderNotifyV3Result.getResult().getTradeState(), "SUCCESS"), "支付结果非 SUCCESS");
 
         return PayOrderNotifyRespDTO
                 .builder()
