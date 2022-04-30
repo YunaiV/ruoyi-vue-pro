@@ -1,12 +1,12 @@
 package cn.iocoder.yudao.module.system.dal.dataobject.mail;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.module.system.enums.mail.MailSendStatusEnum;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 
 import java.io.Serializable;
-import java.sql.Timestamp;
+import java.util.Date;
 
 /**
  * 邮箱日志
@@ -18,6 +18,10 @@ import java.sql.Timestamp;
 @TableName(value = "system_mail_log", autoResultMap = true)
 @Data
 @EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class MailLogDO extends BaseDO implements Serializable {
 
     /**
@@ -29,7 +33,7 @@ public class MailLogDO extends BaseDO implements Serializable {
     /**
      * 邮箱账号编号
      */
-    private String accountCode;
+    private Long accountId;
 
     // TODO @wangjingyi：如果是冗余字段，记得 @ 下；
     /**
@@ -40,7 +44,7 @@ public class MailLogDO extends BaseDO implements Serializable {
     /**
      * 模版主键
      */
-    private String templateId;
+    private Long templateId;
 
     /**
      * 模版编号
@@ -65,16 +69,18 @@ public class MailLogDO extends BaseDO implements Serializable {
     /**
      * 发送时间
      */
-    private Timestamp sendTime;
+    private Date sendTime;
 
     /**
      * 发送状态
+     *
+     * 枚举 {@link MailSendStatusEnum}
      */
-    // TODO @wangjingyi：四个状态，参考短信模块
-    private Boolean sendStatus;
+    private Integer sendStatus;
 
     /**
      * 发送结果
+     *
      */
     private String sendResult;
 

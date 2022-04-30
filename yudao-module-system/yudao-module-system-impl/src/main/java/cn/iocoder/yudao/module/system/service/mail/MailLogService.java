@@ -4,7 +4,9 @@ package cn.iocoder.yudao.module.system.service.mail;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.system.controller.admin.mail.vo.log.MailLogExportReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.mail.vo.log.MailLogPageReqVO;
+import cn.iocoder.yudao.module.system.dal.dataobject.mail.MailAccountDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.mail.MailLogDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.mail.MailTemplateDO;
 
 import java.util.List;
 
@@ -28,4 +30,18 @@ public interface MailLogService {
      * @return
      */
     List<MailLogDO> getMailLogList(MailLogExportReqVO exportReqVO);
+
+    /**
+     * 创建邮箱日志
+     * @param mailAccountDO 邮箱账号信息
+     * @param mailTemplateDO 模版信息
+     * @param from 邮箱
+     * @param content 内容
+     * @param tos 收件人
+     * @param title 标题
+     * @param isSend 是否发送成功
+     */
+    Long createMailLog(MailAccountDO mailAccountDO, MailTemplateDO mailTemplateDO, String from, String content, List<String> tos, String title, Boolean isSend);
+
+    Long updateSmsSendResult(Long logId, String result);
 }

@@ -31,7 +31,7 @@ public class MailTemplatePageReqVO extends PageParam {
     private String content;
 
     @ApiModelProperty("状态")
-    private String status;
+    private Integer status;
 
     @ApiModelProperty("备注")
     private String remark;

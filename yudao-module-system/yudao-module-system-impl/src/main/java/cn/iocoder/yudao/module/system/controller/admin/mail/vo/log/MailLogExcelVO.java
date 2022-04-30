@@ -6,6 +6,7 @@ import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.sql.Timestamp;
+import java.util.Date;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
@@ -30,10 +31,10 @@ public class MailLogExcelVO {
 
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     @ExcelProperty(value = "发送时间" )
-    private Timestamp sendTime;
+    private Date sendTime;
 
     @ExcelProperty(value = "发送状态")
-    private Boolean sendStatus;
+    private Integer sendStatus;
 
     @ExcelProperty(value = "发送结果")
     private String sendResult;

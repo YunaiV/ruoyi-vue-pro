@@ -30,6 +30,7 @@
         <module>yudao-spring-boot-starter-biz-operatelog</module>
         <module>yudao-spring-boot-starter-biz-dict</module>
         <module>yudao-spring-boot-starter-biz-sms</module>
+        <module>yudao-spring-boot-starter-biz-mail</module>
         <module>yudao-spring-boot-starter-activiti</module>
         <module>yudao-spring-boot-starter-biz-pay</module>
         <module>yudao-spring-boot-starter-biz-weixin</module>

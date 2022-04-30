@@ -6,6 +6,8 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.util.Date;
+
 /**
  * 邮箱模版
  *
@@ -29,11 +31,10 @@ public class MailTemplateDO extends BaseDO {
      * 模版编号
      */
     private String code;
-    // TODO @wangjingyi：应该使用 accountId 呀
     /**
-     * 用户名
+     * 邮箱账号主键
      */
-    private String username;
+    private Long accountId;
     /**
      * 标题
      */
@@ -47,7 +48,7 @@ public class MailTemplateDO extends BaseDO {
      *
      * 枚举 {@link CommonStatusEnum}
      */
-    private String status; // TODO @wangjingyi：Integer
+    private Integer status;
     /**
      * 备注
      */

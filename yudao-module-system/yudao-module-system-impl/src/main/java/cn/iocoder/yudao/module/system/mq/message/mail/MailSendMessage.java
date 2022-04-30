@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import javax.validation.constraints.NotNull;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -17,28 +18,33 @@ import java.util.Map;
 public class MailSendMessage extends AbstractStreamMessage {
 
     /**
+     * 日志id
+     */
+    @NotNull(message = "邮箱日志id不能为空")
+    private Long logId;
+    /**
      * 邮箱地址
      */
     @NotNull(message = "邮箱地址不能为空")
-    private String address;
+    private String from;
     /**
-     * 短信模板编号
+     * 邮箱模板编号
      */
-    @NotNull(message = "短信模板编号不能为空")
+    @NotNull(message = "邮箱模板编号不能为空")
     private String templateCode;
     /**
-     * 短信模板参数
+     * 收件人
      */
-    private Map<String, Object> templateParams;
-
+    @NotNull(message = "收件人不能为空")
+    private List<String> tos;
     /**
-     * 用户编号，允许空
+     * 标题
      */
-    private Integer userId;
+    private String title;
     /**
-     * 用户类型，允许空
+     * 内容
      */
-    private Integer userType;
+    private String content;
 
     @Override
     public String getStreamKey() {

@@ -36,7 +36,7 @@ public class MailLogRespVO {
     private Timestamp sendTime;
 
     @ApiModelProperty(value = "发送状态" , required = false , example = "1")
-    private Boolean sendStatus;
+    private Integer sendStatus;
 
     @ApiModelProperty(value = "发送结果" , required = false , example = "yudaoyuanma@123.com")
     private String sendResult;

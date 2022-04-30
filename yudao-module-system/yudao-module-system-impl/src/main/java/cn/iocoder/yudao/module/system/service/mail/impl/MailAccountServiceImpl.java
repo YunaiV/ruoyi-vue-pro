@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.system.controller.admin.mail.vo.account.MailAccou
 import cn.iocoder.yudao.module.system.controller.admin.mail.vo.account.MailAccountUpdateReqVO;
 import cn.iocoder.yudao.module.system.convert.mail.MailAccountConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.mail.MailAccountDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.mail.MailTemplateDO;
 import cn.iocoder.yudao.module.system.dal.mysql.mail.MailAccountMapper;
 import cn.iocoder.yudao.module.system.dal.mysql.mail.MailTemplateMapper;
 import cn.iocoder.yudao.module.system.service.mail.MailAccountService;
@@ -16,8 +17,7 @@ import javax.annotation.Resource;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.MAIL_ACCOUNT_EXISTS;
-import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.MAIL_ACCOUNT_NOT_EXISTS;
+import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
 
 
 /**
@@ -47,8 +47,8 @@ public class MailAccountServiceImpl implements MailAccountService {
 
     @Override
     public void update(MailAccountUpdateReqVO updateReqVO) {
-        // username 要校验唯一 // TODO @wangjingyi：更新的就是自己，username 这样写，会重复呀。
-        this.validateMailAccountOnlyByUserName(updateReqVO.getUsername());
+        // username 要校验唯一
+        this.validateMailAccountExists(updateReqVO.getId());
         MailAccountDO mailAccountDO = MailAccountConvert.INSTANCE.convert(updateReqVO);
         // 校验是否存在
         this.validateMailAccountExists(mailAccountDO.getId());
@@ -57,9 +57,10 @@ public class MailAccountServiceImpl implements MailAccountService {
 
     @Override
     public void delete(Long id) {
-        // TODO @wangjingyi：删除时，要判断是否有使用的模板
-        // 校验是否存在
+        // 校验是否存在账号
         this.validateMailAccountExists(id);
+        // 校验是否存在关联模版
+        this.validateMailTemplateByAccountId(id);
         mailAccountMapper.deleteById(id);
     }
 
@@ -88,6 +89,13 @@ public class MailAccountServiceImpl implements MailAccountService {
         MailAccountDO mailAccountDO = mailAccountMapper.selectByUserName(userName);
         if (mailAccountDO != null) {
             throw exception(MAIL_ACCOUNT_EXISTS);
+        }
+    }
+
+    private void validateMailTemplateByAccountId(Long accountId){
+        MailTemplateDO mailTemplateDO =  mailTemplateMapper.selectOneByAccountId(accountId);
+        if (mailTemplateDO != null) {
+            throw exception(MAIL_RELATE_TEMPLATE_EXISTS);
         }
     }
 }

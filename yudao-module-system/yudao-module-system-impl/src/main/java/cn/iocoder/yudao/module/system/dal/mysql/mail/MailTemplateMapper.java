@@ -6,6 +6,9 @@ import cn.iocoder.yudao.framework.mybatis.core.query.QueryWrapperX;
 import cn.iocoder.yudao.module.system.controller.admin.mail.vo.template.MailTemplatePageReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.mail.MailTemplateDO;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Select;
+
+import java.util.Date;
 
 
 @Mapper
@@ -23,7 +26,15 @@ public interface MailTemplateMapper extends BaseMapperX<MailTemplateDO> {
     }
 
     default MailTemplateDO selectOneByCode(String code){
-        // TODO @wangjingyi：优先使用 lambada 查询
-        return selectOne("code" , code);
+        return selectOne(new QueryWrapperX<MailTemplateDO>()
+                .eqIfPresent("code" , code));
+    };
+
+    @Select("SELECT id FROM system_mail_template WHERE update_time > #{maxUpdateTime} LIMIT 1")
+    Long selectByMaxUpdateTime(Date maxUpdateTime);
+
+    default MailTemplateDO selectOneByAccountId(Long accountId){
+        return selectOne(new QueryWrapperX<MailTemplateDO>()
+                .eqIfPresent("account_id" , accountId));
     };
 }

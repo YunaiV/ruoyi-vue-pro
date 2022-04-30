@@ -126,5 +126,6 @@ public interface ErrorCodeConstants {
     // ========== 邮箱模版 1002020000 ==========
     ErrorCode MAIL_TEMPLATE_NOT_EXISTS = new ErrorCode(1002020000 , "邮箱模版不存在");
     ErrorCode MAIL_TEMPLATE_EXISTS = new ErrorCode(1002020001, "邮箱模版存在");
+    ErrorCode MAIL_RELATE_TEMPLATE_EXISTS = new ErrorCode(1002020002, "存在关联邮箱模版");
 
 }

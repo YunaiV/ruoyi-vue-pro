@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.system.controller.admin.mail.vo.send;
+package cn.iocoder.yudao.module.system.api.mail.dto;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -10,7 +10,7 @@ import java.util.List;
 
 @ApiModel("管理后台 - 邮件发送 Req VO")
 @Data
-public class MailReqVO { // TODO @wangjingqi：1）, 不用空格；2）应该只要传递 templateCode、参数就好，title、from、content、附件应该都是参数里的
+public class MailSendReqDTO { // TODO @wangjingqi：1）, 不用空格；2）应该只要传递 templateCode、参数就好，title、from、content、附件应该都是参数里的
 
     @ApiModelProperty(value = "邮箱",required = true,example = "yudaoyuanma@123.com")
     @NotNull(message = "邮箱账号不能为空")

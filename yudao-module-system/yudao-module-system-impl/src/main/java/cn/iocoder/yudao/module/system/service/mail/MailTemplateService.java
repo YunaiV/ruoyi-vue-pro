@@ -9,6 +9,7 @@ import cn.iocoder.yudao.module.system.dal.dataobject.mail.MailTemplateDO;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Map;
 
 /**
  *  邮箱模版服务类
@@ -18,6 +19,7 @@ import java.util.List;
  */
 public interface MailTemplateService {
 
+    void initLocalCache();
     /**
      * 邮箱模版创建
      *
@@ -62,6 +64,13 @@ public interface MailTemplateService {
      * @return 模版数组
      */
     List<MailTemplateDO> getMailTemplateList();
+    /**
+     *从缓存中获取邮箱模版
+     *
+     * @param code 模板编码
+     * @return 邮箱模板
+     */
+    MailTemplateDO getMailTemplateByCodeFromCache(String code);
 
     /**
      * 发送邮件
@@ -69,4 +78,12 @@ public interface MailTemplateService {
      * @param mailReqVO 邮件发送信息
      */
     void sendMail(MailReqVO mailReqVO);
+
+    /**
+     * 邮件模版内容合成
+     * @param content 邮箱模版
+     * @param params 合成参数
+     * @return
+     */
+    String formateMailTemplateContent(String content, Map<String, String> params);
 }
