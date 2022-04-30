@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.infra.controller.admin.db.vo.DataSourceConfigCrea
 import cn.iocoder.yudao.module.infra.controller.admin.db.vo.DataSourceConfigUpdateReqVO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.db.DataSourceConfigDO;
 import cn.iocoder.yudao.module.infra.dal.mysql.db.DataSourceConfigMapper;
+import com.baomidou.dynamic.datasource.spring.boot.autoconfigure.DynamicDataSourceProperties;
 import org.jasypt.encryption.StringEncryptor;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
@@ -38,6 +39,9 @@ public class DataSourceConfigServiceImplTest extends BaseDbUnitTest {
 
     @MockBean
     private StringEncryptor stringEncryptor;
+
+    @MockBean
+    private DynamicDataSourceProperties dynamicDataSourceProperties;
 
     @Test
     public void testCreateDataSourceConfig_success() {

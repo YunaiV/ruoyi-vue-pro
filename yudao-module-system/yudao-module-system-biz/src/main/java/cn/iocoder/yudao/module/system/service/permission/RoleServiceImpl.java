@@ -247,7 +247,7 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public List<RoleDO> getRoleList(RoleExportReqVO reqVO) {
-        return roleMapper.listRoles(reqVO);
+        return roleMapper.selectList(reqVO);
     }
 
     /**
