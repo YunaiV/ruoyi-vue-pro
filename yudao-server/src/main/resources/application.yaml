@@ -32,7 +32,7 @@ spring:
     # 2. true: 启动时会对数据库中所有表进行更新操作，如果表存在，不做处理，反之，自动创建表
     # 3. create_drop: 启动时自动创建表，关闭时自动删除表
     # 4. drop_create: 启动时，删除旧表，再创建新表
-    database-schema-update: false # 设置为 false，可通过 sql/activiti.sql 初始化
+    database-schema-update: true # 设置为 false，可通过 sql/activiti.sql 初始化
     db-history-used: true # activiti7 默认 false 不生成历史信息表，需手动设置开启
     check-process-definitions: false # 设置为 false，禁用 /resources/processes 自动部署 BPMN XML 流程
     history-level: full # full：保存历史数据的最高级别，可保存全部流程相关细节，包括流程流转各节点参数
@@ -43,7 +43,7 @@ flowable:
   # 2. true: 启动时会对数据库中所有表进行更新操作，如果表存在，不做处理，反之，自动创建表
   # 3. create_drop: 启动时自动创建表，关闭时自动删除表
   # 4. drop_create: 启动时，删除旧表，再创建新表
-  database-schema-update: false # 设置为 false，可通过 https://github.com/flowable/flowable-sql 初始化
+  database-schema-update: true # 设置为 false，可通过 https://github.com/flowable/flowable-sql 初始化
   db-history-used: true # flowable6 默认 true 生成信息表，无需手动设置
   check-process-definitions: false # 设置为 false，禁用 /resources/processes 自动部署 BPMN XML 流程
   history-level: full # full：保存历史数据的最高级别，可保存全部流程相关细节，包括流程流转各节点参数
