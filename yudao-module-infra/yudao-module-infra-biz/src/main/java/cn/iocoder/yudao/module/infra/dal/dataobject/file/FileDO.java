@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.infra.dal.dataobject.file;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
@@ -13,8 +14,9 @@ import java.io.InputStream;
  *
  * @author 芋道源码
  */
-@Data
 @TableName("infra_file")
+@KeySequence("infra_file_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
+@Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @Builder
@@ -45,7 +47,7 @@ public class FileDO extends BaseDO {
      *
      * 通过 {@link cn.hutool.core.io.FileTypeUtil#getType(InputStream)} 获取
      */
-    @TableField(value = "`type`")
+    @TableField("\"type\"")
     private String type;
     /**
      * 文件大小

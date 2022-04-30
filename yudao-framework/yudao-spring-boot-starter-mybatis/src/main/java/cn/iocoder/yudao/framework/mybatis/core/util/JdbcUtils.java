@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.framework.mybatis.core.util;
 
+import com.baomidou.mybatisplus.annotation.DbType;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 
@@ -24,6 +26,17 @@ public class JdbcUtils {
         } catch (Exception ex) {
             return false;
         }
+    }
+
+    /**
+     * 获得 URL 对应的 DB 类型
+     *
+     * @param url URL
+     * @return DB 类型
+     */
+    public static DbType getDbType(String url) {
+        String name = com.alibaba.druid.util.JdbcUtils.getDbType(url, null);
+        return DbType.getDbType(name);
     }
 
 }

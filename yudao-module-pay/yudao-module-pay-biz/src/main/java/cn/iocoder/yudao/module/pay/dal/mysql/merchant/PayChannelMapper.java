@@ -32,7 +32,6 @@ public interface PayChannelMapper extends BaseMapperX<PayChannelDO> {
                 .eqIfPresent("fee_rate", reqVO.getFeeRate())
                 .eqIfPresent("merchant_id", reqVO.getMerchantId())
                 .eqIfPresent("app_id", reqVO.getAppId())
-                // .eqIfPresent("config", reqVO.getConfig())
                 .betweenIfPresent("create_time", reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
                 .orderByDesc("id")        );
     }
@@ -45,7 +44,6 @@ public interface PayChannelMapper extends BaseMapperX<PayChannelDO> {
                 .eqIfPresent("fee_rate", reqVO.getFeeRate())
                 .eqIfPresent("merchant_id", reqVO.getMerchantId())
                 .eqIfPresent("app_id", reqVO.getAppId())
-                // .eqIfPresent("config", reqVO.getConfig())
                 .betweenIfPresent("create_time", reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
                 .orderByDesc("id")        );
     }

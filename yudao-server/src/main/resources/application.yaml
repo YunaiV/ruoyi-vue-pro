@@ -39,7 +39,7 @@ spring:
 
 # 工作流 Flowable 配置
 flowable:
-  # 1. false: 默认值，activiti启动时，对比数据库表中保存的版本，如果不匹配。将抛出异常
+  # 1. false: 默认值，Flowable 启动时，对比数据库表中保存的版本，如果不匹配。将抛出异常
   # 2. true: 启动时会对数据库中所有表进行更新操作，如果表存在，不做处理，反之，自动创建表
   # 3. create_drop: 启动时自动创建表，关闭时自动删除表
   # 4. drop_create: 启动时，删除旧表，再创建新表
@@ -54,7 +54,10 @@ mybatis-plus:
     map-underscore-to-camel-case: true # 虽然默认为 true ，但是还是显示去指定下。
   global-config:
     db-config:
-      id-type: AUTO # 自增 ID
+      id-type: NONE # “智能”模式，基于 IdTypeEnvironmentPostProcessor + 数据源的类型，自动适配成 AUTO、INPUT 模式。
+#      id-type: AUTO # 自增 ID，适合 MySQL 等直接自增的数据库
+#      id-type: INPUT # 用户输入 ID，适合 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库
+#      id-type: ASSIGN_ID # 分配 ID，默认使用雪花算法。注意，Oracle、PostgreSQL、Kingbase、DB2、H2 数据库时，需要去除实体类上的 @KeySequence 注解
       logic-delete-value: 1 # 逻辑已删除值(默认为 1)
       logic-not-delete-value: 0 # 逻辑未删除值(默认为 0)
   type-aliases-package: ${yudao.info.base-package}.module.*.dal.dataobject

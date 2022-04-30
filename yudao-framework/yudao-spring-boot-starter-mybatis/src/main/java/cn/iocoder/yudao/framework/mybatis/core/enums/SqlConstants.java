@@ -5,7 +5,6 @@ package cn.iocoder.yudao.framework.mybatis.core.enums;
  */
 public interface SqlConstants {
 
-
     String LIMIT1 = "LIMIT 1";
 
 }
