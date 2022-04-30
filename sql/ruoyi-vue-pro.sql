@@ -1672,7 +1672,7 @@ CREATE TABLE `infra_codegen_column` (
   `column_comment` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '字段描述',
   `nullable` bit(1) NOT NULL COMMENT '是否允许为空',
   `primary_key` bit(1) NOT NULL COMMENT '是否主键',
-  `auto_Increment` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '是否自增',
+  `auto_increment` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '是否自增',
   `ordinal_position` int NOT NULL COMMENT '排序',
   `java_type` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Java 属性类型',
   `java_field` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Java 属性名',

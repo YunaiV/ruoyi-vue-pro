@@ -43,7 +43,7 @@ public class BpmOALeaveDO extends BaseDO {
      * 请假类型
      */
     @TableField("\"type\"")
-    private String type;
+    private Integer type;
     /**
      * 原因
      */

@@ -47,7 +47,7 @@ public class FileDO extends BaseDO {
      *
      * 通过 {@link cn.hutool.core.io.FileTypeUtil#getType(InputStream)} 获取
      */
-    @TableField(value = "`type`")
+    @TableField("\"type\"")
     private String type;
     /**
      * 文件大小

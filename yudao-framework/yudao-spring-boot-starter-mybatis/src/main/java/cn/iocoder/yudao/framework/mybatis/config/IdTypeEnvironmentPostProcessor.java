@@ -24,22 +24,28 @@ public class IdTypeEnvironmentPostProcessor implements EnvironmentPostProcessor 
 
     private static final String DATASOURCE_DYNAMIC_KEY = "spring.datasource.dynamic";
 
+    private static final String QUARTZ_JOB_STORE_DRIVER_KEY = "spring.quartz.properties.org.quartz.jobStore.driverDelegateClass";
+
     private static final Set<DbType> INPUT_ID_TYPES = SetUtils.asSet(DbType.ORACLE, DbType.ORACLE_12C,
             DbType.POSTGRE_SQL, DbType.KINGBASE_ES, DbType.DB2, DbType.H2);
 
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
-        // 如果非 NONE，则不进行处理
-        IdType idType = getIdType(environment);
-        if (idType != IdType.NONE) {
-            return;
-        }
         // 如果获取不到 DbType，则不进行处理
         DbType dbType = getDbType(environment);
         if (dbType == null) {
             return;
         }
 
+        // 设置 Quartz JobStore 对应的 Driver
+        // TODO 芋艿：暂时没有找到特别合适的地方，先放在这里
+        setJobStoreDriverIfPresent(environment, dbType);
+
+        // 如果非 NONE，则不进行处理
+        IdType idType = getIdType(environment);
+        if (idType != IdType.NONE) {
+            return;
+        }
         // 情况一，用户输入 ID，适合 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库
         if (INPUT_ID_TYPES.contains(dbType)) {
             setIdType(environment, IdType.INPUT);
@@ -56,6 +62,28 @@ public class IdTypeEnvironmentPostProcessor implements EnvironmentPostProcessor 
     public void setIdType(ConfigurableEnvironment environment, IdType idType) {
         environment.getSystemProperties().put(ID_TYPE_KEY, idType);
         log.info("[setIdType][修改 MyBatis Plus 的 idType 为({})]", idType);
+    }
+
+    public void setJobStoreDriverIfPresent(ConfigurableEnvironment environment, DbType dbType) {
+        String driverClass = environment.getProperty(QUARTZ_JOB_STORE_DRIVER_KEY);
+        if (StrUtil.isNotEmpty(driverClass)) {
+            return;
+        }
+        // 根据 dbType 类型，获取对应的 driverClass
+        switch (dbType) {
+            case POSTGRE_SQL:
+                driverClass = "org.quartz.impl.jdbcjobstore.PostgreSQLDelegate";
+                break;
+            case ORACLE:
+            case ORACLE_12C:
+                driverClass = "org.quartz.impl.jdbcjobstore.oracle.OracleDelegate";
+                break;
+        }
+        // 设置 driverClass 变量
+        if (StrUtil.isNotEmpty(driverClass)) {
+            environment.getSystemProperties().put(QUARTZ_JOB_STORE_DRIVER_KEY, driverClass);
+
+        }
     }
 
     public static DbType getDbType(ConfigurableEnvironment environment) {
