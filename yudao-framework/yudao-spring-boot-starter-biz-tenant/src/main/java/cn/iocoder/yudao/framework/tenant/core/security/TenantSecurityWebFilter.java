@@ -75,7 +75,7 @@ public class TenantSecurityWebFilter extends ApiRequestFilter {
             }
         }
 
-        //检查是否是忽略的 URL, 如果是则允许访问
+        // 如果非允许忽略租户的 URL，则校验租户是否合法
         if (!isIgnoreUrl(request)) {
             // 2. 如果请求未带租户的编号，不允许访问。
             if (tenantId == null) {
@@ -91,6 +91,10 @@ public class TenantSecurityWebFilter extends ApiRequestFilter {
                 CommonResult<?> result = globalExceptionHandler.allExceptionHandler(request, ex);
                 ServletUtils.writeJSON(response, result);
                 return;
+            }
+        } else { // 如果是允许忽略租户的 URL，若未传递租户编号，则默认忽略租户编号，避免报错
+            if (tenantId == null) {
+                TenantContextHolder.setIgnore(true);
             }
         }
 

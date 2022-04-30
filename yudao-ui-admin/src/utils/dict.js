@@ -64,11 +64,6 @@ export const DICT_TYPE = {
  * @returns {*|Array} 数据字典数组
  */
 export function getDictDatas(dictType) {
-  // if (dictType === 'bpm_task_assign_script') {
-  //   console.log(store.getters.dict_datas[dictType]);
-  //   debugger
-  // }
-  // debugger
   return store.getters.dict_datas[dictType] || []
 }
 
@@ -95,8 +90,6 @@ export function getDictDatas2(dictType, values) {
       results.push(dict);
     }
   }
-  // debugger
-  // console.log(results);
   return results;
 }
 

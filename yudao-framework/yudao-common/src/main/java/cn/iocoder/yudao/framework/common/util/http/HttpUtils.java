@@ -1,9 +1,7 @@
 package cn.iocoder.yudao.framework.common.util.http;
 
-import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.map.TableMap;
 import cn.hutool.core.net.url.UrlBuilder;
-import cn.hutool.core.util.ReferenceUtil;
 import cn.hutool.core.util.ReflectUtil;
 
 import java.nio.charset.Charset;

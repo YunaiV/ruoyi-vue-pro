@@ -82,9 +82,9 @@ public class WXPayClientConfig implements PayClientConfig {
     @NotBlank(message = "apiclient_cert 不能为空", groups = V3.class)
     private String privateCertContent;
     /**
-     * apiV3 秘钥值
+     * apiV3 密钥值
      */
-    @NotBlank(message = "apiV3 秘钥值 不能为空", groups = V3.class)
+    @NotBlank(message = "apiV3 密钥值 不能为空", groups = V3.class)
     private String apiV3Key;
 
     /**

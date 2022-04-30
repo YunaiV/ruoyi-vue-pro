@@ -1,6 +1,6 @@
 spring:
   application:
-    name: yudao-admin-server
+    name: yudao-server
 
   profiles:
     active: local
@@ -19,6 +19,12 @@ spring:
       write-date-timestamps-as-nanoseconds: false # 设置不使用 nanoseconds 的格式。例如说 1611460870.401，而是直接 1611460870401
       write-durations-as-timestamps: true # 设置 Duration 的格式，使用时间戳
       fail-on-empty-beans: false # 允许序列化无属性的 Bean
+
+  # Cache 配置项
+  cache:
+    type: REDIS
+    redis:
+      time-to-live: 1h # 设置过期时间为 1 小时
 
   # 工作流 Activiti 配置
   activiti:
@@ -104,6 +110,7 @@ yudao:
       - system_sms_channel
       - system_sms_template
       - system_sms_log
+      - system_sensitive_word
       - infra_codegen_column
       - infra_codegen_table
       - infra_test_demo
@@ -116,6 +123,7 @@ yudao:
       - infra_job
       - infra_job_log
       - infra_job_log
+      - infra_data_source_config
   sms-code: # 短信验证码相关的配置项
     expire-times: 10m
     send-frequency: 1m

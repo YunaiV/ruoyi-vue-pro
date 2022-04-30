@@ -61,6 +61,10 @@ spring:
     port: 6379 # 端口
     database: 1 # 数据库索引
 
+jasypt:
+  encryptor:
+    password: yuanma # 加解密的秘钥
+
 --- #################### 定时任务相关配置 ####################
 
 # Quartz 配置项，对应 QuartzProperties 配置类
@@ -186,10 +190,6 @@ yudao:
 justauth:
   enabled: true
   type:
-    GITEE: # Gitee
-      client-id: ee61f0374a4c6c404a8717094caa7a410d76950e45ff60348015830c519ba5c1
-      client-secret: 7c044a5671be3b051414db0cf2cec6ad702dd298d2416ba24ceaf608e6fa26f9
-      ignore-check-redirect-uri: true
     DINGTALK: # 钉钉
       client-id: dingvrnreaje3yqvzhxg
       client-secret: i8E6iZyDvZj51JIb0tYsYfVQYOks9Cq1lgryEjFRqC79P3iJcrxEwT6Qk2QvLrLI

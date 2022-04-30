@@ -9,7 +9,7 @@ export function login(username, password, code, uuid) {
     uuid
   }
   return request({
-    url: '/system/login',
+    url: '/system/auth/login',
     method: 'post',
     data: data
   })
@@ -18,7 +18,7 @@ export function login(username, password, code, uuid) {
 // 获取用户详细信息
 export function getInfo() {
   return request({
-    url: '/system/get-permission-info',
+    url: '/system/auth/get-permission-info',
     method: 'get'
   })
 }
@@ -43,15 +43,15 @@ export function getCodeImg() {
 // 社交授权的跳转
 export function socialAuthRedirect(type, redirectUri) {
   return request({
-    url: '/system/social-auth-redirect?type=' + type + '&redirectUri=' + redirectUri,
+    url: '/system/auth/social-auth-redirect?type=' + type + '&redirectUri=' + redirectUri,
     method: 'get'
   })
 }
 
-// 社交登录，使用 code 授权码
-export function socialLogin(type, code, state) {
+// 社交快捷登录，使用 code 授权码
+export function socialQuickLogin(type, code, state) {
   return request({
-    url: '/system/social-login',
+    url: '/system/auth/social-quick-login',
     method: 'post',
     data: {
       type,
@@ -61,10 +61,10 @@ export function socialLogin(type, code, state) {
   })
 }
 
-// 社交登录，使用 code 授权码 + + 账号密码
-export function socialLogin2(type, code, state, username, password) {
+// 社交绑定登录，使用 code 授权码 + + 账号密码
+export function socialBindLogin(type, code, state, username, password) {
   return request({
-    url: '/system/social-login2',
+    url: '/system/auth/social-bind-login',
     method: 'post',
     data: {
       type,
@@ -72,31 +72,6 @@ export function socialLogin2(type, code, state, username, password) {
       state,
       username,
       password
-    }
-  })
-}
-
-// 社交绑定，使用 code 授权码
-export function socialBind(type, code, state) {
-  return request({
-    url: '/system/social-bind',
-    method: 'post',
-    data: {
-      type,
-      code,
-      state,
-    }
-  })
-}
-
-// 取消社交绑定
-export function socialUnbind(type, unionId) {
-  return request({
-    url: '/system/social-unbind',
-    method: 'delete',
-    data: {
-      type,
-      unionId
     }
   })
 }

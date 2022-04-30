@@ -1,0 +1,4 @@
+### 请求 /system/sensitive-word/validate-text 接口 => 成功
+GET {{baseUrl}}/system/sensitive-word/validate-text?text=XXX&tags=短信&tags=蔬菜
+Authorization: Bearer {{token}}
+tenant-id: {{adminTenentId}}

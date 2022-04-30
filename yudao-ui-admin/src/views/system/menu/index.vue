@@ -1,6 +1,8 @@
 <template>
   <div class="app-container">
     <doc-alert title="功能权限" url="https://doc.iocoder.cn/resource-permission" />
+    <doc-alert title="菜单路由" url="https://doc.iocoder.cn/vue2/route/" />
+    <!-- 搜索工作栏 -->
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch">
       <el-form-item label="菜单名称" prop="name">
         <el-input v-model="queryParams.name" placeholder="请输入菜单名称" clearable @keyup.enter.native="handleQuery"/>
@@ -61,8 +63,8 @@
     </el-table>
 
     <!-- 添加或修改菜单对话框 -->
-    <el-dialog :title="title" :visible.sync="open" width="600px" append-to-body>
-      <el-form ref="form" :model="form" :rules="rules" label-width="80px">
+    <el-dialog :title="title" :visible.sync="open" width="680px" append-to-body>
+      <el-form ref="form" :model="form" :rules="rules" label-width="100px">
         <el-row>
           <el-col :span="24">
             <el-form-item label="上级菜单">
@@ -79,7 +81,7 @@
             </el-form-item>
           </el-col>
           <el-col :span="24">
-            <el-form-item v-if="form.type != '3'" label="菜单图标">
+            <el-form-item v-if="form.type !== 3" label="菜单图标">
               <el-popover placement="bottom-start" width="460" trigger="click" @show="$refs['iconSelect'].reset()">
                 <IconSelect ref="iconSelect" @selected="selected" />
                 <el-input slot="reference" v-model="form.icon" placeholder="点击选择图标" readonly>
@@ -101,25 +103,71 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item v-if="form.type != '3'" label="路由地址" prop="path">
+            <el-form-item v-if="form.type !== 3" label="路由地址" prop="path">
+              <span slot="label">
+                <el-tooltip content="访问的路由地址，如：`user`。如需外网地址时，则以 `http(s)://` 开头" placement="top">
+                <i class="el-icon-question" />
+                </el-tooltip>
+                路由地址
+              </span>
               <el-input v-model="form.path" placeholder="请输入路由地址" />
             </el-form-item>
           </el-col>
-          <el-col :span="12" v-if="form.type == '2'">
+          <el-col :span="12" v-if="form.type === 2">
             <el-form-item label="组件路径" prop="component">
               <el-input v-model="form.component" placeholder="请输入组件路径" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item v-if="form.type != '1'" label="权限标识">
+            <el-form-item v-if="form.type !== 1" label="权限标识">
+              <span slot="label">
+                <el-tooltip content="Controller 方法上的权限字符，如：@PreAuthorize(`@ss.hasPermission('system:user:list')`)" placement="top">
+                  <i class="el-icon-question" />
+                </el-tooltip>
+                权限字符
+              </span>
               <el-input v-model="form.permission" placeholder="请权限标识" maxlength="50" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="菜单状态">
+            <el-form-item label="菜单状态" prop="status">
+              <span slot="label">
+                <el-tooltip content="选择停用时，路由将不会出现在侧边栏，也不能被访问" placement="top">
+                  <i class="el-icon-question" />
+                </el-tooltip>
+                菜单状态
+              </span>
               <el-radio-group v-model="form.status">
                 <el-radio v-for="dict in this.getDictDatas(DICT_TYPE.COMMON_STATUS)"
                           :key="dict.value" :label="parseInt(dict.value)">{{dict.label}}</el-radio>
+              </el-radio-group>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item v-if="form.type !== 3" label="显示状态">
+              <span slot="label">
+                <el-tooltip content="选择隐藏时，路由将不会出现在侧边栏，但仍然可以访问" placement="top">
+                  <i class="el-icon-question" />
+                </el-tooltip>
+                是否显示
+              </span>
+              <el-radio-group v-model="form.visible">
+                <el-radio :key="true" :label="true">显示</el-radio>
+                <el-radio :key="false" :label="false">隐藏</el-radio>
+              </el-radio-group>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item v-if="form.type === 2" label="显示状态">
+              <span slot="label">
+                <el-tooltip content="选择缓存时，则会被 `keep-alive` 缓存，需要匹配组件的 `name` 和路由地址保持一致" placement="top">
+                  <i class="el-icon-question" />
+                </el-tooltip>
+                 是否缓存
+              </span>
+              <el-radio-group v-model="form.keepAlive">
+                <el-radio :key="true" :label="true">缓存</el-radio>
+                <el-radio :key="false" :label="false">不缓存</el-radio>
               </el-radio-group>
             </el-form-item>
           </el-col>
@@ -141,6 +189,7 @@ import IconSelect from "@/components/IconSelect";
 
 import { SystemMenuTypeEnum, CommonStatusEnum } from '@/utils/constants'
 import { getDictDatas, DICT_TYPE } from '@/utils/dict'
+import {isExternal} from "@/utils/validate";
 
 export default {
   name: "Menu",
@@ -244,7 +293,9 @@ export default {
         icon: undefined,
         type: SystemMenuTypeEnum.DIR,
         sort: undefined,
-        status: CommonStatusEnum.ENABLE
+        status: CommonStatusEnum.ENABLE,
+        visible: true,
+        keepAlive: true,
       };
       this.resetForm("form");
     },
@@ -296,7 +347,7 @@ export default {
             || this.form.type === SystemMenuTypeEnum.MENU) {
             // 如果是外链，则不进行校验
             const path = this.form.path
-            if (path.indexOf('http://') === -1 || path.indexOf('https://') === -1) {
+            if (!isExternal(path)) {
               // 父权限为根节点，path 必须以 / 开头
               if (this.form.parentId === 0 && path.charAt(0) !== '/') {
                 this.$modal.msgSuccess('前端必须以 / 开头')

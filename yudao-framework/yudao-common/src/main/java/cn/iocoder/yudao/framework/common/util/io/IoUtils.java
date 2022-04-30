@@ -2,7 +2,6 @@ package cn.iocoder.yudao.framework.common.util.io;
 
 import cn.hutool.core.io.IORuntimeException;
 import cn.hutool.core.io.IoUtil;
-import cn.hutool.core.util.CharsetUtil;
 import cn.hutool.core.util.StrUtil;
 
 import java.io.InputStream;

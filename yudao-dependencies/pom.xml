@@ -14,9 +14,9 @@
     <url>https://github.com/YunaiV/ruoyi-vue-pro</url>
 
     <properties>
-        <revision>1.6.1-snapshot</revision>
+        <revision>1.6.2-snapshot</revision>
         <!-- 统一依赖管理 -->
-        <spring.boot.version>2.5.10</spring.boot.version>
+        <spring.boot.version>2.5.12</spring.boot.version>
         <!-- Web 相关 -->
         <knife4j.version>3.0.2</knife4j.version>
         <swagger-annotations.version>1.5.22</swagger-annotations.version>
@@ -25,8 +25,9 @@
         <mysql.version>5.1.46</mysql.version>
         <druid.version>1.2.8</druid.version>
         <mybatis-plus.version>3.4.3.4</mybatis-plus.version>
+        <mybatis-plus-generator.version>3.5.2</mybatis-plus-generator.version>
         <dynamic-datasource.version>3.5.0</dynamic-datasource.version>
-        <redisson.version>3.16.6</redisson.version>
+        <redisson.version>3.17.0</redisson.version>
         <!-- Config 配置中心相关 -->
         <apollo.version>1.9.2</apollo.version>
         <!-- Job 定时任务相关 -->
@@ -45,6 +46,7 @@
         <activiti.version>7.1.0.M6</activiti.version>
         <flowable.version>6.7.0</flowable.version>
         <!-- 工具类相关 -->
+        <jasypt-spring-boot-starter.version>3.0.4</jasypt-spring-boot-starter.version>
         <lombok.version>1.18.20</lombok.version>
         <mapstruct.version>1.4.1.Final</mapstruct.version>
         <hutool.version>5.6.1</hutool.version>
@@ -60,6 +62,7 @@
         <minio.version>8.2.2</minio.version>
         <aliyun-java-sdk-core.version>4.5.25</aliyun-java-sdk-core.version>
         <aliyun-java-sdk-dysmsapi.version>2.1.0</aliyun-java-sdk-dysmsapi.version>
+        <tencentcloud-sdk-java.version>3.1.471</tencentcloud-sdk-java.version>
         <yunpian-java-sdk.version>1.2.7</yunpian-java-sdk.version>
         <justauth.version>1.4.0</justauth.version>
     </properties>
@@ -190,6 +193,11 @@
                 <groupId>com.baomidou</groupId>
                 <artifactId>mybatis-plus-boot-starter</artifactId>
                 <version>${mybatis-plus.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-generator</artifactId> <!-- 代码生成器，使用它解析表结构 -->
+                <version>${mybatis-plus-generator.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.baomidou</groupId>
@@ -428,6 +436,12 @@
             </dependency>
 
             <dependency>
+                <groupId>com.github.ulisesbocchio</groupId>
+                <artifactId>jasypt-spring-boot-starter</artifactId> <!-- 加解密 -->
+                <version>${jasypt-spring-boot-starter.version}</version>
+            </dependency>
+
+            <dependency>
                 <groupId>cn.iocoder.boot</groupId>
                 <artifactId>yudao-spring-boot-starter-excel</artifactId>
                 <version>${revision}</version>
@@ -551,6 +565,11 @@
                 <groupId>com.aliyun</groupId>
                 <artifactId>aliyun-java-sdk-dysmsapi</artifactId>
                 <version>${aliyun-java-sdk-dysmsapi.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.tencentcloudapi</groupId>
+                <artifactId>tencentcloud-sdk-java</artifactId>
+                <version>${tencentcloud-sdk-java.version}</version>
             </dependency>
             <!-- SMS SDK end -->
 
