@@ -2,12 +2,10 @@ package cn.iocoder.yudao.module.infra.dal.mysql.config;
 
 import cn.iocoder.yudao.framework.apollo.internals.ConfigFrameworkDAO;
 import cn.iocoder.yudao.framework.apollo.internals.dto.ConfigRespDTO;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 import javax.sql.DataSource;
-import java.sql.ResultSet;
 import java.util.Date;
 import java.util.List;
 
@@ -26,14 +24,18 @@ public class ConfigDAOImpl implements ConfigFrameworkDAO {
     }
 
     @Override
-    public boolean selectExistsByUpdateTimeAfter(Date maxUpdateTime) {
-        return jdbcTemplate.query("SELECT id FROM infra_config WHERE update_time > ? LIMIT 1",
-                ResultSet::next, maxUpdateTime);
+    public int selectCountByUpdateTimeGt(Date maxUpdateTime) {
+        return jdbcTemplate.queryForObject("SELECT COUNT(*) FROM infra_config WHERE update_time > ?",
+                Integer.class, maxUpdateTime);
     }
 
     @Override
     public List<ConfigRespDTO> selectList() {
-        return jdbcTemplate.query("SELECT `key`, `value`, update_time, deleted FROM infra_config", new BeanPropertyRowMapper<>(ConfigRespDTO.class));
+        return jdbcTemplate.query("SELECT config_key, value, update_time, deleted FROM infra_config",
+                (rs, rowNum) -> new ConfigRespDTO().setKey(rs.getString("config_key"))
+                        .setValue(rs.getString("value"))
+                        .setUpdateTime(rs.getDate("update_time"))
+                        .setDeleted(rs.getBoolean("deleted")));
     }
 
 }

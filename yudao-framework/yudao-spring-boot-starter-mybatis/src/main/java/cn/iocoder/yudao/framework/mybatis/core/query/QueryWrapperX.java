@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.framework.mybatis.core.query;
 
+import cn.hutool.core.lang.Assert;
+import cn.iocoder.yudao.framework.mybatis.core.enums.SqlConstants;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.ArrayUtils;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
@@ -121,6 +123,26 @@ public class QueryWrapperX<T> extends QueryWrapper<T> {
     @Override
     public QueryWrapperX<T> in(String column, Collection<?> coll) {
         super.in(column, coll);
+        return this;
+    }
+
+    /**
+     * 设置只返回最后一条
+     *
+     * TODO 芋艿：不是完美解，需要在思考下。如果使用多数据源，并且数据源是多种类型时，可能会存在问题：实现之返回一条的语法不同
+     *
+     * @return this
+     */
+    public QueryWrapperX<T> limit1() {
+        Assert.notNull(SqlConstants.DB_TYPE, "获取不到数据库的类型");
+        switch (SqlConstants.DB_TYPE) {
+            case ORACLE:
+            case ORACLE_12C:
+                super.eq("ROWNUM", 1);
+                break;
+            default:
+                super.last("LIMIT 1");
+        }
         return this;
     }
 
