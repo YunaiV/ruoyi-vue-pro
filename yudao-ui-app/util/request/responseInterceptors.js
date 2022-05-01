@@ -9,9 +9,12 @@ module.exports = vm => {
       //可以根据业务情况做相应的处理
       if (res.data.code === 0) {
         return res.data
+      } else if(res.data.code === 401) {
+        //用户未登录或登录token已过期
+        vm.$store.commit('clearLoginInfo')
       } else {
         console.log(res)
-        //错误信息统一处理
+        //其他错误信息统一处理
         uni.$u.toast(res.data.msg)
         return Promise.reject(res)
       }
