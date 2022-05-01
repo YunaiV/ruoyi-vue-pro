@@ -10,9 +10,10 @@
     <modelVersion>4.0.0</modelVersion>
     <modules>
         <module>yudao-module-bpm-api</module>
-        <module>yudao-module-bpm-base</module>
-        <module>yudao-module-bpm-biz-flowable</module>
-        <module>yudao-module-bpm-biz-activiti</module>
+        <module>yudao-module-bpm-biz</module>
+<!--        <module>yudao-module-bpm-base</module>-->
+<!--        <module>yudao-module-bpm-biz-flowable</module>-->
+<!--        <module>yudao-module-bpm-biz-activiti</module>-->
     </modules>
     <artifactId>yudao-module-bpm</artifactId>
     <packaging>pom</packaging>
