@@ -117,7 +117,7 @@ public class DeptServiceImpl implements DeptService {
         if (maxUpdateTime == null) { // 如果更新时间为空，说明 DB 一定有新数据
             log.info("[loadMenuIfUpdate][首次加载全量部门]");
         } else { // 判断数据库中是否有更新的部门
-            if (deptMapper.selectExistsByUpdateTimeAfter(maxUpdateTime) == null) {
+            if (deptMapper.selectCountByUpdateTimeGt(maxUpdateTime) == 0) {
                 return null;
             }
             log.info("[loadMenuIfUpdate][增量加载全量部门]");

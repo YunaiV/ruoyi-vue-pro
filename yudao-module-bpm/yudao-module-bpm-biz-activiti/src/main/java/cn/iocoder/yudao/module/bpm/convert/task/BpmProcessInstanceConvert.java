@@ -116,10 +116,10 @@ public interface BpmProcessInstanceConvert {
         return event;
     }
 
-    default BpmMessageSendWhenProcessInstanceRejectReqDTO convert(ProcessInstance processInstance, String comment) {
+    default BpmMessageSendWhenProcessInstanceRejectReqDTO convert(ProcessInstance processInstance, String reason) {
         BpmMessageSendWhenProcessInstanceRejectReqDTO reqDTO = new BpmMessageSendWhenProcessInstanceRejectReqDTO();
         copyTo(processInstance, reqDTO);
-        reqDTO.setComment(comment);
+        reqDTO.setReason(reason);
         return reqDTO;
     }
     @Mapping(source = "name", target = "processInstanceName")

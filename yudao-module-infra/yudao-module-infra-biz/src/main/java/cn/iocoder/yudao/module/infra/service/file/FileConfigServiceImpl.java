@@ -123,7 +123,7 @@ public class FileConfigServiceImpl implements FileConfigService {
         if (maxUpdateTime == null) { // 如果更新时间为空，说明 DB 一定有新数据
             log.info("[loadFileConfigIfUpdate][首次加载全量文件配置]");
         } else { // 判断数据库中是否有更新的文件配置
-            if (fileConfigMapper.selectExistsByUpdateTimeAfter(maxUpdateTime) == null) {
+            if (fileConfigMapper.selectCountByUpdateTimeGt(maxUpdateTime) == 0) {
                 return null;
             }
             log.info("[loadFileConfigIfUpdate][增量加载全量文件配置]");

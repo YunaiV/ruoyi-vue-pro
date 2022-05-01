@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.bpm.dal.dataobject.oa;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmProcessInstanceResultEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
@@ -42,7 +41,6 @@ public class BpmOALeaveDO extends BaseDO {
     /**
      * 请假类型
      */
-    @TableField("\"type\"")
     private Integer type;
     /**
      * 原因

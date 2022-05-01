@@ -226,7 +226,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         taskService.complete(task.getId(), instance.getProcessVariables()); // TODO 芋艿：variables 的选择
         // 更新任务拓展表为通过
         taskExtMapper.updateByTaskId(new BpmTaskExtDO().setTaskId(task.getId())
-                .setResult(BpmProcessInstanceResultEnum.APPROVE.getResult()).setComment(reqVO.getComment()));
+                .setResult(BpmProcessInstanceResultEnum.APPROVE.getResult()).setReason(reqVO.getReason()));
 
         // TODO 芋艿：添加评论
 //        taskService.addComment(task.getId(), task.getProcessInstanceId(), reqVO.getComment());
@@ -250,11 +250,11 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         }
 
         // 更新流程实例为不通过
-        processInstanceService.updateProcessInstanceExtReject(instance.getProcessInstanceId(), reqVO.getComment());
+        processInstanceService.updateProcessInstanceExtReject(instance.getProcessInstanceId(), reqVO.getReason());
 
         // 更新任务拓展表为不通过
         taskExtMapper.updateByTaskId(new BpmTaskExtDO().setTaskId(task.getId())
-                .setResult(BpmProcessInstanceResultEnum.REJECT.getResult()).setComment(reqVO.getComment()));
+                .setResult(BpmProcessInstanceResultEnum.REJECT.getResult()).setReason(reqVO.getReason()));
 
         // TODO 芋艿：添加评论
 //        taskService.addComment(task.getId(), task.getProcessInstanceId(), reqVO.getComment());

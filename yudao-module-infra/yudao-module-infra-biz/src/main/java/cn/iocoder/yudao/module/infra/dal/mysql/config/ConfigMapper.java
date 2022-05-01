@@ -14,13 +14,13 @@ import java.util.List;
 public interface ConfigMapper extends BaseMapperX<ConfigDO> {
 
     default ConfigDO selectByKey(String key) {
-        return selectOne(ConfigDO::getKey, key);
+        return selectOne(ConfigDO::getConfigKey, key);
     }
 
     default PageResult<ConfigDO> selectPage(ConfigPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<ConfigDO>()
                 .likeIfPresent(ConfigDO::getName, reqVO.getName())
-                .likeIfPresent(ConfigDO::getKey, reqVO.getKey())
+                .likeIfPresent(ConfigDO::getConfigKey, reqVO.getKey())
                 .eqIfPresent(ConfigDO::getType, reqVO.getType())
                 .betweenIfPresent(ConfigDO::getCreateTime, reqVO.getBeginTime(), reqVO.getEndTime()));
     }
@@ -28,7 +28,7 @@ public interface ConfigMapper extends BaseMapperX<ConfigDO> {
     default List<ConfigDO> selectList(ConfigExportReqVO reqVO) {
         return selectList(new LambdaQueryWrapperX<ConfigDO>()
                 .likeIfPresent(ConfigDO::getName, reqVO.getName())
-                .likeIfPresent(ConfigDO::getKey, reqVO.getKey())
+                .likeIfPresent(ConfigDO::getConfigKey, reqVO.getKey())
                 .eqIfPresent(ConfigDO::getType, reqVO.getType())
                 .betweenIfPresent(ConfigDO::getCreateTime, reqVO.getBeginTime(), reqVO.getEndTime()));
     }

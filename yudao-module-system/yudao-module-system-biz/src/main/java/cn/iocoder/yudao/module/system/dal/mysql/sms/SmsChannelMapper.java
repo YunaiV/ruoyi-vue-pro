@@ -21,7 +21,7 @@ public interface SmsChannelMapper extends BaseMapperX<SmsChannelDO> {
                 .orderByDesc(SmsChannelDO::getId));
     }
 
-    @Select("SELECT id FROM system_sms_channel WHERE update_time > #{maxUpdateTime} LIMIT 1")
-    Long selectExistsByUpdateTimeAfter(Date maxUpdateTime);
+    @Select("SELECT COUNT(*) FROM system_sms_channel WHERE update_time > #{maxUpdateTime}")
+    Long selectCountByUpdateTimeGt(Date maxUpdateTime);
 
 }

@@ -137,7 +137,7 @@ public class ConfigServiceTest extends BaseDbUnitTest {
         // 准备参数
         String key = randomString();
         // mock 数据
-        configMapper.insert(randomConfigDO(o -> o.setKey(key)));
+        configMapper.insert(randomConfigDO(o -> o.setConfigKey(key)));
 
         // 调用，校验异常
         assertServiceException(() -> configService.checkConfigKeyUnique(null, key),
@@ -150,7 +150,7 @@ public class ConfigServiceTest extends BaseDbUnitTest {
         Long id = randomLongId();
         String key = randomString();
         // mock 数据
-        configMapper.insert(randomConfigDO(o -> o.setKey(key)));
+        configMapper.insert(randomConfigDO(o -> o.setConfigKey(key)));
 
         // 调用，校验异常
         assertServiceException(() -> configService.checkConfigKeyUnique(id, key),
@@ -162,7 +162,7 @@ public class ConfigServiceTest extends BaseDbUnitTest {
         // mock 数据
         ConfigDO dbConfig = randomConfigDO(o -> { // 等会查询到
             o.setName("芋艿");
-            o.setKey("yunai");
+            o.setConfigKey("yunai");
             o.setType(ConfigTypeEnum.SYSTEM.getType());
             o.setCreateTime(buildTime(2021, 2, 1));
         });
@@ -170,7 +170,7 @@ public class ConfigServiceTest extends BaseDbUnitTest {
         // 测试 name 不匹配
         configMapper.insert(ObjectUtils.cloneIgnoreId(dbConfig, o -> o.setName("土豆")));
         // 测试 key 不匹配
-        configMapper.insert(ObjectUtils.cloneIgnoreId(dbConfig, o -> o.setKey("tudou")));
+        configMapper.insert(ObjectUtils.cloneIgnoreId(dbConfig, o -> o.setConfigKey("tudou")));
         // 测试 type 不匹配
         configMapper.insert(ObjectUtils.cloneIgnoreId(dbConfig, o -> o.setType(ConfigTypeEnum.CUSTOM.getType())));
         // 测试 createTime 不匹配
@@ -196,7 +196,7 @@ public class ConfigServiceTest extends BaseDbUnitTest {
         // mock 数据
         ConfigDO dbConfig = randomConfigDO(o -> { // 等会查询到
             o.setName("芋艿");
-            o.setKey("yunai");
+            o.setConfigKey("yunai");
             o.setType(ConfigTypeEnum.SYSTEM.getType());
             o.setCreateTime(buildTime(2021, 2, 1));
         });
@@ -204,7 +204,7 @@ public class ConfigServiceTest extends BaseDbUnitTest {
         // 测试 name 不匹配
         configMapper.insert(ObjectUtils.cloneIgnoreId(dbConfig, o -> o.setName("土豆")));
         // 测试 key 不匹配
-        configMapper.insert(ObjectUtils.cloneIgnoreId(dbConfig, o -> o.setKey("tudou")));
+        configMapper.insert(ObjectUtils.cloneIgnoreId(dbConfig, o -> o.setConfigKey("tudou")));
         // 测试 type 不匹配
         configMapper.insert(ObjectUtils.cloneIgnoreId(dbConfig, o -> o.setType(ConfigTypeEnum.CUSTOM.getType())));
         // 测试 createTime 不匹配
@@ -230,7 +230,7 @@ public class ConfigServiceTest extends BaseDbUnitTest {
         ConfigDO dbConfig = randomConfigDO();
         configMapper.insert(dbConfig);// @Sql: 先插入出一条存在的数据
         // 准备参数
-        String key = dbConfig.getKey();
+        String key = dbConfig.getConfigKey();
 
         // 调用
         ConfigDO config = configService.getConfigByKey(key);

@@ -46,7 +46,7 @@ public interface RoleMapper extends BaseMapperX<RoleDO> {
         return selectList(RoleDO::getStatus, statuses);
     }
 
-    @Select("SELECT id FROM system_role WHERE update_time > #{maxUpdateTime} LIMIT 1")
-    RoleDO selectExistsByUpdateTimeAfter(Date maxUpdateTime);
+    @Select("SELECT COUNT(*) FROM system_role WHERE update_time > #{maxUpdateTime}")
+    Long selectCountByUpdateTimeGt(Date maxUpdateTime);
 
 }

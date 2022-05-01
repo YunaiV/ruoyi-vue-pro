@@ -35,7 +35,6 @@ public class DictTypeDO extends BaseDO {
     /**
      * 字典类型
      */
-    @TableField("\"type\"")
     private String type;
     /**
      * 状态

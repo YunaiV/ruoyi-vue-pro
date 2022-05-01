@@ -72,7 +72,6 @@ public class OperateLogDO extends BaseDO {
      *
      * 枚举 {@link OperateTypeEnum}
      */
-    @TableField("operate_type")
     private Integer type;
     /**
      * 操作内容，记录整个操作的明细

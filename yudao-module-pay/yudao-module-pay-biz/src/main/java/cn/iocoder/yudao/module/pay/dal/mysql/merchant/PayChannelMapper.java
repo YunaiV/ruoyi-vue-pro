@@ -21,8 +21,8 @@ public interface PayChannelMapper extends BaseMapperX<PayChannelDO> {
         return selectOne(PayChannelDO::getAppId, appId, PayChannelDO::getCode, code);
     }
 
-    @Select("SELECT id FROM pay_channel WHERE update_time > #{maxUpdateTime} LIMIT 1")
-    Long selectExistsByUpdateTimeAfter(Date maxUpdateTime);
+    @Select("SELECT COUNT(*) FROM pay_channel WHERE update_time > #{maxUpdateTime}")
+    Long selectCountByUpdateTimeGt(Date maxUpdateTime);
 
     default PageResult<PayChannelDO> selectPage(PayChannelPageReqVO reqVO) {
         return selectPage(reqVO, new QueryWrapperX<PayChannelDO>()
@@ -33,7 +33,7 @@ public interface PayChannelMapper extends BaseMapperX<PayChannelDO> {
                 .eqIfPresent("merchant_id", reqVO.getMerchantId())
                 .eqIfPresent("app_id", reqVO.getAppId())
                 .betweenIfPresent("create_time", reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
-                .orderByDesc("id")        );
+                .orderByDesc("id"));
     }
 
     default List<PayChannelDO> selectList(PayChannelExportReqVO reqVO) {
@@ -45,7 +45,7 @@ public interface PayChannelMapper extends BaseMapperX<PayChannelDO> {
                 .eqIfPresent("merchant_id", reqVO.getMerchantId())
                 .eqIfPresent("app_id", reqVO.getAppId())
                 .betweenIfPresent("create_time", reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
-                .orderByDesc("id")        );
+                .orderByDesc("id"));
     }
 
     /**

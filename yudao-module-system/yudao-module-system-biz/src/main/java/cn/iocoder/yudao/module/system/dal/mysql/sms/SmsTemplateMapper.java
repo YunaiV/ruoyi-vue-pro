@@ -15,8 +15,8 @@ import java.util.List;
 @Mapper
 public interface SmsTemplateMapper extends BaseMapperX<SmsTemplateDO> {
 
-    @Select("SELECT id FROM system_sms_template WHERE update_time > #{maxUpdateTime} LIMIT 1")
-    Long selectExistsByUpdateTimeAfter(Date maxUpdateTime);
+    @Select("SELECT COUNT(*) FROM system_sms_template WHERE update_time > #{maxUpdateTime}")
+    Long selectCountByUpdateTimeGt(Date maxUpdateTime);
 
     default SmsTemplateDO selectByCode(String code) {
         return selectOne(SmsTemplateDO::getCode, code);
