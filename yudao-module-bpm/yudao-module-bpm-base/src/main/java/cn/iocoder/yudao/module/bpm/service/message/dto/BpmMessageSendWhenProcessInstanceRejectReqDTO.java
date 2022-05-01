@@ -28,6 +28,6 @@ public class BpmMessageSendWhenProcessInstanceRejectReqDTO {
      * 不通过理由
      */
     @NotEmpty(message = "不通过理由不能为空")
-    private String comment;
+    private String reason;
 
 }

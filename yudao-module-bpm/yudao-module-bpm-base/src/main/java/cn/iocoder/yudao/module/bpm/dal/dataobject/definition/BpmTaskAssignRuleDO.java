@@ -33,8 +33,9 @@ public class BpmTaskAssignRuleDO extends BaseDO {
 
     /**
      * {@link #processDefinitionId} 空串，用于标识属于流程模型，而不属于流程定义
+     * 不使用空串的原因，Oracle 针对空串，会处理成 null，进而导致无法检索
      */
-    public static final String PROCESS_DEFINITION_ID_NULL = "";
+    public static final String PROCESS_DEFINITION_ID_NULL = "DEFAULT";
 
     /**
      * 编号
