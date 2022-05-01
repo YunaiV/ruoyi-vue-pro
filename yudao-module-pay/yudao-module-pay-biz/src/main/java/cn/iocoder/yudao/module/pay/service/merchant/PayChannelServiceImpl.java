@@ -106,7 +106,7 @@ public class PayChannelServiceImpl implements PayChannelService {
         if (maxUpdateTime == null) { // 如果更新时间为空，说明 DB 一定有新数据
             log.info("[loadPayChannelIfUpdate][首次加载全量支付渠道]");
         } else { // 判断数据库中是否有更新的支付渠道
-            if (channelMapper.selectExistsByUpdateTimeAfter(maxUpdateTime) == null) {
+            if (channelMapper.selectCountByUpdateTimeGt(maxUpdateTime) == 0) {
                 return null;
             }
             log.info("[loadPayChannelIfUpdate][增量加载全量支付渠道]");

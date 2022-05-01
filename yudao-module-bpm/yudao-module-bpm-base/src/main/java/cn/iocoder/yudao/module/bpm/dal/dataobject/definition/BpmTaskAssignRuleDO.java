@@ -66,7 +66,6 @@ public class BpmTaskAssignRuleDO extends BaseDO {
      *
      * 枚举 {@link BpmTaskAssignRuleTypeEnum}
      */
-    @TableField("\"type\"")
     private Integer type;
     /**
      * 规则值数组，一般关联指定表的编号

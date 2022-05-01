@@ -12,6 +12,7 @@ import cn.iocoder.yudao.module.infra.dal.dataobject.codegen.CodegenColumnDO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.codegen.CodegenTableDO;
 import cn.iocoder.yudao.module.infra.dal.mysql.codegen.CodegenColumnMapper;
 import cn.iocoder.yudao.module.infra.dal.mysql.codegen.CodegenTableMapper;
+import cn.iocoder.yudao.module.infra.enums.codegen.CodegenSceneEnum;
 import cn.iocoder.yudao.module.infra.service.codegen.inner.CodegenBuilder;
 import cn.iocoder.yudao.module.infra.service.codegen.inner.CodegenEngine;
 import cn.iocoder.yudao.module.infra.service.db.DatabaseTableService;
@@ -88,6 +89,7 @@ public class CodegenServiceImpl implements CodegenService {
         // 构建 CodegenTableDO 对象，插入到 DB 中
         CodegenTableDO table = codegenBuilder.buildTable(tableInfo);
         table.setDataSourceConfigId(dataSourceConfigId);
+        table.setScene(CodegenSceneEnum.ADMIN.getScene()); // 默认配置下，使用管理后台的模板
         table.setAuthor(userApi.getUser(userId).getNickname());
         codegenTableMapper.insert(table);
         // 构建 CodegenColumnDO 数组，插入到 DB 中

@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.infra.dal.dataobject.file;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
@@ -47,7 +46,6 @@ public class FileDO extends BaseDO {
      *
      * 通过 {@link cn.hutool.core.io.FileTypeUtil#getType(InputStream)} 获取
      */
-    @TableField("\"type\"")
     private String type;
     /**
      * 文件大小

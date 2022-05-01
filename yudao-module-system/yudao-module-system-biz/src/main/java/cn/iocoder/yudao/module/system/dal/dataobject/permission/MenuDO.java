@@ -4,7 +4,6 @@ import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.system.enums.permission.MenuTypeEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
@@ -46,7 +45,6 @@ public class MenuDO extends BaseDO {
      *
      * 枚举 {@link MenuTypeEnum}
      */
-    @TableField("menu_type")
     private Integer type;
     /**
      * 显示顺序

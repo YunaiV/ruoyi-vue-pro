@@ -105,7 +105,7 @@ public class SmsTemplateServiceImpl implements SmsTemplateService {
         if (maxUpdateTime == null) { // 如果更新时间为空，说明 DB 一定有新数据
             log.info("[loadSmsTemplateIfUpdate][首次加载全量短信模板]");
         } else { // 判断数据库中是否有更新的短信模板
-            if (smsTemplateMapper.selectExistsByUpdateTimeAfter(maxUpdateTime) == null) {
+            if (smsTemplateMapper.selectCountByUpdateTimeGt(maxUpdateTime) == 0) {
                 return null;
             }
             log.info("[loadSmsTemplateIfUpdate][增量加载全量短信模板]");
