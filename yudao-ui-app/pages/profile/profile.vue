@@ -51,7 +51,7 @@
 </template>
 
 <script>
-import { getUserInfo, updateAvatar, updateNickname } from '../../common/api'
+import { getUserInfo, updateAvatar, updateNickname } from '../../api/user'
 
 export default {
   data() {

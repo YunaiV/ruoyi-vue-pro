@@ -3,7 +3,7 @@
     <view class="user-header">
       <view class="user-info" @click="loginOrJump('/pages/profile/profile')">
         <u-avatar size="80" :src="userInfo.avatar"></u-avatar>
-        <text class="nick-name">{{ hasLogin ? userInfo.nickname || '游客' : '点击登录' }}</text>
+        <text class="nick-name">{{ hasLogin ? userInfo.nickname || '游客' : '登录/注册' }}</text>
       </view>
     </view>
 
@@ -90,10 +90,9 @@ export default {
         content: '您确定要退出登录吗',
         success: res => {
           if (res.confirm) {
-            console.log('用户点击确定')
             this.$store.dispatch('logout')
           } else if (res.cancel) {
-            console.log('用户点击取消')
+            //console.log('用户点击取消')
           }
         }
       })

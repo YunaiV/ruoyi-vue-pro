@@ -109,7 +109,7 @@
 </template>
 
 <script>
-import { getBannerData, getNoticeData } from '../../common/api'
+import { getBannerData, getNoticeData } from '../../api/index'
 
 export default {
   components: {},

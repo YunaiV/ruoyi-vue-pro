@@ -48,7 +48,7 @@
 </template>
 
 <script>
-import { passwordLogin, sendSmsCode, smsLogin } from '../../common/api'
+import { passwordLogin, sendSmsCode, smsLogin } from '../../api/auth'
 
 export default {
   data() {

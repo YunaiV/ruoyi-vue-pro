@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import { getUserInfo, logout } from '@/common/api'
+import { logout } from '@/api/auth'
+import { getUserInfo } from '@/api/user'
 
 Vue.use(Vuex) // vue的插件机制
 
