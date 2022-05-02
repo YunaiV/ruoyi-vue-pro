@@ -46,7 +46,7 @@ public interface DictDataMapper extends BaseMapperX<DictDataDO> {
                 .eqIfPresent(DictDataDO::getStatus, reqVO.getStatus()));
     }
 
-    @Select("SELECT id FROM system_dict_data WHERE update_time > #{maxUpdateTime} LIMIT 1")
-    Long selectExistsByUpdateTimeAfter(Date maxUpdateTime);
+    @Select("SELECT COUNT(*) FROM system_dict_data WHERE update_time > #{maxUpdateTime}")
+    Long selectCountByUpdateTimeGt(Date maxUpdateTime);
 
 }

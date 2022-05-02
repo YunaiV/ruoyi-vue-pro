@@ -1,26 +1,25 @@
 package cn.iocoder.yudao.module.infra.service.codegen;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.module.infra.controller.admin.codegen.vo.CodegenCreateListReqVO;
 import cn.iocoder.yudao.module.infra.controller.admin.codegen.vo.CodegenUpdateReqVO;
 import cn.iocoder.yudao.module.infra.controller.admin.codegen.vo.table.CodegenTablePageReqVO;
+import cn.iocoder.yudao.module.infra.controller.admin.codegen.vo.table.DatabaseTableRespVO;
 import cn.iocoder.yudao.module.infra.convert.codegen.CodegenConvert;
 import cn.iocoder.yudao.module.infra.dal.dataobject.codegen.CodegenColumnDO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.codegen.CodegenTableDO;
-import cn.iocoder.yudao.module.infra.dal.dataobject.codegen.SchemaColumnDO;
-import cn.iocoder.yudao.module.infra.dal.dataobject.codegen.SchemaTableDO;
 import cn.iocoder.yudao.module.infra.dal.mysql.codegen.CodegenColumnMapper;
 import cn.iocoder.yudao.module.infra.dal.mysql.codegen.CodegenTableMapper;
-import cn.iocoder.yudao.module.infra.dal.mysql.codegen.SchemaColumnMapper;
-import cn.iocoder.yudao.module.infra.dal.mysql.codegen.SchemaTableMapper;
-import cn.iocoder.yudao.module.infra.enums.codegen.CodegenImportTypeEnum;
-import cn.iocoder.yudao.module.infra.framework.codegen.config.CodegenProperties;
+import cn.iocoder.yudao.module.infra.enums.codegen.CodegenSceneEnum;
 import cn.iocoder.yudao.module.infra.service.codegen.inner.CodegenBuilder;
 import cn.iocoder.yudao.module.infra.service.codegen.inner.CodegenEngine;
-import cn.iocoder.yudao.module.infra.service.codegen.inner.CodegenSQLParser;
+import cn.iocoder.yudao.module.infra.service.db.DatabaseTableService;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
-import org.apache.commons.collections4.KeyValue;
+import com.baomidou.mybatisplus.generator.config.po.TableField;
+import com.baomidou.mybatisplus.generator.config.po.TableInfo;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,9 +42,8 @@ import static cn.iocoder.yudao.module.infra.enums.ErrorCodeConstants.*;
 public class CodegenServiceImpl implements CodegenService {
 
     @Resource
-    private SchemaTableMapper schemaTableMapper;
-    @Resource
-    private SchemaColumnMapper schemaColumnMapper;
+    private DatabaseTableService databaseTableService;
+
     @Resource
     private CodegenTableMapper codegenTableMapper;
     @Resource
@@ -59,68 +57,63 @@ public class CodegenServiceImpl implements CodegenService {
     @Resource
     private CodegenEngine codegenEngine;
 
-    @Resource
-    private CodegenProperties codegenProperties;
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public List<Long> createCodegenList(Long userId, CodegenCreateListReqVO reqVO) {
+        List<Long> ids = new ArrayList<>(reqVO.getTableNames().size());
+        // 遍历添加。虽然效率会低一点，但是没必要做成完全批量，因为不会这么大量
+        reqVO.getTableNames().forEach(tableName -> ids.add(createCodegen(userId, reqVO.getDataSourceConfigId(), tableName)));
+        return ids;
+    }
 
-    private Long createCodegen0(Long userId, CodegenImportTypeEnum importType,
-                                SchemaTableDO schemaTable, List<SchemaColumnDO> schemaColumns) {
+    public Long createCodegen(Long userId, Long dataSourceConfigId, String tableName) {
+        // 从数据库中，获得数据库表结构
+        TableInfo tableInfo = databaseTableService.getTable(dataSourceConfigId, tableName);
+        // 导入
+        return createCodegen0(userId, dataSourceConfigId, tableInfo);
+    }
+
+    private Long createCodegen0(Long userId, Long dataSourceConfigId, TableInfo tableInfo) {
         // 校验导入的表和字段非空
-        if (schemaTable == null) {
-            throw exception(CODEGEN_IMPORT_TABLE_NULL);
-        }
-        if (CollUtil.isEmpty(schemaColumns)) {
-            throw exception(CODEGEN_IMPORT_COLUMNS_NULL);
-        }
+        checkTableInfo(tableInfo);
         // 校验是否已经存在
-        if (codegenTableMapper.selectByTableName(schemaTable.getTableName()) != null) {
+        if (codegenTableMapper.selectByTableNameAndDataSourceConfigId(tableInfo.getName(),
+                dataSourceConfigId) != null) {
             throw exception(CODEGEN_TABLE_EXISTS);
         }
 
         // 构建 CodegenTableDO 对象，插入到 DB 中
-        CodegenTableDO table = codegenBuilder.buildTable(schemaTable);
-        table.setImportType(importType.getType());
+        CodegenTableDO table = codegenBuilder.buildTable(tableInfo);
+        table.setDataSourceConfigId(dataSourceConfigId);
+        table.setScene(CodegenSceneEnum.ADMIN.getScene()); // 默认配置下，使用管理后台的模板
         table.setAuthor(userApi.getUser(userId).getNickname());
         codegenTableMapper.insert(table);
+
         // 构建 CodegenColumnDO 数组，插入到 DB 中
-        List<CodegenColumnDO> columns = codegenBuilder.buildColumns(table.getId(), schemaColumns);
+        List<CodegenColumnDO> columns = codegenBuilder.buildColumns(table.getId(), tableInfo.getFields());
+        // 如果没有主键，则使用第一个字段作为主键
+        if (!tableInfo.isHavePrimaryKey()) {
+            columns.get(0).setPrimaryKey(true);
+        }
         codegenColumnMapper.insertBatch(columns);
         return table.getId();
     }
 
-    @Override
-    public Long createCodegenListFromSQL(Long userId, String sql) {
-        // 从 SQL 中，获得数据库表结构
-        SchemaTableDO schemaTable;
-        List<SchemaColumnDO> schemaColumns;
-        try {
-            KeyValue<SchemaTableDO, List<SchemaColumnDO>> result = CodegenSQLParser.parse(sql);
-            schemaTable = result.getKey();
-            schemaColumns = result.getValue();
-        } catch (Exception ex) {
-            throw exception(CODEGEN_PARSE_SQL_ERROR);
+    private void checkTableInfo(TableInfo tableInfo) {
+        if (tableInfo == null) {
+            throw exception(CODEGEN_IMPORT_TABLE_NULL);
         }
-        // 导入
-        return this.createCodegen0(userId, CodegenImportTypeEnum.SQL, schemaTable, schemaColumns);
-    }
-
-    @Override
-    public Long createCodegen(Long userId, String tableName) {
-        // 获取当前schema
-        String tableSchema = codegenProperties.getDbSchemas().iterator().next();
-        // 从数据库中，获得数据库表结构
-        SchemaTableDO schemaTable = schemaTableMapper.selectByTableSchemaAndTableName(tableSchema, tableName);
-        List<SchemaColumnDO> schemaColumns = schemaColumnMapper.selectListByTableName(tableSchema, tableName);
-        // 导入
-        return this.createCodegen0(userId, CodegenImportTypeEnum.DB, schemaTable, schemaColumns);
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public List<Long> createCodegenListFromDB(Long userId, List<String> tableNames) {
-        List<Long> ids = new ArrayList<>(tableNames.size());
-        // 遍历添加。虽然效率会低一点，但是没必要做成完全批量，因为不会这么大量
-        tableNames.forEach(tableName -> ids.add(createCodegen(userId, tableName)));
-        return ids;
+        if (StrUtil.isEmpty(tableInfo.getComment())) {
+            throw exception(CODEGEN_TABLE_INFO_TABLE_COMMENT_IS_NULL);
+        }
+        if (CollUtil.isEmpty(tableInfo.getFields())) {
+            throw exception(CODEGEN_IMPORT_COLUMNS_NULL);
+        }
+        tableInfo.getFields().forEach(field -> {
+            if (StrUtil.isEmpty(field.getComment())) {
+                throw exception(CODEGEN_TABLE_INFO_COLUMN_COMMENT_IS_NULL, field.getName());
+            }
+        });
     }
 
     @Override
@@ -147,56 +140,32 @@ public class CodegenServiceImpl implements CodegenService {
         if (table == null) {
             throw exception(CODEGEN_TABLE_NOT_EXISTS);
         }
-        String tableSchema = codegenProperties.getDbSchemas().iterator().next();
         // 从数据库中，获得数据库表结构
-        List<SchemaColumnDO> schemaColumns = schemaColumnMapper.selectListByTableName(tableSchema, table.getTableName());
-
+        TableInfo tableInfo = databaseTableService.getTable(table.getDataSourceConfigId(), table.getTableName());
         // 执行同步
-        this.syncCodegen0(tableId, schemaColumns);
+        syncCodegen0(tableId, tableInfo);
     }
 
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void syncCodegenFromSQL(Long tableId, String sql) {
-        // 校验是否已经存在
-        CodegenTableDO table = codegenTableMapper.selectById(tableId);
-        if (table == null) {
-            throw exception(CODEGEN_TABLE_NOT_EXISTS);
-        }
-        // 从 SQL 中，获得数据库表结构
-        List<SchemaColumnDO> schemaColumns;
-        try {
-            KeyValue<SchemaTableDO, List<SchemaColumnDO>> result = CodegenSQLParser.parse(sql);
-            schemaColumns = result.getValue();
-        } catch (Exception ex) {
-            throw exception(CODEGEN_PARSE_SQL_ERROR);
-        }
-
-        // 执行同步
-        this.syncCodegen0(tableId, schemaColumns);
-    }
-
-    private void syncCodegen0(Long tableId, List<SchemaColumnDO> schemaColumns) {
-        // 校验导入的字段不为空
-        if (CollUtil.isEmpty(schemaColumns)) {
-            throw exception(CODEGEN_SYNC_COLUMNS_NULL);
-        }
-        Set<String> schemaColumnNames = CollectionUtils.convertSet(schemaColumns, SchemaColumnDO::getColumnName);
+    private void syncCodegen0(Long tableId, TableInfo tableInfo) {
+        // 校验导入的表和字段非空
+        checkTableInfo(tableInfo);
+        List<TableField> tableFields = tableInfo.getFields();
 
         // 构建 CodegenColumnDO 数组，只同步新增的字段
         List<CodegenColumnDO> codegenColumns = codegenColumnMapper.selectListByTableId(tableId);
         Set<String> codegenColumnNames = CollectionUtils.convertSet(codegenColumns, CodegenColumnDO::getColumnName);
         // 移除已经存在的字段
-        schemaColumns.removeIf(column -> codegenColumnNames.contains(column.getColumnName()));
+        tableFields.removeIf(column -> codegenColumnNames.contains(column.getColumnName()));
         // 计算需要删除的字段
-        Set<Long> deleteColumnIds = codegenColumns.stream().filter(column -> !schemaColumnNames.contains(column.getColumnName()))
+        Set<String> tableFieldNames = CollectionUtils.convertSet(tableFields, TableField::getName);
+        Set<Long> deleteColumnIds = codegenColumns.stream().filter(column -> !tableFieldNames.contains(column.getColumnName()))
                 .map(CodegenColumnDO::getId).collect(Collectors.toSet());
-        if (CollUtil.isEmpty(schemaColumns) && CollUtil.isEmpty(deleteColumnIds)) {
+        if (CollUtil.isEmpty(tableFields) && CollUtil.isEmpty(deleteColumnIds)) {
             throw exception(CODEGEN_SYNC_NONE_CHANGE);
         }
 
         // 插入新增的字段
-        List<CodegenColumnDO> columns = codegenBuilder.buildColumns(tableId, schemaColumns);
+        List<CodegenColumnDO> columns = codegenBuilder.buildColumns(tableId, tableFields);
         codegenColumnMapper.insertBatch(columns);
         // 删除不存在的字段
         if (CollUtil.isNotEmpty(deleteColumnIds)) {
@@ -229,11 +198,6 @@ public class CodegenServiceImpl implements CodegenService {
     }
 
     @Override
-    public List<CodegenTableDO> getCodeGenTableList() {
-        return codegenTableMapper.selectList();
-    }
-
-    @Override
     public List<CodegenColumnDO> getCodegenColumnListByTableId(Long tableId) {
         return codegenColumnMapper.selectListByTableId(tableId);
     }
@@ -255,13 +219,18 @@ public class CodegenServiceImpl implements CodegenService {
     }
 
     @Override
-    public List<SchemaTableDO> getSchemaTableList(String tableName, String tableComment) {
-        List<SchemaTableDO> tables = schemaTableMapper.selectList(codegenProperties.getDbSchemas(), tableName, tableComment);
-        // TODO 强制移除 Quartz 的表，未来做成可配置
-        tables.removeIf(table -> table.getTableName().startsWith("QRTZ_"));
-        tables.removeIf(table -> table.getTableName().startsWith("ACT_"));
-        tables.removeIf(table -> table.getTableName().startsWith("FLW_"));
-        return tables;
+    public List<DatabaseTableRespVO> getDatabaseTableList(Long dataSourceConfigId, String name, String comment) {
+        List<TableInfo> tables = databaseTableService.getTableList(dataSourceConfigId, name, comment);
+        // 移除置顶前缀的表名 // TODO 未来做成可配置
+        tables.removeIf(table -> table.getName().toUpperCase().startsWith("QRTZ_"));
+        tables.removeIf(table -> table.getName().toUpperCase().startsWith("ACT_"));
+        tables.removeIf(table -> table.getName().toUpperCase().startsWith("FLW_"));
+        // 移除已经生成的表
+        // 移除在 Codegen 中，已经存在的
+        Set<String> existsTables = CollectionUtils.convertSet(
+                codegenTableMapper.selectListByDataSourceConfigId(dataSourceConfigId), CodegenTableDO::getTableName);
+        tables.removeIf(table -> existsTables.contains(table.getName()));
+        return CodegenConvert.INSTANCE.convertList04(tables);
     }
 
 }

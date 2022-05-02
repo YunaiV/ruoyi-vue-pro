@@ -2,7 +2,7 @@ package cn.iocoder.yudao.framework.security.config;
 
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.security.core.authentication.MultiUserDetailsAuthenticationProvider;
-import cn.iocoder.yudao.framework.security.core.filter.JWTAuthenticationTokenFilter;
+import cn.iocoder.yudao.framework.security.core.filter.TokenAuthenticationFilter;
 import cn.iocoder.yudao.framework.web.config.WebProperties;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
@@ -55,7 +55,7 @@ public class YudaoWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdap
      * Token 认证过滤器 Bean
      */
     @Resource
-    private JWTAuthenticationTokenFilter authenticationTokenFilter;
+    private TokenAuthenticationFilter authenticationTokenFilter;
 
     /**
      * 自定义的权限映射 Bean 们

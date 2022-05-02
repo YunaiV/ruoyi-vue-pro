@@ -269,7 +269,6 @@ export default {
       });
     },
     doSocialLogin(socialTypeEnum) {
-      // console.log("开始Oauth登录...%o", socialTypeEnum.code);
       // 设置登录中
       this.loading = true;
       // 计算 redirectUri

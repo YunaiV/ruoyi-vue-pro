@@ -18,18 +18,21 @@ public class SecurityConfiguration {
 
             @Override
             public void customize(ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry registry) {
-                // 登录的接口，可匿名访问
-                registry.antMatchers(buildAdminApi("/system/login")).anonymous();
-                //手机短信验证码登录
-                registry.antMatchers(buildAdminApi("/system/sms-login")).anonymous();
-                //短信登录验证码接口
-                registry.antMatchers(buildAdminApi("/system/send-login-sms-code")).anonymous();
+                // 登录的接口
+                registry.antMatchers(buildAdminApi("/system/auth/login")).permitAll();
+                // 社交登陆的接口
+                registry.antMatchers(buildAdminApi("/system/auth/social-auth-redirect")).permitAll();
+                registry.antMatchers(buildAdminApi("/system/auth/social-quick-login")).permitAll();
+                registry.antMatchers(buildAdminApi("/system/auth/social-bind-login")).permitAll();
+                // 登录登录的接口
+                registry.antMatchers(buildAdminApi("/system/auth/sms-login")).permitAll();
+                registry.antMatchers(buildAdminApi("/system/auth/send-login-sms-code")).permitAll();
                 // 验证码的接口
-                registry.antMatchers(buildAdminApi("/system/captcha/**")).anonymous();
+                registry.antMatchers(buildAdminApi("/system/captcha/**")).permitAll();
                 // 获得租户编号的接口
-                registry.antMatchers(buildAdminApi("/system/tenant/get-id-by-name")).anonymous();
+                registry.antMatchers(buildAdminApi("/system/tenant/get-id-by-name")).permitAll();
                 // 短信回调 API
-                registry.antMatchers(buildAdminApi("/system/sms/callback/**")).anonymous();
+                registry.antMatchers(buildAdminApi("/system/sms/callback/**")).permitAll();
             }
 
         };

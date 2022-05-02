@@ -1,4 +1,4 @@
-import {login, logout, getInfo, socialLogin, socialLogin2,smsLogin} from '@/api/login'
+import {login, logout, getInfo, socialQuickLogin, socialBindLogin, smsLogin} from '@/api/login'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 
 const user = {
@@ -57,7 +57,7 @@ const user = {
       const state = userInfo.state
       const type = userInfo.type
       return new Promise((resolve, reject) => {
-        socialLogin(type, code, state).then(res => {
+        socialQuickLogin(type, code, state).then(res => {
           res = res.data;
           setToken(res.token)
           commit('SET_TOKEN', res.token)
@@ -76,7 +76,7 @@ const user = {
       const username = userInfo.username.trim()
       const password = userInfo.password
       return new Promise((resolve, reject) => {
-        socialLogin2(type, code, state, username, password).then(res => {
+        socialBindLogin(type, code, state, username, password).then(res => {
           res = res.data;
           setToken(res.token)
           commit('SET_TOKEN', res.token)
@@ -86,21 +86,21 @@ const user = {
         })
       })
     },
- // 登录
- SmsLogin({ commit }, userInfo) {
-  const mobile = userInfo.mobile.trim()
-  const mobileCode = userInfo.mobileCode
-  return new Promise((resolve, reject) => {
-    smsLogin(mobile,mobileCode).then(res => {
-      res = res.data;
-      setToken(res.token)
-      commit('SET_TOKEN', res.token)
-      resolve()
-    }).catch(error => {
-      reject(error)
-    })
-  })
-},
+    // 登录
+    SmsLogin({ commit }, userInfo) {
+      const mobile = userInfo.mobile.trim()
+      const mobileCode = userInfo.mobileCode
+      return new Promise((resolve, reject) => {
+        smsLogin(mobile,mobileCode).then(res => {
+          res = res.data;
+          setToken(res.token)
+          commit('SET_TOKEN', res.token)
+          resolve()
+        }).catch(error => {
+          reject(error)
+        })
+      })
+    },
     // 获取用户信息
     GetInfo({ commit, state }) {
       return new Promise((resolve, reject) => {

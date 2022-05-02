@@ -25,7 +25,7 @@ public interface UserSessionService {
      *
      * @return {@link Long } 移出的超时用户数量
      **/
-    long clearSessionTimeout();
+    long deleteTimeoutSession();
 
     /**
      * 创建在线用户 Session
@@ -33,32 +33,39 @@ public interface UserSessionService {
      * @param loginUser 登录用户
      * @param userIp 用户 IP
      * @param userAgent 用户 UA
-     * @return Session 编号
+     * @return Token 令牌
      */
     String createUserSession(LoginUser loginUser, String userIp, String userAgent);
 
     /**
      * 刷新在线用户 Session 的更新时间
      *
-     * @param sessionId Session 编号
+     * @param token 令牌
      * @param loginUser 登录用户
      */
-    void refreshUserSession(String sessionId, LoginUser loginUser);
+    void refreshUserSession(String token, LoginUser loginUser);
 
     /**
      * 删除在线用户 Session
      *
-     * @param sessionId Session 编号
+     * @param token token 令牌
      */
-    void deleteUserSession(String sessionId);
+    void deleteUserSession(String token);
 
     /**
-     * 获得 Session 编号对应的在线用户
+     * 删除在线用户 Session
      *
-     * @param sessionId Session 编号
+     * @param id 编号
+     */
+    void deleteUserSession(Long id);
+
+    /**
+     * 获得 Token 对应的在线用户
+     *
+     * @param token 令牌
      * @return 在线用户
      */
-    LoginUser getLoginUser(String sessionId);
+    LoginUser getLoginUser(String token);
 
     /**
      * 获得 Session 超时时间，单位：毫秒

@@ -1,7 +1,7 @@
 -- 菜单 SQL
-INSERT INTO `system_menu`(
-    `name`, `permission`, `menu_type`, `sort`, `parent_id`,
-    `path`, `icon`, `component`, `status`
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
 )
 VALUES (
     '${table.classComment}管理', '', 2, 0, ${table.parentMenuId},
@@ -16,9 +16,9 @@ SELECT @parentId := LAST_INSERT_ID();
 #set ($functionOps = ['query', 'create', 'update', 'delete', 'export'])
 #foreach ($functionName in $functionNames)
 #set ($index = $foreach.count - 1)
-INSERT INTO `system_menu`(
-    `name`, `permission`, `menu_type`, `sort`, `parent_id`,
-    `path`, `icon`, `component`, `status`
+INSERT INTO system_menu(
+    name, permission, type, sort, parent_id,
+    path, icon, component, status
 )
 VALUES (
     '${table.classComment}${functionName}', '${permissionPrefix}:${functionOps.get($index)}', 3, $foreach.count, @parentId,

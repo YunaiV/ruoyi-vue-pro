@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.infra.dal.dataobject.config;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.infra.enums.config.ConfigTypeEnum;
-import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
@@ -15,6 +15,7 @@ import lombok.ToString;
  * @author 芋道源码
  */
 @TableName("infra_config")
+@KeySequence("infra_config_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
@@ -26,19 +27,19 @@ public class ConfigDO extends BaseDO {
     @TableId
     private Long id;
     /**
-     * 参数分组
+     * 参数分类
      */
-    @TableField("`group`")
-    private String group;
+    private String category;
     /**
      * 参数名称
      */
     private String name;
     /**
      * 参数键名
+     *
+     * 支持多 DB 类型时，无法直接使用 key + @TableField("config_key") 来实现转换，原因是 "config_key" AS key 而存在报错
      */
-    @TableField("`key`")
-    private String key;
+    private String configKey;
     /**
      * 参数键值
      */
@@ -48,15 +49,13 @@ public class ConfigDO extends BaseDO {
      *
      * 枚举 {@link ConfigTypeEnum}
      */
-    @TableField("`type`")
     private Integer type;
     /**
-     * 是否敏感
+     * 是否可见
      *
-     * 对于敏感配置，需要管理权限才能查看
+     * 不可见的参数，一般是敏感参数，前端不可获取
      */
-    @TableField("`sensitive`")
-    private Boolean sensitive;
+    private Boolean visible;
     /**
      * 备注
      */

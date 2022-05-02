@@ -1,31 +1,31 @@
 package cn.iocoder.yudao.module.system.service.auth;
 
-import cn.hutool.core.date.DateUtil;
-import cn.iocoder.yudao.framework.security.config.SecurityProperties;
-import cn.iocoder.yudao.framework.security.core.LoginUser;
-import cn.iocoder.yudao.module.system.controller.admin.auth.vo.session.UserSessionPageReqVO;
-import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
-import cn.iocoder.yudao.module.system.dal.mysql.auth.UserSessionMapper;
-import cn.iocoder.yudao.module.system.service.logger.LoginLogService;
-import cn.iocoder.yudao.module.system.service.user.AdminUserService;
-import cn.iocoder.yudao.module.system.dal.dataobject.auth.UserSessionDO;
-import cn.iocoder.yudao.module.system.dal.redis.auth.LoginUserRedisDAO;
-import cn.iocoder.yudao.module.system.enums.common.SexEnum;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
+import cn.iocoder.yudao.framework.security.config.SecurityProperties;
+import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbAndRedisUnitTest;
+import cn.iocoder.yudao.module.system.controller.admin.auth.vo.session.UserSessionPageReqVO;
+import cn.iocoder.yudao.module.system.dal.dataobject.auth.UserSessionDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
+import cn.iocoder.yudao.module.system.dal.mysql.auth.UserSessionMapper;
+import cn.iocoder.yudao.module.system.dal.redis.auth.LoginUserRedisDAO;
+import cn.iocoder.yudao.module.system.enums.common.SexEnum;
+import cn.iocoder.yudao.module.system.enums.logger.LoginLogTypeEnum;
+import cn.iocoder.yudao.module.system.enums.logger.LoginResultEnum;
+import cn.iocoder.yudao.module.system.service.logger.LoginLogService;
+import cn.iocoder.yudao.module.system.service.user.AdminUserService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
 import java.time.Duration;
-import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.Calendar;
 
 import static cn.hutool.core.util.RandomUtil.randomEle;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.addTime;
@@ -33,8 +33,9 @@ import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEq
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
 import static java.util.Collections.singletonList;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -61,6 +62,11 @@ public class UserSessionServiceImplTest extends BaseDbAndRedisUnitTest {
     @MockBean
     private SecurityProperties securityProperties;
 
+    @BeforeEach
+    public void setUp() {
+        when(securityProperties.getSessionTimeout()).thenReturn(Duration.ofDays(1L));
+    }
+
     @Test
     public void testGetUserSessionPage_success() {
         // mock 数据
@@ -78,15 +84,9 @@ public class UserSessionServiceImplTest extends BaseDbAndRedisUnitTest {
         });
         userSessionMapper.insert(dbSession);
         // 测试 username 不匹配
-        userSessionMapper.insert(ObjectUtils.cloneIgnoreId(dbSession, o -> {
-            o.setId(randomString());
-            o.setUserId(123456L);
-        }));
+        userSessionMapper.insert(ObjectUtils.cloneIgnoreId(dbSession, o -> o.setUserId(123456L)));
         // 测试 userIp 不匹配
-        userSessionMapper.insert(ObjectUtils.cloneIgnoreId(dbSession, o -> {
-            o.setId(randomString());
-            o.setUserIp("testUserIp");
-        }));
+        userSessionMapper.insert(ObjectUtils.cloneIgnoreId(dbSession, o -> o.setUserIp("testUserIp")));
         // 准备参数
         UserSessionPageReqVO reqVO = new UserSessionPageReqVO();
         reqVO.setUsername(dbUser.getUsername());
@@ -100,35 +100,60 @@ public class UserSessionServiceImplTest extends BaseDbAndRedisUnitTest {
         assertPojoEquals(dbSession, pageResult.getList().get(0));
     }
 
-    // TODO 芋艿：单测写的有问题
+    @Test
+    public void testClearSessionTimeout_none() {
+        // mock db 数据
+        UserSessionDO userSession = randomPojo(UserSessionDO.class, o -> {
+            o.setUserType(randomEle(UserTypeEnum.values()).getValue());
+            o.setSessionTimeout(addTime(Duration.ofDays(1)));
+        });
+        userSessionMapper.insert(userSession);
+
+        // 调用
+        long count = userSessionService.deleteTimeoutSession();
+        // 断言
+        assertEquals(0, count);
+        assertPojoEquals(userSession, userSessionMapper.selectById(userSession.getId())); // 未删除
+    }
+
+    @Test // Redis 还存在的情况
+    public void testClearSessionTimeout_exists() {
+        // mock db 数据
+        UserSessionDO userSession = randomPojo(UserSessionDO.class, o -> {
+            o.setUserType(randomEle(UserTypeEnum.values()).getValue());
+            o.setSessionTimeout(DateUtils.addDate(Calendar.DAY_OF_YEAR, -1));
+        });
+        userSessionMapper.insert(userSession);
+        // mock redis 数据
+        loginUserRedisDAO.set(userSession.getToken(), new LoginUser());
+
+        // 调用
+        long count = userSessionService.deleteTimeoutSession();
+        // 断言
+        assertEquals(0, count);
+        assertPojoEquals(userSession, userSessionMapper.selectById(userSession.getId())); // 未删除
+    }
+
     @Test
     public void testClearSessionTimeout_success() {
-        // 准备超时数据 120 条, 在线用户 1 条
-        int expectedTimeoutCount = 120, expectedTotal = 1;
-
-        // 准备数据
-        List<UserSessionDO> prepareData = Stream
-                .iterate(0, i -> i)
-                .limit(expectedTimeoutCount)
-                .map(i -> randomPojo(UserSessionDO.class, o -> {
-                    o.setUserType(randomEle(UserTypeEnum.values()).getValue());
-                    o.setSessionTimeout(DateUtil.offsetSecond(new Date(), -1));
-                }))
-                .collect(Collectors.toList());
-        UserSessionDO sessionDO = randomPojo(UserSessionDO.class, o -> {
+        // mock db 数据
+        UserSessionDO userSession = randomPojo(UserSessionDO.class, o -> {
             o.setUserType(randomEle(UserTypeEnum.values()).getValue());
-            o.setSessionTimeout(DateUtil.offsetMinute(new Date(), 30));
+            o.setSessionTimeout(DateUtils.addDate(Calendar.DAY_OF_YEAR, -1));
         });
-        prepareData.add(sessionDO);
-        prepareData.forEach(userSessionMapper::insert);
+        userSessionMapper.insert(userSession);
 
         // 清空超时数据
-        long actualTimeoutCount = userSessionService.clearSessionTimeout();
+        long count = userSessionService.deleteTimeoutSession();
         // 校验
-        assertEquals(expectedTimeoutCount, actualTimeoutCount);
-        List<UserSessionDO> userSessionDOS = userSessionMapper.selectList();
-        assertEquals(expectedTotal, userSessionDOS.size());
-        assertPojoEquals(sessionDO, userSessionDOS.get(0), "updateTime");
+        assertEquals(1, count);
+        assertNull(userSessionMapper.selectById(userSession.getId())); // 已删除
+        verify(loginLogService).createLoginLog(argThat(loginLog -> {
+            assertPojoEquals(userSession, loginLog);
+            assertEquals(LoginLogTypeEnum.LOGOUT_TIMEOUT.getType(), loginLog.getLogType());
+            assertEquals(LoginResultEnum.SUCCESS.getResult(), loginLog.getResult());
+            return true;
+        }));
     }
 
     @Test
@@ -140,80 +165,86 @@ public class UserSessionServiceImplTest extends BaseDbAndRedisUnitTest {
             o.setUserType(randomEle(UserTypeEnum.values()).getValue());
             o.setTenantId(0L); // 租户设置为 0，因为暂未启用多租户组件
         });
-        // mock 方法
-        when(securityProperties.getSessionTimeout()).thenReturn(Duration.ofDays(1));
 
         // 调用
-        String sessionId = userSessionService.createUserSession(loginUser, userIp, userAgent);
+        String token = userSessionService.createUserSession(loginUser, userIp, userAgent);
         // 校验 UserSessionDO 记录
-        UserSessionDO userSessionDO = userSessionMapper.selectById(sessionId);
+        UserSessionDO userSessionDO = userSessionMapper.selectOne(UserSessionDO::getToken, token);
         assertPojoEquals(loginUser, userSessionDO, "id", "updateTime");
-        assertEquals(sessionId, userSessionDO.getId());
+        assertEquals(token, userSessionDO.getToken());
         assertEquals(userIp, userSessionDO.getUserIp());
         assertEquals(userAgent, userSessionDO.getUserAgent());
         // 校验 LoginUser 缓存
-        LoginUser redisLoginUser = loginUserRedisDAO.get(sessionId);
+        LoginUser redisLoginUser = loginUserRedisDAO.get(token);
         assertPojoEquals(loginUser, redisLoginUser, "username", "password");
     }
 
     @Test
-    public void testCreateRefreshUserSession_success() {
+    public void testCreateRefreshUserSession() {
         // 准备参数
-        String sessionId = randomString();
-        String userIp = randomString();
-        String userAgent = randomString();
-        long timeLong = randomLongId();
-        String userName = randomString();
-        Date date = randomDate();
+        String token = randomString();
+
+        // mock redis 数据
         LoginUser loginUser = randomPojo(LoginUser.class, o -> o.setUserType(randomEle(UserTypeEnum.values()).getValue()));
-        // mock 方法
-        when(securityProperties.getSessionTimeout()).thenReturn(Duration.ofDays(1));
-        // mock 数据
-        loginUser.setUpdateTime(date);
-        loginUserRedisDAO.set(sessionId, loginUser);
-        UserSessionDO userSession = UserSessionDO.builder().id(sessionId)
-                .userId(loginUser.getId()).userType(loginUser.getUserType())
-                .userIp(userIp).userAgent(userAgent).username(userName)
-                .sessionTimeout(addTime(Duration.ofMillis(timeLong)))
-                .build();
+        loginUserRedisDAO.set(token, loginUser);
+        // mock db 数据
+        UserSessionDO userSession = randomPojo(UserSessionDO.class, o -> {
+            o.setUserType(randomEle(UserTypeEnum.values()).getValue());
+            o.setToken(token);
+        });
         userSessionMapper.insert(userSession);
 
         // 调用
-        userSessionService.refreshUserSession(sessionId, loginUser);
+        userSessionService.refreshUserSession(token, loginUser);
         // 校验 LoginUser 缓存
-        LoginUser redisLoginUser = loginUserRedisDAO.get(sessionId);
-        assertNotEquals(redisLoginUser.getUpdateTime(), date);
+        LoginUser redisLoginUser = loginUserRedisDAO.get(token);
+        assertPojoEquals(redisLoginUser, loginUser, "username", "password");
         // 校验 UserSessionDO 记录
-        UserSessionDO updateDO = userSessionMapper.selectById(sessionId);
+        UserSessionDO updateDO = userSessionMapper.selectOne(UserSessionDO::getToken, token);
         assertEquals(updateDO.getUsername(), loginUser.getUsername());
-        assertNotEquals(updateDO.getUpdateTime(), userSession.getUpdateTime());
-        assertNotEquals(updateDO.getSessionTimeout(), addTime(Duration.ofMillis(timeLong)));
+        assertNotNull(userSession.getUpdateTime());
+        assertNotNull(userSession.getSessionTimeout());
     }
 
     @Test
-    public void testDeleteUserSession_success() {
+    public void testDeleteUserSession_Token() {
         // 准备参数
-        String sessionId = randomString();
-        String userIp = randomString();
-        String userAgent = randomString();
-        Long timeLong = randomLongId();
-        LoginUser loginUser = randomPojo(LoginUser.class, o -> o.setUserType(randomEle(UserTypeEnum.values()).getValue()));
-        // mock 存入 Redis
-        when(securityProperties.getSessionTimeout()).thenReturn(Duration.ofDays(1));
-        // mock 数据
-        loginUserRedisDAO.set(sessionId, loginUser);
-        UserSessionDO userSession = UserSessionDO.builder().id(sessionId)
-                .userId(loginUser.getId()).userType(loginUser.getUserType())
-                .userIp(userIp).userAgent(userAgent).username(loginUser.getUsername())
-                .sessionTimeout(addTime(Duration.ofMillis(timeLong)))
-                .build();
+        String token = randomString();
+
+        // mock redis 数据
+        loginUserRedisDAO.set(token, new LoginUser());
+        // mock db 数据
+        UserSessionDO userSession = randomPojo(UserSessionDO.class, o -> {
+            o.setUserType(randomEle(UserTypeEnum.values()).getValue());
+            o.setToken(token);
+        });
         userSessionMapper.insert(userSession);
 
         // 调用
-        userSessionService.deleteUserSession(sessionId);
+        userSessionService.deleteUserSession(token);
         // 校验数据不存在了
-        assertNull(loginUserRedisDAO.get(sessionId));
-        assertNull(userSessionMapper.selectById(sessionId));
+        assertNull(loginUserRedisDAO.get(token));
+        assertNull(userSessionMapper.selectOne(UserSessionDO::getToken, token));
+    }
+
+    @Test
+    public void testDeleteUserSession_Id() {
+        // mock db 数据
+        UserSessionDO userSession = randomPojo(UserSessionDO.class, o -> {
+            o.setUserType(randomEle(UserTypeEnum.values()).getValue());
+        });
+        userSessionMapper.insert(userSession);
+        // mock redis 数据
+        loginUserRedisDAO.set(userSession.getToken(), new LoginUser());
+
+        // 准备参数
+        Long id = userSession.getId();
+
+        // 调用
+        userSessionService.deleteUserSession(id);
+        // 校验数据不存在了
+        assertNull(loginUserRedisDAO.get(userSession.getToken()));
+        assertNull(userSessionMapper.selectById(id));
     }
 
 }

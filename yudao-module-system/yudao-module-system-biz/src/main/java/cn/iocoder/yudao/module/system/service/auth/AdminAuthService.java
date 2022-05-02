@@ -29,7 +29,7 @@ public interface AdminAuthService extends SecurityAuthFrameworkService {
      * @param userId
      * @param reqVO
      */
-    public void sendSmsCode(Long userId, AuthSmsSendReqVO reqVO);
+    void sendSmsCode(Long userId, AuthSmsSendReqVO reqVO);
 
     /**
      * 短信登录
@@ -42,31 +42,23 @@ public interface AdminAuthService extends SecurityAuthFrameworkService {
     String smsLogin(AuthSmsLoginReqVO reqVO, String userIp, String userAgent) ;
 
     /**
-     * 社交登录，使用 code 授权码
+     * 社交快捷登录，使用 code 授权码
      *
      * @param reqVO 登录信息
      * @param userIp 用户 IP
      * @param userAgent 用户 UA
      * @return 身份令牌，使用 JWT 方式
      */
-    String socialLogin(@Valid AuthSocialLoginReqVO reqVO, String userIp, String userAgent);
+    String socialLogin(@Valid AuthSocialQuickLoginReqVO reqVO, String userIp, String userAgent);
 
     /**
-     * 社交登录，使用 code 授权码 + 账号密码
+     * 社交绑定登录，使用 code 授权码 + 账号密码
      *
      * @param reqVO 登录信息
      * @param userIp 用户 IP
      * @param userAgent 用户 UA
      * @return 身份令牌，使用 JWT 方式
      */
-    String socialLogin2(@Valid AuthSocialLogin2ReqVO reqVO, String userIp, String userAgent);
-
-    /**
-     * 社交绑定，使用 code 授权码
-     *
-     * @param userId 用户编号
-     * @param reqVO 绑定信息
-     */
-    void socialBind(Long userId, @Valid AuthSocialBindReqVO reqVO);
+    String socialBindLogin(@Valid AuthSocialBindLoginReqVO reqVO, String userIp, String userAgent);
 
 }

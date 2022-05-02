@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.system.dal.redis;
 
 import cn.iocoder.yudao.framework.redis.core.RedisKeyDefine;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
-import me.zhyd.oauth.model.AuthUser;
 
 import java.time.Duration;
 
@@ -20,7 +19,7 @@ public interface RedisKeyConstants {
             STRING, String.class, RedisKeyDefine.TimeoutTypeEnum.DYNAMIC);
 
     RedisKeyDefine LOGIN_USER = new RedisKeyDefine("登录用户的缓存",
-            "login_user:%s", // 参数为 sessionId
+            "login_user:%s", // 参数为 token 令牌
             STRING, LoginUser.class, RedisKeyDefine.TimeoutTypeEnum.DYNAMIC);
 
     RedisKeyDefine SOCIAL_AUTH_STATE = new RedisKeyDefine("社交登陆的 state", // 注意，它是被 JustAuth 的 justauth.type.prefix 使用到
