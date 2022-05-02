@@ -142,20 +142,12 @@ export default {
     },
     handleSubmit() {
       this.$refs.form.validate().then(res => {
-        if (this.currentModeIndex === 0) {
-          this.handleLoginPromise(passwordLogin({ mobile: this.formData.mobile, password: this.formData.password }))
-        } else if (this.currentModeIndex === 1) {
-          this.handleLoginPromise(smsLogin({ mobile: this.formData.mobile, code: this.formData.code }))
-        }
-      })
-    },
-    handleLoginPromise(promise) {
-      promise.then(res => {
-        this.$store.commit('setToken', res.data)
-        uni.$u.toast('登录成功')
-        setTimeout(() => {
-          this.navigateBack()
-        }, 1000)
+        this.$store.dispatch('Login', { type: this.currentModeIndex, data: this.formData }).then(res => {
+          uni.$u.toast('登录成功')
+          setTimeout(() => {
+            this.navigateBack()
+          }, 1000)
+        })
       })
     },
     navigateBack() {

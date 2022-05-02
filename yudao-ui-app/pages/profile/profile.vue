@@ -81,7 +81,7 @@ export default {
           const tempFilePaths = chooseImageRes.tempFilePaths
           updateAvatar(tempFilePaths[0]).then(res => {
             this.userInfo.avatar = res.data
-            this.$store.commit('setUserInfo', this.userInfo)
+            this.$store.commit('SET_USER_INFO', this.userInfo)
           })
         }
       })
@@ -90,7 +90,7 @@ export default {
       updateNickname({ nickname: this.tempName }).then(res => {
         this.nameEditOn = false;
         this.userInfo.nickname = this.tempName
-        this.$store.commit('setUserInfo', this.userInfo)
+        this.$store.commit('SET_USER_INFO', this.userInfo)
       })
     }
   }

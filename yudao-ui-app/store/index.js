@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import { logout } from '@/api/auth'
 import { getUserInfo } from '@/api/user'
+import { passwordLogin, smsLogin } from '../api/auth'
 
 Vue.use(Vuex) // vue的插件机制
 
@@ -14,13 +15,16 @@ const store = new Vuex.Store({
     timerIdent: false // 全局 1s 定时器，只在全局开启一个，所有需要定时执行的任务监听该值即可，无需额外开启 TODO 芋艿：需要看看
   },
   getters: {
+    userInfo(state) {
+      return state.userInfo
+    },
     hasLogin(state) {
       return !!state.token
     }
   },
   mutations: {
     // 更新 state 的通用方法
-    setStateAttr(state, param) {
+    SET_STATE_ATTR(state, param) {
       if (param instanceof Array) {
         for (let item of param) {
           state[item.key] = item.val
@@ -30,22 +34,22 @@ const store = new Vuex.Store({
       }
     },
     // 更新token
-    setToken(state, data) {
+    SET_TOKEN(state, data) {
       // 设置 Token
       const { token } = data
       state.token = token
       uni.setStorageSync('token', token)
 
       // 加载用户信息
-      this.dispatch('obtainUserInfo')
+      this.dispatch('ObtainUserInfo')
     },
     // 更新用户信息
-    setUserInfo(state, data) {
+    SET_USER_INFO(state, data) {
       state.userInfo = data
       uni.setStorageSync('userInfo', data)
     },
     // 清空 Token 和 用户信息
-    clearLoginInfo(state) {
+    CLEAR_LOGIN_INFO(state) {
       uni.removeStorageSync('token')
       state.token = ''
       uni.removeStorageSync('userInfo')
@@ -53,15 +57,28 @@ const store = new Vuex.Store({
     }
   },
   actions: {
-    // 获得用户基本信息
-    async obtainUserInfo({ state, commit }) {
-      const res = await getUserInfo()
-      commit('setUserInfo', res.data)
+    //账号登录
+    Login({ state, commit }, { type, data }) {
+      console.log(type, data)
+      if (type === 0) {
+        return passwordLogin(data).then(res => {
+          commit('SET_TOKEN', res.data)
+        })
+      } else {
+        return smsLogin(data).then(res => {
+          commit('SET_TOKEN', res.data)
+        })
+      }
     },
     // 退出登录
-    async logout({ state, commit }) {
-      commit('clearLoginInfo')
+    async Logout({ state, commit }) {
+      commit('CLEAR_LOGIN_INFO')
       await logout()
+    },
+    // 获得用户基本信息
+    async ObtainUserInfo({ state, commit }) {
+      const res = await getUserInfo()
+      commit('SET_USER_INFO', res.data)
     }
   }
 })

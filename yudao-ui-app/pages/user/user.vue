@@ -73,7 +73,7 @@ export default {
   },
   onLoad() {
     if (this.hasLogin){
-      this.$store.dispatch('obtainUserInfo')
+      this.$store.dispatch('ObtainUserInfo')
     }
   },
   methods: {
@@ -90,7 +90,7 @@ export default {
         content: '您确定要退出登录吗',
         success: res => {
           if (res.confirm) {
-            this.$store.dispatch('logout')
+            this.$store.dispatch('Logout')
           } else if (res.cancel) {
             //console.log('用户点击取消')
           }
@@ -100,7 +100,7 @@ export default {
   },
   computed: {
     userInfo() {
-      return this.$store.state.userInfo
+      return this.$store.getters.userInfo
     },
     hasLogin() {
       return this.$store.getters.hasLogin
