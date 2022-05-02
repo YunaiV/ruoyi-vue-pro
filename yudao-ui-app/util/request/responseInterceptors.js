@@ -11,7 +11,7 @@ module.exports = vm => {
         return res.data
       } else if(res.data.code === 401) {
         //用户未登录或登录token已过期
-        vm.$store.commit('clearLoginInfo')
+        vm.$store.commit('CLEAR_LOGIN_INFO')
       } else {
         console.log(res)
         //其他错误信息统一处理
