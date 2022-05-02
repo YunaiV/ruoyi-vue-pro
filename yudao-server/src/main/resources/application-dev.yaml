@@ -36,7 +36,7 @@ spring:
         time-between-eviction-runs-millis: 60000 # 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位：毫秒
         min-evictable-idle-time-millis: 300000 # 配置一个连接在池中最小生存的时间，单位：毫秒
         max-evictable-idle-time-millis: 900000 # 配置一个连接在池中最大生存的时间，单位：毫秒
-        validation-query: SELECT 1 FROM DUAL # 配置检测连接是否有效
+        validation-query: SELECT 1 # 配置检测连接是否有效
         test-while-idle: true
         test-on-borrow: false
         test-on-return: false
@@ -60,6 +60,10 @@ spring:
     host: 400-infra.server.iocoder.cn # 地址
     port: 6379 # 端口
     database: 1 # 数据库索引
+
+jasypt:
+  encryptor:
+    password: yuanma # 加解密的秘钥
 
 --- #################### 定时任务相关配置 ####################
 

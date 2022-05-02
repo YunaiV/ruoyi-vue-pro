@@ -94,7 +94,7 @@ public class SmsChannelServiceImpl implements SmsChannelService {
         if (maxUpdateTime == null) { // 如果更新时间为空，说明 DB 一定有新数据
             log.info("[loadSmsChannelIfUpdate][首次加载全量短信渠道]");
         } else { // 判断数据库中是否有更新的短信渠道
-            if (smsChannelMapper.selectExistsByUpdateTimeAfter(maxUpdateTime) == null) {
+            if (smsChannelMapper.selectCountByUpdateTimeGt(maxUpdateTime) == 0) {
                 return null;
             }
             log.info("[loadSmsChannelIfUpdate][增量加载全量短信渠道]");

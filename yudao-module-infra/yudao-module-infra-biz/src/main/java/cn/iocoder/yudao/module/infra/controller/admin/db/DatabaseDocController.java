@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.infra.controller.admin.doc;
+package cn.iocoder.yudao.module.infra.controller.admin.db;
 
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.IdUtil;
@@ -30,7 +30,7 @@ import java.util.Arrays;
 @Api(tags = "管理后台 - 数据库文档")
 @RestController
 @RequestMapping("/infra/db-doc")
-public class DbDocController {
+public class DatabaseDocController {
 
     @Resource
     private DynamicDataSourceProperties dynamicDataSourceProperties;

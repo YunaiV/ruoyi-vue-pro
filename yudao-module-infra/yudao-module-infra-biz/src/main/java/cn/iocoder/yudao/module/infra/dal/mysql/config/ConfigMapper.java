@@ -2,11 +2,10 @@ package cn.iocoder.yudao.module.infra.dal.mysql.config;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
-import cn.iocoder.yudao.framework.mybatis.core.query.QueryWrapperX;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.infra.controller.admin.config.vo.ConfigExportReqVO;
 import cn.iocoder.yudao.module.infra.controller.admin.config.vo.ConfigPageReqVO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.config.ConfigDO;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -15,23 +14,23 @@ import java.util.List;
 public interface ConfigMapper extends BaseMapperX<ConfigDO> {
 
     default ConfigDO selectByKey(String key) {
-        return selectOne(new QueryWrapper<ConfigDO>().eq("`key`", key));
+        return selectOne(ConfigDO::getConfigKey, key);
     }
 
     default PageResult<ConfigDO> selectPage(ConfigPageReqVO reqVO) {
-        return selectPage(reqVO, new QueryWrapperX<ConfigDO>()
-                .likeIfPresent("name", reqVO.getName())
-                .likeIfPresent("`key`", reqVO.getKey())
-                .eqIfPresent("`type`", reqVO.getType())
-                .betweenIfPresent("create_time", reqVO.getBeginTime(), reqVO.getEndTime()));
+        return selectPage(reqVO, new LambdaQueryWrapperX<ConfigDO>()
+                .likeIfPresent(ConfigDO::getName, reqVO.getName())
+                .likeIfPresent(ConfigDO::getConfigKey, reqVO.getKey())
+                .eqIfPresent(ConfigDO::getType, reqVO.getType())
+                .betweenIfPresent(ConfigDO::getCreateTime, reqVO.getBeginTime(), reqVO.getEndTime()));
     }
 
     default List<ConfigDO> selectList(ConfigExportReqVO reqVO) {
-        return selectList(new QueryWrapperX<ConfigDO>()
-                .likeIfPresent("name", reqVO.getName())
-                .likeIfPresent("`key`", reqVO.getKey())
-                .eqIfPresent("`type`", reqVO.getType())
-                .betweenIfPresent("create_time", reqVO.getBeginTime(), reqVO.getEndTime()));
+        return selectList(new LambdaQueryWrapperX<ConfigDO>()
+                .likeIfPresent(ConfigDO::getName, reqVO.getName())
+                .likeIfPresent(ConfigDO::getConfigKey, reqVO.getKey())
+                .eqIfPresent(ConfigDO::getType, reqVO.getType())
+                .betweenIfPresent(ConfigDO::getCreateTime, reqVO.getBeginTime(), reqVO.getEndTime()));
     }
 
 }
