@@ -19,7 +19,7 @@ import java.util.Set;
  *
  * @author 芋道源码
  */
-@TableName(value = "system_user", autoResultMap = true)
+@TableName(value = "system_users", autoResultMap = true) // 由于 SQL Server 的 system_user 是关键字，所以使用 system_users
 @KeySequence("system_user_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 @EqualsAndHashCode(callSuper = true)

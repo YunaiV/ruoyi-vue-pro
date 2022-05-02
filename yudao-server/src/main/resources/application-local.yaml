@@ -49,6 +49,9 @@ spring:
 #          url: jdbc:oracle:thin:@127.0.0.1:1521:xe # Oracle 连接的示例
           username: root
           password: 123456
+#          url: jdbc:sqlserver://127.0.0.1:1433;DatabaseName=${spring.datasource.dynamic.datasource.master.name} # SQLServer 连接的示例
+#          username: sa
+#          password: JSm:g(*%lU4ZAkz06cd52KqT3)i1?H7W
         slave: # 模拟从库，可根据自己需要修改
           name: ruoyi-vue-pro
           url: jdbc:mysql://127.0.0.1:3306/${spring.datasource.dynamic.datasource.slave.name}?useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=CTT # MySQL 连接的示例
@@ -56,6 +59,9 @@ spring:
 #          url: jdbc:oracle:thin:@127.0.0.1:1521:xe # Oracle 连接的示例
           username: root
           password: 123456
+#          url: jdbc:sqlserver://127.0.0.1:1433;DatabaseName=${spring.datasource.dynamic.datasource.slave.name} # SQLServer 连接的示例
+#          username: sa
+#          password: JSm:g(*%lU4ZAkz06cd52KqT3)i1?H7W
 
   # Redis 配置。Redisson 默认的配置足够使用，一般不需要进行调优
   redis:

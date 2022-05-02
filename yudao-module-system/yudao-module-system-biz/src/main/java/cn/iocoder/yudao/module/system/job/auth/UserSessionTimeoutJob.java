@@ -24,7 +24,7 @@ public class UserSessionTimeoutJob implements JobHandler {
     @Override
     public String execute(String param) throws Exception {
         // 执行过期
-        Long timeoutCount = userSessionService.clearSessionTimeout();
+        Long timeoutCount = userSessionService.deleteTimeoutSession();
         // 返回结果，记录每次的超时数量
         return String.format("移除在线会话数量为 %s 个", timeoutCount);
     }

@@ -25,18 +25,18 @@ public class UserSessionApiImpl implements UserSessionApi {
     }
 
     @Override
-    public void refreshUserSession(String sessionId, LoginUser loginUser) {
-        userSessionService.refreshUserSession(sessionId, loginUser);
+    public void refreshUserSession(String token, LoginUser loginUser) {
+        userSessionService.refreshUserSession(token, loginUser);
     }
 
     @Override
-    public void deleteUserSession(String sessionId) {
-        userSessionService.deleteUserSession(sessionId);
+    public void deleteUserSession(String token) {
+        userSessionService.deleteUserSession(token);
     }
 
     @Override
-    public LoginUser getLoginUser(String sessionId) {
-        return userSessionService.getLoginUser(sessionId);
+    public LoginUser getLoginUser(String token) {
+        return userSessionService.getLoginUser(token);
     }
 
     @Override
