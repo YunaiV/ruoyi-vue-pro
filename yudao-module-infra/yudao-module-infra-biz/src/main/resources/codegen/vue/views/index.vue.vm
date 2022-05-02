@@ -160,7 +160,7 @@
         </el-form-item>
 #elseif($column.htmlType == "datetime")## 时间框
         <el-form-item label="${comment}" prop="${javaField}">
-          <el-date-picker clearable v-model="form.${javaField}" type="date" value-format="yyyy-MM-dd" placeholder="选择${comment}" />
+          <el-date-picker clearable v-model="form.${javaField}" type="date" value-format="timestamp" placeholder="选择${comment}" />
         </el-form-item>
 #elseif($column.htmlType == "textarea")## 文本框
         <el-form-item label="${comment}" prop="${javaField}">
