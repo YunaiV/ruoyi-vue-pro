@@ -60,7 +60,7 @@ spring:
     host: 400-infra.server.iocoder.cn # 地址
     port: 6379 # 端口
     database: 1 # 数据库索引
-    password: 123456
+#    password: 123456 # 密码，建议生产环境开启
 
 jasypt:
   encryptor:
