@@ -21,7 +21,7 @@ import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
 
 
 /**
- *  邮箱账号 Service 实现类
+ * 邮箱账号 Service 实现类
  *
  * @author wangjingyi
  * @since 2022-03-21
@@ -39,28 +39,34 @@ public class MailAccountServiceImpl implements MailAccountService {
     @Override
     public Long create(MailAccountCreateReqVO createReqVO) {
         // username 要校验唯一
-        this.validateMailAccountOnlyByUserName(createReqVO.getUsername());
+        validateMailAccountOnlyByUserName(createReqVO.getUsername());
         MailAccountDO mailAccountDO = MailAccountConvert.INSTANCE.convert(createReqVO);
         mailAccountMapper.insert(mailAccountDO);
+
+        // 更新
         return mailAccountDO.getId();
     }
 
     @Override
     public void update(MailAccountUpdateReqVO updateReqVO) {
-        // username 要校验唯一
-        this.validateMailAccountExists(updateReqVO.getId());
+        // username 要校验唯一 TODO @wangjingyi：校验唯一的时候，需要排除掉自己
+        validateMailAccountExists(updateReqVO.getId());
         MailAccountDO mailAccountDO = MailAccountConvert.INSTANCE.convert(updateReqVO);
         // 校验是否存在
-        this.validateMailAccountExists(mailAccountDO.getId());
+        validateMailAccountExists(mailAccountDO.getId());
+
+        // 更新
         mailAccountMapper.updateById(mailAccountDO);
     }
 
     @Override
     public void delete(Long id) {
         // 校验是否存在账号
-        this.validateMailAccountExists(id);
+        validateMailAccountExists(id);
         // 校验是否存在关联模版
-        this.validateMailTemplateByAccountId(id);
+        validateMailTemplateByAccountId(id);
+
+        // 删除
         mailAccountMapper.deleteById(id);
     }
 
@@ -95,6 +101,7 @@ public class MailAccountServiceImpl implements MailAccountService {
     private void validateMailTemplateByAccountId(Long accountId){
         MailTemplateDO mailTemplateDO =  mailTemplateMapper.selectOneByAccountId(accountId);
         if (mailTemplateDO != null) {
+            // TODO wangjingyi：MAIL_ACCOUNT_RELATE_TEMPLATE_EXISTS
             throw exception(MAIL_RELATE_TEMPLATE_EXISTS);
         }
     }

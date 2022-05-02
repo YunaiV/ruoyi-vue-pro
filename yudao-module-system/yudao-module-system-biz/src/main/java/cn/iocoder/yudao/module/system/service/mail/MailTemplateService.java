@@ -20,6 +20,7 @@ import java.util.Map;
 public interface MailTemplateService {
 
     void initLocalCache();
+
     /**
      * 邮箱模版创建
      *

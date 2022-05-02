@@ -12,6 +12,7 @@ import lombok.ToString;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class MailAccountPageReqVO extends PageParam {
+
     @ApiModelProperty(value = "邮箱" , required = true , example = "yudaoyuanma@123.com")
     private String from;
 

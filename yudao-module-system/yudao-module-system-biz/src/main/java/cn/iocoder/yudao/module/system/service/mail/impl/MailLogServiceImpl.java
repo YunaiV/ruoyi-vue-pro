@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.system.service.mail.impl;
 
-
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.system.controller.admin.mail.vo.log.MailLogExportReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.mail.vo.log.MailLogPageReqVO;
@@ -62,6 +61,7 @@ public class MailLogServiceImpl implements MailLogService {
         return mailLogDO.getId();
     }
 
+    // TODO @wangjingyi：不需要返回 id 呀
     @Override
     public Long updateSmsSendResult(Long logId, String result) {
         MailLogDO.MailLogDOBuilder logDOBuilder = MailLogDO.builder();
@@ -72,6 +72,7 @@ public class MailLogServiceImpl implements MailLogService {
         return logId;
     }
 
+    // TODO @wangjingyi：无用的方法，需要进行删除
     public Long create(){
         MailLogDO mailLogDO = new MailLogDO();
         mailLogMapper.insert(mailLogDO);

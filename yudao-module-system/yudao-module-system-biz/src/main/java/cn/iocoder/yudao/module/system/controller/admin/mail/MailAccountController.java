@@ -24,7 +24,6 @@ import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
-
 @Api(tags = "管理后台 - 邮件账号")
 @RestController
 @RequestMapping("/system/mail-account")
@@ -57,6 +56,9 @@ public class MailAccountController {
         return success(true);
     }
 
+    // TODO @wangjingyi：getMailAccount 和 getMailAccountPage 这两个接口，定义一个对应的 Resp 类哈，参考别的模块。主要不要返回 password 字段。
+    // 一个可以的做法，是 MailAccountBaseVO 不返回 password，然后 MailAccountCreateReqVO、MailAccountUpdateReqVO 添加这个字段
+
     @GetMapping("/get")
     @ApiOperation("获得邮箱账号")
     @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
@@ -73,6 +75,8 @@ public class MailAccountController {
         PageResult<MailAccountDO> pageResult = mailAccountService.getMailAccountPage(pageReqVO);
         return success(MailAccountConvert.INSTANCE.convertPage(pageResult));
     }
+
+    // TODO @wangjingyi：getSimpleMailAccountList 单独定义一个类，只返回精简的信息，id，from 即可。像密码之类都是敏感信息，不应该返回
 
     @GetMapping("/list-all-simple")
     @ApiOperation(value = "获得邮箱账号精简列表")

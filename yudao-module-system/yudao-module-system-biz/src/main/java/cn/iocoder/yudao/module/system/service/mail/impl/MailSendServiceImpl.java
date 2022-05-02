@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.system.service.mail.impl;
 
-
 import cn.hutool.extra.mail.MailAccount;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.module.system.convert.mail.MailAccountConvert;
@@ -80,6 +79,7 @@ public class MailSendServiceImpl implements MailSendService {
 
     @Override
     public void doSendMail(MailSendMessage message) {
+        // TODO @wangjingyi：直接使用 hutool 发送，不要封装 mail client 哈，因为短信的客户端都是比较统一的
         MailClient mailClient = mailClientFactory.getMailClient();
         String result = mailClient.sendMail(message.getFrom() , message.getContent() , message.getTitle() , message.getTos());
         mailLogService.updateSmsSendResult(message.getLogId() , result);

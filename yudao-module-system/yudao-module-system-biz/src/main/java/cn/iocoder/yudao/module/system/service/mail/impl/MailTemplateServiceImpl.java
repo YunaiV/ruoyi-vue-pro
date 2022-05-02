@@ -62,6 +62,7 @@ public class MailTemplateServiceImpl implements MailTemplateService {
 
     private volatile Date maxUpdateTime;
 
+    // TODO @wangjingyi：参考下别的模块的 initLocalCache 的实现
     @Override
     @PostConstruct
     public void initLocalCache() {
@@ -85,9 +86,11 @@ public class MailTemplateServiceImpl implements MailTemplateService {
     @Override
     public Long create(MailTemplateCreateReqVO createReqVO) {
         // code 要校验唯一
+        // TODO @wangjingyi：参考下我在 account 给的唯一校验的说明。
         this.validateMailTemplateOnlyByCode(createReqVO.getCode());
         MailTemplateDO mailTemplateDO = MailTemplateConvert.INSTANCE.convert(createReqVO);
         mailTemplateMapper.insert(mailTemplateDO);
+        // TODO @wangjingyi：mq 更新
         return mailTemplateDO.getId();
     }
 
@@ -97,6 +100,7 @@ public class MailTemplateServiceImpl implements MailTemplateService {
         this.validateMailTemplateExists(updateReqVO.getId());
         MailTemplateDO mailTemplateDO = MailTemplateConvert.INSTANCE.convert(updateReqVO);
         mailTemplateMapper.updateById(mailTemplateDO);
+        // TODO @wangjingyi：mq 更新
     }
 
     @Override
@@ -104,6 +108,7 @@ public class MailTemplateServiceImpl implements MailTemplateService {
         // 校验是否存在
         this.validateMailTemplateExists(id);
         mailTemplateMapper.deleteById(id);
+        // TODO @wangjingyi：mq 更新
     }
 
     @Override
@@ -144,6 +149,7 @@ public class MailTemplateServiceImpl implements MailTemplateService {
         MailUtil.send(account , mailReqVO.getTos() , mailReqVO.getTitle() , content , false);
     }
 
+    // TODO @@wangjingyi：单词拼写错误
     @Override
     public String formateMailTemplateContent(String content, Map<String, String> params) {
         return StrUtil.format(content, params);

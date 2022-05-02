@@ -29,6 +29,7 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 @RequestMapping("/system/mail-template")
 public class MailTemplateController {
 
+    // TODO @wangjingyi：private
     @Autowired
     MailTemplateService mailTempleService;
 
@@ -54,6 +55,8 @@ public class MailTemplateController {
         mailTempleService.delete(id);
         return success(true);
     }
+
+    // TODO @wangjingyi：下面几个 VO 也参考我在 account 给的建议
 
     @GetMapping("/get")
     @ApiOperation("获得邮箱模版")

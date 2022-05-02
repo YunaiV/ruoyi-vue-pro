@@ -9,7 +9,6 @@ import cn.iocoder.yudao.module.system.dal.dataobject.mail.MailAccountDO;
 import javax.validation.Valid;
 import java.util.List;
 
-
 /**
  * 邮箱账号 Service 接口
  *
