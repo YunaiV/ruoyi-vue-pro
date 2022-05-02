@@ -37,10 +37,10 @@ public class SecurityProperties {
     @NotNull(message = "mock 模式的开关不能为空")
     private Boolean mockEnable;
     /**
-     * mock 模式的秘钥
-     * 一定要配置秘钥，保证安全性
+     * mock 模式的密钥
+     * 一定要配置密钥，保证安全性
      */
-    @NotEmpty(message = "mock 模式的秘钥不能为空") // 这里设置了一个默认值，因为实际上只有 mockEnable 为 true 时才需要配置。
+    @NotEmpty(message = "mock 模式的密钥不能为空") // 这里设置了一个默认值，因为实际上只有 mockEnable 为 true 时才需要配置。
     private String mockSecret = "yudaoyuanma";
 
 }

@@ -29,14 +29,14 @@
             </el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label-width="180px" label="商户秘钥" prop="weChatConfig.mchKey"
+        <el-form-item label-width="180px" label="商户密钥" prop="weChatConfig.mchKey"
                       v-if="form.weChatConfig.apiVersion === 'v2'">
-          <el-input v-model="form.weChatConfig.mchKey" placeholder="请输入商户秘钥" clearable
+          <el-input v-model="form.weChatConfig.mchKey" placeholder="请输入商户密钥" clearable
                     :style="{width: '100%'}" type="textarea" :autosize="{minRows: 8, maxRows: 8}"></el-input>
         </el-form-item>
         <div v-if="form.weChatConfig.apiVersion === 'v3'">
-          <el-form-item label-width="180px" label="API V3秘钥" prop="weChatConfig.apiV3Key">
-            <el-input v-model="form.weChatConfig.apiV3Key" placeholder="请输入API V3秘钥" clearable
+          <el-form-item label-width="180px" label="API V3密钥" prop="weChatConfig.apiV3Key">
+            <el-input v-model="form.weChatConfig.apiV3Key" placeholder="请输入API V3密钥" clearable
                       :style="{width: '100%'}" type="textarea" :autosize="{minRows: 8, maxRows: 8}"></el-input>
           </el-form-item>
           <el-form-item label-width="180px" label="apiclient_key.perm证书" prop="weChatConfig.privateKeyContent">
@@ -164,7 +164,7 @@ export default {
         }],
         'weChatConfig.mchKey': [{
           required: true,
-          message: '请输入商户秘钥',
+          message: '请输入商户密钥',
           trigger: 'blur'
         }],
         'weChatConfig.privateKeyContent': [{
@@ -179,7 +179,7 @@ export default {
         }],
         'weChatConfig.apiV3Key': [{
           required: true,
-          message: '请上传apiV3秘钥值',
+          message: '请上传apiV3密钥值',
           trigger: 'blur'
         }],
       },

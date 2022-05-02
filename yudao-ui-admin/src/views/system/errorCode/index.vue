@@ -1,30 +1,30 @@
 <template>
   <div class="app-container">
-
+    <doc-alert title="异常处理（错误码）" url="https://doc.iocoder.cn/exception/" />
     <!-- 搜索工作栏 -->
-    <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="100px">
+    <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="100px">
       <el-form-item label="错误码类型" prop="type">
-        <el-select v-model="queryParams.type" placeholder="请选择错误码类型" clearable size="small">
+        <el-select v-model="queryParams.type" placeholder="请选择错误码类型" clearable>
           <el-option v-for="dict in this.getDictDatas(DICT_TYPE.SYSTEM_ERROR_CODE_TYPE)"
                      :key="dict.value" :label="dict.label" :value="dict.value"/>
         </el-select>
       </el-form-item>
       <el-form-item label="应用名" prop="applicationName">
-        <el-input v-model="queryParams.applicationName" placeholder="请输入应用名" clearable size="small" @keyup.enter.native="handleQuery"/>
+        <el-input v-model="queryParams.applicationName" placeholder="请输入应用名" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item label="错误码编码" prop="code">
-        <el-input v-model="queryParams.code" placeholder="请输入错误码编码" clearable size="small" @keyup.enter.native="handleQuery"/>
+        <el-input v-model="queryParams.code" placeholder="请输入错误码编码" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item label="错误码提示" prop="message">
-        <el-input v-model="queryParams.message" placeholder="请输入错误码提示" clearable size="small" @keyup.enter.native="handleQuery"/>
+        <el-input v-model="queryParams.message" placeholder="请输入错误码提示" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
       <el-form-item label="创建时间">
-        <el-date-picker v-model="dateRangeCreateTime" size="small" style="width: 240px" value-format="yyyy-MM-dd"
+        <el-date-picker v-model="dateRangeCreateTime" style="width: 240px" value-format="yyyy-MM-dd"
                         type="daterange" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" />
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
-        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
+        <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
+        <el-button icon="el-icon-refresh" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
 

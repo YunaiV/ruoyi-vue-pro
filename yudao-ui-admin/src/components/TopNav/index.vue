@@ -71,7 +71,7 @@ export default {
         for (var item in router.children) {
           if (router.children[item].parentPath === undefined) {
             if(router.path === "/") {
-              router.children[item].path = "/redirect/" + router.children[item].path;
+              router.children[item].path = "/" + router.children[item].path;
             } else {
               if(!this.ishttp(router.children[item].path)) {
                 router.children[item].path = router.path + "/" + router.children[item].path;
@@ -87,22 +87,23 @@ export default {
     // 默认激活的菜单
     activeMenu() {
       const path = this.$route.path;
-      let activePath = this.defaultRouter();
+      let activePath = path;
       if (path.lastIndexOf("/") > 0) {
         const tmpPath = path.substring(1, path.length);
         activePath = "/" + tmpPath.substring(0, tmpPath.indexOf("/"));
+        this.$store.dispatch('app/toggleSideBarHide', false);
       } else if ("/index" == path || "" == path) {
         if (!this.isFrist) {
           this.isFrist = true;
         } else {
           activePath = "index";
         }
+        this.$store.dispatch('app/toggleSideBarHide', true);
+      } else if(!this.$route.children) {
+        activePath = path;
+        this.$store.dispatch('app/toggleSideBarHide', true);
       }
-      var routes = this.activeRoutes(activePath);
-      if (routes.length === 0) {
-        activePath = this.currentIndex || this.defaultRouter()
-        this.activeRoutes(activePath);
-      }
+      this.activeRoutes(activePath);
       return activePath;
     },
   },
@@ -121,29 +122,21 @@ export default {
       const width = document.body.getBoundingClientRect().width / 3;
       this.visibleNumber = parseInt(width / 85);
     },
-    // 默认激活的路由
-    defaultRouter() {
-      let router;
-      Object.keys(this.routers).some((key) => {
-        if (!this.routers[key].hidden) {
-          router = this.routers[key].path;
-          return true;
-        }
-      });
-      return router;
-    },
     // 菜单选择事件
     handleSelect(key, keyPath) {
       this.currentIndex = key;
+      const route = this.routers.find(item => item.path === key);
       if (this.ishttp(key)) {
         // http(s):// 路径新窗口打开
         window.open(key, "_blank");
-      } else if (key.indexOf("/redirect") !== -1) {
-        // /redirect 路径内部打开
-        this.$router.push({ path: key.replace("/redirect", "") });
+      } else if (!route || !route.children) {
+        // 没有子路由路径内部打开
+        this.$router.push({ path: key });
+        this.$store.dispatch('app/toggleSideBarHide', true);
       } else {
         // 显示左侧联动菜单
         this.activeRoutes(key);
+        this.$store.dispatch('app/toggleSideBarHide', false);
       }
     },
     // 当前激活的路由
@@ -159,7 +152,6 @@ export default {
       if(routes.length > 0) {
         this.$store.commit("SET_SIDEBAR_ROUTERS", routes);
       }
-      return routes;
     },
     ishttp(url) {
       return url.indexOf('http://') !== -1 || url.indexOf('https://') !== -1

@@ -1,19 +1,14 @@
 package cn.iocoder.yudao.framework.file.core.client.s3;
 
+import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.http.HttpUtil;
 import cn.iocoder.yudao.framework.file.core.client.AbstractFileClient;
-import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
-import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
-import software.amazon.awssdk.core.sync.RequestBody;
-import software.amazon.awssdk.regions.Region;
-import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
-import software.amazon.awssdk.services.s3.model.GetObjectRequest;
-import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import io.minio.*;
 
-import java.net.URI;
+import java.io.ByteArrayInputStream;
 
-import static cn.iocoder.yudao.framework.file.core.client.s3.S3FileClientConfig.ENDPOINT_QINIU;
+import static cn.iocoder.yudao.framework.file.core.client.s3.S3FileClientConfig.ENDPOINT_ALIYUN;
 
 /**
  * 基于 S3 协议的文件客户端，实现 MinIO、阿里云、腾讯云、七牛云、华为云等云服务
@@ -24,7 +19,7 @@ import static cn.iocoder.yudao.framework.file.core.client.s3.S3FileClientConfig.
  */
 public class S3FileClient extends AbstractFileClient<S3FileClientConfig> {
 
-    private S3Client client;
+    private MinioClient client;
 
     public S3FileClient(Long id, S3FileClientConfig config) {
         super(id, config);
@@ -34,34 +29,27 @@ public class S3FileClient extends AbstractFileClient<S3FileClientConfig> {
     protected void doInit() {
         // 补全 domain
         if (StrUtil.isEmpty(config.getDomain())) {
-            config.setDomain(createDomain());
+            config.setDomain(buildDomain());
         }
         // 初始化客户端
-        client = S3Client.builder()
-                .serviceConfiguration(sb -> sb.pathStyleAccessEnabled(false) // 关闭路径风格
-                .chunkedEncodingEnabled(false)) // 禁用 chunk
-                .endpointOverride(createURI()) // 上传地址
-                .region(Region.of(config.getRegion())) // Region
-                .credentialsProvider(StaticCredentialsProvider.create( // 认证密钥
-                        AwsBasicCredentials.create(config.getAccessKey(), config.getAccessSecret())))
-                .overrideConfiguration(cb -> cb.addExecutionInterceptor(new S3ModifyPathInterceptor(config.getBucket())))
+        client = MinioClient.builder()
+                .endpoint(buildEndpointURL()) // Endpoint URL
+                .region(buildRegion()) // Region
+                .credentials(config.getAccessKey(), config.getAccessSecret()) // 认证密钥
                 .build();
     }
 
     /**
-     * 基于 endpoint 构建调用云服务的 URI 地址
+     * 基于 endpoint 构建调用云服务的 URL 地址
      *
      * @return URI 地址
      */
-    private URI createURI() {
-        String uri;
-        // 如果是七牛，无需拼接 bucket
-        if (config.getEndpoint().contains(ENDPOINT_QINIU)) {
-            uri = StrUtil.format("https://{}", config.getEndpoint());
-        } else {
-            uri = StrUtil.format("https://{}.{}", config.getBucket(), config.getEndpoint());
+    private String buildEndpointURL() {
+        // 如果已经是 http 或者 https，则不进行拼接.主要适配 MinIO
+        if (HttpUtil.isHttp(config.getEndpoint()) || HttpUtil.isHttps(config.getEndpoint())) {
+            return config.getEndpoint();
         }
-        return URI.create(uri);
+        return StrUtil.format("https://{}", config.getEndpoint());
     }
 
     /**
@@ -69,35 +57,56 @@ public class S3FileClient extends AbstractFileClient<S3FileClientConfig> {
      *
      * @return Domain 地址
      */
-    private String createDomain() {
+    private String buildDomain() {
+        // 如果已经是 http 或者 https，则不进行拼接.主要适配 MinIO
+        if (HttpUtil.isHttp(config.getEndpoint()) || HttpUtil.isHttps(config.getEndpoint())) {
+            return StrUtil.format("{}/{}", config.getEndpoint(), config.getBucket());
+        }
+        // 阿里云、腾讯云、华为云都适合。七牛云比较特殊，必须有自定义域名
         return StrUtil.format("https://{}.{}", config.getBucket(), config.getEndpoint());
     }
 
+    /**
+     * 基于 bucket 构建 region 地区
+     *
+     * @return region 地区
+     */
+    private String buildRegion() {
+        // 阿里云必须有 region，否则会报错
+        if (config.getEndpoint().contains(ENDPOINT_ALIYUN)) {
+            return StrUtil.subBefore(config.getEndpoint(), '.', false)
+                    .replaceAll("-internal", ""); // 去除内网 Endpoint 的后缀
+        }
+        return null;
+    }
+
     @Override
-    public String upload(byte[] content, String path) {
+    public String upload(byte[] content, String path) throws Exception {
         // 执行上传
-        PutObjectRequest.Builder request = PutObjectRequest.builder()
+        client.putObject(PutObjectArgs.builder()
                 .bucket(config.getBucket()) // bucket 必须传递
-                .key(path); // 相对路径作为 key
-        client.putObject(request.build(), RequestBody.fromBytes(content));
+                .object(path) // 相对路径作为 key
+                .stream(new ByteArrayInputStream(content), content.length, -1) // 文件内容
+                .build());
         // 拼接返回路径
         return config.getDomain() + "/" + path;
     }
 
     @Override
-    public void delete(String path) {
-        DeleteObjectRequest.Builder request = DeleteObjectRequest.builder()
+    public void delete(String path) throws Exception {
+        client.removeObject(RemoveObjectArgs.builder()
                 .bucket(config.getBucket()) // bucket 必须传递
-                .key(path); // 相对路径作为 key
-        client.deleteObject(request.build());
+                .object(path) // 相对路径作为 key
+                .build());
     }
 
     @Override
-    public byte[] getContent(String path) {
-        GetObjectRequest.Builder request = GetObjectRequest.builder()
+    public byte[] getContent(String path) throws Exception {
+        GetObjectResponse response = client.getObject(GetObjectArgs.builder()
                 .bucket(config.getBucket()) // bucket 必须传递
-                .key(path); // 相对路径作为 key
-        return client.getObjectAsBytes(request.build()).asByteArray();
+                .object(path) // 相对路径作为 key
+                .build());
+        return IoUtil.readBytes(response);
     }
 
 }

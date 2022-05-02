@@ -84,10 +84,9 @@ export default {
           { required: true, trigger: "blur", message: "租户不能为空" },
           {
             validator: (rule, value, callback) => {
-              // debugger
               getTenantIdByName(value).then(res => {
                 const tenantId = res.data;
-                if (tenantId >= 0) {
+                if (tenantId && tenantId >= 0) {
                   // 设置租户
                   Cookies.set("tenantId", tenantId);
                   callback();
@@ -177,7 +176,6 @@ export default {
       });
     },
     doSocialLogin(socialTypeEnum) {
-      // console.log("开始Oauth登录...%o", socialTypeEnum.code);
       // 设置登录中
       this.loading = true;
       // 计算 redirectUri

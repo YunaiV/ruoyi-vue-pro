@@ -19,7 +19,7 @@
           </el-table-column>
           <el-table-column
             label="物理类型"
-            prop="columnType"
+            prop="dataType"
             min-width="10%"
             :show-overflow-tooltip="true"
           />

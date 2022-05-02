@@ -5,21 +5,28 @@
 **「我喜欢写代码，乐此不疲」**  
 **「我喜欢做开源，以此为乐」**
 
+我 🐶 在上海艰苦奋斗，早中晚在 top3 大厂认真搬砖，夜里为开源做贡献。
+
+如果这个项目让你有所收获，记得 Star 关注哦，这对我是非常不错的鼓励与支持。
+
 ## 🐯 平台简介
 
-**芋道**，一套**全部开源**的**企业级**的快速开发平台，毫无保留给个人及企业免费使用。
+**芋道**，以开发者为中心，打造中国第一流的快速开发平台，全部开源，个人与企业可 100% 免费使用。
 
 > 有任何问题，或者想要的功能，可以在 _Issues_ 中提给艿艿。
+>
+> 😜 给项目点点 Star 吧，这对我们真的很重要！
 
 * 前端采用 [vue-element-admin](https://github.com/PanJiaChen/vue-element-admin) ，正在支持 Vue 3 + ElementUI Plus 最新方案。
 * 后端采用 Spring Boot、MySQL + MyBatis Plus、Redis + Redisson。
+* 数据库可使用 MySQL、Oracle、PostgreSQL、SQL Server、MariaDB、国产达梦 DM、TiDB 等
 * 权限认证使用 Spring Security & Token & Redis，支持多终端、多种用户的认证系统。
 * 支持加载动态权限菜单，按钮级别权限控制，本地缓存提升性能。
 * 支持 SaaS 多租户系统，可自定义每个租户的权限，提供透明化的多租户底层封装。
-* 工作流使用 Activiti ，支持动态表单、在线设计流程、多种任务分配方式。
+* 工作流使用 Activiti + Flowable，支持动态表单、在线设计流程、多种任务分配方式。
 * 高效率开发，使用代码生成器可以一键生成前后端代码 + 单元测试 + Swagger 接口文档 + Validator 参数校验。
 * 集成微信小程序、微信公众号、企业微信、钉钉等三方登陆，集成支付宝、微信等支付与退款。
-* 集成阿里云、腾讯云、云片等短信渠道，集成阿里云、腾讯云、七牛云等云存储服务。
+* 集成阿里云、腾讯云、云片等短信渠道，集成 MinIO、阿里云、腾讯云、七牛云等云存储服务。
 
 | 项目名                | 说明                     | 传说门                                                                                                                                 |
 |--------------------|------------------------|-------------------------------------------------------------------------------------------------------------------------------------|
@@ -150,7 +157,7 @@ ps：核心功能已经实现，正在对接微信小程序中...
 
 | 框架                                                                                          | 说明               | 版本       | 学习指南                                                           |
 |---------------------------------------------------------------------------------------------|------------------|----------|----------------------------------------------------------------|
-| [Spring Boot](https://spring.io/projects/spring-boot)                                       | 应用开发框架           | 2.5.10   | [文档](https://github.com/YunaiV/SpringBoot-Labs)                |
+| [Spring Boot](https://spring.io/projects/spring-boot)                                       | 应用开发框架           | 2.5.12   | [文档](https://github.com/YunaiV/SpringBoot-Labs)                |
 | [MySQL](https://www.mysql.com/cn/)                                                          | 数据库服务器           | 5.7      |                                                                |
 | [Druid](https://github.com/alibaba/druid)                                                   | JDBC 连接池、监控组件    | 1.2.8    | [文档](http://www.iocoder.cn/Spring-Boot/datasource-pool/?yudao) |
 | [MyBatis Plus](https://mp.baomidou.com/)                                                    | MyBatis 增强工具包    | 3.5.1    | [文档](http://www.iocoder.cn/Spring-Boot/MyBatis/?yudao)         |

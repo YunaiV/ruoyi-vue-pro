@@ -4,10 +4,10 @@ import store from '@/store'
 import { getToken } from '@/utils/auth'
 import errorCode from '@/utils/errorCode'
 import Cookies from "js-cookie";
-import {getTenantEnable} from "@/utils/ruoyi";
+import {getPath, getTenantEnable} from "@/utils/ruoyi";
 
 // 是否显示重新登录
-let isReloginShow;
+export let isRelogin = { show: false };
 
 axios.defaults.headers['Content-Type'] = 'application/json;charset=utf-8'
 // 创建axios实例
@@ -15,7 +15,7 @@ const service = axios.create({
   // axios中请求配置有baseURL选项，表示请求URL公共部分
   baseURL: process.env.VUE_APP_BASE_API + '/admin-api/', // 此处的 /admin-api/ 地址，原因是后端的基础路径为 /admin-api/
   // 超时
-  timeout: 10000
+  timeout: 30000
 })
 // request拦截器
 service.interceptors.request.use(config => {
@@ -66,23 +66,20 @@ service.interceptors.response.use(res => {
     // 获取错误信息
     const msg = errorCode[code] || res.data.msg || errorCode['default']
     if (code === 401) {
-      if (!isReloginShow) {
-        isReloginShow = true;
+      if (!isRelogin.show) {
+        isRelogin.show = true;
         MessageBox.confirm('登录状态已过期，您可以继续留在该页面，或者重新登录', '系统提示', {
             confirmButtonText: '重新登录',
             cancelButtonText: '取消',
             type: 'warning'
           }
         ).then(() => {
-          isReloginShow = false;
+          isRelogin.show = false;
           store.dispatch('LogOut').then(() => {
-            // 如果是登录页面不需要重新加载
-            if (window.location.hash.indexOf("#/login") !== 0) {
-              location.href = '/index';
-            }
+            location.href = getPath('/index');
           })
         }).catch(() => {
-          isReloginShow = false;
+          isRelogin.show = false;
         });
       }
       return Promise.reject('无效的会话，或者会话已过期，请重新登录。')

@@ -15,12 +15,12 @@ import java.util.List;
 public interface ConfigFrameworkDAO {
 
     /**
-     * 查询是否存在比 maxUpdateTime 更新记录更晚的配置
+     * 查询是否存在比 maxUpdateTime 的更新记录数量
      *
      * @param maxUpdateTime 最大更新时间
      * @return 是否存在
      */
-    boolean selectExistsByUpdateTimeAfter(Date maxUpdateTime);
+    int selectCountByUpdateTimeGt(Date maxUpdateTime);
 
     /**
      * 查询配置列表

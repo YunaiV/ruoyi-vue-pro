@@ -96,6 +96,8 @@ export default {
         }
         // 高亮流程图
         await this.highlightDiagram();
+        const canvas = this.bpmnModeler.get('canvas');
+        canvas.zoom("fit-viewport", "auto");
       } catch (e) {
         console.error(e);
         // console.error(`[Process Designer Warn]: ${e?.message || e}`);
@@ -290,8 +292,8 @@ export default {
           if (task.endTime) {
             html += `<p>结束时间：${this.parseTime(task.endTime)}</p>`
           }
-          if (task.comment) {
-            html += `<p>审批建议：${task.comment}</p>`
+          if (task.reason) {
+            html += `<p>审批建议：${task.reason}</p>`
           }
         } else if (element.type === 'bpmn:EndEvent' && this.processInstance) {
           html = `<p>结果：${this.getDictDataLabel(this.DICT_TYPE.BPM_PROCESS_INSTANCE_RESULT, this.processInstance.result)}</p>`;

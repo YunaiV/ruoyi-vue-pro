@@ -1,5 +1,7 @@
 <template>
   <div class="app-container">
+    <doc-alert title="数据库文档" url="https://doc.iocoder.cn/db-doc/" />
+    <!-- 操作工作栏 -->
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
         <el-button type="primary" icon="el-icon-plus" size="mini" @click="handleExportHtml">导出 HTML</el-button>

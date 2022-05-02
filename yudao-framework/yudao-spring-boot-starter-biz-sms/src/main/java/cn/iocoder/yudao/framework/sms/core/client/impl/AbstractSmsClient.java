@@ -16,7 +16,7 @@ import java.util.List;
  * 短信客户端的抽象类，提供模板方法，减少子类的冗余代码
  *
  * @author zzf
- * @date 2021/2/1 9:28
+ * @since 2021/2/1 9:28
  */
 @Slf4j
 public abstract class AbstractSmsClient implements SmsClient {
@@ -31,7 +31,7 @@ public abstract class AbstractSmsClient implements SmsClient {
     protected final SmsCodeMapping codeMapping;
 
     public AbstractSmsClient(SmsChannelProperties properties, SmsCodeMapping codeMapping) {
-        this.properties = properties;
+        this.properties = prepareProperties(properties);
         this.codeMapping = codeMapping;
     }
 
@@ -54,9 +54,19 @@ public abstract class AbstractSmsClient implements SmsClient {
             return;
         }
         log.info("[refresh][配置({})发生变化，重新初始化]", properties);
-        this.properties = properties;
+        this.properties = prepareProperties(properties);
         // 初始化
         this.init();
+    }
+
+    /**
+     * 在赋值给{@link this#properties}前，子类可根据需要预处理短信渠道配置
+     *
+     * @param properties 数据库中存储的短信渠道配置
+     * @return 满足子类实现的短信渠道配置
+     */
+    protected SmsChannelProperties prepareProperties(SmsChannelProperties properties) {
+        return properties;
     }
 
     @Override
