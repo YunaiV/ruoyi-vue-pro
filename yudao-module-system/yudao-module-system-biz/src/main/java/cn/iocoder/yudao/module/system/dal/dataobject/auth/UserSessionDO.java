@@ -20,6 +20,7 @@ import java.util.Date;
  * @author 芋道源码
  */
 @TableName(value = "system_user_session")
+@KeySequence(value = "system_user_session_seq")
 @Data
 @Builder
 @EqualsAndHashCode(callSuper = true)
