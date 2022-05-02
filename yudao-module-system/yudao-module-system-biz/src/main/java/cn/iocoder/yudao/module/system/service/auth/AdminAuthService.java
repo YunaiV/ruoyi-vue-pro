@@ -26,10 +26,10 @@ public interface AdminAuthService extends SecurityAuthFrameworkService {
 
     /**
      * 短信验证码发送
-     * @param userId
-     * @param reqVO
+     *
+     * @param reqVO 发送请求
      */
-    void sendSmsCode(Long userId, AuthSmsSendReqVO reqVO);
+    void sendSmsCode(AuthSmsSendReqVO reqVO);
 
     /**
      * 短信登录
@@ -49,7 +49,7 @@ public interface AdminAuthService extends SecurityAuthFrameworkService {
      * @param userAgent 用户 UA
      * @return 身份令牌，使用 JWT 方式
      */
-    String socialLogin(@Valid AuthSocialQuickLoginReqVO reqVO, String userIp, String userAgent);
+    String socialQuickLogin(@Valid AuthSocialQuickLoginReqVO reqVO, String userIp, String userAgent);
 
     /**
      * 社交绑定登录，使用 code 授权码 + 账号密码

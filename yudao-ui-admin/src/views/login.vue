@@ -1,4 +1,3 @@
-
 <template>
   <div class="container">
     <div class="logo"></div>
@@ -10,159 +9,141 @@
       <div class="field">
         <!-- [移动端]标题 -->
         <h2 class="mobile-title">
-            <h3 class="title">芋道后台管理系统</h3>
+          <h3 class="title">芋道后台管理系统</h3>
         </h2>
-      
-        <!-- 表单 -->
-    <!-- 表单 -->
-    <div class="form-cont">
-    <el-tabs class="form" v-model="loginForm.loginType" style=" float:none;">
-          <el-tab-pane label="账号密码登录" name="uname">
-          </el-tab-pane>
-          <el-tab-pane label="短信验证码登录" name="sms">
-          </el-tab-pane>
-    </el-tabs>
-    <div>
-            <el-form ref="loginForm" :model="loginForm" :rules="LoginRules"  class="login-form">
-               <el-form-item prop="tenantName" v-if="tenantEnable">
-                <el-input v-model="loginForm.tenantName" type="text" auto-complete="off" placeholder='租户'>
-                  <svg-icon slot="prefix" icon-class="tree" class="el-input__icon input-icon" />
-                </el-input>
-              </el-form-item>
-              <el-form-item prop="username" v-if="loginForm.loginType=='uname'">
-                <el-input
-                  v-model="loginForm.username"
-                  type="text"
-                  auto-complete="off"
-                  placeholder="账号"
-                >
-                  <svg-icon slot="prefix" icon-class="user" class="el-input__icon input-icon" />
-                </el-input>
-              </el-form-item>
-              <el-form-item prop="password" v-if="loginForm.loginType=='uname'">
-                <el-input
-                  v-model="loginForm.password"
-                  type="password"
-                  auto-complete="off"
-                  placeholder="密码"
-                  @keyup.enter.native="handleLogin"
-                >
-                  <svg-icon slot="prefix" icon-class="password" class="el-input__icon input-icon" />
-                </el-input>
-              </el-form-item>
-              
- 
-             <el-form-item prop="mobile" v-if="loginForm.loginType=='sms'">
-              <el-input v-model="loginForm.mobile" type="text" auto-complete="off" placeholder="请输入手机号">
-                <svg-icon slot="prefix" icon-class="phone" class="el-input__icon input-icon" />
-              </el-input>
-            </el-form-item>
-            <el-form-item prop="mobileCode" v-if="loginForm.loginType=='sms'">
-              <el-input v-model="loginForm.mobileCode" type="text" auto-complete="off" @keyup.enter.native="handleLogin" placeholder="短信验证码">
-                <template slot="icon">
-                 <svg-icon slot="prefix" icon-class="password" class="el-input__icon input-icon" />
-                </template>
-               <template slot="append">
-               <span v-if="mobileCodeTimer<=0" class="getMobileCode" @click="getSmsCode" style="cursor: pointer;">获取验证码</span>
-               <span v-if="mobileCodeTimer>0" class="getMobileCode">{{mobileCodeTimer}}秒后可重新获取</span>
-               </template>
-              </el-input>
-            </el-form-item>
 
-              <el-form-item prop="code" v-if="captchaEnable">
-                <el-input
-                  v-model="loginForm.code"
-                  auto-complete="off"
-                  placeholder="验证码"
-                  style="width: 63%"
-                  @keyup.enter.native="handleLogin"
-                >
-                  <svg-icon slot="prefix" icon-class="validCode" class="el-input__icon input-icon" />
+        <!-- 表单 -->
+        <div class="form-cont">
+          <el-tabs class="form" v-model="loginForm.loginType" style=" float:none;">
+            <el-tab-pane label="账号密码登录" name="uname">
+            </el-tab-pane>
+            <el-tab-pane label="短信验证码登录" name="sms">
+            </el-tab-pane>
+          </el-tabs>
+          <div>
+            <el-form ref="loginForm" :model="loginForm" :rules="LoginRules" class="login-form">
+              <el-form-item prop="tenantName" v-if="tenantEnable">
+                <el-input v-model="loginForm.tenantName" type="text" auto-complete="off" placeholder='租户'>
+                  <svg-icon slot="prefix" icon-class="tree" class="el-input__icon input-icon"/>
                 </el-input>
-                <div class="login-code">
-                  <img :src="codeUrl" @click="getCode" class="login-code-img"/>
-                </div>
               </el-form-item>
-              <el-checkbox v-model="loginForm.rememberMe" style="margin:0px 0px 25px 0px;">记住密码</el-checkbox>
+              <!-- 账号密码登录 -->
+              <div v-if="loginForm.loginType === 'uname'">
+                <el-form-item prop="username">
+                  <el-input v-model="loginForm.username" type="text" auto-complete="off" placeholder="账号">
+                    <svg-icon slot="prefix" icon-class="user" class="el-input__icon input-icon"/>
+                  </el-input>
+                </el-form-item>
+                <el-form-item prop="password">
+                  <el-input v-model="loginForm.password" type="password" auto-complete="off" placeholder="密码"
+                            @keyup.enter.native="handleLogin">
+                    <svg-icon slot="prefix" icon-class="password" class="el-input__icon input-icon"/>
+                  </el-input>
+                </el-form-item>
+                <el-form-item prop="code" v-if="captchaEnable">
+                  <el-input v-model="loginForm.code" auto-complete="off" placeholder="验证码" style="width: 63%"
+                            @keyup.enter.native="handleLogin">
+                    <svg-icon slot="prefix" icon-class="validCode" class="el-input__icon input-icon"/>
+                  </el-input>
+                  <div class="login-code">
+                    <img :src="codeUrl" @click="getCode" class="login-code-img"/>
+                  </div>
+                </el-form-item>
+                <el-checkbox v-model="loginForm.rememberMe" style="margin:0 0 25px 0;">记住密码</el-checkbox>
+              </div>
+
+              <!-- 短信验证码登录 -->
+              <div v-if="loginForm.loginType === 'sms'">
+                <el-form-item prop="mobile">
+                  <el-input v-model="loginForm.mobile" type="text" auto-complete="off" placeholder="请输入手机号">
+                    <svg-icon slot="prefix" icon-class="phone" class="el-input__icon input-icon"/>
+                  </el-input>
+                </el-form-item>
+                <el-form-item prop="mobileCode">
+                  <el-input v-model="loginForm.mobileCode" type="text" auto-complete="off" placeholder="短信验证码"
+                            @keyup.enter.native="handleLogin">
+                    <template slot="icon">
+                      <svg-icon slot="prefix" icon-class="password" class="el-input__icon input-icon"/>
+                    </template>
+                    <template slot="append">
+                      <span v-if="mobileCodeTimer <= 0" class="getMobileCode" @click="getSmsCode" style="cursor: pointer;">获取验证码</span>
+                      <span v-if="mobileCodeTimer > 0" class="getMobileCode">{{ mobileCodeTimer }}秒后可重新获取</span>
+                    </template>
+                  </el-input>
+                </el-form-item>
+              </div>
+
+              <!-- 下方的登录按钮 -->
               <el-form-item style="width:100%;">
-                <el-button
-                  :loading="loading"
-                  size="medium"
-                  type="primary"
-                  style="width:100%;"
-                  @click.native.prevent="handleLogin"
-                >
+                <el-button :loading="loading" size="medium" type="primary" style="width:100%;"
+                    @click.native.prevent="handleLogin">
                   <span v-if="!loading">登 录</span>
                   <span v-else>登 录 中...</span>
                 </el-button>
-                
               </el-form-item>
             </el-form>
-    </div>
-    </div>
-
+          </div>
+        </div>
       </div>
     </div>
     <!-- footer -->
     <div class="footer">
-  Copyright © 2020-2021 iocoder.cn All Rights Reserved.
+      Copyright © 2020-2022 iocoder.cn All Rights Reserved.
     </div>
   </div>
 </template>
 
 <script>
-import { getCodeImg,socialAuthRedirect ,sendLoginSmsCode} from "@/api/login";
-import { getTenantIdByName } from "@/api/system/tenant";
+import {getCodeImg, sendSmsCode, socialAuthRedirect} from "@/api/login";
+import {getTenantIdByName} from "@/api/system/tenant";
 import Cookies from "js-cookie";
-import { encrypt, decrypt } from '@/utils/jsencrypt'
+import {decrypt, encrypt} from '@/utils/jsencrypt'
 import {SystemUserSocialTypeEnum} from "@/utils/constants";
-import { getTenantEnable } from "@/utils/ruoyi";
+import {getTenantEnable} from "@/utils/ruoyi";
 
 export default {
   name: "Login",
   data() {
     return {
-      
       codeUrl: "",
       captchaEnable: true,
       tenantEnable: true,
-      mobileCodeTimer:0,
+      mobileCodeTimer: 0,
       loginForm: {
-        loginType:"sms",
+        loginType: "uname",
         username: "admin",
         password: "admin123",
-        mobile:"",
-        mobileCode:"",
+        mobile: "",
+        mobileCode: "",
         rememberMe: false,
         code: "",
         uuid: "",
         tenantName: "芋道源码",
       },
-       scene:21,
+      scene: 21,
 
-      LoginRules:{
+      LoginRules: {
         username: [
-          
-          { required: true, trigger: "blur", message: "用户名不能为空" }
+          {required: true, trigger: "blur", message: "用户名不能为空"}
         ],
         password: [
-          { required: true, trigger: "blur", message: "密码不能为空" }
+          {required: true, trigger: "blur", message: "密码不能为空"}
         ],
-        code: [{ required: true, trigger: "change", message: "验证码不能为空" }],
+        code: [{required: true, trigger: "change", message: "验证码不能为空"}],
         mobile: [
-          
-          { required: true, trigger: "blur", message: "手机号不能为空" },
-            {validator: function(rule, value, callback) {
-              if (/^1[34578]\d{9}$/.test(value) == false) {
+          {required: true, trigger: "blur", message: "手机号不能为空"},
+          {
+            validator: function (rule, value, callback) {
+              if (/^1[0-9]\d{9}$/.test(value) == false) {
                 callback(new Error("手机号格式错误"));
               } else {
                 callback();
               }
             }, trigger: "blur"
-            }
+          }
         ],
-        tenantName:[
-          { required: true, trigger: "blur", message: "租户不能为空" },
+        tenantName: [
+          {required: true, trigger: "blur", message: "租户不能为空"},
           {
             validator: (rule, value, callback) => {
               // debugger
@@ -181,9 +162,9 @@ export default {
           }
         ]
       },
-    
 
-            loading: false,
+
+      loading: false,
       redirect: undefined,
       // 枚举
       SysUserSocialTypeEnum: SystemUserSocialTypeEnum,
@@ -234,23 +215,21 @@ export default {
         password: password === undefined ? this.loginForm.password : decrypt(password),
         rememberMe: rememberMe === undefined ? false : Boolean(rememberMe),
         tenantName: tenantName === undefined ? this.loginForm.tenantName : tenantName,
-        mobile:mobile === undefined ? this.loginForm.mobile : mobile,
-        mobileCode:mobileCode === undefined ? this.loginForm.mobileCode : mobileCode,
-        loginType:loginType === undefined ? this.loginForm.loginType : loginType,
+        mobile: mobile === undefined ? this.loginForm.mobile : mobile,
+        mobileCode: mobileCode === undefined ? this.loginForm.mobileCode : mobileCode,
+        loginType: loginType === undefined ? this.loginForm.loginType : loginType,
       };
     },
     handleLogin() {
-      
       this.$refs.loginForm.validate(valid => {
-      
         if (valid) {
           this.loading = true;
           // 设置 Cookie
           if (this.loginForm.rememberMe) {
-            Cookies.set("username", this.loginForm.username, { expires: 30 });
-            Cookies.set("password", encrypt(this.loginForm.password), { expires: 30 });
-            Cookies.set('rememberMe', this.loginForm.rememberMe, { expires: 30 });
-            Cookies.set('tenantName', this.loginForm.tenantName, { expires: 30 });
+            Cookies.set("username", this.loginForm.username, {expires: 30});
+            Cookies.set("password", encrypt(this.loginForm.password), {expires: 30});
+            Cookies.set('rememberMe', this.loginForm.rememberMe, {expires: 30});
+            Cookies.set('tenantName', this.loginForm.tenantName, {expires: 30});
           } else {
             Cookies.remove("username");
             Cookies.remove("password");
@@ -258,9 +237,10 @@ export default {
             Cookies.remove('tenantName');
           }
           // 发起登陆
-          console.log("发起登录",this.loginForm);
-          this.$store.dispatch(this.loginForm.loginType=="sms"?"SmsLogin":"Login", this.loginForm).then(() => {
-            this.$router.push({ path: this.redirect || "/" }).catch(()=>{});
+          console.log("发起登录", this.loginForm);
+          this.$store.dispatch(this.loginForm.loginType === "sms" ? "SmsLogin" : "Login", this.loginForm).then(() => {
+            this.$router.push({path: this.redirect || "/"}).catch(() => {
+            });
           }).catch(() => {
             this.loading = false;
             this.getCode();
@@ -281,32 +261,26 @@ export default {
         window.location.href = res.data;
       });
     },
-    /**以下为升级短信登录 */
-  
-    changeLoginType(){
-      
-    },
-    getSmsCode(){
-       if(this.mobileCodeTimer>0) return;
-         this.$refs.loginForm.validate(valid => {
-           if(!valid) return;
-      var _this=this;
-       sendLoginSmsCode(this.loginForm.mobile,this.scene,this.loginForm.uuid,this.loginForm.code).then(res => {
+    /** ========== 以下为升级短信登录 ========== */
+    getSmsCode() {
+      if (this.mobileCodeTimer > 0) return;
+      this.$refs.loginForm.validate(valid => {
+        if (!valid) return;
+        sendSmsCode(this.loginForm.mobile, this.scene, this.loginForm.uuid, this.loginForm.code).then(res => {
           this.$modal.msgSuccess("获取验证码成功")
-          this.mobileCodeTimer=60;
-          var msgTimer = setInterval(function(){
-            _this.mobileCodeTimer=_this.mobileCodeTimer-1;
-            if(_this.mobileCodeTimer<=0){
+          this.mobileCodeTimer = 60;
+          let msgTimer = setInterval(() => {
+            this.mobileCodeTimer = this.mobileCodeTimer - 1;
+            if (this.mobileCodeTimer <= 0) {
               clearInterval(msgTimer);
             }
-
-          },1000);
+          }, 1000);
+        });
       });
-         });
     }
   }
 };
 </script>
 <style lang="scss" scoped>
-  @import "~@/assets/styles/login.scss";
+@import "~@/assets/styles/login.scss";
 </style>

@@ -10,10 +10,10 @@ import lombok.experimental.Accessors;
 
 import javax.validation.constraints.NotNull;
 
-@ApiModel("用户 APP - 发送手机验证码 Response VO")
+@ApiModel("用户 APP - 发送手机验证码 Request VO")
 @Data
 @Accessors(chain = true)
-public class AppAuthSendSmsReqVO {
+public class AppAuthSmsSendReqVO {
 
     @ApiModelProperty(value = "手机号", example = "15601691234")
     @Mobile

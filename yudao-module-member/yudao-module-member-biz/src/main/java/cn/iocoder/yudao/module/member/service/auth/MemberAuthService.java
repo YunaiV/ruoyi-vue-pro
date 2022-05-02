@@ -2,8 +2,6 @@ package cn.iocoder.yudao.module.member.service.auth;
 
 import cn.iocoder.yudao.framework.security.core.service.SecurityAuthFrameworkService;
 import cn.iocoder.yudao.module.member.controller.app.auth.vo.*;
-import cn.iocoder.yudao.module.member.controller.app.social.vo.AppSocialUserBindReqVO;
-import cn.iocoder.yudao.module.member.controller.app.social.vo.AppSocialUserUnbindReqVO;
 
 import javax.validation.Valid;
 
@@ -35,7 +33,6 @@ public interface MemberAuthService extends SecurityAuthFrameworkService {
      * @return 身份令牌，使用 JWT 方式
      */
     String smsLogin(@Valid AppAuthSmsLoginReqVO reqVO, String userIp, String userAgent);
-
 
     /**
      * 社交登录，使用 code 授权码
@@ -85,6 +82,6 @@ public interface MemberAuthService extends SecurityAuthFrameworkService {
      * @param userId 用户编号
      * @param reqVO 发送信息
      */
-    void sendSmsCode(Long userId, AppAuthSendSmsReqVO reqVO);
+    void sendSmsCode(Long userId, AppAuthSmsSendReqVO reqVO);
 
 }

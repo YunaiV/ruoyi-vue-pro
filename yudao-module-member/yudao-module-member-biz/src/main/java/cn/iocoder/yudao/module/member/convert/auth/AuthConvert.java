@@ -31,7 +31,7 @@ public interface AuthConvert {
     SocialUserBindReqDTO convert(Long userId, Integer userType, AppAuthSocialQuickLoginReqVO reqVO);
     SocialUserUnbindReqDTO convert(Long userId, Integer userType, AppSocialUserUnbindReqVO reqVO);
 
-    SmsCodeSendReqDTO convert(AppAuthSendSmsReqVO reqVO);
+    SmsCodeSendReqDTO convert(AppAuthSmsSendReqVO reqVO);
     SmsCodeUseReqDTO convert(AppAuthResetPasswordReqVO reqVO, SmsSceneEnum scene, String usedIp);
     SmsCodeUseReqDTO convert(AppAuthSmsLoginReqVO reqVO, Integer scene, String usedIp);
 

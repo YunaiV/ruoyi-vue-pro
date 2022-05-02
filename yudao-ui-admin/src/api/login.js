@@ -77,24 +77,21 @@ export function socialBindLogin(type, code, state, username, password) {
 }
 
 // 获取登录验证码
-export function sendLoginSmsCode(mobile,scene,uuid,code) {
-  var datas = {
-    mobile
-    ,scene
-    ,uuid,
-    code
-  };
+export function sendSmsCode(mobile, scene) {
   return request({
-    url: '/system/send-login-sms-code',
+    url: '/system/auth/send-sms-code',
     method: 'post',
-    data: datas
+    data: {
+      mobile,
+      scene
+    }
   })
 }
 
 // 短信验证码登录
 export function smsLogin(mobile, code) {
   return request({
-    url: '/system/sms-login',
+    url: '/system/auth/sms-login',
     method: 'post',
     data: {
       mobile,

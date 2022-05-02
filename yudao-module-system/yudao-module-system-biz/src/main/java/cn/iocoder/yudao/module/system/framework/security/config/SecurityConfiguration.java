@@ -26,7 +26,7 @@ public class SecurityConfiguration {
                 registry.antMatchers(buildAdminApi("/system/auth/social-bind-login")).permitAll();
                 // 登录登录的接口
                 registry.antMatchers(buildAdminApi("/system/auth/sms-login")).permitAll();
-                registry.antMatchers(buildAdminApi("/system/auth/send-login-sms-code")).permitAll();
+                registry.antMatchers(buildAdminApi("/system/auth/send-sms-code")).permitAll();
                 // 验证码的接口
                 registry.antMatchers(buildAdminApi("/system/captcha/**")).permitAll();
                 // 获得租户编号的接口

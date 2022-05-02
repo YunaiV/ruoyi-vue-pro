@@ -10,11 +10,11 @@ $buttonH: 50;
 
 // container
 $containerBgColor: #e6ebf2;
-$containerBgImage: '../assets/images/bg.png';
+$containerBgImage: '/assets/images/bg.png';
 // container-logo
 $logoWidth: 417px;
 $logoHeight: 64px;
-$logoImage: '../assets/logo/login-logo.png';
+$logoImage: '/assets/logo/logo.png';
 // container-content
 $contentWidth: round($W / $H * 100) * 1vw;
 $contentHeight: round($picH / $W * 100) / 100 * $contentWidth;
@@ -22,7 +22,7 @@ $contentBgColor: #ffffff;
 // container-content-pic
 $picWidth: round($picW / $H * 100) * 1vw;
 $picHeight: inherit;
-$picImage: '../assets/images/pic.png';
+$picImage: '/assets/images/pic.png';
 // container-content-field
 $fieldWidth: $contentWidth - $picWidth;
 $fieldHeight: inherit;
@@ -270,7 +270,7 @@ $mobileRowH: 48;
 $mobileButtonH: 48;
 
 // container
-$mobileContainerBgImage: '../assets/images/bg-mobile.png';
+$mobileContainerBgImage: '/assets/images/bg-mobile.png';
 // container-content
 $mobileContentWidth: round($mobileContentW / $mobileW * 100) * 1vw;
 $mobileContentHeight: round($mobileContentH / $mobileW * 100) / 100 * $mobileContentWidth;
@@ -278,7 +278,7 @@ $mobileContentHeight: round($mobileContentH / $mobileW * 100) / 100 * $mobileCon
 $mobileFormWidth: round($mobileFormW / $mobileW *100) * 1vw;
 $mobileRowHeight: $mobileRowH * 1px;
 $mobileButtonHeight: $mobileButtonH * 1px;
-$iconBgImage: '../assets/images/icon.png';
+$iconBgImage: '/assets/images/icon.png';
 
 // - - - - - 移动端设置
 @media screen and (max-width: 599px) {
@@ -294,7 +294,7 @@ $iconBgImage: '../assets/images/icon.png';
     .logo {
       display: none;
     }
-   
+
     .content {
       // 元素
       width: $mobileContentWidth;
@@ -383,5 +383,5 @@ $iconBgImage: '../assets/images/icon.png';
       bottom: 20px;
     }
   }
- 
+
 }
