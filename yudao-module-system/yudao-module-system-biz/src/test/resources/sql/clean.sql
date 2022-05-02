@@ -4,6 +4,7 @@ DELETE FROM "system_role";
 DELETE FROM "system_role_menu";
 DELETE FROM "system_menu";
 DELETE FROM "system_user_role";
+DELETE FROM "system_user_post";
 DELETE FROM "system_dict_type";
 DELETE FROM "system_user_session";
 DELETE FROM "system_post";
