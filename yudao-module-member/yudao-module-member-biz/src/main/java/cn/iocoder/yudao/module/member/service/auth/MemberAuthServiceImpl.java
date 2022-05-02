@@ -8,8 +8,6 @@ import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.security.core.authentication.MultiUsernamePasswordAuthenticationToken;
 import cn.iocoder.yudao.module.member.controller.app.auth.vo.*;
-import cn.iocoder.yudao.module.member.controller.app.social.vo.AppSocialUserBindReqVO;
-import cn.iocoder.yudao.module.member.controller.app.social.vo.AppSocialUserUnbindReqVO;
 import cn.iocoder.yudao.module.member.convert.auth.AuthConvert;
 import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
 import cn.iocoder.yudao.module.member.dal.mysql.user.MemberUserMapper;
@@ -88,7 +86,7 @@ public class MemberAuthServiceImpl implements MemberAuthService {
         // 使用手机 + 密码，进行登录。
         LoginUser loginUser = this.login0(reqVO.getMobile(), reqVO.getPassword());
 
-        // 缓存登录用户到 Redis 中，返回 sessionId 编号
+        // 缓存登录用户到 Redis 中，返回 Token 令牌
         return createUserSessionAfterLoginSuccess(loginUser, LoginLogTypeEnum.LOGIN_USERNAME, userIp, userAgent);
     }
 
@@ -105,7 +103,7 @@ public class MemberAuthServiceImpl implements MemberAuthService {
         // 执行登陆
         LoginUser loginUser = AuthConvert.INSTANCE.convert(user);
 
-        // 缓存登录用户到 Redis 中，返回 sessionId 编号
+        // 缓存登录用户到 Redis 中，返回 Token 令牌
         return createUserSessionAfterLoginSuccess(loginUser, LoginLogTypeEnum.LOGIN_SMS, userIp, userAgent);
     }
 
@@ -127,7 +125,7 @@ public class MemberAuthServiceImpl implements MemberAuthService {
         // 创建 LoginUser 对象
         LoginUser loginUser = AuthConvert.INSTANCE.convert(user);
 
-        // 缓存登录用户到 Redis 中，返回 sessionId 编号
+        // 缓存登录用户到 Redis 中，返回 Token 令牌
         return createUserSessionAfterLoginSuccess(loginUser, LoginLogTypeEnum.LOGIN_SOCIAL, userIp, userAgent);
     }
 
@@ -136,18 +134,18 @@ public class MemberAuthServiceImpl implements MemberAuthService {
         // 使用手机号、手机验证码登录
         AppAuthSmsLoginReqVO loginReqVO = AppAuthSmsLoginReqVO.builder()
                 .mobile(reqVO.getMobile()).code(reqVO.getSmsCode()).build();
-        String sessionId = this.smsLogin(loginReqVO, userIp, userAgent);
-        LoginUser loginUser = userSessionApi.getLoginUser(sessionId);
+        String token = this.smsLogin(loginReqVO, userIp, userAgent);
+        LoginUser loginUser = userSessionApi.getLoginUser(token);
 
         // 绑定社交用户
         socialUserApi.bindSocialUser(AuthConvert.INSTANCE.convert(loginUser.getId(), getUserType().getValue(), reqVO));
-        return sessionId;
+        return token;
     }
 
     private String createUserSessionAfterLoginSuccess(LoginUser loginUser, LoginLogTypeEnum logType, String userIp, String userAgent) {
         // 插入登陆日志
         createLoginLog(loginUser.getUsername(), logType, LoginResultEnum.SUCCESS);
-        // 缓存登录用户到 Redis 中，返回 sessionId 编号
+        // 缓存登录用户到 Redis 中，返回 Token 令牌
         return userSessionApi.createUserSession(loginUser, userIp, userAgent);
     }
 

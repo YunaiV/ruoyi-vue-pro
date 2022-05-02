@@ -10,7 +10,7 @@ DELETE FROM "system_user_session";
 DELETE FROM "system_post";
 DELETE FROM "system_login_log";
 DELETE FROM "system_operate_log";
-DELETE FROM "system_user";
+DELETE FROM "system_users";
 DELETE FROM "system_sms_channel";
 DELETE FROM "system_sms_template";
 DELETE FROM "system_sms_log";

@@ -3,7 +3,7 @@ package cn.iocoder.yudao.framework.security.config;
 import cn.iocoder.yudao.framework.security.core.aop.PreAuthenticatedAspect;
 import cn.iocoder.yudao.framework.security.core.authentication.MultiUserDetailsAuthenticationProvider;
 import cn.iocoder.yudao.framework.security.core.context.TransmittableThreadLocalSecurityContextHolderStrategy;
-import cn.iocoder.yudao.framework.security.core.filter.JWTAuthenticationTokenFilter;
+import cn.iocoder.yudao.framework.security.core.filter.TokenAuthenticationFilter;
 import cn.iocoder.yudao.framework.security.core.handler.AccessDeniedHandlerImpl;
 import cn.iocoder.yudao.framework.security.core.handler.AuthenticationEntryPointImpl;
 import cn.iocoder.yudao.framework.security.core.handler.LogoutSuccessHandlerImpl;
@@ -86,9 +86,9 @@ public class YudaoSecurityAutoConfiguration {
      * Token 认证过滤器 Bean
      */
     @Bean
-    public JWTAuthenticationTokenFilter authenticationTokenFilter(MultiUserDetailsAuthenticationProvider authenticationProvider,
-                                                                  GlobalExceptionHandler globalExceptionHandler) {
-        return new JWTAuthenticationTokenFilter(securityProperties, authenticationProvider, globalExceptionHandler);
+    public TokenAuthenticationFilter authenticationTokenFilter(MultiUserDetailsAuthenticationProvider authenticationProvider,
+                                                               GlobalExceptionHandler globalExceptionHandler) {
+        return new TokenAuthenticationFilter(securityProperties, authenticationProvider, globalExceptionHandler);
     }
 
     /**

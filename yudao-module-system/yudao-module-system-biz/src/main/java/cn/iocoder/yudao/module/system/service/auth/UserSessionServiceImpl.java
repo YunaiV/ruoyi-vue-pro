@@ -3,28 +3,28 @@ package cn.iocoder.yudao.module.system.service.auth;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.monitor.TracerUtils;
 import cn.iocoder.yudao.framework.security.config.SecurityProperties;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
+import cn.iocoder.yudao.module.system.api.logger.dto.LoginLogCreateReqDTO;
 import cn.iocoder.yudao.module.system.controller.admin.auth.vo.session.UserSessionPageReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.auth.UserSessionDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
 import cn.iocoder.yudao.module.system.dal.mysql.auth.UserSessionMapper;
+import cn.iocoder.yudao.module.system.dal.redis.auth.LoginUserRedisDAO;
 import cn.iocoder.yudao.module.system.enums.logger.LoginLogTypeEnum;
 import cn.iocoder.yudao.module.system.enums.logger.LoginResultEnum;
 import cn.iocoder.yudao.module.system.service.logger.LoginLogService;
 import cn.iocoder.yudao.module.system.service.user.AdminUserService;
-import cn.iocoder.yudao.module.system.dal.redis.auth.LoginUserRedisDAO;
-import cn.iocoder.yudao.module.system.api.logger.dto.LoginLogCreateReqDTO;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.monitor.TracerUtils;
-import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.time.Duration;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.addTime;
@@ -65,82 +65,99 @@ public class UserSessionServiceImpl implements UserSessionService {
         return userSessionMapper.selectPage(reqVO, userIds);
     }
 
-    // TODO @芋艿：优化下该方法
     @Override
-    public long clearSessionTimeout() {
-        // 获取db里已经超时的用户列表
-        List<UserSessionDO> sessionTimeoutDOS = userSessionMapper.selectListBySessionTimoutLt();
-        Map<String, UserSessionDO> timeoutSessionDOMap = sessionTimeoutDOS
-                .stream()
-                .filter(sessionDO -> loginUserRedisDAO.get(sessionDO.getId()) == null)
-                .collect(Collectors.toMap(UserSessionDO::getId, o -> o));
-        // 确认已经超时,按批次移出在线用户列表
-        if (CollUtil.isNotEmpty(timeoutSessionDOMap)) {
-            Lists.partition(new ArrayList<>(timeoutSessionDOMap.keySet()), 100)
-                    .forEach(userSessionMapper::deleteBatchIds);
-            // 记录用户超时退出日志
-            createTimeoutLogoutLog(timeoutSessionDOMap.values());
+    public long deleteTimeoutSession() {
+        // 获取 db 里已经超时的用户列表
+        List<UserSessionDO> timeoutSessions = userSessionMapper.selectListBySessionTimoutLt();
+        if (CollUtil.isEmpty(timeoutSessions)) {
+            return 0L;
         }
-        return timeoutSessionDOMap.size();
+
+        // 由于过期的用户一般不多，所以顺序遍历，进行清理
+        int count = 0;
+        for (UserSessionDO session : timeoutSessions) {
+            // 基于 Redis 二次判断，同时也保证 Redis Key 的立即过期，避免延迟导致浪费内存空间
+            if (loginUserRedisDAO.exists(session.getToken())) {
+                continue;
+            }
+            userSessionMapper.deleteById(session.getId());
+            // 记录退出日志
+            createLogoutLog(session, LoginLogTypeEnum.LOGOUT_TIMEOUT);
+            count++;
+        }
+        return count;
     }
 
-    private void createTimeoutLogoutLog(Collection<UserSessionDO> timeoutSessionDOS) {
-        for (UserSessionDO timeoutSessionDO : timeoutSessionDOS) {
-            LoginLogCreateReqDTO reqDTO = new LoginLogCreateReqDTO();
-            reqDTO.setLogType(LoginLogTypeEnum.LOGOUT_TIMEOUT.getType());
-            reqDTO.setTraceId(TracerUtils.getTraceId());
-            reqDTO.setUserId(timeoutSessionDO.getUserId());
-            reqDTO.setUserType(timeoutSessionDO.getUserType());
-            reqDTO.setUsername(timeoutSessionDO.getUsername());
-            reqDTO.setUserAgent(timeoutSessionDO.getUserAgent());
-            reqDTO.setUserIp(timeoutSessionDO.getUserIp());
-            reqDTO.setResult(LoginResultEnum.SUCCESS.getResult());
-            loginLogService.createLoginLog(reqDTO);
-        }
+    private void createLogoutLog(UserSessionDO session, LoginLogTypeEnum type) {
+        LoginLogCreateReqDTO reqDTO = new LoginLogCreateReqDTO();
+        reqDTO.setLogType(type.getType());
+        reqDTO.setTraceId(TracerUtils.getTraceId());
+        reqDTO.setUserId(session.getUserId());
+        reqDTO.setUserType(session.getUserType());
+        reqDTO.setUsername(session.getUsername());
+        reqDTO.setUserAgent(session.getUserAgent());
+        reqDTO.setUserIp(session.getUserIp());
+        reqDTO.setResult(LoginResultEnum.SUCCESS.getResult());
+        loginLogService.createLoginLog(reqDTO);
     }
 
     @Override
     public String createUserSession(LoginUser loginUser, String userIp, String userAgent) {
         // 生成 Session 编号
-        String sessionId = generateSessionId();
+        String token = generateToken();
         // 写入 Redis 缓存
         loginUser.setUpdateTime(new Date());
-        loginUserRedisDAO.set(sessionId, loginUser);
+        loginUserRedisDAO.set(token, loginUser);
         // 写入 DB 中
-        UserSessionDO userSession = UserSessionDO.builder().id(sessionId)
+        UserSessionDO userSession = UserSessionDO.builder().token(token)
                 .userId(loginUser.getId()).userType(loginUser.getUserType())
                 .userIp(userIp).userAgent(userAgent).username(loginUser.getUsername())
                 .sessionTimeout(addTime(Duration.ofMillis(getSessionTimeoutMillis())))
                 .build();
         userSessionMapper.insert(userSession);
-        // 返回 Session 编号
-        return sessionId;
+        // 返回 Token 令牌
+        return token;
     }
 
     @Override
-    public void refreshUserSession(String sessionId, LoginUser loginUser) {
+    public void refreshUserSession(String token, LoginUser loginUser) {
         // 写入 Redis 缓存
         loginUser.setUpdateTime(new Date());
-        loginUserRedisDAO.set(sessionId, loginUser);
+        loginUserRedisDAO.set(token, loginUser);
         // 更新 DB 中
-        UserSessionDO updateObj = UserSessionDO.builder().id(sessionId).build();
+        UserSessionDO updateObj = UserSessionDO.builder().build();
         updateObj.setUsername(loginUser.getUsername());
         updateObj.setUpdateTime(new Date());
         updateObj.setSessionTimeout(addTime(Duration.ofMillis(getSessionTimeoutMillis())));
-        userSessionMapper.updateById(updateObj);
+        userSessionMapper.updateByToken(token, updateObj);
     }
 
     @Override
-    public void deleteUserSession(String sessionId) {
+    public void deleteUserSession(String token) {
         // 删除 Redis 缓存
-        loginUserRedisDAO.delete(sessionId);
+        loginUserRedisDAO.delete(token);
         // 删除 DB 记录
-        userSessionMapper.deleteById(sessionId);
+        userSessionMapper.deleteByToken(token);
+        // 无需记录日志，因为退出那已经记录
     }
 
     @Override
-    public LoginUser getLoginUser(String sessionId) {
-        return loginUserRedisDAO.get(sessionId);
+    public void deleteUserSession(Long id) {
+        UserSessionDO session = userSessionMapper.selectById(id);
+        if (session == null) {
+            return;
+        }
+        // 删除 Redis 缓存
+        loginUserRedisDAO.delete(session.getToken());
+        // 删除 DB 记录
+        userSessionMapper.deleteById(id);
+        // 记录退出日志
+        createLogoutLog(session, LoginLogTypeEnum.LOGOUT_DELETE);
+    }
+
+    @Override
+    public LoginUser getLoginUser(String token) {
+        return loginUserRedisDAO.get(token);
     }
 
     @Override
@@ -149,11 +166,11 @@ public class UserSessionServiceImpl implements UserSessionService {
     }
 
     /**
-     * 生成 Session 编号，目前采用 UUID 算法
+     * 生成 Token 令牌，目前采用 UUID 算法
      *
      * @return Session 编号
      */
-    private static String generateSessionId() {
+    private static String generateToken() {
         return IdUtil.fastSimpleUUID();
     }
 

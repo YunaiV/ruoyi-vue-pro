@@ -7,21 +7,23 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.ArrayUtils;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
+import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.infra.api.file.FileApi;
 import cn.iocoder.yudao.module.system.controller.admin.user.vo.profile.UserProfileUpdatePasswordReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.user.vo.profile.UserProfileUpdateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.user.vo.user.*;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.PostDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.dept.UserPostDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.tenant.TenantDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
+import cn.iocoder.yudao.module.system.dal.mysql.dept.UserPostMapper;
 import cn.iocoder.yudao.module.system.dal.mysql.user.AdminUserMapper;
 import cn.iocoder.yudao.module.system.enums.common.SexEnum;
 import cn.iocoder.yudao.module.system.service.dept.DeptService;
 import cn.iocoder.yudao.module.system.service.dept.PostService;
 import cn.iocoder.yudao.module.system.service.permission.PermissionService;
 import cn.iocoder.yudao.module.system.service.tenant.TenantService;
-import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import org.junit.jupiter.api.Test;
 import org.mockito.stubbing.Answer;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -30,16 +32,19 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.annotation.Resource;
 import java.io.ByteArrayInputStream;
+import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
 
 import static cn.hutool.core.util.RandomUtil.randomBytes;
 import static cn.hutool.core.util.RandomUtil.randomEle;
+import static cn.iocoder.yudao.framework.common.util.collection.SetUtils.asSet;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.buildTime;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
+import static java.util.Collections.singleton;
 import static org.assertj.core.util.Lists.newArrayList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -47,13 +52,15 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @Import(AdminUserServiceImpl.class)
-public class UserServiceImplTest extends BaseDbUnitTest {
+public class AdminUserServiceImplTest extends BaseDbUnitTest {
 
     @Resource
     private AdminUserServiceImpl userService;
 
     @Resource
     private AdminUserMapper userMapper;
+    @Resource
+    private UserPostMapper userPostMapper;
 
     @MockBean
     private DeptService deptService;
@@ -74,6 +81,7 @@ public class UserServiceImplTest extends BaseDbUnitTest {
         UserCreateReqVO reqVO = randomPojo(UserCreateReqVO.class, o -> {
             o.setSex(RandomUtil.randomEle(SexEnum.values()).getSex());
             o.setMobile(randomString());
+            o.setPostIds(asSet(1L, 2L));
         });
         // mock 账户额度充足
         TenantDO tenant = randomPojo(TenantDO.class, o -> o.setAccountCount(1));
@@ -104,6 +112,10 @@ public class UserServiceImplTest extends BaseDbUnitTest {
         assertPojoEquals(reqVO, user, "password");
         assertEquals("yudaoyuanma", user.getPassword());
         assertEquals(CommonStatusEnum.ENABLE.getStatus(), user.getStatus());
+        // 断言关联岗位
+        List<UserPostDO> userPosts = userPostMapper.selectListByUserId(user.getId());
+        assertEquals(1L, userPosts.get(0).getPostId());
+        assertEquals(2L, userPosts.get(1).getPostId());
     }
 
     @Test
@@ -124,13 +136,16 @@ public class UserServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testUpdateUser_success() {
         // mock 数据
-        AdminUserDO dbUser = randomAdminUserDO();
+        AdminUserDO dbUser = randomAdminUserDO(o -> o.setPostIds(asSet(1L, 2L)));
         userMapper.insert(dbUser);
+        userPostMapper.insert(new UserPostDO().setUserId(dbUser.getId()).setPostId(1L));
+        userPostMapper.insert(new UserPostDO().setUserId(dbUser.getId()).setPostId(2L));
         // 准备参数
         UserUpdateReqVO reqVO = randomPojo(UserUpdateReqVO.class, o -> {
             o.setId(dbUser.getId());
             o.setSex(RandomUtil.randomEle(SexEnum.values()).getSex());
             o.setMobile(randomString());
+            o.setPostIds(asSet(2L, 3L));
         });
         // mock deptService 的方法
         DeptDO dept = randomPojo(DeptDO.class, o -> {
@@ -151,6 +166,10 @@ public class UserServiceImplTest extends BaseDbUnitTest {
         // 断言
         AdminUserDO user = userMapper.selectById(reqVO.getId());
         assertPojoEquals(reqVO, user);
+        // 断言关联岗位
+        List<UserPostDO> userPosts = userPostMapper.selectListByUserId(user.getId());
+        assertEquals(2L, userPosts.get(0).getPostId());
+        assertEquals(3L, userPosts.get(1).getPostId());
     }
 
     @Test
@@ -552,22 +571,26 @@ public class UserServiceImplTest extends BaseDbUnitTest {
         verify(passwordEncoder, times(1)).matches(eq(oldPassword), eq(user.getPassword()));
     }
 
-//    @Test //TODO jason 已经移到userCoreService.getUsersByPostIds
-//    public void testUsersByPostIds() {
-//        // 准备参数
-//        Collection<Long> postIds = asSet(10L, 20L);
-//        // mock 方法
-//        AdminUserDO user1 = randomAdminUserDO(o -> o.setPostIds(asSet(10L, 30L)));
-//        userMapper.insert(user1);
-//        AdminUserDO user2 = randomAdminUserDO(o -> o.setPostIds(singleton(100L)));
-//        userMapper.insert(user2);
-//
-//        // 调用
-//        List<AdminUserDO> result = userService.getUsersByPostIds(postIds);
-//        // 断言
-//        assertEquals(1, result.size());
-//        assertEquals(user1, result.get(0));
-//    }
+    @Test
+    public void testUsersByPostIds() {
+        // 准备参数
+        Collection<Long> postIds = asSet(10L, 20L);
+        // mock user1 数据
+        AdminUserDO user1 = randomAdminUserDO(o -> o.setPostIds(asSet(10L, 30L)));
+        userMapper.insert(user1);
+        userPostMapper.insert(new UserPostDO().setUserId(user1.getId()).setPostId(10L));
+        userPostMapper.insert(new UserPostDO().setUserId(user1.getId()).setPostId(30L));
+        // mock user2 数据
+        AdminUserDO user2 = randomAdminUserDO(o -> o.setPostIds(singleton(100L)));
+        userMapper.insert(user2);
+        userPostMapper.insert(new UserPostDO().setUserId(user2.getId()).setPostId(100L));
+
+        // 调用
+        List<AdminUserDO> result = userService.getUsersByPostIds(postIds);
+        // 断言
+        assertEquals(1, result.size());
+        assertEquals(user1, result.get(0));
+    }
 
     // ========== 随机对象 ==========
 

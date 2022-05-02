@@ -104,7 +104,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         // 使用账号密码，进行登录
         LoginUser loginUser = login0(reqVO.getUsername(), reqVO.getPassword());
 
-        // 缓存登陆用户到 Redis 中，返回 sessionId 编号
+        // 缓存登陆用户到 Redis 中，返回 Token 令牌
         return createUserSessionAfterLoginSuccess(loginUser, LoginLogTypeEnum.LOGIN_USERNAME, userIp, userAgent);
     }
 
@@ -207,7 +207,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         // 创建 LoginUser 对象
         LoginUser loginUser = buildLoginUser(user);
 
-        // 缓存登录用户到 Redis 中，返回 sessionId 编号
+        // 缓存登录用户到 Redis 中，返回 Token 令牌
         return createUserSessionAfterLoginSuccess(loginUser, LoginLogTypeEnum.LOGIN_SOCIAL, userIp, userAgent);
     }
 
@@ -219,14 +219,14 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         // 绑定社交用户
         socialUserService.bindSocialUser(AuthConvert.INSTANCE.convert(loginUser.getId(), getUserType().getValue(), reqVO));
 
-        // 缓存登录用户到 Redis 中，返回 sessionId 编号
+        // 缓存登录用户到 Redis 中，返回 Token 令牌
         return createUserSessionAfterLoginSuccess(loginUser, LoginLogTypeEnum.LOGIN_SOCIAL, userIp, userAgent);
     }
 
     private String createUserSessionAfterLoginSuccess(LoginUser loginUser, LoginLogTypeEnum logType, String userIp, String userAgent) {
         // 插入登陆日志
         createLoginLog(loginUser.getUsername(), logType, LoginResultEnum.SUCCESS);
-        // 缓存登录用户到 Redis 中，返回 sessionId 编号
+        // 缓存登录用户到 Redis 中，返回 Token 令牌
         return userSessionService.createUserSession(loginUser, userIp, userAgent);
     }
 
@@ -240,7 +240,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         // 删除 session
         userSessionService.deleteUserSession(token);
         // 记录登出日志
-        this.createLogoutLog(loginUser.getId(), loginUser.getUsername());
+        createLogoutLog(loginUser.getId(), loginUser.getUsername());
     }
 
     @Override

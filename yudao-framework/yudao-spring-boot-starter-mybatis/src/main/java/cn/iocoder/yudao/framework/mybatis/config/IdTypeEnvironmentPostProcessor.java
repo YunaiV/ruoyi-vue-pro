@@ -82,11 +82,14 @@ public class IdTypeEnvironmentPostProcessor implements EnvironmentPostProcessor 
             case ORACLE_12C:
                 driverClass = "org.quartz.impl.jdbcjobstore.oracle.OracleDelegate";
                 break;
+            case SQL_SERVER:
+            case SQL_SERVER2005:
+                driverClass = "org.quartz.impl.jdbcjobstore.MSSQLDelegate";
+                break;
         }
         // 设置 driverClass 变量
         if (StrUtil.isNotEmpty(driverClass)) {
             environment.getSystemProperties().put(QUARTZ_JOB_STORE_DRIVER_KEY, driverClass);
-
         }
     }
 
