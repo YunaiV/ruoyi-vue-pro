@@ -19,7 +19,7 @@
 
 * 前端采用 [vue-element-admin](https://github.com/PanJiaChen/vue-element-admin) ，正在支持 Vue 3 + ElementUI Plus 最新方案。
 * 后端采用 Spring Boot、MySQL + MyBatis Plus、Redis + Redisson。
-* 数据库可使用 MySQL、Oracle、PostgreSQL、SQL Server、国产达梦 DM 等等。
+* 数据库可使用 MySQL、Oracle、PostgreSQL、SQL Server、MariaDB、国产达梦 DM、TiDB 等
 * 权限认证使用 Spring Security & Token & Redis，支持多终端、多种用户的认证系统。
 * 支持加载动态权限菜单，按钮级别权限控制，本地缓存提升性能。
 * 支持 SaaS 多租户系统，可自定义每个租户的权限，提供透明化的多租户底层封装。
