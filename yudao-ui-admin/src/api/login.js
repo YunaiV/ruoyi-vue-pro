@@ -75,3 +75,27 @@ export function socialBindLogin(type, code, state, username, password) {
     }
   })
 }
+
+// 获取登录验证码
+export function sendSmsCode(mobile, scene) {
+  return request({
+    url: '/system/auth/send-sms-code',
+    method: 'post',
+    data: {
+      mobile,
+      scene
+    }
+  })
+}
+
+// 短信验证码登录
+export function smsLogin(mobile, code) {
+  return request({
+    url: '/system/auth/sms-login',
+    method: 'post',
+    data: {
+      mobile,
+      code
+    }
+  })
+}

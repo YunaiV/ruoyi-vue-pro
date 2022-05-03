@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.member.controller.app.auth;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.module.member.controller.app.auth.vo.*;
 import cn.iocoder.yudao.module.member.service.auth.MemberAuthService;
@@ -35,7 +34,6 @@ public class AppAuthController {
     @ApiOperation("使用手机 + 密码登录")
     public CommonResult<AppAuthLoginRespVO> login(@RequestBody @Valid AppAuthLoginReqVO reqVO) {
         String token = authService.login(reqVO, getClientIP(), getUserAgent());
-        // 返回结果
         return success(AppAuthLoginRespVO.builder().token(token).build());
     }
 
@@ -49,7 +47,7 @@ public class AppAuthController {
 
     @PostMapping("/send-sms-code")
     @ApiOperation(value = "发送手机验证码")
-    public CommonResult<Boolean> sendSmsCode(@RequestBody @Valid AppAuthSendSmsReqVO reqVO) {
+    public CommonResult<Boolean> sendSmsCode(@RequestBody @Valid AppAuthSmsSendReqVO reqVO) {
         authService.sendSmsCode(getLoginUserId(), reqVO);
         return success(true);
     }

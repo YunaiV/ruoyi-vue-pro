@@ -203,6 +203,16 @@ public class AdminUserServiceImpl implements AdminUserService {
         return userMapper.selectByUsername(username);
     }
 
+    /**
+     * 通过手机号获取用户
+     * @param mobile
+     * @return
+     */
+    @Override
+    public AdminUserDO getUserByMobile(String mobile) {
+        return userMapper.selectByMobile(mobile);
+    }
+
     @Override
     public PageResult<AdminUserDO> getUserPage(UserPageReqVO reqVO) {
         return userMapper.selectPage(reqVO, getDeptCondition(reqVO.getDeptId()));

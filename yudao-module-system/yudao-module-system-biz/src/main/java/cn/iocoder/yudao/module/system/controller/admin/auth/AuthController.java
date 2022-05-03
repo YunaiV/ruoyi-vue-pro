@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.system.controller.admin.auth;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
-import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.collection.SetUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
@@ -92,6 +91,25 @@ public class AuthController {
         return success(AuthConvert.INSTANCE.buildMenuTree(menuList));
     }
 
+    // ========== 短信登录相关 ==========
+
+    @PostMapping("/sms-login")
+    @ApiOperation("使用短信验证码登录")
+    @OperateLog(enable = false) // 避免 Post 请求被记录操作日志
+    public CommonResult<AuthLoginRespVO> smsLogin(@RequestBody @Valid AuthSmsLoginReqVO reqVO) {
+        String token = authService.smsLogin(reqVO, getClientIP(), getUserAgent());
+        // 返回结果
+        return success(AuthLoginRespVO.builder().token(token).build());
+    }
+
+    @PostMapping("/send-sms-code")
+    @ApiOperation(value = "发送手机验证码")
+    @OperateLog(enable = false) // 避免 Post 请求被记录操作日志
+    public CommonResult<Boolean> sendLoginSmsCode(@RequestBody @Valid AuthSmsSendReqVO reqVO) {
+        authService.sendSmsCode(reqVO);
+        return success(true);
+    }
+
     // ========== 社交登录相关 ==========
 
     @GetMapping("/social-auth-redirect")
@@ -109,7 +127,7 @@ public class AuthController {
     @ApiOperation("社交快捷登录，使用 code 授权码")
     @OperateLog(enable = false) // 避免 Post 请求被记录操作日志
     public CommonResult<AuthLoginRespVO> socialQuickLogin(@RequestBody @Valid AuthSocialQuickLoginReqVO reqVO) {
-        String token = authService.socialLogin(reqVO, getClientIP(), getUserAgent());
+        String token = authService.socialQuickLogin(reqVO, getClientIP(), getUserAgent());
         // 返回结果
         return success(AuthLoginRespVO.builder().token(token).build());
     }
