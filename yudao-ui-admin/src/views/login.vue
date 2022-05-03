@@ -81,7 +81,20 @@
                   <span v-else>登 录 中...</span>
                 </el-button>
               </el-form-item>
+
+             <el-form-item style="width:100%;">
+                  <div class="oauth-login" style="display:flex">
+                    <div class="oauth-login-item" v-for="item in SysUserSocialTypeEnum" :key="item.type" @click="doSocialLogin(item)">
+                      <img :src="item.img" height="25px" width="25px" alt="登录" >
+                      <span>{{item.title}}</span>
+                    </div>
+                </div>
+              </el-form-item>
+
+
             </el-form>
+            
+              
           </div>
         </div>
       </div>
@@ -283,4 +296,24 @@ export default {
 </script>
 <style lang="scss" scoped>
 @import "~@/assets/styles/login.scss";
+
+
+.oauth-login {
+  display: flex;
+  align-items: cen;
+  cursor:pointer;
+}
+.oauth-login-item {
+  display: flex;
+  align-items: center;
+  margin-right: 10px;
+}
+.oauth-login-item img {
+  height: 25px;
+  width: 25px;
+}
+.oauth-login-item span:hover {
+  text-decoration: underline red;
+  color: red;
+}
 </style>
