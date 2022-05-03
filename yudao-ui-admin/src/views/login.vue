@@ -82,6 +82,7 @@
                 </el-button>
               </el-form-item>
 
+              <!--  社交登录 -->
              <el-form-item style="width:100%;">
                   <div class="oauth-login" style="display:flex">
                     <div class="oauth-login-item" v-for="item in SysUserSocialTypeEnum" :key="item.type" @click="doSocialLogin(item)">
@@ -90,11 +91,7 @@
                     </div>
                 </div>
               </el-form-item>
-
-
             </el-form>
-            
-              
           </div>
         </div>
       </div>
