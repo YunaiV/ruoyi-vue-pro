@@ -27,9 +27,11 @@ public class FtpFileClient extends AbstractFileClient<FtpFileClientConfig> {
 
     @Override
     protected void doInit() {
-        // 补全风格。例如说 Linux 是 /，Windows 是 \
-        if (!config.getBasePath().endsWith(File.separator)) {
-            config.setBasePath(config.getBasePath() + File.separator);
+        //如果路径配置\a\test,替换成/a/test,替换方法已经处理为null情况
+        config.setBasePath(StrUtil.replace(config.getBasePath(),StrUtil.BACKSLASH,StrUtil.SLASH));
+        // ftp是的路径是"/" 结尾
+        if (!config.getBasePath().endsWith(StrUtil.SLASH)) {
+            config.setBasePath(config.getBasePath() + StrUtil.SLASH);
         }
         // 初始化 Ftp 对象
         this.ftp = new Ftp(config.getHost(), config.getPort(), config.getUsername(), config.getPassword(),
@@ -60,7 +62,7 @@ public class FtpFileClient extends AbstractFileClient<FtpFileClientConfig> {
     public byte[] getContent(String path) {
         String filePath = getFilePath(path);
         String fileName = FileUtil.getName(filePath);
-        String dir = StrUtil.removeSuffix(path, fileName);
+        String dir = StrUtil.removeSuffix(filePath, fileName);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         ftp.download(dir, fileName, out);
         return out.toByteArray();
