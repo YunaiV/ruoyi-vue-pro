@@ -27,9 +27,9 @@ public class FtpFileClient extends AbstractFileClient<FtpFileClientConfig> {
 
     @Override
     protected void doInit() {
-        //如果路径配置\a\test,替换成/a/test,替换方法已经处理为null情况
+        // 把配置的 \ 替换成 /, 如果路径配置 \a\test, 替换成 /a/test, 替换方法已经处理 null 情况
         config.setBasePath(StrUtil.replace(config.getBasePath(),StrUtil.BACKSLASH,StrUtil.SLASH));
-        // ftp是的路径是"/" 结尾
+        // ftp的路径是 / 结尾
         if (!config.getBasePath().endsWith(StrUtil.SLASH)) {
             config.setBasePath(config.getBasePath() + StrUtil.SLASH);
         }
