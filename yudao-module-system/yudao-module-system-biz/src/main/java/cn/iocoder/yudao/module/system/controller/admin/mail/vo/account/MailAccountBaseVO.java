@@ -20,10 +20,6 @@ public class MailAccountBaseVO {
     @Email(message = "必须是Email格式")
     private String username;
 
-    @ApiModelProperty(value = "密码",required = true,example = "123456")
-    @NotNull(message = "密码必填")
-    private String password;
-
     @ApiModelProperty(value = "网站",required = true,example = "www.iocoder.cn")
     @NotNull(message = "网站必填")
     private String host;

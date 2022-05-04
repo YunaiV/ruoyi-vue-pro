@@ -30,7 +30,7 @@ public interface MailTemplateMapper extends BaseMapperX<MailTemplateDO> {
                 .eqIfPresent("code" , code));
     };
 
-    @Select("SELECT id FROM system_mail_template WHERE update_time > #{maxUpdateTime} LIMIT 1")
+    @Select("SELECT COUNT(*) FROM system_mail_template WHERE update_time > #{maxUpdateTime} LIMIT 1")
     Long selectByMaxUpdateTime(Date maxUpdateTime);
 
     default MailTemplateDO selectOneByAccountId(Long accountId){

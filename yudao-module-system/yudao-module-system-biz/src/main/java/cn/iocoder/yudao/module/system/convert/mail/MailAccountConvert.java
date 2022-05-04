@@ -4,6 +4,7 @@ import cn.hutool.extra.mail.MailAccount;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.system.controller.admin.mail.vo.account.MailAccountBaseVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.mail.MailAccountDO;
+import cn.iocoder.yudao.module.system.mq.message.mail.MailSendMessage;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
@@ -23,7 +24,7 @@ public interface MailAccountConvert {
 
     List<MailAccountBaseVO> convertList02(List<MailAccountDO> list);
 
-    default MailAccount convertAccount(MailAccountDO mailAccountDO){
+    default MailAccount convertAccount(MailSendMessage mailAccountDO){
         return new MailAccount()
                 .setHost(mailAccountDO.getHost())
                 .setPort(mailAccountDO.getPort())

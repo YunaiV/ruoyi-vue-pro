@@ -18,6 +18,7 @@ import cn.iocoder.yudao.module.system.dal.dataobject.mail.MailTemplateDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsTemplateDO;
 import cn.iocoder.yudao.module.system.dal.mysql.mail.MailAccountMapper;
 import cn.iocoder.yudao.module.system.dal.mysql.mail.MailTemplateMapper;
+import cn.iocoder.yudao.module.system.mq.producer.mail.MailProducer;
 import cn.iocoder.yudao.module.system.service.mail.MailTemplateService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -48,59 +49,53 @@ public class MailTemplateServiceImpl implements MailTemplateService {
     @Resource
     private MailTemplateMapper mailTemplateMapper;
     @Resource
-    private MailAccountMapper mailAccountMapper;
-
-    private volatile List<MailTemplateDO> mailTemplateDOList;
+    private MailProducer mailProducer;
 
     /**
      * 邮件模板缓存
-     * key：邮箱模板编码 {@link MailTemplateDO#getCode()}
+     * key：邮箱模板编码 {@link MailTemplateDO#getId()}
      *
      * 这里声明 volatile 修饰的原因是，每次刷新时，直接修改指向
      */
-    private volatile Map<String, MailTemplateDO> mailTemplateCache;
+    private volatile Map<Long, MailTemplateDO> mailTemplateCache;
 
     private volatile Date maxUpdateTime;
 
-    // TODO @wangjingyi：参考下别的模块的 initLocalCache 的实现
+    // TODO @wangjingyi：参考下别的模块的 initLocalCache 的实现 DONE
     @Override
     @PostConstruct
     public void initLocalCache() {
-        if(maxUpdateTime == null){
-            mailTemplateDOList = mailTemplateMapper.selectList();
-        }else{
-            if(mailTemplateMapper.selectByMaxUpdateTime(maxUpdateTime)<=0){
-                return;
-            }
-        }
+        List<MailTemplateDO> mailTemplateDOList = this.loadMailTemplateIfUpdate(maxUpdateTime);
         if (CollUtil.isEmpty(mailTemplateDOList)) {
             return;
         }
 
         // 写入缓存
-        mailTemplateCache = CollectionUtils.convertMap(mailTemplateDOList, MailTemplateDO::getCode);
+        mailTemplateCache = CollectionUtils.convertMap(mailTemplateDOList, MailTemplateDO::getId);
         maxUpdateTime = CollectionUtils.getMaxValue(mailTemplateDOList, MailTemplateDO::getUpdateTime);
         log.info("[initLocalCache][初始化 mailTemplate 数量为 {}]", mailTemplateDOList.size());
     }
 
     @Override
     public Long create(MailTemplateCreateReqVO createReqVO) {
-        // code 要校验唯一
-        // TODO @wangjingyi：参考下我在 account 给的唯一校验的说明。
-        this.validateMailTemplateOnlyByCode(createReqVO.getCode());
+        //要校验存在
+        this.validateMailTemplateExists(createReqVO.getId());
         MailTemplateDO mailTemplateDO = MailTemplateConvert.INSTANCE.convert(createReqVO);
         mailTemplateMapper.insert(mailTemplateDO);
-        // TODO @wangjingyi：mq 更新
+        // TODO @wangjingyi：mq 更新 DONE
+        mailProducer.sendMailTemplateRefreshMessage();
         return mailTemplateDO.getId();
     }
 
     @Override
     public void update(@Valid MailTemplateUpdateReqVO updateReqVO) {
-        // 校验是否存在
-        this.validateMailTemplateExists(updateReqVO.getId());
+        // 校验是否唯一
+        // TODO @wangjingyi：参考下我在 account 给的唯一校验的说明。
+        this.validateMailTemplateOnlyByCode(updateReqVO.getId(),updateReqVO.getCode());
         MailTemplateDO mailTemplateDO = MailTemplateConvert.INSTANCE.convert(updateReqVO);
         mailTemplateMapper.updateById(mailTemplateDO);
-        // TODO @wangjingyi：mq 更新
+        // TODO @wangjingyi：mq 更新 DONE
+        mailProducer.sendMailTemplateRefreshMessage();
     }
 
     @Override
@@ -108,7 +103,8 @@ public class MailTemplateServiceImpl implements MailTemplateService {
         // 校验是否存在
         this.validateMailTemplateExists(id);
         mailTemplateMapper.deleteById(id);
-        // TODO @wangjingyi：mq 更新
+        // TODO @wangjingyi：mq 更新 DONE
+        mailProducer.sendMailTemplateRefreshMessage();
     }
 
     @Override
@@ -127,43 +123,45 @@ public class MailTemplateServiceImpl implements MailTemplateService {
         return mailTemplateCache.get(code);
     }
 
+    // TODO @@wangjingyi：单词拼写错误 DONE
     @Override
-    public void sendMail(MailReqVO mailReqVO) {
-        // TODO @@wangjingyi：发送的时候，参考下短信；
-        MailTemplateDO mailTemplateDO =  mailTemplateMapper.selectById(mailReqVO.getTemplateId());
-        //查询账号信息
-        MailAccountDO mailAccountDO = mailAccountMapper.selectOne(
-                "from", mailReqVO.getFrom()
-        );
-        String content = mailReqVO.getContent();
-        Map<String , String> params = MailAccountConvert.INSTANCE.convertToMap(mailAccountDO , content);
-        content = StrUtil.format(mailTemplateDO.getContent(), params);
-
-        // 后续功能 TODO ：附件查询
-        //List<String> fileIds = mailSendVO.getFileIds();
-
-        //装载账号信息
-        MailAccount account  = MailAccountConvert.INSTANCE.convertAccount(mailAccountDO);
-
-        //发送
-        MailUtil.send(account , mailReqVO.getTos() , mailReqVO.getTitle() , content , false);
-    }
-
-    // TODO @@wangjingyi：单词拼写错误
-    @Override
-    public String formateMailTemplateContent(String content, Map<String, String> params) {
+    public String formatMailTemplateContent(String content, Map<String, String> params) {
         return StrUtil.format(content, params);
     }
 
     private void validateMailTemplateExists(Long id) {
-        if (mailTemplateMapper.selectById(id) == null) {
+        if (mailTemplateCache.get(id) == null) {
             throw exception(MAIL_TEMPLATE_NOT_EXISTS);
         }
     }
 
-    private void validateMailTemplateOnlyByCode(String code){
-        if (mailTemplateMapper.selectOneByCode(code) != null) {
-            throw exception(MAIL_TEMPLATE_EXISTS);
+    private void validateMailTemplateOnlyByCode(Long id ,String code){
+        mailTemplateCache.forEach((key,value)->{
+            if (value.getCode().equals(code)){
+                if (!key.equals(id)){
+                    throw exception(MAIL_TEMPLATE_EXISTS);
+                }
+            }
+        });
+    }
+    /**
+     * 如果邮件模板发生变化，从数据库中获取最新的全量邮件模板。
+     * 如果未发生变化，则返回空
+     *
+     * @param maxUpdateTime 当前邮件模板的最大更新时间
+     * @return 邮件模板列表
+     */
+    private List<MailTemplateDO> loadMailTemplateIfUpdate(Date maxUpdateTime) {
+        // 第一步，判断是否要更新。
+        if (maxUpdateTime == null) { // 如果更新时间为空，说明 DB 一定有新数据
+            log.info("[loadMailTemplateIfUpdate][首次加载全量邮件模板]");
+        } else { // 判断数据库中是否有更新的邮件模板
+            if (mailTemplateMapper.selectByMaxUpdateTime(maxUpdateTime) == 0) {
+                return null;
+            }
+            log.info("[loadSmsTemplateIfUpdate][增量加载全量邮件模板]");
         }
+        // 第二步，如果有更新，则从数据库加载所有邮件模板
+        return mailTemplateMapper.selectList();
     }
 }

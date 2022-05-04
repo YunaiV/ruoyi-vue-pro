@@ -7,6 +7,9 @@ import cn.iocoder.yudao.module.system.controller.admin.mail.vo.account.MailAccou
 import cn.iocoder.yudao.module.system.dal.dataobject.mail.MailAccountDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.mail.MailTemplateDO;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Select;
+
+import java.util.Date;
 
 @Mapper
 public interface MailAccountMapper extends BaseMapperX<MailAccountDO> {
@@ -25,4 +28,18 @@ public interface MailAccountMapper extends BaseMapperX<MailAccountDO> {
         return selectOne(new QueryWrapperX<MailAccountDO>()
                 .eqIfPresent("username" , userName));
     };
+
+    default MailAccountDO selectByUserNameAndId(String userName,Long id){
+        return selectOne(new QueryWrapperX<MailAccountDO>()
+                .eqIfPresent("username" , userName)
+                .neIfPresent("id" , id));
+    };
+
+    default MailAccountDO selectOneByFrom(String from){
+        return selectOne(new QueryWrapperX<MailAccountDO>()
+                .eqIfPresent("from" , from));
+    };
+
+    @Select("SELECT COUNT(*) FROM system_mail_account WHERE update_time > #{maxUpdateTime}")
+    Long selectCountByUpdateTimeGt(Date maxUpdateTime);
 }

@@ -46,5 +46,11 @@ public interface MailLogService {
      */
     Long createMailLog(MailAccountDO mailAccountDO, MailTemplateDO mailTemplateDO, String from, String content, List<String> tos, String title, Boolean isSend);
 
-    Long updateSmsSendResult(Long logId, String result);
+    /**
+     * 更新邮件发送结果
+     *
+     * @param logId          发送日志Id
+     * @param result         发送结果 默认返回messageId
+     */
+    void updateMailSendResult(Long logId, String result);
 }

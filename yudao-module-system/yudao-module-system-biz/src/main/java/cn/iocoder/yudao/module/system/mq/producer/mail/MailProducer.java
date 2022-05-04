@@ -4,7 +4,9 @@ import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.mq.core.RedisMQTemplate;
 import cn.iocoder.yudao.module.system.dal.dataobject.mail.MailAccountDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.mail.MailTemplateDO;
+import cn.iocoder.yudao.module.system.mq.message.mail.MailAccountRefreshMessage;
 import cn.iocoder.yudao.module.system.mq.message.mail.MailSendMessage;
+import cn.iocoder.yudao.module.system.mq.message.mail.MailTemplateRefreshMessage;
 import cn.iocoder.yudao.module.system.mq.message.sms.SmsChannelRefreshMessage;
 import cn.iocoder.yudao.module.system.mq.message.sms.SmsSendMessage;
 import cn.iocoder.yudao.module.system.mq.message.sms.SmsTemplateRefreshMessage;
@@ -28,18 +30,18 @@ public class MailProducer {
     private RedisMQTemplate redisMQTemplate;
 
     /**
-     * 发送 {@link SmsChannelRefreshMessage} 消息
+     * 发送 {@link MailTemplateRefreshMessage} 消息
      */
-    public void sendMailChannelRefreshMessage() {
-        SmsChannelRefreshMessage message = new SmsChannelRefreshMessage();
+    public void sendMailTemplateRefreshMessage() {
+        MailTemplateRefreshMessage message = new MailTemplateRefreshMessage();
         redisMQTemplate.send(message);
     }
 
     /**
-     * 发送 {@link SmsTemplateRefreshMessage} 消息
+     * 发送 {@link MailTemplateRefreshMessage} 消息
      */
-    public void sendMailTemplateRefreshMessage() {
-        SmsTemplateRefreshMessage message = new SmsTemplateRefreshMessage();
+    public void sendMailAccountRefreshMessage() {
+        MailAccountRefreshMessage message = new MailAccountRefreshMessage();
         redisMQTemplate.send(message);
     }
 
@@ -56,6 +58,11 @@ public class MailProducer {
         MailSendMessage message = new MailSendMessage();
         message.setContent(content);
         message.setFrom(mailAccountDO.getFrom());
+        message.setHost(mailAccountDO.getHost());
+        message.setPort(mailAccountDO.getPort());
+        message.setPassword(mailAccountDO.getPassword());
+        message.setUsername(mailAccountDO.getUsername());
+        message.setSslEnable(mailAccountDO.getSslEnable());
         message.setTemplateCode(mailTemplateDO.getCode());
         message.setTitle(title);
         message.setTos(tos);

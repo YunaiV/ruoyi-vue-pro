@@ -18,4 +18,7 @@ public class MailAccountUpdateReqVO extends MailAccountBaseVO {
     @NotNull(message = "编号不能为空")
     private Long id;
 
+    @ApiModelProperty(value = "密码",required = true,example = "123456")
+    @NotNull(message = "密码必填")
+    private String password;
 }

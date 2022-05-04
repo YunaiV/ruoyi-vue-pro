@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.system.service.mail.impl;
 
 import cn.hutool.extra.mail.MailAccount;
+import cn.hutool.extra.mail.MailUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.module.system.convert.mail.MailAccountConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.mail.MailAccountDO;
@@ -21,8 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.MAIL_TEMPLATE_EXISTS;
-import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.MAIL_TEMPLATE_NOT_EXISTS;
+import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
 
 /**
  * 邮箱模版 服务实现类
@@ -49,23 +49,19 @@ public class MailSendServiceImpl implements MailSendService {
 
     @Override
     public void sendMail(String templateCode, String from , String content , List<String> tos , String title) {
-        // TODO @@wangjingyi：发送的时候，参考下短信；
+        // TODO @@wangjingyi：发送的时候，参考下短信；DONE
+        //校验邮箱模版是否合法
         MailTemplateDO mailTemplateDO =  this.checkMailTemplateValid(templateCode);
         // 创建发送日志。如果模板被禁用，则不发送短信，只记录日志
         Boolean isSend = CommonStatusEnum.ENABLE.getStatus().equals(mailTemplateDO.getStatus());
-        //查询账号信息
-        MailAccountDO mailAccountDO = mailAccountMapper.selectOne(
-                "from", from
-        );
+        //校验账号信息是否合法
+        MailAccountDO mailAccountDO = this.checkMailAccountValid(from);
         Map<String , String> params = MailAccountConvert.INSTANCE.convertToMap(mailAccountDO , content);
-        content = mailTemplateService.formateMailTemplateContent(mailTemplateDO.getContent(), params);
+        content = mailTemplateService.formatMailTemplateContent(mailTemplateDO.getContent(), params);
         Long sendLogId = mailLogService.createMailLog(mailAccountDO , mailTemplateDO , from , content , tos , title , isSend);
 
         // 后续功能 TODO ：附件查询
         //List<String> fileIds = mailSendVO.getFileIds();
-
-        //装载账号信息
-        MailAccount account  = MailAccountConvert.INSTANCE.convertAccount(mailAccountDO);
 
         // 发送 MQ 消息，异步执行发送短信
         if (isSend) {
@@ -73,12 +69,27 @@ public class MailSendServiceImpl implements MailSendService {
         }
     }
 
+    private MailAccountDO checkMailAccountValid(String from) {
+        MailAccountDO mailAccountDO = mailAccountMapper.selectOneByFrom(from);
+        if(null == mailAccountDO){
+            throw exception(MAIL_ACCOUNT_NOT_EXISTS);
+        }
+        return mailAccountDO;
+    }
+
     @Override
     public void doSendMail(MailSendMessage message) {
-        // TODO @wangjingyi：直接使用 hutool 发送，不要封装 mail client 哈，因为短信的客户端都是比较统一的
-        //MailClient mailClient = mailClientFactory.getMailClient();
-        //String result = mailClient.sendMail(message.getFrom() , message.getContent() , message.getTitle() , message.getTos());
-        //mailLogService.updateSmsSendResult(message.getLogId() , result);
+        // TODO @wangjingyi：直接使用 hutool 发送，不要封装 mail client 哈，因为短信的客户端都是比较统一的 DONE
+        //装载账号信息
+        MailAccount account  = MailAccountConvert.INSTANCE.convertAccount(message);
+        //发送邮件
+        try{
+            String messageId = MailUtil.send(account,message.getTos(),message.getTitle(),message.getContent(),false,null);
+            mailLogService.updateMailSendResult(message.getLogId() , messageId);
+        }catch (Exception e){
+            mailLogService.updateMailSendResult(message.getLogId() , e.getMessage());
+        }
+
     }
 
     private MailTemplateDO checkMailTemplateValid(String templateCode) {

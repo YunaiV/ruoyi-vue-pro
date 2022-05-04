@@ -18,6 +18,11 @@ import java.util.List;
 public interface MailAccountService {
 
     /**
+     * 初始化邮箱账号的本地缓存
+     */
+    void initLocalCache();
+
+    /**
      * 创建邮箱账号
      *
      * @param createReqVO 邮箱账号信息

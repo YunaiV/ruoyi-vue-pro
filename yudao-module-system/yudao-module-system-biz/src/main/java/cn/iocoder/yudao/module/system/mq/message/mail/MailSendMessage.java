@@ -28,6 +28,16 @@ public class MailSendMessage extends AbstractStreamMessage {
     @NotNull(message = "邮箱地址不能为空")
     private String from;
     /**
+     * 用户名
+     */
+    @NotNull(message = "用户名不能为空")
+    private String username;
+    /**
+     * 密码
+     */
+    @NotNull(message = "密码不能为空")
+    private String password;
+    /**
      * 邮箱模板编号
      */
     @NotNull(message = "邮箱模板编号不能为空")
@@ -45,6 +55,20 @@ public class MailSendMessage extends AbstractStreamMessage {
      * 内容
      */
     private String content;
+    /**
+     * 主机
+     */
+    @NotNull(message = "host不能为空")
+    private String host;
+    /**
+     * 端口
+     */
+    @NotNull(message = "端口号不能为空")
+    private Integer port;
+    /**
+     * 是否开启 SSL
+     */
+    private Boolean sslEnable;
 
     @Override
     public String getStreamKey() {

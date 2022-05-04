@@ -57,7 +57,7 @@ public class MailAccountController {
     }
 
     // TODO @wangjingyi：getMailAccount 和 getMailAccountPage 这两个接口，定义一个对应的 Resp 类哈，参考别的模块。主要不要返回 password 字段。
-    // 一个可以的做法，是 MailAccountBaseVO 不返回 password，然后 MailAccountCreateReqVO、MailAccountUpdateReqVO 添加这个字段
+    // 一个可以的做法，是 MailAccountBaseVO 不返回 password，然后 MailAccountCreateReqVO、MailAccountUpdateReqVO 添加这个字段 DONE
 
     @GetMapping("/get")
     @ApiOperation("获得邮箱账号")
@@ -76,7 +76,7 @@ public class MailAccountController {
         return success(MailAccountConvert.INSTANCE.convertPage(pageResult));
     }
 
-    // TODO @wangjingyi：getSimpleMailAccountList 单独定义一个类，只返回精简的信息，id，from 即可。像密码之类都是敏感信息，不应该返回
+    // TODO @wangjingyi：getSimpleMailAccountList 单独定义一个类，只返回精简的信息，id，from 即可。像密码之类都是敏感信息，不应该返回 DONE
 
     @GetMapping("/list-all-simple")
     @ApiOperation(value = "获得邮箱账号精简列表")

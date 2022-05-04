@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.system.convert.mail;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.system.controller.admin.mail.vo.template.MailTemplateBaseVO;
+import cn.iocoder.yudao.module.system.controller.admin.mail.vo.template.MailTemplateRespVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.mail.MailTemplateDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
@@ -14,9 +15,9 @@ public interface MailTemplateConvert {
 
     MailTemplateDO convert(MailTemplateBaseVO baseVO);
 
-    MailTemplateBaseVO convert(MailTemplateDO mailTemplateDO);
+    MailTemplateRespVO convert(MailTemplateDO mailTemplateDO);
 
-    PageResult<MailTemplateBaseVO> convertPage(PageResult<MailTemplateDO> pageResult);
+    PageResult<MailTemplateRespVO> convertPage(PageResult<MailTemplateDO> pageResult);
 
-    List<MailTemplateBaseVO> convertList02(List<MailTemplateDO> list);
+    List<MailTemplateRespVO> convertList02(List<MailTemplateDO> list);
 }

@@ -3,10 +3,7 @@ package cn.iocoder.yudao.module.system.controller.admin.mail;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.system.controller.admin.mail.vo.send.MailReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.mail.vo.template.MailTemplateBaseVO;
-import cn.iocoder.yudao.module.system.controller.admin.mail.vo.template.MailTemplateCreateReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.mail.vo.template.MailTemplatePageReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.mail.vo.template.MailTemplateUpdateReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.mail.vo.template.*;
 import cn.iocoder.yudao.module.system.convert.mail.MailTemplateConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.mail.MailTemplateDO;
 import cn.iocoder.yudao.module.system.service.mail.MailTemplateService;
@@ -29,9 +26,9 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 @RequestMapping("/system/mail-template")
 public class MailTemplateController {
 
-    // TODO @wangjingyi：private
+    // TODO @wangjingyi：private DONE
     @Autowired
-    MailTemplateService mailTempleService;
+    private MailTemplateService mailTempleService;
 
     @PostMapping("/create")
     @ApiOperation("创建邮箱模版")
@@ -56,13 +53,13 @@ public class MailTemplateController {
         return success(true);
     }
 
-    // TODO @wangjingyi：下面几个 VO 也参考我在 account 给的建议
+    // TODO @wangjingyi：下面几个 VO 也参考我在 account 给的建议 DONE RespVO中需要BaseVO 中哪些字段
 
     @GetMapping("/get")
     @ApiOperation("获得邮箱模版")
     @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
     @PreAuthorize("@ss.hasPermission('system:mail-template:get')")
-    public CommonResult<MailTemplateBaseVO> getMailTemplate(@RequestParam("id") Long id) {
+    public CommonResult<MailTemplateRespVO> getMailTemplate(@RequestParam("id") Long id) {
         MailTemplateDO mailTemplateDO = mailTempleService.getMailTemplate(id);
         return success(MailTemplateConvert.INSTANCE.convert(mailTemplateDO));
     }
@@ -70,25 +67,17 @@ public class MailTemplateController {
     @GetMapping("/page")
     @ApiOperation("获得邮箱模版分页")
     @PreAuthorize("@ss.hasPermission('system:mail-template:query')")
-    public CommonResult<PageResult<MailTemplateBaseVO>> getMailTemplatePage(@Valid MailTemplatePageReqVO pageReqVO) {
+    public CommonResult<PageResult<MailTemplateRespVO>> getMailTemplatePage(@Valid MailTemplatePageReqVO pageReqVO) {
         PageResult<MailTemplateDO> pageResult = mailTempleService.getMailTemplatePage(pageReqVO);
         return success(MailTemplateConvert.INSTANCE.convertPage(pageResult));
     }
 
     @GetMapping("/list-all-simple")
     @ApiOperation(value = "获得邮箱模版精简列表")
-    public CommonResult<List<MailTemplateBaseVO>> getSimpleTemplateList() {
+    public CommonResult<List<MailTemplateRespVO>> getSimpleTemplateList() {
         List<MailTemplateDO> list = mailTempleService.getMailTemplateList();
         // 排序后，返回给前端
         list.sort(Comparator.comparing(MailTemplateDO::getId));
         return success(MailTemplateConvert.INSTANCE.convertList02(list));
-    }
-
-    @PostMapping("/send")
-    @ApiOperation("发送邮件")
-    @PreAuthorize("@ss.hasPermission('system:mail-template:send')")
-    public CommonResult<Boolean> sendMail(@Valid @RequestBody MailReqVO mailReqVO){
-        mailTempleService.sendMail(mailReqVO);
-        return success(true);
     }
 }

@@ -8,13 +8,11 @@ import cn.iocoder.yudao.module.system.dal.dataobject.mail.MailLogDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.mail.MailTemplateDO;
 import cn.iocoder.yudao.module.system.dal.mysql.mail.MailLogMapper;
 import cn.iocoder.yudao.module.system.enums.mail.MailSendStatusEnum;
-import cn.iocoder.yudao.module.system.enums.sms.SmsSendStatusEnum;
 import cn.iocoder.yudao.module.system.service.mail.MailLogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -61,21 +59,14 @@ public class MailLogServiceImpl implements MailLogService {
         return mailLogDO.getId();
     }
 
-    // TODO @wangjingyi：不需要返回 id 呀
+    // TODO @wangjingyi：不需要返回 id 呀 DONE
     @Override
-    public Long updateSmsSendResult(Long logId, String result) {
+    public void updateMailSendResult(Long logId, String result) {
         MailLogDO.MailLogDOBuilder logDOBuilder = MailLogDO.builder();
         logDOBuilder.id(logId);
         logDOBuilder.sendResult(result);
         MailLogDO mailLogDO = logDOBuilder.build();
         mailLogMapper.updateById(mailLogDO);
-        return logId;
     }
 
-    // TODO @wangjingyi：无用的方法，需要进行删除
-    public Long create(){
-        MailLogDO mailLogDO = new MailLogDO();
-        mailLogMapper.insert(mailLogDO);
-        return mailLogDO.getId();
-    }
 }

@@ -19,6 +19,9 @@ import java.util.Map;
  */
 public interface MailTemplateService {
 
+    /**
+     * 初始化邮箱模版的本地缓存
+     */
     void initLocalCache();
 
     /**
@@ -74,17 +77,10 @@ public interface MailTemplateService {
     MailTemplateDO getMailTemplateByCodeFromCache(String code);
 
     /**
-     * 发送邮件
-     *
-     * @param mailReqVO 邮件发送信息
-     */
-    void sendMail(MailReqVO mailReqVO);
-
-    /**
      * 邮件模版内容合成
      * @param content 邮箱模版
      * @param params 合成参数
      * @return
      */
-    String formateMailTemplateContent(String content, Map<String, String> params);
+    String formatMailTemplateContent(String content, Map<String, String> params);
 }
