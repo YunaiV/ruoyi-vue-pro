@@ -134,6 +134,7 @@ public class AuthServiceImplTest extends BaseDbUnitTest {
         AuthLoginReqVO reqVO = randomPojo(AuthLoginReqVO.class);
         String userIp = randomString();
         String userAgent = randomString();
+
         // 调用, 并断言异常
         assertServiceException(() -> authService.login(reqVO, userIp, userAgent), AUTH_LOGIN_CAPTCHA_NOT_FOUND);
         // 校验调用参数
@@ -148,10 +149,12 @@ public class AuthServiceImplTest extends BaseDbUnitTest {
         // 准备参数
         String userIp = randomString();
         String userAgent = randomString();
-        String code = randomString();
         AuthLoginReqVO reqVO = randomPojo(AuthLoginReqVO.class);
+
         // mock 验证码不正确
+        String code = randomString();
         when(captchaService.getCaptchaCode(reqVO.getUuid())).thenReturn(code);
+
         // 调用, 并断言异常
         assertServiceException(() -> authService.login(reqVO, userIp, userAgent), AUTH_LOGIN_CAPTCHA_CODE_ERROR);
         // 校验调用参数
@@ -172,6 +175,7 @@ public class AuthServiceImplTest extends BaseDbUnitTest {
         // mock 抛出异常
         when(authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(reqVO.getUsername(), reqVO.getPassword())))
                 .thenThrow(new BadCredentialsException("测试账号或密码不正确"));
+
         // 调用, 并断言异常
         assertServiceException(() -> authService.login(reqVO, userIp, userAgent), AUTH_LOGIN_BAD_CREDENTIALS);
         // 校验调用参数
@@ -188,11 +192,13 @@ public class AuthServiceImplTest extends BaseDbUnitTest {
         String userIp = randomString();
         String userAgent = randomString();
         AuthLoginReqVO reqVO = randomPojo(AuthLoginReqVO.class);
+
         // mock 验证码正确
         when(captchaService.getCaptchaCode(reqVO.getUuid())).thenReturn(reqVO.getCode());
         // mock 抛出异常
         when(authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(reqVO.getUsername(), reqVO.getPassword())))
                 .thenThrow(new DisabledException("测试用户被禁用"));
+
         // 调用, 并断言异常
         assertServiceException(() -> authService.login(reqVO, userIp, userAgent), AUTH_LOGIN_USER_DISABLED);
         // 校验调用参数
@@ -214,6 +220,7 @@ public class AuthServiceImplTest extends BaseDbUnitTest {
         // mock 抛出异常
         when(authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(reqVO.getUsername(), reqVO.getPassword())))
                 .thenThrow(new AuthenticationException("测试未知异常") {});
+
         // 调用, 并断言异常
         assertServiceException(() -> authService.login(reqVO, userIp, userAgent), AUTH_LOGIN_FAIL_UNKNOWN);
         // 校验调用参数
@@ -229,27 +236,29 @@ public class AuthServiceImplTest extends BaseDbUnitTest {
         // 准备参数
         String userIp = randomString();
         String userAgent = randomString();
+        AuthLoginReqVO reqVO = randomPojo(AuthLoginReqVO.class);
+
+        // mock 验证码正确
+        when(captchaService.getCaptchaCode(reqVO.getUuid())).thenReturn(reqVO.getCode());
+        // mock authentication
         Long userId = randomLongId();
         Set<Long> userRoleIds = randomSet(Long.class);
-        String sessionId = randomString();
-        AuthLoginReqVO reqVO = randomPojo(AuthLoginReqVO.class);
         LoginUser loginUser = randomPojo(LoginUser.class, o -> {
             o.setId(userId);
             o.setRoleIds(userRoleIds);
         });
-        // mock 验证码正确
-        when(captchaService.getCaptchaCode(reqVO.getUuid())).thenReturn(reqVO.getCode());
-        // mock authentication
         when(authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(reqVO.getUsername(), reqVO.getPassword())))
                 .thenReturn(authentication);
         when(authentication.getPrincipal()).thenReturn(loginUser);
         // mock 获得 User 拥有的角色编号数组
         when(permissionService.getUserRoleIds(userId, singleton(CommonStatusEnum.ENABLE.getStatus()))).thenReturn(userRoleIds);
         // mock 缓存登录用户到 Redis
-        when(userSessionService.createUserSession(loginUser, userIp, userAgent)).thenReturn(sessionId);
+        String token = randomString();
+        when(userSessionService.createUserSession(loginUser, userIp, userAgent)).thenReturn(token);
+
         // 调用, 并断言异常
         String login = authService.login(reqVO, userIp, userAgent);
-        assertEquals(sessionId, login);
+        assertEquals(token, login);
         // 校验调用参数
         verify(captchaService, times(1)).deleteCaptchaCode(reqVO.getUuid());
         verify(loginLogService, times(1)).createLoginLog(

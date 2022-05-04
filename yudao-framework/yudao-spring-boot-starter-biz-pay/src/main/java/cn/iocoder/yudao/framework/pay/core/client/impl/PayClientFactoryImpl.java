@@ -7,6 +7,7 @@ import cn.iocoder.yudao.framework.pay.core.client.PayClientFactory;
 import cn.iocoder.yudao.framework.pay.core.client.impl.alipay.AlipayPayClientConfig;
 import cn.iocoder.yudao.framework.pay.core.client.impl.alipay.AlipayQrPayClient;
 import cn.iocoder.yudao.framework.pay.core.client.impl.alipay.AlipayWapPayClient;
+import cn.iocoder.yudao.framework.pay.core.client.impl.wx.WXNativePayClient;
 import cn.iocoder.yudao.framework.pay.core.client.impl.wx.WXPayClientConfig;
 import cn.iocoder.yudao.framework.pay.core.client.impl.wx.WXPubPayClient;
 import cn.iocoder.yudao.framework.pay.core.enums.PayChannelEnum;
@@ -63,6 +64,7 @@ public class PayClientFactoryImpl implements PayClientFactory {
             case WX_PUB: return (AbstractPayClient<Config>) new WXPubPayClient(channelId, (WXPayClientConfig) config);
             case WX_LITE: return (AbstractPayClient<Config>) new WXPubPayClient(channelId, (WXPayClientConfig) config);
             case WX_APP: return (AbstractPayClient<Config>) new WXPubPayClient(channelId, (WXPayClientConfig) config);
+            case WX_NATIVE: return (AbstractPayClient<Config>) new WXNativePayClient(channelId, (WXPayClientConfig) config);
             case ALIPAY_WAP: return (AbstractPayClient<Config>) new AlipayWapPayClient(channelId, (AlipayPayClientConfig) config);
             case ALIPAY_QR: return (AbstractPayClient<Config>) new AlipayQrPayClient(channelId, (AlipayPayClientConfig) config);
             case ALIPAY_APP: return (AbstractPayClient<Config>) new AlipayQrPayClient(channelId, (AlipayPayClientConfig) config);

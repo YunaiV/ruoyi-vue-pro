@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum;
+import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -20,6 +21,7 @@ import java.util.Map;
  * @author 芋道源码
  */
 @TableName(value = "system_operate_log", autoResultMap = true)
+@KeySequence("system_operate_log_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class OperateLogDO extends BaseDO {
@@ -70,7 +72,6 @@ public class OperateLogDO extends BaseDO {
      *
      * 枚举 {@link OperateTypeEnum}
      */
-    @TableField("operate_type")
     private Integer type;
     /**
      * 操作内容，记录整个操作的明细

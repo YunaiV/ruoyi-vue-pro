@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.framework.mybatis.core.type.JsonLongSetTypeHandler;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmTaskAssignRuleTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmTaskRuleScriptEnum;
+import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -21,6 +22,7 @@ import java.util.Set;
  * @author 芋道源码
  */
 @TableName(value = "bpm_task_assign_rule", autoResultMap = true)
+@KeySequence("bpm_task_assign_rule_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
@@ -31,8 +33,9 @@ public class BpmTaskAssignRuleDO extends BaseDO {
 
     /**
      * {@link #processDefinitionId} 空串，用于标识属于流程模型，而不属于流程定义
+     * 不使用空串的原因，Oracle 针对空串，会处理成 null，进而导致无法检索
      */
-    public static final String PROCESS_DEFINITION_ID_NULL = "";
+    public static final String PROCESS_DEFINITION_ID_NULL = "DEFAULT";
 
     /**
      * 编号
@@ -64,7 +67,6 @@ public class BpmTaskAssignRuleDO extends BaseDO {
      *
      * 枚举 {@link BpmTaskAssignRuleTypeEnum}
      */
-    @TableField("`type`")
     private Integer type;
     /**
      * 规则值数组，一般关联指定表的编号

@@ -7,7 +7,7 @@
     </el-table-column>
     <el-table-column label="操作" align="left" >
       <template slot-scope="scope">
-        <div v-if="scope.row.unionId">
+        <div v-if="scope.row.openid">
           已绑定
           <el-button size="large" type="text" @click="unbind(scope.row)">(解绑)</el-button>
         </div>
@@ -23,7 +23,8 @@
 <script>
 
 import {SystemUserSocialTypeEnum} from "@/utils/constants";
-import {socialAuthRedirect, socialBind, socialUnbind} from "@/api/login";
+import {socialAuthRedirect} from "@/api/login";
+import {socialBind, socialUnbind} from "@/api/system/socialUser";
 
 export default {
   props: {
@@ -50,7 +51,7 @@ export default {
         if (this.user.socialUsers) {
           for (const j in this.user.socialUsers) {
             if (socialUser.type === this.user.socialUsers[j].type) {
-              socialUser.unionId = this.user.socialUsers[j].unionId;
+              socialUser.openid = this.user.socialUsers[j].openid;
               break;
             }
           }
@@ -86,9 +87,9 @@ export default {
       });
     },
     unbind(socialUser) {
-      socialUnbind(socialUser.type, socialUser.unionId).then(resp => {
+      socialUnbind(socialUser.type, socialUser.openid).then(resp => {
         this.$modal.msgSuccess("解绑成功");
-        socialUser.unionId = undefined;
+        socialUser.openid = undefined;
       });
     },
     close() {

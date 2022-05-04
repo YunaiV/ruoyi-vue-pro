@@ -3,9 +3,7 @@ package cn.iocoder.yudao.module.system.dal.dataobject.auth;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -21,17 +19,22 @@ import java.util.Date;
  *
  * @author 芋道源码
  */
-@TableName(value = "system_user_session", autoResultMap = true)
+@TableName(value = "system_user_session")
+@KeySequence(value = "system_user_session_seq")
 @Data
 @Builder
 @EqualsAndHashCode(callSuper = true)
 public class UserSessionDO extends BaseDO {
 
     /**
-     * 会话编号, 即 sessionId
+     * 会话编号
      */
-    @TableId(type = IdType.INPUT)
-    private String id;
+    private Long id;
+    /**
+     * 令牌
+     */
+    private String token;
+
     /**
      * 用户编号
      *

@@ -12,10 +12,6 @@ import javax.validation.constraints.NotNull;
 @Data
 public class CodegenTableBaseVO {
 
-    @ApiModelProperty(value = "导入类型", required = true, example = "1", notes = "参见 CodegenImportTypeEnum 枚举")
-    @NotNull(message = "导入类型不能为空")
-    private Integer importType;
-
     @ApiModelProperty(value = "生成场景", required = true, example = "1", notes = "参见 CodegenSceneEnum 枚举")
     @NotNull(message = "导入类型不能为空")
     private Integer scene;

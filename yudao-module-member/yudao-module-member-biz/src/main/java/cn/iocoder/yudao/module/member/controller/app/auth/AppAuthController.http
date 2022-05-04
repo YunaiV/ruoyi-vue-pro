@@ -9,7 +9,7 @@ tenant-id: {{appTenentId}}
 }
 
 ### 请求 /send-sms-code 接口 => 成功
-POST {{appApi}}/member/send-sms-code
+POST {{appApi}}/member/auth/send-sms-code
 Content-Type: application/json
 tenant-id: {{appTenentId}}
 

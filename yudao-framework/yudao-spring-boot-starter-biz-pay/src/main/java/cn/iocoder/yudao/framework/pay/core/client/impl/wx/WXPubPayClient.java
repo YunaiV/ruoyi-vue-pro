@@ -98,7 +98,7 @@ public class WXPubPayClient extends AbstractPayClient<WXPayClientConfig> {
                 // TODO 芋艿：貌似没 title？
                 .body(reqDTO.getBody())
                 .totalFee(reqDTO.getAmount().intValue()) // 单位分
-                .timeExpire(DateUtil.format(reqDTO.getExpireTime(), "yyyyMMddHHmmss"))
+                .timeExpire(DateUtil.format(reqDTO.getExpireTime(), "yyyy-MM-dd'T'HH:mm:ssXXX"))
                 .spbillCreateIp(reqDTO.getUserIp())
                 .openid(getOpenid(reqDTO))
                 .notifyUrl(reqDTO.getNotifyUrl())
@@ -114,7 +114,7 @@ public class WXPubPayClient extends AbstractPayClient<WXPayClientConfig> {
         // TODO 芋艿：貌似没 title？
         request.setDescription(reqDTO.getBody());
         request.setAmount(new WxPayUnifiedOrderV3Request.Amount().setTotal(reqDTO.getAmount().intValue())); // 单位分
-        request.setTimeExpire(DateUtil.format(reqDTO.getExpireTime(), "yyyyMMddHHmmss"));
+        request.setTimeExpire(DateUtil.format(reqDTO.getExpireTime(), "yyyy-MM-dd'T'HH:mm:ssXXX"));
         request.setPayer(new WxPayUnifiedOrderV3Request.Payer().setOpenid(getOpenid(reqDTO)));
         request.setSceneInfo(new WxPayUnifiedOrderV3Request.SceneInfo().setPayerClientIp(reqDTO.getUserIp()));
         request.setNotifyUrl(reqDTO.getNotifyUrl());

@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.system.controller.admin.auth;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
-import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.collection.SetUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
@@ -36,7 +35,7 @@ import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUti
 
 @Api(tags = "管理后台 - 认证")
 @RestController
-@RequestMapping("/system") // 暂时不跟 /auth 结尾
+@RequestMapping("/system/auth") // 暂时不跟 /auth 结尾
 @Validated
 @Slf4j
 public class AuthController {
@@ -80,7 +79,7 @@ public class AuthController {
         return success(AuthConvert.INSTANCE.convert(user, roleList, menuList));
     }
 
-    @GetMapping("list-menus")
+    @GetMapping("/list-menus")
     @ApiOperation("获得登录用户的菜单列表")
     public CommonResult<List<AuthMenuRespVO>> getMenus() {
         // 获得用户拥有的菜单列表
@@ -90,6 +89,25 @@ public class AuthController {
                 SetUtils.asSet(CommonStatusEnum.ENABLE.getStatus())); // 只要开启的
         // 转换成 Tree 结构返回
         return success(AuthConvert.INSTANCE.buildMenuTree(menuList));
+    }
+
+    // ========== 短信登录相关 ==========
+
+    @PostMapping("/sms-login")
+    @ApiOperation("使用短信验证码登录")
+    @OperateLog(enable = false) // 避免 Post 请求被记录操作日志
+    public CommonResult<AuthLoginRespVO> smsLogin(@RequestBody @Valid AuthSmsLoginReqVO reqVO) {
+        String token = authService.smsLogin(reqVO, getClientIP(), getUserAgent());
+        // 返回结果
+        return success(AuthLoginRespVO.builder().token(token).build());
+    }
+
+    @PostMapping("/send-sms-code")
+    @ApiOperation(value = "发送手机验证码")
+    @OperateLog(enable = false) // 避免 Post 请求被记录操作日志
+    public CommonResult<Boolean> sendLoginSmsCode(@RequestBody @Valid AuthSmsSendReqVO reqVO) {
+        authService.sendSmsCode(reqVO);
+        return success(true);
     }
 
     // ========== 社交登录相关 ==========
@@ -105,36 +123,22 @@ public class AuthController {
         return CommonResult.success(socialUserService.getAuthorizeUrl(type, redirectUri));
     }
 
-    @PostMapping("/social-login")
-    @ApiOperation("社交登录，使用 code 授权码")
+    @PostMapping("/social-quick-login")
+    @ApiOperation("社交快捷登录，使用 code 授权码")
     @OperateLog(enable = false) // 避免 Post 请求被记录操作日志
-    public CommonResult<AuthLoginRespVO> socialLogin(@RequestBody @Valid AuthSocialLoginReqVO reqVO) {
-        String token = authService.socialLogin(reqVO, getClientIP(), getUserAgent());
+    public CommonResult<AuthLoginRespVO> socialQuickLogin(@RequestBody @Valid AuthSocialQuickLoginReqVO reqVO) {
+        String token = authService.socialQuickLogin(reqVO, getClientIP(), getUserAgent());
         // 返回结果
         return success(AuthLoginRespVO.builder().token(token).build());
     }
 
-    @PostMapping("/social-login2")
-    @ApiOperation("社交登录，使用 code 授权码 + 账号密码")
+    @PostMapping("/social-bind-login")
+    @ApiOperation("社交绑定登录，使用 code 授权码 + 账号密码")
     @OperateLog(enable = false) // 避免 Post 请求被记录操作日志
-    public CommonResult<AuthLoginRespVO> socialLogin2(@RequestBody @Valid AuthSocialLogin2ReqVO reqVO) {
-        String token = authService.socialLogin2(reqVO, getClientIP(), getUserAgent());
+    public CommonResult<AuthLoginRespVO> socialBindLogin(@RequestBody @Valid AuthSocialBindLoginReqVO reqVO) {
+        String token = authService.socialBindLogin(reqVO, getClientIP(), getUserAgent());
         // 返回结果
         return success(AuthLoginRespVO.builder().token(token).build());
-    }
-
-    @PostMapping("/social-bind")
-    @ApiOperation("社交绑定，使用 code 授权码")
-    public CommonResult<Boolean> socialBind(@RequestBody @Valid AuthSocialBindReqVO reqVO) {
-        authService.socialBind(getLoginUserId(), reqVO);
-        return CommonResult.success(true);
-    }
-
-    @DeleteMapping("/social-unbind")
-    @ApiOperation("取消社交绑定")
-    public CommonResult<Boolean> socialUnbind(@RequestBody AuthSocialUnbindReqVO reqVO) {
-        socialUserService.unbindSocialUser(getLoginUserId(), UserTypeEnum.ADMIN.getValue(), reqVO.getType(), reqVO.getUnionId());
-        return CommonResult.success(true);
     }
 
 }

@@ -69,10 +69,9 @@ public class UserSessionController {
 
     @DeleteMapping("/delete")
     @ApiOperation("删除 Session")
-    @ApiImplicitParam(name = "id", value = "Session 编号", required = true, dataTypeClass = String.class,
-            example = "fe50b9f6-d177-44b1-8da9-72ea34f63db7")
+    @ApiImplicitParam(name = "id", value = "Session 编号", required = true, dataTypeClass = Long.class, example = "1024")
     @PreAuthorize("@ss.hasPermission('system:user-session:delete')")
-    public CommonResult<Boolean> deleteUserSession(@RequestParam("id") String id) {
+    public CommonResult<Boolean> deleteUserSession(@RequestParam("id") Long id) {
         userSessionService.deleteUserSession(id);
         return success(true);
     }

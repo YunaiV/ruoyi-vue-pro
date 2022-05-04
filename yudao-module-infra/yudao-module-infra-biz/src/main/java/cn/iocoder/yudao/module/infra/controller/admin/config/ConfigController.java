@@ -68,15 +68,15 @@ public class ConfigController {
     }
 
     @GetMapping(value = "/get-value-by-key")
-    @ApiOperation(value = "根据参数键名查询参数值", notes = "敏感配置，不允许返回给前端")
+    @ApiOperation(value = "根据参数键名查询参数值", notes = "不可见的配置，不允许返回给前端")
     @ApiImplicitParam(name = "key", value = "参数键", required = true, example = "yunai.biz.username", dataTypeClass = String.class)
     public CommonResult<String> getConfigKey(@RequestParam("key") String key) {
         ConfigDO config = configService.getConfigByKey(key);
         if (config == null) {
             return null;
         }
-        if (config.getSensitive()) {
-            throw ServiceExceptionUtil.exception(ErrorCodeConstants.CONFIG_GET_VALUE_ERROR_IF_SENSITIVE);
+        if (config.getVisible()) {
+            throw ServiceExceptionUtil.exception(ErrorCodeConstants.CONFIG_GET_VALUE_ERROR_IF_VISIBLE);
         }
         return success(config.getValue());
     }
