@@ -119,13 +119,17 @@ public interface ErrorCodeConstants {
     ErrorCode SOCIAL_USER_UNBIND_NOT_SELF = new ErrorCode(1002018001, "社交解绑失败，非当前用户绑定");
     ErrorCode SOCIAL_USER_NOT_FOUND = new ErrorCode(1002018002, "社交授权失败，找不到对应的用户");
 
-    // ========== 邮箱账号 1002019000 ==========
-    ErrorCode MAIL_ACCOUNT_NOT_EXISTS = new ErrorCode(1002019000, "邮箱账号不存在");
-    ErrorCode MAIL_ACCOUNT_EXISTS = new ErrorCode(1002019001, "邮箱账号存在");
+    // ========== 系统铭感词 1002019000 =========
+    ErrorCode SENSITIVE_WORD_NOT_EXISTS = new ErrorCode(1002019000, "系统敏感词在所有标签中都不存在");
+    ErrorCode SENSITIVE_WORD_EXISTS = new ErrorCode(1002019001, "系统敏感词已在标签中存在");
 
-    // ========== 邮箱模版 1002020000 ==========
-    ErrorCode MAIL_TEMPLATE_NOT_EXISTS = new ErrorCode(1002020000 , "邮箱模版不存在");
-    ErrorCode MAIL_TEMPLATE_EXISTS = new ErrorCode(1002020001, "邮箱模版存在");
-    ErrorCode MAIL_RELATE_TEMPLATE_EXISTS = new ErrorCode(1002020002, "存在关联邮箱模版");
+    // ========== 邮箱账号 1002020000 ==========
+    ErrorCode MAIL_ACCOUNT_NOT_EXISTS = new ErrorCode(1002020000, "邮箱账号不存在");
+    ErrorCode MAIL_ACCOUNT_EXISTS = new ErrorCode(1002020001, "邮箱账号存在");
+
+    // ========== 邮箱模版 1002021000 ==========
+    ErrorCode MAIL_TEMPLATE_NOT_EXISTS = new ErrorCode(1002021000 , "邮箱模版不存在");
+    ErrorCode MAIL_TEMPLATE_EXISTS = new ErrorCode(1002021001, "邮箱模版存在");
+    ErrorCode MAIL_RELATE_TEMPLATE_EXISTS = new ErrorCode(1002021002, "存在关联邮箱模版");
 
 }

@@ -13,10 +13,8 @@ import cn.iocoder.yudao.module.system.service.mail.MailLogService;
 import cn.iocoder.yudao.module.system.service.mail.MailSendService;
 import cn.iocoder.yudao.module.system.service.mail.MailTemplateService;
 import lombok.extern.slf4j.Slf4j;
-import cn.iocoder.yudao.framework.mail.core.client.MailClientFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
-import cn.iocoder.yudao.framework.mail.core.client.MailClient;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -45,8 +43,6 @@ public class MailSendServiceImpl implements MailSendService {
     private MailTemplateService mailTemplateService;
     @Resource
     private MailLogService mailLogService;
-    @Resource
-    private MailClientFactory mailClientFactory;
     @Resource
     private MailProducer mailProducer;
 
@@ -80,9 +76,9 @@ public class MailSendServiceImpl implements MailSendService {
     @Override
     public void doSendMail(MailSendMessage message) {
         // TODO @wangjingyi：直接使用 hutool 发送，不要封装 mail client 哈，因为短信的客户端都是比较统一的
-        MailClient mailClient = mailClientFactory.getMailClient();
-        String result = mailClient.sendMail(message.getFrom() , message.getContent() , message.getTitle() , message.getTos());
-        mailLogService.updateSmsSendResult(message.getLogId() , result);
+        //MailClient mailClient = mailClientFactory.getMailClient();
+        //String result = mailClient.sendMail(message.getFrom() , message.getContent() , message.getTitle() , message.getTos());
+        //mailLogService.updateSmsSendResult(message.getLogId() , result);
     }
 
     private MailTemplateDO checkMailTemplateValid(String templateCode) {

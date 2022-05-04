@@ -1,11 +1,7 @@
 package cn.iocoder.yudao.module.system.convert.mail;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.system.controller.admin.mail.vo.account.MailAccountBaseVO;
 import cn.iocoder.yudao.module.system.controller.admin.mail.vo.template.MailTemplateBaseVO;
-import cn.iocoder.yudao.module.system.controller.admin.mail.vo.template.MailTemplateCreateReqVO;
-import cn.iocoder.yudao.module.system.convert.errorcode.ErrorCodeConvertImpl;
-import cn.iocoder.yudao.module.system.dal.dataobject.mail.MailAccountDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.mail.MailTemplateDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
