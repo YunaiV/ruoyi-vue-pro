@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.system.dal.dataobject.mail;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -24,6 +25,7 @@ public class MailAccountDO extends BaseDO {
     /**
      * 邮箱
      */
+    @TableField("`from`")
     private String from;
     /**
      * 用户名

@@ -16,7 +16,7 @@ public interface MailAccountMapper extends BaseMapperX<MailAccountDO> {
 
     default PageResult<MailAccountDO> selectPage(MailAccountPageReqVO pageReqVO) {
         return selectPage(pageReqVO, new QueryWrapperX<MailAccountDO>()
-                .likeIfPresent("form" , pageReqVO.getFrom())
+                .likeIfPresent("from" , pageReqVO.getFrom())
                 .likeIfPresent("host" , pageReqVO.getHost())
                 .likeIfPresent("username" , pageReqVO.getUsername())
                 .eqIfPresent("password" , pageReqVO.getPassword())
