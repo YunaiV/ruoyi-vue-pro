@@ -68,6 +68,7 @@ public class CategoryController {
         return success(CategoryConvert.INSTANCE.convert(category));
     }
 
+    // TODO @JeromeSoar：这个接口，是不是没用哈
     @GetMapping("/listByIds")
     @ApiOperation("获得商品分类列表")
     @PreAuthorize("@ss.hasPermission('product:category:query')")
@@ -76,6 +77,7 @@ public class CategoryController {
         return success(CategoryConvert.INSTANCE.convertList(list));
     }
 
+    // TODO @JeromeSoar：这应该是个 app 的接口，提供商品分类的树结构。这个调整下，后端只返回列表，前端构建 tree。注意，不需要返回创建时间、是否开启等无关字段。
     @GetMapping("/listByQuery")
     @ApiOperation("获得商品分类列表")
     @PreAuthorize("@ss.hasPermission('product:category:query')")
