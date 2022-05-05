@@ -43,7 +43,7 @@ public class MailLogServiceImpl implements MailLogService {
     @Override
     public Long createMailLog(MailAccountDO mailAccountDO , MailTemplateDO mailTemplateDO , String from, String content, List<String> tos, String title, Boolean isSend) {
         MailLogDO.MailLogDOBuilder logDOBuilder = MailLogDO.builder();
-        logDOBuilder.from(mailAccountDO.getFrom());
+        logDOBuilder.fromAddress(mailAccountDO.getFromAddress());
         logDOBuilder.accountId(mailAccountDO.getId());
         logDOBuilder.content(content);
         logDOBuilder.title(title);

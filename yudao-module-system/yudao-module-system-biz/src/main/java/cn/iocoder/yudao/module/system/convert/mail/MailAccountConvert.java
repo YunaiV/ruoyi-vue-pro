@@ -29,18 +29,18 @@ public interface MailAccountConvert {
                 .setHost(mailAccountDO.getHost())
                 .setPort(mailAccountDO.getPort())
                 .setAuth(true)
-                .setFrom(mailAccountDO.getFrom())
+                .setFrom(mailAccountDO.getFromAddress())
                 .setUser(mailAccountDO.getUsername())
                 .setPass(mailAccountDO.getPassword())
                 .setSslEnable(mailAccountDO.getSslEnable());
-    };
+    }
 
     default Map<String, String> convertToMap(MailAccountDO mailAccountDO , String content) {
         Map<String , String> map = new HashMap<>();
-        map.put("from" , mailAccountDO.getFrom());
+        map.put("from_address" , mailAccountDO.getFromAddress());
         map.put("username" , mailAccountDO.getUsername());
         map.put("content" , content);
         return map;
-    };
+    }
 
 }

@@ -26,7 +26,7 @@ public class MailSendMessage extends AbstractStreamMessage {
      * 邮箱地址
      */
     @NotNull(message = "邮箱地址不能为空")
-    private String from;
+    private String fromAddress;
     /**
      * 用户名
      */

@@ -39,7 +39,7 @@ public class MailLogDO extends BaseDO implements Serializable {
     /**
      * 邮箱账号
      */
-    private String from;
+    private String fromAddress;
 
     /**
      * 模版主键
