@@ -77,8 +77,8 @@
             <artifactId>yudao-spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-        <!-- 工具类相关 -->
 
+        <!-- 工具类相关 -->
     </dependencies>
 
 </project>

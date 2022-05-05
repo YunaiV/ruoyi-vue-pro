@@ -29,6 +29,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public Long createCategory(CategoryCreateReqVO createReqVO) {
+        // TODO JeromeSoar：校验父分类
         // 插入
         CategoryDO category = CategoryConvert.INSTANCE.convert(createReqVO);
         categoryMapper.insert(category);
@@ -38,6 +39,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public void updateCategory(CategoryUpdateReqVO updateReqVO) {
+        // TODO JeromeSoar：校验父分类
         // 校验存在
         this.validateCategoryExists(updateReqVO.getId());
         // 更新
@@ -47,6 +49,8 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public void deleteCategory(Long id) {
+        // TODO JeromeSoar：校验删除的商品分类是否存在
+        // TODO 芋艿 补充只有不存在商品才可以删除
         // 校验存在
         this.validateCategoryExists(id);
         // 删除

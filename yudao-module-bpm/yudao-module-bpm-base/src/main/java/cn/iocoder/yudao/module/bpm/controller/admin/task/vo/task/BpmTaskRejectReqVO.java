@@ -16,6 +16,6 @@ public class BpmTaskRejectReqVO {
 
     @ApiModelProperty(value = "审批意见", required = true, example = "不错不错！")
     @NotEmpty(message = "审批意见不能为空")
-    private String comment;
+    private String reason;
 
 }

@@ -28,6 +28,7 @@ public class CategoryDO extends BaseDO {
     /**
      * 父分类编号
      */
+    // TODO @JeromeSoar：改成 parentId 字段
     private Long pid;
     /**
      * 分类名称
@@ -38,7 +39,9 @@ public class CategoryDO extends BaseDO {
      */
     private String icon;
     /**
-     * 分类图片
+     * 分类 Banner 图片
+     *
+     * 第一层的商品分类，会有该字段，用于用户 App 展示
      */
     private String bannerUrl;
     /**
@@ -51,7 +54,7 @@ public class CategoryDO extends BaseDO {
     private String description;
     /**
      * 开启状态
-     * <p>
+     *
      * 枚举 {@link CommonStatusEnum}
      */
     private Integer status;

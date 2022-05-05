@@ -34,7 +34,6 @@ public interface MemberAuthService extends SecurityAuthFrameworkService {
      */
     String smsLogin(@Valid AppAuthSmsLoginReqVO reqVO, String userIp, String userAgent);
 
-
     /**
      * 社交登录，使用 code 授权码
      *
@@ -43,7 +42,7 @@ public interface MemberAuthService extends SecurityAuthFrameworkService {
      * @param userAgent 用户 UA
      * @return 身份令牌，使用 JWT 方式
      */
-    String socialLogin(@Valid AppAuthSocialLoginReqVO reqVO, String userIp, String userAgent);
+    String socialQuickLogin(@Valid AppAuthSocialQuickLoginReqVO reqVO, String userIp, String userAgent);
 
     /**
      * 社交登录，使用 手机号 + 手机验证码
@@ -53,23 +52,7 @@ public interface MemberAuthService extends SecurityAuthFrameworkService {
      * @param userAgent 用户 UA
      * @return 身份令牌，使用 JWT 方式
      */
-    String socialLogin2(@Valid AppAuthSocialLogin2ReqVO reqVO, String userIp, String userAgent);
-
-    /**
-     * 社交绑定，使用 code 授权码
-     *
-     * @param userId 用户编号
-     * @param reqVO 绑定信息
-     */
-    void socialBind(Long userId, @Valid AppAuthSocialBindReqVO reqVO);
-
-    /**
-     * 取消社交绑定
-     *
-     * @param userId 用户编号
-     * @param reqVO 解绑信息
-     */
-    void unbindSocialUser(Long userId, @Valid AppAuthSocialUnbindReqVO reqVO);
+    String socialBindLogin(@Valid AppAuthSocialBindLoginReqVO reqVO, String userIp, String userAgent);
 
     /**
      * 获得社交认证 URL
@@ -99,6 +82,6 @@ public interface MemberAuthService extends SecurityAuthFrameworkService {
      * @param userId 用户编号
      * @param reqVO 发送信息
      */
-    void sendSmsCode(Long userId, AppAuthSendSmsReqVO reqVO);
+    void sendSmsCode(Long userId, AppAuthSmsSendReqVO reqVO);
 
 }

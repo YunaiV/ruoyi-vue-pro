@@ -68,6 +68,7 @@ public class BrandController {
         return success(BrandConvert.INSTANCE.convert(brand));
     }
 
+    // TODO @JeromeSoar：这个接口，是不是没用哈
     @GetMapping("/list")
     @ApiOperation("获得品牌列表")
     @ApiImplicitParam(name = "ids", value = "编号列表", required = true, example = "1024,2048", dataTypeClass = List.class)

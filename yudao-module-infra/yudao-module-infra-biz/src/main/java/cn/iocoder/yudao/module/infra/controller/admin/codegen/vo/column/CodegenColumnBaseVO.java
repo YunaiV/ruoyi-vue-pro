@@ -22,7 +22,7 @@ public class CodegenColumnBaseVO {
 
     @ApiModelProperty(value = "字段类型", required = true, example = "int(11)")
     @NotNull(message = "字段类型不能为空")
-    private String columnType;
+    private String dataType;
 
     @ApiModelProperty(value = "字段描述", required = true, example = "年龄")
     @NotNull(message = "字段描述不能为空")

@@ -285,11 +285,11 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void updateProcessInstanceExtReject(String id, String comment) {
+    public void updateProcessInstanceExtReject(String id, String reason) {
         // 需要主动查询，因为 instance 只有 id 属性
         ProcessInstance processInstance = getProcessInstance(id);
         // 删除流程实例，以实现驳回任务时，取消整个审批流程
-        deleteProcessInstance(id, StrUtil.format(BpmProcessInstanceDeleteReasonEnum.REJECT_TASK.format(comment)));
+        deleteProcessInstance(id, StrUtil.format(BpmProcessInstanceDeleteReasonEnum.REJECT_TASK.format(reason)));
 
         // 更新 status + result
         // 注意，不能和上面的逻辑更换位置。因为 deleteProcessInstance 会触发流程的取消，进而调用 updateProcessInstanceExtCancel 方法，
@@ -300,7 +300,7 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         processInstanceExtMapper.updateByProcessInstanceId(instanceExtDO);
 
         // 发送流程被不通过的消息
-        messageService.sendMessageWhenProcessInstanceReject(BpmProcessInstanceConvert.INSTANCE.convert(processInstance, comment));
+        messageService.sendMessageWhenProcessInstanceReject(BpmProcessInstanceConvert.INSTANCE.convert(processInstance, reason));
 
         // 发送流程实例的状态事件
         processInstanceResultEventPublisher.sendProcessInstanceResultEvent(

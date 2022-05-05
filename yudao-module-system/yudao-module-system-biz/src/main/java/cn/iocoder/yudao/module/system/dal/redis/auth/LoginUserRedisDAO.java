@@ -24,24 +24,29 @@ public class LoginUserRedisDAO {
     @Resource
     private SecurityProperties securityProperties;
 
-    public LoginUser get(String sessionId) {
-        String redisKey = formatKey(sessionId);
+    public LoginUser get(String token) {
+        String redisKey = formatKey(token);
         return JsonUtils.parseObject(stringRedisTemplate.opsForValue().get(redisKey), LoginUser.class);
     }
 
-    public void set(String sessionId, LoginUser loginUser) {
-        String redisKey = formatKey(sessionId);
+    public Boolean exists(String token) {
+        String redisKey = formatKey(token);
+        return stringRedisTemplate.hasKey(redisKey);
+    }
+
+    public void set(String token, LoginUser loginUser) {
+        String redisKey = formatKey(token);
         stringRedisTemplate.opsForValue().set(redisKey, JsonUtils.toJsonString(loginUser),
                 securityProperties.getSessionTimeout());
     }
 
-    public void delete(String sessionId) {
-        String redisKey = formatKey(sessionId);
+    public void delete(String token) {
+        String redisKey = formatKey(token);
         stringRedisTemplate.delete(redisKey);
     }
 
-    private static String formatKey(String sessionId) {
-        return LOGIN_USER.formatKey(sessionId);
+    private static String formatKey(String token) {
+        return LOGIN_USER.formatKey(token);
     }
 
 }

@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.system.dal.mysql.sms;
 
-import cn.iocoder.yudao.framework.mybatis.core.enums.SqlConstants;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.QueryWrapperX;
 import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsCodeDO;
@@ -19,8 +18,11 @@ public interface SmsCodeMapper extends BaseMapperX<SmsCodeDO> {
      */
     default SmsCodeDO selectLastByMobile(String mobile, String code, Integer scene) {
         return selectOne(new QueryWrapperX<SmsCodeDO>()
-                .eq("mobile", mobile).eqIfPresent("scene", scene).eqIfPresent("code", code)
-                .orderByDesc("id").last(SqlConstants.LIMIT1));
+                .eq("mobile", mobile)
+                .eqIfPresent("scene", scene)
+                .eqIfPresent("code", code)
+                .orderByDesc("id")
+                .limit1());
     }
 
 }

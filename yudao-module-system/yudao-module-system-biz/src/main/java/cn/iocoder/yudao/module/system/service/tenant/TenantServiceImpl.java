@@ -137,7 +137,7 @@ public class TenantServiceImpl implements TenantService {
         if (maxUpdateTime == null) { // 如果更新时间为空，说明 DB 一定有新数据
             log.info("[loadTenantIfUpdate][首次加载全量租户]");
         } else { // 判断数据库中是否有更新的租户
-            if (tenantMapper.selectExistsByUpdateTimeAfter(maxUpdateTime) == null) {
+            if (tenantMapper.selectCountByUpdateTimeGt(maxUpdateTime) == 0) {
                 return null;
             }
             log.info("[loadTenantIfUpdate][增量加载全量租户]");
