@@ -25,8 +25,7 @@ public class MailAccountDO extends BaseDO {
     /**
      * 邮箱
      */
-    @TableField("`from`")
-    private String from;
+    private String fromAddress;
     /**
      * 用户名
      */

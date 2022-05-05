@@ -16,7 +16,7 @@ public interface MailAccountMapper extends BaseMapperX<MailAccountDO> {
 
     default PageResult<MailAccountDO> selectPage(MailAccountPageReqVO pageReqVO) {
         return selectPage(pageReqVO, new QueryWrapperX<MailAccountDO>()
-                .likeIfPresent("from" , pageReqVO.getFrom())
+                .likeIfPresent("from_address" , pageReqVO.getFromAddress())
                 .likeIfPresent("host" , pageReqVO.getHost())
                 .likeIfPresent("username" , pageReqVO.getUsername())
                 .eqIfPresent("password" , pageReqVO.getPassword())
@@ -27,18 +27,18 @@ public interface MailAccountMapper extends BaseMapperX<MailAccountDO> {
     default MailAccountDO selectByUserName(String userName){
         return selectOne(new QueryWrapperX<MailAccountDO>()
                 .eqIfPresent("username" , userName));
-    };
+    }
 
     default MailAccountDO selectByUserNameAndId(String userName,Long id){
         return selectOne(new QueryWrapperX<MailAccountDO>()
                 .eqIfPresent("username" , userName)
                 .neIfPresent("id" , id));
-    };
+    }
 
     default MailAccountDO selectOneByFrom(String from){
         return selectOne(new QueryWrapperX<MailAccountDO>()
-                .eqIfPresent("from" , from));
-    };
+                .eqIfPresent("from_address" , from));
+    }
 
     @Select("SELECT COUNT(*) FROM system_mail_account WHERE update_time > #{maxUpdateTime}")
     Long selectCountByUpdateTimeGt(Date maxUpdateTime);

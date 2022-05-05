@@ -14,7 +14,7 @@ import lombok.ToString;
 public class MailAccountPageReqVO extends PageParam {
 
     @ApiModelProperty(value = "邮箱" , required = true , example = "yudaoyuanma@123.com")
-    private String from;
+    private String fromAddress;
 
     @ApiModelProperty(value = "用户名" , required = true , example = "yudao")
     private String username;

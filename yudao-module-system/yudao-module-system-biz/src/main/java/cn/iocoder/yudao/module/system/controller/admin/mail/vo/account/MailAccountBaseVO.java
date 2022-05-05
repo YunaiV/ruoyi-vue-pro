@@ -13,11 +13,11 @@ public class MailAccountBaseVO {
 
     @ApiModelProperty(value = "邮箱",required = true,example = "yudaoyuanma@123.com")
     @NotNull(message = "邮箱必填")
-    private String from;
+    @Email(message = "必须是Email格式")
+    private String fromAddress;
 
     @ApiModelProperty(value = "用户名",required = true,example = "yudao")
     @NotNull(message = "用户名必填")
-    @Email(message = "必须是Email格式")
     private String username;
 
     @ApiModelProperty(value = "网站",required = true,example = "www.iocoder.cn")
