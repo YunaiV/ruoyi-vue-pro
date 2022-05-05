@@ -44,6 +44,7 @@ public class FtpFileClient extends AbstractFileClient<FtpFileClientConfig> {
         String filePath = getFilePath(path);
         String fileName = FileUtil.getName(filePath);
         String dir = StrUtil.removeSuffix(filePath, fileName);
+        ftp.reconnectIfTimeout();
         boolean success = ftp.upload(dir, fileName, new ByteArrayInputStream(content));
         if (!success) {
             throw new FtpException(StrUtil.format("上传文件到目标目录 ({}) 失败", filePath));
@@ -55,6 +56,7 @@ public class FtpFileClient extends AbstractFileClient<FtpFileClientConfig> {
     @Override
     public void delete(String path) {
         String filePath = getFilePath(path);
+        ftp.reconnectIfTimeout();
         ftp.delFile(filePath);
     }
 
@@ -64,6 +66,7 @@ public class FtpFileClient extends AbstractFileClient<FtpFileClientConfig> {
         String fileName = FileUtil.getName(filePath);
         String dir = StrUtil.removeSuffix(filePath, fileName);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
+        ftp.reconnectIfTimeout();
         ftp.download(dir, fileName, out);
         return out.toByteArray();
     }
