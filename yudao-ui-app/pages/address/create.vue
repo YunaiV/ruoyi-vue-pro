@@ -131,7 +131,7 @@ export default {
           uni.$u.toast('地址已保存')
           setTimeout(() => {
             uni.navigateBack()
-          }, 1000)
+          }, 300)
         })
       })
     }

@@ -2,7 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import { logout } from '@/api/auth'
 import { getUserInfo } from '@/api/user'
-import { passwordLogin, smsLogin } from '@/api/auth'
+import { passwordLogin, smsLogin, socialLogin } from '@/api/auth'
 
 const TokenKey = 'App-Token'
 
@@ -56,13 +56,16 @@ const store = new Vuex.Store({
   actions: {
     //账号登录
     Login({ state, commit }, { type, data }) {
-      console.log(type, data)
       if (type === 0) {
         return passwordLogin(data).then(res => {
           commit('SET_TOKEN', res.data)
         })
-      } else {
+      } else if (type === 1) {
         return smsLogin(data).then(res => {
+          commit('SET_TOKEN', res.data)
+        })
+      } else {
+        return socialLogin(data).then(res => {
           commit('SET_TOKEN', res.data)
         })
       }

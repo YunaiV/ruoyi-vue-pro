@@ -25,17 +25,17 @@
 			}
 		},
 		{
-			"path": "pages/login/login",
+			"path": "pages/login/social",
 			"style": {
-				"navigationBarTitleText": "账号登录"
+				"navigationBarTitleText": "授权登录"
 			}
 		},
-		{
-			"path": "pages/register/register",
-			"style": {
-				"navigationBarTitleText": "注册账号"
-			}
-		},
+    {
+      "path": "pages/login/mobile",
+      "style": {
+        "navigationBarTitleText": "手机登录"
+      }
+    },
 		{
 			"path": "pages/forgot/forgot",
 			"style": {

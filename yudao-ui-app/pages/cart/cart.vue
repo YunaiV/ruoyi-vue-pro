@@ -6,7 +6,7 @@
 
     <view v-if="!hasLogin" class="login-tips-box">
       <view class="login-tips">
-        <navigator url="/pages/login/login" open-type="navigate" hover-class="none">
+        <navigator url="/pages/login/social" open-type="navigate" hover-class="none">
           <text class="login-link">登录</text>
         </navigator>
         <text>查看购物车</text>

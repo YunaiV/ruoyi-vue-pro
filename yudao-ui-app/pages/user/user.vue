@@ -79,7 +79,7 @@ export default {
   methods: {
     loginOrJump(pageUrl) {
       if (!this.hasLogin) {
-        uni.$u.route('/pages/login/login')
+        uni.$u.route('/pages/login/social')
       } else {
         uni.$u.route(pageUrl)
       }

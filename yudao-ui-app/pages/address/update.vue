@@ -161,7 +161,7 @@ export default {
           uni.$u.toast('地址已更新')
           setTimeout(() => {
             uni.navigateBack()
-          }, 1000)
+          }, 300)
         })
       })
     }

@@ -1,15 +1,15 @@
 <template>
   <view class="container">
-    <view class="unp-header">
-      <view class="unp-logo">
-        <u-avatar size="80" icon="github-circle-fill" fontSize="80"></u-avatar>
+    <view class="auth-header">
+      <view class="auth-logo">
+        <u-avatar size="100" icon="github-circle-fill" fontSize="100"></u-avatar>
       </view>
     </view>
 
-    <view class="unp-box">
+    <view class="auth-box">
       <!-- 登录方式选择 -->
       <view class="mode-section">
-        <u-subsection mode="subsection" fontSize="15" :list="loginModeList" :current="currentModeIndex" @change="handleModeChange"></u-subsection>
+        <u-subsection class="subsection" mode="subsection" fontSize="15" :list="loginModeList" :current="currentModeIndex" @change="handleModeChange"></u-subsection>
       </view>
       <u-gap height="40"></u-gap>
 
@@ -37,10 +37,7 @@
         </u-form-item>
 
         <view class="btn-group">
-          <u-button type="primary" text="登录" customStyle="margin-top: 50px" @click="handleSubmit"></u-button>
-
-          <u-gap height="20"></u-gap>
-          <u-button type="info" text="返回" @click="navigateBack()"></u-button>
+          <u-button class="auth-btn" type="primary" customStyle="margin-top: 50px" @click="handleSubmit">登录/注册</u-button>
         </view>
       </u--form>
     </view>
@@ -48,7 +45,7 @@
 </template>
 
 <script>
-import { passwordLogin, sendSmsCode, smsLogin } from '../../api/auth'
+import { sendSmsCode } from '../../api/auth'
 
 export default {
   data() {
@@ -145,45 +142,41 @@ export default {
         this.$store.dispatch('Login', { type: this.currentModeIndex, data: this.formData }).then(res => {
           uni.$u.toast('登录成功')
           setTimeout(() => {
-            this.navigateBack()
-          }, 1000)
+            uni.switchTab({
+              url: '/pages/user/user'
+            })
+          }, 300)
         })
       })
-    },
-    navigateBack() {
-      uni.navigateBack()
     }
   }
 }
 </script>
 
 <style lang="scss" scoped>
-.unp-header {
+.auth-header {
   height: 400rpx;
   @include flex-center;
-  .unp-logo {
+  .auth-logo {
     @include flex-center(column);
   }
 }
 
-.unp-box {
+.auth-box {
   @include flex-center(column);
 
   .mode-section {
-    width: 560rpx;
+    width: 600rpx;
+    .subsection {
+      height: 60rpx;
+    }
   }
   .btn-group {
-    width: 560rpx;
+    width: 600rpx;
+    .auth-btn {
+      height: 90rpx;
+      font-size: 32rpx;
+    }
   }
-}
-
-.lk-group {
-  height: 40rpx;
-  margin-top: 40rpx;
-  @include flex-space-between;
-  font-size: 12rpx;
-
-  color: $u-primary;
-  text-decoration: $u-primary;
 }
 </style>

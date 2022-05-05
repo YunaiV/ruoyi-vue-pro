@@ -9,4 +9,5 @@ export const logout = data => http.post('/member/logout', data)
 export const sendSmsCode = data => http.post('/member/send-sms-code', data)
 //使用手机 + 验证码登录
 export const smsLogin = data => http.post('/member/sms-login', data)
-
+//社交登录，使用 (手机号授权)code + 用户信息
+export const socialLogin = data => http.post('/member/social-login', data)
