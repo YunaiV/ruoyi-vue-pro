@@ -7,8 +7,11 @@ import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.framework.common.util.object.PageUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.*;
 import cn.iocoder.yudao.module.bpm.convert.task.BpmTaskConvert;
+import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmTaskAssignRuleDO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.task.BpmTaskExtDO;
+import cn.iocoder.yudao.module.bpm.dal.mysql.definition.BpmTaskAssignRuleMapper;
 import cn.iocoder.yudao.module.bpm.dal.mysql.task.BpmTaskExtMapper;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmTaskAssignRuleTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmProcessInstanceResultEnum;
 import cn.iocoder.yudao.module.bpm.service.message.BpmMessageService;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
@@ -66,6 +69,8 @@ public class BpmTaskServiceImpl implements BpmTaskService{
     private BpmTaskExtMapper taskExtMapper;
     @Resource
     private BpmMessageService messageService;
+    @Resource
+    private BpmTaskAssignRuleMapper taskAssignRuleMapper;
 
     @Override
     public PageResult<BpmTaskTodoPageItemRespVO> getTodoTaskPage(Long userId, BpmTaskTodoPageReqVO pageVO) {
@@ -183,9 +188,22 @@ public class BpmTaskServiceImpl implements BpmTaskService{
 
         // 完成任务，审批通过
         taskService.complete(task.getId(), instance.getProcessVariables());
+
         // 更新任务拓展表为通过
-        taskExtMapper.updateByTaskId(new BpmTaskExtDO().setTaskId(task.getId())
-                .setResult(BpmProcessInstanceResultEnum.APPROVE.getResult()).setComment(reqVO.getComment()));
+        taskExtMapper.updateByTaskId(
+            new BpmTaskExtDO().setTaskId(task.getId()).setResult(BpmProcessInstanceResultEnum.APPROVE.getResult())
+                .setComment(reqVO.getComment()));
+        // 判断任务是否为或签，或签时删除其余不用审批的任务
+        List<BpmTaskAssignRuleDO> bpmTaskAssignRuleList =
+            taskAssignRuleMapper.selectListByProcessDefinitionId(task.getProcessDefinitionId(),
+                task.getTaskDefinitionKey());
+        if (CollUtil.isNotEmpty(bpmTaskAssignRuleList) && bpmTaskAssignRuleList.size() > 0) {
+            if (BpmTaskAssignRuleTypeEnum.USER_OR_SIGN.getType().equals(bpmTaskAssignRuleList.get(0).getType())) {
+                taskExtMapper.updateUserOrSignTask(
+                    (BpmTaskExtDO)new BpmTaskExtDO().setTaskId(task.getId()).setName(task.getName())
+                        .setProcessInstanceId(task.getProcessInstanceId()).setDeleted(true));
+            }
+        }
     }
 
     @Override

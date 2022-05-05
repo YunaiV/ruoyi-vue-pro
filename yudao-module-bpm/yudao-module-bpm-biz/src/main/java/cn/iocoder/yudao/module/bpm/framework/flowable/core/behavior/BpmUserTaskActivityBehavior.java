@@ -75,34 +75,46 @@ public class BpmUserTaskActivityBehavior extends UserTaskActivityBehavior {
 
     @Override
     @DataPermission(enable = false) // 不需要处理数据权限， 不然会有问题，查询不到数据
-    protected void handleAssignments(TaskService taskService, String assignee, String owner, List<String> candidateUsers, List<String> candidateGroups, TaskEntity task, ExpressionManager expressionManager, DelegateExecution execution, ProcessEngineConfigurationImpl processEngineConfiguration) {
-        boolean isMultiInstance = hasMultiInstanceCharacteristics();
-        if(isMultiInstance){
+    protected void handleAssignments(TaskService taskService, String assignee, String owner,
+        List<String> candidateUsers, List<String> candidateGroups, TaskEntity task, ExpressionManager expressionManager,
+        DelegateExecution execution, ProcessEngineConfigurationImpl processEngineConfiguration) {
+        /*boolean isMultiInstance = hasMultiInstanceCharacteristics();
+        if (isMultiInstance) {
             //多实例 会签/或签,执行多次每个人 待办人都在execution里面获取
             Integer assigneeUserId = execution.getVariableLocal("user", Integer.class);
             TaskHelper.changeTaskAssignee(task, String.valueOf(assigneeUserId));
-        }else {
+        } else {
             // 第一步，获得任务的规则
             BpmTaskAssignRuleDO rule = getTaskRule(task);
             // 第二步，获得任务的候选用户们
             Set<Long> candidateUserIds = calculateTaskCandidateUsers(task, rule);
             // 第三步，设置一个作为负责人
-            Long assigneeUserId = chooseTaskAssignee(candidateUserIds);
+            Long assigneeUserId = chooseTaskAssignee(execution, candidateUserIds);
             TaskHelper.changeTaskAssignee(task, String.valueOf(assigneeUserId));
         }
-
+        */
+        // 第一步，获得任务的规则
+        BpmTaskAssignRuleDO rule = getTaskRule(task);
+        // 第二步，获得任务的候选用户们
+        Set<Long> candidateUserIds = calculateTaskCandidateUsers(task, rule);
+        // 第三步，设置一个作为负责人
+        Long assigneeUserId = chooseTaskAssignee(execution, candidateUserIds);
+        TaskHelper.changeTaskAssignee(task, String.valueOf(assigneeUserId));
     }
 
     private BpmTaskAssignRuleDO getTaskRule(TaskEntity task) {
-        List<BpmTaskAssignRuleDO> taskRules = bpmTaskRuleService.getTaskAssignRuleListByProcessDefinitionId(task.getProcessDefinitionId(),
+        List<BpmTaskAssignRuleDO> taskRules =
+            bpmTaskRuleService.getTaskAssignRuleListByProcessDefinitionId(task.getProcessDefinitionId(),
                 task.getTaskDefinitionKey());
         if (CollUtil.isEmpty(taskRules)) {
-            throw new FlowableException(StrUtil.format("流程任务({}/{}/{}) 找不到符合的任务规则",
-                    task.getId(), task.getProcessDefinitionId(), task.getTaskDefinitionKey()));
+            throw new FlowableException(
+                StrUtil.format("流程任务({}/{}/{}) 找不到符合的任务规则", task.getId(), task.getProcessDefinitionId(),
+                    task.getTaskDefinitionKey()));
         }
         if (taskRules.size() > 1) {
-            throw new FlowableException(StrUtil.format("流程任务({}/{}/{}) 找到过多任务规则({})",
-                    task.getId(), task.getProcessDefinitionId(), task.getTaskDefinitionKey(), taskRules.size()));
+            throw new FlowableException(
+                StrUtil.format("流程任务({}/{}/{}) 找到过多任务规则({})", task.getId(), task.getProcessDefinitionId(),
+                    task.getTaskDefinitionKey(), taskRules.size()));
         }
         return taskRules.get(0);
     }
@@ -123,14 +135,18 @@ public class BpmUserTaskActivityBehavior extends UserTaskActivityBehavior {
             assigneeUserIds = calculateTaskCandidateUsersByUserGroup(task, rule);
         } else if (Objects.equals(BpmTaskAssignRuleTypeEnum.SCRIPT.getType(), rule.getType())) {
             assigneeUserIds = calculateTaskCandidateUsersByScript(task, rule);
+        } else if (Objects.equals(BpmTaskAssignRuleTypeEnum.USER_SIGN.getType(), rule.getType())) {
+            assigneeUserIds = calculateTaskCandidateUsersByUser(task, rule);
+        } else if (Objects.equals(BpmTaskAssignRuleTypeEnum.USER_OR_SIGN.getType(), rule.getType())) {
+            assigneeUserIds = calculateTaskCandidateUsersByUser(task, rule);
         }
 
         // 移除被禁用的用户
         removeDisableUsers(assigneeUserIds);
         // 如果候选人为空，抛出异常 TODO 芋艿：没候选人的策略选择。1 - 挂起；2 - 直接结束；3 - 强制一个兜底人
         if (CollUtil.isEmpty(assigneeUserIds)) {
-            log.error("[calculateTaskCandidateUsers][流程任务({}/{}/{}) 任务规则({}) 找不到候选人]",
-                    task.getId(), task.getProcessDefinitionId(), task.getTaskDefinitionKey(), toJsonString(rule));
+            log.error("[calculateTaskCandidateUsers][流程任务({}/{}/{}) 任务规则({}) 找不到候选人]", task.getId(),
+                task.getProcessDefinitionId(), task.getTaskDefinitionKey(), toJsonString(rule));
             throw exception(TASK_CREATE_FAIL_NO_CANDIDATE_USER);
         }
         return assigneeUserIds;
@@ -182,7 +198,17 @@ public class BpmUserTaskActivityBehavior extends UserTaskActivityBehavior {
         return userIds;
     }
 
-    private Long chooseTaskAssignee(Set<Long> candidateUserIds) {
+    private Long chooseTaskAssignee(DelegateExecution execution, Set<Long> candidateUserIds) {
+        // 获取任务变量
+        Map<String, Object> variables = execution.getVariables();
+        // 设置任务集合变量key
+        String expressionText = String.format("%s_userList", execution.getCurrentActivityId());
+        // 判断当前任务是否为并行任务, 是的话获取任务变量
+        if (variables.containsKey(expressionText)) {
+            String user = variables.get("user").toString();
+            return Long.valueOf(user);
+        }
+
         // TODO 芋艿：未来可以优化下，改成轮询的策略
         int index = RandomUtil.randomInt(candidateUserIds.size());
         return CollUtil.get(candidateUserIds, index);

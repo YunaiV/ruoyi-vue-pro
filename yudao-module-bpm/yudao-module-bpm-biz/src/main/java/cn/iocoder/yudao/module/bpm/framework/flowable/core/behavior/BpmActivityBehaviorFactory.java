@@ -10,7 +10,10 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Setter;
 import lombok.ToString;
+import org.flowable.bpmn.model.Activity;
 import org.flowable.bpmn.model.UserTask;
+import org.flowable.engine.impl.bpmn.behavior.AbstractBpmnActivityBehavior;
+import org.flowable.engine.impl.bpmn.behavior.ParallelMultiInstanceBehavior;
 import org.flowable.engine.impl.bpmn.behavior.UserTaskActivityBehavior;
 import org.flowable.engine.impl.bpmn.parser.factory.DefaultActivityBehaviorFactory;
 
@@ -51,5 +54,19 @@ public class BpmActivityBehaviorFactory extends DefaultActivityBehaviorFactory {
         userTaskActivityBehavior.setAdminUserApi(adminUserApi);
         userTaskActivityBehavior.setScripts(scripts);
         return userTaskActivityBehavior;
+    }
+
+    @Override
+    public ParallelMultiInstanceBehavior createParallelMultiInstanceBehavior(Activity activity,
+        AbstractBpmnActivityBehavior innerActivityBehavior) {
+        BpmParallelMultiInstanceActivityBehavior bpmParallelMultiInstanceActivityBehavior =
+            new BpmParallelMultiInstanceActivityBehavior(activity, innerActivityBehavior);
+        bpmParallelMultiInstanceActivityBehavior.setBpmTaskRuleService(bpmTaskRuleService);
+        bpmParallelMultiInstanceActivityBehavior.setPermissionApi(permissionApi);
+        bpmParallelMultiInstanceActivityBehavior.setDeptApi(deptApi);
+        bpmParallelMultiInstanceActivityBehavior.setUserGroupService(userGroupService);
+        bpmParallelMultiInstanceActivityBehavior.setAdminUserApi(adminUserApi);
+        bpmParallelMultiInstanceActivityBehavior.setScripts(scripts);
+        return bpmParallelMultiInstanceActivityBehavior;
     }
 }
