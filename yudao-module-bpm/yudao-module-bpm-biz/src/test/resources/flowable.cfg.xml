@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+				http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="processEngineConfiguration" class="org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration">
+		<!--保存到文件模式-->
+		<!--<property name="jdbcUrl" value="jdbc:h2:file:~/activiti-in-action-chapter6;AUTO_SERVER=TRUE" />-->
+		<!--内存模式-->
+		<property name="jdbcUrl" value="jdbc:h2:mem:activiti-in-action-chapter6;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE" />
+		<property name="jdbcDriver" value="org.h2.Driver" />
+		<property name="jdbcUsername" value="sa" />
+		<property name="jdbcPassword" value="" />
+
+		<!--HistoryLevel-->
+		<property name="history" value="full" />
+		<property name="databaseSchemaUpdate" value="true" />
+		<property name="flowable5CompatibilityEnabled" value="false" />
+<!--		<property name="jobExecutorActivate" value="false" />-->
+	</bean>
+</beans>
