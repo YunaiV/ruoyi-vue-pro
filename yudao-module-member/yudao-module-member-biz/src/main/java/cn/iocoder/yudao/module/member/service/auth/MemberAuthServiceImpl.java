@@ -84,7 +84,7 @@ public class MemberAuthServiceImpl implements MemberAuthService {
     @Override
     public String login(AppAuthLoginReqVO reqVO, String userIp, String userAgent) {
         // 使用手机 + 密码，进行登录。
-        LoginUser loginUser = this.login0(reqVO.getMobile(), reqVO.getPassword());
+        LoginUser loginUser = login0(reqVO.getMobile(), reqVO.getPassword());
 
         // 缓存登录用户到 Redis 中，返回 Token 令牌
         return createUserSessionAfterLoginSuccess(loginUser, LoginLogTypeEnum.LOGIN_USERNAME, userIp, userAgent);

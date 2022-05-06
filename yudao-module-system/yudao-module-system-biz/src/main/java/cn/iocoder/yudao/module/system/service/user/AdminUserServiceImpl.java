@@ -25,6 +25,7 @@ import cn.iocoder.yudao.module.system.service.tenant.TenantService;
 import com.google.common.annotations.VisibleForTesting;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -61,6 +62,7 @@ public class AdminUserServiceImpl implements AdminUserService {
     @Resource
     private PasswordEncoder passwordEncoder;
     @Resource
+    @Lazy // 延迟，避免循环依赖报错
     private TenantService tenantService;
 
     @Resource

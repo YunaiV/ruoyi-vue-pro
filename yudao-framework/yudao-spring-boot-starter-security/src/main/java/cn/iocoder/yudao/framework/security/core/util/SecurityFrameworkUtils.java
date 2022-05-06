@@ -11,7 +11,6 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Set;
 
 /**
  * 安全服务工具类
@@ -77,17 +76,6 @@ public class SecurityFrameworkUtils {
     public static Long getLoginUserId() {
         LoginUser loginUser = getLoginUser();
         return loginUser != null ? loginUser.getId() : null;
-    }
-
-    /**
-     * 获得当前用户的角色编号数组
-     *
-     * @return 角色编号数组
-     */
-    @Nullable
-    public static Set<Long> getLoginUserRoleIds() {
-        LoginUser loginUser = getLoginUser();
-        return loginUser != null ? loginUser.getRoleIds() : null;
     }
 
     /**

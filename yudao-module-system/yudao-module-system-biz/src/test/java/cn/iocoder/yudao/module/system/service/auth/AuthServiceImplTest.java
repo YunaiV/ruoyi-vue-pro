@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.system.service.auth;
 
-import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.framework.test.core.util.AssertUtils;
@@ -12,7 +11,6 @@ import cn.iocoder.yudao.module.system.enums.logger.LoginResultEnum;
 import cn.iocoder.yudao.module.system.service.common.CaptchaService;
 import cn.iocoder.yudao.module.system.service.dept.PostService;
 import cn.iocoder.yudao.module.system.service.logger.LoginLogService;
-import cn.iocoder.yudao.module.system.service.permission.PermissionService;
 import cn.iocoder.yudao.module.system.service.social.SocialUserService;
 import cn.iocoder.yudao.module.system.service.user.AdminUserService;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,7 +32,6 @@ import java.util.Set;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
-import static java.util.Collections.singleton;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
@@ -48,8 +45,6 @@ public class AuthServiceImplTest extends BaseDbUnitTest {
 
     @MockBean
     private AdminUserService userService;
-    @MockBean
-    private PermissionService permissionService;
     @MockBean
     private AuthenticationManager authenticationManager;
     @MockBean
@@ -108,16 +103,11 @@ public class AuthServiceImplTest extends BaseDbUnitTest {
         // mock 方法 01
         AdminUserDO user = randomPojo(AdminUserDO.class, o -> o.setId(userId));
         when(userService.getUser(eq(userId))).thenReturn(user);
-        // mock 方法 02
-        Set<Long> roleIds = randomSet(Long.class);
-        when(permissionService.getUserRoleIds(eq(userId), eq(singleton(CommonStatusEnum.ENABLE.getStatus()))))
-                .thenReturn(roleIds);
 
         // 调用
         LoginUser loginUser = authService.mockLogin(userId);
         // 断言
         AssertUtils.assertPojoEquals(user, loginUser, "updateTime");
-        assertEquals(roleIds, loginUser.getRoleIds());
     }
 
     @Test
@@ -247,15 +237,10 @@ public class AuthServiceImplTest extends BaseDbUnitTest {
         // mock authentication
         Long userId = randomLongId();
         Set<Long> userRoleIds = randomSet(Long.class);
-        LoginUser loginUser = randomPojo(LoginUser.class, o -> {
-            o.setId(userId);
-            o.setRoleIds(userRoleIds);
-        });
+        LoginUser loginUser = randomPojo(LoginUser.class, o -> o.setId(userId));
         when(authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(reqVO.getUsername(), reqVO.getPassword())))
                 .thenReturn(authentication);
         when(authentication.getPrincipal()).thenReturn(loginUser);
-        // mock 获得 User 拥有的角色编号数组
-        when(permissionService.getUserRoleIds(userId, singleton(CommonStatusEnum.ENABLE.getStatus()))).thenReturn(userRoleIds);
         // mock 缓存登录用户到 Redis
         String token = randomString();
         when(userSessionService.createUserSession(loginUser, userIp, userAgent)).thenReturn(token);

@@ -1,15 +1,16 @@
 package cn.iocoder.yudao.module.system.controller.admin.auth;
 
+import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
+import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.module.system.controller.admin.auth.vo.session.UserSessionPageItemRespVO;
 import cn.iocoder.yudao.module.system.controller.admin.auth.vo.session.UserSessionPageReqVO;
 import cn.iocoder.yudao.module.system.convert.auth.UserSessionConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.auth.UserSessionDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
-import cn.iocoder.yudao.module.system.service.auth.UserSessionService;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
-import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
+import cn.iocoder.yudao.module.system.service.auth.UserSessionService;
 import cn.iocoder.yudao.module.system.service.dept.DeptService;
 import cn.iocoder.yudao.module.system.service.user.AdminUserService;
 import io.swagger.annotations.Api;
@@ -49,7 +50,8 @@ public class UserSessionController {
 
         // 获得拼接需要的数据
         Map<Long, AdminUserDO> userMap = userService.getUserMap(
-                convertList(pageResult.getList(), UserSessionDO::getUserId));
+                convertList(pageResult.getList(), UserSessionDO::getUserId,
+                        session -> session.getUserType().equals(UserTypeEnum.ADMIN.getValue())));
         Map<Long, DeptDO> deptMap = deptService.getDeptMap(
                 convertList(userMap.values(), AdminUserDO::getDeptId));
         // 拼接结果返回

@@ -26,12 +26,13 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getClientIP;
 import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getUserAgent;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
-import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserRoleIds;
+import static java.util.Collections.singleton;
 
 @Api(tags = "管理后台 - 认证")
 @RestController
@@ -69,12 +70,12 @@ public class AuthController {
             return null;
         }
         // 获得角色列表
-        List<RoleDO> roleList = roleService.getRolesFromCache(getLoginUserRoleIds());
+        Set<Long> roleIds = permissionService.getUserRoleIds(getLoginUserId(), singleton(CommonStatusEnum.ENABLE.getStatus()));
+        List<RoleDO> roleList = roleService.getRolesFromCache(roleIds);
         // 获得菜单列表
-        List<MenuDO> menuList = permissionService.getRoleMenuListFromCache(
-                getLoginUserRoleIds(), // 注意，基于登录的角色，因为后续的权限判断也是基于它
+        List<MenuDO> menuList = permissionService.getRoleMenuListFromCache(roleIds,
                 SetUtils.asSet(MenuTypeEnum.DIR.getType(), MenuTypeEnum.MENU.getType(), MenuTypeEnum.BUTTON.getType()),
-                SetUtils.asSet(CommonStatusEnum.ENABLE.getStatus()));
+                singleton(CommonStatusEnum.ENABLE.getStatus())); // 只要开启的
         // 拼接结果返回
         return success(AuthConvert.INSTANCE.convert(user, roleList, menuList));
     }
@@ -82,11 +83,12 @@ public class AuthController {
     @GetMapping("/list-menus")
     @ApiOperation("获得登录用户的菜单列表")
     public CommonResult<List<AuthMenuRespVO>> getMenus() {
+        // 获得角色列表
+        Set<Long> roleIds = permissionService.getUserRoleIds(getLoginUserId(), singleton(CommonStatusEnum.ENABLE.getStatus()));
         // 获得用户拥有的菜单列表
-        List<MenuDO> menuList = permissionService.getRoleMenuListFromCache(
-                getLoginUserRoleIds(), // 注意，基于登录的角色，因为后续的权限判断也是基于它
+        List<MenuDO> menuList = permissionService.getRoleMenuListFromCache(roleIds,
                 SetUtils.asSet(MenuTypeEnum.DIR.getType(), MenuTypeEnum.MENU.getType()), // 只要目录和菜单类型
-                SetUtils.asSet(CommonStatusEnum.ENABLE.getStatus())); // 只要开启的
+                singleton(CommonStatusEnum.ENABLE.getStatus())); // 只要开启的
         // 转换成 Tree 结构返回
         return success(AuthConvert.INSTANCE.buildMenuTree(menuList));
     }

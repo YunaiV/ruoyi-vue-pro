@@ -50,17 +50,6 @@ public class LoginUser implements UserDetails {
      */
     private Long tenantId;
 
-    // ========== UserTypeEnum.ADMIN 独有字段 ==========
-    // TODO 芋艿：可以通过定义一个 Map<String, String> exts 的方式，去除管理员的字段。不过这样会导致系统比较复杂，所以暂时不去掉先；
-    /**
-     * 角色编号数组
-     */
-    private Set<Long> roleIds;
-    /**
-     * 部门编号
-     */
-    private Long deptId;
-
     // ========== 上下文 ==========
     /**
      * 上下文字段，不进行持久化

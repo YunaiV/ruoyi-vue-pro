@@ -1,20 +1,22 @@
 package cn.iocoder.yudao.module.system.service.permission;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.datapermission.core.dept.service.dto.DeptDataPermissionRespDTO;
+import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.RoleDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.RoleMenuDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.UserRoleDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
 import cn.iocoder.yudao.module.system.dal.mysql.permission.RoleMenuBatchInsertMapper;
 import cn.iocoder.yudao.module.system.dal.mysql.permission.RoleMenuMapper;
 import cn.iocoder.yudao.module.system.dal.mysql.permission.UserRoleBatchInsertMapper;
 import cn.iocoder.yudao.module.system.dal.mysql.permission.UserRoleMapper;
+import cn.iocoder.yudao.module.system.enums.permission.DataScopeEnum;
 import cn.iocoder.yudao.module.system.mq.producer.permission.PermissionProducer;
 import cn.iocoder.yudao.module.system.service.dept.DeptService;
-import cn.iocoder.yudao.framework.datapermission.core.dept.service.dto.DeptDataPermissionRespDTO;
-import cn.iocoder.yudao.framework.security.core.LoginUser;
-import cn.iocoder.yudao.module.system.enums.permission.DataScopeEnum;
-import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
+import cn.iocoder.yudao.module.system.service.user.AdminUserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
@@ -25,10 +27,10 @@ import java.util.List;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomLongId;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
+import static java.util.Collections.singleton;
 import static java.util.Collections.singletonList;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -54,6 +56,9 @@ public class PermissionServiceTest extends BaseDbUnitTest {
     private MenuService menuService;
     @MockBean
     private DeptService deptService;
+    @MockBean
+    private AdminUserService userService;
+
     @MockBean
     private PermissionProducer permissionProducer;
 
@@ -124,112 +129,119 @@ public class PermissionServiceTest extends BaseDbUnitTest {
         assertPojoEquals(dbUserRoles.get(0), userRoleDO02);
     }
 
-    @Test // 测试从 context 获取的场景
-    public void testGetDeptDataPermission_fromContext() {
-        // 准备参数
-        LoginUser loginUser = randomPojo(LoginUser.class);
-        // mock 方法
-        DeptDataPermissionRespDTO respDTO = new DeptDataPermissionRespDTO();
-        loginUser.setContext(PermissionServiceImpl.CONTEXT_KEY, respDTO);
-
-        // 调用
-        DeptDataPermissionRespDTO result = permissionService.getDeptDataPermission(loginUser);
-        // 断言
-        assertSame(respDTO, result);
-    }
-
     @Test
     public void testGetDeptDataPermission_All() {
         // 准备参数
-        LoginUser loginUser = randomPojo(LoginUser.class);
-        // mock 方法
-        RoleDO roleDO = randomPojo(RoleDO.class, o -> o.setDataScope(DataScopeEnum.ALL.getScope()));
-        when(roleService.getRolesFromCache(same(loginUser.getRoleIds()))).thenReturn(singletonList(roleDO));
+        Long userId = 1L;
+        // mock 用户的角色编号
+        userRoleMapper.insert(new UserRoleDO().setUserId(userId).setRoleId(2L));
+        // mock 获得用户的角色
+        RoleDO roleDO = randomPojo(RoleDO.class, o -> o.setDataScope(DataScopeEnum.ALL.getScope())
+                .setStatus(CommonStatusEnum.ENABLE.getStatus()));
+        when(roleService.getRolesFromCache(eq(singleton(2L)))).thenReturn(singletonList(roleDO));
+        when(roleService.getRoleFromCache(eq(2L))).thenReturn(roleDO);
 
         // 调用
-        DeptDataPermissionRespDTO result = permissionService.getDeptDataPermission(loginUser);
+        DeptDataPermissionRespDTO result = permissionService.getDeptDataPermission(userId);
         // 断言
         assertTrue(result.getAll());
         assertFalse(result.getSelf());
         assertTrue(CollUtil.isEmpty(result.getDeptIds()));
-        assertSame(result, loginUser.getContext(PermissionServiceImpl.CONTEXT_KEY, DeptDataPermissionRespDTO.class));
     }
 
     @Test
     public void testGetDeptDataPermission_DeptCustom() {
         // 准备参数
-        LoginUser loginUser = randomPojo(LoginUser.class);
-        // mock 方法
-        RoleDO roleDO = randomPojo(RoleDO.class, o -> o.setDataScope(DataScopeEnum.DEPT_CUSTOM.getScope()));
-        when(roleService.getRolesFromCache(same(loginUser.getRoleIds()))).thenReturn(singletonList(roleDO));
+        Long userId = 1L;
+        // mock 用户的角色编号
+        userRoleMapper.insert(new UserRoleDO().setUserId(userId).setRoleId(2L));
+        // mock 获得用户的角色
+        RoleDO roleDO = randomPojo(RoleDO.class, o -> o.setDataScope(DataScopeEnum.DEPT_CUSTOM.getScope())
+                .setStatus(CommonStatusEnum.ENABLE.getStatus()));
+        when(roleService.getRolesFromCache(eq(singleton(2L)))).thenReturn(singletonList(roleDO));
+        when(roleService.getRoleFromCache(eq(2L))).thenReturn(roleDO);
+        // mock 部门的返回
+        when(userService.getUser(eq(1L))).thenReturn(new AdminUserDO().setDeptId(3L), null, null); // 最后返回 null 的目的，看看会不会重复调用
 
         // 调用
-        DeptDataPermissionRespDTO result = permissionService.getDeptDataPermission(loginUser);
+        DeptDataPermissionRespDTO result = permissionService.getDeptDataPermission(1L);
         // 断言
         assertFalse(result.getAll());
         assertFalse(result.getSelf());
         assertEquals(roleDO.getDataScopeDeptIds().size() + 1, result.getDeptIds().size());
         assertTrue(CollUtil.containsAll(result.getDeptIds(), roleDO.getDataScopeDeptIds()));
-        assertTrue(CollUtil.contains(result.getDeptIds(), loginUser.getDeptId()));
-        assertSame(result, loginUser.getContext(PermissionServiceImpl.CONTEXT_KEY, DeptDataPermissionRespDTO.class));
+        assertTrue(CollUtil.contains(result.getDeptIds(), 3L));
     }
 
     @Test
     public void testGetDeptDataPermission_DeptOnly() {
         // 准备参数
-        LoginUser loginUser = randomPojo(LoginUser.class);
-        // mock 方法
-        RoleDO roleDO = randomPojo(RoleDO.class, o -> o.setDataScope(DataScopeEnum.DEPT_ONLY.getScope()));
-        when(roleService.getRolesFromCache(same(loginUser.getRoleIds()))).thenReturn(singletonList(roleDO));
+        Long userId = 1L;
+        // mock 用户的角色编号
+        userRoleMapper.insert(new UserRoleDO().setUserId(userId).setRoleId(2L));
+        // mock 获得用户的角色
+        RoleDO roleDO = randomPojo(RoleDO.class, o -> o.setDataScope(DataScopeEnum.DEPT_ONLY.getScope())
+                .setStatus(CommonStatusEnum.ENABLE.getStatus()));
+        when(roleService.getRolesFromCache(eq(singleton(2L)))).thenReturn(singletonList(roleDO));
+        when(roleService.getRoleFromCache(eq(2L))).thenReturn(roleDO);
+        // mock 部门的返回
+        when(userService.getUser(eq(1L))).thenReturn(new AdminUserDO().setDeptId(3L), null, null); // 最后返回 null 的目的，看看会不会重复调用
 
         // 调用
-        DeptDataPermissionRespDTO result = permissionService.getDeptDataPermission(loginUser);
+        DeptDataPermissionRespDTO result = permissionService.getDeptDataPermission(1L);
         // 断言
         assertFalse(result.getAll());
         assertFalse(result.getSelf());
         assertEquals(1, result.getDeptIds().size());
-        assertTrue(CollUtil.contains(result.getDeptIds(), loginUser.getDeptId()));
-        assertSame(result, loginUser.getContext(PermissionServiceImpl.CONTEXT_KEY, DeptDataPermissionRespDTO.class));
+        assertTrue(CollUtil.contains(result.getDeptIds(), 3L));
     }
 
     @Test
     public void testGetDeptDataPermission_DeptAndChild() {
         // 准备参数
-        LoginUser loginUser = randomPojo(LoginUser.class);
-        // mock 方法（角色）
-        RoleDO roleDO = randomPojo(RoleDO.class, o -> o.setDataScope(DataScopeEnum.DEPT_AND_CHILD.getScope()));
-        when(roleService.getRolesFromCache(same(loginUser.getRoleIds()))).thenReturn(singletonList(roleDO));
+        Long userId = 1L;
+        // mock 用户的角色编号
+        userRoleMapper.insert(new UserRoleDO().setUserId(userId).setRoleId(2L));
+        // mock 获得用户的角色
+        RoleDO roleDO = randomPojo(RoleDO.class, o -> o.setDataScope(DataScopeEnum.DEPT_AND_CHILD.getScope())
+                .setStatus(CommonStatusEnum.ENABLE.getStatus()));
+        when(roleService.getRolesFromCache(eq(singleton(2L)))).thenReturn(singletonList(roleDO));
+        when(roleService.getRoleFromCache(eq(2L))).thenReturn(roleDO);
+        // mock 部门的返回
+        when(userService.getUser(eq(1L))).thenReturn(new AdminUserDO().setDeptId(3L), null, null); // 最后返回 null 的目的，看看会不会重复调用
         // mock 方法（部门）
         DeptDO deptDO = randomPojo(DeptDO.class);
-        when(deptService.getDeptsByParentIdFromCache(eq(loginUser.getDeptId()), eq(true)))
+        when(deptService.getDeptsByParentIdFromCache(eq(3L), eq(true)))
                 .thenReturn(singletonList(deptDO));
 
         // 调用
-        DeptDataPermissionRespDTO result = permissionService.getDeptDataPermission(loginUser);
+        DeptDataPermissionRespDTO result = permissionService.getDeptDataPermission(userId);
         // 断言
         assertFalse(result.getAll());
         assertFalse(result.getSelf());
         assertEquals(2, result.getDeptIds().size());
         assertTrue(CollUtil.contains(result.getDeptIds(), deptDO.getId()));
-        assertTrue(CollUtil.contains(result.getDeptIds(), loginUser.getDeptId()));
-        assertSame(result, loginUser.getContext(PermissionServiceImpl.CONTEXT_KEY, DeptDataPermissionRespDTO.class));
+        assertTrue(CollUtil.contains(result.getDeptIds(), 3L));
     }
 
     @Test
     public void testGetDeptDataPermission_Self() {
         // 准备参数
-        LoginUser loginUser = randomPojo(LoginUser.class);
-        // mock 方法
-        RoleDO roleDO = randomPojo(RoleDO.class, o -> o.setDataScope(DataScopeEnum.SELF.getScope()));
-        when(roleService.getRolesFromCache(same(loginUser.getRoleIds()))).thenReturn(singletonList(roleDO));
+        Long userId = 1L;
+        // mock 用户的角色编号
+        userRoleMapper.insert(new UserRoleDO().setUserId(userId).setRoleId(2L));
+        // mock 获得用户的角色
+        RoleDO roleDO = randomPojo(RoleDO.class, o -> o.setDataScope(DataScopeEnum.SELF.getScope())
+                .setStatus(CommonStatusEnum.ENABLE.getStatus()));
+        when(roleService.getRolesFromCache(eq(singleton(2L)))).thenReturn(singletonList(roleDO));
+        when(roleService.getRoleFromCache(eq(2L))).thenReturn(roleDO);
 
         // 调用
-        DeptDataPermissionRespDTO result = permissionService.getDeptDataPermission(loginUser);
+        DeptDataPermissionRespDTO result = permissionService.getDeptDataPermission(userId);
         // 断言
         assertFalse(result.getAll());
         assertTrue(result.getSelf());
         assertTrue(CollUtil.isEmpty(result.getDeptIds()));
-        assertSame(result, loginUser.getContext(PermissionServiceImpl.CONTEXT_KEY, DeptDataPermissionRespDTO.class));
     }
 
 }

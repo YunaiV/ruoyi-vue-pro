@@ -17,7 +17,6 @@ import cn.iocoder.yudao.module.system.enums.logger.LoginResultEnum;
 import cn.iocoder.yudao.module.system.enums.sms.SmsSceneEnum;
 import cn.iocoder.yudao.module.system.service.common.CaptchaService;
 import cn.iocoder.yudao.module.system.service.logger.LoginLogService;
-import cn.iocoder.yudao.module.system.service.permission.PermissionService;
 import cn.iocoder.yudao.module.system.service.social.SocialUserService;
 import cn.iocoder.yudao.module.system.service.user.AdminUserService;
 import lombok.extern.slf4j.Slf4j;
@@ -36,12 +35,10 @@ import org.springframework.util.Assert;
 import javax.annotation.Resource;
 import javax.validation.Validator;
 import java.util.Objects;
-import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getClientIP;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
-import static java.util.Collections.singleton;
 
 /**
  * Auth Service 实现类
@@ -59,8 +56,6 @@ public class AdminAuthServiceImpl implements AdminAuthService {
     @Autowired
     @SuppressWarnings("SpringJavaAutowiredFieldsWarningInspection") // UserService 存在重名
     private AdminUserService userService;
-    @Resource
-    private PermissionService permissionService;
     @Resource
     private CaptchaService captchaService;
     @Resource
@@ -211,16 +206,6 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         }
     }
 
-    /**
-     * 获得 User 拥有的角色编号数组
-     *
-     * @param userId 用户编号
-     * @return 角色编号数组
-     */
-    private Set<Long> getUserRoleIds(Long userId) {
-        return permissionService.getUserRoleIds(userId, singleton(CommonStatusEnum.ENABLE.getStatus()));
-    }
-
     @Override
     public String socialQuickLogin(AuthSocialQuickLoginReqVO reqVO, String userIp, String userAgent) {
         // 使用 code 授权码，进行登录。然后，获得到绑定的用户编号
@@ -318,17 +303,13 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         }
 
         // 刷新 LoginUser 缓存
-        LoginUser newLoginUser= this.buildLoginUser(user);
+        LoginUser newLoginUser= buildLoginUser(user);
         userSessionService.refreshUserSession(token, newLoginUser);
         return newLoginUser;
     }
 
     private LoginUser buildLoginUser(AdminUserDO user) {
-        LoginUser loginUser = AuthConvert.INSTANCE.convert(user);
-        // 补全字段
-        loginUser.setDeptId(user.getDeptId());
-        loginUser.setRoleIds(this.getUserRoleIds(loginUser.getId()));
-        return loginUser;
+        return AuthConvert.INSTANCE.convert(user);
     }
 
 }
