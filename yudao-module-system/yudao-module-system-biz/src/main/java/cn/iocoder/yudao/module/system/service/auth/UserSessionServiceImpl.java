@@ -23,7 +23,6 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.time.Duration;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
@@ -106,12 +105,11 @@ public class UserSessionServiceImpl implements UserSessionService {
         // 生成 Session 编号
         String token = generateToken();
         // 写入 Redis 缓存
-        loginUser.setUpdateTime(new Date());
         loginUserRedisDAO.set(token, loginUser);
         // 写入 DB 中
         UserSessionDO userSession = UserSessionDO.builder().token(token)
                 .userId(loginUser.getId()).userType(loginUser.getUserType())
-                .userIp(userIp).userAgent(userAgent).username(loginUser.getUsername())
+                .userIp(userIp).userAgent(userAgent).username("")
                 .sessionTimeout(addTime(Duration.ofMillis(getSessionTimeoutMillis())))
                 .build();
         userSessionMapper.insert(userSession);
@@ -121,15 +119,7 @@ public class UserSessionServiceImpl implements UserSessionService {
 
     @Override
     public void refreshUserSession(String token, LoginUser loginUser) {
-        // 写入 Redis 缓存
-        loginUser.setUpdateTime(new Date());
-        loginUserRedisDAO.set(token, loginUser);
-        // 更新 DB 中
-        UserSessionDO updateObj = UserSessionDO.builder().build();
-        updateObj.setUsername(loginUser.getUsername());
-        updateObj.setUpdateTime(new Date());
-        updateObj.setSessionTimeout(addTime(Duration.ofMillis(getSessionTimeoutMillis())));
-        userSessionMapper.updateByToken(token, updateObj);
+
     }
 
     @Override

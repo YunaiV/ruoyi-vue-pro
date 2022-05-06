@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.member.service.auth;
 
 import cn.hutool.core.lang.Assert;
-import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.util.monitor.TracerUtils;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
@@ -78,7 +77,7 @@ public class MemberAuthServiceImpl implements MemberAuthService {
             throw new UsernameNotFoundException(mobile);
         }
         // 创建 LoginUser 对象
-        return AuthConvert.INSTANCE.convert(user);
+        return AuthConvert.INSTANCE.convert2(user);
     }
 
     @Override
@@ -87,7 +86,8 @@ public class MemberAuthServiceImpl implements MemberAuthService {
         LoginUser loginUser = login0(reqVO.getMobile(), reqVO.getPassword());
 
         // 缓存登录用户到 Redis 中，返回 Token 令牌
-        return createUserSessionAfterLoginSuccess(loginUser, LoginLogTypeEnum.LOGIN_USERNAME, userIp, userAgent);
+        return createUserSessionAfterLoginSuccess(loginUser, reqVO.getMobile(),
+                LoginLogTypeEnum.LOGIN_USERNAME, userIp, userAgent);
     }
 
     @Override
@@ -101,10 +101,11 @@ public class MemberAuthServiceImpl implements MemberAuthService {
         Assert.notNull(user, "获取用户失败，结果为空");
 
         // 执行登陆
-        LoginUser loginUser = AuthConvert.INSTANCE.convert(user);
+        LoginUser loginUser = buildLoginUser(user);
 
         // 缓存登录用户到 Redis 中，返回 Token 令牌
-        return createUserSessionAfterLoginSuccess(loginUser, LoginLogTypeEnum.LOGIN_SMS, userIp, userAgent);
+        return createUserSessionAfterLoginSuccess(loginUser, reqVO.getMobile(),
+                LoginLogTypeEnum.LOGIN_SMS, userIp, userAgent);
     }
 
     @Override
@@ -123,10 +124,11 @@ public class MemberAuthServiceImpl implements MemberAuthService {
         }
 
         // 创建 LoginUser 对象
-        LoginUser loginUser = AuthConvert.INSTANCE.convert(user);
+        LoginUser loginUser = buildLoginUser(user);
 
         // 缓存登录用户到 Redis 中，返回 Token 令牌
-        return createUserSessionAfterLoginSuccess(loginUser, LoginLogTypeEnum.LOGIN_SOCIAL, userIp, userAgent);
+        return createUserSessionAfterLoginSuccess(loginUser, null,
+                LoginLogTypeEnum.LOGIN_SOCIAL, userIp, userAgent);
     }
 
     @Override
@@ -142,9 +144,10 @@ public class MemberAuthServiceImpl implements MemberAuthService {
         return token;
     }
 
-    private String createUserSessionAfterLoginSuccess(LoginUser loginUser, LoginLogTypeEnum logType, String userIp, String userAgent) {
+    private String createUserSessionAfterLoginSuccess(LoginUser loginUser, String mobile,
+                                                      LoginLogTypeEnum logType, String userIp, String userAgent) {
         // 插入登陆日志
-        createLoginLog(loginUser.getUsername(), logType, LoginResultEnum.SUCCESS);
+        createLoginLog(loginUser.getId(), mobile, logType, LoginResultEnum.SUCCESS);
         // 缓存登录用户到 Redis 中，返回 Token 令牌
         return userSessionApi.createUserSession(loginUser, userIp, userAgent);
     }
@@ -164,29 +167,32 @@ public class MemberAuthServiceImpl implements MemberAuthService {
             authentication = authenticationManager.authenticate(new MultiUsernamePasswordAuthenticationToken(
                     username, password, getUserType()));
         } catch (BadCredentialsException badCredentialsException) {
-            this.createLoginLog(username, logType, LoginResultEnum.BAD_CREDENTIALS);
+            this.createLoginLog(null, username, logType, LoginResultEnum.BAD_CREDENTIALS);
             throw exception(AUTH_LOGIN_BAD_CREDENTIALS);
         } catch (DisabledException disabledException) {
-            this.createLoginLog(username, logType, LoginResultEnum.USER_DISABLED);
+            this.createLoginLog(null, username, logType, LoginResultEnum.USER_DISABLED);
             throw exception(AUTH_LOGIN_USER_DISABLED);
         } catch (AuthenticationException authenticationException) {
             log.error("[login0][username({}) 发生未知异常]", username, authenticationException);
-            this.createLoginLog(username, logType, LoginResultEnum.UNKNOWN_ERROR);
+            this.createLoginLog(null, username, logType, LoginResultEnum.UNKNOWN_ERROR);
             throw exception(AUTH_LOGIN_FAIL_UNKNOWN);
         }
         Assert.notNull(authentication.getPrincipal(), "Principal 不会为空");
         return (LoginUser) authentication.getPrincipal();
     }
 
-    private void createLoginLog(String mobile, LoginLogTypeEnum logType, LoginResultEnum loginResult) {
+    private void createLoginLog(Long userId, String mobile, LoginLogTypeEnum logType, LoginResultEnum loginResult) {
         // 获得用户
-        MemberUserDO user = userService.getUserByMobile(mobile);
+        if (userId == null) {
+            MemberUserDO user = userService.getUserByMobile(mobile);
+            userId = user != null ? user.getId() : null;
+        }
         // 插入登录日志
         LoginLogCreateReqDTO reqDTO = new LoginLogCreateReqDTO();
         reqDTO.setLogType(logType.getType());
         reqDTO.setTraceId(TracerUtils.getTraceId());
-        if (user != null) {
-            reqDTO.setUserId(user.getId());
+        if (userId != null) {
+            reqDTO.setUserId(userId);
         }
         reqDTO.setUserType(getUserType().getValue());
         reqDTO.setUsername(mobile);
@@ -195,39 +201,14 @@ public class MemberAuthServiceImpl implements MemberAuthService {
         reqDTO.setResult(loginResult.getResult());
         loginLogApi.createLoginLog(reqDTO);
         // 更新最后登录时间
-        if (user != null && Objects.equals(LoginResultEnum.SUCCESS.getResult(), loginResult.getResult())) {
-            userService.updateUserLogin(user.getId(), getClientIP());
+        if (userId != null && Objects.equals(LoginResultEnum.SUCCESS.getResult(), loginResult.getResult())) {
+            userService.updateUserLogin(userId, getClientIP());
         }
     }
 
     @Override
     public LoginUser verifyTokenAndRefresh(String token) {
-        // 获得 LoginUser
-        LoginUser loginUser = userSessionApi.getLoginUser(token);
-        if (loginUser == null) {
-            return null;
-        }
-        // 刷新 LoginUser 缓存
-        this.refreshLoginUserCache(token, loginUser);
-        return loginUser;
-    }
-
-    private void refreshLoginUserCache(String token, LoginUser loginUser) {
-        // 每 1/3 的 Session 超时时间，刷新 LoginUser 缓存
-        if (System.currentTimeMillis() - loginUser.getUpdateTime().getTime() <
-                userSessionApi.getSessionTimeoutMillis() / 3) {
-            return;
-        }
-
-        // 重新加载 UserDO 信息
-        MemberUserDO user = userService.getUser(loginUser.getId());
-        if (user == null || CommonStatusEnum.DISABLE.getStatus().equals(user.getStatus())) {
-            // 校验 token 时，用户被禁用的情况下，也认为 token 过期，方便前端跳转到登录界面
-            throw exception(AUTH_TOKEN_EXPIRED);
-        }
-
-        // 刷新 LoginUser 缓存
-        userSessionApi.refreshUserSession(token, loginUser);
+        return userSessionApi.getLoginUser(token);
     }
 
     @Override
@@ -239,10 +220,10 @@ public class MemberAuthServiceImpl implements MemberAuthService {
         }
 
         // 执行登陆
-        this.createLoginLog(user.getMobile(), LoginLogTypeEnum.LOGIN_MOCK, LoginResultEnum.SUCCESS);
+        createLoginLog(userId, user.getMobile(), LoginLogTypeEnum.LOGIN_MOCK, LoginResultEnum.SUCCESS);
 
         // 创建 LoginUser 对象
-        return AuthConvert.INSTANCE.convert(user);
+        return buildLoginUser(user);
     }
 
     @Override
@@ -255,7 +236,7 @@ public class MemberAuthServiceImpl implements MemberAuthService {
         // 删除 session
         userSessionApi.deleteUserSession(token);
         // 记录登出日志
-        this.createLogoutLog(loginUser.getId(), loginUser.getUsername());
+        createLogoutLog(loginUser.getId());
     }
 
     @Override
@@ -321,17 +302,29 @@ public class MemberAuthServiceImpl implements MemberAuthService {
         return user;
     }
 
-    private void createLogoutLog(Long userId, String username) {
+    private void createLogoutLog(Long userId) {
         LoginLogCreateReqDTO reqDTO = new LoginLogCreateReqDTO();
         reqDTO.setLogType(LoginLogTypeEnum.LOGOUT_SELF.getType());
         reqDTO.setTraceId(TracerUtils.getTraceId());
         reqDTO.setUserId(userId);
         reqDTO.setUserType(getUserType().getValue());
-        reqDTO.setUsername(username);
+        reqDTO.setUsername(getMobile(userId));
         reqDTO.setUserAgent(ServletUtils.getUserAgent());
         reqDTO.setUserIp(getClientIP());
         reqDTO.setResult(LoginResultEnum.SUCCESS.getResult());
         loginLogApi.createLoginLog(reqDTO);
+    }
+
+    private LoginUser buildLoginUser(MemberUserDO user) {
+        return AuthConvert.INSTANCE.convert(user).setUserType(getUserType().getValue());
+    }
+
+    private String getMobile(Long userId) {
+        if (userId == null) {
+            return null;
+        }
+        MemberUserDO user = userService.getUser(userId);
+        return user != null ? user.getMobile() : null;
     }
 
 }

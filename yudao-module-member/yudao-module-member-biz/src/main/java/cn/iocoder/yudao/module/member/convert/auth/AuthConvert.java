@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.member.convert.auth;
 
-import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
+import cn.iocoder.yudao.framework.security.core.authentication.SpringSecurityUser;
 import cn.iocoder.yudao.module.member.controller.app.auth.vo.*;
 import cn.iocoder.yudao.module.member.controller.app.social.vo.AppSocialUserUnbindReqVO;
 import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
@@ -19,13 +19,12 @@ public interface AuthConvert {
 
     AuthConvert INSTANCE = Mappers.getMapper(AuthConvert.class);
 
-    @Mapping(source = "mobile", target = "username")
-    LoginUser convert0(MemberUserDO bean);
+    LoginUser convert(MemberUserDO bean);
 
-    default LoginUser convert(MemberUserDO bean) {
-        // 目的，为了设置 UserTypeEnum.MEMBER.getValue()
-        return convert0(bean).setUserType(UserTypeEnum.MEMBER.getValue());
-    }
+    @Mapping(source = "mobile", target = "username")
+    SpringSecurityUser convert2(MemberUserDO user);
+
+    LoginUser convert(SpringSecurityUser bean);
 
     SocialUserBindReqDTO convert(Long userId, Integer userType, AppAuthSocialBindLoginReqVO reqVO);
     SocialUserBindReqDTO convert(Long userId, Integer userType, AppAuthSocialQuickLoginReqVO reqVO);

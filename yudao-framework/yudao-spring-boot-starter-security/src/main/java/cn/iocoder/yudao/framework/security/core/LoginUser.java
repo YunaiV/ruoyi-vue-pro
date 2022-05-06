@@ -1,14 +1,12 @@
 package cn.iocoder.yudao.framework.security.core;
 
 import cn.hutool.core.map.MapUtil;
-import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 登录用户信息
@@ -16,7 +14,7 @@ import java.util.*;
  * @author 芋道源码
  */
 @Data
-public class LoginUser implements UserDetails {
+public class LoginUser {
 
     /**
      * 用户编号
@@ -28,23 +26,6 @@ public class LoginUser implements UserDetails {
      * 关联 {@link UserTypeEnum}
      */
     private Integer userType;
-    /**
-     * 最后更新时间
-     */
-    private Date updateTime;
-
-    /**
-     * 用户名
-     */
-    private String username;
-    /**
-     * 密码
-     */
-    private String password;
-    /**
-     * 状态
-     */
-    private Integer status;
     /**
      * 租户编号
      */
@@ -58,49 +39,6 @@ public class LoginUser implements UserDetails {
      */
     @JsonIgnore
     private Map<String, Object> context;
-
-    @Override
-    @JsonIgnore// 避免序列化
-    public String getPassword() {
-        return password;
-    }
-
-    @Override
-    public String getUsername() {
-        return username;
-    }
-
-    @Override
-    @JsonIgnore// 避免序列化
-    public boolean isEnabled() {
-        return CommonStatusEnum.ENABLE.getStatus().equals(status);
-    }
-
-    @Override
-    @JsonIgnore// 避免序列化
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return new HashSet<>();
-    }
-
-    @Override
-    @JsonIgnore// 避免序列化
-    public boolean isAccountNonExpired() {
-        return true; // 返回 true，不依赖 Spring Security 判断
-    }
-
-    @Override
-    @JsonIgnore// 避免序列化
-    public boolean isAccountNonLocked() {
-        return true; // 返回 true，不依赖 Spring Security 判断
-    }
-
-    @Override
-    @JsonIgnore// 避免序列化
-    public boolean isCredentialsNonExpired() {
-        return true;  // 返回 true，不依赖 Spring Security 判断
-    }
-
-    // ========== 上下文 ==========
 
     public void setContext(String key, Object value) {
         if (context == null) {

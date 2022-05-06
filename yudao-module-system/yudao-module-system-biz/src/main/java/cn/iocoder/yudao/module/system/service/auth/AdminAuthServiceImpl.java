@@ -1,12 +1,12 @@
 package cn.iocoder.yudao.module.system.service.auth;
 
-import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.util.monitor.TracerUtils;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.framework.common.util.validation.ValidationUtils;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.security.core.authentication.MultiUsernamePasswordAuthenticationToken;
+import cn.iocoder.yudao.framework.security.core.authentication.SpringSecurityUser;
 import cn.iocoder.yudao.module.system.api.logger.dto.LoginLogCreateReqDTO;
 import cn.iocoder.yudao.module.system.api.sms.SmsCodeApi;
 import cn.iocoder.yudao.module.system.controller.admin.auth.vo.auth.*;
@@ -79,7 +79,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
             throw new UsernameNotFoundException(username);
         }
         // 创建 LoginUser 对象
-        return buildLoginUser(user);
+        return AuthConvert.INSTANCE.convert2(user);
     }
 
     @Override
@@ -89,7 +89,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         if (user == null) {
             throw new UsernameNotFoundException(String.valueOf(userId));
         }
-        createLoginLog(user.getUsername(), LoginLogTypeEnum.LOGIN_MOCK, LoginResultEnum.SUCCESS);
+        createLoginLog(userId, user.getUsername(), LoginLogTypeEnum.LOGIN_MOCK, LoginResultEnum.SUCCESS);
 
         // 创建 LoginUser 对象
         return buildLoginUser(user);
@@ -104,7 +104,8 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         LoginUser loginUser = login0(reqVO.getUsername(), reqVO.getPassword());
 
         // 缓存登陆用户到 Redis 中，返回 Token 令牌
-        return createUserSessionAfterLoginSuccess(loginUser, LoginLogTypeEnum.LOGIN_USERNAME, userIp, userAgent);
+        return createUserSessionAfterLoginSuccess(loginUser, reqVO.getUsername(),
+                LoginLogTypeEnum.LOGIN_USERNAME, userIp, userAgent);
     }
 
     @Override
@@ -132,7 +133,8 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         LoginUser loginUser = buildLoginUser(user);
 
         // 缓存登陆用户到 Redis 中，返回 sessionId 编号
-        return createUserSessionAfterLoginSuccess(loginUser, LoginLogTypeEnum.LOGIN_MOBILE, userIp, userAgent);
+        return createUserSessionAfterLoginSuccess(loginUser, reqVO.getMobile(),
+                LoginLogTypeEnum.LOGIN_MOBILE, userIp, userAgent);
     }
 
     private void verifyCaptcha(AuthLoginReqVO reqVO) {
@@ -147,13 +149,13 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         String code = captchaService.getCaptchaCode(reqVO.getUuid());
         if (code == null) {
             // 创建登录失败日志（验证码不存在）
-            this.createLoginLog(reqVO.getUsername(), logTypeEnum, LoginResultEnum.CAPTCHA_NOT_FOUND);
+            createLoginLog(null, reqVO.getUsername(), logTypeEnum, LoginResultEnum.CAPTCHA_NOT_FOUND);
             throw exception(AUTH_LOGIN_CAPTCHA_NOT_FOUND);
         }
         // 验证码不正确
         if (!code.equals(reqVO.getCode())) {
             // 创建登录失败日志（验证码不正确)
-            this.createLoginLog(reqVO.getUsername(), logTypeEnum, LoginResultEnum.CAPTCHA_CODE_ERROR);
+            createLoginLog(null, reqVO.getUsername(), logTypeEnum, LoginResultEnum.CAPTCHA_CODE_ERROR);
             throw exception(AUTH_LOGIN_CAPTCHA_CODE_ERROR);
         }
         // 正确，所以要删除下验证码
@@ -170,29 +172,35 @@ public class AdminAuthServiceImpl implements AdminAuthService {
             authentication = authenticationManager.authenticate(new MultiUsernamePasswordAuthenticationToken(
                     username, password, getUserType()));
         } catch (BadCredentialsException badCredentialsException) {
-            this.createLoginLog(username, logTypeEnum, LoginResultEnum.BAD_CREDENTIALS);
+            createLoginLog(null, username, logTypeEnum, LoginResultEnum.BAD_CREDENTIALS);
             throw exception(AUTH_LOGIN_BAD_CREDENTIALS);
         } catch (DisabledException disabledException) {
-            this.createLoginLog(username, logTypeEnum, LoginResultEnum.USER_DISABLED);
+            createLoginLog(null, username, logTypeEnum, LoginResultEnum.USER_DISABLED);
             throw exception(AUTH_LOGIN_USER_DISABLED);
         } catch (AuthenticationException authenticationException) {
             log.error("[login0][username({}) 发生未知异常]", username, authenticationException);
-            this.createLoginLog(username, logTypeEnum, LoginResultEnum.UNKNOWN_ERROR);
+            createLoginLog(null, username, logTypeEnum, LoginResultEnum.UNKNOWN_ERROR);
             throw exception(AUTH_LOGIN_FAIL_UNKNOWN);
         }
         Assert.notNull(authentication.getPrincipal(), "Principal 不会为空");
-        return (LoginUser) authentication.getPrincipal();
+        // 构建 User 对象
+        return AuthConvert.INSTANCE.convert((SpringSecurityUser) authentication.getPrincipal())
+                .setUserType(getUserType().getValue());
     }
 
-    private void createLoginLog(String username, LoginLogTypeEnum logTypeEnum, LoginResultEnum loginResult) {
+    private void createLoginLog(Long userId, String username,
+                                LoginLogTypeEnum logTypeEnum, LoginResultEnum loginResult) {
         // 获得用户
-        AdminUserDO user = userService.getUserByUsername(username);
+        if (userId == null) {
+            AdminUserDO user = userService.getUserByUsername(username);
+            userId = user != null ? user.getId() : null;
+        }
         // 插入登录日志
         LoginLogCreateReqDTO reqDTO = new LoginLogCreateReqDTO();
         reqDTO.setLogType(logTypeEnum.getType());
         reqDTO.setTraceId(TracerUtils.getTraceId());
-        if (user != null) {
-            reqDTO.setUserId(user.getId());
+        if (userId != null) {
+            reqDTO.setUserId(userId);
         }
         reqDTO.setUserType(getUserType().getValue());
         reqDTO.setUsername(username);
@@ -201,8 +209,8 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         reqDTO.setResult(loginResult.getResult());
         loginLogService.createLoginLog(reqDTO);
         // 更新最后登录时间
-        if (user != null && Objects.equals(LoginResultEnum.SUCCESS.getResult(), loginResult.getResult())) {
-            userService.updateUserLogin(user.getId(), ServletUtils.getClientIP());
+        if (userId != null && Objects.equals(LoginResultEnum.SUCCESS.getResult(), loginResult.getResult())) {
+            userService.updateUserLogin(userId, ServletUtils.getClientIP());
         }
     }
 
@@ -225,7 +233,8 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         LoginUser loginUser = buildLoginUser(user);
 
         // 缓存登录用户到 Redis 中，返回 Token 令牌
-        return createUserSessionAfterLoginSuccess(loginUser, LoginLogTypeEnum.LOGIN_SOCIAL, userIp, userAgent);
+        return createUserSessionAfterLoginSuccess(loginUser, null,
+                LoginLogTypeEnum.LOGIN_SOCIAL, userIp, userAgent);
     }
 
     @Override
@@ -237,12 +246,14 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         socialUserService.bindSocialUser(AuthConvert.INSTANCE.convert(loginUser.getId(), getUserType().getValue(), reqVO));
 
         // 缓存登录用户到 Redis 中，返回 Token 令牌
-        return createUserSessionAfterLoginSuccess(loginUser, LoginLogTypeEnum.LOGIN_SOCIAL, userIp, userAgent);
+        return createUserSessionAfterLoginSuccess(loginUser, reqVO.getUsername(),
+                LoginLogTypeEnum.LOGIN_SOCIAL, userIp, userAgent);
     }
 
-    private String createUserSessionAfterLoginSuccess(LoginUser loginUser, LoginLogTypeEnum logType, String userIp, String userAgent) {
+    private String createUserSessionAfterLoginSuccess(LoginUser loginUser, String username,
+                                                      LoginLogTypeEnum logType, String userIp, String userAgent) {
         // 插入登陆日志
-        createLoginLog(loginUser.getUsername(), logType, LoginResultEnum.SUCCESS);
+        createLoginLog(loginUser.getId(), username, logType, LoginResultEnum.SUCCESS);
         // 缓存登录用户到 Redis 中，返回 Token 令牌
         return userSessionService.createUserSession(loginUser, userIp, userAgent);
     }
@@ -257,7 +268,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         // 删除 session
         userSessionService.deleteUserSession(token);
         // 记录登出日志
-        createLogoutLog(loginUser.getId(), loginUser.getUsername());
+        createLogoutLog(loginUser.getId());
     }
 
     @Override
@@ -265,13 +276,13 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         return UserTypeEnum.ADMIN;
     }
 
-    private void createLogoutLog(Long userId, String username) {
+    private void createLogoutLog(Long userId) {
         LoginLogCreateReqDTO reqDTO = new LoginLogCreateReqDTO();
         reqDTO.setLogType(LoginLogTypeEnum.LOGOUT_SELF.getType());
         reqDTO.setTraceId(TracerUtils.getTraceId());
         reqDTO.setUserId(userId);
+        reqDTO.setUsername(getUsername(userId));
         reqDTO.setUserType(getUserType().getValue());
-        reqDTO.setUsername(username);
         reqDTO.setUserAgent(ServletUtils.getUserAgent());
         reqDTO.setUserIp(ServletUtils.getClientIP());
         reqDTO.setResult(LoginResultEnum.SUCCESS.getResult());
@@ -280,36 +291,19 @@ public class AdminAuthServiceImpl implements AdminAuthService {
 
     @Override
     public LoginUser verifyTokenAndRefresh(String token) {
-        // 获得 LoginUser
-        LoginUser loginUser = userSessionService.getLoginUser(token);
-        if (loginUser == null) {
-            return null;
-        }
-        // 刷新 LoginUser 缓存
-        return this.refreshLoginUserCache(token, loginUser);
-    }
-
-    private LoginUser refreshLoginUserCache(String token, LoginUser loginUser) {
-        // 每 1/3 的 Session 超时时间，刷新 LoginUser 缓存
-        if (System.currentTimeMillis() - loginUser.getUpdateTime().getTime() <
-                userSessionService.getSessionTimeoutMillis() / 3) {
-            return loginUser;
-        }
-
-        // 重新加载 AdminUserDO 信息
-        AdminUserDO user = userService.getUser(loginUser.getId());
-        if (user == null || CommonStatusEnum.DISABLE.getStatus().equals(user.getStatus())) {
-            throw exception(AUTH_TOKEN_EXPIRED); // 校验 token 时，用户被禁用的情况下，也认为 token 过期，方便前端跳转到登录界面
-        }
-
-        // 刷新 LoginUser 缓存
-        LoginUser newLoginUser= buildLoginUser(user);
-        userSessionService.refreshUserSession(token, newLoginUser);
-        return newLoginUser;
+        return userSessionService.getLoginUser(token);
     }
 
     private LoginUser buildLoginUser(AdminUserDO user) {
-        return AuthConvert.INSTANCE.convert(user);
+        return AuthConvert.INSTANCE.convert(user).setUserType(getUserType().getValue());
+    }
+
+    private String getUsername(Long userId) {
+        if (userId == null) {
+            return null;
+        }
+        AdminUserDO user = userService.getUser(userId);
+        return user != null ? user.getUsername() : null;
     }
 
 }
