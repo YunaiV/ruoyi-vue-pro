@@ -148,7 +148,7 @@ public class AdminUserServiceImpl implements AdminUserService {
         checkOldPassword(id, reqVO.getOldPassword());
         // 执行更新
         AdminUserDO updateObj = new AdminUserDO().setId(id);
-        updateObj.setPassword(passwordEncoder.encode(reqVO.getNewPassword())); // 加密密码
+        updateObj.setPassword(encodePassword(reqVO.getNewPassword())); // 加密密码
         userMapper.updateById(updateObj);
     }
 
@@ -172,7 +172,7 @@ public class AdminUserServiceImpl implements AdminUserService {
         // 更新密码
         AdminUserDO updateObj = new AdminUserDO();
         updateObj.setId(id);
-        updateObj.setPassword(passwordEncoder.encode(password)); // 加密密码
+        updateObj.setPassword(encodePassword(password)); // 加密密码
         userMapper.updateById(updateObj);
     }
 
@@ -205,11 +205,6 @@ public class AdminUserServiceImpl implements AdminUserService {
         return userMapper.selectByUsername(username);
     }
 
-    /**
-     * 通过手机号获取用户
-     * @param mobile
-     * @return
-     */
     @Override
     public AdminUserDO getUserByMobile(String mobile) {
         return userMapper.selectByMobile(mobile);
@@ -395,7 +390,7 @@ public class AdminUserServiceImpl implements AdminUserService {
         if (user == null) {
             throw exception(USER_NOT_EXISTS);
         }
-        if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
+        if (!isPasswordMatch(oldPassword, user.getPassword())) {
             throw exception(USER_PASSWORD_FAILED);
         }
     }
@@ -421,7 +416,7 @@ public class AdminUserServiceImpl implements AdminUserService {
             AdminUserDO existUser = userMapper.selectByUsername(importUser.getUsername());
             if (existUser == null) {
                 userMapper.insert(UserConvert.INSTANCE.convert(importUser)
-                        .setPassword(passwordEncoder.encode(userInitPassword))); // 设置默认密码
+                        .setPassword(encodePassword(userInitPassword))); // 设置默认密码
                 respVO.getCreateUsernames().add(importUser.getUsername());
                 return;
             }
@@ -441,6 +436,21 @@ public class AdminUserServiceImpl implements AdminUserService {
     @Override
     public List<AdminUserDO> getUsersByStatus(Integer status) {
         return userMapper.selectListByStatus(status);
+    }
+
+    @Override
+    public boolean isPasswordMatch(String rawPassword, String encodedPassword) {
+        return passwordEncoder.matches(rawPassword, encodedPassword);
+    }
+
+    /**
+     * 对密码进行加密
+     *
+     * @param password 密码
+     * @return 加密后的密码
+     */
+    private String encodePassword(String password) {
+        return passwordEncoder.encode(password);
     }
 
 }

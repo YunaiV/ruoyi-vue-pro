@@ -1,14 +1,14 @@
 package cn.iocoder.yudao.module.system.service.auth;
 
-import cn.iocoder.yudao.module.system.controller.admin.auth.vo.auth.*;
 import cn.iocoder.yudao.framework.security.core.service.SecurityAuthFrameworkService;
+import cn.iocoder.yudao.module.system.controller.admin.auth.vo.auth.*;
 
 import javax.validation.Valid;
 
 /**
  * 管理后台的认证 Service 接口
  *
- * 提供用户的账号密码登录、token 的校验等认证相关的功能
+ * 提供用户的登录、登出的能力
  *
  * @author 芋道源码
  */
@@ -23,6 +23,13 @@ public interface AdminAuthService extends SecurityAuthFrameworkService {
      * @return 身份令牌，使用 JWT 方式
      */
     String login(@Valid AuthLoginReqVO reqVO, String userIp, String userAgent);
+
+    /**
+     * 基于 token 退出登录
+     *
+     * @param token token
+     */
+    void logout(String token);
 
     /**
      * 短信验证码发送

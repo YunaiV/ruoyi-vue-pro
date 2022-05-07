@@ -105,16 +105,6 @@ public class MultiUserDetailsAuthenticationProvider extends AbstractUserDetailsA
         return selectService(request).verifyTokenAndRefresh(token);
     }
 
-    /**
-     * 基于 token 退出登录
-     *
-     * @param request 请求
-     * @param token token
-     */
-    public void logout(HttpServletRequest request, String token) {
-        selectService(request).logout(token);
-    }
-
     private SecurityAuthFrameworkService selectService(HttpServletRequest request) {
         // 第一步，获得用户类型
         UserTypeEnum userType = getUserType(request);

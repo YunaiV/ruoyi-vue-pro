@@ -26,8 +26,6 @@ public interface AuthConvert {
 
     SpringSecurityUser convert2(AdminUserDO user);
 
-    LoginUser convert(SpringSecurityUser bean);
-
     default AuthPermissionInfoRespVO convert(AdminUserDO user, List<RoleDO> roleList, List<MenuDO> menuList) {
         return AuthPermissionInfoRespVO.builder()
             .user(AuthPermissionInfoRespVO.UserVO.builder().id(user.getId()).nickname(user.getNickname()).avatar(user.getAvatar()).build())

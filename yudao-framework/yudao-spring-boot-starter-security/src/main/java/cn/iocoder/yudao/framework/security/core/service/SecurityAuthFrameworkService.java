@@ -21,13 +21,6 @@ public interface SecurityAuthFrameworkService extends UserDetailsService {
     LoginUser verifyTokenAndRefresh(String token);
 
     /**
-     * 基于 token 退出登录
-     *
-     * @param token token
-     */
-    void logout(String token);
-
-    /**
      * 获得用户类型。每个用户类型，对应一个 SecurityAuthFrameworkService 实现类。
      *
      * @return 用户类型

@@ -25,6 +25,13 @@ public interface MemberAuthService extends SecurityAuthFrameworkService {
     String login(@Valid AppAuthLoginReqVO reqVO, String userIp, String userAgent);
 
     /**
+     * 基于 token 退出登录
+     *
+     * @param token token
+     */
+    void logout(String token);
+
+    /**
      * 手机 + 验证码登陆
      *
      * @param reqVO 登陆信息

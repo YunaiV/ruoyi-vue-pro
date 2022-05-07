@@ -1,12 +1,12 @@
 package cn.iocoder.yudao.module.system.service.auth;
 
+import cn.hutool.core.util.ObjectUtil;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.util.monitor.TracerUtils;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.framework.common.util.validation.ValidationUtils;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
-import cn.iocoder.yudao.framework.security.core.authentication.MultiUsernamePasswordAuthenticationToken;
-import cn.iocoder.yudao.framework.security.core.authentication.SpringSecurityUser;
 import cn.iocoder.yudao.module.system.api.logger.dto.LoginLogCreateReqDTO;
 import cn.iocoder.yudao.module.system.api.sms.SmsCodeApi;
 import cn.iocoder.yudao.module.system.controller.admin.auth.vo.auth.*;
@@ -19,18 +19,11 @@ import cn.iocoder.yudao.module.system.service.common.CaptchaService;
 import cn.iocoder.yudao.module.system.service.logger.LoginLogService;
 import cn.iocoder.yudao.module.system.service.social.SocialUserService;
 import cn.iocoder.yudao.module.system.service.user.AdminUserService;
+import com.google.common.annotations.VisibleForTesting;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.DisabledException;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
 
 import javax.annotation.Resource;
 import javax.validation.Validator;
@@ -50,11 +43,6 @@ import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
 public class AdminAuthServiceImpl implements AdminAuthService {
 
     @Resource
-    @Lazy // 延迟加载，因为存在相互依赖的问题
-    private AuthenticationManager authenticationManager;
-
-    @Autowired
-    @SuppressWarnings("SpringJavaAutowiredFieldsWarningInspection") // UserService 存在重名
     private AdminUserService userService;
     @Resource
     private CaptchaService captchaService;
@@ -70,17 +58,6 @@ public class AdminAuthServiceImpl implements AdminAuthService {
 
     @Resource
     private SmsCodeApi smsCodeApi;
-
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        // 获取 username 对应的 AdminUserDO
-        AdminUserDO user = userService.getUserByUsername(username);
-        if (user == null) {
-            throw new UsernameNotFoundException(username);
-        }
-        // 创建 LoginUser 对象
-        return AuthConvert.INSTANCE.convert2(user);
-    }
 
     @Override
     public String login(AuthLoginReqVO reqVO, String userIp, String userAgent) {
@@ -124,7 +101,8 @@ public class AdminAuthServiceImpl implements AdminAuthService {
                 LoginLogTypeEnum.LOGIN_MOBILE, userIp, userAgent);
     }
 
-    private void verifyCaptcha(AuthLoginReqVO reqVO) {
+    @VisibleForTesting
+    void verifyCaptcha(AuthLoginReqVO reqVO) {
         // 如果验证码关闭，则不进行校验
         if (!captchaService.isCaptchaEnable()) {
             return;
@@ -149,46 +127,36 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         captchaService.deleteCaptchaCode(reqVO.getUuid());
     }
 
-    private LoginUser login0(String username, String password) {
+    @VisibleForTesting
+    LoginUser login0(String username, String password) {
         final LoginLogTypeEnum logTypeEnum = LoginLogTypeEnum.LOGIN_USERNAME;
-        // 用户验证
-        Authentication authentication;
-        try {
-            // 调用 Spring Security 的 AuthenticationManager#authenticate(...) 方法，使用账号密码进行认证
-            // 在其内部，会调用到 loadUserByUsername 方法，获取 User 信息
-            authentication = authenticationManager.authenticate(new MultiUsernamePasswordAuthenticationToken(
-                    username, password, getUserType()));
-        } catch (BadCredentialsException badCredentialsException) {
+        // 校验账号是否存在
+        AdminUserDO user = userService.getUserByUsername(username);
+        if (user == null) {
             createLoginLog(null, username, logTypeEnum, LoginResultEnum.BAD_CREDENTIALS);
             throw exception(AUTH_LOGIN_BAD_CREDENTIALS);
-        } catch (DisabledException disabledException) {
-            createLoginLog(null, username, logTypeEnum, LoginResultEnum.USER_DISABLED);
-            throw exception(AUTH_LOGIN_USER_DISABLED);
-        } catch (AuthenticationException authenticationException) {
-            log.error("[login0][username({}) 发生未知异常]", username, authenticationException);
-            createLoginLog(null, username, logTypeEnum, LoginResultEnum.UNKNOWN_ERROR);
-            throw exception(AUTH_LOGIN_FAIL_UNKNOWN);
         }
-        Assert.notNull(authentication.getPrincipal(), "Principal 不会为空");
+        if (!userService.isPasswordMatch(password, user.getPassword())) {
+            createLoginLog(user.getId(), username, logTypeEnum, LoginResultEnum.BAD_CREDENTIALS);
+            throw exception(AUTH_LOGIN_BAD_CREDENTIALS);
+        }
+        // 校验是否禁用
+        if (ObjectUtil.notEqual(user.getStatus(), CommonStatusEnum.ENABLE.getStatus())) {
+            createLoginLog(user.getId(), username, logTypeEnum, LoginResultEnum.USER_DISABLED);
+            throw exception(AUTH_LOGIN_USER_DISABLED);
+        }
+
         // 构建 User 对象
-        return AuthConvert.INSTANCE.convert((SpringSecurityUser) authentication.getPrincipal())
-                .setUserType(getUserType().getValue());
+        return buildLoginUser(user);
     }
 
     private void createLoginLog(Long userId, String username,
                                 LoginLogTypeEnum logTypeEnum, LoginResultEnum loginResult) {
-        // 获得用户
-        if (userId == null) {
-            AdminUserDO user = userService.getUserByUsername(username);
-            userId = user != null ? user.getId() : null;
-        }
         // 插入登录日志
         LoginLogCreateReqDTO reqDTO = new LoginLogCreateReqDTO();
         reqDTO.setLogType(logTypeEnum.getType());
         reqDTO.setTraceId(TracerUtils.getTraceId());
-        if (userId != null) {
-            reqDTO.setUserId(userId);
-        }
+        reqDTO.setUserId(userId);
         reqDTO.setUserType(getUserType().getValue());
         reqDTO.setUsername(username);
         reqDTO.setUserAgent(ServletUtils.getUserAgent());
@@ -293,4 +261,8 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         return user != null ? user.getUsername() : null;
     }
 
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        return null;
+    }
 }
