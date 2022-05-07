@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.framework.security.config;
 
-import cn.iocoder.yudao.framework.security.core.authentication.MultiUserDetailsAuthenticationProvider;
 import cn.iocoder.yudao.framework.security.core.filter.TokenAuthenticationFilter;
 import cn.iocoder.yudao.framework.web.config.WebProperties;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -8,7 +7,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -32,8 +30,6 @@ public class YudaoWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdap
     @Resource
     private WebProperties webProperties;
 
-    @Resource
-    private MultiUserDetailsAuthenticationProvider authenticationProvider;
     /**
      * 认证失败处理类 Bean
      */
@@ -67,14 +63,6 @@ public class YudaoWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdap
     @ConditionalOnMissingBean(AuthenticationManager.class)
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
-    }
-
-    /**
-     * 身份认证接口
-     */
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.authenticationProvider(authenticationProvider);
     }
 
     /**
@@ -130,11 +118,7 @@ public class YudaoWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdap
         // 添加 JWT Filter
         httpSecurity.addFilterBefore(authenticationTokenFilter, UsernamePasswordAuthenticationFilter.class);
     }
-
-    private String buildAdminApi(String url) {
-        return webProperties.getAdminApi().getPrefix() + url;
-    }
-
+    
     private String buildAppApi(String url) {
         return webProperties.getAppApi().getPrefix() + url;
     }

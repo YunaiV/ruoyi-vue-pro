@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.system.convert.auth;
 
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
-import cn.iocoder.yudao.framework.security.core.authentication.SpringSecurityUser;
 import cn.iocoder.yudao.module.system.api.sms.dto.code.SmsCodeSendReqDTO;
 import cn.iocoder.yudao.module.system.api.sms.dto.code.SmsCodeUseReqDTO;
 import cn.iocoder.yudao.module.system.api.social.dto.SocialUserBindReqDTO;
@@ -23,8 +22,6 @@ public interface AuthConvert {
     AuthConvert INSTANCE = Mappers.getMapper(AuthConvert.class);
 
     LoginUser convert(AdminUserDO bean);
-
-    SpringSecurityUser convert2(AdminUserDO user);
 
     default AuthPermissionInfoRespVO convert(AdminUserDO user, List<RoleDO> roleList, List<MenuDO> menuList) {
         return AuthPermissionInfoRespVO.builder()

@@ -5,7 +5,6 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.framework.security.config.SecurityProperties;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
-import cn.iocoder.yudao.framework.security.core.authentication.MultiUserDetailsAuthenticationProvider;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.framework.web.core.handler.GlobalExceptionHandler;
 import cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils;
@@ -29,8 +28,6 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
     private final SecurityProperties securityProperties;
 
-    private final MultiUserDetailsAuthenticationProvider authenticationProvider;
-
     private final GlobalExceptionHandler globalExceptionHandler;
 
     @Override
@@ -42,7 +39,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
             Integer userType = WebFrameworkUtils.getLoginUserType(request);
             try {
                 // 验证 token 有效性
-                LoginUser loginUser = authenticationProvider.verifyTokenAndRefresh(request, token);
+                LoginUser loginUser = null; // TODO 芋艿：待实现
                 // 模拟 Login 功能，方便日常开发调试
                 if (loginUser == null) {
                     loginUser = mockLoginUser(request, token, userType);

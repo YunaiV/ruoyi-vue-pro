@@ -1,11 +1,12 @@
 package cn.iocoder.yudao.module.member.service.auth;
 
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.ObjectUtil;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.util.monitor.TracerUtils;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
-import cn.iocoder.yudao.framework.security.core.authentication.MultiUsernamePasswordAuthenticationToken;
 import cn.iocoder.yudao.module.member.controller.app.auth.vo.*;
 import cn.iocoder.yudao.module.member.convert.auth.AuthConvert;
 import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
@@ -21,14 +22,6 @@ import cn.iocoder.yudao.module.system.enums.logger.LoginResultEnum;
 import cn.iocoder.yudao.module.system.enums.sms.SmsSceneEnum;
 import com.google.common.annotations.VisibleForTesting;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.DisabledException;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,10 +43,6 @@ import static cn.iocoder.yudao.module.member.enums.ErrorCodeConstants.*;
 public class MemberAuthServiceImpl implements MemberAuthService {
 
     @Resource
-    @Lazy // 延迟加载，因为存在相互依赖的问题
-    private AuthenticationManager authenticationManager;
-
-    @Resource
     private MemberUserService userService;
     @Resource
     private SmsCodeApi smsCodeApi;
@@ -68,17 +57,6 @@ public class MemberAuthServiceImpl implements MemberAuthService {
     private PasswordEncoder passwordEncoder;
     @Resource
     private MemberUserMapper userMapper;
-
-    @Override
-    public UserDetails loadUserByUsername(String mobile) throws UsernameNotFoundException {
-        // 获取 username 对应的 SysUserDO
-        MemberUserDO user = userService.getUserByMobile(mobile);
-        if (user == null) {
-            throw new UsernameNotFoundException(mobile);
-        }
-        // 创建 LoginUser 对象
-        return AuthConvert.INSTANCE.convert2(user);
-    }
 
     @Override
     public String login(AppAuthLoginReqVO reqVO, String userIp, String userAgent) {
@@ -157,43 +135,34 @@ public class MemberAuthServiceImpl implements MemberAuthService {
         return socialUserApi.getAuthorizeUrl(type, redirectUri);
     }
 
-    private LoginUser login0(String username, String password) {
-        final LoginLogTypeEnum logType = LoginLogTypeEnum.LOGIN_USERNAME;
-        // 用户验证
-        Authentication authentication;
-        try {
-            // 调用 Spring Security 的 AuthenticationManager#authenticate(...) 方法，使用账号密码进行认证
-            // 在其内部，会调用到 loadUserByUsername 方法，获取 User 信息
-            authentication = authenticationManager.authenticate(new MultiUsernamePasswordAuthenticationToken(
-                    username, password, getUserType()));
-        } catch (BadCredentialsException badCredentialsException) {
-            this.createLoginLog(null, username, logType, LoginResultEnum.BAD_CREDENTIALS);
+    private LoginUser login0(String mobile, String password) {
+        final LoginLogTypeEnum logTypeEnum = LoginLogTypeEnum.LOGIN_MOBILE;
+        // 校验账号是否存在
+        MemberUserDO user = userService.getUserByMobile(mobile);
+        if (user == null) {
+            createLoginLog(null, mobile, logTypeEnum, LoginResultEnum.BAD_CREDENTIALS);
             throw exception(AUTH_LOGIN_BAD_CREDENTIALS);
-        } catch (DisabledException disabledException) {
-            this.createLoginLog(null, username, logType, LoginResultEnum.USER_DISABLED);
-            throw exception(AUTH_LOGIN_USER_DISABLED);
-        } catch (AuthenticationException authenticationException) {
-            log.error("[login0][username({}) 发生未知异常]", username, authenticationException);
-            this.createLoginLog(null, username, logType, LoginResultEnum.UNKNOWN_ERROR);
-            throw exception(AUTH_LOGIN_FAIL_UNKNOWN);
         }
-        Assert.notNull(authentication.getPrincipal(), "Principal 不会为空");
-        return (LoginUser) authentication.getPrincipal();
+        if (!userService.isPasswordMatch(password, user.getPassword())) {
+            createLoginLog(user.getId(), mobile, logTypeEnum, LoginResultEnum.BAD_CREDENTIALS);
+            throw exception(AUTH_LOGIN_BAD_CREDENTIALS);
+        }
+        // 校验是否禁用
+        if (ObjectUtil.notEqual(user.getStatus(), CommonStatusEnum.ENABLE.getStatus())) {
+            createLoginLog(user.getId(), mobile, logTypeEnum, LoginResultEnum.USER_DISABLED);
+            throw exception(AUTH_LOGIN_USER_DISABLED);
+        }
+
+        // 构建 User 对象
+        return buildLoginUser(user);
     }
 
     private void createLoginLog(Long userId, String mobile, LoginLogTypeEnum logType, LoginResultEnum loginResult) {
-        // 获得用户
-        if (userId == null) {
-            MemberUserDO user = userService.getUserByMobile(mobile);
-            userId = user != null ? user.getId() : null;
-        }
         // 插入登录日志
         LoginLogCreateReqDTO reqDTO = new LoginLogCreateReqDTO();
         reqDTO.setLogType(logType.getType());
         reqDTO.setTraceId(TracerUtils.getTraceId());
-        if (userId != null) {
-            reqDTO.setUserId(userId);
-        }
+        reqDTO.setUserId(userId);
         reqDTO.setUserType(getUserType().getValue());
         reqDTO.setUsername(mobile);
         reqDTO.setUserAgent(ServletUtils.getUserAgent());
@@ -204,11 +173,6 @@ public class MemberAuthServiceImpl implements MemberAuthService {
         if (userId != null && Objects.equals(LoginResultEnum.SUCCESS.getResult(), loginResult.getResult())) {
             userService.updateUserLogin(userId, getClientIP());
         }
-    }
-
-    @Override
-    public LoginUser verifyTokenAndRefresh(String token) {
-        return userSessionApi.getLoginUser(token);
     }
 
     @Override
@@ -225,16 +189,12 @@ public class MemberAuthServiceImpl implements MemberAuthService {
     }
 
     @Override
-    public UserTypeEnum getUserType() {
-        return UserTypeEnum.MEMBER;
-    }
-
-    @Override
     public void updatePassword(Long userId, AppAuthUpdatePasswordReqVO reqVO) {
         // 检验旧密码
         MemberUserDO userDO = checkOldPassword(userId, reqVO.getOldPassword());
 
         // 更新用户密码
+        // TODO 芋艿：需要重构到用户模块
         userMapper.updateById(MemberUserDO.builder().id(userDO.getId())
                 .password(passwordEncoder.encode(reqVO.getPassword())).build());
     }
@@ -310,6 +270,10 @@ public class MemberAuthServiceImpl implements MemberAuthService {
         }
         MemberUserDO user = userService.getUser(userId);
         return user != null ? user.getMobile() : null;
+    }
+
+    private UserTypeEnum getUserType() {
+        return UserTypeEnum.MEMBER;
     }
 
 }

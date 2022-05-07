@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.member.service.auth;
 
-import cn.iocoder.yudao.framework.security.core.service.SecurityAuthFrameworkService;
 import cn.iocoder.yudao.module.member.controller.app.auth.vo.*;
 
 import javax.validation.Valid;
@@ -12,7 +11,7 @@ import javax.validation.Valid;
  *
  * @author 芋道源码
  */
-public interface MemberAuthService extends SecurityAuthFrameworkService {
+public interface MemberAuthService {
 
     /**
      * 手机 + 密码登录

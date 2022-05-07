@@ -21,8 +21,6 @@ import cn.iocoder.yudao.module.system.service.social.SocialUserService;
 import cn.iocoder.yudao.module.system.service.user.AdminUserService;
 import com.google.common.annotations.VisibleForTesting;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -226,11 +224,6 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         createLogoutLog(loginUser.getId());
     }
 
-    @Override
-    public UserTypeEnum getUserType() {
-        return UserTypeEnum.ADMIN;
-    }
-
     private void createLogoutLog(Long userId) {
         LoginLogCreateReqDTO reqDTO = new LoginLogCreateReqDTO();
         reqDTO.setLogType(LoginLogTypeEnum.LOGOUT_SELF.getType());
@@ -242,11 +235,6 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         reqDTO.setUserIp(ServletUtils.getClientIP());
         reqDTO.setResult(LoginResultEnum.SUCCESS.getResult());
         loginLogService.createLoginLog(reqDTO);
-    }
-
-    @Override
-    public LoginUser verifyTokenAndRefresh(String token) {
-        return userSessionService.getLoginUser(token);
     }
 
     private LoginUser buildLoginUser(AdminUserDO user) {
@@ -261,8 +249,8 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         return user != null ? user.getUsername() : null;
     }
 
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return null;
+    private UserTypeEnum getUserType() {
+        return UserTypeEnum.ADMIN;
     }
+
 }

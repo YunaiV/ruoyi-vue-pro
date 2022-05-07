@@ -1,13 +1,10 @@
 package cn.iocoder.yudao.framework.security.config;
 
 import cn.iocoder.yudao.framework.security.core.aop.PreAuthenticatedAspect;
-import cn.iocoder.yudao.framework.security.core.authentication.MultiUserDetailsAuthenticationProvider;
 import cn.iocoder.yudao.framework.security.core.context.TransmittableThreadLocalSecurityContextHolderStrategy;
 import cn.iocoder.yudao.framework.security.core.filter.TokenAuthenticationFilter;
 import cn.iocoder.yudao.framework.security.core.handler.AccessDeniedHandlerImpl;
 import cn.iocoder.yudao.framework.security.core.handler.AuthenticationEntryPointImpl;
-import cn.iocoder.yudao.framework.security.core.service.SecurityAuthFrameworkService;
-import cn.iocoder.yudao.framework.web.config.WebProperties;
 import cn.iocoder.yudao.framework.web.core.handler.GlobalExceptionHandler;
 import org.springframework.beans.factory.config.MethodInvokingFactoryBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -20,7 +17,6 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.access.AccessDeniedHandler;
 
 import javax.annotation.Resource;
-import java.util.List;
 
 /**
  * Spring Security 自动配置类，主要用于相关组件的配置
@@ -76,19 +72,8 @@ public class YudaoSecurityAutoConfiguration {
      * Token 认证过滤器 Bean
      */
     @Bean
-    public TokenAuthenticationFilter authenticationTokenFilter(MultiUserDetailsAuthenticationProvider authenticationProvider,
-                                                               GlobalExceptionHandler globalExceptionHandler) {
-        return new TokenAuthenticationFilter(securityProperties, authenticationProvider, globalExceptionHandler);
-    }
-
-    /**
-     * 身份验证的 Provider Bean，通过它实现账号 + 密码的认证
-     */
-    @Bean
-    public MultiUserDetailsAuthenticationProvider authenticationProvider(
-            List<SecurityAuthFrameworkService> securityFrameworkServices,
-            WebProperties webProperties, PasswordEncoder passwordEncoder) {
-        return new MultiUserDetailsAuthenticationProvider(securityFrameworkServices, webProperties, passwordEncoder);
+    public TokenAuthenticationFilter authenticationTokenFilter(GlobalExceptionHandler globalExceptionHandler) {
+        return new TokenAuthenticationFilter(securityProperties, globalExceptionHandler);
     }
 
     /**

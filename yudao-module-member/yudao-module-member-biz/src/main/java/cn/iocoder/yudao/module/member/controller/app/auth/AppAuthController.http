@@ -1,5 +1,5 @@
 ### 请求 /login 接口 => 成功
-POST {{appApi}}/member/login
+POST {{appApi}}/member/auth/login
 Content-Type: application/json
 tenant-id: {{appTenentId}}
 

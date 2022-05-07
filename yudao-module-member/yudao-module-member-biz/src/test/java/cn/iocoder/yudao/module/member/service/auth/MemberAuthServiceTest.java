@@ -16,7 +16,6 @@ import cn.iocoder.yudao.module.system.api.social.SocialUserApi;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.annotation.Resource;
@@ -38,8 +37,8 @@ import static org.mockito.Mockito.when;
 @Import({MemberAuthServiceImpl.class, YudaoRedisAutoConfiguration.class})
 public class MemberAuthServiceTest extends BaseDbAndRedisUnitTest {
 
-    @MockBean
-    private AuthenticationManager authenticationManager;
+    // TODO @芋艿：登录相关的单测，待补全
+
     @MockBean
     private MemberUserService userService;
     @MockBean

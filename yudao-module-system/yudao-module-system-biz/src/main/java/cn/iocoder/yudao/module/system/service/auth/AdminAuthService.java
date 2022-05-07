@@ -12,7 +12,7 @@ import javax.validation.Valid;
  *
  * @author 芋道源码
  */
-public interface AdminAuthService extends SecurityAuthFrameworkService {
+public interface AdminAuthService {
 
     /**
      * 账号登录
