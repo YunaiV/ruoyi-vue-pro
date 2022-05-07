@@ -21,14 +21,6 @@ public interface SecurityAuthFrameworkService extends UserDetailsService {
     LoginUser verifyTokenAndRefresh(String token);
 
     /**
-     * 模拟指定用户编号的 LoginUser
-     *
-     * @param userId 用户编号
-     * @return 登录用户
-     */
-    LoginUser mockLogin(Long userId);
-
-    /**
      * 基于 token 退出登录
      *
      * @param token token

@@ -8,6 +8,7 @@ import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.security.core.authentication.MultiUserDetailsAuthenticationProvider;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.framework.web.core.handler.GlobalExceptionHandler;
+import cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -38,12 +39,13 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         String token = SecurityFrameworkUtils.obtainAuthorization(request, securityProperties.getTokenHeader());
         if (StrUtil.isNotEmpty(token)) {
+            Integer userType = WebFrameworkUtils.getLoginUserType(request);
             try {
                 // 验证 token 有效性
                 LoginUser loginUser = authenticationProvider.verifyTokenAndRefresh(request, token);
                 // 模拟 Login 功能，方便日常开发调试
                 if (loginUser == null) {
-                    loginUser = mockLoginUser(request, token);
+                    loginUser = mockLoginUser(request, token, userType);
                 }
                 // 设置当前用户
                 if (loginUser != null) {
@@ -67,9 +69,10 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
      *
      * @param request 请求
      * @param token 模拟的 token，格式为 {@link SecurityProperties#getMockSecret()} + 用户编号
+     * @param userType 用户类型
      * @return 模拟的 LoginUser
      */
-    private LoginUser mockLoginUser(HttpServletRequest request, String token) {
+    private LoginUser mockLoginUser(HttpServletRequest request, String token, Integer userType) {
         if (!securityProperties.getMockEnable()) {
             return null;
         }
@@ -77,8 +80,10 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
         if (!token.startsWith(securityProperties.getMockSecret())) {
             return null;
         }
+        // 构建模拟用户
         Long userId = Long.valueOf(token.substring(securityProperties.getMockSecret().length()));
-        return authenticationProvider.mockLogin(request, userId);
+        return new LoginUser().setId(userId).setUserType(userType)
+                .setTenantId(WebFrameworkUtils.getTenantId(request));
     }
 
 }

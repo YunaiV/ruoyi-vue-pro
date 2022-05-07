@@ -83,19 +83,6 @@ public class AdminAuthServiceImpl implements AdminAuthService {
     }
 
     @Override
-    public LoginUser mockLogin(Long userId) {
-        // 获取用户编号对应的 AdminUserDO
-        AdminUserDO user = userService.getUser(userId);
-        if (user == null) {
-            throw new UsernameNotFoundException(String.valueOf(userId));
-        }
-        createLoginLog(userId, user.getUsername(), LoginLogTypeEnum.LOGIN_MOCK, LoginResultEnum.SUCCESS);
-
-        // 创建 LoginUser 对象
-        return buildLoginUser(user);
-    }
-
-    @Override
     public String login(AuthLoginReqVO reqVO, String userIp, String userAgent) {
         // 判断验证码是否正确
         verifyCaptcha(reqVO);

@@ -212,21 +212,6 @@ public class MemberAuthServiceImpl implements MemberAuthService {
     }
 
     @Override
-    public LoginUser mockLogin(Long userId) {
-        // 获取用户编号对应的 UserDO
-        MemberUserDO user = userService.getUser(userId);
-        if (user == null) {
-            throw new UsernameNotFoundException(String.valueOf(userId));
-        }
-
-        // 执行登陆
-        createLoginLog(userId, user.getMobile(), LoginLogTypeEnum.LOGIN_MOCK, LoginResultEnum.SUCCESS);
-
-        // 创建 LoginUser 对象
-        return buildLoginUser(user);
-    }
-
-    @Override
     public void logout(String token) {
         // 查询用户信息
         LoginUser loginUser = userSessionApi.getLoginUser(token);

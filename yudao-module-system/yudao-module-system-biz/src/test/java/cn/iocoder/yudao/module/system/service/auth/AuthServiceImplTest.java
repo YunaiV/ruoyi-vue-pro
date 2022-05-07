@@ -97,32 +97,6 @@ public class AuthServiceImplTest extends BaseDbUnitTest {
     }
 
     @Test
-    public void testMockLogin_success() {
-        // 准备参数
-        Long userId = randomLongId();
-        // mock 方法 01
-        AdminUserDO user = randomPojo(AdminUserDO.class, o -> o.setId(userId));
-        when(userService.getUser(eq(userId))).thenReturn(user);
-
-        // 调用
-        LoginUser loginUser = authService.mockLogin(userId);
-        // 断言
-        AssertUtils.assertPojoEquals(user, loginUser, "updateTime");
-    }
-
-    @Test
-    public void testMockLogin_userNotFound() {
-        // 准备参数
-        Long userId = randomLongId();
-        // mock 方法
-
-        // 调用, 并断言异常
-        assertThrows(UsernameNotFoundException.class, // 抛出 UsernameNotFoundException 异常
-                () -> authService.mockLogin(userId),
-                String.valueOf(userId)); // 异常提示为 userId
-    }
-
-    @Test
     public void testLogin_captchaNotFound() {
         // 准备参数
         AuthLoginReqVO reqVO = randomPojo(AuthLoginReqVO.class);

@@ -106,17 +106,6 @@ public class MultiUserDetailsAuthenticationProvider extends AbstractUserDetailsA
     }
 
     /**
-     * 模拟指定用户编号的 LoginUser
-     *
-     * @param request 请求
-     * @param userId 用户编号
-     * @return 登录用户
-     */
-    public LoginUser mockLogin(HttpServletRequest request, Long userId) {
-        return selectService(request).mockLogin(userId);
-    }
-
-    /**
      * 基于 token 退出登录
      *
      * @param request 请求
