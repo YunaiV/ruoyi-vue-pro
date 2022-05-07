@@ -6,7 +6,6 @@ import cn.iocoder.yudao.framework.security.core.context.TransmittableThreadLocal
 import cn.iocoder.yudao.framework.security.core.filter.TokenAuthenticationFilter;
 import cn.iocoder.yudao.framework.security.core.handler.AccessDeniedHandlerImpl;
 import cn.iocoder.yudao.framework.security.core.handler.AuthenticationEntryPointImpl;
-import cn.iocoder.yudao.framework.security.core.handler.LogoutSuccessHandlerImpl;
 import cn.iocoder.yudao.framework.security.core.service.SecurityAuthFrameworkService;
 import cn.iocoder.yudao.framework.web.config.WebProperties;
 import cn.iocoder.yudao.framework.web.core.handler.GlobalExceptionHandler;
@@ -19,7 +18,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.access.AccessDeniedHandler;
-import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -61,14 +59,6 @@ public class YudaoSecurityAutoConfiguration {
     @Bean
     public AccessDeniedHandler accessDeniedHandler() {
         return new AccessDeniedHandlerImpl();
-    }
-
-    /**
-     * 退出处理类 Bean
-     */
-    @Bean
-    public LogoutSuccessHandler logoutSuccessHandler(MultiUserDetailsAuthenticationProvider authenticationProvider) {
-        return new LogoutSuccessHandlerImpl(securityProperties, authenticationProvider);
     }
 
     /**

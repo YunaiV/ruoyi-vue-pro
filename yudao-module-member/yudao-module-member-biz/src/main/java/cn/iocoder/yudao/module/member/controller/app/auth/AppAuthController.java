@@ -1,7 +1,10 @@
 package cn.iocoder.yudao.module.member.controller.app.auth;
 
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.security.config.SecurityProperties;
 import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
+import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.member.controller.app.auth.vo.*;
 import cn.iocoder.yudao.module.member.service.auth.MemberAuthService;
 import io.swagger.annotations.Api;
@@ -13,6 +16,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -30,11 +34,24 @@ public class AppAuthController {
     @Resource
     private MemberAuthService authService;
 
+    @Resource
+    private SecurityProperties securityProperties;
+
     @PostMapping("/login")
     @ApiOperation("使用手机 + 密码登录")
     public CommonResult<AppAuthLoginRespVO> login(@RequestBody @Valid AppAuthLoginReqVO reqVO) {
         String token = authService.login(reqVO, getClientIP(), getUserAgent());
         return success(AppAuthLoginRespVO.builder().token(token).build());
+    }
+
+    @PostMapping("/logout")
+    @ApiOperation("登出系统")
+    public CommonResult<Boolean> logout(HttpServletRequest request) {
+        String token = SecurityFrameworkUtils.obtainAuthorization(request, securityProperties.getTokenHeader());
+        if (StrUtil.isNotBlank(token)) {
+            authService.logout(token);
+        }
+        return success(true);
     }
 
     @PostMapping("/sms-login")

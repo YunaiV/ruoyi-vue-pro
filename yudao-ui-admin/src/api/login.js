@@ -26,7 +26,7 @@ export function getInfo() {
 // 退出方法
 export function logout() {
   return request({
-    url: '/system/logout',
+    url: '/system/auth/logout',
     method: 'post'
   })
 }

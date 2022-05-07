@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.framework.security.config;
 
-import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.security.core.authentication.MultiUserDetailsAuthenticationProvider;
 import cn.iocoder.yudao.framework.security.core.filter.TokenAuthenticationFilter;
 import cn.iocoder.yudao.framework.web.config.WebProperties;
@@ -17,7 +16,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -46,11 +44,6 @@ public class YudaoWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdap
      */
     @Resource
     private AccessDeniedHandler accessDeniedHandler;
-    /**
-     * 退出处理类 Bean
-     */
-    @Resource
-    private LogoutSuccessHandler logoutSuccessHandler;
     /**
      * Token 认证过滤器 Bean
      */
@@ -114,11 +107,8 @@ public class YudaoWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdap
                 .headers().frameOptions().disable().and()
                 // 一堆自定义的 Spring Security 处理器
                 .exceptionHandling().authenticationEntryPoint(authenticationEntryPoint)
-                    .accessDeniedHandler(accessDeniedHandler).and()
-                // 登出地址的配置
-                .logout().logoutSuccessHandler(logoutSuccessHandler).logoutRequestMatcher(request -> // 匹配多种用户类型的登出
-                        StrUtil.equalsAny(request.getRequestURI(), buildAdminApi("/system/logout"),
-                                                                   buildAppApi("/member/logout")));
+                    .accessDeniedHandler(accessDeniedHandler);
+                // 登录、登录暂时不使用 Spring Security 的拓展点，主要考虑一方面拓展多用户、多种登录方式相对复杂，一方面用户的学习成本较高
 
         // 设置每个请求的权限
         httpSecurity
