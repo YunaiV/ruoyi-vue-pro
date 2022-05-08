@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.framework.security.core.filter;
 
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
@@ -8,7 +9,10 @@ import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.framework.web.core.handler.GlobalExceptionHandler;
 import cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils;
+import cn.iocoder.yudao.module.system.api.auth.OAuth2TokenApi;
+import cn.iocoder.yudao.module.system.api.auth.dto.OAuth2AccessTokenCheckRespDTO;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -30,6 +34,8 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
     private final GlobalExceptionHandler globalExceptionHandler;
 
+    private final OAuth2TokenApi oauth2TokenApi;
+
     @Override
     @SuppressWarnings("NullableProblems")
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
@@ -39,11 +45,21 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
             Integer userType = WebFrameworkUtils.getLoginUserType(request);
             try {
                 // 验证 token 有效性
-                LoginUser loginUser = null; // TODO 芋艿：待实现
+                OAuth2AccessTokenCheckRespDTO accessToken = oauth2TokenApi.checkAccessToken(token);
+                if (accessToken != null && ObjectUtil.notEqual(accessToken.getUserType(), userType)) { // 用户类型不匹配，无权限
+                    throw new AccessDeniedException("错误的用户类型");
+                }
+                LoginUser loginUser = null;
+                if (accessToken != null) { // 如果不为空，说明认证通过，则转换成登录用户
+                    loginUser = new LoginUser().setId(accessToken.getUserId()).setUserType(accessToken.getUserType())
+                            .setTenantId(accessToken.getTenantId());
+                }
+
                 // 模拟 Login 功能，方便日常开发调试
                 if (loginUser == null) {
                     loginUser = mockLoginUser(request, token, userType);
                 }
+
                 // 设置当前用户
                 if (loginUser != null) {
                     SecurityFrameworkUtils.setLoginUser(loginUser, request);

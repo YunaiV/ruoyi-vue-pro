@@ -84,8 +84,8 @@ public class WebFrameworkUtils {
         }
         // 1. 优先，从 Attribute 中获取
         Integer userType = (Integer) request.getAttribute(REQUEST_ATTRIBUTE_LOGIN_USER_TYPE);
-        if (userType == null) {
-            return null;
+        if (userType != null) {
+            return userType;
         }
         // 2. 其次，基于 URL 前缀的约定
         if (request.getRequestURI().startsWith(properties.getAdminApi().getPrefix())) {

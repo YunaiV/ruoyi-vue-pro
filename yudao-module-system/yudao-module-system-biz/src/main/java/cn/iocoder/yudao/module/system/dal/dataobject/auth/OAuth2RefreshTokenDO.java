@@ -12,6 +12,7 @@ import java.util.Date;
 /**
  * OAuth2 刷新令牌
  *
+ * @author 芋道源码
  */
 @TableName("system_oauth2_refresh_token")
 @Data
@@ -30,7 +31,7 @@ public class OAuth2RefreshTokenDO extends BaseDO {
     /**
      * 用户编号
      */
-    private Integer userId;
+    private Long userId;
     /**
      * 用户类型
      *
@@ -38,12 +39,14 @@ public class OAuth2RefreshTokenDO extends BaseDO {
      */
     private Integer userType;
     /**
+     * 客户端编号
+     *
+     * 关联 {@link OAuth2ClientDO#getId()}
+     */
+    private Long clientId;
+    /**
      * 过期时间
      */
     private Date expiresTime;
-    /**
-     * 创建 IP
-     */
-    private String createIp;
 
 }

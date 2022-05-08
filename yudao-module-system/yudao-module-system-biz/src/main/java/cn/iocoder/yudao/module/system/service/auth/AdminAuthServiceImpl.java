@@ -49,6 +49,8 @@ public class AdminAuthServiceImpl implements AdminAuthService {
     @Resource
     private UserSessionService userSessionService;
     @Resource
+    private OAuth2TokenService oauth2TokenService;
+    @Resource
     private SocialUserService socialUserService;
 
     @Resource
@@ -207,8 +209,12 @@ public class AdminAuthServiceImpl implements AdminAuthService {
                                                       LoginLogTypeEnum logType, String userIp, String userAgent) {
         // 插入登陆日志
         createLoginLog(loginUser.getId(), username, logType, LoginResultEnum.SUCCESS);
-        // 缓存登录用户到 Redis 中，返回 Token 令牌
-        return userSessionService.createUserSession(loginUser, userIp, userAgent);
+        // 创建访问令牌
+        // TODO userIp、userAgent
+        // TODO clientId
+        return oauth2TokenService.createAccessToken(loginUser.getId(), getUserType().getValue(), 1L)
+                .getAccessToken();
+//        return userSessionService.createUserSession(loginUser, userIp, userAgent);
     }
 
     @Override

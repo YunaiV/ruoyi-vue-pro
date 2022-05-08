@@ -39,11 +39,11 @@ public class OAuth2CodeDO extends BaseDO {
      */
     private Integer userType;
     /**
-     * 应用编号
+     * 客户端编号
      *
-     * 关联 {@link OAuth2ApplicationDO#getId()}
+     * 关联 {@link OAuth2ClientDO#getId()}
      */
-    private Long applicationId;
+    private Long clientId;
     /**
      * 刷新令牌
      *
