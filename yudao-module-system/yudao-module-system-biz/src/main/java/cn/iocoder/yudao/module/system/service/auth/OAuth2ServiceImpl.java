@@ -5,10 +5,12 @@ import org.springframework.stereotype.Service;
 /**
  * OAuth2.0 Service 实现类
  *
+ *
+ *
  * @author 芋道源码
  */
 @Service
-public class OAuth2ServiceImpl implements OAuth2Service {
+public class OAuth2ServiceImpl implements OAuth2TokenService {
 
 //    @Autowired
 //    private SystemBizProperties systemBizProperties;

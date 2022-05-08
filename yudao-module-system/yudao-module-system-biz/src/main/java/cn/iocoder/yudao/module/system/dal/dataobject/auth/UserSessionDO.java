@@ -24,6 +24,7 @@ import java.util.Date;
 @Data
 @Builder
 @EqualsAndHashCode(callSuper = true)
+@Deprecated
 public class UserSessionDO extends BaseDO {
 
     /**

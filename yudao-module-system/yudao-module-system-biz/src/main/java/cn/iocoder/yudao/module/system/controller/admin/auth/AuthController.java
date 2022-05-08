@@ -40,7 +40,7 @@ import static java.util.Collections.singleton;
 
 @Api(tags = "管理后台 - 认证")
 @RestController
-@RequestMapping("/system/auth") // 暂时不跟 /auth 结尾
+@RequestMapping("/system/auth")
 @Validated
 @Slf4j
 public class AuthController {
