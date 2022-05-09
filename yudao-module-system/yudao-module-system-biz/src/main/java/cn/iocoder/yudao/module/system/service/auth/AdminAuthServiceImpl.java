@@ -12,6 +12,7 @@ import cn.iocoder.yudao.module.system.controller.admin.auth.vo.auth.*;
 import cn.iocoder.yudao.module.system.convert.auth.AuthConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.auth.OAuth2AccessTokenDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
+import cn.iocoder.yudao.module.system.enums.auth.OAuth2ClientIdEnum;
 import cn.iocoder.yudao.module.system.enums.logger.LoginLogTypeEnum;
 import cn.iocoder.yudao.module.system.enums.logger.LoginResultEnum;
 import cn.iocoder.yudao.module.system.enums.sms.SmsSceneEnum;
@@ -58,7 +59,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
     private SmsCodeApi smsCodeApi;
 
     @Override
-    public String login(AuthLoginReqVO reqVO) {
+    public AuthLoginRespVO login(AuthLoginReqVO reqVO) {
         // 判断验证码是否正确
         verifyCaptcha(reqVO);
 
@@ -80,7 +81,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
     }
 
     @Override
-    public String smsLogin(AuthSmsLoginReqVO reqVO) {
+    public AuthLoginRespVO smsLogin(AuthSmsLoginReqVO reqVO) {
         // 校验验证码
         smsCodeApi.useSmsCode(AuthConvert.INSTANCE.convert(reqVO, SmsSceneEnum.ADMIN_MEMBER_LOGIN.getScene(), getClientIP()));
 
@@ -161,7 +162,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
     }
 
     @Override
-    public String socialQuickLogin(AuthSocialQuickLoginReqVO reqVO) {
+    public AuthLoginRespVO socialQuickLogin(AuthSocialQuickLoginReqVO reqVO) {
         // 使用 code 授权码，进行登录。然后，获得到绑定的用户编号
         Long userId = socialUserService.getBindUserId(UserTypeEnum.ADMIN.getValue(), reqVO.getType(),
                 reqVO.getCode(), reqVO.getState());
@@ -180,7 +181,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
     }
 
     @Override
-    public String socialBindLogin(AuthSocialBindLoginReqVO reqVO) {
+    public AuthLoginRespVO socialBindLogin(AuthSocialBindLoginReqVO reqVO) {
         // 使用账号密码，进行登录。
         AdminUserDO user = login0(reqVO.getUsername(), reqVO.getPassword());
 
@@ -191,13 +192,14 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         return createTokenAfterLoginSuccess(user.getId(), reqVO.getUsername(), LoginLogTypeEnum.LOGIN_SOCIAL);
     }
 
-    private String createTokenAfterLoginSuccess(Long userId, String username, LoginLogTypeEnum logType) {
+    private AuthLoginRespVO createTokenAfterLoginSuccess(Long userId, String username, LoginLogTypeEnum logType) {
         // 插入登陆日志
         createLoginLog(userId, username, logType, LoginResultEnum.SUCCESS);
         // 创建访问令牌
-        // TODO clientId
-        return oauth2TokenService.createAccessToken(userId, getUserType().getValue(), 1L)
-                .getAccessToken();
+        OAuth2AccessTokenDO accessTokenDO = oauth2TokenService.createAccessToken(userId, getUserType().getValue(),
+                OAuth2ClientIdEnum.DEFAULT.getId());
+        // 构建返回结果
+        return AuthConvert.INSTANCE.convert(accessTokenDO);
     }
 
     @Override

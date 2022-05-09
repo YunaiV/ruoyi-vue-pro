@@ -1,11 +1,13 @@
 package cn.iocoder.yudao.module.system.service.auth;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
-import cn.iocoder.yudao.framework.security.core.LoginUser;
+import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.framework.test.core.util.AssertUtils;
 import cn.iocoder.yudao.module.system.api.sms.SmsCodeApi;
 import cn.iocoder.yudao.module.system.controller.admin.auth.vo.auth.AuthLoginReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.auth.vo.auth.AuthLoginRespVO;
+import cn.iocoder.yudao.module.system.dal.dataobject.auth.OAuth2AccessTokenDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
 import cn.iocoder.yudao.module.system.enums.logger.LoginLogTypeEnum;
 import cn.iocoder.yudao.module.system.enums.logger.LoginResultEnum;
@@ -26,7 +28,6 @@ import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServic
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomString;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
@@ -43,11 +44,11 @@ public class AuthServiceImplTest extends BaseDbUnitTest {
     @MockBean
     private LoginLogService loginLogService;
     @MockBean
-    private UserSessionService userSessionService;
-    @MockBean
     private SocialUserService socialService;
     @MockBean
     private SmsCodeApi smsCodeApi;
+    @MockBean
+    private OAuth2TokenService oauth2TokenService;
 
     @MockBean
     private Validator validator;
@@ -188,22 +189,20 @@ public class AuthServiceImplTest extends BaseDbUnitTest {
         // mock 验证码正确
         when(captchaService.getCaptchaCode(reqVO.getUuid())).thenReturn(reqVO.getCode());
         // mock user 数据
-        AdminUserDO user = randomPojo(AdminUserDO.class, o -> o.setUsername("test_username")
+        AdminUserDO user = randomPojo(AdminUserDO.class, o -> o.setId(1L).setUsername("test_username")
                 .setPassword("test_password").setStatus(CommonStatusEnum.ENABLE.getStatus()));
         when(userService.getUserByUsername(eq("test_username"))).thenReturn(user);
         // mock password 匹配
         when(userService.isPasswordMatch(eq("test_password"), eq(user.getPassword()))).thenReturn(true);
         // mock 缓存登录用户到 Redis
-        String token = randomString();
-//        when(userSessionService.createUserSession(argThat(argument -> {
-//            AssertUtils.assertPojoEquals(user, argument);
-//            return true;
-//        }), eq(userIp), eq(userAgent))).thenReturn(token);
-        // TODO 芋艿：oauth2
+        OAuth2AccessTokenDO accessTokenDO = randomPojo(OAuth2AccessTokenDO.class, o -> o.setUserId(1L)
+                .setUserType(UserTypeEnum.ADMIN.getValue()));
+        when(oauth2TokenService.createAccessToken(eq(1L), eq(UserTypeEnum.ADMIN.getValue()), eq(1L)))
+                .thenReturn(accessTokenDO);
 
         // 调用, 并断言异常
-        String result = authService.login(reqVO);
-        assertEquals(token, result);
+        AuthLoginRespVO loginRespVO = authService.login(reqVO);
+        assertPojoEquals(accessTokenDO, loginRespVO);
         // 校验调用参数
         verify(loginLogService).createLoginLog(
             argThat(o -> o.getLogType().equals(LoginLogTypeEnum.LOGIN_USERNAME.getType())
@@ -216,18 +215,28 @@ public class AuthServiceImplTest extends BaseDbUnitTest {
     public void testLogout_success() {
         // 准备参数
         String token = randomString();
-        LoginUser loginUser = randomPojo(LoginUser.class);
         // mock
-//        when(userSessionService.getLoginUser(token)).thenReturn(loginUser);
-        // TODO @芋艿：oauth2
+        OAuth2AccessTokenDO accessTokenDO = randomPojo(OAuth2AccessTokenDO.class, o -> o.setUserId(1L)
+                .setUserType(UserTypeEnum.ADMIN.getValue()));
+        when(oauth2TokenService.removeAccessToken(eq(token))).thenReturn(accessTokenDO);
+
         // 调用
         authService.logout(token);
         // 校验调用参数
-        verify(userSessionService, times(1)).deleteUserSession(token);
-        verify(loginLogService, times(1)).createLoginLog(
-            argThat(o -> o.getLogType().equals(LoginLogTypeEnum.LOGOUT_SELF.getType())
+        verify(loginLogService).createLoginLog(argThat(o -> o.getLogType().equals(LoginLogTypeEnum.LOGOUT_SELF.getType())
                     && o.getResult().equals(LoginResultEnum.SUCCESS.getResult()))
         );
+    }
+
+    @Test
+    public void testLogout_fail() {
+        // 准备参数
+        String token = randomString();
+
+        // 调用
+        authService.logout(token);
+        // 校验调用参数
+        verify(loginLogService, never()).createLoginLog(any());
     }
 
 }

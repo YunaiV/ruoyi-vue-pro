@@ -40,7 +40,7 @@
 </template>
 
 <script>
-import { getToken } from "@/utils/auth";
+import { getAccessToken } from "@/utils/auth";
 
 export default {
   name: "FileUpload",
@@ -75,7 +75,7 @@ export default {
       baseUrl: process.env.VUE_APP_BASE_API,
       uploadFileUrl: process.env.VUE_APP_BASE_API + "/common/upload", // 上传的图片服务器地址
       headers: {
-        Authorization: "Bearer " + getToken(),
+        Authorization: "Bearer " + getAccessToken(),
       },
       fileList: [],
     };

@@ -237,7 +237,7 @@ import {
   resetUserPwd,
   updateUser
 } from "@/api/system/user";
-import {getToken} from "@/utils/auth";
+import {getAccessToken} from "@/utils/auth";
 import Treeselect from "@riophae/vue-treeselect";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 

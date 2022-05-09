@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.system.dal.redis;
 
 import cn.iocoder.yudao.framework.redis.core.RedisKeyDefine;
-import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.module.system.dal.dataobject.auth.OAuth2AccessTokenDO;
 
 import java.time.Duration;
@@ -18,10 +17,6 @@ public interface RedisKeyConstants {
     RedisKeyDefine CAPTCHA_CODE = new RedisKeyDefine("验证码的缓存",
             "captcha_code:%s", // 参数为 uuid
             STRING, String.class, RedisKeyDefine.TimeoutTypeEnum.DYNAMIC);
-
-    RedisKeyDefine LOGIN_USER = new RedisKeyDefine("登录用户的缓存",
-            "login_user:%s", // 参数为 token 令牌
-            STRING, LoginUser.class, RedisKeyDefine.TimeoutTypeEnum.DYNAMIC);
 
     RedisKeyDefine OAUTH2_ACCESS_TOKEN = new RedisKeyDefine("访问令牌的缓存",
             "oauth2_access_token:%s", // 参数为访问令牌 token

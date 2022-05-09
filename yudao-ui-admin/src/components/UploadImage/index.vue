@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import { getToken } from "@/utils/auth";
+import { getAccessToken } from "@/utils/auth";
 
 export default {
   components: {},
@@ -26,7 +26,7 @@ export default {
     return {
       uploadImgUrl: process.env.VUE_APP_BASE_API + "/common/upload", // 上传的图片服务器地址
       headers: {
-        Authorization: "Bearer " + getToken(),
+        Authorization: "Bearer " + getAccessToken(),
       },
     };
   },

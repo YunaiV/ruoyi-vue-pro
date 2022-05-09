@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { Notification, MessageBox, Message } from 'element-ui'
 import store from '@/store'
-import { getToken } from '@/utils/auth'
+import { getAccessToken } from '@/utils/auth'
 import errorCode from '@/utils/errorCode'
 import Cookies from "js-cookie";
 import {getPath, getTenantEnable} from "@/utils/ruoyi";
@@ -21,8 +21,8 @@ const service = axios.create({
 service.interceptors.request.use(config => {
   // 是否需要设置 token
   const isToken = (config.headers || {}).isToken === false
-  if (getToken() && !isToken) {
-    config.headers['Authorization'] = 'Bearer ' + getToken() // 让每个请求携带自定义token 请根据实际情况自行修改
+  if (getAccessToken() && !isToken) {
+    config.headers['Authorization'] = 'Bearer ' + getAccessToken() // 让每个请求携带自定义token 请根据实际情况自行修改
   }
   // 设置租户
   if (getTenantEnable()) {
@@ -133,7 +133,7 @@ service.interceptors.response.use(res => {
 
 export function getBaseHeader() {
   return {
-    'Authorization': "Bearer " + getToken(),
+    'Authorization': "Bearer " + getAccessToken(),
     'tenant-id': Cookies.get('tenantId'),
   }
 }

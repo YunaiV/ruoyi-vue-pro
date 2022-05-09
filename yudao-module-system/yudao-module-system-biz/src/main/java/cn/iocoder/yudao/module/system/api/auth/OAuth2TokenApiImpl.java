@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.system.api.auth;
 import cn.iocoder.yudao.module.system.api.auth.dto.OAuth2AccessTokenCheckRespDTO;
 import cn.iocoder.yudao.module.system.api.auth.dto.OAuth2AccessTokenCreateReqDTO;
 import cn.iocoder.yudao.module.system.api.auth.dto.OAuth2AccessTokenRespDTO;
-import cn.iocoder.yudao.module.system.convert.auth.UserSessionConvert;
+import cn.iocoder.yudao.module.system.convert.auth.OAuth2TokenConvert;
 import cn.iocoder.yudao.module.system.service.auth.OAuth2TokenService;
 import org.springframework.stereotype.Service;
 
@@ -27,7 +27,7 @@ public class OAuth2TokenApiImpl implements OAuth2TokenApi {
 
     @Override
     public OAuth2AccessTokenCheckRespDTO checkAccessToken(String accessToken) {
-        return UserSessionConvert.INSTANCE.convert(oauth2TokenService.checkAccessToken(accessToken));
+        return OAuth2TokenConvert.INSTANCE.convert(oauth2TokenService.checkAccessToken(accessToken));
     }
 
 }
