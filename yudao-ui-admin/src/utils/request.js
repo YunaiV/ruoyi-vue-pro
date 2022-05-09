@@ -9,7 +9,7 @@ import {refreshToken} from "@/api/login";
 
 // 是否显示重新登录
 export let isRelogin = { show: false };
-// Axios 无感知刷新令牌，参考 https://www.dashingdog.cn/article/11 实现
+// Axios 无感知刷新令牌，参考 https://www.dashingdog.cn/article/11 与 https://segmentfault.com/a/1190000020210980 实现
 // 请求队列
 let requestList = []
 // 是否正在刷新中
@@ -87,7 +87,8 @@ service.interceptors.response.use( async res => {
           requestList.forEach(cb => cb())
           return service(res.config)
         } catch (e) {
-          // 2.1 刷新失败，则只能执行登出操作
+          // 2.2 刷新失败，则只能执行登出操作
+          // 为什么需要 catch 异常呢？刷新失败时，请求因为 Promise.reject 触发异常。
           return handleAuthorized();
         } finally {
           requestList = []
