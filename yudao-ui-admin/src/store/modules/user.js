@@ -3,8 +3,6 @@ import {getAccessToken, setToken, removeToken, getRefreshToken} from '@/utils/au
 
 const user = {
   state: {
-    accessToken: getAccessToken(),
-    refreshToken: getRefreshToken(),
     id: 0, // 用户编号
     name: '',
     avatar: '',
@@ -15,10 +13,6 @@ const user = {
   mutations: {
     SET_ID: (state, id) => {
       state.id = id
-    },
-    SET_TOKEN: (state, token) => {
-      state.accessToken = token.accessToken
-      state.refreshToken = token.refreshToken
     },
     SET_NAME: (state, name) => {
       state.name = name
@@ -46,7 +40,6 @@ const user = {
           res = res.data;
           // 设置 token
           setToken(res)
-          commit('SET_TOKEN', res)
           resolve()
         }).catch(error => {
           reject(error)
@@ -64,7 +57,6 @@ const user = {
           res = res.data;
           // 设置 token
           setToken(res)
-          commit('SET_TOKEN', res)
           resolve()
         }).catch(error => {
           reject(error)
@@ -84,7 +76,6 @@ const user = {
           res = res.data;
           // 设置 token
           setToken(res)
-          commit('SET_TOKEN', res)
           resolve()
         }).catch(error => {
           reject(error)
@@ -100,7 +91,6 @@ const user = {
           res = res.data;
           // 设置 token
           setToken(res)
-          commit('SET_TOKEN', res)
           resolve()
         }).catch(error => {
           reject(error)
@@ -148,7 +138,6 @@ const user = {
     LogOut({ commit, state }) {
       return new Promise((resolve, reject) => {
         logout(state.token).then(() => {
-          commit('SET_TOKEN', '')
           commit('SET_ROLES', [])
           commit('SET_PERMISSIONS', [])
           removeToken()

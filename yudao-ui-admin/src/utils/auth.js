@@ -8,7 +8,7 @@ export function getAccessToken() {
 }
 
 export function getRefreshToken() {
-  return Cookies.get(AccessTokenKey)
+  return Cookies.get(RefreshTokenKey)
 }
 
 export function setToken(token) {

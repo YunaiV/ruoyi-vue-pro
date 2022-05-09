@@ -21,6 +21,7 @@ public class SecurityConfiguration {
                 // 登录的接口
                 registry.antMatchers(buildAdminApi("/system/auth/login")).permitAll();
                 registry.antMatchers(buildAdminApi("/system/auth/logout")).permitAll();
+                registry.antMatchers(buildAdminApi("/system/auth/refresh-token")).permitAll();
                 // 社交登陆的接口
                 registry.antMatchers(buildAdminApi("/system/auth/social-auth-redirect")).permitAll();
                 registry.antMatchers(buildAdminApi("/system/auth/social-quick-login")).permitAll();

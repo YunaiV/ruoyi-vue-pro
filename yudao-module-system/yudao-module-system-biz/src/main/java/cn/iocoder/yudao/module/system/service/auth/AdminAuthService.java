@@ -59,4 +59,12 @@ public interface AdminAuthService {
      */
     AuthLoginRespVO socialBindLogin(@Valid AuthSocialBindLoginReqVO reqVO);
 
+    /**
+     * 刷新访问令牌
+     *
+     * @param refreshToken 刷新令牌
+     * @return 登录结果
+     */
+    AuthLoginRespVO refreshToken(String refreshToken);
+
 }

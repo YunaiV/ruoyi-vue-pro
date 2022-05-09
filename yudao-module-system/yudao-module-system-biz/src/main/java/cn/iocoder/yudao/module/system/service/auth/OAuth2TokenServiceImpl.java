@@ -1,6 +1,8 @@
 package cn.iocoder.yudao.module.system.service.auth;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants;
 import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
@@ -15,8 +17,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.Calendar;
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 
 /**
  * OAuth2.0 Token Service 实现类
@@ -44,15 +48,38 @@ public class OAuth2TokenServiceImpl implements OAuth2TokenService {
         // 创建刷新令牌
         OAuth2RefreshTokenDO refreshTokenDO = createOAuth2RefreshToken(userId, userType, clientDO);
         // 创建访问令牌
-        OAuth2AccessTokenDO accessTokenDO = createOAuth2AccessToken(refreshTokenDO, clientDO);
-        // 记录到 Redis 中
-        oauth2AccessTokenRedisDAO.set(accessTokenDO);
-        return accessTokenDO;
+        return createOAuth2AccessToken(refreshTokenDO, clientDO);
     }
 
     @Override
-    public OAuth2AccessTokenDO refreshAccessToken(String refreshToken) {
-        return null;
+    public OAuth2AccessTokenDO refreshAccessToken(String refreshToken, Long clientId) {
+        // 查询访问令牌
+        OAuth2RefreshTokenDO refreshTokenDO = oauth2RefreshTokenMapper.selectByRefreshToken(refreshToken);
+        if (refreshTokenDO == null) {
+            throw exception(GlobalErrorCodeConstants.BAD_REQUEST, "无效的刷新令牌");
+        }
+
+        // 校验 Client 匹配
+        OAuth2ClientDO clientDO = oauth2ClientService.validOAuthClientFromCache(clientId);
+        if (ObjectUtil.notEqual(clientId, refreshTokenDO.getClientId())) {
+            throw exception(GlobalErrorCodeConstants.BAD_REQUEST, "刷新令牌的客户端编号不正确");
+        }
+
+        // 移除相关的访问令牌
+        List<OAuth2AccessTokenDO> accessTokenDOs = oauth2AccessTokenMapper.selectListByRefreshToken(refreshToken);
+        if (CollUtil.isNotEmpty(accessTokenDOs)) {
+            oauth2AccessTokenMapper.deleteBatchIds(convertSet(accessTokenDOs, OAuth2AccessTokenDO::getId));
+            oauth2AccessTokenRedisDAO.deleteList(convertSet(accessTokenDOs, OAuth2AccessTokenDO::getAccessToken));
+        }
+
+        // 已过期的情况下，删除刷新令牌
+        if (DateUtils.isExpired(refreshTokenDO.getExpiresTime())) {
+            oauth2AccessTokenMapper.deleteById(refreshTokenDO.getId());
+            throw exception(GlobalErrorCodeConstants.UNAUTHORIZED, "刷新令牌已过期");
+        }
+
+        // 创建访问令牌
+        return createOAuth2AccessToken(refreshTokenDO, clientDO);
     }
 
     @Override
@@ -76,10 +103,10 @@ public class OAuth2TokenServiceImpl implements OAuth2TokenService {
     public OAuth2AccessTokenDO checkAccessToken(String accessToken) {
         OAuth2AccessTokenDO accessTokenDO = getAccessToken(accessToken);
         if (accessTokenDO == null) {
-            throw exception(GlobalErrorCodeConstants.UNAUTHORIZED, "Token 不存在");
+            throw exception(GlobalErrorCodeConstants.UNAUTHORIZED, "访问令牌不存在");
         }
         if (DateUtils.isExpired(accessTokenDO.getExpiresTime())) {
-            throw exception(GlobalErrorCodeConstants.UNAUTHORIZED, "Token 已过期");
+            throw exception(GlobalErrorCodeConstants.UNAUTHORIZED, "访问令牌已过期");
         }
         return accessTokenDO;
     }
@@ -98,38 +125,16 @@ public class OAuth2TokenServiceImpl implements OAuth2TokenService {
         return accessTokenDO;
     }
 
-
-//    @Override
-//    @Transactional
-//    public OAuth2AccessTokenRespDTO refreshAccessToken(OAuth2RefreshAccessTokenReqDTO refreshAccessTokenDTO) {
-//        OAuth2RefreshTokenDO refreshTokenDO = oauth2RefreshTokenMapper.selectById(refreshAccessTokenDTO.getRefreshToken());
-//        // 校验刷新令牌是否合法
-//        if (refreshTokenDO == null) { // 不存在
-//            throw ServiceExceptionUtil.exception(OAUTH2_REFRESH_TOKEN_NOT_FOUND);
-//        }
-//        if (refreshTokenDO.getExpiresTime().getTime() < System.currentTimeMillis()) { // 已过期
-//            throw ServiceExceptionUtil.exception(OAUTH_REFRESH_TOKEN_EXPIRED);
-//        }
-//
-//        // 标记 refreshToken 对应的 accessToken 都不合法
-//        // 这块的实现，参考了 Spring Security OAuth2 的代码
-//        List<OAuth2AccessTokenDO> accessTokenDOs = oauth2AccessTokenMapper.selectListByRefreshToken(refreshAccessTokenDTO.getRefreshToken());
-//        accessTokenDOs.forEach(accessTokenDO -> deleteOAuth2AccessToken(accessTokenDO.getId()));
-//
-//        // 创建访问令牌
-//        OAuth2AccessTokenDO oauth2AccessTokenDO = createOAuth2AccessToken(refreshTokenDO, refreshAccessTokenDTO.getCreateIp());
-//        // 返回访问令牌
-//        return OAuth2Convert.INSTANCE.convert(oauth2AccessTokenDO);
-//    }
-
     private OAuth2AccessTokenDO createOAuth2AccessToken(OAuth2RefreshTokenDO refreshTokenDO, OAuth2ClientDO clientDO) {
-        OAuth2AccessTokenDO accessToken = new OAuth2AccessTokenDO().setAccessToken(generateAccessToken())
+        OAuth2AccessTokenDO accessTokenDO = new OAuth2AccessTokenDO().setAccessToken(generateAccessToken())
                 .setUserId(refreshTokenDO.getUserId()).setUserType(refreshTokenDO.getUserType()).setClientId(clientDO.getId())
                 .setRefreshToken(refreshTokenDO.getRefreshToken())
                 .setExpiresTime(DateUtils.addDate(Calendar.SECOND, clientDO.getAccessTokenValiditySeconds()));
-        accessToken.setTenantId(TenantContextHolder.getTenantId()); // 手动设置租户编号，避免缓存到 Redis 的时候，无对应的租户编号
-        oauth2AccessTokenMapper.insert(accessToken);
-        return accessToken;
+        accessTokenDO.setTenantId(TenantContextHolder.getTenantId()); // 手动设置租户编号，避免缓存到 Redis 的时候，无对应的租户编号
+        oauth2AccessTokenMapper.insert(accessTokenDO);
+        // 记录到 Redis 中
+        oauth2AccessTokenRedisDAO.set(accessTokenDO);
+        return accessTokenDO;
     }
 
     private OAuth2RefreshTokenDO createOAuth2RefreshToken(Long userId, Integer userType, OAuth2ClientDO clientDO) {

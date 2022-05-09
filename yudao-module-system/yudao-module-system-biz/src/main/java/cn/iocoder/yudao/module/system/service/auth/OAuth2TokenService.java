@@ -30,9 +30,10 @@ public interface OAuth2TokenService {
      * 参考 DefaultTokenServices 的 refreshAccessToken 方法
      *
      * @param refreshToken 刷新令牌
+     * @param clientId 客户端编号
      * @return 访问令牌的信息
      */
-    OAuth2AccessTokenDO refreshAccessToken(String refreshToken);
+    OAuth2AccessTokenDO refreshAccessToken(String refreshToken, Long clientId);
 
     /**
      * 获得访问令牌

@@ -1,11 +1,14 @@
 package cn.iocoder.yudao.module.system.dal.redis.auth;
 
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.system.dal.dataobject.auth.OAuth2AccessTokenDO;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
+import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static cn.iocoder.yudao.module.system.dal.redis.RedisKeyConstants.OAUTH2_ACCESS_TOKEN;
@@ -37,6 +40,11 @@ public class OAuth2AccessTokenRedisDAO {
     public void delete(String accessToken) {
         String redisKey = formatKey(accessToken);
         stringRedisTemplate.delete(redisKey);
+    }
+
+    public void deleteList(Collection<String> accessTokens) {
+        List<String> redisKeys = CollectionUtils.convertList(accessTokens, OAuth2AccessTokenRedisDAO::formatKey);
+        stringRedisTemplate.delete(redisKeys);
     }
 
     private static String formatKey(String accessToken) {
