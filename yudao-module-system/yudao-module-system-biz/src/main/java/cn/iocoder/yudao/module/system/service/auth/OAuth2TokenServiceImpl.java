@@ -85,23 +85,19 @@ public class OAuth2TokenServiceImpl implements OAuth2TokenService {
     }
 
     @Override
-    public boolean removeAccessToken(String accessToken) {
-        return false;
+    public OAuth2AccessTokenDO removeAccessToken(String accessToken) {
+        // 删除访问令牌
+        OAuth2AccessTokenDO accessTokenDO = oauth2AccessTokenMapper.selectByAccessToken(accessToken);
+        if (accessTokenDO == null) {
+            return null;
+        }
+        oauth2AccessTokenMapper.deleteById(accessTokenDO.getId());
+        oauth2AccessTokenRedisDAO.delete(accessToken);
+        // 删除刷新令牌
+        oauth2RefreshTokenMapper.deleteByRefreshToken(accessTokenDO.getRefreshToken());
+        return accessTokenDO;
     }
 
-//    @Override
-//    @Transactional
-//    public OAuth2AccessTokenRespDTO checkAccessToken(String accessToken) {
-//        OAuth2AccessTokenDO accessTokenDO = this.getOAuth2AccessToken(accessToken);
-//        if (accessTokenDO == null) { // 不存在
-//            throw ServiceExceptionUtil.exception(OAUTH2_ACCESS_TOKEN_NOT_FOUND);
-//        }
-//        if (accessTokenDO.getExpiresTime().getTime() < System.currentTimeMillis()) { // 已过期
-//            throw ServiceExceptionUtil.exception(OAUTH2_ACCESS_TOKEN_TOKEN_EXPIRED);
-//        }
-//        // 返回访问令牌
-//        return OAuth2Convert.INSTANCE.convert(accessTokenDO);
-//    }
 
 //    @Override
 //    @Transactional
@@ -125,20 +121,6 @@ public class OAuth2TokenServiceImpl implements OAuth2TokenService {
 //        // 返回访问令牌
 //        return OAuth2Convert.INSTANCE.convert(oauth2AccessTokenDO);
 //    }
-//
-//    @Override
-//    @Transactional
-//    public void removeToken(OAuth2RemoveTokenByUserReqDTO removeTokenDTO) {
-//        // 删除 Access Token
-//        OAuth2AccessTokenDO accessTokenDO = oauth2AccessTokenMapper.selectByUserIdAndUserType(
-//                removeTokenDTO.getUserId(), removeTokenDTO.getUserType());
-//        if (accessTokenDO != null) {
-//            this.deleteOAuth2AccessToken(accessTokenDO.getId());
-//        }
-//
-//        // 删除 Refresh Token
-//        oauth2RefreshTokenMapper.deleteByUserIdAndUserType(removeTokenDTO.getUserId(), removeTokenDTO.getUserType());
-//    }
 
     private OAuth2AccessTokenDO createOAuth2AccessToken(OAuth2RefreshTokenDO refreshTokenDO, OAuth2ClientDO clientDO) {
         OAuth2AccessTokenDO accessToken = new OAuth2AccessTokenDO().setAccessToken(generateAccessToken())
@@ -158,19 +140,6 @@ public class OAuth2TokenServiceImpl implements OAuth2TokenService {
         return refreshToken;
     }
 
-
-//    /**
-//     * 删除 accessToken 的 MySQL 与 Redis 的数据
-//     *
-//     * @param accessToken 访问令牌
-//     */
-//    private void deleteOAuth2AccessToken(String accessToken) {
-//        // 删除 MySQL
-//        oauth2AccessTokenMapper.deleteById(accessToken);
-//        // 删除 Redis
-//        oauth2AccessTokenRedisDAO.delete(accessToken);
-//    }
-//
     private static String generateAccessToken() {
         return IdUtil.fastSimpleUUID();
     }

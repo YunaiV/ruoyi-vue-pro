@@ -59,8 +59,8 @@ public interface OAuth2TokenService {
      * 参考 DefaultTokenServices 的 revokeToken 方法
      *
      * @param accessToken 刷新令牌
-     * @return 是否移除到
+     * @return 访问令牌的信息
      */
-    boolean removeAccessToken(String accessToken);
+    OAuth2AccessTokenDO removeAccessToken(String accessToken);
 
 }

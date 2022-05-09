@@ -33,8 +33,6 @@ import java.util.List;
 import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getClientIP;
-import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getUserAgent;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 import static java.util.Collections.singleton;
 
@@ -63,7 +61,7 @@ public class AuthController {
     @ApiOperation("使用账号密码登录")
     @OperateLog(enable = false) // 避免 Post 请求被记录操作日志
     public CommonResult<AuthLoginRespVO> login(@RequestBody @Valid AuthLoginReqVO reqVO) {
-        String token = authService.login(reqVO, getClientIP(), getUserAgent());
+        String token = authService.login(reqVO);
         return success(AuthLoginRespVO.builder().token(token).build());
     }
 
@@ -116,7 +114,7 @@ public class AuthController {
     @ApiOperation("使用短信验证码登录")
     @OperateLog(enable = false) // 避免 Post 请求被记录操作日志
     public CommonResult<AuthLoginRespVO> smsLogin(@RequestBody @Valid AuthSmsLoginReqVO reqVO) {
-        String token = authService.smsLogin(reqVO, getClientIP(), getUserAgent());
+        String token = authService.smsLogin(reqVO);
         // 返回结果
         return success(AuthLoginRespVO.builder().token(token).build());
     }
@@ -146,7 +144,7 @@ public class AuthController {
     @ApiOperation("社交快捷登录，使用 code 授权码")
     @OperateLog(enable = false) // 避免 Post 请求被记录操作日志
     public CommonResult<AuthLoginRespVO> socialQuickLogin(@RequestBody @Valid AuthSocialQuickLoginReqVO reqVO) {
-        String token = authService.socialQuickLogin(reqVO, getClientIP(), getUserAgent());
+        String token = authService.socialQuickLogin(reqVO);
         return success(AuthLoginRespVO.builder().token(token).build());
     }
 
@@ -154,7 +152,7 @@ public class AuthController {
     @ApiOperation("社交绑定登录，使用 code 授权码 + 账号密码")
     @OperateLog(enable = false) // 避免 Post 请求被记录操作日志
     public CommonResult<AuthLoginRespVO> socialBindLogin(@RequestBody @Valid AuthSocialBindLoginReqVO reqVO) {
-        String token = authService.socialBindLogin(reqVO, getClientIP(), getUserAgent());
+        String token = authService.socialBindLogin(reqVO);
         return success(AuthLoginRespVO.builder().token(token).build());
     }
 

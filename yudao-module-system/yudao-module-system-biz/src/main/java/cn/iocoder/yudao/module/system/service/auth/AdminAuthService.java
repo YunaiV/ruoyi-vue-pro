@@ -17,11 +17,9 @@ public interface AdminAuthService {
      * 账号登录
      *
      * @param reqVO 登录信息
-     * @param userIp 用户 IP
-     * @param userAgent 用户 UA
      * @return 身份令牌，使用 JWT 方式
      */
-    String login(@Valid AuthLoginReqVO reqVO, String userIp, String userAgent);
+    String login(@Valid AuthLoginReqVO reqVO);
 
     /**
      * 基于 token 退出登录
@@ -41,21 +39,17 @@ public interface AdminAuthService {
      * 短信登录
      *
      * @param reqVO 登录信息
-     * @param userIp 用户 IP
-     * @param userAgent 用户 UA
      * @return 身份令牌，使用 JWT 方式
      */
-    String smsLogin(AuthSmsLoginReqVO reqVO, String userIp, String userAgent) ;
+    String smsLogin(AuthSmsLoginReqVO reqVO) ;
 
     /**
      * 社交快捷登录，使用 code 授权码
      *
      * @param reqVO 登录信息
-     * @param userIp 用户 IP
-     * @param userAgent 用户 UA
      * @return 身份令牌，使用 JWT 方式
      */
-    String socialQuickLogin(@Valid AuthSocialQuickLoginReqVO reqVO, String userIp, String userAgent);
+    String socialQuickLogin(@Valid AuthSocialQuickLoginReqVO reqVO);
 
     /**
      * 社交绑定登录，使用 code 授权码 + 账号密码
@@ -65,6 +59,6 @@ public interface AdminAuthService {
      * @param userAgent 用户 UA
      * @return 身份令牌，使用 JWT 方式
      */
-    String socialBindLogin(@Valid AuthSocialBindLoginReqVO reqVO, String userIp, String userAgent);
+    String socialBindLogin(@Valid AuthSocialBindLoginReqVO reqVO);
 
 }

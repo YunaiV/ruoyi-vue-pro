@@ -2,6 +2,7 @@ package cn.iocoder.yudao.framework.security.core.filter;
 
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.framework.security.config.SecurityProperties;
@@ -44,23 +45,14 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
         if (StrUtil.isNotEmpty(token)) {
             Integer userType = WebFrameworkUtils.getLoginUserType(request);
             try {
-                // 验证 token 有效性
-                OAuth2AccessTokenCheckRespDTO accessToken = oauth2TokenApi.checkAccessToken(token);
-                if (accessToken != null && ObjectUtil.notEqual(accessToken.getUserType(), userType)) { // 用户类型不匹配，无权限
-                    throw new AccessDeniedException("错误的用户类型");
-                }
-                LoginUser loginUser = null;
-                if (accessToken != null) { // 如果不为空，说明认证通过，则转换成登录用户
-                    loginUser = new LoginUser().setId(accessToken.getUserId()).setUserType(accessToken.getUserType())
-                            .setTenantId(accessToken.getTenantId());
-                }
-
-                // 模拟 Login 功能，方便日常开发调试
+                // 1.1 基于 token 构建登录用户
+                LoginUser loginUser = buildLoginUserByToken(token, userType);
+                // 1.2 模拟 Login 功能，方便日常开发调试
                 if (loginUser == null) {
                     loginUser = mockLoginUser(request, token, userType);
                 }
 
-                // 设置当前用户
+                // 2. 设置当前用户
                 if (loginUser != null) {
                     SecurityFrameworkUtils.setLoginUser(loginUser, request);
                 }
@@ -73,6 +65,25 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
         // 继续过滤链
         chain.doFilter(request, response);
+    }
+
+    private LoginUser buildLoginUserByToken(String token, Integer userType) {
+        try {
+            OAuth2AccessTokenCheckRespDTO accessToken = oauth2TokenApi.checkAccessToken(token);
+            if (accessToken == null) {
+                return null;
+            }
+            // 用户类型不匹配，无权限
+            if (ObjectUtil.notEqual(accessToken.getUserType(), userType)) {
+                throw new AccessDeniedException("错误的用户类型");
+            }
+            // 构建登录用户
+            return new LoginUser().setId(accessToken.getUserId()).setUserType(accessToken.getUserType())
+                    .setTenantId(accessToken.getTenantId());
+        } catch (ServiceException serviceException) {
+            // 校验 Token 不通过时，考虑到一些接口是无需登录的，所以直接返回 null 即可
+            return null;
+        }
     }
 
     /**

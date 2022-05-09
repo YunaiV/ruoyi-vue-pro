@@ -70,7 +70,7 @@ public class AuthServiceImplTest extends BaseDbUnitTest {
         when(userService.isPasswordMatch(eq(password), eq(user.getPassword()))).thenReturn(true);
 
         // 调用
-        LoginUser loginUser = authService.login0(username, password);
+        AdminUserDO loginUser = authService.login0(username, password);
         // 校验
         assertPojoEquals(user, loginUser);
     }
@@ -182,8 +182,6 @@ public class AuthServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testLogin_success() {
         // 准备参数
-        String userIp = randomString();
-        String userAgent = randomString();
         AuthLoginReqVO reqVO = randomPojo(AuthLoginReqVO.class, o ->
                 o.setUsername("test_username").setPassword("test_password"));
 
@@ -197,13 +195,14 @@ public class AuthServiceImplTest extends BaseDbUnitTest {
         when(userService.isPasswordMatch(eq("test_password"), eq(user.getPassword()))).thenReturn(true);
         // mock 缓存登录用户到 Redis
         String token = randomString();
-        when(userSessionService.createUserSession(argThat(argument -> {
-            AssertUtils.assertPojoEquals(user, argument);
-            return true;
-        }), eq(userIp), eq(userAgent))).thenReturn(token);
+//        when(userSessionService.createUserSession(argThat(argument -> {
+//            AssertUtils.assertPojoEquals(user, argument);
+//            return true;
+//        }), eq(userIp), eq(userAgent))).thenReturn(token);
+        // TODO 芋艿：oauth2
 
         // 调用, 并断言异常
-        String result = authService.login(reqVO, userIp, userAgent);
+        String result = authService.login(reqVO);
         assertEquals(token, result);
         // 校验调用参数
         verify(loginLogService).createLoginLog(
@@ -219,7 +218,8 @@ public class AuthServiceImplTest extends BaseDbUnitTest {
         String token = randomString();
         LoginUser loginUser = randomPojo(LoginUser.class);
         // mock
-        when(userSessionService.getLoginUser(token)).thenReturn(loginUser);
+//        when(userSessionService.getLoginUser(token)).thenReturn(loginUser);
+        // TODO @芋艿：oauth2
         // 调用
         authService.logout(token);
         // 校验调用参数

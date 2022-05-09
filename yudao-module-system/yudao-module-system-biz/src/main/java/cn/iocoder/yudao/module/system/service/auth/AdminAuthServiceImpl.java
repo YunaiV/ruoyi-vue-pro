@@ -6,11 +6,11 @@ import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.util.monitor.TracerUtils;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.framework.common.util.validation.ValidationUtils;
-import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.module.system.api.logger.dto.LoginLogCreateReqDTO;
 import cn.iocoder.yudao.module.system.api.sms.SmsCodeApi;
 import cn.iocoder.yudao.module.system.controller.admin.auth.vo.auth.*;
 import cn.iocoder.yudao.module.system.convert.auth.AuthConvert;
+import cn.iocoder.yudao.module.system.dal.dataobject.auth.OAuth2AccessTokenDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
 import cn.iocoder.yudao.module.system.enums.logger.LoginLogTypeEnum;
 import cn.iocoder.yudao.module.system.enums.logger.LoginResultEnum;
@@ -47,8 +47,6 @@ public class AdminAuthServiceImpl implements AdminAuthService {
     @Resource
     private LoginLogService loginLogService;
     @Resource
-    private UserSessionService userSessionService;
-    @Resource
     private OAuth2TokenService oauth2TokenService;
     @Resource
     private SocialUserService socialUserService;
@@ -60,16 +58,15 @@ public class AdminAuthServiceImpl implements AdminAuthService {
     private SmsCodeApi smsCodeApi;
 
     @Override
-    public String login(AuthLoginReqVO reqVO, String userIp, String userAgent) {
+    public String login(AuthLoginReqVO reqVO) {
         // 判断验证码是否正确
         verifyCaptcha(reqVO);
 
         // 使用账号密码，进行登录
-        LoginUser loginUser = login0(reqVO.getUsername(), reqVO.getPassword());
+        AdminUserDO user = login0(reqVO.getUsername(), reqVO.getPassword());
 
-        // 缓存登陆用户到 Redis 中，返回 Token 令牌
-        return createUserSessionAfterLoginSuccess(loginUser, reqVO.getUsername(),
-                LoginLogTypeEnum.LOGIN_USERNAME, userIp, userAgent);
+        // 创建 Token 令牌，记录登录日志
+        return createTokenAfterLoginSuccess(user.getId(), reqVO.getUsername(), LoginLogTypeEnum.LOGIN_USERNAME);
     }
 
     @Override
@@ -83,9 +80,9 @@ public class AdminAuthServiceImpl implements AdminAuthService {
     }
 
     @Override
-    public String smsLogin(AuthSmsLoginReqVO reqVO, String userIp, String userAgent) {
+    public String smsLogin(AuthSmsLoginReqVO reqVO) {
         // 校验验证码
-        smsCodeApi.useSmsCode(AuthConvert.INSTANCE.convert(reqVO, SmsSceneEnum.ADMIN_MEMBER_LOGIN.getScene(), userIp));
+        smsCodeApi.useSmsCode(AuthConvert.INSTANCE.convert(reqVO, SmsSceneEnum.ADMIN_MEMBER_LOGIN.getScene(), getClientIP()));
 
         // 获得用户信息
         AdminUserDO user = userService.getUserByMobile(reqVO.getMobile());
@@ -93,12 +90,8 @@ public class AdminAuthServiceImpl implements AdminAuthService {
             throw exception(USER_NOT_EXISTS);
         }
 
-        // 创建 LoginUser 对象
-        LoginUser loginUser = buildLoginUser(user);
-
         // 缓存登陆用户到 Redis 中，返回 sessionId 编号
-        return createUserSessionAfterLoginSuccess(loginUser, reqVO.getMobile(),
-                LoginLogTypeEnum.LOGIN_MOBILE, userIp, userAgent);
+        return createTokenAfterLoginSuccess(user.getId(), reqVO.getMobile(), LoginLogTypeEnum.LOGIN_MOBILE);
     }
 
     @VisibleForTesting
@@ -128,7 +121,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
     }
 
     @VisibleForTesting
-    LoginUser login0(String username, String password) {
+    AdminUserDO login0(String username, String password) {
         final LoginLogTypeEnum logTypeEnum = LoginLogTypeEnum.LOGIN_USERNAME;
         // 校验账号是否存在
         AdminUserDO user = userService.getUserByUsername(username);
@@ -145,9 +138,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
             createLoginLog(user.getId(), username, logTypeEnum, LoginResultEnum.USER_DISABLED);
             throw exception(AUTH_LOGIN_USER_DISABLED);
         }
-
-        // 构建 User 对象
-        return buildLoginUser(user);
+        return user;
     }
 
     private void createLoginLog(Long userId, String username,
@@ -170,7 +161,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
     }
 
     @Override
-    public String socialQuickLogin(AuthSocialQuickLoginReqVO reqVO, String userIp, String userAgent) {
+    public String socialQuickLogin(AuthSocialQuickLoginReqVO reqVO) {
         // 使用 code 授权码，进行登录。然后，获得到绑定的用户编号
         Long userId = socialUserService.getBindUserId(UserTypeEnum.ADMIN.getValue(), reqVO.getType(),
                 reqVO.getCode(), reqVO.getState());
@@ -178,56 +169,46 @@ public class AdminAuthServiceImpl implements AdminAuthService {
             throw exception(AUTH_THIRD_LOGIN_NOT_BIND);
         }
 
-        // 自动登录
+        // 获得用户
         AdminUserDO user = userService.getUser(userId);
         if (user == null) {
             throw exception(USER_NOT_EXISTS);
         }
 
-        // 创建 LoginUser 对象
-        LoginUser loginUser = buildLoginUser(user);
-
-        // 缓存登录用户到 Redis 中，返回 Token 令牌
-        return createUserSessionAfterLoginSuccess(loginUser, null,
-                LoginLogTypeEnum.LOGIN_SOCIAL, userIp, userAgent);
+        // 创建 Token 令牌，记录登录日志
+        return createTokenAfterLoginSuccess(user.getId(), null, LoginLogTypeEnum.LOGIN_SOCIAL);
     }
 
     @Override
-    public String socialBindLogin(AuthSocialBindLoginReqVO reqVO, String userIp, String userAgent) {
+    public String socialBindLogin(AuthSocialBindLoginReqVO reqVO) {
         // 使用账号密码，进行登录。
-        LoginUser loginUser = login0(reqVO.getUsername(), reqVO.getPassword());
+        AdminUserDO user = login0(reqVO.getUsername(), reqVO.getPassword());
 
         // 绑定社交用户
-        socialUserService.bindSocialUser(AuthConvert.INSTANCE.convert(loginUser.getId(), getUserType().getValue(), reqVO));
+        socialUserService.bindSocialUser(AuthConvert.INSTANCE.convert(user.getId(), getUserType().getValue(), reqVO));
 
-        // 缓存登录用户到 Redis 中，返回 Token 令牌
-        return createUserSessionAfterLoginSuccess(loginUser, reqVO.getUsername(),
-                LoginLogTypeEnum.LOGIN_SOCIAL, userIp, userAgent);
+        // 创建 Token 令牌，记录登录日志
+        return createTokenAfterLoginSuccess(user.getId(), reqVO.getUsername(), LoginLogTypeEnum.LOGIN_SOCIAL);
     }
 
-    private String createUserSessionAfterLoginSuccess(LoginUser loginUser, String username,
-                                                      LoginLogTypeEnum logType, String userIp, String userAgent) {
+    private String createTokenAfterLoginSuccess(Long userId, String username, LoginLogTypeEnum logType) {
         // 插入登陆日志
-        createLoginLog(loginUser.getId(), username, logType, LoginResultEnum.SUCCESS);
+        createLoginLog(userId, username, logType, LoginResultEnum.SUCCESS);
         // 创建访问令牌
-        // TODO userIp、userAgent
         // TODO clientId
-        return oauth2TokenService.createAccessToken(loginUser.getId(), getUserType().getValue(), 1L)
+        return oauth2TokenService.createAccessToken(userId, getUserType().getValue(), 1L)
                 .getAccessToken();
-//        return userSessionService.createUserSession(loginUser, userIp, userAgent);
     }
 
     @Override
     public void logout(String token) {
-        // 查询用户信息
-        LoginUser loginUser = userSessionService.getLoginUser(token);
-        if (loginUser == null) {
+        // 删除访问令牌
+        OAuth2AccessTokenDO accessTokenDO = oauth2TokenService.removeAccessToken(token);
+        if (accessTokenDO == null) {
             return;
         }
-        // 删除 session
-        userSessionService.deleteUserSession(token);
-        // 记录登出日志
-        createLogoutLog(loginUser.getId());
+        // 删除成功，则记录登出日志
+        createLogoutLog(accessTokenDO.getUserId());
     }
 
     private void createLogoutLog(Long userId) {
@@ -241,10 +222,6 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         reqDTO.setUserIp(ServletUtils.getClientIP());
         reqDTO.setResult(LoginResultEnum.SUCCESS.getResult());
         loginLogService.createLoginLog(reqDTO);
-    }
-
-    private LoginUser buildLoginUser(AdminUserDO user) {
-        return AuthConvert.INSTANCE.convert(user).setUserType(getUserType().getValue());
     }
 
     private String getUsername(Long userId) {
