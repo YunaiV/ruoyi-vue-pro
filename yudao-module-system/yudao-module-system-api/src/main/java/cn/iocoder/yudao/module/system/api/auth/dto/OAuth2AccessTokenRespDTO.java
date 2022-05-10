@@ -26,7 +26,7 @@ public class OAuth2AccessTokenRespDTO implements Serializable {
     /**
      * 用户编号
      */
-    private Integer userId;
+    private Long userId;
     /**
      * 用户类型
      */

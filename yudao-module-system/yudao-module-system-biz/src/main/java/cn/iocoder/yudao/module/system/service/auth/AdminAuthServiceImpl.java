@@ -18,6 +18,7 @@ import cn.iocoder.yudao.module.system.enums.logger.LoginResultEnum;
 import cn.iocoder.yudao.module.system.enums.sms.SmsSceneEnum;
 import cn.iocoder.yudao.module.system.service.common.CaptchaService;
 import cn.iocoder.yudao.module.system.service.logger.LoginLogService;
+import cn.iocoder.yudao.module.system.service.member.MemberService;
 import cn.iocoder.yudao.module.system.service.social.SocialUserService;
 import cn.iocoder.yudao.module.system.service.user.AdminUserService;
 import com.google.common.annotations.VisibleForTesting;
@@ -51,6 +52,8 @@ public class AdminAuthServiceImpl implements AdminAuthService {
     private OAuth2TokenService oauth2TokenService;
     @Resource
     private SocialUserService socialUserService;
+    @Resource
+    private MemberService memberService;
 
     @Resource
     private Validator validator;
@@ -209,23 +212,27 @@ public class AdminAuthServiceImpl implements AdminAuthService {
     }
 
     @Override
-    public void logout(String token) {
+    public void logout(String token, Integer logType) {
         // 删除访问令牌
         OAuth2AccessTokenDO accessTokenDO = oauth2TokenService.removeAccessToken(token);
         if (accessTokenDO == null) {
             return;
         }
         // 删除成功，则记录登出日志
-        createLogoutLog(accessTokenDO.getUserId());
+        createLogoutLog(accessTokenDO.getUserId(), accessTokenDO.getUserType(), logType);
     }
 
-    private void createLogoutLog(Long userId) {
+    private void createLogoutLog(Long userId, Integer userType, Integer logType) {
         LoginLogCreateReqDTO reqDTO = new LoginLogCreateReqDTO();
-        reqDTO.setLogType(LoginLogTypeEnum.LOGOUT_SELF.getType());
+        reqDTO.setLogType(logType);
         reqDTO.setTraceId(TracerUtils.getTraceId());
         reqDTO.setUserId(userId);
-        reqDTO.setUsername(getUsername(userId));
-        reqDTO.setUserType(getUserType().getValue());
+        reqDTO.setUserType(userType);
+        if (ObjectUtil.notEqual(getUserType(), userType)) {
+            reqDTO.setUsername(getUsername(userId));
+        } else {
+            reqDTO.setUsername(memberService.getMemberUserMobile(userId));
+        }
         reqDTO.setUserAgent(ServletUtils.getUserAgent());
         reqDTO.setUserIp(ServletUtils.getClientIP());
         reqDTO.setResult(LoginResultEnum.SUCCESS.getResult());

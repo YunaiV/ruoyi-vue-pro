@@ -1,9 +1,8 @@
 package cn.iocoder.yudao.module.member.convert.auth;
 
-import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.module.member.controller.app.auth.vo.*;
 import cn.iocoder.yudao.module.member.controller.app.social.vo.AppSocialUserUnbindReqVO;
-import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
+import cn.iocoder.yudao.module.system.api.auth.dto.OAuth2AccessTokenRespDTO;
 import cn.iocoder.yudao.module.system.api.sms.dto.code.SmsCodeSendReqDTO;
 import cn.iocoder.yudao.module.system.api.sms.dto.code.SmsCodeUseReqDTO;
 import cn.iocoder.yudao.module.system.api.social.dto.SocialUserBindReqDTO;
@@ -17,8 +16,6 @@ public interface AuthConvert {
 
     AuthConvert INSTANCE = Mappers.getMapper(AuthConvert.class);
 
-    LoginUser convert(MemberUserDO bean);
-
     SocialUserBindReqDTO convert(Long userId, Integer userType, AppAuthSocialBindLoginReqVO reqVO);
     SocialUserBindReqDTO convert(Long userId, Integer userType, AppAuthSocialQuickLoginReqVO reqVO);
     SocialUserUnbindReqDTO convert(Long userId, Integer userType, AppSocialUserUnbindReqVO reqVO);
@@ -26,5 +23,7 @@ public interface AuthConvert {
     SmsCodeSendReqDTO convert(AppAuthSmsSendReqVO reqVO);
     SmsCodeUseReqDTO convert(AppAuthResetPasswordReqVO reqVO, SmsSceneEnum scene, String usedIp);
     SmsCodeUseReqDTO convert(AppAuthSmsLoginReqVO reqVO, Integer scene, String usedIp);
+
+    AppAuthLoginRespVO convert(OAuth2AccessTokenRespDTO bean);
 
 }

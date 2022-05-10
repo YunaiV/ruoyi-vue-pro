@@ -221,7 +221,7 @@ public class AuthServiceImplTest extends BaseDbUnitTest {
         when(oauth2TokenService.removeAccessToken(eq(token))).thenReturn(accessTokenDO);
 
         // 调用
-        authService.logout(token);
+        authService.logout(token, LoginLogTypeEnum.LOGOUT_SELF.getType());
         // 校验调用参数
         verify(loginLogService).createLoginLog(argThat(o -> o.getLogType().equals(LoginLogTypeEnum.LOGOUT_SELF.getType())
                     && o.getResult().equals(LoginResultEnum.SUCCESS.getResult()))
@@ -234,7 +234,7 @@ public class AuthServiceImplTest extends BaseDbUnitTest {
         String token = randomString();
 
         // 调用
-        authService.logout(token);
+        authService.logout(token, LoginLogTypeEnum.LOGOUT_SELF.getType());
         // 校验调用参数
         verify(loginLogService, never()).createLoginLog(any());
     }

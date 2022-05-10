@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.system.api.auth.dto;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
 import lombok.Data;
-import lombok.experimental.Accessors;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
@@ -14,14 +13,13 @@ import java.io.Serializable;
  * @author 芋道源码
  */
 @Data
-@Accessors(chain = true)
 public class OAuth2AccessTokenCreateReqDTO implements Serializable {
 
     /**
      * 用户编号
      */
     @NotNull(message = "用户编号不能为空")
-    private Integer userId;
+    private Long userId;
     /**
      * 用户类型
      */

@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.system.service.auth;
 
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.system.controller.admin.auth.vo.token.OAuth2AccessTokenPageReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.auth.OAuth2AccessTokenDO;
 
 /**
@@ -63,5 +65,13 @@ public interface OAuth2TokenService {
      * @return 访问令牌的信息
      */
     OAuth2AccessTokenDO removeAccessToken(String accessToken);
+
+    /**
+     * 获得访问令牌分页
+     *
+     * @param reqVO 请求
+     * @return 访问令牌分页
+     */
+    PageResult<OAuth2AccessTokenDO> getAccessTokenPage(OAuth2AccessTokenPageReqVO reqVO);
 
 }

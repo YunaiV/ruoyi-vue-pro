@@ -11,6 +11,7 @@ import cn.iocoder.yudao.module.system.convert.auth.AuthConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.MenuDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.RoleDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
+import cn.iocoder.yudao.module.system.enums.logger.LoginLogTypeEnum;
 import cn.iocoder.yudao.module.system.enums.permission.MenuTypeEnum;
 import cn.iocoder.yudao.module.system.service.auth.AdminAuthService;
 import cn.iocoder.yudao.module.system.service.permission.PermissionService;
@@ -70,14 +71,15 @@ public class AuthController {
     public CommonResult<Boolean> logout(HttpServletRequest request) {
         String token = obtainAuthorization(request, securityProperties.getTokenHeader());
         if (StrUtil.isNotBlank(token)) {
-            authService.logout(token);
+            authService.logout(token, LoginLogTypeEnum.LOGOUT_SELF.getType());
         }
         return success(true);
     }
 
     @PostMapping("/refresh-token")
     @ApiOperation("刷新令牌")
-    @OperateLog(enable = false) // 避免 Post 请求被记录操作日志 TODO 接口文档
+    @ApiImplicitParam(name = "refreshToken", value = "刷新令牌", required = true, dataTypeClass = String.class)
+    @OperateLog(enable = false) // 避免 Post 请求被记录操作日志
     public CommonResult<AuthLoginRespVO> refreshToken(@RequestParam("refreshToken") String refreshToken) {
         return success(authService.refreshToken(refreshToken));
     }

@@ -6,17 +6,19 @@ import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.util.monitor.TracerUtils;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
-import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.module.member.controller.app.auth.vo.*;
 import cn.iocoder.yudao.module.member.convert.auth.AuthConvert;
 import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
 import cn.iocoder.yudao.module.member.dal.mysql.user.MemberUserMapper;
 import cn.iocoder.yudao.module.member.service.user.MemberUserService;
-import cn.iocoder.yudao.module.system.api.auth.UserSessionApi;
+import cn.iocoder.yudao.module.system.api.auth.OAuth2TokenApi;
+import cn.iocoder.yudao.module.system.api.auth.dto.OAuth2AccessTokenCreateReqDTO;
+import cn.iocoder.yudao.module.system.api.auth.dto.OAuth2AccessTokenRespDTO;
 import cn.iocoder.yudao.module.system.api.logger.LoginLogApi;
 import cn.iocoder.yudao.module.system.api.logger.dto.LoginLogCreateReqDTO;
 import cn.iocoder.yudao.module.system.api.sms.SmsCodeApi;
 import cn.iocoder.yudao.module.system.api.social.SocialUserApi;
+import cn.iocoder.yudao.module.system.enums.auth.OAuth2ClientIdEnum;
 import cn.iocoder.yudao.module.system.enums.logger.LoginLogTypeEnum;
 import cn.iocoder.yudao.module.system.enums.logger.LoginResultEnum;
 import cn.iocoder.yudao.module.system.enums.sms.SmsSceneEnum;
@@ -49,9 +51,9 @@ public class MemberAuthServiceImpl implements MemberAuthService {
     @Resource
     private LoginLogApi loginLogApi;
     @Resource
-    private UserSessionApi userSessionApi;
-    @Resource
     private SocialUserApi socialUserApi;
+    @Resource
+    private OAuth2TokenApi oauth2TokenApi;
 
     @Resource
     private PasswordEncoder passwordEncoder;
@@ -59,35 +61,31 @@ public class MemberAuthServiceImpl implements MemberAuthService {
     private MemberUserMapper userMapper;
 
     @Override
-    public String login(AppAuthLoginReqVO reqVO, String userIp, String userAgent) {
+    public AppAuthLoginRespVO login(AppAuthLoginReqVO reqVO) {
         // 使用手机 + 密码，进行登录。
-        LoginUser loginUser = login0(reqVO.getMobile(), reqVO.getPassword());
+        MemberUserDO user = login0(reqVO.getMobile(), reqVO.getPassword());
 
-        // 缓存登录用户到 Redis 中，返回 Token 令牌
-        return createUserSessionAfterLoginSuccess(loginUser, reqVO.getMobile(),
-                LoginLogTypeEnum.LOGIN_USERNAME, userIp, userAgent);
+        // 创建 Token 令牌，记录登录日志
+        return createTokenAfterLoginSuccess(user, reqVO.getMobile(), LoginLogTypeEnum.LOGIN_MOBILE);
     }
 
     @Override
     @Transactional
-    public String smsLogin(AppAuthSmsLoginReqVO reqVO, String userIp, String userAgent) {
+    public AppAuthLoginRespVO smsLogin(AppAuthSmsLoginReqVO reqVO) {
         // 校验验证码
+        String userIp = getClientIP();
         smsCodeApi.useSmsCode(AuthConvert.INSTANCE.convert(reqVO, SmsSceneEnum.MEMBER_LOGIN.getScene(), userIp));
 
         // 获得获得注册用户
         MemberUserDO user = userService.createUserIfAbsent(reqVO.getMobile(), userIp);
         Assert.notNull(user, "获取用户失败，结果为空");
 
-        // 执行登陆
-        LoginUser loginUser = buildLoginUser(user);
-
-        // 缓存登录用户到 Redis 中，返回 Token 令牌
-        return createUserSessionAfterLoginSuccess(loginUser, reqVO.getMobile(),
-                LoginLogTypeEnum.LOGIN_SMS, userIp, userAgent);
+        // 创建 Token 令牌，记录登录日志
+        return createTokenAfterLoginSuccess(user, reqVO.getMobile(), LoginLogTypeEnum.LOGIN_SMS);
     }
 
     @Override
-    public String socialQuickLogin(AppAuthSocialQuickLoginReqVO reqVO, String userIp, String userAgent) {
+    public AppAuthLoginRespVO socialQuickLogin(AppAuthSocialQuickLoginReqVO reqVO) {
         // 使用 code 授权码，进行登录。然后，获得到绑定的用户编号
         Long userId = socialUserApi.getBindUserId(UserTypeEnum.MEMBER.getValue(), reqVO.getType(),
                 reqVO.getCode(), reqVO.getState());
@@ -101,33 +99,30 @@ public class MemberAuthServiceImpl implements MemberAuthService {
             throw exception(USER_NOT_EXISTS);
         }
 
-        // 创建 LoginUser 对象
-        LoginUser loginUser = buildLoginUser(user);
-
-        // 缓存登录用户到 Redis 中，返回 Token 令牌
-        return createUserSessionAfterLoginSuccess(loginUser, null,
-                LoginLogTypeEnum.LOGIN_SOCIAL, userIp, userAgent);
+        // 创建 Token 令牌，记录登录日志
+        return createTokenAfterLoginSuccess(user, null, LoginLogTypeEnum.LOGIN_SOCIAL);
     }
 
     @Override
-    public String socialBindLogin(AppAuthSocialBindLoginReqVO reqVO, String userIp, String userAgent) {
+    public AppAuthLoginRespVO socialBindLogin(AppAuthSocialBindLoginReqVO reqVO) {
         // 使用手机号、手机验证码登录
         AppAuthSmsLoginReqVO loginReqVO = AppAuthSmsLoginReqVO.builder()
                 .mobile(reqVO.getMobile()).code(reqVO.getSmsCode()).build();
-        String token = this.smsLogin(loginReqVO, userIp, userAgent);
-        LoginUser loginUser = userSessionApi.getLoginUser(token);
+        AppAuthLoginRespVO token = smsLogin(loginReqVO);
 
         // 绑定社交用户
-        socialUserApi.bindSocialUser(AuthConvert.INSTANCE.convert(loginUser.getId(), getUserType().getValue(), reqVO));
+        socialUserApi.bindSocialUser(AuthConvert.INSTANCE.convert(token.getUserId(), getUserType().getValue(), reqVO));
         return token;
     }
 
-    private String createUserSessionAfterLoginSuccess(LoginUser loginUser, String mobile,
-                                                      LoginLogTypeEnum logType, String userIp, String userAgent) {
+    private AppAuthLoginRespVO createTokenAfterLoginSuccess(MemberUserDO user, String mobile, LoginLogTypeEnum logType) {
         // 插入登陆日志
-        createLoginLog(loginUser.getId(), mobile, logType, LoginResultEnum.SUCCESS);
-        // 缓存登录用户到 Redis 中，返回 Token 令牌
-        return userSessionApi.createUserSession(loginUser, userIp, userAgent);
+        createLoginLog(user.getId(), mobile, logType, LoginResultEnum.SUCCESS);
+        // 创建 Token 令牌
+        OAuth2AccessTokenRespDTO accessTokenRespDTO = oauth2TokenApi.createAccessToken(new OAuth2AccessTokenCreateReqDTO()
+                .setUserId(user.getId()).setUserType(getUserType().getValue()).setClientId(OAuth2ClientIdEnum.DEFAULT.getId()));
+        // 构建返回结果
+        return AuthConvert.INSTANCE.convert(accessTokenRespDTO);
     }
 
     @Override
@@ -135,7 +130,7 @@ public class MemberAuthServiceImpl implements MemberAuthService {
         return socialUserApi.getAuthorizeUrl(type, redirectUri);
     }
 
-    private LoginUser login0(String mobile, String password) {
+    private MemberUserDO login0(String mobile, String password) {
         final LoginLogTypeEnum logTypeEnum = LoginLogTypeEnum.LOGIN_MOBILE;
         // 校验账号是否存在
         MemberUserDO user = userService.getUserByMobile(mobile);
@@ -152,9 +147,7 @@ public class MemberAuthServiceImpl implements MemberAuthService {
             createLoginLog(user.getId(), mobile, logTypeEnum, LoginResultEnum.USER_DISABLED);
             throw exception(AUTH_LOGIN_USER_DISABLED);
         }
-
-        // 构建 User 对象
-        return buildLoginUser(user);
+        return user;
     }
 
     private void createLoginLog(Long userId, String mobile, LoginLogTypeEnum logType, LoginResultEnum loginResult) {
@@ -177,15 +170,13 @@ public class MemberAuthServiceImpl implements MemberAuthService {
 
     @Override
     public void logout(String token) {
-        // 查询用户信息
-        LoginUser loginUser = userSessionApi.getLoginUser(token);
-        if (loginUser == null) {
+        // 删除访问令牌
+        OAuth2AccessTokenRespDTO accessTokenRespDTO = oauth2TokenApi.removeAccessToken(token);
+        if (accessTokenRespDTO == null) {
             return;
         }
-        // 删除 session
-        userSessionApi.deleteUserSession(token);
-        // 记录登出日志
-        createLogoutLog(loginUser.getId());
+        // 删除成功，则记录登出日志
+        createLogoutLog(accessTokenRespDTO.getUserId());
     }
 
     @Override
@@ -217,6 +208,12 @@ public class MemberAuthServiceImpl implements MemberAuthService {
     public void sendSmsCode(Long userId, AppAuthSmsSendReqVO reqVO) {
         // TODO 要根据不同的场景，校验是否有用户
         smsCodeApi.sendSmsCode(AuthConvert.INSTANCE.convert(reqVO).setCreateIp(getClientIP()));
+    }
+
+    @Override
+    public AppAuthLoginRespVO refreshToken(String refreshToken) {
+        OAuth2AccessTokenRespDTO accessTokenDO = oauth2TokenApi.refreshAccessToken(refreshToken, OAuth2ClientIdEnum.DEFAULT.getId());
+        return AuthConvert.INSTANCE.convert(accessTokenDO);
     }
 
     /**
@@ -258,10 +255,6 @@ public class MemberAuthServiceImpl implements MemberAuthService {
         reqDTO.setUserIp(getClientIP());
         reqDTO.setResult(LoginResultEnum.SUCCESS.getResult());
         loginLogApi.createLoginLog(reqDTO);
-    }
-
-    private LoginUser buildLoginUser(MemberUserDO user) {
-        return AuthConvert.INSTANCE.convert(user).setUserType(getUserType().getValue());
     }
 
     private String getMobile(Long userId) {
