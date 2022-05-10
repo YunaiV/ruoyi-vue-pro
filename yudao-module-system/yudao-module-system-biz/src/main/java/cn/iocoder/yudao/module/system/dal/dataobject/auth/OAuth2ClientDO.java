@@ -2,8 +2,11 @@ package cn.iocoder.yudao.module.system.dal.dataobject.auth;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -18,7 +21,7 @@ import java.util.List;
  *
  * @author 芋道源码
  */
-@TableName("system_oauth2_application")
+@TableName(value = "system_oauth2_client", autoResultMap = true)
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Accessors(chain = true)
@@ -29,7 +32,7 @@ public class OAuth2ClientDO extends BaseDO {
      *
      * 由于 SQL Server 在存储 String 主键有点问题，所以暂时使用 Long 类型
      */
-    @TableId
+    @TableId(type = IdType.INPUT)
     private Long id;
     /**
      * 客户端密钥
@@ -64,6 +67,7 @@ public class OAuth2ClientDO extends BaseDO {
     /**
      * 可重定向的 URI 地址
      */
+    @TableField(typeHandler = JacksonTypeHandler.class)
     private List<String> redirectUris;
 
 }
