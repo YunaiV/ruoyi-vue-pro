@@ -10,6 +10,10 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>yudao-module-bpm-biz</artifactId>
 
+    <properties>
+        <dom4j.version>2.1.3</dom4j.version>
+    </properties>
+
     <name>${project.artifactId}</name>
     <description>
         bpm-base 模块，实现公用的工作流的逻辑，提供给 bpm-activiti 和 bpm-flowable 复用
@@ -35,6 +39,10 @@
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
             <artifactId>yudao-spring-boot-starter-biz-data-permission</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-spring-boot-starter-biz-tenant</artifactId>
         </dependency>
 
         <!-- Web 相关 -->
@@ -76,6 +84,12 @@
             <artifactId>h2</artifactId>
             <version>1.4.196</version>
             <scope>test</scope>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.dom4j/dom4j -->
+        <!-- XML读写框架 -->
+        <dependency>
+            <groupId>org.dom4j</groupId>
+            <artifactId>dom4j</artifactId>
         </dependency>
     </dependencies>
 </project>

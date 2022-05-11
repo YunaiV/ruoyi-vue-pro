@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.bpm.service.message;
 
 import cn.iocoder.yudao.framework.web.config.WebProperties;
 import cn.iocoder.yudao.module.bpm.convert.message.BpmMessageConvert;
-import cn.iocoder.yudao.module.bpm.enums.message.BpmMessageEnum;
+import cn.iocoder.yudao.module.bpm.domain.enums.message.BpmMessageEnum;
 import cn.iocoder.yudao.module.bpm.service.message.dto.BpmMessageSendWhenProcessInstanceApproveReqDTO;
 import cn.iocoder.yudao.module.bpm.service.message.dto.BpmMessageSendWhenProcessInstanceRejectReqDTO;
 import cn.iocoder.yudao.module.bpm.service.message.dto.BpmMessageSendWhenTaskCreatedReqDTO;

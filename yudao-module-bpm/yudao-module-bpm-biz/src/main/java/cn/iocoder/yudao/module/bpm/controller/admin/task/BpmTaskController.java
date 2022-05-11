@@ -7,6 +7,7 @@ import cn.iocoder.yudao.module.bpm.service.task.BpmTaskService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
+import org.apache.ibatis.annotations.Param;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.engine.TaskService;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -17,6 +18,7 @@ import javax.annotation.Resource;
 import javax.validation.Valid;
 
 import java.util.List;
+import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils.getLoginUserId;
@@ -49,8 +51,15 @@ public class BpmTaskController {
     @ApiImplicitParam(name = "processInstanceId", value = "流程实例的编号", required = true, dataTypeClass = String.class)
     @PreAuthorize("@ss.hasPermission('bpm:task:query')")
     public CommonResult<List<BpmTaskRespVO>> getTaskListByProcessInstanceId(
-            @RequestParam("processInstanceId") String processInstanceId) {
+        @RequestParam("processInstanceId") String processInstanceId) {
         return success(taskService.getTaskListByProcessInstanceId(processInstanceId));
+    }
+
+    @GetMapping("/get")
+    @ApiOperation(value = "获取审批单详情", notes = "包括完成的、未完成的")
+    @ApiImplicitParam(name = "taskId", value = "任务Id", required = true, dataTypeClass = String.class)
+    public CommonResult<Object> getTask(@Param("taskId") String processInstanceId) {
+        return success(taskService.getTaskInfo(processInstanceId));
     }
 
     @PutMapping("/approve")
@@ -76,13 +85,14 @@ public class BpmTaskController {
         taskService.updateTaskAssignee(getLoginUserId(), reqVO);
         return success(true);
     }
+
     @PutMapping("/back")
     @ApiOperation(value = "回退")
-//    @PreAuthorize("@ss.hasPermission('bpm:task:back')")
-    public CommonResult<Boolean> backTask(@Valid @RequestBody BpmTaskUpdateAssigneeReqVO reqVO) {
+    //    @PreAuthorize("@ss.hasPermission('bpm:task:back')")
+    public CommonResult<Boolean> backTask(@Valid @RequestBody BpmTaskBackReqVO reqVO) {
         //先硬编码到 回退到第一个审批节点
-        String destinationTaskDefKey = "task01";
-        taskService.backTask(reqVO.getId(),destinationTaskDefKey);
-        return success(true);
+        //        String destinationTaskDefKey = "task01";
+        return taskService.backTask(reqVO);
+
     }
 }

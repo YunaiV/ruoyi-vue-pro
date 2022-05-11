@@ -8,6 +8,7 @@ import org.springframework.security.config.annotation.web.configurers.Expression
 
 /**
  * System 模块的 Security 配置
+ * @author kemengkai
  */
 @Configuration("systemSecurityConfiguration")
 public class SecurityConfiguration {

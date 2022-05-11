@@ -65,6 +65,7 @@
         <tencentcloud-sdk-java.version>3.1.471</tencentcloud-sdk-java.version>
         <yunpian-java-sdk.version>1.2.7</yunpian-java-sdk.version>
         <justauth.version>1.4.0</justauth.version>
+        <dom4j.version>2.1.3</dom4j.version>
     </properties>
 
     <dependencyManagement>
@@ -578,7 +579,13 @@
                 <artifactId>justauth-spring-boot-starter</artifactId> <!-- 社交登陆（例如说，个人微信、企业微信等等） -->
                 <version>${justauth.version}</version>
             </dependency>
-
+            <!-- https://mvnrepository.com/artifact/org.dom4j/dom4j -->
+            <!-- XML读写框架 -->
+            <dependency>
+                <groupId>org.dom4j</groupId>
+                <artifactId>dom4j</artifactId>
+                <version>${dom4j.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 

@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.bpm.enums.task;
+package cn.iocoder.yudao.module.bpm.domain.enums.task;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

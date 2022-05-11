@@ -35,5 +35,4 @@ public class BpmTaskRespVO extends BpmTaskDonePageItemRespVO {
         private String deptName;
 
     }
-
 }

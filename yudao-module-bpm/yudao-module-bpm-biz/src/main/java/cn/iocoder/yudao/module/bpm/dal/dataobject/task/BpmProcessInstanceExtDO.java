@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.bpm.dal.dataobject.task;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.yudao.module.bpm.enums.task.BpmProcessInstanceResultEnum;
-import cn.iocoder.yudao.module.bpm.enums.task.BpmProcessInstanceStatusEnum;
+import cn.iocoder.yudao.module.bpm.domain.enums.task.BpmProcessInstanceResultEnum;
+import cn.iocoder.yudao.module.bpm.domain.enums.task.BpmProcessInstanceStatusEnum;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;

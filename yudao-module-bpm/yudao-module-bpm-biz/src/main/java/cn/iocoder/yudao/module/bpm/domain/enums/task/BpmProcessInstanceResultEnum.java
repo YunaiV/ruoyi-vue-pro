@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.bpm.enums.task;
+package cn.iocoder.yudao.module.bpm.domain.enums.task;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,7 +15,8 @@ public enum BpmProcessInstanceResultEnum {
     PROCESS(1, "处理中"),
     APPROVE(2, "通过"),
     REJECT(3, "不通过"),
-    CANCEL(4, "已取消");
+    CANCEL(4, "已取消"),
+    BACK(5, "退回/驳回");
 
     /**
      * 结果

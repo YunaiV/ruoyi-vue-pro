@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.bpm.framework.flowable.core.behavior.script;
 
-import cn.iocoder.yudao.module.bpm.enums.definition.BpmTaskRuleScriptEnum;
+import cn.iocoder.yudao.module.bpm.domain.enums.definition.BpmTaskRuleScriptEnum;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 import java.util.Set;

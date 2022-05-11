@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.bpm.dal.dataobject.oa;
 
-import cn.iocoder.yudao.module.bpm.enums.task.BpmProcessInstanceResultEnum;
+import cn.iocoder.yudao.module.bpm.domain.enums.task.BpmProcessInstanceResultEnum;
 import lombok.*;
 import java.util.*;
 import com.baomidou.mybatisplus.annotation.*;

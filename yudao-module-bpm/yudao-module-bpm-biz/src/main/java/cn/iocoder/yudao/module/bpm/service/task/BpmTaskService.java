@@ -1,10 +1,10 @@
 package cn.iocoder.yudao.module.bpm.service.task;
 
+import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.*;
 import org.flowable.task.api.Task;
-
 
 import javax.validation.Valid;
 import java.util.List;
@@ -20,16 +20,19 @@ public interface BpmTaskService {
     /**
      * 获得待办的流程任务分页
      *
-     * @param userId 用户编号
+     * @param userId    用户编号
      * @param pageReqVO 分页请求
+     *
      * @return 流程任务分页
      */
     PageResult<BpmTaskTodoPageItemRespVO> getTodoTaskPage(Long userId, BpmTaskTodoPageReqVO pageReqVO);
+
     /**
      * 获得已办的流程任务分页
      *
-     * @param userId 用户编号
+     * @param userId    用户编号
      * @param pageReqVO 分页请求
+     *
      * @return 流程任务分页
      */
     PageResult<BpmTaskDonePageItemRespVO> getDoneTaskPage(Long userId, BpmTaskDonePageReqVO pageReqVO);
@@ -38,17 +41,19 @@ public interface BpmTaskService {
      * 获得流程任务 Map
      *
      * @param processInstanceIds 流程实例的编号数组
+     *
      * @return 流程任务 Map
      */
     default Map<String, List<Task>> getTaskMapByProcessInstanceIds(List<String> processInstanceIds) {
         return CollectionUtils.convertMultiMap(getTasksByProcessInstanceIds(processInstanceIds),
-                Task::getProcessInstanceId);
+            Task::getProcessInstanceId);
     }
 
     /**
      * 获得流程任务列表
      *
      * @param processInstanceIds 流程实例的编号数组
+     *
      * @return 流程任务列表
      */
     List<Task> getTasksByProcessInstanceIds(List<String> processInstanceIds);
@@ -57,15 +62,25 @@ public interface BpmTaskService {
      * 获得指令流程实例的流程任务列表，包括所有状态的
      *
      * @param processInstanceId 流程实例的编号
+     *
      * @return 流程任务列表
      */
     List<BpmTaskRespVO> getTaskListByProcessInstanceId(String processInstanceId);
 
     /**
+     * 获取任务详情
+     *
+     * @param processInstanceId 流程实例的编号
+     *
+     * @return 流程任务列表
+     */
+    List<BpmTaskRespVO> getTaskInfo(String processInstanceId);
+
+    /**
      * 通过任务
      *
      * @param userId 用户编号
-     * @param reqVO 通过请求
+     * @param reqVO  通过请求
      */
     void approveTask(Long userId, @Valid BpmTaskApproveReqVO reqVO);
 
@@ -73,28 +88,30 @@ public interface BpmTaskService {
      * 不通过任务
      *
      * @param userId 用户编号
-     * @param reqVO 不通过请求
+     * @param reqVO  不通过请求
      */
     void rejectTask(Long userId, @Valid BpmTaskRejectReqVO reqVO);
+
     /**
      * 回退任务
      *
-     * @param taskId 任务编号
+     * @param userId 用户id
+     * @param reqVO  回退任务信息
      */
-    void backTask(String taskId,String destinationTaskDefKey);
+    CommonResult<Boolean> backTask(BpmTaskBackReqVO reqVO);
 
     /**
      * 将流程任务分配给指定用户
      *
      * @param userId 用户编号
-     * @param reqVO 分配请求
+     * @param reqVO  分配请求
      */
     void updateTaskAssignee(Long userId, BpmTaskUpdateAssigneeReqVO reqVO);
 
     /**
      * 将流程任务分配给指定用户
      *
-     * @param id 流程任务编号
+     * @param id     流程任务编号
      * @param userId 用户编号
      */
     void updateTaskAssignee(String id, Long userId);

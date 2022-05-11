@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.bpm.enums.task;
+package cn.iocoder.yudao.module.bpm.domain.enums.task;
 
 import cn.hutool.core.util.StrUtil;
 import lombok.AllArgsConstructor;

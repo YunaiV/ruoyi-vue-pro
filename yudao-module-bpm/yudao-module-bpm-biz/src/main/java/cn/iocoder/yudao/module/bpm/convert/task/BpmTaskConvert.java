@@ -1,11 +1,13 @@
 package cn.iocoder.yudao.module.bpm.convert.task;
 
+import cn.hutool.core.util.BooleanUtil;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.BpmTaskDonePageItemRespVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.BpmTaskRespVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.BpmTaskTodoPageItemRespVO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.task.BpmTaskExtDO;
+import cn.iocoder.yudao.module.bpm.domain.enums.task.BpmProcessInstanceResultEnum;
 import cn.iocoder.yudao.module.bpm.service.message.dto.BpmMessageSendWhenTaskCreatedReqDTO;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
@@ -17,9 +19,10 @@ import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
+import org.springframework.beans.BeanUtils;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Bpm 任务 Convert
@@ -31,8 +34,37 @@ public interface BpmTaskConvert {
 
     BpmTaskConvert INSTANCE = Mappers.getMapper(BpmTaskConvert.class);
 
-    default List<BpmTaskTodoPageItemRespVO> convertList1(List<Task> tasks, Map<String, ProcessInstance> processInstanceMap,
-                                                         Map<Long, AdminUserRespDTO> userMap) {
+    /**
+     * 复制对象
+     *
+     * @param source 源 要复制的对象
+     * @param target 目标 复制到此对象
+     * @param <T>
+     *
+     * @return
+     */
+    public static <T> T copy(Object source, Class<T> target) {
+        if (source == null || target == null) {
+            return null;
+        }
+        try {
+            T newInstance = target.newInstance();
+            BeanUtils.copyProperties(source, newInstance);
+            return newInstance;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    default <T, K> List<K> copyList(List<T> source, Class<K> target) {
+        if (null == source || source.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return source.stream().map(e -> copy(e, target)).collect(Collectors.toList());
+    }
+
+    default List<BpmTaskTodoPageItemRespVO> convertList1(List<Task> tasks,
+        Map<String, ProcessInstance> processInstanceMap, Map<Long, AdminUserRespDTO> userMap) {
         return CollectionUtils.convertList(tasks, task -> {
             BpmTaskTodoPageItemRespVO respVO = convert1(task);
             ProcessInstance processInstance = processInstanceMap.get(task.getProcessInstanceId());
@@ -49,13 +81,12 @@ public interface BpmTaskConvert {
 
     @Named("convertSuspendedToSuspensionState")
     default Integer convertSuspendedToSuspensionState(boolean suspended) {
-        return suspended ? SuspensionState.SUSPENDED.getStateCode() :
-                SuspensionState.ACTIVE.getStateCode();
+        return suspended ? SuspensionState.SUSPENDED.getStateCode() : SuspensionState.ACTIVE.getStateCode();
     }
 
-    default List<BpmTaskDonePageItemRespVO> convertList2(List<HistoricTaskInstance> tasks, Map<String, BpmTaskExtDO> bpmTaskExtDOMap,
-                                                         Map<String, HistoricProcessInstance> historicProcessInstanceMap,
-                                                         Map<Long, AdminUserRespDTO> userMap) {
+    default List<BpmTaskDonePageItemRespVO> convertList2(List<HistoricTaskInstance> tasks,
+        Map<String, BpmTaskExtDO> bpmTaskExtDOMap, Map<String, HistoricProcessInstance> historicProcessInstanceMap,
+        Map<Long, AdminUserRespDTO> userMap) {
         return CollectionUtils.convertList(tasks, task -> {
             BpmTaskDonePageItemRespVO respVO = convert2(task);
             BpmTaskExtDO taskExtDO = bpmTaskExtDOMap.get(task.getId());
@@ -71,18 +102,16 @@ public interface BpmTaskConvert {
 
     BpmTaskDonePageItemRespVO convert2(HistoricTaskInstance bean);
 
-    @Mappings({
-            @Mapping(source = "processInstance.id", target = "id"),
-            @Mapping(source = "processInstance.name", target = "name"),
-            @Mapping(source = "processInstance.startUserId", target = "startUserId"),
-            @Mapping(source = "processInstance.processDefinitionId", target = "processDefinitionId"),
-            @Mapping(source = "startUser.nickname", target = "startUserNickname")
-    })
+    @Mappings({@Mapping(source = "processInstance.id", target = "id"),
+        @Mapping(source = "processInstance.name", target = "name"),
+        @Mapping(source = "processInstance.startUserId", target = "startUserId"),
+        @Mapping(source = "processInstance.processDefinitionId", target = "processDefinitionId"),
+        @Mapping(source = "startUser.nickname", target = "startUserNickname")})
     BpmTaskTodoPageItemRespVO.ProcessInstance convert(ProcessInstance processInstance, AdminUserRespDTO startUser);
 
-    default List<BpmTaskRespVO> convertList3(List<HistoricTaskInstance> tasks, Map<String, BpmTaskExtDO> bpmTaskExtDOMap,
-                                             HistoricProcessInstance processInstance, Map<Long, AdminUserRespDTO> userMap,
-                                             Map<Long, DeptRespDTO> deptMap) {
+    default List<BpmTaskRespVO> convertList3(List<HistoricTaskInstance> tasks,
+        Map<String, BpmTaskExtDO> bpmTaskExtDOMap, HistoricProcessInstance processInstance,
+        Map<Long, AdminUserRespDTO> userMap, Map<Long, DeptRespDTO> deptMap) {
         return CollectionUtils.convertList(tasks, task -> {
             BpmTaskRespVO respVO = convert3(task);
             BpmTaskExtDO taskExtDO = bpmTaskExtDOMap.get(task.getId());
@@ -111,37 +140,56 @@ public interface BpmTaskConvert {
     @Mapping(target = "id", ignore = true)
     void copyTo(BpmTaskExtDO from, @MappingTarget BpmTaskDonePageItemRespVO to);
 
-    @Mappings({
-            @Mapping(source = "processInstance.id", target = "id"),
-            @Mapping(source = "processInstance.name", target = "name"),
-            @Mapping(source = "processInstance.startUserId", target = "startUserId"),
-            @Mapping(source = "processInstance.processDefinitionId", target = "processDefinitionId"),
-            @Mapping(source = "startUser.nickname", target = "startUserNickname")
-    })
-    BpmTaskTodoPageItemRespVO.ProcessInstance convert(HistoricProcessInstance processInstance, AdminUserRespDTO startUser);
+    @Mappings({@Mapping(source = "processInstance.id", target = "id"),
+        @Mapping(source = "processInstance.name", target = "name"),
+        @Mapping(source = "processInstance.startUserId", target = "startUserId"),
+        @Mapping(source = "processInstance.processDefinitionId", target = "processDefinitionId"),
+        @Mapping(source = "startUser.nickname", target = "startUserNickname")})
+    BpmTaskTodoPageItemRespVO.ProcessInstance convert(HistoricProcessInstance processInstance,
+        AdminUserRespDTO startUser);
 
-    default BpmTaskExtDO convert2TaskExt(Task task){
-        BpmTaskExtDO taskExtDO = new BpmTaskExtDO()
-                .setTaskId(task.getId())
-                .setAssigneeUserId(NumberUtils.parseLong(task.getAssignee()))
-                .setName(task.getName())
-                .setProcessDefinitionId(task.getProcessDefinitionId())
-                .setProcessInstanceId(task.getProcessInstanceId());
+    default BpmTaskExtDO convert2TaskExt(Task task) {
+        BpmTaskExtDO taskExtDO = new BpmTaskExtDO().setTaskId(task.getId()).setTaskDefKey(task.getTaskDefinitionKey())
+            .setAssigneeUserId(NumberUtils.parseLong(task.getAssignee())).setName(task.getName())
+            .setProcessDefinitionId(task.getProcessDefinitionId()).setProcessInstanceId(task.getProcessInstanceId());
         taskExtDO.setCreateTime(task.getCreateTime());
         return taskExtDO;
     }
 
-    default BpmMessageSendWhenTaskCreatedReqDTO convert(ProcessInstance processInstance, AdminUserRespDTO startUser, Task task) {
+    default BpmMessageSendWhenTaskCreatedReqDTO convert(ProcessInstance processInstance, AdminUserRespDTO startUser,
+        Task task) {
         BpmMessageSendWhenTaskCreatedReqDTO reqDTO = new BpmMessageSendWhenTaskCreatedReqDTO();
         reqDTO.setProcessInstanceId(processInstance.getProcessInstanceId())
-                .setProcessInstanceName(processInstance.getName())
-                .setStartUserId(startUser.getId())
-                .setStartUserNickname(startUser.getNickname())
-                .setTaskId(task.getId())
-                .setTaskName(task.getName())
-                .setAssigneeUserId(NumberUtils.parseLong(task.getAssignee()));
+            .setProcessInstanceName(processInstance.getName()).setStartUserId(startUser.getId())
+            .setStartUserNickname(startUser.getNickname()).setTaskId(task.getId()).setTaskName(task.getName())
+            .setAssigneeUserId(NumberUtils.parseLong(task.getAssignee()));
         return reqDTO;
     }
+
+    /**
+     * bpmTaskExtDo 类数据去重
+     *
+     * @param bpmTaskExtDOList bpmTaskExtDo 类列表
+     *
+     * @return 返回新的list
+     */
+    default List<BpmTaskExtDO> distinct(List<BpmTaskExtDO> bpmTaskExtDOList) {
+        HashMap<String, BpmTaskExtDO> tmpMap = new HashMap<>(50);
+        List<BpmTaskExtDO> result = new ArrayList<>();
+        for (BpmTaskExtDO bpmTaskExtDO : bpmTaskExtDOList) {
+            boolean containsResult = tmpMap.containsKey(bpmTaskExtDO.getTaskDefKey());
+            if (BooleanUtil.isFalse(containsResult)) {
+                tmpMap.put(bpmTaskExtDO.getTaskDefKey(), bpmTaskExtDO);
+            }
+            BpmTaskExtDO tmpBpmTaskExtDO = tmpMap.get(bpmTaskExtDO.getTaskDefKey());
+            if (bpmTaskExtDO.getTaskDefKey().equals(tmpBpmTaskExtDO.getTaskDefKey())) {
+                if (!bpmTaskExtDO.getResult().equals(BpmProcessInstanceResultEnum.PROCESS.getResult())) {
+                    tmpMap.remove(bpmTaskExtDO.getTaskDefKey());
+                    tmpMap.put(bpmTaskExtDO.getTaskDefKey(), bpmTaskExtDO);
+                }
+            }
+        }
+        tmpMap.forEach((key, var) -> result.add(var));
+        return result;
+    }
 }
-
-

@@ -546,6 +546,7 @@ COMMIT;
 DROP TABLE IF EXISTS `bpm_task_ext`;
 CREATE TABLE `bpm_task_ext` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号',
+  `task_def_key` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '流程任务key',
   `assignee_user_id` bigint DEFAULT NULL COMMENT '任务的审批人',
   `name` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '任务的名字',
   `task_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '任务的编号',

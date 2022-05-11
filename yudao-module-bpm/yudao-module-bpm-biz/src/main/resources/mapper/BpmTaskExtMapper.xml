@@ -2,8 +2,36 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.iocoder.yudao.module.bpm.dal.mysql.task.BpmTaskExtMapper">
 
-    
-    <update id="updateUserOrSignTask">
-        UPDATE bpm_task_ext SET deleted=1 WHERE process_instance_id = #{entity.processInstanceId} AND name = #{entity.name} AND task_id != #{entity.taskId}
+
+    <update id="delTaskByProcInstIdAndTaskIdAndTaskDefKey">
+        UPDATE bpm_task_ext
+        SET deleted=1
+        WHERE process_instance_id = #{entity.processInstanceId}
+          AND task_def_key = #{entity.taskDefKey}
+          AND task_id != #{entity.taskId}
     </update>
+    <update id="backByTaskId">
+        UPDATE bpm_task_ext
+        SET result=2,
+            `comment`=#{comment}
+        WHERE task_id = #{taskId}
+    </update>
+    <update id="delByTaskIds">
+        UPDATE bpm_task_ext
+        SET result=1,
+        `deleted`= true
+        WHERE `task_id` IN
+        <foreach collection="taskIdList" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <select id="listByProcInstId" resultType="cn.iocoder.yudao.module.bpm.dal.dataobject.task.BpmTaskExtDO">
+        SELECT *
+        FROM bpm_task_ext
+        WHERE `process_instance_id` = #{procInstId}
+          AND `deleted` = FALSE
+        ORDER BY create_time
+        LIMIT 500
+    </select>
 </mapper>

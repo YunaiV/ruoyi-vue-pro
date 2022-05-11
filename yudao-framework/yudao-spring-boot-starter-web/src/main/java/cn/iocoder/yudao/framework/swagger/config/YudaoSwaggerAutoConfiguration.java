@@ -58,7 +58,8 @@ public class YudaoSwaggerAutoConfiguration {
                 .build()
                 .securitySchemes(securitySchemes())
                 .globalRequestParameters(globalRequestParameters())
-                .securityContexts(securityContexts());
+                .securityContexts(securityContexts())
+                .host("http://localhost:48080");
     }
 
     // ========== apiInfo ==========
