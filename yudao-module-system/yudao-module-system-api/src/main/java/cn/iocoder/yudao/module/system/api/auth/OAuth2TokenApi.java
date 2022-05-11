@@ -44,6 +44,6 @@ public interface OAuth2TokenApi {
      * @param clientId 客户端编号
      * @return 访问令牌的信息
      */
-    OAuth2AccessTokenRespDTO refreshAccessToken(String refreshToken, Long clientId);
+    OAuth2AccessTokenRespDTO refreshAccessToken(String refreshToken, String clientId);
 
 }

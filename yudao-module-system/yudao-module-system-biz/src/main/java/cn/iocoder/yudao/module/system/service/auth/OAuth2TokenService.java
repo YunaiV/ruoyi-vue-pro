@@ -24,7 +24,7 @@ public interface OAuth2TokenService {
      * @param clientId 客户端编号
      * @return 访问令牌的信息
      */
-    OAuth2AccessTokenDO createAccessToken(Long userId, Integer userType, Long clientId);
+    OAuth2AccessTokenDO createAccessToken(Long userId, Integer userType, String clientId);
 
     /**
      * 刷新访问令牌
@@ -35,7 +35,7 @@ public interface OAuth2TokenService {
      * @param clientId 客户端编号
      * @return 访问令牌的信息
      */
-    OAuth2AccessTokenDO refreshAccessToken(String refreshToken, Long clientId);
+    OAuth2AccessTokenDO refreshAccessToken(String refreshToken, String clientId);
 
     /**
      * 获得访问令牌

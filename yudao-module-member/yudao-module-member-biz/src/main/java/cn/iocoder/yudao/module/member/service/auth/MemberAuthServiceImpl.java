@@ -18,7 +18,7 @@ import cn.iocoder.yudao.module.system.api.logger.LoginLogApi;
 import cn.iocoder.yudao.module.system.api.logger.dto.LoginLogCreateReqDTO;
 import cn.iocoder.yudao.module.system.api.sms.SmsCodeApi;
 import cn.iocoder.yudao.module.system.api.social.SocialUserApi;
-import cn.iocoder.yudao.module.system.enums.auth.OAuth2ClientIdEnum;
+import cn.iocoder.yudao.module.system.enums.auth.OAuth2ClientConstants;
 import cn.iocoder.yudao.module.system.enums.logger.LoginLogTypeEnum;
 import cn.iocoder.yudao.module.system.enums.logger.LoginResultEnum;
 import cn.iocoder.yudao.module.system.enums.sms.SmsSceneEnum;
@@ -120,7 +120,7 @@ public class MemberAuthServiceImpl implements MemberAuthService {
         createLoginLog(user.getId(), mobile, logType, LoginResultEnum.SUCCESS);
         // 创建 Token 令牌
         OAuth2AccessTokenRespDTO accessTokenRespDTO = oauth2TokenApi.createAccessToken(new OAuth2AccessTokenCreateReqDTO()
-                .setUserId(user.getId()).setUserType(getUserType().getValue()).setClientId(OAuth2ClientIdEnum.DEFAULT.getId()));
+                .setUserId(user.getId()).setUserType(getUserType().getValue()).setClientId(OAuth2ClientConstants.CLIENT_ID_DEFAULT));
         // 构建返回结果
         return AuthConvert.INSTANCE.convert(accessTokenRespDTO);
     }
@@ -212,7 +212,7 @@ public class MemberAuthServiceImpl implements MemberAuthService {
 
     @Override
     public AppAuthLoginRespVO refreshToken(String refreshToken) {
-        OAuth2AccessTokenRespDTO accessTokenDO = oauth2TokenApi.refreshAccessToken(refreshToken, OAuth2ClientIdEnum.DEFAULT.getId());
+        OAuth2AccessTokenRespDTO accessTokenDO = oauth2TokenApi.refreshAccessToken(refreshToken, OAuth2ClientConstants.CLIENT_ID_DEFAULT);
         return AuthConvert.INSTANCE.convert(accessTokenDO);
     }
 

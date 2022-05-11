@@ -45,7 +45,7 @@ public class OAuth2TokenServiceImpl implements OAuth2TokenService {
 
     @Override
     @Transactional
-    public OAuth2AccessTokenDO createAccessToken(Long userId, Integer userType, Long clientId) {
+    public OAuth2AccessTokenDO createAccessToken(Long userId, Integer userType, String clientId) {
         OAuth2ClientDO clientDO = oauth2ClientService.validOAuthClientFromCache(clientId);
         // 创建刷新令牌
         OAuth2RefreshTokenDO refreshTokenDO = createOAuth2RefreshToken(userId, userType, clientDO);
@@ -54,7 +54,7 @@ public class OAuth2TokenServiceImpl implements OAuth2TokenService {
     }
 
     @Override
-    public OAuth2AccessTokenDO refreshAccessToken(String refreshToken, Long clientId) {
+    public OAuth2AccessTokenDO refreshAccessToken(String refreshToken, String clientId) {
         // 查询访问令牌
         OAuth2RefreshTokenDO refreshTokenDO = oauth2RefreshTokenMapper.selectByRefreshToken(refreshToken);
         if (refreshTokenDO == null) {
@@ -134,7 +134,7 @@ public class OAuth2TokenServiceImpl implements OAuth2TokenService {
 
     private OAuth2AccessTokenDO createOAuth2AccessToken(OAuth2RefreshTokenDO refreshTokenDO, OAuth2ClientDO clientDO) {
         OAuth2AccessTokenDO accessTokenDO = new OAuth2AccessTokenDO().setAccessToken(generateAccessToken())
-                .setUserId(refreshTokenDO.getUserId()).setUserType(refreshTokenDO.getUserType()).setClientId(clientDO.getId())
+                .setUserId(refreshTokenDO.getUserId()).setUserType(refreshTokenDO.getUserType()).setClientId(clientDO.getClientId())
                 .setRefreshToken(refreshTokenDO.getRefreshToken())
                 .setExpiresTime(DateUtils.addDate(Calendar.SECOND, clientDO.getAccessTokenValiditySeconds()));
         accessTokenDO.setTenantId(TenantContextHolder.getTenantId()); // 手动设置租户编号，避免缓存到 Redis 的时候，无对应的租户编号
@@ -146,7 +146,7 @@ public class OAuth2TokenServiceImpl implements OAuth2TokenService {
 
     private OAuth2RefreshTokenDO createOAuth2RefreshToken(Long userId, Integer userType, OAuth2ClientDO clientDO) {
         OAuth2RefreshTokenDO refreshToken = new OAuth2RefreshTokenDO().setRefreshToken(generateRefreshToken())
-                .setUserId(userId).setUserType(userType).setClientId(clientDO.getId())
+                .setUserId(userId).setUserType(userType).setClientId(clientDO.getClientId())
                 .setExpiresTime(DateUtils.addDate(Calendar.SECOND, clientDO.getRefreshTokenValiditySeconds()));
         oauth2RefreshTokenMapper.insert(refreshToken);
         return refreshToken;

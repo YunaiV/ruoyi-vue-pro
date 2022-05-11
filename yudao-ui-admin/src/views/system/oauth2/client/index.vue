@@ -29,19 +29,32 @@
 
     <!-- 列表 -->
     <el-table v-loading="loading" :data="list">
-      <el-table-column label="客户端编号" align="center" prop="id" />
+      <el-table-column label="客户端编号" align="center" prop="clientId" />
       <el-table-column label="客户端密钥" align="center" prop="secret" />
       <el-table-column label="应用名" align="center" prop="name" />
-      <el-table-column label="应用图标" align="center" prop="logo" />
-      <el-table-column label="应用描述" align="center" prop="description" />
+      <el-table-column label="应用图标" align="center" prop="logo">
+        <template slot-scope="scope">
+          <img width="40px" height="40px" :src="scope.row.logo">
+        </template>
+      </el-table-column>
       <el-table-column label="状态" align="center" prop="status">
         <template slot-scope="scope">
           <dict-tag :type="DICT_TYPE.COMMON_STATUS" :value="scope.row.status" />
         </template>
       </el-table-column>
-      <el-table-column label="访问令牌的有效期" align="center" prop="accessTokenValiditySeconds" />
-      <el-table-column label="刷新令牌的有效期" align="center" prop="refreshTokenValiditySeconds" />
-      <el-table-column label="可重定向的 URI 地址" align="center" prop="redirectUris" />
+      <el-table-column label="访问令牌的有效期" align="center" prop="accessTokenValiditySeconds">
+        <template slot-scope="scope">{{ scope.row.accessTokenValiditySeconds }} 秒</template>
+      </el-table-column>
+      <el-table-column label="刷新令牌的有效期" align="center" prop="refreshTokenValiditySeconds">
+        <template slot-scope="scope">{{ scope.row.refreshTokenValiditySeconds }} 秒</template>
+      </el-table-column>
+      <el-table-column label="授权类型" align="center" prop="authorizedGrantTypes">
+        <template slot-scope="scope">
+          <el-tag :disable-transitions="true" v-for="(authorizedGrantType, index) in scope.row.authorizedGrantTypes" :index="index">
+            {{ authorizedGrantType }}
+          </el-tag>
+        </template>
+      </el-table-column>
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
@@ -63,6 +76,9 @@
     <!-- 对话框(添加 / 修改) -->
     <el-dialog :title="title" :visible.sync="open" width="700px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="160px">
+        <el-form-item label="客户端编号" prop="secret">
+          <el-input v-model="form.clientId" placeholder="请输入客户端编号" />
+        </el-form-item>
         <el-form-item label="客户端密钥" prop="secret">
           <el-input v-model="form.secret" placeholder="请输入客户端密钥" />
         </el-form-item>
@@ -70,8 +86,7 @@
           <el-input v-model="form.name" placeholder="请输入应用名" />
         </el-form-item>
         <el-form-item label="应用图标">
-<!--          <imageUpload v-model="form.logo" :limit="1"/>-->
-          <file-upload v-model="form.logo" :limit="1"/>
+          <imageUpload v-model="form.logo" :limit="1"/>
         </el-form-item>
         <el-form-item label="应用描述">
           <el-input type="textarea" v-model="form.description" placeholder="请输入应用名" />
@@ -89,7 +104,39 @@
           <el-input-number v-model="form.refreshTokenValiditySeconds" placeholder="单位：秒" />
         </el-form-item>
         <el-form-item label="可重定向的 URI 地址" prop="redirectUris">
-          <el-input v-model="form.redirectUris" placeholder="请输入可重定向的 URI 地址" />
+          <el-select v-model="form.redirectUris" multiple filterable allow-create placeholder="请输入可重定向的 URI 地址" style="width: 500px" >
+            <el-option v-for="redirectUri in form.redirectUris" :key="redirectUri" :label="redirectUri" :value="redirectUri"/>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="是否自动授权" prop="autoApprove">
+          <el-radio-group v-model="form.autoApprove">
+            <el-radio :key="true" :label="true">自动登录</el-radio>
+            <el-radio :key="false" :label="false">手动登录</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item label="授权类型" prop="authorizedGrantTypes">
+          <el-select v-model="form.authorizedGrantTypes" multiple filterable placeholder="请输入授权类型" style="width: 500px" >
+            <el-option v-for="dict in this.getDictDatas(DICT_TYPE.SYSTEM_OAUTH2_GRANT_TYPE)"
+                       :key="dict.value" :label="dict.label" :value="dict.value"/>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="授权范围" prop="scopes">
+          <el-select v-model="form.scopes" multiple filterable allow-create placeholder="请输入授权范围" style="width: 500px" >
+            <el-option v-for="scope in form.scopes" :key="scope" :label="scope" :value="scope"/>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="权限" prop="authorities">
+          <el-select v-model="form.authorities" multiple filterable allow-create placeholder="请输入权限" style="width: 500px" >
+            <el-option v-for="authority in form.authorities" :key="authority" :label="authority" :value="authority"/>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="资源" prop="resourceIds">
+          <el-select v-model="form.resourceIds" multiple filterable allow-create placeholder="请输入资源" style="width: 500px" >
+            <el-option v-for="resourceId in form.resourceIds" :key="resourceId" :label="resourceId" :value="resourceId"/>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="附加信息" prop="additionalInformation">
+          <el-input type="textarea" v-model="form.additionalInformation" placeholder="请输入附加信息，JSON 格式数据" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -141,6 +188,7 @@ export default {
       form: {},
       // 表单校验
       rules: {
+        clientId: [{ required: true, message: "客户端编号不能为空", trigger: "blur" }],
         secret: [{ required: true, message: "客户端密钥不能为空", trigger: "blur" }],
         name: [{ required: true, message: "应用名不能为空", trigger: "blur" }],
         logo: [{ required: true, message: "应用图标不能为空", trigger: "blur" }],
@@ -148,6 +196,8 @@ export default {
         accessTokenValiditySeconds: [{ required: true, message: "访问令牌的有效期不能为空", trigger: "blur" }],
         refreshTokenValiditySeconds: [{ required: true, message: "刷新令牌的有效期不能为空", trigger: "blur" }],
         redirectUris: [{ required: true, message: "可重定向的 URI 地址不能为空", trigger: "blur" }],
+        autoApprove: [{ required: true, message: "是否自动授权不能为空", trigger: "blur" }],
+        authorizedGrantTypes: [{ required: true, message: "授权类型不能为空", trigger: "blur" }],
       }
     };
   },
@@ -176,14 +226,21 @@ export default {
     reset() {
       this.form = {
         id: undefined,
+        clientId: undefined,
         secret: undefined,
         name: undefined,
         logo: undefined,
         description: undefined,
         status: CommonStatusEnum.ENABLE,
-        accessTokenValiditySeconds: undefined,
-        refreshTokenValiditySeconds: undefined,
-        redirectUris: undefined,
+        accessTokenValiditySeconds: 30 * 60,
+        refreshTokenValiditySeconds: 30 * 24 * 60,
+        redirectUris: [],
+        autoApprove: true,
+        authorizedGrantTypes: [],
+        scopes: [],
+        authorities: [],
+        resourceIds: [],
+        additionalInformation: undefined,
       };
       this.resetForm("form");
     },
@@ -239,7 +296,7 @@ export default {
     /** 删除按钮操作 */
     handleDelete(row) {
       const id = row.id;
-      this.$modal.confirm('是否确认删除 OAuth2 客户端编号为"' + id + '"的数据项?').then(function() {
+      this.$modal.confirm('是否确认删除客户端编号为"' + row.clientId + '"的数据项?').then(function() {
           return deleteOAuth2Client(id);
         }).then(() => {
           this.getList();

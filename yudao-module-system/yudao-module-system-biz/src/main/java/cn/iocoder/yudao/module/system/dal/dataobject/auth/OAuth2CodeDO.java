@@ -5,7 +5,6 @@ import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.experimental.Accessors;
 
 import java.util.Date;
 
@@ -17,7 +16,6 @@ import java.util.Date;
 @TableName("system_oauth2_code")
 @Data
 @EqualsAndHashCode(callSuper = true)
-@Accessors(chain = true)
 public class OAuth2CodeDO extends BaseDO {
 
     /**
@@ -43,7 +41,7 @@ public class OAuth2CodeDO extends BaseDO {
      *
      * 关联 {@link OAuth2ClientDO#getId()}
      */
-    private Long clientId;
+    private String clientId;
     /**
      * 刷新令牌
      *

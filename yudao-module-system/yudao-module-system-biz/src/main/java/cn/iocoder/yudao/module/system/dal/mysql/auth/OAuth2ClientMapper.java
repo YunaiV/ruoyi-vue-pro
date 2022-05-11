@@ -6,6 +6,9 @@ import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.system.controller.admin.auth.vo.client.OAuth2ClientPageReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.auth.OAuth2ClientDO;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Select;
+
+import java.util.Date;
 
 /**
  * OAuth2 客户端 Mapper
@@ -21,5 +24,12 @@ public interface OAuth2ClientMapper extends BaseMapperX<OAuth2ClientDO> {
                 .eqIfPresent(OAuth2ClientDO::getStatus, reqVO.getStatus())
                 .orderByDesc(OAuth2ClientDO::getId));
     }
+
+    default OAuth2ClientDO selectByClientId(String clientId) {
+        return selectOne(OAuth2ClientDO::getClientId, clientId);
+    }
+
+    @Select("SELECT COUNT(*) FROM system_oauth2_client WHERE update_time > #{maxUpdateTime}")
+    int selectCountByUpdateTimeGt(Date maxUpdateTime);
 
 }

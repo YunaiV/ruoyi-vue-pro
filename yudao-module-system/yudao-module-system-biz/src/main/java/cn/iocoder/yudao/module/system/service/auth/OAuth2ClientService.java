@@ -18,7 +18,12 @@ import javax.validation.Valid;
 public interface OAuth2ClientService {
 
     /**
-     * 创建OAuth2 客户端
+     * 初始化 OAuth2Client 的本地缓存
+     */
+    void initLocalCache();
+
+    /**
+     * 创建 OAuth2 客户端
      *
      * @param createReqVO 创建信息
      * @return 编号
@@ -26,21 +31,21 @@ public interface OAuth2ClientService {
     Long createOAuth2Client(@Valid OAuth2ClientCreateReqVO createReqVO);
 
     /**
-     * 更新OAuth2 客户端
+     * 更新 OAuth2 客户端
      *
      * @param updateReqVO 更新信息
      */
     void updateOAuth2Client(@Valid OAuth2ClientUpdateReqVO updateReqVO);
 
     /**
-     * 删除OAuth2 客户端
+     * 删除 OAuth2 客户端
      *
      * @param id 编号
      */
     void deleteOAuth2Client(Long id);
 
     /**
-     * 获得OAuth2 客户端
+     * 获得 OAuth2 客户端
      *
      * @param id 编号
      * @return OAuth2 客户端
@@ -48,7 +53,7 @@ public interface OAuth2ClientService {
     OAuth2ClientDO getOAuth2Client(Long id);
 
     /**
-     * 获得OAuth2 客户端分页
+     * 获得 OAuth2 客户端分页
      *
      * @param pageReqVO 分页查询
      * @return OAuth2 客户端分页
@@ -58,9 +63,9 @@ public interface OAuth2ClientService {
     /**
      * 从缓存中，校验客户端是否合法
      *
-     * @param id 客户端编号
+     * @param clientId 客户端编号
      * @return 客户端
      */
-    OAuth2ClientDO validOAuthClientFromCache(Long id);
+    OAuth2ClientDO validOAuthClientFromCache(String clientId);
 
 }

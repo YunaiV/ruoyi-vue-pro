@@ -18,6 +18,6 @@ public class OAuth2AccessTokenPageReqVO extends PageParam {
     private Integer userType;
 
     @ApiModelProperty(value = "客户端编号", required = true, example = "2")
-    private Long clientId;
+    private String clientId;
 
 }

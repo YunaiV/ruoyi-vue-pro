@@ -14,6 +14,9 @@ import java.util.Date;
 @ToString(callSuper = true)
 public class OAuth2ClientRespVO extends OAuth2ClientBaseVO {
 
+    @ApiModelProperty(value = "编号", required = true)
+    private Long id;
+
     @ApiModelProperty(value = "创建时间", required = true)
     private Date createTime;
 

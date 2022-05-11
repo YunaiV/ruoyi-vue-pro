@@ -2,38 +2,37 @@ package cn.iocoder.yudao.module.system.dal.dataobject.auth;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import com.baomidou.mybatisplus.annotation.IdType;
+import cn.iocoder.yudao.module.system.enums.auth.OAuth2GrantTypeEnum;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.experimental.Accessors;
 
 import java.util.List;
 
 /**
  * OAuth2 客户端 DO
  *
- * 如下字段，考虑到使用相对不是很高频，主要是一些开关，暂时不支持：
- * authorized_grant_types、authorities、additional_information、autoapprove、resource_ids、scope
- *
  * @author 芋道源码
  */
 @TableName(value = "system_oauth2_client", autoResultMap = true)
 @Data
 @EqualsAndHashCode(callSuper = true)
-@Accessors(chain = true)
 public class OAuth2ClientDO extends BaseDO {
 
     /**
-     * 客户端编号
+     * 编号，数据库自增
      *
      * 由于 SQL Server 在存储 String 主键有点问题，所以暂时使用 Long 类型
      */
-    @TableId(type = IdType.INPUT)
+    @TableId
     private Long id;
+    /**
+     * 客户端编号
+     */
+    private String clientId;
     /**
      * 客户端密钥
      */
@@ -69,5 +68,35 @@ public class OAuth2ClientDO extends BaseDO {
      */
     @TableField(typeHandler = JacksonTypeHandler.class)
     private List<String> redirectUris;
+    /**
+     * 是否自动授权
+     */
+    private Boolean autoApprove;
+    /**
+     * 授权类型（模式）
+     *
+     * 枚举 {@link OAuth2GrantTypeEnum}
+     */
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private List<String> authorizedGrantTypes;
+    /**
+     * 授权范围
+     */
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private List<String> scopes;
+    /**
+     * 权限
+     */
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private List<String> authorities;
+    /**
+     * 资源
+     */
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private List<String> resourceIds;
+    /**
+     * 附加信息，JSON 格式
+     */
+    private String additionalInformation;
 
 }

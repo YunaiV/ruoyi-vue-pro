@@ -30,7 +30,7 @@ public class OAuth2AccessTokenRespVO {
     private Integer userType;
 
     @ApiModelProperty(value = "客户端编号", required = true, example = "2")
-    private Long clientId;
+    private String clientId;
 
     @ApiModelProperty(value = "创建时间", required = true)
     private Date createTime;

@@ -125,5 +125,6 @@ public interface ErrorCodeConstants {
 
     // ========== 系统敏感词 1002020000 =========
     ErrorCode OAUTH2_CLIENT_NOT_EXISTS = new ErrorCode(1002020000, "OAuth2 客户端不存在");
+    ErrorCode OAUTH2_CLIENT_EXISTS = new ErrorCode(1002020001, "OAuth2 客户端编号已存在");
 
 }

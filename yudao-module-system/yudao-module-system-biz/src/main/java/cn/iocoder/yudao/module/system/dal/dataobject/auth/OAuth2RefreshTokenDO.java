@@ -43,7 +43,7 @@ public class OAuth2RefreshTokenDO extends BaseDO {
      *
      * 关联 {@link OAuth2ClientDO#getId()}
      */
-    private Long clientId;
+    private String clientId;
     /**
      * 过期时间
      */
