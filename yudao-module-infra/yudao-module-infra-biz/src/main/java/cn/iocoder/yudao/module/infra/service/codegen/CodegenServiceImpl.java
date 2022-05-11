@@ -206,7 +206,7 @@ public class CodegenServiceImpl implements CodegenService {
     public Map<String, String> generationCodes(Long tableId) {
         // 校验是否已经存在
         CodegenTableDO table = codegenTableMapper.selectById(tableId);
-        if (codegenTableMapper.selectById(tableId) == null) {
+        if (table == null) {
             throw exception(CODEGEN_TABLE_NOT_EXISTS);
         }
         List<CodegenColumnDO> columns = codegenColumnMapper.selectListByTableId(tableId);
