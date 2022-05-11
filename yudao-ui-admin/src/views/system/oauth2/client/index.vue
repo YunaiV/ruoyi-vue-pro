@@ -70,7 +70,8 @@
           <el-input v-model="form.name" placeholder="请输入应用名" />
         </el-form-item>
         <el-form-item label="应用图标">
-          <imageUpload v-model="form.logo" :limit="1"/>
+<!--          <imageUpload v-model="form.logo" :limit="1"/>-->
+          <file-upload v-model="form.logo" :limit="1"/>
         </el-form-item>
         <el-form-item label="应用描述">
           <el-input type="textarea" v-model="form.description" placeholder="请输入应用名" />
@@ -104,10 +105,12 @@ import { createOAuth2Client, updateOAuth2Client, deleteOAuth2Client, getOAuth2Cl
 import ImageUpload from '@/components/ImageUpload';
 import Editor from '@/components/Editor';
 import {CommonStatusEnum} from "@/utils/constants";
+import FileUpload from "@/components/FileUpload";
 
 export default {
   name: "OAuth2Client",
   components: {
+    FileUpload,
     ImageUpload,
     Editor,
   },
