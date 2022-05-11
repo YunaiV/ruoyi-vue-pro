@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-upload
-      :action="uploadUrl"
+      :action="uploadFileUrl"
       :before-upload="handleBeforeUpload"
       :on-success="handleUploadSuccess"
       :on-error="handleUploadError"
@@ -10,7 +10,7 @@
       :headers="headers"
       style="display: none"
       ref="upload"
-      v-if="this.type == 'url'"
+      v-if="this.type === 'url'"
     >
     </el-upload>
     <div class="editor" ref="editor" :style="styles"></div>
@@ -60,10 +60,8 @@ export default {
   },
   data() {
     return {
-      uploadUrl: process.env.VUE_APP_BASE_API + "/common/upload", // 上传的图片服务器地址
-      headers: {
-        Authorization: "Bearer " + getAccessToken()
-      },
+      uploadFileUrl: process.env.VUE_APP_BASE_API + "/admin-api/infra/file/upload", // 请求地址
+      headers: { Authorization: "Bearer " + getAccessToken() }, // 设置上传的请求头部
       Quill: null,
       currentValue: "",
       options: {
@@ -126,7 +124,7 @@ export default {
       const editor = this.$refs.editor;
       this.Quill = new Quill(editor, this.options);
       // 如果设置了上传地址则自定义图片上传事件
-      if (this.type == 'url') {
+      if (this.type === 'url') {
         let toolbar = this.Quill.getModule("toolbar");
         toolbar.addHandler("image", (value) => {
           this.uploadType = "image";
@@ -172,11 +170,13 @@ export default {
       // 获取富文本组件实例
       let quill = this.Quill;
       // 如果上传成功
-      if (res.code == 200) {
+      // edit by 芋道源码
+      if (res.code === 200 || res.code === 0) {
         // 获取光标所在位置
         let length = quill.getSelection().index;
         // 插入图片  res.url为服务器返回的图片地址
-        quill.insertEmbed(length, "image", process.env.VUE_APP_BASE_API + res.fileName);
+        // edit by 芋道源码
+        quill.insertEmbed(length, "image", res.data);
         // 调整光标到最后
         quill.setSelection(length + 1);
       } else {

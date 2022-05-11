@@ -2,7 +2,7 @@
   <div class="component-upload-image">
     <el-upload
       multiple
-      :action="url"
+      :action="uploadFileUrl"
       list-type="picture-card"
       :on-success="handleUploadSuccess"
       :before-upload="handleBeforeUpload"
@@ -76,7 +76,7 @@ export default {
       dialogImageUrl: "",
       dialogVisible: false,
       hideUpload: false,
-      url: process.env.VUE_APP_BASE_API + "/admin-api/infra/file/upload", // 请求地址
+      uploadFileUrl: process.env.VUE_APP_BASE_API + "/admin-api/infra/file/upload", // 请求地址
       headers: { Authorization: "Bearer " + getAccessToken() }, // 设置上传的请求头部
       fileList: []
     };
