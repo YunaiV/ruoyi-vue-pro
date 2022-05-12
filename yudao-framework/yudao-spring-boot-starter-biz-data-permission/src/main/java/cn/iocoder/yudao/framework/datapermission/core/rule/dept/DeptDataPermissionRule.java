@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.framework.datapermission.core.dept.rule;
+package cn.iocoder.yudao.framework.datapermission.core.rule.dept;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
@@ -6,13 +6,13 @@ import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
-import cn.iocoder.yudao.framework.datapermission.core.dept.service.DeptDataPermissionFrameworkService;
-import cn.iocoder.yudao.framework.datapermission.core.dept.service.dto.DeptDataPermissionRespDTO;
 import cn.iocoder.yudao.framework.datapermission.core.rule.DataPermissionRule;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.framework.mybatis.core.util.MyBatisUtils;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
+import cn.iocoder.yudao.module.system.api.permission.PermissionApi;
+import cn.iocoder.yudao.module.system.api.permission.dto.DeptDataPermissionRespDTO;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +25,10 @@ import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
 import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
 import net.sf.jsqlparser.expression.operators.relational.InExpression;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * 基于部门的 {@link DataPermissionRule} 数据权限规则实现
@@ -58,7 +61,7 @@ public class DeptDataPermissionRule implements DataPermissionRule {
 
     static final Expression EXPRESSION_NULL = new NullValue();
 
-    private final DeptDataPermissionFrameworkService deptDataPermissionService;
+    private final PermissionApi permissionApi;
 
     /**
      * 基于部门的表字段配置
@@ -102,7 +105,7 @@ public class DeptDataPermissionRule implements DataPermissionRule {
         DeptDataPermissionRespDTO deptDataPermission = loginUser.getContext(CONTEXT_KEY, DeptDataPermissionRespDTO.class);
         // 从上下文中拿不到，则调用逻辑进行获取
         if (deptDataPermission == null) {
-            deptDataPermission = deptDataPermissionService.getDeptDataPermission(loginUser.getId());
+            deptDataPermission = permissionApi.getDeptDataPermission(loginUser.getId());
             if (deptDataPermission == null) {
                 log.error("[getExpression][LoginUser({}) 获取数据权限为 null]", JsonUtils.toJsonString(loginUser));
                 throw new NullPointerException(String.format("LoginUser(%d) Table(%s/%s) 未返回数据权限",

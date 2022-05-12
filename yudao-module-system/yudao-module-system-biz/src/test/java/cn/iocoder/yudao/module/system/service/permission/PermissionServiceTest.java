@@ -4,7 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
-import cn.iocoder.yudao.framework.datapermission.core.dept.service.dto.DeptDataPermissionRespDTO;
+import cn.iocoder.yudao.module.system.api.permission.dto.DeptDataPermissionRespDTO;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.MenuDO;
@@ -359,22 +359,84 @@ public class PermissionServiceTest extends BaseDbUnitTest {
         verify(permissionProducer).sendUserRoleRefreshMessage();
     }
 
-//    @Test
-//    public void testHasAnyRoles_superAdmin() {
-//        // 准备参数
-//        String[] roles = new String[]{"yunai", "tudou"};
-//        // mock 方法
-//        List<RoleDO> roleList = singletonList(randomPojo(RoleDO.class, o -> o.setId(100L)));
-//        when(roleService.getRolesFromCache(eq(roleIds))).thenReturn(roleList);
-//        when(roleService.hasAnySuperAdmin(same(roleList))).thenReturn(true);
-//        List<MenuDO> menuList = randomPojoList(MenuDO.class);
-//        when(menuService.getMenuListFromCache(eq(menuTypes), eq(menusStatuses))).thenReturn(menuList);
-//
-//        // 调用
-//        List<MenuDO> result = permissionService.getRoleMenuListFromCache(roleIds, menuTypes, menusStatuses);
-//        // 断言
-//        assertSame(menuList, result);
-//    }
+    @Test
+    public void testHasAnyPermissions_superAdmin() {
+        // 准备参数
+        Long userId = 1L;
+        String[] roles = new String[]{"system:user:query", "system:user:create"};
+        // mock 用户与角色的缓存
+        permissionService.setUserRoleCache(MapUtil.<Long, Set<Long>>builder().put(1L, asSet(100L)).build());
+        RoleDO role = randomPojo(RoleDO.class, o -> o.setId(100L)
+                .setStatus(CommonStatusEnum.ENABLE.getStatus()));
+        when(roleService.getRoleFromCache(eq(100L))).thenReturn(role);
+        // mock 其它方法
+        when(roleService.hasAnySuperAdmin(eq(asSet(100L)))).thenReturn(true);
+
+        // 调用
+        boolean has = permissionService.hasAnyPermissions(userId, roles);
+        // 断言
+        assertTrue(has);
+    }
+
+    @Test
+    public void testHasAnyPermissions_normal() {
+        // 准备参数
+        Long userId = 1L;
+        String[] roles = new String[]{"system:user:query", "system:user:create"};
+        // mock 用户与角色的缓存
+        permissionService.setUserRoleCache(MapUtil.<Long, Set<Long>>builder().put(1L, asSet(100L)).build());
+        RoleDO role = randomPojo(RoleDO.class, o -> o.setId(100L)
+                .setStatus(CommonStatusEnum.ENABLE.getStatus()));
+        when(roleService.getRoleFromCache(eq(100L))).thenReturn(role);
+        // mock 其它方法
+        MenuDO menu = randomPojo(MenuDO.class, o -> o.setId(1000L));
+        when(menuService.getMenuListByPermissionFromCache(eq("system:user:create"))).thenReturn(singletonList(menu));
+        permissionService.setMenuRoleCache(ImmutableMultimap.<Long, Long>builder().put(1000L, 100L).build());
+
+
+        // 调用
+        boolean has = permissionService.hasAnyPermissions(userId, roles);
+        // 断言
+        assertTrue(has);
+    }
+
+    @Test
+    public void testHasAnyRoles_superAdmin() {
+        // 准备参数
+        Long userId = 1L;
+        String[] roles = new String[]{"yunai", "tudou"};
+        // mock 用户与角色的缓存
+        permissionService.setUserRoleCache(MapUtil.<Long, Set<Long>>builder().put(1L, asSet(100L)).build());
+        RoleDO role = randomPojo(RoleDO.class, o -> o.setId(100L)
+                .setStatus(CommonStatusEnum.ENABLE.getStatus()));
+        when(roleService.getRoleFromCache(eq(100L))).thenReturn(role);
+        // mock 其它方法
+        when(roleService.hasAnySuperAdmin(eq(asSet(100L)))).thenReturn(true);
+
+        // 调用
+        boolean has = permissionService.hasAnyRoles(userId, roles);
+        // 断言
+        assertTrue(has);
+    }
+
+    @Test
+    public void testHasAnyRoles_normal() {
+        // 准备参数
+        Long userId = 1L;
+        String[] roles = new String[]{"yunai", "tudou"};
+        // mock 用户与角色的缓存
+        permissionService.setUserRoleCache(MapUtil.<Long, Set<Long>>builder().put(1L, asSet(100L)).build());
+        RoleDO role = randomPojo(RoleDO.class, o -> o.setId(100L).setCode("yunai")
+                .setStatus(CommonStatusEnum.ENABLE.getStatus()));
+        when(roleService.getRoleFromCache(eq(100L))).thenReturn(role);
+        // mock 其它方法
+        when(roleService.getRolesFromCache(eq(asSet(100L)))).thenReturn(singletonList(role));
+
+        // 调用
+        boolean has = permissionService.hasAnyRoles(userId, roles);
+        // 断言
+        assertTrue(has);
+    }
 
     @Test
     public void testGetDeptDataPermission_All() {

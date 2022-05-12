@@ -13,6 +13,7 @@ import cn.iocoder.yudao.module.system.enums.logger.LoginLogTypeEnum;
 import cn.iocoder.yudao.module.system.enums.logger.LoginResultEnum;
 import cn.iocoder.yudao.module.system.service.common.CaptchaService;
 import cn.iocoder.yudao.module.system.service.logger.LoginLogService;
+import cn.iocoder.yudao.module.system.service.member.MemberService;
 import cn.iocoder.yudao.module.system.service.social.SocialUserService;
 import cn.iocoder.yudao.module.system.service.user.AdminUserService;
 import org.junit.jupiter.api.BeforeEach;
@@ -49,6 +50,8 @@ public class AuthServiceImplTest extends BaseDbUnitTest {
     private SmsCodeApi smsCodeApi;
     @MockBean
     private OAuth2TokenService oauth2TokenService;
+    @MockBean
+    private MemberService memberService;
 
     @MockBean
     private Validator validator;

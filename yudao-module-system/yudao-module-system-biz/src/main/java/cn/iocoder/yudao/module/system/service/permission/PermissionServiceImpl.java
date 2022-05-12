@@ -8,7 +8,7 @@ import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.datapermission.core.annotation.DataPermission;
-import cn.iocoder.yudao.framework.datapermission.core.dept.service.dto.DeptDataPermissionRespDTO;
+import cn.iocoder.yudao.module.system.api.permission.dto.DeptDataPermissionRespDTO;
 import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnore;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.MenuDO;
@@ -45,7 +45,6 @@ import java.util.function.Supplier;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.getMaxValue;
-import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 import static java.util.Collections.singleton;
 
 /**
@@ -53,7 +52,7 @@ import static java.util.Collections.singleton;
  *
  * @author 芋道源码
  */
-@Service("ss") // 使用 Spring Security 的缩写，方便食用
+@Service
 @Slf4j
 public class PermissionServiceImpl implements PermissionService {
 
@@ -71,7 +70,7 @@ public class PermissionServiceImpl implements PermissionService {
      * 这里声明 volatile 修饰的原因是，每次刷新时，直接修改指向
      */
     @Getter
-    @Setter // 单元测试
+    @Setter // 单元测试需要
     private volatile Multimap<Long, Long> roleMenuCache;
     /**
      * 菜单编号与角色编号的缓存映射
@@ -81,6 +80,7 @@ public class PermissionServiceImpl implements PermissionService {
      * 这里声明 volatile 修饰的原因是，每次刷新时，直接修改指向
      */
     @Getter
+    @Setter // 单元测试需要
     private volatile Multimap<Long, Long> menuRoleCache;
     /**
      * 缓存 RoleMenu 的最大更新时间，用于后续的增量轮询，判断是否有更新
@@ -399,19 +399,14 @@ public class PermissionServiceImpl implements PermissionService {
     }
 
     @Override
-    public boolean hasPermission(String permission) {
-        return hasAnyPermissions(permission);
-    }
-
-    @Override
-    public boolean hasAnyPermissions(String... permissions) {
+    public boolean hasAnyPermissions(Long userId, String... permissions) {
         // 如果为空，说明已经有权限
         if (ArrayUtil.isEmpty(permissions)) {
             return true;
         }
 
         // 获得当前登录的角色。如果为空，说明没有权限
-        Set<Long> roleIds = getUserRoleIdsFromCache(getLoginUserId(), singleton(CommonStatusEnum.ENABLE.getStatus()));
+        Set<Long> roleIds = getUserRoleIdsFromCache(userId, singleton(CommonStatusEnum.ENABLE.getStatus()));
         if (CollUtil.isEmpty(roleIds)) {
             return false;
         }
@@ -434,19 +429,14 @@ public class PermissionServiceImpl implements PermissionService {
     }
 
     @Override
-    public boolean hasRole(String role) {
-        return hasAnyRoles(role);
-    }
-
-    @Override
-    public boolean hasAnyRoles(String... roles) {
+    public boolean hasAnyRoles(Long userId, String... roles) {
         // 如果为空，说明已经有权限
         if (ArrayUtil.isEmpty(roles)) {
             return true;
         }
 
         // 获得当前登录的角色。如果为空，说明没有权限
-        Set<Long> roleIds = getUserRoleIdsFromCache(getLoginUserId(), singleton(CommonStatusEnum.ENABLE.getStatus()));
+        Set<Long> roleIds = getUserRoleIdsFromCache(userId, singleton(CommonStatusEnum.ENABLE.getStatus()));
         if (CollUtil.isEmpty(roleIds)) {
             return false;
         }

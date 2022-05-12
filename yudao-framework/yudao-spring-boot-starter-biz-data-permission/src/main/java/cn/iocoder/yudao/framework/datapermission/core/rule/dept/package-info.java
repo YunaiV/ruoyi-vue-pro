@@ -3,4 +3,4 @@
  *
  * @author 芋道源码
  */
-package cn.iocoder.yudao.framework.datapermission.core.dept;
+package cn.iocoder.yudao.framework.datapermission.core.rule.dept;

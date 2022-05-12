@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.framework.datapermission.core.dept.service.dto;
+package cn.iocoder.yudao.module.system.api.permission.dto;
 
 import lombok.Data;
 

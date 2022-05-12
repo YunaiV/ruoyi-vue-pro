@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.system.service.permission;
 
-import cn.iocoder.yudao.framework.datapermission.core.dept.service.DeptDataPermissionFrameworkService;
-import cn.iocoder.yudao.framework.security.core.service.SecurityPermissionFrameworkService;
+import cn.iocoder.yudao.module.system.api.permission.dto.DeptDataPermissionRespDTO;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.MenuDO;
 import org.springframework.lang.Nullable;
 
@@ -16,7 +15,7 @@ import java.util.Set;
  *
  * @author 芋道源码
  */
-public interface PermissionService extends SecurityPermissionFrameworkService, DeptDataPermissionFrameworkService {
+public interface PermissionService {
 
     /**
      * 初始化权限的本地缓存
@@ -114,5 +113,30 @@ public interface PermissionService extends SecurityPermissionFrameworkService, D
      * @param userId 用户编号
      */
     void processUserDeleted(Long userId);
+
+    /**
+     * 判断是否有权限，任一一个即可
+     *
+     * @param userId 用户编号
+     * @param permissions 权限
+     * @return 是否
+     */
+    boolean hasAnyPermissions(Long userId, String... permissions);
+
+    /**
+     * 判断是否有角色，任一一个即可
+     *
+     * @param roles 角色数组
+     * @return 是否
+     */
+    boolean hasAnyRoles(Long userId, String... roles);
+
+    /**
+     * 获得登陆用户的部门数据权限
+     *
+     * @param userId 用户编号
+     * @return 部门数据权限
+     */
+    DeptDataPermissionRespDTO getDeptDataPermission(Long userId);
 
 }
