@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.product.service.category;
 
+import cn.iocoder.yudao.framework.common.exception.ErrorCode;
+import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.product.controller.admin.category.vo.*;
 import cn.iocoder.yudao.module.product.convert.category.CategoryConvert;
@@ -13,7 +15,7 @@ import java.util.Collection;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.CATEGORY_NOT_EXISTS;
+import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.*;
 
 /**
  * 商品分类 Service 实现类
@@ -29,7 +31,8 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public Long createCategory(CategoryCreateReqVO createReqVO) {
-        // TODO JeromeSoar：校验父分类
+        // 校验父分类存在
+        this.validateCategoryExists(createReqVO.getParentId(), CATEGORY_PARENT_NOT_EXISTS);
         // 插入
         CategoryDO category = CategoryConvert.INSTANCE.convert(createReqVO);
         categoryMapper.insert(category);
@@ -39,9 +42,10 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public void updateCategory(CategoryUpdateReqVO updateReqVO) {
-        // TODO JeromeSoar：校验父分类
-        // 校验存在
-        this.validateCategoryExists(updateReqVO.getId());
+        // 校验父分类存在
+        this.validateCategoryExists(updateReqVO.getParentId(), CATEGORY_PARENT_NOT_EXISTS);
+        // 校验分类是否存在
+        this.validateCategoryExists(updateReqVO.getId(), CATEGORY_NOT_EXISTS);
         // 更新
         CategoryDO updateObj = CategoryConvert.INSTANCE.convert(updateReqVO);
         categoryMapper.updateById(updateObj);
@@ -49,18 +53,23 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public void deleteCategory(Long id) {
-        // TODO JeromeSoar：校验删除的商品分类是否存在
         // TODO 芋艿 补充只有不存在商品才可以删除
-        // 校验存在
-        this.validateCategoryExists(id);
+        // 校验分类是否存在
+        CategoryDO categoryDO = this.validateCategoryExists(id, CATEGORY_NOT_EXISTS);
+        // 校验是否还有子分类
+        if (categoryMapper.selectCountByParentId(categoryDO.getParentId()) > 0) {
+            throw ServiceExceptionUtil.exception(CATEGORY_EXISTS_CHILDREN);
+        }
         // 删除
         categoryMapper.deleteById(id);
     }
 
-    private void validateCategoryExists(Long id) {
-        if (categoryMapper.selectById(id) == null) {
-            throw exception(CATEGORY_NOT_EXISTS);
+    private CategoryDO validateCategoryExists(Long id, ErrorCode errorCode) {
+        CategoryDO categoryDO = categoryMapper.selectById(id);
+        if (categoryDO == null) {
+            throw exception(errorCode);
         }
+        return categoryDO;
     }
 
     @Override

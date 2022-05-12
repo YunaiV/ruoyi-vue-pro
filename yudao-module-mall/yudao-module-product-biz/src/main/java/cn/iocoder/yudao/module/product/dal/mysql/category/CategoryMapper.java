@@ -34,4 +34,7 @@ public interface CategoryMapper extends BaseMapperX<CategoryDO> {
                 .orderByDesc(CategoryDO::getId));
     }
 
+    default Long selectCountByParentId(Long parentId) {
+        return selectCount(CategoryDO::getParentId, parentId);
+    }
 }
