@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.product.controller.admin.category;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.product.controller.admin.category.vo.*;
@@ -19,7 +18,6 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 
@@ -68,16 +66,8 @@ public class CategoryController {
         return success(CategoryConvert.INSTANCE.convert(category));
     }
 
-    // TODO @JeromeSoar：这个接口，是不是没用哈
-    @GetMapping("/listByIds")
-    @ApiOperation("获得商品分类列表")
-    @PreAuthorize("@ss.hasPermission('product:category:query')")
-    public CommonResult<List<CategoryRespVO>> getCategoryList(@RequestParam("ids") Collection<Long> ids) {
-        List<CategoryDO> list = categoryService.getCategoryList(ids);
-        return success(CategoryConvert.INSTANCE.convertList(list));
-    }
-
     // TODO @JeromeSoar：这应该是个 app 的接口，提供商品分类的树结构。这个调整下，后端只返回列表，前端构建 tree。注意，不需要返回创建时间、是否开启等无关字段。
+    // TODO @YunaiV: 这个是在管理端展示了一个类似菜单的分类树列表, treeListReqVO 只是查询参数的封装命名，返给前端的是列表数据。PS: 这里 /page 接口没有使用到。
     @GetMapping("/listByQuery")
     @ApiOperation("获得商品分类列表")
     @PreAuthorize("@ss.hasPermission('product:category:query')")
@@ -86,15 +76,7 @@ public class CategoryController {
         list.sort(Comparator.comparing(CategoryDO::getSort));
         return success(CategoryConvert.INSTANCE.convertList(list));
     }
-
-    @GetMapping("/page")
-    @ApiOperation("获得商品分类分页")
-    @PreAuthorize("@ss.hasPermission('product:category:query')")
-    public CommonResult<PageResult<CategoryRespVO>> getCategoryPage(@Valid CategoryPageReqVO pageVO) {
-        PageResult<CategoryDO> pageResult = categoryService.getCategoryPage(pageVO);
-        return success(CategoryConvert.INSTANCE.convertPage(pageResult));
-    }
-
+    
     @GetMapping("/export-excel")
     @ApiOperation("导出商品分类 Excel")
     @PreAuthorize("@ss.hasPermission('product:category:export')")

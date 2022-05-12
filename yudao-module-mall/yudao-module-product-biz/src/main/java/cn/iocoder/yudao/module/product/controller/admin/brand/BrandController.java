@@ -1,30 +1,28 @@
 package cn.iocoder.yudao.module.product.controller.admin.brand;
 
-import org.springframework.web.bind.annotation.*;
-import javax.annotation.Resource;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.security.access.prepost.PreAuthorize;
-import io.swagger.annotations.*;
-
-import javax.validation.constraints.*;
-import javax.validation.*;
-import javax.servlet.http.*;
-import java.util.*;
-import java.io.IOException;
-
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
-
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
-import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.*;
-
 import cn.iocoder.yudao.module.product.controller.admin.brand.vo.*;
-import cn.iocoder.yudao.module.product.dal.dataobject.brand.BrandDO;
 import cn.iocoder.yudao.module.product.convert.brand.BrandConvert;
+import cn.iocoder.yudao.module.product.dal.dataobject.brand.BrandDO;
 import cn.iocoder.yudao.module.product.service.brand.BrandService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiOperation;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import java.io.IOException;
+import java.util.List;
+
+import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 
 @Api(tags = "管理后台 - 品牌")
 @RestController
@@ -66,16 +64,6 @@ public class BrandController {
     public CommonResult<BrandRespVO> getBrand(@RequestParam("id") Long id) {
         BrandDO brand = brandService.getBrand(id);
         return success(BrandConvert.INSTANCE.convert(brand));
-    }
-
-    // TODO @JeromeSoar：这个接口，是不是没用哈
-    @GetMapping("/list")
-    @ApiOperation("获得品牌列表")
-    @ApiImplicitParam(name = "ids", value = "编号列表", required = true, example = "1024,2048", dataTypeClass = List.class)
-    @PreAuthorize("@ss.hasPermission('product:brand:query')")
-    public CommonResult<List<BrandRespVO>> getBrandList(@RequestParam("ids") Collection<Long> ids) {
-        List<BrandDO> list = brandService.getBrandList(ids);
-        return success(BrandConvert.INSTANCE.convertList(list));
     }
 
     @GetMapping("/page")
