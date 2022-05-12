@@ -105,7 +105,7 @@ public class CategoryServiceImplTest extends BaseDbUnitTest {
     public void testGetCategoryPage() {
         // mock 数据
         CategoryDO dbCategory = randomPojo(CategoryDO.class, o -> { // 等会查询到
-            o.setPid(null);
+            o.setParentId(null);
             o.setName(null);
             o.setIcon(null);
             o.setBannerUrl(null);
@@ -116,7 +116,7 @@ public class CategoryServiceImplTest extends BaseDbUnitTest {
         });
         categoryMapper.insert(dbCategory);
         // 测试 pid 不匹配
-        categoryMapper.insert(cloneIgnoreId(dbCategory, o -> o.setPid(null)));
+        categoryMapper.insert(cloneIgnoreId(dbCategory, o -> o.setParentId(null)));
         // 测试 name 不匹配
         categoryMapper.insert(cloneIgnoreId(dbCategory, o -> o.setName(null)));
         // 测试 icon 不匹配
@@ -151,7 +151,7 @@ public class CategoryServiceImplTest extends BaseDbUnitTest {
     public void testGetCategoryList() {
         // mock 数据
         CategoryDO dbCategory = randomPojo(CategoryDO.class, o -> { // 等会查询到
-            o.setPid(null);
+            o.setParentId(null);
             o.setName(null);
             o.setIcon(null);
             o.setBannerUrl(null);
@@ -162,7 +162,7 @@ public class CategoryServiceImplTest extends BaseDbUnitTest {
         });
         categoryMapper.insert(dbCategory);
         // 测试 pid 不匹配
-        categoryMapper.insert(cloneIgnoreId(dbCategory, o -> o.setPid(null)));
+        categoryMapper.insert(cloneIgnoreId(dbCategory, o -> o.setParentId(null)));
         // 测试 name 不匹配
         categoryMapper.insert(cloneIgnoreId(dbCategory, o -> o.setName(null)));
         // 测试 icon 不匹配

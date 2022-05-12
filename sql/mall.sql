@@ -24,7 +24,7 @@ DROP TABLE IF EXISTS `product_category`;
 CREATE TABLE `product_category`
 (
     `id`          bigint        NOT NULL AUTO_INCREMENT COMMENT '分类编号',
-    `pid`         bigint        NOT NULL COMMENT '父分类编号',
+    `parent_id`   bigint        NOT NULL COMMENT '父分类编号',
     `name`        varchar(255)  NOT NULL COMMENT '分类名称',
     `icon`        varchar(100)  NOT NULL DEFAULT '#' COMMENT '分类图标',
     `banner_url`  varchar(255)  NOT NULL COMMENT '分类图片',
@@ -62,29 +62,29 @@ CREATE TABLE `product_brand`
     PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB COMMENT='品牌';
 
--- TODO 父级菜单的 id 处理
-INSERT INTO `system_menu` (`id`, `name`, `permission`, `menu_type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`) VALUES (2000, '商城', '', 1, 1, 0, '/mall', 'merchant', NULL, 0);
-INSERT INTO `system_menu` (`id`, `name`, `permission`, `menu_type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`) VALUES (2001, '商品管理', '', 1, 1, 2000, 'product', 'dict', NULL, 0);
+-- TODO 父级菜单的 id 处理: 2000 、 2001
+INSERT INTO `system_menu` (`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`) VALUES (2000, '商城', '', 1, 1, 0, '/mall', 'merchant', NULL, 0);
+INSERT INTO `system_menu` (`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`) VALUES (2001, '商品管理', '', 1, 1, 2000, 'product', 'dict', NULL, 0);
 -- 商品分类 菜单 SQL
-INSERT INTO `system_menu`(`name`, `permission`, `menu_type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`) VALUES ('商品分类管理', '', 2, 0, 2001, 'category', '', 'mall/product/category/index', 0);
+INSERT INTO `system_menu`(`name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`) VALUES ('商品分类管理', '', 2, 0, 2001, 'category', '', 'mall/product/category/index', 0);
 -- 按钮父菜单ID
 SELECT @parentId := LAST_INSERT_ID();
 -- 按钮 SQL
-INSERT INTO `system_menu`(`name`, `permission`, `menu_type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`) VALUES ('商品分类查询', 'product:category:query', 3, 1, @parentId, '', '', '', 0);
-INSERT INTO `system_menu`(`name`, `permission`, `menu_type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`) VALUES ('商品分类创建', 'product:category:create', 3, 2, @parentId, '', '', '', 0);
-INSERT INTO `system_menu`(`name`, `permission`, `menu_type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`) VALUES ('商品分类更新', 'product:category:update', 3, 3, @parentId, '', '', '', 0);
-INSERT INTO `system_menu`(`name`, `permission`, `menu_type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`) VALUES ('商品分类删除', 'product:category:delete', 3, 4, @parentId, '', '', '', 0);
-INSERT INTO `system_menu`(`name`, `permission`, `menu_type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`) VALUES ('商品分类导出', 'product:category:export', 3, 5, @parentId, '', '', '', 0);
+INSERT INTO `system_menu`(`name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`) VALUES ('商品分类查询', 'product:category:query', 3, 1, @parentId, '', '', '', 0);
+INSERT INTO `system_menu`(`name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`) VALUES ('商品分类创建', 'product:category:create', 3, 2, @parentId, '', '', '', 0);
+INSERT INTO `system_menu`(`name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`) VALUES ('商品分类更新', 'product:category:update', 3, 3, @parentId, '', '', '', 0);
+INSERT INTO `system_menu`(`name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`) VALUES ('商品分类删除', 'product:category:delete', 3, 4, @parentId, '', '', '', 0);
+INSERT INTO `system_menu`(`name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`) VALUES ('商品分类导出', 'product:category:export', 3, 5, @parentId, '', '', '', 0);
 -- 品牌管理 菜单 SQL
-INSERT INTO `system_menu`(`name`, `permission`, `menu_type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`) VALUES ('品牌管理', '', 2, 0, 2001, 'brand', '', 'mall/product/brand/index', 0);
+INSERT INTO `system_menu`(`name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`) VALUES ('品牌管理', '', 2, 0, 2001, 'brand', '', 'mall/product/brand/index', 0);
 -- 按钮父菜单ID
 SELECT @parentId := LAST_INSERT_ID();
 -- 按钮 SQL
-INSERT INTO `system_menu`(`name`, `permission`, `menu_type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`) VALUES ('品牌查询', 'product:brand:query', 3, 1, @parentId, '', '', '', 0);
-INSERT INTO `system_menu`(`name`, `permission`, `menu_type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`) VALUES ('品牌创建', 'product:brand:create', 3, 2, @parentId, '', '', '', 0);
-INSERT INTO `system_menu`(`name`, `permission`, `menu_type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`) VALUES ('品牌更新', 'product:brand:update', 3, 3, @parentId, '', '', '', 0);
-INSERT INTO `system_menu`(`name`, `permission`, `menu_type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`) VALUES ('品牌删除', 'product:brand:delete', 3, 4, @parentId, '', '', '', 0);
-INSERT INTO `system_menu`(`name`, `permission`, `menu_type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`) VALUES ('品牌导出', 'product:brand:export', 3, 5, @parentId, '', '', '', 0);
+INSERT INTO `system_menu`(`name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`) VALUES ('品牌查询', 'product:brand:query', 3, 1, @parentId, '', '', '', 0);
+INSERT INTO `system_menu`(`name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`) VALUES ('品牌创建', 'product:brand:create', 3, 2, @parentId, '', '', '', 0);
+INSERT INTO `system_menu`(`name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`) VALUES ('品牌更新', 'product:brand:update', 3, 3, @parentId, '', '', '', 0);
+INSERT INTO `system_menu`(`name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`) VALUES ('品牌删除', 'product:brand:delete', 3, 4, @parentId, '', '', '', 0);
+INSERT INTO `system_menu`(`name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `status`) VALUES ('品牌导出', 'product:brand:export', 3, 5, @parentId, '', '', '', 0);
 
 
 -- ----------------------------

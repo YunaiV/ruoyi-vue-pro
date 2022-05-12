@@ -15,7 +15,7 @@ public class CategoryBaseVO {
 
     @ApiModelProperty(value = "父分类编号", required = true, example = "1")
     @NotNull(message = "父分类编号不能为空")
-    private Long pid;
+    private Long parentId;
 
     @ApiModelProperty(value = "分类名称", required = true, example = "办公文具")
     @NotBlank(message = "分类名称不能为空")

@@ -77,8 +77,9 @@
     <!-- 对话框(添加 / 修改) -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="上级分类" prop="pid">
-          <Treeselect v-model="form.pid" :options="parentCategoryOptions" :normalizer="normalizer" :show-count="true"
+        <el-form-item label="上级分类" prop="parentId">
+          <Treeselect v-model="form.parentId" :options="parentCategoryOptions" :normalizer="normalizer"
+                      :show-count="true"
                       placeholder="上级分类"/>
         </el-form-item>
         <el-form-item label="分类名称" prop="name">
@@ -172,7 +173,7 @@ export default {
       form: {},
       // 表单校验
       rules: {
-        pid: [{required: true, message: "请选择上级分类", trigger: "blur"}],
+        parentId: [{required: true, message: "请选择上级分类", trigger: "blur"}],
         name: [{required: true, message: "分类名称不能为空", trigger: "blur"}],
         icon: [{required: true, message: "分类图标不能为空", trigger: "blur"}],
         bannerUrl: [{required: true, message: "分类图片不能为空", trigger: "blur"}],
@@ -191,7 +192,7 @@ export default {
       let params = {...this.queryParams};
       // 执行查询
       listCategory(params).then(response => {
-        this.list = this.handleTree(response.data, "id", "pid");
+        this.list = this.handleTree(response.data, "id", "parentId");
         this.loading = false;
       });
     },
@@ -215,7 +216,7 @@ export default {
       listCategory().then(response => {
         this.parentCategoryOptions = [];
         const menu = {id: 0, name: '主分类', children: []};
-        menu.children = this.handleTree(response.data, "id", "pid");
+        menu.children = this.handleTree(response.data, "id", "parentId");
         this.parentCategoryOptions.push(menu);
       });
     },
@@ -228,7 +229,7 @@ export default {
     reset() {
       this.form = {
         id: undefined,
-        pid: undefined,
+        parentId: undefined,
         name: undefined,
         icon: undefined,
         bannerUrl: undefined,

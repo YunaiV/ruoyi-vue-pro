@@ -28,8 +28,7 @@ public class CategoryDO extends BaseDO {
     /**
      * 父分类编号
      */
-    // TODO @JeromeSoar：改成 parentId 字段
-    private Long pid;
+    private Long parentId;
     /**
      * 分类名称
      */
