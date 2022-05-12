@@ -93,7 +93,7 @@ public class OAuth2TokenServiceImpl implements OAuth2TokenService {
         }
 
         // 获取不到，从 MySQL 中获取
-        accessTokenDO = oauth2AccessTokenMapper.selectById(accessToken);
+        accessTokenDO = oauth2AccessTokenMapper.selectByAccessToken(accessToken);
         // 如果在 MySQL 存在，则往 Redis 中写入
         if (accessTokenDO != null && !DateUtils.isExpired(accessTokenDO.getExpiresTime())) {
             oauth2AccessTokenRedisDAO.set(accessTokenDO);

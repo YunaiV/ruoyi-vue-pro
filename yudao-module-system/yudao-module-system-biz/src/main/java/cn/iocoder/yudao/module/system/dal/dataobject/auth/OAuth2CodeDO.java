@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.system.dal.dataobject.auth;
 
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -14,6 +15,7 @@ import java.util.Date;
  * @author 芋道源码
  */
 @TableName("system_oauth2_code")
+@KeySequence("system_oauth2_code_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class OAuth2CodeDO extends BaseDO {
