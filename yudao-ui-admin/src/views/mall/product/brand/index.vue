@@ -84,7 +84,7 @@
         <el-form-item label="品牌名称" prop="name">
           <el-input v-model="form.name" placeholder="请输入品牌名称"/>
         </el-form-item>
-        <el-form-item label="品牌图片">
+        <el-form-item label="品牌图片" prop="bannerUrl">
           <imageUpload v-model="form.bannerUrl" :limit="1"/>
         </el-form-item>
         <el-form-item label="品牌排序" prop="sort">
