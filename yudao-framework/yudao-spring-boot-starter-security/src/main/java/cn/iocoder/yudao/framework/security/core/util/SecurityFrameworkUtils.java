@@ -11,7 +11,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Set;
+import java.util.Collections;
 
 /**
  * 安全服务工具类
@@ -80,17 +80,6 @@ public class SecurityFrameworkUtils {
     }
 
     /**
-     * 获得当前用户的角色编号数组
-     *
-     * @return 角色编号数组
-     */
-    @Nullable
-    public static Set<Long> getLoginUserRoleIds() {
-        LoginUser loginUser = getLoginUser();
-        return loginUser != null ? loginUser.getRoleIds() : null;
-    }
-
-    /**
      * 设置当前用户
      *
      * @param loginUser 登录用户
@@ -110,7 +99,7 @@ public class SecurityFrameworkUtils {
     private static Authentication buildAuthentication(LoginUser loginUser, HttpServletRequest request) {
         // 创建 UsernamePasswordAuthenticationToken 对象
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                loginUser, null, loginUser.getAuthorities());
+                loginUser, null, Collections.emptyList());
         authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
         return authenticationToken;
     }

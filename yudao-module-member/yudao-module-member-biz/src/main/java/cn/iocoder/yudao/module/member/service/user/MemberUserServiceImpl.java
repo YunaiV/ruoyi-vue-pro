@@ -69,7 +69,7 @@ public class MemberUserServiceImpl implements MemberUserService {
         MemberUserDO user = new MemberUserDO();
         user.setMobile(mobile);
         user.setStatus(CommonStatusEnum.ENABLE.getStatus()); // 默认开启
-        user.setPassword(passwordEncoder.encode(password)); // 加密密码
+        user.setPassword(encodePassword(password)); // 加密密码
         user.setRegisterIp(registerIp);
         memberUserMapper.insert(user);
         return user;
@@ -125,6 +125,21 @@ public class MemberUserServiceImpl implements MemberUserService {
 
         // 更新用户手机
         memberUserMapper.updateById(MemberUserDO.builder().id(userId).mobile(reqVO.getMobile()).build());
+    }
+
+    @Override
+    public boolean isPasswordMatch(String rawPassword, String encodedPassword) {
+        return passwordEncoder.matches(rawPassword, encodedPassword);
+    }
+
+    /**
+     * 对密码进行加密
+     *
+     * @param password 密码
+     * @return 加密后的密码
+     */
+    private String encodePassword(String password) {
+        return passwordEncoder.encode(password);
     }
 
     @VisibleForTesting

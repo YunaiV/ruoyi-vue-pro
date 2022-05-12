@@ -193,8 +193,6 @@ yudao:
     enable: false # 本地环境，暂时关闭图片验证码，方便登录等接口的测试
   security:
     token-header: Authorization
-    token-timeout: 1d
-    session-timeout: 1d
     mock-enable: true
     mock-secret: test
   xss:

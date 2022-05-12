@@ -1,13 +1,19 @@
 import axios from 'axios'
 import { Notification, MessageBox, Message } from 'element-ui'
 import store from '@/store'
-import { getToken } from '@/utils/auth'
+import {getAccessToken, getRefreshToken, setToken} from '@/utils/auth'
 import errorCode from '@/utils/errorCode'
 import Cookies from "js-cookie";
 import {getPath, getTenantEnable} from "@/utils/ruoyi";
+import {refreshToken} from "@/api/login";
 
 // 是否显示重新登录
 export let isRelogin = { show: false };
+// Axios 无感知刷新令牌，参考 https://www.dashingdog.cn/article/11 与 https://segmentfault.com/a/1190000020210980 实现
+// 请求队列
+let requestList = []
+// 是否正在刷新中
+let isRefreshToken = false
 
 axios.defaults.headers['Content-Type'] = 'application/json;charset=utf-8'
 // 创建axios实例
@@ -21,8 +27,8 @@ const service = axios.create({
 service.interceptors.request.use(config => {
   // 是否需要设置 token
   const isToken = (config.headers || {}).isToken === false
-  if (getToken() && !isToken) {
-    config.headers['Authorization'] = 'Bearer ' + getToken() // 让每个请求携带自定义token 请根据实际情况自行修改
+  if (getAccessToken() && !isToken) {
+    config.headers['Authorization'] = 'Bearer ' + getAccessToken() // 让每个请求携带自定义token 请根据实际情况自行修改
   }
   // 设置租户
   if (getTenantEnable()) {
@@ -60,29 +66,44 @@ service.interceptors.request.use(config => {
 })
 
 // 响应拦截器
-service.interceptors.response.use(res => {
+service.interceptors.response.use( async res => {
     // 未设置状态码则默认成功状态
     const code = res.data.code || 200;
     // 获取错误信息
     const msg = errorCode[code] || res.data.msg || errorCode['default']
     if (code === 401) {
-      if (!isRelogin.show) {
-        isRelogin.show = true;
-        MessageBox.confirm('登录状态已过期，您可以继续留在该页面，或者重新登录', '系统提示', {
-            confirmButtonText: '重新登录',
-            cancelButtonText: '取消',
-            type: 'warning'
-          }
-        ).then(() => {
-          isRelogin.show = false;
-          store.dispatch('LogOut').then(() => {
-            location.href = getPath('/index');
+      // 如果未认证，并且未进行刷新令牌，说明可能是访问令牌过期了
+      if (!isRefreshToken) {
+        isRefreshToken = true;
+        // 1. 如果获取不到刷新令牌，则只能执行登出操作
+        if (!getRefreshToken()) {
+          return handleAuthorized();
+        }
+        // 2. 进行刷新访问令牌
+        try {
+          const refreshTokenRes = await refreshToken()
+          // 2.1 刷新成功，则回放队列的请求 + 当前请求
+          setToken(refreshTokenRes.data)
+          requestList.forEach(cb => cb())
+          return service(res.config)
+        } catch (e) {
+          // 2.2 刷新失败，则只能执行登出操作
+          // 为什么需要 catch 异常呢？刷新失败时，请求因为 Promise.reject 触发异常。
+          return handleAuthorized();
+        } finally {
+          requestList = []
+          isRefreshToken = false
+        }
+      } else {
+        // 添加到队列，等待刷新获取到新的令牌
+        return new Promise(resolve => {
+          requestList.push(() => {
+            config.headers['Authorization'] = 'Bearer ' + getAccessToken() // 让每个请求携带自定义token 请根据实际情况自行修改
+            resolve(service(config))
           })
-        }).catch(() => {
-          isRelogin.show = false;
-        });
+        })
       }
-      return Promise.reject('无效的会话，或者会话已过期，请重新登录。')
+      return handleAuthorized();
     } else if (code === 500) {
       Message({
         message: msg,
@@ -133,9 +154,29 @@ service.interceptors.response.use(res => {
 
 export function getBaseHeader() {
   return {
-    'Authorization': "Bearer " + getToken(),
+    'Authorization': "Bearer " + getAccessToken(),
     'tenant-id': Cookies.get('tenantId'),
   }
+}
+
+function handleAuthorized() {
+  if (!isRelogin.show) {
+    isRelogin.show = true;
+    MessageBox.confirm('登录状态已过期，您可以继续留在该页面，或者重新登录', '系统提示', {
+        confirmButtonText: '重新登录',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }
+    ).then(() => {
+      isRelogin.show = false;
+      store.dispatch('LogOut').then(() => {
+        location.href = getPath('/index');
+      })
+    }).catch(() => {
+      isRelogin.show = false;
+    });
+  }
+  return Promise.reject('无效的会话，或者会话已过期，请重新登录。')
 }
 
 export default service

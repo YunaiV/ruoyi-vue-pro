@@ -29,13 +29,6 @@
             <optional>true</optional>
         </dependency>
 
-        <!-- 用户信息 -->
-        <dependency>
-            <groupId>cn.iocoder.boot</groupId>
-            <artifactId>yudao-spring-boot-starter-security</artifactId>
-            <optional>true</optional>
-        </dependency>
-
     </dependencies>
 
 </project>

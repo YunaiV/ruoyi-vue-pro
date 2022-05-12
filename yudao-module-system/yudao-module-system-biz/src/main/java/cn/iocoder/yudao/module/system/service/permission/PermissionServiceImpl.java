@@ -3,12 +3,12 @@ package cn.iocoder.yudao.module.system.service.permission;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ArrayUtil;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
+import cn.iocoder.yudao.framework.datapermission.core.annotation.DataPermission;
 import cn.iocoder.yudao.framework.datapermission.core.dept.service.dto.DeptDataPermissionRespDTO;
-import cn.iocoder.yudao.framework.security.core.LoginUser;
-import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnore;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.MenuDO;
@@ -22,6 +22,8 @@ import cn.iocoder.yudao.module.system.dal.mysql.permission.UserRoleMapper;
 import cn.iocoder.yudao.module.system.enums.permission.DataScopeEnum;
 import cn.iocoder.yudao.module.system.mq.producer.permission.PermissionProducer;
 import cn.iocoder.yudao.module.system.service.dept.DeptService;
+import cn.iocoder.yudao.module.system.service.user.AdminUserService;
+import com.google.common.base.Suppliers;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
@@ -36,6 +38,10 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.util.*;
+import java.util.function.Supplier;
+
+import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
+import static java.util.Collections.singleton;
 
 /**
  * 权限 Service 实现类
@@ -45,11 +51,6 @@ import java.util.*;
 @Service("ss") // 使用 Spring Security 的缩写，方便食用
 @Slf4j
 public class PermissionServiceImpl implements PermissionService {
-
-    /**
-     * LoginUser 的 Context 缓存 Key
-     */
-    public static final String CONTEXT_KEY = PermissionServiceImpl.class.getSimpleName();
 
     /**
      * 定时执行 {@link #schedulePeriodicRefresh()} 的周期
@@ -93,6 +94,8 @@ public class PermissionServiceImpl implements PermissionService {
     private MenuService menuService;
     @Resource
     private DeptService deptService;
+    @Resource
+    private AdminUserService userService;
 
     @Resource
     private PermissionProducer permissionProducer;
@@ -319,7 +322,7 @@ public class PermissionServiceImpl implements PermissionService {
         }
 
         // 获得当前登录的角色。如果为空，说明没有权限
-        Set<Long> roleIds = SecurityFrameworkUtils.getLoginUserRoleIds();
+        Set<Long> roleIds = getUserRoleIds(getLoginUserId(), singleton(CommonStatusEnum.ENABLE.getStatus()));
         if (CollUtil.isEmpty(roleIds)) {
             return false;
         }
@@ -354,7 +357,7 @@ public class PermissionServiceImpl implements PermissionService {
         }
 
         // 获得当前登录的角色。如果为空，说明没有权限
-        Set<Long> roleIds = SecurityFrameworkUtils.getLoginUserRoleIds();
+        Set<Long> roleIds = getUserRoleIds(getLoginUserId(), singleton(CommonStatusEnum.ENABLE.getStatus()));
         if (CollUtil.isEmpty(roleIds)) {
             return false;
         }
@@ -368,16 +371,18 @@ public class PermissionServiceImpl implements PermissionService {
     }
 
     @Override
-    public DeptDataPermissionRespDTO getDeptDataPermission(LoginUser loginUser) {
-        // 判断是否 context 已经缓存
-        DeptDataPermissionRespDTO result = loginUser.getContext(CONTEXT_KEY, DeptDataPermissionRespDTO.class);
-        if (result != null) {
+    @DataPermission(enable = false) // 关闭数据权限，不然就会出现递归获取数据权限的问题
+    public DeptDataPermissionRespDTO getDeptDataPermission(Long userId) {
+        DeptDataPermissionRespDTO result = new DeptDataPermissionRespDTO();
+        // 获得用户的角色
+        Set<Long> roleIds = getUserRoleIds(userId, singleton(CommonStatusEnum.ENABLE.getStatus()));
+        if (CollUtil.isEmpty(roleIds)) {
             return result;
         }
-
-        // 创建 DeptDataPermissionRespDTO 对象
-        result = new DeptDataPermissionRespDTO();
-        List<RoleDO> roles = roleService.getRolesFromCache(loginUser.getRoleIds());
+        List<RoleDO> roles = roleService.getRolesFromCache(roleIds);
+        // 获得用户的部门编号的缓存，通过 Guava 的 Suppliers 惰性求值，即有且仅有第一次发起 DB 的查询
+        Supplier<Long> userDeptIdCache = Suppliers.memoize(() -> userService.getUser(userId).getDeptId());
+        // 遍历每个角色，计算
         for (RoleDO role : roles) {
             // 为空时，跳过
             if (role.getDataScope() == null) {
@@ -393,20 +398,20 @@ public class PermissionServiceImpl implements PermissionService {
                 CollUtil.addAll(result.getDeptIds(), role.getDataScopeDeptIds());
                 // 自定义可见部门时，保证可以看到自己所在的部门。否则，一些场景下可能会有问题。
                 // 例如说，登录时，基于 t_user 的 username 查询会可能被 dept_id 过滤掉
-                CollUtil.addAll(result.getDeptIds(), loginUser.getDeptId());
+                CollUtil.addAll(result.getDeptIds(), userDeptIdCache.get());
                 continue;
             }
             // 情况三，DEPT_ONLY
             if (Objects.equals(role.getDataScope(), DataScopeEnum.DEPT_ONLY.getScope())) {
-                CollectionUtils.addIfNotNull(result.getDeptIds(), loginUser.getDeptId());
+                CollectionUtils.addIfNotNull(result.getDeptIds(), userDeptIdCache.get());
                 continue;
             }
             // 情况四，DEPT_DEPT_AND_CHILD
             if (Objects.equals(role.getDataScope(), DataScopeEnum.DEPT_AND_CHILD.getScope())) {
-                List<DeptDO> depts = deptService.getDeptsByParentIdFromCache(loginUser.getDeptId(), true);
+                List<DeptDO> depts = deptService.getDeptsByParentIdFromCache(userDeptIdCache.get(), true);
                 CollUtil.addAll(result.getDeptIds(), CollectionUtils.convertList(depts, DeptDO::getId));
-                //添加本身部门id
-                CollUtil.addAll(result.getDeptIds(), loginUser.getDeptId());
+                // 添加本身部门编号
+                CollUtil.addAll(result.getDeptIds(), userDeptIdCache.get());
                 continue;
             }
             // 情况五，SELF
@@ -415,11 +420,8 @@ public class PermissionServiceImpl implements PermissionService {
                 continue;
             }
             // 未知情况，error log 即可
-            log.error("[getDeptDataPermission][LoginUser({}) role({}) 无法处理]", loginUser.getId(), JsonUtils.toJsonString(result));
+            log.error("[getDeptDataPermission][LoginUser({}) role({}) 无法处理]", userId, JsonUtils.toJsonString(result));
         }
-
-        // 添加到缓存，并返回
-        loginUser.setContext(CONTEXT_KEY, result);
         return result;
     }
 

@@ -1,4 +1,6 @@
 import request from '@/utils/request'
+import {getRefreshToken} from "@/utils/auth";
+import service from "@/utils/request";
 
 // 登录方法
 export function login(username, password, code, uuid) {
@@ -26,7 +28,7 @@ export function getInfo() {
 // 退出方法
 export function logout() {
   return request({
-    url: '/system/logout',
+    url: '/system/auth/logout',
     method: 'post'
   })
 }
@@ -97,5 +99,13 @@ export function smsLogin(mobile, code) {
       mobile,
       code
     }
+  })
+}
+
+// 刷新访问令牌
+export function refreshToken() {
+  return service({
+    url: '/system/auth/refresh-token?refreshToken=' + getRefreshToken(),
+    method: 'post'
   })
 }
