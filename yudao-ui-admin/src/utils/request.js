@@ -86,9 +86,10 @@ service.interceptors.response.use( async res => {
           setToken(refreshTokenRes.data)
           requestList.forEach(cb => cb())
           return service(res.config)
-        } catch (e) {
-          // 2.2 刷新失败，则只能执行登出操作
-          // 为什么需要 catch 异常呢？刷新失败时，请求因为 Promise.reject 触发异常。
+        } catch (e) {// 为什么需要 catch 异常呢？刷新失败时，请求因为 Promise.reject 触发异常。
+          // 2.2 刷新失败，只回放队列的请求
+          requestList.forEach(cb => cb())
+          // 提示是否要登出。即不回放当前请求！不然会形成递归
           return handleAuthorized();
         } finally {
           requestList = []
@@ -98,12 +99,11 @@ service.interceptors.response.use( async res => {
         // 添加到队列，等待刷新获取到新的令牌
         return new Promise(resolve => {
           requestList.push(() => {
-            config.headers['Authorization'] = 'Bearer ' + getAccessToken() // 让每个请求携带自定义token 请根据实际情况自行修改
-            resolve(service(config))
+            res.config.headers['Authorization'] = 'Bearer ' + getAccessToken() // 让每个请求携带自定义token 请根据实际情况自行修改
+            resolve(service(res.config))
           })
         })
       }
-      return handleAuthorized();
     } else if (code === 500) {
       Message({
         message: msg,
@@ -123,9 +123,13 @@ service.interceptors.response.use( async res => {
       })
       return Promise.reject(new Error(msg))
     } else if (code !== 200) {
-      Notification.error({
-        title: msg
-      })
+      if (msg === '无效的刷新令牌') { // hard coding：忽略这个提示，直接登出
+        console.log('无效的刷新令牌')
+      } else {
+        Notification.error({
+          title: msg
+        })
+      }
       return Promise.reject('error')
     } else {
       return res.data
