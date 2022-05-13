@@ -6,7 +6,7 @@ import cn.iocoder.yudao.module.system.controller.admin.permission.vo.role.RoleEx
 import cn.iocoder.yudao.module.system.controller.admin.permission.vo.role.RolePageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.permission.vo.role.RoleUpdateReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.RoleDO;
-import org.springframework.lang.Nullable;
+import org.springframework.lang.NonNull;
 
 import javax.validation.Valid;
 import java.util.Collection;
@@ -79,7 +79,7 @@ public interface RoleService {
      * @param statuses 筛选的状态。允许空，空时不筛选
      * @return 角色列表
      */
-    List<RoleDO> getRoles(@Nullable Collection<Integer> statuses);
+    List<RoleDO> getRoles(@NonNull Collection<Integer> statuses);
 
     /**
      * 获得角色数组，从缓存中
