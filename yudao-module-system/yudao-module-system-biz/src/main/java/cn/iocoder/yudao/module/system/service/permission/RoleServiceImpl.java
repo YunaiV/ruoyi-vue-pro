@@ -22,6 +22,7 @@ import com.google.common.annotations.VisibleForTesting;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -214,7 +215,7 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public List<RoleDO> getRoles(@Nullable Collection<Integer> statuses) {
+    public List<RoleDO> getRoles(@NonNull Collection<Integer> statuses) {
         return roleMapper.selectListByStatus(statuses);
     }
 

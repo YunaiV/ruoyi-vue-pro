@@ -24,6 +24,7 @@ import cn.iocoder.yudao.module.system.service.tenant.handler.TenantInfoHandler;
 import cn.iocoder.yudao.module.system.service.tenant.handler.TenantMenuHandler;
 import cn.iocoder.yudao.module.system.service.user.AdminUserService;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
+import com.google.common.collect.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -231,7 +232,8 @@ public class TenantServiceImplTest extends BaseDbUnitTest {
         role100.setTenantId(dbTenant.getId());
         RoleDO role101 = randomPojo(RoleDO.class, o -> o.setId(101L));
         role101.setTenantId(dbTenant.getId());
-        when(roleService.getRoles(isNull())).thenReturn(asList(role100, role101));
+        when(roleService.getRoles(eq(asList(CommonStatusEnum.ENABLE.getStatus(), CommonStatusEnum.DISABLE.getStatus()))))
+                .thenReturn(asList(role100, role101));
         // mock 每个角色的权限
         when(permissionService.getRoleMenuIds(eq(101L))).thenReturn(asSet(201L, 202L));
 
