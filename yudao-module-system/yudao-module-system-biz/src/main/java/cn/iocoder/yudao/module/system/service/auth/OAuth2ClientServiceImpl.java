@@ -1,7 +1,10 @@
 package cn.iocoder.yudao.module.system.service.auth;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.string.StrUtils;
 import cn.iocoder.yudao.module.system.controller.admin.auth.vo.client.OAuth2ClientCreateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.auth.vo.client.OAuth2ClientPageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.auth.vo.client.OAuth2ClientUpdateReqVO;
@@ -18,15 +21,12 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.getMaxValue;
-import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.OAUTH2_CLIENT_EXISTS;
-import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.OAUTH2_CLIENT_NOT_EXISTS;
+import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
 
 /**
  * OAuth2.0 Client Service 实现类
@@ -175,8 +175,29 @@ public class OAuth2ClientServiceImpl implements OAuth2ClientService {
     }
 
     @Override
-    public OAuth2ClientDO validOAuthClientFromCache(String clientId) {
-        return clientCache.get(clientId);
+    public OAuth2ClientDO validOAuthClientFromCache(String clientId, String authorizedGrantType, Collection<String> scopes, String redirectUri) {
+        // 校验客户端存在、且开启
+        OAuth2ClientDO client = clientCache.get(clientId);
+        if (client == null) {
+            throw exception(OAUTH2_CLIENT_EXISTS);
+        }
+        if (Objects.equals(client.getStatus(), CommonStatusEnum.ENABLE.getStatus())) {
+            throw exception(OAUTH2_CLIENT_DISABLE);
+        }
+
+        // 校验授权方式
+        if (StrUtil.isNotEmpty(authorizedGrantType) && !CollUtil.contains(client.getAuthorizedGrantTypes(), authorizedGrantType)) {
+            throw exception(OAUTH2_CLIENT_AUTHORIZED_GRANT_TYPE_NOT_EXISTS);
+        }
+        // 校验授权范围
+        if (CollUtil.isNotEmpty(scopes) && !CollUtil.containsAll(client.getScopes(), scopes)) {
+            throw exception(OAUTH2_CLIENT_SCOPE_OVER);
+        }
+        // 校验回调地址
+        if (StrUtil.isNotEmpty(redirectUri) && !StrUtils.startWithAny(redirectUri, client.getRedirectUris())) {
+            throw exception(OAUTH2_CLIENT_REDIRECT_URI_NOT_MATCH);
+        }
+        return client;
     }
 
 }

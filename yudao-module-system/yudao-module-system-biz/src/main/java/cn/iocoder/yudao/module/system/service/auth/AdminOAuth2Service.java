@@ -1,5 +1,9 @@
 package cn.iocoder.yudao.module.system.service.auth;
 
+import cn.iocoder.yudao.module.system.dal.dataobject.auth.OAuth2AccessTokenDO;
+
+import java.util.Collection;
+
 /**
  * 管理后台的 OAuth2 Service 接口
  *
@@ -11,4 +15,14 @@ package cn.iocoder.yudao.module.system.service.auth;
  * @author 芋道源码
  */
 public interface AdminOAuth2Service {
+
+    // ImplicitTokenGranter
+    OAuth2AccessTokenDO grantImplicit(Long userId, Integer userType,
+                                      String clientId, Collection<String> scopes);
+
+    // AuthorizationCodeTokenGranter
+    String grantAuthorizationCode(Long userId, Integer userType,
+                                  String clientId, Collection<String> scopes,
+                                  String redirectUri, String state);
+
 }

@@ -7,5 +7,8 @@ package cn.iocoder.yudao.module.system.service.auth;
  *
  * @author 芋道源码
  */
-public class OAuth2CodeService {
+public interface OAuth2CodeService {
+
+
+
 }

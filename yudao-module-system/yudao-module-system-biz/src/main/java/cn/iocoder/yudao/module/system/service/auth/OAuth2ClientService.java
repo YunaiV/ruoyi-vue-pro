@@ -7,6 +7,7 @@ import cn.iocoder.yudao.module.system.controller.admin.auth.vo.client.OAuth2Clie
 import cn.iocoder.yudao.module.system.dal.dataobject.auth.OAuth2ClientDO;
 
 import javax.validation.Valid;
+import java.util.Collection;
 
 /**
  * OAuth2.0 Client Service 接口
@@ -63,9 +64,24 @@ public interface OAuth2ClientService {
     /**
      * 从缓存中，校验客户端是否合法
      *
-     * @param clientId 客户端编号
      * @return 客户端
      */
-    OAuth2ClientDO validOAuthClientFromCache(String clientId);
+    default OAuth2ClientDO validOAuthClientFromCache(String clientId) {
+        return validOAuthClientFromCache(clientId, null, null, null);
+    }
+
+    /**
+     * 从缓存中，校验客户端是否合法
+     *
+     * 非空时，进行校验
+     *
+     * @param clientId 客户端编号
+     * @param authorizedGrantType 授权方式
+     * @param scopes 授权范围
+     * @param redirectUri 重定向地址
+     * @return 客户端
+     */
+    OAuth2ClientDO validOAuthClientFromCache(String clientId, String authorizedGrantType,
+                                             Collection<String> scopes, String redirectUri);
 
 }

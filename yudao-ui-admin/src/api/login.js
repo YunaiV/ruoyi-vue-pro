@@ -122,6 +122,14 @@ export function authorize() {
       response_type: 'code',
       client_id: 'test',
       redirect_uri: 'https://www.iocoder.cn',
+      // scopes: {
+      //   read: true,
+      //   write: false
+      // }
+      scope: {
+        read: true,
+        write: false
+      }
     },
     method: 'post'
   })
