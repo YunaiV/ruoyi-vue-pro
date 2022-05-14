@@ -20,6 +20,8 @@ import java.util.Collections;
  */
 public class SecurityFrameworkUtils {
 
+    public static final String TOKEN_TYPE = "Bearer";
+
     private SecurityFrameworkUtils() {}
 
     /**
@@ -34,7 +36,7 @@ public class SecurityFrameworkUtils {
         if (!StringUtils.hasText(authorization)) {
             return null;
         }
-        int index = authorization.indexOf("Bearer ");
+        int index = authorization.indexOf(TOKEN_TYPE + " ");
         if (index == -1) { // 未找到
             return null;
         }

@@ -4,6 +4,8 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.system.controller.admin.oauth2.vo.token.OAuth2AccessTokenPageReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.auth.OAuth2AccessTokenDO;
 
+import java.util.List;
+
 /**
  * OAuth2.0 Token Service 接口
  *
@@ -22,9 +24,10 @@ public interface OAuth2TokenService {
      * @param userId 用户编号
      * @param userType 用户类型
      * @param clientId 客户端编号
+     * @param scopes 授权范围
      * @return 访问令牌的信息
      */
-    OAuth2AccessTokenDO createAccessToken(Long userId, Integer userType, String clientId);
+    OAuth2AccessTokenDO createAccessToken(Long userId, Integer userType, String clientId, List<String> scopes);
 
     /**
      * 刷新访问令牌

@@ -24,7 +24,7 @@ public class OAuth2TokenApiImpl implements OAuth2TokenApi {
     @Override
     public OAuth2AccessTokenRespDTO createAccessToken(OAuth2AccessTokenCreateReqDTO reqDTO) {
         OAuth2AccessTokenDO accessTokenDO = oauth2TokenService.createAccessToken(
-                reqDTO.getUserId(), reqDTO.getUserType(), reqDTO.getClientId());
+                reqDTO.getUserId(), reqDTO.getUserType(), reqDTO.getClientId(), reqDTO.getScopes());
         return OAuth2TokenConvert.INSTANCE.convert2(accessTokenDO);
     }
 

@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.system.service.oauth2;
 
 import cn.iocoder.yudao.module.system.dal.dataobject.auth.OAuth2AccessTokenDO;
 
-import java.util.Collection;
+import java.util.List;
 
 /**
  * OAuth2 授予 Service 接口
@@ -20,11 +20,11 @@ public interface OAuth2GrantService {
 
     // ImplicitTokenGranter
     OAuth2AccessTokenDO grantImplicit(Long userId, Integer userType,
-                                      String clientId, Collection<String> scopes);
+                                      String clientId, List<String> scopes);
 
     // AuthorizationCodeTokenGranter
     String grantAuthorizationCode(Long userId, Integer userType,
-                                  String clientId, Collection<String> scopes,
+                                  String clientId, List<String> scopes,
                                   String redirectUri, String state);
 
 }

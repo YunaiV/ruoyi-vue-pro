@@ -3,13 +3,16 @@ package cn.iocoder.yudao.module.system.dal.dataobject.auth;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.tenant.core.db.TenantBaseDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * OAuth2 访问令牌 DO
@@ -55,6 +58,11 @@ public class OAuth2AccessTokenDO extends TenantBaseDO {
      * 关联 {@link OAuth2ClientDO#getId()}
      */
     private String clientId;
+    /**
+     * 授权范围
+     */
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private List<String> scopes;
     /**
      * 过期时间
      */

@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.system.service.oauth2;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -181,7 +182,7 @@ public class OAuth2ClientServiceImpl implements OAuth2ClientService {
         if (client == null) {
             throw exception(OAUTH2_CLIENT_EXISTS);
         }
-        if (Objects.equals(client.getStatus(), CommonStatusEnum.ENABLE.getStatus())) {
+        if (ObjectUtil.notEqual(client.getStatus(), CommonStatusEnum.ENABLE.getStatus())) {
             throw exception(OAUTH2_CLIENT_DISABLE);
         }
 

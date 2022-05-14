@@ -1,15 +1,19 @@
 package cn.iocoder.yudao.module.system.controller.admin.oauth2;
 
+import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
+import cn.iocoder.yudao.module.system.dal.dataobject.auth.OAuth2AccessTokenDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.auth.OAuth2ClientDO;
 import cn.iocoder.yudao.module.system.enums.auth.OAuth2GrantTypeEnum;
 import cn.iocoder.yudao.module.system.service.oauth2.OAuth2ApproveService;
 import cn.iocoder.yudao.module.system.service.oauth2.OAuth2ClientService;
 import cn.iocoder.yudao.module.system.service.oauth2.OAuth2GrantService;
+import cn.iocoder.yudao.module.system.util.oauth2.OAuth2Utils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -26,6 +30,7 @@ import java.util.Map;
 import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.BAD_REQUEST;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception0;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
 @Api(tags = "管理后台 - OAuth2.0 授权")
@@ -72,16 +77,6 @@ public class OAuth2Controller {
         // 1.2 校验 redirectUri 重定向域名是否合法 + 校验 scope 是否在 Client 授权范围内
         oauth2ClientService.validOAuthClientFromCache(clientId, grantTypeEnum.getGrantType(), scopes, redirectUri);
 
-        // 2. 判断是否满足自动授权（满足)
-        boolean approved = oauth2ApproveService.checkForPreApproval(getLoginUserId(), UserTypeEnum.ADMIN.getValue(), clientId, scopes);
-        if (approved) {
-            // 2.1 如果是 code 授权码模式，则发放 code 授权码，并重定向
-            if (grantTypeEnum == OAuth2GrantTypeEnum.AUTHORIZATION_CODE) {
-                return success(getAuthorizationCodeRedirect());
-            }
-            return success(getImplicitGrantRedirect());
-        }
-
         // 3. 不满足自动授权，则返回授权相关的展示信息
         return null;
     }
@@ -104,7 +99,7 @@ public class OAuth2Controller {
                                               @RequestParam("client_id") String clientId,
                                               @RequestParam(value = "scope", required = false) String scope,
                                               @RequestParam("redirect_uri") String redirectUri,
-                                              @RequestParam(value = "autoApprove") Boolean autoApprove,
+                                              @RequestParam(value = "auto_approve") Boolean autoApprove,
                                               @RequestParam(value = "state", required = false) String state) {
         @SuppressWarnings("unchecked")
         Map<String, Boolean> scopes = JsonUtils.parseObject(scope, Map.class);
@@ -115,27 +110,28 @@ public class OAuth2Controller {
         // 1.1 校验 responseType 是否满足 code 或者 token 值
         OAuth2GrantTypeEnum grantTypeEnum = getGrantTypeEnum(responseType);
         // 1.2 校验 redirectUri 重定向域名是否合法 + 校验 scope 是否在 Client 授权范围内
-        oauth2ClientService.validOAuthClientFromCache(clientId, grantTypeEnum.getGrantType(), scopes.keySet(), redirectUri);
+        OAuth2ClientDO client = oauth2ClientService.validOAuthClientFromCache(clientId, grantTypeEnum.getGrantType(), scopes.keySet(), redirectUri);
 
         // 2.1 假设 approved 为 null，说明是场景一
         if (Boolean.TRUE.equals(autoApprove)) {
             // 如果无法自动授权通过，则返回空 url，前端不进行跳转
-            if (!oauth2ApproveService.checkForPreApproval(getLoginUserId(), UserTypeEnum.ADMIN.getValue(), clientId, scopes.keySet())) {
+            if (!oauth2ApproveService.checkForPreApproval(getLoginUserId(), getUserType(), clientId, scopes.keySet())) {
                 return success(null);
             }
         } else { // 2.2 假设 approved 非 null，说明是场景二
             // 如果计算后不通过，则跳转一个错误链接
-            if (!oauth2ApproveService.updateAfterApproval(getLoginUserId(), UserTypeEnum.ADMIN.getValue(), clientId, scopes)) {
+            if (!oauth2ApproveService.updateAfterApproval(getLoginUserId(), getUserType(), clientId, scopes)) {
                 return success("TODO");
             }
         }
 
         // 3.1 如果是 code 授权码模式，则发放 code 授权码，并重定向
+        List<String> approveScopes = convertList(scopes.entrySet(), Map.Entry::getKey, Map.Entry::getValue);
         if (grantTypeEnum == OAuth2GrantTypeEnum.AUTHORIZATION_CODE) {
             return success(getAuthorizationCodeRedirect());
         }
         // 3.2 如果是 token 则是 implicit 简化模式，则发送 accessToken 访问令牌，并重定向
-        return success(getImplicitGrantRedirect());
+        return success(getImplicitGrantRedirect(getLoginUserId(), client, redirectUri, state, approveScopes));
     }
 
     private static OAuth2GrantTypeEnum getGrantTypeEnum(String responseType) {
@@ -148,12 +144,22 @@ public class OAuth2Controller {
         throw exception0(BAD_REQUEST.getCode(), "response_type 参数值允许 code 和 token");
     }
 
-    private String getImplicitGrantRedirect() {
-        return "";
+    private String getImplicitGrantRedirect(Long userId, OAuth2ClientDO client,
+                                            String redirectUri, String state, List<String> scopes) {
+        OAuth2AccessTokenDO accessTokenDO = oAuth2GrantService.grantImplicit(userId, getUserType(), client.getClientId(), scopes);
+        Assert.notNull(accessTokenDO, "访问令牌不能为空"); // 防御性检查
+        // 拼接 URL
+        // noinspection unchecked
+        return OAuth2Utils.buildImplicitRedirectUri(redirectUri, accessTokenDO.getAccessToken(), state, accessTokenDO.getExpiresTime(),
+                scopes, JsonUtils.parseObject(client.getAdditionalInformation(), Map.class));
     }
 
     private String getAuthorizationCodeRedirect() {
         return "";
+    }
+
+    private Integer getUserType() {
+        return UserTypeEnum.ADMIN.getValue();
     }
 
 }
