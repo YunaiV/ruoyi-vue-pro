@@ -4,7 +4,6 @@ import cn.iocoder.yudao.module.system.dal.dataobject.auth.OAuth2AccessTokenDO;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -28,7 +27,7 @@ public class OAuth2GrantServiceImpl implements OAuth2GrantService {
     public String grantAuthorizationCode(Long userId, Integer userType,
                                          String clientId, List<String> scopes,
                                          String redirectUri, String state) {
-        return null;
+        return "test";
     }
 
 }

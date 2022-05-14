@@ -49,7 +49,7 @@ public class OAuth2Controller {
 //    GET  oauth/authorize AuthorizationEndpoint
 
     @Resource
-    private OAuth2GrantService oAuth2GrantService;
+    private OAuth2GrantService oauth2GrantService;
     @Resource
     private OAuth2ClientService oauth2ClientService;
     @Resource
@@ -121,17 +121,18 @@ public class OAuth2Controller {
         } else { // 2.2 假设 approved 非 null，说明是场景二
             // 如果计算后不通过，则跳转一个错误链接
             if (!oauth2ApproveService.updateAfterApproval(getLoginUserId(), getUserType(), clientId, scopes)) {
-                return success("TODO");
+                return success(OAuth2Utils.buildUnsuccessfulRedirect(redirectUri, responseType, state,
+                        "access_denied", "User denied access"));
             }
         }
 
         // 3.1 如果是 code 授权码模式，则发放 code 授权码，并重定向
         List<String> approveScopes = convertList(scopes.entrySet(), Map.Entry::getKey, Map.Entry::getValue);
         if (grantTypeEnum == OAuth2GrantTypeEnum.AUTHORIZATION_CODE) {
-            return success(getAuthorizationCodeRedirect());
+            return success(getAuthorizationCodeRedirect(getLoginUserId(), client, approveScopes, redirectUri, state));
         }
         // 3.2 如果是 token 则是 implicit 简化模式，则发送 accessToken 访问令牌，并重定向
-        return success(getImplicitGrantRedirect(getLoginUserId(), client, redirectUri, state, approveScopes));
+        return success(getImplicitGrantRedirect(getLoginUserId(), client, approveScopes, redirectUri, state));
     }
 
     private static OAuth2GrantTypeEnum getGrantTypeEnum(String responseType) {
@@ -145,17 +146,23 @@ public class OAuth2Controller {
     }
 
     private String getImplicitGrantRedirect(Long userId, OAuth2ClientDO client,
-                                            String redirectUri, String state, List<String> scopes) {
-        OAuth2AccessTokenDO accessTokenDO = oAuth2GrantService.grantImplicit(userId, getUserType(), client.getClientId(), scopes);
+                                            List<String> scopes, String redirectUri, String state) {
+        // 1. 创建 access token 访问令牌
+        OAuth2AccessTokenDO accessTokenDO = oauth2GrantService.grantImplicit(userId, getUserType(), client.getClientId(), scopes);
         Assert.notNull(accessTokenDO, "访问令牌不能为空"); // 防御性检查
-        // 拼接 URL
+        // 2. 拼接重定向的 URL
         // noinspection unchecked
         return OAuth2Utils.buildImplicitRedirectUri(redirectUri, accessTokenDO.getAccessToken(), state, accessTokenDO.getExpiresTime(),
                 scopes, JsonUtils.parseObject(client.getAdditionalInformation(), Map.class));
     }
 
-    private String getAuthorizationCodeRedirect() {
-        return "";
+    private String getAuthorizationCodeRedirect(Long userId, OAuth2ClientDO client,
+                                                List<String> scopes, String redirectUri, String state) {
+        // 1. 创建 code 授权码
+        String authorizationCode = oauth2GrantService.grantAuthorizationCode(userId,getUserType(), client.getClientId(), scopes,
+                redirectUri, state);
+        // 2. 拼接重定向的 URL
+        return OAuth2Utils.buildAuthorizationCodeRedirectUri(redirectUri, authorizationCode, state);
     }
 
     private Integer getUserType() {

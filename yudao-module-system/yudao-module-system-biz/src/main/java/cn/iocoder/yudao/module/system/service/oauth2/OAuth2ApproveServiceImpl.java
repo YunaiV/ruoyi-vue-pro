@@ -20,7 +20,7 @@ public class OAuth2ApproveServiceImpl implements OAuth2ApproveService {
 
     @Override
     public boolean updateAfterApproval(Long userId, Integer userType, String clientId, Map<String, Boolean> scopes) {
-        return true;
+        return false;
     }
 
 }
