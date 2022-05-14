@@ -55,16 +55,15 @@ public class OAuth2ClientBaseVO {
     private List<@NotEmpty(message = "重定向的 URI 不能为空")
         @URL(message = "重定向的 URI 格式不正确") String> redirectUris;
 
-    @ApiModelProperty(value = "是否自动授权", required = true, example = "true")
-    @NotNull(message = "是否自动授权不能为空")
-    private Boolean autoApprove;
-
     @ApiModelProperty(value = "授权类型", required = true, example = "password", notes = "参见 OAuth2GrantTypeEnum 枚举")
     @NotNull(message = "授权类型不能为空")
     private List<String> authorizedGrantTypes;
 
     @ApiModelProperty(value = "授权范围", example = "user_info")
     private List<String> scopes;
+
+    @ApiModelProperty(value = "自动通过的授权范围", example = "user_info")
+    private List<String> autoApproveScopes;
 
     @ApiModelProperty(value = "权限", example = "system:user:query")
     private List<String> authorities;

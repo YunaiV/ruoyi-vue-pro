@@ -71,10 +71,6 @@ public class OAuth2ClientDO extends BaseDO {
     @TableField(typeHandler = JacksonTypeHandler.class)
     private List<String> redirectUris;
     /**
-     * 是否自动授权
-     */
-    private Boolean autoApprove;
-    /**
      * 授权类型（模式）
      *
      * 枚举 {@link OAuth2GrantTypeEnum}
@@ -86,6 +82,13 @@ public class OAuth2ClientDO extends BaseDO {
      */
     @TableField(typeHandler = JacksonTypeHandler.class)
     private List<String> scopes;
+    /**
+     * 自动授权的 Scope
+     *
+     * code 授权时，如果 scope 在这个范围内，则自动通过
+     */
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private List<String> autoApproveScopes;
     /**
      * 权限
      */

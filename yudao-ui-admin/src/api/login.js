@@ -109,3 +109,20 @@ export function refreshToken() {
     method: 'post'
   })
 }
+
+// ========== OAUTH 2.0 相关 ==========
+export function authorize() {
+  return service({
+    url: '/system/oauth2/authorize',
+    headers:{
+      'Content-type': 'application/x-www-form-urlencoded',
+      "Access-Control-Allow-Origin": "*"
+    },
+    params: {
+      response_type: 'code',
+      client_id: 'test',
+      redirect_uri: 'https://www.iocoder.cn',
+    },
+    method: 'post'
+  })
+}
