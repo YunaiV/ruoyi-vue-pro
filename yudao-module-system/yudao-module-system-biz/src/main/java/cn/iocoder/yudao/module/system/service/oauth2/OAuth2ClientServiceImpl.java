@@ -1,13 +1,13 @@
-package cn.iocoder.yudao.module.system.service.auth;
+package cn.iocoder.yudao.module.system.service.oauth2;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.string.StrUtils;
-import cn.iocoder.yudao.module.system.controller.admin.auth.vo.client.OAuth2ClientCreateReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.auth.vo.client.OAuth2ClientPageReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.auth.vo.client.OAuth2ClientUpdateReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.oauth2.vo.client.OAuth2ClientCreateReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.oauth2.vo.client.OAuth2ClientPageReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.oauth2.vo.client.OAuth2ClientUpdateReqVO;
 import cn.iocoder.yudao.module.system.convert.auth.OAuth2ClientConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.auth.OAuth2ClientDO;
 import cn.iocoder.yudao.module.system.dal.mysql.auth.OAuth2ClientMapper;

@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.system.controller.admin.auth.vo.client;
+package cn.iocoder.yudao.module.system.controller.admin.oauth2.vo.client;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;

@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.system.controller.admin.auth.vo.auth;
+package cn.iocoder.yudao.module.system.controller.admin.auth.vo;
 
 import cn.iocoder.yudao.framework.common.validation.InEnum;
 import cn.iocoder.yudao.framework.common.validation.Mobile;

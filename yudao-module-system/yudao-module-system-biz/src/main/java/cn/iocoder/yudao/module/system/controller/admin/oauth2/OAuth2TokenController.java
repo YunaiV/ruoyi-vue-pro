@@ -1,14 +1,14 @@
-package cn.iocoder.yudao.module.system.controller.admin.auth;
+package cn.iocoder.yudao.module.system.controller.admin.oauth2;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.system.controller.admin.auth.vo.token.OAuth2AccessTokenPageReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.auth.vo.token.OAuth2AccessTokenRespVO;
+import cn.iocoder.yudao.module.system.controller.admin.oauth2.vo.token.OAuth2AccessTokenPageReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.oauth2.vo.token.OAuth2AccessTokenRespVO;
 import cn.iocoder.yudao.module.system.convert.auth.OAuth2TokenConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.auth.OAuth2AccessTokenDO;
 import cn.iocoder.yudao.module.system.enums.logger.LoginLogTypeEnum;
 import cn.iocoder.yudao.module.system.service.auth.AdminAuthService;
-import cn.iocoder.yudao.module.system.service.auth.OAuth2TokenService;
+import cn.iocoder.yudao.module.system.service.oauth2.OAuth2TokenService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;

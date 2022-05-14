@@ -1,6 +1,7 @@
-package cn.iocoder.yudao.module.system.service.auth;
+package cn.iocoder.yudao.module.system.service.oauth2;
 
 import java.util.Collection;
+import java.util.Map;
 
 /**
  * OAuth2 批准 Service 接口
@@ -23,5 +24,16 @@ public interface OAuth2ApproveService {
      * @return 是否授权通过
      */
     boolean checkForPreApproval(Long userId, Integer userType, String clientId, Collection<String> scopes);
+
+    /**
+     * 在用户发起批准时，基于 scopes 的选项，计算最终是否通过
+     *
+     * @param userId 用户编号
+     * @param userType 用户类型
+     * @param clientId 客户端编号
+     * @param scopes 授权范围
+     * @return 是否授权通过
+     */
+    boolean updateAfterApproval(Long userId, Integer userType, String clientId, Map<String, Boolean> scopes);
 
 }

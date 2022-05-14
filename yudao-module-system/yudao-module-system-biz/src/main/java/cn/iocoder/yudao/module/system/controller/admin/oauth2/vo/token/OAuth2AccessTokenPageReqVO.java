@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.system.controller.admin.auth.vo.token;
+package cn.iocoder.yudao.module.system.controller.admin.oauth2.vo.token;
 
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import io.swagger.annotations.ApiModel;

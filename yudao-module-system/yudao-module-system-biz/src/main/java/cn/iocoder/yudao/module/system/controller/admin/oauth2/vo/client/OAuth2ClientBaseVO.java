@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.system.controller.admin.auth.vo.client;
+package cn.iocoder.yudao.module.system.controller.admin.oauth2.vo.client;
 
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;

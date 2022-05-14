@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.system.service.auth;
+package cn.iocoder.yudao.module.system.service.oauth2;
 
 /**
  * OAuth2.0 授权码 Service 接口

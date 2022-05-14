@@ -1,14 +1,14 @@
-package cn.iocoder.yudao.module.system.controller.admin.auth;
+package cn.iocoder.yudao.module.system.controller.admin.oauth2;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.system.controller.admin.auth.vo.client.OAuth2ClientCreateReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.auth.vo.client.OAuth2ClientPageReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.auth.vo.client.OAuth2ClientRespVO;
-import cn.iocoder.yudao.module.system.controller.admin.auth.vo.client.OAuth2ClientUpdateReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.oauth2.vo.client.OAuth2ClientCreateReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.oauth2.vo.client.OAuth2ClientPageReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.oauth2.vo.client.OAuth2ClientRespVO;
+import cn.iocoder.yudao.module.system.controller.admin.oauth2.vo.client.OAuth2ClientUpdateReqVO;
 import cn.iocoder.yudao.module.system.convert.auth.OAuth2ClientConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.auth.OAuth2ClientDO;
-import cn.iocoder.yudao.module.system.service.auth.OAuth2ClientService;
+import cn.iocoder.yudao.module.system.service.oauth2.OAuth2ClientService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;

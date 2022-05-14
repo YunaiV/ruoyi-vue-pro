@@ -1,11 +1,13 @@
-package cn.iocoder.yudao.module.system.service.auth;
+package cn.iocoder.yudao.module.system.service.oauth2;
 
 import cn.iocoder.yudao.module.system.dal.dataobject.auth.OAuth2AccessTokenDO;
 
 import java.util.Collection;
 
 /**
- * 管理后台的 OAuth2 Service 接口
+ * OAuth2 授予 Service 接口
+ *
+ * 从功能上，和 Spring Security OAuth 的 TokenGranter 的功能，提供访问令牌、刷新令牌的操作
  *
  * 将自身的 AdminUser 用户，授权给第三方应用，采用 OAuth2.0 的协议。
  *
@@ -14,7 +16,7 @@ import java.util.Collection;
  *
  * @author 芋道源码
  */
-public interface AdminOAuth2Service {
+public interface OAuth2GrantService {
 
     // ImplicitTokenGranter
     OAuth2AccessTokenDO grantImplicit(Long userId, Integer userType,

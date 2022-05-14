@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.system.service.auth;
 
-import cn.iocoder.yudao.module.system.controller.admin.auth.vo.auth.*;
+import cn.iocoder.yudao.module.system.controller.admin.auth.vo.*;
 
 import javax.validation.Valid;
 

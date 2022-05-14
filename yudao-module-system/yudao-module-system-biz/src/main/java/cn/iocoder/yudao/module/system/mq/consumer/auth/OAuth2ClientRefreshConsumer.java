@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.system.mq.consumer.auth;
 
 import cn.iocoder.yudao.framework.mq.core.pubsub.AbstractChannelMessageListener;
 import cn.iocoder.yudao.module.system.mq.message.auth.OAuth2ClientRefreshMessage;
-import cn.iocoder.yudao.module.system.service.auth.OAuth2ClientService;
+import cn.iocoder.yudao.module.system.service.oauth2.OAuth2ClientService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 

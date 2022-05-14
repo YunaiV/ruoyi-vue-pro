@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.system.controller.admin.auth;
+package cn.iocoder.yudao.module.system.controller.admin.oauth2;
 
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
@@ -7,8 +7,9 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.system.enums.auth.OAuth2GrantTypeEnum;
-import cn.iocoder.yudao.module.system.service.auth.OAuth2ApproveService;
-import cn.iocoder.yudao.module.system.service.auth.OAuth2ClientService;
+import cn.iocoder.yudao.module.system.service.oauth2.OAuth2ApproveService;
+import cn.iocoder.yudao.module.system.service.oauth2.OAuth2ClientService;
+import cn.iocoder.yudao.module.system.service.oauth2.OAuth2GrantService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -43,6 +44,8 @@ public class OAuth2Controller {
 //    GET  oauth/authorize AuthorizationEndpoint
 
     @Resource
+    private OAuth2GrantService oAuth2GrantService;
+    @Resource
     private OAuth2ClientService oauth2ClientService;
     @Resource
     private OAuth2ApproveService oauth2ApproveService;
@@ -56,8 +59,6 @@ public class OAuth2Controller {
             @ApiImplicitParam(name = "redirect_uri", required = true, value = "重定向 URI", example = "https://www.iocoder.cn", dataTypeClass = String.class),
             @ApiImplicitParam(name = "state", example = "123321", dataTypeClass = String.class)
     })
-    // 情况一：满足自动授权，则走类似 approveOrDeny 的逻辑，最终返回是 CommonResult<String>
-    // 情况二：如果不满足自动授权，则返回授权相关的展示信息，最终返回是 CommonResult<OAuth2AuthorizeRespInfo>
     public CommonResult<Object> authorize(@RequestParam("response_type") String responseType,
                                           @RequestParam("client_id") String clientId,
                                           @RequestParam(value = "scope", required = false) String scope,
@@ -92,16 +93,18 @@ public class OAuth2Controller {
             @ApiImplicitParam(name = "client_id", required = true, value = "客户端编号", example = "tudou", dataTypeClass = String.class),
             @ApiImplicitParam(name = "scope", value = "授权范围", example = "userinfo.read", dataTypeClass = String.class), // 使用 Map<String, Boolean> 格式，Spring MVC 暂时不支持这么接收参数
             @ApiImplicitParam(name = "redirect_uri", required = true, value = "重定向 URI", example = "https://www.iocoder.cn", dataTypeClass = String.class),
-            @ApiImplicitParam(name = "approved", value = "用户是否接受", example = "true", dataTypeClass = Boolean.class), // 该参数为 null 时，会基于用户是否已经授权过，进行自动判断
+            @ApiImplicitParam(name = "autoApprove", required = true, value = "用户是否接受", example = "true", dataTypeClass = Boolean.class),
             @ApiImplicitParam(name = "state", example = "123321", dataTypeClass = String.class)
     })
     @OperateLog(enable = false) // 避免 Post 请求被记录操作日志
+    // 场景一：【自动授权 autoApprove = true】刚进入 authorize.vue 界面，调用该接口，用户历史已经给该应用做过对应的授权，或者 OAuth2Client 支持该 scope 的自动授权
+    // 场景二：【手动授权 autoApprove = false】在 authorize.vue 界面，用户选择好 scope 授权范围，调用该接口，进行授权。此时，approved 为 true 或者 false
     // 因为前后端分离，Axios 无法很好的处理 302 重定向，所以和 Spring Security OAuth 略有不同，返回结果是重定向的 URL，剩余交给前端处理
     public CommonResult<String> approveOrDeny(@RequestParam("response_type") String responseType,
                                               @RequestParam("client_id") String clientId,
                                               @RequestParam(value = "scope", required = false) String scope,
                                               @RequestParam("redirect_uri") String redirectUri,
-                                              @RequestParam("approved") Boolean approved,
+                                              @RequestParam(value = "autoApprove") Boolean autoApprove,
                                               @RequestParam(value = "state", required = false) String state) {
         @SuppressWarnings("unchecked")
         Map<String, Boolean> scopes = JsonUtils.parseObject(scope, Map.class);
@@ -114,8 +117,18 @@ public class OAuth2Controller {
         // 1.2 校验 redirectUri 重定向域名是否合法 + 校验 scope 是否在 Client 授权范围内
         oauth2ClientService.validOAuthClientFromCache(clientId, grantTypeEnum.getGrantType(), scopes.keySet(), redirectUri);
 
-        // 2.1
-        // 2.2
+        // 2.1 假设 approved 为 null，说明是场景一
+        if (Boolean.TRUE.equals(autoApprove)) {
+            // 如果无法自动授权通过，则返回空 url，前端不进行跳转
+            if (!oauth2ApproveService.checkForPreApproval(getLoginUserId(), UserTypeEnum.ADMIN.getValue(), clientId, scopes.keySet())) {
+                return success(null);
+            }
+        } else { // 2.2 假设 approved 非 null，说明是场景二
+            // 如果计算后不通过，则跳转一个错误链接
+            if (!oauth2ApproveService.updateAfterApproval(getLoginUserId(), UserTypeEnum.ADMIN.getValue(), clientId, scopes)) {
+                return success("TODO");
+            }
+        }
 
         // 3.1 如果是 code 授权码模式，则发放 code 授权码，并重定向
         if (grantTypeEnum == OAuth2GrantTypeEnum.AUTHORIZATION_CODE) {
