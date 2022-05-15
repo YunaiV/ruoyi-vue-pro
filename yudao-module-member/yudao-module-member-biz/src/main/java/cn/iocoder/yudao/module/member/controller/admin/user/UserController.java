@@ -23,7 +23,7 @@ import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUti
  */
 @Slf4j
 @Api("用户管理")
-@RestController
+@RestController(value = "memberUserController")
 @RequestMapping("/user")
 public class UserController {
 
