@@ -12,7 +12,7 @@ Content-Type: application/x-www-form-urlencoded
 Authorization: Bearer {{token}}
 tenant-id: {{adminTenentId}}
 
-response_type=code&client_id=default&scope={"user_info": true}&redirect_uri=https://www.iocoder.cn&auto_approve=true
+response_type=code&client_id=default&scope={"user.read": true}&redirect_uri=https://www.iocoder.cn&auto_approve=true
 
 ### 请求 /system/oauth2/token + code 接口 => 成功
 POST {{baseUrl}}/system/oauth2/token
@@ -20,7 +20,7 @@ Content-Type: application/x-www-form-urlencoded
 Authorization: Basic ZGVmYXVsdDphZG1pbjEyMw==
 tenant-id: {{adminTenentId}}
 
-grant_type=authorization_code&redirect_uri=https://www.iocoder.cn
+grant_type=authorization_code&redirect_uri=https://www.iocoder.cn&code=189956c07a174588a97157eabef2f93a
 
 ### 请求 /system/oauth2/token + password 接口 => 成功
 POST {{baseUrl}}/system/oauth2/token

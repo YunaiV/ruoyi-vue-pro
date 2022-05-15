@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.system.dal.redis.auth;
+package cn.iocoder.yudao.module.system.dal.redis.oauth2;
 
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;

@@ -11,7 +11,7 @@ import cn.iocoder.yudao.module.system.controller.admin.oauth2.vo.client.OAuth2Cl
 import cn.iocoder.yudao.module.system.controller.admin.oauth2.vo.client.OAuth2ClientUpdateReqVO;
 import cn.iocoder.yudao.module.system.convert.auth.OAuth2ClientConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.auth.OAuth2ClientDO;
-import cn.iocoder.yudao.module.system.dal.mysql.auth.OAuth2ClientMapper;
+import cn.iocoder.yudao.module.system.dal.mysql.oauth2.OAuth2ClientMapper;
 import cn.iocoder.yudao.module.system.mq.producer.auth.OAuth2ClientProducer;
 import com.google.common.annotations.VisibleForTesting;
 import lombok.Getter;

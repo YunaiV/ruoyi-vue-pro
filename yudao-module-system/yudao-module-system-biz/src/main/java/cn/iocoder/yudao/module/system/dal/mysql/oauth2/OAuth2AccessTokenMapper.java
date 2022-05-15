@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.system.dal.mysql.auth;
+package cn.iocoder.yudao.module.system.dal.mysql.oauth2;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;

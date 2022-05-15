@@ -133,9 +133,13 @@ public interface ErrorCodeConstants {
     ErrorCode OAUTH2_CLIENT_CLIENT_SECRET_ERROR = new ErrorCode(1002020006, "无效 client_secret: {}");
 
     // ========== OAuth2 授权 1002021000 =========
-    ErrorCode OAUTH2_GRANT_CLIENT_ID_MISMATCH = new ErrorCode(1002020000, "client_id 不匹配");
-    ErrorCode OAUTH2_GRANT_REDIRECT_URI_MISMATCH = new ErrorCode(1002020001, "redirect_uri 不匹配");
-    ErrorCode OAUTH2_GRANT_STATE_MISMATCH = new ErrorCode(1002020002, "state 不匹配");
-    ErrorCode OAUTH2_GRANT_CODE_NOT_EXISTS = new ErrorCode(1002020003, "code 不存在");
+    ErrorCode OAUTH2_GRANT_CLIENT_ID_MISMATCH = new ErrorCode(1002021000, "client_id 不匹配");
+    ErrorCode OAUTH2_GRANT_REDIRECT_URI_MISMATCH = new ErrorCode(1002021001, "redirect_uri 不匹配");
+    ErrorCode OAUTH2_GRANT_STATE_MISMATCH = new ErrorCode(1002021002, "state 不匹配");
+    ErrorCode OAUTH2_GRANT_CODE_NOT_EXISTS = new ErrorCode(1002021003, "code 不存在");
+
+    // ========== OAuth2 授权 1002022000 =========
+    ErrorCode OAUTH2_CODE_NOT_EXISTS = new ErrorCode(1002022000, "code 不存在");
+    ErrorCode OAUTH2_CODE_EXPIRE = new ErrorCode(1002022000, "code 已过期");
 
 }

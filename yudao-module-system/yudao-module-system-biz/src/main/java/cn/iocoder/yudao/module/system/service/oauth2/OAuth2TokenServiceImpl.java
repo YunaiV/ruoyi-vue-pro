@@ -11,9 +11,9 @@ import cn.iocoder.yudao.module.system.controller.admin.oauth2.vo.token.OAuth2Acc
 import cn.iocoder.yudao.module.system.dal.dataobject.auth.OAuth2AccessTokenDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.auth.OAuth2ClientDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.auth.OAuth2RefreshTokenDO;
-import cn.iocoder.yudao.module.system.dal.mysql.auth.OAuth2AccessTokenMapper;
-import cn.iocoder.yudao.module.system.dal.mysql.auth.OAuth2RefreshTokenMapper;
-import cn.iocoder.yudao.module.system.dal.redis.auth.OAuth2AccessTokenRedisDAO;
+import cn.iocoder.yudao.module.system.dal.mysql.oauth2.OAuth2AccessTokenMapper;
+import cn.iocoder.yudao.module.system.dal.mysql.oauth2.OAuth2RefreshTokenMapper;
+import cn.iocoder.yudao.module.system.dal.redis.oauth2.OAuth2AccessTokenRedisDAO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

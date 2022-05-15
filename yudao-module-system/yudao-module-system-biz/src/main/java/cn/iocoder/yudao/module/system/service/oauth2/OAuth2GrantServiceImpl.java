@@ -15,8 +15,6 @@ import javax.annotation.Resource;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.OAUTH2_GRANT_CODE_NOT_EXISTS;
-import static java.util.Collections.singletonList;
 
 /**
  * OAuth2 授予 Service 实现类
@@ -28,6 +26,8 @@ public class OAuth2GrantServiceImpl implements OAuth2GrantService {
 
     @Resource
     private OAuth2TokenService oauth2TokenService;
+    @Resource
+    private OAuth2CodeService oauth2CodeService;
     @Resource
     private AdminAuthService adminAuthService;
 
@@ -41,18 +41,15 @@ public class OAuth2GrantServiceImpl implements OAuth2GrantService {
     public String grantAuthorizationCodeForCode(Long userId, Integer userType,
                                                 String clientId, List<String> scopes,
                                                 String redirectUri, String state) {
-        return "test";
+        return oauth2CodeService.createAuthorizationCode(userId, userType, clientId, scopes,
+                redirectUri, state).getCode();
     }
 
     @Override
     public OAuth2AccessTokenDO grantAuthorizationCodeForAccessToken(String clientId, String code,
                                                                     String redirectUri, String state) {
-        // TODO 消费 code
-        OAuth2CodeDO codeDO = new OAuth2CodeDO().setClientId("default").setRedirectUri("https://www.iocoder.cn").setState("")
-                .setUserId(1L).setUserType(2).setScopes(singletonList("user_info"));
-        if (codeDO == null) {
-            throw exception(OAUTH2_GRANT_CODE_NOT_EXISTS);
-        }
+        OAuth2CodeDO codeDO = oauth2CodeService.consumeAuthorizationCode(code);
+        Assert.notNull(codeDO, "授权码不能为空"); // 防御性编程
         // 校验 clientId 是否匹配
         if (!StrUtil.equals(clientId, codeDO.getClientId())) {
             throw exception(ErrorCodeConstants.OAUTH2_GRANT_CLIENT_ID_MISMATCH);
