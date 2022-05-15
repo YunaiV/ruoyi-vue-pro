@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.system.dal.dataobject.auth;
+package cn.iocoder.yudao.module.system.dal.dataobject.oauth2;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;

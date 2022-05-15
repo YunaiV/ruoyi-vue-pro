@@ -4,7 +4,7 @@ import cn.iocoder.yudao.module.system.api.auth.dto.OAuth2AccessTokenCheckRespDTO
 import cn.iocoder.yudao.module.system.api.auth.dto.OAuth2AccessTokenCreateReqDTO;
 import cn.iocoder.yudao.module.system.api.auth.dto.OAuth2AccessTokenRespDTO;
 import cn.iocoder.yudao.module.system.convert.auth.OAuth2TokenConvert;
-import cn.iocoder.yudao.module.system.dal.dataobject.auth.OAuth2AccessTokenDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.oauth2.OAuth2AccessTokenDO;
 import cn.iocoder.yudao.module.system.service.oauth2.OAuth2TokenService;
 import org.springframework.stereotype.Service;
 

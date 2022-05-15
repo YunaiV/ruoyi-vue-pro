@@ -7,7 +7,7 @@ import cn.iocoder.yudao.module.system.controller.admin.oauth2.vo.client.OAuth2Cl
 import cn.iocoder.yudao.module.system.controller.admin.oauth2.vo.client.OAuth2ClientRespVO;
 import cn.iocoder.yudao.module.system.controller.admin.oauth2.vo.client.OAuth2ClientUpdateReqVO;
 import cn.iocoder.yudao.module.system.convert.auth.OAuth2ClientConvert;
-import cn.iocoder.yudao.module.system.dal.dataobject.auth.OAuth2ClientDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.oauth2.OAuth2ClientDO;
 import cn.iocoder.yudao.module.system.service.oauth2.OAuth2ClientService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;

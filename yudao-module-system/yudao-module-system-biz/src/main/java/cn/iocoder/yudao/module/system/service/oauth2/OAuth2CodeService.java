@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.system.service.oauth2;
 
-import cn.iocoder.yudao.module.system.dal.dataobject.auth.OAuth2CodeDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.oauth2.OAuth2CodeDO;
 
 import java.util.List;
 
