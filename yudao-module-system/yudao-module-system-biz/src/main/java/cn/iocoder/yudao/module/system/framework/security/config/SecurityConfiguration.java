@@ -37,7 +37,7 @@ public class SecurityConfiguration {
                 registry.antMatchers(buildAdminApi("/system/sms/callback/**")).permitAll();
                 // OAuth2 API
                 registry.antMatchers(buildAdminApi("/system/oauth2/token")).permitAll();
-                registry.antMatchers(buildAdminApi("/system/oauth2/check_token")).permitAll();
+                registry.antMatchers(buildAdminApi("/system/oauth2/check-token")).permitAll();
             }
 
         };

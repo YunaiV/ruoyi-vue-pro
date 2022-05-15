@@ -42,3 +42,8 @@ grant_type=refresh_token&refresh_token=00895465d6994f72a9d926ceeed0f588
 DELETE {{baseUrl}}/system/oauth2/token?token=ca8a188f464441d6949c51493a2b7596
 Authorization: Basic ZGVmYXVsdDphZG1pbjEyMw==
 tenant-id: {{adminTenentId}}
+
+### 请求 /system/oauth2/check-token 接口 => 成功
+POST {{baseUrl}}/system/oauth2/check-token?token=620d307c5b4148df8a98dd6c6c547106
+Authorization: Basic ZGVmYXVsdDphZG1pbjEyMw==
+tenant-id: {{adminTenentId}}

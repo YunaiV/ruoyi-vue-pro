@@ -7,7 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@ApiModel("管理后台 - 访问令牌 Response VO")
+@ApiModel("管理后台 - 【开放接口】访问令牌 Response VO")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

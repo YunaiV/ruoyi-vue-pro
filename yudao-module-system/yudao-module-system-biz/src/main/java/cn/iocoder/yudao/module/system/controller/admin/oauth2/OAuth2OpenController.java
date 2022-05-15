@@ -10,6 +10,7 @@ import cn.iocoder.yudao.framework.common.util.http.HttpUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.system.controller.admin.oauth2.vo.open.OAuth2OpenAccessTokenRespVO;
+import cn.iocoder.yudao.module.system.controller.admin.oauth2.vo.open.OAuth2OpenCheckTokenRespVO;
 import cn.iocoder.yudao.module.system.convert.oauth2.OAuth2OpenConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.auth.OAuth2AccessTokenDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.auth.OAuth2ClientDO;
@@ -17,6 +18,7 @@ import cn.iocoder.yudao.module.system.enums.auth.OAuth2GrantTypeEnum;
 import cn.iocoder.yudao.module.system.service.oauth2.OAuth2ApproveService;
 import cn.iocoder.yudao.module.system.service.oauth2.OAuth2ClientService;
 import cn.iocoder.yudao.module.system.service.oauth2.OAuth2GrantService;
+import cn.iocoder.yudao.module.system.service.oauth2.OAuth2TokenService;
 import cn.iocoder.yudao.module.system.util.oauth2.OAuth2Utils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -45,14 +47,14 @@ import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUti
 @Slf4j
 public class OAuth2OpenController {
 
-//    POST oauth/check_token CheckTokenEndpoint
-
     @Resource
     private OAuth2GrantService oauth2GrantService;
     @Resource
     private OAuth2ClientService oauth2ClientService;
     @Resource
     private OAuth2ApproveService oauth2ApproveService;
+    @Resource
+    private OAuth2TokenService oauth2TokenService;
 
     /**
      * 对应 Spring Security OAuth 的 TokenEndpoint 类的 postAccessToken 方法
@@ -130,14 +132,31 @@ public class OAuth2OpenController {
                                              @RequestParam("token") String token) {
         // 校验客户端
         String[] clientIdAndSecret = obtainBasicAuthorization(request);
-        if (ArrayUtil.isEmpty(clientIdAndSecret) || clientIdAndSecret.length != 2) {
-            throw exception0(BAD_REQUEST.getCode(), "client_id 或 client_secret 未正确传递");
-        }
         OAuth2ClientDO client = oauth2ClientService.validOAuthClientFromCache(clientIdAndSecret[0], clientIdAndSecret[1],
                 null, null, null);
 
         // 删除访问令牌
         return success(oauth2GrantService.revokeToken(client.getClientId(), token));
+    }
+
+    /**
+     * 对应 Spring Security OAuth 的 CheckTokenEndpoint 类的 checkToken 方法
+     */
+    @PostMapping("/check-token")
+    @ApiOperation(value = "校验访问令牌")
+    @ApiImplicitParam(name = "token", required = true, value = "访问令牌", example = "biu", dataTypeClass = String.class)
+    @OperateLog(enable = false) // 避免 Post 请求被记录操作日志
+    public CommonResult<OAuth2OpenCheckTokenRespVO> checkToken(HttpServletRequest request,
+                                                               @RequestParam("token") String token) {
+        // 校验客户端
+        String[] clientIdAndSecret = obtainBasicAuthorization(request);
+        OAuth2ClientDO client = oauth2ClientService.validOAuthClientFromCache(clientIdAndSecret[0], clientIdAndSecret[1],
+                null, null, null);
+
+        // 校验令牌
+        OAuth2AccessTokenDO accessTokenDO = oauth2TokenService.checkAccessToken(token);
+        Assert.notNull(accessTokenDO, "访问令牌不能为空"); // 防御性检查
+        return success(OAuth2OpenConvert.INSTANCE.convert2(accessTokenDO));
     }
 
     //    GET  oauth/authorize AuthorizationEndpoint TODO
