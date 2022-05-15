@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.system.controller.admin.oauth2;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
@@ -11,25 +12,35 @@ import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.system.controller.admin.oauth2.vo.open.OAuth2OpenAccessTokenRespVO;
 import cn.iocoder.yudao.module.system.controller.admin.oauth2.vo.open.OAuth2OpenCheckTokenRespVO;
+import cn.iocoder.yudao.module.system.controller.admin.oauth2.vo.open.user.OAuth2OpenUserInfoRespVO;
+import cn.iocoder.yudao.module.system.controller.admin.user.vo.profile.UserProfileUpdateReqVO;
 import cn.iocoder.yudao.module.system.convert.oauth2.OAuth2OpenConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.auth.OAuth2AccessTokenDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.auth.OAuth2ClientDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.dept.PostDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
 import cn.iocoder.yudao.module.system.enums.auth.OAuth2GrantTypeEnum;
+import cn.iocoder.yudao.module.system.service.dept.DeptService;
+import cn.iocoder.yudao.module.system.service.dept.PostService;
 import cn.iocoder.yudao.module.system.service.oauth2.OAuth2ApproveService;
 import cn.iocoder.yudao.module.system.service.oauth2.OAuth2ClientService;
 import cn.iocoder.yudao.module.system.service.oauth2.OAuth2GrantService;
 import cn.iocoder.yudao.module.system.service.oauth2.OAuth2TokenService;
+import cn.iocoder.yudao.module.system.service.user.AdminUserService;
 import cn.iocoder.yudao.module.system.util.oauth2.OAuth2Utils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -40,7 +51,19 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
-@Api(tags = "管理后台 - OAuth2.0 授权") // 提供给外部应用调用为主
+/**
+ * 提供给外部应用调用为主
+ *
+ * 一般来说，管理后台的 /system-api/* 是不直接提供给外部应用使用，主要是外部应用能够访问的数据与接口是有限的，而管理后台的 RBAC 无法很好的控制。
+ * 参考大量的开放平台，都是独立的一套 OpenAPI，对应到【本系统】就是在 Controller 下新建 open 包，实现 /open-api/* 接口，然后通过 scope 进行控制。
+ * 另外，一个公司如果有多个管理后台，它们 client_id 产生的 access token 相互之间是无法互通的，即无法访问它们系统的 API 接口，直到两个 client_id 产生信任授权。
+ *
+ * 考虑到【本系统】暂时不想做的过于复杂，默认只有获取到 access token 之后，可以访问【本系统】管理后台的 /system-api/* 所有接口，除非手动添加 scope 控制。
+ * scope 的使用示例，可见当前类的 getUserInfo 和 updateUserInfo 方法，上面有 @PreAuthorize("@ss.hasScope('user.read')") 和 @PreAuthorize("@ss.hasScope('user.write')") 注解
+ *
+ * @author 芋道源码
+ */
+@Api(tags = "管理后台 - OAuth2.0 授权")
 @RestController
 @RequestMapping("/system/oauth2")
 @Validated
@@ -289,6 +312,45 @@ public class OAuth2OpenController {
             throw exception0(BAD_REQUEST.getCode(), "client_id 或 client_secret 未正确传递");
         }
         return clientIdAndSecret;
+    }
+
+    // ============ 用户操作的示例，展示 scope 的使用 ============
+
+    @Resource
+    private AdminUserService userService;
+    @Resource
+    private DeptService deptService;
+    @Resource
+    private PostService postService;
+
+    @GetMapping("/user/get")
+    @ApiOperation("获得用户基本信息")
+    @PreAuthorize("@ss.hasScope('user.read')")
+    public CommonResult<OAuth2OpenUserInfoRespVO> getUserInfo() {
+        // 获得用户基本信息
+        AdminUserDO user = userService.getUser(getLoginUserId());
+        OAuth2OpenUserInfoRespVO resp = OAuth2OpenConvert.INSTANCE.convert(user);
+        // 获得部门信息
+        if (user.getDeptId() != null) {
+            DeptDO dept = deptService.getDept(user.getDeptId());
+            resp.setDept(OAuth2OpenConvert.INSTANCE.convert(dept));
+        }
+        // 获得岗位信息
+        if (CollUtil.isNotEmpty(user.getPostIds())) {
+            List<PostDO> posts = postService.getPosts(user.getPostIds());
+            resp.setPosts(OAuth2OpenConvert.INSTANCE.convertList(posts));
+        }
+        return success(resp);
+    }
+
+    @PutMapping("/user/update")
+    @ApiOperation("更新用户基本信息")
+    @PreAuthorize("@ss.hasScope('user.write')")
+    public CommonResult<Boolean> updateUserInfo(@Valid @RequestBody UserProfileUpdateReqVO reqVO) {
+        // 这里将 UserProfileUpdateReqVO =》UserProfileUpdateReqVO 对象，实现接口的复用。
+        // 主要是，AdminUserService 没有自己的 BO 对象，所以复用只能这么做
+        userService.updateUserProfile(getLoginUserId(), OAuth2OpenConvert.INSTANCE.convert(reqVO));
+        return success(true);
     }
 
 }

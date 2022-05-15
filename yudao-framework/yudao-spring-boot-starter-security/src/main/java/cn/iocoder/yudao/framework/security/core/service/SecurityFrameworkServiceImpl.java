@@ -1,7 +1,12 @@
 package cn.iocoder.yudao.framework.security.core.service;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.iocoder.yudao.framework.security.core.LoginUser;
+import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.system.api.permission.PermissionApi;
 import lombok.AllArgsConstructor;
+
+import java.util.Arrays;
 
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
@@ -33,6 +38,20 @@ public class SecurityFrameworkServiceImpl implements SecurityFrameworkService {
     @Override
     public boolean hasAnyRoles(String... roles) {
         return permissionApi.hasAnyRoles(getLoginUserId(), roles);
+    }
+
+    @Override
+    public boolean hasScope(String scope) {
+        return hasAnyScopes(scope);
+    }
+
+    @Override
+    public boolean hasAnyScopes(String... scope) {
+        LoginUser user = SecurityFrameworkUtils.getLoginUser();
+        if (user == null) {
+            return false;
+        }
+        return CollUtil.containsAny(user.getScopes(), Arrays.asList(scope));
     }
 
 }

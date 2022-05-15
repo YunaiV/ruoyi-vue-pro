@@ -1,16 +1,20 @@
-package cn.iocoder.yudao.module.system.controller.admin.user.vo.profile;
+package cn.iocoder.yudao.module.system.controller.admin.oauth2.vo.open.user;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.Size;
 
-@ApiModel("管理后台 - 用户个人信息更新 Request VO")
+@ApiModel("管理后台 - 【开放接口】更新用户基本信息 Request VO")
 @Data
-public class UserProfileUpdateReqVO {
+@NoArgsConstructor
+@AllArgsConstructor
+public class OAuth2OpenUserUpdateReqVO {
 
     @ApiModelProperty(value = "用户昵称", required = true, example = "芋艿")
     @Size(max = 30, message = "用户昵称长度不能超过 30 个字符")

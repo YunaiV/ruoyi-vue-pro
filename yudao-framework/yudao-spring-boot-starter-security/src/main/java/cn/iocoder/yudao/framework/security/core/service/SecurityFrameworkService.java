@@ -41,4 +41,19 @@ public interface SecurityFrameworkService {
      */
     boolean hasAnyRoles(String... roles);
 
+    /**
+     * 判断是否有授权
+     *
+     * @param scope 授权
+     * @return 是否
+     */
+    boolean hasScope(String scope);
+
+    /**
+     * 判断是否有授权范围，任一一个即可
+     *
+     * @param scope 授权范围数组
+     * @return 是否
+     */
+    boolean hasAnyScopes(String... scope);
 }

@@ -28,7 +28,7 @@ Content-Type: application/x-www-form-urlencoded
 Authorization: Basic ZGVmYXVsdDphZG1pbjEyMw==
 tenant-id: {{adminTenentId}}
 
-grant_type=password&username=admin&password=admin123&scope=user_info
+grant_type=password&username=admin&password=admin123&scope=user.read
 
 ### 请求 /system/oauth2/token + refresh_token 接口 => 成功
 POST {{baseUrl}}/system/oauth2/token
@@ -47,3 +47,18 @@ tenant-id: {{adminTenentId}}
 POST {{baseUrl}}/system/oauth2/check-token?token=620d307c5b4148df8a98dd6c6c547106
 Authorization: Basic ZGVmYXVsdDphZG1pbjEyMw==
 tenant-id: {{adminTenentId}}
+
+### 请求 /system/oauth2/user/get 接口 => 成功
+GET {{baseUrl}}/system/oauth2/user/get
+Authorization: Bearer 9502bd7a768a4ade920b90f41e2efd5c
+tenant-id: {{adminTenentId}}
+
+### 请求 /system/oauth2/user/update 接口 => 成功
+PUT {{baseUrl}}/system/oauth2/user/update
+Content-Type: application/json
+Authorization: Bearer 9502bd7a768a4ade920b90f41e2efd5c
+tenant-id: {{adminTenentId}}
+
+{
+  "nickname": "芋道源码"
+}
