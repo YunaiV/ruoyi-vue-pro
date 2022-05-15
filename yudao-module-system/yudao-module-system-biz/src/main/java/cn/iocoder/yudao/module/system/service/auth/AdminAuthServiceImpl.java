@@ -63,12 +63,33 @@ public class AdminAuthServiceImpl implements AdminAuthService {
     private SmsCodeApi smsCodeApi;
 
     @Override
+    public AdminUserDO authenticate(String username, String password) {
+        final LoginLogTypeEnum logTypeEnum = LoginLogTypeEnum.LOGIN_USERNAME;
+        // 校验账号是否存在
+        AdminUserDO user = userService.getUserByUsername(username);
+        if (user == null) {
+            createLoginLog(null, username, logTypeEnum, LoginResultEnum.BAD_CREDENTIALS);
+            throw exception(AUTH_LOGIN_BAD_CREDENTIALS);
+        }
+        if (!userService.isPasswordMatch(password, user.getPassword())) {
+            createLoginLog(user.getId(), username, logTypeEnum, LoginResultEnum.BAD_CREDENTIALS);
+            throw exception(AUTH_LOGIN_BAD_CREDENTIALS);
+        }
+        // 校验是否禁用
+        if (ObjectUtil.notEqual(user.getStatus(), CommonStatusEnum.ENABLE.getStatus())) {
+            createLoginLog(user.getId(), username, logTypeEnum, LoginResultEnum.USER_DISABLED);
+            throw exception(AUTH_LOGIN_USER_DISABLED);
+        }
+        return user;
+    }
+
+    @Override
     public AuthLoginRespVO login(AuthLoginReqVO reqVO) {
         // 判断验证码是否正确
         verifyCaptcha(reqVO);
 
         // 使用账号密码，进行登录
-        AdminUserDO user = login0(reqVO.getUsername(), reqVO.getPassword());
+        AdminUserDO user = authenticate(reqVO.getUsername(), reqVO.getPassword());
 
         // 创建 Token 令牌，记录登录日志
         return createTokenAfterLoginSuccess(user.getId(), reqVO.getUsername(), LoginLogTypeEnum.LOGIN_USERNAME);
@@ -125,27 +146,6 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         captchaService.deleteCaptchaCode(reqVO.getUuid());
     }
 
-    @VisibleForTesting
-    AdminUserDO login0(String username, String password) {
-        final LoginLogTypeEnum logTypeEnum = LoginLogTypeEnum.LOGIN_USERNAME;
-        // 校验账号是否存在
-        AdminUserDO user = userService.getUserByUsername(username);
-        if (user == null) {
-            createLoginLog(null, username, logTypeEnum, LoginResultEnum.BAD_CREDENTIALS);
-            throw exception(AUTH_LOGIN_BAD_CREDENTIALS);
-        }
-        if (!userService.isPasswordMatch(password, user.getPassword())) {
-            createLoginLog(user.getId(), username, logTypeEnum, LoginResultEnum.BAD_CREDENTIALS);
-            throw exception(AUTH_LOGIN_BAD_CREDENTIALS);
-        }
-        // 校验是否禁用
-        if (ObjectUtil.notEqual(user.getStatus(), CommonStatusEnum.ENABLE.getStatus())) {
-            createLoginLog(user.getId(), username, logTypeEnum, LoginResultEnum.USER_DISABLED);
-            throw exception(AUTH_LOGIN_USER_DISABLED);
-        }
-        return user;
-    }
-
     private void createLoginLog(Long userId, String username,
                                 LoginLogTypeEnum logTypeEnum, LoginResultEnum loginResult) {
         // 插入登录日志
@@ -187,7 +187,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
     @Override
     public AuthLoginRespVO socialBindLogin(AuthSocialBindLoginReqVO reqVO) {
         // 使用账号密码，进行登录。
-        AdminUserDO user = login0(reqVO.getUsername(), reqVO.getPassword());
+        AdminUserDO user = authenticate(reqVO.getUsername(), reqVO.getPassword());
 
         // 绑定社交用户
         socialUserService.bindSocialUser(AuthConvert.INSTANCE.convert(user.getId(), getUserType().getValue(), reqVO));

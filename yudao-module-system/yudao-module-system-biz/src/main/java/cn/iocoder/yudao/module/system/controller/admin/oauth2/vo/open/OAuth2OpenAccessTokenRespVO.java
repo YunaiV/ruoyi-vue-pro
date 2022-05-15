@@ -29,4 +29,7 @@ public class OAuth2OpenAccessTokenRespVO {
     @JsonProperty("expires_in")
     private Long expiresIn;
 
+    @ApiModelProperty(value = "授权范围", example = "user_info", notes = "如果多个授权范围，使用空格分隔")
+    private String scope;
+
 }

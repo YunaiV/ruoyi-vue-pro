@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.system.util.oauth2;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.http.HttpUtils;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 
@@ -58,7 +59,7 @@ public class OAuth2Utils {
             vars.put("expires_in", getExpiresIn(expireTime));
         }
         if (CollUtil.isNotEmpty(scopes)) {
-            vars.put("scope", CollUtil.join(scopes, " "));
+            vars.put("scope", buildScopeStr(scopes));
         }
         for (String key : additionalInformation.keySet()) {
             Object value = additionalInformation.get(key);
@@ -84,6 +85,14 @@ public class OAuth2Utils {
 
     public static long getExpiresIn(Date expireTime) {
         return (expireTime.getTime() - System.currentTimeMillis()) / 1000;
+    }
+
+    public static String buildScopeStr(Collection<String> scopes) {
+        return CollUtil.join(scopes, " ");
+    }
+
+    public static List<String> buildScopes(String scope) {
+        return StrUtil.split(scope, ' ');
     }
 
 }

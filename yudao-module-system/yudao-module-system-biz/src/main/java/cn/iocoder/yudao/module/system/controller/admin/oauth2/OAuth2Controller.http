@@ -21,3 +21,24 @@ Authorization: Basic ZGVmYXVsdDphZG1pbjEyMw==
 tenant-id: {{adminTenentId}}
 
 grant_type=authorization_code&redirect_uri=https://www.iocoder.cn
+
+### 请求 /system/oauth2/token + password 接口 => 成功
+POST {{baseUrl}}/system/oauth2/token
+Content-Type: application/x-www-form-urlencoded
+Authorization: Basic ZGVmYXVsdDphZG1pbjEyMw==
+tenant-id: {{adminTenentId}}
+
+grant_type=password&username=admin&password=admin123&scope=user_info
+
+### 请求 /system/oauth2/token + refresh_token 接口 => 成功
+POST {{baseUrl}}/system/oauth2/token
+Content-Type: application/x-www-form-urlencoded
+Authorization: Basic ZGVmYXVsdDphZG1pbjEyMw==
+tenant-id: {{adminTenentId}}
+
+grant_type=refresh_token&refresh_token=00895465d6994f72a9d926ceeed0f588
+
+### 请求 /system/oauth2/token + DELETE 接口 => 成功
+DELETE {{baseUrl}}/system/oauth2/token?token=ca8a188f464441d6949c51493a2b7596
+Authorization: Basic ZGVmYXVsdDphZG1pbjEyMw==
+tenant-id: {{adminTenentId}}

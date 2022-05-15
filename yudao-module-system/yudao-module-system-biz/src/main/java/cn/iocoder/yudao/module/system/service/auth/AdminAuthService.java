@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.system.service.auth;
 
 import cn.iocoder.yudao.module.system.controller.admin.auth.vo.*;
+import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
 
 import javax.validation.Valid;
 
@@ -12,6 +13,15 @@ import javax.validation.Valid;
  * @author 芋道源码
  */
 public interface AdminAuthService {
+
+    /**
+     * 验证账号 + 密码。如果通过，则返回用户
+     *
+     * @param username 账号
+     * @param password 密码
+     * @return 用户
+     */
+    AdminUserDO authenticate(String username, String password);
 
     /**
      * 账号登录

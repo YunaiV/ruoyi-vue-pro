@@ -16,6 +16,7 @@ public interface OAuth2OpenConvert {
         OAuth2OpenAccessTokenRespVO respVO = convert0(bean);
         respVO.setTokenType(SecurityFrameworkUtils.AUTHORIZATION_BEARER.toLowerCase());
         respVO.setExpiresIn(OAuth2Utils.getExpiresIn(bean.getExpiresTime()));
+        respVO.setScope(OAuth2Utils.buildScopeStr(bean.getScopes()));
         return respVO;
     }
 

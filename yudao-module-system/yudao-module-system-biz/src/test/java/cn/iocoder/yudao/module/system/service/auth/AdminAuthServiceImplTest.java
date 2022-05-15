@@ -34,7 +34,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @Import(AdminAuthServiceImpl.class)
-public class AuthServiceImplTest extends BaseDbUnitTest {
+public class AdminAuthServiceImplTest extends BaseDbUnitTest {
 
     @Resource
     private AdminAuthServiceImpl authService;
@@ -63,7 +63,7 @@ public class AuthServiceImplTest extends BaseDbUnitTest {
     }
 
     @Test
-    public void testLogin0_success() {
+    public void testAuthenticate_success() {
         // 准备参数
         String username = randomString();
         String password = randomString();
@@ -75,19 +75,19 @@ public class AuthServiceImplTest extends BaseDbUnitTest {
         when(userService.isPasswordMatch(eq(password), eq(user.getPassword()))).thenReturn(true);
 
         // 调用
-        AdminUserDO loginUser = authService.login0(username, password);
+        AdminUserDO loginUser = authService.authenticate(username, password);
         // 校验
         assertPojoEquals(user, loginUser);
     }
 
     @Test
-    public void testLogin0_userNotFound() {
+    public void testAuthenticate_userNotFound() {
         // 准备参数
         String username = randomString();
         String password = randomString();
 
         // 调用, 并断言异常
-        AssertUtils.assertServiceException(() -> authService.login0(username, password),
+        AssertUtils.assertServiceException(() -> authService.authenticate(username, password),
                 AUTH_LOGIN_BAD_CREDENTIALS);
         verify(loginLogService).createLoginLog(
                 argThat(o -> o.getLogType().equals(LoginLogTypeEnum.LOGIN_USERNAME.getType())
@@ -97,7 +97,7 @@ public class AuthServiceImplTest extends BaseDbUnitTest {
     }
 
     @Test
-    public void testLogin0_badCredentials() {
+    public void testAuthenticate_badCredentials() {
         // 准备参数
         String username = randomString();
         String password = randomString();
@@ -107,7 +107,7 @@ public class AuthServiceImplTest extends BaseDbUnitTest {
         when(userService.getUserByUsername(eq(username))).thenReturn(user);
 
         // 调用, 并断言异常
-        AssertUtils.assertServiceException(() -> authService.login0(username, password),
+        AssertUtils.assertServiceException(() -> authService.authenticate(username, password),
                 AUTH_LOGIN_BAD_CREDENTIALS);
         verify(loginLogService).createLoginLog(
                 argThat(o -> o.getLogType().equals(LoginLogTypeEnum.LOGIN_USERNAME.getType())
@@ -117,7 +117,7 @@ public class AuthServiceImplTest extends BaseDbUnitTest {
     }
 
     @Test
-    public void testLogin0_userDisabled() {
+    public void testAuthenticate_userDisabled() {
         // 准备参数
         String username = randomString();
         String password = randomString();
@@ -129,7 +129,7 @@ public class AuthServiceImplTest extends BaseDbUnitTest {
         when(userService.isPasswordMatch(eq(password), eq(user.getPassword()))).thenReturn(true);
 
         // 调用, 并断言异常
-        AssertUtils.assertServiceException(() -> authService.login0(username, password),
+        AssertUtils.assertServiceException(() -> authService.authenticate(username, password),
                 AUTH_LOGIN_USER_DISABLED);
         verify(loginLogService).createLoginLog(
                 argThat(o -> o.getLogType().equals(LoginLogTypeEnum.LOGIN_USERNAME.getType())

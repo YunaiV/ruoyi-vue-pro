@@ -18,7 +18,17 @@ import java.util.List;
  */
 public interface OAuth2GrantService {
 
-    // ImplicitTokenGranter
+    /**
+     * 简化模式
+     *
+     * 对应 Spring Security OAuth2 的 ImplicitTokenGranter 功能
+     *
+     * @param userId 用户编号
+     * @param userType 用户类型
+     * @param clientId 客户端编号
+     * @param scopes 授权范围
+     * @return 访问令牌
+     */
     OAuth2AccessTokenDO grantImplicit(Long userId, Integer userType,
                                       String clientId, List<String> scopes);
 
@@ -52,5 +62,52 @@ public interface OAuth2GrantService {
      */
     OAuth2AccessTokenDO grantAuthorizationCodeForAccessToken(String clientId, String code,
                                                              String redirectUri, String state);
+
+    /**
+     * 密码模式
+     *
+     * 对应 Spring Security OAuth2 的 ResourceOwnerPasswordTokenGranter 功能
+     *
+     * @param username 账号
+     * @param password 密码
+     * @param clientId 客户端编号
+     * @param scopes 授权范围
+     * @return 访问令牌
+     */
+    OAuth2AccessTokenDO grantPassword(String username, String password,
+                                      String clientId, List<String> scopes);
+
+    /**
+     * 刷新模式
+     *
+     * 对应 Spring Security OAuth2 的 ResourceOwnerPasswordTokenGranter 功能
+     *
+     * @param refreshToken 刷新令牌
+     * @param clientId 客户端编号
+     * @return 访问令牌
+     */
+    OAuth2AccessTokenDO grantRefreshToken(String refreshToken, String clientId);
+
+    /**
+     * 客户端模式
+     *
+     * 对应 Spring Security OAuth2 的 ClientCredentialsTokenGranter 功能
+     *
+     * @param clientId 客户端编号
+     * @param scopes 授权范围
+     * @return 访问令牌
+     */
+    OAuth2AccessTokenDO grantClientCredentials(String clientId, List<String> scopes);
+
+    /**
+     * 移除访问令牌
+     *
+     * 对应 Spring Security OAuth2 的 ConsumerTokenServices 的 revokeToken 方法
+     *
+     * @param accessToken 访问令牌
+     * @param clientId 客户端编号
+     * @return 是否移除到
+     */
+    boolean revokeToken(String clientId, String accessToken);
 
 }
