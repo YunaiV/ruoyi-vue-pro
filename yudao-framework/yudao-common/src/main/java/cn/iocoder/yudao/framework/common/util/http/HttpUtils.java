@@ -1,11 +1,15 @@
 package cn.iocoder.yudao.framework.common.util.http;
 
+import cn.hutool.core.codec.Base64;
 import cn.hutool.core.map.TableMap;
 import cn.hutool.core.net.url.UrlBuilder;
 import cn.hutool.core.util.ReflectUtil;
+import cn.hutool.core.util.StrUtil;
+import org.springframework.util.StringUtils;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.util.Map;
@@ -94,5 +98,29 @@ public class HttpUtils {
         }
         return builder.build().toUriString();
     }
+
+    public static String[] obtainBasicAuthorization(HttpServletRequest request) {
+        String clientId;
+        String clientSecret;
+        // 先从 Header 中获取
+        String authorization = request.getHeader("Authorization");
+        authorization = StrUtil.subAfter(authorization, "Basic ", true);
+        if (StringUtils.hasText(authorization)) {
+            authorization = Base64.decodeStr(authorization);
+            clientId = StrUtil.subBefore(authorization, ":", false);
+            clientSecret = StrUtil.subAfter(authorization, ":", false);
+        // 再从 Param 中获取
+        } else {
+            clientId = request.getParameter("client_id");
+            clientSecret = request.getParameter("client_secret");
+        }
+
+        // 如果两者非空，则返回
+        if (StrUtil.isNotEmpty(clientId) && StrUtil.isNotEmpty(clientSecret)) {
+            return new String[]{clientId, clientSecret};
+        }
+        return null;
+    }
+
 
 }

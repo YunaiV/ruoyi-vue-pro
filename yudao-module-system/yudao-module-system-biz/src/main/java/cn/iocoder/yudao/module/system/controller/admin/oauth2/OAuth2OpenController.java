@@ -1,12 +1,16 @@
 package cn.iocoder.yudao.module.system.controller.admin.oauth2;
 
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.util.http.HttpUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
+import cn.iocoder.yudao.module.system.controller.admin.oauth2.vo.open.OAuth2OpenAccessTokenRespVO;
+import cn.iocoder.yudao.module.system.convert.oauth2.OAuth2OpenConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.auth.OAuth2AccessTokenDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.auth.OAuth2ClientDO;
 import cn.iocoder.yudao.module.system.enums.auth.OAuth2GrantTypeEnum;
@@ -23,6 +27,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -33,20 +38,16 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
-@Api(tags = "管理后台 - OAuth2.0 授权")
+@Api(tags = "管理后台 - OAuth2.0 授权") // 提供给外部应用调用为主
 @RestController
 @RequestMapping("/system/oauth2")
 @Validated
 @Slf4j
-public class OAuth2Controller {
-
-//    POST oauth/token TokenEndpoint：Password、Implicit、Code、Refresh Token
+public class OAuth2OpenController {
 
 //    POST oauth/check_token CheckTokenEndpoint
 
 //    DELETE oauth/token ConsumerTokenServices#revokeToken
-
-//    GET  oauth/authorize AuthorizationEndpoint
 
     @Resource
     private OAuth2GrantService oauth2GrantService;
@@ -55,6 +56,56 @@ public class OAuth2Controller {
     @Resource
     private OAuth2ApproveService oauth2ApproveService;
 
+    @PostMapping("/token")
+    @ApiOperation(value = "获得访问令牌", notes = "适合 code 授权码模式，或者 implicit 简化模式；在 authorize.vue 单点登录界面被【获取】调用")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "grant_type", required = true, value = "授权类型", example = "code", dataTypeClass = String.class),
+            @ApiImplicitParam(name = "code", value = "授权范围", example = "userinfo.read", dataTypeClass = String.class),
+            @ApiImplicitParam(name = "redirect_uri", value = "重定向 URI", example = "https://www.iocoder.cn", dataTypeClass = String.class),
+            @ApiImplicitParam(name = "state", example = "123321", dataTypeClass = String.class)
+    })
+    @OperateLog(enable = false) // 避免 Post 请求被记录操作日志
+    public CommonResult<OAuth2OpenAccessTokenRespVO> postAccessToken(HttpServletRequest request,
+                                                                     @RequestParam("grant_type") String grantType,
+                                                                     @RequestParam(value = "code", required = false) String code, // 授权码模式
+                                                                     @RequestParam(value = "redirect_uri", required = false) String redirectUri, // 授权码模式
+                                                                     @RequestParam(value = "state", required = false) String state) { // 授权码模式
+        // 授权类型
+        OAuth2GrantTypeEnum grantTypeEnum = OAuth2GrantTypeEnum.getByGranType(grantType);
+        if (grantTypeEnum == null) {
+            throw exception0(BAD_REQUEST.getCode(), StrUtil.format("未知授权类型({})", grantType));
+        }
+        if (grantTypeEnum == OAuth2GrantTypeEnum.IMPLICIT) {
+            throw exception0(BAD_REQUEST.getCode(), "Token 接口不支持 implicit 授权模式");
+        }
+
+        // 校验客户端
+        String[] clientIdAndSecret = HttpUtils.obtainBasicAuthorization(request);
+        if (ArrayUtil.isEmpty(clientIdAndSecret) || clientIdAndSecret.length != 2) {
+            throw exception0(BAD_REQUEST.getCode(), "client_id 或 client_secret 未正确传递");
+        }
+        OAuth2ClientDO client = oauth2ClientService.validOAuthClientFromCache(clientIdAndSecret[0], clientIdAndSecret[1], grantType, null, null);
+
+        // 根据授权模式，获取访问令牌
+        OAuth2AccessTokenDO accessTokenDO = null;
+        switch (grantTypeEnum) {
+            case AUTHORIZATION_CODE:
+                accessTokenDO = oauth2GrantService.grantAuthorizationCodeForAccessToken(client.getClientId(), code, redirectUri, state);
+                break;
+            case PASSWORD:
+                break;
+            case CLIENT_CREDENTIALS:
+                break;
+            case REFRESH_TOKEN:
+                break;
+            default:
+                throw new IllegalArgumentException("未知授权类型：" + grantType);
+        }
+        Assert.notNull(accessTokenDO, "访问令牌不能为空"); // 防御性检查
+        return success(OAuth2OpenConvert.INSTANCE.convert(accessTokenDO));
+    }
+
+    //    GET  oauth/authorize AuthorizationEndpoint TODO
     @GetMapping("/authorize")
     @ApiOperation(value = "获得授权信息", notes = "适合 code 授权码模式，或者 implicit 简化模式；在 authorize.vue 单点登录界面被【获取】调用")
     @ApiImplicitParams({
@@ -75,12 +126,23 @@ public class OAuth2Controller {
         // 1.1 校验 responseType 是否满足 code 或者 token 值
         OAuth2GrantTypeEnum grantTypeEnum = getGrantTypeEnum(responseType);
         // 1.2 校验 redirectUri 重定向域名是否合法 + 校验 scope 是否在 Client 授权范围内
-        oauth2ClientService.validOAuthClientFromCache(clientId, grantTypeEnum.getGrantType(), scopes, redirectUri);
+        oauth2ClientService.validOAuthClientFromCache(clientId, null,
+                grantTypeEnum.getGrantType(), scopes, redirectUri);
 
         // 3. 不满足自动授权，则返回授权相关的展示信息
         return null;
     }
 
+    /**
+     * 对应 Spring Security OAuth 的 AuthorizationEndpoint 类的 approveOrDeny 方法
+     *
+     * 场景一：【自动授权 autoApprove = true】
+     *      刚进入 authorize.vue 界面，调用该接口，用户历史已经给该应用做过对应的授权，或者 OAuth2Client 支持该 scope 的自动授权
+     * 场景二：【手动授权 autoApprove = false】
+     *      在 authorize.vue 界面，用户选择好 scope 授权范围，调用该接口，进行授权。此时，approved 为 true 或者 false
+     *
+     * 因为前后端分离，Axios 无法很好的处理 302 重定向，所以和 Spring Security OAuth 略有不同，返回结果是重定向的 URL，剩余交给前端处理
+     */
     @PostMapping("/authorize")
     @ApiOperation(value = "申请授权", notes = "适合 code 授权码模式，或者 implicit 简化模式；在 authorize.vue 单点登录界面被【提交】调用")
     @ApiImplicitParams({
@@ -92,9 +154,6 @@ public class OAuth2Controller {
             @ApiImplicitParam(name = "state", example = "123321", dataTypeClass = String.class)
     })
     @OperateLog(enable = false) // 避免 Post 请求被记录操作日志
-    // 场景一：【自动授权 autoApprove = true】刚进入 authorize.vue 界面，调用该接口，用户历史已经给该应用做过对应的授权，或者 OAuth2Client 支持该 scope 的自动授权
-    // 场景二：【手动授权 autoApprove = false】在 authorize.vue 界面，用户选择好 scope 授权范围，调用该接口，进行授权。此时，approved 为 true 或者 false
-    // 因为前后端分离，Axios 无法很好的处理 302 重定向，所以和 Spring Security OAuth 略有不同，返回结果是重定向的 URL，剩余交给前端处理
     public CommonResult<String> approveOrDeny(@RequestParam("response_type") String responseType,
                                               @RequestParam("client_id") String clientId,
                                               @RequestParam(value = "scope", required = false) String scope,
@@ -110,7 +169,8 @@ public class OAuth2Controller {
         // 1.1 校验 responseType 是否满足 code 或者 token 值
         OAuth2GrantTypeEnum grantTypeEnum = getGrantTypeEnum(responseType);
         // 1.2 校验 redirectUri 重定向域名是否合法 + 校验 scope 是否在 Client 授权范围内
-        OAuth2ClientDO client = oauth2ClientService.validOAuthClientFromCache(clientId, grantTypeEnum.getGrantType(), scopes.keySet(), redirectUri);
+        OAuth2ClientDO client = oauth2ClientService.validOAuthClientFromCache(clientId, null,
+                grantTypeEnum.getGrantType(), scopes.keySet(), redirectUri);
 
         // 2.1 假设 approved 为 null，说明是场景一
         if (Boolean.TRUE.equals(autoApprove)) {
@@ -159,7 +219,7 @@ public class OAuth2Controller {
     private String getAuthorizationCodeRedirect(Long userId, OAuth2ClientDO client,
                                                 List<String> scopes, String redirectUri, String state) {
         // 1. 创建 code 授权码
-        String authorizationCode = oauth2GrantService.grantAuthorizationCode(userId,getUserType(), client.getClientId(), scopes,
+        String authorizationCode = oauth2GrantService.grantAuthorizationCodeForCode(userId,getUserType(), client.getClientId(), scopes,
                 redirectUri, state);
         // 2. 拼接重定向的 URL
         return OAuth2Utils.buildAuthorizationCodeRedirectUri(redirectUri, authorizationCode, state);

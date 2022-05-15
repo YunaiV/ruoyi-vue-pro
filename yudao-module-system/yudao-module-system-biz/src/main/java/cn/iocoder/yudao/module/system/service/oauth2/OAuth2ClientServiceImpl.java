@@ -176,7 +176,8 @@ public class OAuth2ClientServiceImpl implements OAuth2ClientService {
     }
 
     @Override
-    public OAuth2ClientDO validOAuthClientFromCache(String clientId, String authorizedGrantType, Collection<String> scopes, String redirectUri) {
+    public OAuth2ClientDO validOAuthClientFromCache(String clientId, String clientSecret,
+                                                    String authorizedGrantType, Collection<String> scopes, String redirectUri) {
         // 校验客户端存在、且开启
         OAuth2ClientDO client = clientCache.get(clientId);
         if (client == null) {
@@ -186,6 +187,10 @@ public class OAuth2ClientServiceImpl implements OAuth2ClientService {
             throw exception(OAUTH2_CLIENT_DISABLE);
         }
 
+        // 校验客户端密钥
+        if (StrUtil.isNotEmpty(clientSecret) && ObjectUtil.notEqual(client.getSecret(), clientSecret)) {
+            throw exception(OAUTH2_CLIENT_CLIENT_SECRET_ERROR, clientSecret);
+        }
         // 校验授权方式
         if (StrUtil.isNotEmpty(authorizedGrantType) && !CollUtil.contains(client.getAuthorizedGrantTypes(), authorizedGrantType)) {
             throw exception(OAUTH2_CLIENT_AUTHORIZED_GRANT_TYPE_NOT_EXISTS);
@@ -196,7 +201,7 @@ public class OAuth2ClientServiceImpl implements OAuth2ClientService {
         }
         // 校验回调地址
         if (StrUtil.isNotEmpty(redirectUri) && !StrUtils.startWithAny(redirectUri, client.getRedirectUris())) {
-            throw exception(OAUTH2_CLIENT_REDIRECT_URI_NOT_MATCH);
+            throw exception(OAUTH2_CLIENT_REDIRECT_URI_NOT_MATCH, redirectUri);
         }
         return client;
     }

@@ -67,7 +67,7 @@ public interface OAuth2ClientService {
      * @return 客户端
      */
     default OAuth2ClientDO validOAuthClientFromCache(String clientId) {
-        return validOAuthClientFromCache(clientId, null, null, null);
+        return validOAuthClientFromCache(clientId, null, null, null, null);
     }
 
     /**
@@ -76,12 +76,13 @@ public interface OAuth2ClientService {
      * 非空时，进行校验
      *
      * @param clientId 客户端编号
+     * @param clientSecret 客户端密钥
      * @param authorizedGrantType 授权方式
      * @param scopes 授权范围
      * @param redirectUri 重定向地址
      * @return 客户端
      */
-    OAuth2ClientDO validOAuthClientFromCache(String clientId, String authorizedGrantType,
-                                             Collection<String> scopes, String redirectUri);
+    OAuth2ClientDO validOAuthClientFromCache(String clientId, String clientSecret,
+                                             String authorizedGrantType, Collection<String> scopes, String redirectUri);
 
 }

@@ -50,13 +50,12 @@ public class OAuth2Utils {
         Map<String, Object> vars = new LinkedHashMap<String, Object>();
         Map<String, String> keys = new HashMap<String, String>();
         vars.put("access_token", accessToken);
-        vars.put("token_type", SecurityFrameworkUtils.TOKEN_TYPE.toLowerCase());
+        vars.put("token_type", SecurityFrameworkUtils.AUTHORIZATION_BEARER.toLowerCase());
         if (state != null) {
             vars.put("state", state);
         }
         if (expireTime != null) {
-            long expires_in = (expireTime.getTime() - System.currentTimeMillis()) / 1000;
-            vars.put("expires_in", expires_in);
+            vars.put("expires_in", getExpiresIn(expireTime));
         }
         if (CollUtil.isNotEmpty(scopes)) {
             vars.put("scope", CollUtil.join(scopes, " "));
@@ -81,6 +80,10 @@ public class OAuth2Utils {
             query.put("state", state);
         }
         return HttpUtils.append(redirectUri, query, null, !responseType.contains("code"));
+    }
+
+    public static long getExpiresIn(Date expireTime) {
+        return (expireTime.getTime() - System.currentTimeMillis()) / 1000;
     }
 
 }
