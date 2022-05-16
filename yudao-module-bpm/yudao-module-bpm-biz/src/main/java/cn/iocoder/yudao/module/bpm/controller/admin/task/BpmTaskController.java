@@ -7,9 +7,6 @@ import cn.iocoder.yudao.module.bpm.service.task.BpmTaskService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
-import org.apache.ibatis.annotations.Param;
-import org.flowable.bpmn.model.BpmnModel;
-import org.flowable.engine.TaskService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -18,7 +15,6 @@ import javax.annotation.Resource;
 import javax.validation.Valid;
 
 import java.util.List;
-import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils.getLoginUserId;
@@ -53,13 +49,6 @@ public class BpmTaskController {
     public CommonResult<List<BpmTaskRespVO>> getTaskListByProcessInstanceId(
         @RequestParam("processInstanceId") String processInstanceId) {
         return success(taskService.getTaskListByProcessInstanceId(processInstanceId));
-    }
-
-    @GetMapping("/get")
-    @ApiOperation(value = "获取审批单详情", notes = "包括完成的、未完成的")
-    @ApiImplicitParam(name = "taskId", value = "任务Id", required = true, dataTypeClass = String.class)
-    public CommonResult<Object> getTask(@Param("taskId") String processInstanceId) {
-        return success(taskService.getTaskInfo(processInstanceId));
     }
 
     @PutMapping("/approve")

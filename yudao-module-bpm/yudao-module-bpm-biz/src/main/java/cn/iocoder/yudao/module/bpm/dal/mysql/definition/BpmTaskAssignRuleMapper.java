@@ -32,4 +32,6 @@ public interface BpmTaskAssignRuleMapper extends BaseMapperX<BpmTaskAssignRuleDO
                 .eq("task_definition_key", taskDefinitionKey));
     }
 
+
+
 }

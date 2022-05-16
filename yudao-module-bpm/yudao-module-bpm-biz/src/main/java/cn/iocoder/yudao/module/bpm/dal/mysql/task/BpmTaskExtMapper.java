@@ -22,6 +22,16 @@ public interface BpmTaskExtMapper extends BaseMapperX<BpmTaskExtDO> {
     }
 
     /**
+     * 查询全部任务
+     *
+     * @return 返回任务
+     */
+    @TenantIgnore
+    default List<BpmTaskExtDO> listAll() {
+        return selectList();
+    }
+
+    /**
      * 查询任务
      *
      * @param procInstId 流程id

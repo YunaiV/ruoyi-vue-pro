@@ -68,15 +68,6 @@ public interface BpmTaskService {
     List<BpmTaskRespVO> getTaskListByProcessInstanceId(String processInstanceId);
 
     /**
-     * 获取任务详情
-     *
-     * @param processInstanceId 流程实例的编号
-     *
-     * @return 流程任务列表
-     */
-    List<BpmTaskRespVO> getTaskInfo(String processInstanceId);
-
-    /**
      * 通过任务
      *
      * @param userId 用户编号
@@ -95,7 +86,6 @@ public interface BpmTaskService {
     /**
      * 回退任务
      *
-     * @param userId 用户id
      * @param reqVO  回退任务信息
      */
     CommonResult<Boolean> backTask(BpmTaskBackReqVO reqVO);

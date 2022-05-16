@@ -1,4 +1,4 @@
-package net.lab1024.smartadmin.module.business.approve.camunda.hi.task.inst.domain.vo;
+package cn.iocoder.yudao.module.business.hi.task.inst.domain.vo;
 
 import lombok.Data;
 import java.util.Date;
