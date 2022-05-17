@@ -15,9 +15,6 @@ public class SpuBaseVO {
     @ApiModelProperty(value = "商品名称")
     private String name;
 
-    @ApiModelProperty(value = "上下架状态： true 上架，false 下架")
-    private Boolean visible;
-
     @ApiModelProperty(value = "卖点", required = true)
     @NotNull(message = "卖点不能为空")
     private String sellPoint;
@@ -28,13 +25,10 @@ public class SpuBaseVO {
 
     @ApiModelProperty(value = "分类id", required = true)
     @NotNull(message = "分类id不能为空")
-    private Integer cid;
+    private Long categoryId;
 
-    @ApiModelProperty(value = "列表图")
-    private String listPicUrl;
-
-    @ApiModelProperty(value = "商品主图地址, 数组，以逗号分隔, 最多上传15张", required = true)
-    @NotNull(message = "商品主图地址, 数组，以逗号分隔, 最多上传15张不能为空")
+    @ApiModelProperty(value = "商品主图地址,* 数组，以逗号分隔,最多上传15张", required = true)
+    @NotNull(message = "商品主图地址,* 数组，以逗号分隔,最多上传15张不能为空")
     private String picUrls;
 
     @ApiModelProperty(value = "排序字段", required = true)
@@ -44,10 +38,13 @@ public class SpuBaseVO {
     @ApiModelProperty(value = "点赞初始人数")
     private Integer likeCount;
 
-    @ApiModelProperty(value = "价格")
+    @ApiModelProperty(value = "价格 单位使用：分")
     private Integer price;
 
     @ApiModelProperty(value = "库存数量")
     private Integer quantity;
+
+    @ApiModelProperty(value = "上下架状态： 0 上架（开启） 1 下架（禁用）")
+    private Boolean status;
 
 }

@@ -12,19 +12,8 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @Data
 public class SpuExportReqVO {
 
-    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    @ApiModelProperty(value = "开始创建时间")
-    private Date beginCreateTime;
-
-    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    @ApiModelProperty(value = "结束创建时间")
-    private Date endCreateTime;
-
     @ApiModelProperty(value = "商品名称")
     private String name;
-
-    @ApiModelProperty(value = "上下架状态： true 上架，false 下架")
-    private Boolean visible;
 
     @ApiModelProperty(value = "卖点")
     private String sellPoint;
@@ -33,12 +22,9 @@ public class SpuExportReqVO {
     private String description;
 
     @ApiModelProperty(value = "分类id")
-    private Integer cid;
+    private Long categoryId;
 
-    @ApiModelProperty(value = "列表图")
-    private String listPicUrl;
-
-    @ApiModelProperty(value = "商品主图地址, 数组，以逗号分隔, 最多上传15张")
+    @ApiModelProperty(value = "商品主图地址,* 数组，以逗号分隔,最多上传15张")
     private String picUrls;
 
     @ApiModelProperty(value = "排序字段")
@@ -47,10 +33,21 @@ public class SpuExportReqVO {
     @ApiModelProperty(value = "点赞初始人数")
     private Integer likeCount;
 
-    @ApiModelProperty(value = "价格")
+    @ApiModelProperty(value = "价格 单位使用：分")
     private Integer price;
 
     @ApiModelProperty(value = "库存数量")
     private Integer quantity;
+
+    @ApiModelProperty(value = "上下架状态： 0 上架（开启） 1 下架（禁用）")
+    private Boolean status;
+
+    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
+    @ApiModelProperty(value = "开始创建时间")
+    private Date beginCreateTime;
+
+    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
+    @ApiModelProperty(value = "结束创建时间")
+    private Date endCreateTime;
 
 }

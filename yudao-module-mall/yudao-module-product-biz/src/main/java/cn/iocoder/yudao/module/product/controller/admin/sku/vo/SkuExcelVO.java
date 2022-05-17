@@ -17,17 +17,11 @@ public class SkuExcelVO {
     @ExcelProperty("主键")
     private Integer id;
 
-    @ExcelProperty("创建时间")
-    private Date createTime;
-
     @ExcelProperty("spu编号")
-    private Integer spuId;
+    private Long spuId;
 
-    @ExcelProperty("状态： 1-正常 2-禁用")
-    private Integer skuStatus;
-
-    @ExcelProperty("规格值数组， 以逗号隔开")
-    private String attrs;
+    @ExcelProperty("规格值数组-json格式， [{propertId: , valueId: }, {propertId: , valueId: }]")
+    private String properties;
 
     @ExcelProperty("销售价格，单位：分")
     private Integer price;
@@ -43,5 +37,11 @@ public class SkuExcelVO {
 
     @ExcelProperty("图片地址")
     private String picUrl;
+
+    @ExcelProperty("状态： 0-正常 1-禁用")
+    private Integer status;
+
+    @ExcelProperty("创建时间")
+    private Date createTime;
 
 }

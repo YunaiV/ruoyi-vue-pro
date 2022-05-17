@@ -28,15 +28,11 @@ public class SkuDO extends BaseDO {
     /**
      * spu编号
      */
-    private Integer spuId;
+    private Long spuId;
     /**
-     * 状态： 1-正常 2-禁用
+     * 规格值数组-json格式， [{propertId: , valueId: }, {propertId: , valueId: }]
      */
-    private Integer skuStatus;
-    /**
-     * 规格值数组， 以逗号隔开
-     */
-    private String attrs;
+    private String properties;
     /**
      * 销售价格，单位：分
      */
@@ -57,5 +53,9 @@ public class SkuDO extends BaseDO {
      * 图片地址
      */
     private String picUrl;
+    /**
+     * 状态： 0-正常 1-禁用
+     */
+    private Integer status;
 
 }

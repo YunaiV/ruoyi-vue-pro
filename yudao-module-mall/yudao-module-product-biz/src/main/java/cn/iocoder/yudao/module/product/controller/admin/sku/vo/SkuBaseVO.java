@@ -14,14 +14,11 @@ public class SkuBaseVO {
 
     @ApiModelProperty(value = "spu编号", required = true)
     @NotNull(message = "spu编号不能为空")
-    private Integer spuId;
+    private Long spuId;
 
-    @ApiModelProperty(value = "状态： 1-正常 2-禁用")
-    private Integer skuStatus;
-
-    @ApiModelProperty(value = "规格值数组， 以逗号隔开", required = true)
-    @NotNull(message = "规格值数组， 以逗号隔开不能为空")
-    private String attrs;
+    @ApiModelProperty(value = "规格值数组-json格式， [{propertId: , valueId: }, {propertId: , valueId: }]", required = true)
+    @NotNull(message = "规格值数组-json格式， [{propertId: , valueId: }, {propertId: , valueId: }]不能为空")
+    private String properties;
 
     @ApiModelProperty(value = "销售价格，单位：分", required = true)
     @NotNull(message = "销售价格，单位：分不能为空")
@@ -42,5 +39,8 @@ public class SkuBaseVO {
     @ApiModelProperty(value = "图片地址", required = true)
     @NotNull(message = "图片地址不能为空")
     private String picUrl;
+
+    @ApiModelProperty(value = "状态： 0-正常 1-禁用")
+    private Integer status;
 
 }

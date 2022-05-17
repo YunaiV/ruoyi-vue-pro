@@ -17,14 +17,8 @@ public class SpuExcelVO {
     @ExcelProperty("主键")
     private Integer id;
 
-    @ExcelProperty("创建时间")
-    private Date createTime;
-
     @ExcelProperty("商品名称")
     private String name;
-
-    @ExcelProperty("上下架状态： true 上架，false 下架")
-    private Boolean visible;
 
     @ExcelProperty("卖点")
     private String sellPoint;
@@ -33,12 +27,9 @@ public class SpuExcelVO {
     private String description;
 
     @ExcelProperty("分类id")
-    private Integer cid;
+    private Long categoryId;
 
-    @ExcelProperty("列表图")
-    private String listPicUrl;
-
-    @ExcelProperty("商品主图地址, 数组，以逗号分隔, 最多上传15张")
+    @ExcelProperty("商品主图地址,* 数组，以逗号分隔,最多上传15张")
     private String picUrls;
 
     @ExcelProperty("排序字段")
@@ -47,10 +38,16 @@ public class SpuExcelVO {
     @ExcelProperty("点赞初始人数")
     private Integer likeCount;
 
-    @ExcelProperty("价格")
+    @ExcelProperty("价格 单位使用：分")
     private Integer price;
 
     @ExcelProperty("库存数量")
     private Integer quantity;
+
+    @ExcelProperty("上下架状态： 0 上架（开启） 1 下架（禁用）")
+    private Boolean status;
+
+    @ExcelProperty("创建时间")
+    private Date createTime;
 
 }

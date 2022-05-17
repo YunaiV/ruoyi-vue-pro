@@ -30,10 +30,6 @@ public class SpuDO extends BaseDO {
      */
     private String name;
     /**
-     * 上下架状态： true 上架，false 下架
-     */
-    private Boolean visible;
-    /**
      * 卖点
      */
     private String sellPoint;
@@ -44,13 +40,9 @@ public class SpuDO extends BaseDO {
     /**
      * 分类id
      */
-    private Integer cid;
+    private Long categoryId;
     /**
-     * 列表图
-     */
-    private String listPicUrl;
-    /**
-     * 商品主图地址, 数组，以逗号分隔, 最多上传15张
+     * 商品主图地址,* 数组，以逗号分隔,最多上传15张
      */
     private String picUrls;
     /**
@@ -62,12 +54,16 @@ public class SpuDO extends BaseDO {
      */
     private Integer likeCount;
     /**
-     * 价格
+     * 价格 单位使用：分
      */
     private Integer price;
     /**
      * 库存数量
      */
     private Integer quantity;
+    /**
+     * 上下架状态： 0 上架（开启） 1 下架（禁用）
+     */
+    private Boolean status;
 
 }

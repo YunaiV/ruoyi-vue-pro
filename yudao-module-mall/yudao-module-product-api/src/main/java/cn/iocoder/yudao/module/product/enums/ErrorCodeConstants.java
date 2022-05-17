@@ -18,10 +18,10 @@ public interface ErrorCodeConstants {
     ErrorCode BRAND_NOT_EXISTS = new ErrorCode(1008002000, "品牌不存在");
 
     // ========== 规格名称 1008003000 ==========
-    ErrorCode ATTR_KEY_NOT_EXISTS = new ErrorCode(1008003000, "规格名称不存在");
+    ErrorCode PROPERTY_NOT_EXISTS = new ErrorCode(1008003000, "规格名称不存在");
 
     // ========== 规格值 1008004000 ==========
-    ErrorCode ATTR_VALUE_NOT_EXISTS = new ErrorCode(1008004000, "规格值不存在");
+    ErrorCode PROPERTY_VALUE_NOT_EXISTS = new ErrorCode(1008004000, "规格值不存在");
 
     // ========== 商品spu 1008005000 ==========
     ErrorCode SPU_NOT_EXISTS = new ErrorCode(1008005000, "商品spu不存在");

@@ -19,35 +19,33 @@ public interface SpuMapper extends BaseMapperX<SpuDO> {
 
     default PageResult<SpuDO> selectPage(SpuPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<SpuDO>()
-                .betweenIfPresent(SpuDO::getCreateTime, reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
                 .likeIfPresent(SpuDO::getName, reqVO.getName())
-                .eqIfPresent(SpuDO::getVisible, reqVO.getVisible())
                 .eqIfPresent(SpuDO::getSellPoint, reqVO.getSellPoint())
                 .eqIfPresent(SpuDO::getDescription, reqVO.getDescription())
-                .eqIfPresent(SpuDO::getCid, reqVO.getCid())
-                .eqIfPresent(SpuDO::getListPicUrl, reqVO.getListPicUrl())
+                .eqIfPresent(SpuDO::getCategoryId, reqVO.getCategoryId())
                 .eqIfPresent(SpuDO::getPicUrls, reqVO.getPicUrls())
                 .eqIfPresent(SpuDO::getSort, reqVO.getSort())
                 .eqIfPresent(SpuDO::getLikeCount, reqVO.getLikeCount())
                 .eqIfPresent(SpuDO::getPrice, reqVO.getPrice())
                 .eqIfPresent(SpuDO::getQuantity, reqVO.getQuantity())
+                .eqIfPresent(SpuDO::getStatus, reqVO.getStatus())
+                .betweenIfPresent(SpuDO::getCreateTime, reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
                 .orderByDesc(SpuDO::getId));
     }
 
     default List<SpuDO> selectList(SpuExportReqVO reqVO) {
         return selectList(new LambdaQueryWrapperX<SpuDO>()
-                .betweenIfPresent(SpuDO::getCreateTime, reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
                 .likeIfPresent(SpuDO::getName, reqVO.getName())
-                .eqIfPresent(SpuDO::getVisible, reqVO.getVisible())
                 .eqIfPresent(SpuDO::getSellPoint, reqVO.getSellPoint())
                 .eqIfPresent(SpuDO::getDescription, reqVO.getDescription())
-                .eqIfPresent(SpuDO::getCid, reqVO.getCid())
-                .eqIfPresent(SpuDO::getListPicUrl, reqVO.getListPicUrl())
+                .eqIfPresent(SpuDO::getCategoryId, reqVO.getCategoryId())
                 .eqIfPresent(SpuDO::getPicUrls, reqVO.getPicUrls())
                 .eqIfPresent(SpuDO::getSort, reqVO.getSort())
                 .eqIfPresent(SpuDO::getLikeCount, reqVO.getLikeCount())
                 .eqIfPresent(SpuDO::getPrice, reqVO.getPrice())
                 .eqIfPresent(SpuDO::getQuantity, reqVO.getQuantity())
+                .eqIfPresent(SpuDO::getStatus, reqVO.getStatus())
+                .betweenIfPresent(SpuDO::getCreateTime, reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
                 .orderByDesc(SpuDO::getId));
     }
 

@@ -19,29 +19,29 @@ public interface SkuMapper extends BaseMapperX<SkuDO> {
 
     default PageResult<SkuDO> selectPage(SkuPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<SkuDO>()
-                .betweenIfPresent(SkuDO::getCreateTime, reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
                 .eqIfPresent(SkuDO::getSpuId, reqVO.getSpuId())
-                .eqIfPresent(SkuDO::getSkuStatus, reqVO.getSkuStatus())
-                .eqIfPresent(SkuDO::getAttrs, reqVO.getAttrs())
+                .eqIfPresent(SkuDO::getProperties, reqVO.getProperties())
                 .eqIfPresent(SkuDO::getPrice, reqVO.getPrice())
                 .eqIfPresent(SkuDO::getOriginalPrice, reqVO.getOriginalPrice())
                 .eqIfPresent(SkuDO::getCostPrice, reqVO.getCostPrice())
                 .eqIfPresent(SkuDO::getBarCode, reqVO.getBarCode())
                 .eqIfPresent(SkuDO::getPicUrl, reqVO.getPicUrl())
+                .eqIfPresent(SkuDO::getStatus, reqVO.getStatus())
+                .betweenIfPresent(SkuDO::getCreateTime, reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
                 .orderByDesc(SkuDO::getId));
     }
 
     default List<SkuDO> selectList(SkuExportReqVO reqVO) {
         return selectList(new LambdaQueryWrapperX<SkuDO>()
-                .betweenIfPresent(SkuDO::getCreateTime, reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
                 .eqIfPresent(SkuDO::getSpuId, reqVO.getSpuId())
-                .eqIfPresent(SkuDO::getSkuStatus, reqVO.getSkuStatus())
-                .eqIfPresent(SkuDO::getAttrs, reqVO.getAttrs())
+                .eqIfPresent(SkuDO::getProperties, reqVO.getProperties())
                 .eqIfPresent(SkuDO::getPrice, reqVO.getPrice())
                 .eqIfPresent(SkuDO::getOriginalPrice, reqVO.getOriginalPrice())
                 .eqIfPresent(SkuDO::getCostPrice, reqVO.getCostPrice())
                 .eqIfPresent(SkuDO::getBarCode, reqVO.getBarCode())
                 .eqIfPresent(SkuDO::getPicUrl, reqVO.getPicUrl())
+                .eqIfPresent(SkuDO::getStatus, reqVO.getStatus())
+                .betweenIfPresent(SkuDO::getCreateTime, reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
                 .orderByDesc(SkuDO::getId));
     }
 

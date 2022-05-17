@@ -112,36 +112,40 @@ CREATE TABLE `market_activity` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='促销活动';
 
 
+
+
 -- 规格名称表
-drop table if exists product_attr_key;
-create table product_attr_key
+drop table if exists product_property;
+create table product_property
 (
-    id          int comment '主键',
-    create_time datetime default current_timestamp comment '创建时间',
-    update_time datetime default current_timestamp on update current_timestamp comment '更新时间',
+    id          bigint comment '主键',
+    name        varchar(64) comment '规格名称',
+    status      tinyint comment '状态： 0 开启 ，1 禁用',
+    create_time datetime        default current_timestamp comment '创建时间',
+    update_time datetime        default current_timestamp on update current_timestamp comment '更新时间',
     creator     varchar(64) comment '创建人',
     updater     varchar(64) comment '更新人',
+    tenant_id   bigint NOT NULL DEFAULT '0' COMMENT '租户编号',
     deleted     bit(1) comment '状态',
-    attr_name   varchar(64) comment '规格名称',
-    status      tinyint comment '状态： 1 开启 ，2 禁用',
     primary key (id),
-    key idx_name (attr_name(32)) comment '规格名称索引'
+    key idx_name (name(32)) comment '规格名称索引'
 ) comment '规格名称' character set utf8mb4
                  collate utf8mb4_general_ci;
 
 -- 规格值表
-drop table if exists product_attr_value;
-create table product_attr_value
+drop table if exists product_property_value;
+create table product_property_value
 (
-    id              int comment '主键',
-    create_time     datetime default current_timestamp comment '创建时间',
-    update_time     datetime default current_timestamp on update current_timestamp comment '更新时间',
-    creator         varchar(64) comment '创建人',
-    updater         varchar(64) comment '更新人',
-    deleted         bit(1) comment '状态',
-    attr_key_id     varchar(64) comment '规格键id',
-    attr_value_name varchar(128) comment '规格值名字',
-    status          tinyint comment '状态： 1 开启 ，2 禁用',
+    id          int comment '主键',
+    property_id bigint comment '规格键id',
+    name        varchar(128) comment '规格值名字',
+    status      tinyint comment '状态： 1 开启 ，2 禁用',
+    create_time datetime        default current_timestamp comment '创建时间',
+    update_time datetime        default current_timestamp on update current_timestamp comment '更新时间',
+    creator     varchar(64) comment '创建人',
+    updater     varchar(64) comment '更新人',
+    tenant_id   bigint NOT NULL DEFAULT '0' COMMENT '租户编号',
+    deleted     bit(1) comment '状态',
     primary key (id)
 ) comment '规格值' character set utf8mb4
                 collate utf8mb4_general_ci;
@@ -150,23 +154,23 @@ create table product_attr_value
 drop table if exists product_spu;
 create table product_spu
 (
-    id           int comment '主键',
-    create_time  datetime               default current_timestamp comment '创建时间',
-    update_time  datetime               default current_timestamp on update current_timestamp comment '更新时间',
-    creator      varchar(64) comment '创建人',
-    updater      varchar(64) comment '更新人',
-    deleted      bit(1) comment '状态',
-    name         varchar(128) comment '商品名称',
-    visible      bit(1) comment '上下架状态： true 上架，false 下架',
-    sell_point   varchar(128)  not null comment '卖点',
-    description  text          not null comment '描述',
-    cid          int           not null comment '分类id',
-    list_pic_url varchar(128) comment '列表图',
-    pic_urls     varchar(1024) not null default '' comment '商品主图地址, 数组，以逗号分隔, 最多上传15张',
-    sort         int           not null default 0 comment '排序字段',
-    like_count   int comment '点赞初始人数',
-    price        int comment '价格',
-    quantity     int comment '库存数量',
+    id          int comment '主键',
+    name        varchar(128) comment '商品名称',
+    sell_point  varchar(128)  not null comment '卖点',
+    description text          not null comment '描述',
+    category_id bigint        not null comment '分类id',
+    pic_urls    varchar(1024) not null default '' comment '商品主图地址\n     *\n     * 数组，以逗号分隔\n 最多上传15张',
+    sort        int           not null default 0 comment '排序字段',
+    like_count  int comment '点赞初始人数',
+    price       int comment '价格 单位使用：分',
+    quantity    int comment '库存数量',
+    status      bit(1) comment '上下架状态： 0 上架（开启） 1 下架（禁用）',
+    create_time datetime               default current_timestamp comment '创建时间',
+    update_time datetime               default current_timestamp on update current_timestamp comment '更新时间',
+    creator     varchar(64) comment '创建人',
+    updater     varchar(64) comment '更新人',
+    tenant_id   bigint        NOT NULL DEFAULT '0' COMMENT '租户编号',
+    deleted     bit(1) comment '状态',
     primary key (id)
 ) comment '商品spu' character set utf8mb4
                   collate utf8mb4_general_ci;
@@ -177,19 +181,22 @@ drop table if exists product_sku;
 create table product_sku
 (
     id             int comment '主键',
-    create_time    datetime              default current_timestamp comment '创建时间',
-    update_time    datetime              default current_timestamp on update current_timestamp comment '更新时间',
-    creator        varchar(64) comment '创建人',
-    updater        varchar(64) comment '更新人',
-    deleted        bit(1) comment '状态',
-    spu_id         int          not null comment 'spu编号',
-    sku_status     tinyint comment '状态： 1-正常 2-禁用',
-    attrs          varchar(64)  not null comment '规格值数组， 以逗号隔开',
+    spu_id         bigint       not null comment 'spu编号',
+    properties     varchar(64)  not null comment '规格值数组-json格式， [{propertId: , valueId: }, {propertId: , valueId: }]',
     price          int          not null DEFAULT -1 comment '销售价格，单位：分',
     original_price int          not null DEFAULT -1 comment '原价， 单位： 分',
     cost_price     int          not null DEFAULT -1 comment '成本价，单位： 分',
     bar_code       varchar(64)  not null comment '条形码',
     pic_url        VARCHAR(128) not null comment '图片地址',
+    status         tinyint comment '状态： 0-正常 1-禁用',
+    create_time    datetime              default current_timestamp comment '创建时间',
+    update_time    datetime              default current_timestamp on update current_timestamp comment '更新时间',
+    creator        varchar(64) comment '创建人',
+    updater        varchar(64) comment '更新人',
+    tenant_id      bigint       NOT NULL DEFAULT '0' COMMENT '租户编号',
+    deleted        bit(1) comment '状态',
     primary key (id)
 ) comment '商品sku' character set utf8mb4
                   collate utf8mb4_general_ci;
+
+

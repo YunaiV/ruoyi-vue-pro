@@ -14,22 +14,11 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @ToString(callSuper = true)
 public class SkuPageReqVO extends PageParam {
 
-    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    @ApiModelProperty(value = "开始创建时间")
-    private Date beginCreateTime;
-
-    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    @ApiModelProperty(value = "结束创建时间")
-    private Date endCreateTime;
-
     @ApiModelProperty(value = "spu编号")
-    private Integer spuId;
+    private Long spuId;
 
-    @ApiModelProperty(value = "状态： 1-正常 2-禁用")
-    private Integer skuStatus;
-
-    @ApiModelProperty(value = "规格值数组， 以逗号隔开")
-    private String attrs;
+    @ApiModelProperty(value = "规格值数组-json格式， [{propertId: , valueId: }, {propertId: , valueId: }]")
+    private String properties;
 
     @ApiModelProperty(value = "销售价格，单位：分")
     private Integer price;
@@ -45,5 +34,16 @@ public class SkuPageReqVO extends PageParam {
 
     @ApiModelProperty(value = "图片地址")
     private String picUrl;
+
+    @ApiModelProperty(value = "状态： 0-正常 1-禁用")
+    private Integer status;
+
+    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
+    @ApiModelProperty(value = "开始创建时间")
+    private Date beginCreateTime;
+
+    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
+    @ApiModelProperty(value = "结束创建时间")
+    private Date endCreateTime;
 
 }
