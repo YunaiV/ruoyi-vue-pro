@@ -451,6 +451,7 @@ public class PermissionServiceImpl implements PermissionService {
 
     @Override
     @DataPermission(enable = false) // 关闭数据权限，不然就会出现递归获取数据权限的问题
+    @TenantIgnore // 忽略多租户的自动过滤。如果不忽略，会导致添加租户时，因为切换租户，导致获取不到 User。即使忽略，本身该方法不存在跨租户的操作，不会存在问题。
     public DeptDataPermissionRespDTO getDeptDataPermission(Long userId) {
         DeptDataPermissionRespDTO result = new DeptDataPermissionRespDTO();
         // 获得用户的角色
