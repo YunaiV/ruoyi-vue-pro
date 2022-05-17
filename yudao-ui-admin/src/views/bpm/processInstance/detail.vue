@@ -60,7 +60,7 @@
                   审批人：{{ item.assigneeUser.nickname }}
                   <el-tag type="info" size="mini">{{ item.assigneeUser.deptName }}</el-tag>
                 </label>
-                <label style="font-weight: normal">创建时间：</label>
+                <label style="font-weight: normal" v-if="item.createTime">创建时间：</label>
                 <label style="color:#8a909c; font-weight: normal">{{ parseTime(item.createTime) }}</label>
                 <label v-if="item.endTime" style="margin-left: 30px;font-weight: normal">审批时间：</label>
                 <label v-if="item.endTime" style="color:#8a909c;font-weight: normal"> {{ parseTime(item.endTime) }}</label>
@@ -234,19 +234,19 @@ export default {
         // 审批记录
         this.tasks = response.data;
         // 排序，将未完成的排在前面，已完成的排在后面；
-        this.tasks.sort((a, b) => {
-          // 有已完成的情况，按照完成时间倒序
-          if (a.endTime && b.endTime) {
-            return b.endTime - a.endTime;
-          } else if (a.endTime) {
-            return 1;
-          } else if (b.endTime) {
-            return -1;
-            // 都是未完成，按照创建时间倒序
-          } else {
-            return b.createTime - a.createTime;
-          }
-        });
+        // this.tasks.sort((a, b) => {
+        //   // 有已完成的情况，按照完成时间倒序
+        //   if (a.endTime && b.endTime) {
+        //     return b.endTime - a.endTime;
+        //   } else if (a.endTime) {
+        //     return 1;
+        //   } else if (b.endTime) {
+        //     return -1;
+        //     // 都是未完成，按照创建时间倒序
+        //   } else {
+        //     return b.createTime - a.createTime;
+        //   }
+        // });
 
         // 需要审核的记录
         const userId = store.getters.userId;
