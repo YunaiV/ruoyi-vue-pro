@@ -11,6 +11,7 @@ import java.util.List;
 
 @Mapper
 public interface MailTemplateConvert {
+
     MailTemplateConvert INSTANCE = Mappers.getMapper(MailTemplateConvert.class);
 
     MailTemplateDO convert(MailTemplateBaseVO baseVO);
@@ -20,4 +21,5 @@ public interface MailTemplateConvert {
     PageResult<MailTemplateRespVO> convertPage(PageResult<MailTemplateDO> pageResult);
 
     List<MailTemplateRespVO> convertList02(List<MailTemplateDO> list);
+
 }

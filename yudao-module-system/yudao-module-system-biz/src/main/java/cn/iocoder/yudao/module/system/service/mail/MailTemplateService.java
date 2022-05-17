@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.system.service.mail;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.system.controller.admin.mail.vo.send.MailReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.mail.vo.template.MailTemplateCreateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.mail.vo.template.MailTemplatePageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.mail.vo.template.MailTemplateUpdateReqVO;
@@ -68,8 +67,9 @@ public interface MailTemplateService {
      * @return 模版数组
      */
     List<MailTemplateDO> getMailTemplateList();
+
     /**
-     *从缓存中获取邮箱模版
+     * 从缓存中获取邮箱模版
      *
      * @param code 模板编码
      * @return 邮箱模板
@@ -78,9 +78,11 @@ public interface MailTemplateService {
 
     /**
      * 邮件模版内容合成
+     *
      * @param content 邮箱模版
      * @param params 合成参数
-     * @return
+     * @return 格式化后的内容
      */
     String formatMailTemplateContent(String content, Map<String, String> params);
+
 }

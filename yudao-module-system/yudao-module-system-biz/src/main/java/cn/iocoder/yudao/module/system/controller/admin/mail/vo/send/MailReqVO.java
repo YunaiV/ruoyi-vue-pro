@@ -34,5 +34,4 @@ public class MailReqVO { // TODO @wangjingqi：1）, 不用空格；2）应该�
     @ApiModelProperty(value = "附件",example = "附件编码")
     private List<String> fileIds;
 
-
 }

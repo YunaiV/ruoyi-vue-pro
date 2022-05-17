@@ -17,6 +17,9 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class MailLogPageReqVO extends PageParam {
+
+    // TODO @wangjingyi：required 为 false 时，它是默认值，所以不用谢
+
     @ApiModelProperty(value = "邮箱" , required = false , example = "yudaoyuanma@123.com")
     private String from;
 

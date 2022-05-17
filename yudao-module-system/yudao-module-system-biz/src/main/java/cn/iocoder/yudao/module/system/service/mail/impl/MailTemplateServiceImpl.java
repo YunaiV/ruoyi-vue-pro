@@ -3,20 +3,13 @@ package cn.iocoder.yudao.module.system.service.mail.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.extra.mail.MailAccount;
-import cn.hutool.extra.mail.MailUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
-import cn.iocoder.yudao.module.system.controller.admin.mail.vo.send.MailReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.mail.vo.template.MailTemplateCreateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.mail.vo.template.MailTemplatePageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.mail.vo.template.MailTemplateUpdateReqVO;
-import cn.iocoder.yudao.module.system.convert.mail.MailAccountConvert;
 import cn.iocoder.yudao.module.system.convert.mail.MailTemplateConvert;
-import cn.iocoder.yudao.module.system.dal.dataobject.mail.MailAccountDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.mail.MailTemplateDO;
-import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsTemplateDO;
-import cn.iocoder.yudao.module.system.dal.mysql.mail.MailAccountMapper;
 import cn.iocoder.yudao.module.system.dal.mysql.mail.MailTemplateMapper;
 import cn.iocoder.yudao.module.system.mq.producer.mail.MailProducer;
 import cn.iocoder.yudao.module.system.service.mail.MailTemplateService;
@@ -36,7 +29,7 @@ import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.MAIL_TEMPL
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.MAIL_TEMPLATE_NOT_EXISTS;
 
 /**
- * 邮箱模版 服务实现类
+ * 邮箱模版 Service 实现类
  *
  * @author wangjingyi
  * @since 2022-03-21
@@ -48,6 +41,7 @@ public class MailTemplateServiceImpl implements MailTemplateService {
 
     @Resource
     private MailTemplateMapper mailTemplateMapper;
+
     @Resource
     private MailProducer mailProducer;
 
@@ -61,7 +55,6 @@ public class MailTemplateServiceImpl implements MailTemplateService {
 
     private volatile Date maxUpdateTime;
 
-    // TODO @wangjingyi：参考下别的模块的 initLocalCache 的实现 DONE
     @Override
     @PostConstruct
     public void initLocalCache() {
@@ -78,8 +71,8 @@ public class MailTemplateServiceImpl implements MailTemplateService {
 
     @Override
     public Long create(MailTemplateCreateReqVO createReqVO) {
-        //要校验存在
-        this.validateMailTemplateExists(createReqVO.getId());
+        // 要校验存在
+        validateMailTemplateExists(createReqVO.getId());
         MailTemplateDO mailTemplateDO = MailTemplateConvert.INSTANCE.convert(createReqVO);
         mailTemplateMapper.insert(mailTemplateDO);
         // TODO @wangjingyi：mq 更新 DONE
@@ -123,7 +116,6 @@ public class MailTemplateServiceImpl implements MailTemplateService {
         return mailTemplateCache.get(code);
     }
 
-    // TODO @@wangjingyi：单词拼写错误 DONE
     @Override
     public String formatMailTemplateContent(String content, Map<String, String> params) {
         return StrUtil.format(content, params);

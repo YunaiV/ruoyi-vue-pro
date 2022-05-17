@@ -80,7 +80,6 @@ public class MailLogDO extends BaseDO implements Serializable {
 
     /**
      * 发送结果
-     *
      */
     private String sendResult;
 

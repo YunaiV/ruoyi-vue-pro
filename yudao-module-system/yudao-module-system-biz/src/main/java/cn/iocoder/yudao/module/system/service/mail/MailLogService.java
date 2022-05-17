@@ -20,37 +20,38 @@ public interface MailLogService {
     /**
      * 邮箱日志分页
      *
-     * @param pageVO
-     * @return
+     * @param pageVO 分页参数
+     * @return 分页结果
      */
     PageResult<MailLogDO> getMailLogPage(MailLogPageReqVO pageVO);
 
     /**
      * 邮箱日志数组信息
      *
-     * @param exportReqVO
-     * @return
+     * @param exportReqVO 导出筛选请求
+     * @return 导出的日志数据
      */
     List<MailLogDO> getMailLogList(MailLogExportReqVO exportReqVO);
 
     /**
      * 创建邮箱日志
      *
-     * @param mailAccountDO  邮箱账号信息
-     * @param mailTemplateDO 模版信息
-     * @param from           邮箱
-     * @param content        内容
-     * @param tos            收件人
-     * @param title          标题
-     * @param isSend         是否发送成功
+     * @param mailAccountDO 邮箱账号信息
+     * @param template      模版信息
+     * @param from          邮箱
+     * @param content       内容
+     * @param tos           收件人
+     * @param title         标题
+     * @param isSend        是否发送成功
      */
-    Long createMailLog(MailAccountDO mailAccountDO, MailTemplateDO mailTemplateDO, String from, String content, List<String> tos, String title, Boolean isSend);
+    Long createMailLog(MailAccountDO mailAccountDO, MailTemplateDO template, String from, String content, List<String> tos, String title, Boolean isSend);
 
     /**
      * 更新邮件发送结果
      *
-     * @param logId          发送日志Id
-     * @param result         发送结果 默认返回messageId
+     * @param logId  发送日志Id
+     * @param result 发送结果 默认返回messageId
      */
     void updateMailSendResult(Long logId, String result);
+
 }
