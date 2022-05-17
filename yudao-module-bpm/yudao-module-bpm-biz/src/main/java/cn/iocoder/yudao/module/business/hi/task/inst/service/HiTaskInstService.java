@@ -254,7 +254,7 @@ public class HiTaskInstService {
                 for (Long userId : bpmTaskAssignRuleDO.getOptions()) {
                     BpmTaskRespVO bpmTaskRespVO =
                         (BpmTaskRespVO)new BpmTaskRespVO().setName(targetFlowElement.getName());
-                    bpmTaskRespVOList.addFirst(bpmTaskRespVO);
+                    bpmTaskRespVOList.addLast(bpmTaskRespVO);
                     AdminUserDO adminUserDO = userDoMap.get(userId);
                     DeptDO deptDO = deptMap.get(adminUserDO.getDeptId());
                     bpmTaskRespVO.setAssigneeUser(setUser(adminUserDO));
