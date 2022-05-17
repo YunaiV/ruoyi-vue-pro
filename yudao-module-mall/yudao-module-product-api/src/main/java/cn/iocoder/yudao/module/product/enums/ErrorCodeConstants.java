@@ -22,4 +22,10 @@ public interface ErrorCodeConstants {
 
     // ========== 规格值 1008004000 ==========
     ErrorCode ATTR_VALUE_NOT_EXISTS = new ErrorCode(1008004000, "规格值不存在");
+
+    // ========== 商品spu 1008005000 ==========
+    ErrorCode SPU_NOT_EXISTS = new ErrorCode(1008005000, "商品spu不存在");
+
+    // ========== 商品sku 1008006000 ==========
+    ErrorCode SKU_NOT_EXISTS = new ErrorCode(1008006000, "商品sku不存在");
 }
