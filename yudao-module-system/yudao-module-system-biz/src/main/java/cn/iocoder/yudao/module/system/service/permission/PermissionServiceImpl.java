@@ -250,7 +250,7 @@ public class PermissionServiceImpl implements PermissionService {
     public Set<Long> getUserRoleIdsFromCache(Long userId, Collection<Integer> roleStatuses) {
         Set<Long> cacheRoleIds = userRoleCache.get(userId);
         // 创建用户的时候没有分配角色，会存在空指针异常
-        if (cacheRoleIds == null || cacheRoleIds.isEmpty()) {
+        if (CollUtil.isEmpty(cacheRoleIds)) {
             return Collections.emptySet();
         }
         Set<Long> roleIds = new HashSet<>(cacheRoleIds);
