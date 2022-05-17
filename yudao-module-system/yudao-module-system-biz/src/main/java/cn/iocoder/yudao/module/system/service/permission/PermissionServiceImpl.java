@@ -8,8 +8,8 @@ import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.datapermission.core.annotation.DataPermission;
-import cn.iocoder.yudao.module.system.api.permission.dto.DeptDataPermissionRespDTO;
 import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnore;
+import cn.iocoder.yudao.module.system.api.permission.dto.DeptDataPermissionRespDTO;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.MenuDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.RoleDO;
@@ -248,7 +248,12 @@ public class PermissionServiceImpl implements PermissionService {
 
     @Override
     public Set<Long> getUserRoleIdsFromCache(Long userId, Collection<Integer> roleStatuses) {
-        Set<Long> roleIds = new HashSet<>(userRoleCache.get(userId));
+        Set<Long> cacheRoleIds = userRoleCache.get(userId);
+        // 创建用户的时候没有分配角色，会存在空指针异常
+        if (CollUtil.isEmpty(cacheRoleIds)) {
+            return Collections.emptySet();
+        }
+        Set<Long> roleIds = new HashSet<>(cacheRoleIds);
         // 过滤角色状态
         if (CollectionUtil.isNotEmpty(roleStatuses)) {
             roleIds.removeIf(roleId -> {
