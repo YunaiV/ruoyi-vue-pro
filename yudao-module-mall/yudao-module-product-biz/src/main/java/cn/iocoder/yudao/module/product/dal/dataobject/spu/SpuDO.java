@@ -1,9 +1,10 @@
 package cn.iocoder.yudao.module.product.dal.dataobject.spu;
 
-import lombok.*;
-import java.util.*;
-import com.baomidou.mybatisplus.annotation.*;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.*;
 
 /**
  * 商品spu DO
@@ -44,6 +45,7 @@ public class SpuDO extends BaseDO {
     /**
      * 商品主图地址,* 数组，以逗号分隔,最多上传15张
      */
+    // TODO franky：List<String>
     private String picUrls;
     /**
      * 排序字段

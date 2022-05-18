@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
+// TODO @JeromeSoar：Product 前缀
 /**
  * 品牌 DO
  *
@@ -47,7 +48,7 @@ public class BrandDO extends BaseDO {
     private String description;
     /**
      * 状态
-     * <p>
+     *
      * 枚举 {@link CommonStatusEnum}
      */
     private Integer status;

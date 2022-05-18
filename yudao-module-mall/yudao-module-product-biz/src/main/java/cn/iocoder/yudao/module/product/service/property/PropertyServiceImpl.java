@@ -1,19 +1,22 @@
 package cn.iocoder.yudao.module.product.service.property;
 
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.product.controller.admin.property.vo.PropertyCreateReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.property.vo.PropertyExportReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.property.vo.PropertyPageReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.property.vo.PropertyUpdateReqVO;
+import cn.iocoder.yudao.module.product.convert.property.PropertyConvert;
+import cn.iocoder.yudao.module.product.dal.dataobject.property.PropertyDO;
+import cn.iocoder.yudao.module.product.dal.mysql.property.PropertyMapper;
 import org.springframework.stereotype.Service;
-import javax.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
 
-import java.util.*;
-import cn.iocoder.yudao.module.product.controller.admin.property.vo.*;
-import cn.iocoder.yudao.module.product.dal.dataobject.property.PropertyDO;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
-
-import cn.iocoder.yudao.module.product.convert.property.PropertyConvert;
-import cn.iocoder.yudao.module.product.dal.mysql.property.PropertyMapper;
+import javax.annotation.Resource;
+import java.util.Collection;
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.PROPERTY_NOT_EXISTS;
 
 /**
  * 规格名称 Service 实现类

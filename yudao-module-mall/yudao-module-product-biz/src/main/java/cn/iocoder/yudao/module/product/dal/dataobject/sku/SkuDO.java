@@ -1,9 +1,10 @@
 package cn.iocoder.yudao.module.product.dal.dataobject.sku;
 
-import lombok.*;
-import java.util.*;
-import com.baomidou.mybatisplus.annotation.*;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.*;
 
 /**
  * 商品sku DO
@@ -32,13 +33,14 @@ public class SkuDO extends BaseDO {
     /**
      * 规格值数组-json格式， [{propertId: , valueId: }, {propertId: , valueId: }]
      */
+    // TODO franky：可以定义一个内部的 Property 类，然后 List<Property>
     private String properties;
     /**
      * 销售价格，单位：分
      */
     private Integer price;
     /**
-     * 原价， 单位： 分
+     * 原价，单位：分
      */
     private Integer originalPrice;
     /**

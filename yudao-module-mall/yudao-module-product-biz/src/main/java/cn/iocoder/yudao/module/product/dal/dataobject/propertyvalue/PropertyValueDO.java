@@ -1,10 +1,13 @@
 package cn.iocoder.yudao.module.product.dal.dataobject.propertyvalue;
 
-import lombok.*;
-import java.util.*;
-import com.baomidou.mybatisplus.annotation.*;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.module.product.dal.dataobject.property.PropertyDO;
+import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.*;
 
+// TODO @franky：包放到 property 中
 /**
  * 规格值 DO
  *
@@ -26,7 +29,9 @@ public class PropertyValueDO extends BaseDO {
     @TableId
     private Integer id;
     /**
-     * 规格键id
+     * 规格键 id
+     *
+     * TODO @franky：加个 关联 {@link PropertyDO#getId()} ，这样就能更好的知道
      */
     private Long propertyId;
     /**

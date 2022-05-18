@@ -1,10 +1,13 @@
 package cn.iocoder.yudao.module.product.dal.dataobject.property;
 
-import lombok.*;
-import java.util.*;
-import com.baomidou.mybatisplus.annotation.*;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.*;
 
+// TODO @franky：每个表名，都加个 Product 前缀哈。
 /**
  * 规格名称 DO
  *
@@ -31,6 +34,8 @@ public class PropertyDO extends BaseDO {
     private String name;
     /**
      * 状态： 0 开启 ，1 禁用
+     *
+     * TODO @franky：加个 枚举 {@link CommonStatusEnum} ，这样就能更好的知道
      */
     private Integer status;
 

@@ -1,19 +1,22 @@
 package cn.iocoder.yudao.module.product.service.propertyvalue;
 
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.product.controller.admin.propertyvalue.vo.PropertyValueCreateReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.propertyvalue.vo.PropertyValueExportReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.propertyvalue.vo.PropertyValuePageReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.propertyvalue.vo.PropertyValueUpdateReqVO;
+import cn.iocoder.yudao.module.product.convert.propertyvalue.PropertyValueConvert;
+import cn.iocoder.yudao.module.product.dal.dataobject.propertyvalue.PropertyValueDO;
+import cn.iocoder.yudao.module.product.dal.mysql.propertyvalue.PropertyValueMapper;
 import org.springframework.stereotype.Service;
-import javax.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
 
-import java.util.*;
-import cn.iocoder.yudao.module.product.controller.admin.propertyvalue.vo.*;
-import cn.iocoder.yudao.module.product.dal.dataobject.propertyvalue.PropertyValueDO;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
-
-import cn.iocoder.yudao.module.product.convert.propertyvalue.PropertyValueConvert;
-import cn.iocoder.yudao.module.product.dal.mysql.propertyvalue.PropertyValueMapper;
+import javax.annotation.Resource;
+import java.util.Collection;
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.PROPERTY_VALUE_NOT_EXISTS;
 
 /**
  * 规格值 Service 实现类
@@ -26,6 +29,8 @@ public class PropertyValueServiceImpl implements PropertyValueService {
 
     @Resource
     private PropertyValueMapper propertyValueMapper;
+
+    // TODO @franky：这个合并到 property 中。他们本身是在一起的哈。基本不存在只查询规格，而不查询规格值。
 
     @Override
     public Integer createPropertyValue(PropertyValueCreateReqVO createReqVO) {
