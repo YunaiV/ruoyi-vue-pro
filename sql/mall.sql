@@ -129,7 +129,7 @@ CREATE TABLE `market_activity`
 
 -- 规格菜单 SQL
 INSERT INTO system_menu(name, permission, type, sort, parent_id, path, icon, component, status)
-VALUES ('规格管理', '', 2, 3, 2001, 'property', '', 'product/property/index', 0);
+VALUES ('规格管理', '', 2, 3, 2001, 'property', '', 'mall/product/property/index', 0);
 
 -- 按钮父菜单ID
 SELECT @parentId := LAST_INSERT_ID();
@@ -149,7 +149,7 @@ VALUES ('规格导出', 'product:property:export', 3, 5, @parentId, '', '', '', 
 
 -- 商品菜单 SQL
 INSERT INTO system_menu(name, permission, type, sort, parent_id, path, icon, component, status)
-VALUES ('商品管理', '', 2, 2, 2001, 'spu', '', 'product/spu/index', 0);
+VALUES ('商品管理', '', 2, 2, 2001, 'spu', '', 'mall/product/spu/index', 0);
 
 -- 按钮父菜单ID
 SELECT @parentId := LAST_INSERT_ID();
