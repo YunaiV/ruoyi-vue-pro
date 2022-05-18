@@ -23,7 +23,7 @@ public class TipApplicationRunner implements ApplicationRunner {
                             "项目启动成功！\n\t" +
                             "接口文档: \t{} \n\t" +
                             "开发文档: \t{} \n\t" +
-                            "视频教程: \t{} \n" +
+                            "视频教程: \t{} \n\t" +
                             "源码解析: \t{} \n" +
                             "----------------------------------------------------------",
                     "https://mtw.so/6w48hX",
