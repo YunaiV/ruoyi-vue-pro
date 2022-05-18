@@ -6,14 +6,11 @@
       <el-form-item label="规格名称" prop="name">
         <el-input v-model="queryParams.name" placeholder="请输入规格名称" clearable @keyup.enter.native="handleQuery"/>
       </el-form-item>
-      <el-form-item label="状态： 0 开启 ，1 禁用" prop="status">
-        <el-select v-model="queryParams.status" placeholder="请选择状态： 0 开启 ，1 禁用" clearable size="small">
-          <el-option label="请选择字典生成" value="" />
+      <el-form-item label="开启状态" prop="status">
+        <el-select v-model="queryParams.status" placeholder="请选择开启状态" clearable size="small">
+          <el-option v-for="dict in this.getDictDatas(DICT_TYPE.COMMON_STATUS)"
+                     :key="dict.value" :label="dict.label" :value="dict.value"/>
         </el-select>
-      </el-form-item>
-      <el-form-item label="创建时间">
-        <el-date-picker v-model="dateRangeCreateTime" style="width: 240px" value-format="yyyy-MM-dd"
-                        type="daterange" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" />
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" @click="handleQuery">搜索</el-button>
@@ -36,9 +33,12 @@
 
     <!-- 列表 -->
     <el-table v-loading="loading" :data="list">
-      <el-table-column label="主键" align="center" prop="id" />
       <el-table-column label="规格名称" align="center" prop="name" />
-      <el-table-column label="状态： 0 开启 ，1 禁用" align="center" prop="status" />
+      <el-table-column label="开启状态" align="center" prop="status">
+        <template slot-scope="scope">
+          <dict-tag :type="DICT_TYPE.COMMON_STATUS" :value="scope.row.status"/>
+        </template>
+      </el-table-column>
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
@@ -63,11 +63,33 @@
         <el-form-item label="规格名称" prop="name">
           <el-input v-model="form.name" placeholder="请输入规格名称" />
         </el-form-item>
-        <el-form-item label="状态： 0 开启 ，1 禁用" prop="status">
+        <el-form-item label="开启状态" prop="status">
           <el-radio-group v-model="form.status">
-            <el-radio label="1">请选择字典生成</el-radio>
+            <el-radio v-for="dict in this.getDictDatas(DICT_TYPE.COMMON_STATUS)"
+                      :key="dict.value" :label="parseInt(dict.value)">{{ dict.label }}
+            </el-radio>
           </el-radio-group>
         </el-form-item>
+        <el-form-item label="属性值">
+          <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="addPropertyValue()">添加</el-button>
+        </el-form-item>
+        <el-form-item
+            v-for="(domain, index) in form.propertyValues"
+            :key="domain.key"
+            :prop="'propertyValues.' + index + '.value'"
+            :rules="{
+              required: true, message: '域名不能为空', trigger: 'blur'
+            }"
+          >
+            <el-row>
+              <el-col :span="18">
+                <el-input v-model="domain.value"></el-input>
+              </el-col>
+              <el-col :span="6">
+                <el-button @click.prevent="removePropertyValue(domain)">删除</el-button>
+              </el-col>
+            </el-row>
+          </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitForm">确 定</el-button>
@@ -109,7 +131,13 @@ export default {
         status: null,
       },
       // 表单参数
-      form: {},
+      form: {
+        name:'',
+        status:'',
+        propertyValues: [{
+          value: ''
+        }],
+      },
       // 表单校验
       rules: {
       }
@@ -144,6 +172,11 @@ export default {
         name: undefined,
         status: undefined,
       };
+      this.form.propertyValues = [{
+        key:'',
+        value: ''
+      }];
+      console.log("this.form", this.form)
       this.resetForm("form");
     },
     /** 搜索按钮操作 */
@@ -221,6 +254,19 @@ export default {
           this.$download.excel(response, '规格名称.xls');
           this.exportLoading = false;
         }).catch(() => {});
+    },
+    removePropertyValue(item) {
+      var index = this.form.propertyValues.indexOf(item)
+      if (index !== -1) {
+        this.form.propertyValues.splice(index, 1)
+      }
+    },
+    addPropertyValue() {
+      console.log("this.form.propertyValues", this.form.propertyValues)
+      this.form.propertyValues.push({
+        value: '',
+        key: Date.now()
+      });
     }
   }
 };
