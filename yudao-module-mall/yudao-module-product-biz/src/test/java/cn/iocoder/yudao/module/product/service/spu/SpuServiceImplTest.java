@@ -108,34 +108,27 @@ public class SpuServiceImplTest extends BaseDbUnitTest {
     public void testGetSpuPage() {
        // mock 数据
        SpuDO dbSpu = randomPojo(SpuDO.class, o -> { // 等会查询到
-           o.setCreateTime(null);
            o.setName(null);
-           o.setVisible(null);
            o.setSellPoint(null);
            o.setDescription(null);
-           o.setCid(null);
-           o.setListPicUrl(null);
+           o.setCategoryId(null);
            o.setPicUrls(null);
            o.setSort(null);
            o.setLikeCount(null);
            o.setPrice(null);
            o.setQuantity(null);
+           o.setStatus(null);
+           o.setCreateTime(null);
        });
        spuMapper.insert(dbSpu);
-       // 测试 createTime 不匹配
-       spuMapper.insert(cloneIgnoreId(dbSpu, o -> o.setCreateTime(null)));
        // 测试 name 不匹配
        spuMapper.insert(cloneIgnoreId(dbSpu, o -> o.setName(null)));
-       // 测试 visible 不匹配
-       spuMapper.insert(cloneIgnoreId(dbSpu, o -> o.setVisible(null)));
        // 测试 sellPoint 不匹配
        spuMapper.insert(cloneIgnoreId(dbSpu, o -> o.setSellPoint(null)));
        // 测试 description 不匹配
        spuMapper.insert(cloneIgnoreId(dbSpu, o -> o.setDescription(null)));
-       // 测试 cid 不匹配
-       spuMapper.insert(cloneIgnoreId(dbSpu, o -> o.setCid(null)));
-       // 测试 listPicUrl 不匹配
-       spuMapper.insert(cloneIgnoreId(dbSpu, o -> o.setListPicUrl(null)));
+       // 测试 categoryId 不匹配
+       spuMapper.insert(cloneIgnoreId(dbSpu, o -> o.setCategoryId(null)));
        // 测试 picUrls 不匹配
        spuMapper.insert(cloneIgnoreId(dbSpu, o -> o.setPicUrls(null)));
        // 测试 sort 不匹配
@@ -146,21 +139,24 @@ public class SpuServiceImplTest extends BaseDbUnitTest {
        spuMapper.insert(cloneIgnoreId(dbSpu, o -> o.setPrice(null)));
        // 测试 quantity 不匹配
        spuMapper.insert(cloneIgnoreId(dbSpu, o -> o.setQuantity(null)));
+       // 测试 status 不匹配
+       spuMapper.insert(cloneIgnoreId(dbSpu, o -> o.setStatus(null)));
+       // 测试 createTime 不匹配
+       spuMapper.insert(cloneIgnoreId(dbSpu, o -> o.setCreateTime(null)));
        // 准备参数
        SpuPageReqVO reqVO = new SpuPageReqVO();
-       reqVO.setBeginCreateTime(null);
-       reqVO.setEndCreateTime(null);
        reqVO.setName(null);
-       reqVO.setVisible(null);
        reqVO.setSellPoint(null);
        reqVO.setDescription(null);
-       reqVO.setCid(null);
-       reqVO.setListPicUrl(null);
+       reqVO.setCategoryId(null);
        reqVO.setPicUrls(null);
        reqVO.setSort(null);
        reqVO.setLikeCount(null);
        reqVO.setPrice(null);
        reqVO.setQuantity(null);
+       reqVO.setStatus(null);
+       reqVO.setBeginCreateTime(null);
+       reqVO.setEndCreateTime(null);
 
        // 调用
        PageResult<SpuDO> pageResult = spuService.getSpuPage(reqVO);
@@ -175,34 +171,27 @@ public class SpuServiceImplTest extends BaseDbUnitTest {
     public void testGetSpuList() {
        // mock 数据
        SpuDO dbSpu = randomPojo(SpuDO.class, o -> { // 等会查询到
-           o.setCreateTime(null);
            o.setName(null);
-           o.setVisible(null);
            o.setSellPoint(null);
            o.setDescription(null);
-           o.setCid(null);
-           o.setListPicUrl(null);
+           o.setCategoryId(null);
            o.setPicUrls(null);
            o.setSort(null);
            o.setLikeCount(null);
            o.setPrice(null);
            o.setQuantity(null);
+           o.setStatus(null);
+           o.setCreateTime(null);
        });
        spuMapper.insert(dbSpu);
-       // 测试 createTime 不匹配
-       spuMapper.insert(cloneIgnoreId(dbSpu, o -> o.setCreateTime(null)));
        // 测试 name 不匹配
        spuMapper.insert(cloneIgnoreId(dbSpu, o -> o.setName(null)));
-       // 测试 visible 不匹配
-       spuMapper.insert(cloneIgnoreId(dbSpu, o -> o.setVisible(null)));
        // 测试 sellPoint 不匹配
        spuMapper.insert(cloneIgnoreId(dbSpu, o -> o.setSellPoint(null)));
        // 测试 description 不匹配
        spuMapper.insert(cloneIgnoreId(dbSpu, o -> o.setDescription(null)));
-       // 测试 cid 不匹配
-       spuMapper.insert(cloneIgnoreId(dbSpu, o -> o.setCid(null)));
-       // 测试 listPicUrl 不匹配
-       spuMapper.insert(cloneIgnoreId(dbSpu, o -> o.setListPicUrl(null)));
+       // 测试 categoryId 不匹配
+       spuMapper.insert(cloneIgnoreId(dbSpu, o -> o.setCategoryId(null)));
        // 测试 picUrls 不匹配
        spuMapper.insert(cloneIgnoreId(dbSpu, o -> o.setPicUrls(null)));
        // 测试 sort 不匹配
@@ -213,21 +202,24 @@ public class SpuServiceImplTest extends BaseDbUnitTest {
        spuMapper.insert(cloneIgnoreId(dbSpu, o -> o.setPrice(null)));
        // 测试 quantity 不匹配
        spuMapper.insert(cloneIgnoreId(dbSpu, o -> o.setQuantity(null)));
+       // 测试 status 不匹配
+       spuMapper.insert(cloneIgnoreId(dbSpu, o -> o.setStatus(null)));
+       // 测试 createTime 不匹配
+       spuMapper.insert(cloneIgnoreId(dbSpu, o -> o.setCreateTime(null)));
        // 准备参数
        SpuExportReqVO reqVO = new SpuExportReqVO();
-       reqVO.setBeginCreateTime(null);
-       reqVO.setEndCreateTime(null);
        reqVO.setName(null);
-       reqVO.setVisible(null);
        reqVO.setSellPoint(null);
        reqVO.setDescription(null);
-       reqVO.setCid(null);
-       reqVO.setListPicUrl(null);
+       reqVO.setCategoryId(null);
        reqVO.setPicUrls(null);
        reqVO.setSort(null);
        reqVO.setLikeCount(null);
        reqVO.setPrice(null);
        reqVO.setQuantity(null);
+       reqVO.setStatus(null);
+       reqVO.setBeginCreateTime(null);
+       reqVO.setEndCreateTime(null);
 
        // 调用
        List<SpuDO> list = spuService.getSpuList(reqVO);

@@ -99,7 +99,7 @@ public class SkuServiceImplTest extends BaseDbUnitTest {
         // 准备参数
         Integer id = 1;
 
-        // 调用, 并断言异常spu
+        // 调用, 并断言异常
         assertServiceException(() -> skuService.deleteSku(id), SKU_NOT_EXISTS);
     }
 
@@ -108,25 +108,21 @@ public class SkuServiceImplTest extends BaseDbUnitTest {
     public void testGetSkuPage() {
        // mock 数据
        SkuDO dbSku = randomPojo(SkuDO.class, o -> { // 等会查询到
-           o.setCreateTime(null);
            o.setSpuId(null);
-           o.setSkuStatus(null);
-           o.setAttrs(null);
+           o.setProperties(null);
            o.setPrice(null);
            o.setOriginalPrice(null);
            o.setCostPrice(null);
            o.setBarCode(null);
            o.setPicUrl(null);
+           o.setStatus(null);
+           o.setCreateTime(null);
        });
        skuMapper.insert(dbSku);
-       // 测试 createTime 不匹配
-       skuMapper.insert(cloneIgnoreId(dbSku, o -> o.setCreateTime(null)));
        // 测试 spuId 不匹配
        skuMapper.insert(cloneIgnoreId(dbSku, o -> o.setSpuId(null)));
-       // 测试 skuStatus 不匹配
-       skuMapper.insert(cloneIgnoreId(dbSku, o -> o.setSkuStatus(null)));
-       // 测试 attrs 不匹配
-       skuMapper.insert(cloneIgnoreId(dbSku, o -> o.setAttrs(null)));
+       // 测试 properties 不匹配
+       skuMapper.insert(cloneIgnoreId(dbSku, o -> o.setProperties(null)));
        // 测试 price 不匹配
        skuMapper.insert(cloneIgnoreId(dbSku, o -> o.setPrice(null)));
        // 测试 originalPrice 不匹配
@@ -137,18 +133,22 @@ public class SkuServiceImplTest extends BaseDbUnitTest {
        skuMapper.insert(cloneIgnoreId(dbSku, o -> o.setBarCode(null)));
        // 测试 picUrl 不匹配
        skuMapper.insert(cloneIgnoreId(dbSku, o -> o.setPicUrl(null)));
+       // 测试 status 不匹配
+       skuMapper.insert(cloneIgnoreId(dbSku, o -> o.setStatus(null)));
+       // 测试 createTime 不匹配
+       skuMapper.insert(cloneIgnoreId(dbSku, o -> o.setCreateTime(null)));
        // 准备参数
        SkuPageReqVO reqVO = new SkuPageReqVO();
-       reqVO.setBeginCreateTime(null);
-       reqVO.setEndCreateTime(null);
        reqVO.setSpuId(null);
-       reqVO.setSkuStatus(null);
-       reqVO.setAttrs(null);
+       reqVO.setProperties(null);
        reqVO.setPrice(null);
        reqVO.setOriginalPrice(null);
        reqVO.setCostPrice(null);
        reqVO.setBarCode(null);
        reqVO.setPicUrl(null);
+       reqVO.setStatus(null);
+       reqVO.setBeginCreateTime(null);
+       reqVO.setEndCreateTime(null);
 
        // 调用
        PageResult<SkuDO> pageResult = skuService.getSkuPage(reqVO);
@@ -163,25 +163,21 @@ public class SkuServiceImplTest extends BaseDbUnitTest {
     public void testGetSkuList() {
        // mock 数据
        SkuDO dbSku = randomPojo(SkuDO.class, o -> { // 等会查询到
-           o.setCreateTime(null);
            o.setSpuId(null);
-           o.setSkuStatus(null);
-           o.setAttrs(null);
+           o.setProperties(null);
            o.setPrice(null);
            o.setOriginalPrice(null);
            o.setCostPrice(null);
            o.setBarCode(null);
            o.setPicUrl(null);
+           o.setStatus(null);
+           o.setCreateTime(null);
        });
        skuMapper.insert(dbSku);
-       // 测试 createTime 不匹配
-       skuMapper.insert(cloneIgnoreId(dbSku, o -> o.setCreateTime(null)));
        // 测试 spuId 不匹配
        skuMapper.insert(cloneIgnoreId(dbSku, o -> o.setSpuId(null)));
-       // 测试 skuStatus 不匹配
-       skuMapper.insert(cloneIgnoreId(dbSku, o -> o.setSkuStatus(null)));
-       // 测试 attrs 不匹配
-       skuMapper.insert(cloneIgnoreId(dbSku, o -> o.setAttrs(null)));
+       // 测试 properties 不匹配
+       skuMapper.insert(cloneIgnoreId(dbSku, o -> o.setProperties(null)));
        // 测试 price 不匹配
        skuMapper.insert(cloneIgnoreId(dbSku, o -> o.setPrice(null)));
        // 测试 originalPrice 不匹配
@@ -192,18 +188,22 @@ public class SkuServiceImplTest extends BaseDbUnitTest {
        skuMapper.insert(cloneIgnoreId(dbSku, o -> o.setBarCode(null)));
        // 测试 picUrl 不匹配
        skuMapper.insert(cloneIgnoreId(dbSku, o -> o.setPicUrl(null)));
+       // 测试 status 不匹配
+       skuMapper.insert(cloneIgnoreId(dbSku, o -> o.setStatus(null)));
+       // 测试 createTime 不匹配
+       skuMapper.insert(cloneIgnoreId(dbSku, o -> o.setCreateTime(null)));
        // 准备参数
        SkuExportReqVO reqVO = new SkuExportReqVO();
-       reqVO.setBeginCreateTime(null);
-       reqVO.setEndCreateTime(null);
        reqVO.setSpuId(null);
-       reqVO.setSkuStatus(null);
-       reqVO.setAttrs(null);
+       reqVO.setProperties(null);
        reqVO.setPrice(null);
        reqVO.setOriginalPrice(null);
        reqVO.setCostPrice(null);
        reqVO.setBarCode(null);
        reqVO.setPicUrl(null);
+       reqVO.setStatus(null);
+       reqVO.setBeginCreateTime(null);
+       reqVO.setEndCreateTime(null);
 
        // 调用
        List<SkuDO> list = skuService.getSkuList(reqVO);
