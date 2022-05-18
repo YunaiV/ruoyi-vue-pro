@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.product.dal.dataobject.attrkey;
+package cn.iocoder.yudao.module.product.dal.dataobject.property;
 
 import lombok.*;
 import java.util.*;
@@ -10,27 +10,27 @@ import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
  *
  * @author 芋道源码
  */
-@TableName("product_attr_key")
-@KeySequence("product_attr_key_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
+@TableName("product_property")
+@KeySequence("product_property_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AttrKeyDO extends BaseDO {
+public class PropertyDO extends BaseDO {
 
     /**
      * 主键
      */
     @TableId
-    private Integer id;
+    private Long id;
     /**
      * 规格名称
      */
-    private String attrName;
+    private String name;
     /**
-     * 状态： 1 开启 ，2 禁用
+     * 状态： 0 开启 ，1 禁用
      */
     private Integer status;
 
