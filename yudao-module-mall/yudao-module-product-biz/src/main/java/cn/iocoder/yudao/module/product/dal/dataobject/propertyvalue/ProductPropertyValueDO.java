@@ -21,7 +21,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PropertyValueDO extends BaseDO {
+public class ProductPropertyValueDO extends BaseDO {
 
     /**
      * 主键

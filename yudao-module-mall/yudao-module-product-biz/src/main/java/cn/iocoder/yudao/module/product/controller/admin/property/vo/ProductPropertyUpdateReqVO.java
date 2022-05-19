@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.product.controller.admin.property.vo;
 
-import cn.iocoder.yudao.module.product.controller.admin.propertyvalue.vo.PropertyValueCreateReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.propertyvalue.vo.ProductPropertyValueCreateReqVO;
 import lombok.*;
 import io.swagger.annotations.*;
 import javax.validation.constraints.*;
@@ -18,6 +18,6 @@ public class ProductPropertyUpdateReqVO extends ProductPropertyBaseVO {
 
     @ApiModelProperty(value = "属性值")
     @NotNull(message = "属性值不能为空")
-    List<PropertyValueCreateReqVO> propertyValueList;
+    List<ProductPropertyValueCreateReqVO> propertyValueList;
 
 }

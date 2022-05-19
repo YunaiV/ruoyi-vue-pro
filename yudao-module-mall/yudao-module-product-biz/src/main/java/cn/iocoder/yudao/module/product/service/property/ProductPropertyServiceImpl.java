@@ -4,14 +4,14 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.product.controller.admin.property.vo.*;
 import cn.iocoder.yudao.module.product.controller.admin.property.vo.ProductPropertyCreateReqVO;
 import cn.iocoder.yudao.module.product.controller.admin.property.vo.ProductPropertyUpdateReqVO;
-import cn.iocoder.yudao.module.product.controller.admin.propertyvalue.vo.PropertyValueCreateReqVO;
-import cn.iocoder.yudao.module.product.controller.admin.propertyvalue.vo.PropertyValueRespVO;
+import cn.iocoder.yudao.module.product.controller.admin.propertyvalue.vo.ProductPropertyValueCreateReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.propertyvalue.vo.ProductPropertyValueRespVO;
 import cn.iocoder.yudao.module.product.convert.property.ProductPropertyConvert;
-import cn.iocoder.yudao.module.product.convert.propertyvalue.PropertyValueConvert;
+import cn.iocoder.yudao.module.product.convert.propertyvalue.ProductPropertyValueConvert;
 import cn.iocoder.yudao.module.product.dal.dataobject.property.ProductPropertyDO;
-import cn.iocoder.yudao.module.product.dal.dataobject.propertyvalue.PropertyValueDO;
+import cn.iocoder.yudao.module.product.dal.dataobject.propertyvalue.ProductPropertyValueDO;
 import cn.iocoder.yudao.module.product.dal.mysql.property.ProductPropertyMapper;
-import cn.iocoder.yudao.module.product.service.propertyvalue.PropertyValueService;
+import cn.iocoder.yudao.module.product.service.propertyvalue.ProductPropertyValueService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -38,7 +38,7 @@ public class ProductPropertyServiceImpl implements ProductPropertyService {
     private ProductPropertyMapper productPropertyMapper;
 
     @Resource
-    private PropertyValueService propertyValueService;
+    private ProductPropertyValueService productPropertyValueService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -48,10 +48,10 @@ public class ProductPropertyServiceImpl implements ProductPropertyService {
         productPropertyMapper.insert(property);
 
         //插入属性值
-        List<PropertyValueCreateReqVO> propertyValueList = createReqVO.getPropertyValueList();
-        List<PropertyValueDO> propertyValueDOList = PropertyValueConvert.INSTANCE.convertList03(propertyValueList);
-        propertyValueDOList.stream().forEach(x-> x.setPropertyId(property.getId()));
-        propertyValueService.batchInsert(propertyValueDOList);
+        List<ProductPropertyValueCreateReqVO> propertyValueList = createReqVO.getPropertyValueList();
+        List<ProductPropertyValueDO> productPropertyValueDOList = ProductPropertyValueConvert.INSTANCE.convertList03(propertyValueList);
+        productPropertyValueDOList.stream().forEach(x-> x.setPropertyId(property.getId()));
+        productPropertyValueService.batchInsert(productPropertyValueDOList);
         // 返回
         return property.getId();
     }
@@ -65,11 +65,11 @@ public class ProductPropertyServiceImpl implements ProductPropertyService {
         ProductPropertyDO updateObj = ProductPropertyConvert.INSTANCE.convert(updateReqVO);
         productPropertyMapper.updateById(updateObj);
         //更新属性值，先删后加
-        propertyValueService.deletePropertyValueByPropertyId(updateReqVO.getId());
-        List<PropertyValueCreateReqVO> propertyValueList = updateReqVO.getPropertyValueList();
-        List<PropertyValueDO> propertyValueDOList = PropertyValueConvert.INSTANCE.convertList03(propertyValueList);
-        propertyValueDOList.stream().forEach(x-> x.setPropertyId(updateReqVO.getId()));
-        propertyValueService.batchInsert(propertyValueDOList);
+        productPropertyValueService.deletePropertyValueByPropertyId(updateReqVO.getId());
+        List<ProductPropertyValueCreateReqVO> propertyValueList = updateReqVO.getPropertyValueList();
+        List<ProductPropertyValueDO> productPropertyValueDOList = ProductPropertyValueConvert.INSTANCE.convertList03(propertyValueList);
+        productPropertyValueDOList.stream().forEach(x-> x.setPropertyId(updateReqVO.getId()));
+        productPropertyValueService.batchInsert(productPropertyValueDOList);
     }
 
     @Override
@@ -79,7 +79,7 @@ public class ProductPropertyServiceImpl implements ProductPropertyService {
         // 删除
         productPropertyMapper.deleteById(id);
         //同步删除属性值
-        propertyValueService.deletePropertyValueByPropertyId(id);
+        productPropertyValueService.deletePropertyValueByPropertyId(id);
     }
 
     private void validatePropertyExists(Long id) {
@@ -116,12 +116,12 @@ public class ProductPropertyServiceImpl implements ProductPropertyService {
         List<Long> propertyIds = propertyRespVOPageResult.getList().stream().map(x -> x.getId()).collect(Collectors.toList());
 
         //获取属性值列表
-        List<PropertyValueDO> propertyValueDOList = propertyValueService.getPropertyValueListByPropertyId(propertyIds);
-        List<PropertyValueRespVO> propertyValueRespVOList = PropertyValueConvert.INSTANCE.convertList(propertyValueDOList);
+        List<ProductPropertyValueDO> productPropertyValueDOList = productPropertyValueService.getPropertyValueListByPropertyId(propertyIds);
+        List<ProductPropertyValueRespVO> propertyValueRespVOList = ProductPropertyValueConvert.INSTANCE.convertList(productPropertyValueDOList);
         //组装一对多
         propertyRespVOPageResult.getList().stream().forEach(x->{
             Long propertyId = x.getId();
-            List<PropertyValueRespVO> valueDOList = propertyValueRespVOList.stream().filter(v -> v.getPropertyId().equals(propertyId)).collect(Collectors.toList());
+            List<ProductPropertyValueRespVO> valueDOList = propertyValueRespVOList.stream().filter(v -> v.getPropertyId().equals(propertyId)).collect(Collectors.toList());
             x.setPropertyValueList(valueDOList);
         });
         return propertyRespVOPageResult;
@@ -133,8 +133,8 @@ public class ProductPropertyServiceImpl implements ProductPropertyService {
         ProductPropertyDO property = getProperty(id);
         ProductPropertyRespVO propertyRespVO = ProductPropertyConvert.INSTANCE.convert(property);
         //查询属性值
-        List<PropertyValueDO> valueDOList = propertyValueService.getPropertyValueListByPropertyId(Arrays.asList(id));
-        List<PropertyValueRespVO> propertyValueRespVOS = PropertyValueConvert.INSTANCE.convertList(valueDOList);
+        List<ProductPropertyValueDO> valueDOList = productPropertyValueService.getPropertyValueListByPropertyId(Arrays.asList(id));
+        List<ProductPropertyValueRespVO> propertyValueRespVOS = ProductPropertyValueConvert.INSTANCE.convertList(valueDOList);
         //组装
         propertyRespVO.setPropertyValueList(propertyValueRespVOS);
         return propertyRespVO;

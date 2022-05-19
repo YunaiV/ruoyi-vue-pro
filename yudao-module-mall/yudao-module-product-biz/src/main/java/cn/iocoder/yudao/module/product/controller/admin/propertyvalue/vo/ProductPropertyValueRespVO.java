@@ -8,7 +8,7 @@ import io.swagger.annotations.*;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class PropertyValueRespVO extends PropertyValueBaseVO {
+public class ProductPropertyValueRespVO extends ProductPropertyValueBaseVO {
 
     @ApiModelProperty(value = "主键", required = true)
     private Integer id;

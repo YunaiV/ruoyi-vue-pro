@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.product.controller.admin.property.vo;
 
-import cn.iocoder.yudao.module.product.controller.admin.propertyvalue.vo.PropertyValueRespVO;
+import cn.iocoder.yudao.module.product.controller.admin.propertyvalue.vo.ProductPropertyValueRespVO;
 import lombok.*;
 import java.util.*;
 import io.swagger.annotations.*;
@@ -18,6 +18,6 @@ public class ProductPropertyRespVO extends ProductPropertyBaseVO {
     private Date createTime;
 
     @ApiModelProperty(value = "属性值")
-    private List<PropertyValueRespVO> propertyValueList;
+    private List<ProductPropertyValueRespVO> propertyValueList;
 
 }
