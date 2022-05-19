@@ -12,7 +12,7 @@ import com.alibaba.excel.annotation.ExcelProperty;
  * @author 芋道源码
  */
 @Data
-public class PropertyExcelVO {
+public class ProductPropertyExcelVO {
 
     @ExcelProperty("主键")
     private Long id;

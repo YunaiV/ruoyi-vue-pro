@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.product.controller.admin.property.vo;
 
+import cn.iocoder.yudao.module.product.controller.admin.propertyvalue.vo.PropertyValueRespVO;
 import lombok.*;
 import java.util.*;
 import io.swagger.annotations.*;
@@ -8,12 +9,14 @@ import io.swagger.annotations.*;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class PropertyRespVO extends PropertyBaseVO {
+public class ProductPropertyRespVO extends ProductPropertyBaseVO {
 
     @ApiModelProperty(value = "主键", required = true)
     private Long id;
 
     @ApiModelProperty(value = "创建时间")
     private Date createTime;
+
+    private List<PropertyValueRespVO> propertyValueRespVOList;
 
 }

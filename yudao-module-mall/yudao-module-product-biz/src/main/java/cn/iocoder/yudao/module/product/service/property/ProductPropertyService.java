@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.product.service.property;
 import java.util.*;
 import javax.validation.*;
 import cn.iocoder.yudao.module.product.controller.admin.property.vo.*;
-import cn.iocoder.yudao.module.product.dal.dataobject.property.PropertyDO;
+import cn.iocoder.yudao.module.product.dal.dataobject.property.ProductPropertyDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 
 /**
@@ -11,7 +11,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
  *
  * @author 芋道源码
  */
-public interface PropertyService {
+public interface ProductPropertyService {
 
     /**
      * 创建规格名称
@@ -19,14 +19,14 @@ public interface PropertyService {
      * @param createReqVO 创建信息
      * @return 编号
      */
-    Long createProperty(@Valid PropertyCreateReqVO createReqVO);
+    Long createProperty(@Valid ProductPropertyCreateReqVO createReqVO);
 
     /**
      * 更新规格名称
      *
      * @param updateReqVO 更新信息
      */
-    void updateProperty(@Valid PropertyUpdateReqVO updateReqVO);
+    void updateProperty(@Valid ProductPropertyUpdateReqVO updateReqVO);
 
     /**
      * 删除规格名称
@@ -41,7 +41,7 @@ public interface PropertyService {
      * @param id 编号
      * @return 规格名称
      */
-    PropertyDO getProperty(Long id);
+    ProductPropertyDO getProperty(Long id);
 
     /**
      * 获得规格名称列表
@@ -49,7 +49,7 @@ public interface PropertyService {
      * @param ids 编号
      * @return 规格名称列表
      */
-    List<PropertyDO> getPropertyList(Collection<Long> ids);
+    List<ProductPropertyDO> getPropertyList(Collection<Long> ids);
 
     /**
      * 获得规格名称分页
@@ -57,7 +57,7 @@ public interface PropertyService {
      * @param pageReqVO 分页查询
      * @return 规格名称分页
      */
-    PageResult<PropertyDO> getPropertyPage(PropertyPageReqVO pageReqVO);
+    PageResult<ProductPropertyDO> getPropertyPage(ProductPropertyPageReqVO pageReqVO);
 
     /**
      * 获得规格名称列表, 用于 Excel 导出
@@ -65,6 +65,6 @@ public interface PropertyService {
      * @param exportReqVO 查询条件
      * @return 规格名称列表
      */
-    List<PropertyDO> getPropertyList(PropertyExportReqVO exportReqVO);
+    List<ProductPropertyDO> getPropertyList(ProductPropertyExportReqVO exportReqVO);
 
 }
