@@ -63,8 +63,7 @@ public class ProductPropertyController {
     @ApiImplicitParam(name = "id", value = "编号", required = true, example = "1024", dataTypeClass = Long.class)
     @PreAuthorize("@ss.hasPermission('product:property:query')")
     public CommonResult<ProductPropertyRespVO> getProperty(@RequestParam("id") Long id) {
-        ProductPropertyDO property = productPropertyService.getProperty(id);
-        return success(ProductPropertyConvert.INSTANCE.convert(property));
+        return success(productPropertyService.getPropertyResp(id));
     }
 
     @GetMapping("/list")
@@ -80,8 +79,7 @@ public class ProductPropertyController {
     @ApiOperation("获得规格名称分页")
     @PreAuthorize("@ss.hasPermission('product:property:query')")
     public CommonResult<PageResult<ProductPropertyRespVO>> getPropertyPage(@Valid ProductPropertyPageReqVO pageVO) {
-        PageResult<ProductPropertyDO> pageResult = productPropertyService.getPropertyPage(pageVO);
-        return success(ProductPropertyConvert.INSTANCE.convertPage(pageResult));
+        return success(productPropertyService.getPropertyListPage(pageVO));
     }
 
     @GetMapping("/export-excel")

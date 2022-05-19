@@ -31,4 +31,6 @@ public interface PropertyValueConvert {
 
     List<PropertyValueExcelVO> convertList02(List<PropertyValueDO> list);
 
+    List<PropertyValueDO> convertList03(List<PropertyValueCreateReqVO> list);
+
 }

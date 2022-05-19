@@ -67,4 +67,13 @@ public interface ProductPropertyService {
      */
     List<ProductPropertyDO> getPropertyList(ProductPropertyExportReqVO exportReqVO);
 
+    /**
+     * 获取属性及属性值列表 分页
+     * @param pageReqVO
+     * @return
+     */
+    PageResult<ProductPropertyRespVO> getPropertyListPage(ProductPropertyPageReqVO pageReqVO);
+
+    ProductPropertyRespVO getPropertyResp(Long id);
+
 }

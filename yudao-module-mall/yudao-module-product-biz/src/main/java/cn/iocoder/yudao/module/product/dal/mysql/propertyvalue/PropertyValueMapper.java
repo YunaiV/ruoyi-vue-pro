@@ -35,4 +35,14 @@ public interface PropertyValueMapper extends BaseMapperX<PropertyValueDO> {
                 .orderByDesc(PropertyValueDO::getId));
     }
 
+    default List<PropertyValueDO> getPropertyValueListByPropertyId(List<Long> propertyIds){
+        return selectList(new LambdaQueryWrapperX<PropertyValueDO>()
+                .inIfPresent(PropertyValueDO::getPropertyId, propertyIds));
+    }
+
+    default void deletePropertyValueByPropertyId(Long propertyId){
+        LambdaQueryWrapperX<PropertyValueDO> queryWrapperX = new LambdaQueryWrapperX<>();
+        queryWrapperX.eq(PropertyValueDO::getPropertyId, propertyId).eq(PropertyValueDO::getDeleted, false);
+        delete(queryWrapperX);
+    }
 }

@@ -67,4 +67,22 @@ public interface PropertyValueService {
      */
     List<PropertyValueDO> getPropertyValueList(PropertyValueExportReqVO exportReqVO);
 
+    /**
+     * 批量插入属性值
+     * @param propertyValues
+     */
+    void batchInsert(List<PropertyValueDO> propertyValues);
+
+    /**
+     * 根据属性id查询
+     * @param propertyIds
+     * @return
+     */
+    List<PropertyValueDO> getPropertyValueListByPropertyId(List<Long> propertyIds);
+
+    /**
+     * 根据属性id 删除
+     * @param propertyId
+     */
+    void deletePropertyValueByPropertyId(Long propertyId);
 }

@@ -17,6 +17,7 @@ public class ProductPropertyRespVO extends ProductPropertyBaseVO {
     @ApiModelProperty(value = "创建时间")
     private Date createTime;
 
-    private List<PropertyValueRespVO> propertyValueRespVOList;
+    @ApiModelProperty(value = "属性值")
+    private List<PropertyValueRespVO> propertyValueList;
 
 }

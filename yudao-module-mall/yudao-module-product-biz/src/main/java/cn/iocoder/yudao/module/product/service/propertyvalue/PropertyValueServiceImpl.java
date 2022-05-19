@@ -1,10 +1,7 @@
 package cn.iocoder.yudao.module.product.service.propertyvalue;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.product.controller.admin.propertyvalue.vo.PropertyValueCreateReqVO;
-import cn.iocoder.yudao.module.product.controller.admin.propertyvalue.vo.PropertyValueExportReqVO;
-import cn.iocoder.yudao.module.product.controller.admin.propertyvalue.vo.PropertyValuePageReqVO;
-import cn.iocoder.yudao.module.product.controller.admin.propertyvalue.vo.PropertyValueUpdateReqVO;
+import cn.iocoder.yudao.module.product.controller.admin.propertyvalue.vo.*;
 import cn.iocoder.yudao.module.product.convert.propertyvalue.PropertyValueConvert;
 import cn.iocoder.yudao.module.product.dal.dataobject.propertyvalue.PropertyValueDO;
 import cn.iocoder.yudao.module.product.dal.mysql.propertyvalue.PropertyValueMapper;
@@ -82,6 +79,21 @@ public class PropertyValueServiceImpl implements PropertyValueService {
     @Override
     public List<PropertyValueDO> getPropertyValueList(PropertyValueExportReqVO exportReqVO) {
         return propertyValueMapper.selectList(exportReqVO);
+    }
+
+    @Override
+    public void batchInsert(List<PropertyValueDO> propertyValues) {
+        propertyValueMapper.insertBatch(propertyValues);
+    }
+
+    @Override
+    public List<PropertyValueDO> getPropertyValueListByPropertyId(List<Long> propertyIds) {
+        return propertyValueMapper.getPropertyValueListByPropertyId(propertyIds);
+    }
+
+    @Override
+    public void deletePropertyValueByPropertyId(Long propertyId) {
+        propertyValueMapper.deletePropertyValueByPropertyId(propertyId);
     }
 
 }
