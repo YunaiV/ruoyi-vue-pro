@@ -29,29 +29,36 @@ public class EncryptTypeHandler extends BaseTypeHandler<String> {
     @Override
     public String getNullableResult(ResultSet rs, String columnName) throws SQLException {
         String value = rs.getString(columnName);
-        return getResult(value);
+        return decrypt(value);
     }
 
     @Override
     public String getNullableResult(ResultSet rs, int columnIndex) throws SQLException {
         String value = rs.getString(columnIndex);
-        return getResult(value);
+        return decrypt(value);
     }
 
     @Override
     public String getNullableResult(CallableStatement cs, int columnIndex) throws SQLException {
         String value = cs.getString(columnIndex);
-        return getResult(value);
+        return decrypt(value);
     }
 
-    private String getResult(String value) {
+    private static String decrypt(String value) {
         if (value == null) {
             return null;
         }
         return getEncryptor().decrypt(value);
     }
 
-    private StringEncryptor getEncryptor() {
+    public static String encrypt(String rawValue) {
+        if (rawValue == null) {
+            return null;
+        }
+        return getEncryptor().encrypt(rawValue);
+    }
+
+    private static StringEncryptor getEncryptor() {
         if (encryptor != null) {
             return encryptor;
         }

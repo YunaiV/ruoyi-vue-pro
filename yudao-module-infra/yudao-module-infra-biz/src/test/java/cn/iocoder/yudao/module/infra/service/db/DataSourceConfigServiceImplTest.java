@@ -132,4 +132,16 @@ public class DataSourceConfigServiceImplTest extends BaseDbUnitTest {
         assertServiceException(() -> dataSourceConfigService.deleteDataSourceConfig(id), DATA_SOURCE_CONFIG_NOT_EXISTS);
     }
 
+    @Test // 测试使用 password 查询，可以查询到数据
+    public void testSelectPassword() {
+        // mock 数据
+        DataSourceConfigDO dbDataSourceConfig = randomPojo(DataSourceConfigDO.class);
+        dataSourceConfigMapper.insert(dbDataSourceConfig);// @Sql: 先插入出一条存在的数据
+
+        // 调用
+        DataSourceConfigDO result = dataSourceConfigMapper.selectOne(DataSourceConfigDO::getPassword,
+                EncryptTypeHandler.encrypt(dbDataSourceConfig.getPassword()));
+        System.out.println(result);
+    }
+
 }
