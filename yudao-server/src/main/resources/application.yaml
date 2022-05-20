@@ -61,7 +61,6 @@ mybatis-plus:
       logic-delete-value: 1 # 逻辑已删除值(默认为 1)
       logic-not-delete-value: 0 # 逻辑未删除值(默认为 0)
   type-aliases-package: ${yudao.info.base-package}.module.*.dal.dataobject
-  type-handlers-package: ${yudao.info.base-package}.framework.mybatis.core.type
 
 --- #################### 芋道相关配置 ####################
 
