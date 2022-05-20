@@ -74,7 +74,7 @@
       <!--      <el-table-column label="商户名称" align="center" prop="merchantName" width="120"/>-->
       <!--      <el-table-column label="应用名称" align="center" prop="appName" width="120"/>-->
       <el-table-column label="支付渠道" align="center" width="130">
-        <template v-slot="scope">
+        <template slot-scope="scope">
           <el-popover trigger="hover" placement="top">
             <p>商户名称: {{ scope.row.merchantName }}</p>
             <p>应用名称: {{ scope.row.appName }}</p>
@@ -88,7 +88,7 @@
       <!--      <el-table-column label="交易订单号" align="center" prop="tradeNo" width="140"/>-->
       <!--      <el-table-column label="商户订单编号" align="center" prop="merchantOrderId" width="140"/>-->
       <el-table-column label="商户订单号" align="left" width="230">
-        <template v-slot="scope">
+        <template slot-scope="scope">
           <p class="order-font">
             <el-tag size="mini">退款</el-tag>
             {{ scope.row.merchantRefundNo }}
@@ -100,7 +100,7 @@
         </template>
       </el-table-column>
       <el-table-column label="支付订单号" align="center" prop="merchantRefundNo" width="250">
-        <template v-slot="scope">
+        <template slot-scope="scope">
           <p class="order-font">
             <el-tag size="mini">交易</el-tag>
             {{ scope.row.tradeNo }}
@@ -112,7 +112,7 @@
         </template>
       </el-table-column>
       <el-table-column label="支付金额(元)" align="center" prop="payAmount" width="100">
-        <template v-slot="scope" class="">
+        <template slot-scope="scope" class="">
           ￥{{ parseFloat(scope.row.payAmount / 100).toFixed(2) }}
         </template>
       </el-table-column>
@@ -122,17 +122,17 @@
         </template>
       </el-table-column>
       <el-table-column label="退款类型" align="center" prop="type" width="80">
-        <template v-slot="scope">
+        <template slot-scope="scope">
           <dict-tag :type="DICT_TYPE.PAY_REFUND_ORDER_TYPE" :value="scope.row.type" />
         </template>
       </el-table-column>
       <el-table-column label="退款状态" align="center" prop="status">
-        <template v-slot="scope">
+        <template slot-scope="scope">
           <dict-tag :type="DICT_TYPE.PAY_REFUND_ORDER_STATUS" :value="scope.row.status" />
         </template>
       </el-table-column>
       <el-table-column label="回调状态" align="center" prop="notifyStatus">
-        <template v-slot="scope">
+        <template slot-scope="scope">
           <dict-tag :type="DICT_TYPE.PAY_ORDER_NOTIFY_STATUS" :value="scope.row.notifyStatus" />
         </template>
       </el-table-column>
@@ -183,7 +183,7 @@
           <el-tag class="tag-purple" size="mini">{{ parseFloat(refundDetail.refundAmount / 100).toFixed(2) }}</el-tag>
         </el-descriptions-item>
         <el-descriptions-item label="退款类型">
-          <template v-slot="scope">
+          <template slot-scope="scope">
             <dict-tag :type="DICT_TYPE.PAY_REFUND_ORDER_TYPE" :value="refundDetail.type" />
           </template>
         </el-descriptions-item>

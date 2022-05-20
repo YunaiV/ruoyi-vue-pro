@@ -12,7 +12,7 @@
         </el-table-column>
         <el-table-column label="规则范围" align="center" prop="options" width="440px">
           <template slot-scope="scope">
-            <el-tag size="medium" v-if="scope.row.options" v-for="option in scope.row.options">
+            <el-tag size="medium" v-if="scope.row.options" :key="option" v-for="option in scope.row.options">
               {{ getAssignRuleOptionName(scope.row.type, option) }}
             </el-tag>
           </template>
