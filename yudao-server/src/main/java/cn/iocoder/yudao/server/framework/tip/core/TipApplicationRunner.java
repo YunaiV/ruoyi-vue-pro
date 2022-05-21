@@ -26,7 +26,7 @@ public class TipApplicationRunner implements ApplicationRunner {
                             "视频教程: \t{} \n\t" +
                             "源码解析: \t{} \n" +
                             "----------------------------------------------------------",
-                    "https://mtw.so/6w48hX",
+                    "https://doc.iocoder.cn/api-doc/",
                     "https://doc.iocoder.cn",
                     "https://t.zsxq.com/02Yf6M7Qn",
                     "https://t.zsxq.com/02B6ujIee");
