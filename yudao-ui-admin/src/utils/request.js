@@ -1,9 +1,8 @@
 import axios from 'axios'
 import {Message, MessageBox, Notification} from 'element-ui'
 import store from '@/store'
-import {getAccessToken, getRefreshToken, setToken} from '@/utils/auth'
+import {getAccessToken, getRefreshToken, getTenantId, setToken} from '@/utils/auth'
 import errorCode from '@/utils/errorCode'
-import Cookies from "js-cookie";
 import {getPath, getTenantEnable} from "@/utils/ruoyi";
 import {refreshToken} from "@/api/login";
 
@@ -21,14 +20,15 @@ let requestList = []
 // 是否正在刷新中
 let isRefreshToken = false
 
-
 axios.defaults.headers['Content-Type'] = 'application/json;charset=utf-8'
 // 创建axios实例
 const service = axios.create({
   // axios中请求配置有baseURL选项，表示请求URL公共部分
   baseURL: process.env.VUE_APP_BASE_API + '/admin-api/', // 此处的 /admin-api/ 地址，原因是后端的基础路径为 /admin-api/
   // 超时
-  timeout: 30000
+  timeout: 30000,
+  // 禁用 Cookie 等信息
+  withCredentials: false,
 })
 // request拦截器
 service.interceptors.request.use(config => {
@@ -39,7 +39,7 @@ service.interceptors.request.use(config => {
   }
   // 设置租户
   if (getTenantEnable()) {
-    const tenantId = Cookies.get('tenantId');
+    const tenantId = getTenantId();
     if (tenantId) {
       config.headers['tenant-id'] = tenantId;
     }
@@ -79,7 +79,6 @@ service.interceptors.response.use(async res => {
   // 获取错误信息
   const msg = res.data.msg || errorCode[code] || errorCode['default']
   if (ignoreMsgs.indexOf(msg) !== -1) { // 如果是忽略的错误码，直接返回 msg 异常
-    console.log('132312311');
     return Promise.reject(msg)
   } else if (code === 401) {
     // 如果未认证，并且未进行刷新令牌，说明可能是访问令牌过期了
@@ -166,7 +165,7 @@ service.interceptors.response.use(async res => {
 export function getBaseHeader() {
   return {
     'Authorization': "Bearer " + getAccessToken(),
-    'tenant-id': Cookies.get('tenantId'),
+    'tenant-id': getTenantId(),
   }
 }
 

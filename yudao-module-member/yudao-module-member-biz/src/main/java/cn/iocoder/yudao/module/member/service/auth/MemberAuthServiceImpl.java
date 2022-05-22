@@ -100,7 +100,7 @@ public class MemberAuthServiceImpl implements MemberAuthService {
         }
 
         // 创建 Token 令牌，记录登录日志
-        return createTokenAfterLoginSuccess(user, null, LoginLogTypeEnum.LOGIN_SOCIAL);
+        return createTokenAfterLoginSuccess(user, user.getMobile(), LoginLogTypeEnum.LOGIN_SOCIAL);
     }
 
     @Override
