@@ -304,7 +304,7 @@ export default {
         // 设置上传的请求头部
         headers: getBaseHeader(),
         // 上传的地址
-        url: process.env.VUE_APP_BASE_API + '/admin-api/' + "/system/user/import"
+        url: process.env.VUE_APP_BASE_API + '/admin-api/system/user/import'
       },
       // 查询参数
       queryParams: {
