@@ -429,7 +429,7 @@ export default {
       this.$modal.confirm('是否删除该流程！！').then(function() {
         deleteModel(row.id).then(response => {
           that.getList();
-          that.msgSuccess("删除成功");
+          that.$modal.msgSuccess("删除成功");
         })
       }).catch(() => {});
     },
@@ -439,7 +439,7 @@ export default {
       this.$modal.confirm('是否部署该流程！！').then(function() {
         deployModel(row.id).then(response => {
           that.getList();
-          that.msgSuccess("部署成功");
+          that.$modal.msgSuccess("部署成功");
         })
       }).catch(() => {});
     },

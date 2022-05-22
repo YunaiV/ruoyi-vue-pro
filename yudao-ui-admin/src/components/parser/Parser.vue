@@ -1,6 +1,7 @@
 <script>
 import { deepClone } from '@/utils/index'
 import render from '@/components/render/render.js'
+import {getAccessToken} from "@/utils/auth";
 
 const ruleTrigger = {
   'el-input': 'blur',
@@ -79,9 +80,50 @@ function formBtns(h) {
 }
 
 function renderFormItem(h, elementList) {
+  const that = this
+  const data = this[this.formConf.formModel]
+  // const formRef = that.$refs[that.formConf.formRef] // 这里直接添加有问题，此时还找不到表单 $refs
   return elementList.map(scheme => {
     const config = scheme.__config__
     const layout = layouts[config.layout]
+
+    // edit by 芋道源码，解决 el-upload 上传的问题
+    // 参考 https://github.com/JakHuang/form-generator/blob/master/src/components/parser/example/Index.vue 实现
+    const vModel = scheme.__vModel__
+    const val = data[vModel]
+    if (scheme.__config__.tag === 'el-upload') {
+      // 回显图片
+      scheme['file-list'] = (val || []).map(url => ({ name: url, url }))
+      // 上传地址 + 请求头
+      scheme.action = process.env.VUE_APP_BASE_API + "/admin-api/infra/file/upload"
+      scheme.headers = { Authorization: "Bearer " + getAccessToken() }
+      // 注意 on-success 不能绑定箭头函数！！！
+      scheme['on-success'] = function (response, file, fileList) {
+        if (response.code !== 0) {
+          return;
+        }
+        // 添加到 data 中
+        const prev = data[vModel] || []
+        this.$set(data, vModel, [
+          ...prev,
+          response.data
+        ])
+        // 发起表单校验
+        that.$refs[that.formConf.formRef].validateField(vModel)
+      }
+      // 注意 on-remove 不能绑定箭头函数！！！
+      scheme['on-remove'] = function (file, fileList) {
+        // 移除从 data 中
+        const prev = data[vModel] || []
+        const index = prev.indexOf(file.response.data)
+        if (index === -1) {
+          return
+        }
+        prev.splice(index, 1) // 直接移除即可，无需重复 set，因为 array 是引用
+        // 发起表单校验
+        that.$refs[that.formConf.formRef].validateField(vModel)
+      }
+    }
 
     if (layout) {
       return layout.call(this, h, scheme)
