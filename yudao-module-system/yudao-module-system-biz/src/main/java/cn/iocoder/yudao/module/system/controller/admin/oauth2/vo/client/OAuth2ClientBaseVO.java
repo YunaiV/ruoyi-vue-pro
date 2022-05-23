@@ -18,39 +18,39 @@ import java.util.List;
 @Data
 public class OAuth2ClientBaseVO {
 
-    @ApiModelProperty(value = "客户端编号", required = true)
+    @ApiModelProperty(value = "客户端编号", required = true, example = "tudou")
     @NotNull(message = "客户端编号不能为空")
     private String clientId;
 
-    @ApiModelProperty(value = "客户端密钥", required = true)
+    @ApiModelProperty(value = "客户端密钥", required = true, example = "fan")
     @NotNull(message = "客户端密钥不能为空")
     private String secret;
 
-    @ApiModelProperty(value = "应用名", required = true)
+    @ApiModelProperty(value = "应用名", required = true, example = "土豆")
     @NotNull(message = "应用名不能为空")
     private String name;
 
-    @ApiModelProperty(value = "应用图标", required = true)
+    @ApiModelProperty(value = "应用图标", required = true, example = "https://www.iocoder.cn/xx.png")
     @NotNull(message = "应用图标不能为空")
     @URL(message = "应用图标的地址不正确")
     private String logo;
 
-    @ApiModelProperty(value = "应用描述")
+    @ApiModelProperty(value = "应用描述", example = "我是一个应用")
     private String description;
 
-    @ApiModelProperty(value = "状态", required = true)
+    @ApiModelProperty(value = "状态", required = true, example = "1", notes = "参见 CommonStatusEnum 枚举")
     @NotNull(message = "状态不能为空")
     private Integer status;
 
-    @ApiModelProperty(value = "访问令牌的有效期", required = true)
+    @ApiModelProperty(value = "访问令牌的有效期", required = true, example = "8640")
     @NotNull(message = "访问令牌的有效期不能为空")
     private Integer accessTokenValiditySeconds;
 
-    @ApiModelProperty(value = "刷新令牌的有效期", required = true)
+    @ApiModelProperty(value = "刷新令牌的有效期", required = true, example = "8640000")
     @NotNull(message = "刷新令牌的有效期不能为空")
     private Integer refreshTokenValiditySeconds;
 
-    @ApiModelProperty(value = "可重定向的 URI 地址", required = true)
+    @ApiModelProperty(value = "可重定向的 URI 地址", required = true, example = "https://www.iocoder.cn")
     @NotNull(message = "可重定向的 URI 地址不能为空")
     private List<@NotEmpty(message = "重定向的 URI 不能为空")
         @URL(message = "重定向的 URI 格式不正确") String> redirectUris;

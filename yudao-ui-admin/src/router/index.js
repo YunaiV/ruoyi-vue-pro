@@ -43,8 +43,8 @@ export const constantRoutes = [
     hidden: true
   },
   {
-    path: '/authorize',
-    component: (resolve) => require(['@/views/authorize'], resolve),
+    path: '/sso',
+    component: (resolve) => require(['@/views/sso'], resolve),
     hidden: true
   },
   {

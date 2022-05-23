@@ -14,7 +14,7 @@
 
         <!-- 表单 -->
         <div class="form-cont">
-          <el-tabs class="form" style=" float:none;">
+          <el-tabs class="form" style=" float:none;" value="uname">
             <el-tab-pane label="三方授权" name="uname">
             </el-tab-pane>
           </el-tabs>
@@ -53,7 +53,7 @@
                   <span v-if="!loading">同意授权</span>
                   <span v-else>登 录 中...</span>
                 </el-button>
-                <el-button size="medium" style="width:37%">拒绝</el-button>
+                <el-button size="medium" style="width:36%">拒绝</el-button>
               </el-form-item>
             </el-form>
           </div>
@@ -69,10 +69,9 @@
 
 <script>
 import {getTenantIdByName} from "@/api/system/tenant";
-import Cookies from "js-cookie";
-import {SystemUserSocialTypeEnum} from "@/utils/constants";
 import {getTenantEnable} from "@/utils/ruoyi";
-import {authorize} from "@/api/login";
+import {authorize, getAuthorize} from "@/api/login";
+import {getTenantName, setTenantId} from "@/utils/auth";
 
 export default {
   name: "Login",
@@ -82,6 +81,18 @@ export default {
       loginForm: {
         tenantName: "芋道源码",
       },
+      params: { // URL 上的 client_id、scope 等参数
+        responseType: undefined,
+        clientId: undefined,
+        redirectUri: undefined,
+        state: undefined,
+        scopes: [], // 优先从 query 参数获取；如果未传递，从后端获取
+      },
+      client: { // 客户端信息
+        name: '',
+        logo: '',
+      },
+      checkedScopes: [], // 已选中的 scope 数组
       LoginRules: {
         tenantName: [
           {required: true, trigger: "blur", message: "租户不能为空"},
@@ -92,7 +103,7 @@ export default {
                 const tenantId = res.data;
                 if (tenantId && tenantId >= 0) {
                   // 设置租户
-                  Cookies.set("tenantId", tenantId);
+                  setTenantId(tenantId)
                   callback();
                 } else {
                   callback('租户不存在');
@@ -104,44 +115,84 @@ export default {
         ]
       },
       loading: false,
-      redirect: undefined,
-      // 枚举
-      SysUserSocialTypeEnum: SystemUserSocialTypeEnum,
+      //
     };
   },
   created() {
     // 租户开关
     this.tenantEnable = getTenantEnable();
-    // 重定向地址
-    this.redirect = this.$route.query.redirect;
     this.getCookie();
+
+    // 解析参数
+    // 例如说【自动授权不通过】：client_id=default&redirect_uri=https%3A%2F%2Fwww.iocoder.cn&response_type=code&scope=user.read%20user.write
+    // 例如说【自动授权通过】：client_id=default&redirect_uri=https%3A%2F%2Fwww.iocoder.cn&response_type=code&scope=user.read
+    this.params.responseType = this.$route.query.response_type
+    this.params.clientId = this.$route.query.client_id
+    this.params.redirectUri = this.$route.query.redirect_uri
+    this.params.state = this.$route.query.state
+    if (this.$route.query.scope) {
+      this.params.scopes = this.$route.query.scope.split(' ')
+    }
+
+    // 如果有 scope 参数，先执行一次自动授权，看看是否之前都授权过了。
+    if (this.params.scopes.length > 0) {
+      this.doAuthorize(true, this.params.scopes, []).then(res => {
+        const href = res.data
+        if (!href) {
+          console.log('自动授权未通过！')
+          return;
+        }
+        location.href = href
+      })
+    }
+
+    // 获取授权页的基本信息
+    getAuthorize(this.params.clientId).then(res => {
+      this.client = res.data.client
+      // 解析 scope
+      let scopes
+      // 1.1 如果 params.scope 非空，则过滤下返回的 scopes
+      if (this.params.scopes.length > 0) {
+        scopes = []
+        for (const scope of res.data.scopes) {
+          if (this.params.scopes.indexOf(scope.key) >= 0) {
+            scopes.push(scope)
+          }
+        }
+      // 1.2 如果 params.scope 为空，则使用返回的 scopes 设置它
+      } else {
+        scopes = res.data.scopes
+        for (const scope of scopes) {
+          this.params.scopes.push(scope.key)
+        }
+      }
+      // 生成已选中的 checkedScopes
+      for (const scope of scopes) {
+        if (scope.value) {
+          this.checkedScopes.push(scope.key)
+        }
+      }
+    })
   },
   methods: {
     getCookie() {
-      const tenantName = Cookies.get('tenantName');
+      const tenantName = getTenantName();
       this.loginForm = {
-        tenantName: tenantName === undefined ? this.loginForm.tenantName : tenantName
+        tenantName: tenantName ? tenantName : this.loginForm.tenantName,
       };
     },
     handleLogin() {
-      if (true) {
-        authorize()
-        return;
-      }
       this.$refs.loginForm.validate(valid => {
-        if (valid) {
-          this.loading = true;
-          // 发起登陆
-          console.log("发起登录", this.loginForm);
-          this.$store.dispatch(this.loginForm.loginType === "sms" ? "SmsLogin" : "Login", this.loginForm).then(() => {
-            this.$router.push({path: this.redirect || "/"}).catch(() => {
-            });
-          }).catch(() => {
-            this.loading = false;
-            this.getCode();
-          });
+        if (!valid) {
+          return
         }
-      });
+
+
+      })
+    },
+    doAuthorize(autoApprove, checkedScopes, uncheckedScopes) {
+      return authorize(this.params.responseType, this.params.clientId, this.params.redirectUri, this.params.state,
+          autoApprove, checkedScopes, uncheckedScopes)
     }
   }
 };

@@ -11,14 +11,16 @@ import cn.iocoder.yudao.framework.common.util.http.HttpUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.operatelog.core.annotations.OperateLog;
 import cn.iocoder.yudao.module.system.controller.admin.oauth2.vo.open.OAuth2OpenAccessTokenRespVO;
+import cn.iocoder.yudao.module.system.controller.admin.oauth2.vo.open.OAuth2OpenAuthorizeInfoRespVO;
 import cn.iocoder.yudao.module.system.controller.admin.oauth2.vo.open.OAuth2OpenCheckTokenRespVO;
 import cn.iocoder.yudao.module.system.controller.admin.oauth2.vo.open.user.OAuth2OpenUserInfoRespVO;
-import cn.iocoder.yudao.module.system.controller.admin.user.vo.profile.UserProfileUpdateReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.oauth2.vo.open.user.OAuth2OpenUserUpdateReqVO;
 import cn.iocoder.yudao.module.system.convert.oauth2.OAuth2OpenConvert;
-import cn.iocoder.yudao.module.system.dal.dataobject.oauth2.OAuth2AccessTokenDO;
-import cn.iocoder.yudao.module.system.dal.dataobject.oauth2.OAuth2ClientDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.PostDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.oauth2.OAuth2AccessTokenDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.oauth2.OAuth2ApproveDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.oauth2.OAuth2ClientDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
 import cn.iocoder.yudao.module.system.enums.auth.OAuth2GrantTypeEnum;
 import cn.iocoder.yudao.module.system.service.dept.DeptService;
@@ -91,7 +93,7 @@ public class OAuth2OpenController {
      * 注意，默认需要传递 client_id + client_secret 参数
      */
     @PostMapping("/token")
-    @ApiOperation(value = "获得访问令牌", notes = "适合 code 授权码模式，或者 implicit 简化模式；在 authorize.vue 单点登录界面被【获取】调用")
+    @ApiOperation(value = "获得访问令牌", notes = "适合 code 授权码模式，或者 implicit 简化模式；在 sso.vue 单点登录界面被【获取】调用")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "grant_type", required = true, value = "授权类型", example = "code", dataTypeClass = String.class),
             @ApiImplicitParam(name = "code", value = "授权范围", example = "userinfo.read", dataTypeClass = String.class),
@@ -173,7 +175,7 @@ public class OAuth2OpenController {
                                                                @RequestParam("token") String token) {
         // 校验客户端
         String[] clientIdAndSecret = obtainBasicAuthorization(request);
-        OAuth2ClientDO client = oauth2ClientService.validOAuthClientFromCache(clientIdAndSecret[0], clientIdAndSecret[1],
+        oauth2ClientService.validOAuthClientFromCache(clientIdAndSecret[0], clientIdAndSecret[1],
                 null, null, null);
 
         // 校验令牌
@@ -182,46 +184,36 @@ public class OAuth2OpenController {
         return success(OAuth2OpenConvert.INSTANCE.convert2(accessTokenDO));
     }
 
-    //    GET  oauth/authorize AuthorizationEndpoint TODO
+    /**
+     * 对应 Spring Security OAuth 的 AuthorizationEndpoint 类的 authorize 方法
+     */
     @GetMapping("/authorize")
-    @ApiOperation(value = "获得授权信息", notes = "适合 code 授权码模式，或者 implicit 简化模式；在 authorize.vue 单点登录界面被【获取】调用")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "response_type", required = true, value = "响应类型", example = "code", dataTypeClass = String.class),
-            @ApiImplicitParam(name = "client_id", required = true, value = "客户端编号", example = "tudou", dataTypeClass = String.class),
-            @ApiImplicitParam(name = "scope", value = "授权范围", example = "userinfo.read", dataTypeClass = String.class), // 多个使用空格分隔
-            @ApiImplicitParam(name = "redirect_uri", required = true, value = "重定向 URI", example = "https://www.iocoder.cn", dataTypeClass = String.class),
-            @ApiImplicitParam(name = "state", example = "123321", dataTypeClass = String.class)
-    })
-    public CommonResult<Object> authorize(@RequestParam("response_type") String responseType,
-                                          @RequestParam("client_id") String clientId,
-                                          @RequestParam(value = "scope", required = false) String scope,
-                                          @RequestParam("redirect_uri") String redirectUri,
-                                          @RequestParam(value = "state", required = false) String state) {
-        List<String> scopes = StrUtil.split(scope, ' ');
+    @ApiOperation(value = "获得授权信息", notes = "适合 code 授权码模式，或者 implicit 简化模式；在 sso.vue 单点登录界面被【获取】调用")
+    @ApiImplicitParam(name = "clientId", required = true, value = "客户端编号", example = "tudou", dataTypeClass = String.class)
+    public CommonResult<OAuth2OpenAuthorizeInfoRespVO> authorize(@RequestParam("clientId") String clientId) {
         // 0. 校验用户已经登录。通过 Spring Security 实现
 
-        // 1.1 校验 responseType 是否满足 code 或者 token 值
-        OAuth2GrantTypeEnum grantTypeEnum = getGrantTypeEnum(responseType);
-        // 1.2 校验 redirectUri 重定向域名是否合法 + 校验 scope 是否在 Client 授权范围内
-        oauth2ClientService.validOAuthClientFromCache(clientId, null,
-                grantTypeEnum.getGrantType(), scopes, redirectUri);
-
-        // 3. 不满足自动授权，则返回授权相关的展示信息
-        return null;
+        // 1. 获得 Client 客户端的信息
+        OAuth2ClientDO client = oauth2ClientService.validOAuthClientFromCache(clientId, null,
+                null, null, null);
+        // 2. 获得用户已经授权的信息
+        List<OAuth2ApproveDO> approves = oauth2ApproveService.getApproveList(getLoginUserId(), getUserType(), clientId);
+        // 拼接返回
+        return success(OAuth2OpenConvert.INSTANCE.convert(client, approves));
     }
 
     /**
      * 对应 Spring Security OAuth 的 AuthorizationEndpoint 类的 approveOrDeny 方法
      *
      * 场景一：【自动授权 autoApprove = true】
-     *      刚进入 authorize.vue 界面，调用该接口，用户历史已经给该应用做过对应的授权，或者 OAuth2Client 支持该 scope 的自动授权
+     *      刚进入 sso.vue 界面，调用该接口，用户历史已经给该应用做过对应的授权，或者 OAuth2Client 支持该 scope 的自动授权
      * 场景二：【手动授权 autoApprove = false】
-     *      在 authorize.vue 界面，用户选择好 scope 授权范围，调用该接口，进行授权。此时，approved 为 true 或者 false
+     *      在 sso.vue 界面，用户选择好 scope 授权范围，调用该接口，进行授权。此时，approved 为 true 或者 false
      *
      * 因为前后端分离，Axios 无法很好的处理 302 重定向，所以和 Spring Security OAuth 略有不同，返回结果是重定向的 URL，剩余交给前端处理
      */
     @PostMapping("/authorize")
-    @ApiOperation(value = "申请授权", notes = "适合 code 授权码模式，或者 implicit 简化模式；在 authorize.vue 单点登录界面被【提交】调用")
+    @ApiOperation(value = "申请授权", notes = "适合 code 授权码模式，或者 implicit 简化模式；在 sso.vue 单点登录界面被【提交】调用")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "response_type", required = true, value = "响应类型", example = "code", dataTypeClass = String.class),
             @ApiImplicitParam(name = "client_id", required = true, value = "客户端编号", example = "tudou", dataTypeClass = String.class),
@@ -346,7 +338,7 @@ public class OAuth2OpenController {
     @PutMapping("/user/update")
     @ApiOperation("更新用户基本信息")
     @PreAuthorize("@ss.hasScope('user.write')")
-    public CommonResult<Boolean> updateUserInfo(@Valid @RequestBody UserProfileUpdateReqVO reqVO) {
+    public CommonResult<Boolean> updateUserInfo(@Valid @RequestBody OAuth2OpenUserUpdateReqVO reqVO) {
         // 这里将 UserProfileUpdateReqVO =》UserProfileUpdateReqVO 对象，实现接口的复用。
         // 主要是，AdminUserService 没有自己的 BO 对象，所以复用只能这么做
         userService.updateUserProfile(getLoginUserId(), OAuth2OpenConvert.INSTANCE.convert(reqVO));

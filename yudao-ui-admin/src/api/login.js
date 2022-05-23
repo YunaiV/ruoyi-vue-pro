@@ -111,25 +111,37 @@ export function refreshToken() {
 }
 
 // ========== OAUTH 2.0 相关 ==========
-export function authorize() {
+
+export function getAuthorize(clientId) {
+  return request({
+    url: '/system/oauth2/authorize?clientId=' + clientId,
+    method: 'get'
+  })
+}
+
+export function authorize(responseType, clientId, redirectUri, state,
+                          autoApprove, checkedScopes, uncheckedScopes) {
+  // 构建 scopes
+  const scopes = {};
+  for (const scope of checkedScopes) {
+    scopes[scope] = true;
+  }
+  for (const scope of uncheckedScopes) {
+    scopes[scope] = false;
+  }
+  // 发起请求
   return service({
     url: '/system/oauth2/authorize',
     headers:{
       'Content-type': 'application/x-www-form-urlencoded',
-      "Access-Control-Allow-Origin": "*"
     },
     params: {
-      response_type: 'code',
-      client_id: 'test',
-      redirect_uri: 'https://www.iocoder.cn',
-      // scopes: {
-      //   read: true,
-      //   write: false
-      // }
-      scope: {
-        read: true,
-        write: false
-      }
+      response_type: responseType,
+      client_id: clientId,
+      redirect_uri: redirectUri,
+      state: state,
+      auto_approve: autoApprove,
+      scope: JSON.stringify(scopes)
     },
     method: 'post'
   })

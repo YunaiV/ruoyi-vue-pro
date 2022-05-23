@@ -181,7 +181,7 @@ public class OAuth2ClientServiceImpl implements OAuth2ClientService {
         // 校验客户端存在、且开启
         OAuth2ClientDO client = clientCache.get(clientId);
         if (client == null) {
-            throw exception(OAUTH2_CLIENT_EXISTS);
+            throw exception(OAUTH2_CLIENT_NOT_EXISTS);
         }
         if (ObjectUtil.notEqual(client.getStatus(), CommonStatusEnum.ENABLE.getStatus())) {
             throw exception(OAUTH2_CLIENT_DISABLE);
