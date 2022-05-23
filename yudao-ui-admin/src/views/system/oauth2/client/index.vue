@@ -50,7 +50,7 @@
       </el-table-column>
       <el-table-column label="授权类型" align="center" prop="authorizedGrantTypes">
         <template slot-scope="scope">
-          <el-tag :disable-transitions="true" v-for="(authorizedGrantType, index) in scope.row.authorizedGrantTypes" :index="index">
+          <el-tag :disable-transitions="true" :key="index" v-for="(authorizedGrantType, index) in scope.row.authorizedGrantTypes" :index="index">
             {{ authorizedGrantType }}
           </el-tag>
         </template>

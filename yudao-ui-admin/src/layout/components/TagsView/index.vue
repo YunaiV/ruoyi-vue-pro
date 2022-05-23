@@ -152,31 +152,24 @@ export default {
       })
     },
     refreshSelectedTag(view) {
-      this.$store.dispatch('tagsView/delCachedView', view).then(() => {
-        const { fullPath } = view
-        this.$nextTick(() => {
-          this.$router.replace({
-            path: '/redirect' + fullPath
-          })
-        })
-      })
+      this.$tab.refreshPage(view);
     },
     closeSelectedTag(view) {
-      this.$store.dispatch('tagsView/delView', view).then(({ visitedViews }) => {
+      this.$tab.closePage(view).then(({ visitedViews }) => {
         if (this.isActive(view)) {
           this.toLastView(visitedViews, view)
         }
       })
     },
     closeRightTags() {
-      this.$store.dispatch('tagsView/delRightTags', this.selectedTag).then(visitedViews => {
+      this.$tab.closeRightPage(this.selectedTag).then(visitedViews => {
         if (!visitedViews.find(i => i.fullPath === this.$route.fullPath)) {
           this.toLastView(visitedViews)
         }
       })
     },
     closeLeftTags() {
-      this.$store.dispatch('tagsView/delLeftTags', this.selectedTag).then(visitedViews => {
+      this.$tab.closeLeftPage(this.selectedTag).then(visitedViews => {
         if (!visitedViews.find(i => i.fullPath === this.$route.fullPath)) {
           this.toLastView(visitedViews)
         }
@@ -184,12 +177,12 @@ export default {
     },
     closeOthersTags() {
       this.$router.push(this.selectedTag).catch(()=>{});
-      this.$store.dispatch('tagsView/delOthersViews', this.selectedTag).then(() => {
+      this.$tab.closeOtherPage(this.selectedTag).then(() => {
         this.moveToCurrentTag()
       })
     },
     closeAllTags(view) {
-      this.$store.dispatch('tagsView/delAllViews').then(({ visitedViews }) => {
+      this.$tab.closeAllPage().then(({ visitedViews }) => {
         if (this.affixTags.some(tag => tag.path === this.$route.path)) {
           return
         }

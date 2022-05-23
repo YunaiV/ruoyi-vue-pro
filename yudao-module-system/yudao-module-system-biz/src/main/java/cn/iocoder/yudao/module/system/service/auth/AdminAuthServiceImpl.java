@@ -181,7 +181,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         }
 
         // 创建 Token 令牌，记录登录日志
-        return createTokenAfterLoginSuccess(user.getId(), null, LoginLogTypeEnum.LOGIN_SOCIAL);
+        return createTokenAfterLoginSuccess(user.getId(), user.getUsername(), LoginLogTypeEnum.LOGIN_SOCIAL);
     }
 
     @Override

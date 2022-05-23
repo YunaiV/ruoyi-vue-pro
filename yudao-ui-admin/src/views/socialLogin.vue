@@ -19,7 +19,7 @@
             </el-tab-pane>
           </el-tabs>
           <div>
-            <el-form ref="loginForm" :model="loginForm" :rules="LoginRules" class="login-form">
+            <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form">
               <!-- 账号密码登录 -->
               <el-form-item prop="username">
                 <el-input v-model="loginForm.username" type="text" auto-complete="off" placeholder="账号">
@@ -65,16 +65,28 @@
 <script>
 import Cookies from "js-cookie";
 import { encrypt, decrypt } from '@/utils/jsencrypt'
+import {
+  getPassword, getRememberMe,
+  getUsername,
+  removePassword,
+  removeUsername,
+  setPassword,
+  setRememberMe,
+  setUsername
+} from "@/utils/auth";
+import {getCodeImg} from "@/api/login";
 
 export default {
   name: "ThirdLogin",
   data() {
     return {
+      codeUrl: "",
+      captchaEnable: true,
       loginForm: {
         loginType: "uname",
         username: "admin",
         password: "admin123",
-        rememberMe: false, // TODO 芋艿：后面看情况，去掉这块
+        rememberMe: false,
       },
       loginRules: {
         username: [
@@ -104,6 +116,7 @@ export default {
     this.getCookie();
     // 重定向地址
     this.redirect = this.$route.query.redirect;
+    this.getCode();
     // 社交登录相关
     this.type = this.$route.query.type;
     this.code = this.$route.query.code;
@@ -119,16 +132,30 @@ export default {
     });
   },
   methods: {
+    getCode() {
+      // 只有开启的状态，才加载验证码。默认开启
+      if (!this.captchaEnable) {
+        return;
+      }
+      // 请求远程，获得验证码
+      getCodeImg().then(res => {
+        res = res.data;
+        this.captchaEnable = res.enable;
+        if (this.captchaEnable) {
+          this.codeUrl = "data:image/gif;base64," + res.img;
+          this.loginForm.uuid = res.uuid;
+        }
+      });
+    },
     getCookie() {
-      const username = Cookies.get("username");
-      const password = Cookies.get("password");
-      const rememberMe = Cookies.get('rememberMe')
-      const loginType = Cookies.get('loginType');
+      const username = getUsername();
+      const password = getPassword();
+      const rememberMe = getRememberMe();
       this.loginForm = {
-        username: username === undefined ? this.loginForm.username : username,
-        password: password === undefined ? this.loginForm.password : decrypt(password),
-        rememberMe: rememberMe === undefined ? false : Boolean(rememberMe),
-        loginType: loginType === undefined ? this.loginForm.loginType : loginType,
+        username: username ? username : this.loginForm.username,
+        password: password ? password : this.loginForm.password,
+        rememberMe: rememberMe ? getRememberMe() : false,
+        loginType: this.loginForm.loginType,
       };
     },
     handleLogin() {
@@ -136,11 +163,12 @@ export default {
         if (valid) {
           this.loading = true;
           if (this.loginForm.rememberMe) {
-            Cookies.set("username", this.loginForm.username, { expires: 30 });
-            Cookies.set("password", encrypt(this.loginForm.password), { expires: 30 });
+            setUsername(this.loginForm.username)
+            setPassword(this.loginForm.password)
+            setRememberMe(this.loginForm.rememberMe)
           } else {
-            Cookies.remove("username");
-            Cookies.remove("password");
+            removeUsername()
+            removePassword()
           }
           this.$store.dispatch("SocialLogin2", {
             code: this.code,

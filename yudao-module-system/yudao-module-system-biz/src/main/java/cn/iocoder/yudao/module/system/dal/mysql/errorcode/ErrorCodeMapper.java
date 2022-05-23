@@ -23,7 +23,7 @@ public interface ErrorCodeMapper extends BaseMapperX<ErrorCodeDO> {
                 .eqIfPresent("code", reqVO.getCode())
                 .likeIfPresent("message", reqVO.getMessage())
                 .betweenIfPresent("create_time", reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
-                .orderByAsc("application_name", "code"));
+                .orderByDesc("code"));
     }
 
     default List<ErrorCodeDO> selectList(ErrorCodeExportReqVO reqVO) {

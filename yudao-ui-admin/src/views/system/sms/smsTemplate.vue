@@ -147,7 +147,7 @@
         <el-form-item label="手机号" prop="mobile">
           <el-input v-model="sendSmsForm.mobile" placeholder="请输入手机号" />
         </el-form-item>
-        <el-form-item v-for="param in sendSmsForm.params" :label="'参数 {' + param + '}'" :prop="'templateParams.' + param">
+        <el-form-item v-for="param in sendSmsForm.params" :key="param" :label="'参数 {' + param + '}'" :prop="'templateParams.' + param">
           <el-input v-model="sendSmsForm.templateParams[param]" :placeholder="'请输入 ' + param + ' 参数'" />
         </el-form-item>
       </el-form>

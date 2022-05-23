@@ -8,7 +8,6 @@ import cn.iocoder.yudao.module.infra.dal.dataobject.db.DataSourceConfigDO;
 import cn.iocoder.yudao.module.infra.dal.mysql.db.DataSourceConfigMapper;
 import com.baomidou.dynamic.datasource.spring.boot.autoconfigure.DataSourceProperty;
 import com.baomidou.dynamic.datasource.spring.boot.autoconfigure.DynamicDataSourceProperties;
-import org.jasypt.encryption.StringEncryptor;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -33,9 +32,6 @@ public class DataSourceConfigServiceImpl implements DataSourceConfigService {
     private DataSourceConfigMapper dataSourceConfigMapper;
 
     @Resource
-    private StringEncryptor stringEncryptor;
-
-    @Resource
     private DynamicDataSourceProperties dynamicDataSourceProperties;
 
     @Override
@@ -44,7 +40,6 @@ public class DataSourceConfigServiceImpl implements DataSourceConfigService {
         checkConnectionOK(dataSourceConfig);
 
         // 插入
-        dataSourceConfig.setPassword(stringEncryptor.encrypt(createReqVO.getPassword()));
         dataSourceConfigMapper.insert(dataSourceConfig);
         // 返回
         return dataSourceConfig.getId();
@@ -58,7 +53,6 @@ public class DataSourceConfigServiceImpl implements DataSourceConfigService {
         checkConnectionOK(updateObj);
 
         // 更新
-        updateObj.setPassword(stringEncryptor.encrypt(updateObj.getPassword()));
         dataSourceConfigMapper.updateById(updateObj);
     }
 
@@ -83,12 +77,7 @@ public class DataSourceConfigServiceImpl implements DataSourceConfigService {
             return buildMasterDataSourceConfig();
         }
         // 从 DB 中读取
-        DataSourceConfigDO dataSourceConfig = dataSourceConfigMapper.selectById(id);
-        try {
-            dataSourceConfig.setPassword(stringEncryptor.decrypt(dataSourceConfig.getPassword()));
-        } catch (Exception ignore) { // 解码失败，则不解码
-        }
-        return dataSourceConfig;
+        return dataSourceConfigMapper.selectById(id);
     }
 
     @Override

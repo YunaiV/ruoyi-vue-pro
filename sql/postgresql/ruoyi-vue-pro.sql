@@ -20,7 +20,7 @@
 -- Sequence structure for act_evt_log_log_nr__seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "act_evt_log_log_nr__seq";
-CREATE SEQUENCE "act_evt_log_log_nr__seq" 
+CREATE SEQUENCE "act_evt_log_log_nr__seq"
 INCREMENT 1
 MINVALUE  1
 MAXVALUE 2147483647
@@ -31,7 +31,7 @@ CACHE 1;
 -- Sequence structure for act_hi_tsk_log_id__seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "act_hi_tsk_log_id__seq";
-CREATE SEQUENCE "act_hi_tsk_log_id__seq" 
+CREATE SEQUENCE "act_hi_tsk_log_id__seq"
 INCREMENT 1
 MINVALUE  1
 MAXVALUE 2147483647
@@ -42,7 +42,7 @@ CACHE 1;
 -- Sequence structure for bpm_form_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "bpm_form_seq";
-CREATE SEQUENCE "bpm_form_seq" 
+CREATE SEQUENCE "bpm_form_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -51,7 +51,7 @@ CACHE 1;
 -- Sequence structure for bpm_oa_leave_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "bpm_oa_leave_seq";
-CREATE SEQUENCE "bpm_oa_leave_seq" 
+CREATE SEQUENCE "bpm_oa_leave_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -60,7 +60,7 @@ CACHE 1;
 -- Sequence structure for bpm_process_definition_ext_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "bpm_process_definition_ext_seq";
-CREATE SEQUENCE "bpm_process_definition_ext_seq" 
+CREATE SEQUENCE "bpm_process_definition_ext_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -69,7 +69,7 @@ CACHE 1;
 -- Sequence structure for bpm_process_instance_ext_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "bpm_process_instance_ext_seq";
-CREATE SEQUENCE "bpm_process_instance_ext_seq" 
+CREATE SEQUENCE "bpm_process_instance_ext_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -78,7 +78,7 @@ CACHE 1;
 -- Sequence structure for bpm_task_assign_rule_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "bpm_task_assign_rule_seq";
-CREATE SEQUENCE "bpm_task_assign_rule_seq" 
+CREATE SEQUENCE "bpm_task_assign_rule_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -87,7 +87,7 @@ CACHE 1;
 -- Sequence structure for bpm_task_ext_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "bpm_task_ext_seq";
-CREATE SEQUENCE "bpm_task_ext_seq" 
+CREATE SEQUENCE "bpm_task_ext_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -96,7 +96,7 @@ CACHE 1;
 -- Sequence structure for bpm_user_group_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "bpm_user_group_seq";
-CREATE SEQUENCE "bpm_user_group_seq" 
+CREATE SEQUENCE "bpm_user_group_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -105,7 +105,7 @@ CACHE 1;
 -- Sequence structure for infra_api_access_log_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "infra_api_access_log_seq";
-CREATE SEQUENCE "infra_api_access_log_seq" 
+CREATE SEQUENCE "infra_api_access_log_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -114,7 +114,7 @@ CACHE 1;
 -- Sequence structure for infra_api_error_log_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "infra_api_error_log_seq";
-CREATE SEQUENCE "infra_api_error_log_seq" 
+CREATE SEQUENCE "infra_api_error_log_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -123,7 +123,7 @@ CACHE 1;
 -- Sequence structure for infra_codegen_column_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "infra_codegen_column_seq";
-CREATE SEQUENCE "infra_codegen_column_seq" 
+CREATE SEQUENCE "infra_codegen_column_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -132,7 +132,7 @@ CACHE 1;
 -- Sequence structure for infra_codegen_table_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "infra_codegen_table_seq";
-CREATE SEQUENCE "infra_codegen_table_seq" 
+CREATE SEQUENCE "infra_codegen_table_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -141,7 +141,7 @@ CACHE 1;
 -- Sequence structure for infra_config_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "infra_config_seq";
-CREATE SEQUENCE "infra_config_seq" 
+CREATE SEQUENCE "infra_config_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -150,7 +150,7 @@ CACHE 1;
 -- Sequence structure for infra_data_source_config_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "infra_data_source_config_seq";
-CREATE SEQUENCE "infra_data_source_config_seq" 
+CREATE SEQUENCE "infra_data_source_config_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -159,7 +159,7 @@ CACHE 1;
 -- Sequence structure for infra_file_config_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "infra_file_config_seq";
-CREATE SEQUENCE "infra_file_config_seq" 
+CREATE SEQUENCE "infra_file_config_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -168,7 +168,7 @@ CACHE 1;
 -- Sequence structure for infra_file_content_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "infra_file_content_seq";
-CREATE SEQUENCE "infra_file_content_seq" 
+CREATE SEQUENCE "infra_file_content_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -177,7 +177,7 @@ CACHE 1;
 -- Sequence structure for infra_file_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "infra_file_seq";
-CREATE SEQUENCE "infra_file_seq" 
+CREATE SEQUENCE "infra_file_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -186,7 +186,7 @@ CACHE 1;
 -- Sequence structure for infra_job_log_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "infra_job_log_seq";
-CREATE SEQUENCE "infra_job_log_seq" 
+CREATE SEQUENCE "infra_job_log_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -195,7 +195,7 @@ CACHE 1;
 -- Sequence structure for infra_job_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "infra_job_seq";
-CREATE SEQUENCE "infra_job_seq" 
+CREATE SEQUENCE "infra_job_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -204,7 +204,7 @@ CACHE 1;
 -- Sequence structure for infra_test_demo_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "infra_test_demo_seq";
-CREATE SEQUENCE "infra_test_demo_seq" 
+CREATE SEQUENCE "infra_test_demo_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -213,7 +213,7 @@ CACHE 1;
 -- Sequence structure for member_user_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "member_user_seq";
-CREATE SEQUENCE "member_user_seq" 
+CREATE SEQUENCE "member_user_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -222,7 +222,7 @@ CACHE 1;
 -- Sequence structure for pay_app_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "pay_app_seq";
-CREATE SEQUENCE "pay_app_seq" 
+CREATE SEQUENCE "pay_app_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -231,7 +231,7 @@ CACHE 1;
 -- Sequence structure for pay_channel_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "pay_channel_seq";
-CREATE SEQUENCE "pay_channel_seq" 
+CREATE SEQUENCE "pay_channel_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -240,7 +240,7 @@ CACHE 1;
 -- Sequence structure for pay_merchant_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "pay_merchant_seq";
-CREATE SEQUENCE "pay_merchant_seq" 
+CREATE SEQUENCE "pay_merchant_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -249,7 +249,7 @@ CACHE 1;
 -- Sequence structure for pay_notify_log_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "pay_notify_log_seq";
-CREATE SEQUENCE "pay_notify_log_seq" 
+CREATE SEQUENCE "pay_notify_log_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -258,7 +258,7 @@ CACHE 1;
 -- Sequence structure for pay_notify_task_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "pay_notify_task_seq";
-CREATE SEQUENCE "pay_notify_task_seq" 
+CREATE SEQUENCE "pay_notify_task_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -267,7 +267,7 @@ CACHE 1;
 -- Sequence structure for pay_order_extension_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "pay_order_extension_seq";
-CREATE SEQUENCE "pay_order_extension_seq" 
+CREATE SEQUENCE "pay_order_extension_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -276,7 +276,7 @@ CACHE 1;
 -- Sequence structure for pay_order_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "pay_order_seq";
-CREATE SEQUENCE "pay_order_seq" 
+CREATE SEQUENCE "pay_order_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -285,7 +285,7 @@ CACHE 1;
 -- Sequence structure for pay_refund_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "pay_refund_seq";
-CREATE SEQUENCE "pay_refund_seq" 
+CREATE SEQUENCE "pay_refund_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -294,7 +294,7 @@ CACHE 1;
 -- Sequence structure for system_dept_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "system_dept_seq";
-CREATE SEQUENCE "system_dept_seq" 
+CREATE SEQUENCE "system_dept_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -303,7 +303,7 @@ CACHE 1;
 -- Sequence structure for system_dict_data_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "system_dict_data_seq";
-CREATE SEQUENCE "system_dict_data_seq" 
+CREATE SEQUENCE "system_dict_data_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -312,7 +312,7 @@ CACHE 1;
 -- Sequence structure for system_dict_type_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "system_dict_type_seq";
-CREATE SEQUENCE "system_dict_type_seq" 
+CREATE SEQUENCE "system_dict_type_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -321,7 +321,7 @@ CACHE 1;
 -- Sequence structure for system_error_code_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "system_error_code_seq";
-CREATE SEQUENCE "system_error_code_seq" 
+CREATE SEQUENCE "system_error_code_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -330,7 +330,7 @@ CACHE 1;
 -- Sequence structure for system_login_log_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "system_login_log_seq";
-CREATE SEQUENCE "system_login_log_seq" 
+CREATE SEQUENCE "system_login_log_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -339,7 +339,7 @@ CACHE 1;
 -- Sequence structure for system_menu_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "system_menu_seq";
-CREATE SEQUENCE "system_menu_seq" 
+CREATE SEQUENCE "system_menu_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -348,7 +348,7 @@ CACHE 1;
 -- Sequence structure for system_notice_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "system_notice_seq";
-CREATE SEQUENCE "system_notice_seq" 
+CREATE SEQUENCE "system_notice_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -357,7 +357,7 @@ CACHE 1;
 -- Sequence structure for system_oauth2_access_token_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "system_oauth2_access_token_seq";
-CREATE SEQUENCE "system_oauth2_access_token_seq" 
+CREATE SEQUENCE "system_oauth2_access_token_seq"
 INCREMENT 1
 MINVALUE  1
 MAXVALUE 9223372036854775807
@@ -368,7 +368,7 @@ CACHE 1;
 -- Sequence structure for system_oauth2_client_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "system_oauth2_client_seq";
-CREATE SEQUENCE "system_oauth2_client_seq" 
+CREATE SEQUENCE "system_oauth2_client_seq"
 INCREMENT 1
 MINVALUE  1
 MAXVALUE 9223372036854775807
@@ -379,7 +379,7 @@ CACHE 1;
 -- Sequence structure for system_oauth2_refresh_token_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "system_oauth2_refresh_token_seq";
-CREATE SEQUENCE "system_oauth2_refresh_token_seq" 
+CREATE SEQUENCE "system_oauth2_refresh_token_seq"
 INCREMENT 1
 MINVALUE  1
 MAXVALUE 9223372036854775807
@@ -390,7 +390,7 @@ CACHE 1;
 -- Sequence structure for system_operate_log_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "system_operate_log_seq";
-CREATE SEQUENCE "system_operate_log_seq" 
+CREATE SEQUENCE "system_operate_log_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -399,7 +399,7 @@ CACHE 1;
 -- Sequence structure for system_post_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "system_post_seq";
-CREATE SEQUENCE "system_post_seq" 
+CREATE SEQUENCE "system_post_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -408,7 +408,7 @@ CACHE 1;
 -- Sequence structure for system_role_menu_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "system_role_menu_seq";
-CREATE SEQUENCE "system_role_menu_seq" 
+CREATE SEQUENCE "system_role_menu_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -417,7 +417,7 @@ CACHE 1;
 -- Sequence structure for system_role_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "system_role_seq";
-CREATE SEQUENCE "system_role_seq" 
+CREATE SEQUENCE "system_role_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -426,7 +426,7 @@ CACHE 1;
 -- Sequence structure for system_sensitive_word_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "system_sensitive_word_seq";
-CREATE SEQUENCE "system_sensitive_word_seq" 
+CREATE SEQUENCE "system_sensitive_word_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -435,7 +435,7 @@ CACHE 1;
 -- Sequence structure for system_sms_channel_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "system_sms_channel_seq";
-CREATE SEQUENCE "system_sms_channel_seq" 
+CREATE SEQUENCE "system_sms_channel_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -444,7 +444,7 @@ CACHE 1;
 -- Sequence structure for system_sms_code_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "system_sms_code_seq";
-CREATE SEQUENCE "system_sms_code_seq" 
+CREATE SEQUENCE "system_sms_code_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -453,7 +453,7 @@ CACHE 1;
 -- Sequence structure for system_sms_log_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "system_sms_log_seq";
-CREATE SEQUENCE "system_sms_log_seq" 
+CREATE SEQUENCE "system_sms_log_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -462,7 +462,7 @@ CACHE 1;
 -- Sequence structure for system_sms_template_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "system_sms_template_seq";
-CREATE SEQUENCE "system_sms_template_seq" 
+CREATE SEQUENCE "system_sms_template_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -471,7 +471,7 @@ CACHE 1;
 -- Sequence structure for system_social_user_bind_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "system_social_user_bind_seq";
-CREATE SEQUENCE "system_social_user_bind_seq" 
+CREATE SEQUENCE "system_social_user_bind_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -480,7 +480,7 @@ CACHE 1;
 -- Sequence structure for system_social_user_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "system_social_user_seq";
-CREATE SEQUENCE "system_social_user_seq" 
+CREATE SEQUENCE "system_social_user_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -489,7 +489,7 @@ CACHE 1;
 -- Sequence structure for system_tenant_package_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "system_tenant_package_seq";
-CREATE SEQUENCE "system_tenant_package_seq" 
+CREATE SEQUENCE "system_tenant_package_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -498,7 +498,7 @@ CACHE 1;
 -- Sequence structure for system_tenant_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "system_tenant_seq";
-CREATE SEQUENCE "system_tenant_seq" 
+CREATE SEQUENCE "system_tenant_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -507,7 +507,7 @@ CACHE 1;
 -- Sequence structure for system_user_post_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "system_user_post_seq";
-CREATE SEQUENCE "system_user_post_seq" 
+CREATE SEQUENCE "system_user_post_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -516,7 +516,7 @@ CACHE 1;
 -- Sequence structure for system_user_role_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "system_user_role_seq";
-CREATE SEQUENCE "system_user_role_seq" 
+CREATE SEQUENCE "system_user_role_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -525,7 +525,7 @@ CACHE 1;
 -- Sequence structure for system_user_seq
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "system_user_seq";
-CREATE SEQUENCE "system_user_seq" 
+CREATE SEQUENCE "system_user_seq"
 INCREMENT 1
 MAXVALUE 9223372036854775807
 CACHE 1;
@@ -3470,7 +3470,7 @@ COMMENT ON TABLE "system_oauth2_client" IS 'OAuth2 客户端表';
 -- Records of system_oauth2_client
 -- ----------------------------
 BEGIN;
-INSERT INTO "system_oauth2_client" ("id", "client_id", "secret", "name", "logo", "description", "status", "access_token_validity_seconds", "refresh_token_validity_seconds", "redirect_uris", "auto_approve", "authorized_grant_types", "scopes", "authorities", "resource_ids", "additional_information", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1, 'default', 'admin123', '芋道源码', 'http://test.yudao.iocoder.cn/a5e2e244368878a366b516805a4aabf1.png', '我是描述', 0, 180, 8640, '["https://www.iocoder.cn","https://doc.iocoder.cn"]', '1', '["password","authorization_code","implicit","refresh_token"]', '["user_info"]', '["system:user:query"]', '[]', '{}', '1', '2022-05-11 21:47:12', '1', '2022-05-12 01:00:20', 0);
+INSERT INTO "system_oauth2_client" ("id", "client_id", "secret", "name", "logo", "description", "status", "access_token_validity_seconds", "refresh_token_validity_seconds", "redirect_uris", "auto_approve", "authorized_grant_types", "scopes", "authorities", "resource_ids", "additional_information", "creator", "create_time", "updater", "update_time", "deleted") VALUES (1, 'default', 'admin123', '芋道源码', 'http://test.yudao.iocoder.cn/a5e2e244368878a366b516805a4aabf1.png', '我是描述', 0, 999999999, 8640, '["https://www.iocoder.cn","https://doc.iocoder.cn"]', '1', '["password","authorization_code","implicit","refresh_token"]', '["user_info"]', '["system:user:query"]', '[]', '{}', '1', '2022-05-11 21:47:12', '1', '2022-05-12 01:00:20', 0);
 INSERT INTO "system_oauth2_client" ("id", "client_id", "secret", "name", "logo", "description", "status", "access_token_validity_seconds", "refresh_token_validity_seconds", "redirect_uris", "auto_approve", "authorized_grant_types", "scopes", "authorities", "resource_ids", "additional_information", "creator", "create_time", "updater", "update_time", "deleted") VALUES (40, 'test', 'test2', 'biubiu', 'http://test.yudao.iocoder.cn/277a899d573723f1fcdfb57340f00379.png', NULL, 0, 1800, 43200, '["https://www.iocoder.cn"]', 'true', '["password","authorization_code","implicit"]', '[]', '[]', '[]', '{}', '1', '2022-05-12 00:28:20', '1', '2022-05-13 01:04:21.023', 0);
 COMMIT;
 

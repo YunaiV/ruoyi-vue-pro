@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.system.controller.admin.dict.vo.type.DictTypeExportReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.dict.vo.type.DictTypePageReqVO;
+import cn.iocoder.yudao.module.system.dal.dataobject.dict.DictDataDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.dict.DictTypeDO;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -18,7 +19,8 @@ public interface DictTypeMapper extends BaseMapperX<DictTypeDO> {
                 .likeIfPresent(DictTypeDO::getName, reqVO.getName())
                 .likeIfPresent(DictTypeDO::getType, reqVO.getType())
                 .eqIfPresent(DictTypeDO::getStatus, reqVO.getStatus())
-                .betweenIfPresent(DictTypeDO::getCreateTime, reqVO.getBeginCreateTime(), reqVO.getEndCreateTime()));
+                .betweenIfPresent(DictTypeDO::getCreateTime, reqVO.getBeginCreateTime(), reqVO.getEndCreateTime())
+                .orderByDesc(DictTypeDO::getId));
     }
 
     default List<DictTypeDO> selectList(DictTypeExportReqVO reqVO) {

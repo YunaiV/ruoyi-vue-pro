@@ -107,9 +107,17 @@
 import {getCodeImg, sendSmsCode, socialAuthRedirect} from "@/api/login";
 import {getTenantIdByName} from "@/api/system/tenant";
 import Cookies from "js-cookie";
-import {decrypt, encrypt} from '@/utils/jsencrypt'
 import {SystemUserSocialTypeEnum} from "@/utils/constants";
 import {getTenantEnable} from "@/utils/ruoyi";
+import {
+  getPassword,
+  getRememberMe, getTenantName,
+  getUsername,
+  removePassword, removeRememberMe, removeTenantName,
+  removeUsername,
+  setPassword, setRememberMe, setTenantId, setTenantName,
+  setUsername
+} from "@/utils/auth";
 
 export default {
   name: "Login",
@@ -161,7 +169,7 @@ export default {
                 const tenantId = res.data;
                 if (tenantId && tenantId >= 0) {
                   // 设置租户
-                  Cookies.set("tenantId", tenantId);
+                  setTenantId(tenantId)
                   callback();
                 } else {
                   callback('租户不存在');
@@ -172,8 +180,6 @@ export default {
           }
         ]
       },
-
-
       loading: false,
       redirect: undefined,
       // 枚举
@@ -213,21 +219,16 @@ export default {
       });
     },
     getCookie() {
-      const username = Cookies.get("username");
-      const password = Cookies.get("password");
-      const rememberMe = Cookies.get('rememberMe')
-      const tenantName = Cookies.get('tenantName');
-      const mobile = Cookies.get('mobile');
-      const mobileCode = Cookies.get('mobileCode');
-      const loginType = Cookies.get('loginType');
+      const username = getUsername();
+      const password = getPassword();
+      const rememberMe = getRememberMe();
+      const tenantName = getTenantName();
       this.loginForm = {
-        username: username === undefined ? this.loginForm.username : username,
-        password: password === undefined ? this.loginForm.password : decrypt(password),
-        rememberMe: rememberMe === undefined ? false : Boolean(rememberMe),
-        tenantName: tenantName === undefined ? this.loginForm.tenantName : tenantName,
-        mobile: mobile === undefined ? this.loginForm.mobile : mobile,
-        mobileCode: mobileCode === undefined ? this.loginForm.mobileCode : mobileCode,
-        loginType: loginType === undefined ? this.loginForm.loginType : loginType,
+        ...this.loginForm,
+        username: username ? username : this.loginForm.username,
+        password: password ? password : this.loginForm.password,
+        rememberMe: rememberMe ? getRememberMe() : false,
+        tenantName: tenantName ? tenantName : this.loginForm.tenantName,
       };
     },
     handleLogin() {
@@ -236,18 +237,18 @@ export default {
           this.loading = true;
           // 设置 Cookie
           if (this.loginForm.rememberMe) {
-            Cookies.set("username", this.loginForm.username, {expires: 30});
-            Cookies.set("password", encrypt(this.loginForm.password), {expires: 30});
-            Cookies.set('rememberMe', this.loginForm.rememberMe, {expires: 30});
-            Cookies.set('tenantName', this.loginForm.tenantName, {expires: 30});
+            setUsername(this.loginForm.username)
+            setPassword(this.loginForm.password)
+            setRememberMe(this.loginForm.rememberMe)
+            setTenantName(this.loginForm.tenantName)
           } else {
-            Cookies.remove("username");
-            Cookies.remove("password");
-            Cookies.remove('rememberMe');
-            Cookies.remove('tenantName');
+            removeUsername()
+            removePassword()
+            removeRememberMe()
+            removeTenantName()
           }
           // 发起登陆
-          console.log("发起登录", this.loginForm);
+          // console.log("发起登录", this.loginForm);
           this.$store.dispatch(this.loginForm.loginType === "sms" ? "SmsLogin" : "Login", this.loginForm).then(() => {
             this.$router.push({path: this.redirect || "/"}).catch(() => {
             });
