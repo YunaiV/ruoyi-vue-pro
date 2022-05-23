@@ -26,7 +26,7 @@ public class OAuth2ApproveServiceImpl implements OAuth2ApproveService {
     /**
      * 批准的过期时间，默认 30 天
      */
-    private static final Integer TIMEOUT = 30 * 24 * 60; // 单位：秒
+    private static final Integer TIMEOUT = 30 * 24 * 60 * 60; // 单位：秒
 
     @Resource
     private OAuth2ClientService oauth2ClientService;

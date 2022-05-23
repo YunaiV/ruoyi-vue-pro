@@ -15,7 +15,7 @@
         <!-- 表单 -->
         <div class="form-cont">
           <el-tabs class="form" style=" float:none;" value="uname">
-            <el-tab-pane label="三方授权" name="uname">
+            <el-tab-pane :label="'三方授权（' + client.name + ')'" name="uname">
             </el-tab-pane>
           </el-tabs>
           <div>
@@ -25,35 +25,23 @@
                   <svg-icon slot="prefix" icon-class="tree" class="el-input__icon input-icon"/>
                 </el-input>
               </el-form-item>
-              <!-- 账号密码登录 -->
-              <div v-if="loginForm.loginType === 'uname'">
-                <el-form-item prop="username">
-                  <el-input v-model="loginForm.username" type="text" auto-complete="off" placeholder="账号">
-                    <svg-icon slot="prefix" icon-class="user" class="el-input__icon input-icon"/>
-                  </el-input>
-                </el-form-item>
-                <el-form-item prop="password">
-                  <el-input v-model="loginForm.password" type="password" auto-complete="off" placeholder="密码"
-                            @keyup.enter.native="handleLogin">
-                    <svg-icon slot="prefix" icon-class="password" class="el-input__icon input-icon"/>
-                  </el-input>
-                </el-form-item>
-                <el-form-item prop="code" v-if="captchaEnable">
-                  <el-input v-model="loginForm.code" auto-complete="off" placeholder="验证码" style="width: 63%"
-                            @keyup.enter.native="handleLogin">
-                    <svg-icon slot="prefix" icon-class="validCode" class="el-input__icon input-icon"/>
-                  </el-input>
-                </el-form-item>
-              </div>
-
+              <!-- 授权范围的选择 -->
+              此第三方应用请求获得以下权限：
+              <el-form-item prop="scopes">
+                <el-checkbox-group v-model="loginForm.scopes">
+                  <el-checkbox v-for="scope in params.scopes" :label="scope" :key="scope"
+                               style="display: block; margin-bottom: -10px;">{{formatScope(scope)}}</el-checkbox>
+                </el-checkbox-group>
+              </el-form-item>
               <!-- 下方的登录按钮 -->
               <el-form-item style="width:100%;">
                 <el-button :loading="loading" size="medium" type="primary" style="width:60%;"
-                           @click.native.prevent="handleLogin">
-                  <span v-if="!loading">同意授权</span>
-                  <span v-else>登 录 中...</span>
+                           @click.native.prevent="handleAuthorize(true)">
+                  <span v-if="!loading">统一授权</span>
+                  <span v-else>授 权 中...</span>
                 </el-button>
-                <el-button size="medium" style="width:36%">拒绝</el-button>
+                <el-button size="medium" style="width:36%"
+                           @click.native.prevent="handleAuthorize(false)">拒绝</el-button>
               </el-form-item>
             </el-form>
           </div>
@@ -80,6 +68,7 @@ export default {
       tenantEnable: true,
       loginForm: {
         tenantName: "芋道源码",
+        scopes: [], // 已选中的 scope 数组
       },
       params: { // URL 上的 client_id、scope 等参数
         responseType: undefined,
@@ -92,7 +81,6 @@ export default {
         name: '',
         logo: '',
       },
-      checkedScopes: [], // 已选中的 scope 数组
       LoginRules: {
         tenantName: [
           {required: true, trigger: "blur", message: "租户不能为空"},
@@ -114,8 +102,7 @@ export default {
           }
         ]
       },
-      loading: false,
-      //
+      loading: false
     };
   },
   created() {
@@ -169,7 +156,7 @@ export default {
       // 生成已选中的 checkedScopes
       for (const scope of scopes) {
         if (scope.value) {
-          this.checkedScopes.push(scope.key)
+          this.loginForm.scopes.push(scope.key)
         }
       }
     })
@@ -178,21 +165,50 @@ export default {
     getCookie() {
       const tenantName = getTenantName();
       this.loginForm = {
+        ...this.loginForm,
         tenantName: tenantName ? tenantName : this.loginForm.tenantName,
       };
     },
-    handleLogin() {
+    handleAuthorize(approved) {
       this.$refs.loginForm.validate(valid => {
         if (!valid) {
           return
         }
-
-
+        this.loading = true
+        // 计算 checkedScopes + uncheckedScopes
+        let checkedScopes;
+        let uncheckedScopes;
+        if (approved) { // 同意授权，按照用户的选择
+          checkedScopes = this.loginForm.scopes
+          uncheckedScopes = this.params.scopes.filter(item => checkedScopes.indexOf(item) === -1)
+        } else { // 拒绝，则都是取消
+          checkedScopes = []
+          uncheckedScopes = this.params.scopes
+        }
+        // 提交授权的请求
+        this.doAuthorize(false, checkedScopes, uncheckedScopes).then(res => {
+          const href = res.data
+          if (!href) {
+            return;
+          }
+          location.href = href
+        }).finally(() => {
+          this.loading = false
+        })
       })
     },
     doAuthorize(autoApprove, checkedScopes, uncheckedScopes) {
       return authorize(this.params.responseType, this.params.clientId, this.params.redirectUri, this.params.state,
           autoApprove, checkedScopes, uncheckedScopes)
+    },
+    formatScope(scope) {
+      // 格式化 scope 授权范围，方便用户理解。
+      // 这里仅仅是一个 demo，可以考虑录入到字典数据中，例如说字典类型 "system_oauth2_scope"，它的每个 scope 都是一条字典数据。
+      switch (scope) {
+        case 'user.read': return '访问你的个人信息'
+        case 'user.write': return '修改你的个人信息'
+        default: return scope
+      }
     }
   }
 };
