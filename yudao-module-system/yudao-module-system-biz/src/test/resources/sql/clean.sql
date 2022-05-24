@@ -24,3 +24,4 @@ DELETE FROM "system_oauth2_client";
 DELETE FROM "system_oauth2_approve";
 DELETE FROM "system_oauth2_access_token";
 DELETE FROM "system_oauth2_refresh_token";
+DELETE FROM "system_oauth2_code";
