@@ -15,6 +15,7 @@ import cn.iocoder.yudao.module.system.dal.mysql.oauth2.OAuth2ClientMapper;
 import cn.iocoder.yudao.module.system.mq.producer.auth.OAuth2ClientProducer;
 import com.google.common.annotations.VisibleForTesting;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -51,7 +52,8 @@ public class OAuth2ClientServiceImpl implements OAuth2ClientService {
      *
      * 这里声明 volatile 修饰的原因是，每次刷新时，直接修改指向
      */
-    @Getter
+    @Getter // 解决单测
+    @Setter // 解决单测
     private volatile Map<String, OAuth2ClientDO> clientCache;
     /**
      * 缓存角色的最大更新时间，用于后续的增量轮询，判断是否有更新
@@ -151,7 +153,7 @@ public class OAuth2ClientServiceImpl implements OAuth2ClientService {
     }
 
     @VisibleForTesting
-    public void validateClientIdExists(Long id, String clientId) {
+    void validateClientIdExists(Long id, String clientId) {
         OAuth2ClientDO client = oauth2ClientMapper.selectByClientId(clientId);
         if (client == null) {
             return;
@@ -160,7 +162,7 @@ public class OAuth2ClientServiceImpl implements OAuth2ClientService {
         if (id == null) {
             throw exception(OAUTH2_CLIENT_EXISTS);
         }
-        if (!client.getClientId().equals(clientId)) {
+        if (!client.getId().equals(id)) {
             throw exception(OAUTH2_CLIENT_EXISTS);
         }
     }
@@ -189,7 +191,7 @@ public class OAuth2ClientServiceImpl implements OAuth2ClientService {
 
         // 校验客户端密钥
         if (StrUtil.isNotEmpty(clientSecret) && ObjectUtil.notEqual(client.getSecret(), clientSecret)) {
-            throw exception(OAUTH2_CLIENT_CLIENT_SECRET_ERROR, clientSecret);
+            throw exception(OAUTH2_CLIENT_CLIENT_SECRET_ERROR);
         }
         // 校验授权方式
         if (StrUtil.isNotEmpty(authorizedGrantType) && !CollUtil.contains(client.getAuthorizedGrantTypes(), authorizedGrantType)) {

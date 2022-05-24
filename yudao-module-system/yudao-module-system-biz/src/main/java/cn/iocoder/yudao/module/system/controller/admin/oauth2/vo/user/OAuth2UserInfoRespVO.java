@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.system.controller.admin.oauth2.vo.open.user;
+package cn.iocoder.yudao.module.system.controller.admin.oauth2.vo.user;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -8,11 +8,11 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-@ApiModel("管理后台 - 【开放接口】获得用户基本信息 Response VO")
+@ApiModel("管理后台 - OAuth2.0 获得用户基本信息 Response VO")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class OAuth2OpenUserInfoRespVO {
+public class OAuth2UserInfoRespVO {
 
     @ApiModelProperty(value = "用户编号", required = true, example = "1")
     private Long id;
