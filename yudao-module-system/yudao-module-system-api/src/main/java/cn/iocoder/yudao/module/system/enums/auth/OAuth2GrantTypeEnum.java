@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.system.enums.auth;
 
+import cn.hutool.core.util.ArrayUtil;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -20,5 +21,9 @@ public enum OAuth2GrantTypeEnum {
     ;
 
     private final String grantType;
+
+    public static OAuth2GrantTypeEnum getByGranType(String grantType) {
+        return ArrayUtil.firstMatch(o -> o.getGrantType().equals(grantType), values());
+    }
 
 }

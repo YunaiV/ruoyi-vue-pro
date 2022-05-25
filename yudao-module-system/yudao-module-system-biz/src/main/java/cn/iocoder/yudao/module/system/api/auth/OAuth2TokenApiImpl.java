@@ -4,8 +4,8 @@ import cn.iocoder.yudao.module.system.api.auth.dto.OAuth2AccessTokenCheckRespDTO
 import cn.iocoder.yudao.module.system.api.auth.dto.OAuth2AccessTokenCreateReqDTO;
 import cn.iocoder.yudao.module.system.api.auth.dto.OAuth2AccessTokenRespDTO;
 import cn.iocoder.yudao.module.system.convert.auth.OAuth2TokenConvert;
-import cn.iocoder.yudao.module.system.dal.dataobject.auth.OAuth2AccessTokenDO;
-import cn.iocoder.yudao.module.system.service.auth.OAuth2TokenService;
+import cn.iocoder.yudao.module.system.dal.dataobject.oauth2.OAuth2AccessTokenDO;
+import cn.iocoder.yudao.module.system.service.oauth2.OAuth2TokenService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -24,7 +24,7 @@ public class OAuth2TokenApiImpl implements OAuth2TokenApi {
     @Override
     public OAuth2AccessTokenRespDTO createAccessToken(OAuth2AccessTokenCreateReqDTO reqDTO) {
         OAuth2AccessTokenDO accessTokenDO = oauth2TokenService.createAccessToken(
-                reqDTO.getUserId(), reqDTO.getUserType(), reqDTO.getClientId());
+                reqDTO.getUserId(), reqDTO.getUserType(), reqDTO.getClientId(), reqDTO.getScopes());
         return OAuth2TokenConvert.INSTANCE.convert2(accessTokenDO);
     }
 

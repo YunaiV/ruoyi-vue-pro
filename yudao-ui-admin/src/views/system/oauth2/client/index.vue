@@ -108,20 +108,13 @@
             <el-option v-for="redirectUri in form.redirectUris" :key="redirectUri" :label="redirectUri" :value="redirectUri"/>
           </el-select>
         </el-form-item>
-        <el-form-item label="是否自动授权" prop="autoApprove">
-          <el-radio-group v-model="form.autoApprove">
-            <el-radio :key="true" :label="true">自动登录</el-radio>
-            <el-radio :key="false" :label="false">手动登录</el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item label="授权类型" prop="authorizedGrantTypes">
-          <el-select v-model="form.authorizedGrantTypes" multiple filterable placeholder="请输入授权类型" style="width: 500px" >
-            <el-option v-for="dict in this.getDictDatas(DICT_TYPE.SYSTEM_OAUTH2_GRANT_TYPE)"
-                       :key="dict.value" :label="dict.label" :value="dict.value"/>
-          </el-select>
-        </el-form-item>
         <el-form-item label="授权范围" prop="scopes">
           <el-select v-model="form.scopes" multiple filterable allow-create placeholder="请输入授权范围" style="width: 500px" >
+            <el-option v-for="scope in form.scopes" :key="scope" :label="scope" :value="scope"/>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="自动授权" prop="autoApproveScopes">
+          <el-select v-model="form.autoApproveScopes" multiple filterable placeholder="请输入授权范围" style="width: 500px" >
             <el-option v-for="scope in form.scopes" :key="scope" :label="scope" :value="scope"/>
           </el-select>
         </el-form-item>
@@ -196,7 +189,6 @@ export default {
         accessTokenValiditySeconds: [{ required: true, message: "访问令牌的有效期不能为空", trigger: "blur" }],
         refreshTokenValiditySeconds: [{ required: true, message: "刷新令牌的有效期不能为空", trigger: "blur" }],
         redirectUris: [{ required: true, message: "可重定向的 URI 地址不能为空", trigger: "blur" }],
-        autoApprove: [{ required: true, message: "是否自动授权不能为空", trigger: "blur" }],
         authorizedGrantTypes: [{ required: true, message: "授权类型不能为空", trigger: "blur" }],
       }
     };
@@ -235,9 +227,9 @@ export default {
         accessTokenValiditySeconds: 30 * 60,
         refreshTokenValiditySeconds: 30 * 24 * 60,
         redirectUris: [],
-        autoApprove: true,
         authorizedGrantTypes: [],
         scopes: [],
+        autoApproveScopes: [],
         authorities: [],
         resourceIds: [],
         additionalInformation: undefined,
