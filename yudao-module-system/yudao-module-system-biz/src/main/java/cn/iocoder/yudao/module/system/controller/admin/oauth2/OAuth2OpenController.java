@@ -52,8 +52,6 @@ import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUti
  * 考虑到【本系统】暂时不想做的过于复杂，默认只有获取到 access token 之后，可以访问【本系统】管理后台的 /system-api/* 所有接口，除非手动添加 scope 控制。
  * scope 的使用示例，可见 {@link OAuth2UserController} 类
  *
- *
- *
  * @author 芋道源码
  */
 @Api(tags = "管理后台 - OAuth2.0 授权")
@@ -185,8 +183,7 @@ public class OAuth2OpenController {
         // 0. 校验用户已经登录。通过 Spring Security 实现
 
         // 1. 获得 Client 客户端的信息
-        OAuth2ClientDO client = oauth2ClientService.validOAuthClientFromCache(clientId, null,
-                null, null, null);
+        OAuth2ClientDO client = oauth2ClientService.validOAuthClientFromCache(clientId);
         // 2. 获得用户已经授权的信息
         List<OAuth2ApproveDO> approves = oauth2ApproveService.getApproveList(getLoginUserId(), getUserType(), clientId);
         // 拼接返回
@@ -223,7 +220,6 @@ public class OAuth2OpenController {
         @SuppressWarnings("unchecked")
         Map<String, Boolean> scopes = JsonUtils.parseObject(scope, Map.class);
         scopes = ObjectUtil.defaultIfNull(scopes, Collections.emptyMap());
-        // TODO 芋艿：针对 approved + scopes 在看看 spring security 的实现
         // 0. 校验用户已经登录。通过 Spring Security 实现
 
         // 1.1 校验 responseType 是否满足 code 或者 token 值
@@ -262,7 +258,7 @@ public class OAuth2OpenController {
         if (StrUtil.equalsAny(responseType, "token")) {
             return OAuth2GrantTypeEnum.IMPLICIT;
         }
-        throw exception0(BAD_REQUEST.getCode(), "response_type 参数值允许 code 和 token");
+        throw exception0(BAD_REQUEST.getCode(), "response_type 参数值只允许 code 和 token");
     }
 
     private String getImplicitGrantRedirect(Long userId, OAuth2ClientDO client,
@@ -279,7 +275,7 @@ public class OAuth2OpenController {
     private String getAuthorizationCodeRedirect(Long userId, OAuth2ClientDO client,
                                                 List<String> scopes, String redirectUri, String state) {
         // 1. 创建 code 授权码
-        String authorizationCode = oauth2GrantService.grantAuthorizationCodeForCode(userId,getUserType(), client.getClientId(), scopes,
+        String authorizationCode = oauth2GrantService.grantAuthorizationCodeForCode(userId, getUserType(), client.getClientId(), scopes,
                 redirectUri, state);
         // 2. 拼接重定向的 URL
         return OAuth2Utils.buildAuthorizationCodeRedirectUri(redirectUri, authorizationCode, state);

@@ -61,11 +61,13 @@ public class OAuth2Utils {
         if (CollUtil.isNotEmpty(scopes)) {
             vars.put("scope", buildScopeStr(scopes));
         }
-        for (String key : additionalInformation.keySet()) {
-            Object value = additionalInformation.get(key);
-            if (value != null) {
-                keys.put("extra_" + key, key);
-                vars.put("extra_" + key, value);
+        if (CollUtil.isNotEmpty(additionalInformation)) {
+            for (String key : additionalInformation.keySet()) {
+                Object value = additionalInformation.get(key);
+                if (value != null) {
+                    keys.put("extra_" + key, key);
+                    vars.put("extra_" + key, value);
+                }
             }
         }
         // Do not include the refresh token (even if there is one)
