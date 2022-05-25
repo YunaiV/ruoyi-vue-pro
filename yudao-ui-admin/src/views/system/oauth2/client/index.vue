@@ -103,9 +103,10 @@
         <el-form-item label="刷新令牌的有效期" prop="refreshTokenValiditySeconds">
           <el-input-number v-model="form.refreshTokenValiditySeconds" placeholder="单位：秒" />
         </el-form-item>
-        <el-form-item label="可重定向的 URI 地址" prop="redirectUris">
-          <el-select v-model="form.redirectUris" multiple filterable allow-create placeholder="请输入可重定向的 URI 地址" style="width: 500px" >
-            <el-option v-for="redirectUri in form.redirectUris" :key="redirectUri" :label="redirectUri" :value="redirectUri"/>
+        <el-form-item label="授权类型" prop="authorizedGrantTypes">
+          <el-select v-model="form.authorizedGrantTypes" multiple filterable placeholder="请输入授权类型" style="width: 500px" >
+            <el-option v-for="dict in this.getDictDatas(DICT_TYPE.SYSTEM_OAUTH2_GRANT_TYPE)"
+                       :key="dict.value" :label="dict.label" :value="dict.value"/>
           </el-select>
         </el-form-item>
         <el-form-item label="授权范围" prop="scopes">
@@ -113,9 +114,14 @@
             <el-option v-for="scope in form.scopes" :key="scope" :label="scope" :value="scope"/>
           </el-select>
         </el-form-item>
-        <el-form-item label="自动授权" prop="autoApproveScopes">
+        <el-form-item label="自动授权范围" prop="autoApproveScopes">
           <el-select v-model="form.autoApproveScopes" multiple filterable placeholder="请输入授权范围" style="width: 500px" >
             <el-option v-for="scope in form.scopes" :key="scope" :label="scope" :value="scope"/>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="可重定向的 URI 地址" prop="redirectUris">
+          <el-select v-model="form.redirectUris" multiple filterable allow-create placeholder="请输入可重定向的 URI 地址" style="width: 500px" >
+            <el-option v-for="redirectUri in form.redirectUris" :key="redirectUri" :label="redirectUri" :value="redirectUri"/>
           </el-select>
         </el-form-item>
         <el-form-item label="权限" prop="authorities">
