@@ -6,7 +6,9 @@ import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.module.system.dal.dataobject.oauth2.OAuth2ApproveDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.oauth2.OAuth2ClientDO;
 import cn.iocoder.yudao.module.system.dal.mysql.oauth2.OAuth2ApproveMapper;
+import com.google.common.annotations.VisibleForTesting;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
@@ -35,6 +37,7 @@ public class OAuth2ApproveServiceImpl implements OAuth2ApproveService {
     private OAuth2ApproveMapper oauth2ApproveMapper;
 
     @Override
+    @Transactional
     public boolean checkForPreApproval(Long userId, Integer userType, String clientId, Collection<String> requestedScopes) {
         // 第一步，基于 Client 的自动授权计算，如果 scopes 都在自动授权中，则返回 true 通过
         OAuth2ClientDO clientDO = oauth2ClientService.validOAuthClientFromCache(clientId);
@@ -49,14 +52,14 @@ public class OAuth2ApproveServiceImpl implements OAuth2ApproveService {
         }
 
         // 第二步，算上用户已经批准的授权。如果 scopes 都包含，则返回 true
-        List<OAuth2ApproveDO> approveDOs = oauth2ApproveMapper.selectListByUserIdAndUserTypeAndClientId(
-                userId, userType, clientId);
+        List<OAuth2ApproveDO> approveDOs = getApproveList(userId, userType, clientId);
         Set<String> scopes = convertSet(approveDOs, OAuth2ApproveDO::getScope,
-                o -> o.getApproved() && !DateUtils.isExpired(o.getExpiresTime())); // 只保留未过期的
+                OAuth2ApproveDO::getApproved); // 只保留未过期的 + 同意的
         return CollUtil.containsAll(scopes, requestedScopes);
     }
 
     @Override
+    @Transactional
     public boolean updateAfterApproval(Long userId, Integer userType, String clientId, Map<String, Boolean> requestedScopes) {
         // 如果 requestedScopes 为空，说明没有要求，则返回 true 通过
         if (CollUtil.isEmpty(requestedScopes)) {
@@ -83,8 +86,9 @@ public class OAuth2ApproveServiceImpl implements OAuth2ApproveService {
         return approveDOs;
     }
 
-    private void saveApprove(Long userId, Integer userType, String clientId,
-                             String scope, Boolean approved, Date expireTime) {
+    @VisibleForTesting
+    void saveApprove(Long userId, Integer userType, String clientId,
+                     String scope, Boolean approved, Date expireTime) {
         // 先更新
         OAuth2ApproveDO approveDO = new OAuth2ApproveDO().setUserId(userId).setUserType(userType)
                 .setClientId(clientId).setScope(scope).setApproved(approved).setExpiresTime(expireTime);

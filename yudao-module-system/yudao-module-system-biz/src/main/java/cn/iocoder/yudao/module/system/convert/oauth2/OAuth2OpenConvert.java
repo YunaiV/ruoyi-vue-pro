@@ -7,15 +7,9 @@ import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.system.controller.admin.oauth2.vo.open.OAuth2OpenAccessTokenRespVO;
 import cn.iocoder.yudao.module.system.controller.admin.oauth2.vo.open.OAuth2OpenAuthorizeInfoRespVO;
 import cn.iocoder.yudao.module.system.controller.admin.oauth2.vo.open.OAuth2OpenCheckTokenRespVO;
-import cn.iocoder.yudao.module.system.controller.admin.oauth2.vo.open.user.OAuth2OpenUserInfoRespVO;
-import cn.iocoder.yudao.module.system.controller.admin.oauth2.vo.open.user.OAuth2OpenUserUpdateReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.user.vo.profile.UserProfileUpdateReqVO;
-import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
-import cn.iocoder.yudao.module.system.dal.dataobject.dept.PostDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.oauth2.OAuth2AccessTokenDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.oauth2.OAuth2ApproveDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.oauth2.OAuth2ClientDO;
-import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
 import cn.iocoder.yudao.module.system.util.oauth2.OAuth2Utils;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
@@ -45,14 +39,6 @@ public interface OAuth2OpenConvert {
         return respVO;
     }
     OAuth2OpenCheckTokenRespVO convert3(OAuth2AccessTokenDO bean);
-
-    // ============ 用户操作的示例 ============
-
-    OAuth2OpenUserInfoRespVO convert(AdminUserDO bean);
-    OAuth2OpenUserInfoRespVO.Dept convert(DeptDO dept);
-    List<OAuth2OpenUserInfoRespVO.Post> convertList(List<PostDO> list);
-
-    UserProfileUpdateReqVO convert(OAuth2OpenUserUpdateReqVO bean);
 
     default OAuth2OpenAuthorizeInfoRespVO convert(OAuth2ClientDO client, List<OAuth2ApproveDO> approves) {
         // 构建 scopes
