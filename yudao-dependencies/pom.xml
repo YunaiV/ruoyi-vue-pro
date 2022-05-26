@@ -52,6 +52,7 @@
         <easyexcel.verion>2.2.7</easyexcel.verion>
         <velocity.version>2.2</velocity.version>
         <screw.version>1.0.5</screw.version>
+		<fastjson.version>2.0.4</fastjson.version>
         <guava.version>30.1.1-jre</guava.version>
         <guice.version>5.1.0</guice.version>
         <transmittable-thread-local.version>2.12.2</transmittable-thread-local.version>
@@ -475,6 +476,13 @@
                 <version>${velocity.version}</version>
             </dependency>
 
+			<!--fastjson漏洞升级此次事件影响fastjson 1.2.80及之前所有版本 -->
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>fastjson</artifactId>
+                <version>${fastjson.version}</version>
+            </dependency>
+			
             <dependency>
                 <groupId>cn.smallbun.screw</groupId>
                 <artifactId>screw-core</artifactId> <!-- 实现数据库文档 -->
@@ -483,6 +491,10 @@
                     <exclusion>
                         <groupId>org.freemarker</groupId>
                         <artifactId>freemarker</artifactId> <!-- 移除 Freemarker 依赖，采用 Velocity 作为模板引擎 -->
+                    </exclusion>
+				    <exclusion>
+                        <groupId>com.alibaba</groupId>
+                        <artifactId>fastjson</artifactId> <!-- 最新版screw-core1.0.5依赖fastjson1.2.73存在漏洞，移除。 -->
                     </exclusion>
                 </exclusions>
             </dependency>
