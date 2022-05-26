@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.system.service.dict;
 
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.system.controller.admin.dict.vo.type.DictTypeCreateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.dict.vo.type.DictTypeExportReqVO;
@@ -113,6 +114,9 @@ public class DictTypeServiceImpl implements DictTypeService {
 
     @VisibleForTesting
     public void checkDictTypeUnique(Long id, String type) {
+        if (StrUtil.isEmpty(type)) {
+            return;
+        }
         DictTypeDO dictType = dictTypeMapper.selectByType(type);
         if (dictType == null) {
             return;

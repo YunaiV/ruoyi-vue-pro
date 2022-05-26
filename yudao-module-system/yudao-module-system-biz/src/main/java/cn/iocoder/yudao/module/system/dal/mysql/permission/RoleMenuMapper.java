@@ -11,7 +11,6 @@ import org.springframework.stereotype.Repository;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Mapper
 public interface RoleMenuMapper extends BaseMapperX<RoleMenuDO> {
@@ -37,7 +36,7 @@ public interface RoleMenuMapper extends BaseMapperX<RoleMenuDO> {
         delete(new QueryWrapper<RoleMenuDO>().eq("role_id", roleId));
     }
 
-    @Select("SELECT id FROM system_role_menu WHERE update_time > #{maxUpdateTime} LIMIT 1")
-    Long selectExistsByUpdateTimeAfter(Date maxUpdateTime);
+    @Select("SELECT COUNT(*) FROM system_role_menu WHERE update_time > #{maxUpdateTime}")
+    Long selectCountByUpdateTimeGt(Date maxUpdateTime);
 
 }

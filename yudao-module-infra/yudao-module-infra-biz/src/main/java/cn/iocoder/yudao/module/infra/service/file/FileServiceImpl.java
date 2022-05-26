@@ -2,6 +2,8 @@ package cn.iocoder.yudao.module.infra.service.file;
 
 import cn.hutool.core.io.FileTypeUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.crypto.digest.DigestUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.file.core.client.FileClient;
 import cn.iocoder.yudao.module.infra.controller.admin.file.vo.file.FilePageReqVO;
@@ -36,6 +38,12 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public String createFile(String path, byte[] content) throws Exception {
+        // 计算默认的 path 名
+        String type = FileTypeUtil.getType(new ByteArrayInputStream(content));
+        if (StrUtil.isEmpty(path)) {
+            path = DigestUtil.md5Hex(content) + '.' + type;
+        }
+
         // 上传到文件存储器
         FileClient client = fileConfigService.getMasterFileClient();
         Assert.notNull(client, "客户端(master) 不能为空");
@@ -46,7 +54,7 @@ public class FileServiceImpl implements FileService {
         file.setConfigId(client.getId());
         file.setPath(path);
         file.setUrl(url);
-        file.setType(FileTypeUtil.getType(new ByteArrayInputStream(content)));
+        file.setType(type);
         file.setSize(content.length);
         fileMapper.insert(file);
         return url;

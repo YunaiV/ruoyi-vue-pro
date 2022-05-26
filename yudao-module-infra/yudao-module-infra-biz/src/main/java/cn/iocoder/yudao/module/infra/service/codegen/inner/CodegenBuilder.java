@@ -105,15 +105,17 @@ public class CodegenBuilder {
      * @param table 表定义
      */
     private void initTableDefault(CodegenTableDO table) {
-        // 以 system_dept 举例子。moduleName 为 system、businessName 为 dept、className 为 SystemDept
-        // 如果不希望 System 前缀，则可以手动在【代码生成 - 修改生成配置 - 基本信息】，将实体类名称改为 Dept 即可
-        table.setModuleName(subBefore(table.getTableName(), '_', false)); // 第一个 _ 前缀的前面，作为 module 名字
-        table.setBusinessName(toCamelCase(subAfter(table.getTableName(),
-                '_', false))); // 第一步，第一个 _ 前缀的后面，作为 module 名字; 第二步，可能存在多个 _ 的情况，转换成驼峰
-        table.setClassName(upperFirst(toCamelCase( // 驼峰 + 首字母大写
-                subAfter(table.getTableName(), '_', false)))); // 第一个 _ 前缀的前面，作为 class 名字
-        table.setClassComment(subBefore(table.getTableComment(), // 去除结尾的表，作为类描述
-                '表', true));
+        // 以 system_dept 举例子。moduleName 为 system、businessName 为 dept、className 为 Dept
+        // 如果希望以 System 前缀，则可以手动在【代码生成 - 修改生成配置 - 基本信息】，将实体类名称改为 SystemDept 即可
+        String tableName = table.getTableName().toLowerCase();
+        // 第一步，_ 前缀的前面，作为 module 名字；第二步，moduleName 必须小写；
+        table.setModuleName(subBefore(tableName, '_', false).toLowerCase());
+        // 第一步，第一个 _ 前缀的后面，作为 module 名字; 第二步，可能存在多个 _ 的情况，转换成驼峰; 第三步，businessName 必须小写；
+        table.setBusinessName(toCamelCase(subAfter(tableName, '_', false)).toLowerCase());
+        // 驼峰 + 首字母大写；第一步，第一个 _ 前缀的后面，作为 class 名字；第二步，驼峰命名
+        table.setClassName(upperFirst(toCamelCase(subAfter(tableName, '_', false))));
+        // 去除结尾的表，作为类描述
+        table.setClassComment(StrUtil.removeSuffixIgnoreCase(table.getTableComment(), "表"));
         table.setTemplateType(CodegenTemplateTypeEnum.CRUD.getType());
     }
 

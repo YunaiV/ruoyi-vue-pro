@@ -28,7 +28,7 @@
           <dict-tag :type="DICT_TYPE.BPM_PROCESS_INSTANCE_RESULT" :value="scope.row.result"/>
         </template>
       </el-table-column>
-      <el-table-column label="审批意见" align="center" prop="comment" width="200" />
+      <el-table-column label="审批意见" align="center" prop="reason" width="200" />
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>

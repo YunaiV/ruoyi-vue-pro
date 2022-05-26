@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.system.service.permission;
 
-import cn.iocoder.yudao.framework.datapermission.core.dept.service.DeptDataPermissionFrameworkService;
-import cn.iocoder.yudao.framework.security.core.service.SecurityPermissionFrameworkService;
+import cn.iocoder.yudao.module.system.api.permission.dto.DeptDataPermissionRespDTO;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.MenuDO;
 import org.springframework.lang.Nullable;
 
@@ -16,7 +15,7 @@ import java.util.Set;
  *
  * @author 芋道源码
  */
-public interface PermissionService extends SecurityPermissionFrameworkService, DeptDataPermissionFrameworkService {
+public interface PermissionService {
 
     /**
      * 初始化权限的本地缓存
@@ -37,13 +36,13 @@ public interface PermissionService extends SecurityPermissionFrameworkService, D
                                           Collection<Integer> menusStatuses);
 
     /**
-     * 获得用户拥有的角色编号集合
+     * 获得用户拥有的角色编号集合，从缓存中获取
      *
      * @param userId 用户编号
      * @param roleStatuses 角色状态集合. 允许为空，为空时不过滤
      * @return 角色编号集合
      */
-    Set<Long> getUserRoleIds(Long userId, @Nullable Collection<Integer> roleStatuses);
+    Set<Long> getUserRoleIdsFromCache(Long userId, @Nullable Collection<Integer> roleStatuses);
 
     /**
      * 获得角色拥有的菜单编号集合
@@ -52,6 +51,14 @@ public interface PermissionService extends SecurityPermissionFrameworkService, D
      * @return 菜单编号集合
      */
     Set<Long> getRoleMenuIds(Long roleId);
+
+    /**
+     * 获得拥有多个角色的用户编号集合
+     *
+     * @param roleIds 角色编号集合
+     * @return 用户编号集合
+     */
+    Set<Long> getUserRoleIdListByRoleIds(Collection<Long> roleIds);
 
     /**
      * 设置角色菜单
@@ -68,14 +75,6 @@ public interface PermissionService extends SecurityPermissionFrameworkService, D
      * @return 角色编号集合
      */
     Set<Long> getUserRoleIdListByUserId(Long userId);
-
-    /**
-     * 获得拥有某个角色的用户编号集合
-     *
-     * @param roleId 角色编号
-     * @return 用户编号集合
-     */
-    Set<Long> getUserRoleIdListByRoleId(Long roleId);
 
     /**
      * 设置用户角色
@@ -116,11 +115,28 @@ public interface PermissionService extends SecurityPermissionFrameworkService, D
     void processUserDeleted(Long userId);
 
     /**
-     * 获得拥有多个角色的用户编号集合
+     * 判断是否有权限，任一一个即可
      *
-     * @param roleIds 角色编号集合
-     * @return 用户编号集合
+     * @param userId 用户编号
+     * @param permissions 权限
+     * @return 是否
      */
-    Set<Long> getUserRoleIdListByRoleIds(Collection<Long> roleIds);
+    boolean hasAnyPermissions(Long userId, String... permissions);
+
+    /**
+     * 判断是否有角色，任一一个即可
+     *
+     * @param roles 角色数组
+     * @return 是否
+     */
+    boolean hasAnyRoles(Long userId, String... roles);
+
+    /**
+     * 获得登陆用户的部门数据权限
+     *
+     * @param userId 用户编号
+     * @return 部门数据权限
+     */
+    DeptDataPermissionRespDTO getDeptDataPermission(Long userId);
 
 }

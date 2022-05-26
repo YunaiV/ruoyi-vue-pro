@@ -46,7 +46,6 @@ public class UserProfileController {
     private AdminUserService userService;
     @Resource
     private DeptService deptService;
-
     @Resource
     private PostService postService;
     @Resource

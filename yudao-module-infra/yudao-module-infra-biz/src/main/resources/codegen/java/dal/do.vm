@@ -10,7 +10,8 @@ import ${BaseDOClassName};
  *
  * @author ${table.author}
  */
-@TableName("${table.tableName}")
+@TableName("${table.tableName.toLowerCase()}")
+@KeySequence("${table.tableName.toLowerCase()}_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
@@ -29,7 +30,7 @@ public class ${table.className}DO extends BaseDO {
     #end
      */
     #if (${column.primaryKey})##处理主键
-    @TableId#if (${column.javaType} == 'String')type = IdType.INPUT)#end
+    @TableId#if (${column.javaType} == 'String')(type = IdType.INPUT)#end
     #end
     private ${column.javaType} ${column.javaField};
 #end

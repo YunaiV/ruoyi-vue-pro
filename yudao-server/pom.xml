@@ -21,7 +21,6 @@
     <url>https://github.com/YunaiV/ruoyi-vue-pro</url>
 
     <dependencies>
-        <!-- TODO 芋艿：多模块 -->
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
             <artifactId>yudao-module-member-biz</artifactId>

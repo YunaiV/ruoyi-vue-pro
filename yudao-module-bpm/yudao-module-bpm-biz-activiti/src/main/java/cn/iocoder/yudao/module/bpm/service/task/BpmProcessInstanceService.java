@@ -158,8 +158,8 @@ public interface BpmProcessInstanceService {
      * 更新 ProcessInstance 拓展记录为不通过
      *
      * @param id 流程编号
-     * @param comment 理由。例如说，审批不通过时，需要传递该值
+     * @param reason 理由。例如说，审批不通过时，需要传递该值
      */
-    void updateProcessInstanceExtReject(String id, String comment);
+    void updateProcessInstanceExtReject(String id, String reason);
 
 }

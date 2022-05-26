@@ -113,8 +113,7 @@ public class JsonUtils {
         }
     }
 
-    // TODO @Li：和上面的风格保持一致哈。parseTree
-    public static JsonNode readTree(String text) {
+    public static JsonNode parseTree(String text) {
         try {
             return objectMapper.readTree(text);
         } catch (IOException e) {
@@ -123,13 +122,17 @@ public class JsonUtils {
         }
     }
 
-    public static JsonNode readTree(byte[] text) {
+    public static JsonNode parseTree(byte[] text) {
         try {
             return objectMapper.readTree(text);
         } catch (IOException e) {
             log.error("json parse err,json:{}", text, e);
             throw new RuntimeException(e);
         }
+    }
+
+    public static boolean isJson(String text) {
+        return JSONUtil.isJson(text);
     }
 
 }

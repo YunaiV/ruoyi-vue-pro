@@ -42,6 +42,7 @@ public interface SensitiveWordMapper extends BaseMapperX<SensitiveWordDO> {
         return selectOne(SensitiveWordDO::getName, name);
     }
 
-    @Select("SELECT id FROM system_sensitive_word WHERE update_time > #{maxUpdateTime} LIMIT 1")
-    SensitiveWordDO selectExistsByUpdateTimeAfter(Date maxUpdateTime);
+    @Select("SELECT COUNT(*) FROM system_sensitive_word WHERE update_time > #{maxUpdateTime}")
+    Long selectCountByUpdateTimeGt(Date maxUpdateTime);
+
 }

@@ -18,12 +18,10 @@ import org.flowable.task.api.Task;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
-import org.mapstruct.Mappings;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 /**
  * 流程实例 Convert
@@ -105,11 +103,11 @@ public interface BpmProcessInstanceConvert {
                 .setProcessInstanceName(instance.getName());
     }
 
-    default BpmMessageSendWhenProcessInstanceRejectReqDTO convert2RejectReq(ProcessInstance instance, String comment) {
+    default BpmMessageSendWhenProcessInstanceRejectReqDTO convert2RejectReq(ProcessInstance instance, String reason) {
         return new BpmMessageSendWhenProcessInstanceRejectReqDTO()
             .setProcessInstanceName(instance.getName())
             .setProcessInstanceId(instance.getId())
-            .setComment(comment)
+            .setReason(reason)
             .setStartUserId(NumberUtils.parseLong(instance.getStartUserId()));
     }
 

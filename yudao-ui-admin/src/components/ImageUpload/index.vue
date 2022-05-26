@@ -2,7 +2,7 @@
   <div class="component-upload-image">
     <el-upload
       multiple
-      :action="uploadImgUrl"
+      :action="uploadFileUrl"
       list-type="picture-card"
       :on-success="handleUploadSuccess"
       :before-upload="handleBeforeUpload"
@@ -43,7 +43,7 @@
 </template>
 
 <script>
-import { getToken } from "@/utils/auth";
+import { getAccessToken } from "@/utils/auth";
 
 export default {
   props: {
@@ -76,11 +76,8 @@ export default {
       dialogImageUrl: "",
       dialogVisible: false,
       hideUpload: false,
-      baseUrl: process.env.VUE_APP_BASE_API,
-      uploadImgUrl: process.env.VUE_APP_BASE_API + "/common/upload", // 上传的图片服务器地址
-      headers: {
-        Authorization: "Bearer " + getToken(),
-      },
+      uploadFileUrl: process.env.VUE_APP_BASE_API + "/admin-api/infra/file/upload", // 请求地址
+      headers: { Authorization: "Bearer " + getAccessToken() }, // 设置上传的请求头部
       fileList: []
     };
   },
@@ -93,11 +90,8 @@ export default {
           // 然后将数组转为对象数组
           this.fileList = list.map(item => {
             if (typeof item === "string") {
-              if (item.indexOf(this.baseUrl) === -1) {
-                item = { name: this.baseUrl + item, url: this.baseUrl + item };
-              } else {
-                item = { name: item, url: item };
-              }
+              // edit by 芋道源码
+              item = { name: item, url: item };
             }
             return item;
           });
@@ -127,7 +121,8 @@ export default {
     },
     // 上传成功回调
     handleUploadSuccess(res) {
-      this.uploadList.push({ name: res.fileName, url: res.fileName });
+      // edit by 芋道源码
+      this.uploadList.push({ name: res.data, url: res.data });
       if (this.uploadList.length === this.number) {
         this.fileList = this.fileList.concat(this.uploadList);
         this.uploadList = [];
@@ -188,7 +183,7 @@ export default {
       for (let i in list) {
         strs += list[i].url.replace(this.baseUrl, "") + separator;
       }
-      return strs != '' ? strs.substr(0, strs.length - 1) : '';
+      return strs !== '' ? strs.substr(0, strs.length - 1) : '';
     }
   }
 };
