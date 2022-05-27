@@ -39,7 +39,7 @@ public class FileServiceImpl implements FileService {
     @Override
     public String createFile(String path, byte[] content) throws Exception {
         // 计算默认的 path 名
-        String type = FileTypeUtil.getType(new ByteArrayInputStream(content));
+        String type = FileTypeUtil.getType(new ByteArrayInputStream(content), path);
         if (StrUtil.isEmpty(path)) {
             path = DigestUtil.md5Hex(content) + '.' + type;
         }
