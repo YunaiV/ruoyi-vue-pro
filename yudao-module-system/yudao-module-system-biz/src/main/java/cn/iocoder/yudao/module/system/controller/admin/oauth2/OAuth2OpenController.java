@@ -87,9 +87,11 @@ public class OAuth2OpenController {
             @ApiImplicitParam(name = "grant_type", required = true, value = "授权类型", example = "code", dataTypeClass = String.class),
             @ApiImplicitParam(name = "code", value = "授权范围", example = "userinfo.read", dataTypeClass = String.class),
             @ApiImplicitParam(name = "redirect_uri", value = "重定向 URI", example = "https://www.iocoder.cn", dataTypeClass = String.class),
+            @ApiImplicitParam(name = "state", value = "状态", example = "1", dataTypeClass = String.class),
             @ApiImplicitParam(name = "username", example = "tudou", dataTypeClass = String.class),
             @ApiImplicitParam(name = "password", example = "cai", dataTypeClass = String.class), // 多个使用空格分隔
-            @ApiImplicitParam(name = "scope", example = "user_info", dataTypeClass = String.class)
+            @ApiImplicitParam(name = "scope", example = "user_info", dataTypeClass = String.class),
+            @ApiImplicitParam(name = "refresh_token", example = "123424233", dataTypeClass = String.class),
     })
     @OperateLog(enable = false) // 避免 Post 请求被记录操作日志
     public CommonResult<OAuth2OpenAccessTokenRespVO> postAccessToken(HttpServletRequest request,
@@ -207,8 +209,8 @@ public class OAuth2OpenController {
             @ApiImplicitParam(name = "client_id", required = true, value = "客户端编号", example = "tudou", dataTypeClass = String.class),
             @ApiImplicitParam(name = "scope", value = "授权范围", example = "userinfo.read", dataTypeClass = String.class), // 使用 Map<String, Boolean> 格式，Spring MVC 暂时不支持这么接收参数
             @ApiImplicitParam(name = "redirect_uri", required = true, value = "重定向 URI", example = "https://www.iocoder.cn", dataTypeClass = String.class),
-            @ApiImplicitParam(name = "autoApprove", required = true, value = "用户是否接受", example = "true", dataTypeClass = Boolean.class),
-            @ApiImplicitParam(name = "state", example = "123321", dataTypeClass = String.class)
+            @ApiImplicitParam(name = "auto_approve", required = true, value = "用户是否接受", example = "true", dataTypeClass = Boolean.class),
+            @ApiImplicitParam(name = "state", example = "1", dataTypeClass = String.class)
     })
     @OperateLog(enable = false) // 避免 Post 请求被记录操作日志
     public CommonResult<String> approveOrDeny(@RequestParam("response_type") String responseType,
