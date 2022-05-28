@@ -9,7 +9,6 @@ import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.BpmTaskTodoPage
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmTaskAssignRuleDO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.task.BpmTaskExtDO;
 import cn.iocoder.yudao.module.bpm.dal.mysql.definition.BpmTaskAssignRuleMapper;
-import cn.iocoder.yudao.module.bpm.domain.enums.definition.BpmTaskAssignRuleTypeEnum;
 import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceService;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
@@ -21,14 +20,18 @@ import org.flowable.common.engine.impl.de.odysseus.el.ExpressionFactoryImpl;
 import org.flowable.common.engine.impl.de.odysseus.el.util.SimpleContext;
 import org.flowable.common.engine.impl.javax.el.ExpressionFactory;
 import org.flowable.common.engine.impl.javax.el.ValueExpression;
-import org.flowable.engine.*;
+import org.flowable.engine.HistoryService;
+import org.flowable.engine.RepositoryService;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -259,10 +262,11 @@ public class HiTaskInstService {
                     DeptDO deptDO = deptMap.get(adminUserDO.getDeptId());
                     bpmTaskRespVO.setAssigneeUser(setUser(adminUserDO));
                     bpmTaskRespVO.getAssigneeUser().setDeptName(deptDO.getName());
-                    if (!bpmTaskAssignRuleDO.getType().equals(BpmTaskAssignRuleTypeEnum.USER_OR_SIGN.getType())
-                        && !bpmTaskAssignRuleDO.getType().equals(BpmTaskAssignRuleTypeEnum.USER_SIGN.getType())) {
-                        break;
-                    }
+                    // edit by 芋艿
+//                    if (!bpmTaskAssignRuleDO.getType().equals(BpmTaskAssignRuleTypeEnum.USER_OR_SIGN.getType())
+//                        && !bpmTaskAssignRuleDO.getType().equals(BpmTaskAssignRuleTypeEnum.USER_SIGN.getType())) {
+//                        break;
+//                    }
                 }
             }
             getFlow(bpmnModel, nextTaskDefKey, tmpBpmTaskAssignRuleDOList, bpmTaskRespVOList, userDoMap, deptMap,

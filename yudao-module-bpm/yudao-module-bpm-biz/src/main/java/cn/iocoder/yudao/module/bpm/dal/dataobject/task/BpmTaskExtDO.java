@@ -29,7 +29,7 @@ public class BpmTaskExtDO extends BaseDO {
     private Long id;
 
     /**
-     * 流程任务key
+     * 流程任务key TODO 芋艿，看看这个字段的作用
      */
     private String taskDefKey;
     /**

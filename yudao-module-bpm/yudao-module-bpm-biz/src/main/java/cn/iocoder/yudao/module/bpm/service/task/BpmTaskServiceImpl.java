@@ -15,7 +15,6 @@ import cn.iocoder.yudao.module.bpm.dal.dataobject.task.BpmTaskExtDO;
 import cn.iocoder.yudao.module.bpm.dal.mysql.definition.BpmTaskAssignRuleMapper;
 import cn.iocoder.yudao.module.bpm.dal.mysql.task.BpmActivityMapper;
 import cn.iocoder.yudao.module.bpm.dal.mysql.task.BpmTaskExtMapper;
-import cn.iocoder.yudao.module.bpm.domain.enums.definition.BpmTaskAssignRuleTypeEnum;
 import cn.iocoder.yudao.module.bpm.domain.enums.task.BpmProcessInstanceResultEnum;
 import cn.iocoder.yudao.module.bpm.service.message.BpmMessageService;
 import cn.iocoder.yudao.module.business.hi.task.inst.service.HiTaskInstService;
@@ -214,11 +213,12 @@ public class BpmTaskServiceImpl implements BpmTaskService {
             taskAssignRuleMapper.selectListByProcessDefinitionId(task.getProcessDefinitionId(),
                 task.getTaskDefinitionKey());
         if (CollUtil.isNotEmpty(bpmTaskAssignRuleList) && bpmTaskAssignRuleList.size() > 0) {
-            if (BpmTaskAssignRuleTypeEnum.USER_OR_SIGN.getType().equals(bpmTaskAssignRuleList.get(0).getType())) {
-                taskExtMapper.delTaskByProcInstIdAndTaskIdAndTaskDefKey(
-                    new BpmTaskExtDO().setTaskId(task.getId()).setTaskDefKey(task.getTaskDefinitionKey())
-                        .setProcessInstanceId(task.getProcessInstanceId()));
-            }
+            // edit by 芋艿
+//            if (BpmTaskAssignRuleTypeEnum.USER_OR_SIGN.getType().equals(bpmTaskAssignRuleList.get(0).getType())) {
+//                taskExtMapper.delTaskByProcInstIdAndTaskIdAndTaskDefKey(
+//                    new BpmTaskExtDO().setTaskId(task.getId()).setTaskDefKey(task.getTaskDefinitionKey())
+//                        .setProcessInstanceId(task.getProcessInstanceId()));
+//            }
         }
     }
 

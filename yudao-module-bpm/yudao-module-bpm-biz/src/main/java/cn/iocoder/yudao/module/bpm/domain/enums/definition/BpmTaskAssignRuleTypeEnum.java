@@ -17,8 +17,6 @@ public enum BpmTaskAssignRuleTypeEnum {
     DEPT_LEADER(21, "部门的负责人"),
     POST(22, "岗位"),
     USER(30, "用户"),
-    USER_SIGN(31, "用户---会签"),
-    USER_OR_SIGN(32, "用户---或签"),
     USER_GROUP(40, "用户组"),
     SCRIPT(50, "自定义脚本"), // 例如说，发起人所在部门的领导、发起人所在部门的领导的领导
     ;

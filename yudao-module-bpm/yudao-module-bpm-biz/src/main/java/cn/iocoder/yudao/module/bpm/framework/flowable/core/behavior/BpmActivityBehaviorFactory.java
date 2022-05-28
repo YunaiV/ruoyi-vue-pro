@@ -1,11 +1,6 @@
 package cn.iocoder.yudao.module.bpm.framework.flowable.core.behavior;
 
-import cn.iocoder.yudao.module.bpm.framework.flowable.core.behavior.script.BpmTaskAssignScript;
 import cn.iocoder.yudao.module.bpm.service.definition.BpmTaskAssignRuleService;
-import cn.iocoder.yudao.module.bpm.service.definition.BpmUserGroupService;
-import cn.iocoder.yudao.module.system.api.dept.DeptApi;
-import cn.iocoder.yudao.module.system.api.permission.PermissionApi;
-import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Setter;
@@ -16,8 +11,6 @@ import org.flowable.engine.impl.bpmn.behavior.AbstractBpmnActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.ParallelMultiInstanceBehavior;
 import org.flowable.engine.impl.bpmn.behavior.UserTaskActivityBehavior;
 import org.flowable.engine.impl.bpmn.parser.factory.DefaultActivityBehaviorFactory;
-
-import java.util.List;
 
 /**
  * 自定义的 ActivityBehaviorFactory 实现类，目的如下：
@@ -32,41 +25,18 @@ public class BpmActivityBehaviorFactory extends DefaultActivityBehaviorFactory {
 
     @Setter
     private BpmTaskAssignRuleService bpmTaskRuleService;
-    @Setter
-    private BpmUserGroupService userGroupService;
-
-    @Setter
-    private PermissionApi permissionApi;
-    @Setter
-    private DeptApi deptApi;
-    @Setter
-    private AdminUserApi adminUserApi;
-    @Setter
-    private List<BpmTaskAssignScript> scripts;
 
     @Override
     public UserTaskActivityBehavior createUserTaskActivityBehavior(UserTask userTask) {
-        BpmUserTaskActivityBehavior userTaskActivityBehavior = new BpmUserTaskActivityBehavior(userTask);
-        userTaskActivityBehavior.setBpmTaskRuleService(bpmTaskRuleService);
-        userTaskActivityBehavior.setPermissionApi(permissionApi);
-        userTaskActivityBehavior.setDeptApi(deptApi);
-        userTaskActivityBehavior.setUserGroupService(userGroupService);
-        userTaskActivityBehavior.setAdminUserApi(adminUserApi);
-        userTaskActivityBehavior.setScripts(scripts);
-        return userTaskActivityBehavior;
+        return new BpmUserTaskActivityBehavior(userTask)
+                .setBpmTaskRuleService(bpmTaskRuleService);
     }
 
     @Override
     public ParallelMultiInstanceBehavior createParallelMultiInstanceBehavior(Activity activity,
-        AbstractBpmnActivityBehavior innerActivityBehavior) {
-        BpmParallelMultiInstanceActivityBehavior bpmParallelMultiInstanceActivityBehavior =
-            new BpmParallelMultiInstanceActivityBehavior(activity, innerActivityBehavior);
-        bpmParallelMultiInstanceActivityBehavior.setBpmTaskRuleService(bpmTaskRuleService);
-        bpmParallelMultiInstanceActivityBehavior.setPermissionApi(permissionApi);
-        bpmParallelMultiInstanceActivityBehavior.setDeptApi(deptApi);
-        bpmParallelMultiInstanceActivityBehavior.setUserGroupService(userGroupService);
-        bpmParallelMultiInstanceActivityBehavior.setAdminUserApi(adminUserApi);
-        bpmParallelMultiInstanceActivityBehavior.setScripts(scripts);
-        return bpmParallelMultiInstanceActivityBehavior;
+                                                                             AbstractBpmnActivityBehavior innerActivityBehavior) {
+        return new BpmParallelMultiInstanceBehavior(activity, innerActivityBehavior)
+                .setBpmTaskRuleService(bpmTaskRuleService);
     }
+
 }
