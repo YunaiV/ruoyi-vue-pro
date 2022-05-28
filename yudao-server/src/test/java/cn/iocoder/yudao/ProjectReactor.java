@@ -50,7 +50,7 @@ public class ProjectReactor {
         String projectBaseDirNew = projectBaseDir + "-new"; // 一键改名后，“新”项目所在的目录
         log.info("[main][检测新项目目录 ({})是否存在]", projectBaseDirNew);
         if (FileUtil.exist(projectBaseDirNew)) {
-            log.info("[main][新项目目录检测 ({})已存在，请更改新的目录,程序退出！]", projectBaseDirNew);
+            log.info("[main][新项目目录检测 ({})已存在，请更改新的目录,程序退出]", projectBaseDirNew);
             return;
         }
         log.info("[main][完成新项目目录检测，新项目路径地址 ({})]", projectBaseDirNew);
