@@ -34,8 +34,9 @@ public class BpmActivityServiceImpl implements BpmActivityService {
     @Override
     @TenantIgnore
     public List<BpmActivityRespVO> getActivityListByProcessInstanceId(String procInstId) {
-//                List<HistoricActivityInstance> activityList = historyService.createHistoricActivityInstanceQuery()
-//                        .processInstanceId(procInstId).list();
+//        List<HistoricActivityInstance> activityList = historyService.createHistoricActivityInstanceQuery()
+//                .processInstanceId(procInstId).list();
+        // TODO @ke：这个是想要过滤掉 aha.act_type_ != 'sequenceFlow' 类型么？
         List<BpmActivityDO> bpmActivityDOList = bpmActivityMapper.listAllByProcInstIdAndDelete(procInstId);
         return BpmActivityConvert.INSTANCE.convertList(bpmActivityDOList);
     }

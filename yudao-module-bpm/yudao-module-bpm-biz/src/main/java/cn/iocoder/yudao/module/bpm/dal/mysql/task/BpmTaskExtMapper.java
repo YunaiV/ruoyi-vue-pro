@@ -28,6 +28,7 @@ public interface BpmTaskExtMapper extends BaseMapperX<BpmTaskExtDO> {
         return selectList(BpmTaskExtDO::getProcessInstanceId, processInstanceId);
     }
 
+    // TODO @ke：可以使用类上上面的 default 方法实现。然后，方法的命名上，要保持和 db 一样。因为 mapper 是数据层，不关注业务。例如说，这里，其实复用 updateByTaskId 方法即可
     /**
      * 任务驳回
      *
@@ -38,6 +39,7 @@ public interface BpmTaskExtMapper extends BaseMapperX<BpmTaskExtDO> {
      */
     Boolean backByTaskId(@Param("taskId") String taskId, @Param("reason") String reason);
 
+    // TODO @ke：tong上哈
     /**
      * 逻辑删除任务
      *

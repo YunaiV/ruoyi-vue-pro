@@ -29,7 +29,7 @@ public class BpmFlowableConfiguration {
             ObjectProvider<FlowableEventListener> listeners,
             BpmActivityBehaviorFactory bpmActivityBehaviorFactory) {
         return configuration -> {
-            // 注册监听器，例如说 BpmActivitiEventListener
+            // 注册监听器，例如说 BpmActivityEventListener
             configuration.setEventListeners(ListUtil.toList(listeners.iterator()));
             // 设置 ActivityBehaviorFactory 实现类，用于流程任务的审核人的自定义
             configuration.setActivityBehaviorFactory(bpmActivityBehaviorFactory);

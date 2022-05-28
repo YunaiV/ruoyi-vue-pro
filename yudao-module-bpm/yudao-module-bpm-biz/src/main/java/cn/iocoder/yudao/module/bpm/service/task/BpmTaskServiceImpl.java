@@ -188,6 +188,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
 
         // 拼接数据
 //        List<BpmTaskExtDO> tmpBpmTaskExtDOList = taskExtMapper.listByProcInstId(processInstanceId);
+        // TODO @ke：这个钉钉是咋处理的？得讨论下流程预测的需要程度哈。
         List<BpmTaskExtDO> tmpBpmTaskExtDOList = taskExtMapper.selectListByProcessInstanceId(processInstanceId);
         tmpBpmTaskExtDOList.sort(Comparator.comparing(BpmTaskExtDO::getCreateTime));
         return hiTaskInstService.taskGetComment(tmpBpmTaskExtDOList, "");
@@ -247,9 +248,11 @@ public class BpmTaskServiceImpl implements BpmTaskService {
 
         //        List<HistoricActivityInstance> hisActInstList =
         //            historyService.createHistoricActivityInstanceQuery().processInstanceId(reqVO.getProcInstId()).list();
+        // TODO @ke：使用 historyService.createHistoricActivityInstanceQuery().processInstanceId(reqVO.getProcInstId()).list() 读取，会存在啥问题呀？
         List<BpmActivityDO> bpmActivityDOList = bpmActivityMapper.listAllByProcInstIdAndDelete(reqVO.getProcInstId());
         //        List<BpmActivityDO> bpmActivityDOList = BpmTaskConvert.INSTANCE.copyList(hisActInstList, BpmActivityDO.class);
         //        bpmActivityDOList.forEach(bpmActivityDO -> log.info("bpmActivityDO = " + bpmActivityDO));
+        // TODO @ke：如果 开始->a->b->c->d->结束，从 d 驳回到 b 的话，这样会不会导致 a 也被删除呀？http://blog.wya1.com/article/636697030/details/7296 可以看看这篇文章哈。
         List<String> taskIdList = bpmActivityDOList.stream().filter(
                 bpmActivityDO -> bpmActivityDO.getActivityId().equals(reqVO.getOldTaskDefKey())
                     && !bpmActivityDO.getTaskId().equals(reqVO.getTaskId())).map(BpmActivityDO::getTaskId)
