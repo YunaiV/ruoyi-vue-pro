@@ -4,7 +4,6 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.bpm.api.task.dto.BpmProcessInstanceCreateReqDTO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.*;
-import org.flowable.common.engine.api.delegate.event.FlowableEngineEntityEvent;
 import org.flowable.engine.delegate.event.FlowableCancelledEvent;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -141,9 +140,9 @@ public interface BpmProcessInstanceService {
      * 更新 ProcessInstance 拓展记录为不通过
      *
      * @param id 流程编号
-     * @param comment 理由。例如说，审批不通过时，需要传递该值
+     * @param reason 理由。例如说，审批不通过时，需要传递该值
      */
-    void updateProcessInstanceExtReject(String id, String comment);
+    void updateProcessInstanceExtReject(String id, String reason);
 
 
 }

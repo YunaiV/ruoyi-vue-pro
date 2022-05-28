@@ -4,7 +4,7 @@ import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.rule.BpmTaskAs
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.rule.BpmTaskAssignRuleRespVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.rule.BpmTaskAssignRuleUpdateReqVO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmTaskAssignRuleDO;
-import org.flowable.task.service.impl.persistence.entity.TaskEntity;
+import org.flowable.engine.delegate.DelegateExecution;
 import org.springframework.lang.Nullable;
 
 import javax.validation.Valid;
@@ -86,6 +86,12 @@ public interface BpmTaskAssignRuleService {
      */
     void checkTaskAssignRuleAllConfig(String id);
 
-    Set<Long> calculateTaskCandidateUsers(TaskEntity task);
+    /**
+     * 计算当前执行任务的处理人
+     *
+     * @param execution 执行任务
+     * @return 处理人的编号数组
+     */
+    Set<Long> calculateTaskCandidateUsers(DelegateExecution execution);
 
 }

@@ -7,9 +7,8 @@ import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
-
+import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.util.Assert;
 
@@ -35,10 +34,10 @@ public abstract class BpmTaskAssignLeaderAbstractScript implements BpmTaskAssign
     @Lazy // 解决循环依赖
     private BpmProcessInstanceService bpmProcessInstanceService;
 
-    protected Set<Long> calculateTaskCandidateUsers(TaskEntity task, int level) {
+    protected Set<Long> calculateTaskCandidateUsers(DelegateExecution execution, int level) {
         Assert.isTrue(level > 0, "level 必须大于 0");
         // 获得发起人
-        ProcessInstance processInstance = bpmProcessInstanceService.getProcessInstance(task.getProcessInstanceId());
+        ProcessInstance processInstance = bpmProcessInstanceService.getProcessInstance(execution.getProcessInstanceId());
         Long startUserId = NumberUtils.parseLong(processInstance.getStartUserId());
         // 获得对应 leve 的部门
         DeptRespDTO dept = null;

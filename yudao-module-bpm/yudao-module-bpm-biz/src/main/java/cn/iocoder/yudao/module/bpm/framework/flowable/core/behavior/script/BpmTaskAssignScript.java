@@ -1,10 +1,11 @@
 package cn.iocoder.yudao.module.bpm.framework.flowable.core.behavior.script;
 
 import cn.iocoder.yudao.module.bpm.domain.enums.definition.BpmTaskRuleScriptEnum;
-import org.flowable.task.service.impl.persistence.entity.TaskEntity;
+import org.flowable.engine.delegate.DelegateExecution;
 
 import java.util.Set;
 
+// TODO @芋艿：迁移到 bpm 的 core 下
 /**
  * Bpm 任务分配的自定义 Script 脚本
  * 使用场景：
@@ -17,12 +18,12 @@ import java.util.Set;
 public interface BpmTaskAssignScript {
 
     /**
-     * 基于流程任务，获得任务的候选用户们
+     * 基于执行任务，获得任务的候选用户们
      *
-     * @param task 任务
+     * @param execution 执行任务
      * @return 候选人用户的编号数组
      */
-    Set<Long> calculateTaskCandidateUsers(TaskEntity task);
+    Set<Long> calculateTaskCandidateUsers(DelegateExecution execution);
 
     /**
      * 获得枚举值

@@ -1,8 +1,7 @@
 package cn.iocoder.yudao.module.bpm.dal.mysql.task;
 
-import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnore;
-import cn.iocoder.yudao.module.bpm.dal.dataobject.task.BpmTaskExtDO;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
+import cn.iocoder.yudao.module.bpm.dal.dataobject.task.BpmTaskExtDO;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -21,28 +20,8 @@ public interface BpmTaskExtMapper extends BaseMapperX<BpmTaskExtDO> {
         return selectList(BpmTaskExtDO::getTaskId, taskIds);
     }
 
-    /**
-     * 查询全部任务
-     *
-     * @return 返回任务
-     */
-    @TenantIgnore
-    default List<BpmTaskExtDO> listAll() {
-        return selectList();
-    }
-
-    /**
-     * 查询任务
-     *
-     * @param procInstId 流程id
-     *
-     * @return 返回任务列表
-     */
-    @TenantIgnore
-    List<BpmTaskExtDO> listByProcInstId(@Param("procInstId") String procInstId);
-
     default List<BpmTaskExtDO> selectListByProcessInstanceId(String processInstanceId) {
-        return selectList("process_instance_id", processInstanceId);
+        return selectList(BpmTaskExtDO::getProcessInstanceId, processInstanceId);
     }
 
     /**
@@ -56,11 +35,11 @@ public interface BpmTaskExtMapper extends BaseMapperX<BpmTaskExtDO> {
      * 任务驳回
      *
      * @param taskId  任务列表
-     * @param comment 驳回理由
+     * @param reason 驳回理由
      *
      * @return 返回驳回结果，是否成功
      */
-    Boolean backByTaskId(@Param("taskId") String taskId, @Param("comment") String comment);
+    Boolean backByTaskId(@Param("taskId") String taskId, @Param("reason") String reason);
 
     /**
      * 逻辑删除任务

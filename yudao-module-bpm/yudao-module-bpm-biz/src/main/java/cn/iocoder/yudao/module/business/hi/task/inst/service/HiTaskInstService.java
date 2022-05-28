@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.business.hi.task.inst.service;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.iocoder.yudao.framework.datapermission.core.annotation.DataPermission;
 import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnore;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.BpmTaskRespVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.BpmTaskTodoPageItemRespVO;
@@ -67,6 +68,7 @@ public class HiTaskInstService {
      * @return 返回流程信息
      */
     @TenantIgnore
+    @DataPermission(enable = false) // TODO 芋艿：先临时去掉
     public List<BpmTaskRespVO> taskGetComment(List<BpmTaskExtDO> taskList, Object approved) {
         BpmTaskExtDO task = taskList.get(taskList.size() - 1);
         Map<String, BpmTaskExtDO> bpmTaskMap =
@@ -262,7 +264,7 @@ public class HiTaskInstService {
                     DeptDO deptDO = deptMap.get(adminUserDO.getDeptId());
                     bpmTaskRespVO.setAssigneeUser(setUser(adminUserDO));
                     bpmTaskRespVO.getAssigneeUser().setDeptName(deptDO.getName());
-                    // edit by 芋艿
+                    // edit by 芋艿 TODO
 //                    if (!bpmTaskAssignRuleDO.getType().equals(BpmTaskAssignRuleTypeEnum.USER_OR_SIGN.getType())
 //                        && !bpmTaskAssignRuleDO.getType().equals(BpmTaskAssignRuleTypeEnum.USER_SIGN.getType())) {
 //                        break;

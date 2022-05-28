@@ -13,7 +13,7 @@
     <update id="backByTaskId">
         UPDATE bpm_task_ext
         SET result=2,
-            `comment`=#{comment}
+            `reason`=#{reason}
         WHERE task_id = #{taskId}
     </update>
     <update id="delByTaskIds">
@@ -26,12 +26,5 @@
         </foreach>
     </update>
 
-    <select id="listByProcInstId" resultType="cn.iocoder.yudao.module.bpm.dal.dataobject.task.BpmTaskExtDO">
-        SELECT *
-        FROM bpm_task_ext
-        WHERE `process_instance_id` = #{procInstId}
-          AND `deleted` = FALSE
-        ORDER BY create_time
-        LIMIT 500
-    </select>
+
 </mapper>

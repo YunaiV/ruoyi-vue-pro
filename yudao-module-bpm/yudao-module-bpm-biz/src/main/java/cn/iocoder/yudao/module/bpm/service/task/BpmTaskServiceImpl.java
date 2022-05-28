@@ -186,7 +186,9 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(convertSet(userMap.values(), AdminUserRespDTO::getDeptId));*/
 
         // 拼接数据
-        List<BpmTaskExtDO> tmpBpmTaskExtDOList = taskExtMapper.listByProcInstId(processInstanceId);
+//        List<BpmTaskExtDO> tmpBpmTaskExtDOList = taskExtMapper.listByProcInstId(processInstanceId);
+        List<BpmTaskExtDO> tmpBpmTaskExtDOList = taskExtMapper.selectListByProcessInstanceId(processInstanceId);
+        tmpBpmTaskExtDOList.sort(Comparator.comparing(BpmTaskExtDO::getCreateTime));
         return hiTaskInstService.taskGetComment(tmpBpmTaskExtDOList, "");
     }
 
@@ -207,13 +209,13 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         // 更新任务拓展表为通过
         taskExtMapper.updateByTaskId(
             new BpmTaskExtDO().setTaskId(task.getId()).setResult(BpmProcessInstanceResultEnum.APPROVE.getResult())
-                .setComment(reqVO.getComment()));
+                .setReason(reqVO.getReason()));
         // 判断任务是否为或签，或签时删除其余不用审批的任务
         List<BpmTaskAssignRuleDO> bpmTaskAssignRuleList =
             taskAssignRuleMapper.selectListByProcessDefinitionId(task.getProcessDefinitionId(),
                 task.getTaskDefinitionKey());
         if (CollUtil.isNotEmpty(bpmTaskAssignRuleList) && bpmTaskAssignRuleList.size() > 0) {
-            // edit by 芋艿
+            // edit by 芋艿 TODO
 //            if (BpmTaskAssignRuleTypeEnum.USER_OR_SIGN.getType().equals(bpmTaskAssignRuleList.get(0).getType())) {
 //                taskExtMapper.delTaskByProcInstIdAndTaskIdAndTaskDefKey(
 //                    new BpmTaskExtDO().setTaskId(task.getId()).setTaskDefKey(task.getTaskDefinitionKey())
@@ -233,12 +235,12 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         }
 
         // 更新流程实例为不通过
-        processInstanceService.updateProcessInstanceExtReject(instance.getProcessInstanceId(), reqVO.getComment());
+        processInstanceService.updateProcessInstanceExtReject(instance.getProcessInstanceId(), reqVO.getReason());
 
         // 更新任务拓展表为不通过
         taskExtMapper.updateByTaskId(
             new BpmTaskExtDO().setTaskId(task.getId()).setResult(BpmProcessInstanceResultEnum.REJECT.getResult())
-                .setComment(reqVO.getComment()));
+                .setReason(reqVO.getReason()));
     }
 
     @Override
@@ -269,7 +271,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         // 逻辑删除hiTaskInst表任务
         Boolean delHiTaskInstResult = bpmActivityMapper.delHiTaskInstByTaskId(taskIdList);
         // 更新任务拓展表
-        Boolean backResult = taskExtMapper.backByTaskId(reqVO.getTaskId(), reqVO.getComment());
+        Boolean backResult = taskExtMapper.backByTaskId(reqVO.getTaskId(), reqVO.getReason());
         Boolean delTaskResult = taskExtMapper.delByTaskIds(taskIdList);
         if (!delHiActInstResult && !delHiTaskInstResult && !backResult && !delTaskResult) {
             throw new RuntimeException("任务驳回失败！！！");

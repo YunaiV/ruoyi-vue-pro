@@ -39,5 +39,5 @@ public class BpmTaskBackReqVO {
 
     @ApiModelProperty(value = "审批结果", required = true, example = "任务驳回")
     @NotNull(message = "审批结果")
-    private String comment;
+    private String reason;
 }

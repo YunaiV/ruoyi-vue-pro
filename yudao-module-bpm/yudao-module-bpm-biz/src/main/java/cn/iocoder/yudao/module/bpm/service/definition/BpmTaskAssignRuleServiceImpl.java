@@ -31,7 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.UserTask;
 import org.flowable.common.engine.api.FlowableException;
-import org.flowable.task.service.impl.persistence.entity.TaskEntity;
+import org.flowable.engine.delegate.DelegateExecution;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -40,6 +40,7 @@ import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.util.*;
 
+import static cn.hutool.core.text.CharSequenceUtil.format;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
@@ -226,95 +227,93 @@ public class BpmTaskAssignRuleServiceImpl implements BpmTaskAssignRuleService {
             dictDataApi.validDictDatas(DictTypeConstants.TASK_ASSIGN_SCRIPT,
                 CollectionUtils.convertSet(options, String::valueOf));
         } else {
-            throw new IllegalArgumentException(StrUtil.format("未知的规则类型({})", type));
+            throw new IllegalArgumentException(format("未知的规则类型({})", type));
         }
     }
 
     @Override
     @DataPermission(enable = false) // 忽略数据权限，不然分配会存在问题
-    public Set<Long> calculateTaskCandidateUsers(TaskEntity task) {
-        BpmTaskAssignRuleDO rule = getTaskRule(task);
-        return calculateTaskCandidateUsers(task, rule);
+    public Set<Long> calculateTaskCandidateUsers(DelegateExecution execution) {
+        BpmTaskAssignRuleDO rule = getTaskRule(execution);
+        return calculateTaskCandidateUsers(execution, rule);
     }
 
     @VisibleForTesting
-    BpmTaskAssignRuleDO getTaskRule(TaskEntity task) {
+    BpmTaskAssignRuleDO getTaskRule(DelegateExecution execution) {
         List<BpmTaskAssignRuleDO> taskRules = getTaskAssignRuleListByProcessDefinitionId(
-                task.getProcessDefinitionId(), task.getTaskDefinitionKey());
+                execution.getProcessDefinitionId(), execution.getCurrentActivityId());
         if (CollUtil.isEmpty(taskRules)) {
-            throw new FlowableException(
-                    StrUtil.format("流程任务({}/{}/{}) 找不到符合的任务规则", task.getId(), task.getProcessDefinitionId(),
-                            task.getTaskDefinitionKey()));
+            throw new FlowableException(format("流程任务({}/{}/{}) 找不到符合的任务规则",
+                    execution.getId(), execution.getProcessDefinitionId(), execution.getCurrentActivityId()));
         }
         if (taskRules.size() > 1) {
-            throw new FlowableException(
-                    StrUtil.format("流程任务({}/{}/{}) 找到过多任务规则({})", task.getId(), task.getProcessDefinitionId(),
-                            task.getTaskDefinitionKey(), taskRules.size()));
+            throw new FlowableException(format("流程任务({}/{}/{}) 找到过多任务规则({})",
+                    execution.getId(), execution.getProcessDefinitionId(), execution.getCurrentActivityId()));
         }
         return taskRules.get(0);
     }
 
     @VisibleForTesting
-    Set<Long> calculateTaskCandidateUsers(TaskEntity task, BpmTaskAssignRuleDO rule) {
+    Set<Long> calculateTaskCandidateUsers(DelegateExecution execution, BpmTaskAssignRuleDO rule) {
         Set<Long> assigneeUserIds = null;
         if (Objects.equals(BpmTaskAssignRuleTypeEnum.ROLE.getType(), rule.getType())) {
-            assigneeUserIds = calculateTaskCandidateUsersByRole(task, rule);
+            assigneeUserIds = calculateTaskCandidateUsersByRole(rule);
         } else if (Objects.equals(BpmTaskAssignRuleTypeEnum.DEPT_MEMBER.getType(), rule.getType())) {
-            assigneeUserIds = calculateTaskCandidateUsersByDeptMember(task, rule);
+            assigneeUserIds = calculateTaskCandidateUsersByDeptMember(rule);
         } else if (Objects.equals(BpmTaskAssignRuleTypeEnum.DEPT_LEADER.getType(), rule.getType())) {
-            assigneeUserIds = calculateTaskCandidateUsersByDeptLeader(task, rule);
+            assigneeUserIds = calculateTaskCandidateUsersByDeptLeader(rule);
         } else if (Objects.equals(BpmTaskAssignRuleTypeEnum.POST.getType(), rule.getType())) {
-            assigneeUserIds = calculateTaskCandidateUsersByPost(task, rule);
+            assigneeUserIds = calculateTaskCandidateUsersByPost(rule);
         } else if (Objects.equals(BpmTaskAssignRuleTypeEnum.USER.getType(), rule.getType())) {
-            assigneeUserIds = calculateTaskCandidateUsersByUser(task, rule);
+            assigneeUserIds = calculateTaskCandidateUsersByUser(rule);
         } else if (Objects.equals(BpmTaskAssignRuleTypeEnum.USER_GROUP.getType(), rule.getType())) {
-            assigneeUserIds = calculateTaskCandidateUsersByUserGroup(task, rule);
+            assigneeUserIds = calculateTaskCandidateUsersByUserGroup(rule);
         } else if (Objects.equals(BpmTaskAssignRuleTypeEnum.SCRIPT.getType(), rule.getType())) {
-            assigneeUserIds = calculateTaskCandidateUsersByScript(task, rule);
+            assigneeUserIds = calculateTaskCandidateUsersByScript(execution, rule);
         }
 
         // 移除被禁用的用户
         removeDisableUsers(assigneeUserIds);
         // 如果候选人为空，抛出异常 TODO 芋艿：没候选人的策略选择。1 - 挂起；2 - 直接结束；3 - 强制一个兜底人
         if (CollUtil.isEmpty(assigneeUserIds)) {
-            log.error("[calculateTaskCandidateUsers][流程任务({}/{}/{}) 任务规则({}) 找不到候选人]", task.getId(),
-                    task.getProcessDefinitionId(), task.getTaskDefinitionKey(), toJsonString(rule));
+            log.error("[calculateTaskCandidateUsers][流程任务({}/{}/{}) 任务规则({}) 找不到候选人]", execution.getId(),
+                    execution.getProcessDefinitionId(), execution.getCurrentActivityId(), toJsonString(rule));
             throw exception(TASK_CREATE_FAIL_NO_CANDIDATE_USER);
         }
         return assigneeUserIds;
     }
 
-    private Set<Long> calculateTaskCandidateUsersByRole(TaskEntity task, BpmTaskAssignRuleDO rule) {
+    private Set<Long> calculateTaskCandidateUsersByRole(BpmTaskAssignRuleDO rule) {
         return permissionApi.getUserRoleIdListByRoleIds(rule.getOptions());
     }
 
-    private Set<Long> calculateTaskCandidateUsersByDeptMember(TaskEntity task, BpmTaskAssignRuleDO rule) {
+    private Set<Long> calculateTaskCandidateUsersByDeptMember(BpmTaskAssignRuleDO rule) {
         List<AdminUserRespDTO> users = adminUserApi.getUsersByDeptIds(rule.getOptions());
         return convertSet(users, AdminUserRespDTO::getId);
     }
 
-    private Set<Long> calculateTaskCandidateUsersByDeptLeader(TaskEntity task, BpmTaskAssignRuleDO rule) {
+    private Set<Long> calculateTaskCandidateUsersByDeptLeader(BpmTaskAssignRuleDO rule) {
         List<DeptRespDTO> depts = deptApi.getDepts(rule.getOptions());
         return convertSet(depts, DeptRespDTO::getLeaderUserId);
     }
 
-    private Set<Long> calculateTaskCandidateUsersByPost(TaskEntity task, BpmTaskAssignRuleDO rule) {
+    private Set<Long> calculateTaskCandidateUsersByPost(BpmTaskAssignRuleDO rule) {
         List<AdminUserRespDTO> users = adminUserApi.getUsersByPostIds(rule.getOptions());
         return convertSet(users, AdminUserRespDTO::getId);
     }
 
-    private Set<Long> calculateTaskCandidateUsersByUser(TaskEntity task, BpmTaskAssignRuleDO rule) {
+    private Set<Long> calculateTaskCandidateUsersByUser(BpmTaskAssignRuleDO rule) {
         return rule.getOptions();
     }
 
-    private Set<Long> calculateTaskCandidateUsersByUserGroup(TaskEntity task, BpmTaskAssignRuleDO rule) {
+    private Set<Long> calculateTaskCandidateUsersByUserGroup(BpmTaskAssignRuleDO rule) {
         List<BpmUserGroupDO> userGroups = userGroupService.getUserGroupList(rule.getOptions());
         Set<Long> userIds = new HashSet<>();
         userGroups.forEach(group -> userIds.addAll(group.getMemberUserIds()));
         return userIds;
     }
 
-    private Set<Long> calculateTaskCandidateUsersByScript(TaskEntity task, BpmTaskAssignRuleDO rule) {
+    private Set<Long> calculateTaskCandidateUsersByScript(DelegateExecution execution, BpmTaskAssignRuleDO rule) {
         // 获得对应的脚本
         List<BpmTaskAssignScript> scripts = new ArrayList<>(rule.getOptions().size());
         rule.getOptions().forEach(id -> {
@@ -326,7 +325,7 @@ public class BpmTaskAssignRuleServiceImpl implements BpmTaskAssignRuleService {
         });
         // 逐个计算任务
         Set<Long> userIds = new HashSet<>();
-        scripts.forEach(script -> CollUtil.addAll(userIds, script.calculateTaskCandidateUsers(task)));
+        scripts.forEach(script -> CollUtil.addAll(userIds, script.calculateTaskCandidateUsers(execution)));
         return userIds;
     }
 

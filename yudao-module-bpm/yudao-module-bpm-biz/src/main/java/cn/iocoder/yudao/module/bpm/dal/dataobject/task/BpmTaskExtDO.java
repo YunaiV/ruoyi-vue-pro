@@ -65,7 +65,7 @@ public class BpmTaskExtDO extends BaseDO {
     /**
      * 审批建议
      */
-    private String comment;
+    private String reason;
     /**
      * 任务的结束时间
      *
