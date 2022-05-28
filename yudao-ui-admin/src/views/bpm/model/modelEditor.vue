@@ -2,7 +2,7 @@
   <div class="app-container">
 
     <!-- 流程设计器，负责绘制流程等 -->
-    <my-process-designer :key="`designer-${reloadIndex}`" v-model="xmlString" v-bind="controlForm"
+    <my-process-designer v-if="xmlString !== undefined" :key="`designer-${reloadIndex}`" v-model="xmlString" v-bind="controlForm"
       keyboard ref="processDesigner" @init-finished="initModeler"
       @save="save"/>
 
@@ -30,7 +30,7 @@ export default {
   components: { MyProcessPalette },
   data() {
     return {
-      xmlString: "", // BPMN XML
+      xmlString: undefined, // BPMN XML
       modeler: null,
       reloadIndex: 0,
       controlDrawerVisible: false,
@@ -71,21 +71,6 @@ export default {
         this.modeler = modeler;
         console.log(modeler);
       }, 10);
-    },
-    reloadProcessDesigner(deep) {
-      this.controlForm.additionalModel = [];
-      for (let key in this.addis) {
-        if (this.addis[key]) {
-          this.controlForm.additionalModel.push(this.addis[key]);
-        }
-      }
-      deep && (this.xmlString = undefined);
-      this.reloadIndex += 1;
-      this.modeler = null; // 避免 panel 异常
-      // if (deep) {
-      //   this.xmlString = undefined;
-      //   this.$refs.processDesigner.processRestart();
-      // }
     },
     save(bpmnXml) {
       const data = {
