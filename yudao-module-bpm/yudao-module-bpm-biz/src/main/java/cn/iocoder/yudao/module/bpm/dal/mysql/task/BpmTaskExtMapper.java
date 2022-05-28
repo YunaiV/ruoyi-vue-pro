@@ -20,16 +20,13 @@ public interface BpmTaskExtMapper extends BaseMapperX<BpmTaskExtDO> {
         return selectList(BpmTaskExtDO::getTaskId, taskIds);
     }
 
+    default BpmTaskExtDO selectByTaskId(String taskId) {
+        return selectOne(BpmTaskExtDO::getTaskId, taskId);
+    }
+
     default List<BpmTaskExtDO> selectListByProcessInstanceId(String processInstanceId) {
         return selectList(BpmTaskExtDO::getProcessInstanceId, processInstanceId);
     }
-
-    /**
-     * 删除非当前相同taskDefKey非进行中的任务
-     *
-     * @param entity 任务信息
-     */
-    void delTaskByProcInstIdAndTaskIdAndTaskDefKey(@Param("entity") BpmTaskExtDO entity);
 
     /**
      * 任务驳回

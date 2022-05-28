@@ -15,7 +15,7 @@ import cn.iocoder.yudao.module.bpm.convert.definition.BpmTaskAssignRuleConvert;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmTaskAssignRuleDO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmUserGroupDO;
 import cn.iocoder.yudao.module.bpm.dal.mysql.definition.BpmTaskAssignRuleMapper;
-import cn.iocoder.yudao.module.bpm.domain.enums.definition.BpmTaskAssignRuleTypeEnum;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmTaskAssignRuleTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.DictTypeConstants;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.behavior.script.BpmTaskAssignScript;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
@@ -274,7 +274,7 @@ public class BpmTaskAssignRuleServiceImpl implements BpmTaskAssignRuleService {
 
         // 移除被禁用的用户
         removeDisableUsers(assigneeUserIds);
-        // 如果候选人为空，抛出异常 TODO 芋艿：没候选人的策略选择。1 - 挂起；2 - 直接结束；3 - 强制一个兜底人
+        // 如果候选人为空，抛出异常
         if (CollUtil.isEmpty(assigneeUserIds)) {
             log.error("[calculateTaskCandidateUsers][流程任务({}/{}/{}) 任务规则({}) 找不到候选人]", execution.getId(),
                     execution.getProcessDefinitionId(), execution.getCurrentActivityId(), toJsonString(rule));

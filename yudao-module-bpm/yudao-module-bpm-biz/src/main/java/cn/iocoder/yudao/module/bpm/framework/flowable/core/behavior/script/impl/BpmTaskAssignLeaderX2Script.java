@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.bpm.framework.flowable.core.behavior.script.impl;
 
-import cn.iocoder.yudao.module.bpm.domain.enums.definition.BpmTaskRuleScriptEnum;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmTaskRuleScriptEnum;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.springframework.stereotype.Component;
 

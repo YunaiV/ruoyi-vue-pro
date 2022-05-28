@@ -17,6 +17,7 @@ import java.util.Map;
  * @author 芋道源码
  */
 public interface BpmTaskService {
+
     /**
      * 获得待办的流程任务分页
      *
@@ -119,6 +120,13 @@ public interface BpmTaskService {
      * @param task 任务实体
      */
     void updateTaskExtComplete(Task task);
+
+    /**
+     * 更新 Task 拓展记录为已取消
+     *
+     * @param taskId 任务的编号
+     */
+    void updateTaskExtCancel(String taskId);
 
     /**
      * 更新 Task 拓展记录，并发送通知

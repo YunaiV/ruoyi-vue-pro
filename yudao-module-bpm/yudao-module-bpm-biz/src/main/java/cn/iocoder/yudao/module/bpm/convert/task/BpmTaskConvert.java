@@ -7,7 +7,7 @@ import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.BpmTaskDonePage
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.BpmTaskRespVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.BpmTaskTodoPageItemRespVO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.task.BpmTaskExtDO;
-import cn.iocoder.yudao.module.bpm.domain.enums.task.BpmProcessInstanceResultEnum;
+import cn.iocoder.yudao.module.bpm.enums.task.BpmProcessInstanceResultEnum;
 import cn.iocoder.yudao.module.bpm.service.message.dto.BpmMessageSendWhenTaskCreatedReqDTO;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;

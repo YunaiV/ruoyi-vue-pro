@@ -9,7 +9,7 @@ import cn.iocoder.yudao.module.bpm.convert.definition.BpmFormConvert;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmFormDO;
 import cn.iocoder.yudao.module.bpm.dal.mysql.definition.BpmFormMapper;
 import cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants;
-import cn.iocoder.yudao.module.bpm.domain.enums.definition.BpmModelFormTypeEnum;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmModelFormTypeEnum;
 import cn.iocoder.yudao.module.bpm.service.definition.dto.BpmFormFieldRespDTO;
 import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;

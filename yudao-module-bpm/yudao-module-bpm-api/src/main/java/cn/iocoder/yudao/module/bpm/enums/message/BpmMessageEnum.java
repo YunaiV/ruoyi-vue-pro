@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.bpm.domain.enums.message;
+package cn.iocoder.yudao.module.bpm.enums.message;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -8,6 +8,7 @@ import cn.iocoder.yudao.module.bpm.dal.mysql.task.BpmActivityMapper;
 import lombok.extern.slf4j.Slf4j;
 
 import org.flowable.engine.HistoryService;
+import org.flowable.engine.history.HistoricActivityInstance;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -38,4 +39,10 @@ public class BpmActivityServiceImpl implements BpmActivityService {
         List<BpmActivityDO> bpmActivityDOList = bpmActivityMapper.listAllByProcInstIdAndDelete(procInstId);
         return BpmActivityConvert.INSTANCE.convertList(bpmActivityDOList);
     }
+
+    @Override
+    public HistoricActivityInstance getHistoricActivityByExecutionId(String executionId) {
+        return historyService.createHistoricActivityInstanceQuery().executionId(executionId).singleResult();
+    }
+
 }

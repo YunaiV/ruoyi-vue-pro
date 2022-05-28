@@ -2,8 +2,8 @@ package cn.iocoder.yudao.module.bpm.dal.dataobject.definition;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.framework.mybatis.core.type.JsonLongSetTypeHandler;
-import cn.iocoder.yudao.module.bpm.domain.enums.definition.BpmTaskAssignRuleTypeEnum;
-import cn.iocoder.yudao.module.bpm.domain.enums.definition.BpmTaskRuleScriptEnum;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmTaskAssignRuleTypeEnum;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmTaskRuleScriptEnum;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;

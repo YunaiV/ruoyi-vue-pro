@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.bpm.framework.flowable.core.behavior.script.impl
 
 import cn.iocoder.yudao.framework.common.util.collection.SetUtils;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
-import cn.iocoder.yudao.module.bpm.domain.enums.definition.BpmTaskRuleScriptEnum;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmTaskRuleScriptEnum;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.behavior.script.BpmTaskAssignScript;
 import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceService;
 import org.flowable.engine.delegate.DelegateExecution;

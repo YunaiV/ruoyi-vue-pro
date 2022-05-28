@@ -15,7 +15,8 @@ import cn.iocoder.yudao.module.bpm.dal.dataobject.task.BpmTaskExtDO;
 import cn.iocoder.yudao.module.bpm.dal.mysql.definition.BpmTaskAssignRuleMapper;
 import cn.iocoder.yudao.module.bpm.dal.mysql.task.BpmActivityMapper;
 import cn.iocoder.yudao.module.bpm.dal.mysql.task.BpmTaskExtMapper;
-import cn.iocoder.yudao.module.bpm.domain.enums.task.BpmProcessInstanceResultEnum;
+import cn.iocoder.yudao.module.bpm.enums.task.BpmProcessInstanceDeleteReasonEnum;
+import cn.iocoder.yudao.module.bpm.enums.task.BpmProcessInstanceResultEnum;
 import cn.iocoder.yudao.module.bpm.service.message.BpmMessageService;
 import cn.iocoder.yudao.module.business.hi.task.inst.service.HiTaskInstService;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
@@ -214,14 +215,6 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         List<BpmTaskAssignRuleDO> bpmTaskAssignRuleList =
             taskAssignRuleMapper.selectListByProcessDefinitionId(task.getProcessDefinitionId(),
                 task.getTaskDefinitionKey());
-        if (CollUtil.isNotEmpty(bpmTaskAssignRuleList) && bpmTaskAssignRuleList.size() > 0) {
-            // edit by 芋艿 TODO
-//            if (BpmTaskAssignRuleTypeEnum.USER_OR_SIGN.getType().equals(bpmTaskAssignRuleList.get(0).getType())) {
-//                taskExtMapper.delTaskByProcInstIdAndTaskIdAndTaskDefKey(
-//                    new BpmTaskExtDO().setTaskId(task.getId()).setTaskDefKey(task.getTaskDefinitionKey())
-//                        .setProcessInstanceId(task.getProcessInstanceId()));
-//            }
-        }
     }
 
     @Override
@@ -292,6 +285,23 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         taskService.setAssignee(id, String.valueOf(userId));
     }
 
+    /**
+     * 校验任务是否存在， 并且是否是分配给自己的任务
+     *
+     * @param userId 用户 id
+     * @param taskId task id
+     */
+    private Task checkTask(Long userId, String taskId) {
+        Task task = getTask(taskId);
+        if (task == null) {
+            throw exception(TASK_COMPLETE_FAIL_NOT_EXISTS);
+        }
+        if (!Objects.equals(userId, NumberUtils.parseLong(task.getAssignee()))) {
+            throw exception(TASK_COMPLETE_FAIL_ASSIGN_NOT_SELF);
+        }
+        return task;
+    }
+
     @Override
     public void createTaskExt(Task task) {
         BpmTaskExtDO taskExtDO =
@@ -301,8 +311,43 @@ public class BpmTaskServiceImpl implements BpmTaskService {
 
     @Override
     public void updateTaskExtComplete(Task task) {
-        BpmTaskExtDO taskExtDO = BpmTaskConvert.INSTANCE.convert2TaskExt(task).setEndTime(new Date());
+        BpmTaskExtDO taskExtDO = BpmTaskConvert.INSTANCE.convert2TaskExt(task)
+                .setResult(BpmProcessInstanceResultEnum.APPROVE.getResult()) // 不设置也问题不大，因为 Complete 一般是审核通过，已经设置
+                .setEndTime(new Date());
         taskExtMapper.updateByTaskId(taskExtDO);
+    }
+
+    @Override
+    public void updateTaskExtCancel(String taskId) {
+        // 需要在事务提交后，才进行查询。不然查询不到历史的原因
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+
+            @Override
+            public void afterCommit() {
+                // 可能只是活动，不是任务，所以查询不到
+                HistoricTaskInstance task = getHistoricTask(taskId);
+                if (task == null) {
+                    return;
+                }
+
+                // 如果任务拓展表已经是完成的状态，则跳过
+                BpmTaskExtDO taskExt = taskExtMapper.selectByTaskId(taskId);
+                if (taskExt == null) {
+                    log.error("[updateTaskExtCancel][taskId({}) 查找不到对应的记录，可能存在问题]", taskId);
+                    return;
+                }
+                // 如果已经是最终的结果，则跳过
+                if (BpmProcessInstanceResultEnum.isEndResult(taskExt.getResult())) {
+                    log.error("[updateTaskExtCancel][taskId({}) 处于结果({})，无需进行更新]", taskId, taskExt.getResult());
+                    return;
+                }
+
+                // 更新任务
+                taskExtMapper.updateById(new BpmTaskExtDO().setId(taskExt.getId()).setResult(BpmProcessInstanceResultEnum.CANCEL.getResult())
+                        .setEndTime(new Date()).setReason(BpmProcessInstanceDeleteReasonEnum.translateReason(task.getDeleteReason())));
+            }
+
+        });
     }
 
     @Override
@@ -323,24 +368,12 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         });
     }
 
-    /**
-     * 校验任务是否存在， 并且是否是分配给自己的任务
-     *
-     * @param userId 用户 id
-     * @param taskId task id
-     */
-    private Task checkTask(Long userId, String taskId) {
-        Task task = getTask(taskId);
-        if (task == null) {
-            throw exception(TASK_COMPLETE_FAIL_NOT_EXISTS);
-        }
-        if (!Objects.equals(userId, NumberUtils.parseLong(task.getAssignee()))) {
-            throw exception(TASK_COMPLETE_FAIL_ASSIGN_NOT_SELF);
-        }
-        return task;
-    }
-
     private Task getTask(String id) {
         return taskService.createTaskQuery().taskId(id).singleResult();
     }
+
+    private HistoricTaskInstance getHistoricTask(String id) {
+        return historyService.createHistoricTaskInstanceQuery().taskId(id).singleResult();
+    }
+
 }
