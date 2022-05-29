@@ -173,16 +173,22 @@ logging:
     cn.iocoder.yudao.module.tool.dal.mysql: debug
     cn.iocoder.yudao.module.member.dal.mysql: debug
 
---- #################### 微信公众号相关配置 ####################
-wx: # 参见 https://github.com/Wechat-Group/WxJava/blob/develop/spring-boot-starters/wx-java-mp-spring-boot-starter/README.md 文档
-  mp:
-    # 公众号配置(必填)
+--- #################### 微信公众号、小程序相关配置 ####################
+wx:
+  mp: # 公众号配置（必填），参见 https://github.com/Wechat-Group/WxJava/blob/develop/spring-boot-starters/wx-java-mp-spring-boot-starter/README.md 文档
     app-id: wx041349c6f39b268b
     secret: 5abee519483bc9f8cb37ce280e814bd0
     # 存储配置，解决 AccessToken 的跨节点的共享
     config-storage:
       type: RedisTemplate # 采用 RedisTemplate 操作 Redis，会自动从 Spring 中获取
       key-prefix: wx # Redis Key 的前缀 TODO 芋艿：解决下 Redis key 管理的配置
+      http-client-type: HttpClient # 采用 HttpClient 请求微信公众号平台
+  miniapp: # 小程序配置（必填），参见 https://github.com/Wechat-Group/WxJava/blob/develop/spring-boot-starters/wx-java-miniapp-spring-boot-starter/README.md 文档
+    appid: wx63c280fe3248a3e7
+    secret: 6f270509224a7ae1296bbf1c8cb97aed
+    config-storage:
+      type: RedisTemplate # 采用 RedisTemplate 操作 Redis，会自动从 Spring 中获取
+      key-prefix: wa # Redis Key 的前缀 TODO 芋艿：解决下 Redis key 管理的配置
       http-client-type: HttpClient # 采用 HttpClient 请求微信公众号平台
 
 --- #################### 芋道相关配置 ####################
@@ -218,6 +224,12 @@ justauth:
       client-secret: 1wTb7hYxnpT2TUbIeHGXGo7T0odav1ic10mLdyyATOw
       agent-id: 1000004
       ignore-check-redirect-uri: true
+    WECHAT_MINI_APP: # 微信小程序
+      client-id: ${wx.miniapp.appid}
+      client-secret: ${wx.miniapp.secret}
+      ignore-check-redirect-uri: true
+      ignore-check-state: true # 微信小程序，不会使用到 state，所以不进行校验
+
   cache:
     type: REDIS
     prefix: 'social_auth_state:' # 缓存前缀，目前只对 Redis 缓存生效，默认 JUSTAUTH::STATE::

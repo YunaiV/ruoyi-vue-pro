@@ -46,7 +46,7 @@ public class SocialUserBindReqDTO {
     /**
      * state
      */
-    @NotEmpty(message = "state 不能为空")
+    @NotNull(message = "state 不能为空")
     private String state;
 
 }

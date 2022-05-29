@@ -45,6 +45,14 @@ public interface MemberAuthService {
     AppAuthLoginRespVO socialLogin(@Valid AppAuthSocialLoginReqVO reqVO);
 
     /**
+     * 微信小程序的一键登录
+     *
+     * @param reqVO 登录信息
+     * @return 登录结果
+     */
+    AppAuthLoginRespVO weixinMiniAppLogin(AppAuthWeixinMiniAppLoginReqVO reqVO);
+
+    /**
      * 获得社交认证 URL
      *
      * @param type 社交平台类型
@@ -81,4 +89,5 @@ public interface MemberAuthService {
      * @return 登录结果
      */
     AppAuthLoginRespVO refreshToken(String refreshToken);
+
 }

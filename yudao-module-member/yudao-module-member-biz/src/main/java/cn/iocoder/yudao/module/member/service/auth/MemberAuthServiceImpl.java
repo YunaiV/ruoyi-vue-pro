@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.member.service.auth;
 
+import cn.binarywang.wx.miniapp.api.WxMaService;
+import cn.binarywang.wx.miniapp.bean.WxMaPhoneNumberInfo;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
@@ -23,6 +25,7 @@ import cn.iocoder.yudao.module.system.enums.auth.OAuth2ClientConstants;
 import cn.iocoder.yudao.module.system.enums.logger.LoginLogTypeEnum;
 import cn.iocoder.yudao.module.system.enums.logger.LoginResultEnum;
 import cn.iocoder.yudao.module.system.enums.sms.SmsSceneEnum;
+import cn.iocoder.yudao.module.system.enums.social.SocialTypeEnum;
 import com.google.common.annotations.VisibleForTesting;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -55,6 +58,9 @@ public class MemberAuthServiceImpl implements MemberAuthService {
     private SocialUserApi socialUserApi;
     @Resource
     private OAuth2TokenApi oauth2TokenApi;
+
+    @Resource
+    private WxMaService wxMaService;
 
     @Resource
     private PasswordEncoder passwordEncoder;
@@ -116,12 +122,34 @@ public class MemberAuthServiceImpl implements MemberAuthService {
         return createTokenAfterLoginSuccess(user, user.getMobile(), LoginLogTypeEnum.LOGIN_SOCIAL);
     }
 
+    @Override
+    public AppAuthLoginRespVO weixinMiniAppLogin(AppAuthWeixinMiniAppLoginReqVO reqVO) {
+        // 获得对应的手机号信息
+        WxMaPhoneNumberInfo phoneNumberInfo;
+        try {
+            phoneNumberInfo = wxMaService.getUserService().getNewPhoneNoInfo(reqVO.getPhoneCode());
+        } catch (Exception exception) {
+            throw exception(AUTH_WEIXIN_MINI_APP_PHONE_CODE_ERROR);
+        }
+        // 获得获得注册用户
+        MemberUserDO user = userService.createUserIfAbsent(phoneNumberInfo.getPurePhoneNumber(), getClientIP());
+        Assert.notNull(user, "获取用户失败，结果为空");
+
+        // 绑定社交用户
+        socialUserApi.bindSocialUser(new SocialUserBindReqDTO(user.getId(), getUserType().getValue(),
+                SocialTypeEnum.WECHAT_MINI_APP.getType(), reqVO.getLoginCode(), ""));
+
+        // 创建 Token 令牌，记录登录日志
+        return createTokenAfterLoginSuccess(user, user.getMobile(), LoginLogTypeEnum.LOGIN_SOCIAL);
+    }
+
     private AppAuthLoginRespVO createTokenAfterLoginSuccess(MemberUserDO user, String mobile, LoginLogTypeEnum logType) {
         // 插入登陆日志
         createLoginLog(user.getId(), mobile, logType, LoginResultEnum.SUCCESS);
         // 创建 Token 令牌
         OAuth2AccessTokenRespDTO accessTokenRespDTO = oauth2TokenApi.createAccessToken(new OAuth2AccessTokenCreateReqDTO()
-                .setUserId(user.getId()).setUserType(getUserType().getValue()).setClientId(OAuth2ClientConstants.CLIENT_ID_DEFAULT));
+                .setUserId(user.getId()).setUserType(getUserType().getValue())
+                .setClientId(OAuth2ClientConstants.CLIENT_ID_DEFAULT));
         // 构建返回结果
         return AuthConvert.INSTANCE.convert(accessTokenRespDTO);
     }
