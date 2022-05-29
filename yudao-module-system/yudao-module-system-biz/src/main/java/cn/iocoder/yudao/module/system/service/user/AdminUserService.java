@@ -105,7 +105,6 @@ public interface AdminUserService {
      */
     AdminUserDO getUserByMobile(String mobile);
 
-
     /**
      * 获得用户分页列表
      *
@@ -208,5 +207,14 @@ public interface AdminUserService {
      * @return 用户们
      */
     List<AdminUserDO> getUsersByStatus(Integer status);
+
+    /**
+     * 判断密码是否匹配
+     *
+     * @param rawPassword 未加密的密码
+     * @param encodedPassword 加密后的密码
+     * @return 是否匹配
+     */
+    boolean isPasswordMatch(String rawPassword, String encodedPassword);
 
 }

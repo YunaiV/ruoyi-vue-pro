@@ -12,7 +12,8 @@
     "build:dev": "vue-cli-service build --mode dev",
     "build:demo1024": "vue-cli-service build --mode demo1024",
     "preview": "node build/index.js --preview",
-    "lint": "eslint --ext .js,.vue src"
+    "lint": "eslint --ext .js,.vue src",
+    "clean": "rimraf node_modules"
   },
   "husky": {
     "hooks": {
@@ -62,11 +63,11 @@
     "vue-router": "3.4.9",
     "vuedraggable": "2.24.3",
     "vuex": "3.6.0",
-    "bpmn-js-token-simulation": "^0.10.0",
-    "min-dash": "^3.5.2",
-    "xml-js": "^1.6.11",
-    "@babel/parser": "^7.7.4",
-    "throttle-debounce": "^2.1.0"
+    "bpmn-js-token-simulation": "0.10.0",
+    "min-dash": "3.5.2",
+    "xml-js": "1.6.11",
+    "@babel/parser": "7.7.4",
+    "throttle-debounce": "2.1.0"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "4.4.6",

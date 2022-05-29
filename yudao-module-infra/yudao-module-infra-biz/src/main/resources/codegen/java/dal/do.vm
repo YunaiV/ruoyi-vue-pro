@@ -30,7 +30,7 @@ public class ${table.className}DO extends BaseDO {
     #end
      */
     #if (${column.primaryKey})##处理主键
-    @TableId#if (${column.javaType} == 'String')type = IdType.INPUT)#end
+    @TableId#if (${column.javaType} == 'String')(type = IdType.INPUT)#end
     #end
     private ${column.javaType} ${column.javaField};
 #end

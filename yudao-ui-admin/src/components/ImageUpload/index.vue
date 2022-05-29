@@ -1,21 +1,21 @@
 <template>
   <div class="component-upload-image">
     <el-upload
-      multiple
-      :action="uploadImgUrl"
-      list-type="picture-card"
-      :on-success="handleUploadSuccess"
-      :before-upload="handleBeforeUpload"
-      :limit="limit"
-      :on-error="handleUploadError"
-      :on-exceed="handleExceed"
-      name="file"
-      :on-remove="handleRemove"
-      :show-file-list="true"
-      :headers="headers"
-      :file-list="fileList"
-      :on-preview="handlePictureCardPreview"
-      :class="{hide: this.fileList.length >= this.limit}"
+        multiple
+        :action="uploadFileUrl"
+        list-type="picture-card"
+        :on-success="handleUploadSuccess"
+        :before-upload="handleBeforeUpload"
+        :limit="limit"
+        :on-error="handleUploadError"
+        :on-exceed="handleExceed"
+        name="file"
+        :on-remove="handleRemove"
+        :show-file-list="true"
+        :headers="headers"
+        :file-list="fileList"
+        :on-preview="handlePictureCardPreview"
+        :class="{hide: this.fileList.length >= this.limit}"
     >
       <i class="el-icon-plus"></i>
     </el-upload>
@@ -29,21 +29,21 @@
     </div>
 
     <el-dialog
-      :visible.sync="dialogVisible"
-      title="预览"
-      width="800"
-      append-to-body
+        :visible.sync="dialogVisible"
+        title="预览"
+        width="800"
+        append-to-body
     >
       <img
-        :src="dialogImageUrl"
-        style="display: block; max-width: 100%; margin: 0 auto"
+          :src="dialogImageUrl"
+          style="display: block; max-width: 100%; margin: 0 auto"
       />
     </el-dialog>
   </div>
 </template>
 
 <script>
-import {getToken} from "@/utils/auth";
+import { getAccessToken } from "@/utils/auth";
 
 export default {
   props: {
@@ -76,12 +76,8 @@ export default {
       dialogImageUrl: "",
       dialogVisible: false,
       hideUpload: false,
-      // todo /infra/file/upload 返回的都是带 host 的可访问地址, baseUrl 有点没必要
-      baseUrl: process.env.VUE_APP_BASE_API,
-      uploadImgUrl: process.env.VUE_APP_BASE_API + "/admin-api/infra/file/upload", // 上传的图片服务器地址
-      headers: {
-        Authorization: "Bearer " + getToken(),
-      },
+      uploadFileUrl: process.env.VUE_APP_BASE_API + "/admin-api/infra/file/upload", // 请求地址
+      headers: { Authorization: "Bearer " + getAccessToken() }, // 设置上传的请求头部
       fileList: []
     };
   },
@@ -94,12 +90,8 @@ export default {
           // 然后将数组转为对象数组
           this.fileList = list.map(item => {
             if (typeof item === "string") {
-              // 不带有 http 的路径, 才拼接 baseUrl.
-              if (item.indexOf("http") === -1) {
-                item = {name: this.baseUrl + item, url: this.baseUrl + item};
-              } else {
-                item = {name: item, url: item};
-              }
+              // edit by 芋道源码
+              item = { name: item, url: item };
             }
             return item;
           });
@@ -129,7 +121,8 @@ export default {
     },
     // 上传成功回调
     handleUploadSuccess(res) {
-      this.uploadList.push({name: res.data.fileName, url: res.data.fileUrl});
+      // edit by 芋道源码
+      this.uploadList.push({ name: res.data, url: res.data });
       if (this.uploadList.length === this.number) {
         this.fileList = this.fileList.concat(this.uploadList);
         this.uploadList = [];
@@ -188,10 +181,9 @@ export default {
       let strs = "";
       separator = separator || ",";
       for (let i in list) {
-        // 由于 infra-file 返回带有 host , 不需要替换 baseUrl // .replace(this.baseUrl, "")
-        strs += list[i].url + separator;
+        strs += list[i].url.replace(this.baseUrl, "") + separator;
       }
-      return strs != '' ? strs.substr(0, strs.length - 1) : '';
+      return strs !== '' ? strs.substr(0, strs.length - 1) : '';
     }
   }
 };

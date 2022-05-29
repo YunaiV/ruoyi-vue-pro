@@ -75,13 +75,13 @@ export const SystemUserSocialTypeEnum = {
     title: "钉钉",
     type: 20,
     source: "dingtalk",
-    img: "https://cdn.jsdelivr.net/gh/justauth/justauth-oauth-logo@1.11/dingtalk.png",
+    img: "https://s1.ax1x.com/2022/05/22/OzMDRs.png",
   },
   WECHAT_ENTERPRISE: {
     title: "企业微信",
     type: 30,
     source: "wechat_enterprise",
-    img: "https://cdn.jsdelivr.net/gh/justauth/justauth-oauth-logo@1.11/wechat_enterprise.png",
+    img: "https://s1.ax1x.com/2022/05/22/OzMrzn.png",
   }
 }
 

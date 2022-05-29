@@ -20,6 +20,8 @@ public class SecurityConfiguration {
             public void customize(ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry registry) {
                 // 登录的接口
                 registry.antMatchers(buildAdminApi("/system/auth/login")).permitAll();
+                registry.antMatchers(buildAdminApi("/system/auth/logout")).permitAll();
+                registry.antMatchers(buildAdminApi("/system/auth/refresh-token")).permitAll();
                 // 社交登陆的接口
                 registry.antMatchers(buildAdminApi("/system/auth/social-auth-redirect")).permitAll();
                 registry.antMatchers(buildAdminApi("/system/auth/social-quick-login")).permitAll();
@@ -33,6 +35,9 @@ public class SecurityConfiguration {
                 registry.antMatchers(buildAdminApi("/system/tenant/get-id-by-name")).permitAll();
                 // 短信回调 API
                 registry.antMatchers(buildAdminApi("/system/sms/callback/**")).permitAll();
+                // OAuth2 API
+                registry.antMatchers(buildAdminApi("/system/oauth2/token")).permitAll();
+                registry.antMatchers(buildAdminApi("/system/oauth2/check-token")).permitAll();
             }
 
         };

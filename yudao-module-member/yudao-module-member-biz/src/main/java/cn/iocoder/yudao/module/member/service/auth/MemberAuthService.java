@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.member.service.auth;
 
-import cn.iocoder.yudao.framework.security.core.service.SecurityAuthFrameworkService;
 import cn.iocoder.yudao.module.member.controller.app.auth.vo.*;
 
 import javax.validation.Valid;
@@ -12,47 +11,46 @@ import javax.validation.Valid;
  *
  * @author 芋道源码
  */
-public interface MemberAuthService extends SecurityAuthFrameworkService {
+public interface MemberAuthService {
 
     /**
      * 手机 + 密码登录
      *
      * @param reqVO 登录信息
-     * @param userIp 用户 IP
-     * @param userAgent 用户 UA
-     * @return 身份令牌，使用 JWT 方式
+     * @return 登录结果
      */
-    String login(@Valid AppAuthLoginReqVO reqVO, String userIp, String userAgent);
+    AppAuthLoginRespVO login(@Valid AppAuthLoginReqVO reqVO);
+
+    /**
+     * 基于 token 退出登录
+     *
+     * @param token token
+     */
+    void logout(String token);
 
     /**
      * 手机 + 验证码登陆
      *
      * @param reqVO 登陆信息
-     * @param userIp 用户 IP
-     * @param userAgent 用户 UA
-     * @return 身份令牌，使用 JWT 方式
+     * @return 登录结果
      */
-    String smsLogin(@Valid AppAuthSmsLoginReqVO reqVO, String userIp, String userAgent);
+    AppAuthLoginRespVO smsLogin(@Valid AppAuthSmsLoginReqVO reqVO);
 
     /**
      * 社交登录，使用 code 授权码
      *
      * @param reqVO 登录信息
-     * @param userIp 用户 IP
-     * @param userAgent 用户 UA
-     * @return 身份令牌，使用 JWT 方式
+     * @return 登录结果
      */
-    String socialQuickLogin(@Valid AppAuthSocialQuickLoginReqVO reqVO, String userIp, String userAgent);
+    AppAuthLoginRespVO socialQuickLogin(@Valid AppAuthSocialQuickLoginReqVO reqVO);
 
     /**
      * 社交登录，使用 手机号 + 手机验证码
      *
      * @param reqVO 登录信息
-     * @param userIp 用户 IP
-     * @param userAgent 用户 UA
-     * @return 身份令牌，使用 JWT 方式
+     * @return 登录结果
      */
-    String socialBindLogin(@Valid AppAuthSocialBindLoginReqVO reqVO, String userIp, String userAgent);
+    AppAuthLoginRespVO socialBindLogin(@Valid AppAuthSocialBindLoginReqVO reqVO);
 
     /**
      * 获得社交认证 URL
@@ -84,4 +82,11 @@ public interface MemberAuthService extends SecurityAuthFrameworkService {
      */
     void sendSmsCode(Long userId, AppAuthSmsSendReqVO reqVO);
 
+    /**
+     * 刷新访问令牌
+     *
+     * @param refreshToken 刷新令牌
+     * @return 登录结果
+     */
+    AppAuthLoginRespVO refreshToken(String refreshToken);
 }

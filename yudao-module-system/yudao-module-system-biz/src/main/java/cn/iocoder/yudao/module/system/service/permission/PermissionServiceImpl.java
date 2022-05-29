@@ -3,13 +3,13 @@ package cn.iocoder.yudao.module.system.service.permission;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ArrayUtil;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
-import cn.iocoder.yudao.framework.datapermission.core.dept.service.dto.DeptDataPermissionRespDTO;
-import cn.iocoder.yudao.framework.security.core.LoginUser;
-import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
+import cn.iocoder.yudao.framework.datapermission.core.annotation.DataPermission;
 import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnore;
+import cn.iocoder.yudao.module.system.api.permission.dto.DeptDataPermissionRespDTO;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.MenuDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.RoleDO;
@@ -22,9 +22,14 @@ import cn.iocoder.yudao.module.system.dal.mysql.permission.UserRoleMapper;
 import cn.iocoder.yudao.module.system.enums.permission.DataScopeEnum;
 import cn.iocoder.yudao.module.system.mq.producer.permission.PermissionProducer;
 import cn.iocoder.yudao.module.system.service.dept.DeptService;
+import cn.iocoder.yudao.module.system.service.user.AdminUserService;
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Suppliers;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -36,20 +41,20 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.util.*;
+import java.util.function.Supplier;
+
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.getMaxValue;
+import static java.util.Collections.singleton;
 
 /**
  * 权限 Service 实现类
  *
  * @author 芋道源码
  */
-@Service("ss") // 使用 Spring Security 的缩写，方便食用
+@Service
 @Slf4j
 public class PermissionServiceImpl implements PermissionService {
-
-    /**
-     * LoginUser 的 Context 缓存 Key
-     */
-    public static final String CONTEXT_KEY = PermissionServiceImpl.class.getSimpleName();
 
     /**
      * 定时执行 {@link #schedulePeriodicRefresh()} 的周期
@@ -64,6 +69,8 @@ public class PermissionServiceImpl implements PermissionService {
      *
      * 这里声明 volatile 修饰的原因是，每次刷新时，直接修改指向
      */
+    @Getter
+    @Setter // 单元测试需要
     private volatile Multimap<Long, Long> roleMenuCache;
     /**
      * 菜单编号与角色编号的缓存映射
@@ -72,11 +79,30 @@ public class PermissionServiceImpl implements PermissionService {
      *
      * 这里声明 volatile 修饰的原因是，每次刷新时，直接修改指向
      */
+    @Getter
+    @Setter // 单元测试需要
     private volatile Multimap<Long, Long> menuRoleCache;
     /**
-     * 缓存菜单的最大更新时间，用于后续的增量轮询，判断是否有更新
+     * 缓存 RoleMenu 的最大更新时间，用于后续的增量轮询，判断是否有更新
      */
-    private volatile Date maxUpdateTime;
+    @Getter
+    private volatile Date roleMenuMaxUpdateTime;
+
+    /**
+     * 用户编号与角色编号的缓存映射
+     * key：用户编号
+     * value：角色编号的数组
+     *
+     * 这里声明 volatile 修饰的原因是，每次刷新时，直接修改指向
+     */
+    @Getter
+    @Setter // 单元测试需要
+    private volatile Map<Long, Set<Long>> userRoleCache;
+    /**
+     * 缓存 UserRole 的最大更新时间，用于后续的增量轮询，判断是否有更新
+     */
+    @Getter
+    private volatile Date userRoleMaxUpdateTime;
 
     @Resource
     private RoleMenuMapper roleMenuMapper;
@@ -93,6 +119,8 @@ public class PermissionServiceImpl implements PermissionService {
     private MenuService menuService;
     @Resource
     private DeptService deptService;
+    @Resource
+    private AdminUserService userService;
 
     @Resource
     private PermissionProducer permissionProducer;
@@ -101,15 +129,21 @@ public class PermissionServiceImpl implements PermissionService {
     @Lazy // 注入自己，所以延迟加载
     private PermissionService self;
 
-    /**
-     * 初始化 {@link #roleMenuCache} 和 {@link #menuRoleCache} 缓存
-     */
     @Override
     @PostConstruct
     @TenantIgnore // 初始化缓存，无需租户过滤
     public void initLocalCache() {
+        initUserRoleLocalCache();
+        initRoleMenuLocalCache();
+    }
+
+    /**
+     * 初始化 {@link #roleMenuCache} 和 {@link #menuRoleCache} 缓存
+     */
+    @VisibleForTesting
+    void initRoleMenuLocalCache() {
         // 获取角色与菜单的关联列表，如果有更新
-        List<RoleMenuDO> roleMenuList = loadRoleMenuIfUpdate(maxUpdateTime);
+        List<RoleMenuDO> roleMenuList = loadRoleMenuIfUpdate(roleMenuMaxUpdateTime);
         if (CollUtil.isEmpty(roleMenuList)) {
             return;
         }
@@ -123,8 +157,27 @@ public class PermissionServiceImpl implements PermissionService {
         });
         roleMenuCache = roleMenuCacheBuilder.build();
         menuRoleCache = menuRoleCacheBuilder.build();
-        maxUpdateTime = CollectionUtils.getMaxValue(roleMenuList, RoleMenuDO::getUpdateTime);
-        log.info("[initLocalCache][初始化角色与菜单的关联数量为 {}]", roleMenuList.size());
+        roleMenuMaxUpdateTime = getMaxValue(roleMenuList, RoleMenuDO::getUpdateTime);
+        log.info("[initRoleMenuLocalCache][初始化角色与菜单的关联数量为 {}]", roleMenuList.size());
+    }
+
+    /**
+     * 初始化 {@link #userRoleCache} 缓存
+     */
+    @VisibleForTesting
+    void initUserRoleLocalCache() {
+        // 获取用户与角色的关联列表，如果有更新
+        List<UserRoleDO> userRoleList = loadUserRoleIfUpdate(userRoleMaxUpdateTime);
+        if (CollUtil.isEmpty(userRoleList)) {
+            return;
+        }
+
+        // 初始化 userRoleCache 缓存
+        ImmutableMultimap.Builder<Long, Long> userRoleCacheBuilder = ImmutableMultimap.builder();
+        userRoleList.forEach(userRoleDO -> userRoleCacheBuilder.put(userRoleDO.getUserId(), userRoleDO.getRoleId()));
+        userRoleCache = CollectionUtils.convertMultiMap2(userRoleList, UserRoleDO::getUserId, UserRoleDO::getRoleId);
+        userRoleMaxUpdateTime = getMaxValue(userRoleList, UserRoleDO::getUpdateTime);
+        log.info("[initUserRoleLocalCache][初始化用户与角色的关联数量为 {}]", userRoleList.size());
     }
 
     @Scheduled(fixedDelay = SCHEDULER_PERIOD, initialDelay = SCHEDULER_PERIOD)
@@ -153,6 +206,27 @@ public class PermissionServiceImpl implements PermissionService {
         return roleMenuMapper.selectList();
     }
 
+    /**
+     * 如果用户与角色的关联发生变化，从数据库中获取最新的全量用户与角色的关联。
+     * 如果未发生变化，则返回空
+     *
+     * @param maxUpdateTime 当前角色与菜单的关联的最大更新时间
+     * @return 角色与菜单的关联列表
+     */
+    protected List<UserRoleDO> loadUserRoleIfUpdate(Date maxUpdateTime) {
+        // 第一步，判断是否要更新。
+        if (maxUpdateTime == null) { // 如果更新时间为空，说明 DB 一定有新数据
+            log.info("[loadUserRoleIfUpdate][首次加载全量用户与角色的关联]");
+        } else { // 判断数据库中是否有更新的用户与角色的关联
+            if (userRoleMapper.selectCountByUpdateTimeGt(maxUpdateTime) == 0) {
+                return null;
+            }
+            log.info("[loadUserRoleIfUpdate][增量加载全量用户与角色的关联]");
+        }
+        // 第二步，如果有更新，则从数据库加载所有用户与角色的关联
+        return userRoleMapper.selectList();
+    }
+
     @Override
     public List<MenuDO> getRoleMenuListFromCache(Collection<Long> roleIds, Collection<Integer> menuTypes,
                                                  Collection<Integer> menusStatuses) {
@@ -173,35 +247,38 @@ public class PermissionServiceImpl implements PermissionService {
     }
 
     @Override
-    public Set<Long> getUserRoleIds(Long userId, Collection<Integer> roleStatuses) {
-        List<UserRoleDO> userRoleList = userRoleMapper.selectListByUserId(userId);
+    public Set<Long> getUserRoleIdsFromCache(Long userId, Collection<Integer> roleStatuses) {
+        Set<Long> cacheRoleIds = userRoleCache.get(userId);
+        // 创建用户的时候没有分配角色，会存在空指针异常
+        if (CollUtil.isEmpty(cacheRoleIds)) {
+            return Collections.emptySet();
+        }
+        Set<Long> roleIds = new HashSet<>(cacheRoleIds);
         // 过滤角色状态
         if (CollectionUtil.isNotEmpty(roleStatuses)) {
-            userRoleList.removeIf(userRoleDO -> {
-                RoleDO role = roleService.getRoleFromCache(userRoleDO.getRoleId());
+            roleIds.removeIf(roleId -> {
+                RoleDO role = roleService.getRoleFromCache(roleId);
                 return role == null || !roleStatuses.contains(role.getStatus());
             });
         }
-        return CollectionUtils.convertSet(userRoleList, UserRoleDO::getRoleId);
+        return roleIds;
     }
 
     @Override
     public Set<Long> getRoleMenuIds(Long roleId) {
         // 如果是管理员的情况下，获取全部菜单编号
-        RoleDO role = roleService.getRole(roleId);
-        if (roleService.hasAnySuperAdmin(Collections.singletonList(role))) {
-            return CollectionUtils.convertSet(menuService.getMenus(), MenuDO::getId);
+        if (roleService.hasAnySuperAdmin(Collections.singleton(roleId))) {
+            return convertSet(menuService.getMenus(), MenuDO::getId);
         }
         // 如果是非管理员的情况下，获得拥有的菜单编号
-        return CollectionUtils.convertSet(roleMenuMapper.selectListByRoleId(roleId),
-                RoleMenuDO::getMenuId);
+        return convertSet(roleMenuMapper.selectListByRoleId(roleId), RoleMenuDO::getMenuId);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void assignRoleMenu(Long roleId, Set<Long> menuIds) {
         // 获得角色拥有菜单编号
-        Set<Long> dbMenuIds = CollectionUtils.convertSet(roleMenuMapper.selectListByRoleId(roleId),
+        Set<Long> dbMenuIds = convertSet(roleMenuMapper.selectListByRoleId(roleId),
                 RoleMenuDO::getMenuId);
         // 计算新增和删除的菜单编号
         Collection<Long> createMenuIds = CollUtil.subtract(menuIds, dbMenuIds);
@@ -231,20 +308,21 @@ public class PermissionServiceImpl implements PermissionService {
 
     @Override
     public Set<Long> getUserRoleIdListByUserId(Long userId) {
-        return CollectionUtils.convertSet(userRoleMapper.selectListByUserId(userId),
+        return convertSet(userRoleMapper.selectListByUserId(userId),
                 UserRoleDO::getRoleId);
     }
 
     @Override
-    public Set<Long> getUserRoleIdListByRoleId(Long roleId) {
-        return CollectionUtils.convertSet(userRoleMapper.selectListByRoleId(roleId),
-                UserRoleDO::getRoleId);
+    public Set<Long> getUserRoleIdListByRoleIds(Collection<Long> roleIds) {
+        return convertSet(userRoleMapper.selectListByRoleIds(roleIds),
+                UserRoleDO::getUserId);
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void assignUserRole(Long userId, Set<Long> roleIds) {
         // 获得角色拥有角色编号
-        Set<Long> dbRoleIds = CollectionUtils.convertSet(userRoleMapper.selectListByUserId(userId),
+        Set<Long> dbRoleIds = convertSet(userRoleMapper.selectListByUserId(userId),
                 UserRoleDO::getRoleId);
         // 计算新增和删除的角色编号
         Collection<Long> createRoleIds = CollUtil.subtract(roleIds, dbRoleIds);
@@ -261,6 +339,15 @@ public class PermissionServiceImpl implements PermissionService {
         if (!CollectionUtil.isEmpty(deleteMenuIds)) {
             userRoleMapper.deleteListByUserIdAndRoleIdIds(userId, deleteMenuIds);
         }
+        // 发送刷新消息. 注意，需要事务提交后，在进行发送刷新消息。不然 db 还未提交，结果缓存先刷新了
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+
+            @Override
+            public void afterCommit() {
+                permissionProducer.sendUserRoleRefreshMessage();
+            }
+
+        });
     }
 
     @Override
@@ -281,6 +368,7 @@ public class PermissionServiceImpl implements PermissionService {
             @Override
             public void afterCommit() {
                 permissionProducer.sendRoleMenuRefreshMessage();
+                permissionProducer.sendUserRoleRefreshMessage();
             }
 
         });
@@ -302,24 +390,28 @@ public class PermissionServiceImpl implements PermissionService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void processUserDeleted(Long userId) {
         userRoleMapper.deleteListByUserId(userId);
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+
+            @Override
+            public void afterCommit() {
+                permissionProducer.sendUserRoleRefreshMessage();
+            }
+
+        });
     }
 
     @Override
-    public boolean hasPermission(String permission) {
-        return hasAnyPermissions(permission);
-    }
-
-    @Override
-    public boolean hasAnyPermissions(String... permissions) {
+    public boolean hasAnyPermissions(Long userId, String... permissions) {
         // 如果为空，说明已经有权限
         if (ArrayUtil.isEmpty(permissions)) {
             return true;
         }
 
         // 获得当前登录的角色。如果为空，说明没有权限
-        Set<Long> roleIds = SecurityFrameworkUtils.getLoginUserRoleIds();
+        Set<Long> roleIds = getUserRoleIdsFromCache(userId, singleton(CommonStatusEnum.ENABLE.getStatus()));
         if (CollUtil.isEmpty(roleIds)) {
             return false;
         }
@@ -342,19 +434,14 @@ public class PermissionServiceImpl implements PermissionService {
     }
 
     @Override
-    public boolean hasRole(String role) {
-        return hasAnyRoles(role);
-    }
-
-    @Override
-    public boolean hasAnyRoles(String... roles) {
+    public boolean hasAnyRoles(Long userId, String... roles) {
         // 如果为空，说明已经有权限
         if (ArrayUtil.isEmpty(roles)) {
             return true;
         }
 
         // 获得当前登录的角色。如果为空，说明没有权限
-        Set<Long> roleIds = SecurityFrameworkUtils.getLoginUserRoleIds();
+        Set<Long> roleIds = getUserRoleIdsFromCache(userId, singleton(CommonStatusEnum.ENABLE.getStatus()));
         if (CollUtil.isEmpty(roleIds)) {
             return false;
         }
@@ -362,22 +449,28 @@ public class PermissionServiceImpl implements PermissionService {
         if (roleService.hasAnySuperAdmin(roleIds)) {
             return true;
         }
-        Set<String> userRoles = CollectionUtils.convertSet(roleService.getRolesFromCache(roleIds),
+        Set<String> userRoles = convertSet(roleService.getRolesFromCache(roleIds),
                 RoleDO::getCode);
         return CollUtil.containsAny(userRoles, Sets.newHashSet(roles));
     }
 
     @Override
-    public DeptDataPermissionRespDTO getDeptDataPermission(LoginUser loginUser) {
-        // 判断是否 context 已经缓存
-        DeptDataPermissionRespDTO result = loginUser.getContext(CONTEXT_KEY, DeptDataPermissionRespDTO.class);
-        if (result != null) {
+    @DataPermission(enable = false) // 关闭数据权限，不然就会出现递归获取数据权限的问题
+    @TenantIgnore // 忽略多租户的自动过滤。如果不忽略，会导致添加租户时，因为切换租户，导致获取不到 User。即使忽略，本身该方法不存在跨租户的操作，不会存在问题。
+    public DeptDataPermissionRespDTO getDeptDataPermission(Long userId) {
+        // 获得用户的角色
+        Set<Long> roleIds = getUserRoleIdsFromCache(userId, singleton(CommonStatusEnum.ENABLE.getStatus()));
+        // 如果角色为空，则只能查看自己
+        DeptDataPermissionRespDTO result = new DeptDataPermissionRespDTO();
+        if (CollUtil.isEmpty(roleIds)) {
+            result.setSelf(true);
             return result;
         }
+        List<RoleDO> roles = roleService.getRolesFromCache(roleIds);
 
-        // 创建 DeptDataPermissionRespDTO 对象
-        result = new DeptDataPermissionRespDTO();
-        List<RoleDO> roles = roleService.getRolesFromCache(loginUser.getRoleIds());
+        // 获得用户的部门编号的缓存，通过 Guava 的 Suppliers 惰性求值，即有且仅有第一次发起 DB 的查询
+        Supplier<Long> userDeptIdCache = Suppliers.memoize(() -> userService.getUser(userId).getDeptId());
+        // 遍历每个角色，计算
         for (RoleDO role : roles) {
             // 为空时，跳过
             if (role.getDataScope() == null) {
@@ -393,20 +486,20 @@ public class PermissionServiceImpl implements PermissionService {
                 CollUtil.addAll(result.getDeptIds(), role.getDataScopeDeptIds());
                 // 自定义可见部门时，保证可以看到自己所在的部门。否则，一些场景下可能会有问题。
                 // 例如说，登录时，基于 t_user 的 username 查询会可能被 dept_id 过滤掉
-                CollUtil.addAll(result.getDeptIds(), loginUser.getDeptId());
+                CollUtil.addAll(result.getDeptIds(), userDeptIdCache.get());
                 continue;
             }
             // 情况三，DEPT_ONLY
             if (Objects.equals(role.getDataScope(), DataScopeEnum.DEPT_ONLY.getScope())) {
-                CollectionUtils.addIfNotNull(result.getDeptIds(), loginUser.getDeptId());
+                CollectionUtils.addIfNotNull(result.getDeptIds(), userDeptIdCache.get());
                 continue;
             }
             // 情况四，DEPT_DEPT_AND_CHILD
             if (Objects.equals(role.getDataScope(), DataScopeEnum.DEPT_AND_CHILD.getScope())) {
-                List<DeptDO> depts = deptService.getDeptsByParentIdFromCache(loginUser.getDeptId(), true);
+                List<DeptDO> depts = deptService.getDeptsByParentIdFromCache(userDeptIdCache.get(), true);
                 CollUtil.addAll(result.getDeptIds(), CollectionUtils.convertList(depts, DeptDO::getId));
-                //添加本身部门id
-                CollUtil.addAll(result.getDeptIds(), loginUser.getDeptId());
+                // 添加本身部门编号
+                CollUtil.addAll(result.getDeptIds(), userDeptIdCache.get());
                 continue;
             }
             // 情况五，SELF
@@ -415,18 +508,9 @@ public class PermissionServiceImpl implements PermissionService {
                 continue;
             }
             // 未知情况，error log 即可
-            log.error("[getDeptDataPermission][LoginUser({}) role({}) 无法处理]", loginUser.getId(), JsonUtils.toJsonString(result));
+            log.error("[getDeptDataPermission][LoginUser({}) role({}) 无法处理]", userId, JsonUtils.toJsonString(result));
         }
-
-        // 添加到缓存，并返回
-        loginUser.setContext(CONTEXT_KEY, result);
         return result;
-    }
-
-    @Override
-    public Set<Long> getUserRoleIdListByRoleIds(Collection<Long> roleIds) {
-        return CollectionUtils.convertSet(userRoleMapper.selectListByRoleIds(roleIds),
-                UserRoleDO::getUserId);
     }
 
 }

@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.framework.tenant.core.web;
 
-import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
+import cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -24,9 +24,9 @@ public class TenantContextWebFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
         // 设置
-        String tenantId = request.getHeader(HEADER_TENANT_ID);
-        if (StrUtil.isNotEmpty(tenantId)) {
-            TenantContextHolder.setTenantId(Long.valueOf(tenantId));
+        Long tenantId = WebFrameworkUtils.getTenantId(request);
+        if (tenantId != null) {
+            TenantContextHolder.setTenantId(tenantId);
         }
         try {
             chain.doFilter(request, response);

@@ -54,7 +54,7 @@
       <el-table-column label="描述" align="center" prop="description"/>
       <el-table-column label="标签" align="center" prop="tags">
         <template slot-scope="scope">
-          <el-tag :disable-transitions="true" v-for="(tag, index) in scope.row.tags" :index="index">
+          <el-tag :disable-transitions="true" :key="index" v-for="(tag, index) in scope.row.tags" :index="index">
             {{ tag }}
           </el-tag>
         </template>
