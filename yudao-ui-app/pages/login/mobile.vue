@@ -37,7 +37,7 @@
         </u-form-item>
 
         <view class="btn-group">
-          <u-button class="auth-btn" type="primary" customStyle="margin-top: 50px" @click="handleSubmit">登录/注册</u-button>
+          <u-button class="auth-btn" type="primary" customStyle="margin-top: 50px" @click="handleSubmit">立即登录</u-button>
         </view>
       </u--form>
     </view>
