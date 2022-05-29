@@ -47,7 +47,7 @@ public class AppUserController {
         if (file.isEmpty()) {
             throw exception(FILE_IS_EMPTY);
         }
-        String avatar = userService.updateUserAvatar(getLoginUserId(), file.getInputStream());
+        String avatar = userService.updateUserAvatar(getLoginUserId(), file.getOriginalFilename(), file.getInputStream());
         return success(avatar);
     }
 

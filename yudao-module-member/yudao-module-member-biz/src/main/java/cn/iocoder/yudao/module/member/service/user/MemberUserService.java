@@ -57,10 +57,11 @@ public interface MemberUserService {
     /**
      * 修改用户头像
      * @param userId 用户id
+     * @param originalName 原文件名
      * @param inputStream 头像文件
      * @return 头像url
      */
-    String updateUserAvatar(Long userId, InputStream inputStream) throws Exception;
+    String updateUserAvatar(Long userId, String originalName, InputStream inputStream) throws Exception;
 
     /**
      * 修改手机

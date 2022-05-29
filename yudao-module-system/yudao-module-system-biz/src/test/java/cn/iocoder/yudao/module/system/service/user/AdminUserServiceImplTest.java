@@ -225,10 +225,11 @@ public class AdminUserServiceImplTest extends BaseDbUnitTest {
         ByteArrayInputStream avatarFile = new ByteArrayInputStream(avatarFileBytes);
         // mock 方法
         String avatar = randomString();
-        when(fileApi.createFile(eq(avatarFileBytes))).thenReturn(avatar);
+        String originalName = "单测文件名";
+        when(fileApi.createFile(originalName, eq( avatarFileBytes))).thenReturn(avatar);
 
         // 调用
-        userService.updateUserAvatar(userId, avatarFile);
+        userService.updateUserAvatar(userId, originalName, avatarFile);
         // 断言
         AdminUserDO user = userMapper.selectById(userId);
         assertEquals(avatar, user.getAvatar());

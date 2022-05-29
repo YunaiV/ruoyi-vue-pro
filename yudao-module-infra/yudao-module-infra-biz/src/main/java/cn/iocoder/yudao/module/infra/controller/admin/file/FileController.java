@@ -40,13 +40,11 @@ public class FileController {
     @PostMapping("/upload")
     @ApiOperation("上传文件")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "file", value = "文件附件", required = true, dataTypeClass = MultipartFile.class),
-            @ApiImplicitParam(name = "path", value = "文件路径", example = "yudaoyuanma.png", dataTypeClass = String.class)
+            @ApiImplicitParam(name = "file", value = "文件附件", required = true, dataTypeClass = MultipartFile.class)
     })
     @OperateLog(logArgs = false) // 上传文件，没有记录操作日志的必要
-    public CommonResult<String> uploadFile(@RequestParam("file") MultipartFile file,
-                                           @RequestParam(value = "path", required = false) String path) throws Exception {
-        return success(fileService.createFile(path, IoUtil.readBytes(file.getInputStream())));
+    public CommonResult<String> uploadFile(@RequestParam("file") MultipartFile file) throws Exception {
+        return success(fileService.createFile(file.getOriginalFilename(), IoUtil.readBytes(file.getInputStream())));
     }
 
     @DeleteMapping("/delete")

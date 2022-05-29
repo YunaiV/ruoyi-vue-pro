@@ -62,9 +62,10 @@ public interface AdminUserService {
      * 更新用户头像
      *
      * @param id         用户 id
+     * @param originalName 原文件名称
      * @param avatarFile 头像文件
      */
-    String updateUserAvatar(Long id, InputStream avatarFile) throws Exception;
+    String updateUserAvatar(Long id, String originalName, InputStream avatarFile) throws Exception;
 
     /**
      * 修改密码
